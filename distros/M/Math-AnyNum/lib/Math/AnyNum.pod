@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =head1 SYNOPSIS
 
@@ -2782,7 +2782,7 @@ Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2025 Daniel Șuteu
+Copyright (C) 2017-2026 Daniel Șuteu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

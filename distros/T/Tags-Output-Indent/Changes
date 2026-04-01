@@ -1,3 +1,20 @@
+0.13 2026-03-31T21:08:23+02:00
+ - Add example to doc.
+ - Enable skipped test and add some test messages.
+ - Fix issue with presered element.
+ - Fix issue with whitespace in data, this was related to Indent::Word.
+
+0.12 2026-03-31T18:12:29+02:00
+ - Skip buggy test.
+
+0.11 2026-03-31T18:08:05+02:00
+ - Add test messages.
+ - Add tests for preservation.
+ - Add xml parameter to doc.
+ - Rename example to better name.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.10 2023-01-09T11:38:05+01:00
  - Add test messages.
  - Rewrite from List::MoreUtils to List::Util.

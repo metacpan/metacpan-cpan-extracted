@@ -27,6 +27,7 @@ use Folder;
 
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
+chdir $home or die "Unable to chdir to $home: $!";
 my $paths = Developer::Dashboard::PathRegistry->new(
     home            => $home,
     workspace_roots => [ File::Spec->catdir( $home, 'workspace' ) ],

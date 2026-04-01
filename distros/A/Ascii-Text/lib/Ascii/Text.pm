@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Rope;
 use Rope::Autoload;
@@ -26,6 +26,13 @@ property max_width => (
 	}
 );
 
+property override_empty_space => (
+	initable => 1,
+	writeable => 1,
+	type => Int,
+	value => 0
+);
+	
 property pad => (
 	initable => 1,
 	writeable => 1,
@@ -131,7 +138,7 @@ function render => sub {
 		}
 		if ($words[0]) {
 			@characters = split //, $words[0];
-			my $space = $class->space;
+			my $space = $self->_empty_space($class) || $class->space;
 			my $required_width = scalar @{$space->[0]};
 			$required_width += @{$character_map{$_}->[0]} for @characters;
 			if ($width > $required_width) {
@@ -189,6 +196,24 @@ function print_line => sub {
 	}
 };
 
+
+function list => sub {
+	my ($self) = @_;
+	my $base_path = __FILE__;
+	$base_path =~ s/.pm$//;
+	$base_path .= '/Font';
+	opendir my $dir, $base_path or die $!;
+	my @files = sort grep { $_ =~ s/\.pm$//; $_ !~ m/^\./ } readdir $dir;
+	closedir $dir;
+	return @files;
+};
+
+function _empty_space => sub {
+	my ($self, $font) = @_;
+	return unless $self->override_empty_space;
+	return [$font->default_character($self->override_empty_space)];
+};
+
 1;
 
 __END__
@@ -199,7 +224,7 @@ Ascii::Text - module for generating ASCII text in various fonts and styles
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
@@ -297,6 +322,12 @@ Override the default ANSI color map.
 		...
 	});
 
+=head2 override_empty_space
+
+Override the empty space between words
+
+	$ascii->override_empty_space(3);
+
 =head2 fh
 
 A filehandle to print the ascii text.
@@ -304,6 +335,15 @@ A filehandle to print the ascii text.
 	open my $fh, '>', 'test.txt';
 	$ascii->fh($fh);
 	$ascii->("Hello World");
+
+=head2 list
+
+List all fonts available
+
+	$ascii->list
+
+=head2
+
 
 =head1 AUTHOR
 

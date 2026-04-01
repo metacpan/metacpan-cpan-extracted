@@ -76,10 +76,72 @@ void
 init(self)
     PerlChandra *self
 CODE:
+{
+    SV *self_sv = ST(0);
+
+    /* Set up Bind registry + dispatch callback */
+    {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(self_sv);
+        PUTBACK;
+        call_pv("Chandra::_xs_init_bind", G_DISCARD);
+        FREETMPS;
+        LEAVE;
+    }
+
+    /* Initialize webview */
     if (webview_init(&self->wv) != 0) {
         croak("Failed to initialize webview");
     }
     self->initialized = 1;
+
+    /* Inject bridge JS */
+    {
+        dSP;
+        int count;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::Bridge")));
+        PUTBACK;
+        count = call_method("js_code", G_SCALAR);
+        SPAGAIN;
+        if (count > 0) {
+            SV *js_sv = POPs;
+            const char *js = SvPV_nolen(js_sv);
+            webview_eval(&self->wv, js);
+        }
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+}
+
+SV *
+bind(self_sv, name_sv, callback)
+    SV *self_sv
+    SV *name_sv
+    SV *callback
+CODE:
+{
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(self_sv);
+    XPUSHs(name_sv);
+    XPUSHs(callback);
+    PUTBACK;
+    call_pv("Chandra::_xs_bind_method", G_DISCARD);
+    FREETMPS;
+    LEAVE;
+    RETVAL = SvREFCNT_inc(self_sv);
+}
+OUTPUT:
+    RETVAL
 
 int
 loop(self, ...)
@@ -276,3 +338,165 @@ set_color(self, r, g, b, a)
     int a
 CODE:
     webview_set_color(&self->wv, (uint8_t)r, (uint8_t)g, (uint8_t)b, (uint8_t)a);
+
+void
+_xs_dispatch(json_str)
+    SV *json_str
+CODE:
+{
+    SV *bind = get_sv("Chandra::_xs_bind", 0);
+    if (!bind || !SvOK(bind)) XSRETURN_EMPTY;
+
+    {
+        dSP;
+        int count;
+        SV *result;
+
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(bind);
+        XPUSHs(json_str);
+        PUTBACK;
+        count = call_method("dispatch", G_SCALAR);
+        SPAGAIN;
+        result = (count > 0) ? POPs : &PL_sv_undef;
+
+        if (SvOK(result) && SvROK(result) && SvTYPE(SvRV(result)) == SVt_PVHV) {
+            HV *res_hv = (HV *)SvRV(result);
+            SV **id_svp = hv_fetchs(res_hv, "id", 0);
+
+            if (id_svp && SvOK(*id_svp)) {
+                HV *bind_hv = (HV *)SvRV(bind);
+                SV **app_svp = hv_fetchs(bind_hv, "app", 0);
+
+                if (app_svp && SvOK(*app_svp)) {
+                    SV **result_svp = hv_fetchs(res_hv, "result", 0);
+                    SV **error_svp = hv_fetchs(res_hv, "error", 0);
+                    SV *js_sv;
+
+                    /* $bind->js_resolve($id, $result, $error) */
+                    PUSHMARK(SP);
+                    XPUSHs(bind);
+                    XPUSHs(*id_svp);
+                    XPUSHs(result_svp ? *result_svp : &PL_sv_undef);
+                    XPUSHs(error_svp ? *error_svp : &PL_sv_undef);
+                    PUTBACK;
+                    count = call_method("js_resolve", G_SCALAR);
+                    SPAGAIN;
+                    js_sv = (count > 0) ? newSVsv(POPs) : NULL;
+                    PUTBACK;
+
+                    if (js_sv) {
+                        /* $app->dispatch_eval_js($js) */
+                        PUSHMARK(SP);
+                        XPUSHs(*app_svp);
+                        XPUSHs(sv_2mortal(js_sv));
+                        PUTBACK;
+                        call_method("dispatch_eval_js", G_DISCARD);
+                    }
+                }
+            }
+        }
+
+        FREETMPS; LEAVE;
+    }
+}
+
+void
+_xs_init_bind(self)
+    SV *self
+CODE:
+{
+    SV *bind = get_sv("Chandra::_xs_bind", 0);
+    int need_new = 1;
+
+    if (bind && SvOK(bind) && SvROK(bind)) {
+        HV *bind_hv = (HV *)SvRV(bind);
+        SV **app_svp = hv_fetchs(bind_hv, "app", 0);
+        if (app_svp && SvOK(*app_svp)
+            && SvRV(*app_svp) == SvRV(self)) {
+            /* Same app object — reuse existing bind */
+            (void)hv_stores(bind_hv, "app", newSVsv(self));
+            need_new = 0;
+        }
+    }
+
+    if (need_new) {
+        /* Chandra::Bind->new(app => $self) */
+        dSP;
+        int count;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::Bind")));
+        XPUSHs(sv_2mortal(newSVpvs("app")));
+        XPUSHs(self);
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        if (count > 0) {
+            SV *new_bind = newSVsv(POPs);
+            sv_setsv(get_sv("Chandra::_xs_bind", GV_ADD), new_bind);
+            SvREFCNT_dec(new_bind);
+        }
+        PUTBACK;
+        FREETMPS; LEAVE;
+    }
+
+    /* $self->_set_callback(\&Chandra::_xs_dispatch) */
+    {
+        dSP;
+        CV *dispatch_cv = get_cv("Chandra::_xs_dispatch", 0);
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(self);
+        XPUSHs(sv_2mortal(newRV_inc((SV *)dispatch_cv)));
+        PUTBACK;
+        call_method("_set_callback", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+}
+
+void
+_xs_bind_method(self, name, sub)
+    SV *self
+    SV *name
+    SV *sub
+CODE:
+{
+    SV *bind = get_sv("Chandra::_xs_bind", 0);
+
+    /* Ensure bind exists */
+    if (!bind || !SvOK(bind)) {
+        dSP;
+        int count;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::Bind")));
+        XPUSHs(sv_2mortal(newSVpvs("app")));
+        XPUSHs(self);
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        if (count > 0) {
+            SV *new_bind = newSVsv(POPs);
+            sv_setsv(get_sv("Chandra::_xs_bind", GV_ADD), new_bind);
+            SvREFCNT_dec(new_bind);
+        }
+        PUTBACK;
+        FREETMPS; LEAVE;
+        bind = get_sv("Chandra::_xs_bind", 0);
+    }
+
+    /* $bind->bind($name, $sub) */
+    {
+        dSP;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(bind);
+        XPUSHs(name);
+        XPUSHs(sub);
+        PUTBACK;
+        call_method("bind", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+}

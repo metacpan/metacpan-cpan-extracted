@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use 5.006;
 use strict;
@@ -12,7 +12,7 @@ WriteMakefile(
     ABSTRACT_FROM      => 'lib/Map/Tube/CLI.pm',
     LICENSE            => 'artistic_2',
     EXE_FILES          => [ 'script/map-tube' ],
-    MIN_PERL_VERSION   => 5.006,
+    MIN_PERL_VERSION   => 5.014,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -27,8 +27,10 @@ WriteMakefile(
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
         'MIME::Base64'         => '3.14',
-        'Map::Tube::Exception' => '3.17',
-        'Map::Tube'            => '3.96',
+        'Map::Tube::Exception' => '3.24',
+        'Map::Tube'            => '4.10',
+        'Carp'                 => 0,
+        'Path::Tiny'           => 0,
         'Encode::Locale'       => '1.05',
         'Text::ASCIITable'     => '0.22',
         'utf8::all'            => '0.024',
@@ -38,14 +40,23 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::CLI'         => { file => 'lib/Map/Tube/CLI.pm'       , version => '0.83' },
-            'Map::Tube::CLI::Option' => { file => 'lib/Map/Tube/CLI/Option.pm', version => '0.83' },
+            'Map::Tube::CLI' => {
+                file    => 'lib/Map/Tube/CLI.pm',
+                version => MM->parse_version('lib/Map/Tube/CLI.pm')
+            },
+            'Map::Tube::CLI::Option' => {
+                file    => 'lib/Map/Tube/CLI/Option.pm',
+                version => MM->parse_version('lib/Map/Tube/CLI/Option.pm')
+            },
         },
         resources => {
             repository => {
                 type => 'git',
                 url  => 'https://github.com/manwar/Map-Tube-CLI.git',
                 web  => 'https://github.com/manwar/Map-Tube-CLI',
+            },
+            bugtracker => {
+                web    => 'https://github.com/manwar/Map-Tube-CLI/issues'
             },
         }})
      : ()

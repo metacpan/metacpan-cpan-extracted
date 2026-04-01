@@ -1,13 +1,13 @@
 ---
 abstract: 'Implementation of various techniques used in data compression.'
 author:
-  - 'Daniel Șuteu <trizen@cpan.org>'
+  - 'Daniel Șuteu'
 build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150012'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Compression-Util
 provides:
   Compression::Util:
     file: lib/Compression/Util.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -28,5 +28,5 @@ resources:
   homepage: https://github.com/trizen/Compression-Util
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Compression-Util
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

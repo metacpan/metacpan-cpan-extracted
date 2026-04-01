@@ -82,72 +82,72 @@ BEGIN { mb::require 'Perl::Module'; Perl::Module->unimport; };
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 15
 mb::use  # comment-1
- 
+
 # comment-2
-  
+
  # comment-3
   # comment-4
-   
+
 Perl::Module   # comment-5
-    
+
 # comment-6
-     
+
  # comment-7
   # comment-8
    # comment-9
-      
+
 5.00503    # comment-10
-       
+
 # comment-11
-        
+
  # comment-12
   # comment-13
    # comment-14
     # comment-15
-         
+
 qw(foo bar boo);     # comment-16
-          
+
 # comment-17
-           
+
  # comment-18
   # comment-19
    # comment-20
     # comment-21
-            
+
 END1
 BEGIN { mb::require  # comment-1
- 
+
 # comment-2
-  
+
  # comment-3
   # comment-4
-   
+
 'Perl::Module';   # comment-5
-    
+
 # comment-6
-     
+
  # comment-7
   # comment-8
    # comment-9
-      
+
 Perl::Module->VERSION(5.00503);    # comment-10
-       
+
 # comment-11
-        
+
  # comment-12
   # comment-13
    # comment-14
     # comment-15
-         
+
  Perl::Module->import(qw(foo bar boo)); };     # comment-16
-          
+
 # comment-17
-           
+
  # comment-18
   # comment-19
    # comment-20
     # comment-21
-            
+
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 16
 mb::use Perl::Module 5.00503 qw(;);

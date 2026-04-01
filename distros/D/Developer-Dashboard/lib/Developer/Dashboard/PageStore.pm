@@ -1,10 +1,12 @@
 package Developer::Dashboard::PageStore;
-$Developer::Dashboard::PageStore::VERSION = '0.72';
+$Developer::Dashboard::PageStore::VERSION = '0.94';
 use strict;
 use warnings;
 
+use File::Find ();
 use File::Spec;
-use File::Basename qw(basename);
+use File::Basename qw(basename dirname);
+use File::Path qw(make_path);
 use URI::Escape qw(uri_escape);
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
@@ -42,6 +44,8 @@ sub save_page {
 
     my $id = $page->as_hash->{id} || die 'Saved pages require an id';
     my $file = $self->page_file($id);
+    my $dir = dirname($file);
+    make_path($dir) if !-d $dir;
     open my $fh, '>', $file or die "Unable to save $file: $!";
     print {$fh} $page->canonical_instruction;
     close $fh;
@@ -54,11 +58,9 @@ sub save_page {
 # Output: Developer::Dashboard::PageDocument object.
 sub load_saved_page {
     my ( $self, $id ) = @_;
-    my $file = $self->page_file($id);
-    die "Page '$id' not found" if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    my $page = Developer::Dashboard::PageDocument->from_instruction(<$fh>);
+    my $file = $self->_existing_page_file($id);
+    die "Page '$id' not found" if !$file;
+    my $page = $self->_load_page_file($file);
     $page->{id} ||= $id;
     $page->{meta}{source_kind} = 'saved';
     return $page;
@@ -70,8 +72,8 @@ sub load_saved_page {
 # Output: raw file content string.
 sub read_saved_entry {
     my ( $self, $id ) = @_;
-    my $file = $self->page_file($id);
-    die "Page '$id' not found" if !-f $file;
+    my $file = $self->_existing_page_file($id);
+    die "Page '$id' not found" if !$file;
     open my $fh, '<', $file or die "Unable to read $file: $!";
     local $/;
     return <$fh>;
@@ -137,19 +139,18 @@ sub source_url {
 # Output: sorted list of page id strings.
 sub list_saved_pages {
     my ($self) = @_;
-    my $root = $self->{paths}->dashboards_root;
-    opendir my $dh, $root or return;
-
-    my @ids;
-    while ( my $entry = readdir $dh ) {
-        next if $entry eq '.' || $entry eq '..';
-        next if -d File::Spec->catfile( $root, $entry );
-        my $ok = eval { $self->load_saved_page($entry); 1 };
-        push @ids, $entry if $ok;
+    my %ids;
+    for my $root ( reverse $self->{paths}->dashboards_roots ) {
+        for my $entry ( $self->_saved_page_entries_for_root($root) ) {
+            my $id = $entry->{id};
+            next if !defined $id || $id eq '';
+            my $ok = eval { $self->_load_page_file( $entry->{file} ); 1 };
+            next if !$ok;
+            $ids{$id} = 1;
+        }
     }
-    closedir $dh;
 
-    return sort @ids;
+    return sort keys %ids;
 }
 
 # migrate_legacy_json_pages()
@@ -183,6 +184,66 @@ sub migrate_legacy_json_pages {
     }
     closedir $dh;
     return \@migrated;
+}
+
+# _page_file_candidates($id)
+# Returns candidate bookmark file paths for a page id in lookup order.
+# Input: page id string.
+# Output: ordered list of bookmark file path strings.
+sub _page_file_candidates {
+    my ( $self, $id ) = @_;
+    return map { File::Spec->catfile( $_, $id ) } $self->{paths}->dashboards_roots;
+}
+
+# _existing_page_file($id)
+# Resolves the first existing bookmark file path for a page id.
+# Input: page id string.
+# Output: bookmark file path string or undef when missing.
+sub _existing_page_file {
+    my ( $self, $id ) = @_;
+    for my $file ( $self->_page_file_candidates($id) ) {
+        return $file if -f $file;
+    }
+    return;
+}
+
+# _load_page_file($file)
+# Loads and parses one bookmark file from disk.
+# Input: bookmark file path string.
+# Output: Developer::Dashboard::PageDocument object.
+sub _load_page_file {
+    my ( $self, $file ) = @_;
+    open my $fh, '<', $file or die "Unable to read $file: $!";
+    local $/;
+    return Developer::Dashboard::PageDocument->from_instruction(<$fh>);
+}
+
+# _saved_page_entries_for_root($root)
+# Recursively lists bookmark file entries under one saved-page root.
+# Input: bookmark root directory path string.
+# Output: list of hash references with id and file keys.
+sub _saved_page_entries_for_root {
+    my ( $self, $root ) = @_;
+    return if !defined $root || !-d $root;
+
+    my @entries;
+    File::Find::find(
+        {
+            no_chdir => 1,
+            wanted   => sub {
+                return if !-f $_;
+                my $rel = File::Spec->abs2rel( $File::Find::name, $root );
+                $rel =~ s{\\}{/}g;
+                push @entries, {
+                    id   => $rel,
+                    file => $File::Find::name,
+                };
+            },
+        },
+        $root,
+    );
+
+    return @entries;
 }
 
 1;

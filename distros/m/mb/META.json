@@ -1,6 +1,6 @@
 {
     "name" : "mb",
-    "version" : "0.59",
+    "version" : "0.60",
     "abstract" : "Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...",
     "author" : [
         "ina <ina@cpan.org>"
@@ -19,61 +19,45 @@
         "license" : [
             "http://dev.perl.org/licenses/"
         ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/mb/issues"
+        },
         "repository" : {
-            "url" : "https://github.com/ina-cpan/mb"
+            "url"  : "https://github.com/ina-cpan/mb",
+            "web"  : "https://github.com/ina-cpan/mb",
+            "type" : "git"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "Cwd" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "File::Spec" : "0",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "strict" : "1.01"
             }
         },
         "configure" : {
             "requires" : {
-                "Cwd" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "File::Spec" : "0",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "strict" : "1.01"
             }
         },
         "runtime" : {
             "requires" : {
-                "Cwd" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "File::Spec" : "0",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "strict" : "1.01"
             }
+        },
+        "test" : {
+            "requires" : {
+                "perl" : "5.00503",
+                "strict" : "1.01"
+            }
+        }
+    },
+    "provides" : {
+        "mb" : {
+            "file" : "lib/mb.pm",
+            "version" : "0.60"
         }
     }
 }

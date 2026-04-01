@@ -1,5 +1,13 @@
 Revision history for Compression-Util
 
+0.16    2026-03-31
+
+        [IMPROVEMENTS]
+
+        - Better performance in `bwt_sort()` for certain inputs. (~2x faster)
+        - Better performance in `bwt_decode()`, `huffman_decode()` and `huffman_from_freq()`.
+        - Better performance in `lzss_decode()`.
+
 0.15    2025-04-03
 
         [BUG-FIXES]

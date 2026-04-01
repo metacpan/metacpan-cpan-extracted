@@ -18,7 +18,10 @@ METHODS
 
             Transformation version.
 
-            Default value is '2.6.0'.
+            Default value is '3.0.0'.
+
+            Possible values are: '2.6.0', '2.7.0', '2.8.0', '2.8.1',
+            '2.9.0', '2.10.0' and '3.0.0'.
 
             Default value is undef.
 
@@ -26,7 +29,7 @@ METHODS
 
             XSLT transformation file.
 
-            Default value is XSLT transformation file for '2.6.0' version.
+            Default value is XSLT transformation file for '3.0.0' version.
 
     Returns instance of object.
 
@@ -68,7 +71,7 @@ EXAMPLE
      print $version."\n";
 
      # Output:
-     # 2.6.0
+     # 3.0.0
 
 DEPENDENCIES
     Class::Utils, Error::Pure, File::Share, XML::LibXML, XML::LibXSLT.
@@ -107,5 +110,5 @@ ACKNOWLEDGEMENTS
     Linked Open Data.
 
 VERSION
-    0.05
+    0.06
 

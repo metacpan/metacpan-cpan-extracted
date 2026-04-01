@@ -11,7 +11,7 @@ use XML::LibXML;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Flush tags in object.
 sub flush {
@@ -249,11 +249,11 @@ __END__
  Example:
  'data_callback' => sub {
          my $data_ar = shift;
-	 foreach my $data (@{$data_ar}) {
+         foreach my $data (@{$data_ar}) {
 
-	         # Some process.
-	         $data =~ s/^\s*//ms;
-	 }
+                 # Some process.
+                 $data =~ s/^\s*//ms;
+         }
  }
 
 =item * C<encoding>
@@ -330,6 +330,8 @@ __END__
 
 =head1 EXAMPLE1
 
+=for comment filename=simple_example.pl
+
  use strict;
  use warnings;
 
@@ -341,8 +343,8 @@ __END__
  # Put data.
  $tags->put(
          ['b', 'text'],
-	 ['d', 'data'],
-	 ['e', 'text'],
+         ['d', 'data'],
+         ['e', 'text'],
  );
 
  # Print.
@@ -354,6 +356,8 @@ __END__
 
 =head1 EXAMPLE2
 
+=for comment filename=simple_example_utf8.pl
+
  use strict;
  use warnings;
 
@@ -363,12 +367,12 @@ __END__
  # Object.
  my $tags = Tags::Output::LibXML->new(
          'data_callback' => sub {
-	         my $data_ar = shift;
-		 foreach my $data (@{$data_ar}) {
-		         $data = encode_utf8($data);
-		 }
+                 my $data_ar = shift;
+                 foreach my $data (@{$data_ar}) {
+                         $data = encode_utf8($data);
+                 }
                  return;
-	 },
+         },
  );
 
  # Data in characters.
@@ -377,8 +381,8 @@ __END__
  # Put data.
  $tags->put(
          ['b', 'text'],
-	 ['d', $data],
-	 ['e', 'text'],
+         ['d', $data],
+         ['e', 'text'],
  );
 
  # Print.
@@ -425,12 +429,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2020 Michal Josef Špaček
+© 2011-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -1,4 +1,10 @@
 Revision history for Perl extension Graphics-Penplotter-GcodeXY
+v0.9.4 2026-03-31T15:37:12Z
+    - enhancements, bug fix to optimizer
+    - added preserve key to segments to prevent optimization on individual segments
+    - 3D code, pod and test file (Claude)
+    - added swirl module (claude)
+    - added anamorphic module (claude)
 v0.7.2 2026-03-07T10:02:54Z
     - major code refactoring (Claude)
     - improved SVG input (Claude)

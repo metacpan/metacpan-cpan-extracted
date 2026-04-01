@@ -68,39 +68,51 @@
    "provides" : {
       "Graphics::Penplotter::GcodeXY" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
+      },
+      "Graphics::Penplotter::GcodeXY::Anamorphic" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Anamorphic.pm",
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::Font" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/Font.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::Geometry2D" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/Geometry2D.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
+      },
+      "Graphics::Penplotter::GcodeXY::Geometry3D" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Geometry3D.pm",
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::Hatch" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/Hatch.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::Optimize" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/Optimize.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::Postscript" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/Postscript.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::SVG" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/SVG.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::Split" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/Split.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
+      },
+      "Graphics::Penplotter::GcodeXY::Swirl" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Swirl.pm",
+         "version" : "v0.9.4"
       },
       "Graphics::Penplotter::GcodeXY::Vpype" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY/Vpype.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.9.4"
       }
    },
    "release_status" : "stable",
@@ -112,7 +124,7 @@
          "web" : "https://github.com/gamk67/Graphics-Penplotter-GcodeXY"
       }
    },
-   "version" : "v0.7.2",
+   "version" : "v0.9.4",
    "x_contributors" : [
       "gamk67 <31990368+gamk67@users.noreply.github.com>"
    ],

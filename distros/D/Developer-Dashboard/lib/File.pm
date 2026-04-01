@@ -1,5 +1,5 @@
 package File;
-$File::VERSION = '0.72';
+$File::VERSION = '0.94';
 use strict;
 use warnings;
 

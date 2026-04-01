@@ -1,0 +1,381 @@
+package EV::Websockets;
+use strict;
+use warnings;
+
+use EV;
+
+BEGIN {
+    use XSLoader;
+    our $VERSION = '0.02';
+    XSLoader::load __PACKAGE__, $VERSION;
+}
+
+package EV::Websockets::Context;
+
+sub new {
+    my ($class, %args) = @_;
+    my $loop = $args{loop} // EV::default_loop;
+
+    my $proxy      = $args{proxy};
+    my $proxy_port = $args{proxy_port};
+
+    if (!defined $proxy) {
+        my $env_proxy = $ENV{https_proxy} // $ENV{http_proxy} // $ENV{all_proxy};
+        if ($env_proxy && $env_proxy =~ m{^(?:https?://)?(?:[^@]+\@)?(\[[\w:]+\]|[^:/]+)(?::(\d+))?}) {
+            $proxy      = $1;
+            $proxy_port = $2 // 1080;
+        }
+    }
+    
+    $proxy      //= "";
+    $proxy_port //= 0;
+    
+    return $class->_new($loop, $proxy, $proxy_port,
+        $args{ssl_cert} // "", $args{ssl_key} // "", $args{ssl_ca} // "");
+}
+
+package EV::Websockets::Connection;
+
+1;
+
+__END__
+
+=head1 NAME
+
+EV::Websockets - WebSocket client/server using libwebsockets and EV
+
+=head1 SYNOPSIS
+
+    use EV;
+    use EV::Websockets;
+
+    my $ctx = EV::Websockets::Context->new(loop => EV::default_loop);
+
+    my $conn = $ctx->connect(
+        url        => 'ws://example.com/ws',
+        on_connect => sub {
+            my ($conn) = @_;
+            $conn->send("Hello, WebSocket!");
+        },
+        on_message => sub {
+            my ($conn, $data) = @_;
+            print "Got: $data\n";
+        },
+        on_close   => sub {
+            my ($conn, $code, $reason) = @_;
+            print "Closed: $code " . ($reason // "") . "\n";
+        },
+        on_error   => sub {
+            my ($conn, $err) = @_;
+            print "Error: $err\n";
+        },
+    );
+
+    EV::run;
+
+=head1 DESCRIPTION
+
+EV::Websockets provides WebSocket client and server functionality using the
+libwebsockets C library integrated with the EV event loop.
+
+This module uses libwebsockets' foreign loop integration to run within an
+existing EV event loop, making it suitable for applications already using EV.
+
+B<Important:> a context with no active listeners or connections may spin an
+internal idle watcher, preventing other EV watchers (timers, I/O) from
+firing. Always create a listener (C<< $ctx->listen(...) >>) or connection
+(C<< $ctx->connect(...) >>) before entering C<EV::run>, or destroy the
+context when not in use.
+
+=head1 CLASSES
+
+=head2 EV::Websockets::Context
+
+Manages the libwebsockets context and event loop integration.
+
+=head3 new(%options)
+
+Create a new context.
+
+    my $ctx = EV::Websockets::Context->new(
+        loop       => EV::default_loop,  # optional, defaults to EV::default_loop
+        ssl_cert   => 'client.pem',      # optional, for mTLS client certificates
+        ssl_key    => 'client-key.pem',  # required if ssl_cert is set
+        ssl_ca     => 'ca.pem',          # optional CA chain
+        proxy      => '192.168.1.1',     # optional HTTP proxy host
+        proxy_port => 8080,              # optional proxy port (default: 1080)
+    );
+
+If C<proxy> is not specified, the module reads C<https_proxy>, C<http_proxy>,
+or C<all_proxy> from the environment. Pass C<< proxy => "" >> to suppress
+auto-detection.
+
+=head3 connect(%options)
+
+Create a new WebSocket connection.
+
+    my $conn = $ctx->connect(
+        url              => 'wss://example.com/ws',
+        protocol         => 'chat',              # optional subprotocol
+        headers          => { Authorization => 'Bearer token' },
+        ssl_verify       => 1,                   # 0 to disable TLS verification
+        max_message_size => 1048576,             # optional, 0 = unlimited
+        connect_timeout  => 5.0,                 # optional, seconds
+        on_connect  => sub { my ($conn, $headers) = @_; ... },
+        on_message  => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+        on_close    => sub { my ($conn, $code, $reason) = @_; ... },
+        on_error    => sub { my ($conn, $err) = @_; ... },
+        on_pong     => sub { my ($conn, $payload) = @_; ... },
+        on_drain    => sub { my ($conn) = @_; ... },
+    );
+
+Returns an EV::Websockets::Connection object. C<$is_final> is always 1
+(messages are fully reassembled before delivery).
+
+C<connect_timeout> sets a deadline (in seconds) for the WebSocket handshake.
+If the connection is not established within this time, C<on_error> fires with
+"connect timeout" and the connection is closed.
+
+C<$headers> in C<on_connect> is a hashref of response headers from the server
+(Set-Cookie, Content-Type, Server, Sec-WebSocket-Protocol, and when available
+Location, WWW-Authenticate).
+
+C<on_drain> fires when the send queue becomes empty after a write.
+
+=head3 listen(%options)
+
+Create a WebSocket listener. Returns the port number being listened on
+(useful if port 0 was requested).
+
+    my $port = $ctx->listen(
+        port             => 0,          # 0 to let OS pick a port
+        name             => 'server',   # optional vhost name (default: 'server')
+        protocol         => 'chat',     # optional WebSocket subprotocol
+        ssl_cert         => 'cert.pem', # optional, enables TLS
+        ssl_key          => 'key.pem',  # required if ssl_cert is set
+        ssl_ca           => 'ca.pem',   # optional CA chain
+        max_message_size => 1048576,    # optional, 0 = unlimited
+        headers          => { 'Set-Cookie' => 'session=abc123' }, # response headers
+        on_handshake => sub { my ($headers) = @_; return { 'X-Custom' => 'val' } },
+        on_connect  => sub { my ($conn, $headers) = @_; ... },
+        on_message  => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+        on_close    => sub { my ($conn, $code, $reason) = @_; ... },
+        on_error    => sub { my ($conn, $err) = @_; ... },
+        on_pong     => sub { my ($conn, $payload) = @_; ... },
+        on_drain    => sub { my ($conn) = @_; ... },
+    );
+
+C<protocol> sets the WebSocket subprotocol name advertised by the server vhost.
+The vhost name C<default> is reserved and will croak if used.
+
+C<$headers> in C<on_connect> is a hashref of client request headers
+(Path, Host, Origin, Cookie, Authorization, Sec-WebSocket-Protocol,
+User-Agent, X-Forwarded-For).
+C<Path> is the request URI (e.g., C</chat>).
+
+C<headers> is an optional hashref of headers to inject into the HTTP upgrade
+response (e.g., C<Set-Cookie>).
+
+C<on_handshake> fires before the 101 response is sent
+(at C<LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION>). It receives a hashref of
+request headers (same keys as C<on_connect>). Return a hashref to inject
+per-connection response headers into the upgrade response. Return a false
+value (C<undef>, C<0>, C<"">) to reject the connection (the client receives
+a 403).
+
+=head3 connections
+
+Returns a list of all currently connected Connection objects.
+
+    my @conns = $ctx->connections;
+    $_->send("broadcast!") for @conns;
+
+=head3 adopt(%options)
+
+Adopt an existing IO handle (socket).
+
+    my $conn = $ctx->adopt(
+        fh               => $socket_handle,
+        initial_data     => $already_read_bytes, # optional pre-read data
+        max_message_size => 1048576,
+        on_connect => sub { my ($conn, $headers) = @_; ... },
+        on_message => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+        on_close   => sub { my ($conn, $code, $reason) = @_; ... },
+        on_error   => sub { my ($conn, $err) = @_; ... },
+        on_pong    => sub { my ($conn, $payload) = @_; ... },
+        on_drain   => sub { my ($conn) = @_; ... },
+    );
+
+Once adopted, C<libwebsockets> takes ownership of the file descriptor.
+The module holds a reference to the Perl handle until the connection is
+destroyed, preventing premature fd closure. C<$headers> in C<on_connect>
+is always C<undef> for adopted connections.
+
+If you already read data from the socket (e.g., the HTTP upgrade request),
+pass it via C<initial_data> so lws can process the handshake.
+
+=head2 EV::Websockets::Connection
+
+Represents a WebSocket connection.
+
+=head3 send($data)
+
+Send text data over the connection.
+
+=head3 send_binary($data)
+
+Send binary data over the connection.
+
+=head3 send_ping($data)
+
+Send a Ping frame. Payload is silently truncated to 125 bytes per RFC 6455.
+
+=head3 send_pong($data)
+
+Send a Pong frame. Payload is silently truncated to 125 bytes per RFC 6455.
+
+=head3 send_fragment($data, $is_binary, $is_final)
+
+Send a WebSocket message fragment for streaming large messages. The first
+call starts a new fragmented message (text or binary based on C<$is_binary>).
+Subsequent calls send continuation frames. Set C<$is_final> to true on the
+last fragment.
+
+    $conn->send_fragment("part1", 0, 0);   # text, not final
+    $conn->send_fragment("part2", 0, 0);   # continuation, not final
+    $conn->send_fragment("part3", 0, 1);   # continuation, final
+
+C<$is_binary> defaults to 0, C<$is_final> defaults to 1.
+
+=head3 stash
+
+Returns a hashref for storing arbitrary per-connection metadata. The hashref
+is lazily created on first access and persists for the lifetime of the
+connection.
+
+    $conn->stash->{user_id} = 42;
+    my $uid = $conn->stash->{user_id};
+
+=head3 send_queue_size
+
+Returns the number of payload bytes currently queued for sending.
+
+=head3 get_protocol
+
+Returns the negotiated C<Sec-WebSocket-Protocol> value, or C<undef>.
+
+=head3 peer_address
+
+Returns the peer IP address as a string, or C<undef>.
+
+=head3 close($code, $reason)
+
+Close the connection with the given status code and reason.
+
+=head3 pause_recv
+
+Stop receiving data from this connection (flow control).
+
+=head3 resume_recv
+
+Resume receiving data after C<pause_recv>.
+
+=head3 is_connected
+
+Returns true if the connection is established and open.
+
+=head3 is_connecting
+
+Returns true if the connection is in progress.
+
+=head3 state
+
+Returns the current state as a string: "connecting", "connected", "closing",
+"closed", or "destroyed".
+
+=head1 DEBUGGING
+
+    EV::Websockets::_set_debug(1);
+
+Enables verbose debug output from both the module and libwebsockets.
+In tests, gate on C<$ENV{EV_WS_DEBUG}>:
+
+    EV::Websockets::_set_debug(1) if $ENV{EV_WS_DEBUG};
+
+=head1 FEERSUM INTEGRATION
+
+Adopt WebSocket connections from a Feersum PSGI server via C<psgix.io>:
+
+    use Feersum;
+    use EV::Websockets;
+
+    my $ctx = EV::Websockets::Context->new;
+    # A listener vhost is required for adopt() to work
+    $ctx->listen(port => 0, on_connect => sub {}, on_message => sub {});
+
+    my $feersum = Feersum->endjinn;
+    $feersum->set_psgix_io(1);
+
+    $feersum->psgi_request_handler(sub {
+        my $env = shift;
+        return [400,[],[]] unless ($env->{HTTP_UPGRADE}//'') =~ /websocket/i;
+
+        my $io = $env->{'psgix.io'};
+
+        # Reconstruct HTTP upgrade for lws
+        my $path = $env->{REQUEST_URI} // '/';
+        my $hdr = "GET $path HTTP/1.1\r\n";
+        for (sort keys %$env) {
+            next unless /^HTTP_(.+)/;
+            (my $h=$1) =~ s/_/-/g;
+            $hdr .= "$h: $env->{$_}\r\n";
+        }
+        $hdr .= "\r\n";
+
+        $ctx->adopt(fh => $io, initial_data => $hdr,
+            on_message => sub { $_[0]->send($_[1]) },  # echo
+        );
+        return;
+    });
+
+See also C<eg/feersum_native.pl> and C<eg/feersum_psgi.pl> for full examples.
+
+=head1 BENCHMARKS
+
+The C<bench/> directory contains latency and throughput benchmarks.
+
+    # Echo round-trip latency (native client + native server)
+    perl bench/latency.pl
+
+    # Throughput (messages/sec)
+    perl bench/throughput.pl
+
+    # Comparison with AnyEvent::WebSocket and Net::WebSocket::EVx
+    perl bench/compare.pl
+
+Typical results on Linux (localhost, 1000 round-trips, 64-byte payload):
+
+    EV::Websockets          ~10us avg,  ~97k msg/s  (C/libwebsockets)
+    Net::WebSocket::EVx     ~10us avg,  ~96k msg/s  (C/wslay)
+    Mojolicious             ~83us avg,  ~12k msg/s  (Pure Perl)
+    Net::Async::WebSocket  ~141us avg,   ~7k msg/s  (Pure Perl)
+
+=head1 URL FORMATS
+
+The module supports both C<ws://> and C<wss://> (TLS) URLs.
+
+=head1 SEE ALSO
+
+L<EV>, L<Alien::libwebsockets>, L<libwebsockets|https://libwebsockets.org/>,
+L<Net::WebSocket::EVx>, L<AnyEvent::WebSocket::Client>
+
+=head1 AUTHOR
+
+vividsnow
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

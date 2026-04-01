@@ -3,7 +3,7 @@ use warnings;
 
 use Indent::Word;
 use Term::ANSIColor;
-use Test::More 'tests' => 14;
+use Test::More 'tests' => 17;
 use Test::NoWarnings;
 use Text::ANSI::Util qw(ta_strip);
 use Unicode::UTF8 qw(decode_utf8);
@@ -203,4 +203,46 @@ is_deeply(
 		decode_utf8('<-> švec'),
 	],
 	'Test for short string #3 (ansi).',
+);
+
+# Test.
+$obj = Indent::Word->new(
+	'ansi' => 0,
+	'next_indent' => '  ',
+	'line_size' => 79,
+);
+$data = "  text\n     text\n\ttext\n";
+$ret = $obj->indent($data, '  ', 0);
+is(
+	$ret,
+	'  text text text',
+	'Multi-line text with newlines should be normalized.',
+);
+
+# Test.
+$obj = Indent::Word->new(
+	'ansi' => 0,
+	'next_indent' => '  ',
+	'line_size' => 79,
+);
+$data = "text\t\ttext    text";
+$ret = $obj->indent($data, '', 0);
+is(
+	$ret,
+	'text text text',
+	'Text with tabs and multiple spaces should be normalized.',
+);
+
+# Test.
+$obj = Indent::Word->new(
+	'ansi' => 0,
+	'next_indent' => '  ',
+	'line_size' => 79,
+);
+$data = '   text   ';
+$ret = $obj->indent($data, '', 0);
+is(
+	$ret,
+	'text',
+	'Leading and trailing whitespace should be removed.',
 );

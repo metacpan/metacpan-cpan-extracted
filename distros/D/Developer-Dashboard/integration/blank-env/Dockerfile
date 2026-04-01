@@ -1,5 +1,9 @@
 FROM perl:5.38-bookworm
 
+ENV PERL_MM_USE_DEFAULT=1 \
+    NONINTERACTIVE_TESTING=1 \
+    PERL_CANARY_STABILITY_NOPROMPT=1
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \

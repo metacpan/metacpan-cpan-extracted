@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Tags::Output::Indent;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 
 # Test.
 my $obj = Tags::Output::Indent->new;
@@ -18,7 +18,7 @@ my $right_ret = <<'END';
 </MAIN>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test element with single string data.');
 
 # Test.
 $obj = Tags::Output::Indent->new;
@@ -35,7 +35,7 @@ $right_ret = <<'END';
 </MAIN>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test element with attribute and single string data.');
 
 # Test.
 $obj->reset;
@@ -52,7 +52,7 @@ $right_ret = <<'END';
 </MAIN>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test element with attribute value 0 and single string data.');
 
 # Test.
 $obj = Tags::Output::Indent->new;
@@ -76,7 +76,7 @@ $right_ret = <<'END';
 </MAIN>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test two elements.');
 
 # Test.
 my $long_data = 'a' x 1000;
@@ -93,10 +93,10 @@ $right_ret = <<"END";
 </MAIN>
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Test element with long data word.');
 
 # Test.
-$long_data = 'aaaa ' x 1000;
+$long_data = 'aaaa ' x 100;
 $obj = Tags::Output::Indent->new;
 $obj->put(
 	['b', 'MAIN'],
@@ -106,9 +106,14 @@ $obj->put(
 $ret = $obj->flush;
 $right_ret = <<"END";
 <MAIN>
-  $long_data
+  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+  aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
 </MAIN>
 END
 chomp $right_ret;
-# XXX SKIP
-#is($ret, $right_ret);
+is($ret, $right_ret, 'Test element with long data string with many words.');

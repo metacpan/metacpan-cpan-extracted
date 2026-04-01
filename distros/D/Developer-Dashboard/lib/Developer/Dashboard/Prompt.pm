@@ -1,5 +1,5 @@
 package Developer::Dashboard::Prompt;
-$Developer::Dashboard::Prompt::VERSION = '0.72';
+$Developer::Dashboard::Prompt::VERSION = '0.94';
 use strict;
 use warnings;
 

@@ -377,14 +377,21 @@ sub count_B {
 ######################################################################
 
 sub check_C {
-    my ($root) = @_;
+    my ($root, %opt) = @_;
     my @manifest = _manifest_files($root);
     my @pm_and_t = _manifest_pm_and_t($root);
+
+    # utf8_ok: regex matching files that are intentionally UTF-8 encoded
+    my $utf8_ok = exists $opt{utf8_ok} ? $opt{utf8_ok} : undef;
 
     for my $f (@manifest) {
         my $abs = "$root/$f";
         if ($f =~ m{^doc/}) {
             ok(1, "C - US-ASCII: $f (documents may contain UTF-8 encoding)");
+            next;
+        }
+        if (defined $utf8_ok && $f =~ /$utf8_ok/) {
+            ok(1, "C - US-ASCII: $f (intentionally UTF-8 encoded)");
             next;
         }
         unless (-f $abs) {
@@ -427,7 +434,7 @@ sub check_C {
 }
 
 sub count_C {
-    my ($root) = @_;
+    my ($root, %opt) = @_;
     my @manifest = _manifest_files($root);
     my @pm_and_t = _manifest_pm_and_t($root);
     return scalar(@manifest) + 2 * scalar(@pm_and_t);

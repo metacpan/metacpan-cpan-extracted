@@ -3,7 +3,7 @@ package Feed::Data::BBC;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Rope;
 use Rope::Autoload;
@@ -56,7 +56,7 @@ Feed::Data::BBC - BBC rss feeds
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

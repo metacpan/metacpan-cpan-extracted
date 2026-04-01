@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Future::AsyncAwait" => "0.66",
     "Test2::V0" => "0.000159"
   },
-  "VERSION" => "0.001003",
+  "VERSION" => "0.001004",
   "test" => {
     "TESTS" => "t/*.t"
   }

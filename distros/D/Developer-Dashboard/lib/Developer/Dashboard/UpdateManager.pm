@@ -1,5 +1,5 @@
 package Developer::Dashboard::UpdateManager;
-$Developer::Dashboard::UpdateManager::VERSION = '0.72';
+$Developer::Dashboard::UpdateManager::VERSION = '0.94';
 use strict;
 use warnings;
 

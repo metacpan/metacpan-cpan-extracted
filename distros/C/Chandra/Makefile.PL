@@ -26,9 +26,21 @@ elsif ($^O eq 'linux') {
     chomp($gtk_cflags);
     chomp($gtk_libs);
     if (!$gtk_cflags || !$gtk_libs) {
-        warn "*** gtk+-3.0 and webkit2gtk-4.0 development libraries are required on Linux.\n";
-        warn "*** Install them with: sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev\n";
-        warn "***                or: sudo dnf install gtk3-devel webkit2gtk3-devel\n";
+        warn <<'MSG';
+
+*** Chandra requires gtk+-3.0 and webkit2gtk-4.0 development libraries on Linux.
+***
+*** Install them with your system package manager:
+***
+***   Debian/Ubuntu:  sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev
+***   Fedora/RHEL:    sudo dnf install gtk3-devel webkit2gtk3-devel
+***   Arch:           sudo pacman -S gtk3 webkit2gtk
+***   Alpine:         sudo apk add gtk+3.0-dev webkit2gtk-dev
+***   openSUSE:       sudo zypper install gtk3-devel webkit2gtk-gtk3-devel
+***
+*** Then re-run: perl Makefile.PL
+
+MSG
         exit 0;  # exit 0 = NA for CPAN Testers
     }
     push @extra_ccflags, $gtk_cflags if $gtk_cflags;

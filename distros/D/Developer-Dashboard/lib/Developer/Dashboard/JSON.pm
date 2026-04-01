@@ -1,5 +1,5 @@
 package Developer::Dashboard::JSON;
-$Developer::Dashboard::JSON::VERSION = '0.72';
+$Developer::Dashboard::JSON::VERSION = '0.94';
 use strict;
 use warnings;
 

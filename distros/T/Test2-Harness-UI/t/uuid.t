@@ -38,7 +38,7 @@ sub as_hex {
 }
 
 my @pids;
-for my $schema_name (qw/MySQL MySQL56 PostgreSQL/) {
+for my $schema_name (qw/MySQL PostgreSQL/) {
     my $pid = fork;
     if ($pid) {
         push @pids => $pid;

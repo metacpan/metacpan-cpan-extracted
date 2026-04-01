@@ -1669,7 +1669,7 @@ Please report any bugs or feature requests to: [https://github.com/trizen/Compre
 
 # AUTHOR
 
-Daniel "Trizen" Șuteu  `<trizen@cpan.org>`
+Daniel "Trizen" Șuteu
 
 # ACKNOWLEDGEMENTS
 

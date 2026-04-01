@@ -1,5 +1,17 @@
 Revision history for Map::Tube::CLI
 
+0.84  Tue Mar 31 22:45:00 2026
+      This release prepared by @GWS
+      - Added support for new maps: Brussels, Chicago, Leipzig, Muenchen,
+        Napoli, Paris, San Francisco, Stuttgart and Sydney.
+      - Upgraded dependency on Map::Tube::Exception v3.24.
+      - Upgraded dependency on Map::Tube v4.10.
+      - Upgraded dependency on Perl v5.14.
+      - Restrict writing files to current directory.
+      - Augmented unit test t/01-map-tube-cli.t
+      - Addd unit tests t/02-path-check.t, t/03-as-image.t
+      - Updated POD.
+
 0.83  Fri Feb 21 17:30:00 2025
       - Added support for new map: Oslo.
       - Upgraded dependency on Map::Tube v3.96.

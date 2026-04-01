@@ -1,5 +1,13 @@
 Revision history for PAGI-Middleware-Session-Store-Cookie
 
+0.001004  2026-03-31
+    - SECURITY: Fix insecure rand() fallback in IV generation (CVE-2026-5087)
+    - Use Crypt::PRNG (from CryptX) for cryptographically secure random bytes
+    - Remove misleading Crypt::URandom reference from POD
+    - Align POD style with PAGI framework conventions
+    - Remove stale extraction note from DESCRIPTION
+    - Thanks to Robert Rothenberg and CPANSec for the report and patch
+
 0.001003  2026-03-17
     - Add a recognized Artistic 2.0 license section to the main module POD
     - Add an explicit module version matching the distribution version

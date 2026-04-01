@@ -1,5 +1,5 @@
 package Developer::Dashboard::DockerCompose;
-$Developer::Dashboard::DockerCompose::VERSION = '0.72';
+$Developer::Dashboard::DockerCompose::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -11,17 +11,15 @@ use Developer::Dashboard::JSON qw(json_encode);
 
 # new(%args)
 # Constructs the docker compose resolver and launcher.
-# Input: config, paths, and plugins objects.
+# Input: config and paths objects.
 # Output: Developer::Dashboard::DockerCompose object.
 sub new {
     my ( $class, %args ) = @_;
-    my $config  = $args{config}  || die 'Missing config';
-    my $paths   = $args{paths}   || die 'Missing path registry';
-    my $plugins = $args{plugins} || die 'Missing plugin manager';
+    my $config = $args{config} || die 'Missing config';
+    my $paths  = $args{paths}  || die 'Missing path registry';
     return bless {
-        config  => $config,
-        paths   => $paths,
-        plugins => $plugins,
+        config => $config,
+        paths  => $paths,
     }, $class;
 }
 
@@ -32,10 +30,9 @@ sub new {
 sub resolve {
     my ( $self, %args ) = @_;
     my $project_root = $args{project_root} || $self->{paths}->current_project_root || cwd();
-    my $docker_cfg   = $self->{config}->docker_config;
-    my $plugin_cfg   = $self->{plugins}->docker_config;
-    my $docker_root  = $self->_docker_config_root;
-    my @passthrough  = @{ $args{args} || [] };
+    my $docker_cfg  = $self->{config}->docker_config;
+    my $docker_root = $self->_docker_config_root;
+    my @passthrough = @{ $args{args} || [] };
     my @compose_files = ();
     my @layers;
 
@@ -43,7 +40,7 @@ sub resolve {
     push @compose_files, @base;
     push @layers, { name => 'base', files => [@base] };
 
-    my @project_overlays = ( @{ $plugin_cfg->{files} || [] }, @{ $docker_cfg->{files} || [] }, @{ $docker_cfg->{project_overlays} || [] } );
+    my @project_overlays = ( @{ $docker_cfg->{files} || [] }, @{ $docker_cfg->{project_overlays} || [] } );
     push @compose_files, @project_overlays;
     push @layers, { name => 'project', files => [@project_overlays] } if @project_overlays;
 
@@ -52,15 +49,12 @@ sub resolve {
     my @services = @{ $args{services} || [] };
 
     my %addon_map = (
-        %{ $plugin_cfg->{addons} || {} },
         %{ $docker_cfg->{addons} || {} },
     );
     my %mode_map = (
-        %{ $plugin_cfg->{modes} || {} },
         %{ $docker_cfg->{modes} || {} },
     );
     my %service_map = (
-        %{ $plugin_cfg->{services} || {} },
         %{ $docker_cfg->{services} || {} },
     );
     my @inferred_services = $self->_infer_services_from_args(
@@ -124,7 +118,6 @@ sub resolve {
     }
 
     my %env = (
-        %{ $plugin_cfg->{env} || {} },
         %{ $docker_cfg->{env} || {} },
         DDDC => $docker_root,
     );
@@ -181,6 +174,15 @@ sub _docker_config_root {
     return File::Spec->catdir( $self->{paths}->config_root, 'docker' );
 }
 
+# _home_docker_config_root()
+# Returns the home-backed docker configuration root used as the fallback for isolated service folders.
+# Input: none.
+# Output: absolute directory path string.
+sub _home_docker_config_root {
+    my ($self) = @_;
+    return File::Spec->catdir( $self->{paths}->home_runtime_root, 'config', 'docker' );
+}
+
 # _discover_service_files(%args)
 # Discovers the preferred old-style isolated compose file for a named service from repo-local and global docker config roots.
 # Input: service name and optional project_root.
@@ -194,9 +196,9 @@ sub _discover_service_files {
         service      => $service,
     );
 
-    my @roots = (
-        File::Spec->catdir( $project_root, '.developer-dashboard', 'docker' ),
-        $self->_docker_config_root,
+    my @roots = $self->_service_lookup_roots(
+        project_root => $project_root,
+        service      => $service,
     );
 
     my @files;
@@ -246,7 +248,7 @@ sub _discover_service_names {
 
     for my $root (
         File::Spec->catdir( $project_root, '.developer-dashboard', 'docker' ),
-        $self->_docker_config_root,
+        $self->_home_docker_config_root,
       )
     {
         next if !-d $root;
@@ -270,19 +272,29 @@ sub _service_folder_is_disabled {
     my ( $self, %args ) = @_;
     my $service      = $args{service} || return 0;
     my $project_root = $args{project_root} || cwd();
-
-    for my $root (
-        File::Spec->catdir( $project_root, '.developer-dashboard', 'docker' ),
-        $self->_docker_config_root,
-      )
-    {
-        next if !defined $root || $root eq '';
-        my $service_root = File::Spec->catdir( $root, $service );
-        next if !-d $service_root;
-        return 1 if -f File::Spec->catfile( $service_root, 'disabled.yml' );
-    }
+    my @roots = $self->_service_lookup_roots(
+        project_root => $project_root,
+        service      => $service,
+    );
+    return 0 if !@roots;
+    my $service_root = File::Spec->catdir( $roots[0], $service );
+    return 1 if -f File::Spec->catfile( $service_root, 'disabled.yml' );
 
     return 0;
+}
+
+# _service_lookup_roots(%args)
+# Returns the docker roots that should be searched for one isolated service with project-local precedence over home runtime fallbacks.
+# Input: service name and optional project_root.
+# Output: ordered list of docker root directory path strings.
+sub _service_lookup_roots {
+    my ( $self, %args ) = @_;
+    my $service      = $args{service} || return;
+    my $project_root = $args{project_root} || cwd();
+    my $project_docker_root = File::Spec->catdir( $project_root, '.developer-dashboard', 'docker' );
+    my $project_service_root = File::Spec->catdir( $project_docker_root, $service );
+    return ($project_docker_root) if -d $project_service_root;
+    return ( $self->_home_docker_config_root );
 }
 
 # _infer_services_from_args(%args)

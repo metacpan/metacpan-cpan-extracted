@@ -21,18 +21,13 @@ use FindBin ();
 use lib "$FindBin::Bin/lib";
 use File::Spec ();
 use INA_CPAN_Check;
-
 my $ROOT = File::Spec->rel2abs(
     File::Spec->catdir($FindBin::RealBin, File::Spec->updir));
-
 my @manifest = _manifest_files($ROOT);
 my @pm_files = sort grep { /^lib\/.*\.pm$/ && -f "$ROOT/$_" } @manifest;
-
 plan_tests(scalar(@pm_files) * 6);
-
 for my $pm (@pm_files) {
     my $text = _slurp("$ROOT/$pm");
-
     # G1: =head1 NAME
     ok($text =~ /^=head1\s+NAME/m,        "G1 - =head1 NAME present: $pm");
     # G2: =head1 SYNOPSIS
@@ -43,7 +38,6 @@ for my $pm (@pm_files) {
     my $has_head = $text =~ /^=head1/m;
     my $has_cut  = $text =~ /^=cut\b/m;
     ok(!$has_head || $has_cut, "G4 - POD sections closed by =cut: $pm");
-
     # G11: Pod::Checker - no errors
     # G12: Pod::Checker - no warnings
     {
@@ -69,7 +63,16 @@ for my $pm (@pm_files) {
             $errors   = 0 unless defined $errors   && $errors   > 0;
             $warnings = 0 unless defined $warnings && $warnings > 0;
             $checker_msg11 = " ($errors error(s))"     if $errors;
-            $checker_msg12 = " ($warnings warning(s))" if $warnings;
+            # Pod::Checker older than 1.60 mis-reports warnings for
+            # valid L<> link syntax (e.g. sections with spaces or
+            # special characters), so skip G12 on those versions.
+            if ($warnings && $Pod::Checker::VERSION < 1.60) {
+                $warnings = 0;
+                $checker_msg12 = ' (Pod::Checker too old, skipped)';
+            }
+            elsif ($warnings) {
+                $checker_msg12 = " ($warnings warning(s))";
+            }
         }
         else {
             $checker_msg11 = ' (Pod::Checker not available, skipped)';
@@ -79,5 +82,4 @@ for my $pm (@pm_files) {
         ok(!$warnings, "G12 - Pod::Checker: no warnings: $pm$checker_msg12");
     }
 }
-
 END { end_testing() }

@@ -16,7 +16,7 @@ $MSWin32_MBCS = 0; # ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936
 open(FILE,">@{[__FILE__]}.1"   ); print FILE q{ 1 }; close(FILE);
 open(FILE,">@{[__FILE__]}.2"   ); print FILE q{ 1 }; close(FILE);
 open(FILE,">@{[__FILE__]}.3"   ); print FILE q{ 1 }; close(FILE);
-if ($MSWin32_MBCS) { 
+if ($MSWin32_MBCS) {
     open(FILE,">@{[__FILE__]}.1•\\"); print FILE q{ 1 }; close(FILE);
     open(FILE,">@{[__FILE__]}.2•\\"); print FILE q{ 1 }; close(FILE);
     open(FILE,">@{[__FILE__]}.3•\\"); print FILE q{ 1 }; close(FILE);

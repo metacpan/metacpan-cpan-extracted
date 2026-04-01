@@ -32,6 +32,7 @@ sub dies_like {
 
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+chdir $home or die "Unable to chdir to $home: $!";
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $store = Developer::Dashboard::PageStore->new( paths => $paths );
@@ -90,6 +91,14 @@ unlike( $saved_source_body, qr/request_host|request_path|request_remote_addr/, '
 my ( $saved_render_code, undef, $saved_render_body ) = @{ $app->handle( path => '/page/sample', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
 is( $saved_render_code, 200, 'saved render route responds with success' );
 like( $saved_render_body, qr/body text/, 'saved page route renders bookmark body content' );
+is(
+    $app->_nav_items_html(
+        page            => $page,
+        runtime_context => { params => {} },
+    ),
+    '',
+    'shared nav renderer returns empty html when the nav root does not exist',
+);
 
 my ( $escaped_code, undef, $escaped_body ) = @{ $app->handle( path => '/', query => "token=$token&name=hello%20world&empty", remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
 is( $escaped_code, 200, 'query parser tolerates values without equals signs' );
@@ -100,6 +109,52 @@ like( $escaped_render_body, qr/hello world/, 'render mode still applies query-de
 is( $app->handle( query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } )->[0], 200, 'handle defaults the path to root when omitted' );
 my %parsed = Developer::Dashboard::Web::App::_parse_query('=value&encoded%20key=hello%20world');
 is_deeply( \%parsed, { 'encoded key' => 'hello world' }, '_parse_query skips empty keys and decodes URI escapes' );
+
+my $nav_empty = Developer::Dashboard::PageDocument->new(
+    id     => 'nav/empty.tt',
+    title  => 'Empty Nav',
+    layout => {},
+);
+$store->save_page($nav_empty);
+my $nav_form = Developer::Dashboard::PageDocument->new(
+    id     => 'nav/form.tt',
+    title  => 'Form Nav',
+    layout => { form_tt => '<form id="nav-form"></form>', form => '<div id="nav-form-body"></div>' },
+);
+$store->save_page($nav_form);
+my $nav_missing_file = File::Spec->catfile( $paths->dashboards_root, 'nav', 'broken.tt' );
+open my $nav_missing_fh, '>', $nav_missing_file or die $!;
+print {$nav_missing_fh} "not a bookmark\n";
+close $nav_missing_fh;
+
+my $nav_render = $app->_nav_items_html(
+    page            => $page,
+    runtime_context => { params => {} },
+);
+like( $nav_render, qr/dashboard-nav-items/, 'shared nav renderer emits a nav container when valid nav tt files exist' );
+like( $nav_render, qr/nav-form/, 'shared nav renderer includes form_tt content from nav tt bookmarks' );
+like( $nav_render, qr/nav-form-body/, 'shared nav renderer includes form content from nav tt bookmarks' );
+unlike( $nav_render, qr/broken\.tt/, 'shared nav renderer skips invalid nav tt bookmark files' );
+unlike( $nav_render, qr/empty\.tt/, 'shared nav renderer skips nav tt bookmarks that render an empty fragment' );
+
+my $nav_self_render = $app->_nav_items_html(
+    page            => $nav_form,
+    runtime_context => { params => {} },
+);
+is( $nav_self_render, '', 'shared nav renderer does not inject nav items while rendering a nav bookmark itself' );
+
+my $fragment = $app->_page_fragment_html(
+    Developer::Dashboard::PageDocument->new(
+        layout => { body => '<div id="frag-body"></div>', form_tt => '<div id="frag-form-tt"></div>', form => '<div id="frag-form"></div>' },
+        meta   => { runtime_outputs => ['<div id="frag-output"></div>'], runtime_errors => ['boom'] },
+    )
+);
+like( $fragment, qr/frag-body/, '_page_fragment_html includes the page body' );
+like( $fragment, qr/frag-form-tt/, '_page_fragment_html includes form_tt content' );
+like( $fragment, qr/frag-form/, '_page_fragment_html includes form content' );
+like( $fragment, qr/frag-output/, '_page_fragment_html includes runtime output fragments' );
+like( $fragment, qr/runtime-error/, '_page_fragment_html renders runtime errors' );
+is( $app->_page_fragment_html(), '', '_page_fragment_html returns empty html when no page is provided' );
 
 my ( $not_found_code, $not_found_type, $not_found_body ) = @{ $app->handle( path => '/missing', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
 is( $not_found_code, 404, 'unknown routes return not found' );

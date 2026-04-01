@@ -72,6 +72,7 @@
             "Map::Tube::Singapore" : "0",
             "Map::Tube::Sofia" : "0",
             "Map::Tube::Stockholm" : "0",
+            "Map::Tube::Sydney" : "0",
             "Map::Tube::Tbilisi" : "0",
             "Map::Tube::Tokyo" : "0",
             "Map::Tube::Toulouse" : "0",
@@ -84,12 +85,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Task-Map-Tube-Bundle/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/Task-Map-Tube-Bundle.git",
          "web" : "https://github.com/manwar/Task-Map-Tube-Bundle"
       }
    },
-   "version" : "0.06",
+   "version" : "v1.0.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

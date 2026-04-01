@@ -1,5 +1,5 @@
 package Developer::Dashboard::CLI::OpenFile;
-$Developer::Dashboard::CLI::OpenFile::VERSION = '0.72';
+$Developer::Dashboard::CLI::OpenFile::VERSION = '0.94';
 use strict;
 use warnings;
 

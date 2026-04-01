@@ -1,4 +1,4 @@
-package Graphics::Penplotter::GcodeXY::Geometry2D v0.7.2;
+package Graphics::Penplotter::GcodeXY::Geometry2D v0.9.4;
 
 use v5.38.2;
 use feature qw( signatures );

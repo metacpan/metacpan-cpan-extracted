@@ -8,6 +8,8 @@ MANIFEST.SKIP
 README
 t/00-load.t
 t/01-map-tube-cli.t
+t/02-path-check.t
+t/03-as-image.t
 xt/manifest.t
 xt/pod.t
 xt/meta-json.t

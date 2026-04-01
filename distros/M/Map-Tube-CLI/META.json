@@ -33,17 +33,19 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Encode::Locale" : "1.05",
             "MIME::Base64" : "3.14",
-            "Map::Tube" : "3.96",
-            "Map::Tube::Exception" : "3.17",
+            "Map::Tube" : "4.10",
+            "Map::Tube::Exception" : "3.24",
             "Module::Pluggable" : "5.1",
             "Moo" : "2.000000",
             "MooX::Options" : "4.023",
+            "Path::Tiny" : "0",
             "Text::ASCIITable" : "0.22",
             "Types::Standard" : "1.000005",
             "namespace::autoclean" : "0.28",
-            "perl" : "5.006",
+            "perl" : "5.014",
             "utf8::all" : "0.024"
          }
       }
@@ -51,21 +53,24 @@
    "provides" : {
       "Map::Tube::CLI" : {
          "file" : "lib/Map/Tube/CLI.pm",
-         "version" : "0.83"
+         "version" : "0.84"
       },
       "Map::Tube::CLI::Option" : {
          "file" : "lib/Map/Tube/CLI/Option.pm",
-         "version" : "0.83"
+         "version" : "0.84"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Map-Tube-CLI/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/Map-Tube-CLI.git",
          "web" : "https://github.com/manwar/Map-Tube-CLI"
       }
    },
-   "version" : "0.83",
+   "version" : "0.84",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

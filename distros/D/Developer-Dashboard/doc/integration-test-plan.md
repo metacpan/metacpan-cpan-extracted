@@ -25,7 +25,7 @@ The integration run covers these command families:
 
 - host packaging: `dzil build`
 - installation: `cpanm <tarball>`
-- bootstrap: `dashboard init`, `dashboard update`
+- bootstrap: `dashboard init`, user-provided `dashboard update`
 - help and prompt: `dashboard`, `dashboard help`, `dashboard ps1`, `dashboard shell bash`
 - paths: `dashboard paths`, `dashboard path list`, `dashboard path resolve`, `dashboard path project-root`
 - encoding: `dashboard encode`, `dashboard decode`
@@ -57,13 +57,10 @@ The integration run creates:
 
 - a temporary home directory under `/tmp`
 - a fake project root under `/tmp/fake-project`
-- fake project `bookmarks`, `configs`, and `startup` directories
-- environment-variable overrides for:
-  - `DEVELOPER_DASHBOARD_BOOKMARKS`
-  - `DEVELOPER_DASHBOARD_CONFIGS`
-  - `DEVELOPER_DASHBOARD_STARTUP`
+- a fake project `./.developer-dashboard` tree with `dashboards`, `config`, and `cli` directories
 - a saved page named `sample`
 - a saved legacy bookmark page named `project-home`
+- shared nav bookmark pages under `nav/*.tt`
 - a helper user for explicit add/remove testing
 - a second helper user for browser login/logout cleanup testing
 - a temporary Compose project under `/tmp`
@@ -72,38 +69,46 @@ The integration run creates:
 
 1. Build the distribution tarball on the host with `dzil build`.
 2. Start the blank container with only that host-built tarball mounted into it.
-3. Install the mounted tarball with `cpanm --notest`.
-4. Extract the same tarball inside the container so update scripts can run from the built artifact contents.
-5. Verify the installed CLI responds to `dashboard help`.
-6. Verify bare `dashboard` returns usage output.
-7. Create a fake project root with bookmark, config, and startup directories and export the dashboard override variables toward them.
-8. Run `dashboard init` and confirm runtime roots and starter pages exist.
-9. Run `dashboard update` from the extracted tarball tree and confirm the update pipeline completes in the clean container.
-10. Exercise path, prompt, shell, encode/decode, and indicator commands.
-11. Exercise collector write/run/read/start/restart/stop flows, including a fake-project startup collector definition.
-12. Exercise page create/save/show/encode/decode/render/source flows inside the fake bookmark directory.
-13. Exercise builtin action execution.
-14. Exercise docker compose dry-run resolution against a temporary project.
-15. Start the installed web service.
-16. Confirm exact-loopback access reaches the editor page in Chromium.
-17. Confirm the browser can render a saved fake-project bookmark page from the fake project bookmark directory.
-18. Confirm non-loopback self-access reaches the helper login page in Chromium.
-19. Log in as a helper through the HTTP helper flow.
-20. Confirm helper page chrome shows `Logout`.
-21. Log out and confirm the helper account is removed.
-22. Restart the installed runtime from the extracted tarball tree and confirm the web service comes back.
-23. Stop the runtime and confirm the web service is gone.
+3. Install the mounted tarball with `cpanm`.
+4. Create the fake-project `./.developer-dashboard` tree only after that install step succeeds so the tarball's own tests still run against a clean runtime.
+5. Extract the same tarball inside the container for the rest of the installed-command checks.
+6. Verify the installed CLI responds to `dashboard help`.
+7. Verify bare `dashboard` returns usage output.
+8. Verify `dashboard version` reports the installed runtime version.
+9. Create a fake project root with a local `./.developer-dashboard` runtime tree.
+10. Run `dashboard init` from inside that fake project and confirm the project-local runtime roots plus `welcome`, `api-dashboard`, and `db-dashboard` starter pages exist.
+11. Seed a user-provided fake-project `./.developer-dashboard/cli/update` command plus `update.d` hooks in the clean container, run `dashboard update`, and confirm the normal top-level command-hook pipeline completes, including later-hook reads through `Runtime::Result`.
+12. Exercise path, prompt, shell, encode/decode, and indicator commands.
+13. Exercise collector write/run/read/start/restart/stop flows, including fake-project config collector definitions.
+14. Restart the installed runtime with one intentionally broken Perl config collector and one healthy config collector, then verify the broken collector reports an error without stopping the healthy collector or its green indicator state.
+15. Exercise page create/save/show/encode/decode/render/source flows inside the fake bookmark directory.
+16. Exercise builtin action execution.
+17. Exercise docker compose dry-run resolution against a temporary project.
+18. Start the installed web service.
+19. Confirm exact-loopback access reaches the editor page in Chromium.
+20. Confirm the browser can render a saved fake-project bookmark page from the fake project bookmark directory.
+21. Confirm the browser inserts sorted rendered `nav/*.tt` bookmark fragments between the top chrome and the main page body.
+22. Confirm non-loopback self-access reaches the helper login page in Chromium.
+23. Log in as a helper through the HTTP helper flow.
+24. Confirm helper page chrome shows `Logout`.
+25. Log out and confirm the helper account is removed.
+26. Restart the installed runtime from the extracted tarball tree and confirm the web service comes back.
+27. Stop the runtime and confirm the web service is gone.
 
 ## Expected Results
 
 - every covered command exits successfully except bare `dashboard`, which should
   return usage with a non-zero status
+- `dashboard version` reports the installed release version
 - `dashboard init` creates starter state without requiring manual setup
-- `dashboard update` succeeds in the container from the extracted tarball contents
+- `dashboard update` succeeds in the container from a user-provided fake-project `./.developer-dashboard/cli/update` command through the normal command-hook path
 - the installed `dashboard` binary works without `perl -Ilib`
-- the fake project directories become the active bookmark, config, and startup roots
+- the fake project's `./.developer-dashboard` tree becomes the active local runtime root with the home tree as fallback
+- a broken config Perl collector reports an error without stopping other configured collectors
+- a healthy config collector still reports `ok` and stays green in `dashboard indicator list`, `dashboard ps1`, and `/system/status`
 - the web service serves the root editor on `127.0.0.1:7890`
 - the browser can load both the editor and a saved fake-project bookmark page from the fake project bookmark directory
+- the browser sees sorted shared `nav/*.tt` fragments above the main page body on that fake-project bookmark page
 - non-loopback access produces the helper login page
 - helper logout removes both the helper session and the helper account
 - `dashboard stop` leaves no active listener on port `7890`

@@ -9,7 +9,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN       = 4;          # minimum match length in LZ parsing
@@ -951,23 +951,36 @@ sub binary_vrl_decode ($bitstring) {
 ############################
 
 sub bwt_sort ($s, $LOOKAHEAD_LEN = 128) {    # O(n * LOOKAHEAD_LEN) space (fast)
-#<<<
-    [
-     map { $_->[1] } sort {
-              ($a->[0] cmp $b->[0])
-           || ((substr($s, $a->[1]) . substr($s, 0, $a->[1])) cmp (substr($s, $b->[1]) . substr($s, 0, $b->[1])))
-     }
-     map {
-         my $t = substr($s, $_, $LOOKAHEAD_LEN);
+    my $len      = length($s);
+    my $double_s = $s . $s;                  # Pre-compute doubled string
 
-         if (length($t) < $LOOKAHEAD_LEN) {
-             $t .= substr($s, 0, ($_ < $LOOKAHEAD_LEN) ? $_ : ($LOOKAHEAD_LEN - length($t)));
-         }
+    # Schwartzian transform with optimized sorting
+    return [
+        map { $_->[1] }
+        sort {
+            ($a->[0] cmp $b->[0])
+              || do {
+                my ($cmp, $s_len) = (0, $LOOKAHEAD_LEN << 2);
+                while (1) {
+                    ($cmp = substr($double_s, $a->[1], $s_len) cmp substr($double_s, $b->[1], $s_len)) && last;
+                    $s_len <<= 1;
+                }
+                $cmp;
+            }
+        }
+        map {
+            my $pos = $_;
+            my $end = $pos + $LOOKAHEAD_LEN;
 
-         [$t, $_]
-       } 0 .. length($s) - 1
+            # Handle wraparound efficiently
+            my $t =
+              ($end <= $len)
+              ? substr($s,        $pos, $LOOKAHEAD_LEN)
+              : substr($double_s, $pos, $LOOKAHEAD_LEN);
+
+            [$t, $pos]
+          } 0 .. $len - 1
     ];
-#>>>
 }
 
 sub bwt_encode ($s, $LOOKAHEAD_LEN = 128) {
@@ -977,41 +990,44 @@ sub bwt_encode ($s, $LOOKAHEAD_LEN = 128) {
     }
 
     my $bwt = bwt_sort($s, $LOOKAHEAD_LEN);
-    my $ret = join('', map { substr($s, $_ - 1, 1) } @$bwt);
 
+    my $ret = '';
     my $idx = 0;
-    foreach my $i (@$bwt) {
-        $i || last;
-        ++$idx;
+
+    my $i = 0;
+    foreach my $pos (@$bwt) {
+        $ret .= substr($s, $pos - 1, 1);
+        $idx = $i if !$pos;
+        ++$i;
     }
 
     return ($ret, $idx);
 }
 
-sub bwt_decode ($bwt, $idx) {    # fast inversion
+sub bwt_decode ($bwt, $idx) {
+    my @L = unpack('C*', $bwt);
+    my $n = scalar @L;
 
-    my @tail = split(//, $bwt);
-    my @head = sort @tail;
+    my @freq = (0) x 256;
+    $freq[$_]++ for @L;
 
-    my %indices;
-    foreach my $i (0 .. $#tail) {
-        push @{$indices{$tail[$i]}}, $i;
+    my @cumul = (0) x 257;
+    $cumul[$_ + 1] = $cumul[$_] + $freq[$_] for 0 .. 255;
+
+    my @next;
+    my @cnt = (0) x 256;
+    for my $i (0 .. $n - 1) {
+        $next[$cumul[$L[$i]] + $cnt[$L[$i]]++] = $i;
     }
 
-    my @table;
-    foreach my $v (@head) {
-        push @table, shift(@{$indices{$v}});
+    my @dec;
+    my $i = $idx;
+    for (1 .. $n) {
+        $i = $next[$i];
+        push @dec, $L[$i];
     }
 
-    my $dec = '';
-    my $i   = $idx;
-
-    for (1 .. scalar(@head)) {
-        $dec .= $head[$i];
-        $i = $table[$i];
-    }
-
-    return $dec;
+    return pack('C*', @dec);
 }
 
 ##############################################
@@ -1859,18 +1875,31 @@ sub huffman_encode ($symbols, $dict) {
     join('', @{$dict}{@$symbols});
 }
 
+sub _build_trie ($rev_dict) {
+    my $root = {};
+    for my $code (keys %$rev_dict) {
+        my $node = $root;
+        for my $bit (split //, $code) {
+            $node->{$bit} //= {};
+            $node = $node->{$bit};
+        }
+        $node->{sym} = $rev_dict->{$code};
+    }
+    return $root;
+}
+
 sub huffman_decode ($bits, $rev_dict) {
-    local $" = '|';
-    [
-     split(
-         ' ', $bits =~ s{(@{[
-        map  { $_->[1] }
-        sort { $a->[0] <=> $b->[0] }
-        map  { [length($_), $_] }
-        keys %$rev_dict]
-    })}{$rev_dict->{$1} }gr
-          )
-    ];
+    my $root = _build_trie($rev_dict);
+    my @result;
+    my $node = $root;
+    foreach my $i (0 .. length($bits) - 1) {
+        $node = $node->{substr($bits, $i, 1)};
+        if (exists $node->{sym}) {
+            push @result, $node->{sym};
+            $node = $root;
+        }
+    }
+    return \@result;
 }
 
 # produce encode and decode dictionary from a tree
@@ -1883,83 +1912,122 @@ sub _huffman_walk_tree ($node, $code, $h) {
     return $h;
 }
 
-sub huffman_from_code_lengths ($code_lengths) {
+sub huffman_from_code_lengths ($code_lengths_table) {
+
+    if (ref($code_lengths_table) eq 'ARRAY') {
+        my %table = map { (($code_lengths_table->[$_] > 0) ? ($_, $code_lengths_table->[$_]) : ()) } 0 .. $#{$code_lengths_table};
+        return __SUB__->(\%table);
+    }
 
     # This algorithm is based on the pseudocode in RFC 1951 (Section 3.2.2)
     # (Steps are numbered as in the RFC)
 
-    # Step 1
-    my $max_length    = max(@$code_lengths) // 0;
+    my @code_lengths = map { [$_, $code_lengths_table->{$_}] } sort { $a <=> $b } keys %$code_lengths_table;
+
+    # Step 1: Count the number of codes for each length
+    my $max_length    = max(map { $_->[1] } @code_lengths) // 0;
     my @length_counts = (0) x ($max_length + 1);
-    foreach my $length (@$code_lengths) {
-        ++$length_counts[$length];
+
+    foreach my $length (map { $_->[1] } @code_lengths) {
+
+        # Treat undef or negative lengths as 0 (unused)
+        if (defined($length) and $length > 0) {
+            ++$length_counts[$length];
+        }
     }
 
-    # Step 2
+    # Step 2: Generate the starting numerical value for each length
     my $code = 0;
     $length_counts[0] = 0;
     my @next_code = (0) x ($max_length + 1);
+
     foreach my $bits (1 .. $max_length) {
         $code = ($code + $length_counts[$bits - 1]) << 1;
         $next_code[$bits] = $code;
     }
 
-    # Step 3
-    my @code_table;
-    foreach my $n (0 .. $#{$code_lengths}) {
-        my $length = $code_lengths->[$n];
-        if ($length != 0) {
-            $code_table[$n] = sprintf('%0*b', $length, $next_code[$length]);
-            ++$next_code[$length];
-        }
-    }
-
+    # Step 3: Assign numerical values to all codes
     my %dict;
     my %rev_dict;
+    foreach my $pair (@code_lengths) {
+        my ($key, $length) = @$pair;
 
-    foreach my $i (0 .. $#{$code_lengths}) {
-        my $code = $code_table[$i];
-        if (defined($code)) {
-            $dict{$i}        = $code;
-            $rev_dict{$code} = $i;
+        # Skip zero-length codes (unused symbols)
+        if (defined($length) and $length != 0) {
+
+            # Format the integer code as a binary string with $length bits
+            my $binary_code = sprintf('%0*b', $length, $next_code[$length]);
+
+            $dict{$key}             = $binary_code;
+            $rev_dict{$binary_code} = $key;
+
+            # Increment the code for the next symbol of this length
+            ++$next_code[$length];
         }
     }
 
     return (wantarray ? (\%dict, \%rev_dict) : \%dict);
 }
 
-# make a tree, and return resulting dictionaries
-sub huffman_from_freq ($freq) {
+sub _heap_push ($heap, $item) {
+    push @$heap, $item;
+    my $i = $#$heap;
+    while ($i > 0) {
+        my $p = ($i - 1) >> 1;
+        last if ($heap->[$p][1] <= $heap->[$i][1]);
+        @{$heap}[$p, $i] = @{$heap}[$i, $p];
+        $i = $p;
+    }
+}
 
-    my @nodes      = map { [$_, $freq->{$_}] } sort { $a <=> $b } keys %$freq;
-    my $max_symbol = scalar(@nodes) ? $nodes[-1][0] : -1;
+sub _heap_pop ($heap) {
+    return pop @$heap if (@$heap == 1);
+    my $top = $heap->[0];
+    $heap->[0] = pop @$heap;
+    my $n = scalar @$heap;
+    my $i = 0;
+    while (1) {
+        my $s = $i;
+        my $l = 2 * $i + 1;
+        my $r = $l + 1;
+        $s = $l if ($l < $n && $heap->[$l][1] < $heap->[$s][1]);
+        $s = $r if ($r < $n && $heap->[$r][1] < $heap->[$s][1]);
+        last if $s == $i;
+        @{$heap}[$i, $s] = @{$heap}[$s, $i];
+        $i = $s;
+    }
+    return $top;
+}
 
-    do {    # poor man's priority queue
-        @nodes = sort { $a->[1] <=> $b->[1] } @nodes;
-        my ($x, $y) = splice(@nodes, 0, 2);
-        if (defined($x)) {
-            if (defined($y)) {
-                push @nodes, [[$x, $y], $x->[1] + $y->[1]];
-            }
-            else {
-                push @nodes, [[$x], $x->[1]];
-            }
-        }
-    } while (@nodes > 1);
+sub huffman_from_freq($freq) {
 
-    my $h = _huffman_walk_tree($nodes[0], '', {});
-
-    my @code_lengths;
-    foreach my $i (0 .. $max_symbol) {
-        if (exists $h->{$i}) {
-            $code_lengths[$i] = length($h->{$i});
-        }
-        else {
-            $code_lengths[$i] = 0;
-        }
+    # Initialize Heap
+    # Structure: [ [symbol_or_children], frequency ]
+    my @heap;
+    foreach my $k (sort { $a <=> $b } keys %$freq) {
+        _heap_push(\@heap, [$k, $freq->{$k}]);
     }
 
-    huffman_from_code_lengths(\@code_lengths);
+    # Build Huffman Tree
+    while (@heap > 1) {
+        my $x = _heap_pop(\@heap);
+        my $y = _heap_pop(\@heap);
+        _heap_push(\@heap, [[$x, $y], $x->[1] + $y->[1]]);
+    }
+
+    if (@heap == 1 && !ref $heap[0][0]) {
+        @heap = ([[$heap[0]], $heap[0][1]]);
+    }
+
+    # Generate Codes
+    my $h = _huffman_walk_tree($heap[0], '', {});
+
+    my %code_lengths;
+    foreach my $i (keys %$freq) {
+        $code_lengths{$i} = length($h->{$i});
+    }
+
+    huffman_from_code_lengths(\%code_lengths);
 }
 
 sub huffman_from_symbols ($symbols) {
@@ -2501,9 +2569,9 @@ sub lzss_decode ($literals, $distances, $lengths) {
             $data .= substr($data, -1) x $length;
         }
         else {                     # overlapping matches
-            foreach my $i (1 .. $length) {
-                $data .= substr($data, $data_len + $i - $dist - 1, 1) // confess "bad input";
-            }
+            my $pattern   = substr($data, $data_len - $dist, $dist) // confess "bad input";
+            my $full_reps = int(($length + $dist - 1) / $dist) + 1;
+            $data .= substr($pattern x $full_reps, 0, $length) // confess "bad input";
         }
 
         $data_len += $length;
@@ -5764,11 +5832,18 @@ The prefix codes are in canonical form, as defined in RFC 1951 (Section 3.2.2).
     my $dict = huffman_from_code_lengths(\@code_lengths);
     my ($dict, $rev_dict) = huffman_from_code_lengths(\@code_lengths);
 
-Low-level function that constructs a dictionary of canonical prefix codes, given an array of code lengths, as defined in RFC 1951 (Section 3.2.2).
+    my $dict = huffman_from_code_lengths(\%code_lengths);
+    my ($dict, $rev_dict) = huffman_from_code_lengths(\%code_lengths);
+
+Low-level function that constructs a dictionary of canonical prefix codes as defined in RFC 1951 (Section 3.2.2), given an array-ref of code lengths or a hash-ref of (symbol => length) values,
 
 It takes a single parameter, C<\@code_lengths>, where entry C<$i> in the array corresponds to the code length for symbol C<$i>.
 
-The function returns two values: C<$dict>, which is the mapping of symbols to Huffman codes, and C<$rev_dict>, which holds the reverse mapping of Huffman codes to symbols.
+Similarily, when a hash-ref table is given, C<\%code_lengths>, keys are the symbols and values are the code lengths. This variant is useful for large symbols.
+
+In list context, the function returns two values: C<$dict>, which is the mapping of symbols to Huffman codes, and C<$rev_dict>, which holds the reverse mapping of Huffman codes to symbols.
+
+In scalar context, it returns only the C<$dict> table.
 
 =head2 huffman_encode
 
@@ -6098,7 +6173,7 @@ Please report any bugs or feature requests to: L<https://github.com/trizen/Compr
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu  C<< <trizen@cpan.org> >>
+Daniel "Trizen" Șuteu
 
 =head1 ACKNOWLEDGEMENTS
 

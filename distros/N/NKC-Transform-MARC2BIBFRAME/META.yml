@@ -6,8 +6,11 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.36
+  File::Object: 0
+  Perl6::Slurp: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -37,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/NKC-Transform-MARC2BIBFRAME
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/NKC-Transform-MARC2BIBFRAME
-version: '0.04'
+version: '0.05'

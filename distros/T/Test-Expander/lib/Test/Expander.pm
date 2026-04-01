@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.7.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.7.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings

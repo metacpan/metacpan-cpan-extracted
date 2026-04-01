@@ -1,0 +1,86 @@
+NAME
+    Error::Pure::Output::Bio - Output bioperl subroutines for Error::Pure.
+
+SYNOPSIS
+     use Error::Pure::Output::Bio qw(err_bio);
+
+     my $err = err_bio(@errors);
+     my @err = err_bio(@errors);
+
+SUBROUTINES
+  "err_bio"
+     my $err = err_bio(@errors);
+     my @err = err_bio(@errors);
+
+    Bioperl print of backtrace.
+
+    Returns string in scalar context. Returns array of lines in array
+    context.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Error::Pure::Output::Bio qw(err_bio);
+
+     # Fictional error structure.
+     my $err_hr = {
+             'msg' => [
+                     'FOO',
+                     'KEY',
+                     'VALUE',
+             ],
+             'stack' => [
+                     {
+                             'args' => '(2)',
+                             'class' => 'main',
+                             'line' => 1,
+                             'prog' => 'script.pl',
+                             'sub' => 'err',
+                     }, {
+                             'args' => '',
+                             'class' => 'main',
+                             'line' => 20,
+                             'prog' => 'script.pl',
+                             'sub' => 'eval {...}',
+                     }
+             ],
+     };
+
+     # Print out.
+     print scalar err_bio($err_hr);
+
+     # Output:
+     # ------------- EXCEPTION -------------
+     # MSG: FOO
+     # VALUE: KEY: VALUE
+     # STACK: main script.pl:1
+     # STACK: main script.pl:20
+     # -------------------------------------
+
+DEPENDENCIES
+    Exporter, Readonly.
+
+SEE ALSO
+    Task::Error::Pure
+        Install the Error::Pure modules.
+
+    Error::Pure::Output::Text
+        Output subroutines for Error::Pure.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Error-Pure-Output-Bio>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2013-2026
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

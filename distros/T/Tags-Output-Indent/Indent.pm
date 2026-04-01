@@ -19,7 +19,7 @@ Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.10;
+our $VERSION = 0.13;
 
 # Finalize Tags output.
 sub finalize {
@@ -99,7 +99,7 @@ sub reset {
 
 # Check parameters to rigth values.
 sub _check_params {
-        my $self = shift;
+	my $self = shift;
 
 	# Check params from SUPER.
 	$self->SUPER::_check_params();
@@ -448,13 +448,12 @@ sub _put_end_of_tag {
 	if ($self->{'xml'} && (! scalar @{$self->{'no_simple'}}
 		|| none { $_ eq $tag } @{$self->{'no_simple'}})) {
 
-		my $pre = $self->{'preserve_obj'}->end($tag);
+		my ($pre, $pre_pre) = $self->{'preserve_obj'}->end($tag);
 		if (scalar @{$self->{'tmp_code'}}) {
 			if (scalar @{$self->{'tmp_comment_code'}}
 				&& $self->{'comment_flag'} == 1) {
 
 				$self->_print_tag('>');
-# XXX				$self->{'preserve_obj'}->end($tag);
 				$self->_print_end_tag($tag);
 			} else {
 				$self->_print_tag('/>');
@@ -466,16 +465,27 @@ sub _put_end_of_tag {
 			$self->_print_end_tag($tag);
 		}
 
+		# If we just ended a preserved element ($pre_pre == 1), reset the previous flag
+		# so that the next element will start on a new line
+		if ($pre == 0 && $pre_pre == 1) {
+			$self->{'preserve_obj'}->save_previous;
+		}
+
 	# Tag cannot be simple.
 	} else {
 		if (scalar @{$self->{'tmp_code'}}) {
 			unshift @{$self->{'printed_tags'}}, $tag;
 			$self->_print_tag('>');
 			shift @{$self->{'printed_tags'}};
-# XXX				$self->_newline;
 		}
-		$self->{'preserve_obj'}->end($tag);
+		my ($pre, $pre_pre) = $self->{'preserve_obj'}->end($tag);
 		$self->_print_end_tag($tag);
+
+		# If we just ended a preserved element ($pre_pre == 1), reset the previous flag
+		# so that the next element will start on a new line
+		if ($pre == 0 && $pre_pre == 1) {
+			$self->{'preserve_obj'}->save_previous;
+		}
 	}
 	return;
 }
@@ -721,6 +731,11 @@ Returns instance of class.
  Strict instruction.
  Default value is 1.
 
+=item * C<xml>
+
+ Flag, that means xml output.
+ Default is 0 (sgml).
+
 =back
 
 =head2 C<finalize>
@@ -769,7 +784,9 @@ Resets internal variables.
  Ending bad tag: '%s' in block of tag '%s'.
  In XML mode must be a attribute value.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
+
+=for comment filename=simple_example.pl
 
  use strict;
  use warnings;
@@ -782,8 +799,8 @@ Resets internal variables.
  # Put data.
  $tags->put(
          ['b', 'text'],
-	 ['d', 'data'],
-	 ['e', 'text'],
+         ['d', 'data'],
+         ['e', 'text'],
  );
 
  # Print.
@@ -792,6 +809,45 @@ Resets internal variables.
  # Output:
  # <text>
  #   data
+ # </text>
+
+=head1 EXAMPLE2
+
+=for comment filename=simple_example_utf8.pl
+
+ use strict;
+ use warnings;
+
+ use Tags::Output::Indent;
+ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+ # Object.
+ my $tags = Tags::Output::Indent->new(
+         'data_callback' => sub {
+                 my $data_ar = shift;
+                 foreach my $data (@{$data_ar}) {
+                         $data = encode_utf8($data);
+                 }
+                 return;
+         },
+ );
+
+ # Data in characters.
+ my $data = decode_utf8('řčěšřšč');
+
+ # Put data.
+ $tags->put(
+         ['b', 'text'],
+         ['d', $data],
+         ['e', 'text'],
+ );
+
+ # Print.
+ print $tags->flush."\n";
+
+ # Output:
+ # <text>
+ #   řčěšřšč
  # </text>
 
 =head1 DEPENDENCIES
@@ -834,12 +890,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2023 Michal Josef Špaček
+© 2011-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.13
 
 =cut

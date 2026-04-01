@@ -1,5 +1,5 @@
 package Developer::Dashboard::RuntimeManager;
-$Developer::Dashboard::RuntimeManager::VERSION = '0.72';
+$Developer::Dashboard::RuntimeManager::VERSION = '0.94';
 use strict;
 use warnings;
 

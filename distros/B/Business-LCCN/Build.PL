@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Business::LCCN',
     license             => 'perl',
-    dist_author         => 'Anirvan Chatterjee <anirvan@cpan.org>',
+    dist_author         => ['Anirvan Chatterjee <anirvan@cpan.org>', 'Jan Willamowius <jan@willamowius.de>'],
     dist_version_from   => 'lib/Business/LCCN.pm',
     requires => {
 	'perl' => '5.6.1',

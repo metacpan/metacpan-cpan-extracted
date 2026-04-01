@@ -1,27 +1,25 @@
 package Developer::Dashboard::PageResolver;
-$Developer::Dashboard::PageResolver::VERSION = '0.72';
+$Developer::Dashboard::PageResolver::VERSION = '0.94';
 use strict;
 use warnings;
 
 use Developer::Dashboard::PageDocument;
 
 # new(%args)
-# Constructs the page resolver over saved/config/plugin page sources.
-# Input: config, pages, paths, plugins, and actions objects.
+# Constructs the page resolver over saved and config-backed page sources.
+# Input: config, pages, paths, and actions objects.
 # Output: Developer::Dashboard::PageResolver object.
 sub new {
     my ( $class, %args ) = @_;
     my $config  = $args{config}  || die 'Missing config';
     my $pages   = $args{pages}   || die 'Missing page store';
     my $paths   = $args{paths}   || die 'Missing path registry';
-    my $plugins = $args{plugins} || die 'Missing plugin manager';
     my $actions = $args{actions} || die 'Missing action runner';
     return bless {
         actions => $actions,
         config  => $config,
         pages   => $pages,
         paths   => $paths,
-        plugins => $plugins,
     }, $class;
 }
 
@@ -76,7 +74,6 @@ sub providers {
     );
 
     push @providers, @{ $self->{config}->providers };
-    push @providers, @{ $self->{plugins}->providers };
     return \@providers;
 }
 
@@ -102,7 +99,8 @@ sub load_provider_page {
                     'home: ' . $self->{paths}->home,
                     'runtime: ' . $self->{paths}->runtime_root,
                     'dashboards: ' . $self->{paths}->dashboards_root,
-                    'plugins: ' . $self->{paths}->plugins_root,
+                    'config: ' . $self->{paths}->config_root,
+                    'cli: ' . $self->{paths}->cli_root,
                 ),
             },
             actions => [

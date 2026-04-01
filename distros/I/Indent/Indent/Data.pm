@@ -12,7 +12,7 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -165,6 +165,8 @@ Returns string or array of data to print.
 
 =head1 EXAMPLE1
 
+=for comment filename=indent_data.pl
+
  use strict;
  use warnings;
 
@@ -187,6 +189,8 @@ Returns string or array of data to print.
  #   ext|
 
 =head1 EXAMPLE2
+
+=for comment filename=indent_data_with_prefix.pl
 
  use strict;
  use warnings;
@@ -212,6 +216,8 @@ Returns string or array of data to print.
  # <->  xt|
 
 =head1 EXAMPLE3
+
+=for comment filename=indent_data_non_indent.pl
 
  use strict;
  use warnings;
@@ -276,12 +282,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2024 Michal Josef Špaček
+© 2005-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

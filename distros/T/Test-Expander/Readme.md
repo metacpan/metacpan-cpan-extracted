@@ -109,7 +109,7 @@ redundancy, and improving consistency across test suites.
 The module is built around two ideas:
 
 - _Automate what is repeated in every test_
-- _Eliminate hard‑coded references that make refactoring difficult_
+- _Eliminate hard-coded references that make refactoring difficult_
 
 The following sections summarize its core features.
 

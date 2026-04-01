@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 no warnings 'once';
 
+use_ok('Chandra');
 use_ok('Chandra::Tray');
 
 # --- Constructor ---
@@ -205,22 +206,9 @@ use_ok('Chandra::Tray');
 	is($ret, $tray, 'remove when not active returns self');
 }
 
-# --- show with mock XS ---
+# --- show guard: no _webview returns self ---
 {
-	my @create_calls;
-	my $mock_wv = bless {}, 'MockTrayWV1';
-	no strict 'refs';
-	*MockTrayWV1::_tray_create = sub {
-		shift;
-		push @create_calls, [@_];
-		return 0;
-	};
-	use strict 'refs';
-
-	my $mock_app = bless { _wv => $mock_wv, _started => 1 }, 'MockTrayApp1';
-	no strict 'refs';
-	*MockTrayApp1::webview = sub { shift->{_wv} };
-	use strict 'refs';
+	my $mock_app = bless { _started => 1 }, 'MockTrayApp1';
 
 	my $tray = Chandra::Tray->new(
 		app     => $mock_app,
@@ -228,62 +216,37 @@ use_ok('Chandra::Tray');
 		tooltip => 'Test',
 	);
 	$tray->add_item('Quit' => sub {});
-	$tray->show;
-
-	is(scalar @create_calls, 1, '_tray_create called once');
-	is($create_calls[0][0], 'icon.png', 'icon passed');
-	is($create_calls[0][1], 'Test', 'tooltip passed');
-	ok(ref $create_calls[0][3] eq 'CODE', 'callback passed');
-	is($tray->is_active, 1, 'tray is active after show');
+	my $ret = $tray->show;
+	is($ret, $tray, 'show returns self when no _webview');
+	is($tray->is_active, 0, 'not active without _webview');
 }
 
-# --- remove with mock XS ---
+# --- remove when not active returns self ---
 {
-	my $destroy_called = 0;
-	my $mock_wv = bless {}, 'MockTrayWV2';
-	no strict 'refs';
-	*MockTrayWV2::_tray_create = sub { return 0 };
-	*MockTrayWV2::_tray_destroy = sub { $destroy_called = 1 };
-	use strict 'refs';
-
-	my $mock_app = bless { _wv => $mock_wv, _started => 1 }, 'MockTrayApp2';
-	no strict 'refs';
-	*MockTrayApp2::webview = sub { shift->{_wv} };
-	use strict 'refs';
+	my $mock_app = bless { _started => 1 }, 'MockTrayApp2';
 
 	my $tray = Chandra::Tray->new(app => $mock_app);
-	$tray->show;
-	$tray->remove;
-
-	is($destroy_called, 1, '_tray_destroy called');
+	$tray->show;	# won't activate (no _webview)
+	my $ret = $tray->remove;
+	is($ret, $tray, 'remove returns self');
 	is($tray->is_active, 0, 'not active after remove');
 }
 
-# --- _sync on update when active ---
+# --- _sync on update when active (verify menu JSON updates) ---
 {
-	my @update_calls;
-	my $mock_wv = bless {}, 'MockTrayWV3';
-	no strict 'refs';
-	*MockTrayWV3::_tray_create = sub { return 0 };
-	*MockTrayWV3::_tray_update = sub { shift; push @update_calls, [@_] };
-	use strict 'refs';
-
-	my $mock_app = bless { _wv => $mock_wv, _started => 1 }, 'MockTrayApp3';
-	no strict 'refs';
-	*MockTrayApp3::webview = sub { shift->{_wv} };
-	use strict 'refs';
-
 	my $tray = Chandra::Tray->new(
-		app     => $mock_app,
 		icon    => 'a.png',
 		tooltip => 'A',
 	);
-	$tray->show;
+	$tray->add_item('Show' => sub {});
+
+	my $json1 = $tray->_menu_json;
 	$tray->add_item('New Item' => sub {});
-	is(scalar @update_calls, 1, '_tray_update called on add_item when active');
+	my $json2 = $tray->_menu_json;
+	isnt($json1, $json2, 'menu JSON changes after add_item');
 
 	$tray->set_tooltip('B');
-	is(scalar @update_calls, 2, '_tray_update called on set_tooltip when active');
+	is($tray->{tooltip}, 'B', 'tooltip updated for sync');
 }
 
 # --- items returns a copy ---

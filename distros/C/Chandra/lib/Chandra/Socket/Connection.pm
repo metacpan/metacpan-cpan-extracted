@@ -4,144 +4,20 @@ use strict;
 use warnings;
 
 use Cpanel::JSON::XS ();
-use POSIX qw(EAGAIN EWOULDBLOCK);
+use POSIX ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-my $json = Cpanel::JSON::XS->new->utf8->allow_nonref->allow_blessed->convert_blessed;
+# XS methods are registered under the Chandra bootstrap.
+# Ensure the shared object is loaded.
+require Chandra;
 
-use constant MAX_FRAME_SIZE  => 16 * 1024 * 1024;   # 16 MB
-use constant MAX_BUFFER_SIZE => 64 * 1024 * 1024;   # 64 MB
+our $_xs_json = Cpanel::JSON::XS->new->utf8->allow_nonref->allow_blessed->convert_blessed;
 
-sub new {
-	my ($class, %args) = @_;
-	return bless {
-		socket     => $args{socket},
-		name       => $args{name},
-		_buf       => '',
-		_connected => $args{socket} ? 1 : 0,
-	}, $class;
-}
+# _xs_do_send, _xs_do_recv, _xs_json_encode, _xs_json_decode are now XSUBs in socket_connection.xs
 
-sub socket    { $_[0]->{socket} }
-sub name      { $_[0]->{name} }
-sub set_name  { $_[0]->{name} = $_[1] }
-
-sub is_connected {
-	my ($self) = @_;
-	return $self->{_connected} && $self->{socket} ? 1 : 0;
-}
-
-sub send {
-	my ($self, $channel, $data, $extra) = @_;
-	return 0 unless $self->is_connected;
-
-	my $msg = {
-		channel => $channel,
-		data    => $data,
-		($self->{name} ? (from => $self->{name}) : ()),
-	};
-	if ($extra && ref $extra eq 'HASH') {
-		$msg->{$_} = $extra->{$_} for keys %$extra;
-	}
-
-	my $payload = $json->encode($msg);
-	my $frame = pack('N', length($payload)) . $payload;
-
-	local $SIG{PIPE} = 'IGNORE';
-	my $written = $self->{socket}->syswrite($frame);
-	return (defined $written && $written == length($frame)) ? 1 : 0;
-}
-
-sub reply {
-	my ($self, $orig_msg, $data) = @_;
-	return 0 unless $orig_msg && defined $orig_msg->{_id};
-	return $self->send($orig_msg->{channel}, $data, { _reply_to => $orig_msg->{_id} });
-}
-
-sub recv {
-	my ($self) = @_;
-	return () unless $self->is_connected;
-
-	my $buf;
-	my $read = $self->{socket}->sysread($buf, 65536);
-	if ($read) {
-		$self->{_buf} .= $buf;
-		if (length($self->{_buf}) > MAX_BUFFER_SIZE) {
-			warn "Chandra::Socket::Connection: buffer overflow, disconnecting\n";
-			$self->{_connected} = 0;
-			$self->{_buf} = '';
-			return ();
-		}
-	} elsif (!defined $read && $! != EAGAIN && $! != EWOULDBLOCK) {
-		$self->{_connected} = 0;
-		return ();
-	} elsif (defined $read && $read == 0) {
-		$self->{_connected} = 0;
-		return ();
-	}
-
-	return $self->_decode_frames;
-}
-
-sub _decode_frames {
-	my ($self) = @_;
-	my @messages;
-
-	while (length($self->{_buf}) >= 4) {
-		my $len = unpack('N', substr($self->{_buf}, 0, 4));
-		if ($len > MAX_FRAME_SIZE) {
-			warn "Chandra::Socket::Connection: frame too large ($len bytes), disconnecting\n";
-			$self->{_connected} = 0;
-			$self->{_buf} = '';
-			return @messages;
-		}
-		last if length($self->{_buf}) < 4 + $len;
-
-		my $payload = substr($self->{_buf}, 4, $len);
-		$self->{_buf} = substr($self->{_buf}, 4 + $len);
-
-		my $msg = eval { $json->decode($payload) };
-		if ($msg) {
-			push @messages, $msg;
-		} else {
-			warn "Chandra::Socket::Connection: malformed JSON frame: $@\n";
-		}
-	}
-
-	return @messages;
-}
-
-sub close {
-	my ($self) = @_;
-	$self->{_connected} = 0;
-	if ($self->{socket}) {
-		$self->{socket}->close;
-		$self->{socket} = undef;
-	}
-}
-
-# Encode/decode helpers for testing
-sub encode_frame {
-	my ($class, $msg) = @_;
-	my $payload = $json->encode($msg);
-	return pack('N', length($payload)) . $payload;
-}
-
-sub decode_frames {
-	my ($class, $data) = @_;
-	my @messages;
-	my $buf = $data;
-	while (length($buf) >= 4) {
-		my $len = unpack('N', substr($buf, 0, 4));
-		last if length($buf) < 4 + $len;
-		my $payload = substr($buf, 4, $len);
-		$buf = substr($buf, 4 + $len);
-		my $msg = eval { $json->decode($payload) };
-		push @messages, $msg if $msg;
-	}
-	return @messages;
-}
+# XS methods: new, socket, name, set_name, is_connected,
+#   send, reply, recv, close, encode_frame, decode_frames
 
 1;
 

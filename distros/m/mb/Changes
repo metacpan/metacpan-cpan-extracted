@@ -1,5 +1,14 @@
 Revision history for this software.
 
+0.60  2026-03-31 JST (Japan Standard Time)
+  - fix lib/mb.pm: =encoding utf8 -> utf-8 (Pod::Checker 1.45 compat)
+  - fix t/9025-perl542compat.t: avoid "implicit split to @_" deprecation
+    warning on Perl 5.8.x in T7 (use explicit array variable instead of
+    scalar(split ...))
+  - fix t/9050-pod.t: skip G12 Pod::Checker warnings check when
+    Pod::Checker < 1.60 to avoid false FAILs caused by mis-reported
+    warnings for valid L<> link syntax on older Perl installations
+
 0.59  2026-03-29 JST (Japan Standard Time)
   - add t/lib/INA_CPAN_Check.pm: shared test library aligned with
     DB-Handy 1.07, HTTP-Handy 1.03, LTSV-LINQ 1.07, mb-JSON 0.04

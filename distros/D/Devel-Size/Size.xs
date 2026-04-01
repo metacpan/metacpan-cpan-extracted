@@ -670,7 +670,7 @@ op_size(pTHX_ const OP * const baseop, struct state *st)
 		   pointer. So there is no allocation to total up. */
 		TAG;break;
 #endif
-#if PERL_VERSION > 43 || PERL_SUBVERSION > 4
+#if PERL_VERSION > 43 || (PERL_VERSION == 43 && PERL_SUBVERSION > 4)
 	    case OP_MULTIPARAM:
 	    {
                 struct op_multiparam_aux *aux = (struct op_multiparam_aux *)cUNOP_AUXx(baseop)->op_aux;

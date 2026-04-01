@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.72';
+our $VERSION = '0.94';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-0.72
+0.94
 
 =head1 INTRODUCTION
 
@@ -36,6 +36,13 @@ prompt indicators, path aliases, open-file shortcuts, data query tools, and
 Docker Compose helpers so local development can stay centered around one
 consistent home instead of a pile of disconnected scripts and tabs.
 
+When the current project contains F<./.developer-dashboard>, that tree becomes
+the first runtime lookup root for dashboard-managed files. The home runtime
+under F<~/.developer-dashboard> stays as the fallback base, so project-local
+bookmarks, config, CLI hooks, helper users, sessions, and isolated docker
+service folders can override home defaults without losing shared fallback data
+that is not redefined locally.
+
 Release tarballs contain installable runtime artifacts only; local Dist::Zilla release-builder configuration is kept out of the shipped archive.
 Frequently used built-in commands such as C<of>, C<open-file>, C<pjq>, C<pyq>,
 C<ptomq>, and C<pjp> are also installed as standalone executables so they can
@@ -43,6 +50,9 @@ run directly without loading the full C<dashboard> runtime.
 Before publishing a release, the built tarball should be smoke-tested with
 C<cpanm> from the artifact itself so the shipped archive matches the fixed
 source tree.
+Repository metadata should also keep explicit repository links, shipped module
+C<provides>, and root F<SECURITY.md> / F<CONTRIBUTING.md> policy files aligned
+for CPAN and Kwalitee consumers.
 
 It provides a small ecosystem for:
 
@@ -99,7 +109,7 @@ action execution with trusted and safer page boundaries
 
 =item *
 
-plugin-loaded providers, path aliases, and compose overlays
+config-backed providers, path aliases, and compose overlays
 
 =item *
 
@@ -110,6 +120,11 @@ update scripts and release packaging for CPAN distribution
 Developer Dashboard is meant to become the developer's working home:
 
 =over 4
+
+=item *
+
+shared nav fragments from saved C<nav/*.tt> bookmarks rendered between the top
+chrome and the main page body on other saved pages
 
 =item *
 
@@ -131,6 +146,55 @@ a configurable runtime that can adapt to each codebase without losing one
 familiar entrypoint
 
 =back
+
+=head2 Shared Nav Fragments
+
+If C<nav/*.tt> files exist under the saved bookmark root, every non-nav page
+render includes them between the top chrome and the main page body.
+
+For the default runtime that means files such as:
+
+=over 4
+
+=item *
+
+F<~/.developer-dashboard/dashboards/nav/foo.tt>
+
+=item *
+
+F<~/.developer-dashboard/dashboards/nav/bar.tt>
+
+=back
+
+And with route access such as:
+
+=over 4
+
+=item *
+
+C</app/nav/foo.tt>
+
+=item *
+
+C</page/nav/foo.tt/edit>
+
+=item *
+
+C</page/nav/foo.tt/source>
+
+=back
+
+The bookmark editor can save those nested ids directly, for example
+C<BOOKMARK: nav/foo.tt>. On a page like C</app/index>, the direct C<nav/*.tt>
+files are loaded in sorted filename order, rendered through the normal page
+runtime, and inserted above the page body. Non-C<.tt> files and subdirectories
+under C<nav/> are ignored by that shared-nav renderer.
+
+Shared nav fragments and normal bookmark pages both render through Template
+Toolkit with C<env.current_page> set to the active request path, such as
+C</app/index>. The same path is also available as
+C<env.runtime_context.current_page>, alongside the rest of the request-time
+runtime context.
 
 =head2 What You Get
 
@@ -291,8 +355,8 @@ The toolchain already understands Perl module names, Java class names, direct
 files, structured-data formats, and project-local compose flows, so it suits
 mixed-language teams and polyglot repositories as well as Perl-heavy work.
 
-Project-specific behavior is added through configuration, startup collector
-definitions, saved pages, and optional plugins.
+Project-specific behavior is added through configuration, saved pages, and
+user CLI extensions.
 
 =head1 DOCUMENTATION
 
@@ -304,7 +368,7 @@ definitions, saved pages, and optional plugins.
 
 L<Developer::Dashboard::PathRegistry> resolves the runtime roots that
 everything else depends on, such as dashboards, config, collectors,
-indicators, plugins, logs, cache, and startup files.
+indicators, CLI hooks, logs, and cache.
 
 =item * File Registry
 
@@ -318,12 +382,11 @@ L<Developer::Dashboard::PageDocument> and L<Developer::Dashboard::PageStore>
 implement the saved and transient page model, including bookmark-style source
 documents, encoded transient pages, and persistent bookmark storage.
 
-=item * Page Resolver and Plugins
+=item * Page Resolver
 
-L<Developer::Dashboard::PageResolver> and
-L<Developer::Dashboard::PluginManager> resolve saved pages, provider pages,
-plugin-defined aliases, and extension packs so browser pages and actions can
-come from both built-in and plugin-backed sources.
+L<Developer::Dashboard::PageResolver> resolves saved pages and provider pages
+so browser pages and actions can come from both built-in and config-backed
+sources.
 
 =item * Actions
 
@@ -415,18 +478,33 @@ Filter enabled collector/checker names.
 
 Override the config root.
 
-=item * C<DEVELOPER_DASHBOARD_STARTUP>
-
-Override the startup collector-definition root.
-
 =back
 
 =head2 User CLI Extensions
 
 Unknown top-level subcommands can be provided by executable files under
-F<~/.developer-dashboard/cli>. For example, C<dashboard foobar a b> will exec
-F<~/.developer-dashboard/cli/foobar> with C<a b> as argv, while preserving
-stdin, stdout, and stderr.
+F<./.developer-dashboard/cli> first and then F<~/.developer-dashboard/cli>.
+For example, C<dashboard foobar a b> will exec the first matching
+F<cli/foobar> with C<a b> as argv, while preserving stdin, stdout, and
+stderr.
+
+Per-command hook files can live under either
+F<./.developer-dashboard/cli/E<lt>commandE<gt>> or
+F<./.developer-dashboard/cli/E<lt>commandE<gt>.d> first, then the same paths
+under F<~/.developer-dashboard/cli/>. Executable files in the selected
+directory are run in sorted filename order before the real command runs,
+non-executable files are skipped, and each hook now streams its own
+C<stdout> and C<stderr> live to the terminal while still accumulating those
+channels into C<RESULT> as JSON. Built-in commands such as C<dashboard pjq>
+use the same hook directory. A
+directory-backed custom command can provide its real executable as
+F<~/.developer-dashboard/cli/E<lt>commandE<gt>/run>, and that runner receives
+the final C<RESULT> environment variable. After each hook finishes, the updated
+C<RESULT> JSON is written back into the environment before the next sorted hook
+starts, so later hook scripts can react to earlier hook output.
+
+Perl hook code can use C<Runtime::Result> to decode C<RESULT> safely and read
+per-hook C<stdout>, C<stderr>, exit codes, or the last recorded hook entry.
 
 =head2 Open File Commands
 
@@ -521,10 +599,16 @@ Run the CLI directly from the repository:
 
   perl -Ilib bin/dashboard init
   perl -Ilib bin/dashboard auth add-user <username> <password>
+  perl -Ilib bin/dashboard version
   perl -Ilib bin/dashboard of --print My::Module
   perl -Ilib bin/dashboard open-file --print com.example.App
   printf '{"alpha":{"beta":2}}' | perl -Ilib bin/dashboard pjq alpha.beta
   printf 'alpha:\n  beta: 3\n' | perl -Ilib bin/dashboard pyq alpha.beta
+  mkdir -p ~/.developer-dashboard/cli/update.d
+  printf '#!/usr/bin/env perl\nuse Runtime::Result;\nprint Runtime::Result::stdout(q{01-runtime});\nprint $ENV{RESULT} // q{}\n' > ~/.developer-dashboard/cli/update
+  chmod +x ~/.developer-dashboard/cli/update
+  printf '#!/bin/sh\necho runtime-update\n' > ~/.developer-dashboard/cli/update.d/01-runtime
+  chmod +x ~/.developer-dashboard/cli/update.d/01-runtime
   perl -Ilib bin/dashboard update
   perl -Ilib bin/dashboard serve
   perl -Ilib bin/dashboard stop
@@ -536,6 +620,37 @@ User CLI extensions can be tested from the repository too:
   printf '#!/bin/sh\ncat\n' > ~/.developer-dashboard/cli/foobar
   chmod +x ~/.developer-dashboard/cli/foobar
   printf 'hello\n' | perl -Ilib bin/dashboard foobar
+
+  mkdir -p ~/.developer-dashboard/cli/pjq
+  printf '#!/usr/bin/env perl\nprint "seed\\n";\n' > ~/.developer-dashboard/cli/pjq/00-seed.pl
+  chmod +x ~/.developer-dashboard/cli/pjq/00-seed.pl
+  printf '{"alpha":{"beta":2}}' | perl -Ilib bin/dashboard pjq alpha.beta
+
+Each top-level dashboard command can also use an optional hook directory at
+F<~/.developer-dashboard/cli/E<lt>commandE<gt>>. Executable files from that
+directory run in sorted filename order before the real command starts,
+non-executable files are skipped, and the captured stdout/stderr from the hook
+files are accumulated into C<$ENV{RESULT}> as JSON for later hooks and the
+final command. Directory-backed custom commands can use
+F<~/.developer-dashboard/cli/E<lt>commandE<gt>/run> as the actual executable.
+If a subcommand does not have a built-in implementation, the real command can
+be supplied as F<~/.developer-dashboard/cli/E<lt>commandE<gt>> or
+F<~/.developer-dashboard/cli/E<lt>commandE<gt>/run>.
+
+If you want C<dashboard update>, provide it as a normal user command at
+F<~/.developer-dashboard/cli/update> or
+F<~/.developer-dashboard/cli/update/run>. Its hook files can live under
+F<~/.developer-dashboard/cli/update> or
+F<~/.developer-dashboard/cli/update.d>, and the real command receives the
+final C<RESULT> JSON through the environment after those hook files run.
+Each later hook also sees the latest rewritten C<RESULT> from the earlier hook
+set, and Perl code can read that payload through C<Runtime::Result>.
+
+Use C<dashboard version> to print the installed Developer Dashboard version.
+
+The blank-container integration harness applies fake-project dashboard override
+environment variables only after C<cpanm> finishes installing the tarball so
+the shipped test suite still runs against a clean runtime.
 
 =head2 First Run
 
@@ -550,13 +665,21 @@ Inspect resolved paths:
   dashboard path add foobar /tmp/foobar
   dashboard path del foobar
 
-Custom path aliases are stored in the global dashboard config so shell
+Custom path aliases are stored in the effective dashboard config root so shell
 helpers such as C<cdr foobar> and C<which_dir foobar> keep working across
-sessions. When an alias points inside the current home directory, the stored
-config uses C<$HOME/...> instead of a hard-coded absolute home path so a
-shared F<~/.developer-dashboard> tree remains portable across different
-developer accounts. Re-adding an existing alias updates it without error, and
-deleting a missing alias is also safe.
+sessions. When a project-local F<./.developer-dashboard> tree exists, alias
+writes go there first; otherwise they go to the home runtime. When an alias
+points inside the current home directory, the stored config uses C<$HOME/...>
+instead of a hard-coded absolute home path so a shared fallback runtime
+remains portable across different developer accounts. Re-adding an existing
+alias updates it without error, and deleting a missing alias is also safe.
+
+Legacy C<Folder> compatibility also accepts the modern root-style names
+through C<AUTOLOAD>, so older code can use either C<Folder-E<gt>dd> or
+C<Folder-E<gt>runtime_root>, and likewise C<bookmarks_root> and
+C<config_root>. Before C<Folder-E<gt>configure(...)> runs, those
+runtime-backed names lazily bootstrap a default dashboard path registry from
+C<$HOME> instead of dying.
 
 Render shell bootstrap:
 
@@ -731,6 +854,10 @@ collector has produced real output it appears as missing. Prompt output
 renders an explicit status glyph in front of the collector icon, so
 successful checks show fragments such as C<✅🔑> while failing or not-yet-run
 checks show fragments such as C<🚨🔑>.
+The blank-environment integration flow also keeps a regression for mixed
+collector health: one intentionally broken Perl collector must stay red
+without stopping a second healthy collector from staying green in
+C<dashboard indicator list>, C<dashboard ps1>, and C</system/status>.
 
 =head2 Docker Compose
 
@@ -746,7 +873,9 @@ Include addons or modes:
 
 The resolver also supports old-style isolated service folders without adding
 entries to dashboard JSON config. If
-C<~/.developer-dashboard/config/docker/green/compose.yml> exists,
+C<./.developer-dashboard/docker/green/compose.yml> exists in the current
+project it wins; otherwise the resolver falls back to
+C<~/.developer-dashboard/config/docker/green/compose.yml>.
 C<dashboard docker compose config green> or
 C<dashboard docker compose up green> will pick it up automatically by
 inferring service names from the passthrough compose args before the real
@@ -755,8 +884,8 @@ resolver scans isolated service folders and preloads every non-disabled folder.
 If a folder contains C<disabled.yml> it is skipped. Each isolated folder
 contributes C<development.compose.yml> when present, otherwise C<compose.yml>.
 
-During compose execution the dashboard exports C<DDDC> as
-C<~/.developer-dashboard/config/docker>, so compose YAML can keep using
+During compose execution the dashboard exports C<DDDC> as the effective
+config-root docker directory for the current runtime, so compose YAML can keep using
 C<${DDDC}> paths inside the YAML itself. Wrapper flags such as
 C<--service>, C<--addon>, C<--mode>, C<--project>, and C<--dry-run> are
 consumed first, and all remaining docker compose flags such as C<-d> and
@@ -861,13 +990,11 @@ Limits enabled collector or checker jobs to a colon-separated list of names.
 
 Overrides the config directory.
 
-=item * C<DEVELOPER_DASHBOARD_STARTUP>
-
-Overrides the startup collector-definition directory.
-
 =back
 
-Startup collector definitions are read from C<*.json> files in C<DEVELOPER_DASHBOARD_STARTUP>. A startup file may contain either a single collector object or an array of collector objects.
+Collector definitions come only from dashboard configuration JSON, so config
+remains the single source of truth for path aliases, providers, collectors,
+and Docker compose overlays.
 
 =head2 Testing And Coverage
 
@@ -893,11 +1020,17 @@ breaking TAP from daemon-style child processes.
 
 =head2 Updating Runtime State
 
-Run the ordered update pipeline:
+Run your user-provided update command:
 
   dashboard update
 
-This performs runtime bootstrap, dependency refresh, shell bootstrap generation, and collector restart orchestration.
+If F<./.developer-dashboard/cli/update> or
+F<./.developer-dashboard/cli/update/run> exists in the current project it is
+used first; otherwise the home runtime fallback is used. C<dashboard update>
+runs that command after any sorted hook files from F<update/> or F<update.d>.
+
+C<dashboard init> seeds three editable starter bookmarks when they are
+missing: C<welcome>, C<api-dashboard>, and C<db-dashboard>.
 
 =head2 Blank Environment Integration
 
@@ -916,14 +1049,15 @@ ship:
 
   rm -f Developer-Dashboard-*.tar.gz
   dzil build
-  tar -tzf Developer-Dashboard-0.58.tar.gz | grep run-host-integration.sh
-  cpanm /tmp/Developer-Dashboard-0.58.tar.gz -v
+  tar -tzf Developer-Dashboard-0.94.tar.gz | grep run-host-integration.sh
+  cpanm /tmp/Developer-Dashboard-0.94.tar.gz -v
 
 The harness also:
 
-- creates a fake project wired through C<DEVELOPER_DASHBOARD_BOOKMARKS>, C<DEVELOPER_DASHBOARD_CONFIGS>, and C<DEVELOPER_DASHBOARD_STARTUP>
+- creates a fake project with its own F<./.developer-dashboard> runtime tree
 - verifies the installed CLI works against that fake project through the mounted tarball install
-- extracts the same tarball inside the container so C<dashboard update> runs from artifact contents instead of the live repo
+- seeds a user-provided fake-project F<./.developer-dashboard/cli/update> command plus F<update.d> hooks inside the container so C<dashboard update> exercises the same top-level command-hook path as every other subcommand, including later-hook reads through C<Runtime::Result>
+- verifies collector failure isolation with one intentionally broken Perl config collector and one healthy config collector, and confirms the healthy indicator still stays green after C<dashboard restart>
 - starts the installed web service
 - uses headless Chromium to verify the root editor, a saved fake-project bookmark page from the fake project bookmark directory, and the helper login page
 - verifies helper logout cleanup and runtime restart and stop behavior
@@ -936,15 +1070,14 @@ No. The core distribution is intended to be reusable for any project.
 
 =head2 Where should project-specific behavior live?
 
-In configuration, startup collector definitions, saved pages, and optional extensions. The core should stay generic.
+In configuration, saved pages, and user CLI extensions. The core should stay generic.
 
 =head2 Is the software spec implemented?
 
-The current distribution implements the core runtime, page engine, action runner, plugin/provider loader, prompt and collector system, web lifecycle manager, and Docker Compose resolver described by the software spec.
+The current distribution implements the core runtime, page engine, action runner, provider loader, prompt and collector system, web lifecycle manager, and Docker Compose resolver described by the software spec.
 
 What remains intentionally lightweight is breadth, not architecture:
 
-- plugin packs are JSON-based rather than a larger CPAN plugin API
 - provider pages and action handlers are implemented in a compact v1 form
 - legacy bookmarks are supported, with Template Toolkit rendering and one clean sandpit package per page run so C<CODE*> blocks can share state within a bookmark render without leaking runtime globals into later requests
 
@@ -962,7 +1095,11 @@ Because prompt rendering, dashboards, and wrappers should consume prepared state
 
 =head2 How are CPAN releases built?
 
-The repository is set up to build release artifacts with Dist::Zilla and upload them to PAUSE from GitHub Actions.
+The repository is set up to build release artifacts with Dist::Zilla, including explicit C<provides> metadata generation, and upload them to PAUSE from GitHub Actions.
+
+Runtime release metadata pins C<JSON::XS> explicitly in Dist::Zilla so built
+tarballs declare the JSON backend dependency even if automatic prerequisite
+scanning misses it during PAUSE installs.
 
 =head2 What JSON implementation does the project use?
 

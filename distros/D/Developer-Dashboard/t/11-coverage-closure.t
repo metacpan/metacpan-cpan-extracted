@@ -22,7 +22,6 @@ use Developer::Dashboard::PageResolver;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
-use Developer::Dashboard::PluginManager;
 use Developer::Dashboard::Prompt;
 use Developer::Dashboard::SessionStore;
 use Developer::Dashboard::Web::App;
@@ -39,6 +38,7 @@ sub dies_like {
 
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+chdir $home or die "Unable to chdir to $home: $!";
 
 my $repo = File::Spec->catdir( $home, 'projects', 'coverage-app' );
 my $bin  = File::Spec->catdir( $home, 'bin' );
@@ -65,17 +65,15 @@ print {$repo_cfg_fh} <<'JSON';
 {
   "nested": { "repo": 1 },
   "collectors": [
-    { "name": "repo.collector", "command": "printf repo", "cwd": "home", "interval": 5 }
-  ],
-  "plugins": [
-    "skip-me",
-    { "collectors": [ { "name": "cfg.collector", "command": "printf cfg", "cwd": "home", "interval": 7 } ] }
+    { "name": "repo.collector", "command": "printf repo", "cwd": "home", "interval": 5 },
+    { "name": "cfg.collector", "command": "printf cfg", "cwd": "home", "interval": 7 }
   ],
   "providers": [
-    { "id": "cfg-provider", "title": "Config Provider", "body": "cfg page body" }
+    { "id": "cfg-provider", "title": "Config Provider", "body": "cfg page body" },
+    { "id": "shared-provider", "page": { "id": "shared-provider", "title": "Shared Provider", "layout": { "body": "shared body" } } }
   ],
   "docker": {
-    "files": ["compose.dev.yaml"],
+    "files": ["compose.dev.yaml", "compose.test.yaml"],
     "project_overlays": ["compose.test.yaml"],
     "services": {
       "worker": { "files": ["compose.worker.yaml"] }
@@ -85,6 +83,9 @@ print {$repo_cfg_fh} <<'JSON';
         "files": ["compose.debug.yaml"],
         "modes": ["dev"],
         "env": { "DEBUG_ENABLED": "1" }
+      },
+      "extra": {
+        "files": ["compose.debug.yaml"]
       }
     },
     "modes": {
@@ -115,32 +116,7 @@ my $paths = Developer::Dashboard::PathRegistry->new(
     project_roots   => [ File::Spec->catdir( $home, 'projects' ) ],
 );
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
-
-open my $plugin_fh, '>', File::Spec->catfile( $paths->plugins_root, 'coverage.json' ) or die $!;
-print {$plugin_fh} <<'JSON';
-[
-  "skip-me",
-  {
-    "collectors": [
-      { "name": "plugin.collector", "command": "printf plugin", "cwd": "home", "interval": 9 }
-    ],
-    "providers": [
-      { "id": "plugin-provider", "page": { "id": "plugin-provider", "title": "Plugin Provider", "layout": { "body": "plugin body" } } }
-    ],
-    "docker": {
-      "files": ["compose.test.yaml"],
-      "services": ["named-service"],
-      "addons": { "extra": { "files": ["compose.debug.yaml"] } },
-      "modes": { "debug": { "files": ["compose.debug.yaml"] } },
-      "env": { "PLUGIN_ENV": "yes" }
-    }
-  }
-]
-JSON
-close $plugin_fh;
-
-my $plugins = Developer::Dashboard::PluginManager->new( paths => $paths );
-my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths, plugins => $plugins, repo_root => $repo );
+my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths, repo_root => $repo );
 $config->save_global(
     {
         nested     => { global => 1 },
@@ -150,16 +126,12 @@ $config->save_global(
     }
 );
 
-is( scalar( $plugins->plugins ), 1, 'plugin manager accepts array plugin file and skips non-hash values' );
-ok( $plugins->docker_config->{modes}{debug}, 'plugin manager merges docker modes' );
-is( $plugins->docker_config->{env}{PLUGIN_ENV}, 'yes', 'plugin manager merges docker env' );
-
 my $merged = $config->merged;
 ok( $merged->{nested}{global}, 'config merged keeps global nested hash values' );
 ok( $merged->{nested}{repo}, 'config merged keeps repo nested hash values' );
 my $jobs = $config->collectors;
-is( scalar( grep { $_->{name} eq 'plugin.collector' } @$jobs ), 1, 'config collectors include plugin collectors' );
-is( scalar( grep { $_->{name} eq 'cfg.collector' } @$jobs ), 1, 'config collectors include inline config plugin collectors' );
+is( scalar( grep { $_->{name} eq 'repo.collector' } @$jobs ), 1, 'config collectors include repo collectors' );
+is( scalar( grep { $_->{name} eq 'cfg.collector' } @$jobs ), 1, 'config collectors include additional config collectors' );
 
 my $pages = Developer::Dashboard::PageStore->new( paths => $paths );
 my $actions = Developer::Dashboard::ActionRunner->new( files => $files, paths => $paths );
@@ -168,7 +140,6 @@ my $resolver = Developer::Dashboard::PageResolver->new(
     config  => $config,
     pages   => $pages,
     paths   => $paths,
-    plugins => $plugins,
 );
 
 my $listed_page = Developer::Dashboard::PageDocument->new(
@@ -177,7 +148,7 @@ my $listed_page = Developer::Dashboard::PageDocument->new(
     layout => { body => 'listed' },
 );
 $pages->save_page($listed_page);
-ok( scalar( grep { $_ eq 'plugin-provider' } $resolver->list_pages ), 'page resolver lists plugin provider pages' );
+ok( scalar( grep { $_ eq 'shared-provider' } $resolver->list_pages ), 'page resolver lists config page providers' );
 ok( scalar( grep { $_ eq 'listed-saved' } $resolver->list_pages ), 'page resolver lists saved pages alongside providers' );
 like( $resolver->load_named_page('system-status')->as_hash->{layout}{body}, qr/runtime paths/i, 'page resolver loads builtin system status page' );
 like( $resolver->load_named_page('project-context')->as_hash->{layout}{body}, qr/Current project root/, 'page resolver loads builtin project context page' );
@@ -472,19 +443,6 @@ dies_like(
 my $docker = Developer::Dashboard::DockerCompose->new(
     config  => $config,
     paths   => $paths,
-    plugins => bless(
-        {
-            docker => {
-                addons => {
-                    extra => { files => ['compose.debug.yaml'] },
-                },
-                env => {
-                    PLUGIN_ENV => 'yes',
-                },
-            },
-        },
-        'Local::DockerPlugins'
-    ),
 );
 my $resolved = $docker->resolve(
     project_root => $repo,
@@ -505,15 +463,6 @@ my $docker_run = $docker->run(
 is( $docker_run->{exit_code}, 0, 'docker compose wrapper executes stub docker successfully' );
 like( $docker_run->{stdout}, qr/DEBUG:1/, 'docker compose wrapper injects addon environment into command execution' );
 like( $docker_run->{stdout}, qr/MODE:dev/, 'docker compose wrapper injects mode environment into command execution' );
-
-{
-    package Local::DockerPlugins;
-    # docker_config()
-    # Returns plugin docker configuration for the coverage docker-compose test.
-    # Input: none.
-    # Output: docker config hash reference.
-    sub docker_config { return shift->{docker} }
-}
 
 {
     package Local::ActionMock;

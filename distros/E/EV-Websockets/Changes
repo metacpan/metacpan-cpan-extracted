@@ -1,0 +1,21 @@
+Revision history for EV::Websockets
+
+0.02    2026-03-31
+        - on_handshake: server callback for per-connection response headers
+          and connection rejection (403)
+        - send_fragment: streaming fragmented writes (NO_FIN/CONTINUATION)
+        - stash: per-connection metadata hashref
+        - on_drain: callback when send queue empties
+        - send_queue_size: query pending send bytes
+        - connect_timeout: deadline for WebSocket handshake
+        - Server protocol parameter on listen()
+        - Broader client response header capture (Sec-WebSocket-Protocol,
+          Location, WWW-Authenticate)
+        - Server-side X-Forwarded-For in on_connect headers
+        - O(1) fd watcher lookup (flat array indexed by fd)
+        - Single-alloc send queue nodes (FAM)
+        - adopt() holds IO handle reference (prevents premature fd closure)
+        - TLS listener support (LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT)
+
+0.01    2026-02-20
+        - Initial release.

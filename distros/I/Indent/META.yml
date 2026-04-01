@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Indent
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Indent
-version: '0.09'
+version: '0.10'

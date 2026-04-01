@@ -3,91 +3,11 @@ package Chandra::Bridge;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-# JavaScript bridge code that gets injected into every page
-# This provides the window.chandra object for JS -> Perl communication
-
-use constant JS_BRIDGE => <<'END_EOF';
-(function() {
-    if (window.chandra) return;
-
-    window.chandra = {
-        _callbacks: {},
-        _id: 0,
-
-        invoke: function(method, args) {
-            var self = this;
-            return new Promise(function(resolve, reject) {
-                var id = ++self._id;
-                self._callbacks[id] = { resolve: resolve, reject: reject };
-                window.external.invoke(JSON.stringify({
-                    type: 'call',
-                    id: id,
-                    method: method,
-                    args: args || []
-                }));
-            });
-        },
-
-        call: function(method) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            return this.invoke(method, args);
-        },
-
-        _resolve: function(id, result, error) {
-            var cb = this._callbacks[id];
-            if (!cb) return;
-            delete this._callbacks[id];
-            if (error) {
-                cb.reject(new Error(error));
-            } else {
-                cb.resolve(result);
-            }
-        },
-
-        _event: function(handlerId, eventData) {
-            window.external.invoke(JSON.stringify({
-                type: 'event',
-                handler: handlerId,
-                event: eventData || {}
-            }));
-        },
-
-        _eventData: function(e, extra) {
-            var data = {
-                type: e.type,
-                targetId: e.target ? e.target.id : null,
-                targetName: e.target ? e.target.name : null,
-                value: e.target ? e.target.value : null,
-                checked: e.target ? e.target.checked : null,
-                key: e.key || null,
-                keyCode: e.keyCode || null
-            };
-            if (extra) {
-                for (var k in extra) {
-                    data[k] = extra[k];
-                }
-            }
-            return data;
-        }
-    };
-})();
-END_EOF
-
-# Return the bridge code
-sub js_code {
-	return JS_BRIDGE;
-}
-
-# Return bridge code wrapped for eval
-sub js_code_escaped {
-	my $code = JS_BRIDGE;
-	$code =~ s/\\/\\\\/g;
-	$code =~ s/'/\\'/g;
-	$code =~ s/\n/\\n/g;
-	return $code;
-}
+# XS methods are registered under the Chandra bootstrap.
+# Ensure the shared object is loaded.
+require Chandra;
 
 1;
 

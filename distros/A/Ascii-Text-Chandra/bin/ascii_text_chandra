@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Ascii::Text::Chandra;
+
+Ascii::Text::Chandra->run();
+
+1;
+
+=head1 NAME
+
+ascii_text_chandra - run the ascii text application
+
+=cut

@@ -14,7 +14,7 @@ require XSLoader;
 # This allows declaration   use Devel::Size ':all';
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
-$VERSION = '0.86';
+$VERSION = '0.87';
 
 XSLoader::load( __PACKAGE__);
 

@@ -1,5 +1,5 @@
 package DataHelper;
-$DataHelper::VERSION = '0.72';
+$DataHelper::VERSION = '0.94';
 use strict;
 use warnings;
 

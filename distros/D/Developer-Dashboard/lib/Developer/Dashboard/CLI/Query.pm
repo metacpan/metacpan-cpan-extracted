@@ -1,5 +1,5 @@
 package Developer::Dashboard::CLI::Query;
-$Developer::Dashboard::CLI::Query::VERSION = '0.72';
+$Developer::Dashboard::CLI::Query::VERSION = '0.94';
 use strict;
 use warnings;
 

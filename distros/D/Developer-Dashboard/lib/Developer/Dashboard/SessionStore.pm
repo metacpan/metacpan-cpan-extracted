@@ -1,5 +1,5 @@
 package Developer::Dashboard::SessionStore;
-$Developer::Dashboard::SessionStore::VERSION = '0.72';
+$Developer::Dashboard::SessionStore::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -53,11 +53,13 @@ sub create {
 sub get {
     my ( $self, $session_id ) = @_;
     return if !defined $session_id || $session_id eq '';
-    my $file = $self->_session_file($session_id);
-    return if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    return json_decode( scalar <$fh> );
+    for my $file ( $self->_session_file_candidates($session_id) ) {
+        next if !-f $file;
+        open my $fh, '<', $file or die "Unable to read $file: $!";
+        local $/;
+        return json_decode( scalar <$fh> );
+    }
+    return;
 }
 
 # delete($session_id)
@@ -67,8 +69,7 @@ sub get {
 sub delete {
     my ( $self, $session_id ) = @_;
     return if !defined $session_id || $session_id eq '';
-    my $file = $self->_session_file($session_id);
-    unlink $file if -f $file;
+    unlink $_ for grep { -f $_ } $self->_session_file_candidates($session_id);
     return 1;
 }
 
@@ -103,6 +104,15 @@ sub from_cookie {
 sub _session_file {
     my ( $self, $session_id ) = @_;
     return File::Spec->catfile( $self->{paths}->sessions_root, "$session_id.json" );
+}
+
+# _session_file_candidates($session_id)
+# Returns all candidate session file paths in effective lookup order.
+# Input: session id string.
+# Output: ordered list of session file path strings.
+sub _session_file_candidates {
+    my ( $self, $session_id ) = @_;
+    return map { File::Spec->catfile( $_, "$session_id.json" ) } $self->{paths}->sessions_roots;
 }
 
 # _now_iso8601()

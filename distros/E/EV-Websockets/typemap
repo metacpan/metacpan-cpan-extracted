@@ -1,0 +1,16 @@
+EV::Websockets::Context     T_PTROBJ
+EV::Websockets::Connection  T_EV_WS_CONN
+EV::Loop                    T_PTROBJ
+
+INPUT
+T_EV_WS_CONN
+    if (sv_derived_from($arg, \"EV::Websockets::Connection\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type, tmp);
+    }
+    else
+        croak(\"$var is not of type EV::Websockets::Connection\")
+
+OUTPUT
+T_EV_WS_CONN
+    $arg = get_conn_sv($var);

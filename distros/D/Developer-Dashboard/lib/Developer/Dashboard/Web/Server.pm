@@ -1,5 +1,5 @@
 package Developer::Dashboard::Web::Server;
-$Developer::Dashboard::Web::Server::VERSION = '0.72';
+$Developer::Dashboard::Web::Server::VERSION = '0.94';
 use strict;
 use warnings;
 

@@ -1,5 +1,5 @@
 package Developer::Dashboard::ActionRunner;
-$Developer::Dashboard::ActionRunner::VERSION = '0.72';
+$Developer::Dashboard::ActionRunner::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -196,7 +196,8 @@ sub _run_builtin_action {
                     home       => $self->{paths}->home,
                     runtime    => $self->{paths}->runtime_root,
                     dashboards => $self->{paths}->dashboards_root,
-                    plugins    => $self->{paths}->plugins_root,
+                    config     => $self->{paths}->config_root,
+                    cli        => $self->{paths}->cli_root,
                 }
             ),
         };

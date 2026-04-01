@@ -4,113 +4,11 @@ use strict;
 use warnings;
 use File::Find ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-sub new {
-	my ($class, %args) = @_;
-	return bless {
-		watches     => [],
-		interval    => $args{interval} // 1.0,
-		_last_check => 0,
-	}, $class;
-}
-
-sub watch {
-	my ($self, $path, $callback) = @_;
-
-	die "watch() requires a path" unless defined $path;
-	die "watch() requires a callback" unless ref $callback eq 'CODE';
-	die "watch() path does not exist: $path" unless -e $path;
-
-	my $files = $self->_scan_files($path);
-
-	push @{$self->{watches}}, {
-		path     => $path,
-		callback => $callback,
-		files    => $files,
-	};
-
-	return $self;
-}
-
-sub poll {
-	my ($self) = @_;
-
-	my $now = time();
-	return 0 if ($now - $self->{_last_check}) < $self->{interval};
-	$self->{_last_check} = $now;
-
-	my $total_changed = 0;
-
-	for my $watch (@{$self->{watches}}) {
-		my @changed;
-		my $current = $self->_scan_files($watch->{path});
-
-		# Modified or new files
-		for my $file (keys %$current) {
-			if (!exists $watch->{files}{$file}
-				|| $watch->{files}{$file} != $current->{$file}) {
-				push @changed, $file;
-			}
-		}
-
-		# Deleted files
-		for my $file (keys %{$watch->{files}}) {
-			if (!exists $current->{$file}) {
-				push @changed, $file;
-			}
-		}
-
-		if (@changed) {
-			$watch->{files} = $current;
-			eval { $watch->{callback}->(\@changed) };
-			if ($@) {
-				warn "Chandra::HotReload: callback error: $@";
-			}
-			$total_changed += scalar @changed;
-		}
-	}
-
-	return $total_changed;
-}
-
-sub clear {
-	my ($self) = @_;
-	$self->{watches} = [];
-	return $self;
-}
-
-sub watched_paths {
-	my ($self) = @_;
-	return map { $_->{path} } @{$self->{watches}};
-}
-
-sub interval {
-	my ($self, $val) = @_;
-	$self->{interval} = $val if defined $val;
-	return $self->{interval};
-}
-
-sub _scan_files {
-	my ($self, $path) = @_;
-	my %files;
-
-	if (-f $path) {
-		my @stat = stat($path);
-		$files{$path} = $stat[9] if @stat;
-	} elsif (-d $path) {
-		File::Find::find({
-				wanted => sub {
-					return unless -f $_;
-					my @stat = stat($_);
-					$files{$File::Find::name} = $stat[9] if @stat;
-				},
-				no_chdir => 1,
-			}, $path);
-	}
-
-	return \%files;
-}
+# XS methods are registered under the Chandra bootstrap.
+# Ensure the shared object is loaded.
+require Chandra;
 
 1;
 

@@ -58,4 +58,10 @@ The exit code from capture() not a separate command.
 
 21. If there is a new version of tar ball from dzil, remove the old one and do not leave the old one at the working directory. Only keep the latest version.
 
-22. For release to cpan PAUSE. You will need to do it locally, username is MICVU and password is in ~/.bashrc PAUSE_PASS
+22. For release to cpan PAUSE. You will need to do it locally, username is MICVU and password is in ~/.bashrc PAUSE_PASS and the passphrase for the ~/.ssh/mf is also at ~/.bashrc MF_PASS. Everytime. release to PAUSE tag PAUSE_RELEASED_HERE to git
+
+23. Never surpress any errors. Expose them as much as possible. Then when an error show up. Fix it. Never hide them.
+
+24. Make sure 100% fixed for any Kwalitee Issues.
+
+25. Do not touch or inspect any unrelated Docker process from docker ps when working on integration test.

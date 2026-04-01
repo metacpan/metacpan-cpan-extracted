@@ -1,5 +1,5 @@
 package Developer::Dashboard::PageDocument;
-$Developer::Dashboard::PageDocument::VERSION = '0.72';
+$Developer::Dashboard::PageDocument::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -231,7 +231,7 @@ sub render_template { return shift; }
 
 # render_html(%opts)
 # Renders the page document into HTML for browser display.
-# Input: optional action_urls and page_url values.
+# Input: optional action_urls, page_url, chrome_html, and nav_html values.
 # Output: HTML string.
 sub render_html {
     my ( $self, %opts ) = @_;
@@ -240,6 +240,7 @@ sub render_html {
     my $desc  = _html( $self->{description} );
     my $body_html = defined $self->{layout}{body} ? $self->{layout}{body} : '';
     my $chrome_html = defined $opts{chrome_html} ? $opts{chrome_html} : '';
+    my $nav_html = defined $opts{nav_html} ? $opts{nav_html} : '';
 
     my $form_section = '';
     if ( defined $self->{layout}{form_tt} && $self->{layout}{form_tt} ne '' ) {
@@ -324,11 +325,28 @@ sub render_html {
       color: #b00020;
       white-space: pre-wrap;
     }
+    .dashboard-nav-items {
+      margin: 0 0 24px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      background: #f3eee2;
+    }
+    .dashboard-nav-items ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .dashboard-nav-items li + li {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
   </style>
 </head>
 <body>
 <main>
   $chrome_html
+  $nav_html
   @{[ $desc ne '' ? qq{<p>$desc</p>} : '' ]}
   <section class="body">$body_html</section>
   $form_section

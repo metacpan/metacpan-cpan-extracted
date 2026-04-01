@@ -1,5 +1,8 @@
 Revision history for Perl module Cookie
 
+v0.3.11 2026-04-01T07:26:03+0900
+    - Removing debugging code
+
 v0.3.10 2026-03-30T10:28:31+0900
     - Minor correction in method 'stat' in Cookie::Domain to account for local domains
     - Corrected a bug in Cookie::Jar extract method when checking for the port number.

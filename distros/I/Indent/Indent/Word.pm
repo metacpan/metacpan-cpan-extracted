@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -73,6 +73,13 @@ sub indent {
 	if ($non_indent) {
 		return $indent.$data;
 	}
+
+	# Normalize whitespace: collapse all whitespace (including newlines) to single spaces.
+	$data =~ s/\s+/ /g;
+
+	# Remove leading and trailing whitespace.
+	$data =~ s/^\s+//;
+	$data =~ s/\s+$//;
 
 	my ($first, $second) = (undef, $indent.$data);
 	my $last_second_length = 0;
@@ -254,6 +261,8 @@ See L<https://no-color.org/>.
 
 =head1 EXAMPLE1
 
+=for comment filename=indent_word.pl
+
  use strict;
  use warnings;
 
@@ -272,6 +281,8 @@ See L<https://no-color.org/>.
  # <--tab->text text text
 
 =head1 EXAMPLE2
+
+=for comment filename=indent_word_ansi.pl
 
  use strict;
  use warnings;
@@ -345,12 +356,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2024 Michal Josef Špaček
+© 2005-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

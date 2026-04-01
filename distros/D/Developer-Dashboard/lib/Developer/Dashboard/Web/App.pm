@@ -1,10 +1,11 @@
 package Developer::Dashboard::Web::App;
-$Developer::Dashboard::Web::App::VERSION = '0.72';
+$Developer::Dashboard::Web::App::VERSION = '0.94';
 use strict;
 use warnings;
 
 use Capture::Tiny qw(capture);
 use POSIX qw(strftime);
+use File::Spec;
 use URI;
 use URI::Escape qw(uri_unescape);
 use Cwd qw(cwd);
@@ -178,7 +179,7 @@ sub handle {
         return [ 200, 'image/webp', '' ];
     }
 
-    if ( $path =~ m{^/app/([^/]+)$} ) {
+    if ( $path =~ m{^/app/(.+)$} ) {
         return $self->_legacy_app_response(
             id           => $1,
             query_params => \%params,
@@ -214,7 +215,7 @@ sub handle {
         );
     }
 
-    if ( $path =~ m{^/page/([^/]+)/source$} ) {
+    if ( $path =~ m{^/page/(.+)/source$} ) {
         my $page = $self->_load_named_page($1);
         $page->{meta}{raw_instruction} = $page->canonical_instruction;
         $page = $self->_page_with_runtime_state(
@@ -233,7 +234,7 @@ sub handle {
         return [ 200, 'text/plain; charset=utf-8', $page->{meta}{raw_instruction} || $page->canonical_instruction ];
     }
 
-    if ( $path =~ m{^/page/([^/]+)/edit$} ) {
+    if ( $path =~ m{^/page/(.+)/edit$} ) {
         my $page = $self->_load_named_page($1);
         $page->{meta}{raw_instruction} = $page->canonical_instruction;
         $page = $self->_page_with_runtime_state(
@@ -252,7 +253,7 @@ sub handle {
         return [ 200, 'text/html; charset=utf-8', $self->_edit_html($page) ];
     }
 
-    if ( $path =~ m{^/page/([^/]+)/action/([^/]+)$} && $method eq 'POST' ) {
+    if ( $path =~ m{^/page/(.+)/action/([^/]+)$} && $method eq 'POST' ) {
         my $page = $self->_load_named_page($1);
         $page = $self->_page_with_runtime_state(
             $page,
@@ -275,7 +276,7 @@ sub handle {
         );
     }
 
-    if ( $path =~ m{^/page/([^/]+)$} ) {
+    if ( $path =~ m{^/page/(.+)$} ) {
         my $page = $self->_load_named_page($1);
         $page->{meta}{raw_instruction} = $page->canonical_instruction;
         $page = $self->_page_with_runtime_state(
@@ -826,6 +827,7 @@ sub _escape_html {
 sub _render_page_html {
     my ( $self, $page, $mode ) = @_;
     $page->with_mode( $mode || 'render' );
+    my $request_context = $page->{meta}{request_context} || {};
     my %action_urls;
     for my $action ( @{ $page->as_hash->{actions} || [] } ) {
         next if ref($action) ne 'HASH' || !$action->{id};
@@ -843,6 +845,10 @@ sub _render_page_html {
     my $page_url = ( $page->{meta}{source_kind} || '' ) eq 'transient'
       ? $self->{pages}->editable_url($page)
       : '/page/' . ( $page->as_hash->{id} || '' );
+    my $runtime_context = {
+        params       => { %{ $page->{state} || {} } },
+        current_page => $request_context->{path} || '',
+    };
     return $page->render_html(
         action_urls => \%action_urls,
         page_url    => $page_url,
@@ -854,7 +860,89 @@ sub _render_page_html {
                 source => ( $page->{meta}{source_kind} || '' ) eq 'transient' ? '/?token=' . $self->{pages}->encode_page($page) : $page_url . '/edit',
             },
         ),
+        nav_html => $self->_nav_items_html(
+            page            => $page,
+            runtime_context => $runtime_context,
+        ),
     );
+}
+
+# _nav_items_html(%args)
+# Renders saved nav/*.tt bookmark fragments between page chrome and body.
+# Input: page document object and runtime context hash reference.
+# Output: HTML fragment string.
+sub _nav_items_html {
+    my ( $self, %args ) = @_;
+    my $page = $args{page} || return '';
+    my $page_id = $page->as_hash->{id} || '';
+    return '' if $page_id =~ m{\Anav/};
+
+    my $paths = $self->{pages}{paths} || return '';
+    my $nav_root = File::Spec->catdir( $paths->dashboards_root, 'nav' );
+    return '' if !-d $nav_root;
+
+    opendir my $dh, $nav_root or return '';
+    my @entries = sort grep {
+        $_ ne '.' && $_ ne '..'
+          && $_ =~ /\.tt\z/
+          && -f File::Spec->catfile( $nav_root, $_ )
+    } readdir $dh;
+    closedir $dh;
+    return '' if !@entries;
+
+    my @items;
+    my $current_page = $args{runtime_context}{current_page} || '';
+    for my $entry (@entries) {
+        my $nav_id = 'nav/' . $entry;
+        my $nav_page = eval { $self->_load_named_page($nav_id) };
+        next if !$nav_page || $@;
+        $nav_page->{meta}{raw_instruction} = $nav_page->canonical_instruction;
+        $nav_page = $self->{runtime}->prepare_page(
+            page            => $self->_page_with_runtime_state(
+                $nav_page,
+                query_params => $args{runtime_context}{params} || {},
+                body_params  => {},
+                path         => '/page/' . $page_id,
+                remote_addr  => $self->{_current_request_context}{remote_addr},
+                headers      => { host => $self->{_current_request_context}{host} || '' },
+            ),
+            source          => $nav_page->{meta}{source_kind} || 'saved',
+            runtime_context => {
+                %{ $args{runtime_context} || { params => {} } },
+                current_page => $current_page,
+            },
+        );
+        my $fragment = $self->_page_fragment_html($nav_page);
+        next if $fragment eq '';
+        push @items, qq{<li data-nav-id="} . _escape_html($nav_id) . qq{">$fragment</li>};
+    }
+
+    return '' if !@items;
+    return qq{<section class="dashboard-nav-items"><ul>} . join( '', @items ) . qq{</ul></section>};
+}
+
+# _page_fragment_html($page)
+# Builds a body-level HTML fragment from a prepared page document.
+# Input: prepared page document object.
+# Output: HTML fragment string.
+sub _page_fragment_html {
+    my ( $self, $page ) = @_;
+    return '' if !$page;
+
+    my $fragment = defined $page->{layout}{body} ? $page->{layout}{body} : '';
+    $fragment .= $page->{layout}{form_tt} if defined $page->{layout}{form_tt} && $page->{layout}{form_tt} ne '';
+    $fragment .= $page->{layout}{form} if defined $page->{layout}{form} && $page->{layout}{form} ne '';
+
+    for my $chunk ( @{ $page->{meta}{runtime_outputs} || [] } ) {
+        next if !defined $chunk || ref($chunk);
+        $fragment .= $chunk;
+    }
+    for my $chunk ( @{ $page->{meta}{runtime_errors} || [] } ) {
+        next if !defined $chunk || ref($chunk);
+        $fragment .= qq{<pre class="runtime-error">} . _escape_html($chunk) . qq{</pre>\n};
+    }
+
+    return $fragment;
 }
 
 # _action_response(%args)

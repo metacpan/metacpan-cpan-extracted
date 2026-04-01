@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Capture::Tiny qw(capture);
+use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
@@ -18,11 +19,26 @@ use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SessionStore;
 use Developer::Dashboard::Web::App;
+my $home = tempdir(CLEANUP => 1);
+local $ENV{HOME} = $home;
+chdir $home or die "Unable to chdir to $home: $!";
+my $auto_projects = File::Spec->catdir( $home, 'projects' );
+make_path($auto_projects);
+
 use Folder;
 use Zipper qw(zip unzip _cmdx _cmdp __cmdx acmdx Ajax);
 
-my $home = tempdir(CLEANUP => 1);
-local $ENV{HOME} = $home;
+is( Folder->dd, File::Spec->catdir( $home, '.developer-dashboard' ), 'Folder dd lazily bootstraps the runtime root before configure' );
+is( Folder->runtime_root, File::Spec->catdir( $home, '.developer-dashboard' ), 'Folder runtime_root lazily bootstraps through AUTOLOAD before configure' );
+{
+    my $runtime_home = File::Spec->catdir( $home, '.developer-dashboard' );
+    make_path( File::Spec->catdir( $runtime_home, '.git' ) );
+    chdir $runtime_home or die "Unable to chdir to $runtime_home: $!";
+    is( Folder->dd, $runtime_home, 'Folder dd does not append a nested runtime root when cwd is the home runtime repository' );
+    is( Folder->runtime_root, $runtime_home, 'Folder runtime_root stays at the home runtime root when cwd is the home runtime repository' );
+    chdir $home or die "Unable to chdir to $home: $!";
+}
+
 my $workspace = File::Spec->catdir( $home, 'workspace' );
 my $project   = File::Spec->catdir( $workspace, 'demo' );
 mkdir $workspace;
@@ -44,9 +60,11 @@ Folder->configure(
 is( Folder->home, $home, 'Folder home resolves current home' );
 ok( Folder->tmp, 'Folder tmp resolves a temp dir' );
 is( Folder->dd, $paths->runtime_root, 'Folder dd resolves runtime root' );
+is( Folder->runtime_root, $paths->runtime_root, 'Folder AUTOLOAD resolves runtime_root through the legacy runtime alias' );
 is( Folder->bookmarks, $paths->dashboards_root, 'Folder bookmarks resolves dashboards root' );
+is( Folder->bookmarks_root, $paths->dashboards_root, 'Folder AUTOLOAD resolves bookmarks_root through the legacy bookmarks alias' );
 is( Folder->configs, $paths->config_root, 'Folder configs resolves config root' );
-is( Folder->startup, $paths->startup_root, 'Folder startup resolves startup root' );
+is( Folder->config_root, $paths->config_root, 'Folder AUTOLOAD resolves config_root through the legacy configs alias' );
 ok( -d Folder->postman, 'Folder postman creates the neutral postman directory' );
 
 my $cd_result = Folder->cd(

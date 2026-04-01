@@ -1,3 +1,11 @@
+0.04 2026-03-31T22:17:28+02:00
+ - Add tests for finalize() method.
+ - Remove tabs from doc.
+ - Rename example files to better names.
+ - Rename test files to better names.
+ - Update copyright years.
+ - Update to Module::Install@1.21.
+
 0.03 2020-04-28T00:50:37+02:00
  - Add REPOSITORY section to doc.
  - Add author website to AUTHOR section in doc.

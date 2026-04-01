@@ -1,5 +1,11 @@
 Revision history for Perl extension Devel::Size.
 
+0.87 2026-03-31 nicholas
+ [no changes]
+
+0.86_50 2026-02-10 nicholas
+ * Fix the build on v5.38.5 - reported as CPAN #173167, but identified already
+
 0.86 2026-02-10 nicholas
  [no changes]
 

@@ -1,5 +1,6 @@
 Changes
-examples/ex1.pl
+examples/simple_example.pl
+examples/simple_example_utf8.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

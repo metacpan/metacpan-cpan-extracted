@@ -1,5 +1,10 @@
 Revision history for Chandra
 
+0.07  2026-03-31
+    - Port code to XS (all methods now in C)
+    - Add global css and js chain methods to Chandra::App
+    - Extend routes with a way to assign custom css and js per route
+
 0.06  2026-03-30
     - Add system tray integration and example
     - Another attempt at fixing windows to run

@@ -11,6 +11,7 @@ use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
 
 local $ENV{HOME} = tempdir(CLEANUP => 1);
+chdir $ENV{HOME} or die "Unable to chdir to $ENV{HOME}: $!";
 
 my $paths = Developer::Dashboard::PathRegistry->new;
 my $store = Developer::Dashboard::PageStore->new(paths => $paths);

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use File::Spec;
 use File::Temp qw(tempdir);
 use URI::Escape qw(uri_escape);
 
@@ -65,6 +66,20 @@ CODE1: print "<div>Runtime</div>";
 PAGE
 $store->save_page($legacy_page);
 
+my $nav_alpha = Developer::Dashboard::PageDocument->new(
+    id     => 'nav/alpha.tt',
+    title  => 'Alpha Nav',
+    layout => { body => '[% IF env.current_page == \'/app/index\' %]Home[% ELSE %]<a href="/app/index">Home</a>[% END %]' },
+);
+$store->save_page($nav_alpha);
+
+my $nav_beta = Developer::Dashboard::PageDocument->new(
+    id     => 'nav/beta.tt',
+    title  => 'Beta Nav',
+    layout => { body => 'nav-current=[% env.current_page %] nav-rt=[% env.runtime_context.current_page %]' },
+);
+$store->save_page($nav_beta);
+
 my ($code1, $type1, $body1) = @{ $app->handle(path => '/', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($code1, 200, 'root editor route ok');
 like($body1, qr/<textarea[^>]*name="instruction"/, 'root route renders editable instruction textarea');
@@ -121,7 +136,7 @@ unlike($body1d, qr/"request_host"\s*:/, 'form-urlencoded update does not persist
 my ($code1d_bookmark, undef, $body1d_bookmark) = @{ $app->handle(
     path        => '/',
     method      => 'POST',
-    body        => 'instruction=TITLE%3A%20Developer%20Dashboard%0A%3A--------------------------------------------------------------------------------%3A%0ABOOKMARK%3A%20index%0A%3A--------------------------------------------------------------------------------%3A%0ASTASH%3A%20%0A%3A--------------------------------------------------------------------------------%3A%0AHTML%3A%20HERE%0A',
+    body        => 'instruction=TITLE%3A%20Developer%20Dashboard%0A%3A--------------------------------------------------------------------------------%3A%0ABOOKMARK%3A%20index%0A%3A--------------------------------------------------------------------------------%3A%0ASTASH%3A%20%0A%3A--------------------------------------------------------------------------------%3A%0AHTML%3A%20HERE%20%5B%25%20env.current_page%20%25%5D%20%5B%25%20env.runtime_context.current_page%20%25%5D%0A',
     remote_addr => '127.0.0.1',
     headers     => { host => '127.0.0.1' },
 ) };
@@ -130,7 +145,27 @@ ok( -f File::Spec->catfile( $paths->dashboards_root, 'index' ), 'root editor sav
 like($body1d_bookmark, qr/BOOKMARK:\s+index/s, 'posted bookmark response preserves the bookmark id');
 my ($code1d_saved, undef, $body1d_saved) = @{ $app->handle(path => '/app/index', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($code1d_saved, 200, 'legacy /app/index route loads a bookmark saved from the root editor');
-like($body1d_saved, qr/HERE/, 'legacy /app/index route renders the saved bookmark body');
+like($body1d_saved, qr/HERE \/app\/index \/app\/index/, 'legacy /app/index route renders the saved bookmark body with current page context');
+like($body1d_saved, qr/class="dashboard-nav-items"/, 'saved page render includes shared nav section when nav tt pages exist');
+like($body1d_saved, qr{<li data-nav-id="nav/alpha\.tt">Home</li>}s, 'shared nav fragments evaluate Template Toolkit conditionals against the current page');
+like($body1d_saved, qr/nav-current=\/app\/index nav-rt=\/app\/index/, 'shared nav fragments receive env.current_page and env.runtime_context.current_page');
+
+my ($code1d_nav, undef, $body1d_nav) = @{ $app->handle(
+    path        => '/',
+    method      => 'POST',
+    body        => 'instruction=TITLE%3A%20Nav%20Editor%0A%3A--------------------------------------------------------------------------------%3A%0ABOOKMARK%3A%20nav%2Ffoo.tt%0A%3A--------------------------------------------------------------------------------%3A%0AHTML%3A%20%3Ca%20href%3D%22%2Ffoo%22%3EFoo%20Nav%3C%2Fa%3E%0A',
+    remote_addr => '127.0.0.1',
+    headers     => { host => '127.0.0.1' },
+) };
+is($code1d_nav, 200, 'posted nested nav bookmark route ok');
+ok( -f File::Spec->catfile( $paths->dashboards_root, 'nav', 'foo.tt' ), 'root editor saves nested nav bookmark instructions under nav/' );
+my ($code1d_nav_page, undef, $body1d_nav_page) = @{ $app->handle(path => '/app/nav/foo.tt', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($code1d_nav_page, 200, 'legacy /app route loads nested nav bookmark ids');
+like($body1d_nav_page, qr/Foo Nav/, 'legacy /app nested nav route renders the saved nav bookmark body');
+my ($code1d_nav_source, $type1d_nav_source, $body1d_nav_source) = @{ $app->handle(path => '/page/nav/foo.tt/source', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($code1d_nav_source, 200, 'nested nav bookmark source route ok');
+like($type1d_nav_source, qr/text\/plain/, 'nested nav bookmark source route returns plain text');
+like($body1d_nav_source, qr/^BOOKMARK:\s+nav\/foo.tt$/m, 'nested nav bookmark source route preserves nested bookmark id');
 
 my ($code1d_tt, undef, $body1d_tt) = @{ $app->handle(
     path        => '/',
@@ -209,6 +244,14 @@ unlike($body2, qr/id="logout-url"/, 'admin route does not render logout link');
 my ($code2b, undef, $body2b) = @{ $app->handle(path => '/page/welcome', query => 'name=Michael', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($code2b, 200, 'saved page with query state route ok');
 like($body2b, qr/Michael/, 'query parameters are merged into page state during render');
+like($body2b, qr{<li data-nav-id="nav/alpha\.tt"><a href="/app/index">Home</a></li>}s, 'shared nav TT fragments render conditional output against non-index pages');
+like($body2b, qr/nav-current=\/page\/welcome nav-rt=\/page\/welcome/s, 'shared nav TT fragments receive the current page path on non-index pages');
+my $nav_pos = index($body2b, 'class="dashboard-nav-items"');
+my $body_pos = index($body2b, '<section class="body">');
+my $alpha_pos = index($body2b, 'data-nav-id="nav/alpha.tt"');
+my $beta_pos = index($body2b, 'data-nav-id="nav/beta.tt"');
+ok($nav_pos > -1 && $nav_pos < $body_pos, 'shared nav section renders before the main page body');
+ok($alpha_pos > -1 && $beta_pos > $alpha_pos, 'shared nav tt bookmarks render in sorted filename order');
 unlike($body2, qr/id="play-url"/, 'render mode does not render play link');
 like($body2, qr{href="/page/welcome/edit"[^>]+id="view-source-url"}, 'render mode view source points to edit route');
 

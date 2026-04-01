@@ -1,5 +1,5 @@
 package Developer::Dashboard::Collector;
-$Developer::Dashboard::Collector::VERSION = '0.72';
+$Developer::Dashboard::Collector::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -122,7 +122,10 @@ sub read_status {
     return if !-f $file;
     open my $fh, '<', $file or die "Unable to read $file: $!";
     local $/;
-    return json_decode(<$fh>);
+    my $raw = <$fh>;
+    my $data = eval { json_decode($raw) };
+    return $data if !$@;
+    return;
 }
 
 # read_output($name)

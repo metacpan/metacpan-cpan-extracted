@@ -1,5 +1,5 @@
 package Developer::Dashboard::Auth;
-$Developer::Dashboard::Auth::VERSION = '0.72';
+$Developer::Dashboard::Auth::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -85,11 +85,13 @@ sub verify_user {
 # Output: user hash reference or undef when missing.
 sub get_user {
     my ( $self, $username ) = @_;
-    my $file = $self->_user_file($username);
-    return if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    return json_decode( scalar <$fh> );
+    for my $file ( $self->_user_file_candidates($username) ) {
+        next if !-f $file;
+        open my $fh, '<', $file or die "Unable to read $file: $!";
+        local $/;
+        return json_decode( scalar <$fh> );
+    }
+    return;
 }
 
 # list_users()
@@ -98,17 +100,18 @@ sub get_user {
 # Output: sorted list of user hash references.
 sub list_users {
     my ($self) = @_;
-    my $root = $self->{paths}->users_root;
-    opendir my $dh, $root or return;
-    my @users;
-    while ( my $entry = readdir $dh ) {
-        next if $entry eq '.' || $entry eq '..';
-        next if $entry !~ /(.*)\.json$/;
-        my $user = eval { $self->get_user($1) };
-        push @users, $user if $user;
+    my %users;
+    for my $root ( reverse $self->{paths}->users_roots ) {
+        opendir my $dh, $root or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry eq '.' || $entry eq '..';
+            next if $entry !~ /(.*)\.json$/;
+            my $user = eval { $self->get_user($1) };
+            $users{$1} = $user if $user;
+        }
+        closedir $dh;
     }
-    closedir $dh;
-    return sort { $a->{username} cmp $b->{username} } @users;
+    return sort { $a->{username} cmp $b->{username} } values %users;
 }
 
 # remove_user($username)
@@ -117,8 +120,7 @@ sub list_users {
 # Output: true value.
 sub remove_user {
     my ( $self, $username ) = @_;
-    my $file = $self->_user_file($username);
-    unlink $file if -f $file;
+    unlink $_ for grep { -f $_ } $self->_user_file_candidates($username);
     return 1;
 }
 
@@ -173,6 +175,17 @@ sub _user_file {
     my $safe = $username;
     $safe =~ s/[^A-Za-z0-9_.-]+/_/g;
     return File::Spec->catfile( $self->{paths}->users_root, "$safe.json" );
+}
+
+# _user_file_candidates($username)
+# Returns all candidate user-record file paths in effective lookup order.
+# Input: username string.
+# Output: ordered list of user record file path strings.
+sub _user_file_candidates {
+    my ( $self, $username ) = @_;
+    my $safe = $username;
+    $safe =~ s/[^A-Za-z0-9_.-]+/_/g;
+    return map { File::Spec->catfile( $_, "$safe.json" ) } $self->{paths}->users_roots;
 }
 
 # _canonical_host($host)

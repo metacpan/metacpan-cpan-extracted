@@ -1,0 +1,37 @@
+---
+abstract: 'WebSocket client/server using libwebsockets and EV'
+author:
+  - vividsnow
+build_requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  AnyEvent::WebSocket::Server: '0'
+  Digest::SHA: '0'
+  ExtUtils::MakeMaker: '0'
+  MIME::Base64: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Base::Wrapper: '1.97'
+  Alien::libwebsockets: '0'
+  EV::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EV-Websockets
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  EV: '4'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/vividsnow/EV-Websockets/issues
+  repository: https://github.com/vividsnow/EV-Websockets.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

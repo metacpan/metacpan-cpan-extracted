@@ -1,5 +1,5 @@
 package Developer::Dashboard::PageRuntime;
-$Developer::Dashboard::PageRuntime::VERSION = '0.72';
+$Developer::Dashboard::PageRuntime::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -152,6 +152,17 @@ sub _render_templates {
     my $page = $args{page} || die 'Missing page';
     my $layout = $page->{layout} || {};
     my $state  = $page->{state}  || {};
+    my $request_context = $page->{meta}{request_context} || {};
+    my $current_page = $args{runtime_context}{current_page} || $request_context->{path} || '';
+    my %template_runtime = (
+        %{ $args{runtime_context} || {} },
+        current_page => $current_page,
+    );
+    my %template_env = (
+        %ENV,
+        current_page    => $current_page,
+        runtime_context => \%template_runtime,
+    );
 
     my $system = $self->_system_context(%args);
     my $tt = Template->new(
@@ -178,9 +189,9 @@ sub _render_templates {
                 description => $page_data->{description},
                 mode   => $page_data->{mode},
                 icon   => $page_data->{icon},
-                ENV    => \%ENV,
+                ENV    => \%template_env,
                 SYSTEM => $system,
-                env    => \%ENV,
+                env    => \%template_env,
                 func   => sub { return '' },
                 method => sub {
                     my ( $class, $method, @rest ) = @_;

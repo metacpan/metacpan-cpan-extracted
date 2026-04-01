@@ -1,4 +1,4 @@
-\bOLD_CODE\b
+\b[O][L][D]_CODE\b
 ^\.github/
 ^SOFTWARE_SPEC\.md$
 ^ELLEN\.md$

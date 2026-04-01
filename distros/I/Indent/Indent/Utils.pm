@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Scalar my $DEFAULT_TAB_LENGTH => 8;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Length of tab.
 our $TAB_LENGTH = $DEFAULT_TAB_LENGTH;
@@ -157,6 +157,8 @@ Gets length of string.
 
 =head1 EXAMPLE1
 
+=for comment filename=reduce_duplicit_ws.pl
+
  use strict;
  use warnings;
 
@@ -170,6 +172,8 @@ Gets length of string.
  # a b|
 
 =head1 EXAMPLE2
+
+=for comment filename=remove_first_ws.pl
 
  use strict;
  use warnings;
@@ -185,6 +189,8 @@ Gets length of string.
 
 =head1 EXAMPLE3
 
+=for comment filename=remove_last_ws.pl
+
  use strict;
  use warnings;
 
@@ -199,6 +205,8 @@ Gets length of string.
 
 =head1 EXAMPLE4
 
+=for comment filename=remove_ws.pl
+
  use strict;
  use warnings;
 
@@ -212,6 +220,8 @@ Gets length of string.
  # a|
 
 =head1 EXAMPLE5
+
+=for comment filename=string_len.pl
 
  use strict;
  use warnings;
@@ -268,12 +278,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2024 Michal Josef Špaček
+© 2005-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

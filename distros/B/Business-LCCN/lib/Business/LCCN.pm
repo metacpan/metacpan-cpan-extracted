@@ -14,11 +14,11 @@ Business::LCCN - Work with Library of Congress Control Number (LCCN) codes
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ use overload
 
 subtype 'LCCN_Year'   => as 'Int' => where { $_ >= 1898 };
 subtype 'LCCN_Serial' => as 'Str' => where {m/^\d{6}$/};
-enum 'LCCN_Structure' => qw( A B );
+enum 'LCCN_Structure' => [qw( A B )];
 
 # normalize syntax at http://www.loc.gov/marc/lccn-namespace.html
 subtype 'LCCN_Normalized' => as 'Str' =>
@@ -615,6 +615,7 @@ L<http://search.cpan.org/dist/Business-LCCN>
 
 =head1 COPYRIGHT & LICENSE
 
+Copyright 2026 Jan Willamowius, https://www.ean-search.org/
 Copyright 2008 Anirvan Chatterjee, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it

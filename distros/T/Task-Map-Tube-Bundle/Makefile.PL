@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use 5.006;
 use strict;
@@ -59,6 +59,7 @@ WriteMakefile(
         'Map::Tube::Singapore'       => '0',
         'Map::Tube::Sofia'           => '0',
         'Map::Tube::Stockholm'       => '0',
+        'Map::Tube::Sydney'          => '0',
         'Map::Tube::Tbilisi'         => '0',
         'Map::Tube::Toulouse'        => '0',
         'Map::Tube::Tokyo'           => '0',
@@ -75,6 +76,9 @@ WriteMakefile(
                 type => 'git',
                 url  => 'https://github.com/manwar/Task-Map-Tube-Bundle.git',
                 web  => 'https://github.com/manwar/Task-Map-Tube-Bundle',
+            },
+            bugtracker => {
+                web    => 'https://github.com/manwar/Task-Map-Tube-Bundle/issues'
             },
         }})
      : ()

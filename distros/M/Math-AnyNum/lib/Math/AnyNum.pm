@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -1260,14 +1260,14 @@ sub new {
 
     # MPFR
     if ($ref eq 'Math::MPFR') {
-        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set($r, $num, $ROUND);
         return bless \$r;
     }
 
     # MPC
     if ($ref eq 'Math::MPC') {
-        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set($r, $num, $ROUND);
         return bless \$r;
     }
@@ -1463,19 +1463,18 @@ sub i {
 }
 
 sub e {
-    state $one_f = (Math::MPFR::Rmpfr_init_set_ui_nobless(1, $ROUND))[0];
     my $e = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_exp($e, $one_f, $ROUND);
+    Math::MPFR::Rmpfr_set_ui($e, 1, $ROUND);
+    Math::MPFR::Rmpfr_exp($e, $e, $ROUND);
     bless \$e;
 }
 
 sub phi {
-    state $five4_f = (Math::MPFR::Rmpfr_init_set_d_nobless(1.25, $ROUND))[0];
-
     my $phi = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_sqrt($phi, $five4_f, $ROUND);
+    Math::MPFR::Rmpfr_set_ui($phi, 5, $ROUND);
+    Math::MPFR::Rmpfr_div_2ui($phi, $phi, 2, $ROUND);    # phi=5/4
+    Math::MPFR::Rmpfr_sqrt($phi, $phi, $ROUND);
     Math::MPFR::Rmpfr_add_d($phi, $phi, 0.5, $ROUND);
-
     bless \$phi;
 }
 
@@ -2534,7 +2533,8 @@ sub __inv__ {
 
   Math_MPC: {
         my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
         return $r;
     }
 }
@@ -3514,25 +3514,19 @@ sub __div__ {
 
   Math_MPC__Scalar: {
         my $r = Math::MPC::Rmpc_init2($PREC);
-        if ($y < 0) {
-            Math::MPC::Rmpc_div_ui($r, $x, -$y, $ROUND);
-            Math::MPC::Rmpc_neg($r, $r, $ROUND);
-        }
-        else {
-            Math::MPC::Rmpc_div_ui($r, $x, $y, $ROUND);
-        }
+        Math::MPC::Rmpc_set_ui($r, (($y < 0) ? (-$y) : $y), $ROUND);
+        Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($y < 0);
+        Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
         return $r;
     }
 
   Scalar__Math_MPC: {
+
+        # XXX: don't use Rmpc_ui_div(), as it is broken in mpc=1.4.0
         my $r = Math::MPC::Rmpc_init2($PREC);
-        if ($x < 0) {
-            Math::MPC::Rmpc_ui_div($r, -$x, $y, $ROUND);
-            Math::MPC::Rmpc_neg($r, $r, $ROUND);
-        }
-        else {
-            Math::MPC::Rmpc_ui_div($r, $x, $y, $ROUND);
-        }
+        Math::MPC::Rmpc_set_ui($r, (($x < 0) ? (-$x) : $x), $ROUND);
+        Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($x < 0);
+        Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
         return $r;
     }
 
@@ -4878,11 +4872,19 @@ sub __log2__ {
     }
 
   Math_MPC: {
-        my $r   = Math::MPC::Rmpc_init2($PREC);
-        my $ln2 = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
-        Math::MPC::Rmpc_log($r, $x, $ROUND);
-        Math::MPC::Rmpc_div_fr($r, $r, $ln2, $ROUND);
+        state $MPC_VERSION = Math::MPC::MPC_VERSION();
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if ($MPC_VERSION >= 66560) {    # available only in mpc>=1.4.0
+            Math::MPC::Rmpc_log2($r, $x, $ROUND);
+        }
+        else {
+            my $ln2 = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
+            Math::MPC::Rmpc_log($r, $x, $ROUND);
+            Math::MPC::Rmpc_div_fr($r, $r, $ln2, $ROUND);
+        }
         return $r;
     }
 }
@@ -5133,16 +5135,12 @@ sub __cbrt__ {
     }
 
   Math_MPC: {
-
-        state $three_inv = do {
-            my $r = Math::MPC::Rmpc_init2_nobless($PREC);
-            Math::MPC::Rmpc_set_ui($r, 3, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-            $r;
-        };
+        my $three_inv = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui($three_inv, 3, $ROUND);
+        Math::MPFR::Rmpfr_ui_div($three_inv, 1, $three_inv, $ROUND);
 
         my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_pow($r, $x, $three_inv, $ROUND);
+        Math::MPC::Rmpc_pow_fr($r, $x, $three_inv, $ROUND);
         return $r;
     }
 }
@@ -5739,9 +5737,11 @@ sub __sec__ {
 
     # sec(x) = 1/cos(x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
         Math::MPC::Rmpc_cos($r, $x, $ROUND);
-        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
         return $r;
     }
 }
@@ -5762,9 +5762,11 @@ sub __sech__ {
 
     # sech(x) = 1/cosh(x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
         Math::MPC::Rmpc_cosh($r, $x, $ROUND);
-        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
         return $r;
     }
 }
@@ -5795,8 +5797,9 @@ sub __asec__ {
 
     # asec(x) = acos(1/x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
         Math::MPC::Rmpc_acos($r, $r, $ROUND);
         return $r;
     }
@@ -5828,8 +5831,9 @@ sub __asech__ {
 
     # asech(x) = acosh(1/x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
         Math::MPC::Rmpc_acosh($r, $r, $ROUND);
         return $r;
     }
@@ -5855,9 +5859,11 @@ sub __csc__ {
 
     # csc(x) = 1/sin(x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
         Math::MPC::Rmpc_sin($r, $x, $ROUND);
-        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
         return $r;
     }
 }
@@ -5878,9 +5884,11 @@ sub __csch__ {
 
     # csch(x) = 1/sinh(x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
         Math::MPC::Rmpc_sinh($r, $x, $ROUND);
-        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
         return $r;
     }
 }
@@ -5911,8 +5919,9 @@ sub __acsc__ {
 
     # acsc(x) = asin(1/x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
         Math::MPC::Rmpc_asin($r, $r, $ROUND);
         return $r;
     }
@@ -5936,8 +5945,9 @@ sub __acsch__ {
 
     # acsch(x) = asinh(1/x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
         Math::MPC::Rmpc_asinh($r, $r, $ROUND);
         return $r;
     }
@@ -5963,9 +5973,11 @@ sub __cot__ {
 
     # cot(x) = 1/tan(x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
         Math::MPC::Rmpc_tan($r, $x, $ROUND);
-        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
         return $r;
     }
 }
@@ -5986,9 +5998,11 @@ sub __coth__ {
 
     # coth(x) = 1/tanh(x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
         Math::MPC::Rmpc_tanh($r, $x, $ROUND);
-        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
         return $r;
     }
 }
@@ -6011,8 +6025,9 @@ sub __acot__ {
 
     # acot(x) = atan(1/x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
         Math::MPC::Rmpc_atan($r, $r, $ROUND);
         return $r;
     }
@@ -6044,8 +6059,9 @@ sub __acoth__ {
 
     # acoth(x) = atanh(1/x)
   Math_MPC: {
-        my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
         Math::MPC::Rmpc_atanh($r, $r, $ROUND);
         return $r;
     }
@@ -10416,7 +10432,7 @@ sub __base__ {
 
         # return Math::MPC::Rmpc_get_str($base, 0, $x, $ROUND);       # not OK
 
-        my $fr = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $fr = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::RMPC_RE($fr, $x);
         my $real = __base__($fr, $base);
         Math::MPC::RMPC_IM($fr, $x);

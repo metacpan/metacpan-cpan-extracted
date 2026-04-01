@@ -1,0 +1,147 @@
+NAME
+    Shared::Simple - Inter-process shared memory key-value store
+
+SYNOPSIS
+      use Shared::Simple;
+
+      # First process: create a fresh segment (cleans up any stale leftovers)
+      my $shm = Shared::Simple->new('myapp', Shared::Simple::EXCLUSIVE);
+
+      # Subsequent processes: attach to the existing segment
+      my $shm = Shared::Simple->new('myapp', Shared::Simple::SHARED);
+      # or simply omit the mode SHARED is the default
+      my $shm = Shared::Simple->new('myapp');
+
+      # Store a value
+      $shm->put('greeting', 'hello');
+
+      # Retrieve a value
+      my $val = $shm->get('greeting');   # 'hello'
+
+      # Missing key returns undef
+      my $x = $shm->get('nosuchkey');    # undef
+
+DESCRIPTION
+    "Shared::Simple" provides a persistent, named key-value store backed by
+    POSIX shared memory ("shm_open"/"mmap"). Multiple processes can open the
+    same named segment simultaneously; reads and writes are serialised with
+    a process-shared POSIX mutex. The underlying hash table resizes
+    automatically when it runs out of space.
+
+METHODS
+  new
+      my $shm = Shared::Simple->new($name);
+      my $shm = Shared::Simple->new($name, $mode);
+
+    Opens or creates a POSIX shared memory segment identified by $name.
+
+    $mode controls how an existing segment is handled and must be one of the
+    two constants exported by this module:
+
+    "Shared::Simple::SHARED" (default)
+        Create-or-attach semantics. If the named segment does not yet exist
+        it is created and initialised; if it already exists the process
+        attaches to it. This is the right mode for every worker that shares
+        data with others. If another process is currently initialising the
+        segment, "new" will wait up to five seconds before croaking with a
+        timeout error.
+
+    "Shared::Simple::EXCLUSIVE"
+        Fresh-start semantics. Any existing segment with this name is
+        unlinked before the new one is created, guaranteeing a clean, empty
+        hash table. Use this once at program startup -- typically in the
+        parent process before forking -- to ensure a consistent initial
+        state regardless of leftovers from previous runs. See "CAVEATS" for
+        important restrictions.
+
+    $name must be a non-empty string short enough to form a valid POSIX
+    shared memory name (roughly "NAME_MAX - 1" characters on the target
+    platform).
+
+    Returns a blessed "Shared::Simple" object. Croaks on failure.
+
+  put
+      $shm->put($key, $value);
+
+    Stores $value under $key in the shared segment. If $key already exists
+    its value is overwritten.
+
+    Constraints:
+
+    *   Both $key and $value must be defined and non-empty strings.
+
+    *   $value must not exceed 32 bytes.
+
+    Returns 1 on success. Croaks on validation failure or an internal error.
+
+  get
+      my $value = $shm->get($key);
+
+    Looks up $key in the shared segment. Returns the stored string on
+    success, or "undef" if the key does not exist.
+
+    $key must be a defined, non-empty string; otherwise the method croaks.
+
+  get_size
+      my $n = $shm->get_size;
+
+    Returns the number of key-value pairs currently stored in the shared
+    segment as an integer.
+
+  get_all
+      my $href = $shm->get_all;
+
+    Returns a reference to a Perl hash containing every key-value pair
+    currently stored in the shared segment. The returned hash is a snapshot
+    taken under the lock; it is independent of the shared memory and safe to
+    read or modify after the call returns.
+
+CONCURRENCY
+    All operations acquire a process-shared POSIX mutex before touching
+    shared memory. On Linux, the mutex is configured as robust: if a process
+    dies while holding the lock, the next caller will recover it
+    automatically ("EOWNERDEAD" handling). This recovery is not available on
+    macOS.
+
+LIMITATIONS
+    *   Values are limited to 32 bytes. Storing longer strings will croak.
+
+    *   The shared memory segment persists until it is explicitly unlinked
+        from the filesystem (e.g. with shm_unlink(3)); destroying the Perl
+        object only detaches the mapping.
+
+CAVEATS
+  EXCLUSIVE mode is not safe to call concurrently
+    "EXCLUSIVE" unlinks the underlying POSIX shared memory objects and
+    recreates them from scratch. This is an inherently destructive,
+    non-atomic sequence of operations. If two or more processes call "new"
+    with "EXCLUSIVE" for the same name at the same time, they will race to
+    destroy each other's live segment, causing data corruption, invalid
+    internal state, and unpredictable failures in every process sharing that
+    segment.
+
+    Only one process must ever call "new" with "EXCLUSIVE" for a given name
+    at any one time, and no other process should be attached to the segment
+    when it does so. The intended pattern is:
+
+      # Parent / coordinator -- runs once before workers start
+      Shared::Simple->new('myapp', Shared::Simple::EXCLUSIVE);
+
+      # Workers -- fork after the parent has finished initialising
+      for (1 .. $N) {
+          fork or do {
+              my $shm = Shared::Simple->new('myapp', Shared::Simple::SHARED);
+              ...;
+              exit;
+          };
+      }
+
+AUTHOR
+    Denys Fisher, <shmakins at gmail dot com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2026 by Denys Fisher
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

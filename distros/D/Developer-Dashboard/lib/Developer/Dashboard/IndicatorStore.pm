@@ -1,5 +1,5 @@
 package Developer::Dashboard::IndicatorStore;
-$Developer::Dashboard::IndicatorStore::VERSION = '0.72';
+$Developer::Dashboard::IndicatorStore::VERSION = '0.94';
 use strict;
 use warnings;
 

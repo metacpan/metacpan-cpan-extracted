@@ -121,7 +121,7 @@ The module is built around two ideas:
 
 =item * I<Automate what is repeated in every test>
 
-=item * I<Eliminate hard‑coded references that make refactoring difficult>
+=item * I<Eliminate hard-coded references that make refactoring difficult>
 
 =back
 
@@ -506,8 +506,6 @@ B<my subtest with [> (its number is B<2>), this can easily be done with the foll
 
 =back
 
-=back
-
 =item
 
 Another idea inspired by other module namely by L<Test::Most|https://metacpan.org/pod/Test::Most> is the idea of
@@ -519,6 +517,8 @@ This feature can be applied both for the whole test file using the C<-bail> opti
 
 and for a part of it using the functions C<bail_on_failure> and C<restore_failure_handler> to activate and deactivate
 this reaction, correspondingly.
+
+=back
 
 C<Test::Expander> combines all advanced possibilities provided by L<Test2::V1|https://metacpan.org/pod/Test2::V1>
 with some specific functions only available in the older module L<Test::More|https://metacpan.org/pod/Test::More>

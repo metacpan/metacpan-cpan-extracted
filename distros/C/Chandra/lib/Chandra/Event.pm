@@ -3,53 +3,11 @@ package Chandra::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-# Event object passed to event handlers
-# Contains data from the JavaScript event
-
-sub new {
-	my ($class, $data) = @_;
-	$data //= {};
-	return bless $data, $class;
-}
-
-# Event type (click, change, keyup, etc.)
-sub type { shift->{type} }
-
-# Target element ID
-sub target_id { shift->{targetId} }
-
-# Target element name attribute
-sub target_name { shift->{targetName} }
-
-# Value (for inputs)
-sub value { shift->{value} }
-
-# Checked state (for checkboxes)
-sub checked { shift->{checked} }
-
-# Key pressed (for keyboard events)
-sub key { shift->{key} }
-
-# Key code (for keyboard events)
-sub key_code { shift->{keyCode} }
-
-# Custom data (from data-* attributes or explicit)
-sub data {
-	my ($self, $key) = @_;
-	if (defined $key) {
-		return $self->{data}{$key} if ref $self->{data} eq 'HASH';
-		return undef;
-	}
-	return $self->{data};
-}
-
-# Get any arbitrary field
-sub get {
-	my ($self, $key) = @_;
-	return $self->{$key};
-}
+# XS methods are registered under the Chandra bootstrap.
+# Ensure the shared object is loaded.
+require Chandra;
 
 1;
 

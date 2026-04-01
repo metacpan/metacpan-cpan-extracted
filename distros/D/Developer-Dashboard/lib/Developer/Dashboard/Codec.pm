@@ -1,5 +1,5 @@
 package Developer::Dashboard::Codec;
-$Developer::Dashboard::Codec::VERSION = '0.72';
+$Developer::Dashboard::Codec::VERSION = '0.94';
 use strict;
 use warnings;
 

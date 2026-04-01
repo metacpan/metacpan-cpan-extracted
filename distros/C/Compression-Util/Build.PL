@@ -7,7 +7,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name       => 'Compression::Util',
     license           => 'artistic_2',
-    dist_author       => q<Daniel Șuteu <trizen@cpan.org>>,
+    dist_author       => q<Daniel Șuteu>,
     dist_version_from => 'lib/Compression/Util.pm',
     release_status    => 'stable',
 

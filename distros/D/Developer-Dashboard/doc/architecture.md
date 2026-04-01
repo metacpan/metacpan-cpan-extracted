@@ -26,9 +26,6 @@ instead of a loose pile of utilities.
 - `Capture::Tiny`
   Captures external command output for collectors, updater scripts, and smoke-test command execution.
 
-- `Developer::Dashboard::PluginManager`
-  Loads JSON-based extension packs from global and repo-local plugin directories.
-
 - `Developer::Dashboard::ActionRunner`
   Executes built-in actions and trusted command actions with cwd, env, timeout, background support, and encoded action payload transport.
 
@@ -150,6 +147,10 @@ Page source compatibility is explicit:
 - posting a root-editor document with `BOOKMARK: some-id` persists it as a saved bookmark so `/app/some-id` can load it on the next request
 - `/apps` redirects to `/app/index`
 - edit and render views include shared top chrome with share/source links plus the original status-plus-alias indicator strip, refreshed from `/system/status`, alongside the local user, a machine IP link chosen from the active interfaces, and a browser-updated date/time
+- direct `nav/*.tt` saved bookmarks are treated as shared nav fragments, so `/app/nav/foo.tt` remains editable like any other bookmark while non-nav pages insert the sorted rendered `nav/*.tt` outputs between the top chrome and the main page body
+- bookmark Template Toolkit rendering exposes `env.current_page` and `env.runtime_context.current_page`, so saved pages and nav fragments can branch on the active request path without losing the rest of the runtime context
+- when the active project contains `./.developer-dashboard`, the page store, config loader, CLI hook resolver, auth/session stores, and isolated docker service lookup all read that tree first and then fall back to `~/.developer-dashboard`
+- `dashboard init` seeds `welcome`, `api-dashboard`, and `db-dashboard` as normal editable saved bookmarks
 - the editor view auto-submits the bookmark form on textarea change/blur instead of relying on a visible update button
 - the editor shows in-place syntax highlighting inside the same editing surface for directive, HTML, CSS, JavaScript, and Perl `CODE*` content
 
@@ -166,16 +167,20 @@ The core supports compatibility-style environment overrides for project customiz
 - `DEVELOPER_DASHBOARD_CONFIGS`
   Config root.
 
-- `DEVELOPER_DASHBOARD_STARTUP`
-  Startup collector-definition root.
-
-Startup definitions are read as JSON files and merged into the collector set.
 
 The runtime also supports user CLI extensions:
 
-- unknown top-level `dashboard` subcommands are resolved from `~/.developer-dashboard/cli`
+- unknown top-level `dashboard` subcommands are resolved from `./.developer-dashboard/cli` first and then `~/.developer-dashboard/cli`
 - the matching executable receives the remaining argv unchanged
 - stdin, stdout, and stderr are preserved through `exec`
+- every top-level command also has an optional hook directory at `./.developer-dashboard/cli/<command>` or `./.developer-dashboard/cli/<command>.d`, with the home runtime as fallback
+- executable hook files from that directory run in sorted filename order before the real command starts
+- non-executable files in the hook directory are skipped
+- hook `stdout` and `stderr` stream live to the terminal while also being accumulated into `RESULT` JSON for later hooks and the final command
+- after each hook exits, the updated `RESULT` JSON is written back into the environment before the next hook starts
+- Perl hook scripts can use `Runtime::Result` to decode `RESULT` and inspect prior hook `stdout`, `stderr`, and exit codes
+- there is no special built-in `update` path; `dashboard update` is just another user-provided command when `./.developer-dashboard/cli/update` or `./.developer-dashboard/cli/update/run` exists, with the same home fallback
+- directory-backed custom commands can use `./.developer-dashboard/cli/<command>/run` as the final executable after hooks complete, with the same home fallback
 
 ## Packaging
 

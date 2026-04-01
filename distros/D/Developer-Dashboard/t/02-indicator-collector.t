@@ -12,6 +12,7 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Prompt;
 
 local $ENV{HOME} = tempdir(CLEANUP => 1);
+chdir $ENV{HOME} or die "Unable to chdir to $ENV{HOME}: $!";
 
 my $paths = Developer::Dashboard::PathRegistry->new;
 my $collector = Developer::Dashboard::Collector->new(paths => $paths);

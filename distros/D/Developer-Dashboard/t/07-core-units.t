@@ -39,6 +39,10 @@ make_path( File::Spec->catdir( $workspace, 'Alpha-App', '.git' ) );
 make_path( File::Spec->catdir( $workspace, '.hidden' ) );
 make_path( File::Spec->catdir( $projects, 'Alpha-App' ) );
 make_path( File::Spec->catdir( $projects, 'Beta App' ) );
+my $local_repo = File::Spec->catdir( $home, 'projects', 'Local-App' );
+make_path( File::Spec->catdir( $local_repo, '.git' ) );
+make_path( File::Spec->catdir( $local_repo, '.developer-dashboard' ) );
+chdir $home or die $!;
 
 my $paths = Developer::Dashboard::PathRegistry->new(
     home            => $home,
@@ -55,13 +59,14 @@ ok( -d $paths->state_root, 'state root created' );
 ok( -d $paths->cache_root, 'cache root created' );
 ok( -d $paths->logs_root, 'logs root created' );
 ok( -d $paths->dashboards_root, 'dashboards root created' );
-ok( -d $paths->plugins_root, 'plugins root created' );
 ok( -d $paths->cli_root, 'cli root created' );
 ok( -d $paths->collectors_root, 'collectors root created' );
 ok( -d $paths->indicators_root, 'indicators root created' );
+ok( -d $paths->sessions_root, 'sessions root created' );
 ok( -d $paths->temp_root, 'temp root created' );
 ok( -d $paths->config_root, 'config root created' );
-ok( -d $paths->startup_root, 'startup root created' );
+ok( -d $paths->auth_root, 'auth root created' );
+ok( -d $paths->users_root, 'users root created' );
 ok( !defined $paths->project_root_for( File::Spec->catdir( $home, 'not-a-repo' ) ), 'project_root_for returns undef outside repos' );
 
 is( $paths->home, $home, 'home accessor works' );
@@ -84,6 +89,7 @@ is( $resolved_home, $home, 'resolve_dir resolves method-backed names' );
 is( $paths->resolve_dir('bookmarks'), $paths->dashboards_root, 'resolve_dir accepts legacy bookmarks alias' );
 is( $paths->resolve_dir('bookmarks_root'), $paths->dashboards_root, 'resolve_dir accepts legacy bookmarks_root alias' );
 is( $paths->resolve_dir('cli_root'), $paths->cli_root, 'resolve_dir accepts cli_root' );
+is( $paths->resolve_dir('sessions_root'), $paths->sessions_root, 'resolve_dir accepts sessions_root' );
 is( $paths->resolve_dir('/tmp'), '/tmp', 'resolve_dir returns absolute paths as-is' );
 is( $paths->resolve_dir('named'), File::Spec->catdir( $home, 'named-path' ), 'resolve_dir expands named paths' );
 is_deeply( $paths->named_paths, { named => '~/named-path' }, 'named_paths exposes registered aliases' );
@@ -97,6 +103,57 @@ dies_like( sub { $paths->resolve_dir('missing-name') }, qr/Unknown directory nam
 my $project_match = $paths->resolve_any( 'missing-name', 'workspace_roots', 'home' );
 is( $project_match, $home, 'resolve_any returns first existing directory' );
 ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef when nothing resolves' );
+{
+    chdir $home or die $!;
+    is( $paths->repo_dashboard_root, undef, 'repo_dashboard_root returns undef outside a repo' );
+    chdir $home or die $!;
+}
+{
+    chdir $local_repo or die $!;
+    is( $paths->project_runtime_root, File::Spec->catdir( $local_repo, '.developer-dashboard' ), 'project_runtime_root resolves only when the repo already contains a dashboard root' );
+    is( $paths->runtime_root, File::Spec->catdir( $local_repo, '.developer-dashboard' ), 'runtime_root prefers the project-local dashboard root when present' );
+    is_deeply(
+        [ $paths->runtime_roots ],
+        [
+            File::Spec->catdir( $local_repo, '.developer-dashboard' ),
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+        ],
+        'runtime_roots returns project-local then home fallback roots',
+    );
+    is( $paths->dashboards_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'dashboards' ), 'dashboards_root writes to the project-local runtime when present' );
+    is( $paths->cli_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'cli' ), 'cli_root writes to the project-local runtime when present' );
+    is( $paths->config_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'config' ), 'config_root writes to the project-local runtime when present' );
+    is( $paths->users_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'config', 'auth', 'users' ), 'users_root writes to the project-local runtime when present' );
+    is( $paths->sessions_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'state', 'sessions' ), 'sessions_root writes to the project-local runtime when present' );
+    chdir $home or die $!;
+}
+{
+    chdir $local_repo or die $!;
+    is_deeply(
+        [ $paths->cli_roots ],
+        [
+            File::Spec->catdir( $local_repo, '.developer-dashboard', 'cli' ),
+            File::Spec->catdir( $home, '.developer-dashboard', 'cli' ),
+        ],
+        'cli_roots returns project-local then home fallback roots',
+    );
+    chdir $home or die $!;
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS} = '~/bookmarks-env';
+    is_deeply(
+        [ $paths->dashboards_roots ],
+        [ File::Spec->catdir( $home, 'bookmarks-env' ) ],
+        'dashboards_roots honors the bookmarks environment override',
+    );
+}
+
+is_deeply(
+    Developer::Dashboard::PathRegistry->new( home => $home )->named_paths,
+    {},
+    'named_paths returns an empty hash when no aliases are configured',
+);
 
 my $named_dir = $paths->resolve_dir('named');
 ok( !defined scalar $paths->ls('named'), 'ls returns undef for missing directory' );
@@ -118,7 +175,7 @@ my $with_dir_result = $paths->with_dir(
     }
 );
 is( $with_dir_result, 'ok', 'with_dir returns scalar result' );
-is( cwd(), $original_cwd, 'with_dir restores original cwd after scalar call' );
+is( cwd(), $home, 'with_dir restores original cwd after scalar call' );
 
 my @with_dir_list = $paths->with_dir(
     'named',
@@ -140,7 +197,7 @@ dies_like(
     qr/boom/,
     'with_dir rethrows callback exceptions',
 );
-is( cwd(), $original_cwd, 'with_dir restores cwd after callback errors' );
+is( cwd(), $home, 'with_dir restores cwd after callback errors' );
 
 my @located = $paths->locate_projects('alpha');
 is_deeply(
@@ -359,6 +416,33 @@ print {$skip_json} "skip\n";
 close $skip_json;
 is_deeply( [ sort grep { $_ ne 'skip.txt' } $page_store->list_saved_pages ], ['page-one'], 'list_saved_pages includes saved bookmark files' );
 
+my $home_only_page = Developer::Dashboard::PageDocument->new(
+    id     => 'shared-page',
+    title  => 'Home Shared Page',
+    layout => { body => 'from home root' },
+);
+$page_store->save_page($home_only_page);
+{
+    chdir $local_repo or die $!;
+    my $local_store = Developer::Dashboard::PageStore->new( paths => $paths );
+    is( $local_store->read_saved_entry('shared-page'), $home_only_page->canonical_instruction, 'page store falls back to the home bookmark root when a project-local page is missing' );
+    my $local_override_page = Developer::Dashboard::PageDocument->new(
+        id     => 'shared-page',
+        title  => 'Local Shared Page',
+        layout => { body => 'from local root' },
+    );
+    my $local_only_page = Developer::Dashboard::PageDocument->new(
+        id     => 'local-only',
+        title  => 'Local Only Page',
+        layout => { body => 'local page body' },
+    );
+    $local_store->save_page($local_override_page);
+    $local_store->save_page($local_only_page);
+    is( $local_store->load_saved_page('shared-page')->as_hash->{title}, 'Local Shared Page', 'page store prefers project-local bookmark files over the home fallback' );
+    is_deeply( [ $local_store->list_saved_pages ], [ 'local-only', 'page-one', 'shared-page' ], 'page store lists the project-local union of bookmark ids with local overrides taking precedence' );
+    chdir $home or die $!;
+}
+
 my $collector = Developer::Dashboard::Collector->new( paths => $paths );
 dies_like( sub { Developer::Dashboard::Collector->new }, qr/Missing paths registry/, 'collector requires paths' );
 my $collector_paths = $collector->collector_paths('alpha.collector');
@@ -400,12 +484,21 @@ make_path( File::Spec->catdir( $paths->collectors_root, 'broken.collector' ) );
 open my $broken_status, '>', File::Spec->catfile( $paths->collectors_root, 'broken.collector', 'status.json' ) or die $!;
 print {$broken_status} "{broken\n";
 close $broken_status;
+ok( !defined $collector->read_status('broken.collector'), 'read_status returns undef for invalid collector status json' );
+$collector->write_status(
+    'broken.collector',
+    {
+        enabled => 1,
+        running => 1,
+    }
+);
+is( $collector->read_status('broken.collector')->{running}, 1, 'write_status recovers by overwriting invalid collector status json' );
 
 my @collectors = $collector->list_collectors;
 is_deeply(
     [ map { $_->{name} } @collectors ],
-    [ 'alpha.collector', 'beta.collector' ],
-    'list_collectors sorts valid collector status and skips invalid files',
+    [ 'alpha.collector', 'beta.collector', 'broken.collector' ],
+    'list_collectors sorts collector status and includes a collector once invalid status is repaired',
 );
 
 my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
@@ -526,9 +619,38 @@ like(
     );
     like( $branch_prompt, qr/\{Alpha-App:master\}/, 'prompt includes repo name and git branch' );
 }
+{
+    my $git_repo = File::Spec->catdir( $home, 'prompt-git-repo' );
+    make_path($git_repo);
+    system( 'git', 'init', '-q', $git_repo ) == 0 or die 'git init failed';
+    system( 'git', '-C', $git_repo, 'config', 'user.email', 'prompt@example.test' ) == 0 or die 'git config user.email failed';
+    system( 'git', '-C', $git_repo, 'config', 'user.name', 'Prompt Coverage' ) == 0 or die 'git config user.name failed';
+    open my $git_file_fh, '>', File::Spec->catfile( $git_repo, 'README' ) or die $!;
+    print {$git_file_fh} "prompt coverage\n";
+    close $git_file_fh;
+    system( 'git', '-C', $git_repo, 'add', 'README' ) == 0 or die 'git add failed';
+    system( 'git', '-C', $git_repo, 'commit', '-q', '-m', 'init' ) == 0 or die 'git commit failed';
+
+    my $cwd_before = cwd();
+    chdir $git_repo or die $!;
+    my $rendered_from_cwd = Developer::Dashboard::Prompt->new(
+        paths      => $plain_paths,
+        indicators => Developer::Dashboard::IndicatorStore->new( paths => $plain_paths ),
+    )->render;
+    chdir $cwd_before or die $!;
+
+    like( $rendered_from_cwd, qr/prompt-git-repo/, 'prompt render uses the current working directory when cwd is omitted' );
+
+    my $detected_branch = Developer::Dashboard::Prompt->new(
+        paths      => $plain_paths,
+        indicators => Developer::Dashboard::IndicatorStore->new( paths => $plain_paths ),
+    )->_git_branch($git_repo);
+    ok( defined $detected_branch && $detected_branch ne '', 'prompt detects a git branch from a real repository' );
+}
 
 my $repo = File::Spec->catdir( $home, 'repo-for-config' );
 make_path( File::Spec->catdir( $repo, '.git' ) );
+make_path( File::Spec->catdir( $repo, '.developer-dashboard' ) );
 open my $repo_cfg, '>', File::Spec->catfile( $repo, '.developer-dashboard.json' ) or die $!;
 print {$repo_cfg} <<'JSON';
 {
@@ -538,55 +660,137 @@ print {$repo_cfg} <<'JSON';
       "name": "repo.collector",
       "command": "printf 'repo'",
       "cwd": "home"
+    },
+    {
+      "name": "config.two",
+      "command": "printf 'two'",
+      "cwd": "home"
     }
   ]
 }
 JSON
 close $repo_cfg;
-
-make_path( $paths->startup_root );
-open my $startup_hash, '>', File::Spec->catfile( $paths->startup_root, 'one.json' ) or die $!;
-print {$startup_hash} <<'JSON';
+my $home_config_file = File::Spec->catfile( $home, '.developer-dashboard', 'config', 'config.json' );
+make_path( File::Spec->catdir( $home, '.developer-dashboard', 'config' ) );
+open my $home_cfg, '>', $home_config_file or die $!;
+print {$home_cfg} <<'JSON';
 {
-  "name": "startup.one",
-  "command": "printf 'one'",
-  "cwd": "home"
+  "path_aliases": {
+    "home_only": "~/home-only"
+  },
+  "collectors": [
+    {
+      "name": "home.collector",
+      "command": "printf 'home'",
+      "cwd": "home"
+    }
+  ]
 }
 JSON
-close $startup_hash;
-
-open my $startup_array, '>', File::Spec->catfile( $paths->startup_root, 'two.json' ) or die $!;
-print {$startup_array} <<'JSON';
-[
-  {
-    "name": "startup.two",
-    "command": "printf 'two'",
-    "cwd": "home"
+close $home_cfg;
+my $local_config_file = File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'config.json' );
+make_path( File::Spec->catdir( $repo, '.developer-dashboard', 'config' ) );
+open my $local_cfg, '>', $local_config_file or die $!;
+print {$local_cfg} <<'JSON';
+{
+  "path_aliases": {
+    "local_only": "~/local-only"
   },
-  "skip"
-]
+  "collectors": [
+    {
+      "name": "local.collector",
+      "command": "printf 'local'",
+      "cwd": "home"
+    }
+  ]
+}
 JSON
-close $startup_array;
-
-open my $startup_skip, '>', File::Spec->catfile( $paths->startup_root, 'skip.txt' ) or die $!;
-print {$startup_skip} "skip\n";
-close $startup_skip;
+close $local_cfg;
 
 {
-    local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'repo.collector:startup.two';
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'repo.collector:config.two';
     chdir $repo or die $!;
-    is_deeply( $config->load_repo, { default_mode => 'source', collectors => [ { name => 'repo.collector', command => q{printf 'repo'}, cwd => 'home' } ] }, 'load_repo reads repo-local configuration' );
+    is( $paths->current_project_root, $repo, 'current_project_root resolves the active git repo' );
+    is( $paths->repo_dashboard_root, File::Spec->catdir( $repo, '.developer-dashboard' ), 'repo_dashboard_root resolves an existing repo dashboard directory' );
+    is_deeply(
+        $config->load_repo,
+        {
+            default_mode => 'source',
+            collectors   => [
+                { name => 'repo.collector', command => q{printf 'repo'}, cwd => 'home' },
+                { name => 'config.two',     command => q{printf 'two'},  cwd => 'home' },
+            ],
+        },
+        'load_repo reads repo-local configuration',
+    );
+    is_deeply(
+        $config->load_global,
+        {
+            path_aliases => {
+                home_only  => '~/home-only',
+                local_only => '~/local-only',
+            },
+            collectors => [
+                { name => 'local.collector', command => q{printf 'local'}, cwd => 'home' },
+            ],
+        },
+        'load_global gives the project-local runtime config precedence while still merging nested hash domains such as path aliases',
+    );
     is( $config->merged->{default_mode}, 'source', 'merged gives repo config precedence over global config' );
     my $collectors = $config->collectors;
-    is_deeply( [ map { $_->{name} } @$collectors ], [ 'repo.collector', 'startup.two' ], 'collector filter follows colon-separated legacy semantics' );
+    is_deeply( [ map { $_->{name} } @$collectors ], [ 'repo.collector', 'config.two' ], 'collector filter follows colon-separated legacy semantics' );
+    my $global_aliases = $config->global_path_aliases;
+    is( $global_aliases->{home_only}, File::Spec->catdir( $home, 'home-only' ), 'global_path_aliases keeps the home runtime fallback aliases' );
+    is( $global_aliases->{local_only}, File::Spec->catdir( $home, 'local-only' ), 'global_path_aliases includes project-local runtime aliases' );
+    my $saved_global = $config->save_global(
+        {
+            path_aliases => {
+                saved_here => '~/saved-here',
+            },
+        }
+    );
+    is( $saved_global, $local_config_file, 'save_global writes into the project-local runtime config when it exists' );
 }
 {
-    local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'repo.collector::startup.two';
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'repo.collector::config.two';
     chdir $repo or die $!;
     my $collectors = $config->collectors;
-    is_deeply( [ map { $_->{name} } @$collectors ], [ 'repo.collector', 'startup.two' ], 'collector filter ignores blank checker names' );
+    is_deeply( [ map { $_->{name} } @$collectors ], [ 'repo.collector', 'config.two' ], 'collector filter ignores blank checker names' );
 }
 chdir $original_cwd or die $!;
+
+{
+    require Developer::Dashboard::Auth;
+    require Developer::Dashboard::SessionStore;
+    my $auth = Developer::Dashboard::Auth->new( files => $files, paths => $paths );
+    my $sessions = Developer::Dashboard::SessionStore->new( paths => $paths );
+    my $home_user_root = File::Spec->catdir( $home, '.developer-dashboard', 'config', 'auth', 'users' );
+    make_path($home_user_root);
+    open my $home_user, '>', File::Spec->catfile( $home_user_root, 'fallback.json' ) or die $!;
+    print {$home_user} qq|{"username":"fallback","role":"helper","salt":"one","password_hash":"two","updated_at":"2026-01-01T00:00:00Z"}|;
+    close $home_user;
+    my $home_session_root = File::Spec->catdir( $home, '.developer-dashboard', 'state', 'sessions' );
+    make_path($home_session_root);
+    open my $home_session, '>', File::Spec->catfile( $home_session_root, 'fallback-session.json' ) or die $!;
+    print {$home_session} qq|{"session_id":"fallback-session","username":"fallback","role":"helper","remote_addr":"","created_at":"2026-01-01T00:00:00Z","expires_at":"2099-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z"}|;
+    close $home_session;
+
+    chdir $local_repo or die $!;
+    ok( $auth->get_user('fallback'), 'auth falls back to the home runtime user store when the local runtime does not define the user' );
+    my $created_user = $auth->add_user( username => 'localhelper', password => 'helper-pass-123' );
+    is( $created_user->{username}, 'localhelper', 'auth add_user writes local runtime users successfully' );
+    ok( -f File::Spec->catfile( $local_repo, '.developer-dashboard', 'config', 'auth', 'users', 'localhelper.json' ), 'auth add_user writes to the project-local runtime user store when available' );
+    my @users = $auth->list_users;
+    is_deeply( [ map { $_->{username} } @users ], [ 'fallback', 'localhelper' ], 'auth list_users returns the project-local and home fallback union' );
+    ok( $sessions->get('fallback-session'), 'session store falls back to the home runtime session root when a local record is missing' );
+    my $created_session = $sessions->create( username => 'localhelper', role => 'helper' );
+    ok( -f File::Spec->catfile( $local_repo, '.developer-dashboard', 'state', 'sessions', $created_session->{session_id} . '.json' ), 'session store writes new sessions to the project-local runtime when available' );
+    $auth->remove_user('fallback');
+    ok( !defined $auth->get_user('fallback'), 'auth remove_user removes matching records from all runtime roots' );
+    $sessions->delete('fallback-session');
+    ok( !defined $sessions->get('fallback-session'), 'session delete removes matching records from all runtime roots' );
+    chdir $home or die $!;
+}
 
 my $collector_indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
 my $runner = Developer::Dashboard::CollectorRunner->new(
@@ -667,6 +871,30 @@ like( $code_error_result->{stderr}, qr/code boom/, 'run_once captures perl colle
 my $code_error_indicator = $collector_indicators->get_indicator('code.collector.error');
 ok( $code_error_indicator, 'failing perl collector code writes an indicator record' );
 is( $code_error_indicator->{status}, 'error', 'failing perl collector code marks indicator error' ) if $code_error_indicator;
+my $isolated_broken = $runner->run_once(
+    {
+        name      => 'isolated.collector.broken',
+        code      => q{this is broken perl code},
+        cwd       => 'home',
+        indicator => { name => 'isolated.indicator.broken', label => 'Broken', icon => 'B' },
+    }
+);
+my $isolated_healthy = $runner->run_once(
+    {
+        name      => 'isolated.collector.healthy',
+        command   => q{printf 'healthy ok'},
+        cwd       => 'home',
+        indicator => { name => 'isolated.indicator.healthy', label => 'Healthy', icon => 'H' },
+    }
+);
+is( $isolated_broken->{exit_code}, 255, 'broken collector still fails with a non-zero exit code in the isolation scenario' );
+is( $isolated_healthy->{exit_code}, 0, 'healthy collector still succeeds after a broken collector run' );
+is( $collector_indicators->get_indicator('isolated.indicator.broken')->{status}, 'error', 'broken collector isolation scenario leaves its indicator red' );
+is( $collector_indicators->get_indicator('isolated.indicator.healthy')->{status}, 'ok', 'healthy collector isolation scenario leaves its indicator green' );
+my $collector_prompt = Developer::Dashboard::Prompt->new( paths => $paths, indicators => $collector_indicators );
+my $collector_prompt_output = $collector_prompt->render( jobs => 0, cwd => $home );
+like( $collector_prompt_output, qr/🚨B/, 'prompt keeps the broken collector status visible in the isolation scenario' );
+like( $collector_prompt_output, qr/✅H/, 'prompt keeps the healthy collector status visible in the isolation scenario' );
 like( $runner->_process_title('demo'), qr/^dashboard collector: demo$/, '_process_title formats managed process names' );
 ok( !defined $runner->loop_state('missing-loop-state'), 'loop_state returns undef for missing state files' );
 ok( !$runner->_is_managed_loop( undef, 'demo' ), '_is_managed_loop rejects missing pids' );
@@ -942,13 +1170,13 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     is_deeply( [ $runner->running_loops ], [], 'running_loops prunes stale pidfiles' );
 }
 
-my @empty_startup = @{ Developer::Dashboard::Config->new(
+my $empty_config = Developer::Dashboard::Config->new(
     files => Developer::Dashboard::FileRegistry->new(
         paths => Developer::Dashboard::PathRegistry->new( home => tempdir(CLEANUP => 1) )
     ),
     paths => Developer::Dashboard::PathRegistry->new( home => tempdir(CLEANUP => 1) ),
-)->startup_collectors };
-is_deeply( \@empty_startup, [], 'startup_collectors returns an empty list without startup files' );
+);
+is_deeply( $empty_config->collectors, [], 'collectors returns an empty list without configured jobs' );
 
 dies_like( sub { Developer::Dashboard::UpdateManager->new }, qr/Missing config/, 'update manager requires config' );
 

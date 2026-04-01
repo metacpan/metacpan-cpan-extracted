@@ -1,4 +1,4 @@
-package Graphics::Penplotter::GcodeXY::Optimize v0.7.2;
+package Graphics::Penplotter::GcodeXY::Optimize v0.9.4;
 
 use v5.38.2;
 use feature qw( signatures );
@@ -34,6 +34,20 @@ my $optline = 0;   # instruction counter, used in debug output
 # PUBLIC ENTRY POINT
 # Called by _flushPsegments in GcodeXY.pm.
 # ===========================================================================
+
+# Return true if any segment in the range [$line .. $line+$count-1] is
+# marked with the `preserve` flag; used to prevent optimization from
+# touching segments emitted by callers that requested preservation.
+sub _preserve_in_range ($self, $line, $count) {
+    return 0 unless defined $self->{psegments};
+    my $max = $#{ $self->{psegments} } // -1;
+    for my $i (0 .. $count-1) {
+        my $idx = $line + $i;
+        last if $idx > $max;
+        return 1 if $self->{psegments}[$idx]{preserve};
+    }
+    return 0;
+}
 
 # Path segment peephole optimisation.
 # Applied immediately before gcode generation.
@@ -244,6 +258,46 @@ sub _optimize ($self) {
             . ( $before - $after )
             . ' instructions' . $EOL;
     }
+    # Final cleanup: remove trivial redundancies that patterns may have
+    # missed, but do not touch segments marked 'preserve'. This handles
+    # consecutive identical PU/PD, and zero-length moves.
+    $self->_post_optimize_cleanup();
+    return 1;
+}
+
+
+# Remove trivial redundant segments left after peephole passes.
+sub _post_optimize_cleanup ($self) {
+    my $i = 0;
+    my $len = scalar @{ $self->{psegments} };
+    while ( $i < $len ) {
+        my $seg = $self->{psegments}[$i];
+        $i++ and next unless defined $seg && defined $seg->{key};
+
+        # don't alter preserved segments or windows containing them
+        if ( $seg->{preserve} ) { $i++; next }
+
+        # remove consecutive identical PU/PD
+        if ( $seg->{key} eq 'u' || $seg->{key} eq 'd' ) {
+            if ( $i+1 <= $len-1 ) {
+                my $nxt = $self->{psegments}[$i+1];
+                if ( defined $nxt && $nxt->{key} && $nxt->{key} eq $seg->{key} && !$nxt->{preserve} ) {
+                    splice @{ $self->{psegments} }, $i+1, 1; $len--; next;
+                }
+            }
+        }
+
+        # remove zero-length moves (move or line with identical src/dst)
+        if ( $seg->{key} eq 'l' || $seg->{key} eq 'm' ) {
+            if ( defined $seg->{sx} && defined $seg->{dx} && defined $seg->{sy} && defined $seg->{dy} ) {
+                if ( $seg->{sx} == $seg->{dx} && $seg->{sy} == $seg->{dy} && !$seg->{preserve} ) {
+                    splice @{ $self->{psegments} }, $i, 1; $len--; next;
+                }
+            }
+        }
+
+        $i++;
+    }
     return 1;
 }
 
@@ -253,6 +307,7 @@ sub _optimize ($self) {
 # ===========================================================================
 
 sub _pattern1 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 5);
     if ( $rest < 5 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'm'
@@ -260,14 +315,15 @@ sub _pattern1 ($self, $line, $rest) {
         && $self->{psegments}[ $line + 2 ]{key} eq 'l'
         && $self->{psegments}[ $line + 3 ]{key} eq 'l'
         && $self->{psegments}[ $line + 4 ]{key} eq 'u'
-        && $self->{psegments}[ $line + 2 ]{dx} == $self->{psegments}[ $line + 0 ]{dx}
-        && $self->{psegments}[ $line + 2 ]{dy} == $self->{psegments}[ $line + 0 ]{dy}
+        && $self->{psegments}[ $line + 2 ]{sx} == $self->{psegments}[ $line + 0 ]{dx}
+        && $self->{psegments}[ $line + 2 ]{sy} == $self->{psegments}[ $line + 0 ]{dy}
         && $self->{psegments}[ $line + 3 ]{dx} == $self->{psegments}[ $line + 2 ]{sx}
         && $self->{psegments}[ $line + 3 ]{dy} == $self->{psegments}[ $line + 2 ]{sy}
     ) ? 1 : 0;
 }
 
 sub _pattern2 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 6);
     if ( $rest < 6 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'l'
@@ -284,6 +340,7 @@ sub _pattern2 ($self, $line, $rest) {
 }
 
 sub _pattern10 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 5);
     if ( $rest < 5 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'l'
@@ -303,6 +360,7 @@ sub _pattern10 ($self, $line, $rest) {
 }
 
 sub _pattern3 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 4);
     if ( $rest < 4 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'l'
@@ -315,6 +373,7 @@ sub _pattern3 ($self, $line, $rest) {
 }
 
 sub _pattern4 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 6);
     if ( $rest < 6 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'u'
@@ -329,6 +388,7 @@ sub _pattern4 ($self, $line, $rest) {
 }
 
 sub _pattern11 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 6);
     if ( $rest < 6 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'u'
@@ -341,6 +401,7 @@ sub _pattern11 ($self, $line, $rest) {
 }
 
 sub _pattern5 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 2);
     if ( $rest < 2 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'u'
@@ -349,6 +410,7 @@ sub _pattern5 ($self, $line, $rest) {
 }
 
 sub _pattern6 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 2);
     if ( $rest < 2 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'u'
@@ -357,6 +419,7 @@ sub _pattern6 ($self, $line, $rest) {
 }
 
 sub _pattern7 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 2);
     if ( $rest < 2 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'd'
@@ -365,6 +428,7 @@ sub _pattern7 ($self, $line, $rest) {
 }
 
 sub _pattern8 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 2);
     if ( $rest < 2 ) { return 0 }
     return (
            $self->{psegments}[ $line + 0 ]{key} eq 'd'
@@ -373,6 +437,7 @@ sub _pattern8 ($self, $line, $rest) {
 }
 
 sub _pattern9 ($self, $line, $rest) {
+    return 0 if $self->_preserve_in_range($line, 1);
     if ( $rest < 1 ) { return 0 }
     return (
         (   $self->{psegments}[ $line + 0 ]{key} eq 'm'
@@ -467,20 +532,26 @@ sub _prPseg ($self, $index) {
         return 0;
     }
     if ( $self->{psegments}[$index]{key} eq 'u' ) {
-        print STDOUT "    $index: PENUP$EOL";
+        print STDOUT "    $index: PENUP";
+        print STDOUT " [preserve]" if $self->{psegments}[$index]{preserve};
+        print STDOUT "$EOL";
         return 1;
     }
     if ( $self->{psegments}[$index]{key} eq 'd' ) {
-        print STDOUT "    $index: PENDOWN$EOL";
+        print STDOUT "    $index: PENDOWN";
+        print STDOUT " [preserve]" if $self->{psegments}[$index]{preserve};
+        print STDOUT "$EOL";
         return 1;
     }
-    printf STDOUT "    %d: %s (%5.2f,%5.2f) -> (%5.2f,%5.2f)$EOL",
+    printf STDOUT "    %d: %s (%5.2f,%5.2f) -> (%5.2f,%5.2f)",
         $index,
         $self->{psegments}[$index]{key},
         $self->{psegments}[$index]{sx},
         $self->{psegments}[$index]{sy},
         $self->{psegments}[$index]{dx},
         $self->{psegments}[$index]{dy};
+    print STDOUT " [preserve]" if $self->{psegments}[$index]{preserve};
+    print STDOUT "$EOL";
     return 1;
 }
 

@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.83';
+$Map::Tube::CLI::VERSION   = '0.84';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,12 +9,13 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.83
+Version 0.84
 
 =cut
 
 use 5.006;
 use utf8::all;
+use Carp qw(croak);
 use Data::Dumper;
 use MIME::Base64;
 use Map::Tube::Utils qw(is_valid_color);
@@ -31,6 +32,7 @@ use Module::Pluggable
     inner       => 0,
     max_depth   => 3;
 
+use Path::Tiny;
 use Text::ASCIITable;
 use Moo;
 use namespace::autoclean;
@@ -88,7 +90,9 @@ Now request for preferred route as below:
 
 =head2 Generate Full Map
 
-To generate entire map, follow the command below:
+To generate a graphical representation of the entire map, follow the command
+below. This will generate a PNG file named after the map in your current working
+directory. (It will silently overwrite any pre-existing file of the same name.)
 
     $ map-tube --map Delhi --generate_map
 
@@ -98,7 +102,10 @@ In case you want different background color to the map then you can try below:
 
 =head2 Generate Just a Line Map
 
-To generate just a particular line map, follow the command below:
+To generate a graphical representation of just a particular line map, follow
+the command below. This will generate a PNG file named after the line in your
+current working directory. (It will silently overwrite any pre-existing file
+of the same name.)
 
     $ map-tube --map London --line Bakerloo --generate_map
 
@@ -149,9 +156,13 @@ sure you have the latest maps when you install.
 
 =item * L<Bielefeld|Map::Tube::Bielefeld>
 
+=item * L<Brussels|Map::Tube::Brussels>
+
 =item * L<Bucharest|Map::Tube::Bucharest>
 
 =item * L<Budapest|Map::Tube::Budapest>
+
+=item * L<Chicago|Map::Tube::Chicago>
 
 =item * L<Copenhagen|Map::Tube::Copenhagen>
 
@@ -179,6 +190,8 @@ sure you have the latest maps when you install.
 
 =item * L<KualaLumpur|Map::Tube::KualaLumpur>
 
+=item * L<London|Map::Tube::Leipzig>
+
 =item * L<London|Map::Tube::London>
 
 =item * L<Lyon|Map::Tube::Lyon>
@@ -193,6 +206,10 @@ sure you have the latest maps when you install.
 
 =item * L<Moscow|Map::Tube::Moscow>
 
+=item * L<Muenchen|Map::Tube::Muenchen>
+
+=item * L<Napoli|Map::Tube::Napoli>
+
 =item * L<Nuremberg|Map::Tube::Nuremberg>
 
 =item * L<NYC|Map::Tube::NYC>
@@ -205,6 +222,8 @@ sure you have the latest maps when you install.
 
 =item * L<Oslo|Map::Tube::Oslo>
 
+=item * L<Paris|Map::Tube::Paris>
+
 =item * L<Prague|Map::Tube::Prague>
 
 =item * L<RheinRuhr|Map::Tube::RheinRuhr>
@@ -215,11 +234,17 @@ sure you have the latest maps when you install.
 
 =item * L<Samara|Map::Tube::Samara>
 
+=item * L<SanFrancisco|Map::Tube::SanFrancisco>
+
 =item * L<Singapore|Map::Tube::Singapore>
 
 =item * L<Sofia|Map::Tube::Sofia>
 
 =item * L<Stockholm|Map::Tube::Stockholm>
+
+=item * L<Stuttgart|Map::Tube::Stuttgart>
+
+=item * L<Sydney|Map::Tube::Sydney>
 
 =item * L<Tbilisi|Map::Tube::Tbilisi>
 
@@ -296,22 +321,11 @@ sub run {
         print $map_obj->get_shortest_route($start, $end)->preferred, "\n";
     }
     elsif ($self->generate_map) {
-        my ($image_file, $image_data);
+        $map_obj->bgcolor($bgcolor) if defined $bgcolor;
+        my $image_file = _clean_path( ( $line // $map ) . '.png' );
+        my $image_data = $map_obj->as_image($line);
 
-        if (defined $bgcolor) {
-            $map_obj->bgcolor($bgcolor);
-        }
-
-        if (defined $line) {
-            $image_file = sprintf(">%s.png", $line);
-            $image_data = $map_obj->as_image($line);
-        }
-        else {
-            $image_file = sprintf(">%s.png", $map);
-            $image_data = $map_obj->as_image;
-        }
-
-        open(my $IMAGE, $image_file);
+        open(my $IMAGE, '>', $image_file);
         binmode($IMAGE);
         print $IMAGE decode_base64($image_data);
         close($IMAGE);
@@ -556,6 +570,37 @@ sub _validate_param {
     }
 }
 
+sub _clean_path {
+    my ($tainted_path) = @_;
+
+    # Force string value (in case of malicious use of dualvars):
+    $tainted_path = "$tainted_path";
+
+    # Basic file name cleaning; printable characters only
+    $tainted_path =~ /^([[:print:]]+)$/
+        or croak "Non-printable characters detected in file name";
+    my $clean_path = $1;
+
+    # Exclude redirection characters ( < | > ) from path
+    $clean_path =~ s/[<>\|]//g;
+
+    # Reduce to basename (no paths allowed):
+    # This ensures the user cannot use "../../" to escape the current directory
+    $clean_path = path($clean_path)->basename;
+
+    # Confirm it's a regular file, if it already exists:
+    # We check here so the error message contains the simple name, not the absolute path.
+    if (-e $clean_path && !-f $clean_path) {
+        croak "File exists but is not a regular file: $clean_path";
+    }
+
+    # Canonicalize path (Now safe to make absolute for internal use):
+    $clean_path = path($clean_path)->realpath;
+
+    # Return cleaned path
+    return $clean_path;
+}
+
 sub _supported_maps {
 
     return {
@@ -565,7 +610,9 @@ sub _supported_maps {
         'BERLIN'          => 'Map::Tube::Berlin',
         'BIELEFELD'       => 'Map::Tube::Bielefeld',
         'BUCHAREST'       => 'Map::Tube::Bucharest',
+        'BRUSSELS'        => 'Map::Tube::Brussels',
         'BUDAPEST'        => 'Map::Tube::Budapest',
+        'CHICAGO'         => 'Map::Tube::Chicago',
         'COPENHAGEN'      => 'Map::Tube::Copenhagen',
         'DELHI'           => 'Map::Tube::Delhi',
         'DNIPROPETROVSK'  => 'Map::Tube::Dnipropetrovsk',
@@ -579,6 +626,7 @@ sub _supported_maps {
         'KOELNBONN'       => 'Map::Tube::KoelnBonn',
         'KOLKATTA'        => 'Map::Tube::Kolkatta',
         'KUALALUMPUR'     => 'Map::Tube::KualaLumpur',
+        'LEIPZIG'         => 'Map::Tube::Leipzig',
         'LONDON'          => 'Map::Tube::London',
         'LYON'            => 'Map::Tube::Lyon',
         'MADRID'          => 'Map::Tube::Madrid',
@@ -586,20 +634,26 @@ sub _supported_maps {
         'MILAN'           => 'Map::Tube::Milan',
         'MINSK'           => 'Map::Tube::Minsk',
         'MOSCOW'          => 'Map::Tube::Moscow',
+        'MUENCHEN'        => 'Map::Tube::Muenchen',
+        'NAPOLI'          => 'Map::Tube::Napoli',
         'NUREMBERG'       => 'Map::Tube::Nuremberg',
         'NYC'             => 'Map::Tube::NYC',
         'NANJING'         => 'Map::Tube::Nanjing',
         'NIZHNYNOVGOROD'  => 'Map::Tube::NizhnyNovgorod',
         'NOVOSIBIRSK'     => 'Map::Tube::Novosibirsk',
         'OSLO'            => 'Map::Tube::Oslo',
+        'PARIS'           => 'Map::Tube::Paris',
         'PRAGUE'          => 'Map::Tube::Prague',
         'RHEINRUHR'       => 'Map::Tube::RheinRuhr',
         'ROME'            => 'Map::Tube::Rome',
         'SAINTPETERSBURG' => 'Map::Tube::SaintPetersburg',
         'SAMARA'          => 'Map::Tube::Samara',
+        'SANFRANCISCO'    => 'Map::Tube::SanFrancisco',
         'SINGAPORE'       => 'Map::Tube::Singapore',
         'SOFIA'           => 'Map::Tube::Sofia',
         'STOCKHOLM'       => 'Map::Tube::Stockholm',
+        'STUTTGART'       => 'Map::Tube::Stuttgart',
+        'SYDNEY'          => 'Map::Tube::Sydney',
         'TBILISI'         => 'Map::Tube::Tbilisi',
         'TOKYO'           => 'Map::Tube::Tokyo',
         'TOULOUSE'        => 'Map::Tube::Toulouse',
@@ -649,7 +703,7 @@ L<http://metacpan.org/dist/Map-Tube-CLI/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2025 Mohammad Sajid Anwar.
+Copyright (C) 2015 - 2026 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

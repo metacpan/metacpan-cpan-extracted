@@ -15,11 +15,14 @@ my $plan = do { local $/; <$plan_fh> };
 close $plan_fh;
 like( $plan, qr/dzil build/, 'integration plan covers host dzil build' );
 like( $plan, qr/cpanm/, 'integration plan covers cpanm install' );
+unlike( $plan, qr/cpanm --notest/, 'integration plan no longer skips tarball install tests with cpanm --notest' );
 like( $plan, qr/dashboard serve/, 'integration plan covers installed web lifecycle' );
 like( $plan, qr/helper logout/i, 'integration plan covers helper logout cleanup' );
 like( $plan, qr/Chromium|browser/i, 'integration plan covers browser-backed verification' );
-like( $plan, qr/DEVELOPER_DASHBOARD_BOOKMARKS/, 'integration plan covers fake-project env overrides' );
+like( $plan, qr/\.developer-dashboard/, 'integration plan covers fake-project local runtime overrides' );
 like( $plan, qr/host-built tarball/i, 'integration plan requires host-built tarball flow' );
+like( $plan, qr/broken collector|broken Perl collector|healthy collector/i, 'integration plan covers collector failure isolation' );
+like( $plan, qr/Runtime::Result/, 'integration plan covers Runtime::Result-based hook verification' );
 like( $plan, qr/run-host-integration\.sh/, 'integration plan points to the host-side launcher' );
 
 open my $runner_fh, '<', 'integration/blank-env/run-integration.pl' or die $!;
@@ -28,10 +31,16 @@ close $runner_fh;
 like( $runner, qr/Developer-Dashboard\.tar\.gz/, 'integration runner consumes mounted tarball artifact' );
 like( $runner, qr/tar -xzf/, 'integration runner extracts the tarball inside the container' );
 like( $runner, qr/dashboard update/, 'integration runner exercises dashboard update' );
+like( $runner, qr/Runtime::Result/, 'integration runner exercises Runtime::Result-aware hook chaining' );
 like( $runner, qr/dashboard docker compose --project .* --dry-run config/, 'integration runner exercises docker compose dry-run' );
 like( $runner, qr/dashboard auth add-user helper_login helper-login-pass-123/, 'integration runner exercises helper login path' );
+unlike( $runner, qr/cpanm --notest/, 'integration runner installs the tarball without cpanm --notest' );
+like( $runner, qr/broken\.collector/, 'integration runner provisions a broken config collector regression case' );
+like( $runner, qr/healthy\.collector/, 'integration runner provisions a healthy config collector regression case' );
+like( $runner, qr/dashboard indicator list after restart/, 'integration runner checks indicator isolation after restart' );
 like( $runner, qr/chromium.*--headless/s, 'integration runner uses headless Chromium for browser checks' );
-like( $runner, qr/DEVELOPER_DASHBOARD_BOOKMARKS/, 'integration runner exports fake-project env overrides' );
+like( $runner, qr/\.developer-dashboard/, 'integration runner provisions a fake-project local runtime tree' );
+like( $runner, qr/cpanm install host-built tarball.*dashboard init.*api-dashboard/s, 'integration runner builds the fake-project local runtime only after the tarball install step' );
 like( $runner, qr/__END__/, 'integration runner carries POD trailer' );
 
 open my $docker_fh, '<', 'integration/blank-env/Dockerfile' or die $!;
@@ -61,6 +70,7 @@ if ( -f 'dist.ini' ) {
     close $dist_fh;
     like( $dist, qr/exclude_filename = Makefile\.PL/, 'dist.ini excludes checked-in Makefile.PL from dzil gather phase' );
     like( $dist, qr/\[AutoPrereqs\]/, 'dist.ini includes AutoPrereqs for built distribution dependencies' );
+    like( $dist, qr/^JSON::XS = 0$/m, 'dist.ini pins JSON::XS explicitly for built distribution runtime metadata' );
 }
 else {
     ok( !-f 'dist.ini', 'release tarball excludes dist.ini from shipped assets' );
@@ -69,6 +79,7 @@ else {
     close $meta_fh;
     ok( exists $meta->{prereqs}, 'META.json ships generated prerequisite metadata in the tarball' );
     ok( exists $meta->{prereqs}{runtime}, 'META.json keeps runtime prerequisite sections in the tarball' );
+    ok( exists $meta->{prereqs}{runtime}{requires}{'JSON::XS'}, 'META.json keeps JSON::XS in shipped runtime prerequisites' );
 }
 
 done_testing;

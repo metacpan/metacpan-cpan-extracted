@@ -3,13 +3,15 @@ package PAGI::Middleware::Session::Store::Cookie;
 use strict;
 use warnings;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 
 use parent 'PAGI::Middleware::Session::Store';
 use Future;
 use JSON::MaybeXS qw(encode_json decode_json);
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Digest::SHA qw(sha256);
+use Crypt::AuthEnc::GCM;
+use Crypt::PRNG qw(random_bytes);
 
 =head1 NAME
 
@@ -23,20 +25,22 @@ PAGI::Middleware::Session::Store::Cookie - Encrypted client-side session store
         secret => 'at-least-32-bytes-of-secret-key!',
     );
 
+    # All methods return Futures
+    my $blob = await $store->set('session_id', { user_id => 123 });
+    my $data = await $store->get($blob);
+    await $store->delete('session_id');
+
 =head1 DESCRIPTION
 
 Stores session data encrypted in the client cookie itself using AES-256-GCM
 (authenticated encryption). No server-side storage is needed.
 
-The C<set()> method returns the encrypted blob (not the session ID).
-The C<get()> method accepts the encrypted blob and returns the decoded
+The C<set> method returns the encrypted blob (not the session ID).
+The C<get> method accepts the encrypted blob and returns the decoded
 session data, or undef if decryption/verification fails.
 
 B<Limitations:> Cookie size is limited to ~4KB. Large sessions will fail.
 Session revocation requires server-side state (e.g., a blocklist).
-
-B<Note:> This module will be extracted to a separate CPAN distribution
-in a future release.
 
 =cut
 
@@ -65,7 +69,7 @@ and is used to derive the AES-256 encryption key via SHA-256.
 
 =head2 get
 
-    my $data = await $store->get($encrypted_blob);
+    my $future = $store->get($encrypted_blob);
 
 Decrypts and decodes the blob. Returns a Future resolving to the session
 hashref, or undef if the blob is invalid, tampered, or cannot be decoded.
@@ -83,10 +87,10 @@ sub get {
 
 =head2 set
 
-    my $transport_value = await $store->set($id, $data);
+    my $future = $store->set($id, $data);
 
 Encrypts the session data and returns a Future resolving to the encrypted
-blob. This blob is what gets passed to C<State::inject()> for storage
+blob. This blob is what gets passed to C<State::inject> for storage
 in the response cookie. Nothing is stored server-side.
 
 =cut
@@ -100,7 +104,7 @@ sub set {
 
 =head2 delete
 
-    await $store->delete($id);
+    my $future = $store->delete($id);
 
 No-op for cookie stores (client manages cookie lifetime).
 Returns a Future resolving to 1.
@@ -115,12 +119,10 @@ sub delete {
 sub _encrypt {
     my ($self, $data) = @_;
 
-    require Crypt::AuthEnc::GCM;
-
     my $json = encode_json($data);
 
     # Generate random 12-byte IV (standard for AES-GCM)
-    my $iv = _random_bytes(12);
+    my $iv = random_bytes(12);
 
     my $gcm = Crypt::AuthEnc::GCM->new('AES', $self->{_key}, $iv);
     my $ciphertext = $gcm->encrypt_add($json);
@@ -133,8 +135,6 @@ sub _encrypt {
 
 sub _decrypt {
     my ($self, $blob) = @_;
-
-    require Crypt::AuthEnc::GCM;
 
     my $packed = decode_base64($blob);
     return undef unless defined $packed && length($packed) > 28;
@@ -153,25 +153,6 @@ sub _decrypt {
     return decode_json($json);
 }
 
-sub _random_bytes {
-    my ($n) = @_;
-
-    # Use /dev/urandom for cryptographically secure random bytes.
-    # Falls back to Perl's rand() if /dev/urandom is unavailable
-    # (e.g., on some non-Unix systems). See SECURITY section for details.
-    if (open my $fh, '<:raw', '/dev/urandom') {
-        my $bytes;
-        read($fh, $bytes, $n) == $n or die "Short read from /dev/urandom";
-        close $fh;
-        return $bytes;
-    }
-
-    warn "PAGI::Middleware::Session::Store::Cookie: /dev/urandom not available, "
-       . "falling back to Perl's rand() for IV generation. "
-       . "Install Crypt::URandom for secure random bytes on this platform.\n";
-    return join('', map { chr(int(rand(256))) } 1 .. $n);
-}
-
 1;
 
 __END__
@@ -188,17 +169,9 @@ produces different ciphertext each time.
 
 =head2 IV Generation
 
-The encryption IV is generated from C</dev/urandom> when available
-(all modern Unix/Linux/macOS systems). On systems without
-C</dev/urandom>, the module falls back to Perl's C<rand()>, which is
-B<not cryptographically secure> -- a runtime warning is emitted in
-this case. If you are running on such a system, install
-L<Crypt::URandom> and the module will use it automatically.
-
-B<Note:> A predictable IV does not compromise the confidentiality or
-authenticity of AES-GCM (the key is still required), but it may allow
-an attacker to detect when the same session data is re-encrypted,
-which leaks information about session changes.
+The encryption initialization vector (IV) is generated from
+L<Crypt::PRNG>, which uses system sources of randomness such as
+F</dev/urandom> as a seed.
 
 =head2 Cookie Size
 

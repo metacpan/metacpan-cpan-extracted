@@ -1,5 +1,5 @@
 package Developer::Dashboard::Config;
-$Developer::Dashboard::Config::VERSION = '0.72';
+$Developer::Dashboard::Config::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -9,8 +9,8 @@ use Cwd qw(cwd);
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
 # new(%args)
-# Constructs a configuration loader bound to files, paths, and plugins.
-# Input: files and paths objects, plus optional plugins and repo_root.
+# Constructs a configuration loader bound to files and paths.
+# Input: files and paths objects, plus optional repo_root.
 # Output: Developer::Dashboard::Config object.
 sub new {
     my ( $class, %args ) = @_;
@@ -19,7 +19,6 @@ sub new {
     return bless {
         files => $files,
         paths => $paths,
-        plugins => $args{plugins},
         repo_root => $args{repo_root},
     }, $class;
 }
@@ -30,11 +29,14 @@ sub new {
 # Output: configuration hash reference.
 sub load_global {
     my ($self) = @_;
-    my $file = $self->{files}->global_config;
-    return {} if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    return json_decode(<$fh>);
+    my $merged = {};
+    for my $file ( reverse $self->_global_config_files ) {
+        next if !-f $file;
+        open my $fh, '<', $file or die "Unable to read $file: $!";
+        local $/;
+        $merged = $self->_merge_hashes( $merged, json_decode(<$fh>) );
+    }
+    return $merged;
 }
 
 # save_global($config)
@@ -43,7 +45,7 @@ sub load_global {
 # Output: written file path string.
 sub save_global {
     my ( $self, $config ) = @_;
-    my $file = $self->{files}->global_config;
+    my $file = $self->_global_config_file;
     open my $fh, '>', $file or die "Unable to write $file: $!";
     print {$fh} json_encode( $config || {} );
     close $fh;
@@ -99,7 +101,7 @@ sub _merge_hashes {
 }
 
 # collectors()
-# Returns all configured collectors after config/plugin/startup merging.
+# Returns all configured collectors from merged configuration.
 # Input: none.
 # Output: array reference of collector job hash references.
 sub collectors {
@@ -111,58 +113,10 @@ sub collectors {
         push @jobs, @{ $cfg->{collectors} };
     }
 
-    if ( $self->{plugins} ) {
-        push @jobs, @{ $self->{plugins}->collectors };
-    }
-
-    if ( ref( $cfg->{plugins} ) eq 'ARRAY' ) {
-        for my $plugin ( @{ $cfg->{plugins} } ) {
-            next if ref($plugin) ne 'HASH';
-            push @jobs, @{ $plugin->{collectors} || [] } if ref( $plugin->{collectors} ) eq 'ARRAY';
-        }
-    }
-
-    push @jobs, @{ $self->startup_collectors };
-
     if ( my $filter = $ENV{DEVELOPER_DASHBOARD_CHECKERS} ) {
         my %wanted = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, $filter;
         @jobs = grep { ref($_) eq 'HASH' && $wanted{ $_->{name} } } @jobs;
     }
-
-    return \@jobs;
-}
-
-# startup_collectors()
-# Loads collector definitions from the startup directory.
-# Input: none.
-# Output: array reference of collector job hash references.
-sub startup_collectors {
-    my ($self) = @_;
-    my $root = $self->{paths}->startup_root;
-    return [] if !-d $root;
-
-    opendir my $dh, $root or die "Unable to open startup root $root: $!";
-    my @jobs;
-
-    while ( my $entry = readdir $dh ) {
-        next if $entry eq '.' || $entry eq '..';
-        next if $entry !~ /\.json$/;
-
-        my $file = File::Spec->catfile( $root, $entry );
-        next if !-f $file;
-
-        open my $fh, '<', $file or die "Unable to read $file: $!";
-        local $/;
-        my $data = json_decode(<$fh>);
-
-        if ( ref($data) eq 'HASH' ) {
-            push @jobs, $data;
-        }
-        elsif ( ref($data) eq 'ARRAY' ) {
-            push @jobs, grep { ref($_) eq 'HASH' } @$data;
-        }
-    }
-    closedir $dh;
 
     return \@jobs;
 }
@@ -296,8 +250,25 @@ sub providers {
     my $cfg = $self->merged;
     my @providers = ();
     push @providers, @{ $cfg->{providers} } if ref( $cfg->{providers} ) eq 'ARRAY';
-    push @providers, @{ $self->{plugins}->providers } if $self->{plugins};
     return \@providers;
+}
+
+# _global_config_file()
+# Returns the writable global configuration file path for the effective runtime root.
+# Input: none.
+# Output: writable configuration file path string.
+sub _global_config_file {
+    my ($self) = @_;
+    return File::Spec->catfile( $self->{paths}->config_root, 'config.json' );
+}
+
+# _global_config_files()
+# Returns the global configuration file candidates in effective lookup order.
+# Input: none.
+# Output: ordered list of configuration file path strings.
+sub _global_config_files {
+    my ($self) = @_;
+    return map { File::Spec->catfile( $_, 'config.json' ) } $self->{paths}->config_roots;
 }
 
 1;
@@ -315,12 +286,12 @@ Developer::Dashboard::Config - merged configuration loader
 
 =head1 DESCRIPTION
 
-This module loads and merges global, repo-local, startup, and plugin-backed
-configuration for Developer Dashboard.
+This module loads and merges global and repo-local configuration for Developer
+Dashboard.
 
 =head1 METHODS
 
-=head2 new, load_global, save_global, load_repo, merged, collectors, startup_collectors, path_aliases, global_path_aliases, save_global_path_alias, remove_global_path_alias, docker_config, providers
+=head2 new, load_global, save_global, load_repo, merged, collectors, path_aliases, global_path_aliases, save_global_path_alias, remove_global_path_alias, docker_config, providers
 
 Load and expose configuration domains used by the runtime.
 

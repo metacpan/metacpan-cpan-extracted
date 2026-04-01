@@ -9,7 +9,7 @@ use File::Share ':all';
 use XML::LibXML;
 use XML::LibXSLT;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub new {
 	my ($class, @params) = @_;
@@ -105,7 +105,9 @@ Constructor.
 
 Transformation version.
 
-Default value is '2.6.0'.
+Default value is '3.0.0'.
+
+Possible values are: '2.6.0', '2.7.0', '2.8.0', '2.8.1', '2.9.0', '2.10.0' and '3.0.0'.
 
 Default value is undef.
 
@@ -113,7 +115,7 @@ Default value is undef.
 
 XSLT transformation file.
 
-Default value is XSLT transformation file for '2.6.0' version.
+Default value is XSLT transformation file for '3.0.0' version.
 
 =back
 
@@ -163,7 +165,7 @@ Returns MARC XML string.
  print $version."\n";
 
  # Output:
- # 2.6.0
+ # 3.0.0
 
 =head1 DEPENDENCIES
 
@@ -220,6 +222,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -15,4 +15,4 @@ my $version = $obj->version;
 print $version."\n";
 
 # Output:
-# 2.6.0
+# 3.0.0

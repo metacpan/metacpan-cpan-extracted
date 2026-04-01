@@ -49,7 +49,6 @@ sub handler : method
         return( Apache2::Const::DECLINED );
     }
     $r->err_headers_out->set( 'Test-No' => $path );
-    $self->message( "Calling method \"$path\"." );
     my $rc = $code->( $self );
     $r->log_error( "$class: Returning http code '$rc' for method '$path'" );
     if( $rc == Apache2::Const::HTTP_OK )
@@ -110,7 +109,6 @@ sub ok
 {
     my $self = shift( @_ );
     my $cond = shift( @_ );
-    $self->message( "Is ok? ", $cond ? 'yes' : 'no' );
     return( $cond ? $self->success : $self->failure );
 }
 
@@ -140,18 +138,14 @@ sub test01
     my $c = $jar->make( name => 'session_token' => value => $token, path => '/', expires => "Monday, 01-Nov-2021 17:12:40 GMT" ) ||
     do
     {
-        $self->message( "Unable to create cookie session_token: ", $jar->error );
         return( $self->ok(0) );
     };
     
     defined( $rv = $jar->set( $c ) ) || do
     {
-        $self->message( "setting cookie header for cookie 'session_token' returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     my @set_values = $r->err_headers_out->get( 'Set-Cookie' );
-    # $self->message( "Set-Cookie headers set are: ", sub{ join( "\n", @set_values ) } );
-    $self->message( "test01 is ok? ", "@set_values" =~ /(^|\b)session_token=$token/ ? 'yes' : 'no' );
     # Need to set the call context for the regexp to scalar (boolean) so that the 'ok' method received the right value
     # Otherwise, the regexp would return nothing in list context and would render the test false even if it were true.
     return( $self->ok( "@set_values" =~ /(^|\b)session_token=$token/ ? 1 : 0 ) );
@@ -168,13 +162,11 @@ sub test02
     my $csrf = q{9849724969dbcffd48c074b894c8fbda14610dc0ae62fac0f78b2aa091216e0b.1635825594};
     my $c = $jar->make( name => 'csrf_token', value => $csrf, path => '/' ) || do
     {
-        $self->message( "Unable to create csrf cookie: ", $jar->error );
         return( $self->ok(0) );
     };
     # $resp->header( 'Set-Cookie' => qq{csrf_token=${csrf}; path=/} );
     defined( $rv = $jar->set( $c ) ) || do
     {
-        $self->message( "set cookie headr for cookie 'csrf_token' returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     my @set_values = $r->err_headers_out->get( 'Set-Cookie' );
@@ -196,12 +188,10 @@ sub test04
     my $r = $self->request;
     my $c = $jar->make( name => 'site_prefs', value => "lang=en-GB", path => '/account' ) || do
     {
-        $self->message( "Unable to create cookie site_prefs: ", $jar->error );
         return( $self->ok(0) );
     };
     defined( $rv = $jar->set( $c ) ) || do
     {
-        $self->message( "set cookie header for cookie 'site_prefs' returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     my @set_values = $r->err_headers_out->get( 'Set-Cookie' );
@@ -224,7 +214,6 @@ sub test06
     my $jar = $self->jar;
     my $csrf = $jar->get( 'csrf_token' ) || do
     {
-        $self->message( "Could not find the csrf_token cookie from what the http client sent me." );
         return( $self->ok(0) );
     };
     # To properly elapse the cookie, it needs to have the same property values
@@ -232,7 +221,6 @@ sub test06
     $csrf->path( '/' );
     defined( $rv = $jar->set( $csrf ) ) || do
     {
-        $self->message( "add_response_header returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     return( $self->ok( $jar->exists( 'site_prefs' ) ) );
@@ -261,13 +249,11 @@ sub test07
     );
     defined( $c ) || do
     {
-        $self->message( "make returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     
     defined( $rv = $jar->set( $c ) ) || do
     {
-        $self->message( "set returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     # return( $self->ok( $jar->exists( 'secret_cookie' ) ) );
@@ -281,19 +267,16 @@ sub test08
     my $jar  = $self->jar;
     my $c = $jar->get( 'secret_cookie' ) || do
     {
-        $self->message( "Could not find the secret_cookie cookie from what the http client sent me." );
         return( $self->ok(0) );
     };
     my $val = $c->value;
     if( !$val->length )
     {
-        $self->message( "Cookie secret_cookie value is empty." );
         return( $self->ok(0) );
     }
     my $rv = $c->decrypt( key => $CRYPT_KEY, iv => $CRYPT_IV, algo => 'AES' );
     if( !defined( $rv ) )
     {
-        $self->message( "Failed to decrypt the secret_cookie cookie value '$val': ", $c->error );
         return( $self->ok(0) );
     }
     return( $self->ok(1) );
@@ -307,19 +290,16 @@ sub test09
     my $jar  = $self->jar;
     my $c = $jar->get( 'secret_cookie' ) || do
     {
-        $self->message( "Could not find the cookie secret_cookie from what the http client sent me." );
         return( $self->ok(0) );
     };
     my $val = $c->value;
     if( !$val->length )
     {
-        $self->message( "Cookie secret_cookie value is empty." );
         return( $self->ok(0) );
     }
     my $rv = $c->decrypt( key => $CRYPT_KEY, iv => $CRYPT_IV, algo => 'AES' );
     if( !$rv )
     {
-        $self->message( "Ok, the decryption failed as it was supposed to for cookie secret_cookie for value '$val'." );
         return( $self->ok(1) );
     }
     return( $self->ok(0) );
@@ -347,12 +327,10 @@ sub test10
     );
     defined( $c ) || do
     {
-        $self->message( "make returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     defined( $rv = $jar->set( $c ) ) || do
     {
-        $self->message( "set returned an error: ", $jar->error );
         return( $self->ok(0) );
     };
     my @set_values = $r->err_headers_out->get( 'Set-Cookie' );
@@ -365,18 +343,15 @@ sub test11
     my $jar  = $self->jar;
     my $c = $jar->get( 'signed_cookie' ) || do
     {
-        $self->message( "Could not find the signed_cookie cookie from what the http client sent me." );
         return( $self->ok(0) );
     };
     my $val = $c->value;
     if( !$val->length )
     {
-        $self->message( "Cookie signed_cookie value is empty." );
         return( $self->ok(0) );
     }
     if( !$c->is_valid( key => $CRYPT_KEY ) )
     {
-        $self->message( "Failed to validate the signed_cookie cookie value '$val'." );
         return( $self->ok(0) );
     }
     return( $self->ok(1) );
@@ -388,18 +363,15 @@ sub test12
     my $jar  = $self->jar;
     my $c = $jar->get( 'signed_cookie' ) || do
     {
-        $self->message( "Could not find the signed_cookie cookie from what the http client sent me." );
         return( $self->ok(0) );
     };
     my $val = $c->value;
     if( !$val->length )
     {
-        $self->message( "Cookie signed_cookie value is empty." );
         return( $self->ok(0) );
     }
     if( !$c->is_valid( key => $CRYPT_KEY ) )
     {
-        $self->message( "Ok, the validation failed as it was supposed to for cookie signed_cookie for value '$val'." );
         return( $self->ok(1) );
     }
     return( $self->ok(0) );

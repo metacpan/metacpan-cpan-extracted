@@ -1,5 +1,5 @@
 package Folder;
-$Folder::VERSION = '0.72';
+$Folder::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -8,8 +8,11 @@ use File::Basename qw(dirname);
 use File::Find ();
 use File::Path qw(make_path);
 use File::Spec;
+use Scalar::Util qw(blessed);
 
-our $PATHS = {};
+use Developer::Dashboard::PathRegistry ();
+
+our $PATHS;
 our %ALIASES;
 our $AUTOLOAD;
 
@@ -45,7 +48,8 @@ sub tmp {
 # Input: none.
 # Output: directory path string.
 sub dd {
-    return $PATHS && $PATHS->can('runtime_root') ? $PATHS->runtime_root : '';
+    my $paths = _paths_obj();
+    return $paths && $paths->can('runtime_root') ? $paths->runtime_root : '';
 }
 
 # bookmarks()
@@ -53,7 +57,8 @@ sub dd {
 # Input: none.
 # Output: directory path string.
 sub bookmarks {
-    return $PATHS && $PATHS->can('dashboards_root') ? $PATHS->dashboards_root : '';
+    my $paths = _paths_obj();
+    return $paths && $paths->can('dashboards_root') ? $paths->dashboards_root : '';
 }
 
 # configs()
@@ -61,7 +66,8 @@ sub bookmarks {
 # Input: none.
 # Output: directory path string.
 sub configs {
-    return $PATHS && $PATHS->can('config_root') ? $PATHS->config_root : '';
+    my $paths = _paths_obj();
+    return $paths && $paths->can('config_root') ? $paths->config_root : '';
 }
 
 # postman()
@@ -74,12 +80,20 @@ sub postman {
     return $dir;
 }
 
-# startup()
-# Returns the dashboard startup directory.
+# _paths_obj()
+# Returns the configured paths object or lazily builds a default runtime path registry.
 # Input: none.
-# Output: directory path string.
-sub startup {
-    return $PATHS && $PATHS->can('startup_root') ? $PATHS->startup_root : '';
+# Output: blessed paths object or undef when no home directory is available.
+sub _paths_obj {
+    return $PATHS if blessed($PATHS);
+    my $home = $ENV{HOME} || '';
+    return if $home eq '';
+    $PATHS = Developer::Dashboard::PathRegistry->new(
+        home            => $home,
+        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+    );
+    return $PATHS;
 }
 
 # cd($where, $code)
@@ -137,9 +151,10 @@ sub ls {
 sub locate {
     my ( $class, @parts ) = @_;
     @parts = grep { defined && $_ ne '' } @parts;
-    return () if !@parts || !$PATHS || !$PATHS->can('workspace_roots');
+    my $paths = _paths_obj();
+    return () if !@parts || !$paths || !$paths->can('workspace_roots');
     my @found;
-    for my $root ( $PATHS->workspace_roots ) {
+    for my $root ( $paths->workspace_roots ) {
         next if !-d $root;
         File::Find::find(
             {
@@ -169,6 +184,14 @@ sub _resolve_path {
     my ( $class, $where ) = @_;
     return if !defined $where || $where eq '';
     return $where if File::Spec->file_name_is_absolute($where) || -d $where;
+    my %legacy_aliases = (
+        runtime_root   => 'dd',
+        bookmarks_root => 'bookmarks',
+        config_root    => 'configs',
+    );
+    if ( my $legacy = $legacy_aliases{$where} ) {
+        return $class->$legacy() if $class->can($legacy);
+    }
     return $class->$where() if $class->can($where);
     return $ALIASES{$where} if defined $ALIASES{$where};
     my $env = 'DEVELOPER_DASHBOARD_PATH_' . uc($where);
@@ -185,8 +208,8 @@ sub AUTOLOAD {
     my ($name) = $AUTOLOAD =~ /::([^:]+)$/;
     return if $name eq 'DESTROY';
     my $path = $class->_resolve_path($name);
-    die "Unknown folder '$name'" if !defined $path || $path eq '';
-    make_path($path) if $path =~ m{^/} && !-e $path;
+    die "Unknown folder '$name'" if !defined $path;
+    make_path($path) if $path ne '' && $path =~ m{^/} && !-e $path;
     return $path;
 }
 
@@ -210,7 +233,7 @@ code that expects a C<Folder> package.
 
 =head1 METHODS
 
-=head2 configure, home, tmp, dd, bookmarks, configs, startup, cd, ls, locate
+=head2 configure, home, tmp, dd, bookmarks, configs, cd, ls, locate
 
 Configure and resolve compatibility folders.
 

@@ -1,3 +1,7 @@
+0.023     2026-03-31 18:57:05-07:00 America/Los_Angeles
+
+    - Fix test lockup on omnios and other 16k pipe buffer systems
+
 0.022     2024-04-10 13:24:30-07:00 America/Los_Angeles
 
     - Fix rarely seen EOF race condition in mixed data mode

@@ -3,74 +3,11 @@ package Chandra::Dialog;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-# Dialog type constants (match webview.h enums)
-use constant {
-	TYPE_OPEN  => 0,
-	TYPE_SAVE  => 1,
-	TYPE_ALERT => 2,
-};
-
-# Dialog flag constants
-use constant {
-	FLAG_FILE      => 0,
-	FLAG_DIRECTORY => 1,
-	FLAG_INFO      => (1 << 1),
-	FLAG_WARNING   => (2 << 1),
-	FLAG_ERROR     => (3 << 1),
-};
-
-sub new {
-	my ($class, %args) = @_;
-	return bless {
-		app => $args{app},
-	}, $class;
-}
-
-sub open_file {
-	my ($self, %opts) = @_;
-	my $title = $opts{title} // 'Open File';
-	my $filter = $opts{filter} // '';
-	return $self->{app}->webview->dialog(TYPE_OPEN, FLAG_FILE, $title, $filter);
-}
-
-sub open_directory {
-	my ($self, %opts) = @_;
-	my $title = $opts{title} // 'Open Directory';
-	return $self->{app}->webview->dialog(TYPE_OPEN, FLAG_DIRECTORY, $title, '');
-}
-
-sub save_file {
-	my ($self, %opts) = @_;
-	my $title = $opts{title} // 'Save File';
-	my $default = $opts{default} // '';
-	return $self->{app}->webview->dialog(TYPE_SAVE, FLAG_FILE, $title, $default);
-}
-
-sub info {
-	my ($self, %opts) = @_;
-	my $title = $opts{title} // 'Information';
-	my $message = $opts{message} // '';
-	$self->{app}->webview->dialog(TYPE_ALERT, FLAG_INFO, $title, $message);
-	return $self;
-}
-
-sub warning {
-	my ($self, %opts) = @_;
-	my $title = $opts{title} // 'Warning';
-	my $message = $opts{message} // '';
-	$self->{app}->webview->dialog(TYPE_ALERT, FLAG_WARNING, $title, $message);
-	return $self;
-}
-
-sub error {
-	my ($self, %opts) = @_;
-	my $title = $opts{title} // 'Error';
-	my $message = $opts{message} // '';
-	$self->{app}->webview->dialog(TYPE_ALERT, FLAG_ERROR, $title, $message);
-	return $self;
-}
+# XS methods are registered under the Chandra bootstrap.
+# Ensure the shared object is loaded.
+require Chandra;
 
 1;
 

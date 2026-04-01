@@ -1,3 +1,8 @@
+0.005   2026-01-28  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Bug regex to check base 32 digits.
+
+
 0.004   2026-01-20  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

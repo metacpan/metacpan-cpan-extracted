@@ -1,5 +1,5 @@
 package Zipper;
-$Zipper::VERSION = '0.72';
+$Zipper::VERSION = '0.94';
 use strict;
 use warnings;
 

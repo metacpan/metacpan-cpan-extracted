@@ -9,9 +9,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-01-20'; # DATE
+our $DATE = '2026-01-28'; # DATE
 our $DIST = 'App-CrockfordBase32Utils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(
                        num_to_cfbase32
@@ -115,8 +115,8 @@ sub cfbase32_decode {
     [200, "OK", Convert::Base32::Crockford::decode_base32($str)];
 }
 
-my $cfbase32_digit_re    = qr/[0-9A-HJ-NP-TV-Z]/;
-my $cfbase32_nondigit_re = qr/[^0-9A-HJ-NP-TV-Z]/;
+my $cfbase32_digit_re    = qr/[0-9A-HJKMNP-TV-Z]/;
+my $cfbase32_nondigit_re = qr/[^0-9A-HJKMNP-TV-Z]/;
 
 my @cfbase32_digits = qw(0 1 2 3 4 5 6 7 8 9
                          A B C D E F G H J K
@@ -358,7 +358,7 @@ App::CrockfordBase32Utils - Utilities related to Crockford's Base 32 encoding
 
 =head1 VERSION
 
-This document describes version 0.004 of App::CrockfordBase32Utils (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
+This document describes version 0.005 of App::CrockfordBase32Utils (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-28.
 
 =head1 DESCRIPTION
 
@@ -473,41 +473,41 @@ Result:
    200,
    "OK",
    [
-     "N3JMT6M2B0YG",
-     "DBWTMFBKN9FE",
-     "ECXZ0V5NM50M",
-     "A6Y4C9SVQ6MX",
-     "04K9ESNZX5AS",
-     "WDWJEAZMEP90",
-     "VNWTY2GFMWZR",
-     "YEPGJ07130R2",
-     "8CWMYHH1CSHS",
-     "HV28X0F3H0N4",
-     "B34989JWPSF0",
-     "918Y3WJPMJMS",
-     "90S75ZA6MJ06",
-     "GBFJST7DRE0H",
-     "7ANA09TSMED6",
-     "KGJYYKYVPCCY",
-     "AT483B8M52KN",
-     "XCZ307G6DP6E",
-     "NVRMYT9CZB56",
-     "FHT5Q5343NK3",
-     "JDNGZ9XSJB84",
-     "58QW86W68A1M",
-     "QKTEQVF1HZW6",
-     "SMA4MWZ6ZQBG",
-     "35HZ7H7Q8AG8",
-     "5D9ESKZRCNWY",
-     "1KVJR6TP51TV",
-     "E5ZH7XFZ1WSR",
-     "40CR2BFKSVWG",
-     "EB9SCPETF17N",
-     "P7YD2HJ0FWD6",
-     "948KKKFYF48S",
-     "FKZ7Y78YRJ38",
-     "DVRJVT0BV18J",
-     "4ENMAQ4S7YGB",
+     "6GWZVR17YXFP",
+     "66GQZ1V967SP",
+     "6BXPTRCWGD26",
+     "CX57PE12V0C5",
+     "37XKPHFWMX76",
+     "N0076837F05J",
+     "X801Y0PDYF7V",
+     "32GA91BMG1KW",
+     "S3F6NYS18HV7",
+     "QJCG3SZME1A1",
+     "HYF6HRE575QA",
+     "KQ2QGJG8ZVV5",
+     "49RGFFXA2247",
+     "AS1A9QFK0GPR",
+     "G6D2W6KPZPV3",
+     "5A40WK7FTRS5",
+     "V4XFWZ3QYHRN",
+     "VSSKKHQ1VMGH",
+     "DNBQV8A0PHYE",
+     "CDDYH2XNC6ZZ",
+     "52J63APZAVBP",
+     "Y4MHANNGR3NX",
+     "3TGYBFXMS7KD",
+     "15AHNMMFVXZE",
+     "AESWWKCF17J7",
+     "PXEZZ3ZKTP60",
+     "AH169RGQMTQW",
+     "AMXWX8DPEPKD",
+     "JSCVNX5QF6AH",
+     "PQ6E6CNFRYAE",
+     "9K9FSXQZTD3D",
+     "51EDE2QMHCB3",
+     "VK1YMTQSV788",
+     "2WVZYW59XGZT",
+     "N7VYPRF54F72",
    ],
    {},
  ]
@@ -522,48 +522,48 @@ Result:
    200,
    "OK",
    [
-     "PGDH9MK94177",
-     "GVR2DNYFRRK2",
-     "DB0V0N779QTJ",
-     "AYNKPKJ4ZF09",
-     "XFTYF1MR0T68",
-     "AJ0FE5E7MTVA",
-     "TW424P6DG0FJ",
-     "ZTDCSQFHFPHQ",
-     "SN4HHMADK3XH",
-     "CB3GSGDRTM8T",
-     "BNCGYF8SDZ3V",
-     "HQYEPQFZGVM0",
-     "EN4FXQK16TB4",
-     "G36JTTAV66N7",
-     "METRYBJKW96H",
-     "H9F232BEB7EN",
-     "TZ0DSD7ZWSY3",
-     "D6FDSDKPBAM9",
-     "16CCRSW9SAPA",
-     "NW6S9RPF6TBK",
-     "7WT638GKRZGS",
-     "C9ZT146KW0S4",
-     "YMBY6B8SDMEE",
-     "VZFFAACX60ZV",
-     "PHV5Q2JXSNS0",
-     "RSF4X7Z9R05Y",
-     "ZJ4DCZ02T5PN",
-     "YAN01K86KMQ5",
-     "AACED7N0Y99E",
-     "ZHZ0JF7ZXNJR",
-     "D9R0A5S7ET68",
-     "3BTRMB7B1SP1",
-     "T9WTQ4VCM95P",
-     "DD6BCWBYZB3J",
-     "S5HEQ0AAWMFR",
+     "4KMM7Y637F7R",
+     "TDPQ4JA8FE23",
+     "414K4NTED8G8",
+     "838SDSPRRPNG",
+     "ZPHFSRTV2PPG",
+     "6NP6B4NNAJ12",
+     "HKYFWJZS6HSC",
+     "SEZAMQC370GD",
+     "91SXVD7KWXTG",
+     "194ZWXXRR3HV",
+     "JV0N4X19MWCD",
+     "AEJVWBG8KH8A",
+     "PS79YVY3NNN9",
+     "HRQXJ97N0MHR",
+     "8BCRDBB4S5F6",
+     "K685WE8SYAM8",
+     "6G9ERYHC96VZ",
+     "N1VE9S94BQ1V",
+     "W8FNSSB187YZ",
+     "RAKH5XGJMF5C",
+     "R2MJKNBNZ8Y0",
+     "TD6TZB4PKNJH",
+     "14M3YZFS2JSA",
+     "HXBK114F4C9D",
+     "R8J0F737PK04",
+     "TENQJ5F4A0Y8",
+     "P0N96Q52KZ3B",
+     "MJFCHDV6EM9P",
+     "HW8RPT5DJ0A7",
+     "MYSVA2QPJ9XA",
+     "2GA5WXEK0MMK",
+     "AW9F4DSTCHYF",
+     "GFPX8S18AGA0",
+     "P0TGFATCRV37",
+     "1G1W3J3P9B38",
    ],
    {},
  ]
 
 =item * Generate a formatted random code:
 
- cfbase32_rand(fill_char_template => "###-###-###", len => 9); # -> [200, "OK", ["1A8-ZR5-PCY"], {}]
+ cfbase32_rand(fill_char_template => "###-###-###", len => 9); # -> [200, "OK", ["3SQ-6SA-2Y6"], {}]
 
 =back
 

@@ -1,7 +1,43 @@
 # Fixed Bugs
 
+## 2026-04-01
+
+- Fixed `Folder->dd` and `Folder->runtime_root` returning a doubled `~/.developer-dashboard/.developer-dashboard` path when the current working directory was already inside the home runtime repository.
+- Fixed runtime-root precedence drift by making a project-local `./.developer-dashboard` tree the first lookup root for bookmarks, config, CLI commands and hooks, auth users, sessions, and isolated docker service folders, while still falling back to `~/.developer-dashboard` when the local item is absent.
+- Fixed local bookmark seeding gaps by adding sanitized `api-dashboard` and `db-dashboard` starter pages to `dashboard init`, so the runtime ships editable built-in request and SQL workspaces without carrying forward company-specific or credential-bearing legacy bookmark content.
+- Fixed blank-environment parity drift by moving the integration harness onto a real fake-project `./.developer-dashboard` tree instead of env-var bookmark/config overrides, so the tarball install exercises the same local-over-home runtime precedence as the shipped code.
+
 ## 2026-03-31
 
+- Fixed blank-environment install stalls by exporting `PERL_CANARY_STABILITY_NOPROMPT` alongside the other noninteractive installer variables, so clean-container `cpanm` runs do not hang on dependency prompts from the `JSON::XS` toolchain.
+- Fixed CLI hook state visibility by rewriting `RESULT` after each executable hook finishes, so the next sorted hook can react to the accumulated JSON from earlier hook runs instead of only the final command seeing it.
+- Fixed Perl hook ergonomics by adding `Runtime::Result`, so hook scripts can read prior hook stdout, stderr, exit codes, and the last hook entry without hand-decoding the raw `RESULT` JSON string.
+- Fixed configuration drift by removing separate startup and plugin extension roots, so collectors, providers, path aliases, and docker overlays now come from dashboard config JSON as the single source of truth.
+- Fixed blank-environment override drift by moving the fake-project collector regression setup into config JSON instead of a separate startup directory, so the installed runtime exercises the same configured collector path used in normal operation.
+- Fixed CLI hook directory naming drift by accepting both `~/.developer-dashboard/cli/<command>/` and `~/.developer-dashboard/cli/<command>.d/` as equivalent hook folders, so either naming style runs the same executable files before the main command.
+- Fixed CLI hook progress visibility by replacing the buffered command-hook capture path with a streaming runner, so users can see hook stdout and stderr as each executable file runs instead of staring at a blank terminal until the command finishes.
+- Fixed CLI hook RESULT propagation by keeping the streamed stdout and stderr accumulated into the final per-hook JSON blob, so later hooks and the real command still receive structured `RESULT` data after visible progress output.
+- Fixed bookmark Template Toolkit context for saved pages and shared nav fragments by setting `env.current_page` to the active request path, so TT conditionals no longer see only the raw process environment and can branch on routes such as `/app/index`.
+- Fixed bookmark runtime-context exposure by adding `env.runtime_context.current_page`, so nav fragments and bookmark pages can read the current route from the same runtime-context hash used during rendering.
+- Fixed CPAN metadata gaps by adding explicit Dist::Zilla `provides` and repository resources, so generated META files declare shipped modules and the source repository instead of leaving Kwalitee warnings for missing metadata.
+- Fixed policy-document gaps by adding root `SECURITY.md` and `CONTRIBUTING.md` files, with a vulnerability-reporting contact and contributor workflow guidance for the published distribution.
+- Fixed nested bookmark route drift by letting saved page routes accept ids such as `nav/foo.tt`, so bookmark-editor pages and source routes work for subdirectory-backed saved bookmarks instead of only one path segment.
+- Fixed nested bookmark save failures by creating parent directories automatically for saved ids such as `nav/foo.tt`, so bookmark-editor saves can write shared nav pages without manual directory setup.
+- Fixed shared page-nav composition by rendering direct `nav/*.tt` bookmark files in sorted filename order between the top chrome and the main page body on other saved pages, while still keeping `/app/nav/foo.tt` itself as a normal editable bookmark page.
+- Fixed unconfigured `Folder` runtime drift by making `Folder->dd` and AUTOLOAD-backed root aliases such as `Folder->runtime_root` lazily bootstrap the default dashboard path registry from `HOME`, so compatibility code sees the same runtime root as `dashboard paths` before explicit `configure()`.
+- Fixed `Folder` naming drift by teaching `AUTOLOAD` to resolve `runtime_root`, `bookmarks_root`, `config_root`, and `startup_root` through the existing legacy aliases, so compatibility code can use the same root-style names shown by `dashboard paths`.
+- Fixed blank-container integration contamination by delaying `DEVELOPER_DASHBOARD_BOOKMARKS`, `DEVELOPER_DASHBOARD_CONFIGS`, and `DEVELOPER_DASHBOARD_STARTUP` until after `cpanm` finishes installing the tarball, so the shipped test suite still runs against a clean runtime.
+- Fixed installed-version visibility by adding `dashboard version`, so an installed runtime can report its shipped Developer Dashboard version without inspecting module files.
+- Fixed update-output ambiguity by documenting and testing that `dashboard update` prints the common RESULT JSON map directly.
+- Fixed runtime update architecture drift by making `dashboard update` use the same top-level command hook path as every other `dashboard <command>` instead of delegating command-folder execution to `UpdateManager`.
+- Fixed runtime update execution drift by making `dashboard update` run any executable regular file in `~/.developer-dashboard/cli/update` while still skipping non-executable files.
+- Fixed update-path drift by moving `dashboard update` to `~/.developer-dashboard/cli/update`, so runtime-managed update scripts no longer depend on the current working directory or the repo-local `./updates` folder.
+- Fixed missing-update-dir failures by making `dashboard update` return `{}` when `~/.developer-dashboard/cli/update` does not exist yet.
+- Fixed CLI hook extensibility by letting every `dashboard <command>` use an optional `~/.developer-dashboard/cli/<command>` hook directory where executable files run in sorted filename order, non-executable files are skipped, and captured `stdout`/`stderr` are exposed to later hooks and the final command through `RESULT` JSON.
+- Fixed custom CLI directory support by allowing `~/.developer-dashboard/cli/<command>/run` to serve as the real executable for directory-backed custom commands after the hook files finish.
+- Fixed collector state recovery so a malformed persisted `status.json` for a collector such as `vpn` is treated as missing state and is overwritten on the next write instead of crashing collector startup during `dashboard restart`.
+- Fixed collector-failure regression coverage by adding a blank-environment and unit test scenario where one broken Perl startup collector stays red without stopping a second healthy collector or its green indicator state.
+- Fixed tarball-install validation drift by removing `cpanm --notest` from the blank-environment integration flow, so the shipped artifact is exercised with install-time tests enabled.
 - Fixed legacy bookmark runtime output so `CODE1: { a => 1 }` now both merges `{ a => 1 }` into stash for Template Toolkit rendering and dumps the returned structure into the visible runtime output area.
 - Fixed legacy bookmark runtime order so `CODE*` blocks execute before Template Toolkit rendering, allowing returned hashes such as `{ a => 1 }` to feed `[% stash.a %]` in page HTML.
 - Fixed the `hide` helper so `hide print $a` keeps the printed stdout while suppressing the Perl return value instead of dropping the whole block output.
@@ -113,7 +149,7 @@
 - Fixed session hardening gaps by expiring helper sessions automatically, binding them to the originating remote address, and storing them with `0600` permissions.
 - Fixed web-response hardening gaps by adding CSP, no-store, frame-deny, nosniff, no-referrer, and no-store headers to the local HTTP server.
 - Fixed documentation hygiene by removing literal password examples and replacing them with placeholders.
-- Fixed repository hygiene outside `OLD_CODE` by confirming the active tree is clear of the banned company-specific references.
+- Fixed repository hygiene outside the read-only legacy reference tree by confirming the active tree is clear of the banned company-specific references.
 
 - Fixed old bookmark route drift by adding generic `/app/<name>` forwarding for saved bookmark files and saved URL bookmark entries.
 - Fixed old ajax compatibility drift by adding a generic `/ajax` token execution path in the new dashboard runtime.
@@ -161,3 +197,5 @@
 - Fixed false web-process deduplication so `dashboard serve` no longer treats the invoking shell command, tracing wrappers, or its own current process as an already running web service.
 - Fixed plugin discovery by correcting the duplicate-file guard so first-seen plugin JSON files are actually loaded.
 - Fixed Docker Compose resolution by correcting the duplicate-file guard so discovered compose files and overlays survive into the final stack.
+- Fixed command-routing drift by removing the special built-in `dashboard update` branch, so `update` now behaves like any other user-provided top-level command while still receiving `RESULT` from its ordered hook files.
+- Fixed missing PAUSE test dependency metadata by pinning `JSON::XS` explicitly in the Dist::Zilla runtime prerequisites, so clean tarball installs always declare the JSON backend module.

@@ -3,7 +3,7 @@ package Chandra;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Chandra', $VERSION);
@@ -11,69 +11,7 @@ XSLoader::load('Chandra', $VERSION);
 use Chandra::Bind;
 use Chandra::Bridge;
 
-# Global bind registry (matches XS global callback limitation)
-my $_bind;
-
-# Bind a Perl sub to be callable from JavaScript
-sub bind {
-	my ($self, $name, $sub) = @_;
-	$_bind //= Chandra::Bind->new(app => $self);
-	$_bind->bind($name, $sub);
-	return $self;
-}
-
-# Internal dispatch callback - handles JSON from JS
-sub _dispatch {
-	my ($json_str) = @_;
-
-	return unless $_bind;
-
-	my $result = $_bind->dispatch($json_str);
-
-	# If this was a 'call' type with an id, send the result back
-	# Use dispatch_eval_js to defer the eval to the next run loop iteration
-	# (calling eval_js directly from within the callback causes WebKit crashes)
-	if ($result && defined $result->{id}) {
-		my $app = $_bind->{app};
-		if ($app && $app->can('dispatch_eval_js')) {
-			my $js = $_bind->js_resolve(
-				$result->{id},
-				$result->{result},
-				$result->{error}
-			);
-			$app->dispatch_eval_js($js);
-		}
-	}
-}
-
-# TODO: fix this hack once I port the rest into XS/C.
-# Override init to inject bridge and set up dispatch callback
-{
-	no warnings 'redefine';
-	my $orig_init = \&init;
-
-	*init = sub {
-		my ($self) = @_;
-
-		# Initialize bind registry for this app (preserve existing bindings)
-		if (!$_bind || !$_bind->{app} || $_bind->{app} != $self) {
-			$_bind = Chandra::Bind->new(app => $self);
-		} else {
-			$_bind->{app} = $self;
-		}
-
-		# Set the dispatch callback
-		$self->_set_callback(\&_dispatch);
-
-		# Call original init
-		$orig_init->($self);
-
-		# Inject the JS bridge
-		$self->eval_js(Chandra::Bridge->js_code);
-
-		return $self;
-	};
-}
+# _xs_dispatch, _xs_init_bind, _xs_bind_method are now XSUBs in core.xs
 
 1;
 

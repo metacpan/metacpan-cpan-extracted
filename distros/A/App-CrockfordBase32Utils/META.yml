@@ -19,7 +19,7 @@ name: App-CrockfordBase32Utils
 provides:
   App::CrockfordBase32Utils:
     file: lib/App/CrockfordBase32Utils.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Convert::Base32::Crockford: '0'
   Data::Sah::Compiler::perl::TH::array: '0.914'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CrockfordBase32Utils
   homepage: https://metacpan.org/release/App-CrockfordBase32Utils
   repository: git://github.com/perlancar/perl-App-CrockfordBase32Utils.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 74afa10cd51d4082f7632083a8aa75e111d6b5b29c6dd110f971bc3bb6f7b275 Bio.pm
+SHA256 9bc12f37bc04f0cbc840cf03511d9a957fce379b0d8658e837a1b7b102fb9c53 Changes
+SHA256 0df73d8813281f4506c9fd0e5d97b2636551ba4256506d429655c39ee9e0b80f MANIFEST
+SHA256 11f2b040bdbcf2a53593972683934932d21d052ca9ba8dc528cd2673165a5576 META.yml
+SHA256 4399bcb9188e865ead2593b3b0f075859e584ebd7935057f5f2f9ff996028c31 Makefile.PL
+SHA256 1bda03eabd113692fd0d42f6c570899716405b725a6e4b42677bef6aeb4a229a README
+SHA256 91a8138f2493d86e0031d0ea4efbe4cabd9680972db530fc1babf210fb32f671 examples/err_bio.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 32c8592dc4ed3e522cf34f21d2ade299eb536c83abdc2286b5479fabe791b14c t/Error-Pure-Output-Bio/01-use.t
+SHA256 624bd09b7dafed6925a081a93b37a27d5b3b91e6111ef47a9d7fa263081ea5ac t/Error-Pure-Output-Bio/02-version.t
+SHA256 e50c9a799cb4b69a19c2b92d3c1aa954b16ec531c94cb0aec1b877fd87bbb288 t/Error-Pure-Output-Bio/03-err_bio.t
+SHA256 244533a08d16d52fc3220ca8d8ffb66b1f590a5535bca6335389d35679b2add3 xt/Error-Pure-Output-Bio/01-pod_coverage.t
+SHA256 c9f67197458b7ed32c7d5b7172adcc118b7490645d3742f1d8b2545812aeada2 xt/Error-Pure-Output-Bio/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEECAMiMrHl7JYa0rZPZ58rGyDXs5UFAmnL5lAACgkQZ58rGyDX
+s5WFtQwAhYyp+orxFkYveFrYA2ui2oksO8Vd1LRYnYeVERgO1DDwkWOidw4bwsEK
+2oni5S9VmtinywBH/niUyFRGfDbJ32oj75n85iJ2rmKDHK5K9mAdsAU2WtgDDeCB
+sXJrIncidHgVsRxxrRChY1aDJmET2nFJlnI8JN0Xu5Mx+tcsefS2ZGZCInIyHa0L
+a6uG9BOewdWoW1qE2LeT22fRDKveo/pYw+wQq2ba+cnKjzQh+VkAl3hgUHRT+RWa
+eNqxIjREw31+XHqito2NUcXw491L1jomXJryXIS+GItMuFzvfJDQNQBJL/kJyvG9
+wNifa3njA8/hTl5s6kwFItOML1m7hvEN2r9gA5qJ1cuzI8xg7I0WRHlQeEOtCahf
+5wpAMBSwusUtOUvZ4WStaIUH5R6eMifNjlETM8DUDNAAM4rG971/wqEDuvcDOpwm
+8nFL7KqtBnC6czmkwha7DRdQrh0ltrgmJ5tywsQzfYZO0YnC5iJRxDHf97jzSH6x
+Em8TZ9Ph
+=2rui
+-----END PGP SIGNATURE-----

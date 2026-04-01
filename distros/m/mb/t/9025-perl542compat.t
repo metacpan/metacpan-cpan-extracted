@@ -95,8 +95,8 @@ ok(mb->can('_insert_source_encoding_unimport'),
 {
     my $script = "use strict;\nuse v5.42;\n# comment\nprint 1;\n";
     my $got = mb::_insert_source_encoding_unimport($script);
-    my $orig_lines = scalar(split /\n/, $script);
-    my $got_lines  = scalar(split /\n/, $got);
+    my @orig_lines_a = split /\n/, $script; my $orig_lines = scalar @orig_lines_a;
+    my @got_lines_a  = split /\n/, $got;   my $got_lines  = scalar @got_lines_a;
     ok($orig_lines == $got_lines,
         'line count unchanged: no line number shift in error messages');
 }

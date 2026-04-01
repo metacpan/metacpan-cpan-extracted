@@ -16,13 +16,13 @@ Developer Dashboard now applies these runtime protections in the active codebase
 
 ## Repository Hygiene
 
-The active tree outside `OLD_CODE` is kept free of:
+The active tree outside the read-only legacy reference tree is kept free of:
 
 - company-specific product names listed in the repo rules
 - embedded sensitive material
 - literal password examples in user-facing documentation
 
-`OLD_CODE` remains read-only reference material and is not modified or committed as part of the active runtime.
+That legacy reference tree remains read-only reference material and is not modified or committed as part of the active runtime.
 
 ## Verification
 
@@ -31,3 +31,10 @@ Run these checks:
 ```bash
 prove -lr t
 ```
+
+## Private Reporting
+
+The published root security policy lives in [`SECURITY.md`](../SECURITY.md) and
+currently directs private reports to:
+
+- `security@manif3station.local`

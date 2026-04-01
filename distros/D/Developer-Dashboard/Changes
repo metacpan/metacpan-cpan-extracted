@@ -1,5 +1,113 @@
 Revision history for Developer Dashboard
 
+0.94  2026-04-01
+    - fixed `Folder->dd` and `Folder->runtime_root` so they keep the home runtime root unchanged when the current working directory is already inside `~/.developer-dashboard`, instead of appending a second `.developer-dashboard`
+
+0.93  2026-04-01
+    - made a project-local `./.developer-dashboard` tree the first runtime lookup root for bookmarks, config, CLI commands and hooks, auth users, sessions, and isolated docker service folders, while still falling back to `~/.developer-dashboard` when the project-local item is missing
+    - seeded sanitized `api-dashboard` and `db-dashboard` bookmark pages during `dashboard init` alongside `welcome`, keeping the pages editable as normal saved bookmarks without carrying forward legacy company-specific text or credentials
+    - moved the blank-environment integration flow onto a real fake-project `./.developer-dashboard` tree so the tarball install verifies the same local-over-home precedence model used by the shipped runtime
+
+0.92  2026-04-01
+    - hardened blank-environment tarball installation by exporting PERL_CANARY_STABILITY_NOPROMPT and the other noninteractive installer flags during clean-container cpanm runs
+    - kept the Runtime::Result hook-chain helper release intact while making the blank integration path safe against interactive dependency prompts from the JSON::XS toolchain
+
+0.91  2026-04-01
+    - formalized per-hook RESULT rewrites between sorted CLI hook executions so each later hook sees the JSON result of earlier hook scripts
+    - added Runtime::Result as a Perl helper for decoding RESULT and reading prior hook stdout, stderr, exit codes, and the last recorded hook entry
+    - extended blank-environment integration coverage so dashboard update proves later executable hooks can react to earlier hook output through Runtime::Result
+
+0.90  2026-04-01
+    - removed startup collector files and plugin packs so dashboard configuration JSON is the single source of truth for collectors, providers, path aliases, and docker overlays
+    - removed startup and plugin paths from the runtime surface, legacy Folder aliases, blank-environment integration flow, and supporting documentation
+
+0.89  2026-04-01
+    - added an explicit Dist::Zilla runtime prerequisite for `JSON::XS` so the built tarball always declares the JSON backend dependency for PAUSE installs
+    - extended release metadata coverage to assert the shipped runtime prereqs include `JSON::XS`
+
+0.88  2026-03-31
+    - removed the built-in `dashboard update` branch so `update` behaves like any other user-supplied top-level command
+    - kept `dashboard update` working through a user-provided `~/.developer-dashboard/cli/update` command plus sorted hook files from `update` or `update.d`
+
+0.87  2026-03-31
+
+    - added `.d` hook-directory aliases so `~/.developer-dashboard/cli/<command>.d/` behaves the same as `~/.developer-dashboard/cli/<command>/` for top-level command hooks
+    - updated smoke and blank-environment integration coverage so the shipped runtime accepts `.d` hook folders for command preprocessing
+
+0.86  2026-03-31
+
+    - changed the top-level command hook runner so executable files under `~/.developer-dashboard/cli/<command>` stream stdout and stderr live to the terminal instead of buffering silently until the command finishes
+    - kept the live-streamed hook output accumulated into `RESULT` JSON so later hook files and the final command still receive the full per-hook stdout, stderr, and exit code payloads
+    - updated smoke and integration-facing documentation for the new visible hook progress behavior
+
+0.85  2026-03-31
+
+    - fixed bookmark Template Toolkit environment so saved pages and shared `nav/*.tt` fragments receive `env.current_page` for the active request path instead of only raw process environment values
+    - exposed the active request path again as `env.runtime_context.current_page`, keeping the rest of the request-time runtime context available to bookmark and nav Template Toolkit code
+    - added web regression coverage for nav Template Toolkit conditionals so a fragment such as `[% IF env.current_page == '/app/index' %]...[% END %]` renders against the outer page path
+
+0.84  2026-03-31
+
+    - added explicit Dist::Zilla metadata for `provides` and repository resources so generated META files satisfy CPAN Kwalitee checks for shipped modules and source repository links
+    - added root `SECURITY.md` and `CONTRIBUTING.md` guidance, including a vulnerability-reporting contact and contributor workflow expectations
+    - updated release metadata tests and docs to keep repository metadata and contributor/security policy files aligned with future releases
+
+0.83  2026-03-31
+
+    - added nested saved bookmark route support so `/app/nav/foo.tt`, `/page/nav/foo.tt/edit`, and `/page/nav/foo.tt/source` work like any other saved bookmark id
+    - fixed saved bookmark persistence for nested ids by creating parent directories automatically when bookmark ids contain path separators such as `nav/foo.tt`
+    - added shared `nav/*.tt` bookmark rendering so direct `.tt` files under the saved bookmark `nav/` folder render in sorted filename order between the top chrome and the main page body on other saved pages
+
+0.82  2026-03-31
+
+    - fixed unconfigured legacy `Folder` access so `Folder->dd` and AUTOLOAD-backed root aliases such as `Folder->runtime_root` lazily bootstrap the default dashboard path registry from `$HOME` instead of dying or returning placeholder state
+    - added legacy helper coverage for the unconfigured `Folder` runtime access path so installed compatibility wrappers match `dashboard paths` even before explicit runtime wiring is applied
+
+0.80  2026-03-31
+
+    - fixed legacy `Folder` compatibility so AUTOLOAD resolves `runtime_root`, `bookmarks_root`, `config_root`, and `startup_root` through the existing legacy alias methods instead of rejecting the modern path names shown by `dashboard paths`
+    - added legacy helper coverage for the root-style `Folder` names so installed compatibility code can call the same runtime path names exposed by the CLI
+
+0.79  2026-03-31
+
+    - fixed the blank-container integration harness so fake-project dashboard override env vars are applied only after `cpanm` finishes installing the tarball
+    - kept the installed tarball test phase running in a clean environment, preventing the fake project from breaking shipped tests that expect an empty runtime
+    - updated integration asset coverage and release metadata for the new integration-harness fix release
+
+0.78  2026-03-31
+
+    - added `dashboard version` so installed runtimes can report the shipped Developer Dashboard version directly
+    - kept `dashboard update` printing the common RESULT JSON map from the per-command hook runner
+    - updated tests and docs for the version command and explicit update output behavior
+
+0.77  2026-03-31
+
+    - changed `dashboard update` to use the same top-level command hook path as every other `dashboard <command>` under `~/.developer-dashboard/cli/update`
+    - kept update hook execution based on executable regular files in sorted filename order while skipping non-executable files
+    - changed `dashboard update` output to return the common RESULT hash instead of a separate updater-managed step list
+
+0.76  2026-03-31
+
+    - changed `dashboard update` to execute runtime-managed scripts from `~/.developer-dashboard/cli/update` instead of the repository-local `./updates` directory
+    - made `dashboard update` return an empty result set when no runtime update directory exists instead of dying on a missing folder
+    - updated tests, docs, and blank-container integration coverage to exercise the runtime CLI update directory flow directly
+
+0.75  2026-03-31
+
+    - added per-command CLI hook directories under `~/.developer-dashboard/cli/<command>` so built-in and custom commands can pre-run executable hook files in sorted filename order and receive the accumulated `RESULT` JSON environment variable
+    - added directory-backed custom CLI commands via `~/.developer-dashboard/cli/<command>/run` while still skipping non-executable files in the same hook directory
+    - documented the per-command CLI hook flow in the README, main POD, architecture guide, and testing guide
+
+0.74  2026-03-31
+
+    - fixed collector startup recovery so malformed persisted collector `status.json` files are treated as missing state and are overwritten cleanly on the next status write instead of crashing `dashboard restart`
+
+0.73  2026-03-31
+
+    - added unit and blank-container integration regressions for mixed collector health so one broken Perl startup collector must not stop a second healthy collector or its green indicator state
+    - changed the blank-environment tarball install step to run `cpanm` with tests enabled instead of using `--notest`
+    - documented the collector-failure isolation regression and full tarball-install expectation in the README, main POD, and integration plan
+
 0.72  2026-03-31
 
     - fixed legacy bookmark runtime output so returned hashes and arrays from `CODE*` blocks are dumped into the visible runtime output area while still merging into stash for Template Toolkit rendering

@@ -170,6 +170,11 @@ METHODS
              Strict instruction.
              Default value is 1.
 
+    *       "xml"
+
+             Flag, that means xml output.
+             Default is 0 (sgml).
+
   "finalize"
      $tags->finalize;
 
@@ -255,10 +260,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2023 Michal Josef Špaček
+    © 2011-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.10
+    0.13
 
