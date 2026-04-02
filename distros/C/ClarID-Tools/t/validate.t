@@ -9,9 +9,6 @@ my $schema   = catfile( 'share', 'clarid-codebook-schema.json' );
 my $exe      = catfile( 'bin',   'clarid-tools' );
 my $inc      = join ' -I', '', @INC;    # prepend -I to each path in @INC
 
-# how many tests? e.g. 3
-plan tests => 10;
-
 # 1) Valid codebook should pass
 {
     my $out =
@@ -66,6 +63,20 @@ plan tests => 10;
         $out,
 qr/Duplicate stub_code 'B' in category 'tissue' \(entity: 'biosample'\) for keys '(?:Kidney' and 'Blood|Blood' and 'Kidney')/,
         'detects duplicate stub_code in tissue'
+    );
+}
+
+# 6) Unsupported codebook version
+{
+    my $unsupported_yaml = 't/data/unsupported_codebook.yaml';
+    my $out =
+      `$^X $inc $exe validate --codebook $unsupported_yaml --schema $schema 2>&1`;
+    my $exit = $? >> 8;
+    ok( $exit != 0, 'non-zero exit on unsupported codebook version' );
+    like(
+        $out,
+        qr/Unsupported codebook version '0\.04'.*supports: 0\.02, 0\.03/,
+        'reports unsupported codebook version'
     );
 }
 

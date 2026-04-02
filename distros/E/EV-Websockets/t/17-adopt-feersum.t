@@ -18,7 +18,6 @@ EV::Websockets::_set_debug(1) if $ENV{EV_WS_DEBUG};
 # to EV::Websockets adopt() with reconstructed HTTP upgrade as initial_data.
 
 my $ctx = EV::Websockets::Context->new();
-$ctx->listen(port => 0, on_connect => sub {}, on_message => sub {});
 
 my $feersum = Feersum->endjinn;
 my $sock = IO::Socket::INET->new(

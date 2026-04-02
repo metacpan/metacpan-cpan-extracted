@@ -10,7 +10,8 @@ use Test::NoWarnings;
 eval {
 	Indent->new('');
 };
-is($EVAL_ERROR, "Unknown parameter ''.\n");
+is($EVAL_ERROR, "Unknown parameter ''.\n",
+	"Unknown parameter ''.");
 
 # Test.
 eval {
@@ -18,7 +19,8 @@ eval {
 		'something' => 'value',
 	);
 };
-is($EVAL_ERROR, "Unknown parameter 'something'.\n");
+is($EVAL_ERROR, "Unknown parameter 'something'.\n",
+	"Unknown parameter 'something'.");
 
 # Test.
 eval {
@@ -26,7 +28,8 @@ eval {
 		'next_indent' => undef,
 	);
 };
-is($EVAL_ERROR, "'next_indent' parameter must be defined.\n");
+is($EVAL_ERROR, "'next_indent' parameter must be defined.\n",
+	"'next_indent' parameter must be defined.");
 
 # Test.
 eval {
@@ -34,7 +37,8 @@ eval {
 		'next_indent' => {},
 	);
 };
-is($EVAL_ERROR, "'next_indent' parameter must be a string.\n");
+is($EVAL_ERROR, "'next_indent' parameter must be a string.\n",
+	"'next_indent' parameter must be a string.");
 
 # Test.
 eval {
@@ -42,7 +46,8 @@ eval {
 		'next_indent' => \'',
 	);
 };
-is($EVAL_ERROR, "'next_indent' parameter must be a string.\n");
+is($EVAL_ERROR, "'next_indent' parameter must be a string.\n",
+	"'next_indent' parameter must be a string.");
 
 # Test.
 eval {
@@ -50,7 +55,8 @@ eval {
 		'indent' => undef,
 	);
 };
-is($EVAL_ERROR, "'indent' parameter must be defined.\n");
+is($EVAL_ERROR, "'indent' parameter must be defined.\n",
+	"'indent' parameter must be defined.");
 
 # Test.
 eval {
@@ -58,7 +64,8 @@ eval {
 		'indent' => {},
 	);
 };
-is($EVAL_ERROR, "'indent' parameter must be a string.\n");
+is($EVAL_ERROR, "'indent' parameter must be a string.\n",
+	"'indent' parameter must be a string.");
 
 # Test.
 eval {
@@ -66,7 +73,8 @@ eval {
 		'indent' => \'',
 	);
 };
-is($EVAL_ERROR, "'indent' parameter must be a string.\n");
+is($EVAL_ERROR, "'indent' parameter must be a string.\n",
+	"'indent' parameter must be a string.");
 
 # Test.
 my $obj = Indent->new;

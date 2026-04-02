@@ -2,10 +2,14 @@ _config.yml
 bin/sidef
 Build.PL
 Changes
+COMPUTATIONAL_ALGEBRA_GUIDE.md
+CONTRIBUTING.md
 lib/Sidef.pm
 lib/Sidef.pod
 lib/Sidef/Deparse/Perl.pm
+lib/Sidef/Deparse/Perl.pod
 lib/Sidef/Deparse/Sidef.pm
+lib/Sidef/Deparse/Sidef.pod
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Func.pm
@@ -21,7 +25,9 @@ lib/Sidef/Object/LazyMethod.pod
 lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Optimizer.pm
+lib/Sidef/Optimizer.pod
 lib/Sidef/Parser.pm
+lib/Sidef/Parser.pod
 lib/Sidef/Sys/Sig.pm
 lib/Sidef/Sys/Sig.pod
 lib/Sidef/Sys/Sys.pm
@@ -113,6 +119,7 @@ Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
+NUMBER_THEORY_GUIDE.md
 NUMBER_THEORY_REFERENCE.md
 NUMBER_THEORY_TUTORIAL.md
 README.md
@@ -741,6 +748,7 @@ scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
 scripts/Tests/binomialmod.sf
+scripts/Tests/binomialmod_2.sf
 scripts/Tests/bitonic_sorter.sf
 scripts/Tests/block_identities.sf
 scripts/Tests/block_return.sf
@@ -922,6 +930,7 @@ scripts/Tests/method_aliases.sf
 scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
 scripts/Tests/mod_class.sf
+scripts/Tests/modular_k-th_root_all_solutions_znlog.sf
 scripts/Tests/modular_quadratic_formula.sf
 scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
@@ -1034,6 +1043,7 @@ scripts/Tests/roman_numerals_encoding.sf
 scripts/Tests/roman_numerals_encoding_2.sf
 scripts/Tests/root_mean_square.sf
 scripts/Tests/rootmod.sf
+scripts/Tests/roots_of_unity_convergents.sf
 scripts/Tests/roots_on_the_rise.sf
 scripts/Tests/round_half_to_even.sf
 scripts/Tests/roundf.sf
@@ -1077,6 +1087,7 @@ scripts/Tests/squarefree.sf
 scripts/Tests/static_const_lazy_init.sf
 scripts/Tests/string_encodings.sf
 scripts/Tests/string_escapes.sf
+scripts/Tests/string_methods.sf
 scripts/Tests/string_to_number.sf
 scripts/Tests/strip_chars_from_str.sf
 scripts/Tests/strip_non_ascii_chars.sf
@@ -1125,6 +1136,7 @@ scripts/Tests/with_statement.sf
 scripts/Tests/word_processing.sf
 scripts/Tests/word_roots.sf
 scripts/Tests/word_wrap_enumerator.sf
+scripts/Tests/znlog.sf
 scripts/towers_of_hanoi.sf
 scripts/tree_traversal.sf
 scripts/unique_prefixes.sf
@@ -1145,6 +1157,8 @@ scripts/WWW/socket_inet.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
 scripts/zeta_2n.sf
+SIDEF_ADVANCED_GUIDE.md
+SIDEF_BEGINNER_GUIDE.md
 t/00-load.t
 t/01-number.t
 t/02-pow.t
@@ -1168,7 +1182,6 @@ t/oo_inheritance.t
 t/pod.t
 t/smart_word_wrap.t
 TODO
-TUTORIAL.md
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
 utils/Concepts/sidef_concept.jl
@@ -1187,6 +1200,7 @@ utils/find_invalid_types.pl
 utils/find_undefined_methods.pl
 utils/gource-video.sh
 utils/grep_errors.sh
+utils/make_pdfs.sh
 utils/pod_generator.pl
 utils/sidef2bin.sh
 utils/sidef2exe.txt

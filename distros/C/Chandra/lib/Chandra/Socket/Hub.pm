@@ -7,7 +7,7 @@ use IO::Select;
 use Chandra::Socket::Connection;
 use File::Spec ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 require Chandra;
 

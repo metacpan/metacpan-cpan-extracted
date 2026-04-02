@@ -15,7 +15,6 @@ use IO::Socket::INET;
 # standard PSGI application running on Feersum.
 
 my $ctx = EV::Websockets::Context->new();
-$ctx->listen(port => 0, on_connect => sub {}, on_message => sub {});
 
 my $feersum = Feersum->endjinn;
 $feersum->set_psgix_io(1); # enable psgix.io in env

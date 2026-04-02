@@ -42,9 +42,25 @@ typedef struct {
 } PerlChandra;
 
 /* ---- Extract PerlChandra* from an app's _webview ---- */
-/* Returns NULL if app has no valid _webview */
+/* Returns NULL if app has no valid _webview or if _webview is not a Chandra */
 #define CHANDRA_PC_FROM_APP(app_sv) \
     chandra_pc_from_app(aTHX_ (app_sv))
+
+/* ---- Get _webview SV from app (for fallback Perl calls) ---- */
+#define CHANDRA_WEBVIEW_SV(app_sv) \
+    chandra_webview_sv(aTHX_ (app_sv))
+
+static SV *
+chandra_webview_sv(pTHX_ SV *app_sv)
+{
+    HV *app_hv;
+    SV **wv_svp;
+    if (!SvROK(app_sv)) return NULL;
+    app_hv = (HV *)SvRV(app_sv);
+    wv_svp = hv_fetchs(app_hv, "_webview", 0);
+    if (!wv_svp || !SvOK(*wv_svp)) return NULL;
+    return *wv_svp;
+}
 
 static PerlChandra *
 chandra_pc_from_app(pTHX_ SV *app_sv)
@@ -52,13 +68,20 @@ chandra_pc_from_app(pTHX_ SV *app_sv)
     HV *app_hv;
     SV **wv_svp;
     SV *wv_sv;
+    SV *wv_rv;
+    svtype t;
     if (!SvROK(app_sv)) return NULL;
     app_hv = (HV *)SvRV(app_sv);
     wv_svp = hv_fetchs(app_hv, "_webview", 0);
     if (!wv_svp || !SvOK(*wv_svp)) return NULL;
     wv_sv = *wv_svp;
     if (!SvROK(wv_sv)) return NULL;
-    return INT2PTR(PerlChandra *, SvIV(SvRV(wv_sv)));
+    wv_rv = SvRV(wv_sv);
+    /* Mocks use hashes/arrays, real Chandra is a blessed IV scalar */
+    t = SvTYPE(wv_rv);
+    if (t == SVt_PVHV || t == SVt_PVAV || t == SVt_PVCV) return NULL;
+    if (!SvIOK(wv_rv)) return NULL;  /* Must have valid IV */
+    return INT2PTR(PerlChandra *, SvIV(wv_rv));
 }
 
 /* ---- Parse JSON menu string into tray items ---- */
@@ -159,6 +182,34 @@ chandra_tray_free_item_labels(struct webview_tray *tray)
     }
 }
 
+/* ---- Escape JS string (backslash, single-quote, newline, CR) ---- */
+/* Returns a new (non-mortal) SV with the escaped string.           */
+
+static SV *
+chandra_escape_js(pTHX_ SV *str_sv)
+{
+    const char *src;
+    STRLEN src_len, i, j;
+    char *buf;
+    SV *result;
+
+    src = SvPV(str_sv, src_len);
+    Newx(buf, src_len * 2 + 1, char);
+    j = 0;
+    for (i = 0; i < src_len; i++) {
+        switch (src[i]) {
+            case '\\': buf[j++] = '\\'; buf[j++] = '\\'; break;
+            case '\'': buf[j++] = '\\'; buf[j++] = '\''; break;
+            case '\n': buf[j++] = '\\'; buf[j++] = 'n';  break;
+            case '\r': buf[j++] = '\\'; buf[j++] = 'r';  break;
+            default:   buf[j++] = src[i]; break;
+        }
+    }
+    result = newSVpvn(buf, j);
+    Safefree(buf);
+    return result;
+}
+
 /* ---- Safe string helpers using Perl memory ---- */
 
 #define chandra_savepv(s) ((s) ? savepv(s) : NULL)
@@ -241,6 +292,41 @@ static void tray_menu_cb(struct webview *w, int item_id) {
         call_sv(pc->tray_callback, G_DISCARD);
         FREETMPS; LEAVE;
     }
+}
+
+/* ---- Create PerlChandra struct and bless as "Chandra" ---- */
+/* Returns a new (non-mortal) blessed SV.                     */
+
+static SV *
+chandra_create_pc(pTHX_ const char *title, const char *url,
+                  int width, int height, int resizable,
+                  int debug, SV *callback_sv)
+{
+    PerlChandra *pc;
+    SV *sv;
+
+    Newxz(pc, 1, PerlChandra);
+    pc->wv.title     = savepv(title);
+    pc->wv.url       = savepv(url);
+    pc->wv.width     = width;
+    pc->wv.height    = height;
+    pc->wv.resizable = resizable;
+    pc->wv.debug     = debug;
+    pc->initialized  = 0;
+
+    if (callback_sv && SvOK(callback_sv) && SvROK(callback_sv)) {
+        perl_callback = SvREFCNT_inc(callback_sv);
+        pc->callback  = perl_callback;
+        pc->wv.external_invoke_cb = external_invoke_cb;
+        my_perl_interp = PERL_GET_THX;
+    } else {
+        pc->wv.external_invoke_cb = NULL;
+        pc->callback = NULL;
+    }
+
+    sv = sv_newmortal();
+    sv_setref_pv(sv, "Chandra", (void *)pc);
+    return newSVsv(sv);   /* non-mortal copy */
 }
 
 /* ---- Static XS callback for App navigate ---- */

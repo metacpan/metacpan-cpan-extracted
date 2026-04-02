@@ -10,7 +10,7 @@ use IO::File;
 require POSIX;
 
 our @ISA     = qw(IO::Handle);
-our $VERSION = '1.24';    # keep same as in Tty.pm
+our $VERSION = '1.25';    # keep same as in Tty.pm
 eval { local $^W = 0; local $SIG{__DIE__}; require IO::Stty };
 push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
@@ -148,10 +148,11 @@ sub make_slave_controlling_terminal {
 
 sub DESTROY {
     my $self = shift;
-    if ( exists ${*$self}{'io_pty_slave'} ) {
-        close ${*$self}{'io_pty_slave'};
-        delete ${*$self}{'io_pty_slave'};
-    }
+    # Only delete the internal reference; do not force-close the slave.
+    # Perl's refcounting will close the fd when no references remain.
+    # Force-closing here breaks consumers (e.g. IPC::Run) that hold
+    # their own reference to the slave obtained via $pty->slave().
+    delete ${*$self}{'io_pty_slave'};
 }
 
 *clone_winsize_from = \&IO::Tty::clone_winsize_from;
@@ -169,7 +170,7 @@ IO::Pty - Pseudo TTY object class
 
 =head1 VERSION
 
-1.24
+1.25
 
 =head1 SYNOPSIS
 

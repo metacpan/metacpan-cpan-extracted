@@ -1,0 +1,53 @@
+NAME
+
+    IPC::Manager:DBI - Database based clients for IPC::Manager.
+
+DESCRIPTION
+
+    These are all based off of IPC::Manager::Base::DBI. These all use a
+    database as the message store.
+
+    These all have 1 table for tracking clients, and another for tracking
+    messages. Messages are deleted once read. The 'route' is a DSN. You
+    also usually need to provide a username and password.
+
+        my $con = ipcm_connect(my_con => $info, user => $USER, pass => $PASS);
+
+    MariaDB
+
+      IPC::Manager::Client::MariaDB
+
+    MySQL
+
+      IPC::Manager::Client::MySQL
+
+    PostgreSQL
+
+      IPC::Manager::Client::PostgreSQL
+
+    SQLite
+
+      IPC::Manager::Client::SQLite
+
+SOURCE
+
+    The source code repository for IPC::Manager can be found at
+    https://github.com/exodist/IPC-Manager.
+
+MAINTAINERS
+
+    Chad Granum <exodist@cpan.org>
+
+AUTHORS
+
+    Chad Granum <exodist@cpan.org>
+
+COPYRIGHT
+
+    Copyright Chad Granum <exodist7@gmail.com>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See https://dev.perl.org/licenses/
+

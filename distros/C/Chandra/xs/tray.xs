@@ -608,20 +608,8 @@ CODE:
         icon_str = (icon_svp && SvOK(*icon_svp)) ? SvPV_nolen(*icon_svp) : "";
         tooltip_str = (tooltip_svp && SvOK(*tooltip_svp)) ? SvPV_nolen(*tooltip_svp) : "";
 
-        /* Build menu JSON */
-        {
-            dSP;
-            int count;
-            ENTER; SAVETMPS;
-            PUSHMARK(SP);
-            XPUSHs(self);
-            PUTBACK;
-            count = call_method("_menu_json", G_SCALAR);
-            SPAGAIN;
-            menu_json_sv = (count > 0) ? newSVsv(POPs) : newSVpvs("[]");
-            PUTBACK;
-            FREETMPS; LEAVE;
-        }
+        /* Build menu JSON directly */
+        menu_json_sv = chandra_tray_build_menu_json(aTHX_ self);
 
         /* Build dispatch callback */
         {
@@ -735,20 +723,12 @@ CODE:
         SV **icon_svp = hv_fetchs(hv, "icon", 0);
         SV **tooltip_svp = hv_fetchs(hv, "tooltip", 0);
         const char *icon_str, *tooltip_str;
-        dSP;
-        int count;
 
         icon_str = (icon_svp && SvOK(*icon_svp)) ? SvPV_nolen(*icon_svp) : "";
         tooltip_str = (tooltip_svp && SvOK(*tooltip_svp)) ? SvPV_nolen(*tooltip_svp) : "";
 
-        /* Build menu JSON */
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(self);
-        PUTBACK;
-        count = call_method("_menu_json", G_SCALAR);
-        SPAGAIN;
-        menu_json_sv = (count > 0) ? POPs : sv_2mortal(newSVpvs("[]"));
+        /* Build menu JSON directly */
+        menu_json_sv = chandra_tray_build_menu_json(aTHX_ self);
 
         /* Update tray struct directly */
         if (pc->tray.icon_path) Safefree((char *)pc->tray.icon_path);
@@ -759,11 +739,9 @@ CODE:
         chandra_tray_free_item_labels(&pc->tray);
         pc->tray.item_count = 0;
         chandra_tray_parse_menu_json(SvPV_nolen(menu_json_sv), &pc->tray);
+        SvREFCNT_dec(menu_json_sv);
 
         webview_tray_update(&pc->tray);
-
-        PUTBACK;
-        FREETMPS; LEAVE;
     }
 }
 

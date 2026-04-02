@@ -2,10 +2,16 @@
 
 ### Method 1: From CPAN (Recommended)
 
-First install system level dependencies:
+First install the core system dependencies:
 
 ```bash
-sudo apt-get install gcc make cpanminus libperl-dev qrencode zbar-tools
+sudo apt-get install gcc make cpanminus libperl-dev
+```
+
+If you also plan to use `clarid-tools qrcode`, install the QR helper tools too:
+
+```bash
+sudo apt-get install qrencode zbar-tools
 ```
 We use `cpanm` to install the CPAN modules. We'll install the dependencies at `~/perl5`:
 
@@ -32,7 +38,13 @@ cpanm ClarID::Tools
 First, we need to install a few system components:
 
 ```bash
-sudo apt install gcc make git cpanminus libperl-dev qrencode zbar-tools
+sudo apt install gcc make git cpanminus libperl-dev
+```
+
+If you also plan to use `clarid-tools qrcode`, install the QR helper tools too:
+
+```bash
+sudo apt install qrencode zbar-tools
 ```
 
 Use `git clone` to get the latest (stable) version:
@@ -42,7 +54,7 @@ git clone https://github.com/CNAG-Biomedical-Informatics/clarid-tools.git
 cd clarid-tools
 ```
 
-If you only new to update to the lastest version do:
+If you only need to update to the latest version, do:
 
 ```bash
 git pull
@@ -81,9 +93,20 @@ This distribution is written in pure Perl and is intended to run on any platform
 
 ## Common errors: Symptoms and treatment
 
-* Perl errors:
-    - Foo
+- `clarid-tools qrcode` fails with `qrencode not found in PATH`
 
-      Solution: 
+  Install `qrencode` with your system package manager.
 
-      `Bar`
+- `clarid-tools qrcode` fails with `zbarimg not found in PATH`
+
+  Install `zbar-tools` with your system package manager.
+
+- A new terminal cannot find locally installed Perl modules
+
+  Ensure you loaded `local::lib`, for example by adding:
+
+  ```bash
+  eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+  ```
+
+  to your shell startup file.

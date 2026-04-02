@@ -1,6 +1,6 @@
 # Containerized Installation
 
-### Method 3: Installing from Docker Hub
+### Method 1: Installing from Docker Hub (fast)
 
 Pull the latest Docker image from [Docker Hub](https://hub.docker.com/r/manuelrueda/clarid-tools):
 
@@ -9,9 +9,9 @@ docker pull manuelrueda/clarid-tools:latest
 docker image tag manuelrueda/clarid-tools:latest cnag/clarid-tools:latest
 ```
 
-### Method 4: Installing from Dockerfile
+### Method 2: Building from the repository Dockerfile
 
-Download the `Dockerfile` from [GitHub](https://github.com/CNAG-Biomedical-Informatics/clarid-tools/blob/main/Dockerfile):
+Download the `Dockerfile` from [GitHub](https://github.com/CNAG-Biomedical-Informatics/clarid-tools/blob/main/docker/Dockerfile):
 
 ```bash
 wget https://raw.githubusercontent.com/CNAG-Biomedical-Informatics/clarid-tools/main/docker/Dockerfile
@@ -32,6 +32,8 @@ Then build the container:
   ```
 
 ## Running and Interacting with the Container
+
+The Docker image already includes the external QR dependencies used by `clarid-tools qrcode`, including `qrencode` and `zbarimg` (`zbar-tools`).
 
 To run the container:
 
@@ -56,13 +58,9 @@ clarid-tools
 
 - OS/ARCH supported: **linux/amd64** and **linux/arm64**.
 - Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOS, OpenSUSE) should do as well (untested).
-- Perl 5 (>= 5.36 core; installed by default in many Linux distributions). Check the version with `perl -v`
 - 1GB of RAM
 - \>= 1 core (ideally i7 or Xeon).
 - At least 5GB HDD.
-
-## Platform Compatibility
-This distribution is written in pure Perl and is intended to run on any platform supported by Perl 5. It has been tested on Debian Linux and macOS. It is expected to work on Windows; please report any issues.
 
 ## Common errors: Symptoms and treatment
 

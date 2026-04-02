@@ -3,3 +3,5 @@ Revision history for Shannon-Entropy-XS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+1.12	01/04/2026
+	- Add custom op which improves performance from 5952380.95/s to 7633587.79/s in benchmark

@@ -6,7 +6,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.02';
+    our $VERSION = '0.03';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -310,9 +310,6 @@ Adopt WebSocket connections from a Feersum PSGI server via C<psgix.io>:
     use EV::Websockets;
 
     my $ctx = EV::Websockets::Context->new;
-    # A listener vhost is required for adopt() to work
-    $ctx->listen(port => 0, on_connect => sub {}, on_message => sub {});
-
     my $feersum = Feersum->endjinn;
     $feersum->set_psgix_io(1);
 

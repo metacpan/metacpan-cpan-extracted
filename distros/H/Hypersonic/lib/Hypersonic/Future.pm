@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # High-performance JIT-compiled Future for async operations
 # Serves as the foundation for all async in Hypersonic:

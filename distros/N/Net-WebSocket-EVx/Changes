@@ -1,3 +1,6 @@
+- 0.20
+	Fix test prereqs for CPAN Testers
+
 - 0.19
 	Fix bugs, harden XS, expand tests, add CI
 

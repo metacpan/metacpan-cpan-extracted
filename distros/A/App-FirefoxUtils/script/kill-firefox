@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-26'; # DATE
+our $DATE = '2026-03-29'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxUtils/terminate_firefox",
@@ -40,7 +40,7 @@ kill-firefox - Terminate Firefox (by default with -KILL signal)
 
 =head1 VERSION
 
-This document describes version 0.024 of kill-firefox (from Perl distribution App-FirefoxUtils), released on 2026-03-26.
+This document describes version 0.025 of kill-firefox (from Perl distribution App-FirefoxUtils), released on 2026-03-29.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,95 @@
+# mapping_biosample.yaml
+
+fields:
+  unique_id:
+    source: samples.sample_id
+
+  project:
+    source: project.project_id
+
+  species: {}
+
+  tissue:
+    source: samples.specimen_type
+    operations: #order matters!!
+      - strip_quotes
+      - trim
+      - remove_all_spaces
+      - remove_suffix: NOS
+      - map_values:
+          FibroblastsfromBoneMarrow: BoneMarrow
+
+  sample_type:
+    source: samples.tumor_descriptor
+    operations:
+      - map_values:
+          'Not Applicable': Normal
+
+  assay: {}
+
+  condition:
+    source: samples.tumor_code
+    operations:
+      - strip_quotes
+      - trim
+      - map_values:
+          'Acute myeloid leukemia (AML)': C92.0
+          'Induction Failure AML (AML-IF)': C92.0
+          '--': Z00.00
+
+  timepoint: {}
+
+  duration:
+    source: samples.days_to_collection
+    operations:
+      - strip_quotes
+      - trim
+      - map_values:
+          '--': ~
+
+#  batch:
+#    source: samples.catalog_reference
+#    operations:
+#      - strip_quotes
+#      - trim
+#      - map_values:
+#          '--': ~
+
+#  replicate:
+#    source: samples.sample_ordinal
+#    operations:
+#      - strip_quotes
+#      - trim
+#      - map_values:
+#          '--': ~
+
+  # subject_id behavior:
+  # - if 'source' is set, rows sharing the same raw value get the same integer ID (group-mode)
+  # - if 'source' is empty, every row gets a new sequential ID (pure-counter mode)
+  subject_id:
+    source: cases.case_id
+    operations: []
+
+output_headers:
+  - unique_id
+  - project
+  - species
+  - tissue
+  - sample_type
+  - assay
+  - condition
+  - timepoint
+  - duration
+#  - batch
+#  - replicate
+  - subject_id
+
+# static_fields: fallback values used when a field is None or '' after operations.
+# Normalize sentinels (e.g. '--', 'NA') to null with map_values; static_fields sets the final display value
+static_fields:
+  assay:     'Not Available'
+  species:   Human
+  timepoint: Collection
+  duration: P0N
+#  batch:     0
+#  replicate: 0

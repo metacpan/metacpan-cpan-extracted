@@ -1,5 +1,12 @@
 Revision history for Chandra
 
+0.09  2026-04-01
+    - Fix Makefile to identify BSD's that should use GTK/WebKit2
+
+0.08  2026-04-01
+    - Fix removing unnecessary call_method overhead when calling internal XSUBS.
+    - Adds Native OS desktop notifications
+
 0.07  2026-03-31
     - Port code to XS (all methods now in C)
     - Add global css and js chain methods to Chandra::App

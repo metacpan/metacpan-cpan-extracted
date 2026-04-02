@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1,
-#        XDR::Gen version 1.1.2 and LibVirt version v12.1.0
+#        XDR::Gen version 1.1.2 and LibVirt version v12.2.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Transport::XDR v12.1.0;
+package Protocol::Sys::Virt::Transport::XDR v12.2.0;
 
 use v5.14;
 use warnings FATAL => 'uninitialized';
@@ -709,9 +709,9 @@ Protocol::Sys::Virt::Transport::XDR - Protocol header and error constants and (d
 
 =head1 VERSION
 
-v12.1.0
+v12.2.0
 
-Based on LibVirt tag v12.1.0
+Based on LibVirt tag v12.2.0
 
 =head1 SYNOPSYS
 

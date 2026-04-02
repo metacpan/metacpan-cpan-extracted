@@ -7,7 +7,7 @@ use warnings;
 # All room management is done in C via XS::JIT::Builder.
 # This module generates XS functions callable from Perl.
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Maximum rooms and clients per room
 use constant MAX_ROOMS => 1000;

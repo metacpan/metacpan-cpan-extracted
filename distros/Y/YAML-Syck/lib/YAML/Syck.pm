@@ -4,13 +4,13 @@ package YAML::Syck;
 
 use strict;
 
-our ( $Headless, $SingleQuote, $ImplicitBinary, $ImplicitTyping, $ImplicitUnicode, $UseCode, $LoadCode, $DumpCode, $DeparseObject );
+our ( $Headless, $SingleQuote, $ImplicitBinary, $ImplicitTyping, $ImplicitUnicode, $UseCode, $LoadCode, $DumpCode, $DeparseObject, $MaxDepth );
 
 use 5.006;
 use Exporter;
 use XSLoader ();
 
-our $VERSION   = '1.42';
+our $VERSION   = '1.43';
 our @EXPORT    = qw( Dump Load DumpFile LoadFile );
 our @EXPORT_OK = qw( DumpInto LoadBytes LoadUTF8 DumpBytes DumpUTF8 );
 our @ISA       = qw( Exporter );
@@ -57,7 +57,9 @@ sub Dump {
 
 sub Load {
     if (wantarray) {
+        return unless defined $_[0] && length $_[0];
         my ($rv) = YAML::Syck::LoadYAML( $_[0] );
+        return unless defined $rv && ref $rv eq 'ARRAY';
         @{$rv};
     }
     else {
@@ -135,7 +137,9 @@ sub LoadBytes {
     my ($str) = @_;
     utf8::downgrade($str);
     if (wantarray) {
+        return unless defined $str && length $str;
         my ($rv) = YAML::Syck::LoadYAML($str);
+        return unless defined $rv && ref $rv eq 'ARRAY';
         return @{$rv};
     }
     return YAML::Syck::LoadYAML($str);
@@ -145,7 +149,9 @@ sub LoadUTF8 {
     my ($str) = @_;
     local $YAML::Syck::ImplicitUnicode = 1;
     if (wantarray) {
+        return unless defined $str && length $str;
         my ($rv) = YAML::Syck::LoadYAML($str);
+        return unless defined $rv && ref $rv eq 'ARRAY';
         return @{$rv};
     }
     return YAML::Syck::LoadYAML($str);
@@ -224,6 +230,13 @@ Some calls are designed to die rather than returning YAML. You should wrap
 your calls in eval to assure you do not get unexpected results.
 
 =head1 FLAGS
+
+=head2 $YAML::Syck::MaxDepth
+
+Maximum nesting depth for C<Dump>.  Defaults to 512.  If a data structure
+is nested deeper than this limit, C<Dump> will C<croak> instead of
+overflowing the C stack.  Increase this if you legitimately need to
+serialize very deeply nested structures.
 
 =head2 $YAML::Syck::Headless
 

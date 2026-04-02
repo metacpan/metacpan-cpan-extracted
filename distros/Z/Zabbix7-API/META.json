@@ -42,6 +42,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Moo" : "0",
+            "Test::Exception" : "0",
             "perl" : "5.010"
          }
       },
@@ -54,7 +56,7 @@
    "provides" : {
       "Zabbix7::API" : {
          "file" : "lib/Zabbix7/API.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "Zabbix7::API::Action" : {
          "file" : "lib/Zabbix7/API/Action.pm"
@@ -129,7 +131,7 @@
          "web" : "https://github.com/scotticles/perl-zabbix7-api"
       }
    },
-   "version" : "1.3",
+   "version" : "1.4",
    "x_contributors" : [
       "scotth <scotth@cpan.org>"
    ],

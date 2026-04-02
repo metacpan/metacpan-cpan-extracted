@@ -3,8 +3,10 @@ Changes
 EVx.xs
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
+Net-WebSocket-EVx-0.19.tar.gz
 README
 README.md
 cpanfile

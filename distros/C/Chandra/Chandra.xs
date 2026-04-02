@@ -9,12 +9,15 @@
 #define WEBVIEW_IMPLEMENTATION
 #define CHANDRA_XS_IMPLEMENTATION
 #include "include/chandra/chandra.h"
+#include "include/chandra/chandra_error.h"
 #include "include/chandra/chandra_bind.h"
 #include "include/chandra/chandra_element.h"
 #include "include/chandra/chandra_devtools.h"
+#include "include/chandra/chandra_internal.h"
 #include "include/chandra/chandra_socket_common.h"
 #include "include/chandra/chandra_socket_hub.h"
 #include "include/chandra/chandra_socket_client.h"
+#include "include/chandra/chandra_notify.h"
 
 MODULE = Chandra    PACKAGE = Chandra
 
@@ -28,6 +31,7 @@ INCLUDE: xs/element.xs
 INCLUDE: xs/dialog.xs
 INCLUDE: xs/devtools.xs
 INCLUDE: xs/hotreload.xs
+INCLUDE: xs/notify.xs
 
 INCLUDE: xs/protocol.xs
 

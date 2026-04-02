@@ -92,6 +92,8 @@ async sub login_user ($self, $mail, $password) {
             status              => $login->{status},
             users_workflow_fkey => $login->{users_workflow_fkey},
             users_users_pkey    => $login->{users_users_pkey},
+            avatar              => $login->{avatar},
+            name                => $login->{name},
         };
     } elsif (defined $login and exists $login->{status}) {
         $result = {
@@ -125,6 +127,8 @@ async sub post_login($self, $login ) {
         users_workflow_fkey      => $login->{users_workflow_fkey},
         users_users_pkey         => $login->{data}->{users_users_pkey},
         companies_companies_pkey => $login->{data}->{companies_companies_pkey},
+        avatar                   => $login->{data}->{avatar},
+        name                     => $login->{data}->{name},
     };
 
     return $result;

@@ -16,7 +16,7 @@
 # -----------------------------------------------------------------------------
 
 metadata:
-  version:       "0.01"
+  version:       "0.03"
   author:        "Manuel Rueda <manuel.rueda@cnag.eu>"
   center:        "CNAG"
   date:          "2025-07-10"

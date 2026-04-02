@@ -21,20 +21,30 @@ Makefile.PL
 MANIFEST			This list of files
 mkdocs.yml
 non-containerized/README.md
-share/clarid-codebook-0.02.yaml
-share/clarid-codebook-schema-0.02.json
 share/clarid-codebook-schema.json
 share/clarid-codebook.yaml
 share/icd10.json
 share/icd10_order.json
+share/README
+share/README_ICD10.md
+share/versions/0.02/clarid-codebook-schema.json
+share/versions/0.02/clarid-codebook.yaml
+share/versions/0.03/clarid-codebook-schema.json
+share/versions/0.03/clarid-codebook.yaml
 t/bulk.t
 t/code.t
 t/data/bad_codebook.yaml
 t/data/biosample_conds.csv
 t/data/biosample_conds_to_decode.csv
 t/data/duplicate_codebook.yaml
+t/data/unsupported_codebook.yaml
 t/qrcode.t
 t/validate.t
+utils/csv/csv2_clarid_in.py
+utils/csv/gdc_biosample_mapping.yaml
+utils/csv/gdc_subject_mapping.yaml
+utils/csv/README.md
+utils/csv/test_parse_data_unittest.py
 VERSION
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

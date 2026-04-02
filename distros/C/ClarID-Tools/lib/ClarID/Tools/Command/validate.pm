@@ -10,10 +10,10 @@ use MooX::Options
   auto_help => 1,
   usage     => 'pod',
   version   => $ClarID::Tools::VERSION;
-use YAML::XS        qw(LoadFile);
 use JSON::XS   qw(decode_json);
 use Path::Tiny      qw(path);
 use ClarID::Tools::Validator;
+use ClarID::Tools::Util qw(load_yaml_file);
 # Tell App::Cmd this is a command
 use App::Cmd::Setup -command;
 use namespace::autoclean;
@@ -48,7 +48,7 @@ sub abstract { "validate a codebook against its JSON schema" }
 sub execute {
     my ($self, $opts, @args) = @_;
 
-    my $cb_data    = LoadFile( $self->codebook );
+    my $cb_data    = load_yaml_file( $self->codebook );
     my $schema_txt = path( $self->schema )->slurp_utf8;
     my $schema     = decode_json( $schema_txt );
 

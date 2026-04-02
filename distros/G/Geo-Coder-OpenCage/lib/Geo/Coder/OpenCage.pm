@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoding API
-$Geo::Coder::OpenCage::VERSION = '0.38';
+$Geo::Coder::OpenCage::VERSION = '0.39';
 use strict;
 use warnings;
 
@@ -152,7 +152,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 
@@ -183,7 +183,7 @@ It is recommended you read the L<best practices for using the OpenCage geocoder|
 =head1 DEVELOPING WITH AI
 
 Please note there is an
-L<AI SKILL.md for working with the OpenCage Geocoding API|https://github.com/OpenCageData/opencage-skills/blob/master/opencage-geocoding-api/SKILL.md>
+L<Agent Skill for working with the OpenCage Geocoding API|https://github.com/OpenCageData/opencage-skills/>
 which includes a reference file for developing in Perl using this module.
 
 =head1 METHODS

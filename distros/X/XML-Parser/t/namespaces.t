@@ -1,13 +1,13 @@
-BEGIN { print "1..16\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 15;
+
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
 
 ################################################################
 # Check namespaces
 
-$docstring = <<'End_of_doc;';
+my $docstring = <<'End_of_doc;';
 <foo xmlns="urn:blazing-saddles"
      xmlns:bar="urn:young-frankenstein"
      bar:alpha="17">
@@ -26,6 +26,7 @@ $docstring = <<'End_of_doc;';
 End_of_doc;
 
 my $gname;
+my @results;
 
 sub init {
     my $xp = shift;
@@ -37,47 +38,33 @@ sub start {
     my $el = shift;
 
     if ( $el eq 'foo' ) {
-        print "not " unless $xp->namespace($el) eq 'urn:blazing-saddles';
-        print "ok 2\n";
-
-        print "not " unless $xp->new_ns_prefixes == 2;
-        print "ok 3\n";
+        push @results, [ 'foo_ns',      $xp->namespace($el) eq 'urn:blazing-saddles' ];
+        push @results, [ 'foo_new_pfx', $xp->new_ns_prefixes == 2 ];
 
         while (@_) {
             my $att = shift;
             my $val = shift;
             if ( $att eq 'alpha' ) {
-                print "not " unless $xp->eq_name( $gname, $att );
-                print "ok 4\n";
+                push @results, [ 'foo_eq_name', $xp->eq_name( $gname, $att ) ];
                 last;
             }
         }
     }
     elsif ( $el eq 'zebra' ) {
-        print "not " unless $xp->new_ns_prefixes == 0;
-        print "ok 5\n";
-
-        print "not " unless $xp->namespace($el) eq 'urn:blazing-saddles';
-        print "ok 6\n";
+        push @results, [ 'zebra_new_pfx', $xp->new_ns_prefixes == 0 ];
+        push @results, [ 'zebra_ns',      $xp->namespace($el) eq 'urn:blazing-saddles' ];
     }
     elsif ( $el eq 'tango' ) {
-        print "not " if $xp->namespace( $_[0] );
-        print "ok 8\n";
-
-        print "not " unless $_[0] eq $_[2];
-        print "ok 9\n";
-
-        print "not " if $xp->eq_name( $_[0], $_[2] );
-        print "ok 10\n";
+        push @results, [ 'tango_no_ns',       !$xp->namespace( $_[0] ) ];
+        push @results, [ 'tango_beta_same',   $_[0] eq $_[2] ];
+        push @results, [ 'tango_beta_neq',    !$xp->eq_name( $_[0], $_[2] ) ];
 
         my $cnt = 0;
         foreach ( $xp->new_ns_prefixes ) {
             $cnt++ if $_ eq '#default';
             $cnt++ if $_ eq 'zoo';
         }
-
-        print "not " unless $cnt == 2;
-        print "ok 11\n";
+        push @results, [ 'tango_new_pfx', $cnt == 2 ];
     }
 }
 
@@ -86,13 +73,11 @@ sub end {
     my $el = shift;
 
     if ( $el eq 'zebra' ) {
-        print "not "
-          unless $xp->expand_ns_prefix('#default') eq 'urn:blazing-saddles';
-        print "ok 7\n";
+        push @results,
+          [ 'zebra_expand', $xp->expand_ns_prefix('#default') eq 'urn:blazing-saddles' ];
     }
     elsif ( $el eq 'everywhere' ) {
-        print "not " unless $xp->namespace($el) eq 'urn:blazing-saddles';
-        print "ok 16\n";
+        push @results, [ 'everywhere_ns', $xp->namespace($el) eq 'urn:blazing-saddles' ];
     }
 }
 
@@ -101,29 +86,22 @@ sub proc {
     my $target = shift;
 
     if ( $target eq 'nscheck' ) {
-        print "not " if $xp->new_ns_prefixes > 0;
-        print "ok 12\n";
+        push @results, [ 'nscheck_no_new', $xp->new_ns_prefixes == 0 ];
 
         my $cnt = 0;
         foreach ( $xp->current_ns_prefixes ) {
             $cnt++ if $_ eq 'zoo';
             $cnt++ if $_ eq 'bar';
         }
-
-        print "not " unless $cnt == 2;
-        print "ok 13\n";
-
-        print "not "
-          unless $xp->expand_ns_prefix('bar') eq 'urn:young-frankenstein';
-        print "ok 14\n";
-
-        print "not "
-          unless $xp->expand_ns_prefix('zoo') eq 'urn:high-anxiety';
-        print "ok 15\n";
+        push @results, [ 'nscheck_cur_pfx', $cnt == 2 ];
+        push @results,
+          [ 'nscheck_bar', $xp->expand_ns_prefix('bar') eq 'urn:young-frankenstein' ];
+        push @results,
+          [ 'nscheck_zoo', $xp->expand_ns_prefix('zoo') eq 'urn:high-anxiety' ];
     }
 }
 
-my $parser = new XML::Parser(
+my $parser = XML::Parser->new(
     ErrorContext => 2,
     Namespaces   => 1,
     Handlers     => {
@@ -135,3 +113,20 @@ my $parser = new XML::Parser(
 );
 
 $parser->parse($docstring);
+
+# Now verify all results collected during parsing
+ok( $results[0][1],  'foo element in urn:blazing-saddles namespace' );
+ok( $results[1][1],  'foo element introduces 2 new namespace prefixes' );
+ok( $results[2][1],  'generated ns name matches alpha attribute' );
+ok( $results[3][1],  'zebra introduces no new namespace prefixes' );
+ok( $results[4][1],  'zebra inherits urn:blazing-saddles namespace' );
+ok( $results[5][1],  'tango beta attribute has no namespace' );
+ok( $results[6][1],  'tango beta and zoo:beta have same local name' );
+ok( $results[7][1],  'tango beta and zoo:beta are not namespace-equal' );
+ok( $results[8][1],  'tango introduces 2 new prefixes (#default, zoo)' );
+ok( $results[9][1],  'expand #default after zebra gives urn:blazing-saddles' );
+ok( $results[10][1], 'no new namespace prefixes at nscheck PI' );
+ok( $results[11][1], 'current prefixes include zoo and bar' );
+ok( $results[12][1], 'bar expands to urn:young-frankenstein' );
+ok( $results[13][1], 'zoo expands to urn:high-anxiety' );
+ok( $results[14][1], 'everywhere element in urn:blazing-saddles namespace' );

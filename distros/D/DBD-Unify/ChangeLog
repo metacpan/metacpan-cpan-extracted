@@ -1,3 +1,7 @@
+0.96    - 01 Apr 2026, H.Merijn Brand
+    * gcc-15 and prototypes
+    * tested with perl-5.42.2-qm on Unify DataServer 9.1 on openSUSE Tumbleweed
+
 0.95    - 25 Jan 2026, H.Merijn Brand
     * It's 2026
     * Update to Devel-PPPort-3.73

@@ -81,24 +81,42 @@ CODE:
     RETVAL = sv_bless(newRV_noinc((SV *)self_hv),
         gv_stashpv(class, GV_ADD));
 
-    /* Generate token */
+    /* Generate token (inline, avoids call_pv overhead) */
     {
-        dSP;
-        int count;
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        PUTBACK;
-        count = call_pv("Chandra::Socket::Hub::_xs_generate_token",
-            G_SCALAR);
-        SPAGAIN;
-        if (count > 0) {
-            SV *token_sv = POPs;
-            (void)hv_stores(self_hv, "_token", newSVsv(token_sv));
+        unsigned char bytes[16];
+        int fd;
+        char hex[33];
+        SV *token_sv;
+
+        fd = open("/dev/urandom", O_RDONLY);
+        if (fd >= 0) {
+            ssize_t n = read(fd, bytes, 16);
+            close(fd);
+            if (n == 16) {
+                int i;
+                for (i = 0; i < 16; i++)
+                    sprintf(hex + i * 2, "%02x", bytes[i]);
+                hex[32] = '\0';
+                token_sv = newSVpvn(hex, 32);
+            } else {
+                /* Fallback: Perl random */
+                int i;
+                for (i = 0; i < 4; i++)
+                    sprintf(hex + i * 8, "%08x",
+                        (unsigned int)(Drand01() * (double)0xFFFFFFFF));
+                hex[32] = '\0';
+                token_sv = newSVpvn(hex, 32);
+            }
+        } else {
+            /* Fallback: Perl random */
+            int i;
+            for (i = 0; i < 4; i++)
+                sprintf(hex + i * 8, "%08x",
+                    (unsigned int)(Drand01() * (double)0xFFFFFFFF));
+            hex[32] = '\0';
+            token_sv = newSVpvn(hex, 32);
         }
-        PUTBACK;
-        FREETMPS;
-        LEAVE;
+        (void)hv_stores(self_hv, "_token", token_sv);
     }
 
     /* Create IO::Select and store it */

@@ -7,7 +7,7 @@ use Chandra;
 use Chandra::Bridge;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 # All methods now in XS via Chandra's XSLoader (xs/app.xs)
 

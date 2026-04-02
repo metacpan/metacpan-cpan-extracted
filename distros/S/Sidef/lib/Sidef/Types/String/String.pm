@@ -1460,6 +1460,12 @@ package Sidef::Types::String::String {
         bless \$output;
     }
 
+    sub from_json {
+        my ($self) = @_;
+        state $x = require JSON;
+        Sidef::Types::Perl::Perl->to_sidef(scalar JSON::from_json($$self));
+    }
+
     sub _require {
         my ($self) = @_;
 
@@ -1497,6 +1503,95 @@ package Sidef::Types::String::String {
     sub unescape {
         my ($self) = @_;
         $self->new($$self =~ s{\\(.)}{$1}grs);
+    }
+
+    sub _bwt_sort {
+        my ($s, $LOOKAHEAD_LEN) = @_;    # O(n * LOOKAHEAD_LEN) space (fast)
+
+        $LOOKAHEAD_LEN //= 128;
+
+        my $len      = CORE::length($s);
+        my $double_s = $s . $s;            # Pre-compute doubled string
+
+        # Schwartzian transform with optimized sorting
+        return [
+            map { $_->[1] }
+            sort {
+                ($a->[0] cmp $b->[0])
+                  || do {
+                    my ($cmp, $s_len) = (0, $LOOKAHEAD_LEN << 2);
+                    while (1) {
+                        ($cmp = CORE::substr($double_s, $a->[1], $s_len) cmp CORE::substr($double_s, $b->[1], $s_len)) && last;
+                        $s_len <<= 1;
+                    }
+                    $cmp;
+                }
+            }
+            map {
+                my $pos = $_;
+                my $end = $pos + $LOOKAHEAD_LEN;
+
+                # Handle wraparound efficiently
+                my $t =
+                  ($end <= $len)
+                  ? CORE::substr($s,        $pos, $LOOKAHEAD_LEN)
+                  : CORE::substr($double_s, $pos, $LOOKAHEAD_LEN);
+
+                [$t, $pos]
+              } 0 .. $len - 1
+        ];
+    }
+
+    sub bwt_encode {
+        my ($s) = @_;
+
+        $s = $$s;
+
+        my $bwt = _bwt_sort($s);
+
+        my $ret = '';
+        my $idx = 0;
+
+        my $i = 0;
+        foreach my $pos (@$bwt) {
+            $ret .= CORE::substr($s, $pos - 1, 1);
+            $idx = $i if !$pos;
+            ++$i;
+        }
+
+        return ((bless \$ret), Sidef::Types::Number::Number::_set_int($idx));
+    }
+
+    sub bwt_decode {
+        my ($bwt, $idx) = @_;
+
+        $bwt = $$bwt;
+        $idx = CORE::int($idx);
+
+        my @L = CORE::unpack('C*', $bwt);
+        my $n = scalar @L;
+
+        my @freq = (0) x 256;
+        $freq[$_]++ for @L;
+
+        my @cumul = (0) x 257;
+        $cumul[$_ + 1] = $cumul[$_] + $freq[$_] for 0 .. 255;
+
+        my @next;
+        my @cnt = (0) x 256;
+        for my $i (0 .. $n - 1) {
+            $next[$cumul[$L[$i]] + $cnt[$L[$i]]++] = $i;
+        }
+
+        my @dec;
+        my $i = $idx;
+        for (1 .. $n) {
+            $i = $next[$i];
+            CORE::push(@dec, $L[$i]);
+        }
+
+        my $str = CORE::pack('C*', @dec);
+        bless \$str;
     }
 
     sub apply_escapes {

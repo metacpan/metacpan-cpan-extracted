@@ -692,17 +692,6 @@ defaulthandle(void *userData, const char *string, int len)
 {
   dSP;
   CallbackVector* cbv = (CallbackVector*) userData;
-  SV *handler;
-
-  /* If a Char handler is registered and this is character data (not markup),
-     forward to the Char handler instead of Default. Libexpat sends character
-     data outside the root element to the default handler, but users expect
-     the Char handler to be called (rt.cpan.org #46685). */
-  if (SvTRUE(cbv->char_sv) && len > 0
-      && string[0] != '<' && string[0] != '&')
-    handler = cbv->char_sv;
-  else
-    handler = cbv->dflt_sv;
 
   ENTER;
   SAVETMPS;
@@ -712,7 +701,7 @@ defaulthandle(void *userData, const char *string, int len)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpvn((char*)string, len)));
   PUTBACK;
-  perl_call_sv(handler, G_DISCARD|G_VOID);
+  perl_call_sv(cbv->dflt_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -877,7 +866,7 @@ xmlDecl(void *userData,
   PUSHs(encoding ? sv_2mortal(newUTF8SVpv((char *)encoding, 0))
 	: &PL_sv_undef);
   PUSHs(standalone == -1 ? &PL_sv_undef
-	: sv_2mortal(standalone ? newSVpvn("yes", 3) : newSVpvn("no", 2)));
+	: (standalone ? &PL_sv_yes : &PL_sv_no));
   PUTBACK;
   perl_call_sv(cbv->xmldec_sv, G_DISCARD|G_VOID);
   FREETMPS;
@@ -2059,14 +2048,28 @@ XML_ExpatVersion()
 void
 XML_ExpatVersionInfo()
     PPCODE:
-	XML_Expat_Version info = XML_ExpatVersionInfo();
+	const char *ver = (const char *)XML_ExpatVersion();
+	/* Parse "expat_X.Y.Z" to extract runtime version components.
+	   Avoids XML_ExpatVersionInfo() struct return which is broken
+	   under -fpcc-struct-return ABI mismatch. */
+	int major = 0, minor = 0, micro = 0;
+	const char *p = ver;
+	while (*p && *p != '_') p++;
+	if (*p == '_') p++;
+	major = atoi(p);
+	while (*p && *p != '.') p++;
+	if (*p == '.') p++;
+	minor = atoi(p);
+	while (*p && *p != '.') p++;
+	if (*p == '.') p++;
+	micro = atoi(p);
 	EXTEND(SP, 6);
 	PUSHs(sv_2mortal(newSVpv("major", 5)));
-	PUSHs(sv_2mortal(newSViv(info.major)));
+	PUSHs(sv_2mortal(newSViv(major)));
 	PUSHs(sv_2mortal(newSVpv("minor", 5)));
-	PUSHs(sv_2mortal(newSViv(info.minor)));
+	PUSHs(sv_2mortal(newSViv(minor)));
 	PUSHs(sv_2mortal(newSVpv("micro", 5)));
-	PUSHs(sv_2mortal(newSViv(info.micro)));
+	PUSHs(sv_2mortal(newSViv(micro)));
 
 SV *
 XML_LoadEncoding(data, size)

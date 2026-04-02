@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002013';
+our $VERSION = '0.002014';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -1271,7 +1271,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002013
+This document describes Dios version 0.002014
 
 
 =head1 SYNOPSIS

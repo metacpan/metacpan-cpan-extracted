@@ -19,20 +19,12 @@ requires "overload" => "0";
 requires "parent" => "0";
 requires "perl" => "5.012000";
 suggests "Atomic::Pipe" => "0.022";
-suggests "DBD::MariaDB" => "1.00";
-suggests "DBD::Pg" => "v3.5.0";
-suggests "DBD::SQLite" => "1.44";
-suggests "DBD::mysql" => "4.00";
-suggests "DBI" => "1.644";
-suggests "DBIx::QuickDB" => "0.000038";
 suggests "IO::Select" => "1.55";
-suggests "IO::Socket::UNIX" => "1.55";
 suggests "Linux::Inotify2" => "2.3";
 
 on 'test' => sub {
   requires "Test2::API" => "1.302219";
   requires "Test2::Require::Module" => "1.302219";
-  requires "Test2::Tools::QuickDB" => "0.000038";
   requires "Test2::V1" => "1.302219";
 };
 
@@ -42,13 +34,7 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Atomic::Pipe" => "0.022";
-  requires "DBD::MariaDB" => "1.00";
-  requires "DBD::Pg" => "v3.5.0";
-  requires "DBD::SQLite" => "1.44";
-  requires "DBD::mysql" => "4.00";
-  requires "DBI" => "1.644";
-  requires "DBIx::QuickDB" => "0.000038";
   requires "IO::Select" => "1.55";
-  requires "IO::Socket::UNIX" => "1.55";
+  requires "Linux::Inotify2" => "2.3";
   requires "Test::Pod" => "1.41";
 };

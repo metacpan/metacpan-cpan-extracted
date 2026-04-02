@@ -1,0 +1,8 @@
+0.002000   2026-04-01
+
+  - Add save_privkey() and save_pubkey() methods to Net::Nostr::Key
+  - Improved documentation
+
+0.001000   2026-04-01
+
+  - First release

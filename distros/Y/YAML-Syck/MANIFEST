@@ -37,10 +37,15 @@ t/bug/doesnt-stringify.t
 t/bug/rt-41141.t
 t/bug/rt-49404-double_free.t
 t/bug/rt-54167.t
+t/croak-leak.t
 t/gh-132-base60-safety.t
 t/gh-25-inline-array-no-space.t
 t/gh-26-implicit-type-roundtrip.t
 t/gh-28-wide-char-dumpfile.t
+t/gh-dumpcode-prototype.t
+t/gh-load-list-context.t
+t/gh-negative-base60.t
+t/gh-negative-hex-oct.t
 t/json-basic.t
 t/json-circular-ref.t
 t/json-crlf.t
@@ -54,6 +59,7 @@ t/json-minus.t
 t/json-newline.t
 t/json-null.t
 t/json-numbers.t
+t/json-postprocess.t
 t/json-refs.t
 t/json-singlequote.t
 t/leak.t
@@ -74,9 +80,11 @@ t/yaml-equals-scalar.t
 t/yaml-implicit-typing.t
 t/yaml-implicit-warnings.t
 t/yaml-magic-vars.t
+t/yaml-max-depth.t
 t/yaml-merge-key.t
 t/yaml-multi-document.t
 t/yaml-nested-flow.t
+t/yaml-perl-scalar-leak.t
 t/yaml-roundtrip.t
 t/yaml-str-colon-first.t
 t/yaml-tie.t

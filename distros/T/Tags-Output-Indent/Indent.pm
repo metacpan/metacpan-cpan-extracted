@@ -6,7 +6,7 @@ use warnings;
 
 use Error::Pure qw(err);
 use Indent;
-use Indent::Word;
+use Indent::Word 0.10;
 use Indent::Block;
 use List::Util qw(none);
 use Readonly;
@@ -19,7 +19,7 @@ Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Finalize Tags output.
 sub finalize {
@@ -562,10 +562,10 @@ __END__
  use Tags::Output::Indent(%params);
 
  my $tags = Tags::Output::Indent->new;
- $tags->put(['b', 'tag']);
- my @open_tags = $tags->open_tags;
  $tags->finalize;
  $tags->flush;
+ my @open_elements = $tags->open_elements;
+ $tags->put(['b', 'tag']);
  $tags->reset;
 
 =head1 METHODS
@@ -754,17 +754,19 @@ If defined 'output_handler' flush to its.
 Or return code.
 If enabled $reset_flag, then resets internal variables via reset method.
 
-=head2 C<open_tags>
+=head2 C<open_elements>
 
- my @open_tags = $tags->open_tags;
+ my @open_elements = $tags->open_elements;
 
-Return array of opened tags.
+Get list of opened elements.
+
+Return array of strings.
 
 =head2 C<put>
 
  $tags->put(['b', 'tag']);
 
-Put tags code in tags format.
+Put L<Tags> structure to object.
 
 =head2 C<reset>
 
@@ -896,6 +898,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

@@ -1,14 +1,14 @@
 ---
 abstract: 'The Sidef Programming Language - A modern, high-level programming language'
 author:
-  - 'Daniel Șuteu <trizen@cpan.org>'
-  - 'Ioana Fălcușan <ioanaflavia@gmail.com>'
+  - 'Daniel Șuteu'
+  - 'Ioana Fălcușan'
 build_requires:
   Test::More: '1.0'
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150012'
 keywords:
   - sidef
   - 'programming language'
@@ -32,7 +32,7 @@ no_index:
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '26.01'
+    version: '26.04'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -147,8 +147,13 @@ recommends:
   Digest::MD5: '2.0'
   Digest::SHA: '5.0'
   File::Find: '0'
+  HTTP::Tiny: '0'
+  IO::Compress::Gzip: '0'
+  IO::Compress::RawDeflate: '0'
+  JSON: '0'
+  JSON::PP: '0'
   MIME::Base64: '3.00'
-  Math::Prime::Util: '0.73'
+  Math::Prime::Util: '0.74'
   Term::ReadLine::Gnu: '1.36'
   Text::Balanced: '2.00'
   Text::ParseWords: '3.00'
@@ -171,7 +176,7 @@ requires:
   Math::GMPz: '0.48'
   Math::MPC: '1.09'
   Math::MPFR: '3.36'
-  Math::Prime::Util::GMP: '0.52'
+  Math::Prime::Util::GMP: '0.53'
   Memoize: '0'
   Scalar::Util: '1.45'
   Socket: '0'
@@ -188,9 +193,9 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef.git
-version: '26.01'
+version: '26.04'
 x_authority: cpan:TRIZEN
 x_contributors:
-  - 'Daniel Șuteu <trizen@cpan.org>'
-  - 'Ioana Fălcușan <ioanaflavia@gmail.com>'
+  - 'Daniel Șuteu'
+  - 'Ioana Fălcușan'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

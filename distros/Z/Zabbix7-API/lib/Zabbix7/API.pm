@@ -15,7 +15,7 @@ use JSON;
 use LWP::UserAgent;
 use Log::Any;
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 has 'server' => (is => 'ro', required => 1);
 has 'ua' => (is => 'ro', lazy => 1, builder => '_build_ua');

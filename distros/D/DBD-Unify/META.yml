@@ -1,46 +1,46 @@
---- 
+---
 abstract: DBI driver for Unify database systems
-author: 
+author:
   - H.Merijn Brand <hmbrand@cpan.org>
-build_requires: 
+build_requires:
   Config: 0
   File::Copy: 0
   File::Find: 0
-configure_requires: 
+configure_requires:
   Config: 0
   Cwd: 0
   DBI::DBD: 0
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150011
+generated_by: Author, CPAN::Meta::Converter version 2.150013
 license: perl
-meta-spec: 
+meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBD-Unify
-provides: 
-  DBD::Unify: 
+provides:
+  DBD::Unify:
     file: lib/DBD/Unify.pm
-    version: '0.95'
-  DBD::Unify::GetInfo: 
+    version: '0.96'
+  DBD::Unify::GetInfo:
     file: lib/DBD/Unify/GetInfo.pm
-    version: '0.95'
-  DBD::Unify::TypeInfo: 
+    version: '0.96'
+  DBD::Unify::TypeInfo:
     file: lib/DBD/Unify/TypeInfo.pm
-    version: '0.95'
-recommends: 
+    version: '0.96'
+recommends:
   DBI: '1.647'
   Test::More: '1.302219'
   perl: '5.018002'
-requires: 
+requires:
   Carp: 0
   DBI: '1.42'
   DynaLoader: 0
   Test::Harness: 0
   Test::More: '0.90'
   perl: '5.008006'
-resources: 
+resources:
   bugtracker: https://github.com/perl5-dbi/DBD-Unify/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-Unify
-version: '0.95'
+version: '0.96'

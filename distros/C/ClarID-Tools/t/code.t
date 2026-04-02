@@ -2,12 +2,40 @@
 use strict;
 use warnings;
 use File::Spec::Functions qw(catfile catdir);
-use Test::More tests => 27;
+use File::Temp qw(tempfile);
+use Test::More;
+use YAML::XS qw(LoadFile DumpFile);
 
 my $codebook = catfile('share','clarid-codebook.yaml');
 my $exe     = catfile('bin', 'clarid-tools');
 my $inc    = join ' -I', '', @INC;    # prepend -I to each path in @INC
 my $logfile  = catfile('t','tmp_logfile');
+
+sub _base62_fixed {
+    my ( $num, $width ) = @_;
+    my @alphabet = ( '0' .. '9', 'A' .. 'Z', 'a' .. 'z' );
+    return '0' x $width if $num == 0;
+    my $out = '';
+    while ( $num > 0 ) {
+        $out = $alphabet[ $num % 62 ] . $out;
+        $num = int( $num / 62 );
+    }
+    return substr( ( '0' x $width ) . $out, -$width );
+}
+
+sub _temp_codebook {
+    my ($mutator) = @_;
+    my $doc = LoadFile($codebook);
+    $mutator->($doc);
+    my ( $fh, $path ) = tempfile(
+        'clarid-codebook-XXXX',
+        SUFFIX => '.yaml',
+        DIR    => 't',
+        UNLINK => 1,
+    );
+    DumpFile( $path, $doc );
+    return $path;
+}
 
 
 # 1. Biosample human encode (default codebook path)
@@ -481,5 +509,92 @@ EOF
 unlink $logfile;
 }
 
-done_testing();
+# 28. Biosample stub encode/decode with 3-char species stubs inferred from codebook
+{
+    my $cb3 = _temp_codebook(
+        sub {
+            my ($doc) = @_;
+            my $species = $doc->{entities}{biosample}{species};
+            my $i       = 0;
+            for my $key ( sort keys %{$species} ) {
+                $species->{$key}{stub_code} = _base62_fixed( $i++, 3 );
+            }
+        }
+    );
 
+    my $encode_cmd =
+"$^X $inc $exe code --project TCGA-AML --entity biosample --format stub --action encode --codebook $cb3 "
+      . "--species Human --subject_id 1 --tissue Liver --sample_type Tumor "
+      . "--assay RNA_seq --condition I25.110 --timepoint Challenge --duration P1M --batch 1 --replicate 5";
+    my $stub = `$encode_cmd`;
+    chomp $stub;
+    like( $stub, qr/^AML[0-9A-Za-z]{3}001/, 'biosample stub encode with 3-char species stubs' );
+
+    my $decode_cmd =
+"$^X $inc $exe code --entity biosample --format stub --action decode --codebook $cb3 "
+      . "--clar_id $stub --subject_id_base62_width 3";
+    my $out = `$decode_cmd`;
+    chomp $out;
+    my @lines = split /\n/, $out;
+    is_deeply(
+        \@lines,
+        [
+            'project: TCGA-AML',
+            'species: Human',
+            'subject_id: 1',
+            'tissue: Liver',
+            'sample_type: Tumor',
+            'assay: RNA_seq',
+            'condition: I25.110',
+            'timepoint: Challenge',
+            'duration: P1M',
+            'batch: 1',
+            'replicate: 5',
+        ],
+        'biosample stub decode with 3-char species stubs'
+    );
+}
+
+# 29. Mixed species stub widths in the codebook are rejected
+{
+    my $bad_cb = _temp_codebook(
+        sub {
+            my ($doc) = @_;
+            $doc->{entities}{biosample}{species}{Human}{stub_code} = '001';
+            $doc->{entities}{biosample}{species}{Mouse}{stub_code} = '01';
+        }
+    );
+
+    my $cmd =
+"$^X $inc $exe code --entity biosample --format stub --action decode --codebook $bad_cb "
+      . "--clar_id AML001001LTR2to01C1MB01R05 --subject_id_base62_width 3 2>&1";
+    my $out = `$cmd`;
+    like(
+        $out,
+        qr/Species stub_code values must all have the same length/,
+        'mixed species stub widths are rejected'
+    );
+}
+
+# 30. Unsupported codebook version is rejected
+{
+    my $bad_cb = _temp_codebook(
+        sub {
+            my ($doc) = @_;
+            $doc->{metadata}{version} = '0.04';
+        }
+    );
+
+    my $cmd =
+      "$^X $inc $exe code --entity biosample --format human --action encode --codebook $bad_cb "
+      . "--project TCGA-AML --species Human --subject_id 1 --tissue Liver --sample_type Tumor "
+      . "--assay RNA_seq --condition I25.110 --timepoint Baseline --duration P0D --batch 1 --replicate 5 2>&1";
+    my $out = `$cmd`;
+    like(
+        $out,
+        qr/Unsupported codebook version '0\.04'.*supports: 0\.02, 0\.03/,
+        'unsupported codebook version is rejected in code mode'
+    );
+}
+
+done_testing();

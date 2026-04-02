@@ -14,7 +14,7 @@ use warnings;
 # - Connection: keep-alive/close header
 # - Response format (HTTP/1.1 200 OK\r\nHeader: Value\r\n\r\nBody)
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Protocol identifier - used for version negotiation
 sub protocol_id { 'HTTP/1.1' }

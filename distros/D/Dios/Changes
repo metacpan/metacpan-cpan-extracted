@@ -218,3 +218,10 @@ Revision history for Dios
         * Removed vestigal use of ~~
           which no longer works in Perl 5.41+
           (Thanks, James)
+
+
+0.002014  Thu Apr  2 10:01:28 2026
+
+        * Updated CLASS type test to handle optimized (non-typeglob) elements in stashes,
+          which may be encountered under recent perls.
+          (Many thanks, Leon!)

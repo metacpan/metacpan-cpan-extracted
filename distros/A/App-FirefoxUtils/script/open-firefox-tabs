@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-26'; # DATE
+our $DATE = '2026-03-29'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxUtils/open_firefox_tabs",
@@ -38,7 +38,7 @@ open-firefox-tabs - Open a list of Firefox tabs, with options
 
 =head1 VERSION
 
-This document describes version 0.024 of open-firefox-tabs (from Perl distribution App-FirefoxUtils), released on 2026-03-26.
+This document describes version 0.025 of open-firefox-tabs (from Perl distribution App-FirefoxUtils), released on 2026-03-29.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ B<open-firefox-tabs> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?"
 
 B<open-firefox-tabs> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<open-firefox-tabs> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--exclude-all-tags|/"--exclude-all-tags=s@">>=I<str>)+|B<L<--exclude-all-tags-json|/"--exclude-all-tags=s@">>=I<json>] [(B<L<--exclude-any-tags|/"--exclude-any-tags=s@">>=I<str>)+|B<L<--exclude-any-tags-json|/"--exclude-any-tags=s@">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [(B<L<--include-all-tags|/"--include-all-tags=s@">>=I<str>)+|B<L<--include-all-tags-json|/"--include-all-tags=s@">>=I<json>] [(B<L<--include-any-tags|/"--include-any-tags=s@">>=I<str>)+|B<L<--include-any-tags-json|/"--include-any-tags=s@">>=I<json>] [B<L<--items|/"--items=s*">>=I<hash>|B<L<--items-json|/"--items=s*">>=I<json>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--new-window|/"--new-window, -w">>|B<L<-w|/"--new-window, -w">>|B<L<--no-new-window|/"--new-window, -w">>|B<L<--nonew-window|/"--new-window, -w">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--shuffle|/"--shuffle">>|B<L<--no-shuffle|/"--shuffle">>|B<L<--noshuffle|/"--shuffle">>] -- [I<L<query|/"--query=s@">>] ...
+B<open-firefox-tabs> [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--exclude-all-tags|/"--exclude-all-tags=s@">>=I<str>)+|B<L<--exclude-all-tags-json|/"--exclude-all-tags=s@">>=I<json>] [(B<L<--exclude-any-tags|/"--exclude-any-tags=s@">>=I<str>)+|B<L<--exclude-any-tags-json|/"--exclude-any-tags=s@">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [(B<L<--include-all-tags|/"--include-all-tags=s@">>=I<str>)+|B<L<--include-all-tags-json|/"--include-all-tags=s@">>=I<json>] [(B<L<--include-any-tags|/"--include-any-tags=s@">>=I<str>)+|B<L<--include-any-tags-json|/"--include-any-tags=s@">>=I<json>] [B<L<--items|/"--items=s*">>=I<hash>|B<L<--items-json|/"--items=s*">>=I<json>] [B<L<--kde-activity|/"--kde-activity=s">>=I<str>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--new-window|/"--new-window, -w">>|B<L<-w|/"--new-window, -w">>|B<L<--no-new-window|/"--new-window, -w">>|B<L<--nonew-window|/"--new-window, -w">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--shuffle|/"--shuffle">>|B<L<--no-shuffle|/"--shuffle">>|B<L<--noshuffle|/"--shuffle">>] -- [I<L<query|/"--query=s@">>] ...
 
 =head1 DESCRIPTION
 
@@ -159,6 +159,10 @@ See C<--items>.
 
 (No description)
 
+
+=item B<--kde-activity>=I<s>
+
+Switch to the specified KDE activity.
 
 =item B<--new-window>, B<-w>
 
@@ -429,6 +433,7 @@ List of available configuration parameters:
  include_all_tags (see --include-all-tags)
  include_any_tags (see --include-any-tags)
  items (see --items)
+ kde_activity (see --kde-activity)
  log_level (see --log-level)
  naked_res (see --naked-res)
  new_window (see --new-window)

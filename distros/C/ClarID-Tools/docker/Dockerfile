@@ -14,10 +14,13 @@ RUN apt-get update && \
 
 # Download Convert-Pheno
 WORKDIR /usr/share/
-RUN git clone https://github.com/mrueda/clarid-tools.git
+RUN git clone https://github.com/CNAG-Biomedical-Informatics/clarid-tools.git
 
-# Remove the .git folder to save space and avoid shipping VCS data
-RUN rm -rf clarid-tools/.git
+# Remove Git metadata and CI configs to shrink image and avoid shipping them
+RUN rm -rf clarid-tools/.git clarid-tools/.github clarid-tools/.gitattributes clarid-tools/.gitignore
+
+# Remove docs
+RUN rm -rf clarid-tools/docs/ clarid-tools/mkdocs.yml
 
 # Install Perl modules
 WORKDIR /usr/share/clarid-tools
@@ -32,7 +35,3 @@ RUN groupadd -g "${GID}" dockeruser \
 
 # To change default user from root -> dockeruser
 #USER dockeruser
-
-# Get back to entry dir
-WORKDIR /usr/share/clarid-tools
-

@@ -18,7 +18,8 @@ assert_eq(binomialmod(1e10, 1e4, next_prime(2**64)**2), binomial(1e10, 1e4) % ne
 assert_eq(binomialmod(1e10, 1e4, prev_prime(2**64)), binomial(1e10, 1e4) % prev_prime(2**64))
 assert_eq(binomialmod(1e10, 1e4, next_prime(2**64)), binomial(1e10, 1e4) % next_prime(2**64))
 
-if (Number(Number.ULONG_MAX) > 2**32) {
+#if (Number(Number.ULONG_MAX) > 2**32) {
+if (true) {  # should pass on 32-bit as well
     assert_eq(binomialmod(1e10, 1e3, (2**127 + 1)), binomial(1e10, 1e3) % (2**127 + 1))
     assert_eq(binomialmod(1e10, 1e3, (2**127 - 1)), binomial(1e10, 1e3) % (2**127 - 1))
     assert_eq(binomialmod(1e10, 1e5, (2**127 - 1)), binomial(1e10, 1e5) % (2**127 - 1))
@@ -36,6 +37,8 @@ if (Number(Number.ULONG_MAX) > 2**32) {
     assert_eq(binomialmod(2**60 - 99, 1e5, prev_prime(1e9)), binomial(2**60 - 99, 1e5) % prev_prime(1e9))
     assert_eq(binomialmod(2**60 - 99, 1e5, next_prime(2**64)), binomial(2**60 - 99, 1e5) % next_prime(2**64))
 }
+
+assert_eq(binomialmod(8589935272,4294966820, 50**10), 55077260000000000)
 
 var upto = 10
 for n in (-upto .. upto), k in (-upto .. upto), m in (-upto .. upto) {
@@ -89,9 +92,9 @@ for n in (-upto .. upto), k in (-upto .. upto), m in (-upto .. upto) {
 assert_eq(binomialmod(2*4514260853041 - 1, 4514260853041 - 1, 4514260853041.isqrt), 1)
 assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649.isqrt), 1)
 
-#assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649), 1)                       # this takes 3.5s
-#assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649**2), 1)                    # this takes 7.5s
-#assert_eq(binomialmod(2*4514260853041 - 1, 4514260853041 - 1, 4514260853041), 1)       # FIXME: this takes a lot of time
+assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649), 1)
+assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649**2), 1)
+assert_eq(binomialmod(2*4514260853041 - 1, 4514260853041 - 1, 4514260853041), 1)
 
 assert_eq(binomialmod(2*16843 - 1, 16843-1, 16843**4), 1)
 assert_eq(binomialmod(2*2124679 - 1, 2124679-1, 2124679**2), 1)

@@ -3,11 +3,12 @@ use warnings;
 use Test::More tests => 1;
 
 # Test for deeply nested elements to exercise st_serial_stack reallocation.
-# This catches off-by-one errors in the stack growth check (GH #39).
+# The stack is initially allocated at 1024 entries and grows by 512.
+# Use depth > 1024 to actually trigger reallocation (GH #39, GH #215).
 
 use XML::Parser;
 
-my $depth = 600;
+my $depth = 2048;
 
 my $xml = '';
 for my $i ( 1 .. $depth ) {

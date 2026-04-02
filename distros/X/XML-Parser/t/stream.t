@@ -1,8 +1,8 @@
-BEGIN { print "1..3\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 3;
+
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
 
 my $delim   = '------------123453As23lkjlklz877';
 my $file    = 'samples/REC-xml-19980210.xml';
@@ -20,7 +20,7 @@ while (<$in_fh>) {
 close($in_fh);
 print $out_fh "$delim\n";
 
-open( $in_fh, $file );
+open( $in_fh, '<', $file ) or die "Couldn't reopen $file for input";
 while (<$in_fh>) {
     print $out_fh $_;
 }
@@ -28,26 +28,26 @@ while (<$in_fh>) {
 close($in_fh);
 close($out_fh);
 
-my $parser = new XML::Parser(
+my $parser = XML::Parser->new(
     Stream_Delimiter => $delim,
     Handlers         => {
         Comment => sub { $cnt++; }
     }
 );
 
-open( my $fh, $tmpfile );
+open( my $fh, '<', $tmpfile ) or die "Couldn't open $tmpfile for reading";
 
 $parser->parse($fh);
 
-print "not " if ( $cnt != 37 );
-print "ok 2\n";
+is( $cnt, 37, 'first parse of delimited stream finds 37 comments' );
 
 $cnt = 0;
 
 $parser->parse($fh);
 
-print "not " if ( $cnt != 37 );
-print "ok 3\n";
+is( $cnt, 37, 'second parse of delimited stream finds 37 comments' );
 
 close($fh);
 unlink($tmpfile);
+
+ok( !-f $tmpfile, 'temp file cleaned up' );

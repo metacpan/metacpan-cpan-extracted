@@ -97,7 +97,7 @@ it in the standard library directories. Install 'expat-devel' (or
 
 Or you can download expat from:
 
-http://sourceforge.net/projects/expat/
+https://github.com/libexpat/libexpat
 
 If expat is installed, but in a non-standard directory, then use the
 standard ExtUtils::MakeMaker options to Makefile.PL:

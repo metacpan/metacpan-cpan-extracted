@@ -1,3 +1,36 @@
+1.43 Apr 01 2026
+
+  [Bug Fixes]
+  - Fix: prevent resource leaks on croak/early-return paths in Dump
+    (PR #161)
+  - Fix: prevent output SV leaks on croak in Dump/DumpFile callers
+    (PR #163)
+  - Fix: Load() in list context returns empty list for empty/undef input;
+    also applies to LoadBytes and LoadUTF8 (GH #164, PR #165)
+  - Fix: DumpCode serializes prototype string instead of code body
+    (PR #168)
+  - Fix: memory leak in !perl/scalar Load — newRV_inc should be
+    newRV_noinc (PR #170)
+  - Fix: add pTHX_ to SAVEDESTRUCTOR_X callback for threaded Perl
+    (GH #175, PR #176)
+  - Fix: add TODO guard for eval_pv leak on Perl < 5.14
+    (GH #179, PR #180)
+  - Fix: negative hex and octal values parsed as 0 with ImplicitTyping
+    (PR #183)
+  - Fix: negative int#base60 values produce unsigned wraparound (PR #185)
+
+  [Improvements]
+  - Modernize META_MERGE for CPANTS compliance (PR #162)
+  - Fix hash table size handling and remove compile warnings in syck_st
+    (PR #174)
+
+  [Maintenance]
+  - Restore TODO guard for Dump code leak test on Perl < 5.26 (PR #167)
+  - Resolve 2010 TODO in perl_json_postprocess with test coverage
+    (PR #166)
+  - CI: upgrade actions to resolve Node.js 20 deprecation warnings
+    (PR #177)
+
 1.42 Mar 27 2026
 
   [Bug Fixes]

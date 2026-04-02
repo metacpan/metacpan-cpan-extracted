@@ -22,14 +22,8 @@
       "develop" : {
          "requires" : {
             "Atomic::Pipe" : "0.022",
-            "DBD::MariaDB" : "1.00",
-            "DBD::Pg" : "v3.5.0",
-            "DBD::SQLite" : "1.44",
-            "DBD::mysql" : "4.00",
-            "DBI" : "1.644",
-            "DBIx::QuickDB" : "0.000038",
             "IO::Select" : "1.55",
-            "IO::Socket::UNIX" : "1.55",
+            "Linux::Inotify2" : "2.3",
             "Test::Pod" : "1.41"
          }
       },
@@ -55,14 +49,7 @@
          },
          "suggests" : {
             "Atomic::Pipe" : "0.022",
-            "DBD::MariaDB" : "1.00",
-            "DBD::Pg" : "v3.5.0",
-            "DBD::SQLite" : "1.44",
-            "DBD::mysql" : "4.00",
-            "DBI" : "1.644",
-            "DBIx::QuickDB" : "0.000038",
             "IO::Select" : "1.55",
-            "IO::Socket::UNIX" : "1.55",
             "Linux::Inotify2" : "2.3"
          }
       },
@@ -70,7 +57,6 @@
          "requires" : {
             "Test2::API" : "1.302219",
             "Test2::Require::Module" : "1.302219",
-            "Test2::Tools::QuickDB" : "0.000038",
             "Test2::V1" : "1.302219"
          }
       }
@@ -85,7 +71,7 @@
          "url" : "https://github.com/exodist/IPC-Manager/"
       }
    },
-   "version" : "0.000009",
+   "version" : "0.000010",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

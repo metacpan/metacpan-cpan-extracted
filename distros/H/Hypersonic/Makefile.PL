@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 my $has_alien_openssl = eval { require Alien::OpenSSL; 1 };
 
 my %prereqs = (
-    'XS::JIT' => '0.13',
+    'XS::JIT' => '0.15',
     'Cpanel::JSON::XS' => '0',
 );
 

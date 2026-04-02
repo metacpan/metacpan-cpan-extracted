@@ -37,7 +37,7 @@ $^W=1;
 
 my %define;
 my @libs;
-my $Package_Version = '1.24';  # keep this consistent with Tty.pm
+my $Package_Version = MM->parse_version('Tty.pm');
 my $Is_Beta = ($Package_Version =~ m/_/);
 
 open(SUB, ">xssubs.c") or die "open: $!";
@@ -491,7 +491,7 @@ print "DEFINE = @{[sort keys %define]}\n";
 
 WriteMakefile1(
     'NAME'	     => 'IO::Tty',
-    'VERSION'        => $Package_Version,
+    'VERSION_FROM'   => 'Tty.pm',
     'DEFINE'	     => join(" ", sort keys %define),
     'LIBS'           => join(" ", @libs),
     'clean'	     => {'FILES' => 'xssubs.c conf Tty.exp_old log'},

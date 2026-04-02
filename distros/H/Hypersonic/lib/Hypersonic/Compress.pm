@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # JIT-compiled gzip compression for Hypersonic
 # All compression happens in C via zlib for maximum performance

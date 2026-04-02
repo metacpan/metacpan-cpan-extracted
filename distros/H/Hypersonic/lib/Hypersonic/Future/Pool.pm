@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use XS::JIT::Builder;
 use Hypersonic::Future qw(MAX_FUTURES);

@@ -195,33 +195,15 @@ CODE:
                 if (SvTRUE(ERRSV)) {
                     SvREFCNT_dec(call_result);
 
-                    /* Chandra::Error->capture($@, context => "call($method)", skip => 0) */
-                    SV *saved_err = sv_2mortal(newSVsv(ERRSV));
-                    SV *ctx_sv = sv_2mortal(newSVpvf("call(%s)", method));
-
-                    PUSHMARK(SP);
-                    XPUSHs(sv_2mortal(newSVpvs("Chandra::Error")));
-                    XPUSHs(saved_err);
-                    XPUSHs(sv_2mortal(newSVpvs("context")));
-                    XPUSHs(ctx_sv);
-                    XPUSHs(sv_2mortal(newSVpvs("skip")));
-                    XPUSHs(sv_2mortal(newSViv(0)));
-                    PUTBACK;
-
-                    int ec = call_method("capture", G_SCALAR);
-                    SPAGAIN;
-
-                    if (ec > 0) {
-                        SV *err_ref = POPs;
-                        if (SvROK(err_ref) && SvTYPE(SvRV(err_ref)) == SVt_PVHV) {
-                            HV *err_hv = (HV *)SvRV(err_ref);
-                            SV **msg_svp = hv_fetchs(err_hv, "message", 0);
-                            if (msg_svp && *msg_svp) {
-                                (void)hv_stores(ret, "error", SvREFCNT_inc(*msg_svp));
-                            }
-                        }
+                    /* Direct C call to chandra_error_capture */
+                    char ctx_buf[256];
+                    snprintf(ctx_buf, sizeof(ctx_buf), "call(%s)", method);
+                    HV *err_hv = chandra_error_capture(aTHX_ ERRSV, ctx_buf, 0);
+                    SV **msg_svp = hv_fetchs(err_hv, "message", 0);
+                    if (msg_svp && *msg_svp) {
+                        (void)hv_stores(ret, "error", SvREFCNT_inc(*msg_svp));
                     }
-                    PUTBACK;
+                    SvREFCNT_dec((SV *)err_hv);
                 }
                 else {
                     (void)hv_stores(ret, "result", call_result); /* already inc'd */
@@ -254,7 +236,7 @@ CODE:
                 RETVAL = newRV_noinc((SV *)ret);
             }
             else {
-                /* Create Event: Chandra::Event->new($event_data) */
+                /* Create Event using direct C function */
                 SV *event_data;
                 if (event_data_svp && *event_data_svp && SvOK(*event_data_svp)) {
                     event_data = *event_data_svp;
@@ -262,22 +244,7 @@ CODE:
                     event_data = sv_2mortal(newRV_noinc((SV *)newHV()));
                 }
 
-                SV *event_obj;
-                {
-                    ENTER;
-                    SAVETMPS;
-                    PUSHMARK(SP);
-                    XPUSHs(sv_2mortal(newSVpvs("Chandra::Event")));
-                    XPUSHs(event_data);
-                    PUTBACK;
-
-                    int ec = call_method("new", G_SCALAR);
-                    SPAGAIN;
-                    event_obj = (ec > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
-                    PUTBACK;
-                    FREETMPS;
-                    LEAVE;
-                }
+                SV *event_obj = chandra_event_new(aTHX_ event_data);
 
                 /* Get app from self */
                 HV *self_hv = (HV *)SvRV(self);
@@ -298,48 +265,22 @@ CODE:
                     PUTBACK;
 
                     if (SvTRUE(ERRSV)) {
-                        SV *saved_err = sv_2mortal(newSVsv(ERRSV));
-                        SV *ctx_sv = sv_2mortal(newSVpvf("event(%s)", handler_id));
+                        /* Direct C calls to error handling */
+                        char ctx_buf[256];
+                        snprintf(ctx_buf, sizeof(ctx_buf), "event(%s)", handler_id);
+                        HV *err_hv = chandra_error_capture(aTHX_ ERRSV, ctx_buf, 0);
 
-                        PUSHMARK(SP);
-                        XPUSHs(sv_2mortal(newSVpvs("Chandra::Error")));
-                        XPUSHs(saved_err);
-                        XPUSHs(sv_2mortal(newSVpvs("context")));
-                        XPUSHs(ctx_sv);
-                        XPUSHs(sv_2mortal(newSVpvs("skip")));
-                        XPUSHs(sv_2mortal(newSViv(0)));
-                        PUTBACK;
-
-                        int cc = call_method("capture", G_SCALAR);
-                        SPAGAIN;
+                        /* Format and warn */
+                        SV *fmt = chandra_error_format_text(aTHX_ err_hv);
+                        warn("%" SVf, SVfARG(fmt));
+                        SvREFCNT_dec(fmt);
 
                         HV *ret = newHV();
-                        if (cc > 0) {
-                            SV *err_ref = POPs;
-                            if (SvROK(err_ref) && SvTYPE(SvRV(err_ref)) == SVt_PVHV) {
-                                HV *err_hv = (HV *)SvRV(err_ref);
-
-                                /* warn Chandra::Error->format_text($err) */
-                                PUSHMARK(SP);
-                                XPUSHs(sv_2mortal(newSVpvs("Chandra::Error")));
-                                XPUSHs(err_ref);
-                                PUTBACK;
-
-                                int fc = call_method("format_text", G_SCALAR);
-                                SPAGAIN;
-                                if (fc > 0) {
-                                    SV *fmt = POPs;
-                                    warn("%" SVf, SVfARG(fmt));
-                                }
-                                PUTBACK;
-
-                                SV **msg_svp = hv_fetchs(err_hv, "message", 0);
-                                if (msg_svp && *msg_svp) {
-                                    (void)hv_stores(ret, "error", SvREFCNT_inc(*msg_svp));
-                                }
-                            }
+                        SV **msg_svp = hv_fetchs(err_hv, "message", 0);
+                        if (msg_svp && *msg_svp) {
+                            (void)hv_stores(ret, "error", SvREFCNT_inc(*msg_svp));
                         }
-                        PUTBACK;
+                        SvREFCNT_dec((SV *)err_hv);
 
                         SvREFCNT_dec(event_obj);
                         SvREFCNT_dec(decoded);

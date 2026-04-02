@@ -1910,7 +1910,7 @@ package Sidef::Types::Array::Array {
 
         my %hash;
         foreach my $item (@$self) {
-            $hash{$item}++;
+            ++$hash{$item};
         }
 
         foreach my $key (CORE::keys(%hash)) {
@@ -1918,6 +1918,151 @@ package Sidef::Types::Array::Array {
         }
 
         Sidef::Types::Hash::Hash->new(\%hash);
+    }
+
+    sub _huffman_from_code_lengths {
+        my ($code_lengths_table) = @_;
+
+        # This algorithm is based on the pseudocode in RFC 1951 (Section 3.2.2)
+        # (Steps are numbered as in the RFC)
+
+        my @code_lengths = map { [$_, $code_lengths_table->{$_}] } CORE::sort { $a <=> $b } CORE::keys %$code_lengths_table;
+
+        # Step 1: Count the number of codes for each length
+        my $max_length    = List::Util::max(map { $_->[1] } @code_lengths) // 0;
+        my @length_counts = (0) x ($max_length + 1);
+
+        foreach my $length (map { $_->[1] } @code_lengths) {
+
+            # Treat undef or negative lengths as 0 (unused)
+            if (defined($length) and $length > 0) {
+                ++$length_counts[$length];
+            }
+        }
+
+        # Step 2: Generate the starting numerical value for each length
+        my $code = 0;
+        $length_counts[0] = 0;
+        my @next_code = (0) x ($max_length + 1);
+
+        foreach my $bits (1 .. $max_length) {
+            $code = ($code + $length_counts[$bits - 1]) << 1;
+            $next_code[$bits] = $code;
+        }
+
+        # Step 3: Assign numerical values to all codes
+        my %dict;
+        foreach my $pair (@code_lengths) {
+            my ($key, $length) = @$pair;
+
+            # Skip zero-length codes (unused symbols)
+            if (defined($length) and $length != 0) {
+
+                # Format the integer code as a binary string with $length bits
+                my $binary_code = sprintf('%0*b', $length, $next_code[$length]);
+
+                $dict{$key} = bless(\$binary_code, 'Sidef::Types::String::String');
+
+                # Increment the code for the next symbol of this length
+                ++$next_code[$length];
+            }
+        }
+
+        Sidef::Types::Hash::Hash->new(\%dict);
+    }
+
+    sub _huffman_walk_tree {
+        my ($node, $code, $h) = @_;
+
+        # Node structure: [ content, frequency ]
+        # If content is a reference, it's an internal node: [left_child, right_child]
+        # If content is a scalar, it's a leaf: 'symbol'
+
+        my $c = $node->[0] // return $h;
+
+        if (ref $c) {
+
+            # Recurse: Left adds '0', Right adds '1'
+            __SUB__->($c->[$_], $code . $_, $h) for ('0', '1');
+        }
+        else {
+            # Leaf node found
+            $h->{$c} = $code;
+        }
+
+        return $h;
+    }
+
+    sub _heap_push {
+        my ($heap, $item) = @_;
+        CORE::push(@$heap, $item);
+        my $i = $#$heap;
+        while ($i > 0) {
+            my $p = ($i - 1) >> 1;
+            last if ($heap->[$p][1] <= $heap->[$i][1]);
+            @{$heap}[$p, $i] = @{$heap}[$i, $p];
+            $i = $p;
+        }
+    }
+
+    sub _heap_pop {
+        my ($heap) = @_;
+        return CORE::pop(@$heap) if (@$heap == 1);
+        my $top = $heap->[0];
+        $heap->[0] = CORE::pop @$heap;
+        my $n = scalar @$heap;
+        my $i = 0;
+        while (1) {
+            my $s = $i;
+            my $l = 2 * $i + 1;
+            my $r = $l + 1;
+            $s = $l if ($l < $n && $heap->[$l][1] < $heap->[$s][1]);
+            $s = $r if ($r < $n && $heap->[$r][1] < $heap->[$s][1]);
+            last if $s == $i;
+            @{$heap}[$i, $s] = @{$heap}[$s, $i];
+            $i = $s;
+        }
+        return $top;
+    }
+
+    sub huffman {
+        my ($self) = @_;
+
+        # 1. Count Frequencies
+        my %freq;
+        foreach my $item (@$self) {
+            ++$freq{$item};
+        }
+
+        my @symbols = CORE::sort CORE::keys %freq;
+
+        # 2. Initialize Heap
+        # Structure: [ [symbol_or_children], frequency ]
+        my @heap;
+        foreach my $k (@symbols) {
+            _heap_push(\@heap, [$k, $freq{$k}]);
+        }
+
+        # 3. Build Huffman Tree
+        while (@heap > 1) {
+            my $x = _heap_pop(\@heap);
+            my $y = _heap_pop(\@heap);
+            _heap_push(\@heap, [[$x, $y], $x->[1] + $y->[1]]);
+        }
+
+        if (@heap == 1 && !ref $heap[0][0]) {
+            @heap = ([[$heap[0]], $heap[0][1]]);
+        }
+
+        # 4. Generate Codes
+        my $h = _huffman_walk_tree($heap[0], '', {});
+
+        my %code_lengths;
+        foreach my $i (@symbols) {
+            $code_lengths{$i} = CORE::length($h->{$i});
+        }
+
+        _huffman_from_code_lengths(\%code_lengths);
     }
 
     sub first_by {

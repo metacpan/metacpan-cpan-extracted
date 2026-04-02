@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+BEGIN { $ENV{LOG_FMT_NO_XS} = 1 }
+
 use Test::Fatal;
 use Test::More;
 
@@ -16,7 +18,7 @@ use Log::Dispatchouli::Global '$Logger' => { init => {
 
   sub call_bravo {
     my ($self, $n) = @_;
-    
+
     local $Logger = $Logger->proxy({ proxy_prefix => "$n: " });
 
     $Logger->log("inside call_bravo");
@@ -31,7 +33,7 @@ use Log::Dispatchouli::Global '$Logger' => { init => {
 
   sub endpoint {
     my ($self, $n) = @_;
-    
+
     $L->log("inside Bravo::endpoint");
   }
 }

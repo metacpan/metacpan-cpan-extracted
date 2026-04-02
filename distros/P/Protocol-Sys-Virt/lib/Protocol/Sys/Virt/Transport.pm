@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1,
-#        XDR::Gen version 1.1.2 and LibVirt version v12.1.0
+#        XDR::Gen version 1.1.2 and LibVirt version v12.2.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,7 +13,7 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Transport v12.1.0;
+package Protocol::Sys::Virt::Transport v12.2.0;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -342,9 +342,9 @@ Protocol::Sys::Virt::Transport - Low level Libvirt connection protocol
 
 =head1 VERSION
 
-v12.1.0
+v12.2.0
 
-Based on LibVirt tag v12.1.0
+Based on LibVirt tag v12.2.0
 
 =head1 SYNOPSIS
 

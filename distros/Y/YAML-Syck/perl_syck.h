@@ -230,8 +230,11 @@ yaml_syck_parser_handler
                 char *ptr, *end;
                 UV sixty = 1;
                 UV total = 0;
+                int is_neg;
                 syck_str_blow_away_commas( n );
                 ptr = n->data.str->ptr;
+                is_neg = (*ptr == '-');
+                if (is_neg) ptr++;
                 end = n->data.str->ptr + n->data.str->len;
                 while ( end > ptr )
                 {
@@ -252,17 +255,34 @@ yaml_syck_parser_handler
                     total += bnum * sixty;
                     sixty *= 60;
                 }
-                sv = newSVuv(total);
+                if (is_neg)
+                    sv = newSViv(-(IV)total);
+                else
+                    sv = newSVuv(total);
             } else if (strEQ( id, "int#hex" )) {
                 I32 flags = 0;
+                char *ptr = n->data.str->ptr;
                 STRLEN len = n->data.str->len;
+                int is_neg = (*ptr == '-');
                 syck_str_blow_away_commas( n );
-                sv = newSVuv( grok_hex( n->data.str->ptr, &len, &flags, NULL) );
+                if (is_neg) { ptr++; len--; }
+                UV uv = grok_hex( ptr, &len, &flags, NULL);
+                if (is_neg)
+                    sv = newSViv(-(IV)uv);
+                else
+                    sv = newSVuv(uv);
             } else if (strEQ( id, "int#oct" )) {
                 I32 flags = 0;
+                char *ptr = n->data.str->ptr;
                 STRLEN len = n->data.str->len;
+                int is_neg = (*ptr == '-');
                 syck_str_blow_away_commas( n );
-                sv = newSVuv( grok_oct( n->data.str->ptr, &len, &flags, NULL) );
+                if (is_neg) { ptr++; len--; }
+                UV uv = grok_oct( ptr, &len, &flags, NULL);
+                if (is_neg)
+                    sv = newSViv(-(IV)uv);
+                else
+                    sv = newSVuv(uv);
             } else if (strEQ( id, "int" ) ) {
                 UV uv;
                 int flags;
@@ -335,7 +355,7 @@ yaml_syck_parser_handler
                     croak("code %s did not evaluate to a subroutine reference\n", SvPV_nolen(sub));
                 }
 
-                SvREFCNT_inc(sv); /* XXX seems to be necessary */
+                SvREFCNT_inc(sv); /* prevent FREETMPS from freeing the mortal cv */
 
                 FREETMPS;
                 LEAVE;
@@ -379,7 +399,7 @@ yaml_syck_parser_handler
                     CHECK_UTF8;
                 }
 
-                sv = newRV_inc(sv);
+                sv = newRV_noinc(sv);
 
                 if ( load_blessed && (*(pkg - 1) != '\0') && (*pkg != '\0') ) {
                     sv_bless(sv, gv_stashpv(id + 12, TRUE));
@@ -816,11 +836,10 @@ void perl_json_postprocess(SV *sv) {
         *(s+len-2) = '\'';
     }
 
-    /* 2010-07-20 - TODDR: This for loop doesn't appear to do anything other than shorten
-     * the line if it sees [,:] when not in quotes. Even then it appears that the \0 isn't
-     * being placed right if that happens. TODO: need test case to prove this does not work
-     * as expected.
-    */
+    /* Strip spaces after ':' and ',' outside quoted strings to produce
+     * compact JSON.  The C-level emitter outputs "key": "value", ... with
+     * spaces; this in-place compaction removes them.  See t/json-postprocess.t.
+     */
     for (i = 0; i < len; i++) {
         ch = *(s+i);
         *pos++ = ch;
@@ -869,7 +888,7 @@ static SV * LoadYAML (char *s) {
     ENTER; SAVETMPS;
 
     /* Don't even bother if the string is empty. */
-    if (*s == '\0') { return &PL_sv_undef; }
+    if (*s == '\0') { FREETMPS; LEAVE; return &PL_sv_undef; }
 
 #ifdef YAML_IS_JSON
     s = perl_json_preprocess(s);
@@ -941,29 +960,27 @@ json_syck_mark_emitter
 yaml_syck_mark_emitter
 #endif
 (SyckEmitter *e, SV *sv) {
-#ifdef YAML_IS_JSON
     e->depth++;
-#endif
 
     if (syck_emitter_mark_node(e, (st_data_t)sv, PERL_SYCK_EMITTER_MARK_NODE_FLAGS) == 0) {
-#ifdef YAML_IS_JSON
         e->depth--;
-#endif
         return;
     }
 
-#ifdef YAML_IS_JSON
     if (e->depth >= e->max_depth) {
+#ifdef YAML_IS_JSON
         croak("Dumping circular structures is not supported with JSON::Syck, consider increasing $JSON::Syck::MaxDepth higher then %d.", e->max_depth);
-    }
+#else
+        croak("Structure is nested deeper than $YAML::Syck::MaxDepth (%d); increase $YAML::Syck::MaxDepth to dump deeper structures.", e->max_depth);
 #endif
+    }
 
     if (SvROK(sv)) {
         PERL_SYCK_MARK_EMITTER(e, SvRV(sv));
 #ifdef YAML_IS_JSON
         st_insert(e->markers, (st_data_t)sv, 0);
-        e->depth--;
 #endif
+        e->depth--;
         return;
     }
 
@@ -998,8 +1015,8 @@ yaml_syck_mark_emitter
 
 #ifdef YAML_IS_JSON
     st_insert(e->markers, (st_data_t)sv, 0);
-    --e->depth;
 #endif
+    --e->depth;
 }
 
 
@@ -1034,6 +1051,7 @@ yaml_syck_emitter_handler
     if (sv_isobject(sv)) {
         ref = savepv(sv_reftype(SvRV(sv), TRUE));
         ref_orig = ref;
+        bonus->cur_ref = ref;  /* track for cleanup on croak */
         *tag = '\0';
         strcat(tag, OBJECT_TAG);
 
@@ -1138,6 +1156,7 @@ yaml_syck_emitter_handler
                 syck_emitter_write(e, an, strlen(anchor_name) + 1);
                 S_FREE(an);
                 Safefree(ref_orig);
+                bonus->cur_ref = NULL;
                 return;
             }
         }
@@ -1188,8 +1207,10 @@ yaml_syck_emitter_handler
         /* emit an undef (typically pointed from a blesed SvRV) */
         syck_emit_scalar(e, OBJOF("str"), scalar_plain, 0, 0, 0, NULL_LITERAL, NULL_LITERAL_LENGTH);
     }
-    else if (SvPOK(sv)) {
-        /* emit a string */
+    else if (SvPOK(sv) && ty != SVt_PVCV) {
+        /* emit a string (exclude CVs: prototyped subs have SvPOK set for the
+         * prototype string, but must go through the SVt_PVCV case below for
+         * proper B::Deparse handling) */
         STRLEN len = sv_len(sv);
 
 /* JSON should preserve quotes even on simple integers ("0" is true in javascript) */
@@ -1340,7 +1361,6 @@ yaml_syck_emitter_handler
                 }
                 else {
                     dSP;
-                    I32 len;
                     int count, reallen;
                     SV *text;
                     CV *cv = (CV*)sv;
@@ -1368,7 +1388,6 @@ yaml_syck_emitter_handler
                     }
 
                     text = POPs;
-                    len = SvLEN(text);
                     reallen = strlen(SvPV_nolen(text));
 
                     /*
@@ -1376,7 +1395,7 @@ yaml_syck_emitter_handler
                      * "(prototype) ;" or ";".
                      */
 
-                    if (len == 0 || *(SvPV_nolen(text)+reallen-1) == ';') {
+                    if (reallen == 0 || *(SvPV_nolen(text)+reallen-1) == ';') {
                         croak("The result of B::Deparse::coderef2text was empty - maybe you're trying to serialize an XS function?\n");
                     }
 
@@ -1416,9 +1435,34 @@ yaml_syck_emitter_handler
 #ifndef YAML_IS_JSON
     if (ref_orig != NULL) {
         Safefree(ref_orig);
+        bonus->cur_ref = NULL;  /* already freed — prevent double-free in destructor */
     }
 #endif
 }
+
+/* Destructor for SAVEDESTRUCTOR_X: frees emitter and tag buffer on croak.
+ * Registered after allocation so Perl's scope unwinding handles cleanup
+ * even when a croak() longjmps past the normal return path.
+ * Guarded because perl_syck.h is included twice (YAML and JSON modes). */
+#ifndef CLEANUP_EMITTER_BONUS_DEFINED
+#define CLEANUP_EMITTER_BONUS_DEFINED
+static void
+cleanup_emitter_bonus(pTHX_ void *p) {
+    struct emitter_xtra *bonus = (struct emitter_xtra *)p;
+    if (bonus->cur_ref != NULL) {
+        Safefree(bonus->cur_ref);
+        bonus->cur_ref = NULL;
+    }
+    if (bonus->emitter != NULL) {
+        syck_free_emitter((SyckEmitter *)bonus->emitter);
+        bonus->emitter = NULL;
+    }
+    if (bonus->tag != NULL) {
+        Safefree(bonus->tag);
+        bonus->tag = NULL;
+    }
+}
+#endif
 
 void
 #ifdef YAML_IS_JSON
@@ -1427,20 +1471,17 @@ DumpJSONImpl
 DumpYAMLImpl
 #endif
 (SV *sv, struct emitter_xtra *bonus, SyckOutputHandler output_handler) {
-    SyckEmitter *emitter = syck_new_emitter();
+    SyckEmitter *emitter;
     SV *headless         = GvSV(gv_fetchpv(form("%s::Headless", PACKAGE_NAME), TRUE, SVt_PV));
     SV *implicit_binary  = GvSV(gv_fetchpv(form("%s::ImplicitBinary", PACKAGE_NAME), TRUE, SVt_PV));
     SV *use_code         = GvSV(gv_fetchpv(form("%s::UseCode", PACKAGE_NAME), TRUE, SVt_PV));
     SV *dump_code        = GvSV(gv_fetchpv(form("%s::DumpCode", PACKAGE_NAME), TRUE, SVt_PV));
     SV *sortkeys         = GvSV(gv_fetchpv(form("%s::SortKeys", PACKAGE_NAME), TRUE, SVt_PV));
+    SV *max_depth        = GvSV(gv_fetchpv(form("%s::MaxDepth", PACKAGE_NAME), TRUE, SVt_PV));
 #ifdef YAML_IS_JSON
     SV *singlequote      = GvSV(gv_fetchpv(form("%s::SingleQuote", PACKAGE_NAME), TRUE, SVt_PV));
-    SV *max_depth        = GvSV(gv_fetchpv(form("%s::MaxDepth", PACKAGE_NAME), TRUE, SVt_PV));
     json_quote_char      = (SvTRUE(singlequote) ? '\'' : '"' );
     json_quote_style     = (SvTRUE(singlequote) ? scalar_2quote_1 : scalar_2quote );
-    emitter->indent      = PERL_SYCK_INDENT_LEVEL;
-    emitter->max_depth   = SvIOK(max_depth) ? SvIV(max_depth) : json_max_depth;
-    emitter->json_mode   = 1;
 #else
     SV *singlequote      = GvSV(gv_fetchpv(form("%s::SingleQuote", PACKAGE_NAME), TRUE, SVt_PV));
     yaml_quote_style     = (SvTRUE(singlequote) ? scalar_1quote : scalar_none);
@@ -1448,6 +1489,8 @@ DumpYAMLImpl
 
     ENTER; SAVETMPS;
 
+    /* Initialize B::Deparse BEFORE allocating the emitter, so that if
+     * eval_pv croaks (longjmp) we don't leak the SyckEmitter. */
 #ifndef YAML_IS_JSON
     if (SvTRUE(use_code) || SvTRUE(dump_code)) {
         SV *bdeparse = GvSV(gv_fetchpv(form("%s::DeparseObject", PACKAGE_NAME), TRUE, SVt_PV));
@@ -1461,6 +1504,17 @@ DumpYAMLImpl
     }
 #endif
 
+    emitter = syck_new_emitter();
+
+    if (SvIOK(max_depth))
+        emitter->max_depth = SvIV(max_depth);
+#ifdef YAML_IS_JSON
+    else
+        emitter->max_depth = json_max_depth;
+    emitter->indent      = PERL_SYCK_INDENT_LEVEL;
+    emitter->json_mode   = 1;
+#endif
+
     emitter->headless = SvTRUE(headless);
     emitter->sort_keys = SvTRUE(sortkeys);
     emitter->anchor_format = "%d";
@@ -1470,7 +1524,13 @@ DumpYAMLImpl
     *(bonus->tag) = '\0';
     bonus->dump_code = SvTRUE(use_code) || SvTRUE(dump_code);
     bonus->implicit_binary = SvTRUE(implicit_binary);
+    bonus->emitter = emitter;
+    bonus->cur_ref = NULL;
     emitter->bonus = bonus;
+
+    /* Register destructor so croak() in callbacks (mark_emitter,
+     * emitter_handler) won't leak the emitter or tag buffer. */
+    SAVEDESTRUCTOR_X(cleanup_emitter_bonus, bonus);
 
     syck_emitter_handler( emitter, PERL_SYCK_EMITTER_HANDLER );
     syck_output_handler( emitter, output_handler );
@@ -1484,9 +1544,13 @@ DumpYAMLImpl
 
     syck_emit( emitter, (st_data_t)sv );
     syck_emitter_flush( emitter, 0 );
-    syck_free_emitter( emitter );
 
+    /* Normal path: clean up now and NULL the pointers so the
+     * SAVEDESTRUCTOR_X callback (at LEAVE) becomes a no-op. */
+    syck_free_emitter( emitter );
+    bonus->emitter = NULL;
     Safefree(bonus->tag);
+    bonus->tag = NULL;
 
     FREETMPS; LEAVE;
 
@@ -1503,7 +1567,9 @@ DumpYAML
 (SV *sv) {
     SV *implicit_unicode = GvSV(gv_fetchpv(form("%s::ImplicitUnicode", PACKAGE_NAME), TRUE, SVt_PV));
     struct emitter_xtra bonus;
-    SV *out = newSVpvn("", 0);
+    /* Mortalize so croak inside DumpImpl won't leak the SV.
+     * SvREFCNT_inc before return counteracts the XS wrapper's sv_2mortal. */
+    SV *out = sv_2mortal(newSVpvn("", 0));
     bonus.out.outsv = out;
 #ifdef YAML_IS_JSON
     DumpJSONImpl(sv, &bonus, perl_syck_output_handler_pv);
@@ -1518,6 +1584,7 @@ DumpYAML
         SvUTF8_on(out);
     }
 #endif
+    SvREFCNT_inc_simple_void(out);
     return out;
 }
 
@@ -1534,8 +1601,9 @@ DumpYAMLFile
 #ifdef YAML_IS_JSON
     {
         /* Buffer into an SV so we can apply perl_json_postprocess(),
-         * then write the postprocessed result to the file handle. */
-        SV *buf = newSVpvn("", 0);
+         * then write the postprocessed result to the file handle.
+         * Mortalize buf so croak inside DumpJSONImpl won't leak it. */
+        SV *buf = sv_2mortal(newSVpvn("", 0));
         STRLEN len;
         char *s;
         bonus.out.outsv = buf;
@@ -1549,7 +1617,6 @@ DumpYAMLFile
                 bonus.ioerror = errno;
             }
         }
-        SvREFCNT_dec(buf);
     }
 #else
     DumpYAMLImpl(sv, &bonus, perl_syck_output_handler_io);

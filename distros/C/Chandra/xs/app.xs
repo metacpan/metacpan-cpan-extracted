@@ -44,30 +44,15 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- Delegate accessors to _webview ----
+ # ---- Direct struct accessors via PerlChandra* ----
 
 SV *
 title(self)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        PUTBACK;
-        count = call_method("title", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? newSVsv(POPs) : &PL_sv_undef;
-        PUTBACK;
-        FREETMPS; LEAVE;
-    } else {
-        RETVAL = &PL_sv_undef;
-    }
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    RETVAL = pc ? newSVpv(pc->wv.title, 0) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -77,23 +62,8 @@ url(self)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        PUTBACK;
-        count = call_method("url", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? newSVsv(POPs) : &PL_sv_undef;
-        PUTBACK;
-        FREETMPS; LEAVE;
-    } else {
-        RETVAL = &PL_sv_undef;
-    }
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    RETVAL = pc ? newSVpv(pc->wv.url, 0) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -103,23 +73,8 @@ width(self)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        PUTBACK;
-        count = call_method("width", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? (int)POPi : 800;
-        PUTBACK;
-        FREETMPS; LEAVE;
-    } else {
-        RETVAL = 800;
-    }
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    RETVAL = pc ? pc->wv.width : 800;
 }
 OUTPUT:
     RETVAL
@@ -129,23 +84,8 @@ height(self)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        PUTBACK;
-        count = call_method("height", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? (int)POPi : 600;
-        PUTBACK;
-        FREETMPS; LEAVE;
-    } else {
-        RETVAL = 600;
-    }
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    RETVAL = pc ? pc->wv.height : 600;
 }
 OUTPUT:
     RETVAL
@@ -155,23 +95,8 @@ resizable(self)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        PUTBACK;
-        count = call_method("resizable", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? (int)POPi : 1;
-        PUTBACK;
-        FREETMPS; LEAVE;
-    } else {
-        RETVAL = 1;
-    }
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    RETVAL = pc ? pc->wv.resizable : 1;
 }
 OUTPUT:
     RETVAL
@@ -181,23 +106,8 @@ debug(self)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        PUTBACK;
-        count = call_method("debug", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? (int)POPi : 0;
-        PUTBACK;
-        FREETMPS; LEAVE;
-    } else {
-        RETVAL = 0;
-    }
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    RETVAL = pc ? pc->wv.debug : 0;
 }
 OUTPUT:
     RETVAL
@@ -216,7 +126,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- bind($name, $coderef) ----
+ # ---- bind($name, $coderef) — calls _xs_bind_method directly ----
 
 SV *
 bind(self, name_sv, callback)
@@ -235,7 +145,7 @@ CODE:
         XPUSHs(name_sv);
         XPUSHs(callback);
         PUTBACK;
-        call_method("bind", G_DISCARD);
+        call_pv("Chandra::_xs_bind_method", G_DISCARD);
         FREETMPS; LEAVE;
     }
     RETVAL = SvREFCNT_inc(self);
@@ -829,22 +739,8 @@ CODE:
     {
         SV **css_svp = opts ? hv_fetchs(opts, "css", 0) : NULL;
         if (css_svp && SvOK(*css_svp)) {
-            SV *escaped;
+            SV *escaped = chandra_escape_js(aTHX_ *css_svp);
             SV *js;
-            /* Escape the CSS */
-            {
-                dSP;
-                int count;
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(*css_svp);
-                PUTBACK;
-                count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                SPAGAIN;
-                escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
-            }
             js = newSVpvs("(function(){var s=document.getElementById('chandra-route-css');");
             sv_catpvs(js, "if(!s){s=document.createElement('style');s.id='chandra-route-css';document.head.appendChild(s);}");
             sv_catpvs(js, "s.textContent='");
@@ -880,21 +776,8 @@ CODE:
     {
         SV **js_svp = opts ? hv_fetchs(opts, "js", 0) : NULL;
         if (js_svp && SvOK(*js_svp)) {
-            SV *escaped;
+            SV *escaped = chandra_escape_js(aTHX_ *js_svp);
             SV *js;
-            {
-                dSP;
-                int count;
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(*js_svp);
-                PUTBACK;
-                count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                SPAGAIN;
-                escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
-            }
             js = newSVpvs("(function(){var o=document.getElementById('chandra-route-js');");
             sv_catpvs(js, "if(o)o.parentNode.removeChild(o);");
             sv_catpvs(js, "var s=document.createElement('script');s.id='chandra-route-js';");
@@ -963,20 +846,7 @@ CODE:
                     if (i > 0) sv_catpvs(joined, "\n");
                     if (elem && SvOK(*elem)) sv_catsv(joined, *elem);
                 }
-                /* Escape */
-                {
-                    dSP;
-                    int count;
-                    ENTER; SAVETMPS;
-                    PUSHMARK(SP);
-                    XPUSHs(joined);
-                    PUTBACK;
-                    count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                    SPAGAIN;
-                    escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                    PUTBACK;
-                    FREETMPS; LEAVE;
-                }
+                escaped = chandra_escape_js(aTHX_ joined);
                 SvREFCNT_dec(joined);
 
                 js = newSVpvs("(function(){var s=document.getElementById('chandra-global-css');");
@@ -1015,34 +885,18 @@ CODE:
     {
         SV **dt_svp = hv_fetchs(hv, "_devtools", 0);
         if (dt_svp && SvOK(*dt_svp) && SvROK(*dt_svp)) {
-            /* Check is_enabled */
-            dSP;
-            int count;
-            ENTER; SAVETMPS;
-            PUSHMARK(SP);
-            XPUSHs(*dt_svp);
-            PUTBACK;
-            count = call_method("is_enabled", G_SCALAR);
-            SPAGAIN;
-            if (count > 0) { SV *tmp = POPs; if (SvTRUE(tmp)) {
-                SV *dt_js;
-                /* Get DevTools JS code */
+            if (chandra_devtools_is_enabled(aTHX_ *dt_svp)) {
+                /* Get DevTools JS code directly */
+                SV *dt_js = newSVpv(chandra_devtools_js_code(), 0);
+                dSP;
+                ENTER; SAVETMPS;
                 PUSHMARK(SP);
-                XPUSHs(sv_2mortal(newSVpvs("Chandra::DevTools")));
+                XPUSHs(*wv_svp);
+                XPUSHs(sv_2mortal(dt_js));
                 PUTBACK;
-                count = call_method("js_code", G_SCALAR);
-                SPAGAIN;
-                if (count > 0) {
-                    dt_js = POPs;
-                    PUSHMARK(SP);
-                    XPUSHs(*wv_svp);
-                    XPUSHs(dt_js);
-                    PUTBACK;
-                    call_method(method, G_DISCARD);
-                }
-            }}
-            PUTBACK;
-            FREETMPS; LEAVE;
+                call_method(method, G_DISCARD);
+                FREETMPS; LEAVE;
+            }
         }
     }
 
@@ -1091,25 +945,14 @@ CODE:
     {
         SV **routes_svp = hv_fetchs(hv, "_routes", 0);
         if (routes_svp && SvROK(*routes_svp)) {
-            SV *router_js;
+            SV *router_js = newSVpv(CHANDRA_ROUTER_JS, 0);
             dSP;
-            int count;
             ENTER; SAVETMPS;
-            /* Get router JS */
             PUSHMARK(SP);
-            XPUSHs(self);
+            XPUSHs(*wv_svp);
+            XPUSHs(sv_2mortal(router_js));
             PUTBACK;
-            count = call_method("_router_js", G_SCALAR);
-            SPAGAIN;
-            if (count > 0) {
-                router_js = POPs;
-                PUSHMARK(SP);
-                XPUSHs(*wv_svp);
-                XPUSHs(router_js);
-                PUTBACK;
-                call_method(method, G_DISCARD);
-            }
-            PUTBACK;
+            call_method(method, G_DISCARD);
             FREETMPS; LEAVE;
         }
     }
@@ -1131,20 +974,7 @@ CODE:
                     if (i > 0) sv_catpvs(joined, ";\n");
                     if (elem && SvOK(*elem)) sv_catsv(joined, *elem);
                 }
-                /* Escape */
-                {
-                    dSP;
-                    int count;
-                    ENTER; SAVETMPS;
-                    PUSHMARK(SP);
-                    XPUSHs(joined);
-                    PUTBACK;
-                    count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                    SPAGAIN;
-                    escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                    PUTBACK;
-                    FREETMPS; LEAVE;
-                }
+                escaped = chandra_escape_js(aTHX_ joined);
                 SvREFCNT_dec(joined);
 
                 js = newSVpvs("(function(){var s=document.getElementById('chandra-global-js');");
@@ -1186,103 +1016,87 @@ CODE:
 
     started_svp = hv_fetchs(hv, "_started", 0);
     if (started_svp && SvIV(*started_svp)) {
-        SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-        if (wv_svp && SvOK(*wv_svp)) {
-            SV *body_escaped, *full_escaped, *nav_js;
-            const char *path = SvPV_nolen(path_sv);
+        PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+        SV *body_escaped, *full_escaped, *nav_js;
+        const char *path = SvPV_nolen(path_sv);
 
-            /* Get body and full rendered content */
-            {
-                SV *body_sv, *full_sv;
-                dSP;
-                int count;
+        /* Get body and full rendered content */
+        {
+            SV *body_sv, *full_sv;
+            dSP;
+            int count;
 
-                /* _render_route_body */
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(self);
-                XPUSHs(path_sv);
-                PUTBACK;
-                count = call_method("_render_route_body", G_SCALAR);
-                SPAGAIN;
-                body_sv = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
+            /* _render_route_body */
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(self);
+            XPUSHs(path_sv);
+            PUTBACK;
+            count = call_method("_render_route_body", G_SCALAR);
+            SPAGAIN;
+            body_sv = (count > 0) ? newSVsv(POPs) : newSVpvs("");
+            PUTBACK;
+            FREETMPS; LEAVE;
 
-                /* _render_route */
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(self);
-                XPUSHs(path_sv);
-                PUTBACK;
-                count = call_method("_render_route", G_SCALAR);
-                SPAGAIN;
-                full_sv = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
+            /* _render_route */
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(self);
+            XPUSHs(path_sv);
+            PUTBACK;
+            count = call_method("_render_route", G_SCALAR);
+            SPAGAIN;
+            full_sv = (count > 0) ? newSVsv(POPs) : newSVpvs("");
+            PUTBACK;
+            FREETMPS; LEAVE;
 
-                /* Escape both */
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(body_sv);
-                PUTBACK;
-                count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                SPAGAIN;
-                body_escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
-                SvREFCNT_dec(body_sv);
+            /* Escape both — direct C call */
+            body_escaped = chandra_escape_js(aTHX_ body_sv);
+            SvREFCNT_dec(body_sv);
 
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(full_sv);
-                PUTBACK;
-                count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                SPAGAIN;
-                full_escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
-                SvREFCNT_dec(full_sv);
-            }
+            full_escaped = chandra_escape_js(aTHX_ full_sv);
+            SvREFCNT_dec(full_sv);
+        }
 
-            /* Build navigate JS */
-            nav_js = newSVpvs("var _c=document.getElementById('chandra-content');");
-            sv_catpvs(nav_js, "if(_c){_c.innerHTML='");
-            sv_catsv(nav_js, body_escaped);
-            sv_catpvs(nav_js, "';Array.prototype.slice.call(_c.getElementsByTagName('script')).forEach(function(_s){");
-            sv_catpvs(nav_js, "var _n=document.createElement('script');_n.text=_s.text;_s.parentNode.replaceChild(_n,_s);");
-            sv_catpvs(nav_js, "});}else{document.open();document.write('");
-            sv_catsv(nav_js, full_escaped);
-            sv_catpvs(nav_js, "');document.close();}history.pushState({},'','");
-            sv_catpv(nav_js, path);
-            sv_catpvs(nav_js, "');");
+        /* Build navigate JS */
+        nav_js = newSVpvs("var _c=document.getElementById('chandra-content');");
+        sv_catpvs(nav_js, "if(_c){_c.innerHTML='");
+        sv_catsv(nav_js, body_escaped);
+        sv_catpvs(nav_js, "';Array.prototype.slice.call(_c.getElementsByTagName('script')).forEach(function(_s){");
+        sv_catpvs(nav_js, "var _n=document.createElement('script');_n.text=_s.text;_s.parentNode.replaceChild(_n,_s);");
+        sv_catpvs(nav_js, "});}else{document.open();document.write('");
+        sv_catsv(nav_js, full_escaped);
+        sv_catpvs(nav_js, "');document.close();}history.pushState({},'','");
+        sv_catpv(nav_js, path);
+        sv_catpvs(nav_js, "');");
 
-            SvREFCNT_dec(body_escaped);
-            SvREFCNT_dec(full_escaped);
+        SvREFCNT_dec(body_escaped);
+        SvREFCNT_dec(full_escaped);
 
-            /* dispatch_eval_js the navigate JS */
-            {
-                dSP;
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(*wv_svp);
-                XPUSHs(sv_2mortal(nav_js));
-                PUTBACK;
+        /* dispatch */
+        if (pc) {
+            webview_dispatch(&pc->wv, deferred_eval_cb, strdup(SvPV_nolen(nav_js)));
+        } else {
+            SV *wv = CHANDRA_WEBVIEW_SV(self);
+            if (wv) {
+                dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+                XPUSHs(wv); XPUSHs(nav_js); PUTBACK;
                 call_method("dispatch_eval_js", G_DISCARD);
                 FREETMPS; LEAVE;
             }
+        }
+        SvREFCNT_dec(nav_js);
 
-            /* Inject route CSS/JS */
-            {
-                dSP;
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(self);
-                XPUSHs(sv_2mortal(newSViv(1)));
-                PUTBACK;
-                call_method("_inject_route_css_js", G_DISCARD);
-                FREETMPS; LEAVE;
-            }
+        /* Inject route CSS/JS */
+        {
+            dSP;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(self);
+            XPUSHs(sv_2mortal(newSViv(1)));
+            PUTBACK;
+            call_method("_inject_route_css_js", G_DISCARD);
+            FREETMPS; LEAVE;
         }
     }
     RETVAL = SvREFCNT_inc(self);
@@ -1290,7 +1104,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- eval($js) ----
+ # ---- eval($js) — direct webview_eval ----
 
 SV *
 eval(self, js_sv)
@@ -1298,29 +1112,24 @@ eval(self, js_sv)
     SV *js_sv
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(js_sv);
-        PUTBACK;
-        count = call_method("eval_js", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? newSVsv(POPs) : &PL_sv_undef;
-        PUTBACK;
-        FREETMPS; LEAVE;
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    if (pc) {
+        RETVAL = newSViv(webview_eval(&pc->wv, SvPV_nolen(js_sv)));
     } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); XPUSHs(js_sv); PUTBACK;
+            call_method("eval_js", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
         RETVAL = &PL_sv_undef;
     }
 }
 OUTPUT:
     RETVAL
 
- # ---- dispatch_eval($js) ----
+ # ---- dispatch_eval($js) — direct webview_dispatch ----
 
 void
 dispatch_eval(self, js_sv)
@@ -1328,17 +1137,17 @@ dispatch_eval(self, js_sv)
     SV *js_sv
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(js_sv);
-        PUTBACK;
-        call_method("dispatch_eval_js", G_DISCARD);
-        FREETMPS; LEAVE;
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    if (pc) {
+        webview_dispatch(&pc->wv, deferred_eval_cb, strdup(SvPV_nolen(js_sv)));
+    } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); XPUSHs(js_sv); PUTBACK;
+            call_method("dispatch_eval_js", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
     }
 }
 
@@ -1352,11 +1161,9 @@ update(self, selector_sv, content)
 CODE:
 {
     HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
     SV *html_sv;
     SV *escaped_html, *escaped_sel, *js;
-
-    if (!wv_svp || !SvOK(*wv_svp)) goto done_update;
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
 
     /* Resolve content: if renderable object, call render() */
     if (SvROK(content) && sv_isobject(content)) {
@@ -1380,36 +1187,10 @@ CODE:
         html_sv = newSVsv(content);
     }
 
-    /* Escape HTML */
-    {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(html_sv);
-        PUTBACK;
-        count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-        SPAGAIN;
-        escaped_html = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-        PUTBACK;
-        FREETMPS; LEAVE;
-    }
+    escaped_html = chandra_escape_js(aTHX_ html_sv);
     SvREFCNT_dec(html_sv);
 
-    /* Escape selector */
-    {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(selector_sv);
-        PUTBACK;
-        count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-        SPAGAIN;
-        escaped_sel = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-        PUTBACK;
-        FREETMPS; LEAVE;
-    }
+    escaped_sel = chandra_escape_js(aTHX_ selector_sv);
 
     /* Build JS */
     js = newSVpvs("var _el=document.querySelector('");
@@ -1421,23 +1202,21 @@ CODE:
     SvREFCNT_dec(escaped_html);
     SvREFCNT_dec(escaped_sel);
 
-    /* dispatch_eval_js */
-    {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(sv_2mortal(js));
-        PUTBACK;
-        call_method("dispatch_eval_js", G_DISCARD);
-        FREETMPS; LEAVE;
+    if (pc) {
+        webview_dispatch(&pc->wv, deferred_eval_cb, strdup(SvPV_nolen(js)));
+    } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); XPUSHs(js); PUTBACK;
+            call_method("dispatch_eval_js", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
     }
-
-    done_update:
-    ;
+    SvREFCNT_dec(js);
 }
 
- # ---- set_title($title) ----
+ # ---- set_title($title) — direct webview_set_title ----
 
 SV *
 set_title(self, title_sv)
@@ -1445,17 +1224,20 @@ set_title(self, title_sv)
     SV *title_sv
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(title_sv);
-        PUTBACK;
-        call_method("set_title", G_DISCARD);
-        FREETMPS; LEAVE;
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    if (pc) {
+        const char *title = SvPV_nolen(title_sv);
+        webview_set_title(&pc->wv, title);
+        Safefree((char *)pc->wv.title);
+        pc->wv.title = savepv(title);
+    } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); XPUSHs(title_sv); PUTBACK;
+            call_method("set_title", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
     }
     RETVAL = SvREFCNT_inc(self);
 }
@@ -1549,7 +1331,7 @@ CODE:
     }
 }
 
- # ---- inject_css($css) ----
+ # ---- inject_css($css) — direct webview_inject_css ----
 
 SV *
 inject_css(self, css_sv)
@@ -1557,49 +1339,49 @@ inject_css(self, css_sv)
     SV *css_sv
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(css_sv);
-        PUTBACK;
-        call_method("inject_css", G_DISCARD);
-        FREETMPS; LEAVE;
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    if (pc) {
+        webview_inject_css(&pc->wv, SvPV_nolen(css_sv));
+    } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); XPUSHs(css_sv); PUTBACK;
+            call_method("inject_css", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
     }
     RETVAL = SvREFCNT_inc(self);
 }
 OUTPUT:
     RETVAL
 
- # ---- fullscreen($enable) ----
+ # ---- fullscreen($enable) — direct webview_set_fullscreen ----
 
 SV *
 fullscreen(self, ...)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
     int enable = (items > 1) ? SvIV(ST(1)) : 1;
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(sv_2mortal(newSViv(enable)));
-        PUTBACK;
-        call_method("set_fullscreen", G_DISCARD);
-        FREETMPS; LEAVE;
+    if (pc) {
+        webview_set_fullscreen(&pc->wv, enable);
+    } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); mXPUSHi(enable); PUTBACK;
+            call_method("set_fullscreen", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
     }
     RETVAL = SvREFCNT_inc(self);
 }
 OUTPUT:
     RETVAL
 
- # ---- set_color($r, $g, $b, $a) ----
+ # ---- set_color($r, $g, $b, $a) — direct webview_set_color ----
 
 SV *
 set_color(self, r, g, b, ...)
@@ -1609,48 +1391,46 @@ set_color(self, r, g, b, ...)
     int b
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
     int a = (items > 4) ? SvIV(ST(4)) : 255;
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(sv_2mortal(newSViv(r)));
-        XPUSHs(sv_2mortal(newSViv(g)));
-        XPUSHs(sv_2mortal(newSViv(b)));
-        XPUSHs(sv_2mortal(newSViv(a)));
-        PUTBACK;
-        call_method("set_color", G_DISCARD);
-        FREETMPS; LEAVE;
+    if (pc) {
+        webview_set_color(&pc->wv, (uint8_t)r, (uint8_t)g, (uint8_t)b, (uint8_t)a);
+    } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); mXPUSHi(r); mXPUSHi(g); mXPUSHi(b); mXPUSHi(a); PUTBACK;
+            call_method("set_color", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
     }
     RETVAL = SvREFCNT_inc(self);
 }
 OUTPUT:
     RETVAL
 
- # ---- terminate() ----
+ # ---- terminate() — direct webview_terminate ----
 
 void
 terminate(self)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        PUTBACK;
-        call_method("terminate", G_DISCARD);
-        FREETMPS; LEAVE;
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+    if (pc) {
+        webview_terminate(&pc->wv);
+    } else {
+        SV *wv = CHANDRA_WEBVIEW_SV(self);
+        if (wv) {
+            dSP; ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(wv); PUTBACK;
+            call_method("terminate", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
     }
 }
 
- # ---- init() ----
+ # ---- init() — delegates to webview's init (needs _xs_init_bind + Bridge) ----
 
 SV *
 init(self)
@@ -1674,37 +1454,21 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- loop($blocking) ----
+ # ---- loop($blocking) — direct webview_loop ----
 
 int
 loop(self, ...)
     SV *self
 CODE:
 {
-    HV *hv = (HV *)SvRV(self);
-    SV **wv_svp = hv_fetchs(hv, "_webview", 0);
+    PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
     int blocking = (items > 1) ? SvIV(ST(1)) : 1;
-    if (wv_svp && SvOK(*wv_svp)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*wv_svp);
-        XPUSHs(sv_2mortal(newSViv(blocking)));
-        PUTBACK;
-        count = call_method("loop", G_SCALAR);
-        SPAGAIN;
-        RETVAL = (count > 0) ? (int)POPi : 1;
-        PUTBACK;
-        FREETMPS; LEAVE;
-    } else {
-        RETVAL = 1;
-    }
+    RETVAL = pc ? webview_loop(&pc->wv, blocking) : 1;
 }
 OUTPUT:
     RETVAL
 
- # ---- exit() ----
+ # ---- exit() — direct webview_exit ----
 
 void
 exit(self)
@@ -1714,15 +1478,9 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **started_svp = hv_fetchs(hv, "_started", 0);
     if (started_svp && SvIV(*started_svp)) {
-        SV **wv_svp = hv_fetchs(hv, "_webview", 0);
-        if (wv_svp && SvOK(*wv_svp)) {
-            dSP;
-            ENTER; SAVETMPS;
-            PUSHMARK(SP);
-            XPUSHs(*wv_svp);
-            PUTBACK;
-            call_method("exit", G_DISCARD);
-            FREETMPS; LEAVE;
+        PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+        if (pc && pc->initialized) {
+            webview_exit(&pc->wv);
         }
         (void)hv_stores(hv, "_started", newSViv(0));
     }
@@ -1882,16 +1640,7 @@ CODE:
         PUTBACK;
         FREETMPS; LEAVE;
 
-        /* Escape */
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(html_sv);
-        PUTBACK;
-        count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-        SPAGAIN;
-        escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-        PUTBACK;
-        FREETMPS; LEAVE;
+        escaped = chandra_escape_js(aTHX_ html_sv);
         SvREFCNT_dec(html_sv);
 
         js = newSVpvs("document.open();document.write('");
@@ -1917,21 +1666,8 @@ CODE:
         FREETMPS; LEAVE;
 
     } else if (html_svp && SvOK(*html_svp)) {
-        SV *escaped, *js;
-        dSP;
-        int count;
-
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(*html_svp);
-        PUTBACK;
-        count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-        SPAGAIN;
-        escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-        PUTBACK;
-        FREETMPS; LEAVE;
-
-        js = newSVpvs("document.open();document.write('");
+        SV *escaped = chandra_escape_js(aTHX_ *html_svp);
+        SV *js = newSVpvs("document.open();document.write('");
         sv_catsv(js, escaped);
         sv_catpvs(js, "');document.close();");
         SvREFCNT_dec(escaped);
@@ -2239,20 +1975,7 @@ CODE:
                 FREETMPS; LEAVE;
             }
 
-            /* Escape and eval */
-            {
-                dSP;
-                int count;
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(html_sv);
-                PUTBACK;
-                count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                SPAGAIN;
-                escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
-            }
+            escaped = chandra_escape_js(aTHX_ html_sv);
             SvREFCNT_dec(html_sv);
 
             js = newSVpvs("document.open();document.write('");
@@ -2274,21 +1997,8 @@ CODE:
             /* Static content mode */
             SV **html_svp = hv_fetchs(hv, "_html", 0);
             if (html_svp && SvOK(*html_svp)) {
-                SV *escaped, *js;
-                dSP;
-                int count;
-
-                ENTER; SAVETMPS;
-                PUSHMARK(SP);
-                XPUSHs(*html_svp);
-                PUTBACK;
-                count = call_pv("Chandra::App::_escape_js", G_SCALAR);
-                SPAGAIN;
-                escaped = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-                PUTBACK;
-                FREETMPS; LEAVE;
-
-                js = newSVpvs("document.open();document.write('");
+                SV *escaped = chandra_escape_js(aTHX_ *html_svp);
+                SV *js = newSVpvs("document.open();document.write('");
                 sv_catsv(js, escaped);
                 sv_catpvs(js, "');document.close();");
                 SvREFCNT_dec(escaped);
@@ -2407,3 +2117,43 @@ CODE:
     }
     (void)hv_stores(hv, "_started", newSViv(0));
 }
+
+ # ---- notify(%args) — send a desktop notification ----
+
+int
+notify(self, ...)
+    SV *self
+CODE:
+{
+    ChandraNotification notif;
+    I32 i;
+
+    memset(&notif, 0, sizeof(notif));
+
+    /* Parse key-value pairs from args */
+    for (i = 1; i + 1 < items; i += 2) {
+        const char *key = SvPV_nolen(ST(i));
+        SV *val = ST(i + 1);
+
+        if (strcmp(key, "title") == 0 && SvOK(val)) {
+            notif.title = SvPV_nolen(val);
+        } else if (strcmp(key, "body") == 0 && SvOK(val)) {
+            notif.body = SvPV_nolen(val);
+        } else if (strcmp(key, "icon") == 0 && SvOK(val)) {
+            notif.icon = SvPV_nolen(val);
+        } else if (strcmp(key, "sound") == 0 && SvOK(val)) {
+            notif.sound = SvIV(val);
+        } else if (strcmp(key, "timeout") == 0 && SvOK(val)) {
+            notif.timeout_ms = SvIV(val);
+        }
+    }
+
+    if (!notif.title) {
+        warn("Chandra::App::notify: title is required");
+        RETVAL = 0;
+    } else {
+        RETVAL = chandra_notify_send(aTHX_ &notif);
+    }
+}
+OUTPUT:
+    RETVAL

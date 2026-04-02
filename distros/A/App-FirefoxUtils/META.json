@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "App::BrowserUtils" : "0.019",
+            "App::KDEActivityUtils" : "0",
             "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" : "0",
             "Data::Sah::Coerce::perl::To_duration::From_float::seconds" : "0",
             "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" : "0",
@@ -85,7 +86,7 @@
    "provides" : {
       "App::FirefoxUtils" : {
          "file" : "lib/App/FirefoxUtils.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       }
    },
    "release_status" : "stable",
@@ -100,7 +101,7 @@
          "web" : "https://github.com/perlancar/perl-App-FirefoxUtils"
       }
    },
-   "version" : "0.024",
+   "version" : "0.025",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

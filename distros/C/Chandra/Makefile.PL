@@ -18,8 +18,8 @@ if ($^O eq 'darwin') {
     push @extra_ldflags, '-framework WebKit';
     push @extra_ldflags, '-framework Cocoa';
 }
-elsif ($^O eq 'linux') {
-    # Linux - use GTK/WebKit2
+elsif ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd' || $^O eq 'netbsd' || $^O eq 'dragonfly') {
+    # Linux/BSD - use GTK/WebKit2
     push @extra_ccflags, '-DWEBVIEW_GTK=1';
     my $gtk_cflags = `pkg-config --cflags gtk+-3.0 webkit2gtk-4.0 2>/dev/null`;
     my $gtk_libs = `pkg-config --libs gtk+-3.0 webkit2gtk-4.0 2>/dev/null`;
@@ -51,6 +51,10 @@ elsif ($^O eq 'MSWin32') {
     push @extra_ccflags, '-DWEBVIEW_WINAPI=1';
     push @extra_libs, '-lole32', '-lcomctl32', '-loleaut32', '-luuid', '-lgdi32';
 }
+else {
+    warn "*** Chandra is not supported on $^O\n";
+    exit 0;  # exit 0 = NA for CPAN Testers
+}
 
 WriteMakefile(
     NAME              => 'Chandra',
@@ -62,7 +66,7 @@ WriteMakefile(
     
     TYPEMAPS          => ['typemap'],
     INC               => '-I. -Iinclude -Iinclude/chandra',
-    OBJECT            => 'Chandra$(OBJ_EXT) include/chandra/chandra_error$(OBJ_EXT)',
+    OBJECT            => 'Chandra$(OBJ_EXT)',
     CCFLAGS           => join(' ', $Config{ccflags}, @extra_ccflags),
     LDDLFLAGS         => join(' ', $Config{lddlflags}, @extra_ldflags),
     LIBS              => [join(' ', @extra_libs)],
@@ -91,18 +95,7 @@ WriteMakefile(
 
 # Add custom target to download webview.h if not present
 sub MY::postamble {
-    # On macOS with SDK Perl, the headers live inside the sysroot
-    # and need -iwithsysroot instead of -I.
-    my $perl_inc_flag = ($^O eq 'darwin')
-        ? '-iwithsysroot "$(PERL_INC)"'
-        : '"-I$(PERL_INC)"';
-    my $c_rule = <<"END_RULE";
-
-include/chandra/chandra_error\$(OBJ_EXT): include/chandra/chandra_error.c include/chandra/chandra.h
-\t\$(CC) -c \$(CCFLAGS) \$(OPTIMIZE) \$(CCCDLFLAGS) \$(PASTHRU_DEFINE) \$(DEFINE) -DVERSION=\\"\$(VERSION)\\" -DXS_VERSION=\\"\$(XS_VERSION)\\" \$(INC) $perl_inc_flag -o \$\@ include/chandra/chandra_error.c
-END_RULE
-
-    return $c_rule . <<'MAKE';
+    return <<'MAKE';
 
 webview.h:
 	@echo "Downloading webview.h from GitHub..."

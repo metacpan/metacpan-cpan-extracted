@@ -146,7 +146,8 @@ my %handler_for = (
         return 1 if exists $stash->{'ISA'};
         return 1 if exists $stash->{'VERSION'};
         for my $globref (values %$stash) {
-            return 1 if *{$globref}{CODE};
+            my $type = ref $globref;
+            return 1 if $type eq 'SCALAR' || $type eq 'CODE' || *{$globref}{CODE};
         }
         return 0;
     },

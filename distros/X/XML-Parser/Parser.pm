@@ -16,7 +16,7 @@ use Carp;
 
 BEGIN {
     require XML::Parser::Expat;
-    $VERSION = '2.54';
+    $VERSION = '2.55';
     die "Parser.pm and Expat.pm versions don't match"
       unless $VERSION eq $XML::Parser::Expat::VERSION;
 }
@@ -715,8 +715,8 @@ including any internal or external DTD declarations.
 
 This handler is called for xml declarations. Version is a string containing
 the version. Encoding is either undefined or contains an encoding string.
-Standalone will be either the string C<"yes">, C<"no">, or undefined if the
-standalone attribute is yes, no, or not made respectively.
+Standalone will be either true, false, or undefined if the standalone attribute
+is yes, no, or not made respectively.
 
 =head1 STYLES
 

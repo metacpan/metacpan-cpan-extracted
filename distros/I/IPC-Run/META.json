@@ -34,11 +34,11 @@
       },
       "runtime" : {
          "recommends" : {
-            "IO::Pty" : "1.08",
+            "IO::Pty" : "1.25",
             "Readonly" : "0"
          },
          "requires" : {
-            "IO::Pty" : "1.08",
+            "IO::Pty" : "1.25",
             "Test::More" : "0.47"
          }
       }
@@ -46,15 +46,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/IPC-Run/issues"
+         "web" : "https://github.com/cpan-authors/IPC-Run/issues"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/toddr/IPC-Run"
+         "url" : "https://github.com/cpan-authors/IPC-Run"
       }
    },
-   "version" : "20260322.0",
+   "version" : "20260401.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -36,19 +36,37 @@
          }
       }
    },
+   "provides" : {
+      "JSON::Syck" : {
+         "file" : "lib/JSON/Syck.pm",
+         "version" : "1.43"
+      },
+      "YAML::Dumper::Syck" : {
+         "file" : "lib/YAML/Dumper/Syck.pm"
+      },
+      "YAML::Loader::Syck" : {
+         "file" : "lib/YAML/Loader/Syck.pm"
+      },
+      "YAML::Syck" : {
+         "file" : "lib/YAML/Syck.pm",
+         "version" : "1.43"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/toddr/YAML-Syck/issues"
       },
-      "homepage" : "http://github.com/toddr/YAML-Syck",
+      "homepage" : "https://github.com/toddr/YAML-Syck",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/toddr/YAML-Syck"
+         "type" : "git",
+         "url" : "https://github.com/toddr/YAML-Syck.git",
+         "web" : "https://github.com/toddr/YAML-Syck"
       }
    },
-   "version" : "1.42",
+   "version" : "1.43",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -538,9 +538,17 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     char cmd[MAX_PATH_LEN * 4];  /* Larger buffer for extra flags */
     int ret;
 
+    /* On macOS, Perl headers live inside the SDK, so use -iwithsysroot
+       (matching what ExtUtils::MakeMaker generates) instead of plain -I */
+#ifdef __APPLE__
+    const char *inc_flag = "-iwithsysroot";
+#else
+    const char *inc_flag = "-I";
+#endif
+
     /* Compile to object with optimization and extra cflags */
-    snprintf(cmd, sizeof(cmd), "%s %s %s %s %s -c -o \"%s\" -I\"%s/CORE\" \"%s\" 2>&1",
-             cc, ccflags, optimize, cccdlflags, extra_cflags, o_file, archlib, c_file);
+    snprintf(cmd, sizeof(cmd), "%s %s %s %s %s -c -o \"%s\" %s \"%s/CORE\" \"%s\" 2>&1",
+             cc, ccflags, optimize, cccdlflags, extra_cflags, o_file, inc_flag, archlib, c_file);
 
     ret = system(cmd);
     if (ret != 0) {
@@ -569,6 +577,14 @@ int xs_jit_load(pTHX_ const char *module_name, const char *so_file) {
     dSP;
     char safe_module[256];
     safe_name(module_name, safe_module, sizeof(safe_module));
+
+    /* Resolve to absolute path - macOS hardened runtime rejects relative paths in dlopen */
+    char abs_so_file[MAX_PATH_LEN];
+    if (so_file[0] != '/') {
+        if (realpath(so_file, abs_so_file)) {
+            so_file = abs_so_file;
+        }
+    }
 
     ENTER;
     SAVETMPS;

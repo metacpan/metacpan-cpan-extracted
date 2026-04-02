@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-26'; # DATE
+our $DATE = '2026-03-29'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our @EXPORT_OK = qw(
                        ps_firefox
@@ -247,6 +247,11 @@ MARKDOWN
                 # W = --no-new-window
             },
         },
+        kde_activity => {
+            summary => 'Switch to the specified KDE activity',
+            schema => 'str*',
+
+        },
         shuffle => {
             schema => 'bool*',
         },
@@ -287,6 +292,15 @@ sub open_firefox_tabs {
 
     my $items = $args{items} or return [400, "Please specify items"];
     @$items or return [400, "Please specify at least one item in items"];
+
+    if (defined $args{kde_activity}) {
+        require App::KDEActivityUtils;
+        my $res_kde_activity = App::KDEActivityUtils::set_current_kde_activity(
+            name => $args{kde_activity},
+        );
+        return [500, "Can't set current KDE activity: $res_kde_activity->[0] - $res_kde_activity->[1]"]
+            unless $res_kde_activity->[0] == 200;
+    }
 
     if ($args{shuffle}) {
         $items = [List::Util::shuffle(@$items)];
@@ -400,7 +414,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.024 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2026-03-26.
+This document describes version 0.025 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2026-03-29.
 
 =head1 SYNOPSIS
 
@@ -738,6 +752,10 @@ Include all items that have any tag specified.
 =item * B<items>* => I<array[hash]>
 
 (No description)
+
+=item * B<kde_activity> => I<str>
+
+Switch to the specified KDE activity.
 
 =item * B<new_window> => I<bool>
 

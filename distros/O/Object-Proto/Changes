@@ -1,0 +1,17 @@
+Revision history for Object-Proto
+
+0.03	2026-04-02
+	- Adds multiple inheritance via extends
+	- Adds parent and ancestors meta functions
+
+0.02	2026-04-01
+	- Optimise hot paths new/get/set
+	- Add benchmark to POD
+	- Remove cross Ancient tests
+	- Improve test coverage with valid tests
+
+0.01    2026-04-01
+        First release - split from Ancient distribution.
+        Objects with prototype chains.
+        Type constraints and modifiers.
+        XS-level type registration API.

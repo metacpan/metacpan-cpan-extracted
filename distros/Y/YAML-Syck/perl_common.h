@@ -41,6 +41,8 @@ struct emitter_xtra {
     char dump_code;
     bool implicit_binary;
     int ioerror;
+    void *emitter;  /* SyckEmitter* — freed by SAVEDESTRUCTOR_X on croak */
+    char *cur_ref;  /* current savepv(ref) in handler — freed on croak */
 };
 
 struct parser_xtra {

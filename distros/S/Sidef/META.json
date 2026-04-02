@@ -1,8 +1,8 @@
 {
    "abstract" : "The Sidef Programming Language - A modern, high-level programming language",
    "author" : [
-      "Daniel Șuteu <trizen@cpan.org>",
-      "Ioana Fălcușan <ioanaflavia@gmail.com>"
+      "Daniel Șuteu",
+      "Ioana Fălcușan"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Module::Build version 0.4234",
@@ -49,8 +49,13 @@
             "Digest::MD5" : "2.0",
             "Digest::SHA" : "5.0",
             "File::Find" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Compress::Gzip" : "0",
+            "IO::Compress::RawDeflate" : "0",
+            "JSON" : "0",
+            "JSON::PP" : "0",
             "MIME::Base64" : "3.00",
-            "Math::Prime::Util" : "0.73",
+            "Math::Prime::Util" : "0.74",
             "Term::ReadLine::Gnu" : "1.36",
             "Text::Balanced" : "2.00",
             "Text::ParseWords" : "3.00",
@@ -74,7 +79,7 @@
             "Math::GMPz" : "0.48",
             "Math::MPC" : "1.09",
             "Math::MPFR" : "3.36",
-            "Math::Prime::Util::GMP" : "0.52",
+            "Math::Prime::Util::GMP" : "0.53",
             "Memoize" : "0",
             "Scalar::Util" : "1.45",
             "Socket" : "0",
@@ -86,17 +91,6 @@
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
-         },
-         "suggests" : {
-            "DBD::SQLite" : "0",
-            "DBI" : "0",
-            "DateTime" : "0",
-            "File::Slurp" : "0",
-            "HTTP::Tiny" : "0",
-            "IO::Compress::Gzip" : "0",
-            "JSON::PP" : "0",
-            "LWP::UserAgent" : "0",
-            "Regexp::Common" : "0"
          }
       },
       "test" : {
@@ -108,7 +102,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "26.01"
+         "version" : "26.04"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -291,11 +285,11 @@
          "web" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "26.01",
+   "version" : "26.04",
    "x_authority" : "cpan:TRIZEN",
    "x_contributors" : [
-      "Daniel Șuteu <trizen@cpan.org>",
-      "Ioana Fălcușan <ioanaflavia@gmail.com>"
+      "Daniel Șuteu",
+      "Ioana Fălcușan"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

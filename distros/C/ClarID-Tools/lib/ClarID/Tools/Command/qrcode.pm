@@ -8,7 +8,7 @@ use MooX::Options
   auto_version     => 1,
   usage            => 'USAGE',
   config_from_hash => {};
-use Types::Standard qw(Enum Str);
+use Types::Standard qw(Enum Int Str);
 use Text::CSV_XS;
 use File::Path       qw(make_path);
 use Carp             qw(croak);
@@ -70,7 +70,7 @@ option 'sep' => (
 option 'size' => (
   is      => 'ro',
   format  => 'i',
-  isa     => Str,
+  isa     => Int,
   default => sub { 3 },
   doc     => 'module size for qrencode (-s flag)',
 );

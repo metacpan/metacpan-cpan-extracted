@@ -1,7 +1,7 @@
 package OpenTelemetry::Instrumentation::namespace;
 # ABSTRACT: OpenTelemetry instrumentation for a namespace
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 use v5.38;
 use experimental 'try';

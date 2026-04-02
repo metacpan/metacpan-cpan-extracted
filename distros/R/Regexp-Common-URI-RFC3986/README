@@ -1,0 +1,152 @@
+NAME
+    Regexp::Common::URI::RFC3986 - Regexp patterns from RFC 3986
+
+SYNOPSIS
+        use Regexp::Common::URI::RFC3986 qw /:ALL/;
+
+        # Match a full URI
+        if( $string =~ /^$URI_reference$/ )
+        {
+            print "Valid URI reference\n";
+        }
+
+        # Match an IPv6 literal host
+        if( $string =~ /^$IP_literal$/ )
+        {
+            print "Valid IP literal\n";
+        }
+
+        # Use IDN helpers for Unicode hostnames
+        use Regexp::Common::URI::RFC3986 qw /:IDN/;
+
+        if( $string =~ /^$IDN_HOST$/ )
+        {
+            print "Valid Unicode hostname\n";
+        }
+
+VERSION
+        2025102001
+
+DESCRIPTION
+    This module exports regular expressions derived from RFC 3986 (*Uniform
+    Resource Identifier (URI): Generic Syntax*, January 2005), which
+    supersedes RFC 2396.
+
+    All exported variables are plain strings containing non-capturing regex
+    fragments ("(?:...)"). They are designed to be interpolated into larger
+    patterns and do not require "Regexp::Common" to function.
+
+    The exported variables mirror the structure and naming of
+    "Regexp::Common::URI::RFC2396" (from the "Regexp-Common" distribution),
+    updated to the RFC 3986 grammar. Key improvements over RFC 2396 include:
+
+    *   $pct_encoded replacing the old $escaped
+
+    *   $sub_delims and $unreserved per RFC 3986 §2
+
+    *   The full set of "path_*" productions ($path_abempty, $path_absolute,
+        $path_noscheme, $path_rootless, $path_empty)
+
+    *   $IP_literal supporting IPv6 addresses and "IPvFuture" forms
+
+    *   $IPv6address as a faithful transcription of RFC 3986 Appendix A
+
+    For backward compatibility, several RFC 2396 names ($mark, $uric,
+    $urics, $uric_no_slash, $escaped, $hostname, etc.) are also exported,
+    mapped to sensible RFC 3986 equivalents.
+
+EXPORTS
+    Nothing is exported by default. Use the following tags or individual
+    names.
+
+  Export tags
+    ":low"
+        Base character class building blocks: $digit, $upalpha, $lowalpha,
+        $alpha, $alphanum, $hex, $hexdig, $escaped, $pct_encoded, $mark,
+        $unreserved, $sub_delims, $reserved, $pchar, $uric, $urics,
+        $userinfo, $userinfo_no_colon, $uric_no_slash.
+
+    ":parts"
+        Path and query/fragment productions: $query, $fragment, $param,
+        $segment, $segment_nz, $segment_nz_nc, $path_abempty,
+        $path_absolute, $path_noscheme, $path_rootless, $path_empty,
+        $path_segments, $ftp_segments, $rel_segment, $abs_path, $rel_path,
+        $path.
+
+    ":connect"
+        Host and authority productions: $port, $dec_octet, $IPv4address,
+        $hextet, $ls32, $IPv6address, $IPvFuture, $IP_literal, $toplabel,
+        $domainlabel, $hostname, $host, $hostport, $server, $reg_name,
+        $authority.
+
+    ":URI"
+        Top-level URI productions: $scheme, $net_path, $opaque_part,
+        $hier_part, $relative_part, $relativeURI, $absoluteURI,
+        $relative_ref, $URI_reference.
+
+    ":IDN"
+        Optional non-normative Unicode/IDN helpers: $IDN_DOT, $ACE,
+        $IDN_U_LABEL, $IDN_HOST.
+
+    ":ALL"
+        All of the above.
+
+  Optional Unicode/IDN helpers
+    RFC 3986 is ASCII-only at the syntax level; internationalised host names
+    are to be represented as A-labels (punycode). For callers who want to
+    pre-validate Unicode host names before ACE conversion, the following
+    non-normative helpers are also exported under the ":IDN" tag:
+
+    $IDN_DOT
+        Recognises "." and the three IDNA dot-equivalents (U+3002, U+FF0E,
+        U+FF61).
+
+    $ACE
+        Case-insensitive "xn--" punycode prefix.
+
+    $IDN_U_LABEL
+        A single Unicode label of at most 63 characters, with the ACE hyphen
+        rule enforced: "--" at positions 3-4 is only permitted for ACE
+        labels.
+
+    $IDN_HOST
+        One or more Unicode labels separated by $IDN_DOT.
+
+    These variables are *non-normative* conveniences and are not used by the
+    RFC 3986 $host production, which remains ASCII per the specification.
+
+DEPENDENCIES
+    None beyond Exporter, which is part of the Perl core.
+
+REFERENCES
+    [RFC 3986]
+        Berners-Lee, T., Fielding, R., and Masinter, L.: *Uniform Resource
+        Identifiers (URI): Generic Syntax*. January 2005. Supersedes RFC
+        2732, RFC 2396, and RFC 1808. <http://tools.ietf.org/html/rfc3986>
+
+    [RFC 2396]
+        Berners-Lee, T., Fielding, R., and Masinter, L.: *Uniform Resource
+        Identifiers (URI): Generic Syntax*. August 1998.
+        <http://tools.ietf.org/html/rfc2396>
+
+COMPATIBILITY
+    This module has been tested on Perl 5.10 and 5.12 via perlbrew (local),
+    and on Perl 5.14 through 5.40 via the GitLab CI pipeline.
+
+SEE ALSO
+    Regexp::Common::URI::RFC2396 in the "Regexp-Common" distribution, which
+    this module supersedes.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+    The export structure and variable naming follow the conventions
+    established by Damian Conway and Abigail in
+    "Regexp::Common::URI::RFC2396".
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2025-2026, Jacques Deguest <jack@deguest.jp>
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

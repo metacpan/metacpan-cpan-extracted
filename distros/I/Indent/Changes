@@ -1,3 +1,16 @@
+0.11 2026-04-01T15:48:34+02:00
+ [Indent]
+ - Add test messages.
+
+ [Indent::Block]
+ - Add test messages.
+
+ [Indent::Data]
+ - Add test messages.
+
+ [Indent::Utils]
+ - Add test messages.
+
 0.10 2026-03-31T20:30:19+02:00
  [Indent::Word]
  - Add whitespace normalization.

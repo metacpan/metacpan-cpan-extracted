@@ -79,18 +79,8 @@ CODE:
 {
     SV *self_sv = ST(0);
 
-    /* Set up Bind registry + dispatch callback */
-    {
-        dSP;
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(self_sv);
-        PUTBACK;
-        call_pv("Chandra::_xs_init_bind", G_DISCARD);
-        FREETMPS;
-        LEAVE;
-    }
+    /* Set up Bind registry + dispatch callback directly in C */
+    chandra_init_bind(aTHX_ self_sv);
 
     /* Initialize webview */
     if (webview_init(&self->wv) != 0) {
@@ -98,26 +88,8 @@ CODE:
     }
     self->initialized = 1;
 
-    /* Inject bridge JS */
-    {
-        dSP;
-        int count;
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(sv_2mortal(newSVpvs("Chandra::Bridge")));
-        PUTBACK;
-        count = call_method("js_code", G_SCALAR);
-        SPAGAIN;
-        if (count > 0) {
-            SV *js_sv = POPs;
-            const char *js = SvPV_nolen(js_sv);
-            webview_eval(&self->wv, js);
-        }
-        PUTBACK;
-        FREETMPS;
-        LEAVE;
-    }
+    /* Inject bridge JS directly from C constant */
+    webview_eval(&self->wv, CHANDRA_BRIDGE_JS);
 }
 
 SV *
@@ -127,17 +99,10 @@ bind(self_sv, name_sv, callback)
     SV *callback
 CODE:
 {
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    XPUSHs(self_sv);
-    XPUSHs(name_sv);
-    XPUSHs(callback);
-    PUTBACK;
-    call_pv("Chandra::_xs_bind_method", G_DISCARD);
-    FREETMPS;
-    LEAVE;
+    /* Register binding directly in C */
+    STRLEN nlen;
+    const char *name = SvPV(name_sv, nlen);
+    chandra_app_bind(aTHX_ self_sv, name, nlen, callback);
     RETVAL = SvREFCNT_inc(self_sv);
 }
 OUTPUT:
@@ -372,27 +337,20 @@ CODE:
                 if (app_svp && SvOK(*app_svp)) {
                     SV **result_svp = hv_fetchs(res_hv, "result", 0);
                     SV **error_svp = hv_fetchs(res_hv, "error", 0);
-                    SV *js_sv;
 
-                    /* $bind->js_resolve($id, $result, $error) */
-                    PUSHMARK(SP);
-                    XPUSHs(bind);
-                    XPUSHs(*id_svp);
-                    XPUSHs(result_svp ? *result_svp : &PL_sv_undef);
-                    XPUSHs(error_svp ? *error_svp : &PL_sv_undef);
-                    PUTBACK;
-                    count = call_method("js_resolve", G_SCALAR);
-                    SPAGAIN;
-                    js_sv = (count > 0) ? newSVsv(POPs) : NULL;
-                    PUTBACK;
+                    /* Build JS resolve string directly in C */
+                    int id_int = (int)SvIV(*id_svp);
+                    SV *js_sv = chandra_bind_js_resolve(aTHX_ id_int,
+                        result_svp ? *result_svp : &PL_sv_undef,
+                        error_svp ? *error_svp : &PL_sv_undef);
 
                     if (js_sv) {
-                        /* $app->dispatch_eval_js($js) */
-                        PUSHMARK(SP);
-                        XPUSHs(*app_svp);
-                        XPUSHs(sv_2mortal(js_sv));
-                        PUTBACK;
-                        call_method("dispatch_eval_js", G_DISCARD);
+                        /* Dispatch eval directly via webview */
+                        PerlChandra *pc = CHANDRA_PC_FROM_APP(*app_svp);
+                        if (pc && pc->initialized) {
+                            chandra_dispatch_eval_js(aTHX_ pc, SvPV_nolen(js_sv));
+                        }
+                        SvREFCNT_dec(js_sv);
                     }
                 }
             }
@@ -422,37 +380,30 @@ CODE:
     }
 
     if (need_new) {
-        /* Chandra::Bind->new(app => $self) */
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(sv_2mortal(newSVpvs("Chandra::Bind")));
-        XPUSHs(sv_2mortal(newSVpvs("app")));
-        XPUSHs(self);
-        PUTBACK;
-        count = call_method("new", G_SCALAR);
-        SPAGAIN;
-        if (count > 0) {
-            SV *new_bind = newSVsv(POPs);
-            sv_setsv(get_sv("Chandra::_xs_bind", GV_ADD), new_bind);
-            SvREFCNT_dec(new_bind);
-        }
-        PUTBACK;
-        FREETMPS; LEAVE;
+        /* Create Chandra::Bind hash directly in C */
+        HV *bind_hv = newHV();
+        (void)hv_stores(bind_hv, "app", newSVsv(self));
+        SV *new_bind = sv_bless(newRV_noinc((SV *)bind_hv),
+                                gv_stashpvs("Chandra::Bind", GV_ADD));
+        sv_setsv(get_sv("Chandra::_xs_bind", GV_ADD), new_bind);
+        SvREFCNT_dec(new_bind);
     }
 
-    /* $self->_set_callback(\&Chandra::_xs_dispatch) */
+    /* Set callback directly on PerlChandra struct */
     {
-        dSP;
+        PerlChandra *pc = INT2PTR(PerlChandra *, SvIV(SvRV(self)));
         CV *dispatch_cv = get_cv("Chandra::_xs_dispatch", 0);
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(self);
-        XPUSHs(sv_2mortal(newRV_inc((SV *)dispatch_cv)));
-        PUTBACK;
-        call_method("_set_callback", G_DISCARD);
-        FREETMPS; LEAVE;
+        SV *callback = newRV_inc((SV *)dispatch_cv);
+
+        if (pc->callback) {
+            SvREFCNT_dec(pc->callback);
+            perl_callback = NULL;
+        }
+        perl_callback = SvREFCNT_inc(callback);
+        pc->callback = perl_callback;
+        pc->wv.external_invoke_cb = external_invoke_cb;
+        my_perl_interp = PERL_GET_THX;
+        SvREFCNT_dec(callback);
     }
 }
 
@@ -467,36 +418,20 @@ CODE:
 
     /* Ensure bind exists */
     if (!bind || !SvOK(bind)) {
-        dSP;
-        int count;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(sv_2mortal(newSVpvs("Chandra::Bind")));
-        XPUSHs(sv_2mortal(newSVpvs("app")));
-        XPUSHs(self);
-        PUTBACK;
-        count = call_method("new", G_SCALAR);
-        SPAGAIN;
-        if (count > 0) {
-            SV *new_bind = newSVsv(POPs);
-            sv_setsv(get_sv("Chandra::_xs_bind", GV_ADD), new_bind);
-            SvREFCNT_dec(new_bind);
-        }
-        PUTBACK;
-        FREETMPS; LEAVE;
+        /* Create Chandra::Bind hash directly in C */
+        HV *bind_hv = newHV();
+        (void)hv_stores(bind_hv, "app", newSVsv(self));
+        SV *new_bind = sv_bless(newRV_noinc((SV *)bind_hv),
+                                gv_stashpvs("Chandra::Bind", GV_ADD));
+        sv_setsv(get_sv("Chandra::_xs_bind", GV_ADD), new_bind);
+        SvREFCNT_dec(new_bind);
         bind = get_sv("Chandra::_xs_bind", 0);
     }
 
-    /* $bind->bind($name, $sub) */
+    /* Register directly in the bind registry */
     {
-        dSP;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(bind);
-        XPUSHs(name);
-        XPUSHs(sub);
-        PUTBACK;
-        call_method("bind", G_DISCARD);
-        FREETMPS; LEAVE;
+        STRLEN nlen;
+        const char *nstr = SvPV(name, nlen);
+        chandra_bind_register(aTHX_ nstr, nlen, sub);
     }
 }

@@ -98,11 +98,11 @@ DEF_RULE
 $builder_def_rule
 # Compile xs_jit.c to object file
 $xs_jit_o : $xs_jit_c $xs_jit_h
-\t\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_o $xs_jit_c
+	\$(CCCMD) \$(CCCDLFLAGS) -iwithsysroot "\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_o $xs_jit_c
 
 # Compile xs_jit_builder.c to object file
 $xs_jit_builder_o : $xs_jit_builder_c $xs_jit_builder_h
-\t\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_builder_o $xs_jit_builder_c
+	\$(CCCMD) \$(CCCDLFLAGS) -iwithsysroot "\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_builder_o $xs_jit_builder_c
 
 # Make sure xs_jit object is built before linking main module
 \$(INST_DYNAMIC) : $xs_jit_o
@@ -113,7 +113,7 @@ $builder_c : $builder_xs
 
 # Compile Builder.c to object file
 $builder_o : $builder_c $xs_jit_builder_h
-\t\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" -Ilib/XS/JIT \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $builder_o $builder_c
+	\$(CCCMD) \$(CCCDLFLAGS) -iwithsysroot "\$(PERL_INC)" -Ilib/XS/JIT \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $builder_o $builder_c
 
 # Link Builder.so/dll - on Windows use Builder.def instead of EXPORT_LIST
 $builder_so : $builder_o $xs_jit_builder_o $builder_export_list

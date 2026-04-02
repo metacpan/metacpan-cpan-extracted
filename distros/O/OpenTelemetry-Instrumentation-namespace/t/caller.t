@@ -121,4 +121,10 @@ describe 'With explicit auto-instrumentation' => sub {
     };
 };
 
+is messages {
+    OpenTelemetry::Instrumentation->import( caller => [ qr/.*/ => 0 ] );
+} => [
+    [ trace => E, match qr/Loading .*::caller/ ],
+] => 'caller instrumentation does not report false failed installs';
+
 done_testing;

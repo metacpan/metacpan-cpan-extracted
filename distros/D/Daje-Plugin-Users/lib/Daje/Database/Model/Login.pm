@@ -45,7 +45,7 @@ has 'db';
 sub login ($self, $mail, $password) {
     my $outcome;
     my $login_stmt = qq{
-        SELECT users_users_pkey, mail, users_workflow_fkey
+        SELECT users_users_pkey, mail, users_workflow_fkey, avatar, name
             FROM users_users
            WHERE mail = ? AND password = ? AND active = true
     };

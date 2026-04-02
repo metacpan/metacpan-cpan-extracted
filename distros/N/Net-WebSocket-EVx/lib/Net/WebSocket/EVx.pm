@@ -5,7 +5,7 @@ use EV ();
 use XSLoader ();
 our $VERSION;
 BEGIN {
-    $VERSION = '0.19';
+    $VERSION = '0.20';
     XSLoader::load(__PACKAGE__, $VERSION);
 }
 use constant { WS_FRAGMENTED_EOF => 0, WS_FRAGMENTED_ERROR => -1, WS_FRAGMENTED_DATA => 1, WS_RSV1_BIT => 0x04 };

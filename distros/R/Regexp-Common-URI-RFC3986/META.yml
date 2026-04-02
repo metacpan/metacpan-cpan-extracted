@@ -1,0 +1,41 @@
+---
+abstract: 'Regexp patterns from RFC 3986'
+author:
+  - 'Jacques Deguest <jack@deguest.jp>'
+build_requires:
+  Exporter: '0'
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - 'regular expression'
+  - URI
+  - RFC3986
+  - pattern
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-Common-URI-RFC3986
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/Regexp-Common-URI-RFC3986/-/issues
+  repository: https://gitlab.com/jackdeguest/Regexp-Common-URI-RFC3986.git
+version: '2025102001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

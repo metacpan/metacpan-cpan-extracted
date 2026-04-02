@@ -1,4 +1,4 @@
-/* Copyright (c) 1999-2026  H.Merijn Brand <h.m.brand@xs4all.nl>
+/* Copyright (c) 1999-2026  H.Merijn Brand <hmbrand@cpan.org>
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Artistic License, as specified in the Perl README file.
@@ -85,8 +85,21 @@ extern int      sqlxec  (CRSCB   *,                              SQLDBGST *);
 
 extern char    *basename (const char *path);
 
+/* See $UNIFY/rhli.c */
 extern int	uallcgp (UTXID, UTID, int, int*, UCID **, USTATUS *);
 extern int	uinfcgp (UTXID, int, UCID *, UOPTS, UCGPINF *, USTATUS *, USTATUS *);
+extern int      inihvds (HVDS *, void *, const char *, int *, HVDS *, int, int, int, int);
+extern int      sqlebtx (UTXID *, USTATUS *);
+extern int      uallath (UTXID, int, int *, UAID **, USTATUS *);
+extern int      ualllnk (UTXID, UTID, int, int *, ULID **, USTATUS *);
+extern int      ualltbl (UTXID, UAID, int, int *, UTID **, USTATUS *);
+extern int      ufchcnm (UTXID, UCID, int *, char ***, USTATUS *);
+extern int      ufchtnm (UTXID, UTID, int *, char ***, USTATUS *);
+extern int      uinfath (UTXID, int, UAID *, int, UATHINF *, USTATUS *, USTATUS *);
+extern int      uinfcol (UTXID, int, UCID *, UOPTS, UCOLINF *, USTATUS *, USTATUS *);
+extern int      uinflnk (UTXID, int, ULID *, UOPTS, ULNKINF *, USTATUS *, USTATUS *);
+extern int      uinftbl (UTXID, int, UTID *, UOPTS, UTBLINF *, USTATUS *, USTATUS *);
+extern int      uopndb  (char *, int, UDBID *, USTATUS *);
 
 #define Max(a,b)	((a)>=(b)?(a):(b))
 
@@ -658,7 +671,6 @@ static void _db_dict (int refresh) {
 
 			if (ufchcnm (txid, cid, &nn, &cnames, &status))
 			    cname = cnames[0];
-
 
 			if (ti->nkey > 1) { /* Combined keys */
 			    int kc;

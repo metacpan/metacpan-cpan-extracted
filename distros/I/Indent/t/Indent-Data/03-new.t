@@ -10,7 +10,8 @@ use Test::NoWarnings;
 eval {
 	Indent::Data->new('');
 };
-is($EVAL_ERROR, "Unknown parameter ''.\n");
+is($EVAL_ERROR, "Unknown parameter ''.\n",
+	"Unknown parameter ''.");
 
 # Test.
 eval {
@@ -18,7 +19,8 @@ eval {
 		'something' => 'value',
 	);
 };
-is($EVAL_ERROR, "Unknown parameter 'something'.\n");
+is($EVAL_ERROR, "Unknown parameter 'something'.\n",
+	"Unknown parameter 'something'.");
 
 # Test.
 eval {
@@ -27,7 +29,8 @@ eval {
 		'line_size' => '1',
 	);
 };
-is($EVAL_ERROR, "Bad line_size = '1' or length of string '  '.\n");
+is($EVAL_ERROR, "Bad line_size = '1' or length of string '  '.\n",
+	"Bad line_size = '1' or length of string '  '.");
 
 # Test.
 my $obj = Indent::Data->new;

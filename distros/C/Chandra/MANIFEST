@@ -15,8 +15,9 @@ include/chandra/chandra.h
 include/chandra/chandra_bind.h
 include/chandra/chandra_devtools.h
 include/chandra/chandra_element.h
-include/chandra/chandra_error.c
-include/chandra/chandra_error.o
+include/chandra/chandra_error.h
+include/chandra/chandra_internal.h
+include/chandra/chandra_notify.h
 include/chandra/chandra_socket_client.h
 include/chandra/chandra_socket_common.h
 include/chandra/chandra_socket_hub.h
@@ -37,6 +38,7 @@ lib/Chandra/Element.pm
 lib/Chandra/Error.pm
 lib/Chandra/Event.pm
 lib/Chandra/HotReload.pm
+lib/Chandra/Notify.pm
 lib/Chandra/Protocol.pm
 lib/Chandra/Socket/Client.pm
 lib/Chandra/Socket/Connection.pm
@@ -83,6 +85,7 @@ t/34_socket_edge.t
 t/35_tray.t
 t/36_tray_edge.t
 t/37_css_js.t
+t/38_notify.t
 typemap
 xs/app.xs
 xs/bind.xs
@@ -94,6 +97,7 @@ xs/element.xs
 xs/error.xs
 xs/event.xs
 xs/hotreload.xs
+xs/notify.xs
 xs/protocol.xs
 xs/socket_client.xs
 xs/socket_connection.xs

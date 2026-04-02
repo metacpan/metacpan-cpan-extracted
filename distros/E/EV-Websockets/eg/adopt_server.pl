@@ -12,7 +12,6 @@ use EV::Websockets;
 # and upgrading it to a WebSocket connection.
 
 my $ctx = EV::Websockets::Context->new();
-$ctx->listen(port => 0, on_connect => sub {}, on_message => sub {});
 
 my $port = 8080;
 

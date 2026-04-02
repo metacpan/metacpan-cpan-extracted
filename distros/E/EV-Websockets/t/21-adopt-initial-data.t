@@ -10,9 +10,6 @@ EV::Websockets::_set_debug(1) if $ENV{EV_WS_DEBUG};
 
 my $ctx = EV::Websockets::Context->new();
 
-# Vhost required for adopt()
-$ctx->listen(port => 0, on_connect => sub {}, on_message => sub {});
-
 # Raw TCP listener (stand-in for Feersum/nginx/etc.)
 my $raw_srv = IO::Socket::INET->new(
     Listen    => 5,

@@ -193,7 +193,7 @@
       },
       "Daje::Plugin::Users" : {
          "file" : "lib/Daje/Plugin/Users.pm",
-         "version" : "0.01"
+         "version" : "0.04"
       },
       "Daje::Plugin::Users::Authorities" : {
          "file" : "lib/Daje/Plugin/Users/Authorities.pm"
@@ -228,7 +228,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Plugin-Users"
       }
    },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_contributors" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],

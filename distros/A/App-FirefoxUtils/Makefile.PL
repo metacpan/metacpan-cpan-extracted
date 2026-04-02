@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::FirefoxUtils",
   "PREREQ_PM" => {
     "App::BrowserUtils" => "0.019",
+    "App::KDEActivityUtils" => 0,
     "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
@@ -77,7 +78,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.024",
+  "VERSION" => "0.025",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -86,6 +87,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::BrowserUtils" => "0.019",
+  "App::KDEActivityUtils" => 0,
   "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,

@@ -1,5 +1,30 @@
 Revision history for Perl extension XML::Parser.
 
+2.55 2026-04-01 (by Todd Rinaldo)
+
+  Fixes:
+    - PR #221 Fix struct-return ABI mismatch in XML_ExpatVersionInfo()
+      by parsing the version string instead of using the struct return,
+      which was corrupted when Perl and libexpat used different struct
+      return conventions (-fpcc-struct-return vs -freg-struct-return)
+    - PR #214 GH #211 GH #212 GH #213 Revert defaulthandle char
+      routing and standalone string changes that broke downstream CPAN
+      modules (XML-Twig, XML-DOM, XML-XPath)
+    - PR #216 GH #215 Increase deep_nesting test depth from 600 to
+      2048 to actually exercise the st_serial_stack reallocation code
+      path (the GH #39 fix)
+    - PR #218 Update expat download URL from SourceForge to GitHub in
+      the "expat not found" error message
+
+  Improvements:
+    - PR #220 GH #215 Add AddressSanitizer CI job for XS memory safety
+      to catch heap buffer overflows and use-after-free bugs
+
+  Maintenance:
+    - PR #219 Modernize last 4 print-ok test files (astress, namespaces,
+      stream, skip) to Test::More with descriptive test names
+    - PR #217 Remove obsolete .travis.yml (project uses GitHub Actions)
+
 2.54 2026-03-27 (by Todd Rinaldo)
 
   Fixes:

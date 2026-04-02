@@ -17,12 +17,23 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  JSON::Syck:
+    file: lib/JSON/Syck.pm
+    version: '1.43'
+  YAML::Dumper::Syck:
+    file: lib/YAML/Dumper/Syck.pm
+  YAML::Loader::Syck:
+    file: lib/YAML/Loader/Syck.pm
+  YAML::Syck:
+    file: lib/YAML/Syck.pm
+    version: '1.43'
 requires:
   perl: '5.006'
 resources:
   bugtracker: https://github.com/toddr/YAML-Syck/issues
-  homepage: http://github.com/toddr/YAML-Syck
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/toddr/YAML-Syck
-version: '1.42'
+  homepage: https://github.com/toddr/YAML-Syck
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/toddr/YAML-Syck.git
+version: '1.43'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

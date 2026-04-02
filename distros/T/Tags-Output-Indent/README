@@ -5,10 +5,10 @@ SYNOPSIS
      use Tags::Output::Indent(%params);
 
      my $tags = Tags::Output::Indent->new;
-     $tags->put(['b', 'tag']);
-     my @open_tags = $tags->open_tags;
      $tags->finalize;
      $tags->flush;
+     my @open_elements = $tags->open_elements;
+     $tags->put(['b', 'tag']);
      $tags->reset;
 
 METHODS
@@ -187,15 +187,17 @@ METHODS
     return code. If enabled $reset_flag, then resets internal variables via
     reset method.
 
-  "open_tags"
-     my @open_tags = $tags->open_tags;
+  "open_elements"
+     my @open_elements = $tags->open_elements;
 
-    Return array of opened tags.
+    Get list of opened elements.
+
+    Return array of strings.
 
   "put"
      $tags->put(['b', 'tag']);
 
-    Put tags code in tags format.
+    Put Tags structure to object.
 
   "reset"
      $tags->reset;
@@ -213,7 +215,7 @@ ERRORS
      Ending bad tag: '%s' in block of tag '%s'.
      In XML mode must be a attribute value.
 
-EXAMPLE
+EXAMPLE1
      use strict;
      use warnings;
 
@@ -235,6 +237,42 @@ EXAMPLE
      # Output:
      # <text>
      #   data
+     # </text>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Tags::Output::Indent;
+     use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+     # Object.
+     my $tags = Tags::Output::Indent->new(
+             'data_callback' => sub {
+                     my $data_ar = shift;
+                     foreach my $data (@{$data_ar}) {
+                             $data = encode_utf8($data);
+                     }
+                     return;
+             },
+     );
+
+     # Data in characters.
+     my $data = decode_utf8('řčěšřšč');
+
+     # Put data.
+     $tags->put(
+             ['b', 'text'],
+             ['d', $data],
+             ['e', 'text'],
+     );
+
+     # Print.
+     print $tags->flush."\n";
+
+     # Output:
+     # <text>
+     #   řčěšřšč
      # </text>
 
 DEPENDENCIES
@@ -265,5 +303,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.13
+    0.14
 

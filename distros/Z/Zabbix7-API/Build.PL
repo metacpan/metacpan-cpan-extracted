@@ -22,6 +22,8 @@ my %args = (
     },
 
     requires => {
+        'Moo' => '0',
+        'Test::Exception' => '0',
         'perl' => '5.010',
     },
 

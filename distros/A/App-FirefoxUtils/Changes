@@ -1,3 +1,8 @@
+0.025   2026-03-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli open-firefox-tabs] Add option: --kde-activity.
+
+
 0.024   2026-03-26  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

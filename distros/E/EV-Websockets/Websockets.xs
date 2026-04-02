@@ -1178,7 +1178,6 @@ CODE:
         croak("Failed to create libwebsockets context");
     }
     ev_ws_ssl_inited = 1;
-
     ev_timer_init(&RETVAL->timer, timer_cb, 0.00001, 0.);
     RETVAL->timer.data = (void*)RETVAL;
 
@@ -1345,16 +1344,19 @@ CODE:
     if (host[0] == '[') {
         p = strchr(host, ']');
         if (p) {
-            size_t iplen = p - host - 1; /* length of bare address */
-            Newx(host_header, iplen + 3, char); /* [addr]\0 */
-            host_header[0] = '[';
-            memcpy(host_header + 1, host + 1, iplen);
-            host_header[iplen + 1] = ']';
-            host_header[iplen + 2] = '\0';
+            size_t iplen = p - host - 1;
+            int hport = 0;
             host++;    /* skip '[' */
+            if (*(p + 1) == ':') {
+                hport = atoi(p + 2);
+                port = hport;
+            }
             *p = '\0'; /* terminate IPv6 address */
-            if (*(p + 1) == ':')
-                port = atoi(p + 2);
+            Newx(host_header, iplen + 10, char); /* [addr]:port\0 */
+            if (hport && hport != (use_ssl ? 443 : 80))
+                snprintf(host_header, iplen + 10, "[%s]:%d", host, hport);
+            else
+                snprintf(host_header, iplen + 10, "[%s]", host);
         }
     } else {
         p = strchr(host, ':');
@@ -1669,15 +1671,22 @@ CODE:
     link_conn(self, RETVAL);
 
     {
-        /* Try "server" vhost first (created by listen()), fall back to "default" */
         struct lws_vhost *vh = lws_get_vhost_by_name(self->lws_ctx, "server");
-        if (!vh) vh = lws_get_vhost_by_name(self->lws_ctx, "default");
+        if (!vh) {
+            /* Auto-create a server vhost for adoption (no listener needed) */
+            struct lws_context_creation_info vinfo;
+            memset(&vinfo, 0, sizeof(vinfo));
+            vinfo.port = CONTEXT_PORT_NO_LISTEN_SERVER;
+            vinfo.protocols = protocols;
+            vinfo.vhost_name = "server";
+            vh = lws_create_vhost(self->lws_ctx, &vinfo);
+        }
         if (!vh) {
             unlink_conn(RETVAL);
             free_conn_resources(RETVAL);
             RETVAL->magic = EV_WS_CONN_FREED;
             Safefree(RETVAL);
-            croak("Cannot find default vhost for adoption");
+            croak("Failed to create vhost for adoption");
         }
         pending_adoption = RETVAL;
         if (initial_data_sv && SvOK(initial_data_sv)) {

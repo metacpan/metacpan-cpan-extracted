@@ -6,4 +6,5 @@ bck/
 old/
 __pycache__/
 /do_readme.sh
+/README
 /README_text.md

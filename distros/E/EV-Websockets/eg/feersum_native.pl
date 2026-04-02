@@ -15,8 +15,6 @@ use IO::Socket::INET;
 # from the PSGI env and replay them to lws via initial_data.
 
 my $ctx = EV::Websockets::Context->new();
-# A listener vhost is required for adopt() to work with lws 4.5+
-$ctx->listen(port => 0, on_connect => sub {}, on_message => sub {});
 
 my $feersum = Feersum->endjinn;
 

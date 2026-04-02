@@ -1,0 +1,85 @@
+metadata:
+  version: "0.04"
+  local_version: "test-unsupported"
+  author: "Test"
+  center: "Test"
+  date: "2026-04-01"
+  description: "Unsupported version test codebook."
+  repository: "https://example.org"
+
+entities:
+  _defaults:
+    Unknown:
+      code: UNK
+      stub_code: U
+      label: "Unknown"
+      id: "NCIT:C17998"
+    "Not Available":
+      code: NAV
+      stub_code: n
+      label: "Not Available"
+      id: "NCIT:C126101"
+  biosample:
+    project:
+      "TCGA-AML":
+        code: TCGA_AML
+        stub_code: AML
+        label: "TCGA Acute Myeloid Leukemia"
+        id: "NCIT:C17998"
+    species:
+      Human:
+        code: HomSap
+        stub_code: "01"
+        label: "Homo sapiens"
+        id: "NCBITaxon:9606"
+        tax_code: MPH
+    tissue:
+      Liver:
+        code: LIV
+        stub_code: L
+        label: "Liver"
+        id: "UBERON:0002107"
+    sample_type:
+      Tumor:
+        code: TUM
+        stub_code: T
+        label: "Tumor"
+        id: "NCIT:C3262"
+    assay:
+      RNA_seq:
+        code: RNA
+        stub_code: R
+        label: "RNA sequencing"
+        id: "EFO:0002770"
+    timepoint:
+      Baseline:
+        code: BSL
+        stub_code: B
+        label: "Baseline"
+        id: "NCIT:C25213"
+    condition_pattern: '^[A-Z][0-9]{2}(?:\.[0-9A-Z]{1,4})?$'
+  subject:
+    study:
+      "TCGA-AML":
+        code: TCGA_AML
+        stub_code: AML
+        label: "TCGA Acute Myeloid Leukemia"
+        id: "NCIT:C17998"
+    type:
+      Case:
+        code: CAS
+        stub_code: C
+        label: "Case"
+        id: "NCIT:C25464"
+    sex:
+      Male:
+        code: MAL
+        stub_code: M
+        label: "Male"
+        id: "PATO:0000384"
+    age_group:
+      Adult:
+        code: ADU
+        stub_code: A
+        label: "Adult"
+        id: "NCIT:C17600"

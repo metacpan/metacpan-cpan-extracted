@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-26'; # DATE
+our $DATE = '2026-03-29'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxUtils/firefox_has_processes",
@@ -40,7 +40,7 @@ firefox-has-processes - Check whether Firefox has processes
 
 =head1 VERSION
 
-This document describes version 0.024 of firefox-has-processes (from Perl distribution App-FirefoxUtils), released on 2026-03-26.
+This document describes version 0.025 of firefox-has-processes (from Perl distribution App-FirefoxUtils), released on 2026-03-29.
 
 =head1 SYNOPSIS
 

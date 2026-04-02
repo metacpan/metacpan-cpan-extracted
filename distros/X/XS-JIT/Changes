@@ -1,5 +1,10 @@
 Revision history for XS-JIT
 
+0.15    2026-04-01
+	- Fixes for macOS hardened runtime
+                - SDK header resolution: use -iwithsysroot for Perl CORE includes
+	        - Fix dlopen failure, resolve relative paths to absolute
+
 0.14    2026-01-29
 	- Fix Windows build: use correct .def file for Builder.dll
 	  (was incorrectly using JIT.def which exports boot_XS__JIT instead of boot_XS__JIT__Builder)

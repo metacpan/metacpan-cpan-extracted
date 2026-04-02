@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-OpenCage
 
+0.39    2026-04-01
+        - better Agent Skill link in pod, no code changes
+
 0.38    2026-03-26
         - more pod fixes
         - fix timestamp typo in date for 0.37 entry

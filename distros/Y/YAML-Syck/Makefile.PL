@@ -40,6 +40,8 @@ _
 # One liner stolen from inc/Module/Install/Compiler.pm
 my $c_files = join ' ', map { substr( $_, 0, -2 ) . $Config::Config{_o} } ( glob("*.c"), ( -e 'Syck.c' ? () : 'Syck.c' ) );
 
+my $version = MM->parse_version('lib/YAML/Syck.pm');
+
 WriteMakefile(
     NAME               => 'YAML::Syck',
     AUTHOR             => q{Todd Rinaldo <toddr@cpan.org>},
@@ -63,12 +65,35 @@ WriteMakefile(
     $ExtUtils::MakeMaker::VERSION >= 6.46
     ? (
         'META_MERGE' => {
+            'meta-spec' => { version => 2 },
             resources => {
-                'license'    => 'http://dev.perl.org/licenses/',
-                'homepage'   => 'http://github.com/toddr/YAML-Syck',
-                'bugtracker' => 'https://github.com/toddr/YAML-Syck/issues',
-                'repository' => 'http://github.com/toddr/YAML-Syck',
-            }
+                'license'    => ['https://dev.perl.org/licenses/'],
+                'homepage'   => 'https://github.com/toddr/YAML-Syck',
+                'bugtracker' => {
+                    'web' => 'https://github.com/toddr/YAML-Syck/issues',
+                },
+                'repository' => {
+                    'type' => 'git',
+                    'url'  => 'https://github.com/toddr/YAML-Syck.git',
+                    'web'  => 'https://github.com/toddr/YAML-Syck',
+                },
+            },
+            provides => {
+                'YAML::Syck' => {
+                    file    => 'lib/YAML/Syck.pm',
+                    version => $version,
+                },
+                'JSON::Syck' => {
+                    file    => 'lib/JSON/Syck.pm',
+                    version => $version,
+                },
+                'YAML::Dumper::Syck' => {
+                    file    => 'lib/YAML/Dumper/Syck.pm',
+                },
+                'YAML::Loader::Syck' => {
+                    file    => 'lib/YAML/Loader/Syck.pm',
+                },
+            },
         }
       )
     : (),

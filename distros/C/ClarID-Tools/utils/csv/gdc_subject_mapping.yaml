@@ -1,0 +1,188 @@
+# mapping_subject.yaml
+
+fields:
+  unique_id:
+    source: cases.case_id
+    operations:
+      - strip_quotes
+      - trim
+
+  study:
+    source: project.project_id
+    operations:
+      - strip_quotes
+      - trim
+
+  type:
+    source: project.project_id
+    operations:
+      - map_values:
+          APOLLO-LUAD: Case
+          BEATAML1.0-COHORT: Case
+          BEATAML1.0-CRENOLANIB: Case
+          CDDP_EAGLE-1: Case
+          CGCI-BLGSP: Case
+          CGCI-HTMCP-CC: Case
+          CGCI-HTMCP-DLBCL: Case
+          CGCI-HTMCP-LC: Case
+          CMI-ASC: Case
+          CMI-MBC: Case
+          CMI-MPC: Case
+          CPTAC-2: Case
+          CPTAC-3: Case
+          CTSP-DLBCL1: Case
+          EXCEPTIONAL_RESPONDERS-ER: Case
+          FM-AD: Case
+          HCMI-CMDC: Case
+          MATCH-B: Case
+          MATCH-C1: Case
+          MATCH-H: Case
+          MATCH-I: Case
+          MATCH-N: Case
+          MATCH-P: Case
+          MATCH-Q: Case
+          MATCH-R: Case
+          MATCH-S1: Case
+          MATCH-S2: Case
+          MATCH-U: Case
+          MATCH-W: Case
+          MATCH-Y: Case
+          MATCH-Z1A: Case
+          MATCH-Z1B: Case
+          MATCH-Z1D: Case
+          MATCH-Z1I: Case
+          MMRF-COMMPASS: Case
+          MP2PRT-ALL: Case
+          MP2PRT-WT: Case
+          NCICCR-DLBCL: Case
+          OHSU-CNL: Case
+          ORGANOID-PANCREATIC: Case
+          REBC-THYR: Case
+          TARGET-ALL-P1: Case
+          TARGET-ALL-P2: Case
+          TARGET-ALL-P3: Case
+          TARGET-AML: Case
+          TARGET-CCSK: Case
+          TARGET-NBL: Case
+          TARGET-OS: Case
+          TARGET-RT: Case
+          TARGET-WT: Case
+          TCGA-ACC: Case
+          TCGA-BLCA: Case
+          TCGA-BRCA: Case
+          TCGA-CESC: Case
+          TCGA-CHOL: Case
+          TCGA-COAD: Case
+          TCGA-DLBC: Case
+          TCGA-ESCA: Case
+          TCGA-GBM: Case
+          TCGA-HNSC: Case
+          TCGA-KICH: Case
+          TCGA-KIRC: Case
+          TCGA-KIRP: Case
+          TCGA-LAML: Case
+          TCGA-LGG: Case
+          TCGA-LIHC: Case
+          TCGA-LUAD: Case
+          TCGA-LUSC: Case
+          TCGA-MESO: Case
+          TCGA-OV: Case
+          TCGA-PAAD: Case
+          TCGA-PCPG: Case
+          TCGA-PRAD: Case
+          TCGA-READ: Case
+          TCGA-SARC: Case
+          TCGA-SKCM: Case
+          TCGA-STAD: Case
+          TCGA-TGCT: Case
+          TCGA-THCA: Case
+          TCGA-THYM: Case
+          TCGA-UCEC: Case
+          TCGA-UCS: Case
+          TCGA-UVM: Case
+          TRIO-CRU: Case
+          VAREPOP-APOLLO: Case
+          WCDT-MCRPC: Case
+
+  condition:
+    source: diagnoses.icd_10_code
+    operations:
+      - strip_quotes
+      - map_values:
+          '--': 'R69'
+          'C73.9': 'C73'
+          'C78.9': 'C78'
+          'C76.7': 'C76'
+          'C96.7': 'C96'
+          'C61.9': 'C61'
+          'C19.9': 'C19'
+
+  sex:
+    source: demographic.gender
+    operations:
+      - strip_quotes
+      - trim
+      - normalize_sex
+      - map_values:
+          '--': 'Not Available'
+
+  age_group:
+    source: demographic.age_at_index
+    operations:
+      - strip_quotes
+      - trim
+      - map_values:
+          '--': ~
+      - bucketize_age:
+          - name: "Age0to9"
+            min: 0
+            max: 9
+          - name: "Age10to19"
+            min: 10
+            max: 19
+          - name: "Age20to29"
+            min: 20
+            max: 29
+          - name: "Age30to39"
+            min: 30
+            max: 39
+          - name: "Age40to49"
+            min: 40
+            max: 49
+          - name: "Age50to59"
+            min: 50
+            max: 59
+          - name: "Age60to69"
+            min: 60
+            max: 69
+          - name: "Age70to79"
+            min: 70
+            max: 79
+          - name: "Age80to89"
+            min: 80
+            max: 89
+          - name: "Age90to99"
+            min: 90
+            max: 99
+
+
+  subject_id:
+  # subject_id behavior:
+  # - if 'source' is set, rows sharing the same raw value get the same integer ID (group-mode)
+  # - if 'source' is empty, every row gets a new sequential ID (pure-counter mode)
+    source: cases.case_id
+    operations: []
+
+output_headers:
+  - unique_id
+  - study
+  - type
+  - condition
+  - sex
+  - age_group
+  - subject_id
+
+static_fields:
+  type:      'Not Available'
+  sex:       'Not Available'
+  age_group: 'Not Available'

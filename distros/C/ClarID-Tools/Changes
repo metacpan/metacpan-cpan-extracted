@@ -1,4 +1,14 @@
-Revision history for Perl distribution Pheno-Ranker
+Revision history for ClarID-Tools
+
+0.03 2025-04-01T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Moved csv pre-processing scripts from nb/data/scripts to utils/csv. Updated nb/*py accordingly
+ - Updated 'code.pm' (and tests) to allow for alternative encodings for field 'species'
+ - csv2_clarid_in.py now writes CSV output with Unix (\n) line endings explicitly for consistent preprocessing output across
+   platforms
+ - Bulk CSV output now uses Text::CSV_XS->print instead of raw string joins, so fields such as condition_name are properly quoted and escaped
+ - Move shared schemas/codebooks to share/versions/ and symlink top-level paths to latest version
+ - Add explicit checks for supported codebook versions (0.02 and 0.03)
 
 0.02 2025-09-05T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 

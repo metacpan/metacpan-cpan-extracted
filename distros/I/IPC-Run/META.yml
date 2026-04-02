@@ -20,14 +20,14 @@ no_index:
     - t
     - inc
 recommends:
-  IO::Pty: '1.08'
+  IO::Pty: '1.25'
   Readonly: '0'
 requires:
-  IO::Pty: '1.08'
+  IO::Pty: '1.25'
   Test::More: '0.47'
 resources:
-  bugtracker: https://github.com/toddr/IPC-Run/issues
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/toddr/IPC-Run
-version: '20260322.0'
+  bugtracker: https://github.com/cpan-authors/IPC-Run/issues
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/cpan-authors/IPC-Run
+version: '20260401.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

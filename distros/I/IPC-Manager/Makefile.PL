@@ -37,10 +37,9 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::API" => "1.302219",
     "Test2::Require::Module" => "1.302219",
-    "Test2::Tools::QuickDB" => "0.000038",
     "Test2::V1" => "1.302219"
   },
-  "VERSION" => "0.000009",
+  "VERSION" => "0.000010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +61,6 @@ my %FallbackPrereqs = (
   "Sub::Util" => "1.40",
   "Test2::API" => "1.302219",
   "Test2::Require::Module" => "1.302219",
-  "Test2::Tools::QuickDB" => "0.000038",
   "Test2::Util::UUID" => "0.002010",
   "Test2::V1" => "1.302219",
   "Time::HiRes" => 0,

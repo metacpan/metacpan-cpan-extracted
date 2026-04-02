@@ -13,7 +13,7 @@ use warnings;
 # All methods return C code strings for JIT compilation.
 # Zero runtime overhead - handshake code compiled only when websocket routes exist.
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # RFC 6455 magic GUID for accept key calculation
 our $WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';

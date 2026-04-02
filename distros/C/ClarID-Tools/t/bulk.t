@@ -79,10 +79,10 @@ EOF
 
     my $want = <<'EOF';
 unique_id,clar_id,project,species,subject_id,tissue,sample_type,assay,condition,timepoint,duration,batch,replicate,condition_name
-samp001,CNAG_Test-HomSap-00001-LIV-NOR-RNA-C22.0-BSL-P0D-B01-R05,CNAG-Test,Human,1,Liver,Normal,RNA_seq,C22.0,Baseline,P0D,1,5,Liver cell carcinoma
-samp002,CNAG_Test-MusMus-00002-BRN-TUM-CHI-C71.0-TRT-P7W-B02-R02,CNAG-Test,Mouse,2,Brain,Tumor,ChIP_seq,C71.0,Treatment,P7W,2,2,Malignant neoplasm of cerebrum, except lobes and ventricles
-samp003,CNAG_Test-DanRer-00003-BLO-NOR-WES-I46-SUR-P1M-B03-R01,CNAG-Test,Zebrafish,3,Blood,Normal,WES,I46,Surgery,P1M,3,1,Cardiac arrest
-samp004,CNAG_Test-RatNor-00004-KID-NOR-LCMS-C66-CHL-P3Y-B01-R10,CNAG-Test,Rat,4,Kidney,Normal,LC_MS,C66,Challenge,P3Y,1,10,Malignant neoplasm of ureter
+samp001,CNAG_Test-HomSap-00001-LIV-NOR-RNA-C22.0-BSL-P0D-B01-R05,CNAG-Test,Human,1,Liver,Normal,RNA_seq,C22.0,Baseline,P0D,1,5,"Liver cell carcinoma"
+samp002,CNAG_Test-MusMus-00002-BRN-TUM-CHI-C71.0-TRT-P7W-B02-R02,CNAG-Test,Mouse,2,Brain,Tumor,ChIP_seq,C71.0,Treatment,P7W,2,2,"Malignant neoplasm of cerebrum, except lobes and ventricles"
+samp003,CNAG_Test-DanRer-00003-BLO-NOR-WES-I46-SUR-P1M-B03-R01,CNAG-Test,Zebrafish,3,Blood,Normal,WES,I46,Surgery,P1M,3,1,"Cardiac arrest"
+samp004,CNAG_Test-RatNor-00004-KID-NOR-LCMS-C66-CHL-P3Y-B01-R10,CNAG-Test,Rat,4,Kidney,Normal,LC_MS,C66,Challenge,P3Y,1,10,"Malignant neoplasm of ureter"
 EOF
     chomp( my @want = split /\n/, $want );
 
@@ -188,7 +188,7 @@ EOF
     
     my $want = <<'EOF';
 unique_id,subject_id,project,species,tissue,sample_type,assay,condition,timepoint,duration,batch,replicate,clar_id,project,species,subject_id,tissue,sample_type,assay,condition,timepoint,duration,batch,replicate,condition_name
-samp001,1,CNAG-Test,Human,Liver,Normal,RNA_seq,C22.0;C22.2;C22.3;C24.4,Baseline,P0D,1,5,CNAG_Test-HomSap-00001-LIV-NOR-RNA-C22.0+C22.2+C22.3+C24.4-BSL-P0D-B01-R05,CNAG-Test,Human,1,Liver,Normal,RNA_seq,C22.0;C22.2;C22.3;C24.4,Baseline,P0D,1,5,Liver cell carcinoma;Hepatoblastoma;Angiosarcoma of liver;
+samp001,1,CNAG-Test,Human,Liver,Normal,RNA_seq,C22.0;C22.2;C22.3;C24.4,Baseline,P0D,1,5,CNAG_Test-HomSap-00001-LIV-NOR-RNA-C22.0+C22.2+C22.3+C24.4-BSL-P0D-B01-R05,CNAG-Test,Human,1,Liver,Normal,RNA_seq,C22.0;C22.2;C22.3;C24.4,Baseline,P0D,1,5,"Liver cell carcinoma;Hepatoblastoma;Angiosarcoma of liver;"
 EOF
     chomp( my @want = split /\n/, $want );
     is_deeply \@got, \@want, 'bulk biosample human-decode multiple conds with condition name';

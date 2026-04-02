@@ -1,5 +1,14 @@
 Revision history for EV::Websockets
 
+0.03    2026-04-01
+        - adopt() auto-creates server vhost (no dummy listen() needed)
+        - Fixed conn->wsi not set during on_connect for adopted connections
+        - Fixed premature close dropping unsent data on choked pipe
+        - Fixed IPv6 Host header missing brackets (RFC 7230)
+        - Fixed negative fd guard in fd_watcher functions
+        - Fixed handshake_headers_map leak on aborted handshake
+        - New examples: chat_server, proxy, backpressure
+
 0.02    2026-03-31
         - on_handshake: server callback for per-connection response headers
           and connection rejection (403)

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+BEGIN { $ENV{LOG_FMT_NO_XS} = 1 }
+
 use Log::Dispatchouli;
 use Test::More 0.88;
 use Test::Deep;

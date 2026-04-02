@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Session management for Hypersonic
 # Uses signed cookies for session ID, memory store for data

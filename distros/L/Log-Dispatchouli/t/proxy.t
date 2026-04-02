@@ -1,10 +1,12 @@
 use v5.20.0;
 use warnings;
 
+use experimental 'lexical_subs';
+
+BEGIN { $ENV{LOG_FMT_NO_XS} = 1 }
+
 use Log::Dispatchouli;
 use Test::More 0.88;
-
-use experimental 'lexical_subs';
 
 {
   my $logger = Log::Dispatchouli->new_tester({

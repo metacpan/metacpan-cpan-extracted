@@ -8,7 +8,8 @@ use File::ShareDir::ProjectDistDir qw(dist_dir);
 use App::Cmd::Setup -app;
 
 # Central version for your entire CLI suite
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+our @SUPPORTED_CODEBOOK_VERSIONS = qw(0.02 0.03);
 
 # Share dir
 our $share_dir = dist_dir('ClarID-Tools');
@@ -53,4 +54,3 @@ Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag
 =head1 COPYRIGHT
 
 This PERL file is copyrighted. See the LICENSE file included in this distribution.
-

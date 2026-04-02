@@ -60,10 +60,204 @@ assert_eq(binomialmod(1234567, 1e4, factorial(20)),      binomial(1234567, 1e4) 
 assert_eq(binomialmod(-10, -10, -10), binomial(-10, -10) % -10)
 assert_eq(binomialmod(-50, 4, -50), binomial(-50, 4) % -50)
 
-#~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) + 1), binomial(1e6, 1e3) % (ipow(2, 128) + 1));
-#~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) - 1), binomial(1e6, 1e3) % (ipow(2, 128) - 1));
+assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) + 1), binomial(1e6, 1e3) % (ipow(2, 128) + 1));
+assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) - 1), binomial(1e6, 1e3) % (ipow(2, 128) - 1));
 
-#~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) + 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) + 1)**2));
-#~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
+assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) + 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) + 1)**2));
+assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
 
-say("binomial(10^10, 10^5) mod 13! = ", binomialmod(1e10, 1e5, factorial(13)));
+assert_eq([binomialmod(400,343,1777),
+           binomialmod(-400,343,1777),
+           binomialmod(-14,343,1777),
+           binomialmod(400,-343,1777),
+           binomialmod(-400,-343,1777),
+           binomialmod(-14,-343,1777)],
+           [977, 251, 421, 0, 0, 647])
+
+# --- 1. Edge Cases & Base Constraints ---
+assert_eq(binomialmod(10, 5, 1), 0)
+assert_eq(binomialmod(10, -5, 7), 0)
+assert_eq(binomialmod(-5, -2, 7), 0)
+assert_eq(binomialmod(-10, 5, 17), 4)
+assert_eq(binomialmod(-10, 4, 17), 1)
+assert_eq(binomialmod(5, 10, 7), 0)
+assert_eq(binomialmod(10, 0, 13), 1)
+assert_eq(binomialmod(10, 10, 13), 1)
+assert_eq(binomialmod(10, 1, 13), 10)
+assert_eq(binomialmod(10, 9, 13), 10)
+assert_eq(binomialmod(20, 17, 11), binomial(20, 3) % 11)
+
+# --- 2. Algorithmic Fast Paths ---
+# k <= 10^4 (bypasses prime factorization)
+assert_eq(binomialmod(10**6, 5000, 10**9 + 7), binomial(10**6, 5000) % (10**9 + 7))
+
+# Square-free m (triggers Lucas Theorem directly)
+assert_eq(binomialmod(10**7, 10**5 + 1, 2310), binomial(10**7, 10**5 + 1) % 2310)
+
+# n < p^q (triggers small_k routine directly on prime power)
+assert_eq(binomialmod(5000, 2500, 101**3), binomial(5000, 2500) % 101**3)
+
+# e_0 >= q (correctly evaluates to 0 mod p^q)
+assert_eq(binomialmod(343, 7, 49), 0)
+
+# --- 3. Prime Power Generalizations (Granville) ---
+# p^2 optimization path
+assert_eq(binomialmod(10**7, 10**4 + 5, 1009**2), binomial(10**7, 10**4 + 5) % 1009**2)
+
+# p^e (e >= 3) polynomial fast path
+assert_eq(binomialmod(10**6, 10**4 + 3, 11**3), binomial(10**6, 10**4 + 3) % 11**3)
+assert_eq(binomialmod(10**7, 10**4 + 1, 5**5), binomial(10**7, 10**4 + 1) % 5**5)
+
+# Deep p^e (e = 10) polynomial expansion holding precision
+assert_eq(binomialmod(10**8, 10**4 + 7, 3**10), binomial(10**8, 10**4 + 7) % 3**10)
+
+# --- 4. Composite Modulus / Chinese Remainder Theorem ---
+# CRT successfully recombines Lucas, p^2, and p^e results
+assert_eq(binomialmod(10**7, 10**4 + 11, 11**3 * 13**2 * 17 * 19), binomial(10**7, 10**4 + 11) % (11**3 * 13**2 * 17 * 19))
+
+# --- 5. The "Buggy Block" Edge Case Check ---
+# Safely handles sign carry adjustments when q is vastly larger than the base-p representation of n
+assert_eq(binomialmod(100, 50, 2**40), binomial(100, 50) % 2**40)
+
+# Tests from Math::Prime::Util
+assert_eq(binomialmod(0,0,7), 1)
+assert_eq(binomialmod(0,1,7), 0)
+assert_eq(binomialmod(0,2,7), 0)
+assert_eq(binomialmod(3,0,7), 1)
+assert_eq(binomialmod(7,5,11), 10)
+assert_eq(binomialmod(950,100,123456), 24942)
+assert_eq(binomialmod(950,100,7), 2)
+assert_eq(binomialmod(8100,4000,1155), 924)
+assert_eq(binomialmod(950,100,1000000007), 640644226)
+assert_eq(binomialmod(189,34,877), 81)
+assert_eq(binomialmod(189,34,253009), 47560)
+assert_eq(binomialmod(189,34,36481), 14169)
+assert_eq(binomialmod(1900,17,41), 0)
+assert_eq(binomialmod(5000,654,101223721), 59171352)
+assert_eq(binomialmod(-112,5,351), 313)
+assert_eq(binomialmod(-189,34,877), 141)
+assert_eq(binomialmod(-23,-29,377), 117)
+assert_eq(binomialmod(189,-34,877), 0)
+assert_eq(binomialmod(100000000,87654321,1005973), 937361)
+assert_eq(binomialmod(100000000,7654321,1299709), 582708)
+assert_eq(binomialmod(100000000,7654321,12345678), 4152168)
+assert_eq(binomialmod(100000,7654,32768), 12288)
+assert_eq(binomialmod(100000,7654,196608), 110592)
+assert_eq(binomialmod(100000,7654,101223721), 5918452)
+assert_eq(binomialmod(100000000,7654321,32768), 24576)
+assert_eq(binomialmod(100000000,7654321,196608), 122880)
+assert_eq(binomialmod(100000000,7654321,101223721), 5463123)
+
+assert_eq(binomialmod(1e10, 1e5, factorial(13)), 1556755200)
+
+# ----------------------------------------------------------------------
+# Basic edge cases
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(0, 0, 100), 1, "C(0,0) % 100")
+assert_eq(binomialmod(5, 0, 100), 1, "C(5,0) % 100")
+assert_eq(binomialmod(5, 5, 100), 1, "C(5,5) % 100")
+assert_eq(binomialmod(5, 1, 100), 5, "C(5,1) % 100")
+assert_eq(binomialmod(5, 4, 100), 5, "C(5,4) % 100")
+assert_eq(binomialmod(5, 2, 100), 10, "C(5,2) % 100")
+assert_eq(binomialmod(5, 3, 100), 10, "C(5,3) % 100")
+
+# n < k -> 0
+assert_eq(binomialmod(5, 6, 100), 0, "n < k returns 0")
+assert_eq(binomialmod(10, 20, 100), 0, "n < k (large)")
+
+# m = 1 -> 0
+assert_eq(binomialmod(12345, 6789, 1), 0, "m = 1 returns 0")
+
+# ----------------------------------------------------------------------
+# Negative n (the implementation transforms to positive n)
+# ----------------------------------------------------------------------
+# Known identity: C(-n, k) = (-1)^k * C(n + k - 1, k)
+assert_eq(binomialmod(-5, 3, 1000), (-1)**3 * binomial(5 + 3 - 1, 3) % 1000, "C(-5,3) % 1000")
+assert_eq(binomialmod(-10, 2, 1234), (-1)**2 * binomial(10 + 2 - 1, 2) % 1234, "C(-10,2) % 1234")
+
+# Negative k (converted to n - k)
+assert_eq(binomialmod(10, -3, 1000), binomial(10, 13) % 1000, "C(10,-3) -> C(10,13) % 1000")
+assert_eq(binomialmod(5, -2, 100), binomial(5, 7) % 100, "C(5,-2) -> C(5,7) % 100")
+
+# ----------------------------------------------------------------------
+# Small k path (k <= 1e4 or heuristic)
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(1e7, 10, 1e9+7), binomial(1e7, 10) % (1e9+7),
+          "Small k (k=10) with large n")
+assert_eq(binomialmod(1e8, 1000, 123456789), 10119783,
+          "Small k (k=1000) with large n")
+
+# ----------------------------------------------------------------------
+# Lucas theorem for prime modulus
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(100, 30, 101), binomial(100, 30) % 101, "Prime modulus 101 (Lucas)")
+assert_eq(binomialmod(1e6, 500000, 10007), 0,
+          "Large n, prime modulus 10007 (Lucas)")
+
+# ----------------------------------------------------------------------
+# Prime power p^2 fast path (p > 2)
+# ----------------------------------------------------------------------
+# Test the special p² optimization (p=3, e=2)
+assert_eq(binomialmod(30, 10, 9), binomial(30, 10) % 9, "p² path: p=3, m=9")
+assert_eq(binomialmod(50, 20, 25), binomial(50, 20) % 25, "p² path: p=5, m=25")
+
+# ----------------------------------------------------------------------
+# Higher prime powers (p^e, e >= 3) – Granville's algorithm
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(100, 40, 27), binomial(100, 40) % 27, "p³ path: p=3, m=27")
+assert_eq(binomialmod(200, 80, 125), binomial(200, 80) % 125, "p³ path: p=5, m=125")
+
+# ----------------------------------------------------------------------
+# Composite modulus (multiple prime powers) – Chinese remainder
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(100, 50, 1000), binomial(100, 50) % 1000, "Composite m=1000")
+assert_eq(binomialmod(1000, 500, 9999), binomial(1000, 500) % 9999, "Composite m=9999")
+
+# ----------------------------------------------------------------------
+# Cases where result is zero due to p‑adic valuation
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(10, 5, 4), 0, "v_p(C(n,k)) >= e -> 0 (p=2, e=2)")
+assert_eq(binomialmod(12, 6, 4), 0, "v_p(C(n,k)) >= e -> 0 (p=2, e=2)")
+assert_eq(binomialmod(27, 9, 27), 3, "v_p(C(n,k)) >= e -> 0 (p=3, e=3)")  # known from Lucas + Kummer
+
+# ----------------------------------------------------------------------
+# Heuristic _is_small_k_binomialmod triggers
+# ----------------------------------------------------------------------
+# For large n, m, and small k, the heuristic decides to use _small_k_binomialmod
+# We'll test with n=1e9, k=1e4, m=1e9+7 (prime), expecting the fast path.
+assert_eq(binomialmod(1e9, 1e4, 1e16), 2526743562400000,
+          "Heuristic: small k (1e4) with large n and prime m")
+assert_eq(binomialmod(1e9, 1e4, 1e9+7), 514182778)
+
+# ----------------------------------------------------------------------
+# Cases where p > n (so binomial mod p^e reduces to direct computation)
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(10, 3, 121), binomial(10, 3) % 121, "p > n (p=11, m=121)")
+assert_eq(binomialmod(20, 5, 169), binomial(20, 5) % 169, "p > n (p=13, m=169)")
+
+# ----------------------------------------------------------------------
+# Fallback loop (when no special optimization applies)
+# ----------------------------------------------------------------------
+assert_eq(binomialmod(30, 15, 4), binomial(30, 15) % 4, "Fallback: p=2, e=2 (p² path not used)")
+
+# ----------------------------------------------------------------------
+# Very large inputs (stress the algorithm)
+# ----------------------------------------------------------------------
+# These are computationally heavy but should pass. We'll only run a few.
+assert_eq(binomialmod(1e6, 500000, 1000003), 375001,
+          "Very large n, medium k, prime modulus")
+assert_eq(binomialmod(1e7, 1e6, 999983), 472109,
+          "Very large n, k, prime modulus")
+
+# ----------------------------------------------------------------------
+# Zero modulus (should return undef)
+# ----------------------------------------------------------------------
+# In Sidef, binomialmod with m=0 returns NaN. We'll test that.
+var res = binomialmod(5, 2, 0)
+assert(res.is_nan, "m=0 returns NaN")
+
+# ----------------------------------------------------------------------
+# Done
+# ----------------------------------------------------------------------
+
+say "** Tests passed!"

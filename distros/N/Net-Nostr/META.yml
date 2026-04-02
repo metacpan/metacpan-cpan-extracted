@@ -1,0 +1,43 @@
+---
+abstract: 'Client and relay library for the Nostr protocol'
+author:
+  - 'Nicholas B. Hubbard <nicholashubbard@posteo.net>'
+build_requires:
+  Clone: '0'
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Nostr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  AnyEvent::Socket: '0'
+  AnyEvent::WebSocket::Client: '0'
+  AnyEvent::WebSocket::Server: '0'
+  Bitcoin::Crypto::Bech32: '0'
+  Class::Tiny: '0'
+  Crypt::KeyDerivation: '0'
+  Crypt::Mac::HMAC: '0'
+  Crypt::PK::ECC: '0'
+  Crypt::PK::ECC::Schnorr: '0'
+  Crypt::PRNG: '0'
+  Crypt::Stream::ChaCha: '0'
+  Digest::SHA: '0'
+  JSON: '0'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/NicholasBHubbard/Net-Nostr/issues
+  repository: https://github.com/NicholasBHubbard/Net-Nostr
+version: '0.002000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

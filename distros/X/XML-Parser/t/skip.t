@@ -1,8 +1,8 @@
-BEGIN { print "1..4\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 4;
+
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
 
 my $cmnt_count    = 0;
 my $pi_count      = 0;
@@ -34,7 +34,7 @@ sub start {
     }
 }
 
-my $p = new XML::Parser(
+my $p = XML::Parser->new(
     Handlers => {
         Init    => \&init,
         Start   => \&start,
@@ -45,12 +45,10 @@ my $p = new XML::Parser(
 
 $p->parsefile('samples/REC-xml-19980210.xml');
 
-print "not " if $between_count;
-print "ok 2\n";
+is( $between_count, 0, 'no start events seen between authlist and index 2000' );
 
-print "not " if $pi_count;
-print "ok 3\n";
+is( $pi_count, 0, 'no processing instructions seen (all in prolog, skipped)' );
 
-print "not " unless $cmnt_count == 5;
-print "ok 4\n";
+is( $cmnt_count, 5, 'only 5 comments seen after skip_until points' );
 
+pass('skip_until parsing completed without error');

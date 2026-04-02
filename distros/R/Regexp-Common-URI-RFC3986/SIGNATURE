@@ -1,0 +1,24 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 de361745a5142491d7ecafd22a29198db8219c657b0f5633d630853edcfafb54 Changes
+SHA256 9b9f944cfe5af85fdc2dc94aa5c9ba732f3fa0a76c5324dbbb379ddd56d54cf2 MANIFEST
+SHA256 180fee8143df9f72764691633ef3f05dad82dcf666678bcb0e224aa3a863cfc4 META.json
+SHA256 7dd17bbb9c57e28dbccb2d1b4eeb158e65cc1c2c084b8b4b2e7d65be45bc04e0 META.yml
+SHA256 ec77daf32bd667aed875a59cbaafc600772a731c3d34f909bbde2d76bb07f029 Makefile.PL
+SHA256 6db3e0c8af19fc8e04d4bbb1b8a3b4257995a279c1b878e5669bc5674bf56883 README
+SHA256 911b2f7b50d6218fa76a98234876c388e8da1a4a5e76cdb7eb3c171b980add47 lib/Regexp/Common/URI/RFC3986.pm
+SHA256 8579befc4b93af0f879e51f40bd2c6ab4215516dcc2a1f95ae86a6cf13709c6f t/01_rfc3986.t

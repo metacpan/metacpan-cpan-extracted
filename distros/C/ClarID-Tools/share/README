@@ -1,0 +1,10 @@
+# Shared Resources
+
+This directory contains packaged resources used by ClarID-Tools, including:
+
+- the default ClarID codebook
+- the JSON Schema used for codebook validation
+- the ICD-10 lookup data used during encoding and decoding
+
+In a repository checkout, these files are available under `share/`.
+In an installed distribution, ClarID-Tools resolves the packaged copies automatically via Perl sharedir support.

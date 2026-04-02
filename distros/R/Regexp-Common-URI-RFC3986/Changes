@@ -1,0 +1,42 @@
+Revision history for Perl module Regexp-Common-URI-RFC3986
+
+2025102001  2026-04-02T11:30:10+0900
+    - Initial release as a standalone CPAN distribution.
+
+    - Provides Regexp::Common::URI::RFC3986, a complete set of regex building blocks
+      transcribed from RFC 3986 (Uniform Resource Identifier: Generic Syntax, January 2005),
+      superseding RFC 2396.
+
+    - No dependency on Regexp::Common: all variables are plain interpolable strings
+      exported via Exporter. The module can be used independently of the Regexp::Common
+      framework.
+
+    - Key improvements over Regexp::Common::URI::RFC2396:
+
+      * $pct_encoded (replaces the old $escaped, kept as alias)
+      * $sub_delims and $unreserved per RFC 3986 §2
+      * Full path_* production set: $path_abempty, $path_absolute, $path_noscheme,
+        $path_rootless, $path_empty
+      * $IP_literal supporting IPv6 addresses and IPvFuture forms
+      * $IPv6address as a faithful transcription of all 9 alternatives from RFC 3986
+        Appendix A (the original RFC2396 module predates IPv6 literal support entirely)
+
+    - Addition with $IPv6address relative to the PR originally submitted to Regexp-Common
+      on 2025-10-20: the alternation set previously had only 8 forms, missing the 8th
+      RFC 3986 alternative:
+
+          [ *5( h16 ":" ) h16 ] "::" h16
+
+      This would have caused addresses such as "::1", "fe80::1", and "2001:db8::1" to
+      fail to match. All 9 alternatives are now correctly implemented.
+
+    - Backward-compatibility aliases for RFC 2396 names are exported:
+      $mark, $uric, $urics, $uric_no_slash, $escaped, $hostname, $domainlabel, $toplabel,
+      $hostport, $server, $rel_segment, $rel_path, $path_segments, $abs_path, $path,
+      $ftp_segments.
+
+    - Optional non-normative Unicode/IDN helpers under the :IDN export tag:
+      $IDN_DOT, $ACE, $IDN_U_LABEL, $IDN_HOST.
+
+    - Test suite: 162 tests, fully standalone (no dependency on the t::Common helper from
+      Regexp-Common).

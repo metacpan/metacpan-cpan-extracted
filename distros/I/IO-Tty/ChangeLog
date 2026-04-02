@@ -1,3 +1,19 @@
+1.25 2026-04-01 Todd Rinaldo <toddr@cpan.org>
+
+  Bug Fixes:
+    * GH #62, PR #64 - Fix IO::Pty DESTROY force-closing the slave pty.
+      The DESTROY method (added in 1.21) explicitly closed the cached
+      slave handle, breaking consumers like IPC::Run that hold a
+      reference to the slave via $pty->slave() and expect it to survive
+      master destruction. Now just deletes the internal reference and
+      lets Perl's refcounting handle fd closure correctly.
+
+  Maintenance:
+    * PR #61 - Simplify version variables to a single source of truth.
+      Extract version from Tty.pm in Makefile.PL using
+      MM->parse_version() instead of hardcoding it, use VERSION_FROM in
+      WriteMakefile, and remove $XS_VERSION from Tty.pm.
+
 1.24 2026-03-27 Todd Rinaldo <toddr@cpan.org>
 
   Bug Fixes:

@@ -1,0 +1,51 @@
+# NAME
+
+IPC::Manager::Client::UnixSocket - Use UNIX sockets for message transfers.
+
+# DESCRIPTION
+
+Each client has a unix socket used in SOCK\_DGRAM mode to allow multi-writer,
+single-reader use of the socket.
+
+# NOTES
+
+Suspend is not usable in this protocol.
+
+# SYNOPSIS
+
+    use IPC::Manager qw/ipcm_spawn ipcm_connect/;
+
+    my $spawn = ipcm_spawn(protocol => 'UnixSocket');
+
+    my $con1 = $spawn->connect('con1');
+    my $con2 = ipcm_connect(con2, $spawn->info);
+
+    $con1->send_message(con1 => {'hello' => 'con2'});
+
+    my @messages = $con2->get_messages;
+
+# METHODS
+
+See [IPC::Manager::Client](https://metacpan.org/pod/IPC%3A%3AManager%3A%3AClient).
+
+# SOURCE
+
+The source code repository for IPC::Manager can be found at
+[https://github.com/exodist/IPC-Manager](https://github.com/exodist/IPC-Manager).
+
+# MAINTAINERS
+
+- Chad Granum <exodist@cpan.org>
+
+# AUTHORS
+
+- Chad Granum <exodist@cpan.org>
+
+# COPYRIGHT
+
+Copyright Chad Granum <exodist7@gmail.com>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See [https://dev.perl.org/licenses/](https://dev.perl.org/licenses/)

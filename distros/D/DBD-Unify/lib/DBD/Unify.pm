@@ -9,7 +9,7 @@ use warnings;
 
 package DBD::Unify;
 
-our $VERSION = "0.95";
+our $VERSION = "0.96";
 
 =head1 NAME
 
@@ -252,10 +252,10 @@ sub table_info {
 	}
 
     my @where;
-    $schema and push @where, _is_or_like ("OWNR",       $schema);
-    $table  and push @where, _is_or_like ("TABLE_NAME", $table);
+    $schema and push @where => _is_or_like ("OWNR",       $schema);
+    $table  and push @where => _is_or_like ("TABLE_NAME", $table);
     $type   and $type = uc substr $type, 0, 1;
-    $type   and push @where, _is_or_like ("TABLE_TYPE", $type);
+    $type   and push @where => _is_or_like ("TABLE_TYPE", $type);
     local $" = " and ";
     my $sql = join " " =>
 	q{select '', OWNR, TABLE_NAME, TABLE_TYPE, RDWRITE},
@@ -326,7 +326,7 @@ sub table_info {
 		my $p = $dd->{COLUMN}[$c->{LINK}];
 		my $T = $dd->{TABLE}[$p->{TID}];
 		my $S = $T->{ANAME} || "";
-		push @links, {
+		push @links => {
 		    index_name			=> "",		# ?
 		    referenced_owner		=> $S,
 		    referenced_table		=> $T->{NAME},
@@ -353,7 +353,7 @@ sub table_info {
 	my @fld = @{$sth->{NAME_lc}};
 	$sth->bind_columns (\@sli{@fld});
 	while ($sth->fetch) {
-	    push @links, { %sli };
+	    push @links => { %sli };
 	    }
 	} # _set_link_cache
 
@@ -369,7 +369,7 @@ sub table_info {
 		$tbl and lc $tbl ne lc $t and next;
 		foreach my $c (sort keys %{$cache{$s}{$t}}) {
 		    $col and lc $col ne lc $c and next;
-		    push @ci, $cache{$s}{$t}{$c};
+		    push @ci => $cache{$s}{$t}{$c};
 		    }
 		}
 	    }
@@ -395,7 +395,7 @@ sub table_info {
 	    $Fschema and lc $_->{referencing_owner} ne lc $Fschema and next;
 	    $Ftable  and lc $_->{referencing_table} ne lc $Ftable  and next;
 
-	    push @fki, [
+	    push @fki => [
 		undef, @{$_}{qw( referenced_owner  referenced_table  referenced_column  )},
 		undef, @{$_}{qw( referencing_owner referencing_table referencing_column )},
 		$_->{referencing_column_ord} + 1,
@@ -418,7 +418,7 @@ sub table_info {
 		foreach my $t (sort keys %{$cache{$s}}) {
 		    foreach my $c (sort keys %{$cache{$s}{$t}}) {
 			$cache{$s}{$t}{$c}[-4] eq "Y" or next;
-			push @{$pki->{key}{$s}{$t}}, $c;
+			push @{$pki->{key}{$s}{$t}} => $c;
 			}
 		    }
 		}
@@ -435,7 +435,7 @@ sub table_info {
 		$hth->bind_columns (\my ($sch, $tbl, $fld, $ord));
 		while ($hth->fetch) {
 		    #warn "$ord $sch.$tbl.$fld\n";
-		    push @{$pki->{key}{$sch}{$tbl}}, $fld;
+		    push @{$pki->{key}{$sch}{$tbl}} => $fld;
 		    }
 		}
 	    }
@@ -464,7 +464,7 @@ sub column_info {
 	my $odbc_type = (
 	    $uni_type_name eq "NUMERIC" && $sli[4] <= 4 ? 5 : # SMALLINT
 	    DBD::Unify::_uni2sql_type ($uni_type) ) || 0;
-	push @fki, [
+	push @fki => [
 	    # TABLE_CAT, TABLE_SCHEM, TABLE_NAME, COLUMN_NAME,
 	    undef, @sli[0..2],
 	    # DATA_TYPE, TYPE_NAME,
@@ -540,9 +540,9 @@ sub primary_key {
 	    my $tbl = $t->{NAME};
 	    defined $schema && lc $sch ne lc $schema and next;
 	    defined $table  && lc $tbl ne lc $table  and next;
-	    push @key, $c->{NAME};
+	    push @key => $c->{NAME} if $c->{NAME} && $c->{NAME} ne "?";
 	    }
-	return @key;
+	@key and return @key;
 	}
 
     # Fetching table information from SYS is *extremely* slow
@@ -560,7 +560,7 @@ sub primary_key {
 	defined $schema && lc $sch ne lc $schema and next;
 	foreach my $tbl (sort keys %{$pki_cache->{key}{$sch}}) {
 	    defined $table && lc $tbl ne lc $table and next;
-	    push @key, @{$pki_cache->{key}{$sch}{$tbl}};
+	    push @key => @{$pki_cache->{key}{$sch}{$tbl}};
 	    }
 	}
     return @key;
@@ -618,12 +618,12 @@ sub link_info {
 	}
     my @where;
     unless ($type and $type =~ m/^[Rr]/) {
-	$schema and push @where, "REFERENCING_OWNER = '$schema'";
-	$table  and push @where, "REFERENCING_TABLE = '$table'";
+	$schema and push @where => "REFERENCING_OWNER = '$schema'";
+	$table  and push @where => "REFERENCING_TABLE = '$table'";
 	}
     else {
-	$schema and push @where, "REFERENCED_OWNER  = '$schema'";
-	$table  and push @where, "REFERENCED_TABLE  = '$table'";
+	$schema and push @where => "REFERENCED_OWNER  = '$schema'";
+	$table  and push @where => "REFERENCED_TABLE  = '$table'";
 	}
     local $" = " and ";
     my $where = @where ? " where @where" : "";

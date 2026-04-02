@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # JIT-compiled Request object using array-based slots for maximum speed
 # Generates XS accessors at compile time via XS::JIT::Builder

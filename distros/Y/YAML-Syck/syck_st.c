@@ -130,8 +130,8 @@ new_size(int size)
     {
 	if (newsize > size) return primes[i];
     }
-    /* Ran out of polynomials */
-    return -1;			/* should raise exception */
+    /* Ran out of polynomials, return last known prime */
+    return primes[i > 1 ? i - 2 : 0];
 #endif
 }
 
@@ -161,6 +161,7 @@ st_init_table_with_size(struct st_hash_type *type, int size)
 #endif
 
     size = new_size(size);	/* round up to prime number */
+    if (size <= 0) size = MINSIZE;
 
     tbl = alloc(st_table);
     tbl->type = type;
@@ -313,6 +314,7 @@ rehash(st_table *table)
     unsigned int hash_val;
 
     new_num_bins = new_size(old_num_bins+1);
+    if (new_num_bins <= 0) return;
     new_bins = (st_table_entry**)Calloc(new_num_bins, sizeof(st_table_entry*));
 
     for(i = 0; i < old_num_bins; i++) {

@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.013;
+package Log::Dispatchouli 3.100;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 # Not dangerous.  Accepted without change.
@@ -492,8 +492,19 @@ sub _compute_proxy_ctx_kvstr_aref ($) {
   return [];
 }
 
+my $LOG_FMT_PACKAGE;
+sub _log_fmt_package { $LOG_FMT_PACKAGE }
+
+BEGIN {
+  $LOG_FMT_PACKAGE = 'Log::Fmt';
+  my $ok = eval { require Log::Fmt::XS; };
+  if ($ok && ! $ENV{LOG_FMT_NO_XS}) {
+    $LOG_FMT_PACKAGE = 'Log::Fmt::WithXS';
+  }
+}
+
 sub fmt_event ($self, $type, $data) {
-  my $kv_aref = Log::Fmt->_pairs_to_kvstr_aref([
+  my $kv_aref = $self->_log_fmt_package->_pairs_to_kvstr_aref([
     event => $type,
     (_ARRAY0($data) ? @$data : $data->%{ sort keys %$data })
   ]);
@@ -907,7 +918,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.013
+version 3.100
 
 =head1 SYNOPSIS
 
@@ -1449,7 +1460,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

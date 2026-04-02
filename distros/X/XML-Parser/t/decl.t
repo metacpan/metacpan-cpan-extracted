@@ -188,6 +188,9 @@ $| = 1;
 $parser->parse($docstr);
 
 # Test XMLDecl standalone attribute values (GH#73)
+# standalone returns Perl boolean: true (1) for "yes", false ("") for "no",
+# undef when absent. This matches the historical API that downstream modules
+# (XML-Twig, XML-DOM) depend on.
 {
     my @got;
     my $xd_parser = XML::Parser->new(
@@ -196,18 +199,18 @@ $parser->parse($docstr);
         }
     );
 
-    # standalone="yes" should return "yes"
+    # standalone="yes" should return Perl true
     @got = ();
     $xd_parser->parse(qq{<?xml version="1.0" standalone="yes"?>\n<r/>});
     is($got[0], '1.0', 'XMLDecl standalone=yes: version');
-    is($got[2], 'yes', 'XMLDecl standalone=yes: standalone is "yes"');
+    ok($got[2], 'XMLDecl standalone=yes: standalone is true');
 
-    # standalone="no" should return "no"
+    # standalone="no" should return Perl false (not undef)
     @got = ();
     $xd_parser->parse(qq{<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<r/>});
     is($got[0], '1.0',   'XMLDecl standalone=no: version');
     is($got[1], 'UTF-8', 'XMLDecl standalone=no: encoding');
-    is($got[2], 'no',    'XMLDecl standalone=no: standalone is "no"');
+    ok(defined($got[2]) && !$got[2], 'XMLDecl standalone=no: standalone is defined but false');
 
     # no standalone attribute should return undef
     @got = ();

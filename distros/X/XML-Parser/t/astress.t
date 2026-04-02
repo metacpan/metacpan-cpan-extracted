@@ -1,49 +1,27 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl test.pl'
+use strict;
+use warnings;
+use Test::More tests => 29;
 
-######################### We start with some black magic to print on failure.
-
-# Change 1..1 below to 1..last_test_to_print .
-# (It may become useful if the test is moved to ./t subdirectory.)
-
-BEGIN { print "1..31\n"; }
-END { print "not ok 1\n" unless $loaded; }
 use XML::Parser;
-use FileHandle;    # Make 5.10.0 happy.
-$loaded = 1;
-print "ok 1\n";
+use FileHandle;
 
-######################### End of black magic.
-
-# Insert your test code below (better if it prints "ok 13"
-# (correspondingly "not ok 13") depending on the success of chunk 13
-# of the test code):
-
-# Test 2
-
-my $parser = new XML::Parser( ProtocolEncoding => 'ISO-8859-1' );
-if ($parser) {
-    print "ok 2\n";
-}
-else {
-    print "not ok 2\n";
-    exit;
-}
+my $parser = XML::Parser->new( ProtocolEncoding => 'ISO-8859-1' );
+ok( $parser, 'parser created with ISO-8859-1 encoding' );
 
 my @ndxstack;
 my $indexok = 1;
 
-# Need this external entity
+# Need these external entities
 
-open( ZOE, '>zoe.ent' );
+open( ZOE, '>zoe.ent' ) or die "Cannot write zoe.ent: $!";
 print ZOE "'cute'";
 close(ZOE);
 
-open( PAUL, '>paul.ent' );
+open( PAUL, '>paul.ent' ) or die "Cannot write paul.ent: $!";
 print PAUL "'Paul'";
 close(PAUL);
 
-open( PAULA, '>paula.ent' );
+open( PAULA, '>paula.ent' ) or die "Cannot write paula.ent: $!";
 print PAULA "'Paula'";
 close(PAULA);
 
@@ -74,21 +52,21 @@ my $xmlstring = <<"End_of_XML;";
 </foo>
 End_of_XML;
 
-# Handlers
-my @tests;
+# Handlers — collect results into arrays for later verification
+my @results;
 my $pos = '';
 
 sub ch {
     my ( $p, $str ) = @_;
-    $tests[4]++;
-    $tests[5]++ if ( $str =~ /2nd line/ and $p->in_element('blah') );
+    $results[0]++;    # char handler called
+    $results[1]++ if ( $str =~ /2nd line/ and $p->in_element('blah') );
     if ( $p->in_element('boom') ) {
-        $tests[17]++ if $str =~ /pretty/;
-        $tests[18]++ if $str =~ /cute/;
+        $results[13]++ if $str =~ /pretty/;
+        $results[14]++ if $str =~ /cute/;
     }
     elsif ( $p->in_element('boom2') ) {
-        $tests[30]++ if $str =~ /\bPaul\b/;
-        $tests[31]++ if $str =~ /\bPaula\b/;
+        $results[24]++ if $str =~ /\bPaul\b/;
+        $results[25]++ if $str =~ /\bPaula\b/;
     }
 }
 
@@ -96,13 +74,13 @@ sub st {
     my ( $p, $el, %atts ) = @_;
 
     $ndxstack[ $p->depth ] = $p->element_index;
-    $tests[6]++ if ( $el eq 'bar' and $atts{stomp} eq 'jill' );
+    $results[2]++ if ( $el eq 'bar' and $atts{stomp} eq 'jill' );
     if ( $el eq 'zap' and $atts{'ref'} eq 'zing' ) {
-        $tests[7]++;
+        $results[3]++;
         $p->default_current;
     }
     elsif ( $el eq 'bar' ) {
-        $tests[22]++ if $p->recognized_string eq '<bar id="jack" stomp="jill">';
+        $results[18]++ if $p->recognized_string eq '<bar id="jack" stomp="jill">';
     }
 }
 
@@ -110,11 +88,11 @@ sub eh {
     my ( $p, $el ) = @_;
     $indexok = 0 unless $p->element_index == $ndxstack[ $p->depth ];
     if ( $el eq 'zap' ) {
-        $tests[8]++;
+        $results[4]++;
         my @old = $p->setHandlers( 'Char', \&newch );
-        $tests[19]++ if $p->current_line == 20;
-        $tests[20]++ if $p->current_column == 20;
-        $tests[23]++ if ( $old[0] eq 'Char' and $old[1] == \&ch );
+        $results[15]++ if $p->current_line == 20;
+        $results[16]++ if $p->current_column == 20;
+        $results[19]++ if ( $old[0] eq 'Char' and $old[1] == \&ch );
     }
     if ( $el eq 'boom' ) {
         $p->setHandlers( 'Default', \&dh );
@@ -124,28 +102,28 @@ sub eh {
 sub dh {
     my ( $p, $str ) = @_;
     if ( $str =~ /doozy/ ) {
-        $tests[9]++;
+        $results[5]++;
         $pos = $p->position_in_context(1);
     }
-    $tests[10]++ if $str =~ /^<zap/;
+    $results[6]++ if $str =~ /^<zap/;
 }
 
 sub pi {
     my ( $p, $tar, $data ) = @_;
 
-    $tests[11]++ if ( $tar eq 'line-noise' and $data =~ /&\^&<</ );
+    $results[7]++ if ( $tar eq 'line-noise' and $data =~ /&\^&<</ );
 }
 
-sub note {
+sub notation_handler {
     my ( $p, $name, $base, $sysid, $pubid ) = @_;
 
-    $tests[12]++ if ( $name eq 'bar' and $pubid eq 'qrs' );
+    $results[8]++ if ( $name eq 'bar' and $pubid eq 'qrs' );
 }
 
 sub unp {
     my ( $p, $name, $base, $sysid, $pubid, $notation ) = @_;
 
-    $tests[13]++ if ( $name eq 'zinger'
+    $results[9]++ if ( $name eq 'zinger'
         and $pubid eq 'xyz'
         and $sysid eq 'abc'
         and $notation eq 'bar' );
@@ -155,10 +133,10 @@ sub newch {
     my ( $p, $str ) = @_;
 
     if ( $] < 5.007001 ) {
-        $tests[14]++ if $str =~ /'\302\240'/;
+        $results[10]++ if $str =~ /'\302\240'/;
     }
     else {
-        $tests[14]++ if $str =~ /'\xa0'/;
+        $results[10]++ if $str =~ /'\xa0'/;
     }
 }
 
@@ -166,87 +144,84 @@ sub extent {
     my ( $p, $base, $sys, $pub ) = @_;
 
     if ( $sys eq 'fran-def' ) {
-        $tests[15]++;
+        $results[11]++;
         return 'pretty';
     }
     elsif ( $sys eq 'zoe.ent' ) {
-        $tests[16]++;
+        $results[12]++;
 
-        open( FOO, $sys ) or die "Couldn't open $sys";
+        open( FOO, '<', $sys ) or die "Couldn't open $sys";
         return *FOO;
     }
     elsif ( $sys eq 'paul.ent' ) {
-        $tests[28]++;
+        $results[22]++;
 
-        open( FOO, $sys ) or die "Couldn't open $sys";
+        open( FOO, '<', $sys ) or die "Couldn't open $sys";
         return \*FOO;
     }
     elsif ( $sys eq 'paula.ent' ) {
-        $tests[29]++;
+        $results[23]++;
 
-        open( my $fh, $sys ) or die "Couldn't open $sys";
+        open( my $fh, '<', $sys ) or die "Couldn't open $sys";
         return $fh;
     }
 }
 
-eval {
-    $parser->setHandlers(
-        'Char'         => \&ch,
-        'Start'        => \&st,
-        'End'          => \&eh,
-        'Proc'         => \&pi,
-        'Notation'     => \&note,
-        'Unparsed'     => \&unp,
-        'ExternEnt'    => \&extent,
-        'ExternEntFin' => sub { close(FOO); }
-    );
-};
+$parser->setHandlers(
+    'Char'         => \&ch,
+    'Start'        => \&st,
+    'End'          => \&eh,
+    'Proc'         => \&pi,
+    'Notation'     => \&notation_handler,
+    'Unparsed'     => \&unp,
+    'ExternEnt'    => \&extent,
+    'ExternEntFin' => sub { close(FOO); }
+);
 
-if ($@) {
-    print "not ok 3\n";
-    exit;
-}
-
-print "ok 3\n";
-
-# Test 4..20
 eval { $parser->parsestring($xmlstring); };
 
-if ($@) {
-    print "Parse error:\n$@";
-}
-else {
-    $tests[21]++;
-}
-
-unlink('zoe.ent')  if ( -f 'zoe.ent' );
-unlink('paul.ent') if ( -f 'paul.ent' );
+# Clean up external entity files
+unlink('zoe.ent')   if ( -f 'zoe.ent' );
+unlink('paul.ent')  if ( -f 'paul.ent' );
 unlink('paula.ent') if ( -f 'paula.ent' );
 
-for ( 4 .. 23 ) {
-    print "not " unless $tests[$_];
-    print "ok $_\n";
-}
+is( $@, '', 'parse completed without error' );
 
-$cmpstr = << 'End_of_Cmp;';
+ok( $results[0],  'char handler was called' );
+ok( $results[1],  'in_element(blah) detected 2nd line' );
+ok( $results[2],  'start handler saw bar with stomp=jill' );
+ok( $results[3],  'start handler saw zap with ref=zing, called default_current' );
+ok( $results[4],  'end handler saw zap, swapped char handler' );
+ok( $results[5],  'default handler saw doozy comment' );
+ok( $results[6],  'default handler saw <zap element' );
+ok( $results[7],  'proc handler saw line-noise PI' );
+ok( $results[8],  'notation handler saw bar with pubid qrs' );
+ok( $results[9],  'unparsed handler saw zinger entity' );
+ok( $results[10], 'new char handler saw non-UTF8 character' );
+ok( $results[11], 'extern ent handler returned string for fran-def' );
+ok( $results[12], 'extern ent handler returned bare glob for zoe.ent' );
+ok( $results[13], 'fran external entity resolved to pretty' );
+ok( $results[14], 'zoe external entity resolved to cute' );
+ok( $results[15], 'current_line correct at end of zap' );
+ok( $results[16], 'current_column correct at end of zap' );
+ok( $results[18], 'recognized_string correct for bar start tag' );
+ok( $results[19], 'setHandlers returned old Char handler' );
+
+my $cmpstr = << 'End_of_Cmp;';
     <blah> 2nd line in bar </blah>
     3rd line in bar <!-- Isn't this a doozy -->
 ===================^
   </bar>
 End_of_Cmp;
 
-if ( $cmpstr ne $pos ) {
-    print "not ";
-}
-print "ok 24\n";
+is( $pos, $cmpstr, 'position_in_context shows correct context' );
 
-print "not " unless $indexok;
-print "ok 25\n";
+ok( $indexok, 'element_index consistent across start/end pairs' );
 
 # Test that memory leak through autovivifying symbol table entries is fixed.
 
 my $count = 0;
-$parser = new XML::Parser(
+$parser = XML::Parser->new(
     Handlers => {
         Start => sub { $count++ }
     }
@@ -256,18 +231,11 @@ $xmlstring = '<a><b>Sea</b></a>';
 
 eval { $parser->parsestring($xmlstring); };
 
-if ( $count != 2 ) {
-    print "not ";
-}
-print "ok 26\n";
+is( $count, 2, 'parsed 2 start tags in simple XML' );
 
-if ( exists $::{$xmlstring} ) {
-    print "not ";
-}
-print "ok 27\n";
+ok( !exists $::{$xmlstring}, 'XML string did not auto-vivify symbol table entry' );
 
-for ( 28 .. 31 ) {
-    print "not " unless $tests[$_];
-    print "ok $_\n";
-}
-
+ok( $results[22], 'extern ent handler returned glob ref for paul.ent' );
+ok( $results[23], 'extern ent handler returned lexical fh for paula.ent' );
+ok( $results[24], 'boom2 char data includes Paul' );
+ok( $results[25], 'boom2 char data includes Paula' );

@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Fmt 3.013;
+package Log::Fmt 3.100;
 # ABSTRACT: a little parser and emitter of structured log lines
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -98,8 +98,18 @@ use String::Flogger ();
 #pod
 #pod Finally, wrap the string in double quotes.
 #pod
-#pod =cut
-
+#pod =head3 Special values
+#pod
+#pod There are no reserved or sentinel values for undefined values, null pointers,
+#pod or the like.  Convention is to use a single identifier surrounded by tildes to
+#pod indicate such a value.  For example, given a null pointer for the C<user.name>
+#pod value, a system might log:
+#pod
+#pod     user.name=~null~
+#pod
+#pod If C<~null~> was a valid username, there would be ambiguity here.  The choice
+#pod of exact sentinels is left to the implementing system.
+#pod
 #pod =method format_event_string
 #pod
 #pod   my $octets = Log::Fmt->format_event_string([
@@ -120,6 +130,9 @@ use String::Flogger ();
 # okchr = %x21 / %x23-3c / %x3e-5b / %x5d-7e ; VCHAR minus \ and " and =
 # key   = 1*(okchr)
 # value = key / quoted
+#
+# Remember to update the tr/// expression in _pairs_to_kvstr_aref if this
+# changes!
 my $KEY_RE = qr{[\x21\x23-\x3c\x3e-\x5b\x5d-\x7e]+};
 
 sub _escape_unprintable {
@@ -157,7 +170,7 @@ sub _pairs_to_kvstr_aref {
   KEY: for (my $i = 0; $i < @$aref; $i += 2) {
     # replace non-ident-safe chars with ?
     my $key = length $aref->[$i] ? "$aref->[$i]" : '~';
-    $key =~ tr/\x21\x23-\x3C\x3E-\x7E/?/c;
+    $key =~ tr{\x21\x23-\x3c\x3e-\x5b\x5d-\x7e}{?}c;
 
     # If the prefix is "" you can end up with a pair like ".foo=1" which is
     # weird but probably best.  And that means you could end up with
@@ -321,7 +334,7 @@ Log::Fmt - a little parser and emitter of structured log lines
 
 =head1 VERSION
 
-version 3.013
+version 3.100
 
 =head1 OVERVIEW
 
@@ -515,13 +528,25 @@ convert any non-ASCII byte (C<%x80-ff>) to the C<\x{...}> form
 
 Finally, wrap the string in double quotes.
 
+=head3 Special values
+
+There are no reserved or sentinel values for undefined values, null pointers,
+or the like.  Convention is to use a single identifier surrounded by tildes to
+indicate such a value.  For example, given a null pointer for the C<user.name>
+value, a system might log:
+
+    user.name=~null~
+
+If C<~null~> was a valid username, there would be ambiguity here.  The choice
+of exact sentinels is left to the implementing system.
+
 =head1 AUTHOR
 
 Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Ricardo SIGNES.
+This software is copyright (c) 2026 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -52,7 +52,6 @@ share/x-sjis-unicode.enc	x-sjis-unicode encoding map
 t/astress.t			Test script
 t/bare_glob_filehandle.t
 t/cdata.t			Test script
-t/char_end_doc.t
 t/checklib_findcc.t
 t/checklib_tmpdir.t
 t/combine_chars.t		Test script

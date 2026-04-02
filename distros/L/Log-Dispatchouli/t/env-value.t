@@ -4,6 +4,8 @@ use warnings;
 
 use Test::More;
 
+BEGIN { $ENV{LOG_FMT_NO_XS} = 1 }
+
 use Log::Dispatchouli;
 
 {

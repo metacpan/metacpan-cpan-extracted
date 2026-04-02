@@ -1,7 +1,7 @@
 package OpenTelemetry::Instrumentation::caller;
 # ABSTRACT: OpenTelemetry instrumentation for the current namespace
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 use v5.38;
 
@@ -14,6 +14,8 @@ sub install {
     $rules = [ qr/.*/ => 1 ] unless @$rules;
 
     $class->wrap_subroutines( scalar caller(2), $rules, $options );
+
+    return !!1;
 }
 
 1;

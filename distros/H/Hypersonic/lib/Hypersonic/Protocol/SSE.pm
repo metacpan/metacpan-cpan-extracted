@@ -8,7 +8,7 @@ use warnings;
 # This module generates C code for efficient event formatting.
 # Transport uses HTTP/1.1 chunked encoding or HTTP/2 DATA frames.
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
