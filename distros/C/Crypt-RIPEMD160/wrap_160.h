@@ -26,7 +26,7 @@ typedef RIPEMD160_INFO *Crypt__RIPEMD160;
 /* Function prototypes */
 void RIPEMD160_init(Crypt__RIPEMD160 ripemd160);
 
-void RIPEMD160_update(Crypt__RIPEMD160 ripemd160, byte *strptr, dword len);
+void RIPEMD160_update(Crypt__RIPEMD160 ripemd160, const byte *strptr, dword len);
 
 void RIPEMD160_final(Crypt__RIPEMD160 ripemd160);
 

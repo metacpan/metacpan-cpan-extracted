@@ -693,8 +693,8 @@ if($p > $mbi &&
    $p >= $mbi &&
    $mbi < $p &&
    $mbi <= $p &&
-   ($p <=> $mbi) > 0 &&
-   ($mbi <=> $p) < 0 &&
+   ($p <=> $mbi) == 1 &&
+   ($mbi <=> $p) == -1 &&
    $p != $mbi &&
    !($p == $mbi) &&
    Math::GMPf::get_refcnt($p) == $expected_refcnt) {print "ok 39\n"}
@@ -1110,26 +1110,26 @@ else {
 ###########################
 ###########################
 
-if(($mpf1 <=> $inf) < 0) {print "ok 91\n"}
+if(($mpf1 <=> $inf) == -1) {print "ok 91\n"}
 else {
   my $p = ($mpf1 <=> $inf);
   warn "\n \$p: $p\n";
   print "not ok 91\n";
 }
 
-if(($mpf1 <=> $ninf) > 0) {print "ok 92\n"}
+if(($mpf1 <=> $ninf) == 1) {print "ok 92\n"}
 else {
   warn "\n ", ($mpf1 <=> $ninf), "\n";
   print "not ok 92\n";
 }
 
-if(($mpf1 <=> $infstring) < 0) {print "ok 93\n"}
+if(($mpf1 <=> $infstring) == -1) {print "ok 93\n"}
 else {
   warn "\n ",  ($mpf1 <=> $infstring), "\n";
   print "not ok 93\n";
 }
 
-if(($mpf1 <=> $ninfstring) > 0) {print "ok 94\n"}
+if(($mpf1 <=> $ninfstring) == 1) {print "ok 94\n"}
 else {
   warn "\n ",  ($mpf1 <=> $ninfstring), "\n";
   print "not ok 94\n";
@@ -1137,26 +1137,26 @@ else {
 
 ###########################
 
-if(($inf <=> $mpf1) > 0) {print "ok 95\n"}
+if(($inf <=> $mpf1) == 1) {print "ok 95\n"}
 else {
   warn "\n ", ($inf <=> $mpf1), "\n";
   print "not ok 95\n";
 }
 
-if(($ninf <=> $mpf1) < 0) {print "ok 96\n"}
+if(($ninf <=> $mpf1) == -1) {print "ok 96\n"}
 else {
   my $p = ($ninf <=> $mpf1);
   warn "\n \$p: $p\n";
   print "not ok 96\n";
 }
 
-if(($infstring <=> $mpf1) > 0) {print "ok 97\n"}
+if(($infstring <=> $mpf1) == 1) {print "ok 97\n"}
 else {
   warn "\n ", ($infstring <=> $mpf1), "\n";
   print "not ok 97\n";
 }
 
-if(($ninfstring <=> $mpf1) < 0) {print "ok 98\n"}
+if(($ninfstring <=> $mpf1) == -1) {print "ok 98\n"}
 else {
   warn "\n ", ($ninfstring <=> $mpf1), "\n";
   print "not ok 98\n";

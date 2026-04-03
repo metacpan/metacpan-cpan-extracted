@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb
-version: 0.60
+version: 0.61
 abstract: Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
 author:
   - ina <ina@cpan.org>
@@ -18,7 +18,7 @@ minimum_perl_version: 5.00503
 provides:
   mb:
     file: lib/mb.pm
-    version: 0.60
+    version: 0.61
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/mb/issues

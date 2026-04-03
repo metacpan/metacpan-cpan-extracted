@@ -89,7 +89,7 @@ DumpFile($yaml_file, $yaml_data);
 #------------------------------------------------------------------------------
 
 lives_ok {
-	App::Test::Generator::generate($conf_file, $output_file);
+	App::Test::Generator->generate({ schema_file => $conf_file, output_file => $output_file });
 } 'Generator runs without fatal errors';
 
 #------------------------------------------------------------------------------
@@ -130,9 +130,7 @@ SAFE
 close $sfh;
 
 lives_ok {
-	App::Test::Generator::generate(
-		$safe_conf, File::Spec->catfile($dir, 'safe_generated.t')
-	);
+	App::Test::Generator->generate($safe_conf, File::Spec->catfile($dir, 'safe_generated.t'));
 } 'Safe-mode config loads cleanly';
 
 # Test configuration validation
@@ -147,7 +145,7 @@ output:
     string
 SAFE
 close $ofh;
-lives_ok { App::Test::Generator::generate($valid_conf) } 'Output only loads';
+lives_ok { App::Test::Generator->generate($valid_conf) } 'Output only loads';
 
 #------------------------------------------------------------------------------
 # Check no unexpected runtime warnings/errors

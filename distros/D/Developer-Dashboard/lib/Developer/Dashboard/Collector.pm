@@ -1,7 +1,9 @@
 package Developer::Dashboard::Collector;
-$Developer::Dashboard::Collector::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use File::Spec;
 use POSIX qw(strftime);

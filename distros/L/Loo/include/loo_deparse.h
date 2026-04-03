@@ -34,8 +34,8 @@
 #  define PadnameLEN(pn) SvCUR((SV *)(pn))
 #endif
 
-/* PADNAME type: typedef'd as SV from 5.20; became a struct in 5.22 */
-#if PERL_VERSION < 20
+/* PADNAME type: typedef'd as SV from 5.18; became a struct in 5.22 */
+#if PERL_VERSION < 18
    typedef SV PADNAME;
 #endif
 
@@ -80,6 +80,7 @@ typedef struct {
     CV         *cv;
     PADNAMELIST *padnames;
     int         last_was_block;
+    int         in_list_assign;
 } DDCDeparse;
 
 /* ── Forward declarations ─────────────────────────────────────── */
@@ -938,7 +939,7 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
     /* ── Pad variables ($x, @a, %h) ──────────────────────────── */
     case OP_PADSV: case OP_PADAV: case OP_PADHV: {
         const char *name = ddc_padname_for_targ(aTHX_ ctx, o->op_targ);
-        if (o->op_private & OPpLVAL_INTRO)
+        if ((o->op_private & OPpLVAL_INTRO) && !ctx->in_list_assign)
             ddc_emit_keyword(aTHX_ ctx, "my ", 3);
         if (name) {
             ddc_emit_variable(aTHX_ ctx, name, strlen(name));
@@ -1295,7 +1296,9 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
                 OP *rhs_kid;
                 int first_rhs = 1;
                 /* Emit padrange as LHS: my ($a, $b) */
+                ctx->in_list_assign = 1;
                 ddc_deparse_op(aTHX_ rk, ctx);
+                ctx->in_list_assign = 0;
                 sv_catpvn(ctx->out, " ", 1);
                 ddc_emit_operator(aTHX_ ctx, "=", 1);
                 sv_catpvn(ctx->out, " ", 1);
@@ -1310,7 +1313,54 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
             }
         }
 
-        if (left) ddc_deparse_op(aTHX_ left, ctx);
+        /* Detect LHS list context: the LHS of an aassign is always
+           a list.  When it contains only scalars (padsv with LVINTRO),
+           parens are needed to preserve list assignment semantics.
+           Two patterns:
+             (a) no padrange (pre-5.18 or lexical-array RHS):
+                 ex-list(pushmark, padsv[LVINTRO], ...)
+                 → we emit the outer my(...) wrapper
+             (b) padrange on LHS (5.18+ with lexical-array RHS):
+                 ex-list(padrange[count=1,$scalar], ...)
+                 → padrange handler emits my(...) when in_list_assign
+           e.g.  my ($first) = @arr  must NOT become  my $first = @arr
+                  my ($a, $b) = @_   must NOT become  my $a, my $b = @_ */
+        {
+            int lhs_list = 0;
+            int lhs_padrange = 0;
+            if (left && left->op_type == OP_NULL &&
+                (left->op_flags & OPf_KIDS))
+            {
+                OP *lk = cUNOPx(left)->op_first;
+                if (lk && lk->op_type == OP_PUSHMARK) {
+                    OP *l2 = OpSIBLING(lk);
+                    if (l2 && l2->op_type == OP_PADSV &&
+                        (l2->op_private & OPpLVAL_INTRO))
+                        lhs_list = 1;
+                }
+#if PERL_VERSION >= 18
+                else if (lk && lk->op_type == OP_PADRANGE &&
+                         (lk->op_private & OPpLVAL_INTRO))
+                {
+                    int cnt = (int)(lk->op_private & OPpPADRANGE_COUNTMASK);
+                    if (cnt == 1) {
+                        const char *n = ddc_padname_for_targ(aTHX_ ctx, lk->op_targ);
+                        if (n && *n == '$') lhs_padrange = 1;
+                    }
+                }
+#endif
+            }
+            if (left) {
+                if (lhs_list) {
+                    ddc_emit_keyword(aTHX_ ctx, "my ", 3);
+                    sv_catpvn(ctx->out, "(", 1);
+                }
+                ctx->in_list_assign = (lhs_list || lhs_padrange);
+                ddc_deparse_op(aTHX_ left, ctx);
+                ctx->in_list_assign = 0;
+                if (lhs_list) sv_catpvn(ctx->out, ")", 1);
+            }
+        }
         sv_catpvn(ctx->out, " ", 1);
         ddc_emit_operator(aTHX_ ctx, "=", 1);
         sv_catpvn(ctx->out, " ", 1);
@@ -1466,11 +1516,20 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
         int count = (int)(o->op_private & OPpPADRANGE_COUNTMASK);
         int is_intro = (o->op_private & OPpLVAL_INTRO) ? 1 : 0;
         int i;
+        /* Need parens for list context when all vars are scalars
+           (e.g. my ($x) = @_ but NOT my @a = @_) */
+        int need_parens = 0;
+        if (count > 1) {
+            need_parens = 1;
+        } else if (ctx->in_list_assign && count == 1) {
+            const char *n = ddc_padname_for_targ(aTHX_ ctx, base);
+            if (n && *n == '$') need_parens = 1;
+        }
         if (is_intro) {
             ddc_emit_keyword(aTHX_ ctx, "my", 2);
             sv_catpvn(ctx->out, " ", 1);
         }
-        if (count > 1) sv_catpvn(ctx->out, "(", 1);
+        if (need_parens) sv_catpvn(ctx->out, "(", 1);
         for (i = 0; i < count; i++) {
             const char *name = ddc_padname_for_targ(aTHX_ ctx, base + i);
             if (i > 0) sv_catpvn(ctx->out, ", ", 2);
@@ -1479,7 +1538,7 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
             else
                 sv_catpvf(ctx->out, "$pad_%d", (int)(base + i));
         }
-        if (count > 1) sv_catpvn(ctx->out, ")", 1);
+        if (need_parens) sv_catpvn(ctx->out, ")", 1);
         break;
     }
 #endif /* PERL_VERSION >= 18 */
@@ -2612,7 +2671,6 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
         UNOP_AUX_item *aux = cUNOP_AUXo->op_aux;
         SSize_t nargs = aux[PERL_MULTICONCAT_IX_NARGS].ssize;
         const char *plain_pv;
-        SSize_t *lens;
         OP *kids[64];
         int nkids = 0;
         SSize_t seg;
@@ -2622,7 +2680,6 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
         int out_parts = 0;
 
         plain_pv = aux[PERL_MULTICONCAT_IX_PLAIN_PV].pv;
-        lens = &aux[PERL_MULTICONCAT_IX_LENGTHS].ssize;
 
         /* Collect arg kids — skip childless null placeholders */
         if (o->op_flags & OPf_KIDS) {
@@ -2660,7 +2717,11 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
             }
 
             for (seg = 0; seg <= nargs; seg++) {
-                SSize_t slen = lens[seg];
+                /* Index aux array directly — do NOT use SSize_t*
+                   pointer arithmetic, which breaks on platforms
+                   where sizeof(SSize_t) < sizeof(UNOP_AUX_item)
+                   (e.g. 32-bit with USE_64_BIT_INT). */
+                SSize_t slen = aux[PERL_MULTICONCAT_IX_LENGTHS + seg].ssize;
 
                 /* Constant segment */
                 if (slen > 0 && plain_pv) {

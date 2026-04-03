@@ -5,14 +5,16 @@ use IPC::Run3;
 use IPC::System::Simple qw(system);
 use Test::Most;
 
-use App::Test::Generator qw(generate);
+use_ok('App::Test::Generator');
 
 my $conf_file = 't/conf/abs.yml';
 my $outfile = 't/tmp_abs.t';
 
 unlink $outfile;
 
-ok(App::Test::Generator::generate($conf_file, $outfile), 'generate fuzz test');
+mkdir 't' if(!-d 't');
+
+ok(App::Test::Generator->generate($conf_file, $outfile), 'generate fuzz test');
 ok(-e $outfile, "fuzz test file created");
 
 open my $fh, '<', $outfile or die $!;

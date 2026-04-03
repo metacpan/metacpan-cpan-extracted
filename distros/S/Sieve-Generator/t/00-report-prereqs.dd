@@ -23,6 +23,7 @@ do { my $x = {
                                       'Moo::Role' => '0',
                                       'Params::Util' => '0',
                                       'Sub::Exporter' => '0',
+                                      'builtin' => '0',
                                       'experimental' => '0',
                                       'perl' => 'v5.36.0'
                                     }

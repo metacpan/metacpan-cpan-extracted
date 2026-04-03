@@ -166,7 +166,7 @@ mysignal(int sig, mysig_t act)
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HAVE_STRLCPY
+#if !defined(HAVE_STRLCPY) && !defined(HAS_STRLCPY)
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters
@@ -199,7 +199,7 @@ strlcpy(char *dst, const char *src, size_t siz)
         return(s - src - 1);    /* count does not include NUL */
 }
 
-#endif /* !HAVE_STRLCPY */
+#endif /* !HAVE_STRLCPY && !HAS_STRLCPY */
 
 /*
  * Move file descriptor so it doesn't collide with stdin/out/err

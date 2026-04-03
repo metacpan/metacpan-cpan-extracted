@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Text 0.001;
+package Sieve::Generator::Text 0.002;
 # ABSTRACT: role for objects that render as inline Sieve text fragments
 
 use Moo::Role;
@@ -42,7 +42,7 @@ Sieve::Generator::Text - role for objects that render as inline Sieve text fragm
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

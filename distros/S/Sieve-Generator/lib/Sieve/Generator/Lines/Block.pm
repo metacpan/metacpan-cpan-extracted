@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Lines::Block 0.001;
+package Sieve::Generator::Lines::Block 0.002;
 # ABSTRACT: a Sieve block (a brace-delimited sequence of statements)
 
 use Moo;
@@ -54,7 +54,7 @@ Sieve::Generator::Lines::Block - a Sieve block (a brace-delimited sequence of st
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

@@ -1,11 +1,16 @@
 services:
   blank-env:
+    image: dd-int-test:latest
     build:
-      context: ../..
-      dockerfile: integration/blank-env/Dockerfile
+        context: ../..
+        dockerfile: integration/blank-env/Dockerfile
     working_dir: /opt/integration
+    entrypoint:
+      - perl
+      - /opt/integration/run-integration.pl
     volumes:
       - ${DASHBOARD_TARBALL:?set DASHBOARD_TARBALL to a host-built Developer-Dashboard tarball}:/artifacts/Developer-Dashboard.tar.gz:ro
+      - ./run-integration.pl:/opt/integration/run-integration.pl:ro
     environment:
       PERL_MM_USE_DEFAULT: "1"
       NONINTERACTIVE_TESTING: "1"

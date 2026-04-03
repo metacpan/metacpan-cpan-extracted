@@ -187,7 +187,7 @@ clause array:
 
 Like `exists` but negated.
 
-### Any
+### any
 
     $q->any($subquery)
     # ANY(SELECT ...)
@@ -199,7 +199,7 @@ Returns an ANY subquery expression. Used with comparison operators in WHERE:
     ) } }
     # salary > ANY(SELECT salary FROM managers)
 
-### All
+### all
 
     $q->all($subquery)
     # ALL(SELECT ...)
@@ -228,7 +228,7 @@ values or expression objects.
 
 Like `between` but negated.
 
-### Compare
+### compare
 
     $q->compare($left, $op, $right)
 
@@ -505,7 +505,13 @@ The WHERE clause accepts several forms that can be freely mixed and nested.
 
     { column => $value }          # column = ?
     { column => undef }           # column IS NULL
-    { column => \@list }          # column IN (?, ?, ?)
+    { column => \@list }          # column = ? OR column = ? OR ...
+                                  # each element is processed individually:
+                                  #   undef      => column IS NULL
+                                  #   { op => v} => column op v
+                                  #   scalar     => column = ?
+                                  # e.g. { col => [undef, { '>' => 3 }] }
+                                  #   => col IS NULL OR col > ?
     { column => $expr }           # column = expr  (no bind if Expr object)
     { column => { op => $val } }  # column op ?
 

@@ -7,8 +7,8 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.69';
-$VERSION = eval $VERSION;
+our $VERSION = '0.70';
+#$VERSION = eval $VERSION;
 DynaLoader::bootstrap Math::GMPq::Random $VERSION;
 
 @Math::GMPq::Random::EXPORT = ();

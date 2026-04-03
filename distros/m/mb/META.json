@@ -1,6 +1,6 @@
 {
     "name" : "mb",
-    "version" : "0.60",
+    "version" : "0.61",
     "abstract" : "Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...",
     "author" : [
         "ina <ina@cpan.org>"
@@ -57,7 +57,7 @@
     "provides" : {
         "mb" : {
             "file" : "lib/mb.pm",
-            "version" : "0.60"
+            "version" : "0.61"
         }
     }
 }

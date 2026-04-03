@@ -115,11 +115,25 @@ sub where_sql {
   like $sql, qr/WHERE id IN \(SELECT user_id FROM orders\)/, '-in subquery';
 }
 
-# array value = IN
+# array value = OR conditions
 {
   my ($sql, @bind) = where_sql({ id => [1, 2, 3] });
-  like $sql, qr/WHERE id IN \(\?, \?, \?\)/, 'array value as IN';
+  like $sql, qr/WHERE \(id = \? OR id = \? OR id = \?\)/, 'array value as OR';
   is_deeply \@bind, [1, 2, 3], 'array value binds';
+}
+
+# array value with undef and operator hashref
+{
+  my ($sql, @bind) = where_sql({ col => [undef, { '>' => 3 }] });
+  like $sql, qr/WHERE \(col IS NULL OR col > \?\)/, 'array with undef and operator';
+  is_deeply \@bind, [3], 'array mixed binds';
+}
+
+# single-element array (no parens needed)
+{
+  my ($sql, @bind) = where_sql({ id => [42] });
+  like $sql, qr/WHERE id = \?/, 'single-element array no parens';
+  is_deeply \@bind, [42], 'single-element array binds';
 }
 
 # -and array

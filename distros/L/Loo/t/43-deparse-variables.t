@@ -47,14 +47,17 @@ assert_exact(
     "};\n"
 );
 
-assert_exact(
-    'lexical array constant index',
-    sub { my @x; return $x[2] },
-    "\$VAR1 = sub {\n" .
-    "  my \@x;\n" .
-    "  return \$x[2];\n" .
-    "};\n"
-);
+SKIP: {
+    skip 'OP_AELEMFAST_LEX not available before 5.18', 1 if $] < 5.018;
+    assert_exact(
+        'lexical array constant index',
+        sub { my @x; return $x[2] },
+        "\$VAR1 = sub {\n" .
+        "  my \@x;\n" .
+        "  return \$x[2];\n" .
+        "};\n"
+    );
+}
 
 assert_exact(
     'lexical array dynamic index',

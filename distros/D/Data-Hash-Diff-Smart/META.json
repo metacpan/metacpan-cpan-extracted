@@ -62,6 +62,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Hash-Diff-Smart"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

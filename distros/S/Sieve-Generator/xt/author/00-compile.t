@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 16;
+plan tests => 15;
 
 my @module_files = (
     'Sieve/Generator.pm',
@@ -17,7 +17,6 @@ my @module_files = (
     'Sieve/Generator/Lines/Heredoc.pm',
     'Sieve/Generator/Lines/IfElse.pm',
     'Sieve/Generator/Lines/Junction.pm',
-    'Sieve/Generator/Lines/PrettyCommand.pm',
     'Sieve/Generator/Sugar.pm',
     'Sieve/Generator/Text.pm',
     'Sieve/Generator/Text/Qstr.pm',

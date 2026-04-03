@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.60';
+$VERSION = '0.61';
 $VERSION = $VERSION;
 
 # internal use
@@ -5480,18 +5480,6 @@ In any case, it is certain that "M" and "B" in mb.pm modulino are the first two 
 mb.pm modulino is a solution that can run your Perl script written in MBCS encoding.
 This software is a source code filter, a transpiler-modulino.
 
-=head2 Perl 5.42 and source::encoding
-
-Perl 5.42 introduces the C<source::encoding> pragma, and enables
-ASCII-only checking automatically for C<use v5.41> and later.
-
-mb transpiles most program tokens into US-ASCII, but it intentionally keeps
-comments and POD as-is. Those may contain multibyte characters.
-
-Therefore, when mb runs as a command and writes a transpiled C<.oo.*> file, it
-inserts a defensive C<BEGIN> block that disables C<source::encoding> checking
-when the pragma exists.
-
 Perl is said to have been able to handle Unicode since version 5.8.
 However, unlike JPerl, "Easy jobs must be easy" has been lost.
 
@@ -5620,7 +5608,27 @@ Once, Larry Wall san said like this;
 
 "Easy jobs must be easy."
 
-Welcome to world of Larry Wall-san's way!!
+Welcome to Larry Wall-san's way!!
+
+=head1 Perl 5.42 and source::encoding
+
+Perl 5.42 introduces the C<source::encoding> pragma, and enables
+ASCII-only checking of the Perl script source automatically for
+C<use v5.41> and later.
+
+mb passes most tokens through as-is, and only escapes DAMEMOJI
+--- multibyte characters whose second octet happens to be an ASCII
+metacharacter --- inside string and regular expression literals.
+
+Comments and POD are left completely untouched and may therefore
+contain arbitrary multibyte characters.
+
+Therefore, when mb transpiles a script, it appends C<no source::encoding;>
+on the same line as any C<use v5.41> or later statement in the
+transpiled C<.oo.*> file. This suppresses C<source::encoding> checking
+without introducing extra lines, so that line numbers in error
+messages are not shifted between the original and the transpiled
+script.
 
 =head1 TERMINOLOGY
 

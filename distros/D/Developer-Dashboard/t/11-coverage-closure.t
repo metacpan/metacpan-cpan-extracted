@@ -188,7 +188,7 @@ my $script_page = Developer::Dashboard::PageDocument->new(
     },
     actions  => [],
 );
-my $script_html = $script_page->render_html( page_url => '/page/script-page' );
+my $script_html = $script_page->render_html( page_url => '/app/script-page' );
 like( $script_html, qr/<section class="body">body<\/section>/, 'page render keeps bookmark body content' );
 like( $script_page->canonical_instruction, qr/^CODE1:\s+print 1;/m, 'page document serializes valid meta code entries only' );
 
@@ -216,7 +216,7 @@ my $form_page = Developer::Dashboard::PageDocument->new(
         runtime_errors => ['runtime failure'],
     },
 );
-my $form_html = $form_page->render_html( page_url => '/page/form-page' );
+my $form_html = $form_page->render_html( page_url => '/app/form-page' );
 like( $form_html, qr/<form>FORM<\/form>/, 'page render includes legacy FORM blocks' );
 like( $form_html, qr/<div>FORMTT<\/div>/, 'page render includes legacy FORM\.TT blocks' );
 like( $form_html, qr/runtime-error/, 'page render includes runtime error markup' );

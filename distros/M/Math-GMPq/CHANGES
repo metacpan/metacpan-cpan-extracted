@@ -1,5 +1,9 @@
 Revision history for Perl module Math::GMPq
 
+0.70
+ - Enable quadmath builds on cygwin smoker. See (eg):
+   https://www.cpantesters.org/cpan/report/3fa2b1f1-71b3-1014-beba-d9dcb6a500a3.
+
 0.69
  - Allow the overloaded comparison operations to accept a Math-GMP object.
  - Allow the overloaded exponentiation functions (overload_pow & overload_pow_eq)

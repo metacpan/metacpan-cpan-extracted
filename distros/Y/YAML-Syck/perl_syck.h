@@ -69,6 +69,7 @@ static enum scalar_style yaml_quote_style = scalar_none;
 
 #define TRACK_OBJECT(sv) (av_push(((struct parser_xtra *)p->bonus)->objects, sv))
 #define USE_OBJECT(sv) (SvREFCNT_inc(sv))
+#define IS_SIGN(c) ((c) == '-' || (c) == '+')
 
 #ifndef YAML_IS_JSON
 
@@ -265,7 +266,7 @@ yaml_syck_parser_handler
                 STRLEN len = n->data.str->len;
                 int is_neg = (*ptr == '-');
                 syck_str_blow_away_commas( n );
-                if (is_neg) { ptr++; len--; }
+                if (IS_SIGN(*ptr)) { ptr++; len--; }
                 UV uv = grok_hex( ptr, &len, &flags, NULL);
                 if (is_neg)
                     sv = newSViv(-(IV)uv);
@@ -277,7 +278,7 @@ yaml_syck_parser_handler
                 STRLEN len = n->data.str->len;
                 int is_neg = (*ptr == '-');
                 syck_str_blow_away_commas( n );
-                if (is_neg) { ptr++; len--; }
+                if (IS_SIGN(*ptr)) { ptr++; len--; }
                 UV uv = grok_oct( ptr, &len, &flags, NULL);
                 if (is_neg)
                     sv = newSViv(-(IV)uv);

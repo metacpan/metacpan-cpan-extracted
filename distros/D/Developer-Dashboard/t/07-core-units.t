@@ -297,6 +297,16 @@ is_deeply(
     { foo => File::Spec->catdir( $home, 'foo-path' ) },
     'path_aliases includes expanded global aliases when no repo override exists',
 );
+is( $global_alias_config->web_workers, 1, 'web_workers defaults to one worker when unset' );
+is_deeply(
+    $global_alias_config->save_global_web_workers(3),
+    { workers => 3 },
+    'save_global_web_workers persists a positive integer worker count',
+);
+is( $global_alias_config->load_global->{web}{workers}, 3, 'save_global_web_workers writes the worker count into global config' );
+is( $global_alias_config->web_workers, 3, 'web_workers reads the saved worker count from config' );
+dies_like( sub { $global_alias_config->save_global_web_workers(0) }, qr/positive integer/, 'save_global_web_workers rejects zero workers' );
+dies_like( sub { $global_alias_config->save_global_web_workers('abc') }, qr/positive integer/, 'save_global_web_workers rejects non-numeric worker counts' );
 is_deeply(
     $global_alias_config->save_global_path_alias( 'foo', File::Spec->catdir( $home, 'foo-path-updated' ) ),
     { name => 'foo', path => File::Spec->catdir( $home, 'foo-path-updated' ) },

@@ -1,7 +1,9 @@
 package Developer::Dashboard::Auth;
-$Developer::Dashboard::Auth::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Fcntl qw(:mode);
 use Digest::SHA qw(sha256_hex);
@@ -126,14 +128,19 @@ sub remove_user {
 
 # login_page(%args)
 # Builds the helper login page HTML.
-# Input: optional message text.
+# Input: optional message text and optional redirect_to path/query string.
 # Output: HTML string.
 sub login_page {
     my ( $self, %args ) = @_;
     my $message = $args{message} || 'Helper access requires login.';
+    my $redirect_to = defined $args{redirect_to} ? $args{redirect_to} : '';
     $message =~ s/&/&amp;/g;
     $message =~ s/</&lt;/g;
     $message =~ s/>/&gt;/g;
+    $redirect_to =~ s/&/&amp;/g;
+    $redirect_to =~ s/</&lt;/g;
+    $redirect_to =~ s/>/&gt;/g;
+    $redirect_to =~ s/"/&quot;/g;
     return <<"HTML";
 <!DOCTYPE html>
 <html>
@@ -154,6 +161,7 @@ sub login_page {
   <h1>Developer Dashboard</h1>
   <p>$message</p>
   <form method="post" action="/login">
+    <input name="redirect_to" type="hidden" value="$redirect_to">
     <label for="username">Username</label>
     <input id="username" name="username" type="text" autocomplete="username">
     <label for="password">Password</label>

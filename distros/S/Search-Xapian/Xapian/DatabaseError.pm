@@ -25,6 +25,7 @@ use Search::Xapian::DatabaseCreateError;
 use Search::Xapian::DatabaseLockError;
 use Search::Xapian::DatabaseModifiedError;
 use Search::Xapian::DatabaseOpeningError;
+use Search::Xapian::DatabaseClosedError;
 
 our @ISA = qw(DynaLoader Search::Xapian::RuntimeError);
 

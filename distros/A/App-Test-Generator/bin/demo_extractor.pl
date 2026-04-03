@@ -24,9 +24,9 @@ use lib "$FindBin::Bin/../lib";
 
 use App::Test::Generator::SchemaExtractor;
 
-print "=" x 70 . "\n";
+print '=' x 70 . "\n";
 print "Schema Extractor Demonstration\n";
-print "=" x 70 . "\n\n";
+print '=' x 70 . "\n\n";
 
 # Create temporary directory for our test
 my $tempdir = tempdir(CLEANUP => 1);
@@ -339,6 +339,6 @@ if ($success_rate >= 80) {
 print "\n" . "=" x 70 . "\n";
 print "Generated schema files in: $schema_dir/\n";
 print "You can inspect them manually for more details.\n";
-print "=" x 70 . "\n";
+print '=' x 70 . "\n";
 
 __END__

@@ -20,14 +20,14 @@ no_index:
 provides:
   JSON::Syck:
     file: lib/JSON/Syck.pm
-    version: '1.43'
+    version: '1.44'
   YAML::Dumper::Syck:
     file: lib/YAML/Dumper/Syck.pm
   YAML::Loader::Syck:
     file: lib/YAML/Loader/Syck.pm
   YAML::Syck:
     file: lib/YAML/Syck.pm
-    version: '1.43'
+    version: '1.44'
 requires:
   perl: '5.006'
 resources:
@@ -35,5 +35,5 @@ resources:
   homepage: https://github.com/toddr/YAML-Syck
   license: https://dev.perl.org/licenses/
   repository: https://github.com/toddr/YAML-Syck.git
-version: '1.43'
+version: '1.44'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

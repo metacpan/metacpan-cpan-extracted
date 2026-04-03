@@ -1,5 +1,42 @@
 Revision history for Perl extension Crypt::RIPEMD160.
 
+0.12 2026-04-02
+
+  Bug fixes:
+    - Fix MAC reset() after mac()/hexmac() by preserving the key so the
+      inner pad can be recomputed. PR #23
+    - Prevent STRLEN-to-dword truncation for large inputs on 64-bit
+      platforms in the XS add() method. PR #26
+    - Croak on read errors in addfile() instead of silently truncating
+      the hash input. GH #35, PR #35
+    - Zero sensitive memory (hash state) on destroy and reset to avoid
+      leaking intermediate digests. PR #39
+    - Zero MDfinish stack buffer after final compression to prevent
+      transient data from lingering on the stack. PR #44
+
+  Improvements:
+    - Add clone() method for copying mid-computation state, enabling
+      efficient digest of data sharing a common prefix. PR #27
+    - Simplify digest byte extraction and MAC reset internals. PR #36
+    - Add const qualifiers to C function signatures and remove unused
+      includes. PR #24
+
+  Maintenance:
+    - Add LICENSE file and =head1 LICENSE sections to module POD. PR #29
+    - Add LICENSE section to MAC.pm POD and exclude .claude/ from dist.
+      PR #37
+    - Remove executable permission and shebang from Makefile.PL. PR #28
+    - Modernize Makefile.PL metadata: add META_PROVIDES, test
+      dependencies, and MIN_PERL_VERSION. PR #25, PR #33
+    - Modernize misc/ scripts and clean up MANIFEST.SKIP. PR #34
+    - Modernize README and clean cpanfile. PR #25
+    - Add CONTRIBUTING.md. PR #31
+    - Add SECURITY.md with vulnerability reporting contact. PR #32
+    - Add AI_POLICY.md for AI policy.
+    - Add CLAUDE.md with generated file warnings. PR #45
+    - Add author tests for POD validation and coverage. PR #42
+    - Add padding boundary test vectors. PR #43
+
 0.11 2026-03-22
 
   Bug fixes:

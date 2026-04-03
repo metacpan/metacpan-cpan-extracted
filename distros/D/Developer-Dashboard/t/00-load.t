@@ -28,6 +28,8 @@ my @modules = qw(
   Developer::Dashboard::UpdateManager
   Developer::Dashboard::SessionStore
   Developer::Dashboard::Web::App
+  Developer::Dashboard::Web::DancerApp
+  Developer::Dashboard::Web::Server::Daemon
   Developer::Dashboard::Web::Server
 );
 

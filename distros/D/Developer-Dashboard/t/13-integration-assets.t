@@ -9,6 +9,7 @@ ok( -f 'integration/blank-env/Dockerfile', 'blank-environment Dockerfile exists'
 ok( -f 'integration/blank-env/docker-compose.yml', 'blank-environment docker compose file exists' );
 ok( -f 'integration/blank-env/run-integration.pl', 'blank-environment integration runner exists' );
 ok( -f 'integration/blank-env/run-host-integration.sh', 'host-side blank-environment integration launcher exists' );
+ok( -f 'integration/browser/run-bookmark-browser-smoke.pl', 'bookmark browser smoke script exists' );
 
 open my $plan_fh, '<', 'doc/integration-test-plan.md' or die $!;
 my $plan = do { local $/; <$plan_fh> };
@@ -24,6 +25,20 @@ like( $plan, qr/host-built tarball/i, 'integration plan requires host-built tarb
 like( $plan, qr/broken collector|broken Perl collector|healthy collector/i, 'integration plan covers collector failure isolation' );
 like( $plan, qr/Runtime::Result/, 'integration plan covers Runtime::Result-based hook verification' );
 like( $plan, qr/run-host-integration\.sh/, 'integration plan points to the host-side launcher' );
+like( $plan, qr/run-bookmark-browser-smoke\.pl/, 'integration plan documents the fast bookmark browser smoke runner' );
+
+open my $testing_fh, '<', 'doc/testing.md' or die $!;
+my $testing = do { local $/; <$testing_fh> };
+close $testing_fh;
+like( $testing, qr/run-bookmark-browser-smoke\.pl/, 'testing doc documents the bookmark browser smoke runner' );
+like( $testing, qr/headless\s+Chromium/s, 'testing doc explains that the bookmark smoke runner uses headless Chromium' );
+
+open my $smoke_fh, '<', 'integration/browser/run-bookmark-browser-smoke.pl' or die $!;
+my $smoke = do { local $/; <$smoke_fh> };
+close $smoke_fh;
+like( $smoke, qr/--bookmark-file/, 'bookmark smoke script accepts an explicit bookmark file path' );
+like( $smoke, qr/--expect-ajax-path/, 'bookmark smoke script accepts ajax path assertions' );
+like( $smoke, qr/__END__/, 'bookmark smoke script carries POD trailer' );
 
 open my $runner_fh, '<', 'integration/blank-env/run-integration.pl' or die $!;
 my $runner = do { local $/; <$runner_fh> };
@@ -38,7 +53,12 @@ unlike( $runner, qr/cpanm --notest/, 'integration runner installs the tarball wi
 like( $runner, qr/broken\.collector/, 'integration runner provisions a broken config collector regression case' );
 like( $runner, qr/healthy\.collector/, 'integration runner provisions a healthy config collector regression case' );
 like( $runner, qr/dashboard indicator list after restart/, 'integration runner checks indicator isolation after restart' );
-like( $runner, qr/chromium.*--headless/s, 'integration runner uses headless Chromium for browser checks' );
+like( $runner, qr/_browser_binary|chromium-browser|google-chrome|apt-get install -y --no-install-recommends chromium/s, 'integration runner resolves or bootstraps a headless browser for browser checks' );
+like( $runner, qr/IPC::Open3|open3/, 'integration runner uses a live subprocess bridge for long-running command output' );
+like( $runner, qr/IO::Select/, 'integration runner monitors long-running command streams without fully buffering them first' );
+like( $runner, qr/legacy-ajax-stream|project-stream\.txt/, 'integration runner provisions a long-running saved ajax stream regression case' );
+like( $runner, qr/_capture_stream_prefix/, 'integration runner captures early ajax stream chunks during the long-running saved ajax regression case' );
+like( $runner, qr/_distribution_version/, 'integration runner reads the expected installed version from the extracted tarball instead of hard-coding a release number' );
 like( $runner, qr/\.developer-dashboard/, 'integration runner provisions a fake-project local runtime tree' );
 like( $runner, qr/cpanm install host-built tarball.*dashboard init.*api-dashboard/s, 'integration runner builds the fake-project local runtime only after the tarball install step' );
 like( $runner, qr/__END__/, 'integration runner carries POD trailer' );
@@ -62,7 +82,9 @@ like( $host, qr/\.perl5/, 'host launcher bootstraps a local perl toolchain when 
 like( $host, qr/rm -rf Developer-Dashboard-\* Developer-Dashboard-\*\.tar\.gz/, 'host launcher removes old release build directories and tarballs before building a new one' );
 like( $host, qr/LOCAL_DZIL.*build/s, 'host launcher builds the tarball on the host with Dist::Zilla' );
 like( $host, qr/DASHBOARD_TARBALL/, 'host launcher exports the tarball path for docker compose' );
-like( $host, qr/run --build --rm blank-env/, 'host launcher rebuilds the blank image before running integration' );
+like( $host, qr/run --rm blank-env/, 'host launcher runs the blank-environment integration service' );
+unlike( $host, qr/run --build --rm blank-env/, 'host launcher does not rebuild the integration image when using the prebuilt container path' );
+like( $host, qr/dd-int-test:latest/, 'host launcher POD documents the prebuilt dd-int-test image path' );
 
 if ( -f 'dist.ini' ) {
     open my $dist_fh, '<', 'dist.ini' or die $!;

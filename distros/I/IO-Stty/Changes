@@ -1,5 +1,47 @@
 Revision history for Perl extension IO::Stty
 
+0.08 Thu Apr 02 2026
+
+  Bug fixes:
+   - Fix Perl 5.8 compatibility: replace // (defined-or) operator with
+     ternary equivalent. The // operator requires Perl 5.10 but
+     MIN_PERL_VERSION is 5.008. (GH #28, GH #29, PR #30, PR #31)
+   - Implement crterase alias (was documented but never coded) and
+     correct dec/crt combination documentation to match actual behavior.
+     (PR #33)
+   - Add exta, extb, and 134.5 baud rate aliases that were documented
+     but silently rejected. (PR #32)
+   - Use _POSIX_VDISABLE for disabling special characters instead of
+     hardcoded 0, fixing 'undef'/'^-' on macOS/BSD where VDISABLE is
+     255. Also fix sane/cooked combos to use 'undef' for eol. (PR #37)
+   - Handle VEOF/VMIN and VEOL/VTIME shared cc slots on Solaris/SVR4
+     systems where these overlap in the termios cc array. (GH #38,
+     PR #42)
+   - Fix _cc_to_hat() to use only _POSIX_VDISABLE, not hardcoded 0/255,
+     preventing wrong <undef> display on Linux and macOS. (PR #46)
+   - Add missing igncr flag to -a display output. (PR #50)
+   - Handle getattr() failure by returning undef instead of silently
+     continuing with zeroed flags. Return setattr() result so callers
+     can detect failure. (PR #36)
+   - Fix broken $private_subs reference in t/99-pod-coverage.t and
+     remove duplicate echok in sane combo expansion. (PR #34)
+
+  Improvements:
+   - Add evenp, oddp, parity, cbreak, and litout combination aliases
+     matching GNU stty behavior. (PR #35)
+   - Add 'speed' query parameter to return just the output baud rate,
+     matching GNU stty behavior. (PR #51)
+   - Document iexten as a settable local flag in POD. (PR #36)
+   - Document AI Policy
+
+  Maintenance:
+   - Add provides metadata to Makefile.PL for correct CPAN indexing,
+     using MM->parse_version() for dynamic version extraction. (PR #47,
+     PR #53)
+   - Add strict/warnings to boilerplate test files. (PR #34)
+   - Clarify in CLAUDE.md that README.md and MANIFEST are generated
+     files and that release prep is human-only. (PR #53, PR #54)
+
 0.07 Sun Mar 22 2026
 
   Bug fixes:

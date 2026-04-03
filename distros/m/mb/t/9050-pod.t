@@ -62,7 +62,16 @@ for my $pm (@pm_files) {
             unlink $tmpfile if -f $tmpfile;
             $errors   = 0 unless defined $errors   && $errors   > 0;
             $warnings = 0 unless defined $warnings && $warnings > 0;
-            $checker_msg11 = " ($errors error(s))"     if $errors;
+            # Pod::Checker older than 1.51 incorrectly reports errors for
+            # valid L<URL> and L<> internal link syntax, so skip G11 on
+            # those versions to avoid false FAILs on older Perl installations.
+            if ($errors && $Pod::Checker::VERSION < 1.51) {
+                $errors = 0;
+                $checker_msg11 = ' (Pod::Checker too old, skipped)';
+            }
+            elsif ($errors) {
+                $checker_msg11 = " ($errors error(s))";
+            }
             # Pod::Checker older than 1.60 mis-reports warnings for
             # valid L<> link syntax (e.g. sections with spaces or
             # special characters), so skip G12 on those versions.

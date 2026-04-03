@@ -1,5 +1,207 @@
 Revision history for Developer Dashboard
 
+1.33  2026-04-03
+    - changed the root route so `/` now redirects to `/app/index` whenever a saved `index` bookmark exists, making the saved home page the default browser entrypoint
+    - kept the existing blank-editor fallback on `/` when no saved `index` bookmark exists yet
+    - changed unknown saved routes such as `/app/foobar` to open the bookmark editor with a prefilled blank bookmark template instead of returning a 404 page
+    - normalized saved bookmark ids that already include `/app/` so the prefilled unknown-route editor still saves and loads through the normal dashboards tree
+    - updated README, POD, release docs, and release metadata for the root-index and unknown-route editor changes
+
+1.30  2026-04-03
+    - fixed helper-login redirect flow so requests that are forced through `/login` now preserve the original internal route and query, sending the browser back to pages such as `/app/index` after successful login instead of always redirecting to `/`
+    - hardened helper redirect handling so only safe local app routes are accepted for post-login redirects, rejecting malformed, external, and login-loop targets
+    - updated README, POD, release docs, and release metadata for the helper-login redirect fix
+
+1.29  2026-04-02
+    - fixed saved bookmark route generation so pages whose raw bookmark id already includes `/app/` no longer build broken links such as `/app//app/index/edit` for View Source and related saved-page routes
+    - changed shared `nav/*.tt` rendering to use CSS-driven horizontal wrapping instead of a hardcoded vertical inline flex layout
+    - changed shared nav styling to inherit page theme variables for panel, line, accent, and text colors, so dark bookmark themes no longer force a pale nav box or hidden nav link text
+    - updated README, POD, release docs, and release metadata for the shared-nav and saved-route fixes
+
+1.28  2026-04-02
+    - fixed HTTPS startup so `dashboard serve --ssl` now enables Starman SSL mode in addition to passing the generated certificate and key paths
+    - strengthened SSL regression coverage to assert the Plack runner receives `ssl => 1` alongside the generated certificate paths
+    - updated README, POD, release docs, and release metadata for the HTTPS fix patch release
+
+1.27  2026-04-02
+    - fixed nav template vertical layout by adding flexbox display style to nav items list, so multiple dashboards/nav/*.tt files now display vertically stacked one after another inside the horizontal white box instead of horizontally aligned
+
+1.26  2026-04-02
+    - version bump to comply with Rule 55: never reuse version number (v1.24 and v1.25 both released to PAUSE with overlapping commits, v1.26 created to establish clean separation)
+
+1.25  2026-04-02
+    - documented SSL parameter passing bug fix in FIXED_BUGS.md for version tracking and release notes
+
+1.24  2026-04-02
+    - fixed critical bug where ssl parameter was not being passed to Web::Server in app_builder callback, causing `dashboard serve --ssl` to silently fail to enable HTTPS
+    - ssl parameter now correctly flows through entire chain: CLI parsing -> RuntimeManager -> app_builder -> Web::Server configuration
+
+1.23  2026-04-02
+    - fixed uninitialized value warnings in listening_url() by guarding against undefined daemon and providing fallback defaults for sockhost and sockport
+    - all warnings from Developer::Dashboard code now eliminated (remaining warnings are from external dependencies)
+
+1.22  2026-04-02
+    - added HTTPS support to the web server with `dashboard serve --ssl` flag, enabling Starman HTTPS mode
+    - added automatic self-signed certificate generation in `~/.developer-dashboard/certs/server.crt` and `~/.developer-dashboard/certs/server.key` on first HTTPS startup
+    - configured Starman to accept `--ssl-key` and `--ssl-cert` parameters through Plack::Runner when SSL mode is enabled
+    - added Web::Server SSL test coverage for cert generation, cert path retrieval, SSL parameter passing, and listening URL scheme selection
+    - implemented web service settings persistence: `dashboard serve --host HOST --port PORT --workers N --ssl` now saves these settings globally
+    - `dashboard restart` now inherits all saved settings (host, port, workers, ssl) from the previous serve session, so `dashboard serve --ssl` followed by `dashboard restart` maintains SSL mode
+    - CLI flags override saved settings, allowing temporary overrides when needed (e.g., `dashboard restart --ssl` to enable SSL or `dashboard restart --port 8000` to use a different port)
+    - added Config module persistence methods `web_settings()` and `save_global_web_settings()` for atomic multi-setting updates
+    - added comprehensive test suite for configuration persistence with default values, save/load cycles, partial updates, and validation
+
+1.21  2026-04-02
+    - fixed malformed legacy bookmark icon bytes on saved page load by normalizing broken heading and item icon glyphs into stable browser-safe fallbacks and repairing common damaged joined emoji such as `🧑‍💻`
+    - kept saved edit and source routes on the repaired raw bookmark text from disk instead of always regenerating canonical source, so browser views preserve the repaired legacy icon markup
+    - added direct page-store and web-route regressions for malformed legacy bookmark icon bytes plus a browser-backed saved-page smoke verification against the reproduced `/tmp/index` issue
+
+1.20  2026-04-02
+    - fixed bookmark editor overlay drift by restoring live syntax highlighting inside a clipped overlay viewport that follows the textarea by transform instead of trying to scroll a second independent layer
+    - fixed the editor bottom-of-file geometry by preserving the final blank line in the overlay so scrolling and caret targeting stay aligned on long bookmarks
+    - added browser-backed and web-route regression coverage for the saved bookmark editor highlighting and scroll-sync behaviour
+
+1.19  2026-04-02
+    - fixed plain legacy `Folder` alias drift so direct calls such as `perl -MFolder -e 'print Folder->docker'` now lazy-load config-backed path aliases from the active runtime instead of rejecting aliases that `dashboard paths` already exposes
+    - kept explicit `Folder->configure(..., aliases => ...)` overrides intact while adding the lazy config-backed alias cache
+    - added legacy-helper regression coverage for repo-local config alias resolution through plain `Folder` usage
+
+1.18  2026-04-02
+    - fixed singleton-managed saved Ajax lifecycle cleanup so `dashboard stop` and `dashboard restart` now terminate `dashboard ajax: ...` workers as part of the managed web shutdown path
+    - added browser `pagehide` cleanup beacons for `Ajax(..., singleton => 'NAME', ...)`, letting saved bookmark pages call `/ajax/singleton/stop?singleton=NAME` when the tab closes so singleton workers do not linger after browser exit
+    - added direct web/runtime regressions for singleton stop-route cleanup, stop/restart singleton teardown, and writer-cancelled saved Ajax streams
+    - changed the bookmark editor overlay to render exact escaped source with wrapping disabled instead of live syntax markup, preventing long exact bookmark edits from leaking highlight fragments, mis-highlighting selections, or shifting the caret onto the wrong line
+    - added exact editor geometry regressions for the long bookmark repro and reran the browser-backed editor verification path
+
+1.17  2026-04-02
+    - fixed bookmark editor script-block highlighting so saved `/app/<id>/edit` pages keep JavaScript lines in script mode instead of flipping into CSS-style attribute/value markup after `<script>` tags
+    - protected the browser and server editor highlighters from rewriting their own inserted span markup, preventing placeholder or token-fragment leaks that could dislocate the visible overlay while typing exact saved bookmark text
+    - updated `dashboard serve workers N` to start the web service immediately when it is stopped, with `--host HOST` and `--port PORT` available for that auto-start path
+    - added focused web and CLI regressions for the exact bookmark editor repro and for `dashboard serve workers` starting a stopped web service
+    - verified the exact `/app/test/edit` bookmark repro in headless Chromium, updated testing and architecture docs, and bumped release metadata for 1.17
+
+1.16  2026-04-02
+    - fixed bookmark editor typing drift by removing width-changing bold styling from the visible directive highlight overlay, keeping the syntax-highlight layer aligned with the real textarea caret while typing
+    - verified the editor route through headless Chromium in addition to the web regression test coverage
+
+1.15  2026-04-02
+    - added `singleton => 'NAME'` support to saved bookmark `Ajax(...)` helpers, emitting `/ajax/<file>?type=...&singleton=NAME` so browser refreshes can replace older long-running Perl ajax workers cleanly
+    - renamed singleton-managed saved Ajax Perl workers to `dashboard ajax: NAME` and reused `_pkill_perl` before launching a replacement stream, preventing stale refresh-driven background workers from accumulating
+    - extended web and legacy-helper coverage for singleton Ajax urls, singleton process titles, and refresh-safe saved Ajax replacement behaviour
+
+1.14  2026-04-02
+    - updated the GitHub Actions workflows to use `actions/checkout@v5` and opt JavaScript actions into Node 24, removing the hosted-runner deprecation path for the previous Node 20 checkout runtime
+    - closed the remaining `lib/` coverage gaps in `Developer::Dashboard::Web::App`, `Developer::Dashboard::Web::DancerApp`, and `Developer::Dashboard::RuntimeManager`, bringing the reviewed Devel::Cover report back to 100% statement and subroutine coverage
+    - fixed runtime web-process detection so `dashboard serve logs ...` and `dashboard serve workers ...` helper commands are no longer misdetected as managed web servers during shutdown and restart scans
+
+1.13  2026-04-02
+    - extended `dashboard serve logs` with `-n N` tailing and `-f` follow mode, so users can start from the last requested lines and continue streaming appended Dancer2 and Starman log output live
+    - added runtime-manager and CLI regressions for tailed and followed web logs
+    - updated README, main POD, architecture docs, and release metadata for the 1.13 log-tail follow release
+
+1.12  2026-04-02
+    - added `dashboard serve logs` so users can print the combined Dancer2 and Starman runtime log without hunting for the dashboard log file manually
+    - added configurable Starman worker counts through `dashboard serve workers N`, plus one-off `dashboard serve --workers N` and `dashboard restart --workers N` overrides
+    - updated README, main POD, architecture docs, and release metadata for the 1.12 web-log and worker-control release
+
+1.11  2026-04-02
+    - fixed saved bookmark Ajax Perl wrappers to enable autoflush on `STDOUT` and `STDERR`, so long-running handlers that only `print` and `sleep` now stream visible browser output immediately instead of stalling behind process buffering
+    - extended the blank-environment integration runner to exercise a long-running saved `/ajax/...` stream and assert that the first chunks arrive on time through the installed browser-facing route
+    - updated README, POD, testing docs, fixed-bug notes, and release metadata for the 1.11 saved-ajax streaming release
+
+1.10  2026-04-02
+    - changed saved bookmark Ajax helpers and `/ajax/<file>` routes to default to `text/plain` output when no explicit `type => ...` or `?type=...` is supplied
+    - fixed the Dancer2 ajax bridge so streamed `/ajax/...` responses flush through the HTTP layer instead of being buffered into one final string
+    - extended ajax helper, web-route, and streaming coverage and updated README, POD, bug notes, and release metadata for the 1.10 ajax-default and streaming fix
+
+1.09  2026-04-02
+    - fixed transient `/?mode=render&token=...` play for named bookmarks so shared `nav/*.tt` fragments keep the saved `/app/<id>` current-page context instead of collapsing to `/`
+    - added a dedicated bookmark play regression test for shared nav rendering on both unnamed transient play and named bookmark token play
+    - updated README, POD, fixed-bug notes, and release metadata for the 1.09 nav-context fix
+
+1.08  2026-04-02
+    - added `integration/browser/run-bookmark-browser-smoke.pl` for fast host-side browser verification of saved bookmark files, including page-source, ajax, and final DOM assertions
+    - documented the new bookmark browser smoke workflow in README, main POD, testing docs, and the integration plan so bookmark regressions get a dedicated repro path before the slower blank-environment cycle
+    - updated release metadata and release-sensitive tests for the 1.08 bookmark browser smoke tooling release
+
+1.07  2026-04-02
+    - fixed `/js/jquery.js` for saved bookmark pages by serving a built-in local jQuery-style compatibility shim when no runtime file overrides it
+    - verified that legacy `Ajax jvar => 'foo.bar', file => 'foobar'` bookmark pages bind `foo.bar` to `/ajax/foobar?...` and that the saved ajax endpoint executes through the browser-facing route
+    - updated README, POD, static-file docs, release docs, and release-sensitive tests for the new built-in `/js/jquery.js` behavior
+
+1.06  2026-04-02
+    - fixed saved bookmark editor boot-script escaping so literal bookmark HTML such as `</script>` no longer breaks the source editor and leaks raw instruction text below the page
+    - fixed legacy bookmark bootstrap ordering so `Ajax jvar => ...` bindings run after `set_chain_value()` is defined, preventing play-route JavaScript `ReferenceError` failures
+    - updated README, POD, changelog, fixed-bug notes, and troubleshooting docs to describe the bookmark editor/script bootstrap fixes
+
+1.05  2026-04-02
+    - fixed saved bookmark editor boot-script escaping so literal bookmark HTML such as `</script>` no longer breaks the source editor and leaks raw instruction text below the page
+    - fixed legacy bookmark bootstrap ordering so `Ajax jvar => ...` bindings run after `set_chain_value()` is defined, preventing play-route JavaScript `ReferenceError` failures
+    - removed the parallel `/page/...` browser route surface and moved saved render, edit, source, and action routes fully onto `/app/...`
+    - fixed the web server constructor so `port => 0` keeps the requested ephemeral-port bind instead of collapsing back to the default `7890`
+    - fixed the blank-environment runner so the helper-login flow now opens `/app/welcome` instead of the removed `/page/welcome` route, and made the browser step resolve or bootstrap Chromium when the prebuilt `dd-int-test:latest` image is stale
+    - fixed runtime restart races by waiting for the old listener on the managed web port to disappear before starting the replacement server, preventing intermittent `Address already in use` failures during `dashboard restart`
+    - fixed minimal-container listener discovery by falling back to `/proc` socket scans when `ss` is unavailable, so `dashboard stop` and `dashboard restart` still find Starman listener pids inside the prebuilt `dd-int-test:latest` image
+    - fixed the remaining blank-container restart race by re-probing the managed web port for late listener pids after the first shutdown sweep, so `dashboard restart` no longer leaves port `7890` occupied after the initial TERM/KILL pass
+    - fixed managed web detection for the Dancer2/Starman master-worker split, so `dashboard stop` and `dashboard restart` still trust the recorded master pid when the bound port listener is reported as a separate worker pid
+    - updated README, POD, and route-focused tests to document and verify the single `/app/...` saved bookmark surface
+
+1.04  2026-04-01
+    - completed the browser migration onto explicit Dancer2 routes, so the HTTP route table now lives in `Developer::Dashboard::Web::DancerApp` instead of a single catch-all bridge into the old dispatcher
+    - kept `Developer::Dashboard::Web::App` as the page and action service layer, so saved-page rendering, helper auth, legacy `/app` compatibility, and transient-policy enforcement continue to behave the same behind the new Dancer2 route surface
+    - added PSGI entrypoint and route-layer regression coverage for the Dancer2 server path, response headers, and route compatibility flow
+
+1.03  2026-04-01
+    - fixed the blank-environment integration runner so long-running commands stream stdout and stderr live instead of buffering silently through the wrapper, making fresh-container `cpanm` and browser-backed verification progress visible
+    - fixed the blank-environment integration runner to derive the expected installed version from the extracted tarball instead of hard-coding a release number, so the clean-container flow keeps working across version bumps
+    - re-ran the host-built tarball blank-environment integration flow successfully, including the headless Chromium browser checks
+
+1.02  2026-04-01
+    - fixed saved bookmark static asset lookup so `/js/*`, `/css/*`, and `/others/*` can resolve files from the effective runtime public tree and from `dashboards/public/...`, keeping saved local assets such as `dashboards/public/js/jquery.js` available after browser saves
+    - fixed legacy bookmark parsing so a standalone `---` line also terminates the current legacy section, preventing pasted prose after `CODE*` blocks from being compiled and shown as runtime syntax errors or leaked back into the editor
+    - added regressions for markdown-style legacy section breaks and for static file lookup from both runtime and bookmark-root public directories
+
+1.01  2026-04-01
+    - fixed saved bookmark editor posts so `/page/<id>/edit` saves keep using named saved-bookmark routes and `/page/<id>` play links instead of falling back to transient `token=` URLs when transient web tokens are disabled
+    - reduced CLI startup side effects by deferring configured path-alias loading, saved-page migration, and collector-indicator sync until commands that actually need them run
+    - extended web and CLI regressions for saved bookmark browser edits under the transient-url deny policy and for `dashboard restart` avoiding accidental project-local `.developer-dashboard` creation in repos that have not opted in
+
+1.00  2026-04-01
+    - added static file serving for public directory (js, css, others) at ~/.developer-dashboard/dashboard/public/{js,css,others}/
+    - added routes /js/*, /css/*, /others/* to serve static files with automatic MIME type detection
+    - included jQuery 4.0.0 minified in public/js/ to eliminate CDN dependencies
+    - implemented directory traversal attack prevention and file boundary validation
+    - added comprehensive unit tests for static file serving and MIME type detection (18 tests)
+    - added documentation for static file serving in doc/static-file-serving.md
+    - extended web app POD documentation with _serve_static_file and _get_content_type methods
+
+0.99  2026-04-01
+    - moved saved bookmark `Ajax(file => ...)` storage into `.developer-dashboard/dashboards/ajax/...`, so named handlers live under the saved bookmark tree instead of the runtime cache
+    - changed saved bookmark `Ajax(file => ...)` calls without `code => ...` to point at an existing executable in that ajax tree instead of overwriting it with an empty generated file
+    - changed transient-url-disabled saved bookmark Ajax endpoints to emit `/ajax/<file>?type=...` and resolve files directly from the shared dashboards ajax tree
+    - fixed saved Ajax stream draining so closed-handle comparisons stop emitting uninitialized-value warnings during coverage and process-backed ajax runs
+    - extended unit, metadata, and blank-environment integration coverage for the dashboards ajax-tree location and existing-file execution flow
+
+0.98  2026-04-01
+    - changed saved bookmark `/ajax?page=...&file=...` handlers to execute the stored runtime-cache file as a real process, defaulting to Perl unless the file starts with a shebang
+    - streamed both saved-handler `stdout` and `stderr` back to the browser directly, so `print`, `warn`, `die`, `system`, and `exec` behave like the old playground progress stream instead of a buffered JSON-style response
+    - extended unit, metadata, and blank-environment integration coverage for process-backed ajax streaming and shebang-backed saved handlers
+
+0.97  2026-04-01
+    - changed legacy `/ajax` execution to run bookmark Ajax Perl code directly and stream raw output chunks back to the browser instead of buffering through a page render pass
+    - changed saved bookmark `Ajax file => ...` handlers to preserve live browser progress updates while transient token urls remain disabled by default
+    - extended app, server, metadata, and coverage tests for streamed `/ajax` responses and saved bookmark file handlers
+
+0.96  2026-04-01
+    - changed saved bookmark `Ajax` helper calls to support explicit `file => 'name.json'` routes, storing the handler code under the runtime cache and emitting `/ajax?page=...&file=...` endpoints that stay usable while transient token urls are disabled
+    - kept transient `/ajax?token=...` support for transient pages behind the existing transient-url opt-in, while making saved bookmark ajax handlers work under the default deny policy
+    - extended unit, metadata, and blank-environment integration coverage for saved bookmark Ajax file routing
+
+0.95  2026-04-01
+    - disabled browser execution of transient `token=` and `atoken=` payloads by default, so only saved bookmark-file routes execute unless `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS` is enabled explicitly
+    - kept saved bookmark posts and saved page routes working while rejecting transient root-editor runs, encoded action URLs, and legacy `/ajax?token=...` requests with an explicit `403` policy response
+    - extended unit, release-metadata, and blank-environment integration coverage for the new transient web token policy
+
 0.94  2026-04-01
     - fixed `Folder->dd` and `Folder->runtime_root` so they keep the home runtime root unchanged when the current working directory is already inside `~/.developer-dashboard`, instead of appending a second `.developer-dashboard`
 

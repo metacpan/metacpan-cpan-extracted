@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+export GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-"nigelhorne/App-Test-Generator"}
+
+set -e
+
+# --- Step 0: Cleanup old data ---
+echo "Cleaning up old coverage, LCSAJ, and mutation data..."
+rm -rf cover_db coverage lcsaj mutation_html mutation.json cover_html t/tmp_*.t
+
+# --- Step 1: Build blib if needed ---
+echo "Building blib..."
+perl Makefile.PL && make
+
+export PERL5OPT='-Ilib'
+
+# --- Step 2: Run tests under Devel::Cover ---
+echo "Running tests with Devel::Cover..."
+cover -test -outputdir cover_html -select '^lib/'
+cover -report json -outputdir cover_html
+
+# --- Step 3: Generate JSON coverage report ---
+echo "Generating JSON coverage report..."
+cover -report json -outputdir cover_html
+
+# --- Step 4: Export LCSAJ targets (absolute paths) ---
+echo "Finding LCSAJ targets..."
+export LCSAJ_TARGETS=$(
+  { find lib -name '*.pm' -exec realpath {} \; ;
+    find blib/lib -name '*.pm' -exec realpath {} \; ; } \
+  | tr '\n' ':' | sed 's/:$//'
+)
+
+set +e
+
+# --- Step 5: Run tests again under LCSAJ runtime ---
+echo "Recording LCSAJ hits..."
+if [ -z "$LCSAJ_TARGETS" ]; then
+	echo "ERROR: LCSAJ_TARGETS is empty - no .pm files found" >&2
+	exit 1
+fi
+echo "LCSAJ_TARGETS=$LCSAJ_TARGETS"
+mkdir -p coverage
+PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime -Mblib" prove -l t
+
+# --- Step 5b: Merge per-process LCSAJ hit files ---
+echo "Merging LCSAJ hits..."
+perl -MJSON::MaybeXS -MFile::Slurp -e '
+	my %merged;
+	for my $f (glob("cover_html/lcsaj_hits/hits_*.json")) {
+		my $data = eval { decode_json(read_file($f)) } or next;
+		for my $file (keys %$data) {
+			for my $line (keys %{$data->{$file}}) {
+				$merged{$file}{$line} += $data->{$file}{$line};
+			}
+		}
+	}
+	write_file("cover_html/lcsaj_hits.json", encode_json(\%merged));
+	printf "Merged %d files\n", scalar keys %merged;
+'
+
+# --- Step 5c: Verify LCSAJ hits ---
+echo "Checking LCSAJ hits..."
+if [ -f cover_html/lcsaj_hits.json ]; then
+	echo "lcsaj_hits.json exists, size $(wc -c < cover_html/lcsaj_hits.json) bytes"
+	perl -MJSON::MaybeXS -MFile::Slurp -e '
+		my $h = decode_json(read_file("cover_html/lcsaj_hits.json"));
+		for my $f (sort keys %$h) {
+			printf "%s: %d lines hit\n", $f, scalar keys %{$h->{$f}};
+		}
+	'
+else
+	echo "lcsaj_hits.json MISSING"
+fi
+
+# --- Step 6: Run mutation analysis ---
+echo "Running mutation analysis..."
+mkdir -p mutation_html/lib cover_html
+bin/app-test-generator-mutate \
+    -v \
+    --lib lib \
+    --tests t \
+    --json mutation.json \
+    --html cover_html/mutation_html \
+    --mutation_level=fast \
+    --cover_json cover_html/cover.json \
+    --lcsaj_root cover_html/mutation_html/lib \
+    --lcsaj_hits cover_html/lcsaj_hits.json < /dev/null
+    # --min-score 85
+
+set -e
+
+# --- Step 7: Create the test dashboard
+scripts/generate_index.pl
+
+echo "Done! Check cover_html/index.html locally, or https://nigelhorne.github.io/${GITHUB_REPOSITORY#*/}/coverage/ when deployed."

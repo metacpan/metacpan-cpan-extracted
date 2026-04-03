@@ -1,4 +1,4 @@
-FROM perl:5.38-bookworm
+FROM dd-int-test:latest
 
 ENV PERL_MM_USE_DEFAULT=1 \
     NONINTERACTIVE_TESTING=1 \

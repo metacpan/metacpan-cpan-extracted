@@ -1,7 +1,9 @@
 package Runtime::Result;
-$Runtime::Result::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use JSON::XS qw(decode_json);
 

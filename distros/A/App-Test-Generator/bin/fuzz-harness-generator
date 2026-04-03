@@ -169,7 +169,7 @@ if($run && !$outfile) {
 	($fh, $outfile) = File::Temp::tempfile();
 	close $fh;
 
-	App::Test::Generator::generate($infile, $outfile);
+	App::Test::Generator->generate($infile, $outfile);
 
 	exit system('prove', '-l', $outfile) >> 8;
 }
@@ -179,7 +179,7 @@ if ($dry_run) {
 	close $fh;
 
 	eval {
-		App::Test::Generator::generate($infile, $tmp);
+		App::Test::Generator->generate($infile, $tmp);
 		1;
 	} or do {
 		die "Dry-run failed for $infile: $@";
@@ -192,7 +192,7 @@ if ($dry_run) {
 	warn "Overwriting existing file: $outfile";
 }
 
-App::Test::Generator::generate($infile, $outfile);
+App::Test::Generator->generate($infile, $outfile);
 
 if($outfile) {
 	chmod 0755, $outfile if($outfile =~ /\.(pl|cgi)$/);

@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Lines::Document 0.001;
+package Sieve::Generator::Lines::Document 0.002;
 # ABSTRACT: a sequence of Sieve lines forming a complete script or blank line
 
 use Moo;
@@ -68,7 +68,7 @@ Sieve::Generator::Lines::Document - a sequence of Sieve lines forming a complete
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

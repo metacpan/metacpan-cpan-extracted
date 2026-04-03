@@ -1,3 +1,10 @@
+benchmarks/bench.pl
+benchmarks/cycles.pl
+benchmarks/large.pl
+benchmarks/lcs.pl
+benchmarks/medium.pl
+benchmarks/small.pl
+benchmarks/unordered.pl
 Changes
 cpanfile
 lib/Data/Hash/Diff/Smart.pm
@@ -11,18 +18,27 @@ lib/Data/Hash/Diff/Smart/Renderer/YAML.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
 t/00-load.t
 t/array-lcs.t
 t/array-unordered.t
 t/basic.t
+t/critic.t
 t/cycle-detection.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
+t/github_1.t
 t/ignore-wildcards.t
+t/integration.t
 t/json-renderer.t
+t/kwalitee.t
 t/test2-renderer.t
 t/text-renderer.t
+t/unit.t
 t/yaml-renderer.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -18,13 +18,20 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Crypt::RIPEMD160:
+    file: lib/Crypt/RIPEMD160.pm
+    version: '0.12'
+  Crypt::RIPEMD160::MAC:
+    file: lib/Crypt/RIPEMD160/MAC.pm
+    version: '0.12'
 requires:
-  Test::More: '0'
   XSLoader: '0'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/cpan-authors/Crypt-RIPEMD160/issues
   homepage: https://github.com/cpan-authors/Crypt-RIPEMD160
   license: https://dev.perl.org/licenses/
-  repository: https://github.com/cpan-authors/Crypt-RIPEMD160
-version: '0.11'
+  repository: https://github.com/cpan-authors/Crypt-RIPEMD160.git
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

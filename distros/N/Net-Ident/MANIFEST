@@ -1,29 +1,21 @@
 .perltidyrc
+AI_POLICY.md
 Changes				revision history
 cpanfile
 Ident.pm			the module itself, contains pod
-INSTALL				installation instructions
 Makefile.PL			feed to perl to get a makefile
 MANIFEST
 README.md			extract of the manpage, gives a brief overview
 t/0use.t			script to test "use Net::Ident"
-t/apache.t			script to test Net::Ident within apache and mod_perl
-t/apache/conf/access.conf.in	prototype access.conf
-t/apache/conf/apache_config.pl.in	prototype for apache settings
-t/apache/conf/httpd.conf.in	prototype httpd.conf for test apache
-t/apache/conf/mime.types	bare-bones mime.types
-t/apache/conf/srm.conf.in	prototype srm.conf
-t/apache/html/testapache.txt	simple .txt file to test basic apache ops
-t/apache/logs/.exists		Directory for the logfiles
-t/apache/perl/testident		script to actually test ident within mod_perl
-t/apache/perl/testmodperl	script to test mod_perl operates OK
-t/async.t
+t/async.t			tests for async non-blocking interface
 t/compat.t			script to test compatibility-mode FH->ident_lookup
 t/constructor.t			tests for new() and _passfh filehandle resolution
 t/export.t			tests for export hooks (:fh, :apache, :debug tags)
 t/hosts				Hosts to use for testing purposes
 t/Ident.t			test script that actually makes ident lookups
+t/lookup.t			tests for lookup() and lookupFromInAddr() functions
 t/parse.t			unit tests for RFC1413 response parsing
 t/query.t			unit tests for query() method and end-to-end flow
+t/timeout.t			tests for timeout behavior in query() and ready()
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

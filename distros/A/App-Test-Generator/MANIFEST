@@ -3,7 +3,9 @@ bin/demo_extractor.pl
 bin/extract-schemas
 bin/extract-schemas2
 bin/fuzz-harness-generator
+bin/instrument_modules
 Changes
+CONTRIBUTIONS.md
 cpanfile
 doc/getting-started-blog.md
 doc/SchemaExtractor.pm
@@ -15,6 +17,8 @@ lib/App/Test/Generator/Analyzer/SideEffect.pm
 lib/App/Test/Generator/CoverageGuidedFuzzer.pm
 lib/App/Test/Generator/Emitter/Perl.pm
 lib/App/Test/Generator/Exporter/YAML.pm
+lib/App/Test/Generator/LCSAJ.pm
+lib/App/Test/Generator/LCSAJ/Coverage.pm
 lib/App/Test/Generator/Model/Method.pm
 lib/App/Test/Generator/Mutant.pm
 lib/App/Test/Generator/Mutation/Base.pm
@@ -34,12 +38,14 @@ lib/App/Test/Generator/Sample/Module.pm
 lib/App/Test/Generator/SchemaExtractor.pm
 lib/App/Test/Generator/Template.pm
 lib/App/Test/Generator/TestStrategy.pm
+lib/Devel/App/Test/Generator/LCSAJ/Runtime.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 scripts/generate_index.pl
+scripts/generate_test_dashboard
 t/10-compile.t
 t/30-basics.t
 t/40-more.t
@@ -52,10 +58,8 @@ t/conf-fuzz.t
 t/conf/abs.yml
 t/conf/abs_custom.yml
 t/conf/app_generator.yml
-t/conf/class_simple.conf
 t/conf/data_text_append.conf
 t/conf/data_text_set.yml
-t/conf/email_rfc822.yml
 t/conf/html_genealogy_map.conf
 t/conf/html_genealogy_map.yml
 t/conf/uc.conf

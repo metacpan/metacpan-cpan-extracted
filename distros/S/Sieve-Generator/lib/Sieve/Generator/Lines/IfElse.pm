@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Lines::IfElse 0.001;
+package Sieve::Generator::Lines::IfElse 0.002;
 # ABSTRACT: a Sieve if/elsif/else conditional construct
 
 use Moo;
@@ -86,7 +86,7 @@ Sieve::Generator::Lines::IfElse - a Sieve if/elsif/else conditional construct
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

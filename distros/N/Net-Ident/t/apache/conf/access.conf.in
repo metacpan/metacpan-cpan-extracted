@@ -1,4 +1,0 @@
-<Directory $apache_root/html>
-Options All
-AllowOverride All
-</Directory>

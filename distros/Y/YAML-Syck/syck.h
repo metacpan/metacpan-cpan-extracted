@@ -31,6 +31,11 @@
 # include <stdint.h>
 #elif defined(I_INTTYPES)
 # include <inttypes.h>
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+  /* MinGW provides uintptr_t via <crtdefs.h>, included by <stdlib.h> */
+#elif defined(_MSC_VER) && _MSC_VER >= 1600
+  /* MSVC 2010+ provides <stdint.h> */
+# include <stdint.h>
 #elif !defined(SYCK_UINTPTR_DEFINED)
 # define SYCK_UINTPTR_DEFINED
   typedef unsigned long uintptr_t;

@@ -3,12 +3,16 @@
 use strict;
 use warnings;
 
-use Capture::Tiny qw(capture);
 use File::Basename qw(dirname);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
+use IO::Select;
+use IPC::Open3 qw(open3);
 use JSON::XS qw(decode_json);
+use Symbol qw(gensym);
 use Time::HiRes qw(sleep time);
+
+our $BROWSER_BINARY;
 
 # main()
 # Executes the full blank-environment integration flow against a host-built tarball.
@@ -44,6 +48,8 @@ sub main {
     _run_shell( 'extract host-built tarball', "tar -xzf " . _shell_quote($tarball) . ' -C ' . _shell_quote($dist_dir) );
     my $source_root = _single_subdir($dist_dir);
     _assert( defined $source_root && -d $source_root, 'extracted tarball produced one source root' );
+    my $expected_version = _distribution_version($source_root);
+    _assert( defined $expected_version && $expected_version ne '', 'extracted tarball exposes a distribution version' );
 
     _write_text(
         File::Spec->catfile( $compose, 'compose.yaml' ),
@@ -106,6 +112,40 @@ HTML: <div id="project-marker">Fake Project Home</div>
 BOOKMARK
     );
     _write_text(
+        File::Spec->catfile( $bookmarks, 'legacy-ajax' ),
+        <<'BOOKMARK'
+TITLE: Legacy Ajax
+:--------------------------------------------------------------------------------:
+BOOKMARK: legacy-ajax
+:--------------------------------------------------------------------------------:
+HTML: <script>var configs = {};</script>
+:--------------------------------------------------------------------------------:
+CODE1: Ajax jvar => 'configs.project.endpoint', type => 'text', file => 'project-endpoint.json', code => q{
+print "saved-start\n";
+warn "saved-warn\n";
+system 'sh', '-c', 'printf "saved-child-out\n"; printf "saved-child-err\n" >&2';
+die "saved-die\n";
+};
+BOOKMARK
+    );
+    _write_text(
+        File::Spec->catfile( $bookmarks, 'legacy-ajax-stream' ),
+        <<'BOOKMARK'
+TITLE: Legacy Ajax Stream
+:--------------------------------------------------------------------------------:
+BOOKMARK: legacy-ajax-stream
+:--------------------------------------------------------------------------------:
+HTML: <script>var configs = {};</script>
+:--------------------------------------------------------------------------------:
+CODE1: Ajax jvar => 'configs.project.stream', file => 'project-stream.txt', code => q{
+for (1..3) {
+    print "stream$_\n";
+    sleep 1;
+}
+};
+BOOKMARK
+    );
+    _write_text(
         File::Spec->catfile( $bookmarks, 'nav', 'alpha.tt' ),
         <<'BOOKMARK'
 TITLE: Alpha Nav
@@ -139,7 +179,7 @@ BOOKMARK
     _assert_match( $help->{stdout}, qr/Description:/, 'dashboard help renders extended POD help' );
 
     my $version = _run_shell( 'dashboard version', 'dashboard version' );
-    _assert_match( $version->{stdout}, qr/^0\.94$/m, 'dashboard version reports the installed runtime version' );
+    _assert_match( $version->{stdout}, qr/^\Q$expected_version\E$/m, 'dashboard version reports the installed runtime version' );
 
     my $init = _run_shell( 'dashboard init', 'cd ' . _shell_quote($project) . ' && dashboard init' );
     my $init_data = decode_json( $init->{stdout} );
@@ -375,6 +415,13 @@ JSON
     _assert_match( $serve->{stdout}, qr/"pid"\s*:/, 'dashboard serve starts background web service' );
     _wait_for_http( 'http://127.0.0.1:7890/', 200 );
 
+    my $blocked_transient = _run_shell(
+        'curl transient token denied by default',
+        'curl -sS -o /tmp/transient-denied.body -w \'%{http_code}\' ' . _shell_quote( 'http://127.0.0.1:7890/?token=' . $token ),
+    );
+    _assert_match( $blocked_transient->{stdout}, qr/^403$/, 'loopback transient token route is denied by default' );
+    _assert_match( _read_text('/tmp/transient-denied.body'), qr/Transient token URLs are disabled/, 'loopback transient token denial explains the policy' );
+
     my $root = _run_shell( 'curl loopback root', q{curl -fsS http://127.0.0.1:7890/} );
     _assert_match( $root->{stdout}, qr/instruction-editor/, 'loopback root serves the bookmark editor' );
     my $root_dom = _run_browser_dom( 'browser loopback root', 'http://127.0.0.1:7890/', user_data_dir => $profile );
@@ -389,6 +436,25 @@ JSON
     _assert_match( $project_dom, qr{<div id="nav-beta">/app/project-home / /app/project-home</div>}, 'browser exposes current_page through env and env.runtime_context for shared nav TT fragments' );
     _assert( index( $project_dom, 'nav-alpha' ) < index( $project_dom, 'nav-beta' ), 'browser renders shared nav bookmark fragments in sorted filename order' );
     _assert( index( $project_dom, 'dashboard-nav-items' ) < index( $project_dom, 'project-marker' ), 'browser renders shared nav fragments before the main page body' );
+    my $legacy_ajax_page = _run_shell( 'curl legacy ajax saved page', q{curl -fsS http://127.0.0.1:7890/app/legacy-ajax} );
+    _assert_match( $legacy_ajax_page->{stdout}, qr{/ajax/project-endpoint\.json\?type=text}, 'saved bookmark Ajax renders a stable file-backed ajax endpoint by default' );
+    my $legacy_ajax_saved = _run_shell( 'curl saved bookmark ajax endpoint', q{curl -fsS 'http://127.0.0.1:7890/ajax/project-endpoint.json?type=text'} );
+    _assert_match( $legacy_ajax_saved->{stdout}, qr/saved-start/, 'saved bookmark ajax endpoint streams direct perl stdout' );
+    _assert_match( $legacy_ajax_saved->{stdout}, qr/saved-warn/, 'saved bookmark ajax endpoint streams perl stderr warnings' );
+    _assert_match( $legacy_ajax_saved->{stdout}, qr/saved-child-out/, 'saved bookmark ajax endpoint streams child stdout' );
+    _assert_match( $legacy_ajax_saved->{stdout}, qr/saved-child-err/, 'saved bookmark ajax endpoint streams child stderr' );
+    _assert_match( $legacy_ajax_saved->{stdout}, qr/saved-die/, 'saved bookmark ajax endpoint streams uncaught perl die output' );
+    my $legacy_ajax_stream_page = _run_shell( 'curl legacy ajax stream saved page', q{curl -fsS http://127.0.0.1:7890/app/legacy-ajax-stream} );
+    _assert_match( $legacy_ajax_stream_page->{stdout}, qr{/ajax/project-stream\.txt\?type=text}, 'saved bookmark ajax stream page renders a stable default text ajax endpoint' );
+    my $legacy_ajax_stream = _capture_stream_prefix(
+        'curl saved bookmark ajax stream endpoint',
+        q{curl --no-buffer -fsS 'http://127.0.0.1:7890/ajax/project-stream.txt'},
+        expected_chunks => [ 'stream1', 'stream2' ],
+        timeout         => 4,
+    );
+    _assert( @{ $legacy_ajax_stream->{events} || [] } >= 2, 'saved bookmark ajax stream endpoint produced multiple early chunks before process exit' );
+    _assert( ( $legacy_ajax_stream->{events}[0]{at} || 99 ) < 1.5, 'saved bookmark ajax stream endpoint flushes the first chunk before the long-running ajax loop finishes' );
+    _assert( ( $legacy_ajax_stream->{events}[1]{at} || 99 ) < 2.5, 'saved bookmark ajax stream endpoint keeps flushing later chunks during the long-running ajax loop' );
 
     my $container_ip = _trim( _run_shell( 'container ip', q{hostname -I | awk '{print $1}'} )->{stdout} );
     _assert( $container_ip ne '', 'container ip discovered for helper-access path' );
@@ -415,7 +481,7 @@ JSON
 
     my $helper_page = _run_shell(
         'helper page after login',
-        'curl -fsS -b ' . _shell_quote($cookie) . ' http://' . $container_ip . ':7890/page/welcome'
+        'curl -fsS -b ' . _shell_quote($cookie) . ' http://' . $container_ip . ':7890/app/welcome'
     );
     _assert_match( $helper_page->{stdout}, qr/id="logout-url"/, 'helper page chrome renders logout link' );
 
@@ -475,19 +541,45 @@ JSON
 }
 
 # _run_shell($label, $command, %opts)
-# Runs one shell command, captures stdout and stderr, and returns structured command results.
+# Runs one shell command, streams stdout and stderr live, and returns structured command results.
 # Input: human label, shell command string, and optional allow_fail flag.
 # Output: hash reference with command, stdout, stderr, and exit_code.
 sub _run_shell {
     my ( $label, $command, %opts ) = @_;
     print "==> $label\n";
     print "    $command\n";
-    my ( $stdout, $stderr, $exit_code ) = capture {
-        system 'sh', '-lc', $command;
-        return $? >> 8;
-    };
-    print $stdout if defined $stdout && $stdout ne '';
-    print STDERR $stderr if defined $stderr && $stderr ne '';
+    my $stderr_fh = gensym();
+    my $pid = open3( undef, my $stdout_fh, $stderr_fh, 'sh', '-lc', $command );
+    my $selector = IO::Select->new( $stdout_fh, $stderr_fh );
+    my $stdout = '';
+    my $stderr = '';
+    my $stdout_fd = fileno($stdout_fh);
+    my $stderr_fd = fileno($stderr_fh);
+
+    while ( my @ready = $selector->can_read ) {
+        for my $fh (@ready) {
+            my $buffer = '';
+            my $read = sysread( $fh, $buffer, 8192 );
+            if ( !defined $read || $read == 0 ) {
+                $selector->remove($fh);
+                close $fh;
+                next;
+            }
+            if ( defined fileno($fh) && fileno($fh) == $stdout_fd ) {
+                $stdout .= $buffer;
+                print $buffer;
+                next;
+            }
+            if ( defined fileno($fh) && fileno($fh) == $stderr_fd ) {
+                $stderr .= $buffer;
+                print STDERR $buffer;
+                next;
+            }
+        }
+    }
+
+    waitpid( $pid, 0 );
+    my $exit_code = $? >> 8;
     if ( !$opts{allow_fail} && $exit_code != 0 ) {
         die "Command failed for [$label] with exit $exit_code\n";
     }
@@ -496,6 +588,66 @@ sub _run_shell {
         exit_code => $exit_code,
         stdout    => defined $stdout ? $stdout : '',
         stderr    => defined $stderr ? $stderr : '',
+    };
+}
+
+# _capture_stream_prefix($label, $command, %opts)
+# Runs one streaming shell command and records when expected stdout chunks first appear.
+# Input: human label, shell command string, expected_chunks array ref, and optional timeout seconds.
+# Output: hash reference with stdout, stderr, and matched event timing data.
+sub _capture_stream_prefix {
+    my ( $label, $command, %opts ) = @_;
+    my $expected = $opts{expected_chunks} || [];
+    my $timeout  = $opts{timeout} || 5;
+    print "==> $label\n";
+    print "    $command\n";
+    my $stderr_fh = gensym();
+    my $pid = open3( undef, my $stdout_fh, $stderr_fh, 'sh', '-lc', $command );
+    my $selector = IO::Select->new( $stdout_fh, $stderr_fh );
+    my $stdout = '';
+    my $stderr = '';
+    my $stdout_fd = fileno($stdout_fh);
+    my $stderr_fd = fileno($stderr_fh);
+    my @events;
+    my $start = time;
+    my $deadline = $start + $timeout;
+
+    while ( $selector->count && @events < @{$expected} && time < $deadline ) {
+        my @ready = $selector->can_read(0.25);
+        next if !@ready;
+        for my $fh (@ready) {
+            my $buffer = '';
+            my $read = sysread( $fh, $buffer, 8192 );
+            if ( !defined $read || $read == 0 ) {
+                $selector->remove($fh);
+                close $fh;
+                next;
+            }
+            if ( defined fileno($fh) && fileno($fh) == $stdout_fd ) {
+                $stdout .= $buffer;
+                print $buffer;
+                while ( @events < @{$expected} && index( $stdout, $expected->[@events] ) >= 0 ) {
+                    push @events, {
+                        chunk => $expected->[@events],
+                        at    => time - $start,
+                    };
+                }
+                next;
+            }
+            if ( defined fileno($fh) && fileno($fh) == $stderr_fd ) {
+                $stderr .= $buffer;
+                print STDERR $buffer;
+            }
+        }
+    }
+
+    kill 'TERM', $pid;
+    waitpid( $pid, 0 );
+
+    return {
+        stdout => $stdout,
+        stderr => $stderr,
+        events => \@events,
     };
 }
 
@@ -536,8 +688,9 @@ sub _run_browser_dom {
 sub _browser_command {
     my ( $url, %opts ) = @_;
     my $profile = $opts{user_data_dir} || '/tmp/developer-dashboard-browser-profile';
+    my $browser = _browser_binary();
     return join ' ',
-      'chromium',
+      _shell_quote($browser),
       '--headless',
       '--no-sandbox',
       '--disable-gpu',
@@ -546,6 +699,44 @@ sub _browser_command {
       '--user-data-dir=' . _shell_quote($profile),
       '--dump-dom',
       _shell_quote($url);
+}
+
+# _browser_binary()
+# Resolves one available headless browser binary, installing Chromium when the image lacks one.
+# Input: none.
+# Output: absolute browser executable path string.
+sub _browser_binary {
+    return $BROWSER_BINARY if defined $BROWSER_BINARY && $BROWSER_BINARY ne '';
+
+    for my $candidate ( qw(chromium chromium-browser google-chrome google-chrome-stable) ) {
+        my $probe = _run_shell(
+            "probe browser $candidate",
+            "command -v $candidate",
+            allow_fail => 1,
+        );
+        my $path = _trim( $probe->{stdout} );
+        if ( $probe->{exit_code} == 0 && $path ne '' ) {
+            $BROWSER_BINARY = $path;
+            return $BROWSER_BINARY;
+        }
+    }
+
+    _run_shell(
+        'install chromium fallback',
+        'apt-get update && apt-get install -y --no-install-recommends chromium',
+    );
+
+    my $installed = _run_shell(
+        'probe installed chromium fallback',
+        'command -v chromium',
+        allow_fail => 1,
+    );
+    my $path = _trim( $installed->{stdout} );
+    die "Unable to find a headless browser binary after installing chromium\n"
+      if $installed->{exit_code} != 0 || $path eq '';
+
+    $BROWSER_BINARY = $path;
+    return $BROWSER_BINARY;
 }
 
 # _single_subdir($dir)
@@ -560,6 +751,20 @@ sub _single_subdir {
     my @dirs = grep { -d File::Spec->catdir( $dir, $_ ) } @children;
     return if @dirs != 1;
     return File::Spec->catdir( $dir, $dirs[0] );
+}
+
+# _distribution_version($source_root)
+# Reads the extracted distribution version from the main module file.
+# Input: extracted source root directory path string.
+# Output: version string or undef when it cannot be found.
+sub _distribution_version {
+    my ($source_root) = @_;
+    return if !defined $source_root || $source_root eq '';
+    my $module = File::Spec->catfile( $source_root, 'lib', 'Developer', 'Dashboard.pm' );
+    return if !-f $module;
+    my $text = _read_text($module);
+    return $1 if $text =~ /our \$VERSION = '([^']+)'/;
+    return;
 }
 
 # _decode_json_tail($text)
@@ -678,7 +883,7 @@ installed C<dashboard> CLI and web runtime against a fake project.
 
 =head1 FUNCTIONS
 
-=head2 main, _run_shell, _wait_for_http, _run_browser_dom, _browser_command, _single_subdir, _decode_json_tail, _reset_dir, _write_text, _read_text, _trim, _shell_quote, _assert, _assert_match
+=head2 main, _run_shell, _wait_for_http, _run_browser_dom, _browser_command, _browser_binary, _single_subdir, _decode_json_tail, _reset_dir, _write_text, _read_text, _trim, _shell_quote, _assert, _assert_match
 
 Run and validate the host-built-tarball integration workflow.
 

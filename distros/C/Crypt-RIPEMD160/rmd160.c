@@ -16,10 +16,8 @@
 \********************************************************************/
 
 /*  header files */
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "rmd160.h"      
+#include "rmd160.h"
 
 /********************************************************************/
 
@@ -36,7 +34,7 @@ void MDinit(dword *MDbuf)
 
 /********************************************************************/
 
-void rmd160_compress(dword *MDbuf, dword *X)
+void rmd160_compress(dword *MDbuf, const dword *X)
 {
    dword aa = MDbuf[0],  bb = MDbuf[1],  cc = MDbuf[2],
          dd = MDbuf[3],  ee = MDbuf[4];
@@ -236,7 +234,7 @@ void rmd160_compress(dword *MDbuf, dword *X)
 
 /********************************************************************/
 
-void MDfinish(dword *MDbuf, byte *strptr, dword lswlen, dword mswlen)
+void MDfinish(dword *MDbuf, const byte *strptr, dword lswlen, dword mswlen)
 {
    dword        i;                                 /* counter       */
    dword        X[16];                             /* message words */
@@ -262,6 +260,9 @@ void MDfinish(dword *MDbuf, byte *strptr, dword lswlen, dword mswlen)
    X[14] = lswlen << 3;
    X[15] = (lswlen >> 29) | (mswlen << 3);
    rmd160_compress(MDbuf, X);
+
+   /* zero sensitive message data from the stack */
+   memset(X, 0, 16*sizeof(dword));
 
    return;
 }

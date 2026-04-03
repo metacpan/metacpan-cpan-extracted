@@ -904,22 +904,39 @@ sub _render_where {
         push @parts, $s;
         push @bind, @b;
       } elsif (ref $val eq 'ARRAY') {
-        # { col => [1,2,3] } => col IN (?,?,?)
+        # { col => [v1, v2, ...] } => col = ? OR col = ? OR ...
+        # Each element is processed individually:
+        #   undef      => col IS NULL
+        #   hashref    => operator form (e.g. { '>' => 3 } => col > 3)
+        #   expr obj   => col = <rendered expr>
+        #   scalar     => col = ?
         if (!@$val) {
           push @parts, '1 = 0';
         } else {
-          my @placeholders;
+          my @or_parts;
+          my @or_bind;
           for my $v (@$val) {
-            if (blessed($v) && $v->isa('SQL::Wizard::Expr')) {
+            if (!defined $v) {
+              push @or_parts, "$qkey IS NULL";
+            } elsif (blessed($v) && $v->isa('SQL::Wizard::Expr')) {
               my ($s, @b) = $self->render($v);
-              push @placeholders, $s;
-              push @bind, @b;
+              push @or_parts, "$qkey = $s";
+              push @or_bind, @b;
+            } elsif (ref $v eq 'HASH') {
+              my ($s, @b) = $self->_render_where_value($qkey, $v);
+              push @or_parts, $s;
+              push @or_bind, @b;
             } else {
-              push @placeholders, '?';
-              push @bind, $v;
+              push @or_parts, "$qkey = ?";
+              push @or_bind, $v;
             }
           }
-          push @parts, "$qkey IN (" . join(', ', @placeholders) . ")";
+          if (@or_parts == 1) {
+            push @parts, $or_parts[0];
+          } else {
+            push @parts, '(' . join(' OR ', @or_parts) . ')';
+          }
+          push @bind, @or_bind;
         }
       } else {
         push @parts, "$qkey = ?";

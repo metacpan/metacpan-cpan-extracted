@@ -2,6 +2,10 @@
 
 Data::Hash::Diff::Smart - Smart structural diff for Perl data structures
 
+# VERSION
+
+Version 0.01
+
 # SYNOPSIS
 
     use Data::Hash::Diff::Smart qw(diff diff_text diff_json diff_yaml diff_test2);
@@ -59,6 +63,14 @@ Returns an arrayref of change operations:
     - lcs - minimal diff using Longest Common Subsequence
     - unordered - treat arrays as multisets (order ignored)
 
+- array\_key => 'id'
+
+    When using unordered `array_mode` with arrays of hashes,
+    nominate a field to use as the identity key for matching elements across the two arrays.
+    Without this, elements are compared as multisets by structure.
+
+        diff($old, $new, array_mode => 'unordered', array_key => 'id')
+
 ## diff\_text($old, $new, %opts)
 
 Render the diff as a human-readable text format.
@@ -79,9 +91,34 @@ Render the diff as Test2 diagnostics suitable for `diag`.
 
 The diff engine lives in [Data::Hash::Diff::Smart::Engine](https://metacpan.org/pod/Data%3A%3AHash%3A%3ADiff%3A%3ASmart%3A%3AEngine).
 
+# BENCHMARKS
+
+To run all benchmarks:
+
+    perl benchmarks/bench.pl
+
+This will run diff operations on:
+
+\- small structures
+\- medium nested structures
+\- large 5000-element arrays
+\- cyclic structures (cycle detection)
+\- unordered array mode
+\- LCS array mode
+
+Example output:
+
+    === Benchmark: medium ===
+                 Rate
+    diff     12000/s
+
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
+
+# SEE ALSO
+
+[Data::Hash::Patch::Smart](https://metacpan.org/pod/Data%3A%3AHash%3A%3APatch%3A%3ASmart)
 
 # REPOSITORY
 

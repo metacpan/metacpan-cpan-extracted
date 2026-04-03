@@ -154,15 +154,15 @@ package Horse {
   use Types::Standard qw( Object );
   use Type::Params -sigs;
   use namespace::autoclean;
-   
+
   # ...;   # define attributes, etc
-   
+
   signature_for add_child => (
     # method     => true,
     method     => 1,
     positional => [ Object ],
   );
-   
+
   sub add_child ( $self, $child ) {
     push $self->children->@*, $child;
     return $self;

@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "Moo::Role" => 0,
     "Params::Util" => 0,
     "Sub::Exporter" => 0,
+    "builtin" => 0,
     "experimental" => 0
   },
   "TEST_REQUIRES" => {
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "Test2::API" => 0,
   "Test::Differences" => 0,
   "Test::More" => "0.96",
+  "builtin" => 0,
   "experimental" => 0,
   "lib" => 0,
   "strict" => 0,

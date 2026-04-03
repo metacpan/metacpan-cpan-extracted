@@ -8,11 +8,11 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
@@ -23,7 +23,6 @@ sub mutate {
 	my @mutants;
 
 	for my $stmt (@$compounds) {
-
 		next unless(($stmt->type||'') eq 'if' || ($stmt->type||'') eq 'unless');
 
 		my ($cond) = grep { $_->isa('PPI::Structure::Condition') } $stmt->children;
@@ -32,9 +31,11 @@ sub mutate {
 
 		push @mutants, App::Test::Generator::Mutant->new(
 			id => 'COND_INV_' . $stmt->location->[0],
+			group => 'COND_INV:' . $stmt->location->[0],
 			description => 'Invert condition',
 			line => $stmt->location->[0],
-			original => $cond->content,
+			type => 'boolean',
+			original => $cond->content(),
 			transform => sub {
 				my ($doc) = @_;
 

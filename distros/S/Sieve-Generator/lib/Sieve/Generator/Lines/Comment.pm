@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Lines::Comment 0.001;
+package Sieve::Generator::Lines::Comment 0.002;
 # ABSTRACT: a Sieve comment line
 
 use Moo;
@@ -56,7 +56,7 @@ Sieve::Generator::Lines::Comment - a Sieve comment line
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

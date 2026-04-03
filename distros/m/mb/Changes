@@ -1,5 +1,16 @@
 Revision history for this software.
 
+0.61  2026-04-03 JST (Japan Standard Time)
+  - fix t/9050-pod.t: skip G11 Pod::Checker errors check when
+    Pod::Checker < 1.51 to avoid false FAILs caused by mis-reported
+    errors for valid L</section>, L</"section">, and L<URL> syntax
+    on older Perl installations (CPAN Testers FAIL fix)
+  - fix lib/mb.pm: update =head1 Perl 5.42 and source::encoding POD
+    to accurately describe that no source::encoding; is appended on
+    the same line as qualifying use VERSION statements (not in a
+    BEGIN block), and clarify that only DAMEMOJI inside string and
+    regexp literals are escaped; comments and POD are left untouched
+
 0.60  2026-03-31 JST (Japan Standard Time)
   - fix lib/mb.pm: =encoding utf8 -> utf-8 (Pod::Checker 1.45 compat)
   - fix t/9025-perl542compat.t: avoid "implicit split to @_" deprecation

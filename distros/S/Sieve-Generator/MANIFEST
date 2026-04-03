@@ -16,13 +16,11 @@ lib/Sieve/Generator/Lines/Document.pm
 lib/Sieve/Generator/Lines/Heredoc.pm
 lib/Sieve/Generator/Lines/IfElse.pm
 lib/Sieve/Generator/Lines/Junction.pm
-lib/Sieve/Generator/Lines/PrettyCommand.pm
 lib/Sieve/Generator/Sugar.pm
 lib/Sieve/Generator/Text.pm
 lib/Sieve/Generator/Text/Qstr.pm
 lib/Sieve/Generator/Text/QstrList.pm
 lib/Sieve/Generator/Text/Terms.pm
-proof
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t

@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Lines 0.001;
+package Sieve::Generator::Lines 0.002;
 # ABSTRACT: role for objects that render as lines of Sieve code
 
 use Moo::Role;
@@ -41,7 +41,7 @@ Sieve::Generator::Lines - role for objects that render as lines of Sieve code
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

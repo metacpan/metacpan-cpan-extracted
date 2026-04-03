@@ -39,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-Array
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-Array
-version: '0.04'
+version: '0.05'

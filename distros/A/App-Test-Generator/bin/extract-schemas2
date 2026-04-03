@@ -43,8 +43,8 @@ generate Perl test files using App::Test::Generator::Emitter::Perl.
 # ----------------------------------------------------------------------
 
 my %cli_opts = (
-    help => 0,
-    man  => 0,
+	help => 0,
+	man  => 0,
 );
 
 my %opts = (

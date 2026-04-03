@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Text::QstrList 0.001;
+package Sieve::Generator::Text::QstrList 0.002;
 # ABSTRACT: a Sieve string list (a bracketed list of quoted strings)
 
 use Moo;
@@ -45,7 +45,7 @@ Sieve::Generator::Text::QstrList - a Sieve string list (a bracketed list of quot
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

@@ -50,12 +50,18 @@ if($Config{nvsize} == 8 && !Math::GMPf::GMPF_WIN32_FMT_BUG) {
   Rmpf_sprintf($buf, "%a", sqrt 2, 32);
   $buf =~ s/^0x//i;
   $buf =~ s/p/@/i;
-  cmp_ok(Math::GMPf->new($buf, 16), '==', sqrt(2), 'Rmpf_sprintf() reads "%a" correctly');
+  if($buf =~ /^1\./) {
+    # if $buf !~ /^1\./ (which is very rare), then this test would need to be modified.
+    cmp_ok(Math::GMPf->new($buf, 16), '==', sqrt(2), 'Rmpf_sprintf() reads "%a" correctly');
+  }
 
   Rmpf_sprintf($buf, "%A", sqrt 2, 32);
   $buf =~ s/^0x//i;
   $buf =~ s/p/@/i;
-  cmp_ok(Math::GMPf->new($buf, 16), '==', sqrt(2), 'Rmpf_sprintf() reads "%A" correctly');
+  if($buf =~ /^1\./) {
+    # if $buf !~ /^1\./ (which is very rare), then this test would need to be modified.
+    cmp_ok(Math::GMPf->new($buf, 16), '==', sqrt(2), 'Rmpf_sprintf() reads "%A" correctly');
+  }
 }
 
 done_testing();

@@ -264,6 +264,48 @@ subtest 'MAC reset and reuse' => sub {
     is($hex1, $hex2, 'two fresh MAC instances produce same result');
 };
 
+subtest 'MAC reset after mac() preserves key' => sub {
+    # mac() and hexmac() zero the key material, but reset() must still
+    # reconstruct the correct HMAC state from the original key.
+    my $key = "secret key";
+    my $data = "test data";
+
+    my $mac = Crypt::RIPEMD160::MAC->new($key);
+    $mac->add($data);
+    my $hex1 = $mac->hexmac;
+
+    # reset() after hexmac() should allow correct reuse
+    $mac->reset();
+    $mac->add($data);
+    my $hex2 = $mac->hexmac;
+
+    # Fresh instance as ground truth
+    my $fresh = Crypt::RIPEMD160::MAC->new($key);
+    $fresh->add($data);
+    my $hex3 = $fresh->hexmac;
+
+    is($hex1, $hex3, 'first mac matches fresh instance');
+    is($hex2, $hex3, 'mac after reset matches fresh instance');
+};
+
+subtest 'MAC reset after mac() with long key' => sub {
+    # Keys > 64 bytes are hashed before use; reset must handle this too
+    my $key = chr(0xaa) x 80;
+    my $data = "Test Using Larger Than Block-Size Key - Hash Key First";
+
+    my $mac = Crypt::RIPEMD160::MAC->new($key);
+    $mac->add($data);
+    my $hex1 = $mac->hexmac;
+
+    $mac->reset();
+    $mac->add($data);
+    my $hex2 = $mac->hexmac;
+
+    is($hex1, '6466ca07 ac5eac29 e1bd523e 5ada7605 b791fd8b',
+       'first mac matches RFC 2286 vector');
+    is($hex2, $hex1, 'mac after reset matches first mac');
+};
+
 subtest 'MAC mac() returns 20 bytes' => sub {
     my $mac = Crypt::RIPEMD160::MAC->new('key');
     $mac->add('data');
@@ -337,6 +379,160 @@ subtest 'MAC single byte key' => sub {
     $mac->add('test');
     my $hex = $mac->hexmac;
     like($hex, qr/^[0-9a-f]{8}( [0-9a-f]{8}){4}$/, 'single byte key works');
+};
+
+# ========================================
+# clone() tests
+# ========================================
+
+subtest 'clone produces independent copy' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('abc');
+    my $clone = $ctx->clone;
+    isa_ok($clone, 'Crypt::RIPEMD160');
+
+    # Both should produce the same digest
+    my $hex_orig  = unpack("H*", $ctx->digest);
+    my $hex_clone = unpack("H*", $clone->digest);
+    is($hex_orig, $abc_hex, 'original produces correct hash');
+    is($hex_clone, $abc_hex, 'clone produces same hash');
+};
+
+subtest 'clone is independent after diverging' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('abc');
+
+    my $clone = $ctx->clone;
+    $clone->add('def');  # diverge from original
+
+    my $hex_orig = unpack("H*", $ctx->digest);
+    my $hex_clone = unpack("H*", $clone->digest);
+
+    is($hex_orig, $abc_hex, 'original unaffected by clone addition');
+    isnt($hex_clone, $abc_hex, 'clone diverged after additional data');
+
+    # Verify clone matches "abcdef" hash
+    my $expected = Crypt::RIPEMD160->new;
+    $expected->add('abcdef');
+    my $hex_expected = unpack("H*", $expected->digest);
+    is($hex_clone, $hex_expected, 'clone matches "abcdef" hash');
+};
+
+subtest 'clone at block boundary' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('X' x 64);  # exactly one block
+
+    my $clone = $ctx->clone;
+    $ctx->add('Y');
+    $clone->add('Z');
+
+    my $hex1 = unpack("H*", $ctx->digest);
+    my $hex2 = unpack("H*", $clone->digest);
+
+    isnt($hex1, $hex2, 'clone diverges at block boundary');
+};
+
+subtest 'clone of fresh context' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    my $clone = $ctx->clone;
+    $clone->add('abc');
+
+    my $hex_orig  = unpack("H*", $ctx->digest);
+    my $hex_clone = unpack("H*", $clone->digest);
+
+    is($hex_orig, $empty_hex, 'original stays empty');
+    is($hex_clone, $abc_hex, 'clone of fresh context works');
+};
+
+# ========================================
+# addfile() read error handling
+# ========================================
+
+subtest 'addfile croaks on read error' => sub {
+    # Tied handle that simulates a read() failure (returns undef, sets $!)
+    {
+        package ReadErrorHandle;
+        sub TIEHANDLE { bless {}, shift }
+        sub READ { $! = 5; return undef }  # EIO
+    }
+    tie *ERR_FH, 'ReadErrorHandle';
+
+    my $ctx = Crypt::RIPEMD160->new;
+    eval { $ctx->addfile(\*ERR_FH) };
+    like($@, qr/read failed/i, 'RIPEMD160 addfile croaks on read error');
+    untie *ERR_FH;
+};
+
+subtest 'MAC addfile croaks on read error' => sub {
+    {
+        package ReadErrorHandle2;
+        sub TIEHANDLE { bless {}, shift }
+        sub READ { $! = 5; return undef }
+    }
+    tie *ERR_FH2, 'ReadErrorHandle2';
+
+    my $mac = Crypt::RIPEMD160::MAC->new("key");
+    eval { $mac->addfile(\*ERR_FH2) };
+    like($@, qr/read failed/i, 'MAC addfile croaks on read error');
+    untie *ERR_FH2;
+};
+
+# ========================================
+# Padding boundary tests (55/56/57 bytes)
+# ========================================
+# RIPEMD-160 padding appends 0x80 + 64-bit length (9 bytes minimum).
+# If (message_length mod 64) > 55, padding overflows into a second
+# compression block.  These tests exercise both sides of that boundary.
+
+subtest 'padding boundary: 55 bytes (fits in one block)' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('A' x 55);
+    is(unpack("H*", $ctx->digest),
+       'c4cf09138ab0b859b70c321375557430649190b4',
+       '55 bytes: padding fits in one block');
+};
+
+subtest 'padding boundary: 56 bytes (spills to second block)' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('A' x 56);
+    is(unpack("H*", $ctx->digest),
+       '6da64c99dd269139248fa73adfb40e19b8722196',
+       '56 bytes: padding requires second compression block');
+};
+
+subtest 'padding boundary: 57 bytes' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('A' x 57);
+    is(unpack("H*", $ctx->digest),
+       '017d4d1b03c32d833b31df97148b43c0130bd295',
+       '57 bytes: one past the padding boundary');
+};
+
+# Same boundary at 119/120 bytes (second block pair)
+subtest 'padding boundary: 119 bytes (55 mod 64, fits in block)' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('A' x 119);
+    is(unpack("H*", $ctx->digest),
+       'a0dcfad464c8cee6ea3137a640a90498e80db360',
+       '119 bytes: multi-block, padding fits');
+};
+
+subtest 'padding boundary: 120 bytes (56 mod 64, spills)' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('A' x 120);
+    is(unpack("H*", $ctx->digest),
+       '2c62c467efc39f9c6b73394ef63abf3c89aa0f96',
+       '120 bytes: multi-block, padding spills');
+};
+
+subtest 'padding boundary: incremental add across boundary' => sub {
+    # Feed 56 bytes one at a time — exercises the partial-block
+    # accumulation path in RIPEMD160_update plus the padding overflow
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('A') for 1..56;
+    is(unpack("H*", $ctx->digest),
+       '6da64c99dd269139248fa73adfb40e19b8722196',
+       '56 bytes fed incrementally matches single-add vector');
 };
 
 # ========================================

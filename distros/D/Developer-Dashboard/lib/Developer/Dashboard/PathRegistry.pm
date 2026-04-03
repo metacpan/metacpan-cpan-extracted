@@ -1,7 +1,9 @@
 package Developer::Dashboard::PathRegistry;
-$Developer::Dashboard::PathRegistry::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Cwd qw(cwd);
 use File::Basename qw(dirname);

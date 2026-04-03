@@ -1,3 +1,11 @@
+1.44 Apr 02 2026
+
+  [Bug Fixes]
+  - Fix: positive hex and octal values parsed as 0 with ImplicitTyping
+    (PR #187)
+  - Fix: resolve uintptr_t redefinition error on Win64 MinGW
+    (PR #186)
+
 1.43 Apr 01 2026
 
   [Bug Fixes]

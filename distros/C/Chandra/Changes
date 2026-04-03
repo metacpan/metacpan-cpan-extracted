@@ -1,5 +1,8 @@
 Revision history for Chandra
 
+0.10  2026-04-02
+    - Add Chandra::Shortcut — keyboard shortcuts and global hotkeys
+
 0.09  2026-04-01
     - Fix Makefile to identify BSD's that should use GTK/WebKit2
 

@@ -1,8 +1,12 @@
 package Developer::Dashboard::PageStore;
-$Developer::Dashboard::PageStore::VERSION = '0.94';
+
 use strict;
 use warnings;
 
+our $VERSION = '1.33';
+use utf8;
+
+use Encode qw(decode FB_CROAK FB_DEFAULT);
 use File::Find ();
 use File::Spec;
 use File::Basename qw(basename dirname);
@@ -29,7 +33,7 @@ sub new {
 sub page_file {
     my ( $self, $id ) = @_;
     die 'Missing page id' if !defined $id || $id eq '';
-    return File::Spec->catfile( $self->{paths}->dashboards_root, $id );
+    return File::Spec->catfile( $self->{paths}->dashboards_root, $self->_normalized_page_id($id) );
 }
 
 # save_page($page)
@@ -63,6 +67,7 @@ sub load_saved_page {
     my $page = $self->_load_page_file($file);
     $page->{id} ||= $id;
     $page->{meta}{source_kind} = 'saved';
+    $page->{meta}{raw_instruction} = $self->_read_saved_instruction($file);
     return $page;
 }
 
@@ -74,9 +79,7 @@ sub read_saved_entry {
     my ( $self, $id ) = @_;
     my $file = $self->_existing_page_file($id);
     die "Page '$id' not found" if !$file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    return <$fh>;
+    return $self->_read_saved_instruction($file);
 }
 
 # load_transient_page($token)
@@ -192,7 +195,22 @@ sub migrate_legacy_json_pages {
 # Output: ordered list of bookmark file path strings.
 sub _page_file_candidates {
     my ( $self, $id ) = @_;
-    return map { File::Spec->catfile( $_, $id ) } $self->{paths}->dashboards_roots;
+    my $normalized = $self->_normalized_page_id($id);
+    return map { File::Spec->catfile( $_, $normalized ) } $self->{paths}->dashboards_roots;
+}
+
+# _normalized_page_id($id)
+# Normalizes one saved bookmark id for on-disk lookup and persistence.
+# Input: page id string, optionally already prefixed with /app/.
+# Output: relative bookmark id string without a leading /app/ or slash.
+sub _normalized_page_id {
+    my ( $self, $id ) = @_;
+    $id = '' if !defined $id;
+    $id =~ s/^\s+//;
+    $id =~ s/\s+$//;
+    $id =~ s{\A/+app/+}{};
+    $id =~ s{\A/+}{};
+    return $id;
 }
 
 # _existing_page_file($id)
@@ -213,9 +231,35 @@ sub _existing_page_file {
 # Output: Developer::Dashboard::PageDocument object.
 sub _load_page_file {
     my ( $self, $file ) = @_;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
+    return Developer::Dashboard::PageDocument->from_instruction( $self->_read_saved_instruction($file) );
+}
+
+# _read_saved_instruction($file)
+# Reads one saved bookmark file and normalizes legacy-invalid UTF-8 bytes.
+# Input: bookmark file path string.
+# Output: decoded instruction text string that is safe to emit as UTF-8 HTML/text.
+sub _read_saved_instruction {
+    my ( $self, $file ) = @_;
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
     local $/;
-    return Developer::Dashboard::PageDocument->from_instruction(<$fh>);
+    my $raw = <$fh>;
+    close $fh or die "Unable to close $file: $!";
+    return '' if !defined $raw;
+    my $text = eval { decode( 'UTF-8', $raw, FB_CROAK ) } || decode( 'UTF-8', $raw, FB_DEFAULT );
+    return $self->_normalize_legacy_icon_markup($text);
+}
+
+# _normalize_legacy_icon_markup($text)
+# Repairs browser-visible icon placeholders left behind by malformed legacy bookmark bytes.
+# Input: decoded bookmark instruction text string.
+# Output: normalized instruction text string with stable fallback glyphs in icon HTML contexts.
+sub _normalize_legacy_icon_markup {
+    my ( $self, $text ) = @_;
+    return '' if !defined $text;
+    $text =~ s/\x{1F9D1}\x{FFFD}\x{1F4BB}/\x{1F9D1}\x{200D}\x{1F4BB}/g;
+    $text =~ s{(<h2>)\x{FFFD}(\s+)}{$1◈$2}g;
+    $text =~ s{(<span\s+class="icon">)[^<]*\x{FFFD}[^<]*(</span>)}{$1🏷️$2}g;
+    return $text;
 }
 
 # _saved_page_entries_for_root($root)

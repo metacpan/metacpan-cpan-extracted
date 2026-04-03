@@ -11,7 +11,7 @@ use Time::Piece;
 use Log::Log4perl qw(:easy);
 use MIME::Base64;
 
-our $VERSION = '3.1.0';
+our $VERSION = '3.2.0';
 
 use constant {
     GATE_URLS => [
@@ -279,6 +279,51 @@ sub telegram_status {
     return $self->_request(
         'telegram/status',
         { id => int($telegram_id) }
+    );
+}
+
+sub send_mobile_id {
+    my ($self, %args) = @_;
+
+    die "number is required" unless defined $args{number};
+    die "sign is required" unless defined $args{sign};
+    die "callback_url is required" unless defined $args{callback_url};
+
+    $self->_validate_phone_number($args{number});
+
+    return $self->_request(
+        'mobile-id/send',
+        {
+            number      => $args{number},
+            sign        => $args{sign},
+            callbackUrl => $args{callback_url},
+        }
+    );
+}
+
+sub mobile_id_status {
+    my ($self, $req_id) = @_;
+
+    return $self->_request(
+        'mobile-id/status',
+        { id => int($req_id) }
+    );
+}
+
+sub verify_mobile_id {
+    my ($self, %args) = @_;
+
+    die "req_id is required" unless defined $args{req_id};
+    die "code is required" unless defined $args{code};
+    die "sign is required" unless defined $args{sign};
+
+    return $self->_request(
+        'mobile-id/verify',
+        {
+            id   => int($args{req_id}),
+            code => $args{code},
+            sign => $args{sign},
+        }
     );
 }
 

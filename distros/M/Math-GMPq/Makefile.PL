@@ -7,6 +7,16 @@ require 5.006;
 
 $| = 1;
 
+# A cpantester's build of perl is/was specifying "LIBS=-lquadmath" in the Perl_MM_OPT
+# envirnoment variable - which overrides the assignment to $options{LIBS} below,
+# at line 125.
+# See (eg) https://www.cpantesters.org/cpan/report/41ed0a6e-6f74-1014-a0b5-c5df354b4780 .
+# The following substitution regex works around the problem.
+{
+  no warnings 'uninitialized'; # It doesn't matter if $ENV{PERL_MM_OPT} is uninitialized.
+  $ENV{PERL_MM_OPT} =~ s/\sLIBS=\-lquadmath|^LIBS=\-lquadmath//;
+}
+
 our %args = map { split /\s*=\s*/ } @ARGV;
 our $LIBS = $args{ LIBS } || "-lgmp";
 our $INC = $args{ INC };

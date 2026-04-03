@@ -1,7 +1,9 @@
 package File;
-$File::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use File::Spec;
 

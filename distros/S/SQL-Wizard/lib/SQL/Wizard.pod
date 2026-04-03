@@ -529,7 +529,13 @@ The WHERE clause accepts several forms that can be freely mixed and nested.
 
     { column => $value }          # column = ?
     { column => undef }           # column IS NULL
-    { column => \@list }          # column IN (?, ?, ?)
+    { column => \@list }          # column = ? OR column = ? OR ...
+                                  # each element is processed individually:
+                                  #   undef      => column IS NULL
+                                  #   { op => v} => column op v
+                                  #   scalar     => column = ?
+                                  # e.g. { col => [undef, { '>' => 3 }] }
+                                  #   => col IS NULL OR col > ?
     { column => $expr }           # column = expr  (no bind if Expr object)
     { column => { op => $val } }  # column op ?
 

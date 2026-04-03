@@ -1,7 +1,9 @@
 package Developer::Dashboard::DockerCompose;
-$Developer::Dashboard::DockerCompose::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);

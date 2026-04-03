@@ -9,6 +9,7 @@ examples/element_example.pl
 examples/hot_reload_content.html
 examples/hot_reload_example.pl
 examples/routing_example.pl
+examples/shortcut_example.pl
 examples/socket_ipc_example.pl
 examples/tray_example.pl
 include/chandra/chandra.h
@@ -40,6 +41,7 @@ lib/Chandra/Event.pm
 lib/Chandra/HotReload.pm
 lib/Chandra/Notify.pm
 lib/Chandra/Protocol.pm
+lib/Chandra/Shortcut.pm
 lib/Chandra/Socket/Client.pm
 lib/Chandra/Socket/Connection.pm
 lib/Chandra/Socket/Hub.pm
@@ -86,6 +88,8 @@ t/35_tray.t
 t/36_tray_edge.t
 t/37_css_js.t
 t/38_notify.t
+t/39_shortcut.t
+t/40_shortcut_edge.t
 typemap
 xs/app.xs
 xs/bind.xs
@@ -99,6 +103,7 @@ xs/event.xs
 xs/hotreload.xs
 xs/notify.xs
 xs/protocol.xs
+xs/shortcut.xs
 xs/socket_client.xs
 xs/socket_connection.xs
 xs/socket_hub.xs

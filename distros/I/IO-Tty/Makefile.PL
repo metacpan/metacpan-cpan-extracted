@@ -160,6 +160,11 @@ foreach my $f (sort keys %funcs) {
 #define __BSD_VISIBLE 1
 #endif
 #endif
+#ifdef __DragonFly__
+#ifndef __BSD_VISIBLE
+#define __BSD_VISIBLE 1
+#endif
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

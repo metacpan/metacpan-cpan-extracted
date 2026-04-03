@@ -11,7 +11,11 @@ my ( $CS8, $B9600 );
 eval { $CS8 = POSIX::CS8(); $B9600 = POSIX::B9600(); 1 }
     or plan skip_all => 'POSIX termios constants not available on this platform';
 
-plan tests => 8;
+plan tests => 9;
+
+# Determine platform's VDISABLE value (0 on Linux, 255 on macOS/BSD)
+my $VDISABLE = eval { POSIX::_POSIX_VDISABLE() };
+$VDISABLE = 0 unless defined $VDISABLE;
 
 # Build a minimal set of arguments for show_me_the_crap.
 # Flags are all zero so every flag prints with '-' prefix.
@@ -23,15 +27,15 @@ my $ispeed  = $B9600;
 my $ospeed  = $B9600;
 
 my %cc = (
-    INTR  => 3,    # ^C
-    QUIT  => 28,   # ^\
-    ERASE => 127,  # ^?
-    KILL  => 21,   # ^U
-    EOF   => 4,    # ^D
-    EOL   => 0,    # <undef>
-    START => 17,   # ^Q
-    STOP  => 19,   # ^S
-    SUSP  => 26,   # ^Z
+    INTR  => 3,          # ^C
+    QUIT  => 28,         # ^\
+    ERASE => 127,        # ^?
+    KILL  => 21,         # ^U
+    EOF   => 4,          # ^D
+    EOL   => $VDISABLE,  # <undef> (disabled)
+    START => 17,         # ^Q
+    STOP  => 19,         # ^S
+    SUSP  => 26,         # ^Z
     MIN   => 1,
     TIME  => 0,
 );
@@ -99,3 +103,6 @@ like(
     );
     unlike( $out, qr/ispeed/, 'ispeed not shown when equal to ospeed' );
 }
+
+# Every settable iflag should appear in -a output (igncr was missing before)
+like( $output, qr/-igncr/, '-a output includes igncr flag' );

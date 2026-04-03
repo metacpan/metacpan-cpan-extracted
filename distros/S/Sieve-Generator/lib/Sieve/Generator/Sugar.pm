@@ -1,14 +1,19 @@
 use v5.36.0;
 
-package Sieve::Generator::Sugar 0.001;
+package Sieve::Generator::Sugar 0.002;
 # ABSTRACT: constructor functions for building Sieve generator objects
 
 use JSON::MaybeXS ();
+use Params::Util qw(_ARRAY0 _HASH0 _SCALAR0);
+
+use experimental 'builtin', 'for_list';
+use builtin 'blessed';
 
 use Sub::Exporter -setup => [ qw(
   blank
   block
   command
+  test
   comment
   set
   sieve
@@ -20,15 +25,11 @@ use Sub::Exporter -setup => [ qw(
   noneof
 
   bool
-  fourpart
   hasflag
-  header_exists
-  not_header_exists
-  not_string_test
   qstr
-  size
-  string_test
   terms
+  var_eq
+  var_ne
 ) ];
 
 use Sieve::Generator::Lines::Block;
@@ -47,13 +48,13 @@ use Sieve::Generator::Text::Terms;
 #pod   use Sieve::Generator::Sugar '-all';
 #pod
 #pod   my $script = sieve(
-#pod     command('require', qstr([ qw(fileinto imap4flags) ])),
+#pod     command('require', [ qw(fileinto imap4flags) ]),
 #pod     blank(),
 #pod     ifelse(
 #pod       header_exists('X-Spam'),
 #pod       block(
-#pod         command('addflag', qstr('$Junk')),
-#pod         command('fileinto', qstr('Spam')),
+#pod         command('addflag', '$Junk'),
+#pod         command('fileinto', 'Spam'),
 #pod       ),
 #pod     ),
 #pod   );
@@ -97,7 +98,7 @@ sub comment ($content, $arg = undef) {
 
 #pod =func command
 #pod
-#pod   my $cmd = command($identifier, @args);
+#pod   my $cmd = command($identifier, (\%tagged?), @args);
 #pod
 #pod This function creates a L<Sieve::Generator::Lines::Command> with the given
 #pod identifier and arguments.  Arguments may be plain strings or objects doing
@@ -106,11 +107,61 @@ sub comment ($content, $arg = undef) {
 #pod
 #pod =cut
 
-sub command ($identifier, @args) {
+my sub _command ($identifier, $meta_arg, @args) {
+  my $tagged_args;
+
+  if (@args && _HASH0($args[0]) && !blessed($args[0])) {
+    my $tagged_input = shift @args;
+
+    for my ($k, $v) (%$tagged_input) {
+      # The underlying data structure is designed so we can represent this:
+      #
+      #   :arg v1 v2 v3
+      #
+      # ...but there's currently
+      $tagged_args->{$k} = !defined $v  ? []
+                         : blessed($v)  ? [ $v ]
+                         : !ref $v      ? [ Sieve::Generator::Text::Qstr->new({ str => $v }) ]
+                         : _ARRAY0($v)  ? [ Sieve::Generator::Text::QstrList->new({ strs => $v }) ]
+                         : _SCALAR0($v) ? [ Sieve::Generator::Text::Terms->new({ terms => [$$v] }) ]
+                         : Carp::confess("unknown reference type $v passed in Sieve command sugar's tagged args");
+    }
+  }
+
+  my @autoquoted_args = map {;
+                           blessed($_)  ? $_
+                         : !ref $_      ? Sieve::Generator::Text::Qstr->new({ str => $_ })
+                         : _ARRAY0($_)  ? Sieve::Generator::Text::QstrList->new({ strs => $_ })
+                         : _SCALAR0($_) ? Sieve::Generator::Text::Terms->new({ terms => [$$_] })
+                         : Carp::confess("unknown reference type $_ passed in Sieve command sugar's positional args");
+                        } @args;
+
   return Sieve::Generator::Lines::Command->new({
-    identifier => $identifier,
-    args => \@args,
+    %$meta_arg,
+
+    identifier  => $identifier,
+    tagged_args => $tagged_args // {},
+    positional_args => \@autoquoted_args,
   });
+}
+
+sub command ($identifier, @args) {
+  _command($identifier, {}, @args);
+}
+
+#pod =func test
+#pod
+#pod   my $test = test($identifier, (\%tagged?), @args);
+#pod
+#pod This function creates a L<Sieve::Generator::Lines::Command> with the given
+#pod identifier and arguments -- and semicolon-at-the-end turned off.  In the
+#pod future, this might produce a distinct object, but for now, and really in Sieve,
+#pod commands and tests are I<nearly> the same thing.
+#pod
+#pod =cut
+
+sub test ($identifier, @args) {
+  _command($identifier, { autowrap => 0, semicolon => 0 }, @args);
 }
 
 #pod =func set
@@ -126,7 +177,7 @@ sub command ($identifier, @args) {
 sub set ($var, $val) {
   return Sieve::Generator::Lines::Command->new({
     identifier => 'set',
-    args => [
+    positional_args => [
       Sieve::Generator::Text::Qstr->new({ str => $var }),
       Sieve::Generator::Text::Qstr->new({ str => $val }),
     ],
@@ -280,31 +331,6 @@ sub heredoc ($text) {
   return Sieve::Generator::Lines::Heredoc->new({ text => $text });
 }
 
-#pod =func fourpart
-#pod
-#pod   my $test = fourpart($identifier, $tag, $arg1, $arg2);
-#pod
-#pod This function creates a L<Sieve::Generator::Text::Terms> representing a
-#pod four-part Sieve test of the form C<identifier :tag arg1 arg2>.  C<$identifier>
-#pod and C<$tag> are used as-is (with C<:> prepended to C<$tag>); C<$arg1> and
-#pod C<$arg2> are each quoted automatically, with array references becoming Sieve
-#pod string lists and plain scalars becoming quoted strings.
-#pod
-#pod =cut
-
-sub fourpart ($identifier, $tag, $arg1, $arg2) {
-  return Sieve::Generator::Text::Terms->new({
-    terms => [
-      $identifier,
-      ":$tag",
-      (ref $arg1 ? Sieve::Generator::Text::QstrList->new({ strs => $arg1 })
-                 : Sieve::Generator::Text::Qstr->new({ str => $arg1 })),
-      (ref $arg2 ? Sieve::Generator::Text::QstrList->new({ strs => $arg2 })
-                 : Sieve::Generator::Text::Qstr->new({ str => $arg2 })),
-    ],
-  });
-}
-
 #pod =func qstr
 #pod
 #pod   my $q    = qstr($string);
@@ -326,38 +352,6 @@ sub qstr (@inputs) {
   } @inputs;
 }
 
-#pod =func header_exists
-#pod
-#pod   my $test = header_exists($header);
-#pod
-#pod This function creates an RFC 5228 C<exists> test that is true if the named
-#pod header field is present in the message.  The C<$header> is automatically
-#pod quoted as a Sieve string.
-#pod
-#pod =cut
-
-sub header_exists ($header) {
-  return Sieve::Generator::Text::Terms->new({
-    terms => [ 'exists', Sieve::Generator::Text::Qstr->new({ str => $header }) ],
-  });
-}
-
-#pod =func not_header_exists
-#pod
-#pod   my $test = not_header_exists($header);
-#pod
-#pod This function creates a C<not exists> test that is true if the named header
-#pod field is absent from the message.  The C<$header> is automatically quoted as
-#pod a Sieve string.
-#pod
-#pod =cut
-
-sub not_header_exists ($header) {
-  return Sieve::Generator::Text::Terms->new({
-    terms => [ 'not exists', Sieve::Generator::Text::Qstr->new({ str => $header }) ],
-  });
-}
-
 #pod =func hasflag
 #pod
 #pod   my $test = hasflag($flag);
@@ -371,53 +365,6 @@ sub not_header_exists ($header) {
 sub hasflag ($flag) {
   return Sieve::Generator::Text::Terms->new({
     terms => [ 'hasflag', Sieve::Generator::Text::Qstr->new({ str => $flag }) ],
-  });
-}
-
-#pod =func string_test
-#pod
-#pod   my $test = string_test($comparator, $key, $value);
-#pod
-#pod This function creates an RFC 5229 C<string> test using the given comparator
-#pod tag (e.g. C<is>, C<contains>, C<matches>).  The C<$key> and C<$value> should
-#pod be objects doing L<Sieve::Generator::Text>, typically produced by L</qstr>.
-#pod
-#pod =cut
-
-sub string_test ($comparator, $key, $value) {
-  return Sieve::Generator::Text::Terms->new({
-    terms => [ "string :$comparator", $key, $value ],
-  });
-}
-
-#pod =func not_string_test
-#pod
-#pod   my $test = not_string_test($comparator, $key, $value);
-#pod
-#pod This function creates the negation of an RFC 5229 C<string> test.  It accepts
-#pod the same arguments as L</string_test>.
-#pod
-#pod =cut
-
-sub not_string_test ($comparator, $key, $value) {
-  return Sieve::Generator::Text::Terms->new({
-    terms => [ "not string :$comparator", $key, $value ],
-  });
-}
-
-#pod =func size
-#pod
-#pod   my $test = size($comparator, $value);
-#pod
-#pod This function creates an RFC 5228 C<size> test using the given comparator
-#pod (C<over> or C<under>) and size value (e.g. C<100K>).  The value is not quoted
-#pod and is passed through as-is.
-#pod
-#pod =cut
-
-sub size ($comparator, $value) {
-  return Sieve::Generator::Text::Terms->new({
-    terms => [ "size :$comparator", $value ],
   });
 }
 
@@ -436,6 +383,53 @@ sub bool ($value) {
   });
 }
 
+#pod =func var_eq
+#pod
+#pod   my $test = var_eq($var, $value);
+#pod
+#pod This produces a string "is" test checking that the given variable name equals
+#pod the given value, by producing something like C<string :is "${$var}" "$value">.
+#pod
+#pod =cut
+
+sub var_eq ($var, $value) {
+  return Sieve::Generator::Lines::Command->new({
+    autowrap  => 0,
+    semicolon => 0,
+
+    identifier  => 'string',
+    tagged_args => { is => [] },
+    positional_args => [
+      Sieve::Generator::Text::Qstr->new({ str => "\${$var}" }),
+      qstr($value),
+    ],
+  });
+}
+
+#pod =func var_ne
+#pod
+#pod   my $test = var_ne($var, $value);
+#pod
+#pod This produces an inverted string "is" test checking that the given variable
+#pod name equals the given value, by producing something like C<not string :is
+#pod "${$var}" "$value">.
+#pod
+#pod =cut
+
+sub var_ne ($var, $value) {
+  return Sieve::Generator::Lines::Command->new({
+    autowrap  => 0,
+    semicolon => 0,
+
+    identifier  => 'not string',
+    tagged_args => { is => [] },
+    positional_args => [
+      Sieve::Generator::Text::Qstr->new({ str => "\${$var}" }),
+      qstr($value),
+    ],
+  });
+}
+
 1;
 
 __END__
@@ -450,20 +444,20 @@ Sieve::Generator::Sugar - constructor functions for building Sieve generator obj
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   use Sieve::Generator::Sugar '-all';
 
   my $script = sieve(
-    command('require', qstr([ qw(fileinto imap4flags) ])),
+    command('require', [ qw(fileinto imap4flags) ]),
     blank(),
     ifelse(
       header_exists('X-Spam'),
       block(
-        command('addflag', qstr('$Junk')),
-        command('fileinto', qstr('Spam')),
+        command('addflag', '$Junk'),
+        command('fileinto', 'Spam'),
       ),
     ),
   );
@@ -508,12 +502,21 @@ to one.
 
 =head2 command
 
-  my $cmd = command($identifier, @args);
+  my $cmd = command($identifier, (\%tagged?), @args);
 
 This function creates a L<Sieve::Generator::Lines::Command> with the given
 identifier and arguments.  Arguments may be plain strings or objects doing
 L<Sieve::Generator::Text>.  The command renders as a semicolon-terminated
 Sieve statement.
+
+=head2 test
+
+  my $test = test($identifier, (\%tagged?), @args);
+
+This function creates a L<Sieve::Generator::Lines::Command> with the given
+identifier and arguments -- and semicolon-at-the-end turned off.  In the
+future, this might produce a distinct object, but for now, and really in Sieve,
+commands and tests are I<nearly> the same thing.
 
 =head2 set
 
@@ -600,16 +603,6 @@ given C<$text>.  The text renders using the Sieve C<text:>/C<.> multiline
 string syntax.  Any line beginning with C<.> is automatically escaped to
 C<..>.
 
-=head2 fourpart
-
-  my $test = fourpart($identifier, $tag, $arg1, $arg2);
-
-This function creates a L<Sieve::Generator::Text::Terms> representing a
-four-part Sieve test of the form C<identifier :tag arg1 arg2>.  C<$identifier>
-and C<$tag> are used as-is (with C<:> prepended to C<$tag>); C<$arg1> and
-C<$arg2> are each quoted automatically, with array references becoming Sieve
-string lists and plain scalars becoming quoted strings.
-
 =head2 qstr
 
   my $q    = qstr($string);
@@ -622,22 +615,6 @@ array reference produces a L<Sieve::Generator::Text::QstrList> that renders
 as a bracketed Sieve string list.  When given a list of arguments, it maps
 over each and returns a corresponding list of objects.
 
-=head2 header_exists
-
-  my $test = header_exists($header);
-
-This function creates an RFC 5228 C<exists> test that is true if the named
-header field is present in the message.  The C<$header> is automatically
-quoted as a Sieve string.
-
-=head2 not_header_exists
-
-  my $test = not_header_exists($header);
-
-This function creates a C<not exists> test that is true if the named header
-field is absent from the message.  The C<$header> is automatically quoted as
-a Sieve string.
-
 =head2 hasflag
 
   my $test = hasflag($flag);
@@ -646,35 +623,27 @@ This function creates an RFC 5232 C<hasflag> test that is true if the message
 has the given flag set.  The C<$flag> is automatically quoted as a Sieve
 string.
 
-=head2 string_test
-
-  my $test = string_test($comparator, $key, $value);
-
-This function creates an RFC 5229 C<string> test using the given comparator
-tag (e.g. C<is>, C<contains>, C<matches>).  The C<$key> and C<$value> should
-be objects doing L<Sieve::Generator::Text>, typically produced by L</qstr>.
-
-=head2 not_string_test
-
-  my $test = not_string_test($comparator, $key, $value);
-
-This function creates the negation of an RFC 5229 C<string> test.  It accepts
-the same arguments as L</string_test>.
-
-=head2 size
-
-  my $test = size($comparator, $value);
-
-This function creates an RFC 5228 C<size> test using the given comparator
-(C<over> or C<under>) and size value (e.g. C<100K>).  The value is not quoted
-and is passed through as-is.
-
 =head2 bool
 
   my $test = bool($value);
 
 This function returns a Terms representing a literal C<true> or C<false>
 depending on the truthiness of C<$value>.
+
+=head2 var_eq
+
+  my $test = var_eq($var, $value);
+
+This produces a string "is" test checking that the given variable name equals
+the given value, by producing something like C<string :is "${$var}" "$value">.
+
+=head2 var_ne
+
+  my $test = var_ne($var, $value);
+
+This produces an inverted string "is" test checking that the given variable
+name equals the given value, by producing something like C<not string :is
+"${$var}" "$value">.
 
 =head1 AUTHOR
 

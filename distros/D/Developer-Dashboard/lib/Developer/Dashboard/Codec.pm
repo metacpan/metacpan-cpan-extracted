@@ -1,7 +1,9 @@
 package Developer::Dashboard::Codec;
-$Developer::Dashboard::Codec::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Exporter 'import';
 use IO::Compress::Gzip qw(gzip $GzipError);

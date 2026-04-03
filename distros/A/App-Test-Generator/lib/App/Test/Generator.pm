@@ -36,14 +36,14 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use constant {
-	DEFAULT_ITERATIONS => 50,
+	DEFAULT_ITERATIONS => 30,
 	DEFAULT_PROPERTY_TRIALS => 1000
 };
 
-use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup', 'properties', 'close_stdin');
+use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup', 'properties', 'close_stdin', 'test_security');
 
 =head1 NAME
 
@@ -51,7 +51,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test 
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -69,10 +69,10 @@ From Perl:
   use App::Test::Generator qw(generate);
 
   # Generate to STDOUT
-  App::Test::Generator::generate("t/conf/add.yml");
+  App::Test::Generator->generate("t/conf/add.yml");
 
   # Generate directly to a file
-  App::Test::Generator::generate('t/conf/add.yml', 't/add_fuzz.t');
+  App::Test::Generator->generate('t/conf/add.yml', 't/add_fuzz.t');
 
   # Holy grail mode - read a Perl file, generate tests, and run them
   # This is a long way away yet, but see t/schema_input.t for a proof of concept
@@ -240,6 +240,8 @@ Setting this to 0 disables timeout testing.
 =item * C<dedup>, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 
 =item * C<properties>, enable L<Test::LectroTest> Property tests (default: 0)
+
+*item * C<test_security>, send some security string based tests (default: 0)
 
 =back
 
@@ -440,7 +442,7 @@ When provided, the generated C<t/fuzz.t> will call C<srand($seed)> so fuzz runs 
 
 =head3 C<$iterations>
 
-An optional integer controlling how many fuzz iterations to perform (default 50).
+An optional integer controlling how many fuzz iterations to perform (default 30).
 
 =head3 C<%edge_cases>
 
@@ -491,7 +493,7 @@ During fuzzing iterations, there's a 40% probability that a test case will use a
     - " "
 
   seed: 42
-  iterations: 50
+  iterations: 30
 
 =head3 Semantic Data Generators
 
@@ -879,7 +881,7 @@ The generated test will include:
 
 =item * Traditional edge-case tests for boundary conditions
 
-=item * Random fuzzing with 50 iterations (or as configured)
+=item * Random fuzzing with 30 iterations (or as configured)
 
 =item * Property-based tests that verify the transforms with 1000 trials each
 
@@ -1250,44 +1252,46 @@ Takes a schema file and produces a test file (or STDOUT).
 
 sub generate
 {
-	if($_[0] && ($_[0] eq __PACKAGE__)) {
-		shift;
-	}
+	croak 'Usage: generate(schema_file [, outfile])' if(scalar(@_) <= 1);
 
+	my $class = shift;
 	my $args = $_[0];
 
 	my ($schema_file, $test_file, $schema);
 	# Globals loaded from the user's conf (all optional except function maybe)
-	my (%config, $module, $function, $new, $yaml_cases);
+	my ($module, $function, $new, $yaml_cases);
 	my ($seed, $iterations);
 
-	if(ref($args) || defined($_[2])) {
+	if((ref($args) eq 'HASH') || defined($_[2])) {
 		# Modern API
 		my $params = Params::Validate::Strict::validate_strict({
 			args => Params::Get::get_params(undef, \@_),
 			schema => {
 				input_file => { type => 'string', optional => 1 },
+				schema_file => { type => 'string', optional => 1 },
 				output_file => { type => 'string', optional => 1 },
 				schema => { type => 'hashref', optional => 1 },
 				quiet => { type => 'boolean', optional => 1 },	# Not yet used
 			}
 		});
-		if($params->{'input_file'}) {
+		if($params->{'schema_file'}) {
+			$schema_file = $params->{'schema_file'};
+		} elsif($params->{'input_file'}) {
 			$schema_file = $params->{'input_file'};
 		} elsif($params->{'schema'}) {
 			$schema = $params->{'schema'};
 		} else {
 			croak(__PACKAGE__, ': Usage: generate(input_file|schema [, output_file]');
 		}
+		if(defined($schema_file)) {
+			$schema = _load_schema($schema_file);
+		}
 		$test_file = $params->{'output_file'};
 	} else {
 		# Legacy API
-		($schema_file, $test_file) = ($_[0], $_[1]);
+		($schema_file, $test_file) = @_;
 		if(defined($schema_file)) {
 			$schema = _load_schema($schema_file);
-			if(!defined($schema)) {
-				croak "Failed to load schema from $schema_file";
-			}
 		} else {
 			croak 'Usage: generate(schema_file [, outfile])';
 		}
@@ -1315,7 +1319,7 @@ sub generate
 	my @edge_case_array = @{$schema->{edge_case_array}} if(exists($schema->{edge_case_array}));
 	_validate_config($schema);
 
-	%config = %{$schema->{config}} if(exists($schema->{config}));
+	my %config = %{$schema->{config}} if(exists($schema->{config}));
 
 	_normalize_config(\%config);
 
@@ -1759,15 +1763,16 @@ sub _load_schema {
 	# $abs = "./$abs" unless $abs =~ m{^/};
 	# require $abs;
 
-	if(my $schema = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file)) {
+	if(my $schema = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file, no_fixate => 1)) {
 		if($schema = $schema->all()) {
-			if(defined($schema->{'$module'}) || defined($schema->{'our $module'}) || !defined($schema->{'module'})) {
+			if(exists($schema->{'$module'}) || exists($schema->{'our $module'}) || !exists($schema->{'module'})) {
 				croak("$schema_file: Loading perl files as configs is no longer supported");
 			}
 			$schema->{'_source'} = $schema_file;
 			return $schema;
 		}
 	}
+	croak "Failed to load schema from $schema_file";
 }
 
 sub _load_schema_section

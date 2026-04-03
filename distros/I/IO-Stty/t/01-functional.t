@@ -96,6 +96,30 @@ subtest 'iflag settings (icrnl, ixon)' => sub {
     ok($t->getiflag & IXON,  'ixon re-enabled');
 };
 
+subtest 'igncr toggle' => sub {
+    my ($pty, $slave) = fresh_pty();
+
+    IO::Stty::stty($slave, 'igncr');
+    my $t = get_termios($slave);
+    ok($t->getiflag & IGNCR, 'igncr set');
+
+    IO::Stty::stty($slave, '-igncr');
+    $t = get_termios($slave);
+    ok(!($t->getiflag & IGNCR), 'igncr cleared');
+};
+
+subtest '-a output shows igncr' => sub {
+    my ($pty, $slave) = fresh_pty();
+
+    IO::Stty::stty($slave, 'igncr');
+    my $output = IO::Stty::stty($slave, '-a');
+    like($output, qr/(?<!\-)igncr/, '-a shows igncr when set');
+
+    IO::Stty::stty($slave, '-igncr');
+    $output = IO::Stty::stty($slave, '-a');
+    like($output, qr/-igncr/, '-a shows -igncr when cleared');
+};
+
 subtest 'oflag (opost)' => sub {
     my ($pty, $slave) = fresh_pty();
 
@@ -279,6 +303,31 @@ subtest 'dec combination' => sub {
     is($t->getcc(VKILL),  21,  'dec: kill=21');
 };
 
+subtest 'crt combination' => sub {
+    my ($pty, $slave) = fresh_pty();
+    # Clear echoe/echok first so we can verify crt sets them
+    IO::Stty::stty($slave, '-echoe', '-echok');
+    my $t = get_termios($slave);
+    ok(!($t->getlflag & ECHOE), 'echoe cleared before crt');
+
+    IO::Stty::stty($slave, 'crt');
+    $t = get_termios($slave);
+    ok($t->getlflag & ECHOE, 'crt: echoe set');
+    ok($t->getlflag & ECHOK, 'crt: echok set');
+};
+
+subtest 'crterase alias for echoe' => sub {
+    my ($pty, $slave) = fresh_pty();
+
+    IO::Stty::stty($slave, '-crterase');
+    my $t = get_termios($slave);
+    ok(!($t->getlflag & ECHOE), 'crterase clears ECHOE');
+
+    IO::Stty::stty($slave, 'crterase');
+    $t = get_termios($slave);
+    ok($t->getlflag & ECHOE, 'crterase sets ECHOE');
+};
+
 # ── 5. Control character assignment ───────────────────────────────────
 
 subtest 'set control chars by integer' => sub {
@@ -301,14 +350,19 @@ subtest 'set control chars by hat notation' => sub {
 };
 
 subtest 'disable control char with undef' => sub {
+    # _POSIX_VDISABLE is the platform-specific value for "disabled"
+    # (0 on Linux, 255 on macOS/BSD)
+    my $VDISABLE = eval { POSIX::_POSIX_VDISABLE() };
+    $VDISABLE = 0 unless defined $VDISABLE;
+
     my ($pty, $slave) = fresh_pty();
     IO::Stty::stty($slave, 'eol', 'undef');
     my $t = get_termios($slave);
-    is($t->getcc(VEOL), 0, 'eol disabled via undef');
+    is($t->getcc(VEOL), $VDISABLE, 'eol disabled via undef (uses _POSIX_VDISABLE)');
 
     IO::Stty::stty($slave, 'eol', '^-');
     $t = get_termios($slave);
-    is($t->getcc(VEOL), 0, 'eol disabled via ^-');
+    is($t->getcc(VEOL), $VDISABLE, 'eol disabled via ^- (uses _POSIX_VDISABLE)');
 };
 
 subtest 'set min and time' => sub {
@@ -321,7 +375,10 @@ subtest 'set min and time' => sub {
 
 subtest '-a output shows min and time' => sub {
     my ($pty, $slave) = fresh_pty();
-    IO::Stty::stty($slave, 'min', 3, 'time', 7);
+    # min/time are only meaningful in non-canonical mode; on systems where
+    # VEOF==VMIN (e.g. Solaris), setting min/time while ICANON is on would
+    # overwrite the eof/eol slots instead.
+    IO::Stty::stty($slave, '-icanon', 'min', 3, 'time', 7);
     my $output = IO::Stty::stty($slave, '-a');
     like($output, qr/min = 3/, '-a shows min value');
     like($output, qr/time = 7/, '-a shows time value');
@@ -373,6 +430,38 @@ subtest 'non-tty handle returns undef' => sub {
     my $result = IO::Stty::stty($fh, '-a');
     is($result, undef, 'non-tty returns undef');
     close $fh;
+};
+
+# ── 9. iexten flag ─────────────────────────────────────────────────────
+
+subtest 'toggle iexten flag' => sub {
+    my ($pty, $slave) = fresh_pty();
+
+    IO::Stty::stty($slave, 'iexten');
+    my $t = get_termios($slave);
+    ok($t->getlflag & IEXTEN, 'iexten is set after stty iexten');
+
+    IO::Stty::stty($slave, '-iexten');
+    $t = get_termios($slave);
+    ok(!($t->getlflag & IEXTEN), 'iexten is cleared after stty -iexten');
+};
+
+# ── 10. Return value on set operations ─────────────────────────────────
+
+subtest 'stty returns true on successful set' => sub {
+    my ($pty, $slave) = fresh_pty();
+
+    my $result = IO::Stty::stty($slave, 'echo');
+    ok($result, 'stty returns true value when setting flags');
+};
+
+# ── 11. iexten shown in -a output ─────────────────────────────────────
+
+subtest 'iexten appears in -a output' => sub {
+    my ($pty, $slave) = fresh_pty();
+
+    my $output = IO::Stty::stty($slave, '-a');
+    like($output, qr/-?iexten/, '-a output includes iexten');
 };
 
 done_testing;

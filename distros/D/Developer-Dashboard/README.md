@@ -63,6 +63,13 @@ By default it listens on `0.0.0.0:7890`, so you can open it in a browser at:
 http://127.0.0.1:7890/
 ```
 
+Run `dashboard serve --ssl` to enable HTTPS with a generated self-signed
+certificate under `~/.developer-dashboard/certs/`, then open:
+
+```text
+https://127.0.0.1:7890/
+```
+
 The access model is deliberate:
 
 - exact numeric loopback admin access on `127.0.0.1` does not require a password
@@ -70,6 +77,17 @@ The access model is deliberate:
 - helper logins let you share the dashboard safely without turning every browser request into full local-admin access
 
 In practice that means the developer at the machine gets friction-free local admin access, while shared or forwarded access is forced through explicit helper accounts.
+When a saved `index` bookmark exists, opening `/` now redirects straight to
+`/app/index` so the saved home page becomes the default browser entrypoint.
+When no saved `index` bookmark exists yet, `/` still opens the free-form
+bookmark editor.
+If a user opens an unknown saved route such as `/app/foobar`, the browser now
+opens the bookmark editor with a prefilled blank bookmark for that requested
+path instead of showing a 404 error page.
+When helper access is sent to `/login`, the login form now keeps the original
+requested path and query string in a hidden redirect target. After a successful
+helper login, the browser is sent back to that saved route, such as
+`/app/index`, instead of being dropped at `/`.
 
 ### Collectors, Indicators, And PS1
 
@@ -136,8 +154,8 @@ Project-specific behavior is added through configuration, saved pages, and user 
 - `Developer::Dashboard::IndicatorStore` and `Developer::Dashboard::Prompt`
   Expose cached state to shell prompts and dashboards, including compact versus extended prompt rendering, stale-state marking, generic built-in indicator refresh, and page-header status payloads for the web UI.
 
-- `Developer::Dashboard::Web::App` and `Developer::Dashboard::Web::Server`
-  Provide the browser interface on port `7890`, including the root editor, page rendering, login/logout, helper sessions, and the exact-loopback admin trust model.
+- `Developer::Dashboard::Web::DancerApp`, `Developer::Dashboard::Web::App`, and `Developer::Dashboard::Web::Server`
+  Provide the browser interface on port `7890`, with Dancer2 owning the HTTP route table while the web-app service handles page rendering, login/logout, helper sessions, and the exact-loopback admin trust model.
 
 - `dashboard of` and `dashboard open-file`
   Resolve direct files, `file:line` references, Perl module names, Java class names, and recursive file-pattern matches under a resolved scope so the dashboard can shorten navigation work across different stacks.
@@ -170,6 +188,71 @@ The distribution supports these compatibility-style customization variables:
 - `DEVELOPER_DASHBOARD_CONFIGS`
   Override the config root.
 
+- `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS`
+  Allow browser execution of transient `/?token=...`, `/action?atoken=...`, and legacy `/ajax?token=...` payloads. The default is off, so the web UI only executes saved bookmark files unless this is set to a truthy value such as `1`, `true`, `yes`, or `on`.
+
+
+### Transient Web Token Policy
+
+Transient page tokens still exist for CLI workflows such as `dashboard page encode`
+and `dashboard page decode`, but browser routes that execute a transient payload
+from `token=` or `atoken=` are disabled by default.
+
+That means links such as:
+
+- `http://127.0.0.1:7890/?token=...`
+- `http://127.0.0.1:7890/action?atoken=...`
+- `http://127.0.0.1:7890/ajax?token=...`
+
+return a `403` unless `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS` is enabled.
+Saved bookmark-file routes such as `/app/index` and
+`/app/index/action/...` continue to work without that flag.
+Saved bookmark editor pages also stay on their named `/app/<id>/edit` and
+`/app/<id>` routes when you save from the browser, so editing an existing
+bookmark file does not fall back to transient `token=` URLs under the default
+deny policy.
+
+Legacy `Ajax` helper calls inside saved bookmark `CODE*` blocks should use an
+explicit `file => 'name.json'` argument. When a saved page supplies that name,
+the helper stores the Ajax Perl code under the saved dashboard ajax tree and emits a stable
+saved-bookmark endpoint such as `/ajax/name.json?type=text`.
+Those saved Ajax handlers run the stored file as a real process, defaulting to
+Perl unless the file starts with a shebang, and stream both `stdout` and
+`stderr` back to the browser as they happen. That keeps bookmark Ajax
+workflows usable even while transient token URLs stay disabled by default, and
+it means bookmark Ajax code can rely on normal `print`, `warn`, `die`,
+`system`, and `exec` process behaviour instead of a buffered JSON wrapper.
+Saved bookmark Ajax handlers also default to `text/plain` when no explicit
+`type => ...` argument is supplied, and the generated Perl wrapper now enables
+autoflush on both `STDOUT` and `STDERR` so long-running handlers show
+incremental output in the browser instead of stalling behind process buffers.
+If a saved handler also needs refresh-safe process reuse, pass
+`singleton => 'NAME'` in the `Ajax` helper. The generated url then carries
+that singleton name, the Perl worker runs as `dashboard ajax: NAME`, and the
+runtime terminates any older matching Perl Ajax worker before starting the
+replacement stream for the refreshed browser request. Singleton-managed Ajax
+workers are also terminated by `dashboard stop` and `dashboard restart`, and
+the bookmark page now registers a `pagehide` cleanup beacon against
+`/ajax/singleton/stop?singleton=NAME` so closing the browser tab also tears
+down the matching worker instead of leaving it behind.
+If `code => ...` is omitted, `Ajax(file => 'name')` targets the existing
+executable at `dashboards/ajax/name` instead of rewriting it.
+Static files referenced by saved bookmarks are resolved from the effective
+runtime public tree first and then from the saved bookmark root. The web layer
+also provides a built-in `/js/jquery.js` compatibility shim, so bookmark pages
+that expect a local jQuery-style helper still have `$`, `$(document).ready`,
+`$.ajax`, and selector `.text(...)` support even when no runtime file has been
+copied into `dashboard/public/js` yet.
+
+Saved bookmark editor and view-source routes also protect literal inline script
+content from breaking the browser bootstrap. If a bookmark body contains HTML
+such as `</script>`, the editor now escapes the inline JSON assignment used to
+reload the source text, so the browser keeps the full bookmark source inside
+the editor instead of spilling raw text below the page. Legacy bookmark
+rendering also loads `set_chain_value()` before bookmark body HTML, so
+`Ajax jvar => ...` helpers can bind saved `/ajax/...` endpoints without
+throwing a play-route JavaScript `ReferenceError`.
+
 
 ### User CLI Extensions
 
@@ -191,8 +274,8 @@ For the default runtime that means files such as:
 And with route access such as:
 
 - `/app/nav/foo.tt`
-- `/page/nav/foo.tt/edit`
-- `/page/nav/foo.tt/source`
+- `/app/nav/foo.tt/edit`
+- `/app/nav/foo.tt/source`
 
 The bookmark editor can save those nested ids directly, for example
 `BOOKMARK: nav/foo.tt`. On a page like `/app/index`, the direct `nav/*.tt`
@@ -204,7 +287,14 @@ Shared nav fragments and normal bookmark pages both render through Template
 Toolkit with `env.current_page` set to the active request path, such as
 `/app/index`. The same path is also available as
 `env.runtime_context.current_page`, alongside the rest of the request-time
-runtime context.
+runtime context. Token play renders for named bookmarks also reuse that saved
+`/app/<id>` path for nav context, so shared `nav/*.tt` fragments do not
+disappear just because the browser reached the page through a transient
+`/?mode=render&token=...` URL.
+Shared nav markup now wraps horizontally by default and inherits the page
+theme through CSS variables such as `--panel`, `--line`, `--text`, and
+`--accent`, so dark bookmark themes no longer force a pale nav box or hide nav
+link text against the background.
 
 ### Open File Commands
 
@@ -321,6 +411,10 @@ Use `dashboard version` to print the installed Developer Dashboard version.
 The blank-container integration harness now installs the tarball first and then
 builds a fake-project `./.developer-dashboard` tree so the shipped test suite
 still starts from a clean runtime before exercising project-local overrides.
+That same blank-container path now also verifies web stop/restart behavior in a
+minimal image where listener ownership may need to be discovered from `/proc`
+instead of `ss`, including a late listener re-probe before `dashboard restart`
+brings the web service back up.
 
 ### First Run
 
@@ -341,7 +435,7 @@ dashboard path del foobar
 
 Custom path aliases are stored in the effective dashboard config root so shell helpers such as `cdr foobar` and `which_dir foobar` keep working across sessions. When a project-local `./.developer-dashboard` tree exists, alias writes go there first; otherwise they go to the home runtime. When a saved alias points inside your home directory, the stored config uses `$HOME/...` instead of a hard-coded absolute home path so a shared fallback runtime remains portable across different developer accounts. Re-adding an existing alias updates it without error, and deleting a missing alias is also safe.
 
-Legacy `Folder` compatibility also accepts the modern root-style names through `AUTOLOAD`, so older code can use either `Folder->dd` or `Folder->runtime_root`, and likewise `bookmarks_root` and `config_root`. Before `Folder->configure(...)` runs, those runtime-backed names lazily bootstrap a default dashboard path registry from `HOME` instead of dying.
+Legacy `Folder` compatibility also accepts the modern root-style names through `AUTOLOAD`, so older code can use either `Folder->dd` or `Folder->runtime_root`, and likewise `bookmarks_root` and `config_root`. Before `Folder->configure(...)` runs, those runtime-backed names lazily bootstrap a default dashboard path registry from `HOME` instead of dying. Plain `Folder` calls also lazy-load the same config-backed path aliases shown by `dashboard paths`, so a direct `perl -MFolder -e 'print Folder->docker'` from the active project resolves the configured alias instead of failing with `Unknown folder`.
 
 Render shell bootstrap:
 
@@ -447,7 +541,7 @@ dashboard action run system-status paths
 Bookmark documents use the original separator-line format with directive headers such as `TITLE:`, `STASH:`, `HTML:`, `FORM.TT:`, `FORM:`, and `CODE1:`.
 Posting a bookmark document with `BOOKMARK: some-id` back through the root editor now saves it to the bookmark store so `/app/some-id` resolves it immediately.
 
-The browser editor highlights directive sections, HTML, CSS, JavaScript, and Perl `CODE*` content directly inside the editing surface rather than in a separate preview pane.
+The browser editor now renders syntax-highlight markup again, but keeps that highlight layer inside a clipped overlay viewport that follows the real textarea scroll position by transform instead of via a second scrollbox. That restores the visible highlighting while keeping long bookmark lines, full-text selection, and caret placement aligned with the real textarea.
 Edit and source views preserve raw Template Toolkit placeholders inside `HTML:` and `FORM.TT:` sections, so values such as `[% title %]` are kept in the bookmark source instead of being rewritten to rendered HTML after a browser save.
 
 Template Toolkit rendering exposes the page title as `title`, so a bookmark
@@ -581,6 +675,18 @@ The browser security model follows the legacy local-first trust concept:
 The editor and rendered pages also include a shared top chrome with share/source links on the left and the original status-plus-alias indicator strip on the right, refreshed from `/system/status`. That top-right area also includes the local username, the current host or IP link, and the current date/time in the same spirit as the old local dashboard chrome.
 The displayed address is discovered from the machine interfaces, preferring a VPN-style address when one is active, and the date/time is refreshed in the browser with JavaScript.
 The bookmark editor also follows the old auto-submit flow, so the form submits when the textarea changes and loses focus instead of showing a manual update button.
+For saved bookmark files, that browser save posts back to the named
+`/app/<id>/edit` route and keeps the Play link on `/app/<id>` instead of a
+transient `token=` URL, so updates still work while transient URLs are
+disabled.
+Legacy bookmark parsing also treats a standalone `---` line as a section
+break, preventing pasted prose after a code block from being compiled into the
+saved `CODE*` body.
+Saved bookmark loads now also normalize malformed legacy icon bytes before the
+browser sees them. Broken section glyphs fall back to `◈`, broken item-icon
+glyphs fall back to `🏷️`, and common damaged joined emoji sequences such as
+`🧑‍💻` are repaired so edit and play routes stop showing Unicode replacement
+boxes from older bookmark files.
 - helper access requires a login backed by local file-based user and session records
 
 This keeps the fast path for exact loopback access while making non-canonical or remote access explicit.
@@ -591,6 +697,9 @@ The default web bind is `0.0.0.0:7890`. Trust is still decided from the request 
 
 - `dashboard serve` starts the web service in the background by default
 - `dashboard serve --foreground` keeps the web service attached to the terminal
+- `dashboard serve --ssl` enables HTTPS in Starman with the generated local certificate and key, and the saved SSL setting is reused by later `dashboard restart` runs unless you override it
+- `dashboard serve logs` prints the combined Dancer2 and Starman runtime log captured in the dashboard log file, `dashboard serve logs -n 100` starts from the last 100 lines, and `dashboard serve logs -f` follows appended output live
+- `dashboard serve workers N` saves the default Starman worker count and starts the web service immediately when it is currently stopped; `--host HOST` and `--port PORT` can steer that auto-start path, and `dashboard serve --workers N` or `dashboard restart --workers N` can still override it for one run
 - `dashboard stop` stops both the web service and managed collector loops
 - `dashboard restart` stops both, starts configured collector loops again, then starts the web service
 - web shutdown and duplicate detection do not trust pid files alone; they validate managed processes by environment marker or process title and use a `pkill`-style scan fallback when needed
@@ -634,17 +743,25 @@ integration/blank-env/run-host-integration.sh
 ```
 
 This integration path builds the distribution tarball on the host with
-`dzil build`, starts a blank container with only that tarball mounted into it,
-installs the tarball with `cpanm`, and then exercises the installed
-`dashboard` command inside the clean Perl container.
+`dzil build`, runs the prebuilt `dd-int-test:latest` container with only that
+tarball mounted into it, installs the tarball with `cpanm`, and then
+exercises the installed `dashboard` command inside the clean Perl container.
+The runtime-manager lifecycle checks also fall back to `/proc` socket ownership
+scans when that minimal image does not provide `ss`, and they re-probe the
+managed port for late listener pids before restart, so `dashboard stop` and
+`dashboard restart` keep working inside the same blank-container environment
+used for release verification.
+Those checks also cover the Starman master-worker split, where the recorded
+managed pid can be the master while the bound listener pid is a separate
+worker process on the same managed port.
 
 Before uploading a release artifact, remove older build directories and tarballs first so only the current release artifact remains, then validate the exact tarball that will ship:
 
 ```bash
 rm -rf Developer-Dashboard-* Developer-Dashboard-*.tar.gz
 dzil build
-tar -tzf Developer-Dashboard-0.94.tar.gz | grep run-host-integration.sh
-cpanm /tmp/Developer-Dashboard-0.94.tar.gz -v
+tar -tzf Developer-Dashboard-1.33.tar.gz | grep run-host-integration.sh
+cpanm /tmp/Developer-Dashboard-1.33.tar.gz -v
 ```
 
 The harness also:
@@ -695,6 +812,10 @@ The repository is set up to build release artifacts with Dist::Zilla and upload 
 The Dist::Zilla runtime prerequisite list now pins `JSON::XS` explicitly so
 the built tarball always declares the JSON backend dependency for PAUSE test
 installs.
+
+The GitHub Actions workflows pin `actions/checkout@v5` and set
+`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` so hosted runners stay ahead of the
+Node 20 JavaScript-action deprecation window.
 
 ### What JSON implementation does the project use?
 
@@ -752,3 +873,25 @@ The coverage-closure suite includes managed collector loop start/stop paths
 under `Devel::Cover`, including wrapped fork coverage in
 `t/14-coverage-closure-extra.t`, so the covered run stays green without
 breaking TAP from daemon-style child processes.
+
+For fast saved-bookmark browser regressions, run the dedicated smoke script:
+
+```bash
+integration/browser/run-bookmark-browser-smoke.pl
+```
+
+That host-side smoke runner creates an isolated temporary runtime, starts the
+checkout-local dashboard, loads one saved bookmark page through headless
+Chromium, and can assert page-source fragments, saved `/ajax/...` output, and
+the final browser DOM. With no arguments it runs the built-in legacy Ajax
+`foo.bar` bookmark case. For a real bookmark file, point it at the saved file
+and add explicit expectations:
+
+```bash
+integration/browser/run-bookmark-browser-smoke.pl \
+  --bookmark-file ~/.developer-dashboard/dashboards/test \
+  --expect-page-fragment "set_chain_value(foo,'bar','/ajax/foobar?type=text')" \
+  --expect-ajax-path /ajax/foobar?type=text \
+  --expect-ajax-body 123 \
+  --expect-dom-fragment '<span class="display">123</span>'
+```

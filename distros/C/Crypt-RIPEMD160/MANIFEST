@@ -1,7 +1,10 @@
+AI_POLICY.md
 Changes
 CHGEUER.asc
+CONTRIBUTING.md
 lib/Crypt/RIPEMD160.pm
 lib/Crypt/RIPEMD160/MAC.pm
+LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -9,7 +12,7 @@ misc/rfc2104.txt
 misc/rfc2286.txt
 misc/ripemd160_driver.pl
 misc/speedtest.pl
-README
+README.md
 RIPEMD160.xs
 rmd160.c
 rmd160.h
@@ -25,8 +28,11 @@ rmd160/mac/rmd128mc.c
 rmd160/mac/rmd128mc.h
 rmd160/mac/rmd160mc.c
 rmd160/mac/rmd160mc.h
+SECURITY.md
 t/01test.t
 t/02methods.t
+t/pod-coverage.t
+t/pod.t
 typemap
 wrap_160.c
 wrap_160.h

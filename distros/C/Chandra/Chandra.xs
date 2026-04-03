@@ -35,6 +35,8 @@ INCLUDE: xs/notify.xs
 
 INCLUDE: xs/protocol.xs
 
+INCLUDE: xs/shortcut.xs
+
 INCLUDE: xs/socket_connection.xs
 INCLUDE: xs/socket_hub.xs
 INCLUDE: xs/socket_client.xs

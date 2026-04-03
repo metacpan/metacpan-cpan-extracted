@@ -631,6 +631,105 @@ static XS(xs_protocol_bound_callback)
     XSRETURN(1);
 }
 
+/* ---- Shortcut static XS callback ---- */
+
+static XS(xs_shortcut_dispatch_callback)
+{
+    dXSARGS;
+    SV *shortcut_self = (SV *)CvXSUBANY(cv).any_ptr;
+    SV *combo_sv = (items > 0) ? ST(0) : &PL_sv_undef;
+    SV *result = &PL_sv_undef;
+
+    /* Check weak ref is still valid */
+    if (!shortcut_self || !SvOK(shortcut_self) || !SvROK(shortcut_self)) {
+        ST(0) = &PL_sv_undef;
+        XSRETURN(1);
+    }
+
+    {
+        HV *hv = (HV *)SvRV(shortcut_self);
+        SV **da_svp, **bindings_svp;
+        const char *combo_str;
+        STRLEN combo_len;
+
+        /* Check global disable */
+        da_svp = hv_fetchs(hv, "_disabled_all", 0);
+        if (da_svp && SvIV(*da_svp)) {
+            ST(0) = &PL_sv_undef;
+            XSRETURN(1);
+        }
+
+        combo_str = SvPV(combo_sv, combo_len);
+
+        /* Look up binding */
+        bindings_svp = hv_fetchs(hv, "bindings", 0);
+        if (bindings_svp && SvROK(*bindings_svp)) {
+            HV *bindings_hv = (HV *)SvRV(*bindings_svp);
+            SV **entry_svp = hv_fetch(bindings_hv, combo_str, combo_len, 0);
+
+            if (entry_svp && SvROK(*entry_svp) && SvTYPE(SvRV(*entry_svp)) == SVt_PVHV) {
+                HV *ehv = (HV *)SvRV(*entry_svp);
+                SV **enabled_svp = hv_fetchs(ehv, "enabled", 0);
+                SV **handler_svp = hv_fetchs(ehv, "handler", 0);
+
+                if (enabled_svp && SvIV(*enabled_svp)
+                    && handler_svp && SvOK(*handler_svp)
+                    && SvROK(*handler_svp)) {
+                    /* Build a Chandra::Event from the combo */
+                    SV *event;
+                    {
+                        HV *evdata = newHV();
+                        (void)hv_stores(evdata, "type", newSVpvs("keydown"));
+                        (void)hv_stores(evdata, "combo", newSVpvn(combo_str, combo_len));
+                        (void)hv_stores(evdata, "key", newSVpvn(combo_str, combo_len));
+
+                        load_module(PERL_LOADMOD_NOIMPORT,
+                            newSVpvs("Chandra::Event"), NULL);
+                        {
+                            dSP;
+                            int count;
+                            ENTER; SAVETMPS;
+                            PUSHMARK(SP);
+                            XPUSHs(sv_2mortal(newSVpvs("Chandra::Event")));
+                            XPUSHs(sv_2mortal(newRV_noinc((SV *)evdata)));
+                            PUTBACK;
+                            count = call_method("new", G_SCALAR);
+                            SPAGAIN;
+                            event = (count > 0) ? newSVsv(POPs) : newSV(0);
+                            PUTBACK;
+                            FREETMPS; LEAVE;
+                        }
+                    }
+
+                    /* Call the handler */
+                    {
+                        dSP;
+                        int count;
+                        ENTER; SAVETMPS;
+                        PUSHMARK(SP);
+                        XPUSHs(sv_2mortal(event));
+                        PUTBACK;
+                        count = call_sv(*handler_svp, G_SCALAR);
+                        SPAGAIN;
+                        if (count > 0) {
+                            result = newSVsv(POPs);
+                        }
+                        PUTBACK;
+                        FREETMPS; LEAVE;
+                    }
+                }
+            }
+        }
+    }
+
+    if (result == &PL_sv_undef) {
+        ST(0) = &PL_sv_undef;
+    } else {
+        ST(0) = sv_2mortal(result);
+    }
+    XSRETURN(1);
+}
+
 #endif /* CHANDRA_XS_IMPLEMENTATION */
 
 #endif /* CHANDRA_H */

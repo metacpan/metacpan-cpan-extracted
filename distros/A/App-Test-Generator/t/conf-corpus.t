@@ -15,7 +15,7 @@ plan skip_all => 'no corpus config available' unless -e $conf_file && -e $corpus
 
 unlink $outfile;
 
-ok(App::Test::Generator::generate($conf_file, $outfile), 'generate corpus test');
+ok(App::Test::Generator->generate($conf_file, $outfile), 'generate corpus test');
 ok(-e $outfile, "corpus test file created");
 
 open my $fh, '<', $outfile or die $!;

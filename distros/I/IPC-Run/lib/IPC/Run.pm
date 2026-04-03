@@ -1163,7 +1163,7 @@ use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 
 BEGIN {
-    $VERSION = '20260401.0';
+    $VERSION = '20260402.0';
     @ISA     = qw{ Exporter };
 
     ## We use @EXPORT for the end user's convenience: there's only one function
@@ -2035,6 +2035,8 @@ sub harness {
                     croak "Process control symbol ('|', '&') missing" if $cur_kid;
                     croak "Can't spawn a subroutine on Win32"
                       if Win32_MODE && ref eq "CODE";
+                    croak "Can't run undefined command. Did you pass a reference to an undefined array?"
+                      if ref eq 'ARRAY' && @$_ && !defined( $_->[0] );
                     $cur_kid = {
                         TYPE   => 'cmd',
                         VAL    => $_,
@@ -2768,7 +2770,7 @@ sub _open_pipes {
                 }
                 _debug_desc_fd( 'writing to', $pipe ) if _debugging_details;
 
-                if ( length $$in_ref && $$in_ref ) {
+                if ( length $$in_ref ) {
                     my $c = _write( $pipe->{FD}, $$in_ref );
                     unless ( defined $c ) {
                         ## EPIPE: child closed stdin before reading all input.

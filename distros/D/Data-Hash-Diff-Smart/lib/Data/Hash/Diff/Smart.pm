@@ -14,13 +14,17 @@ our @EXPORT_OK = qw(
 	diff_test2
 );
 
-our $VERSION = '0.01';
-
-=pod
-
 =head1 NAME
 
 Data::Hash::Diff::Smart - Smart structural diff for Perl data structures
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -87,6 +91,14 @@ Choose how arrays are diffed:
 
 =back
 
+=item * array_key => 'id'
+
+When using unordered C<array_mode> with arrays of hashes,
+nominate a field to use as the identity key for matching elements across the two arrays.
+Without this, elements are compared as multisets by structure.
+
+    diff($old, $new, array_mode => 'unordered', array_key => 'id')
+
 =back
 
 =head2 diff_text($old, $new, %opts)
@@ -150,9 +162,34 @@ sub diff_test2 {
 
 1;
 
+=head1 BENCHMARKS
+
+To run all benchmarks:
+
+    perl benchmarks/bench.pl
+
+This will run diff operations on:
+
+- small structures
+- medium nested structures
+- large 5000-element arrays
+- cyclic structures (cycle detection)
+- unordered array mode
+- LCS array mode
+
+Example output:
+
+    === Benchmark: medium ===
+                 Rate
+    diff     12000/s
+
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 SEE ALSO
+
+L<Data::Hash::Patch::Smart>
 
 =head1 REPOSITORY
 

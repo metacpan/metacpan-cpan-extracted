@@ -957,6 +957,47 @@ CODE:
         }
     }
 
+    /* Shortcut */
+    {
+        SV **sc_svp = hv_fetchs(hv, "_shortcut", 0);
+        if (sc_svp && SvOK(*sc_svp) && SvROK(*sc_svp)) {
+            HV *sc_hv = (HV *)SvRV(*sc_svp);
+            SV **bindings_svp = hv_fetchs(sc_hv, "bindings", 0);
+            if (bindings_svp && SvROK(*bindings_svp)
+                && SvTYPE(SvRV(*bindings_svp)) == SVt_PVHV
+                && HvUSEDKEYS((HV *)SvRV(*bindings_svp)) > 0) {
+                if (dispatch) {
+                    dSP;
+                    int count;
+                    SV *sc_js;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(*sc_svp);
+                    PUTBACK;
+                    count = call_method("js_code", G_SCALAR);
+                    SPAGAIN;
+                    if (count > 0) {
+                        sc_js = POPs;
+                        PUSHMARK(SP);
+                        XPUSHs(*wv_svp);
+                        XPUSHs(sc_js);
+                        PUTBACK;
+                        call_method("dispatch_eval_js", G_DISCARD);
+                    }
+                    FREETMPS; LEAVE;
+                } else {
+                    dSP;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(*sc_svp);
+                    PUTBACK;
+                    call_method("inject", G_DISCARD);
+                    FREETMPS; LEAVE;
+                }
+            }
+        }
+    }
+
     /* Global JS */
     {
         SV **gjs_svp = hv_fetchs(hv, "_global_js", 0);
@@ -2154,6 +2195,138 @@ CODE:
     } else {
         RETVAL = chandra_notify_send(aTHX_ &notif);
     }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- shortcuts() — lazy accessor for Chandra::Shortcut instance ----
+
+SV *
+shortcuts(self)
+    SV *self
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **svp = hv_fetchs(hv, "_shortcut", 0);
+    if (svp && SvOK(*svp)) {
+        RETVAL = SvREFCNT_inc(*svp);
+    } else {
+        SV *sc;
+        dSP;
+        int count;
+        load_module(PERL_LOADMOD_NOIMPORT,
+            newSVpvs("Chandra::Shortcut"), NULL);
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::Shortcut")));
+        XPUSHs(sv_2mortal(newSVpvs("app")));
+        XPUSHs(self);
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        sc = (count > 0) ? newSVsv(POPs) : newSV(0);
+        PUTBACK;
+        FREETMPS; LEAVE;
+        (void)hv_stores(hv, "_shortcut", SvREFCNT_inc(sc));
+        RETVAL = sc;
+    }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- shortcut($combo, $handler, %opts) — convenience method ----
+
+SV *
+shortcut(self, combo_sv, handler, ...)
+    SV *self
+    SV *combo_sv
+    SV *handler
+CODE:
+{
+    SV *sc;
+    dSP;
+    int count;
+    I32 i;
+
+    /* Get shortcuts instance */
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(self);
+    PUTBACK;
+    count = call_method("shortcuts", G_SCALAR);
+    SPAGAIN;
+    sc = (count > 0) ? newSVsv(POPs) : newSV(0);
+    PUTBACK;
+    FREETMPS; LEAVE;
+
+    /* Call bind on it, forwarding all args */
+    {
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(sc));
+        XPUSHs(combo_sv);
+        XPUSHs(handler);
+        for (i = 3; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+        call_method("bind", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+ # ---- shortcut_map(\%map) — bulk registration ----
+
+SV *
+shortcut_map(self, map_sv)
+    SV *self
+    SV *map_sv
+CODE:
+{
+    SV *sc;
+    HV *map_hv;
+    HE *entry;
+    dSP;
+    int count;
+
+    if (!SvROK(map_sv) || SvTYPE(SvRV(map_sv)) != SVt_PVHV) {
+        croak("shortcut_map() requires a hashref");
+    }
+    map_hv = (HV *)SvRV(map_sv);
+
+    /* Get shortcuts instance */
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(self);
+    PUTBACK;
+    count = call_method("shortcuts", G_SCALAR);
+    SPAGAIN;
+    sc = (count > 0) ? newSVsv(POPs) : newSV(0);
+    PUTBACK;
+    FREETMPS; LEAVE;
+
+    /* Iterate map and bind each */
+    hv_iterinit(map_hv);
+    while ((entry = hv_iternext(map_hv)) != NULL) {
+        SV *combo_key = hv_iterkeysv(entry);
+        SV *handler_val = HeVAL(entry);
+
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sc);
+        XPUSHs(sv_2mortal(newSVsv(combo_key)));
+        XPUSHs(handler_val);
+        PUTBACK;
+        call_method("bind", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+
+    SvREFCNT_dec(sc);
+    RETVAL = SvREFCNT_inc(self);
 }
 OUTPUT:
     RETVAL

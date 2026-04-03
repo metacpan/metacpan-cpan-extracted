@@ -53,6 +53,6 @@
          "url" : "https://github.com/cpan-authors/XML-Parser"
       }
    },
-   "version" : "2.55",
+   "version" : "2.56",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

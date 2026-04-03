@@ -22,7 +22,7 @@ sieve_is(
         terms("turkey :is carved"),
         anyof(
           terms("rolls", ":are", qstr("buttered")),
-          fourpart(sides => are => [ qw(taters yams) ] => 'creamed'),
+          test(sides => { are => [ qw(taters yams) ] } => 'creamed'),
         ),
       ),
       block(terms("print", qstr("dinner"))),
@@ -57,50 +57,74 @@ sieve_is(
   ifelse(
     terms(specialuse_exists => qstr('\Snoozed')),
     block(
-      command(snooze => ':tzid'      => qstr('America/New_York'),
-                        ':mailboxid' => qstr("000-111-222"),
-                        ':addflags'  => qstr([ '$new' ]),
-                        ':weekdays'  => qstr([ 1, 2, 5 ]),
-                        ':times'     => qstr([ '9:00', '12:00' ]),
-      )
-    )
-  ),
-  <<~'END',
-  if specialuse_exists "\\Snoozed" {
-    snooze :tzid "America/New_York" :mailboxid "000-111-222" :addflags [ "$new" ] :weekdays [ "1", "2", "5" ] :times [ "9:00", "12:00" ];
-  }
-  END
-  "commands, generically formatted"
-);
-
-require Sieve::Generator::Lines::PrettyCommand;
-sieve_is(
-  ifelse(
-    terms(specialuse_exists => qstr('\Snoozed')),
-    block(
-      Sieve::Generator::Lines::PrettyCommand->new({
-        identifier => 'snooze',
-        arg_groups => [
-          [ ':tzid'      => qstr('America/New_York') ],
-          [ ':mailboxid' => qstr("000-111-222")      ],
-          [ ':addflags'  => qstr([ '$new' ])         ],
-          [ ':weekdays'  => qstr([ 1, 2, 5 ])        ],
-          [ ':times'     => qstr([ '9:00', '12:00' ])],
-        ]
+      command(snooze => {
+        'addflags'  => qstr([ '$new' ]),
+        'mailboxid' => qstr("000-111-222"),
+        'times'     => qstr([ '9:00', '12:00' ]),
+        'tzid'      => qstr('America/New_York'),
+        'weekdays'  => qstr([ 1, 2, 5 ])
       }),
     )
   ),
   <<~'END',
   if specialuse_exists "\\Snoozed" {
-    snooze :tzid "America/New_York"
+    snooze :addflags [ "$new" ]
            :mailboxid "000-111-222"
-           :addflags [ "$new" ]
-           :weekdays [ "1", "2", "5" ]
-           :times [ "9:00", "12:00" ];
+           :times [ "9:00", "12:00" ]
+           :tzid "America/New_York"
+           :weekdays [ "1", "2", "5" ];
   }
   END
-  "commands, prettily formatted"
+  "commands, generically formatted"
 );
+
+sieve_is(
+  command('whatever', { novalue => undef }, 'xyzzy'),
+  qq{whatever :novalue "xyzzy";\n},
+  "tagged arg with no value",
+);
+
+sieve_is(
+  test('whatever', { novalue => undef }, 'xyzzy'),
+  qq{whatever :novalue "xyzzy"\n},
+  "test is a command without a semicolon",
+);
+
+{
+  my $snooze = Sieve::Generator::Lines::Command->new({
+    identifier  => 'snooze',
+    tagged_args => {
+      addflags  => [ qstr([ '$new' ]) ],
+      mailboxid => [ qstr("000-111-222") ],
+      times     => [ qstr([ '9:00', '12:00' ]) ],
+      tzid      => [ qstr('America/New_York') ],
+      weekdays  => [ qstr([ 1, 2, 5 ]) ],
+    }
+  });
+
+  sieve_is(
+    ifelse(
+      terms(specialuse_exists => qstr('\Snoozed')),
+      block($snooze),
+    ),
+    <<~'END',
+    if specialuse_exists "\\Snoozed" {
+      snooze :addflags [ "$new" ]
+             :mailboxid "000-111-222"
+             :times [ "9:00", "12:00" ]
+             :tzid "America/New_York"
+             :weekdays [ "1", "2", "5" ];
+    }
+    END
+    "commands, prettily formatted"
+  );
+
+  is(
+    $snooze->_as_sieve_oneline,
+    qq{snooze :addflags [ "\$new" ] :mailboxid "000-111-222" :times [ "9:00", "12:00" ] :tzid "America/New_York" :weekdays [ "1", "2", "5" ];\n},
+    "can force long command to be one line",
+  );
+}
 
 sieve_is(
   ifelse('true', block(command('stop'))),
@@ -159,23 +183,23 @@ sieve_is(
 );
 
 sieve_is(
-  ifelse(header_exists("X-Spam-Status"), block(command('stop'))),
+  ifelse(test(exists => "X-Spam-Status"), block(command('stop'))),
   <<~'END',
   if exists "X-Spam-Status" {
     stop;
   }
   END
-  "header_exists"
+  "header exists"
 );
 
 sieve_is(
-  ifelse(not_header_exists("X-Spam-Status"), block(command('stop'))),
+  ifelse(test('not exists', "X-Spam-Status"), block(command('stop'))),
   <<~'END',
   if not exists "X-Spam-Status" {
     stop;
   }
   END
-  "not_header_exists"
+  "header not exists"
 );
 
 sieve_is(
@@ -190,7 +214,7 @@ sieve_is(
 
 sieve_is(
   ifelse(
-    string_test('is', qstr('${stop}'), qstr('Y')),
+    test(string => { is => undef }, '${stop}', 'Y'),
     block(command('stop'))
   ),
   <<~'END',
@@ -203,7 +227,7 @@ sieve_is(
 
 sieve_is(
   ifelse(
-    not_string_test('is', qstr('${stop}'), qstr('Y')),
+    test('not string' => { is => undef }, '${stop}', 'Y'),
     block(command('stop'))
   ),
   <<~'END',
@@ -215,7 +239,7 @@ sieve_is(
 );
 
 sieve_is(
-  ifelse(size('over', '100K'), block(command('stop'))),
+  ifelse(test(size => { over => undef }, \'100K'), block(command('stop'))),
   <<~'END',
   if size :over 100K {
     stop;
@@ -384,45 +408,9 @@ sieve_is(
   sieve_is($doc, "stop;\nkeep;\n", "Document::append");
 }
 
-# PrettyCommand::args flattens arg_groups
 {
-  my $cmd = Sieve::Generator::Lines::PrettyCommand->new({
-    identifier => 'snooze',
-    arg_groups => [
-      [ ':tzid', qstr('UTC') ],
-      ':standalone',
-    ],
-  });
-  my @args = $cmd->args;
-  is(@args, 3, 'PrettyCommand::args flattens array groups');
+  my $doc = sieve(var_eq(true => 'Y'));
+  sieve_is($doc, qq[string :is "\${true}" "Y"\n], "var_eq");
 }
-
-# fourpart with plain arg1 and plain arg2 (covers Qstr branch for arg1)
-sieve_is(
-  ifelse(
-    fourpart(header => is => 'Subject' => 'Hello'),
-    block(command('stop'))
-  ),
-  <<~'END',
-  if header :is "Subject" "Hello" {
-    stop;
-  }
-  END
-  "fourpart with plain arg1 and plain arg2"
-);
-
-# fourpart with ref arg2 (covers QstrList branch for arg2)
-sieve_is(
-  ifelse(
-    fourpart(header => contains => 'From' => [qw(alice@example.com bob@example.com)]),
-    block(command('stop'))
-  ),
-  <<~'END',
-  if header :contains "From" [ "alice@example.com", "bob@example.com" ] {
-    stop;
-  }
-  END
-  "fourpart with ref arg2"
-);
 
 done_testing;

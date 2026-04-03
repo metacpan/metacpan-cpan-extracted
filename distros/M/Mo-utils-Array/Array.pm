@@ -13,7 +13,7 @@ use Scalar::Util qw(blessed);
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_items check_array_object
 	check_array_required check_array_strings);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -94,10 +94,7 @@ sub check_array_strings {
 		return;
 	}
 
-	if (! defined $strings_ar) {
-		err "Parameter '$key' must have strings definition.";
-	}
-	if (ref $strings_ar ne 'ARRAY') {
+	if (defined $strings_ar && ref $strings_ar ne 'ARRAY') {
 		err "Parameter '$key' must have right string definition.";
 	}
 
@@ -110,7 +107,7 @@ sub check_array_strings {
 				'Reference', (ref $value),
 			;
 		}
-		if (none { $value eq $_ } @{$strings_ar}) {
+		if (defined $strings_ar && none { $value eq $_ } @{$strings_ar}) {
 			err "Parameter '$key' must be one of the defined strings.",
 				'Value', $value,
 				'Possible strings', "'".(join "', '", @{$strings_ar})."'",
@@ -141,11 +138,11 @@ Mo::utils::Array - Mo array utilities.
  check_array_items($self, $key, $max_items);
  check_array_object($self, $key, $class);
  check_array_required($self, $key);
- check_array_strings($self, $key, $strings_ar);
+ check_array_strings($self, $key, [$strings_ar]);
 
 =head1 DESCRIPTION
 
-Mo array utilities for checking of data objects.
+Mo utilities for checking of data objects which are array.
 
 =head1 SUBROUTINES
 
@@ -202,12 +199,13 @@ Returns undef.
 
 =head2 C<check_array_strings>
 
- check_array_strings($self, $key, $strings_ar);
+ check_array_strings($self, $key, [$strings_ar]);
 
-I<Since version 0.02.>
+I<Since version 0.05.>
 
-Check parameter defined by C<$key> which is reference to array with strings
-defined by C<$strings_ar> which is reference to array.
+Check parameter defined by C<$key> which is reference to array with strings.
+There are two use cases, first one is check only if the item is string and
+second one if string is from C<$strings_ar> optional reference to array.
 
 Put error if check isn't ok.
 
@@ -254,7 +252,6 @@ Returns undef.
                  Value: %s
                  Reference: %s
          Parameter '%s' must have right string definition.
-         Parameter '%s' must have strings definition.
 
 =head1 EXAMPLE1
 
@@ -533,6 +530,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Text::Qstr 0.001;
+package Sieve::Generator::Text::Qstr 0.002;
 # ABSTRACT: a Sieve quoted string
 
 use Moo;
@@ -43,7 +43,7 @@ Sieve::Generator::Text::Qstr - a Sieve quoted string
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,49 @@
+BOOKMARK: test
+:--------------------------------------------------------------------------------:
+HTML: <script src="/js/jq.js"></script>
+<script>var foo = {};
+$(document).ready(function () {
+    let lastLength = 0;
+
+    $.ajax({
+        url: foo.bar,
+        type: 'GET',
+        dataType: 'text',
+        cache: false,
+
+        xhr: function () {
+            const xhr = new window.XMLHttpRequest();
+
+            xhr.onprogress = function () {
+                const response = xhr.responseText;
+
+                // Replace whole content with everything received so far
+                $('.display').text(response);
+
+                // If you want only the new chunk instead, use this:
+                // const newChunk = response.substring(lastLength);
+                // $('.display').append(newChunk);
+                // lastLength = response.length;
+            };
+
+            return xhr;
+        },
+
+        success: function (response) {
+            $('.display').text(response);
+        },
+
+        error: function (xhr, status, error) {
+            console.error('Stream error:', status, error);
+        }
+    });
+});
+</script>
+TEST2: <span class=display></span>
+:--------------------------------------------------------------------------------:
+CODE1: Ajax jvar => 'foo.bar', singleton => 'FOOBAR', file => 'foobar', code => q{
+    while (1) {
+      print 123;
+      sleep 1;
+    }
+};

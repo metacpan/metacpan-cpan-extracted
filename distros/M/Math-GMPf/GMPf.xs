@@ -2397,7 +2397,9 @@ SV * overload_spaceship(pTHX_ mpf_t * a, SV * b, SV * third) {
 
        ret = Rmpf_cmp_NV(aTHX_ a, b);
        if(SWITCH_ARGS) ret *= -1;
-       return newSViv(ret);
+       if(ret < 0) return newSViv(-1);
+       if(ret > 0) return newSViv(1);
+       return newSViv(0);
      }
 
      if(sv_isobject(b)) {
@@ -3626,7 +3628,7 @@ Rmpf_get_default_prec ()
 void
 Rmpf_set_default_prec (prec)
 	SV *	prec
-        CODE:
+        PPCODE:
         Rmpf_set_default_prec(aTHX_ prec);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3706,7 +3708,7 @@ void
 _Rmpf_set_ld (q, p)
 	mpf_t *	q
 	SV *	p
-        CODE:
+        PPCODE:
         _Rmpf_set_ld(aTHX_ q, p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3714,7 +3716,7 @@ void
 _Rmpf_set_float128 (q, p)
 	mpf_t *	q
 	SV *	p
-        CODE:
+        PPCODE:
         _Rmpf_set_float128(aTHX_ q, p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3722,7 +3724,7 @@ void
 Rmpf_set_d (p, d)
 	mpf_t *	p
 	double	d
-        CODE:
+        PPCODE:
         Rmpf_set_d(p, d);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3730,7 +3732,7 @@ void
 Rmpf_set_NV (q, p)
 	mpf_t *	q
 	SV *	p
-        CODE:
+        PPCODE:
         Rmpf_set_NV(aTHX_ q, p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3752,7 +3754,7 @@ void
 Rmpf_set_IV (a, my_iv)
 	mpf_t *	a
 	SV *	my_iv
-        CODE:
+        PPCODE:
         Rmpf_set_IV(aTHX_ a, my_iv);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3819,36 +3821,36 @@ Rmpf_deref2 (p, base, n_digits)
 	mpf_t *	p
 	SV *	base
 	SV *	n_digits
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpf_deref2(aTHX_ p, base, n_digits);
-        return; /* assume stack size is correct */
+        return;
 
 void
 DESTROY (p)
 	mpf_t *	p
-        CODE:
+        PPCODE:
         DESTROY(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpf_clear (p)
 	mpf_t *	p
-        CODE:
+        PPCODE:
         Rmpf_clear(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpf_clear_mpf (p)
 	mpf_t *	p
-        CODE:
+        PPCODE:
         Rmpf_clear_mpf(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpf_clear_ptr (p)
 	mpf_t *	p
-        CODE:
+        PPCODE:
         Rmpf_clear_ptr(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3863,7 +3865,7 @@ void
 Rmpf_set_prec (p, prec)
 	mpf_t *	p
 	SV *	prec
-        CODE:
+        PPCODE:
         Rmpf_set_prec(aTHX_ p, prec);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3871,7 +3873,7 @@ void
 Rmpf_set_prec_raw (p, prec)
 	mpf_t *	p
 	SV *	prec
-        CODE:
+        PPCODE:
         Rmpf_set_prec_raw(aTHX_ p, prec);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3879,7 +3881,7 @@ void
 Rmpf_set (p1, p2)
 	mpf_t *	p1
 	mpf_t *	p2
-        CODE:
+        PPCODE:
         Rmpf_set(p1, p2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3887,7 +3889,7 @@ void
 Rmpf_set_ui (p, ul)
 	mpf_t *	p
 	unsigned long	ul
-        CODE:
+        PPCODE:
         Rmpf_set_ui(p, ul);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3895,7 +3897,7 @@ void
 Rmpf_set_si (p, l)
 	mpf_t *	p
 	long	l
-        CODE:
+        PPCODE:
         Rmpf_set_si(p, l);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3903,7 +3905,7 @@ void
 Rmpf_set_z (p, z)
 	mpf_t *	p
 	mpz_t *	z
-        CODE:
+        PPCODE:
         Rmpf_set_z(p, z);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3911,7 +3913,7 @@ void
 Rmpf_set_q (p, q)
 	mpf_t *	p
 	mpq_t *	q
-        CODE:
+        PPCODE:
         Rmpf_set_q(p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3920,7 +3922,7 @@ Rmpf_set_str (p, str, base)
 	mpf_t *	p
 	SV *	str
 	int	base
-        CODE:
+        PPCODE:
         Rmpf_set_str(aTHX_ p, str, base);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -3928,7 +3930,7 @@ void
 Rmpf_swap (p1, p2)
 	mpf_t *	p1
 	mpf_t *	p2
-        CODE:
+        PPCODE:
         Rmpf_swap(p1, p2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4120,17 +4122,17 @@ Rmpf_get_ui (p)
 void
 Rmpf_get_d_2exp (n)
 	mpf_t *	n
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpf_get_d_2exp(aTHX_ n);
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpf_add (dest, src1, src2)
 	mpf_t *	dest
 	mpf_t *	src1
 	mpf_t *	src2
-        CODE:
+        PPCODE:
         Rmpf_add(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4139,7 +4141,7 @@ Rmpf_add_ui (dest, src, num)
 	mpf_t *	dest
 	mpf_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpf_add_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4148,7 +4150,7 @@ Rmpf_sub (dest, src1, src2)
 	mpf_t *	dest
 	mpf_t *	src1
 	mpf_t *	src2
-        CODE:
+        PPCODE:
         Rmpf_sub(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4157,7 +4159,7 @@ Rmpf_sub_ui (dest, src, num)
 	mpf_t *	dest
 	mpf_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpf_sub_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4166,7 +4168,7 @@ Rmpf_ui_sub (dest, num, src)
 	mpf_t *	dest
 	unsigned long	num
 	mpf_t *	src
-        CODE:
+        PPCODE:
         Rmpf_ui_sub(dest, num, src);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4175,7 +4177,7 @@ Rmpf_mul (dest, src1, src2)
 	mpf_t *	dest
 	mpf_t *	src1
 	mpf_t *	src2
-        CODE:
+        PPCODE:
         Rmpf_mul(dest, src1, src2);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4184,7 +4186,7 @@ Rmpf_mul_ui (dest, src, num)
 	mpf_t *	dest
 	mpf_t *	src
 	unsigned long	num
-        CODE:
+        PPCODE:
         Rmpf_mul_ui(dest, src, num);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4193,7 +4195,7 @@ Rmpf_div (d, p, q)
 	mpf_t *	d
 	mpf_t *	p
 	mpf_t *	q
-        CODE:
+        PPCODE:
         Rmpf_div(d, p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4202,7 +4204,7 @@ Rmpf_ui_div (d, p, q)
 	mpf_t *	d
 	unsigned long	p
 	mpf_t *	q
-        CODE:
+        PPCODE:
         Rmpf_ui_div(d, p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4211,7 +4213,7 @@ Rmpf_div_ui (d, p, q)
 	mpf_t *	d
 	mpf_t *	p
 	unsigned long	q
-        CODE:
+        PPCODE:
         Rmpf_div_ui(d, p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4219,7 +4221,7 @@ void
 Rmpf_sqrt (r, x)
 	mpf_t *	r
 	mpf_t *	x
-        CODE:
+        PPCODE:
         Rmpf_sqrt(r, x);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4227,7 +4229,7 @@ void
 Rmpf_sqrt_ui (r, x)
 	mpf_t *	r
 	unsigned long	x
-        CODE:
+        PPCODE:
         Rmpf_sqrt_ui(r, x);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4236,7 +4238,7 @@ Rmpf_pow_ui (r, num, pow)
 	mpf_t *	r
 	mpf_t *	num
 	unsigned long	pow
-        CODE:
+        PPCODE:
         Rmpf_pow_ui(r, num, pow);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4244,7 +4246,7 @@ void
 Rmpf_neg (r, x)
 	mpf_t *	r
 	mpf_t *	x
-        CODE:
+        PPCODE:
         Rmpf_neg(r, x);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4252,7 +4254,7 @@ void
 Rmpf_abs (r, x)
 	mpf_t *	r
 	mpf_t *	x
-        CODE:
+        PPCODE:
         Rmpf_abs(r, x);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4261,7 +4263,7 @@ Rmpf_mul_2exp (r, x, s)
 	mpf_t *	r
 	mpf_t *	x
 	SV *	s
-        CODE:
+        PPCODE:
         Rmpf_mul_2exp(aTHX_ r, x, s);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4270,7 +4272,7 @@ Rmpf_div_2exp (r, x, s)
 	mpf_t *	r
 	mpf_t *	x
 	SV *	s
-        CODE:
+        PPCODE:
         Rmpf_div_2exp(aTHX_ r, x, s);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4285,7 +4287,7 @@ Rmpf_reldiff (d, p, q)
 	mpf_t *	d
 	mpf_t *	p
 	mpf_t *	q
-        CODE:
+        PPCODE:
         Rmpf_reldiff(d, p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4297,7 +4299,7 @@ void
 Rmpf_ceil (p, q)
 	mpf_t *	p
 	mpf_t *	q
-        CODE:
+        PPCODE:
         Rmpf_ceil(p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4305,7 +4307,7 @@ void
 Rmpf_floor (p, q)
 	mpf_t *	p
 	mpf_t *	q
-        CODE:
+        PPCODE:
         Rmpf_floor(p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4313,7 +4315,7 @@ void
 Rmpf_trunc (p, q)
 	mpf_t *	p
 	mpf_t *	q
-        CODE:
+        PPCODE:
         Rmpf_trunc(p, q);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4501,7 +4503,7 @@ OUTPUT:  RETVAL
 void
 Rmpf_urandomb (p, ...)
 	SV *	p
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpf_urandomb(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
@@ -4509,7 +4511,7 @@ Rmpf_urandomb (p, ...)
 void
 Rmpf_random2 (x, ...)
 	SV *	x
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpf_random2(aTHX_ x);
         XSRETURN_EMPTY; /* return empty stack */
@@ -4677,7 +4679,7 @@ overload_inc (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-        CODE:
+        PPCODE:
         overload_inc(aTHX_ p, second, third);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4686,7 +4688,7 @@ overload_dec (p, second, third)
 	SV *	p
 	SV *	second
 	SV *	third
-        CODE:
+        PPCODE:
         overload_dec(aTHX_ p, second, third);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4762,14 +4764,14 @@ nok_pokflag ()
 void
 clear_nok_pok ()
 
-        CODE:
+        PPCODE:
         clear_nok_pok();
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 set_nok_pok (x)
 	int	x
-        CODE:
+        PPCODE:
         set_nok_pok(x);
         XSRETURN_EMPTY; /* return empty stack */
 

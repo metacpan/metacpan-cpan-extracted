@@ -109,13 +109,13 @@ void MDinit(dword *MDbuf);
  *  initializes MDbuffer to "magic constants"
  */
 
-void rmd160_compress(dword *MDbuf, dword *X);
+void rmd160_compress(dword *MDbuf, const dword *X);
 /*
  *  the compression function.
  *  transforms MDbuf using message bytes X[0] through X[15]
  */
 
-void MDfinish(dword *MDbuf, byte *strptr, dword lswlen, dword mswlen);
+void MDfinish(dword *MDbuf, const byte *strptr, dword lswlen, dword mswlen);
 /*
  *  puts bytes from strptr into X and pad out; appends length 
  *  and finally, compresses the last block(s)

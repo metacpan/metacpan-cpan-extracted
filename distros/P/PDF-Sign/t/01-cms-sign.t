@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use File::Basename qw(dirname);
+use File::Spec;
 
 # skip entire test if openssl not available
 my $quiet = ($^O eq 'MSWin32' ? '2>nul' : '2>/dev/null');
@@ -14,6 +16,8 @@ my $tmpdir = tempdir(CLEANUP => 1);
 my $cert   = "$tmpdir/cert.pem";
 my $key    = "$tmpdir/key.pem";
 my $infile = "$tmpdir/input.pdf";
+my $tdir    = dirname(__FILE__);
+my $cnf     = File::Spec->catfile($tdir, 'openssl.cnf');
 
 # ============================================================
 # generate self-signed certificate for testing
@@ -25,7 +29,7 @@ my $gen = system(
     '-days',   '1',
     '-nodes',
     '-subj',   '/C=IT/O=PDF-Sign-Test/CN=PDF-Sign Test Certificate',
-	'-config', 'openssl.cnf',
+    '-config', $cnf
 );
 plan skip_all => 'openssl could not generate test certificate' if $gen != 0;
 ok(-e $cert, 'self-signed certificate generated');

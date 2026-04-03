@@ -1,5 +1,13 @@
 Revision history for Perl extension XML::Parser.
 
+2.56 2026-04-02 (by Todd Rinaldo)
+
+  Fixes:
+    - PR #223 Skip original_string test when expat lacks
+      XML_CONTEXT_BYTES, fixing false test failures on platforms
+      where libexpat is compiled without XML_CONTEXT_BYTES (e.g.
+      DragonFlyBSD system expat)
+
 2.55 2026-04-01 (by Todd Rinaldo)
 
   Fixes:

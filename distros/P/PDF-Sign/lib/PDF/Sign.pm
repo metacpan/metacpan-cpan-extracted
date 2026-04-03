@@ -54,7 +54,7 @@ use Cwd qw(getcwd);
 use POSIX qw(strftime);
 use MIME::Base64 qw(decode_base64);
 use File::Slurp qw(write_file);
-# Crypt::OpenSSL::X509 intentionally not used — XS dependency with
+# Crypt::OpenSSL::X509 intentionally not used - XS dependency with
 # known installation issues on macOS (missing OpenSSL headers).
 # Subject name extracted via openssl binary instead.
 
@@ -69,32 +69,31 @@ BEGIN {
         $PDF_BACKEND = 'PDF::Builder';
         require PDF::Builder::Basic::PDF::Utils;
         PDF::Builder::Basic::PDF::Utils->import();
-        
-    } else {
-        die "PDF::Sign requires PDF::API2 or PDF::Builder\n";
+
     }
+
     sub PDFLiteral {
-		if ($PDF_BACKEND eq 'PDF::API2'){
-			return PDF::API2::Basic::PDF::Literal->new(@_);
-		}
-		if ($PDF_BACKEND eq 'PDF::Builder'){
-			return PDF::Builder::Basic::PDF::Literal->new(@_);
-		}
-	}
-	sub PDFForm {
-		if ($PDF_BACKEND eq 'PDF::API2'){
-			return PDF::API2::Resource::XObject::Form->new(@_);
-		}
-		if ($PDF_BACKEND eq 'PDF::Builder'){
-			return PDF::Builder::Resource::XObject::Form->new(@_);
-		}
-	}
+        if ($PDF_BACKEND eq 'PDF::API2'){
+            return PDF::API2::Basic::PDF::Literal->new(@_);
+        }
+        if ($PDF_BACKEND eq 'PDF::Builder'){
+            return PDF::Builder::Basic::PDF::Literal->new(@_);
+        }
+    }
+    sub PDFForm {
+        if ($PDF_BACKEND eq 'PDF::API2'){
+            return PDF::API2::Resource::XObject::Form->new(@_);
+        }
+        if ($PDF_BACKEND eq 'PDF::Builder'){
+            return PDF::Builder::Resource::XObject::Form->new(@_);
+        }
+    }
 }
 
 # LWP fallback detection (curl preferred)
 my $HAS_LWP = eval { require LWP::UserAgent; 1 };
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT_OK = qw(
     config
@@ -124,7 +123,9 @@ our $x509_chain;
 our $privkey_pem;
 our $tsaserver  = 'http://timestamp.digicert.com';
 our $tmpdir     = getcwd();
-our $siglen     = 1024 * ($PDF_BACKEND eq 'PDF::Builder' ? 8 : 8);
+# Investigation on PDF::Buider breaking lenght of byterange
+
+our $siglen     = 1024 * (($PDF_BACKEND // '') eq 'PDF::Builder' ? 8 : 8);
 our $debug      = 0;
 
 my $zerorange   = sprintf("0 %8d %8d %8d", 0, 0, 0);
@@ -181,7 +182,7 @@ sub config {
     # re-detect openssl version and cms availability if osslcmd changed
     if (exists $args{osslcmd}) {
         open(my $fh, '-|', $osslcmd, 'version')
-            or die "Cannot exec openssl: $!";
+            or die "Cannot exec $osslcmd: $!";
         $osslv = do { local $/; <$fh> };
         close $fh;
         chomp $osslv;
@@ -296,7 +297,7 @@ sub prepare_file {
     }
 
     my $acroformdict = PDFDict();
-    $acroformdict->{Fields}   = PDFArray @formarray;
+    $acroformdict->{Fields}   = PDFArray(@formarray);
     $acroformdict->{SigFlags} = PDFNum(3);
     $acroformdict = $p->new_obj($acroformdict);
 
@@ -364,6 +365,8 @@ sub prepare_ts {
     my $sigdict           = PDFDict();
     $sigdict->{Type}      = PDFName("DocTimeStamp");
     $sigdict->{Filter}    = PDFName("Adobe.PPKLite");
+    # Ongoing investigation: first the chicken or the egg, the timestamp how do you know it first
+    # seems to be correct not to indicate it here
     if ($^O eq 'linux') {
         #$sigdict->{M} = PDFStr(substr(strftime("D:%Y%m%d%H%M%S%z", localtime), 0, 19) . "'00'");
     } else {
@@ -400,7 +403,7 @@ sub prepare_ts {
         my $signprec = $pdf->{catalog}->{AcroForm}->{' objnum'} - 1;
         push @formarray, PDFLiteral("$signprec 0 R");
     }
-    $acroformdict->{Fields}   = PDFArray @formarray;
+    $acroformdict->{Fields}   = PDFArray(@formarray);
     $acroformdict->{SigFlags} = PDFNum(3);
     $acroformdict = $p->new_obj($acroformdict);
     $pdf->{catalog}->{'AcroForm'} = $acroformdict;
@@ -542,18 +545,33 @@ sub ts_query {
     my (%args) = @_;
     # args: in (file to timestamp), out (output .tsq file)
 
+    # sanitize paths — strip double quotes to prevent shell injection
+    # (shell form used intentionally for stderr redirection, see note above)
+    (my $in_safe  = $args{in})  =~ s/\"//g;
+    (my $out_safe = $args{out}) =~ s/\"//g;
+
+    # NOTE: shell form used intentionally here (not list form) to allow
+    # stderr redirection (2>/dev/null) and suppress openssl noise:
+    #   "Using configuration from openssl.cnf"
+    # This is acceptable in CGI/Apache context where error_log pollution
+    # is a real operational concern. The input paths come from caller-
+    # controlled configuration, not from external user input.
+
     my @cmd = (
         $osslcmd,
         'ts', '-query',
-        '-data', $args{in},
+        '-data', "\"$in_safe\"",
         '-sha256', '-cert',
-        '-out',    $args{out},
+        '-out',  "\"$out_safe\"",
     );
-
     # use openssl.cnf only if present in current directory
-    push @cmd, '-config', 'openssl.cnf' if -e 'openssl.cnf';
+    # avoid logging "Using configuration from openssl.cnf" in STDERR
+    my $null = ($^O eq 'MSWin32' ? 'nul' : '/dev/null');
 
-    open(my $fh, '-|', @cmd)
+    push @cmd, '-config', "openssl.cnf", "2>$null" if -e 'openssl.cnf';
+
+    local $" = " ";
+    open(my $fh, '-|', "@cmd")
         or die "Cannot exec openssl ts: $!";
     # output goes to .tsq file, stdout is empty
     close $fh
@@ -649,24 +667,6 @@ sub tsa_fetch {
 #
 # Verification uses openssl with -noverify (no CA chain check) by default.
 # Pass ca_bundle => '/path/to/ca.pem' to enable full chain verification.
-# ============================================================
-# ============================================================
-# sub: verify_signatures
-# Reads and verifies all digital signatures in a PDF file.
-# Returns an arrayref of hashrefs, one per signature field:
-#
-#   [{
-#     type       => 'cms' | 'tsa',
-#     subfilter  => 'ETSI.CAdES.detached' | 'adbe.pkcs7.detached' | 'ETSI.RFC3161',
-#     signer     => 'CN=..., O=...',       # subject from sig dict or openssl output
-#     signed_at  => 'D:20260329...',       # /M field from sig dict (cms only)
-#     tsa_at     => '...',                 # timestamp from TSA token (tsa only)
-#     valid      => '1' | '',             # cryptographic verification result
-#     error      => '...',                # error message if valid is ''
-#   }, ...]
-#
-# Verification uses openssl with -noverify (no CA chain check) by default.
-# Pass ca_bundle => '/path/to/ca.pem' to enable full chain verification.
 #
 # Uses PDF::API2 (or PDF::Builder) to walk AcroForm signature fields,
 # and extracts the DER blob directly from the ByteRange gap in the raw PDF.
@@ -676,17 +676,6 @@ sub verify_signatures {
     my $ca_bundle = $args{ca_bundle};
 
     die "verify_signatures: file not found: $pdf_path\n" unless -e $pdf_path;
-
-    # load PDF backend
-    my $backend;
-    if (eval { require PDF::API2; 1 }) {
-        $backend = 'PDF::API2';
-    } elsif (eval { require PDF::Builder; 1 }) {
-        $backend = 'PDF::Builder';
-    } else {
-        die "verify_signatures requires PDF::API2 or PDF::Builder\n";
-    }
-    require PDF::API2::Basic::PDF::Utils;
 
     # read raw PDF bytes — needed for ByteRange gap extraction
     open(my $fh, '<:raw', $pdf_path) or die "Cannot read $pdf_path: $!";
@@ -712,17 +701,17 @@ sub verify_signatures {
     my @results;
 
     # open PDF via PDF::API2 to walk AcroForm signature fields
-    my $pdf = $backend->open($pdf_path);
+    my $pdf = $PDF_BACKEND->open($pdf_path);
 
     my $acroform = $pdf->{catalog}->{AcroForm};
     return [] unless $acroform;
     $acroform = $acroform->realise
-        if $acroform->isa('PDF::API2::Basic::PDF::Objind');
+        if $acroform->isa($PDF_BACKEND.'::Basic::PDF::Objind');
 
     my $fields = $acroform->{Fields};
     return [] unless $fields;
     $fields = $fields->realise
-        if $fields->isa('PDF::API2::Basic::PDF::Objind');
+        if $fields->isa($PDF_BACKEND.'::Basic::PDF::Objind');
 
     my @field_list = $fields->elements;
 
@@ -731,7 +720,7 @@ sub verify_signatures {
     for my $field_ref (@field_list) {
         my $field = $field_ref;
         $field = $field->realise
-            if $field->isa('PDF::API2::Basic::PDF::Objind');
+            if $field->isa($PDF_BACKEND.'::Basic::PDF::Objind');
 
         # only process signature fields
         my $ft = $field->{FT} or next;
@@ -740,7 +729,7 @@ sub verify_signatures {
         # get signature value dict
         my $sigval = $field->{V} or next;
         $sigval = $sigval->realise
-            if $sigval->isa('PDF::API2::Basic::PDF::Objind');
+            if $sigval->isa($PDF_BACKEND.'::Basic::PDF::Objind');
 
         # extract metadata from sig dict
         my $subfilter = $sigval->{SubFilter} ? $sigval->{SubFilter}->val : '';
@@ -816,7 +805,7 @@ sub verify_signatures {
         if ($type eq 'cms') {
             # -binary: treat content as binary (required for PDF byte streams)
             # -out /dev/null: suppress verified content on stdout
-			my $null = ($^O eq 'MSWin32' ? 'nul' : '/dev/null');
+            my $null = ($^O eq 'MSWin32' ? 'nul' : '/dev/null');
             my $out = `$osslcmd cms -verify -binary -in \Q$tmp_der\E -inform DER -content \Q$tmp_content\E -out $null $noverify 2>&1`;
             if ($? == 0 || $out =~ /Verification successful/i) {
                 $valid = '1';
@@ -896,7 +885,7 @@ sub _cert_subject {
 
 # ============================================================
 # internal: _which
-# Portable `which` — returns full path of binary or undef.
+# Portable `which` - returns full path of binary or undef.
 # ============================================================
 sub _which {
     my $bin = shift;
@@ -905,6 +894,16 @@ sub _which {
         return $full if -x $full;
     }
     return undef;
+}
+unless ($PDF_BACKEND) {
+    # installa stub che muoiono per le funzioni che richiedono il backend
+    no warnings 'redefine';
+    no strict 'refs';
+    for my $fn (qw(prepare_file sign_file prepare_ts ts_file)) {
+        *{"PDF::Sign::$fn"} = sub {
+            die "PDF::Sign: $fn requires PDF::API2 or PDF::Builder\n";
+        };
+    }
 }
 
 1;
@@ -992,7 +991,7 @@ Directory for temporary files. Default: current working directory.
 
 =item C<$PDF::Sign::siglen>
 
-Signature buffer size in bytes. Default: 8192 (1024*8).
+Signature buffer size in bytes. Default: 6144 (1024*6).
 Increase if signatures are truncated.
 
 =item C<$PDF::Sign::debug>
@@ -1005,7 +1004,7 @@ Enable debug output. Default: 0.
 
 =head2 config(%args)
 
-Configure PDF::Sign in one call. All keys are optional — only provided
+Configure PDF::Sign in one call. All keys are optional - only provided
 keys are updated. Recommended over setting package variables directly.
 
     config(
@@ -1015,7 +1014,7 @@ keys are updated. Recommended over setting package variables directly.
         privkey_pem => '/path/to/privkey.pem',
         tsaserver   => 'http://timestamp.digicert.com',
         tmpdir      => '/tmp',
-        siglen      => 8192,
+        siglen      => 6144,
         debug       => 1,
     );
 

@@ -7,7 +7,7 @@
 =head1 DEPENDENCIES
 
    This module needs the GMP C library - available from:
-   http://gmplib.org
+   L<https://gmplib.org>
 
 =head1 DESCRIPTION
 
@@ -15,7 +15,7 @@
    Basically this module simply wraps all of the 'mpf'
    floating point functions provided by that library.
    The documentation below extensively plagiarises the
-   GMP documentation at https://gmplib.org .
+   GMP documentation at L<https://gmplib.org> .
    See the Math::GMPf test suite for some examples
    of usage.
 
@@ -838,7 +838,7 @@
 
    This program is free software; you may redistribute it and/or
    modify it under the same terms as Perl itself.
-   Copyright 2006-2023 Sisyphus
+   Copyright 2006-2023, 2025-26 Sisyphus
 
 =head1 AUTHOR
 

@@ -8,7 +8,7 @@ use Test::Most;
 
 BEGIN { use_ok('App::Test::Generator') }
 
-throws_ok(sub { App::Test::Generator::generate() }, qr/^Usage: /, 'Dies with no args');
+throws_ok(sub { App::Test::Generator->generate() }, qr/^Usage: /, 'Dies with no args');
 
 my $dir = tempdir(CLEANUP => 1);
 my $conf_file = File::Spec->catfile($dir, 'example.yml');
@@ -33,7 +33,7 @@ close $fh;
 		$warnings .= $_[0];
 	};
 
-	App::Test::Generator::generate($conf_file);
+	App::Test::Generator->generate($conf_file);
 
 	like($warnings, qr/Module .+ not found/, 'Error generated when a module is not found');
 }
@@ -59,7 +59,7 @@ CONF
 
 close $fh;
 
-throws_ok(sub { App::Test::Generator::generate($conf_file) }, qr/not_there_at_all:\s/, 'Dies when yaml_cases file is not found');
+throws_ok(sub { App::Test::Generator->generate($conf_file) }, qr/not_there_at_all:\s/, 'Dies when yaml_cases file is not found');
 
 unlink $conf_file;
 
@@ -73,7 +73,7 @@ CONF
 
 close $fh;
 
-lives_ok(sub { App::Test::Generator::generate($conf_file) }, 'Tests no input or output passes');
+lives_ok(sub { App::Test::Generator->generate($conf_file) }, 'Tests no input or output passes');
 
 unlink $conf_file;
 
@@ -91,6 +91,6 @@ CONF
 
 close $fh;
 
-throws_ok(sub { App::Test::Generator::generate($conf_file) }, qr/Invalid type/, 'Type must be sensible');
+throws_ok(sub { App::Test::Generator->generate($conf_file) }, qr/Invalid type/, 'Type must be sensible');
 
 done_testing();

@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::Array qw(check_array_strings);
 use Readonly;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 12;
 use Test::NoWarnings;
 
 Readonly::Array our @POSSIBLE_STRINGS => qw(foo bar);
@@ -14,8 +14,22 @@ Readonly::Array our @POSSIBLE_STRINGS => qw(foo bar);
 my $self = {
 	'key' => ['foo'],
 };
-my $ret = check_array_strings($self, 'key', \@POSSIBLE_STRINGS);
+my $ret = check_array_strings($self, 'key');
+is($ret, undef, 'Right structure (one of strings, without possible strings).');
+
+# Test.
+$self = {
+	'key' => ['foo'],
+};
+$ret = check_array_strings($self, 'key', \@POSSIBLE_STRINGS);
 is($ret, undef, 'Right structure (one of strings).');
+
+# Test.
+$self = {
+	'key' => [],
+};
+$ret = check_array_strings($self, 'key');
+is($ret, undef, 'Right structure (none of strings, without possible strings).');
 
 # Test.
 $self = {
@@ -28,6 +42,17 @@ is($ret, undef, 'Right structure (none of strings).');
 $self = {};
 $ret = check_array_strings($self, 'key', \@POSSIBLE_STRINGS);
 is($ret, undef, 'Right structure (no key).');
+
+# Test.
+$self = {
+	'key' => 'foo',
+};
+eval {
+	check_array_strings($self, 'key');
+};
+is($EVAL_ERROR, "Parameter 'key' must be a array.\n",
+	"Parameter 'key' must be a array (string).");
+clean();
 
 # Test.
 $self = {
@@ -49,17 +74,6 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'key' must be a array.\n",
 	"Parameter 'key' must be a array (undef).");
-clean();
-
-# Test.
-$self = {
-	'key' => [],
-};
-eval {
-	check_array_strings($self, 'key');
-};
-is($EVAL_ERROR, "Parameter 'key' must have strings definition.\n",
-	"Parameter 'key' must have strings definition (no definition).");
 clean();
 
 # Test.

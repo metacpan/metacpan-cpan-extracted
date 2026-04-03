@@ -1,4 +1,4 @@
-[\![testsuite](https://github.com/cpan-authors/Net-Ident/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions/workflows/testsuite.yml)
+[![testsuite](https://github.com/cpan-authors/Net-Ident/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions/workflows/testsuite.yml)
 
 # NAME
 
@@ -7,12 +7,12 @@ Net::Ident - lookup the username on the remote end of a TCP/IP connection
 # SYNOPSIS
 
     use Net::Ident;
-    
+
     $username = Net::Ident::lookup(SOCKET, $timeout);
 
     $username = Net::Ident::lookupFromInAddr($localsockaddr,
                                               $remotesockaddr, $timeout);
-    
+
     $obj = Net::Ident->new(SOCKET, $timeout);
     $obj = Net::Ident->newFromInAddr($localsockaddr, $remotesockaddr,
                                            $timeout);
@@ -22,9 +22,9 @@ Net::Ident - lookup the username on the remote end of a TCP/IP connection
     ($username, $opsys, $error) = $obj->username;
     $fh = $obj->getfh;
     $txt = $obj->geterror;
-    
+
     use Net::Ident 'ident_lookup';
-    
+
     $username = ident_lookup(SOCKET, $timeout);
 
     use Net::Ident 'lookupFromInAddr';
@@ -109,8 +109,6 @@ calling method, these routines behave exactly the same.
     parameter specifies the timeout in seconds, just like the timeout parameter
     of the function calls above.
 
-
-
     Some people do not like the way that \`\`proper'' object design is broken
     by letting one module add methods to another class. This is why, starting
     from version 1.20, you have to explicitly ask for this behaviour to occur.
@@ -188,9 +186,9 @@ that has a suitable ident daemon installed.
     # $Net::Ident::DEBUG = 2;
     use Socket;
     use strict;
-    
+
     sub logmsg { print "$0 $$: @_ at ", scalar localtime, "\n" }
-    
+
     my $port = shift || 2345;
     my $proto = getprotobyname('tcp');
     socket(Server, PF_INET, SOCK_STREAM, $proto) or die "socket: $!";
@@ -198,20 +196,20 @@ that has a suitable ident daemon installed.
       die "setsockopt: $!";
     bind(Server, sockaddr_in($port, INADDR_ANY)) or die "bind: $!";
     listen(Server,SOMAXCONN) or die "listen: $!";
-    
+
     logmsg "server started on port $port";
-    
+
     my $paddr;
-    
+
     for ( ; $paddr = accept(Client,Server); close Client) {
         my($port,$iaddr) = sockaddr_in($paddr);
         my $name = gethostbyaddr($iaddr,AF_INET) || inet_ntoa($iaddr);
         logmsg "connection from $name [" . inet_ntoa($iaddr) .
           "] at port $port";
-       
+
         my $username = Client->ident_lookup(30) || "~unknown";
         logmsg "User at $name:$port is $username";
-        
+
         print Client "Hello there, $username\@$name, it's now ",
            scalar localtime, "\n";
     }

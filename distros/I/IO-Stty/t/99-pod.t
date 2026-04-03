@@ -1,5 +1,8 @@
 #!perl -T
 
+use strict;
+use warnings;
+
 use Test::More;
 
 plan skip_all => "\$ENV{RELEASE_TESTING} required for these tests" if(!$ENV{RELEASE_TESTING});

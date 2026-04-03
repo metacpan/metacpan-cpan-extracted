@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
+use Cwd qw(abs_path);
 use Getopt::Long;
 use JSON::MaybeXS;
 use File::Find;
+use File::Spec;
 use Time::HiRes qw(time);
 use Pod::Usage;
 
@@ -162,9 +164,19 @@ The output structure:
         survived => [ ... mutant IDs ... ]
     }
 
+=head2 --cover_json <file>
+
+The location of the file generatated by C<cover -report json>.
+That file is used to generate an approximation for an LCSAJ table.
+
 =head2 --fail-fast
 
 (Reserved for future use.)
+
+=head2 --mutation_level <full|fast>
+
+Setting to C<fast> removes redundant mutations and dedups mutations before running.
+The default is C<full>.
 
 =head2 --timeout <seconds>
 
@@ -326,30 +338,37 @@ The mutation testing process follows this execution flow:
 =cut
 
 my %opt = (
-	lib        => 'lib',
-	tests      => 't',
-	min_score  => 0,
-	fail_fast  => 0,
-	verbose    => 0,
-	quiet      => 0,
+	lib => 'lib',
+	tests => 't',
+	min_score => 0,
+	fail_fast => 0,
+	verbose => 0,
+	quiet => 0,
 	man	=> 0,
 	help	=> 0,
 	html => 0,
+	mutation_level => 'full',
+	lcsaj_root  => 'lcsaj',
+	lcsaj_hits => 'cover_html/lcsaj_hits.json',
 );
 
 GetOptions(
-	'lib=s'        => \$opt{lib},
-	'file=s'       => \$opt{file},
-	'tests=s'      => \$opt{tests},
-	'min-score=i'  => \$opt{min_score},
-	'json=s'       => \$opt{json},
-	'fail-fast'    => \$opt{fail_fast},
-	'timeout=i'    => \$opt{timeout},
-	'verbose'      => \$opt{verbose},
-	'quiet'        => \$opt{quiet},
-	'help|h'          => \$opt{help},
+	'lib=s' => \$opt{lib},
+	'file=s' => \$opt{file},
+	'tests=s' => \$opt{tests},
+	'min-score=i' => \$opt{min_score},
+	'cover_json=s' => \$opt{cover_json},
+	'json=s' => \$opt{json},
+	'fail-fast' => \$opt{fail_fast},
+	'timeout=i' => \$opt{timeout},
+	'verbose' => \$opt{verbose},
+	'quiet' => \$opt{quiet},
+	'help|h' => \$opt{help},
 	'html=s'	=> \$opt{html},
-	'man|m'           => \$opt{man},
+	'mutation_level=s'	=> \$opt{mutation_level},
+	'man|m' => \$opt{man},
+	'lcsaj_root=s'  => \$opt{lcsaj_root},
+	'lcsaj_hits=s' => \$opt{lcsaj_hits},
 ) or pod2usage(3);
 
 pod2usage(-exitval => 0, -verbose => 1) if $opt{help};
@@ -364,13 +383,16 @@ my @files;
 if ($opt{file}) {
 	push @files, $opt{file};
 } else {
-    find(
-        sub {
-            push @files, $File::Find::name if /\.pm$/;
-        },
-        $opt{lib}
-    );
+	find(
+		sub {
+			push @files, $File::Find::name if /\.pm$/;
+		},
+		$opt{lib}
+	);
 }
+
+# Pass target files to LCSAJ runtime debugger
+$ENV{LCSAJ_TARGETS} = join(':', map { abs_path($_) } @files);
 
 # -------------------------
 # Verify baseline tests
@@ -378,7 +400,7 @@ if ($opt{file}) {
 
 print "Running baseline tests...\n" if $opt{verbose};
 
-if (system("prove -l $opt{tests}") != 0) {
+if (system("prove -Mblib -l $opt{tests}") != 0) {
 	print STDERR "Baseline tests failed.\n";
 	exit 2;
 }
@@ -396,40 +418,98 @@ for my $file (@files) {
 	my $mutator = App::Test::Generator::Mutator->new(
 		file => $file,
 		lib_dir => $opt{lib},
+		mutation_level => $opt{mutation_level},
 	);
+
+	# ------------------------------------------------------------
+	# Group mutants by mutation site
+	# ------------------------------------------------------------
 
 	my @mutants = $mutator->generate_mutants();
 
-	for my $mutant (@mutants) {
+	my $groups = {};
+
+	if ($opt{mutation_level} eq 'fast') {
+		$groups = group_mutants($file, \@mutants);
+	} else {
+		$groups = { map { $_->id => [$_] } @mutants };
+	}
+
+	for my $group (values %$groups) {
+		my $mutant = representative_mutant($group);
+
+		print 'Testing representative mutant ',
+			$mutant->id,
+			" ($file line ",
+			$mutant->line,
+			') representing ',
+			scalar(@$group),
+			" mutants\n" if $opt{verbose};
+
+		# Now run mutation test using only this representative
 		my $workspace = $mutator->prepare_workspace();
 
 		$mutator->apply_mutant($mutant);
 
-		local $ENV{PERL5LIB} = "$workspace:$workspace/lib" . ($ENV{PERL5LIB} ? ":$ENV{PERL5LIB}" : '');
+		# The workspace contains a full copy of lib/ with just the mutant applied.
+		# We point PERL5LIB at it so prove picks up the mutated module instead of
+		# the original, without -Mblib overriding us by loading the project's own
+		# blib/ first.
+		local $ENV{PERL5LIB} = File::Spec->catfile($workspace, $opt{lib}) . ($ENV{PERL5LIB} ? ":$ENV{PERL5LIB}" : '');
 
 		my $compile = system($^X, '-c', File::Spec->catfile($workspace, $file));
-		next if $compile != 0;	# skip invalid mutants
+		next if $compile != 0;
+
+		# warn "WORKSPACE: $workspace\n";
+		# warn "WORKSPACE lib contents: " . join(', ', glob("$workspace/lib/*")) . "\n";
+		# warn "PERL5LIB: $ENV{PERL5LIB}\n";
+
+		# Clear PERL5OPT to prevent any -Ilib or other flags from overriding
+		# the workspace PERL5LIB. If PERL5OPT contains -Ilib, prove will load
+		# modules from the project's own lib/ directory instead of the mutated
+		# workspace, causing all mutants to survive regardless of the mutation.
+		local $ENV{PERL5OPT} = '';
 
 		my $survived = (system('prove', $opt{tests}) == 0);
 
-		$total++;
-
+		# --------------------------------------------------
+		# If tests pass → mutant survived
+		# --------------------------------------------------
 		if ($survived) {
-			push @survivors, {
-				id => $mutant->id(),
-				line => $mutant->line(),
-				file => $file,
-				description => $mutant->description(),
-				status => 'Survived'
-			};
+			# representative survived
+			# mark entire group as survived
+
+			for my $m (@$group) {
+				my $difficulty = mutation_difficulty($m);
+
+				push @survivors, {
+					id          => $m->id(),
+					line        => $m->line(),
+					file        => $file,
+					description => $m->description(),
+					status      => 'Survived',
+					difficulty  => $difficulty->{label},
+					priority    => $difficulty->{score},
+					hint        => $difficulty->{hint},
+				};
+
+				$total++;
+			}
 		} else {
-			$killed++;
-			push @killed_mutants, {
-				id => $mutant->id(),
-				line => $mutant->line(),
-				file => $file,
-				description => $mutant->description(),
-				status => 'Killed'
+			# representative killed
+			# assume whole group killed
+
+			for my $m (@$group) {
+				push @killed_mutants, {
+					id => $m->id(),
+					line => $m->line(),
+					file => $file,
+					description => $m->description(),
+					status => 'Killed'
+				};
+
+				$total++;
+				$killed++;
 			}
 		}
 
@@ -447,28 +527,161 @@ unless ($opt{quiet}) {
 	print "\nMutation Score: $score%\n";
 	print "Total: $total\n";
 	print "Killed: $killed\n";
-	print "Survived: ", scalar(@survivors), "\n";
+	print 'Survived: ', scalar(@survivors), "\n";
 }
 
 if ($opt{json}) {
-    open my $fh, '>', $opt{json} or die $!;
-    print $fh encode_json({
-        score      => $score,
-        total      => $total,
-        killed     => $killed,
-        survived   => \@survivors,
-	killed => \@killed_mutants,
-    });
-    close $fh;
+	# Sort Survivors by Priority
+	@survivors = sort { $b->{priority} <=> $a->{priority} } @survivors;
+
+	open my $fh, '>', $opt{json} or die $!;
+	print $fh encode_json({
+		score => $score,
+		total => $total,
+		killed_count => $killed,
+		survived_count => scalar(@survivors),
+		killed => \@killed_mutants,
+		survived => \@survivors,
+	});
+
+	close $fh;
 }
 
 if ($opt{html}) {
+	if(!$opt{json}) {
+		die '--html needs --json';
+	}
 	require App::Test::Generator::Report::HTML;
-	App::Test::Generator::Report::HTML->generate($opt{json}, $opt{html});
+	App::Test::Generator::Report::HTML->import();
+
+	App::Test::Generator::Report::HTML->generate(
+		$opt{json},             # mutation results
+		$opt{html},             # output directory
+		$opt{cover_json},       # optional Devel::Cover JSON
+		$opt{lcsaj_root},                # directory containing *.lcsaj.json files
+		$opt{lcsaj_hits},  # runtime LCSAJ hit data
+	);
 }
 
-exit 1 if $score < $opt{min_score};
+if($score < $opt{min_score}) {
+	print STDERR "score $score is less than min_score $opt{min_score}\n";
+	exit 1;
+}
 exit 0;
+
+# ------------------------------------------------------------
+# group_mutants
+#
+# Groups mutants that affect the same location and operator.
+#
+# Example:
+#
+#   line 42:  >  → >=
+#   line 42:  >  → <
+#
+# These belong to the same mutation "site".
+#
+# The function returns a structure like:
+#
+#   {
+#      "file:line:operator" => [ mutant1, mutant2, mutant3 ]
+#   }
+#
+# This allows us to treat them as a logical unit.
+# ------------------------------------------------------------
+
+sub group_mutants {
+	my ($file, $mutants) = @_;
+
+	my %groups;
+
+	for my $m (@$mutants) {
+		my $line = $m->line;
+
+		# original token mutated (>, ==, !, etc)
+		my $orig = defined $m->original ? $m->original : '';
+
+		# group key identifies a mutation site
+		$orig =~ s/\s+//g;
+		my $key = join(':', $file, $line, $orig);
+
+		push @{ $groups{$key} }, $m;
+	}
+
+	return \%groups;
+}
+
+# ------------------------------------------------------------
+# representative_mutant
+#
+# Selects a single mutant from a group to represent
+# the mutation site.
+#
+# Strategy:
+#   - prefer boundary mutations
+#   - otherwise use the first mutant
+#
+# This improves mutation efficiency by avoiding
+# redundant test runs.
+# ------------------------------------------------------------
+
+sub representative_mutant {
+	my $group = $_[0];
+
+	for my $m (@$group) {
+		# Prefer boundary-type mutations if available
+		if($m->id() && $m->id() =~ /BOUNDARY|NUM/) {
+			return $m;
+		}
+	}
+
+	# fallback: first mutant
+	return $group->[0];
+}
+
+# ------------------------------------------------------------
+# mutation_difficulty
+#
+# Assigns a difficulty ranking to a mutant.
+#
+# Difficulty reflects how valuable killing the mutant would be.
+# Higher difficulty means the missing test likely reveals
+# a meaningful behavioral gap.
+# ------------------------------------------------------------
+
+sub mutation_difficulty {
+	my $mutant = $_[0];
+
+	my $id = $mutant->id // '';
+
+	# Numeric boundary mutants expose missing edge cases
+	return {
+		score => 3,
+		label => 'HIGH',
+		hint => 'Likely missing edge-case test (boundary value)'
+	} if $id =~ /BOUNDARY|NUM/;
+
+	# Conditional inversions reveal missing negative assertions
+	return {
+		score => 2,
+		label => 'MEDIUM',
+		hint => 'Add tests asserting both true and false outcomes'
+	} if $id =~ /COND|INV|NEG/;
+
+    # Logical operator changes
+    return {
+        score => 2,
+        label => 'MEDIUM',
+	hint => 'Test combinations where only one logical operand is true'
+    } if $id =~ /LOGIC|AND|OR/;
+
+    # Default: minor mutation
+    return {
+        score => 1,
+        label => 'LOW',
+        hint  => 'Mutation survived but impact may be minor'
+    };
+}
 
 =head1 AUTHOR
 

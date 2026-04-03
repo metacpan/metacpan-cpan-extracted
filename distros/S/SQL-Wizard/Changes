@@ -1,3 +1,10 @@
+0.10  2026-04-02
+    - BREAKING: { column => \@list } now generates OR conditions instead of IN
+      Each element is processed individually: undef => IS NULL,
+      { op => val } => operator form, scalar => = ?
+      e.g. { col => [undef, { '>' => 3 }] } => col IS NULL OR col > ?
+    - Use explicit { column => { -in => \@list } } for IN clauses
+
 0.09  2026-03-22
     - $q->compare($left, $op, $right) for arbitrary comparisons
     - Enables correlated subqueries, function calls, and expressions

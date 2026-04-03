@@ -1,7 +1,9 @@
 package Developer::Dashboard::JSON;
-$Developer::Dashboard::JSON::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Exporter 'import';
 use JSON::XS ();

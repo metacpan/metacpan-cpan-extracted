@@ -10,14 +10,14 @@ binmode STDERR, ':utf8';
 
 use open qw(:std :encoding(UTF-8));
 
-my $conf_file = 't/conf/class_simple.conf';
+my $conf_file = 't/conf/app_generator.yml';
 ok(-e $conf_file, 'config file exists: $conf_file');
 
 # Generate into a scalar
 {
 	local *STDOUT;
 	open STDOUT, '>', \my $output;
-	App::Test::Generator::generate($conf_file);
+	App::Test::Generator->generate($conf_file);
 	like($output, qr/use Test::Most;/, 'output looks like a test file');
 }
 

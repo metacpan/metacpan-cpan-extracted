@@ -7,11 +7,11 @@ use App::Test::Generator::Mutant;
 
 use PPI;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
@@ -26,16 +26,16 @@ sub mutate {
 	my $returns = $doc->find('PPI::Statement::Return') || [];
 	my @mutants;
 
-    for my $ret (@$returns) {
+	for my $ret (@$returns) {
+		my $expr = $ret->schild(1) or next;
 
-        my $expr = $ret->schild(1) or next;
+		my $original = $ret->content;
+		my $line     = $ret->location->[0];
 
-        my $original = $ret->content;
-        my $line     = $ret->location->[0];
-
-        push @mutants, App::Test::Generator::Mutant->new(
-            id          => "BOOL_NEGATE_$line",
-            description => "Negate return expression",
+		push @mutants, App::Test::Generator::Mutant->new(
+			id          => "BOOL_NEGATE_$line",
+			group          => "BOOL_NEGATE:$line",
+			description => 'Negate return expression',
             original    => $original,
             transform => sub {
 		my $doc = $_[0];
@@ -48,6 +48,7 @@ sub mutate {
 		);
 	},
             line        => $line,
+	    type => 'boolean'
         );
     }
 

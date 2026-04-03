@@ -1,0 +1,5 @@
+HTML: [% IF env.current_page == '/app/index' %]
+  [Home]
+[% ELSE %]
+  <a href="/app/index">Home</a>
+[% END %]

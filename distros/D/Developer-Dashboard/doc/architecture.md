@@ -79,12 +79,15 @@ instead of a loose pile of utilities.
   Applies Template Toolkit rendering for `HTML` and `FORM.TT`, then executes legacy `CODE*` sections inside one throwaway sandpit package per page run and captures their output for page rendering.
 
 - `Developer::Dashboard::Web::App`
-  Resolves the root free-form editor, saved page, transient page, login,
-  logout, `/apps`, and legacy `/app/<name>` routes, giving the browser side a
-  working home page plus helper-safe sharing.
+  Implements the browser service layer for page rendering, page actions, helper
+  login/logout, and legacy compatibility flows behind the HTTP route table.
+
+- `Developer::Dashboard::Web::DancerApp`
+  Owns the explicit Dancer2 HTTP route table, normalizes requests, enforces
+  protected-route authorization, and forwards work into the web-app service.
 
 - `Developer::Dashboard::Web::Server`
-  Minimal HTTP server for browsing saved and transient pages, defaulting to bind `0.0.0.0:7890`.
+  PSGI web server wrapper for the Dancer2 app, defaulting to bind `0.0.0.0:7890`.
 
 - `Developer::Dashboard::UpdateManager`
   Runs ordered update scripts, stops running collectors, and restarts them afterward.
@@ -146,13 +149,17 @@ Page source compatibility is explicit:
 - `/` with no bookmark path opens the free-form instruction editor directly
 - posting a root-editor document with `BOOKMARK: some-id` persists it as a saved bookmark so `/app/some-id` can load it on the next request
 - `/apps` redirects to `/app/index`
+- transient browser execution from `/?token=...`, `/action?atoken=...`, and legacy `/ajax?token=...` is disabled by default and only re-enabled when `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS` is truthy
+- saved bookmark `Ajax` helper calls can avoid transient tokens by supplying `file => 'name.json'`, which stores the code under `dashboards/ajax/...`, emits `/ajax/<name>?type=...`, and runs the stored file as a real process so live `stdout` and `stderr` stream back to the browser directly
 - edit and render views include shared top chrome with share/source links plus the original status-plus-alias indicator strip, refreshed from `/system/status`, alongside the local user, a machine IP link chosen from the active interfaces, and a browser-updated date/time
 - direct `nav/*.tt` saved bookmarks are treated as shared nav fragments, so `/app/nav/foo.tt` remains editable like any other bookmark while non-nav pages insert the sorted rendered `nav/*.tt` outputs between the top chrome and the main page body
 - bookmark Template Toolkit rendering exposes `env.current_page` and `env.runtime_context.current_page`, so saved pages and nav fragments can branch on the active request path without losing the rest of the runtime context
 - when the active project contains `./.developer-dashboard`, the page store, config loader, CLI hook resolver, auth/session stores, and isolated docker service lookup all read that tree first and then fall back to `~/.developer-dashboard`
 - `dashboard init` seeds `welcome`, `api-dashboard`, and `db-dashboard` as normal editable saved bookmarks
+- `dashboard serve logs` exposes the combined Dancer2 and Starman runtime log stored in the dashboard log file, with `-n N` tailing and `-f` follow mode
+- `dashboard serve workers N` persists the default Starman worker count in config and auto-starts the web service when it is currently stopped; `--host HOST` and `--port PORT` steer that auto-start path, while `dashboard serve --workers N` and `dashboard restart --workers N` still allow one-off overrides
 - the editor view auto-submits the bookmark form on textarea change/blur instead of relying on a visible update button
-- the editor shows in-place syntax highlighting inside the same editing surface for directive, HTML, CSS, JavaScript, and Perl `CODE*` content
+- the editor keeps a plain escaped source overlay with wrapping disabled so the visible text geometry stays identical to the real textarea during long bookmark edits
 
 ## Environment Overrides
 
@@ -166,6 +173,9 @@ The core supports compatibility-style environment overrides for project customiz
 
 - `DEVELOPER_DASHBOARD_CONFIGS`
   Config root.
+
+- `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS`
+  Opt-in flag for browser execution of transient `token=` and `atoken=` payloads.
 
 
 The runtime also supports user CLI extensions:

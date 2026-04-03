@@ -4,27 +4,31 @@ use Crypt::RIPEMD160 0.03;
 
 use strict;
 use warnings;
+use Carp;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new {
     my($pkg, $key) = @_;
 
+    # Hash long keys per RFC 2104
+    if (length($key) > 64) {
+	$key = Crypt::RIPEMD160->hash($key);
+    }
+
+    my $k_ipad = chr(0x36) x 64;
+    my $k_opad = chr(0x5c) x 64;
+    $k_ipad ^= $key;
+    $k_opad ^= $key;
+
     my $self = {
 	'key' => $key,
 	'hash' => Crypt::RIPEMD160->new,
-	'k_ipad' => chr(0x36) x 64,
-	'k_opad' => chr(0x5c) x 64,
+	'k_ipad' => $k_ipad,
+	'k_opad' => $k_opad,
 	};
 
     bless $self, $pkg;
-
-    if (length($self->{'key'}) > 64) {
-	$self->{'key'} = Crypt::RIPEMD160->hash($self->{'key'});
-    }
-
-    $self->{'k_ipad'} ^= $self->{'key'};
-    $self->{'k_opad'} ^= $self->{'key'};
 
     $self->{'hash'}->add($self->{'k_ipad'});
 
@@ -35,16 +39,6 @@ sub reset {
     my($self) = @_;
 
     $self->{'hash'}->reset();
-    $self->{'k_ipad'} = chr(0x36) x 64;
-    $self->{'k_opad'} = chr(0x5c) x 64;
-
-    if (length($self->{'key'}) > 64) {
-	$self->{'key'} = Crypt::RIPEMD160->hash($self->{'key'});
-    }
-
-    $self->{'k_ipad'} ^= $self->{'key'};
-    $self->{'k_opad'} ^= $self->{'key'};
-
     $self->{'hash'}->add($self->{'k_ipad'});
 
     return $self;
@@ -66,9 +60,11 @@ sub addfile
     if (!ref($handle)) {
 	$handle = $package . "::" . $handle unless ($handle =~ /(\:\:|\')/);
     }
-    while (read($handle, $data, 8192)) {
+    my $n;
+    while ($n = read($handle, $data, 8192)) {
 	$self->{'hash'}->add($data);
     }
+    croak "addfile read failed: $!" unless defined $n;
 }
 
 sub mac {
@@ -76,13 +72,7 @@ sub mac {
 
     my($inner) = $self->{'hash'}->digest();
 
-    my($outer) = Crypt::RIPEMD160->hash($self->{'k_opad'}.$inner);
-
-    $self->{'key'} = "";
-    $self->{'k_ipad'} = "";
-    $self->{'k_opad'} = "";
-
-    return($outer);
+    return Crypt::RIPEMD160->hash($self->{'k_opad'}.$inner);
 }
 
 sub hexmac {
@@ -90,13 +80,7 @@ sub hexmac {
 
     my($inner) = $self->{'hash'}->digest();
 
-    my($outer) = Crypt::RIPEMD160->hexhash($self->{'k_opad'}.$inner);
-
-    $self->{'key'} = "";
-    $self->{'k_ipad'} = "";
-    $self->{'k_opad'} = "";
-
-    return($outer);
+    return Crypt::RIPEMD160->hexhash($self->{'k_opad'}.$inner);
 }
 
 1;
@@ -135,9 +119,9 @@ list of strings) or B<addfile> (which reads from a file handle).
 The final MAC value is returned by B<mac> as a 20-byte binary string,
 or by B<hexmac> as a human-readable hex string.
 
-Note that both B<mac> and B<hexmac> are destructive operations that
-clear the key material. To compute another MAC, create a new context
-or call B<reset>.
+Note that both B<mac> and B<hexmac> are destructive, read-once
+operations on the accumulated data. To compute another MAC with the
+same key, call B<reset> and then B<add> new data.
 
 =head1 EXAMPLES
 
@@ -149,13 +133,21 @@ or call B<reset>.
 
     print("MAC is " . unpack("H*", $digest) . "\n");
 
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl you may have available.
+
+See L<https://dev.perl.org/licenses/> for more information.
+
 =head1 AUTHOR
 
-The RIPEMD-160 interface was written by Christian H. Geuer 
+The RIPEMD-160 interface was written by Christian H. Geuer
 (C<christian.geuer@crypto.gun.de>).
 
 =head1 SEE ALSO
 
-MD5(3pm) and SHA(1).
+L<Crypt::RIPEMD160>
 
 =cut

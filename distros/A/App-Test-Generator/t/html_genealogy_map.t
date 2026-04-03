@@ -13,7 +13,7 @@ my $outfile = 't/tmp_html_genealogy_map.t';
 
 unlink $outfile;
 
-ok(App::Test::Generator::generate($conf_file, $outfile), 'generate fuzz test');
+ok(App::Test::Generator->generate($conf_file, $outfile), 'generate fuzz test');
 ok(-e $outfile, 'fuzz test file created');
 
 open my $fh, '<', $outfile or die $!;

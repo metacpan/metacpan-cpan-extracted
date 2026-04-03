@@ -5,7 +5,16 @@ use warnings;
 
 use POSIX;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+# _POSIX_VDISABLE: the value that disables a special character slot.
+# On Linux this is typically 0; on macOS/BSD it is typically 255 (0xFF).
+# Fall back to 0 if the platform doesn't define it.
+my $VDISABLE;
+BEGIN {
+    $VDISABLE = eval { POSIX::_POSIX_VDISABLE() };
+    $VDISABLE = 0 unless defined $VDISABLE;
+}
 
 # Baud rate constants: standard POSIX rates plus modern rates.
 # Modern rates (B57600, B115200, B230400) are not available on all platforms,
@@ -24,6 +33,10 @@ BEGIN {
             $BAUD_SPEEDS{$val}  = $rate;
         }
     }
+    # Standard aliases: 134.5 → B134, exta → B19200, extb → B38400
+    $BAUD_RATES{'134.5'} = $BAUD_RATES{'134'}   if exists $BAUD_RATES{'134'};
+    $BAUD_RATES{'exta'}  = $BAUD_RATES{'19200'} if exists $BAUD_RATES{'19200'};
+    $BAUD_RATES{'extb'}  = $BAUD_RATES{'38400'} if exists $BAUD_RATES{'38400'};
 }
 
 =for markdown [![testsuite](https://github.com/cpan-authors/IO-Stty/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/IO-Stty/actions/workflows/testsuite.yml)
@@ -203,6 +216,11 @@ Disable flushing after interrupt and quit special characters.
 
 * Though this claims non-posixhood it is supported by the perl POSIX.pm.
 
+=item [-]iexten
+
+Enable implementation-defined input processing.  This is needed for
+special characters like werase and lnext to be recognized.
+
 =item [-]tostop (np)
 
 Stop background jobs that try to write to the terminal.
@@ -254,14 +272,50 @@ Same as:
 
 With  `-',  same  as parenb istrip cs7.
 
+=item crt
+
+Same as:
+
+    echoe echok
+
 =item dec
 
 Same as:
 
-    echoe echoctl echoke -ixany
+    echoe echok
 
 Also sets the interrupt special character to Ctrl-C, erase to
 Del, and kill to Ctrl-U.
+
+=item [-]cbreak
+
+Same as C<-icanon> (with C<->, same as C<icanon>).
+
+=item evenp, parity
+
+Same as:
+
+    parenb -parodd cs7
+
+=item oddp
+
+Same as:
+
+    parenb parodd cs7
+
+=item -evenp, -parity, -oddp
+
+Same as:
+
+    -parenb cs8
+
+=item [-]litout
+
+Same as:
+
+    -parenb -istrip -opost cs8
+
+With C<->, same as C<parenb istrip opost cs7>.
 
 =back
 
@@ -274,7 +328,8 @@ either literally, in hat notation (`^c'), or as an integer
 which may start with `0x' to indicate hexadecimal, `0' to
 indicate octal, or any other digit to indicate decimal.
 Giving a value of `^-' or `undef' disables that special
-character.
+character (sets it to C<_POSIX_VDISABLE>, which is 0 on
+Linux and 255 on macOS/BSD).
 
 =over 4
 
@@ -335,9 +390,12 @@ been read, when -icanon is set.
 
 Set the input and output speeds to N.  N can be one
 of: 0 50 75 110 134 134.5 150 200 300 600 1200 1800
-2400 4800 9600 19200 38400 exta extb.  exta is  the
-same  as 19200; extb is the same as 38400.  0 hangs
-up the line if -clocal is set.
+2400 4800 9600 19200 38400 57600 115200 230400 exta
+extb.  134.5 is the same as 134; exta is the same
+as 19200; extb is the same as 38400.  Modern rates
+(57600, 115200, 230400) are only available on
+platforms whose POSIX implementation defines them.
+0 hangs up the line if -clocal is set.
 
 =back
 
@@ -355,6 +413,10 @@ Print all current settings in a form  that  can  be
 used  as  an  argument  to  another stty command to
 restore the current settings.
 
+=item speed
+
+Print the output baud rate.
+
 =item -v,--version
 
 Print version info.
@@ -371,7 +433,8 @@ Print version info.
 
 Parse a special character value from any of the supported notations:
 literal integers, hat notation (C<^c>), hexadecimal (C<0x...>),
-octal (C<0...>), or C<undef>/C<^-> to disable.
+octal (C<0...>), or C<undef>/C<^-> to disable (returns
+C<_POSIX_VDISABLE>).
 
 =cut
 
@@ -380,7 +443,7 @@ sub _parse_char_value {
 
     # undef or ^- means disable the character
     if ( $val eq 'undef' || $val eq '^-' ) {
-        return 0;
+        return $VDISABLE;
     }
 
     # Hat notation: ^c means Ctrl-C (0x03), ^? means DEL (0x7F)
@@ -420,6 +483,10 @@ sub _parse_char_value {
 
     IO::Stty::stty(\*STDIN, @params);
 
+Returns a string for query options (C<-a>, C<-g>, C<-v>), C<undef> if
+the handle is not a terminal or if the terminal parameters could not be
+read, and a true value on success when setting parameters.
+
 From comments:
 
     I'm not feeling very inspired about this. Terminal parameters are obscure
@@ -445,7 +512,10 @@ sub stty {
 
     # make a terminal object.
     my ($termios) = POSIX::Termios->new();
-    $termios->getattr($file_num) || warn "Couldn't get terminal parameters for '$tty_name', file num ($file_num)";
+    unless ( $termios->getattr($file_num) ) {
+        warn "Couldn't get terminal parameters for '$tty_name', file num ($file_num)";
+        return undef;
+    }
     my ($c_cflag) = $termios->getcflag;
     my ($c_iflag) = $termios->getiflag;
     my ($ispeed)  = $termios->getispeed;
@@ -476,8 +546,16 @@ sub stty {
         if ( $_[0] =~ /^(-v|--version|version)$/ ) {
             return $IO::Stty::VERSION . "\n";
         }
-        elsif ( $_[0] =~ /^\d+$/ ) {
+        elsif ( $_[0] =~ /^\d+$/ || $_[0] eq '134.5'
+            || $_[0] eq 'exta' || $_[0] eq 'extb' )
+        {
             push( @parameters, 'ispeed', $_[0], 'ospeed', $_[0] );
+        }
+
+        # Print just the output speed (matches GNU stty 'speed')
+        elsif ( $_[0] eq 'speed' ) {
+            my $speed_str = exists $BAUD_SPEEDS{$ospeed} ? $BAUD_SPEEDS{$ospeed} : $ospeed;
+            return "$speed_str\n";
         }
 
         # Do we want to know what the crap is?
@@ -554,8 +632,8 @@ sub stty {
             unshift(
                 @parameters, 'cread', '-ignbrk', 'brkint', '-inlcr', '-igncr', 'icrnl',
                 '-ixoff', 'opost', 'isig', 'icanon', 'iexten', 'echo', 'echoe', 'echok',
-                '-echonl', '-noflsh', '-tostop', 'echok', 'intr', 3, 'quit', 28, 'erase',
-                8,      'kill', 21,    'eof', 4, 'eol', 0, 'stop', 19, 'start', 17, 'susp', 26,
+                '-echonl', '-noflsh', '-tostop', 'intr', 3, 'quit', 28, 'erase',
+                8,      'kill', 21,    'eof', 4, 'eol', 'undef', 'stop', 19, 'start', 17, 'susp', 26,
                 'time', 0,      'min', 0
             );
             next;
@@ -569,7 +647,7 @@ sub stty {
                 @parameters, 'brkint', 'ignpar', 'istrip', 'icrnl', 'ixon', 'opost',
                 'isig',      'icanon',
                 'intr', 3, 'quit', 28, 'erase', 8, 'kill', 21, 'eof',
-                4, 'eol', 0, 'stop', 19, 'start', 17, 'susp', 26, 'time', 0, 'min', 0
+                4, 'eol', 'undef', 'stop', 19, 'start', 17, 'susp', 26, 'time', 0, 'min', 0
             );
             next;
         }
@@ -597,6 +675,34 @@ sub stty {
 
             # 127 == delete, no?
             unshift( @parameters, 'echoe', 'echok', 'intr', 3, 'erase', 127, 'kill', 21 );
+            next;
+        }
+        if ( $_ eq 'evenp' || $_ eq 'parity' ) {
+            unshift( @parameters, 'parenb', '-parodd', 'cs7' );
+            next;
+        }
+        if ( $_ eq '-evenp' || $_ eq '-parity' || $_ eq '-oddp' ) {
+            unshift( @parameters, '-parenb', 'cs8' );
+            next;
+        }
+        if ( $_ eq 'oddp' ) {
+            unshift( @parameters, 'parenb', 'parodd', 'cs7' );
+            next;
+        }
+        if ( $_ eq 'cbreak' ) {
+            unshift( @parameters, '-icanon' );
+            next;
+        }
+        if ( $_ eq '-cbreak' ) {
+            unshift( @parameters, 'icanon' );
+            next;
+        }
+        if ( $_ eq 'litout' ) {
+            unshift( @parameters, '-parenb', '-istrip', '-opost', 'cs8' );
+            next;
+        }
+        if ( $_ eq '-litout' ) {
+            unshift( @parameters, 'parenb', 'istrip', 'opost', 'cs7' );
             next;
         }
         $set_value = 1;              # On by default...
@@ -649,7 +755,7 @@ sub stty {
         # Are we there yet? No. Are we there yet? No. Are we there yet...
         #    print "Values: $c_lflag,".($c_lflag | ECHO)." ".($c_lflag & (~ECHO))."\n";
         if ( $_ eq 'echo' )   { $c_lflag = ( ( $set_value ? ( $c_lflag | ECHO )   : ( $c_lflag & ( ~ECHO ) ) ) );   next; }
-        if ( $_ eq 'echoe' )  { $c_lflag = ( ( $set_value ? ( $c_lflag | ECHOE )  : ( $c_lflag & ( ~ECHOE ) ) ) );  next; }
+        if ( $_ eq 'echoe' || $_ eq 'crterase' )  { $c_lflag = ( ( $set_value ? ( $c_lflag | ECHOE )  : ( $c_lflag & ( ~ECHOE ) ) ) );  next; }
         if ( $_ eq 'echok' )  { $c_lflag = ( ( $set_value ? ( $c_lflag | ECHOK )  : ( $c_lflag & ( ~ECHOK ) ) ) );  next; }
         if ( $_ eq 'echonl' ) { $c_lflag = ( ( $set_value ? ( $c_lflag | ECHONL ) : ( $c_lflag & ( ~ECHONL ) ) ) ); next; }
         if ( $_ eq 'icanon' ) { $c_lflag = ( ( $set_value ? ( $c_lflag | ICANON ) : ( $c_lflag & ( ~ICANON ) ) ) ); next; }
@@ -692,15 +798,42 @@ sub stty {
     $termios->setcc( VQUIT,  $control_chars{'QUIT'} );
     $termios->setcc( VERASE, $control_chars{'ERASE'} );
     $termios->setcc( VKILL,  $control_chars{'KILL'} );
-    $termios->setcc( VEOF,   $control_chars{'EOF'} );
-    $termios->setcc( VTIME,  $control_chars{'TIME'} );
-    $termios->setcc( VMIN,   $control_chars{'MIN'} );
+
+    # On some systems (e.g. Solaris/SVR4), VEOF==VMIN and VEOL==VTIME
+    # share the same cc slot.  The slot's meaning depends on ICANON:
+    # canonical mode uses VEOF/VEOL, non-canonical uses VMIN/VTIME.
+    # Writing both would let the second overwrite the first, so we
+    # write only the one that matches the final ICANON state.
+    if (VEOF == VMIN) {
+        if ($c_lflag & ICANON) {
+            $termios->setcc( VEOF, $control_chars{'EOF'} );
+        }
+        else {
+            $termios->setcc( VMIN, $control_chars{'MIN'} );
+        }
+    }
+    else {
+        $termios->setcc( VEOF, $control_chars{'EOF'} );
+        $termios->setcc( VMIN, $control_chars{'MIN'} );
+    }
+    if (VEOL == VTIME) {
+        if ($c_lflag & ICANON) {
+            $termios->setcc( VEOL, $control_chars{'EOL'} );
+        }
+        else {
+            $termios->setcc( VTIME, $control_chars{'TIME'} );
+        }
+    }
+    else {
+        $termios->setcc( VTIME, $control_chars{'TIME'} );
+        $termios->setcc( VEOL,  $control_chars{'EOL'} );
+    }
+
     $termios->setcc( VSTART, $control_chars{'START'} );
     $termios->setcc( VSTOP,  $control_chars{'STOP'} );
     $termios->setcc( VSUSP,  $control_chars{'SUSP'} );
-    $termios->setcc( VEOL,   $control_chars{'EOL'} );
-    $termios->setattr( $file_num, TCSANOW );    # TCSANOW = do immediately. don't unbuffer first.
-                                                # OK.. that sucked.
+    return $termios->setattr( $file_num, TCSANOW );    # TCSANOW = do immediately. don't unbuffer first.
+                                                      # OK.. that sucked.
 }
 
 =item B<show_me_the_crap()>
@@ -721,7 +854,7 @@ This is the back-end for C<stty(\*FH, '-a')>.
 
 sub _cc_to_hat {
     my ($val) = @_;
-    return '<undef>' if !defined $val || $val == 0 || $val == 255;
+    return '<undef>' if !defined $val || $val == $VDISABLE;
     return '^?' if $val == 127;
     return '^' . chr( ord('@') + $val ) if $val >= 0 && $val < 32;
     return chr($val);
@@ -757,7 +890,7 @@ sub show_me_the_crap {
     $rs .= "\n";
     $rs .= 'intr = ' . _cc_to_hat($cc{'INTR'}) . '; quit = ' . _cc_to_hat($cc{'QUIT'}) . '; erase = ' . _cc_to_hat($cc{'ERASE'}) . '; kill = ' . _cc_to_hat($cc{'KILL'}) . ";\n";
     $rs .= 'eof = ' . _cc_to_hat($cc{'EOF'}) . '; eol = ' . _cc_to_hat($cc{'EOL'}) . '; start = ' . _cc_to_hat($cc{'START'}) . '; stop = ' . _cc_to_hat($cc{'STOP'}) . '; susp = ' . _cc_to_hat($cc{'SUSP'}) . ";\n";
-    $rs .= 'min = ' . ($cc{'MIN'} // 0) . '; time = ' . ($cc{'TIME'} // 0) . ";\n";
+    $rs .= 'min = ' . (defined $cc{'MIN'} ? $cc{'MIN'} : 0) . '; time = ' . (defined $cc{'TIME'} ? $cc{'TIME'} : 0) . ";\n";
 
     # c flags.
     $rs .= ( ( $c_cflag & CLOCAL ) ? '' : '-' ) . 'clocal ';
@@ -803,6 +936,7 @@ sub show_me_the_crap {
     $rs .= ( ( $c_iflag & INPCK )  ? '' : '-' ) . 'inpck ';
     $rs .= ( ( $c_iflag & ISTRIP ) ? '' : '-' ) . 'istrip ';
     $rs .= ( ( $c_iflag & INLCR )  ? '' : '-' ) . 'inlcr ';
+    $rs .= ( ( $c_iflag & IGNCR )  ? '' : '-' ) . 'igncr ';
     $rs .= ( ( $c_iflag & ICRNL )  ? '' : '-' ) . 'icrnl ';
     $rs .= ( ( $c_iflag & IXON )   ? '' : '-' ) . 'ixon ';
     $rs .= ( ( $c_iflag & IXOFF )  ? '' : '-' ) . "ixoff\n";

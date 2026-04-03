@@ -1,4 +1,18 @@
 Revision history for Data-Hash-Diff-Smart
 
+0.02	Thu Apr  2 20:53:21 EDT 2026
+	Added benchmarks
+	Added array_key (GitHub#1)
+	Fixed the _diff_array_unordered scalar-dereference crash
+	Fixed ignore-on-add/remove omission
+	Fixed renderer undef-field warnings
+	Added function.t - white-box tests for all functions, including helper functions, in Smart.pm and Engine.pm
+	Added unit.t - black-box subtests to test each public function, according to their API documentation
+	Added integration.t - a set of subtests to black‑box, end‑to‑end behaviour across multiple routines,
+		including the entire package, according to their API documentation
+	Added edge_cases.t - a set of destructive, pathological, boundary‑condition sub
+	Added extended_tests.t - any other tests that are needed to raise the coverage and LCSAJ/TER3 scores
+	Use 'require' rather than 'use' to load renderers
+
 0.01	Tue Mar 17 08:00:49 EDT 2026
         First draft

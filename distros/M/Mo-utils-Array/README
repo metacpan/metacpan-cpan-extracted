@@ -8,10 +8,10 @@ SYNOPSIS
      check_array_items($self, $key, $max_items);
      check_array_object($self, $key, $class);
      check_array_required($self, $key);
-     check_array_strings($self, $key, $strings_ar);
+     check_array_strings($self, $key, [$strings_ar]);
 
 DESCRIPTION
-    Mo array utilities for checking of data objects.
+    Mo utilities for checking of data objects which are array.
 
 SUBROUTINES
   "check_array"
@@ -62,12 +62,14 @@ SUBROUTINES
     Returns undef.
 
   "check_array_strings"
-     check_array_strings($self, $key, $strings_ar);
+     check_array_strings($self, $key, [$strings_ar]);
 
-    *Since version 0.02.*
+    *Since version 0.05.*
 
-    Check parameter defined by $key which is reference to array with strings
-    defined by $strings_ar which is reference to array.
+    Check parameter defined by $key which is reference to array with
+    strings. There are two use cases, first one is check only if the item is
+    string and second one if string is from $strings_ar optional reference
+    to array.
 
     Put error if check isn't ok.
 
@@ -113,7 +115,6 @@ ERRORS
                      Value: %s
                      Reference: %s
              Parameter '%s' must have right string definition.
-             Parameter '%s' must have strings definition.
 
 EXAMPLE1
      use strict;
@@ -341,5 +342,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

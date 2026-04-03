@@ -1,5 +1,11 @@
 Revision history for Perl module Math::GMPz
 
+0.69
+ - Document use of Math::GMP_OLOAD
+ - Enable quadmath builds on cygwin smoker.
+   See (eg):
+   https://www.cpantesters.org/cpan/report/92d409a0-6c24-1014-891d-d1fdbdc460dd .
+
 0.68
  - Ensure that overloaded <=> operations return one of 1, -1, 0, and undef.
    Required some amendments to GMPz.xs, and some rewriting of parts of some

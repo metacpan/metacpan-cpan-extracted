@@ -1,0 +1,13 @@
+services:
+  app:
+    init: true
+    build: .
+    ports:
+    - 7890:7890
+    working_dir: /root/.developer-dashboard
+    volumes:
+    - /app
+    command:
+    - perl
+    - -e
+    - system qw( dashboard serve --workers 5 --ssl ); sleep

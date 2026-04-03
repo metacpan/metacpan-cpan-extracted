@@ -29,13 +29,11 @@ DEPENDENCIES
 
 TESTING
 
-    # included openssl.cnf for selfsigned certificate generation
-
-    # included example.pl
-    perl example.pl
-
-    # basic load test (no certificates needed, use selfsigned tmp certs):
+    # basic load test (no certificates needed):
     make test
+
+    # full signing test (requires certificates):
+    TEST_CERT_PEM=/path/cert.pem TEST_KEY_PEM=/path/key.pem make test
 
     # TSA test (requires network):
     TSA_TEST=1 make test

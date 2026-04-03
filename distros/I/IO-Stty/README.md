@@ -161,6 +161,11 @@ turned off by preceding it with a \`-'.
 
     \* Though this claims non-posixhood it is supported by the perl POSIX.pm.
 
+- \[-\]iexten
+
+    Enable implementation-defined input processing.  This is needed for
+    special characters like werase and lnext to be recognized.
+
 - \[-\]tostop (np)
 
     Stop background jobs that try to write to the terminal.
@@ -208,14 +213,50 @@ turned off by preceding it with a \`-'.
 
     With  \`-',  same  as parenb istrip cs7.
 
+- crt
+
+    Same as:
+
+        echoe echok
+
 - dec
 
     Same as:
 
-        echoe echoctl echoke -ixany
+        echoe echok
 
     Also sets the interrupt special character to Ctrl-C, erase to
     Del, and kill to Ctrl-U.
+
+- \[-\]cbreak
+
+    Same as `-icanon` (with `-`, same as `icanon`).
+
+- evenp, parity
+
+    Same as:
+
+        parenb -parodd cs7
+
+- oddp
+
+    Same as:
+
+        parenb parodd cs7
+
+- -evenp, -parity, -oddp
+
+    Same as:
+
+        -parenb cs8
+
+- \[-\]litout
+
+    Same as:
+
+        -parenb -istrip -opost cs8
+
+    With `-`, same as `parenb istrip opost cs7`.
 
 ## Special characters
 
@@ -226,7 +267,8 @@ either literally, in hat notation (\`^c'), or as an integer
 which may start with \`0x' to indicate hexadecimal, \`0' to
 indicate octal, or any other digit to indicate decimal.
 Giving a value of \`^-' or \`undef' disables that special
-character.
+character (sets it to `_POSIX_VDISABLE`, which is 0 on
+Linux and 255 on macOS/BSD).
 
 - intr
 
@@ -281,9 +323,12 @@ character.
 
     Set the input and output speeds to N.  N can be one
     of: 0 50 75 110 134 134.5 150 200 300 600 1200 1800
-    2400 4800 9600 19200 38400 exta extb.  exta is  the
-    same  as 19200; extb is the same as 38400.  0 hangs
-    up the line if -clocal is set.
+    2400 4800 9600 19200 38400 57600 115200 230400 exta
+    extb.  134.5 is the same as 134; exta is the same
+    as 19200; extb is the same as 38400.  Modern rates
+    (57600, 115200, 230400) are only available on
+    platforms whose POSIX implementation defines them.
+    0 hangs up the line if -clocal is set.
 
 ## OPTIONS
 
@@ -297,6 +342,10 @@ character.
     used  as  an  argument  to  another stty command to
     restore the current settings.
 
+- speed
+
+    Print the output baud rate.
+
 - -v,--version
 
     Print version info.
@@ -309,11 +358,16 @@ character.
 
     Parse a special character value from any of the supported notations:
     literal integers, hat notation (`^c`), hexadecimal (`0x...`),
-    octal (`0...`), or `undef`/`^-` to disable.
+    octal (`0...`), or `undef`/`^-` to disable (returns
+    `_POSIX_VDISABLE`).
 
 - **stty()**
 
         IO::Stty::stty(\*STDIN, @params);
+
+    Returns a string for query options (`-a`, `-g`, `-v`), `undef` if
+    the handle is not a terminal or if the terminal parameters could not be
+    read, and a true value on success when setting parameters.
 
     From comments:
 

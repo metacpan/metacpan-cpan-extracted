@@ -9,11 +9,11 @@ use App::Test::Generator::Planner::Fixture;
 use App::Test::Generator::Planner::Mock;
 use App::Test::Generator::Planner::Grouping;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
@@ -30,17 +30,17 @@ sub plan_all {
 
 	my $global = $self->build_plan();
 
-    my %method_plan;
+	my %method_plan;
 
-    foreach my $method (keys %{ $self->{schemas} }) {
+	foreach my $method (keys %{ $self->{schemas} }) {
 
-        my $schema = $self->{schemas}{$method};
+		my $schema = $self->{schemas}{$method};
 
-        my %plan;
+		my %plan;
 
-        # -----------------------------------
-        # Strategy mapping
-        # -----------------------------------
+		# -----------------------------------
+		# Strategy mapping
+		# -----------------------------------
 
         if ($schema->{accessor} && $schema->{accessor}->{type}) {
 

@@ -1,4 +1,4 @@
-# SmsAero API Client for Perl
+# SMSAero API Client for Perl
 
 ## Installation:
 

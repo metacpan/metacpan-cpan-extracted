@@ -1,7 +1,9 @@
 package Developer::Dashboard::PageDocument;
-$Developer::Dashboard::PageDocument::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
@@ -329,21 +331,39 @@ sub render_html {
       margin: 0 0 24px;
       padding: 14px 18px;
       border: 1px solid var(--line);
-      background: #f3eee2;
+      background: var(--panel, #f3eee2);
+      color: var(--text, var(--ink));
+      border-radius: 14px;
     }
     .dashboard-nav-items ul {
       list-style: none;
       margin: 0;
       padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      align-items: center;
+    }
+    .dashboard-nav-items li {
+      margin: 0;
+      padding: 0;
     }
     .dashboard-nav-items li + li {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+    .dashboard-nav-items a {
+      color: var(--text, var(--ink));
+      text-decoration-color: var(--accent, currentColor);
+    }
+    .dashboard-nav-items a:hover {
+      color: var(--accent, var(--text, var(--ink)));
     }
   </style>
 </head>
 <body>
+$legacy_bootstrap
 <main>
   $chrome_html
   $nav_html
@@ -353,7 +373,6 @@ sub render_html {
   $runtime_output
   $runtime_errors
 </main>
-$legacy_bootstrap
 </body>
 </html>
 HTML
@@ -395,7 +414,8 @@ sub _decode_stash_section {
 sub _parse_legacy_sections {
     my ($text) = @_;
     my %sections;
-    my @parts = split /\Q$LEGACY_SEP\E\s*\n?/, $text;
+    my $markdown_sep = qr{^\s*---\s*$}m;
+    my @parts = split /(?:\Q$LEGACY_SEP\E\s*\n?|$markdown_sep)/, $text;
     for my $part (@parts) {
         $part =~ s/\A[\r\n\s]+//;
         $part =~ s/[\r\n\s]+\z//;
@@ -478,6 +498,22 @@ function set_chain_value(obj, path, value) {
     current = current[keys[i]];
   }
   current[keys[keys.length - 1]] = value;
+}
+function dashboard_ajax_singleton_cleanup(name) {
+  if (!name) return;
+  if (!window.__dashboardAjaxSingletons) window.__dashboardAjaxSingletons = {};
+  if (window.__dashboardAjaxSingletons[name]) return;
+  window.__dashboardAjaxSingletons[name] = true;
+  window.addEventListener('pagehide', function() {
+    let url = '/ajax/singleton/stop?singleton=' + encodeURIComponent(name);
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, '');
+      return;
+    }
+    if (window.fetch) {
+      fetch(url, { method: 'POST', keepalive: true, credentials: 'same-origin' }).catch(function () {});
+    }
+  });
 }
 var ready_status = {};
 function ready(options) {

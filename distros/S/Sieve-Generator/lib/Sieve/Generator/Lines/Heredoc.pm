@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Lines::Heredoc 0.001;
+package Sieve::Generator::Lines::Heredoc 0.002;
 # ABSTRACT: a Sieve multiline string (heredoc)
 
 use Moo;
@@ -45,7 +45,7 @@ Sieve::Generator::Lines::Heredoc - a Sieve multiline string (heredoc)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

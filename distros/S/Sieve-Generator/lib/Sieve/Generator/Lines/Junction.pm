@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Lines::Junction 0.001;
+package Sieve::Generator::Lines::Junction 0.002;
 # ABSTRACT: a Sieve allof/anyof/noneof test
 
 use Moo;
@@ -70,7 +70,7 @@ Sieve::Generator::Lines::Junction - a Sieve allof/anyof/noneof test
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

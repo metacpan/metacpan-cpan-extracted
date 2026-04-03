@@ -27,7 +27,7 @@ else
   export DASHBOARD_TARBALL="$ROOT_DIR/$TARBALL"
 fi
 
-docker compose -f integration/blank-env/docker-compose.yml run --build --rm blank-env
+docker compose -f integration/blank-env/docker-compose.yml run --rm blank-env
 
 : <<'__END__'
 
@@ -47,7 +47,7 @@ This script either uses a supplied host tarball via C<TARBALL=/path/to/tar.gz>
 or installs Dist::Zilla into a local F<.perl5> toolchain when needed, builds
 the C<Developer-Dashboard> tarball on the host, exports the resulting artifact
 path as C<DASHBOARD_TARBALL>, and then runs the blank-environment Docker
-integration flow.
+integration flow against the prebuilt C<dd-int-test:latest> image.
 
 =cut
 __END__

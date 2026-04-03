@@ -2,10 +2,15 @@ use strict;
 use warnings;
 
 use Capture::Tiny qw(capture);
+use Cwd qw(cwd);
+use Errno qw(EINTR EIO);
+use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
+use POSIX qw(:sys_wait_h);
 use Test::More;
+use Time::HiRes qw(time);
 use URI::Escape qw(uri_escape);
 
 use lib 'lib';
@@ -15,6 +20,7 @@ use Developer::Dashboard::Auth;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
+use Developer::Dashboard::PageRuntime::StreamHandle;
 use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SessionStore;
@@ -79,6 +85,30 @@ my @folder_listing = Folder->ls('alias_demo');
 ok( @folder_listing >= 0, 'Folder ls returns entries for a real directory' );
 ok( grep( { $_ eq $project } Folder->locate('demo') ), 'Folder locate finds matching workspace directories' );
 is( Folder->alias_demo, $project, 'Folder AUTOLOAD resolves configured aliases' );
+{
+    my $repo = File::Spec->catdir( $workspace, 'folder-config-repo' );
+    make_path( File::Spec->catdir( $repo, '.git' ) );
+    make_path( File::Spec->catdir( $repo, '.developer-dashboard', 'config' ) );
+    open my $fh, '>', File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'config.json' ) or die $!;
+    print {$fh} <<'JSON';
+{
+  "path_aliases": {
+    "docker": "~/docker-alias"
+  }
+}
+JSON
+    close $fh;
+    my $docker_alias = File::Spec->catdir( $home, 'docker-alias' );
+    make_path($docker_alias);
+    local $Folder::PATHS = undef;
+    local %Folder::ALIASES = ();
+    local %Folder::CONFIG_ALIASES = ();
+    local $Folder::CONFIG_ALIASES_KEY = '';
+    my $cwd = Cwd::cwd();
+    chdir $repo or die "Unable to chdir to $repo: $!";
+    is( Folder->docker, $docker_alias, 'Folder AUTOLOAD lazily resolves config-backed path aliases in a plain Perl process' );
+    chdir $cwd or die "Unable to chdir to $cwd: $!";
+}
 
 my $zipped = zip('print qq{ok};');
 ok( $zipped->{raw}, 'zip returns a raw token' );
@@ -90,11 +120,76 @@ my @cmdp = _cmdp( perl => 'print 1;' );
 is( $cmdp[1], 'perl', '_cmdp returns pipeline metadata' );
 my $ajax_url = acmdx( type => 'json', code => 'print qq{{}};' );
 like( $ajax_url->{url}{tokenised}, qr{^/ajax\?token=}, 'acmdx builds a tokenised ajax url' );
+my $ajax_singleton_url = acmdx( type => 'text', code => 'print qq{ok};', singleton => 'TRANSIENT' );
+like( $ajax_singleton_url->{url}{tokenised}, qr/[?&]singleton=TRANSIENT/, 'acmdx carries the optional singleton value into transient ajax urls' );
 my ( $ajax_stdout, undef, $ajax_result ) = capture {
     return Ajax( jvar => 'configs.coverage.endpoint', code => 'print qq{{}};' );
 };
 like( $ajax_stdout, qr/set_chain_value/, 'Ajax prints the legacy config-binding script' );
 is( $ajax_result, 'HIDE-THIS', 'Ajax returns the legacy hide marker' );
+my ( $ajax_singleton_stdout, undef, $ajax_singleton_result ) = capture {
+    return Ajax( jvar => 'configs.coverage.endpoint', code => 'print qq{{}};', singleton => 'TRANSIENT' );
+};
+like( $ajax_singleton_stdout, qr/[?&]singleton=TRANSIENT/, 'Ajax carries the optional singleton value into transient ajax bindings' );
+is( $ajax_singleton_result, 'HIDE-THIS', 'Ajax still returns the hide marker when a transient singleton is supplied' );
+{
+    local $Zipper::AJAX_CONTEXT = {
+        source               => 'saved',
+        page_id              => 'coverage-page',
+        runtime_root         => $paths->runtime_root,
+        allow_transient_urls => 0,
+    };
+    my ( $saved_ajax_stdout, undef, $saved_ajax_result ) = capture {
+        return Ajax(
+            jvar      => 'configs.coverage.saved',
+            file      => 'coverage.json',
+            singleton => 'coverage-stream',
+            code      => 'print qq{{"ok":1}};',
+        );
+    };
+    like( $saved_ajax_stdout, qr{/ajax/coverage\.json\?type=text&singleton=coverage-stream}, 'Ajax prints a saved bookmark ajax url with the default text type and singleton when a file name is supplied' );
+    is( $saved_ajax_result, 'HIDE-THIS', 'saved bookmark Ajax still returns the hide marker' );
+    ok( -f Zipper::saved_ajax_file_path( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'saved bookmark Ajax stores the named ajax code file under the dashboards ajax tree' );
+    ok( -x Zipper::saved_ajax_file_path( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'saved bookmark Ajax marks the stored dashboards ajax tree file executable' );
+    is( Zipper::load_saved_ajax_code( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'print qq{{"ok":1}};', 'saved bookmark Ajax stored code can be loaded back from the dashboards ajax tree' );
+    my $saved_ajax_error = eval {
+        Ajax(
+            jvar => 'configs.coverage.saved',
+            code => 'print qq{{"ok":1}};',
+        );
+        '';
+    } || $@;
+    like( $saved_ajax_error, qr/file is required/, 'saved bookmark Ajax requires a file name when transient token urls are disabled' );
+}
+{
+    my $existing_path = Zipper::saved_ajax_file_path(
+        runtime_root => $paths->runtime_root,
+        file         => 'existing.sh',
+    );
+    my $existing_dir = dirname($existing_path);
+    make_path($existing_dir);
+    open my $fh, '>', $existing_path or die $!;
+    print {$fh} "#!/bin/sh\nprintf 'existing coverage\\n'\n";
+    close $fh;
+    chmod 0700, $existing_path or die $!;
+
+    local $Zipper::AJAX_CONTEXT = {
+        source               => 'saved',
+        page_id              => 'coverage-existing',
+        runtime_root         => $paths->runtime_root,
+        allow_transient_urls => 0,
+    };
+    my ( $stdout, undef, $result ) = capture {
+        return Ajax(
+            jvar => 'configs.coverage.existing',
+            file => 'existing.sh',
+            type => 'text',
+        );
+    };
+    like( $stdout, qr{/ajax/existing\.sh\?type=text}, 'Ajax prints a saved bookmark ajax url when only an existing file name is supplied' );
+    is( $result, 'HIDE-THIS', 'saved bookmark Ajax with only a file still returns the hide marker' );
+    is( Zipper::load_saved_ajax_code( runtime_root => $paths->runtime_root, file => 'existing.sh' ), "#!/bin/sh\nprintf 'existing coverage\\n'\n", 'saved bookmark Ajax with only a file leaves the existing executable content unchanged' );
+}
 
 is_deeply( je( j( { ok => 1 } ) ), { ok => 1 }, 'DataHelper je decodes JSON created by j' );
 is_deeply( Developer::Dashboard::PageDocument::_decode_structured_json('{"ok":1}'), { ok => 1 }, 'PageDocument structured JSON decoder returns parsed hashes' );
@@ -127,6 +222,369 @@ is( $modern_page->render_template('ignored'), $modern_page, 'render_template com
 like( $modern_page->canonical_json, qr/Modern Title/, 'canonical_json serializes page content' );
 
 my $runtime = Developer::Dashboard::PageRuntime->new( paths => $paths );
+{
+    my $buffer = '';
+    local *STREAM;
+    tie *STREAM, 'Developer::Dashboard::PageRuntime::StreamHandle', writer => sub { $buffer .= $_[0] if defined $_[0] };
+    print STREAM "alpha", undef, "beta";
+    printf STREAM "%s-%s", 'gamma', 'delta';
+    close STREAM;
+    untie *STREAM;
+    is( $buffer, 'alphabetagamma-delta', 'stream handle forwards print and printf output chunks to the callback' );
+}
+{
+    local *STREAM;
+    tie *STREAM, 'Developer::Dashboard::PageRuntime::StreamHandle';
+    print STREAM 'ignored-default-writer';
+    close STREAM;
+    untie *STREAM;
+    pass('stream handle accepts the default no-op writer');
+}
+{
+    my $streamed = '';
+    my $stream_page = Developer::Dashboard::PageDocument->new( id => 'stream-direct' );
+    my $stream_result = $runtime->stream_code_block(
+        code          => 'print "streamed";',
+        page          => $stream_page,
+        source        => 'saved',
+        state         => {},
+        runtime_context => {},
+        stdout_writer => sub { $streamed .= $_[0] if defined $_[0] },
+    );
+    is( $streamed, 'streamed', 'stream_code_block forwards printed stdout chunks directly' );
+    is( $stream_result->{error}, '', 'stream_code_block leaves the trailing error text empty on success' );
+}
+{
+    my $returned = '';
+    my $stream_page = Developer::Dashboard::PageDocument->new( id => 'stream-return-writer' );
+    my $stream_result = $runtime->stream_code_block(
+        code            => 'return { ok => 1 };',
+        page            => $stream_page,
+        source          => 'saved',
+        state           => {},
+        runtime_context => {},
+        return_writer   => sub { $returned .= $_[0] if defined $_[0] },
+    );
+    like( $returned, qr/ok => 1/, 'stream_code_block forwards structured return values through the optional return writer' );
+    is( $stream_result->{error}, '', 'stream_code_block leaves the trailing error text empty when using a return writer' );
+}
+{
+    my $stream_page = Developer::Dashboard::PageDocument->new( id => 'stream-default-writers' );
+    my $stream_result = $runtime->stream_code_block(
+        code            => 'return { ok => 1 };',
+        page            => $stream_page,
+        source          => 'saved',
+        state           => {},
+        runtime_context => {},
+    );
+    is_deeply( $stream_result->{returns}, [ { ok => 1 } ], 'stream_code_block works with the default no-op stream writers' );
+}
+is( Developer::Dashboard::PageRuntime::_noop_writer('ignored'), '', '_noop_writer accepts ignored streamed chunks' );
+like( $runtime->_runtime_value_text( { ok => 1 } ), qr/ok => 1/, '_runtime_value_text renders structured runtime values' );
+{
+    my $saved_path = Zipper::saved_ajax_file_path(
+        runtime_root => $paths->runtime_root,
+        file         => 'coverage.json',
+    );
+    is_deeply(
+        [ ( $runtime->_saved_ajax_command( path => $saved_path ) )[ 0, 1 ] ],
+        [ $^X, '-e' ],
+        '_saved_ajax_command defaults saved Ajax files without shebangs to the Perl bootstrap interpreter path',
+    );
+    my %saved_env = $runtime->_saved_ajax_env(
+        path      => $saved_path,
+        page      => 'coverage-page',
+        type      => 'text',
+        singleton => 'coverage-stream',
+        params    => { a => '1 2', b => 'ok' },
+    );
+    is( $saved_env{DEVELOPER_DASHBOARD_AJAX_PAGE}, 'coverage-page', '_saved_ajax_env exposes the saved bookmark id' );
+    is( $saved_env{DEVELOPER_DASHBOARD_AJAX_SINGLETON}, 'coverage-stream', '_saved_ajax_env exposes the saved bookmark singleton name' );
+    like( $saved_env{DEVELOPER_DASHBOARD_AJAX_PARAMS}, qr/"a"\s*:\s*"1 2"/, '_saved_ajax_env encodes request params as JSON' );
+    like( $saved_env{QUERY_STRING}, qr/a=1%202/, '_saved_ajax_env rebuilds a query string for child process use' );
+}
+is( $runtime->_quote_process_pattern_literal('name.+(test)?'), 'name\.\+\(test\)\?', '_quote_process_pattern_literal escapes regex metacharacters safely for singleton matching' );
+eval { $runtime->_normalize_saved_ajax_singleton("bad\nname") };
+like( "$@", qr/Invalid ajax singleton name/, '_normalize_saved_ajax_singleton rejects control characters' );
+{
+    my $shebang_file = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'shebang-handler' );
+    open my $fh, '>', $shebang_file or die $!;
+    print {$fh} "#!/bin/sh\nprintf 'ok\\n'\n";
+    close $fh;
+    chmod 0700, $shebang_file or die $!;
+    is_deeply( [ $runtime->_saved_ajax_command( path => $shebang_file ) ], [ $shebang_file ], '_saved_ajax_command executes shebang saved Ajax files directly' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'process-runner.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} "print qq{process-out\\n}; warn qq{process-err\\n}; system 'sh', '-c', 'printf \"child-out\\\\n\"; printf \"child-err\\\\n\" >&2'; die qq{process-die\\n};";
+    close $fh;
+    chmod 0700, $saved_path or die $!;
+    my $streamed = '';
+    my $stream_result = $runtime->stream_saved_ajax_file(
+        path          => $saved_path,
+        page          => 'coverage-page',
+        type          => 'text',
+        params        => { page => 'coverage-page', file => 'process-runner.pl', type => 'text' },
+        stdout_writer => sub { $streamed .= $_[0] if defined $_[0] },
+        stderr_writer => sub { $streamed .= $_[0] if defined $_[0] },
+    );
+    like( $streamed, qr/process-out/, 'stream_saved_ajax_file forwards direct perl stdout' );
+    like( $streamed, qr/process-err/, 'stream_saved_ajax_file forwards direct perl stderr' );
+    like( $streamed, qr/child-out/, 'stream_saved_ajax_file forwards child stdout' );
+    like( $streamed, qr/child-err/, 'stream_saved_ajax_file forwards child stderr' );
+    like( $streamed, qr/process-die/, 'stream_saved_ajax_file forwards uncaught perl die text' );
+    ok( $stream_result->{exit_code} != 0, 'stream_saved_ajax_file reports the failing process exit code' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'singleton-runner.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} 'print qq{$0\n};';
+    close $fh;
+    chmod 0700, $saved_path or die $!;
+    my @patterns;
+    my $streamed = '';
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::RuntimeManager::_pkill_perl = sub {
+            my ( $self, $pattern ) = @_;
+            push @patterns, $pattern;
+            return 1;
+        };
+        my $stream_result = $runtime->stream_saved_ajax_file(
+            path          => $saved_path,
+            page          => 'coverage-page',
+            type          => 'text',
+            params        => { page => 'coverage-page', file => 'singleton-runner.pl', type => 'text', singleton => 'FOOBAR' },
+            stdout_writer => sub { $streamed .= $_[0] if defined $_[0] },
+            stderr_writer => sub { $streamed .= $_[0] if defined $_[0] },
+        );
+        is( $stream_result->{exit_code}, 0, 'stream_saved_ajax_file succeeds when singleton replacement is enabled' );
+    }
+    is_deeply( \@patterns, ['^dashboard ajax: FOOBAR$'], 'stream_saved_ajax_file kills matching singleton Ajax workers before starting a replacement' );
+    like( $streamed, qr/^dashboard ajax: FOOBAR$/m, 'stream_saved_ajax_file renames the saved Perl Ajax worker to the singleton process title' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'stream-timing.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} <<'PL';
+for (1..3) {
+    print "tick$_";
+    sleep 1;
+}
+PL
+    close $fh;
+    chmod 0700, $saved_path or die $!;
+    my @chunks;
+    my @times;
+    my $start = time;
+    my $stream_result = $runtime->stream_saved_ajax_file(
+        path          => $saved_path,
+        page          => 'coverage-page',
+        type          => 'text',
+        params        => { page => 'coverage-page', file => 'stream-timing.pl', type => 'text' },
+        stdout_writer => sub {
+            my ($chunk) = @_;
+            return if !defined $chunk || $chunk eq '';
+            push @chunks, $chunk;
+            push @times, time - $start;
+        },
+        stderr_writer => sub { die "unexpected stderr chunk during timing stream test: $_[0]" if defined $_[0] && $_[0] ne '' },
+    );
+    is( $stream_result->{exit_code}, 0, 'stream_saved_ajax_file succeeds for timed saved ajax stream output' );
+    is( join( '', @chunks ), 'tick1tick2tick3', 'stream_saved_ajax_file forwards all timed ajax stdout chunks in order' );
+    ok( @times >= 2, 'stream_saved_ajax_file delivers multiple timed chunks before process exit' );
+    ok( $times[0] < 1.5, 'stream_saved_ajax_file forwards the first timed chunk before the saved ajax process finishes' );
+    ok( $times[1] < 2.5, 'stream_saved_ajax_file keeps forwarding later timed chunks during the long-running saved ajax process' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'disconnect-runner.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} <<'PL';
+$SIG{TERM} = sub { exit 0 };
+print "$$\n";
+while (1) {
+    print "tick\n";
+    sleep 1;
+}
+PL
+    close $fh;
+    chmod 0700, $saved_path or die $!;
+    my $child_pid;
+    my $stream_result = $runtime->stream_saved_ajax_file(
+        path          => $saved_path,
+        page          => 'coverage-page',
+        type          => 'text',
+        params        => { page => 'coverage-page', file => 'disconnect-runner.pl', type => 'text', singleton => 'FOOBAR' },
+        stdout_writer => sub {
+            my ($chunk) = @_;
+            if ( !defined $child_pid && defined $chunk && $chunk =~ /(\d+)/ ) {
+                $child_pid = $1 + 0;
+            }
+            return 0;
+        },
+        stderr_writer => sub { return 0 },
+    );
+    ok( $stream_result->{disconnected}, 'stream_saved_ajax_file marks the run as disconnected when the stream writer closes early' );
+    ok( defined $child_pid, 'disconnect test captures the saved ajax worker pid from the first streamed chunk' );
+    ok( !kill( 0, $child_pid ), 'stream_saved_ajax_file terminates the saved ajax worker when the browser stream disconnects' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'writer-error-runner.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} <<'PL';
+$SIG{TERM} = sub { exit 0 };
+print "$$\n";
+while (1) {
+    print "tick\n";
+    sleep 1;
+}
+PL
+    close $fh;
+    chmod 0700, $saved_path or die $!;
+    my $child_pid;
+    my $chunks = 0;
+    my $error = eval {
+        $runtime->stream_saved_ajax_file(
+            path          => $saved_path,
+            page          => 'coverage-page',
+            type          => 'text',
+            params        => { page => 'coverage-page', file => 'writer-error-runner.pl', type => 'text' },
+            stdout_writer => sub {
+                my ($chunk) = @_;
+                if ( !defined $child_pid && defined $chunk && $chunk =~ /(\d+)/ ) {
+                    $child_pid = $1 + 0;
+                }
+                $chunks++;
+                die "writer exploded\n" if $chunks > 1;
+                return 1;
+            },
+            stderr_writer => sub { return 1 },
+        );
+        return '';
+    } || $@;
+    like( $error, qr/writer exploded/, 'stream_saved_ajax_file surfaces non-disconnect writer failures instead of suppressing them' );
+    ok( defined $child_pid, 'writer failure test captures the saved ajax worker pid from the first streamed chunk' );
+    for ( 1 .. 20 ) {
+        my $reaped = waitpid( $child_pid, WNOHANG );
+        last if $reaped == $child_pid || !kill 0, $child_pid;
+        select undef, undef, undef, 0.1;
+    }
+    my $writer_reaped = waitpid( $child_pid, WNOHANG );
+    ok( $writer_reaped == $child_pid || !kill( 0, $child_pid ), 'stream_saved_ajax_file terminates the saved ajax worker after a non-disconnect writer failure' );
+    waitpid( $child_pid, 0 ) if $writer_reaped != $child_pid;
+}
+{
+    my $stdout_chunk = '';
+    pipe my $stdout_reader, my $stdout_writer_handle or die $!;
+    print {$stdout_writer_handle} 'chunk-out';
+    close $stdout_writer_handle;
+    my $select = IO::Select->new($stdout_reader);
+    $runtime->_drain_saved_ajax_ready_handle(
+        fh            => $stdout_reader,
+        path          => 'stdout-path',
+        select        => $select,
+        stdout        => $stdout_reader,
+        stdout_writer => sub { $stdout_chunk .= $_[0] if defined $_[0] },
+        stderr_writer => sub { die "unexpected stderr callback" },
+    );
+    is( $stdout_chunk, 'chunk-out', '_drain_saved_ajax_ready_handle forwards stdout chunks to the stdout writer' );
+}
+{
+    my $stderr_chunk = '';
+    pipe my $stdout_reader, my $stdout_writer_handle or die $!;
+    pipe my $stderr_reader, my $stderr_writer_handle or die $!;
+    print {$stderr_writer_handle} 'chunk-err';
+    close $stderr_writer_handle;
+    close $stdout_writer_handle;
+    my $select = IO::Select->new($stderr_reader);
+    $runtime->_drain_saved_ajax_ready_handle(
+        fh            => $stderr_reader,
+        path          => 'stderr-path',
+        select        => $select,
+        stdout        => $stdout_reader,
+        stdout_writer => sub { die "unexpected stdout callback" },
+        stderr_writer => sub { $stderr_chunk .= $_[0] if defined $_[0] },
+    );
+    is( $stderr_chunk, 'chunk-err', '_drain_saved_ajax_ready_handle forwards non-stdout chunks to the stderr writer' );
+}
+{
+    my $stderr_chunk = '';
+    pipe my $fh, my $writer_handle or die $!;
+    close $writer_handle;
+    my $select = IO::Select->new($fh);
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageRuntime::_stream_sysread = sub {
+            $! = EINTR;
+            return undef;
+        };
+        $runtime->_drain_saved_ajax_ready_handle(
+            fh            => $fh,
+            path          => 'eintr-path',
+            select        => $select,
+            stdout        => $fh,
+            stdout_writer => sub { die "unexpected stdout callback" },
+            stderr_writer => sub { $stderr_chunk .= $_[0] if defined $_[0] },
+        );
+    }
+    is( $stderr_chunk, '', '_drain_saved_ajax_ready_handle quietly retries EINTR reads without surfacing an error chunk' );
+}
+{
+    my $stderr_chunk = '';
+    pipe my $fh, my $writer_handle or die $!;
+    close $writer_handle;
+    my $select = IO::Select->new($fh);
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageRuntime::_stream_sysread = sub {
+            $! = EIO;
+            return undef;
+        };
+        $runtime->_drain_saved_ajax_ready_handle(
+            fh            => $fh,
+            path          => 'error-path',
+            select        => $select,
+            stdout        => $fh,
+            stdout_writer => sub { die "unexpected stdout callback" },
+            stderr_writer => sub { $stderr_chunk .= $_[0] if defined $_[0] },
+        );
+    }
+    like( $stderr_chunk, qr/Unable to read ajax stream for error-path/, '_drain_saved_ajax_ready_handle surfaces real read errors through the stderr writer' );
+}
+{
+    ok( $runtime->_looks_like_stream_disconnect_error(), '_looks_like_stream_disconnect_error treats empty errors as disconnect-like shutdowns' );
+    ok( $runtime->_looks_like_stream_disconnect_error("Broken pipe\n"), '_looks_like_stream_disconnect_error recognizes broken-pipe disconnect errors' );
+    ok( !$runtime->_looks_like_stream_disconnect_error("writer exploded\n"), '_looks_like_stream_disconnect_error does not hide unrelated writer failures' );
+}
+{
+    pipe my $select_reader, my $select_writer or die $!;
+    pipe my $extra_reader, my $extra_writer or die $!;
+    my $select = IO::Select->new($select_reader);
+    ok( $runtime->_close_saved_ajax_streams( $select, $select_reader, $extra_reader, $extra_writer ), '_close_saved_ajax_streams returns true after closing active handles' );
+    ok( !defined fileno($select_reader), '_close_saved_ajax_streams closes handles still tracked by the select set' );
+    ok( !defined fileno($extra_reader), '_close_saved_ajax_streams closes extra read handles passed outside the select set' );
+    ok( !defined fileno($extra_writer), '_close_saved_ajax_streams closes extra write handles passed outside the select set' );
+}
+{
+    my $class_page = Developer::Dashboard::PageDocument->new( layout => { body => 'plain body' } );
+    my $prepared_class = Developer::Dashboard::PageRuntime->prepare_page(
+        page            => $class_page,
+        runtime_context => {},
+    );
+    is( $prepared_class->{layout}{body}, 'plain body', 'prepare_page also works when called as a class method' );
+}
+{
+    my $empty_page = Developer::Dashboard::PageDocument->new;
+    my $class_runtime = Developer::Dashboard::PageRuntime->run_code_blocks( page => $empty_page );
+    is_deeply( $class_runtime, { outputs => [], errors => [] }, 'run_code_blocks also works when called as a class method with no code blocks' );
+}
+{
+    my $sandpit = $runtime->_new_sandpit();
+    ok( $sandpit->{package}, '_new_sandpit creates a package even when called with default state and runtime context' );
+    ok( !$runtime->_destroy_sandpit('not-a-sandpit'), '_destroy_sandpit returns quietly for invalid inputs' );
+    $runtime->_destroy_sandpit($sandpit);
+}
 my $prepared = $runtime->prepare_page(
     page => $modern_page,
     source => 'saved',
@@ -194,7 +652,7 @@ like( $logout_headers->{'Set-Cookie'}, qr/Max-Age=0/, 'logout expires the sessio
 
 {
     open my $fh, '>', $pages->page_file('legacy-forward') or die $!;
-    print {$fh} '/page/legacy-page';
+    print {$fh} '/app/legacy-page';
     close $fh;
 }
 is( $app->handle( path => '/app/legacy-forward', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } )->[0], 200, 'legacy app forwarding handles saved url bookmarks' );

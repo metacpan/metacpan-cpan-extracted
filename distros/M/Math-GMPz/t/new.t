@@ -161,6 +161,8 @@ eval{my $f36 = Math::GMPz->new($f28, 12);};
 if($@ =~ /Too many arguments supplied to new\(\) \- expected only one/) {$ok .= 'g'}
 
 eval{my $f37 = Math::GMPz->new($f28, 12);};
+#print "F28: $f28\n";
+#print "F37: $f37\n";
 if($@ =~ /Too many arguments supplied to new\(\) \- expected only one/) {$ok .= 'h'}
 else{ warn "H: \$\@: $@\n" }
 
@@ -228,71 +230,3 @@ else {print "not ok 5 $ok\n"}
 my $z = Math::GMPz->new("1234  \n 56 \t 78");
 if($z == 12345678) { print "ok 6\n" }
 else {print "not ok 6 $z\n" }
-
-__END__
-
-# Math::GMPz does not currently support the below code.
-#
-#my $obj1 = Math::GMPz->new(123);
-#my $obj2 = $obj1->new(456);
-#
-#if(ref($obj1) eq 'Math::GMPz' && ref($obj2) eq 'Math::GMPz') { print "ok 7\n"}
-#else {
-#  warn " REF 1: ", ref($obj1), "\n REF 2: ", ref($obj2), "\n";
-#  print "not ok 7\n";
-#}
-#
-#if($obj1 == 123 && $obj2 == 456) { print "ok 8\n" }
-#else {
-#  warn " OBJ 1: ", $obj1, "\n OBJ 2: ", $obj2, "\n";
-#  print "not ok 8\n";
-#}
-#
-#eval{ my $obj3 = $obj1->new(456, 16);};
-#if($@ =~ /Too many arguments supplied to new\(\) \- expected only one/) { print "ok 9\n" }
-#else {
-#  warn "\$\@: $@\n";
-#  print "not ok 9\n";
-#}
-#
-#my $obj4 = $obj1->new('456', 16);
-#if($obj4 == 1110) { print "ok 10\n" }
-#else {
-#  warn " Expected: 1110\n Got: $obj4\n";
-#  print "not ok 10\n";
-#}
-#
-#eval{ my $obj5 = $obj1->new('459', 8);};
-#if($@ =~ /First argument supplied to Rmpz_init_set_str is not a valid base 8 integer/) { print "ok 11\n" }
-#else {
-#  warn "\$\@: $@\n";
-#  print "not ok 11\n";
-#}
-#
-#eval{ my $obj6 = $obj1->new('456', 16, 0);};
-#if($@ =~ /Too many arguments supplied to new\(\)/) { print "ok 12\n" }
-#else {
-#  warn "\$\@: $@\n";
-# print "not ok 12\n";
-#}
-#
-#my $obj7 = $obj1->new();
-#if("$obj7" eq "0") { print "ok 13\n" }
-#else {
-#  warn " Expected: 0\n Got: $obj7\n";
-#  print "not ok 13\n";
-#}
-#
-#my $obj8 = Math::GMPz->new($obj1);
-#if($obj8 == 123) { print "ok 14\n" }
-#else {
-#  warn " Expected: 123\n Got: $obj8\n";
-#  print "not ok 14\n";
-#}
-#
-#my $obj9 = Math::GMPz::new($obj1);
-#if($obj9 == 123) { print "ok 15\n" }
-$else {
-#  warn " Expected: 123\n Got: $obj9\n";
-#  print "not ok 15\n";
-#}

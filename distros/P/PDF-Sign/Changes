@@ -1,13 +1,41 @@
 Revision history for PDF-Sign
 
+0.02  2026-04-02
+    - Fixed: PDFArray() and similar calls now use explicit parentheses
+      to avoid parser ambiguity when imported at compile time
+    - Fixed: PDF backend detection moved to BEGIN block with warn instead
+      of die, allowing modules that do not require PDF::API2 or
+      PDF::Builder to load PDF::Sign without fatal error
+    - Fixed: functions requiring PDF backend (prepare_file, sign_file,
+      prepare_ts, ts_file) replaced by informative stubs when no PDF
+      backend is available, deferred error to call time
+    - Fixed: Makefile.PL now exits with status 0 (NA report) when
+      neither PDF::API2 nor PDF::Builder is installed, avoiding
+      spurious FAIL reports on CPAN Testers (RT#174516)
+    - Fixed: test suite skips gracefully when PDF backend or openssl
+      is unavailable, producing SKIP instead of FAIL (RT#174516)
+    - Fixed: openssl.cnf referenced via __FILE__-relative path in
+      test files for consistent behavior regardless of invocation dir
+    - Fixed: PDF backend detection in tests uses BEGIN block to
+      anticipate compile-time loading of PDF::Sign
+    - Fixed: duplicate comment block in verify_signatures removed
+    - Fixed: verify_signatures temp file path separator normalized
+      to forward slash for cross-platform consistency
+    - Known limitation: ts_query uses shell form (not list form) to
+      suppress openssl "Using configuration from..." stderr noise
+      when used in CGI/Apache context; shell injection risk is
+      accepted and documented (input is caller-controlled tmpdir path)
+    - Fixed: ts_query sanitizes path arguments (strip double quotes)
+      to mitigate shell injection risk in shell form invocation
+    - Thanks to SREZIC for reporting and suggestions (RT#174516)
+ 
 0.01  2026-03-29
     - Initial CPAN release
     - prepare_file, sign_file: CMS/CAdES signature support
     - prepare_ts, ts_file: RFC3161 DocTimeStamp support
-    - cms_sign: openssl cms fallback smime via open() list form (no shell injection)
+    - cms_sign: openssl cms via open() list form (no shell injection)
     - ts_query: openssl ts via open() list form
     - tsa_fetch: curl with LWP::UserAgent fallback
-    - verify_signatures: estract cms and tsa
     - OpenSSL 1.x / 3.x compatibility (-cades, ETSI.CAdES.detached)
     - PDF::API2 or PDF::Builder backend autodetection
     - Cross-platform timezone handling (Linux / Windows)

@@ -4,7 +4,12 @@ use strict;
 use warnings;
 use Test::More;
 
+use POSIX ();
 use IO::Stty;
+
+# _POSIX_VDISABLE: the platform-specific value used to disable a cc slot
+my $VDISABLE = eval { POSIX::_POSIX_VDISABLE() };
+$VDISABLE = 0 unless defined $VDISABLE;
 
 # _parse_char_value is a private sub, call it fully qualified
 my @tests = (
@@ -40,9 +45,9 @@ my @tests = (
     [ '017',  15,   'octal 017' ],
     [ '0177', 127,  'octal 0177' ],
 
-    # undef / ^-
-    [ 'undef', 0, 'undef disables character' ],
-    [ '^-',    0, '^- disables character' ],
+    # undef / ^- (returns _POSIX_VDISABLE, which is 0 on Linux, 255 on macOS)
+    [ 'undef', $VDISABLE, 'undef disables character (returns _POSIX_VDISABLE)' ],
+    [ '^-',    $VDISABLE, '^- disables character (returns _POSIX_VDISABLE)' ],
 );
 
 plan tests => scalar @tests;

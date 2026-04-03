@@ -37,5 +37,12 @@ close($rec);
 
 $xpnb->parse_done;
 
-is( $cnt, 37,            'parse_start/parse_more counted 37 comments' );
-is( $str, '&draft.day;', 'original_string returns unexpanded entity ref' );
+is( $cnt, 37, 'parse_start/parse_more counted 37 comments' );
+
+# original_string relies on XML_GetInputContext which returns NULL
+# when libexpat is compiled without XML_CONTEXT_BYTES (e.g. DragonFlyBSD).
+SKIP: {
+    skip 'original_string not available (expat compiled without XML_CONTEXT_BYTES)', 1
+        if !defined $str || $str eq '';
+    is( $str, '&draft.day;', 'original_string returns unexpanded entity ref' );
+}

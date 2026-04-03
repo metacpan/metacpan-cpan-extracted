@@ -1,15 +1,13 @@
-^\.git*
+^\.git
+^\.claude/
 ^cpanfile$
 \.bs$
 ^RIPEMD160\.c$
 \.o$
-^\.gitignore$
 ^blib/
 ^Makefile$
 ^MANIFEST.bak$
 ^MYMETA\.
 ^pm_to_blib$
 \.perltidyrc$
-^MANIFEST.bak$
-^MYMETA\.
 ^CLAUDE.md$

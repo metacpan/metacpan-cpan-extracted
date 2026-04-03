@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>16d40555-b954-47f2-9b4b-74efbb4da65a</MessageSerialNumber>
-  <MessageDate>Tue, 31 Mar 2026 05:30:21 BST</MessageDate>
+  <MessageSerialNumber>f0bba11f-a870-41e6-96e8-09cc3e6db061</MessageSerialNumber>
+  <MessageDate>Fri, 3 Apr 2026 05:29:05 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1927,8 +1927,12 @@
           <Length>5</Length>
         </Rule>
         <Rule>
-          <Range>2000000-6899999</Range>
+          <Range>2000000-6849999</Range>
           <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>6850000-6899999</Range>
+          <Length>6</Length>
         </Rule>
         <Rule>
           <Range>6900000-6999999</Range>
@@ -2491,8 +2495,12 @@
       <Agency>India</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-0999999</Range>
+          <Range>0000000-0899999</Range>
           <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>0900000-0999999</Range>
+          <Length>4</Length>
         </Rule>
         <Rule>
           <Range>1000000-4699999</Range>
@@ -5009,8 +5017,16 @@
       <Agency>Morocco</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-1999999</Range>
+          <Range>0000000-0299999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>0300000-1299999</Range>
           <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>1300000-1999999</Range>
+          <Length>3</Length>
         </Rule>
         <Rule>
           <Range>2000000-2299999</Range>
@@ -5025,8 +5041,12 @@
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>8000000-8549999</Range>
+          <Range>8000000-8299999</Range>
           <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>8300000-8549999</Range>
+          <Length>4</Length>
         </Rule>
         <Rule>
           <Range>8550000-9999999</Range>
@@ -8867,15 +8887,15 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>4000000-5499999</Range>
+          <Range>4000000-6199999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>5500000-9499999</Range>
+          <Range>6200000-9199999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9500000-9999999</Range>
+          <Range>9200000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

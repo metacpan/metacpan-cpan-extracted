@@ -103,6 +103,25 @@ subtest 'version (bare) returns version' => sub {
     is( $ver, $IO::Stty::VERSION . "\n", 'bare version returns VERSION' );
 };
 
+# ── speed query ──────────────────────────────────────────────────────
+
+subtest 'speed returns output baud rate' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    IO::Stty::stty( $slave, '9600' );
+    my $speed = IO::Stty::stty( $slave, 'speed' );
+    is( $speed, "9600\n", 'speed returns symbolic baud rate' );
+};
+
+subtest 'speed with unknown rate returns raw numeric' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    # Just verify speed returns something reasonable for default pty speed
+    my $speed = IO::Stty::stty( $slave, 'speed' );
+    ok( defined $speed, 'speed returns a defined value' );
+    like( $speed, qr/^\d+\n$/, 'speed output is a number followed by newline' );
+};
+
 # ── single flag arg works ────────────────────────────────────────────
 
 subtest 'single flag arg (not numeric, not special)' => sub {

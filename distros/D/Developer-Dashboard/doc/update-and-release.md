@@ -51,8 +51,10 @@ Serve the local app in the background:
 perl -Ilib bin/dashboard serve
 ```
 
-The root path now opens the free-form bookmark editor directly, and `/apps` redirects to `/app/index`.
+The root path now redirects to `/app/index` when a saved `index` bookmark exists, and otherwise opens the free-form bookmark editor directly. `/apps` still redirects to `/app/index`.
+Unknown saved routes such as `/app/foobar` must now open the bookmark editor with a prefilled blank bookmark for `/app/foobar` instead of returning a plain 404 page.
 If the posted editor content includes `BOOKMARK: some-id`, that post now persists the bookmark document so `/app/some-id` works immediately after saving from `/`.
+Saved bookmark editor routes such as `/app/some-id/edit` must keep posting back to that named route and keep their Play links on `/app/some-id`, even when transient `token=` URLs are disabled by default.
 Edit and source routes must preserve raw Template Toolkit placeholders in bookmark source, so browser saves of `HTML:` or `FORM.TT:` content such as `[% title %]` should be verified as source-stable as well as render-correct.
 
 Create a helper login user:
@@ -127,7 +129,18 @@ Access semantics:
 - `http://localhost:7890/` is helper access and requires login
 - remote or non-canonical host access also requires login
 
+When helper access is redirected to `/login`, the login form must preserve the
+original target path and query in a hidden redirect field so a successful
+helper login returns the browser to the original route, such as `/app/index`,
+instead of always sending it to `/`.
+
 The default bind is `0.0.0.0:7890`, so the service is reachable on local and VPN interfaces unless the host firewall blocks it.
+Run `dashboard serve --ssl` to enable HTTPS with the generated self-signed
+certificate stored under `~/.developer-dashboard/certs/`, and verify the local
+listener at `https://127.0.0.1:7890/`.
+Shared `nav/*.tt` fragments now wrap horizontally and inherit bookmark theme
+colors from CSS variables, so bookmark pages with dark panels do not force a
+light nav strip or unreadable nav link text.
 
 Process management does not trust pid files alone. The runtime validates managed web and collector processes by environment marker or process title, and uses a `pkill`-style scan fallback when pid state is stale.
 
@@ -147,7 +160,7 @@ The extension layer now includes:
 Compose setup can now stay isolated in service folders under `./.developer-dashboard/docker/<service>/compose.yml` for the current project, with `~/.developer-dashboard/config/docker/<service>/compose.yml` as the fallback. The wrapper infers service names from passthrough docker compose args such as `config green` before building the final `docker compose` command. When no service name is passed, the resolver scans isolated service folders and preloads every non-disabled folder. A folder containing `disabled.yml` is skipped. Each isolated folder contributes `development.compose.yml` when present, otherwise `compose.yml`. The compose runtime also exports `DDDC` as the effective config-root docker directory for the current runtime so YAML can continue to use `${DDDC}` paths internally. Wrapper-only flags are consumed first and remaining docker compose flags such as `-d` and `--build` pass through untouched.
 Without `--dry-run`, the wrapper now hands off with `exec`, so terminal users see the normal streaming output from `docker compose` itself instead of a dashboard JSON wrapper.
 Path aliases can now be managed from the CLI with `dashboard path add <name> <path>` and `dashboard path del <name>`. These commands persist user-defined aliases in the effective config root, using a project-local `./.developer-dashboard` tree first when it exists and otherwise the home runtime. Both repeated adds and repeated deletes are intentionally idempotent. When an added path lives under the current home directory, the stored config rewrites it to `$HOME/...` so a shared dashboard config directory does not hard-code one developer's absolute home path.
-Legacy `Folder` compatibility now also accepts the root-style names exposed by `dashboard paths`, so `Folder->runtime_root`, `Folder->bookmarks_root`, and `Folder->config_root` resolve through the existing legacy aliases without adding separate wrapper methods. Before `Folder->configure(...)` runs, those runtime-backed names now lazily bootstrap a default dashboard path registry from `HOME` instead of dying.
+Legacy `Folder` compatibility now also accepts the root-style names exposed by `dashboard paths`, so `Folder->runtime_root`, `Folder->bookmarks_root`, and `Folder->config_root` resolve through the existing legacy aliases without adding separate wrapper methods. Before `Folder->configure(...)` runs, those runtime-backed names now lazily bootstrap a default dashboard path registry from `HOME` instead of dying. Plain `Folder` calls also lazy-load config-backed path aliases from the active runtime, so direct compatibility calls such as `Folder->docker` match the aliases shown by `dashboard paths`.
 `dashboard init` now seeds `welcome`, `api-dashboard`, and `db-dashboard` as editable saved bookmarks when those ids are missing.
 
 ## Release To PAUSE
@@ -168,8 +181,8 @@ Before publishing to PAUSE, remove older build directories and tarballs first so
 ```bash
 rm -rf Developer-Dashboard-* Developer-Dashboard-*.tar.gz
 dzil build
-tar -tzf Developer-Dashboard-0.94.tar.gz | grep run-host-integration.sh
-cpanm /tmp/Developer-Dashboard-0.94.tar.gz -v
+tar -tzf Developer-Dashboard-1.33.tar.gz | grep run-host-integration.sh
+cpanm /tmp/Developer-Dashboard-1.33.tar.gz -v
 ```
 
 and uploads the resulting tarball to PAUSE using:
@@ -180,6 +193,7 @@ and uploads the resulting tarball to PAUSE using:
 stored as GitHub Actions secrets.
 
 The release workflow bootstraps the C<App::Cmd> dependency chain explicitly before C<Dist::Zilla>, including modules such as C<Module::Pluggable::Object>, C<Getopt::Long::Descriptive>, C<Class::Load>, and C<IO::TieCombine>, so fresh GitHub runners do not fail during release dependency installation when C<Dist::Zilla> pulls in the C<App::Cmd::*> stack. It also installs C<Dist::Zilla::Plugin::MetaProvides::Package> so generated META files include an explicit C<provides> section.
+Both shipped GitHub workflows now pin C<actions/checkout@v5> and set C<FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true> so hosted runners do not rely on the deprecated Node 20 JavaScript-action runtime.
 
 Generated release metadata should also include repository resources plus an
 explicit C<provides> section, and the repository root should ship

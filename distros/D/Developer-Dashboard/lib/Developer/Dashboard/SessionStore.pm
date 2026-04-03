@@ -1,7 +1,9 @@
 package Developer::Dashboard::SessionStore;
-$Developer::Dashboard::SessionStore::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Digest::SHA qw(sha256_hex);
 use File::Spec;

@@ -5,13 +5,11 @@
 
 void RIPEMD160_init(Crypt__RIPEMD160 ripemd160)
 {
+  memset(ripemd160, 0, sizeof(RIPEMD160_INFO));
   MDinit(ripemd160->MDbuf);
-  ripemd160->local = (dword) 0;
-  ripemd160->count_lo = (dword) 0;
-  ripemd160->count_hi = (dword) 0;
 }
 
-void RIPEMD160_update(Crypt__RIPEMD160 ripemd160, byte *strptr, dword len)
+void RIPEMD160_update(Crypt__RIPEMD160 ripemd160, const byte *strptr, dword len)
 {
   dword
     i;

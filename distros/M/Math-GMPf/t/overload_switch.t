@@ -38,8 +38,8 @@ cmp_ok(-4, '<', $two, "IV < Math::GMPf object");
 cmp_ok($two, '<=', 6,  "Math::GMPf object <= IV");
 cmp_ok(-4, '<=', $two, "IV <= Math::GMPf object");
 
-cmp_ok($two <=> 6, '<', 0, "Math::GMPf object <=> IV");
-cmp_ok(6 <=> $two, '>', 0, "IV <=> Math::GMPf object");
+cmp_ok($two <=> 6, '==', -1, "Math::GMPf object <=> IV");
+cmp_ok(6 <=> $two, '==', 1, "IV <=> Math::GMPf object");
 
 # These next 2 subs will cause failures here on perl-5.20.0
 # and later if &PL_sv_yes or &PL_sv_no is encountered in the

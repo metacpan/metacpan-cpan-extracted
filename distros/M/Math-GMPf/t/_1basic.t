@@ -20,8 +20,8 @@ warn "# GMPF_WIN32_FMT_BUG is ", Math::GMPf::GMPF_WIN32_FMT_BUG, "\n";
 warn "# GMP_LIMB_BITS is ", Math::GMPf::GMP_LIMB_BITS, "\n" if defined Math::GMPf::GMP_LIMB_BITS;
 warn "# GMP_NAIL_BITS is ", Math::GMPf::GMP_NAIL_BITS, "\n" if defined Math::GMPf::GMP_NAIL_BITS;
 
-if($Math::GMPf::VERSION eq '0.53' && $Math::GMPf::Random::VERSION eq '0.53' &&
-   $Math::GMPf::V::VERSION eq '0.53' &&
+if($Math::GMPf::VERSION eq '0.54' && $Math::GMPf::Random::VERSION eq '0.54' &&
+   $Math::GMPf::V::VERSION eq '0.54' &&
    Math::GMPf::_get_xs_version() eq $Math::GMPf::VERSION) {print "ok 1\n"}
 else {
   warn "$Math::GMPf::VERSION $Math::GMPf::Random::VERSION $Math::GMPf::V::VERSION ",

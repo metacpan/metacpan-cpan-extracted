@@ -69,3 +69,4 @@
 App-.*
 .test-script-*
 typescript
+mutation*

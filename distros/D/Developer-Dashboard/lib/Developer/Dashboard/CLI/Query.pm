@@ -1,7 +1,9 @@
 package Developer::Dashboard::CLI::Query;
-$Developer::Dashboard::CLI::Query::VERSION = '0.94';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.33';
 
 use Exporter 'import';
 use FindBin qw($Bin);

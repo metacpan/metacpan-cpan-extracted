@@ -24,7 +24,7 @@ use IPC::Open3;
 use JSON::MaybeXS qw(encode_json decode_json);
 use Symbol qw(gensym);
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -6055,11 +6055,13 @@ sub _write_schema {
 		function => $method_name,
 		module => $package_name,
 		config => {
+			close_stdin => 0,
 			dedup => 1,
 			test_nuls => 0,
 			test_undef => 0,
 			test_empty => 1,
-			test_non_ascii => 0
+			test_non_ascii => 0,
+			test_security => 0
 		}
 	};
 
@@ -7543,4 +7545,3 @@ assistance of AI.
 =cut
 
 1;
-

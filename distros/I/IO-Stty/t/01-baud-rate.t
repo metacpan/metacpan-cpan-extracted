@@ -53,7 +53,76 @@ subtest 'single-arg numeric sets both speeds' => sub {
     is( $t->getispeed, POSIX::B9600(), 'single-arg 9600 sets ispeed' );
 };
 
-# ── 2. Invalid baud rate warns ────────────────────────────────────────
+# ── 2. Baud rate aliases (exta, extb, 134.5) ─────────────────────────
+
+subtest 'exta is alias for 19200' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+    IO::Stty::stty( $slave, 'ospeed', 'exta' );
+    my $t = get_termios($slave);
+    is( $t->getospeed, POSIX::B19200(), 'exta sets ospeed to 19200' );
+    is( scalar @warnings, 0, 'no warnings for exta' )
+        or diag "Got warnings: @warnings";
+};
+
+subtest 'extb is alias for 38400' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+    IO::Stty::stty( $slave, 'ospeed', 'extb' );
+    my $t = get_termios($slave);
+    is( $t->getospeed, POSIX::B38400(), 'extb sets ospeed to 38400' );
+    is( scalar @warnings, 0, 'no warnings for extb' )
+        or diag "Got warnings: @warnings";
+};
+
+subtest '134.5 is alias for B134' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+    IO::Stty::stty( $slave, 'ospeed', '134.5' );
+    my $t = get_termios($slave);
+    is( $t->getospeed, POSIX::B134(), '134.5 sets ospeed to B134' );
+    is( scalar @warnings, 0, 'no warnings for 134.5' )
+        or diag "Got warnings: @warnings";
+};
+
+subtest 'single-arg exta sets both speeds' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+    IO::Stty::stty( $slave, 'exta' );
+    my $t = get_termios($slave);
+    is( $t->getospeed, POSIX::B19200(), 'single-arg exta sets ospeed' );
+    is( $t->getispeed, POSIX::B19200(), 'single-arg exta sets ispeed' );
+    is( scalar @warnings, 0, 'no warnings for single-arg exta' )
+        or diag "Got warnings: @warnings";
+};
+
+subtest 'single-arg 134.5 sets both speeds' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+    IO::Stty::stty( $slave, '134.5' );
+    my $t = get_termios($slave);
+    is( $t->getospeed, POSIX::B134(), 'single-arg 134.5 sets ospeed' );
+    is( $t->getispeed, POSIX::B134(), 'single-arg 134.5 sets ispeed' );
+    is( scalar @warnings, 0, 'no warnings for single-arg 134.5' )
+        or diag "Got warnings: @warnings";
+};
+
+# ── 3. Invalid baud rate warns ────────────────────────────────────────
 
 subtest 'unknown baud rate produces warning, does not die' => sub {
     my ( $pty, $slave ) = fresh_pty();

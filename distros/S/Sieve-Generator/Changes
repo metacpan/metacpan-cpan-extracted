@@ -1,4 +1,10 @@
 Revision history for Sieve-Generator
 
+0.002     2026-04-02 10:53:46-04:00 America/New_York
+        - remove a bunch of sugar that didn't pull its weight
+        - significantly improve the "command" sugar for more auto-typing and
+          better formatted output; also, tagged arguments
+        - added the var_eq and var_ne sugar, which save fiddly typing
+
 0.001     2026-03-23 13:57:21-04:00 America/New_York
         - first release

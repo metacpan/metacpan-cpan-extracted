@@ -39,6 +39,10 @@ for my $rate (@modern_rates) {
     }
 }
 
+# Determine platform's VDISABLE value (0 on Linux, 255 on macOS/BSD)
+my $VDISABLE = eval { POSIX::_POSIX_VDISABLE() };
+$VDISABLE = 0 unless defined $VDISABLE;
+
 # Test show_me_the_crap() speed display for each available rate
 # We need a dummy termios state to call show_me_the_crap()
 my %dummy_cc = (
@@ -47,7 +51,7 @@ my %dummy_cc = (
     ERASE => 127,
     KILL  => 21,
     EOF   => 4,
-    EOL   => 0,
+    EOL   => $VDISABLE,
     START => 17,
     STOP  => 19,
     SUSP  => 26,

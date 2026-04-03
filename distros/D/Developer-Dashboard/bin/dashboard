@@ -76,11 +76,7 @@ my $runner     = Developer::Dashboard::CollectorRunner->new(
     paths      => $paths,
 );
 my $config     = Developer::Dashboard::Config->new( files => $files, paths => $paths );
-my $collector_jobs = $config->collectors;
-my $synced_collector_indicators = $indicators->sync_collectors($collector_jobs);
 my $pages      = Developer::Dashboard::PageStore->new( paths => $paths );
-$pages->migrate_legacy_json_pages;
-$paths->register_named_paths( $config->path_aliases );
 my $page_runtime = Developer::Dashboard::PageRuntime->new(
     files   => $files,
     paths   => $paths,
@@ -125,9 +121,11 @@ my $runtime = Developer::Dashboard::RuntimeManager->new(
             sessions => $web_sessions,
         );
         return Developer::Dashboard::Web::Server->new(
-            app  => $app,
-            host => $args{host},
-            port => $args{port},
+            app     => $app,
+            host    => $args{host},
+            port    => $args{port},
+            workers => $args{workers},
+            ssl     => $args{ssl},
         );
     },
     config => $config,
@@ -136,7 +134,37 @@ my $runtime = Developer::Dashboard::RuntimeManager->new(
     runner => $runner,
 );
 
+my $CONFIG_PATH_ALIASES_LOADED  = 0;
+my $SAVED_PAGES_MIGRATED        = 0;
+my $COLLECTOR_INDICATORS_SYNCED = 0;
+
+sub _load_configured_path_aliases {
+    return 1 if $CONFIG_PATH_ALIASES_LOADED;
+    $paths->register_named_paths( $config->path_aliases );
+    $CONFIG_PATH_ALIASES_LOADED = 1;
+    return 1;
+}
+
+sub _migrate_saved_pages {
+    return 1 if $SAVED_PAGES_MIGRATED;
+    $pages->migrate_legacy_json_pages;
+    $SAVED_PAGES_MIGRATED = 1;
+    return 1;
+}
+
+sub _collector_jobs {
+    return $config->collectors;
+}
+
+sub _sync_configured_collector_indicators {
+    return 1 if $COLLECTOR_INDICATORS_SYNCED;
+    $indicators->sync_collectors( _collector_jobs() );
+    $COLLECTOR_INDICATORS_SYNCED = 1;
+    return 1;
+}
+
 if ( $cmd eq 'ps1' ) {
+    _sync_configured_collector_indicators();
     my $jobs = 0;
     my $cwd  = cwd();
     my $mode = 'compact';
@@ -154,6 +182,7 @@ if ( $cmd eq 'ps1' ) {
     exit 0;
 }
 elsif ( $cmd eq 'paths' ) {
+    _load_configured_path_aliases();
     my %out = (
         home           => $paths->home,
         home_runtime_root => $paths->home_runtime_root,
@@ -177,6 +206,7 @@ elsif ( $cmd eq 'paths' ) {
 elsif ( $cmd eq 'path' ) {
     my $action = shift @ARGV || '';
     if ( $action eq 'resolve' ) {
+        _load_configured_path_aliases();
         my $name = shift @ARGV || die "Usage: dashboard path resolve <name>\n";
         print $paths->resolve_dir($name), "\n";
         exit 0;
@@ -208,6 +238,7 @@ elsif ( $cmd eq 'path' ) {
         exit 0;
     }
     elsif ( $action eq 'list' ) {
+        _load_configured_path_aliases();
         my %out = (
             home         => $paths->home,
             home_runtime => $paths->home_runtime_root,
@@ -242,6 +273,7 @@ elsif ( $cmd eq 'decode' ) {
     exit 0;
 }
 elsif ( $cmd eq 'indicator' ) {
+    _sync_configured_collector_indicators() if ( ( $ARGV[0] || '' ) eq 'list' );
     my $action = shift @ARGV || '';
     if ( $action eq 'set' ) {
         my ( $name, $label, $icon, $status ) = @ARGV;
@@ -312,14 +344,14 @@ elsif ( $cmd eq 'collector' ) {
     }
     elsif ( $action eq 'run' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector run <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{$collector_jobs};
+        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
         die "Unknown collector '$name'\n" if !$job;
         print json_encode( $runner->run_once($job) );
         exit 0;
     }
     elsif ( $action eq 'start' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector start <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{$collector_jobs};
+        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
         die "Unknown collector '$name'\n" if !$job;
         my $pid = $runner->start_loop($job);
         print "$pid\n";
@@ -333,7 +365,7 @@ elsif ( $cmd eq 'collector' ) {
     }
     elsif ( $action eq 'restart' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector restart <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{$collector_jobs};
+        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
         die "Unknown collector '$name'\n" if !$job;
         $runner->stop_loop($name);
         my $pid = $runner->start_loop($job);
@@ -360,6 +392,7 @@ elsif ( $cmd eq 'config' ) {
         exit 0;
     }
     elsif ( $action eq 'show' ) {
+        _load_configured_path_aliases();
         print json_encode( $config->merged );
         exit 0;
     }
@@ -389,7 +422,8 @@ elsif ( $cmd eq 'auth' ) {
     }
 }
 elsif ( $cmd eq 'init' ) {
-    my $migrated = $pages->migrate_legacy_json_pages;
+    _migrate_saved_pages();
+    my $migrated = [];
     my $config_file = $config->save_global(
         {
             collectors => [
@@ -423,6 +457,8 @@ elsif ( $cmd eq 'version' ) {
     exit 0;
 }
 elsif ( $cmd eq 'page' ) {
+    _load_configured_path_aliases();
+    _migrate_saved_pages();
     my $action = shift @ARGV || '';
     if ( $action eq 'new' ) {
         my $id = shift @ARGV || '';
@@ -544,6 +580,8 @@ elsif ( $cmd eq 'page' ) {
     }
 }
 elsif ( $cmd eq 'action' ) {
+    _load_configured_path_aliases();
+    _migrate_saved_pages();
     my $sub = shift @ARGV || '';
     if ( $sub eq 'run' ) {
         my $page_id = shift @ARGV || die "Usage: dashboard action run <page_id> <action_id>\n";
@@ -562,6 +600,7 @@ elsif ( $cmd eq 'action' ) {
     }
 }
 elsif ( $cmd eq 'docker' ) {
+    _load_configured_path_aliases();
     my $sub = shift @ARGV || '';
     if ( $sub eq 'compose' ) {
         my @addons;
@@ -597,26 +636,86 @@ elsif ( $cmd eq 'docker' ) {
     }
 }
 elsif ( $cmd eq 'serve' ) {
-    my $host = '0.0.0.0';
-    my $port = 7890;
+    _load_configured_path_aliases();
+    _migrate_saved_pages();
+    my $action = @ARGV && $ARGV[0] !~ /^-/ ? shift @ARGV : '';
+    if ( $action eq 'logs' ) {
+        my $follow = 0;
+        my $lines;
+        GetOptionsFromArray(
+            \@ARGV,
+            'f'   => \$follow,
+            'n=i' => \$lines,
+        );
+        print $runtime->web_log(
+            follow => $follow,
+            ( defined $lines ? ( lines => $lines ) : () ),
+        );
+        exit 0;
+    }
+    if ( $action eq 'workers' ) {
+        my $workers = shift @ARGV;
+        my $host = '0.0.0.0';
+        my $port = 7890;
+        GetOptionsFromArray(
+            \@ARGV,
+            'host=s' => \$host,
+            'port=i' => \$port,
+        );
+        my $saved = $config->save_global_web_workers($workers);
+        my $running = $runtime->running_web;
+        my $pid;
+        if ( !$running ) {
+            $pid = $runtime->start_web(
+                host    => $host,
+                port    => $port,
+                workers => $saved->{workers},
+            );
+        }
+        print json_encode(
+            {
+                %{$saved},
+                ( defined $pid ? ( pid => $pid ) : () ),
+            }
+        );
+        exit 0;
+    }
+    unshift @ARGV, $action if defined $action && $action ne '';
+    my $settings = $config->web_settings;
+    my $host = $settings->{host};
+    my $port = $settings->{port};
+    my $workers = $settings->{workers};
+    my $ssl = $settings->{ssl};
     my $foreground = 0;
     GetOptionsFromArray(
         \@ARGV,
         'host=s'      => \$host,
         'port=i'      => \$port,
+        'workers=i'   => \$workers,
+        'ssl!'        => \$ssl,
         'foreground!' => \$foreground,
+    );
+    $config->save_global_web_settings(
+        host    => $host,
+        port    => $port,
+        workers => $workers,
+        ssl     => $ssl,
     );
     my $result = $runtime->start_web(
         foreground => $foreground,
         host       => $host,
         port       => $port,
+        workers    => $workers,
+        ssl        => $ssl,
     );
     if (!$foreground) {
         print json_encode(
             {
-                host => $host,
-                pid  => $result,
-                port => $port,
+                host    => $host,
+                port    => $port,
+                workers => $workers,
+                ssl     => $ssl,
+                pid     => $result,
             }
         );
     }
@@ -627,17 +726,25 @@ elsif ( $cmd eq 'stop' ) {
     exit 0;
 }
 elsif ( $cmd eq 'restart' ) {
-    my $host = '0.0.0.0';
-    my $port = 7890;
+    _load_configured_path_aliases();
+    my $settings = $config->web_settings;
+    my $host = $settings->{host};
+    my $port = $settings->{port};
+    my $workers = $settings->{workers};
+    my $ssl = $settings->{ssl};
     GetOptionsFromArray(
         \@ARGV,
-        'host=s' => \$host,
-        'port=i' => \$port,
+        'host=s'    => \$host,
+        'port=i'    => \$port,
+        'workers=i' => \$workers,
+        'ssl!'      => \$ssl,
     );
     print json_encode(
         $runtime->restart_all(
-            host => $host,
-            port => $port,
+            host    => $host,
+            port    => $port,
+            workers => $workers,
+            ssl     => $ssl,
         )
     );
     exit 0;
@@ -1170,9 +1277,9 @@ dashboard - command-line entrypoint for Developer Dashboard
   dashboard page source <id|token>
   dashboard action run <page_id> <action_id>
   dashboard docker compose [--addon NAME] [--mode NAME] [--service NAME] [--project DIR] [--dry-run] <compose-args...>
-  dashboard serve [--host HOST] [--port PORT] [--foreground]
+  dashboard serve [logs [-f] [-n N]|workers <N>] [--host HOST] [--port PORT] [--workers N] [--foreground]
   dashboard stop
-  dashboard restart [--host HOST] [--port PORT]
+  dashboard restart [--host HOST] [--port PORT] [--workers N]
   dashboard shell [bash]
   dashboard <custom-subcommand> [args...]
 

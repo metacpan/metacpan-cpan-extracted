@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.94';
+our $VERSION = '1.33';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-0.94
+1.33
 
 =head1 INTRODUCTION
 
@@ -176,11 +176,11 @@ C</app/nav/foo.tt>
 
 =item *
 
-C</page/nav/foo.tt/edit>
+C</app/nav/foo.tt/edit>
 
 =item *
 
-C</page/nav/foo.tt/source>
+C</app/nav/foo.tt/source>
 
 =back
 
@@ -194,7 +194,14 @@ Shared nav fragments and normal bookmark pages both render through Template
 Toolkit with C<env.current_page> set to the active request path, such as
 C</app/index>. The same path is also available as
 C<env.runtime_context.current_page>, alongside the rest of the request-time
-runtime context.
+runtime context. Token play renders for named bookmarks also reuse that saved
+C</app/E<lt>idE<gt>> path for nav context, so shared C<nav/*.tt> fragments do
+not disappear just because the browser reached the page through a transient
+C</?mode=render&token=...> URL.
+Shared nav markup now wraps horizontally by default and inherits the page
+theme through CSS variables such as C<--panel>, C<--line>, C<--text>, and
+C<--accent>, so dark bookmark themes no longer force a pale nav box or hide
+nav link text against the background.
 
 =head2 What You Get
 
@@ -232,6 +239,11 @@ By default it listens on C<0.0.0.0:7890>, so you can open it in a browser at:
 
   http://127.0.0.1:7890/
 
+Run C<dashboard serve --ssl> to enable HTTPS with a generated self-signed
+certificate under F<~/.developer-dashboard/certs/>, then open:
+
+  https://127.0.0.1:7890/
+
 The access model is deliberate:
 
 =over 4
@@ -256,6 +268,17 @@ request into full local-admin access
 In practice that means the developer at the machine gets friction-free local
 admin access, while shared or forwarded access is forced through explicit
 helper accounts.
+When a saved C<index> bookmark exists, opening C</> now redirects straight to
+C</app/index> so the saved home page becomes the default browser entrypoint.
+When no saved C<index> bookmark exists yet, C</> still opens the free-form
+bookmark editor.
+If a user opens an unknown saved route such as C</app/foobar>, the browser now
+opens the bookmark editor with a prefilled blank bookmark for that requested
+path instead of showing a 404 error page.
+When helper access is sent to C</login>, the login form now keeps the original
+requested path and query string in a hidden redirect target. After a
+successful helper login, the browser is sent back to that saved route, such as
+C</app/index>, instead of being dropped at C</>.
 
 =head2 Collectors, Indicators, And PS1
 
@@ -413,10 +436,12 @@ refresh, and page-header status payloads for the web UI.
 
 =item * Web Layer
 
-L<Developer::Dashboard::Web::App> and
+L<Developer::Dashboard::Web::DancerApp>,
+L<Developer::Dashboard::Web::App>, and
 L<Developer::Dashboard::Web::Server> provide the browser interface on port
-C<7890>, including the root editor, page rendering, login/logout, helper
-sessions, and the exact-loopback admin trust model.
+C<7890>, with Dancer2 owning the HTTP route table while the web-app service
+handles page rendering, login/logout, helper sessions, and the
+exact-loopback admin trust model.
 
 =item * Open File Commands
 
@@ -478,7 +503,83 @@ Filter enabled collector/checker names.
 
 Override the config root.
 
+=item * C<DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS>
+
+Allow browser execution of transient C</?token=...>, C</action?atoken=...>,
+and legacy C</ajax?token=...> payloads. The default is off, so the web UI only
+executes saved bookmark files unless this is set to a truthy value such as
+C<1>, C<true>, C<yes>, or C<on>.
+
 =back
+
+=head2 Transient Web Token Policy
+
+Transient page tokens still exist for CLI workflows such as C<dashboard page encode>
+and C<dashboard page decode>, but browser routes that execute a transient payload
+from C<token=> or C<atoken=> are disabled by default.
+
+That means links such as:
+
+=over 4
+
+=item * C<http://127.0.0.1:7890/?token=...>
+
+=item * C<http://127.0.0.1:7890/action?atoken=...>
+
+=item * C<http://127.0.0.1:7890/ajax?token=...>
+
+=back
+
+return a C<403> unless C<DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS> is enabled.
+Saved bookmark-file routes such as C</app/index> and
+C</app/index/action/...> continue to work without that flag. Saved bookmark
+editor pages also stay on their named C</app/E<lt>idE<gt>/edit> and
+C</app/E<lt>idE<gt>> routes when you save from the browser, so editing an
+existing bookmark file does not fall back to transient C<token=> URLs under the
+default deny policy.
+
+Legacy C<Ajax> helper calls inside saved bookmark C<CODE*> blocks should use
+an explicit C<file =E<gt> 'name.json'> argument. When a saved page supplies that
+name, the helper stores the Ajax Perl code under the saved dashboard ajax tree and emits a
+stable saved-bookmark endpoint such as
+C</ajax/name.json?type=text>. Those saved Ajax handlers
+run the stored file as a real process, defaulting to Perl unless the file
+starts with a shebang, and stream both C<stdout> and C<stderr> back to the
+browser as they happen. That keeps bookmark Ajax workflows usable even while
+transient token URLs stay disabled by default, and it means bookmark Ajax code
+can rely on normal C<print>, C<warn>, C<die>, C<system>, and C<exec> process
+behaviour instead of a buffered JSON wrapper.
+Saved bookmark Ajax handlers also default to C<text/plain> when no explicit
+C<type =E<gt> ...> argument is supplied, and the generated Perl wrapper now
+enables autoflush on both C<STDOUT> and C<STDERR> so long-running handlers
+show incremental output in the browser instead of stalling behind process
+buffers.
+If a saved handler also needs refresh-safe process reuse, pass
+C<singleton =E<gt> 'NAME'> in the C<Ajax> helper. The generated url then carries
+that singleton name, the Perl worker runs as C<dashboard ajax: NAME>, and the
+runtime terminates any older matching Perl Ajax worker before starting the
+replacement stream for the refreshed browser request. Singleton-managed Ajax
+workers are also terminated by C<dashboard stop> and C<dashboard restart>, and
+the bookmark page now registers a C<pagehide> cleanup beacon against
+C</ajax/singleton/stop?singleton=NAME> so closing the browser tab also tears
+down the matching worker instead of leaving it behind.
+If C<code =E<gt> ...> is omitted, C<Ajax(file =E<gt> 'name')> targets the
+existing executable at C<dashboards/ajax/name> instead of rewriting it.
+Static files referenced by saved bookmarks are resolved from the effective
+runtime public tree first and then from the saved bookmark root. The web layer
+also provides a built-in C</js/jquery.js> compatibility shim, so bookmark pages
+that expect a local jQuery-style helper still have C<$>, C<$(document).ready>,
+C<$.ajax>, and selector C<.text(...)> support even when no runtime file has
+been copied into C<dashboard/public/js> yet.
+
+Saved bookmark editor and view-source routes also protect literal inline
+script content from breaking the browser bootstrap. If a bookmark body
+contains HTML such as C</script>, the editor now escapes the inline JSON
+assignment used to reload the source text, so the browser keeps the full
+bookmark source inside the editor instead of spilling raw text below the page.
+Legacy bookmark rendering also loads C<set_chain_value()> before bookmark body
+HTML, so C<Ajax jvar =E<gt> ...> helpers can bind saved C</ajax/...>
+endpoints without throwing a play-route JavaScript C<ReferenceError>.
 
 =head2 User CLI Extensions
 
@@ -651,6 +752,10 @@ Use C<dashboard version> to print the installed Developer Dashboard version.
 The blank-container integration harness applies fake-project dashboard override
 environment variables only after C<cpanm> finishes installing the tarball so
 the shipped test suite still runs against a clean runtime.
+That same blank-container path now also verifies web stop/restart behavior in a
+minimal image where listener ownership may need to be discovered from F</proc>
+instead of C<ss>, including a late listener re-probe before
+C<dashboard restart> brings the web service back up.
 
 =head2 First Run
 
@@ -679,7 +784,10 @@ through C<AUTOLOAD>, so older code can use either C<Folder-E<gt>dd> or
 C<Folder-E<gt>runtime_root>, and likewise C<bookmarks_root> and
 C<config_root>. Before C<Folder-E<gt>configure(...)> runs, those
 runtime-backed names lazily bootstrap a default dashboard path registry from
-C<$HOME> instead of dying.
+C<$HOME> instead of dying. Plain C<Folder> calls also lazy-load the same
+config-backed path aliases shown by C<dashboard paths>, so a direct
+C<perl -MFolder -e 'print Folder-E<gt>docker'> from the active project
+resolves the configured alias instead of failing with C<Unknown folder>.
 
 Render shell bootstrap:
 
@@ -762,15 +870,16 @@ Posting a bookmark document with C<BOOKMARK: some-id> back through the root
 editor now saves it to the bookmark store so C</app/some-id> resolves it
 immediately.
 
-The browser editor highlights directive sections, HTML, CSS, JavaScript, and
-Perl C<CODE*> content directly inside the editing surface rather than in a
-separate preview pane.
+The browser editor now renders syntax-highlight markup again, but keeps that
+highlight layer inside a clipped overlay viewport that follows the real
+textarea scroll position by transform instead of via a second scrollbox.
+That restores the visible highlighting while keeping long bookmark lines,
+full-text selection, and caret placement aligned with the real textarea.
 
 Edit and source views preserve raw Template Toolkit placeholders inside
 C<HTML:> and C<FORM.TT:> sections, so values such as C<[% title %]> are kept
 in the bookmark source instead of being rewritten to rendered HTML after a
 browser save.
-
 Template Toolkit rendering exposes the page title as C<title>, so a bookmark
 with C<TITLE: Sample Dashboard> can reference it directly inside C<HTML:> or
 C<FORM.TT:> with C<[% title %]>. Transient play and view-source links are
@@ -941,6 +1050,18 @@ That top-right area also includes the local username, the current host or IP
 link, and the current date/time in the same spirit as the old local dashboard chrome.
 The displayed address is discovered from the machine interfaces, preferring a VPN-style address when one is active, and the date/time is refreshed in the browser with JavaScript.
 The bookmark editor also follows the old auto-submit flow, so the form submits when the textarea changes and loses focus instead of showing a manual update button.
+For saved bookmark files, that browser save posts back to the named
+C</app/E<lt>idE<gt>/edit> route and keeps the Play link on
+C</app/E<lt>idE<gt>> instead of a transient C<token=> URL, so updates still
+work while transient URLs are disabled.
+Legacy bookmark parsing also treats a standalone C<---> line as a section
+break, preventing pasted prose after a code block from being compiled into the
+saved C<CODE*> body.
+Saved bookmark loads now also normalize malformed legacy icon bytes before the
+browser sees them. Broken section glyphs fall back to C<◈>, broken item-icon
+glyphs fall back to C<🏷️>, and common damaged joined emoji sequences such as
+C<🧑‍💻> are repaired so edit and play routes stop showing Unicode replacement
+boxes from older bookmark files.
 
 The default web bind is C<0.0.0.0:7890>. Trust is still decided from the request origin and host header, not from the listen address.
 
@@ -957,6 +1078,26 @@ C<dashboard serve> starts the web service in the background by default
 =item *
 
 C<dashboard serve --foreground> keeps the web service attached to the terminal
+
+=item *
+
+C<dashboard serve --ssl> enables HTTPS in Starman with the generated local
+certificate and key, and the saved SSL setting is reused by later
+C<dashboard restart> runs unless you override it
+
+=item *
+
+C<dashboard serve logs> prints the combined Dancer2 and Starman runtime log
+captured in the dashboard log file, C<dashboard serve logs -n 100> starts from
+the last 100 lines, and C<dashboard serve logs -f> follows appended output live
+
+=item *
+
+C<dashboard serve workers N> saves the default Starman worker count and starts
+the web service immediately when it is currently stopped; C<--host HOST> and
+C<--port PORT> can steer that auto-start path, and both
+C<dashboard serve --workers N> and C<dashboard restart --workers N> can still
+override the worker count for one run
 
 =item *
 
@@ -990,6 +1131,13 @@ Limits enabled collector or checker jobs to a colon-separated list of names.
 
 Overrides the config directory.
 
+=item * C<DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS>
+
+Allows browser execution of transient C</?token=...>, C</action?atoken=...>,
+and legacy C</ajax?token=...> payloads. The default is off, so the web UI only
+executes saved bookmark files unless this is set to a truthy value such as
+C<1>, C<true>, C<yes>, or C<on>.
+
 =back
 
 Collector definitions come only from dashboard configuration JSON, so config
@@ -1018,6 +1166,24 @@ under C<Devel::Cover>, including wrapped fork coverage in
 C<t/14-coverage-closure-extra.t>, so the covered run stays green without
 breaking TAP from daemon-style child processes.
 
+For fast saved-bookmark browser regressions, run the dedicated smoke script:
+
+  integration/browser/run-bookmark-browser-smoke.pl
+
+That host-side smoke runner creates an isolated temporary runtime, starts the
+checkout-local dashboard, loads one saved bookmark page through headless
+Chromium, and can assert page-source fragments, saved C</ajax/...> output, and
+the final browser DOM. With no arguments it runs the built-in legacy Ajax
+C<foo.bar> bookmark case. For a real bookmark file, point it at the saved file
+and add explicit expectations:
+
+  integration/browser/run-bookmark-browser-smoke.pl \
+    --bookmark-file ~/.developer-dashboard/dashboards/test \
+    --expect-page-fragment "set_chain_value(foo,'bar','/ajax/foobar?type=text')" \
+    --expect-ajax-path /ajax/foobar?type=text \
+    --expect-ajax-body 123 \
+    --expect-dom-fragment '<span class="display">123</span>'
+
 =head2 Updating Runtime State
 
 Run your user-provided update command:
@@ -1039,18 +1205,26 @@ Run the host-built tarball integration flow with:
   integration/blank-env/run-host-integration.sh
 
 This integration path builds the distribution tarball on the host with
-C<dzil build>, starts a blank container with only that tarball mounted into it,
-installs the tarball with C<cpanm>, and then exercises the installed
-C<dashboard> command inside the clean Perl container.
+C<dzil build>, runs the prebuilt C<dd-int-test:latest> container with only
+that tarball mounted into it, installs the tarball with C<cpanm>, and then
+exercises the installed C<dashboard> command inside the clean Perl container.
+The runtime-manager lifecycle checks also fall back to F</proc> socket
+ownership scans when that minimal image does not provide C<ss>, and they
+re-probe the managed port for late listener pids before restart, so
+C<dashboard stop> and C<dashboard restart> keep working inside the same
+blank-container environment used for release verification.
+Those checks also cover the Starman master-worker split, where the recorded
+managed pid can be the master while the bound listener pid is a separate
+worker process on the same managed port.
 
-Before uploading a release artifact, remove older tarballs first so only the
-current release artifact remains, then validate the exact tarball that will
-ship:
+Before uploading a release artifact, remove older build directories and
+tarballs first so only the current release artifact remains, then validate the
+exact tarball that will ship:
 
-  rm -f Developer-Dashboard-*.tar.gz
+  rm -rf Developer-Dashboard-* Developer-Dashboard-*.tar.gz
   dzil build
-  tar -tzf Developer-Dashboard-0.94.tar.gz | grep run-host-integration.sh
-  cpanm /tmp/Developer-Dashboard-0.94.tar.gz -v
+  tar -tzf Developer-Dashboard-1.33.tar.gz | grep run-host-integration.sh
+  cpanm /tmp/Developer-Dashboard-1.33.tar.gz -v
 
 The harness also:
 
@@ -1100,6 +1274,10 @@ The repository is set up to build release artifacts with Dist::Zilla, including 
 Runtime release metadata pins C<JSON::XS> explicitly in Dist::Zilla so built
 tarballs declare the JSON backend dependency even if automatic prerequisite
 scanning misses it during PAUSE installs.
+
+The GitHub Actions workflows pin C<actions/checkout@v5> and set
+C<FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true> so hosted runners stay ahead of the
+Node 20 JavaScript-action deprecation window.
 
 =head2 What JSON implementation does the project use?
 
