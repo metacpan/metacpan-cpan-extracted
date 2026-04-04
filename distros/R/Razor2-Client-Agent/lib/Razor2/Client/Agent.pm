@@ -11,20 +11,20 @@
 package Razor2::Client::Agent;
 
 use strict;
+use warnings;
 use Getopt::Long;
 use IO::File;
 
 use Razor2::String qw(fisher_yates_shuffle);
 
-use base qw(Razor2::Client::Core);
-use base qw(Razor2::Client::Config);
-use base qw(Razor2::Logger);
-use base qw(Razor2::String);
+use parent qw(Razor2::Client::Core);
+use parent qw(Razor2::Client::Config);
+use parent qw(Razor2::Logger);
+use parent qw(Razor2::String);
 use Razor2::Preproc::Manager;
-use Data::Dumper;
 
 our $PROTOCOL = $Razor2::Client::Version::PROTOCOL;
-our $VERSION  = $Razor2::Client::Version::VERSION;
+our $VERSION  = '2.88';
 
 sub new {
     my ( $class, $breed ) = @_;
@@ -141,7 +141,7 @@ sub do_conf {
     }
     if ( exists $self->{conf}->{logfile} ) {
         my $debuglevel = exists $self->{conf}->{debuglevel} ? $self->{conf}->{debuglevel} : 9;
-        my $logger = new Razor2::Logger(
+        my $logger = Razor2::Logger->new(
             LogDebugLevel => $debuglevel,
             LogTo         => $logto,
             LogPrefix     => $self->{breed},
@@ -857,7 +857,7 @@ sub parse_mbox {
             $fh = $file;
         }
         else {
-            open $fh, "<$file" or return $self->error("Can't open $file: $!");
+            open $fh, '<', $file or return $self->error("Can't open $file: $!");
         }
 
         my $line = <$fh>;
@@ -1052,10 +1052,10 @@ sub loadservercache {
     my @fns;
     my $sep = '\.';
     $sep = '_' if $^O eq 'VMS';
-    if ( opendir D, $self->{razorhome} ) {
-        @fns = map { s/_/./g; "$self->{razorhome}/$_"; } grep /^server$sep[\S]+\.conf$/, readdir D;
+    if ( opendir my $dh, $self->{razorhome} ) {
+        @fns = map { s/_/./g; "$self->{razorhome}/$_"; } grep /^server$sep[\S]+\.conf$/, readdir $dh;
         @fns = map { /^(\S+)$/, $1 } @fns;                # untaint
-        closedir D;
+        closedir $dh;
     }
     foreach (@fns) {
         /server\.(.+)\.conf$/ and my $sn = $1;
@@ -1102,3 +1102,153 @@ sub writeservers {
 }
 
 1;
+
+=for markdown [![testsuite](https://github.com/cpan-authors/Razor2-Client-Agent/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Razor2-Client-Agent/actions/workflows/testsuite.yml)
+
+=head1 NAME
+
+Razor2::Client::Agent - Command-line interface for Vipul's Razor spam detection
+
+=head1 SYNOPSIS
+
+    use Razor2::Client::Agent;
+
+    my $agent = Razor2::Client::Agent->new('razor-check');
+    $agent->read_options() or $agent->raise_error;
+    $agent->do_conf()      or $agent->raise_error;
+    my $rc = $agent->doit({});
+    exit $rc;
+
+=head1 DESCRIPTION
+
+Razor2::Client::Agent provides the user interface layer for Vipul's Razor,
+a distributed, collaborative spam detection and filtering network.  It
+implements the command-line tools B<razor-check>, B<razor-report>,
+B<razor-revoke>, and B<razor-admin>.
+
+This module inherits from L<Razor2::Client::Core> (network protocol),
+L<Razor2::Client::Config> (configuration management), L<Razor2::Logger>
+(logging), and L<Razor2::String> (utility functions).
+
+Typical usage is through the command-line programs rather than calling
+this module directly.  See L<razor-check(1)>, L<razor-report(1)>,
+L<razor-revoke(1)>, and L<razor-admin(1)>.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new($breed)>
+
+Constructor.  C<$breed> is the full program name, which must end with one
+of C<razor-check>, C<razor-report>, C<razor-revoke>, or C<razor-admin>.
+The breed determines which operations are available.
+
+Deletes C<$ENV{PATH}> and C<$ENV{BASH_ENV}> for taint safety.
+
+=item B<read_options($agent)>
+
+Parses command-line options via L<Getopt::Long>.  Returns true on success,
+false on error (error message available via C<errstr()>).
+
+=item B<do_conf()>
+
+Processes configuration: resolves razorhome, reads the config file, sets up
+logging, and creates the home directory if C<-create> was specified.
+Must be called after C<read_options()>.
+
+=item B<doit($args)>
+
+Main dispatcher.  Calls the appropriate handler based on the breed:
+C<checkit()> for check, C<adminit()> for admin, C<reportit()> for report
+and revoke.
+
+Returns 0 for match (spam), 1 for no match (not spam), or 2 for error.
+
+=item B<checkit($args)>
+
+Checks mail against the Razor catalogue servers.  Accepts input as
+filenames, mbox files, signatures on the command line, or a filehandle
+in C<$args>.
+
+Return values: 0 = spam detected, 1 = not spam, 2 = error.
+
+=item B<reportit($args)>
+
+Reports mail as spam (or revokes a previous report).  Requires a valid
+Razor identity; attempts automatic registration if none is found.
+Backgrounds itself unless C<-f> (foreground) is specified.
+
+Return values: 0 = success, 2 = error.
+
+=item B<adminit($args)>
+
+Handles administrative tasks: creating razorhome (C<-create>), server
+discovery (C<-discover>), and identity registration (C<-register>).
+
+Return values: 0 = success, 2 = error.
+
+=item B<parse_mbox($args)>
+
+Parses input into individual mail messages.  Supports mbox format
+(splitting on C<^From > lines), single RFC 822 messages, filehandle
+input (via C<< $args->{fh} >>), and array reference input (via
+C<< $args->{aref} >>).
+
+Returns an array reference of scalar references to mail content.
+
+=item B<local_check($obj)>
+
+Performs local whitelist and mailing-list checks.  Returns true if the
+mail should be skipped (not checked against the server).
+
+=item B<read_whitelist()>
+
+Loads the whitelist file specified in the configuration.  The whitelist
+maps header names to patterns; matching mail is skipped.
+
+=item B<get_server_info()>
+
+Reads server lists, loads cached server configurations, and resolves the
+next server to connect to.  Called before network operations.
+
+=item B<raise_error($errstr)>
+
+Prints a fatal error message and exits with the Razor error code extracted
+from the message, or 255 if no code is found.
+
+=item B<log($level, $msg)>
+
+Logs a message at the given debug level.  Uses the L<Razor2::Logger>
+instance if available, otherwise prints to STDOUT in debug mode.
+
+=item B<logll($loglevel)>
+
+Returns true if the current debug level is at or above C<$loglevel>.
+Use this to guard expensive log message construction.
+
+=back
+
+=head1 CONFIGURATION
+
+See L<razor-agent.conf(5)> for configuration file format and options.
+
+The razorhome directory (default F<~/.razor/>, system-wide F</etc/razor/>)
+stores configuration files, server lists, identity files, and logs.
+
+=head1 SEE ALSO
+
+L<razor-check(1)>, L<razor-report(1)>, L<razor-revoke(1)>,
+L<razor-admin(1)>, L<razor-agent.conf(5)>, L<razor-whitelist(5)>,
+L<Razor2::Client::Core>, L<Razor2::Client::Config>
+
+=head1 AUTHORS
+
+Vipul Ved Prakash, E<lt>mail@vipul.netE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

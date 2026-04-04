@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use Test::More tests => 13;
 use MIME::Base64 qw/encode_base64 decode_base64/;
 use Crypt::OpenSSL::Guess qw/openssl_version/;
@@ -7,20 +10,21 @@ my ($major, $minor, $patch) = openssl_version();
 BEGIN { use_ok('Crypt::OpenSSL::AES') };
 
 my $key = pack("C*",0x30,0x31,0x32,0x33,0x30,0x31,0x32,0x33,0x30,0x31,0x32,0x33,0x30,0x31,0x32,0x33,0x30,0x31,0x32,0x33,0x30,0x31,0x32,0x33,0x30,0x31,0x32,0x33,0x30,0x31,0x32,0x33);
-
+my $iv     = "4b2e6d920c60f1212c07c2e4d7ce6776";
 my $plaintext = pack("C*",0x41,0x42,0x43,0x44,0x41,0x42,0x43,0x44,0x41,0x42,0x43,0x44,0x41,0x42,0x43,0x44);
 
 my $expected_enc = pack("C*", 0x9b, 0xc3, 0x7f, 0x1b, 0x92, 0x93, 0xcc, 0xf9, 0x6b, 0x64, 0x00, 0xae, 0xa3, 0xc8, 0x85, 0xbb);
 
 my $c = Crypt::OpenSSL::AES->new($key, {cipher => 'AES-256-ECB'});
 
+my $encrypted;
 ok(($encrypted = $c->encrypt($plaintext)) eq $expected_enc, "Encrypted Successfully AES-256-ECB");
 
 ok($c->decrypt($encrypted) eq $plaintext, "Decrypted Successfully using AES-256-ECB");
 
 ok($c->decrypt($c->encrypt("Hello World. 123")) eq "Hello World. 123", "Simple String Encrypted/Decrypted Successfully");
 
-my $c = Crypt::OpenSSL::AES->new($key,
+$c = Crypt::OpenSSL::AES->new($key,
                                     {
                                         cipher  => 'AES-256-CBC',
                                         iv      => 'hsui28sk2o2ksjd4',
@@ -30,10 +34,9 @@ ok($c->decrypt($c->encrypt("Hello World. 123")) eq "Hello World. 123", "Simple S
 {
     SKIP: {
         skip "Crypt::Mode::CBC not supported - OpenSSL $major$minor", 1 if $major le '0.9' && $minor le '7';
-        $key    = "e4e9ac6aa161179889f0e3804d187112f59f3325950a27d943be398074968afc";
-        $iv     = "4b2e6d920c60f1212c07c2e4d7ce6776c";
+        my $key    = "e4e9ac6aa161179889f0e3804d187112f59f3325950a27d943be398074968afc";
         # Following data was encrypted with Crypt::Mode::CBC
-        $ciphertext = decode_base64("bnTwr7+SR5m71I2TKZNJzz5UcQuoTRdzKvXU/2aN+aA=");
+        my $ciphertext = decode_base64("bnTwr7+SR5m71I2TKZNJzz5UcQuoTRdzKvXU/2aN+aA=");
 
         my $c = Crypt::OpenSSL::AES->new(pack("H*", $key),
                                     {

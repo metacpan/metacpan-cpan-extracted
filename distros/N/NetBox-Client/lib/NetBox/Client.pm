@@ -187,7 +187,7 @@ Be quiet when set to `true` (which is default). Currently not implemented.
         'errmsg' => NetBox::Client::Common::E_OK->[1],
         'error'  => boolean::false,
     }, __PACKAGE__;
-    foreach  my $key (keys %{(DEFAULTS)}) {
+    foreach my $key (keys %{(DEFAULTS)}) {
         $self->{$key} = defined($options{$key})
             ? $options{$key}
             : DEFAULTS->{$key};
@@ -492,6 +492,24 @@ sub DESTROY {}
 =back
 
 =head1 B<CHANGELOG>
+
+=head3 v0.1.7 - 2026-04-03
+
+=over 4
+
+=item fixed contents passing when updating objects;
+
+=item fixed booleans passing when updating objects.
+
+=back
+
+=head3 v0.1.6 - 2025-11-19
+
+=over 4
+
+=item fixed error handling on SSL certificate check failure.
+
+=back
 
 =head3 v0.1.5 - 2025-10-08
 

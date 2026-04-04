@@ -25,7 +25,7 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use IO::Socket;
 use Carp qw(croak);
 use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE);
-$VERSION = '1.03';
+$VERSION = '1.04';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
 

@@ -56,7 +56,7 @@
          "web" : "https://github.com/briandfoy/string-redactable"
       }
    },
-   "version" : "0.901",
+   "version" : "1.088",
    "x_extra_modules" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

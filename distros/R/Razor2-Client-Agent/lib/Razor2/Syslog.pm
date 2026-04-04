@@ -1,18 +1,14 @@
 package Razor2::Syslog;
+use strict;
+use warnings;
 
 use IO::Socket::IP;
 use IO::File;
-use Data::Dumper;
 
-require Exporter;
+use Exporter 'import';
 
-our @ISA = qw(Exporter AutoLoader);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
 our @EXPORT  = qw();
-our $VERSION = '0.03';
+our $VERSION = '2.88';
 
 # Preloaded methods go here.
 
@@ -70,7 +66,7 @@ sub new {
         $self->{$_} = $par{$_};
     }
 
-    my $sock = new IO::Socket::IP(
+    my $sock = IO::Socket::IP->new(
         PeerAddr => $$self{SyslogHost},
         PeerPort => $$self{SyslogPort},
         Proto    => 'udp'

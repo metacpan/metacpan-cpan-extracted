@@ -1,27 +1,46 @@
 #!/usr/local/bin/perl
 
-use lib '.';
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use Business::UPS;
 
+print "UPS Version " . $Business::UPS::VERSION . "\n\n";
 
-# Try a US shipment
+# Track a package using UPStrack()
 #
-my ($shipping,$ups_zone,$error) = getUPS(qw/GNDCOM 23606 11111 50/);
-$error and die "ERROR: $error\n";
-print "UPS Version " . $Business::UPS::VERSION . "\n";
-print "From: 23606 to 11111 Weight 50 GNDCOM\n";
-print "Shipping is \$$shipping\n";
-print "UPS Zone is $ups_zone\n";
-#exit(0);
-
-# How about a shipment from the US to Great Britain
+# NOTE: Replace the tracking number below with a real one.
+# This will contact UPS servers and return live tracking data.
 #
-my ($type,$from,$to,$wgt,$co) = qw/XPR 23606 B67JH 10 GB/;
-my ($shipping,$ups_zone,$error) = getUPS($type,$from,$to,$wgt,$co,'', '', '', '', '');
-print "Tying:\n";
-print "From: $from\nTo:$to\nWeight: $wgt\nCountry:	$co\n";
-$error and die "ERROR: $error\n";
-print "Shipping is \$$shipping\n";
-print "UPS Zone is $ups_zone\n";
+my $tracking_number = shift || '1Z12345E0205271688';
 
-print "See the manpage for a working example of UPStrack\n";
+print "Tracking package: $tracking_number\n\n";
+
+my %t = eval { UPStrack($tracking_number) };
+if ($@) {
+    die "ERROR: $@";
+}
+
+print "Current Status: $t{'Current Status'}\n";
+print "Service Type:   $t{'Service Type'}\n"   if $t{'Service Type'};
+print "Weight:         $t{'Weight'}\n"         if $t{'Weight'};
+print "Shipped To:     $t{'Shipped To'}\n"     if $t{'Shipped To'};
+print "Delivery Date:  $t{'Delivery Date'}\n"  if $t{'Delivery Date'};
+print "Signed By:      $t{'Signed By'}\n"      if $t{'Signed By'};
+print "Location:       $t{'Location'}\n"       if $t{'Location'};
+
+if (my $count = $t{'Activity Count'}) {
+    print "\nPackage activity ($count events):\n";
+    my %activities = %{ $t{'Scanning'} };
+    for my $num (1 .. $count) {
+        printf "  %s %s - %s (%s)\n",
+            $activities{$num}{'date'}     || '',
+            $activities{$num}{'time'}     || '',
+            $activities{$num}{'activity'} || '',
+            $activities{$num}{'location'} || '';
+    }
+}
+
+print "\n$t{'Notice'}\n";

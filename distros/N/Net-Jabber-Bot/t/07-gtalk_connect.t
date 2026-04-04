@@ -25,8 +25,8 @@ $forums_and_responses{'test_forum1'} = ["jbot:", ""];
         forums_and_responses => \%forums_and_responses,
     );
 
-    is($bot->from_full, 'testuser@talk.google.com/testbot',
-       "from_full produces correctly formatted user\@server/alias string");
+    is($bot->from_full, 'testuser@talk.google.com/' . $bot->resource,
+       "from_full produces correctly formatted user\@server/resource string");
 }
 
 # Test 2: from_full with lazy defaults for alias

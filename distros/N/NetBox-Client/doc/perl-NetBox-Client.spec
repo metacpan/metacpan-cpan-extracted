@@ -1,5 +1,5 @@
 Name:           perl-NetBox-Client
-Version:        0.1.5
+Version:        0.1.7
 Release:        1%{?dist}
 Summary:        NetBox API perl client
 License:        Distributable, see LICENSE
@@ -56,6 +56,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/NetBox*
 
 %changelog
+
+* Fri Apr  3 2026 Volodymyr Pidgornyi <vp@dtel-ix.net> 0.1.7
+- fixed contents passing when updating objects;
+- fixed booleans passing when updating objects.
+
+* Wed Nov 19 2025 Volodymyr Pidgornyi <vp@dtel-ix.net> 0.1.6
+- fixed error handling on SSL certificate check failure.
 
 * Wed Oct  8 2025 Volodymyr Pidgornyi <vp@dtel-ix.net> 0.1.5
 - renamed module to NetBox::Client to match CPAN naming conventions.

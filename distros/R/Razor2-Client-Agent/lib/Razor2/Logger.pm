@@ -3,6 +3,7 @@
 package Razor2::Logger;
 
 use strict;
+use warnings;
 use Razor2::Syslog;
 use Time::HiRes qw(gettimeofday);
 use POSIX qw(strftime);
@@ -26,16 +27,17 @@ sub new {
     my $loghost  = $args{LogHost}     || '127.0.0.1';
 
     if ( $self->{LogTo} eq 'syslog' ) {
-        $$self{syslog} = new Razor2::Syslog( Facility => $facility, Priority => 'debug', Name => $prefix, SyslogHost => $loghost );
+        $$self{syslog} = Razor2::Syslog->new( Facility => $facility, Priority => 'debug', Name => $prefix, SyslogHost => $loghost );
         $self->{LogType} = 'syslog';
     }
     elsif ( $self->{LogTo} =~ /^file:(.*)$/ ) {
         $self->{LogType} = 'file';
         my $name = $1;
         chomp $name;
-        open( LOGF, ">>$name" ) or do {
+        my $logfh;
+        open( $logfh, '>>', $name ) or do {
             if ( $self->{DontDie} ) {
-                open LOGF, ">>/dev/null" or do {
+                open( $logfh, '>>', '/dev/null' ) or do {
                     print STDERR "Failed to open /dev/null, $!\n";
                 };
             }
@@ -43,17 +45,17 @@ sub new {
                 die $!;
             }
         };
-        binmode( LOGF, ':encoding(UTF-8)' );
-        LOGF->autoflush(1);
-        $self->{fd} = *LOGF{IO};
+        binmode( $logfh, ':encoding(UTF-8)' );
+        $logfh->autoflush(1);
+        $self->{fd} = $logfh;
     }
     elsif ( $self->{LogTo} eq 'none' ) {
         $self->{LogType} = 'null';
-        open( LOGF, '>>/dev/null' ) or do {
+        open( my $logfh, '>>', '/dev/null' ) or do {
             die $!;
         };
-        LOGF->autoflush(1);
-        $self->{fd} = *LOGF{IO};
+        $logfh->autoflush(1);
+        $self->{fd} = $logfh;
     }
     elsif ( $self->{LogTo} eq 'sys-syslog' ) {
 
@@ -120,7 +122,7 @@ sub log {
     }
     elsif ( $self->{LogType} eq 'file' ) {
 
-        my $now_string;
+        my $now_string = '';
         if ( $self->{LogTimestamp} ) {
             my ( $seconds, $microseconds ) = gettimeofday;
             $now_string = strftime $self->{LogTimeFormat}, localtime($seconds);
@@ -149,9 +151,9 @@ sub log2file {
     my $len = length($$textref);
     my $fn  = "$self->{Log2FileDir}/razor.$$.$fn_ext";
 
-    if ( open OUT, '>:encoding(UTF-8)', $fn ) {
-        print OUT $$textref;
-        close OUT;
+    if ( open my $out_fh, '>:encoding(UTF-8)', $fn ) {
+        print $out_fh $$textref;
+        close $out_fh;
         $self->log( $prio, "log2file: wrote message len=$len to file: $fn" );
     }
     else {

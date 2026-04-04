@@ -1,4 +1,6 @@
 package Razor2::Preproc::deBase64;
+use strict;
+use warnings;
 
 sub new {
     return bless {}, shift;
@@ -34,10 +36,11 @@ sub extract_base64 {
 
     if ( $$text =~ /Content-Transfer-Encoding: base64(.*)$/si ) {
         my $rhs = $1;
-        $rhs =~ /\r?\n\r?\n([^=]*)/s;                # match to end of data or '='
-        return $1 . "==";
+        if ( $rhs =~ /\r?\n\r?\n([^=]*)/s ) {
+            return $1 . "==";
+        }
     }
-    return undef;
+    return;
 }
 
 1;

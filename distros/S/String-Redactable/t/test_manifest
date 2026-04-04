@@ -1,6 +1,7 @@
 load.t
 placeholder.t
 redact.t
+multiple.t
 tie.t
 pod.t
 pod_coverage.t

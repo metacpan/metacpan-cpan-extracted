@@ -23,7 +23,8 @@ use Object::Proto;
 # Basic $_ patterns
 # ============================================
 
-subtest 'foreach with $_ getter' => sub {
+# foreach with $_ getter
+{
     my @boxes = (
         new Box(10, 20, 30),
         new Box(40, 50, 60),
@@ -35,9 +36,9 @@ subtest 'foreach with $_ getter' => sub {
         push @widths, width($_);
     }
     is_deeply(\@widths, [10, 40, 70], 'foreach $_ getter');
-};
-
-subtest 'foreach with $_ setter' => sub {
+}
+# foreach with $_ setter
+{
     my @boxes = (
         new Box(1, 2, 3),
         new Box(4, 5, 6),
@@ -49,9 +50,9 @@ subtest 'foreach with $_ setter' => sub {
 
     is(width($boxes[0]), 100, 'first box width set via $_');
     is(width($boxes[1]), 100, 'second box width set via $_');
-};
-
-subtest 'map with $_ getter' => sub {
+}
+# map with $_ getter
+{
     my @coords = (
         new Coord(1, 2),
         new Coord(3, 4),
@@ -60,9 +61,9 @@ subtest 'map with $_ getter' => sub {
 
     my @cxs = map { cx($_) } @coords;
     is_deeply(\@cxs, [1, 3, 5], 'map $_ getter');
-};
-
-subtest 'map with $_ setter' => sub {
+}
+# map with $_ setter
+{
     my @items = (
         new Item(10),
         new Item(20),
@@ -74,9 +75,9 @@ subtest 'map with $_ setter' => sub {
 
     my @vals = map { val($_) } @items;
     is_deeply(\@vals, [20, 40, 60], 'map $_ setter');
-};
-
-subtest 'grep with $_ getter' => sub {
+}
+# grep with $_ getter
+{
     my @boxes = (
         new Box(5, 10, 15),
         new Box(50, 60, 70),
@@ -87,13 +88,13 @@ subtest 'grep with $_ getter' => sub {
     is(scalar(@big), 2, 'grep found 2 big boxes');
     is(width($big[0]), 50, 'first big box width');
     is(width($big[1]), 15, 'second big box width');
-};
-
+}
 # ============================================
 # Nested loops with $_
 # ============================================
 
-subtest 'nested foreach with $_' => sub {
+# nested foreach with $_
+{
     my @outer = (
         new Coord(1, 1),
         new Coord(2, 2),
@@ -111,9 +112,9 @@ subtest 'nested foreach with $_' => sub {
         }
     }
     is_deeply(\@results, [10, 20, 20, 40], 'nested loop with $_ in inner');
-};
-
-subtest 'map inside foreach with $_' => sub {
+}
+# map inside foreach with $_
+{
     my @boxes = (
         new Box(1, 2, 3),
         new Box(4, 5, 6),
@@ -125,13 +126,13 @@ subtest 'map inside foreach with $_' => sub {
         push @all_dims, width($box), height($box), depth($box);
     }
     is_deeply(\@all_dims, [1, 2, 3, 4, 5, 6], 'foreach captures $_ for accessors');
-};
-
+}
 # ============================================
 # $_ with expression values
 # ============================================
 
-subtest 'setter with $_ and expression' => sub {
+# setter with $_ and expression
+{
     my @coords = (
         new Coord(1, 1),
         new Coord(2, 2),
@@ -146,9 +147,9 @@ subtest 'setter with $_ and expression' => sub {
 
     my @cxs = map { cx($_) } @coords;
     is_deeply(\@cxs, [1, 3, 5], 'setter with $_ and expression');
-};
-
-subtest 'chained $_ operations' => sub {
+}
+# chained $_ operations
+{
     my @items = (
         new Item(1),
         new Item(2),
@@ -162,13 +163,13 @@ subtest 'chained $_ operations' => sub {
 
     my @tripled = map { val($_) } @items;
     is_deeply(\@tripled, [3, 6, 9], 'chained $_ get/set');
-};
-
+}
 # ============================================
 # $_ with sub calls
 # ============================================
 
-subtest '$_ with sub call argument' => sub {
+# $_ with sub call argument
+{
     sub compute { return 42 }
 
     my @boxes = (
@@ -182,9 +183,9 @@ subtest '$_ with sub call argument' => sub {
 
     is(width($boxes[0]), 42, 'first box set via $_ with sub call');
     is(width($boxes[1]), 42, 'second box set via $_ with sub call');
-};
-
-subtest '$_ with method call argument' => sub {
+}
+# $_ with method call argument
+{
     my @coords = (
         new Coord(10, 20),
         new Coord(30, 40),
@@ -197,13 +198,13 @@ subtest '$_ with method call argument' => sub {
 
     is(cx($coords[0]), 20, 'first coord cx set from method call');
     is(cx($coords[1]), 40, 'second coord cx set from method call');
-};
-
+}
 # ============================================
 # $_ preservation across operations
 # ============================================
 
-subtest '$_ preserved in complex expression' => sub {
+# $_ preserved in complex expression
+{
     my @boxes = (
         new Box(2, 3, 4),
         new Box(5, 6, 7),
@@ -214,9 +215,9 @@ subtest '$_ preserved in complex expression' => sub {
     } @boxes;
 
     is_deeply(\@volumes, [24, 210], 'volume calculation with $_');
-};
-
-subtest '$_ in sort with accessor' => sub {
+}
+# $_ in sort with accessor
+{
     my @items = (
         new Item(30),
         new Item(10),
@@ -226,13 +227,13 @@ subtest '$_ in sort with accessor' => sub {
     my @sorted = sort { val($a) <=> val($b) } @items;
     my @vals = map { val($_) } @sorted;
     is_deeply(\@vals, [10, 20, 30], 'sorted by accessor value');
-};
-
+}
 # ============================================
 # Edge cases with $_
 # ============================================
 
-subtest '$_ with defined check' => sub {
+# $_ with defined check
+{
     my @items = (
         new Item(1),
         new Item(2),
@@ -244,9 +245,9 @@ subtest '$_ with defined check' => sub {
         push @vals, val($_) if defined $_;
     }
     is_deeply(\@vals, [1, 2], 'foreach handles defined objects');
-};
-
-subtest 'while with $_ aliasing' => sub {
+}
+# while with $_ aliasing
+{
     my @boxes = (
         new Box(1, 1, 1),
         new Box(2, 2, 2),
@@ -261,6 +262,5 @@ subtest 'while with $_ aliasing' => sub {
 
     is(width($boxes[0]), 10, 'while with local $_ works');
     is(width($boxes[1]), 20, 'while with local $_ works for second');
-};
-
+}
 done_testing;

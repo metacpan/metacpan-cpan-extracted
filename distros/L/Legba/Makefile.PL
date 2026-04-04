@@ -6,7 +6,7 @@ WriteMakefile(
     NAME             => 'Legba',
     VERSION_FROM     => 'lib/Legba.pm',
     ABSTRACT         => 'Ultra-fast global slot storage implemented in XS',
-    AUTHOR           => 'Your Name',
+    AUTHOR           => 'LNATION <email@lnation.org>',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.010001',
     PREREQ_PM        => {},

@@ -10,9 +10,9 @@ use File::chdir;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-07'; # DATE
+our $DATE = '2026-04-04'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 # FRAGMENT id=shcompgen-hint completer=1 for=cdpart
 
@@ -113,7 +113,7 @@ cdpart-backend - Change directory part
 
 =head1 VERSION
 
-This document describes version 0.013 of cdpart-backend (from Perl distribution App-CdUtils), released on 2025-11-07.
+This document describes version 0.014 of cdpart-backend (from Perl distribution App-CdUtils), released on 2026-04-04.
 
 =head1 SYNOPSIS
 
@@ -300,7 +300,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

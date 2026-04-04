@@ -57,11 +57,17 @@ CLASSES
             ssl_ca     => 'ca.pem',          # optional CA chain
             proxy      => '192.168.1.1',     # optional HTTP proxy host
             proxy_port => 8080,              # optional proxy port (default: 1080)
+            ssl_init   => 0,                 # optional, skip OpenSSL global init
         );
 
     If "proxy" is not specified, the module reads "https_proxy",
     "http_proxy", or "all_proxy" from the environment. Pass "proxy => """ to
     suppress auto-detection.
+
+    "ssl_init" controls whether libwebsockets initializes OpenSSL globals.
+    By default, initialization happens once on the first context. Pass
+    "ssl_init => 0" when coexisting with another TLS library (e.g.
+    Feersum/picotls) to avoid reinitializing shared OpenSSL state.
 
    connect(%options)
     Create a new WebSocket connection.

@@ -28,6 +28,6 @@ resources:
   bugtracker: https://github.com/briandfoy/string-redactable/issues
   homepage: https://github.com/briandfoy/string-redactable
   repository: https://github.com/briandfoy/string-redactable
-version: '0.901'
+version: '1.088'
 x_extra_modules: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

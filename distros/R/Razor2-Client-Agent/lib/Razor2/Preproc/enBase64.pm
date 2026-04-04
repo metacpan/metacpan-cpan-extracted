@@ -1,4 +1,6 @@
 package Razor2::Preproc::enBase64;
+use strict;
+use warnings;
 
 sub new {
     return bless {}, shift;

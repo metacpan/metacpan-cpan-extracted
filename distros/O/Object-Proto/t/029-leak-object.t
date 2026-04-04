@@ -24,7 +24,8 @@ for (1..10) {
     $obj->age;
 }
 
-subtest 'accessor get no leak' => sub {
+# accessor get no leak
+{
     my $obj = new LeakPerson name => 'Test', age => 25;
     no_leaks_ok {
         for (1..1000) {
@@ -32,9 +33,9 @@ subtest 'accessor get no leak' => sub {
             my $a = $obj->age;
         }
     } 'accessor get no leak';
-};
-
-subtest 'accessor set no leak' => sub {
+}
+# accessor set no leak
+{
     my $obj = new LeakPerson name => 'Start', age => 1;
     no_leaks_ok {
         for (1..1000) {
@@ -42,27 +43,27 @@ subtest 'accessor set no leak' => sub {
             $obj->age(42);
         }
     } 'accessor set no leak';
-};
-
-subtest 'default value access no leak' => sub {
+}
+# default value access no leak
+{
     my $obj = new LeakWithDefault;
     no_leaks_ok {
         for (1..1000) {
             my $v = $obj->val;
         }
     } 'default value no leak';
-};
-
-subtest 'readonly access no leak' => sub {
+}
+# readonly access no leak
+{
     my $obj = new LeakReadonly fixed => 'immutable';
     no_leaks_ok {
         for (1..1000) {
             my $v = $obj->fixed;
         }
     } 'readonly access no leak';
-};
-
-subtest 'typed properties no leak' => sub {
+}
+# typed properties no leak
+{
     my $obj = new LeakTyped num => 3.14, arr => [1, 2, 3], hash => { a => 1 };
     no_leaks_ok {
         for (1..1000) {
@@ -71,9 +72,9 @@ subtest 'typed properties no leak' => sub {
             my $h = $obj->hash;
         }
     } 'typed get no leak';
-};
-
-subtest 'typed setter no leak' => sub {
+}
+# typed setter no leak
+{
     my $obj = new LeakTyped num => 0, arr => [], hash => {};
     my $arr = [1, 2, 3];
     my $hash = { x => 1 };
@@ -84,9 +85,9 @@ subtest 'typed setter no leak' => sub {
             $obj->hash($hash);
         }
     } 'typed set no leak';
-};
-
-subtest 'prototype operations no leak' => sub {
+}
+# prototype operations no leak
+{
     my $parent = new LeakPerson name => 'Parent', age => 50;
     my $child = new LeakPerson name => 'Child', age => 20;
     Object::Proto::set_prototype($child, $parent);
@@ -96,9 +97,9 @@ subtest 'prototype operations no leak' => sub {
             my $proto = Object::Proto::prototype($child);
         }
     } 'prototype get no leak';
-};
-
-subtest 'freeze check no leak' => sub {
+}
+# freeze check no leak
+{
     my $obj = new LeakPerson name => 'Freeze', age => 30;
     Object::Proto::freeze($obj);
     no_leaks_ok {
@@ -106,9 +107,9 @@ subtest 'freeze check no leak' => sub {
             my $f = Object::Proto::is_frozen($obj);
         }
     } 'is_frozen no leak';
-};
-
-subtest 'lock check no leak' => sub {
+}
+# lock check no leak
+{
     my $obj = new LeakPerson name => 'Lock', age => 30;
     Object::Proto::lock($obj);
     no_leaks_ok {
@@ -116,15 +117,14 @@ subtest 'lock check no leak' => sub {
             my $l = Object::Proto::is_locked($obj);
         }
     } 'is_locked no leak';
-};
-
-subtest 'type introspection no leak' => sub {
+}
+# type introspection no leak
+{
     no_leaks_ok {
         for (1..1000) {
             my $has = Object::Proto::has_type('Str');
             my @types = Object::Proto::list_types();
         }
     } 'type introspection no leak';
-};
-
+}
 done_testing;

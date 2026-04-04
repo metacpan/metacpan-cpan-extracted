@@ -12,10 +12,12 @@
 #   G8  TABLE OF CONTENTS: no phantom entries
 #   G9  TABLE OF CONTENTS order matches POD section order
 #   G10 DIAGNOSTICS covers all die/croak/$errstr messages
-#   G11 Pod::Checker syntax check (no errors)
+#   G11 Pod::Checker: no errors
+#   G12 Pod::Checker: no warnings
 ######################################################################
 use strict;
-BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub';
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
+        $INC{'warnings.pm'} = 'stub';
         eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
@@ -31,7 +33,7 @@ my @manifest = _manifest_files($ROOT);
 my @pm_files = sort grep { /^lib\/.*\.pm$/ && -f "$ROOT/$_" } @manifest;
 
 plan_skip('no .pm files found') unless @pm_files;
-plan_tests(scalar(@pm_files) * 11);
+plan_tests(scalar(@pm_files) * 12);
 
 for my $pm (@pm_files) {
     my $text = _slurp("$ROOT/$pm");
@@ -138,34 +140,57 @@ for my $pm (@pm_files) {
        . (@missing_diag
           ? " (missing: " . join('; ', @missing_diag[0..2]) . ")"
           : ''));
-    # G11: Pod::Checker syntax check
+    # G11: Pod::Checker - no errors
+    # G12: Pod::Checker - no warnings
     {
-        my $checker_ok = 1;
-        my $checker_msg = '';
+        my $errors   = 0;
+        my $warnings = 0;
+        my $checker_msg11 = '';
+        my $checker_msg12 = '';
         my $has_checker = eval { require Pod::Checker; 1 };
         if ($has_checker) {
-            my $errors = 0;
-            local *STDERR_SAVE;
-            open STDERR_SAVE, ">&STDERR" or die "cannot dup STDERR: $!";
-            local *STDERR;
-            open STDERR, "> /dev/null" or do {
-                # Windows fallback: use temp file
-                open STDERR, "> $ROOT/pod_checker_$$.tmp" or die;
-            };
-            $errors = Pod::Checker::podchecker("$ROOT/$pm");
-            open STDERR, ">&STDERR_SAVE";
-            close STDERR_SAVE;
-            unlink "$ROOT/pod_checker_$$.tmp" if -f "$ROOT/pod_checker_$$.tmp";
-            if ($errors && $errors > 0) {
-                $checker_ok  = 0;
-                $checker_msg = " ($errors error(s))";
+            my $devnull = File::Spec->devnull;
+            my $tmpfile = "$ROOT/pod_checker_$$.tmp";
+            local *SAVEERR;
+            open SAVEERR, '>&STDERR' or die;
+            if (!open STDERR, ">$devnull") {
+                open STDERR, ">$tmpfile" or open STDERR, '>&SAVEERR';
+            }
+            my $checker = Pod::Checker->new(-warnings => 1);
+            $checker->parse_from_file("$ROOT/$pm");
+            $errors   = $checker->num_errors;
+            $warnings = $checker->num_warnings;
+            open STDERR, '>&SAVEERR'; close SAVEERR;
+            unlink $tmpfile if -f $tmpfile;
+            $errors   = 0 unless defined $errors   && $errors   > 0;
+            $warnings = 0 unless defined $warnings && $warnings > 0;
+            # Pod::Checker older than 1.51 incorrectly reports errors for
+            # valid L<URL> and L<> internal link syntax, so skip G11 on
+            # those versions to avoid false FAILs on older Perl installations.
+            if ($errors && $Pod::Checker::VERSION < 1.51) {
+                $errors = 0;
+                $checker_msg11 = ' (Pod::Checker too old, skipped)';
+            }
+            elsif ($errors) {
+                $checker_msg11 = " ($errors error(s))";
+            }
+            # Pod::Checker older than 1.60 mis-reports warnings for
+            # valid L<> link syntax (e.g. sections with spaces or
+            # special characters), so skip G12 on those versions.
+            if ($warnings && $Pod::Checker::VERSION < 1.60) {
+                $warnings = 0;
+                $checker_msg12 = ' (Pod::Checker too old, skipped)';
+            }
+            elsif ($warnings) {
+                $checker_msg12 = " ($warnings warning(s))";
             }
         }
         else {
-            $checker_msg = ' (Pod::Checker not available, skipped)';
+            $checker_msg11 = ' (Pod::Checker not available, skipped)';
+            $checker_msg12 = ' (Pod::Checker not available, skipped)';
         }
-        ok($checker_ok,
-           "G11 - Pod::Checker: no POD syntax errors: $pm" . $checker_msg);
+        ok(!$errors,   "G11 - Pod::Checker: no errors: $pm$checker_msg11");
+        ok(!$warnings, "G12 - Pod::Checker: no warnings: $pm$checker_msg12");
     }
 }
 

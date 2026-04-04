@@ -172,4 +172,216 @@ subtest 'UPStrack dies when trackDetails missing' => sub {
     like( $@, qr/tracking/i, 'dies on missing trackDetails' );
 };
 
+# Minimal response — only required fields present
+my $minimal_json = <<'JSON';
+{
+  "trackDetails": [
+    {
+      "trackingNumber": "1Z999AA10123456784",
+      "packageStatus": "Label Created"
+    }
+  ]
+}
+JSON
+
+subtest 'UPStrack handles minimal response (no optional fields)' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $minimal_json ),
+    );
+
+    my %result = UPStrack("1Z999AA10123456784");
+
+    is( $result{'Current Status'}, 'Label Created', 'status from minimal response' );
+    ok( !exists $result{'Service Type'},   'no service type when missing' );
+    ok( !exists $result{'Weight'},         'no weight when missing' );
+    ok( !exists $result{'Shipped To'},     'no shipped-to when missing' );
+    ok( !exists $result{'Delivery Date'},  'no delivery date when both dates missing' );
+    ok( !exists $result{'Signed By'},      'no signed-by when missing' );
+    ok( !exists $result{'Location'},       'no location when missing' );
+    is( $result{'Activity Count'}, 0,      'zero activities' );
+    is_deeply( $result{'Scanning'}, {},    'empty scanning hash' );
+};
+
+# Response with empty shipmentProgressActivities array
+my $empty_activities_json = <<'JSON';
+{
+  "trackDetails": [
+    {
+      "trackingNumber": "1Z999AA10123456784",
+      "packageStatus": "In Transit",
+      "service": "UPS Ground",
+      "scheduledDeliveryDate": "Monday, 01/20/2026",
+      "shipmentProgressActivities": []
+    }
+  ]
+}
+JSON
+
+subtest 'UPStrack handles empty activities array' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $empty_activities_json ),
+    );
+
+    my %result = UPStrack("1Z999AA10123456784");
+
+    is( $result{'Current Status'},  'In Transit',            'status present' );
+    is( $result{'Delivery Date'},   'Monday, 01/20/2026',    'scheduled delivery date' );
+    is( $result{'Activity Count'},  0,                       'zero activities from empty array' );
+    is_deeply( $result{'Scanning'}, {},                      'empty scanning hash' );
+};
+
+# Response with deliveredDate but no scheduledDeliveryDate
+my $delivered_only_date_json = <<'JSON';
+{
+  "trackDetails": [
+    {
+      "trackingNumber": "1Z999AA10123456784",
+      "packageStatus": "Delivered",
+      "deliveredDate": "Friday, 01/17/2026",
+      "shipToAddress": {
+        "city": "PORTLAND"
+      }
+    }
+  ]
+}
+JSON
+
+subtest 'UPStrack uses deliveredDate as fallback' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $delivered_only_date_json ),
+    );
+
+    my %result = UPStrack("1Z999AA10123456784");
+
+    is( $result{'Delivery Date'}, 'Friday, 01/17/2026', 'falls back to deliveredDate' );
+    is( $result{'Shipped To'},    'PORTLAND',            'partial address (city only)' );
+};
+
+# Response with weight hash but no unitOfMeasurement
+my $weight_no_unit_json = <<'JSON';
+{
+  "trackDetails": [
+    {
+      "trackingNumber": "1Z999AA10123456784",
+      "packageStatus": "In Transit",
+      "weight": {
+        "weight": "12.50"
+      }
+    }
+  ]
+}
+JSON
+
+subtest 'UPStrack handles weight without unitOfMeasurement' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $weight_no_unit_json ),
+    );
+
+    my %result = UPStrack("1Z999AA10123456784");
+
+    is( $result{'Weight'}, '12.50', 'weight value without trailing unit or space' );
+};
+
+# Response with weight hash but no weight value (only unit)
+my $weight_no_value_json = <<'JSON';
+{
+  "trackDetails": [
+    {
+      "trackingNumber": "1Z999AA10123456784",
+      "packageStatus": "In Transit",
+      "weight": {
+        "unitOfMeasurement": "KGS"
+      }
+    }
+  ]
+}
+JSON
+
+subtest 'UPStrack omits weight when weight value is missing' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $weight_no_value_json ),
+    );
+
+    my %result = UPStrack("1Z999AA10123456784");
+
+    ok( !exists $result{'Weight'}, 'no weight key when weight value is missing' );
+};
+
+# Response with shipToAddress containing empty strings
+my $empty_address_json = <<'JSON';
+{
+  "trackDetails": [
+    {
+      "trackingNumber": "1Z999AA10123456784",
+      "packageStatus": "In Transit",
+      "shipToAddress": {
+        "city": "",
+        "state": "",
+        "country": "US"
+      }
+    }
+  ]
+}
+JSON
+
+subtest 'UPStrack filters empty address components' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $empty_address_json ),
+    );
+
+    my %result = UPStrack("1Z999AA10123456784");
+
+    is( $result{'Shipped To'}, 'US', 'only non-empty address parts included' );
+};
+
+# Response with trackDetails as empty array
+my $empty_details_json = '{"trackDetails": []}';
+
+subtest 'UPStrack dies on empty trackDetails array' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $empty_details_json ),
+    );
+
+    eval { UPStrack("1Z999AA10123456784") };
+    like( $@, qr/tracking/i, 'dies on empty trackDetails array' );
+};
+
+# Response with activity missing some fields
+my $partial_activity_json = <<'JSON';
+{
+  "trackDetails": [
+    {
+      "trackingNumber": "1Z999AA10123456784",
+      "packageStatus": "In Transit",
+      "shipmentProgressActivities": [
+        {
+          "date": "January 15, 2026",
+          "activityScan": "Departure Scan"
+        }
+      ]
+    }
+  ]
+}
+JSON
+
+subtest 'UPStrack handles activities with missing fields' => sub {
+    @mock_responses = (
+        MockResponse->new( success => 1, content => $partial_activity_json ),
+    );
+
+    my %result = UPStrack("1Z999AA10123456784");
+
+    is( $result{'Activity Count'}, 1, 'one activity' );
+    my %scanning = %{ $result{'Scanning'} };
+    is( $scanning{1}{'date'},     'January 15, 2026', 'date present' );
+    is( $scanning{1}{'activity'}, 'Departure Scan',   'activity present' );
+    ok( !exists $scanning{1}{'time'},     'time not present when missing' );
+    ok( !exists $scanning{1}{'location'}, 'location not present when missing' );
+};
+
+subtest 'UPStrack dies on undef tracking number' => sub {
+    eval { UPStrack(undef) };
+    like( $@, qr/tracking/i, 'dies on undef tracking number' );
+};
+
 done_testing();

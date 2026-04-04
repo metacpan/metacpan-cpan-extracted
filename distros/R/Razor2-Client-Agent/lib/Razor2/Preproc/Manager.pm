@@ -5,8 +5,9 @@ use Razor2::Preproc::deHTMLxs;
 use Razor2::Preproc::deHTML;
 use Razor2::Preproc::deNewline;
 use Razor2::Preproc::deHTML_comment;
-use Data::Dumper;
+use File::Temp ();
 use strict;
+use warnings;
 
 sub new {
 
@@ -14,11 +15,11 @@ sub new {
 
     my %self = ();
 
-    $self{deBase64}  = new Razor2::Preproc::deBase64  unless exists $args{no_deBase64};
-    $self{deQP}      = new Razor2::Preproc::deQP      unless exists $args{no_deQP};
-    $self{deHTML}    = new Razor2::Preproc::deHTMLxs  unless exists $args{no_deHTML};
-    $self{deNewline} = new Razor2::Preproc::deNewline unless exists $args{no_deNewline};
-    $self{deHTML_comment} = new Razor2::Preproc::deHTML_comment if exists $args{deHTML_comment};
+    $self{deBase64}  = Razor2::Preproc::deBase64->new  unless exists $args{no_deBase64};
+    $self{deQP}      = Razor2::Preproc::deQP->new      unless exists $args{no_deQP};
+    $self{deHTML}    = Razor2::Preproc::deHTMLxs->new  unless exists $args{no_deHTML};
+    $self{deNewline} = Razor2::Preproc::deNewline->new unless exists $args{no_deNewline};
+    $self{deHTML_comment} = Razor2::Preproc::deHTML_comment->new if exists $args{deHTML_comment};
     $self{rm} = $args{RM};
 
     return bless \%self, $class;
@@ -35,7 +36,7 @@ sub preproc {
     my $lengths = { '1_orig' => length($$bodyref) } if $dolength;
 
     #-- $self->{rm}->{log}->log(12, "before_deBase64:");
-    if ( exists $$self{deBase64} && $self->{deBase64}->isit($bodyref) ) {
+    if ( exists $self->{deBase64} && $self->{deBase64}->isit($bodyref) ) {
         $self->{deBase64}->doit($bodyref);
     }
 
@@ -46,7 +47,7 @@ sub preproc {
 
     #-- $self->{rm}->{log}->log(12, "before_deQP:");
     my $isQP;
-    if ( exists $$self{deQP} && ( $isQP = $self->{deQP}->isit($bodyref) ) ) {
+    if ( exists $self->{deQP} && ( $isQP = $self->{deQP}->isit($bodyref) ) ) {
         $self->{deQP}->doit($bodyref);
     }
 
@@ -56,18 +57,18 @@ sub preproc {
     $lengths->{'3_after_deQP'} = length($$bodyref) if $dolength;
 
     #-- $self->{rm}->{log}->log(12, "before_deHTML:");
-    if ( exists $$self{deHTML} && $self->{deHTML}->isit($bodyref) ) {
+    if ( exists $self->{deHTML} && $self->{deHTML}->isit($bodyref) ) {
         $self->{deHTML}->doit($bodyref);
     }
 
     #-- $self->{rm}->{log}->log(12, "after_deHTML:");
 
-    if ( exists $$self{deHTML_comment} && $self->{deHTML_comment}->isit($bodyref) ) {
+    if ( exists $self->{deHTML_comment} && $self->{deHTML_comment}->isit($bodyref) ) {
         $self->{deHTML_comment}->doit($bodyref);
     }
 
     #-- $self->{rm}->{log}->log(12, "before_deNewline:");
-    if ( exists $$self{deNewline} ) {
+    if ( exists $self->{deNewline} ) {
         $self->{deNewline}->doit($bodyref);
     }
 
@@ -86,14 +87,9 @@ sub preproc {
 
 sub log2file {
     my ( $self, $msgref, $mailid ) = @_;
-    my $len = length($$msgref);
-    my $fn  = "/tmp/.razor.debug.msg.$$.$mailid";
-    if ( open OUT, ">$fn" ) {
-        print OUT $$msgref;
-        close OUT;
-    }
-    else {
-    }
+    my $fh = File::Temp->new(TEMPLATE => "razor_debug_XXXXXX", TMPDIR => 1, SUFFIX => ".$mailid");
+    print $fh $$msgref;
+    close $fh;
 }
 
 1;

@@ -21,7 +21,7 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 use Carp qw(croak);
@@ -32,7 +32,7 @@ use Carp qw(croak);
 
 package mb::JSON::Boolean;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 use overload

@@ -1,3 +1,10 @@
+1.27 2026-04-03 Todd Rinaldo <toddr@cpan.org>
+
+  Bug Fixes:
+    * GH #68, PR #68 - Fix build on OpenBSD by including termios.h to
+      detect openpty reliably and setting _BSD_SOURCE to find strlcpy
+      in includes. (Alexander Bluhm)
+
 1.26 2026-04-02 Todd Rinaldo <toddr@cpan.org>
 
   Bug Fixes:

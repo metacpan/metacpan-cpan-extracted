@@ -24,7 +24,8 @@
 #   P14 Header pragma order correct               (.pm only)
 ######################################################################
 use strict;
-BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub';
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
+        $INC{'warnings.pm'} = 'stub';
         eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }

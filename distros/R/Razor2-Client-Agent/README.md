@@ -1,121 +1,143 @@
-[![Build Status](https://travis-ci.org/toddr/Razor2-Client-Agent.png?branch=master)](https://travis-ci.org/toddr/Razor2-Client-Agent)
+[![testsuite](https://github.com/cpan-authors/Razor2-Client-Agent/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Razor2-Client-Agent/actions/workflows/testsuite.yml)
 
-                    Vipul's Razor v2 README
+# NAME
 
-Vipul's Razor is a distributed, collaborative, spam detection and
-filtering network. Through user contribution, Razor establishes a
-distributed and constantly updating catalogue of spam in propagation that
-is consulted by email clients to filter out known spam. Detection is done
-with statistical and randomized signatures that efficiently spot mutating
-spam content. User input is validated through reputation assignments based
-on consensus on report and revoke assertions which in turn is used for
-computing confidence values associated with individual signatures.
+Razor2::Client::Agent - Command-line interface for Vipul's Razor spam detection
 
-Vipul's Razor v2 agent software is available from project's homepage at
-http://razor.sf.net. Razor Agents are written in Perl and will work on
-most Unix operating systems and others OSes for which perl is available.
-Installation and usage instructions can be found in the INSTALL document
-in the distribution.
+# SYNOPSIS
 
-Vipul's Razor v2 is almost a complete rewrite of Razor v1. The following
-is a list of the most significant new features:
+    use Razor2::Client::Agent;
 
- 1 New Protocol
+    my $agent = Razor2::Client::Agent->new('razor-check');
+    $agent->read_options() or $agent->raise_error;
+    $agent->do_conf()      or $agent->raise_error;
+    my $rc = $agent->doit({});
+    exit $rc;
 
-    The Razor v2 protocol has been completely redesigned. The new
-    protocol is based on exchange of _Structured Information Strings_,
-    that are similar to URIs and can be parsed with URI decoding
-    libraries. v2 protocol supports _Pipelining_, which means Razor
-    Agents can keep a connection open with server to eliminate the
-    latency introduced by TCP 3-way handshake and 4-way breakdown for
-    every connection. The new protocol semantics allow seamless
-    introduction of new signature schemes.
+# DESCRIPTION
 
- 2 Ephemeral Signatures
+Razor2::Client::Agent provides the user interface layer for Vipul's Razor,
+a distributed, collaborative spam detection and filtering network.  It
+implements the command-line tools **razor-check**, **razor-report**,
+**razor-revoke**, and **razor-admin**.
 
-    Ephemeral Signatures are short-lived signatures based on
-    collaboratively computed random numbers. Ephemeral Signatures select a
-    section of text from the spam message based on a random number that
-    changes every so often. This makes the hashing scheme a moving target,
-    and spammers can't exploit it because they don't know which part of
-    the message will be hashed after the random number rollover.
+This module inherits from [Razor2::Client::Core](https://metacpan.org/pod/Razor2%3A%3AClient%3A%3ACore) (network protocol),
+[Razor2::Client::Config](https://metacpan.org/pod/Razor2%3A%3AClient%3A%3AConfig) (configuration management), [Razor2::Logger](https://metacpan.org/pod/Razor2%3A%3ALogger)
+(logging), and [Razor2::String](https://metacpan.org/pod/Razor2%3A%3AString) (utility functions).
 
- 3 Preprocessors
+Typical usage is through the command-line programs rather than calling
+this module directly.  See [razor-check(1)](http://man.he.net/man1/razor-check), [razor-report(1)](http://man.he.net/man1/razor-report),
+[razor-revoke(1)](http://man.he.net/man1/razor-revoke), and [razor-admin(1)](http://man.he.net/man1/razor-admin).
 
-    Razor v2 supports several preprocessors. Preprocessors alter the the
-    text of a spam before a hash is computed. This version includes
-    preprocessors to decode Base64 encoded messages, decode QP encoded
-    messages and convert HTML to plaintext. Spammers employ several
-    techniques that hide mutations in various encoding. Preprocessors
-    defeat such techniques by hashing the content that a recipient
-    actually sees in his/her mail user agent.
+# METHODS
 
- 4 Multiple Filteration Engines
+- **new($breed)**
 
-    Razor v2 supports multiple engines. An engine is logical unit that
-    encapsulates a particular type of filteration service. Razor v2
-    currently supports four engines - VR1 which is equivalent to Razor v1,
-    VR2 that is based on SHA1 signatures of bodytext, VR3 that is based on
-    Nilsimsa signatures, and VR4 based on Ephemeral hashes. New engines
-    can be seamlessly plugged into the service as and when required.
+    Constructor.  `$breed` is the full program name, which must end with one
+    of `razor-check`, `razor-report`, `razor-revoke`, or `razor-admin`.
+    The breed determines which operations are available.
 
- 5 Complete Backward Compatibility with Razor v1
+    Deletes `$ENV{PATH}` and `$ENV{BASH_ENV}` for taint safety.
 
-    The VR1 engine is functionally equivalent to the Razor v1 service and
-    uses the same database. This means users who transition from v1 to v2
-    will still get the benefit of several million signatures known to the
-    v1 service.
+- **read\_options($agent)**
 
- 6 Base64 signature encoding
+    Parses command-line options via [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong).  Returns true on success,
+    false on error (error message available via `errstr()`).
 
-    Signatures are now encoded as base 64 numbers instead of base 16
-    (hex), reducing traffic that goes over the wire by 33%.
+- **do\_conf()**
 
- 7 Truth Evaluation System (TeS)
+    Processes configuration: resolves razorhome, reads the config file, sets up
+    logging, and creates the home directory if `-create` was specified.
+    Must be called after `read_options()`.
 
-    Razor v2 has a transparent, back-end component known as TeS. TeS is a
-    combination of a reputation system and pattern recognition heuristics
-    that assigns trust to reporters and confidence values (between 0-100)
-    to every signature. Users can set an acceptable confidence level in
-    their Razor configuration. The server also publishes a recommended
-    confidence level. TeS has been designed to eliminate false positives
-    of legit bulk email that were occasionally generated by bad reports
-    in Razor v1.
+- **doit($args)**
 
- 8 Submission of entire spam messages
+    Main dispatcher.  Calls the appropriate handler based on the breed:
+    `checkit()` for check, `adminit()` for admin, `reportit()` for report
+    and revoke.
 
-    Razor v2 accepts the entire body text of spam messages not previously
-    known to the system. This lets Razor v2 compute new Ephemeral
-    Signatures every n hours as well as seed the database whenever a new
-    signature scheme and/or preprocessor is introduced. It should be noted
-    that Razor v2 _does not_ accept contents of legit email during a check
-    dialogue. Only signatures are sent when checking email.
+    Returns 0 for match (spam), 1 for no match (not spam), or 2 for error.
 
- 9 Revocation
+- **checkit($args)**
 
-    Razor v2 allows users to revoke messages that they don't consider to
-    be spam. Revocation input is fed into TeS, that adjusts the confidence
-    value of a signature or remove it from the database as necessary.
-    Revocation is done through a tool called razor-revoke, which is a part
-    of the new Razor distribution.
+    Checks mail against the Razor catalogue servers.  Accepts input as
+    filenames, mbox files, signatures on the command line, or a filehandle
+    in `$args`.
 
-10 Reporter Registration
+    Return values: 0 = spam detected, 1 = not spam, 2 = error.
 
-    Razor v2 requires reporters to be registered. This lets reporters
-    build a reputation over time, so their reports and revocations are
-    weighed according to their reputation value. Report requires users to
-    authenticate which is done using a CRAM-SHA1 authentication scheme.
+- **reportit($args)**
 
-11 Content classes
+    Reports mail as spam (or revokes a previous report).  Requires a valid
+    Razor identity; attempts automatic registration if none is found.
+    Backgrounds itself unless `-f` (foreground) is specified.
 
-    Razor v2 introduces the concept of content classes. A content class is
-    a set of messages that represents variations on the same content. As
-    new reports come in, Nomination servers associate them to an existing
-    content class, if a (close) match is found. Additionally, Razor v2
-    treats each MIME attachment is a separate content class, so spammers
-    MIME attachment can be individually tracked (which is very useful in
-    case of viruses).
+    Return values: 0 = success, 2 = error.
 
+- **adminit($args)**
 
-              $Id: README,v 1.4 2005/06/28 22:19:07 jpr5 Exp $
+    Handles administrative tasks: creating razorhome (`-create`), server
+    discovery (`-discover`), and identity registration (`-register`).
 
+    Return values: 0 = success, 2 = error.
+
+- **parse\_mbox($args)**
+
+    Parses input into individual mail messages.  Supports mbox format
+    (splitting on `^From ` lines), single RFC 822 messages, filehandle
+    input (via `$args->{fh}`), and array reference input (via
+    `$args->{aref}`).
+
+    Returns an array reference of scalar references to mail content.
+
+- **local\_check($obj)**
+
+    Performs local whitelist and mailing-list checks.  Returns true if the
+    mail should be skipped (not checked against the server).
+
+- **read\_whitelist()**
+
+    Loads the whitelist file specified in the configuration.  The whitelist
+    maps header names to patterns; matching mail is skipped.
+
+- **get\_server\_info()**
+
+    Reads server lists, loads cached server configurations, and resolves the
+    next server to connect to.  Called before network operations.
+
+- **raise\_error($errstr)**
+
+    Prints a fatal error message and exits with the Razor error code extracted
+    from the message, or 255 if no code is found.
+
+- **log($level, $msg)**
+
+    Logs a message at the given debug level.  Uses the [Razor2::Logger](https://metacpan.org/pod/Razor2%3A%3ALogger)
+    instance if available, otherwise prints to STDOUT in debug mode.
+
+- **logll($loglevel)**
+
+    Returns true if the current debug level is at or above `$loglevel`.
+    Use this to guard expensive log message construction.
+
+# CONFIGURATION
+
+See [razor-agent.conf(5)](http://man.he.net/man5/razor-agent.conf) for configuration file format and options.
+
+The razorhome directory (default `~/.razor/`, system-wide `/etc/razor/`)
+stores configuration files, server lists, identity files, and logs.
+
+# SEE ALSO
+
+[razor-check(1)](http://man.he.net/man1/razor-check), [razor-report(1)](http://man.he.net/man1/razor-report), [razor-revoke(1)](http://man.he.net/man1/razor-revoke),
+[razor-admin(1)](http://man.he.net/man1/razor-admin), [razor-agent.conf(5)](http://man.he.net/man5/razor-agent.conf), [razor-whitelist(5)](http://man.he.net/man5/razor-whitelist),
+[Razor2::Client::Core](https://metacpan.org/pod/Razor2%3A%3AClient%3A%3ACore), [Razor2::Client::Config](https://metacpan.org/pod/Razor2%3A%3AClient%3A%3AConfig)
+
+# AUTHORS
+
+Vipul Ved Prakash, <mail@vipul.net>
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

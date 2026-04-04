@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{UTF8::R2},
-    'VERSION'   => q{0.29},
+    'VERSION'   => q{0.30},
     'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use},
     'PREREQ_PM' => {
         'Symbol' => '0',
@@ -43,7 +43,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'UTF8::R2' => {
                 'file'    => 'lib/UTF8/R2.pm',
-                'version' => '0.29',
+                'version' => '0.30',
             }
         },
     };

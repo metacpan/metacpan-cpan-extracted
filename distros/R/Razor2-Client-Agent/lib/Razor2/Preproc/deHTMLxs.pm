@@ -1,18 +1,10 @@
 package Razor2::Preproc::deHTMLxs;
 
 use strict;
+use warnings;
 
-use Exporter   ();
 use XSLoader   ();
-use AutoLoader ();
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-our @EXPORT  = qw();
-our $VERSION = '2.87';
+our $VERSION = '2.88';
 
 XSLoader::load( 'Razor2::Preproc::deHTMLxs', $VERSION );
 

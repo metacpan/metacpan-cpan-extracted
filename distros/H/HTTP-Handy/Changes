@@ -1,5 +1,23 @@
 Revision history for HTTP-Handy
 
+1.04  2026-04-04 JST (Japan Standard Time)
+
+    Fixes:
+    - t/9050-pod.t: replace G11 implementation with Pod::Checker OO
+      interface (Pod::Checker->new / num_errors / num_warnings) and
+      split into G11 (errors) + G12 (warnings); plan updated from
+      11 to 12 tests per .pm file.
+    - t/9050-pod.t: skip G11 Pod::Checker errors check when
+      Pod::Checker < 1.51 to avoid false FAILs caused by mis-reported
+      errors for valid L</section>, L</"section">, and L<URL> syntax
+      on older Perl installations (CPAN Testers FAIL fix).
+    - t/9050-pod.t: skip G12 Pod::Checker warnings check when
+      Pod::Checker < 1.60 to avoid false FAILs caused by mis-reported
+      warnings for valid L<> link syntax on older Perl installations.
+    - t/9050-pod.t: fix warnings stub guard to use
+      !defined(&warnings::import) form (consistent with other 9xxx
+      tests).
+
 1.03  2026-03-24 JST (Japan Standard Time)
 
     Tests:

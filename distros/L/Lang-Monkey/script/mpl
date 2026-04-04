@@ -1,0 +1,972 @@
+#!perl
+
+use strict;
+use warnings;
+use feature 'say';
+
+package Lexer;
+sub new {
+    my ($class, $input) = @_;
+    my $self = { input => $input // '', pos => 0, read_pos => 0, ch => '' };
+    bless $self, $class;
+    $self->_read_char;
+    return $self;
+}
+
+sub _read_char {
+    my ($self) = @_;
+    if ($self->{read_pos} >= length $self->{input}) {
+        $self->{ch} = '';
+    } else {
+        $self->{ch} = substr($self->{input}, $self->{read_pos}, 1);
+    }
+    $self->{pos} = $self->{read_pos};
+    $self->{read_pos}++;
+}
+
+sub peek_char {
+    my ($self) = @_;
+    return '' if $self->{read_pos} >= length $self->{input};
+    return substr($self->{input}, $self->{read_pos}, 1);
+}
+
+sub next_token {
+    my ($self) = @_;
+    $self->_skip_whitespace;
+    my $tok;
+
+    if ($self->{ch} eq '=') {
+        if ($self->peek_char eq '=') {
+            my $ch = $self->{ch};
+            $self->_read_char;
+            $tok = { type => 'EQ', literal => "$ch$self->{ch}" };
+        } else {
+            $tok = { type => 'ASSIGN', literal => '=' };
+        }
+    }
+    elsif ($self->{ch} eq '!') {
+        if ($self->peek_char eq '=') {
+            my $ch = $self->{ch};
+            $self->_read_char;
+            $tok = { type => 'NOT_EQ', literal => "$ch$self->{ch}" };
+        } else {
+            $tok = { type => 'BANG', literal => '!' };
+        }
+    }
+    elsif ($self->{ch} eq '+') { $tok = { type => 'PLUS', literal => '+' } }
+    elsif ($self->{ch} eq '-') { $tok = { type => 'MINUS', literal => '-' } }
+    elsif ($self->{ch} eq '/') { $tok = { type => 'SLASH', literal => '/' } }
+    elsif ($self->{ch} eq '*') { $tok = { type => 'ASTERISK', literal => '*' } }
+    elsif ($self->{ch} eq '<') { $tok = { type => 'LT', literal => '<' } }
+    elsif ($self->{ch} eq '>') { $tok = { type => 'GT', literal => '>' } }
+    elsif ($self->{ch} eq ';') { $tok = { type => 'SEMICOLON', literal => ';' } }
+    elsif ($self->{ch} eq ',') { $tok = { type => 'COMMA', literal => ',' } }
+    elsif ($self->{ch} eq ':') { $tok = { type => 'COLON', literal => ':' } }
+    elsif ($self->{ch} eq '(') { $tok = { type => 'LPAREN', literal => '(' } }
+    elsif ($self->{ch} eq ')') { $tok = { type => 'RPAREN', literal => ')' } }
+    elsif ($self->{ch} eq '{') { $tok = { type => 'LBRACE', literal => '{' } }
+    elsif ($self->{ch} eq '}') { $tok = { type => 'RBRACE', literal => '}' } }
+    elsif ($self->{ch} eq '[') { $tok = { type => 'LBRACKET', literal => '[' } }
+    elsif ($self->{ch} eq ']') { $tok = { type => 'RBRACKET', literal => ']' } }
+    elsif ($self->{ch} eq '"') {
+        $tok = { type => 'STRING', literal => $self->_read_string };
+    }
+    elsif ($self->{ch} eq '') {
+        $tok = { type => 'EOF', literal => '' };
+    }
+    elsif ($self->_is_letter($self->{ch})) {
+        my $literal = $self->_read_identifier;
+        my $type = $self->_lookup_ident($literal);
+        return { type => $type, literal => $literal };
+    }
+    elsif ($self->_is_digit($self->{ch})) {
+        return { type => 'INT', literal => $self->_read_number };
+    }
+    else {
+        $tok = { type => 'ILLEGAL', literal => $self->{ch} };
+    }
+
+    $self->_read_char;
+    return $tok;
+}
+
+sub _skip_whitespace {
+    my ($self) = @_;
+    while ($self->{ch} =~ /[ \t\n\r]/) {
+        $self->_read_char;
+    }
+}
+
+sub _read_identifier {
+    my ($self) = @_;
+    my $start = $self->{pos};
+    while ($self->_is_letter($self->{ch})) {
+        $self->_read_char;
+    }
+    return substr($self->{input}, $start, $self->{pos} - $start);
+}
+
+sub _read_number {
+    my ($self) = @_;
+    my $start = $self->{pos};
+    while ($self->_is_digit($self->{ch})) {
+        $self->_read_char;
+    }
+    return substr($self->{input}, $start, $self->{pos} - $start);
+}
+
+sub _read_string {
+    my ($self) = @_;
+    my $position = $self->{pos} + 1;
+    while (1) {
+        $self->_read_char;
+        last if $self->{ch} eq '"' || $self->{ch} eq '';
+    }
+    return substr($self->{input}, $position, $self->{pos} - $position);
+}
+
+sub _is_letter {
+    my ($self, $ch) = @_;
+    return $ch =~ /[a-zA-Z_]/;
+}
+
+sub _is_digit {
+    my ($self, $ch) = @_;
+    return $ch =~ /[0-9]/;
+}
+
+sub _lookup_ident {
+    my ($self, $ident) = @_;
+    return {
+        'fn'     => 'FUNCTION',
+        'let'    => 'LET',
+        'true'   => 'TRUE',
+        'false'  => 'FALSE',
+        'if'     => 'IF',
+        'else'   => 'ELSE',
+        'return' => 'RETURN',
+    }->{$ident} // 'IDENT';
+}
+
+package AST;
+sub new {
+    my ($class, $type, %fields) = @_;
+    return bless { type => $type, %fields }, $class;
+}
+
+package Parser;
+use constant {
+    LOWEST      => 1,
+    EQUALS      => 2,
+    LESSGREATER => 3,
+    SUM         => 4,
+    PRODUCT     => 5,
+    PREFIX      => 6,
+    CALL        => 7,
+    INDEX       => 8,
+};
+
+my %PRECEDENCES = (
+    EQ        => EQUALS,
+    NOT_EQ    => EQUALS,
+    LT        => LESSGREATER,
+    GT        => LESSGREATER,
+    PLUS      => SUM,
+    MINUS     => SUM,
+    SLASH     => PRODUCT,
+    ASTERISK  => PRODUCT,
+    LPAREN    => CALL,
+    LBRACKET  => INDEX,
+);
+
+sub new {
+    my ($class, $lexer) = @_;
+    my $self = {
+        lexer           => $lexer,
+        cur_token       => undef,
+        peek_token      => undef,
+        errors          => [],
+        prefix_parse_fns => {},
+        infix_parse_fns  => {},
+    };
+    bless $self, $class;
+
+    $self->_register_prefix('IDENT', \
+        &parse_identifier);
+    $self->_register_prefix('INT', \
+        &parse_integer_literal);
+    $self->_register_prefix('TRUE', \
+        &parse_boolean);
+    $self->_register_prefix('FALSE', \
+        &parse_boolean);
+    $self->_register_prefix('STRING', \
+        &parse_string_literal);
+    $self->_register_prefix('BANG', \
+        &parse_prefix_expression);
+    $self->_register_prefix('MINUS', \
+        &parse_prefix_expression);
+    $self->_register_prefix('LPAREN', \
+        &parse_grouped_expression);
+    $self->_register_prefix('IF', \
+        &parse_if_expression);
+    $self->_register_prefix('FUNCTION', \
+        &parse_function_literal);
+    $self->_register_prefix('LBRACKET', \
+        &parse_array_literal);
+    $self->_register_prefix('LBRACE', \
+        &parse_hash_literal);
+
+    $self->_register_infix('PLUS', \
+        &parse_infix_expression);
+    $self->_register_infix('MINUS', \
+        &parse_infix_expression);
+    $self->_register_infix('SLASH', \
+        &parse_infix_expression);
+    $self->_register_infix('ASTERISK', \
+        &parse_infix_expression);
+    $self->_register_infix('EQ', \
+        &parse_infix_expression);
+    $self->_register_infix('NOT_EQ', \
+        &parse_infix_expression);
+    $self->_register_infix('LT', \
+        &parse_infix_expression);
+    $self->_register_infix('GT', \
+        &parse_infix_expression);
+    $self->_register_infix('LPAREN', \
+        &parse_call_expression);
+    $self->_register_infix('LBRACKET', \
+        &parse_index_expression);
+
+    $self->_next_token;
+    $self->_next_token;
+    return $self;
+}
+
+sub _register_prefix {
+    my ($self, $token_type, $fn) = @_;
+    $self->{prefix_parse_fns}{$token_type} = $fn;
+}
+
+sub _register_infix {
+    my ($self, $token_type, $fn) = @_;
+    $self->{infix_parse_fns}{$token_type} = $fn;
+}
+
+sub _next_token {
+    my ($self) = @_;
+    $self->{cur_token}  = $self->{peek_token};
+    $self->{peek_token} = $self->{lexer}->next_token;
+}
+
+sub parse_program {
+    my ($self) = @_;
+    my $program = AST->new('Program', statements => []);
+    while ($self->{cur_token}{type} ne 'EOF') {
+        my $stmt = $self->parse_statement;
+        push @{ $program->{statements} }, $stmt if defined $stmt;
+        $self->_next_token;
+    }
+    return $program;
+}
+
+sub parse_statement {
+    my ($self) = @_;
+    return $self->parse_let_statement  if $self->{cur_token}{type} eq 'LET';
+    return $self->parse_return_statement if $self->{cur_token}{type} eq 'RETURN';
+    return $self->parse_expression_statement;
+}
+
+sub parse_let_statement {
+    my ($self) = @_;
+    my $stmt = AST->new('LetStatement');
+    return undef unless $self->_expect_peek('IDENT');
+
+    $stmt->{name} = AST->new('Identifier', value => $self->{cur_token}{literal});
+    return undef unless $self->_expect_peek('ASSIGN');
+
+    $self->_next_token;
+    $stmt->{value} = $self->parse_expression(LOWEST);
+
+    if ($self->{peek_token}{type} eq 'SEMICOLON') {
+        $self->_next_token;
+    }
+    return $stmt;
+}
+
+sub parse_return_statement {
+    my ($self) = @_;
+    my $stmt = AST->new('ReturnStatement');
+    $self->_next_token;
+    $stmt->{return_value} = $self->parse_expression(LOWEST);
+    if ($self->{peek_token}{type} eq 'SEMICOLON') {
+        $self->_next_token;
+    }
+    return $stmt;
+}
+
+sub parse_expression_statement {
+    my ($self) = @_;
+    my $stmt = AST->new('ExpressionStatement');
+    $stmt->{expression} = $self->parse_expression(LOWEST);
+    if ($self->{peek_token}{type} eq 'SEMICOLON') {
+        $self->_next_token;
+    }
+    return $stmt;
+}
+
+sub parse_expression {
+    my ($self, $precedence) = @_;
+    my $prefix = $self->{prefix_parse_fns}{ $self->{cur_token}{type} };
+    unless ($prefix) {
+        push @{ $self->{errors} }, "no prefix parse function for $self->{cur_token}{type} found";
+        return undef;
+    }
+    my $left_exp = $self->$prefix();
+    while ($self->{peek_token}{type} ne 'SEMICOLON' && $precedence < $self->_peek_precedence) {
+        my $infix = $self->{infix_parse_fns}{ $self->{peek_token}{type} };
+        last unless $infix;
+        $self->_next_token;
+        $left_exp = $self->$infix($left_exp);
+    }
+    return $left_exp;
+}
+
+sub parse_identifier {
+    my ($self) = @_;
+    return AST->new('Identifier', value => $self->{cur_token}{literal});
+}
+
+sub parse_integer_literal {
+    my ($self) = @_;
+    return AST->new('IntegerLiteral', value => int($self->{cur_token}{literal}));
+}
+
+sub parse_boolean {
+    my ($self) = @_;
+    return AST->new('Boolean', value => $self->{cur_token}{type} eq 'TRUE');
+}
+
+sub parse_string_literal {
+    my ($self) = @_;
+    return AST->new('StringLiteral', value => $self->{cur_token}{literal});
+}
+
+sub parse_prefix_expression {
+    my ($self) = @_;
+    my $expression = AST->new('PrefixExpression', operator => $self->{cur_token}{literal});
+    $self->_next_token;
+    $expression->{right} = $self->parse_expression(PREFIX);
+    return $expression;
+}
+
+sub parse_infix_expression {
+    my ($self, $left) = @_;
+    my $expression = AST->new('InfixExpression', operator => $self->{cur_token}{literal}, left => $left);
+    my $precedence = $self->_cur_precedence;
+    $self->_next_token;
+    $expression->{right} = $self->parse_expression($precedence);
+    return $expression;
+}
+
+sub parse_grouped_expression {
+    my ($self) = @_;
+    $self->_next_token;
+    my $exp = $self->parse_expression(LOWEST);
+    $self->_expect_peek('RPAREN');
+    return $exp;
+}
+
+sub parse_if_expression {
+    my ($self) = @_;
+    my $expression = AST->new('IfExpression');
+    return undef unless $self->_expect_peek('LPAREN');
+    $self->_next_token;
+    $expression->{condition} = $self->parse_expression(LOWEST);
+    return undef unless $self->_expect_peek('RPAREN');
+    return undef unless $self->_expect_peek('LBRACE');
+    $expression->{consequence} = $self->parse_block_statement;
+    if ($self->{peek_token}{type} eq 'ELSE') {
+        $self->_next_token;
+        return undef unless $self->_expect_peek('LBRACE');
+        $expression->{alternative} = $self->parse_block_statement;
+    }
+    return $expression;
+}
+
+sub parse_function_literal {
+    my ($self) = @_;
+    my $lit = AST->new('FunctionLiteral');
+    return undef unless $self->_expect_peek('LPAREN');
+    $lit->{parameters} = $self->parse_function_parameters;
+    return undef unless $self->_expect_peek('LBRACE');
+    $lit->{body} = $self->parse_block_statement;
+    return $lit;
+}
+
+sub parse_function_parameters {
+    my ($self) = @_;
+    my @params;
+    if ($self->{peek_token}{type} eq 'RPAREN') {
+        $self->_next_token;
+        return \@params;
+    }
+    $self->_next_token;
+    push @params, AST->new('Identifier', value => $self->{cur_token}{literal});
+    while ($self->{peek_token}{type} eq 'COMMA') {
+        $self->_next_token;
+        $self->_next_token;
+        push @params, AST->new('Identifier', value => $self->{cur_token}{literal});
+    }
+    $self->_expect_peek('RPAREN');
+    return \@params;
+}
+
+sub parse_call_expression {
+    my ($self, $function) = @_;
+    my $exp = AST->new('CallExpression', function => $function, arguments => $self->parse_expression_list('RPAREN'));
+    return $exp;
+}
+
+sub parse_array_literal {
+    my ($self) = @_;
+    return AST->new('ArrayLiteral', elements => $self->parse_expression_list('RBRACKET'));
+}
+
+sub parse_hash_literal {
+    my ($self) = @_;
+    my %pairs;
+    while ($self->{peek_token}{type} ne 'RBRACE') {
+        $self->_next_token;
+        my $key = $self->parse_expression(LOWEST);
+        return undef unless $self->_expect_peek('COLON');
+        $self->_next_token;
+        my $value = $self->parse_expression(LOWEST);
+        my $hash_key = $self->_hash_key($key);
+        $pairs{$hash_key} = { key => $key, value => $value };
+        last if $self->{peek_token}{type} ne 'COMMA';
+        $self->_next_token;
+    }
+    return undef unless $self->_expect_peek('RBRACE');
+    return AST->new('HashLiteral', pairs => \%pairs);
+}
+
+sub parse_index_expression {
+    my ($self, $left) = @_;
+    my $exp = AST->new('IndexExpression', left => $left);
+    $self->_next_token;
+    $exp->{index} = $self->parse_expression(LOWEST);
+    $self->_expect_peek('RBRACKET');
+    return $exp;
+}
+
+sub parse_expression_list {
+    my ($self, $end) = @_;
+    my @list;
+    if ($self->{peek_token}{type} eq $end) {
+        $self->_next_token;
+        return \@list;
+    }
+    $self->_next_token;
+    push @list, $self->parse_expression(LOWEST);
+    while ($self->{peek_token}{type} eq 'COMMA') {
+        $self->_next_token;
+        $self->_next_token;
+        push @list, $self->parse_expression(LOWEST);
+    }
+    $self->_expect_peek($end);
+    return \@list;
+}
+
+sub parse_block_statement {
+    my ($self) = @_;
+    my $block = AST->new('BlockStatement', statements => []);
+    $self->_next_token;
+    while ($self->{cur_token}{type} ne 'RBRACE' && $self->{cur_token}{type} ne 'EOF') {
+        my $stmt = $self->parse_statement;
+        push @{ $block->{statements} }, $stmt if defined $stmt;
+        $self->_next_token;
+    }
+    return $block;
+}
+
+sub _hash_key {
+    my ($self, $node) = @_;
+    return "STRING:" . $node->{value} if $node->{type} eq 'StringLiteral';
+    return "INTEGER:" . $node->{value} if $node->{type} eq 'IntegerLiteral';
+    return "BOOLEAN:" . ($node->{value} ? 'true' : 'false') if $node->{type} eq 'Boolean';
+    return "NULL:null" if $node->{type} eq 'Null';
+    return undef;
+}
+
+sub _expect_peek {
+    my ($self, $t) = @_;
+    if ($self->{peek_token}{type} eq $t) {
+        $self->_next_token;
+        return 1;
+    }
+    push @{ $self->{errors} }, "expected next token to be $t, got $self->{peek_token}{type} instead";
+    return 0;
+}
+
+sub _peek_precedence {
+    my ($self) = @_;
+    return $PRECEDENCES{ $self->{peek_token}{type} } // LOWEST;
+}
+
+sub _cur_precedence {
+    my ($self) = @_;
+    return $PRECEDENCES{ $self->{cur_token}{type} } // LOWEST;
+}
+
+package Environment;
+sub new {
+    my ($class, $outer) = @_;
+    return bless { store => {}, outer => $outer }, $class;
+}
+
+sub get {
+    my ($self, $name) = @_;
+    return $self->{store}{$name} if exists $self->{store}{$name};
+    return $self->{outer}->get($name) if $self->{outer};
+    return undef;
+}
+
+sub set {
+    my ($self, $name, $val) = @_;
+    $self->{store}{$name} = $val;
+    return $val;
+}
+
+package IntegerObject;
+sub new { bless { type => 'INTEGER', value => $_[1] }, $_[0] }
+sub inspect { $_[0]->{value} }
+
+package BooleanObject;
+sub new { bless { type => 'BOOLEAN', value => $_[1] }, $_[0] }
+sub inspect { $_[0]->{value} ? 'true' : 'false' }
+
+package NullObject;
+sub new { bless { type => 'NULL' }, $_[0] }
+sub inspect { 'null' }
+
+package ReturnValue;
+sub new { bless { type => 'RETURN_VALUE', value => $_[1] }, $_[0] }
+sub inspect { $_[0]->{value}->inspect }
+
+package ErrorObject;
+sub new { bless { type => 'ERROR', message => $_[1] }, $_[0] }
+sub inspect { "ERROR: $_[0]->{message}" }
+
+package FunctionObject;
+sub new { bless { type => 'FUNCTION', parameters => $_[1], body => $_[2], env => $_[3] }, $_[0] }
+sub inspect {
+    my ($self) = @_;
+    my $params = join(', ', map { $_->{value} } @{ $self->{parameters} });
+    return "fn($params) { ... }";
+}
+
+package StringObject;
+sub new { bless { type => 'STRING', value => $_[1] }, $_[0] }
+sub inspect { $_[0]->{value} }
+
+package ArrayObject;
+sub new { bless { type => 'ARRAY', elements => $_[1] }, $_[0] }
+sub inspect {
+    my ($self) = @_;
+    my $elements = join(', ', map { $_->inspect } @{ $self->{elements} });
+    return "[$elements]";
+}
+
+package HashObject;
+sub new { bless { type => 'HASH', pairs => $_[1] }, $_[0] }
+sub inspect {
+    my ($self) = @_;
+    my @entries;
+    while (my ($k, $pair) = each %{ $self->{pairs} }) {
+        push @entries, $pair->{key}->inspect . ": " . $pair->{value}->inspect;
+    }
+    return '{' . join(', ', @entries) . '}';
+}
+
+package BuiltinObject;
+sub new { bless { type => 'BUILTIN', fn => $_[1] }, $_[0] }
+sub inspect { 'builtin function' }
+
+package Evaluator;
+use feature 'state';
+
+our %BUILTINS = (
+    len  => BuiltinObject->new(sub {
+        my ($args) = @_;
+        return ErrorObject->new('argument to `len` not supported') unless @$args == 1;
+        my $arg = $args->[0];
+        return ErrorObject->new('argument to `len` not supported, got ' . $arg->{type})
+            unless $arg->{type} eq 'STRING' || $arg->{type} eq 'ARRAY';
+        return IntegerObject->new(length $arg->{value}) if $arg->{type} eq 'STRING';
+        return IntegerObject->new(scalar @{ $arg->{elements} });
+    }),
+    first => BuiltinObject->new(sub {
+        my ($args) = @_;
+        return ErrorObject->new('wrong number of arguments. got=' . scalar(@$args) . ', want=1') unless @$args == 1;
+        my $arg = $args->[0];
+        return ErrorObject->new('argument to `first` must be ARRAY, got ' . $arg->{type}) unless $arg->{type} eq 'ARRAY';
+        return @$arg->{elements} ? $arg->{elements}[0] : NullObject->new;
+    }),
+    last => BuiltinObject->new(sub {
+        my ($args) = @_;
+        return ErrorObject->new('wrong number of arguments. got=' . scalar(@$args) . ', want=1') unless @$args == 1;
+        my $arg = $args->[0];
+        return ErrorObject->new('argument to `last` must be ARRAY, got ' . $arg->{type}) unless $arg->{type} eq 'ARRAY';
+        return @$arg->{elements} ? $arg->{elements}[-1] : NullObject->new;
+    }),
+    rest => BuiltinObject->new(sub {
+        my ($args) = @_;
+        return ErrorObject->new('wrong number of arguments. got=' . scalar(@$args) . ', want=1') unless @$args == 1;
+        my $arg = $args->[0];
+        return ErrorObject->new('argument to `rest` must be ARRAY, got ' . $arg->{type}) unless $arg->{type} eq 'ARRAY';
+        return @$arg->{elements} > 1 ? ArrayObject->new([ @{ $arg->{elements} }[1 .. $#{ $arg->{elements} }] ]) : NullObject->new;
+    }),
+    push => BuiltinObject->new(sub {
+        my ($args) = @_;
+        return ErrorObject->new('wrong number of arguments. got=' . scalar(@$args) . ', want=2') unless @$args == 2;
+        my $array = $args->[0];
+        return ErrorObject->new('argument to `push` must be ARRAY, got ' . $array->{type}) unless $array->{type} eq 'ARRAY';
+        return ArrayObject->new([ @{ $array->{elements} }, $args->[1] ]);
+    }),
+    puts => BuiltinObject->new(sub {
+        my ($args) = @_;
+        foreach my $arg (@$args) {
+            say $arg->inspect;
+        }
+        return NullObject->new;
+    }),
+);
+
+sub evaluate {
+    my ($node, $env) = @_;
+    return undef unless defined $node;
+    if (ref $node eq 'AST') {
+        my $type = $node->{type};
+        if ($type eq 'Program') {
+            return _eval_program($node, $env);
+        }
+        if ($type eq 'ExpressionStatement') {
+            return evaluate($node->{expression}, $env);
+        }
+        if ($type eq 'IntegerLiteral') {
+            return IntegerObject->new($node->{value});
+        }
+        if ($type eq 'Boolean') {
+            return _native_bool_to_boolean_object($node->{value});
+        }
+        if ($type eq 'StringLiteral') {
+            return StringObject->new($node->{value});
+        }
+        if ($type eq 'PrefixExpression') {
+            my $right = evaluate($node->{right}, $env);
+            return $right if _is_error($right);
+            return _eval_prefix_expression($node->{operator}, $right);
+        }
+        if ($type eq 'InfixExpression') {
+            my $left = evaluate($node->{left}, $env);
+            return $left if _is_error($left);
+            my $right = evaluate($node->{right}, $env);
+            return $right if _is_error($right);
+            return _eval_infix_expression($node->{operator}, $left, $right);
+        }
+        if ($type eq 'BlockStatement') {
+            return _eval_block_statement($node, $env);
+        }
+        if ($type eq 'IfExpression') {
+            return _eval_if_expression($node, $env);
+        }
+        if ($type eq 'ReturnStatement') {
+            my $val = evaluate($node->{return_value}, $env);
+            return $val if _is_error($val);
+            return ReturnValue->new($val);
+        }
+        if ($type eq 'LetStatement') {
+            my $val = evaluate($node->{value}, $env);
+            return $val if _is_error($val);
+            $env->set($node->{name}{value}, $val);
+            return undef;
+        }
+        if ($type eq 'Identifier') {
+            return _eval_identifier($node, $env);
+        }
+        if ($type eq 'FunctionLiteral') {
+            return FunctionObject->new($node->{parameters}, $node->{body}, $env);
+        }
+        if ($type eq 'CallExpression') {
+            my $function = evaluate($node->{function}, $env);
+            return $function if _is_error($function);
+            my @args = map { my $v = evaluate($_, $env); return $v if _is_error($v); $v } @{ $node->{arguments} };
+            return _apply_function($function, \@args);
+        }
+        if ($type eq 'ArrayLiteral') {
+            my @elements = map { my $el = evaluate($_, $env); return $el if _is_error($el); $el } @{ $node->{elements} };
+            return ArrayObject->new(\@elements);
+        }
+        if ($type eq 'IndexExpression') {
+            my $left = evaluate($node->{left}, $env);
+            return $left if _is_error($left);
+            my $index = evaluate($node->{index}, $env);
+            return $index if _is_error($index);
+            return _eval_index_expression($left, $index);
+        }
+        if ($type eq 'HashLiteral') {
+            my %pairs;
+            while (my ($key_str, $pair) = each %{ $node->{pairs} }) {
+                my $key = evaluate($pair->{key}, $env);
+                return $key if _is_error($key);
+                my $value = evaluate($pair->{value}, $env);
+                return $value if _is_error($value);
+                my $hashed = _hash_key($key);
+                return $hashed if _is_error($hashed);
+                $pairs{$hashed->{value}} = { key => $key, value => $value };
+            }
+            return HashObject->new(\%pairs);
+        }
+    }
+    return undef;
+}
+
+sub _eval_program {
+    my ($program, $env) = @_;
+    my $result;
+    foreach my $stmt (@{ $program->{statements} }) {
+        $result = evaluate($stmt, $env);
+        return $result if defined $result && $result->{type} eq 'RETURN_VALUE';
+        return $result if defined $result && $result->{type} eq 'ERROR';
+    }
+    return $result;
+}
+
+sub _eval_block_statement {
+    my ($block, $env) = @_;
+    my $result;
+    foreach my $stmt (@{ $block->{statements} }) {
+        $result = evaluate($stmt, $env);
+        return $result if defined $result && ($result->{type} eq 'RETURN_VALUE' || $result->{type} eq 'ERROR');
+    }
+    return $result;
+}
+
+sub _eval_prefix_expression {
+    my ($operator, $right) = @_;
+    if ($operator eq '!') {
+        return _eval_bang_operator_expression($right);
+    }
+    if ($operator eq '-') {
+        return _eval_minus_prefix_operator_expression($right);
+    }
+    if ($right->{type} eq 'INTEGER') {
+        return ErrorObject->new('unknown operator: ' . $operator . $right->{type});
+    }
+    return ErrorObject->new('unknown operator: ' . $operator . $right->{type});
+}
+
+sub _eval_bang_operator_expression {
+    my ($right) = @_;
+    return BooleanObject->new(0) if $right->{type} eq 'NULL';
+    return BooleanObject->new(0) if $right->{type} eq 'BOOLEAN' && !$right->{value};
+    return BooleanObject->new(1);
+}
+
+sub _eval_minus_prefix_operator_expression {
+    my ($right) = @_;
+    return ErrorObject->new('unknown operator: -' . $right->{type}) unless $right->{type} eq 'INTEGER';
+    return IntegerObject->new(-$right->{value});
+}
+
+sub _eval_infix_expression {
+    my ($operator, $left, $right) = @_;
+    if ($left->{type} eq 'INTEGER' && $right->{type} eq 'INTEGER') {
+        return _eval_integer_infix_expression($operator, $left, $right);
+    }
+    if ($left->{type} eq 'STRING' && $right->{type} eq 'STRING') {
+        return _eval_string_infix_expression($operator, $left, $right);
+    }
+    if ($operator eq '==') {
+        return _native_bool_to_boolean_object($left->{value} eq $right->{value});
+    }
+    if ($operator eq '!=') {
+        return _native_bool_to_boolean_object($left->{value} ne $right->{value});
+    }
+    if ($left->{type} ne $right->{type}) {
+        return ErrorObject->new('type mismatch: ' . $left->{type} . ' ' . $operator . ' ' . $right->{type});
+    }
+    return ErrorObject->new('unknown operator: ' . $left->{type} . ' ' . $operator . ' ' . $right->{type});
+}
+
+sub _eval_integer_infix_expression {
+    my ($operator, $left, $right) = @_;
+    if ($operator eq '+') { return IntegerObject->new($left->{value} + $right->{value}); }
+    if ($operator eq '-') { return IntegerObject->new($left->{value} - $right->{value}); }
+    if ($operator eq '*') { return IntegerObject->new($left->{value} * $right->{value}); }
+    if ($operator eq '/') { return IntegerObject->new(int($left->{value} / $right->{value})); }
+    if ($operator eq '<') { return _native_bool_to_boolean_object($left->{value} < $right->{value}); }
+    if ($operator eq '>') { return _native_bool_to_boolean_object($left->{value} > $right->{value}); }
+    if ($operator eq '==') { return _native_bool_to_boolean_object($left->{value} == $right->{value}); }
+    if ($operator eq '!=') { return _native_bool_to_boolean_object($left->{value} != $right->{value}); }
+    return ErrorObject->new('unknown operator: ' . $left->{type} . ' ' . $operator . ' ' . $right->{type});
+}
+
+sub _eval_string_infix_expression {
+    my ($operator, $left, $right) = @_;
+    if ($operator eq '+') {
+        return StringObject->new($left->{value} . $right->{value});
+    }
+    return ErrorObject->new('unknown operator: ' . $left->{type} . ' ' . $operator . ' ' . $right->{type});
+}
+
+sub _eval_if_expression {
+    my ($ie, $env) = @_;
+    my $condition = evaluate($ie->{condition}, $env);
+    return $condition if _is_error($condition);
+    if (_is_truthy($condition)) {
+        return evaluate($ie->{consequence}, $env);
+    } elsif ($ie->{alternative}) {
+        return evaluate($ie->{alternative}, $env);
+    }
+    return NullObject->new;
+}
+
+sub _eval_identifier {
+    my ($node, $env) = @_;
+    my $val = $env->get($node->{value});
+    return $val if defined $val;
+    return $BUILTINS{$node->{value}} if exists $BUILTINS{$node->{value}};
+    return ErrorObject->new('identifier not found: ' . $node->{value});
+}
+
+sub _apply_function {
+    my ($fn, $args) = @_;
+    if ($fn->{type} eq 'FUNCTION') {
+        my $extended_env = _extend_function_env($fn, $args);
+        my $evaluated = evaluate($fn->{body}, $extended_env);
+        return $evaluated->{value} if defined $evaluated && $evaluated->{type} eq 'RETURN_VALUE';
+        return $evaluated;
+    }
+    if ($fn->{type} eq 'BUILTIN') {
+        return $fn->{fn}->($args);
+    }
+    return ErrorObject->new('not a function: ' . $fn->{type});
+}
+
+sub _eval_index_expression {
+    my ($left, $index) = @_;
+    if ($left->{type} eq 'ARRAY' && $index->{type} eq 'INTEGER') {
+        return _eval_array_index_expression($left, $index);
+    }
+    if ($left->{type} eq 'HASH') {
+        return _eval_hash_index_expression($left, $index);
+    }
+    return ErrorObject->new('index operator not supported: ' . $left->{type});
+}
+
+sub _eval_array_index_expression {
+    my ($array, $index) = @_;
+    my $idx = $index->{value};
+    if ($idx < 0 || $idx > $#{ $array->{elements} }) {
+        return NullObject->new;
+    }
+    return $array->{elements}[$idx];
+}
+
+sub _eval_hash_index_expression {
+    my ($hash, $index) = @_;
+    my $key = _hash_key($index);
+    return $key if _is_error($key);
+    my $pair = $hash->{pairs}{ $key->{value} };
+    return defined $pair ? $pair->{value} : NullObject->new;
+}
+
+sub _extend_function_env {
+    my ($fn, $args) = @_;
+    my $env = Environment->new($fn->{env});
+    for my $idx (0 .. $#{ $fn->{parameters} }) {
+        $env->set($fn->{parameters}[$idx]{value}, $args->[$idx]);
+    }
+    return $env;
+}
+
+sub _native_bool_to_boolean_object {
+    my ($input) = @_;
+    return BooleanObject->new($input ? 1 : 0);
+}
+
+sub _is_truthy {
+    my ($obj) = @_;
+    return 0 if $obj->{type} eq 'NULL';
+    return 0 if $obj->{type} eq 'BOOLEAN' && !$obj->{value};
+    return 1;
+}
+
+sub _is_error {
+    my ($obj) = @_;
+    return defined $obj && ref $obj && $obj->{type} eq 'ERROR';
+}
+
+sub _hash_key {
+    my ($obj) = @_;
+    if ($obj->{type} eq 'STRING') {
+        return StringObject->new('STRING:' . $obj->{value});
+    }
+    if ($obj->{type} eq 'INTEGER') {
+        return StringObject->new('INTEGER:' . $obj->{value});
+    }
+    if ($obj->{type} eq 'BOOLEAN') {
+        return StringObject->new('BOOLEAN:' . ($obj->{value} ? 'true' : 'false'));
+    }
+    return ErrorObject->new('unusable as hash key: ' . $obj->{type});
+}
+
+package main;
+sub run {
+    my ($source) = @_;
+    my $lexer = Lexer->new($source);
+    my $parser = Parser->new($lexer);
+    my $program = $parser->parse_program;
+    if (@{ $parser->{errors} }) {
+        foreach my $err (@{ $parser->{errors} }) {
+            say "Parser error: $err";
+        }
+        return;
+    }
+    my $env = Environment->new;
+    my $result = Evaluator::evaluate($program, $env);
+    say $result->inspect if defined $result && $result->{type} ne 'NULL';
+}
+
+sub repl {
+    my $env = Environment->new;
+    while (1) {
+        print '>> ';
+        my $line = <STDIN>;
+        last unless defined $line;
+        chomp $line;
+        last if $line =~ /^\s*(quit|exit)\s*$/i;
+        my $lexer = Lexer->new($line);
+        my $parser = Parser->new($lexer);
+        my $program = $parser->parse_program;
+        if (@{ $parser->{errors} }) {
+            say for @{ $parser->{errors} };
+            next;
+        }
+        my $result = Evaluator::evaluate($program, $env);
+        say $result->inspect if defined $result && $result->{type} ne 'NULL';
+    }
+}
+
+if (!caller) {
+    if (@ARGV) {
+        local $/;
+        my $code = <>;
+        run($code);
+    } else {
+        say 'Monkey Interpreter (Perl)';
+        say 'Type exit or quit to leave';
+        repl();
+    }
+}

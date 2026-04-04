@@ -17,7 +17,8 @@ Object::Proto::define('Node', qw(value next_value));
 # Multi-level property resolution (same class)
 # ============================================
 
-subtest 'two-level same-class chain' => sub {
+# two-level same-class chain
+{
     my $n1 = new Node 'level1', 'n1_next';
     my $n2 = new Node undef, undef;
 
@@ -26,9 +27,9 @@ subtest 'two-level same-class chain' => sub {
     # n2 has no value, should get from n1
     is($n2->value, 'level1', 'value inherits from prototype');
     is($n2->next_value, 'n1_next', 'next_value inherits from prototype');
-};
-
-subtest 'three-level same-class chain' => sub {
+}
+# three-level same-class chain
+{
     my $n1 = new Node 'level1', 'n1_next';
     my $n2 = new Node undef, 'n2_next';
     my $n3 = new Node undef, undef;
@@ -40,9 +41,9 @@ subtest 'three-level same-class chain' => sub {
     is($n3->value, 'level1', 'value inherits through 2 levels');
     # n3 should get next_value from n2 (1 level up, shadowed)
     is($n3->next_value, 'n2_next', 'next_value from middle level (shadowed)');
-};
-
-subtest 'five-level same-class chain' => sub {
+}
+# five-level same-class chain
+{
     my @nodes;
     push @nodes, new Node 'root', 'root_next';
     for my $i (1..4) {
@@ -53,13 +54,13 @@ subtest 'five-level same-class chain' => sub {
 
     # Node at index 4 (5th node) should resolve from root
     is($nodes[4]->value, 'root', 'five-level chain resolves correctly');
-};
-
+}
 # ============================================
 # Cross-class prototypes (shared properties only)
 # ============================================
 
-subtest 'cross-class prototype with shared property' => sub {
+# cross-class prototype with shared property
+{
     my $gp = new GrandParent 'gp_name', 'from_grandparent', 'gp_only_val';
     my $p = new Parent undef, undef, 'p_only_val';
 
@@ -73,9 +74,9 @@ subtest 'cross-class prototype with shared property' => sub {
 
     # p_only is Parent's own property
     is($p->p_only, 'p_only_val', 'Parent own property works');
-};
-
-subtest 'three-level cross-class chain' => sub {
+}
+# three-level cross-class chain
+{
     my $gp = new GrandParent 'gp', 'from_gp', 'gp_only';
     my $p = new Parent undef, undef, 'p_only';
     my $c = new Child undef, undef, 'c_only';
@@ -89,13 +90,13 @@ subtest 'three-level cross-class chain' => sub {
 
     # Class-specific properties work
     is($c->c_only, 'c_only', 'Child c_only works');
-};
-
+}
 # ============================================
 # Circular reference detection
 # ============================================
 
-subtest 'circular reference detection' => sub {
+# circular reference detection
+{
     my $n1 = new Node 'a', 'a_next';
     my $n2 = new Node 'b', 'b_next';
 
@@ -112,9 +113,9 @@ subtest 'circular reference detection' => sub {
 
     # Access should find value before hitting cycle
     is($n3->value, 'a', 'can still access value in cyclic chain');
-};
-
-subtest 'self-referential prototype' => sub {
+}
+# self-referential prototype
+{
     my $obj = new Node undef, undef;
 
     Object::Proto::set_prototype($obj, $obj);  # Self-reference
@@ -126,13 +127,13 @@ subtest 'self-referential prototype' => sub {
 
     ok(@warnings > 0, 'self-reference produces warning');
     like($warnings[0], qr/[Cc]ircular/, 'warning mentions circular');
-};
-
+}
 # ============================================
 # New API functions
 # ============================================
 
-subtest 'prototype_chain returns full chain' => sub {
+# prototype_chain returns full chain
+{
     my $n1 = new Node 'n1', 'n1_next';
     my $n2 = new Node 'n2', 'n2_next';
     my $n3 = new Node 'n3', 'n3_next';
@@ -148,16 +149,16 @@ subtest 'prototype_chain returns full chain' => sub {
     is($chain->[0]->value, 'n3', 'first in chain is n3');
     is($chain->[1]->value, 'n2', 'second in chain is n2');
     is($chain->[2]->value, 'n1', 'third in chain is n1');
-};
-
-subtest 'prototype_chain with no prototype' => sub {
+}
+# prototype_chain with no prototype
+{
     my $obj = new Node 'data', 'next';
 
     my $chain = Object::Proto::prototype_chain($obj);
     is(scalar(@$chain), 1, 'chain has only self when no prototype');
-};
-
-subtest 'prototype_depth' => sub {
+}
+# prototype_depth
+{
     my $n1 = new Node 'n1', 'n1';
     my $n2 = new Node 'n2', 'n2';
     my $n3 = new Node 'n3', 'n3';
@@ -168,9 +169,9 @@ subtest 'prototype_depth' => sub {
     is(Object::Proto::prototype_depth($n1), 0, 'n1 has depth 0');
     is(Object::Proto::prototype_depth($n2), 1, 'n2 has depth 1');
     is(Object::Proto::prototype_depth($n3), 2, 'n3 has depth 2');
-};
-
-subtest 'has_own_property' => sub {
+}
+# has_own_property
+{
     my $n1 = new Node 'data', 'next';
     my $n2 = new Node undef, undef;
 
@@ -180,13 +181,13 @@ subtest 'has_own_property' => sub {
     ok(Object::Proto::has_own_property($n1, 'next_value'), 'n1 has own next_value');
     ok(!Object::Proto::has_own_property($n2, 'value'), 'n2 does not have own value');
     ok(!Object::Proto::has_own_property($n2, 'next_value'), 'n2 does not have own next_value');
-};
-
+}
 # ============================================
 # Property shadowing
 # ============================================
 
-subtest 'property shadowing' => sub {
+# property shadowing
+{
     my $n1 = new Node 'original', 'n1_next';
     my $n2 = new Node 'shadowed', undef;
 
@@ -198,9 +199,9 @@ subtest 'property shadowing' => sub {
 
     # n2 inherits next_value
     is($n2->next_value, 'n1_next', 'n2 inherits next_value');
-};
-
-subtest 'setting inherited property creates own copy' => sub {
+}
+# setting inherited property creates own copy
+{
     my $n1 = new Node 'inherited', 'n1_next';
     my $n2 = new Node undef, undef;
 
@@ -217,13 +218,13 @@ subtest 'setting inherited property creates own copy' => sub {
 
     # Now has_own_property should be true
     ok(Object::Proto::has_own_property($n2, 'value'), 'now has own property');
-};
-
+}
 # ============================================
 # Edge cases
 # ============================================
 
-subtest 'undefined values vs missing properties' => sub {
+# undefined values vs missing properties
+{
     my $n1 = new Node undef, 'n1_next';
     my $n2 = new Node undef, undef;
 
@@ -235,9 +236,9 @@ subtest 'undefined values vs missing properties' => sub {
 
     # next_value is undef at n2, should fall through to n1
     is($n2->next_value, 'n1_next', 'next_value inherits from n1');
-};
-
-subtest 'empty prototype chain' => sub {
+}
+# empty prototype chain
+{
     my $obj = new Node 'data', 'next';
 
     my $depth = Object::Proto::prototype_depth($obj);
@@ -245,9 +246,9 @@ subtest 'empty prototype chain' => sub {
 
     my $chain = Object::Proto::prototype_chain($obj);
     is(scalar(@$chain), 1, 'chain only contains self');
-};
-
-subtest 'prototype chain with frozen objects' => sub {
+}
+# prototype chain with frozen objects
+{
     my $n1 = new Node 'n1', 'n1_next';
     my $n2 = new Node undef, undef;
 
@@ -259,9 +260,9 @@ subtest 'prototype chain with frozen objects' => sub {
 
     my $chain = Object::Proto::prototype_chain($n2);
     is(scalar(@$chain), 2, 'chain includes frozen prototype');
-};
-
-subtest 'modifying prototype affects inheritors' => sub {
+}
+# modifying prototype affects inheritors
+{
     my $n1 = new Node 'original', 'n1_next';
     my $n2 = new Node undef, undef;
 
@@ -274,6 +275,5 @@ subtest 'modifying prototype affects inheritors' => sub {
 
     # n2 should see the change (since it inherits)
     is($n2->value, 'modified', 'inheritor sees prototype change');
-};
-
+}
 done_testing();

@@ -1,4 +1,6 @@
 package Razor2::Preproc::deQP;
+use strict;
+use warnings;
 
 #use MIME::QuotedPrint;
 

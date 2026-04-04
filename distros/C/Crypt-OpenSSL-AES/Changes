@@ -1,5 +1,86 @@
 Revision history for Perl extension Crypt::OpenSSL::AES.
 
+0.23 -- Fri Apr 03 11:37:17 ADT 2026
+
+    [Deprecation Notice]
+    - OpenSSL versions below 0.9.8 will not be supported in an upcoming release.
+    - It will likely be removed in the next production release.
+
+    [Updates since 0.21]
+    - Release 0.22 as a production release
+    - A fairly large list of commits.
+    - Thanks to Joe Schaefer (@joesuf4) for prompting the release.
+    - Fix type casting for plaintext in AES decryption (@joesuf4)
+    - Allow encryption and decryption of zero length data
+    - tests: add additional tests and enable strict and warnings
+    - tests: Modernize the module new syntax
+    - Properly free memory in the event of an error
+    - Add checks to ensure the module is not cloned across threads
+    - A fair number of miscelaneous cleanups
+    - Verify that the IV is the correct length
+    - Add a check for fips mode and method to enable
+    - Replace static cipher getters with EVP_CIPHER_fetch()
+    - Re-initialize EVP Context Between Calls to encrypt or decrypt
+
+0.22 -- Thu Apr 02 22:25:09 ADT 2026
+
+    [Deprecation Notice]
+    - OpenSSL versions below 0.9.8 will not be supported in an upcoming release.
+    - It will likely be removed in the next production release.
+
+    [Updates since 0.21]
+    - A fairly large list of commits.
+    - Thanks to Joe Schaefer (@joesuf4) for prompting the release.
+    - Fix type casting for plaintext in AES decryption (@joesuf4)
+    - Allow encryption and decryption of zero length data
+    - tests: add additional tests and enable strict and warnings
+    - tests: Modernize the module new syntax
+    - Properly free memory in the event of an error
+    - Add checks to ensure the module is not cloned across threads
+    - A fair number of miscelaneous cleanups
+    - Verify that the IV is the correct length
+    - Add a check for fips mode and method to enable
+    - Replace static cipher getters with EVP_CIPHER_fetch()
+    - Re-initialize EVP Context Between Calls to encrypt or decrypt
+
+    [Detailed Change Log]
+    - 1587ac2 Remove Crypt::CBC as a set dependency
+    - 6f813d8 Upgrade ppport.h to Version 3.73
+    - f064619 Update copyright year and add META.json
+    - 7ad96e4 Add a MANIFEST.SKIP
+    - 2f4783c Example Docker Container to run in Apache
+    - 16d2d64 get_padding should return true or false
+    - 17fc906 Update the version number for the next release
+    - a452981 License text updates
+    - 488c11b Add Crypt::CBC as a test dependency
+    - 97de73e Update Dependencies
+    - a693ae7 Update the testsuite
+    - 9e0d2b7 Increase plaintext buffer size in accordance with OpenSSL documentation
+    - 4a827c9 Even encrypt and decrypt zero length data
+    - 5a60996 tests: Fix typo
+    - 9bbbc8d tests: localize the key to the scope
+    - 8f96914 tests: Modernize the module new syntax
+    - 3764f7d tests: Fix the error checks and improve error handling use Crypt::OpenSSL::Guess in openssl check
+    - 31c4493 tests: Add strict and warnings
+    - a65f963 Properly free RETVAL in new()
+    - acd9ce7 Add unsafe thread checks and add thread information to pod
+    - 612e57c Clarify the err: label and cleanup usage
+    - 3c33d3a Fix indenting issue
+    - f89c323 Be consistent with STRLEN usage
+    - 372717f Ensure that options exists before reading it
+    - cc49603 We do not export anything
+    - 48baad2 Replace the SYNOPSIS with more secure recommendation
+    - 7a3071d Free ciphertext in legacy encrypt
+    - df809e8 cipher from EVP_CIPHER_fetch() must be freed
+    - 42f362f Verify that the IV used is the correct length
+    - 5eb7263 Fix type casting for plaintext in AES decryption
+    - 00af656 Be consistent on using plaintext_len
+    - 8001417 Croak on ECB ciphers if an IV is specified before calling get_cipher
+    - 3f728fa Properly free memory if calls when an error causes a croak and fix memory leak on error
+    - 3d0b263 Check fips mode and add pod information related to FIPS
+    - 5ecc3be Replace static cipher getters with EVP_CIPHER_fetch()
+    - 6e202f1 Re-initialize EVP Context Between Calls
+
 0.21 -- Mon Jun 10 20:24:50 ADT 2024
 
     [Updates since 0.19]

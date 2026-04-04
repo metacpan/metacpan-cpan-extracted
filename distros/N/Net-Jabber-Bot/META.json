@@ -40,7 +40,7 @@
             "Time::HiRes" : "0",
             "Type::Tiny" : "1",
             "Types::Standard" : "0",
-            "perl" : "5.008",
+            "perl" : "5.010",
             "version" : "0"
          }
       },
@@ -68,6 +68,6 @@
          "web" : "https://github.com/cpan-authors/perl-net-jabber-bot"
       }
    },
-   "version" : "v2.1.9",
+   "version" : "3.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

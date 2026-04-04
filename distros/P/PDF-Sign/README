@@ -20,7 +20,6 @@ INSTALLATION
 DEPENDENCIES
 
     PDF::API2 or PDF::Builder (one required)
-    Crypt::OpenSSL::X509
     File::Slurp
     MIME::Base64 (core)
     POSIX (core)
@@ -31,9 +30,6 @@ TESTING
 
     # basic load test (no certificates needed):
     make test
-
-    # full signing test (requires certificates):
-    TEST_CERT_PEM=/path/cert.pem TEST_KEY_PEM=/path/key.pem make test
 
     # TSA test (requires network):
     TSA_TEST=1 make test

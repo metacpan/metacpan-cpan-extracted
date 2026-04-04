@@ -1,5 +1,21 @@
 Revision history for Object-Proto
 
+0.05	2026-04-03
+	- Export role(), requires(), and with() into caller's namespace on import
+	- Add t/050-exported-keywords.t for new export coverage
+
+0.04	2026-04-03
+	- Add BUILD callback hook when instantiating 'new' objects
+	- Add trigger callbacks for slots via :trigger(method_name)
+	- Add custom predicate/clearer names via :predicate(name) and :clearer(name)
+	- Add reader/writer for Java-style accessors via :reader(name) and :writer(name)
+	- Add weak references via :weak modifier (auto-weaken references)
+	- Add init_arg via :arg(name) for alternate constructor argument names
+	- Builders now run at construction by default (eager); use :lazy for deferred
+	- Fix role slots with defaults not being applied
+	- Fix required attributes now reject setting to undef via setters
+	- Update POD
+
 0.03	2026-04-02
 	- Adds multiple inheritance via extends
 	- Adds parent and ancestors meta functions

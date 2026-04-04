@@ -18,13 +18,17 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Business::UPS:
+    file: lib/Business/UPS.pm
+    version: '2.04'
 requires:
   JSON::PP: '0'
   LWP::UserAgent: '0'
-  Test::More: '0'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/cpan-authors/Business-UPS/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/cpan-authors/Business-UPS
-version: '2.03'
+  repository: https://github.com/cpan-authors/Business-UPS.git
+version: '2.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb-JSON
-version: 0.04
+version: 0.05
 abstract: JSON encode/decode for multibyte (UTF-8) strings
 author:
   - ina <ina@cpan.org>
@@ -21,10 +21,10 @@ minimum_perl_version: 5.00503
 provides:
   mb::JSON:
     file: lib/mb/JSON.pm
-    version: 0.04
+    version: 0.05
   mb::JSON::Boolean:
     file: lib/mb/JSON.pm
-    version: 0.04
+    version: 0.05
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/mb-JSON/issues

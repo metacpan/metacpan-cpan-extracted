@@ -88,10 +88,10 @@ package main;
 
 Object::Proto::define('Logger', 'prefix:Str');
 
-Object::Proto::before('Logger::log_msg', sub {
+before('Logger::log_msg', sub {
     push @main::log, "before 1";
 });
-Object::Proto::before('Logger::log_msg', sub {
+before('Logger::log_msg', sub {
     push @main::log, "before 2";
 });
 

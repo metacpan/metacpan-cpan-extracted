@@ -41,27 +41,28 @@ for (1..10) {
 # Object creation
 # ============================================
 
-subtest 'positional constructor no leak' => sub {
+# positional constructor no leak
+{
     no_leaks_ok {
         for (1..50) {
             my $obj = new LeakKeys 'str', 42, 3.14;
         }
     } 'positional constructor does not leak';
-};
-
-subtest 'named constructor no leak' => sub {
+}
+# named constructor no leak
+{
     no_leaks_ok {
         for (1..50) {
             my $obj = new LeakKeys a => 'str', b => 42, c => 3.14;
         }
     } 'named constructor does not leak';
-};
-
+}
 # ============================================
 # Accessor operations (should not leak)
 # ============================================
 
-subtest 'accessor get repeated no leak' => sub {
+# accessor get repeated no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $a = $keys_obj->a;
@@ -69,9 +70,9 @@ subtest 'accessor get repeated no leak' => sub {
             my $c = $keys_obj->c;
         }
     } 'accessor get repeated does not leak';
-};
-
-subtest 'accessor set repeated no leak' => sub {
+}
+# accessor set repeated no leak
+{
     no_leaks_ok {
         for (1..500) {
             $keys_obj->a('updated');
@@ -79,57 +80,57 @@ subtest 'accessor set repeated no leak' => sub {
             $keys_obj->c(2.71);
         }
     } 'accessor set repeated does not leak';
-};
-
+}
 # ============================================
 # Lock operations
 # ============================================
 
-subtest 'is_locked no leak' => sub {
+# is_locked no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $l = Object::Proto::is_locked($seal_obj);
         }
     } 'is_locked does not leak';
-};
-
+}
 # ============================================
 # Method calls
 # ============================================
 
-subtest 'custom method call no leak' => sub {
+# custom method call no leak
+{
     no_leaks_ok {
         for (1..500) {
             $method_obj->increment;
         }
     } 'custom method does not leak';
-};
-
+}
 # ============================================
 # Prototype chain operations
 # ============================================
 
-subtest 'prototype get no leak' => sub {
+# prototype get no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $p = Object::Proto::prototype($proto_child);
         }
     } 'prototype get does not leak';
-};
-
-subtest 'prototype chain access no leak' => sub {
+}
+# prototype chain access no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $d = $proto_child->data;
         }
     } 'prototype chain access does not leak';
-};
-
+}
 # ============================================
 # Lock/unlock operations
 # ============================================
 
-subtest 'lock/unlock cycle no leak' => sub {
+# lock/unlock cycle no leak
+{
     my $obj = new LeakSeal x => 1;
     no_leaks_ok {
         for (1..200) {
@@ -138,34 +139,34 @@ subtest 'lock/unlock cycle no leak' => sub {
             Object::Proto::unlock($obj);
         }
     } 'lock/unlock cycle does not leak';
-};
-
+}
 # ============================================
 # Type registration
 # ============================================
 
-subtest 'has_type no leak' => sub {
+# has_type no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $h1 = Object::Proto::has_type('Str');
             my $h2 = Object::Proto::has_type('NonExistent');
         }
     } 'has_type does not leak';
-};
-
-subtest 'list_types no leak' => sub {
+}
+# list_types no leak
+{
     no_leaks_ok {
         for (1..200) {
             my $types = Object::Proto::list_types();
         }
     } 'list_types does not leak';
-};
-
+}
 # ============================================
 # Freeze operations
 # ============================================
 
-subtest 'freeze and is_frozen no leak' => sub {
+# freeze and is_frozen no leak
+{
     my $obj = new LeakSeal x => 42;
     Object::Proto::freeze($obj);
     no_leaks_ok {
@@ -174,6 +175,5 @@ subtest 'freeze and is_frozen no leak' => sub {
             my $v = $obj->x;
         }
     } 'freeze and is_frozen no leak';
-};
-
+}
 done_testing();

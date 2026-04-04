@@ -1,5 +1,22 @@
 Revision history for mb-JSON
 
+0.05  2026-04-04 JST (Japan Standard Time)
+  - fix t/9050-pod.t: replace G11 implementation with Pod::Checker OO
+    interface (Pod::Checker->new / num_errors / num_warnings) and
+    split into G11 (errors) + G12 (warnings); plan updated from
+    11 to 12 tests per .pm file.
+  - fix t/9050-pod.t: skip G11 Pod::Checker errors check when
+    Pod::Checker < 1.51 to avoid false FAILs caused by mis-reported
+    errors for valid L</section>, L</"section">, and L<URL> syntax
+    on older Perl installations (CPAN Testers FAIL fix).
+  - fix t/9050-pod.t: skip G12 Pod::Checker warnings check when
+    Pod::Checker < 1.60 to avoid false FAILs caused by mis-reported
+    warnings for valid L<> link syntax on older Perl installations.
+  - fix t/9010-encoding.t, t/9020-perl5compat.t, t/9050-pod.t,
+    t/9060-readme.t, t/9070-examples.t, t/9080-cheatsheets.t:
+    warnings stub guard updated to !defined(&warnings::import) form
+    (consistent with mb 0.61, UTF8-R2 0.30, and other distributions).
+
 0.04  2026-03-26 JST (Japan Standard Time)
 
     New features:

@@ -55,6 +55,13 @@ typedef struct {
     U8 has_builder;                 /* Has builder method */
     U8 has_clearer;                 /* Generate clear_X method */
     U8 has_predicate;               /* Generate has_X method */
+    U8 is_weak;                     /* Weaken references when stored */
+    U8 has_checks;                  /* is_readonly | is_required | has_coerce | TYPE_CUSTOM — skip block when 0 */
+    SV *clearer_name;               /* Custom clearer method name */
+    SV *predicate_name;             /* Custom predicate method name */
+    SV *reader_name;                /* Custom reader method name (get_X style) */
+    SV *writer_name;                /* Custom writer method name (set_X style) */
+    SV *init_arg;                   /* Alternate constructor argument name */
 } SlotSpec;
 
 /* Custom op definitions */
@@ -94,6 +101,7 @@ typedef struct {
 struct ClassMeta_s {
     char *class_name;
     HV *prop_to_idx;      /* property name -> slot index */
+    HV *arg_to_idx;       /* constructor argument name -> slot index (init_arg or property name) */
     char **idx_to_prop;   /* slot index -> property name */
     IV slot_count;
     HV *stash;            /* cached stash pointer */
@@ -104,11 +112,16 @@ struct ClassMeta_s {
     U8 has_any_triggers;  /* Quick check: any slot has triggers? */
     U8 has_any_required;  /* Quick check: any slot is required? */
     U8 has_any_lazy;      /* Quick check: any slot is lazy? */
+    U8 has_any_builders;  /* Quick check: any slot has builders? */
+    U8 has_any_weak;      /* Quick check: any slot has weak refs? */
     /* Singleton support */
     SV *singleton_instance;  /* Cached singleton instance, NULL if not a singleton */
     U8 is_singleton;         /* Flag: class is a singleton */
     /* DEMOLISH support - only set if class has DEMOLISH method */
     CV *demolish_cv;         /* Cached DEMOLISH method, NULL if none */
+    /* BUILD support - called after new() */
+    CV *build_cv;            /* Cached BUILD method, NULL if none */
+    U8 has_build;            /* Flag: class has BUILD method */
     /* Role support */
     RoleMeta **consumed_roles;  /* Array of consumed roles, NULL if none */
     IV role_count;
@@ -142,8 +155,8 @@ static ClassMeta* get_class_meta(pTHX_ const char *class_name, STRLEN len);
 static void install_constructor(pTHX_ const char *class_name, ClassMeta *meta);
 static void install_accessor(pTHX_ const char *class_name, const char *prop_name, IV idx);
 static void install_accessor_typed(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta);
-static void install_clearer(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta);
-static void install_predicate(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta);
+static void install_clearer(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta, SV *custom_name);
+static void install_predicate(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta, SV *custom_name);
 static void install_destroy_wrapper(pTHX_ const char *class_name, ClassMeta *meta);
 static RoleMeta* get_role_meta(pTHX_ const char *role_name, STRLEN len);
 static XS(xs_prototype);
@@ -173,29 +186,36 @@ OBJECT_INLINE bool check_builtin_type(pTHX_ SV *val, BuiltinTypeID type_id) {
         case TYPE_ANY:
             return true;
         case TYPE_DEFINED:
-            /* SvOK checks if defined, but be defensive for older Perls */
-            /* where constant 0 might have edge cases */
+            /* Be defensive: SvOK may not catch all defined values in older Perls */
             return SvOK(val) || SvIOK(val) || SvNOK(val) || SvPOK(val);
         case TYPE_STR:
             return SvOK(val) && !SvROK(val);  /* defined non-ref */
         case TYPE_INT:
             if (SvIOK(val)) return true;
             if (SvPOK(val)) {
-                /* String that looks like integer */
+                /* Use strtoll for fast integer parsing */
                 STRLEN len;
-                const char *pv;
-                const char *p;
-
-                pv = SvPV(val, len);
+                const char *pv = SvPV(val, len);
+                char *endp;
                 if (len == 0) return false;
-                p = pv;
-                if (*p == '-' || *p == '+') p++;
-                while (*p && *p >= '0' && *p <= '9') p++;
-                return p == pv + len;
+                errno = 0;
+                (void)strtoll(pv, &endp, 10);
+                return errno == 0 && endp == pv + len && *pv != '\0';
             }
             return false;
         case TYPE_NUM:
-            return SvNIOK(val) || (SvPOK(val) && looks_like_number(val));
+            if (SvNIOK(val)) return true;
+            if (SvPOK(val)) {
+                /* Use strtod for fast number parsing */
+                STRLEN len;
+                const char *pv = SvPV(val, len);
+                char *endp;
+                if (len == 0) return false;
+                errno = 0;
+                (void)strtod(pv, &endp);
+                return errno == 0 && endp == pv + len && *pv != '\0';
+            }
+            return false;
         case TYPE_BOOL:
             /* Accept 0, 1, "", or boolean SVs */
             if (SvIOK(val)) {
@@ -430,9 +450,8 @@ static SlotSpec* parse_slot_spec(pTHX_ const char *spec_str, STRLEN len) {
                     Safefree(cb_copy);
                 }
             } else if (mod_len == 7 && strncmp(mod_start, "builder", 7) == 0) {
-                /* builder(method_name) - lazy builder method */
+                /* builder(method_name) - builder method, called at new() unless :lazy */
                 spec->has_builder = 1;
-                spec->is_lazy = 1;  /* builder implies lazy */
                 if (arg_len > 0) {
                     char *cb_copy;
                     Newx(cb_copy, arg_len + 1, char);
@@ -446,6 +465,58 @@ static SlotSpec* parse_slot_spec(pTHX_ const char *spec_str, STRLEN len) {
                     snprintf(build_name, sizeof(build_name), "_build_%s", spec->name);
                     spec->builder_name = newSVpv(build_name, 0);
                 }
+            } else if (mod_len == 7 && strncmp(mod_start, "clearer", 7) == 0) {
+                /* clearer(method_name) - custom clearer method name */
+                spec->has_clearer = 1;
+                if (arg_len > 0) {
+                    char *name_copy;
+                    Newx(name_copy, arg_len + 1, char);
+                    Copy(arg_start, name_copy, arg_len, char);
+                    name_copy[arg_len] = '\0';
+                    spec->clearer_name = newSVpvn(name_copy, arg_len);
+                    Safefree(name_copy);
+                }
+            } else if (mod_len == 9 && strncmp(mod_start, "predicate", 9) == 0) {
+                /* predicate(method_name) - custom predicate method name */
+                spec->has_predicate = 1;
+                if (arg_len > 0) {
+                    char *name_copy;
+                    Newx(name_copy, arg_len + 1, char);
+                    Copy(arg_start, name_copy, arg_len, char);
+                    name_copy[arg_len] = '\0';
+                    spec->predicate_name = newSVpvn(name_copy, arg_len);
+                    Safefree(name_copy);
+                }
+            } else if (mod_len == 6 && strncmp(mod_start, "reader", 6) == 0) {
+                /* reader(method_name) - custom getter method name */
+                if (arg_len > 0) {
+                    char *name_copy;
+                    Newx(name_copy, arg_len + 1, char);
+                    Copy(arg_start, name_copy, arg_len, char);
+                    name_copy[arg_len] = '\0';
+                    spec->reader_name = newSVpvn(name_copy, arg_len);
+                    Safefree(name_copy);
+                }
+            } else if (mod_len == 6 && strncmp(mod_start, "writer", 6) == 0) {
+                /* writer(method_name) - custom setter method name */
+                if (arg_len > 0) {
+                    char *name_copy;
+                    Newx(name_copy, arg_len + 1, char);
+                    Copy(arg_start, name_copy, arg_len, char);
+                    name_copy[arg_len] = '\0';
+                    spec->writer_name = newSVpvn(name_copy, arg_len);
+                    Safefree(name_copy);
+                }
+            } else if (mod_len == 3 && strncmp(mod_start, "arg", 3) == 0) {
+                /* arg(init_arg_name) - alternate constructor argument name */
+                if (arg_len > 0) {
+                    char *name_copy;
+                    Newx(name_copy, arg_len + 1, char);
+                    Copy(arg_start, name_copy, arg_len, char);
+                    name_copy[arg_len] = '\0';
+                    spec->init_arg = newSVpvn(name_copy, arg_len);
+                    Safefree(name_copy);
+                }
             }
         } else {
             /* Simple modifier: type name or flag */
@@ -455,10 +526,14 @@ static SlotSpec* parse_slot_spec(pTHX_ const char *spec_str, STRLEN len) {
                 spec->is_readonly = 1;
             } else if (mod_len == 4 && strncmp(mod_start, "lazy", 4) == 0) {
                 spec->is_lazy = 1;
+            } else if (mod_len == 4 && strncmp(mod_start, "weak", 4) == 0) {
+                spec->is_weak = 1;
             } else if (mod_len == 7 && strncmp(mod_start, "clearer", 7) == 0) {
                 spec->has_clearer = 1;
+                /* Default clearer name: clear_<property> */
             } else if (mod_len == 9 && strncmp(mod_start, "predicate", 9) == 0) {
                 spec->has_predicate = 1;
+                /* Default predicate name: has_<property> */
             } else {
                 /* Try as type name */
                 char *type_copy;
@@ -488,6 +563,9 @@ static SlotSpec* parse_slot_spec(pTHX_ const char *spec_str, STRLEN len) {
         }
     }
     
+    spec->has_checks = spec->is_readonly | spec->is_required | spec->has_coerce
+                     | (spec->type_id == TYPE_CUSTOM ? 1 : 0);
+
     return spec;
 }
 
@@ -549,6 +627,7 @@ static SlotSpec* clone_slot_spec(pTHX_ const SlotSpec *src) {
     dst->is_required = src->is_required;
     dst->is_readonly = src->is_readonly;
     dst->is_lazy     = src->is_lazy;
+    dst->is_weak     = src->is_weak;
     dst->has_default  = src->has_default;
     dst->has_trigger  = src->has_trigger;
     dst->has_coerce   = src->has_coerce;
@@ -561,6 +640,11 @@ static SlotSpec* clone_slot_spec(pTHX_ const SlotSpec *src) {
     if (src->trigger_cb)  dst->trigger_cb  = SvREFCNT_inc(src->trigger_cb);
     if (src->coerce_cb)   dst->coerce_cb   = SvREFCNT_inc(src->coerce_cb);
     if (src->builder_name) dst->builder_name = SvREFCNT_inc(src->builder_name);
+    if (src->clearer_name) dst->clearer_name = SvREFCNT_inc(src->clearer_name);
+    if (src->predicate_name) dst->predicate_name = SvREFCNT_inc(src->predicate_name);
+    if (src->reader_name) dst->reader_name = SvREFCNT_inc(src->reader_name);
+    if (src->writer_name) dst->writer_name = SvREFCNT_inc(src->writer_name);
+    if (src->init_arg) dst->init_arg = SvREFCNT_inc(src->init_arg);
 
     return dst;
 }
@@ -572,6 +656,7 @@ static ClassMeta* create_class_meta(pTHX_ const char *class_name, STRLEN len) {
     Copy(class_name, meta->class_name, len, char);
     meta->class_name[len] = '\0';
     meta->prop_to_idx = newHV();
+    meta->arg_to_idx = newHV();
     meta->idx_to_prop = NULL;
     meta->slot_count = 1;  /* slot 0 reserved for prototype */
     meta->stash = gv_stashpvn(class_name, len, GV_ADD);
@@ -621,35 +706,42 @@ static OP* pp_object_new(pTHX) {
     ary[0] = &PL_sv_undef;
 
     if (is_named) {
-        /* Named needs pre-filled writable slots since keys arrive in arbitrary order */
-        for (i = 1; i < slot_count; i++) {
-            ary[i] = newSV(0);
-        }
-
         /* Fast path: no types, no defaults, no required */
         if (!meta->has_any_types && !meta->has_any_defaults && !meta->has_any_required) {
+            /* Don't pre-fill slots - use newSVsv directly to avoid double-touch.
+               Initialize ary to NULL, assign directly, then fill unfilled with newSV(0). */
+            Zero(&ary[1], slot_count - 1, SV*);
+
             for (i = 0; i < items; i += 2) {
                 SV *key_sv = MARK[i + 1];
                 SV *val_sv = (i + 1 < items) ? MARK[i + 2] : &PL_sv_undef;
                 STRLEN key_len;
                 const char *key = SvPV(key_sv, key_len);
-                SV **idx_svp = hv_fetch(meta->prop_to_idx, key, key_len, 0);
+                SV **idx_svp = hv_fetch(meta->arg_to_idx, key, key_len, 0);
                 if (idx_svp) {
                     IV idx = SvIVX(*idx_svp);
-                    sv_setsv(ary[idx], val_sv);
+                    ary[idx] = newSVsv(val_sv);
                 }
             }
+
+            /* Fill remaining NULL slots with writable undef */
+            for (i = 1; i < slot_count; i++) {
+                if (!ary[i]) ary[i] = newSV(0);
+            }
         } else {
-            /* Slow path: has types/defaults/required */
+            /* Slow path: has types/defaults/required
+               Use NULL-init + direct newSVsv for provided slots to avoid double-touch */
+            Zero(&ary[1], slot_count - 1, SV*);
+
             for (i = 0; i < items; i += 2) {
                 SV *key_sv = MARK[i + 1];
                 SV *val_sv = (i + 1 < items) ? MARK[i + 2] : &PL_sv_undef;
                 STRLEN key_len;
                 const char *key = SvPV(key_sv, key_len);
-                SV **idx_svp = hv_fetch(meta->prop_to_idx, key, key_len, 0);
+                SV **idx_svp = hv_fetch(meta->arg_to_idx, key, key_len, 0);
                 if (idx_svp) {
                     IV idx = SvIVX(*idx_svp);
-                    
+
                     if (meta->has_any_types && meta->slots[idx] && meta->slots[idx]->has_type) {
                         SlotSpec *spec = meta->slots[idx];
                         if (spec->type_id != TYPE_CUSTOM) {
@@ -664,33 +756,35 @@ static OP* pp_object_new(pTHX) {
                             }
                         }
                     }
-                    sv_setsv(ary[idx], val_sv);
+                    ary[idx] = newSVsv(val_sv);
                 }
             }
 
-            /* Fill defaults and check required */
+            /* Fill defaults and check required; allocate undef for unfilled slots */
             for (i = 1; i < slot_count; i++) {
-                if (!SvOK(ary[i])) {
+                if (!ary[i] || !SvOK(ary[i])) {
                     SlotSpec *spec = meta->slots[i];
-                    
+
                     if (spec && spec->is_required) {
                         croak("Required slot '%s' not provided in new()", spec->name);
                     }
-                    
+
                     if (spec && spec->has_default && spec->default_sv) {
                         if (SvROK(spec->default_sv)) {
+                            if (ary[i]) SvREFCNT_dec(ary[i]);
                             if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVAV) {
-                                SvREFCNT_dec(ary[i]);
                                 ary[i] = newRV_noinc((SV*)newAV());
                             } else if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVHV) {
-                                SvREFCNT_dec(ary[i]);
                                 ary[i] = newRV_noinc((SV*)newHV());
                             } else {
-                                sv_setsv(ary[i], spec->default_sv);
+                                ary[i] = newSVsv(spec->default_sv);
                             }
                         } else {
-                            sv_setsv(ary[i], spec->default_sv);
+                            if (ary[i]) { sv_setsv(ary[i], spec->default_sv); }
+                            else        { ary[i] = newSVsv(spec->default_sv); }
                         }
+                    } else if (!ary[i]) {
+                        ary[i] = newSV(0);
                     }
                 }
             }
@@ -766,6 +860,79 @@ static OP* pp_object_new(pTHX) {
     obj_sv = newRV_noinc((SV*)obj_av);
     sv_bless(obj_sv, meta->stash);
 
+    /* Call builders for non-lazy builder slots that weren't set */
+    if (meta->has_any_builders) {
+        for (i = 1; i < slot_count; i++) {
+            SlotSpec *spec = meta->slots[i];
+            if (spec && spec->has_builder && !spec->is_lazy && !SvOK(ary[i])) {
+                /* Call builder method */
+                dSP;
+                IV count;
+                ENTER;
+                SAVETMPS;
+                PUSHMARK(SP);
+                XPUSHs(obj_sv);
+                PUTBACK;
+                count = call_method(SvPV_nolen(spec->builder_name), G_SCALAR);
+                SPAGAIN;
+                if (count > 0) {
+                    SV *built_val = POPs;
+                    
+                    /* Coerce + type check the built value */
+                    if (spec->has_type) {
+                        if (spec->has_coerce || spec->type_id == TYPE_CUSTOM)
+                            built_val = apply_slot_coercion(aTHX_ built_val, spec);
+                        if (!check_slot_type(aTHX_ built_val, spec)) {
+                            const char *type_name = (spec->type_id == TYPE_CUSTOM && spec->registered) 
+                                ? spec->registered->name 
+                                : type_id_to_name(spec->type_id);
+                            croak("Type constraint failed for '%s' in builder: expected %s",
+                                  spec->name, type_name);
+                        }
+                    }
+                    
+                    sv_setsv(ary[i], built_val);
+                }
+                PUTBACK;
+                FREETMPS;
+                LEAVE;
+            }
+        }
+    }
+
+    /* Weaken references if any slots have is_weak */
+    if (meta->has_any_weak) {
+        for (i = 1; i < slot_count; i++) {
+            SlotSpec *spec = meta->slots[i];
+            if (spec && spec->is_weak && SvROK(ary[i])) {
+                sv_rvweaken(ary[i]);
+            }
+        }
+    }
+
+    /* Call BUILD if defined. Use tri-state: 0=unchecked, 1=has BUILD, 2=no BUILD.
+       Avoids gv_fetchmeth on every construction once checked. */
+    if (meta->has_build == 0) {
+        GV *gv = gv_fetchmeth(meta->stash, "BUILD", 5, 0);
+        if (gv && GvCV(gv)) {
+            meta->has_build = 1;
+            meta->build_cv = GvCV(gv);
+        } else {
+            meta->has_build = 2;
+        }
+    }
+    if (meta->has_build == 1) {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(obj_sv);
+        PUTBACK;
+        call_method("BUILD", G_VOID | G_DISCARD);
+        FREETMPS;
+        LEAVE;
+    }
+
     SP = MARK;
     XPUSHs(obj_sv);
     PUTBACK;
@@ -788,8 +955,6 @@ static SV* resolve_property_chain(pTHX_ AV *av, IV idx) {
     int i;
 
     while (av && depth < MAX_PROTOTYPE_DEPTH) {
-        SV **svp;
-
         /* Check for circular reference */
         for (i = 0; i < depth; i++) {
             if (visited[i] == av) {
@@ -800,17 +965,18 @@ static SV* resolve_property_chain(pTHX_ AV *av, IV idx) {
         visited[depth] = av;
 
         /* Try to fetch the property at this level */
-        svp = av_fetch(av, idx, 0);
-        if (svp && SvOK(*svp)) {
-            return *svp;
+        if (idx <= AvFILLp(av)) {
+            SV *slot = AvARRAY(av)[idx];
+            if (slot && SvOK(slot)) return slot;
         }
 
         /* Follow prototype chain (slot 0) */
-        svp = av_fetch(av, 0, 0);
-        if (!svp || !SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
-            break;
+        if (AvFILLp(av) < 0) break;
+        {
+            SV *proto_sv = AvARRAY(av)[0];
+            if (!proto_sv || !SvROK(proto_sv) || SvTYPE(SvRV(proto_sv)) != SVt_PVAV) break;
+            av = (AV*)SvRV(proto_sv);
         }
-        av = (AV*)SvRV(*svp);
         depth++;
     }
 
@@ -847,10 +1013,11 @@ static OP* pp_object_get(pTHX) {
         }
     }
 
-    /* Slow path: check prototype chain only if prototype exists */
+    /* Slow path: check prototype chain only if prototype exists.
+       Slot 0 is always allocated - use direct access instead of av_fetch(). */
     {
-        SV **proto = av_fetch(av, 0, 0);
-        if (proto && SvROK(*proto) && SvTYPE(SvRV(*proto)) == SVt_PVAV) {
+        SV *proto_sv = AvARRAY(av)[0];
+        if (proto_sv && SvROK(proto_sv) && SvTYPE(SvRV(proto_sv)) == SVt_PVAV) {
             SV *result = resolve_property_chain(aTHX_ av, idx);
             SETs(result);
             RETURN;
@@ -933,9 +1100,8 @@ static IV register_func_accessor_data(pTHX_ FuncAccessorData *data) {
     return g_func_accessor_count++;
 }
 
-/* Look up FuncAccessorData by ID */
-static FuncAccessorData* get_func_accessor_data(IV id) {
-    if (id < 0 || id >= g_func_accessor_count) return NULL;
+/* Look up FuncAccessorData by ID — inlined for hot path performance */
+OBJECT_INLINE FuncAccessorData* get_func_accessor_data(IV id) {
     return g_func_accessor_registry[id];
 }
 
@@ -948,7 +1114,6 @@ static OP* pp_object_set_typed(pTHX) {
     ClassMeta *meta = data->meta;
     SlotSpec *spec = meta->slots[idx];
     AV *av;
-    MAGIC *mg;
 
     if (!SvROK(obj) || SvTYPE(SvRV(obj)) != SVt_PVAV) {
         croak("Not an object");
@@ -956,19 +1121,26 @@ static OP* pp_object_set_typed(pTHX) {
 
     av = (AV*)SvRV(obj);
 
-    /* Check frozen/locked */
-    mg = get_object_magic(aTHX_ obj);
-    if (mg && (mg->mg_private & OBJ_FLAG_FROZEN)) {
-        croak("Cannot modify frozen object");
+    /* Check frozen/locked — only walk magic list if object has magic */
+    if (SvMAGICAL(av)) {
+        MAGIC *mg = get_object_magic(aTHX_ obj);
+        if (mg && (mg->mg_private & OBJ_FLAG_FROZEN)) {
+            croak("Cannot modify frozen object");
+        }
     }
 
-    /* Readonly check */
-    if (spec->is_readonly) {
-        croak("Cannot modify readonly slot '%s'", spec->name);
+    /* Fast-skip readonly/required/coerce when none apply */
+    if (spec->has_checks) {
+        if (spec->is_readonly) {
+            croak("Cannot modify readonly slot '%s'", spec->name);
+        }
+        if (spec->is_required && !SvOK(val)) {
+            croak("Cannot set required slot '%s' to undef", spec->name);
+        }
+        if (spec->has_coerce || spec->type_id == TYPE_CUSTOM) {
+            val = apply_slot_coercion(aTHX_ val, spec);
+        }
     }
-
-    /* Apply coercion */
-    val = apply_slot_coercion(aTHX_ val, spec);
 
     /* Type check using helper (handles both C and Perl callbacks) */
     if (spec->has_type) {
@@ -981,19 +1153,32 @@ static OP* pp_object_set_typed(pTHX) {
         }
     }
 
-    /* Trigger callback (old, new) */
+    /* Trigger callback ($self, $new_value) */
     if (spec->has_trigger && spec->trigger_cb) {
-        SV *oldval = *av_fetch(av, idx, 0);
         dSP;
         PUSHMARK(SP);
         XPUSHs(obj);
-        XPUSHs(oldval);
         XPUSHs(val);
         PUTBACK;
-        call_sv(spec->trigger_cb, G_DISCARD);
+        call_method(SvPV_nolen(spec->trigger_cb), G_DISCARD);
     }
 
-    av_store(av, idx, newSVsv(val));
+    if (!spec->is_weak) {
+        /* In-place update avoids newSVsv allocation (common case) */
+        if (idx <= AvFILLp(av)) {
+            SV *slot = AvARRAY(av)[idx];
+            if (slot) {
+                sv_setsv(slot, val);
+                SETs(val);
+                RETURN;
+            }
+        }
+        av_store(av, idx, newSVsv(val));
+    } else {
+        SV *stored = newSVsv(val);
+        av_store(av, idx, stored);
+        if (SvROK(stored)) sv_rvweaken(stored);
+    }
     SETs(val);
     RETURN;
 }
@@ -1079,11 +1264,11 @@ static XS(xs_object_new_fallback) {
 
     arg_count = items - start_arg;
 
-    /* Detect named pairs: even count and first arg is a known property name */
+    /* Detect named pairs: even count and first arg is a known property name or init_arg */
     if (arg_count > 0 && (arg_count % 2) == 0 && SvPOK(ST(start_arg))) {
         STRLEN len;
         const char *pv = SvPV(ST(start_arg), len);
-        if (hv_exists(meta->prop_to_idx, pv, len)) {
+        if (hv_exists(meta->prop_to_idx, pv, len) || hv_exists(meta->arg_to_idx, pv, len)) {
             is_named = 1;
         }
     }
@@ -1098,96 +1283,46 @@ static XS(xs_object_new_fallback) {
     /* Slot 0 = prototype (initially undef - read-only is fine, never written via setter) */
     ary[0] = &PL_sv_undef;
 
-    if (is_named) {
-        /* Named needs pre-filled writable slots since keys arrive in arbitrary order */
-        for (i = 1; i < slot_count; i++) {
+    /* Fill slots with defaults or writable undef in a single pass */
+    for (i = 1; i < slot_count; i++) {
+        SlotSpec *spec = meta->slots[i];
+        if (spec && spec->has_default && spec->default_sv) {
+            if (SvROK(spec->default_sv)) {
+                if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVAV) {
+                    ary[i] = newRV_noinc((SV*)newAV());
+                } else if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVHV) {
+                    ary[i] = newRV_noinc((SV*)newHV());
+                } else {
+                    ary[i] = newSVsv(spec->default_sv);
+                }
+            } else {
+                ary[i] = newSVsv(spec->default_sv);
+            }
+        } else {
             ary[i] = newSV(0);
         }
+    }
 
-        /* Fast path: no types, no defaults, no required - common case */
-        if (!meta->has_any_types && !meta->has_any_defaults && !meta->has_any_required) {
-            for (i = start_arg; i < items; i += 2) {
-                SV *key_sv = ST(i);
-                SV *val_sv = (i + 1 < items) ? ST(i + 1) : &PL_sv_undef;
-                STRLEN key_len;
-                const char *key = SvPV(key_sv, key_len);
-                SV **idx_svp = hv_fetch(meta->prop_to_idx, key, key_len, 0);
-                if (idx_svp) {
-                    IV idx = SvIVX(*idx_svp);
-                    sv_setsv(ary[idx], val_sv);
-                }
-            }
-        } else {
-            /* Slow path: has types/defaults/required */
-            for (i = start_arg; i < items; i += 2) {
-                SV *key_sv = ST(i);
-                SV *val_sv = (i + 1 < items) ? ST(i + 1) : &PL_sv_undef;
-                STRLEN key_len;
-                const char *key = SvPV(key_sv, key_len);
-                SV **idx_svp = hv_fetch(meta->prop_to_idx, key, key_len, 0);
-                if (idx_svp) {
-                    IV idx = SvIVX(*idx_svp);
-                    
-                    /* Coerce + type check on construction */
-                    if (meta->has_any_types && meta->slots[idx] && meta->slots[idx]->has_type) {
-                        SlotSpec *spec = meta->slots[idx];
-                        val_sv = apply_slot_coercion(aTHX_ val_sv, spec);
-                        if (!check_slot_type(aTHX_ val_sv, spec)) {
-                            const char *type_name = (spec->type_id == TYPE_CUSTOM && spec->registered) 
-                                ? spec->registered->name 
-                                : type_id_to_name(spec->type_id);
-                            croak("Type constraint failed for '%s' in new(): expected %s",
-                                  spec->name, type_name);
-                        }
-                    }
-                    sv_setsv(ary[idx], val_sv);
-                }
-            }
+    /* Create blessed reference NOW so triggers can do method dispatch */
+    obj_sv = newRV_noinc((SV*)obj_av);
+    sv_bless(obj_sv, meta->stash);
 
-            /* Fill defaults and check required - only for unset slots */
-            for (i = 1; i < slot_count; i++) {
-                if (!SvOK(ary[i])) {
-                    SlotSpec *spec = meta->slots[i];
-                    
-                    if (spec && spec->is_required) {
-                        croak("Required slot '%s' not provided in new()", spec->name);
-                    }
-                    
-                    if (spec && spec->has_default && spec->default_sv) {
-                        if (SvROK(spec->default_sv)) {
-                            if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVAV) {
-                                SvREFCNT_dec(ary[i]);
-                                ary[i] = newRV_noinc((SV*)newAV());
-                            } else if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVHV) {
-                                SvREFCNT_dec(ary[i]);
-                                ary[i] = newRV_noinc((SV*)newHV());
-                            } else {
-                                sv_setsv(ary[i], spec->default_sv);
-                            }
-                        } else {
-                            sv_setsv(ary[i], spec->default_sv);
-                        }
-                    }
-                }
-            }
-        }
-    } else {
-        /* Positional: newSVsv directly, no pre-fill needed */
-        IV provided = items - start_arg;
-        if (provided > slot_count - 1) provided = slot_count - 1;
-
-        if (!meta->has_any_types) {
-            for (i = 0; i < provided; i++) {
-                ary[i + 1] = newSVsv(ST(start_arg + i));
-            }
-        } else {
-            for (i = 0; i < provided; i++) {
-                IV idx = i + 1;
-                SV *val_sv = ST(start_arg + i);
+    if (is_named) {
+        /* Named arguments */
+        for (i = start_arg; i < items; i += 2) {
+            SV *key_sv = ST(i);
+            SV *val_sv = (i + 1 < items) ? ST(i + 1) : &PL_sv_undef;
+            STRLEN key_len;
+            const char *key = SvPV(key_sv, key_len);
+            SV **idx_svp = hv_fetch(meta->arg_to_idx, key, key_len, 0);
+            if (idx_svp) {
+                IV idx = SvIVX(*idx_svp);
+                SlotSpec *spec = meta->slots[idx];
                 
-                if (meta->slots[idx] && meta->slots[idx]->has_type) {
-                    SlotSpec *spec = meta->slots[idx];
-                    val_sv = apply_slot_coercion(aTHX_ val_sv, spec);
+                /* Coerce + type check */
+                if (spec && spec->has_type) {
+                    if (spec->has_coerce || spec->type_id == TYPE_CUSTOM)
+                        val_sv = apply_slot_coercion(aTHX_ val_sv, spec);
                     if (!check_slot_type(aTHX_ val_sv, spec)) {
                         const char *type_name = (spec->type_id == TYPE_CUSTOM && spec->registered) 
                             ? spec->registered->name 
@@ -1196,48 +1331,139 @@ static XS(xs_object_new_fallback) {
                               spec->name, type_name);
                     }
                 }
-                ary[idx] = newSVsv(val_sv);
+                
+                /* Trigger callback */
+                if (spec && spec->has_trigger && spec->trigger_cb) {
+                    dSP;
+                    PUSHMARK(SP);
+                    XPUSHs(obj_sv);
+                    XPUSHs(val_sv);
+                    PUTBACK;
+                    call_method(SvPV_nolen(spec->trigger_cb), G_DISCARD);
+                }
+                
+                sv_setsv(ary[idx], val_sv);
             }
         }
+    } else {
+        /* Positional arguments */
+        IV provided = items - start_arg;
+        if (provided > slot_count - 1) provided = slot_count - 1;
 
-        /* Fill remaining empty slots with writable undef */
-        for (i = provided + 1; i < slot_count; i++) {
-            ary[i] = newSV(0);
+        for (i = 0; i < provided; i++) {
+            IV idx = i + 1;
+            SV *val_sv = ST(start_arg + i);
+            SlotSpec *spec = meta->slots[idx];
+            
+            /* Coerce + type check */
+            if (spec && spec->has_type) {
+                if (spec->has_coerce || spec->type_id == TYPE_CUSTOM)
+                    val_sv = apply_slot_coercion(aTHX_ val_sv, spec);
+                if (!check_slot_type(aTHX_ val_sv, spec)) {
+                    const char *type_name = (spec->type_id == TYPE_CUSTOM && spec->registered) 
+                        ? spec->registered->name 
+                        : type_id_to_name(spec->type_id);
+                    croak("Type constraint failed for '%s' in new(): expected %s",
+                          spec->name, type_name);
+                }
+            }
+            
+            /* Trigger callback */
+            if (spec && spec->has_trigger && spec->trigger_cb) {
+                dSP;
+                PUSHMARK(SP);
+                XPUSHs(obj_sv);
+                XPUSHs(val_sv);
+                PUTBACK;
+                call_method(SvPV_nolen(spec->trigger_cb), G_DISCARD);
+            }
+            
+            sv_setsv(ary[idx], val_sv);
         }
+    }
 
-        /* Fill defaults/required for positional when class has them */
-        if (meta->has_any_defaults || meta->has_any_required) {
-            for (i = 1; i < slot_count; i++) {
-                if (!SvOK(ary[i])) {
-                    SlotSpec *spec = meta->slots[i];
+    /* Call builders for non-lazy builder slots that weren't set */
+    if (meta->has_any_builders) {
+        for (i = 1; i < slot_count; i++) {
+            SlotSpec *spec = meta->slots[i];
+            if (spec && spec->has_builder && !spec->is_lazy && !SvOK(ary[i])) {
+                /* Call builder method */
+                dSP;
+                IV count;
+                ENTER;
+                SAVETMPS;
+                PUSHMARK(SP);
+                XPUSHs(obj_sv);
+                PUTBACK;
+                count = call_method(SvPV_nolen(spec->builder_name), G_SCALAR);
+                SPAGAIN;
+                if (count > 0) {
+                    SV *built_val = POPs;
                     
-                    if (spec && spec->is_required) {
-                        croak("Required slot '%s' not provided in new()", spec->name);
-                    }
-                    
-                    if (spec && spec->has_default && spec->default_sv) {
-                        if (SvROK(spec->default_sv)) {
-                            if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVAV) {
-                                SvREFCNT_dec(ary[i]);
-                                ary[i] = newRV_noinc((SV*)newAV());
-                            } else if (SvTYPE(SvRV(spec->default_sv)) == SVt_PVHV) {
-                                SvREFCNT_dec(ary[i]);
-                                ary[i] = newRV_noinc((SV*)newHV());
-                            } else {
-                                sv_setsv(ary[i], spec->default_sv);
-                            }
-                        } else {
-                            sv_setsv(ary[i], spec->default_sv);
+                    /* Coerce + type check the built value */
+                    if (spec->has_type) {
+                        if (spec->has_coerce || spec->type_id == TYPE_CUSTOM)
+                            built_val = apply_slot_coercion(aTHX_ built_val, spec);
+                        if (!check_slot_type(aTHX_ built_val, spec)) {
+                            const char *type_name = (spec->type_id == TYPE_CUSTOM && spec->registered) 
+                                ? spec->registered->name 
+                                : type_id_to_name(spec->type_id);
+                            croak("Type constraint failed for '%s' in builder: expected %s",
+                                  spec->name, type_name);
                         }
                     }
+                    
+                    sv_setsv(ary[i], built_val);
                 }
+                PUTBACK;
+                FREETMPS;
+                LEAVE;
             }
         }
     }
 
-    /* Create blessed reference */
-    obj_sv = newRV_noinc((SV*)obj_av);
-    sv_bless(obj_sv, meta->stash);
+    /* Check required slots */
+    if (meta->has_any_required) {
+        for (i = 1; i < slot_count; i++) {
+            SlotSpec *spec = meta->slots[i];
+            if (spec && spec->is_required && !SvOK(ary[i])) {
+                croak("Required slot '%s' not provided in new()", spec->name);
+            }
+        }
+    }
+
+    /* Weaken references if any slots have is_weak */
+    if (meta->has_any_weak) {
+        for (i = 1; i < slot_count; i++) {
+            SlotSpec *spec = meta->slots[i];
+            if (spec && spec->is_weak && SvROK(ary[i])) {
+                sv_rvweaken(ary[i]);
+            }
+        }
+    }
+
+    /* Call BUILD if defined. Use tri-state: 0=unchecked, 1=has BUILD, 2=no BUILD.
+       Avoids gv_fetchmeth on every construction once checked. */
+    if (meta->has_build == 0) {
+        GV *gv = gv_fetchmeth(meta->stash, "BUILD", 5, 0);
+        if (gv && GvCV(gv)) {
+            meta->has_build = 1;
+            meta->build_cv = GvCV(gv);
+        } else {
+            meta->has_build = 2;
+        }
+    }
+    if (meta->has_build == 1) {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(obj_sv);
+        PUTBACK;
+        call_method("BUILD", G_VOID | G_DISCARD);
+        FREETMPS;
+        LEAVE;
+    }
 
     ST(0) = sv_2mortal(obj_sv);
     XSRETURN(1);
@@ -1326,33 +1552,27 @@ static OP* pp_object_func_get(pTHX) {
     dSP;
     SV *obj = TOPs;  /* peek, don't pop */
     FuncAccessorData *data = get_func_accessor_data(PL_op->op_targ);
-    IV idx;
+    IV idx = data->slot_idx;
+    SV *rv;
     AV *av;
     SV *sv;
 
-    if (!data) {
-        croak("Internal error: invalid accessor data");
-    }
-    idx = data->slot_idx;
-
-    if (!SvROK(obj) || SvTYPE(SvRV(obj)) != SVt_PVAV) {
-        croak("Not an object");
-    }
-    av = (AV*)SvRV(obj);
+    if (!SvROK(obj)) croak("Not an object");
+    rv = SvRV(obj);
+    if (SvTYPE(rv) != SVt_PVAV) croak("Not an object");
+    av = (AV*)rv;
 
     /* Validate object is of expected class (stash pointer comparison) */
-    if (data->expected_class) {
-        if (SvSTASH(SvRV(obj)) != data->expected_class->stash) {
-            croak("Expected object of class '%s', got '%s'",
-                  data->expected_class->class_name,
-                  HvNAME(SvSTASH(SvRV(obj))));
-        }
+    if (data->expected_class && SvSTASH(rv) != data->expected_class->stash) {
+        croak("Expected object of class '%s', got '%s'",
+              data->expected_class->class_name,
+              HvNAME(SvSTASH(rv)));
     }
 
-    /* Direct array access (faster than av_fetch + av_len) */
+    /* Direct array access — no SvOK needed (func path has no prototype chain) */
     if (idx <= AvFILLp(av)) {
         sv = AvARRAY(av)[idx];
-        if (sv && SvOK(sv)) {
+        if (sv) {
             SETs(sv);
             RETURN;
         }
@@ -1367,24 +1587,20 @@ static OP* pp_object_func_set(pTHX) {
     SV *val = POPs;  /* Pop value first */
     SV *obj = TOPs;  /* Object left on stack */
     FuncAccessorData *data = get_func_accessor_data(PL_op->op_targ);
-    IV idx;
+    IV idx = data->slot_idx;
+    SV *rv;
     AV *av;
 
-    if (!data) {
-        croak("Internal error: invalid accessor data");
-    }
-    idx = data->slot_idx;
-
-    if (!SvROK(obj) || SvTYPE(SvRV(obj)) != SVt_PVAV) {
-        croak("Not an object");
-    }
-    av = (AV*)SvRV(obj);
+    if (!SvROK(obj)) croak("Not an object");
+    rv = SvRV(obj);
+    if (SvTYPE(rv) != SVt_PVAV) croak("Not an object");
+    av = (AV*)rv;
 
     /* Validate object is of expected class (stash pointer comparison) */
-    if (data->expected_class && SvSTASH(SvRV(obj)) != data->expected_class->stash) {
+    if (data->expected_class && SvSTASH(rv) != data->expected_class->stash) {
         croak("Expected object of class '%s', got '%s'",
               data->expected_class->class_name,
-              HvNAME(SvSTASH(SvRV(obj))));
+              HvNAME(SvSTASH(rv)));
     }
 
     /* In-place update if slot already has an SV (avoids alloc/dealloc) */
@@ -1483,7 +1699,7 @@ static OP* func_accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckob
 
     newop = newUNOP(OP_CUSTOM, 0, objop);
     newop->op_ppaddr = pp_object_func_get;
-    newop->op_targ = data->registry_id;  /* Store registry ID, not pointer */
+    newop->op_targ = data->registry_id;
 
     op_free(entersubop);
     return newop;
@@ -1661,7 +1877,7 @@ static XS(xs_import) {
     dXSARGS;
     const char *caller_pkg;
     SV *full_name;
-    CV *define_cv;
+    CV *define_cv, *before_cv, *after_cv, *around_cv;
     GV *gv;
 
     PERL_UNUSED_VAR(items);
@@ -1683,8 +1899,67 @@ static XS(xs_import) {
         GvIMPORTED_CV_on(gv);
     }
     GvMULTI_on(gv);
-
     SvREFCNT_dec(full_name);
+
+    /* Export before/after/around modifiers */
+    before_cv = get_cv("Object::Proto::before", 0);
+    after_cv = get_cv("Object::Proto::after", 0);
+    around_cv = get_cv("Object::Proto::around", 0);
+
+    if (before_cv) {
+        full_name = newSVpvf("%s::before", caller_pkg);
+        gv = gv_fetchsv(full_name, GV_ADD, SVt_PVCV);
+        if (GvCV(gv) == NULL) {
+            GvCV_set(gv, (CV*)SvREFCNT_inc((SV*)before_cv));
+            GvIMPORTED_CV_on(gv);
+        }
+        GvMULTI_on(gv);
+        SvREFCNT_dec(full_name);
+    }
+
+    if (after_cv) {
+        full_name = newSVpvf("%s::after", caller_pkg);
+        gv = gv_fetchsv(full_name, GV_ADD, SVt_PVCV);
+        if (GvCV(gv) == NULL) {
+            GvCV_set(gv, (CV*)SvREFCNT_inc((SV*)after_cv));
+            GvIMPORTED_CV_on(gv);
+        }
+        GvMULTI_on(gv);
+        SvREFCNT_dec(full_name);
+    }
+
+    if (around_cv) {
+        full_name = newSVpvf("%s::around", caller_pkg);
+        gv = gv_fetchsv(full_name, GV_ADD, SVt_PVCV);
+        if (GvCV(gv) == NULL) {
+            GvCV_set(gv, (CV*)SvREFCNT_inc((SV*)around_cv));
+            GvIMPORTED_CV_on(gv);
+        }
+        GvMULTI_on(gv);
+        SvREFCNT_dec(full_name);
+    }
+
+    /* Export role/requires/with */
+    {
+        static const char *names[] = { "role", "requires", "with" };
+        int i;
+        for (i = 0; i < 3; i++) {
+            CV *cv = get_cvn_flags(
+                Perl_form(aTHX_ "Object::Proto::%s", names[i]),
+                strlen("Object::Proto::") + strlen(names[i]), 0);
+            if (cv) {
+                full_name = newSVpvf("%s::%s", caller_pkg, names[i]);
+                gv = gv_fetchsv(full_name, GV_ADD, SVt_PVCV);
+                if (GvCV(gv) == NULL) {
+                    GvCV_set(gv, (CV*)SvREFCNT_inc((SV*)cv));
+                    GvIMPORTED_CV_on(gv);
+                }
+                GvMULTI_on(gv);
+                SvREFCNT_dec(full_name);
+            }
+        }
+    }
+
     XSRETURN_EMPTY;
 }
 
@@ -1739,8 +2014,14 @@ static XS(xs_accessor_typed_fallback) {
             croak("Cannot modify readonly slot '%s'", spec->name);
         }
         
+        /* Required fields cannot be set to undef */
+        if (spec->is_required && !SvOK(val)) {
+            croak("Cannot set required slot '%s' to undef", spec->name);
+        }
+        
         /* Coercion */
-        val = apply_slot_coercion(aTHX_ val, spec);
+        if (spec->has_coerce || spec->type_id == TYPE_CUSTOM)
+            val = apply_slot_coercion(aTHX_ val, spec);
 
         /* Type check */
         if (spec->has_type) {
@@ -1752,8 +2033,25 @@ static XS(xs_accessor_typed_fallback) {
                       spec->name, type_name);
             }
         }
+
+        /* Trigger callback ($self, $new_value) */
+        if (spec->has_trigger && spec->trigger_cb) {
+            dSP;
+            PUSHMARK(SP);
+            XPUSHs(self);
+            XPUSHs(val);
+            PUTBACK;
+            call_method(SvPV_nolen(spec->trigger_cb), G_DISCARD);
+        }
         
-        av_store(av, idx, newSVsv(val));
+        {
+            SV *stored = newSVsv(val);
+            av_store(av, idx, stored);
+            /* Weaken reference if is_weak flag is set */
+            if (spec->is_weak && SvROK(stored)) {
+                sv_rvweaken(stored);
+            }
+        }
         ST(0) = val;
         XSRETURN(1);
     } else {
@@ -1879,6 +2177,216 @@ static OP* accessor_typed_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *cko
     }
 }
 
+/* XS fallback for reader-only accessor (get_X style) */
+static XS(xs_reader_fallback) {
+    dXSARGS;
+    SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
+    IV idx = data->slot_idx;
+    ClassMeta *meta = data->meta;
+    SlotSpec *spec = meta->slots[idx];
+    SV *self = ST(0);
+    AV *av;
+
+    PERL_UNUSED_ARG(items);
+
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV) {
+        croak("Not an object");
+    }
+    av = (AV*)SvRV(self);
+
+    /* Handle lazy builder */
+    if (spec && spec->is_lazy && spec->has_builder && spec->builder_name) {
+        if (idx <= AvFILLp(av)) {
+            SV *slot = AvARRAY(av)[idx];
+            if (!slot || !SvOK(slot)) {
+                /* Call builder method */
+                dSP;
+                IV count;
+                ENTER;
+                SAVETMPS;
+                PUSHMARK(SP);
+                XPUSHs(self);
+                PUTBACK;
+                count = call_method(SvPV_nolen(spec->builder_name), G_SCALAR);
+                SPAGAIN;
+                if (count > 0) {
+                    SV *built_val = POPs;
+                    
+                    /* Type check the built value */
+                    if (spec->has_type) {
+                        if (spec->has_coerce || spec->type_id == TYPE_CUSTOM)
+                            built_val = apply_slot_coercion(aTHX_ built_val, spec);
+                        if (!check_slot_type(aTHX_ built_val, spec)) {
+                            const char *type_name = (spec->type_id == TYPE_CUSTOM && spec->registered) 
+                                ? spec->registered->name 
+                                : type_id_to_name(spec->type_id);
+                            croak("Type constraint failed for '%s' in builder: expected %s",
+                                  spec->name, type_name);
+                        }
+                    }
+                    
+                    sv_setsv(AvARRAY(av)[idx], built_val);
+                }
+                PUTBACK;
+                FREETMPS;
+                LEAVE;
+            }
+        }
+    }
+
+    /* Getter - fast path: direct slot access */
+    if (idx <= AvFILLp(av)) {
+        SV *sv = AvARRAY(av)[idx];
+        if (sv && SvOK(sv)) {
+            ST(0) = sv;
+            XSRETURN(1);
+        }
+    }
+    /* Slow path: check prototype chain */
+    {
+        SV **proto = av_fetch(av, 0, 0);
+        if (proto && SvROK(*proto) && SvTYPE(SvRV(*proto)) == SVt_PVAV) {
+            SV *result = resolve_property_chain(aTHX_ av, idx);
+            ST(0) = result;
+            XSRETURN(1);
+        }
+    }
+    ST(0) = &PL_sv_undef;
+    XSRETURN(1);
+}
+
+/* XS fallback for writer-only accessor (set_X style) */
+static XS(xs_writer_fallback) {
+    dXSARGS;
+    SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
+    IV idx = data->slot_idx;
+    ClassMeta *meta = data->meta;
+    SlotSpec *spec = meta->slots[idx];
+    SV *self = ST(0);
+    AV *av;
+    MAGIC *mg;
+
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV) {
+        croak("Not an object");
+    }
+    av = (AV*)SvRV(self);
+
+    if (items < 2) {
+        croak("Writer method requires a value argument");
+    }
+
+    /* Check frozen */
+    mg = get_object_magic(aTHX_ self);
+    if (mg && (mg->mg_private & OBJ_FLAG_FROZEN)) {
+        croak("Cannot modify frozen object");
+    }
+
+    /* Check readonly */
+    if (spec && spec->is_readonly) {
+        croak("Cannot modify readonly slot '%s'", spec->name);
+    }
+
+    {
+        SV *val = ST(1);
+        
+        /* Required fields cannot be set to undef */
+        if (spec && spec->is_required && !SvOK(val)) {
+            croak("Cannot set required slot '%s' to undef", spec->name);
+        }
+        
+        /* Coerce + type check */
+        if (spec && spec->has_type) {
+            if (spec->has_coerce || spec->type_id == TYPE_CUSTOM)
+                val = apply_slot_coercion(aTHX_ val, spec);
+            if (!check_slot_type(aTHX_ val, spec)) {
+                const char *type_name = (spec->type_id == TYPE_CUSTOM && spec->registered) 
+                    ? spec->registered->name 
+                    : type_id_to_name(spec->type_id);
+                croak("Type constraint failed for '%s': expected %s",
+                      spec->name, type_name);
+            }
+        }
+        
+        /* Trigger callback ($self, $new_value) */
+        if (spec && spec->has_trigger && spec->trigger_cb) {
+            dSP;
+            PUSHMARK(SP);
+            XPUSHs(self);
+            XPUSHs(val);
+            PUTBACK;
+            call_method(SvPV_nolen(spec->trigger_cb), G_DISCARD);
+        }
+        
+        /* In-place update */
+        if (idx <= AvFILLp(av)) {
+            SV *slot = AvARRAY(av)[idx];
+            if (slot) {
+                sv_setsv(slot, val);
+                /* Weaken reference if is_weak flag is set */
+                if (spec && spec->is_weak && SvROK(slot)) {
+                    sv_rvweaken(slot);
+                }
+                ST(0) = val;
+                XSRETURN(1);
+            }
+        }
+        {
+            SV *stored = newSVsv(val);
+            av_store(av, idx, stored);
+            /* Weaken reference if is_weak flag is set */
+            if (spec && spec->is_weak && SvROK(stored)) {
+                sv_rvweaken(stored);
+            }
+        }
+        ST(0) = val;
+        XSRETURN(1);
+    }
+}
+
+/* Install reader-only accessor (get_X style) */
+static void install_reader(pTHX_ const char *class_name, const char *method_name, IV idx, ClassMeta *meta) {
+    char full_name[256];
+    CV *cv;
+    SlotOpData *data;
+
+    snprintf(full_name, sizeof(full_name), "%s::%s", class_name, method_name);
+
+    /* Check if method already exists */
+    cv = get_cvn_flags(full_name, strlen(full_name), 0);
+    if (cv) {
+        return;
+    }
+
+    Newx(data, 1, SlotOpData);
+    data->slot_idx = idx;
+    data->meta = meta;
+
+    cv = newXS(full_name, xs_reader_fallback, __FILE__);
+    CvXSUBANY(cv).any_iv = PTR2IV(data);
+}
+
+/* Install writer-only accessor (set_X style) */
+static void install_writer(pTHX_ const char *class_name, const char *method_name, IV idx, ClassMeta *meta) {
+    char full_name[256];
+    CV *cv;
+    SlotOpData *data;
+
+    snprintf(full_name, sizeof(full_name), "%s::%s", class_name, method_name);
+
+    /* Check if method already exists */
+    cv = get_cvn_flags(full_name, strlen(full_name), 0);
+    if (cv) {
+        return;
+    }
+
+    Newx(data, 1, SlotOpData);
+    data->slot_idx = idx;
+    data->meta = meta;
+
+    cv = newXS(full_name, xs_writer_fallback, __FILE__);
+    CvXSUBANY(cv).any_iv = PTR2IV(data);
+}
+
 /* Install typed accessor (with type check, triggers, etc.) */
 static void install_accessor_typed(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta) {
     char full_name[256];
@@ -1935,13 +2443,17 @@ static XS(xs_clearer_fallback) {
     XSRETURN(1);
 }
 
-/* Install clearer method (clear_X) */
-static void install_clearer(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta) {
+/* Install clearer method (clear_X or custom name) */
+static void install_clearer(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta, SV *custom_name) {
     char full_name[256];
     CV *cv;
     SlotOpData *data;
 
-    snprintf(full_name, sizeof(full_name), "%s::clear_%s", class_name, prop_name);
+    if (custom_name && SvOK(custom_name)) {
+        snprintf(full_name, sizeof(full_name), "%s::%s", class_name, SvPV_nolen(custom_name));
+    } else {
+        snprintf(full_name, sizeof(full_name), "%s::clear_%s", class_name, prop_name);
+    }
 
     /* Check if method already exists */
     cv = get_cvn_flags(full_name, strlen(full_name), 0);
@@ -1983,13 +2495,17 @@ static XS(xs_predicate_fallback) {
     XSRETURN(1);
 }
 
-/* Install predicate method (has_X) */
-static void install_predicate(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta) {
+/* Install predicate method (has_X or custom name) */
+static void install_predicate(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta, SV *custom_name) {
     char full_name[256];
     CV *cv;
     SlotOpData *data;
 
-    snprintf(full_name, sizeof(full_name), "%s::has_%s", class_name, prop_name);
+    if (custom_name && SvOK(custom_name)) {
+        snprintf(full_name, sizeof(full_name), "%s::%s", class_name, SvPV_nolen(custom_name));
+    } else {
+        snprintf(full_name, sizeof(full_name), "%s::has_%s", class_name, prop_name);
+    }
 
     /* Check if method already exists */
     cv = get_cvn_flags(full_name, strlen(full_name), 0);
@@ -2142,19 +2658,40 @@ static void apply_role_to_class(pTHX_ ClassMeta *class_meta, RoleMeta *role_meta
         hv_store(class_meta->prop_to_idx, role_slot->name, strlen(role_slot->name), 
                  newSViv(new_idx), 0);
         
+        /* Add to arg_to_idx using init_arg if specified, otherwise property name */
+        if (role_slot->init_arg) {
+            STRLEN arg_len;
+            const char *arg_name = SvPV(role_slot->init_arg, arg_len);
+            hv_store(class_meta->arg_to_idx, arg_name, arg_len, newSViv(new_idx), 0);
+        } else {
+            hv_store(class_meta->arg_to_idx, role_slot->name, strlen(role_slot->name), 
+                     newSViv(new_idx), 0);
+        }
+        
+        /* Track if any slots have defaults */
+        if (role_slot->has_default) {
+            class_meta->has_any_defaults = 1;
+        }
+        
         /* Install accessor for this slot */
         if (role_slot->has_type || role_slot->has_trigger || role_slot->has_coerce || 
-            role_slot->is_readonly || role_slot->is_lazy) {
+            role_slot->is_readonly || role_slot->is_lazy || role_slot->is_required || role_slot->is_weak) {
             install_accessor_typed(aTHX_ class_meta->class_name, role_slot->name, new_idx, class_meta);
         } else {
             install_accessor(aTHX_ class_meta->class_name, role_slot->name, new_idx);
         }
         
         if (role_slot->has_clearer) {
-            install_clearer(aTHX_ class_meta->class_name, role_slot->name, new_idx, class_meta);
+            install_clearer(aTHX_ class_meta->class_name, role_slot->name, new_idx, class_meta, role_slot->clearer_name);
         }
         if (role_slot->has_predicate) {
-            install_predicate(aTHX_ class_meta->class_name, role_slot->name, new_idx, class_meta);
+            install_predicate(aTHX_ class_meta->class_name, role_slot->name, new_idx, class_meta, role_slot->predicate_name);
+        }
+        if (role_slot->reader_name) {
+            install_reader(aTHX_ class_meta->class_name, SvPV_nolen(role_slot->reader_name), new_idx, class_meta);
+        }
+        if (role_slot->writer_name) {
+            install_writer(aTHX_ class_meta->class_name, SvPV_nolen(role_slot->writer_name), new_idx, class_meta);
         }
     }
     
@@ -2515,20 +3052,38 @@ static XS(xs_define) {
                 if (cloned->has_trigger) meta->has_any_triggers = 1;
                 if (cloned->is_required) meta->has_any_required = 1;
                 if (cloned->is_lazy) meta->has_any_lazy = 1;
+                if (cloned->has_builder) meta->has_any_builders = 1;
+                if (cloned->is_weak) meta->has_any_weak = 1;
 
                 hv_store(meta->prop_to_idx, cloned->name, strlen(cloned->name), newSViv(idx), 0);
+                
+                /* Add to arg_to_idx using init_arg if specified, otherwise property name */
+                if (cloned->init_arg) {
+                    STRLEN arg_len;
+                    const char *arg_name = SvPV(cloned->init_arg, arg_len);
+                    hv_store(meta->arg_to_idx, arg_name, arg_len, newSViv(idx), 0);
+                } else {
+                    hv_store(meta->arg_to_idx, cloned->name, strlen(cloned->name), newSViv(idx), 0);
+                }
+                
                 meta->idx_to_prop[idx] = cloned->name;
 
-                if (cloned->has_type || cloned->has_trigger || cloned->has_coerce || cloned->is_readonly || cloned->is_lazy) {
+                if (cloned->has_type || cloned->has_trigger || cloned->has_coerce || cloned->is_readonly || cloned->is_lazy || cloned->is_required || cloned->is_weak) {
                     install_accessor_typed(aTHX_ class_pv, cloned->name, idx, meta);
                 } else {
                     install_accessor(aTHX_ class_pv, cloned->name, idx);
                 }
                 if (cloned->has_clearer) {
-                    install_clearer(aTHX_ class_pv, cloned->name, idx, meta);
+                    install_clearer(aTHX_ class_pv, cloned->name, idx, meta, cloned->clearer_name);
                 }
                 if (cloned->has_predicate) {
-                    install_predicate(aTHX_ class_pv, cloned->name, idx, meta);
+                    install_predicate(aTHX_ class_pv, cloned->name, idx, meta, cloned->predicate_name);
+                }
+                if (cloned->reader_name) {
+                    install_reader(aTHX_ class_pv, SvPV_nolen(cloned->reader_name), idx, meta);
+                }
+                if (cloned->writer_name) {
+                    install_writer(aTHX_ class_pv, SvPV_nolen(cloned->writer_name), idx, meta);
                 }
             }
         }
@@ -2566,9 +3121,20 @@ static XS(xs_define) {
         if (spec->has_default) meta->has_any_defaults = 1;
         if (spec->has_trigger) meta->has_any_triggers = 1;
         if (spec->is_required) meta->has_any_required = 1;
+        if (spec->has_builder) meta->has_any_builders = 1;
+        if (spec->is_weak) meta->has_any_weak = 1;
 
         /* Store name -> idx mapping (use parsed name, not full spec) */
         hv_store(meta->prop_to_idx, spec->name, strlen(spec->name), newSViv(idx), 0);
+        
+        /* Store arg -> idx mapping (use init_arg if specified, otherwise property name) */
+        if (spec->init_arg) {
+            STRLEN arg_len;
+            const char *arg_name = SvPV(spec->init_arg, arg_len);
+            hv_store(meta->arg_to_idx, arg_name, arg_len, newSViv(idx), 0);
+        } else {
+            hv_store(meta->arg_to_idx, spec->name, strlen(spec->name), newSViv(idx), 0);
+        }
 
         /* Store idx -> name mapping */
         meta->idx_to_prop[idx] = spec->name;
@@ -2577,7 +3143,7 @@ static XS(xs_define) {
         if (spec->is_lazy) meta->has_any_lazy = 1;
 
         /* Install accessor method - typed or plain depending on spec */
-        if (spec->has_type || spec->has_trigger || spec->has_coerce || spec->is_readonly || spec->is_lazy) {
+        if (spec->has_type || spec->has_trigger || spec->has_coerce || spec->is_readonly || spec->is_lazy || spec->is_required || spec->is_weak) {
             install_accessor_typed(aTHX_ class_pv, spec->name, idx, meta);
         } else {
             install_accessor(aTHX_ class_pv, spec->name, idx);
@@ -2585,12 +3151,22 @@ static XS(xs_define) {
         
         /* Install clearer method if requested */
         if (spec->has_clearer) {
-            install_clearer(aTHX_ class_pv, spec->name, idx, meta);
+            install_clearer(aTHX_ class_pv, spec->name, idx, meta, spec->clearer_name);
         }
         
         /* Install predicate method if requested */
         if (spec->has_predicate) {
-            install_predicate(aTHX_ class_pv, spec->name, idx, meta);
+            install_predicate(aTHX_ class_pv, spec->name, idx, meta, spec->predicate_name);
+        }
+        
+        /* Install custom reader method if specified */
+        if (spec->reader_name) {
+            install_reader(aTHX_ class_pv, SvPV_nolen(spec->reader_name), idx, meta);
+        }
+        
+        /* Install custom writer method if specified */
+        if (spec->writer_name) {
+            install_writer(aTHX_ class_pv, SvPV_nolen(spec->writer_name), idx, meta);
         }
     }
 
@@ -2601,7 +3177,12 @@ static XS(xs_define) {
             av_push(isa, newSVpv(parent_metas[i]->class_name, 0));
         }
         /* Notify Perl's method resolution cache that ISA changed */
+#if PERL_VERSION_LT(5, 40, 0)
         Perl_mro_isa_changed_in(aTHX_ meta->stash);
+#else
+        /* In 5.40+, mro_isa_changed_in is not exported; modifying @ISA triggers cache invalidation */
+        mro_method_changed_in(meta->stash);
+#endif
         Safefree(parent_metas);
     }
 
@@ -2627,6 +3208,18 @@ static XS(xs_define) {
             meta->demolish_cv = demolish_cv;
             /* Install DESTROY wrapper that calls DEMOLISH */
             install_destroy_wrapper(aTHX_ class_pv, meta);
+        }
+    }
+
+    /* Check for BUILD method - called after new() */
+    {
+        char build_name[256];
+        CV *build_cv;
+        snprintf(build_name, sizeof(build_name), "%s::BUILD", class_pv);
+        build_cv = get_cvn_flags(build_name, strlen(build_name), 0);
+        if (build_cv) {
+            meta->build_cv = build_cv;
+            meta->has_build = 1;
         }
     }
     
@@ -3017,6 +3610,7 @@ static XS(xs_slot_info) {
     hv_store(info, "is_required", 11, newSViv(spec ? spec->is_required : 0), 0);
     hv_store(info, "is_readonly", 11, newSViv(spec ? spec->is_readonly : 0), 0);
     hv_store(info, "is_lazy", 7, newSViv(spec ? spec->is_lazy : 0), 0);
+    hv_store(info, "is_weak", 7, newSViv(spec ? spec->is_weak : 0), 0);
     hv_store(info, "has_default", 11, newSViv(spec ? spec->has_default : 0), 0);
     hv_store(info, "has_trigger", 11, newSViv(spec ? spec->has_trigger : 0), 0);
     hv_store(info, "has_coerce", 10, newSViv(spec ? spec->has_coerce : 0), 0);
@@ -3033,6 +3627,11 @@ static XS(xs_slot_info) {
     /* Builder method name */
     if (spec && spec->has_builder && spec->builder_name) {
         hv_store(info, "builder", 7, newSVsv(spec->builder_name), 0);
+    }
+
+    /* init_arg (if specified) */
+    if (spec && spec->init_arg) {
+        hv_store(info, "init_arg", 8, newSVsv(spec->init_arg), 0);
     }
 
     ST(0) = sv_2mortal(newRV_noinc((SV*)info));

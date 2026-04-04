@@ -1,5 +1,8 @@
 # Changes for String::Redactable
 
+1.088 2026-04-03T19:18:43Z
+	* fix multiple objects interfering with each other
+
 0.901 2026-03-02T17:39:32Z
 	* first release of a module to help hide sensitive string
 

@@ -23,7 +23,7 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '1.07';
+$VERSION = '1.08';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
 
@@ -1361,7 +1361,7 @@ sub ThenByNumDescending { my($s, $k)=@_; $s->_thenby($k, -1, 'num') }
 
 1;
 
-=encoding utf8
+=encoding utf-8
 
 =head1 NAME
 

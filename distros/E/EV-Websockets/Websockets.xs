@@ -1130,7 +1130,7 @@ CODE:
 MODULE = EV::Websockets  PACKAGE = EV::Websockets::Context
 
 EV::Websockets::Context
-_new(char* class, EV::Loop loop, const char* proxy = NULL, int proxy_port = 0, const char* ssl_cert = NULL, const char* ssl_key = NULL, const char* ssl_ca = NULL);
+_new(char* class, EV::Loop loop, const char* proxy = NULL, int proxy_port = 0, const char* ssl_cert = NULL, const char* ssl_key = NULL, const char* ssl_ca = NULL, int ssl_init = -1);
 CODE:
 {
     struct lws_context_creation_info info;
@@ -1152,7 +1152,9 @@ CODE:
 #endif
     info.gid = -1;
     info.uid = -1;
-    info.options = ev_ws_ssl_inited ? 0 : LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
+    if (ssl_init == -1)
+        ssl_init = ev_ws_ssl_inited ? 0 : 1;
+    info.options = ssl_init ? LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT : 0;
     info.user = RETVAL;
     info.foreign_loops = foreign_loops;
     info.vhost_name = "default";
@@ -1177,7 +1179,8 @@ CODE:
         Safefree(RETVAL);
         croak("Failed to create libwebsockets context");
     }
-    ev_ws_ssl_inited = 1;
+    if (ssl_init)
+        ev_ws_ssl_inited = 1;
     ev_timer_init(&RETVAL->timer, timer_cb, 0.00001, 0.);
     RETVAL->timer.data = (void*)RETVAL;
 

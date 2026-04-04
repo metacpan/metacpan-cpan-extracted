@@ -12,7 +12,8 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
 # Test 1: Multiple import_accessors calls
 # ============================================
 
-subtest 'no warnings on multiple import_accessors calls' => sub {
+# no warnings on multiple import_accessors calls
+{
     @warnings = ();
 
     require Object::Proto;
@@ -26,13 +27,13 @@ subtest 'no warnings on multiple import_accessors calls' => sub {
     my @redefine_warnings = grep { /redefin/i } @warnings;
     is(scalar(@redefine_warnings), 0, 'no redefinition warnings from multiple imports')
         or diag("Warnings: @redefine_warnings");
-};
-
+}
 # ============================================
 # Test 2: Multiple import_accessor calls for same alias
 # ============================================
 
-subtest 'no warnings on multiple import_accessor with same alias' => sub {
+# no warnings on multiple import_accessor with same alias
+{
     @warnings = ();
 
     Object::Proto::define('Gadget', qw(id label));
@@ -45,13 +46,13 @@ subtest 'no warnings on multiple import_accessor with same alias' => sub {
     my @redefine_warnings = grep { /redefin/i } @warnings;
     is(scalar(@redefine_warnings), 0, 'no redefinition warnings from repeated import_accessor')
         or diag("Warnings: @redefine_warnings");
-};
-
+}
 # ============================================
 # Test 3: Simulating use in a package
 # ============================================
 
-subtest 'no warnings when used in package' => sub {
+# no warnings when used in package
+{
     @warnings = ();
 
     # This simulates what Ancient::NeuralForge::Activation would do
@@ -76,13 +77,13 @@ subtest 'no warnings when used in package' => sub {
     my @redefine_warnings = grep { /redefin/i } @warnings;
     is(scalar(@redefine_warnings), 0, 'no redefinition warnings in package context')
         or diag("Warnings: @redefine_warnings");
-};
-
+}
 # ============================================
 # Test 4: Import when sub already exists
 # ============================================
 
-subtest 'no warning when importing over existing CV' => sub {
+# no warning when importing over existing CV
+{
     @warnings = ();
 
     # Define a sub first, then import accessor with same name
@@ -110,13 +111,13 @@ subtest 'no warning when importing over existing CV' => sub {
 
     # Verify the original sub is preserved
     is(ConflictTest::existing_func(), "original", 'existing sub preserved');
-};
-
+}
 # ============================================
 # Test 5: Cross-package imports
 # ============================================
 
-subtest 'no warnings on cross-package imports' => sub {
+# no warnings on cross-package imports
+{
     @warnings = ();
 
     eval q{
@@ -151,13 +152,13 @@ subtest 'no warnings on cross-package imports' => sub {
     my @redefine_warnings = grep { /redefin/i } @warnings;
     is(scalar(@redefine_warnings), 0, 'no warnings on cross-package imports')
         or diag("Warnings: @redefine_warnings");
-};
-
+}
 # ============================================
 # Test 6: Verify accessors still work after multiple imports
 # ============================================
 
-subtest 'accessors work correctly after multiple imports' => sub {
+# accessors work correctly after multiple imports
+{
     Object::Proto::define('TestItem', qw(foo bar));
     Object::Proto::import_accessors('TestItem', 'main');
     Object::Proto::import_accessors('TestItem', 'main');  # Duplicate
@@ -169,6 +170,5 @@ subtest 'accessors work correctly after multiple imports' => sub {
 
     foo($item, 'world');
     is(foo($item), 'world', 'foo setter works');
-};
-
+}
 done_testing();

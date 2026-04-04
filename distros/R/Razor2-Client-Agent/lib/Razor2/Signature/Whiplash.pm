@@ -6,11 +6,10 @@
 ## $Id: Whiplash.pm,v 1.7 2007/05/08 22:22:36 rsoderberg Exp $
 
 package Razor2::Signature::Whiplash;
+use strict;
+use warnings;
 
-BEGIN {
-  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
-}
+use Digest::SHA qw(sha1_hex);
 
 sub new {
 
@@ -685,7 +684,7 @@ sub whiplash {
         # the value of length to the nearest multiple of ``length_error''.
         # Take the first 20 hex chars from SHA1 and call it the signature.
 
-        $sig = substr sha1_hex($host), 0, 12;
+        my $sig = substr sha1_hex($host), 0, 12;
         $sig .= substr sha1_hex($corrected_length), 0, 4;
 
         push @sigs, $sig;
@@ -755,7 +754,7 @@ sub extract_hosts {
         return;
     }
 
-    while ( $host = next_host($text) ) {
+    while ( my $host = next_host($text) ) {
 
         last unless $host;
 

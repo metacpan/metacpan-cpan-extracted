@@ -32,7 +32,7 @@ sub ok {
 sub diag { print "# $_[0]\n" }
 END { exit 1 if $T_PLAN && $T_FAIL }
 
-plan_tests(8);
+plan_tests(7);
 
 # Section 1: UTF8::R2 module
 eval { require UTF8::R2 };
@@ -41,7 +41,6 @@ diag("load error: $@") if $@;
 
 ok(defined $UTF8::R2::VERSION,          'UTF8::R2: $VERSION defined');
 ok($UTF8::R2::VERSION =~ /^\d+\.\d+/,   'UTF8::R2: $VERSION looks like a version number');
-ok($UTF8::R2::VERSION eq '0.29',        'UTF8::R2: $VERSION is 0.29');
 
 # Section 2: INA_CPAN_Check
 eval { require INA_CPAN_Check };

@@ -7,7 +7,8 @@ use Object::Proto;
 
 # ==== Undef and Empty Values ====
 
-subtest 'undef handling' => sub {
+# undef handling
+{
     Object::Proto::define('NullableClass',
         'value:Any',
         'str:Str',
@@ -23,9 +24,9 @@ subtest 'undef handling' => sub {
     # Str rejects undef (requires defined non-ref)
     eval { $obj->str(undef) };
     like($@, qr/Type constraint failed/, 'Str rejects undef');
-};
-
-subtest 'empty string handling' => sub {
+}
+# empty string handling
+{
     Object::Proto::define('EmptyStrClass',
         'name:Str',
         'value:Any',
@@ -34,11 +35,11 @@ subtest 'empty string handling' => sub {
     my $obj = new EmptyStrClass name => '', value => '';
     is($obj->name, '', 'Str accepts empty string');
     is($obj->value, '', 'Any accepts empty string');
-};
-
+}
 # ==== Unicode ====
 
-subtest 'unicode values' => sub {
+# unicode values
+{
     Object::Proto::define('UnicodeClass', 'text:Str');
 
     my $unicode = "\x{1F600}\x{1F4A9}";  # emoji
@@ -52,11 +53,11 @@ subtest 'unicode values' => sub {
     my $arabic = "\x{0627}\x{0644}\x{0639}\x{0631}\x{0628}\x{064A}\x{0629}";
     $obj->text($arabic);
     is($obj->text, $arabic, 'Str preserves Arabic characters');
-};
-
+}
 # ==== Any Type ====
 
-subtest 'Any type' => sub {
+# Any type
+{
     Object::Proto::define('AnyClass', 'data:Any');
 
     my $obj = new AnyClass;
@@ -79,11 +80,11 @@ subtest 'Any type' => sub {
 
     $obj->data(undef);
     ok(!defined($obj->data), 'Any accepts undef');
-};
-
+}
 # ==== Defined Type ====
 
-subtest 'Defined type' => sub {
+# Defined type
+{
     Object::Proto::define('DefinedClass', 'value:Defined');
 
     my $obj = new DefinedClass value => 0;
@@ -100,11 +101,11 @@ subtest 'Defined type' => sub {
 
     eval { new DefinedClass value => undef };
     like($@, qr/Type constraint failed/, 'Defined rejects undef in constructor');
-};
-
+}
 # ==== Object Type ====
 
-subtest 'Object type' => sub {
+# Object type
+{
     Object::Proto::define('WrapperClass', 'wrapped:Object');
     Object::Proto::define('InnerClass', 'x:Int');
 
@@ -128,11 +129,11 @@ subtest 'Object type' => sub {
     my $blessed_array = bless [], 'SomeClass';
     $wrapper->wrapped($blessed_array);
     isa_ok($wrapper->wrapped, 'SomeClass', 'Object accepts any blessed ref');
-};
-
+}
 # ==== Bool Edge Cases ====
 
-subtest 'Bool edge cases' => sub {
+# Bool edge cases
+{
     Object::Proto::define('BoolClass', 'flag:Bool');
 
     my $obj = new BoolClass;
@@ -157,11 +158,11 @@ subtest 'Bool edge cases' => sub {
 
     $obj->flag([]);
     ok(ref($obj->flag) eq 'ARRAY', 'Bool accepts arrayref (truthy)');
-};
-
+}
 # ==== Int Edge Cases ====
 
-subtest 'Int edge cases' => sub {
+# Int edge cases
+{
     Object::Proto::define('IntClass', 'num:Int');
 
     my $obj = new IntClass num => 0;
@@ -184,11 +185,11 @@ subtest 'Int edge cases' => sub {
 
     eval { $obj->num('42.5') };
     like($@, qr/Type constraint failed/, 'Int rejects decimal string');
-};
-
+}
 # ==== Num Edge Cases ====
 
-subtest 'Num edge cases' => sub {
+# Num edge cases
+{
     Object::Proto::define('NumClass', 'value:Num');
 
     my $obj = new NumClass value => 0;
@@ -204,11 +205,11 @@ subtest 'Num edge cases' => sub {
 
     $obj->value('123.456');
     ok(abs($obj->value - 123.456) < 0.00001, 'Num accepts numeric string');
-};
-
+}
 # ==== Default Expression Freshness ====
 
-subtest 'default array freshness' => sub {
+# default array freshness
+{
     Object::Proto::define('ArrayDefaultClass', 'items:ArrayRef:default([])');
 
     my $obj1 = new ArrayDefaultClass;
@@ -220,9 +221,9 @@ subtest 'default array freshness' => sub {
 
     # Verify they're different references
     ok($obj1->items != $obj2->items, 'different array references');
-};
-
-subtest 'default hash freshness' => sub {
+}
+# default hash freshness
+{
     Object::Proto::define('HashDefaultClass', 'data:HashRef:default({})');
 
     my $obj1 = new HashDefaultClass;
@@ -233,18 +234,18 @@ subtest 'default hash freshness' => sub {
     is_deeply($obj2->data, {}, 'second object still empty (fresh hash)');
 
     ok($obj1->data != $obj2->data, 'different hash references');
-};
-
-subtest 'default undef' => sub {
+}
+# default undef
+{
     Object::Proto::define('UndefDefaultClass', 'value:Any:default(undef)');
 
     my $obj = new UndefDefaultClass;
     ok(!defined($obj->value), 'default(undef) produces undef');
-};
-
+}
 # ==== Multiple Modifiers ====
 
-subtest 'required + readonly' => sub {
+# required + readonly
+{
     Object::Proto::define('RequiredReadonlyClass',
         'id:Str:required:readonly',
     );
@@ -259,9 +260,9 @@ subtest 'required + readonly' => sub {
     # Cannot modify readonly
     eval { $obj->id('xyz') };
     like($@, qr/Cannot modify readonly/, 'readonly enforced');
-};
-
-subtest 'required + default (default ignored)' => sub {
+}
+# required + default (default ignored)
+{
     # When both required and default are specified, required takes precedence
     Object::Proto::define('RequiredDefaultClass',
         'value:Str:required:default(fallback)',
@@ -279,9 +280,9 @@ subtest 'required + default (default ignored)' => sub {
     } else {
         like($error, qr/Required/, 'required+default still requires value');
     }
-};
-
-subtest 'type + readonly' => sub {
+}
+# type + readonly
+{
     Object::Proto::define('TypeReadonlyClass',
         'count:Int:readonly',
     );
@@ -291,11 +292,11 @@ subtest 'type + readonly' => sub {
 
     eval { $obj->count(99) };
     like($@, qr/Cannot modify readonly/, 'readonly prevents modification');
-};
-
+}
 # ==== Large Object (Many Properties) ====
 
-subtest 'large object' => sub {
+# large object
+{
     my @props = map { "prop$_:Any" } 1..50;
     Object::Proto::define('LargeClass', @props);
 
@@ -308,11 +309,11 @@ subtest 'large object' => sub {
 
     $obj->prop50(100);
     is($obj->prop50, 100, 'setter works on large object');
-};
-
+}
 # ==== Multiple Class Independence ====
 
-subtest 'class independence' => sub {
+# class independence
+{
     Object::Proto::define('ClassA', 'x:Int');
     Object::Proto::define('ClassB', 'x:Str');
     Object::Proto::define('ClassC', 'x:Any', 'y:Int');
@@ -332,6 +333,5 @@ subtest 'class independence' => sub {
 
     $b->x(123);  # Should work since Str accepts numeric-looking values
     pass('ClassB accepts different type');
-};
-
+}
 done_testing;

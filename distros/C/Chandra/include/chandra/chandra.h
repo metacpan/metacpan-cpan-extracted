@@ -65,23 +65,34 @@ chandra_webview_sv(pTHX_ SV *app_sv)
 static PerlChandra *
 chandra_pc_from_app(pTHX_ SV *app_sv)
 {
-    HV *app_hv;
-    SV **wv_svp;
-    SV *wv_sv;
-    SV *wv_rv;
+    SV *rv;
     svtype t;
     if (!SvROK(app_sv)) return NULL;
-    app_hv = (HV *)SvRV(app_sv);
-    wv_svp = hv_fetchs(app_hv, "_webview", 0);
-    if (!wv_svp || !SvOK(*wv_svp)) return NULL;
-    wv_sv = *wv_svp;
-    if (!SvROK(wv_sv)) return NULL;
-    wv_rv = SvRV(wv_sv);
-    /* Mocks use hashes/arrays, real Chandra is a blessed IV scalar */
-    t = SvTYPE(wv_rv);
-    if (t == SVt_PVHV || t == SVt_PVAV || t == SVt_PVCV) return NULL;
-    if (!SvIOK(wv_rv)) return NULL;  /* Must have valid IV */
-    return INT2PTR(PerlChandra *, SvIV(wv_rv));
+    rv = SvRV(app_sv);
+    t = SvTYPE(rv);
+
+    /* Raw Chandra SV: blessed reference to an IV holding PerlChandra* directly */
+    if (t != SVt_PVHV && t != SVt_PVAV && t != SVt_PVCV) {
+        if (!SvIOK(rv)) return NULL;
+        return INT2PTR(PerlChandra *, SvIV(rv));
+    }
+
+    /* Chandra::App hashref: locate PerlChandra* via the _webview field */
+    {
+        HV *app_hv = (HV *)rv;
+        SV **wv_svp = hv_fetchs(app_hv, "_webview", 0);
+        SV *wv_sv, *wv_rv;
+        svtype wv_t;
+        if (!wv_svp || !SvOK(*wv_svp)) return NULL;
+        wv_sv = *wv_svp;
+        if (!SvROK(wv_sv)) return NULL;
+        wv_rv = SvRV(wv_sv);
+        /* Mocks use hashes/arrays, real Chandra is a blessed IV scalar */
+        wv_t = SvTYPE(wv_rv);
+        if (wv_t == SVt_PVHV || wv_t == SVt_PVAV || wv_t == SVt_PVCV) return NULL;
+        if (!SvIOK(wv_rv)) return NULL;
+        return INT2PTR(PerlChandra *, SvIV(wv_rv));
+    }
 }
 
 /* ---- Parse JSON menu string into tray items ---- */

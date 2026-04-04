@@ -58,7 +58,7 @@ sub _build_data {
 package main;
 
 Object::Proto::define('LazyWithClearer',
-    'data:Str:builder(_build_data):clearer:predicate'
+    'data:Str:lazy:builder(_build_data):clearer:predicate'
 );
 
 my $lwc = LazyWithClearer->new();
@@ -114,5 +114,87 @@ $co->value(20);
 is($co->value, 20, 'value is set');
 $co->clear_value;
 ok(!$co->value, 'value is cleared');
+
+# Test 11: Custom predicate and clearer names
+Object::Proto::define('CustomNames',
+    'attr:Str:clearer(reset_attr):predicate(attr_defined)'
+);
+
+my $cn = CustomNames->new();
+
+# Custom predicate name works
+ok($cn->can('attr_defined'), 'custom predicate method exists');
+ok(!$cn->can('has_attr'), 'default predicate method does not exist');
+ok(!$cn->attr_defined, 'custom predicate returns false initially');
+
+$cn->attr('hello');
+ok($cn->attr_defined, 'custom predicate returns true after set');
+is($cn->attr, 'hello', 'attr value correct');
+
+# Custom clearer name works
+ok($cn->can('reset_attr'), 'custom clearer method exists');
+ok(!$cn->can('clear_attr'), 'default clearer method does not exist');
+
+my $ret2 = $cn->reset_attr;
+isa_ok($ret2, 'CustomNames', 'custom clearer returns self');
+ok(!$cn->attr_defined, 'predicate false after custom clearer');
+
+# Test 12: Custom predicate only (no custom clearer)
+Object::Proto::define('CustomPredicate',
+    'data:Int:predicate(is_data_set)'
+);
+
+my $cp = CustomPredicate->new();
+ok($cp->can('is_data_set'), 'custom predicate name works');
+ok(!$cp->can('has_data'), 'default predicate name not created');
+ok(!$cp->is_data_set, 'is_data_set false initially');
+$cp->data(42);
+ok($cp->is_data_set, 'is_data_set true after set');
+
+# Test 13: Custom clearer only (no custom predicate)
+Object::Proto::define('CustomClearer',
+    'info:Str:clearer(wipe_info)'
+);
+
+my $cc = CustomClearer->new();
+ok($cc->can('wipe_info'), 'custom clearer name works');
+ok(!$cc->can('clear_info'), 'default clearer name not created');
+$cc->info('secret');
+is($cc->info, 'secret', 'info is set');
+$cc->wipe_info;
+ok(!defined($cc->info) || !$cc->info, 'info is cleared by wipe_info');
+
+# Test 14: Custom names with lazy builder
+our $custom_build_count = 0;
+
+package LazyCustom;
+
+sub init_cache {
+    $main::custom_build_count++;
+    return { items => [] };
+}
+
+package main;
+
+Object::Proto::define('LazyCustom',
+    'cache:HashRef:lazy:builder(init_cache):clearer(invalidate_cache):predicate(cache_loaded)'
+);
+
+my $lc = LazyCustom->new();
+is($custom_build_count, 0, 'Custom builder not called at construction');
+ok(!$lc->cache_loaded, 'cache_loaded returns false before access');
+
+my $cache = $lc->cache;
+is($custom_build_count, 1, 'Builder called on first access');
+ok(ref($cache) eq 'HASH', 'Cache is a hashref');
+ok($lc->cache_loaded, 'cache_loaded returns true after build');
+
+$lc->invalidate_cache;
+ok(!$lc->cache_loaded, 'cache_loaded false after invalidate_cache');
+is($custom_build_count, 1, 'Builder not called by invalidation');
+
+# Re-access rebuilds
+$lc->cache;
+is($custom_build_count, 2, 'Builder called again after invalidation');
 
 done_testing();

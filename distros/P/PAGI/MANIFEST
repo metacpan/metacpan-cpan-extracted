@@ -240,9 +240,14 @@ t/40-connection-limiting.t
 t/40-event-validation.t
 t/41-connection-limiting-stress.t
 t/42-file-response.t
+t/43-unix-socket.t
 t/44-access-log-format.t
+t/45-multi-listener.t
 t/46-multiworker-bugs.t
 t/47-worker-heartbeat.t
+t/48-fd-reuse.t
+t/49-systemd-activation.t
+t/50-hot-restart.t
 t/app-file.t
 t/app-router-group.t
 t/app-router.t

@@ -75,7 +75,7 @@ SKIP: {
                                         padding => $padding,
                                     });
             };
-            like($@, qr//, "Match of keysize ($ks) and cipher ($iks)");
+            ok(!$@, "Match of keysize ($ks) and cipher ($iks)");
         }
     }
 }

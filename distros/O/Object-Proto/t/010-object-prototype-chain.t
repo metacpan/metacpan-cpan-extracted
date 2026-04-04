@@ -7,7 +7,8 @@ use Object::Proto;
 
 # ==== Multi-level Prototype Chains ====
 
-subtest 'three-level prototype chain' => sub {
+# three-level prototype chain
+{
     Object::Proto::define('Base', 'base_prop:Str');
     Object::Proto::define('Middle', 'base_prop:Str', 'middle_prop:Str');
     Object::Proto::define('Derived', 'base_prop:Str', 'middle_prop:Str', 'derived_prop:Str');
@@ -32,9 +33,9 @@ subtest 'three-level prototype chain' => sub {
 
     my $p3 = Object::Proto::prototype($p2);
     ok(!defined($p3), 'base has no prototype');
-};
-
-subtest 'prototype property lookup' => sub {
+}
+# prototype property lookup
+{
     # Note: object module stores properties per-object,
     # so prototype lookup for properties depends on implementation
     # This test documents expected behavior
@@ -54,9 +55,9 @@ subtest 'prototype property lookup' => sub {
     # Parent still accessible via prototype
     my $proto = Object::Proto::prototype($child);
     is($proto->name, 'parent', 'parent name accessible via prototype');
-};
-
-subtest 'circular prototype prevention' => sub {
+}
+# circular prototype prevention
+{
     Object::Proto::define('CircA', 'x:Int');
     Object::Proto::define('CircB', 'x:Int');
 
@@ -76,11 +77,11 @@ subtest 'circular prototype prevention' => sub {
         pass('circular prototype allowed (implementation choice)');
         # Don't call prototype() in a loop to avoid hang
     }
-};
-
+}
 # ==== Prototype with Freeze/Lock ====
 
-subtest 'frozen object as prototype' => sub {
+# frozen object as prototype
+{
     Object::Proto::define('FreezeProtoClass', 'value:Int');
 
     my $proto = new FreezeProtoClass value => 42;
@@ -98,9 +99,9 @@ subtest 'frozen object as prototype' => sub {
     ok(!Object::Proto::is_frozen($child), 'child is not frozen');
     $child->value(200);
     is($child->value, 200, 'child can be modified');
-};
-
-subtest 'cannot set prototype on frozen object' => sub {
+}
+# cannot set prototype on frozen object
+{
     Object::Proto::define('FrozenChildClass', 'x:Int');
 
     my $proto = new FrozenChildClass x => 1;
@@ -109,9 +110,9 @@ subtest 'cannot set prototype on frozen object' => sub {
 
     eval { Object::Proto::set_prototype($frozen, $proto) };
     like($@, qr/frozen|Cannot/i, 'cannot set prototype on frozen object');
-};
-
-subtest 'locked object prototype' => sub {
+}
+# locked object prototype
+{
     Object::Proto::define('LockedProtoClass', 'x:Int');
 
     my $proto = new LockedProtoClass x => 1;
@@ -129,11 +130,11 @@ subtest 'locked object prototype' => sub {
         my $p = Object::Proto::prototype($obj);
         is($p->x, 1, 'prototype set on locked object worked');
     }
-};
-
+}
 # ==== Prototype Type Compatibility ====
 
-subtest 'cross-class prototype' => sub {
+# cross-class prototype
+{
     Object::Proto::define('TypeA', 'a:Int');
     Object::Proto::define('TypeB', 'b:Str');
 
@@ -145,11 +146,11 @@ subtest 'cross-class prototype' => sub {
     my $p = Object::Proto::prototype($a);
     isa_ok($p, 'TypeB', 'cross-class prototype works');
     is($p->b, 'hello', 'cross-class prototype property accessible');
-};
-
+}
 # ==== Prototype with Defaults ====
 
-subtest 'prototype and defaults' => sub {
+# prototype and defaults
+{
     Object::Proto::define('DefaultProtoClass',
         'name:Str:default(unknown)',
         'count:Int:default(0)',
@@ -165,6 +166,5 @@ subtest 'prototype and defaults' => sub {
 
     my $p = Object::Proto::prototype($child);
     is($p->name, 'proto_name', 'prototype has its own value');
-};
-
+}
 done_testing;

@@ -16,15 +16,6 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 
-#include <linux/nsfs.h>
-#include <linux/kcmp.h>
-
-/* kcmp.h does not define symbols, so there is no way to detect preesence of enum */
-/* members, so we just hardcode new symbols here. */
-#ifndef KCMP_EPOLL_TFD
-  #define KCMP_EPOLL_TFD 7
-#endif
-
 #ifdef __has_include
   #if !__has_include("linux/kcmp.h") // use "" as GCC wrongly expands macros
     #undef SYS_kcmp
@@ -39,6 +30,12 @@
 #else
   #define kcmp(pid1,pid2,type,idx1,idx2) \
     (errno = ENOSYS, -1)
+#endif
+
+/* kcmp.h does not define symbols, so there is no way to detect preesence of enum */
+/* members, so we just hardcode new symbols here. */
+#ifndef KCMP_EPOLL_TFD
+  #define KCMP_EPOLL_TFD 7
 #endif
 
 /* from schmorp.h */
@@ -126,7 +123,6 @@ BOOT:
       const_iv_clone (NEWNET)
 #   endif
 #   ifdef CLONE_NEWTIME
-      x
       const_iv_clone (NEWTIME)
 #   endif
 #   ifdef CLONE_PTRACE

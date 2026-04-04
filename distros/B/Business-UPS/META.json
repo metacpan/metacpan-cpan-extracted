@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -35,8 +34,19 @@
          "requires" : {
             "JSON::PP" : "0",
             "LWP::UserAgent" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Business::UPS" : {
+         "file" : "lib/Business/UPS.pm",
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -48,9 +58,11 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/cpan-authors/Business-UPS"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/Business-UPS.git",
+         "web" : "https://github.com/cpan-authors/Business-UPS"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

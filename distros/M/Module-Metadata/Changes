@@ -1,5 +1,9 @@
 Revision history for Module-Metadata
 
+1.000039  2026-04-03 20:54:53Z
+  - adds recognition of attributes in "class" declarations (Erik Huelsmann,
+    #39)
+
 1.000038  2023-04-28 11:25:40Z
   - detects "class" syntax
 

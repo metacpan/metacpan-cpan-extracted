@@ -26,5 +26,5 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/javalikescript/webview-c.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

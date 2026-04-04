@@ -37,7 +37,8 @@ for (1..10) {
 
 # ==== Clearer tests ====
 
-subtest 'clearer basic no leak' => sub {
+# clearer basic no leak
+{
     my $obj = new LeakClearer name => 'Test', age => 25;
     no_leaks_ok {
         for (1..1000) {
@@ -45,9 +46,9 @@ subtest 'clearer basic no leak' => sub {
             $obj->name('Restored');
         }
     } 'clearer basic no leak';
-};
-
-subtest 'clearer with default no leak' => sub {
+}
+# clearer with default no leak
+{
     my $obj = new LeakClearer name => 'Test', age => 50;
     no_leaks_ok {
         for (1..1000) {
@@ -55,49 +56,49 @@ subtest 'clearer with default no leak' => sub {
             my $val = $obj->age;  # should return default
         }
     } 'clearer default no leak';
-};
-
-subtest 'clearer on already undef no leak' => sub {
+}
+# clearer on already undef no leak
+{
     my $obj = new LeakClearer;
     no_leaks_ok {
         for (1..1000) {
             $obj->clear_name;  # already undef
         }
     } 'clearer undef no leak';
-};
-
+}
 # ==== Predicate tests ====
 
-subtest 'predicate true no leak' => sub {
+# predicate true no leak
+{
     my $obj = new LeakPredicate title => 'Title';
     no_leaks_ok {
         for (1..1000) {
             my $has = $obj->has_title;
         }
     } 'predicate true no leak';
-};
-
-subtest 'predicate false no leak' => sub {
+}
+# predicate false no leak
+{
     my $obj = new LeakPredicate;
     no_leaks_ok {
         for (1..1000) {
             my $has = $obj->has_title;
         }
     } 'predicate false no leak';
-};
-
-subtest 'predicate with default no leak' => sub {
+}
+# predicate with default no leak
+{
     my $obj = new LeakPredicate;
     no_leaks_ok {
         for (1..1000) {
             my $has = $obj->has_count;  # has default, so true
         }
     } 'predicate default no leak';
-};
-
+}
 # ==== Combined clearer + predicate ====
 
-subtest 'clearer predicate combo no leak' => sub {
+# clearer predicate combo no leak
+{
     my $obj = new LeakBoth value => 'data';
     no_leaks_ok {
         for (1..500) {
@@ -107,9 +108,9 @@ subtest 'clearer predicate combo no leak' => sub {
             $obj->value('restored');
         }
     } 'clearer predicate combo no leak';
-};
-
-subtest 'array clearer predicate no leak' => sub {
+}
+# array clearer predicate no leak
+{
     my $obj = new LeakBoth;
     no_leaks_ok {
         for (1..500) {
@@ -119,9 +120,9 @@ subtest 'array clearer predicate no leak' => sub {
             $obj->clear_data;
         }
     } 'array clearer predicate no leak';
-};
-
-subtest 'multiple objects clearer no leak' => sub {
+}
+# multiple objects clearer no leak
+{
     no_leaks_ok {
         for (1..300) {
             my $obj = new LeakClearer name => 'Test', age => 20;
@@ -129,9 +130,9 @@ subtest 'multiple objects clearer no leak' => sub {
             $obj->clear_age;
         }
     } 'multiple clearer no leak';
-};
-
-subtest 'multiple objects predicate no leak' => sub {
+}
+# multiple objects predicate no leak
+{
     no_leaks_ok {
         for (1..300) {
             my $obj = new LeakPredicate title => 'T';
@@ -139,6 +140,5 @@ subtest 'multiple objects predicate no leak' => sub {
             my $has2 = $obj->has_count;
         }
     } 'multiple predicate no leak';
-};
-
+}
 done_testing;

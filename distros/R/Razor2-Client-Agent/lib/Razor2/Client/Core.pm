@@ -11,23 +11,22 @@
 package Razor2::Client::Core;
 
 use strict;
+use warnings;
 use IO::Socket::IP;
 use IO::Select;
 use Errno qw(:POSIX);
 
 use Razor2::Client::Version;
-use Data::Dumper;
-use base qw(Razor2::String);
-use base qw(Razor2::Logger);
-use base qw(Razor2::Client::Engine);
-use base qw(Razor2::Errorhandler);
-use Razor2::Client::Version;
+use parent qw(Razor2::String);
+use parent qw(Razor2::Logger);
+use parent qw(Razor2::Client::Engine);
+use parent qw(Razor2::Errorhandler);
 use Razor2::String qw(hextobase64 makesis parsesis hmac_sha1 xor_key
   prep_mail debugobj to_batched_query
   from_batched_query hexbits2hash
   fisher_yates_shuffle);
 
-our ($VERSION) = do { my @r = ( q$Revision: 1.92 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = '2.88';
 our $PROTOCOL = $Razor2::Client::Version::PROTOCOL;
 
 sub new {
@@ -130,34 +129,6 @@ sub nextserver {
             return $self->errprefix("No Razor servers available at this time");
         }
         return $self->nextserver;
-    }
-}
-
-sub load_at_runtime {
-    my ( $self, $class, $sub, $args ) = @_;
-
-    $sub  = 'new' unless defined $sub;
-    $args = ""    unless defined $args;
-
-    eval "use $class";
-    if ($@) {
-        $self->log( 2, "$class not found, please to fix." );
-        return $self->error("\n\n$@");
-    }
-    my $evalstr;
-    if ( $sub && $sub ne "new" ) {
-        $evalstr = $class . "::$sub($args);";
-    }
-    else {
-        $evalstr = $class . "->new($args)";
-    }
-    if ( my $dude = eval $evalstr ) {
-        $self->log( 12, "Found and evaled $evalstr ==> $dude" );
-        return $dude;
-    }
-    else {
-        $self->log( 5, "Found but problem (bad args?) with $evalstr" );
-        return $self->error("Problem with $evalstr");
     }
 }
 
@@ -1746,8 +1717,11 @@ sub connect {
 
     if ( $self->{conf}->{socks_server} ) {
 
-        my $socks_module = "Net::SOCKS";
-        eval "require $socks_module";
+        eval { require Net::SOCKS };
+        if ($@) {
+            $self->log( 3, "Net::SOCKS not available, cannot use SOCKS proxy: $@" );
+        }
+        else {
 
         $self->log( 6, "Will try to connect through the SOCKS server on $$self{conf}{socks_server}..." );
 
@@ -1765,6 +1739,8 @@ sub connect {
             }
 
         }
+
+        } # else Net::SOCKS available
 
     }
 
@@ -2040,4 +2016,157 @@ sub zonename {
 }
 
 1;
+
+=head1 NAME
+
+Razor2::Client::Core - Network protocol engine for Vipul's Razor
+
+=head1 SYNOPSIS
+
+    # Typically used via Razor2::Client::Agent, not directly
+    use Razor2::Client::Agent;
+
+    my $agent = Razor2::Client::Agent->new('razor-check');
+    # Core methods are inherited by Agent
+
+=head1 DESCRIPTION
+
+Razor2::Client::Core implements the Razor v2 network protocol: server
+discovery, connection management, signature computation, spam checking,
+reporting, revocation, and identity registration/authentication.
+
+This module communicates with Razor catalogue servers (for checking) and
+nomination servers (for reporting/revoking) using a TCP-based protocol
+with SIS-encoded (Server Information String) messages.
+
+Core inherits from L<Razor2::String>, L<Razor2::Logger>,
+L<Razor2::Client::Engine>, and L<Razor2::Errorhandler>.
+
+=head1 METHODS
+
+=head2 Connection Management
+
+=over 4
+
+=item B<connect(%params)>
+
+Establishes a TCP connection to a Razor server.  Supports direct
+connections, HTTP proxy tunneling (C<proxy> config), and SOCKS proxies
+(C<socks_server> config, requires L<Net::SOCKS>).
+
+Default port is 2703.  Reads and parses the server greeting on connect.
+Automatically tries the next server on failure.
+
+=item B<disconnect()>
+
+Sends a quit command and closes the connection.
+
+=item B<nextserver()>
+
+Selects the next server from the current server list.  If no servers
+remain, initiates server discovery.  Loads per-server configuration
+from cached F<server.*.conf> files.
+
+=back
+
+=head2 Server Discovery
+
+=over 4
+
+=item B<bootstrap_discovery()>
+
+Performs DNS-based discovery of Razor servers by querying TXT records
+for the razordiscovery zone.  Used when no server lists exist.
+
+=item B<discover($server)>
+
+Connects to a discovery server and retrieves current catalogue and
+nomination server lists.
+
+=back
+
+=head2 Signature Operations
+
+=over 4
+
+=item B<prepare_objects($mails)>
+
+Takes an array reference of mail scalar references and prepares them
+into internal objects with headers, body parts, and preprocessing
+applied.
+
+=item B<compute_sigs($objects)>
+
+Computes spam signatures for each mail object using the configured
+engines.  Requires server info (for engine parameters like ep4) to
+be loaded first via C<get_server_info()>.
+
+Returns an array reference of printable signature strings.
+
+=back
+
+=head2 Spam Checking
+
+=over 4
+
+=item B<check($objects)>
+
+Sends computed signatures to the catalogue server and retrieves
+confidence values.  Sets C<< $obj->{spam} >> on each object based
+on the response.
+
+=item B<check_logic($objects)>
+
+Applies the configured logic method to determine the final spam
+verdict for each mail object based on per-engine confidence values.
+
+=back
+
+=head2 Reporting
+
+=over 4
+
+=item B<report($objects)>
+
+Reports or revokes spam signatures with the nomination server.
+Requires prior authentication.  Sends signatures in batched queries.
+
+=item B<register($params)>
+
+Registers a new identity with the nomination server.  C<$params> is a
+hash reference with optional C<user> and C<pass> keys.
+
+Returns a hash reference with the registered credentials on success.
+
+=item B<authenticate($options)>
+
+Authenticates with the server using HMAC-SHA1 challenge-response.
+C<$options> is a hash reference with C<user> and C<pass> keys.
+Attempts automatic re-registration on unknown user errors.
+
+=back
+
+=head1 PROTOCOL
+
+The Razor v2 protocol uses TCP connections (default port 2703) with
+SIS-encoded messages (URI-escaped key=value pairs separated by C<&>
+and terminated by CRLF).  Server discovery uses DNS TXT records.
+
+The protocol version is defined in L<Razor2::Client::Version>.
+
+=head1 SEE ALSO
+
+L<Razor2::Client::Agent>, L<Razor2::Client::Config>,
+L<Razor2::Client::Engine>, L<Razor2::String>
+
+=head1 AUTHORS
+
+Vipul Ved Prakash, E<lt>mail@vipul.netE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 

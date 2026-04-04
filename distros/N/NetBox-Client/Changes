@@ -1,5 +1,12 @@
 Revision history for perl module NetBox::API.
 
+0.1.7 Fri Apr  3 14:27:55 EEST 2026
+	- fixed contents passing when updating objects;
+	- fixed booleans passing when updating objects.
+
+0.1.6 Wed Nov 19 18:03:54 EET 2025
+	- fixed error handling on SSL certificate check failure.
+
 0.1.5 Wed Oct  8 11:03:48 EEST 2025
 	- renamed module to NetBox::Client to match CPAN naming conventions.
 

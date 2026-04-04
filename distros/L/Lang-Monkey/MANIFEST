@@ -1,0 +1,10 @@
+Changes
+Lang-Monkey-0.01.tar.gz
+lib/Lang/Monkey.pm
+Makefile.PL
+MANIFEST
+README
+script/mpl
+t/Lang-Monkey.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

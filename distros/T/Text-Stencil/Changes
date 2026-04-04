@@ -1,0 +1,16 @@
+Revision history for Text::Stencil
+
+0.01  2026-04-03
+    - Initial release
+    - 35 transform types: html, html_br, url, json, hex, base64, base64url,
+      raw, int, int_comma, float, sprintf, trim, uc, lc, pad, rpad, trunc,
+      substr, replace, mask, default, bool, if, unless, map, wrap, count,
+      date, plural, number_si, bytes_si, elapsed, ago
+    - Transform chaining with | (pipe)
+    - Arrayref and hashref row modes (auto-detected)
+    - Methods: new, from_file, render, render_one, render_to_fh, clone,
+      columns, row_count
+    - Custom delimiter via escape_char option
+    - Shorthand new($row_template)
+    - UTF-8 transparent, thread-safe
+    - 2-3x faster than Text::Xslate for table rendering

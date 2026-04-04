@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-use File::Which qw(which);
+use Crypt::OpenSSL::Guess qw(find_openssl_exec find_openssl_prefix);
 use Test::More tests => 1;
 
-my $openssl = which('openssl');
-like($openssl, qr/openssl/, "Found openssl");
-print "$openssl version: ";
-
-my $version = `$openssl version`;
-diag($version);
+my $openssl = find_openssl_exec(find_openssl_prefix());
+ok($openssl, "Found OpenSSL full path");
+if ($openssl) {
+    my $version = `$openssl version`;
+    diag($version);
+} else {
+    warn "Unable to find openssl";
+}

@@ -93,7 +93,7 @@ BEGIN {
 # LWP fallback detection (curl preferred)
 my $HAS_LWP = eval { require LWP::UserAgent; 1 };
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(
     config
@@ -739,7 +739,30 @@ sub verify_signatures {
         my $type = ($subfilter eq 'ETSI.RFC3161') ? 'tsa' : 'cms';
 
         # get ByteRange for this signature
-        my $br = $byteranges[$sig_index++];
+
+        # estrai i primi 16 bytes hex del Contents per identificare il ByteRange
+        my $contents_obj = $sigval->{Contents};
+        my $contents_raw = $contents_obj ? $contents_obj->as_pdf : '';
+        # as_pdf produce <3082...0000> — estrai i primi caratteri hex significativi
+        my $contents_prefix = '';
+        if ($contents_raw =~ m{<([0-9a-fA-F]{16,})}) {
+            $contents_prefix = lc(substr($1, 0, 16));
+        }
+
+        # cerca il ByteRange il cui gap contiene questo prefix
+        my $br;
+        for my $candidate (@byteranges) {
+            my $gap = substr($raw, $candidate->[1], $candidate->[2] - $candidate->[1]);
+            my $gap_hex = '';
+            if ($gap =~ m{<([0-9a-fA-F]+)>}) {
+                $gap_hex = lc(substr($1, 0, 16));
+            }
+            if ($contents_prefix && $gap_hex eq $contents_prefix) {
+                    $br = $candidate;
+                    last;
+            }
+        }
+
         unless ($br) {
             push @results, {
                 type => $type, subfilter => $subfilter,
@@ -793,19 +816,38 @@ sub verify_signatures {
         my $signed_content = substr($raw, $br->[0], $br->[1])
                            . substr($raw, $br->[2], $br->[3]);
 
+        #warn "br: " . join(', ', @$br) . "\n";
+        #warn "raw length: " . length($raw) . "\n";
+        #warn "gap start: $br->[1], gap length: " . ($br->[2] - $br->[1]) . "\n";
+        #warn "first bytes of gap: " . unpack('H*', substr($gap, 0, 20)) . "\n";
+        #warn "contents_hex length: " . length($contents_hex) . "\n";
+        #warn "der length after trim: " . length($der) . "\n";
+        #warn "first bytes der: " . unpack('H*', substr($der, 0, 4)) . "\n";
+        #warn "signed_content length: " . length($signed_content) . "\n";
+
         # write temp files for openssl
-        my $tmp_der     = "$tmpdir/pdfsign_verify_der_$$.tmp";
-        my $tmp_content = "$tmpdir/pdfsign_verify_content_$$.tmp";
+        my $tmp_der     = "$tmpdir/pdfsign_verify_der_".$$."_$type.tmp";
+        my $tmp_content = "$tmpdir/pdfsign_verify_content_".$$."_$type.tmp";
         write_file($tmp_der,     { binmode => ':raw' }, $der);
         write_file($tmp_content, { binmode => ':raw' }, $signed_content);
 
         my ($valid, $error, $tsa_at) = ('', '', '');
-        my $noverify = $ca_bundle ? "-CAfile \Q$ca_bundle\E" : '-noverify';
+
+        # estrai il certificato dal CMS DER
+        my $tmp_cert = "$tmpdir/pdfsign_verify_cert_".$$."_$type.pem";
+        `$osslcmd cms -inform DER -in \Q$tmp_der\E -verify -noverify -certsout \Q$tmp_cert\E -out /dev/null 2>/dev/null`;
+
+        my $noverify = $ca_bundle
+            ? "-CAfile \Q$ca_bundle\E"
+            : (-e $tmp_cert ? "-CAfile \Q$tmp_cert\E -noverify" : '-noverify');
 
         if ($type eq 'cms') {
             # -binary: treat content as binary (required for PDF byte streams)
             # -out /dev/null: suppress verified content on stdout
             my $null = ($^O eq 'MSWin32' ? 'nul' : '/dev/null');
+
+            #warn "CMD: $osslcmd cms -verify -binary -in $tmp_der -inform DER -content $tmp_content -out $null $noverify\n";
+
             my $out = `$osslcmd cms -verify -binary -in \Q$tmp_der\E -inform DER -content \Q$tmp_content\E -out $null $noverify 2>&1`;
             if ($? == 0 || $out =~ /Verification successful/i) {
                 $valid = '1';
@@ -819,7 +861,21 @@ sub verify_signatures {
             }
 
         } elsif ($type eq 'tsa') {
-            my $out = `$osslcmd ts -verify -in \Q$tmp_der\E -token_in -data \Q$tmp_content\E 2>&1`;
+            my $sys_ca = (-e '/etc/ssl/certs/ca-certificates.crt') 
+                            ? '/etc/ssl/certs/ca-certificates.crt'      # Debian/Ubuntu
+                            : (-e '/etc/ssl/cert.pem') 
+                            ? '/etc/ssl/cert.pem'                       # macOS/FreeBSD
+                            : undef;
+
+            my $ts_verify_ca = $ca_bundle
+                            ? "-CAfile \Q$ca_bundle\E"
+                            : (-e $tmp_cert && -s $tmp_cert 
+                            ? "-CAfile \Q$tmp_cert\E" 
+                            : ($sys_ca ? "-CAfile \Q$sys_ca\E" : ''));
+
+            #warn "CMD: $osslcmd ts -verify -in \Q$tmp_der\E -token_in -data \Q$tmp_content\E $ts_verify_ca 2>&1\n";
+
+            my $out = `$osslcmd ts -verify -in \Q$tmp_der\E -token_in -data \Q$tmp_content\E $ts_verify_ca 2>&1`;
             if ($? == 0 || $out =~ /Verification:\s*OK/i) {
                 $valid = '1';
             } else {
@@ -834,7 +890,7 @@ sub verify_signatures {
             }
         }
 
-        unlink $tmp_der, $tmp_content;
+        unlink $tmp_der, $tmp_content, $tmp_cert;
 
         push @results, {
             type      => $type,
@@ -916,7 +972,7 @@ PDF::Sign - Sign PDF files with CMS/CAdES signatures and RFC3161 timestamps
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -991,7 +1047,7 @@ Directory for temporary files. Default: current working directory.
 
 =item C<$PDF::Sign::siglen>
 
-Signature buffer size in bytes. Default: 6144 (1024*6).
+Signature buffer size in bytes. Default: 8192 (1024*8).
 Increase if signatures are truncated.
 
 =item C<$PDF::Sign::debug>
@@ -1054,7 +1110,7 @@ Returns an arrayref of hashrefs, one per signature field found:
         printf "Signer:    %s\n", $sig->{signer};     # cms only
         printf "Signed at: %s\n", $sig->{signed_at};  # cms only
         printf "TSA at:    %s\n", $sig->{tsa_at};     # tsa only
-        printf "Valid:     %s\n", $sig->{valid} ? 'YES' : 'NO';
+        printf "Valid:     %s\n", $sig->{valid} ? '1' : '0';
         printf "Error:     %s\n", $sig->{error} if $sig->{error};
     }
 
@@ -1062,7 +1118,7 @@ Optional args:
 
     verify_signatures('signed.pdf', ca_bundle => '/etc/ssl/certs/ca-bundle.crt');
 
-Without C<ca_bundle>, verification uses C<-noverify> (no CA chain check —
+Without C<ca_bundle>, verification uses C<-noverify> (no CA chain check -
 cryptographic integrity only). With C<ca_bundle>, full chain verification
 is performed.
 

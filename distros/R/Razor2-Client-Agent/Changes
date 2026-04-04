@@ -1,3 +1,43 @@
+2.88 2026-04-03
+
+  Bug Fixes:
+  - Fix razorhome option assignment and readlink safety in
+    Config.pm. (PR #36)
+  - Prevent argument mutation and data loss in SIS parsing
+    functions. (PR #42)
+  - Fix bugs in preprocessing and engine modules. (PR #41)
+  - Replace two-arg open with three-arg form in Agent.pm. (PR #40)
+  - Correct dependency declarations in Makefile.PL and cpanfile.
+    (PR #39)
+  - Eliminate uninitialized value warnings in Ephemeral.pm. (PR #37)
+  - Security hardening: remove unsafe eval, fix file locking, harden
+    error handling. (PR #27)
+
+  Improvements:
+  - Modernize Perl idioms: three-arg open, lexical filehandles,
+    use parent. (PR #24)
+  - Add use strict and use warnings to all modules. (PR #25)
+  - Remove unused imports, modernize Exporter, simplify Digest::SHA
+    fallback. (PR #28)
+  - Use consistent literal version numbers across all modules.
+    (PR #29)
+  - Add META provides and upgrade repository metadata to CPAN META
+    spec v2. (PR #30)
+  - Update repository URLs from toddr to cpan-authors. (PR #38)
+
+  Tests:
+  - Add 109 tests for previously untested core modules. (PR #26)
+  - Add 44 tests for preprocessing and engine modules. (PR #41)
+  - Add t/config.t for Config.pm. (PR #36)
+
+  Documentation:
+  - Add POD documentation to Agent.pm, Config.pm, and Core.pm.
+    (PR #35)
+  - Add SECURITY.md with vulnerability reporting guidelines. (PR #31)
+  - Add CONTRIBUTING.md with contributor guidelines. (PR #32)
+  - Add CLAUDE.md with build artifact and release policy rules.
+    (PR #43)
+
 2.87 2026-03-22
 
   Bug Fixes:

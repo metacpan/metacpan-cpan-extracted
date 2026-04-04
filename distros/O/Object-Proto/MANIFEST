@@ -47,7 +47,6 @@ t/031-leak-object-introspection.t
 t/032-leak-object-lazy.t
 t/033-leak-object-clearer-predicate.t
 t/034-leak-object-singleton.t
-t/034-leak-object-singleton.tt
 t/035-object-slot-info-ext.t
 t/036-object-cross-class-func.t
 t/037-object-constructor-edge.t
@@ -59,6 +58,12 @@ t/042-extends-multilevel.t
 t/043-extends-types.t
 t/044-extends-methods.t
 t/045-extends-multiple.t
+t/046-build-hook.t
+t/047-object-trigger.t
+t/048-object-reader-writer.t
+t/049-object-weak-initarg.t
+t/050-exported-keywords.t
+t/fix_subtests.pl
 t/lib/NeuralNet/Activation.pm
 t/lib/NeuralNet/Layer.pm
 t/lib/NeuralNet/Loss.pm

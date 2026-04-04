@@ -1,7 +1,9 @@
 package Razor2::Engine::VR8;
+use strict;
+use warnings;
+
 use Razor2::Signature::Whiplash;
 use Razor2::String qw(hextobase64);
-use Data::Dumper;
 
 sub new {
 
@@ -10,11 +12,9 @@ sub new {
     my $self = bless {
         description     => 'whiplash',
         has_greet_param => 0,
-        whiplash        => new Razor2::Signature::Whiplash,
+        whiplash        => Razor2::Signature::Whiplash->new,
         rm              => $args{RM},
     }, $class;
-
-    die unless $self;
 
     return $self;
 

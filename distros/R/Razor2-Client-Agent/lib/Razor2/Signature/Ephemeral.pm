@@ -2,20 +2,19 @@
 
 package Razor2::Signature::Ephemeral;
 use strict;
-use Data::Dumper;
+use warnings;
 
-BEGIN {
-  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
-}
+use Digest::SHA qw(sha1_hex);
 
 sub new {
 
     my ( $class, %args ) = @_;
 
     my $self = bless {
-        seed => $args{seed} || 42,
-        separator => encode_separator( $args{separator} ) || encode_separator("10"),
+        seed      => $args{seed} || 42,
+        separator => defined $args{separator}
+            ? encode_separator( $args{separator} )
+            : encode_separator("10"),
     }, $class;
     $self;
 

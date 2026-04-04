@@ -1,4 +1,6 @@
 package Razor2::Preproc::deHTML;
+use strict;
+use warnings;
 
 sub new {
 

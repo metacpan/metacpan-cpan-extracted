@@ -79,12 +79,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Crypt::OpenSSL::Guess" => "0.10",
+    "Crypt::URandom" => 0,
     "Digest::SHA" => 0,
-    "File::Which" => 0,
     "MIME::Base64" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.21",
+  "VERSION" => "0.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -97,9 +97,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Crypt::OpenSSL::Guess" => "0.10",
+  "Crypt::URandom" => 0,
   "Digest::SHA" => 0,
   "Exporter" => 0,
-  "File::Which" => 0,
   "MIME::Base64" => 0,
   "Test::More" => 0,
   "XSLoader" => 0

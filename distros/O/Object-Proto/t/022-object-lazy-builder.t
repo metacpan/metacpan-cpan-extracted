@@ -4,87 +4,128 @@ use warnings;
 use Test::More;
 use Object::Proto;
 
-# Test lazy/builder support
+# Test builder (eager) and lazy builder support
 
 # Counters to track builder invocations
-our $build_count = 0;
-our $typed_build_count = 0;
+our $eager_build_count = 0;
+our $lazy_build_count = 0;
+our $typed_eager_count = 0;
+our $typed_lazy_count = 0;
 our $default_build_count = 0;
-our $direct_build_count = 0;
 
-# Define class with lazy builder
+# === Test 1: Eager builder (called at construction) ===
+package EagerPerson;
+
+sub _build_greeting {
+    my ($self) = @_;
+    $main::eager_build_count++;
+    return "Hello, " . $self->name . "!";
+}
+
+package main;
+
+Object::Proto::define('EagerPerson',
+    'name:Str:required',
+    'greeting:Str:builder(_build_greeting)'  # No :lazy, so called at new()
+);
+
+$eager_build_count = 0;
+my $ep = EagerPerson->new(name => "Alice");
+is($eager_build_count, 1, 'Eager builder called at construction');
+is($ep->greeting, 'Hello, Alice!', 'Eager builder set correct value');
+
+# Second access doesn't call builder again
+my $g2 = $ep->greeting;
+is($eager_build_count, 1, 'Builder not called on subsequent access');
+
+# === Test 2: Lazy builder (called on first access) ===
 package LazyPerson;
 
 sub _build_greeting {
     my ($self) = @_;
-    $main::build_count++;
-    return "Hello, " . $self->name . "!";
+    $main::lazy_build_count++;
+    return "Hi, " . $self->name . "!";
 }
 
 package main;
 
 Object::Proto::define('LazyPerson',
     'name:Str:required',
-    'greeting:Str:builder(_build_greeting)'
+    'greeting:Str:lazy:builder(_build_greeting)'  # :lazy = deferred to first access
 );
 
-# Test 1: Builder not called at construction time
-$build_count = 0;
-my $p = LazyPerson->new(name => "Alice");
-is($build_count, 0, 'Builder not called at construction');
+$lazy_build_count = 0;
+my $lp = LazyPerson->new(name => "Bob");
+is($lazy_build_count, 0, 'Lazy builder NOT called at construction');
 
-# Test 2: Builder called on first access
-my $greeting = $p->greeting;
-is($build_count, 1, 'Builder called on first access');
-is($greeting, 'Hello, Alice!', 'Builder returned correct value');
+# First access triggers builder
+my $lazy_greeting = $lp->greeting;
+is($lazy_build_count, 1, 'Lazy builder called on first access');
+is($lazy_greeting, 'Hi, Bob!', 'Lazy builder returned correct value');
 
-# Test 3: Value is cached - builder not called again
-my $greeting2 = $p->greeting;
-is($build_count, 1, 'Builder not called on second access (cached)');
-is($greeting2, 'Hello, Alice!', 'Cached value returned');
+# Value is cached
+my $lazy_greeting2 = $lp->greeting;
+is($lazy_build_count, 1, 'Lazy builder not called on second access (cached)');
 
-# Test 4: Different objects have different built values
-my $p2 = LazyPerson->new(name => "Bob");
-is($build_count, 1, 'Builder not called for new object until accessed');
-my $g2 = $p2->greeting;
-is($build_count, 2, 'Builder called for second object');
-is($g2, 'Hello, Bob!', 'Second object has correct greeting');
+# === Test 3: Different objects get their own built values ===
+my $lp2 = LazyPerson->new(name => "Carol");
+is($lazy_build_count, 1, 'Lazy builder not called for new object until accessed');
+my $g3 = $lp2->greeting;
+is($lazy_build_count, 2, 'Lazy builder called for second object');
+is($g3, 'Hi, Carol!', 'Second object has correct greeting');
 
-# Test 5: Lazy with default (no builder)
-package LazyWithDefault;
-package main;
-
+# === Test 4: Lazy with default (no builder) ===
 Object::Proto::define('LazyWithDefault',
     'value:Int:lazy:default(42)'
 );
 
 my $lwd = LazyWithDefault->new();
-# Check that the value is lazily initialized
 my $val = $lwd->value;
 is($val, 42, 'Lazy default value works');
 
-# Test 6: Lazy builder with type checking
-package TypedLazy;
+# === Test 5: Eager builder with type checking ===
+package TypedEager;
 
 sub _build_count {
     my ($self) = @_;
-    $main::typed_build_count++;
+    $main::typed_eager_count++;
     return 100;
 }
 
 package main;
 
-Object::Proto::define('TypedLazy',
-    'count:Int:builder(_build_count)'
+Object::Proto::define('TypedEager',
+    'count:Int:builder(_build_count)'  # Eager, typed
 );
 
-my $tl = TypedLazy->new();
-is($typed_build_count, 0, 'Typed builder not called at construction');
-my $c = $tl->count;
-is($c, 100, 'Typed builder returns correct value');
-is($typed_build_count, 1, 'Typed builder called once');
+$typed_eager_count = 0;
+my $te = TypedEager->new();
+is($typed_eager_count, 1, 'Typed eager builder called at construction');
+is($te->count, 100, 'Typed eager builder returns correct value');
 
-# Test 7: Default builder name (_build_propname)
+# === Test 6: Lazy builder with type checking ===
+package TypedLazy;
+
+sub _build_score {
+    my ($self) = @_;
+    $main::typed_lazy_count++;
+    return 200;
+}
+
+package main;
+
+Object::Proto::define('TypedLazy',
+    'score:Int:lazy:builder(_build_score)'  # Lazy, typed
+);
+
+$typed_lazy_count = 0;
+my $tl = TypedLazy->new();
+is($typed_lazy_count, 0, 'Typed lazy builder NOT called at construction');
+my $s = $tl->score;
+is($s, 200, 'Typed lazy builder returns correct value');
+is($typed_lazy_count, 1, 'Typed lazy builder called once');
+
+# === Test 7: Default builder name (_build_propname) ===
 package DefaultBuilderName;
 
 sub _build_answer {
@@ -96,20 +137,20 @@ sub _build_answer {
 package main;
 
 Object::Proto::define('DefaultBuilderName',
-    'answer:Int:builder()'  # Empty parens = use default _build_answer
+    'answer:Int:builder()'  # Empty parens = use default _build_answer, eager
 );
 
+$default_build_count = 0;
 my $dbn = DefaultBuilderName->new();
-is($default_build_count, 0, 'Default-named builder not called at construction');
-my $ans = $dbn->answer;
-is($ans, 42, 'Default-named builder works');
-is($default_build_count, 1, 'Default-named builder called');
+is($default_build_count, 1, 'Default-named eager builder called at construction');
+is($dbn->answer, 42, 'Default-named builder works');
 
-# Test 8: Setting lazy value directly bypasses builder
+# === Test 8: Providing value bypasses eager builder ===
 package DirectSet;
+our $direct_build_count = 0;
 
 sub _build_data {
-    $main::direct_build_count++;
+    $DirectSet::direct_build_count++;
     return "built";
 }
 
@@ -119,28 +160,66 @@ Object::Proto::define('DirectSet',
     'data:Str:builder(_build_data)'
 );
 
-my $ds = DirectSet->new();
-$ds->data("manual");
-is($ds->data, "manual", 'Directly set value is returned');
-is($direct_build_count, 0, 'Builder not called when value set directly');
+$DirectSet::direct_build_count = 0;
+my $ds = DirectSet->new(data => "manual");  # Provide value directly
+is($ds->data, "manual", 'Directly provided value is used');
+is($DirectSet::direct_build_count, 0, 'Builder not called when value provided');
 
-# Test 9: Lazy with both builder and type
-package BuildTyped;
+# === Test 9: Providing value bypasses lazy builder ===
+package DirectSetLazy;
+our $direct_lazy_count = 0;
 
-sub _build_score {
-    return "99";  # String, should be coerced or accepted as Int
+sub _build_info {
+    $DirectSetLazy::direct_lazy_count++;
+    return "lazy-built";
 }
 
 package main;
 
-Object::Proto::define('BuildTyped',
-    'score:Int:builder(_build_score)'
+Object::Proto::define('DirectSetLazy',
+    'info:Str:lazy:builder(_build_info)'
 );
 
-my $bt = BuildTyped->new();
-# This might fail type checking if strict - depends on implementation
-# For now, just check it works with string "99" (Perl is lenient)
-my $score = $bt->score;
-ok(defined $score, 'Lazy typed attribute with string value works');
+$DirectSetLazy::direct_lazy_count = 0;
+my $dsl = DirectSetLazy->new(info => "provided");
+is($dsl->info, "provided", 'Directly provided value used (lazy)');
+is($DirectSetLazy::direct_lazy_count, 0, 'Lazy builder not called when value provided');
+
+# === Test 10: Builder order reversed (:builder:lazy same as :lazy:builder) ===
+package BuilderOrderTest;
+our $order_count = 0;
+
+sub _build_val {
+    $BuilderOrderTest::order_count++;
+    return "ordered";
+}
+
+package main;
+
+Object::Proto::define('BuilderOrderTest',
+    'val:Str:builder(_build_val):lazy'  # :builder before :lazy
+);
+
+$BuilderOrderTest::order_count = 0;
+my $bot = BuilderOrderTest->new();
+is($BuilderOrderTest::order_count, 0, 'Builder with trailing :lazy is lazy');
+$bot->val;
+is($BuilderOrderTest::order_count, 1, 'Builder called on access');
+
+# === Test 11: Eager builder with coercion ===
+package CoerceEager;
+
+sub _build_amount {
+    return "99";  # String that should work with Int
+}
+
+package main;
+
+Object::Proto::define('CoerceEager',
+    'amount:Int:builder(_build_amount)'
+);
+
+my $ce = CoerceEager->new();
+is($ce->amount, 99, 'Eager builder with string coerced to Int');
 
 done_testing();

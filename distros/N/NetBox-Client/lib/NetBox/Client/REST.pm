@@ -23,11 +23,11 @@ our $VERSION = $NetBox::Client::Common::VERSION;
 
 sub __call :prototype($$$$$) ($class, $self, $method, $query, $vars = {}) {
     #{{{
-    delete $vars->{'raw'} if exists $vars->{'raw'};
+    delete $vars->{'raw'} if ref $vars eq 'HASH' and exists $vars->{'raw'};
     return $class->GET($self, $query, $vars) if $method eq 'GET';
     my @result = qw();
     my $request = HTTP::Request->new($method, sprintf('%s/%s/', $self->baseurl, $query));
-    $request->content(JSON->new->pretty(0)->encode($vars));
+    $request->content(JSON->new->pretty(0)->convert_blessed(1)->encode($vars));
     eval {
         local $SIG{'ALRM'} = sub { die "operation timed out\n" };
         alarm $self->timeout;
@@ -43,7 +43,11 @@ sub __call :prototype($$$$$) ($class, $self, $method, $query, $vars = {}) {
                 @result = @{$payload}
             }
         } else {
-            $self->__seterror(NetBox::Client::Common::E_REQFAIL, $response->status_line);
+            $self->__seterror(
+                NetBox::Client::Common::E_REQFAIL,
+                ($response->code || 'XXX'),
+                ($response->message || 'Unknown error occured')
+            );
             return qw();
         }
         alarm 0;
@@ -92,7 +96,11 @@ sub GET :prototype($$$$) ($class, $self, $query, $vars = {}) {
                 $vars->{'offset'} += $self->limit;
                 $i = boolean::false if scalar @result >= $count;
             } else {
-                $self->__seterror(NetBox::Client::Common::E_REQFAIL, $response->status_line);
+                $self->__seterror(
+                    NetBox::Client::Common::E_REQFAIL,
+                    ($response->code || 'XXX'),
+                    ($response->message || 'Unknown error occured')
+                );
                 $i = boolean::false;
             }
         }

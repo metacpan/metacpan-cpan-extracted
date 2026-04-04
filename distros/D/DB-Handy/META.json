@@ -1,6 +1,6 @@
 {
     "name" : "DB-Handy",
-    "version" : "1.07",
+    "version" : "1.08",
     "abstract" : "Pure-Perl flat-file relational database with DBI-like interface",
     "author" : [
         "ina <ina@cpan.org>"
@@ -85,15 +85,15 @@
     "provides" : {
         "DB::Handy" : {
             "file" : "lib/DB/Handy.pm",
-            "version" : "1.07"
+            "version" : "1.08"
         },
         "DB::Handy::Connection" : {
             "file" : "lib/DB/Handy.pm",
-            "version" : "1.07"
+            "version" : "1.08"
         },
         "DB::Handy::Statement" : {
             "file" : "lib/DB/Handy.pm",
-            "version" : "1.07"
+            "version" : "1.08"
         }
     }
 }

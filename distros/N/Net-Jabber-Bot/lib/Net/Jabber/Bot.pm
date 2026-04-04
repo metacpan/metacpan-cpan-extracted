@@ -1,5 +1,6 @@
 package Net::Jabber::Bot;
 
+use 5.010;
 use Moo;
 use Types::Standard qw(Int HashRef Str Maybe ArrayRef Bool CodeRef InstanceOf Num);
 use Type::Tiny;
@@ -52,7 +53,7 @@ has 'from_full'           => (
     is      => 'rw',
     default => sub {
         my $self = shift;
-        ($self->username || '') . '@' . ($self->server || '') . '/' . ($self->alias || '');
+        ($self->username || '') . '@' . ($self->server || '') . '/' . ($self->resource || '');
     }
 );
 
@@ -80,17 +81,19 @@ has 'messages_sent_today' => (
 has '_running' => ( isa => Bool, is => 'rw', default => 0 );
 
 
+=for markdown [![testsuite](https://github.com/cpan-authors/perl-net-jabber-bot/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/perl-net-jabber-bot/actions/workflows/testsuite.yml)
+
 =head1 NAME
 
 Net::Jabber::Bot - Automated Bot creation with safeties
 
 =head1 VERSION
 
-Version 2.1.8
+Version 3.01
 
 =cut
 
-our $VERSION = '2.1.9';
+our $VERSION = '3.01';
 
 =head1 SYNOPSIS
 
@@ -237,7 +240,7 @@ password to get into the server
 
 =item B<alias>
 
-This will be your nickname in rooms, as well as the login resource (which can't have duplicates). I couldn't come up with any reason these should not be the same so hardcoded them to be the same.
+This will be your nickname in chat rooms. The XMPP resource (used for login and presence) defaults to C<alias_hostname_pid> to ensure uniqueness across multiple bot instances.
 
 =item B<forums_and_responses>
 
@@ -533,10 +536,12 @@ sub Start {
 
     while ( $self->_running ) {
                                                                            # Process and re-connect if you have to.
-        eval { $self->Process($process_timeout) };
+        my $process_result;
+        eval { $process_result = $self->Process($process_timeout) };
 
-        if ($@) {                                                          #Assume the connection is down...
-            ERROR("Server error: $@");
+        if ($@ || !defined $process_result) {                              #Assume the connection is down...
+            my $error = $@ || "Process returned undef (connection lost)";
+            ERROR("Server error: $error");
             my $message = "Disconnected from " . $self->server . ":" . $self->port . " as " . $self->username;
 
             ERROR("$message Reconnecting...");
@@ -700,9 +705,14 @@ sub _process_jabber_message {
     }
 
     # Are these my own messages?
-    if ( $self->ignore_self_messages ) {    # TODO: || $self->safety_mode (this breaks tests in 06?)
+    if ( $self->ignore_self_messages ) {
 
-        if ( defined $resource && $resource eq $self->resource ) {    # Ignore my own messages.
+        # In MUC (groupchat), the from JID resource is the room nickname (alias),
+        # not the XMPP resource. Check both to handle direct and group messages.
+        if ( defined $resource
+            && ( $resource eq $self->resource
+                || ( $type eq 'groupchat' && $resource eq $self->alias ) ) )
+        {
             DEBUG("Ignoring message from self...\n");
             return;
         }
@@ -1001,16 +1011,44 @@ sub SendJabberMessage {
 
     my $max_size = $self->max_message_size;
 
-    # Split the message into no more than max_message_size so that we do not piss off jabber.
-    # Split on new line. Space if you have to or just chop at max size.
-    my @message_chunks = ( $message =~ /.{1,$max_size}$|.{1,$max_size}\n|.{1,$max_size}\s|.{1,$max_size}/gs );
+    # Split the message into chunks of at most max_message_size characters.
+    # Prefer breaking at newlines, then spaces, then hard chop.
+    my @message_chunks;
+    my $remaining = $message;
+    while ( length $remaining ) {
+        if ( length $remaining <= $max_size ) {
+            push @message_chunks, $remaining;
+            last;
+        }
+        my $chunk = substr( $remaining, 0, $max_size );
+        my $break_pos;
+
+        # Prefer breaking at the last newline within the chunk
+        my $nl_pos = rindex( $chunk, "\n" );
+        if ( $nl_pos >= 0 ) {
+            $break_pos = $nl_pos + 1;    # include the newline
+        }
+        else {
+            # Fall back to the last space
+            my $sp_pos = rindex( $chunk, " " );
+            if ( $sp_pos >= 0 ) {
+                $break_pos = $sp_pos + 1;    # include the space
+            }
+            else {
+                $break_pos = $max_size;      # hard chop
+            }
+        }
+
+        push @message_chunks, substr( $remaining, 0, $break_pos );
+        $remaining = substr( $remaining, $break_pos );
+    }
 
     DEBUG("Max message = $max_size. Splitting...") if ( $#message_chunks > 0 );
     my $return_value;
     foreach my $message_chunk (@message_chunks) {
         my $msg_return = $self->_send_individual_message( $recipient, $message_chunk, $message_type, $subject, $from );
         if ( defined $msg_return ) {
-            $return_value = ( $return_value // '' ) . $msg_return;
+            $return_value = ( defined $return_value ? $return_value : '' ) . $msg_return;
         }
     }
     return $return_value;
@@ -1126,9 +1164,7 @@ sub SetForumSubject {
         DEBUG("Truncated subject: $subject");
         return "Subject is too long!";
     }
-    $self->_send_individual_message( $recipient, "Setting subject to $subject", 'groupchat', $subject );
-
-    return;
+    return $self->_send_individual_message( $recipient, "Setting subject to $subject", 'groupchat', $subject );
 }
 
 =item B<ChangeStatus>

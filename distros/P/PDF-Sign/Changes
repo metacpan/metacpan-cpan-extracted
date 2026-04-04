@@ -1,4 +1,20 @@
 Revision history for PDF-Sign
+0.03  2026-04-04
+    - Fixed: VERSION in POD corrected to 0.03
+    - Fixed: replaced UTF-8 em-dash with ASCII hyphen-minus in POD
+    - Fixed: README removed stale dependency on Crypt::OpenSSL::X509
+      (removed in 0.01, never published)
+    - Fixed: README removed TEST_CERT_PEM/TEST_KEY_PEM instructions,
+      test suite now generates self-signed certificates automatically
+    - Fixed: verify_signatures ByteRange matching rewritten to use
+      Contents fingerprint instead of field order (fixes CMS/TSA swap)
+    - Fixed: verify_signatures CMS verification compatible with
+      OpenSSL 1.1.1 (CAfile extraction from embedded certificate)
+    - Known: TSA verification via openssl ts -verify requires a full
+      CA bundle; pass ca_bundle argument or ensure system CA store
+      is available. Acrobat Reader performs full PAdES validation.
+    - Known: TSA verification not available with LibreSSL (no ts -verify)
+    - Known: CMS verification not available with LibreSSL (no cms command)
 
 0.02  2026-04-02
     - Fixed: PDFArray() and similar calls now use explicit parentheses

@@ -165,6 +165,11 @@ foreach my $f (sort keys %funcs) {
 #define __BSD_VISIBLE 1
 #endif
 #endif
+#ifdef __OpenBSD__
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -180,6 +185,9 @@ foreach my $f (sort keys %funcs) {
 #  endif
 #  if __has_include(<libutil.h>)
 #    include <libutil.h>
+#  endif
+#  if __has_include(<termios.h>)
+#    include <termios.h>
 #  endif
 #  if __has_include(<util.h>)
 #    include <util.h>

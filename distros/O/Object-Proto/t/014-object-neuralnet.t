@@ -11,7 +11,8 @@ use Object::Proto;
 # ============================================
 # Test NeuralNet::Activation singleton
 # ============================================
-subtest 'NeuralNet::Activation singleton' => sub {
+# NeuralNet::Activation singleton
+{
     require NeuralNet::Activation;
 
     # Test singleton behavior
@@ -53,12 +54,12 @@ subtest 'NeuralNet::Activation singleton' => sub {
     my $tanh_fn = $act1->tanh_fn;
     my $tanh_out = $tanh_fn->([0]);
     is(sprintf("%.4f", $tanh_out->[0]), '0.0000', 'tanh(0) = 0');
-};
-
+}
 # ============================================
 # Test NeuralNet::Loss singleton
 # ============================================
-subtest 'NeuralNet::Loss singleton' => sub {
+# NeuralNet::Loss singleton
+{
     require NeuralNet::Loss;
 
     my $loss1 = NeuralNet::Loss->instance;
@@ -91,12 +92,12 @@ subtest 'NeuralNet::Loss singleton' => sub {
     is_deeply([map { sprintf("%.2f", $_) } @$grad],
               ['-0.50', '0.50'],
               'MSE gradient for multiple outputs');
-};
-
+}
 # ============================================
 # Test NeuralNet::Layer typed slots
 # ============================================
-subtest 'NeuralNet::Layer typed slots' => sub {
+# NeuralNet::Layer typed slots
+{
     require NeuralNet::Layer;
 
     # Test required slots
@@ -131,12 +132,12 @@ subtest 'NeuralNet::Layer typed slots' => sub {
 
     # Test num_params
     is($layer->num_params, 8, 'num_params = 3*2 + 2 = 8');
-};
-
+}
 # ============================================
 # Test NeuralNet::Network full features
 # ============================================
-subtest 'NeuralNet::Network features' => sub {
+# NeuralNet::Network features
+{
     require NeuralNet::Network;
 
     # Test defaults
@@ -178,12 +179,12 @@ subtest 'NeuralNet::Network features' => sub {
     like($summary, qr/Learning rate: 0\.5/, 'summary includes learning rate');
     like($summary, qr/2 -> 4/, 'summary includes layer dimensions');
     like($summary, qr/4 -> 1/, 'summary includes second layer');
-};
-
+}
 # ============================================
 # Test NeuralNet::Network training (simple linear task)
 # ============================================
-subtest 'NeuralNet::Network training' => sub {
+# NeuralNet::Network training
+{
     require NeuralNet::Network;
 
     # Seed random for reproducibility
@@ -233,12 +234,12 @@ subtest 'NeuralNet::Network training' => sub {
     ok(ref($out) eq 'ARRAY', 'predict returns array');
     ok(scalar(@$out) == 1, 'predict returns correct size');
     ok(defined $out->[0], 'output is defined');
-};
-
+}
 # ============================================
 # Test function-style accessors work correctly
 # ============================================
-subtest 'function-style accessors' => sub {
+# function-style accessors
+{
     require NeuralNet::Layer;
 
     my $layer = NeuralNet::Layer->new(
@@ -259,6 +260,5 @@ subtest 'function-style accessors' => sub {
     # Method-style still works
     is($layer->input_size, 2, 'method-style getter still works');
     is_deeply($layer->biases, [1, 2, 3], 'method-style sees function-style changes');
-};
-
+}
 done_testing;

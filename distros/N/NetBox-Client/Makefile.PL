@@ -5,8 +5,8 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'NetBox::Client',
     AUTHOR       => 'Volodymyr Pidgornyi <vp@dtel-ix.net>',
-    VERSION      => '0.1.5',
-    ABSTRACT     => 'perl interface to NetBox API',
+    VERSION      => '0.1.7',
+    ABSTRACT     => 'perl client interface to NetBox API',
     LICENSE      => 'apache_2_0',
     META_MERGE => {
         'meta-spec' => { version => 2 },

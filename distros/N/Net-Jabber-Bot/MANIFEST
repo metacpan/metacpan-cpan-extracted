@@ -5,6 +5,7 @@ lib/Net/Jabber/Bot.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+README.md
 t/00-load.t
 t/03-test_connectivity.t
 t/05-helper_functions.t
@@ -15,8 +16,15 @@ t/07-multiline_messages.t
 t/07-test_disconnect_message_count.t
 t/07-test_disconnect_public_api.t
 t/07-test_from_parameter.t
+t/07-test_message_callback.t
+t/07-test_message_chunking.t
+t/07-test_message_sending.t
+t/07-test_muc_self_detection.t
+t/07-test_presence_and_iq.t
+t/07-test_public_api_connected.t
 t/07-test_reconnect_and_leaks.t
 t/07-test_reconnect_failure.t
+t/07-test_set_forum_subject.t
 t/08-test_start_stop.t
 t/99-pod-coverage.t
 t/99-pod.t

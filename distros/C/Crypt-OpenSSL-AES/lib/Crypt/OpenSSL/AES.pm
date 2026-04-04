@@ -10,37 +10,21 @@ use 5.008000;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 require Exporter;
 
 our @ISA = qw(Exporter);
 
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Crypt::OpenSSL::AES ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
-
 require XSLoader;
 XSLoader::load('Crypt::OpenSSL::AES', $VERSION);
+
+sub CLONE_SKIP { 1 }
 
 # Preloaded methods go here.
 
 1;
 __END__
-
 =head1 NAME
 
 Crypt::OpenSSL::AES - A Perl wrapper around OpenSSL's AES library
@@ -48,25 +32,28 @@ Crypt::OpenSSL::AES - A Perl wrapper around OpenSSL's AES library
 =head1 SYNOPSIS
 
      use Crypt::OpenSSL::AES;
+     use Crypt::URandom qw( urandom );  # Always use a strong random source
 
+     # Basic usage (defaults to AES-ECB based on key length; ECB is not recommended)
+     my $key    = urandom(32);
      my $cipher = Crypt::OpenSSL::AES->new($key);
 
-     or
+     # Recommended usage: AES-256-CBC with proper Initialization Vector and Padding
+     my $secure_key = urandom(32); # 32 bytes (256 bits) for AES-256
+     my $iv         = urandom(16); # 16 bytes (128 bits) block size for AES
 
-     # Pick better keys and iv...
-     my $key = pack("H*", substr(sha512_256_hex(rand(1000)), 0, ($ks/4)));
-     my $iv  = pack("H*", substr(sha512_256_hex(rand(1000)), 0, 32));
-     my $cipher = Crypt::OpenSSL::AES->new(
-                                            $key,
-                                            {
-                                                cipher => 'AES-256-CBC',
-                                                iv      => $iv, (16-bytes for supported ciphers)
-                                                padding => 1, (0 - no padding, 1 - padding)
-                                            }
-                                        );
+     my $secure_cipher = Crypt::OpenSSL::AES->new(
+         $secure_key,
+         {
+             cipher  => 'AES-256-CBC',
+             iv      => $iv,
+             padding => 1, # 1 for standard block padding, 0 for no padding
+         }
+     );
 
-     $encrypted = $cipher->encrypt($plaintext);
-     $decrypted = $cipher->decrypt($encrypted);
+     my $plaintext = "Confidential data to be encrypted.";
+     my $encrypted = $secure_cipher->encrypt($plaintext);
+     my $decrypted = $secure_cipher->decrypt($encrypted);
 
 =head1 DESCRIPTION
 
@@ -103,10 +90,6 @@ Supports padding and iv
 
 =back
 
-=back
-
-=over 4
-
 =item Stream Ciphers
 
 The blocksize is 1 byte. OpenSSL does not pad even if padding
@@ -130,6 +113,49 @@ Supports iv
 
 =back
 
+=head1 FIPS COMPLIANCE
+
+When using OpenSSL 3.0+ built with FIPS support, pass C<provider_props => 'fips=yes'>
+to the constructor to ensure only FIPS-validated algorithm implementations are used.
+
+B<AES-ECB is not approved for general data encryption under FIPS 140-3.>
+Use AES-CBC or AES-CTR with a random IV instead.
+
+    my $cipher = Crypt::OpenSSL::AES->new($key, {
+        cipher         => 'AES-256-CBC',
+        iv             => $iv,
+        padding        => 1,
+        provider_props => 'fips=yes',
+    });
+
+    # Check at runtime:
+    warn "FIPS mode active\n" if Crypt::OpenSSL::AES::fips_mode();
+
+=head1 mod_perl / THREADED ENVIRONMENTS
+
+B<Never store a Crypt::OpenSSL::AES object in a package variable under
+mod_perl with the worker or event MPM.> Each request handler must
+construct its own object. The underlying C<EVP_CIPHER_CTX> is not
+thread-safe.
+
+Under prefork MPM this restriction does not apply, but you should still
+avoid constructing cipher objects at C<use> time (i.e., at server startup
+before the fork), because OpenSSL's PRNG state is not safely shared
+across C<fork()>.
+
+Recommended pattern for mod_perl handlers:
+
+    sub handler {
+        my $r = shift;
+        my $cipher = Crypt::OpenSSL::AES->new($key, { ... });
+        # use $cipher only within this request
+    }
+
+    # httpd.conf or startup.pl
+    PerlChildInitHandler sub {
+        Crypt::OpenSSL::AES::post_fork_init();
+    }
+
 =over 4
 
 =item new()
@@ -149,7 +175,7 @@ new constructor.
     my $cipher = Crypt::OpenSSL::AES->new($key,
                     {
                         cipher  => 'AES-256-CBC',
-                        iv      => $iv, (16-bytes for supported ciphers)
+                        iv      => $iv, # (16-bytes for supported ciphers)
                         padding => 1, (0 - no padding, 1 - padding)
                     });
 
@@ -189,6 +215,11 @@ be 1 byte and no padding is required.
 
 Crypt::CBC is no longer required to encrypt/decrypt data of arbitrary
 lengths.
+
+=item $cipher->fips_mode()
+
+Will return true (1) or false (0) depending whether the openssl 'fips=yes'
+default property is set.
 
 =item keysize
 

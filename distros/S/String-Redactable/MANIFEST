@@ -10,6 +10,8 @@ MANIFEST.SKIP
 README.pod
 SECURITY.md
 t/load.t
+t/multiple.pl
+t/multiple.t
 t/placeholder.t
 t/pod.t
 t/pod_coverage.t

@@ -13,7 +13,8 @@ Object::Proto::define('Entry', qw(id name score));
 Object::Proto::define('Cell', qw(r c));
 Object::Proto::define('Data', qw(num));
 
-subtest 'for with $attr' => sub {
+# for with $attr
+{
     my $obj = new Point 10, 20;
     my @attrs = ('x', 'y');
     my @result;
@@ -21,18 +22,18 @@ subtest 'for with $attr' => sub {
         push @result, $obj->$attr();
     }
     is_deeply(\@result, [10, 20], 'object accessors with $attr');
-};
-
-subtest 'for with $key' => sub {
+}
+# for with $key
+{
     my $obj = new Point 1, 2;
     my $sum = 0;
     for my $key ('x', 'y') {
         $sum += $obj->$key();
     }
     is($sum, 3, 'object access with $key');
-};
-
-subtest 'for with $item coords' => sub {
+}
+# for with $item coords
+{
     my @specs = (
         [10, 20],
         [30, 40],
@@ -45,17 +46,17 @@ subtest 'for with $item coords' => sub {
 
     is($objects[0]->x(), 10, 'object from $item x');
     is($objects[1]->y(), 40, 'object from $item y');
-};
-
-subtest 'map with $_' => sub {
+}
+# map with $_
+{
     my @data = (1, 2, 3);
 
     my @objects = map { new Data $_ } @data;
     my @nums = map { $_->num() } @objects;
     is_deeply(\@nums, [1, 2, 3], 'objects from map with $_');
-};
-
-subtest 'for with $obj' => sub {
+}
+# for with $obj
+{
     # Use parentheses to avoid parsing issues with indirect object syntax
     my $o1 = new Item(10);
     my $o2 = new Item(20);
@@ -67,9 +68,9 @@ subtest 'for with $obj' => sub {
         $sum += $obj->val();
     }
     is($sum, 60, 'iterate objects with $obj');
-};
-
-subtest 'for with $n creating objects' => sub {
+}
+# for with $n creating objects
+{
     my @nums = (1, 2, 3);
     my @objects;
     for my $n (@nums) {
@@ -81,9 +82,9 @@ subtest 'for with $n creating objects' => sub {
         push @squares, $obj->y();  # y holds squared value
     }
     is_deeply(\@squares, [1, 4, 9], 'objects with $n');
-};
-
-subtest 'nested $row/$col' => sub {
+}
+# nested $row/$col
+{
     my @matrix;
     for my $row (1..2) {
         my @row_objs;
@@ -95,9 +96,9 @@ subtest 'nested $row/$col' => sub {
 
     is($matrix[0][0]->r(), 1, 'nested row 0 col 0');
     is($matrix[1][2]->c(), 3, 'nested row 1 col 2');
-};
-
-subtest 'while with $current' => sub {
+}
+# while with $current
+{
     my @objects = map { new Item $_ } (1..5);
     my $i = 0;
     my @vals;
@@ -107,15 +108,15 @@ subtest 'while with $current' => sub {
         $i++;
     }
     is_deeply(\@vals, [1, 2, 3, 4, 5], 'while with $current');
-};
-
-subtest 'grep with $_ on objects' => sub {
+}
+# grep with $_ on objects
+{
     my @objects = map { new Data $_ } (1..10);
     my @evens = grep { $_->num() % 2 == 0 } @objects;
     is(scalar(@evens), 5, 'grep objects with $_');
-};
-
-subtest 'for with $entry named' => sub {
+}
+# for with $entry named
+{
     my @entries = (
         [1, 'alice', 90],
         [2, 'bob', 85],
@@ -128,6 +129,5 @@ subtest 'for with $entry named' => sub {
 
     is($objects[0]->name(), 'alice', 'entry name from $entry');
     is($objects[1]->score(), 85, 'entry score from $entry');
-};
-
+}
 done_testing();

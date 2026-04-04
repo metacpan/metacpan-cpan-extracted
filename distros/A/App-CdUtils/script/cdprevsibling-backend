@@ -9,19 +9,20 @@ use File::chdir;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-07'; # DATE
+our $DATE = '2026-04-04'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 # FRAGMENT id=shcompgen-hint completer=1 for=cdprevsibling
 
 my $cwd = $ENV{PWD} || cwd();
 my @cwd_elems = split m!/+!, $cwd;
-my $cmd = $0 =~ /cdprev/ ? 'cdprevsibling' : 'cdnextsibling';
+my $cmd = $0 =~ /prev/ ? 'cdprevsibling' : 'cdnextsibling';
 my $sort_files_opts = $ENV{CDPREVNEXTSIBLING_SORT_FILES_OPTS} // '--by-field=name';
 my %opts = (
     num => 1,
     level => 1,
+    action => 'cd',
 );
 
 GetOptionsWithCompletion(
@@ -37,6 +38,8 @@ Options:
   --version, -v
   --num=i, -n
   --level=i, -l
+  --sort=s, -S, -t
+  --ls
 USAGE
         exit 0;
     },
@@ -47,6 +50,21 @@ USAGE
     },
     'num|n=i' => \$opts{num},
     'level|l=i' => \$opts{level},
+    'ls' => sub { $opts{action} = 'ls' },
+    'sort=s' => sub {
+        my $val = $1;
+        if ($val eq 'name') {
+            $sort_files_opts = "--by-field name";
+        } elsif ($val eq 'size') {
+            $sort_files_opts = "--by-field size --reverse";
+        } elsif ($val eq 'time') {
+            $sort_files_opts = "--by-field time --reverse";
+        } else {
+            die "$cmd: Invalid value for --sort, please only specify name, size, or time\n";
+        }
+    },
+    'S' => sub { $opts{sort} = 'size' },
+    't' => sub { $opts{sort} = 'time' },
 );
 
 die "$cmd: Level must be at least 1\n" if $opts{level} < 1;
@@ -77,6 +95,23 @@ for my $i (0 .. $#dirs) {
 }
 
 $curpos //= 0;
+
+if ($opts{action} eq 'ls') {
+    my $i = 0;
+    if ($cmd eq 'cdnextsibling') {
+        while ($curpos < @dirs) {
+            print "$i. $dirs[$curpos]\n";
+            $i++; $curpos++;
+        }
+    } else {
+        while ($curpos >= 0) {
+            print "$i. $dirs[$curpos]\n";
+            $i++; $curpos--;
+        }
+    }
+    exit 0;
+}
+
 my $newpos = $curpos + $opts{num} * ($cmd eq 'cdprevsibling' ? -1 : 1);
 $newpos = 0 if $newpos < 0;
 $newpos = @dirs-1 if $newpos >= @dirs;
@@ -110,14 +145,21 @@ cdprevsibling-backend - Change to the "previous" or "next" sibling directory
 
 =head1 VERSION
 
-This document describes version 0.013 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2025-11-07.
+This document describes version 0.014 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2026-04-04.
 
 =head1 SYNOPSIS
 
 To use in shell:
 
- % cdprevsibling() { cd `cdprevsibling-backend "$1"`; }
- % cdnextsibling() { cd `cdnextsibling-backend "$1"`; }
+ % cdprevsibling() { cd `cdprevsibling-backend "$@"`; }
+ % cdnextsibling() { cd `cdnextsibling-backend "$@"`; }
+
+ % lsprevsibling() { cdprevsibling-backend --ls "$@"; }
+ % lsnextsibling() { cdnextsibling-backend --ls "$@"; }
+
+(or define them in your shell startup file e.g. F<~/.bashrc>):
+
+Then:
 
  % pwd
  /some/path
@@ -169,11 +211,28 @@ Changing sibling of grandparent (and upper) directory:
  % pwd
  /some/path/A/X1        # (because A/X1/Z is not available)
 
+To see the list of previous/next siblings:
+
+ % pwd
+ A/X0
+ % lsprevsibling
+ 0. X0
+ 1. X1
+ 2. X2
+
+ % lsnextsibling -l2
+ 0. A
+ 1. B
+
 =head1 DESCRIPTION
 
 B<cdprevsibling> and B<cdnextsibling> are commands to change to "previous" and
-"next" sibling directories, respectively. By default, asciibetical ordering is
-used. You can change the ordering by setting the
+"next" sibling directories, respectively.
+
+B<Ordering.> By defauult, asciibetical ordering is used (C<--sort=name>). You
+can change the ordering by using these options: C<--sort=time> or C<-t> to sort
+by the newest directory first, C<--sort=size> or C<-S> to sort by the largest
+directory first. Or you can also change the ordering by setting the
 L</CDPREVNEXTSIBLING_SORT_FILES_OPTS> options, as L<sort-files> utility is used
 to sort the directories.
 
@@ -212,6 +271,27 @@ same structure. In that case, this script will stop at the last depth where the
 same directory can be found. For example, if current position is C</A/X1/Y> and
 level is 3, next sibling should be C</B/X1/Y>. However, since the path does not
 exist, the script will return C</B/X1>.
+
+=head2 --ls
+
+List all the previous/next siblings (including current as number 0) instead of
+printing the target previous/next sibling.
+
+=head2 --sort=s
+
+Change the sorting order. Possible values: C<name>, C<size>, C<time>. Default is
+C<name>. If specified explicitly, will override
+L</CDPREVNEXTSIBLING_SORT_FILES_OPTS>.
+
+=head2 -S
+
+Shortcut for C<--sort=size>, sort by largest directory first. Equivalent to
+C<sort-files --by-field size --reverse>.
+
+=head2 -t
+
+Shortcut for C<--sort=time>, sort by newest (largest mtime) directory first.
+Equivalent to C<sort-files --by-field mtime --reverse>.
 
 =head1 COMPLETION
 
@@ -287,7 +367,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

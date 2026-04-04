@@ -1,3 +1,15 @@
+0.014   2026-04-04  Released-By: PERLANCAR; Urgency: medium
+
+        [utilities cd{next,prev}sibling]
+
+        - Add options --sort, -S, -t.
+
+        - Add option --ls (for ls{next,prev}sibling).
+
+        - [bugfix] Fix shell function instruction ("$1" only passes first
+          argument, should use "$@" instead).
+
+
 0.013   2025-11-07  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

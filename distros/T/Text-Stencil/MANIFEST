@@ -1,0 +1,19 @@
+bench.pl
+Changes
+eg/csv_export.pl
+eg/from_file.pl
+eg/html_table.pl
+eg/json_output.pl
+eg/skip_and_sort.pl
+eg/streaming.pl
+eg/transforms.pl
+lib/Text/Stencil.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/fortune.t
+t/generic.t
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

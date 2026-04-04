@@ -6,7 +6,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -31,7 +31,8 @@ sub new {
     $proxy_port //= 0;
     
     return $class->_new($loop, $proxy, $proxy_port,
-        $args{ssl_cert} // "", $args{ssl_key} // "", $args{ssl_ca} // "");
+        $args{ssl_cert} // "", $args{ssl_key} // "", $args{ssl_ca} // "",
+        exists $args{ssl_init} ? ($args{ssl_init} ? 1 : 0) : -1);
 }
 
 package EV::Websockets::Connection;
@@ -104,11 +105,17 @@ Create a new context.
         ssl_ca     => 'ca.pem',          # optional CA chain
         proxy      => '192.168.1.1',     # optional HTTP proxy host
         proxy_port => 8080,              # optional proxy port (default: 1080)
+        ssl_init   => 0,                 # optional, skip OpenSSL global init
     );
 
 If C<proxy> is not specified, the module reads C<https_proxy>, C<http_proxy>,
 or C<all_proxy> from the environment. Pass C<< proxy => "" >> to suppress
 auto-detection.
+
+C<ssl_init> controls whether libwebsockets initializes OpenSSL globals.
+By default, initialization happens once on the first context.  Pass
+C<< ssl_init => 0 >> when coexisting with another TLS library (e.g.
+Feersum/picotls) to avoid reinitializing shared OpenSSL state.
 
 =head3 connect(%options)
 

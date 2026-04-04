@@ -1,12 +1,19 @@
+AI_POLICY.md
 Changes
+CONTRIBUTING.md
 country-codes.txt
 examples/test.pl
 lib/Business/UPS.pm
+LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 product-codes.txt
-README
+SECURITY.md
 t/00-load.t
+t/getups.t
+t/pod-coverage.t
+t/pod.t
 t/upstrack.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

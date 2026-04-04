@@ -1,5 +1,8 @@
 Revision history for EV::Websockets
 
+0.04    2026-04-01
+        - ssl_init option on Context->new() to control OpenSSL global init
+
 0.03    2026-04-01
         - adopt() auto-creates server vhost (no dummy listen() needed)
         - Fixed conn->wsi not set during on_connect for adopted connections

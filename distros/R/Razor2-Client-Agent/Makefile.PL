@@ -8,7 +8,7 @@
 ##
 ## $Id: Makefile.PL,v 1.30 2007/05/08 22:47:53 rsoderberg Exp $
 
-our $VERSION = "2.87";
+our $VERSION = "2.88";
 
 use ExtUtils::MakeMaker;
 
@@ -23,15 +23,20 @@ WriteMakefile(
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
     EXE_FILES => [qw( bin/razor-client bin/razor-admin bin/razor-check bin/razor-report bin/razor-revoke )],
     PREREQ_PM => {
-        'IO::Socket::IP' => 0,
         'Digest::SHA'    => 0,
         'File::Copy'     => 0,
         'File::Spec'     => 0,
+        'File::Temp'     => 0,
         'Getopt::Long'   => 0,
+        'IO::Socket::IP' => 0,
         'MIME::Base64'   => 0,
-        'Test::More'     => 0,
         'Time::HiRes'    => 0,
         'URI::Escape'    => 0,
+        'parent'         => 0,
+    },
+    TEST_REQUIRES => {
+        'File::Temp'  => 0,
+        'Test::More'  => 0,
     },
     MAN1PODS => {
         'docs/razor-check.pod'  => '$(INST_MAN1DIR)/razor-check.1',
@@ -43,14 +48,86 @@ WriteMakefile(
     clean      => { FILES    => 'Razor2-Client-Agent-*' },
     'OBJECT'   => q[_deHTMLxs$(OBJ_EXT) deHTMLxs$(OBJ_EXT)],
     META_MERGE => {
+        'meta-spec' => { version => 2 },
         resources => {
-            license => 'http://dev.perl.org/licenses/',
+            license => ['http://dev.perl.org/licenses/'],
 
             #homepage    => 'http://razor.sourceforge.net/',
-            bugtracker => 'https://github.com/toddr/Razor2-Client-Agent/issues',
-            repository => 'http://github.com/toddr/Razor2-Client-Agent',
+            bugtracker => {
+                web => 'https://github.com/cpan-authors/Razor2-Client-Agent/issues',
+            },
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/cpan-authors/Razor2-Client-Agent.git',
+                web  => 'https://github.com/cpan-authors/Razor2-Client-Agent',
+            },
 
             #MailingList => 'https://sourceforge.net/mailarchive/forum.php?forum_name=razor-users',
+        },
+        provides => {
+            'Razor2::Client::Agent' => {
+                file    => 'lib/Razor2/Client/Agent.pm',
+                version => $VERSION,
+            },
+            'Razor2::Client::Config' => {
+                file => 'lib/Razor2/Client/Config.pm',
+            },
+            'Razor2::Client::Core' => {
+                file => 'lib/Razor2/Client/Core.pm',
+            },
+            'Razor2::Client::Engine' => {
+                file => 'lib/Razor2/Client/Engine.pm',
+            },
+            'Razor2::Client::Version' => {
+                file    => 'lib/Razor2/Client/Version.pm',
+                version => $VERSION,
+            },
+            'Razor2::Engine::VR8' => {
+                file => 'lib/Razor2/Engine/VR8.pm',
+            },
+            'Razor2::Errorhandler' => {
+                file => 'lib/Razor2/Errorhandler.pm',
+            },
+            'Razor2::Logger' => {
+                file => 'lib/Razor2/Logger.pm',
+            },
+            'Razor2::Preproc::Manager' => {
+                file => 'lib/Razor2/Preproc/Manager.pm',
+            },
+            'Razor2::Preproc::deBase64' => {
+                file => 'lib/Razor2/Preproc/deBase64.pm',
+            },
+            'Razor2::Preproc::deHTML' => {
+                file => 'lib/Razor2/Preproc/deHTML.pm',
+            },
+            'Razor2::Preproc::deHTML_comment' => {
+                file => 'lib/Razor2/Preproc/deHTML_comment.pm',
+            },
+            'Razor2::Preproc::deHTMLxs' => {
+                file    => 'lib/Razor2/Preproc/deHTMLxs.pm',
+                version => $VERSION,
+            },
+            'Razor2::Preproc::deNewline' => {
+                file => 'lib/Razor2/Preproc/deNewline.pm',
+            },
+            'Razor2::Preproc::deQP' => {
+                file => 'lib/Razor2/Preproc/deQP.pm',
+            },
+            'Razor2::Preproc::enBase64' => {
+                file => 'lib/Razor2/Preproc/enBase64.pm',
+            },
+            'Razor2::Signature::Ephemeral' => {
+                file => 'lib/Razor2/Signature/Ephemeral.pm',
+            },
+            'Razor2::Signature::Whiplash' => {
+                file => 'lib/Razor2/Signature/Whiplash.pm',
+            },
+            'Razor2::String' => {
+                file => 'lib/Razor2/String.pm',
+            },
+            'Razor2::Syslog' => {
+                file => 'lib/Razor2/Syslog.pm',
+            },
         },
     },
 );

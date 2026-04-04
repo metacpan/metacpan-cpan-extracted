@@ -56,16 +56,17 @@ for (1..10) {
     my $c = $obj->computed;
 }
 
-subtest 'lazy builder first access no leak' => sub {
+# lazy builder first access no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $obj = new LeakLazy name => 'Test';
             my $val = $obj->computed;  # triggers builder
         }
     } 'lazy first access no leak';
-};
-
-subtest 'lazy builder repeated access no leak' => sub {
+}
+# lazy builder repeated access no leak
+{
     my $obj = new LeakLazy name => 'Cached';
     # First access triggers builder
     my $first = $obj->computed;
@@ -74,18 +75,18 @@ subtest 'lazy builder repeated access no leak' => sub {
             my $val = $obj->computed;  # cached, no rebuild
         }
     } 'lazy repeated access no leak';
-};
-
-subtest 'lazy with default dependency no leak' => sub {
+}
+# lazy with default dependency no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $obj = new LeakLazyDefault;
             my $val = $obj->doubled;
         }
     } 'lazy default dependency no leak';
-};
-
-subtest 'lazy clear and rebuild no leak' => sub {
+}
+# lazy clear and rebuild no leak
+{
     $LeakLazyClear::BUILD_COUNT = 0;
     my $obj = new LeakLazyClear counter => 1;
     no_leaks_ok {
@@ -95,9 +96,9 @@ subtest 'lazy clear and rebuild no leak' => sub {
             $val = $obj->cached;       # rebuild
         }
     } 'lazy clear rebuild no leak';
-};
-
-subtest 'lazy multiple objects no leak' => sub {
+}
+# lazy multiple objects no leak
+{
     no_leaks_ok {
         for (1..300) {
             my $obj1 = new LeakLazy name => 'One';
@@ -106,9 +107,9 @@ subtest 'lazy multiple objects no leak' => sub {
             my $c2 = $obj2->computed;
         }
     } 'lazy multiple objects no leak';
-};
-
-subtest 'lazy object clone no leak' => sub {
+}
+# lazy object clone no leak
+{
     my $obj = new LeakLazy name => 'Source';
     my $orig = $obj->computed;  # trigger builder first
     no_leaks_ok {
@@ -117,6 +118,5 @@ subtest 'lazy object clone no leak' => sub {
             my $val = $clone->computed;  # should use cloned value
         }
     } 'lazy clone no leak';
-};
-
+}
 done_testing;

@@ -30,12 +30,12 @@ requires:
   Time::HiRes: '0'
   Type::Tiny: '1'
   Types::Standard: '0'
-  perl: '5.008'
+  perl: '5.010'
   version: '0'
 resources:
   bugtracker: https://github.com/cpan-authors/perl-net-jabber-bot/issues
   homepage: https://metacpan.org/pod/Net::Jabber::Bot
   license: https://dev.perl.org/licenses/
   repository: https://github.com/cpan-authors/perl-net-jabber-bot.git
-version: v2.1.9
+version: '3.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

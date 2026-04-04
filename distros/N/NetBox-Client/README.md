@@ -267,6 +267,15 @@ NetBox version.
 
 # **CHANGELOG**
 
+### v0.1.7 - 2026-04-03
+
+- fixed contents passing when updating objects;
+- fixed booleans passing when updating objects.
+
+### v0.1.6 - 2025-11-19
+
+- fixed error handling on SSL certificate check failure.
+
 ### v0.1.5 - 2025-10-08
 
 - renamed module to NetBox::Client to match CPAN naming conventions.

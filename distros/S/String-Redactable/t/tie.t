@@ -7,16 +7,12 @@ my $class = 'Tie::' . $parent_class;
 
 subtest 'sanity' => sub {
 	use_ok $class;
-	can_ok $class, qw(new placeholder);
+	can_ok $class, qw(new);
 
 	local $SIG{__WARN__} = sub {};
 
 	my $string = 'abcdef';
 	isa_ok my $obj = $class->new('1234'), $class;
-	isa_ok $obj, $parent_class;
-
-	ok defined $obj->placeholder, 'placeholder is defined';
-	ok length $obj->placeholder, 'placeholder has a non-zero length';
 	};
 
 subtest 'tie' => sub {
@@ -25,7 +21,7 @@ subtest 'tie' => sub {
 	local $SIG{__WARN__} = sub { $warnings = $_[0] };
 	my $warnings_re = qr/\APossible unintended/;
 
-	my $original;
+	my $original = 'abcdef';
 	my $original_re;
 	my $obj;
 	my $tied_scalar;
@@ -38,16 +34,13 @@ subtest 'tie' => sub {
 		$obj = tie $tied_scalar, $class, $original;
 		ok ! defined $warnings, 'no warning after tie' or diag $warnings;
 
-		$original_re = qr/\A$original/;
+		$original_re = qr/$original/;
 		};
 
 	subtest 'isa' => sub {
 		undef $warnings;
 		isa_ok $obj, $class;
-		isa_ok $obj, $parent_class;
 		isa_ok tied($tied_scalar), $class;
-		ok ! defined $warnings, 'no warning';
-		isa_ok tied($tied_scalar), $parent_class;
 		ok ! defined $warnings, 'no warning';
 		};
 

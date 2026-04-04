@@ -2,21 +2,27 @@ use v5.20;
 
 package Tie::String::Redactable;
 use experimental qw(signatures);
-use parent qw(String::Redactable);
+use parent qw(Tie::Scalar);
+use String::Redactable;
+use warnings;
 
-our $VERSION = '1.087';
+our $VERSION = '1.088';
 
 sub TIESCALAR ($class, $string) {
 	local $SIG{__WARN__} = sub {};
-	my $self = bless String::Redactable->new($string), __PACKAGE__;
+	my $self = bless { string => String::Redactable->new($string) }, $class;
 	}
 
 sub FETCH ($self) {
-	$self->placeholder;
+	$self->{'string'}->placeholder;
 	}
 
 sub STORE {
 	return;
+	}
+
+sub to_str_unsafe ($self) {
+	$self->{'string'}->to_str_unsafe;
 	}
 
 =encoding utf8
@@ -40,6 +46,16 @@ This is a tied version of L<String::Redactable> that refuses to store
 a new value, and you have to go through the tied object to get to the
 object that allows you to call the method you need. It's unlikely that
 you would inadvertently type out any of that.
+
+=head2 Methods
+
+=over 4
+
+=item * to_str_unsafe
+
+This dispatches to the underlying L<String::Redactable> object.
+
+=back
 
 =head1 TO DO
 

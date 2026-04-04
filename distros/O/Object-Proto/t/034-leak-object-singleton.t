@@ -34,23 +34,24 @@ for (1..10) {
     $s3->setting;
 }
 
-subtest 'singleton instance no leak' => sub {
+# singleton instance no leak
+{
     no_leaks_ok {
         for (1..1000) {
             my $s = LeakSingleton1->instance();
         }
     } 'singleton instance no leak';
-};
-
-subtest 'singleton instance with args no leak' => sub {
+}
+# singleton instance with args no leak
+{
     no_leaks_ok {
         for (1..1000) {
             my $s = LeakSingleton2->instance(name => 'test', value => 42);
         }
     } 'singleton instance args no leak';
-};
-
-subtest 'singleton accessor get no leak' => sub {
+}
+# singleton accessor get no leak
+{
     my $s = LeakSingleton1->instance();
     no_leaks_ok {
         for (1..1000) {
@@ -58,9 +59,9 @@ subtest 'singleton accessor get no leak' => sub {
             my $cnt = $s->count;
         }
     } 'singleton accessor get no leak';
-};
-
-subtest 'singleton accessor set no leak' => sub {
+}
+# singleton accessor set no leak
+{
     my $s = LeakSingleton1->instance();
     no_leaks_ok {
         for (1..1000) {
@@ -68,9 +69,9 @@ subtest 'singleton accessor set no leak' => sub {
             $s->count(42);
         }
     } 'singleton accessor set no leak';
-};
-
-subtest 'singleton state increment no leak' => sub {
+}
+# singleton state increment no leak
+{
     my $s = LeakSingleton1->instance();
     $s->count(0);
     no_leaks_ok {
@@ -79,9 +80,9 @@ subtest 'singleton state increment no leak' => sub {
             $s->count($c + 1);
         }
     } 'singleton increment no leak';
-};
-
-subtest 'singleton hash manipulation no leak' => sub {
+}
+# singleton hash manipulation no leak
+{
     my $s = LeakSingletonTyped->instance(setting => 'test');
     no_leaks_ok {
         for (1..500) {
@@ -90,9 +91,9 @@ subtest 'singleton hash manipulation no leak' => sub {
             delete $s->cache->{key};
         }
     } 'singleton hash no leak';
-};
-
-subtest 'singleton multiple classes no leak' => sub {
+}
+# singleton multiple classes no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $s1 = LeakSingleton1->instance();
@@ -101,9 +102,9 @@ subtest 'singleton multiple classes no leak' => sub {
             my $n = $s2->name;
         }
     } 'singleton multi-class no leak';
-};
-
-subtest 'singleton same instance check no leak' => sub {
+}
+# singleton same instance check no leak
+{
     no_leaks_ok {
         for (1..500) {
             my $a = LeakSingleton1->instance();
@@ -111,6 +112,5 @@ subtest 'singleton same instance check no leak' => sub {
             my $same = ($a == $b);
         }
     } 'singleton same instance no leak';
-};
-
+}
 done_testing;

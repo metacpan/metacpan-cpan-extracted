@@ -1,0 +1,31 @@
+bench/moo_vs_sugar.pl
+Changes
+ignore.txt
+lib/Object/Proto/Sugar.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basic.t
+t/02-coerce.t
+t/03-trigger.t
+t/04-defaults.t
+t/05-builder.t
+t/06-predicate.t
+t/07-clearer.t
+t/08-required.t
+t/09-lazy.t
+t/10-reader_writer.t
+t/11-init_arg.t
+t/12-weak_ref.t
+t/13-modifiers.t
+t/14-extends.t
+t/15-roles.t
+t/16-type-constants.t
+t/17-func-accessors.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

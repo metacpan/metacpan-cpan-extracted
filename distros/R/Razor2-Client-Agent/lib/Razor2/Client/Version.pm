@@ -10,9 +10,10 @@
 
 package Razor2::Client::Version;
 use strict;
+use warnings;
 
 our $PROTOCOL = 3;
-our $VERSION  = '2.87';
+our $VERSION  = '2.88';
 
 1;
 

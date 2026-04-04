@@ -126,28 +126,26 @@ EV::Websockets::_set_debug(1) if $ENV{EV_WS_DEBUG};
         on_close => sub { delete $keep{srv} },
     );
 
-    my $t = EV::timer(0.1, 0, sub {
-        $keep{cli} = $ctx->connect(
-            url => "ws://127.0.0.1:$port",
-            on_connect => sub { $_[0]->send("ping1") },
-            on_message => sub {
-                my ($c, $data) = @_;
-                if ($phase == 0) {
-                    $resp1 = $data;
-                    $phase = 1;
-                    $c->send("ping2");
-                } else {
-                    $resp2 = $data;
-                    $c->close(1000);
-                }
-            },
-            on_close => sub {
-                delete $keep{cli};
-                my $t; $t = EV::timer(0.3, 0, sub { undef $t; EV::break });
-            },
-            on_error => sub { delete $keep{cli}; EV::break },
-        );
-    });
+    $keep{cli} = $ctx->connect(
+        url => "ws://127.0.0.1:$port",
+        on_connect => sub { $_[0]->send("ping1") },
+        on_message => sub {
+            my ($c, $data) = @_;
+            if ($phase == 0) {
+                $resp1 = $data;
+                $phase = 1;
+                $c->send("ping2");
+            } else {
+                $resp2 = $data;
+                $c->close(1000);
+            }
+        },
+        on_close => sub {
+            delete $keep{cli};
+            my $t; $t = EV::timer(0.3, 0, sub { undef $t; EV::break });
+        },
+        on_error => sub { delete $keep{cli}; EV::break },
+    );
 
     my $to = EV::timer(10, 0, sub { diag "Timeout!"; EV::break });
     EV::run;

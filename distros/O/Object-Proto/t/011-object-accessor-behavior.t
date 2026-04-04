@@ -7,7 +7,8 @@ use Object::Proto;
 
 # ==== Accessor Return Values ====
 
-subtest 'getter returns current value' => sub {
+# getter returns current value
+{
     Object::Proto::define('GetterTest', 'val:Str');
 
     my $obj = new GetterTest val => 'initial';
@@ -17,9 +18,9 @@ subtest 'getter returns current value' => sub {
     my $ret = $obj->val('updated');
     is($ret, 'updated', 'setter returns new value');
     is($obj->val, 'updated', 'value was actually set');
-};
-
-subtest 'method chaining' => sub {
+}
+# method chaining
+{
     Object::Proto::define('ChainTest', 'a:Str', 'b:Int', 'c:Num');
 
     my $obj = new ChainTest a => '', b => 0, c => 0.0;
@@ -27,20 +28,20 @@ subtest 'method chaining' => sub {
     # Value is returned, allowing use in expressions
     my $res = $obj->a('hello');
     is($res, 'hello', 'setter returns value for chaining');
-};
-
+}
 # ==== Constructor Variations ====
 
-subtest 'new with hash' => sub {
+# new with hash
+{
     Object::Proto::define('HashNew', 'x:Int', 'y:Int');
 
     my %args = (x => 10, y => 20);
     my $obj = new HashNew %args;
     is($obj->x, 10, 'hash args x');
     is($obj->y, 20, 'hash args y');
-};
-
-subtest 'new with partial args' => sub {
+}
+# new with partial args
+{
     Object::Proto::define('PartialNew',
         'required:Str:required',
         'optional:Str:default(none)',
@@ -49,36 +50,36 @@ subtest 'new with partial args' => sub {
     my $obj = new PartialNew required => 'yes';
     is($obj->required, 'yes', 'required field set');
     is($obj->optional, 'none', 'optional uses default');
-};
-
+}
 # ==== Error Message Quality ====
 
-subtest 'type error messages' => sub {
+# type error messages
+{
     Object::Proto::define('ErrorMsg', 'num:Int');
 
     eval { new ErrorMsg num => 'not a number' };
     like($@, qr/Int/, 'error mentions expected type');
     like($@, qr/num/, 'error mentions property name');
-};
-
-subtest 'required field error' => sub {
+}
+# required field error
+{
     Object::Proto::define('RequiredError', 'must_have:Str:required');
 
     eval { new RequiredError };
     like($@, qr/required|must_have/i, 'error for missing required field');
-};
-
-subtest 'readonly error' => sub {
+}
+# readonly error
+{
     Object::Proto::define('ReadonlyError', 'fixed:Str:readonly');
 
     my $obj = new ReadonlyError fixed => 'immutable';
     eval { $obj->fixed('change') };
     like($@, qr/readonly|cannot|modify/i, 'error for modifying readonly');
-};
-
+}
 # ==== Property Name Edge Cases ====
 
-subtest 'property names with underscores' => sub {
+# property names with underscores
+{
     Object::Proto::define('UnderscoreProps',
         'my_value:Str',
         'another_one:Int',
@@ -93,20 +94,20 @@ subtest 'property names with underscores' => sub {
     is($obj->my_value, 'test', 'underscore property works');
     is($obj->another_one, 42, 'multiple underscores work');
     is($obj->_private, 'secret', 'leading underscore works');
-};
-
-subtest 'single letter properties' => sub {
+}
+# single letter properties
+{
     Object::Proto::define('SingleLetter', 'x:Int', 'y:Int', 'z:Int');
 
     my $obj = new SingleLetter x => 1, y => 2, z => 3;
     is($obj->x, 1, 'single letter x');
     is($obj->y, 2, 'single letter y');
     is($obj->z, 3, 'single letter z');
-};
-
+}
 # ==== Mixed Modifiers ====
 
-subtest 'type with coerce and default' => sub {
+# type with coerce and default
+{
     Object::Proto::define('MixedModifiers',
         'count:Int:default(0):coerce',
     );
@@ -118,28 +119,28 @@ subtest 'type with coerce and default' => sub {
     # Coerce should work
     my $obj2 = new MixedModifiers count => '42';
     is($obj2->count, 42, 'coerce works with type+default');
-};
-
+}
 # ==== Introspection ====
 
-subtest 'object blessed correctly' => sub {
+# object blessed correctly
+{
     Object::Proto::define('BlessCheck', 'val:Str');
 
     my $obj = new BlessCheck val => 'test';
     isa_ok($obj, 'BlessCheck', 'object has correct class');
     ok(ref($obj), 'object is a reference');
-};
-
-subtest 'can call accessors' => sub {
+}
+# can call accessors
+{
     Object::Proto::define('CanCheck', 'prop:Str');
 
     my $obj = new CanCheck prop => 'value';
     ok($obj->can('prop'), 'object can call prop');
-};
-
+}
 # ==== Undef vs Empty ====
 
-subtest 'undef handling in optional fields' => sub {
+# undef handling in optional fields
+{
     # Use Any type which allows undef
     Object::Proto::define('UndefOptional', 'maybe:Any');
 
@@ -151,11 +152,11 @@ subtest 'undef handling in optional fields' => sub {
 
     $obj->maybe(undef);
     ok(!defined($obj->maybe), 'can set back to undef');
-};
-
+}
 # ==== Numeric Edge Cases ====
 
-subtest 'numeric precision' => sub {
+# numeric precision
+{
     Object::Proto::define('NumPrecision', 'val:Num');
 
     my $obj = new NumPrecision val => 3.14159265358979;
@@ -166,9 +167,9 @@ subtest 'numeric precision' => sub {
 
     $obj->val(-1e308);
     ok($obj->val < -1e307, 'negative large float works');
-};
-
-subtest 'integer bounds' => sub {
+}
+# integer bounds
+{
     Object::Proto::define('IntBounds', 'val:Int');
 
     # Use values that are definitely integers
@@ -182,6 +183,48 @@ subtest 'integer bounds' => sub {
     # Zero
     $obj->val(0);
     is($obj->val, 0, 'zero works');
-};
+}
+# ==== Required Cannot Be Set To Undef ====
 
+# required field cannot be set to undef via setter
+{
+    Object::Proto::define('RequiredNoUndef', 'name:Str:required');
+
+    my $obj = new RequiredNoUndef name => 'initial';
+    is($obj->name, 'initial', 'required field set at construction');
+
+    eval { $obj->name(undef) };
+    ok($@, 'error for setting required field to undef');
+    is($obj->name, 'initial', 'value unchanged after failed set');
+}
+# required field cannot be passed undef in constructor
+{
+    Object::Proto::define('RequiredNoUndefCtor', 'title:Str:required');
+
+    eval { new RequiredNoUndefCtor title => undef };
+    ok($@, 'error for passing undef to required in constructor');
+}
+# required with writer cannot be set to undef
+{
+    Object::Proto::define('RequiredWriter', 'code:Str:required:writer(set_code)');
+
+    my $obj = new RequiredWriter code => 'ABC';
+    is($obj->code, 'ABC', 'required field set');
+
+    eval { $obj->set_code(undef) };
+    ok($@, 'writer cannot set required to undef');
+    is($obj->code, 'ABC', 'value unchanged after failed write');
+}
+# required untyped field cannot be set to undef
+{
+    # Required field without a type constraint
+    Object::Proto::define('RequiredUntyped', 'value:required');
+
+    my $obj = new RequiredUntyped value => 'anything';
+    is($obj->value, 'anything', 'untyped required field set');
+
+    eval { $obj->value(undef) };
+    ok($@, 'untyped required cannot be set to undef');
+    is($obj->value, 'anything', 'value unchanged');
+}
 done_testing;

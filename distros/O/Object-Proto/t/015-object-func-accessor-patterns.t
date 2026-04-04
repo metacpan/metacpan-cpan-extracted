@@ -21,7 +21,8 @@ use Object::Proto;
 # Basic function accessor in map
 # ============================================
 
-subtest 'func accessor in map getter' => sub {
+# func accessor in map getter
+{
     my @boxes = (
         new Box(10, 20, 30),
         new Box(40, 50, 60),
@@ -33,9 +34,9 @@ subtest 'func accessor in map getter' => sub {
 
     my @heights = map { height($_) } @boxes;
     is_deeply(\@heights, [20, 50, 80], 'map height accessor');
-};
-
-subtest 'func accessor in map setter' => sub {
+}
+# func accessor in map setter
+{
     my @boxes = (
         new Box(1, 2, 3),
         new Box(4, 5, 6),
@@ -46,13 +47,13 @@ subtest 'func accessor in map setter' => sub {
 
     is(width($boxes[0]), 2, 'first box width doubled');
     is(width($boxes[1]), 8, 'second box width doubled');
-};
-
+}
 # ============================================
 # Function accessor in grep
 # ============================================
 
-subtest 'func accessor in grep' => sub {
+# func accessor in grep
+{
     my @people = (
         new Person('Alice', 25),
         new Person('Bob', 17),
@@ -64,13 +65,13 @@ subtest 'func accessor in grep' => sub {
     is(scalar(@adults), 2, 'grep found 2 adults');
     is(name($adults[0]), 'Alice', 'first adult is Alice');
     is(name($adults[1]), 'Charlie', 'second adult is Charlie');
-};
-
+}
 # ============================================
 # Function accessor in for loop
 # ============================================
 
-subtest 'func accessor in for loop' => sub {
+# func accessor in for loop
+{
     my @coords = (
         new Coord(1, 2),
         new Coord(3, 4),
@@ -90,9 +91,9 @@ subtest 'func accessor in for loop' => sub {
 
     is(cy($coords[0]), 12, 'first coord y incremented');
     is(cy($coords[2]), 16, 'third coord y incremented');
-};
-
-subtest 'func accessor in foreach with $_' => sub {
+}
+# func accessor in foreach with $_
+{
     my @boxes = map { new Box($_, $_ * 2, $_ * 3) } (1..3);
 
     my @depths;
@@ -100,13 +101,13 @@ subtest 'func accessor in foreach with $_' => sub {
         push @depths, depth($_);
     }
     is_deeply(\@depths, [3, 6, 9], 'foreach with $_ and func accessor');
-};
-
+}
 # ============================================
 # Nested loops with func accessors
 # ============================================
 
-subtest 'nested loops with func accessors' => sub {
+# nested loops with func accessors
+{
     my @row1 = map { new Coord($_, 1) } (1..3);
     my @row2 = map { new Coord($_, 2) } (1..3);
     my @grid = (\@row1, \@row2);
@@ -120,13 +121,13 @@ subtest 'nested loops with func accessors' => sub {
     # row1: 1*1 + 2*1 + 3*1 = 6
     # row2: 1*2 + 2*2 + 3*2 = 12
     is($total, 18, 'nested loop with func accessors');
-};
-
+}
 # ============================================
 # Complex argument expressions
 # ============================================
 
-subtest 'func accessor with expression argument' => sub {
+# func accessor with expression argument
+{
     my $box = new Box(10, 20, 30);
 
     # Set width to height + depth
@@ -136,9 +137,9 @@ subtest 'func accessor with expression argument' => sub {
     # Chained modifications
     height($box, width($box) / 2);
     is(height($box), 25, 'height set to width / 2');
-};
-
-subtest 'func accessor with method call result' => sub {
+}
+# func accessor with method call result
+{
     my $c1 = new Coord(5, 10);
     my $c2 = new Coord(0, 0);
 
@@ -148,22 +149,22 @@ subtest 'func accessor with method call result' => sub {
 
     is(cx($c2), 5, 'x set from method call');
     is(cy($c2), 10, 'y set from method call');
-};
-
-subtest 'func accessor with sub call result' => sub {
+}
+# func accessor with sub call result
+{
     my $box = new Box(1, 2, 3);
 
     sub compute_value { return 42 }
 
     width($box, compute_value());
     is(width($box), 42, 'width set from sub call');
-};
-
+}
 # ============================================
 # Multiple objects same call
 # ============================================
 
-subtest 'func accessor alternating objects' => sub {
+# func accessor alternating objects
+{
     my $c1 = new Coord(1, 2);
     my $c2 = new Coord(10, 20);
 
@@ -174,13 +175,13 @@ subtest 'func accessor alternating objects' => sub {
 
     is(cx($c1), 10, 'c1 x swapped');
     is(cx($c2), 1, 'c2 x swapped');
-};
-
+}
 # ============================================
 # Return value usage
 # ============================================
 
-subtest 'func accessor return value in expression' => sub {
+# func accessor return value in expression
+{
     my $box = new Box(10, 20, 30);
 
     my $volume = width($box) * height($box) * depth($box);
@@ -190,22 +191,22 @@ subtest 'func accessor return value in expression' => sub {
     my $new_width = width($box, 5);
     is($new_width, 5, 'setter returns new value');
     is(width($box), 5, 'value was set');
-};
-
-subtest 'chained func accessor calls' => sub {
+}
+# chained func accessor calls
+{
     my $c = new Coord(0, 0);
 
     # Chain setters (each returns new value)
     my $final = cx($c, cx($c, 5) + 10);
     is($final, 15, 'chained setter result');
     is(cx($c), 15, 'chained setter applied');
-};
-
+}
 # ============================================
 # Edge cases
 # ============================================
 
-subtest 'func accessor with undef' => sub {
+# func accessor with undef
+{
     my $person = new Person('Test', 30);
 
     name($person, undef);
@@ -213,25 +214,25 @@ subtest 'func accessor with undef' => sub {
 
     name($person, 'Restored');
     is(name($person), 'Restored', 'can set back from undef');
-};
-
-subtest 'func accessor with empty string' => sub {
+}
+# func accessor with empty string
+{
     my $person = new Person('Test', 30);
 
     name($person, '');
     is(name($person), '', 'can set to empty string');
     ok(defined(name($person)), 'empty string is defined');
-};
-
-subtest 'func accessor with zero' => sub {
+}
+# func accessor with zero
+{
     my $coord = new Coord(5, 5);
 
     cx($coord, 0);
     is(cx($coord), 0, 'can set to zero');
     ok(defined(cx($coord)), 'zero is defined');
-};
-
-subtest 'func accessor with negative' => sub {
+}
+# func accessor with negative
+{
     my $coord = new Coord(5, 5);
 
     cx($coord, -10);
@@ -239,13 +240,13 @@ subtest 'func accessor with negative' => sub {
 
     cy($coord, -0.5);
     is(cy($coord), -0.5, 'can set to negative float');
-};
-
+}
 # ============================================
 # Sort with func accessors
 # ============================================
 
-subtest 'sort with func accessor' => sub {
+# sort with func accessor
+{
     my @people = (
         new Person('Charlie', 30),
         new Person('Alice', 25),
@@ -259,13 +260,13 @@ subtest 'sort with func accessor' => sub {
     my @by_name = sort { name($a) cmp name($b) } @people;
     is(name($by_name[0]), 'Alice', 'alphabetically first');
     is(name($by_name[2]), 'Charlie', 'alphabetically last');
-};
-
+}
 # ============================================
 # Accumulate with func accessors
 # ============================================
 
-subtest 'accumulate with func accessor' => sub {
+# accumulate with func accessor
+{
     my @boxes = (
         new Box(2, 3, 4),
         new Box(1, 1, 1),
@@ -278,6 +279,5 @@ subtest 'accumulate with func accessor' => sub {
     }
     # 24 + 1 + 125 = 150
     is($total_volume, 150, 'accumulated volume');
-};
-
+}
 done_testing();

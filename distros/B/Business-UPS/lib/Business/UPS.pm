@@ -3,13 +3,11 @@ package Business::UPS;
 use strict;
 use warnings;
 
+use Carp;
 use LWP::UserAgent;
 use JSON::PP qw(decode_json encode_json);
-require 5.008;
-
-require Exporter;
-
-our @ISA = qw(Exporter AutoLoader);
+use Exporter 'import';
+use 5.014;
 
 our @EXPORT = qw/ getUPS UPStrack /;
 
@@ -17,9 +15,14 @@ our @EXPORT = qw/ getUPS UPStrack /;
 #	Copyright 1998 Mark Solomon <msolomon@seva.net> (See GNU GPL)
 #	Started 01/07/1998 Mark Solomon
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 sub getUPS {
+
+    warnings::warnif( 'deprecated',
+        'getUPS() is deprecated: the UPS rate quoting endpoint (qcostcgi.cgi) '
+        . 'has been retired by UPS. This function will be removed in a future '
+        . 'release. See Business::UPS documentation for alternatives.' );
 
     my (
         $product, $origin, $dest,      $weight, $country, $rate_chart, $length,
@@ -45,10 +48,13 @@ sub getUPS {
     $workString .= "&30_cod=1"                     if $cod;
     $workString = "${ups_cgi}${workString}";
 
-    my $lwp    = LWP::UserAgent->new();
+    my $lwp    = LWP::UserAgent->new(
+        agent   => "Business-UPS/$VERSION",
+        timeout => 30,
+    );
     my $result = $lwp->get($workString);
 
-    Error("Failed fetching data.") unless $result->is_success;
+    croak("Failed fetching data.") unless $result->is_success;
 
     my @ret = split( '%', $result->content );
 
@@ -69,7 +75,7 @@ sub UPStrack {
     my $tracking_number = shift;
     my %retValue;
 
-    $tracking_number || Error("No tracking number provided to UPStrack()");
+    $tracking_number || croak("No tracking number provided to UPStrack()");
 
     my $ups_url = 'https://www.ups.com/track/api/Track/GetStatus?loc=en_US';
     my $payload = encode_json( {
@@ -77,21 +83,24 @@ sub UPStrack {
         TrackingNumber => [$tracking_number],
     } );
 
-    my $lwp = LWP::UserAgent->new();
+    my $lwp = LWP::UserAgent->new(
+        agent   => "Business-UPS/$VERSION",
+        timeout => 30,
+    );
     my $result = $lwp->post(
         $ups_url,
         'Content-Type' => 'application/json',
         Content        => $payload,
     );
 
-    Error("Cannot get tracking data from UPS") unless $result->is_success();
+    croak("Cannot get tracking data from UPS") unless $result->is_success();
 
     my $json;
     eval { $json = decode_json( $result->content() ) };
-    Error("Cannot parse JSON response from UPS: $@") if $@;
+    croak("Cannot parse JSON response from UPS: $@") if $@;
 
     my $details = $json->{trackDetails};
-    Error("No tracking details returned from UPS") unless $details && ref($details) eq 'ARRAY' && @$details;
+    croak("No tracking details returned from UPS") unless $details && ref($details) eq 'ARRAY' && @$details;
 
     my $track = $details->[0];
 
@@ -99,7 +108,10 @@ sub UPStrack {
     $retValue{'Service Type'}   = $track->{service}        if $track->{service};
 
     if ( my $w = $track->{weight} ) {
-        $retValue{'Weight'} = "$w->{weight} $w->{unitOfMeasurement}" if $w->{weight};
+        if ( $w->{weight} ) {
+            my $unit = $w->{unitOfMeasurement} || '';
+            $retValue{'Weight'} = length($unit) ? "$w->{weight} $unit" : $w->{weight};
+        }
     }
 
     if ( my $addr = $track->{shipToAddress} ) {
@@ -107,7 +119,8 @@ sub UPStrack {
         $retValue{'Shipped To'} = join( ', ', @parts ) if @parts;
     }
 
-    $retValue{'Delivery Date'} = $track->{scheduledDeliveryDate} || $track->{deliveredDate};
+    my $delivery_date = $track->{scheduledDeliveryDate} || $track->{deliveredDate};
+    $retValue{'Delivery Date'} = $delivery_date if $delivery_date;
     $retValue{'Signed By'}     = $track->{receivedBy}  if $track->{receivedBy};
     $retValue{'Location'}      = $track->{leftAt}      if $track->{leftAt};
 
@@ -131,18 +144,11 @@ sub UPStrack {
     return %retValue;
 }
 
-sub Error {
-    my $error = shift;
-    die "$error\n";
-}
-
-END { }
-
-# Autoload methods go after =cut, and are processed by the autosplit program.
-
 1;
 
 __END__
+
+=for markdown [![testsuite](https://github.com/cpan-authors/Business-UPS/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Business-UPS/actions/workflows/testsuite.yml)
 
 =head1 NAME
 
@@ -157,16 +163,25 @@ Business::UPS - A UPS Interface Module
   print "Shipping is \$$shipping\n";
   print "UPS Zone is $ups_zone\n";
 
-  %track = UPStrack("z10192ixj29j39");
-  $track{error} and die "ERROR: $track{error}";
+  my %track = eval { UPStrack("1Z12345E0205271688") };
+  die "ERROR: $@" if $@;
 
-  # 'Delivered' or 'In-transit'
-  print "This package is $track{Current Status}\n"; 
+  # 'Delivered' or 'In Transit'
+  print "This package is $track{'Current Status'}\n";
 
 =head1 DESCRIPTION
 
-A way of sending four arguments to a module to get shipping charges 
+A way of sending four arguments to a module to get shipping charges
 that can be used in, say, a CGI.
+
+B<NOTE:> The C<getUPS()> function is B<deprecated>. The UPS rate quoting
+endpoint (C<qcostcgi.cgi>) it relied on has been permanently retired by UPS.
+Calls to C<getUPS()> will emit a deprecation warning and will always fail
+with an HTTP error. This function will be removed in a future release.
+
+For rate quoting, consider using L<Business::Shipping> or the
+L<UPS Rating API|https://developer.ups.com/api/reference?loc=en_US#tag/Rating_other>
+directly.
 
 =head1 REQUIREMENTS
 
@@ -180,12 +195,19 @@ Perl 5.014 or higher
 
 =item *
 
-LWP::UserAgent Module
+LWP::UserAgent
 
-=back 4
+=item *
+
+JSON::PP (core since Perl 5.14)
+
+=back
 
 
-=head1 ARGUMENTS for getUPS()
+=head1 ARGUMENTS for getUPS() (DEPRECATED)
+
+B<This function is deprecated.> The UPS endpoint it uses no longer exists.
+See L</DESCRIPTION> for alternatives.
 
 Call the subroutine with the following values:
 
@@ -198,11 +220,11 @@ and optionally:
 
   5.  Country Code, (see country-codes.txt)
   6.  Rate Chart (drop-off, pick-up, etc - see below)
-  6.  Length,
-  7.  Width,
-  8.  Height,
-  9.  Oversized (defined if oversized), and
-  10. COD (defined if C.O.D.)
+  7.  Length,
+  8.  Width,
+  9.  Height,
+  10. Oversized (defined if oversized), and
+  11. COD (defined if C.O.D.)
 
 =over 4
 
@@ -289,11 +311,12 @@ Can be one of the following:
 
 =head1 ARGUMENTS for UPStrack()
 
-The tracking number.
+The tracking number. Dies on error (use eval to catch).
 
   use Business::UPS;
-  %t = UPStrack("1ZX29W290250xxxxxx");
-  print "This package is $track{'Current Status'}\n";
+  my %t = eval { UPStrack("1ZX29W290250xxxxxx") };
+  die "ERROR: $@" if $@;
+  print "This package is $t{'Current Status'}\n";
 
 =head1 RETURN VALUES
 
@@ -318,19 +341,19 @@ The tracking number.
 	  10. Total Cost:	7.75
 
 =item UPStrack()
-	
-The hash that's returned is like the following:
 
-  'Last Updated' 	=> 'Jun 10 2003 12:28 P.M.'
-  'Shipped On'		=> 'June 9, 2003'
-  'Signed By'		=> 'SIGNATURE'
-  'Shipped To'		=> 'LOS ANGELES,CA,US'
-  'Scanning'		=> HASH(0x146e0c) (more later...)
-  'Activity Count'	=> 5
-  'Weight'		=> '16.00 Lbs'
-  'Current Status'	=> 'Delivered'
-  'Location'		=> 'RESIDENTIAL'
-  'Service Type'	=> 'STANDARD'
+The hash that's returned contains the following keys:
+
+  'Current Status'  => 'Delivered'         # or 'In Transit'
+  'Service Type'    => 'UPS Ground'
+  'Weight'          => '5.00 LBS'
+  'Shipped To'      => 'ANYTOWN, CA, US'
+  'Delivery Date'   => 'Wednesday, 01/14/2026'
+  'Signed By'       => 'SMITH'             # if delivered
+  'Location'        => 'Front Door'        # if delivered
+  'Activity Count'  => 3
+  'Scanning'        => HASH(0x...)         # see below
+  'Notice'          => 'UPS authorizes...'
 
 Notice the key 'Scanning' is a reference to a hash.
 (Which is a reference to another hash.)
@@ -340,17 +363,17 @@ Each of those values is another hash, holding a reference to
 an activity that's happened to an item.  (See example for
 details)
 
-  %hash{Scanning}{1}{'location'} = 'MESQUITE,TX,US';
-  %hash{Scanning}{1}{'date'} = 'Jun 10, 2003';
-  %hash{Scanning}{1}{'time'} = '12:55 A.M.';
-  %hash{Scanning}{1}{'activity'} = 'ARRIVAL SCAN';
-  %hash{Scanning}{2}{'location'} = 'MESQUITE,TX,US';
-  .
-  .
-  .
-  %hash{Scanning}{x}{'activity'} = 'DELIVERED';
+  $hash{Scanning}{1}{'location'} = 'ANYTOWN, CA, US';
+  $hash{Scanning}{1}{'date'} = 'January 14, 2026';
+  $hash{Scanning}{1}{'time'} = '11:57 A.M.';
+  $hash{Scanning}{1}{'activity'} = 'Delivered';
+  $hash{Scanning}{2}{'location'} = 'ANYTOWN, CA, US';
+  ...
 
 NOTE: The items generally go in reverse chronological order.
+
+Dies on error (HTTP failure, invalid JSON, missing tracking data).
+Use eval {} to catch errors.
 
 =back
 
@@ -360,7 +383,7 @@ NOTE: The items generally go in reverse chronological order.
 
 =item getUPS()
 
-To retreive the shipping of a 'Ground Commercial' Package 
+To retrieve the shipping of a 'Ground Commercial' Package
 weighing 25lbs. sent from 23001 to 24002 this package would 
 be called like this:
 
@@ -378,44 +401,48 @@ be called like this:
 
   use Business::UPS;
 
-  %t = UPStrack("z10192ixj29j39");
-  $t{error} and die "ERROR: $t{error}";
-	
-  print "This package is $t{'Current Status'}\n"; # 'Delivered' or 
-						  # 'In-transit'
+  my %t = eval { UPStrack("1Z12345E0205271688") };
+  die "ERROR: $@" if $@;
+
+  print "This package is $t{'Current Status'}\n"; # 'Delivered' or
+                                                  # 'In Transit'
   print "More info:\n";
-  foreach $key (keys %t) {
+  foreach my $key (keys %t) {
     print "KEY: $key = $t{$key}\n";
   }
 
-  %activities = %{$t{'Scanning'}};
+  my %activities = %{$t{'Scanning'}};
 
   print "Package activity:\n";
   for (my $num = $t{'Activity Count'}; $num > 0; $num--)
   {
-  	print "-- ITEM $num --\n";
-	foreach $newkey (keys %{$activities{$num}})
-	{
-		print "$newkey: $activities{$num}{$newkey}\n";
-	}
+    print "-- ITEM $num --\n";
+    foreach my $newkey (keys %{$activities{$num}})
+    {
+      print "$newkey: $activities{$num}{$newkey}\n";
+    }
   }
 
 =back
 
 =head1 BUGS
 
-Probably lots.  Contact me if you find them.
+Please report bugs via the GitHub issue tracker at
+L<https://github.com/cpan-authors/Business-UPS/issues>.
 
 =head1 AUTHOR
 
 Justin Wheeler <upsmodule@datademons.com>
 
-mailto:upsmodule@datademons.com
-
-This software was originally written by Mark Solomon <mailto:msoloman@seva.net> (http://www.seva.net/~msolomon/)
+Originally written by Mark Solomon.
 
 NOTE: UPS is a registered trademark of United Parcel Service.  Due to UPS licensing, using this software is not
 be endorsed by UPS, and may not be allowed.  Use at your own risk.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.  See L<perlartistic> and L<perlgpl>.
 
 =head1 SEE ALSO
 

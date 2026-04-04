@@ -15,7 +15,7 @@ use Carp;
 require POSIX;
 
 our @ISA        = qw(IO::Handle);
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 our ( $CONFIG, $DEBUG );
 
 eval { local $^W = 0; local $SIG{__DIE__}; require IO::Stty };
@@ -115,7 +115,7 @@ IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 =head1 VERSION
 
-1.26
+1.27
 
 =head1 SYNOPSIS
 

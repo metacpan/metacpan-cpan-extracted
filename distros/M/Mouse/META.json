@@ -82,7 +82,7 @@
    "provides" : {
       "Mouse" : {
          "file" : "lib/Mouse.pm",
-         "version" : "v2.6.1"
+         "version" : "v2.6.2"
       },
       "Mouse::Exporter" : {
          "file" : "lib/Mouse/Exporter.pm"
@@ -118,7 +118,7 @@
          "file" : "lib/Mouse/Meta/Role/Application.pm"
       },
       "Mouse::Meta::Role::Application::RoleSummation" : {
-         "file" : "lib/Mouse/Meta/Role/Composite.pm"
+         "file" : "lib/Mouse/Tiny.pm"
       },
       "Mouse::Meta::Role::Composite" : {
          "file" : "lib/Mouse/Meta/Role/Composite.pm"
@@ -137,10 +137,14 @@
       },
       "Mouse::Role" : {
          "file" : "lib/Mouse/Role.pm",
-         "version" : "v2.6.1"
+         "version" : "v2.6.2"
       },
       "Mouse::Spec" : {
          "file" : "lib/Mouse/Spec.pm",
+         "version" : "v2.6.2"
+      },
+      "Mouse::Tiny" : {
+         "file" : "lib/Mouse/Tiny.pm",
          "version" : "v2.6.1"
       },
       "Mouse::TypeRegistry" : {
@@ -148,7 +152,7 @@
       },
       "Mouse::Util" : {
          "file" : "lib/Mouse/Util.pm",
-         "version" : "v2.6.1"
+         "version" : "v2.6.2"
       },
       "Mouse::Util::MetaRole" : {
          "file" : "lib/Mouse/Util/MetaRole.pm"
@@ -181,7 +185,7 @@
          "web" : "https://github.com/xslate/p5-Mouse"
       }
    },
-   "version" : "v2.6.1",
+   "version" : "v2.6.2",
    "x_contributors" : [
       "Aleksandr Matveev <a.matveev@corp.mail.ru>",
       "Alex Solovey <a.solovey@gmail.com>",
@@ -240,6 +244,6 @@
       "Ævar Arnfjörð Bjarmason <avarab@gmail.com>",
       "大沢 和宏 <yappo@shibuya.pl>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 0
 }

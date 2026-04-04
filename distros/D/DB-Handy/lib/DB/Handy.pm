@@ -45,7 +45,7 @@ use File::Spec;
 use POSIX ();
 
 use vars qw($VERSION $errstr);
-$VERSION = '1.07';
+$VERSION = '1.08';
 $VERSION = $VERSION;
 $errstr  = '';
 

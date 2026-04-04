@@ -1,0 +1,15 @@
+^\.github/
+^\.git/
+^MYMETA\.
+^MANIFEST\.bak$
+^\.gitignore$
+^\.perltidyrc$
+^Makefile$
+^blib/
+^pm_to_blib$
+^.*\.bs$
+^xt/
+^CLAUDE\.md$
+^README\.md$
+^Business-UPS-
+^cpanfile$

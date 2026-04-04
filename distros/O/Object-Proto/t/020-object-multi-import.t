@@ -41,7 +41,8 @@ use Object::Proto;
 # Basic multi-object access
 # ============================================
 
-subtest 'basic multi-object creation and access' => sub {
+# basic multi-object creation and access
+{
     my $person = new Person 'Alice', 30, 'alice@example.com';
     my $address = new Address '123 Main St', 'Springfield', '12345', 'USA';
 
@@ -53,9 +54,9 @@ subtest 'basic multi-object creation and access' => sub {
     is(city($address), 'Springfield', 'Address city accessor');
     is(zipcode($address), '12345', 'Address zipcode accessor');
     is(country($address), 'USA', 'Address country accessor');
-};
-
-subtest 'aliased accessors for conflicting names' => sub {
+}
+# aliased accessors for conflicting names
+{
     # Product has 'name' which conflicts with Person's 'name'
     my $product = new Product 'SKU001', 'Widget', 9.99, 100;
 
@@ -63,22 +64,22 @@ subtest 'aliased accessors for conflicting names' => sub {
     is(product_sku($product), 'SKU001', 'Product SKU accessor');
     is(price($product), 9.99, 'Product price accessor');
     is(qty($product), 100, 'Product quantity via aliased accessor');
-};
-
-subtest 'order accessors with aliases' => sub {
+}
+# order accessors with aliases
+{
     my $order = new Order 'ORD-123', 'Bob Smith', 150.00, 'pending';
 
     is(order_id($order), 'ORD-123', 'Order id via alias');
     is(customer($order), 'Bob Smith', 'Order customer via alias');
     is(order_total($order), 150.00, 'Order total via alias');
     is(order_status($order), 'pending', 'Order status via alias');
-};
-
+}
 # ============================================
 # Setters with multiple imports
 # ============================================
 
-subtest 'setters work across multiple objects' => sub {
+# setters work across multiple objects
+{
     my $person = new Person 'Charlie', 25, 'charlie@test.com';
     my $address = new Address '456 Oak Ave', 'Shelbyville', '67890', 'USA';
 
@@ -94,9 +95,9 @@ subtest 'setters work across multiple objects' => sub {
 
     is(city($address), 'Capital City', 'Address city updated');
     is(zipcode($address), '99999', 'Address zipcode updated');
-};
-
-subtest 'aliased setters work correctly' => sub {
+}
+# aliased setters work correctly
+{
     my $product = new Product 'SKU002', 'Gadget', 19.99, 50;
 
     product_name($product, 'Super Gadget');
@@ -110,13 +111,13 @@ subtest 'aliased setters work correctly' => sub {
     # Verify method accessors also see the updates
     is($product->name, 'Super Gadget', 'Method accessor sees alias update');
     is($product->quantity, 75, 'Method accessor sees alias update');
-};
-
+}
 # ============================================
 # Multiple objects in loops
 # ============================================
 
-subtest 'iterate multiple persons with function accessors' => sub {
+# iterate multiple persons with function accessors
+{
     my @people = (
         new Person('Alice', 30, 'alice@test.com'),
         new Person('Bob', 25, 'bob@test.com'),
@@ -132,9 +133,9 @@ subtest 'iterate multiple persons with function accessors' => sub {
     # Filter by age
     my @adults = grep { age($_) >= 30 } @people;
     is(scalar(@adults), 2, 'grep filtered adults');
-};
-
-subtest 'iterate mixed object types' => sub {
+}
+# iterate mixed object types
+{
     my @items = (
         new Person('Alice', 30, 'alice@test.com'),
         new Address('123 Main', 'City', '12345', 'USA'),
@@ -151,13 +152,13 @@ subtest 'iterate mixed object types' => sub {
     }
 
     is_deeply(\@results, ['Person: Alice', 'Address: City'], 'mixed type iteration');
-};
-
+}
 # ============================================
 # Complex workflows with multiple objects
 # ============================================
 
-subtest 'e-commerce workflow with multiple objects' => sub {
+# e-commerce workflow with multiple objects
+{
     # Create customer
     my $customer = new Person 'Dave', 40, 'dave@shop.com';
 
@@ -186,9 +187,9 @@ subtest 'e-commerce workflow with multiple objects' => sub {
     # Update order status
     order_status($order, 'shipped');
     is(order_status($order), 'shipped', 'Order status updated');
-};
-
-subtest 'config management with function accessors' => sub {
+}
+# config management with function accessors
+{
     my $dev_config = new Config 'localhost', 3000, 30, 1;
     my $prod_config = new Config 'api.example.com', 443, 60, 0;
 
@@ -206,13 +207,13 @@ subtest 'config management with function accessors' => sub {
 
     is(timeout($dev_config), 120, 'dev timeout updated');
     is(timeout($prod_config), 90, 'prod timeout updated');
-};
-
+}
 # ============================================
 # Simultaneous access to same-named properties
 # ============================================
 
-subtest 'same property name different objects' => sub {
+# same property name different objects
+{
     # Both Person and Product have 'name', but Product is aliased
     my $person = new Person 'Eve', 28, 'eve@test.com';
     my $product = new Product 'SKU-X', 'Thingamajig', 15.00, 10;
@@ -226,13 +227,13 @@ subtest 'same property name different objects' => sub {
     # Both objects unchanged by accessing the other
     is(name($person), 'Eve', 'Person name still correct');
     is(product_name($product), 'Thingamajig', 'Product name still correct');
-};
-
+}
 # ============================================
 # Nested data structures with objects
 # ============================================
 
-subtest 'array of objects with function accessors' => sub {
+# array of objects with function accessors
+{
     my @addresses = (
         new Address('111 First St', 'Town A', '11111', 'USA'),
         new Address('222 Second St', 'Town B', '22222', 'USA'),
@@ -246,9 +247,9 @@ subtest 'array of objects with function accessors' => sub {
     # Find address by zipcode
     my ($found) = grep { zipcode($_) eq '22222' } @addresses;
     is(street($found), '222 Second St', 'found address by zipcode');
-};
-
-subtest 'hash of objects' => sub {
+}
+# hash of objects
+{
     my %configs = (
         dev  => new Config('localhost', 3000, 30, 1),
         test => new Config('test.example.com', 8080, 45, 1),
@@ -262,13 +263,13 @@ subtest 'hash of objects' => sub {
     # Update via hash access
     debug($configs{prod}, 1);  # Enable debug in prod (oops!)
     is(debug($configs{prod}), 1, 'updated via hash access');
-};
-
+}
 # ============================================
 # Object transformation pipelines
 # ============================================
 
-subtest 'transform objects in pipeline' => sub {
+# transform objects in pipeline
+{
     my @people = (
         new Person('alice', 30, 'alice@test.com'),
         new Person('bob', 25, 'bob@test.com'),
@@ -293,9 +294,9 @@ subtest 'transform objects in pipeline' => sub {
     is(age($people[0]), 31, 'first age incremented');
     is(age($people[1]), 26, 'second age incremented');
     is(age($people[2]), 36, 'third age incremented');
-};
-
-subtest 'filter and transform products' => sub {
+}
+# filter and transform products
+{
     my @products = (
         new Product('SKU-1', 'Cheap Item', 5.00, 100),
         new Product('SKU-2', 'Mid Item', 25.00, 50),
@@ -324,13 +325,13 @@ subtest 'filter and transform products' => sub {
         $total_value += price($p) * qty($p);
     }
     ok($total_value > 0, "total inventory value: $total_value");
-};
-
+}
 # ============================================
 # Verify no cross-contamination
 # ============================================
 
-subtest 'objects remain independent' => sub {
+# objects remain independent
+{
     my $p1 = new Person 'Person One', 20, 'p1@test.com';
     my $p2 = new Person 'Person Two', 30, 'p2@test.com';
     my $a1 = new Address 'Addr One', 'City One', '10000', 'Country One';
@@ -351,6 +352,5 @@ subtest 'objects remain independent' => sub {
     is(name($p1), 'Modified One', 'p1 name still modified');
     is(name($p2), 'Person Two', 'p2 name still unchanged');
     is(city($a2), 'City Two', 'a2 city unchanged');
-};
-
+}
 done_testing();

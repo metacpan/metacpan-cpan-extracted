@@ -10,7 +10,8 @@
 
 package Razor2::Client::Config;
 use strict;
-use Data::Dumper;
+use warnings;
+use Fcntl qw(:flock);
 use File::Copy;
 use File::Spec;
 
@@ -92,9 +93,8 @@ sub read_conf {
     # insert things that should not be in conf here
     #
 
-    # turn off run-time warnings unless debug flag passed
-    # http://www.perldoc.com/perl5.6.1/pod/perllexwarn.html
-    $^W = 0 unless $conf->{debug};
+    # Warnings are now controlled by the `use warnings` pragma per-module.
+    # The old `$^W = 0` global suppression has been removed.
 
     # add full path to all config values that need them
     #
@@ -218,7 +218,7 @@ sub find_home {
     }
 
     if ( defined $self->{opt}->{razorhome} ) {
-        $self->{razorhome_computed} = $self->{razorhome};
+        $self->{razorhome_computed} = $self->{opt}->{razorhome};
         return 1;
     }
 
@@ -401,20 +401,25 @@ sub save_ident {
 sub my_readlink {
     my ( $self, $fn ) = @_;
 
-    while (1) {
+    my $max_depth = 20;
+    while ( $max_depth-- > 0 ) {
         return $fn unless -l $fn;
 
         if ( $fn =~ /^(.*)\/([^\/]+)$/ ) {
             my $dir = $1;
             $fn = readlink $fn;
+            return unless defined $fn;               # broken symlink
             $fn = $1 if $fn =~ /^(\S+)$/;           # untaint readlink
-            $fn = "$dir/$fn" unless $fn =~ /^\//;
+            $fn = "$dir/$fn" unless $fn =~ /^\// || $fn =~ /^[A-Za-z]:/;
         }
         else {
             $fn = readlink $fn;
+            return unless defined $fn;               # broken symlink
             $fn = $1 if $fn =~ /^(\S+)$/;           # untaint readlink
         }
     }
+    $self->log( 1, "my_readlink: too many symlink levels for $fn" );
+    return $fn;
 }
 
 sub parse_value {
@@ -461,15 +466,15 @@ sub read_file {
 
     my $total = 0;
     my @lines;
-    unless ( open CONF, "<$fn" ) {
+    open( my $conf_fh, '<', $fn ) or do {
         $self->log( 5, "Can't read file $fn: $!" );
         return;
-    }
+    };
 
     # set $/ to the default in case someone has overwritten $/ elsewhere
     local $/ = "\n";
 
-    for (<CONF>) {
+    for (<$conf_fh>) {
         chomp;
         next if /^\s*#/;
         if ($nothash) {
@@ -485,7 +490,7 @@ sub read_file {
         }
         $total++;
     }
-    close CONF;
+    close $conf_fh;
     $self->log( 5, "read_file: $total items read from $fn" );
 
     return $nothash ? \@lines : $conf;
@@ -502,7 +507,7 @@ sub write_file {
     my ( $self, $fn, $hash, $append, $header, $lock ) = @_;
 
     $fn = "$self->{razorhome}/$fn" unless ( $fn =~ /^\// );
-    $fn = ">$fn" if $append;
+    my $open_mode = $append ? '>>' : '>';
 
     if ( $^O eq 'VMS' && $fn !~ /\[/ ) {
         my ( $dir, $file, $ext ) = ( $fn =~ /(^.*\/)(.*)(\..*)$/ );
@@ -513,34 +518,34 @@ sub write_file {
 
     $fn = $1 if $fn =~ /^(\S+)$/;    # untaint $fn
 
-    # check for lock file
+    # file-based locking using flock to avoid race conditions
     my $lockfile = "$fn.lock";
     $lockfile = "${fn}_lock;1" if $^O eq 'VMS';
+    my $lock_fh;
     if ($lock) {
-        if ( -r "$lockfile" ) {
+        open( $lock_fh, '>', $lockfile ) or do {
+            return $self->error("Can't create lock file $lockfile: $!");
+        };
+        flock( $lock_fh, LOCK_EX | LOCK_NB ) or do {
+            close $lock_fh;
             return $self->error("File is locked, try again later: $lockfile");
-        }
-        else {
-            unless ( open LOCK, ">$fn.lock" ) {
-                return $self->error("Can't create lock file $fn.lock: $!");
-            }
-            close LOCK;
-        }
+        };
     }
-    unless ( open CONF, ">$fn" ) {
+    open( my $conf_fh, $open_mode, $fn ) or do {
+        if ($lock_fh) { flock( $lock_fh, LOCK_UN ); close $lock_fh; unlink $lockfile; }
         return $self->error("Can't write file $fn: $!");
-    }
-    print CONF "$header\n" if $header;
+    };
+    print $conf_fh "$header\n" if $header;
     my $total = 0;
     if ( ref($hash) eq 'HASH' ) {
         foreach ( sort keys %$hash ) {
             return $self->error("Key cannot contain '=': $_") if /=/;
-            printf CONF "%-22s = ", $_;
+            printf $conf_fh "%-22s = ", $_;
             if ( ref( $hash->{$_} ) eq "ARRAY" ) {
-                print CONF join( ',', @{ $hash->{$_} } ) . "\n";
+                print $conf_fh join( ',', @{ $hash->{$_} } ) . "\n";
             }
             else {
-                print CONF $hash->{$_} . "\n";
+                print $conf_fh $hash->{$_} . "\n";
             }
             $total++;
         }
@@ -550,21 +555,23 @@ sub write_file {
         foreach (@$hash) {
             next unless /\S/;
             if ( ref($_) eq "ARRAY" ) {
-                print CONF join( ', ', @$_ ) . "\n";
+                print $conf_fh join( ', ', @$_ ) . "\n";
             }
             else {
-                print CONF $_ . "\n";
+                print $conf_fh $_ . "\n";
             }
             $total++;
         }
     }
     elsif ( ref($hash) eq 'SCALAR' ) {
-        printf CONF $$hash;
+        printf $conf_fh $$hash;
         $total++;
     }
-    close CONF;
-    if ($lock) {
-        1 while unlink "$lockfile";
+    close $conf_fh;
+    if ($lock_fh) {
+        flock( $lock_fh, LOCK_UN );
+        close $lock_fh;
+        unlink $lockfile;
     }
     $self->log( 5, "wrote $total " . ref($hash) . " items to file: $fn" );
 
@@ -629,4 +636,150 @@ sub default_agent_conf {
 }
 
 1;
+
+=head1 NAME
+
+Razor2::Client::Config - Configuration management for Vipul's Razor
+
+=head1 SYNOPSIS
+
+    # Typically used via Razor2::Client::Agent, not directly
+    use Razor2::Client::Agent;
+
+    my $agent = Razor2::Client::Agent->new('razor-check');
+    $agent->read_options() or die $agent->errstr;
+    $agent->do_conf()      or die $agent->errstr;
+
+    # Access configuration values
+    my $debuglevel = $agent->{conf}{debuglevel};
+
+=head1 DESCRIPTION
+
+Razor2::Client::Config handles all configuration file and identity
+management for the Razor2 client.  It reads and writes the
+F<razor-agent.conf> configuration file, resolves the razorhome directory,
+and manages user identity files used for authentication with Razor servers.
+
+This module is a parent class of L<Razor2::Client::Agent> and is not
+typically instantiated directly.
+
+=head1 METHODS
+
+=over 4
+
+=item B<read_conf($params)>
+
+Reads the Razor configuration.  Resolves which config file to use
+(command-line override, user home, or system default), merges defaults
+with file values and command-line options, and stores the result in
+C<< $self->{conf} >>.
+
+C<$params> is an optional hash reference of additional overrides.
+
+Returns the configuration hash reference on success.
+
+=item B<compute_razorconf()>
+
+Determines the path to the F<razor-agent.conf> file.  Checks the user's
+razorhome first (F<~/.razor/razor-agent.conf>), then the system default
+(F</etc/razor/razor-agent.conf>).  Sets C<< $self->{razorconf} >> and
+C<< $self->{computed_razorconf} >>.
+
+=item B<write_conf($hash)>
+
+Writes configuration to the F<razor-agent.conf> file.  If C<$hash> is not
+provided, reads the current file and merges with defaults.
+
+=item B<find_home($rhome)>
+
+Resolves the razorhome directory.  Search order: command-line C<-home>
+option, C<razorhome> from config file, C<$HOME/.razor/>, config file
+directory.  Sets C<< $self->{razorhome} >>.
+
+On VMS, uses C<_razor> instead of C<.razor>.
+
+=item B<create_home($rhome)>
+
+Creates the razorhome directory at C<$rhome> with mode 0755.
+
+=item B<compute_identity()>
+
+Resolves the identity file path from command-line options, configuration,
+or the default (F<E<lt>razorhomeE<gt>/identity>).  Follows symlinks.
+
+=item B<get_ident()>
+
+Reads and returns the identity file as a hash reference with C<user> and
+C<pass> keys.  Warns if the file is world-readable.
+
+=item B<save_ident($ident)>
+
+Writes an identity hash (C<user>, C<pass>) to disk with mode 0600.
+Creates a symlink from F<identity> to the user-specific file unless
+C<-i> was specified.  Falls back to file copy on systems without symlink
+support.
+
+Returns the identity file path on success.
+
+=item B<read_file($filename, $defaults, $nothash)>
+
+General-purpose config file reader.  In hash mode (default), parses
+C<key = value> lines into a hash reference, skipping comments.  In
+array mode (C<$nothash> true), returns an array reference of lines.
+
+C<$defaults> provides initial values that file contents override.
+
+=item B<write_file($filename, $data, $append, $header, $lock)>
+
+Writes data to a file.  Accepts a hash reference (written as C<key = value>),
+array reference (one item per line), or scalar reference (raw content).
+Supports append mode, a header string, and advisory file locking via
+L<flock(2)>.
+
+=item B<default_agent_conf()>
+
+Returns a hash reference of default agent configuration values.
+
+=item B<default_server_conf()>
+
+Returns a hash reference of default per-server configuration values.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F</etc/razor/razor-agent.conf>
+
+System-wide configuration file.
+
+=item F<~/.razor/razor-agent.conf>
+
+Per-user configuration file (takes precedence over system config).
+
+=item F<~/.razor/identity>
+
+Symlink to the active identity file.
+
+=item F<~/.razor/identity-E<lt>userE<gt>>
+
+Identity file containing credentials for a registered user.
+
+=back
+
+=head1 SEE ALSO
+
+L<razor-agent.conf(5)>, L<Razor2::Client::Agent>, L<Razor2::Client::Core>
+
+=head1 AUTHORS
+
+Vipul Ved Prakash, E<lt>mail@vipul.netE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
