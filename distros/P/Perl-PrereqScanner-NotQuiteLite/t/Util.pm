@@ -18,7 +18,7 @@ our $EVAL;
 our $PARSERS;
 
 sub todo_test {
-  SKIP: {
+  TODO: {
     local $TODO = "FIXME";
     test(@_);
   }

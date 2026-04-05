@@ -1,6 +1,11 @@
 # ChangeLog for Pod::Simple dist
 #---------------------------------------------------------------------------
-3.47 2025-05-xx Karl Williamson <khw@cpan.org>
+3.48 2026-
+	- Add sections to manpage URLs  Peter Oliver++
+	- Better fallback when no HTML::Entities  Tomasz Konojacki++
+	- Don't call each on an anonymous hash  Niko Tyni++
+	- Fix encoding of Unicode URL fragments  Graham Knop++
+3.47 2025-05-15 Karl Williamson <khw@cpan.org>
 	- No git-related files in MANIFEST  James Keenan++
 	- Rename method and field to avoid conflicts  Graham Knop++
 3.46 2025-05-12 Karl Williamson <khw@cpan.org>

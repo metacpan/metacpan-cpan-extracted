@@ -1,6 +1,6 @@
 package Langertha::Engine::AnthropicBase;
 # ABSTRACT: Base class for Anthropic-compatible engines
-our $VERSION = '0.307';
+our $VERSION = '0.308';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -353,7 +353,7 @@ Langertha::Engine::AnthropicBase - Base class for Anthropic-compatible engines
 
 =head1 VERSION
 
-version 0.307
+version 0.308
 
 =head1 SYNOPSIS
 

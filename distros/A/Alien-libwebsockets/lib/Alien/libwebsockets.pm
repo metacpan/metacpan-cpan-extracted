@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub has_extensions {
     my ($class) = @_;
@@ -55,8 +55,9 @@ Alien::libwebsockets - Find or build libwebsockets C library
 This module provides the libwebsockets C library. It will either
 use the system library if available, or download and build it from source.
 
-When built from source, libwebsockets is configured with libev, SSL,
-zlib, and permessage-deflate extension support.
+When built from source, libwebsockets is configured with SSL, zlib,
+and permessage-deflate extension support. Libev support is enabled
+automatically if C<libev> development headers are available.
 
 =head1 METHODS
 

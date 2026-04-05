@@ -1,5 +1,8 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9918 2026/04/05
+  - Support builtin, experimental, native class and Feature::Compat::Class
+
 0.9917 2023/04/27
   - Update Object::Pad support (:isa/:does)
 

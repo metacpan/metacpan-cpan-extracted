@@ -31,21 +31,14 @@ EV::Websockets::_set_debug(1) if $ENV{EV_WS_DEBUG};
     );
 
     my $msg_count = 0;
-    my $t = EV::timer(0.1, 0, sub {
-        $keep{cli} = $ctx->connect(
-            url => "ws://127.0.0.1:$port",
-            on_connect => sub { },
-            on_message => sub {
-                $msg_count++;
-            },
-            on_drain => sub { },
-            on_close => sub {
-                delete $keep{cli};
-                my $t; $t = EV::timer(0.3, 0, sub { undef $t; EV::break });
-            },
-            on_error => sub { delete $keep{cli}; EV::break },
-        );
-    });
+    $keep{cli} = $ctx->connect(
+        url => "ws://127.0.0.1:$port",
+        on_connect => sub { },
+        on_message => sub { $msg_count++ },
+        on_drain => sub { },
+        on_close => sub { delete $keep{cli}; EV::break },
+        on_error => sub { delete $keep{cli}; EV::break },
+    );
 
     # Give drain time to fire, then close
     my $closer; $closer = EV::timer(2, 0, sub {

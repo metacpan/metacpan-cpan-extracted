@@ -1,5 +1,8 @@
 Revision history for Object-Proto-Sugar
 
+0.02	2026-04-04
+	- Add support for defining "has" attributes as arrayref
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

@@ -106,19 +106,21 @@ ok(eval { XS::JIT::Builder::inline_init(); 1 }, 'inline_init works');
         },
     );
     
-    # Register inline ops
+    # Register inline ops (requires Perl 5.14+ for cv_set_call_checker)
     my $cv_name = \&InlineTest::iname;
     my $cv_age  = \&InlineTest::iage;
     
-    main::ok(XS::JIT::Builder::inline_register($cv_name, INLINE_GETTER, 0), 
+    main::ok(XS::JIT::Builder::inline_register($cv_name, INLINE_GETTER, 0) || $] < 5.014, 
        'inline_register for getter returns true');
-    main::ok(XS::JIT::Builder::inline_register($cv_age, INLINE_SETTER, 1),
+    main::ok(XS::JIT::Builder::inline_register($cv_age, INLINE_SETTER, 1) || $] < 5.014,
        'inline_register for setter returns true');
     
-    main::is(XS::JIT::Builder::inline_get_type($cv_name), INLINE_GETTER,
-       'inline_get_type returns INLINE_GETTER');
-    main::is(XS::JIT::Builder::inline_get_type($cv_age), INLINE_SETTER,
-       'inline_get_type returns INLINE_SETTER');
+    my $expected_getter = $] < 5.014 ? INLINE_NONE : INLINE_GETTER;
+    my $expected_setter = $] < 5.014 ? INLINE_NONE : INLINE_SETTER;
+    main::is(XS::JIT::Builder::inline_get_type($cv_name), $expected_getter,
+       'inline_get_type returns expected type for getter');
+    main::is(XS::JIT::Builder::inline_get_type($cv_age), $expected_setter,
+       'inline_get_type returns expected type for setter');
     
     sub new {
         my $class = shift;

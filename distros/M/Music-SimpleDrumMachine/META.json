@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/Music-SimpleDrumMachine"
       }
    },
-   "version" : "0.0100",
+   "version" : "0.0204",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

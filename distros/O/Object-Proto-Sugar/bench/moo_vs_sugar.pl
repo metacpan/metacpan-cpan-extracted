@@ -84,6 +84,8 @@ use Benchmark qw(:all);
 	has breed => ( is => 'rw', accessor => 1 );
 }
 
+package main;
+
 # Import function-style accessors into main
 Dog::SugarFn->import_accessors;   # imports: name, sound, age, breed
 

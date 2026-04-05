@@ -12,6 +12,7 @@ WriteMakefile(
     META_MERGE => {
         resources => {
             repository => 'https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite',
+            bugtracker => 'https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite/issues',
         },
     },
     test => {TESTS => "t/*.t t/*/*.t t/*/*/*.t"},

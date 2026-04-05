@@ -3,11 +3,10 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0100';
+our $VERSION = '0.0204';
 
 use v5.36;
 use feature 'try';
-no warnings 'experimental::try';
 
 use Moo;
 use strictures 2;
@@ -18,6 +17,15 @@ use IO::Async::Timer::Periodic ();
 use MIDI::RtMidi::FFI::Device ();
 use Music::Duration::Partition ();
 use namespace::clean;
+
+no warnings 'experimental::try';
+
+
+has add_drums => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not an array-ref" unless ref($_[0]) eq 'ARRAY' },
+    default => sub { [] },
+);
 
 
 has beats => (
@@ -60,16 +68,17 @@ sub _build_drums {
         kick  => { num => 36, chan => $self->chan < 0 ? 0 : $self->chan, pat => [] },
         snare => { num => 38, chan => $self->chan < 0 ? 1 : $self->chan, pat => [] },
         hihat => { num => 42, chan => $self->chan < 0 ? 2 : $self->chan, pat => [] },
-        crash => { num => 49, chan => $self->chan < 0 ? 3 : $self->chan, pat => [] },
+        open  => { num => 46, chan => $self->chan < 0 ? 3 : $self->chan, pat => [] },
+        crash => { num => 49, chan => $self->chan < 0 ? 4 : $self->chan, pat => [] },
     };
     return $drums;
 }
 
 
-has fill_part => (
-    is      => 'ro',
-    isa     => sub { croak "$_[0] is not an code-ref" unless ref($_[0]) eq 'CODE' },
-    default => sub { \&_default_part },
+has filling => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 1 },
 );
 
 
@@ -80,7 +89,7 @@ has next_part => (
 
 
 has notes => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => sub { croak "$_[0] is not an array-ref" unless ref($_[0]) eq 'ARRAY' },
     default => sub { [qw(60 64 67)] },
 );
@@ -93,8 +102,9 @@ has parts => (
 
 
 has port_name => (
-    is      => 'ro',
-    default => sub { 'usb' },
+    is       => 'ro',
+    default  => sub { 'usb' },
+    required => 1,
 );
 
 
@@ -102,6 +112,13 @@ has ppqn => (
     is      => 'ro',
     isa     => sub { croak "$_[0] is not an integer" unless $_[0] =~ /^\d+$/ },
     default => sub { 24 },
+);
+
+
+has prefill_part => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not an code-ref" unless ref($_[0]) eq 'CODE' },
+    default => sub { \&_default_part },
 );
 
 
@@ -120,7 +137,6 @@ has _midi_out => (
     is      => 'lazy',
     builder => '_build__midi_out',
 );
-
 sub _build__midi_out {
     my ($self) = @_;
     my $midi_out = RtMidiOut->new;
@@ -137,7 +153,6 @@ has _interval => (
     is      => 'lazy',
     builder => '_build__interval',
 );
-
 sub _build__interval {
     my ($self) = @_;
     return 60 / $self->bpm / $self->ppqn;
@@ -147,7 +162,6 @@ has _nth => ( # clocks per 16th-note
     is      => 'lazy',
     builder => '_build__nth',
 );
-
 sub _build__nth {
     my ($self) = @_;
     return $self->ppqn / $self->divisions;
@@ -159,14 +173,13 @@ my %attrs = (
         _ticks      => 0, # how many clock ticks?
         _beat_count => 0, # how many beats?
         _bar_count  => 0, # how many measures?
-        _toggle     => 0, # part A, B, C, ...?
         _hats       => 0, # 1st hihat beat bit
         _trigger    => 0, # trigger a fill
         _filled     => 0, # we just filled
     },
 );
-for my $is ( keys %attrs ) {
-    for my $attr ( keys $attrs{$is}->%* ) {
+for my $is (keys %attrs) {
+    for my $attr (keys $attrs{$is}->%*) {
         has $attr => (
             is      => $is,
             default => sub { $attrs{$is}{$attr} },
@@ -184,16 +197,23 @@ sub BUILD {
     my ($self, $args) = @_;
 
     $SIG{INT} = sub {
-        say "\nStop";
+        say "\nStop" if $self->verbose;
         try {
-            $self->_midi_out->panic;
             $self->_midi_out->stop;
+            $self->_midi_out->panic;
         }
         catch ($e) {
             warn "Can't halt the MIDI out device: $e\n";
         }
         exit;
     };
+
+    # any drums to add?
+    my $n = keys $self->drums->%*;
+    for my $drum ($args->{add_drums}->@*) {
+        my $chan = defined $drum->{chan} ? $drum->{chan} : $self->chan < 0 ? $n++ : $self->chan;
+        $self->drums->{ $drum->{drum} } = { num  => $drum->{num}, chan => $chan, pat  => [] };
+    }
 
     my $timer = IO::Async::Timer::Periodic->new(
         interval => $self->_interval,
@@ -257,10 +277,11 @@ sub _adjust_cymbals($self) {
 }
 
 sub _adjust_drums($self, $fill_flag) {
-    if ($fill_flag) {
+    say 'Beats: ' . $self->_beat_count if $self->verbose;
+    if ($self->filling && $fill_flag) {
         say 'fill' if $self->verbose;
         my $size = rand() < 0.5 ? $self->divisions / 2 : $self->divisions;
-        say "S: $size" if $self->verbose;
+        say "size: $size" if $self->verbose;
         my %durations = (
             sn => [1],
             en => [1,0],
@@ -276,15 +297,25 @@ sub _adjust_drums($self, $fill_flag) {
         my @converted = map { $durations{$_}->@* } @$motif;
         if ($size < $self->divisions) {
             my $div = $self->beats / $size;
-            my ($next, $pats) = $self->fill_part->();
-            $self->drums->{hihat}{pat} = [ $pats->{hihat}->@[0 .. $div - 1], (0) x $div ];
-            $self->drums->{kick}{pat}  = [ $pats->{kick}->@[0 .. $div - 1],  (0) x $div ];
-            $self->drums->{snare}{pat} = [ $pats->{snare}->@[0 .. $div - 1], @converted[0 .. $div - 1] ]
+            my ($next, $pats) = $self->prefill_part->();
+            for my $drum (keys $self->drums->%*) {
+                if ($drum eq 'snare') {
+                    $self->drums->{$drum}{pat} = [ $pats->{$drum}->@[0 .. $div - 1], @converted[0 .. $div - 1] ]
+                }
+                else {
+                    $self->drums->{$drum}{pat} = [ $pats->{$drum}->@[0 .. $div - 1], (0) x $div ];
+                }
+            }
         }
         else {
-            $self->drums->{hihat}{pat} = [ (0) x $self->beats ];
-            $self->drums->{kick}{pat}  = [ (0) x $self->beats ];
-            $self->drums->{snare}{pat} = \@converted;
+            for my $drum (keys $self->drums->%*) {
+                if ($drum eq 'snare') {
+                    $self->drums->{$drum}{pat} = \@converted;
+                }
+                else {
+                    $self->drums->{$drum}{pat} = [ (0) x $self->beats ];
+                }
+            }
         }
     }
     else {
@@ -297,7 +328,7 @@ sub _adjust_drums($self, $fill_flag) {
     }
     $self->_hats($self->drums->{hihat}{pat}[0]); # save bit
     $self->drums->{crash}{pat} = [ (0) x ($self->beats * $self->divisions) ];
-    $self->_adjust_cymbals;
+    $self->_adjust_cymbals if $self->filling;
     # $drums->{hihat}{num} = $self->_random_note($notes);
     # $drums->{kick}{num}  = $self->_random_note($notes);
     # $drums->{snare}{num} = $self->_random_note($notes);
@@ -315,7 +346,7 @@ sub _random_note($self) {
 }
 
 sub _default_part {
-    say 'Default part!';
+    # say 'Default part!';
     my %patterns = (
         hihat => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
         kick  => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
@@ -339,19 +370,65 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0100
+version 0.0204
 
 =head1 SYNOPSIS
 
   use Music::SimpleDrumMachine ();
 
-  my $dm = Music::SimpleDrumMachine->new(verbose => 1);
+  my $dm = Music::SimpleDrumMachine->new( # use defaults
+    port_name => 'midi device',
+  );
+  # OR:
+  $dm = Music::SimpleDrumMachine->new(
+    port_name => 'midi device',
+    bpm       => 100,
+    next_part => 'part_A',
+    parts     => {
+        part_A => \&part_A,
+        part_B => \&part_B,
+    },
+    verbose => 1,
+  );
+
+  sub part_A {
+      print "part A\n";
+      my %patterns = (
+          hihat => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
+          kick  => [qw(1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1)],
+          snare => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 1 0)],
+      );
+      my $next = 'part_B';
+      return $next, \%patterns;
+  }
+  sub part_B {
+      print "part B\n";
+      my %patterns = (
+          hihat => [qw(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)],
+          kick  => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
+          snare => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
+      );
+      my $next = 'part_A';
+      return $next, \%patterns;
+  }
 
 =head1 DESCRIPTION
 
-C<Music::SimpleDrumMachine> is a simple 16th-note-phrase drummer.
+C<Music::SimpleDrumMachine> is a simple 16th-note-phrase drummer. By
+invoking this module, your MIDI device will begin playing in
+real-time.
 
 =head1 ATTRIBUTES
+
+=head2 add_drums
+
+  add_drums => \%drums,
+
+Add an array-ref of hash-refs of the form
+C<[{ drum =E<gt> 'name', num => midi_num, chan => channel }]>
+to the known drums in the constructor. The B<chan> key is optional
+and is only necessary if you want to assign a drum to a specific
+channel.
 
 =head2 beats
 
@@ -394,6 +471,7 @@ Default: C<4>
 =head2 drums
 
   $drums = $dm->drums;
+  $dm->drums($drums);
 
 The known drums.
 
@@ -402,35 +480,38 @@ Default:
   kick  => { num => 36, chan => ..., pat => [] },
   snare => { num => 38, chan => ..., pat => [] },
   hihat => { num => 42, chan => ..., pat => [] },
+  open  => { num => 46, chan => ..., pat => [] },
   crash => { num => 49, chan => ..., pat => [] },
 
-=head2 fill_part
+=head2 filling
 
-  $fill_part = $dm->fill_part;
+  $filling = $dm->filling;
+  $dm->filling($boolean);
 
-Code-ref of the part to play for 1/2-bar fills.
-
-Default: \&_default_part
+Do we fill between parts?
 
 =head2 next_part
 
   $next_part = $dm->next_part;
+  $dm->next_part($next_part);
 
 Name of the part to play first.
 
-Default: '_default_part'
+Default: C<'_default_part'>
 
 =head2 notes
 
   $notes = $dm->notes;
+  $dm->notes($notes);
 
 The notes to set for each drum - why not?
 
-Default: [60, 64, 67]
+Default: C<[60, 64, 67]>
 
 =head2 parts
 
   $parts = $dm->parts;
+  $dm->parts($parts);
 
 List of code-refs of the parts to play.
 
@@ -452,6 +533,14 @@ The "pulses per quarter-note" or "clocks per beat."
 
 Default: C<24>
 
+=head2 prefill_part
+
+  $prefill_part = $dm->prefill_part;
+
+Code-ref of the part to play for 1/2-bar fills.
+
+Default: C<\&_default_part>
+
 =head2 verbose
 
   $verbose = $dm->verbose;
@@ -470,9 +559,17 @@ Create a new C<Music::SimpleDrumMachine> object.
 
 =head1 SEE ALSO
 
+The F<eg/*.pl> programs in this distribution.
+
+L<IO::Async::Loop>
+
+L<IO::Async::Timer::Periodic>
+
+L<MIDI::RtMidi::FFI::Device>
+
 L<Moo>
 
-L<http://somewhere.el.se>
+L<Music::Duration::Partition>
 
 =head1 AUTHOR
 

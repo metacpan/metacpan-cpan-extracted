@@ -18,8 +18,9 @@ DESCRIPTION
     This module provides the libwebsockets C library. It will either use the
     system library if available, or download and build it from source.
 
-    When built from source, libwebsockets is configured with libev, SSL,
-    zlib, and permessage-deflate extension support.
+    When built from source, libwebsockets is configured with SSL, zlib, and
+    permessage-deflate extension support. Libev support is enabled
+    automatically if "libev" development headers are available.
 
 METHODS
     Inherits all methods from Alien::Base and implements the following.

@@ -20,6 +20,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
          --[no-]rule        use Unicode rules for tables (default: on)
+     -V  --cat-v            visualize whitespace via cat-v
      -w  --width=#          fold width (default: 80)
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark)
      -m  --mode=#           light or dark (default: light)
@@ -40,7 +41,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.06
+Version 1.07
 
 # DESCRIPTION
 
@@ -243,6 +244,13 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     Unicode box-drawing characters (`│`, `├`, `┤`, `┼`) and
     dashes (`-`) in separator lines are replaced with horizontal
     rules (`─`).  Default is enabled.
+
+- **-V**, **--cat-v**
+
+    Pass the output through [cat-v(1)](https://metacpan.org/pod/App%3A%3Acat%3A%3Av) to visualize
+    whitespace and special characters.  Spaces are shown as `·`
+    and other invisible characters are made visible.  Newline
+    visualization is disabled by default.
 
 - **-w** _N_, **--width**=_N_
 

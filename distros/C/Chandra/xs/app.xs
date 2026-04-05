@@ -2330,3 +2330,112 @@ CODE:
 }
 OUTPUT:
     RETVAL
+
+ # ---- store($name) — persistent key-value store for this app ----
+ # Caches the Chandra::Store instance on the self hash under _store_ or
+ # _store_<name>.  Derives the store name from the app title when no
+ # explicit name is given, mirroring the Perl version exactly.
+
+SV *
+store(self, ...)
+    SV *self
+CODE:
+{
+    HV   *hv        = (HV *)SvRV(self);
+    SV   *name_sv   = (items > 1 && SvOK(ST(1))) ? ST(1) : NULL;
+    char  cache_key[256];
+    SV  **cached_svp;
+
+    if (name_sv) {
+        STRLEN nlen;
+        const char *nstr = SvPV(name_sv, nlen);
+        if (nlen > 240) nlen = 240;
+        snprintf(cache_key, sizeof(cache_key), "_store_%.*s", (int)nlen, nstr);
+    } else {
+        strncpy(cache_key, "_store_", sizeof(cache_key));
+    }
+
+    cached_svp = hv_fetch(hv, cache_key, (I32)strlen(cache_key), 0);
+    if (cached_svp && SvOK(*cached_svp)) {
+        RETVAL = SvREFCNT_inc(*cached_svp);
+    } else {
+        dSP;
+        int   count;
+        SV   *store_name_sv;
+
+        if (name_sv) {
+            store_name_sv = newSVsv(name_sv);
+        } else {
+            /* Derive store name from app title: lowercase, replace
+             * runs of [^a-z0-9_-] with '_', strip leading/trailing '_' */
+            SV *title_sv;
+            STRLEN tlen;
+            const char *tstr;
+            char *buf, *dst;
+            const char *p, *end;
+            int in_run;
+
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(self);
+            PUTBACK;
+            count = call_method("title", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (count > 0 && !SvTRUE(ERRSV))
+                title_sv = newSVsv(POPs);
+            else
+                title_sv = newSVpvs("chandra");
+            PUTBACK; FREETMPS; LEAVE;
+
+            tstr = SvPV(title_sv, tlen);
+            buf  = (char *)malloc(tlen + 2);
+            dst  = buf;
+            in_run = 0;
+            for (p = tstr, end = tstr + tlen; p < end; p++) {
+                unsigned char c = (unsigned char)*p;
+                if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
+                    || c == '_' || c == '-') {
+                    *dst++ = c;
+                    in_run = 0;
+                } else if (c >= 'A' && c <= 'Z') {
+                    *dst++ = (char)(c + 32);  /* tolower */
+                    in_run = 0;
+                } else {
+                    if (!in_run) { *dst++ = '_'; in_run = 1; }
+                }
+            }
+            *dst = '\0';
+
+            /* strip leading underscores */
+            p = buf;
+            while (*p == '_') p++;
+            /* strip trailing underscores */
+            dst = buf + strlen(p);
+            while (dst > p && *(dst-1) == '_') dst--;
+            *dst = '\0';
+
+            store_name_sv = (*p) ? newSVpv(p, dst - p)
+                                 : newSVpvs("chandra");
+            free(buf);
+            SvREFCNT_dec(title_sv);
+        }
+
+        load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Chandra::Store"), NULL);
+
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::Store")));
+        XPUSHs(sv_2mortal(newSVpvs("name")));
+        XPUSHs(sv_2mortal(store_name_sv));
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        RETVAL = (count > 0) ? newSVsv(POPs) : newSV(0);
+        PUTBACK; FREETMPS; LEAVE;
+
+        (void)hv_store(hv, cache_key, (I32)strlen(cache_key),
+                       SvREFCNT_inc(RETVAL), 0);
+    }
+}
+OUTPUT:
+    RETVAL

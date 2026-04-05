@@ -109,7 +109,7 @@ my $ctx = EV::Websockets::Context->new();
                 $close_state = $c->state;
                 $close_is_connected = $c->is_connected;
                 delete $keep{c};
-                my $t; $t = EV::timer(0.3, 0, sub { undef $t; EV::break });
+                EV::break;
             },
             on_error => sub { delete $keep{c}; EV::break },
         );

@@ -36,7 +36,7 @@ no_index:
 provides:
   Alien::libwebsockets:
     file: lib/Alien/libwebsockets.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Alien::Base: '2.37'
   Alien::Build: '2.37'
@@ -44,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-alien-libwebsockets/issues
   repository: https://github.com/vividsnow/perl5-alien-libwebsockets.git
-version: '0.02'
+version: '0.03'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

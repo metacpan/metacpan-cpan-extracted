@@ -5,6 +5,8 @@ use lib "$FindBin::Bin/../";
 use Test::More;
 use t::Util;
 
+#REQUIRES: Test::More
+
 # taken from Test::Class::Most pod
 test('parent with a package', <<'END', {'Test::Class::Most' => 0, 'Tests::For::Foo' => 0});
 package Tests::For::Foo::Child;

@@ -53,14 +53,6 @@ my %enables_utf8 = map {$_ => 1} qw(
   Mojo::Base::Che
 );
 
-my %new_keyword_since = (
-  say => '5.010',
-  state => '5.010',
-  given => '5.010',
-  when => '5.010',
-  default => '5.010',
-);
-
 my $default_g_re_prototype = qr{\G(\([^\)]*?\))};
 
 sub new {
@@ -356,13 +348,6 @@ sub token_is_op_keyword {
   return 0;
 }
 
-sub check_new_keyword {
-  my ($self, $token) = @_;
-  if (exists $new_keyword_since{$token}) {
-    $self->add_perl($new_keyword_since{$token}, $token);
-  }
-}
-
 sub register_keywords {
   my ($self, @keywords) = @_;
   for my $keyword (@keywords) {
@@ -439,262 +424,277 @@ sub merge_perl {
   }
 }
 
-sub _keywords {(
-    '__FILE__' => 1,
-    '__LINE__' => 2,
-    '__PACKAGE__' => 3,
-    '__DATA__' => 4,
-    '__END__' => 5,
-    '__SUB__' => 6,
-    AUTOLOAD => 7,
-    BEGIN => 8,
-    UNITCHECK => 9,
-    DESTROY => 10,
-    END => 11,
-    INIT => 12,
-    CHECK => 13,
-    abs => 14,
-    accept => 15,
-    alarm => 16,
-    and => 17,
-    atan2 => 18,
-    bind => 19,
-    binmode => 20,
-    bless => 21,
-    break => 22,
-    caller => 23,
-    chdir => 24,
-    chmod => 25,
-    chomp => 26,
-    chop => 27,
-    chown => 28,
-    chr => 29,
-    chroot => 30,
-    close => 31,
-    closedir => 32,
-    cmp => 33,
-    connect => 34,
-    continue => 35,
-    cos => 36,
-    crypt => 37,
-    dbmclose => 38,
-    dbmopen => 39,
-    default => 40,
-    defined => 41,
-    delete => 42,
-    die => 43,
-    do => 44,
-    dump => 45,
-    each => 46,
-    else => 47,
-    elsif => 48,
-    endgrent => 49,
-    endhostent => 50,
-    endnetent => 51,
-    endprotoent => 52,
-    endpwent => 53,
-    endservent => 54,
-    eof => 55,
-    eq => 56,
-    eval => 57,
-    evalbytes => 58,
-    exec => 59,
-    exists => 60,
-    exit => 61,
-    exp => 62,
-    fc => 63,
-    fcntl => 64,
-    fileno => 65,
-    flock => 66,
-    for => 67,
-    foreach => 68,
-    fork => 69,
-    format => 70,
-    formline => 71,
-    ge => 72,
-    getc => 73,
-    getgrent => 74,
-    getgrgid => 75,
-    getgrnam => 76,
-    gethostbyaddr => 77,
-    gethostbyname => 78,
-    gethostent => 79,
-    getlogin => 80,
-    getnetbyaddr => 81,
-    getnetbyname => 82,
-    getnetent => 83,
-    getpeername => 84,
-    getpgrp => 85,
-    getppid => 86,
-    getpriority => 87,
-    getprotobyname => 88,
-    getprotobynumber => 89,
-    getprotoent => 90,
-    getpwent => 91,
-    getpwnam => 92,
-    getpwuid => 93,
-    getservbyname => 94,
-    getservbyport => 95,
-    getservent => 96,
-    getsockname => 97,
-    getsockopt => 98,
-    given => 99,
-    glob => 100,
-    gmtime => 101,
-    goto => 102,
-    grep => 103,
-    gt => 104,
-    hex => 105,
-    if => 106,
-    index => 107,
-    int => 108,
-    ioctl => 109,
-    join => 110,
-    keys => 111,
-    kill => 112,
-    last => 113,
-    lc => 114,
-    lcfirst => 115,
-    le => 116,
-    length => 117,
-    link => 118,
-    listen => 119,
-    local => 120,
-    localtime => 121,
-    lock => 122,
-    log => 123,
-    lstat => 124,
-    lt => 125,
-    m => 126,
-    map => 127,
-    mkdir => 128,
-    msgctl => 129,
-    msgget => 130,
-    msgrcv => 131,
-    msgsnd => 132,
-    my => 133,
-    ne => 134,
-    next => 135,
-    no => 136,
-    not => 137,
-    oct => 138,
-    open => 139,
-    opendir => 140,
-    or => 141,
-    ord => 142,
-    our => 143,
-    pack => 144,
-    package => 145,
-    pipe => 146,
-    pop => 147,
-    pos => 148,
-    print => 149,
-    printf => 150,
-    prototype => 151,
-    push => 152,
-    q => 153,
-    qq => 154,
-    qr => 155,
-    quotemeta => 156,
-    qw => 157,
-    qx => 158,
-    rand => 159,
-    read => 160,
-    readdir => 161,
-    readline => 162,
-    readlink => 163,
-    readpipe => 164,
-    recv => 165,
-    redo => 166,
-    ref => 167,
-    rename => 168,
-    require => 169,
-    reset => 170,
-    return => 171,
-    reverse => 172,
-    rewinddir => 173,
-    rindex => 174,
-    rmdir => 175,
-    s => 176,
-    say => 177,
-    scalar => 178,
-    seek => 179,
-    seekdir => 180,
-    select => 181,
-    semctl => 182,
-    semget => 183,
-    semop => 184,
-    send => 185,
-    setgrent => 186,
-    sethostent => 187,
-    setnetent => 188,
-    setpgrp => 189,
-    setpriority => 190,
-    setprotoent => 191,
-    setpwent => 192,
-    setservent => 193,
-    setsockopt => 194,
-    shift => 195,
-    shmctl => 196,
-    shmget => 197,
-    shmread => 198,
-    shmwrite => 199,
-    shutdown => 200,
-    sin => 201,
-    sleep => 202,
-    socket => 203,
-    socketpair => 204,
-    sort => 205,
-    splice => 206,
-    split => 207,
-    sprintf => 208,
-    sqrt => 209,
-    srand => 210,
-    stat => 211,
-    state => 212,
-    study => 213,
-    sub => 214,
-    substr => 215,
-    symlink => 216,
-    syscall => 217,
-    sysopen => 218,
-    sysread => 219,
-    sysseek => 220,
-    system => 221,
-    syswrite => 222,
-    tell => 223,
-    telldir => 224,
-    tie => 225,
-    tied => 226,
-    time => 227,
-    times => 228,
-    tr => 229,
-    truncate => 230,
-    uc => 231,
-    ucfirst => 232,
-    umask => 233,
-    undef => 234,
-    unless => 235,
-    unlink => 236,
-    unpack => 237,
-    unshift => 238,
-    untie => 239,
-    until => 240,
-    use => 241,
-    utime => 242,
-    values => 243,
-    vec => 244,
-    wait => 245,
-    waitpid => 246,
-    wantarray => 247,
-    warn => 248,
-    when => 249,
-    while => 250,
-    write => 251,
-    x => 252,
-    xor => 253,
-    y => 254 || 255,
-)}
+sub _keywords {
+    my $i = 1;
+    map {$_ => $i++} qw(
+        __CLASS__
+        __DATA__
+        __END__
+        __FILE__
+        __LINE__
+        __PACKAGE__
+        __SUB__
+        ADJUST
+        AUTOLOAD
+        BEGIN
+        CHECK
+        DESTROY
+        END
+        INIT
+        UNITCHECK
+        abs
+        accept
+        alarm
+        all
+        and
+        any
+        atan2
+        bind
+        binmode
+        bless
+        break
+        caller
+        catch
+        chdir
+        chmod
+        chomp
+        chop
+        chown
+        chr
+        chroot
+        class
+        close
+        closedir
+        cmp
+        connect
+        continue
+        cos
+        crypt
+        dbmclose
+        dbmopen
+        default
+        defer
+        defined
+        delete
+        die
+        do
+        dump
+        each
+        else
+        elsif
+        endgrent
+        endhostent
+        endnetent
+        endprotoent
+        endpwent
+        endservent
+        eof
+        eq
+        eval
+        evalbytes
+        exec
+        exists
+        exit
+        exp
+        fc
+        fcntl
+        field
+        fileno
+        finally
+        flock
+        for
+        foreach
+        fork
+        format
+        formline
+        ge
+        getc
+        getgrent
+        getgrgid
+        getgrnam
+        gethostbyaddr
+        gethostbyname
+        gethostent
+        getlogin
+        getnetbyaddr
+        getnetbyname
+        getnetent
+        getpeername
+        getpgrp
+        getppid
+        getpriority
+        getprotobyname
+        getprotobynumber
+        getprotoent
+        getpwent
+        getpwnam
+        getpwuid
+        getservbyname
+        getservbyport
+        getservent
+        getsockname
+        getsockopt
+        given
+        glob
+        gmtime
+        goto
+        grep
+        gt
+        hex
+        if
+        index
+        int
+        ioctl
+        isa
+        join
+        keys
+        kill
+        last
+        lc
+        lcfirst
+        le
+        length
+        link
+        listen
+        local
+        localtime
+        lock
+        log
+        lstat
+        lt
+        m
+        map
+        method
+        mkdir
+        msgctl
+        msgget
+        msgrcv
+        msgsnd
+        my
+        ne
+        next
+        no
+        not
+        oct
+        open
+        opendir
+        or
+        ord
+        our
+        pack
+        package
+        pipe
+        pop
+        pos
+        print
+        printf
+        prototype
+        push
+        q
+        qq
+        qr
+        quotemeta
+        qw
+        qx
+        rand
+        read
+        readdir
+        readline
+        readlink
+        readpipe
+        recv
+        redo
+        ref
+        rename
+        require
+        reset
+        return
+        reverse
+        rewinddir
+        rindex
+        rmdir
+        s
+        say
+        scalar
+        seek
+        seekdir
+        select
+        semctl
+        semget
+        semop
+        send
+        setgrent
+        sethostent
+        setnetent
+        setpgrp
+        setpriority
+        setprotoent
+        setpwent
+        setservent
+        setsockopt
+        shift
+        shmctl
+        shmget
+        shmread
+        shmwrite
+        shutdown
+        sin
+        sleep
+        socket
+        socketpair
+        sort
+        splice
+        split
+        sprintf
+        sqrt
+        srand
+        stat
+        state
+        study
+        sub
+        substr
+        symlink
+        syscall
+        sysopen
+        sysread
+        sysseek
+        system
+        syswrite
+        tell
+        telldir
+        tie
+        tied
+        time
+        times
+        tr
+        truncate
+        try
+        uc
+        ucfirst
+        umask
+        undef
+        unless
+        unlink
+        unpack
+        unshift
+        untie
+        until
+        use
+        utime
+        values
+        vec
+        wait
+        waitpid
+        wantarray
+        warn
+        when
+        while
+        write
+        x
+        xor
+        y
+    );
+}
 
 1;
 

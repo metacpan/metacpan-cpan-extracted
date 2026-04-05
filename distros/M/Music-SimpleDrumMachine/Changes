@@ -1,4 +1,60 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0204 2026-04-05 00:28:58
+    - Make the fills optional with the filling attribute.
+    - Make _adjust_drums() more generic.
+
+0.0203 2026-04-04 23:58:42
+    - Fix the 'add_drums' logic.
+
+0.0202 2026-04-04 22:01:48
+    - Improve documentation.
+
+0.0201 2026-04-04 21:47:22
+    - Fix channel selection logic when adding a new drum.
+
+0.0200 2026-04-04 21:42:59
+    - Add an 'add_drums' attribute.
+    - Simplify the add-drum.pl code.
+
+0.0111 2026-04-04 21:02:33
+    - Simplify the open-hh.pl code.
+    - Add the open hihat to the known drums.
+    - Add the eg/add-drum.pl example program.
+
+0.0110 2026-04-04 20:41:45
+    - Add the eg/open-hh.pl example program.
+
+0.0109 2026-04-04 12:54:14
+    - Rename the "prefill_part" attribute.
+    - Add a handy comment!
+    - Silence the experimental try warning.
+
+0.0108 2026-04-04 11:54:49
+    Add more verbosity.
+
+0.0107 2026-04-04 11:45:43
+    - Swap stop and panic calls.
+    - Remove cruft.
+
+0.0106 2026-04-04 10:25:45
+    - Fix a stupid typo.
+
+0.0105 2026-04-04 10:15:55
+    - Improve documentation.
+
+0.0104 2026-04-04 09:59:27
+    - Improve documentation.
+
+0.0103 2026-04-04 09:16:38
+    - Improve documentation.
+
+0.0102 2026-04-04 09:10:43
+    - Improve documentation.
+    - Make the ->notes a read-write attribute.
+
+0.0101 2026-04-04 09:06:08
+    - Improve documentation.
+
 0.0100 2026-04-03 20:37:03
     - Mint with Dist::Zilla.

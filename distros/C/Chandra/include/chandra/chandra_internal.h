@@ -98,6 +98,18 @@ static const char CHANDRA_ROUTER_JS[] =
     "            }\n"
     "        }\n"
     "    };\n"
+    "    document.addEventListener('click', function(e) {\n"
+    "        var el = e.target;\n"
+    "        while (el && el.tagName !== 'A') el = el.parentElement;\n"
+    "        if (!el) return;\n"
+    "        var href = el.getAttribute('href');\n"
+    "        if (!href || href.match(/^https?:\\/\\//) || href.match(/^#/)) return;\n"
+    "        e.preventDefault();\n"
+    "        window.chandra.invoke('__chandra_navigate', [href]);\n"
+    "    });\n"
+    "    window.addEventListener('popstate', function() {\n"
+    "        window.chandra.invoke('__chandra_navigate', [location.pathname || '/']);\n"
+    "    });\n"
     "})();\n";
 
 /* ============================================================================

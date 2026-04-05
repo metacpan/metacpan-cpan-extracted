@@ -32,6 +32,7 @@ use Inline C => 'DATA', NAME => __PACKAGE__,
 END
 
 # PATL/Inline-Java-0.53/Java/PerlInterpreter/PerlInterpreter.pm
+#SKIP: ignore jvm
 test('Inline::Java without VERSION', <<'END', {Inline => 0, 'Inline::Java' => 0});
 use Inline (
     Java => 'STUDY',
@@ -42,6 +43,7 @@ use Inline (
 END
 
 # INGY/Inline-0.80/example/modules/Boo-2.01/lib/Boo/Far.pm
+#SKIP: no main.pm
 test('with Config', <<'END', {Inline => 0, 'Inline::C' => 0});
 use Inline Config => NAME => 'Boo::Far' => VERSION => '2.01';
 

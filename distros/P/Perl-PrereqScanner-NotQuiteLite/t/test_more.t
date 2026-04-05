@@ -13,6 +13,7 @@ plan skip_all => 'foo';
 use strict;
 END
 
+#EXPECTED_NOTHING
 test('skip_all inside BEGIN', <<'END', {'Test::More' => 0}, {}, {'strict' => 0});
 use Test::More;
 
@@ -23,6 +24,7 @@ BEGIN {
 use strict;
 END
 
+#EXPECTED_NOTHING
 test('skip_all inside sub BEGIN', <<'END', {'Test::More' => 0}, {}, {'strict' => 0});
 use Test::More;
 
@@ -33,6 +35,7 @@ sub BEGIN {
 use strict;
 END
 
+#EXPECTED_NOTHING_IF: $^O eq 'MSWin32'
 test('skip_all inside BEGIN if', <<'END', {'Test::More' => 0}, {}, {'strict' => 0});
 use Test::More;
 
@@ -43,6 +46,7 @@ sub BEGIN {
 use strict;
 END
 
+#EXPECTED_NOTHING_IF: $^O eq 'MSWin32'
 test('"skip_all"', <<'END', {'Test::More' => 0}, {}, {'strict' => 0});
 use Test::More;
 
@@ -53,6 +57,7 @@ sub BEGIN {
 use strict;
 END
 
+#EXPECTED_NOTHING
 test('plan(skip_all => ...)', <<'END', {}, {}, {'strict' => 0, 'Test::More' => 0}); # INGY/perl5-0.21/t/release-pod-syntax.t
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {

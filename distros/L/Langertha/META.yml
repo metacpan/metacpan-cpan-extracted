@@ -22,6 +22,7 @@ requires:
   File::ShareDir::ProjectDistDir: '0'
   Future: '0'
   Future::AsyncAwait: '0.66'
+  Import::Into: '0'
   JSON::MaybeXS: '0'
   JSON::PP: '0'
   JSON::Schema::Modern: '0.617'
@@ -43,7 +44,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha/issues
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.307'
+version: '0.308'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -52,7 +53,8 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - README.md
           exclude_match: []
           include_dotfiles: 1
           prefix: ''
@@ -293,7 +295,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.307'
+          tag: '0.308'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

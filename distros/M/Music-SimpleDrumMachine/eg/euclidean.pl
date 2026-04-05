@@ -2,7 +2,8 @@
 
 # Play and clock an external MIDI device, like a drum machine or sequencer.
 # Examples:
-#   perl eg/euclidean.pl fluid 90   # with fluidsynth
+#   perl eg/euclidean.pl 'gs wavetable' 90 # on windows
+#   perl eg/euclidean.pl fluid 90 # with fluidsynth
 #   perl eg/euclidean.pl usb 100 -1 # multi-timbral
 
 use v5.36;

@@ -1,5 +1,9 @@
 Revision history for Alien::libwebsockets
 
+0.03    2026-04-04
+        - Libev support now optional (auto-detected at build time).
+        - Auto-detect latest libwebsockets release from GitHub.
+
 0.02    2026-03-30
         - Improved cross-platform support and build determinism.
 

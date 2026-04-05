@@ -47,7 +47,8 @@ sub parse_class_args {
   my $isa = my $does = 0;
   while(my $token = shift @$tokens) {
     my ($name, $version) = ('', 0);
-    if (ref $token && $token->[1] && $token->[1] eq 'WORD') {
+    # only for old Object::Pad: isa is a keyword now
+    if (ref $token && $token->[1] && ($token->[1] eq 'WORD' or $token->[1] eq 'KEYWORD')) {
       if ($token->[0] eq 'isa' or $token->[0] eq 'extends') {
         $isa  = 1;
         $does = 0;
@@ -69,6 +70,10 @@ sub parse_class_args {
           $c->add_package($name => $version);
         }
       }
+    }
+    if (ref $token && $token->[0] eq ':') {
+      $isa = $does = 0;
+      last;
     }
     if (ref $token && $token->[1] && $token->[1] eq 'ATTRIBUTE') {
       while($token->[0] =~ s/:(?:isa|does)\(([^)]+)\)//) {

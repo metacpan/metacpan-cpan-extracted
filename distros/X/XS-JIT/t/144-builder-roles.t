@@ -93,7 +93,7 @@ subtest 'Cloneable role' => sub {
         name      => $pkg,
         cache_dir => $cache_dir,
         functions => {
-            "${pkg}::clone" => { source => 'clone', is_xs_native => 1 },
+            "${pkg}::clone" => { source => 'jit_clone', is_xs_native => 1 },
         },
     ), 'compile Cloneable role');
 
@@ -248,7 +248,7 @@ subtest 'with_roles - multiple roles' => sub {
             "${pkg}::gt"       => { source => 'gt', is_xs_native => 1 },
             "${pkg}::le"       => { source => 'le', is_xs_native => 1 },
             "${pkg}::ge"       => { source => 'ge', is_xs_native => 1 },
-            "${pkg}::clone"    => { source => 'clone', is_xs_native => 1 },
+            "${pkg}::clone"    => { source => 'jit_clone', is_xs_native => 1 },
             "${pkg}::TO_JSON"  => { source => 'TO_JSON', is_xs_native => 1 },
             "${pkg}::TO_HASH"  => { source => 'TO_HASH', is_xs_native => 1 },
         },

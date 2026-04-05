@@ -1,6 +1,6 @@
 package Langertha::Role::Runnable;
 # ABSTRACT: Common async execution contract for Raider and Raid nodes
-our $VERSION = '0.307';
+our $VERSION = '0.308';
 use Moose::Role;
 
 
@@ -21,7 +21,7 @@ Langertha::Role::Runnable - Common async execution contract for Raider and Raid 
 
 =head1 VERSION
 
-version 0.307
+version 0.308
 
 =head1 SYNOPSIS
 

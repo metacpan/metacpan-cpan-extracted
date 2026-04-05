@@ -349,6 +349,53 @@ char* xs_jit_generate_code(pTHX_ const char *user_code,
     strbuf_append(&buf, "#include \"XSUB.h\"\n");
     strbuf_append(&buf, "\n");
 
+    /* PERL_STATIC_INLINE compatibility for Perl < 5.13.4 */
+    strbuf_append(&buf, "#ifndef PERL_STATIC_INLINE\n");
+    strbuf_append(&buf, "#  define PERL_STATIC_INLINE static\n");
+    strbuf_append(&buf, "#endif\n");
+    strbuf_append(&buf, "\n");
+
+    /* PERL_VERSION_GE macro for version checks */
+    strbuf_append(&buf, "#ifndef PERL_VERSION_GE\n");
+    strbuf_append(&buf, "#  define PERL_VERSION_GE(r,v,s) \\\n");
+    strbuf_append(&buf, "      (PERL_REVISION > (r) || (PERL_REVISION == (r) && \\\n");
+    strbuf_append(&buf, "       (PERL_VERSION > (v) || (PERL_VERSION == (v) && PERL_SUBVERSION >= (s)))))\n");
+    strbuf_append(&buf, "#endif\n");
+    strbuf_append(&buf, "\n");
+
+    /* XOP API backwards compatibility for pre-5.14 Perl */
+    strbuf_append(&buf, "#if !PERL_VERSION_GE(5,14,0)\n");
+    strbuf_append(&buf, "/* Pre-5.14: use deprecated custom op interface */\n");
+    strbuf_append(&buf, "#  ifndef XOP_DEFINED_BY_COMPAT\n");
+    strbuf_append(&buf, "#    define XOP_DEFINED_BY_COMPAT 1\n");
+    strbuf_append(&buf, "typedef struct { const char *xop_name; const char *xop_desc; U32 xop_class; } XOP;\n");
+    strbuf_append(&buf, "#  endif\n");
+    strbuf_append(&buf, "#  ifndef OA_UNOP\n");
+    strbuf_append(&buf, "#    define OA_UNOP 1\n");
+    strbuf_append(&buf, "#  endif\n");
+    strbuf_append(&buf, "#  ifndef OA_BINOP\n");
+    strbuf_append(&buf, "#    define OA_BINOP 2\n");
+    strbuf_append(&buf, "#  endif\n");
+    strbuf_append(&buf, "#  ifndef XopENTRY_set\n");
+    strbuf_append(&buf, "#    define XopENTRY_set(xop, field, value) do { (xop)->field = (value); } while(0)\n");
+    strbuf_append(&buf, "#  endif\n");
+    strbuf_append(&buf, "PERL_STATIC_INLINE void S_xop_compat_register(pTHX_ Perl_ppaddr_t ppfunc, const char *name, const char *desc) {\n");
+    strbuf_append(&buf, "    if (!PL_custom_op_names) PL_custom_op_names = newHV();\n");
+    strbuf_append(&buf, "    if (!PL_custom_op_descs) PL_custom_op_descs = newHV();\n");
+    strbuf_append(&buf, "    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(name, 0), 0);\n");
+    strbuf_append(&buf, "    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(desc, 0), 0);\n");
+    strbuf_append(&buf, "}\n");
+    strbuf_append(&buf, "#  undef Perl_custom_op_register\n");
+    strbuf_append(&buf, "#  ifdef PERL_IMPLICIT_CONTEXT\n");
+    strbuf_append(&buf, "#    define Perl_custom_op_register(ctx, ppfunc, xop) \\\n");
+    strbuf_append(&buf, "        S_xop_compat_register((ctx), (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)\n");
+    strbuf_append(&buf, "#  else\n");
+    strbuf_append(&buf, "#    define Perl_custom_op_register(ppfunc, xop) \\\n");
+    strbuf_append(&buf, "        S_xop_compat_register(aTHX_ (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)\n");
+    strbuf_append(&buf, "#  endif\n");
+    strbuf_append(&buf, "#endif /* !PERL_VERSION_GE(5,14,0) */\n");
+    strbuf_append(&buf, "\n");
+
     /* Version compatibility macros - only emit if not defined on build system */
 #ifndef PERL_UNUSED_VAR
     strbuf_append(&buf, "#ifndef PERL_UNUSED_VAR\n");

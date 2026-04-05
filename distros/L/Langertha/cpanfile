@@ -2,6 +2,7 @@
 requires 'File::ShareDir::ProjectDistDir';
 requires 'Future';
 requires 'Future::AsyncAwait', '>= 0.66';
+requires 'Import::Into';
 requires 'JSON::MaybeXS';
 requires 'JSON::PP';
 requires 'JSON::Schema::Modern', '>= 0.617';

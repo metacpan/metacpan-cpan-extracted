@@ -2244,6 +2244,8 @@ void xs_jit_register_checker(pTHX_ XS_JIT_Builder* b, const char* cv_expr, const
 
 /* ============================================
  * Inline op support
+ * Custom ops work on all Perl versions (with compat shim for pre-5.14)
+ * cv_set_call_checker requires Perl 5.14+ - returns 0 on older Perls
  * ============================================ */
 
 /* For cv_set_call_checker - need Perl 5.14+ */
@@ -2260,8 +2262,10 @@ static int xs_jit_xops_registered = 0;
 /* Forward declarations */
 static OP* S_pp_xs_jit_get(pTHX);
 static OP* S_pp_xs_jit_set(pTHX);
+#if PERL_VERSION_GE(5,14,0)
 static OP* S_ck_xs_jit_get(pTHX_ OP* entersubop, GV* namegv, SV* ckobj);
 static OP* S_ck_xs_jit_set(pTHX_ OP* entersubop, GV* namegv, SV* ckobj);
+#endif
 
 /* Initialize inline op subsystem */
 void xs_jit_inline_init(pTHX) {
@@ -2329,6 +2333,7 @@ static OP* S_pp_xs_jit_set(pTHX) {
     return NORMAL;
 }
 
+#if PERL_VERSION_GE(5,14,0)
 /*
  * S_ck_xs_jit_get - Call checker for read-only accessors
  */
@@ -2455,6 +2460,7 @@ static OP* S_ck_xs_jit_set(pTHX_ OP* entersubop, GV* namegv, SV* ckobj) {
         return (OP*)newop;
     }
 }
+#endif /* PERL_VERSION_GE(5,14,0) */
 
 /* Register inline op for a CV */
 int xs_jit_inline_register(pTHX_ CV* cv, XS_JIT_InlineType type, 
@@ -2464,6 +2470,12 @@ int xs_jit_inline_register(pTHX_ CV* cv, XS_JIT_InlineType type,
     
     if (!cv) return 0;
     
+    /* cv_set_call_checker requires Perl 5.14+ - on older Perls it's a no-op */
+#if !PERL_VERSION_GE(5,14,0)
+    PERL_UNUSED_ARG(slot);
+    PERL_UNUSED_ARG(type);
+    return 0;  /* Not supported on pre-5.14 */
+#else
     xs_jit_inline_init(aTHX);
     
     SV* ckobj = newSViv(slot);
@@ -2486,10 +2498,15 @@ int xs_jit_inline_register(pTHX_ CV* cv, XS_JIT_InlineType type,
     }
     
     return 1;
+#endif
 }
 
 /* Check if CV has inline op */
 XS_JIT_InlineType xs_jit_inline_get_type(pTHX_ CV* cv) {
+#if !PERL_VERSION_GE(5,14,0)
+    PERL_UNUSED_ARG(cv);
+    return XS_JIT_INLINE_NONE;
+#else
     MAGIC* mg;
     
     if (!cv) return XS_JIT_INLINE_NONE;
@@ -2505,6 +2522,7 @@ XS_JIT_InlineType xs_jit_inline_get_type(pTHX_ CV* cv) {
     }
     
     return XS_JIT_INLINE_NONE;
+#endif
 }
 
 /* ============================================
@@ -4188,8 +4206,11 @@ static void xs_jit_role_comparable(pTHX_ XS_JIT_Builder* b, XS_JIT_RoleOpts* opt
 static void xs_jit_role_cloneable(pTHX_ XS_JIT_Builder* b, XS_JIT_RoleOpts* opts) {
     PERL_UNUSED_ARG(opts);
 
-    /* clone() - shallow clone of hash-based object */
-    xs_jit_xs_function(aTHX_ b, "clone");
+    /* jit_clone() - shallow clone of hash-based object
+     * Note: We use "jit_clone" internally to avoid collision with
+     * libc's clone() syscall wrapper on Linux.
+     */
+    xs_jit_xs_function(aTHX_ b, "jit_clone");
     xs_jit_xs_preamble(aTHX_ b);
     xs_jit_get_self_hv(aTHX_ b);
     xs_jit_comment(aTHX_ b, "Declare all variables at top for C89");

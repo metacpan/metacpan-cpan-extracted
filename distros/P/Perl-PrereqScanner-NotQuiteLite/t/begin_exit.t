@@ -17,6 +17,7 @@ exit if $^O eq 'MSWin32';
 use strict;
 END
 
+#EXPECTED_NOTHING
 test('exit inside BEGIN', <<'END', {}, {}, {});
 BEGIN {
   # comment to avoid shortcut
@@ -26,6 +27,7 @@ BEGIN {
 use strict;
 END
 
+#EXPECTED_NOTHING
 test('exit inside sub BEGIN', <<'END', {}, {}, {});
 sub BEGIN {
   # comment to avoid shortcut
@@ -35,6 +37,7 @@ sub BEGIN {
 use strict;
 END
 
+#EXPECTED_NOTHING_IF: $^O eq 'MSWin32'
 test('exit inside BEGIN if', <<'END', {}, {}, {'strict' => 0});
 sub BEGIN {
   exit if $^O eq 'MSWin32';
@@ -43,6 +46,7 @@ sub BEGIN {
 use strict;
 END
 
+#EXPECTED_NOTHING_IF: $^O eq 'MSWin32'
 test('exit inside BEGIN if block', <<'END', {}, {}, {'strict' => 0});
 BEGIN {
   if ($^O eq 'MSWin32') {

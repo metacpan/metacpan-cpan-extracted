@@ -1,5 +1,13 @@
 Revision history for Object-Proto
 
+0.07	2026-04-05
+	- Add +attr syntax for modifying inherited attributes (Moo/Moose-style)
+	- Fix xop_class registration for custom ops (fixes assertion failures on
+	  Perl DEBUGGING builds)
+
+0.06	2026-04-04
+	- Fix role slots with builders so consuming classes can provide the builder
+
 0.05	2026-04-03
 	- Export role(), requires(), and with() into caller's namespace on import
 	- Add t/050-exported-keywords.t for new export coverage

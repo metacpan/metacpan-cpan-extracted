@@ -649,6 +649,91 @@ static SlotSpec* clone_slot_spec(pTHX_ const SlotSpec *src) {
     return dst;
 }
 
+/* Merge child override modifiers onto a clone of parent spec.
+ * Only fields that are explicitly set in override are applied.
+ * This enables Moo/Moose-style '+attr' syntax for inheritance.
+ * Called at define-time only - zero runtime overhead. */
+static SlotSpec* merge_slot_spec(pTHX_ const SlotSpec *parent, const SlotSpec *override) {
+    SlotSpec *merged = clone_slot_spec(aTHX_ parent);
+    
+    /* Override type if specified */
+    if (override->has_type) {
+        merged->type_id = override->type_id;
+        merged->registered = override->registered;
+        merged->has_type = 1;
+    }
+    
+    /* Override default if specified */
+    if (override->has_default) {
+        if (merged->default_sv) SvREFCNT_dec(merged->default_sv);
+        merged->default_sv = override->default_sv ? SvREFCNT_inc(override->default_sv) : NULL;
+        merged->has_default = 1;
+    }
+    
+    /* Override trigger if specified */
+    if (override->has_trigger) {
+        if (merged->trigger_cb) SvREFCNT_dec(merged->trigger_cb);
+        merged->trigger_cb = override->trigger_cb ? SvREFCNT_inc(override->trigger_cb) : NULL;
+        merged->has_trigger = 1;
+    }
+    
+    /* Override coerce if specified */
+    if (override->has_coerce) {
+        if (merged->coerce_cb) SvREFCNT_dec(merged->coerce_cb);
+        merged->coerce_cb = override->coerce_cb ? SvREFCNT_inc(override->coerce_cb) : NULL;
+        merged->has_coerce = 1;
+    }
+    
+    /* Override builder if specified */
+    if (override->has_builder) {
+        if (merged->builder_name) SvREFCNT_dec(merged->builder_name);
+        merged->builder_name = override->builder_name ? SvREFCNT_inc(override->builder_name) : NULL;
+        merged->has_builder = 1;
+    }
+    
+    /* Boolean flags - only set if explicitly enabled in override */
+    if (override->is_required) merged->is_required = 1;
+    if (override->is_readonly) merged->is_readonly = 1;
+    if (override->is_lazy)     merged->is_lazy = 1;
+    if (override->is_weak)     merged->is_weak = 1;
+    
+    /* Clearer/predicate */
+    if (override->has_clearer) {
+        merged->has_clearer = 1;
+        if (override->clearer_name) {
+            if (merged->clearer_name) SvREFCNT_dec(merged->clearer_name);
+            merged->clearer_name = SvREFCNT_inc(override->clearer_name);
+        }
+    }
+    if (override->has_predicate) {
+        merged->has_predicate = 1;
+        if (override->predicate_name) {
+            if (merged->predicate_name) SvREFCNT_dec(merged->predicate_name);
+            merged->predicate_name = SvREFCNT_inc(override->predicate_name);
+        }
+    }
+    
+    /* Reader/writer/init_arg */
+    if (override->reader_name) {
+        if (merged->reader_name) SvREFCNT_dec(merged->reader_name);
+        merged->reader_name = SvREFCNT_inc(override->reader_name);
+    }
+    if (override->writer_name) {
+        if (merged->writer_name) SvREFCNT_dec(merged->writer_name);
+        merged->writer_name = SvREFCNT_inc(override->writer_name);
+    }
+    if (override->init_arg) {
+        if (merged->init_arg) SvREFCNT_dec(merged->init_arg);
+        merged->init_arg = SvREFCNT_inc(override->init_arg);
+    }
+    
+    /* Recompute has_checks flag */
+    merged->has_checks = merged->is_readonly | merged->is_required | merged->has_coerce
+                       | (merged->type_id == TYPE_CUSTOM ? 1 : 0);
+    
+    return merged;
+}
+
 static ClassMeta* create_class_meta(pTHX_ const char *class_name, STRLEN len) {
     ClassMeta *meta;
     Newxz(meta, 1, ClassMeta);
@@ -2396,10 +2481,16 @@ static void install_accessor_typed(pTHX_ const char *class_name, const char *pro
 
     snprintf(full_name, sizeof(full_name), "%s::%s", class_name, prop_name);
 
-    /* Check if accessor already exists to avoid redefinition warnings */
+    /* Check if accessor already exists */
     cv = get_cvn_flags(full_name, strlen(full_name), 0);
     if (cv) {
-        return;  /* Already defined, skip */
+        /* Update existing accessor's data (for +attr overrides) */
+        data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
+        if (data) {
+            data->slot_idx = idx;
+            data->meta = meta;
+        }
+        return;
     }
 
     /* Allocate persistent data for this slot */
@@ -2668,9 +2759,27 @@ static void apply_role_to_class(pTHX_ ClassMeta *class_meta, RoleMeta *role_meta
                      newSViv(new_idx), 0);
         }
         
-        /* Track if any slots have defaults */
+        /* Track class-level fast-path flags for role slots */
+        if (role_slot->has_type) {
+            class_meta->has_any_types = 1;
+        }
         if (role_slot->has_default) {
             class_meta->has_any_defaults = 1;
+        }
+        if (role_slot->has_trigger) {
+            class_meta->has_any_triggers = 1;
+        }
+        if (role_slot->is_required) {
+            class_meta->has_any_required = 1;
+        }
+        if (role_slot->is_lazy) {
+            class_meta->has_any_lazy = 1;
+        }
+        if (role_slot->has_builder) {
+            class_meta->has_any_builders = 1;
+        }
+        if (role_slot->is_weak) {
+            class_meta->has_any_weak = 1;
         }
         
         /* Install accessor for this slot */
@@ -3096,14 +3205,50 @@ static XS(xs_define) {
         SlotSpec *spec;
         IV idx;
         SV **existing;
+        U8 is_modification = 0;
+        const char *real_spec_pv = spec_pv;
+        STRLEN real_spec_len = spec_len;
+
+        /* Check for +attr modification syntax (Moo/Moose-style) */
+        if (spec_len > 0 && spec_pv[0] == '+') {
+            is_modification = 1;
+            real_spec_pv = spec_pv + 1;
+            real_spec_len = spec_len - 1;
+        }
 
         /* Parse the slot spec (e.g., "name:Str:required" or just "name") */
-        spec = parse_slot_spec(aTHX_ spec_pv, spec_len);
+        spec = parse_slot_spec(aTHX_ real_spec_pv, real_spec_len);
 
-        /* Check if this property already exists (override from parent) */
+        /* Check if this property already exists (from parent) */
         existing = hv_fetch(meta->prop_to_idx, spec->name, strlen(spec->name), 0);
-        if (existing && SvIOK(*existing)) {
-            /* Override: reuse same slot index */
+        
+        if (is_modification) {
+            /* +attr syntax: merge child modifiers onto parent spec */
+            SlotSpec *parent_spec;
+            SlotSpec *merged;
+            
+            if (!existing || !SvIOK(*existing)) {
+                croak("+%s: no inherited attribute '%s' to modify", 
+                      spec->name, spec->name);
+            }
+            idx = SvIV(*existing);
+            parent_spec = meta->slots[idx];
+            
+            /* Merge override onto clone of parent */
+            merged = merge_slot_spec(aTHX_ parent_spec, spec);
+            
+            /* Free the override spec (we cloned what we needed) */
+            Safefree(spec->name);
+            Safefree(spec);
+            spec = merged;
+            
+            /* Free old parent spec */
+            if (parent_spec) {
+                Safefree(parent_spec->name);
+                Safefree(parent_spec);
+            }
+        } else if (existing && SvIOK(*existing)) {
+            /* Full override: reuse same slot index */
             idx = SvIV(*existing);
             /* Free old spec */
             if (meta->slots[idx]) {
@@ -4087,6 +4232,17 @@ static XS(xs_with) {
         RoleMeta *role_meta = get_role_meta(aTHX_ role_pv, role_len);
         
         if (!role_meta) {
+            /* Auto-load the role module */
+            SV *module_sv = newSVpvn(role_pv, role_len);
+            SV *err;
+            load_module(PERL_LOADMOD_NOIMPORT, module_sv, NULL);
+            err = ERRSV;
+            if (SvTRUE(err)) {
+                croak("Role '%s' not defined (failed to load: %" SVf ")", role_pv, SVfARG(err));
+            }
+            role_meta = get_role_meta(aTHX_ role_pv, role_len);
+        }
+        if (!role_meta) {
             croak("Role '%s' not defined", role_pv);
         }
         
@@ -4299,26 +4455,32 @@ XS_EXTERNAL(boot_Object__Proto) {
     /* Register custom ops */
     XopENTRY_set(&object_new_xop, xop_name, "object_new");
     XopENTRY_set(&object_new_xop, xop_desc, "object constructor");
+    XopENTRY_set(&object_new_xop, xop_class, OA_BASEOP);
     Perl_custom_op_register(aTHX_ pp_object_new, &object_new_xop);
     
     XopENTRY_set(&object_get_xop, xop_name, "object_get");
     XopENTRY_set(&object_get_xop, xop_desc, "object property get");
+    XopENTRY_set(&object_get_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_object_get, &object_get_xop);
     
     XopENTRY_set(&object_set_xop, xop_name, "object_set");
     XopENTRY_set(&object_set_xop, xop_desc, "object property set");
+    XopENTRY_set(&object_set_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_object_set, &object_set_xop);
 
     XopENTRY_set(&object_set_typed_xop, xop_name, "object_set_typed");
     XopENTRY_set(&object_set_typed_xop, xop_desc, "object property set with type check");
+    XopENTRY_set(&object_set_typed_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_object_set_typed, &object_set_typed_xop);
 
     XopENTRY_set(&object_func_get_xop, xop_name, "object_func_get");
     XopENTRY_set(&object_func_get_xop, xop_desc, "object function-style get");
+    XopENTRY_set(&object_func_get_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_object_func_get, &object_func_get_xop);
     
     XopENTRY_set(&object_func_set_xop, xop_name, "object_func_set");
     XopENTRY_set(&object_func_set_xop, xop_desc, "object function-style set");
+    XopENTRY_set(&object_func_set_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_object_func_set, &object_func_set_xop);
 
     /* Initialize registries */

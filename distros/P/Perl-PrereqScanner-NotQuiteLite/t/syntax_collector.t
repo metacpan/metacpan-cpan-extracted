@@ -21,8 +21,9 @@ use Syntax::Collector -collect => q/
 /;
 END
 
+# Syntax::Colletor spits an error if no spec is provided at import time
 test('no spec', <<'END', {'Syntax::Collector' => 0});
-use Syntax::Collector;
+use Syntax::Collector ();
 END
 
 done_testing;

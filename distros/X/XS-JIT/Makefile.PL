@@ -77,6 +77,9 @@ sub postamble {
     my $builder_so = 'blib/arch/auto/XS/JIT/Builder/Builder.$(DLEXT)';
     my $builder_def = 'lib/XS/JIT/Builder.def';
     
+    # -iwithsysroot is Apple Clang-specific; use -I on other platforms
+    my $inc_flag = ($^O eq 'darwin') ? '-iwithsysroot' : '-I';
+    
     # On Windows, we need a separate .def file for Builder.dll
     # Generate it now so it's available for the build
     my $builder_export_list = '';
@@ -98,11 +101,11 @@ DEF_RULE
 $builder_def_rule
 # Compile xs_jit.c to object file
 $xs_jit_o : $xs_jit_c $xs_jit_h
-	\$(CCCMD) \$(CCCDLFLAGS) -iwithsysroot "\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_o $xs_jit_c
+	\$(CCCMD) \$(CCCDLFLAGS) $inc_flag "\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_o $xs_jit_c
 
 # Compile xs_jit_builder.c to object file
 $xs_jit_builder_o : $xs_jit_builder_c $xs_jit_builder_h
-	\$(CCCMD) \$(CCCDLFLAGS) -iwithsysroot "\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_builder_o $xs_jit_builder_c
+	\$(CCCMD) \$(CCCDLFLAGS) $inc_flag "\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $xs_jit_builder_o $xs_jit_builder_c
 
 # Make sure xs_jit object is built before linking main module
 \$(INST_DYNAMIC) : $xs_jit_o
@@ -113,7 +116,7 @@ $builder_c : $builder_xs
 
 # Compile Builder.c to object file
 $builder_o : $builder_c $xs_jit_builder_h
-	\$(CCCMD) \$(CCCDLFLAGS) -iwithsysroot "\$(PERL_INC)" -Ilib/XS/JIT \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $builder_o $builder_c
+	\$(CCCMD) \$(CCCDLFLAGS) $inc_flag "\$(PERL_INC)" -Ilib/XS/JIT \$(PASTHRU_DEFINE) \$(DEFINE) -c -o $builder_o $builder_c
 
 # Link Builder.so/dll - on Windows use Builder.def instead of EXPORT_LIST
 $builder_so : $builder_o $xs_jit_builder_o $builder_export_list

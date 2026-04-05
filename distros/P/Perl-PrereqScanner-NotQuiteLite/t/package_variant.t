@@ -22,7 +22,7 @@ use Package::Variant
   importing => ['Moo'],
   subs      => [qw( with has )];
 
-...
+# snip
 
 with 'Data::Record::Serialize::Role::Base';
 END

@@ -19,6 +19,8 @@ requires 'Command::Run';
 
 requires 'Getopt::EX::termcolor';
 
+requires 'App::cat::v';
+
 on 'test' => sub {
     requires 'Test::More', '0.98';
 };

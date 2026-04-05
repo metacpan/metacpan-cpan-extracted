@@ -82,8 +82,6 @@ my $start = EV::timer(0.1, 0, sub {
             delete $keep{conn};
             $main::client_done = 1;
             EV::break if $main::server_close;
-            # Give server time to process close
-            my $t; $t = EV::timer(0.5, 0, sub { undef $t; EV::break; });
         },
         on_error => sub {
             diag "Client error: $_[1]";

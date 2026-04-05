@@ -21,16 +21,24 @@ use Test::More;
 	  isa => sub { die "$_[0] is too much cat food!" unless $_[0] < 15 },
 	);
 
+	has [qw/one two three/] => (
+	  is => 'rw',
+	  isa => Int
+	);
+
 	1;
 }
 
 package main;
 
-my $test = new Test "sour", "sweet", 10;
+my $test = new Test "sour", "sweet", 10, 1, 2, 3;
 
 is($test->taste, "sour", "expects sour");
 is($test->brand, "sweet", "expects sweet");
 is($test->pounds, 10, "expects pounds");
+is($test->one, 1, "one is 1");
+is($test->two, 2, "two is 2");
+is($test->three, 3, "three is 3");
 
 eval {
 	$test->taste('sweet');

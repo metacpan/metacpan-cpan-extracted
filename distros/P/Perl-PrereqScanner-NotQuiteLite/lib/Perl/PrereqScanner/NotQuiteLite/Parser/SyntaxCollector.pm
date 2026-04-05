@@ -34,7 +34,7 @@ sub parse_syntax_collector_args {
   if (ref $spec) {
     $spec = $spec->[0];
   }
-  return unless $spec;
+  return if !$spec or ref $spec;
 
   my @features =
     map {

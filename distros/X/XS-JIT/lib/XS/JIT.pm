@@ -6,7 +6,7 @@ use warnings;
 use File::Spec;
 use Config;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 require XSLoader;
 XSLoader::load('XS::JIT', $VERSION);

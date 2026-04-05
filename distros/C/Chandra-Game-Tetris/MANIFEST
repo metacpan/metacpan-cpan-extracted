@@ -1,0 +1,25 @@
+bin/chandra_tetris
+Changes
+ignore.txt
+lib/Chandra/Game/Tetris.pm
+lib/Chandra/Game/Tetris/Blocks.pm
+lib/Chandra/Game/Tetris/Blocks/Iblock.pm
+lib/Chandra/Game/Tetris/Blocks/Jblock.pm
+lib/Chandra/Game/Tetris/Blocks/Lblock.pm
+lib/Chandra/Game/Tetris/Blocks/Oblock.pm
+lib/Chandra/Game/Tetris/Blocks/Role.pm
+lib/Chandra/Game/Tetris/Blocks/Sblock.pm
+lib/Chandra/Game/Tetris/Blocks/Tblock.pm
+lib/Chandra/Game/Tetris/Blocks/Zblock.pm
+lib/Chandra/Game/Tetris/Engine.pm
+lib/Chandra/Game/Tetris/Grid.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for Chandra
 
+0.12  2026-04-04
+    - Add Chandra::Store - Persistent key-value storage for Chandra apps
+
 0.10  2026-04-02
     - Add Chandra::Shortcut — keyboard shortcuts and global hotkeys
 

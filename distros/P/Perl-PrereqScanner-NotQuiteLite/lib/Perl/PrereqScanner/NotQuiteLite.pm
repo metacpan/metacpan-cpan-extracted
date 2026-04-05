@@ -6,11 +6,11 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.9917';
+our $VERSION = '0.9918';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
-  ClassAutouse ClassLoad Core Inline KeywordDeclare Later
+  ClassAutouse ClassLoad Core FeatureCompatClass Inline KeywordDeclare Later
   Mixin ModuleRuntime MojoBase Moose MooseXDeclare ObjectPad Only
   PackageVariant Plack POE Prefork Superclass Syntax SyntaxCollector
   TestClassMost TestMore TestRequires UniversalVersion Unless
@@ -1369,7 +1369,6 @@ sub _scan {
           ($token_desc, $token_type) = ($token, 'OP');
         } else {
           ($token_desc, $token_type) = ('KEYWORD', 'KEYWORD');
-          $c->check_new_keyword($token);
           push @keywords, $token unless $token eq 'undef';
         }
       } else {

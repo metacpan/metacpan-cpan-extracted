@@ -5,12 +5,15 @@ examples/chat_hub.pl
 examples/chat_window.pl
 examples/counter_app.pl
 examples/devtools_example.pl
+examples/dialog_example.pl
 examples/element_example.pl
 examples/hot_reload_content.html
 examples/hot_reload_example.pl
+examples/multiwindow_example.pl
 examples/routing_example.pl
 examples/shortcut_example.pl
 examples/socket_ipc_example.pl
+examples/store_example.pl
 examples/tray_example.pl
 include/chandra/chandra.h
 include/chandra/chandra_bind.h
@@ -22,6 +25,8 @@ include/chandra/chandra_notify.h
 include/chandra/chandra_socket_client.h
 include/chandra/chandra_socket_common.h
 include/chandra/chandra_socket_hub.h
+include/chandra/chandra_store.h
+include/chandra/chandra_window.h
 include/webview-cocoa.c
 include/webview-gtk.c
 include/webview-tray-cocoa.c
@@ -45,6 +50,7 @@ lib/Chandra/Shortcut.pm
 lib/Chandra/Socket/Client.pm
 lib/Chandra/Socket/Connection.pm
 lib/Chandra/Socket/Hub.pm
+lib/Chandra/Store.pm
 lib/Chandra/Tray.pm
 Makefile.PL
 MANIFEST
@@ -90,6 +96,8 @@ t/37_css_js.t
 t/38_notify.t
 t/39_shortcut.t
 t/40_shortcut_edge.t
+t/41_store.t
+t/42_store_edge.t
 typemap
 xs/app.xs
 xs/bind.xs
@@ -107,6 +115,7 @@ xs/shortcut.xs
 xs/socket_client.xs
 xs/socket_connection.xs
 xs/socket_hub.xs
+xs/store.xs
 xs/tray.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

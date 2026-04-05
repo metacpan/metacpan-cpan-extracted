@@ -54,14 +54,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/vividsnow/EV-Websockets/issues"
+         "web" : "https://github.com/vividsnow/perl5-ev-websockets/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/vividsnow/EV-Websockets.git",
-         "web" : "https://github.com/vividsnow/EV-Websockets"
+         "url" : "https://github.com/vividsnow/perl5-ev-websockets.git",
+         "web" : "https://github.com/vividsnow/perl5-ev-websockets"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "File::ShareDir::ProjectDistDir" => 0,
     "Future" => 0,
     "Future::AsyncAwait" => "0.66",
+    "Import::Into" => 0,
     "JSON::MaybeXS" => 0,
     "JSON::PP" => 0,
     "JSON::Schema::Modern" => "0.617",
@@ -55,7 +56,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "0.307",
+  "VERSION" => "0.308",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,6 +67,7 @@ my %FallbackPrereqs = (
   "File::ShareDir::ProjectDistDir" => 0,
   "Future" => 0,
   "Future::AsyncAwait" => "0.66",
+  "Import::Into" => 0,
   "JSON::MaybeXS" => 0,
   "JSON::PP" => 0,
   "JSON::Schema::Modern" => "0.617",

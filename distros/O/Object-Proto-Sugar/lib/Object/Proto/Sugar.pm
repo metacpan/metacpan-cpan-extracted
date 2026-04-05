@@ -9,7 +9,7 @@ use Object::Proto;
 use Carp qw/croak/;
 our (%valid_types, @type_list);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 BEGIN {
 	@type_list  = @{ Object::Proto::list_types() };
@@ -35,7 +35,13 @@ sub import {
 	BEGIN::Lift::install(
 		($caller, 'has') => sub {
 			my ($name, %params) = @_;
-			push @spec, $name, \%params;
+			if (ref $name) {
+				for (@{$name}) {
+					push @spec, $_, \%params;
+				}
+			} else {
+				push @spec, $name, \%params;
+			}
 		}
 	);
 
@@ -105,7 +111,7 @@ sub import {
 			*{"${caller}::import_accessors"} = sub {
 				my ($class, @names) = @_;
 				my $target = caller();
-				# Use C-level installer — creates CVs with call checkers
+				# Use C-level installer - creates CVs with call checkers
 				# so code compiled after this gets custom ops
 				unless (@names) {
 					for my $pkg (_mro($class)) {
@@ -350,11 +356,9 @@ Object::Proto::Sugar - Moo-se-like syntax for Object::Proto
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
-
-our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
@@ -397,7 +401,7 @@ our $VERSION = '0.01';
 
 C<Object::Proto::Sugar> provides Moo-se-like declarative syntax over
 L<Object::Proto>, giving you C<has>, C<extends>, C<with>, C<requires>,
-method modifiers, and type constants — all compiled down to the
+method modifiers, and type constants - all compiled down to the
 zero-overhead XS layer underneath.
 
 =head1 KEYWORDS
@@ -434,7 +438,7 @@ Accepts a built-in type constant, a type name string, or a custom coderef:
 
 	isa => Str              # built-in type constant
 	isa => 'Str'            # same, as above
-	isa => sub { $_[0] > 0 }  # custom check — dies on failure
+	isa => sub { $_[0] > 0 }  # custom check - dies on failure
 
 =head3 default
 
@@ -442,7 +446,7 @@ Accepts a built-in type constant, a type name string, or a custom coderef:
 	default => 'text'       # string
 	default => []           # fresh arrayref per object
 	default => {}           # fresh hashref per object
-	default => sub { ... }  # coderef — called as builder
+	default => sub { ... }  # coderef - called as builder
 
 =head3 builder
 

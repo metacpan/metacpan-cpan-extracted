@@ -1,7 +1,7 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load('Object::Proto', $VERSION);
 

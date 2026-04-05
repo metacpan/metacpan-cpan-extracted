@@ -16,6 +16,10 @@ share {
 
     plugin 'Build::CMake';
 
+    my $has_libev = !system($^O eq 'darwin'
+        ? 'test -f "$(brew --prefix libev 2>/dev/null)/include/ev.h" 2>/dev/null'
+        : 'echo "#include <ev.h>" | cc -E -x c - >/dev/null 2>&1');
+
     build [
         ['%{cmake}',
             @{ meta->prop->{plugin_build_cmake}->{args} },
@@ -24,8 +28,8 @@ share {
             '-DCMAKE_BUILD_TYPE=Release',
             '-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
             '-DBUILD_SHARED_LIBS:BOOL=ON',
-            '-DLWS_WITH_LIBEV:BOOL=ON',
-            '-DLWS_WITH_EVLIB_PLUGINS:BOOL=ON',
+            '-DLWS_WITH_LIBEV:BOOL='  . ($has_libev ? 'ON' : 'OFF'),
+            '-DLWS_WITH_EVLIB_PLUGINS:BOOL=' . ($has_libev ? 'ON' : 'OFF'),
             '-DLWS_WITHOUT_TESTAPPS:BOOL=ON',
             '-DLWS_WITH_LIBCAP:BOOL=OFF',
             '-DLWS_WITH_SSL:BOOL=ON',

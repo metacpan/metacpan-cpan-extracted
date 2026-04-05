@@ -264,56 +264,44 @@ SKIP: {
     my ($msg_after_die, $connection_survived);
     my %keep;
 
+    my $srv_msg_count = 0;
     my $port = $ctx->listen(
         port => 0,
         on_connect => sub { $keep{srv} = $_[0] },
         on_message => sub {
             my ($c, $data) = @_;
+            $srv_msg_count++;
             $c->send("echo:$data");
+            if ($srv_msg_count == 1) {
+                # Send retry immediately — the client's die in on_message
+                # is caught by G_EVAL, so the connection stays alive
+                $c->send("retry");
+            }
         },
         on_close => sub { delete $keep{srv} },
     );
 
     my $phase = 0;
-    my $t = EV::timer(0.1, 0, sub {
-        $keep{cli} = $ctx->connect(
-            url => "ws://127.0.0.1:$port",
-            on_connect => sub {
-                $_[0]->send("first");
-            },
-            on_message => sub {
-                my ($c, $data) = @_;
-                if ($phase == 0) {
-                    $phase = 1;
-                    # This die should be caught by the XS layer, not crash
-                    die "test exception in on_message";
-                } elsif ($phase == 1) {
-                    $msg_after_die = $data;
-                    $connection_survived = 1;
-                    $c->close(1000);
-                }
-            },
-            on_close => sub {
-                delete $keep{cli};
-                my $t; $t = EV::timer(0.3, 0, sub { undef $t; EV::break });
-            },
-            on_error => sub { delete $keep{cli}; EV::break },
-        );
-    });
-
-    # The die in phase 0 prevents close(1000) and the second send.
-    # We need to re-trigger from the server side after the die.
-    # Actually, the die happens in on_message for "echo:first".
-    # The XS layer catches it via G_EVAL, warns, and continues.
-    # But the send("second") after close never happens because die unwinds.
-    # We need the server to send another message after the die.
-    # Let's use a timer to send from server after a delay.
-    my $resend; $resend = EV::timer(1.0, 0, sub {
-        undef $resend;
-        if ($keep{srv} && !$connection_survived) {
-            $keep{srv}->send("retry");
-        }
-    });
+    $keep{cli} = $ctx->connect(
+        url => "ws://127.0.0.1:$port",
+        on_connect => sub { $_[0]->send("first") },
+        on_message => sub {
+            my ($c, $data) = @_;
+            if ($phase == 0) {
+                $phase = 1;
+                die "test exception in on_message";
+            } elsif ($phase == 1) {
+                $msg_after_die = $data;
+                $connection_survived = 1;
+                $c->close(1000);
+            }
+        },
+        on_close => sub {
+            delete $keep{cli};
+            EV::break;
+        },
+        on_error => sub { delete $keep{cli}; EV::break },
+    );
 
     my $to = EV::timer(10, 0, sub { diag "Timeout!"; EV::break });
     EV::run;

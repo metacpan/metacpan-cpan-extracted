@@ -90,4 +90,47 @@ eval { Object::Proto::with('Article', 'Conflicting') };
 ok($@, 'Slot conflict detected');
 like($@, qr/Slot conflict.*'title'/, 'Error mentions conflicting slot');
 
+# Test 8: Eager builder on role slot can be implemented by consuming class
+Object::Proto::role('BuildableRole',
+    'payload:Str:builder()'
+);
+
+package BuildableConsumer;
+our $buildable_consumer_count = 0;
+sub _build_payload {
+    $buildable_consumer_count++;
+    return 'consumer payload';
+}
+package main;
+
+Object::Proto::define('BuildableConsumer');
+Object::Proto::with('BuildableConsumer', 'BuildableRole');
+
+$BuildableConsumer::buildable_consumer_count = 0;
+my $buildable = BuildableConsumer->new();
+is($BuildableConsumer::buildable_consumer_count, 1,
+   'Role eager builder called during consuming class construction');
+is($buildable->payload, 'consumer payload',
+   'Role slot builder value comes from consuming class');
+
+# Test 9: Same role builder remains overridable in subclasses
+Object::Proto::define('BuildableChild',
+    extends => 'BuildableConsumer',
+);
+
+package BuildableChild;
+our $buildable_child_count = 0;
+sub _build_payload {
+    $buildable_child_count++;
+    return 'child payload';
+}
+package main;
+
+$BuildableChild::buildable_child_count = 0;
+my $buildable_child = BuildableChild->new();
+is($BuildableChild::buildable_child_count, 1,
+   'Subclass can supply builder for inherited role slot');
+is($buildable_child->payload, 'child payload',
+   'Inherited role slot builder resolves in subclass');
+
 done_testing();

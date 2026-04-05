@@ -21,6 +21,7 @@ use Mo;
 extends 'Test::More';
 END
 
+#SKIP: works with only limited versions of perl
 test('Moose-like module that does not have Moose in its name', <<'END', {'Moxie' => 0, 'Test::More' => 0, 'Exporter' => 0});
 use Moxie;
 extends 'Test::More';

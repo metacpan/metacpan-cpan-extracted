@@ -5,6 +5,7 @@ use lib "$FindBin::Bin/../../";
 use Test::More;
 use t::Util;
 
+#EXPECTED: syntax error .+?, near "extends qw/Bar/"
 test('no moose', <<'END', {Moose => 0, Foo => 0});
 use Moose;
 extends qw/Foo/;

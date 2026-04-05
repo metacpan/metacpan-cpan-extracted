@@ -6,6 +6,8 @@ use Test::More;
 use t::Util;
 
 # taken from only.pm SYNOPSIS
+
+#EXPECTED: Loaded MyModule, but version .+ did not satisfy the requirement
 test('only bare => version', <<'END', {only => 0, MyModule => '0.30'});
 use only MyModule => 0.30;
 END
@@ -20,6 +22,7 @@ use only MyModule =>
     [ '0.30-',     qw(:all) ];
 END
 
+#EXPECTED: Loaded MyModule, but version .+ did not satisfy the requirement
 test('only {}, module => version', <<'END', {only => 0, MyModule => '0.33'});
 use only {versionlib => '/home/ingy/perlmods'},
     MyModule => 0.33;
@@ -29,6 +32,7 @@ test('only {}', <<'END', {only => 0});
 use only {versionlib => '/home/ingy/perlmods'};
 END
 
+#EXPECTED: Loaded Test::More, but version .+ did not satisfy the requirement
 test('only qw/bare version/', <<'END', {only => 0, 'Test::More' => 0.88});
 use only qw/Test::More 0.88/;
 END

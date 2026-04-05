@@ -53,11 +53,11 @@ WriteMakefile(Alien::Base::Wrapper->new('Alien::libwebsockets')->mm_args2(ev_arg
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/vividsnow/EV-Websockets.git',
-                web  => 'https://github.com/vividsnow/EV-Websockets',
+                url  => 'https://github.com/vividsnow/perl5-ev-websockets.git',
+                web  => 'https://github.com/vividsnow/perl5-ev-websockets',
             },
             bugtracker => {
-                web => 'https://github.com/vividsnow/EV-Websockets/issues',
+                web => 'https://github.com/vividsnow/perl5-ev-websockets/issues',
             },
         },
     },

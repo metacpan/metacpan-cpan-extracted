@@ -21,6 +21,96 @@
 #include "XSUB.h"
 
 /* ============================================
+ * PERL_STATIC_INLINE compatibility for Perl < 5.13.4
+ * ============================================ */
+#ifndef PERL_STATIC_INLINE
+#  define PERL_STATIC_INLINE static
+#endif
+
+/* ============================================
+ * Version checking macro
+ * ============================================ */
+#ifndef PERL_VERSION_GE
+#  define PERL_VERSION_GE(r,v,s) \
+      (PERL_REVISION > (r) || (PERL_REVISION == (r) && \
+       (PERL_VERSION > (v) || (PERL_VERSION == (v) && PERL_SUBVERSION >= (s)))))
+#endif
+
+/* ============================================
+ * XOP API backwards compatibility for custom ops
+ * Provides fallback to PL_custom_op_names/PL_custom_op_descs for pre-5.14 Perl.
+ * Based on Ancient::xop_compat.h
+ * ============================================ */
+
+#if PERL_VERSION_GE(5,14,0)
+/* Modern XOP API available */
+#  define XS_JIT_HAS_CUSTOM_OPS 1
+#else
+/* Pre-5.14: use deprecated custom op interface */
+#  define XS_JIT_HAS_CUSTOM_OPS 1  /* Still enable, but use compat code */
+
+/* Dummy XOP struct for pre-5.14 (stores name/desc for registration) */
+#  ifndef XOP_DEFINED_BY_COMPAT
+#    define XOP_DEFINED_BY_COMPAT 1
+typedef struct {
+    const char *xop_name;
+    const char *xop_desc;
+    U32 xop_class;
+} XOP;
+#  endif
+
+/* OA_UNOP/OA_BINOP may not be defined either */
+#  ifndef OA_UNOP
+#    define OA_UNOP 1
+#  endif
+#  ifndef OA_BINOP
+#    define OA_BINOP 2
+#  endif
+
+/* XopENTRY_set stores values in our dummy struct */
+#  ifndef XopENTRY_set
+#    define XopENTRY_set(xop, field, value) \
+        do { (xop)->field = (value); } while(0)
+#  endif
+
+/* Fallback custom op registration using deprecated interface */
+PERL_STATIC_INLINE void
+S_xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, const char *name, const char *desc) {
+    if (!PL_custom_op_names) {
+        PL_custom_op_names = newHV();
+    }
+    if (!PL_custom_op_descs) {
+        PL_custom_op_descs = newHV();
+    }
+    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(name, 0), 0);
+    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(desc, 0), 0);
+}
+
+#  undef Perl_custom_op_register
+#  ifdef PERL_IMPLICIT_CONTEXT
+#    define Perl_custom_op_register(ctx, ppfunc, xop) \
+        S_xop_compat_register_custom_op((ctx), (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)
+#  else
+#    define Perl_custom_op_register(ppfunc, xop) \
+        S_xop_compat_register_custom_op(aTHX_ (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)
+#  endif
+
+/* cv_set_call_checker doesn't exist pre-5.14, provide no-op */
+#  ifndef cv_set_call_checker
+#    define cv_set_call_checker(cv, checker, ckobj) /* no-op on pre-5.14 */
+#  endif
+#  ifndef cv_set_call_checker_flags
+#    define cv_set_call_checker_flags(cv, checker, ckobj, flags) /* no-op on pre-5.14 */
+#  endif
+
+/* PERL_MAGIC_checkcall doesn't exist pre-5.14 */
+#  ifndef PERL_MAGIC_checkcall
+#    define PERL_MAGIC_checkcall '&'
+#  endif
+
+#endif /* PERL_VERSION_GE(5,14,0) */
+
+/* ============================================
  * Op sibling compatibility for Perl < 5.22
  * These macros were added in Perl 5.21.2 as part of the
  * OP sibling rework. On older Perls, ops use op_sibling directly.
@@ -741,6 +831,9 @@ void xs_jit_register_checker(pTHX_ XS_JIT_Builder* b, const char* cv_expr, const
  * Inline ops replace function calls with custom ops at compile time,
  * bypassing XS call overhead entirely. This provides ~2x speedup.
  * 
+ * Note: cv_set_call_checker requires Perl 5.14+. On older Perls,
+ * xs_jit_inline_register returns 0 (not supported).
+ * 
  * Usage:
  *   CV* cv = get_cv("MyClass::name", 0);
  *   xs_jit_inline_register(aTHX_ cv, XS_JIT_INLINE_GETTER, 0, NULL, 0);
@@ -749,7 +842,7 @@ void xs_jit_register_checker(pTHX_ XS_JIT_Builder* b, const char* cv_expr, const
 /* Initialize inline op subsystem (safe to call multiple times) */
 void xs_jit_inline_init(pTHX);
 
-/* Register an inline op for a CV */
+/* Register an inline op for a CV. Returns 1 on success, 0 if not supported. */
 int xs_jit_inline_register(pTHX_ CV* cv, XS_JIT_InlineType type, 
                            IV slot, const char* key, STRLEN key_len);
 

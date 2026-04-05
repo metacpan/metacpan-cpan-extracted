@@ -3,5 +3,31 @@ Langertha-*
 *.html
 *.tar.gz
 .bash_history
-.env
 cover_db
+
+# Carton/Carmel
+/local/
+/.carmel/
+cpanfile.snapshot
+
+# Environment
+.env
+
+# Python
+__pycache__
+
+# Project related
+.home
+.data
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/

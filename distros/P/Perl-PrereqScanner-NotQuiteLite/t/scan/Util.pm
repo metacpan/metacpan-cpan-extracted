@@ -10,7 +10,7 @@ use if (-d ".git" and !$ENV{PERL_PSNQL_DEBUG}), "Test::FailWarnings";
 our @EXPORT = (@Test::More::EXPORT, qw/test todo_test test_with_error/);
 
 sub todo_test {
-  SKIP: {
+  TODO: {
     local $TODO = "FIXME";
     test(@_);
   }

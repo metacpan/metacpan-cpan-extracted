@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+my %conf = (
+	debug => 1,
+);
+my $help;
+
+GetOptions(
+	'app_width=i' => \$conf{app_width},
+	'app_height=i' => \$conf{app_height},
+	'grid_width=i' => \$conf{grid_width},
+	'grid_height=i' => \$conf{grid_height},
+	'debug!' => \$conf{debug},
+	'help|h' => \$help,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+use Chandra::Game::Tetris;
+
+Chandra::Game::Tetris->new(conf => \%conf)->run;
+
+=head1 SYNOPSIS
+
+	chandra_tetris [options]
+
+	  --app-width=N
+	  --app-height=N
+	  --grid-width=N
+	  --grid-height=N
+	  --debug
+	  --no-debug
+	  --help
+
+=cut

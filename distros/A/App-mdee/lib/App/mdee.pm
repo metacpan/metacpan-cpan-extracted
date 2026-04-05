@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 1;
 =encoding utf-8
@@ -30,6 +30,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
          --[no-]rule        use Unicode rules for tables (default: on)
+     -V  --cat-v            visualize whitespace via cat-v
      -w  --width=#          fold width (default: 80)
      -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark)
      -m  --mode=#           light or dark (default: light)
@@ -50,7 +51,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =cut
 =head1 DESCRIPTION
@@ -274,6 +275,13 @@ When enabled, ASCII pipe characters (C<|>) are replaced with
 Unicode box-drawing characters (C<│>, C<├>, C<┤>, C<┼>) and
 dashes (C<->) in separator lines are replaced with horizontal
 rules (C<─>).  Default is enabled.
+
+=item B<-V>, B<--cat-v>
+
+Pass the output through L<cat-v(1)|App::cat::v> to visualize
+whitespace and special characters.  Spaces are shown as C<·>
+and other invisible characters are made visible.  Newline
+visualization is disabled by default.
 
 =item B<-w> I<N>, B<--width>=I<N>
 

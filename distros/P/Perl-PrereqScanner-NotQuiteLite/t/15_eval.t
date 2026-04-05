@@ -32,6 +32,7 @@ use warnings;
 our $VERSION = '0.006001';
 $VERSION = eval $VERSION;
 
+our ($pod_spec, $synopsis, $constructor, $add_doc_pod);
 # (snip)
 
 sub bind_simple {

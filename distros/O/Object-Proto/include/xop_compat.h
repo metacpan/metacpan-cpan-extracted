@@ -43,10 +43,14 @@ typedef struct {
 #  endif
 
 /* XopENTRY_set stores values in our dummy struct
- * Modern Perl passes xop_name/xop_desc as the field, so we use it directly */
+ * Modern Perl passes xop_name/xop_desc as the field, so we use it directly
+ * For xop_class on pre-5.14, it's a no-op since we don't have the real API */
 #  ifndef XopENTRY_set
 #    define XopENTRY_set(xop, field, value) \
-        do { (xop)->field = (value); } while(0)
+        XopENTRY_set_impl_##field(xop, value)
+#    define XopENTRY_set_impl_xop_name(xop, value) do { (xop)->xop_name = (value); } while(0)
+#    define XopENTRY_set_impl_xop_desc(xop, value) do { (xop)->xop_desc = (value); } while(0)
+#    define XopENTRY_set_impl_xop_class(xop, value) do { /* no-op on pre-5.14 */ } while(0)
 #  endif
 
 /* Fallback custom op registration using deprecated interface

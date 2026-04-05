@@ -6,7 +6,8 @@ use Test::More;
 BEGIN { $ENV{PERL_PSNQL_MINVER} = 1 }
 use t::Util;
 
-test('say', <<'END', {perl => '5.010'});
+test('say', <<'END', {perl => '5.010', feature => 0});
+use feature 'say';
 say "hello";
 END
 
@@ -43,7 +44,7 @@ package Foo v0.0.1 { foo() }
 END
 
 test('use feature', <<'END', {perl => '5.010', feature => 0});
-use feature;
+use feature ();
 END
 
 test('use feature unicode_strings', <<'END', {perl => '5.012', feature => 0});
@@ -114,20 +115,25 @@ test('@-{}', <<'END', {perl => '5.010'});
 @-{"a"};
 END
 
-test('when', <<'END', {perl => '5.010'});
+test('when', <<'END', {perl => '5.010', feature => 0});
+use feature 'switch';
 when (1) { }
 END
 
-test('when', <<'END', {perl => '5.010'});
+test('when', <<'END', {perl => '5.010', feature => 0});
+use feature 'switch';
 when ([1,2,3]) { }
 END
 
 # TODO: sideff when is actually since 5.012
-todo_test('sideff when', <<'END', {perl => '5.012'});
+todo_test('sideff when', <<'END', {perl => '5.012', feature => 0});
+use feature 'switch';
 print "$_," when [1,2,3];
 END
 
-test('when', <<'END', {perl => '5.010'});
+test('when', <<'END', {perl => '5.010', feature => 0});
+use feature 'switch';
+sub foo {}
 warn; when (1) { foo(); }
 END
 
@@ -200,38 +206,43 @@ $gref->*{ $slot };
 END
 
 test('->@[]', <<'END', {perl => '5.020'});
-$aref->@[ ... ];
+$aref->@[ @_ ];
 END
 
 test('->@[]', <<'END', {perl => '5.020'});
+sub foo {}
 $aref->@[ foo() ];
 END
 
 test('->@{}', <<'END', {perl => '5.020'});
-$href->@{ ... };
+$href->@{ @_ };
 END
 
 test('->@{}', <<'END', {perl => '5.020'});
+sub foo {}
 $href->@{ foo() };
 END
 
 test('->%[]', <<'END', {perl => '5.020'});
-$aref->%[ ... ];
+$aref->%[ @_ ];
 END
 
 test('->%[]', <<'END', {perl => '5.020'});
+sub foo {}
 $aref->%[ foo() ];
 END
 
 test('->%{}', <<'END', {perl => '5.020'});
-$href->%{ ... };
+$href->%{ @_ };
 END
 
 test('->%{}', <<'END', {perl => '5.020'});
+sub foo {}
 $href->%{ foo() };
 END
 
 test('proto', <<'END', {});
+no feature 'signatures';
 sub mylink ($$)        { foo(); }
 sub myvec ($$$)        { foo(); }
 sub myindex ($$;$)     { foo(); }
@@ -248,7 +259,8 @@ sub myrand (;$)        { foo(); }
 sub mytime ()          { foo(); }
 END
 
-test('Catalyst controllers', <<'END', {});
+test('Catalyst controllers', <<'END', {'base' => 0, 'Catalyst::Controller' => 0});
+use base 'Catalyst::Controller';
 sub my_handles : Path('handles') { ... }
 sub my_handles : Local { ... }
 sub my_handles : Regex('^handles') { ... }
@@ -260,59 +272,69 @@ sub root : Chained('/') PathPart('/cd') CaptureArgs(1) {
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
-sub foo :lvalue ($a, $b = 1, @c) { .... }
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
+sub foo :lvalue ($a, $b = 1, @c) { ... }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($left, $right) {
     return $left + $right;
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($first, $, $third) {
     return "first=$first, third=$third";
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($left, $right = 0) {
     return $left + $right;
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($first_name, $surname, $nickname = $first_name) {
     print "$first_name $surname is known as \"$nickname\"";
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($thing, $=) {
     print $thing;
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($filter, @inputs) {
     print $filter->($_) foreach @inputs;
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($thing, @) {
     print $thing;
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($filter, %inputs) {
     print $filter->($_, $inputs{$_}) foreach sort keys %inputs;
 }
 END
 
-test('signatures', <<'END', {perl => '5.020'});
+test('signatures', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo ($thing, %) {
     print $thing;
 }
@@ -322,42 +344,51 @@ test(':prototype', <<'END', {perl => '5.020'});
 sub foo :prototype($) { $_[0] }
 END
 
-test(':prototype', <<'END', {perl => '5.020'});
+test(':prototype', <<'END', {perl => '5.020', feature => 0});
+use feature 'signatures';
 sub foo :prototype($$) ($left, $right) {
     return $left + $right;
 }
 END
 
-test('bitwise op', <<'END', {perl => '5.022'});
+test('bitwise op', <<'END', {perl => '5.022', feature => 0});
+use feature 'bitwise';
 $a &. $b
 END
 
-test('bitwise op', <<'END', {perl => '5.022'});
+test('bitwise op', <<'END', {perl => '5.022', feature => 0});
+use feature 'bitwise';
 $a |. $b
 END
 
-test('bitwise op', <<'END', {perl => '5.022'});
+test('bitwise op', <<'END', {perl => '5.022', feature => 0});
+use feature 'bitwise';
 $a ^. $b
 END
 
-test('bitwise op', <<'END', {perl => '5.022'});
+#SKIP: not implemented?
+test('bitwise op', <<'END', {perl => '5.022', feature => 0});
+use feature 'bitwise';
 $a ~. $b
 END
 
-test('bitwise op', <<'END', {perl => '5.022'});
+test('bitwise op', <<'END', {perl => '5.022', feature => 0});
+use feature 'bitwise';
 $a &.= $b
 END
 
-test('bitwise op', <<'END', {perl => '5.022'});
+test('bitwise op', <<'END', {perl => '5.022', feature => 0});
+use feature 'bitwise';
 $a |.= $b
 END
 
-test('bitwise op', <<'END', {perl => '5.022'});
+test('bitwise op', <<'END', {perl => '5.022', feature => 0});
+use feature 'bitwise';
 $a ^.= $b
 END
 
-test('<<NAME>>', <<'END', {perl => '5.022'});
-while(<<DATA>>) { ... }
+test('<<>>', <<'END', {perl => '5.022'});
+while(<<>>) { ... }
 END
 
 test('<<~', <<'END', {perl => '5.026'});

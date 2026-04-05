@@ -1,6 +1,6 @@
 package Langertha::Engine::LMStudioOpenAI;
 # ABSTRACT: LM Studio via OpenAI-compatible API
-our $VERSION = '0.307';
+our $VERSION = '0.308';
 use Moose;
 
 extends 'Langertha::Engine::OpenAIBase';
@@ -45,7 +45,7 @@ Langertha::Engine::LMStudioOpenAI - LM Studio via OpenAI-compatible API
 
 =head1 VERSION
 
-version 0.307
+version 0.308
 
 =head1 SYNOPSIS
 
