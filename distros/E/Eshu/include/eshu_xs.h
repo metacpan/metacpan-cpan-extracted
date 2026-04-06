@@ -258,6 +258,21 @@ static void eshu_xs_process_line(eshu_xs_ctx_t *ctx, eshu_buf_t *out,
 		return;
 	}
 
+	/* Check for module-level directives that must stay at column 0:
+	 * PROTOTYPES: ENABLE/DISABLE and VERSIONCHECK: ENABLE/DISABLE */
+	{
+		int mlen = (int)(eol - content);
+		if ((mlen >= 11 && memcmp(content, "PROTOTYPES:", 11) == 0) ||
+		    (mlen >= 13 && memcmp(content, "VERSIONCHECK:", 13) == 0)) {
+			ctx->section = ESHU_XS_NONE;
+			ctx->c_depth = 0;
+			ctx->c_ctx.state = ESHU_CODE;
+			eshu_buf_write_trimmed(out, content, line_len);
+			eshu_buf_putc(out, '\n');
+			return;
+		}
+	}
+
 	/* Check for BOOT: label (special: depth 0) */
 	if (eshu_xs_is_boot_label(content, eol)) {
 		ctx->section = ESHU_XS_LABEL;

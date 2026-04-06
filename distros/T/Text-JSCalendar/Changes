@@ -1,4 +1,22 @@
-Revision history for Perl extension Test::JSCalendar
+Revision history for Perl extension Text::JSCalendar
+
+0.03  2026-04-05
+	- Update for latest JSCalendar drafts (jscalendarbis,
+	  jscalendar-icalendar, icalendar-jscalendar-extensions)
+	- Add virtualLocations (CONFERENCE property)
+	- Add endTimeZone (replaces locations[end] hack)
+	- Add GEO -> locations[].coordinates
+	- Fix privacy/CLASS property bug
+	- Add priority, color, lastModified generation
+	- Add STYLED-DESCRIPTION -> descriptionContentType
+	- Add showWithoutTime alongside isAllDay
+	- freeBusyStatus is now a string (was boolean showAsFree)
+	- Add organizerCalendarAddress
+	- Add IMAGE -> links, binary ATTACH -> data: URI
+	- Add VTODO/Task support
+	- Add participant scheduleAgent, delegatedFrom/To, ROLE=OWNER
+	- @type updated to Event/Task per JSCalendar bis
+	- Add Cyrus CalDAV/JMAP integration tests
 
 0.02  2019-03-24
 	- add tests

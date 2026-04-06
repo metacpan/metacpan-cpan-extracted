@@ -1,0 +1,18 @@
+Revision history for Data-Buffer-Shared
+
+0.01  2026-04-05
+    - Initial release
+    - 11 type variants: I8/U8/I16/U16/I32/U32/I64/U64/F32/F64/Str
+    - File-backed, anonymous, and memfd constructors
+    - Lock-free atomic get/set for numeric types
+    - Atomic counters: incr/decr/add/cas/cmpxchg
+    - Atomic bitwise: and/or/xor
+    - Seqlock-guarded bulk: slice/set_slice/get_raw/set_raw/fill/clear
+    - Batch atomic add_slice
+    - Zero-copy as_scalar (mmap-aliased scalar ref)
+    - Raw pointer access: ptr/ptr_at
+    - Explicit locking: lock_wr/unlock_wr/lock_rd/unlock_rd
+    - fd passing: new_memfd/new_from_fd/fd
+    - eventfd notifications: create_eventfd/attach_eventfd/notify/wait_notify
+    - Futex-based rwlock with stale-lock recovery
+    - Keyword API via XS::Parse::Keyword

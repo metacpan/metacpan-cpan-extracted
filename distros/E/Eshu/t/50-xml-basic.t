@@ -147,4 +147,44 @@ END
 	is($got, $expected, 'indent_string with lang xml');
 }
 
+# Namespace-prefixed tags
+{
+	my $input = <<'END';
+<root xmlns:ns="http://example.com">
+<ns:child>text</ns:child>
+<ns:child>more</ns:child>
+</root>
+END
+
+	my $expected = <<'END';
+<root xmlns:ns="http://example.com">
+	<ns:child>text</ns:child>
+	<ns:child>more</ns:child>
+</root>
+END
+
+	my $got = Eshu->indent_xml($input);
+	is($got, $expected, 'namespace-prefixed tags');
+}
+
+# XML processing instruction does not change depth
+{
+	my $input = <<'END';
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+<child>text</child>
+</root>
+END
+
+	my $expected = <<'END';
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<child>text</child>
+</root>
+END
+
+	my $got = Eshu->indent_xml($input);
+	is($got, $expected, 'XML processing instruction does not affect depth');
+}
+
 done_testing();

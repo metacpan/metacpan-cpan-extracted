@@ -1,0 +1,308 @@
+o See also:
+- DataTraversal - For Term::TablePrint
+- DataTypes - For Rope
+- ModuleBuilding
+- https://en.wikipedia.org/wiki/ANSI_escape_code
+- https://en.wikipedia.org/wiki/X11_color_names
+- https://no-color.org/ - For env var NO_COLOR
+- https://turso.tech/ - For Turso DB
+
+<pre>
+Output from Gemini:
+- libtickit
+- The Terminal Interface Construction Kit
+- A high-level C library used for building interactive, full-screen terminal programs (TUIs)
+- It is designed to be a more modern and flexible alternative to the classic ncurses library
+</pre>
+
+<pre>
+Sample code from Dave Cross:
+#!/usr/bin/env bash
+BINDIR=`dirname $0`
+BINDIR="$BINDIR/../bin"
+TIMELINE="$BINDIR/timeline"
+$TIMELINE --years_per_grid=10 < $BINDIR/../examples/henry-viii.dat > henry-viii.svg
+</pre>
+
+<pre>
+Path to turso:
+/home/ron/perl5/lib/perl5/x86_64-linux/auto/share/dist/Alien-Turso-CLI/bin/turso
+</pre>
+
+o Aion::Emitter:
+- Event dispatcher
+- https://metacpan.org/dist/Aion-Emitter
+
+o Aion::Run:
+- Role for console commands
+- https://metacpan.org/dist/Aion-Run
+
+o Alien::libtickit:
+- Alien wrapping for libtickit
+- https://metacpan.org/dist/Alien-libtickit
+- This module behaves like ExtUtils::PkgConfig
+
+o Alien::Turso::CLI:
+- Install and find Turso CLI
+- https://metacpan.org/pod/Alien::Turso::CLI
+
+o App::ansicolumn:
+- ANSI sequence aware column command
+- https://metacpan.org/dist/App-ansicolumn
+
+o App::ansifold:
+- Fold command handling ANSI terminal sequences
+- https://metacpan.org/dist/App-ansifold
+
+o App::BashHistoryUtils:
+- CLI utilities related to bash history file
+- https://metacpan.org/dist/App-BashHistoryUtils
+
+o App::Cmd:
+- Write command line apps with less suffering
+- https://metacpan.org/pod/App::Cmd
+
+o App::cat::v:
+- cat-v command implementation
+- https://metacpan.org/dist/App-cat-v
+
+o App::chot:
+- Command Heuristic Omni-Tracer
+- https://metacpan.org/dist/App-chot
+- But see App::PMUtils
+
+o App::lms:
+- A utility to locate and display command or library files
+- https://metacpan.org/dist/App-lms
+- But see App::PMUtils
+
+o App::nup:
+- N-up output wrapper for optex -Mup
+- https://metacpan.org/dist/App-nup
+
+o App::oo_modulino_zsh_completion_helper:
+- Provides zsh completion for OO-Modulinos
+- https://metacpan.org/dist/App-oo_modulino_zsh_completion_helper
+
+o App::optex:
+- General purpose command option wrapper
+- https://metacpan.org/dist/App-optex
+
+o App::optex::up:
+- Optex module for multi-column paged output
+- https://metacpan.org/dist/App-optex-up
+
+o App::optex::rpn:
+- Optex module for Reverse Polish Notation calculation
+- https://metacpan.org/dist/App-optex-rpn
+
+o App::optex::xform:
+- Data transform filter module for optex
+- https://metacpan.org/dist/App-optex-xform
+
+o App::papersway:
+- PaperWM-like scrollable tiling window management for Sway/i3wm
+- https://metacpan.org/pod/App::papersway
+
+o App::PickArgs:
+- Pick one or more items from command-line arguments
+- https://metacpan.org/dist/App-PickArgs
+
+o App::PMUtils:
+- Command-line utilities related to Perl modules
+- https://metacpan.org/pod/App::PMUtils
+
+o App::SpeedTest:
+- Command-line interface to speedtest.net
+- https://metacpan.org/dist/App-SpeedTest
+
+o ARGV::OrDATA:
+- Let the diamond operator read from DATA if there's no ARGV
+- https://metacpan.org/dist/ARGV-OrDATA
+
+o Chandra:
+- Perl bindings to webview-c for creating cross-platform GUIs
+- https://metacpan.org/dist/Chandra
+
+o CLI::Cmdline:
+- Minimal command-line parser with short/long options and aliases in pure Perl
+- https://metacpan.org/dist/CLI-Cmdline
+
+o CLI::Framework:
+- Build standardized, flexible, testable command-line applications
+- https://metacpan.org/pod/CLI::Framework
+
+o CLI::Helpers:
+- Subroutines for making simple command line scripts
+- https://metacpan.org/dist/CLI-Helpers
+
+o CLI::Simple:
+- A minimalist object oriented base class for CLI applications
+- https://metacpan.org/dist/CLI-Simple
+
+o cpanm-shcompgen:
+- Install modules from CPAN (and activate shell completion)
+- https://metacpan.org/pod/cpanm-shcompgen
+- See shcompgen below
+
+o Curses:
+- Terminal screen handling and optimization
+- https://metacpan.org/dist/Curses
+
+o Getopt::App:
+- Write and test your script with ease
+- https://metacpan.org/dist/Getopt-App
+- Helps you structure your scripts and integrates Getopt::Long with a very simple API
+- Makes it very easy to test your script, since the script file can be sourced without actually being run
+
+o Getopt::ArgvFile:
+- Interpolates script options from files into @ARGV or another array
+- https://metacpan.org/pod/Getopt::ArgvFile
+
+o Getopt::Class:
+- Extended dictionary version of Getopt::Long
+- https://metacpan.org/dist/Getopt-Class
+- Fancy!
+
+o Getopt::EX:
+- Getopt Extender
+- https://metacpan.org/pod/Getopt::EX
+
+o Getopt::EX::Colormap:
+- ANSI terminal color and option support
+- https://metacpan.org/pod/Getopt::EX::Colormap
+
+o Getopt::EX::Config:
+- Getopt::EX module configuration interface
+- https://metacpan.org/pod/Getopt::EX::Config
+
+o Getopt::EX::Hashed:
+- Hash object automation for Getopt::Long
+- https://metacpan.org/dist/Getopt-EX-Hashed
+
+o Getopt::EX::i18n:
+- General i18n module
+- https://metacpan.org/dist/Getopt-EX-i18n
+
+o Getopt::EX::LabeledParam:
+- Labeled parameter handling
+- https://metacpan.org/pod/Getopt::EX::LabeledParam
+
+o Getopt::EX::termcolor:
+- Getopt::EX termcolor module
+- https://metacpan.org/pod/Getopt::EX::termcolor
+
+o Getopt::Guided:
+- getopts implementation that follows POSIX utility guidelines
+- https://metacpan.org/dist/Getopt-Guided
+
+o Getopt::Lazier:
+- Lazy Getopt-like command-line options and argument parser
+- https://metacpan.org/pod/Getopt::Lazier
+
+o Getopt::Long::Bash:
+- Bash option parsing that does what you mean
+- https://metacpan.org/dist/Getopt-Long-Bash
+
+o Getopt::Std:
+- Process single-character switches with switch clustering
+- https://metacpan.org/pod/Getopt::Std
+- Ships with Perl
+
+o Getopt::Type::Tiny:
+- Clean Getopt::Long wrapper with Type::Tiny support
+- https://metacpan.org/dist/Getopt-Type-Tiny
+
+o Getopt::Yath:
+- Option processing yath style
+- https://metacpan.org/pod/Getopt::Yath
+
+o MooX::Cmd:
+- Giving an easy Moo style way to make command organized CLI apps
+- https://metacpan.org/pod/MooX::Cmd
+
+o MooX::Options:
+- Explicit Options eXtension for Object Class
+- https://metacpan.org/pod/MooX::Options
+
+o OptArgs2:
+- Command-line argument and option processor
+- https://metacpan.org/pod/OptArgs2
+
+o PerlVision:
+- Text-mode User Interface Widgets
+- https://metacpan.org/dist/PerlVision
+
+o Progress::Any:
+- Record progress to any output
+- https://metacpan.org/dist/Progress-Any
+
+o Progress::Any::Output::TermProgressBarColor:
+- Output progress to terminal as color bar
+- https://metacpan.org/pod/Progress::Any::Output::TermProgressBarColor
+
+o Progress::Any::SIGHandler:
+- Output progress to terminal as simple message
+- https://metacpan.org/dist/Progress-Any-SIGHandler
+
+o Rope::Cmd:
+- Command Line Applications via Rope
+- https://metacpan.org/dist/Rope-Cmd
+
+o shcompgen:
+- Generate shell completion scripts
+- https://metacpan.org/pod/shcompgen
+- See cpanm-shcompgen above
+
+o Shell::Cmd:
+- Run shell commands with enhanced support
+- https://metacpan.org/release/SBECK/Shell-Cmd-3.05
+
+o String::ShellQuote:
+- Quote strings for passing through the shell
+- https://metacpan.org/pod/String::ShellQuote
+
+o Term::Choose:
+- Choose items from a list interactively.
+- https://metacpan.org/dist/Term-Choose
+
+o Term::Choose::LineFold:
+- Control the number of occupied columns of a character string on a terminal with a monospaced font
+- https://metacpan.org/pod/Term::Choose::LineFold
+
+o Term::Choose::LineFold::XS:
+- XS acceleration for Term-Choose-LineFold
+- https://metacpan.org/dist/Term-Choose-LineFold-XS
+
+o Term::Choose::Util:
+- TUI-related functions for selecting directories, files, numbers and subsets of lists.
+- https://metacpan.org/dist/Term-Choose-Util
+
+o Term::ProgressSpinner:
+- Terminal Progress bars!
+- https://metacpan.org/dist/Term-ProgressSpinner
+
+o Term::ReadLine:
+- Perl interface to various readline packages. If no real package is found, substitutes stubs instead of basic functions
+- https://metacpan.org/dist/Term-ReadLine
+
+o Term::ReadLine::Gnu:
+- Perl extension for the GNU Readline/History Library
+- https://metacpan.org/pod/Term::ReadLine::Gnu
+
+o Term::ReadLine::Repl:
+- A batteries included interactive Term::ReadLine REPL module
+- https://metacpan.org/dist/Term-ReadLine-Repl
+
+o Tickit:
+- Terminal Interface Construction KIT
+- https://metacpan.org/dist/Tickit
+
+o TVision:
+- Perl glue to the TurboVision library
+- https://metacpan.org/pod/TVision
+- A modern port of Turbo Vision 2.0, the classical framework for text-based user interfaces. Now cross-platform and with Unicode support
+
+o Win32API::Console:
+- Win32 native Console API
+- https://metacpan.org/dist/Win32API-Console

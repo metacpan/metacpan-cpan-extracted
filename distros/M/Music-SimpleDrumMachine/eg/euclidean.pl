@@ -7,7 +7,6 @@
 #   perl eg/euclidean.pl usb 100 -1 # multi-timbral
 
 use v5.36;
-
 use Math::Prime::XS qw(primes);
 use Music::CreatingRhythms ();
 use Music::SimpleDrumMachine ();
@@ -30,7 +29,7 @@ my $dm = Music::SimpleDrumMachine->new(
         part_B => \&part_B,
         part_C => \&part_C,
     },
-    verbose   => 1,
+    verbose => 1,
 );
 
 sub part_A {

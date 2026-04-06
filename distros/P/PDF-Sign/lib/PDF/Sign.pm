@@ -45,9 +45,8 @@ package PDF::Sign;
 # --- end BSD 2-Clause License ---
 
 use strict;
-no strict 'refs';
 use warnings;
-use 5.016;
+use 5.010;
 
 use Exporter 'import';
 use Cwd qw(getcwd);
@@ -93,7 +92,7 @@ BEGIN {
 # LWP fallback detection (curl preferred)
 my $HAS_LWP = eval { require LWP::UserAgent; 1 };
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our @EXPORT_OK = qw(
     config
@@ -213,15 +212,32 @@ sub prepare_file {
     $sigdict->{Filter} = PDFName("Adobe.PPKLite");
     $sigdict->{Reason} = PDFStr($reason);
     $sigdict->{Name}   = PDFStr(_cert_subject($x509_pem));
-
-    if ($^O eq 'linux') {
-        $sigdict->{M} = PDFStr(substr(strftime("D:%Y%m%d%H%M%S%z", localtime), 0, 19) . "'00'");
+    my $isodatetimetz;
+    # using %z for timeoffset only for well known supporting systems
+    if ($^O eq 'linux'   || $^O eq 'darwin'  ||
+        $^O eq 'freebsd' || $^O eq 'openbsd' ||
+        $^O eq 'netbsd'  || $^O eq 'solaris') {
+        $isodatetimetz = strftime("D:%Y%m%d%H%M%S%z", localtime);
+        $isodatetimetz =~ s/([+-]\d{2}):(\d{2})$/$1$2/;
     } else {
-        my @lt = localtime;
-        my $tz = $lt[8] ? 2 : 1;
-        $sigdict->{M} = PDFStr(substr(strftime("D:%Y%m%d%H%M%S+0${tz}", localtime), 0, 19) . "'00'");
-    }
+        # Calculate Time Zone Offset
+        # (timegm-based: correct DST handling for all timezones,
+        #  replaces the previous CET/CEST-only approach)
+        my $t      = time();
+        my @lt     = localtime($t);
 
+        use Time::Local qw(timegm);
+        my $offset_sec = timegm(@lt[0..5]) - $t;
+
+        my $sign = ($offset_sec < 0) ? '-' : '+';
+        my $abs  = abs($offset_sec);
+        my $oh   = int($abs / 3600);
+        my $om   = int(($abs % 3600) / 60);
+
+        my $tzo  = sprintf("%s%02d%02d", $sign, $oh, $om);
+        $isodatetimetz = strftime("D:%Y%m%d%H%M%S", @lt) . $tzo;
+    }
+    $sigdict->{M} = PDFStr($isodatetimetz);
     # ETSI.CAdES.detached only with OpenSSL 3+
     # LibreSSL (any version) and OpenSSL 1.x use adbe.pkcs7.detached
     if ($osslv =~ /^OpenSSL 3/) {
@@ -545,10 +561,10 @@ sub ts_query {
     my (%args) = @_;
     # args: in (file to timestamp), out (output .tsq file)
 
-    # sanitize paths — strip double quotes to prevent shell injection
+    # sanitize paths — strip non path chars  to prevent shell injection
     # (shell form used intentionally for stderr redirection, see note above)
-    (my $in_safe  = $args{in})  =~ s/\"//g;
-    (my $out_safe = $args{out}) =~ s/\"//g;
+    (my $in_safe  = $args{in})  =~ s/[^\\\:\_\w\.\/\-]//g;
+    (my $out_safe = $args{out}) =~ s/[^\\\:\_\w\.\/\-]//g;
 
     # NOTE: shell form used intentionally here (not list form) to allow
     # stderr redirection (2>/dev/null) and suppress openssl noise:
@@ -963,215 +979,3 @@ unless ($PDF_BACKEND) {
 }
 
 1;
-
-__END__
-
-=head1 NAME
-
-PDF::Sign - Sign PDF files with CMS/CAdES signatures and RFC3161 timestamps
-
-=head1 VERSION
-
-Version 0.03
-
-=head1 SYNOPSIS
-
-    use PDF::Sign qw(config :sign :ts);
-    # or selectively:
-    use PDF::Sign qw(config :sign);   # config prepare_file sign_file cms_sign
-    use PDF::Sign qw(config :ts);     # config prepare_ts ts_file ts_query tsa_fetch
-
-    # configure (recommended)
-    config(
-        osslcmd     => '/usr/local/bin/openssl',  # optional, default: 'openssl'
-        x509_pem    => '/path/to/cert.pem',
-        x509_chain  => '/path/to/chain.pem',      # optional
-        privkey_pem => '/path/to/privkey.pem',
-        tsaserver   => 'http://timestamp.digicert.com',
-        tmpdir      => '/tmp',
-        debug       => 0,
-    );
-
-    # sign
-    my $pdf = PDF::API2->open('input.pdf');
-    prepare_file($pdf, 0);              # 0 = invisible, 1 = visible widget
-    my $signed = sign_file($pdf);
-
-    # timestamp
-    my $pdf2 = PDF::API2->from_string($signed);
-    prepare_ts($pdf2);
-    my $timestamped = ts_file($pdf2);
-
-    open(my $fh, '>:raw', 'output.pdf') or die $!;
-    print $fh $timestamped;
-    close $fh;
-
-=head1 DESCRIPTION
-
-PDF::Sign provides functions to apply CMS/CAdES digital signatures and
-RFC3161 timestamps to PDF files, producing PAdES-compliant output.
-
-Requires an external C<openssl> binary for signing operations.
-TSA requests use C<curl> if available, falling back to L<LWP::UserAgent>.
-
-=head1 CONFIGURATION
-
-All configuration is done via package variables (C<our>), settable
-from the calling script:
-
-=over 4
-
-=item C<$PDF::Sign::osslcmd>
-
-Path to the openssl binary. Default: C<openssl> (from PATH).
-
-=item C<$PDF::Sign::x509_pem>
-
-Path to the signer certificate PEM file. Required for signing.
-
-=item C<$PDF::Sign::x509_chain>
-
-Path to the certificate chain PEM file. Optional.
-
-=item C<$PDF::Sign::privkey_pem>
-
-Path to the private key PEM file. Required for signing.
-
-=item C<$PDF::Sign::tsaserver>
-
-URL of the TSA server. Default: C<http://timestamp.digicert.com>.
-
-=item C<$PDF::Sign::tmpdir>
-
-Directory for temporary files. Default: current working directory.
-
-=item C<$PDF::Sign::siglen>
-
-Signature buffer size in bytes. Default: 8192 (1024*8).
-Increase if signatures are truncated.
-
-=item C<$PDF::Sign::debug>
-
-Enable debug output. Default: 0.
-
-=back
-
-=head1 FUNCTIONS
-
-=head2 config(%args)
-
-Configure PDF::Sign in one call. All keys are optional - only provided
-keys are updated. Recommended over setting package variables directly.
-
-    config(
-        osslcmd     => '/usr/local/bin/openssl',
-        x509_pem    => '/path/to/cert.pem',
-        x509_chain  => '/path/to/chain.pem',
-        privkey_pem => '/path/to/privkey.pem',
-        tsaserver   => 'http://timestamp.digicert.com',
-        tmpdir      => '/tmp',
-        siglen      => 6144,
-        debug       => 1,
-    );
-
-If C<osslcmd> is changed, the openssl version is re-detected automatically.
-
-Package variables (C<$PDF::Sign::x509_pem> etc.) still work for
-backwards compatibility.
-
-=head2 prepare_file($pdf, $presign, $reason)
-
-Prepares the AcroForm structure for a CMS/CAdES signature.
-C<$presign = 1> adds a visible widget on page 1; C<$presign = 0> adds
-an invisible field. C<$reason> is optional.
-
-=head2 sign_file($pdf)
-
-Applies the CMS/CAdES signature. Returns the signed PDF as a string.
-
-=head2 prepare_ts($pdf)
-
-Prepares the AcroForm structure for a RFC3161 DocTimeStamp.
-Appends to an existing AcroForm if a signature field already exists.
-
-=head2 ts_file($pdf)
-
-Applies the RFC3161 timestamp. Returns the timestamped PDF as a string.
-
-=head2 verify_signatures($pdf_path, %args)
-
-Reads and verifies all digital signatures in a PDF file.
-Returns an arrayref of hashrefs, one per signature field found:
-
-    my $sigs = verify_signatures('signed.pdf');
-    for my $sig (@$sigs) {
-        printf "Type:      %s\n", $sig->{type};       # cms | tsa
-        printf "SubFilter: %s\n", $sig->{subfilter};
-        printf "Signer:    %s\n", $sig->{signer};     # cms only
-        printf "Signed at: %s\n", $sig->{signed_at};  # cms only
-        printf "TSA at:    %s\n", $sig->{tsa_at};     # tsa only
-        printf "Valid:     %s\n", $sig->{valid} ? '1' : '0';
-        printf "Error:     %s\n", $sig->{error} if $sig->{error};
-    }
-
-Optional args:
-
-    verify_signatures('signed.pdf', ca_bundle => '/etc/ssl/certs/ca-bundle.crt');
-
-Without C<ca_bundle>, verification uses C<-noverify> (no CA chain check -
-cryptographic integrity only). With C<ca_bundle>, full chain verification
-is performed.
-
-=head2 cms_sign(%args)
-
-Low-level: invokes openssl cms to sign a file stream.
-Args: C<signer>, C<inkey>, C<in>, C<certfile> (optional).
-Returns raw DER signature bytes.
-
-=head2 ts_query(%args)
-
-Low-level: generates a .tsq timestamp query file via openssl ts.
-Args: C<in> (file to timestamp), C<out> (output .tsq path).
-
-=head2 tsa_fetch(%args)
-
-Low-level: sends .tsq to TSA server, returns TimeStampToken DER bytes.
-Args: C<tsq> (input .tsq path), C<tsa_url>.
-Uses curl if available, falls back to LWP::UserAgent.
-
-=head1 DEPENDENCIES
-
-=over 4
-
-=item * L<PDF::API2> or L<PDF::Builder> (one required)
-
-=item * L<File::Slurp>
-
-=item * L<MIME::Base64> (core)
-
-=item * L<POSIX> (core)
-
-=item * External: C<openssl> binary
-
-=item * External: C<curl> binary (optional, falls back to LWP::UserAgent)
-
-=back
-
-=head1 AUTHOR
-
-Massimiliano Citterio
-
-Originally inspired by Martin Schuette E<lt>info@mschuette.nameE<gt> (2012)
-L<https://mschuette.name/files/pdfsign.pl>
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself (GPL/Artistic License).
-
-See L<http://dev.perl.org/licenses/> for more information.
-
-The original code by Martin Schuette is covered by the BSD 2-Clause License
-retained in the source.
-
-=cut

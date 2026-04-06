@@ -23,6 +23,9 @@ t/14-extends.t
 t/15-roles.t
 t/16-type-constants.t
 t/17-func-accessors.t
+t/18-attributes.t
+t/19-lazier.t
+t/20-constants.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

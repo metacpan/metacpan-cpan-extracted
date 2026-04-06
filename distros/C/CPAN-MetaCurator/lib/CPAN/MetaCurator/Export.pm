@@ -17,7 +17,7 @@ use File::Slurper 'read_lines';
 
 our %seen;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 # -----------------------------------------------
 

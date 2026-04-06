@@ -17,7 +17,8 @@ sub RunTest ($$) {
     my $config   = shift;
     my $numTests = shift;
 
-    if ( !open( CF, ">$CONFIG_FILE" ) || !( print CF $config ) || !close(CF) ) {
+    my $cf;
+    if ( !open( $cf, '>', $CONFIG_FILE ) || !( print $cf $config ) || !close($cf) ) {
         die "Error while creating config file $CONFIG_FILE: $!";
     }
 

@@ -23,6 +23,7 @@ t/01-c-basic.t
 t/02-c-comments.t
 t/03-c-preprocessor.t
 t/04-c-strings.t
+t/05-c-structs.t
 t/10-pl-basic.t
 t/11-pl-strings.t
 t/12-pl-heredoc.t
@@ -31,12 +32,15 @@ t/14-pl-qw.t
 t/15-pl-pod.t
 t/16-pl-comments.t
 t/17-pl-complex.t
+t/18-pl-special-blocks.t
+t/19-pl-misc.t
 t/20-xs-c-section.t
 t/21-xs-xsub-basic.t
 t/22-xs-labels.t
 t/23-xs-nested-c.t
 t/24-xs-multi-xsub.t
 t/25-xs-boot.t
+t/26-xs-advanced.t
 t/30-cli-basic.t
 t/31-cli-diff.t
 t/32-cli-check.t
@@ -58,6 +62,7 @@ t/54-html-verbatim.t
 t/55-html-void.t
 t/56-xml-multiline-tag.t
 t/57-xml-complex.t
+t/58-xml-html5.t
 t/60-css-basic.t
 t/61-css-comments.t
 t/62-css-strings.t
@@ -65,6 +70,8 @@ t/63-css-atrules.t
 t/64-css-nested.t
 t/65-css-url.t
 t/66-css-complex.t
+t/67-css-custom-props.t
+t/68-css-advanced.t
 t/70-dir-basic.t
 t/71-dir-recursive.t
 t/72-dir-filter.t
@@ -90,6 +97,8 @@ t/93-pl-defined-or.t
 t/94-pl-end-data.t
 t/95-pod-verbatim-relative.t
 t/96-pl-array-last-index.t
+t/98-edge-general.t
+t/99-js-modern.t
 t/lib/Sample/Cache.pm
 t/lib/Sample/Router.pm
 t/lib/sample_hashtable.h

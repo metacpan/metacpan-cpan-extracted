@@ -1,5 +1,10 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2026.095.1 Sun Apr  5 20:20:51 2026
+	- news: Options 'select/having' added; by CCELSO
+	- news: Options 'select/buffer_reverse' added; by CCELSO
+	- fix: write error on testSQL.t:/tmp folder for OpenBSD.amd64-openbsd-thread-multi; by CCELSO
+
 2024.213.1 Wed Jul 31 23:09:41 2024
 	- fix: function parsing fields error in multiple tables; by CCELSO
 

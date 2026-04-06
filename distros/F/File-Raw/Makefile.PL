@@ -66,9 +66,12 @@ WriteMakefile(%WriteMakefileArgs);
 package MY;
 
 sub postamble {
+    # IMPORTANT: Do NOT pass $(PASTHRU) to the test XS module build.
+    # PASTHRU may contain INSTALL_BASE or PREFIX which conflict with
+    # the test module's local blib installation paths.
     return <<'MAKE_FRAG';
 build_test_xs : $(INST_DYNAMIC)
-	cd t/xs/file_api_test && $(PERL) Makefile.PL $(PASTHRU) && $(MAKE) $(PASTHRU)
+	cd t/xs/file_api_test && $(PERL) Makefile.PL && $(MAKE)
 
 all :: build_test_xs
 MAKE_FRAG

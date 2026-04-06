@@ -1,0 +1,46 @@
+# Exercises many branches in Spec / ClientModels (plain object properties, $ref, array).
+openapi: 3.0.0
+info:
+  title: Kitchen sink
+  version: '1.0'
+paths:
+  /sink:
+    get:
+      operationId: get_sink
+      summary: one operation
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OuterDto'
+components:
+  schemas:
+    InnerDto:
+      type: object
+      properties:
+        label:
+          type: string
+    OuterDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+        ratio:
+          type: number
+        flag:
+          type: boolean
+        status:
+          type: string
+          enum:
+            - alpha
+            - beta
+        tags:
+          type: array
+          items:
+            type: string
+        inner:
+          $ref: '#/components/schemas/InnerDto'

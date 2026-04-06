@@ -97,4 +97,54 @@ END
 	is($got, $expected, '@layer nesting');
 }
 
+# @supports with compound and condition
+{
+	my $input = <<'END';
+@supports (display: grid) and (gap: 10px) {
+.grid {
+display: grid;
+gap: 10px;
+}
+}
+END
+
+	my $expected = <<'END';
+@supports (display: grid) and (gap: 10px) {
+	.grid {
+		display: grid;
+		gap: 10px;
+	}
+}
+END
+
+	my $got = Eshu->indent_css($input);
+	is($got, $expected, '@supports with compound and condition');
+}
+
+# @page rule
+{
+	my $input = <<'END';
+@page {
+margin: 1in;
+orphans: 3;
+}
+@page :first {
+margin-top: 2in;
+}
+END
+
+	my $expected = <<'END';
+@page {
+	margin: 1in;
+	orphans: 3;
+}
+@page :first {
+	margin-top: 2in;
+}
+END
+
+	my $got = Eshu->indent_css($input);
+	is($got, $expected, '@page rule');
+}
+
 done_testing();

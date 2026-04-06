@@ -1,11 +1,11 @@
 ---
 module: CGI::Info
 function: script_path
+accessor:
+  property: script_path
+  type: getter
 
 new:
-
-# script_path takes no arguments
-input: undef
 
 # Returns an absolute path
 output:

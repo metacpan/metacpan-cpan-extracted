@@ -133,4 +133,78 @@ END
 	is($got, $expected, 'inline tags on same line cancel out');
 }
 
+# Atom feed structure
+{
+	my $input = <<'END';
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>My Blog</title>
+<link href="https://example.com"/>
+<entry>
+<title>Post One</title>
+<link href="https://example.com/1"/>
+<summary>First post</summary>
+</entry>
+<entry>
+<title>Post Two</title>
+<link href="https://example.com/2"/>
+<summary>Second post</summary>
+</entry>
+</feed>
+END
+
+	my $expected = <<'END';
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>My Blog</title>
+	<link href="https://example.com"/>
+	<entry>
+		<title>Post One</title>
+		<link href="https://example.com/1"/>
+		<summary>First post</summary>
+	</entry>
+	<entry>
+		<title>Post Two</title>
+		<link href="https://example.com/2"/>
+		<summary>Second post</summary>
+	</entry>
+</feed>
+END
+
+	my $got = Eshu->indent_xml($input);
+	is($got, $expected, 'Atom feed structure');
+}
+
+# Namespace-prefixed XML at multiple depths
+{
+	my $input = <<'END';
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Header>
+<auth:Token xmlns:auth="http://example.com/auth">abc123</auth:Token>
+</soap:Header>
+<soap:Body>
+<m:GetUser xmlns:m="http://example.com/api">
+<m:Id>42</m:Id>
+</m:GetUser>
+</soap:Body>
+</soap:Envelope>
+END
+
+	my $expected = <<'END';
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Header>
+		<auth:Token xmlns:auth="http://example.com/auth">abc123</auth:Token>
+	</soap:Header>
+	<soap:Body>
+		<m:GetUser xmlns:m="http://example.com/api">
+			<m:Id>42</m:Id>
+		</m:GetUser>
+	</soap:Body>
+</soap:Envelope>
+END
+
+	my $got = Eshu->indent_xml($input);
+	is($got, $expected, 'namespace-prefixed XML with SOAP envelope');
+}
+
 done_testing();

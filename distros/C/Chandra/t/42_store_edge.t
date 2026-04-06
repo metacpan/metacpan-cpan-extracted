@@ -3,13 +3,12 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Spec;
 use POSIX qw(:sys_wait_h);
 
 use_ok('Chandra::Store');
 
 my $dir = tempdir(CLEANUP => 1);
-sub sp { File::Spec->catfile($dir, "$_[0].json") }
+sub sp { "$dir/$_[0].json" }
 
 # ---- Corrupt JSON recovery ----
 
@@ -49,7 +48,7 @@ sub sp { File::Spec->catfile($dir, "$_[0].json") }
 # ---- Missing directory created automatically ----
 
 {
-    my $nested = File::Spec->catfile($dir, 'deep', 'nested', 'dir', 'store.json');
+    my $nested = "$dir/deep/nested/dir/store.json";
     my $s = Chandra::Store->new(path => $nested);
     $s->set('x', 1);
     ok(-f $nested, 'deeply nested directory and file created automatically');
@@ -194,7 +193,9 @@ SKIP: {
     like($store->path, qr/store\.json$/, 'name-based path ends in store.json');
     # Cleanup
     unlink $store->path;
-    rmdir(File::Basename::dirname($store->path));
+    my $path = $store->path;
+    $path =~ s|/[^/]+$||;  # simple dirname
+    rmdir($path);
 }
 
 done_testing();

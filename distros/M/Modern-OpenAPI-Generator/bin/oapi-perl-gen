@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+use v5.026;
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catdir( $Bin, '..', 'lib' );
+
+use Modern::OpenAPI::Generator::CLI ();
+Modern::OpenAPI::Generator::CLI->run(@ARGV);
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+oapi-perl-gen - Generate Mojolicious OpenAPI 3.x clients, servers, models, and docs
+
+=head1 SYNOPSIS
+
+  oapi-perl-gen --name MyApp::API --output ./generated openapi.yaml
+
+  oapi-perl-gen --name MyApp::API -o ./out ./spec/openapi.yaml
+
+  oapi-perl-gen --help              # full manual (L<Pod::Usage>, POD from ::CLI)
+
+  oapi-perl-gen --usage             # synopsis only (L<Pod::Usage>)
+
+=head1 DESCRIPTION
+
+This program delegates to L<Modern::OpenAPI::Generator::CLI>. Help text is
+served from the same POD as L<Modern::OpenAPI::Generator::CLI> via
+L<Pod::Usage> (C<--help> full, C<--usage> short), not a hand-maintained string.
+
+For the generator itself (what files are written, client/server/models), see
+L<Modern::OpenAPI::Generator>.
+
+=head1 OPTIONS
+
+See L<Modern::OpenAPI::Generator::CLI>. Run C<oapi-perl-gen --help> or
+C<perldoc Modern::OpenAPI::Generator::CLI>.
+
+=head1 SEE ALSO
+
+L<Modern::OpenAPI::Generator>, L<Modern::OpenAPI::Generator::CLI>
+
+=cut

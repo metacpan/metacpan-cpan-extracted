@@ -11,13 +11,45 @@
 
 #include "chandra.h"
 #include <sys/stat.h>
+#ifndef _WIN32
 #include <sys/file.h>
+#endif
 #include <fcntl.h>
+#ifndef _WIN32
 #include <unistd.h>
+#include <pwd.h>
+#endif
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-#include <pwd.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <process.h>  /* _getpid() */
+#ifndef getpid
+#define getpid _getpid
+#endif
+#ifndef LOCK_SH
+#define LOCK_SH 1
+#define LOCK_EX 2
+#define LOCK_UN 8
+#endif
+static int
+_chandra_store_flock(int fd, int op)
+{
+    HANDLE h = (HANDLE)_get_osfhandle(fd);
+    OVERLAPPED ov;
+    DWORD flags = 0;
+    if (h == INVALID_HANDLE_VALUE) return -1;
+    memset(&ov, 0, sizeof(ov));
+    if (op & LOCK_UN)
+        return UnlockFileEx(h, 0, MAXDWORD, MAXDWORD, &ov) ? 0 : -1;
+    if (op & LOCK_EX)
+        flags |= LOCKFILE_EXCLUSIVE_LOCK;
+    return LockFileEx(h, flags, 0, MAXDWORD, MAXDWORD, &ov) ? 0 : -1;
+}
+#define flock(fd, op) _chandra_store_flock((fd), (op))
+#endif
 
 #ifdef CHANDRA_XS_IMPLEMENTATION
 
@@ -98,29 +130,68 @@ chandra_store_decode(pTHX_ SV *json_sv, const char *path)
  * ============================================================================ */
 
 static int
-chandra_store_mkdirp(const char *path, mode_t mode)
+chandra_store_mkdirp(const char *path, int mode)
 {
     char tmp[4096];
     char *p;
-    struct stat st;
     size_t len;
 
-    if (stat(path, &st) == 0) return 0;
+#ifdef _WIN32
+    /* Use Win32 API to avoid Perl's stat/mkdir macro redefinitions */
+    DWORD attr = GetFileAttributesA(path);
+    if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY))
+        return 0;
+#else
+    {
+        struct stat st;
+        if (stat(path, &st) == 0) return 0;
+    }
+#endif
 
     strncpy(tmp, path, sizeof(tmp) - 1);
     tmp[sizeof(tmp) - 1] = '\0';
     len = strlen(tmp);
     if (len > 0 && tmp[len - 1] == '/') tmp[len - 1] = '\0';
+#ifdef _WIN32
+    /* Also handle backslash separators */
+    if (len > 0 && tmp[len - 1] == '\\') tmp[len - 1] = '\0';
+#endif
 
     for (p = tmp + 1; *p; p++) {
+#ifdef _WIN32
+        if (*p == '/' || *p == '\\') {
+#else
         if (*p == '/') {
+#endif
             *p = '\0';
-            if (stat(tmp, &st) != 0)
-                if (mkdir(tmp, mode) != 0 && errno != EEXIST) return -1;
-            *p = '/';
+#ifdef _WIN32
+            {
+                DWORD a = GetFileAttributesA(tmp);
+                if (a == INVALID_FILE_ATTRIBUTES || !(a & FILE_ATTRIBUTE_DIRECTORY))
+                    if (!CreateDirectoryA(tmp, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+                        return -1;
+            }
+#else
+            {
+                struct stat st;
+                if (stat(tmp, &st) != 0)
+                    if (mkdir(tmp, mode) != 0 && errno != EEXIST) return -1;
+            }
+#endif
+            *p =
+#ifdef _WIN32
+                '\\';
+#else
+                '/';
+#endif
         }
     }
+#ifdef _WIN32
+    if (!CreateDirectoryA(tmp, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+        return -1;
+#else
     if (mkdir(tmp, mode) != 0 && errno != EEXIST) return -1;
+#endif
     return 0;
 }
 
@@ -213,13 +284,19 @@ chandra_store_save_c(pTHX_ HV *self_hv)
     strncpy(dir_buf, path, sizeof(dir_buf) - 1);
     dir_buf[sizeof(dir_buf) - 1] = '\0';
     last_slash = strrchr(dir_buf, '/');
+#ifdef _WIN32
+    {
+        char *bs = strrchr(dir_buf, '\\');
+        if (!last_slash || (bs && bs > last_slash)) last_slash = bs;
+    }
+#endif
     if (last_slash) {
         *last_slash = '\0';
         chandra_store_mkdirp(dir_buf, 0700);
     }
 
     /* Build .tmp.PID path */
-    snprintf(tmp_path, sizeof(tmp_path), "%s.tmp.%d", path, (int)getpid());
+    my_snprintf(tmp_path, sizeof(tmp_path), "%s.tmp.%d", path, (int)getpid());
 
     /* JSON-encode the data */
     json_sv = chandra_store_encode(aTHX_ *data_svp);
@@ -240,9 +317,15 @@ chandra_store_save_c(pTHX_ HV *self_hv)
 
     SvREFCNT_dec(json_sv);
 
+#ifdef _WIN32
+    if (!MoveFileExA(tmp_path, path, MOVEFILE_REPLACE_EXISTING))
+        croak("Chandra::Store: cannot rename '%s' to '%s': error %lu\n",
+              tmp_path, path, (unsigned long)GetLastError());
+#else
     if (rename(tmp_path, path) != 0)
         croak("Chandra::Store: cannot rename '%s' to '%s': %s\n",
               tmp_path, path, strerror(errno));
+#endif
 }
 
 static void
@@ -309,11 +392,23 @@ chandra_store_default_path(pTHX_ const char *name)
     const char *home = getenv("HOME");
     SV *path_sv;
 
+#ifdef _WIN32
+    if (!home || !*home) {
+        home = getenv("USERPROFILE");
+    }
+    if (!home || !*home) {
+        home = getenv("APPDATA");
+    }
+    if (!home || !*home) {
+        home = "C:\\\\";
+    }
+#else
     if (!home || !*home) {
         /* Fall back to getpwuid */
         struct passwd *pw = getpwuid(getuid());
         home = pw ? pw->pw_dir : "/tmp";
     }
+#endif
 
     path_sv = newSVpvf("%s/.chandra/%s/store.json", home, name);
     return path_sv;

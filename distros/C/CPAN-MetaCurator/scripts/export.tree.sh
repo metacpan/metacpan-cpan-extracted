@@ -9,3 +9,8 @@ declare -x DEST=$DH/misc
 
 cp $SOURCE $DEST
 echo Copied $SOURCE to $DEST
+
+declare -x DEST=~/savage.net.au/misc
+
+cp $SOURCE $DEST
+echo Copied $SOURCE to $DEST

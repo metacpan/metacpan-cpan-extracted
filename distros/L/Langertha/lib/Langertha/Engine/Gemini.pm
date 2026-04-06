@@ -1,20 +1,21 @@
 package Langertha::Engine::Gemini;
 # ABSTRACT: Google Gemini API
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
 
 extends 'Langertha::Engine::Remote';
 
-with 'Langertha::Role::'.$_ for (qw(
+with map { 'Langertha::Role::'.$_ } qw(
   Models
   Chat
   Temperature
   ResponseSize
   SystemPrompt
   Streaming
-));
+  Tools
+);
 
 
 sub default_response_size { 2048 }
@@ -366,8 +367,6 @@ sub format_tool_results {
   );
 }
 
-with 'Langertha::Role::Tools';
-
 __PACKAGE__->meta->make_immutable;
 
 
@@ -385,7 +384,7 @@ Langertha::Engine::Gemini - Google Gemini API
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

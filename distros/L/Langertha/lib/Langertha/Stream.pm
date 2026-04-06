@@ -1,8 +1,7 @@
 package Langertha::Stream;
 # ABSTRACT: Iterator for streaming responses
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
-use namespace::autoclean;
 use Carp qw( croak );
 
 
@@ -82,7 +81,7 @@ Langertha::Stream - Iterator for streaming responses
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

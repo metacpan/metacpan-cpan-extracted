@@ -1,12 +1,13 @@
 package Langertha::Engine::OpenAIBase;
 # ABSTRACT: Base class for OpenAI-compatible engines
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak );
+use Module::Runtime qw( use_module );
 
 extends 'Langertha::Engine::Remote';
 
-with 'Langertha::Role::'.$_ for (qw(
+with map { 'Langertha::Role::'.$_ } qw(
   OpenAICompatible
   OpenAPI
   Models
@@ -15,7 +16,11 @@ with 'Langertha::Role::'.$_ for (qw(
   SystemPrompt
   Streaming
   Chat
-));
+);
+
+sub _build_openapi_operations {
+  return use_module('Langertha::Spec::OpenAI')->data;
+}
 
 
 sub default_model { croak "".(ref $_[0])." requires model to be set" }
@@ -38,7 +43,7 @@ Langertha::Engine::OpenAIBase - Base class for OpenAI-compatible engines
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

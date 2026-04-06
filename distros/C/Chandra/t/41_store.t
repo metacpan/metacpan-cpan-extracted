@@ -3,12 +3,11 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Spec;
 
 use_ok('Chandra::Store');
 
 my $dir = tempdir(CLEANUP => 1);
-sub store_path { File::Spec->catfile($dir, "$_[0].json") }
+sub store_path { "$dir/$_[0].json" }
 
 # ---- Construction ----
 

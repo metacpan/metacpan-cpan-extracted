@@ -1,6 +1,6 @@
 package Langertha;
 # ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use utf8;
 use strict;
 use warnings;
@@ -156,7 +156,7 @@ Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

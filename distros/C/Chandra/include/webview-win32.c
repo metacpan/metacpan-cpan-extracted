@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 #include <shlobj.h>
+#include <commdlg.h>   /* OPENFILENAMEA, GetOpenFileNameA, GetSaveFileNameA */
+#include <shellapi.h>  /* NOTIFYICONDATAA, Shell_NotifyIconA */
 
 /* ---- OLE / IWebBrowser2 helpers ---- */
 
@@ -311,9 +313,9 @@ static WebviewSite *create_site(struct webview *w, HWND hwnd) {
 
 /* ---- Navigate helper ---- */
 
-static void navigate(IOleObject **browser, const char *url) {
+static void navigate(IOleObject *browser, const char *url) {
   IWebBrowser2 *wb = NULL;
-  (*browser)->lpVtbl->QueryInterface(*browser, &IID_IWebBrowser2, (void **)&wb);
+  browser->lpVtbl->QueryInterface(browser, &IID_IWebBrowser2, (void **)&wb);
   if (wb) {
     int len = MultiByteToWideChar(CP_UTF8, 0, url, -1, NULL, 0);
     BSTR burl = SysAllocStringLen(NULL, len);
@@ -342,8 +344,8 @@ static LRESULT CALLBACK webview_wndproc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
   case WM_SIZE: {
     if (w && w->priv.browser) {
       IOleInPlaceObject *ipo = NULL;
-      (*(w->priv.browser))->lpVtbl->QueryInterface(
-          *(w->priv.browser), &IID_IOleInPlaceObject, (void **)&ipo);
+      w->priv.browser->lpVtbl->QueryInterface(
+          w->priv.browser, &IID_IOleInPlaceObject, (void **)&ipo);
       if (ipo) {
         RECT rc;
         GetClientRect(hwnd, &rc);
@@ -428,14 +430,14 @@ WEBVIEW_API int webview_init(struct webview *w) {
 
   /* Create OLE browser object */
   IOleObject *ole = NULL;
-  HRESULT hr = CoCreateInstance(&CLSID_WebBrowser, NULL, CLSCTX_INPLACE_SERVER,
+  HRESULT hr = CoCreateInstance(&CLSID_WebBrowser, NULL, CLSCTX_INPROC_SERVER,
                                 &IID_IOleObject, (void **)&ole);
   if (FAILED(hr) || !ole) {
     DestroyWindow(w->priv.hwnd);
     return -1;
   }
 
-  w->priv.browser = (IOleObject **)ole;
+  w->priv.browser = ole;
 
   WebviewSite *site = create_site(w, w->priv.hwnd);
   if (!site) {
@@ -455,7 +457,7 @@ WEBVIEW_API int webview_init(struct webview *w) {
 
   /* Navigate to URL */
   const char *url = webview_check_url(w->url);
-  navigate(&w->priv.browser, url);
+  navigate(w->priv.browser, url);
 
   ShowWindow(w->priv.hwnd, SW_SHOW);
   UpdateWindow(w->priv.hwnd);
@@ -497,8 +499,8 @@ WEBVIEW_API int webview_eval(struct webview *w, const char *js) {
 
   if (!w->priv.browser) return -1;
 
-  hr = (*(w->priv.browser))->lpVtbl->QueryInterface(
-      *(w->priv.browser), &IID_IWebBrowser2, (void **)&wb);
+  hr = w->priv.browser->lpVtbl->QueryInterface(
+      w->priv.browser, &IID_IWebBrowser2, (void **)&wb);
   if (FAILED(hr) || !wb) return -1;
 
   hr = wb->lpVtbl->get_Document(wb, &doc_disp);
@@ -656,9 +658,8 @@ WEBVIEW_API void webview_terminate(struct webview *w) {
 
 WEBVIEW_API void webview_exit(struct webview *w) {
   if (w->priv.browser) {
-    IOleObject *ole = (IOleObject *)w->priv.browser;
-    ole->lpVtbl->Close(ole, OLECLOSE_NOSAVE);
-    ole->lpVtbl->Release(ole);
+    w->priv.browser->lpVtbl->Close(w->priv.browser, OLECLOSE_NOSAVE);
+    w->priv.browser->lpVtbl->Release(w->priv.browser);
     w->priv.browser = NULL;
   }
   OleUninitialize();
@@ -668,5 +669,17 @@ WEBVIEW_API void webview_exit(struct webview *w) {
 WEBVIEW_API void webview_print_log(const char *s) {
   OutputDebugStringA(s);
   OutputDebugStringA("\n");
+#ifdef MULTIPLICITY
+  /* stderr is redefined by Perl under MULTIPLICITY; use Win32 API instead */
+  {
+    HANDLE h = GetStdHandle(STD_ERROR_HANDLE);
+    if (h && h != INVALID_HANDLE_VALUE) {
+      DWORD written;
+      WriteFile(h, s, (DWORD)strlen(s), &written, NULL);
+      WriteFile(h, "\n", 1, &written, NULL);
+    }
+  }
+#else
   fprintf(stderr, "%s\n", s);
+#endif
 }

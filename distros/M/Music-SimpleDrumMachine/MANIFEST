@@ -8,9 +8,9 @@ Makefile.PL
 README
 README.md
 dist.ini
-eg/add-drum.pl
+eg/add-drums.pl
 eg/euclidean.pl
-eg/open-hh.pl
+eg/list_devices.pl
 lib/Music/SimpleDrumMachine.pm
 t/00-compile.t
 t/01-methods.t

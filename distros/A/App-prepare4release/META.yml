@@ -1,5 +1,5 @@
 ---
-abstract: 'prepare a Perl distribution for release (skeleton)'
+abstract: 'prepare a Perl distribution for release'
 author:
   - 'Sergey Kovalev <skov@cpan.org>'
 build_requires:
@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/neo1ite/prepare4release/issues
   repository: https://github.com/neo1ite/prepare4release.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

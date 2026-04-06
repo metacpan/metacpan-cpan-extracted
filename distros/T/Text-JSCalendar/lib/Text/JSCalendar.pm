@@ -26,12 +26,20 @@ use Text::JSCalendar::TimeZones;
 
 # monkey patch like a bandit
 BEGIN {
-  my @properties = Data::ICal::Entry::Alarm::optional_unique_properties();
+  my @alarm_properties = Data::ICal::Entry::Alarm::optional_unique_properties();
   foreach my $want (qw(uid acknowledged)) {
-    push @properties, $want unless grep { $_ eq $want } @properties;
+    push @alarm_properties, $want unless grep { $_ eq $want } @alarm_properties;
   }
   no warnings 'redefine';
-  *Data::ICal::Entry::Alarm::optional_unique_properties = sub { @properties };
+  *Data::ICal::Entry::Alarm::optional_unique_properties = sub { @alarm_properties };
+
+  # Suppress warnings for properties not known to Data::ICal::Entry::Event
+  my $orig_warn = $SIG{__WARN__};
+  $SIG{__WARN__} = sub {
+    return if $_[0] =~ /^Unknown property for Data::ICal::Entry::/;
+    if ($orig_warn) { $orig_warn->(@_) }
+    else { warn @_ }
+  };
 }
 
 our $UTC = DateTime::TimeZone::UTC->new();
@@ -57,29 +65,47 @@ BEGIN {
       uid                  => [0, 'string',    1, undef],
       relatedTo            => [2, 'keywords',  0, undef],
       keywords             => [0, 'keywords',  0, undef],
+      categories           => [0, 'keywords',  0, undef],
       prodId               => [0, 'string',    0, undef],
       created              => [0, 'utcdate',   0, undef],
       updated              => [0, 'utcdate',   1, undef],
       sequence             => [0, 'number',    0, 0],
+      method               => [0, 'string',    0, undef],
       title                => [0, 'string',    0, ''],
       description          => [0, 'string',    0, ''],
+      descriptionContentType => [0, 'string',  0, undef],
       links                => [2, 'object',    0, undef],
       locale               => [0, 'string',    0, undef],
       localizations        => [0, 'patch',     0, undef],
       locations            => [2, 'object',    0, undef],
+      virtualLocations     => [2, 'object',    0, undef],
+      color                => [0, 'string',    0, undef],
+      showWithoutTime      => [0, 'bool',      0, $JSON::false],
       isAllDay             => [0, 'bool',      0, $JSON::false],
       start                => [0, 'localdate', 1, undef],
       timeZone             => [0, 'timezone',  0, undef],
+      endTimeZone          => [0, 'timezone',  0, undef],
       duration             => [0, 'duration',  0, undef],
       recurrenceRule       => [0, 'object',    0, undef],
       recurrenceOverrides  => [2, 'patch',     0, undef],
+      recurrenceId         => [0, 'localdate', 0, undef],
+      recurrenceIdTimeZone => [0, 'timezone',  0, undef],
       status               => [0, 'string',    0, undef],
-      showAsFree           => [0, 'bool',      0, $JSON::false],
+      freeBusyStatus       => [0, 'string',    0, 'busy'],
+      privacy              => [0, 'string',    0, 'public'],
+      priority             => [0, 'number',    0, 0],
       replyTo              => [0, 'object',    0, undef],
+      organizerCalendarAddress => [0, 'string', 0, undef],
       participants         => [2, 'object',    0, undef],
       useDefaultAlerts     => [0, 'bool',      0, $JSON::false],
       alerts               => [2, 'object',    0, undef],
       excluded             => [0, 'bool',      0, $JSON::false],
+      lastModified         => [0, 'utcdate',   0, undef],
+      # Task-specific properties
+      due                  => [0, 'localdate', 0, undef],
+      estimatedDuration    => [0, 'duration',  0, undef],
+      percentComplete      => [0, 'number',    0, undef],
+      progress             => [0, 'string',    0, undef],
     },
     replyTo => {
       imip                 => [0, 'mailto',    0, undef],
@@ -100,7 +126,14 @@ BEGIN {
       timeZone             => [0, 'timezone',  0, undef],
       address              => [0, 'object',    0, undef],
       coordinates          => [0, 'string',    0, undef],
+      locationTypes        => [0, 'keywords',  0, undef],
+      links                => [2, 'object',    0, undef],
       uri                  => [0, 'string',    0, undef],
+    },
+    virtualLocations => {
+      name                 => [0, 'string',    0, ''],
+      uri                  => [0, 'string',    1, undef],
+      features             => [0, 'keywords',  0, undef],
     },
     recurrenceRule => {
       frequency            => [0, 'string',    1, undef],
@@ -127,15 +160,20 @@ BEGIN {
     participants => {
       name                 => [0, 'string',    1, undef],
       email                => [0, 'string',    1, undef],
+      calendarAddress      => [0, 'string',    0, undef],
+      sendTo               => [0, 'object',    0, undef],
       kind                 => [0, 'string',    0, 'unknown'],
       roles                => [1, 'string',    1, undef],
       locationId           => [0, 'string',    0, undef],
       participationStatus  => [0, 'string',    0, 'needs-action'],
       attendance           => [0, 'string',    0, 'required'],
       expectReply          => [0, 'bool',      0, $JSON::false],
+      scheduleAgent        => [0, 'string',    0, undef],
       scheduleSequence     => [0, 'number',    0, 0],
       scheduleUpdated      => [0, 'utcdate',   0, undef],
-      # XXX - there's a bunch more here
+      progress             => [0, 'string',    0, undef],
+      delegatedFrom        => [0, 'keywords',  0, undef],
+      delegatedTo          => [0, 'keywords',  0, undef],
     },
     alerts => {
       relativeTo           => [0, 'string',    0, 'before-start'],
@@ -187,9 +225,11 @@ BEGIN {
     relatedTo
     prodId
     isAllDay
+    showWithoutTime
     recurrenceRule
     recurrenceOverrides
     replyTo
+    organizerCalendarAddress
     participantId
     method
   };
@@ -376,7 +416,7 @@ Version 0.02
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -579,20 +619,27 @@ sub _makeParticipant {
   $Participants->{$id}{sendTo} = { "imip" => "mailto:$email" };
   $Participants->{$id}{kind} = lc $VAttendee->{params}{"cutype"}[0]
     if $VAttendee->{params}{"cutype"};
-  push @{$Participants->{$id}{roles}}, $role;
+  push @{$Participants->{$id}{roles}}, $role
+    unless grep { $_ eq $role } @{$Participants->{$id}{roles} || []};
   # we don't support locationId yet
   if ($VAttendee->{params}{"partstat"}) {
     $Participants->{$id}{participationStatus} = lc($VAttendee->{params}{"partstat"}[0] // "needs-action");
   }
   if ($VAttendee->{params}{"role"}) {
-    push @{$Participants->{$id}{roles}}, 'chair'
-      if uc $VAttendee->{params}{"role"}[0] eq 'CHAIR';
+    my $ical_role = uc($VAttendee->{params}{"role"}[0] || '');
+    if ($ical_role eq 'CHAIR' && !grep { $_ eq 'chair' } @{$Participants->{$id}{roles} || []}) {
+      push @{$Participants->{$id}{roles}}, 'chair';
+    }
+
+    if ($ical_role eq 'OWNER' && !grep { $_ eq 'owner' } @{$Participants->{$id}{roles} || []}) {
+      push @{$Participants->{$id}{roles}}, 'owner';
+    }
 
     $Participants->{$id}{attendance} = 'optional'
-      if uc $VAttendee->{params}{"role"}[0] eq 'OPT-PARTICIPANT';
+      if $ical_role eq 'OPT-PARTICIPANT';
 
     $Participants->{$id}{attendance} = 'none'
-      if uc $VAttendee->{params}{"role"}[0] eq 'NON-PARTICIPANT';
+      if $ical_role eq 'NON-PARTICIPANT';
   }
   if ($VAttendee->{params}{"rsvp"}) {
     $Participants->{$id}{expectReply} = lc($VAttendee->{params}{"rsvp"}[0] // "") eq 'yes' ? $JSON::true : $JSON::false;
@@ -605,6 +652,26 @@ sub _makeParticipant {
 
   if (exists $VAttendee->{params}{"x-sequence"}) {
     $Participants->{$id}{scheduleSequence} = $VAttendee->{params}{"x-sequence"}[0] // "";
+  }
+
+  if ($VAttendee->{params}{"schedule-agent"}) {
+    $Participants->{$id}{scheduleAgent} = lc($VAttendee->{params}{"schedule-agent"}[0]);
+  }
+
+  if ($VAttendee->{params}{"delegated-from"}) {
+    my %df;
+    for my $uri (@{$VAttendee->{params}{"delegated-from"}}) {
+      $df{$uri} = $JSON::true;
+    }
+    $Participants->{$id}{delegatedFrom} = \%df if %df;
+  }
+
+  if ($VAttendee->{params}{"delegated-to"}) {
+    my %dt;
+    for my $uri (@{$VAttendee->{params}{"delegated-to"}}) {
+      $dt{$uri} = $JSON::true;
+    }
+    $Participants->{$id}{delegatedTo} = \%dt if %dt;
   }
 }
 
@@ -750,7 +817,8 @@ sub _getEventsFromVCalendar {
     my $prodid = $Calendar->{properties}{prodid}[0]{value};
 
     foreach my $VEvent (@{$Calendar->{objects} || []}) {
-      next unless lc $VEvent->{type} eq 'vevent';
+      next unless lc $VEvent->{type} eq 'vevent' || lc $VEvent->{type} eq 'vtodo';
+      my $is_task = lc $VEvent->{type} eq 'vtodo';
 
       # parse simple component properties {{{
 
@@ -969,6 +1037,7 @@ sub _getEventsFromVCalendar {
       # parse alarms {{{
 
       my %Alerts;
+      my $hasDefaultAlarm = 0;
       foreach my $VAlarm (@{$VEvent->{objects} || []}) {
         next unless lc $VAlarm->{type} eq 'valarm';
 
@@ -976,7 +1045,14 @@ sub _getEventsFromVCalendar {
           = map { $_ => $VAlarm->{properties}{$_}[0] }
               keys %{$VAlarm->{properties}};
 
-        my $alarmuid = $AlarmProperties{uid}{value} || _hexkey($VAlarm, $uid) . '-alarmauto';
+        # X-APPLE-DEFAULT-ALARM:TRUE -> useDefaultAlerts
+        if (lc($AlarmProperties{'x-apple-default-alarm'}{value} // '') eq 'true') {
+          $hasDefaultAlarm = 1;
+        }
+
+        my $alarmuid = $AlarmProperties{uid}{value}
+                    || $AlarmProperties{'x-wr-alarmuid'}{value}
+                    || _hexkey($VAlarm, $uid) . '-alarmauto';
 
         my %Alert;
 
@@ -1055,11 +1131,22 @@ sub _getEventsFromVCalendar {
       my %Links;
       foreach my $Attach (@{$VEvent->{properties}{attach} || []}) {
         next unless $Attach->{value};
-        next unless grep { $Attach->{value} =~ m{^$_://} } qw{http https ftp};
 
-        my $uri = $Attach->{value};
+        my $uri;
+        my $encoding = lc($Attach->{params}{encoding}[0] || '');
+        if ($encoding eq 'base64' || $encoding eq 'b') {
+          # Binary ATTACH - convert to data: URI
+          my $mime = $Attach->{params}{fmttype}[0] || 'application/octet-stream';
+          $uri = "data:$mime;base64," . $Attach->{value};
+        }
+        elsif (grep { $Attach->{value} =~ m{^$_://} } qw{http https ftp data}) {
+          $uri = $Attach->{value};
+        }
+        else {
+          next;
+        }
+
         my $filename = $Attach->{params}{filename}[0];
-        # XXX - mime guessing?
         my $mime = $Attach->{params}{fmttype}[0];
         if (not defined $mime and $filename) {
           $::MimeTypes ||= MIME::Types->new;
@@ -1081,6 +1168,37 @@ sub _getEventsFromVCalendar {
         my $uri = $URL->{value};
         next unless $uri;
         $Links{sha1_hex(lc $uri)} = { href => $uri };
+      }
+      # IMAGE -> links with rel='icon'
+      foreach my $Image (@{$VEvent->{properties}{image} || []}) {
+        my $uri = $Image->{value};
+        next unless $uri;
+        my $id = sha1_hex(lc $uri);
+        $Links{$id} = {
+          href => $uri,
+          rel => 'icon',
+          defined $Image->{params}{fmttype}[0] ? (type => $Image->{params}{fmttype}[0]) : (),
+          defined $Image->{params}{label}[0] ? (title => $Image->{params}{label}[0]) : (),
+        };
+      }
+
+      # }}}
+
+      # parse CONFERENCE -> virtualLocations {{{
+
+      my %VirtualLocations;
+      foreach my $Conference (@{$VEvent->{properties}{conference} || []}) {
+        next unless $Conference->{value};
+        my $id = $Conference->{params}{'x-jmap-id'}[0] || sha1_hex($Conference->{value});
+        my %vloc = (uri => $Conference->{value});
+        if ($Conference->{params}{label}) {
+          $vloc{name} = $Conference->{params}{label}[0];
+        }
+        if ($Conference->{params}{feature}) {
+          my @features = map { lc $_ } map { split /,/ } @{$Conference->{params}{feature}};
+          $vloc{features} = { map { $_ => $JSON::true } @features };
+        }
+        $VirtualLocations{$id} = \%vloc;
       }
 
       # }}}
@@ -1112,8 +1230,8 @@ sub _getEventsFromVCalendar {
       # ==============================================================
       # 4.1 Metadata
 
-      # 4.1.1 @type
-      $Event{'@type'} = 'jsevent';
+      # 4.1.1 @type (JSCalendar bis uses capitalized names)
+      $Event{'@type'} = $is_task ? 'Task' : 'Event';
 
       # 4.1.2 uid
       $Event{uid} = "$uid";
@@ -1158,20 +1276,56 @@ sub _getEventsFromVCalendar {
         if ($Properties{summary} and defined $Properties{summary}{value});
 
       # 4.2.2 description
-      $Event{description} = join("\n", @description) if @description;
-
-      # 4.2.3 descriptionContentType is not supported
+      # STYLED-DESCRIPTION overrides DESCRIPTION if present
+      if ($Properties{'styled-description'}{value}) {
+        $Event{description} = $Properties{'styled-description'}{value};
+        $Event{descriptionContentType} = $Properties{'styled-description'}{params}{fmttype}[0] // 'text/html';
+      }
+      elsif (@description) {
+        $Event{description} = join("\n", @description);
+      }
 
       # 4.2.4 locations
-      # XXX - support more structured representations from VEVENTs
       if ($Properties{location}{value}) {
         $Event{locations}{location} = { name => $Properties{location}{value} };
       }
-      if (not $IsAllDay and $StartTimeZone and $StartTimeZone ne $EndTimeZone) {
-        $Event{locations}{end} = { rel => 'end', timeZone => $EndTimeZone };
+      # X-APPLE-STRUCTURED-LOCATION -> location with coordinates, name, description
+      # Check for Apple structured locations first; if present, skip plain GEO
+      my $has_apple_location = scalar @{$VEvent->{properties}{'x-apple-structured-location'} || []};
+
+      # GEO -> separate location with coordinates (only if no Apple structured location)
+      if (!$has_apple_location && $Properties{geo}{value}) {
+        my ($lat, $lon) = split /;/, $Properties{geo}{value};
+        if (defined $lat && defined $lon) {
+          my $coords = "geo:$lat,$lon";
+          my $locid = $Event{locations} ? 'geo' : 'location';
+          $Event{locations}{$locid} = { coordinates => $coords };
+        }
       }
 
-      # 4.2.5 virtualLocations is not supported
+      for my $ASL (@{$VEvent->{properties}{'x-apple-structured-location'} || []}) {
+        next unless $ASL->{value};
+        my %loc;
+        if ($ASL->{value} =~ m{^geo:([-\d.]+),([-\d.]+)}) {
+          $loc{coordinates} = $ASL->{value};
+        }
+        my $title = $ASL->{params}{'x-title'}[0];
+        $loc{name} = $title if defined $title && $title ne '';
+        my $address = $ASL->{params}{'x-address'}[0];
+        $loc{description} = $address if defined $address && $address ne '';
+        if (%loc) {
+          my $locid = sha1_hex($ASL->{value} || 'apple-location');
+          $Event{locations}{$locid} = \%loc;
+        }
+      }
+
+      # endTimeZone (replaces old locations[end] hack)
+      if (not $IsAllDay and $StartTimeZone and $StartTimeZone ne $EndTimeZone) {
+        $Event{endTimeZone} = $EndTimeZone;
+      }
+
+      # 4.2.5 virtualLocations
+      $Event{virtualLocations} = \%VirtualLocations if %VirtualLocations;
 
       # 4.2.6 links
       $Event{links} = \%Links if %Links;
@@ -1226,15 +1380,20 @@ sub _getEventsFromVCalendar {
         $Event{freeBusyStatus} = 'free' if lc($Properties{transp}{value}) eq 'transparent';
       }
 
-      # 4.4.3 privacy is not supported
-      if ($Properties{privacy}{value}) {
-        $Event{privacy} = 'private' unless $Properties{privacy}{value} eq 'public';
+      # 4.4.3 privacy (from CLASS property)
+      if ($Properties{class}{value}) {
+        my $cls = lc($Properties{class}{value});
+        if ($cls eq 'private') { $Event{privacy} = 'private' }
+        elsif ($cls eq 'confidential') { $Event{privacy} = 'confidential' }
       }
 
-      # 4.4.4 replyTo
+      # 4.4.4 replyTo + organizerCalendarAddress
       foreach my $partid (sort keys %Participants) { # later wins
         next unless grep { $_ eq 'owner' } @{$Participants{$partid}{roles}};
         $Event{replyTo} = $Participants{$partid}{sendTo};
+        if ($Participants{$partid}{sendTo}{imip}) {
+          $Event{organizerCalendarAddress} = $Participants{$partid}{sendTo}{imip};
+        }
       }
 
       # 4.4.5 participants
@@ -1247,6 +1406,7 @@ sub _getEventsFromVCalendar {
 
       # 4.5.2 alerts
       $Event{alerts} = \%Alerts if %Alerts;
+      $Event{useDefaultAlerts} = $JSON::true if $hasDefaultAlarm;
 
       # ==============================================================
       # 4.6 Multilingual properties
@@ -1273,12 +1433,41 @@ sub _getEventsFromVCalendar {
       my $duration = $Self->_make_duration($End->subtract_datetime($Start), $IsAllDay);
       $Event{duration} = $duration if $duration;
 
-      # 5.1.4 isAllDay
+      # 5.1.4 showWithoutTime (replaces isAllDay)
+      $Event{showWithoutTime} = $IsAllDay ? $JSON::true : $JSON::false;
       $Event{isAllDay} = $IsAllDay ? $JSON::true : $JSON::false;
+      # SHOW-WITHOUT-TIME property (for DATE-TIME events shown as all-day)
+      if (!$IsAllDay && $Properties{'show-without-time'}{value}) {
+        my $swt = lc($Properties{'show-without-time'}{value});
+        $Event{showWithoutTime} = $JSON::true if $swt eq 'true' || $swt eq 'yes';
+      }
 
       # 5.1.5 status
       if ($Properties{status}{value}) {
         $Event{status} = lc($Properties{status}{value}) if lc($Properties{status}{value}) ne 'confirmed';
+      }
+
+      # Task-specific properties (VTODO)
+      if ($is_task) {
+        if ($Properties{due}{value}) {
+          my ($Due, $DueTz) = $Self->_getDateObj($Calendar, $Properties{due});
+          $Event{due} = $Due->iso8601();
+        }
+        if (defined $Properties{'percent-complete'}{value}) {
+          $Event{percentComplete} = int($Properties{'percent-complete'}{value});
+        }
+        if ($Properties{'estimated-duration'}{value}) {
+          $Event{estimatedDuration} = uc $Properties{'estimated-duration'}{value};
+        }
+        if ($Properties{completed}{value}) {
+          $Event{progress} = 'completed';
+        }
+        elsif (lc($Properties{status}{value} || '') eq 'in-process') {
+          $Event{progress} = 'in-process';
+        }
+        elsif (lc($Properties{status}{value} || '') eq 'cancelled') {
+          $Event{progress} = 'cancelled';
+        }
       }
 
       push @Events, \%Event;
@@ -1464,13 +1653,25 @@ sub _argsToVEvents {
   my ($TimeZones, $Args, $recurrenceData) = @_;
   my @VEvents;
 
-  my $VEvent = Data::ICal::Entry::Event->new();
+  my $type = $Args->{'@type'} || '';
+  my $is_task = $type eq 'jstask' || $type eq 'Task';
+  my $VEvent;
+  if ($is_task) {
+    eval { require Data::ICal::Entry::Todo };
+    $VEvent = Data::ICal::Entry::Todo->new();
+  } else {
+    $VEvent = Data::ICal::Entry::Event->new();
+  }
 
   # required properties
+  my $transp = 'OPAQUE';
+  if (defined $Args->{freeBusyStatus}) {
+    $transp = 'TRANSPARENT' if $Args->{freeBusyStatus} eq 'free';
+  }
   $VEvent->add_properties(
     uid      => $Args->{uid},
     sequence => ($Args->{sequence} || 0),
-    transp   => ($Args->{freeBusyStatus} ? 'TRANSPARENT' : 'OPAQUE'),
+    ($is_task ? () : (transp => $transp)),
   );
 
   if ($recurrenceData) {
@@ -1479,18 +1680,40 @@ sub _argsToVEvents {
   }
 
   # direct copy if properties exist
-  foreach my $Property (qw{description title}) {
-    my $Prop = $Args->{$Property} // '';
-    next if $Prop eq '';
+  if (defined $Args->{title} && $Args->{title} ne '') {
     my %lang;
     $lang{language} = $Args->{locale} if exists $Args->{locale};
-    my $key = $Property;
-    $key = 'summary' if $Property eq 'title';
-    $VEvent->add_property($key => [$Prop, \%lang]);
+    $VEvent->add_property(summary => [$Args->{title}, \%lang]);
+  }
+  if (defined $Args->{description} && $Args->{description} ne '') {
+    my %lang;
+    $lang{language} = $Args->{locale} if exists $Args->{locale};
+    if ($Args->{descriptionContentType} && $Args->{descriptionContentType} ne 'text/plain') {
+      # STYLED-DESCRIPTION for non-plain content types
+      $VEvent->add_property('styled-description' => [$Args->{description}, { FMTTYPE => $Args->{descriptionContentType}, %lang }]);
+    }
+    else {
+      $VEvent->add_property(description => [$Args->{description}, \%lang]);
+    }
   }
 
   if ($Args->{status} and $Args->{status} ne 'confirmed') {
     $VEvent->add_property('status', uc($Args->{status}));
+  }
+
+  # privacy -> CLASS
+  if ($Args->{privacy} && $Args->{privacy} ne 'public') {
+    $VEvent->add_property('class' => uc($Args->{privacy}));
+  }
+
+  # priority
+  if ($Args->{priority} && $Args->{priority} > 0) {
+    $VEvent->add_property('priority' => $Args->{priority});
+  }
+
+  # color
+  if ($Args->{color}) {
+    $VEvent->add_property('color' => $Args->{color});
   }
 
   # dates in UTC - stored in UTC
@@ -1498,30 +1721,61 @@ sub _argsToVEvents {
   $VEvent->add_property(dtstamp => $Self->_makeZTime($Args->{updated} || DateTime->now->iso8601()));
 
   # dates in localtime - zones based on location
-  my $EndTimeZone;
+  my $EndTimeZone = $Args->{endTimeZone};
   my $locations = $Args->{locations} || {};
   foreach my $id (sort keys %$locations) {
-    if ($locations->{$id}{rel} and $locations->{$id}{rel} eq 'end') {
-      $EndTimeZone = $locations->{end}{timeZone};
+    # Backward compat: also check locations[end] hack
+    if (!$EndTimeZone && $locations->{$id}{rel} && $locations->{$id}{rel} eq 'end') {
+      $EndTimeZone = $locations->{$id}{timeZone};
     }
-    if ($locations->{$id}{name}) {
+    if ($locations->{$id}{name} && !$locations->{$id}{coordinates}) {
+      # Only emit LOCATION if this entry doesn't also have coordinates
+      # (coordinates with name go into X-APPLE-STRUCTURED-LOCATION with X-TITLE)
       $VEvent->add_property(location => $locations->{$id}{name});
+    }
+    # GEO from coordinates
+    if ($locations->{$id}{coordinates} && $locations->{$id}{coordinates} =~ m{^geo:([-\d.]+),([-\d.]+)}) {
+      my ($lat, $lon) = ($1, $2);
+      my $has_apple_meta = $locations->{$id}{name} || $locations->{$id}{description};
+      if ($has_apple_meta) {
+        # Emit X-APPLE-STRUCTURED-LOCATION (which implies GEO)
+        my %asl_params = (VALUE => 'URI');
+        $asl_params{'X-TITLE'} = $locations->{$id}{name} if $locations->{$id}{name};
+        $asl_params{'X-ADDRESS'} = $locations->{$id}{description} if $locations->{$id}{description};
+        $VEvent->add_property('x-apple-structured-location' => [$locations->{$id}{coordinates}, \%asl_params]);
+      }
+      else {
+        # Plain GEO without Apple metadata
+        $VEvent->add_property('geo' => "$lat;$lon");
+      }
     }
   }
 
+  # lastModified
+  if ($Args->{lastModified}) {
+    $VEvent->add_property('last-modified' => $Self->_makeZTime($Args->{lastModified}));
+  }
+
   my $StartTimeZone = $Args->{timeZone};
+  my $IsAllDay = $Args->{showWithoutTime} // $Args->{isAllDay};
   my $Start = _wireDate($Args->{start}, $StartTimeZone);
-  $VEvent->add_property(dtstart => $Self->_makeVTimeObj($TimeZones, $Start, $StartTimeZone, $Args->{isAllDay}));
+  $VEvent->add_property(dtstart => $Self->_makeVTimeObj($TimeZones, $Start, $StartTimeZone, $IsAllDay));
+
+  # SHOW-WITHOUT-TIME for DATE-TIME events displayed as all-day
+  if ($Args->{showWithoutTime} && !$IsAllDay) {
+    $VEvent->add_property('show-without-time' => 'TRUE');
+  }
+
   if ($Args->{duration}) {
     $EndTimeZone //= $StartTimeZone;
     my $Duration = eval { DateTime::Format::ICal->parse_duration($Args->{duration}) };
     my $End = $Start->clone()->add($Duration) if $Duration;
     $End->set_time_zone($EndTimeZone) if $EndTimeZone;
-    $VEvent->add_property(dtend => $Self->_makeVTimeObj($TimeZones, $End, $EndTimeZone, $Args->{isAllDay}));
+    $VEvent->add_property(dtend => $Self->_makeVTimeObj($TimeZones, $End, $EndTimeZone, $IsAllDay));
   }
 
   if ($Args->{recurrenceRule}) {
-    my %Recurrence = $Self->_makeRecurrence($Args->{recurrenceRule}, $Args->{isAllDay}, $StartTimeZone);
+    my %Recurrence = $Self->_makeRecurrence($Args->{recurrenceRule}, $IsAllDay, $StartTimeZone);
 
     # RFC 2445 4.3.10 - FREQ is the first part of the RECUR value type.
     # RFC 5545 3.3.10 - FREQ should be first to ensure backward compatibility.
@@ -1536,14 +1790,14 @@ sub _argsToVEvents {
     foreach my $recurrenceId (sort keys %{$Args->{recurrenceOverrides}}) {
       my $val = $Args->{recurrenceOverrides}{$recurrenceId};
       if ($val->{excluded}) {
-        $VEvent->add_property(exdate => $Self->_makeLTime($TimeZones, $recurrenceId, $StartTimeZone, $Args->{isAllDay}));
+        $VEvent->add_property(exdate => $Self->_makeLTime($TimeZones, $recurrenceId, $StartTimeZone, $IsAllDay));
       }
       elsif (keys %$val) {
         my $SubEvent = $Self->_maximise($Args, $val, $recurrenceId);
         push @VEvents, $Self->_argsToVEvents($TimeZones, $SubEvent, [$recurrenceId, $Args]);
       }
       else {
-        $VEvent->add_property(rdate => $Self->_makeLTime($TimeZones, $recurrenceId, $StartTimeZone, $Args->{isAllDay}));
+        $VEvent->add_property(rdate => $Self->_makeLTime($TimeZones, $recurrenceId, $StartTimeZone, $IsAllDay));
       }
     }
   }
@@ -1634,7 +1888,10 @@ sub _argsToVEvents {
       foreach my $prop (keys %AttendeeProps) {
         delete $AttendeeProps{$prop} if $AttendeeProps{$prop} eq '';
       }
-      if (grep { $_ eq 'chair' } @{$Attendee->{roles}}) {
+      if (grep { $_ eq 'owner' } @{$Attendee->{roles}}) {
+        $AttendeeProps{ROLE} = 'OWNER';
+      }
+      elsif (grep { $_ eq 'chair' } @{$Attendee->{roles}}) {
         $AttendeeProps{ROLE} = 'CHAIR';
       }
       elsif ($Attendee->{attendance} and $Attendee->{attendance} eq 'optional') {
@@ -1644,6 +1901,13 @@ sub _argsToVEvents {
         $AttendeeProps{ROLE} = 'NON-PARTICIPANT';
       }
       # default is REQ-PARTICIPANT
+      $AttendeeProps{"SCHEDULE-AGENT"} = uc($Attendee->{scheduleAgent}) if $Attendee->{scheduleAgent};
+      if ($Attendee->{delegatedFrom} && ref($Attendee->{delegatedFrom}) eq 'HASH') {
+        $AttendeeProps{"DELEGATED-FROM"} = join(',', sort keys %{$Attendee->{delegatedFrom}});
+      }
+      if ($Attendee->{delegatedTo} && ref($Attendee->{delegatedTo}) eq 'HASH') {
+        $AttendeeProps{"DELEGATED-TO"} = join(',', sort keys %{$Attendee->{delegatedTo}});
+      }
 
       $AttendeeProps{PARTSTAT} = uc $Attendee->{"participationStatus"} if $Attendee->{"participationStatus"};
 
@@ -1694,6 +1958,38 @@ sub _argsToVEvents {
   if ($Args->{keywords}) {
     my @items = sort keys %{$Args->{keywords}};
     $VEvent->add_property('CATEGORIES', join(',', @items));
+  }
+
+  # virtualLocations -> CONFERENCE
+  if ($Args->{virtualLocations}) {
+    foreach my $id (sort keys %{$Args->{virtualLocations}}) {
+      my $vloc = $Args->{virtualLocations}{$id};
+      next unless $vloc->{uri};
+      my %params = ('VALUE' => 'URI');
+      $params{'X-JMAP-ID'} = $id;
+      if ($vloc->{features} && ref($vloc->{features}) eq 'HASH') {
+        my @feats = sort keys %{$vloc->{features}};
+        $params{FEATURE} = join(',', map { uc $_ } @feats) if @feats;
+      }
+      $params{LABEL} = $vloc->{name} if defined $vloc->{name} && $vloc->{name} ne '';
+      $VEvent->add_property(conference => [$vloc->{uri}, \%params]);
+    }
+  }
+
+  # Task-specific properties (VTODO)
+  if ($is_task) {
+    if ($Args->{due}) {
+      $VEvent->add_property(due => $Self->_makeLTime($TimeZones, $Args->{due}, $StartTimeZone, $IsAllDay));
+    }
+    if (defined $Args->{percentComplete}) {
+      $VEvent->add_property('percent-complete' => $Args->{percentComplete});
+    }
+    if ($Args->{estimatedDuration}) {
+      $VEvent->add_property('estimated-duration' => $Args->{estimatedDuration});
+    }
+    if ($Args->{progress} && $Args->{progress} eq 'completed') {
+      $VEvent->add_property(completed => $Self->_makeZTime($Args->{updated} || DateTime->now->iso8601()));
+    }
   }
 
   # detect if this is a dummy top-level event and skip it

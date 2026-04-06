@@ -1,20 +1,20 @@
 package Langertha::Engine::AKI;
 # ABSTRACT: AKI.IO native API
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak carp );
 use JSON::MaybeXS;
 
 extends 'Langertha::Engine::Remote';
 
-with 'Langertha::Role::'.$_ for (qw(
+with map { 'Langertha::Role::'.$_ } qw(
   Models
   Temperature
   SystemPrompt
   Chat
   Tools
   HermesTools
-));
+);
 
 
 has api_key => (
@@ -192,7 +192,7 @@ Langertha::Engine::AKI - AKI.IO native API
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

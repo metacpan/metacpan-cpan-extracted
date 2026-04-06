@@ -1,4 +1,7 @@
 Revision history for perl module CPAN::MetaPackager.
 
+1.01  2026-04-06
+    - Add timing info to output during Import.populate_packages_table()
+
 1.00  2026-03-11
     - Original version.

@@ -9,11 +9,10 @@ use Net::DAVTalk;
 use base qw(Net::DAVTalk);
 
 use Carp;
-use Text::VCardFast qw(vcard2hash);
+use Text::JSContact qw(vcard_to_jscontact jscontact_to_vcard);
 use XML::Spice;
 use URI::Escape qw(uri_unescape);
-use Net::CardDAVTalk::VCard;
-use Data::Dumper;
+use JSON;
 
 
 =head1 NAME
@@ -26,7 +25,7 @@ Version 0.09
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our $BATCHSIZE = 100;
 
@@ -299,35 +298,36 @@ sub GetAddressBooks {
 
 # Contact methods {{{
 
-=head2 $Self->NewContact($AddressBookPath, $VCard)
+=head2 $Self->NewContact($AddressBookPath, $Card)
 
-Create a new contact from the Net::CardDAVTalk::VCard object,
-either using its uid field or generating a new UUID and appending
-.vcf for the filename.
+Create a new contact from a JSContact Card hashref.
+Generates a UID if not present.
 
 Returns the full path to the card.
-
-NOTE: can also be used for a kind: group v4 style group.
 
 =cut
 
 sub NewContact {
-  my ($Self, $Path, $VCard) = @_;
+  my ($Self, $Path, $Card) = @_;
 
   $Path || confess "New contact path not specified";
-  $VCard->isa("Net::CardDAVTalk::VCard") || confess "Invalid contact";
+  ref($Card) eq 'HASH' || confess "Invalid contact (expected hashref)";
 
-  my $Uid = $VCard->uid() // $VCard->uid($Self->genuuid());
+  $Card->{uid} //= 'urn:uuid:' . $Self->genuuid();
+  my $Uid = $Card->{uid};
+  $Uid =~ s/^urn:uuid://;
+
+  my $VCardStr = jscontact_to_vcard($Card);
 
   $Self->Request(
     'PUT',
     "$Path/$Uid.vcf",
-    $VCard->as_string(),
+    $VCardStr,
     'Content-Type'  => 'text/vcard',
     'If-None-Match' => '*',
   );
 
-  return $VCard->{CPath} = "$Path/$Uid.vcf";
+  return "$Path/$Uid.vcf";
 }
 
 =head2 $self->DeleteContact($Path)
@@ -349,37 +349,35 @@ sub DeleteContact {
   return $CPath;
 }
 
-=head2 $Self->UpdateContact($Path, $VCard)
+=head2 $Self->UpdateContact($Path, $Card)
 
-Identical to NewContact, but will fail unless there is an
-existing contact with that path.  Also takes the full path
-instead of just the addressbook path.
-
-NOTE: can also be used for a kind: group v4 style group.
+Like NewContact, but updates an existing contact.
+Takes the full path and a JSContact Card hashref.
 
 =cut
 
 sub UpdateContact {
-  my ($Self, $CPath, $VCard) = @_;
+  my ($Self, $CPath, $Card) = @_;
 
   $CPath || confess "Update contact path not specified";
-  $VCard->isa("Net::CardDAVTalk::VCard") || confess "Invalid contact";
+  ref($Card) eq 'HASH' || confess "Invalid contact (expected hashref)";
+
+  my $VCardStr = jscontact_to_vcard($Card);
 
   $Self->Request(
     'PUT',
     $CPath,
-    $VCard->as_string(),
+    $VCardStr,
     'Content-Type' => 'text/vcard',
     'If-Match'     => '*',
   );
 
-  return $VCard->{CPath} = $CPath;
+  return $CPath;
 }
 
 =head2 $Self->GetContact($Path)
 
-Fetch a specific contact by path.  Returns a
-Net::CardDAVTalk::VCard object.
+Fetch a specific contact by path.  Returns a JSContact Card hashref.
 
 =cut
 
@@ -396,12 +394,12 @@ sub GetContact {
   my $Data = $Response && $Response->{content}
     // return undef;
 
-  my $VCard = eval { Net::CardDAVTalk::VCard->new_fromstring($Data) }
+  my $Card = eval { vcard_to_jscontact($Data) }
     // return undef;
 
-  $VCard->{CPath} = $CPath;
+  $Card->{CPath} = $CPath;
 
-  return $VCard;
+  return $Card;
 }
 
 =head2 $Self->GetContactAndProps($Path, $Props)
@@ -704,24 +702,25 @@ sub _ParseReportData {
   my $Data = $Propstat->{"{$NS_D}prop"}{"{$NS_C}address-data"}{content}
     // return;
 
-  my $VCard = Net::CardDAVTalk::VCard->new_fromstring($Data);
-  return unless $VCard;
+  my $Card = eval { vcard_to_jscontact($Data) };
+  return unless $Card;
 
-  $VCard->{CPath} = $CPath;
-  $VCard->{href} = $HRef;
+  $Card->{CPath} = $CPath;
+  $Card->{href} = $HRef;
+  $Card->{_raw} = $Data;
 
-  my %Props;
+  my %ExtraProps;
   for (@$Props) {
     my ($NS, $PropName) = @$_;
     my $NS_P = $Self->ns($NS);
     my $PropValue = $Propstat->{"{$NS_D}prop"}{"{$NS_P}$PropName"}{content}
       // next;
-    $Props{"${NS}:${PropName}"} = $PropValue;
+    $ExtraProps{"${NS}:${PropName}"} = $PropValue;
   }
 
-  $VCard->{meta} = \%Props;
+  $Card->{meta} = \%ExtraProps if %ExtraProps;
 
-  return $VCard;
+  return $Card;
 }
 
 sub _unrequest_url {

@@ -62,7 +62,7 @@ use constant BODY_DISPLAY_SIZE => 1_024;
 #   status
 #
 sub new {
-    my ( $self, $args_hr ) = @_;
+    my ( $class, $args_hr ) = @_;
 
     my $content = $args_hr->{'content'};
     if ( defined($content) && length($content) > BODY_DISPLAY_SIZE() ) {
@@ -71,7 +71,7 @@ sub new {
 
     $content ||= q<>;
 
-    return $self->SUPER::new(
+    return $class->SUPER::new(
         "The response to the HTTP “$args_hr->{'method'}” request from “$args_hr->{'url'}” indicated an error ($args_hr->{'status'}, $args_hr->{'reason'}): “$content”",
         $args_hr,
     );

@@ -4,7 +4,7 @@ package Net::ACME2::HTTP_Tiny;
 
 =head1 NAME
 
-Net::ACME2::HTTP_Tiny - HTTP client for Net::ACME
+Net::ACME2::HTTP_Tiny - Synchronous HTTP client for Net::ACME
 
 =head1 SYNOPSIS
 
@@ -23,15 +23,20 @@ Net::ACME2::HTTP_Tiny - HTTP client for Net::ACME
 
 =head1 DESCRIPTION
 
-This module largely duplicates the work of C<HTTP::Tiny::UA>, just without the
-dependency on C<superclass.pm> (which brings in a mess of other undesirables).
+This module wraps L<HTTP::Tiny>, thus:
 
-The chief benefit is that C<request()> and related methods will return
-instances of C<HTTP::Tiny::UA::Response> rather than simple hashes.
+=over
 
-This also always verifies remote SSL connections and always C<die()>s if
+=item * Duplicate the work of C<HTTP::Tiny::UA> without the
+dependency on L<superclass> (which brings in a mess of other undesirables).
+Thus, the returns from C<request()> and related methods
+are instances of C<HTTP::Tiny::UA::Response> rather than simple hashes.
+
+=item * Verify remote SSL connections, and always C<die()> if
 either the network connection fails or the protocol indicates an error
 (4xx or 5xx).
+
+=back
 
 =cut
 
@@ -43,19 +48,19 @@ use parent qw( HTTP::Tiny );
 use HTTP::Tiny::UA::Response ();
 
 use Net::ACME2::X ();
+use Net::ACME2::HTTP::Convert ();
 
 # This circular dependency is unfortunate, but PAUSE needs to see a static
 # $Net::ACME2::VERSION. (Thanks to Dan Book for pointing it out.)
 use Net::ACME2 ();
 
-sub VERSION {
+our $VERSION;
+BEGIN {
 
     # HTTP::Tiny gets upset if there’s anything non-numeric
     # (e.g., “-TRIAL1”) in VERSION(). So weed it out here.
-    my $version = $Net::ACME2::VERSION;
-    $version =~ s<[^0-9].].*><>;
-
-    return $version;
+    $VERSION = $Net::ACME2::VERSION;
+    $VERSION =~ s<[^0-9.].*><>;
 }
 
 #Use this to tweak SSL config, e.g., if you want to cache PublicSuffix.
@@ -83,44 +88,13 @@ sub new {
 sub request {
     my ( $self, $method, $url, $args_hr ) = @_;
 
-    #HTTP::Tiny clobbers $@. The clobbering is useless since the
-    #error is in the $resp variable already. Clobbering also risks
-    #action-at-a-distance problems, so prevent it here.
-
-    #cf. eval_bug.readme
-    my $eval_err = $@;
+    # NB: HTTP::Tiny clobbers $@. The clobbering is useless since the
+    # error is in the $resp variable already. Clobbering also risks
+    # action-at-a-distance problems.
 
     my $resp = _base_request( $self, $method, $url, $args_hr || () );
 
-    $@ = $eval_err;
-
-    my $resp_obj = HTTP::Tiny::UA::Response->new($resp);
-
-    #cf. HTTP::Tiny docs
-    if ( $resp_obj->status() == 599 ) {
-        die Net::ACME2::X->create(
-            'HTTP::Network',
-            {
-                method    => $method,
-                url       => $url,
-                error     => $resp_obj->content(),
-                redirects => $resp->{'redirects'},
-            }
-        );
-    }
-
-    if ( $resp->{'status'} >= 400 ) {
-        die Net::ACME2::X->create(
-            'HTTP::Protocol',
-            {
-                method    => $method,
-                redirects => $resp->{'redirects'},
-                ( map { ( $_ => $resp_obj->$_() ) } qw( content status reason url headers ) ),
-            },
-        );
-    }
-
-    return $resp_obj;
+    return Net::ACME2::HTTP::Convert::http_tiny_to_net_acme2($method, $resp);
 }
 
 1;

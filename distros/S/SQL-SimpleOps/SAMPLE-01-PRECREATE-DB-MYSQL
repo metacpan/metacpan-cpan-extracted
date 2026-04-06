@@ -1,5 +1,5 @@
 
-# MySQL/MariaDB start
+-- MySQL/MariaDB start
 
 DROP TABLE IF EXISTS `test_db`.`standard_notnull` ;
 DROP TABLE IF EXISTS `test_db`.`standard_null` ;
@@ -105,4 +105,4 @@ CREATE USER 'user_update'@'localhost' IDENTIFIED BY 'password_update';
 GRANT SELECT ON `test_db`.* TO 'user_read'@'localhost';
 GRANT SELECT,INSERT,UPDATE,DELETE ON `test_db`.* TO 'user_update'@'localhost';
 
-# MySQL/MariaDB done
+-- MySQL/MariaDB done

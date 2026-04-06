@@ -8,7 +8,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use parent 'Net_ACME2_Example';
+use parent 'Net_ACME2_Example_Sync';
 
 use constant _CHALLENGE_TYPE => 'tls-alpn-01';
 

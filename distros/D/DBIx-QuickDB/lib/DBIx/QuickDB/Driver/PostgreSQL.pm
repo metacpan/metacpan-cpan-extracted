@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000039';
+our $VERSION = '0.000040';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -39,7 +39,7 @@ sub version_string {
     # Go in reverse order assuming the last param hash provided is most important
     for my $arg (reverse @_) {
         my $type = reftype($arg) or next;    # skip if not a ref
-        next if $type eq 'HASH';             # We have a hashref, possibly blessed
+        next unless $type eq 'HASH';         # We have a hashref, possibly blessed
 
         # If we find a launcher we are done looping, we want to use this binary.
         $binary = $arg->{+POSTGRES} and last;
@@ -67,6 +67,8 @@ sub list_env_vars {
     );
 }
 
+sub error_log { "$_[0]->{+DIR}/error.log" }
+
 sub _default_paths {
     return (
         initdb   => $INITDB,
@@ -87,6 +89,10 @@ sub _default_config {
         lc_numeric                 => "'en_US.UTF-8'",
         lc_time                    => "'en_US.UTF-8'",
         listen_addresses           => "''",
+        log_destination            => "'stderr'",
+        logging_collector          => "'on'",
+        log_directory              => "'$self->{+DIR}'",
+        log_filename               => "'error.log'",
         max_connections            => "100",
         shared_buffers             => "128MB",
         unix_socket_directories    => "'$self->{+DIR}'",
@@ -188,7 +194,7 @@ sub bootstrap {
     my $dir = $self->{+DIR};
     my $db_dir = $self->{+DATA_DIR};
     mkdir($db_dir) or die "Could not create data dir: $!";
-    $self->run_command([$self->{+INITDB}, '-E', 'UTF8', '-D', $db_dir]);
+    $self->run_command([$self->{+INITDB}, '-E', 'UTF8', '-A', 'trust', '-D', $db_dir]);
 
     $self->write_config;
     $self->start;
@@ -209,7 +215,7 @@ sub bootstrap {
 
         last if $ok;
 
-        die $@ if $try == 5;
+        die $err if $try == 5;
 
         sleep 0.5;
     }

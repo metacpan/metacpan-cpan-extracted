@@ -1,5 +1,5 @@
 package Data::Frame::Util;
-$Data::Frame::Util::VERSION = '0.006004';
+$Data::Frame::Util::VERSION = '0.006005';
 # ABSTRACT: Utility functions
 
 use Data::Frame::Setup;
@@ -184,7 +184,7 @@ Data::Frame::Util - Utility functions
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 DESCRIPTION
 

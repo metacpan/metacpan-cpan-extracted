@@ -1,5 +1,20 @@
 Revision history for CGI-Info
 
+1.12	Sun Apr  5 17:46:12 EDT 2026
+	as_string should not return undef
+	Added mutation tests and LCSAJ data to the test dashboard
+	Say who is trying to upload or using unsupported multipart
+	Block attacks with var_dump%28md5
+	Allow the default max_upload_size to be configurable at runtime
+	Added function.t - white-box tests for all functions, including helper functions
+	Added unit.t - a set of black-box subtests to test each public function, according to their API documentation in the POD
+	Added integration.t - a set of subtests to black‑box, end‑to‑end behaviour across multiple routines, including the entire package, according to the POD documentation.
+		Includes as many stateful tests and tests of integration with other packages as possible.
+	Added edge_cases.t - a set of destructive, pathological, boundary‑condition subtests
+		Fixed an issue that edge_cases found in scanning very long parameters for injections - the scan was slow and inefficient
+	Added extended.t - any other tests
+	Fix handling double injection NUL via %2500
+
 1.11	Mon Feb  2 12:59:36 EST 2026
 	Fix "skipped: (no reason given)" https://www.cpantesters.org/cpan/report/6af2b33e-fef6-11f0-9424-b5d717f4d45d
 

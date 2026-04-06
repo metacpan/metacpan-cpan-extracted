@@ -1,8 +1,7 @@
 package Langertha::Stream::Chunk;
 # ABSTRACT: Represents a single chunk from a streaming response
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
-use namespace::autoclean;
 
 
 has content => (
@@ -64,7 +63,7 @@ Langertha::Stream::Chunk - Represents a single chunk from a streaming response
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

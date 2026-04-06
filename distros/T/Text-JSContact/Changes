@@ -1,0 +1,12 @@
+Revision history for Perl extension Text::JSContact
+
+0.01  2026-04-05
+	- Initial release
+	- Bidirectional vCard <=> JSContact conversion
+	- Follows RFCs 9553 (JSContact), 9554 (extensions), 9555 (vCard mapping)
+	- Covers: name, emails, phones, addresses, organizations, titles,
+	  anniversaries, notes, onlineServices, media, links, calendars,
+	  schedulingAddresses, cryptoKeys, directories, keywords, members,
+	  relatedTo, speakToAs, preferredLanguages, personalInfo
+	- 192 unit tests including RFC 9555 test vectors
+	- Cyrus CardDAV integration tests

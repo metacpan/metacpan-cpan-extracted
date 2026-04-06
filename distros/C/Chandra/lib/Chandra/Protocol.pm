@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.
@@ -59,6 +59,23 @@ parameters.
 
 Handlers can also be invoked programmatically from JavaScript via
 C<window.__chandraProtocol.navigate(url)>.
+
+The injected JavaScript also transparently intercepts C<< <link> >>,
+C<< <script> >>, C<< <img> >>, and C<fetch()> calls whose URLs match
+a registered scheme.  For C<< <link> >> and C<< <script> >> elements
+the content is fetched via the Perl handler and injected inline; for
+C<< <img> >> elements the data is base64-encoded into a data URI.
+A C<MutationObserver> watches for dynamically added elements as well.
+
+To avoid C<"Failed to load resource: unsupported URL"> warnings in the
+developer console, use C<data-href> / C<data-src> attributes instead of
+plain C<href> / C<src>:
+
+    <link rel="stylesheet" data-href="myapp://css/style.css">
+    <script data-src="myapp://js/app.js"></script>
+    <img data-src="myapp://images/logo.png">
+
+Both forms (C<data-*> and native attributes) are supported.
 
 This is implemented entirely in Perl + JavaScript — no C-level
 protocol registration is required.

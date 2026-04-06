@@ -1,6 +1,6 @@
 package Langertha::Role::OpenAICompatible;
 # ABSTRACT: Role for OpenAI-compatible API format
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose::Role;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -22,12 +22,6 @@ sub update_request {
 
 
 sub openapi_file { yaml => dist_file('Langertha','openai.yaml') };
-
-
-sub _build_openapi_operations {
-  require Langertha::Spec::OpenAI;
-  return Langertha::Spec::OpenAI::data();
-}
 
 
 sub default_embedding_model { 'text-embedding-3-large' }
@@ -348,7 +342,7 @@ Langertha::Role::OpenAICompatible - Role for OpenAI-compatible API format
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 
@@ -358,11 +352,10 @@ version 0.308
     package My::Engine;
     use Moose;
 
-    with 'Langertha::Role::'.$_ for (qw(
+    with map { 'Langertha::Role::'.$_ } qw(
         JSON HTTP OpenAICompatible OpenAPI Models Temperature
-        ResponseSize SystemPrompt Streaming Chat
-    ));
-    with 'Langertha::Role::Tools';
+        ResponseSize SystemPrompt Streaming Chat Tools
+    );
 
     sub _build_api_key { $ENV{MY_API_KEY} || die "needs api_key" }
     sub default_model { 'my-model' }

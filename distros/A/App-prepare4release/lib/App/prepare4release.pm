@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Carp qw(croak);
 use Cwd qw(getcwd);
@@ -500,11 +500,12 @@ sub _replace_marked_postamble_block {
 	return $content
 		unless $content =~ /^\# BEGIN PREPARE4RELEASE_POSTAMBLE/m;
 	my $out = $content;
-	$out =~ s{
-		^\# BEGIN PREPARE4RELEASE_POSTAMBLE \n
-		.*?
-		^\# END PREPARE4RELEASE_POSTAMBLE \n?
-	}{$new_block}msx;
+	# Line endings: require \r?\n so CRLF files (common on Windows / some editors)
+	# still match; a strict \n-only pattern leaves the block unchanged and pod2*
+	# never updates.
+	# No /x: it would strip spaces in "# BEGIN ..." and treat # as comments. The pattern
+	# must be a single line: multiline s{}{} would include literal \n\t from this file.
+	$out =~ s/^\# BEGIN PREPARE4RELEASE_POSTAMBLE\s*\r?\n.*?^\# END PREPARE4RELEASE_POSTAMBLE\s*\r?\n?/$new_block/ms;
 	return $out;
 }
 
@@ -656,6 +657,7 @@ sub ensure_meta_merge {
 
 sub _patch_meta_merge_block {
 	my ( $class, $content, $repo_git_url, $repo_web, $bugtracker_web, $verbose ) = @_;
+	my $before = $content;
 
 	if ( $content =~ s/(repository\s*=>\s*\{[^}]*?)(\burl\s*=>\s*)'[^']*'/${1}${2}'$repo_git_url'/s ) {
 		1;
@@ -688,8 +690,142 @@ BUG
 		$content =~ s/\Q$resources_head\E/$resources_head\n$inj/s;
 	}
 
-	warn "[prepare4release] Makefile.PL: patched existing META_MERGE\n" if $verbose;
+	if ( $content ne $before ) {
+		warn "[prepare4release] Makefile.PL: patched existing META_MERGE\n" if $verbose;
+	}
 	return $content;
+}
+
+sub _escape_makefile_single_quoted {
+	my ( $class, $s ) = @_;
+	$s =~ s/\\/\\\\/g;
+	$s =~ s/'/\\'/g;
+	return $s;
+}
+
+# Build ( MAKEMAKER_KEY => value ) from prepare4release.json root. Only keys
+# present in the JSON are applied (empty strings are skipped).
+sub makefile_scalar_keys_from_config {
+	my ( $class, $config ) = @_;
+	$config = {} unless ref $config eq 'HASH';
+	my @out;    # [ key, string value ]
+
+	for my $pair (
+		[ author         => 'AUTHOR' ],
+		[ abstract       => 'ABSTRACT' ],
+		[ abstract_from  => 'ABSTRACT_FROM' ],
+		[ license        => 'LICENSE' ],
+	  )
+	{
+		my ( $json_key, $mm_key ) = @{$pair};
+		next unless exists $config->{$json_key};
+		my $v = $config->{$json_key};
+		next unless defined $v && !ref $v && length $v;
+		push @out, [ $mm_key, $v ];
+	}
+
+	if ( exists $config->{min_perl_version} ) {
+		my $v = $config->{min_perl_version};
+		if ( defined $v && !ref $v && length $v ) {
+			push @out, [ 'MIN_PERL_VERSION', $v ];
+		}
+	}
+	elsif ( exists $config->{perl_min} ) {
+		my $v = $config->{perl_min};
+		if ( defined $v && !ref $v && length $v ) {
+			push @out, [ 'MIN_PERL_VERSION', $v ];
+		}
+	}
+
+	if ( exists $config->{module_name} ) {
+		my $v = $config->{module_name};
+		if ( defined $v && !ref $v && length $v ) {
+			push @out, [ 'NAME', $v ];
+		}
+	}
+	elsif ( exists $config->{name} ) {
+		my $v = $config->{name};
+		if ( defined $v && !ref $v && length $v ) {
+			push @out, [ 'NAME', $v ];
+		}
+	}
+
+	if ( exists $config->{version_from} ) {
+		my $v = $config->{version_from};
+		if ( defined $v && !ref $v && length $v ) {
+			push @out, [ 'VERSION_FROM', $v ];
+		}
+	}
+
+	return @out;
+}
+
+sub _replace_write_makefile_scalar {
+	my ( $class, $content, $mm_key, $value ) = @_;
+	my $ev = $class->_escape_makefile_single_quoted($value);
+
+	if ( $content =~ /\b\Q$mm_key\E\s*=>\s*'/ ) {
+		$content =~ s/(\b\Q$mm_key\E\s*=>\s*)'(?:\\.|[^'\\])*'/${1}'$ev'/s;
+		return ( $content, 1 );
+	}
+	if ( $content =~ /\b\Q$mm_key\E\s*=>\s*"/ ) {
+		$content =~ s/(\b\Q$mm_key\E\s*=>\s*)"[^"]*"/${1}'$ev'/s;
+		return ( $content, 1 );
+	}
+	my $pair = $class->write_makefile_close_index($content);
+	if ($pair) {
+		my $close_idx = $pair->[1];
+		substr( $content, $close_idx, 0 ) = ",\n\t$mm_key => '$ev'";
+		return ( $content, 1 );
+	}
+	return ( $content, 0 );
+}
+
+# EXE_FILES => [ 'bin/foo', ... ] — value is Perl list, not a quoted string.
+sub _replace_write_makefile_exe_files {
+	my ( $class, $content, $paths ) = @_;
+	$paths = [] unless ref $paths eq 'ARRAY';
+	my $list = join ', ', map { qq{'$_'} } @{$paths};
+	my $expr = "[$list]";
+
+	if ( $content =~ /\bEXE_FILES\s*=>\s*\[/ ) {
+		$content =~ s/(\bEXE_FILES\s*=>\s*)\[[^\]]*\]/${1}$expr/s;
+		return ( $content, 1 );
+	}
+	my $pair = $class->write_makefile_close_index($content);
+	if ($pair) {
+		my $close_idx = $pair->[1];
+		substr( $content, $close_idx, 0 ) = ",\n\tEXE_FILES => $expr";
+		return ( $content, 1 );
+	}
+	return ( $content, 0 );
+}
+
+sub ensure_makefile_metadata_from_config {
+	my ( $class, $makefile_path, $content, $config, $verbose ) = @_;
+	$config = {} unless ref $config eq 'HASH';
+
+	my $new = $content;
+	my $any = 0;
+
+	for my $pair ( $class->makefile_scalar_keys_from_config($config) ) {
+		my ( $mm_key, $val ) = @{$pair};
+		my $ch;
+		( $new, $ch ) = $class->_replace_write_makefile_scalar( $new, $mm_key, $val );
+		$any ||= $ch;
+		warn "[prepare4release] Makefile.PL: set $mm_key from prepare4release.json\n"
+			if $verbose && $ch;
+	}
+
+	if ( exists $config->{exe_files} && ref $config->{exe_files} eq 'ARRAY' ) {
+		my $ch;
+		( $new, $ch ) = $class->_replace_write_makefile_exe_files( $new, $config->{exe_files} );
+		$any ||= $ch;
+		warn "[prepare4release] Makefile.PL: set EXE_FILES from prepare4release.json\n"
+			if $verbose && $ch;
+	}
+
+	return ( $new, $any );
 }
 
 sub apply_makefile_patches {
@@ -1779,9 +1915,19 @@ sub load_config_file {
 		return {};
 	}
 	my $json = JSON::PP->new->relaxed;
-	my $data = $json->decode($raw);
-	croak 'prepare4release.json must be a JSON object'
-		unless ref $data eq 'HASH';
+	my $data = eval { $json->decode($raw) };
+	if ( $@ || !defined $data ) {
+		my $err = $@ || 'decode returned undef';
+		$err =~ s/\s+\z//;
+		warn "[prepare4release] prepare4release.json: invalid JSON ($err); "
+			. "treating as empty {}\n";
+		return {};
+	}
+	if ( ref $data ne 'HASH' ) {
+		warn "[prepare4release] prepare4release.json: top level must be a JSON object; "
+			. "treating as empty {}\n";
+		return {};
+	}
 	return $data;
 }
 
@@ -1806,6 +1952,7 @@ sub parse_argv {
 		'github'   => \$opts{github},
 		'gitlab'   => \$opts{gitlab},
 		'cpan'     => \$opts{cpan},
+		'sync-deps!' => \$opts{sync_deps},
 		'help|?'   => \$opts{help},
 		'usage'    => \$opts{usage},
 		'verbose'  => \$opts{verbose},
@@ -2130,6 +2277,18 @@ sub run {
 	croak 'Makefile.PL not found in current directory' unless $mf;
 
 	my ( $mf_content, $mf_snippets ) = $class->read_makefile_pl_snippets($mf);
+
+	my ( $mf_meta, $meta_changed ) = $class->ensure_makefile_metadata_from_config(
+		$mf, $mf_content, $config, $opts->{verbose} );
+	if ($meta_changed) {
+		open my $mout, '>:encoding(UTF-8)', $mf
+			or croak "Cannot write Makefile.PL '$mf': $!";
+		print {$mout} $mf_meta;
+		close $mout;
+		$mf_content = $mf_meta;
+		( $mf_content, $mf_snippets ) = $class->read_makefile_pl_snippets($mf);
+	}
+
 	my $identity = $class->resolve_identity( $cwd, $config, $mf_snippets );
 
 	my $app = $class->new(
@@ -2168,6 +2327,14 @@ sub run {
 		warn "[prepare4release] repository web: " . $app->repository_web_url . "\n";
 		warn "[prepare4release] repository git: " . $app->repository_git_url . "\n";
 		warn "[prepare4release] bugtracker: " . $app->bugtracker_url . "\n";
+	}
+
+	require App::prepare4release::Deps;
+	my $mf_deps_changed;
+	( $mf_content, $mf_deps_changed ) = App::prepare4release::Deps->apply(
+		$cwd, $mf, $mf_content, $identity, $config, $opts );
+	if ($mf_deps_changed) {
+		( $mf_content, $mf_snippets ) = $class->read_makefile_pl_snippets($mf);
 	}
 
 	$class->apply_makefile_patches( $mf, $opts, $app, $opts->{verbose} );
@@ -2217,7 +2384,7 @@ __END__
 
 =head1 NAME
 
-App::prepare4release - prepare a Perl distribution for release (skeleton)
+App::prepare4release - prepare a Perl distribution for release
 
 =head1 SYNOPSIS
 
@@ -2234,7 +2401,10 @@ live). The tool:
 =item *
 
 Loads F<prepare4release.json> and resolves C<module_name> / C<version> / C<dist_name>
-when omitted (from F<Makefile.PL> and the main F<.pm>).
+when omitted (from F<Makefile.PL> and the main F<.pm>). Invalid JSON logs a warning
+and behaves like an empty object. Root keys such as C<author>, C<abstract>,
+C<license>, C<min_perl_version>, C<module_name>, C<version_from>, and C<exe_files>
+are copied into F<Makefile.PL> C<WriteMakefile(...)> when set (see L</CONFIGURATION FILE>).
 
 =item *
 
@@ -2301,6 +2471,16 @@ Warns when any F<t/*.t> or F<xt/**/*.t> file starts with C<use Test::More> or
 C<use Test::Most> (legacy assertion frameworks). Prefer L<Test2::V1> or
 L<Test2::Tools::Spec>.
 
+=item *
+
+Scans F<lib/>, F<bin/>, F<maint/>, F<t/>, and optionally F<xt/> for C<use> /
+C<require> and compares with C<PREREQ_PM> / C<TEST_REQUIRES> in F<Makefile.PL>.
+Core modules for the target minimum Perl are skipped unless a minimum module
+version is given on the C<use> line (see L<Module::CoreList>). By default only a
+warning is printed; C<--sync-deps> or C<dependencies.sync> in
+F<prepare4release.json> updates F<Makefile.PL> and appends to F<cpanfile> when
+present. C<dependencies.skip> disables the check.
+
 =back
 
 =head1 README badge injector (F<maint/inject-readme-badges.pl>)
@@ -2324,14 +2504,44 @@ C<App::prepare4release> is added to the target module.
 File name: F<prepare4release.json> (in the distribution root).
 
 An empty file or whitespace-only file is treated as an empty JSON object C<{}>.
+Invalid JSON logs a warning and is treated as C<{}>.
 
 =over 4
+
+=item C<author>
+
+Optional. Copied into F<Makefile.PL> C<AUTHOR> (distinct from C<git.author>).
+
+=item C<abstract>
+
+Optional. Copied into F<Makefile.PL> C<ABSTRACT>.
+
+=item C<abstract_from>
+
+Optional. Copied into F<Makefile.PL> C<ABSTRACT_FROM>.
+
+=item C<license>
+
+Optional. Copied into F<Makefile.PL> C<LICENSE>.
+
+=item C<exe_files>
+
+Optional. JSON array of paths; copied into F<Makefile.PL> C<EXE_FILES>.
 
 =item C<module_name>
 
 Optional. Perl package (e.g. C<My::Module>). If omitted, taken from the
 C<VERSION_FROM> module's C<package> line, from C<NAME> in F<Makefile.PL>, or from
-the first C<lib/**/*.pm> file.
+the first C<lib/**/*.pm> file. If set, also written to F<Makefile.PL> C<NAME>.
+
+=item C<name>
+
+Optional. Alternative to C<module_name> for F<Makefile.PL> C<NAME> when
+C<module_name> is absent.
+
+=item C<version_from>
+
+Optional. Path written to F<Makefile.PL> C<VERSION_FROM> when set.
 
 =item C<version>
 
@@ -2344,12 +2554,13 @@ Optional. Defaults to C<module_name> with C<::> replaced by hyphens.
 =item C<min_perl_version>
 
 Optional. Minimum Perl version string for the README C<Perl> badge (e.g. C<5.026>
-or C<v5.26.0>). If omitted, C<MIN_PERL_VERSION> from F<Makefile.PL> is used, then
-the combined makefile/module heuristic.
+or C<v5.26.0>). If set, also copied into F<Makefile.PL> C<MIN_PERL_VERSION>. If
+omitted for the badge, C<MIN_PERL_VERSION> from F<Makefile.PL> is used, then the
+combined makefile/module heuristic.
 
 =item C<perl_min>
 
-Optional alias for C<min_perl_version>.
+Optional alias for C<min_perl_version> (Makefile and badge).
 
 =item C<bugtracker>
 
@@ -2398,6 +2609,31 @@ Array of Debian package names (e.g. C<libssl-dev>) appended to the generated
 GitHub Actions and GitLab CI C<apt-get install> steps. System libraries are not
 inferrable reliably from CPAN metadata alone; list them here when XS or
 C<Alien::*> needs OS packages.
+
+=back
+
+=item C<dependencies>
+
+Optional object for L<App::prepare4release::Deps>:
+
+=over 8
+
+=item C<sync>
+
+If true, merge missing prerequisites into F<Makefile.PL> / F<cpanfile> (same as
+C<--sync-deps>).
+
+=item C<skip>
+
+If true, skip scanning.
+
+=item C<scan_xt>
+
+If true, include F<xt/**/*.t> in test prerequisites (default false).
+
+=item C<sync_cpanfile>
+
+If false, do not modify F<cpanfile> when C<sync> is true (default true).
 
 =back
 

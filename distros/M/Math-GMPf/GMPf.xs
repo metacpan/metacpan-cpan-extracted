@@ -762,9 +762,8 @@ _rndaz takes 3 arguments:
  2) the exponent of the Math::GMPf object;
  3) a boolean (integer) argument
 
-The first 2 arguments are returned by Rmpf_deref2, the third by
-Rmpf_get_prec.
-If the 4th argument is true, then the length of the binary string,
+The first 2 arguments are returned by Rmpf_deref2.
+If the 3rd argument is true, then the length of the binary string,
 and the index of the ULP, will be printed to STDOUT.
 
 If '0' is returned, then Rmpf_get_d and Rmpf_get_d_rndn will return

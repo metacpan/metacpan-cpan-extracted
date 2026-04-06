@@ -1,4 +1,13 @@
-Revision history for File-Fast
+Revision history for File-Raw
+
+0.03    2026-04-05
+        - Fix xop_class registration for custom ops to prevent assertion
+          failures on debug builds of Perl 5.14-5.21 (CPAN Testers failures)
+        - Fix XOP compatibility macros for pre-5.14 Perl versions
+	- Switch to Dynaloader so we can link back to 5.10
+
+0.02    2025-05-23
+        - Initial CPAN release
 
 0.01    Date/time
         First version, released on an unsuspecting world.

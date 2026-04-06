@@ -110,4 +110,104 @@ END
 	is($got, $input, 'single-line rules stay unchanged');
 }
 
+# CSS Grid layout with named template areas
+{
+	my $input = <<'END';
+.layout {
+display: grid;
+grid-template-columns: 200px 1fr;
+grid-template-areas:
+"sidebar main"
+"sidebar footer";
+gap: 1rem;
+}
+.sidebar {
+grid-area: sidebar;
+}
+END
+
+	my $expected = <<'END';
+.layout {
+	display: grid;
+	grid-template-columns: 200px 1fr;
+	grid-template-areas:
+	"sidebar main"
+	"sidebar footer";
+	gap: 1rem;
+}
+.sidebar {
+	grid-area: sidebar;
+}
+END
+
+	my $got = Eshu->indent_css($input);
+	is($got, $expected, 'CSS Grid with named template areas');
+}
+
+# Complex attribute selectors and :not()
+{
+	my $input = <<'END';
+a[href^="https"] {
+color: green;
+}
+input[type="text"],
+input[type="email"] {
+border: 1px solid #ccc;
+}
+.parent > .child:not(.excluded):first-child {
+font-weight: bold;
+}
+END
+
+	my $expected = <<'END';
+a[href^="https"] {
+	color: green;
+}
+input[type="text"],
+input[type="email"] {
+	border: 1px solid #ccc;
+}
+.parent > .child:not(.excluded):first-child {
+	font-weight: bold;
+}
+END
+
+	my $got = Eshu->indent_css($input);
+	is($got, $expected, 'attribute selectors and :not() pseudo-class');
+}
+
+# @font-face and @import at-rules
+{
+	my $input = <<'END';
+@font-face {
+font-family: 'MyFont';
+src: url('font.woff2') format('woff2');
+font-weight: 400;
+}
+
+@media print {
+body {
+font-size: 12pt;
+}
+}
+END
+
+	my $expected = <<'END';
+@font-face {
+	font-family: 'MyFont';
+	src: url('font.woff2') format('woff2');
+	font-weight: 400;
+}
+
+@media print {
+	body {
+		font-size: 12pt;
+	}
+}
+END
+
+	my $got = Eshu->indent_css($input);
+	is($got, $expected, '@font-face followed by @media');
+}
+
 done_testing();

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.

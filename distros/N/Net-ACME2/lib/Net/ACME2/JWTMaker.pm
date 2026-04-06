@@ -42,6 +42,15 @@ sub create_key_id_jws {
     return $self->_create_jwt(%args);
 }
 
+sub create_full_jws_for_url {
+    my ($self, %args) = @_;
+
+    local $args{'extra_headers'}{'jwk'} = $self->{'key'}->get_struct_for_public_jwk();
+    local $args{'extra_headers'}{'url'} = $args{'url'};
+
+    return $self->_create_jwt(%args);
+}
+
 #----------------------------------------------------------------------
 
 #expects:

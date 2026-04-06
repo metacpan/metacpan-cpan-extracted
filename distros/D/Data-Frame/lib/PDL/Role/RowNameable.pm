@@ -1,5 +1,5 @@
 package PDL::Role::RowNameable;
-$PDL::Role::RowNameable::VERSION = '0.006004';
+$PDL::Role::RowNameable::VERSION = '0.006005';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ PDL::Role::RowNameable
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 AUTHORS
 

@@ -3,10 +3,19 @@ package File::Raw;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-require XSLoader;
-XSLoader::load('File::Raw', $VERSION);
+# Use DynaLoader with RTLD_GLOBAL so C API symbols (file_hooks.h) are visible
+# to other XS modules that link against us at runtime.
+# XSLoader on older Perls (5.10) doesn't honour dl_load_flags.
+use DynaLoader;
+our @ISA = ('DynaLoader');
+# Returns 0x01 (RTLD_GLOBAL) to DynaLoader::bootstrap, causing dlopen()
+# to load Raw.so into the global symbol table. Without this, symbols
+# default to RTLD_LOCAL and are invisible to subsequently loaded XS
+# modules that depend on our C API (e.g. test files for file_set_read_hook).
+sub dl_load_flags { 0x01 }
+__PACKAGE__->bootstrap($VERSION);
 
 1;
 

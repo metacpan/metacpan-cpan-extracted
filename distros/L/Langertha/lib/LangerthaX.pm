@@ -1,6 +1,6 @@
 package LangerthaX;
 # ABSTRACT: Bring your own viking!
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ LangerthaX - Bring your own viking!
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,15 @@
 package Langertha::Engine::Remote;
 # ABSTRACT: Base class for all remote engines
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 
 use Langertha::RateLimit;
 
-with 'Langertha::Role::'.$_ for (qw(
+with map { 'Langertha::Role::'.$_ } qw(
   JSON
   HTTP
   PluginHost
-));
+);
 
 
 has '+url' => (
@@ -65,7 +65,7 @@ Langertha::Engine::Remote - Base class for all remote engines
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

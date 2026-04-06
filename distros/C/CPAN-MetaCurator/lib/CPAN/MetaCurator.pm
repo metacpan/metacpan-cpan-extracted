@@ -2,7 +2,7 @@ package CPAN::MetaCurator;
 
 use 5.36.0;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 #-------------------------------------------------
 
@@ -12,45 +12,58 @@ our $VERSION = '1.14';
 
 =head1 NAME
 
-CPAN::MetaPackager - Manage the cpan.metapackager.sqlite database
+CPAN::MetaCurator - Manage the cpan.metacurator.sqlite database
 
 =head1 How to convert a Perl.Wiki.html into a jsTree
 
 Note: My web host and I use case-sensitive file systems.
 
-A: Prepare wikis:
-1: cd ~/savage.net.au/
-2: Edit Perl.Wiki, etc. Includes updating the release date. Save to ~/Downloads/
-3: cp ~/Downloads/*.Wiki.html to misc/
-4: git commit -am"Update Perl.Wiki V 1.xx"
-5: mv ~/Downloads/*.Wiki.html to $DH (/dev/shm/html on my machine)
+=head2 Prepare wikis
+=over
+=item cd ~/savage.net.au/
+=item Edit Perl.Wiki, etc. Includes updating the release date. Save to ~/Downloads/
+=item cp ~/Downloads/*.Wiki.html to misc/
+=item git commit -am"Update Perl.Wiki V 1.xx"
+=item mv ~/Downloads/*.Wiki.html to $DH (/dev/shm/html on my machine) for eye-ball check via FF
+=back
 
-B: Export Perl.Wiki.html:
-1: In the 'Tools' tab click 'export all'
-2: In the export menu click 'JSON format'. This creates ~/Downloads/tiddlers.json
-3: cd ~/perl.modules/CPAN-MetaCurator
-4: mv ~/Downloads/tiddlers.json data/tiddlers.json
+=head2 Export Perl.Wiki.html
+=over
+=item In the 'Tools' tab click 'export all'
+=item In the export menu click 'JSON format'. This creates ~/Downloads/tiddlers.json
+=item cd ~/perl.modules/CPAN-MetaCurator
+=item mv ~/Downloads/tiddlers.json data/tiddlers.json
+=back
 
-C: Rebuild Perl Wiki Tree:
+=head2 Rebuild Perl Wiki Tree
+
 Note: Optionally use sqlite database (15 Mb) from CPAN::MetaPackager
-1. Set env var INCLUDE_PACKAGES=1 if you have /tmp/cpan.metapackager.sqlite available & to 0 (default) otherwise
-2: Run scripts/build.db.sh to import tiddlers.json file into database data/cpan.metacurator.sqlite
-	 (takes 15+ hours on my Levono M70Q 'Tiny' desktop)
-3: Run scripts/export.tree.sh to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
-4: Run script to backup new files: bu5.sh savage.net.au
 
-D: Patch ~/savage.net.au/index.html:
-1: cd ~/perl.modules/Local-Website
-2: Edit Local::Website::Util::PatchIndex's sub parser() if necessary
-3: Run scripts/parse.index.sh to patch ~/savage.net.au/index.html
-4: cp index.html $DH
+=over
+=item Set env var INCLUDE_PACKAGES=1 if you have /tmp/cpan.metapackager.sqlite available & to 0 (default) otherwise
+=item Run scripts/build.db.sh to import tiddlers.json file into database data/cpan.metacurator.sqlite
+=item Run scripts/export.tree.sh to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
+=item git push
+=back
 
-E: Upload:
-1: Upload Perl.Wiki.html, etc to savage.net.au
-2: Upload index.html
-3: Log in to blogs.perl.org
-4: Post details of the uploads
-5: Wait ... Check how it appears on blogs.perl.org. Takes about 1 min
+=head2 Patch ~/savage.net.au/index.html
+=over
+=item cd ~/perl.modules/Local-Website
+=item Edit Local::Website::Util::PatchIndex's sub parser() if necessary
+=item Run scripts/parse.index.sh to patch ~/savage.net.au/index.html
+=item cp index.html $DH
+=item Backup new files: bu5.sh savage.net.au
+=item Backup new files: bu5.sh perl.modules
+=back
+
+=head2 Upload
+=over
+=item Upload Perl.Wiki.html, etc to savage.net.au
+=item Upload index.html
+=item Log in to blogs.perl.org
+=item Post details of the uploads
+=item Wait ... Check how it appears on blogs.perl.org. Takes about 1 min
+=back
 
 =head1 Machine-Readable Change Log
 

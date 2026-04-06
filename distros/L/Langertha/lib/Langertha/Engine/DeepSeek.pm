@@ -1,13 +1,12 @@
 package Langertha::Engine::DeepSeek;
 # ABSTRACT: DeepSeek API
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::ResponseFormat';
-with 'Langertha::Role::Tools';
+with 'Langertha::Role::ResponseFormat', 'Langertha::Role::Tools';
 
 
 sub _build_supported_operations {[qw(
@@ -44,7 +43,7 @@ Langertha::Engine::DeepSeek - DeepSeek API
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

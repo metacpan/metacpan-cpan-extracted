@@ -64,6 +64,7 @@ t/048-object-reader-writer.t
 t/049-object-weak-initarg.t
 t/050-exported-keywords.t
 t/051-plus-attr.t
+t/052-object-clone-deep.t
 t/fix_subtests.pl
 t/lib/NeuralNet/Activation.pm
 t/lib/NeuralNet/Layer.pm

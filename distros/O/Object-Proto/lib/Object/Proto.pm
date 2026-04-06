@@ -1,7 +1,7 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 require XSLoader;
 XSLoader::load('Object::Proto', $VERSION);
 
@@ -66,6 +66,17 @@ and installs accessor methods. Must be called before using C<new>.
 
 	object 'Cat', qw(name age color));
 
+This is a convenience keyword exported by C<use Object::Proto>. It is
+equivalent to calling C<Object::Proto::define()> directly.
+
+=head2 Object::Proto::define($class, @properties)
+
+The underlying function that C<object> delegates to. Use this form when
+you need to define classes without importing the keyword, or from outside
+a C<BEGIN> block:
+
+	Object::Proto::define('Cat', qw(name age color));
+
 Property names can include type constraints, defaults, and modifiers
 using the colon-separated format:
 
@@ -121,9 +132,21 @@ The following types are available with inline checks (zero overhead):
 
 =item * B<clearer> - install a clear_* method to reset value
 
+=item * B<clearer(name)> - install clearer with custom method name
+
 =item * B<predicate> - install a has_* method to check if set
 
+=item * B<predicate(name)> - install predicate with custom method name
+
+=item * B<reader(name)> - install a separate getter method (Java-style get_*)
+
+=item * B<writer(name)> - install a separate setter method (Java-style set_*)
+
 =item * B<trigger(method)> - method called when value changes
+
+=item * B<weak> - weaken references stored in this slot (prevents circular refs)
+
+=item * B<arg(name)> - use different name for constructor argument (init_arg)
 
 =back
 
@@ -165,6 +188,163 @@ Install helper methods to clear and check slot values:
 	$p->has_nickname;     # true
 	$p->clear_nickname;   # reset to undef
 	$p->has_nickname;     # false
+
+Custom method names can be specified:
+
+	object 'Config',
+	    'cache:HashRef:clearer(invalidate):predicate(is_cached)',
+	);
+
+	$config->is_cached;    # false
+	$config->cache({});
+	$config->is_cached;    # true
+	$config->invalidate;   # clear the cache
+
+=head3 Reader and Writer
+
+For Java-style accessors, use C<reader> and C<writer> to create
+separate getter and setter methods:
+
+	object 'Person',
+	    'name:Str:reader(get_name):writer(set_name)',
+	);
+
+	my $p = new Person;
+	$p->set_name('Alice');
+	print $p->get_name;    # "Alice"
+	
+	# The default accessor still works
+	print $p->name;        # "Alice"
+
+Writers enforce type constraints and fire triggers just like
+the default accessor. Use with C<readonly> to prevent modification
+after construction:
+
+	object 'Entity',
+	    'id:Int:readonly:reader(get_id)',  # readonly, no writer needed
+	);
+
+=head3 Weak References
+
+Use C<weak> to automatically weaken references stored in a slot,
+preventing circular reference memory leaks:
+
+	object 'TreeNode',
+	    'value:Str',
+	    'parent:Object:weak',      # weak ref to parent
+	    'children:ArrayRef',
+	);
+
+	my $parent = new TreeNode value => 'root';
+	my $child = new TreeNode value => 'leaf', parent => $parent;
+	push @{$parent->children}, $child;
+
+	# parent->children points to child
+	# child->parent points weakly to parent
+	# When $parent goes out of scope and has no strong refs,
+	# it will be garbage collected properly
+
+Weak references are weakened:
+
+=over 4
+
+=item * At construction time when passed via constructor
+
+=item * When set via the accessor method
+
+=item * When set via a custom writer method
+
+=back
+
+=head3 Constructor Argument Names (init_arg)
+
+Use C<arg(name)> to specify a different name for the constructor
+argument. The accessor method still uses the property name:
+
+	object 'Config',
+	    'api_key:Str:required:arg(_api_key)',
+	);
+
+	# Constructor uses the init_arg name
+	my $config = new Config _api_key => 'secret123';
+
+	# Accessor uses property name
+	print $config->api_key;    # "secret123"
+
+This is useful for:
+
+=over 4
+
+=item * Providing a "private" constructor interface while keeping simple accessor names
+
+=item * Migrating from other object systems that use different conventions
+
+=item * Creating backwards-compatible APIs
+
+=back
+
+Combined with other modifiers:
+
+	object 'Widget',
+	    'id:Int:required:readonly:arg(_widget_id)',
+	    'config:HashRef:weak:arg(_config)',
+	);
+
+=head3 Inheritance (extends)
+
+Classes can inherit slots from a parent class using the C<extends> key:
+
+	object 'Animal', 'name:Str:required', 'sound:Str';
+
+	object 'Dog',
+	    extends => 'Animal',
+	    'breed:Str',
+	);
+
+	my $dog = new Dog name => 'Rex', sound => 'Woof', breed => 'Lab';
+	print $dog->name;   # "Rex"  (inherited from Animal)
+	print $dog->breed;  # "Lab"  (own slot)
+	print $dog->isa('Animal');  # true
+
+The parent class must already be defined. All parent slots are copied into
+the child class, and C<@ISA> is set up automatically. The child can override
+any inherited slot by redefining it:
+
+	object 'StrictDog',
+	    extends => 'Animal',
+	    'name:Str:required:readonly',   # override with readonly
+	    'breed:Str:required',
+	);
+
+=head4 Multiple Inheritance
+
+Pass an arrayref to C<extends> to inherit from multiple parents:
+
+	object 'Swimmer', 'stroke:Str';
+	object 'Runner',  'pace:Num';
+
+	object 'Triathlete',
+	    extends => ['Swimmer', 'Runner'],
+	    'event:Str',
+	);
+
+	my $t = new Triathlete stroke => 'freestyle', pace => 7.5, event => '70.3';
+	print $t->isa('Swimmer');  # true
+	print $t->isa('Runner');   # true
+
+When multiple parents define a slot with the same name, the first parent
+in the list wins. The child can always override any inherited slot.
+
+=head4 Multi-level Inheritance
+
+Inheritance chains work as expected:
+
+	object 'Grandparent', 'family:Str';
+	object 'Parent', extends => 'Grandparent', 'middle:Str';
+	object 'Child',  extends => 'Parent', 'first:Str';
+
+	my $c = new Child family => 'Smith', middle => 'J', first => 'Alice';
+	print $c->isa('Grandparent');  # true
 
 =head2 Object::Proto::register_type($name, $check, $coerce)
 
@@ -335,6 +515,29 @@ Get the prototype object (or undef if none).
 
 Set the prototype object. Fails if object is frozen.
 
+=head2 Object::Proto::prototype_chain($obj)
+
+Return the full prototype chain as an arrayref, starting from C<$obj>
+and following each prototype link. Detects and stops on circular
+references.
+
+	my $chain = Object::Proto::prototype_chain($cat);
+	# [$cat, $proto, $proto_of_proto, ...]
+
+=head2 Object::Proto::prototype_depth($obj)
+
+Return the depth of the prototype chain (number of prototypes above
+this object). Returns 0 if the object has no prototype.
+
+	my $depth = Object::Proto::prototype_depth($cat);  # 0, 1, 2, ...
+
+=head2 Object::Proto::has_own_property($obj, $property)
+
+Return true if the object has a defined value for the given property
+in its own slots (not inherited via prototype chain).
+
+	if (Object::Proto::has_own_property($cat, 'name')) { ... }
+
 =head2 $obj->lock
 
 Prevent adding new properties. Can be unlocked.
@@ -452,6 +655,46 @@ Additional keys may be present depending on the slot configuration:
 
 =back
 
+=head2 Object::Proto::parent($class)
+
+Return the parent class(es) of a class. In scalar context, returns the
+first (or only) parent class name, or C<undef> if none. In list context,
+returns all parent class names.
+
+	object 'Animal', 'name:Str';
+	object 'Dog', extends => 'Animal', 'breed:Str';
+
+	my $p = Object::Proto::parent('Dog');     # 'Animal'
+	my @p = Object::Proto::parent('Dog');     # ('Animal')
+
+	object 'Hybrid', extends => ['Dog', 'Cat'];
+	my $first = Object::Proto::parent('Hybrid');  # 'Dog'
+	my @all   = Object::Proto::parent('Hybrid');  # ('Dog', 'Cat')
+
+Returns C<undef>/empty list for classes with no parent.
+
+=head2 Object::Proto::ancestors($class)
+
+Return all ancestor classes in breadth-first order, with duplicates
+removed. Useful for inspecting the full inheritance hierarchy.
+
+	object 'A', 'a:Str';
+	object 'B', extends => 'A', 'b:Str';
+	object 'C', extends => 'B', 'c:Str';
+
+	my @anc = Object::Proto::ancestors('C');  # ('B', 'A')
+
+For multiple inheritance with diamond patterns, each ancestor appears
+only once (first occurrence wins):
+
+	object 'Base', 'x:Str';
+	object 'Left',  extends => 'Base';
+	object 'Right', extends => 'Base';
+	object 'Diamond', extends => ['Left', 'Right'];
+
+	my @anc = Object::Proto::ancestors('Diamond');
+	# ('Left', 'Right', 'Base')  -- Base appears once
+
 =head2 Object::Proto::import_accessors($class, $target)
 
 Import function-style accessors for maximum performance. This enables
@@ -510,13 +753,46 @@ Parameters:
 Function-style accessors are compiled to custom ops at compile time,
 giving performance competitive with or faster than C<slot>.
 
-B<Note:> Function-style accessors are not bound to a specific class.
-They operate by slot index, so they work transparently with any object
-that has the same slot at that index. For example, if C<Person> and
-C<TypedPerson> both define C<age> at the same position, an accessor
-imported from C<Person> will work on C<TypedPerson> objects too. This
-is by design for maximum flexibility, but it means the caller is
-responsible for defining compatible objects.
+=head1 BUILD
+
+Define a C<BUILD> method in your class to run initialization code
+after object construction. C<BUILD> is called automatically after
+C<new()> with the fully constructed object as its argument.
+
+	package Counter;
+	use Object::Proto;
+
+	object 'Counter', 'count', 'label:Str';
+
+	sub BUILD {
+	    my ($self) = @_;
+	    $self->count(0);
+	}
+
+	package main;
+	my $c = new Counter label => 'hits';
+	$c->count;  # 0 (set by BUILD)
+
+All constructor arguments are applied before C<BUILD> runs, so you
+can read slot values in your BUILD method:
+
+	package Derived;
+	object 'Derived', 'x', 'y', 'sum';
+
+	sub BUILD {
+	    my ($self) = @_;
+	    $self->sum(($self->x // 0) + ($self->y // 0));
+	}
+
+	my $d = new Derived x => 3, y => 4;
+	$d->sum;  # 7
+
+When a child class inherits via C<extends>, the child's C<BUILD>
+method is called (not the parent's). Call the parent's BUILD
+explicitly if needed.
+
+Zero overhead: BUILD is detected lazily on first C<new()> call,
+and the lookup is cached.
 
 =head1 DEMOLISH
 
@@ -536,6 +812,32 @@ a C<DESTROY> wrapper that calls your C<DEMOLISH> method.
 
 Zero overhead: The DESTROY wrapper is only installed for classes that
 define a DEMOLISH method.
+
+=head1 SINGLETONS
+
+=head2 Object::Proto::singleton($class)
+
+Mark a class as a singleton. This installs a C<< $class->instance() >>
+method that always returns the same object.
+
+	package Config;
+	BEGIN {
+	    Object::Proto::define('Config', 'debug:Bool:default(0)');
+	    Object::Proto::singleton('Config');
+	}
+
+	sub BUILD {
+	    my ($self) = @_;
+	    # initialization runs once, on first instance() call
+	}
+
+	package main;
+	my $cfg  = Config->instance;
+	my $same = Config->instance;  # same object
+
+The instance is created lazily on the first call to C<instance()>.
+If the class defines a C<BUILD> method, it is called after construction.
+The class must already be defined with C<Object::Proto::define()>.
 
 =head1 ROLES
 
@@ -723,7 +1025,8 @@ Multiple modifiers can be stacked:
 	Object::Proto (XS func) 5427162/s      197%       155%                   53%                  6%           2%                      --     -10%
 	Raw Hash                6024884/s      230%       184%                   70%                 18%          13%                     11%       --
 
-... If you only instantiate once and then set/get inside the benchmark
+... If you only instantiate once and then only set/get inside the benchmark
+
 
 	Test: Mixed set/get (5 seconds)
 	----------------------------------------
@@ -747,7 +1050,7 @@ Multiple modifiers can be stacked:
 
 =head1 AUTHOR
 
-LNATION C<< <email@lnation.org> >>
+LNATION E<email@lnation.org>
 
 =head1 LICENSE
 

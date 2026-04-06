@@ -2,7 +2,7 @@ package IPC::Manager::Spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use POSIX();
 
@@ -63,7 +63,7 @@ sub cleave {
         POSIX::_exit(0);
     }
 
-    print $wh "$pid\n";
+    print $wh "$$\n";
     close($wh);
 
     $self->{+PID} = $$;
@@ -86,15 +86,19 @@ sub terminate {
     my ($con) = @_;
     $con //= $self->connect('spawn');
 
-    $con->broadcast({terminate => 1});
-
+    # Send the signal before the broadcast so services can act on it
+    # before the terminate message arrives and ends the event loop.
     if ($self->{+SIGNAL()}) {
         for my $peer ($con->peers) {
-            my $pid = eval { $con->peer_pid($peer) } or next;
+            my $pid;
+            unless (eval { $pid = $con->peer_pid($peer); 1 }) { warn $@; next }
+            next unless $pid;
             next                           if $pid == $$;
             kill($self->{+SIGNAL()}, $pid) if $self->{+SIGNAL()};
         }
     }
+
+    $con->broadcast({terminate => 1});
 }
 
 sub wait {
@@ -110,7 +114,7 @@ sub wait {
         my @found;
         for my $peer ($con->peers) {
             next if $peer eq $con->id;
-            next unless eval { $con->peer_pid($peer) };
+            unless (eval { $con->peer_pid($peer); 1 }) { warn $@; next }
             push @found => $peer;
         }
 
@@ -135,11 +139,11 @@ sub sanity_delta {
         my $read = $stat->{read} // {};
 
         for my $peer2 (keys %$sent) {
-            $deltas->{"$peer2 -> $peer1"} += $sent->{$peer2};
+            $deltas->{"$peer1 -> $peer2"} += $sent->{$peer2};
         }
 
         for my $peer2 (keys %$read) {
-            $deltas->{"$peer1 -> $peer2"} -= $read->{$peer2};
+            $deltas->{"$peer2 -> $peer1"} -= $read->{$peer2};
         }
     }
 
@@ -179,12 +183,19 @@ sub shutdown {
 
     $self->terminate($con);
     $self->wait($con);
-    $self->sanity_check($con) if $self->do_sanity_check;
+
+    my $sanity_err;
+    if ($self->do_sanity_check) {
+        local $@;
+        eval { $self->sanity_check($con); 1 } or $sanity_err = $@;
+    }
 
     $con->disconnect;
     $con = undef;
 
     $self->unspawn;
+
+    die $sanity_err if $sanity_err;
 }
 
 1;

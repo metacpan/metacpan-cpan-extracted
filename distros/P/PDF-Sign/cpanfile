@@ -1,10 +1,11 @@
 # cpanfile — dependencies for PDF::Sign
 # Install all deps: cpanm --installdeps .
 
-requires 'perl',        '5.016';
+requires 'perl',        '5.010';
 requires 'Exporter',    '0';
 requires 'Cwd',         '0';
 requires 'POSIX',       '0';
+requires 'Time::Local', '0';
 requires 'MIME::Base64','0';
 requires 'File::Slurp', '0';
 

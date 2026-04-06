@@ -56,6 +56,8 @@ Test::Pod::Coverage::pod_coverage_ok(
 				license_file_blob_url
 				list_files_for_eol_xt
 				load_config_file
+				makefile_scalar_keys_from_config
+				ensure_makefile_metadata_from_config
 				makefile_has_pod2github
 				makefile_has_pod2markdown
 				makefile_pl_path

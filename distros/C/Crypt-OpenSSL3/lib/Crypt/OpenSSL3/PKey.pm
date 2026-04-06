@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::PKey;
-$Crypt::OpenSSL3::PKey::VERSION = '0.002';
+$Crypt::OpenSSL3::PKey::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::PKey - An assymetrical key
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

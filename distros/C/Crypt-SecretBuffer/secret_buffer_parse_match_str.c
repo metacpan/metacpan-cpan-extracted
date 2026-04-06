@@ -20,8 +20,8 @@ bool SB_PARSE_MATCH_STR_FN(secret_buffer_parse *parse, SB_PATTERN_EL_TYPE *patte
    bool consttime=0 != (flags & SECRET_BUFFER_MATCH_CONST_TIME);
    bool anchor_fail= false;
    bool encoding_error= false;
-   U8 *ret_pos= NULL, *ret_lim= NULL,
-       ret_pos_bit= 0, ret_lim_bit= 0;
+   const U8 *ret_pos= NULL, *ret_lim= NULL;
+         U8  ret_pos_bit= 0, ret_lim_bit= 0;
    /* U8 *orig= parse->pos; */
 
    if (!pattern_len) {
@@ -35,13 +35,13 @@ bool SB_PARSE_MATCH_STR_FN(secret_buffer_parse *parse, SB_PATTERN_EL_TYPE *patte
    if (!reverse) {
       /* When operating in consttime mode, some matches are "fake" and should be ignored until
        * we reach "real_search_pos". Currently the pointer is enough, no need for the pos_bit. */
-      U8 *real_search_pos= parse->pos;
+      const U8 *real_search_pos= parse->pos;
       int first_cp= *pattern;
       while (parse->pos < parse->lim) {
          /* search_pos keeps track of where this iteration started, and next_search_pos
           * may get set during the match to indicate we need to backtrack the parse->pos */
-         U8 *search_pos= parse->pos, search_pos_bit= parse->pos_bit;
-         U8 *next_char_pos, next_char_pos_bit;
+         const U8 *search_pos= parse->pos, *next_char_pos;
+         U8 search_pos_bit= parse->pos_bit, next_char_pos_bit;
          bool matched;
          int cp= sb_parse_next_codepoint(parse);
          #define SB_HANDLE_ENCODING_ERROR { \
@@ -63,9 +63,9 @@ bool SB_PARSE_MATCH_STR_FN(secret_buffer_parse *parse, SB_PATTERN_EL_TYPE *patte
          matched= cp == first_cp;
          if ((matched || consttime) && pattern_len > 1) {
             SB_PATTERN_EL_TYPE *pat_pos= pattern+1, *pat_lim= pattern + pattern_len;
-            U8 *next_potential_pos= NULL, next_potential_pos_bit= 0;
+            const U8 *next_potential_pos= NULL; U8 next_potential_pos_bit= 0;
             while (parse->pos < parse->lim && pat_pos < pat_lim) {
-               U8 *at_pos= parse->pos, at_pos_bit= parse->pos_bit;
+               const U8 *at_pos= parse->pos; U8 at_pos_bit= parse->pos_bit;
                cp= sb_parse_next_codepoint(parse);
                if (cp < 0) SB_HANDLE_ENCODING_ERROR
                /* speed up outer loop by checking for whether this character could be the start
@@ -162,11 +162,11 @@ bool SB_PARSE_MATCH_STR_FN(secret_buffer_parse *parse, SB_PATTERN_EL_TYPE *patte
    else {
       /* When operating in consttime mode, some matches are "fake" and should be ignored until
        * we reach "real_search_pos". */
-      U8 *real_search_lim= parse->lim;
+      const U8 *real_search_lim= parse->lim;
       int last_cp= pattern[pattern_len-1];
       while (parse->pos < parse->lim) {
-         U8 *search_lim= parse->lim, search_lim_bit= parse->lim_bit;
-         U8 *next_char_lim, next_char_lim_bit;
+         const U8 *search_lim= parse->lim, *next_char_lim;
+         U8 search_lim_bit= parse->lim_bit, next_char_lim_bit;
          bool matched;
          int cp= sb_parse_prev_codepoint(parse);
          #define SB_HANDLE_ENCODING_ERROR { \
@@ -188,9 +188,9 @@ bool SB_PARSE_MATCH_STR_FN(secret_buffer_parse *parse, SB_PATTERN_EL_TYPE *patte
          matched= cp == last_cp;
          if ((matched || consttime) && pattern_len > 1) {
             SB_PATTERN_EL_TYPE *pat_lim= pattern + pattern_len - 1; /* final char already matched */
-            U8 *next_potential_lim= NULL, next_potential_lim_bit= 0;
+            const U8 *next_potential_lim= NULL; U8 next_potential_lim_bit= 0;
             while (parse->pos < parse->lim && pattern < pat_lim) {
-               U8 *at_lim= parse->lim, at_lim_bit= parse->lim_bit;
+               const U8 *at_lim= parse->lim; U8 at_lim_bit= parse->lim_bit;
                cp= sb_parse_prev_codepoint(parse);
                if (cp < 0) SB_HANDLE_ENCODING_ERROR
                /* if const time is not requested, speed up outer loop by checking for whether

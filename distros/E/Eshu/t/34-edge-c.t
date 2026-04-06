@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Eshu;
 
-plan tests => 6;
+plan tests => 9;
 
 # 1. Multiline macro continuation
 {
@@ -151,4 +151,76 @@ END
 
 	my $got = Eshu->indent_c($input);
 	is($got, $expected, 'preprocessor inside function body');
+}
+
+# 7. do-while loop
+{
+	my $input = <<'END';
+void foo() {
+int x = 0;
+do {
+x++;
+} while (x < 3);
+}
+END
+
+	my $expected = <<'END';
+void foo() {
+	int x = 0;
+	do {
+		x++;
+	} while (x < 3);
+}
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'do-while loop');
+}
+
+# 8. C99 designated initializers
+{
+	my $input = <<'END';
+struct point p = {
+.x = 1,
+.y = 2,
+.z = 3,
+};
+END
+
+	my $expected = <<'END';
+struct point p = {
+	.x = 1,
+	.y = 2,
+	.z = 3,
+};
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'C99 designated initializers');
+}
+
+# 9. Nested designated initializers
+{
+	my $input = <<'END';
+struct config cfg = {
+.server = {
+.host = "localhost",
+.port = 8080,
+},
+.timeout = 30,
+};
+END
+
+	my $expected = <<'END';
+struct config cfg = {
+	.server = {
+		.host = "localhost",
+		.port = 8080,
+	},
+	.timeout = 30,
+};
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'nested designated initializers');
 }

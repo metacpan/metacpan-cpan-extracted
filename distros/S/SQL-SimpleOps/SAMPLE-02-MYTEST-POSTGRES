@@ -1,10 +1,11 @@
 # Tue Sep 20 19:21:42 -03 2022
 
 #
-### PRE-CREATE DATABASE MODE
+## PRE-CREATE DATABASE MODE
+## See: README howto precreate database
 #
 
-## common error: 099S [open] connection to server at "localhost" (::1), port 5432 failed:
+## common error: 099S [open] connection to server at "localhost" (::1), port 5432 failed: Connection refused
 ## see: /var/lib/pgsql/data/pg_hba.conf
 
 # export SQL_SIMPLE_DB_SHOW_CONTENTS=
@@ -12,6 +13,9 @@
 # export SQL_SIMPLE_DB_TEST_CREATE_ALLOWED=
 # export SQL_SIMPLE_DB_TEST_SKIP_CREATE="1"
 # export SQL_SIMPLE_DB_SHOW_CREATE=
+
+# export SQL_SIMPLE_SQLITE=
+# export SQL_SIMPLE_MYSQL=
 
 # export SQL_SIMPLE_PG="1"
 # export SQL_SIMPLE_PG_DB="test_db"

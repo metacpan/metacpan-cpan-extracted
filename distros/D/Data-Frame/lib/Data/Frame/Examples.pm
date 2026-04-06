@@ -1,5 +1,5 @@
 package Data::Frame::Examples;
-$Data::Frame::Examples::VERSION = '0.006004';
+$Data::Frame::Examples::VERSION = '0.006005';
 # ABSTRACT: Example data sets
 
 use Data::Frame::Setup;
@@ -113,7 +113,7 @@ Data::Frame::Examples - Example data sets
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 SYNOPSIS
 

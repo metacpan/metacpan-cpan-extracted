@@ -1,13 +1,14 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.021';
+$Crypt::SecretBuffer::VERSION = '0.023';
 
 use strict;
 use warnings;
 use Carp;
 use IO::Handle;
 use Scalar::Util ();
+use Fcntl ();
 use parent qw( DynaLoader );
 use overload '""' => \&stringify,
              'cmp' => \&memcmp;
@@ -18,7 +19,7 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.021';
+$Crypt::SecretBuffer::Exports::VERSION = '0.023';
    use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
       secret_buffer secret span unmask_secrets_to memcmp
@@ -213,14 +214,19 @@ sub as_pipe {
 sub load_file {
    my ($self, $path)= @_;
    open my $fh, '<', $path or croak "open($path): $!";
-   my $blocksize= -s $path;
+   my $chunksize= -s $fh;
+   if (!$chunksize) {
+      $chunksize= sysseek($fh, 0, Fcntl::SEEK_END());
+      sysseek($fh, 0, Fcntl::SEEK_SET());
+   }
+   $chunksize ||= 64*1024; # if stat doesn't report size and not seekable, just try 64K
    while (1) {
-      my $got= $self->append_sysread($fh, $blocksize);
+      my $got= $self->append_sysread($fh, $chunksize);
       defined $got or croak "sysread($path): $!";
       last if $got == 0;
       # should have read the whole thing first try, but file could be changing, so keep going
-      # at 16K intervals until EOF.
-      $blocksize= 16*1024 if $blocksize > 16*1024;
+      # at 64K intervals until EOF.
+      $chunksize= 64*1024;
    }
    close($fh) or croak "close($path): $!";
    return $self;
@@ -478,20 +484,23 @@ Erases the buffer.  Equivalent to C<< $buf->length(0) >>.  Returns C<$self> for 
 Replace a span of bytes in the buffer with a new value.  C<$offset> and C<$length> may be
 negative to reference backward from the end of the buffer.  The replacement may be another
 C<SecretBuffer>, a L<Span|Crypt::SecretBuffer::Span>, a scalar, a scalar-ref.
+This copies raw bytes even if the replacement is a Span with an encoding.
 
 Returns C<$self>, for chaining.  If you want to return the replaced span, use C<substr>.
 
 =head2 assign
 
-  $buf->assign($replacement);
+  $buf->assign($replacement, ...);
 
-Alias for C<< $buf->splice(0, $buf->length, $replacemenmt) >>.
+Replace contents of buffer with bytes of C<$replacement>, concatenating multiple arguments.
+This copies raw bytes even if the replacement is a Span with an encoding.
 
 =head2 append
 
-  $buf->append($data)
+  $buf->append($data, ...)
 
-Alias for C<< $buf->splice($buf->length, 0, $replacemenmt) >>.
+Append contents of buffer with bytes of C<$data>, concatenating multiple arguments.
+This copies raw bytes even if the replacement is a Span with an encoding.
 
 =head2 substr
 
@@ -997,7 +1006,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 AUTHOR
 

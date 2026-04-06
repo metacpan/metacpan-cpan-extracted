@@ -16,6 +16,12 @@ The ACME Challenge object.
 You probably won’t instantiate these directly; they’re created automatically
 as part of L<Net::ACME2::Authorization> instantiation.
 
+Known challenge types (e.g., C<http-01>, C<dns-01>) are returned as
+specific subclasses. Unrecognized challenge types are returned as
+instances of this base class, giving access to the standard accessors
+(C<type()>, C<token()>, C<status()>, C<url()>) for any challenge a CA
+may offer.
+
 =cut
 
 use parent qw( Net::ACME2::AccessorBase );

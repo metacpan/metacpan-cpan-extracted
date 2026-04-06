@@ -2,7 +2,7 @@ package IPC::Manager::Client::AtomicPipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use File::Spec;
 use Atomic::Pipe;
@@ -16,7 +16,8 @@ use Object::HashBase qw{
     +pipe_cache
 };
 
-sub viable { eval { require Atomic::Pipe; 1 } || 0 }
+sub viable            { eval { require Atomic::Pipe; 1 } || 0 }
+sub suspend_supported { 0 }
 
 sub check_path { -p $_[1] }
 sub path_type  { 'FIFO' }
@@ -71,8 +72,9 @@ sub pre_suspend_hook {
 
 sub fill_buffer {
     my $self = shift;
-    push @{$self->{+BUFFER}} => $self->{+PIPE}->read_message;
-    return @{$self->{+BUFFER}} ? 1 : 0;
+    my $msg = $self->{+PIPE}->read_message // return @{$self->{+BUFFER}} ? 1 : 0;
+    push @{$self->{+BUFFER}} => $msg;
+    return 1;
 }
 
 sub _process_msg {
@@ -149,9 +151,29 @@ single-reader use of the pipe.
 
     my @messages = $con2->get_messages;
 
+=head1 CONSTRUCTOR PARAMETERS
+
+=over 4
+
+=item permissions => $octal
+
+File permission bits used when creating the FIFO.  Defaults to C<0700>.
+
+=back
+
 =head1 METHODS
 
-See L<IPC::Manager::Client>.
+See L<IPC::Manager::Client> and L<IPC::Manager::Base::FS> for inherited methods.
+
+=over 4
+
+=item $con->pre_suspend_hook
+
+Before suspending, drains any messages still buffered in the pipe and writes
+them to the resume file so they are not lost across the suspend/reconnect
+cycle.
+
+=back
 
 =head1 SOURCE
 

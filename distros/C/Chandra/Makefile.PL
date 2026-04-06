@@ -75,7 +75,6 @@ WriteMakefile(
         'Cpanel::JSON::XS' => 0,
         'IO::Socket::UNIX' => 0,
         'IO::Select'       => 0,
-        'File::Spec'       => 0,
     },
     TEST_REQUIRES     => {
         'Test::More' => 0,
@@ -93,17 +92,18 @@ WriteMakefile(
     },
 );
 
-# Add custom target to download webview.h if not present
-sub MY::postamble {
-    return <<'MAKE';
+# Override test_dynamic to inject skip env vars on headless Linux
+sub MY::test_dynamic {
+    my $self = shift;
+    my $skip_env = '';
+    if ($^O ne 'darwin' && $^O ne 'MSWin32') {
+        if (!$ENV{DISPLAY} && !$ENV{WAYLAND_DISPLAY}) {
+            $skip_env = 'CHANDRA_SKIP_WINDOW=1 CHANDRA_SKIP_CLIPBOARD=1 ';
+        }
+    }
 
-webview.h:
-	@echo "Downloading webview.h from GitHub..."
-	curl -sL https://raw.githubusercontent.com/javalikescript/webview-c/master/webview.h -o include/webview.h
-	curl -sL https://raw.githubusercontent.com/javalikescript/webview-c/master/webview-cocoa.c -o include/webview-cocoa.c
-	curl -sL https://raw.githubusercontent.com/javalikescript/webview-c/master/webview-gtk.c -o include/webview-gtk.c
-
-download: webview.h
-
+    return <<"MAKE";
+test_dynamic :: pure_all
+	${skip_env}\$(FULLPERLRUN) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" \$(TEST_FILES)
 MAKE
 }

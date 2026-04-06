@@ -7,29 +7,70 @@ use BEGIN::Lift;
 use Devel::Hook;
 use Object::Proto;
 use Carp qw/croak/;
-our (%valid_types, @type_list);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
+
+use constant ro => 'ro';
+use constant is_ro => ( is => ro );
+use constant rw => 'rw';
+use constant is_rw => ( is => rw );
+use constant nan => undef;
+use constant lzy => ( lazy => 1 );
+use constant bld => ( builder => 1 );
+use constant lzy_bld => ( lazy_build => 1 );
+use constant trg => ( trigger => 1 );
+use constant clr => ( clearer => 1 );
+use constant req => ( required => 1 );
+use constant coe => ( coerce => 1 );
+use constant lzy_hash => (lazy => 1, isa => 'HashRef', default => {} );
+use constant lzy_array => (lazy => 1, isa => 'ArrayRef', default => [] );
+use constant lzy_str => (lazy => 1, isa => 'Str', default => "");
+use constant dhash => (isa => 'HashRef', default => {});
+use constant darray => (isa => 'ArrayRef', default => []);
+use constant dstr => (isa => 'Str', default => "");
+
+our (%valid_types, @type_list, %valid_constants, %modifier_dispatch);
 
 BEGIN {
 	@type_list  = @{ Object::Proto::list_types() };
 	%valid_types = map { $_ => 1 } @type_list;
+	%valid_constants = map { $_ => 1 } qw(
+		ro rw is_ro is_rw nan
+		lzy bld lzy_bld trg clr req coe
+		lzy_hash lzy_array lzy_str dhash darray dstr
+	);
+	%modifier_dispatch = (
+		before => \&Object::Proto::before,
+		after  => \&Object::Proto::after,
+		around => \&Object::Proto::around,
+	);
 }
 
-my %_modifier_dispatch = (
-	before => \&Object::Proto::before,
-	after  => \&Object::Proto::after,
-	around => \&Object::Proto::around,
-);
-
 sub import {
+	my ($pkg, @import) = @_;
 	no strict 'refs';
 	my $caller = caller();
 	my (@spec, @modifiers, @extends, @with, @requires, $is_role);
-	$is_role = 1 if grep { $_ eq '-role' } @_;
+	$is_role = 1 if grep { $_ eq '-role' } @import;
 
-	for my $type (@type_list) {
-		*{"${caller}::${type}"} = sub { $type };
+	if (grep { $_ eq '-types' } @import) {
+		*{"${caller}::${_}"} = sub { $_ } for @type_list;
+	}
+	if (grep { $_ eq '-constants' } @import) {
+		*{"${caller}::${_}"} = \&{"Object::Proto::Sugar::${_}"} for keys %valid_constants;
+	}
+
+	for my $name (@import) {
+		next if $name =~ /^-/;
+		if ($name =~ /^[A-Z]/) {
+			croak "Unknown type '$name' requested from Object::Proto::Sugar"
+				unless $valid_types{$name};
+			*{"${caller}::${name}"} = sub { $name };
+		} else {
+			croak "Unknown constant '$name' requested from Object::Proto::Sugar"
+				unless $valid_constants{$name};
+			*{"${caller}::${name}"} = \&{"Object::Proto::Sugar::${name}"};
+		}
 	}
 
 	BEGIN::Lift::install(
@@ -44,6 +85,25 @@ sub import {
 			}
 		}
 	);
+
+	BEGIN::Lift::install(
+		($caller, 'attributes') => sub {
+			my @attr = @_;
+			while (@attr) {
+				my @names = ref $attr[0] eq 'ARRAY' ? @{ shift @attr } : shift @attr;
+				my @sp = @{ shift(@attr) };
+				splice @sp, $#sp < 1 ? 0 : 1, 0, delete $sp[-1]->{default}
+					if ref $sp[-1] eq 'HASH' && exists $sp[-1]->{default};
+				unshift @sp, 'ro' unless (!$sp[0] || !ref $sp[0]) && ($sp[0] || "") =~ m/^(ro|rw|set)$/;
+				my %params = (is => $sp[0]);
+				$params{default} = ref $sp[1] eq 'CODE' ? $sp[1] : sub { Object::Proto::clone($sp[1]) }
+					if defined $sp[1];
+				%params = (%params, %{ $sp[2] }) if ref $sp[2] eq 'HASH';
+				push @spec, $_, \%params for @names;
+			}
+		}
+	);
+
 
 	BEGIN::Lift::install(
 		($caller, 'extends') => sub { push @extends, @_ }
@@ -85,9 +145,11 @@ sub import {
 			push @attributes, $attr;
 		}
 
-		my @extends_arg = @extends > 1 ? (extends => \@extends)
-		: @extends     ? (extends => $extends[0])
-		:                ();
+		my @extends_arg = @extends > 1 
+			? (extends => \@extends)
+			: @extends 
+				? (extends => $extends[0])
+				: ();
 		if ($is_role) {
 			Object::Proto::role($caller, @attributes);
 			Object::Proto::requires($caller, @requires) if @requires;
@@ -133,7 +195,7 @@ sub import {
 		for my $mod (@modifiers) {
 			my ($type, $name, $code) = @{$mod};
 			my $meth = $name =~ /::/ ? $name : "${caller}::${name}";
-			$_modifier_dispatch{$type}->($meth, $code);
+			$modifier_dispatch{$type}->($meth, $code);
 		}
 	});
 }
@@ -356,53 +418,43 @@ Object::Proto::Sugar - Moo-se-like syntax for Object::Proto
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
 =head1 SYNOPSIS
 
 	package Animal;
-	use Object::Proto::Sugar;
+	use Object::Proto::Sugar -types, -constants;
 
-	has name => (
-	    is => 'rw',
-	    isa => Str,
-	    required => 1
-	);
+	has name  => (is_rw, req, isa => Str);
+	has sound => (is_rw, isa => Str, default => 'silence');
 
-	has sound => (
-	    is => 'rw',
-	    isa => Str,
-	    default  => 'silence'
-	);
-
-	sub speak {
-	    $_[0]->sound
-	}
+	sub speak { $_[0]->sound }
 
 	package Dog;
-	use Object::Proto::Sugar;
+	use Object::Proto::Sugar qw(Str is_rw);
 
 	extends 'Animal';
 
-	has breed => (
-	    is => 'rw',
-	    isa => Str
-	);
+	has breed => (is_rw, isa => Str);
 
 	package main;
 
 	my $dog = new Dog name => 'Rex', sound => 'woof', breed => 'Lab';
-	print $dog->speak;   # woof
+	print $dog->speak;          # woof
 	print $dog->isa('Animal');  # 1
 
 =head1 DESCRIPTION
 
 C<Object::Proto::Sugar> provides Moo-se-like declarative syntax over
 L<Object::Proto>, giving you C<has>, C<extends>, C<with>, C<requires>,
-method modifiers, and type constants - all compiled down to the
-zero-overhead XS layer underneath.
+and method modifiers - all compiled down to the zero-overhead XS layer
+underneath.
+
+Nothing beyond the keywords are imported by default. Type constants
+(C<Str>, C<Int>, ...) and sugar constants (C<is_rw>, C<req>, ...) are
+opt-in via import flags or explicit named imports. See L</IMPORTING>.
 
 =head1 KEYWORDS
 
@@ -434,11 +486,11 @@ Declares an attribute. All options are optional unless noted.
 
 =head3 isa
 
-Accepts a built-in type constant, a type name string, or a custom coderef:
+Accepts a type name string, an imported type constant, or a custom coderef:
 
-	isa => Str              # built-in type constant
-	isa => 'Str'            # same, as above
-	isa => sub { $_[0] > 0 }  # custom check - dies on failure
+	isa => 'Str'              # type name string - always works
+	isa => Str                # type constant - requires: use Object::Proto::Sugar qw(Str)
+	isa => sub { $_[0] > 0 } # custom check - dies on failure
 
 =head3 default
 
@@ -508,6 +560,63 @@ is garbage-collected:
 	has parent => ( is => 'rw', weak_ref => 1 );
 
 C<weak> is an alias for C<weak_ref>.
+
+=head2 attributes $name => \@spec, ...
+
+A positional shorthand for declaring one or more attributes in a compact
+array-based syntax, rather than the named-pair style of C<has>.
+
+Each declaration is a name (or arrayref of names) paired with an arrayref
+specifying C<[mode, default, \%options]>:
+
+	attributes x => ['rw'];
+	attributes y => ['ro', 0];
+	attributes z => ['rw', sub { [] }, { required => 1 }];
+
+Multiple names sharing the same spec can be declared in one call:
+
+	attributes [qw(width height)] => ['rw', 0];
+
+=head3 Spec arrayref format
+
+	[ $mode ]
+	[ $mode, $default ]
+	[ $mode, $default, \%options ]
+	[ $mode, \%options ]          # default supplied inside %options
+	[ \%options ]                 # mode defaults to 'ro'
+
+=over 4
+
+=item * B<mode> - C<'ro'>, C<'rw'>, or C<'set'>. Defaults to C<'ro'> if omitted.
+
+=item * B<default> - a scalar, reference, or coderef. Non-code values are
+deep-cloned per object via C<Object::Proto::clone> so each instance gets its
+own independent copy. A coderef is installed as a builder.
+
+=item * B<%options> - any option accepted by C<has>: C<required>, C<lazy>,
+C<isa>, C<coerce>, C<builder>, C<trigger>, C<predicate>, C<clearer>,
+C<reader>, C<writer>, C<init_arg>/C<arg>, C<weak_ref>/C<weak>,
+C<accessor>. The C<default> key may also be placed here instead of in the
+positional slot.
+
+=back
+
+Examples:
+
+	# equivalent to: has x => (is => 'rw', default => 0)
+	attributes x => ['rw', 0];
+
+	# equivalent to: has tags => (is => 'ro', default => sub { [] })
+	attributes tags => ['ro', []];
+
+	# default inside options hash - identical result
+	attributes tags => ['ro', { default => [] }];
+
+	# multiple names, shared spec
+	attributes [qw(created_at updated_at)] => ['ro', { required => 1 }];
+
+	# full options
+	attributes email => ['rw', undef, { isa => Str, required => 1 }];
 
 =head2 extends @parents
 
@@ -586,7 +695,7 @@ Define a role by passing C<-role> to the import:
 Consume it with C<with>:
 
 	package Document;
-	use Object::Proto::Sugar;
+	use Object::Proto::Sugar qw(Str);
 
 	with 'Printable';
 
@@ -596,20 +705,51 @@ Check consumption at runtime:
 
 	Object::Proto::does($doc, 'Printable');  # true
 
+=head1 IMPORTING
+
+By default C<use Object::Proto::Sugar> installs only the compile-time
+keywords (C<has>, C<attributes>, C<extends>, C<with>, C<requires>,
+C<before>, C<after>, C<around>). Everything else is opt-in:
+
+=over 4
+
+=item C<-role>
+
+Mark the current package as a role instead of a class.
+
+=item C<-types>
+
+Import all built-in type constants (C<Str>, C<Int>, C<ArrayRef>, ...).
+
+=item C<-constants>
+
+Import all sugar shorthand constants (C<is_rw>, C<req>, C<lzy_array>, ...).
+
+=item Named imports
+
+Import individual types or constants by name. Uppercase names are treated
+as types, lowercase as sugar constants. Unknown names croak at compile time.
+
+=back
+
+Examples:
+
+	use Object::Proto::Sugar;                        # keywords only
+	use Object::Proto::Sugar -types;                 # + all type constants
+	use Object::Proto::Sugar -constants;             # + all sugar constants
+	use Object::Proto::Sugar -types, -constants;     # + both
+	use Object::Proto::Sugar qw(Str Int);            # + specific types
+	use Object::Proto::Sugar qw(is_rw req);          # + specific sugar constants
+	use Object::Proto::Sugar qw(Str is_rw req);      # + mix of both
+	use Object::Proto::Sugar -role, -types;          # role + all types
+
+
+
 =head1 TYPE CONSTANTS
 
-C<use Object::Proto::Sugar> exports a constant for every registered type
-into the calling package, so you can write:
+Type constants are opt-in. See L</IMPORTING> for the full import syntax.
 
-	isa => Str
-	isa => ArrayRef
-
-instead of:
-
-	isa => 'Str'
-	isa => 'ArrayRef'
-
-The built-in constants are:
+The built-in types are:
 
 =over 4
 
@@ -638,12 +778,71 @@ The built-in constants are:
 Custom types registered with C<Object::Proto::register_type> before
 C<use Object::Proto::Sugar> is called will also get a constant exported.
 
+=head1 SUGAR CONSTANTS
+
+Sugar constants are opt-in shorthand that expand inline into C<has> option
+lists. See L</IMPORTING> for the full import syntax.
+
+	use Object::Proto::Sugar -constants;
+
+	has name  => (is_rw, req);
+	has tags  => (is_ro, lzy_array);
+	has score => (is_rw, nan);    # explicit undef default
+
+=head2 Mode constants
+
+	ro          # 'ro'
+	rw          # 'rw'
+	is_ro       # (is => 'ro')
+	is_rw       # (is => 'rw')
+
+=head2 Value constants
+
+	nan         # undef  (explicit undef default)
+
+=head2 Option constants
+
+	req         # (required => 1)
+	lzy         # (lazy => 1)
+	bld         # (builder => 1)
+	lzy_bld     # (lazy_build => 1)
+	trg         # (trigger => 1)
+	clr         # (clearer => 1)
+	coe         # (coerce => 1)
+
+=head2 Lazy + default constants
+
+	lzy_hash    # (lazy => 1, isa => 'HashRef',  default => {})
+	lzy_array   # (lazy => 1, isa => 'ArrayRef', default => [])
+	lzy_str     # (lazy => 1, isa => 'Str',      default => "")
+
+=head2 Default-only constants
+
+	dhash       # (isa => 'HashRef',  default => {})
+	darray      # (isa => 'ArrayRef', default => [])
+	dstr        # (isa => 'Str',      default => "")
+
+The C<default> values in these constants are plain refs/scalars. Sugar
+deep-clones them via C<Object::Proto::clone> so each object instance gets
+its own independent copy.
+
+=head2 Usage examples
+
+	has config   => (is_rw, lzy_hash);
+	has items    => (is_ro, darray);
+	has label    => (is_rw, dstr);
+	has name     => (is_rw, req, isa => 'Str');
+	has handler  => (is_ro, lzy, bld, isa => 'CodeRef');
+
+	# positional attributes syntax also works
+	attributes score => [rw, 0, { req }];
+
 =head1 INHERITANCE
 
 =head2 Single parent
 
 	package Dog;
-	use Object::Proto::Sugar;
+	use Object::Proto::Sugar qw(Str);
 
 	extends 'Animal';
 

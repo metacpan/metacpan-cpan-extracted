@@ -1,3 +1,14 @@
+Version 0.023 - 2026-04-05
+  - Fix 5.8 compat
+  - Documentation fix on ->append and ->assign
+
+Version 0.022 - 2026-04-05
+  - Fix ->load_file when the path is a device node (or where -s fails)
+  - Allow multiple arguments to ->append and ->assign
+  - Semi-breaking change: pointers in struct secret_buffer_parse are now
+    declared as 'const', which could break C code that makes direct use
+    of that struct.
+
 Version 0.021 - 2026-03-12
   - Fix ->save_file(x, 'rename') when the path was a bare filename
   - Enhance append_console_line:

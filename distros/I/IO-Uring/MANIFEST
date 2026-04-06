@@ -11,6 +11,8 @@ dist.ini
 examples/echo.pl
 lib/IO/Uring.pm
 lib/IO/Uring.xs
+lib/IO/Uring/BufferGroup.pm
+lib/IO/Uring/Singleton.pm
 planner/xs.pl
 t/00-compile.t
 t/01probe.t

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Eshu;
 
 # CODE label alignment
@@ -121,4 +121,80 @@ END
 
 	my $got = Eshu->indent_xs($input);
 	is($got, $expected, 'PPCODE label at depth 1');
+}
+
+# INIT label (inside XSUB, not the Perl INIT{} block)
+{
+	my $input = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+int
+sum(a, b)
+int a
+int b
+PREINIT:
+int result;
+INIT:
+result = 0;
+CODE:
+result = a + b;
+RETVAL = result;
+OUTPUT:
+RETVAL
+END
+
+	my $expected = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+int
+sum(a, b)
+	int a
+	int b
+	PREINIT:
+		int result;
+	INIT:
+		result = 0;
+	CODE:
+		result = a + b;
+		RETVAL = result;
+	OUTPUT:
+		RETVAL
+END
+
+	my $got = Eshu->indent_xs($input);
+	is($got, $expected, 'INIT label inside XSUB');
+}
+
+# INTERFACE_MACRO label
+{
+	my $input = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+int
+call_fn(fn, x)
+void (*fn)(int)
+int x
+CODE:
+fn(x);
+RETVAL = 0;
+OUTPUT:
+RETVAL
+END
+
+	my $expected = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+int
+call_fn(fn, x)
+	void (*fn)(int)
+	int x
+	CODE:
+		fn(x);
+		RETVAL = 0;
+	OUTPUT:
+		RETVAL
+END
+
+	my $got = Eshu->indent_xs($input);
+	is($got, $expected, 'XSUB with function-pointer parameter');
 }

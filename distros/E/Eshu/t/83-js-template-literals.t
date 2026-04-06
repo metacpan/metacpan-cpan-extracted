@@ -133,4 +133,44 @@ END
 	is($got, $expected, 'normal indentation resumes after template literal');
 }
 
+# Template literals as object property values
+{
+	my $input = <<'END';
+const obj = {
+a: `hello ${name}`,
+b: `world ${n + 1}`,
+};
+END
+
+	my $expected = <<'END';
+const obj = {
+	a: `hello ${name}`,
+	b: `world ${n + 1}`,
+};
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'template literals as object property values');
+}
+
+# Template literal with ternary expression in interpolation
+{
+	my $input = <<'END';
+function foo(x) {
+var msg = `result: ${x > 0 ? 'pos' : 'neg'}`;
+return msg;
+}
+END
+
+	my $expected = <<'END';
+function foo(x) {
+	var msg = `result: ${x > 0 ? 'pos' : 'neg'}`;
+	return msg;
+}
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'template literal with ternary in interpolation');
+}
+
 done_testing();

@@ -1,21 +1,18 @@
 package Future::Uring::Handle;
-$Future::Uring::Handle::VERSION = '0.003';
+$Future::Uring::Handle::VERSION = '0.004';
 use 5.020;
 use warnings;
 use experimental 'signatures';
 
 require Future::Uring;
 
-use File::StatX qw/STATX_BASIC_STATS STATX_BTIME/;
-
-*ring = *Future::Uring::ring;
-sub ring;
-
 use IO::Uring qw/
 	IORING_FSYNC_DATASYNC IOSQE_ASYNC IOSQE_IO_LINK IOSQE_IO_HARDLINK IOSQE_IO_DRAIN IORING_RECVSEND_POLL_FIRST
 	IORING_TIMEOUT_ABS IORING_TIMEOUT_BOOTTIME IORING_TIMEOUT_REALTIME
 	/;
+use IO::Uring::Singleton 'ring';
 use IO::Poll qw/POLLIN POLLOUT/;
+use File::StatX qw/STATX_BASIC_STATS STATX_BTIME/;
 
 my sub to_sflags($args) {
 	my $result = 0;
@@ -39,6 +36,7 @@ my sub add_timeout($ring, $args) {
 	$flags |= IORING_TIMEOUT_ABS if $args->{timeout_absolute};
 	$s_flags |= IOSQE_IO_LINK    if $args->{link};
 	$ring->link_timeout($time_spec, $flags, $s_flags);
+	return;
 }
 
 sub new($class, $fh) {
@@ -195,7 +193,7 @@ sub recv($self, $length, %args) {
 	$ring->submit if $args{timeout} && $ring->sq_space_left < 2;
 	my $id = $ring->recv($self->{fh}, $buffer, $flags, $p_flags, $s_flags, sub($res, $flags) {
 		if ($res > 0) {
-			$future->done($res == $length ? $buffer : substr($buffer, 0, $res));
+			$future->done($res == $length ? $buffer : substr $buffer, 0, $res);
 		} elsif ($res == 0) {
 			$future->done;
 		} else {
@@ -217,7 +215,7 @@ sub read($self, $length, %args) {
 	$ring->submit if $args{timeout} && $ring->sq_space_left < 2;
 	my $id = $ring->read($self->{fh}, $buffer, $offset, $s_flags, sub($res, $flags) {
 		if ($res > 0) {
-			$future->done($res == $length ? $buffer : substr($buffer, 0, $res));
+			$future->done($res == $length ? $buffer : substr $buffer, 0, $res);
 		} elsif ($res == 0) {
 			$future->done;
 		} else {
@@ -450,7 +448,7 @@ Future::Uring::Handle - A Uring filehandle
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

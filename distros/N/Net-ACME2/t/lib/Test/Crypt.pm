@@ -74,4 +74,36 @@ sub verify {
     return;
 }
 
+sub decode_eab_jws {
+    my ($jws_hr, $mac_key_b64u) = @_;
+
+    require Digest::SHA;
+
+    my $header_hr = JSON::decode_json(
+        MIME::Base64::decode_base64url( $jws_hr->{'protected'} )
+    );
+
+    my $payload = MIME::Base64::decode_base64url( $jws_hr->{'payload'} );
+    my $payload_hr = JSON::decode_json($payload);
+
+    my $mac_key = MIME::Base64::decode_base64url($mac_key_b64u);
+
+    my %hmac_funcs = (
+        HS256 => \&Digest::SHA::hmac_sha256,
+        HS384 => \&Digest::SHA::hmac_sha384,
+        HS512 => \&Digest::SHA::hmac_sha512,
+    );
+
+    my $hmac_cr = $hmac_funcs{ $header_hr->{'alg'} }
+        or die "Unknown EAB alg: $header_hr->{'alg'}";
+
+    my $signing_input = "$jws_hr->{'protected'}.$jws_hr->{'payload'}";
+    my $expected_sig = $hmac_cr->($signing_input, $mac_key);
+    my $actual_sig = MIME::Base64::decode_base64url( $jws_hr->{'signature'} );
+
+    die "EAB HMAC verification failed!" if $expected_sig ne $actual_sig;
+
+    return ($header_hr, $payload_hr);
+}
+
 1;

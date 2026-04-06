@@ -1,5 +1,5 @@
 package PDL::StringfiableExtension;
-$PDL::StringfiableExtension::VERSION = '0.006004';
+$PDL::StringfiableExtension::VERSION = '0.006005';
 use strict;
 use warnings;
 use PDL::Lite ();
@@ -43,7 +43,7 @@ PDL::StringfiableExtension
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 AUTHORS
 

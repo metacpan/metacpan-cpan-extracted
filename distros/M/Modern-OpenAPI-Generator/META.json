@@ -1,0 +1,71 @@
+{
+   "abstract" : "Generate Mojolicious-friendly OpenAPI 3.x clients and servers",
+   "author" : [
+      "Modern::OpenAPI::Generator contributors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Modern-OpenAPI-Generator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Path" : "2.08",
+            "Getopt::Long" : "2.54",
+            "JSON::MaybeXS" : "1.004",
+            "Mojolicious" : "9.0",
+            "Moo" : "2.005",
+            "OpenAPI::Modern" : "0.060",
+            "Path::Tiny" : "0.144",
+            "Pod::Usage" : "0",
+            "Storable" : "3.08",
+            "Types::Standard" : "2.000",
+            "YAML::PP" : "0.034",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Pod" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/neo1ite/Modern-OpenAPI-Generator/issues"
+      },
+      "homepage" : "https://github.com/neo1ite/Modern-OpenAPI-Generator",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neo1ite/Modern-OpenAPI-Generator.git",
+         "web" : "https://github.com/neo1ite/Modern-OpenAPI-Generator"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

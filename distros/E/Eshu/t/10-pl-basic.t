@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 9;
+use Test::More tests => 13;
 use Eshu;
 
 # Simple sub
@@ -202,4 +202,104 @@ END
 
 	my $got = Eshu->indent_pl($input);
 	is($got, $expected, 'hashref and arrayref nesting');
+}
+
+# elsif chain
+{
+	my $input = <<'END';
+sub classify {
+my ($n) = @_;
+if ($n < 0) {
+return 'negative';
+} elsif ($n == 0) {
+return 'zero';
+} elsif ($n < 10) {
+return 'small';
+} else {
+return 'large';
+}
+}
+END
+
+	my $expected = <<'END';
+sub classify {
+	my ($n) = @_;
+	if ($n < 0) {
+		return 'negative';
+	} elsif ($n == 0) {
+		return 'zero';
+	} elsif ($n < 10) {
+		return 'small';
+	} else {
+		return 'large';
+	}
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'elsif chain');
+}
+
+# foreach keyword
+{
+	my $input = <<'END';
+foreach my $item (@list) {
+process($item);
+log_item($item);
+}
+END
+
+	my $expected = <<'END';
+foreach my $item (@list) {
+	process($item);
+	log_item($item);
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'foreach keyword');
+}
+
+# map with block
+{
+	my $input = <<'END';
+my @doubled = map {
+$_ * 2;
+} @numbers;
+END
+
+	my $expected = <<'END';
+my @doubled = map {
+	$_ * 2;
+} @numbers;
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'map with block');
+}
+
+# grep and sort with blocks
+{
+	my $input = <<'END';
+my @evens = grep {
+$_ % 2 == 0;
+} @numbers;
+
+my @sorted = sort {
+$a->{name} cmp $b->{name};
+} @records;
+END
+
+	my $expected = <<'END';
+my @evens = grep {
+	$_ % 2 == 0;
+} @numbers;
+
+my @sorted = sort {
+	$a->{name} cmp $b->{name};
+} @records;
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'grep and sort with blocks');
 }

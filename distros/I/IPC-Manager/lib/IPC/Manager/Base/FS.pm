@@ -2,7 +2,7 @@ package IPC::Manager::Base::FS;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use File::Spec;
 
@@ -137,6 +137,10 @@ sub init {
         $self->make_path($path);
     }
 
+    # Prime the peer-change inotify watch now that the route directory
+    # exists, so events are captured from the start.
+    $self->handles_for_peer_change if USE_INOTIFY();
+
     $self->write_pid;
 }
 
@@ -151,9 +155,11 @@ sub write_pid {
     my $self = shift;
 
     my $pidfile = $self->pidfile;
-    open(my $fh, '>', $pidfile) or die "Could not open pidfile '$pidfile': $!";
+    my $pend = $pidfile . ".pend";
+    open(my $fh, '>', $pend) or die "Could not open pidfile '$pend': $!";
     print $fh $self->{+PID};
     close($fh);
+    rename($pend, $pidfile) or die "Could not rename file '$pend' -> '$pidfile': $!";
 }
 
 sub requeue_message {
@@ -343,6 +349,32 @@ Get the stats file for the connection.
 =item $con->write_pid
 
 Write the pidfile for the connection.
+
+=item $bool = $con->can_select
+
+Returns true if C<IO::Select> is available and this client can use it for
+non-blocking message detection.
+
+=item $select = $con->select
+
+Returns a cached L<IO::Select> object populated with the client's
+C<handles_for_select>.  Creates the object on first call.  Returns undef if
+C<can_select> is false or there are no handles to monitor.
+
+=item $bool = $con->have_handles_for_peer_change
+
+Returns true if L<Linux::Inotify2> is available and can be used to watch the
+route directory for new peer connections.
+
+=item $con->reset_handles_for_peer_change
+
+Drains pending inotify events after a peer-change notification so that the
+handle does not remain spuriously readable.
+
+=item @handles = $con->handles_for_peer_change
+
+Returns the inotify filehandle watching the route directory for peer arrivals
+and departures.  Dies unless L<Linux::Inotify2> is available.
 
 =back
 

@@ -75,6 +75,6 @@
          "web" : "https://github.com/ronsavage/CPAN-MetaPackager"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

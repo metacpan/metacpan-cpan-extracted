@@ -166,45 +166,7 @@ CODE:
     if (items > 1) {
         /* Class method: socket_path($name) */
         const char *name = SvPV_nolen(ST(1));
-        dSP;
-        int count;
-        SV *dir_sv;
-        ENTER;
-        SAVETMPS;
-
-        /* Get $ENV{XDG_RUNTIME_DIR} || File::Spec->tmpdir */
-        {
-            SV **env_svp;
-            HV *env_hv = get_hv("ENV", 0);
-            if (env_hv && (env_svp = hv_fetchs(env_hv, "XDG_RUNTIME_DIR", 0)) && SvOK(*env_svp)) {
-                dir_sv = newSVsv(*env_svp);
-            } else {
-                PUSHMARK(SP);
-                XPUSHs(sv_2mortal(newSVpvs("File::Spec")));
-                PUTBACK;
-                count = call_method("tmpdir", G_SCALAR);
-                SPAGAIN;
-                dir_sv = (count > 0) ? newSVsv(POPs) : newSVpvs("/tmp");
-                PUTBACK;
-            }
-        }
-
-        /* File::Spec->catfile($dir, "chandra-$name.sock") */
-        {
-            SV *filename = newSVpvf("chandra-%s.sock", name);
-            PUSHMARK(SP);
-            XPUSHs(sv_2mortal(newSVpvs("File::Spec")));
-            XPUSHs(sv_2mortal(dir_sv));
-            XPUSHs(sv_2mortal(filename));
-            PUTBACK;
-            count = call_method("catfile", G_SCALAR);
-            SPAGAIN;
-            RETVAL = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-            PUTBACK;
-        }
-
-        FREETMPS;
-        LEAVE;
+        RETVAL = _sock_build_path(aTHX_ name);
     } else {
         RETVAL = &PL_sv_undef;
     }

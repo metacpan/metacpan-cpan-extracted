@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Random::Context;
-$Crypt::OpenSSL3::Random::Context::VERSION = '0.002';
+$Crypt::OpenSSL3::Random::Context::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Random::Context - A instance of a random number generator
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 METHODS
 

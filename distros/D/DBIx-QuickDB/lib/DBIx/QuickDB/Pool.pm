@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000039';
+our $VERSION = '0.000040';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -156,7 +156,7 @@ sub add_db {
         unless $params{build};
 
     $self->throw("'$params{build}' is not a valid builder, it must be either a coderef, or a class method on '$self->{+LIBRARY}'", %params)
-        unless $params{build} && ref($params{build}) eq 'CODE' || $self->{+LIBRARY}->can($params{'build'});
+        unless ref($params{build}) eq 'CODE' || $self->{+LIBRARY}->can($params{build});
 
     $self->throw("A checksum sub or method name is required")
         unless $params{checksum};

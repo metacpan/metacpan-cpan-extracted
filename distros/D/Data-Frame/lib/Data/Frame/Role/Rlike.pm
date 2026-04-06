@@ -1,5 +1,5 @@
 package Data::Frame::Role::Rlike;
-$Data::Frame::Role::Rlike::VERSION = '0.006004';
+$Data::Frame::Role::Rlike::VERSION = '0.006005';
 
 use Data::Frame::Role;
 
@@ -58,7 +58,7 @@ Data::Frame::Role::Rlike
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 SYNOPSIS
 

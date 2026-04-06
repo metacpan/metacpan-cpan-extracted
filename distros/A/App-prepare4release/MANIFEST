@@ -2,6 +2,7 @@
 bin/prepare4release
 Changes
 lib/App/prepare4release.pm
+lib/App/prepare4release/Deps.pm
 LICENSE
 maint/inject-readme-badges.pl
 Makefile.PL
@@ -16,12 +17,15 @@ t/alien-scan.t
 t/ci-ensure.t
 t/ci-render.t
 t/config-load.t
+t/deps-sync.t
+t/makefile-metadata.t
 t/coverage-deep.t
 t/coverage-edge.t
 t/helpers-more.t
 t/more-coverage.t
 t/perl-matrix.t
 t/pm-min-version.t
+t/postamble-crlf.t
 xt/author/compile-internal.t
 xt/author/compile.t
 xt/author/cpants.t

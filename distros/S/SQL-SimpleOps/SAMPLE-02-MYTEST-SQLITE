@@ -10,6 +10,9 @@
 # export SQL_SIMPLE_DB_TEST_SKIP_CREATE="1"
 # export SQL_SIMPLE_DB_SHOW_CREATE=
 
+# export SQL_SIMPLE_PG=
+# export SQL_SIMPLE_MYSQL=
+
 # export SQL_SIMPLE_SQLITE="1"
 
 # perl t/testDB.t

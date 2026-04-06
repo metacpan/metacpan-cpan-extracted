@@ -1095,7 +1095,7 @@ current Perl interpreter context. You won't need to directly use these
 most of the time.
 
 The first few lines of code in the C function are standard boilerplate
-added to to all XSUBs.  Note that the naming convention for Perl
+added to all XSUBs.  Note that the naming convention for Perl
 interpreter macros is that ones starting with a C<d> are declarations; they
 go in places where a variable can be declared, and typically declare one
 or more variables and possibly their initialisations.
@@ -1922,13 +1922,13 @@ use C<TYPEMAP:> to individually override specific C<TYPEMAP>, C<INPUT>, or
 C<OUTPUT> entries in the system typemap. In general, typemap changes
 affect any subsequent XSUBs within the file, until further updates.
 
-Note however that, due to a quirk in parsing, it is possible for a
-C<TYPEMAP:> block which comes I<immediately after> an XSUB to affect any
-entries used by that XSUB, as if the block had appeared just before the
-XSUB. If all such typemap blocks are placed near the start of an XS file,
-then this won't be an issue. Indeed, it can only be a possible issue if
-you want typemap meanings to change during the course of an XS file (which
-is rare).
+Note however that, due to a quirk in parsing, it is possible in F<xsubpp>
+prior to 3.61 for a C<TYPEMAP:> block which comes I<immediately after> an
+XSUB to affect any entries used by that XSUB, as if the block had appeared
+just before the XSUB. If all such typemap blocks are placed near the start
+of an XS file, then this won't be an issue. Indeed, it can only be a
+possible issue if you want typemap meanings to change during the course of
+an XS file (which is rare).
 
 The C<TYPEMAP> keyword syntax is intended to mimic Perl's "heredoc"
 syntax, and the keyword must be followed by one of these three forms:
@@ -4783,6 +4783,8 @@ C<::_guts> and the module version number:
 
     #define MY_CXT_KEY "MyModule::_guts" XS_VERSION
 
+=for apidoc Amnh||MY_CXT_KEY
+
 =item my_cxt_t
 
 The "static" values should be stored within a struct typedef which I<must>
@@ -4793,6 +4795,8 @@ existence of the C<my_cxt_t> typedef name. For example:
         int some_value;
         int some_other_value;
     } my_cxt_t;
+
+=for apidoc yh||my_cxt_t
 
 =item START_MY_CXT
 
@@ -4886,6 +4890,9 @@ code can be added to C<CLONE()> to deep copy items within the structure.
 These are variants of the C<MY_CXT_INIT> and C<dMY_CXT> macros which take
 an explicit perl interpreter as an argument.
 
+=for apidoc  Amnh||MY_CXT_INIT_INTERP
+=for apidoc_item ||dMY_CXT_INIT_INTERP
+
 =back
 
 Note that these macros will only work together within the I<same> source
@@ -4938,7 +4945,52 @@ t/.
 =head2 Use of standard C library functions
 
 Often, the Perl API contains functions which you should use I<instead> of
-the standard C library ones. See L<perlclib>.
+the standard C library ones. See L<perlclib>.  Further, many libc
+functions are problematic or need special care to use in conjunction
+with perl.  L<perlclib> has specifics, and hints.
+
+=head2 Symbols defined by Perl that are visible to XS code
+
+By doing C<#include "perl.h">, you gain access to thousands of functions
+and macros defined by the perl interpreter.  Some of these you
+definitely want, such as elements designed to help your job be easier,
+described in L<perlapi>.  But some are inadvertently visible, and can be
+considered to be polluting your namespace.  Starting in Perl v5.44,
+more care is being taken to prevent adding new symbols like this, and we
+plan to gradually clean up many of the existing ones.
+
+In practice, this hasn't been much of a problem.  The universe of
+possible names is vast, and you can just choose a synonym or a different
+spelling if you find a clash with perl.
+
+Additionally, functionality has been created that just never got
+documented, and hence doesn't appear in L<perlapi>.  If you find yourself
+needing something that seems like somebody else could have needed it
+too, try perusing the array C<@unresolved_visibility_overrides> near the
+top of F<regen/embed.pl> for likely sounding candidates, and then
+investigate.  If something turns out to be what you want, let us know by
+reporting it via L<https://github.com/Perl/perl5/issues>, or better yet
+submit a patch.  By this time you are probably better equipped to know
+what to say in the documentation than anyone else!
+
+C<@unresolved_visibility_overrides> lists all the macros that are
+visible to your namespace that we haven't decided on what their
+disposition should be.  You can look through this list also to find
+names to avoid using yourself.
+
+Perl does reserve for itself names that begin with C<PL_> or have some
+form of C<perl> inside them (upper- and/or lowercase, but delimited in
+some way on both ends, such as C</^Perl_/>.  A pattern giving the exact
+spellings is also near the top of the file F<regen/embed.pl>.
+
+Functions furnished by perl have long come in two forms, one which
+begins with C<Perl_>, and a short name that dispenses with that prefix.
+If the short name clashes with one of your symbols, you can just
+use the long name.  The downsides of doing that, though, are that the
+short name hid from you the need (or not) of a thread context parameter,
+and F<ppport.h> relies on the short name to furnish a fixed or
+back-compat version should that become necessary.  L<perlapi> gives the
+prototypes for the available forms of each API element.
 
 =head2 Event loops and control flow
 
@@ -4954,7 +5006,7 @@ this model, the less likely conflicts will occur.
 
 =head1 XS VERSION
 
-This document covers features supported by F<xsubpp> 3.61.
+This document covers features supported by F<xsubpp> 3.63.
 
 =head1 AUTHOR DIAGNOSTICS
 

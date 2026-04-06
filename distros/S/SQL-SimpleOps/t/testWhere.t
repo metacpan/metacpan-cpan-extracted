@@ -27,7 +27,7 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
-	our $VERSION = "2024.213.1";
+	our $VERSION = "2026.095.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -130,7 +130,7 @@
 		f=> "0111",
 		t=> "t1",
 		w=> [ "id"=> [ "!", undef ] ],
-		r=> "id NOT NULL"
+		r=> "id IS NOT NULL"
 	);
 	&my_where
 	(
@@ -264,7 +264,7 @@
 		f=> "0224",
 		w=> [ "id" => [ "!", undef ], "or", no => undef ],
 		t=> "t1",
-		r=> "id NOT NULL OR no IS NULL",
+		r=> "id IS NOT NULL OR no IS NULL",
 	);
 	&my_where
 	(

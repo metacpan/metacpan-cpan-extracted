@@ -63,7 +63,7 @@ extern bool secret_buffer_charset_test_codepoint(const secret_buffer_charset *cs
  * used to initialize a parse struct using secret_buffer_parse_init_from_sv.
  */
 typedef struct {
-   U8 *pos, *lim;
+   const U8 *pos, *lim;
    const char *error;
    int encoding;
    U8 pos_bit, lim_bit;
@@ -126,7 +126,19 @@ extern bool secret_buffer_match_bytestr(secret_buffer_parse *p, char *data, size
  * and also sets src->pos pointing at the character that could not be converted.
  */
 extern SSize_t secret_buffer_sizeof_transcode(secret_buffer_parse *src, int dst_encoding);
+
+/* Transcode from source to destination, respecting the ->encoding of each.
+ * MAKE SURE THAT 'dst' POINTERS DESCRIBE WRITEABLE DATA.
+ * The secret_buffer_parse struct declares its data pointers as 'const', and I should have
+ * created a matching struct with writable pointers, but created this API prior to that and now
+ * don't want to change the declaration because its public.
+ */
 extern bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst);
+
+/* Copy characters from a parse struct to a Perl SV, optionally appending.
+ * This respects the src->encoding, as opposed to secret_buffer_splice which always copies
+ * bytes even if the source is a ::Span with an encoding.
+ */
 extern bool secret_buffer_copy_to(secret_buffer_parse *src, SV *dst_sv, int encoding, bool append);
 
 /* Create a new Crypt::SecretBuffer object with a mortal ref and return its secret_buffer

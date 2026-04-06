@@ -1,14 +1,15 @@
 package Langertha::Engine::LMStudio;
 # ABSTRACT: LM Studio native REST API
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
 use File::ShareDir::ProjectDistDir qw( :all );
+use Module::Runtime qw( use_module );
 
 extends 'Langertha::Engine::Remote';
 
-with 'Langertha::Role::'.$_ for (qw(
+with map { 'Langertha::Role::'.$_ } qw(
   OpenAPI
   Models
   Temperature
@@ -17,7 +18,7 @@ with 'Langertha::Role::'.$_ for (qw(
   SystemPrompt
   Streaming
   Chat
-));
+);
 
 
 has '+url' => (
@@ -48,8 +49,7 @@ sub openapi_file { yaml => dist_file('Langertha','lmstudio.yaml') };
 
 
 sub _build_openapi_operations {
-  require Langertha::Spec::LMStudio;
-  return Langertha::Spec::LMStudio::data();
+  return use_module('Langertha::Spec::LMStudio')->data;
 }
 
 sub _build_supported_operations {[qw(
@@ -371,7 +371,7 @@ Langertha::Engine::LMStudio - LM Studio native REST API
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

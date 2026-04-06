@@ -1,6 +1,6 @@
 package Langertha::Role::Langfuse;
 # ABSTRACT: Langfuse observability integration
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose::Role;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Carp qw( croak );
@@ -343,7 +343,7 @@ Langertha::Role::Langfuse - Langfuse observability integration
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

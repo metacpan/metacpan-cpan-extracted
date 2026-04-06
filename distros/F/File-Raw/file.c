@@ -25,14 +25,12 @@
     #include <io.h>
     #include <windows.h>
     #include <direct.h>
-    /* Windows compatibility macros */
-    #define open _open
-    #define read _read
-    #define write _write
-    #define close _close
-    #define stat _stat
-    #define fstat _fstat
-    #define access _access
+    /* 
+     * Windows compatibility - use Perl's wrapper functions
+     * We DON'T redefine open/read/write/close/stat/fstat/access here
+     * because Perl's XSUB.h already defines them to work correctly.
+     * Just define the flags and other missing bits.
+     */
     #define O_RDONLY _O_RDONLY
     #define O_WRONLY _O_WRONLY
     #define O_RDWR _O_RDWR
@@ -40,8 +38,12 @@
     #define O_TRUNC _O_TRUNC
     #define O_APPEND _O_APPEND
     #define O_BINARY _O_BINARY
-    #define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
-    #define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
+    #ifndef S_ISREG
+        #define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
+    #endif
+    #ifndef S_ISDIR
+        #define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
+    #endif
     #define R_OK 4
     #define W_OK 2
     /* ssize_t for Windows */
@@ -52,6 +54,9 @@
             typedef int ssize_t;
         #endif
     #endif
+    /* Windows doesn't have real uid/gid - use dummy values */
+    #define FILE_FAKE_UID 1000
+    #define FILE_FAKE_GID 1000
 #else
     #include <unistd.h>
     #include <sys/mman.h>
@@ -118,8 +123,13 @@ static struct {
     char path[STAT_CACHE_PATH_MAX];
     struct stat st;
     int valid;
+#ifdef _WIN32
+    int uid;
+    int gid;
+#else
     uid_t uid;
     gid_t gid;
+#endif
 } g_stat_cache = { "", {0}, 0, 0, 0 };
 
 /* Get cached stat or perform new stat */
@@ -139,8 +149,14 @@ static int cached_stat(const char *path, struct stat *st) {
     if (len < STAT_CACHE_PATH_MAX) {
         memcpy(g_stat_cache.path, path, len + 1);
         g_stat_cache.st = *st;
+#ifdef _WIN32
+        /* Windows doesn't have real uid/gid concepts */
+        g_stat_cache.uid = FILE_FAKE_UID;
+        g_stat_cache.gid = FILE_FAKE_GID;
+#else
         g_stat_cache.uid = geteuid();
         g_stat_cache.gid = getegid();
+#endif
         g_stat_cache.valid = 1;
     }
     
@@ -161,6 +177,9 @@ static void invalidate_stat_cache_path(const char *path) {
 
 /* Check readable using cached stat */
 static int file_is_readable_cached(const char *path) {
+#ifdef _WIN32
+    return access(path, R_OK) == 0;
+#else
     struct stat st;
     if (cached_stat(path, &st) < 0) return 0;
     
@@ -173,10 +192,14 @@ static int file_is_readable_cached(const char *path) {
     } else {
         return (st.st_mode & S_IROTH) != 0;
     }
+#endif
 }
 
 /* Check writable using cached stat */
 static int file_is_writable_cached(const char *path) {
+#ifdef _WIN32
+    return access(path, W_OK) == 0;
+#else
     struct stat st;
     if (cached_stat(path, &st) < 0) return 0;
     
@@ -189,10 +212,22 @@ static int file_is_writable_cached(const char *path) {
     } else {
         return (st.st_mode & S_IWOTH) != 0;
     }
+#endif
 }
 
 /* Check executable using cached stat */
 static int file_is_executable_cached(const char *path) {
+#ifdef _WIN32
+    /* Windows: check file extension for executability */
+    const char *ext = strrchr(path, '.');
+    if (ext) {
+        if (_stricmp(ext, ".exe") == 0 || _stricmp(ext, ".bat") == 0 ||
+            _stricmp(ext, ".cmd") == 0 || _stricmp(ext, ".com") == 0) {
+            return access(path, R_OK) == 0;
+        }
+    }
+    return 0;
+#else
     struct stat st;
     if (cached_stat(path, &st) < 0) return 0;
     
@@ -205,6 +240,7 @@ static int file_is_executable_cached(const char *path) {
     } else {
         return (st.st_mode & S_IXOTH) != 0;
     }
+#endif
 }
 
 /* Implementation of C API */
@@ -464,7 +500,11 @@ static OP* pp_file_slurp(pTHX) {
     }
 
     /* Fast path: direct syscalls, no hooks */
+#ifdef _WIN32
+    fd = open(path, O_RDONLY | O_BINARY);
+#else
     fd = open(path, O_RDONLY);
+#endif
     if (fd < 0) {
         PUSHs(&PL_sv_undef);
         PUTBACK;
@@ -4607,122 +4647,152 @@ XS_EXTERNAL(boot_File__Raw) {
     /* Register custom ops */
     XopENTRY_set(&file_slurp_xop, xop_name, "file_slurp");
     XopENTRY_set(&file_slurp_xop, xop_desc, "file slurp");
+    XopENTRY_set(&file_slurp_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_slurp, &file_slurp_xop);
 
     XopENTRY_set(&file_spew_xop, xop_name, "file_spew");
     XopENTRY_set(&file_spew_xop, xop_desc, "file spew");
+    XopENTRY_set(&file_spew_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_file_spew, &file_spew_xop);
 
     XopENTRY_set(&file_exists_xop, xop_name, "file_exists");
     XopENTRY_set(&file_exists_xop, xop_desc, "file exists");
+    XopENTRY_set(&file_exists_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_exists, &file_exists_xop);
 
     XopENTRY_set(&file_size_xop, xop_name, "file_size");
     XopENTRY_set(&file_size_xop, xop_desc, "file size");
+    XopENTRY_set(&file_size_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_size, &file_size_xop);
 
     XopENTRY_set(&file_is_file_xop, xop_name, "file_is_file");
     XopENTRY_set(&file_is_file_xop, xop_desc, "file is_file");
+    XopENTRY_set(&file_is_file_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_is_file, &file_is_file_xop);
 
     XopENTRY_set(&file_is_dir_xop, xop_name, "file_is_dir");
     XopENTRY_set(&file_is_dir_xop, xop_desc, "file is_dir");
+    XopENTRY_set(&file_is_dir_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_is_dir, &file_is_dir_xop);
 
     XopENTRY_set(&file_lines_xop, xop_name, "file_lines");
     XopENTRY_set(&file_lines_xop, xop_desc, "file lines");
+    XopENTRY_set(&file_lines_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_lines, &file_lines_xop);
 
     XopENTRY_set(&file_unlink_xop, xop_name, "file_unlink");
     XopENTRY_set(&file_unlink_xop, xop_desc, "file unlink");
+    XopENTRY_set(&file_unlink_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_unlink, &file_unlink_xop);
 
     XopENTRY_set(&file_mkdir_xop, xop_name, "file_mkdir");
     XopENTRY_set(&file_mkdir_xop, xop_desc, "file mkdir");
+    XopENTRY_set(&file_mkdir_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_mkdir, &file_mkdir_xop);
 
     XopENTRY_set(&file_rmdir_xop, xop_name, "file_rmdir");
     XopENTRY_set(&file_rmdir_xop, xop_desc, "file rmdir");
+    XopENTRY_set(&file_rmdir_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_rmdir, &file_rmdir_xop);
 
     XopENTRY_set(&file_touch_xop, xop_name, "file_touch");
     XopENTRY_set(&file_touch_xop, xop_desc, "file touch");
+    XopENTRY_set(&file_touch_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_touch, &file_touch_xop);
 
     XopENTRY_set(&file_clear_stat_cache_xop, xop_name, "file_clear_stat_cache");
     XopENTRY_set(&file_clear_stat_cache_xop, xop_desc, "clear stat cache");
+    XopENTRY_set(&file_clear_stat_cache_xop, xop_class, OA_BASEOP);
     Perl_custom_op_register(aTHX_ pp_file_clear_stat_cache, &file_clear_stat_cache_xop);
 
     XopENTRY_set(&file_basename_xop, xop_name, "file_basename");
     XopENTRY_set(&file_basename_xop, xop_desc, "file basename");
+    XopENTRY_set(&file_basename_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_basename, &file_basename_xop);
 
     XopENTRY_set(&file_dirname_xop, xop_name, "file_dirname");
     XopENTRY_set(&file_dirname_xop, xop_desc, "file dirname");
+    XopENTRY_set(&file_dirname_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_dirname, &file_dirname_xop);
 
     XopENTRY_set(&file_extname_xop, xop_name, "file_extname");
     XopENTRY_set(&file_extname_xop, xop_desc, "file extname");
+    XopENTRY_set(&file_extname_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_extname, &file_extname_xop);
 
     XopENTRY_set(&file_mtime_xop, xop_name, "file_mtime");
     XopENTRY_set(&file_mtime_xop, xop_desc, "file mtime");
+    XopENTRY_set(&file_mtime_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_mtime, &file_mtime_xop);
 
     XopENTRY_set(&file_atime_xop, xop_name, "file_atime");
     XopENTRY_set(&file_atime_xop, xop_desc, "file atime");
+    XopENTRY_set(&file_atime_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_atime, &file_atime_xop);
 
     XopENTRY_set(&file_ctime_xop, xop_name, "file_ctime");
     XopENTRY_set(&file_ctime_xop, xop_desc, "file ctime");
+    XopENTRY_set(&file_ctime_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_ctime, &file_ctime_xop);
 
     XopENTRY_set(&file_mode_xop, xop_name, "file_mode");
     XopENTRY_set(&file_mode_xop, xop_desc, "file mode");
+    XopENTRY_set(&file_mode_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_mode, &file_mode_xop);
 
     XopENTRY_set(&file_is_link_xop, xop_name, "file_is_link");
     XopENTRY_set(&file_is_link_xop, xop_desc, "file is_link");
+    XopENTRY_set(&file_is_link_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_is_link, &file_is_link_xop);
 
     XopENTRY_set(&file_is_readable_xop, xop_name, "file_is_readable");
     XopENTRY_set(&file_is_readable_xop, xop_desc, "file is_readable");
+    XopENTRY_set(&file_is_readable_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_is_readable, &file_is_readable_xop);
 
     XopENTRY_set(&file_is_writable_xop, xop_name, "file_is_writable");
     XopENTRY_set(&file_is_writable_xop, xop_desc, "file is_writable");
+    XopENTRY_set(&file_is_writable_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_is_writable, &file_is_writable_xop);
 
     XopENTRY_set(&file_is_executable_xop, xop_name, "file_is_executable");
     XopENTRY_set(&file_is_executable_xop, xop_desc, "file is_executable");
+    XopENTRY_set(&file_is_executable_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_is_executable, &file_is_executable_xop);
 
     XopENTRY_set(&file_readdir_xop, xop_name, "file_readdir");
     XopENTRY_set(&file_readdir_xop, xop_desc, "file readdir");
+    XopENTRY_set(&file_readdir_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_readdir, &file_readdir_xop);
 
     XopENTRY_set(&file_slurp_raw_xop, xop_name, "file_slurp_raw");
     XopENTRY_set(&file_slurp_raw_xop, xop_desc, "file slurp_raw");
+    XopENTRY_set(&file_slurp_raw_xop, xop_class, OA_UNOP);
     Perl_custom_op_register(aTHX_ pp_file_slurp_raw, &file_slurp_raw_xop);
 
     XopENTRY_set(&file_copy_xop, xop_name, "file_copy");
     XopENTRY_set(&file_copy_xop, xop_desc, "file copy");
+    XopENTRY_set(&file_copy_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_file_copy, &file_copy_xop);
 
     XopENTRY_set(&file_move_xop, xop_name, "file_move");
     XopENTRY_set(&file_move_xop, xop_desc, "file move");
+    XopENTRY_set(&file_move_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_file_move, &file_move_xop);
 
     XopENTRY_set(&file_chmod_xop, xop_name, "file_chmod");
     XopENTRY_set(&file_chmod_xop, xop_desc, "file chmod");
+    XopENTRY_set(&file_chmod_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_file_chmod, &file_chmod_xop);
 
     XopENTRY_set(&file_append_xop, xop_name, "file_append");
     XopENTRY_set(&file_append_xop, xop_desc, "file append");
+    XopENTRY_set(&file_append_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_file_append, &file_append_xop);
 
     XopENTRY_set(&file_atomic_spew_xop, xop_name, "file_atomic_spew");
     XopENTRY_set(&file_atomic_spew_xop, xop_desc, "file atomic_spew");
+    XopENTRY_set(&file_atomic_spew_xop, xop_class, OA_BINOP);
     Perl_custom_op_register(aTHX_ pp_file_atomic_spew, &file_atomic_spew_xop);
 
     /* Install functions with call checker for custom op optimization */

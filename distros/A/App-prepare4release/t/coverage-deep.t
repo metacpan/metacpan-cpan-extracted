@@ -578,7 +578,7 @@ PM
 sub _write_dist_gitlab {
 	my ($root) = @_;
 	open my $fj, '>:encoding(UTF-8)', File::Spec->catfile( $root, 'prepare4release.json' );
-	print {$fj} qq({"git":{"repo":"group/gitlab-proj"}}\n);
+	print {$fj} qq({"git":{"repo":"group/gitlab-proj"},"dependencies":{"skip":true}}\n);
 	close $fj;
 	open my $fm, '>:encoding(UTF-8)', File::Spec->catfile( $root, 'Makefile.PL' );
 	print {$fm} <<'MK';

@@ -27,13 +27,13 @@ name: Future-Uring
 provides:
   Future::Uring:
     file: lib/Future/Uring.pm
-    version: '0.003'
+    version: '0.004'
   Future::Uring::Exception:
     file: lib/Future/Uring/Exception.pm
-    version: '0.003'
+    version: '0.004'
   Future::Uring::Handle:
     file: lib/Future/Uring/Handle.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   Fcntl: '0'
@@ -42,7 +42,8 @@ requires:
   IO::File: '0'
   IO::Poll: '0'
   IO::Socket: '0'
-  IO::Uring: '0.011'
+  IO::Uring: '0.012'
+  IO::Uring::Singleton: '0'
   Signal::Info: '0'
   Socket: '0'
   Time::Spec: '0'
@@ -55,7 +56,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/future-uring/issues
   repository: git://github.com/Leont/future-uring.git
-version: '0.003'
+version: '0.004'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

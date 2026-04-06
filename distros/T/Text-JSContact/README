@@ -1,0 +1,159 @@
+Text::JSContact - Convert between vCard and JSContact
+
+DESCRIPTION
+
+Text::JSContact provides bidirectional conversion between vCard (RFC 6350)
+and JSContact (RFC 9553), following the mapping rules in RFC 9555 and the
+extensions in RFC 9554.
+
+The module handles both standard vCard properties and widely-used vendor
+extensions, particularly those from Apple's Contacts/AddressBook framework.
+
+FUNCTIONS
+
+  vcard_to_jscontact($vcard_string)
+
+    Parse a vCard string and return a JSContact Card hashref.
+
+  jscontact_to_vcard($card_hashref)
+
+    Convert a JSContact Card hashref to a vCard string (version 4.0).
+
+  patch_vcard($original_vcard_string, $old_card, $new_card)
+
+    Apply changes to a vCard while preserving unrecognized properties and
+    vendor extensions. Compares $old_card and $new_card to determine what
+    changed, then applies only those changes to the original vCard string.
+
+    This is the recommended way to update contacts via CardDAV, because it
+    preserves Apple extensions, custom X-properties, and any other data in
+    the vCard that JSContact does not model.
+
+    $original_vcard_string - the raw vCard text as fetched from the server
+    $old_card              - the JSContact Card parsed from that vCard
+    $new_card              - the modified JSContact Card to write back
+
+    Returns a new vCard string with minimal changes applied.
+
+APPLE VCARD EXTENSIONS
+
+Apple's Contacts framework (macOS/iOS) uses several non-standard vCard
+properties and parameters.  These are not part of any RFC but are widely
+used by Apple clients, iCloud, and third-party applications that need to
+interoperate with the Apple ecosystem.
+
+There is no formal Apple specification for these extensions.  Our
+implementation is based on reverse-engineering Apple-exported vCards and
+community documentation, including:
+
+  - iOS full vCard examples from cozy/cozy-vcard test suite
+    https://github.com/cozy/cozy-vcard/blob/master/test/ios-full.vcf
+
+  - X-ABLabel discussion and behavior analysis
+    https://github.com/mstilkerich/rcmcarddav/issues/310
+    https://github.com/FossifyOrg/Contacts/issues/187
+
+  - Apple group contact format (X-ADDRESSBOOKSERVER-KIND/MEMBER)
+    https://github.com/nextcloud/server/issues/9369
+
+  - RFC 9554 standardization of SOCIALPROFILE (replacing X-SOCIALPROFILE)
+    https://datatracker.ietf.org/doc/rfc9554/
+
+  - X-ABCROP-RECTANGLE format analysis
+    https://gitlab.com/CardBook/CardBook/-/issues/283
+
+Policy: Reading Apple Extensions
+
+When parsing vCards, we recognize and convert the following Apple
+extensions to their JSContact equivalents:
+
+  X-ABLabel           -> label field on the associated property
+                         Parsed from itemN.X-ABLabel grouped with the
+                         labeled property.  Apple standard labels like
+                         _$!<HomePage>!$_ are unwrapped to just "HomePage".
+
+  X-ADDRESSBOOKSERVER-KIND   -> kind (e.g. "group")
+  X-ADDRESSBOOKSERVER-MEMBER -> members (Apple's vCard 3.0 equivalent
+                                of the standard KIND + MEMBER properties)
+
+  X-ABRELATEDNAMES    -> relatedTo, with relation type derived from the
+                         associated X-ABLabel.  Mappings:
+                           Mother/Father/Parent -> parent
+                           Brother/Sister       -> sibling
+                           Child                -> child
+                           Friend               -> friend
+                           Spouse/Partner        -> spouse
+                           Assistant/Manager     -> colleague
+
+  X-ABDATE            -> anniversaries, with kind derived from X-ABLabel.
+                         "Anniversary" label maps to kind "wedding".
+
+  X-ABADR             -> addresses[].countryCode (ISO country code,
+                         grouped with the associated ADR property)
+
+  X-PHONETIC-FIRST-NAME  -> name.phoneticComponents (kind: given)
+  X-PHONETIC-MIDDLE-NAME -> name.phoneticComponents (kind: given2)
+  X-PHONETIC-LAST-NAME   -> name.phoneticComponents (kind: surname)
+
+  X-SOCIALPROFILE      -> onlineServices (with service from TYPE param
+                          and user from x-user param)
+
+  X-AIM, X-ICQ, X-MSN,
+  X-YAHOO, X-JABBER,
+  X-SKYPE, X-TWITTER,
+  X-GOOGLE-TALK        -> onlineServices (legacy IM properties)
+
+Policy: Writing Apple Extensions
+
+When generating vCards, we write standard vCard 4.0 properties.  Apple
+extensions are generated in the following cases:
+
+  - When a JSContact property has a "label" field, we generate a grouped
+    itemN.X-ABLabel property alongside the main property.  This ensures
+    custom labels survive round-trips through Apple clients.
+
+  - Standard vCard 4.0 equivalents are used where they exist:
+      KIND instead of X-ADDRESSBOOKSERVER-KIND
+      MEMBER instead of X-ADDRESSBOOKSERVER-MEMBER
+      RELATED instead of X-ABRELATEDNAMES
+      ANNIVERSARY instead of X-ABDATE
+      SOCIALPROFILE instead of X-SOCIALPROFILE (per RFC 9554)
+
+  - Legacy X-service IM properties (X-AIM, X-SKYPE, etc.) are written
+    as IMPP properties with SERVICE-TYPE parameter.
+
+The intent is that vCards generated by this module are valid vCard 4.0
+that Apple clients can read, while vCards from Apple clients are fully
+parsed without data loss.
+
+Preserving Unknown Properties (patch_vcard)
+
+When updating a contact via CardDAV, a naive approach of converting
+JSContact -> vCard and PUT-ing the result will lose any vCard properties
+that JSContact does not model.  This includes vendor extensions, custom
+X-properties, and any standard properties we don't yet handle.
+
+The patch_vcard() function solves this by:
+
+  1. Parsing the original vCard to identify all properties
+  2. Comparing old_card and new_card to find what actually changed
+  3. Modifying only the changed properties in the original vCard
+  4. Preserving everything else verbatim
+
+This is important for interoperability with Apple and other clients that
+store data in properties we may not understand.
+
+SPECIFICATIONS
+
+  RFC 6350  - vCard Format Specification
+  RFC 9553  - JSContact: A JSON Representation of Contact Data
+  RFC 9554  - vCard Format Extensions for JSContact
+  RFC 9555  - JSContact: Converting from and to vCard
+
+AUTHOR
+
+  Bron Gondwana <brong@cpan.org>
+
+LICENSE
+
+  Same as Perl itself (Artistic License 2.0)

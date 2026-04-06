@@ -23,7 +23,7 @@ use warnings;
 
 package Net::Daemon::Log;
 
-our $VERSION = '0.02';
+our $VERSION = '0.52';
 
 use Config;
 
@@ -68,7 +68,7 @@ sub OpenLog($) {
         require Win32::EventLog;
         $self->{'eventLog'} = Win32::EventLog->new( ref($self), '' )
           or die "Cannot open EventLog:" . Win32::GetLastError();
-        $self->{'$eventId'} = 0;
+        $self->{'eventId'} = 0;
     }
     else {
         eval { require Sys::Syslog };
@@ -198,13 +198,6 @@ Net::Daemon::Log - Utility functions for logging
   $self->Fatal("This is a fatal error message");
 
 
-=head1 WARNING
-
-THIS IS ALPHA SOFTWARE. It is *only* 'Alpha' because the interface (API)
-is not finalised. The Alpha status does not reflect code quality or
-stability.
-
-
 =head1 DESCRIPTION
 
 Net::Daemon::Log is a utility class for portable logging messages.
@@ -235,7 +228,7 @@ These are replacements for logging with levels debug and err. The difference
 between the latter two is that Fatal includes throwing a Perl exception.
 
 
-=head2 Chossing a logging target
+=head2 Choosing a logging target
 
 By default logging will happen to syslog (Unix) or EventLog (Windows).
 However you may choose logging to stderr by setting
@@ -248,7 +241,7 @@ alternative option is setting
     $self->{'logfile'} = $handle;
 
 where $handle is any object supporting a I<print> method, for example
-an IO::Handle object. Usually the logging target is choosen as soon
+an IO::Handle object. Usually the logging target is chosen as soon
 as you call $self->Log() the first time. However, you may force
 choosing the target by doing a
 
@@ -259,7 +252,7 @@ before calling Log the first time.
 
 =head1 MULTITHREADING
 
-The Multithreading capabitities of this class are depending heavily
+The Multithreading capabilities of this class are depending heavily
 on the underlying classes Sys::Syslog, Win32::EventLog or IO::Handle.
 If they are thread safe, you can well assume that this package is
 too. (The exception being that you should better call

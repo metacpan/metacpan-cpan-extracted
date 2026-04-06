@@ -1,12 +1,26 @@
 Changes
+ignore.txt
 lib/Net/CalDAVTalk.pm
 lib/Net/CalDAVTalk/TimeZones.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/api.t
+t/boilerplate.t
+t/caldav.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+testdata/alert.ics
+testdata/alert.je
+testdata/participants.ics
+testdata/participants.je
+testdata/recurs-with-exceptions.ics
+testdata/recurs-with-exceptions.je
+testdata/recurs.ics
+testdata/recurs.je
+testdata/simple.ics
+testdata/simple.je
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,5 @@
 package Data::Frame::Partial::Eval;
-$Data::Frame::Partial::Eval::VERSION = '0.006004';
+$Data::Frame::Partial::Eval::VERSION = '0.006005';
 # ABSTRACT: Partial class for data frame's eval method
 
 use Data::Frame::Role;
@@ -56,7 +56,7 @@ Data::Frame::Partial::Eval - Partial class for data frame's eval method
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 SYNOPSIS
 

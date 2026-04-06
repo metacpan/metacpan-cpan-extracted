@@ -1,0 +1,38 @@
+---
+abstract: 'Convert between Email::MIME and the JSON format from RFC 8621 (JMAP Mail)'
+author:
+  - 'Bron Gondwana <brong@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-JSEmail
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Format: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  DateTime::Format::ISO8601::Format: '0'
+  DateTime::Format::Mail: '0'
+  Digest::SHA: '0'
+  Email::MIME: '0'
+  Email::MIME::ContentType: '0'
+  Email::MIME::Header::AddressList: '0'
+  Encode: '0'
+  Encode::MIME::Header: '0'
+  HTML::Strip: '0'
+  JSON: '0'
+  JSON::XS: '0'
+  Unicode::Normalize: '0'
+  perl: '5.014'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

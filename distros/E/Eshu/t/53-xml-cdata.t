@@ -69,4 +69,22 @@ END
 	is($got, $expected, 'DOCTYPE does not affect depth');
 }
 
+# CDATA with < > and {} characters that look like tags/code
+{
+	my $input = <<'END';
+<root>
+<code><![CDATA[if (x < 10 && y > 5) { return; }]]></code>
+</root>
+END
+
+	my $expected = <<'END';
+<root>
+	<code><![CDATA[if (x < 10 && y > 5) { return; }]]></code>
+</root>
+END
+
+	my $got = Eshu->indent_xml($input);
+	is($got, $expected, 'CDATA with tag-like and code-like characters inside');
+}
+
 done_testing();

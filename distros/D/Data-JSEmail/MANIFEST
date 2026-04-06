@@ -1,0 +1,8 @@
+Changes
+differ.pl
+lib/Data/JSEmail.pm
+Makefile.PL
+MANIFEST			This list of files
+t/cyrus-jmap.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

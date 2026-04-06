@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -34,10 +34,11 @@ requires qw{
     handle_request
 };
 
-sub cycle            { 0.2 }
-sub interval         { 0.2 }
-sub use_posix_exit   { 0 }
-sub intercept_errors { 0 }
+sub cycle                { 0.2 }
+sub interval             { 0.2 }
+sub use_posix_exit       { 0 }
+sub intercept_errors     { 0 }
+sub expose_error_details { 0 }
 
 sub terminated    { $_[0]->{_TERMINATED} }
 sub is_terminated { defined $_[0]->{_TERMINATED} ? 1 : 0 }
@@ -110,16 +111,42 @@ sub workers {
     return $self->{_WORKERS};
 }
 
+sub terminate_workers {
+    my $self = shift;
+
+    my $workers = $self->{_WORKERS} or return;
+
+    $self->reap_workers(kill => 'TERM');
+
+    my $start = time;
+    while (keys %$workers) {
+        my $kill;
+        if (time - $start > 15) {
+            $kill = 'KILL';
+            $start = time;
+        }
+
+        $self->reap_workers(kill => $kill);
+        sleep 0.05 if keys %$workers;
+    }
+}
+
 sub reap_workers {
     my $self = shift;
+    my %params = @_;
 
     my $workers = $self->{_WORKERS} or return;
 
     my %out;
     for my $pid (keys %$workers) {
         local $?;
-        my $check = waitpid($pid, WNOHANG) or next;
+        my $check = waitpid($pid, WNOHANG);
         my $exit = $?;
+
+        unless ($check) {
+            kill($params{kill}, $pid) if $params{kill};
+            next;
+        }
 
         my $name = delete $workers->{$pid};
 
@@ -163,15 +190,16 @@ sub run_on_response_message {
 
 sub send_response {
     my $self = shift;
-    my ($peer, $id, $resp) = @_;
+    my ($peer, $id, $resp, $error) = @_;
 
-    $self->client->send_message(
-        $peer,
-        {
-            ipcm_response_id => $id,
-            response         => $resp,
-        }
+    my %payload = (
+        ipcm_response_id => $id,
+        response         => $resp,
     );
+
+    $payload{ipcm_error} = $error if defined $error;
+
+    $self->client->send_message($peer, \%payload);
 }
 
 sub run_on_request_message {
@@ -179,12 +207,24 @@ sub run_on_request_message {
     my ($msg) = @_;
 
     my $peer = $msg->from;
-
     my $req  = $msg->content;
 
     # return empty list to not send a response yet.
     # return one item (can be undef, 0, '', or any other value)
-    my @resp = $self->handle_request($req, $msg);
+    my (@resp, $err);
+    {
+        local $@;
+        eval { @resp = $self->handle_request($req, $msg); 1 } or $err = $@ || "There was an error: $@";
+    }
+
+    if (defined $err) {
+        my $error_message = $self->expose_error_details
+            ? "$err"
+            : "Internal service error";
+
+        $self->send_response($peer, $req->{ipcm_request_id}, undef, $error_message);
+        return;
+    }
 
     return unless @resp;
     croak "Incorrect number of responses to request" if @resp != 1;
@@ -204,13 +244,6 @@ sub in_correct_pid {
     my $self = shift;
     my $pid  = $self->pid;
     croak "Incorrect PID (did your fork leak? $$ vs $pid)" unless $$ == $pid;
-}
-
-sub kill {
-    my $self = shift;
-    my ($sig) = @_;
-    croak "A signal is required" unless defined $sig;
-    CORE::kill($sig, $self->pid);
 }
 
 sub debug {
@@ -431,6 +464,8 @@ sub run {
 
     $self->_run_on_cleanup();
 
+    $self->terminate_workers();
+
     %SIG = %{$self->{_ORIG_SIG}};
 
     return $self->terminated // 0;
@@ -568,6 +603,13 @@ Returns whether to use POSIX exit codes (default: 0).
 
 Returns whether to intercept and log errors (default: 0).
 
+=item $self->expose_error_details()
+
+Returns whether exception text from C<handle_request> should be included in
+error responses.  When false (the default), a generic C<"Internal service
+error"> message is sent.  When true, the stringified exception is sent as the
+C<ipcm_error> value.
+
 =item $val = $self->terminated()
 
 Gets the termination status.
@@ -665,7 +707,10 @@ Reaps terminated worker processes. Returns a hashref of results.
 
 =item $self->send_response($peer, $id, $resp)
 
-Sends a response message to a peer.
+=item $self->send_response($peer, $id, $resp, $error)
+
+Sends a response message to a peer.  If C<$error> is provided, the response
+payload includes an C<ipcm_error> key with the error string.
 
 =item $client = $self->client()
 
@@ -674,10 +719,6 @@ Returns the client connection for this service.
 =item $self->in_correct_pid()
 
 Verifies we're running in the correct process. Dies if not.
-
-=item $self->kill($sig)
-
-Sends a signal to the service process.
 
 =item $self->debug(@msg)
 

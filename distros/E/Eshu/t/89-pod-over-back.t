@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Eshu;
 
 # Basic over/back
@@ -167,4 +167,58 @@ END
 
 	my $got = Eshu->indent_pl($input);
 	is($got, $expected, 'over/back in Perl source file');
+}
+
+# 3-level nested over/back
+{
+	my $input = <<'END';
+=over 4
+
+=item Level 1
+
+=over 4
+
+=item Level 2
+
+=over 4
+
+=item Level 3
+
+Deep item text.
+
+=back
+
+=back
+
+=back
+
+=cut
+END
+
+	my $expected = <<'END';
+=over 4
+
+=item Level 1
+
+=over 4
+
+=item Level 2
+
+=over 4
+
+=item Level 3
+
+Deep item text.
+
+=back
+
+=back
+
+=back
+
+=cut
+END
+
+	my $got = Eshu->indent_pod($input);
+	is($got, $expected, '3-level nested over/back');
 }

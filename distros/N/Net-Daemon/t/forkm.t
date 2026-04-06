@@ -1,28 +1,15 @@
 # -*- perl -*-
-#
 
-require 5.004;
 use strict;
+use warnings;
+
 use IO::Socket        ();
-use Config            ();
 use Net::Daemon::Test ();
 use Fcntl             ();
-use Config            ();
 use POSIX qw/WNOHANG/;
+use Test::More;
 
-my $debug = 0;
-my $dh;
-if ($debug) {
-    $dh = Symbol::gensym();
-    open( $dh, ">", "forkm.log" ) or die "Failed to open forkm.log: $!";
-}
-
-sub DEBUG {
-    my $msg = shift;
-    print $dh "$$: $msg\n" if $dh;
-}
-
-DEBUG("Start");
+my $main_pid = $$;
 my $ok;
 eval {
     if ( $^O ne "MSWin32" ) {
@@ -35,13 +22,10 @@ eval {
     }
 };
 if ( !$ok ) {
-    DEBUG("!ok");
-    print "1..0 # SKIP This test requires a system with working forks.\n";
-    exit;
+    plan skip_all => 'This test requires a system with working forks.';
 }
 
-$|  = 1;
-$^W = 1;
+plan tests => 10;
 
 my ( $handle, $port );
 if (@ARGV) {
@@ -49,7 +33,7 @@ if (@ARGV) {
 }
 else {
     ( $handle, $port ) = Net::Daemon::Test->Child(
-        10,            $^X,              '-Iblib/lib', '-Iblib/arch', 't/server',
+        undef,         $^X,              '-Iblib/lib', '-Iblib/arch', 't/server',
         '--mode=fork', 'logfile=stderr', 'debug'
     );
 }
@@ -63,12 +47,10 @@ sub ReadWrite {
     my $fh = shift;
     my $i  = shift;
     my $j  = shift;
-    DEBUG("ReadWrite: -> fh=$fh, i=$i, j=$j");
     if ( !$fh->print("$j\n") || !$fh->flush() ) {
         die "Child $i: Error while writing $j: " . $fh->error() . " ($!)";
     }
     my $line = $fh->getline();
-    DEBUG("ReadWrite: line=$line");
     die "Child $i: Error while reading: " . $fh->error() . " ($!)"
       unless defined($line);
     my $num;
@@ -76,13 +58,10 @@ sub ReadWrite {
       unless defined( $num = IsNum($line) );
     die "Child $i: Expected " . ( $j * 2 ) . ", got $num"
       unless $j * 2 == $num;
-    DEBUG("ReadWrite: <-");
 }
 
 sub MyChild {
     my $i = shift;
-
-    DEBUG("MyChild: -> $i");
 
     eval {
         my $fh = IO::Socket::INET->new(
@@ -90,7 +69,6 @@ sub MyChild {
             'PeerPort' => $port
         );
         if ( !$fh ) {
-            DEBUG("MyChild: Cannot connect: $!");
             die "Cannot connect: $!";
         }
         for ( my $j = 0; $j < 1000; $j++ ) {
@@ -99,100 +77,67 @@ sub MyChild {
     };
     if ($@) {
         print STDERR "Client: Error $@\n";
-        DEBUG("MyChild: Client: Error $@");
         return 0;
     }
-    DEBUG("MyChild: <-");
     return 1;
 }
 
-sub ShowResults {
-    DEBUG("ShowResults: ->");
-    my @results;
-    for ( my $i = 1; $i <= 10; $i++ ) {
-        $results[ $i - 1 ] = "not ok $i\n";
-    }
-    if ( open( LOG, "<log" ) ) {
-        while ( defined( my $line = <LOG> ) ) {
-            if ( $line =~ /(\d+)/ ) {
-                $results[ $1 - 1 ] = $line;
-            }
-        }
-    }
-    for ( my $i = 1; $i <= 10; $i++ ) {
-        print $results[ $i - 1 ];
-    }
-    DEBUG("ShowResults: <-");
-    exit 0;
-}
-
-my %childs;
-
-sub CatchChild {
-    DEBUG("CatchChild: ->");
-    for ( ;; ) {
-        my $pid = waitpid -1, WNOHANG;
-        last if $pid <= 0;
-        if ( $pid > 0 ) {
-            DEBUG("CatchChild: $pid");
-            if ( exists $childs{$pid} ) {
-                delete $childs{$pid};
-                if ( keys(%childs) == 0 ) {
-
-                    # We ae done when the last of our ten childs are gone.
-                    ShowResults();
-                    last;
-                }
-            }
-        }
-    }
-    $SIG{'CHLD'} = \&CatchChild;
-    DEBUG("CatchChild: <-");
-}
-$SIG{'CHLD'} = \&CatchChild;
-
-# Spawn 10 childs, each of them running a series of test
+# Spawn 10 children, each running a series of exchanges.
+# Children write results to a shared log file; parent collects them.
 unlink "log";
-DEBUG("Spawning childs");
+my %childs;
 for ( my $i = 0; $i < 10; $i++ ) {
-    if ( defined( my $pid = fork() ) ) {
-        if ($pid) {
-
-            # This is the parent
-            $childs{$pid} = $i;
-        }
-        else {
-            DEBUG("Child starting");
-
-            # This is the child
-            undef $handle;
-            %childs = ();
-            my $result = MyChild($i);
-            my $fh     = Symbol::gensym();
-            if (   !open( $fh, ">>log" )
-                || !flock( $fh, 2 )
-                || !seek( $fh, 0, 2 )
-                || !( print $fh ( ( $result ? "ok " : "not ok " ), ( $i + 1 ), "\n" ) )
-                || !close($fh) ) {
-                print STDERR "Error while writing log file: $!\n";
-                exit 1;
-            }
-            exit 0;
-        }
+    my $pid = fork();
+    if ( !defined($pid) ) {
+        die "Failed to create new child: $!";
+    }
+    if ($pid) {
+        # Parent
+        $childs{$pid} = $i;
     }
     else {
-        print STDERR "Failed to create new child: $!\n";
-        exit 1;
+        # Child
+        undef $handle;
+        %childs = ();
+        my $result = MyChild($i);
+        require Symbol;
+        my $fh = Symbol::gensym();
+        if (   !open( $fh, ">>log" )
+            || !flock( $fh, 2 )
+            || !seek( $fh, 0, 2 )
+            || !( print $fh ( ( $result ? "ok " : "not_ok " ), ( $i + 1 ), "\n" ) )
+            || !close($fh) ) {
+            print STDERR "Error while writing log file: $!\n";
+            exit 1;
+        }
+        exit 0;
     }
 }
 
-my $secs = 120;
-while ( $secs > 0 ) {
-    $secs -= sleep $secs;
+# Wait for all children to finish
+while ( keys(%childs) > 0 ) {
+    my $pid = waitpid( -1, 0 );
+    last if $pid <= 0;
+    delete $childs{$pid} if exists $childs{$pid};
+}
+
+# Read results from log file and report via Test::More
+my @results;
+if ( open( my $log_fh, '<', 'log' ) ) {
+    while ( defined( my $line = <$log_fh> ) ) {
+        if ( $line =~ /^(ok|not_ok)\s+(\d+)/ ) {
+            $results[ $2 - 1 ] = $1 eq 'ok' ? 1 : 0;
+        }
+    }
+    close($log_fh);
+}
+
+for ( my $i = 0; $i < 10; $i++ ) {
+    ok( $results[$i], "forked child " . ( $i + 1 ) . " exchange (1000 rounds)" );
 }
 
 END {
-    DEBUG( "END: -> handle=" . ( defined($handle) ? $handle : "undef" ) );
+    return unless $$ == $main_pid;
     if ($handle) {
         $handle->Terminate();
         undef $handle;
@@ -201,7 +146,6 @@ END {
         kill 'TERM', $var;
     }
     %childs = ();
-    unlink "ndtest.prt";
-    DEBUG("END: <-");
-    exit 0;
+    unlink "ndtest.prt" if -f "ndtest.prt";
+    unlink "log"        if -f "log";
 }

@@ -154,4 +154,3 @@ END
 	my $got = Eshu->indent_pl($input);
 	is($got, $expected, '$#{$ref} — braced last-index syntax');
 }
-END

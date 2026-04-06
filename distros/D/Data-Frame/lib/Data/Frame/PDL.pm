@@ -1,5 +1,5 @@
 package Data::Frame::PDL;
-$Data::Frame::PDL::VERSION = '0.006004';
+$Data::Frame::PDL::VERSION = '0.006005';
 # ABSTRACT: A mixin to add some methods to PDL
 
 use 5.016;
@@ -163,7 +163,7 @@ Data::Frame::PDL - A mixin to add some methods to PDL
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 DESCRIPTION
 

@@ -18,7 +18,7 @@ prepare4release - prepare a Perl module directory for release
 
 =head1 SYNOPSIS
 
-  prepare4release [--github | --gitlab] [--cpan] [--verbose]
+  prepare4release [--github | --gitlab] [--cpan] [--sync-deps | --no-sync-deps] [--verbose]
 
   prepare4release --usage
 
@@ -45,6 +45,16 @@ create a GitLab CI pipeline with a similar Perl matrix.
 Adds CPAN-oriented Markdown shield lines (Repology/MetaCPAN, fury.io, cpants) in
 F<README.md> together with license and Perl badges; see L<App::prepare4release>.
 CI badges follow C<--github> / C<--gitlab> as described there.
+
+=item C<--sync-deps>
+
+Merge missing modules into F<Makefile.PL> C<PREREQ_PM> / C<TEST_REQUIRES> (from a
+static scan of F<lib/>, F<bin/>, F<maint/>, F<t/>, optionally F<xt/>) and append
+lines to F<cpanfile> when present. Without this flag, only a one-line warning is
+printed when mismatches are found (unless C<dependencies.skip> is set in
+F<prepare4release.json>). The same can be enabled via
+C<"dependencies": { "sync": true }> in the JSON file; C<--no-sync-deps> forces
+off.
 
 =item C<--verbose>
 

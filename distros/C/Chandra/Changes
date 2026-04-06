@@ -1,5 +1,17 @@
 Revision history for Chandra
 
+0.14 2026-04-06
+   - Add Chandra::ContextMenu - Context menus for Chandra applications
+   - A few more fixes to try and get Strawberry to build
+
+0.13  2026-04-05
+    - Add Chandra::Window - Multi-window management
+    - Add Chandra::Assets - Asset bundling and resource loading for Chandra apps
+    - Add Chandra::Clipboard - System clipboard access (text, HTML, images)
+    - Add Chandra::DragDrop - File drops, text drops, intra-app drag and drop
+    - Auto-detect headless environments in Makefile.PL for CPAN Testers
+    - Fix Windows/Strawberry Perl builds (MULTIPLICITY-safe Win32 APIs)
+
 0.12  2026-04-04
     - Add Chandra::Store - Persistent key-value storage for Chandra apps
 

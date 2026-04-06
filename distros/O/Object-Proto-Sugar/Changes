@@ -1,5 +1,9 @@
 Revision history for Object-Proto-Sugar
 
+0.03	2026-04-05
+	- Explictly require type constants to be imported into a package
+	- Extend with more sugar constants (porting my MooX::LazierAttributes syntax)
+
 0.02	2026-04-04
 	- Add support for defining "has" attributes as arrayref
 

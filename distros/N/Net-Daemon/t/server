@@ -41,10 +41,10 @@ sub Loop {
     if ( $self->{'loop-timeout'} ) {
         my $count = $self->{'loop-count'} || 0;
         if ( ( $self->{'loop-count'} = ++$count ) == 10 ) {
-            $self->Done();
-            open( COUNT, ">ndtest.cnt" );
-            print COUNT "10\n";
-            close(COUNT);
+            $self->Done(1);
+            open( my $cnt_fh, '>', 'ndtest.cnt' );
+            print $cnt_fh "10\n";
+            close($cnt_fh);
         }
     }
 }
@@ -68,7 +68,7 @@ sub Run ($) {
             my $num;
             {
                 my $lock = lock($Net::Daemon::RegExpLock)
-                  if ( $self->{'mode'} eq 'threads' );
+                  if ( $self->{'mode'} eq 'ithreads' );
                 if ( $line =~ /(\d+)/ ) {
                     $num = $1;
                 }

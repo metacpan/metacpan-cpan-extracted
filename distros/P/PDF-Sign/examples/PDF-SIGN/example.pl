@@ -32,7 +32,7 @@ config(
     osslcmd     => 'openssl',
     x509_pem    => $cert,
     privkey_pem => $key,
-	tmpdir      => $tmpdir,
+    tmpdir      => $tmpdir,
 );
 
 my $signature = eval {

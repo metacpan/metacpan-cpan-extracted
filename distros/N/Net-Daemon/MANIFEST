@@ -1,3 +1,4 @@
+AI_POLICY.md
 ChangeLog			Module history
 lib/Net/Daemon.pm		Net::Daemon module
 lib/Net/Daemon/Log.pm		Support class for logging
@@ -5,7 +6,7 @@ lib/Net/Daemon/Test.pm		Support class for writing tests
 Makefile.PL			Makefile generator
 MANIFEST			This file
 MANIFEST.SKIP			Files to ignore while generating the dist archive
-README				Ascii docs
+README.md
 t/base.t			Base test
 t/clone.t			Test of post_clone() hook for per-connection init
 t/config.t			Test of config file handling and access control
@@ -18,6 +19,8 @@ t/listen.t			Test the --listen option
 t/logfile.t			Test logfile string handling in Net::Daemon::Log
 t/loop-child.t			Same with loop-child set
 t/loop.t			Test the loop-timeout option
+t/mode.t			Test mode auto-detection and explicit selection
+t/privdrop.t
 t/reap.t
 t/server			Script used by the server tests
 t/single.t			Test of a single-mode server

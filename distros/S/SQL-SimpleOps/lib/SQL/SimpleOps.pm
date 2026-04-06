@@ -50,11 +50,10 @@
 
 	our @EXPORT = qw(
 		new
-		Open Select SelectCursor Delete Insert
-		Update Commit Close Call Wait SelectSubQuery
-		getDBH getMessage getRC getRows
-		getLastCursor getLastSQL getLastSave getWhere
-		getAliasTable getAliasCols
+		Open Select SelectCursor Delete Insert Update Commit Close Call Wait
+		Join SelectSubQuery
+		getDBH getMessage getRC getRows getLastCursor getLastSQL getLastSave
+		getWhere getAliasTable getAliasCols
 		setDumper
 
 		SQL_SIMPLE_ALIAS_INSERT
@@ -94,7 +93,7 @@
 		$err
 	);
 
-	our $VERSION = "2024.213.1";
+	our $VERSION = "2026.095.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -201,6 +200,7 @@
 		"047" => { T=>"E", M=>"[%s] Buffer arrayref Off not allowed for multiple field list" },
 		"048" => { T=>"E", M=>"[%s] Buffer hashindex must be arrayref" },
 		"049" => { T=>"E", M=>"[%s] Cursor_order invalid" },
+		"050" => { T=>"E", M=>"[%s] Buffer reverse invalid, buffer is not arrayref" },
 		"099" => { T=>"S", M=>"[%s] %s" },
 	);
 
@@ -829,9 +829,18 @@ sub _Select()
 
 	return SQL_SIMPLE_RC_SYNTAX if ($self->_checkTablesEntries("select",$argv) != SQL_SIMPLE_RC_OK);
 
-	## testing buffer-hashindex
+	## testing buffer options
 	if	(!defined($argv->{buffer})){}
+	## buffer array options
+	elsif	(ref($argv->{buffer}) eq "ARRAY"){}
+	elsif	(defined($argv->{buffer_reverse}))
+	{
+		$self->_setMessage("select",SQL_SIMPLE_RC_SYNTAX,"050");
+		return SQL_SIMPLE_RC_SYNTAX;
+	}
+	## others buffers type
 	elsif	(ref($argv->{buffer}) ne "HASH"){}
+	## buffer hash options
 	elsif	(!defined($argv->{buffer_hashkey})){}
 	elsif	(!defined($argv->{buffer_hashindex})){}
 	elsif	(ref($argv->{buffer_hashindex}) ne "ARRAY")
@@ -1090,6 +1099,10 @@ sub _Select()
 			$self->_getAliasCols(5,$group_work[$i],SQL_SIMPLE_ALIAS_GROUPBY);
 	}
 
+	## make having
+	my $having;
+	return SQL_SIMPLE_RC_SYNTAX if ($self->_getWhere("select",$argv->{having},\$having));
+
 	## make order
 	my @order;
 	while (@order_work)
@@ -1116,6 +1129,7 @@ sub _Select()
 	my $sql = "SELECT ".join(", ",@fields)." FROM ".join(", ",@tables);
 	$sql .= " WHERE ".$where if ($where);
 	$sql .= " GROUP BY ".join(", ",@group_work) if (@group_work);
+	$sql .= " HAVING ".$having if ($having);
 	$sql .= " ORDER BY ".join(", ",@order) if (@order);
 	$sql .= " LIMIT ".$argv->{limit} if (defined($argv->{limit}) && $argv->{limit} > 0);
 
@@ -1140,7 +1154,7 @@ sub _Select()
 		buffer_hashkey => $argv->{buffer_hashkey},
 		buffer_arrayref => $argv->{buffer_arrayref},
 		buffer_hashindex => $argv->{buffer_hashindex},
-		buffer_hashindex => $argv->{buffer_hashindex},
+		buffer_reverse => $argv->{buffer_reverse},
 		buffer_fields => @fields+0,
 		cursor => $argv->{cursor},
 		cursor_command => $argv->{cursor_command},
@@ -1755,7 +1769,17 @@ sub _Call()
 
 					## move data
 					if	($type == 1) { %{$argv->{buffer}} = %{$ref}; }
-					elsif	($type == 2) { ($self->{work}{cursor_order}) ? push(@{$argv->{buffer}},$ref): unshift(@{$argv->{buffer}},$ref); }
+					elsif	($type == 2)
+					{
+						if (!$argv->{buffer_reverse})
+						{
+							($self->{work}{cursor_order}) ? push(@{$argv->{buffer}},$ref): unshift(@{$argv->{buffer}},$ref);
+						}
+						else
+						{
+							($self->{work}{cursor_order}) ? unshift(@{$argv->{buffer}},$ref): push(@{$argv->{buffer}},$ref);
+						}
+					}
 					elsif	($type == 3) { last if (&{$argv->{buffer}}($ref,$argv->{buffer_options})); }
 					elsif	($type == 4) { foreach my $id(keys(%{$ref})) { ${$argv->{buffer}} = $ref->{$id}; }}
 					elsif	($type == 5)
@@ -1815,7 +1839,14 @@ sub _Call()
 					elsif	($type == 7)
 					{
 						my @key = keys(%{$ref});
-						($self->{work}{cursor_order}) ? push(@{$argv->{buffer}},$ref->{ $key[0] }) : unshift(@{$argv->{buffer}},$ref->{ $key[0] });
+						if (!$argv->{buffer_reverse})
+						{
+							($self->{work}{cursor_order}) ? push(@{$argv->{buffer}},$ref->{ $key[0] }) : unshift(@{$argv->{buffer}},$ref->{ $key[0] });
+						}
+						else
+						{
+							($self->{work}{cursor_order}) ? unshift(@{$argv->{buffer}},$ref->{ $key[0] }) : push(@{$argv->{buffer}},$ref->{ $key[0] });
+						}
 					}
 					$ref_saved = $ref;
 				}
@@ -2222,7 +2253,7 @@ sub _getWhereRecursive()
 				}
 				else
 				{
-					push(@where_aux,$value1." NOT NULL");
+					push(@where_aux,$value1." IS NOT NULL");
 				}
 			}
 			if (@where_aux > 1)

@@ -31,23 +31,24 @@ X<Constructor>
     $my_module = SQL::SimpleOps->new
     (
        # load by config file
-       configfile => filename,					# load options by configfile
+       configfile => filename, # load options by configfile
 
        # connections process
 
-       interface => interface_name,				# (default: 'dbi')
+       interface => interface_name,                   # (default: 'dbi')
        interface_options =>
        {
-          ...							# (see interface options)
+          ...                                         # (see interface options)
        },
-       driver => mysql | mariadb | postgres | sqlite,		# (no defaults)
-       db => dnsname,						# (no defaults)
-       server => dbservername,					# (no defaults)
-       port => tcpport_number,					# (optional)
-       login => login_name,					# (optional)
-       password => login_password,				# (optional)
+       driver => mysql | mariadb | postgres | sqlite, # (no defaults)
+       
+       db => dnsname,               # (no defaults)
+       server => dbservername,      # (no defaults)
+       port => tcpport_number,      # (optional)
+       login => login_name,         # (optional)
+       password => login_password,  # (optional)
 
-       # tables definitions					# (no defaults)
+       # tables definitions (no defaults)
 
        tables =>
        {
@@ -65,26 +66,26 @@ X<Constructor>
 
        # generic options
 
-       quote => character,			# (default: apostrophe)
-       connect => 0 | 1,			# (default: 1 )
-       commit => 0 | 1,				# (default: 0 )
+       quote => character,  # (default: apostrophe)
+       connect => 0 | 1,    # (default: 1 )
+       commit => 0 | 1,     # (default: 0 )
 
-       # message log options			# (default: SQL_SIMPLE_LOG_STD)
+       # message log options (default: SQL_SIMPLE_LOG_STD)
 
-       message_log => SQL_SIMPLE_LOG_OFF | SQL_SIMPLE_LOG_SYS + SQL_SIMPLE_LOG_STD,
+       message_log => SQL_SIMPLE_LOG_OFF | SQL_SIMPLE_LOG_SYS | SQL_SIMPLE_LOG_STD,
 
-       message_syslog_facility => string,	# (default: 'local0')
-       message_syslog_service => string,	# (default: 'SQL-SimpleOps')
+       message_syslog_facility => string,  # (default: 'local0')
+       message_syslog_service => string,   # (default: 'SQL-SimpleOps')
 
-       # sql_save options			# (default: disabled)
+       # sql_save options (default: SQL_SIMPLE_CMD_OFF)
 
        sql_save => SQL_SIMPLE_CMD_OFF | SQL_SIMPLE_CMD_ON | SQL_SIMPLE_CMD_ALL,
 
-       sql_save_bydate => 0 | 1,		# (default: 0)
-       sql_save_dir => fullpath,		# (default: (linux) '/var/spool/sql')
-       						# (default: (windows) 'c:/windows/temp')
-       sql_save_name => string,			# (default: 'sql')
-       sql_save_ignore => 0 | 1,		# (default: 1)
+       sql_save_dir => fullpath,  # (default: (linux) '/var/spool/sql')
+                                  # (default: (windows) 'c:/windows/temp')
+       sql_save_name => string,   # (default: 'sql')
+       sql_save_ignore => 0 | 1,  # (default: 1)
+       sql_save_bydate => 0 | 1,  # (default: 0)
     );
 
 =head2 Database Initializations
@@ -116,19 +117,19 @@ X<SQL Commands>
 
        # where clause
 
-       where => [ condition1, ... ], 		# (see below: WHERE)
+       where => [ condition1, ... ],  # (see below: WHERE)
 
        # generic options
 
-       force => 0 | 1,				# (default: 0)
-       notfound => 0 | 1			# (default: 0)
+       force => 0 | 1,        # (default: 0)
+       notfound => 0 | 1,     # (default: 0)
 
-       commit => 0 | 1,				# (default: global value)
-       message_log => 0 | 1,			# (default: global value)
-       sql_save => 0 | 1,			# (default: global value)
+       commit => 0 | 1,       # (default: global value)
+       message_log => 0 | 1,  # (default: global value)
+       sql_save => 0 | 1,     # (default: global value)
 
-       make_only => 0 | 1,			# (default: 0)
-       flush => 0 | 1,				# (default: 1)
+       make_only => 0 | 1,    # (default: 0)
+       flush => 0 | 1,        # (default: 1)
     );
 
  Insert
@@ -140,43 +141,43 @@ X<SQL Commands>
 
        # fields to insert
 
-       fields =>				# (no defaults)
+       fields =>                         # (no defaults)
        {
           col1_alias => value,
           col2_alias => value,
           ...
        },
        or
-       fields => [ col_1,col_2,... ],		# (multiple fields)
-       values =>				# (multiple lines)
+       fields => [ col_1,col_2,... ],    # (multiple fields)
+       values =>                         # (multiple lines)
        [
           [ val_01,val_02,... ],
           [ val_11,val_12,... ],
           ...
        ]
        or
-       fields => [ col_1 ],			# (one field only)
-       values => [ val_11,val_21,... ],		# (multiple lines)
+       fields => [ col_1 ],              # (one field only)
+       values => [ val_11,val_21,... ],  # (multiple lines)
 
        # fields for update if already exists
 
-       conflict =>				# (no defaults)
+       conflict =>                       # (no defaults)
        {
           col1_alias => value,
           col2_alias => value,
           ...
        },
-       conflict_key => col_name,		# (no defaults)
+       conflict_key => col_name,         # (no defaults)
 
        # generic options
 
-       commit => 0 | 1,				# (default: global value)
-       message_log => 0 | 1,			# (default: global value)
-       sql_save => 0 | 1,			# (default: global value)
-       quote => string,				# (default: global value)
+       commit => 0 | 1,                  # (default: global value)
+       message_log => 0 | 1,             # (default: global value)
+       sql_save => 0 | 1,                # (default: global value)
+       quote => string,                  # (default: global value)
 
-       make_only => 0 | 1,			# (default: 0)
-       flush => 0 | 1,				# (default: 1)
+       make_only => 0 | 1,               # (default: 0)
+       flush => 0 | 1,                   # (default: 1)
     );
 
  Select
@@ -193,12 +194,12 @@ X<SQL Commands>
        fields => [ col1_alias, col2_alias, ... ],
        or
        fields => [ col1_alias, { col2_alias => newalias }, ... ],
-	   or
-	   fields => "*"
+       or
+       fields => "*"
 
        # where clause
 
-       where => [ condition1, ... ], 		# (see below: WHERE)
+       where => [ condition1, ... ],   # (see below: WHERE)
 
        # group by options
 
@@ -206,11 +207,15 @@ X<SQL Commands>
        or
        group_by => [ col1_alias, col2_alias, ... ],
 
+       # having clause
+
+       having => [ condition1, ... ],  # (see below: HAVING)
+
        # order by options
 
-       order_by => undef,		# (disable the order process, is default)
+       order_by => undef,              # (disable the order process, is default)
        or
-       order_by => col_alias,		# (default is SQL_SIMPLE_ORDER_ASC)
+       order_by => col_alias,          # (default is SQL_SIMPLE_ORDER_ASC)
        or
        order_by => { col_alias => SQL_SIMPLE_ORDER_ASC | SQL_SIMPLE_ORDER_DESC },
        or
@@ -222,7 +227,7 @@ X<SQL Commands>
           ...
        ],
 
-       # return buffer				# (no defaults)
+       # return buffer (no defaults)
 
        buffer => hash_ref | array_ref | scalar_ref | callback_ref,
        buffer_options => hash_ref | array_ref | scalar_ref | value_ref,
@@ -230,22 +235,23 @@ X<SQL Commands>
        buffer_hashkey => column_name,
        or
        buffer_hashkey => [col1,col2,...],
-	   ...
-       buffer_arrayref => 0 | 1,		# (default: 1)
-	   buffer_hashindex => arrayref		# (must be arrayref)
+       ...
+       buffer_arrayref => 0 | 1,       # (default: 1)
+       buffer_hashindex => arrayref,   # (must be arrayref)
+       buffer_reverse => 0 | 1,        # (default: 0) 
 
        # generic options
 
-       subquery => 0 | 1,			# (default: 0)
-       limit => value_max_lines,		# (default: unlimited lines) 
-       notfound => 0 | 1,			# (default: 0)
+       subquery => 0 | 1,              # (default: 0)
+       limit => value_max_lines,       # (default: unlimited lines) 
+       notfound => 0 | 1,              # (default: 0)
 
-       message_log => 0 | 1,			# (default: global value)
-       quote => string,				# (default: global value)
-       sql_save => 0 | 1,			# (default: global value)
+       message_log => 0 | 1,           # (default: global value)
+       quote => string,                # (default: global value)
+       sql_save => 0 | 1,              # (default: global value)
 
-       make_only => 0 | 1,			# (default: 0)
-       flush => 0 | 1,				# (default: 1)
+       make_only => 0 | 1,             # (default: 0)
+       flush => 0 | 1,                 # (default: 1)
     );
 
  SelectCursor
@@ -262,26 +268,26 @@ X<SQL Commands>
 
        # cursor options
 
-       cursor => current_cursor_key,				# (no defaults)
-	   ...
-       cursor_key => col_alias,					# (no defaults)
-	   or
-	   cursor_ky => [ col_alias1, ... col_alias2 ],
-	   ...
-       cursor_info = array_ref | hash_ref | scalar_ref>,	# (no defaults)
+       cursor => current_cursor_key,                      # (no defaults)
        ...
-       cursor_command =>					# (default: TOP)
+       cursor_key => col_alias,                           # (no defaults)
+       or
+       cursor_key => [ col_alias1, ... col_alias2 ],
+       ...
+       cursor_info = array_ref | hash_ref | scalar_ref>,  # (no defaults)
+       ...
+       cursor_command =>                                  # (default: TOP)
           SQL_SIMPLE_CURSOR_TOP | 
           SQL_SIMPLE_CURSOR_BACK |
           SQL_SIMPLE_CURSOR_NEXT |
           SQL_SIMPLE_CURSOR_RELOAD |
           SQL_SIMPLE_CURSOR_LAST,
        ...
-       cursor_order =>						# (default: no defaults)
+       cursor_order =>                                    # (default: no defaults)
           SQL_SIMPLE_ORDER_ASC |
           SQL_SIMPLE_ORDER_DESC
        ...
-       limit =>							# (default: no defaults)
+       limit => value,                                    # (default: no defaults)
     );
 
  SelectSubQuery
@@ -302,7 +308,7 @@ X<SQL Commands>
 
        # fiels list
 
-       fields =>				# (no defaults)
+       fields =>                       # (no defaults)
        {
           col1_alias => value,
           col2_alias => value,
@@ -311,21 +317,21 @@ X<SQL Commands>
 
        # where clause
 
-       where => [ condition1, ... ], 		# (see below: WHERE)
+       where => [ condition1, ... ],   # (see below: WHERE)
 
        # options
 
-       commit => 0 | 1,				# (default: global value)
-       force => 0 | 1,				# (default: 0)
-       notfound => 0 | 1,			# (default: 0)
+       commit => 0 | 1,                # (default: global value)
+       force => 0 | 1,                 # (default: 0)
+       notfound => 0 | 1,              # (default: 0)
 
-       commit => 0 | 1,				# (default: global value)
-       message_log => 0 | 1,			# (default: global value)
-       sql_save => 0 | 1,			# (default: global value)
-       quote => string,				# (default: global value)
+       commit => 0 | 1,                # (default: global value)
+       message_log => 0 | 1,           # (default: global value)
+       sql_save => 0 | 1,              # (default: global value)
+       quote => string,                # (default: global value)
 
-       make_only => 0 | 1,			# (default: 0)
-       flush => 0 | 1,				# (default: 1)
+       make_only => 0 | 1,             # (default: 0)
+       flush => 0 | 1,                 # (default: 1)
     );
 
 =head2 Call SQL
@@ -336,9 +342,9 @@ X<Call SQL>
     (
        # sql command
 
-       command => sql_command_string,		# (no defaults)
+       command => sql_command_string,   # (no defaults)
 
-       # return values				# (no defaults)
+       # return values (no defaults)
 
        buffer => hash_ref | array_ref | scalar_ref | callback_ref,
        buffer_options => any_ref_type,
@@ -346,18 +352,19 @@ X<Call SQL>
        buffer_hashkey => column_name,
        or
        buffer_hashkey => [col1,col2,...],
-	   ...
-       buffer_arrayref => 0 | 1,		# (default: 1)
-	   buffer_hashindex => arrayreaf	# (no defaults)
+       ...
+       buffer_arrayref => 0 | 1,        # (default: 1)
+       buffer_hashindex => arrayreaf,   # (no defaults)
+       buffer_reverse => 0 | 1,         # (defaunt: 0)
 
        # options
 
-       commit => 0 | 1,				# (default: global value)
-       message_log => 0 | 1,			# (default: global value)
-       sql_save => 0 | 1,			# (default: global value)
+       commit => 0 | 1,                 # (default: global value)
+       message_log => 0 | 1,            # (default: global value)
+       sql_save => 0 | 1,               # (default: global value)
 
-       make_only => 0 | 1,			# (default: 0)
-       flush => 0 | 1,				# (default: 1)
+       make_only => 0 | 1,              # (default: 0)
+       flush => 0 | 1,                  # (default: 1)
     );
 
 =head2 General Methods
@@ -401,7 +408,7 @@ X<General Methods>
 
        # where clause
 
-       where => where_clause,			# (se: Where Clause) 
+       where => where_clause,
 
        # return buffer
 
@@ -409,7 +416,7 @@ X<General Methods>
     );
 
  setDumper
-    $state = SQL::SimpleOps->setDumper( false | true );	(default: false)
+    $state = SQL::SimpleOps->setDumper( false | true );  # (default: false)
 
 =head1 DESCRIPTION
 X<DESCRIPTION>
@@ -498,7 +505,7 @@ X<Configuration File>
 
 The config file is not mandatory.
 
-It is the resource used to load the options to initialize the constructor and was created to minize the risk of code changes. 
+It is the resource used to load the options to initialize the constructor and was created to minimize the risk of code changes. 
 You can specify all options and provide changes without recoding.
 
 The format of config file must be JSON and respect the struct below.
@@ -513,10 +520,10 @@ The format of config file must be JSON and respect the struct below.
     "commit":"0 | 1",
     "connect":"0 | 1",
     "interface":"dbi",
-    "interface_options":{
-        "options1":"value",
+    "interface_options":{       # the list of options depends of interface in use
+        "options1":"value",     # the options may not be required, depends of interface
         "options2":"value",
-        "...":"..."					<- no comma at end is allowed
+        "...":"..."
      },
     "message_log":"value",
     "message_syslog_facility":"string",
@@ -528,16 +535,16 @@ The format of config file must be JSON and respect the struct below.
     "sql_save_name":"string",
     "sql_save_dir":"string",
     "sql_save_bydate":"0 | 1",
-    "tables":{
-       "table1_alias":{
+    "tables":{                  # the list of cols and names depends of table in mapped
+       "table1_alias":{         # the maps is not required, use only if need
            "cols":{
               "col1_alias_name":"col1_real_name",
-              "...":"..."				<- no comma at end is allowed
+              "...":"..."
            },
           "name":"real_table_name_on_database"
         },
-       "...":"..."					<- no comma at end is allowed
-     }							<- no comma at end is allowed
+       "...":"..."
+     }
   }
 
 B<NOTE:> The example listed above is a simple illustration,
@@ -579,34 +586,32 @@ The C<where>, C<order_by> and C<group_by> can be configured using the following 
   my @where = ( where1, ...  );
   select( where => \@where, ... );
 
-=head3 Loading Data into Applications (C<buffer>, C<buffer_options>, C<buffer_hashkey> and C<buffer_arrayref> options)
-X<Loading Data into Applicatons>
+=head3 Data manipulation options (C<buffer>, C<buffer_options>, C<buffer_hashkey>, C<buffer_arrayref>, C<buffer_reverse> and C<subqueries> options)
+X<Data Manipulation Options>
 
 Exists two different process to manipulate the application data with the module.
-The first update data into the database (C<Insert>, C<Delete> and C<Update>) and the second get data from the database (C<Select> and C<SelectCursor>).
 
-The first process the data will be sent by arguments, where the module will convert to SQL command and run it.
+The first sends data to the database (C<Insert>, C<Delete> and C<Update>) and;
 
-The second process the data will be load into variable sent by arguments, where the module will store the data.
+The second get data from the database (C<Select> and C<SelectCursor>).
 
 B<Example1:> Putting the data into the database.
 
-  SQL::SimpleOps->Insert
+  SQL::SimpleOps->Insert          # fields using hash format
   (
      table => "my_table",
-     fields =>					# (assign by hash)
+     fields =>
      {
        id => 1,
        name => "my_name",
-       ...
      }
   );
   or
-  SQL::SimpleOps->Insert
+  SQL::SimpleOps->Insert          # fields based value option
   (
      table => "my_table",
-     fields => [ id, name ],			# (array of fields)
-     values => [ [ 1, "my_name"] ],		# (array into array)
+     fields => [ id, name ],
+     values => [ 1, "my_name" ],
   );
 
 B<NOTE:> The return code must be C<SQL_SIMPLE_RC_OK> for successful or C<SQL_SIMPLE_RC_ERROR> if any errors.
@@ -656,7 +661,7 @@ B<Example4:>
   {
      foreach my $id(sort(keys(%{$my_buffer{$ref}})))
      {
-        print "id=".$id." -- value=".$my_buffer{$ref}->{$id}."\n";
+        print "id=".$id." -- value=".$ref->{$id}."\n";
      }
   } 
 
@@ -678,7 +683,7 @@ The best type of C<buffer> is the C<hash_ref> with C<buffer_hashkey> option, whe
 
 B<Example6:>
 
-  SQL::SimpleOps->Select( buffer => \%my_buffer, buffer_hashkey => "id", fields => [ "id", ... ], ... );
+  SQL::SimpleOps->Select( buffer => \%my_buffer, buffer_hashkey => "id", fields => [ "id", "fld1", "fld2", ... ], ... );
 
   foreach my $id(sort(keys(%my_buffer)))
   {
@@ -740,8 +745,7 @@ B<Example9:>
 
   foreach my $key1(@my_index)
   {
-	print "key: ".$key.", buffer: ".$my_hash{$key},"\n";
-
+     print "key: ".$key.", buffer: ".$my_hash{$key},"\n";
   }
 
 B<REMEMBER:> You can use this option if your C<buffer> is a C<hashref>, otherwise, use the buffer's option C<arrayref>.
@@ -766,10 +770,10 @@ B<Example10:>
   ...
   sub subrot_1()
   {
-     my $ref = shift;			# my hash of extracted row from table1
-     my $any = shift;			# my 'buffer_options' option.
+     my $ref = shift;   # my hash of extracted row from table1
+     my $any = shift;   # my 'buffer_options' option.
      ...
-     return SQL::SimpleOps->Select	# returing the code of call
+     return SQL::SimpleOps->Select   # returing the code of call
      (
         table => table2,
         where => [ id => $ref->{register} ],
@@ -780,28 +784,120 @@ B<Example10:>
   ...
   sub subrot_2()
   {
-     my $ref = shift;		# my hash of extracted row from table2
-     my $any = shift;		# my 'buffer_options' options created on table1
+     my $ref = shift;     # my hash of extracted row from table2
+     my $any = shift;     # my 'buffer_options' options created on table1
      ...
-     return 1 if (...any condition..);	# rc != 0 will ignore the row
+     return 1 if (...any condition..);   # rc != 0 will ignore the row
      ...
-     push(@{any},$ref);		# putting the data into @any_info array
+     push(@{any},$ref);	  # putting the data into @any_info array
      return 0;
   };
 
 B<NOTE:> This example is not a real use case, it is simple sample for references.
 
+=item B<Reversed Extractions>
+
+The reverted extractions allow build the buffer as LiFo format (Last In is the First Out),
+where the extracted buffer in reversed.
+
+B<Example11:>
+
+Example of Table:
+
+ +----+------+-------+
+ | id | next | value |
+ +----+------+-------+
+ |  0 |    2 |   100 |
+ |  1 |    4 |   100 |
+ |  2 |    3 |   100 |
+ |  3 |    6 |   200 |
+ |  4 |    5 |   200 |
+ |  5 |    7 |   200 |
+ |  6 |    8 |   300 |
+ |  7 |    0 |   300 |
+ |  8 |    0 |   300 |
+ +----+------+-------+
+
+Code1:
+
+  my @my_buffer;
+  my $my_flush = 1;
+  my $my_id = 0;
+
+  while (1)
+  {
+     $mymod->Select
+     (
+        table => 'mytable',
+        fields => [ 'id', 'next', 'value' ],
+        buffer => \@my_buffer,
+        buffer_reversed => 1,
+        where =>
+        [
+          id => $my_id,
+        ],
+        flush => $my_flush,
+        notfound => 1,
+        order_by => 'id',
+     );
+     last if ($buffer[0]->{next} == 0);
+     my_id = $buffer[0]->{next};
+  }
+
+Result1:
+
+ +-------+--------------------------------------+
+ | index | hash                                 |
+ +-------+--------------------------------------+
+ |     0 | { id => 8, next => 0, value => 300 } |
+ |     1 | { id => 6, next => 8, value => 300 } |
+ |     2 | { id => 3, next => 6, value => 200 } |
+ |     3 | { id => 2, next => 3, value => 100 } |
+ |     4 | { id => 0, next => 2, value => 100 } |
+ +-------+--------------------------------------+
+
+Code2:
+
+  my @my_buffer;
+  my $my_flush = 1;
+
+  while (1)
+  {
+     my $where = [ value => [ '>', $buffer[0]->{value} ] if (@my_buffer);
+     $mymod->Select
+     (
+        table => 'mytable',
+        fields => [ 'id', 'value' ],
+        buffer => \@my_buffer,
+        buffer_reversed => 1,
+        where => $where,
+        flush => $my_flush,
+        notfound => 1,
+        order_by => 'id',
+     );
+     last if ($mymod->getRows() == 0);
+  }
+
+Result2:
+
+ +-------+---------------------------+
+ | index | hash                      |
+ +-------+---------------------------+
+ |     0 | { id => 6, value => 300 } |
+ |     1 | { id => 3, value => 200 } |
+ |     2 | { id => 0, value => 100 } |
+ +-------+---------------------------+
+
 =item B<SubQueries>
 
 The subquery is a select into select, available to create on merged ou cross reference list of data.
 
-B<Example11:>
-
-  my @any_info;
+B<Example12:>
 
   my $mymod = new SQL::SimplesOps(...);
 
-  $mymod->SimpleOps->Select
+  my @any_info;
+  $mymod->Select
   (
      table => table1,
      where => [ id => $mymod->SelectSubQuery( table => "table2", field => "my_tb2_id", where => [ ... ] ) ],
@@ -828,19 +924,20 @@ The Aliases Table is not mandatory. See B<EXAMPLES>
 
 When mapped the B<Aliases Column> these aliases will be the keys in the C<hashref buffers>
 
-B<Why should I?> Some places disallow tables using generic names (out of the norms), in this case, you can use aliases to abstract the real name in your the databases.
+B<Why should I?> Some companies may impose rules and/or standards for column ou tables naming conventions.
+The internal aliases for external names do not require recoding if an external rule is changed.
 
-B<REMEMBER:> Do not use I<reserved words>, like function names (etc), as aliases. This keywords are reserved and is not allowed to assign as aliases (SQL will be fail).
+B<REMEMBER:> Do not use I<reserved words>, like function names (etc), as aliases. This keywords are reserved and is not allowed to assign as aliases and SQL will be fail.
 
 B<Format:>
 
   my %contents =
   (
-     aliases_table_0 =>				# table without list of fields
+     aliases_table_0 =>             # table without list of fields
      {
         name => realname_table_0,
      },
-     aliases_table_1 =>				# table with list of fields
+     aliases_table_1 =>            # table with list of fields
      {
         name => realname_table_1,
         cols =>
@@ -881,7 +978,7 @@ Results:
 
 B<NOTE:> The '*' option will not assign alias names in the SQL Command.
 
-B<NOTE:> <NOTE:> You can mix your C<select> with C<Alias Table Fields> and non-Alias entries. but I must remember this:
+B<NOTE:> You can mix your C<select> with C<Alias Table Fields> and non-Alias entries. but I must remember this:
 C<select> in tables without the C<fields> option will be limited to the definition of C<alias table>, 
 in this case, to obtain all fields you must impose C<fields => "*">:
 
@@ -964,7 +1061,7 @@ B<Operators:> The follow operators was been builtin:
   Operator	Description
   undef		"is null"
   =		"equal" condition (default)
-  !		"not equal"
+  !		"not equal" or "is not null" (if 'undef' value)
   !=		"not equal"
   <>		"not equal"
   >		"greater than"
@@ -989,45 +1086,45 @@ B<Example1:>
   (
      where =>
      [
-       fld000 => undef,					# ... fld000 IS NULL
+       fld000 => undef,                     # ... fld000 IS NULL
 
-       fld010 => 1,					# ... fld010 = '1'
+       fld010 => 1,                         # ... fld010 = '1'
 
-       fld020 => [ '>', 1 ],				# ... fld020 > '1'
+       fld020 => [ '>', 1 ],                # ... fld020 > '1'
 
-       fld021 => [ '!', undef ],			# ... fld021 NOT NULL
+       fld021 => [ '!', undef ],            # ... fld021 IS NOT NULL
 
-       fld030 => [ 1, 2 ],				# ... fld030 IN ('1','2')
+       fld030 => [ 1, 2 ],                  # ... fld030 IN ('1','2')
 
-       fld031 => [ '!', 1, 2 ],				# ... fld031 NOT IN ('1','2')
+       fld031 => [ '!', 1, 2 ],             # ... fld031 NOT IN ('1','2')
 
-       fld040 => [ 1, '..', 3 ],			# ... fld040 BETWEEN ('1','3')
+       fld040 => [ 1, '..', 3 ],            # ... fld040 BETWEEN ('1','3')
 
-       fld041 => [ '!', 1, '..', 3 ],			# ... fld041 NOT BETWEEN ('1','3')
+       fld041 => [ '!', 1, '..', 3 ],       # ... fld041 NOT BETWEEN ('1','3')
 
-     [ fld050 => 1, fld051 => 2 ],			# ... ( fld050 = '1' and fld051 = '2' )
+     [ fld050 => 1, fld051 => 2 ],          # ... ( fld050 = '1' and fld051 = '2' )
 
-     [ fld060 => 1, 'or', fld061 => 2 ],		# ... ( fld060 = '1' or fld061 = '2' )
+     [ fld060 => 1, 'or', fld061 => 2 ],    # ... ( fld060 = '1' or fld061 = '2' )
 
-     [ fld070 => 1, 'and', fld071 => 2 ],		# ... ( fld070 = '1' and fld071 = '2' )
+     [ fld070 => 1, 'and', fld071 => 2 ],   # ... ( fld070 = '1' and fld071 = '2' )
 
        fld080 => 1, 'or', [ fld081 => 2, fld082 => 3 ],	# ... fld080 = '1' or ( fld081 = '2' and fld082 = '3' )
 
        fld090 => 1, [ fld091 => 2, 'or', fld092 => 3 ], # ... fld090 = '1' and ( fld091 = '2' or fld092 = '3' )
 
-       fld100 => [ '%%', 'abc' ],			# ... fld100 LIKE '%abc%'
+       fld100 => [ '%%', 'abc' ],             # ... fld100 LIKE '%abc%'
 
-       fld110 => [ '^%', 'abc' ],			# ... fld110 LIKE 'abc%'
+       fld110 => [ '^%', 'abc' ],             # ... fld110 LIKE 'abc%'
 
-       fld120 => [ '%^', 'abc' ],			# ... fld120 LIKE '%abc'
+       fld120 => [ '%^', 'abc' ],             # ... fld120 LIKE '%abc'
 
-       fld121 => [ '^^', 'ab%de' ],			# ... fld121 LIKE 'ab%de'  		# use '%' if required
+       fld121 => [ '^^', 'ab%de' ],           # ... fld121 LIKE 'ab%de'  # use '%' if required
 
-       fld130 => '\\concat(fld130,"xxxx")',		# ... fld130 = concat(fld130,"xxxx")  	# without quote
+       fld130 => '\\concat(fld130,"xxxx")',   # ... fld130 = concat(fld130,"xxxx")   # without quote
 
-       fld200 => '\\fld210',				# ... fld200 = fld210		# without quote
+       fld200 => '\\fld210',                  # ... fld200 = fld210   # without quote
 
-       fld220 => [ "!", '\\fld230' ],			# ... fld220 != fld240		# without quote
+       fld220 => [ "!", '\\fld230' ],         # ... fld220 != fld240  # without quote
 
      ],
 
@@ -1036,6 +1133,39 @@ B<Example1:>
 B<IMPORTANT:> Do not use aliases column name on the right side. The translation for this side does not apply.
 
 B<BEWARE:> The operators (if used) must be the first field on the C<array_ref>.
+
+=head2 Having Clause
+X<Having Clause>
+
+We belive that the most basic situations is supported.
+
+The C<having> clause is used because the C<where> clause cannot be used with aggregate functions.
+
+The C<having> clause is similar as C<where> clause in format and operators.
+
+B<Example1:>
+
+  SQL::SimpleOps->Select
+  (
+    having =>
+    [
+      'count(fld000)' => 10,            # count of fld000 must be 10
+
+      'count(fld010)' => [ ">", 10],    # count of fld010 must be greather than 10
+
+      'count(fld020)' => [ "<", 10),    # count of fld020 must be less than 10
+
+      'max(fld100)' => [ 10,20,30 ],    # max of fld100 must be 10 or 20 or 30
+
+      [
+         'max(fld110)' => [ ">", 10 ],  # max of fld110 must be between 11 and 19
+         'max(fld110)' => [ "<", 20 ],
+      ],
+      ...
+    ],
+  );
+
+B<REMEMBER:> The left side must be aggregate function.
 
 =head1 METHODS
 X<METHODS>
@@ -1075,19 +1205,19 @@ All parameters set in the Constructor (method new) are defined as Global Paramet
 
 Enable/disable commit after updates.
 
-Do not to be confused with the I<commit> available in the options for B<interface driver> (see L<DBI>), it has an other escope.
+Do not to be confused with the I<commit> available in the options for B<interface driver> (see L<DBI> module), it has an other escope.
 
 Defaults: The default value is disabled.
 
 =item B<db:>
 
-The name of database name. The value depend of type of interface and driver option. see L<DBI> module.
+The name of database name. The value depend of type of interface and driver option (see L<DBI> module).
 
 Defaults: no defaults
 
 =item B<driver:>
 
-Sets the name of database engine. see L<DBI> module.
+Sets the name of database engine (see L<DBI> module).
 
 Defaults: no defaults
 
@@ -1128,14 +1258,14 @@ B<NOTE:> You can enable Syslog and C<STDERR> simultanely. Use the C<SQL_SIMPLE_L
 =item B<message_syslog_service:>
 
 Sets an identifier string on the System Syslog Messages.
-See: L<Sys::Syslg>
+See: L<Sys::Syslog> module
 
 Defaults: The default value is C<message_syslog_service=SQL-SimpleOps>
 
 =item B<message_syslog_facility:>
 
 Sets the Syslog Facility for the messages on the System Syslog Messages, must be: C<local0> to C<local7>.
-See: L<Sys::Syslg>
+See: L<Sys::Syslog> module
 
 Defaults: The default value is C<local0>.
 
@@ -1150,7 +1280,7 @@ Defaults: no defaults
 This option consists the TCP Port to use for connection.
 
 The option is not mandatory because it is common to use the default database port,
-however some installations may modify the default port. The following defaul pors are known:
+however some installations may modify the default port. The following default ports are known:
 
   DB2:		50000/tcp
   MySQL:	3306/tcp
@@ -1186,6 +1316,8 @@ B<BEWARE:> You can use this feature as "Recover Database" if your engine does no
 However, it is highly recommended that you use the Database Native Resource for this purpose.
 Examples: Archive Logs, Backup Mode, and Others.
 
+B<REMEMBER:> Event logging can degrade the application if the number of occurrences is too high.
+
 Defaults: The default value is C<SQL_SIMPLE_CMD_OFF>.
 
 =item B<sql_save_bydate:>
@@ -1201,7 +1333,7 @@ Defaults: The option is disabled. See C<sql_save_dir> option.
 
 Sets the folder for writes log file process.
 
-Defaults: (unix/linux) F</var/spool/sql/> or (windows) F<c:\windows\temp>
+Defaults: (unix/linux) F</var/spool/sql/> or (windows) F<c:/windows/temp>
 
 B<NOTE:> The folder must be previously created.
 
@@ -1213,7 +1345,7 @@ Defaults: The default value is C<sql>.
 
 =item B<sql_save_ignore:>
 
-Sets enable/disable option to abort if there are errors wrtten to the Log File.
+Sets enable/disable option to abort if there are errors written to the Log File.
 
 Defaults: The default value is disabled. If errors the return code will be C<SQL_SIMPLE_RC_ERROR>.
 
@@ -1259,8 +1391,8 @@ B<Example1:> The database "my_db" using "interface_options". see L<DBI>
      ...
      interface_options =>
      {
-        RaiserError => 1, 			# (default: 0)
-        PrintError => 1,			# (default: 0)
+        RaiserError => 1,   # (default: 0)
+        PrintError => 1,    # (default: 0)
         AutoCommit => 1,
         InactiveDestroy => 1,
         AutoInactiveDestroy => 1,
@@ -1276,9 +1408,9 @@ B<Example2:> The database "my_db" writing on System Syslog Service. see L<Sys::S
      driver => "mariadb",
      db => "my_db",
      ...
-     message_log => SQL_SIMPLE_LOG_SYS,		# (default is STDERR)
-     message_syslog_facility => "local7",	# (default is "local0")
-     message_syslog_service => "my_service",	# (default is "SQL-SimpleOps")
+     message_log => SQL_SIMPLE_LOG_SYS,       # (default is STDERR)
+     message_syslog_facility => "local7",     # (default is "local0")
+     message_syslog_service => "my_service",  # (default is "SQL-SimpleOps")
      ...
   );
 
@@ -1294,9 +1426,9 @@ B<Example3:> The database "my_db" writing SQL Log Files.
      driver => "mysql",
      db => "my_db",
      ...
-     sql_save => SQL_SIMPLE_CMD_ALL,		# (default is OFF)
-     sql_save_name => "my_cmds",		# (default is "sql")
-     sql_save_dir => "/var/tmp/sql",		# (default is "/var/spool/sql")
+     sql_save => SQL_SIMPLE_CMD_ALL,   # (default is OFF)
+     sql_save_name => "my_cmds",       # (default is "sql")
+     sql_save_dir => "/var/tmp/sql",   # (default is "/var/spool/sql")
      ...
   );
 
@@ -1331,17 +1463,17 @@ A Pid that runs multiple commands will have the multiple SQL Log Files.
 
 =back
 
-B<Example4:> The database "my_db" writing SQL Log Files splited by date.
+B<Example4:> The database "db" writing SQL Log Files splited by date.
 
   my $mymod = SQL::SimpleOps->new
   (
      driver => "mysql",
-     db => "my_db",
+     db => "dbs",                      # (will be the second word as filename)
      ...
-     sql_save => SQL_SIMPLE_CMD_ALL,		# (default is OFF)
-     sql_save_name => "my_cmds",		# (default is "sql")
-     sql_save_dir => "/var/tmp/sql",		# (default is "/var/spool/sql")
-     sql_save_bydate => 1,			# (default is OFF)
+     sql_save => SQL_SIMPLE_CMD_ALL,   # (default is OFF)
+     sql_save_name => "cmds",          # (default is "sql", will be the first word as filename)
+     sql_save_dir => "/var/tmp/sql",   # (default is "/var/spool/sql")
+     sql_save_bydate => 1,             # (default is OFF)
      ...
   );
 
@@ -1349,7 +1481,7 @@ The SQL Command will be written as flat file separeted into distinct folders by 
 
 The folder will be create as:
 
-F<B</var/tmp/sql>/[YYYY]/[YYYYmm]/[YYYYmmdd]/B<my_cmds>.B<my_db>.[today].[pid].[counter]>
+F<B</var/tmp/sql>/[YYYY]/[YYYYmm]/[YYYYmmdd]/B<cmds>.B<dbs>.[today].[pid].[counter]>
 
 B<Example5:> The database "my_db" forcing commit for each update command.
 
@@ -1358,12 +1490,14 @@ B<Example5:> The database "my_db" forcing commit for each update command.
      driver => "mysql",
      db => "my_db",
      ...
-     commit => 1,				# (default is OFF)
+     commit => 1,    # (default is OFF)
      ...
   );
 
-The C<commit> option for each update command can cause degradation in the process or even the database engine.
-Use this option wisely.
+The C<commit> option for each update command can cause latency in the process or even the database engine
+(depending on the mechanisms of each database). Use this option wisely.
+
+B<REMEMBER:> Some database engine have C<commit> enabled by default.
 
 B<When can i use it?>
 The C<commit> option can be used at the end of a large number of updates,
@@ -1371,13 +1505,13 @@ and that at a certain point you need to create relational consistency to reduce 
 
 In this case, you can either execute the Commit SQL Command or execute the last update command of the cycle using C<commit> option.
 
-  SQL::SimpleOps->Commit();			# (simple commit command)
+  SQL::SimpleOps->Commit();   # (simple commit command)
   or
   SQL::SimpleOps->Update
   (
      table => "my_table",
      ...
-     commit => 1,				# (default is OFF)
+     commit => 1,             # (default is OFF)
   );
 
 =head3 Openning MySQL/MariaDB Engine
@@ -1440,11 +1574,11 @@ B<Example2:> The database as "my_db" and fileset as "my_file.db":
   (
      driver => "sqlite",
      db => "my_db"
-     dbfile => "/var/tmp/my_file.db"	# (or: dbfile => "my_file")
+     dbfile => "/var/tmp/my_file.db"   # (or: dbfile => "my_file")
      interface_options =>
      {
-        RaiseError => 1,		# (the default is 0)
-        PrintError => 1,		# (the default is 0)
+        RaiseError => 1,   # (the default is 0)
+        PrintError => 1,   # (the default is 0)
      },
   );
 
@@ -1555,7 +1689,7 @@ X<Insert>
 
 This method insert the selected rows from a table.
 
-  SQL::SimpleOps->Insert			# (insert by fields based hash)
+  SQL::SimpleOps->Insert   # (insert by fields based hash)
   (
      table => "my_table",
      fields =>
@@ -1572,7 +1706,7 @@ This method insert the selected rows from a table.
      ...
   );
   or
-  SQL::SimpleOps->				# (insert be fields/values array)
+  SQL::SimpleOps->   # (insert be fields/values array)
   (
      table => "my_table",
      fields => [ col_1, col_2, ... ],
@@ -1580,7 +1714,7 @@ This method insert the selected rows from a table.
      ...
   );
   or
-  SQL::SimpleOps->Insert			# (insert by fields on array)
+  SQL::SimpleOps->Insert   # (insert by fields on array)
   (
      table => "my_table",
      fields => [ col_1, col_2, col_3,, ... ],
@@ -1593,7 +1727,7 @@ This method insert the selected rows from a table.
      ...
   );
   or
-  SQL::SimpleOps->Insert			# (insert unique field)
+  SQL::SimpleOps->Insert   # (insert unique field)
   (
      table => "my_table",
      fields => [ col_1 ],
@@ -1610,8 +1744,8 @@ B<Example1:> Inserting rows without C<conflict> option.
      table => "my_table",
      fields =>
      {
-        key => 1,			# (it is a key)
-        value_1 => value,		# (it is a value)
+        key => 1,           # (it is a key)
+        value_1 => value,   # (it is a value)
      },
   );
 
@@ -1626,12 +1760,12 @@ B<Example2:> Inserting rows with C<conflict> option. If the key already only upd
      table => "my_table",
      fields =>
      {
-        key => 1,			# (it is mais key)
-        value_1 => value,		# (it is a value)
+        key => 1,           # (it is mais key)
+        value_1 => value,   # (it is a value)
      },
      conflict =>
      {
-        my_update => $my_time,		# (make systime update if already)
+        my_update => $my_time,   # (make systime update if already)
      }
   );
 
@@ -1646,12 +1780,12 @@ B<Example3:> Inserting rows with C<conflict> and C<conflict_key> options. If the
      table => "my_table",
      fields =>
      {
-        key => 1,			# (it is mais key)
-        value_1 => value,		# (it is a value)
+        key => 1,           # (it is mais key)
+        value_1 => value,   # (it is a value)
      },
      conflict =>
      {
-        my_update => $my_time,		# (make systime update if already)
+        my_update => $my_time,   # (make systime update if already)
      }
      conflict_key => "key",
   );
@@ -1676,15 +1810,15 @@ This method extract the selected rows from a tables based the conditions in the 
 
   SQL::SimpleOps->Select
   (
-     table => my_table_list,			# mandatory
-     fields => [ my_list_of_fields ],		# optional for single table, defaul: all columns
-                                                # mandatory for multiple tables list
-     where => [ my_where_conditions ],		# mandatory for 'where' rules
-     order_by => [ my_order_list ],		# mandatory for 'order by' rules
-     group_by => [ my_group_list ],		# mandatory for 'group by' rules
-     buffer => my_buffer_ref,			# mandatory for extract the data
-     flush => 1 | 0,				# options, reset buffer before load
-						# default: buffer will be reseted
+     table => my_table_list,            # mandatory
+     fields => [ my_list_of_fields ],   # optional for single table, defaul: all columns
+	                                    # mandatory for multiple tables list
+     where => [ my_where_conditions ],  # mandatory for 'where' rules
+     order_by => [ my_order_list ],     # mandatory for 'order by' rules
+     group_by => [ my_group_list ],     # mandatory for 'group by' rules
+     buffer => my_buffer_ref,           # mandatory for extract the data
+     flush => 1 | 0,                    # options, reset buffer before load
+                                        # default: buffer will be reseted
   );
 
 The option C<fields> is not mandatory, however:
@@ -1821,11 +1955,11 @@ however, you can use additional conditions for this items.
   (
      ...
      cursor_command =>
-         SQL_SIMPLE_CURSOR_TOP |	# read first page
-         SQL_SIMPLE_CURSOR_LAST |	# read last page
-         SQL_SIMPLE_CURSOR_NEXT |	# read forward page, based last pointer
-         SQL_SIMPLE_CURSOR_BACK |	# read backward page, based last pointer
-         SQL_SIMPLE_CURSOR_RELOAD,	# read current page, based last pointer
+         SQL_SIMPLE_CURSOR_TOP |    # read first page
+         SQL_SIMPLE_CURSOR_LAST     # read last page
+         SQL_SIMPLE_CURSOR_NEXT |   # read forward page, based last pointer
+         SQL_SIMPLE_CURSOR_BACK |   # read backward page, based last pointer
+         SQL_SIMPLE_CURSOR_RELOAD,  # read current page, based last pointer
      ...
      cursor => current_cursor_value,
      ...
@@ -1836,8 +1970,8 @@ however, you can use additional conditions for this items.
      cursor_info => %cursor_info | @cursor_info | $cursor_info,
      ...
      cursor_order =>
-         SQL_SIMPLE_ORDER_ASC |		# buffer using enforced order_by ASC
-         SQL_SIMPLE_ORDER_DESC          # buffer using enforced order_by DESC
+         SQL_SIMPLE_ORDER_ASC |   # buffer using enforced order_by ASC
+         SQL_SIMPLE_ORDER_DESC    # buffer using enforced order_by DESC
      ...
      limit => no_lines,
   );
@@ -1930,22 +2064,22 @@ B<Example1:> Using single key:
 
   %buffer_info =
   {
-     rc => value,			# Single value
-     lines => value,			# Single value
-     first => value-first-key,		# Single value
-     last => value-last-key,		# Single value
-     previouscmd => value-cmd		# Single value
+     rc => value,                 # Single value
+     lines => value,              # Single value
+     first => value-first-key,    # Single value
+     last => value-last-key,      # Single value
+     previouscmd => value-cmd     # Single value
   };
 
 B<Example2:> Using multiple keys:
 
   %buffer_info =
   {
-     rc => value,				# Single value
-     lines => value,				# Single value
-     first => [ first1, ..., firstN, ],		# Array
-     last => [ first1, ..., firstN, ],		# Array
-     previouscmd => value,			# Single value
+     rc => value,                         # Single value
+     lines => value,                      # Single value
+     first => [ first1, ..., firstN, ],   # Array
+     last => [ first1, ..., firstN, ],    # Array
+     previouscmd => value,                # Single value
   };
 
 =item B<array_ref:>
@@ -1958,22 +2092,22 @@ B<Example1:> Using single key:
 
   @buffer_info =
   [
-     value,		# RC value, indexed by #0
-     value,		# Lines value, indexed by #1
-     value-first-key,	# First value, indexed by #2
-     value-last-key,	# Last value, indexed by #3
-     value-last-cmd,	# Last Command, indexed by #4
+     value,             # RC value, indexed by #0
+     value,             # Lines value, indexed by #1
+     value-first-key,   # First value, indexed by #2
+     value-last-key,    # Last value, indexed by #3
+     value-last-cmd,    # Last Command, indexed by #4
   ];
 
 B<Example2:> Using multiple keys:
 
   @buffer_info =
   [
-     value,			# RC value, indexed by #0
-     value,			# Lines value, indexed by #1
-     [ first1, ..., firstN, ],	# First Array values, indexed by #2
-     [ first1, ..., firstN, ],	# Last Array values, indexed by #3
-     value,			# Last Command, indexed by #4
+     value,                     # RC value, indexed by #0
+     value,                     # Lines value, indexed by #1
+     [ first1, ..., firstN, ],  # First Array values, indexed by #2
+     [ first1, ..., firstN, ],  # Last Array values, indexed by #3
+     value,                     # Last Command, indexed by #4
   ];
 
 =item B<scalar_ref:>
@@ -2057,11 +2191,11 @@ B<NOTE:> The C<buffer_info> is a reserved area where it is not recommended to ma
 
 By default the following ordered rules will be applied:
 
- SQL_SIMPLE_COMMAND_TOP		ascending
- SQL_SIMPLE_COMMAND_BACK	descending
- SQL_SIMPLE_COMMAND_NEXT	ascending
- SQL_SIMPLE_COMMAND_LAST	descending
- SQL_SIMPLE_COMMAND_RELOAD	ascending
+ SQL_SIMPLE_COMMAND_TOP     ascending
+ SQL_SIMPLE_COMMAND_BACK    descending
+ SQL_SIMPLE_COMMAND_NEXT    ascending
+ SQL_SIMPLE_COMMAND_LAST    descending
+ SQL_SIMPLE_COMMAND_RELOAD  ascending
 
 In this case the first and last rows in the buffer will not be aligned with the cursor keys (C<cursor_info>).
 
@@ -2239,12 +2373,12 @@ This method updates the selected to create C<select> into the C<select> as subqu
 
   SQL::SimpleOps->SelectSubQuery
   (
-     ...			# see: Select options and format
+     ...              # see: Select options and format
   );
   or
   SQL::SimpleOps->Select
   (
-     ...			# see: Select options and format
+     ...              # see: Select options and format
 	 subquery => 1,
   );
 
@@ -2499,20 +2633,20 @@ B<Example1:>
   ...
   my $mymod = SQL::SimpleOps->new ( ... );
 
-  $mymod->setDumper(1);		# use '1' to enable the show
+  $mymod->setDumper(1);   # use '1' to enable the show
 
   $mymod->Select( ... );
   print "mySQL: ".$mymod->getLastSQL()."\n";
 
-  $mymod->setDumper(0);		# use '0' to disable the show
+  $mymod->setDumper(0);   # use '0' to disable the show
   ...
 
 Results:
 
-  select = {	# this text will be sent in STDERR
-      ...		# your select command arguments
+  select = {            # this text will be sent in STDERR
+      ...               # your select command arguments
   }
-  mySQL: SELECT ....	# your create SQL command
+  mySQL: SELECT ....    # your create SQL command
 
 =head1 CONSTANTS
 X<CONSTANS>
@@ -2526,9 +2660,9 @@ The constants was created to identify the values and actions for some options.
 The parameters can be used to enable the I<Save SQL Command Process>.
 This process write on local disks the SQL Command when you can use for Debuging or Recover Database.
 
-  SQL_SIMPLE_CMD_OFF		# Save Command is disabled (default)
-  SQL_SIMPLE_CMD_ON		# Save Command is enabled for update
-  SQL_SIMPLE_CMD_ALL		# Save Command is enabled for update/read
+  SQL_SIMPLE_CMD_OFF   # Save Command is disabled (default)
+  SQL_SIMPLE_CMD_ON    # Save Command is enabled for update
+  SQL_SIMPLE_CMD_ALL   # Save Command is enabled for update/read
 
   my $mymod = SQL::SimpleOps->new( sql_save => SQL_SIMPLE_CMD_OFF | SQL_SIMPLE_CMD_ON | SQL_SIMPLE_CMD_ALL, ... );
 
@@ -2536,9 +2670,9 @@ Default: C<SQL_SIMPLE_CMD_OFF>
 
 B<NOTE:> You can override (temporary) this option on each SQL execution (valid for all commands).
 
-  SQL::SimpleOps->Select( sql_save => 1, ... );		# (if global disabled)
+  SQL::SimpleOps->Select( sql_save => 1, ... );   # (if global disabled)
   or
-  SQL::SimpleOps->Select( sql_save => 0, ... );		# (if global enabled)
+  SQL::SimpleOps->Select( sql_save => 0, ... );   # (if global enabled)
 
 =item I<message_log> option
 
@@ -2548,10 +2682,10 @@ The send messages does not abort the module.
 
 We recommended using the I<Syslog Service> for complexed applications.
 
-  SQL_SIMPLE_LOG_OFF		# Log is disabled
-  SQL_SIMPLE_LOG_SYS		# Log is enabled for syslog service
-  SQL_SIMPLE_LOG_STD		# Log is enabled for STDERR (default)
-  SQL_SIMPLE_LOG_ALL		# Log is enabled for STDERR/Syslog
+  SQL_SIMPLE_LOG_OFF   # Log is disabled
+  SQL_SIMPLE_LOG_SYS   # Log is enabled for syslog service
+  SQL_SIMPLE_LOG_STD   # Log is enabled for STDERR (default)
+  SQL_SIMPLE_LOG_ALL   # Log is enabled for STDERR/Syslog
 
   my $mymod = SQL::SimpleOps->new
   (
@@ -2569,19 +2703,19 @@ Default: C<SQL_SIMPLE_LOG_STD>
 
 B<NOTE:> You can override (temporary) this option on each SQL execution (valid for all command).
 
-  SQL::SimpleOps->Select( message_log => 1, ... );		# (if global disabled)
+  SQL::SimpleOps->Select( message_log => 1, ... );   # (if global disabled)
   or
-  SQL::SimpleOps->Select( message_log => 0, ... );		# (if global enabled)
+  SQL::SimpleOps->Select( message_log => 0, ... );   # (if global enabled)
 
 =item I<cursor_command> option
 
 The parameters can be used to establish the operations on extract list.
 
-  SQL_SIMPLE_CURSOR_TOP		# Cursor Command Top of List (ascending order)
-  SQL_SIMPLE_CURSOR_BACK	# Cursor Command Backward (descending order)
-  SQL_SIMPLE_CURSOR_NEXT	# Cursor Command Forward (ascending order)
-  SQL_SIMPLE_CURSOR_LAST	# Cursor Command Bottom of List (descending order)
-  SQL_SIMPLE_CURSOR_RELOAD	# Cursor Command Reload the Current Page (ascending order)
+  SQL_SIMPLE_CURSOR_TOP     # Cursor Command Top of List (ascending order)
+  SQL_SIMPLE_CURSOR_BACK    # Cursor Command Backward (descending order)
+  SQL_SIMPLE_CURSOR_NEXT    # Cursor Command Forward (ascending order)
+  SQL_SIMPLE_CURSOR_LAST    # Cursor Command Bottom of List (descending order)
+  SQL_SIMPLE_CURSOR_RELOAD  # Cursor Command Reload the Current Page (ascending order)
 
 Default: no defaults
 
@@ -2589,9 +2723,9 @@ Default: no defaults
 
 The parameters can be used to determine the sort ordered on columns.
 
-  SQL_SIMPLE_ORDER_OFF		# Order is disabled (for SelectCursor only)
-  SQL_SIMPLE_ORDER_ASC		# Order is Ascending
-  SQL_SIMPLE_ORDER_DESC		# Order is Descending
+  SQL_SIMPLE_ORDER_OFF    # Order is disabled (for SelectCursor only)
+  SQL_SIMPLE_ORDER_ASC    # Order is Ascending
+  SQL_SIMPLE_ORDER_DESC   # Order is Descending
 
 Default: C<SQL_SIMPLE_ORDER_ASC>
 
@@ -2603,10 +2737,10 @@ The command, by default, does the sorting using the C<cursor_key> option.
 
 This values estabilish the termination code after the method has been done.
 
-  SQL_SIMPLE_RC_SYNTAX		# Return Code Syntax Error
-  SQL_SIMPLE_RC_OK		# Return Code Execution SQL Successful
-  SQL_SIMPLE_RC_ERROR		# Return Code Execution SQL with errors
-  SQL_SIMPLE_RC_EMPTY		# Return Code Execution SQL Successful with no Rows
+  SQL_SIMPLE_RC_SYNTAX   # Return Code Syntax Error
+  SQL_SIMPLE_RC_OK       # Return Code Execution SQL Successful
+  SQL_SIMPLE_RC_ERROR    # Return Code Execution SQL with errors
+  SQL_SIMPLE_RC_EMPTY    # Return Code Execution SQL Successful with no Rows
 
 B<NOTE:> If you run queries with no results (no rows found), the termination code will be C<SQL_SIMPLE_RC_EMPTY>.
 However, you can use the C<notfound> option to force this query to be C<SQL_SIMPLE_RC_OK>.
@@ -2636,13 +2770,13 @@ This values are used with C<getAliasCols> to define how to translate the name to
 where the translation depends on the action in question in the command,
 some parts of command the aliases is allowed and an others not.
 
-  SQL_SIMPLE_ALIAS_INSERT - used as: INSERT INTO ... (field) ...
-  SQL_SIMPLE_ALIAS_UPDATE - used as: UPDATE ... SET field = ...
-  SQL_SIMPLE_ALIAS_DELETE - not applied
-  SQL_SIMPLE_ALIAS_SELECT - used as: SELECT field .... FROM ....
-  SQL_SIMPLE_ALIAS_WHERE - used as: ... WHERE field ....
-  SQL_SIMPLE_ALIAS_ORDERBY - used as: ... ORDER BY field ...
-  SQL_SIMPLE_ALIAS_GROUPBY - used as: ... GROUP BY fild ...
+  SQL_SIMPLE_ALIAS_INSERT   - used as: INSERT INTO ... (field) ...
+  SQL_SIMPLE_ALIAS_UPDATE   - used as: UPDATE ... SET field = ...
+  SQL_SIMPLE_ALIAS_DELETE   - not applied
+  SQL_SIMPLE_ALIAS_SELECT   - used as: SELECT field .... FROM ....
+  SQL_SIMPLE_ALIAS_WHERE    - used as: ... WHERE field ....
+  SQL_SIMPLE_ALIAS_ORDERBY  - used as: ... ORDER BY field ...
+  SQL_SIMPLE_ALIAS_GROUPBY  - used as: ... GROUP BY fild ...
 
 =back
 
@@ -2672,10 +2806,10 @@ You can run the public methods and/or make changes or adjustements in the data b
 
 The plugin must return the following termination code:
 
-  rc < 0	Syntax error and abort the action;
-  rc = 0	Successful and continue the action;
-  rc = 1	Error and abort the action;
-  rc = 2	Successful but skip the action.
+  rc < 0   Syntax error and abort the action;
+  rc = 0   Successful and continue the action;
+  rc = 1   Error and abort the action;
+  rc = 2   Successful but skip the action.
 
 B<BEWARE:> Do not make changes on currents plugins.
 
@@ -2695,7 +2829,7 @@ The constructor must be:
   sub new()
   {
      my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::[interface]::[driver]';
-     my $self = {@};	# <-- sql_simple as argument
+     my $self = {@}; # <-- sql_simple as argument
      bless($self,$class);
   }
 
@@ -3336,13 +3470,13 @@ The second does not use an L<Aliases Table> (no aliases available).
 
 =head3 Glossary
 
- fld_realX		Field's realname.
- fld_aliasX		Field's alias name.
- fld_noalias	Field without alias name.
- tab_realX		Table's realname.
- tab_aliasX		Table's alias name.
- tab_noalias	Table without alias name.
- bad_alias		Table without alias and not in table list.
+ fld_realX    Field's realname.
+ fld_aliasX	  Field's alias name.
+ fld_noalias  Field without alias name.
+ tab_realX    Table's realname.
+ tab_aliasX   Table's alias name.
+ tab_noalias  Table without alias name.
+ bad_alias    Table without alias and not in table list.
 
 =head2 Tests with L<Aliases Table>
 
@@ -3728,6 +3862,17 @@ X<SELECT AND GROUPBY COMMAND>
  Select( table => ["tab_alias1","tab_alias2"], fields => [ {"fld_alias1"=>"my1"},{"fld_alias2"->"my2"} ], group_by => [ "tab_alias1.my1","tab_alias1.my2" ] )
  warning: translate the table name 'tab_real1' but 'my2' is not assigned in same table -- DOT NOT USE
  returns: SELECT fld_alias1 my1, fld_alias2 my2 FROM tab_real1 tab_alias1, tab_real2 tab_alias2 GROUP BY tab_alias1.my1, tab_alias1.my2
+
+=head3 SELECT AND HAVING COMMAND
+X<SELECT AND GROUPBY COMMAND>
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], having => [ "count(fld_alias1)" => 1 ] )
+ note: lower case is supported
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 HAVING count(fld_real1) = 1
+
+ Select( table => "tab_alias1", fields => [ "fld_alias1" ], having => [ "count(fld_alias1)" => [ '>', 0 ], "count(fld_alias1)" => [ ',', 10 ], ] )
+ note: lower case is supported
+ returns: SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 HAVING count(fld_real1) > 0 AND 1 count(fld_real1) < 10
 
 =head3 SELECT AND ORDERBY COMMAND
 X<SELECT AND ORDERBY COMMAND>
@@ -5128,6 +5273,44 @@ B<Command:> Select and SelectCursor
 
 =back
 
+=head2 049E Cursor_order invalid
+X<049E>
+
+=over
+
+=item *
+
+B<Error:> The ordered mode in the cursor select must be 'asc' or 'desc'
+
+=item *
+
+B<Action:> Check the C<cursor_order> in the C<SelectCursor> command
+
+=item *
+
+B<Command:> SelectCursor
+
+=back
+
+=head2 050E Buffer reverse invalid, buffer is not arrayref
+X<050E>
+
+=over
+
+=item *
+
+B<Error:> The C<buffer> must be arrayref to use the C<buffer_reverse> option
+
+=item *
+
+B<Action:> Check the C<buffer> option type in the C<Select> command
+
+=item *
+
+B<Command:> Select
+
+=back
+
 =head2 099S [I<command>] I<dbh-interface-message>
 X<099S>
 
@@ -5164,17 +5347,17 @@ B<Action:> Internal Module Error, open a issue.
 
 =head1 SEE ALSO
 
-L<DBD::mysql>, L<DBD::Pg>, L<DBD::SQLite>, L<DBI>
+L<DBI>, L<DBD>, L<DBD::mysql>, L<DBD::Pg>, L<DBD::SQLite>
 
 =head1 EXTERNAL REFERENCES
 X<EXTERNAL REFERENCES>
 
+L<SQL Wiki|https://en.wikipedia.org/wiki/SQL>,
+L<W3C|https://www.w3schools.com/sql/>,
 L<MySQL|https://www.mysql.com/>,
 L<MariaDB|https://www.mariadb.org/>,
 L<Postgres|https://www.postgresql.org/>,
-L<SQLite|https://www.sqlite.org/>,
-L<SQL Wiki|https://en.wikipedia.org/wiki/SQL>,
-L<W3C|https://www.w3schools.com/sql/>
+L<SQLite|https://www.sqlite.org/>
 
 =head1 AUTHOR
 X<AUTHOR>
@@ -5184,7 +5367,7 @@ Carlos Celso, E<lt>ccelso@cpan.orgE<gt>
 =head1 COPYRIGHT
 X<COPYRIGHT>
 
-Copyright (C) 2008-2024 by Carlos Celso
+Copyright (C) 2008-2025 by Carlos Celso
 
 =head1 LICENSE
 X<LICENSE>

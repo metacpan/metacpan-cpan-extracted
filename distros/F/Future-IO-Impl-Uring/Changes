@@ -1,5 +1,8 @@
 Revision history for Future-IO-Impl-Uring
 
+0.010     2026-04-05 22:06:08+02:00 Europe/Brussels
+          - Use IO::Uring::Singleton
+
 0.009     2026-03-01 15:29:09+01:00 Europe/Brussels
           - Declare dependency on correct version of Future::IO
 

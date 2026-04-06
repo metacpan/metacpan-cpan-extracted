@@ -1,4 +1,4 @@
-SQL-SimpleOps version 2024.213.1
+SQL-SimpleOps version 2026.095.1
 ================================
 
  The README is used to introduce the module and provide instructions on
@@ -221,11 +221,40 @@ MAKING ITERACTIVE TEST UNDER SQLITE
   # export SQL_SIMPLE_SQLITE=1
   # perl t/testDB.t
 
+ A) MySQL/MariaDB - Example to create test_db table
+
+    # /usr/bin/mariadb < SAMPLE-01-PRECREATE-DB-MYSQL
+
+    Testing update login (password: password_update):
+
+    # /usr/bin/mariadb -u user_update -p test_db
+
+ B) Postgres - Examplte to create test_db table
+
+    # su - postgres
+    # psql < SAMPLE-01-PRECREATE-DB-PG-STEP1
+    # psql -d test_db < SAMPLE-01-PRECREATE-DB-PG-STEP2
+
+    Testing update login (password: password_update):
+
+    # /usr/bin/psql -d test_db -U user_update -W
+
+ C) SQLite - Example to create test_db table
+
+    No pre-creation is required. The DEMO use temporary file on /tmp directory.
+
 MAKING ITERACTIVE TEST UNDER MYSQL/MARIADB (BASED PRE-CREATED DATABASE)
 
  IMPORTANT:
 
   a) MySQL/MariaDB must be installed and started.
+
+  b) See: SAMPLE-01-PRECREATE-DB-MYSQL, where
+
+     server:   localhost
+     user:     user_update
+     password: password_update
+     dsname:   test_db
 
  (optional)
 
@@ -235,9 +264,10 @@ MAKING ITERACTIVE TEST UNDER MYSQL/MARIADB (BASED PRE-CREATED DATABASE)
  (optional)
 
   # export SQL_SIMPLE_MYSQL_SERVER=[server|localhost]
-  # export SQL_SIMPLE_MYSQL_PORT=[port]
   # export SQL_SIMPLE_MYSQL_USER=[user-or-role-with-updates]
   # export SQL_SIMPLE_MYSQL_PASSWORD=[password]
+
+  # export SQL_SIMPLE_MYSQL_PORT=[port] # required if not defaults
 
  (mandatory)
 
@@ -325,13 +355,22 @@ MAKING ITERACTIVE TEST UNDER POSTGRESQL (BASED PRE-CREATED DATABASE)
  IMPORTANT:
 
   a) Postgress must be installed and started.
-  b) Common Error:
 
-     Msg: connection to server at "localhost" (::1), port 5432 failed:
+  b) Common Errors:
+
+     Msg: connection to server at "localhost" (::1), port 5432 failed: Connection refused
      See: /var/lib/pgsql/data/pg_hba.conf
 
-     Msg: onnection to server at "x.x.x.x", port 5432 failed: Connection refused
+     Msg: connection to server at "x.x.x.x", port 5432 failed: Connection refused
      See: /var/lib/pgsql/data/pg_hba.conf
+
+  c) See: SAMPLE-01-PRECREATE-DB-PG, where
+
+     server:   localhost
+     user:     user_update
+     password: password_update
+     dsname:   test_db
+     scheme:   test_db
 
  (optional)
 
@@ -411,7 +450,7 @@ DEPENDENCIES
 
 COPYRIGHT
 
-  Copyright (C) 2008-2024 Carlos Celso.
+  Copyright (C) 2008-2025 Carlos Celso.
 
 LICENCE
 

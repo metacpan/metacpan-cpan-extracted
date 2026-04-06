@@ -7,7 +7,7 @@ use Test2::V1 -import, -utf8;
 
 use Future::Uring;
 
-use POSIX qw/setlocale LC_ALL/;
+use POSIX qw/uname setlocale LC_ALL/;
 use Socket qw/
 	pack_sockaddr_in sockaddr_family INADDR_LOOPBACK
 	AF_INET AF_UNIX SOCK_DGRAM SOCK_STREAM PF_UNSPEC
@@ -15,6 +15,9 @@ use Socket qw/
 use IO::Socket::INET;
 use IO::Socket::UNIX;
 use Time::HiRes qw/time/;
+
+my ($os, undef, $release) = uname;
+diag "Running $os $release";
 
 sub time_about(&@) {
 	my ($code, $want_time, $name) = @_;

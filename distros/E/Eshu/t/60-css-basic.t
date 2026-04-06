@@ -154,4 +154,46 @@ END
 	is($got, $expected, 'blank lines preserved');
 }
 
+# calc() with nested parens — parens in values do not affect brace depth
+{
+	my $input = <<'END';
+.box {
+width: calc(100% - (2 * 16px));
+height: calc(50vh - 20px);
+}
+END
+
+	my $expected = <<'END';
+.box {
+	width: calc(100% - (2 * 16px));
+	height: calc(50vh - 20px);
+}
+END
+
+	my $got = Eshu->indent_css($input);
+	is($got, $expected, 'calc() with nested parens does not affect depth');
+}
+
+# var() custom property usage
+{
+	my $input = <<'END';
+.text {
+color: var(--primary);
+font-size: var(--size, 16px);
+margin: var(--spacing, 8px) 0;
+}
+END
+
+	my $expected = <<'END';
+.text {
+	color: var(--primary);
+	font-size: var(--size, 16px);
+	margin: var(--spacing, 8px) 0;
+}
+END
+
+	my $got = Eshu->indent_css($input);
+	is($got, $expected, 'var() custom property usage');
+}
+
 done_testing();

@@ -17,6 +17,7 @@ MANIFEST.SKIP
 README
 README.md
 scripts/generate_index.pl
+scripts/generate_test_dashboard
 SECURITY.md
 t/00-load.t
 t/10-compile.t
@@ -34,6 +35,7 @@ t/comment-spelling.t
 t/conf/as_string.yml
 t/conf/AUTOLOAD.yml
 t/conf/browser_type.yml
+t/conf/cgi_host_url.yml
 t/conf/cookie.yml
 t/conf/domain_name.yml
 t/conf/host_name.yml
@@ -51,12 +53,16 @@ t/critic.t
 t/cv.t
 t/dependent-modules.t
 t/dist.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
 t/expect.t
+t/extended_tests.t
 t/fixme.t
+t/function.t
 t/fuzz.t
 t/gv.t
+t/integration.t
 t/is_mobile.t
 t/is_robot.t
 t/is_search.t
@@ -95,6 +101,7 @@ t/strict.t
 t/tabs.t
 t/taint.t
 t/tmpdir.t
+t/unit.t
 t/untaint.t
 t/unused.t
 t/vars.t

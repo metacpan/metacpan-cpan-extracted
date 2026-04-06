@@ -1,7 +1,6 @@
 package Chandra::Game::Tetris::Blocks;
 
-use Object::Proto::Sugar;
-
+use Object::Proto::Sugar -types;
 use strict;
 use warnings;
 

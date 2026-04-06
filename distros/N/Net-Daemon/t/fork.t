@@ -1,13 +1,11 @@
 # -*- perl -*-
-#
-#   $Id: fork.t,v 1.2 1999/08/12 14:28:59 joe Exp $
-#
 
-require 5.004;
 use strict;
+use warnings;
+
 use IO::Socket        ();
-use Config            ();
 use Net::Daemon::Test ();
+use Test::More;
 
 my $ok;
 eval {
@@ -16,15 +14,15 @@ eval {
         if ( defined($pid) ) {
             if ( !$pid ) { exit 0; }    # Child
         }
+        waitpid( $pid, 0 );
         $ok = 1;
     }
 };
 if ( !$ok ) {
-    print "1..0 # SKIP This test requires a system with working forks.\n";
-    exit;
+    plan skip_all => 'This test requires a system with working forks.';
 }
 
-my $numTests = 5;
+plan tests => 5;
 
 my ( $handle, $port );
 if (@ARGV) {
@@ -32,7 +30,7 @@ if (@ARGV) {
 }
 else {
     ( $handle, $port ) = Net::Daemon::Test->Child(
-        $numTests,
+        undef,
         $^X, '-Iblib/lib',
         '-Iblib/arch',
         't/server', '--mode=fork',
@@ -40,46 +38,38 @@ else {
     );
 }
 
-print "Making first connection to port $port...\n";
 my $fh = IO::Socket::INET->new(
     'PeerAddr' => '127.0.0.1',
     'PeerPort' => $port
 );
-printf( "%s 1\n", $fh          ? "ok" : "not ok" );
-printf( "%s 2\n", $fh->close() ? "ok" : "not ok" );
-print "Making second connection to port $port...\n";
+ok( $fh, 'first connection' );
+ok( $fh->close(), 'first connection close' );
+
 $fh = IO::Socket::INET->new(
     'PeerAddr' => '127.0.0.1',
     'PeerPort' => $port
 );
-printf( "%s 3\n", $fh ? "ok" : "not ok" );
-eval {
+ok( $fh, 'second connection' );
+
+my $exchange_ok = eval {
     for ( my $i = 0; $i < 20; $i++ ) {
-        print "Writing number: $i\n";
         if ( !$fh->print("$i\n") || !$fh->flush() ) {
-            die "Client: Error while writing number $i: " . $fh->error() . " ($!)";
+            die "Error while writing number $i: " . $fh->error() . " ($!)";
         }
-        print "Written.\n";
         my ($line) = $fh->getline();
         if ( !defined($line) ) {
-            die "Client: Error while reading number $i: " . $fh->error() . " ($!)";
+            die "Error while reading number $i: " . $fh->error() . " ($!)";
         }
         if ( $line !~ /(\d+)/ || $1 != $i * 2 ) {
-            die "Wrong response, exptected " . ( $i * 2 ) . ", got $line";
+            die "Wrong response, expected " . ( $i * 2 ) . ", got $line";
         }
     }
+    1;
 };
-if ($@) {
-    print STDERR "$@\n";
-    print "not ok 4\n";
-}
-else {
-    print "ok 4\n";
-}
-printf( "%s 5\n", $fh->close() ? "ok" : "not ok" );
+ok( $exchange_ok, 'multiplier exchange (20 rounds)' ) or diag($@);
+ok( $fh->close(), 'second connection close' );
 
 END {
     if ($handle)           { $handle->Terminate() }
     if ( -f "ndtest.prt" ) { unlink "ndtest.prt" }
-    exit 0;
 }

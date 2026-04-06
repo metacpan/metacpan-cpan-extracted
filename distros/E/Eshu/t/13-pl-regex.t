@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 10;
 use Eshu;
 
 # Regex match with braces inside
@@ -127,4 +127,88 @@ END
 
 	my $got = Eshu->indent_pl($input);
 	is($got, $expected, 's{}{} substitution with paired delimiters');
+}
+
+# qr// compiled regex — single line, no depth change
+{
+	my $input = <<'END';
+sub foo {
+my $re = qr/\d+/;
+my $x = 1;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	my $re = qr/\d+/;
+	my $x = 1;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'qr// compiled regex');
+}
+
+# qr{} with paired braces containing nested braces in pattern
+{
+	my $input = <<'END';
+sub foo {
+my $re = qr{foo{2}bar};
+my $x = 1;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	my $re = qr{foo{2}bar};
+	my $x = 1;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'qr{} with nested braces in pattern');
+}
+
+# Backtick command — simple, no braces
+{
+	my $input = <<'END';
+sub foo {
+my $out = `ls -la`;
+my $x = 1;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	my $out = `ls -la`;
+	my $x = 1;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'backtick command');
+}
+
+# Regex character class with braces — must not affect depth
+{
+	my $input = <<'END';
+sub foo {
+my $re = /[{}]/;
+if ($x =~ /[\[\]{}]+/) {
+print "match\n";
+}
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	my $re = /[{}]/;
+	if ($x =~ /[\[\]{}]+/) {
+		print "match\n";
+	}
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'regex character class with braces does not affect depth');
 }

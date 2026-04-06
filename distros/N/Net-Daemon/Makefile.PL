@@ -21,7 +21,7 @@ my %opts = (
         'COMPRESS'     => q[gzip -9vf],
         'SUFFIX'       => q[.gz]
     },
-    'realclean' => { 'FILES' => 't/config ndtest.prt' },
+    'realclean' => { 'FILES' => 't/config ndtest.prt ndtest.cnt log' },
     'META_MERGE' => {
         'meta-spec' => { version => 2 },
         'resources' => {

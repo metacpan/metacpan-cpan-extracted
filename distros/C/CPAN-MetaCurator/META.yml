@@ -58,5 +58,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaCurator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/CPAN-MetaCurator.git
-version: '1.14'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

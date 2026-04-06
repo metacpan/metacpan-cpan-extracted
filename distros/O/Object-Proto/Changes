@@ -1,5 +1,14 @@
 Revision history for Object-Proto
 
+0.09	2026-04-05
+	- Fix linker failure on Perl 5.36+ where Perl_mro_isa_changed_in is no
+	  longer an exported symbol.
+	- Set MIN_PERL_VERSION to 5.10
+
+0.08	2026-04-05
+	- Fix Object::Proto::clone so it deep clones objects instead of shallow copying
+	- Extend clone to support any reference being passed
+
 0.07	2026-04-05
 	- Add +attr syntax for modifying inherited attributes (Moo/Moose-style)
 	- Fix xop_class registration for custom ops (fixes assertion failures on

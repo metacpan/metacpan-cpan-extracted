@@ -3,7 +3,7 @@ package Chandra::Game::Tetris::Grid;
 use strict;
 use warnings;
 
-use Object::Proto::Sugar;
+use Object::Proto::Sugar qw(-types);
 use Chandra;
 
 has width => (

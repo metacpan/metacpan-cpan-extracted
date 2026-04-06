@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Chandra' => '0.11',
-	'Object::Proto::Sugar' => '0.02'
+	'Object::Proto::Sugar' => '0.03'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Chandra-Game-Tetris-*' },

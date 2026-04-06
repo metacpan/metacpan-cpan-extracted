@@ -1,5 +1,12 @@
 Revision history for Future-Uring
 
+0.004     2026-04-05 22:05:13+02:00 Europe/Brussels
+          - Bump IO::Uring dependency for statx
+          - Remove tmpfile named argument
+          - Add flags argument to open
+          - Print OS name and version in tests
+          - Use IO::Uring::Singleton
+
 0.003     2026-02-26 18:47:48+01:00 Europe/Brussels
           - Remove *at functions
           - Add statx function and method

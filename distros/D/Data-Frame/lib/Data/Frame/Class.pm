@@ -1,5 +1,5 @@
 package Data::Frame::Class;
-$Data::Frame::Class::VERSION = '0.006004';
+$Data::Frame::Class::VERSION = '0.006005';
 # ABSTRACT: For creating classes in Data::Frame
 
 use Data::Frame::Setup ();
@@ -23,7 +23,7 @@ Data::Frame::Class - For creating classes in Data::Frame
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 SYNOPSIS
 

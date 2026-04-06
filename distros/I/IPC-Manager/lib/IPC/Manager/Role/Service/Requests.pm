@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service::Requests;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -83,7 +83,7 @@ sub get_response {
     croak "Not expecting a response with id '$resp_id'"
         unless exists $resps->{$resp_id};
 
-    return undef unless defined $resps->{$resp_id};
+    return () unless defined $resps->{$resp_id};
     return delete $resps->{$resp_id};
 }
 

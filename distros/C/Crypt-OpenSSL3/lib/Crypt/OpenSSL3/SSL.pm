@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::SSL;
-$Crypt::OpenSSL3::SSL::VERSION = '0.002';
+$Crypt::OpenSSL3::SSL::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::SSL - An SSL connection
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -99,6 +99,8 @@ Methods in this class generally match functions the C<SSL_*> namespace in C<libs
 =head2 get_domain_flags
 
 =head2 get_finished
+
+=head2 get_param
 
 =head2 get_peer_certificate
 
@@ -247,6 +249,8 @@ Methods in this class generally match functions the C<SSL_*> namespace in C<libs
 =head2 set_num_tickets
 
 =head2 set_options
+
+=head2 set_param
 
 =head2 set_post_handshake_auth
 

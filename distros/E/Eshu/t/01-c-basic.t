@@ -208,4 +208,98 @@ END
 	is($got, $expected, 'switch/case basic');
 }
 
+# static inline function
+{
+	my $input = <<'END';
+static inline int max(int a, int b) {
+return a > b ? a : b;
+}
+
+static inline int min(int a, int b) {
+return a < b ? a : b;
+}
+END
+
+	my $expected = <<'END';
+static inline int max(int a, int b) {
+	return a > b ? a : b;
+}
+
+static inline int min(int a, int b) {
+	return a < b ? a : b;
+}
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'static inline functions');
+}
+
+# while loop with break/continue
+{
+	my $input = <<'END';
+void process(int *arr, int n) {
+int i = 0;
+while (i < n) {
+if (arr[i] < 0) {
+i++;
+continue;
+}
+if (arr[i] == 0) {
+break;
+}
+handle(arr[i]);
+i++;
+}
+}
+END
+
+	my $expected = <<'END';
+void process(int *arr, int n) {
+	int i = 0;
+	while (i < n) {
+		if (arr[i] < 0) {
+			i++;
+			continue;
+		}
+		if (arr[i] == 0) {
+			break;
+		}
+		handle(arr[i]);
+		i++;
+	}
+}
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'while loop with break/continue');
+}
+
+# Struct initializer in function call
+{
+	my $input = <<'END';
+void setup() {
+config_t cfg = {
+.width = 800,
+.height = 600,
+.title = "My App",
+};
+app_init(&cfg);
+}
+END
+
+	my $expected = <<'END';
+void setup() {
+	config_t cfg = {
+		.width = 800,
+		.height = 600,
+		.title = "My App",
+	};
+	app_init(&cfg);
+}
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'struct initializer inside function');
+}
+
 done_testing();

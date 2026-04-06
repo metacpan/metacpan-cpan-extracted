@@ -1,5 +1,30 @@
 Revision history for App::prepare4release
 
+0.03    2026-04-05
+        Fix Makefile.PL PREPARE4RELEASE postamble replacement: _replace_marked_postamble_block
+        used s/// with the /x flag, which ignored spaces in the pattern and treated # as
+        a comment, so lines like "# BEGIN PREPARE4RELEASE_POSTAMBLE" never matched and
+        pod2markdown was not upgraded to pod2github under --github/--gitlab. Use a
+        single-line pattern with ms only (no /x). _patch_meta_merge_block: log "patched
+        existing META_MERGE" only when content actually changes.
+        Tests: t/postamble-crlf.t (CRLF + LF + realistic Makefile.PL fragment).
+
+0.02    2026-04-05
+        Invalid prepare4release.json: warn and treat as {} (no fatal decode).
+        Root JSON keys copied into Makefile.PL WriteMakefile: author, abstract,
+        abstract_from, license, min_perl_version / perl_min, module_name / name,
+        version_from, exe_files (array).
+        New App::prepare4release::Deps: static scan of lib/, bin/, maint/, t/ (optional
+        xt/) for use/require; optional --sync-deps / dependencies.sync merges missing
+        modules into PREREQ_PM and TEST_REQUIRES; appends requires/test_requires to
+        cpanfile when present (dependencies.sync_cpanfile, dependencies.skip,
+        dependencies.scan_xt). Module::CoreList for omitting core deps without explicit
+        use VERSION. Tests: t/config-load.t, t/makefile-metadata.t, t/deps-sync.t;
+        integration fixtures use dependencies.skip. Deps.pm: $VERSION for Test::Version.
+        POD/README: document JSON resilience, metadata keys, dependency sync.
+        t/deps-sync.t: use lib ../lib for harnesses without prove -Ilib; Deps: guard
+        Module::CoreList::is_core with eval + can() for older perls.
+
 0.01    2026-03-31
         MY::postamble runs maint/inject-readme-badges.pl after pod2github/pod2markdown:
         generated standalone Perl (core only) embeds frozen README shields so make

@@ -1,0 +1,44 @@
+bench/contention.pl
+bench/multiprocess.pl
+bench/single.pl
+bench/vs.pl
+Changes
+eg/basic.pl
+eg/batch_insert.pl
+eg/deque.pl
+eg/eventfd_ev.pl
+eg/graceful_shutdown.pl
+eg/log_aggregator.pl
+eg/memfd_sharing.pl
+eg/pipeline.pl
+eg/priority_lanes.pl
+eg/producer_consumer.pl
+eg/request_response.pl
+eg/retry_queue.pl
+eg/rolling_buffer.pl
+eg/worker_pool.pl
+lib/Data/Queue/Shared.pm
+lib/Data/Queue/Shared/Int.pm
+lib/Data/Queue/Shared/Int16.pm
+lib/Data/Queue/Shared/Int32.pm
+lib/Data/Queue/Shared/Str.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+queue.h
+README
+Shared.xs
+t/01-int.t
+t/02-str.t
+t/03-multiprocess.t
+t/04-features.t
+t/05-pop-back.t
+t/06-eventfd.t
+t/07-anonymous.t
+t/08-memfd.t
+t/09-coverage.t
+t/10-int32-int16.t
+t/11-keywords.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

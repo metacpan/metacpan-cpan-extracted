@@ -1,5 +1,5 @@
 package Data::Frame::Indexer::Label;
-$Data::Frame::Indexer::Label::VERSION = '0.006004';
+$Data::Frame::Indexer::Label::VERSION = '0.006005';
 # ABSTRACT: Data::Frame indexer by string labels (column names)
 
 use Data::Frame::Class;
@@ -20,7 +20,7 @@ Data::Frame::Indexer::Label - Data::Frame indexer by string labels (column names
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 AUTHORS
 

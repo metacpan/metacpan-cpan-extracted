@@ -63,7 +63,7 @@ ok(
     );
 }
 
-#This ensures that there’s no warning or error otherwise
+#This ensures that there's no warning or error otherwise
 #if the file goes away prematurely.
 {
     my $handler = $challenge->create_handler( 'my_key_authz', $docroot );
@@ -71,6 +71,39 @@ ok(
     my $fs_path = File::Spec->catdir( $docroot, $challenge->path() );
 
     unlink $fs_path;
+}
+
+# die-in-DESTROY bug: when EUID mismatch triggers during normal scope exit,
+# die propagates as an exception from DESTROY. After the fix, this should be
+# a warning instead — DESTROY must not throw.
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+
+    lives_ok {
+        my $handler = $challenge->create_handler( 'my_key_authz', $docroot );
+
+        # Simulate EUID mismatch so DESTROY's guard triggers
+        $handler->{'_euid'} = $> + 1;
+
+        # $handler goes out of scope here — DESTROY fires.
+        # With die: this throws an exception. With warn: just a warning.
+    } 'DESTROY with EUID mismatch does not die';
+
+    ok( scalar @warnings, 'DESTROY with EUID mismatch emits a warning' );
+    like(
+        $warnings[0] || '',
+        qr/EUID/,
+        '... warning mentions EUID mismatch',
+    );
+
+    # Perl's die-in-DESTROY auto-conversion appends "(in cleanup)".
+    # A proper warn does not. This is how we verify the fix.
+    unlike(
+        $warnings[0] || '',
+        qr/\(in cleanup\)/,
+        '... warning is a proper warn, not a die converted by Perl',
+    );
 }
 
 done_testing();

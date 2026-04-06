@@ -1,5 +1,19 @@
 Revision history for Langertha
 
+0.309     2026-04-05 16:37:32Z
+
+    - Fix Moose role composition: consolidate all separate `with` calls into
+      single `with map { 'Langertha::Role::'.$_ } qw(...)` form across all
+      engines; this exposed a real role conflict between Role::OpenAICompatible
+      and Role::OpenAPI on `_build_openapi_operations`.
+    - Fix role conflict: remove `_build_openapi_operations` from
+      Role::OpenAICompatible (wrong place), define it in Engine::OpenAIBase
+      (the consuming class) using `use_module` instead of `require` hack.
+    - Apply same `use_module('Langertha::Spec::*')->data` pattern to
+      Engine::Ollama, Engine::Mistral, Engine::LMStudio.
+    - Add missing `make_immutable` to Engine::Whisper and Request::HTTP.
+    - Remove unused `namespace::autoclean` from Stream and Stream::Chunk.
+
 0.308     2026-04-04 15:03:20Z
 
 0.307     2026-03-10 17:42:28Z

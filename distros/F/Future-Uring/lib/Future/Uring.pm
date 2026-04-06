@@ -1,17 +1,18 @@
 package Future::Uring;
-$Future::Uring::VERSION = '0.003';
+$Future::Uring::VERSION = '0.004';
 use 5.020;
 use warnings;
 use experimental 'signatures';
 
-use IO::Uring 0.011
+use IO::Uring 0.012
 	qw/IOSQE_ASYNC IOSQE_IO_LINK IOSQE_IO_HARDLINK IOSQE_IO_DRAIN/,
 	qw/IORING_TIMEOUT_ABS IORING_TIMEOUT_BOOTTIME IORING_TIMEOUT_REALTIME IORING_TIMEOUT_ETIME_SUCCESS/,
 	qw/AT_SYMLINK_FOLLOW RENAME_EXCHANGE RENAME_NOREPLACE AT_REMOVEDIR/,
 	qw/P_PID P_PGID P_PIDFD P_ALL WEXITED WSTOPPED WCONTINUED WNOWAIT/;
+use IO::Uring::Singleton 'ring';
 use Carp 'croak';
 use Errno qw/ETIME/;
-use Fcntl qw/O_RDONLY O_RDWR O_WRONLY O_APPEND O_CREAT O_DIRECT O_DSYNC O_EXCL O_NOFOLLOW O_SYNC O_TMPFILE/;
+use Fcntl qw/O_RDONLY O_RDWR O_WRONLY O_APPEND O_CREAT O_DIRECT O_DSYNC O_EXCL O_NOFOLLOW O_SYNC/;
 use Socket qw/AF_INET AF_INET6 AF_UNIX SOCK_STREAM SOCK_DGRAM SOCK_SEQPACKET SOCK_RAW/;
 use IO::File;
 use IO::Socket;
@@ -21,10 +22,6 @@ use Time::Spec;
 
 use Future::Uring::Handle;
 use Future::Uring::Exception;
-
-sub ring() {
-	state $ring = IO::Uring->new(our $ring_size //= 128);
-}
 
 my sub to_sflags($args) {
 	my $result = 0;
@@ -48,6 +45,7 @@ my sub add_timeout($ring, $args) {
 	$flags |= IORING_TIMEOUT_ABS if $args->{timeout_absolute};
 	$s_flags |= IOSQE_IO_LINK    if $args->{link};
 	$ring->link_timeout($time_spec, $flags, $s_flags);
+	return;
 }
 
 sub to_handle($fh) {
@@ -58,13 +56,13 @@ sub run_once($timeout = undef) {
 	my $ring = ring();
 	if (defined $timeout) {
 		if ($timeout == 0) {
-			$ring->run_once(0);
+			return $ring->run_once(0);
 		} else {
 			my $timespec = ref($timeout) ? $timeout : Time::Spec->new($timeout);
-			$ring->run_once(1, $timespec);
+			return $ring->run_once(1, $timespec);
 		}
 	} else {
-		$ring->run_once(1);
+		return $ring->run_once(1);
 	}
 }
 
@@ -145,7 +143,6 @@ my %extra_flags = (
 	exclusive => O_EXCL,
 	no_follow => O_NOFOLLOW,
 	sync      => O_SYNC,
-	tempfile  => O_TMPFILE
 );
 
 use subs 'open';
@@ -155,6 +152,7 @@ sub open($filename, $open_mode = '<', %args) {
 	my (undef, $sourcename, $line) = caller;
 	my $s_flags = to_sflags(\%args);
 	my $flags = $main_flags{$open_mode} // croak("Unknown mode '$open_mode'");
+	$flags |= 0+$args{flags} if $args{flags};
 	for my $key (keys %extra_flags) {
 		$flags |= $extra_flags{$key} if $args{$key};
 	}
@@ -446,7 +444,7 @@ Future::Uring - Future-returning io_uring functions
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -592,6 +590,10 @@ The permission mode that will be used if the file is newly created (e.g. C<0644>
 
 A dirhandle that acts as the base of any relative C<$path>. Defaults to the current working directory (represented by undef).
 
+=item * flags
+
+The value of the C<flags> argument to C<open>, it will be amended with the named arguments below.
+
 =item * d_sync
 
 If true, write operations on the file will complete according to the requirements of synchronized I/O data integrity completion.
@@ -607,10 +609,6 @@ If the trailing component (i.e., basename) of path is a symbolic link, then the 
 =item * sync
 
 If true write operations on the file will complete according to the requirements of synchronized I/O file integrity completion (by contrast with the synchronized I/O data integrity completion provided by C<d_sync>.
-
-=item * tempfile
-
-Create an unnamed temporary regular file. The path argument specifies a directory; an unnamed inode will be created in that directory's filesystem. Anything written to the resulting file will be lost when the last file descriptor is closed, unless the file is given a name.
 
 =back
 

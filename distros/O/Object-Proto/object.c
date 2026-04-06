@@ -3321,13 +3321,12 @@ static XS(xs_define) {
         for (i = 0; i < parent_count; i++) {
             av_push(isa, newSVpv(parent_metas[i]->class_name, 0));
         }
-        /* Notify Perl's method resolution cache that ISA changed */
-#if PERL_VERSION_LT(5, 40, 0)
-        Perl_mro_isa_changed_in(aTHX_ meta->stash);
-#else
-        /* In 5.40+, mro_isa_changed_in is not exported; modifying @ISA triggers cache invalidation */
+        /* Notify Perl's method resolution cache that ISA changed.
+         * Perl_mro_isa_changed_in was made a hidden (non-exported) symbol
+         * in Perl 5.36.0. mro_method_changed_in is public since 5.10.0
+         * and is the correct public API for invalidating the method cache
+         * after an ISA change. */
         mro_method_changed_in(meta->stash);
-#endif
         Safefree(parent_metas);
     }
 
@@ -3616,50 +3615,122 @@ static XS(xs_is_locked) {
    Introspection API
    ============================================ */
 
-/* Object::Proto::clone($obj) - create shallow copy of object */
+/* Deep clone an SV, recursing into refs.
+ * seen_hv maps refaddr strings -> cloned SV* (handles circular refs).
+ * Returns a mortal SV. */
+static SV* deep_clone_sv(pTHX_ SV *src, HV *seen_hv) {
+    SV *dst;
+    char addr_buf[32];
+    STRLEN addr_len;
+    SV **cached;
+
+    /* Non-references: return a plain copy */
+    if (!SvROK(src)) {
+        return newSVsv(src);
+    }
+
+    /* Check seen table to break circular references */
+    addr_len = (STRLEN)sprintf(addr_buf, "%p", (void*)SvRV(src));
+    cached = hv_fetch(seen_hv, addr_buf, (I32)addr_len, 0);
+    if (cached) {
+        return SvREFCNT_inc(*cached);
+    }
+
+    if (SvTYPE(SvRV(src)) == SVt_PVAV) {
+        /* Array ref (possibly blessed) */
+        AV *src_av = (AV*)SvRV(src);
+        AV *dst_av = newAV();
+        IV i, len = av_len(src_av);
+
+        dst = newRV_noinc((SV*)dst_av);
+        if (SvOBJECT(SvRV(src)))
+            sv_bless(dst, SvSTASH(SvRV(src)));
+
+        /* Register before recursing to handle circular refs */
+        hv_store(seen_hv, addr_buf, (I32)addr_len, SvREFCNT_inc(dst), 0);
+
+        av_extend(dst_av, len);
+        for (i = 0; i <= len; i++) {
+            SV **svp = av_fetch(src_av, i, 0);
+            if (svp && SvOK(*svp)) {
+                SV *child = deep_clone_sv(aTHX_ *svp, seen_hv);
+                av_store(dst_av, i, child);
+            } else {
+                av_store(dst_av, i, newSV(0));
+            }
+        }
+
+    } else if (SvTYPE(SvRV(src)) == SVt_PVHV) {
+        /* Hash ref (possibly blessed) */
+        HV *src_hv = (HV*)SvRV(src);
+        HV *dst_hv = newHV();
+        HE *he;
+
+        dst = newRV_noinc((SV*)dst_hv);
+        if (SvOBJECT(SvRV(src)))
+            sv_bless(dst, SvSTASH(SvRV(src)));
+
+        hv_store(seen_hv, addr_buf, (I32)addr_len, SvREFCNT_inc(dst), 0);
+
+        hv_iterinit(src_hv);
+        while ((he = hv_iternext(src_hv))) {
+            STRLEN klen;
+            const char *key = HePV(he, klen);
+            SV *val  = HeVAL(he);
+            SV *copy = deep_clone_sv(aTHX_ val, seen_hv);
+            hv_store(dst_hv, key, (I32)klen, copy, 0);
+        }
+
+    } else if (SvTYPE(SvRV(src)) < SVt_PVAV) {
+        /* Scalar ref */
+        SV *inner = deep_clone_sv(aTHX_ SvRV(src), seen_hv);
+        dst = newRV_noinc(inner);
+        if (SvOBJECT(SvRV(src)))
+            sv_bless(dst, SvSTASH(SvRV(src)));
+        hv_store(seen_hv, addr_buf, (I32)addr_len, SvREFCNT_inc(dst), 0);
+
+    } else {
+        /* Code refs, globs, etc. — share as-is */
+        dst = newSVsv(src);
+        hv_store(seen_hv, addr_buf, (I32)addr_len, SvREFCNT_inc(dst), 0);
+    }
+
+    return dst;
+}
+
+/* Object::Proto::clone($obj) - deep clone an object, arrayref, hashref,
+ * scalarref, or plain scalar */
 static XS(xs_clone) {
     dXSARGS;
-    AV *src_av, *dst_av;
-    SV *src_obj, *dst_obj;
-    const char *class_name;
-    ClassMeta *meta;
-    IV i, len;
+    SV *src;
 
-    if (items < 1) croak("Usage: Object::Proto::clone($obj) or $obj->clone()");
+    if (items < 1) croak("Usage: Object::Proto::clone($val) or $obj->clone()");
 
-    src_obj = ST(0);
+    src = ST(0);
 
-    if (!SvROK(src_obj) || SvTYPE(SvRV(src_obj)) != SVt_PVAV || !SvOBJECT(SvRV(src_obj))) {
-        croak("Object::Proto::clone: argument is not an object");
-    }
-
-    src_av = (AV*)SvRV(src_obj);
-
-    /* Get class metadata from the blessed stash */
-    class_name = HvNAME(SvSTASH(SvRV(src_obj)));
-    meta = get_class_meta(aTHX_ class_name, strlen(class_name));
-
-    /* Create new AV with same size */
-    len = av_len(src_av);
-    dst_av = newAV();
-    av_extend(dst_av, len);
-
-    /* Shallow copy all slots */
-    for (i = 0; i <= len; i++) {
-        SV **svp = av_fetch(src_av, i, 0);
-        if (svp && SvOK(*svp)) {
-            av_store(dst_av, i, newSVsv(*svp));
+    /* Plain scalar (non-ref): return a copy of the value */
+    if (!SvROK(src)) {
+        if (SvOK(src)) {
+            ST(0) = sv_2mortal(newSVsv(src));
         } else {
-            av_store(dst_av, i, newSV(0));
+            ST(0) = &PL_sv_undef;
         }
+        XSRETURN(1);
     }
 
-    /* Create blessed reference to same class (clone is NOT frozen/locked) */
-    dst_obj = newRV_noinc((SV*)dst_av);
-    sv_bless(dst_obj, meta ? meta->stash : SvSTASH(SvRV(src_obj)));
+    {
+        HV *seen_hv = newHV();
+        SV *dst;
 
-    ST(0) = sv_2mortal(dst_obj);
-    XSRETURN(1);
+        /* For blessed objects backed by an AV: strip frozen/locked magic
+         * by cloning the underlying AV fresh (deep_clone_sv handles the
+         * bless but the new ref carries no Object::Proto magic). */
+        dst = deep_clone_sv(aTHX_ src, seen_hv);
+        SvREFCNT_dec((SV*)seen_hv);
+
+        ST(0) = sv_2mortal(dst);
+        XSRETURN(1);
+    }
 }
 
 /* Object::Proto::properties($class) - return property names for a class */

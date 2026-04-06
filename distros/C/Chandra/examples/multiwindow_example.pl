@@ -27,6 +27,7 @@ my $app = Chandra::App->new(
     title  => 'Todos',
     width  => 600,
     height => 500,
+    debug => 1,
 );
 
 # Persist the window size via Chandra::Store
@@ -39,46 +40,67 @@ my $saved_h = $store->get('window.height', 500);
 # -----------------------------------------------------------------------
 
 sub render_todos {
+    my $theme = $store->get('theme', 'light');
+    my $is_dark = $theme eq 'dark';
+    
     my @visible = $filter eq 'all'    ? @todos
                 : $filter eq 'active' ? grep { !$_->{done} } @todos
                 :                       grep {  $_->{done} } @todos;
 
+    my $done_color = $is_dark ? '#666' : '#888';
     my $items = join '', map {
+        my $id      = $_->{id};
+        my $text    = $_->{text};
         my $checked = $_->{done} ? 'checked' : '';
-        my $strike  = $_->{done} ? 'style="text-decoration:line-through;color:#888"' : '';
+        my $strike  = $_->{done} ? qq(style="text-decoration:line-through;color:$done_color") : '';
         qq(<li>
           <input type="checkbox" $checked
-            onchange="window.chandra.invoke('toggle',[${\ $_->{id} }])">
-          <span $strike>${\ $_->{text} }</span>
-          <button onclick="window.chandra.invoke('remove',[${\ $_->{id} }])">✕</button>
+            onchange="window.chandra.invoke('toggle',[$id])">
+          <span $strike>$text</span>
+          <button onclick="window.chandra.invoke('remove',[$id])">✕</button>
         </li>)
     } @visible;
 
     my $remaining = scalar grep { !$_->{done} } @todos;
     my $total     = scalar @todos;
+    
+    my $all_active    = $filter eq 'all'    ? 'active' : '';
+    my $active_active = $filter eq 'active' ? 'active' : '';
+    my $done_active   = $filter eq 'done'   ? 'active' : '';
+    
+    # Dark mode colors
+    my $bg          = $is_dark ? '#1a1a2e' : '#fafafa';
+    my $toolbar_bg  = $is_dark ? '#16213e' : '#fff';
+    my $toolbar_bdr = $is_dark ? '#0f3460' : '#eee';
+    my $btn_bg      = $is_dark ? '#0f3460' : '#ecf0f1';
+    my $btn_fg      = $is_dark ? '#eee'    : '#333';
+    my $li_border   = $is_dark ? '#0f3460' : '#f0f0f0';
+    my $li_fg       = $is_dark ? '#eee'    : 'inherit';
+    my $footer_fg   = $is_dark ? '#888'    : '#888';
+    my $del_btn     = $is_dark ? '#555'    : '#ccc';
 
     return qq(
 <!DOCTYPE html>
 <html>
 <head>
 <style>
-  body { font-family: system-ui, sans-serif; margin: 0; background: #fafafa; }
+  body { font-family: system-ui, sans-serif; margin: 0; background: $bg; color: $li_fg; }
   h1   { background: #e74c3c; color: #fff; margin: 0; padding: 16px 20px; font-size: 1.4em; }
-  .toolbar { display:flex; gap:8px; padding:12px 20px; background:#fff; border-bottom:1px solid #eee; }
+  .toolbar { display:flex; gap:8px; padding:12px 20px; background:$toolbar_bg; border-bottom:1px solid $toolbar_bdr; }
   button   { cursor:pointer; border:none; border-radius:4px; padding:6px 12px; font-size:.9em; }
   .btn-add { background:#e74c3c; color:#fff; }
-  .btn-settings { background:#ecf0f1; color:#333; margin-left:auto; }
+  .btn-settings { background:$btn_bg; color:$btn_fg; margin-left:auto; }
   .filters { display:flex; gap:4px; }
-  .filters button { background:#ecf0f1; color:#333; }
+  .filters button { background:$btn_bg; color:$btn_fg; }
   .filters button.active { background:#3498db; color:#fff; }
   ul   { list-style:none; margin:0; padding:0 20px; }
   li   { display:flex; align-items:center; gap:8px; padding:10px 0;
-         border-bottom:1px solid #f0f0f0; }
+         border-bottom:1px solid $li_border; }
   li input[type=checkbox] { width:18px; height:18px; cursor:pointer; }
   li span { flex:1; }
-  li button { background:transparent; color:#ccc; font-size:1.1em; padding:2px 6px; }
+  li button { background:transparent; color:$del_btn; font-size:1.1em; padding:2px 6px; }
   li button:hover { color:#e74c3c; }
-  .footer { padding:12px 20px; color:#888; font-size:.85em; }
+  .footer { padding:12px 20px; color:$footer_fg; font-size:.85em; }
 </style>
 </head>
 <body>
@@ -87,11 +109,11 @@ sub render_todos {
   <button class="btn-add"
     onclick="window.chandra.invoke('open_add', [])">+ Add Todo</button>
   <div class="filters">
-    <button class="${\ ($filter eq 'all'    ? 'active' : '') }"
+    <button class="$all_active"
       onclick="window.chandra.invoke('set_filter',['all'])">All</button>
-    <button class="${\ ($filter eq 'active' ? 'active' : '') }"
+    <button class="$active_active"
       onclick="window.chandra.invoke('set_filter',['active'])">Active</button>
-    <button class="${\ ($filter eq 'done'   ? 'active' : '') }"
+    <button class="$done_active"
       onclick="window.chandra.invoke('set_filter',['done'])">Done</button>
   </div>
   <button class="btn-settings"
@@ -106,6 +128,7 @@ sub render_todos {
 
 sub refresh_main {
     $app->set_content(render_todos());
+    $app->refresh();
 }
 
 # -----------------------------------------------------------------------
@@ -143,19 +166,30 @@ $app->bind('set_filter', sub {
 # Add-todo dialog
 # -----------------------------------------------------------------------
 
-my $add_html = q(
+sub add_html {
+    my $theme = $store->get('theme', 'light');
+    my $is_dark = $theme eq 'dark';
+    
+    my $bg       = $is_dark ? '#1a1a2e' : '#fff';
+    my $fg       = $is_dark ? '#eee'    : '#333';
+    my $input_bg = $is_dark ? '#16213e' : '#fff';
+    my $input_bd = $is_dark ? '#0f3460' : '#ccc';
+    my $btn_bg   = $is_dark ? '#0f3460' : '#ecf0f1';
+    my $btn_fg   = $is_dark ? '#eee'    : '#333';
+    
+    return qq(
 <!DOCTYPE html>
 <html>
 <head>
 <style>
-  body { font-family:system-ui,sans-serif; margin:0; padding:20px; background:#fff; }
-  h2   { margin-top:0; font-size:1.1em; color:#333; }
+  body { font-family:system-ui,sans-serif; margin:0; padding:20px; background:$bg; color:$fg; }
+  h2   { margin-top:0; font-size:1.1em; }
   input[type=text] { width:100%; box-sizing:border-box; padding:8px; font-size:1em;
-                     border:1px solid #ccc; border-radius:4px; }
+                     border:1px solid $input_bd; border-radius:4px; background:$input_bg; color:$fg; }
   .buttons { display:flex; gap:8px; margin-top:12px; justify-content:flex-end; }
   button { border:none; border-radius:4px; padding:8px 16px; cursor:pointer; font-size:.9em; }
   .ok     { background:#e74c3c; color:#fff; }
-  .cancel { background:#ecf0f1; color:#333; }
+  .cancel { background:$btn_bg; color:$btn_fg; }
 </style>
 </head>
 <body>
@@ -172,6 +206,7 @@ my $add_html = q(
 </body>
 </html>
 );
+}
 
 $app->bind('open_add', sub {
     if ($add_win && !$add_win->is_closed) {
@@ -183,7 +218,8 @@ $app->bind('open_add', sub {
         width   => 360,
         height  => 160,
         modal   => 1,
-        content => $add_html,
+        content => add_html(),
+        debug   => 1,
     );
     $add_win->on_close(sub { 1 });
     return undef;
@@ -213,12 +249,18 @@ $app->bind('add_cancel', sub {
 
 sub settings_html {
     my $theme = $store->get('theme', 'light');
+    my $is_dark = $theme eq 'dark';
+    my $checked = $is_dark ? 'checked' : '';
+    
+    my $bg     = $is_dark ? '#1a1a2e' : '#fff';
+    my $fg     = $is_dark ? '#eee'    : '#333';
+    
     return qq(
 <!DOCTYPE html>
 <html>
 <head>
 <style>
-  body { font-family:system-ui,sans-serif; margin:0; padding:20px; background:#fff; }
+  body { font-family:system-ui,sans-serif; margin:0; padding:20px; background:$bg; color:$fg; }
   h2   { margin-top:0; font-size:1.1em; }
   label { display:flex; align-items:center; gap:8px; margin:10px 0; }
   button { border:none; border-radius:4px; padding:8px 16px; cursor:pointer;
@@ -228,9 +270,9 @@ sub settings_html {
 <body>
 <h2>Settings</h2>
 <label>
-  <input type="checkbox" id="dark" ${\($theme eq 'dark' ? 'checked' : ''\)}
+  <input type="checkbox" id="dark" $checked
     onchange="window.chandra.invoke('set_theme',[this.checked?'dark':'light'])">
-  Dark theme (stored in Chandra::Store)
+  Dark theme
 </label>
 <button onclick="window.chandra.invoke('clear_done',[])">Clear completed todos</button>
 </body>
@@ -275,6 +317,8 @@ $app->bind('open_settings', sub {
 $app->bind('set_theme', sub {
     my ($theme) = @_;
     $store->set('theme', $theme);
+    # Refresh main window with new theme
+    refresh_main();
     # Reload settings window to reflect the change
     if ($settings_win && !$settings_win->is_closed) {
         $settings_win->set_content(settings_html());

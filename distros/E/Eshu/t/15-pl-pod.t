@@ -102,9 +102,9 @@ END
 # Multiple pod sections
 {
 	my $input = <<'END';
-sub foo {
-return 1;
-}
+    sub foo {
+        return 1;
+    }
 
 =head1 NAME
 
@@ -112,9 +112,9 @@ Foo
 
 =cut
 
-sub bar {
-return 2;
-}
+    sub bar {
+        return 2;
+    }
 
 =head1 METHODS
 

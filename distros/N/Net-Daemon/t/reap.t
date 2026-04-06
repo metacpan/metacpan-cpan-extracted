@@ -49,11 +49,17 @@ if ( !$pid ) {
     exit(0);    # Child exits immediately
 }
 
-# Give child time to exit and become a zombie
-select( undef, undef, undef, 0.2 );
-
-# Call the reaper
-$handler->();
+# Retry the reaper until the child is reaped (up to 5 seconds).
+# A single sleep+call is racy on loaded systems (CPAN smokers).
+my $reaped = 0;
+for my $attempt ( 1 .. 50 ) {
+    select( undef, undef, undef, 0.1 );
+    $handler->();
+    if ( defined $child_pid_ref ) {
+        $reaped = 1;
+        last;
+    }
+}
 
 # The child should now be reaped - waitpid should return -1 or 0
 my $result = waitpid( $pid, WNOHANG );

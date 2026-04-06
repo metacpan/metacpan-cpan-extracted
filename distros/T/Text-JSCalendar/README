@@ -1,29 +1,228 @@
-Text::JSCalendar
-================
+Text::JSCalendar - Convert between iCalendar and JSCalendar
 
-Text::JSCalendar is a module for converting between ICalendar and JSCalendar formats
+DESCRIPTION
 
-INSTALLATION
+Text::JSCalendar provides bidirectional conversion between iCalendar
+(RFC 5545) and JSCalendar, following the latest drafts:
 
-To install this module type the following:
+  - draft-ietf-calext-jscalendar-icalendar (mapping specification)
+  - draft-ietf-calext-jscalendarbis (JSCalendar data model)
+  - draft-ietf-calext-icalendar-jscalendar-extensions (new iCal properties)
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+METHODS
 
-DEPENDENCIES
+  $jscal = Text::JSCalendar->new()
 
-This module requires these other modules and libraries:
+    Create a converter instance.  Caches timezone objects for performance.
 
-  (see Makefile.PL)
+  @events = $jscal->vcalendarToEvents($ical_string)
 
-COPYRIGHT AND LICENCE
+    Parse an iCalendar string (VCALENDAR with VEVENT or VTODO components)
+    and return a list of JSCalendar Event or Task hashrefs.
 
-Copyright (C) 2019 by FastMail Pty Ltd
+  $ical_string = $jscal->eventsToVCalendar(@events)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
+    Convert one or more JSCalendar Event/Task hashrefs to an iCalendar
+    string with VTIMEZONE components automatically included.
 
+  $normalized = Text::JSCalendar->NormaliseEvent($event)
 
+    Return a copy of the event with default-valued properties removed.
+    Useful for comparison and storage.
+
+  $bool = Text::JSCalendar->CompareEvents($event1, $event2)
+
+    Compare two events after normalization.  Returns true if identical.
+
+CONVERSION DESIGN
+
+The module converts between two representations of the same data:
+
+  iCalendar (RFC 5545)          JSCalendar (draft-jscalendarbis)
+  ========================      ==============================
+  VEVENT                   <=>  Event (@type: "Event")
+  VTODO                    <=>  Task (@type: "Task")
+  DTSTART + DTEND/DURATION <=>  start + duration + timeZone
+  RRULE                    <=>  recurrenceRule
+  EXDATE / RDATE           <=>  recurrenceOverrides
+  RECURRENCE-ID            <=>  recurrenceOverrides (patches)
+  ATTENDEE / ORGANIZER     <=>  participants + replyTo
+  VALARM                   <=>  alerts
+  ATTACH / URL / IMAGE     <=>  links
+  CONFERENCE               <=>  virtualLocations
+  CATEGORIES               <=>  keywords
+  RELATED-TO               <=>  relatedTo
+
+Property Mapping
+
+  iCalendar Property          JSCalendar Property
+  -------------------------   ----------------------------
+  UID                         uid
+  SUMMARY                     title
+  DESCRIPTION                 description
+  STYLED-DESCRIPTION          description + descriptionContentType
+  DTSTART                     start + timeZone
+  DTEND                       (computed as duration)
+  DURATION                    duration
+  DTSTART TZID (end differs)  endTimeZone
+  STATUS                      status
+  TRANSP                      freeBusyStatus ("free"/"busy")
+  CLASS                       privacy ("private"/"confidential"/"public")
+  PRIORITY                    priority (0-9)
+  COLOR                       color
+  LOCATION                    locations[].name
+  GEO                         locations[].coordinates
+  CONFERENCE                  virtualLocations[].uri + features
+  SHOW-WITHOUT-TIME           showWithoutTime
+  CREATED                     created
+  DTSTAMP / LAST-MODIFIED     updated / lastModified
+  SEQUENCE                    sequence
+  PRODID                      prodId
+  ORGANIZER                   organizerCalendarAddress + participant
+  ATTENDEE                    participants[]
+  VALARM                      alerts[]
+  ATTACH                      links[] (rel: "enclosure")
+  URL                         links[]
+  IMAGE                       links[] (rel: "icon")
+  CATEGORIES                  keywords
+  RELATED-TO                  relatedTo
+  RRULE                       recurrenceRule
+  EXDATE                      recurrenceOverrides (excluded: true)
+  RDATE                       recurrenceOverrides (empty patch)
+  RECURRENCE-ID               recurrenceOverrides (computed patch)
+
+  Task-specific (VTODO):
+  DUE                         due
+  PERCENT-COMPLETE            percentComplete
+  ESTIMATED-DURATION          estimatedDuration
+  COMPLETED / STATUS          progress
+
+Participant Mapping
+
+  ATTENDEE Parameter          JSCalendar Property
+  -------------------------   ----------------------------
+  CN                          name
+  EMAIL                       email
+  CUTYPE                      kind
+  PARTSTAT                    participationStatus
+  ROLE=CHAIR                  roles: [chair]
+  ROLE=OWNER                  roles: [owner]
+  ROLE=OPT-PARTICIPANT        attendance: optional
+  ROLE=NON-PARTICIPANT        attendance: none
+  RSVP                        expectReply
+  SCHEDULE-AGENT              scheduleAgent
+  DELEGATED-FROM              delegatedFrom
+  DELEGATED-TO                delegatedTo
+  X-SEQUENCE                  scheduleSequence
+  X-DTSTAMP                   scheduleUpdated
+
+APPLE ICALENDAR EXTENSIONS
+
+Apple's Calendar app (macOS/iOS) uses several proprietary iCalendar
+extensions.  There is no formal Apple specification for these; our
+implementation is based on reverse-engineering and community sources:
+
+  - X-APPLE-STRUCTURED-LOCATION format examples
+    https://github.com/collective/icalendar/issues/116
+    https://github.com/icalendar/icalendar/issues/108
+
+  - Apple iCalendar property analysis
+    https://spaceraccoon.dev/exploiting-icalendar-properties-enterprise-applications/
+
+  - iCalendar non-standard properties overview
+    https://en.wikipedia.org/wiki/ICalendar
+
+  - RFC 9073 (standardized alternative to Apple structured data)
+    https://www.rfc-editor.org/rfc/rfc9073.html
+
+Reading Apple Extensions
+
+  X-APPLE-STRUCTURED-LOCATION
+    Parsed into locations[] with:
+    - geo: URI value -> coordinates
+    - X-TITLE parameter -> name
+    - X-ADDRESS parameter -> description
+    When both X-APPLE-STRUCTURED-LOCATION and GEO are present on the
+    same event, the Apple property takes precedence (it is a superset
+    of GEO with additional metadata).
+
+  X-APPLE-DEFAULT-ALARM
+    When a VALARM has X-APPLE-DEFAULT-ALARM:TRUE, the event's
+    useDefaultAlerts is set to true.
+
+  X-WR-ALARMUID
+    Used as a fallback alarm identifier when the standard UID property
+    is missing from a VALARM.
+
+Writing Apple Extensions
+
+  When generating iCalendar output:
+
+  - Locations with coordinates AND a name or description are written as
+    X-APPLE-STRUCTURED-LOCATION (with X-TITLE and X-ADDRESS parameters)
+    instead of plain GEO.  This ensures Apple Calendar displays the
+    location on a map with the correct title.
+
+  - Locations with coordinates but no additional metadata are written
+    as standard GEO properties.
+
+  - This approach ensures that:
+    1. Apple Calendar gets rich location data it can display
+    2. Other clients get standard GEO they can parse
+    3. Round-trips through our converter are stable
+
+  Properties we do NOT generate (low interop value):
+  - X-APPLE-TRAVEL-DURATION (no JSCalendar equivalent)
+  - X-APPLE-TRAVEL-ADVISORY-BEHAVIOR (no JSCalendar equivalent)
+  - X-APPLE-MAPKIT-HANDLE (binary plist, opaque)
+
+TIMEZONE HANDLING
+
+The module includes Text::JSCalendar::TimeZones which contains
+auto-generated VTIMEZONE data for all IANA timezone identifiers.
+Timezone lookup uses fuzzy matching (Text::LevenshteinXS) to handle
+non-standard TZID values from various calendar implementations.
+
+When generating iCalendar output, VTIMEZONE components are
+automatically included for all timezones referenced by events.
+
+TESTING
+
+  t/api.t          - Gold-file comparison tests (parse + roundtrip)
+  t/icalfiles.t    - Roundtrip normalization tests
+  t/cyrus-caldav.t - Live Cyrus CalDAV/JMAP integration tests
+                     (set CYRUS_URL, CYRUS_USER, CYRUS_PASS to enable)
+
+The Cyrus integration tests verify:
+  - CalDAV PUT/GET roundtrip for events with various properties
+  - End timezone handling
+  - GEO coordinate preservation
+  - CONFERENCE/virtualLocations
+  - VTODO/Task support
+  - JMAP CalendarEvent creation and comparison with our conversion
+
+SPECIFICATIONS
+
+  RFC 5545  - Internet Calendaring (iCalendar)
+  RFC 7986  - New Properties for iCalendar
+  RFC 9073  - Event Publishing Extensions to iCalendar
+
+  draft-ietf-calext-jscalendarbis
+    JSCalendar: A JSON Representation of Calendar Data
+
+  draft-ietf-calext-jscalendar-icalendar
+    JSCalendar: Converting from and to iCalendar
+
+  draft-ietf-calext-icalendar-jscalendar-extensions
+    iCalendar Format Extensions for JSCalendar
+
+AUTHOR
+
+  Bron Gondwana <brong@cpan.org>
+
+LICENSE
+
+  Copyright 2019-2026 FastMail Pty Ltd.
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself (Artistic License 2.0).

@@ -3,23 +3,20 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-# Platform-specific linking against File::Raw shared library
+# File::Raw exports its C API symbols via dl_load_flags { 0x01 } (RTLD_GLOBAL).
+# This means on ELF platforms (Linux, FreeBSD, etc.) we do NOT need to link
+# against Raw.so directly - the symbols are globally available at runtime
+# as long as File::Raw is loaded first.
+#
+# On macOS, flat namespace makes symbols visible without any special handling.
+# On Windows, we still need explicit linking.
+
 my $extra_libs = '';
 
-if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'netbsd' ||
-    $^O eq 'solaris' || $^O eq 'sunos' || $^O eq 'dragonfly') {
-    # Unix ELF systems: link against Raw.so via -L/-l with $ORIGIN rpath
-    $extra_libs = '-L../../../blib/arch/auto/File/Raw -Wl,-rpath,\$ORIGIN/../File/Raw -lRaw';
-}
-elsif ($^O eq 'openbsd') {
-    # OpenBSD: link via -L/-l without GNU ld rpath flags
-    $extra_libs = '-L../../../blib/arch/auto/File/Raw -lRaw';
-}
-elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
+if ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
     my $raw_dir = '../../../blib/arch/auto/File/Raw';
     $extra_libs = "-L$raw_dir -lRaw";
 }
-# macOS/darwin: no special linking needed (flat namespace makes symbols visible)
 
 my %makefile_args = (
     NAME              => 'file_api_test',

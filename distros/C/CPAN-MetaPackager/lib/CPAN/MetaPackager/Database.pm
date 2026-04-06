@@ -88,16 +88,14 @@ has time_option =>
 	required	=> 0,
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # -----------------------------------------------
 
 sub build_pad
 {
-	my($self)			= @_;
-	my($pad)			= {};
-	$$pad{count}		= {};
-	$$pad{count}{$_}	= 0 for (@{$self -> node_types});
+	my($self)	= @_;
+	my($pad)	= {};
 
 	for (@{$self -> table_names}) {$$pad{$_} = $self -> read_table($_) };
 
@@ -179,20 +177,6 @@ sub insert_hashref
 
 # --------------------------------------------------
 
-sub read_1_record
-{
-	my($self, $table_name, $id) = @_;
-	my($sql)	= "select * from $table_name where id = $id";
-	my($set)	= $self -> db -> query($sql) || die $self -> db -> error;
-
-	# Return a hashref.
-
-	return ${$set -> hashes}[0];
-
-} # End of read_1_record.
-
-# --------------------------------------------------
-
 sub read_table
 {
 	my($self, $table_name)	= @_;
@@ -204,18 +188,6 @@ sub read_table
 	return [$set -> hashes];
 
 } # End of read_table.
-
-# --------------------------------------------------
-
-sub update_table
-{
-	my($self, $table_name, $id, $columns)	= @_;
-	my($sql)	= "update $table_name set $columns where id = $id";
-	my($set)	= $self -> db -> query($sql) || die $self -> db -> error;
-
-	return $set;
-
-} # End of update_table.
 
 # --------------------------------------------------
 

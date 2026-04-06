@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Chandra" : "0.11",
-            "Object::Proto::Sugar" : "0.02",
+            "Object::Proto::Sugar" : "0.03",
             "perl" : "5.008003"
          }
       },
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.01,
+   "version" : 0.02,
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

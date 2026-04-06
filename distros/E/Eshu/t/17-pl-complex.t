@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 12;
 use Eshu;
 
 # Real-world: module boilerplate
@@ -195,4 +195,176 @@ END
 
 	my $got = Eshu->indent_pl($input);
 	is($got, $expected, 'chained method calls with nested args');
+}
+
+# Explicit scalar deref ${$ref} — braces net zero, depth unaffected
+{
+	my $input = <<'END';
+sub foo {
+my $ref = \42;
+my $val = ${$ref};
+return $val;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	my $ref = \42;
+	my $val = ${$ref};
+	return $val;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'explicit scalar deref ${$ref}');
+}
+
+# Array deref @{$ref} — braces net zero
+{
+	my $input = <<'END';
+sub foo {
+my @copy = @{$self->{items}};
+return \@copy;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	my @copy = @{$self->{items}};
+	return \@copy;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'array deref @{$ref} does not corrupt depth');
+}
+
+# Statement modifier: if/unless do not open a block
+{
+	my $input = <<'END';
+sub process {
+my $x = get_value();
+return undef if !defined $x;
+return 0 if $x == 0;
+return $x;
+}
+END
+
+	my $expected = <<'END';
+sub process {
+	my $x = get_value();
+	return undef if !defined $x;
+	return 0 if $x == 0;
+	return $x;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'statement modifiers do not open blocks');
+}
+
+# Statement modifiers: unless/while/until
+{
+	my $input = <<'END';
+sub run {
+do_step() unless $done;
+redo() while !$finished;
+my $x = 1;
+}
+END
+
+	my $expected = <<'END';
+sub run {
+	do_step() unless $done;
+	redo() while !$finished;
+	my $x = 1;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'unless/while statement modifiers do not open blocks');
+}
+
+# die with hashref object
+{
+	my $input = <<'END';
+sub check {
+my ($val) = @_;
+die {
+code => 400,
+message => 'bad input',
+value => $val,
+} unless defined $val;
+return $val;
+}
+END
+
+	my $expected = <<'END';
+sub check {
+	my ($val) = @_;
+	die {
+		code => 400,
+		message => 'bad input',
+		value => $val,
+	} unless defined $val;
+	return $val;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'die with hashref object');
+}
+
+# Ternary operator spanning conditions
+{
+	my $input = <<'END';
+sub label {
+my ($n) = @_;
+my $text = $n == 1
+? 'one item'
+: "$n items";
+return $text;
+}
+END
+
+	my $expected = <<'END';
+sub label {
+	my ($n) = @_;
+	my $text = $n == 1
+	? 'one item'
+	: "$n items";
+	return $text;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'ternary continuation lines at depth 1');
+}
+
+# Nested map/grep pipeline
+{
+	my $input = <<'END';
+sub active_names {
+my ($self) = @_;
+return [
+map { $_->{name} }
+grep { $_->{active} }
+@{$self->{users}}
+];
+}
+END
+
+	my $expected = <<'END';
+sub active_names {
+	my ($self) = @_;
+	return [
+		map { $_->{name} }
+		grep { $_->{active} }
+		@{$self->{users}}
+	];
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'nested map/grep pipeline inside arrayref');
 }

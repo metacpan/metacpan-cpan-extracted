@@ -1,13 +1,12 @@
 package Langertha::Engine::AKIOpenAI;
 # ABSTRACT: AKI.IO via OpenAI-compatible API
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Tools';
-with 'Langertha::Role::HermesTools';
+with 'Langertha::Role::Tools', 'Langertha::Role::HermesTools';
 
 
 has '+url' => (
@@ -43,7 +42,7 @@ Langertha::Engine::AKIOpenAI - AKI.IO via OpenAI-compatible API
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

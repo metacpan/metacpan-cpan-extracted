@@ -3,6 +3,7 @@
 
 requires "Carp" => "0";
 requires "Errno" => "0";
+requires "Fcntl" => "0";
 requires "File::Path" => "0";
 requires "File::Spec" => "0";
 requires "File::Temp" => "0";
@@ -13,18 +14,27 @@ requires "POSIX" => "0";
 requires "Role::Tiny" => "2.002004";
 requires "Scalar::Util" => "0";
 requires "Sub::Util" => "1.40";
+requires "Test2::IPC" => "1.302219";
 requires "Test2::Util::UUID" => "0.002010";
 requires "Time::HiRes" => "0";
 requires "overload" => "0";
 requires "parent" => "0";
 requires "perl" => "5.012000";
 suggests "Atomic::Pipe" => "0.022";
+suggests "DBD::MariaDB" => "1.00";
+suggests "DBD::Pg" => "v3.5.0";
+suggests "DBD::mysql" => "4.00";
+suggests "DBI" => "1.644";
+suggests "DBIx::QuickDB" => "0.000040";
 suggests "IO::Select" => "1.55";
+suggests "IO::Socket::UNIX" => "1.55";
+suggests "IPC::SysV" => "2.09";
 suggests "Linux::Inotify2" => "2.3";
 
 on 'test' => sub {
   requires "Test2::API" => "1.302219";
   requires "Test2::Require::Module" => "1.302219";
+  requires "Test2::V0" => "1.302219";
   requires "Test2::V1" => "1.302219";
 };
 
@@ -34,7 +44,14 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Atomic::Pipe" => "0.022";
+  requires "DBD::MariaDB" => "1.00";
+  requires "DBD::Pg" => "v3.5.0";
+  requires "DBD::mysql" => "4.00";
+  requires "DBI" => "1.644";
+  requires "DBIx::QuickDB" => "0.000040";
   requires "IO::Select" => "1.55";
+  requires "IO::Socket::UNIX" => "1.55";
+  requires "IPC::SysV" => "2.09";
   requires "Linux::Inotify2" => "2.3";
   requires "Test::Pod" => "1.41";
 };

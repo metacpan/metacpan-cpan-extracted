@@ -1,5 +1,5 @@
 package Future::Uring::Exception;
-$Future::Uring::Exception::VERSION = '0.003';
+$Future::Uring::Exception::VERSION = '0.004';
 use 5.020;
 use warnings;
 use experimental 'signatures';
@@ -11,7 +11,7 @@ require Future::Uring;
 
 sub new($class, $operation, $res, $filename, $line) {
 	my $error = do { local $! = -$res; "$!" };
-	bless {
+	return bless {
 		operation => $operation,
 		errno     => -$res,
 		error     => $error,
@@ -51,7 +51,7 @@ sub PROPAGATE($self, $filename, $line) {
 		error     => $self->{error},
 		filename  => $filename,
 		line      => $line,
-	}, ref($self);
+	}, ref $self;
 }
 
 1;
@@ -70,7 +70,7 @@ Future::Uring::Exception - an exception from Future::Uring
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

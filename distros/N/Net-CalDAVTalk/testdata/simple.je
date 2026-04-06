@@ -1,0 +1,20 @@
+[
+   {
+      "@type" : "Event",
+      "duration" : "PT1H",
+      "isAllDay" : false,
+      "locations" : {
+         "location" : {
+            "name" : "At a location"
+         }
+      },
+      "prodId" : "test",
+      "sequence" : 1,
+      "showWithoutTime" : false,
+      "start" : "2016-09-16T10:00:00",
+      "timeZone" : "Europe/Berlin",
+      "title" : "Simple Event",
+      "uid" : "9f160501-da22-4a96-a4e9-c56cef8158e8",
+      "updated" : "2016-09-13T12:16:00Z"
+   }
+]

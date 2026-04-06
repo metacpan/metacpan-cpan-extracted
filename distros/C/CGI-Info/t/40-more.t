@@ -205,10 +205,10 @@ subtest 'Custom validation subroutines' => sub {
 
 # Test Params::Validate::Strict integration
 subtest 'Strict validation rules' => sub {
-	plan skip_all => 'Params::Validate::Strict not available'
-		unless eval { require Params::Validate::Strict; 1 };
+	test_needs 'Params::Validate::Strict';
 
-	my $info = CGI::Info->new();
+	my @messages;
+	my $info = CGI::Info->new(logger => \@messages);
 
 	local @ARGV = ('age=25', 'invalid_age=200');
 
@@ -229,6 +229,7 @@ subtest 'Strict validation rules' => sub {
 
 	is($params->{age}, 25, 'Strict validation passed for valid age');
 	ok(!exists($params->{invalid_age}), 'Strict validation failed for invalid age');
+	ok(scalar(@messages));
 };
 
 # Test security features - SQL injection detection
@@ -239,7 +240,7 @@ subtest 'SQL injection detection' => sub {
 		QUERY_STRING => "search=' OR 1=1--"
 	);
 
-	my $info = CGI::Info->new();
+	my $info = new_ok('CGI::Info');
 	my $params = $info->params();
 
 	is($info->{status}, 403, 'SQL injection blocked with 403 status');
@@ -448,11 +449,22 @@ subtest 'Content length validation' => sub {
 	is($info->{status}, 411, 'Invalid content length returns 411');
 
 	# Test oversized content
-	$info = CGI::Info->new();
+	$info = new_ok('CGI::Info');
 	$info->{max_upload_size} = 100;
 	$ENV{CONTENT_LENGTH} = '1000';
 	$params = $info->params();
 	is($info->{status}, 413, 'Oversized content returns 413');
+
+	# Boundary test
+	$info = new_ok('CGI::Info');
+	$info->{max_upload_size} = 0;
+	$ENV{CONTENT_LENGTH} = '1';
+	$params = $info->params();
+	is($info->{status}, 413, 'Oversized content returns 413, when max_upload_size set to 0');
+
+	$info = CGI::Info->new(max_upload_size => 0);
+	$params = $info->params();
+	is($info->{status}, 413, 'Oversized content returns 413, when max_upload_size set to 0 in new');
 
 	restore_env();
 };

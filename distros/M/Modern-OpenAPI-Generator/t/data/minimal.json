@@ -1,0 +1,33 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Minimal", "version": "1.0" },
+  "paths": {
+    "/ping": {
+      "get": {
+        "operationId": "get_ping",
+        "summary": "ping",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PingResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PingResponse": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

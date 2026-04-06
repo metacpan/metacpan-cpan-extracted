@@ -8,6 +8,7 @@ data/cpan.metapackager.conf
 data/modules.table.csv
 data/one.png
 data/tiddlers.json
+data/topic.txt
 html/cpan.metacurator.tree.html
 lib/CPAN/MetaCurator.pm
 lib/CPAN/MetaCurator/Config.pm

@@ -1,5 +1,12 @@
 Revision history for Net-CardDAVTalk
 
+0.10    Sat Apr  5 2026
+  - Delegate vCard<=>JSContact conversion to Text::JSContact
+  - API now uses JSContact Card hashrefs instead of VCard objects
+  - NewContact/UpdateContact take hashrefs
+  - GetContact/GetContacts return hashrefs
+  - VCard.pm no longer used (kept for backward compatibility)
+
 0.09    Fri Mar  2 13:09 2018
   - add VCard updates for 'n' setting on groups and VPhoto
 

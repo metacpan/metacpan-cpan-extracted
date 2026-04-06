@@ -5,9 +5,8 @@ use warnings;
 
 use IO::Select;
 use Chandra::Socket::Connection;
-use File::Spec ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 require Chandra;
 

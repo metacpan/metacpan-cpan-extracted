@@ -76,7 +76,7 @@ use Symbol;
 
 our $VERSION;
 BEGIN {
-  $VERSION = '3.61';
+  $VERSION = '3.63';
   require ExtUtils::ParseXS::Constants; ExtUtils::ParseXS::Constants->VERSION($VERSION);
   require ExtUtils::ParseXS::CountLines; ExtUtils::ParseXS::CountLines->VERSION($VERSION);
   require ExtUtils::ParseXS::Node; ExtUtils::ParseXS::Node->VERSION($VERSION);
@@ -97,6 +97,7 @@ use ExtUtils::ParseXS::Utilities qw(
   current_line_number
   blurt
   death
+  deathHint
   escape_file_for_line_directive
   report_typemap_failure
 );

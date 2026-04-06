@@ -1,5 +1,5 @@
 package PDL::Role::Enumerable;
-$PDL::Role::Enumerable::VERSION = '0.006004';
+$PDL::Role::Enumerable::VERSION = '0.006005';
 use 5.010;
 use strict;
 use warnings;
@@ -68,7 +68,7 @@ PDL::Role::Enumerable
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 AUTHORS
 

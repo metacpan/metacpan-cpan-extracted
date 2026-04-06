@@ -4,12 +4,12 @@ use 5.008003;
 use strict;
 use warnings;
 
-use Object::Proto::Sugar;
+use Object::Proto::Sugar -types;
 use Chandra::App;
 use Chandra::Game::Tetris::Engine;
 use Cpanel::JSON::XS ();
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has conf => (
 	isa => HashRef

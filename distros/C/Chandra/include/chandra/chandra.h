@@ -390,6 +390,53 @@ static void sigpipe_restore(SigpipeGuard *guard) {
 
 /* ---- Recursive directory walker for HotReload ---- */
 
+#ifdef _WIN32
+#include <windows.h>
+static void
+_hotreload_scan_recursive(pTHX_ const char *dir, HV *files_hv)
+{
+    WIN32_FIND_DATAA fdata;
+    HANDLE hFind;
+    char pattern[4096];
+    int len;
+
+    len = snprintf(pattern, sizeof(pattern), "%s\\*", dir);
+    if (len < 0 || (size_t)len >= sizeof(pattern)) return;
+
+    hFind = FindFirstFileA(pattern, &fdata);
+    if (hFind == INVALID_HANDLE_VALUE) return;
+
+    do {
+        const char *name = fdata.cFileName;
+        SV *fullpath_sv;
+        const char *fullpv;
+        STRLEN fulllen;
+
+        if (name[0] == '.') {
+            if (name[1] == '\0') continue;
+            if (name[1] == '.' && name[2] == '\0') continue;
+        }
+
+        fullpath_sv = newSVpvf("%s/%s", dir, name);
+        fullpv = SvPV(fullpath_sv, fulllen);
+
+        if (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            _hotreload_scan_recursive(aTHX_ fullpv, files_hv);
+        } else {
+            /* Convert FILETIME to Unix epoch seconds */
+            ULARGE_INTEGER ull;
+            ull.LowPart  = fdata.ftLastWriteTime.dwLowDateTime;
+            ull.HighPart = fdata.ftLastWriteTime.dwHighDateTime;
+            (void)hv_store(files_hv, fullpv, (I32)fulllen,
+                newSVnv((NV)((double)ull.QuadPart / 10000000.0 - 11644473600.0)), 0);
+        }
+
+        SvREFCNT_dec(fullpath_sv);
+    } while (FindNextFileA(hFind, &fdata));
+
+    FindClose(hFind);
+}
+#else
 #include <dirent.h>
 static void
 _hotreload_scan_recursive(pTHX_ const char *dir, HV *files_hv)
@@ -429,6 +476,7 @@ _hotreload_scan_recursive(pTHX_ const char *dir, HV *files_hv)
 
     closedir(dh);
 }
+#endif
 
 /* ---- DevTools static XS callbacks ---- */
 
@@ -738,6 +786,66 @@ static XS(xs_shortcut_dispatch_callback)
     } else {
         ST(0) = sv_2mortal(result);
     }
+    XSRETURN(1);
+}
+
+/* ---- DragDrop static XS callback ---- */
+
+static XS(XS_Chandra__DragDrop__dispatch_trampoline)
+{
+    dXSARGS;
+    SV *dd_self = (SV *)CvXSUBANY(cv).any_ptr;
+    SV *json_sv = (items > 0) ? ST(0) : &PL_sv_undef;
+
+    if (!dd_self || !SvOK(dd_self) || !SvROK(dd_self)) {
+        ST(0) = &PL_sv_undef;
+        XSRETURN(1);
+    }
+
+    {
+        dSP;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(dd_self);
+        XPUSHs(json_sv);
+        PUTBACK;
+        call_method("_dispatch", G_DISCARD | G_EVAL);
+        if (SvTRUE(ERRSV))
+            warn("DragDrop dispatch error: %s", SvPV_nolen(ERRSV));
+        FREETMPS; LEAVE;
+    }
+
+    ST(0) = &PL_sv_undef;
+    XSRETURN(1);
+}
+
+/* ---- ContextMenu static XS callback ---- */
+
+static XS(XS_Chandra__ContextMenu__dispatch_trampoline)
+{
+    dXSARGS;
+    SV *cm_self = (SV *)CvXSUBANY(cv).any_ptr;
+    SV *json_sv = (items > 0) ? ST(0) : &PL_sv_undef;
+
+    if (!cm_self || !SvOK(cm_self) || !SvROK(cm_self)) {
+        ST(0) = &PL_sv_undef;
+        XSRETURN(1);
+    }
+
+    {
+        dSP;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(cm_self);
+        XPUSHs(json_sv);
+        PUTBACK;
+        call_method("_dispatch", G_DISCARD | G_EVAL);
+        if (SvTRUE(ERRSV))
+            warn("ContextMenu dispatch error: %s", SvPV_nolen(ERRSV));
+        FREETMPS; LEAVE;
+    }
+
+    ST(0) = &PL_sv_undef;
     XSRETURN(1);
 }
 

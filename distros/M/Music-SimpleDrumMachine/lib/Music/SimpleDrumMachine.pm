@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0204';
+our $VERSION = '0.0403';
 
 use v5.36;
 use feature 'try';
@@ -68,10 +68,26 @@ sub _build_drums {
         kick  => { num => 36, chan => $self->chan < 0 ? 0 : $self->chan, pat => [] },
         snare => { num => 38, chan => $self->chan < 0 ? 1 : $self->chan, pat => [] },
         hihat => { num => 42, chan => $self->chan < 0 ? 2 : $self->chan, pat => [] },
-        open  => { num => 46, chan => $self->chan < 0 ? 3 : $self->chan, pat => [] },
-        crash => { num => 49, chan => $self->chan < 0 ? 4 : $self->chan, pat => [] },
+        fillcrash => { num => 49, chan => $self->chan < 0 ? 3 : $self->chan, pat => [] },
     };
     return $drums;
+}
+
+
+has fill_crash => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 1 },
+);
+
+
+has fills => (
+    is      => 'lazy',
+    builder => '_build_fills',
+);
+sub _build_fills {
+    my ($self) = @_;
+    return { _default_fill => sub { $self->_default_fill } };
 }
 
 
@@ -79,6 +95,12 @@ has filling => (
     is      => 'rw',
     isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
     default => sub { 1 },
+);
+
+
+has next_fill => (
+    is      => 'rw',
+    default => sub { '_default_fill' },
 );
 
 
@@ -96,9 +118,13 @@ has notes => (
 
 
 has parts => (
-    is      => 'rw',
-    default => sub { { _default_part => \&_default_part } },
+    is      => 'lazy',
+    builder => '_build_parts',
 );
+sub _build_parts {
+    my ($self) = @_;
+    return { _default_part => sub { $self->_default_part } };
+}
 
 
 has port_name => (
@@ -126,6 +152,27 @@ has verbose => (
     is      => 'ro',
     isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
+);
+
+
+has velo_max => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not valid" unless $_[0] =~ /^\d+$/ },
+    default => sub { 10 },
+);
+
+
+has velo_min => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not valid" unless $_[0] =~ /^-?\d+$/ },
+    default => sub { -10 },
+);
+
+
+has velo_off => (
+    is      => 'rw',
+    isa     => sub { croak "$_[0] is not valid" unless $_[0] =~ /^\d+$/ },
+    default => sub { 110 },
 );
 
 has _queue => (
@@ -212,7 +259,7 @@ sub BUILD {
     my $n = keys $self->drums->%*;
     for my $drum ($args->{add_drums}->@*) {
         my $chan = defined $drum->{chan} ? $drum->{chan} : $self->chan < 0 ? $n++ : $self->chan;
-        $self->drums->{ $drum->{drum} } = { num  => $drum->{num}, chan => $chan, pat  => [] };
+        $self->drums->{ $drum->{drum} } = { num => $drum->{num}, chan => $chan, pat  => [] };
     }
 
     my $timer = IO::Async::Timer::Periodic->new(
@@ -232,7 +279,7 @@ sub BUILD {
                 }
                 for my $drum (keys $self->drums->%*) { # fill the queue
                     if ($self->drums->{$drum}{pat}[ $self->_beat_count % scalar($self->drums->{$drum}{pat}->@*) ]) {
-                        push $self->_queue->@*, { drum => $drum, velocity => $self->_velocity(-10, 10, 110) };
+                        push $self->_queue->@*, { drum => $drum, velocity => $self->velocity };
                     }
                 }
                 for my $drum ($self->_queue->@*) { # play the queue
@@ -265,88 +312,52 @@ sub BUILD {
 }
 
 sub _adjust_cymbals($self) {
-    if ($self->_filled) {
-        $self->drums->{crash}{pat}[0] = 1; # crash on one
-        $self->drums->{hihat}{pat}[0] = 0; # mutually exclusive
-    }
-    else {
-        $self->drums->{crash}{pat}[0] = 0; # not crashing
-        $self->drums->{hihat}{pat}[0] = $self->_hats; # restore hihat bit
+    if ($self->fill_crash) {
+        if ($self->_filled) {
+            $self->drums->{fillcrash}{pat}[0] = 1; # crash on one
+            $self->drums->{hihat}{pat}[0] = 0; # mutually exclusive
+        }
+        else {
+            $self->drums->{fillcrash}{pat}[0] = 0; # not crashing
+            $self->drums->{hihat}{pat}[0] = $self->_hats; # restore hihat bit
+        }
     }
     $self->_filled(0);
 }
 
 sub _adjust_drums($self, $fill_flag) {
     say 'Beats: ' . $self->_beat_count if $self->verbose;
+    my ($next, $patterns);
+    # play a fill or a part
     if ($self->filling && $fill_flag) {
-        say 'fill' if $self->verbose;
-        my $size = rand() < 0.5 ? $self->divisions / 2 : $self->divisions;
-        say "size: $size" if $self->verbose;
-        my %durations = (
-            sn => [1],
-            en => [1,0],
-            qn => [1,0,0,0],
-        );
-        my $mdp = Music::Duration::Partition->new(
-            size    => $self->divisions,
-            pool    => [qw(qn en sn)],
-            weights => [1, 2, 1],
-            groups  => [0, 0, 2],
-        );
-        my $motif = $mdp->motif;
-        my @converted = map { $durations{$_}->@* } @$motif;
-        if ($size < $self->divisions) {
-            my $div = $self->beats / $size;
-            my ($next, $pats) = $self->prefill_part->();
-            for my $drum (keys $self->drums->%*) {
-                if ($drum eq 'snare') {
-                    $self->drums->{$drum}{pat} = [ $pats->{$drum}->@[0 .. $div - 1], @converted[0 .. $div - 1] ]
-                }
-                else {
-                    $self->drums->{$drum}{pat} = [ $pats->{$drum}->@[0 .. $div - 1], (0) x $div ];
-                }
-            }
-        }
-        else {
-            for my $drum (keys $self->drums->%*) {
-                if ($drum eq 'snare') {
-                    $self->drums->{$drum}{pat} = \@converted;
-                }
-                else {
-                    $self->drums->{$drum}{pat} = [ (0) x $self->beats ];
-                }
-            }
-        }
+        my $fill = $self->fills->{ $self->next_fill };
+        ($next, $patterns) = $fill->();
+        $self->next_fill($next);
     }
     else {
         my $part = $self->parts->{ $self->next_part };
-        my ($next, $patterns) = $part->();
+        ($next, $patterns) = $part->();
         $self->next_part($next);
-        for my $drum (keys %$patterns) {
-            $self->drums->{$drum}{pat} = $patterns->{$drum};
+    }
+    # add the patterns to the drums
+    for my $drum (keys %$patterns) {
+        $self->drums->{$drum}{pat} = $patterns->{$drum};
+    }
+    # add zero-patterns to the unused drums
+    for my $drum (keys $self->drums->%*) {
+        unless (exists $patterns->{$drum}) {
+            $self->drums->{$drum}{pat} = [ (0) x $self->beats ];
         }
     }
-    $self->_hats($self->drums->{hihat}{pat}[0]); # save bit
-    $self->drums->{crash}{pat} = [ (0) x ($self->beats * $self->divisions) ];
-    $self->_adjust_cymbals if $self->filling;
-    # $drums->{hihat}{num} = $self->_random_note($notes);
-    # $drums->{kick}{num}  = $self->_random_note($notes);
-    # $drums->{snare}{num} = $self->_random_note($notes);
-    # $drums->{crash}{num} = $self->_random_note($notes);
+    if ($self->filling) {
+        $self->_hats($self->drums->{hihat}{pat}[0]); # save bit
+        $self->drums->{fillcrash}{pat} = [ (0) x ($self->beats * $self->divisions) ];
+        $self->_adjust_cymbals;
+    }
 }
 
-sub _velocity($self, $min, $max, $offset) {
-    my $random = $offset + int(rand($max - $min + 1)) + $min;
-    return $random;
-}
-
-sub _random_note($self) {
-    my $random = $self->notes->[ int rand $self->notes->@* ] - 24;
-    return $random;
-}
-
-sub _default_part {
-    # say 'Default part!';
+sub _default_part($self) {
+    say '_default_part' if $self->verbose;
     my %patterns = (
         hihat => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
         kick  => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
@@ -354,6 +365,56 @@ sub _default_part {
     );
     my $next = '_default_part';
     return $next, \%patterns;
+}
+
+sub _default_fill($self) {
+    say '_default_fill' if $self->verbose;
+    my $size = rand() < 0.5 ? $self->divisions / 2 : $self->divisions;
+    say "size: $size" if $self->verbose;
+    my %durations = (
+        sn => [1],
+        en => [1,0],
+        qn => [1,0,0,0],
+    );
+    my $mdp = Music::Duration::Partition->new(
+        size    => $self->divisions,
+        pool    => [qw(qn en sn)],
+        weights => [1, 2, 1],
+        groups  => [0, 0, 2],
+    );
+    my $motif = $mdp->motif;
+    my @converted = map { $durations{$_}->@* } @$motif;
+    my %patterns;
+    if ($size < $self->divisions) {
+        my $div = $self->beats / $size;
+        my ($next, $pats) = $self->prefill_part->($self);
+        for my $drum (keys $self->drums->%*) {
+            if ($drum eq 'snare') {
+                $patterns{$drum} = [ $pats->{$drum}->@[0 .. $div - 1], @converted[0 .. $div - 1] ]
+            }
+            else {
+                $patterns{$drum} = [ $pats->{$drum}->@[0 .. $div - 1], (0) x $div ];
+            }
+        }
+    }
+    else {
+        for my $drum (keys $self->drums->%*) {
+            if ($drum eq 'snare') {
+                $patterns{$drum} = \@converted;
+            }
+            else {
+                $patterns{$drum} = [ (0) x $self->beats ];
+            }
+        }
+    }
+    my $next = '_default_fill';
+    return $next, \%patterns;
+}
+
+
+sub velocity($self) {
+    my $random = $self->velo_off + int(rand($self->velo_max - $self->velo_min + 1)) + $self->velo_min;
+    return $random;
 }
 
 1;
@@ -370,25 +431,28 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0204
+version 0.0403
 
 =head1 SYNOPSIS
 
   use Music::SimpleDrumMachine ();
 
   my $dm = Music::SimpleDrumMachine->new( # use defaults
-    port_name => 'midi device',
+    port_name => 'midi device', # required
   );
+
   # OR:
   $dm = Music::SimpleDrumMachine->new(
     port_name => 'midi device',
     bpm       => 100,
-    next_part => 'part_A',
     parts     => {
         part_A => \&part_A,
         part_B => \&part_B,
     },
-    verbose => 1,
+    next_part => 'part_A',
+    fills     => { fill_A => \&fill_A },
+    next_fill => 'fill_A',
+    verbose   => 1,
   );
 
   sub part_A {
@@ -411,12 +475,25 @@ version 0.0204
       my $next = 'part_A';
       return $next, \%patterns;
   }
+  sub fill_A {
+      print "fill_A\n";
+      my %patterns = (
+          snare => [qw(1 0 1 0 1 1 1 1 0 1 0 1 1 0 1 0)],
+      );
+      my $next = 'fill_A';
+      return $next, \%patterns;
+  }
 
 =head1 DESCRIPTION
 
 C<Music::SimpleDrumMachine> is a simple 16th-note-phrase drummer. By
 invoking this module, your MIDI device will begin playing in
 real-time.
+
+* Triplets are not supported. Boo!
+
+* Use the extra-handy eg/list_devices.pl program to see the names of
+the open MIDI ports on the system.
 
 =head1 ATTRIBUTES
 
@@ -425,7 +502,7 @@ real-time.
   add_drums => \%drums,
 
 Add an array-ref of hash-refs of the form
-C<[{ drum =E<gt> 'name', num => midi_num, chan => channel }]>
+C<[{ drum =E<gt> 'name', num =E<gt> midi_num, chan =E<gt> channel }]>
 to the known drums in the constructor. The B<chan> key is optional
 and is only necessary if you want to assign a drum to a specific
 channel.
@@ -480,22 +557,50 @@ Default:
   kick  => { num => 36, chan => ..., pat => [] },
   snare => { num => 38, chan => ..., pat => [] },
   hihat => { num => 42, chan => ..., pat => [] },
-  open  => { num => 46, chan => ..., pat => [] },
-  crash => { num => 49, chan => ..., pat => [] },
+  fillcrash => { num => 49, chan => ..., pat => [] },
+
+=head2 fill_crash
+
+  $fill_crash = $dm->fill_crash;
+  $dm->fill_crash($boolean);
+
+Should we crash after a fill?
+
+Default: C<1>
+
+=head2 fills
+
+  $fills = $dm->fills;
+  $dm->fills($fills);
+
+List of code-refs of the fills to play.
+
+Default: C<[_default_fill()]>
 
 =head2 filling
 
   $filling = $dm->filling;
   $dm->filling($boolean);
 
-Do we fill between parts?
+Should we fill between parts?
+
+Default: C<1>
+
+=head2 next_fill
+
+  $next_fill = $dm->next_fill;
+  $dm->next_fill($next_fill);
+
+Name of the fill to play first and set subsequently in a fill.
+
+Default: C<'_default_fill'>
 
 =head2 next_part
 
   $next_part = $dm->next_part;
   $dm->next_part($next_part);
 
-Name of the part to play first.
+Name of the part to play first and set subsequently in a part.
 
 Default: C<'_default_part'>
 
@@ -515,7 +620,7 @@ Default: C<[60, 64, 67]>
 
 List of code-refs of the parts to play.
 
-Default: C<[\&_default_part]>
+Default: C<[_default_part()]>
 
 =head2 port_name
 
@@ -547,15 +652,55 @@ Default: C<\&_default_part>
 
 Show progress.
 
+Default: C<0>
+
+=head2 velo_max
+
+  $velo_max = $dm->velo_max;
+  $dm->velo_max($max);
+
+The maximum allowed relative velocity from the B<velo_off> offset.
+
+Default: C<10>
+
+=head2 velo_min
+
+  $velo_min = $dm->velo_min;
+  $dm->velo_min($min);
+
+The minimum allowed relative velocity from the B<velo_off> offset.
+
+Default: C<-10>
+
+=head2 velo_off
+
+  $velo_off = $dm->velo_off;
+  $dm->velo_off($offset);
+
+The velocity offset.
+
+Default: C<110>
+
 =head1 METHODS
 
 =head2 new
 
-  $dm = Music::SimpleDrumMachine->new(verbose => 1);
+  $dm = Music::SimpleDrumMachine->new(%arguments);
 
 Create a new C<Music::SimpleDrumMachine> object.
 
 =for Pod::Coverage BUILD
+
+=head2 velocity
+
+  $dm->velocity;
+
+Return a random velocity between the B<velo_min> (minimum) and
+B<velo_max> (maximum), starting at the B<velo_off> offset.
+
+So, for C<-10, 10, 110> (the default), a number between C<100> and
+C<120> will be returned. The triple C<0, 0, 127> will return C<127>
+every time.
 
 =head1 SEE ALSO
 

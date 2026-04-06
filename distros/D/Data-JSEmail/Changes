@@ -1,0 +1,16 @@
+Revision history for Perl extension Data::JSEmail
+
+0.01  2026-04-05
+	- Review and fix against RFC 8621
+	- Fix bodyValues to only store text/* parts
+	- Fix make() Reply-To crash (array ref used as hash ref)
+	- Add NFC normalization to asText
+	- Add sender convenience property
+	- Add isEncodingProblem/isTruncated to bodyValues
+	- Add headers to body parts
+	- Add Message-ID, In-Reply-To, References to make()
+	- Fix asMessageIds to return undef on parse failure
+	- Fix asDate to handle undef/unparseable values
+	- Fix _detect_encoding to allow tab/LF/CR as valid 7bit
+	- Remove unused Image::Size import
+	- Add Cyrus JMAP integration tests

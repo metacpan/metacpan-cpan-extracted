@@ -1,5 +1,3 @@
-
-
 [![License](https://img.shields.io/badge/license-Perl%205-blue.svg)](https://github.com/neo1ite/prepare4release/blob/main/LICENSE)
 [![Perl](https://img.shields.io/badge/perl-5.10%2B-blue.svg)](https://www.perl.org/)
 [![CI](https://github.com/neo1ite/prepare4release/actions/workflows/ci.yml/badge.svg)](https://github.com/neo1ite/prepare4release/actions/workflows/ci.yml)
@@ -7,9 +5,10 @@
 [![CPAN version](https://badge.fury.io/pl/App-prepare4release.svg)](https://metacpan.org/pod/App/prepare4release)
 [![CPAN testers](https://cpants.cpanauthors.org/dist/App-prepare4release.svg)](https://cpants.cpanauthors.org/dist/App-prepare4release)
 
+
 # NAME
 
-App::prepare4release - prepare a Perl distribution for release (skeleton)
+App::prepare4release - prepare a Perl distribution for release
 
 # SYNOPSIS
 
@@ -24,7 +23,10 @@ Run from the distribution root (where `prepare4release.json` and `Makefile.PL`
 live). The tool:
 
 - Loads `prepare4release.json` and resolves `module_name` / `version` / `dist_name`
-when omitted (from `Makefile.PL` and the main `.pm`).
+when omitted (from `Makefile.PL` and the main `.pm`). Invalid JSON logs a warning
+and behaves like an empty object. Root keys such as `author`, `abstract`,
+`license`, `min_perl_version`, `module_name`, `version_from`, and `exe_files`
+are copied into `Makefile.PL` `WriteMakefile(...)` when set (see ["CONFIGURATION FILE"](#configuration-file)).
 - Patches `Makefile.PL`: `META_MERGE` (`repository` and `bugtracker` URLs), and
 a marked `MY::postamble` block (between `# BEGIN PREPARE4RELEASE_POSTAMBLE` and
 `# END PREPARE4RELEASE_POSTAMBLE`) that runs `pod2github` when `--github` or
@@ -72,6 +74,13 @@ fails, a short built-in fallback is written. If `README` is missing but
 - Warns when any `t/*.t` or `xt/**/*.t` file starts with `use Test::More` or
 `use Test::Most` (legacy assertion frameworks). Prefer [Test2::V1](https://metacpan.org/pod/Test2%3A%3AV1) or
 [Test2::Tools::Spec](https://metacpan.org/pod/Test2%3A%3ATools%3A%3ASpec).
+- Scans `lib/`, `bin/`, `maint/`, `t/`, and optionally `xt/` for `use` /
+`require` and compares with `PREREQ_PM` / `TEST_REQUIRES` in `Makefile.PL`.
+Core modules for the target minimum Perl are skipped unless a minimum module
+version is given on the `use` line (see [Module::CoreList](https://metacpan.org/pod/Module%3A%3ACoreList)). By default only a
+warning is printed; `--sync-deps` or `dependencies.sync` in
+`prepare4release.json` updates `Makefile.PL` and appends to `cpanfile` when
+present. `dependencies.skip` disables the check.
 
 # README badge injector (`maint/inject-readme-badges.pl`)
 
@@ -94,12 +103,42 @@ options so the script and `README.md` stay consistent. No runtime dependency on
 File name: `prepare4release.json` (in the distribution root).
 
 An empty file or whitespace-only file is treated as an empty JSON object `{}`.
+Invalid JSON logs a warning and is treated as `{}`.
+
+- `author`
+
+    Optional. Copied into `Makefile.PL` `AUTHOR` (distinct from `git.author`).
+
+- `abstract`
+
+    Optional. Copied into `Makefile.PL` `ABSTRACT`.
+
+- `abstract_from`
+
+    Optional. Copied into `Makefile.PL` `ABSTRACT_FROM`.
+
+- `license`
+
+    Optional. Copied into `Makefile.PL` `LICENSE`.
+
+- `exe_files`
+
+    Optional. JSON array of paths; copied into `Makefile.PL` `EXE_FILES`.
 
 - `module_name`
 
     Optional. Perl package (e.g. `My::Module`). If omitted, taken from the
     `VERSION_FROM` module's `package` line, from `NAME` in `Makefile.PL`, or from
-    the first `lib/**/*.pm` file.
+    the first `lib/**/*.pm` file. If set, also written to `Makefile.PL` `NAME`.
+
+- `name`
+
+    Optional. Alternative to `module_name` for `Makefile.PL` `NAME` when
+    `module_name` is absent.
+
+- `version_from`
+
+    Optional. Path written to `Makefile.PL` `VERSION_FROM` when set.
 
 - `version`
 
@@ -112,12 +151,13 @@ An empty file or whitespace-only file is treated as an empty JSON object `{}`.
 - `min_perl_version`
 
     Optional. Minimum Perl version string for the README `Perl` badge (e.g. `5.026`
-    or `v5.26.0`). If omitted, `MIN_PERL_VERSION` from `Makefile.PL` is used, then
-    the combined makefile/module heuristic.
+    or `v5.26.0`). If set, also copied into `Makefile.PL` `MIN_PERL_VERSION`. If
+    omitted for the badge, `MIN_PERL_VERSION` from `Makefile.PL` is used, then the
+    combined makefile/module heuristic.
 
 - `perl_min`
 
-    Optional alias for `min_perl_version`.
+    Optional alias for `min_perl_version` (Makefile and badge).
 
 - `bugtracker`
 
@@ -160,6 +200,27 @@ An empty file or whitespace-only file is treated as an empty JSON object `{}`.
         GitHub Actions and GitLab CI `apt-get install` steps. System libraries are not
         inferrable reliably from CPAN metadata alone; list them here when XS or
         `Alien::*` needs OS packages.
+
+- `dependencies`
+
+    Optional object for [App::prepare4release::Deps](https://metacpan.org/pod/App%3A%3Aprepare4release%3A%3ADeps):
+
+    - `sync`
+
+        If true, merge missing prerequisites into `Makefile.PL` / `cpanfile` (same as
+        `--sync-deps`).
+
+    - `skip`
+
+        If true, skip scanning.
+
+    - `scan_xt`
+
+        If true, include `xt/**/*.t` in test prerequisites (default false).
+
+    - `sync_cpanfile`
+
+        If false, do not modify `cpanfile` when `sync` is true (default true).
 
 # Continuous integration
 

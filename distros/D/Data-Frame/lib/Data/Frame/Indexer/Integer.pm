@@ -1,5 +1,5 @@
 package Data::Frame::Indexer::Integer;
-$Data::Frame::Indexer::Integer::VERSION = '0.006004';
+$Data::Frame::Indexer::Integer::VERSION = '0.006005';
 # ABSTRACT: Data::Frame indexer by integer indices
 
 use Data::Frame::Class;
@@ -20,7 +20,7 @@ Data::Frame::Indexer::Integer - Data::Frame indexer by integer indices
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 AUTHORS
 

@@ -2,7 +2,7 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed weaken/;
@@ -53,6 +53,7 @@ sub have_ready_messages   { croak "Not Implemented" }
 sub have_handles_for_select { 0 }
 sub handles_for_select      { croak "Not Implemented" }
 
+sub suspend_supported             { 1 }
 sub have_handles_for_peer_change  { 0 }
 sub reset_handles_for_peer_change { croak "Not Implemented" }
 sub handles_for_peer_change       { croak "Not Implemented" }
@@ -221,7 +222,7 @@ sub DESTROY {
     return unless $self->{+PID} && $self->{+PID} == $$;
     local $@;
     eval { $self->disconnect;  1 } or warn $@;
-    eval { $self->write_stats; 1 } or warn $@;
+    eval { $self->write_stats; 1 } or warn $@ unless $self->{+DISCONNECTED};
 }
 
 1;
@@ -468,6 +469,43 @@ returns a boolean and if it is false it sets $@ to the error message.
 
 Write the C<< $con->stats >> data to the data store so that
 C<< $con->read_stats >> can read it.
+
+=item $bool = $con->viable
+
+Returns true if this protocol is usable in the current environment, i.e. all
+required modules are loadable and any runtime prerequisites (kernel features,
+available file types, etc.) are satisfied.  Always check C<viable> before
+calling C<spawn> with a protocol you have not explicitly required.
+
+=item $bool = $con->have_handles_for_select
+
+Returns true if this client provides filehandles that can be passed to
+C<IO::Select> to wait for incoming messages.  Returns false by default;
+protocols that support it override this to return true.
+
+=item @handles = $con->handles_for_select
+
+Returns the list of filehandles to register with C<IO::Select> for incoming
+message notification.  Only valid when C<have_handles_for_select> returns
+true.
+
+=item $bool = $con->have_handles_for_peer_change
+
+Returns true if this client can supply a filehandle that becomes readable
+whenever the set of connected peers changes (e.g. a new client connects or an
+existing one disconnects).  Returns false by default.
+
+=item $con->reset_handles_for_peer_change
+
+Drains or resets the peer-change notification handle after a peer-change
+event has been processed, so that it does not remain spuriously readable.
+Only valid when C<have_handles_for_peer_change> returns true.
+
+=item @handles = $con->handles_for_peer_change
+
+Returns the filehandle(s) that become readable on a peer-connect or
+peer-disconnect event.  Only valid when C<have_handles_for_peer_change>
+returns true.
 
 =back
 

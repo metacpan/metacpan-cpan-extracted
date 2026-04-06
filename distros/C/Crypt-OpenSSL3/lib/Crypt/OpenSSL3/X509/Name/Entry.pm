@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Name::Entry;
-$Crypt::OpenSSL3::X509::Name::Entry::VERSION = '0.002';
+$Crypt::OpenSSL3::X509::Name::Entry::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509::Name::Entry - An entry in a X509 name
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

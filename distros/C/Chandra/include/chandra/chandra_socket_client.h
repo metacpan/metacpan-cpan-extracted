@@ -100,6 +100,10 @@ _client_do_connect(pTHX_ SV *self)
     transport = (transport_svp && SvOK(*transport_svp))
         ? SvPV_nolen(*transport_svp) : "unix";
 
+#ifdef _WIN32
+    if (!strEQ(transport, "tcp"))
+        croak("Socket::Client: Unix domain sockets are not supported on Windows; use transport => 'tcp'");
+#endif
     if (strEQ(transport, "tcp"))
         sock = _client_connect_tcp(aTHX_ hv);
     else

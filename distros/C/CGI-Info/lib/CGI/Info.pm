@@ -34,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.11
+Version 1.12
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 =head1 SYNOPSIS
 
@@ -400,7 +400,7 @@ sub _find_site_details
 		$self->{cgi_site} = URI::Heuristic::uf_uristr($host);
 		# Remove trailing dots from the name.  They are legal in URLs
 		# and some sites link using them to avoid spoofing (nice)
-		$self->{cgi_site} =~ s/(.*)\.+$/$1/;  # Trim trailing dots
+		$self->{cgi_site} =~ s/\.+$//;	# Trim trailing dots
 
 		if($ENV{'SERVER_NAME'} && ($host eq $ENV{'SERVER_NAME'}) && (my $protocol = $self->protocol()) && $self->protocol() ne 'http') {
 			$self->{cgi_site} =~ s/^http/$protocol/;
@@ -658,8 +658,8 @@ sub params {
 	my %FORM;
 
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
-		require IO::Interactive;
-		IO::Interactive->import();
+		# require IO::Interactive;
+		# IO::Interactive->import();
 
 		if(@ARGV) {
 			@pairs = @ARGV;
@@ -680,7 +680,8 @@ sub params {
 			}
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
-		} elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
+		# } elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
+		} elsif(0) {
 			# TODO:  Do I really need this anymore?
 			my $oldfh = select(STDOUT);
 			print "Entering debug mode\n",
@@ -702,7 +703,11 @@ sub params {
 	} elsif(($ENV{'REQUEST_METHOD'} eq 'GET') || ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		if(my $query = $ENV{'QUERY_STRING'}) {
 			if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
-				$self->_warn('Multipart/form-data not supported for GET');
+				if($ENV{'REMOTE_ADDR'}) {
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Multipart/form-data not supported for GET" });
+				} else {
+					$self->_warn('Multipart/form-data not supported for GET');
+				}
 				$self->{status} = 501;	# Not implemented
 				return;
 			}
@@ -743,9 +748,12 @@ sub params {
 			# }
 		} elsif($content_type =~ /multipart\/form-data/i) {
 			if(!defined($self->{upload_dir})) {
-				$self->_warn({
-					warning => 'Attempt to upload a file when upload_dir has not been set'
-				});
+				if($ENV{'REMOTE_ADDR'}) {
+					# This could be an attack
+					$self->_warn({ warning => "$ENV{REMOTE_ADDR}: Attempt to upload a file when upload_dir has not been set" });
+				} else {
+					$self->_warn({ warning => 'Attempt to upload a file when upload_dir has not been set' });
+				}
 				return;
 			}
 
@@ -886,10 +894,11 @@ sub params {
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 		$key =~ tr/+/ /;
 		if(defined($value)) {
-			$value =~ s/\0//g;	# Strip NUL byte poison
-			$value =~ s/%00//g;	# Strip encoded NUL byte poison
-			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
+			$value =~ s/%00//g;   # Strip encoded NUL byte poison
+			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;   # URL-decode
 			$value =~ tr/+/ /;
+			$value =~ s/\0//g;    # Strip NUL again: %2500 -> %00 -> \0 after second pass
+			$value =~ s/%00//g;   # Strip literal %00 again: catches %2500 -> %00
 		} else {
 			$value = '';
 		}
@@ -956,29 +965,66 @@ sub params {
 		# }
 		my $orig_value = $value;
 		$value = _sanitise_input($value);
-
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
+			   # ($value =~ /\/AND\/.++\(SELECT\//) || # United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
 			# Facebook FBCLID can have "--"
-			# if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
-			if(($value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
-			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
-			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
-			   ($value =~ /((\%27)|(\'))union/ix) ||
-			   ($value =~ /select[[a-z]\s\*]from/ix) ||
-			   ($value =~ /\sAND\s1=1/ix) ||
-			   ($value =~ /\sOR\s.+\sAND\s/) ||
-			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
-			   ($value =~ /\/AND\/.+\(SELECT\//) ||	# United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
-			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
+
+			# Pre-filter: only run quote-based regexes if value contains injection chars.
+
+			# Compute pre-filter flags from orig_value so quotes stripped by
+			# convert_XSS don't cause injection patterns to be missed
+
+			my $has_quote  = index($orig_value, "'")    >= 0 || index($orig_value, '%27') >= 0;
+			my $has_hash   = index($orig_value, '#')    >= 0 || index($orig_value, '%23') >= 0;
+			my $has_equals = index($orig_value, '=')    >= 0 || index($orig_value, '%3D') >= 0;
+			my $has_semi   = index($orig_value, ';')    >= 0 || index($orig_value, '%3B') >= 0;
+			my $has_dash   = index($orig_value, '--')   >= 0;
+
+			# All WAF patterns run on $orig_value (pre-XSS-sanitisation)
+			# convert_XSS encodes ', =, < etc. as HTML entities, which would hide
+			# injection patterns from the WAF if we checked $value instead.
+			if($has_quote || $has_hash || ($has_equals && $has_dash)) {
+				if(($orig_value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
+				   (($has_equals && ($has_quote || $has_semi || $has_dash)) &&
+				   $orig_value =~ /((\%3D)|(=))[^-]*+((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
+				   ($has_quote &&
+				    $orig_value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
+				    ($has_quote &&
+				    $orig_value =~ /((\%27)|(\'))union/ix)) {
+					$self->status(403);
+					if($ENV{'REMOTE_ADDR'}) {
+						$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
+					} else {
+						$self->_warn("SQL injection attempt blocked for '$key=$orig_value'");
+					}
+					return;
+				}
+			}
+
+			my $has_select = index($orig_value, 'SELECT') >= 0 || index($orig_value, 'select') >= 0;
+			my $has_dump   = index($orig_value, 'var_dump') >= 0;
+			my $has_exec   = index($orig_value, 'exec') >= 0;
+			my $has_or  = index($orig_value, ' OR ')  >= 0;
+			my $has_and = index($orig_value, ' AND ') >= 0;
+			my $has_slash  = index($orig_value, '/**/') >= 0 || index($orig_value, '/AND/') >= 0;
+
+			if(($has_select && $orig_value =~ /select[[a-z]\s\*]from/ix) ||
+			   ($has_and    && $orig_value =~ /\sAND\s1=1/ix) ||
+			   ($has_or && $has_and && $orig_value =~ /\sOR\s.*\sAND\s/) ||
+			   ($has_slash  && $orig_value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
+			   ($has_dump   && $orig_value =~ /var_dump[^m]*+md5/) ||
+			   ($has_slash  && $has_select && $orig_value =~ /\/AND\/[^(]*+\(SELECT\//) ||
+			   ($has_exec   && $orig_value =~ /exec(\s|\+)++(s|x)p\w+/ix)) {
 				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
-					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$value'");
+					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$orig_value'");
 				} else {
-					$self->_warn("SQL injection attempt blocked for '$key=$value'");
+					$self->_warn("SQL injection attempt blocked for '$key=$orig_value'");
 				}
 				return;
 			}
+
 			if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
 				if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 					$self->status(403);
@@ -990,6 +1036,7 @@ sub params {
 					return;
 				}
 			}
+
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i) ||
 			   ($orig_value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
@@ -998,11 +1045,13 @@ sub params {
 				$self->_warn("XSS injection attempt blocked for '$value'");
 				return;
 			}
+
 			if($value =~ /mustleak\.com\//) {
 				$self->status(403);
 				$self->_warn("Blocked mustleak attack for '$key'");
 				return;
 			}
+
 			if($value =~ /\.\.\//) {
 				$self->status(403);
 				$self->_warn("Blocked directory traversal attack for '$key'");
@@ -1403,7 +1452,9 @@ sub as_string
 		} sort keys %{$params};
 	}
 
-	$self->_trace("as_string: returning '$rc'") if($rc);
+	$rc ||= '';
+
+	$self->_trace("as_string: returning '$rc'");
 
 	return $rc;
 }
@@ -1588,13 +1639,13 @@ sub documentroot
 
 =head2 logdir($dir)
 
-Gets and sets the name of a directory that you can use to store logs in.
+Gets and sets the name of a directory where you can store logs.
 
 =over 4
 
 =item $dir
 
-Path to the directory where logs will be stored
+Path to the directory where logs will be stored.
 
 =back
 
@@ -2003,12 +2054,26 @@ sub cookie
 	if(!defined($field)) {
 		$self->_error('what cookie do you want?');
 		Carp::croak('what cookie do you want?');
+		return;
+	}
+	if(ref($field)) {
+		$self->_error('Cookie name should be a string');
+		Carp::croak('Cookie name should be a string');
+		return;
 	}
 
 	# Load cookies if not already loaded
 	unless($self->{jar}) {
 		if(defined $ENV{'HTTP_COOKIE'}) {
-			$self->{jar} = { map { split(/=/, $_, 2) } split(/; /, $ENV{'HTTP_COOKIE'}) };
+			# grep { /=/ } filters out malformed tokens (empty strings, bare
+			# semicolons, entries with no name=value separator) that would
+			# otherwise cause split(/=/, $_, 2) to return a single-element list
+			# and make the flattened list odd-length, corrupting the hash.
+			$self->{jar} = {
+				map  { split(/=/, $_, 2) }
+				grep { /=/ }
+				split(/; /, $ENV{'HTTP_COOKIE'})
+			};
 		}
 	}
 

@@ -15,7 +15,7 @@ INSTALLATION
     make install
 
     # or in one step:
-    cpanm PDF-Sign-0.01.tar.gz
+    cpanm PDF-Sign-0.05.tar.gz
 
 DEPENDENCIES
 
@@ -23,6 +23,7 @@ DEPENDENCIES
     File::Slurp
     MIME::Base64 (core)
     POSIX (core)
+    Time::Local (core)
     External: openssl binary
     External: curl binary (optional, falls back to LWP::UserAgent)
 
@@ -35,6 +36,8 @@ TESTING
     TSA_TEST=1 make test
 
 COPYRIGHT AND LICENSE
+
+Citterio Massimiliano
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself (GPL/Artistic License).

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 10;
 use Eshu;
 
 # Basic qw()
@@ -151,4 +151,64 @@ END
 
 	my $got = Eshu->indent_pl($input);
 	is($got, $expected, 'y/// transliteration');
+}
+
+# qx{} shell command
+{
+	my $input = <<'END';
+sub foo {
+my $out = qx{ls -la};
+my $x = 1;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	my $out = qx{ls -la};
+	my $x = 1;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'qx{} shell command');
+}
+
+# tr with angle bracket delimiters
+{
+	my $input = <<'END';
+sub foo {
+$x =~ tr<a-z><A-Z>;
+my $y = 1;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	$x =~ tr<a-z><A-Z>;
+	my $y = 1;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'tr<><> with angle bracket delimiters');
+}
+
+# s/// with braces in the replacement section
+{
+	my $input = <<'END';
+sub foo {
+$x =~ s/old/{new_value}/g;
+my $y = 1;
+}
+END
+
+	my $expected = <<'END';
+sub foo {
+	$x =~ s/old/{new_value}/g;
+	my $y = 1;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 's/// with braces in replacement section');
 }

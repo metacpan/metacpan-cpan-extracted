@@ -1,5 +1,5 @@
 package Data::Frame::Rlike;
-$Data::Frame::Rlike::VERSION = '0.006004';
+$Data::Frame::Rlike::VERSION = '0.006005';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Data::Frame::Rlike
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 DESCRIPTION
 

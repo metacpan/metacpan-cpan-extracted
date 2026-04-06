@@ -1,0 +1,19 @@
+requires 'perl', '5.026';
+
+requires 'YAML::PP',         '0.034';
+requires 'JSON::MaybeXS',    '1.004';
+requires 'OpenAPI::Modern',  '0.060';
+requires 'Mojolicious',      '9.0';
+requires 'Moo',              '2.005';
+requires 'Types::Standard',  '2.000';
+requires 'Storable',         '3.08';
+requires 'Getopt::Long',     '2.54';
+requires 'Pod::Usage',       '0';
+requires 'Path::Tiny',       '0.144';
+requires 'Carp',             '0';
+requires 'File::Path',       '2.08';
+
+on test => sub {
+    requires 'Test::More', '0.96';
+    requires 'Test::Pod',  '1.00';
+};

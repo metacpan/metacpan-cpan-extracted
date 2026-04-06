@@ -15,7 +15,7 @@ sub _write_minimal_dist {
 	my ($root) = @_;
 	my $j = File::Spec->catfile( $root, 'prepare4release.json' );
 	open my $fj, '>:encoding(UTF-8)', $j or die $!;
-	print {$fj} qq({"git":{"repo":"testuser/p4r-int"}}\n);
+	print {$fj} qq({"git":{"repo":"testuser/p4r-int"},"dependencies":{"skip":true}}\n);
 	close $fj;
 
 	my $mf = File::Spec->catfile( $root, 'Makefile.PL' );
@@ -255,8 +255,14 @@ MK
 	print {$fh} "{ not json";
 	close $fh;
 
-	eval { App::prepare4release->load_config_file($p) };
-	like( $@, qr/./, 'load_config_file dies on invalid JSON' );
+	my @warn;
+	local $SIG{__WARN__} = sub { push @warn, $_[0] };
+
+	my $cfg = App::prepare4release->load_config_file($p);
+	is( ref $cfg, 'HASH', 'load_config_file returns hashref on invalid JSON' );
+	is( scalar keys %$cfg, 0, 'invalid JSON yields empty object' );
+	ok( scalar @warn, 'invalid JSON warns' );
+	like( $warn[0], qr/invalid JSON/, 'warning mentions invalid JSON' );
 }
 
 # --- resolve_config_path explicit --------------------------------------------

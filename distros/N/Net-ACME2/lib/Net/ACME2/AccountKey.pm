@@ -23,13 +23,12 @@ use constant {
         secp521r1 => 'sha521',
     },
 
-    _TRY_OPENSSL => 1,
     _TRY_CRYPTX => 1,
 };
 
 #----------------------------------------------------------------------
-# An abstraction that allows use of OpenSSL or CryptX for crypto operations
-# as available and useful. Either will be faster than Crypt::Perl.
+# An abstraction that allows use of CryptX for crypto operations
+# as available and useful. It will be faster than Crypt::Perl.
 #----------------------------------------------------------------------
 
 sub new {
@@ -48,24 +47,7 @@ sub new {
     my %self;
 
     if ($key_type eq 'rsa') {
-        if (_TRY_OPENSSL() && eval { require Crypt::OpenSSL::RSA; require Crypt::OpenSSL::Bignum }) {
-
-            my $pem;
-            if (0 == index($pem_or_der, '----')) {
-                $pem = $pem_or_der;
-            }
-            else {
-                require Crypt::Format;
-                $pem = Crypt::Format::der2pem($pem_or_der, 'RSA PRIVATE KEY');
-            }
-
-            $obj = Crypt::OpenSSL::RSA->new_private_key($pem);
-            $obj->use_pkcs1_padding();
-            $obj->use_sha256_hash();
-
-            $engine = 'crypt_openssl_rsa';
-        }
-        elsif (_TRY_CRYPTX() && eval { require Crypt::PK::RSA }) {
+        if (_TRY_CRYPTX() && eval { require Crypt::PK::RSA }) {
             $obj = Crypt::PK::RSA->new(\$pem_or_der);
             $engine = 'crypt_pk';
         }
@@ -142,29 +124,6 @@ sub get_type {
     return $self->{'key_type'};
 }
 
-# Worth submitting this upstream?
-sub _build_jwk_thumbprint_for_crypt_openssl_rsa {
-    my ($self) = @_;
-
-    my ($n, $e) = $self->_get_crypt_openssl_rsa_n_e_strings();
-    my $json = qq<{"e":"$e","kty":"RSA","n":"$n"}>;
-
-    require Digest::SHA;
-    my $hash_cr = Digest::SHA->can( _JWK_THUMBPRINT_DIGEST() );
-    return MIME::Base64::encode_base64url( $hash_cr->($json) );
-}
-
-sub _get_crypt_openssl_rsa_n_e_strings {
-    my ($self) = @_;
-
-    my ($n, $e) = $self->{'obj'}->get_key_parameters();
-
-    require MIME::Base64;
-    $_ = MIME::Base64::encode_base64url( $_->to_bin() ) for ($n, $e);
-
-    return ($n, $e);
-}
-
 #----------------------------------------------------------------------
 
 # for RSA
@@ -173,10 +132,7 @@ sub sign_RS256 {
 
     my $engine = $self->{'engine'};
 
-    if ($engine eq 'crypt_openssl_rsa') {
-        return $self->{'obj'}->sign($msg);
-    }
-    elsif ($engine eq 'crypt_pk') {
+    if ($engine eq 'crypt_pk') {
         return $self->{'obj'}->sign_message($msg, 'sha256', 'v1.5');
     }
     elsif ($engine eq 'crypt_perl') {
@@ -230,16 +186,7 @@ sub get_struct_for_public_jwk {
 
     my $engine = $self->{'engine'};
 
-    if ($engine eq 'crypt_openssl_rsa') {
-        my ($n, $e) = $self->_get_crypt_openssl_rsa_n_e_strings();
-
-        return {
-            e => $e,
-            kty => 'RSA',
-            n => $n,
-        };
-    }
-    elsif ($engine eq 'crypt_pk') {
+    if ($engine eq 'crypt_pk') {
         return $self->{'obj'}->export_key_jwk('public', 1);
     }
     elsif ($engine eq 'crypt_perl') {
@@ -254,14 +201,7 @@ sub get_jwk_thumbprint {
 
     my $engine = $self->{'engine'};
 
-    if ($engine eq 'crypt_openssl_rsa') {
-        my $thumbprint = $self->_build_jwk_thumbprint_for_crypt_openssl_rsa();
-
-        _DEBUG() && print STDERR "key thumbprint: $thumbprint$/";
-
-        return $thumbprint;
-    }
-    elsif ($engine eq 'crypt_pk') {
+    if ($engine eq 'crypt_pk') {
         return $self->{'obj'}->export_key_jwk_thumbprint( _JWK_THUMBPRINT_DIGEST() );
     }
     elsif ($engine eq 'crypt_perl') {

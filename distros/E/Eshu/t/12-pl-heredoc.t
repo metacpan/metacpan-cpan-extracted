@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Eshu;
 
 # Basic heredoc pass-through
@@ -159,4 +159,66 @@ END
 
 	my $got = Eshu->indent_pl($input);
 	is($got, $expected, 'heredoc followed by more code');
+}
+
+# Heredoc as argument to print
+{
+	my $input = <<'END';
+sub show_help {
+print <<USAGE;
+Usage: tool [options]
+  --help     Show help
+  --version  Show version
+USAGE
+print "Done\n";
+}
+END
+
+	my $expected = <<'END';
+sub show_help {
+	print <<USAGE;
+Usage: tool [options]
+  --help     Show help
+  --version  Show version
+USAGE
+	print "Done\n";
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'heredoc as argument to print');
+}
+
+# Two heredocs in sequence
+{
+	my $input = <<'END';
+sub make_html {
+my $header = <<HTML;
+<html>
+<body>
+HTML
+my $footer = <<HTML;
+</body>
+</html>
+HTML
+return $header . $footer;
+}
+END
+
+	my $expected = <<'END';
+sub make_html {
+	my $header = <<HTML;
+<html>
+<body>
+HTML
+	my $footer = <<HTML;
+</body>
+</html>
+HTML
+	return $header . $footer;
+}
+END
+
+	my $got = Eshu->indent_pl($input);
+	is($got, $expected, 'two heredocs in sequence inside sub');
 }

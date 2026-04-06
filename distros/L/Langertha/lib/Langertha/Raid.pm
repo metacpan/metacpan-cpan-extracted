@@ -1,6 +1,6 @@
 package Langertha::Raid;
 # ABSTRACT: Base class for orchestrating Runnable steps
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -183,7 +183,7 @@ Langertha::Raid - Base class for orchestrating Runnable steps
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

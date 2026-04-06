@@ -1,0 +1,12 @@
+Revision history for Data-Queue-Shared
+
+0.01  2026-04-05
+    - Initial release
+    - Int queue: lock-free Vyukov bounded MPMC
+    - Str queue: futex-mutex with circular arena, deque ops (push_front, pop_back)
+    - Backing: file-backed mmap, anonymous (MAP_ANONYMOUS), memfd
+    - Blocking push/pop with timeout via futex
+    - Batch ops under single mutex (push_multi, pop_multi, drain)
+    - eventfd integration (opt-in notify)
+    - PID-based stale lock recovery
+    - peek, sync, stats with waiter counts

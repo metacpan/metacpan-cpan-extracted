@@ -1,5 +1,5 @@
 package PDL::SV;
-$PDL::SV::VERSION = '0.006004';
+$PDL::SV::VERSION = '0.006005';
 # ABSTRACT: PDL subclass for keeping scalar data (like strings)
 
 use 5.016;
@@ -444,7 +444,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 SYNOPSIS
 

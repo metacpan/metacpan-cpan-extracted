@@ -1,6 +1,6 @@
 package Langertha::Request::HTTP;
 # ABSTRACT: A HTTP Request inside of Langertha
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use MooseX::NonMoose;
 
@@ -30,6 +30,8 @@ sub BUILDARGS {
   return { %args };
 }
 
+__PACKAGE__->meta->make_immutable;
+
 
 1;
 
@@ -45,7 +47,7 @@ Langertha::Request::HTTP - A HTTP Request inside of Langertha
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

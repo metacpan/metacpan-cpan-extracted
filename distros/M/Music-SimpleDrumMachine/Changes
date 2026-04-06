@@ -1,5 +1,49 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0403 2026-04-05 15:42:35
+    - Improve documentation.
+    - Clean-up code a bit.
+
+0.0402 2026-04-05 15:30:32
+    - Don't change the notes.
+    - Intelligently handle the velocity.
+
+0.0401 2026-04-05 14:43:52
+    - Improve documentation and code comments.
+    - A bit of code cleanup.
+
+0.0400 2026-04-05 12:54:27
+    - Fix the fill-crash handling logic.
+    - Enhance the the eg/* programs.
+    - Improve documentation.
+
+0.0307 2026-04-05 11:46:27
+    - Add the extra-handy eg/list_devices.pl program.
+    - Improve documentation.
+    - Fix the eg/add-drum.pl program.
+
+0.0306 2026-04-05 11:30:01
+    - Improve documentation.
+
+0.0305 2026-04-05 10:44:01
+    - Automatically account for uncustomized drums.
+
+0.0304 2026-04-05 10:20:23
+    - Enhance the fill in the add-drum.pl program.
+    - Add the missing open-hh to the eg/euclidean.pl program.
+
+0.0303 2026-04-05 09:56:36
+    - Uncomment debugging measure. Argh!
+
+0.0302 2026-04-05 09:51:21
+    - Fix _default_part() and _default_fill() logic.
+
+0.0301 2026-04-05 08:46:22
+    - Fix documentation.
+
+0.0300 2026-04-05 08:42:38
+    - Make fills user defined.
+
 0.0204 2026-04-05 00:28:58
     - Make the fills optional with the filling attribute.
     - Make _adjust_drums() more generic.

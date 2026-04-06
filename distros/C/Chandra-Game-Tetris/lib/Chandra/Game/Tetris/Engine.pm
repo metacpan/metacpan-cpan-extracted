@@ -3,7 +3,7 @@ package Chandra::Game::Tetris::Engine;
 use strict;
 use warnings;
 
-use Object::Proto::Sugar;
+use Object::Proto::Sugar -types;
 use Chandra::Game::Tetris::Grid;
 use Chandra::Game::Tetris::Blocks;
 use Chandra::Element;

@@ -8,7 +8,9 @@
  * chandra_socket_hub.h and chandra_socket_client.h.
  */
 
+#ifndef _WIN32
 #include <fcntl.h>
+#endif
 
 #ifndef SOCK_STREAM
 #define SOCK_STREAM 1
@@ -151,53 +153,52 @@ _sock_free_sv_array(pTHX_ SV **svs, int count)
     }
 }
 
-/* ---- Resolve runtime directory: $ENV{XDG_RUNTIME_DIR} || File::Spec->tmpdir ---- */
+/* ---- Resolve runtime directory: $XDG_RUNTIME_DIR || $TMPDIR || /tmp ---- */
 
 static SV *
 _sock_runtime_dir(pTHX)
 {
     SV **env_svp;
     HV *env_hv = get_hv("ENV", 0);
-    if (env_hv &&
-        (env_svp = hv_fetchs(env_hv, "XDG_RUNTIME_DIR", 0)) &&
-        SvOK(*env_svp)) {
-        return newSVsv(*env_svp);
-    } else {
-        dSP;
-        int count;
-        SV *result;
-        ENTER; SAVETMPS;
-        PUSHMARK(SP);
-        XPUSHs(sv_2mortal(newSVpvs("File::Spec")));
-        PUTBACK;
-        count = call_method("tmpdir", G_SCALAR);
-        SPAGAIN;
-        result = (count > 0) ? newSVsv(POPs) : newSVpvs("/tmp");
-        PUTBACK;
-        FREETMPS; LEAVE;
-        return result;
+    if (env_hv) {
+        if ((env_svp = hv_fetchs(env_hv, "XDG_RUNTIME_DIR", 0)) && SvOK(*env_svp))
+            return newSVsv(*env_svp);
+        if ((env_svp = hv_fetchs(env_hv, "TMPDIR", 0)) && SvOK(*env_svp))
+            return newSVsv(*env_svp);
+#ifdef _WIN32
+        if ((env_svp = hv_fetchs(env_hv, "TEMP", 0)) && SvOK(*env_svp))
+            return newSVsv(*env_svp);
+        if ((env_svp = hv_fetchs(env_hv, "TMP", 0)) && SvOK(*env_svp))
+            return newSVsv(*env_svp);
+#endif
     }
+#ifdef _WIN32
+    return newSVpvs("C:\\Temp");
+#else
+    return newSVpvs("/tmp");
+#endif
 }
 
-/* ---- File::Spec->catfile($dir, $filename)  (consumes dir_sv) ---- */
+/* ---- Join dir + filename (pure C, no File::Spec) ---- */
 
 static SV *
 _sock_catfile(pTHX_ SV *dir_sv, SV *filename_sv)
 {
-    dSP;
-    int count;
+    STRLEN dir_len, fn_len;
+    const char *dir = SvPV(dir_sv, dir_len);
+    const char *fn  = SvPV(filename_sv, fn_len);
     SV *result;
-    ENTER; SAVETMPS;
-    PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVpvs("File::Spec")));
-    XPUSHs(sv_2mortal(dir_sv));
-    XPUSHs(sv_2mortal(filename_sv));
-    PUTBACK;
-    count = call_method("catfile", G_SCALAR);
-    SPAGAIN;
-    result = (count > 0) ? newSVsv(POPs) : newSVpvs("");
-    PUTBACK;
-    FREETMPS; LEAVE;
+
+    /* Strip trailing slashes from dir */
+    while (dir_len > 0 && (dir[dir_len-1] == '/' || dir[dir_len-1] == '\\'))
+        dir_len--;
+
+    result = newSVpvn(dir, dir_len);
+    sv_catpvs(result, "/");
+    sv_catpvn(result, fn, fn_len);
+
+    SvREFCNT_dec(dir_sv);
+    SvREFCNT_dec(filename_sv);
     return result;
 }
 
@@ -519,13 +520,13 @@ _sock_read_token_file(pTHX_ const char *path)
     char token_path[4096];
     int fd;
     my_snprintf(token_path, sizeof(token_path), "%s.token", path);
-    fd = open(token_path, O_RDONLY);
+    fd = PerlLIO_open(token_path, O_RDONLY);
     if (fd >= 0) {
         char buf[256];
-        ssize_t n = read(fd, buf, sizeof(buf) - 1);
-        close(fd);
+        SSize_t n = PerlLIO_read(fd, buf, sizeof(buf) - 1);
+        PerlLIO_close(fd);
         if (n > 0)
-            return newSVpvn(buf, n);
+            return newSVpvn(buf, (STRLEN)n);
     }
     return NULL;
 }
@@ -533,13 +534,13 @@ _sock_read_token_file(pTHX_ const char *path)
 /* ---- Write a token file (C-level I/O) ---- */
 
 static void
-_sock_write_token_file(const char *path, const char *token, STRLEN tlen)
+_sock_write_token_file(pTHX_ const char *path, const char *token, STRLEN tlen)
 {
-    int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    int fd = PerlLIO_open3(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
     if (fd >= 0) {
-        ssize_t n = write(fd, token, tlen);
+        ssize_t n = PerlLIO_write(fd, token, tlen);
         (void)n;
-        close(fd);
+        PerlLIO_close(fd);
     }
 }
 

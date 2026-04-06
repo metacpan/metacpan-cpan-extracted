@@ -1,0 +1,24 @@
+[
+   {
+      "@type" : "Event",
+      "alerts" : {
+         "596EF954-520D-4C36-8141-53ECE91F04CB" : {
+            "acknowledged" : "2016-08-02T23:08:24Z",
+            "action" : "display",
+            "offset" : "PT15H",
+            "relativeTo" : "before-start"
+         }
+      },
+      "created" : "2016-07-14T03:22:56Z",
+      "duration" : "P4D",
+      "freeBusyStatus" : "free",
+      "isAllDay" : true,
+      "prodId" : "test",
+      "sequence" : 0,
+      "showWithoutTime" : true,
+      "start" : "2016-08-04T00:00:00",
+      "title" : "Writer's Festival",
+      "uid" : "9ab56a09-132e-427a-8e48-e79771dec0fa",
+      "updated" : "2016-08-02T23:08:24Z"
+   }
+]

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::SSL::Context;
-$Crypt::OpenSSL3::SSL::Context::VERSION = '0.002';
+$Crypt::OpenSSL3::SSL::Context::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::SSL::Context - A context for SSL connections
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -71,6 +71,8 @@ Methods in this class generally match the C<SSL_CTX_*> namespace in C<libssl>.
 =head2 get_num_tickets
 
 =head2 get_options
+
+=head2 get_param
 
 =head2 get_read_ahead
 
@@ -137,6 +139,8 @@ Methods in this class generally match the C<SSL_CTX_*> namespace in C<libssl>.
 =head2 set_num_tickets
 
 =head2 set_options
+
+=head2 set_param
 
 =head2 set_post_handshake_auth
 

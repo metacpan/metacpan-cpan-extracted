@@ -1,3 +1,10 @@
+0.000040  2026-04-05 14:03:55-07:00 America/Los_Angeles
+
+    - Make MySQL less noisy
+    - Remove other noise
+    - Fix Mariadb binary detection
+    - Fix a few minor bugs (AI assisted)
+
 0.000039  2026-01-23 12:04:49-08:00 America/Los_Angeles
 
     - Add $db->resync method

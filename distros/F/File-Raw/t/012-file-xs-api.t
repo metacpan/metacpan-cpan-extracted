@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use FindBin;
 
 # Test file hooks C API via file_api_test XS module
 
@@ -17,10 +18,31 @@ BEGIN {
     }
     File::Raw->import();
 
-    # Try to load file_api_test (depends on file.so)
-    eval { require file_api_test; file_api_test->import(); };
+    # Try to load file_api_test (depends on Raw.so symbols)
+    # On Linux with older Perls, symbol lookup failure causes a fatal exit
+    # that's not catchable by eval, so we test in a subprocess first.
+    # On macOS/Windows, eval can catch the load failure.
+    if ($^O eq 'linux' || $^O eq 'freebsd') {
+        # Get absolute paths from FindBin
+        my $blib_lib = "$FindBin::Bin/../blib/lib";
+        my $blib_arch = "$FindBin::Bin/../blib/arch";
+        my $check = system($^X, "-I$blib_lib", "-I$blib_arch", '-e',
+            'use File::Raw; require file_api_test; file_api_test::has_hook("read")');
+        if ($check != 0) {
+            plan skip_all => "file_api_test has linking issues (symbol lookup failed)";
+            exit 0;
+        }
+    }
+    
+    # Now try to load - on macOS/Windows, eval will catch any errors
+    eval {
+        require file_api_test;
+        file_api_test->import();
+        # Force symbol resolution
+        file_api_test::has_hook('read');
+    };
     if ($@) {
-        plan skip_all => "file_api_test not loadable (linking issue): $@";
+        plan skip_all => "file_api_test not loadable: $@";
         exit 0;
     }
 }

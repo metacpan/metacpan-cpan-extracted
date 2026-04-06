@@ -1,5 +1,8 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.15  2026-04-06
+    - Re-build db with newest data/tiddlers.json. Export as tree
+
 1.14  2026-03-20
 	- Add a NAME section to the POD in MetaCurator.pm
 	- Fix Export.pm to add each modules NAME to its entry in cpan.metacurator.tree.html

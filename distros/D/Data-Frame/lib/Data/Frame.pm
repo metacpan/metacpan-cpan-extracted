@@ -1,5 +1,5 @@
 package Data::Frame;
-$Data::Frame::VERSION = '0.006004';
+$Data::Frame::VERSION = '0.006005';
 # ABSTRACT: data frame implementation
 
 use 5.016;
@@ -664,7 +664,7 @@ method which (:$bad_to_val=undef, :$ignore_both_bad=true) {
               ? $self->both_bad->nth_column( $cidx )
               : undef;
 
-            if ( defined $bad_to_val ) {
+            if ( defined $bad_to_val and $column->badflag ) {
                 $column = $column->setbadtoval($bad_to_val);
             }
 
@@ -1100,7 +1100,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 STATUS
 

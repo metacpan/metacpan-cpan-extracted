@@ -278,7 +278,7 @@ bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst)
          dst->error= "miscalculated buffer length";
          return false;
       }
-      memcpy(dst->pos, src->pos, cnt);
+      memcpy((U8*)dst->pos, src->pos, cnt);
       dst->pos += cnt;
       src->pos += cnt;
    }
@@ -296,15 +296,17 @@ bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst)
             return false;
          }
          if (!shift) {
+            U8 *writable= (U8*) dst->pos;
             if (dst->pos + 4 > dst->lim) {
                dst->error= "miscalculated buffer length";
                return false;
             }
+            dst->pos += 4;
             accum |= cp;
-            *dst->pos++ = base64_alphabet[0x3F & (accum >> 18)];
-            *dst->pos++ = base64_alphabet[0x3F & (accum >> 12)];
-            *dst->pos++ = base64_alphabet[0x3F & (accum >> 6)];
-            *dst->pos++ = base64_alphabet[0x3F & accum];
+            writable[0] = base64_alphabet[0x3F & (accum >> 18)];
+            writable[1] = base64_alphabet[0x3F & (accum >> 12)];
+            writable[2] = base64_alphabet[0x3F & (accum >> 6)];
+            writable[3] = base64_alphabet[0x3F & accum];
             accum= 0;
             shift= 16;
          }
@@ -319,10 +321,16 @@ bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst)
       }
       // write leftover accumulated bits
       if (shift < 16) {
-         *dst->pos++ = base64_alphabet[0x3F & (accum >> 18)];
-         *dst->pos++ = base64_alphabet[0x3F & (accum >> 12)];
-         *dst->pos++ = shift? '=' : base64_alphabet[0x3F & (accum >> 6)];
-         *dst->pos++ = '=';
+         U8 *writable= (U8*) dst->pos;
+         if (dst->pos + 4 > dst->lim) {
+            dst->error= "miscalculated buffer length";
+            return false;
+         }
+         dst->pos += 4;
+         writable[0] = base64_alphabet[0x3F & (accum >> 18)];
+         writable[1] = base64_alphabet[0x3F & (accum >> 12)];
+         writable[2] = shift? '=' : base64_alphabet[0x3F & (accum >> 6)];
+         writable[3] = '=';
       }
    }
    else {
@@ -392,6 +400,7 @@ secret_buffer_copy_to(secret_buffer_parse *src, SV *dst_sv, int encoding, bool a
    else {
       // For destination SV, set length to 0 unless appending, then force it to
       // be bytes or utf-8, then grow it to ensure room for additional `need_bytes`.
+      U8* ptr;
       STRLEN len;
       // If overwriting, set the length to 0 before forcing to bytes or utf8
       if (!append)
@@ -401,10 +410,11 @@ secret_buffer_copy_to(secret_buffer_parse *src, SV *dst_sv, int encoding, bool a
       else SvPVbyte(dst_sv, len);
       // grow it to the required length, for writing
       sv_grow(dst_sv, (append? len : 0) + need_bytes + 1);
-      dst.pos= (U8*) SvPVX_mutable(dst_sv) + len;
-      dst.lim= dst.pos + need_bytes;
+      ptr= (U8*) SvPVX_mutable(dst_sv) + len;
       // don't forget the NUL terminator
-      *dst.lim= '\0';
+      ptr[need_bytes]= '\0';
+      dst.pos= ptr;
+      dst.lim= dst.pos + need_bytes;
    }
    if (!secret_buffer_transcode(src, &dst)) {
       if (!src->error) src->error= dst.error;
@@ -467,8 +477,8 @@ secret_buffer_append_uv_asn1_der_length(secret_buffer *buf, UV val) {
 bool
 secret_buffer_parse_uv_asn1_der_length(secret_buffer_parse *parse, UV *out) {
    /* Work on a local cursor so we can roll back on failure */
-   U8 *pos = parse->pos;
-   U8 *lim = parse->lim;
+   const U8 *pos = parse->pos;
+   const U8 *lim = parse->lim;
    UV result;
 
    if (pos >= lim) {
@@ -558,8 +568,8 @@ secret_buffer_append_uv_base128le(secret_buffer *buf, UV val) {
 /* Parse Unsigned LittleEndian Base128 (also requiring canonical / minimal encoding) */
 bool
 secret_buffer_parse_uv_base128le(secret_buffer_parse *parse, UV *out) {
-   U8 *pos = parse->pos;
-   U8 *lim = parse->lim;
+   const U8 *pos = parse->pos;
+   const U8 *lim = parse->lim;
    UV result= 0, payload;
    int shift= 7;
 
@@ -628,8 +638,8 @@ secret_buffer_append_uv_base128be(secret_buffer *buf, UV val) {
 /* Parse Unsigned BigEndian Base128 (also requiring canonical / minimal encoding) */
 bool
 secret_buffer_parse_uv_base128be(secret_buffer_parse *parse, UV *out) {
-   U8 *pos = parse->pos;
-   U8 *lim = parse->lim;
+   const U8 *pos = parse->pos;
+   const U8 *lim = parse->lim;
    UV result= 0;
 
    if (pos >= lim) {
@@ -674,9 +684,9 @@ static bool sb_parse_match_charset_bytes(
    bool anchored= 0 != (flags & SECRET_BUFFER_MATCH_ANCHORED);
    bool consttime=0 != (flags & SECRET_BUFFER_MATCH_CONST_TIME);
    int step= reverse? -1 : 1;
-   U8 *pos= reverse? parse->lim-1 : parse->pos,
-      *lim= reverse? parse->pos-1 : parse->lim,
-      *span_start= NULL;
+   const U8 *pos= reverse? parse->lim-1 : parse->pos,
+            *lim= reverse? parse->pos-1 : parse->lim,
+            *span_start= NULL;
    //warn("scan_charset_bytes pos=%p lim=%p len=%d", parse->pos, parse->lim, (int)(parse->lim - parse->pos));
 
    while (pos != lim) {
@@ -729,7 +739,7 @@ static bool sb_parse_match_charset_codepoints(
    bool consttime=0 != (flags & SECRET_BUFFER_MATCH_CONST_TIME);
    bool span_started= false;
    bool encoding_error= false;
-   U8 *span_mark= NULL, *prev_mark= reverse? parse->lim : parse->pos;
+   const U8 *span_mark= NULL, *prev_mark= reverse? parse->lim : parse->pos;
 
    while (parse->pos < parse->lim) {
       int codepoint= reverse? sb_parse_prev_codepoint(parse)
@@ -812,7 +822,7 @@ int sb_parse_codepointcmp(secret_buffer_parse *lhs, secret_buffer_parse *rhs) {
 
 /* UTF-8 decoding helper */
 static int sb_parse_next_codepoint(secret_buffer_parse *parse) {
-   U8 *pos= parse->pos, *lim= parse->lim;
+   const U8 *pos= parse->pos, *lim= parse->lim;
    int cp, encoding= parse->encoding;
    #define SB_RETURN_ERROR(msg) { parse->error= msg; return -1; }
 
@@ -933,7 +943,7 @@ static int sb_parse_next_codepoint(secret_buffer_parse *parse) {
       }
       else {
          // if next char is '=', terminate the decoding
-         U8 *next= pos+1;
+         const U8 *next= pos+1;
          while (next < lim && *next <= ' ')
             next++;
          if (next < lim && *next == '=') {
@@ -955,7 +965,7 @@ static int sb_parse_next_codepoint(secret_buffer_parse *parse) {
 }
 
 static int sb_parse_prev_codepoint(secret_buffer_parse *parse) {
-   U8 *pos= parse->pos, *lim= parse->lim;
+   const U8 *pos= parse->pos, *lim= parse->lim;
    int encoding= parse->encoding;
    int cp;
    #define SB_RETURN_ERROR(msg) { parse->error= msg; return -1; }
@@ -973,7 +983,7 @@ static int sb_parse_prev_codepoint(secret_buffer_parse *parse) {
          if (encoding == SECRET_BUFFER_ENCODING_ASCII)
             SB_RETURN_ERROR("not 7-bit ASCII")
          // else need to backtrack and then call next_codepoint
-         U8 *start= lim;
+         const U8 *start= lim;
          while (start >= pos && (*start & 0xC0) == 0x80)
             --start;
          parse->pos= start;
@@ -1103,7 +1113,7 @@ static int sizeof_codepoint_encoding(int codepoint, int encoding) {
 static bool sb_parse_encode_codepoint(secret_buffer_parse *dst, int codepoint) {
    #define SB_RETURN_ERROR(msg) { dst->error= msg; return false; }
    int encoding= dst->encoding, n;
-   U8 *dst_pos= dst->pos;
+   U8 *dst_pos= (U8*) dst->pos;
    // codepoints above 0x10FFFF are illegal
    if (codepoint >= 0x110000)
       SB_RETURN_ERROR("invalid codepoint");

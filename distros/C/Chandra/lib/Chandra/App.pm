@@ -7,7 +7,7 @@ use Chandra;
 use Chandra::Bridge;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 1;
 
@@ -182,6 +182,30 @@ alert dialogs.
 Return the L<Chandra::Protocol> instance for registering custom URL
 scheme handlers (e.g. C<myapp://path>).
 
+=head2 drag_drop()
+
+Return the L<Chandra::DragDrop> instance for advanced drag-and-drop
+configuration (make_draggable, on_internal_drop, etc.).
+
+=head2 on_file_drop($coderef)
+
+Register a global file-drop handler.  Convenience wrapper for
+C<< $app->drag_drop->on_file_drop($cb) >>.
+
+    $app->on_file_drop(sub {
+        my ($files) = @_;
+        print "Dropped: $_\n" for @$files;
+    });
+
+=head2 drop_zone($selector, $coderef)
+
+Register a zone-specific drop handler.  Convenience wrapper for
+C<< $app->drag_drop->add_drop_zone($sel, $cb) >>.
+
+    $app->drop_zone('#upload-area', sub {
+        my ($files, $target) = @_;
+    });
+
 =head2 inject_css($css)
 
 Inject a CSS stylesheet into the current page.
@@ -274,6 +298,6 @@ Low-level lifecycle methods for manual event loop control.
 
 L<Chandra>, L<Chandra::Element>, L<Chandra::Bind>, L<Chandra::DevTools>,
 L<Chandra::HotReload>, L<Chandra::Dialog>, L<Chandra::Protocol>,
-L<Chandra::Socket::Hub>, L<Chandra::Socket::Client>
+L<Chandra::DragDrop>, L<Chandra::Socket::Hub>, L<Chandra::Socket::Client>
 
 =cut

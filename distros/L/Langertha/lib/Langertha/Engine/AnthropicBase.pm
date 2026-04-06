@@ -1,20 +1,21 @@
 package Langertha::Engine::AnthropicBase;
 # ABSTRACT: Base class for Anthropic-compatible engines
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
 
 extends 'Langertha::Engine::Remote';
 
-with 'Langertha::Role::'.$_ for (qw(
+with map { 'Langertha::Role::'.$_ } qw(
   Models
   Chat
   Temperature
   ResponseSize
   SystemPrompt
   Streaming
-));
+  Tools
+);
 
 
 sub default_response_size { 1024 }
@@ -300,8 +301,6 @@ sub format_tool_results {
   );
 }
 
-with 'Langertha::Role::Tools';
-
 sub _parse_rate_limit_headers {
   my ( $self, $http_response ) = @_;
   my %raw;
@@ -353,7 +352,7 @@ Langertha::Engine::AnthropicBase - Base class for Anthropic-compatible engines
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

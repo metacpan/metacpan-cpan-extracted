@@ -99,6 +99,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "DynaLoader" => 0,
     "Exporter" => 0,
+    "Fcntl" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
     "IO::Handle" => 0,
@@ -122,7 +123,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.021",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -140,6 +141,7 @@ my %FallbackPrereqs = (
   "DynaLoader" => 0,
   "Encode" => 0,
   "Exporter" => 0,
+  "Fcntl" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "FindBin" => 0,

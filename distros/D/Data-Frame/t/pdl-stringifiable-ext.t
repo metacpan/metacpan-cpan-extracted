@@ -32,6 +32,7 @@ for (@each) {
 subtest 'lengths' => sub {
 	for my $data (@each) {
 		note $data->{val};
+		local $PDL::doubleformat = "%".length($data->{val}).".8g";
 		is( pdl($data->{val})->element_stringify_max_width, $data->{zerodim} );
 		is( pdl([ $data->{val} ])->element_stringify_max_width, $data->{ndim} );
 		is( pdl([ [ $data->{val} ] ])->element_stringify_max_width, $data->{ndim} );

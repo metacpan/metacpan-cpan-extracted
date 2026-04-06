@@ -1,5 +1,5 @@
 package PDL::Logical;
-$PDL::Logical::VERSION = '0.006004';
+$PDL::Logical::VERSION = '0.006005';
 # ABSTRACT: PDL subclass for keeping logical data
 
 use 5.016;
@@ -67,7 +67,7 @@ PDL::Logical - PDL subclass for keeping logical data
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 SYNOPSIS
 

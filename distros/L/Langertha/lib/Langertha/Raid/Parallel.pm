@@ -1,6 +1,6 @@
 package Langertha::Raid::Parallel;
 # ABSTRACT: Parallel Raid orchestrator with branched context isolation
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Future::AsyncAwait;
 use Future;
@@ -123,7 +123,7 @@ Langertha::Raid::Parallel - Parallel Raid orchestrator with branched context iso
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

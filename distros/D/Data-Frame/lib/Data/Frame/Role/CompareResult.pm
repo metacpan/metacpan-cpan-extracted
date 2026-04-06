@@ -1,5 +1,5 @@
 package Data::Frame::Role::CompareResult;
-$Data::Frame::Role::CompareResult::VERSION = '0.006004';
+$Data::Frame::Role::CompareResult::VERSION = '0.006005';
 # ABSTRACT: Role for column compare result
 
 use Data::Frame::Role;
@@ -28,7 +28,7 @@ Data::Frame::Role::CompareResult - Role for column compare result
 
 =head1 VERSION
 
-version 0.006004
+version 0.006005
 
 =head1 ATTRIBUTES
 

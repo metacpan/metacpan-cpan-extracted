@@ -69,7 +69,7 @@ typedef struct webview2_struct webview2;
 
 struct webview_priv {
   HWND hwnd;
-  IOleObject **browser;
+  IOleObject *browser;
   BOOL is_fullscreen;
   DWORD saved_style;
   DWORD saved_ex_style;

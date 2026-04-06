@@ -3,7 +3,7 @@ package Chandra::Tray;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Chandra;
 use Cpanel::JSON::XS ();

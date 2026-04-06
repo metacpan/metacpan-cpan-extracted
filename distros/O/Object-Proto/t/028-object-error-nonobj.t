@@ -48,11 +48,11 @@ like($@, qr/object|blessed|reference/i, 'set_prototype rejects plain string as f
 eval { Object::Proto::prototype("not an object") };
 like($@, qr/object|blessed|reference/i, 'prototype rejects plain string');
 
-# clone on non-object
-eval { Object::Proto::clone("not an object") };
-like($@, qr/object|blessed|reference/i, 'clone rejects plain string');
+# clone accepts non-objects: scalars return as-is, refs are deep copied
+my $s = Object::Proto::clone("not an object");
+is($s, "not an object", 'clone returns plain string as-is');
 
-eval { Object::Proto::clone(undef) };
-like($@, qr/object|blessed|reference/i, 'clone rejects undef');
+my $u = Object::Proto::clone(undef);
+ok(!defined $u, 'clone returns undef as-is');
 
 done_testing;

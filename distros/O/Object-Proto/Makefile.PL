@@ -1,4 +1,4 @@
-use 5.008003;
+use 5.010000;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Object/Proto.pm',
     ABSTRACT_FROM    => 'lib/Object/Proto.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.008003',
+    MIN_PERL_VERSION => '5.010000',
     OBJECT           => 'object$(OBJ_EXT)',
     C                => ['object.c'],
     XS               => {},

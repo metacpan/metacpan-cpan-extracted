@@ -21,8 +21,7 @@ use warnings;
 use autodie;
 
 use Errno ();
-
-our $ASSUME_UNIX_PATHS;
+use File::Spec ();
 
 my @required = qw( key_authorization  challenge  document_root );
 
@@ -35,27 +34,17 @@ sub new {
 
     -d $opts{'document_root'} or die "Document root “$opts{'document_root'}” doesn’t exist!";
 
-    my ($file_path, $dir);
+    my @relpath = split m</>, $opts{'challenge'}->path();
 
-    if ($ASSUME_UNIX_PATHS) {
-        $file_path = $opts{'document_root'} . $opts{'challenge'}->path();
-        $dir = substr( $file_path, rindex( $file_path, '/' ) );
-    }
-    else {
-        require File::Spec;
+    my $file_path = File::Spec->catdir(
+        $opts{'document_root'},
+        @relpath,
+    );
 
-        my @relpath = split m</>, $opts{'challenge'}->path();
-
-        $file_path = File::Spec->catdir(
-            $opts{'document_root'},
-            @relpath,
-        );
-
-        $dir = File::Spec->catdir(
-            $opts{'document_root'},
-            @relpath[ 0 .. ($#relpath - 1) ],
-        );
-    }
+    my $dir = File::Spec->catdir(
+        $opts{'document_root'},
+        @relpath[ 0 .. ($#relpath - 1) ],
+    );
 
     _mkdir_if_not_exists($dir);
 
@@ -92,7 +81,8 @@ sub DESTROY {
     my ($self) = @_;
 
     if ( $> != $self->{'_euid'} ) {
-        die "XXX attempt to delete “$self->{'_path'}” with EUID $>; created with EUID $self->{'_euid'}!";
+        warn "XXX attempt to delete “$self->{'_path'}” with EUID $>; created with EUID $self->{'_euid'}!";
+        return;
     }
 
     _unlink_if_exists( $self->{'_path'} );
@@ -128,7 +118,7 @@ sub _unlink_if_exists {
     local ( $!, $^E );
 
     eval { unlink $path; 1 } or do {
-        die if $@->errno() != Errno::ENOENT();
+        warn $@ if $@->errno() != Errno::ENOENT();
     };
 
     $@ = $eval_err;

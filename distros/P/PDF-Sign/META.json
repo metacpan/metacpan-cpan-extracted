@@ -42,7 +42,8 @@
             "MIME::Base64" : "0",
             "PDF::API2" : "2.038",
             "POSIX" : "0",
-            "perl" : "5.016"
+            "Time::Local" : "0",
+            "perl" : "5.010"
          },
          "suggests" : {
             "PDF::Builder" : "0"
@@ -60,6 +61,6 @@
          "type" : "cvs"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

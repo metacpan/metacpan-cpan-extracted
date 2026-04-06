@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 7;
 use Eshu;
 
 # Simple XSUB with CODE
@@ -119,4 +119,101 @@ END
 
 	my $got = Eshu->indent_xs($input);
 	is($got, $input, 'already indented — idempotent');
+}
+
+# XSUB with CLEANUP section
+{
+	my $input = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+SV *
+new_object()
+CODE:
+RETVAL = newSV(0);
+CLEANUP:
+if (!RETVAL) croak("alloc failed");
+OUTPUT:
+RETVAL
+END
+
+	my $expected = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+SV *
+new_object()
+	CODE:
+		RETVAL = newSV(0);
+	CLEANUP:
+		if (!RETVAL) croak("alloc failed");
+	OUTPUT:
+		RETVAL
+END
+
+	my $got = Eshu->indent_xs($input);
+	is($got, $expected, 'XSUB with CLEANUP section');
+}
+
+# XSUB with POSTCALL section
+{
+	my $input = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+void
+call_hook(name)
+const char * name
+CODE:
+invoke(name);
+POSTCALL:
+check_errors();
+END
+
+	my $expected = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+void
+call_hook(name)
+	const char * name
+	CODE:
+		invoke(name);
+	POSTCALL:
+		check_errors();
+END
+
+	my $got = Eshu->indent_xs($input);
+	is($got, $expected, 'XSUB with POSTCALL section');
+}
+
+# PROTOTYPE: per-XSUB prototype declaration — should sit at label depth (1 tab),
+# not be indented as a body line (2 tabs)
+{
+	my $input = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+int
+add(a, b)
+int a
+int b
+PROTOTYPE: $$
+CODE:
+RETVAL = a + b;
+OUTPUT:
+RETVAL
+END
+
+	my $expected = <<'END';
+MODULE = Foo  PACKAGE = Foo
+
+int
+add(a, b)
+	int a
+	int b
+	PROTOTYPE: $$
+	CODE:
+		RETVAL = a + b;
+	OUTPUT:
+		RETVAL
+END
+
+	my $got = Eshu->indent_xs($input);
+	is($got, $expected, 'PROTOTYPE: per-XSUB directive at label depth (1 tab)');
 }

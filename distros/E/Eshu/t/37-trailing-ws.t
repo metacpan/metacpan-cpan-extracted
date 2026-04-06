@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Eshu;
 
-plan tests => 5;
+plan tests => 7;
 
 # 1. C — trailing spaces stripped
 {
@@ -49,4 +49,18 @@ END
 	my $expected = "void foo() {\n\tx = 1;\n}\n";
 	my $result = Eshu->indent_c($input);
 	is $result, $expected, 'trailing ws stripped and indent corrected';
+}
+
+# 6. Empty input produces empty output
+{
+	my $result = Eshu->indent_pl('');
+	is $result, '', 'empty Perl input produces empty output';
+}
+
+# 7. Input without trailing newline — indenter adds one
+{
+	my $input = "sub foo {\nmy \$x = 1;\n}";
+	my $expected = "sub foo {\n\tmy \$x = 1;\n}\n";
+	my $result = Eshu->indent_pl($input);
+	is $result, $expected, 'no trailing newline: indenter adds one';
 }

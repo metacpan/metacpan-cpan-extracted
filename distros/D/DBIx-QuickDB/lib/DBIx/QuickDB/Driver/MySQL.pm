@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000039';
+our $VERSION = '0.000040';
 
 use Capture::Tiny qw/capture/;
 use Carp qw/confess croak/;
@@ -35,6 +35,7 @@ sub install_bin_list { qw/mysql_install_db/ }
 sub server_bin       { $_[0]->provider_info->{server_bin}  }
 sub client_bin       { $_[0]->provider_info->{client_bin}  }
 sub install_bin      { $_[0]->provider_info->{install_bin} }
+sub error_log        { "$_[0]->{+DIR}/error.log" }
 
 my %PROVIDER_CACHE;
 sub provider_info {
@@ -49,24 +50,29 @@ sub provider_info {
     for my $bin ($this->server_bin_list) {
         if (my $mysqld = can_run($bin)) {
             $found{server_bin} = $mysqld if $this->verify_provider($mysqld);
+            last if $found{server_bin};
         }
     }
 
     return $PROVIDER_CACHE{$class} = {} unless $found{server_bin};
 
     for my $bin ($this->client_bin_list) {
-        if (my $mysql = can_run('mysql')) {
-            $found{client_bin} = $mysql if $this->verify_provider($mysql);
+        if (my $mysql = can_run($bin)) {
+            $found{client_bin} = $mysql;
+            last;
         }
     }
 
     return $PROVIDER_CACHE{$class} = {} unless $found{client_bin};
 
-    if (my $install = can_run('mysql_install_db')) {
-        my ($stdout, $stderr) = capture { system($install) };
-        my $output = $stdout . "\n" .  $stderr;
-        unless ($output =~ m/is deprecated/) {
-            $found{install_bin} = $install if $this->verify_provider($install);
+    for my $bin ($this->install_bin_list) {
+        if (my $install = can_run($bin)) {
+            my ($stdout, $stderr) = capture { system($install) };
+            my $output = $stdout . "\n" .  $stderr;
+            unless ($output =~ m/is deprecated/) {
+                $found{install_bin} = $install;
+            }
+            last if $found{install_bin};
         }
     }
 
@@ -161,7 +167,7 @@ sub version_string {
     croak "Could not find a viable server binary" unless $binary;
 
     # Call the binary with '-V', capturing and returning the output using backticks.
-    my ($v) = capture { system($binary, '-V') };
+    my ($v, $stderr) = capture { system($binary, '-V') };
 
     return $v;
 }
@@ -238,6 +244,7 @@ sub _default_config {
             'socket'   => $socket,
             'tmpdir'   => $temp_dir,
 
+            'log_error'                      => "$dir/error.log",
             'secure_file_priv'               => $dir,
             'default_storage_engine'         => 'InnoDB',
             'innodb_buffer_pool_size'        => '20M',
@@ -298,7 +305,7 @@ sub init {
             my $subcfg = { %{$cfg->{$key}} };
             $cfg->{$key} = $subcfg;
 
-            for my $skey (%$subdft) {
+            for my $skey (keys %$subdft) {
                 next if defined $subcfg->{$skey};
                 $subcfg->{$skey} = $subdft->{$skey};
             }

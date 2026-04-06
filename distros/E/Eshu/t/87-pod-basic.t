@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Eshu;
 
 # Basic POD directives at column 0
@@ -126,6 +126,66 @@ END
 
 	my $got = Eshu->indent_pod($input);
 	is($got, $expected, 'empty POD section');
+}
+
+# =for directive stays at column 0
+{
+	my $input = <<'END';
+=head1 NOTES
+
+=for html <p class="note">This is HTML.</p>
+
+=for comment This won't appear in output.
+
+=cut
+END
+
+	my $expected = <<'END';
+=head1 NOTES
+
+=for html <p class="note">This is HTML.</p>
+
+=for comment This won't appear in output.
+
+=cut
+END
+
+	my $got = Eshu->indent_pod($input);
+	is($got, $expected, '=for directive stays at column 0');
+}
+
+# =begin/=end block preserved
+{
+	my $input = <<'END';
+=head1 OUTPUT
+
+=begin html
+
+<table>
+<tr><td>Data</td></tr>
+</table>
+
+=end html
+
+=cut
+END
+
+	my $expected = <<'END';
+=head1 OUTPUT
+
+=begin html
+
+<table>
+<tr><td>Data</td></tr>
+</table>
+
+=end html
+
+=cut
+END
+
+	my $got = Eshu->indent_pod($input);
+	is($got, $expected, '=begin/=end block preserved');
 }
 
 # Detect .pod extension

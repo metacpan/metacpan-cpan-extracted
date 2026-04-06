@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.11
+Version 1.12
 
 # SYNOPSIS
 
@@ -474,11 +474,11 @@ Synonym of rootdir(), for compatibility with Apache.
 
 ## logdir($dir)
 
-Gets and sets the name of a directory that you can use to store logs in.
+Gets and sets the name of a directory where you can store logs.
 
 - $dir
 
-    Path to the directory where logs will be stored
+    Path to the directory where logs will be stored.
 
 ## is\_robot
 

@@ -143,4 +143,70 @@ END
 	is($got, $expected, 'escaped single quote in char literal');
 }
 
+# Wide string literal L"..."
+{
+	my $input = <<'END';
+void foo() {
+wchar_t *s = L"wide { string }";
+int x = 1;
+}
+END
+
+	my $expected = <<'END';
+void foo() {
+	wchar_t *s = L"wide { string }";
+	int x = 1;
+}
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'wide string literal L"..."');
+}
+
+# Adjacent string literals (C concatenation)
+{
+	my $input = <<'END';
+void foo() {
+const char *msg =
+"part one "
+"part { two } "
+"part three";
+int x = 1;
+}
+END
+
+	my $expected = <<'END';
+void foo() {
+	const char *msg =
+	"part one "
+	"part { two } "
+	"part three";
+	int x = 1;
+}
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'adjacent string literal concatenation');
+}
+
+# String with hex escape sequence
+{
+	my $input = <<'END';
+void foo() {
+const char *esc = "\x7b value \x7d";
+int x = 1;
+}
+END
+
+	my $expected = <<'END';
+void foo() {
+	const char *esc = "\x7b value \x7d";
+	int x = 1;
+}
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'string with hex escape sequences');
+}
+
 done_testing();

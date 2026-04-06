@@ -1,0 +1,8 @@
+\.git
+\.perltidyrc
+cpanfile
+^MANIFEST.bak
+^MYMETA.json
+^MYMETA.yml
+^Makefile$
+^CLAUDE\.md$

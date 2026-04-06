@@ -1,0 +1,14 @@
+Revision history for Modern-OpenAPI-Generator
+
+0.002   2026-04-06
+    - CLI: Pod::Usage (pod2usage) for --help, --usage, and invalid options; full
+      OPTIONS / feature-selection / Swagger UI notes in POD in
+      lib/Modern/OpenAPI/Generator/CLI.pm (single source of truth for help text).
+    - Dependencies: declare Pod::Usage in Makefile.PL (PREREQ_PM) and cpanfile.
+    - bin/oapi-perl-gen: POD updated to describe delegation to ::CLI and
+      Pod::Usage-based help.
+
+0.001   2026-04-05
+    - Initial CPAN / GitHub release: OpenAPI 3.x client, server, Swagger UI,
+      docs, tests, Moo models from components/schemas, optional auth plugins
+      (HMAC, Bearer), local-test stubs.

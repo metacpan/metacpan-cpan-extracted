@@ -48,9 +48,9 @@ Object::Proto::define('Simple', 'foo', 'bar', 'baz');
     # Modify original's array
     push @{$p->tags}, 'added';
 
-    # Clone should see the change (shallow copy = shared reference)
-    is_deeply($clone->tags, ['original', 'added'],
-        'Shallow copy shares references');
+    # Deep clone: clone has its own copy, does not see the change
+    is_deeply($clone->tags, ['original'],
+        'Deep copy does not share references');
 }
 # clone() does not copy frozen state
 {
@@ -84,13 +84,14 @@ Object::Proto::define('Simple', 'foo', 'bar', 'baz');
     ok(!defined $clone->bar, 'Clone bar is undef');
     ok(!defined $clone->baz, 'Clone baz is undef');
 }
-# clone() error handling
+# clone() accepts non-objects: scalars return as-is, refs are deep copied
 {
-    eval { Object::Proto::clone("not an object") };
-    like($@, qr/not an object/i, 'Croaks on non-object');
+    my $s = Object::Proto::clone("not an object");
+    is($s, "not an object", 'clone returns plain string as-is');
 
-    eval { Object::Proto::clone([1,2,3]) };
-    like($@, qr/not an object/i, 'Croaks on plain arrayref');
+    my $aref = Object::Proto::clone([1,2,3]);
+    is_deeply($aref, [1,2,3], 'clone deep copies plain arrayref');
+    isnt($aref, [1,2,3], 'clone plain arrayref is a distinct reference');
 }
 # ==== Object::Proto::properties() Tests ====
 

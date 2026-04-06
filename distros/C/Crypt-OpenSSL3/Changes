@@ -1,5 +1,8 @@
 Revision history for Crypt-OpenSSL3
 
+0.003     2026-04-05 21:18:34+02:00 Europe/Brussels
+          - Add many ASN1 and X509 related types
+
 0.002     2025-10-23 23:30:37+02:00 Europe/Brussels
           - Various compilation fixes for clang and C++
 

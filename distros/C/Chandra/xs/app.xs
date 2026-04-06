@@ -998,6 +998,93 @@ CODE:
         }
     }
 
+    /* DragDrop */
+    {
+        SV **dd_svp = hv_fetchs(hv, "_dragdrop", 0);
+        if (dd_svp && SvOK(*dd_svp) && SvROK(*dd_svp)) {
+            HV *dd_hv = (HV *)SvRV(*dd_svp);
+            SV **h_svp = hv_fetchs(dd_hv, "_handlers", 0);
+            SV **dz_svp = hv_fetchs(dd_hv, "_drop_zones", 0);
+            int has_handlers = (h_svp && SvROK(*h_svp)
+                && HvUSEDKEYS((HV *)SvRV(*h_svp)) > 0);
+            int has_zones = (dz_svp && SvROK(*dz_svp)
+                && HvUSEDKEYS((HV *)SvRV(*dz_svp)) > 0);
+            if (has_handlers || has_zones) {
+                if (dispatch) {
+                    dSP;
+                    int count;
+                    SV *dd_js;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(*dd_svp);
+                    PUTBACK;
+                    count = call_method("js_code", G_SCALAR);
+                    SPAGAIN;
+                    if (count > 0) {
+                        dd_js = POPs;
+                        PUSHMARK(SP);
+                        XPUSHs(*wv_svp);
+                        XPUSHs(dd_js);
+                        PUTBACK;
+                        call_method("dispatch_eval_js", G_DISCARD);
+                    }
+                    FREETMPS; LEAVE;
+                } else {
+                    dSP;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(*dd_svp);
+                    PUTBACK;
+                    call_method("inject", G_DISCARD);
+                    FREETMPS; LEAVE;
+                }
+            }
+        }
+    }
+
+    /* ContextMenu */
+    {
+        SV **cm_svp = hv_fetchs(hv, "_contextmenu", 0);
+        if (cm_svp && SvOK(*cm_svp) && SvROK(*cm_svp)) {
+            HV *cm_hv = (HV *)SvRV(*cm_svp);
+            SV **att_svp = hv_fetchs(cm_hv, "_attachments", 0);
+            SV **gl_svp  = hv_fetchs(cm_hv, "_global", 0);
+            int has_attach = (att_svp && SvROK(*att_svp)
+                && HvUSEDKEYS((HV *)SvRV(*att_svp)) > 0);
+            int is_global = (gl_svp && SvTRUE(*gl_svp));
+            if (has_attach || is_global) {
+                if (dispatch) {
+                    dSP;
+                    int count;
+                    SV *cm_js;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(*cm_svp);
+                    PUTBACK;
+                    count = call_method("js_code", G_SCALAR);
+                    SPAGAIN;
+                    if (count > 0) {
+                        cm_js = POPs;
+                        PUSHMARK(SP);
+                        XPUSHs(*wv_svp);
+                        XPUSHs(cm_js);
+                        PUTBACK;
+                        call_method("dispatch_eval_js", G_DISCARD);
+                    }
+                    FREETMPS; LEAVE;
+                } else {
+                    dSP;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(*cm_svp);
+                    PUTBACK;
+                    call_method("inject", G_DISCARD);
+                    FREETMPS; LEAVE;
+                }
+            }
+        }
+    }
+
     /* Global JS */
     {
         SV **gjs_svp = hv_fetchs(hv, "_global_js", 0);
@@ -1107,9 +1194,9 @@ CODE:
         sv_catpvs(nav_js, "var _n=document.createElement('script');_n.text=_s.text;_s.parentNode.replaceChild(_n,_s);");
         sv_catpvs(nav_js, "});}else{document.open();document.write('");
         sv_catsv(nav_js, full_escaped);
-        sv_catpvs(nav_js, "');document.close();}history.pushState({},'','");
+        sv_catpvs(nav_js, "');document.close();}try{history.pushState({},'','");
         sv_catpv(nav_js, path);
-        sv_catpvs(nav_js, "');");
+        sv_catpvs(nav_js, "');}catch(_e){}");
 
         SvREFCNT_dec(body_escaped);
         SvREFCNT_dec(full_escaped);
@@ -2436,6 +2523,409 @@ CODE:
         (void)hv_store(hv, cache_key, (I32)strlen(cache_key),
                        SvREFCNT_inc(RETVAL), 0);
     }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- open_window(%args) — create a child window ----
+
+SV *
+open_window(self, ...)
+    SV *self
+CODE:
+{
+    dSP;
+    int count;
+    I32 i;
+
+    load_module(PERL_LOADMOD_NOIMPORT,
+        newSVpvs("Chandra::Window"), NULL);
+
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpvs("Chandra::Window")));
+    /* Forward all key-value pairs */
+    for (i = 1; i < items; i++) {
+        XPUSHs(ST(i));
+    }
+    /* Add parent => $self */
+    XPUSHs(sv_2mortal(newSVpvs("parent")));
+    XPUSHs(self);
+    PUTBACK;
+    count = call_method("new", G_SCALAR);
+    SPAGAIN;
+    RETVAL = (count > 0) ? newSVsv(POPs) : &PL_sv_undef;
+    PUTBACK;
+    FREETMPS; LEAVE;
+
+    /* Track child windows in _windows array */
+    if (SvOK(RETVAL)) {
+        HV *hv = (HV *)SvRV(self);
+        SV **arr_svp = hv_fetchs(hv, "_windows", 0);
+        AV *arr;
+        if (arr_svp && SvROK(*arr_svp)) {
+            arr = (AV *)SvRV(*arr_svp);
+        } else {
+            arr = newAV();
+            (void)hv_stores(hv, "_windows", newRV_noinc((SV *)arr));
+        }
+        av_push(arr, SvREFCNT_inc(RETVAL));
+    }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- windows() — return all child windows ----
+
+void
+windows(self)
+    SV *self
+PPCODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **arr_svp = hv_fetchs(hv, "_windows", 0);
+
+    if (arr_svp && SvROK(*arr_svp)) {
+        AV *arr = (AV *)SvRV(*arr_svp);
+        I32 len = av_len(arr) + 1;
+        I32 i;
+        for (i = 0; i < len; i++) {
+            SV **elem = av_fetch(arr, i, 0);
+            if (elem && SvOK(*elem)) {
+                XPUSHs(sv_2mortal(newSVsv(*elem)));
+            }
+        }
+    }
+}
+
+ # ---- window_by_id($id) — find child window by ID ----
+
+SV *
+window_by_id(self, id_sv)
+    SV *self
+    SV *id_sv
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **arr_svp = hv_fetchs(hv, "_windows", 0);
+    const char *target_id = SvPV_nolen(id_sv);
+
+    RETVAL = &PL_sv_undef;
+
+    if (arr_svp && SvROK(*arr_svp)) {
+        AV *arr = (AV *)SvRV(*arr_svp);
+        I32 len = av_len(arr) + 1;
+        I32 i;
+        for (i = 0; i < len; i++) {
+            SV **elem = av_fetch(arr, i, 0);
+            if (elem && SvOK(*elem) && SvROK(*elem)) {
+                HV *win_hv = (HV *)SvRV(*elem);
+                SV **id_svp = hv_fetchs(win_hv, "id", 0);
+                if (id_svp && SvOK(*id_svp)) {
+                    const char *win_id = SvPV_nolen(*id_svp);
+                    if (strcmp(win_id, target_id) == 0) {
+                        RETVAL = newSVsv(*elem);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- window_count() — return number of child windows ----
+
+int
+window_count(self)
+    SV *self
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **arr_svp = hv_fetchs(hv, "_windows", 0);
+
+    if (arr_svp && SvROK(*arr_svp)) {
+        AV *arr = (AV *)SvRV(*arr_svp);
+        RETVAL = (int)(av_len(arr) + 1);
+    } else {
+        RETVAL = 0;
+    }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- on_close($coderef) — register close handler for main window ----
+
+SV *
+on_close(self, handler)
+    SV *self
+    SV *handler
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    (void)hv_stores(hv, "_on_close", newSVsv(handler));
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+ # ---- assets($root, prefix => $pfx) — lazy Chandra::Assets accessor ----
+
+SV *
+assets(self, ...)
+    SV *self
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **cached_svp = hv_fetchs(hv, "_assets", 0);
+
+    if (cached_svp && SvOK(*cached_svp)) {
+        RETVAL = SvREFCNT_inc(*cached_svp);
+    } else {
+        dSP;
+        int count;
+        SV *root_sv = (items > 1 && SvOK(ST(1))) ? ST(1) : NULL;
+
+        if (!root_sv) {
+            croak("assets() requires a root directory on first call");
+        }
+
+        load_module(PERL_LOADMOD_NOIMPORT,
+            newSVpvs("Chandra::Assets"), NULL);
+
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::Assets")));
+        XPUSHs(sv_2mortal(newSVpvs("root")));
+        XPUSHs(root_sv);
+        XPUSHs(sv_2mortal(newSVpvs("app")));
+        XPUSHs(self);
+
+        /* Forward remaining named args (prefix => 'xxx', etc.) */
+        {
+            I32 i;
+            for (i = 2; i < items; i++) {
+                XPUSHs(ST(i));
+            }
+        }
+
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        RETVAL = (count > 0) ? newSVsv(POPs) : newSV(0);
+        PUTBACK; FREETMPS; LEAVE;
+
+        (void)hv_stores(hv, "_assets", SvREFCNT_inc(RETVAL));
+    }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- clipboard() — returns Chandra::Clipboard class for convenience ----
+
+SV *
+clipboard(self)
+    SV *self
+CODE:
+{
+    load_module(PERL_LOADMOD_NOIMPORT,
+        newSVpvs("Chandra::Clipboard"), NULL);
+    RETVAL = newSVpvs("Chandra::Clipboard");
+}
+OUTPUT:
+    RETVAL
+
+ # ---- drag_drop() — lazy Chandra::DragDrop accessor ----
+
+SV *
+drag_drop(self)
+    SV *self
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **cached_svp = hv_fetchs(hv, "_dragdrop", 0);
+
+    if (cached_svp && SvOK(*cached_svp)) {
+        RETVAL = SvREFCNT_inc(*cached_svp);
+    } else {
+        dSP;
+        int count;
+
+        load_module(PERL_LOADMOD_NOIMPORT,
+            newSVpvs("Chandra::DragDrop"), NULL);
+
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::DragDrop")));
+        XPUSHs(sv_2mortal(newSVpvs("app")));
+        XPUSHs(self);
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        RETVAL = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
+        PUTBACK; FREETMPS; LEAVE;
+
+        (void)hv_stores(hv, "_dragdrop", SvREFCNT_inc(RETVAL));
+    }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- on_file_drop($coderef) — convenience for drag_drop->on_file_drop ----
+
+SV *
+on_file_drop(self, callback)
+    SV *self
+    SV *callback
+CODE:
+{
+    SV *dd;
+    dSP;
+    int count;
+
+    /* Get or create drag_drop instance */
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(self);
+    PUTBACK;
+    count = call_method("drag_drop", G_SCALAR);
+    SPAGAIN;
+    dd = (count > 0) ? POPs : &PL_sv_undef;
+
+    PUSHMARK(SP);
+    XPUSHs(dd);
+    XPUSHs(callback);
+    PUTBACK;
+    call_method("on_file_drop", G_DISCARD);
+    FREETMPS; LEAVE;
+
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+ # ---- drop_zone($selector, $coderef) — convenience for drag_drop->add_drop_zone ----
+
+SV *
+drop_zone(self, selector, callback)
+    SV *self
+    SV *selector
+    SV *callback
+CODE:
+{
+    SV *dd;
+    dSP;
+    int count;
+
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(self);
+    PUTBACK;
+    count = call_method("drag_drop", G_SCALAR);
+    SPAGAIN;
+    dd = (count > 0) ? POPs : &PL_sv_undef;
+
+    PUSHMARK(SP);
+    XPUSHs(dd);
+    XPUSHs(selector);
+    XPUSHs(callback);
+    PUTBACK;
+    call_method("add_drop_zone", G_DISCARD);
+    FREETMPS; LEAVE;
+
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+ # ---- context_menu_instance() — lazy Chandra::ContextMenu accessor ----
+
+SV *
+context_menu_instance(self)
+    SV *self
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **cached_svp = hv_fetchs(hv, "_contextmenu", 0);
+
+    if (cached_svp && SvOK(*cached_svp)) {
+        RETVAL = SvREFCNT_inc(*cached_svp);
+    } else {
+        dSP;
+        int count;
+
+        load_module(PERL_LOADMOD_NOIMPORT,
+            newSVpvs("Chandra::ContextMenu"), NULL);
+
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::ContextMenu")));
+        XPUSHs(sv_2mortal(newSVpvs("app")));
+        XPUSHs(self);
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        RETVAL = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
+        PUTBACK; FREETMPS; LEAVE;
+
+        (void)hv_stores(hv, "_contextmenu", SvREFCNT_inc(RETVAL));
+    }
+}
+OUTPUT:
+    RETVAL
+
+ # ---- context_menu(selector, items_or_cb) — convenience method ----
+
+SV *
+context_menu(self, selector, items_or_cb)
+    SV *self
+    SV *selector
+    SV *items_or_cb
+CODE:
+{
+    SV *cm;
+    dSP;
+    int count;
+
+    /* Get or create context_menu instance */
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(self);
+    PUTBACK;
+    count = call_method("context_menu_instance", G_SCALAR);
+    SPAGAIN;
+    cm = (count > 0) ? POPs : &PL_sv_undef;
+
+    if (SvROK(items_or_cb) && SvTYPE(SvRV(items_or_cb)) == SVt_PVCV) {
+        /* Dynamic: attach(selector, coderef) */
+        PUSHMARK(SP);
+        XPUSHs(cm);
+        XPUSHs(selector);
+        XPUSHs(items_or_cb);
+        PUTBACK;
+        call_method("attach", G_DISCARD);
+    } else if (SvROK(items_or_cb) && SvTYPE(SvRV(items_or_cb)) == SVt_PVAV) {
+        /* Static items: set items, then attach */
+        HV *cm_hv = (HV *)SvRV(cm);
+        (void)hv_stores(cm_hv, "_items", newSVsv(items_or_cb));
+
+        /* Register actions */
+        {
+            SV **actions_svp = hv_fetchs(cm_hv, "_actions", 0);
+            _cm_register_actions(aTHX_ cm_hv,
+                (AV *)SvRV(items_or_cb), (HV *)SvRV(*actions_svp));
+        }
+
+        PUSHMARK(SP);
+        XPUSHs(cm);
+        XPUSHs(selector);
+        PUTBACK;
+        call_method("attach", G_DISCARD);
+    }
+    FREETMPS; LEAVE;
+
+    RETVAL = SvREFCNT_inc(self);
 }
 OUTPUT:
     RETVAL

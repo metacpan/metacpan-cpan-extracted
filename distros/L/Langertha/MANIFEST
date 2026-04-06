@@ -3,7 +3,7 @@
 .claude/skills/perl-ai-langertha/SKILL.md
 .claude/skills/perl-dzil-author-getty/SKILL.md
 .claude/skills/perl-dzil-distini/SKILL.md
-.claude/skills/perl-moo/SKILL.md
+.claude/skills/perl-moose/SKILL.md
 .gitignore
 CLAUDE.md
 Changes

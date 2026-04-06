@@ -869,6 +869,12 @@ MODULE = IO::Uring				PACKAGE = IO::Uring::BufferGroup
 IV CLONE_SKIP(sv)
 
 
+IV id(IO::Uring::BufferGroup self)
+CODE:
+	RETVAL = self->id;
+OUTPUT: RETVAL
+
+
 SV* get(IO::Uring::BufferGroup self, UV index, size_t size)
 CODE:
 	if (index >= self->buffer_count || size > self->buffer_size)

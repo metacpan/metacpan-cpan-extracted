@@ -1,5 +1,65 @@
 Revision history for Perl module Net::ACME2
 
+0.41 5 April 2026
+
+  [New Features]
+  - Add async I/O support via Net::Curl backend (experimental).
+    Pass async_ua to Net::ACME2->new() to enable. (PR #18)
+  - Add create_account() External Account Binding (EAB) support.
+    (GH #38, PR #55)
+  - Add account key rollover support via key_change() (RFC 8555 §7.3.5).
+    (GH #39, PR #54)
+  - Add deactivate_account() method (RFC 8555 §7.3.6). (GH #40, PR #53)
+  - Add update_account() method (RFC 8555 §7.3.2). (GH #41, PR #52)
+  - Add deactivate_authorization() method (RFC 8555 §7.5.2). (GH #42, PR #51)
+  - Add get_orders() method for account orders list (RFC 8555 §7.1.2.1).
+    (GH #43, PR #50)
+  - Add get_certificate_chains() for alternate chain support (RFC 8555 §7.4.2).
+    (GH #44, PR #49)
+  - Add certificate revocation support via revoke_certificate() (RFC 8555 §7.6).
+    (GH #37, PR #56)
+  - Expose Retry-After header via retry_after() on Order and Authorization.
+    (GH #45, PR #48)
+  - Add retry_after_seconds() to Order and Authorization. (PR #60)
+  - Support unknown challenge types via generic fallback. (GH #36, PR #46)
+
+  [Bug Fixes]
+  - Fix: handle GET method in Curl backend. (PR #21)
+  - Fix: correct substr() directory extraction in Handler.pm
+    $ASSUME_UNIX_PATHS path, then remove $ASSUME_UNIX_PATHS entirely
+    in favor of always using File::Spec. (PR #17)
+  - Fix: replace die with warn in DESTROY to avoid suppressing exceptions.
+    (PR #58)
+  - Fix: replace unsafe $@ manipulation with direct die in HTTP.pm. (PR #59)
+  - Fix: replace plain die strings with structured X::Generic exceptions in
+    _post. (PR #64)
+  - Fix: guard get_certificate_chain(s) against undef certificate URL.
+    (GH #63, PR #65, PR #67)
+  - Fix: preserve JSON parse failure context in _xform_http_error. (PR #66)
+  - Fix: throw exception on unparseable HTTP status in Curl backend. (PR #68)
+  - Fix: guard empty lines in Curl.pm header parsing. (PR #65)
+  - Fix: skip Net::Curl::Multi on Windows in cpanfile. (PR #34)
+  - Fix: quote since-perl value to prevent YAML float truncation. (PR #32)
+
+  [Improvements]
+  - Bump minimum Perl from 5.10 to 5.14. (PR #33)
+  - Require CryptX as primary crypto backend. (PR #47)
+  - Remove all Crypt::OpenSSL::RSA mentions. (PR #35)
+  - Remove commented-out badNonce debug scaffolding from HTTP.pm. (PR #61)
+  - Remove dead code from async refactor. (PR #62, PR #65)
+
+  [Maintenance]
+  - Modernize Makefile.PL metadata and dependency declarations. (PR #28)
+  - Add cpanfile and switch CI to install-with-cpm. (PR #30)
+  - Use MM->parse_version() instead of hardcoded version in provides. (PR #31)
+  - Consolidate CI workflows into single testsuite.yml. (PR #27)
+  - Add CLAUDE.md with project conventions and architecture. (PR #24, PR #29)
+  - Extensive new test coverage: HTTP transport, dns_01 challenges, order
+    lifecycle, JWTMaker, EAB, key rollover, certificate revocation,
+    get_orders, RetryAfter, PromiseUtil, Curl backend, get_certificate guard,
+    and structured exception tests.
+    (PR #20, PR #22, PR #25, PR #57)
+
 0.35 13 April 2020
 - Fix mis-parse of subproblem identifiers in to_string().
 

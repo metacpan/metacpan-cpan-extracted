@@ -125,7 +125,7 @@ _hub_create_unix_listener(pTHX_ HV *hv)
     path_str = SvPV(path_sv, path_len);
     (void)hv_stores(hv, "_socket_path", newSVsv(path_sv));
 
-    (void)unlink(path_str);
+    (void)PerlLIO_unlink(path_str);
 
     listener = _sock_unix_listen(aTHX_ path_sv);
     if (!listener) {
@@ -134,7 +134,9 @@ _hub_create_unix_listener(pTHX_ HV *hv)
             path_str, SvPV_nolen(get_sv("!", 0)));
     }
 
-    (void)chmod(path_str, 0600);
+#ifndef _WIN32
+    (void)PerlLIO_chmod(path_str, 0600);
+#endif
     _sock_set_nonblocking(aTHX_ listener);
 
     /* Write token file */
@@ -145,7 +147,7 @@ _hub_create_unix_listener(pTHX_ HV *hv)
         if (token_svp && SvOK(*token_svp)) {
             STRLEN tlen;
             const char *tstr = SvPV(*token_svp, tlen);
-            _sock_write_token_file(SvPV_nolen(token_path_sv), tstr, tlen);
+            _sock_write_token_file(aTHX_ SvPV_nolen(token_path_sv), tstr, tlen);
         }
         SvREFCNT_dec(token_path_sv);
     }
@@ -168,6 +170,10 @@ _hub_start_listener(pTHX_ SV *self)
     transport = (transport_svp && SvOK(*transport_svp))
         ? SvPV_nolen(*transport_svp) : "unix";
 
+#ifdef _WIN32
+    if (!strEQ(transport, "tcp"))
+        croak("Hub: Unix domain sockets are not supported on Windows; use transport => 'tcp'");
+#endif
     if (strEQ(transport, "tcp"))
         listener = _hub_create_tcp_listener(aTHX_ hv);
     else
@@ -489,14 +495,14 @@ _hub_do_close(pTHX_ SV *self)
         const char *tp = SvPV_nolen(*token_path_svp);
         Stat_t st;
         if (PerlLIO_stat(tp, &st) == 0)
-            (void)unlink(tp);
+            (void)PerlLIO_unlink(tp);
     }
 
     if (sock_path_svp && SvOK(*sock_path_svp)) {
         const char *sp = SvPV_nolen(*sock_path_svp);
         Stat_t st;
         if (PerlLIO_stat(sp, &st) == 0)
-            (void)unlink(sp);
+            (void)PerlLIO_unlink(sp);
     }
 }
 

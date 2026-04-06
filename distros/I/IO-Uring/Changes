@@ -1,5 +1,10 @@
 Revision history for IO-Uring
 
+0.013     2026-04-05 21:56:54+02:00 Europe/Brussels
+          - Reorganize and extend buffer group documentation
+          - Add id method to BufferGroup
+		  - Add IO::Uring::Singleton
+
 0.012     2026-02-26 18:52:42+01:00 Europe/Brussels
           - Add statx and fstatx functions
 

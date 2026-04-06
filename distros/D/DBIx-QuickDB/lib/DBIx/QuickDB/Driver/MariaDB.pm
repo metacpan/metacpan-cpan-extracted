@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000039';
+our $VERSION = '0.000040';
 
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;
@@ -18,7 +18,7 @@ sub verify_provider {
 
     $provider //= $class->provider;
 
-    my ($v) = capture { system($bin, '-V') };
+    my ($v, $stderr) = capture { system($bin, '-V') };
     return 1 if $v =~ m/$provider/i;
     return 0;
 }

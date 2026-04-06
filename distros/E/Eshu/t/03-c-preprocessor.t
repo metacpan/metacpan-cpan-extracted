@@ -171,4 +171,30 @@ END
 	is($got, $expected, '#if/#elif/#else/#endif');
 }
 
+# Multi-line macro with nested control structures
+{
+	my $input = <<'END';
+#define INIT(s, v) \
+    do { \
+        (s).value = v; \
+        if ((s).debug) { \
+            printf("set\n"); \
+        } \
+    } while (0)
+END
+
+	my $expected = <<'END';
+#define INIT(s, v) \
+do { \
+	(s).value = v; \
+	if ((s).debug) { \
+		printf("set\n"); \
+	} \
+} while (0)
+END
+
+	my $got = Eshu->indent_c($input);
+	is($got, $expected, 'multi-line macro with nested control structures');
+}
+
 done_testing();

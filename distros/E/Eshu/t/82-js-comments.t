@@ -143,4 +143,84 @@ END
 	is($got, $expected, 'comment after opening brace');
 }
 
+# Lint-directive comments (eslint, @ts)
+{
+	my $input = <<'END';
+function unsafe(input) {
+// eslint-disable-next-line no-eval
+const result = eval(input);
+// @ts-ignore
+return result.value;
+}
+END
+
+	my $expected = <<'END';
+function unsafe(input) {
+	// eslint-disable-next-line no-eval
+	const result = eval(input);
+	// @ts-ignore
+	return result.value;
+}
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'lint-directive comments treated as plain comments');
+}
+
+# TODO / FIXME comments
+{
+	my $input = <<'END';
+class Widget {
+render() {
+// TODO: implement caching
+// FIXME: handle null case
+return this.buildDOM();
+}
+}
+END
+
+	my $expected = <<'END';
+class Widget {
+	render() {
+		// TODO: implement caching
+		// FIXME: handle null case
+		return this.buildDOM();
+	}
+}
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'TODO/FIXME comments inside nested class method');
+}
+
+# Block comment with braces and code-like content
+{
+	my $input = <<'END';
+/*
+ * Example usage:
+ *   if (x) {
+ *     doSomething();
+ *   }
+ */
+function doSomething() {
+return true;
+}
+END
+
+	my $expected = <<'END';
+/*
+* Example usage:
+*   if (x) {
+*     doSomething();
+*   }
+*/
+function doSomething() {
+	return true;
+}
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'block comment with code-like example braces');
+}
+
 done_testing();

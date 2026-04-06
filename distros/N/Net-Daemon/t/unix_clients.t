@@ -3,17 +3,19 @@
 #   Test that proto => 'unix' works when clients are defined.
 #   Reproduces https://github.com/cpan-authors/Net-Daemon/issues/1
 #
-require 5.004;
+
 use strict;
+use warnings;
 
 use IO::Socket        ();
-use Config            ();
 use Net::Daemon::Test ();
+use Test::More;
 
 if ( $^O eq "MSWin32" ) {
-    print "1..0\n";
-    exit 0;
+    plan skip_all => 'Unix sockets are not available on Windows';
 }
+
+plan tests => 3;
 
 my $CONFIG_FILE = "t/unix_clients_config";
 my $SOCK_PATH   = "mysock_clients";
@@ -24,14 +26,12 @@ my $config = q/
       'clients' => [ { 'mask' => '.*', 'accept' => 1 } ]
     }/;
 
-if ( !open( CF, ">$CONFIG_FILE" ) || !( print CF $config ) || !close(CF) ) {
-    die "Error while creating config file $CONFIG_FILE: $!";
-}
-
-my $numTests = 3;
+open( my $cf, '>', $CONFIG_FILE ) or die "Error creating $CONFIG_FILE: $!";
+print $cf $config or die "Error writing $CONFIG_FILE: $!";
+close($cf) or die "Error closing $CONFIG_FILE: $!";
 
 my ( $handle, $port ) = Net::Daemon::Test->Child(
-    $numTests,
+    undef,
     $^X,        '-Iblib/lib', '-Iblib/arch',
     't/server', "--localpath=$SOCK_PATH",
     '--mode=fork',
@@ -39,14 +39,9 @@ my ( $handle, $port ) = Net::Daemon::Test->Child(
     '--timeout', 60
 );
 
-print "Connecting to Unix socket with clients defined...\n";
 my $fh = IO::Socket::UNIX->new( 'Peer' => $port );
-if ( !$fh ) {
-    print "Failed to connect: " . ( $@ || $! ) . "\n";
-}
-printf( "%s 1\n", $fh ? "ok" : "not ok" );
+ok( $fh, 'connect to unix socket with clients defined' ) or diag("Connect failed: " . ( $@ || $! ));
 
-# Test data exchange to verify client was accepted
 my $success = 0;
 if ($fh) {
     eval {
@@ -56,14 +51,13 @@ if ($fh) {
         $success = 1 if $line =~ /10/;
     };
 }
-printf( "%s 2\n", $success ? "ok" : "not ok" );
+ok( $success, 'data exchange through unix socket' ) or diag($@);
 
-printf( "%s 3\n", ( $fh && $fh->close() ) ? "ok" : "not ok" );
+ok( ( $fh && $fh->close() ), 'connection close' );
 
 END {
-    if ($handle) { $handle->Terminate() }
-    unlink "ndtest.prt"  if -e "ndtest.prt";
-    unlink $SOCK_PATH    if -e $SOCK_PATH;
-    unlink $CONFIG_FILE  if -e $CONFIG_FILE;
-    exit 0;
+    if ($handle)              { $handle->Terminate() }
+    if ( -f "ndtest.prt" )    { unlink "ndtest.prt" }
+    if ( -e $SOCK_PATH )      { unlink $SOCK_PATH }
+    if ( -f $CONFIG_FILE )    { unlink $CONFIG_FILE }
 }

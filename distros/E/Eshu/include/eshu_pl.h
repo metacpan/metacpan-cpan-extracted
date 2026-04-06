@@ -658,9 +658,24 @@ static void eshu_pl_process_line(eshu_pl_ctx_t *ctx, eshu_buf_t *out,
 		return;
 	}
 
-	/* ── Inside multi-line q/qq/qw/regex: indent at current depth+1 ── */
-	if (ctx->state == ESHU_QW || ctx->state == ESHU_QQ ||
-	    ctx->state == ESHU_Q || ctx->state == ESHU_REGEX) {
+	/* ── Inside multi-line DQ/SQ string: preserve verbatim (re-indenting changes value) ── */
+	if (ctx->state == ESHU_STRING_DQ || ctx->state == ESHU_STRING_SQ) {
+		eshu_buf_write_trimmed(out, line_start, (int)(eol - line_start));
+		eshu_buf_putc(out, '\n');
+		eshu_pl_scan_line(ctx, content, eol);
+		return;
+	}
+
+	/* ── Inside multi-line qq/q (string literals): preserve verbatim ── */
+	if (ctx->state == ESHU_QQ || ctx->state == ESHU_Q) {
+		eshu_buf_write_trimmed(out, line_start, (int)(eol - line_start));
+		eshu_buf_putc(out, '\n');
+		eshu_pl_scan_line(ctx, content, eol);
+		return;
+	}
+
+	/* ── Inside multi-line qw/regex: indent at current depth+1 ── */
+	if (ctx->state == ESHU_QW || ctx->state == ESHU_REGEX) {
 		int qdepth = ctx->depth + 1;
 		/* closing delimiter line gets same depth as opening line */
 		if (ctx->q_close && *content == ctx->q_close)

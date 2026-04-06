@@ -1,13 +1,12 @@
 package Langertha::Engine::NousResearch;
 # ABSTRACT: Nous Research Inference API
-our $VERSION = '0.308';
+our $VERSION = '0.309';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Tools';
-with 'Langertha::Role::HermesTools';
+with 'Langertha::Role::Tools', 'Langertha::Role::HermesTools';
 
 
 sub _build_supported_operations {[qw(
@@ -77,7 +76,7 @@ Langertha::Engine::NousResearch - Nous Research Inference API
 
 =head1 VERSION
 
-version 0.308
+version 0.309
 
 =head1 SYNOPSIS
 

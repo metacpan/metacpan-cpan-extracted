@@ -223,4 +223,78 @@ END
 	like($got, qr/\tbaz\(\);/, 'range: line 3 re-indented');
 }
 
+# Object with method shorthand
+{
+	my $input = <<'END';
+const obj = {
+greet(name) {
+return `Hello, ${name}!`;
+},
+square(x) {
+return x * x;
+},
+};
+END
+
+	my $expected = <<'END';
+const obj = {
+	greet(name) {
+		return `Hello, ${name}!`;
+	},
+	square(x) {
+		return x * x;
+	},
+};
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'object with method shorthand');
+}
+
+# async/await function
+{
+	my $input = <<'END';
+async function fetchUser(id) {
+const response = await fetch(`/users/${id}`);
+const user = await response.json();
+return user;
+}
+END
+
+	my $expected = <<'END';
+async function fetchUser(id) {
+	const response = await fetch(`/users/${id}`);
+	const user = await response.json();
+	return user;
+}
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'async/await function');
+}
+
+# Arrow function with block body (.map( opens paren depth, => { opens brace depth)
+{
+	my $input = <<'END';
+const doubled = items.map(x => {
+return x * 2;
+});
+const filtered = items.filter(x => {
+return x > 1;
+});
+END
+
+	my $expected = <<'END';
+const doubled = items.map(x => {
+		return x * 2;
+	});
+const filtered = items.filter(x => {
+		return x > 1;
+	});
+END
+
+	my $got = Eshu->indent_js($input);
+	is($got, $expected, 'arrow function with block body');
+}
+
 done_testing();

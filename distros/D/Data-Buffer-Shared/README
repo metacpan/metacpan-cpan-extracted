@@ -1,0 +1,102 @@
+NAME
+    Data::Buffer::Shared - Type-specialized shared-memory buffers for
+    multiprocess access
+
+SYNOPSIS
+        use Data::Buffer::Shared::I64;
+
+        # Create or open a shared buffer (file-backed mmap)
+        my $buf = Data::Buffer::Shared::I64->new('/tmp/mybuf.shm', 1024);
+
+        # Keyword API (fastest)
+        buf_i64_set $buf, 0, 42;
+        my $val = buf_i64_get $buf, 0;
+
+        # Method API
+        $buf->set(0, 42);
+        my $v = $buf->get(0);
+
+        # Lock-free atomic operations (integer types)
+        buf_i64_incr $buf, 0;
+        buf_i64_add $buf, 0, 10;
+        buf_i64_cas $buf, 0, 52, 100;
+
+        # Multiprocess
+        if (fork() == 0) {
+            my $child = Data::Buffer::Shared::I64->new('/tmp/mybuf.shm', 1024);
+            buf_i64_incr $child, 0;   # atomic, visible to parent
+            exit;
+        }
+        wait;
+
+DESCRIPTION
+    Data::Buffer::Shared provides type-specialized fixed-capacity buffers
+    stored in file-backed shared memory (mmap(MAP_SHARED)), enabling
+    efficient multiprocess data sharing on Linux.
+
+    Linux-only. Requires 64-bit Perl.
+
+  Features
+    *   File-backed mmap for cross-process sharing
+
+    *   Lock-free atomic get/set for numeric types (single-element)
+
+    *   Lock-free atomic counters: incr/decr/add/cas (integer types)
+
+    *   Seqlock-guarded bulk operations (slice, fill)
+
+    *   Futex-based read-write lock with stale lock recovery
+
+    *   Keyword API via XS::Parse::Keyword
+
+    *   Presized: fixed capacity, no growing
+
+  Variants
+    Data::Buffer::Shared::I8 - int8
+    Data::Buffer::Shared::U8 - uint8
+    Data::Buffer::Shared::I16 - int16
+    Data::Buffer::Shared::U16 - uint16
+    Data::Buffer::Shared::I32 - int32
+    Data::Buffer::Shared::U32 - uint32
+    Data::Buffer::Shared::I64 - int64
+    Data::Buffer::Shared::U64 - uint64
+    Data::Buffer::Shared::F32 - float
+    Data::Buffer::Shared::F64 - double
+    Data::Buffer::Shared::Str - fixed-length string
+
+  API
+    Replace "xx" with variant prefix: "i8", "u8", "i16", "u16", "i32",
+    "u32", "i64", "u64", "f32", "f64", "str".
+
+        buf_xx_set $buf, $idx, $value;    # set element (lock-free atomic for numeric)
+        my $v = buf_xx_get $buf, $idx;    # get element (lock-free atomic for numeric)
+        my @v = buf_xx_slice $buf, $from, $count;  # bulk read (seqlock)
+        buf_xx_fill $buf, $value;         # fill all elements (write-locked)
+
+    Integer variants also have:
+
+        my $n = buf_xx_incr $buf, $idx;          # atomic increment, returns new value
+        my $n = buf_xx_decr $buf, $idx;          # atomic decrement
+        my $n = buf_xx_add $buf, $idx, $delta;   # atomic add
+        my $ok = buf_xx_cas $buf, $idx, $old, $new;  # compare-and-swap
+
+    Diagnostics:
+
+        my $c = buf_xx_capacity $buf;
+        my $s = buf_xx_mmap_size $buf;
+        my $e = buf_xx_elem_size $buf;
+
+    Explicit locking (for batch operations):
+
+        buf_xx_lock_wr $buf;    # write lock + seqlock begin
+        buf_xx_unlock_wr $buf;  # seqlock end + write unlock
+        buf_xx_lock_rd $buf;    # read lock
+        buf_xx_unlock_rd $buf;  # read unlock
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

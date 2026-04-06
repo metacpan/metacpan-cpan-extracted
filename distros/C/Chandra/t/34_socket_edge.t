@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Test::More;
 use IO::Socket::UNIX;
-use File::Spec ();
 
 plan skip_all => 'Unix sockets not available' unless eval { IO::Socket::UNIX->new; 1 } || 1;
 
@@ -319,8 +318,8 @@ use_ok('Chandra::Socket::Client');
 
     # Manually connect and send bad handshake
     require IO::Socket::UNIX;
-    my $dir = $ENV{XDG_RUNTIME_DIR} || File::Spec->tmpdir;
-    my $path = File::Spec->catfile($dir, "chandra-$name.sock");
+    my $dir = $ENV{XDG_RUNTIME_DIR} || $ENV{TMPDIR} || '/tmp';
+    my $path = "$dir/chandra-$name.sock";
     my $sock = IO::Socket::UNIX->new(
         Peer => $path,
         Type => IO::Socket::UNIX::SOCK_STREAM(),

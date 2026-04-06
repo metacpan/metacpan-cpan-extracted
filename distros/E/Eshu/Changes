@@ -1,5 +1,14 @@
 Revision history for Eshu
 
+0.06    2026-04-05
+        - Fix PROTOTYPES: ENABLE/DISABLE and VERSIONCHECK: DISABLE being
+          incorrectly indented at 1 tab instead of column 0..
+        - Extend test coverage across all language modules: 
+        - Add new test files: t/05-c-structs.t (structs, unions, enums),
+          t/19-pl-misc.t (unless, until, do-while, local, chained methods),
+          t/26-xs-advanced.t, t/58-xml-html5.t, t/68-css-advanced.t,
+          t/99-js-modern.t.
+
 0.05    2026-03-30
         - Fix $# (last array index) operator being misinterpreted as a
           comment, causing incorrect depth tracking for the rest of the line.

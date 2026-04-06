@@ -1,4 +1,16 @@
 Revision history for PDF-Sign
+
+0.05  2026-04-06
+    - Fixed: regression to allow Mswin32 paths in ts_query
+
+0.04  2026-04-06
+    - Fixed: Calculation of Time Zone Offset for systems without %z
+      (timegm-based: correct DST handling for all timezones,
+       replaces the previous CET/CEST-only approach)
+    - Pod separated from code
+    - Checked Compatibility with deps to Perl 5.10+ 
+    - Fixed: strips non path chars from args of ts_query
+
 0.03  2026-04-04
     - Fixed: VERSION in POD corrected to 0.03
     - Fixed: replaced UTF-8 em-dash with ASCII hyphen-minus in POD

@@ -2,7 +2,7 @@ package IPC::Manager::Client::MessageFiles;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use Carp qw/croak confess/;
 use File::Spec;
@@ -32,7 +32,11 @@ sub init {
     $self->{+PEND_COUNT}  = 0;
     $self->{+READY_COUNT} = 0;
 
-    return unless USE_INOTIFY;
+    # Prime the message-directory inotify watch now that the path exists,
+    # so events are captured from the start.  Skip on reconnect so the
+    # first message_files() call does a full directory scan and picks up
+    # any messages written while the client was suspended.
+    $self->inotify if USE_INOTIFY && !$self->{+RECONNECT};
 }
 
 sub have_handles_for_select { USE_INOTIFY() }
@@ -46,7 +50,7 @@ sub inotify {
 
     my $i = Linux::Inotify2->new;
     $i->blocking(0);
-    $i->watch($self->path, Linux::Inotify2::IN_CREATE());
+    $i->watch($self->path, Linux::Inotify2::IN_CREATE() | Linux::Inotify2::IN_MOVED_TO());
 
     return $self->{+INOTIFY} = $i;
 }
@@ -91,10 +95,15 @@ sub message_files {
     my ($ext) = @_;
 
     if (USE_INOTIFY && !$self->{+READY_COUNT} && !$self->{+PEND_COUNT}) {
-        return undef unless $self->select->can_read(0);
+        my $check_for_pre_inotify = $self->{+INOTIFY} ? 0 : 1;
 
-        # Reset the status
-        $self->inotify->read;
+        if ($self->select->can_read(0)) {
+            # Reset the status
+            $self->inotify->read;
+        }
+        else {
+            return undef unless $check_for_pre_inotify;
+        }
     }
 
     my (@pend, @ready);
@@ -128,7 +137,7 @@ sub get_messages {
         my $full = File::Spec->catfile($self->path, $msg);
         open(my $fh, '<', $full) or die "Could not open file '$full': $!";
         my $content = do { local $/; <$fh> };
-        close($full);
+        close($fh);
         unlink($full) or die "Could not unlink file '$full': $!";
 
         my $msg = IPC::Manager::Message->new($self->{+SERIALIZER}->deserialize($content));
@@ -207,7 +216,29 @@ is a file added to the client subdirectories.
 
 =head1 METHODS
 
-See L<IPC::Manager::Client>.
+See L<IPC::Manager::Client> and L<IPC::Manager::Base::FS> for inherited methods.
+
+=over 4
+
+=item $inotify = $con->inotify
+
+Returns the L<Linux::Inotify2> instance watching the client's message
+directory for newly created message files.  Created on first call.  Dies
+unless L<Linux::Inotify2> is available.
+
+=item $arrayref_or_undef = $con->message_files($ext)
+
+Scans the client's message directory and returns an arrayref of filenames
+matching C<.ready> (when C<$ext> is C<'ready'>) or C<.pend> (when C<$ext>
+is C<'pend'>), or undef if there are none.  As a side-effect, updates the
+internal C<pend_count> and C<ready_count> caches.
+
+=item $dirhandle = $con->dir_handle
+
+Returns a cached, rewound directory handle for the client's message
+directory.  Opens the directory on first call.
+
+=back
 
 =head1 SOURCE
 

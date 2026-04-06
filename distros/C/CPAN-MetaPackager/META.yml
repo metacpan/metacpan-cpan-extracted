@@ -44,5 +44,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaPackager
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/CPAN-MetaPackager.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

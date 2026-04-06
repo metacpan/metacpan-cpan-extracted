@@ -81,7 +81,6 @@ has separator =>
 
 # Warning. Order is important because of foreign key constraints.
 # The tables are created in this order, and dropped in reverse order.
-# Lastly, we process the topics table to extract the module names.
 # See also Database.build_pad().
 
 has table_names =>
@@ -92,7 +91,7 @@ has table_names =>
 	required	=> 0,
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # -----------------------------------------------
 

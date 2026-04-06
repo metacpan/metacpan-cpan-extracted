@@ -1,17 +1,8 @@
 use Test2::V1 -ipP;
 use Test2::IPC;
 
-{
-    no warnings 'once';
-    $main::PROTOCOL = 'MessageFiles';
-}
-
-subtest general => sub {
-    do './t/generic_test.pl' or die $@;
-};
-
-subtest service => sub {
-    do './t/service_test.pl' or die $@;
-};
+use lib 't/lib';
+use IPC::Manager::Test;
+IPC::Manager::Test->run_all(protocol => 'MessageFiles');
 
 done_testing;

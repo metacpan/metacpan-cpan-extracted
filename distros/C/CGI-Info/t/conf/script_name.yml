@@ -4,9 +4,16 @@
 module: CGI::Info
 function: script_name
 
+accessor:
+  property: script_name
+  type: getter
+
 new:
 
 output:
   type: string
   min: 1
   nomatch: "^[\/\\]"	# Does not return absolute path
+accessor:
+  property: script_name
+  type: getter

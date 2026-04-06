@@ -2,7 +2,7 @@ package Chandra::Game::Tetris::Blocks::Role;
 
 use strict;
 use warnings;
-use Object::Proto::Sugar -role;
+use Object::Proto::Sugar qw(-role -types);
 use Chandra::Element;
 
 has name => (

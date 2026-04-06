@@ -7,23 +7,29 @@ use IO::Socket        ();
 use Config            ();
 use Net::Daemon::Test ();
 use Fcntl             ();
+use Test::More;
 
-use Config;
+$| = 1;
 
-$|  = 1;
-$^W = 1;
+if ( !$Config::Config{useithreads} ) {
+    plan skip_all => 'This test requires a perl with working ithreads.';
+}
 
-if ( !$Config{useithreads} ) {
-    print "1..0 # SKIP This test requires a perl with working ithreads.\n";
+# Perl ithreads on Windows use DuplicateHandle() to clone file descriptors
+# into new threads.  MSDN explicitly states that DuplicateHandle must not
+# be used with Winsock SOCKETs — WSADuplicateSocket() is required instead.
+# Since Perl core does not use WSADuplicateSocket, accepted client sockets
+# get corrupted when cloned into handler threads, causing sporadic
+# "Invalid argument" errors during socket I/O.  This is a Perl core
+# limitation, not a Net::Daemon bug.  See #19, #30.
+if ( $^O eq "MSWin32" ) {
+    print "1..0 # SKIP Perl ithreads on Windows cannot safely duplicate Winsock sockets (DuplicateHandle vs WSADuplicateSocket)\n";
     exit 0;
 }
 
-if ( $^O eq "MSWin32" ) {
-   print  "1..0 # SKIP This test is failing on windows I think due to Win32-Process but it needs help right now.\n";
-   exit 0;
-}
-
 require threads;
+
+plan tests => 10;
 
 my ( $handle, $port );
 if (@ARGV) {
@@ -31,7 +37,7 @@ if (@ARGV) {
 }
 else {
     ( $handle, $port ) = Net::Daemon::Test->Child(
-        10,                $^X,              '-Iblib/lib', '-Iblib/arch', 't/server',
+        undef,             $^X,              '-Iblib/lib', '-Iblib/arch', 't/server',
         '--mode=ithreads', 'logfile=stderr', 'debug'
     );
 }
@@ -80,8 +86,6 @@ sub MyChild {
 
 my @threads;
 for ( my $i = 0; $i < 10; $i++ ) {
-
-    #print "Spawning child $i.\n";
     my $tid = threads->new( \&MyChild, $i );
     if ( !$tid ) {
         print STDERR "Failed to create new thread: $!\n";
@@ -91,19 +95,13 @@ for ( my $i = 0; $i < 10; $i++ ) {
 }
 eval { alarm 1; alarm 0 };
 alarm 120 unless $@;
-for ( my $i = 1; $i <= 10; $i++ ) {
+for ( my $i = 0; $i < 10; $i++ ) {
     my $tid = shift @threads;
-    if ( $tid->join() ) {
-        print "ok $i\n";
-    }
-    else {
-        print "not ok $i\n";
-    }
+    ok( $tid->join(), "client thread $i completed 1000 round-trips" );
 }
 
 END {
     if ($handle) {
-        print "Terminating server.\n";
         $handle->Terminate();
         undef $handle;
     }

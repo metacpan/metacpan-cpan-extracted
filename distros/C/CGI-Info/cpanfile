@@ -3,7 +3,6 @@
 requires 'perl', '5.008';
 
 requires 'Carp';
-requires 'Class::Autouse';
 requires 'Cwd';
 requires 'ExtUtils::MakeMaker', '6.64';
 requires 'File::Basename';
@@ -21,8 +20,6 @@ requires 'Return::Set';
 requires 'Scalar::Util';
 requires 'Socket';
 requires 'String::Clean::XSS';
-requires 'String::EscapeCage', '0.02';
-requires 'Sub::Private';
 requires 'Sys::Hostname';
 requires 'Sys::Path';
 requires 'URI::Heuristic';
@@ -32,6 +29,7 @@ requires 'namespace::clean';
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';
 };
+
 on 'test' => sub {
 	requires 'Errno';
 	requires 'File::Temp';
@@ -46,7 +44,7 @@ on 'test' => sub {
 	requires 'Test::CleanNamespaces';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
-	requires 'Test::Kwalitee';
+	requires 'Test::Mockingbird';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';
@@ -60,6 +58,7 @@ on 'test' => sub {
 	requires 'strict';
 	requires 'warnings';
 };
+
 on 'develop' => sub {
 	requires 'Devel::Cover';
 	requires 'Perl::Critic';

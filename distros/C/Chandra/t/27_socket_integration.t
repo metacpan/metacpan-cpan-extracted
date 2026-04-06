@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Test::More;
 use IO::Socket::UNIX;
-use File::Spec ();
 no warnings 'once', 'redefine';
 
 plan 'no_plan';
@@ -249,8 +248,8 @@ SKIP: {
 # === Hub stale socket file cleanup ===
 {
 	my $name = "test-stale-$$";
-	my $dir = $ENV{XDG_RUNTIME_DIR} || File::Spec->tmpdir;
-	my $path = File::Spec->catfile($dir, "chandra-$name.sock");
+	my $dir = $ENV{XDG_RUNTIME_DIR} || $ENV{TMPDIR} || '/tmp';
+	my $path = "$dir/chandra-$name.sock";
 
 	# Create stale file
 	open my $fh, '>', $path or die "Cannot create $path: $!";

@@ -25,11 +25,18 @@
 #include "SecretBuffer.h"
 #include "SecretBufferManualLinkage.h"
 
+/* struct attached to ::Span objects */
 typedef struct secret_buffer_span {
    size_t pos, lim;
    int encoding;
    const char *last_error;
 } secret_buffer_span;
+
+/* struct used for making lists of byte ranges prior to copying things */
+typedef struct secret_buffer_byte_range {
+   const U8 *ptr;
+   STRLEN len;
+} secret_buffer_byte_range;
 
 // For typemap
 typedef secret_buffer_span *auto_secret_buffer_span;
@@ -506,13 +513,30 @@ new(...)
       PUSHs(buf_ref);
 
 void
-append(buf, source= NULL)
+append(buf, ...)
    auto_secret_buffer buf
-   SV *source;
    ALIAS:
       assign = 1
+   INIT:
+      int i;
+      size_t from_ofs= (ix? 0 : buf->len), len_sum= 0;
+      U8 *write_pos;
+      secret_buffer_byte_range stack_ranges[16], *ranges= stack_ranges;
+      if ((items-1) > 16) {
+         Newx(ranges, (items-1), secret_buffer_byte_range);
+         SAVEFREEPV(ranges);
+      }
    PPCODE:
-      secret_buffer_splice_sv(buf, ix? 0 : buf->len, ix? buf->len : 0, source);
+      for (i= 0; i < items-1; i++) {
+         ranges[i].ptr= secret_buffer_SvPVbyte(ST(i+1), &ranges[i].len);
+         len_sum += ranges[i].len;
+      }
+      secret_buffer_set_len(buf, from_ofs + len_sum);
+      write_pos= buf->data + from_ofs;
+      for (i= 0; i < items-1; i++) {
+         memcpy(write_pos, ranges[i].ptr, ranges[i].len);
+         write_pos += ranges[i].len;
+      }
       XSRETURN(1); /* return self for chaining */
 
 void

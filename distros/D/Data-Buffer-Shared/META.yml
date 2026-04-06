@@ -1,0 +1,27 @@
+---
+abstract: 'Type-specialized shared-memory buffers for multiprocess access'
+author:
+  - vividsnow
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  Devel::PPPort: '0'
+  ExtUtils::MakeMaker: '0'
+  XS::Parse::Keyword::Builder: '0.40'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Buffer-Shared
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XS::Parse::Keyword: '0.40'
+  perl: '5.022'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

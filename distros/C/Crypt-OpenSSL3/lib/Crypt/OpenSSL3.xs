@@ -16,6 +16,7 @@
 #include <openssl/kdf.h>
 #include <openssl/rand.h>
 #include <openssl/err.h>
+#include <openssl/x509v3.h>
 #include <openssl/opensslv.h>
 
 #include <openssl/rsa.h>
@@ -111,11 +112,24 @@ typedef BIGNUM BN;
 DUPLICATING_TYPE(BN, BigNum, BigNum);
 #define BN_CTX_dup(old) BN_CTX_new()
 DUPLICATING_TYPE(BN_CTX, BigNum__Context, BigNum::Context)
+
 SIMPLE_TYPE(ASN1_OBJECT, ASN1__Object, ASN1::Object, )
+DUPLICATING_TYPE(ASN1_INTEGER, ASN1__Integer, ASN1::Integer)
+#define ASN1_ENUMERATED_dup ASN1_INTEGER_dup
+DUPLICATING_TYPE(ASN1_ENUMERATED, ASN1__Enumerated, ASN1::Enumerated)
+DUPLICATING_TYPE(ASN1_STRING, ASN1__String, ASN1::String)
+DUPLICATING_TYPE(ASN1_OCTET_STRING, ASN1__String__Octet, ASN1::String::Octet)
+DUPLICATING_TYPE(ASN1_TIME, ASN1__Time, ASN1::Time)
+DUPLICATING_TYPE(ASN1_GENERALIZEDTIME, ASN1__Time__Generalized, ASN1::Time::Generalized)
+DUPLICATING_TYPE(ASN1_UTCTIME, ASN1__Time__UTC, ASN1::Time::UTC)
 DUPLICATING_TYPE(X509, X509, X509)
 COUNTING_TYPE(X509_STORE, X509__Store, X509::Store)
 DUPLICATING_TYPE(X509_NAME, X509__Name, X509::Name)
 DUPLICATING_TYPE(X509_NAME_ENTRY, X509__Name__Entry, X509::Name::Entry)
+DUPLICATING_TYPE(X509_ALGOR, X509__Algorithm, X509::Algoritm)
+DUPLICATING_TYPE(X509_EXTENSION, X509__Extension, X509::Extension)
+SIMPLE_TYPE(X509_VERIFY_PARAM, X509__VerifyParam, X509::VerifyParam, )
+DUPLICATING_TYPE(GENERAL_NAME, X509__GeneralName, X509::GeneralName)
 typedef long Crypt__OpenSSL3__X509__VerifyResult;
 
 COUNTING_TYPE(BIO, BIO, BIO)
@@ -143,10 +157,40 @@ SIMPLE_TYPE(SSL_CIPHER, SSL__Cipher, SSL::Context, const)
 
 #define BN_generate_prime BN_generate_prime_ex2
 
+#define OBJ_get_data OBJ_get0_data
+#define ASN1_INTEGER_get_BN(ai) ASN1_INTEGER_to_BN(ai, NULL)
+#define ASN1_INTEGER_set_BN(ai, bn) BN_to_ASN1_INTEGER(bn, ai)
+#define ASN1_ENUMERATED_set_BN(ai, bn) BN_to_ASN1_ENUMERATED(bn, ai)
+#define ASN1_ENUMERATED_get_BN(ai) ASN1_ENUMERATED_to_BN(ai, NULL)
+
+#define GENERAL_NAME_type(gn) (gn->type)
+
 #define X509_read_pem PEM_read_bio_X509
 #define X509_write_pem PEM_write_bio_X509
+#define X509_get_tbs_sigalg(c) (X509_ALGOR*)X509_get0_tbs_sigalg(c)
+#define X509_get_signature X509_get0_signature
+#define X509_get_subject_key_id(c) (ASN1_OCTET_STRING*)X509_get0_subject_key_id(c)
+#define X509_get_authority_key_id(c) (ASN1_OCTET_STRING*)X509_get0_authority_key_id(c)
+#define X509_get_authority_serial(c) (ASN1_INTEGER*)X509_get0_authority_serial(c)
+#define X509_set_notAfter X509_set1_notAfter
+#define X509_set_notBefore X509_set1_notBefore
+#define X509_get_distinguishing_id X509_get0_distinguishing_id
+#define X509_set_distinguishing_id X509_set0_distinguishing_id
+
+#define X509_ALGOR_get X509_ALGOR_get0
+#define X509_ALGOR_set X509_ALGOR_set0
 #define X509_verify_cert_error_code(value) value
 #define X509_verify_cert_ok(value) (value == X509_V_OK)
+#define X509_VERIFY_PARAM_add_policy X509_VERIFY_PARAM_add0_policy
+#define X509_VERIFY_PARAM_get_host X509_VERIFY_PARAM_get0_host
+#define X509_VERIFY_PARAM_set_host X509_VERIFY_PARAM_set1_host
+#define X509_VERIFY_PARAM_add_host X509_VERIFY_PARAM_add1_host
+#define X509_VERIFY_PARAM_get_peername X509_VERIFY_PARAM_get0_peername
+#define X509_VERIFY_PARAM_get_email X509_VERIFY_PARAM_get0_email
+#define X509_VERIFY_PARAM_set_email X509_VERIFY_PARAM_set1_email
+#define X509_VERIFY_PARAM_get_ip_asc X509_VERIFY_PARAM_get1_ip_asc
+#define X509_VERIFY_PARAM_set_ip X509_VERIFY_PARAM_set1_ip
+#define X509_VERIFY_PARAM_set_ip_asc X509_VERIFY_PARAM_set1_ip_asc
 
 #define SSL_Method_TLS TLS_method
 #define SSL_Method_TLS_server TLS_server_method
@@ -160,6 +204,9 @@ SIMPLE_TYPE(SSL_CIPHER, SSL__Cipher, SSL::Context, const)
 #define SSL_Method_QUIC_client_thread OSSL_QUIC_client_thread_method
 #define SSL_Method_QUIC_server OSSL_QUIC_server_method
 
+#define SSL_CTX_get_param SSL_CTX_get0_param
+#define SSL_CTX_set_param SSL_CTX_set1_param
+
 #define SSL_set_host SSL_set1_host
 #define SSL_set_rbio SSL_set0_rbio
 #define SSL_set_wbio SSL_set0_wbio
@@ -169,6 +216,8 @@ SIMPLE_TYPE(SSL_CIPHER, SSL__Cipher, SSL::Context, const)
 #define SSL_get_listener SSL_get0_listener
 #define SSL_get_domain SSL_get0_domain
 #define SSL_set_initial_peer_addr SSL_set1_initial_peer_addr
+#define SSL_get_param SSL_get0_param
+#define SSL_set_param SSL_set1_param
 #if !OPENSSL_VERSION_PREREQ(3, 2)
 #define SSL_is_tls(s) (!SSL_is_dtls(s))
 #define SSL_is_quic(s) FALSE
@@ -450,6 +499,7 @@ DEFINE_PROVIDED_CALLBACK(EVP_SIGNATURE)
 
 typedef int Bool;
 typedef int Success;
+typedef int PrintRet;
 #define undef &PL_sv_undef
 
 // This will force byte semantics on all strings
@@ -469,8 +519,11 @@ TYPEMAP: <<END
 const unsigned char*	T_PV
 Bool	T_BOOL
 struct timeval	T_TIMEVAL
+int64_t T_IV
+uint32_t	T_UV
 uint64_t	T_UV
 Success T_SUCCESS
+PrintRet T_PRINT
 
 Crypt::OpenSSL3::Random T_MAGICEXT
 Crypt::OpenSSL3::Random::Context T_MAGICEXT
@@ -495,11 +548,24 @@ Crypt::OpenSSL3::BigNum T_MAGICEXT
 Crypt::OpenSSL3::BigNum::Context T_MAGICEXT
 
 Crypt::OpenSSL3::ASN1::Object	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::Integer	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::Enumerated	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::String	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::String::Octet	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::String::UTF8	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::Time	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::Time::Generalized	T_MAGICEXT
+Crypt::OpenSSL3::ASN1::Time::UTC	T_MAGICEXT
+
 Crypt::OpenSSL3::X509	T_MAGICEXT
 Crypt::OpenSSL3::X509::Store	T_MAGICEXT
 Crypt::OpenSSL3::X509::Name	T_MAGICEXT
 Crypt::OpenSSL3::X509::Name::Entry	T_MAGICEXT
+Crypt::OpenSSL3::X509::Algorithm	T_MAGICEXT
 Crypt::OpenSSL3::X509::VerifyResult T_INTOBJ
+Crypt::OpenSSL3::X509::GeneralName	T_MAGICEXT
+Crypt::OpenSSL3::X509::Extension	T_MAGICEXT
+Crypt::OpenSSL3::X509::VerifyParam	T_MAGICEXT
 
 Crypt::OpenSSL3::SSL::Method T_MAGICEXT
 Crypt::OpenSSL3::SSL::Context T_MAGICEXT
@@ -532,6 +598,8 @@ T_TIMEVAL
 	sv_setnv($arg, $var.tv_sec + $var.tv_usec / 1000000.0);
 T_SUCCESS
 	${"$var" eq "RETVAL" ? \"$arg = $var < 0 ? &PL_sv_undef : boolSV($var);" : \"sv_setsv($arg, $var < 0 ? &PL_sv_undef : boolSV($var));"}
+T_PRINT
+	${"$var" eq "RETVAL" ? \"$arg = $var < 0 ? &PL_sv_undef : newSViv($var);" : \"if ($var < 0) sv_setsv($arg, &PL_sv_undef); else sv_setiv($arg, $var);"}
 T_PV
 	sv_setpv((SV*)$arg, (const char*)$var);
 END
@@ -595,8 +663,7 @@ CODE:
 	char* ptr = (char*)make_buffer(&RETVAL, length);
 	ERR_error_string_n(e, ptr, length);
 	set_buffer_length(RETVAL, strlen(ptr));
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::BIO	PREFIX = BIO_
 
@@ -685,8 +752,7 @@ CODE:
 			set_buffer_length(RETVAL, length);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 unsigned short BIO_ADDR_rawport(Crypt::OpenSSL3::BIO::Address ap)
 
@@ -932,7 +998,251 @@ Crypt::OpenSSL3::BigNum::Context BN_CTX_new(SV* classname)
 INTERFACE: BN_CTX_new  BN_CTX_secure_new
 C_ARGS:
 
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::Object	PREFIX = OBJ_
+
+int OBJ_create(class, const char *oid, const char *sn, const char *ln)
+C_ARGS: oid, sn, ln
+POSTCALL:
+	if (RETVAL == NID_undef)
+		XSRETURN_UNDEF;
+
+Crypt::OpenSSL3::ASN1::Object OBJ_txt2obj(const char *s, bool no_name = FALSE)
+
+Crypt::OpenSSL3::ASN1::Object OBJ_nid2obj(int n)
+
+int OBJ_cmp(Crypt::OpenSSL3::ASN1::Object a, Crypt::OpenSSL3::ASN1::Object b)
+
+int OBJ_obj2nid(Crypt::OpenSSL3::ASN1::Object o)
+
+size_t OBJ_length(Crypt::OpenSSL3::ASN1::Object obj)
+
+const unsigned char *OBJ_get_data(Crypt::OpenSSL3::ASN1::Object obj)
+
+SV* OBJ_obj2txt(Crypt::OpenSSL3::ASN1::Object a, bool no_name = FALSE)
+CODE:
+	int buf_len = OBJ_obj2txt(NULL, 0, a, no_name);
+	if (buf_len > 0) {
+		char* ptr = make_buffer(&RETVAL, buf_len);
+		if (OBJ_obj2txt(ptr, buf_len, a, no_name) > 0)
+			set_buffer_length(RETVAL, buf_len);
+	}
+OUTPUT: RETVAL
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::Integer	PREFIX = ASN1_INTEGER_
+
+Crypt::OpenSSL3::ASN1::Integer ASN1_INTEGER_new()
+C_ARGS:
+
+NO_OUTPUT int ASN1_INTEGER_get_int64(Crypt::OpenSSL3::ASN1::Integer a, OUTLIST int64_t pr)
+C_ARGS: &pr, a
+POSTCALL:
+	if (!RETVAL)
+		XSRETURN_UNDEF;
+
+bool ASN1_INTEGER_set_int64(Crypt::OpenSSL3::ASN1::Integer a, int64_t r)
+
+NO_OUTPUT int ASN1_INTEGER_get_uint64(Crypt::OpenSSL3::ASN1::Integer a, OUTLIST uint64_t pr)
+C_ARGS: &pr, a
+POSTCALL:
+	if (!RETVAL)
+		XSRETURN_UNDEF;
+
+bool ASN1_INTEGER_set_uint64(Crypt::OpenSSL3::ASN1::Integer a, uint64_t r)
+
+Crypt::OpenSSL3::BigNum ASN1_INTEGER_get_BN(Crypt::OpenSSL3::ASN1::Integer ai)
+
+bool ASN1_INTEGER_set_BN(Crypt::OpenSSL3::ASN1::Integer ai, Crypt::OpenSSL3::BigNum bn)
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::Enumerated	PREFIX = ASN1_ENUMERATED_
+
+Crypt::OpenSSL3::ASN1::Enumerated ASN1_ENUMERATED_new()
+C_ARGS:
+
+NO_OUTPUT int ASN1_ENUMERATED_get_int64(Crypt::OpenSSL3::ASN1::Enumerated a, OUTLIST int64_t pr)
+C_ARGS: &pr, a
+POSTCALL:
+	if (!RETVAL)
+		XSRETURN_UNDEF;
+
+bool ASN1_ENUMERATED_set_int64(Crypt::OpenSSL3::ASN1::Enumerated a, int64_t r)
+
+bool ASN1_ENUMERATED_set_BN(Crypt::OpenSSL3::ASN1::Integer ai, Crypt::OpenSSL3::BigNum bn)
+
+Crypt::OpenSSL3::BigNum ASN1_ENUMERATED_get_BN(Crypt::OpenSSL3::ASN1::Enumerated ai)
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::String	PREFIX = ASN1_STRING_
+
+BOOT:
+{
+	HV* stash = gv_stashpvs("Crypt::OpenSSL3::ASN1::String", GV_ADD | GV_ADDMULTI);
+	CONSTANT2(ASN1_STR, FLGS_ESC_2253);
+	CONSTANT2(ASN1_STR, FLGS_ESC_CTRL);
+	CONSTANT2(ASN1_STR, FLGS_ESC_MSB);
+	CONSTANT2(ASN1_STR, FLGS_UTF8_CONVERT);
+	CONSTANT2(ASN1_STR, FLGS_IGNORE_TYPE);
+	CONSTANT2(ASN1_STR, FLGS_SHOW_TYPE);
+	CONSTANT2(ASN1_STR, FLGS_DUMP_ALL);
+	CONSTANT2(ASN1_STR, FLGS_DUMP_UNKNOWN);
+	CONSTANT2(ASN1_STR, FLGS_DUMP_DER);
+	CONSTANT2(ASN1_STR, FLGS_ESC_2254);
+	CONSTANT2(ASN1_STR, FLGS_RFC2253);
+}
+
+int ASN1_STRING_length(Crypt::OpenSSL3::ASN1::String x)
+
+SV* ASN1_STRING_get_data(Crypt::OpenSSL3::ASN1::String x)
+CODE:
+	const char* data = ASN1_STRING_get0_data(x);
+	int length = ASN1_STRING_length(x);
+	RETVAL = newSVpvn(data, length);
+OUTPUT: RETVAL
+
+Crypt::OpenSSL3::ASN1::String ASN1_STRING_dup(Crypt::OpenSSL3::ASN1::String a)
+
+int ASN1_STRING_cmp(Crypt::OpenSSL3::ASN1::String a, Crypt::OpenSSL3::ASN1::String b)
+
+int ASN1_STRING_set(Crypt::OpenSSL3::ASN1::String str, const char *data, int length(data))
+
+int ASN1_STRING_type(Crypt::OpenSSL3::ASN1::String x)
+
+SV* ASN1_STRING_to_UTF8(Crypt::OpenSSL3::ASN1::String in)
+CODE:
+	unsigned char* out = NULL;
+	int result = ASN1_STRING_to_UTF8(&out, in);
+	if (result > 0) {
+		RETVAL = newSVpvn_utf8(out, result, 1);
+		OPENSSL_free(out);
+	} else
+		RETVAL = &PL_sv_undef;
+OUTPUT: RETVAL
+
+bool ASN1_STRING_print(Crypt::OpenSSL3::BIO out, Crypt::OpenSSL3::ASN1::String str)
+
+PrintRet ASN1_STRING_print_ex(Crypt::OpenSSL3::BIO out, Crypt::OpenSSL3::ASN1::String str, unsigned long flags)
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::String::Octet	PREFIX = ASN1_OCTET_STRING_
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::Time	PREFIX = ASN1_TIME_
+
+Crypt::OpenSSL3::ASN1::Time ASN1_TIME_new(class)
+C_ARGS:
+
+Crypt::OpenSSL3::ASN1::Time ASN1_TIME_dup(Crypt::OpenSSL3::ASN1::Time t);
+
+bool ASN1_TIME_set(Crypt::OpenSSL3::ASN1::Time s, time_t t)
+
+bool ASN1_TIME_adj(Crypt::OpenSSL3::ASN1::Time s, time_t t, int offset_day, long offset_sec)
+
+bool ASN1_TIME_set_string(Crypt::OpenSSL3::ASN1::Time s, const char *str)
+
+bool ASN1_TIME_set_string_X509(Crypt::OpenSSL3::ASN1::Time s, const char *str)
+
+bool ASN1_TIME_normalize(Crypt::OpenSSL3::ASN1::Time s)
+
+bool ASN1_TIME_check(Crypt::OpenSSL3::ASN1::Time t)
+
+bool ASN1_TIME_print(Crypt::OpenSSL3::BIO b, Crypt::OpenSSL3::ASN1::Time s)
+
+PrintRet ASN1_TIME_print_ex(Crypt::OpenSSL3::BIO bp, Crypt::OpenSSL3::ASN1::Time tm, unsigned long flags)
+
+NO_OUTPUT bool ASN1_TIME_diff(Crypt::OpenSSL3::ASN1::Time from, Crypt::OpenSSL3::ASN1::Time to, OUTLIST int pday, OUTLIST int psec)
+C_ARGS: &pday, &psec, from, to
+POSTCALL:
+	if (!RETVAL)
+		XSRETURN_EMPTY;
+
+int ASN1_TIME_compare(Crypt::OpenSSL3::ASN1::Time a, Crypt::OpenSSL3::ASN1::Time b)
+POSTCALL:
+	if (RETVAL == -2)
+		XSRETURN_UNDEF;
+
+void ASN1_TIME_to_tm(Crypt::OpenSSL3::ASN1::Time s)
+PPCODE:
+	struct tm tm;
+	if (ASN1_TIME_to_tm(s, &tm)) {
+		EXTEND(SP, 9);
+		mPUSHi(tm.tm_sec);
+		mPUSHi(tm.tm_min);
+		mPUSHi(tm.tm_hour);
+		mPUSHi(tm.tm_mday);
+		mPUSHi(tm.tm_mon);
+		mPUSHi(tm.tm_year);
+		mPUSHi(tm.tm_wday);
+		mPUSHi(tm.tm_yday);
+		mPUSHi(tm.tm_isdst);
+	}
+
+Crypt::OpenSSL3::ASN1::Time::Generalized ASN1_TIME_to_generalizedtime(Crypt::OpenSSL3::ASN1::Time t)
+C_ARGS: t, NULL
+POSTCALL:
+	if (!RETVAL)
+		XSRETURN_UNDEF;
+
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::Time	PREFIX = X509_
+
+int X509_cmp_time(Crypt::OpenSSL3::ASN1::Time asn1_time, time_t in_tm)
+C_ARGS: asn1_time, &in_tm
+
+int X509_cmp_current_time(Crypt::OpenSSL3::ASN1::Time asn1_time)
+
+int X509_cmp_timeframe(Crypt::OpenSSL3::ASN1::Time start, Crypt::OpenSSL3::ASN1::Time end, Crypt::OpenSSL3::X509::VerifyParam vpm)
+C_ARGS: vpm, start, end
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::Time::Generalized	PREFIX = ASN1_GENERALIZEDTIME_
+
+Crypt::OpenSSL3::ASN1::Time::Generalized ASN1_GENERALIZEDTIME_new(class)
+C_ARGS:
+
+Crypt::OpenSSL3::ASN1::Time::Generalized ASN1_GENERALIZEDTIME_dup(Crypt::OpenSSL3::ASN1::Time::Generalized t);
+
+bool ASN1_GENERALIZEDTIME_set(Crypt::OpenSSL3::ASN1::Time::Generalized s, time_t t)
+
+bool ASN1_GENERALIZEDTIME_adj(Crypt::OpenSSL3::ASN1::Time::Generalized s, time_t t, int offset_day, long offset_sec)
+
+bool ASN1_GENERALIZEDTIME_set_string(Crypt::OpenSSL3::ASN1::Time::Generalized s, const char *str)
+
+bool ASN1_GENERALIZEDTIME_check(Crypt::OpenSSL3::ASN1::Time::Generalized t)
+
+bool ASN1_GENERALIZEDTIME_print(Crypt::OpenSSL3::BIO b, Crypt::OpenSSL3::ASN1::Time::Generalized s)
+
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::ASN1::Time::UTC	PREFIX = ASN1_UTCTIME_
+
+Crypt::OpenSSL3::ASN1::Time::UTC ASN1_UTCTIME_new(class)
+C_ARGS:
+
+Crypt::OpenSSL3::ASN1::Time::UTC ASN1_UTCTIME_dup(Crypt::OpenSSL3::ASN1::Time::UTC t);
+
+bool ASN1_UTCTIME_set(Crypt::OpenSSL3::ASN1::Time::UTC s, time_t t)
+
+bool ASN1_UTCTIME_adj(Crypt::OpenSSL3::ASN1::Time::UTC s, time_t t, int offset_day, long offset_sec)
+
+bool ASN1_UTCTIME_set_string(Crypt::OpenSSL3::ASN1::Time::UTC s, const char *str)
+
+int ASN1_UTCTIME_cmp_time_t(Crypt::OpenSSL3::ASN1::Time::UTC s, time_t t)
+
+bool ASN1_UTCTIME_check(Crypt::OpenSSL3::ASN1::Time::UTC t)
+
+bool ASN1_UTCTIME_print(Crypt::OpenSSL3::BIO b, Crypt::OpenSSL3::ASN1::Time::UTC s)
+
+
 MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509	PREFIX = X509_
+
+BOOT:
+{
+	HV* stash = gv_stashpvs("Crypt::OpenSSL3::X509", GV_ADD | GV_ADDMULTI);
+	CONSTANT2(X509_, CHECK_FLAG_ALWAYS_CHECK_SUBJECT);
+	CONSTANT2(X509_, CHECK_FLAG_NEVER_CHECK_SUBJECT);
+	CONSTANT2(X509_, CHECK_FLAG_NO_WILDCARDS);
+	CONSTANT2(X509_, CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+	CONSTANT2(X509_, CHECK_FLAG_MULTI_LABEL_WILDCARDS);
+	CONSTANT2(X509_, CHECK_FLAG_SINGLE_LABEL_SUBDOMAINS);
+}
+
+Crypt::OpenSSL3::X509 X509_new(class)
+C_ARGS:
 
 Crypt::OpenSSL3::X509 X509_dup(Crypt::OpenSSL3::X509 self)
 
@@ -945,6 +1255,58 @@ POSTCALL:
 bool X509_write_pem(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::BIO bio)
 C_ARGS: bio, x
 
+const char *X509_get_default_cert_file(class)
+C_ARGS:
+
+const char *X509_get_default_cert_dir(class)
+C_ARGS:
+
+const char *X509_get_default_cert_file_env(class)
+C_ARGS:
+
+const char *X509_get_default_cert_dir_env(class)
+C_ARGS:
+
+bool X509_sign(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::PKey pkey, Crypt::OpenSSL3::MD md)
+
+bool X509_sign_ctx(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::MD::Context ctx)
+
+bool X509_verify(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::PKey pkey)
+
+bool X509_self_signed(Crypt::OpenSSL3::X509 cert, bool verify_signature)
+
+Crypt::OpenSSL3::PKey X509_get_pubkey(Crypt::OpenSSL3::X509 x)
+
+bool X509_set_pubkey(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::PKey pkey);
+
+long X509_get_version(Crypt::OpenSSL3::X509 x)
+
+bool X509_set_version(Crypt::OpenSSL3::X509 x, long version)
+
+void X509_get_signature(Crypt::OpenSSL3::X509 x, OUTLIST Crypt::OpenSSL3::ASN1::String::Octet psig, OUTLIST Crypt::OpenSSL3::X509::Algorithm palg)
+C_ARGS: (const ASN1_BIT_STRING**)&psig, (const X509_ALGOR**)&palg, x
+POSTCALL:
+	psig = ASN1_STRING_dup(psig);
+	palg = X509_ALGOR_dup(palg);
+
+int X509_get_signature_nid(Crypt::OpenSSL3::X509 x)
+
+Crypt::OpenSSL3::X509::Algorithm X509_get_tbs_sigalg(Crypt::OpenSSL3::X509 x)
+POSTCALL:
+	RETVAL = X509_ALGOR_dup(RETVAL);
+
+Crypt::OpenSSL3::ASN1::Time X509_get_notBefore(Crypt::OpenSSL3::X509 x)
+POSTCALL:
+	RETVAL = ASN1_TIME_dup(RETVAL);
+
+Crypt::OpenSSL3::ASN1::Time X509_get_notAfter(Crypt::OpenSSL3::X509 x)
+POSTCALL:
+	RETVAL = ASN1_TIME_dup(RETVAL);
+
+bool X509_set_notBefore(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::ASN1::Time tm)
+
+bool X509_set_notAfter(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::ASN1::Time tm)
+
 Crypt::OpenSSL3::X509::Name X509_get_subject_name(Crypt::OpenSSL3::X509 x)
 INTERFACE:
 	X509_get_subject_name  X509_get_issuer_name
@@ -955,6 +1317,10 @@ bool X509_set_subject_name(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::X509::Name 
 
 bool X509_set_issuer_name(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::X509::Name name)
 
+unsigned long X509_subject_name_hash(Crypt::OpenSSL3::X509 x)
+
+unsigned long X509_issuer_name_hash(Crypt::OpenSSL3::X509 x)
+
 NO_OUTPUT Bool X509_digest(Crypt::OpenSSL3::X509 data, Crypt::OpenSSL3::MD type, OUTLIST SV* digest)
 INTERFACE: X509_digest  X509_pubkey_digest
 INIT:
@@ -964,6 +1330,207 @@ C_ARGS: data, type, ptr, &output_length
 POSTCALL:
 	if (RETVAL)
 		set_buffer_length(digest, output_length);
+
+Crypt::OpenSSL3::ASN1::String::Octet X509_digest_sig(Crypt::OpenSSL3::X509 cert)
+C_ARGS: cert, NULL, NULL
+
+Crypt::OpenSSL3::ASN1::String::Octet X509_get_distinguishing_id(Crypt::OpenSSL3::X509 x)
+
+void X509_set_distinguishing_id(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::ASN1::String::Octet distid)
+
+bool X509_check_ca(Crypt::OpenSSL3::X509 cert)
+
+bool X509_check_host(Crypt::OpenSSL3::X509 cert, const char *name, size_t length(name), unsigned int flags, OUTLIST char *peername)
+
+bool X509_check_email(Crypt::OpenSSL3::X509 cert, const char *address, size_t length(address), unsigned int flags)
+
+bool X509_check_ip(Crypt::OpenSSL3::X509 cert, const unsigned char *address, size_t length(address), unsigned int flags)
+
+bool X509_check_ip_asc(Crypt::OpenSSL3::X509 cert, const char *address, unsigned int flags)
+
+bool X509_check_issued(Crypt::OpenSSL3::X509 issuer, Crypt::OpenSSL3::X509 subject)
+
+bool X509_check_private_key(Crypt::OpenSSL3::X509 cert, Crypt::OpenSSL3::PKey pkey)
+
+int X509_cmp(Crypt::OpenSSL3::X509 a, Crypt::OpenSSL3::X509 b)
+
+int X509_issuer_and_serial_cmp(Crypt::OpenSSL3::X509 a, Crypt::OpenSSL3::X509 b)
+
+int X509_issuer_name_cmp(Crypt::OpenSSL3::X509 a, Crypt::OpenSSL3::X509 b)
+
+int X509_subject_name_cmp(Crypt::OpenSSL3::X509 a, Crypt::OpenSSL3::X509 b)
+
+long X509_get_pathlen(Crypt::OpenSSL3::X509 x)
+
+uint32_t X509_get_extension_flags(Crypt::OpenSSL3::X509 x)
+
+uint32_t X509_get_key_usage(Crypt::OpenSSL3::X509 x)
+
+uint32_t X509_get_extended_key_usage(Crypt::OpenSSL3::X509 x)
+
+Crypt::OpenSSL3::ASN1::String::Octet X509_get_subject_key_id(Crypt::OpenSSL3::X509 x)
+POSTCALL:
+	RETVAL = ASN1_OCTET_STRING_dup(RETVAL);
+
+Crypt::OpenSSL3::ASN1::String::Octet X509_get_authority_key_id(Crypt::OpenSSL3::X509 x)
+POSTCALL:
+	RETVAL = ASN1_OCTET_STRING_dup(RETVAL);
+
+#if 0
+Crypt::OpenSSL3::X509::GeneralName X509_get0_authority_issuer(Crypt::OpenSSL3::X509 x)
+#endif
+
+Crypt::OpenSSL3::ASN1::Integer X509_get_authority_serial(Crypt::OpenSSL3::X509 x)
+POSTCALL:
+	RETVAL = ASN1_INTEGER_dup(RETVAL);
+
+void X509_set_proxy_flag(Crypt::OpenSSL3::X509 x)
+
+void X509_set_proxy_pathlen(Crypt::OpenSSL3::X509 x, int l)
+
+long X509_get_proxy_pathlen(Crypt::OpenSSL3::X509 x)
+
+int X509_get_ext_count(Crypt::OpenSSL3::X509 x)
+
+Crypt::OpenSSL3::X509::Extension X509_get_ext(Crypt::OpenSSL3::X509 x, int loc)
+
+int X509_get_ext_by_NID(Crypt::OpenSSL3::X509 x, int nid, int lastpos = -1)
+
+int X509_get_ext_by_OBJ(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::ASN1::Object obj, int lastpos = -1)
+
+int X509_get_ext_by_critical(Crypt::OpenSSL3::X509 x, int crit, int lastpos = -1)
+
+Crypt::OpenSSL3::X509::Extension X509_delete_ext(Crypt::OpenSSL3::X509 x, int loc)
+
+int X509_add_ext(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::X509::Extension ex, int loc = -1)
+
+Crypt::OpenSSL3::ASN1::Integer X509_get_serialNumber(Crypt::OpenSSL3::X509 x)
+
+bool X509_set_serialNumber(Crypt::OpenSSL3::X509 x, Crypt::OpenSSL3::ASN1::Integer serial)
+
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509::VerifyParam	PREFIX = X509_VERIFY_PARAM_
+
+bool X509_VERIFY_PARAM_set_flags(Crypt::OpenSSL3::X509::VerifyParam param, unsigned long flags)
+
+bool X509_VERIFY_PARAM_clear_flags(Crypt::OpenSSL3::X509::VerifyParam param, unsigned long flags)
+
+unsigned long X509_VERIFY_PARAM_get_flags(Crypt::OpenSSL3::X509::VerifyParam param)
+
+bool X509_VERIFY_PARAM_set_inh_flags(Crypt::OpenSSL3::X509::VerifyParam param, uint32_t flags)
+
+uint32_t X509_VERIFY_PARAM_get_inh_flags(Crypt::OpenSSL3::X509::VerifyParam param)
+
+bool X509_VERIFY_PARAM_set_purpose(Crypt::OpenSSL3::X509::VerifyParam param, int purpose)
+
+int X509_VERIFY_PARAM_get_purpose(Crypt::OpenSSL3::X509::VerifyParam param)
+
+bool X509_VERIFY_PARAM_set_trust(Crypt::OpenSSL3::X509::VerifyParam param, int trust)
+
+void X509_VERIFY_PARAM_set_time(Crypt::OpenSSL3::X509::VerifyParam param, time_t t)
+
+time_t X509_VERIFY_PARAM_get_time(Crypt::OpenSSL3::X509::VerifyParam param)
+
+bool X509_VERIFY_PARAM_add_policy(Crypt::OpenSSL3::X509::VerifyParam param, Crypt::OpenSSL3::ASN1::Object policy)
+C_ARGS: param, (ASN1_OBJECT*)policy
+
+#if 0
+bool X509_VERIFY_PARAM_set1_policies(Crypt::OpenSSL3::X509::VerifyParam param, Crypt::OpenSSL3::ASN1::Object policies)
+#endif
+
+void X509_VERIFY_PARAM_set_depth(Crypt::OpenSSL3::X509::VerifyParam param, int depth)
+
+int X509_VERIFY_PARAM_get_depth(Crypt::OpenSSL3::X509::VerifyParam param)
+
+void X509_VERIFY_PARAM_set_auth_level(Crypt::OpenSSL3::X509::VerifyParam param, int auth_level)
+
+int X509_VERIFY_PARAM_get_auth_level(Crypt::OpenSSL3::X509::VerifyParam param)
+
+char *X509_VERIFY_PARAM_get_host(Crypt::OpenSSL3::X509::VerifyParam param, int n)
+
+bool X509_VERIFY_PARAM_set_host(Crypt::OpenSSL3::X509::VerifyParam param, const char *name, size_t length(name))
+
+bool X509_VERIFY_PARAM_add_host(Crypt::OpenSSL3::X509::VerifyParam param, const char *name, size_t length(name))
+
+void X509_VERIFY_PARAM_set_hostflags(Crypt::OpenSSL3::X509::VerifyParam param, unsigned int flags)
+
+unsigned int X509_VERIFY_PARAM_get_hostflags(Crypt::OpenSSL3::X509::VerifyParam param)
+
+char *X509_VERIFY_PARAM_get_peername(Crypt::OpenSSL3::X509::VerifyParam param)
+
+char *X509_VERIFY_PARAM_get_email(Crypt::OpenSSL3::X509::VerifyParam param)
+
+bool X509_VERIFY_PARAM_set_email(Crypt::OpenSSL3::X509::VerifyParam param, const char *email, size_t length(email))
+
+char *X509_VERIFY_PARAM_get_ip_asc(Crypt::OpenSSL3::X509::VerifyParam param)
+CLEANUP:
+	OPENSSL_free(RETVAL);
+
+bool X509_VERIFY_PARAM_set_ip(Crypt::OpenSSL3::X509::VerifyParam param, const unsigned char *ip, size_t length(ip))
+
+bool X509_VERIFY_PARAM_set_ip_asc(Crypt::OpenSSL3::X509::VerifyParam param, const char *ipasc)
+
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509::GeneralName	PREFIX = GENERAL_NAME_
+
+Crypt::OpenSSL3::X509::GeneralName GENERAL_NAME_dup(Crypt::OpenSSL3::X509::GeneralName gn)
+
+int GENERAL_NAME_type(Crypt::OpenSSL3::X509::GeneralName gn)
+
+SV* GENERAL_NAME_to_string(Crypt::OpenSSL3::X509::GeneralName gn)
+CODE:
+	switch (gn->type) {
+		case GEN_OTHERNAME: {
+			ASN1_UTF8STRING* str = gn->d.otherName->value->value.utf8string;
+			RETVAL = newSVpvn(ASN1_STRING_get0_data(str), ASN1_STRING_length(str));
+			break;
+		}
+		default:
+			RETVAL = &PL_sv_undef;
+	}
+OUTPUT: RETVAL
+
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509::Algorithm	PREFIX = X509_ALGOR_
+
+Crypt::OpenSSL3::X509::Algorithm X509_ALGOR_dup(Crypt::OpenSSL3::X509::Algorithm alg)
+
+bool X509_ALGOR_set(Crypt::OpenSSL3::X509::Algorithm alg, Crypt::OpenSSL3::ASN1::Object aobj)
+C_ARGS: alg, (ASN1_OBJECT*)aobj, V_ASN1_UNDEF, NULL
+
+void X509_ALGOR_get(Crypt::OpenSSL3::X509::Algorithm alg, OUTLIST Crypt::OpenSSL3::ASN1::Object paobj)
+C_ARGS: (const ASN1_OBJECT**)&paobj, NULL, NULL, alg
+
+void X509_ALGOR_set_md(Crypt::OpenSSL3::X509::Algorithm alg, Crypt::OpenSSL3::MD md)
+
+int X509_ALGOR_cmp(Crypt::OpenSSL3::X509::Algorithm a, Crypt::OpenSSL3::X509::Algorithm b)
+
+bool X509_ALGOR_copy(Crypt::OpenSSL3::X509::Algorithm dest, Crypt::OpenSSL3::X509::Algorithm src)
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509::Attribute	PREFIX = X509_ATTRIBUTE_
+
+
+MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509::Extension	PREFIX = X509_EXTENSION_
+
+Crypt::OpenSSL3::X509::Extension X509_EXTENSION_dup(Crypt::OpenSSL3::X509::Extension ex)
+
+bool X509_EXTENSION_set_object(Crypt::OpenSSL3::X509::Extension ex, Crypt::OpenSSL3::ASN1::Object obj)
+
+bool X509_EXTENSION_set_critical(Crypt::OpenSSL3::X509::Extension ex, bool crit)
+
+bool X509_EXTENSION_set_data(Crypt::OpenSSL3::X509::Extension ex, Crypt::OpenSSL3::ASN1::String::Octet data)
+
+Crypt::OpenSSL3::X509::Extension X509_EXTENSION_create_by_NID(int nid, bool crit, Crypt::OpenSSL3::ASN1::String::Octet data)
+C_ARGS: NULL, nid, crit, data
+
+Crypt::OpenSSL3::X509::Extension X509_EXTENSION_create_by_OBJ(Crypt::OpenSSL3::ASN1::Object obj, bool crit, Crypt::OpenSSL3::ASN1::String::Octet data)
+C_ARGS: NULL, obj, crit, data
+
+Crypt::OpenSSL3::ASN1::Object X509_EXTENSION_get_object(Crypt::OpenSSL3::X509::Extension ex)
+
+bool X509_EXTENSION_get_critical(Crypt::OpenSSL3::X509::Extension ex)
+
+Crypt::OpenSSL3::ASN1::String::Octet X509_EXTENSION_get_data(Crypt::OpenSSL3::X509::Extension ne)
 
 
 MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509::VerifyResult	PREFIX = X509_verify_cert_
@@ -982,6 +1549,8 @@ int X509_NAME_cmp(Crypt::OpenSSL3::X509::Name a, Crypt::OpenSSL3::X509::Name b)
 
 int X509_NAME_get_index_by_NID(Crypt::OpenSSL3::X509::Name name, int nid, int lastpos)
 
+int X509_NAME_get_index_by_OBJ(Crypt::OpenSSL3::X509::Name name, Crypt::OpenSSL3::ASN1::Object obj, int lastpos)
+
 int X509_NAME_entry_count(Crypt::OpenSSL3::X509::Name name)
 
 Crypt::OpenSSL3::X509::Name::Entry X509_NAME_get_entry(Crypt::OpenSSL3::X509::Name name, int loc)
@@ -993,6 +1562,15 @@ char* X509_NAME_oneline(Crypt::OpenSSL3::X509::Name a)
 	CLEANUP:
 		if (RETVAL)
 			OPENSSL_free(RETVAL);
+
+NO_OUTPUT int X509_NAME_digest(Crypt::OpenSSL3::X509::Name data, Crypt::OpenSSL3::MD type, OUTLIST SV* hash)
+INIT:
+	unsigned len = EVP_MD_size(type);
+	char* ptr = make_buffer(&hash, len);
+C_ARGS: data, type, ptr, &len
+POSTCALL:
+	if (RETVAL)
+		set_buffer_length(hash, len);
 
 MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::X509::Name::Entry	PREFIX = X509_NAME_ENTRY
 
@@ -1125,6 +1703,10 @@ void SSL_CTX_set_post_handshake_auth(Crypt::OpenSSL3::SSL::Context ctx, int val)
 bool SSL_CTX_set_cipher_list(Crypt::OpenSSL3::SSL::Context ctx, const char *str)
 
 bool SSL_CTX_set_ciphersuites(Crypt::OpenSSL3::SSL::Context ctx, const char *str)
+
+Crypt::OpenSSL3::X509::VerifyParam SSL_CTX_get_param(Crypt::OpenSSL3::SSL::Context ctx)
+
+bool SSL_CTX_set_param(Crypt::OpenSSL3::SSL::Context ctx, Crypt::OpenSSL3::X509::VerifyParam vpm);
 
 int SSL_CTX_add_client_CA(Crypt::OpenSSL3::SSL::Context ctx, Crypt::OpenSSL3::X509 cacert)
 POSTCALL:
@@ -1315,6 +1897,10 @@ const char *SSL_get_cipher_list(Crypt::OpenSSL3::SSL ssl, int priority)
 POSTCALL:
 	if (!RETVAL)
 		XSRETURN_UNDEF;
+
+Crypt::OpenSSL3::X509::VerifyParam SSL_get_param(Crypt::OpenSSL3::SSL ssl)
+
+bool SSL_set_param(Crypt::OpenSSL3::SSL ssl, Crypt::OpenSSL3::X509::VerifyParam vpm);
 
 int SSL_add_client_CA(Crypt::OpenSSL3::SSL ssl, Crypt::OpenSSL3::X509 cacert)
 POSTCALL:
@@ -1725,8 +2311,7 @@ PPCODE:
 SV* EVP_RAND_get_param(Crypt::OpenSSL3::Random rand, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_RAND, rand, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::Random	PREFIX = RAND_
 
@@ -1834,8 +2419,7 @@ PPCODE:
 SV* EVP_CIPHER_get_param(Crypt::OpenSSL3::Cipher cipher, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_CIPHER, cipher, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 
 MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::Cipher::Context	PREFIX = EVP_CIPHER_CTX_
@@ -1878,8 +2462,7 @@ bool EVP_CIPHER_CTX_set_params(Crypt::OpenSSL3::Cipher::Context ctx, PARAMS(EVP_
 SV* EVP_CIPHER_CTX_get_param(Crypt::OpenSSL3::Cipher::Context ctx, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_CIPHER_CTX, ctx, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 
 int EVP_CIPHER_CTX_get_nid(Crypt::OpenSSL3::Cipher::Context e)
@@ -1972,8 +2555,7 @@ bool EVP_MD_xof(Crypt::OpenSSL3::MD md)
 SV* EVP_MD_get_param(Crypt::OpenSSL3::MD md, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_MD, md, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 NO_OUTPUT bool EVP_MD_digest(Crypt::OpenSSL3::MD md, const char* input, size_t length(input), OUTLIST SV* digest)
 INIT:
@@ -2041,8 +2623,7 @@ CODE:
 			set_buffer_length(RETVAL, size);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 SV* EVP_MD_CTX_sign(Crypt::OpenSSL3::MD::Context ctx, const unsigned char *tbs, size_t length(tbs))
 CODE:
@@ -2053,8 +2634,7 @@ CODE:
 			set_buffer_length(RETVAL, size);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 bool EVP_MD_CTX_verify_init(Crypt::OpenSSL3::MD::Context ctx, Crypt::OpenSSL3::MD type, Crypt::OpenSSL3::PKey pkey, Crypt::OpenSSL3::PKey::Context pctx = NULL)
 C_ARGS: ctx, pctx ? &pctx : NULL, type, NULL, pkey
@@ -2070,8 +2650,7 @@ bool EVP_MD_CTX_set_params(Crypt::OpenSSL3::MD::Context ctx, PARAMS(EVP_MD_CTX) 
 SV* EVP_MD_CTX_get_param(Crypt::OpenSSL3::MD::Context ctx, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_MD_CTX, ctx, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 
 void EVP_MD_CTX_ctrl(Crypt::OpenSSL3::MD::Context ctx, int cmd, int p1, char* p2);
@@ -2123,8 +2702,7 @@ PPCODE:
 SV* EVP_MAC_get_param(Crypt::OpenSSL3::MAC mac, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_MAC, mac, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 
 
@@ -2148,8 +2726,7 @@ bool EVP_MAC_CTX_set_params(Crypt::OpenSSL3::MAC::Context ctx, PARAMS(EVP_MAC_CT
 SV* EVP_MAC_CTX_get_param(Crypt::OpenSSL3::MAC::Context ctx, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_MAC_CTX, ctx, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 
 
@@ -2207,8 +2784,7 @@ PPCODE:
 SV* EVP_KDF_get_param(Crypt::OpenSSL3::KDF kdf, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_KDF, kdf, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 
 MODULE = Crypt::OpenSSL3	PACKAGE = Crypt::OpenSSL3::KDF::Context	PREFIX = EVP_KDF_CTX_
@@ -2227,8 +2803,7 @@ bool EVP_KDF_CTX_set_params(Crypt::OpenSSL3::KDF::Context ctx, PARAMS(EVP_KDF_CT
 SV* EVP_KDF_CTX_get_param(Crypt::OpenSSL3::KDF::Context ctx, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_KDF_CTX, ctx, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 Crypt::OpenSSL3::KDF EVP_KDF_CTX_kdf(Crypt::OpenSSL3::KDF::Context ctx)
 POSTCALL:
@@ -2415,8 +2990,7 @@ POSTCALL:
 SV* EVP_PKEY_get_param(Crypt::OpenSSL3::PKey pkey, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_PKEY, pkey, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 bool EVP_PKEY_get_int_param(Crypt::OpenSSL3::PKey pkey, const char *key_name, OUT int out)
 
@@ -2471,8 +3045,7 @@ bool EVP_PKEY_CTX_set_params(Crypt::OpenSSL3::PKey::Context ctx, PARAMS(EVP_PKEY
 SV* EVP_PKEY_CTX_get_param(Crypt::OpenSSL3::PKey::Context ctx, const char* name)
 CODE:
 	GENERATE_GET_PARAM(EVP_PKEY_CTX, ctx, name)
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 
 bool EVP_PKEY_CTX_is_a(Crypt::OpenSSL3::PKey::Context ctx, const char *keytype)
@@ -2572,8 +3145,10 @@ bool EVP_PKEY_CTX_set_dh_kdf_type(Crypt::OpenSSL3::PKey::Context ctx, int kdf)
 bool EVP_PKEY_CTX_get_dh_kdf_type(Crypt::OpenSSL3::PKey::Context ctx)
 
 bool EVP_PKEY_CTX_set_dh_kdf_oid(Crypt::OpenSSL3::PKey::Context ctx, Crypt::OpenSSL3::ASN1::Object oid)
+C_ARGS: ctx, (ASN1_OBJECT*) oid
 
 bool EVP_PKEY_CTX_get_dh_kdf_oid(Crypt::OpenSSL3::PKey::Context ctx, OUT Crypt::OpenSSL3::ASN1::Object oid)
+C_ARGS: ctx, (ASN1_OBJECT**) &oid
 
 bool EVP_PKEY_CTX_set_dh_kdf_md(Crypt::OpenSSL3::PKey::Context ctx, Crypt::OpenSSL3::MD md)
 
@@ -2616,8 +3191,7 @@ CODE:
 	RETVAL = EVP_PKEY_CTX_get1_id(ctx, ptr);
 	if (RETVAL)
 		set_buffer_length(id, length);
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 bool EVP_PKEY_CTX_set_hkdf_mode(Crypt::OpenSSL3::PKey::Context pctx, int mode)
 
@@ -2681,8 +3255,7 @@ CODE:
 			set_buffer_length(RETVAL, unwrapped_length);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 #if OPENSSL_VERSION_PREREQ(3, 2)
 Success EVP_PKEY_auth_encapsulate_init(Crypt::OpenSSL3::PKey::Context ctx, Crypt::OpenSSL3::PKey authpriv)
@@ -2707,8 +3280,7 @@ CODE:
 			set_buffer_length(RETVAL, out_length);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 bool EVP_PKEY_decrypt_init(Crypt::OpenSSL3::PKey::Context ctx)
 C_ARGS: ctx, NULL
@@ -2723,8 +3295,7 @@ CODE:
 			set_buffer_length(RETVAL, out_length);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 bool EVP_PKEY_derive_init(Crypt::OpenSSL3::PKey::Context ctx)
 C_ARGS: ctx, NULL
@@ -2741,8 +3312,7 @@ CODE:
 			set_buffer_length(RETVAL, key_length);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 Success EVP_PKEY_sign_init(Crypt::OpenSSL3::PKey::Context ctx, Crypt::OpenSSL3::Signature type = NULL, CTX_PARAMS(EVP_SIGNATURE) params = NULL)
 
@@ -2756,8 +3326,7 @@ CODE:
 			set_buffer_length(RETVAL, sig_length);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 Success EVP_PKEY_verify_init(Crypt::OpenSSL3::PKey::Context ctx, Crypt::OpenSSL3::Signature type = NULL, CTX_PARAMS(EVP_SIGNATURE) params = NULL)
 
@@ -2777,8 +3346,7 @@ CODE:
 			set_buffer_length(RETVAL, sigsize);
 	} else
 		RETVAL = &PL_sv_undef;
-OUTPUT:
-	RETVAL
+OUTPUT: RETVAL
 
 Success EVP_PKEY_verify_message_init(Crypt::OpenSSL3::PKey::Context ctx, Crypt::OpenSSL3::Signature type = NULL, CTX_PARAMS(EVP_SIGNATURE) params = NULL)
 
