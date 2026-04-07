@@ -11,7 +11,7 @@ my %WriteMakefileArgs = (
     NAME => 'JSON::Create',
     VERSION_FROM => $pm,
     ABSTRACT_FROM => $pod,
-    AUTHOR => 'Ben Bullock <bkb@cpan.org>',
+    AUTHOR => 'Ben Bullock <benkasminbullock@gmail.com>',
     LICENSE => 'perl',
     # JSON::Create doesn't need any of these, they are only used by
     # JSON::Create::PP

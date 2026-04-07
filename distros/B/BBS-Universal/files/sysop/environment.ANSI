@@ -1,0 +1,12 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+Z|BACK|WHITE|Return to System Menu
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]   [% GREEN %] _____            _                                      _[% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% GREEN %]| ____|_ ____   _(_)_ __ ___  _ __  _ __ ___   ___ _ __ | |_[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% GREEN %]|  _| | '_ \ \ / / | '__/ _ \| '_ \| '_ ` _ \ / _ \ '_ \| __|[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% GREEN %]| |___| | | \ V /| | | | (_) | | | | | | | | |  __/ | | | |_[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]  [% GREEN %]|_____|_| |_|\_/ |_|_|  \___/|_| |_|_| |_| |_|\___|_| |_|\__|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+
+[% ENVIRONMENT %]

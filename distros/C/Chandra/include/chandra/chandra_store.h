@@ -302,7 +302,7 @@ chandra_store_save_c(pTHX_ HV *self_hv)
     json_sv = chandra_store_encode(aTHX_ *data_svp);
     json_str = SvPV(json_sv, json_len);
 
-    fh = fopen(tmp_path, "w");
+    fh = fopen(tmp_path, "wb");
     if (!fh) {
         SvREFCNT_dec(json_sv);
         croak("Chandra::Store: cannot open '%s' for write: %s\n",
@@ -343,7 +343,7 @@ chandra_store_reload_c(pTHX_ HV *self_hv)
     if (!path_svp || !SvOK(*path_svp)) return;
     path = SvPV_nolen(*path_svp);
 
-    fh = fopen(path, "r");
+    fh = fopen(path, "rb");
     if (!fh) return;  /* File doesn't exist yet — start fresh */
 
     fd = fileno(fh);

@@ -15,6 +15,15 @@ elsif ( path('blib')->exists ) {
 }
 local @Test2::Tools::Command::command = @CMD;
 
+# avoid Log::Any::Adapter::Screen log noise
+delete(
+	@ENV{
+		'NO_COLOR',   'COLOR',
+		'LOG_PREFIX', 'LOG_LEVEL',
+		'QUIET',      'VERBOSE', 'DEBUG', 'TRACE'
+	}
+);
+
 subtest '--help, ignoring earlier --list-licenses' => sub {
 	my ( $result, $exit_status, $stdout_ref, $stderr_ref ) = command {
 		args   => [qw(--list-licenses --help)],

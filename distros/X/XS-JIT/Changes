@@ -1,5 +1,8 @@
 Revision history for XS-JIT
 
+0.17	2026-04-06
+	- Various attempts at fixing cpantester failures
+
 0.15    2026-04-01
 	- Fixes for macOS hardened runtime
                 - SDK header resolution: use -iwithsysroot for Perl CORE includes

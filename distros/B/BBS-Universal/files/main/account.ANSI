@@ -1,0 +1,23 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+A|UPDATE ACCOMPLISHMENTS|MAGENTA|USER|Update Accomplishments
+B|CHANGE BAUD RATE|BRIGHT BLUE|USER|Change Simulated Baud Rate
+C|CHANGE ACCESS LEVEL|WHITE|SYSOP|Change Access Level
+D|CHANGE DATE FORMAT|BRIGHT GREEN|USER|Change Date Format
+E|TOGGLE SHOW EMAIL|GREEN|USER|Toggle Show Email
+F|TOGGLE PLAY FORTUNES|BRIGHT CYAN|USER|Toggle Fortune Cookies
+L|UPDATE LOCATION|RED|USER|Update Your Location
+M|UPDATE EMAIL|WHITE|USER|Update Email Address
+P|TOGGLE PREFER NICKNAME|YELLOW|USER|Toggle Prefer Nickname
+R|UPDATE RETRO SYSTEMS|GREEN|USER|Update Retro Systems
+S|CHANGE SCREEN SIZE|BLUE|USER|Change Screen Size
+T|CHOOSE TEXT MODE|CYAN|USER|Choose Text Mode
+Z|BACK|WHITE|USER|Main Menu
+---
+[% CLS %][% BRIGHT CYAN %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT CYAN %]     _                             _[% RESET %]
+[% BRIGHT CYAN          %] [% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT CYAN %]   / \   ___ ___ ___  _   _ _ __ | |_[% RESET %]
+[% BRIGHT CYAN          %]  [% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT CYAN %] / _ \ / __/ __/ _ \| | | | '_ \| __|[% RESET %]
+[% BRIGHT CYAN          %]  [% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT CYAN %]/ ___ \ (_| (_| (_) | |_| | | | | |_[% RESET %]
+[% BRIGHT CYAN          %] [% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT CYAN %]/_/   \_\___\___\___/ \__,_|_| |_|\__|[% RESET %]
+[% BRIGHT CYAN          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+[% USER INFO %]

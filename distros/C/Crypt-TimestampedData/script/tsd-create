@@ -88,7 +88,7 @@ tsd-create - Create a TimeStampedData (.tsd) file from a file and timestamp
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

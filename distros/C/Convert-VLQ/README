@@ -1,0 +1,31 @@
+Convert-VLQ version 0.01
+========================
+
+This module converts integers into and from the base64 VLQ representation used by
+source maps.  
+
+This module is based on base64-vlq.js and JS::SourceMap::Decoder.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2026 by Philip Gwyn
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

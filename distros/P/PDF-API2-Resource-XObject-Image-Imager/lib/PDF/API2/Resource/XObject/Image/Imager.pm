@@ -1,12 +1,12 @@
 package PDF::API2::Resource::XObject::Image::Imager;
 
-# $Id: Imager.pm 2707 2025-05-17 17:03:41Z fil $
+# $Id: Imager.pm 2776 2026-04-07 09:37:26Z fil $
 
 use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
@@ -124,12 +124,12 @@ sub _read_to
     my $data;
     $img->write( type=>'raw', data=>\$data ) or die "Unable to create raw: ".$img->errstr;
     if( 0 ) {
-        use Compress::LZW::Compressor;
-        my $c = Compress::LZW::Compressor->new;
-        $obj->{'Filter'} = PDFArray(PDFName('LZWDecode'));
-        $obj->{' stream'} = $c->compress( $data );
+        #use Compress::LZW::Compressor;
+        #my $c = Compress::LZW::Compressor->new;
+        #$obj->{'Filter'} = PDFArray(PDFName('LZWDecode'));
+        #$obj->{' stream'} = $c->compress( $data );
         # use Data::Dump qw( pp );
-        warn pp $c->compress( join '', 0x45, 0x45, 0x45, 0x45, 0x45, 0x65, 0x45, 0x45, 0x45, 0x66 );
+        #warn pp $c->compress( join '', 0x45, 0x45, 0x45, 0x45, 0x45, 0x65, 0x45, 0x45, 0x45, 0x66 );
     }
     else {
         $obj->{'Filter'} = PDFArray(PDFName('FlateDecode'));

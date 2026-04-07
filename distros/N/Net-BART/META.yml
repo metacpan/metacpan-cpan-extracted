@@ -1,0 +1,50 @@
+---
+abstract: 'Balanced Routing Tables for IPv4 and IPv6'
+author:
+  - unknown
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-BART
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - gobench
+provides:
+  Net::BART:
+    file: lib/Net/BART.pm
+    version: '0.01'
+  Net::BART::Art:
+    file: lib/Net/BART/Art.pm
+    version: '0.01'
+  Net::BART::BitSet256:
+    file: lib/Net/BART/BitSet256.pm
+    version: '0.01'
+  Net::BART::LPM:
+    file: lib/Net/BART/LPM.pm
+    version: '0.01'
+  Net::BART::Node:
+    file: lib/Net/BART/Node.pm
+    version: '0.01'
+  Net::BART::SparseArray256:
+    file: lib/Net/BART/SparseArray256.pm
+    version: '0.01'
+  Net::BART::XS:
+    file: lib/Net/BART/XS.pm
+    version: '0.01'
+requires:
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/gaissmai/Net-BART/issues
+  repository: https://github.com/gaissmai/Net-BART.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

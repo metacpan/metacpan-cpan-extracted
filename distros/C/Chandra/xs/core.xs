@@ -79,6 +79,8 @@ CODE:
 {
     SV *self_sv = ST(0);
 
+    if (self->initialized) return;
+
     /* Set up Bind registry + dispatch callback directly in C */
     chandra_init_bind(aTHX_ self_sv);
 
@@ -222,6 +224,14 @@ CODE:
     RETVAL = self->wv.height;
 OUTPUT:
     RETVAL
+
+void
+resize(self, width, height)
+    PerlChandra *self
+    int width
+    int height
+CODE:
+    webview_set_size(&self->wv, width, height);
 
 void
 _set_callback(self, callback)

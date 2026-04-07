@@ -1,0 +1,8 @@
+[% CLS %][% B_BLACK  %]                 [% RESET %]
+[% B_BLACK %][% BRIGHT RED  %]  ██████ [% GREEN  %]██████  [% RESET %]
+[% B_BLACK %][% BRIGHT RED  %]  ██████ [% GREEN  %]██████  [% RESET %]
+[% B_BLACK %][% BRIGHT RED  %]  ▀▀▀▀▀▀ [% GREEN  %]▀▀▀▀▀▀  [% RESET %]
+[% B_BLACK %][% BRIGHT BLUE %]  ██████ [% YELLOW %]██████  [% RESET %]
+[% B_BLACK %][% BRIGHT BLUE %]  ██████ [% YELLOW %]██████  [% RESET %]
+[% B_BLACK %][% BRIGHT BLUE %]  ▀▀▀▀▀▀ [% YELLOW %]▀▀▀▀▀▀  [% RESET %]
+[% B_BLACK           %]                 [% RESET %]

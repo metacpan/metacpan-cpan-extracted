@@ -1,0 +1,14 @@
+# USER MODE MENU
+# Key | Command | Color |Access Level | Description
+Z|BACK|WHITE|USER|Return to Main Menu
+---
+[% CLS %][% YELLOW %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% YELLOW %]     _    _                 _[% RESET %]
+ [% YELLOW          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% YELLOW %]   / \  | |__   ___  _   _| |_[% RESET %]
+  [% YELLOW          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% YELLOW %] / _ \ | '_ \ / _ \| | | | __|[% RESET %]
+  [% YELLOW          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% YELLOW %]/ ___ \| |_) | (_) | |_| | |_[% RESET %]
+ [% YELLOW          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% YELLOW %]/_/   \_\_.__/ \___/ \__,_|\__|[% RESET %]
+[% YELLOW          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+
+[% WRAP %]This system is running on the "BBS::Universal" software written in Perl by [% GREEN %][% AUTHOR NAME %][% RESET %].  It is a multi-threaded system designed to accommodate internet connections by retro-computers or modern computers.  It operates just like the BBS systems in the 1980s and 1990s.  The advantage to this system is it allows more than one user to connect at a time, so no waiting.[% ENDWRAP %]
+
+[% WRAP %]The software supports [% BRIGHT WHITE %]ASCII[% RESET %], [% ORANGE %]ATASCII[% RESET %], [% BRIGHT BLUE %]PETSCII[% RESET %] and [% YELLOW %]ANSI[% RESET %] text formats, with the capability to add more.[% ENDWRAP %]

@@ -1,0 +1,18 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+A|SYSOP ADD FILE|CYAN|Add a File
+B|SYSOP ADD FILE CATEGORY|BRIGHT BLUE|Add a File Category
+C|SYSOP SELECT FILE CATEGORY|MAGENTA|Select File Category
+L|SYSOP LIST FILES|GREEN|List Files
+E|SYSOP EDIT FILE CATEGORIES|YELLOW|Edit File Categories
+D|SYSOP DELETE FILES|CYAN|Delete Files
+Z|BACK|WHITE|Return To Main Menu
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% BRIGHT YELLOW %] _____ _ _        __  __[% RESET %] 
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% BRIGHT YELLOW %]|  ___(_) | ___  |  \/  | __ _ _ __   __ _  __ _  ___ _ __[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT YELLOW %]| |_  | | |/ _ \ | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT YELLOW %]|  _| | | |  __/ | |  | | (_| | | | | (_| | (_| |  __/ |[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% BRIGHT YELLOW %]|_|   |_|_|\___| |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]  [% BRIGHT YELLOW %]                                           |___/[% RESET %]
+
+[% B_ORANGE %][% BLACK %] Current Category [% RESET %] [% BRIGHT YELLOW %][% BLACK RIGHT-POINTING TRIANGLE %][% RESET %] [% BRIGHT WHITE %][% FILE CATEGORY %][% RESET %]

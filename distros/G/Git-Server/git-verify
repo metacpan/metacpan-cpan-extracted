@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 =pod
 
@@ -69,8 +69,9 @@ This library is free software; you can redistribute it and/or modify it under th
 use strict;
 use warnings;
 use Cwd qw(abs_path);
+use FindBin qw($RealBin);
 
-our $VERSION = "0.039";
+our $VERSION = "0.040";
 
 if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
     s{^ssh://(|[^/:]+\@)\[([a-z0-9\-\.\:]+)\]:(\d+)(?:$|/)}{}i ||
@@ -97,15 +98,20 @@ if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
         if ($resolvable) {
             length()?$ARGV[0]=$_:shift;
             $ENV{XMODIFIERS}="client=".abs_path($0)."\@v$VERSION";
+            my $search = q{$_=shift and 1+s/'/'"'"'/g and`(which '$_' git-verify|grep . || find . ~ /usr/local/bin /usr/bin /bin -name git-verify) 2>/dev/null`=~m{^(.+)}&&exec $1,@ARGV;warn"Cannot find git-verify on ".`hostname`."[$1][$!]['$_' @ARGV]\n"};
+            pipe my $FAKE_STDIN, my $prog;
+            print $prog $search;
+            close $prog;
+            open STDIN, "<&", $FAKE_STDIN;
             exec qw[ssh
                 -o PubKeyAuthentication=yes
                 -o KbdInteractiveAuthentication=no
                 -o PasswordAuthentication=no
                 -o SendEnv=XMODIFIERS
                 -p], $remoteport,
-                "$userprefix$remotehost",abs_path($0),(
-                !(grep {m{[^\w/\-.]}} @ARGV) ? @ARGV :   # Unable to find any potentionally stank chars so it's safe to pass @ARGV as is.
-                "--escaperepos",map{unpack"H*",$_}@ARGV  # Otherwise, encode every character for all repos just to be extra safe.
+                "$userprefix$remotehost","perl","-",abs_path($0),(
+                !(grep {m{[^\w/\-.]}} @ARGV) ? @ARGV :     # Unable to find any potentionally stank chars so it's safe to pass @ARGV as is.
+                ("--escaperepos",map{unpack"H*",$_}@ARGV)  # Otherwise, encode every character for all repos just to be extra safe.
             ) or die "$0: remote verification failed.\n";
         }
     };
@@ -114,13 +120,31 @@ if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
 my @repo_dirs = @ARGV;
 if (!@repo_dirs) {
     local $_ = $ENV{SSH_ORIGINAL_COMMAND} || "";
-    @repo_dirs = split and $repo_dirs[0] =~ m{(^|/)git-verify$} and shift @repo_dirs;
+    @repo_dirs = split;
+    splice @repo_dirs, 0, 2 if $repo_dirs[0] && $repo_dirs[1] && $repo_dirs[0] eq "perl" && $repo_dirs[1] eq "-";
+    shift @repo_dirs if $repo_dirs[0] && $repo_dirs[0] =~ m{/git-verify$};
 }
 if (@repo_dirs and $repo_dirs[0] eq "--escaperepos") {
     shift @repo_dirs;
     foreach (@repo_dirs) {
         $_ = pack "H*",$_;
     }
+}
+if (!@repo_dirs and !$ENV{GIT_SERVER_VERSION} and my $gitdir = $ENV{GIT_DIR}) {
+    # Not running within git-server properly, so use a wrapper to avoid this problem in the future.
+    eval {
+        require File::Spec;
+        my $fixed = 0;
+        foreach my $path (File::Spec->path) {
+            if (-d $path and -w _) { # First writeable directory in $PATH
+                foreach (qw[git-upload-pack git-receive-pack]) {
+                    symlink "$RealBin/git-packer","$path/$_" and ++$fixed and warn "Installed symlink: $path/$_ -> $RealBin/git-packer\n" if !-e "$path/$_";
+                }
+                last if $fixed;
+            }
+        }
+    };
+    @repo_dirs = (abs_path $gitdir);
 }
 
 sub run_how_cmd {
@@ -167,38 +191,102 @@ if (eval { require File::Which;1 }) {
 }
 
 #2. Verify SSH Method
-if (my $user = $ENV{REMOTE_USER}) {
-    if ($ENV{SSH_AUTH_SOCK}) {
-        if (my @pubkeys = `ssh-add -l 2>/dev/null`) {
-            print "REMOTE_USER: $user: AllowAgentForwarding is enabled: OK\n";
+my $keyfile = "$ENV{HOME}/.ssh/authorized_keys";
+if (local $_ = $ENV{HOME} and my @s = stat) {
+    if (-d _ and $s[2] & 0700 and not $s[2] & 0022) {
+        printf "REMOTE_USER: \$HOME has safe %04o permissions: GOOD\n", ($s[2] & 07777);
+    }
+    else {
+        printf "REMOTE_USER: \$HOME broken %04o permissions: BAD!\n", ($s[2] & 07777);
+        system qw[chmod -v u+rwx], $_ if not $s[2] & 0700;
+        system qw[chmod -v go-w], $_ if $s[2] & 0022;
+    }
+    $_ .= "/.ssh";
+    if (@s = stat) {
+        if (-d _ and $s[2] & 0700 and not $s[2] & 0022) {
+            printf "REMOTE_USER: ~/.ssh has safe %04o permissions: GOOD\n", ($s[2] & 07777);
         }
         else {
-            print "REMOTE_USER: $user: AllowAgentForwarding is mostly enabled, but no pubkeys forwarded: FINE\n";
+            printf "REMOTE_USER: ~/.ssh broken %04o permissions: BAD!\n", ($s[2] & 07777);
+            system qw[chmod -v u+rwx], $_ if not $s[2] & 0700;
+            system qw[chmod -v go-w], $_ if $s[2] & 0022;
+        }
+        $_ .= "/config";
+        if (@s = stat) {
+            if (-f _ and $s[2] & 0600 and not $s[2] & 0022) {
+                printf "REMOTE_USER: ~/.ssh/config has safe %04o permissions: GOOD\n", ($s[2] & 07777);
+            }
+            else {
+                printf "REMOTE_USER: ~/.ssh/config has dangerous %04o permissions: BAD!\n", ($s[2] & 07777);
+                system qw[chmod -v 0600], $_ if -f _;
+            }
+        }
+        else {
+            print "REMOTE_USER: ~/.ssh/config does not exist: BAD!\n";
+        }
+        $_ = $keyfile;
+        if (@s = stat) {
+            if (-f _ and $s[2] & 0600 and not $s[2] & 0022) {
+                printf "REMOTE_USER: ~/.ssh/authorized_keys has safe %04o permissions: GOOD\n", ($s[2] & 07777);
+            }
+            else {
+                printf "REMOTE_USER: ~/.ssh/authorized_keys broken %04o permissions: BAD!\n", ($s[2] & 07777);
+                system qw[chmod -v 0600], $_ if -f _;
+            }
+        }
+        else {
+            print "REMOTE_USER: ~/.ssh/authorized_keys does not exist: BAD!\n";
         }
     }
     else {
-        print "REMOTE_USER: $user: AllowAgentForwarding is not enabled: FINE\n";
+        print "REMOTE_USER: ~/.ssh does not exist: BAD!\n";
+    }
+}
+else {
+    print "REMOTE_USER: \$HOME $ENV{HOME} does not exist? BAD!\n";
+}
+if (my $user = $ENV{REMOTE_USER}) {
+    if ($ENV{SERVER_ADDR}) {
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ForceCommand [git-server] configured properly: GOOD\n";
+    }
+    else {
+        if (local $_ = $ENV{SSH_CONNECTION}) {
+            ($ENV{REMOTE_ADDR}, $ENV{REMOTE_PORT}, $ENV{SERVER_ADDR}, $ENV{SERVER_PORT}) = split;
+            print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: Broken [ForceCommand] configuration not going through git-server properly: BAD\n";
+        }
+        chomp($ENV{SERVER_ADDR} = `hostname`) if !$ENV{SERVER_ADDR};
+    }
+    if ($ENV{SSH_AUTH_SOCK}) {
+        if (my @pubkeys = `ssh-add -l 2>/dev/null`) {
+            print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: AllowAgentForwarding is enabled: OK\n";
+        }
+        else {
+            print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: AllowAgentForwarding is mostly enabled, but no pubkeys forwarded: FINE\n";
+        }
+    }
+    else {
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: AllowAgentForwarding is not enabled: FINE\n";
     }
     if ($ENV{XMODIFIERS} && $ENV{XMODIFIERS} =~ /(v|client)=/) {
-        print "REMOTE_USER: $user: AcceptEnv is sufficient: OK\n";
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: AcceptEnv is sufficient: OK\n";
     }
     else {
         # "AcceptEnv XMODIFIERS" is required to support several git-deploy features
         # and to support "-o" (or "-O") GIT_OPTION_* settings in "pre-" hooks
         # and to allow enabling DEBUG if needed.
-        print "REMOTE_USER: $user: Missing [AcceptEnv XMODIFIERS] on sshd configuration: CRIPPLED SERVER!\n";
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: Missing [AcceptEnv XMODIFIERS] on sshd configuration: CRIPPLED SERVER!\n";
     }
     if ($ENV{SSH_USER_AUTH}) {
-        print "REMOTE_USER: $user: ExposeAuthInfo is enabled: OK\n";
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo is enabled: OK\n";
     }
     else {
-        print "REMOTE_USER: $user: ExposeAuthInfo is disabled but authentication working: FINE\n";
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo is disabled but authentication working: FINE\n";
     }
     if (my $count = @repo_dirs) {
-        print "REMOTE_USER: $user: Filtering $count specified repos for access: OK\n";
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: Filtering $count specified repos for access: OK\n";
     }
     else {
-        print "REMOTE_USER: $user: Scanning remote repos with access: OK\n";
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: Scanning remote repos with access: OK\n";
     }
 }
 elsif (local $_ = $ENV{SSH_CONNECTION}) {
@@ -213,11 +301,11 @@ elsif (local $_ = $ENV{SSH_CONNECTION}) {
         $how = $1 if <$auth> =~ /^publickey (.+)/;
         close $auth;
     }
-    my $keyfile = "$ENV{HOME}/.ssh/authorized_keys";
     if (!$how) {
         print "REMOTE_USER: ExposeAuthInfo is disabled: POOR! Enable it for hints on how to better configure $keyfile\n";
     }
     elsif (open my $keys, "<", $keyfile) {
+        print "REMOTE_USER: ExposeAuthInfo is enabled: OK\n";
         my $label = "";
         my $line = 0;
         my @matches = ();
@@ -227,42 +315,46 @@ elsif (local $_ = $ENV{SSH_CONNECTION}) {
             if ($pos >= 0) {
                 $label = $1 if substr($_,$pos+length($how)) =~ /^\s*(\S[^\r\n]*)/;
                 next if /^\s*\#/; # Ignore comments
+                s/\s*$//;
                 push @matches, [$line, $pos, $label, $_];
             }
         }
         close $keys;
         $label ||= "$ENV{USER}\@$ENV{REMOTE_ADDR}";
+        (my $hint_user = lc($label =~ /^$ENV{USER}\@(.+)/ || $label =~ /^([^@]+)@/ ? $1 : $label)) =~ s/[^a-z0-9]+/_/g;
         if (@matches) {
             foreach my $k (@matches) {
-                my $o = substr($k->[3],0,$k->[2]);
+                my $o = substr($k->[3],0,$k->[1]);
+                $o =~ s/\s+$//;
                 if ($o =~ /(?:^|,)command="[^\"]*git-server\b[^\"]*"/i and
                     $o =~ /(?:^|,)command="[^\"]*git-server[^\"]* (KEY|REMOTE_USER)=(\w+)\b[^\"]*"/i ||
                     $o =~ /(?:^|,)environment="(KEY|REMOTE_USER)=(\w+)\b[^\"]*"/i) {
                     my $var = $1;
                     my $user = $2;
                     if ($var eq "REMOTE_USER") {
-                        print qq{REMOTE_USER: $user: Entry appears fine yet still malfunctioned somehow! $keyfile:$k->[0]:$k->[3]};
+                        print qq{REMOTE_USER: $user: Entry appears fine yet still malfunctioned somehow! [$ENV{SERVER_ADDR}:$keyfile] Line $k->[0]:$k->[3]\n};
                     }
                     else {
                         print "REMOTE_USER: $user: Line $k->[0] should use REMOTE_USER=$user instead of $var=$user: BAD\n";
                     }
                 }
-                elsif ($k->[2] > 0) {
-                    print qq{REMOTE_USER: Confusing preliminary directives [$o] fail to define REMOTE_USER at Line $k->[0] of $keyfile: BAD\n};
+                elsif (length $o) {
+                    print qq{REMOTE_USER: Preliminary directives exist [$o] but fail to define any REMOTE_USER: BAD! Try something like this in $keyfile Line $k->[0]:\n};
+                    print qq{command="$bin REMOTE_USER=$hint_user" $k->[3]\n};
                 }
                 else {
-                    print "REMOTE_USER: Instead of missing options, try something like this in $keyfile Line $k->[0]:\n";
-                    print qq{command="$bin REMOTE_USER=user" $k->[3]\n};
+                    print "REMOTE_USER: No options found! Try something like this in $keyfile Line $k->[0]:\n";
+                    print qq{command="$bin REMOTE_USER=$hint_user" $k->[3]\n};
                 }
             }
         }
         else {
             print "REMOTE_USER: [$ENV{SERVER_ADDR}:$keyfile] Unrecognized format allowed key but still not found. Try something like this:\n";
-            print qq{command="$bin REMOTE_USER=user" $how $label\n\n};
+            print qq{command="$bin REMOTE_USER=$hint_user" $how $label\n\n};
         }
     }
     else {
-        print "REMOTE_USER: BROKEN! Unable to read [$keyfile] [$!]\n";
+        print "REMOTE_USER: BROKEN! Unable to read [$ENV{SERVER_ADDR}:$keyfile] [$!]\n";
     }
 }
 else {
@@ -300,7 +392,7 @@ if (@repo_dirs) {
                 push @check, map { "$ENV{HOME}/$_" } @check; # Try with prepended $HOME too
             }
             foreach (@check) {
-                $gitdir = $_ and next if -d;
+                $gitdir = $_ and last if -d;
             }
         }
         next if !$gitdir;

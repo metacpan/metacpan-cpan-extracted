@@ -1,0 +1,115 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+Z|SYSOP MANUAL|WHITE|Return To Table of Contents
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% RED         %] ____  ____ ____    _   _       _                          _ [% RESET %] [% BRIGHT CYAN %] __  __                         _ [% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% YELLOW      %]| __ )| __ ) ___|  | | | |_ __ (_)_   _____ _ __ ___  __ _| |[% RESET %] [% BRIGHT CYAN %]|  \/  | __ _ _ __  _   _  __ _| |[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% GREEN       %]|  _ \|  _ \___ \  | | | | '_ \| \ \ / / _ \ '__/ __|/ _` | |[% RESET %] [% BRIGHT CYAN %]| |\/| |/ _` | '_ \| | | |/ _` | |[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% MAGENTA     %]| |_) | |_) |__) | | |_| | | | | |\ V /  __/ |  \__ \ (_| | |[% RESET %] [% BRIGHT CYAN %]| |  | | (_| | | | | |_| | (_| | |[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% BRIGHT BLUE %]|____/|____/____/   \___/|_| |_|_| \_/ \___|_|  |___/\__,_|_|[% RESET %] [% BRIGHT CYAN %]|_|  |_|\__,_|_| |_|\__,_|\__,_|_|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+
+[% HORIZONTAL RULE CYAN %][% BOLD %][% B_CYAN %][% BLACK %] SYSOP TOKENS[% RESET %]
+
+Tokens are not commands, but macros that are inserted into the text at the token location.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] BBS NAME [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the BBS name.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] BBS VERSIONS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show BBS versions.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] COMMANDS REFERENCE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the "files/sysop/commands_reference.ANSI" menu.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] CPU BITS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+The number of bits the CPU processes (usually 32 or 64).
+
+[% BOLD %][% B_YELLOW %][% BLACK %] CPU CORES [% RESET %][% YELLOW %]🭬[% RESET %]
+
+The number of CPU cores.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] CPU IDENTITY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show CPU identity.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] CPU LOAD [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the CPU load.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] CPU SPEED [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the CPU speed.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] CPU THREADS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the number of CPU threads.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] DISK FREE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the 'df' or 'duf' disk free output.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] ENVIRONMENT [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the system environment variables.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] FILE CATEGORY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the current file category.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] HARDWARE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the hardware description.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] HOSTNAME [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the server hostname.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] IP ADDRESS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the server IP address.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] JUSTIFIED text ENDJUSTIFIED [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Justify text between JUSTIFIED and ENDJUSTIFIED tokens.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] MEMORY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Shows the memory table.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] MIDDLE VERTICAL RULE color [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show a vertical rule centered and in the set color using the appropriate ANSI color token.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] ONLINE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show number of users online.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] SYSOP VIEW CONFIGURATION [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the system configuration.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] THREADS COUNT [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the number of allocated server threads.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] UPTIME [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the system uptime.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] USERS COUNT [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the number of users.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] VERSIONS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show complete versions output.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] WRAP text ENDWRAP [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Word wrap text between the WRAP and ENDWRAP tokens.
+

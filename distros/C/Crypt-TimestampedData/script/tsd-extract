@@ -120,7 +120,7 @@ tsd-extract - Extract content and timestamps from a TimeStampedData (.tsd) file
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

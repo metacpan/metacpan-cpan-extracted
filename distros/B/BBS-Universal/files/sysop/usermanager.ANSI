@@ -1,0 +1,18 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+1|SYSOP LIST USERS VERTICAL ABBREVIATED|CYAN|List Users Vertically With Just The Essentials
+2|SYSOP LIST USERS HORIZONTAL ABBREVIATED|CYAN|List Users Horizontally With Just The Essentials
+3|SYSOP LIST USERS VERTICAL DETAILED|CYAN|List Users Vertically With All Details
+4|SYSOP LIST USERS HORIZONTAL DETAILED|CYAN|List Users Horizontally With All Details (can be too big)
+P|SYSOP EDIT NEW USERS|ORANGE|Process New Users
+E|SYSOP EDIT USER|BRIGHT BLUE|Edit User
+A|SYSOP ADD USER|YELLOW|Add New User
+R|SYSOP DELETE USER|RED|Remove a User
+Z|BACK|WHITE|Return to System Menu
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% BRIGHT CYAN %] _   _                 __  __[% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% BRIGHT CYAN %]| | | |___  ___ _ __  |  \/  | __ _ _ __   __ _  __ _  ___ _ __[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT CYAN %]| | | / __|/ _ \ '__| | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT CYAN %]| |_| \__ \  __/ |    | |  | | (_| | | | | (_| | (_| |  __/ |[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% BRIGHT CYAN %] \___/|___/\___|_|    |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]  [% BRIGHT CYAN %]                                                |___/[% RESET %]

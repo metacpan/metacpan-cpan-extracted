@@ -10,6 +10,7 @@ WriteMakefile(
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.010001',
     PREREQ_PM        => {},
+    macro 	     => { TARFLAGS   => "--format=ustar -c -v -f" },
     TEST_REQUIRES    => {
         'Test::More' => '0.88',
     },

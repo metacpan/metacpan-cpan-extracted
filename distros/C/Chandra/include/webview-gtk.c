@@ -164,6 +164,12 @@ WEBVIEW_API void webview_set_title(struct webview *w, const char *title) {
   gtk_window_set_title(GTK_WINDOW(w->priv.window), title);
 }
 
+WEBVIEW_API void webview_set_size(struct webview *w, int width, int height) {
+  gtk_window_resize(GTK_WINDOW(w->priv.window), width, height);
+  w->width = width;
+  w->height = height;
+}
+
 WEBVIEW_API void webview_set_fullscreen(struct webview *w, int fullscreen) {
   if (fullscreen) {
     gtk_window_fullscreen(GTK_WINDOW(w->priv.window));

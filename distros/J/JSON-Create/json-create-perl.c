@@ -698,12 +698,38 @@ json_create_add_string (json_create_t * jc, SV * input)
 #define DIGIT(x) (((x)%10)|0x30)
 
 static INLINE json_create_status_t
+json_create_add_unsigned(json_create_t * jc, SV * sv) {
+    long unsigned int uv;
+    int uvlen;
+    char * spillover;
+    uv = SvUV (sv);
+    uvlen = 0;
+    spillover = ((char *) jc->buffer) + jc->length;
+    uvlen += snprintf (spillover + uvlen, MARGIN - uvlen, "%lu", uv);
+    if (uvlen >= MARGIN) {
+	if (JCEH) {
+	    (*JCEH) (__FILE__, __LINE__,
+		     "A printed integer number %ld was "
+		     "longer than MARGIN=%d bytes",
+		     SvIV (sv), MARGIN);
+	}
+	return json_create_number_too_long;
+    }
+    jc->length += uvlen;
+    CHECKLENGTH;
+    return json_create_ok;
+}
+
+static INLINE json_create_status_t
 json_create_add_integer (json_create_t * jc, SV * sv)
 {
     long int iv;
     int ivlen;
     char * spillover;
 
+    if (SvIOK_UV(sv)) {
+	return json_create_add_unsigned (jc, sv);
+    }
     iv = SvIV (sv);
     ivlen = 0;
 

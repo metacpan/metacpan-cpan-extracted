@@ -554,6 +554,14 @@ WEBVIEW_API void webview_set_title(struct webview *w, const char *title) {
                get_nsstring(title));
 }
 
+WEBVIEW_API void webview_set_size(struct webview *w, int width, int height) {
+  CGSize size = {width, height};
+  ((void(*)(id, SEL, CGSize))objc_msgSend)(
+      w->priv.window, sel_registerName("setContentSize:"), size);
+  w->width = width;
+  w->height = height;
+}
+
 WEBVIEW_API void webview_set_fullscreen(struct webview *w, int fullscreen) {
   unsigned long windowStyleMask = ((unsigned long(*)(id, SEL))objc_msgSend)(
       w->priv.window, sel_registerName("styleMask"));

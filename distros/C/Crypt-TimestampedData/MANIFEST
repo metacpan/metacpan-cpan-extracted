@@ -2,9 +2,11 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 lib/Crypt/TSD.pm
 lib/Crypt/TimestampedData.pm
 script/tsd-create

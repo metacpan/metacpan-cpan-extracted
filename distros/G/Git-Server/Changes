@@ -1,5 +1,32 @@
 Revision History for Git::Server
 
+0.040  2026-04-06 15:00:00
+ - Prevent "mangling shebang" during build.
+ - Security: Honor core.sshCommand if exists.
+ - Security: Throttle push notifications if too many.
+ - Security: Use $PATH properly (broke in v0.036).
+ - Optimization: Cache git some ref lookups.
+ - Utilize core.hooksPath or emulate it on older git.
+ - Allow Read-Only Repo (without "acl.writers").
+ - Add git-packer to wrap even without ForceCommand.
+ - Improvements with git-verify
+   * Try looking in more places for git-verify.
+   * Works even if within directory with weird chars.
+   * Auto-correct authorized_keys broken permissions.
+   * Fix authorized_keys parser.
+   * Use first repo match in ".git" scan.
+   * Calculate a better REMOTE_USER hint for
+     pubkey update recommendation.
+   * Setup git-packer wrapper until SSH configured.
+ - Improvements with git-deploy
+   * Better handling of NON-deploy repos.
+   * Avoid aborting if local changes.
+   * Use real remote word; not just hardcode "origin".
+   * Add git-deploy -i <SSH_IDENTITY_FILE> feature.
+   * Fix pull grind when "new" file already exists.
+   * Fix git-deploy auto-update %ENV pollution.
+   * Auto-detect fatal pull attempts.
+
 0.039  2026-03-23 02:00:00
  - Improvements with git-deploy
    * Always show [git-deploy] for {deploy} users.

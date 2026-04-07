@@ -18,6 +18,7 @@ t/12-metadata.t
 t/13-transaction.t
 t/14-foreign-key-info.t
 t/15-typeof.t
+t/90-sqllogictest.t
 t/99-type-array.t
 t/99-type-blob.t
 t/99-type-boolean.t

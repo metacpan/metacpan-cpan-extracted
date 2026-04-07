@@ -1,0 +1,13 @@
+
+Welcome to [% BBS NAME %] Running the
+
+[% BANNER %]
+
+Server software.
+The local time is [% TIME %].
+
+Connected to server instance [% THREAD ID %].
+There are currently [% ONLINE %] users online out of [% USERS COUNT %].
+
+Please login or create an account.
+

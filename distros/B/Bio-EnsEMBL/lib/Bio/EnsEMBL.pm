@@ -69,5 +69,5 @@ use strict;
 use warnings;
 package Bio::EnsEMBL;
 # ABSTRACT: API to connect to and work with EnsEMBL genomic databases
-$Bio::EnsEMBL::VERSION = '113.0.0';
+$Bio::EnsEMBL::VERSION = '114.0.0';
 1;

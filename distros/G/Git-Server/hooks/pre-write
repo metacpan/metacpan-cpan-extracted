@@ -6,6 +6,7 @@ use FindBin qw($Script);
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
+$ENV{GIT_HOOKS_PATH} ||= "$base/hooks";
 my $acl = {};
 my $conf = $0 =~ m{(.*)/} ? `$1/configs` : `git config --list`;
 while ($conf =~ s/^acl.(\w+)=(.*)$//m) {
@@ -19,9 +20,9 @@ while ($conf =~ s/^acl.(\w+)=(.*)$//m) {
 $SIG{PIPE} = sub { exit 1; };
 $ENV{GIT_SERVER_VERSION} ||= "UNKNOWN";
 
-$conf !~ /^proxy/m or 0 == system "hooks/proxy", $Script or die localtime().": [$who] git-server: proxy operation failure: $?\n";
+$conf !~ /^proxy/m or 0 == system "$ENV{GIT_HOOKS_PATH}/proxy", $Script or die localtime().": [$who] git-server: proxy operation failure: $?\n";
 # Verify IP
-if (my $banned = system "hooks/restrictip") {
+if (my $banned = system "$ENV{GIT_HOOKS_PATH}/restrictip") {
     exit ($banned >> 8 || 1);
 }
 # Cannot pass without writers access:

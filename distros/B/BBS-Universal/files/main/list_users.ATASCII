@@ -1,0 +1,9 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+Z|BACK|WHITE|USER|Return to the Main Menu
+---
+ _    _    _     _   _
+| |  (_)__| |_  | | | |___ ___ _ _ ___
+| |__| (_-<  _| | |_| (_-</ -_) '_(_-<
+|____|_/__/\__|  \___//__/\___|_| /__/
+[% SHOW USERS LIST %]

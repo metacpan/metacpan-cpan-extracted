@@ -2,6 +2,7 @@ CHANGES
 Makefile.PL
 MANIFEST
 math_mpfi_include.h
+math_mpfi_unused.h
 MPFI.pm
 MPFI.pod
 README

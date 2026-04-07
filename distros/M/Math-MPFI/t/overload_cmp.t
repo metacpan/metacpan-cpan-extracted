@@ -263,10 +263,10 @@ else {
   warn "3F: Got: ", $double < $mpfi + 1, "\nExpected a true value\n";
 }
 
-if(($mpfi <=> $double) == 0 && ($mpfi <=> $double + 1) < 0 && ($mpfi <=> $double - 1) > 0) {$ok .= 'g'}
+if(($mpfi <=> $double) == 0 && ($mpfi <=> $double + 1) == -1 && ($mpfi <=> $double - 1) == 1) {$ok .= 'g'}
 else {warn "3g: Expected true values, but got at least one false value\n"}
 
-if(($double <=> $mpfi) == 0 && ($double + 1 <=> $mpfi) > 0 && ($double - 1 <=> $mpfi) < 0) {$ok .= 'G'}
+if(($double <=> $mpfi) == 0 && ($double + 1 <=> $mpfi) == 1 && ($double - 1 <=> $mpfi) == -1) {$ok .= 'G'}
 else {warn "3G: Expected true values, but got at least one false value\n"}
 
 Rmpfi_set_ui($mpfi, $max_even);
@@ -301,10 +301,10 @@ else {
   warn "3J: Got: ", $max_even < $mpfi + 1, "\nExpected a true value\n";
 }
 
-if(($mpfi <=> $max_even) == 0 && ($mpfi <=> $max_even + 1) < 0 && ($mpfi <=> $max_even - 1) > 0) {$ok .= 'k'}
+if(($mpfi <=> $max_even) == 0 && ($mpfi <=> $max_even + 1) == -1 && ($mpfi <=> $max_even - 1) == 1) {$ok .= 'k'}
 else {warn "3k: Expected true values, but got at least one false value\n"}
 
-if(($max_even <=> $mpfi) == 0 && ($max_even + 1 <=> $mpfi) > 0 && ($max_even - 1 <=> $mpfi) < 0) {$ok .= 'K'}
+if(($max_even <=> $mpfi) == 0 && ($max_even + 1 <=> $mpfi) == 1 && ($max_even - 1 <=> $mpfi) == -1) {$ok .= 'K'}
 else {warn "3K: Expected true values, but got at least one false value\n"}
 
 Rmpfi_set_si($mpfi, $si + 1);
@@ -339,10 +339,10 @@ else {
   warn "3N: Got: ", $si < $mpfi, "\nExpected a true value\n";
 }
 
-if(($mpfi <=> $si + 1) == 0 && ($mpfi <=> $si + 2) < 0 && ($mpfi <=> $si) > 0) {$ok .= 'o'}
+if(($mpfi <=> $si + 1) == 0 && ($mpfi <=> $si + 2) == -1 && ($mpfi <=> $si) == 1) {$ok .= 'o'}
 else {warn "3o: Expected true values, but got at least one false value\n"}
 
-if(($si + 1 <=> $mpfi) == 0 && ($si + 2 <=> $mpfi) > 0 && ($si <=> $mpfi) < 0) {$ok .= 'O'}
+if(($si + 1 <=> $mpfi) == 0 && ($si + 2 <=> $mpfi) == 1 && ($si <=> $mpfi) == -1) {$ok .= 'O'}
 else {warn "3O: Expected true values, but got at least one false value\n"}
 
 Rmpfi_set_str($mpfi, $str, 10);
@@ -377,10 +377,10 @@ else {
   warn "3R: Got: ", $str < $mpfi + 1, "\nExpected a true value\n";
 }
 
-if(($mpfi <=> $str) == 0 && ($mpfi - 1 <=> $str) < 0 && ($mpfi + 1 <=> $str) > 0) {$ok .= 's'}
+if(($mpfi <=> $str) == 0 && ($mpfi - 1 <=> $str) == -1 && ($mpfi + 1 <=> $str) == 1) {$ok .= 's'}
 else {warn "3s: Expected true values, but got at least one false value\n"}
 
-if(($str <=> $mpfi) == 0 && ($str <=> $mpfi - 1) > 0 && ($str <=> $mpfi + 1) < 0) {$ok .= 'S'}
+if(($str <=> $mpfi) == 0 && ($str <=> $mpfi - 1) == 1 && ($str <=> $mpfi + 1) == -1) {$ok .= 'S'}
 else {warn "3S: Expected true values, but got at least one false value\n"}
 
 if($ok eq 'abcdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsS') {print "ok 3\n"}

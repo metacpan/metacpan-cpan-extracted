@@ -1,0 +1,75 @@
+0.023   April 06, 2026
+
+        Minor changes and documentation improvements.
+
+0.022   February 04, 2026
+
+        Finally figured out why things suddenly stopped working.
+
+0.019   December 25, 2025
+
+        Considerable work on ATASCII and PETSCII drivers as well as
+		the SysOp commands list for each.
+
+0.018   December 25, 2025
+
+        Fixed a syntax error in ATASCII code.
+
+0.017   December 19, 2025
+
+        Added a clock feature to the SysOp menu
+
+0.016   December 08, 2025
+
+        Fixed file view returning to the same file prompt
+		Added coloring of category display
+
+0.015   November 17, 2025
+
+        Added SysOp menu file display
+
+0.014   November 15, 2025
+
+        Added an animated SysOp menu
+
+0.013   November 06, 2025
+
+        ANSI handling vastly overhauled.
+
+0.012   November 04, 2025
+
+        Features added
+
+0.011   October 30, 2025
+
+        Improved the SysOp mode commands list options
+		Corrected users list to make sure nicknames override fullname if
+		desired
+
+0.010   October 25, 2025
+
+        Bug tweaks
+
+0.009   October 20, 2025
+
+        Added many more ANSI colors.  Added RSS news feeds.
+
+0.008   October 09, 2025
+
+        Added README files to the "files/" sections
+
+0.007   October 06, 2025
+
+        Added model inpui to sysop text entry
+
+0.004   September 20, 2025
+
+        Barely functional now.  Long way to go.
+
+0.002   Feb 10, 2024
+
+        Operational Alpha version.  No messages, no file transfer yet.
+
+0.001   Sep 06, 2023
+
+        First version.  Not operational

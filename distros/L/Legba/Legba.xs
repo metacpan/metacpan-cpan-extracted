@@ -296,7 +296,8 @@ static OP* slot_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
         OpMORESIB_set(pushop, cvop);
         OpLASTSIB_set(arg, NULL);
         op_contextualize(arg, G_SCALAR);
-        newop = newUNOP(OP_CUSTOM, 0, arg);
+        newop = newUNOP(OP_NULL, 0, arg);
+        newop->op_type   = OP_CUSTOM;
         newop->op_ppaddr = pp_slot_set;
         newop->op_targ   = idx;
         op_free(entersubop);
@@ -385,7 +386,8 @@ static OP* slot_set_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
             OpMORESIB_set(pushop, cvop);
             OpLASTSIB_set(valop, NULL);
             op_contextualize(valop, G_SCALAR);
-            newop = newUNOP(OP_CUSTOM, 0, valop);
+            newop = newUNOP(OP_NULL, 0, valop);
+            newop->op_type   = OP_CUSTOM;
             newop->op_ppaddr = pp_slot_set;
             newop->op_targ   = SvIV(*svp);
             op_free(entersubop);
@@ -441,7 +443,8 @@ static OP* slot_watch_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) 
                 OP *newop;
                 OpMORESIB_set(pushop, cvop);
                 OpLASTSIB_set(cbop, NULL);
-                newop = newUNOP(OP_CUSTOM, 0, cbop);
+                newop = newUNOP(OP_NULL, 0, cbop);
+                newop->op_type   = OP_CUSTOM;
                 newop->op_ppaddr = pp_slot_watch;
                 newop->op_targ   = SvIV(*svp);
                 op_free(entersubop);
@@ -480,7 +483,8 @@ static OP* slot_unwatch_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj
                     OP *newop;
                     OpMORESIB_set(pushop, cvop);
                     OpLASTSIB_set(cbop, NULL);
-                    newop = newUNOP(OP_CUSTOM, 0, cbop);
+                    newop = newUNOP(OP_NULL, 0, cbop);
+                    newop->op_type   = OP_CUSTOM;
                     newop->op_ppaddr = pp_slot_unwatch_one;
                     newop->op_targ   = idx;
                     op_free(entersubop);
@@ -941,7 +945,8 @@ static XS(xs_make_set_op) {
     name = SvPV(ST(0), name_len);
     idx  = get_or_create_slot_idx(aTHX_ name, name_len);
     /* Setter needs an operand child; use a null op as placeholder */
-    op   = newUNOP(OP_CUSTOM, 0, newOP(OP_NULL, 0));
+    op   = newUNOP(OP_NULL, 0, newOP(OP_NULL, 0));
+    op->op_type   = OP_CUSTOM;
     op->op_ppaddr = pp_slot_set;
     op->op_targ   = idx;
     ST(0) = sv_2mortal(newSVuv(PTR2UV(op)));

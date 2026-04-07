@@ -1,5 +1,16 @@
 Revision history for Net-Async-NATS
 
+0.003     2026-04-07 00:59:57Z
+
+  - Fix reconnect Future retention: the Future returned by the internal
+    connect() call was not held anywhere, so the reconnect async sub was
+    garbage-collected mid-flight ("lost its returning future")
+  - _on_disconnect now cancels any pending connect Future so its async
+    sub unwinds cleanly instead of hanging forever
+  - connect() now cancels stale Futures from previous failed attempts
+  - Reconnect chain uses proper Future composition (then/on_done/on_fail)
+    instead of nested closures with eval
+
 0.002     2026-03-07 19:44:22Z
 
   - Fix connect hang: retain TCP connect Future to prevent garbage collection

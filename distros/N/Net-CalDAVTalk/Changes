@@ -1,6 +1,10 @@
 Revision history for Net-CalDAVTalk
 
-0.13    Sat Apr  5 2026
+0.14    Mon Apr  6 11:11 2026
+   - add missing dep on Text::JSCalendar
+   - update dep on Net::DAVTalk
+
+0.13    Sat Apr  4 13:00 2026
    - Delegate iCalendar<=>JSCalendar conversion to Text::JSCalendar 0.03
    - Remove ~1500 lines of conversion code now in Text::JSCalendar
    - All CalDAV protocol/sync operations unchanged

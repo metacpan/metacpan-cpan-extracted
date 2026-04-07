@@ -1,5 +1,5 @@
 package IO::Uring::Singleton;
-$IO::Uring::Singleton::VERSION = '0.013';
+$IO::Uring::Singleton::VERSION = '0.014';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ IO::Uring::Singleton - A shared singleton uring
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

@@ -9,6 +9,11 @@ use Test::More ();
 use Exporter 'import';
 use DBI ();
 use Carp;
+use Digest::MD5;
+use JSON::PP qw(decode_json);
+
+use DBD::DuckDB::FFI qw(duckdb_library_version);
+
 
 our @EXPORT = qw(connect_ok run_sqllogictest);
 
@@ -63,7 +68,9 @@ sub clean {
 
 sub run_sqllogictest {
 
-    my ($fh, $dbh) = @_;
+    my ($fh, $dbh, $options) = @_;
+
+    $options //= {hash_threshold => 8};
 
     my $content = do { local $/; <$fh> };
     close $fh;
@@ -92,7 +99,7 @@ sub run_sqllogictest {
 
         Test::More::subtest $test_name => sub {
 
-            my (@expected, $mode, $sql, $output, $types, $sort_mode, $label);
+            my (@expected, $mode, $sql, $output, $types, $sort_mode, $label, $hash_mode, $onlyif);
 
             foreach my $line (split /\n/, $test) {
 
@@ -109,6 +116,9 @@ sub run_sqllogictest {
                     $output = 1;
                     next;
                 }
+                elsif ($line =~ /^onlyif\s+(.*)$/) {
+                    $onlyif = $1;
+                }
                 else {
                     if (defined $mode) {
                         if ($mode =~ /^statement:/) {
@@ -118,10 +128,21 @@ sub run_sqllogictest {
                             $sql .= "$line\n";
                         }
                         if ($output) {
-                            my @data = map { $_ eq 'TRUE' ? !!1 : $_ eq 'FALSE' ? !!0 : $_ eq 'NULL' ? undef : $_ }
-                                split /\t/, $line;
+                            if ($line =~ /(\d+) values hashing to ([a-f\d]{32}|[A-F\d]{32})/) {
+                                push @expected, [$line, $1, $2];
+                                $hash_mode = 1;
+                            }
+                            else {
+                                my @data = map {
+                                          $_ eq 'TRUE'                 ? !!1
+                                        : $_ eq 'FALSE'                ? !!0
+                                        : $_ eq 'NULL'                 ? undef
+                                        : substr($_, 0, 1) =~ /({|\[)/ ? decode_json($_)    # Detect JSON data
+                                        : $_
+                                } split /\t/, $line;
 
-                            push @expected, [@data];
+                                push @expected, [@data];
+                            }
                         }
                     }
                 }
@@ -130,6 +151,47 @@ sub run_sqllogictest {
 
             Test::More::diag $label if $label;
             Test::More::diag "SQL: $sql";
+
+            if ($onlyif) {
+
+                my $skip = 0;
+
+                if ($onlyif =~ /([=<>]+)/) {
+
+                    my ($token, $op, $value) = $onlyif =~ /(\w+)([=<>]+)(.*)$/;
+                    Test::More::diag "ONLYIF $token $op $value";
+
+                    for ($token) {
+                        if (/version/) {
+
+                            my $version = duckdb_library_version;
+                            $version =~ s/v//;
+
+                            Test::More::diag "VERSION=$version";
+
+                            if ($op eq '>=') {
+                                $skip = 1 unless (version->parse($version) >= version->parse($value));
+                            }
+                            if ($op eq '<=') {
+                                $skip = 1 unless (version->parse($version) <= version->parse($value));
+                            }
+                            if ($op eq '>') {
+                                $skip = 1 unless (version->parse($version) > version->parse($value));
+                            }
+                            if ($op eq '<') {
+                                $skip = 1 unless (version->parse($version) < version->parse($value));
+                            }
+
+                        }
+                    }
+                }
+
+                if ($skip) {
+                    Test::More::pass "SKIP";
+                    goto END_SQLLOGICTEST;
+                }
+
+            }
 
             if ($mode =~ /^statement:(ok|error)/) {
 
@@ -164,19 +226,51 @@ sub run_sqllogictest {
                 my $expected_rows = scalar(@expected);
                 my $expected_cols = scalar(split //, $types || '');
 
-                Test::More::is $sth->rows,            $expected_rows, "Expected rows";
-                Test::More::is scalar(@{$rows->[0]}), $expected_cols, "Expected columns";
+                Test::More::diag(Test::More::explain($rows));
 
-                if (@expected) {
-                    Test::More::is_deeply $rows, \@expected, 'Expected output';
+                if ($hash_mode) {
+
+                    my ($expected_result, $expected_n_values, $expected_digest) = @{$expected[0]};
+
+                    my $n_values = $sth->rows * scalar(@{$rows->[0]});
+                    Test::More::is $n_values, $expected_n_values, "Expected $expected_n_values values";
+
+                    Test::More::diag('Option: Hash Threshold: ', $options->{hash_threshold});
+
+                    if ($options->{hash_threshold} > 0 && $n_values > $options->{hash_threshold}) {
+
+                        my $md5 = Digest::MD5->new;
+
+                    DIGEST: foreach my $row (@{$rows}) {
+                            foreach my $value (@{$row}) {
+                                $md5->add("$value\n");
+                            }
+                        }
+
+                        my $digest = $md5->hexdigest;
+
+                        Test::More::is $digest, $expected_digest, "Expected hash $expected_digest";
+                        Test::More::is sprintf('%s values hashing to %s', $n_values, $digest), $expected_result,
+                            $expected_result;
+
+                    }
                 }
+                else {
+                    Test::More::is $sth->rows,            $expected_rows, "Expected $expected_rows rows";
+                    Test::More::is scalar(@{$rows->[0]}), $expected_cols, "Expected $expected_cols columns";
 
+                    if (@expected) {
+                        Test::More::is_deeply $rows, \@expected, 'Expected output';
+                    }
+                }
+            }
+
+        END_SQLLOGICTEST: {
+                $test_id++;
+                $test_description = undef;
             }
 
         };
-
-        $test_id++;
-        $test_description = undef;
 
     }
 

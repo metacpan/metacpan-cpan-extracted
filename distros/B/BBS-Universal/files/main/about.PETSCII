@@ -1,0 +1,13 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+Z|BACK|WHITE|USER|Return to Main Menu
+---
+[% YELLOW %]    _    _                 _[% RESET %]
+[% YELLOW %]   / \  | |__   ___  _   _| |_[% RESET %]
+[% YELLOW %]  / _ \ | '_ \ / _ \| | | | __|[% RESET %]
+[% YELLOW %] / ___ \| |_) | (_) | |_| | |_[% RESET %]
+[% YELLOW %]/_/   \_\_.__/ \___/ \__,_|\__|[% RESET %]
+
+[% WRAP %]This system is running on the "BBS::Universal" software written in Perl by [% GREEN %][% AUTHOR NAME %][% RESET %].  It is a multi-threaded system designed to accommodate internet connections by retro-computers or modern computers.  It operates just like the BBS systems in the 1980s and 1990s.  The advantage to this system is it allows more than one user to connect at a time, so no waiting.[% ENDWRAP %]
+
+[% WRAP %]The software supports ASCII, [% YELLOW %]ATASCII[% RESET %], [% LIGHT BLUE %]PETSCII[% RESET %] and [% GREEN %]ANSI[% RESET %] text formats, with the capability to add more.[% ENDWRAP %]

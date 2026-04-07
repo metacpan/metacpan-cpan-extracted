@@ -7,6 +7,18 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.10	2026-04-06
+
+ [ Bug Fixes ]
+ - avoid Log::Any::Adapter::Screen log noise
+   Tim Landscheidt++
+ - fix POD formatting
+   Tim Landscheidt++
+
+ [ Other ]
+ - revert to run perltidy (not perltidier) with tidyall
+ - tighten dependency on String::License for consistent error messages
+
 v3.3.9	2023-07-04
 
  [ Bug Fixes ]
@@ -126,10 +138,12 @@ v3.3.0	2022-01-08
  - use only SPDX shortnames (not also debian shortnames) for
    Software::License and SPDX tests, and list only deviating entries
 
+ [ Packaging ]
+ - Run perltidier (not perltidy) with tidyall
+
  [ Other ]
  - Added: add options --quiet --debug --trace (and deprecate now no-op
    option --no-verbose)
- - Run perltidier (not perltidy) with tidyall
  - avoid given/when
  - call log->trace() (not log->tracef()) for simple strings
  - change option --skipped to use Log::Tiny (not core warn), and log as

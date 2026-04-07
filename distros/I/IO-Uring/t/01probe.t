@@ -6,10 +6,10 @@ use Test::More;
 use IO::Uring;
 use POSIX 'uname';
 
-my $ring = IO::Uring->new(32);
-
 my ($os, $release) = (uname)[0, 2];
 diag "Running $os $release";
+
+my $ring = IO::Uring->new(32);
 
 my %hash = %{ $ring->probe };
 $_ += 0 for values %hash;

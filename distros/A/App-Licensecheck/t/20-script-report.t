@@ -15,6 +15,15 @@ elsif ( path('blib')->exists ) {
 }
 local @Test2::Tools::Command::command = @CMD;
 
+# avoid Log::Any::Adapter::Screen log noise
+delete(
+	@ENV{
+		'NO_COLOR',   'COLOR',
+		'LOG_PREFIX', 'LOG_LEVEL',
+		'QUIET',      'VERBOSE', 'DEBUG', 'TRACE'
+	}
+);
+
 subtest 'machine-readable output; short-form option' => sub {
 	command {
 		args   => [qw(-m t/devscripts/beerware.cpp)],

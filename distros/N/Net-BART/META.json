@@ -1,0 +1,89 @@
+{
+   "abstract" : "Balanced Routing Tables for IPv4 and IPv6",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-BART",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "gobench"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Net::BART" : {
+         "file" : "lib/Net/BART.pm",
+         "version" : "0.01"
+      },
+      "Net::BART::Art" : {
+         "file" : "lib/Net/BART/Art.pm",
+         "version" : "0.01"
+      },
+      "Net::BART::BitSet256" : {
+         "file" : "lib/Net/BART/BitSet256.pm",
+         "version" : "0.01"
+      },
+      "Net::BART::LPM" : {
+         "file" : "lib/Net/BART/LPM.pm",
+         "version" : "0.01"
+      },
+      "Net::BART::Node" : {
+         "file" : "lib/Net/BART/Node.pm",
+         "version" : "0.01"
+      },
+      "Net::BART::SparseArray256" : {
+         "file" : "lib/Net/BART/SparseArray256.pm",
+         "version" : "0.01"
+      },
+      "Net::BART::XS" : {
+         "file" : "lib/Net/BART/XS.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gaissmai/Net-BART/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gaissmai/Net-BART.git",
+         "web" : "https://github.com/gaissmai/Net-BART"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -6,6 +6,10 @@
  * are routed through the global perl_callback (same as the main window),
  * so all $app->bind() handlers work from any window.
  *
+ * On Windows: creates Win32 HWND + OLE IWebBrowser2 child windows.
+ *
+ * On Linux: creates GtkWindow + WebKitWebView child windows.
+ *
  * On other platforms: every entry point is a no-op stub that returns -1.
  * Window.pm falls back to a "stub" mode and logs a warning.
  *
@@ -262,6 +266,14 @@ cwin_create(const char *title, int width, int height,
     ((void(*)(id, SEL, id))objc_msgSend)(
         win, sel_registerName("makeKeyAndOrderFront:"), win);
 
+    /* Bring the application to the foreground so the window is visible
+       without requiring the user to click the dock icon. */
+    ((void(*)(id, SEL, int))objc_msgSend)(
+        ((id(*)(id, SEL))objc_msgSend)(
+            (id)objc_getClass("NSApplication"),
+            sel_registerName("sharedApplication")),
+        sel_registerName("activateIgnoringOtherApps:"), 1);
+
     cw->nswindow  = win;
     cw->wkwebview = wv;
     return cw->wid;
@@ -470,7 +482,735 @@ cwin_exists(int wid)
     return visible;
 }
 
-#else  /* ============================================================ stubs */
+#elif defined(WEBVIEW_WINAPI) /* ========================================= Win32 */
+
+typedef struct {
+    int   active;
+    int   wid;
+    int   parent_wid;
+    int   is_modal;
+    HWND  hwnd;
+    IOleObject *browser;
+} ChandraChildWin;
+
+static ChandraChildWin _cwin_table[CHANDRA_MAX_CHILD_WINDOWS];
+static int             _cwin_next_id = 1;
+static int             _cwin_child_class_ready = 0;
+
+static ChandraChildWin *_cwin_find(int wid) {
+    int i;
+    for (i = 0; i < CHANDRA_MAX_CHILD_WINDOWS; i++)
+        if (_cwin_table[i].active && _cwin_table[i].wid == wid)
+            return &_cwin_table[i];
+    return NULL;
+}
+
+static ChandraChildWin *_cwin_alloc(void) {
+    int i;
+    for (i = 0; i < CHANDRA_MAX_CHILD_WINDOWS; i++) {
+        if (!_cwin_table[i].active) {
+            memset(&_cwin_table[i], 0, sizeof(ChandraChildWin));
+            _cwin_table[i].active = 1;
+            _cwin_table[i].wid    = _cwin_next_id++;
+            return &_cwin_table[i];
+        }
+    }
+    return NULL;
+}
+
+/* ---- Child window procedure ---- */
+/* Separate from main wndproc so WM_DESTROY doesn't PostQuitMessage.       */
+
+static LRESULT CALLBACK _cwin_wndproc(HWND hwnd, UINT msg,
+                                      WPARAM wParam, LPARAM lParam) {
+    ChandraChildWin *cw = (ChandraChildWin *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    switch (msg) {
+    case WM_CREATE: {
+        CREATESTRUCT *cs = (CREATESTRUCT *)lParam;
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)cs->lpCreateParams);
+        return 0;
+    }
+    case WM_SIZE: {
+        if (cw && cw->browser) {
+            IOleInPlaceObject *ipo = NULL;
+            cw->browser->lpVtbl->QueryInterface(
+                cw->browser, &IID_IOleInPlaceObject, (void **)&ipo);
+            if (ipo) {
+                RECT rc;
+                GetClientRect(hwnd, &rc);
+                ipo->lpVtbl->SetObjectRects(ipo, &rc, &rc);
+                ipo->lpVtbl->Release(ipo);
+            }
+        }
+        return 0;
+    }
+    case WM_CLOSE:
+        /* Deactivate in table, just destroy window — don't quit app */
+        if (cw) {
+            cw->active = 0;
+            if (cw->browser) {
+                cw->browser->lpVtbl->Close(cw->browser, OLECLOSE_NOSAVE);
+                cw->browser->lpVtbl->Release(cw->browser);
+                cw->browser = NULL;
+            }
+        }
+        DestroyWindow(hwnd);
+        return 0;
+    }
+    return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+static void _cwin_ensure_class(void) {
+    if (_cwin_child_class_ready) return;
+    WNDCLASSEX wc;
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    ZeroMemory(&wc, sizeof(WNDCLASSEX));
+    wc.cbSize      = sizeof(WNDCLASSEX);
+    wc.hInstance   = hInstance;
+    wc.lpfnWndProc = _cwin_wndproc;
+    wc.lpszClassName = "Chandra_ChildWin";
+    wc.hIcon       = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hCursor     = LoadCursor(NULL, IDC_ARROW);
+    RegisterClassEx(&wc);
+    _cwin_child_class_ready = 1;
+}
+
+/* Navigate helper (duplicated from webview-win32.c to avoid linkage issues) */
+static void _cwin_navigate_ole(IOleObject *browser, const char *url) {
+    IWebBrowser2 *wb = NULL;
+    browser->lpVtbl->QueryInterface(browser, &IID_IWebBrowser2, (void **)&wb);
+    if (wb) {
+        int len = MultiByteToWideChar(CP_UTF8, 0, url, -1, NULL, 0);
+        BSTR burl = SysAllocStringLen(NULL, len);
+        if (burl) {
+            MultiByteToWideChar(CP_UTF8, 0, url, -1, burl, len);
+            VARIANT empty;
+            VariantInit(&empty);
+            wb->lpVtbl->Navigate(wb, burl, &empty, &empty, &empty, &empty);
+            SysFreeString(burl);
+        }
+        wb->lpVtbl->Release(wb);
+    }
+}
+
+/* Eval JS in child OLE browser */
+static int _cwin_eval_ole(IOleObject *browser, const char *js) {
+    IWebBrowser2 *wb = NULL;
+    IDispatch *doc_disp = NULL;
+    IHTMLDocument2 *doc = NULL;
+    HRESULT hr;
+
+    if (!browser) return -1;
+
+    hr = browser->lpVtbl->QueryInterface(browser, &IID_IWebBrowser2, (void **)&wb);
+    if (FAILED(hr) || !wb) return -1;
+
+    hr = wb->lpVtbl->get_Document(wb, &doc_disp);
+    if (FAILED(hr) || !doc_disp) { wb->lpVtbl->Release(wb); return -1; }
+
+    hr = doc_disp->lpVtbl->QueryInterface(doc_disp, &IID_IHTMLDocument2, (void **)&doc);
+    doc_disp->lpVtbl->Release(doc_disp);
+    if (FAILED(hr) || !doc) { wb->lpVtbl->Release(wb); return -1; }
+
+    IHTMLWindow2 *win = NULL;
+    hr = doc->lpVtbl->get_parentWindow(doc, &win);
+    if (SUCCEEDED(hr) && win) {
+        int len = MultiByteToWideChar(CP_UTF8, 0, js, -1, NULL, 0);
+        BSTR bjs = SysAllocStringLen(NULL, len);
+        if (bjs) {
+            MultiByteToWideChar(CP_UTF8, 0, js, -1, bjs, len);
+            BSTR lang = SysAllocString(L"JavaScript");
+            VARIANT ret;
+            VariantInit(&ret);
+            win->lpVtbl->execScript(win, bjs, lang, &ret);
+            VariantClear(&ret);
+            SysFreeString(lang);
+            SysFreeString(bjs);
+        }
+        win->lpVtbl->Release(win);
+    }
+    doc->lpVtbl->Release(doc);
+    wb->lpVtbl->Release(wb);
+    return 0;
+}
+
+/* ---- Public C API --------------------------------------------------------- */
+
+static int
+cwin_create(const char *title, int width, int height,
+            int x, int y, int resizable, int frameless)
+{
+    ChandraChildWin *cw = _cwin_alloc();
+    if (!cw) return -1;
+
+    _cwin_ensure_class();
+
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    DWORD style = WS_OVERLAPPEDWINDOW;
+    if (!resizable)
+        style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
+    if (frameless)
+        style = WS_POPUP | WS_VISIBLE;
+
+    RECT rc = {0, 0, width, height};
+    AdjustWindowRect(&rc, style, FALSE);
+
+    cw->hwnd = CreateWindowEx(
+        0, "Chandra_ChildWin",
+        title ? title : "Window",
+        style,
+        (x >= 0 ? x : CW_USEDEFAULT),
+        (y >= 0 ? y : CW_USEDEFAULT),
+        rc.right - rc.left, rc.bottom - rc.top,
+        NULL, NULL, hInstance, cw);
+
+    if (!cw->hwnd) { cw->active = 0; return -1; }
+
+    /* Embed OLE browser */
+    IOleObject *ole = NULL;
+    HRESULT hr = CoCreateInstance(&CLSID_WebBrowser, NULL,
+        CLSCTX_INPROC_SERVER, &IID_IOleObject, (void **)&ole);
+    if (FAILED(hr) || !ole) {
+        DestroyWindow(cw->hwnd);
+        cw->active = 0;
+        return -1;
+    }
+    cw->browser = ole;
+
+    WebviewSite *site = create_site(NULL, cw->hwnd);
+    if (!site) {
+        ole->lpVtbl->Release(ole);
+        DestroyWindow(cw->hwnd);
+        cw->active = 0;
+        return -1;
+    }
+
+    ole->lpVtbl->SetClientSite(ole, &site->client_site);
+    ole->lpVtbl->SetHostNames(ole, L"Chandra", L"Chandra");
+
+    RECT rect;
+    GetClientRect(cw->hwnd, &rect);
+    OleSetContainedObject((IUnknown *)ole, TRUE);
+    ole->lpVtbl->DoVerb(ole, OLEIVERB_INPLACEACTIVATE, NULL,
+                         &site->client_site, 0, cw->hwnd, &rect);
+
+    _cwin_navigate_ole(ole, "about:blank");
+
+    ShowWindow(cw->hwnd, SW_SHOW);
+    UpdateWindow(cw->hwnd);
+
+    /* Inject the invoke bridge */
+    {
+        static const char *bridge_js =
+            "window.external={invoke:function(s){"
+            "var img=new Image();"
+            "img.src='invoke://localhost/'+encodeURIComponent(s);"
+            "}};";
+        _cwin_eval_ole(ole, bridge_js);
+    }
+
+    return cw->wid;
+}
+
+static void
+cwin_destroy(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw) return;
+    if (cw->browser) {
+        cw->browser->lpVtbl->Close(cw->browser, OLECLOSE_NOSAVE);
+        cw->browser->lpVtbl->Release(cw->browser);
+        cw->browser = NULL;
+    }
+    if (cw->hwnd) {
+        DestroyWindow(cw->hwnd);
+        cw->hwnd = NULL;
+    }
+    cw->active = 0;
+}
+
+static void
+cwin_set_html(int wid, const char *html)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->browser) return;
+    /* Navigate to about:blank then write HTML via document.write */
+    char *js;
+    size_t html_len = strlen(html);
+    /* Escape for JS string */
+    size_t js_alloc = html_len * 6 + 128;
+    js = (char *)malloc(js_alloc);
+    if (!js) return;
+    char *p = js;
+    p += sprintf(p, "document.open();document.write('");
+    const char *s;
+    for (s = html; *s; s++) {
+        if (*s == '\'') { *p++ = '\\'; *p++ = '\''; }
+        else if (*s == '\\') { *p++ = '\\'; *p++ = '\\'; }
+        else if (*s == '\n') { *p++ = '\\'; *p++ = 'n'; }
+        else if (*s == '\r') { *p++ = '\\'; *p++ = 'r'; }
+        else *p++ = *s;
+    }
+    p += sprintf(p, "');document.close();");
+    *p = '\0';
+    _cwin_eval_ole(cw->browser, js);
+    free(js);
+}
+
+static void
+cwin_eval_js(int wid, const char *js)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->browser) return;
+    _cwin_eval_ole(cw->browser, js);
+}
+
+static void
+cwin_set_title(int wid, const char *title)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    SetWindowTextA(cw->hwnd, title);
+}
+
+static void
+cwin_set_size(int wid, int w, int h)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    RECT rc;
+    GetWindowRect(cw->hwnd, &rc);
+    MoveWindow(cw->hwnd, rc.left, rc.top, w, h, TRUE);
+}
+
+static void
+cwin_set_position(int wid, int x, int y)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    RECT rc;
+    GetWindowRect(cw->hwnd, &rc);
+    int w = rc.right - rc.left;
+    int h = rc.bottom - rc.top;
+    MoveWindow(cw->hwnd, x, y, w, h, TRUE);
+}
+
+static void
+cwin_show(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    ShowWindow(cw->hwnd, SW_SHOW);
+}
+
+static void
+cwin_hide(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    ShowWindow(cw->hwnd, SW_HIDE);
+}
+
+static void
+cwin_focus(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    SetForegroundWindow(cw->hwnd);
+    SetFocus(cw->hwnd);
+}
+
+static void
+cwin_minimize(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    ShowWindow(cw->hwnd, SW_MINIMIZE);
+}
+
+static void
+cwin_maximize(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->hwnd) return;
+    ShowWindow(cw->hwnd, SW_MAXIMIZE);
+}
+
+static void
+cwin_navigate(int wid, const char *url)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->browser) return;
+    _cwin_navigate_ole(cw->browser, url);
+}
+
+static void
+cwin_set_modal(int wid, int parent_wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw) return;
+    cw->parent_wid = parent_wid;
+    cw->is_modal = 1;
+
+    /* Set as topmost */
+    SetWindowPos(cw->hwnd, HWND_TOPMOST, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE);
+
+    /* Disable parent if found */
+    ChandraChildWin *parent = parent_wid > 0 ? _cwin_find(parent_wid) : NULL;
+    if (parent && parent->hwnd)
+        EnableWindow(parent->hwnd, FALSE);
+}
+
+static void
+cwin_end_modal(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->is_modal) return;
+
+    SetWindowPos(cw->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE);
+
+    ChandraChildWin *parent = cw->parent_wid > 0 ? _cwin_find(cw->parent_wid) : NULL;
+    if (parent && parent->hwnd) {
+        EnableWindow(parent->hwnd, TRUE);
+        SetForegroundWindow(parent->hwnd);
+    }
+    cw->is_modal = 0;
+    cw->parent_wid = 0;
+}
+
+static int
+cwin_is_modal(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    return cw ? cw->is_modal : 0;
+}
+
+static int
+cwin_exists(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->active) return 0;
+    return IsWindow(cw->hwnd) && IsWindowVisible(cw->hwnd);
+}
+
+#elif defined(WEBVIEW_GTK) /* ============================================ GTK */
+
+typedef struct {
+    int         active;
+    int         wid;
+    int         parent_wid;
+    int         is_modal;
+    GtkWidget  *window;
+    GtkWidget  *webview;
+    GtkWidget  *scroller;
+} ChandraChildWin;
+
+static ChandraChildWin _cwin_table[CHANDRA_MAX_CHILD_WINDOWS];
+static int             _cwin_next_id = 1;
+
+static ChandraChildWin *_cwin_find(int wid) {
+    int i;
+    for (i = 0; i < CHANDRA_MAX_CHILD_WINDOWS; i++)
+        if (_cwin_table[i].active && _cwin_table[i].wid == wid)
+            return &_cwin_table[i];
+    return NULL;
+}
+
+static ChandraChildWin *_cwin_alloc(void) {
+    int i;
+    for (i = 0; i < CHANDRA_MAX_CHILD_WINDOWS; i++) {
+        if (!_cwin_table[i].active) {
+            memset(&_cwin_table[i], 0, sizeof(ChandraChildWin));
+            _cwin_table[i].active = 1;
+            _cwin_table[i].wid    = _cwin_next_id++;
+            return &_cwin_table[i];
+        }
+    }
+    return NULL;
+}
+
+/* ---- GTK signal: script message from child webview ---- */
+static void
+_cwin_gtk_message_cb(WebKitUserContentManager *m,
+                     WebKitJavascriptResult *r,
+                     gpointer arg)
+{
+    (void)m; (void)arg;
+    if (!perl_callback || !SvOK(perl_callback)) return;
+
+#if WEBKIT_MAJOR_VERSION >= 2 && WEBKIT_MINOR_VERSION >= 22
+    JSCValue *value = webkit_javascript_result_get_js_value(r);
+    char *s = jsc_value_to_string(value);
+#else
+    JSGlobalContextRef context = webkit_javascript_result_get_global_context(r);
+    JSValueRef value = webkit_javascript_result_get_value(r);
+    JSStringRef js = JSValueToStringCopy(context, value, NULL);
+    size_t n = JSStringGetMaximumUTF8CStringSize(js);
+    char *s = g_new(char, n);
+    JSStringGetUTF8CString(js, s, n);
+    JSStringRelease(js);
+#endif
+
+    {
+        dTHX;
+        dSP;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpv(s, 0)));
+        PUTBACK;
+        call_sv(perl_callback, G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+    g_free(s);
+}
+
+/* ---- GTK signal: child window destroyed by user ---- */
+static void
+_cwin_gtk_destroy_cb(GtkWidget *widget, gpointer arg)
+{
+    (void)widget;
+    int wid = GPOINTER_TO_INT(arg);
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (cw) {
+        cw->active  = 0;
+        cw->window  = NULL;
+        cw->webview = NULL;
+        cw->scroller = NULL;
+    }
+}
+
+/* ---- Public C API --------------------------------------------------------- */
+
+static int
+cwin_create(const char *title, int width, int height,
+            int x, int y, int resizable, int frameless)
+{
+    ChandraChildWin *cw = _cwin_alloc();
+    if (!cw) return -1;
+
+    cw->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(cw->window), title ? title : "Window");
+
+    if (resizable) {
+        gtk_window_set_default_size(GTK_WINDOW(cw->window), width, height);
+    } else {
+        gtk_widget_set_size_request(cw->window, width, height);
+    }
+    gtk_window_set_resizable(GTK_WINDOW(cw->window), !!resizable);
+
+    if (frameless)
+        gtk_window_set_decorated(GTK_WINDOW(cw->window), FALSE);
+
+    if (x >= 0 && y >= 0)
+        gtk_window_move(GTK_WINDOW(cw->window), x, y);
+    else
+        gtk_window_set_position(GTK_WINDOW(cw->window), GTK_WIN_POS_CENTER);
+
+    cw->scroller = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(cw->window), cw->scroller);
+
+    /* WebKit with user content manager for JS bridge */
+    WebKitUserContentManager *ucm = webkit_user_content_manager_new();
+    webkit_user_content_manager_register_script_message_handler(ucm, "external");
+    g_signal_connect(ucm, "script-message-received::external",
+                     G_CALLBACK(_cwin_gtk_message_cb),
+                     GINT_TO_POINTER(cw->wid));
+
+    cw->webview = webkit_web_view_new_with_user_content_manager(ucm);
+    gtk_container_add(GTK_CONTAINER(cw->scroller), cw->webview);
+
+    /* Inject window.external.invoke bridge */
+    {
+        const char *bridge =
+            "window.external={invoke:function(x){"
+            "window.webkit.messageHandlers.external.postMessage(x);"
+            "}};";
+        WebKitUserScript *us = webkit_user_script_new(
+            bridge,
+            WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES,
+            WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START,
+            NULL, NULL);
+        webkit_user_content_manager_add_script(ucm, us);
+        webkit_user_script_unref(us);
+    }
+
+    /* Inject the Chandra promise bridge */
+    {
+        WebKitUserScript *us = webkit_user_script_new(
+            CHANDRA_BRIDGE_JS,
+            WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES,
+            WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START,
+            NULL, NULL);
+        webkit_user_content_manager_add_script(ucm, us);
+        webkit_user_script_unref(us);
+    }
+
+    g_signal_connect(G_OBJECT(cw->window), "destroy",
+                     G_CALLBACK(_cwin_gtk_destroy_cb),
+                     GINT_TO_POINTER(cw->wid));
+
+    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(cw->webview), "about:blank");
+    gtk_widget_show_all(cw->window);
+
+    return cw->wid;
+}
+
+static void
+cwin_destroy(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw) return;
+    if (cw->window) {
+        gtk_widget_destroy(cw->window);
+        cw->window = NULL;
+        cw->webview = NULL;
+        cw->scroller = NULL;
+    }
+    cw->active = 0;
+}
+
+static void
+cwin_set_html(int wid, const char *html)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->webview) return;
+    webkit_web_view_load_html(WEBKIT_WEB_VIEW(cw->webview), html, "about:blank");
+}
+
+static void
+cwin_eval_js(int wid, const char *js)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->webview) return;
+    webkit_web_view_run_javascript(WEBKIT_WEB_VIEW(cw->webview),
+                                   js, NULL, NULL, NULL);
+}
+
+static void
+cwin_set_title(int wid, const char *title)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_window_set_title(GTK_WINDOW(cw->window), title);
+}
+
+static void
+cwin_set_size(int wid, int w, int h)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_window_resize(GTK_WINDOW(cw->window), w, h);
+}
+
+static void
+cwin_set_position(int wid, int x, int y)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_window_move(GTK_WINDOW(cw->window), x, y);
+}
+
+static void
+cwin_show(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_widget_show_all(cw->window);
+}
+
+static void
+cwin_hide(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_widget_hide(cw->window);
+}
+
+static void
+cwin_focus(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_window_present(GTK_WINDOW(cw->window));
+}
+
+static void
+cwin_minimize(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_window_iconify(GTK_WINDOW(cw->window));
+}
+
+static void
+cwin_maximize(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    gtk_window_maximize(GTK_WINDOW(cw->window));
+}
+
+static void
+cwin_navigate(int wid, const char *url)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->webview) return;
+    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(cw->webview), url);
+}
+
+static void
+cwin_set_modal(int wid, int parent_wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->window) return;
+    cw->parent_wid = parent_wid;
+    cw->is_modal = 1;
+
+    gtk_window_set_modal(GTK_WINDOW(cw->window), TRUE);
+    gtk_window_set_keep_above(GTK_WINDOW(cw->window), TRUE);
+
+    ChandraChildWin *parent = parent_wid > 0 ? _cwin_find(parent_wid) : NULL;
+    if (parent && parent->window)
+        gtk_window_set_transient_for(GTK_WINDOW(cw->window),
+                                     GTK_WINDOW(parent->window));
+}
+
+static void
+cwin_end_modal(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->is_modal || !cw->window) return;
+
+    gtk_window_set_modal(GTK_WINDOW(cw->window), FALSE);
+    gtk_window_set_keep_above(GTK_WINDOW(cw->window), FALSE);
+    gtk_window_set_transient_for(GTK_WINDOW(cw->window), NULL);
+
+    ChandraChildWin *parent = cw->parent_wid > 0 ? _cwin_find(cw->parent_wid) : NULL;
+    if (parent && parent->window)
+        gtk_window_present(GTK_WINDOW(parent->window));
+
+    cw->is_modal = 0;
+    cw->parent_wid = 0;
+}
+
+static int
+cwin_is_modal(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    return cw ? cw->is_modal : 0;
+}
+
+static int
+cwin_exists(int wid)
+{
+    ChandraChildWin *cw = _cwin_find(wid);
+    if (!cw || !cw->active || !cw->window) return 0;
+    return gtk_widget_get_visible(cw->window);
+}
+
+#else  /* ============================================== fallback stubs */
 
 static int  cwin_create(const char *t, int w, int h, int x, int y,
                         int r, int f) {
@@ -492,7 +1232,7 @@ static void cwin_end_modal(int wid)                     { (void)wid; }
 static int  cwin_is_modal(int wid)                      { (void)wid; return 0; }
 static int  cwin_exists(int wid)                        { (void)wid; return 0; }
 
-#endif  /* WEBVIEW_COCOA */
+#endif  /* platform selection */
 #endif  /* CHANDRA_WINDOW_IMPLEMENTATION */
 
 #endif  /* CHANDRA_WINDOW_H */

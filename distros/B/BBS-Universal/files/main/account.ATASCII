@@ -1,0 +1,21 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+A|UPDATE ACCOMPLISHMENTS|MAGENTA|USER|Update Accomplishments
+C|CHANGE ACCESS LEVEL|WHITE|SYSOP|Change Access Level
+B|CHANGE BAUD RATE|BRIGHT BLUE|USER|Change Simulated Baud Rate
+D|CHANGE DATE FORMAT|BRIGHT GREEN|USER|Change Date Format
+E|TOGGLE SHOW EMAIL|GREEN|USER|Toggle Show Email
+F|TOGGLE PLAY FORTUNES|BRIGHT CYAN|USER|Toggle Fortune Cookies
+L|UPDATE LOCATION|RED|USER|Update Your Location
+M|UPDATE EMAIL|WHITE|USER|Update Email Address
+P|TOGGLE PREFER NICKNAME|YELLOW|USER|Toggle Prefer Nickname
+R|UPDATE RETRO SYSTEMS|GREEN|USER|Update Retro Systems
+S|CHANGE SCREEN SIZE|BLUE|USER|Change Screen Size
+T|CHOOSE TEXT MODE|CYAN|USER|Choose Text Mode
+Z|BACK|WHITE|USER|Main Menu
+---
+   _                      _   
+  /_\  __ __ ___ _  _ _ _| |_ 
+ / _ \/ _/ _/ _ \ || | ' \  _|
+/_/ \_\__\__\___/\_,_|_||_\__|
+[% USER INFO %]

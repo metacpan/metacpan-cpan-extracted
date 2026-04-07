@@ -15,22 +15,7 @@ if ($meta) {
   $no_build_spvm_modules = 1;
 }
 
-# Check supported environment
-unless ($meta) {
-  require SPVM::Builder::Config;
-  # Need a compiler supporting c++11
-  my $config = SPVM::Builder::Config->new_cpp(file_optional => 1);
-  my $cc = $config->cc;
-  
-  my $tmp_dir = File::Temp->newdir;
-  
-  unless (system("$cc -o $tmp_dir/cpp11_check.o --std=c++11 t/support/cpp11_check.cpp") == 0) {
-    warn "Need a compiler supporting c++11\n";
-    die "OS unsupported\n";
-  }
-}
-
-my %spvm_requires = ('SPVM' => '0.990042');
+my %spvm_requires = ('SPVM' => '0.990155');
 WriteMakefile(
   NAME              => 'SPVM::Resource::RE2',
   VERSION_FROM      => 'lib/SPVM/Resource/RE2.pm',

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 =pod
 
@@ -128,9 +128,10 @@ This library is free software; you can redistribute it and/or modify it under th
 
 use strict;
 use warnings;
-use FindBin qw($Bin);
+use Cwd qw(abs_path);
+use FindBin qw($RealBin);
 
-our $VERSION = "0.039";
+our $VERSION = "0.040";
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 $ENV{GIT_CONNECTED_EPOCH} ||= eval { require Time::HiRes; Time::HiRes::time() } || time;
@@ -167,14 +168,16 @@ elsif ($bare =~ /false/) {
             "  Option b) Commit changes: git -C $where commit -a -m 'Keep modifications found on server'\n".
             "$server_monkeys\n";
     }
-    if ($where =~ /^(.*?)\/?\.git$/) {
+    if ($where =~ m{^(.+?[^/])\.git$}) {
         my $gitless = $1;
-        my $recommendation = -e $gitless ? "mv -v $gitless $gitless-CRUSTY-PLEASE-DELETE-\$\$ && " : "";
-        $recommendation .= "git clone --bare $where $gitless";
-        $recommendation .= qq{ && (grep -q "ref: " $gitless/HEAD || grep " refs/heads/" $gitless/packed-refs | head -1 | awk '{print "ref: ", \$2}' > $gitless/HEAD)};
-        $recommendation .= qq{ && mv -v $where $where-CRUSTY-PLEASE-DELETE-\$\$};
+        my $recommendation = -d $gitless && -f "$gitless/config" && -d "$gitless/refs" && -d "$gitless/objects" ? # Great if $gitless is already bare
+            "mv -v $where $where-CRUSTY-PLEASE-DELETE-\$\$" : # Get rid of other "$gitless.git" crusty non-bare repo. Maybe a duplicate of the GOOD bare $gitless repo?
+            (-l $gitless || -e $gitless ? "mv -v $gitless $gitless-CRUSTY-PLEASE-DELETE-\$\$ && " : ""). # Get the other crusty non-bare repo out of the way! Maybe a duplicate?
+            "git clone --bare $where $gitless && ". # Convert non-bare $where into bare $gitless
+            qq{(grep -q "ref: " $gitless/HEAD || grep " refs/heads/" $gitless/packed-refs | head -1 | awk '{print "ref:",\$2}' > $gitless/HEAD)}. # Ensure HEAD exists
+            qq{ && mv -v $where $where-CRUSTY-PLEASE-DELETE-\$\$}; # Get rid of crusty old non-bare $gitless.git now that GOOD bare $gitless was made
         die localtime().": [$who] git-server: Non-bare git folder ending with '.git' is too dangerous for a server repo! Manual intervention required.\n".
-            "  Recommendation: $recommendation\n";
+            "  Recommendation on $ENV{SERVER_ADDR}: $recommendation\n";
     }
     # Make sure NOT to be stuck on any branch just to be safe.
     # Otherwise, if the client attempts to push any changes to that branch, it will crash with the following:
@@ -198,13 +201,12 @@ elsif ($bare =~ /false/) {
     }
 }
 else {
-    die localtime().": [$who] git-server: Broken bare for git repo configuration! $dir/config: ".`git config core.bare 2>&1`."\n";
+    die localtime().": [$who] git-server: Broken bare for git repo configuration! $dir/config: ".`git config core.bare 2>&1`."\n"; # Show any weird config errors
 }
 
 my $hook = $cmd =~ /^(git-[\w\-]+)/ && $git_op_hook->{$1} or die localtime().": [$who] git-server: Unimplemented operation!\n";
 
-my $xmods = $ENV{XMODIFIERS} || "";
-if ($xmods) {
+if (my $xmods = $ENV{XMODIFIERS}) {
     $cmd !~ /^git-receive-pack\b/ or
         `git config --list 2>/dev/null` =~ /^receive.advertisePushOptions=/im
         or system qw(git config --global receive.advertisePushOptions true);
@@ -223,28 +225,59 @@ if ($xmods) {
     }
 }
 
-my $base = $0 =~ /([\w\-\.]+)$/ ? $1 : die "$0: Stank base\n";
-if ($0 !~ m{^\Q$dir\E/hooks/} and    # Launched outside of repo/hooks
-    !-x "$dir/hooks/$base" and       # repo is missing hooks/run-git-hooks
-    -e "$dir/config" and             # repo is properly --bare
-    $Bin =~ m{/hooks$} and           # Launched from "hooks" folder somewhere
-    !-l $Bin and                     # Spawned from real "hooks" folder, not a symlink
-    !-l "$dir/hooks"                 # Repo hooks is not a symlink, (so it's probably the original "sample" stock)
-    || !-d _) {                      # Or it's not even a directory (maybe non-existent or plain "hooks" file or a special mknod file or unix socket)
+# Compute effective "hooks" directory regardless of git version:
+sub effective_hooks_path { abs_path(`git rev-parse --path-format=absolute --git-path hooks 2>/dev/null` =~ m{^(/.+)$} ? $1 : "$dir/hooks"); }
+
+my $should_hooks = $ENV{GIT_HOOKS_PATH} = $RealBin;
+my $actual_hooks = effective_hooks_path;
+if ($actual_hooks ne $should_hooks) {
+    # Need to update effective hooksPath
     warn localtime().": [$who] git-server: Automatically configuring repo [$dir] to use hooks properly...\n";
-    # Don't delete stock "hooks" folder in case there is something needed in there. Just move it out of the way to be safe.
-    rename "$dir/hooks","$dir/hooks-CRUSTY-PLEASE-DELETE-$$" and warn "rename: $dir/hooks -> $dir/hooks-CRUSTY-PLEASE-DELETE-$$\n" if lstat "$dir/hooks";
-    symlink $Bin, "$dir/hooks" and warn "symlink: $dir/hooks -> $Bin\n";
-    if (-l "$dir/hooks" and -d "$dir/hooks") {
-        warn localtime().": [$who] git-server: Successfully upgraded hooks to myself.\n";
-        if (!`git config acl.writers`) {
-            warn localtime().": [$who] git-server: No [acl.writers] found? Running: [git config acl.writer $ENV{REMOTE_USER}]\n";
-            system "git config acl.writers $ENV{REMOTE_USER} 1>&2";
+    chomp(my $target = `git config core.hooksPath`);
+    if (!$target) {
+        # No core.hooksPath at all, so just create a global default:
+        if (my $update_err = spawn($dir, "git","config","--global","core.hooksPath",$should_hooks)) {
+            warn localtime().": [$who] git-server: ERROR [$update_err] attempting to update default hooks folder: [$actual_hooks] -> [$should_hooks]\n";
         }
+        else {
+            warn localtime().": [$who] git-server: Updated default hooks folder: [$actual_hooks] -> [$should_hooks]\n";
+        }
+        $target = $should_hooks;
+    }
+    $target = abs_path($target =~ /^\// ? $target : "$dir/$target");
+    if ($target ne $should_hooks) {
+        # Still wrong core.hooksPath set, so override local setting with correct directory:
+        if (my $update_err = spawn($dir, "git","config","--local","core.hooksPath",$should_hooks)) {
+            warn localtime().": [$who] git-server: ERROR [$update_err] attempting to update local hooks folder: [$actual_hooks] -> [$should_hooks]\n";
+        }
+        else {
+            warn localtime().": [$who] git-server: Updated local hooks folder: [$actual_hooks] -> [$should_hooks]\n";
+        }
+        $target = $should_hooks;
+    }
+
+    # Check to verify effective hooks folder is now correct:
+    if (effective_hooks_path ne $should_hooks) {
+        # Older versions of git may not support "--git-path" or do not honor "core.hooksPath" so need to symlink as an emergency fallback to force it to work.
+        # Don't delete old "hooks" folder in case there is something needed in there. Just move it out of the way to be safe.
+        warn localtime().": [$who] git-server: Older git requires hooks symlink to work ...\n";
+        rename "$dir/hooks","$dir/hooks-CRUSTY-PLEASE-DELETE-$$" and warn "rename: $dir/hooks -> $dir/hooks-CRUSTY-PLEASE-DELETE-$$\n" if lstat "$dir/hooks";
+        symlink $should_hooks, "$dir/hooks" and warn "symlink: $dir/hooks -> $should_hooks\n";
+    }
+
+    # Last check to verify effective hooks folder is really fixed:
+    if (effective_hooks_path eq $should_hooks) {
+        # Effective hooks folder is now PERFECT
+        warn localtime().": [$who] git-server: Successfully updated effective hooks folder: [$actual_hooks] -> [$should_hooks]\n";
     }
     else {
-        warn localtime().": [$who] git-server: FAILED configuring repo [$dir/hooks]! Manual intervention required.\n";
+        warn localtime().": [$who] git-server: FAILED configuring [$dir/hooks] -> [$should_hooks]! Manual intervention required.\n";
     }
+}
+
+if (`git config --list` !~ /^acl\./m) {
+    warn localtime().": [$who] git-server: No [acl] found? Running: [git config acl.writer $ENV{REMOTE_USER}]\n";
+    system "git config acl.writers $ENV{REMOTE_USER} 1>&2";
 }
 
 # Custom hooks are free to read or write in this IPC folder
@@ -255,8 +288,8 @@ mkdir $ENV{IPC}, 0700;
 die localtime().": [$who] git-server: Unable to create [$ENV{IPC}] folder! $!\n" unless -d $ENV{IPC};
 
 my $pre_failure = 0;
-if (-x "$dir/hooks/pre-$hook") {
-    if ($pre_failure = spawn($dir, "hooks/pre-$hook")) {
+if (-x "$ENV{GIT_HOOKS_PATH}/pre-$hook") {
+    if ($pre_failure = spawn($dir, "$ENV{GIT_HOOKS_PATH}/pre-$hook")) {
         warn localtime().": [$who] git-server: pre-$hook failure: $pre_failure\n";
     }
     $ENV{GIT_PRE_EXIT_STATUS} = $pre_failure;
@@ -264,19 +297,19 @@ if (-x "$dir/hooks/pre-$hook") {
 
 my $git_failure = $pre_failure;
 if (!$git_failure) {
-    my $shell = "$dir/hooks/git-shell";
+    my $shell = "$ENV{GIT_HOOKS_PATH}/git-shell";
     $shell = "git-shell" unless -x $shell;
     $git_failure = spawn(".", $shell, "-c", $cmd);
     $ENV{GIT_EXIT_STATUS} = $git_failure;
 }
 
 my $post_failure = 0;
-if (-x "$dir/hooks/post-$hook") {
+if (-x "$ENV{GIT_HOOKS_PATH}/post-$hook") {
     if ($cmd) {
         # Restore SSH_ORIGINAL_COMMAND in case the post hook wants it.
         $ENV{SSH_ORIGINAL_COMMAND} = $cmd;
     }
-    if ($post_failure = spawn($dir, "hooks/post-$hook")) {
+    if ($post_failure = spawn($dir, "$ENV{GIT_HOOKS_PATH}/post-$hook")) {
         warn localtime().": [$who] git-server: post-$hook failure: $pre_failure\n";
     }
 }

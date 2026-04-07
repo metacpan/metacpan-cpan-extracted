@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+!$ENV{REMOTE_USER} && !$ENV{REMOTE_ADDR} && die "\npre-receive: git-server mis-configured.\n".($0=~m{^(.*)/hooks/}?`$1/git-verify`:"");
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 my $r = "\x01"; # enable bit 2^(fileno STDIN)
 die localtime().": [$who] git-server: NO pre-receive STDIN? Commandline Execution Worked!\n" if !select $r, undef, undef, 0.2;

@@ -2,10 +2,12 @@
 use strict;
 use warnings;
 use Test::More;
-use IO::Socket::UNIX;
 
-# Socket tests require Unix sockets
-plan skip_all => 'Unix sockets not available' unless eval { IO::Socket::UNIX->new; 1 } || 1;
+my $is_win32 = $^O eq 'MSWin32';
+
+unless ($is_win32) {
+    require IO::Socket::UNIX;
+}
 
 plan tests => 47;
 
@@ -50,7 +52,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Connection via socketpair ===
-{
+SKIP: {
+	skip 'AF_UNIX socketpair not available on Windows', 13 if $is_win32;
 	use Socket;
 	socketpair(my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0)
 		or die "socketpair: $!";
@@ -94,7 +97,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Hub creation (Unix socket) ===
-{
+SKIP: {
+	skip 'Unix socket path tests not applicable on Windows', 5 if $is_win32;
 	my $name = "test-hub-$$";
 	my $dir = $ENV{XDG_RUNTIME_DIR} || $ENV{TMPDIR} || '/tmp';
 	my $path = "$dir/chandra-$name.sock";

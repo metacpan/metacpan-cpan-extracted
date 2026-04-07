@@ -1,0 +1,13 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+A|BBS LIST ADD|YELLOW|USER|Add a BBS Entry
+L|SHOW FULL BBS LIST|BRIGHT BLUE|USER|Show Full BBS List
+S|SEARCH BBS LIST|CYAN|USER|Search For One or More BBS'
+Z|BACK|WHITE|USER|Return to the Main Menu
+---
+[% CLS %][% BRIGHT BLUE %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% BRIGHT BLUE %] ____  ____ ____    _     _     _   _[% RESET %]
+ [% BRIGHT BLUE          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% BRIGHT BLUE %]| __ )| __ ) ___|  | |   (_)___| |_(_)_ __   __ _[% RESET %]
+  [% BRIGHT BLUE          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %]|  _ \|  _ \___ \  | |   | / __| __| | '_ \ / _` |[% RESET %]
+  [% BRIGHT BLUE          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %]| |_) | |_) |__) | | |___| \__ \ |_| | | | | (_| |[% RESET %]
+ [% BRIGHT BLUE          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% BRIGHT BLUE %]|____/|____/____/  |_____|_|___/\__|_|_| |_|\__, |[% RESET %]
+[% BRIGHT BLUE          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]  [% BRIGHT BLUE %]                                             |___/[% RESET %]

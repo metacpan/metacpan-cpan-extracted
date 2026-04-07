@@ -2,7 +2,12 @@
 use strict;
 use warnings;
 use Test::More;
-use IO::Socket::UNIX;
+
+my $is_win32 = $^O eq 'MSWin32';
+
+unless ($is_win32) {
+    require IO::Socket::UNIX;
+}
 
 plan skip_all => 'Unix sockets not available' unless eval { IO::Socket::UNIX->new; 1 } || 1;
 
@@ -11,7 +16,8 @@ use_ok('Chandra::Socket::Hub');
 use_ok('Chandra::Socket::Client');
 
 # === Connection set_name ===
-{
+SKIP: {
+    skip 'AF_UNIX socketpair not available on Windows', 2 if $is_win32;
     use Socket;
     socketpair(my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0) or die "socketpair: $!";
     $s1->blocking(0);
@@ -48,7 +54,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Connection close is idempotent ===
-{
+SKIP: {
+    skip 'AF_UNIX socketpair not available on Windows', 2 if $is_win32;
     use Socket;
     socketpair(my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0) or die "socketpair: $!";
     $s1->blocking(0);
@@ -63,7 +70,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Connection reply without _id returns 0 ===
-{
+SKIP: {
+    skip 'AF_UNIX socketpair not available on Windows', 1 if $is_win32;
     use Socket;
     socketpair(my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0) or die "socketpair: $!";
     $s1->blocking(0);
@@ -77,7 +85,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Connection reply with _id works ===
-{
+SKIP: {
+    skip 'AF_UNIX socketpair not available on Windows', 4 if $is_win32;
     use Socket;
     socketpair(my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0) or die "socketpair: $!";
     $s1->blocking(0);
@@ -100,7 +109,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Connection reply with undef original returns 0 ===
-{
+SKIP: {
+    skip 'AF_UNIX socketpair not available on Windows', 1 if $is_win32;
     use Socket;
     socketpair(my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0) or die "socketpair: $!";
     $s1->blocking(0);
@@ -114,7 +124,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Connection send with extra fields ===
-{
+SKIP: {
+    skip 'AF_UNIX socketpair not available on Windows', 2 if $is_win32;
     use Socket;
     socketpair(my $s1, my $s2, AF_UNIX, SOCK_STREAM, 0) or die "socketpair: $!";
     $s1->blocking(0);
@@ -224,7 +235,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Hub socket_path class method ===
-{
+SKIP: {
+    skip 'socket_path returns Unix path on non-Windows only', 1 if $is_win32;
     my $path = Chandra::Socket::Hub->socket_path('myapp');
     like($path, qr/chandra-myapp\.sock$/, 'socket_path returns correct path');
 }
@@ -312,7 +324,8 @@ use_ok('Chandra::Socket::Client');
 }
 
 # === Hub authentication rejects bad token ===
-{
+SKIP: {
+    skip 'Requires IO::Socket::UNIX for direct socket connection', 3 if $is_win32;
     my $name = "test-auth-$$";
     my $hub = Chandra::Socket::Hub->new(name => $name);
 

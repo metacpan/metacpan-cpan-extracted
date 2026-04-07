@@ -1,5 +1,5 @@
 package Hustle::Table;
-our $VERSION="v0.8.0";
+our $VERSION="v0.8.1";
 
 use strict;
 use warnings;
@@ -158,10 +158,10 @@ sub _prepare_online_cached {
 
 
 		if($is_regex){
-			$d.=\' and (push $cache->{$input}->@*, $table->[\'.$index.\'], [@{^CAPTURE}]);\';
+			$d.=\' and (push $entry->@*, $table->[\'.$index.\'], [@{^CAPTURE}]);\';
 		}	
 		else {
-			$d.=\' and (push $cache->{$input}->@*, $table->[\'.$index.\'],  undef);\';
+			$d.=\' and (push $entry->@*, $table->[\'.$index.\'],  undef);\';
 
 		}
 		$d;
@@ -174,8 +174,8 @@ sub _prepare_online_cached {
   no warnings "numeric";
 	sub {
     for my \$input (\@_){
-      \$entry=\$cache->{\$input};
-      \$entry and return \$entry->\@*;
+      \$entry=\$cache->{\$input}//=[];
+      \$entry->@* and return \$entry->\@*;
 
 
 
@@ -196,13 +196,11 @@ sub _prepare_online_cached {
 
 
       my \@output;
-      for(\$cache->{\$input}//=[]){
-        # If we get here and nothing matched, we force default match
-        push \$_->\@*, \$table->[\@\$table-1], undef unless \$_->\@*;
-        
-        # Copy to output
-        push \@output, \$_->@*;
-      } 
+      # If we get here and nothing matched, we force default match
+      push \$entry->\@*, \$table->[\@\$table-1], undef unless \$entry->\@*;
+
+      # Copy to output
+      push \@output, \$entry->@*;
     return \@output;
     }
 	} ';

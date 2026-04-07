@@ -1,0 +1,59 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+Z|SYSOP MANUAL|CYAN|Go Back To The Table of Contents
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% RED         %] ____  ____ ____    _   _       _                          _ [% RESET %] [% BRIGHT CYAN %] __  __                         _ [% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% YELLOW      %]| __ )| __ ) ___|  | | | |_ __ (_)_   _____ _ __ ___  __ _| |[% RESET %] [% BRIGHT CYAN %]|  \/  | __ _ _ __  _   _  __ _| |[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% GREEN       %]|  _ \|  _ \___ \  | | | | '_ \| \ \ / / _ \ '__/ __|/ _` | |[% RESET %] [% BRIGHT CYAN %]| |\/| |/ _` | '_ \| | | |/ _` | |[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% MAGENTA     %]| |_) | |_) |__) | | |_| | | | | |\ V /  __/ |  \__ \ (_| | |[% RESET %] [% BRIGHT CYAN %]| |  | | (_| | | | | |_| | (_| | |[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% BRIGHT BLUE %]|____/|____/____/   \___/|_| |_|_| \_/ \___|_|  |___/\__,_|_|[% RESET %] [% BRIGHT CYAN %]|_|  |_|\__,_|_| |_|\__,_|\__,_|_|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+
+[% HORIZONTAL RULE CYAN %][% BOLD %][% B_CYAN %][% BLACK %] MENUS[% RESET %]
+
+BBS::Universal uses a specialized menu file format.  Each file is divided into two sections separated by a line with "---" by itseld.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] TEXT MODES [% RESET %][% YELLOW %]🭬[% RESET %]
+
+The BBS can operate in three different text modes:
+
+ * [% BOLD %]ASCII[% RESET %] - Plain text mode
+ * [% BOLD %]ATASCII[% RESET %] - Atari 8 bit text mode
+ * [% BOLD %]ANSII[% RESET %] - ANSI color and graphics characters mode.  It can support 16 color, 256 color and 24 bit color codes.
+ * [% BOLD %]PETSCII[% RESET %] - Commodore 8 bit color and graphics characters mode.
+
+There is a menu file for each text mode.  The body name is the same for all modes, but the file extension is the name of the text mode.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] MENU SETUP [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Each menu entry requires the following on a single line per entry, each variable separated by the pipe character "|"
+
+ * [% BOLD %]Key[% RESET %]
+ * [% BOLD %]Command Token[% RESET %]
+ * [% BOLD %]Color[% RESET %]
+ * [% BOLD %]Access Level[% RESET %] (Only for user menus)
+ * [% BOLD %]Description[% RESET %]
+
+All menu entries are sorted alphabetically by Key.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] MENU BODY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+You can place any text and tokens (even raw codes) you want in this section.
+
+[% BOLD %][% B_YELLOW %][% BLACK %] EXAMPLE  [% RESET %][% YELLOW %]🭬[% RESET %]
+
+ * files/main/menu.ASCII
+
+B|BBS LISTING|BLUE|VETERAN|Show BBS List
+O|FORUMS|WHITE|USER|Go To Forums
+M|ACCOUNT MANAGER|WHITE|USER|Manage Your Account
+F|FILES|WHITE|USER|Go To Files
+N|NEWS|WHITE|USER|System News
+A|ABOUT|WHITE|USER|About This BBS
+U|LIST USERS|BRIGHT WHITE|VETERAN|List Users
+X|DISCONNECT|WHITE|USER|Disconnect
+---
+  __  __
+ |  \/  |___ _ _ _  _
+ | |\/| / -_) ' \ || |
+ |_|  |_\___|_||_\_,_|

@@ -1,0 +1,8 @@
+Revision history for Heap-PQ
+
+0.02  2026-04-07
+      - Optimise the comparison function to be MULTICALL and use $a/$b instead of @_
+      - Extend to be able to pass a key into the comparison function to stay within C where possible, removing the perl callback overhead entirely
+
+0.01  2026-04-06
+      - Initial release, ported from Ancient distribution.

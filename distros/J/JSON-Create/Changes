@@ -1,3 +1,7 @@
+0.36 2026-04-07
+
+* Unsigned integers bug fixed
+
 0.35 2021-07-16
 
 * Fix a problem with blessed values (blessed numbers have quotes added)

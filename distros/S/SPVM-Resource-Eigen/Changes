@@ -1,3 +1,8 @@
+0.005 2026-04-07
+  [Requirement Changes]
+    * Require SPVM 0.990155.
+  [Internal Changes]
+    * Clean up configs by removing redundant link flags and boilerplate as the SPVM core now handles them.
 0.004 2025-01-28
   [Requirement Changes]
     * Require SPVM 0.990042.

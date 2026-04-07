@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 =pod
 
@@ -44,8 +44,8 @@ Then add hooks/run-git-hooks to override the default behavior:
   vi project/hooks/run-git-hooks
   chmod 755 project/hooks/run-git-hooks
 
-If hooks/run-git-hooks exists from within the repository being targeted,
-then this will run with the correct GIT_DIR
+If hooks/run-git-hooks exists from within the targetted repository's
+hooksPath, then this will run with the correct GIT_DIR
 and any other ENV settings defined in authorized_keys.
 If it doesn't exist, then it will look for a way to use
 these git-server hooks with this project.
@@ -73,29 +73,25 @@ use warnings;
 use Cwd qw(abs_path);
 use FindBin qw($Bin);
 
-our $VERSION = "0.039";
+our $VERSION = "0.040";
 
 $SIG{PIPE} = sub { exit 1; };
 my $cmd = $ENV{SSH_ORIGINAL_COMMAND} ||= # Standard Method from ~/.ssh/authorized_keys: command="git-server REMOTE_USER=user1" # i.e., "git-upload-pack 'project'"
     @ARGV == 2 && $ARGV[0] eq "-c" && shift && shift || ""; # Advanced Method from /etc/passwd SHELL
 
 while (my $pair = shift) {
-    if ($pair =~ /^(\w+)=(.*)$/) {
-        $ENV{$1} = $2;
-    }
-    else {
-        die "Invalid ENV setting [$pair]\n";
-    }
+    $pair =~ /^(\w+)=(.*)$/ or die "Invalid ENV setting [$pair]\n";
+    $ENV{$1} = $2;
 }
 
 $ENV{REMOTE_USER} ||= $ENV{KEY} || "";
 $ENV{SSH_CONNECTION} ||= "";
 ($ENV{REMOTE_ADDR}, $ENV{REMOTE_PORT}, $ENV{SERVER_ADDR}, $ENV{SERVER_PORT}) = split / /, $ENV{SSH_CONNECTION};
 if (!$ENV{REMOTE_PORT} || !$ENV{SERVER_ADDR} || !$ENV{SERVER_PORT}
-    || $cmd =~ m{(^|/)(git-|)verify}
+    || $cmd =~ m{/git-verify\b}
     || !$ENV{REMOTE_ADDR} || $ENV{REMOTE_ADDR} !~ /^([\da-f\.:]+)$/) {
     (my $v = $0) =~ s{-[^/]+$}{-verify};
-    exec $v or die "Verification failed\n";
+    exec $v or die "git-verify: Verification failed\n";
 }
 $ENV{REMOTE_ADDR} = $1; # Taint cleaner
 $ENV{REMOTE_USER} ||= "MISCONFIGURED_REMOTE_USER";
@@ -107,34 +103,22 @@ my $dir = undef;
 if ($cmd =~ /^(git-[\w\-]+) (.+)$/) {
     my $op = $1;
     my $repo = $2;
-    if ($repo =~ /^'(.+)'$/) {
-        $repo = $1;
-        $repo =~ s/\'\\\'\'/\'/g;
-    }
-    $repo =~ s/\.git$//;
-    $repo =~ s/\/+$//;
-    my $home = $ENV{HOME} || (getpwuid $<)[7];
+    $repo = $1, $repo =~ s/'\\''/'/g if $repo =~ /^'(.+)'$/;
+    $repo =~ s%(\.git|/)+$%%;
+    my $home = $ENV{HOME} ||= (getpwuid $<)[7];
     foreach my $try ("$repo.git/.git", "$repo.git", "$repo/.git", $repo) {
-        if (-d $try) {
-            $dir = $try;
-            $ENV{GIT_DIR} = abs_path $dir;
-            last;
-        }
-        if ($try =~ s{^/+}{} and -d $try) {
-            $dir = $try;
-            $ENV{GIT_DIR} = abs_path $dir;
-            last;
-        }
-        if ($try =~ s{^~/}{$home/} and -d $try) {
+        if (-d $try or $try =~ s{^/+}{} && -d $try or $try =~ s{^~/}{$home/} && -d $try) {
             $dir = $try;
             $ENV{GIT_DIR} = abs_path $dir;
             last;
         }
     }
-    # Make sure this looks like a real life sane enough git repo
+    # Repository sanity check:
     die localtime().": [$who] git-server: You can't access '$repo' git repository\n" unless $dir && -f "$dir/config" && -d "$dir/refs" && -d "$dir/objects";
+
+    # To avoid "fatal: bad argument" crash, git-shell mandates that repo dir be shell-escaped with single quotes even if it seems like it's not needed. i.e., "git-upload-pack 'project'"
     my $escape_dir = $ENV{GIT_DIR};
-    $escape_dir =~ s/\'/\'\\'\'/g;
+    $escape_dir =~ s/'/'\\''/g;
     $escape_dir = "'$escape_dir'";
     $cmd = "$op $escape_dir";
 }
@@ -143,7 +127,16 @@ else {
 }
 
 # Hand off request to the best handler
-my $handler =
-    -x "$ENV{GIT_DIR}/hooks/run-git-hooks" ? "$ENV{GIT_DIR}/hooks/run-git-hooks" :
-    -x "$Bin/hooks/run-git-hooks" ? "$Bin/hooks/run-git-hooks" : "git-shell";
-exec $handler, "-c", $cmd;
+my @handler = ("$ENV{GIT_DIR}/hooks/run-git-hooks", "$Bin/hooks/run-git-hooks", "git-shell");
+if (`git rev-parse --path-format=absolute --git-path hooks 2>/dev/null` =~ m{^(/.+)$}) {
+    unshift @handler, "$1/run-git-hooks";
+}
+# Handle crusty old git versions that don't support "--git-path"
+elsif (my $hooksdir = `git config core.hooksPath`) {
+    chomp($hooksdir);
+    $hooksdir = "$ENV{GIT_DIR}/$hooksdir" if $hooksdir !~ m{^/};
+    $hooksdir = abs_path $hooksdir;
+    unshift @handler, "$hooksdir/run-git-hooks";
+}
+-x || /^\w/ and exec $_, "-c", $cmd foreach @handler;
+die localtime().": [$who] git-server: Failed to spawn handler $!\n";

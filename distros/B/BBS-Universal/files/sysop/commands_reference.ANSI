@@ -1,0 +1,17 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+S|SYSOP COMMANDS REFERENCE SYSOP|YELLOW|SysOp Tokens
+U|SYSOP COMMANDS REFERENCE USER|CYAN|User Mode Tokens
+V|SYSOP COMMANDS REFERENCE ANSI|PINK|ANSI Tokens
+A|SYSOP COMMANDS REFERENCE ASCII|BRIGHT WHITE|ASCII Tokens
+T|SYSOP COMMANDS REFERENCE ATASCII|BRIGHT BLUE|ATASCII Tokens
+P|SYSOP COMMANDS REFERENCE PETSCII|MAGENTA|PETSCII Tokens
+Z|BACK|WHITE|Return To System Menu
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% COLOR 202 %]    ____                                          _       ____       __[% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% COLOR 202 %]  / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |___  |  _ \ ___ / _| ___ _ __ ___ _ __   ___ ___[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% COLOR 202 %]| |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __| | |_) / _ \ |_ / _ \ '__/ _ \ '_ \ / __/ _ \[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% COLOR 202 %]| |__| (_) | | | | | | | | | | | (_| | | | | (_| \__ \ |  _ <  __/  _|  __/ | |  __/ | | | (_|  __/[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% COLOR 202 %] \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/ |_| \_\___|_|  \___|_|  \___|_| |_|\___\___|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+

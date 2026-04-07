@@ -322,11 +322,11 @@ Net::CalDAVTalk - Module to talk CalDAV and give a JSON interface to the data
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 =head1 SYNOPSIS

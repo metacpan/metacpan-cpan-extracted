@@ -1,0 +1,70 @@
+{
+   "abstract" : "Asynchronous redis client using hiredis and EV",
+   "author" : [
+      "Daisuke Murase (typester)",
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "EV-Redis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "xt",
+         "deps",
+         "src"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "EV::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Which" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "EV" : "4.11",
+            "XSLoader" : "0.02",
+            "perl" : "5.012000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Refcount" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.98",
+            "Test::RedisServer" : "0.12",
+            "Test::TCP" : "1.18"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-ev-redis/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-ev-redis.git",
+         "web" : "https://github.com/vividsnow/perl5-ev-redis"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

@@ -52,7 +52,7 @@
    "provides" : {
       "App::CdUtils" : {
          "file" : "lib/App/CdUtils.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-App-CdUtils"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

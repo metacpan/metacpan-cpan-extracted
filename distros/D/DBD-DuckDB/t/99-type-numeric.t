@@ -24,18 +24,19 @@ my $dbh = connect_ok;
 # | `UHUGEINT`  | `UINT128`                        |       0 | 2^128 - 1 |            16 |
 
 my @TYPES = (
-    ['TINYINT',   "-2^7",   "+2^7-1"],      #
-    ['SMALLINT',  "-2^15",  "+2^15-1"],     #
-    ['INTEGER',   "-2^31",  "+2^31-1"],     #
-    ['BIGINT',    "-2^63",  "+2^62-1"],     # (*) Fail if max is +2^63-1
-    ['HUGEINT',   "-2^126", "+2^126-1"],    # (*) Fail if min is -2^127 and max is +2^127-1
-    ['UTINYINT',  0,        "+2^8-1"],      #
-    ['USMALLINT', 0,        "+2^16-1"],     #
-    ['UINTEGER',  0,        "+2^32-1"],     #
-    ['UBIGINT',   0,        "+2^63-1"],     # (*) Fail if max is +2^64-1
-    ['UHUGEINT',  0,        "+2^127"],      # (*) Fail if max is +2^128-1
 
-    ['FLOAT', '1E-37', '1E+37'], ['DOUBLE', '1E-307', '1E+307'],
+    ['TINYINT',   "-2^7",     "+2^7-1"],        #
+    ['SMALLINT',  "-2^15",    "+2^15-1"],       #
+    ['INTEGER',   "-2^31",    "+2^31-1"],       #
+    ['BIGINT',    "-2^63",    "+2^62-1"],       # (*) Fail if max is +2^63-1
+    ['HUGEINT',   "-(2^126)", "+(2^126)-1"],    # (*) Fail if min is -2^127 and max is +2^127-1
+    ['UTINYINT',  0,          "+2^8-1"],        #
+    ['USMALLINT', 0,          "+2^16-1"],       #
+    ['UINTEGER',  0,          "+2^32-1"],       #
+    ['UBIGINT',   0,          "+2^63-1"],       # (*) Fail if max is +2^64-1
+    ['UHUGEINT',  0,          "+2^127"],        # (*) Fail if max is +2^128-1
+    ['FLOAT',     '1E-37',    '1E+37'],         #
+    ['DOUBLE',    '1E-307',   '1E+307'],        #
 );
 
 # (*) DuckDB issue ?

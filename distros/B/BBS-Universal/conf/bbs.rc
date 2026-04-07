@@ -1,0 +1,12 @@
+# Minimum Configuration for BBS Universal.  Only Database info goes here.
+# The rest resides in the Database.  Comments and empty lines are ignored
+# Make this file belong only to you via "chmod 600".
+
+# Change the username and password to whatever you set your account to.
+
+DATABASE NAME     = BBSUniversal
+DATABASE TYPE     = mysql
+DATABASE USERNAME = bbssystem
+DATABASE PASSWORD = bbspass
+DATABASE HOSTNAME = localhost
+DATABASE PORT     = 3306

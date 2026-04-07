@@ -1,6 +1,6 @@
 package Net::Async::NATS::Subscription;
 # ABSTRACT: Represents a NATS subscription
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ Net::Async::NATS::Subscription - Represents a NATS subscription
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -95,7 +95,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

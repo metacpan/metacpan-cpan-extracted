@@ -19,7 +19,7 @@ unless ($meta) {
 }
 
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990143');
+my %configure_and_runtime_requires = ('SPVM' => '0.990155');
 WriteMakefile(
   NAME              => 'SPVM::Thread',
   VERSION_FROM      => 'lib/SPVM/Thread.pm',

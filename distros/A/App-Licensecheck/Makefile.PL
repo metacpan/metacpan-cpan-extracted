@@ -38,7 +38,7 @@ my $meta = {
                                 "Pod::Usage"                => "1.60",
                                 "String::Copyright"         => 0.003,
                                 "String::Escape"            => 0,
-                                "String::License"           => 0,
+                                "String::License"           => "v0.0.6",
                               },
                             },
                             test => {
@@ -56,7 +56,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.3.9" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.3.10" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -71,7 +71,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.3.9",
+  "version"            => "v3.3.10",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
   "x_help_wanted"      => ["documenter", "tester"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },

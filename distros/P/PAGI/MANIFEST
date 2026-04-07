@@ -119,6 +119,10 @@ lib/PAGI/App/WebSocket/Chat.pm
 lib/PAGI/App/WebSocket/Echo.pm
 lib/PAGI/App/WrapCGI.pm
 lib/PAGI/App/WrapPSGI.pm
+lib/PAGI/Context.pm
+lib/PAGI/Context/HTTP.pm
+lib/PAGI/Context/SSE.pm
+lib/PAGI/Context/WebSocket.pm
 lib/PAGI/Cookbook.pod
 lib/PAGI/Endpoint/HTTP.pm
 lib/PAGI/Endpoint/Router.pm
@@ -189,6 +193,7 @@ lib/PAGI/Spec.pod
 lib/PAGI/Spec/Lifespan.pod
 lib/PAGI/Spec/Tls.pod
 lib/PAGI/Spec/Www.pod
+lib/PAGI/Stash.pm
 lib/PAGI/Test/Client.pm
 lib/PAGI/Test/Response.pm
 lib/PAGI/Test/SSE.pm
@@ -265,6 +270,13 @@ t/certs/client.csr
 t/certs/client.key
 t/certs/server.crt
 t/certs/server.key
+t/context/01-factory.t
+t/context/02-shared.t
+t/context/03-http.t
+t/context/04-websocket.t
+t/context/05-sse.t
+t/context/06-extension.t
+t/context/07-router.t
 t/endpoint-router.t
 t/endpoint/01-http-constructor.t
 t/endpoint/02-http-dispatch.t
@@ -370,6 +382,7 @@ t/sse/09-iteration.t
 t/sse/10-integration.t
 t/sse/11-wire-format.t
 t/sse/12-format-helpers.t
+t/stash.t
 t/static_test_files/app.js
 t/static_test_files/hello.txt
 t/static_test_files/index.html

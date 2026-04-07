@@ -208,8 +208,8 @@ int xs_jit_is_cached(pTHX_ const char *code, const char *name,
         return 0;
     }
 
-    struct stat st;
-    return stat(path, &st) == 0;
+    Stat_t st;
+    return PerlLIO_stat(path, &st) == 0;
 }
 
 /* Generate XS wrapper/alias for a single function */
@@ -593,9 +593,12 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     const char *inc_flag = "-I";
 #endif
 
+    /* Ensure C99 mode for for-loop variable declarations; skip if ccflags already sets -std= */
+    const char *std_flag = (strstr(ccflags, "-std=") == NULL) ? "-std=gnu99" : "";
+
     /* Compile to object with optimization and extra cflags */
-    snprintf(cmd, sizeof(cmd), "%s %s %s %s %s -c -o \"%s\" %s \"%s/CORE\" \"%s\" 2>&1",
-             cc, ccflags, optimize, cccdlflags, extra_cflags, o_file, inc_flag, archlib, c_file);
+    snprintf(cmd, sizeof(cmd), "%s %s %s %s %s %s -c -o \"%s\" %s \"%s/CORE\" \"%s\" 2>&1",
+             cc, ccflags, std_flag, optimize, cccdlflags, extra_cflags, o_file, inc_flag, archlib, c_file);
 
     ret = system(cmd);
     if (ret != 0) {
@@ -627,11 +630,17 @@ int xs_jit_load(pTHX_ const char *module_name, const char *so_file) {
 
     /* Resolve to absolute path - macOS hardened runtime rejects relative paths in dlopen */
     char abs_so_file[MAX_PATH_LEN];
+#ifdef WIN32
+    if (_fullpath(abs_so_file, so_file, MAX_PATH_LEN)) {
+        so_file = abs_so_file;
+    }
+#else
     if (so_file[0] != '/') {
         if (realpath(so_file, abs_so_file)) {
             so_file = abs_so_file;
         }
     }
+#endif
 
     ENTER;
     SAVETMPS;
@@ -819,8 +828,8 @@ int xs_jit_compile(pTHX_ const char *code, const char *name,
 
     /* Check cache unless force */
     if (!force) {
-        struct stat st;
-        if (stat(so_path, &st) == 0) {
+        Stat_t st;
+        if (PerlLIO_stat(so_path, &st) == 0) {
             /* Cached - just load */
             return xs_jit_load(aTHX_ name, so_path);
         }

@@ -1,0 +1,14 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+S|NEWS SUMMARY|GREEN|USER|List System News Summary
+D|NEWS DISPLAY|MAGENTA|USER|Show System News in Detail
+C|RSS CATEGORIES|BRIGHT YELLOW|USER|World News Feed Categories
+W|RSS FEEDS|BRIGHT BLUE|USER|World News Feeds
+Z|BACK|CYAN|USER|Return to the Main Menu
+---
+  NN N NN    _  _
+  NN N NN   | \| |_____ __ _____
+ NNN N NNN  | .` / -_) V  V (_-<
+NNN  N  NNN |_|\_\___|\_/\_//__/
+
+World Feed Category:  [% RSS CATEGORY %]

@@ -2,8 +2,8 @@ NAME
     App::CdUtils - CLI utilities related to changing directories
 
 VERSION
-    This document describes version 0.014 of App::CdUtils (from Perl
-    distribution App-CdUtils), released on 2026-04-04.
+    This document describes version 0.015 of App::CdUtils (from Perl
+    distribution App-CdUtils), released on 2026-04-07.
 
 DESCRIPTION
     This distribution contains the following utilities:

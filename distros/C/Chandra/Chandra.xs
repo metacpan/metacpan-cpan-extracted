@@ -16,14 +16,17 @@
 #include "include/chandra/chandra_devtools.h"
 #include "include/chandra/chandra_internal.h"
 #include "include/chandra/chandra_socket_common.h"
+#include "include/chandra/chandra_socket_token.h"
 #include "include/chandra/chandra_socket_hub.h"
 #include "include/chandra/chandra_socket_client.h"
 #include "include/chandra/chandra_notify.h"
 #include "include/chandra/chandra_store.h"
+#include "include/chandra/chandra_log.h"
 #include "include/chandra/chandra_assets.h"
 #include "include/chandra/chandra_clipboard.h"
 #include "include/chandra/chandra_contextmenu.h"
 #include "include/chandra/chandra_window.h"
+#include "include/chandra/chandra_splash.h"
 
 /* Window registry - maps native wid to Perl SV* objects */
 static HV *_window_registry = NULL;
@@ -83,6 +86,7 @@ INCLUDE: xs/protocol.xs
 INCLUDE: xs/shortcut.xs
 
 INCLUDE: xs/socket_connection.xs
+INCLUDE: xs/socket_token.xs
 INCLUDE: xs/socket_hub.xs
 INCLUDE: xs/socket_client.xs
 
@@ -93,4 +97,6 @@ INCLUDE: xs/clipboard.xs
 INCLUDE: xs/dragdrop.xs
 INCLUDE: xs/contextmenu.xs
 INCLUDE: xs/store.xs
+INCLUDE: xs/log.xs
 INCLUDE: xs/window.xs
+INCLUDE: xs/splash.xs

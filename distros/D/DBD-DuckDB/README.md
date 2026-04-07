@@ -28,13 +28,13 @@ consult the **DBI** documentation first!
 # SETUP
 
 To use [DBD::DuckDB](https://metacpan.org/pod/DBD%3A%3ADuckDB), the native DuckDB library must be available when the
-module is loaded.  There are two common ways to satisfy this requirement.
+module is loaded. There are two common ways to satisfy this requirement.
 
 ## Manual installation
 
 - Download the library
 
-        $ wget https://github.com/duckdb/duckdb/releases/download/v$VERSION/libduckdb-linux-amd64.zip
+        $ wget https://github.com/duckdb/duckdb/releases/download/v$DUCKDB_VERSION/libduckdb-linux-amd64.zip
         $ unzip duckdb-linux-amd64.zip
         $ sudo cp libduckdb.so /usr/lib64/          # or another system library directory
 
@@ -68,6 +68,11 @@ installs the native DuckDB C library for the current platform.
     No environment variables or manual copying of \*.so files are needed;
     when you `use DBD::DuckDB`, the module calls
     `Alien::DuckDB->dynamic_lib` to obtain the correct library path.
+
+If both [Alien::DuckDB](https://metacpan.org/pod/Alien%3A%3ADuckDB) and `libduckdb.so` are present in the system, [FFI::CheckLib](https://metacpan.org/pod/FFI%3A%3ACheckLib)
+will always load [Alien::DuckDB](https://metacpan.org/pod/Alien%3A%3ADuckDB).
+
+If you want to avoid this, you can export the variable [DUCKDB\_NO\_ALIEN=1](https://metacpan.org/pod/DUCKDB_NO_ALIEN%3D1).
 
 # THE DBI CLASS
 

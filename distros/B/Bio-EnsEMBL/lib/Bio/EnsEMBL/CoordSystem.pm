@@ -1,7 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-Copyright [2016-2024] EMBL-European Bioinformatics Institute
+See the NOTICE file distributed with this work for additional information
+regarding copyright ownership.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ use strict;
 use warnings;
 
 package Bio::EnsEMBL::CoordSystem;
-$Bio::EnsEMBL::CoordSystem::VERSION = '113.0.0';
+$Bio::EnsEMBL::CoordSystem::VERSION = '114.0.0';
 use Bio::EnsEMBL::Storable;
 
 use Bio::EnsEMBL::Utils::Argument  qw(rearrange);

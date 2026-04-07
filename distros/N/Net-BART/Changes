@@ -1,0 +1,8 @@
+Revision history for Net-BART
+
+0.01  2026-04-06
+    - Initial release
+    - Net::BART: pure Perl implementation of BART (Balanced Routing Tables)
+    - Net::BART::XS: C/XS implementation for maximum performance
+    - IPv4 and IPv6 support
+    - Operations: insert, delete, lookup (LPM), get (exact match), contains, walk

@@ -32,12 +32,15 @@ Files: Changes
  META.json
  META.yml
  bin/licensecheck
- dist.ini
  doap.ttl
  lib/App/Licensecheck.pm
  t/20-script-encoding.t
  t/20-script-report.t
  t/20-script-resolve.t
+Copyright: Copyright 2026 Jonas Smedegaard.
+License: AGPL_3
+
+Files: dist.ini
  t/devscripts.t
  t/lib/Test2/Require/WorkingUtf8.pm
  t/reading.t
@@ -59,28 +62,28 @@ Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: AGPL_3
- This software is Copyright (c) 2023 by Jonas Smedegaard.
+ This software is Copyright (c) 2026 by Jonas Smedegaard.
  
  This is free software, licensed under:
  
    The GNU Affero General Public License, Version 3, November 2007
 
 License: Artistic-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2026 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2026 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 1, February 1989
 
 License: Artistic-2.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2026 by the copyright holder(s).
  
  This is free software, licensed under:
  

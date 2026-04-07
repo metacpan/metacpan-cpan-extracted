@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 =pod
 
@@ -55,6 +55,7 @@ foreach my $lock_file (glob "$lock_dir/*.lock") {
             }
             if (kill 0, $worker and kill 9, $sleeper) {
                 warn localtime().": [$who] git-server: Sending push notification to $lockid ...\n";
+                sleep 1;
             }
             elsif (!kill 0, $worker and !kill 0, $sleeper and -M $lock_file > 2) {
                 warn localtime().": [$who] git-server: Clearing stale push notification on $lockid from ".(-M $lock_file)." days ago ...\n";

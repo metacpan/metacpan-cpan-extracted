@@ -15,6 +15,15 @@ ok $dbh->do(q{INSERT INTO array_table VALUES (10, [1, 2, 3]), (20, [4, 5, 6])}) 
 
 SCOPE: {
 
+    my $sth = $dbh->prepare('INSERT INTO array_table VALUES(?, ?)');
+    $sth->execute(30, [7, 8, 9]);
+
+    ok !$dbh->errstr, 'Bind ARRAY';
+
+}
+
+SCOPE: {
+
     my $sth = $dbh->prepare('SELECT * FROM array_table WHERE id = ?');
     $sth->execute(10);
 
@@ -30,6 +39,16 @@ SCOPE: {
 
     my $row = $sth->fetchrow_hashref;
     is_deeply($row->{arr}, [4, 5, 6]);
+
+}
+
+SCOPE: {
+
+    my $sth = $dbh->prepare('SELECT * FROM array_table WHERE id = $1');
+    $sth->execute(30);
+
+    my $row = $sth->fetchrow_hashref;
+    is_deeply($row->{arr}, [7, 8, 9]);
 
 }
 

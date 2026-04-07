@@ -1,3 +1,6 @@
+0.010 2026-04-07
+  [Internal Changes]
+    * Clean up config.
 0.009 2026-03-10
   [Internal Changes]
     * Use native types in all places.

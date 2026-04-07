@@ -1,0 +1,12 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+A|BBS LIST ADD|YELLOW|VETERAN|Add a BBS Entry
+L|SHOW FULL BBS LIST|BRIGHT BLUE|USER|Show Full BBS List
+S|SEARCH BBS LIST|CYAN|USER|Search For One or More BBS'
+Z|BACK|WHITE|USER|Return to the Main Menu
+---
+ ___ ___ ___   _    _    _   _ 
+| _ ) _ ) __| | |  (_)__| |_(_)_ _  __ _
+| _ \ _ \__ \ | |__| (_-<  _| | ' \/ _` |
+|___/___/___/ |____|_/__/\__|_|_||_\__, |
+                                   |___/

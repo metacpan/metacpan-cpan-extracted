@@ -543,6 +543,14 @@ WEBVIEW_API void webview_set_title(struct webview *w, const char *title) {
   SetWindowTextA(w->priv.hwnd, title);
 }
 
+WEBVIEW_API void webview_set_size(struct webview *w, int width, int height) {
+  RECT rc;
+  GetWindowRect(w->priv.hwnd, &rc);
+  MoveWindow(w->priv.hwnd, rc.left, rc.top, width, height, TRUE);
+  w->width = width;
+  w->height = height;
+}
+
 WEBVIEW_API void webview_set_fullscreen(struct webview *w, int fullscreen) {
   if (w->priv.is_fullscreen == (BOOL)fullscreen) return;
   w->priv.is_fullscreen = fullscreen;

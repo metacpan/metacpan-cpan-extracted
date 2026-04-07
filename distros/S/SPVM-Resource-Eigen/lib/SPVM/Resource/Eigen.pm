@@ -1,6 +1,6 @@
 package SPVM::Resource::Eigen;
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 1;
 
@@ -16,16 +16,9 @@ Resource::Eigen in L<SPVM> is a L<resouce|SPVM::Document::Resource> for L<C++ Ei
 
 MyClass.config:
   
-  my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
+  my $config = SPVM::Builder::Config->new_cpp17;
   
   $config->use_resource('Resource::Eigen');
-  
-  if ($^O eq 'MSWin32') {
-    $config->add_static_lib('stdc++');
-  }
-  else {
-    $config->add_lib('stdc++');
-  }
   
   $config;
 
@@ -59,27 +52,9 @@ L<Eigen|https://eigen.tuxfamily.org/index.php>
 
 C++
 
-=head1 Language Specification
+=head1 Language Standard
 
 C++17
-
-=head1 Required Libraries
-
-Windows:
-
-=over 2
-
-=item * stdc++ (The static link is preffered)
-
-=back
-
-Unix/Linux/Mac:
-
-=over 2
-
-=item * stdc++
-
-=back
 
 =head1 Header Files
 

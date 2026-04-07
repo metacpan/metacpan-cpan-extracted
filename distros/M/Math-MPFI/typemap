@@ -1,20 +1,11 @@
-mpq_t *		MPQ
-mpz_t *		MPZ
-mpf_t * 	MPF
-mpfr_t *	MPFR
-mpfi_t *	MPFI
-gmp_randstate_t *		GMP_RANDSTATE
+mpq_t *            GMP_PTR
+mpz_t *            GMP_PTR
+mpf_t *            GMP_PTR
+mpc_t *            GMP_PTR
+mpfi_t *           GMP_PTR
+mpfr_t *           GMP_PTR
+gmp_randstate_t *   GMP_PTR
 
 INPUT
-MPQ
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPZ
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPF
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPFR
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPFI
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-GMP_RANDSTATE
+GMP_PTR
             $var = INT2PTR($type, SvIVX(SvRV($arg)))

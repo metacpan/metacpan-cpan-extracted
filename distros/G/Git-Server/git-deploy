@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 =pod
 
@@ -23,6 +23,7 @@ instantly after a push is triggered.
     [ --fix-nasty ]
     [ --background ]
     [ --max-delay <seconds> ]
+    [ { --identity | -i } <identitykeyfile> ]
     [ { -v | --version } ]
 
 =head2 --branch <branch>
@@ -39,6 +40,8 @@ By default, the current branch is used.
 =head2 --chdir <dir>
 
 Jump to <dir> prior to running "git pull".
+If this option is used multiple times,
+then it will chdir in the order speficied.
 By default, the current directory is used.
 
   Example: git deploy --chdir ~/projectx
@@ -107,6 +110,14 @@ interval between 5 and 7 minutes.
 
   Example: git deploy --max-delay 10
 
+=head2 --identity <identitykeyfile>
+
+Specify identity keyfile to be used for SSH repos.
+
+  Example: git-deploy -i ~/.ssh/id_ed25519-repodeploy
+
+  sshCommand = ssh -i ~/.ssh/id_ed25519-repodeploykey -o IdentitiesOnly=yes
+
 =head2 --version
 
 Show git-deploy version.
@@ -143,10 +154,11 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.039";
+our $VERSION = "0.040";
 
 my @invoked = ($0, @ARGV);
 my %initial_ENV = %ENV;
+my $origin = "";
 my $cwd = getcwd();
 my $opts = [];
 my $build = undef;
@@ -155,8 +167,11 @@ my $chdir = [];
 my $umask = undef;
 my $fix_nasty = undef;
 my $background = undef;
-my $maxpatience = undef;
+our $maxpatience = undef;
+my $identities = [];
 my $ver = undef;
+my $deploying_version = 0;
+my $maxdelayrecommended = 0;
 Getopt::Long::Configure("no_ignore_case");
 GetOptions
     "O|o=s@" => $opts,
@@ -168,6 +183,7 @@ GetOptions
     "fix-nasty" => \$fix_nasty,
     "background" => \$background,
     "max-delay=i" => \$maxpatience,
+    "identity|i=s@" => $identities,
     or exec perldoc => $0;
 
 if ($ver) {
@@ -214,6 +230,11 @@ sub rebuild {
     }
 }
 
+sub current_origin {
+    (my $r = run_output_ignore_err qw(git remote)) =~ s/\n.*$//s;
+    return $r || "origin";
+}
+
 sub current_branch {
     my $scan = run_output_ignore_err qw(git branch -a);
     return $1 if $scan =~ m{^\* ([\w/\-.@]+)}m;
@@ -221,7 +242,7 @@ sub current_branch {
         $scan = run_output_ignore_err("git", "branch", "-a", "--contains", $1).$scan;
     }
     return $1 if $scan =~ m{^\s+([\w/\-.@]+)}m;
-    die localtime().": [$$] Unable to determine which branch to deploy.\n$scan\n";
+    die localtime().": [$$] $Script: Unable to determine which branch to deploy.\n$scan\n";
 }
 
 # checkout_branch()
@@ -242,7 +263,12 @@ sub pull_push_notification {
         ($initial_ENV{XMODIFIERS} ? ($initial_ENV{XMODIFIERS}) : ()),
         ;
     # Generate GIT_SSH_COMMAND to ensure XMODIFIERS is provided to the git server:
-    $ENV{GIT_SSH_COMMAND} = ($initial_ENV{GIT_SSH_COMMAND} || "ssh")." -o SendEnv=XMODIFIERS";
+    $ENV{GIT_SSH_COMMAND} = ($initial_ENV{GIT_SSH_COMMAND} || (run_output_include_err(qw[git config core.sshCommand]) =~ /^(.+)/ ? $1 : "ssh"))." -o SendEnv=XMODIFIERS";
+    if (@$identities) {
+        # Inject --identity files into GIT_SSH_COMMAND:
+        $ENV{GIT_SSH_COMMAND} .= " -o IdentitiesOnly=yes";
+        $ENV{GIT_SSH_COMMAND} .= " -i $_" foreach @$identities;
+    }
     $0 = "$Script - $cwd: Waiting for push notification [$deploy_branch]";
     # Run "fetch" to call "git-upload-pack" causing the git-server to wait for the "push_notification" to release the update:
     return run_output_include_err(qw[git fetch]);
@@ -269,14 +295,48 @@ if (@$chdir) {
 
 $ENV{GIT_DIR} ||= abs_path(`git rev-parse --git-dir 2>/dev/null` =~ /^(.+)/ && $1 || ".git");
 
-if ($umask and $umask =~ /^(\d+)$/) {
-    umask oct $1;
+umask oct $1 if $umask and $umask =~ /^(\d+)$/;
+
+if (@$identities) {
+    # Sanity check to verify identity files are ready to go.
+    foreach (@$identities) {
+        s/\.pub$//;
+        -e && -r _ && -s _ or die "$Script: --identity $_: Unable to find key\n";
+        my $pub = run_output_ignore_err "ssh-keygen", "-y", "-P", "", "-f", $_;
+        if ($pub) {
+            warn localtime().": [$$] $Script: Using identity: $pub";
+        }
+        else {
+            die localtime().": [$$] $Script: Unable to read identity file without using a passphrase: $_\n";
+        }
+    }
 }
 
+$origin = current_origin();
 $0 = "$Script - $cwd: Initial checkout [".checkout_branch()."]";
 run_output_ignore_err "git", "checkout", checkout_branch;
 sleep 1;
 rebuild;
+
+if (!$maxpatience) {
+    $0 = "$Script - $cwd: Searching for other deployers ...";
+    if (getps =~ /(.*\Q$Script - $cwd\E: Waiting.*)/) {
+        my $found = $1;
+        my $stagger = 5+int(rand()*115);
+        $0 = "$Script - $cwd: Waiting $stagger seconds for random stagger ...";
+        warn localtime().": [$$] $Script: Since no --max-delay option was provided, waiting $stagger seconds random stagger delay before taking over for other deployer:\n$found\n";
+        print run_output_include_err(sleep => $stagger);
+    }
+}
+
+if (sleep 1) {
+    # Run quick pre-flight sanity test before entering loop
+    local $maxpatience = 1;
+    my $update = pull_push_notification;
+    $0 = "$Script - $cwd: Scanning updates";
+    die localtime().": [$$] $Script: Fatal crash while attempting to pull from ".run_output_ignore_err("git","config","remote.$origin.url")."\n$update\n\n".localtime().": [$$] $Script: Manual intervention required.\n" if $update =~ /^fatal:/m;
+}
+
 if ($background) {
     exit if fork;
     require POSIX;
@@ -286,31 +346,22 @@ if ($background) {
     open STDERR, ">", "/dev/null";
 }
 
-if (!$maxpatience) {
-    $0 = "$Script - $cwd: Searching for other deployers ...";
-    if (getps =~ /(.*\Q$Script - $cwd\E: Waiting.*)/) {
-        my $found = $1;
-        my $stagger = 5+int(rand()*115);
-        $0 = "$Script - $cwd: Waiting $stagger seconds for random stagger ...";
-        warn localtime().": [$$] Waiting random stagger delay $stagger secconds before taking over for other deployer:\n$found\n";
-        print run_output_include_err(sleep => $stagger);
-    }
-}
+sleep 1;
 
-my $deploying_version = 0;
 while (1) {
     my $update = pull_push_notification;
-    $deploying_version ||= $update =~ / git-server v([\d.]+):.*waiting for notification/ || /git-server.*waiting for notification/ ? $1 || "OLD" :
-        ($maxpatience ? 0 : !warn localtime().": [$$] git-deploy: Warning: Missing recommended [ --max-delay <INTERVAL_SECONDS> ] for NON-deployable repo.\n");
+    $deploying_version ||= $update =~ / git-server(?: v([\d.]+):)?.*waiting for notification/ ? $1 || "OLD" : 0 or
+        $maxpatience or $maxdelayrecommended ||= warn localtime().": [$$] $Script: Warning: Missing recommended [ --max-delay <INTERVAL_SECONDS> ] for NON-deploy repo: ".run_output_ignore_err("git","config","remote.$origin.url");
     my $branch = checkout_branch;
     $update .= run_output_include_err "git", "checkout", $branch;
-    $update .= run_output_include_err "git", "rebase", "origin/$branch";
+    $update .= run_output_include_err "git", "rebase", "$origin/$branch";
     $0 = "$Script - $cwd: Scanning updates";
     $update .= run_output_include_err "git", "rebase", "--abort" if $update =~ /fix conflicts|git rebase.*--continue|you need to resolve your|stop rebasing/;
     if (-M "$Bin/$Script" < 0) {
         # Myself update detected so need to respawn
-        warn localtime().": [$$] Auto-update $Script respawning ...\n";
+        warn localtime().": [$$] $Script: Auto-update $Script respawning ...\n";
         sleep 1;
+        %ENV = %initial_ENV;
         exec @invoked or die localtime().": [$$] $Bin/$Script: RESPAWN FATAL CRASH\n";
     }
     if ($update =~ /POSSIBLE.*SOMEONE.*DOING.*NASTY/) {
@@ -342,10 +393,10 @@ while (1) {
     if ($update =~ /Your branch.*diverged/) {
         # Rebase can't work if there are local divergents.
         warn $update;
-        warn localtime().": [$$] Detected local divergence off [$branch] so doing HARD RESET ...\n";
+        warn localtime().": [$$] $Script: Detected local divergence off [$branch] so doing HARD RESET ...\n";
         my $hard = "";
         $hard .= run_output_include_err "git", "checkout", $branch;
-        $hard .= run_output_include_err "git", "reset", "--hard", "origin/$branch";
+        $hard .= run_output_include_err "git", "reset", "--hard", "$origin/$branch";
         my $running = getps;
         last if $running =~ /\Q$Script - $cwd\E: Waiting/;
         $0 = "$Script - $cwd: Waiting because of local divergence";
@@ -361,6 +412,19 @@ while (1) {
         $monkey = ": $1" if $update =~ /^M\s+(\S+)/m;
         $0 = "$Script - $cwd: Waiting because of local modifications$monkey";
         print run_output_ignore_err qw(sleep 10);
+        $0 = "$Script - $cwd: Checking if changes still exist$monkey";
+    }
+    elsif ($update =~ /untracked.*files would be overwritten/) {
+        # Can't create a file if it's already there.
+        warn $update;
+        my $running = getps;
+        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
+        my $monkey = "";
+        $monkey = ": $1" if $update =~ /would be overwritten.*\n\s*(\S.*?)\s*\n/;
+        $0 = "$Script - $cwd: Waiting because someone created file locally$monkey";
+        print run_output_ignore_err qw(sleep 20);
+        $monkey =~ s/:\s+// and system "mv","-v","-n",$monkey,"$monkey-PLEASE-REMOVE-MANUALLY-CREATED-FILE-FOR-DEPLOY-$$";
+        $0 = "$Script - $cwd: Checking if file still exist$monkey";
     }
     elsif ($update =~ m{fatal: Unable to create '(.+?)': File exists.}) {
         # Updates cannot work while lock file exists
@@ -395,14 +459,28 @@ while (1) {
             print run_output_include_err qw(sleep 60);
         }
     }
+    elsif ($update =~ /^(fatal:.*)/m) {
+        my $fatal = substr $1, 0, 30;
+        chomp (my $url = run_output_ignore_err("git","config","remote.$origin.url"));
+        warn localtime().": [$$] $Script: Fatal crash during update: $url\n";
+        warn $update;
+        warn localtime().": [$$] $Script: Manual intervention required. Please repair the problem now!\n";
+        $0 = "$Script - $cwd: Found fatal crash [$fatal] $url";
+        my $running = getps;
+        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
+        $0 = "$Script - $cwd: Waiting for fix [$fatal] $url";
+        print run_output_ignore_err qw(sleep 65);
+        next;
+    }
     # If repo isn't via git-server, then we can't rely on the server to regulate any other git-deploy running, so we have to take care of everything ourselves. So either he goes, or I go.
-    warn localtime().": [$$] git-deploy: Aborting other git-deploy process still running on NON-deployable repo:\n$1\n" and kill TERM => $2 or last if !$deploying_version and getps() =~ /^(\w+\s+(\d+).*\Q$Script - $cwd\E: Waiting.*)/m;
+    warn localtime().": [$$] $Script: Aborting other git-deploy process still running on NON-deploy repo:\n$1\n" and kill TERM => $2 or last if !$deploying_version and getps() =~ /^(\w+\s+(\d+).*\Q$Script - $cwd\E: Waiting.*)/m;
     # Get out of here if someone is monkeying a local file "error: cannot rebase: You have unstaged changes."
-    warn localtime().": [$$] git-deploy: Deployable git-server v$deploying_version wants me to leave.\n$update" and last if $deploying_version and $update !~ /rewinding head to replay|fast-forward|but expected|Unpacking objects|Cannot rebase|ecent commit/;
+    warn localtime().": [$$] $Script: Deployable git-server v$deploying_version wants me to leave.\n$update" and last if $deploying_version and $update !~ /rewinding head to replay|fast-forward|but expected|Unpacking objects|Cannot rebase|ecent commit/;
     if ($update =~ /Current branch.*is up to date/) {
         my $pause_because_done = $deploying_version ? 5 + int(55 * rand()) : ($maxpatience || (305 + int(115 * rand())));
-        $0 = "$Script - $cwd: Waiting $pause_because_done seconds because everything was updated ...";
-        print "Everything was already updated perfectly. Sleeping $pause_because_done seconds ...\n";
+        my $why_wait = $deploying_version ? "since everything had already been deployed ..." : "for NON-deploy repo ...";
+        $0 = "$Script - $cwd: Waiting $pause_because_done seconds $why_wait";
+        print "Everything was already updated. Sleeping $pause_because_done seconds $why_wait\n";
         print run_output_ignore_err sleep => $pause_because_done;
     }
     $0 = "$Script - $cwd: Update complete";

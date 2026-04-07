@@ -1,6 +1,6 @@
 package SPVM::Resource::Zlib;
 
-our $VERSION = "1.008";
+our $VERSION = "1.009";
 
 1;
 
@@ -117,6 +117,8 @@ C99
 =over 2
 
 =item * -D_LARGEFILE64_SOURCE
+
+=item * -D_DEFAULT_SOURCE
 
 =back
 

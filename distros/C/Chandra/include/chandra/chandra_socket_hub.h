@@ -8,6 +8,9 @@
  * Depends on chandra_socket_common.h for shared utilities.
  */
 
+/* Forward declarations */
+static void _hub_do_broadcast(pTHX_ SV *self, SV *channel, SV *data);
+
 /* ---- Remove a connection by fileno ---- */
 
 static void
@@ -171,8 +174,11 @@ _hub_start_listener(pTHX_ SV *self)
         ? SvPV_nolen(*transport_svp) : "unix";
 
 #ifdef _WIN32
-    if (!strEQ(transport, "tcp"))
-        croak("Hub: Unix domain sockets are not supported on Windows; use transport => 'tcp'");
+    /* Auto-upgrade to TCP on Windows — Unix domain sockets not available */
+    if (!strEQ(transport, "tcp")) {
+        transport = "tcp";
+        (void)hv_stores(hv, "transport", newSVpvs("tcp"));
+    }
 #endif
     if (strEQ(transport, "tcp"))
         listener = _hub_create_tcp_listener(aTHX_ hv);
@@ -183,6 +189,50 @@ _hub_start_listener(pTHX_ SV *self)
 
     if (select_svp && SvOK(*select_svp))
         _sock_select_add(aTHX_ *select_svp, listener);
+
+#ifdef _WIN32
+    /* Write discovery file so clients can find this TCP hub by name.
+     * The file contains "port\ntoken\n" and is written to the same
+     * directory that would hold the Unix socket path.                */
+    {
+        SV **name_svp = hv_fetchs(hv, "name", 0);
+        if (name_svp && SvOK(*name_svp)) {
+            SV *disc_path = _sock_build_path(aTHX_ SvPV_nolen(*name_svp));
+            /* Get the real bound port via sockname() */
+            dSP;
+            int count;
+            IV real_port = 0;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(listener);
+            PUTBACK;
+            count = call_method("sockport", G_SCALAR | G_EVAL);
+            SPAGAIN;
+            if (count > 0 && !SvTRUE(ERRSV)) {
+                SV *r = POPs;
+                if (SvOK(r)) real_port = SvIV(r);
+            }
+            PUTBACK;
+            FREETMPS; LEAVE;
+
+            if (real_port > 0) {
+                (void)hv_stores(hv, "port", newSViv(real_port));
+
+                SV **token_svp = hv_fetchs(hv, "_token", 0);
+                const char *disc_str = SvPV_nolen(disc_path);
+                FILE *dfh = fopen(disc_str, "wb");
+                if (dfh) {
+                    fprintf(dfh, "%" IVdf "\n%s\n", real_port,
+                            (token_svp && SvOK(*token_svp))
+                                ? SvPV_nolen(*token_svp) : "");
+                    fclose(dfh);
+                    (void)hv_stores(hv, "_discovery_path", newSVsv(disc_path));
+                }
+            }
+            SvREFCNT_dec(disc_path);
+        }
+    }
+#endif
 }
 
 /* ---- Accept a new client connection ---- */
@@ -261,6 +311,7 @@ _hub_process_handshake(pTHX_ SV *self, HV *hv, SV *conn, IV fh_fileno,
 {
     HV *hdata_hv;
     SV **htok_svp, **hname_svp;
+    int token_ok = 0;
 
     if (!data_sv || !SvOK(data_sv) || !SvROK(data_sv))
         return 0;
@@ -269,10 +320,33 @@ _hub_process_handshake(pTHX_ SV *self, HV *hv, SV *conn, IV fh_fileno,
     htok_svp  = hv_fetchs(hdata_hv, "token", 0);
     hname_svp = hv_fetchs(hdata_hv, "name", 0);
 
-    /* Verify token */
-    if (!htok_svp || !SvOK(*htok_svp) ||
-        !token_sv || !SvOK(token_sv) ||
-        !sv_eq(*htok_svp, token_sv)) {
+    /* Verify token — use Token manager if available, else raw compare */
+    if (htok_svp && SvOK(*htok_svp) && token_sv && SvOK(token_sv)) {
+        SV **tm_svp = hv_fetchs(hv, "_token_manager", 0);
+        if (tm_svp && SvOK(*tm_svp) && SvROK(*tm_svp)) {
+            /* Use Token->validate */
+            dSP;
+            int count;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(*tm_svp);
+            XPUSHs(*htok_svp);
+            PUTBACK;
+            count = call_method("validate", G_SCALAR);
+            SPAGAIN;
+            if (count > 0) {
+                SV *res = POPs;
+                token_ok = SvTRUE(res) ? 1 : 0;
+            }
+            PUTBACK;
+            FREETMPS; LEAVE;
+        } else {
+            /* Simple string compare (backward compat) */
+            token_ok = sv_eq(*htok_svp, token_sv) ? 1 : 0;
+        }
+    }
+
+    if (!token_ok) {
         warn("Hub: rejected unauthenticated connection\n");
         _hub_remove_conn(aTHX_ self, fh_fileno, fh);
         return -1; /* break */
@@ -391,6 +465,105 @@ _hub_dispatch_conn(pTHX_ SV *self, HV *hv, SV *fh, IV fh_fileno,
     _sock_free_sv_array(aTHX_ msg_svs, msg_count);
 }
 
+/* ---- Perform token rotation and broadcast to clients ---- */
+
+static void
+_hub_check_token_rotation(pTHX_ SV *self, HV *hv)
+{
+    SV **tm_svp = hv_fetchs(hv, "_token_manager", 0);
+    int due;
+
+    if (!tm_svp || !SvOK(*tm_svp) || !SvROK(*tm_svp)) return;
+
+    /* Check if rotation is due */
+    {
+        dSP;
+        int count;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(*tm_svp);
+        PUTBACK;
+        count = call_method("rotation_due", G_SCALAR);
+        SPAGAIN;
+        due = (count > 0 && SvTRUE(POPs)) ? 1 : 0;
+        PUTBACK;
+        FREETMPS; LEAVE;
+    }
+
+    if (!due) return;
+
+    /* Rotate */
+    {
+        dSP;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(*tm_svp);
+        PUTBACK;
+        call_method("rotate", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+
+    /* Get new current token */
+    {
+        SV *new_token = NULL;
+        dSP;
+        int count;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(*tm_svp);
+        PUTBACK;
+        count = call_method("current", G_SCALAR);
+        SPAGAIN;
+        if (count > 0) {
+            SV *t = POPs;
+            if (SvOK(t)) new_token = newSVsv(t);
+        }
+        PUTBACK;
+        FREETMPS; LEAVE;
+
+        if (new_token) {
+            /* Update _token */
+            (void)hv_stores(hv, "_token", newSVsv(new_token));
+
+            /* Update token file */
+            {
+                SV **tp_svp = hv_fetchs(hv, "_token_path", 0);
+                if (tp_svp && SvOK(*tp_svp)) {
+                    STRLEN tlen;
+                    const char *tstr = SvPV(new_token, tlen);
+                    _sock_write_token_file(aTHX_
+                        SvPV_nolen(*tp_svp), tstr, tlen);
+                }
+            }
+
+            /* Broadcast __token_rotate to all clients */
+            {
+                HV *data_hv = newHV();
+                (void)hv_stores(data_hv, "token", newSVsv(new_token));
+                _hub_do_broadcast(aTHX_ self,
+                    sv_2mortal(newSVpvs("__token_rotate")),
+                    sv_2mortal(newRV_noinc((SV *)data_hv)));
+            }
+
+            /* Fire on_token_rotate callback */
+            {
+                SV **cb_svp = hv_fetchs(hv, "_on_token_rotate", 0);
+                if (cb_svp && SvOK(*cb_svp) && SvROK(*cb_svp)) {
+                    dSP;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(sv_2mortal(SvREFCNT_inc(new_token)));
+                    PUTBACK;
+                    call_sv(*cb_svp, G_DISCARD);
+                    FREETMPS; LEAVE;
+                }
+            }
+
+            SvREFCNT_dec(new_token);
+        }
+    }
+}
+
 /* ---- Poll for new connections and incoming messages ---- */
 
 static void
@@ -406,6 +579,12 @@ _hub_do_poll(pTHX_ SV *self)
     SV **ready_svs = NULL;
     int ready_count = 0;
     int ri;
+
+    /* Check for scheduled token rotation */
+    _hub_check_token_rotation(aTHX_ self, hv);
+
+    /* Re-fetch token in case rotation changed it */
+    token_svp = hv_fetchs(hv, "_token", 0);
 
     if (!select_svp   || !SvOK(*select_svp))   return;
     if (!listener_svp || !SvOK(*listener_svp))  return;
@@ -503,6 +682,17 @@ _hub_do_close(pTHX_ SV *self)
         Stat_t st;
         if (PerlLIO_stat(sp, &st) == 0)
             (void)PerlLIO_unlink(sp);
+    }
+
+    /* Clean up TCP discovery file (Windows auto-upgrade) */
+    {
+        SV **disc_svp = hv_fetchs(hv, "_discovery_path", 0);
+        if (disc_svp && SvOK(*disc_svp)) {
+            const char *dp = SvPV_nolen(*disc_svp);
+            Stat_t st;
+            if (PerlLIO_stat(dp, &st) == 0)
+                (void)PerlLIO_unlink(dp);
+        }
     }
 }
 

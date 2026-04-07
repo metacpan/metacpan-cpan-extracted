@@ -1,7 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-Copyright [2016-2024] EMBL-European Bioinformatics Institute
+See the NOTICE file distributed with this work for additional information
+regarding copyright ownership.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ Translation.
 =cut
 
 package Bio::EnsEMBL::DBSQL::TranslationAdaptor;
-$Bio::EnsEMBL::DBSQL::TranslationAdaptor::VERSION = '113.0.0';
+$Bio::EnsEMBL::DBSQL::TranslationAdaptor::VERSION = '114.0.0';
 use vars qw(@ISA);
 use strict;
 

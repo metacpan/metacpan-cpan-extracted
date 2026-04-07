@@ -2929,3 +2929,96 @@ CODE:
 }
 OUTPUT:
     RETVAL
+
+ # ---- splash(%args) — convenience wrapper for Chandra::Splash ----
+
+SV *
+splash(self, ...)
+    SV *self
+PREINIT:
+    SV *splash_obj;
+    SV *init_cb = NULL;
+    I32 i;
+CODE:
+{
+    dSP;
+    int count;
+
+    /* Scan args for 'init' callback, collect the rest for Splash->new */
+    AV *new_args = newAV();
+    sv_2mortal((SV *)new_args);
+
+    for (i = 1; i + 1 < items; i += 2) {
+        const char *key = SvPV_nolen(ST(i));
+        if (strEQ(key, "init")) {
+            init_cb = ST(i + 1);
+        } else {
+            av_push(new_args, newSVsv(ST(i)));
+            av_push(new_args, newSVsv(ST(i + 1)));
+        }
+    }
+
+    /* Create Chandra::Splash->new(@new_args) */
+    {
+        I32 n = av_len(new_args) + 1;
+        I32 j;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpvs("Chandra::Splash")));
+        for (j = 0; j < n; j++) {
+            SV **elem = av_fetch(new_args, j, 0);
+            if (elem) XPUSHs(*elem);
+        }
+        PUTBACK;
+        count = call_method("new", G_SCALAR);
+        SPAGAIN;
+        splash_obj = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
+        PUTBACK;
+        FREETMPS; LEAVE;
+    }
+
+    if (!SvOK(splash_obj) || !sv_isobject(splash_obj)) {
+        RETVAL = &PL_sv_undef;
+        goto splash_done;
+    }
+
+    /* show() */
+    {
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(splash_obj);
+        PUTBACK;
+        call_method("show", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+
+    /* Call init callback if provided */
+    if (init_cb && SvROK(init_cb) && SvTYPE(SvRV(init_cb)) == SVt_PVCV) {
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(splash_obj);
+        PUTBACK;
+        call_sv(init_cb, G_DISCARD | G_EVAL);
+        SPAGAIN;
+        if (SvTRUE(ERRSV)) {
+            warn("Chandra::App->splash init callback died: %s",
+                 SvPV_nolen(ERRSV));
+        }
+        FREETMPS; LEAVE;
+    }
+
+    /* close() */
+    {
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(splash_obj);
+        PUTBACK;
+        call_method("close", G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+
+    RETVAL = splash_obj;
+    splash_done: ;
+}
+OUTPUT:
+    RETVAL

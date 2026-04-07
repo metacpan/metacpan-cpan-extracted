@@ -1,4 +1,4 @@
 #!/bin/sh
 
-hooks/proxy `basename $0`
-exec hooks/post-action
+${GIT_HOOKS_PATH:hooks}/proxy `basename $0`
+exec ${GIT_HOOKS_PATH:hooks}/post-action

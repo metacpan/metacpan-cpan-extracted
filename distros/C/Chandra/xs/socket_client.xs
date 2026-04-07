@@ -35,7 +35,11 @@ CODE:
 
     /* Defaults */
     if (!hv_exists(self_hv, "transport", 9)) {
+#ifdef _WIN32
+        (void)hv_stores(self_hv, "transport", newSVpvs("tcp"));
+#else
         (void)hv_stores(self_hv, "transport", newSVpvs("unix"));
+#endif
     }
     if (!hv_exists(self_hv, "host", 4)) {
         (void)hv_stores(self_hv, "host", newSVpvs("127.0.0.1"));
@@ -263,3 +267,16 @@ CODE:
         (void)hv_stores(hv, "_conn", newSV(0));
     }
 }
+
+SV *
+on_token_refresh(self, callback)
+    SV *self
+    SV *callback
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    (void)hv_stores(hv, "_on_token_refresh", newSVsv(callback));
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL

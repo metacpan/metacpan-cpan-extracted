@@ -1,0 +1,828 @@
+#!/usr/bin/env perl
+
+# =============================================================
+#  ____  ____ ____    _   _       _                          _
+# | __ )| __ ) ___|  | | | |_ __ (_)_   _____ _ __ ___  __ _| |
+# |  _ \|  _ \___ \  | | | | '_ \| \ \ / / _ \ '__/ __|/ _` | |
+# | |_) | |_) |__) | | |_| | | | | |\ V /  __/ |  \__ \ (_| | |
+# |____/|____/____/   \___/|_| |_|_| \_/ \___|_|  |___/\__,_|_|
+#
+# =============================================================
+# BBS::Universal
+# Copyright © 2023-2026 Richard Kelsch
+# All Rights Reserved
+# Licensed under the GNU Public License Version 3
+#   See the LICENSE file for details
+
+use 5.010;
+use strict;
+use English qw( -no_match_vars );
+use utf8;
+use charnames ':full';
+use Config;
+use open qw(:std :utf8);
+no warnings;
+
+# use Carp::Always;
+# Use threads first, so others inherit
+use threads (
+    'yield',
+    'stack_size' => 256 * 1024, # 256K
+    'exit'       => 'threads_only',
+    'stringify',
+);
+
+use DBI;
+use DBD::mysql;
+use Cwd;
+use DateTime;
+use Time::HiRes qw(time sleep);
+use Debug::Easy;
+use Getopt::Long;
+use Term::ReadKey;
+use Term::ANSIScreen qw( :cursor :screen );
+use Term::ANSIColor;
+use Text::SimpleTable;
+use List::Util qw(min max);
+use Text::Format;
+use IO::Socket qw(AF_INET SOCK_STREAM SHUT_WR SHUT_RDWR SHUT_RD);
+# use Cache::Memcached;
+use Cache::Memcached::Fast;
+
+use BBS::Universal;
+
+BEGIN {
+    our $VERSION = '0.014';
+}
+
+binmode(STDIN,  ':encoding(UTF-8)');
+binmode(STDOUT, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)');
+
+our $OLDDIR         = getcwd;
+our $LEVEL          = 'ERROR';
+our $SERVER_THREADS = {};
+our $RESTART        = FALSE;
+our @CALL           = @ARGV;
+our $SINGLE         = FALSE;
+our $MPLAYER        = FALSE;
+our $NOSOUND        = FALSE;
+
+# Shared with threads
+
+our $TEST = FALSE;
+
+GetOptions(
+    'test|sysop'     => \$TEST,
+    'debug=s'        => \$LEVEL,
+    'single'         => \$SINGLE,
+    'nosound|silent' => \$NOSOUND,
+);
+
+our $DEBUG = Debug::Easy->new(
+    'LogLevel' => $LEVEL,
+    'Color'    => TRUE,
+);
+
+############## BBS Core ###################
+$DEBUG->DEBUG(['Initializing BBS...']);
+
+print cls,locate(1,1),'Initializing BBS...';
+my $BBS_OBJ = BBS::Universal->small_new({ 'debug' => $DEBUG, 'debuglevel' => $LEVEL, 'nosound' => $NOSOUND });
+
+$DEBUG->DEBUG(['Initializing Memcached']);
+our $CACHE  = Cache::Memcached::Fast->new(
+    {
+        'servers' => [
+            {
+                'address' => $BBS_OBJ->{'CONF'}->{'MEMCACHED HOST'} . ':' . $BBS_OBJ->{'CONF'}->{'MEMCACHED PORT'},
+            },
+        ],
+          'namespace'      => $BBS_OBJ->{'CONF'}->{'MEMCACHED NAMESPACE'},
+          'utf8'           => TRUE,
+          'close_on_error' => TRUE,
+    }
+);
+$BBS_OBJ->{'debug'}->ERROR(['CACHE not defined']) unless (defined($CACHE));
+$CACHE->flush_all;
+$CACHE->enable_compress(TRUE);
+$CACHE->set_multi(
+    ['RUNNING',         TRUE],
+    ['TEST',            $TEST],
+    ['UPDATE',          TRUE],
+    ['ONLINE',          0],
+    ['THREADS_RUNNING', 0],
+    ['ROW_ADJUST',      0],
+    ['START_ROW',       7],
+    ['SHOW_STATUS',     TRUE],
+    ['NOSOUND',         $NOSOUND],
+);
+$DEBUG->DEBUG(['Memcached Initialized']);
+# Trap all dangerous signals for a thread friendly finish
+$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = $SIG{'HUP'} = sub { hard_finish($BBS_OBJ); };
+
+my $MAX_THREADS = ($SINGLE) ? 1 : min(int($BBS_OBJ->{'CPU'}->{'CPU CORES'} * $BBS_OBJ->{'CONF'}->{'THREAD MULTIPLIER'}), 99);
+chdir($BBS_OBJ->{'CONF'}->{'BBS ROOT'});
+$DEBUG->DEBUG(['Initializing SysOp Commands']);
+
+# ╭─────────┬───────────────────────╮
+# │ Unicode │ Character Token Names │
+# ├─────────┼───────────────────────┤
+# │ U+1FBF0 │  SEGMENTED DIGIT ZERO │ 🯰
+# │ U+1FBF1 │   SEGMENTED DIGIT ONE │ 🯱
+# │ U+1FBF2 │   SEGMENTED DIGIT TWO │ 🯲
+# │ U+1FBF3 │ SEGMENTED DIGIT THREE │ 🯳
+# │ U+1FBF4 │  SEGMENTED DIGIT FOUR │ 🯴
+# │ U+1FBF5 │  SEGMENTED DIGIT FIVE │ 🯵
+# │ U+1FBF6 │   SEGMENTED DIGIT SIX │ 🯶
+# │ U+1FBF7 │ SEGMENTED DIGIT SEVEN │ 🯷
+# │ U+1FBF8 │ SEGMENTED DIGIT EIGHT │ 🯸
+# │ U+1FBF9 │  SEGMENTED DIGIT NINE │ 🯹
+# ╰─────────┴───────────────────────╯
+
+our @CLOCK = ('🯰','🯱','🯲','🯳','🯴','🯵','🯶','🯷','🯸','🯹');
+
+our $SYSOP_COMMANDS = {
+    'SYSOP ADD FILE' => sub {
+        my $self = shift;
+        $self->sysop_add_file();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/filemanager.ANSI'));
+    },
+    'SYSOP ADD USER' => sub {
+        my $self = shift;
+        $self->sysop_user_add($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST'), 'files/sysop/adduser.ANSI');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP BBS ADD' => sub {
+        my $self = shift;
+        $self->sysop_add_bbs();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/bbs_listing_manager.ANSI'));
+    },
+    'SYSOP BBS LISTINGS MANAGER' => sub {
+        my $self = shift;
+        return($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/bbs_listing_manager.ANSI'));
+    },
+    'SYSOP BBS BULK MERGE' => sub {
+        my $self = shift;
+        $self->sysop_bbs_list_bulk_import();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/bbs_listing_manager.ANSI'));
+    },
+    'SYSOP BBS DELETE' => sub {
+        my $self = shift;
+        $self->sysop_delete_bbs();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/bbs_listing_manager.ANSI'));
+    },
+    'SYSOP BBS EDIT' => sub {
+        my $self = shift;
+        $self->sysop_edit_bbs();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/bbs_listing_manager.ANSI'));
+    },
+    'SYSOP BBS LIST VIEW' => sub {
+        my $self = shift;
+        $self->sysop_list_bbs();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/bbs_listing_manager.ANSI'));
+    },
+    'SYSOP COMMANDS REFERENCE ANSI' => sub {
+        my $self = shift;
+        $self->sysop_output($self->sysop_list_commands('ANSI'));
+        print "\nPress a key to continue ";
+        $self->sysop_keypress(TRUE);
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP COMMANDS REFERENCE ASCII' => sub {
+        my $self = shift;
+        $self->sysop_output($self->sysop_list_commands('ASCII'));
+        print "\nPress a key to continue ";
+        $self->sysop_keypress(TRUE);
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP COMMANDS REFERENCE ATASCII' => sub {
+        my $self = shift;
+        $self->sysop_output($self->sysop_list_commands('ATASCII'));
+        print "\nPress a key to continue ";
+        $self->sysop_keypress(TRUE);
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP COMMANDS REFERENCE FULL' => sub {
+        my $self = shift;
+        $self->sysop_output($self->sysop_list_commands('FULL'));
+        print "\nPress a key to continue ";
+        $self->sysop_keypress(TRUE);
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP COMMANDS REFERENCE PETSCII' => sub {
+        my $self = shift;
+        $self->sysop_output($self->sysop_list_commands('PETSCII'));
+        print "\nPress a key to continue ";
+        $self->sysop_keypress(TRUE);
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP COMMANDS REFERENCE SYSOP' => sub {
+        my $self = shift;
+        $self->sysop_output($self->sysop_list_commands('SYSOP'));
+        print "\nPress a key to continue ";
+        $self->sysop_keypress(TRUE);
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP COMMANDS REFERENCE USER' => sub {
+        my $self = shift;
+        $self->sysop_output($self->sysop_list_commands('USER'));
+        print "\nPress a key to continue ";
+        $self->sysop_keypress(TRUE);
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP DELETE FILES' => sub {
+        my $self = shift;
+        $self->sysop_delete_files();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/filemanager.ANSI'));
+    },
+    'SYSOP DELETE USER' => sub {
+        my $self = shift;
+        $self->sysop_user_delete($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST'), 'files/sysop/deleteuser.ANSI');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP EDIT CONFIGURATION' => sub {
+        my $self = shift;
+        $self->sysop_edit_configuration();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/settings.ANSI'));
+    },
+    'SYSOP EDIT FILE CATEGORIES' => sub {
+        my $self = shift;
+        $self->sysop_edit_file_categories();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/filemanager.ANSI'));
+    },
+    'SYSOP EDIT NEW USERS' => sub {
+        my $self = shift;
+        $self->sysop_new_user_edit($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST'), 'files/sysop/edituser.ANSI');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP EDIT USER' => sub {
+        my $self = shift;
+        $self->sysop_user_edit($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST'), 'files/sysop/edituser.ANSI');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP LIST COMMANDS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/commands_reference.ANSI'));
+    },
+    'SYSOP LIST FILES' => sub {
+        my $self = shift;
+        $self->sysop_list_files();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/filemanager.ANSI'));
+    },
+    'SYSOP ADD FILE CATEGORY' => sub {
+        my $self = shift;
+        $self->sysop_add_file_category();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/filemanager.ANSI'));
+    },
+    'SYSOP LIST USERS HORIZONTAL ABBREVIATED' => sub {
+        my $self = shift;
+        $self->sysop_list_users('HORIZONTAL ABBREVIATED', 'files/sysop/edituser.ANSI');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP LIST USERS HORIZONTAL DETAILED' => sub {
+        my $self = shift;
+        $self->sysop_list_users('HORIZONTAL DETAILED');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP LIST USERS VERTICAL ABBREVIATED' => sub {
+        my $self = shift;
+        $self->sysop_list_users('VERTICAL ABBREVIATED');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP LIST USERS VERTICAL DETAILED' => sub {
+        my $self = shift;
+        $self->sysop_list_users('VERTICAL DETAILED');
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+    'SYSOP LOGIN SYSOP' => sub {
+        run_bbs_sysop(shift, TRUE, $DEBUG, $LEVEL);
+        return ('BACK');
+    },
+    'SYSOP LOGIN USER' => sub {
+        run_bbs_sysop(shift, FALSE, $DEBUG, $LEVEL);
+        return ('BACK');
+    },
+    'SYSOP MANUAL' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/manual.ANSI'));
+    },
+    'SYSOP MANUAL INTRODUCTION' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/manual-introduction.ANSI'));
+    },
+    'SYSOP MANUAL SYSOP COMMANDS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/manual-sysop-commands.ANSI'));
+    },
+    'SYSOP MANUAL SYSOP TOKENS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/manual-sysop-tokens.ANSI'));
+    },
+    'SYSOP MANUAL USER COMMANDS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/manual-user-commands.ANSI'));
+    },
+    'SYSOP MANUAL USER TOKENS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/manual-user-tokens.ANSI'));
+    },
+    'SYSOP MANUAL MENUS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/manual-menus.ANSI'));
+    },
+    'SYSOP RESTART' => sub {
+        print "\n\nShutting down threads\n";
+        $CACHE->set('RUNNING', FALSE);
+        $RESTART = TRUE;
+    },
+    'SYSOP SELECT FILE CATEGORY' => sub {
+        my $self = shift;
+
+        $self->sysop_select_file_category();
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/filemanager.ANSI'));
+    },
+    'SYSOP FILE MANAGER' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/filemanager.ANSI'));
+    },
+    'SYSOP SETTINGS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/settings.ANSI'));
+    },
+    'SYSOP SHUTDOWN' => sub {
+        my $self = shift;
+        print "\nShutdown BBS (y/N)?  ";
+        if ($self->sysop_decision) {
+            print "\n", colored(['bright_yellow','on_red'],' Shutting down threads '), "\n";
+            $CACHE->set('RUNNING', FALSE);
+        } else {
+            return('BACK');
+        }
+    },
+    'SYSOP SHOW ENVIRONMENT' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/environment.ANSI'));
+    },
+    'SYSOP STATISTICS' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/statistics.ANSI'));
+    },
+    'SYSOP USER MANAGER' => sub {
+        my $self = shift;
+        return ($self->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/usermanager.ANSI'));
+    },
+};
+
+$DEBUG->DEBUG(['SysOp Commands Initialized','Starting BBS']);
+system_menu($BBS_OBJ);
+chdir($OLDDIR);
+if ($RESTART) {
+    print "\n\nRESTARTING...\n";
+    exec($ENV{'_'}, @CALL);
+}
+
+exit(0);
+
+##############################################################################
+
+sub ruler {
+    my $width   = shift;
+
+    my $text = "\r" . '⏺' x $width;
+    for (my $count=0;$count<$width;$count++) {
+        my $v = $count / 10;
+        if (int($count / 10) == $v) {
+            substr($text,$count,1) = substr("$count",0,1);
+        }
+    }
+    return($text);
+}
+
+sub system_menu {
+    my $bbs_obj = shift;
+
+    $DEBUG->DEBUG(['Start System Menu']);
+    my $key = '';
+    my ($wsize, $hsize, $wpixels, $hpixels) = logo($bbs_obj);
+    my ($width, $height) = ($wsize, $hsize);
+    print locate($CACHE->get('START_ROW'), 1), cldown;
+
+    my $socket;
+    $bbs_obj->playit('startup.mp3');
+    unless ($TEST) {
+        $DEBUG->DEBUG(['Loading Threads']);
+        print 'Loading ' . $MAX_THREADS . ' Threads ...';
+        $socket = IO::Socket->new(
+            'Domain'    => AF_INET,
+            'LocalHost' => $bbs_obj->{'CONF'}->{'HOST'},
+            'LocalPort' => $bbs_obj->{'CONF'}->{'PORT'},
+            'Type'      => SOCK_STREAM,
+            'Proto'     => 'tcp',
+            'Listen'    => 1,
+            'ReuseAddr' => TRUE,
+            'ReusePort' => TRUE,
+            'Timeout'   => 1,
+            'Blocking'  => FALSE,
+        );
+        my $error = undef;
+        $error = "Cannot create socket for $!n" unless ($socket);
+        if (defined($error)) {
+            $DEBUG->ERROR([$error, 'Local Mode Only']);
+            sleep 5;
+        } else {
+            foreach my $thread (1 .. $MAX_THREADS) {
+                my $name = sprintf('TH_%02d', $thread);
+                $SERVER_THREADS->{$name} = threads->create(
+                    \&run_bbs,
+                    $bbs_obj,
+                    {
+                        'thread_number' => $thread,
+                        'thread_name'   => $name,
+                        'socket'        => $socket,
+                        'debuglevel'    => $LEVEL
+                    }
+                );
+                $CACHE->set('UPDATE', TRUE);
+                servers_status($bbs_obj, FALSE);
+            }
+            $SIG{'ALRM'} = sub { servers_status($bbs_obj, TRUE); };
+            $CACHE->set('UPDATE', TRUE);
+            servers_status($bbs_obj, TRUE);    # This is a sub not a method, so we pass the object conventionally
+            $DEBUG->DEBUG(['Threads Loaded']);
+        }
+    } else {
+        $DEBUG->DEBUG(['Test mode active, no server threads']);
+    }
+    # Set up window
+    print setscroll(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), $hsize);
+    print locate(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 1), cldown;
+    $bbs_obj->{'sysop'} = TRUE;
+    $bbs_obj->users_load('sysop', '');
+	$CACHE->set('RUNNING', TRUE);
+    while ($CACHE->get('RUNNING')) {
+        ($wsize, $hsize, $wpixels, $hpixels) = GetTerminalSize();
+        if ($wsize != $width || $hsize != $height) {
+            alarm(0);
+            ($wsize, $hsize, $wpixels, $hpixels) = logo();
+            ($width, $height) = ($wsize, $hsize);
+            servers_status($bbs_obj, TRUE) unless ($TEST);
+        }
+        my $command = $bbs_obj->sysop_parse_menu(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 'files/sysop/sysop.ANSI');
+        while ($command !~ /BACK/ && $CACHE->get('RUNNING')) {
+            if (exists($SYSOP_COMMANDS->{$command}) && ref($SYSOP_COMMANDS->{$command}) eq 'CODE') {
+                $bbs_obj->playit('boing.mp3');
+                $command = $SYSOP_COMMANDS->{$command}->($bbs_obj);
+            } else {
+                $DEBUG->ERROR(["$command is not a valid SysOp Command!"]);
+                $command = 'BACK';
+            }
+            threads->yield();
+        }
+    }
+    $socket->close() if (defined($socket));
+    $CACHE->set('RUNNING', FALSE);
+    finish($bbs_obj);
+    shutdown_message();
+    $DEBUG->DEBUG(['End System Menu']);
+}
+
+sub servers_status {
+    my $bbs_obj    = shift;
+    my $show_alarm = shift;
+
+    if ($CACHE->get('SHOW_STATUS') && ! $bbs_obj->{'LOCAL LOGIN'}) {
+        if ($CACHE->get('UPDATE') && !$TEST) {
+            alarm(0);
+            my ($wsize, $hsize, $wpixels, $hpixels) = GetTerminalSize();
+            my $stp   = int($wsize / 22);
+            my $steps = $stp;
+            my @row   = ();
+            my @sizes;
+            foreach my $count (1 .. $stp) {
+                push(@sizes, 18);
+            }
+
+            my $table = Text::SimpleTable->new(@sizes);
+            my $count = 1;
+            $CACHE->set_multi(
+                ['ROW_ADJUST',      2],
+                ['ONLINE',          0],
+                ['THREADS_RUNNING', 0],
+            );
+            foreach my $name (sort(keys %{$SERVER_THREADS})) {
+                if ($CACHE->get($name) eq 'CONNECTED') {
+                    $CACHE->set_multi(
+                        ['ONLINE',          $CACHE->get('ONLINE') + 1],
+                        ['THREADS_RUNNING', $CACHE->get('THREADS_RUNNING') + 1],
+                        [$name,             'CONNECTED'],
+                    );
+                } elsif ($CACHE->get($name) eq 'IDLE') {
+                    $CACHE->set_multi(
+                        ['THREADS_RUNNING', $CACHE->get('THREADS_RUNNING') + 1],
+                        [$name,             'IDLE'],
+                    );
+                } else {
+                    $CACHE->set_multi(
+                        ['THREADS_RUNNING', $CACHE->get('THREADS_RUNNING') - 1],
+                        [$name,             'FINISHED'],
+                    );
+                }
+                push(@row, "$name -> " . $CACHE->get($name));
+                $steps--;
+                if ($steps == 0) {
+                    $steps = $stp;
+                    $table->row(@row);
+                    @row = ();
+                    $CACHE->set('ROW_ADJUST', $CACHE->get('ROW_ADJUST') + 1);
+                }
+                $count++;
+                threads->yield();
+            }
+            if (scalar(@row)) {
+                while ($steps >= 0) {
+                    push(@row, ' ');
+                    $steps--;
+                    threads->yield();
+                }
+                $CACHE->set('ROW_ADJUST', $CACHE->get('ROW_ADJUST') + 1);
+                $table->row(@row);
+                $CACHE->set('UPDATE', FALSE);
+            }
+            if (defined($table)) {
+                my $tbl = locate($CACHE->get('START_ROW'),1) . $bbs_obj->center($table->boxes->draw(), $wsize);
+                my $cn  = colored(['green'],   'CONNECTED');
+                my $idl = colored(['magenta'], 'IDLE');
+                my $fn  = colored(['red'],     'FINISHED');
+                $tbl =~ s/CONNECTED/$cn/g;
+                $tbl =~ s/IDLE/$idl/g;
+                $tbl =~ s/FINISHED/$fn/g;
+
+                if ($show_alarm) {
+                    print savepos, $tbl, loadpos;
+                    $SIG{ALRM} = sub { servers_status($bbs_obj, TRUE); };
+                    alarm(1);
+                } else {
+                    print $tbl;
+                }
+            }
+        }
+    }
+    return (TRUE);
+}
+
+sub run_bbs {
+    my $bbs_obj = shift;
+
+    # Only allow the main program to respond to signals, not the threads
+    local $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = $SIG{'HUP'} = $SIG{'ALRM'} = undef;
+    my $params        = shift;
+    my $thread_name   = $params->{'thread_name'};
+    my $thread_number = $params->{'thread_number'};
+    my $socket        = $params->{'socket'};
+    my $debug         = Debug::Easy->new(
+        'LogLevel'        => $params->{'debuglevel'},
+        'Color'           => TRUE,
+        'Prefix'          => '%Date% %Time% %Benchmark% %Loglevel% ' . $thread_name . ' [%Subroutine%][%Lastline%] ',
+        'DEBUGMAX-Prefix' => '%Date% %Time% %Benchmark% %Loglevel% ' . $thread_name . ' [%Module%][%Lines%] ',
+    );
+
+    $debug->DEBUG('Start Run BBS');
+    while ($CACHE->get('RUNNING')) {
+        $CACHE->set($thread_name, 'IDLE');
+        my $client_socket = $socket->accept();
+        if (defined($client_socket)) {
+            binmode($client_socket, ':ultra-raw');
+            # Turn off LINEMODE
+            print $client_socket chr(IAC),chr(WONT),chr(LINEMODE);
+            print $client_socket chr(IAC),chr(WILL),chr(ECHO);
+            print $client_socket chr(IAC),chr(WILL),chr(SUPPRESS_GO_AHEAD);
+            $CACHE->set_multi(
+                [$thread_name, 'CONNECTED'],
+                ['UPDATE',     TRUE],
+            );
+            my $bbs = BBS::Universal->new(
+                {
+                    'thread_name'   => $thread_name,
+                      'thread_number' => $thread_number,
+                      'socket'        => $socket,
+                      'client_socket' => $client_socket,
+                      'debug'         => $debug,
+                      'debuglevel'    => $params->{'debuglevel'},
+                }
+            );
+            $bbs->run(FALSE);
+            $client_socket->shutdown(SHUT_RDWR);    # Hang up
+            $CACHE->set_multi(
+                [$thread_name, 'IDLE'],
+                ['UPDATE',     TRUE],
+            );
+        } else {
+            $CACHE->set_multi(
+                [$thread_name, 'IDLE'],
+                ['UPDATE',     TRUE],
+            );
+        }
+        threads->yield();
+    }
+    $debug->DEBUG(['End Run BBS']);
+    $CACHE->set($thread_name, 'TERMINATED');
+}
+
+sub run_bbs_sysop {
+    my $bbs_obj = shift;
+    my $sysop   = shift;
+    my $debug   = shift;
+    my $level   = shift;
+
+    $debug->DEBUG(['Start Run BBS SysOp']);
+    $bbs_obj->{'LOCAL LOGIN'} = TRUE;
+    # Only allow the main program to respond to signals, not the threads
+    #    local $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = $SIG{'HUP'} = undef;
+    print locate(($CACHE->get('START_ROW') + $CACHE->get('ROW_ADJUST')), 1), cldown;
+    my $bbs = BBS::Universal->new(
+        {
+            'thread_name' => 'CONSOLE',
+            'debug'       => $debug,
+            'debuglevel'  => $level,
+            'local_mode'  => TRUE,
+        }
+    );
+    $bbs->run($sysop);
+    delete($bbs_obj->{'LOCAL LOGIN'});
+    threads->yield() if (!$TEST);    # Be friendly
+    $debug->DEBUG(['End Run BBS SysOp']);
+}
+
+sub clean_joinable {
+    my $bbs_obj = shift;
+    alarm(0);
+    $bbs_obj->{'debug'}->DEBUG(['Start Clean Joinable']);
+    while (threads->list(threads::running)) {
+        foreach my $thread (threads->list(threads::joinable)) {
+            $thread->join();
+            $CACHE->set('UPDATE', TRUE);
+            servers_status($bbs_obj, FALSE);
+            alarm 0;
+            threads->yield();
+        }
+        threads->yield();
+    }
+    foreach my $thread (threads->list(threads::joinable)) {
+        $thread->join();
+        $CACHE->set('UPDATE', TRUE);
+        servers_status($bbs_obj, FALSE);
+        alarm 0;
+        threads->yield();
+    }
+    $bbs_obj->{'debug'}->DEBUG(['End Clean Joinable']);
+}
+
+sub finish {
+    my $bbs_obj = shift;
+    $CACHE->set('RUNNING', FALSE);
+    $DEBUG->DEBUG(['Shutting Down, waiting for all sessions to end nicely...']);
+    $bbs_obj->playit('shutdown.mp3');
+    clean_joinable($bbs_obj);
+    $DEBUG->DEBUG(['Shutdown Complete']);
+    chdir($OLDDIR);
+    system('reset');
+    alarm(0);
+}
+
+sub hard_finish {
+    my $bbs_obj = shift;
+
+    # Force a hard finish.
+    #
+    # It unceremoniously kills all threads (and disconnects anyone connected to them)
+
+    $CACHE->set('RUNNING', FALSE);
+
+    alarm(0);
+    sleep 1;
+    if ($TEST) {
+        print "Skipping threads\n";
+    } else {
+        foreach my $thread (threads->list(threads::running)) {
+            $thread->kill('KILL');
+        }
+        clean_joinable();
+    }
+    $DEBUG->DEBUG(['Hard Shutdown Complete']);
+    chdir($OLDDIR);
+    system('reset');
+    shutdown_message();
+    exit(1);
+}
+
+sub shutdown_message {
+    $DEBUG->DEBUG(['Shutdown Beginning']);
+    logo();
+    print colored(['red'],q{
+┏━┓╻ ╻╻ ╻╺┳╸╺┳┓┏━┓╻ ╻┏┓╻   ┏━╸┏━┓┏┳┓┏━┓╻  ┏━╸╺┳╸┏━╸
+┗━┓┣━┫┃ ┃ ┃  ┃┃┃ ┃┃╻┃┃┗┫   ┃  ┃ ┃┃┃┃┣━┛┃  ┣╸  ┃ ┣╸
+┗━┛╹ ╹┗━┛ ╹ ╺┻┛┗━┛┗┻┛╹ ╹   ┗━╸┗━┛╹ ╹╹  ┗━╸┗━╸ ╹ ┗━╸}), "\n\n";
+    $DEBUG->DEBUG(['Shutdown Complete']);
+} ## end sub shutdown_message
+
+sub logo {
+    my $bbs_obj = shift;
+    my ($wsize, $hsize, $wpixels, $hpixels) = GetTerminalSize();
+
+    $DEBUG->DEBUG(['Start Logo']);
+    $CACHE->set('ROW_ADJUST', 0);
+    my $version = sprintf('Version %.03f', $BBS::Universal::VERSION);
+    my $banner  = colored(['red','on_black'],         q{  ____  ____ ____    _   _       _                          _  } . clline) . colored(['blue'], '│') . colored(['yellow', 'on_ansi17'],' [% VERSION %]                            ') . colored(['blue'], '│') . "\n";
+    $banner    .= colored(['yellow','on_black'],      q{ | __ )| __ ) ___|  | | | |_ __ (_)_   _____ _ __ ___  __ _| | } . clline) . colored(['blue'], '│') . colored(['yellow', 'on_ansi17'],' Written By Richard Kelsch                ') . colored(['blue'], '│') . "\n";
+    $banner    .= colored(['green','on_black'],       q{ |  _ \|  _ \___ \  | | | | '_ \| \ \ / / _ \ '__/ __|/ _` | | } . clline) . colored(['blue'], '│') . colored(['yellow', 'on_ansi17'],' Copyright © 2023-2026 Richard Kelsch     ') . colored(['blue'], '│') . "\n";
+    $banner    .= colored(['magenta','on_black'],     q{ | |_) | |_) |__) | | |_| | | | | |\ V /  __/ |  \__ \ (_| | | } . clline) . colored(['blue'], '│') . colored(['yellow', 'on_ansi17'],' All Rights Reserved                      ') . colored(['blue'], '│') . "\n";
+    $banner    .= colored(['bright_blue','on_black'], q{ |____/|____/____/   \___/|_| |_|_| \_/ \___|_|  |___/\__,_|_| } . clline) . colored(['blue'], '│') . colored(['yellow', 'on_ansi17'],' Licensed Under The Perl Artistic License ') . colored(['blue'], '│') . "\n";
+    $banner    .= colored(['blue','on_black'], '━' x 63 . '┷' . '━' x 42 . '┷') . "\n";
+    $banner =~ s/\[\% VERSION \%\]/$version/s;
+
+    print setscroll(1, $hsize), locate(1, 1);
+    $banner .= locate(6,108) . colored(['blue','on_black'], '━' x ($wsize - 107));
+    print $banner;
+    print locate($CACHE->get('START_ROW'), 1),  cldown;
+    $DEBUG->DEBUG(['End Logo']);
+    return ($wsize, $hsize, $wpixels, $hpixels);
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+ BBS::Universal
+
+ =============================================================
+  ____  ____ ____    _   _       _                          _
+ | __ )| __ ) ___|  | | | |_ __ (_)_   _____ _ __ ___  __ _| |
+ |  _ \|  _ \___ \  | | | | '_ \| \ \ / / _ \ '__/ __|/ _` | |
+ | |_) | |_) |__) | | |_| | | | | |\ V /  __/ |  \__ \ (_| | |
+ |____/|____/____/   \___/|_| |_|_| \_/ \___|_|  |___/\__,_|_|
+
+ =============================================================
+
+=head1 DESCRIPTION
+
+A Universal BBS that connects to TCP/IP instead of serial
+
+It works with a variety of text encoding formats
+
+NOTE:  The System Operator terminal MUST support UTF-8!  This gives graphics character support.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<ASCII>
+
+Simple plain ASCII text
+
+=item B<ATASCII>
+
+Atari 8 bit ATASCII
+
+It has graphics characters and cursor movement
+
+=item B<PETSCII>
+
+Commodore 8 bit PETSCII
+
+It has color, graphics characters and cursor movement
+
+=item B<ANSI>
+
+ANSI encoded text
+
+It has color, graphics characters and cursor movement.  Typically used on Terminals and Unix/Linux/Windows/Mac consoles and terminal clients.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2023-2026 Richard Kelsch
+All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made by someone other than you, you are nevertheless required to ensure that your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use, offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation (including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or contributory patent infringement, then this Artistic License to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

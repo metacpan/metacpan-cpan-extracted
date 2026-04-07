@@ -3,6 +3,10 @@ TODO
 
 Some features we need or want, plus some neat ideas that may not be too feasible to implement.
 
+ - If running hooks/proxy shows 100% perfectly clean during the pre-write hook, then for the post-write hook, hooks/proxy is safe to rudely "--force" jam the sync to push to the remote $there repo every single branch and tag from $here, even if it rewrites history.
+
+ - Allow proxy.url to be specified multiple times in order to sync with multiple remote "$there" repos. For example, there-0, there-1, there-2, etc...
+
  - Make sure ipc-parse can determine if action was actually performed or else the reason of why not.
 
  - Add [log.verbosity] 0 or 1 or 2 feature to control level of messaging spewage to the git client.
@@ -12,6 +16,8 @@ Some features we need or want, plus some neat ideas that may not be too feasible
  - Investigate converting get_fork_hash common fork sniffer scan to use "git merge-base --fork-point <ref> <commit>" instead of grinding through the logs.
 
  - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6.
+
+ - Add git-deploy [ -i <IDENTITY_FILE> ] to force a specific ssh identity file when connecting to remote repo.
 
  - Add Support for HTTP protocol git read and write operations using Basic password Authorization (instead of only pubkeys over SSH protocol).
    * Design a way to support "git-deploy" feature via HTTP (through REMOTE_USER or DeployToken or URI flag or Special HTTP Header or PAT [Personal Access Token] or maybe some other mechanism). Allow client to specify max-delay seconds (default 90) in case nothing new is ready since last pull.
@@ -33,14 +39,12 @@ Some features we need or want, plus some neat ideas that may not be too feasible
      1. For example, the ability to export ENV variables from a PRE* hook to a POST* hook.
      2. Allow data in $git->stash to persist among all hooks where the $git object is the first argument passed to each custom block hook.
 
- - Monkey the core.hooksPath setting on the git server to point to these hooks provided.
-
  - Investigate making git-deploy setup alias.deploy hook in case it's not in a cron path.
 
  - [webhook] features for callback:
    * Allow for WhiteList or BlackList filters to trigger webhook or ignore webhooks under certain conditions:
      : When specified branches are involved
-     : When certain KEY users are involved
+     : When certain REMOTE_USER is involved
      : When coming from a specific IP or Network CIDR
      : When certain files are affected (tricky for pull reads)
      : When certain strings exist in any of the commit comments being pushed. (Tricky for pull reads.)

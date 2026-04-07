@@ -12,9 +12,11 @@ if ($^O eq 'darwin') {
     push @extra_ccflags, '-DWEBVIEW_COCOA=1';
     push @extra_ccflags, '-DOBJC_OLD_DISPATCH_PROTOTYPES=1';
     push @extra_ccflags, '-x objective-c';  # Compile as Objective-C
-    # System perl is arm64e; bundle must match for PAC-compatible IMPs
-    push @extra_ccflags, '-arch arm64e';
-    push @extra_ldflags, '-arch arm64e';
+    # Match the architecture of the Perl we're building for
+    if ($Config{archname} =~ /arm|aarch64/) {
+        push @extra_ccflags, '-arch arm64e';
+        push @extra_ldflags, '-arch arm64e';
+    }
     push @extra_ldflags, '-framework WebKit';
     push @extra_ldflags, '-framework Cocoa';
 }
@@ -91,19 +93,3 @@ WriteMakefile(
         },
     },
 );
-
-# Override test_dynamic to inject skip env vars on headless Linux
-sub MY::test_dynamic {
-    my $self = shift;
-    my $skip_env = '';
-    if ($^O ne 'darwin' && $^O ne 'MSWin32') {
-        if (!$ENV{DISPLAY} && !$ENV{WAYLAND_DISPLAY}) {
-            $skip_env = 'CHANDRA_SKIP_WINDOW=1 CHANDRA_SKIP_CLIPBOARD=1 ';
-        }
-    }
-
-    return <<"MAKE";
-test_dynamic :: pure_all
-	${skip_env}\$(FULLPERLRUN) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" \$(TEST_FILES)
-MAKE
-}

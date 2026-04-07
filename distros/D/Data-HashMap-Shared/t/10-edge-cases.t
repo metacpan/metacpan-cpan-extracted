@@ -464,9 +464,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # add with TTL: expired key treated as absent
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 1);
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, 1, 100;
-    sleep 2;
+    sleep 4;
     my $r = shm_ii_add $map, 1, 200;
     ok($r, 'add succeeds after TTL expiry');
     my $v = shm_ii_get $map, 1;
@@ -748,11 +748,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # persist then get: seqlock ensures visibility
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 1);
+    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, 1, 100;
     # persist before TTL expires
     shm_ii_persist $map, 1;
-    sleep 2;
+    sleep 4;
     # should still be readable (persisted = permanent)
     my $v = shm_ii_get $map, 1;
     is($v, 100, 'persist then get: entry survives past original TTL');
@@ -778,10 +778,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # pop/shift on TTL-only map with expired entries
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 1);
+    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, $_, $_ * 10 for 1..5;
     shm_ii_put_ttl $map, 99, 990, 0;  # permanent entry
-    sleep 2;
+    sleep 4;
     # keys 1-5 expired, key 99 still live
     my ($k, $v) = shm_ii_pop $map;
     is($k, 99, 'pop on TTL map skips expired, returns live entry');
@@ -794,9 +794,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # cas on TTL map with expired key
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 1);
+    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, 1, 100;
-    sleep 2;
+    sleep 4;
     my $r = shm_ii_cas $map, 1, 100, 200;
     ok(!$r, 'cas on expired key returns false');
     unlink $path;
@@ -805,10 +805,10 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # drain on TTL map: skips expired entries
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 1);
+    my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, $_, $_ for 1..3;
     shm_ii_put_ttl $map, 99, 99, 0;  # permanent
-    sleep 2;
+    sleep 4;
     my @got = shm_ii_drain $map, 10;
     is(scalar @got, 2, 'drain on TTL map returns only live entries (1 pair)');
     is($got[0], 99, 'drain on TTL map: live key is 99');
@@ -1501,8 +1501,8 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 60);
     shm_ii_put $map, 1, 10;
     shm_ii_put $map, 2, 20;
-    shm_ii_put_ttl $map, 3, 30, 1;  # expires in 1s
-    sleep 2;
+    shm_ii_put_ttl $map, 3, 30, 2;  # expires in 2s
+    sleep 4;
     my @vals = $map->get_multi(1, 2, 3);
     is($vals[0], 10, 'get_multi TTL: non-expired key 1');
     is($vals[1], 20, 'get_multi TTL: non-expired key 2');
@@ -1633,9 +1633,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # --- flush_expired with actual expired entries ---
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 1);  # TTL=1s
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);  # TTL=1s
     shm_ii_put $map, $_, $_ for 1..50;
-    sleep 2;
+    sleep 4;
     my $flushed = shm_ii_flush_expired $map;
     is($flushed, 50, 'flush_expired: all 50 entries flushed');
     my $sz = shm_ii_size $map;
@@ -1648,9 +1648,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # --- flush_expired_partial full scan cycle ---
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 1);
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, $_, $_ for 1..30;
-    sleep 2;
+    sleep 4;
     my $total = 0;
     my $rounds = 0;
     my $done = 0;

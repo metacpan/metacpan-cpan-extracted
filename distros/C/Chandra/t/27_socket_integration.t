@@ -2,7 +2,10 @@
 use strict;
 use warnings;
 use Test::More;
-use IO::Socket::UNIX;
+my $is_win32 = $^O eq 'MSWin32';
+unless ($is_win32) {
+    require IO::Socket::UNIX;
+}
 no warnings 'once', 'redefine';
 
 plan 'no_plan';
@@ -246,7 +249,8 @@ SKIP: {
 }
 
 # === Hub stale socket file cleanup ===
-{
+SKIP: {
+	skip 'Unix socket path tests not applicable on Windows', 3 if $is_win32;
 	my $name = "test-stale-$$";
 	my $dir = $ENV{XDG_RUNTIME_DIR} || $ENV{TMPDIR} || '/tmp';
 	my $path = "$dir/chandra-$name.sock";

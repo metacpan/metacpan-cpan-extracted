@@ -15,7 +15,7 @@ our @EXPORT_OK = @Crypt::TimestampedData::EXPORT_OK;
 our %EXPORT_TAGS = %Crypt::TimestampedData::EXPORT_TAGS;
 
 # Set version - will be synchronized by SyncVersionFromDist plugin
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Make this module an alias
 *Crypt::TSD:: = *Crypt::TimestampedData::;
@@ -30,7 +30,7 @@ Crypt::TSD - Alias for Crypt::TimestampedData
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,12 @@ version 0.01
 
 This is a convenient alias for L<Crypt::TimestampedData>. It provides
 the same functionality with a shorter name for easier typing.
+
+=head1 SECURITY
+
+This alias follows the same security policy as L<Crypt::TimestampedData>.
+Report issues privately to E<lt>gdo@leader.itE<gt>; see F<SECURITY.md> in the
+distribution root. Do not use public trackers for undisclosed vulnerabilities.
 
 =head1 SEE ALSO
 

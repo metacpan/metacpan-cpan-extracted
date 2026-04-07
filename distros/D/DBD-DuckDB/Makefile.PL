@@ -28,7 +28,7 @@ WriteMakefile(
                 web  => 'https://github.com/giterlizzi/perl-DBD-DuckDB'
             },
         },
-        x_purl => 'pkg:cpan/GDT/DBD-DuckDB'
+        x_purl => 'pkg:cpan/DBD-DuckDB'
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
     clean => {FILES    => 'DBD-DuckDB-*'},

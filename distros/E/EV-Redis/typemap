@@ -1,0 +1,2 @@
+EV::Redis               T_PTROBJ
+EV::Loop                T_PTROBJ

@@ -10,6 +10,7 @@ Git-Server.spec
 lib/Git/Server.pm
 git-client
 git-deploy
+git-packer
 git-server
 git-verify
 hooks/git-shell

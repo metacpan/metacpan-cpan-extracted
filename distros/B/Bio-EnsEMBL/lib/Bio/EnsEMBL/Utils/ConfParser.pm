@@ -1,7 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-Copyright [2016-2024] EMBL-European Bioinformatics Institute
+See the NOTICE file distributed with this work for additional information
+regarding copyright ownership.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ parameters and their values to pass to another script.
 =cut
 
 package Bio::EnsEMBL::Utils::ConfParser;
-$Bio::EnsEMBL::Utils::ConfParser::VERSION = '113.0.0';
+$Bio::EnsEMBL::Utils::ConfParser::VERSION = '114.0.0';
 use strict;
 use warnings;
 no warnings 'uninitialized';

@@ -5,7 +5,7 @@ use strict;
 
 our @ISA = qw!Exporter!;
 our @EXPORT = qw!true false!;
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 my $t = 1;
 my $f = 0;

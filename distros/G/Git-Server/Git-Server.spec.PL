@@ -21,7 +21,6 @@ my @make_install_cmd = (
 
 my @cmd = (
     "cpan2rpm",
-    "--force",
     "--spec-only",
     "--spec", $spec,
     "--make-maker","INSTALLDIRS=vendor",

@@ -207,17 +207,28 @@ much faster than using prepared statements or individual INSERT INTO statements.
 
 =head1 METHODS
 
+=head3 B<begin_row>
+
 =head3 B<append>
 
     $appender->append($value, $type);
 
 Append a single column.
 
+=head3 B<end_row>
+
+    $appender->end_row;
+
+Finish the current row of appends. After C<end_row> is called, the next row can
+be appended.
+
 =head3 B<append_row>
 
     $appender->append_row(%row_data);
 
 Append a single row.
+
+This method call C<begin_row>, C<append> and C<end_row> automatically.
 
 =head3 B<error>
 

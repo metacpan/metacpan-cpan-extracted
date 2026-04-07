@@ -1,0 +1,17 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+C|FILE CATEGORY|YELLOW|USER|Change File Category
+L|LIST FILES DETAILED|MAGENTA|USER|List files
+S|SEARCH FILES SUMMARY|BRIGHT BLUE|USER|Search for file (short format)
+D|SEARCH FILES DETAILED|RED|USER|Search for file (long format)
+U|UPLOAD FILE|CYAN|VETERAN|Upload a file
+Z|BACK|GREEN|USER|Main Menu
+---
+[% CLS %][% GREEN %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% GREEN %] _____ _ _        ____            _[% RESET %]
+ [% GREEN          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% GREEN %]|  ___(_) | ___  / ___| _   _ ___| |_ ___ _ __ ___[% RESET %]
+  [% GREEN          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% GREEN %]| |_  | | |/ _ \ \___ \| | | / __| __/ _ \ '_ ` _ \[% RESET %]
+  [% GREEN          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% GREEN %]|  _| | | |  __/  ___) | |_| \__ \ ||  __/ | | | | |[% RESET %]
+ [% GREEN          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% GREEN %]|_|   |_|_|\___| |____/ \__, |___/\__\___|_| |_| |_|[% RESET %]
+[% GREEN          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]  [% GREEN %]                        |___/[% RESET %]
+
+[% BLACK %][% B_BRIGHT MAGENTA %]Current Category[% RESET %] [% GREEN %][% BLACK RIGHT-POINTING TRIANGLE %][% RESET %] [% FILE CATEGORY %]

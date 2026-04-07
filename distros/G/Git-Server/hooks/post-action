@@ -5,6 +5,7 @@ use warnings;
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 my $dir = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
+$ENV{GIT_HOOKS_PATH} ||= "$dir/hooks";
 
 # Usage: logger($message);
 # Purpose:
@@ -18,7 +19,7 @@ sub logger {
     $msg =~ s/\s*\n/\n/g; # Remove trailing space
     $msg =~ s/^\n//gm; # Remove blank lines
     $msg ||= "WARNING\n";
-    if (my $pid = open my $fh, "|-", "$dir/hooks/logger", "") {
+    if (my $pid = open my $fh, "|-", "$ENV{GIT_HOOKS_PATH}/logger", "") {
         while ($msg =~ s/^(.+)\n//) {
             my $line = $1 or last;
             print $fh localtime().": [$who]: $line\n";
@@ -75,7 +76,7 @@ if ($ENV{IPC}) {
         }
         else {
             open STDERR, ">", "/dev/null";
-            exec "$dir/hooks/ipc-parse", "" or die "$dir/hooks/ipc-parse: Failed!\n";
+            exec "$ENV{GIT_HOOKS_PATH}/ipc-parse", "" or die "$ENV{GIT_HOOKS_PATH}/ipc-parse: Failed!\n";
         }
         $data;
     };
@@ -101,7 +102,7 @@ if ($ENV{IPC}) {
     # Check if pushed any branches
     if (local $_ = $ref and "HASH" eq ref and ($_->{operation} || "") eq "push" and $_ = $_->{refs}) {
         my $branches = [ eval { map { ($_->{type} || "") eq "branch" && $_->{ref} ? ( $_->{ref} ) : () } @$_ } ];
-        system "hooks/push-notify", @$branches if @$branches;
+        system "$ENV{GIT_HOOKS_PATH}/push-notify", @$branches if @$branches;
     }
 
     my $ended = $ref->{server_git_completed} = eval { require Time::HiRes; Time::HiRes::time() } || time();
@@ -232,8 +233,7 @@ else {
     # Operation completed successfully.
     my @refs = map { " $_->{type}:$_->{ref}" } @{ $ref->{refs} };
     my $pull_branch = ($ENV{XMODIFIERS}||="") =~ /\bpull_branch=(\S+)\n/ ? $1 : "";
-    my $client = $ENV{XMODIFIERS} =~ /^client=.*(git-\w+)(?:@([\w\.]+))?/m ? $1 : "";
-    my $client_version = $2 || "";
+    my $client = $ENV{XMODIFIERS} =~ /^client=.*(git-?\w*)/m ? $1 : "";
     (my $msg = $op) =~ s/e?$/ed/;
     $msg .= " (in $ref->{server_git_duration} seconds)" if $ref->{server_git_duration};
     if ($pull_branch) {
@@ -247,7 +247,6 @@ else {
             $op eq "pull" ? " [git pull]" :
             $op eq "push" ? " [git push]" : "";
     }
-    $msg .= " [$client $client_version]" if $client and $client_version;
     $msg .= " ($ref->{client_git_version})" if $ref->{client_git_version};
     $msg .= "@refs" if @refs;
     logger $msg;

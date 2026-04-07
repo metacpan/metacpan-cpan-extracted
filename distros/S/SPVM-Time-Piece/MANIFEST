@@ -1,7 +1,6 @@
 .gitattributes
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
-.github/workflows/windows-2019.yml
 .github/workflows/windows-latest.yml
 .gitignore
 Changes

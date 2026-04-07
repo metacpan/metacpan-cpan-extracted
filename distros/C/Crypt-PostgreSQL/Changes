@@ -1,3 +1,9 @@
+0.03 - 2026-04-06, Guido Brugnara
+
+    CPAN security policy and metadata (CPANSec alignment): add SECURITY.md,
+    enable MetaJSON (META.json) in dist.ini, add POD SECURITY section.
+
+
 0.02 - 2025-01-25, Guido Brugnara
 
     Typos on Documentation.

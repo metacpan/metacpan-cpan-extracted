@@ -1,0 +1,31 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+Z|SYSOP MANUAL|CYAN|Go Back To The Table of Contents
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% RED         %] ____  ____ ____    _   _       _                          _ [% RESET %] [% BRIGHT CYAN %] __  __                         _ [% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% YELLOW      %]| __ )| __ ) ___|  | | | |_ __ (_)_   _____ _ __ ___  __ _| |[% RESET %] [% BRIGHT CYAN %]|  \/  | __ _ _ __  _   _  __ _| |[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% GREEN       %]|  _ \|  _ \___ \  | | | | '_ \| \ \ / / _ \ '__/ __|/ _` | |[% RESET %] [% BRIGHT CYAN %]| |\/| |/ _` | '_ \| | | |/ _` | |[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% MAGENTA     %]| |_) | |_) |__) | | |_| | | | | |\ V /  __/ |  \__ \ (_| | |[% RESET %] [% BRIGHT CYAN %]| |  | | (_| | | | | |_| | (_| | |[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% BRIGHT BLUE %]|____/|____/____/   \___/|_| |_|_| \_/ \___|_|  |___/\__,_|_|[% RESET %] [% BRIGHT CYAN %]|_|  |_|\__,_|_| |_|\__,_|\__,_|_|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+
+[% HORIZONTAL RULE CYAN %][% BOLD %][% B_CYAN %][% BLACK %] INTRODUCTION[% RESET %]
+
+[% JUSTIFIED %]Way back in the late 1980s, I wrote a BBS program on the Timex/Sinclair 2068 (in BASIC and Z80 machine code) and called it
+[% ITALIC %]The Looney Bin![% RESET %].  It was briefly feature on an issue of BYTE Magazine and was a message only BBS. Later
+I ran a BBS on an Atari 800XL with a single 1050 floppy drive.  Then I coded a BBS program from scratch called [% ITALIC %]Spiffy BBS[% RESET %].
+It was written in compiled GFA BASIC on an Atari 1040 ST.  It was the most advanced BBS I ever wrote, and ran for a few years.
+It was ASCII, VT-52 and ATASCII.[% ENDJUSTIFIED %]
+
+[% JUSTIFIED %]Now I reflected on the past and got interested in retro-computers.  I noticed they were becoming popular again.  Some people ran
+serial to TCP/IP adapters and running old BBS programs on them.  Quite ingenious.  PCs have ANSI BBS programs, one being [% ITALIC %]SBBS[% RESET %].[% ENDJUSTIFIED %]
+
+[% JUSTIFIED %]I decided to make this program, [% ITALIC %]BBS::Universal[% RESET %] to accommodate plain ASCII, ANSI, ATASCII, and PETSCII formats.
+Instead of a redirected modem program like many of the others, this one is written to be a network server.[% ENDJUSTIFIED %]
+
+[% BOLD %][% B_YELLOW %][% BLACK %] COMMANDS VERSUS TOKENS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+The system bifercates the SysOp system from the user system.  This means SysOp tokens and commands will not work when a user is using the system.
+
+Commands are typically used in menus as a choice.  Tokens are macros that are embedded in text.  They can be colors, cursor controls, BBS system data.
+

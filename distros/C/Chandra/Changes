@@ -1,5 +1,12 @@
 Revision history for Chandra
 
+0.15 2026-04-06
+   - Add Chandra::Splash - For splash screen / loading state
+   - Add Chandra::Log - For structured logging framework
+   - Add Chandra::Socket::Token - For token management with rotation and expiry
+   - More test fixes for Strawberry Perl
+   - Makefile fix for darwin intel arch
+
 0.14 2026-04-06
    - Add Chandra::ContextMenu - Context menus for Chandra applications
    - A few more fixes to try and get Strawberry to build

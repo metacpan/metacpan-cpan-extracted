@@ -101,8 +101,46 @@ _client_do_connect(pTHX_ SV *self)
         ? SvPV_nolen(*transport_svp) : "unix";
 
 #ifdef _WIN32
-    if (!strEQ(transport, "tcp"))
-        croak("Socket::Client: Unix domain sockets are not supported on Windows; use transport => 'tcp'");
+    /* Auto-upgrade to TCP on Windows */
+    if (!strEQ(transport, "tcp")) {
+        transport = "tcp";
+        (void)hv_stores(hv, "transport", newSVpvs("tcp"));
+    }
+
+    /* If connecting by hub name (no explicit port), read discovery file */
+    {
+        SV **port_svp  = hv_fetchs(hv, "port", 0);
+        SV **hub_svp   = hv_fetchs(hv, "hub_name", 0);
+        if ((!port_svp || !SvOK(*port_svp)) && hub_svp && SvOK(*hub_svp)) {
+            SV *disc_path = _sock_build_path(aTHX_ SvPV_nolen(*hub_svp));
+            const char *dpath = SvPV_nolen(disc_path);
+            FILE *dfh = fopen(dpath, "rb");
+            if (dfh) {
+                char line[256];
+                /* Line 1: port */
+                if (fgets(line, sizeof(line), dfh)) {
+                    IV port = atoi(line);
+                    if (port > 0)
+                        (void)hv_stores(hv, "port", newSViv(port));
+                }
+                /* Line 2: token (if not explicitly provided) */
+                {
+                    SV **explicit_svp = hv_fetchs(hv, "_explicit_token", 0);
+                    if ((!explicit_svp || !SvTRUE(*explicit_svp))
+                        && fgets(line, sizeof(line), dfh)) {
+                        /* Strip trailing newline */
+                        size_t len = strlen(line);
+                        while (len > 0 && (line[len-1] == '\n' || line[len-1] == '\r'))
+                            line[--len] = '\0';
+                        if (len > 0)
+                            (void)hv_stores(hv, "_token", newSVpvn(line, len));
+                    }
+                }
+                fclose(dfh);
+            }
+            SvREFCNT_dec(disc_path);
+        }
+    }
 #endif
     if (strEQ(transport, "tcp"))
         sock = _client_connect_tcp(aTHX_ hv);
@@ -238,6 +276,30 @@ _client_do_poll(pTHX_ SV *self)
         reply_svp = hv_fetchs(msg_hv, "_reply_to", 0);
         ch_svp    = hv_fetchs(msg_hv, "channel", 0);
         data_svp  = hv_fetchs(msg_hv, "data", 0);
+
+        /* Handle __token_rotate from hub */
+        if (ch_svp && SvOK(*ch_svp) &&
+            strEQ(SvPV_nolen(*ch_svp), "__token_rotate")) {
+            if (data_svp && SvOK(*data_svp) && SvROK(*data_svp)) {
+                HV *td = (HV *)SvRV(*data_svp);
+                SV **new_tok_svp = hv_fetchs(td, "token", 0);
+                if (new_tok_svp && SvOK(*new_tok_svp)) {
+                    (void)hv_stores(hv, "_token",
+                        newSVsv(*new_tok_svp));
+                    /* Fire on_token_refresh callback */
+                    {
+                        SV **cb_svp2 = hv_fetchs(hv,
+                            "_on_token_refresh", 0);
+                        if (cb_svp2 && SvOK(*cb_svp2)
+                            && SvROK(*cb_svp2)) {
+                            _sock_dispatch_cb(aTHX_ *cb_svp2,
+                                *new_tok_svp);
+                        }
+                    }
+                }
+            }
+            continue;
+        }
 
         if (_client_dispatch_reply(aTHX_ hv,
                 reply_svp ? *reply_svp : NULL,

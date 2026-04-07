@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 =pod
 
@@ -86,7 +86,7 @@ This library is free software; you can redistribute it and/or modify it under th
 use strict;
 use Cwd qw(abs_path);
 
-our $VERSION = "0.039";
+our $VERSION = "0.040";
 
 # Locate the real "git" later in the $PATH (after myself)
 our $real_git = find_real_git();
@@ -140,7 +140,7 @@ sub pass_options {
     push @options, "client=".abs_path($0)."\@v$VERSION";
     push @options, $ENV{XMODIFIERS} if $ENV{XMODIFIERS};
     $ENV{XMODIFIERS} = join "\n", @options;
-    $ENV{GIT_SSH_COMMAND} ||= "ssh";
+    $ENV{GIT_SSH_COMMAND} ||= git(qw[config core.sshCommand]) =~ /^(.+)/ ? $1 : "ssh";
     $ENV{GIT_SSH_COMMAND} = "$ENV{GIT_SSH_COMMAND} -o SendEnv=XMODIFIERS";
 }
 
@@ -148,7 +148,8 @@ sub find_real_git {
     my $myself = (stat $0)[1] or die "$0: Can't find my inode?\n";
     my $found_git = "";
     $ENV{GIT_CLIENT_TRIED} ||= "";
-    foreach my $path (split /\n/, $ENV{PATH}) {
+    require File::Spec;
+    foreach my $path (File::Spec->path) {
         my $try = "$path/git";
         if (my @stat = stat $try) {
             if ($stat[1] == $myself) {

@@ -2,9 +2,16 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
+README_BUILD.pod
+SECURITY.md
+dzil_build.sh
+dzil_build_trial.sh
+dzil_release.sh
+dzil_release_trial.sh
 lib/Crypt/PostgreSQL.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t

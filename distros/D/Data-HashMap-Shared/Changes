@@ -1,5 +1,8 @@
 Revision history for Data-HashMap-Shared
 
+0.04  2026-04-06
+    - Fix timing-sensitive TTL tests for slow CI environments
+
 0.03  2026-03-30
     - Fix "panic: free from wrong pool" on threaded/DEBUGGING Perls
       (use Perl allocator for SAVEFREEPV-managed buffers)

@@ -11,6 +11,16 @@ warn "\n Version 1.5 (or later) of the mpfi C library\n",
      " (available from https://gforge.inria.fr/projects/mpfi)\n",
      " is needed to build this module\n";
 
+# A cpantester's build of perl is/was specifying "LIBS=-lquadmath" in the Perl_MM_OPT
+# envirnoment variable - which overrides the assignment to $options{LIBS} below,
+# at line 502.
+# See (eg) https://www.cpantesters.org/cpan/report/8c458db3-71b3-1014-beba-d9dcb6a500a3 .
+# The following substitution regex works around the problem.
+{
+  no warnings 'uninitialized'; # It doesn't matter if $ENV{PERL_MM_OPT} is uninitialized.
+  $ENV{PERL_MM_OPT} =~ s/\sLIBS=\-lquadmath|^LIBS=\-lquadmath//;
+}
+
 my $use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
 my $use_long_double = 0;# Let perl decide whether to include 'long double' support
 

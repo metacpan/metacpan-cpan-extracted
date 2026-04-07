@@ -1,0 +1,15 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+A|SYSOP BBS ADD|YELLOW|Add a BBS to the List
+B|SYSOP BBS BULK MERGE|PINK|Bulk Add/Merge BBS List
+E|SYSOP BBS EDIT|GREEN|Edit a BBS on List
+R|SYSOP BBS DELETE|RED|Remove a BBS on List
+V|SYSOP BBS LIST VIEW|ORANGE|View BBS List
+Z|BACK|WHITE|Return to System Menu
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %]   ____  ____ ____    _     _     _   _               __  __[% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %] | __ )| __ ) ___|  | |   (_)___| |_(_)_ __   __ _  |  \/  | __ _ _ __   __ _  __ _  ___ _ __[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %]|  _ \|  _ \___ \  | |   | / __| __| | '_ \ / _` | | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %]| |_) | |_) |__) | | |___| \__ \ |_| | | | | (_| | | |  | | (_| | | | | (_| | (_| |  __/ |[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %] |____/|____/____/  |_____|_|___/\__|_|_| |_|\__, | |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% BRIGHT BLUE %]                                              |___/                            |___/[% RESET %]

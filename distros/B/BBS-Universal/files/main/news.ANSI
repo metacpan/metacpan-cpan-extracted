@@ -1,0 +1,16 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+S|NEWS SUMMARY|GREEN|USER|List System News Summary
+D|NEWS DISPLAY|MAGENTA|USER|Show System News in Detail
+C|RSS CATEGORIES|BRIGHT YELLOW|USER|World News Feed Categories
+W|RSS FEEDS|BRIGHT BLUE|USER|World News Feeds
+Z|BACK|WHITE|USER|Return to the Main Menu
+---
+[% CLS %][% CYAN %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% BRIGHT WHITE %][% B_BLUE %][% BLACK STAR %] [% RED %][% B_BRIGHT WHITE %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% RESET %]  _   _                    [% B_BLUE %] [% BLACK STAR %] [% RESET %]
+ [% CYAN %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% BRIGHT WHITE          %][% B_BLUE %][% BLACK STAR %] [% RED %][% B_BRIGHT WHITE %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% RESET %] | \ | | _____      _____  [% B_BLUE %] [% BLACK STAR %] [% RESET %]
+  [% CYAN %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% BRIGHT WHITE          %][% B_BLUE %][% BLACK STAR %] [% RED %][% B_BRIGHT WHITE %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% RESET %] |  \| |/ _ \ \ /\ / / __| [% B_BLUE %] [% BLACK STAR %] [% RESET %]
+  [% CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT WHITE        %][% RED      %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% RESET %] | |\  |  __/\ V  V /\__ \ [% B_BLUE %] [% BLACK STAR %] [% RESET %]
+ [% CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% B_BRIGHT WHITE        %][% RED      %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% RESET %] |_| \_|\___| \_/\_/ |___/ [% B_BLUE %] [% BLACK STAR %] [% RESET %]
+[% CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]  [% RED                   %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% RESET               %]                           [% BLUE %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% UPPER HALF BLOCK %][% RESET %]
+
+[% BLACK %][% B_BRIGHT BLUE %] World News Category [% RESET %] [% RSS CATEGORY %]

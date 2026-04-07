@@ -15,7 +15,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # touch refreshes TTL
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 10);
 
     shm_ii_put $map, 1, 10;
     sleep 1;
@@ -24,7 +24,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     ok(shm_ii_touch $map, 1, 'touch returns true for existing key');
 
     my $rem = shm_ii_ttl_remaining $map, 1;
-    ok($rem > 1, "TTL refreshed after touch: $rem");
+    ok($rem > 5, "TTL refreshed after touch: $rem");
 
     # touch non-existent key
     ok(!shm_ii_touch $map, 999, 'touch returns false for missing key');

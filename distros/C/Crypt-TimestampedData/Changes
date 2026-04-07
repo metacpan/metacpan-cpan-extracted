@@ -1,3 +1,10 @@
+0.02 - 2026-04-06, Guido Brugnara
+
+    CPAN security policy and metadata (CPANSec alignment)
+    - Added SECURITY.md with coordinated vulnerability disclosure contact
+    - Ship META.json in the distribution ([MetaJSON] in dist.ini)
+    - Document security reporting in POD (=head1 SECURITY in main module and alias)
+
 0.01 - 2025-10-11, Guido Brugnara
 
     First stable release

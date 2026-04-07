@@ -118,9 +118,9 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 # cursor_seek with TTL expired key
 {
     my $path = tmpfile();
-    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 1);
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 2);
     shm_ii_put $map, 1, 10;
-    sleep 2;
+    sleep 4;
     my $cur = shm_ii_cursor $map;
     ok(!shm_ii_cursor_seek $cur, 1, 'seek expired key returns false');
     unlink $path;

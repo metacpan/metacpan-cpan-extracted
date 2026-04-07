@@ -1,5 +1,8 @@
 Revision history for IO-Uring
 
+0.014     2026-04-06 19:06:33+02:00 Europe/Brussels
+          - Abort configuration if kernel isn't recent enough
+
 0.013     2026-04-05 21:56:54+02:00 Europe/Brussels
           - Reorganize and extend buffer group documentation
           - Add id method to BufferGroup

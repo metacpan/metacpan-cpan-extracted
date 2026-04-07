@@ -9,6 +9,7 @@ WriteMakefile
     PREREQ_PM     => {
         'Cwd'          => 0,
         'Getopt::Long' => 0,
+        'File::Spec'   => 0,
         'File::Which'  => 0,
         (`which strace 2>/dev/null` ? () : ('IO::Trace' => 0)),
     },
@@ -18,6 +19,7 @@ WriteMakefile
     EXE_FILES => [ `cat MANIFEST` =~ /^(git-.{6})$/gm ],
     PM => {
         map ( ( "lib/$_" => "\$(INST_LIB)/$_" ), `cat MANIFEST` =~ m{^lib/(.+\.pm)$}gm ),
-        map ( ( $_ => "\$(INST_SCRIPT)/$_" ), `cat MANIFEST` =~ /^(git-.{6}|hooks.*)$/gm ),
+        # Kludge to install "hooks" folder too:
+        map ( ( $_ => "\$(INST_SCRIPT)/$_" ), `cat MANIFEST` =~ /^(hooks.*)$/gm ),
     },
     ;

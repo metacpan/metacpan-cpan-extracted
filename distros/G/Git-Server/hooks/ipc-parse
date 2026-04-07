@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+use Fcntl qw(O_RDWR O_CREAT LOCK_EX);
 
 sub crash {
     my $err_message = shift;
@@ -47,6 +48,59 @@ sub d {
     return $s;
 }
 
+my $json_obj = undef;
+my $serializer = eval {require JSON; $json_obj = JSON->new->canonical} ? sub { $json_obj->encode(@_)."\n" } : eval {require Data::Dumper;1} ? sub { Data::Dumper::Dumper(@_) } : sub { qq{{"error":"Data Transport Failure"}\n} };
+sub serialize { $serializer->(@_) }
+sub unserialize {
+    my $string = shift;
+    return $json_obj->decode($string) if $string =~ /^[\[\{]/;
+    return eval($string) || crash "unserialize [$string] crashed: $@";
+}
+
+# $val = cache { some_painful_munger_to_generate_value() } $key, $TIME_TO_LIVE;
+# If no $TIME_TO_LIVE is provided, then defaults to 3600, meaning one hour.
+my $dir = $ENV{GIT_DIR} or crash "Unable to determine repo";
+my $cachedir = "$dir/tmp";
+mkdir $cachedir, 0700 if !-d $cachedir;
+my $memoize = {};
+sub cache (&$;$) {
+    my $generator = shift;
+    "CODE" eq ref $generator or crash "cache: generator routine required instead of [$generator]";
+    my $key = shift;
+    $key =~ /^[\w\-\.]+$/ or crash "cache: key stank [$key]";
+    my $ttl = shift || 3600;
+    $ttl =~ /^\d+$/ or crash "cache: ttl stank [$ttl]";
+    if (!keys %$memoize and opendir my $caches, $cachedir) {
+        # Clear any stale cache files
+        foreach my $node (readdir $caches) {
+            my $cachefile = "$cachedir/$node";
+            $node =~ /^cache-(\d+)-/ or next;
+            my $stale = -$1+time;
+            unlink $cachefile if -f $cachefile and [stat _]->[9] < $stale;
+        }
+        closedir $caches;
+    }
+    # Only run the painful $generator if there's no cache
+    return $memoize->{$key} ||= do {
+        my $cachefile = "$cachedir/cache-$ttl-$key.txt";
+        sysopen my $fh, $cachefile, (O_RDWR|O_CREAT), 0600 or crash "$cachefile: open: $!";
+        flock $fh, LOCK_EX or crash "$cachefile: flock: $!";
+        my $cached = join "", <$fh>;
+        my $val = undef;
+        if (length $cached) {
+            close $fh; # Release the LOCK ASAP
+            $val = unserialize($cached);
+        }
+        else { # Hold the lock to ensure nobody else tries to run this same expensive $generator
+            my $val = $generator->();
+            $cached = serialize($val);
+            print $fh $cached;
+            close $fh;
+        }
+        $val;
+    };
+}
+
 # my $details_hash = commit_details($commit_id);
 sub commit_details {
     my $c = shift;
@@ -87,37 +141,39 @@ sub commit_details {
     return $hash;
 }
 
-# parents_of:
+# $list = parents_of($commit_hash):
 # Find nearest parent hashes.
 # There might be more than one parent if it's a merge commit.
 # There might be zero parents if it's the very first commit.
-my $memoize_parents_of = {};
 sub parents_of {
     my $new = shift;
-    return $memoize_parents_of->{$new} if $memoize_parents_of->{$new};
-    chomp (my $pretty = `git cat-file -p $new`);
-    $pretty =~ s/\n\s*\n.*$/\n/s; # Ignore everything after the first nothing line
-    my $parents = [];
-    # There will be one parent for straight forward commit.
-    # There will be two parents for a merge commit.
-    push @$parents, $1 while $pretty =~ s/^parent\s+(\w+)\s*$//m;
-    return $memoize_parents_of->{$new} = $parents;
+    $new =~ /^(\w+)$/ or crash "parents_of: hash stank [$new]";
+    $new = $1;
+    return cache {
+        chomp (my $pretty = `git cat-file -p $new`);
+        $pretty =~ s/\n\s*\n.*$/\n/s; # Ignore everything after the first nothing line
+        my $parents = [];
+        # There will be one parent for straight forward commit.
+        # There will be two parents for a merge commit.
+        push @$parents, $1 while $pretty =~ s/^parent\s+(\w+)\s*$//m;
+        $parents;
+    } "parents_of-$new", 7200;
 }
 
-my $memoize_refs_containing_hash = {};
+# $containers = refs_containing_hash($commit_hash)
 sub refs_containing_hash {
     my $hash = shift;
-    return $memoize_refs_containing_hash->{$hash} if defined $memoize_refs_containing_hash->{$hash};
-    my $refs = {};
     # Security Emergency Taint Sniffing
-    if ($hash =~ /^(\w+)$/) {
-        $hash = $1;
+    $hash =~ /^(\w+)$/ or crash "refs_containing_hash: hash stank [$hash]";
+    $hash = $1;
+    return cache {
+        my $refs = {};
         foreach my $refname (`git branch --format '%(refname)' --contains $hash ; git tag --format '%(refname)' --contains $hash`) {
             chomp $refname;
             $refs->{$refname} = 1;
         }
-    }
-    return $memoize_refs_containing_hash->{$hash} = $refs;
+        $refs;
+    } "refs_containing_hash-$hash", 1800;
 }
 
 # get_fork_hash:
@@ -133,7 +189,7 @@ sub get_fork_hash {
     while (@revs) {
         my @prevs = ();
         foreach my $rev (@revs) {
-            my $tip = $seen->{$rev} or crash "Implementation Fatality! Missing seen value for rev=[$rev] ?\n";
+            my $tip = $seen->{$rev} or crash "Implementation Fatality! Missing seen value for rev=[$rev] ?";
             my $parents = parents_of($rev);
             foreach my $prev (@$parents) {
                 if (my $common_tip = $seen->{$prev}) {
@@ -255,7 +311,7 @@ if (open my $log_fh, "<", \$log) {
     close $log_fh;
 }
 
-my $who = ($ENV{REMOTE_USER} || crash "Auth required\n")."\@$ENV{REMOTE_ADDR}";
+my $who = ($ENV{REMOTE_USER} || crash "Auth required")."\@$ENV{REMOTE_ADDR}";
 my $cmd = $ENV{SSH_ORIGINAL_COMMAND} or crash "Unable to determine SSH command";
 my $operation = "";
 if ($cmd =~ /^git-receive-pack\s/) {
@@ -264,7 +320,7 @@ if ($cmd =~ /^git-receive-pack\s/) {
 elsif ($cmd =~ /^git-upload-pack\s/) {
     $operation = "pull";
 }
-die "Unrecognized invocation [$cmd]\n" unless $operation;
+crash "Unrecognized invocation [$cmd]" unless $operation;
 
 my $extracted = "";
 while ($client_to_server =~ s/^([0-9a-f]{4})//) {
@@ -274,7 +330,6 @@ while ($client_to_server =~ s/^([0-9a-f]{4})//) {
         $extracted =~ s/\s*$/\n/;
     }
 }
-#$client_to_server = $extracted.$client_to_server;
 $client_to_server = $extracted;
 $extracted = "";
 while ($server_to_client =~ s/^([0-9a-f]{4})//) {
@@ -284,7 +339,6 @@ while ($server_to_client =~ s/^([0-9a-f]{4})//) {
         $extracted =~ s/\s*$/\n/;
     }
 }
-#$server_to_client = $extracted.$server_to_client;
 $server_to_client = $extracted;
 #warn "DEBUG: leftovers=[$log]\n";
 warn "DEBUG: in=[$client_to_server]\n";
@@ -303,7 +357,8 @@ if (my $i = $ENV{GIT_OPTION_COUNT}) {
     }
 }
 
-if ($ENV{USER} and $ENV{HOME} and my $full = $ENV{GIT_DIR}) {
+if ($ENV{USER} and $ENV{HOME}) {
+    my $full = $dir;
     $full =~ s{^\Q$ENV{HOME}\E/*}{};
     $full ||= ".";
     $full =~ s/\.git$//;
@@ -333,7 +388,17 @@ if ($operation eq "pull" and @$want and !@$have) {
 
 # Example: agent=git/2.39.3.(Apple.Git-146)
 $info->{client_git_version} = $1 if $client_to_server =~ m{(?:^|\s|\b)agent=([\w/\.\-\(\)]+)};
+if (($ENV{XMODIFIERS}||"") =~ /^client=.*(git-?\w*)(?:@([\w\.]+))?/m) {
+    my $client = $1;
+    $client = "git-client" if $client eq "git";
+    my $version = $2 || "unknown";
+    $info->{client_git_version} = $info->{client_git_version} ? "[$client $version] $info->{client_git_version}" : "[$client $version]";
+}
+
 $info->{server_git_version} = $1 if $server_to_client =~ m{(?:^|\s|\b)agent=([\w/\.\-\(\)]+)};
+if (my $version = $ENV{GIT_SERVER_VERSION}) {
+    $info->{server_git_version} = $info->{server_git_version} ? "[git-server $version] $info->{server_git_version}" : "[git-server $version]";
+}
 
 defined ($info->{error_code} = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS}) or $info->{error_code} = -1;
 $info->{SUCCESS} = $info->{error_code} ? 0 : 1;
@@ -518,13 +583,5 @@ if ($info->{SUCCESS}) {
 # Include Deprecated OLD info for backwards compatibility:
 $info->{git_client_connected} = $info->{server_git_connected};
 
-if (eval { require JSON }) {
-    print JSON->new->canonical->encode($info)."\n";
-}
-elsif (eval { require Data::Dumper }) {
-    print Data::Dumper::Dumper($info);
-}
-else {
-    print qq{{"error":"Data Transport Failure"}\n};
-}
+print serialize($info);
 exit;

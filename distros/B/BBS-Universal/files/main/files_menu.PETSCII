@@ -1,0 +1,15 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+C|FILE CATEGORY|YELLOW|USER|Change File Category
+L|LIST FILES DETAILED|MAGENTA|USER|List files
+S|SEARCH FILES SUMMARY|GREEN|USER|Search for file (short format)
+D|SEARCH FILES DETAILED|RED|USER|Search for file (long format)
+U|UPLOAD FILE|CYAN|VETERAN|Upload a file
+Z|BACK|GREEN|USER|Main Menu
+---
+ ___ _ _        
+| __(_) |___ ___
+| _|| | / -_|_-<
+|_| |_|_\___/__/
+
+Current Category:  [% FILE CATEGORY %]

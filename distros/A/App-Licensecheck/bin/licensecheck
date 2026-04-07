@@ -12,7 +12,7 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.9
+Version v3.3.10
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ use Log::Any::Adapter;
 
 use App::Licensecheck;
 
-our $VERSION = 'v3.3.9';
+our $VERSION = 'v3.3.10';
 
 my $progname = path($0)->basename;
 
@@ -607,9 +607,13 @@ Can be set to 0 to explicitly disable colors.
 The default is to use color when connected to a terminal.
 
 =item LOG_LEVEL
+
 =item QUIET
+
 =item VERBOSE
+
 =item DEBUG
+
 =item TRACE
 
 Used to emit varying details about discoveries to STDERR

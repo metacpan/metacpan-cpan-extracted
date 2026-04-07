@@ -50,7 +50,7 @@
             "Pod::Usage" : "1.60",
             "String::Copyright" : "0.003",
             "String::Escape" : "0",
-            "String::License" : "0",
+            "String::License" : "v0.0.6",
             "autodie" : "0",
             "namespace::clean" : "0",
             "perl" : "5.012000"
@@ -73,7 +73,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.3.9"
+         "version" : "v3.3.10"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.3.9",
+   "version" : "v3.3.10",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],
@@ -104,5 +104,5 @@
          "file" : "bin/licensecheck"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

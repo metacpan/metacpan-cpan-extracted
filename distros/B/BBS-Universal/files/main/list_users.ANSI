@@ -1,0 +1,11 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+Z|BACK|WHITE|USER|Return to the Main Menu
+---
+[% CLS %][% ORANGE %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% ORANGE %]   _     _     _     _   _[% RESET %]
+ [% ORANGE          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% ORANGE %] | |   (_)___| |_  | | | |___  ___ _ __ ___[% RESET %]
+  [% ORANGE          %][% BLACK UPPER RIGHT TRIANGLE %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% ORANGE %]| |   | / __| __| | | | / __|/ _ \ '__/ __|[% RESET %]
+  [% ORANGE          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% ORANGE %]| |___| \__ \ |_  | |_| \__ \  __/ |  \__ \[% RESET %]
+ [% ORANGE          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% ORANGE %] |_____|_|___/\__|  \___/|___/\___|_|  |___/[% RESET %]
+[% ORANGE          %][% BLACK LOWER RIGHT TRIANGLE %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+[% SHOW USERS LIST %]

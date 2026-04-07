@@ -4,7 +4,7 @@
       "Arne Becker <arne@example.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -91,9 +91,9 @@
          "web" : "https://github.com/Ensembl/ensembl"
       }
    },
-   "version" : "113.0.0",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "114.0.0",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Apache-2.0"
 }
 

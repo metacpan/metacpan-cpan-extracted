@@ -8,7 +8,7 @@ use Devel::Hook;
 use Object::Proto;
 use Carp qw/croak/;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 use constant ro => 'ro';
 use constant is_ro => ( is => ro );
@@ -418,7 +418,7 @@ Object::Proto::Sugar - Moo-se-like syntax for Object::Proto
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

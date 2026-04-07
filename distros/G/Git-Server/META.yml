@@ -19,7 +19,8 @@ no_index:
     - inc
 requires:
   Cwd: '0'
+  File::Spec: '0'
   File::Which: '0'
   Getopt::Long: '0'
-version: '0.039'
+version: '0.040'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

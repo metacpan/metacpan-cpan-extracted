@@ -30,7 +30,7 @@ perldoc command.
 
 You can also look for information at:
 
-  * GitHub issues (report bugs here) https://github.com/giterlizzi/perl-DBD::DuckDB/issues
+  * GitHub issues (report bugs here) https://github.com/giterlizzi/perl-DBD-DuckDB/issues
 
 
 ## LICENSE AND COPYRIGHT

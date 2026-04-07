@@ -1,10 +1,10 @@
 {
    "abstract" : "Create JSON",
    "author" : [
-      "Ben Bullock <bkb@cpan.org>"
+      "Ben Bullock <benkasminbullock@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -62,6 +62,6 @@
          "web" : "https://github.com/benkasminbullock/json-create"
       }
    },
-   "version" : "0.35",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.36",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

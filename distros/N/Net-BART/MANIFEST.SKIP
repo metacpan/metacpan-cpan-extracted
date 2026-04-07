@@ -1,0 +1,34 @@
+# Version control
+^\.git/
+^\.gitignore$
+^\.claude/
+
+# Build artifacts
+^Makefile$
+^META\.
+^blib/
+^pm_to_blib$
+\.o$
+\.bs$
+^lib/Net/BART/XS\.c$
+
+# Editor files
+~$
+\.bak$
+\.swp$
+\.orig$
+
+# OS files
+\.DS_Store$
+^Thumbs\.db$
+
+# MANIFEST backup
+^MANIFEST\.bak$
+
+# Benchmarks and Go code (not needed for distribution)
+^bench.*\.pl$
+^micro_bench\.pl$
+^gobench/
+
+# Memory files
+^\.claude/

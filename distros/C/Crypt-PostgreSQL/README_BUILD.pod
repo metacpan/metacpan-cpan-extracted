@@ -1,0 +1,95 @@
+=encoding UTF-8
+
+=head1 Build and Release Scripts for Crypt-PostgreSQL
+
+Documentation for generating CPAN package: L<https://metacpan.org/pod/Dist::Zilla::Starter>
+
+Debian/Ubuntu installation: C<sudo apt-get install libdist-zilla-perl>
+
+This project includes custom scripts to manage the custom plugin C<SyncVersionFromDist>.
+
+=head1 Available Scripts
+
+=head2 Build Scripts
+
+=head3 C<dzil_build.sh>
+
+Executes normal build for final distribution.
+
+    ./dzil_build.sh
+
+=head3 C<dzil_build.sh --trial>
+
+Executes trial build passing the C<--trial> parameter.
+
+    ./dzil_build.sh --trial
+
+=head3 C<dzil_build_trial.sh>
+
+Executes trial build by calling C<dzil_build.sh --trial>.
+
+    ./dzil_build_trial.sh
+
+=head2 Release Scripts
+
+=head3 C<dzil_release_trial.sh>
+
+Executes complete release with C<--trial> (build + test + upload to CPAN).
+
+    ./dzil_release_trial.sh
+
+=head3 C<dzil_release.sh>
+
+Executes normal release (build + test + upload to CPAN).
+
+    ./dzil_release.sh
+
+=head3 C<dzil_release.sh --trial>
+
+Executes trial release passing the C<--trial> parameter.
+
+    ./dzil_release.sh --trial
+
+=head1 Why Use These Scripts?
+
+These scripts are necessary because:
+
+=over 4
+
+=item * B<Custom Plugin>: The project uses a custom Dist::Zilla plugin (C<SyncVersionFromDist>)
+
+=item * B<PERL5LIB>: The plugin is located in C<lib/Dist/Zilla/Plugin/> and must be available during build
+
+=item * B<Package Exclusion>: The plugin and scripts are excluded from the final package via C<[PruneFiles]>
+
+=back
+
+=head1 Features
+
+=over 4
+
+=item * ✅ Automatically set C<PERL5LIB=lib>
+
+=item * ✅ Execute build/release with Dist::Zilla
+
+=item * ✅ Verify operation success
+
+=item * ✅ Provide clear feedback on operation
+
+=item * ✅ Handle both normal and trial versions
+
+=back
+
+=head1 Notes
+
+=over 4
+
+=item * Scripts are excluded from the final package
+
+=item * The C<SyncVersionFromDist> plugin automatically synchronizes versions between C<Crypt::PostgreSQL> and C<Crypt::TSD>
+
+=item * No need to manually run C<PERL5LIB=lib dzil build>
+
+=item * C<dzil release> commands require interactive confirmation
+
+=back

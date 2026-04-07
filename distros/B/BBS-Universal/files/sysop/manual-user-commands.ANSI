@@ -1,0 +1,165 @@
+# SYSOP MODE MENU
+# Key | Command | Color | Description
+Z|SYSOP MANUAL|WHITE|Return To System Menu
+---
+[% CLS %][% BRIGHT RED %][% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT RED     %] [% RESET %][% BRIGHT RED     %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %]  [% RED         %] ____  ____ ____    _   _       _                          _ [% RESET %] [% BRIGHT CYAN %] __  __                         _ [% RESET %]
+[% BRIGHT YELLOW       %] [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT YELLOW  %] [% RESET %][% BRIGHT YELLOW  %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %] [% YELLOW      %]| __ )| __ ) ___|  | | | |_ __ (_)_   _____ _ __ ___  __ _| |[% RESET %] [% BRIGHT CYAN %]|  \/  | __ _ _ __  _   _  __ _| |[% RESET %]
+[% BRIGHT GREEN        %]  [% BLACK UPPER RIGHT TRIANGLE %][% B_BRIGHT GREEN   %] [% RESET %][% BRIGHT GREEN   %][% INVERT %][% BLACK UPPER RIGHT TRIANGLE %][% RESET %][% GREEN       %]|  _ \|  _ \___ \  | | | | '_ \| \ \ / / _ \ '__/ __|/ _` | |[% RESET %] [% BRIGHT CYAN %]| |\/| |/ _` | '_ \| | | |/ _` | |[% RESET %]
+[% BRIGHT MAGENTA      %]  [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT MAGENTA %] [% RESET %][% BRIGHT MAGENTA %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% MAGENTA     %]| |_) | |_) |__) | | |_| | | | | |\ V /  __/ |  \__ \ (_| | |[% RESET %] [% BRIGHT CYAN %]| |  | | (_| | | | | |_| | (_| | |[% RESET %]
+[% BRIGHT BLUE         %] [% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT BLUE    %] [% RESET %][% BRIGHT BLUE    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %] [% BRIGHT BLUE %]|____/|____/____/   \___/|_| |_|_| \_/ \___|_|  |___/\__,_|_|[% RESET %] [% BRIGHT CYAN %]|_|  |_|\__,_|_| |_|\__,_|\__,_|_|[% RESET %]
+[% BRIGHT CYAN         %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT CYAN    %] [% RESET %][% BRIGHT CYAN    %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %]
+
+[% HORIZONTAL RULE CYAN %][% BOLD %][% B_CYAN %][% BLACK %] USER COMMANDS[% RESET %]
+
+[% BOLD %][% B_GREEN %][% BLACK %] ABOUT [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show "files/main/about.*" that should explain everything about your BBS
+
+[% BOLD %][% B_GREEN %][% BLACK %] ACCOUNT MANAGER [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show "files/main/account.*" that should list the commands to modify the user's account settings
+
+[% BOLD %][% B_GREEN %][% BLACK %] BBS LIST ADD [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Add an entry to the BBS list.
+
+[% BOLD %][% B_GREEN %][% BLACK %] BBS LISTING [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show "files/main/bbs_listing.*" showing BBS list maintenance options.
+
+[% BOLD %][% B_GREEN %][% BLACK %] CHANGE BAUD RATE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Change the simulated baud rate.
+
+[% BOLD %][% B_GREEN %][% BLACK %] CHANGE DATE FORMAT [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Change the date format.
+
+[% BOLD %][% B_GREEN %][% BLACK %] CHANGE SCREEN SIZE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Change the screen width and height.
+
+[% BOLD %][% B_GREEN %][% BLACK %] CHOOSE TEXT MODE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Change the text mode to ASCII, ANSI, ATASCII or PETSCII.
+
+[% BOLD %][% B_GREEN %][% BLACK %] DISCONNECT [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Simply disconnects the user in a friendly way.
+
+[% BOLD %][% B_GREEN %][% BLACK %] FILE CATEGORY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Change the file category.
+
+[% BOLD %][% B_GREEN %][% BLACK %] FILES [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the "files/main/files_menu.*" to show the commands to handle downloadabe files.
+
+[% BOLD %][% B_GREEN %][% BLACK %] FORUM CATEGORIES [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Choose the current forum category.
+
+[% BOLD %][% B_GREEN %][% BLACK %] FORUM MESSAGES [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Write a new message in the current category.
+
+[% BOLD %][% B_GREEN %][% BLACK %] FORUM MESSAGES DELETE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Delete the current message
+
+[% BOLD %][% B_GREEN %][% BLACK %] FORUM MESSAGES EDIT [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Edit the current message
+
+[% BOLD %][% B_GREEN %][% BLACK %] FORUM MESSAGES LIST [% RESET %][% YELLOW %]🭬[% RESET %]
+
+List the messages in the current forum.
+
+[% BOLD %][% B_GREEN %][% BLACK %] FORUM MESSAGES READ [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Read the messages in the current category sorted by most recent message first.
+
+[% BOLD %][% B_GREEN %][% BLACK %] FORUMS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the list of forums.
+
+[% BOLD %][% B_GREEN %][% BLACK %] LIST FILES DETAILED [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show a detailed file list in the current file category.
+
+[% BOLD %][% B_GREEN %][% BLACK %] LIST FILES SUMMARY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show a summary file list in the current file category.
+
+[% BOLD %][% B_GREEN %][% BLACK %] LIST USERS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the user list.
+
+[% BOLD %][% B_GREEN %][% BLACK %] NEWS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Go to the "files/main/news.*" file with the News commands.
+
+[% BOLD %][% B_GREEN %][% BLACK %] NEWS DISPLAY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the local system news in detail sorted by most recent first.
+
+[% BOLD %][% B_GREEN %][% BLACK %] NEWS SUMMARY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the local system news summary sorted by the most recent first.
+
+[% BOLD %][% B_GREEN %][% BLACK %] RSS CATEGORIES [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show a list of world news categories.
+
+[% BOLD %][% B_GREEN %][% BLACK %] RSS FEEDS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the world news feeds for the current news category.
+
+[% BOLD %][% B_GREEN %][% BLACK %] SEARCH BBS LIST [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Search the BBS for a specific BBS.
+
+[% BOLD %][% B_GREEN %][% BLACK %] SEARCH FILES DETAILED [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Search for a specific file and show its details.
+
+[% BOLD %][% B_GREEN %][% BLACK %] SEARCH FILES SUMMARY [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Search for a specific file and only show a brief summary.
+
+[% BOLD %][% B_GREEN %][% BLACK %] SHOW FULL BBS LIST [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Show the full BBS list.
+
+[% BOLD %][% B_GREEN %][% BLACK %] TOGGLE PLAY FORTUNES [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Part of account settings.  It enables or disables the fortunes at the main menu prompt.
+
+[% BOLD %][% B_GREEN %][% BLACK %] TOGGLE PREFER NICKNAME [% RESET %][% YELLOW %]🭬[% RESET %]
+
+As part of account settings, toggle the prefer nickname setting.
+
+[% BOLD %][% B_GREEN %][% BLACK %] TOGGLE SHOW EMAIL [% RESET %][% YELLOW %]🭬[% RESET %]
+
+As part of account settings, toggle the show email setting.  This will hide the user's email to other users if turned off.
+
+[% BOLD %][% B_GREEN %][% BLACK %] UPDATE ACCOMPLISHMENTS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+As part of account settings, enter accomplishments.  Can be anything and is basically a brag for the user.
+
+[% BOLD %][% B_GREEN %][% BLACK %] UPDATE EMAIL [% RESET %][% YELLOW %]🭬[% RESET %]
+
+As part of account settings, allows the email address to be changed.
+
+[% BOLD %][% B_GREEN %][% BLACK %] UPDATE LOCATION [% RESET %][% YELLOW %]🭬[% RESET %]
+
+As part of account settings, allows the change of location for the user.
+
+[% BOLD %][% B_GREEN %][% BLACK %] UPDATE RETRO SYSTEMS [% RESET %][% YELLOW %]🭬[% RESET %]
+
+As part of account settings, allows the user to change the user's list of retro systems.
+
+[% BOLD %][% B_GREEN %][% BLACK %] UPLOAD FILE [% RESET %][% YELLOW %]🭬[% RESET %]
+
+Upload a file.
+

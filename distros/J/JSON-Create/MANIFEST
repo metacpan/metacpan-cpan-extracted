@@ -1,3 +1,4 @@
+.#Changes
 bench/bench.pl
 Changes
 Create.xs
@@ -55,7 +56,6 @@ t/escape-slash.t
 t/fformat.t
 t/float.t
 t/funky-numbers.t
-t/guff.txt
 t/indent.t
 t/jcbool.t
 t/JCT.pm

@@ -57,7 +57,14 @@
     /* Windows doesn't have real uid/gid - use dummy values */
     #define FILE_FAKE_UID 1000
     #define FILE_FAKE_GID 1000
+    /*
+     * On Windows with PERL_IMPLICIT_SYS, Perl redefines open() to
+     * PerlLIO_open() which only accepts 2 args. Use _open() directly
+     * for the 3-arg form (path, flags, mode).
+     */
+    #define file_open3(path, flags, mode) _open(path, flags, mode)
 #else
+    #define file_open3(path, flags, mode) open(path, flags, mode)
     #include <unistd.h>
     #include <sys/mman.h>
     #include <utime.h>      /* For utime - more portable than utimes */
@@ -121,7 +128,7 @@ static FileHookEntry *g_file_hooks[4] = { NULL, NULL, NULL, NULL };
 
 static struct {
     char path[STAT_CACHE_PATH_MAX];
-    struct stat st;
+    Stat_t st;
     int valid;
 #ifdef _WIN32
     int uid;
@@ -133,7 +140,8 @@ static struct {
 } g_stat_cache = { "", {0}, 0, 0, 0 };
 
 /* Get cached stat or perform new stat */
-static int cached_stat(const char *path, struct stat *st) {
+static int cached_stat(const char *path, Stat_t *st) {
+    dTHX;
     if (g_stat_cache.valid && strcmp(path, g_stat_cache.path) == 0) {
         *st = g_stat_cache.st;
         return 0;
@@ -177,10 +185,11 @@ static void invalidate_stat_cache_path(const char *path) {
 
 /* Check readable using cached stat */
 static int file_is_readable_cached(const char *path) {
+    dTHX;
 #ifdef _WIN32
     return access(path, R_OK) == 0;
 #else
-    struct stat st;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) return 0;
     
     if (g_stat_cache.uid == 0) return 1;  /* root can read anything */
@@ -197,10 +206,11 @@ static int file_is_readable_cached(const char *path) {
 
 /* Check writable using cached stat */
 static int file_is_writable_cached(const char *path) {
+    dTHX;
 #ifdef _WIN32
     return access(path, W_OK) == 0;
 #else
-    struct stat st;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) return 0;
     
     if (g_stat_cache.uid == 0) return 1;  /* root can write anything */
@@ -217,6 +227,7 @@ static int file_is_writable_cached(const char *path) {
 
 /* Check executable using cached stat */
 static int file_is_executable_cached(const char *path) {
+    dTHX;
 #ifdef _WIN32
     /* Windows: check file extension for executability */
     const char *ext = strrchr(path, '.');
@@ -228,7 +239,7 @@ static int file_is_executable_cached(const char *path) {
     }
     return 0;
 #else
-    struct stat st;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) return 0;
     
     if (g_stat_cache.uid == 0) return 1;  /* root can execute anything */
@@ -486,7 +497,7 @@ static OP* pp_file_slurp(pTHX) {
     SV *path_sv = POPs;
     const char *path = SvPV_nolen(path_sv);
     int fd;
-    struct stat st;
+    Stat_t st;
     SV *result;
     char *buf;
     ssize_t n, total;
@@ -957,8 +968,10 @@ static OP* file_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     OpMORESIB_set(pushop, cvop);
     OpLASTSIB_set(argop, NULL);
 
-    /* Create unary custom op with arg as child */
-    newop = newUNOP(OP_CUSTOM, 0, argop);
+    /* Create as OP_NULL first to avoid -DDEBUGGING assertion in newUNOP,
+       then convert to OP_CUSTOM */
+    newop = newUNOP(OP_NULL, 0, argop);
+    newop->op_type = OP_CUSTOM;
     newop->op_ppaddr = ppfunc;
 
     op_free(entersubop);
@@ -997,8 +1010,10 @@ static OP* file_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     OpLASTSIB_set(pathop, NULL);
     OpLASTSIB_set(dataop, NULL);
 
-    /* Create binary custom op */
-    newop = newBINOP(OP_CUSTOM, 0, pathop, dataop);
+    /* Create as OP_NULL first to avoid -DDEBUGGING assertion in newBINOP,
+       then convert to OP_CUSTOM */
+    newop = newBINOP(OP_NULL, 0, pathop, dataop);
+    newop->op_type = OP_CUSTOM;
     newop->op_ppaddr = ppfunc;
 
     op_free(entersubop);
@@ -1115,7 +1130,7 @@ static void file_init(pTHX) {
 
 static SV* file_slurp_internal(pTHX_ const char *path) {
     int fd;
-    struct stat st;
+    Stat_t st;
     SV *result;
     char *buf;
     ssize_t total = 0, n;
@@ -1249,7 +1264,7 @@ apply_hooks:
 
 static SV* file_slurp_raw_internal(pTHX_ const char *path) {
     int fd;
-    struct stat st;
+    Stat_t st;
     SV *result;
     char *buf;
     ssize_t total = 0, n;
@@ -1389,7 +1404,7 @@ static int file_spew_internal(pTHX_ const char *path, SV *data) {
 
     buf = SvPV(write_data, len);
 
-    fd = open(path, open_flags, 0644);
+    fd = file_open3(path, open_flags, 0644);
     if (UNLIKELY(fd < 0)) {
         if (free_write_data) SvREFCNT_dec(write_data);
         return 0;
@@ -1465,7 +1480,7 @@ static int file_append_internal(pTHX_ const char *path, SV *data) {
 
     buf = SvPV(data, len);
 
-    fd = open(path, open_flags, 0644);
+    fd = file_open3(path, open_flags, 0644);
     if (UNLIKELY(fd < 0)) {
         return 0;
     }
@@ -1550,6 +1565,7 @@ static IV alloc_mmap_slot(void) {
 }
 
 static void free_mmap_slot(IV idx) {
+    dTHX;
     MmapEntry *entry;
 
     if (idx < 0 || idx >= g_mmaps_count) return;
@@ -1641,7 +1657,7 @@ static IV file_mmap_open(pTHX_ const char *path, int writable) {
 
 #else
     int fd;
-    struct stat st;
+    Stat_t st;
     int flags = writable ? O_RDWR : O_RDONLY;
     int prot = writable ? (PROT_READ | PROT_WRITE) : PROT_READ;
 
@@ -1711,6 +1727,7 @@ static SV* file_mmap_get_sv(pTHX_ IV idx) {
 }
 
 static void file_mmap_close(IV idx) {
+    dTHX;
     if (idx < 0 || idx >= g_mmaps_count) return;
 
     MmapEntry *entry = &g_mmaps[idx];
@@ -1721,6 +1738,7 @@ static void file_mmap_close(IV idx) {
 }
 
 static void file_mmap_sync(IV idx) {
+    dTHX;
     MmapEntry *entry;
 
     if (idx < 0 || idx >= g_mmaps_count) return;
@@ -1774,6 +1792,7 @@ static IV alloc_iter_slot(void) {
 }
 
 static void free_iter_slot(IV idx) {
+    dTHX;
     LineIterEntry *entry;
 
     if (idx < 0 || idx >= g_iters_count) return;
@@ -1914,6 +1933,7 @@ static SV* file_lines_next(pTHX_ IV idx) {
 }
 
 static int file_lines_eof(IV idx) {
+    dTHX;
     LineIterEntry *entry;
 
     if (idx < 0 || idx >= g_iters_count) {
@@ -1925,6 +1945,7 @@ static int file_lines_eof(IV idx) {
 }
 
 static void file_lines_close(IV idx) {
+    dTHX;
     if (idx < 0 || idx >= g_iters_count) return;
 
     LineIterEntry *entry = &g_iters[idx];
@@ -1939,7 +1960,8 @@ static void file_lines_close(IV idx) {
    ============================================ */
 
 static IV file_size_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) {
         return -1;
     }
@@ -1947,32 +1969,38 @@ static IV file_size_internal(const char *path) {
 }
 
 static int file_exists_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     return cached_stat(path, &st) == 0;
 }
 
 static int file_is_file_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) return 0;
     return S_ISREG(st.st_mode);
 }
 
 static int file_is_dir_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) return 0;
     return S_ISDIR(st.st_mode);
 }
 
 static int file_is_readable_internal(const char *path) {
+    dTHX;
     return file_is_readable_cached(path);
 }
 
 static int file_is_writable_internal(const char *path) {
+    dTHX;
     return file_is_writable_cached(path);
 }
 
 static IV file_mtime_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) {
         return -1;
     }
@@ -1980,7 +2008,8 @@ static IV file_mtime_internal(const char *path) {
 }
 
 static IV file_atime_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) {
         return -1;
     }
@@ -1988,7 +2017,8 @@ static IV file_atime_internal(const char *path) {
 }
 
 static IV file_ctime_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) {
         return -1;
     }
@@ -1996,7 +2026,8 @@ static IV file_ctime_internal(const char *path) {
 }
 
 static IV file_mode_internal(const char *path) {
-    struct stat st;
+    dTHX;
+    Stat_t st;
     if (cached_stat(path, &st) < 0) {
         return -1;
     }
@@ -2005,7 +2036,7 @@ static IV file_mode_internal(const char *path) {
 
 /* Combined stat - returns all attributes in one syscall */
 static HV* file_stat_all_internal(pTHX_ const char *path) {
-    struct stat st;
+    Stat_t st;
     HV *result;
 
     if (cached_stat(path, &st) < 0) {
@@ -2030,19 +2061,21 @@ static HV* file_stat_all_internal(pTHX_ const char *path) {
 }
 
 static int file_is_link_internal(const char *path) {
+    dTHX;
 #ifdef _WIN32
     /* Windows: check for reparse point */
     DWORD attrs = GetFileAttributesA(path);
     if (attrs == INVALID_FILE_ATTRIBUTES) return 0;
     return (attrs & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 #else
-    struct stat st;
+    Stat_t st;
     if (lstat(path, &st) < 0) return 0;
     return S_ISLNK(st.st_mode);
 #endif
 }
 
 static int file_is_executable_internal(const char *path) {
+    dTHX;
 #ifdef _WIN32
     /* Windows: check file extension */
     const char *ext = strrchr(path, '.');
@@ -2063,6 +2096,7 @@ static int file_is_executable_internal(const char *path) {
    ============================================ */
 
 static int file_unlink_internal(const char *path) {
+    dTHX;
     int result;
 #ifdef _WIN32
     result = _unlink(path) == 0;
@@ -2079,7 +2113,7 @@ static int file_unlink_internal(const char *path) {
 static int file_copy_internal(pTHX_ const char *src, const char *dst) {
 #if defined(__APPLE__)
     /* macOS: Use native copyfile() for best performance and metadata */
-    struct stat st;
+    Stat_t st;
     int result;
     if (stat(src, &st) < 0) return 0;
     result = copyfile(src, dst, NULL, COPYFILE_DATA) == 0;
@@ -2090,7 +2124,7 @@ static int file_copy_internal(pTHX_ const char *src, const char *dst) {
 #elif defined(__linux__)
     /* Linux: Use sendfile() for zero-copy transfer */
     int fd_src, fd_dst;
-    struct stat st;
+    Stat_t st;
     off_t offset = 0;
     ssize_t sent;
 
@@ -2102,7 +2136,7 @@ static int file_copy_internal(pTHX_ const char *src, const char *dst) {
         return 0;
     }
 
-    fd_dst = open(dst, O_WRONLY | O_CREAT | O_TRUNC, st.st_mode & 07777);
+    fd_dst = file_open3(dst, O_WRONLY | O_CREAT | O_TRUNC, st.st_mode & 07777);
     if (fd_dst < 0) {
         close(fd_src);
         return 0;
@@ -2169,7 +2203,7 @@ fallback_cleanup:
     int fd_src, fd_dst;
     char *buffer;
     ssize_t n_read, n_written, written;
-    struct stat st;
+    Stat_t st;
     int result = 0;
 #ifdef _WIN32
     int open_flags_r = O_RDONLY | O_BINARY;
@@ -2187,7 +2221,7 @@ fallback_cleanup:
         return 0;
     }
 
-    fd_dst = open(dst, open_flags_w, st.st_mode & 07777);
+    fd_dst = file_open3(dst, open_flags_w, st.st_mode & 07777);
     if (fd_dst < 0) {
         close(fd_src);
         return 0;
@@ -2255,6 +2289,7 @@ static int file_move_internal(pTHX_ const char *src, const char *dst) {
 }
 
 static int file_touch_internal(const char *path) {
+    dTHX;
     int result;
 #ifdef _WIN32
     HANDLE h;
@@ -2280,7 +2315,7 @@ static int file_touch_internal(const char *path) {
         result = 1;
     } else {
         /* File doesn't exist, create it */
-        fd = open(path, O_WRONLY | O_CREAT, 0644);
+        fd = file_open3(path, O_WRONLY | O_CREAT, 0644);
         if (fd < 0) {
             return 0;
         }
@@ -2296,6 +2331,7 @@ static int file_touch_internal(const char *path) {
 }
 
 static int file_chmod_internal(const char *path, int mode) {
+    dTHX;
     int result;
 #ifdef _WIN32
     result = _chmod(path, mode) == 0;
@@ -2310,6 +2346,7 @@ static int file_chmod_internal(const char *path, int mode) {
 }
 
 static int file_mkdir_internal(const char *path, int mode) {
+    dTHX;
     int result;
 #ifdef _WIN32
     PERL_UNUSED_VAR(mode);
@@ -2325,6 +2362,7 @@ static int file_mkdir_internal(const char *path, int mode) {
 }
 
 static int file_rmdir_internal(const char *path) {
+    dTHX;
     int result;
 #ifdef _WIN32
     result = _rmdir(path) == 0;
@@ -2619,7 +2657,7 @@ static int file_atomic_spew_internal(pTHX_ const char *path, SV *data) {
 
     buf = SvPV(data, len);
 
-    fd = open(temp_path, open_flags, 0644);
+    fd = file_open3(temp_path, open_flags, 0644);
     if (fd < 0) {
         return 0;
     }
@@ -2829,7 +2867,7 @@ static XS(xs_lines) {
     const char *path;
     AV *lines;
     int fd;
-    struct stat st;
+    Stat_t st;
     char *buffer;
     char *p, *end, *line_start;
     size_t file_size;
@@ -4967,5 +5005,9 @@ XS_EXTERNAL(boot_File__Raw) {
     /* Register cleanup for global destruction */
     Perl_call_atexit(aTHX_ file_cleanup_callback_registry, NULL);
 
+#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION >= 22)
     Perl_xs_boot_epilog(aTHX_ ax);
+#else
+    XSRETURN_YES;
+#endif
 }

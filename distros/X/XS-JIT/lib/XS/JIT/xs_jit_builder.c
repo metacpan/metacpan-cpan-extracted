@@ -1887,11 +1887,11 @@ void xs_jit_wrap_before(pTHX_ XS_JIT_Builder* b, const char* func_name,
     xs_jit_line(aTHX_ b, "    PUTBACK;");
     xs_jit_line(aTHX_ b, "    count = call_sv(orig_cv, gimme | G_EVAL);");
     xs_jit_line(aTHX_ b, "    SPAGAIN;");
-    xs_jit_line(aTHX_ b, "    if (SvTRUE(ERRSV)) { FREETMPS; LEAVE; croak_sv(ERRSV); }");
+    xs_jit_line(aTHX_ b, "    if (SvTRUE(ERRSV)) { FREETMPS; LEAVE; croak(\"%%s\", SvPV_nolen(ERRSV)); }");
     xs_jit_line(aTHX_ b, "    for (i = count - 1; i >= 0; i--) av_store(saved_results, i, newSVsv(POPs));");
     xs_jit_line(aTHX_ b, "    FREETMPS; LEAVE;");
     xs_jit_line(aTHX_ b, "}");
-    
+
     xs_jit_comment(aTHX_ b, "Return the saved results");
     xs_jit_line(aTHX_ b, "count = av_len(saved_results) + 1;");
     xs_jit_line(aTHX_ b, "if (gimme == G_ARRAY) {");
@@ -1939,7 +1939,7 @@ void xs_jit_wrap_after(pTHX_ XS_JIT_Builder* b, const char* func_name,
     xs_jit_line(aTHX_ b, "    PUTBACK;");
     xs_jit_line(aTHX_ b, "    orig_count = call_sv(orig_cv, gimme | G_EVAL);");
     xs_jit_line(aTHX_ b, "    SPAGAIN;");
-    xs_jit_line(aTHX_ b, "    if (SvTRUE(ERRSV)) { FREETMPS; LEAVE; croak_sv(ERRSV); }");
+    xs_jit_line(aTHX_ b, "    if (SvTRUE(ERRSV)) { FREETMPS; LEAVE; croak(\"%%s\", SvPV_nolen(ERRSV)); }");
     xs_jit_line(aTHX_ b, "    for (i = orig_count - 1; i >= 0; i--) av_store(saved_results, i, newSVsv(POPs));");
     xs_jit_line(aTHX_ b, "    FREETMPS; LEAVE;");
     xs_jit_line(aTHX_ b, "}");
@@ -2004,7 +2004,7 @@ void xs_jit_wrap_around(pTHX_ XS_JIT_Builder* b, const char* func_name,
     xs_jit_line(aTHX_ b, "    PUTBACK;");
     xs_jit_line(aTHX_ b, "    count = call_sv(around_cv, gimme | G_EVAL);");
     xs_jit_line(aTHX_ b, "    SPAGAIN;");
-    xs_jit_line(aTHX_ b, "    if (SvTRUE(ERRSV)) { FREETMPS; LEAVE; croak_sv(ERRSV); }");
+    xs_jit_line(aTHX_ b, "    if (SvTRUE(ERRSV)) { FREETMPS; LEAVE; croak(\"%%s\", SvPV_nolen(ERRSV)); }");
     xs_jit_line(aTHX_ b, "    for (i = count - 1; i >= 0; i--) av_store(saved_results, i, newSVsv(POPs));");
     xs_jit_line(aTHX_ b, "    FREETMPS; LEAVE;");
     xs_jit_line(aTHX_ b, "    count = av_len(saved_results) + 1;");

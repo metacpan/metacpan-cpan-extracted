@@ -1,6 +1,9 @@
 Revision history for Net-CardDAVTalk
 
-0.10    Sat Apr  5 2026
+0.11    Mon Apr  6 11:17 2026
+  - add dependencies on Text::JSContact and Net::DAVTalk
+
+0.10    Sat Apr  4 13:00 2026
   - Delegate vCard<=>JSContact conversion to Text::JSContact
   - API now uses JSContact Card hashrefs instead of VCard objects
   - NewContact/UpdateContact take hashrefs

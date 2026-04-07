@@ -13,6 +13,7 @@
 
 
 #include "math_mpfi_include.h"
+#include "math_mpfi_unused.h"
 
 int nok_pok = 0; /* flag that is incremented whenever a scalar that is both *
                   * NOK and POK is passed to new or an overloaded operator  */
@@ -51,6 +52,7 @@ int _win32_infnanstring(char * s) { /* MS Windows only - detect 1.#INF and 1.#IN
 
   return 0;
 #else
+  PERL_UNUSED_ARG(s);
   croak("Math::MPFI::_win32_infnanstring not implemented for this build of perl");
 #endif
 }
@@ -149,6 +151,7 @@ SV * _my_mpfr_set_float128(pTHX_ mpfr_t *p, SV * q, unsigned int round) { /* int
      else mpfr_mul_2ui(*p, *p, exp - exp2, GMP_RNDN);
      return newSViv(returned);
 #else
+     PERL_UNUSED_ARG3(p, q, round);
      croak("Math::MPFI::_my_mpfr_set_float128 not implemented for this build of perl");
 #endif
 }
@@ -424,6 +427,7 @@ void Rmpfi_init_set(pTHX_ mpfi_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set function");
@@ -443,6 +447,7 @@ void Rmpfi_init_set_ui(pTHX_ SV * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_ui function");
@@ -462,6 +467,7 @@ void Rmpfi_init_set_si(pTHX_ SV * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_si function");
@@ -481,6 +487,7 @@ void Rmpfi_init_set_d(pTHX_ SV * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_d function");
@@ -500,6 +507,7 @@ void Rmpfi_init_set_z(pTHX_ mpz_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_z function");
@@ -519,6 +527,7 @@ void Rmpfi_init_set_q(pTHX_ mpq_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_q function");
@@ -538,6 +547,7 @@ void Rmpfi_init_set_fr(pTHX_ mpfr_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_fr function");
@@ -558,6 +568,7 @@ void Rmpfi_init_set_str(pTHX_ SV * q, SV * base) {
      SV * obj_ref, * obj;
      int ret = (int)SvIV(base);
      mpfr_t t;
+     PERL_UNUSED_ARG(items);
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfi_init_set str is out of allowable range");
 
@@ -582,7 +593,7 @@ void Rmpfi_init_set_str(pTHX_ SV * q, SV * base) {
          ret = mpfi_init_set_str(*mpfi_t_obj, (char *)SvPV_nolen(q),SvIV(base));
        }
 #else
-
+     PERL_UNUSED_VAR(t);
      ret = mpfi_init_set_str(*mpfi_t_obj, SvPV_nolen(q), ret);
 
 #endif
@@ -601,6 +612,7 @@ void Rmpfi_init_set_nobless(pTHX_ mpfi_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_nobless function");
@@ -620,6 +632,7 @@ void Rmpfi_init_set_ui_nobless(pTHX_ SV * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_ui_nobless function");
@@ -639,6 +652,7 @@ void Rmpfi_init_set_si_nobless(pTHX_ SV * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_si_nobless function");
@@ -658,6 +672,7 @@ void Rmpfi_init_set_d_nobless(pTHX_ SV * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_d_nobless function");
@@ -677,6 +692,7 @@ void Rmpfi_init_set_z_nobless(pTHX_ mpz_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_z_nobless function");
@@ -696,6 +712,7 @@ void Rmpfi_init_set_q_nobless(pTHX_ mpq_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_q_nobless function");
@@ -715,6 +732,7 @@ void Rmpfi_init_set_fr_nobless(pTHX_ mpfr_t * q) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(items);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_init_set_fr_nobless function");
@@ -734,6 +752,7 @@ void Rmpfi_init_set_str_nobless(pTHX_ SV * q, SV * base) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret = (int)SvIV(base);
+     PERL_UNUSED_ARG(items);
 
      if(ret < 0 || ret > 36 || ret == 1) croak("2nd argument supplied to Rmpfi_init_set str is out of allowable range");
 
@@ -1545,8 +1564,9 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) ret = MPFI_CMP_UI(*a,SvUVX(b));
        else ret = MPFI_CMP_SI(*a,SvIVX(b));
-
        if(SWITCH_ARGS) ret *= -1;
+       if(ret < 0) ret = -1;
+       if(ret > 0) ret = 1;
        return newSViv(ret);
      }
 #else
@@ -1558,6 +1578,8 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
        ret = MPFI_CMP_FR(*a,t);
        if(SWITCH_ARGS) ret *= -1;
        mpfr_clear(t);
+       if(ret < 0) ret = -1;
+       if(ret > 0) ret = 1;
        return newSViv(ret);
      }
 
@@ -1595,6 +1617,8 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
        ret = MPFI_CMP_FR(*a,t);
        mpfr_clear(t);
        if(SWITCH_ARGS) ret *= -1;
+       if(ret < 0) ret = -1;
+       if(ret > 0) ret = 1;
        return newSViv(ret);
      }
 
@@ -1636,7 +1660,8 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
        mpfr_clear(t);
 
 #endif
-
+       if(ret < 0) ret = -1;
+       if(ret > 0) ret = 1;
        return newSViv(ret);
      }
 
@@ -1644,6 +1669,8 @@ SV * overload_spaceship(pTHX_ mpfi_t * a, SV * b, SV * third) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPFI")) {
          ret = MPFI_CMP(*a, *(INT2PTR(mpfi_t *, SvIVX(SvRV(b)))));
+         if(ret < 0) ret = -1;
+         if(ret > 0) ret = 1;
          return newSViv(ret);
        }
      }
@@ -2134,6 +2161,7 @@ SV * overload_lt(pTHX_ mpfi_t * a, SV * b, SV * third) {
 SV * overload_equiv(pTHX_ mpfi_t * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
+     PERL_UNUSED_ARG(third);
 
 #ifndef MATH_MPFI_NEED_LONG_LONG_INT
      if(SV_IS_IOK(b)) {
@@ -2245,6 +2273,7 @@ SV * overload_add(pTHX_ mpfi_t * a, SV * b, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("%s", "Failed to allocate memory in overload_add function");
@@ -2300,6 +2329,7 @@ SV * overload_add(pTHX_ mpfi_t * a, SV * b, SV * third) {
            croak("%s", "Invalid string supplied to Math::MPFI::overload_add");
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_add");
 #endif
@@ -2360,6 +2390,7 @@ SV * overload_mul(pTHX_ mpfi_t * a, SV * b, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
      int ret;
+     PERL_UNUSED_ARG(third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("%s", "Failed to allocate memory in overload_mul function");
@@ -2414,6 +2445,7 @@ SV * overload_mul(pTHX_ mpfi_t * a, SV * b, SV * third) {
            croak("%s", "Invalid string supplied to Math::MPFI::overload_mul");
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_mul");
 #endif
@@ -2540,6 +2572,7 @@ SV * overload_sub(pTHX_ mpfi_t * a, SV * b, SV * third) {
            croak("%s", "Invalid string supplied to Math::MPFI::overload_sub");
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_sub");
 #endif
@@ -2674,6 +2707,7 @@ SV * overload_div(pTHX_ mpfi_t * a, SV * b, SV * third) {
            croak("%s", "Invalid string supplied to Math::MPFI::overload_div");
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode))
          croak("%s", "Invalid string supplied to Math::MPFI::overload_div");
 #endif
@@ -2737,6 +2771,7 @@ SV * overload_div(pTHX_ mpfi_t * a, SV * b, SV * third) {
 SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
+     PERL_UNUSED_ARG(third);
 
      SvREFCNT_inc(a);
 
@@ -2787,6 +2822,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
          }
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode)) {
          SvREFCNT_dec(a);
          croak("%s", "Invalid string supplied to Math::MPFI::overload_add_eq");
@@ -2849,6 +2885,7 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
+     PERL_UNUSED_ARG(third);
 
      SvREFCNT_inc(a);
 
@@ -2899,6 +2936,7 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
          }
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode)) {
          SvREFCNT_dec(a);
          croak("%s", "Invalid string supplied to Math::MPFI::overload_mul_eq");
@@ -2960,6 +2998,7 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
+     PERL_UNUSED_ARG(third);
 
      SvREFCNT_inc(a);
 
@@ -3010,6 +3049,7 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
          }
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode)) {
          SvREFCNT_dec(a);
          croak("%s", "Invalid string supplied to Math::MPFI::overload_sub_eq");
@@ -3071,6 +3111,7 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
      mpfr_t t;
      int ret;
+     PERL_UNUSED_ARG(third);
 
      SvREFCNT_inc(a);
 
@@ -3121,6 +3162,7 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
          }
        }
 #else
+       PERL_UNUSED_VAR(ret);
        if(mpfr_init_set_str(t, (char *)SvPV_nolen(b), 0, __gmpfr_default_rounding_mode)) {
          SvREFCNT_dec(a);
          croak("%s", "Invalid string supplied to Math::MPFI::overload_div_eq");
@@ -3182,6 +3224,7 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 SV * overload_sqrt(pTHX_ mpfi_t * p, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(second, third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in overload_sqrt function");
@@ -3244,12 +3287,14 @@ void Rmpfi_urandom(mpfr_t * rop, mpfi_t * op, gmp_randstate_t * state) {
 }
 
 SV * overload_true(pTHX_ mpfi_t * op, SV * second, SV * third) {
+     PERL_UNUSED_ARG2(second, third);
      if(MPFI_IS_ZERO_PORTABLE(*op)) return newSViv(0);
      if(mpfi_nan_p(*op)) return newSViv(0);
      return newSViv(1);
 }
 
 SV * overload_not(pTHX_ mpfi_t * op, SV * second, SV * third) {
+     PERL_UNUSED_ARG2(second, third);
      if(MPFI_IS_ZERO_PORTABLE(*op)) return newSViv(1);
      if(mpfi_nan_p(*op)) return newSViv(1);
      return newSViv(0);
@@ -3258,6 +3303,7 @@ SV * overload_not(pTHX_ mpfi_t * op, SV * second, SV * third) {
 SV * overload_abs(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(second, third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_abs function");
@@ -3274,6 +3320,7 @@ SV * overload_abs(pTHX_ mpfi_t * op, SV * second, SV * third) {
 SV * overload_sin(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(second, third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_sin function");
@@ -3290,6 +3337,7 @@ SV * overload_sin(pTHX_ mpfi_t * op, SV * second, SV * third) {
 SV * overload_cos(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(second, third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_cos function");
@@ -3306,6 +3354,7 @@ SV * overload_cos(pTHX_ mpfi_t * op, SV * second, SV * third) {
 SV * overload_log(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(second, third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_log function");
@@ -3322,6 +3371,7 @@ SV * overload_log(pTHX_ mpfi_t * op, SV * second, SV * third) {
 SV * overload_exp(pTHX_ mpfi_t * op, SV * second, SV * third) {
      mpfi_t * mpfi_t_obj;
      SV * obj_ref, * obj;
+     PERL_UNUSED_ARG2(second, third);
 
      Newxz(mpfi_t_obj, 1, mpfi_t);
      if(mpfi_t_obj == NULL) croak("Failed to allocate memory in Rmpfi_exp function");
@@ -3411,6 +3461,8 @@ SV * overload_atan2(pTHX_ mpfi_t * a, SV * b, SV * third) {
            croak("Invalid string supplied to Math::MPFI::overload_atan2");
        }
 #else
+       PERL_UNUSED_VAR(tr);
+       PERL_UNUSED_VAR(ret);
        if(mpfi_set_str(*mpfi_t_obj, SvPV_nolen(b), 10))
          croak("Invalid string supplied to Math::MPFI::overload_atan2");
 #endif
@@ -3652,18 +3704,9 @@ OUTPUT:  RETVAL
 void
 _Rmpfi_set_default_prec (p)
 	SV *	p
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         _Rmpfi_set_default_prec(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpfi_get_default_prec ()
@@ -3676,18 +3719,9 @@ void
 Rmpfi_set_prec (op, prec)
 	mpfi_t *	op
 	SV *	prec
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_set_prec(aTHX_ op, prec);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpfi_get_prec (op)
@@ -3735,34 +3769,16 @@ OUTPUT:  RETVAL
 void
 DESTROY (p)
 	mpfi_t *	p
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         DESTROY(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpfi_clear (p)
 	mpfi_t *	p
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_clear(aTHX_ p);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpfi_set (rop, op)
@@ -3823,276 +3839,139 @@ void
 Rmpfi_swap (x, y)
 	mpfi_t *	x
 	mpfi_t *	y
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_swap(x, y);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpfi_init_set (q)
 	mpfi_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_ui (q)
 	SV *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_ui(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_si (q)
 	SV *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_si(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_d (q)
 	SV *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_d(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_z (q)
 	mpz_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_z(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_q (q)
 	mpq_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_q(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_fr (q)
 	mpfr_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_fr(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_str (q, base)
 	SV *	q
 	SV *	base
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_str(aTHX_ q, base);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_nobless (q)
 	mpfi_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_nobless(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_ui_nobless (q)
 	SV *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_ui_nobless(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_si_nobless (q)
 	SV *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_si_nobless(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_d_nobless (q)
 	SV *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_d_nobless(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_z_nobless (q)
 	mpz_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_z_nobless(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_q_nobless (q)
 	mpq_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_q_nobless(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_fr_nobless (q)
 	mpfr_t *	q
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_fr_nobless(aTHX_ q);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 void
 Rmpfi_init_set_str_nobless (q, base)
 	SV *	q
 	SV *	base
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
+        PL_markstack_ptr++;
         Rmpfi_init_set_str_nobless(aTHX_ q, base);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 int
 Rmpfi_diam_abs (rop, op)
@@ -4128,18 +4007,9 @@ void
 Rmpfi_alea (rop, op)
 	mpfr_t *	rop
 	mpfi_t *	op
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_alea(rop, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 double
 Rmpfi_get_d (op)
@@ -4149,18 +4019,9 @@ void
 Rmpfi_get_fr (rop, op)
 	mpfr_t *	rop
 	mpfi_t *	op
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_get_fr(rop, op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 Rmpfi_get_NV (op)
@@ -4733,18 +4594,9 @@ OUTPUT:  RETVAL
 void
 Rmpfi_print_binary (op)
 	mpfi_t *	op
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_print_binary(op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpfi_get_left (rop, op)
@@ -4919,18 +4771,9 @@ Rmpfi_bisect (rop1, rop2, op)
 void
 RMPFI_ERROR (msg)
 	SV *	msg
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         RMPFI_ERROR(aTHX_ msg);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 Rmpfi_is_error ()
@@ -4939,34 +4782,16 @@ Rmpfi_is_error ()
 void
 Rmpfi_set_error (op)
 	int	op
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_set_error(op);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpfi_reset_error ()
 
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_reset_error();
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 _itsa (a)
@@ -5187,18 +5012,9 @@ Rmpfi_urandom (rop, op, state)
 	mpfr_t *	rop
 	mpfi_t *	op
 	gmp_randstate_t *	state
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         Rmpfi_urandom(rop, op, state);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 SV *
 overload_true (op, second, third)
@@ -5339,34 +5155,16 @@ nok_pokflag ()
 void
 clear_nok_pok ()
 
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         clear_nok_pok();
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 void
 set_nok_pok (x)
 	int	x
-        PREINIT:
-        I32* temp;
         PPCODE:
-        temp = PL_markstack_ptr++;
         set_nok_pok(x);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        XSRETURN_EMPTY; /* return empty stack */
 
 int
 _has_pv_nv_bug ()

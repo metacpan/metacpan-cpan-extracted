@@ -19,7 +19,23 @@ Server Side:
 ```
 [git@gitsrvhost ~]$ cd
 [git@gitsrvhost ~]$ git clone https://github.com/hookbot/git-server
+[git@gitsrvhost ~]$ ./git-server/git-verify
 [git@gitsrvhost ~]$
+```
+
+Optionally, if you have sudo or super user powers,
+you can install it on the system:
+
+```
+[admin@gitsrvhost ~]$ git clone https://github.com/hookbot/git-server
+[admin@gitsrvhost ~]$ cd git-server
+[admin@gitsrvhost git-server]$ perl Makefile.PL
+[admin@gitsrvhost git-server]$ make dist
+[admin@gitsrvhost git-server]$ rpm -ta Git-Server*.tar.gz
+[admin@gitsrvhost git-server]$ ls -1tr ~/rpmbuild/RPMS/noarch/perl-Git-Server-*rpm | tail -1 | xargs sudo yum install
+[admin@gitsrvhost git-server]$ cd
+[admin@gitsrvhost ~]$ git-verify
+[admin@gitsrvhost ~]$
 ```
 
 3. Using one of the following methods, setup a repository
@@ -55,8 +71,8 @@ to the proxy.url repo just to be safe:
 remote[...]
 Receiving[...]
 [git@gitsrvhost ~]$ cd /tmp/ProjX-test
-[git@gitsrvhost ProjX-testt]$ git pull
-[git@gitsrvhost ProjX-testt]$ cd
+[git@gitsrvhost ProjX-test]$ git pull
+[git@gitsrvhost ProjX-test]$ cd
 [git@gitsrvhost ~]$ rm -rf /tmp/ProjX-test
 [git@gitsrvhost ~]$
 ```
@@ -76,7 +92,7 @@ cause the repos to become out of sync, so it may not
 be the best long-term solution to use the proxy feature.
 
 C. Or if you already have the project checked out locally
-on this server, then switch it to bare:
+on this server, let's say in /tmp/ProjX, then switch it to bare:
 
 ```
 [git@gitsrvhost ~]$ git clone --bare /tmp/ProjX ~/ProjX
@@ -99,14 +115,13 @@ You can add unlimited client users and SSH public keys.
 
 5. HOOKS
 
-By default, the entire "hooks" folder will be symlinked
-to utilize these git-server features provided, but you
-may symlink it to wherever you wish. For example:
+By default, the "core.hooksPath" will point to the "hooks" folder
+of this installation to utilize these git-server features,
+but you can set it to wherever you wish. For example:
 
 ```
 [git@gitsrvhost ~]$ cd ProjX
-[git@gitsrvhost ProjX]$ mv -v hooks hooks.SAMPLES_OLD
-[git@gitsrvhost ProjX]$ ln -s -v ~/git-server/hooks .
+[git@gitsrvhost ProjX]$ git config core.hooksPath ~/git-server/hooks
 [git@gitsrvhost ProjX]$ cd
 [git@gitsrvhost ~]$
 ```
@@ -366,7 +381,7 @@ ensure this name is in the acl.deploy comma-delimited list.
 
 ```
 [admin@gitsrvhost ~]$ sudo su - git
-[git@gitsrvhost ~]$ echo 'command="~/git-server/git-server REMOTE_USER=push_notification_key1" ssh-ed25519 AAAAC1NTE5/FiREggu4HKIZPpJSe puller@deploy-host' >> ~/.ssh/authorized_keys
+[git@gitsrvhost ~]$ echo 'command="git-server REMOTE_USER=push_notification_key1" ssh-ed25519 AAAAC1NTE5/FiREggu4HKIZPpJSe puller@deploy-host' >> ~/.ssh/authorized_keys
 [git@gitsrvhost ~]$ cd ~/ProjX
 [git@gitsrvhost ProjX]$ git config acl.deploy
 srv7
@@ -400,13 +415,13 @@ Find another user with "writers" access to perform a push:
 
 ```
 [alice@dev ProjX]$ git push
-Tue Jun 23 07:54:45 2015: [alice] git-server: RUNNING PUSH ...
+Tue Jun 23 07:54:45 2015: [alice@192.168.5.100] git-server v0.040: PUSH Running...
 Counting objects: 4, done.
 Delta compression using up to 8 threads.
 Compressing objects: 100% (2/2), done.
 Writing objects: 100% (4/4), 387 bytes | 0 bytes/s, done.
 Total 4 (delta 1), reused 0 (delta 0)
-remote: Tue Jun 23 07:54:45 2015: Sending push notification to 222.222.222.222-push_notification_key1 ...
+remote: Tue Jun 23 07:54:45 2015: [alice@192.168.5.100] git-server: Sending push notification to 222.222.222.222-push_notification_key1 ...
 To git@git-host:projectz
    f60b258..d759447  main -> main
 [alice@dev ProjX]$
@@ -422,7 +437,7 @@ And you can append a cron to keep the deployment daemon running.
 A cron can ensure the latest version is always immediately deployed.
 
 ```
-[puller@deploy-host ProjX]$ (crontab -l 2>/dev/null ; echo ; echo "# Update once an hour" ; echo "0 * * * * git deploy --chdir ~/ProjX >/dev/null 2>/dev/null") | crontab -
+[puller@deploy-host ProjX]$ (crontab -l 2>/dev/null ; echo ; echo "# Update once an hour" ; echo "0 * * * * git deploy --background --chdir ~/ProjX >/dev/null 2>/dev/null") | crontab -
 [puller@deploy-host ProjX]$
 ```
 

@@ -1,5 +1,5 @@
 package IO::Uring::BufferGroup;
-$IO::Uring::BufferGroup::VERSION = '0.013';
+$IO::Uring::BufferGroup::VERSION = '0.014';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ IO::Uring::BufferGroup - An uring buffer group
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

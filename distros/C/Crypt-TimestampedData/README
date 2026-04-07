@@ -25,6 +25,15 @@ DESCRIPTION
     as opaque DER blobs. The goal is to enable reading/writing of .TSD
     files, delegating CMS/TS handling to external libraries when available.
 
+SECURITY
+
+    Report security vulnerabilities **privately** to the maintainer at
+    <gdo@leader.it>. See the SECURITY.md file in this distribution's root
+    directory for the full policy (coordinated disclosure, optional CC to
+    the CPAN Security Group <https://security.metacpan.org/> at
+    <cpan-security@security.metacpan.org>). Do not file security issues on
+    public bug trackers before coordination.
+
 METHODS
 
  new(%args)

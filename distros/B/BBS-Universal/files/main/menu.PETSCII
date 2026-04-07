@@ -1,0 +1,16 @@
+# USER MODE MENU
+# Key | Command | Color | Access Level | Description
+B|BBS LISTING|BLUE|VETERAN|Show BBS List
+O|FORUMS|WHITE|USER|Go To Forums
+M|ACCOUNT MANAGER|WHITE|USER|Manage Your Account
+F|FILES|WHITE|USER|Go To Files
+N|NEWS|WHITE|USER|System News
+A|ABOUT|WHITE|USER|About This BBS
+U|LIST USERS|YELLOW|VETERAN|List Users
+X|DISCONNECT|WHITE|USER|Disconnect
+---
+[% RED    %] __  __
+[% YELLOW %]|  \/  |___ _ _ _  _
+[% GREEN  %]| |\/| / -_) ' \ || |
+[% BLUE   %]|_|  |_\___|_||_\_,_|
+[% FORTUNE %]

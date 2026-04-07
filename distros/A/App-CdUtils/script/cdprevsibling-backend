@@ -9,11 +9,18 @@ use File::chdir;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-04'; # DATE
+our $DATE = '2026-04-07'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 # FRAGMENT id=shcompgen-hint completer=1 for=cdprevsibling
+# FRAGMENT id=shcompgen-hint completer=1 for=cdnextsibling
+
+# FRAGMENT id=shcompgen-hint completer=1 for=gdprevsibling
+# FRAGMENT id=shcompgen-hint completer=1 for=gdnextsibling
+
+# FRAGMENT id=shcompgen-hint completer=1 for=lsprevsibling
+# FRAGMENT id=shcompgen-hint completer=1 for=lsnextsibling
 
 my $cwd = $ENV{PWD} || cwd();
 my @cwd_elems = split m!/+!, $cwd;
@@ -145,7 +152,7 @@ cdprevsibling-backend - Change to the "previous" or "next" sibling directory
 
 =head1 VERSION
 
-This document describes version 0.014 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2026-04-04.
+This document describes version 0.015 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2026-04-07.
 
 =head1 SYNOPSIS
 
@@ -153,6 +160,10 @@ To use in shell:
 
  % cdprevsibling() { cd `cdprevsibling-backend "$@"`; }
  % cdnextsibling() { cd `cdnextsibling-backend "$@"`; }
+
+ # gd is short for "get" directory
+ % gdprevsibling() { cdprevsibling-backend "$@"; }
+ % gdnextsibling() { cdnextsibling-backend "$@"; }
 
  % lsprevsibling() { cdprevsibling-backend --ls "$@"; }
  % lsnextsibling() { cdnextsibling-backend --ls "$@"; }

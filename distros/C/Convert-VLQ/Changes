@@ -1,0 +1,6 @@
+Revision history for Perl extension Convert::VLQ.
+
+0.01  Mon Apr  6 15:58:20 2026
+	- original version; created by h2xs 1.23 with options
+		-b5.10.1 -AXc --use-new-tests --skip-exporter --skip-autoloader Convert::VLQ
+

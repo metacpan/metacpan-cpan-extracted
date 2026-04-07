@@ -5,14 +5,14 @@ Crypt::PostgreSQL - Module for generating encrypted password for PostgreSQL
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =cut
 
 use strict;
 use warnings;
 package Crypt::PostgreSQL;
-$Crypt::PostgreSQL::VERSION = '0.02';
+$Crypt::PostgreSQL::VERSION = '0.03';
 BEGIN {
     use Exporter ();
     use vars qw ($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -94,6 +94,15 @@ sub encrypt_scram {
     return "SCRAM-SHA-256\$$iterations:$b64_salt\$$b64_client_key:$b64_server_key";
 }
 
+
+=head1 SECURITY
+
+Report security vulnerabilities **privately** to the maintainer at
+E<lt>gdo@leader.itE<gt>. See the F<SECURITY.md> file in this distribution's
+root directory for the full policy (coordinated disclosure, optional CC to the
+L<CPAN Security Group|https://security.metacpan.org/> at
+E<lt>cpan-security@security.metacpan.orgE<gt>). Do not file security issues on
+public bug trackers before coordination.
 
 =head1 BUGS
 

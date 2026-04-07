@@ -6,6 +6,7 @@ use FindBin qw($Script);
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
+$ENV{GIT_HOOKS_PATH} ||= "$base/hooks";
 my $acl = {};
 my $conf = $0 =~ m{(.*)/} ? `$1/configs` : `git config --list`;
 while ($conf =~ s/^acl.(\w+)=(.*)$//m) {
@@ -23,16 +24,16 @@ my $deploy_branch = ($ENV{XMODIFIERS}||"") =~ /\bpull_branch=(\S+)\nclient.*git-
 my $msg = $deploy_branch ? " [git-deploy --branch $deploy_branch]" : "";
 $0 = "pre-read - $who:$base$msg";
 
-$conf !~ /^proxy/m or 0 == system "hooks/proxy", $Script or die localtime().": [$who] git-server: proxy operation failure: $?\n";
+$conf !~ /^proxy/m or 0 == system "$ENV{GIT_HOOKS_PATH}/proxy", $Script or die localtime().": [$who] git-server: proxy operation failure: $?\n";
 # Verify IP
-if (my $banned = system "hooks/restrictip") {
+if (my $banned = system "$ENV{GIT_HOOKS_PATH}/restrictip") {
     exit ($banned >> 8 || 1);
 }
 if ($acl->{deploy}->{$ENV{REMOTE_USER}}) {
     $msg ||= " [git-deploy]";
     warn localtime().": [$who] git-server v$ENV{GIT_SERVER_VERSION}: PULL$msg waiting for notification ...\n";
     my $puller = "$who:$base";
-    if (my $notification_error = system "hooks/push-notification", $puller or $?) {
+    if (my $notification_error = system "$ENV{GIT_HOOKS_PATH}/push-notification", $puller or $?) {
         die localtime().": [$who] git-server: Too many other concurrent reads. Try again later. (ERROR: $notification_error-$?)\n";
     }
 }

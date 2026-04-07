@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Convert/VLQ.pm
+t/00_compile.t
+t/00_info.t
+t/01_pod.t
+t/10_vlqs.t
+t/11_encode.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

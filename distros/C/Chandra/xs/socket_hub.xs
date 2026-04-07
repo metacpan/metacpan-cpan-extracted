@@ -61,12 +61,18 @@ CODE:
             (void)hv_stores(self_hv, "tls_cert", newSVsv(val));
         } else if (strEQ(key, "tls_key")) {
             (void)hv_stores(self_hv, "tls_key", newSVsv(val));
+        } else if (strEQ(key, "token")) {
+            (void)hv_stores(self_hv, "_token_config", newSVsv(val));
         }
     }
 
     /* Defaults */
     if (!hv_exists(self_hv, "transport", 9)) {
+#ifdef _WIN32
+        (void)hv_stores(self_hv, "transport", newSVpvs("tcp"));
+#else
         (void)hv_stores(self_hv, "transport", newSVpvs("unix"));
+#endif
     }
     if (!hv_exists(self_hv, "bind_addr", 9)) {
         (void)hv_stores(self_hv, "bind_addr", newSVpvs("127.0.0.1"));
@@ -117,6 +123,65 @@ CODE:
             token_sv = newSVpvn(hex, 32);
         }
         (void)hv_stores(self_hv, "_token", token_sv);
+    }
+
+    /* If token config is a hashref, create a Token manager */
+    {
+        SV **tc_svp = hv_fetchs(self_hv, "_token_config", 0);
+        if (tc_svp && SvOK(*tc_svp) && SvROK(*tc_svp)
+            && SvTYPE(SvRV(*tc_svp)) == SVt_PVHV) {
+            HV *tc_hv = (HV *)SvRV(*tc_svp);
+            SV *tm;
+            AV *args = newAV();
+            HE *entry;
+
+            hv_iterinit(tc_hv);
+            while ((entry = hv_iternext(tc_hv)) != NULL) {
+                av_push(args, newSVhek(HeKEY_hek(entry)));
+                av_push(args, newSVsv(hv_iterval(tc_hv, entry)));
+            }
+
+            /* Call Chandra::Socket::Token->new(...) */
+            {
+                dSP;
+                int count;
+                I32 j, alen;
+                ENTER; SAVETMPS;
+                PUSHMARK(SP);
+                XPUSHs(sv_2mortal(newSVpvs("Chandra::Socket::Token")));
+                alen = av_len(args);
+                for (j = 0; j <= alen; j++) {
+                    SV **el = av_fetch(args, j, 0);
+                    if (el) XPUSHs(sv_2mortal(newSVsv(*el)));
+                }
+                PUTBACK;
+                count = call_method("new", G_SCALAR);
+                SPAGAIN;
+                if (count > 0) {
+                    tm = newSVsv(POPs);
+                    (void)hv_stores(self_hv, "_token_manager", tm);
+
+                    /* Use the Token manager's current token */
+                    {
+                        SV *cur;
+                        PUSHMARK(SP);
+                        XPUSHs(tm);
+                        PUTBACK;
+                        count = call_method("current", G_SCALAR);
+                        SPAGAIN;
+                        if (count > 0) {
+                            cur = POPs;
+                            if (SvOK(cur))
+                                (void)hv_stores(self_hv, "_token",
+                                    newSVsv(cur));
+                        }
+                        PUTBACK;
+                    }
+                }
+                FREETMPS; LEAVE;
+            }
+            SvREFCNT_dec((SV *)args);
+        }
     }
 
     /* Create IO::Select and store it */
@@ -347,3 +412,43 @@ CODE:
 {
     _hub_do_close(aTHX_ self);
 }
+
+void
+rotate_token(self)
+    SV *self
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **tm_svp = hv_fetchs(hv, "_token_manager", 0);
+    if (tm_svp && SvOK(*tm_svp) && SvROK(*tm_svp)) {
+        /* Force rotation by setting rotation_at to past */
+        HV *tm_hv = (HV *)SvRV(*tm_svp);
+        (void)hv_stores(tm_hv, "_rotation_at", newSVnv(0));
+        _hub_check_token_rotation(aTHX_ self, hv);
+    }
+}
+
+SV *
+on_token_rotate(self, callback)
+    SV *self
+    SV *callback
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    (void)hv_stores(hv, "_on_token_rotate", newSVsv(callback));
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+SV *
+token_manager(self)
+    SV *self
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    SV **svp = hv_fetchs(hv, "_token_manager", 0);
+    RETVAL = (svp && SvOK(*svp)) ? SvREFCNT_inc(*svp) : &PL_sv_undef;
+}
+OUTPUT:
+    RETVAL

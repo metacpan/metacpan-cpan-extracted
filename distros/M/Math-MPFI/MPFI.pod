@@ -11,10 +11,10 @@ Math::MPFI - perl interface to the MPFI (interval arithmetic) library.
    This module needs the MPFI, MPFR and GMP C libraries. (Install GMP
    first, then MPFR, then MPFI.)
 
-   The GMP library is availble from http://gmplib.org
-   The MPFR library is available from http://www.mpfr.org/
+   The GMP library is availble from L<https://gmplib.org>
+   The MPFR library is available from L<https://www.mpfr.org>
    The MPFI library is available from
-       http://gforge.inria.fr/projects/mpfi/
+       L<https://gforge.inria.fr/projects/mpfi>
 
 =head1 DESCRIPTION
 
@@ -880,7 +880,7 @@ Math::MPFI - perl interface to the MPFI (interval arithmetic) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2010, 2011, 2014, 2016, 2018-19, 2023 Sisyphus
+    Copyright 2010, 2011, 2014, 2016, 2018-19, 2023-24, 2026, Sisyphus
 
 =head1 AUTHOR
 

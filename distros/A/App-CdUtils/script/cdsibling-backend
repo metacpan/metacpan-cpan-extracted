@@ -10,9 +10,9 @@ use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 # FRAGMENT id=shcompgen-hint completer=1 for=cdsibling
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-04'; # DATE
+our $DATE = '2026-04-07'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $cwd = getcwd();
 my ($curname) = $cwd =~ m!/([^/]*)$!;
@@ -79,7 +79,7 @@ cdsibling-backend - Change to a sibling directory, with completion set to workin
 
 =head1 VERSION
 
-This document describes version 0.014 of cdsibling-backend (from Perl distribution App-CdUtils), released on 2026-04-04.
+This document describes version 0.015 of cdsibling-backend (from Perl distribution App-CdUtils), released on 2026-04-07.
 
 =head1 SYNOPSIS
 

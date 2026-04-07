@@ -11,7 +11,7 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.3.9
+Version v3.3.10
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ See the script for casual usage.
 
 =cut
 
-package App::Licensecheck v3.3.9;
+package App::Licensecheck v3.3.10;
 
 class App::Licensecheck;
 
@@ -61,7 +61,7 @@ use String::Copyright 0.003 {
 	format          => sub { join ' ', $_->[0] || (), $_->[1] || () },
 	},
 	'copyright' => { -as => 'copyright_optimistic' };
-use String::License;
+use String::License 0.0.6;
 use String::License::Naming::SPDX;
 
 use namespace::clean qw(-except new);
@@ -78,15 +78,15 @@ field $path;
 
 # resolve patterns
 
-field $naming :param = undef;
+field $naming : param = undef;
 
 # parse
 
-field $top_lines :param //= 60;
-field $end_bytes :param //= 5000;    # roughly 60 lines of 80 chars
-field $encoding :param = undef;
+field $top_lines : param //= 60;
+field $end_bytes : param //= 5000;    # roughly 60 lines of 80 chars
+field $encoding : param = undef;
 field $fh;
-field $content :param = undef;
+field $content : param = undef;
 field $tail_content;
 field $offset;
 field $license;

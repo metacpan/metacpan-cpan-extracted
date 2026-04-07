@@ -1,0 +1,46 @@
+---
+abstract: 'Universal BBS Server'
+author:
+  - 'Richard Kelsch <rkelsch@cpan.org>'
+build_requires:
+  Test::More: '0.44'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '7.20'
+  Term::ANSIColor: '4.00'
+  Time::HiRes: '1.9700'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BBS-Universal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cache::Memcached::Fast: '0.25'
+  Config: '0'
+  DBD::mysql: '4.00'
+  DBI: '1.50'
+  DateTime: '1.18'
+  Debug::Easy: '0'
+  English: '0'
+  File::Basename: '2.85'
+  File::Path: '0'
+  File::Which: '0'
+  IO::Socket: '1.20'
+  List::Util: '1.40'
+  Number::Format: '0'
+  Term::ANSIColor: '4.00'
+  Term::ANSIScreen: '1.50'
+  Term::ReadKey: '2.30'
+  Text::Format: '0.50'
+  Text::SimpleTable: '2.07'
+  Time::HiRes: '0'
+  XML::RSS::LibXML: '0.3105'
+  perl: '5.020'
+version: '0.023'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

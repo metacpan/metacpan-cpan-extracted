@@ -1,5 +1,5 @@
 package Crypt::TimestampedData;
-$Crypt::TimestampedData::VERSION = '0.01';
+$Crypt::TimestampedData::VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ Crypt::TimestampedData - Read and write TimeStampedData files (.TSD, RFC 5544)
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,15 @@ Minimal implementation of the TimeStampedData format (RFC 5544) using Convert::A
 This version treats CMS constructs and TimeStampTokens as opaque DER blobs.
 The goal is to enable reading/writing of .TSD files, delegating CMS/TS handling
 to external libraries when available.
+
+=head1 SECURITY
+
+Report security vulnerabilities **privately** to the maintainer at
+E<lt>gdo@leader.itE<gt>. See the F<SECURITY.md> file in this distribution's
+root directory for the full policy (coordinated disclosure, optional CC to the
+L<CPAN Security Group|https://security.metacpan.org/> at
+E<lt>cpan-security@security.metacpan.orgE<gt>). Do not file security issues on
+public bug trackers before coordination.
 
 =head1 METHODS
 

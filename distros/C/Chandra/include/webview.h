@@ -143,6 +143,7 @@ WEBVIEW_API int webview_loop(struct webview *w, int blocking);
 WEBVIEW_API int webview_eval(struct webview *w, const char *js);
 WEBVIEW_API int webview_inject_css(struct webview *w, const char *css);
 WEBVIEW_API void webview_set_title(struct webview *w, const char *title);
+WEBVIEW_API void webview_set_size(struct webview *w, int width, int height);
 WEBVIEW_API void webview_set_fullscreen(struct webview *w, int fullscreen);
 WEBVIEW_API void webview_set_color(struct webview *w, uint8_t r, uint8_t g,
                                    uint8_t b, uint8_t a);

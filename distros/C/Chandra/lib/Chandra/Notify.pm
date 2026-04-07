@@ -41,7 +41,7 @@ Chandra::Notify provides native desktop notifications across platforms:
 
 =over 4
 
-=item * macOS: Uses UNUserNotificationCenter (10.14+) or NSUserNotification
+=item * macOS: Uses UNUserNotificationCenter (10.15+) or NSUserNotification
 
 =item * Linux: Uses libnotify if available, falls back to notify-send
 
@@ -133,7 +133,7 @@ __END__
 
 =head2 macOS
 
-Requires macOS 10.8+ for NSUserNotification, 10.14+ for UNUserNotificationCenter.
+Requires macOS 10.8+ for NSUserNotification, 10.15+ for UNUserNotificationCenter.
 The app must be properly signed to display notifications in some cases.
 
 =head2 Linux
