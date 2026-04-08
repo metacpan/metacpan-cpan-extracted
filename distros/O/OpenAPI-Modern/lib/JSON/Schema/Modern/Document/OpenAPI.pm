@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 
 use 5.020;
 use utf8;
@@ -264,7 +264,6 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     {
       collect_annotations => 0,
       validate_formats => 1,
-      with_defaults => 1,
       callbacks => {
         # we avoid producing errors here so we don't create extra errors for "not all additional
         # properties are valid" etc
@@ -757,7 +756,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.132
+version 0.133
 
 =head1 SYNOPSIS
 

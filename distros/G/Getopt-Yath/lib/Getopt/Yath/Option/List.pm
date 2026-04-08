@@ -2,7 +2,7 @@ package Getopt::Yath::Option::List;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use Getopt::Yath::Util qw/decode_json/;
 
@@ -57,7 +57,7 @@ sub normalize_value {
         local $@;
         unless (eval { local $SIG{__DIE__}; $out = decode_json($input[0]); 1 }) {
             my ($err) = split /[\n\r]+/, $@;
-            $err =~ s{at \Q$INC{'Getopt/Yath/Util/JSON.pm'}\E line \d+\..*$}{};
+            $err =~ s{at \Q$INC{'Getopt/Yath/Util.pm'}\E line \d+\..*$}{};
             die "Could not decode JSON string: $err\n====\n$input[0]\n====\n";
         }
         return @$out;
@@ -90,7 +90,7 @@ sub default_short_examples {
     my $self = shift;
     my %params = @_;
 
-    my $list = $self->SUPER::default_long_examples(%params);
+    my $list = $self->SUPER::default_short_examples(%params);
     push @$list => $self->inject_default_short_examples();
     return $list;
 }
@@ -125,6 +125,44 @@ list.
         long_examples => [ ' HOME', ' SHELL' ],
         short_examples => [ ' HOME', ' SHELL' ],
     );
+
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option> are inherited. The following are
+overridden or noteworthy:
+
+=over 4
+
+=item requires_arg: true
+
+=item allows_list: true
+
+Each use of C<--opt VAL> appends to the list. C<--no-opt> empties it.
+
+=item normalize_value(@input)
+
+If the input looks like a JSON array (e.g., C<'["a","b"]'>), it is decoded and
+the elements are returned. If C<split_on> is set, values are split on that
+delimiter before normalization.
+
+=item get_initial_value
+
+Checks C<from_env_vars> for initial values. Unlike the base class, multiple
+environment variables can each contribute a value. Returns an empty arrayref if
+no environment values are found.
+
+=back
+
+=head1 ADDITIONAL ATTRIBUTES
+
+=over 4
+
+=item split_on => $delimiter
+
+A string or regex to split values on. For example, with C<< split_on => ',' >>,
+C<--opt foo,bar> adds both C<foo> and C<bar> to the list.
+
+=back
 
 =head1 SOURCE
 

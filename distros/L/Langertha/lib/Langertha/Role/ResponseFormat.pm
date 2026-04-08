@@ -1,6 +1,6 @@
 package Langertha::Role::ResponseFormat;
 # ABSTRACT: Role for an engine where you can specify structured output
-our $VERSION = '0.309';
+our $VERSION = '0.400';
 use Moose::Role;
 
 has response_format => (
@@ -25,7 +25,7 @@ Langertha::Role::ResponseFormat - Role for an engine where you can specify struc
 
 =head1 VERSION
 
-version 0.309
+version 0.400
 
 =head2 response_format
 
@@ -50,13 +50,17 @@ C<{ type => 'json_object' }> or a JSON Schema definition. Optional.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha/issues>.
 
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
 
 =head1 COPYRIGHT AND LICENSE
 

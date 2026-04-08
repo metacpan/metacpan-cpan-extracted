@@ -27,6 +27,7 @@
             "DBD::mysql" : "4.00",
             "DBI" : "1.644",
             "DBIx::QuickDB" : "0.000040",
+            "Digest::SHA" : "0",
             "IO::Select" : "1.55",
             "IO::Socket::UNIX" : "1.55",
             "IPC::SysV" : "2.09",
@@ -35,6 +36,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Digest::SHA" : "0"
+         },
          "requires" : {
             "Carp" : "0",
             "Errno" : "0",
@@ -88,7 +92,7 @@
          "url" : "https://github.com/exodist/IPC-Manager/"
       }
    },
-   "version" : "0.000011",
+   "version" : "0.000012",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -325,6 +325,7 @@ sub is_equal ($got, $expected, $test_name = undef) {
       $ctx->$method('structures differ'.($state->{path} ? ' starting at '.$state->{path} : ''));
       my ($equal, $stack) = Test::Deep::cmp_details($got, $expected);
       $ctx->$method(Test::Deep::deep_diag($stack)) if not $equal;
+      $ctx->$method("got result:\n".$encoder->encode($got));
     }
     return $equal;
   } $got, $expected, $test_name;

@@ -1,5 +1,9 @@
 Revision history for Object-Proto
 
+0.10	2026-04-07
+	- Fix import_accessors/import_accessor to override existing OO accessors
+	  from a different class defined in the same package (collision bug)
+
 0.09	2026-04-05
 	- Fix linker failure on Perl 5.36+ where Perl_mro_isa_changed_in is no
 	  longer an exported symbol.

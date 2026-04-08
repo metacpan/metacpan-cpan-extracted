@@ -1,10 +1,10 @@
 package Bot::IRC::X::Retort;
 # ABSTRACT: Bot::IRC plugin for bot-retorting to key words
 
-use 5.014;
+use 5.016;
 use exact;
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -81,7 +81,7 @@ Bot::IRC::X::Retort - Bot::IRC plugin for bot-retorting to key words
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Retort/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Retort/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Retort/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Retort)

@@ -1,7 +1,7 @@
 package Bot::IRC::X::Time;
 # ABSTRACT: Bot::IRC plugin for some time functions
 
-use 5.014;
+use 5.016;
 use exact;
 
 use Date::Parse 'str2time';
@@ -9,7 +9,7 @@ use DateTime;
 use DateTime::Format::Human::Duration;
 use DateTime::Duration;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -98,7 +98,7 @@ Bot::IRC::X::Time - Bot::IRC plugin for some time functions
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Time/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Time/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Time/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Time)

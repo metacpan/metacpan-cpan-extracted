@@ -5,48 +5,50 @@ use App::Bin::Search;
 use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 use Test::Output;
-
-# Common.
-my $script = abs2rel(File::Object->new->file('04-run.t')->s);
-# XXX Hack for missing abs2rel on Windows.
-if ($OSNAME eq 'MSWin32') {
-	$script =~ s/\\/\//msg;
-}
-my $help = <<"END";
-Usage: $script [-b] [-h] [-v] [--version] hex_stream search
-	-b		Print in binary (default hexadecimal).
-	-h		Print help.
-	-v		Verbose mode.
-	--version	Print version.
-	hex_stream	Input hexadecimal stream.
-	search		Search string (in hex).
-END
+use Test::Warn;
 
 # Test.
 @ARGV = (
 	'-h',
 );
+my $right_ret = help();
 stderr_is(
 	sub {
 		App::Bin::Search->new->run;
 		return;
 	},
-	$help,
+	$right_ret,
 	'Run help (-h).',
 );
 
 # Test.
 @ARGV = ();
+$right_ret = help();
 stderr_is(
 	sub {
 		App::Bin::Search->new->run;
 		return;
 	},
-	$help,
+	$right_ret,
 	'Run help (no options).',
+);
+
+# Test.
+@ARGV = (
+	'-x',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		warning_is { App::Bin::Search->new->run; } "Unknown option: x\n",
+			'Warning about bad argument';
+		return;
+	},
+	$right_ret,
+	'Run help (-x - bad option).',
 );
 
 # Test.
@@ -54,7 +56,7 @@ stderr_is(
 	'FFABCD',
 	'D5',
 );
-my $right_ret = <<"END";
+$right_ret = <<"END";
 Found D5E68 at 8 bit
 END
 stdout_is(
@@ -192,3 +194,22 @@ stdout_is(
 	$right_ret,
 	'Search FF in FFABCD (default - hexadecimal output).',
 );
+
+sub help {
+	my $script = abs2rel(File::Object->new->file('04-run.t')->s);
+	# XXX Hack for missing abs2rel on Windows.
+	if ($OSNAME eq 'MSWin32') {
+		$script =~ s/\\/\//msg;
+	}
+	my $help = <<"END";
+Usage: $script [-b] [-h] [-v] [--version] hex_stream search
+	-b		Print in binary (default hexadecimal).
+	-h		Print help.
+	-v		Verbose mode.
+	--version	Print version.
+	hex_stream	Input hexadecimal stream.
+	search		Search string (in hex).
+END
+
+	return $help;
+}

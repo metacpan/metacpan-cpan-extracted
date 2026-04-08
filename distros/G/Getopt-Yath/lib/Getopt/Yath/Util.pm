@@ -7,7 +7,7 @@ use Cpanel::JSON::XS();
 use Importer Importer => 'import';
 use File::Temp qw/ tempfile /;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 our @EXPORT_OK = qw{
     decode_json
@@ -112,7 +112,7 @@ Collection of utility functions for Getopt::Yath.
 
 =head1 SYNOPSIS
 
-    use Getopt::Yath qw{
+    use Getopt::Yath::Util qw{
         fqmod
         mod2file
         decode_json
@@ -160,7 +160,7 @@ Encode perl data into a json string using only ascii characters.
 
 =item $file = encode_json_file($data)
 
-Encode the data to a json file. A new tempfile filename is returend.
+Encode the data to a json file. A new tempfile filename is returned.
 
 =item $data = decode_json_file($path)
 

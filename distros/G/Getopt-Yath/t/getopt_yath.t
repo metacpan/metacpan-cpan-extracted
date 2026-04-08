@@ -456,21 +456,21 @@ option_group {category => 'This is the category', group => 'foo', no_module => 1
         local $ENV{EXAMPLEX};
         like(
             parse_options([]),
-            {settings => {foo => {env_neg => F()}}, env => {EXAMPLEA => undef, EXAMPLEX => F()}},
+            {settings => {foo => {env_neg => F()}}, env => {EXAMPLEA => undef, EXAMPLEX => T()}},
             "Set by env var"
         );
         ok(!$ENV{EXAMPLEA}, "Clear env EXAMPLEA");
-        is($ENV{EXAMPLEX}, F(), "Set EXAMPLEX");
+        is($ENV{EXAMPLEX}, T(), "Set EXAMPLEX");
 
         local $ENV{EXAMPLEA} = 0;
         local $ENV{EXAMPLEX};
         like(
             parse_options([]),
-            {settings => {foo => {env_neg => T()}}, env => {EXAMPLEA => undef, EXAMPLEX => T()}},
+            {settings => {foo => {env_neg => T()}}, env => {EXAMPLEA => undef, EXAMPLEX => F()}},
             "Set by env var"
         );
         ok(!$ENV{EXAMPLEA}, "Clear env EXAMPLEA");
-        is($ENV{EXAMPLEX}, T(), "Set EXAMPLEX");
+        is($ENV{EXAMPLEX}, F(), "Set EXAMPLEX");
 
     };
 
@@ -534,6 +534,7 @@ This is the category  (foo)
 
   [auto-list]
   -L
+  -LARG
   -L=ARG
   -L='["json","list"]'
   --auto-list
@@ -614,6 +615,7 @@ This is the category  (foo)
     default: 1
 
   [list]
+  -lARG
   -l ARG
   -l=ARG
   -l '["json","list"]'
@@ -705,9 +707,13 @@ NO DESCRIPTION - FIX ME
 
 =item -L
 
+=item -LARG
+
 =item -L=ARG
 
 =item -L='["json","list"]'
+
+=item -L:{ ARG1 ARG2 ... }:
 
 =item -L=:{ ARG1 ARG2 ... }:
 
@@ -819,6 +825,8 @@ The following environment variables will be set after arguments are processed: C
 foo boolean
 
 
+=item -lARG
+
 =item -l ARG
 
 =item -l=ARG
@@ -826,6 +834,8 @@ foo boolean
 =item -l '["json","list"]'
 
 =item -l='["json","list"]'
+
+=item -l:{ ARG1 ARG2 ... }:
 
 =item -l :{ ARG1 ARG2 ... }:
 

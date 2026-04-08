@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000040';
+our $VERSION = '0.000041';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;

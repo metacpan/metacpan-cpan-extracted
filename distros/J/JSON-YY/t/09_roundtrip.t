@@ -1,0 +1,63 @@
+use strict;
+use warnings;
+use Test::More;
+use JSON::YY qw(encode_json decode_json);
+
+eval { require JSON::XS };
+plan skip_all => 'JSON::XS required for roundtrip tests' if $@;
+
+# roundtrip: encode with YY, decode with XS, and vice versa
+my @test_data = (
+    [1, 2, 3],
+    {a => 1, b => "hello"},
+    {nested => {deep => [1, {x => 2}]}},
+    [undef, "str", 42, 3.14],
+    {empty_arr => [], empty_obj => {}},
+    {"" => "empty key"},
+    {long => "x" x 1000},
+    [map { {id => $_, name => "n$_"} } 1..100],
+    {utf8 => "\x{263a}", ascii => "plain"},
+);
+
+for my $i (0..$#test_data) {
+    my $data = $test_data[$i];
+
+    # YY encode → XS decode
+    my $yy_json = encode_json($data);
+    my $xs_decoded = JSON::XS::decode_json($yy_json);
+
+    # XS encode → YY decode
+    my $xs_json = JSON::XS::encode_json($data);
+    my $yy_decoded = decode_json($xs_json);
+
+    # compare
+    is_deeply $xs_decoded, $yy_decoded,
+        "roundtrip $i: YY encode/XS decode matches XS encode/YY decode";
+
+    # YY roundtrip
+    my $rt = decode_json(encode_json($data));
+    is_deeply $rt, $yy_decoded, "roundtrip $i: YY self-roundtrip";
+}
+
+# types preservation
+{
+    my $json = '{"i":42,"f":3.14,"s":"str","t":true,"f2":false,"n":null}';
+    my $yy = decode_json($json);
+    my $xs = JSON::XS::decode_json($json);
+
+    is $yy->{i}, $xs->{i}, 'integer preserved';
+    is $yy->{f}, $xs->{f}, 'float preserved';
+    is $yy->{s}, $xs->{s}, 'string preserved';
+    ok $yy->{t}, 'true preserved';
+    ok !$yy->{f2}, 'false preserved';
+    ok !defined $yy->{n}, 'null preserved';
+}
+
+# large numbers
+{
+    my $json = '[9999999999999999,18446744073709551615,-9223372036854775808]';
+    my $d = decode_json($json);
+    is $d->[0], 9999999999999999, 'large int';
+}
+
+done_testing;

@@ -2,7 +2,7 @@ package Getopt::Yath::Option::AutoPathList;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use Getopt::Yath::Option::PathList;
 
@@ -26,7 +26,7 @@ sub default_short_examples {
     my $self = shift;
     my %params = @_;
 
-    my $list = $self->SUPER::default_long_examples(%params);
+    my $list = $self->SUPER::default_short_examples(%params);
     push @$list => (qq{='*.*'});
     return $list;
 }
@@ -63,6 +63,24 @@ Like L<Getopt::Yath::Option::PathList> with autofill.
         short_examples => ['', 'lib', '=lib', 'lib', '"lib/*"'],
     );
 
+
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option::AutoList> are inherited, with
+C<normalize_value> from L<Getopt::Yath::Option::PathList> (glob expansion).
+
+=over 4
+
+=item requires_arg: false
+
+=item allows_autofill: true
+
+=item requires_autofill: true
+
+C<--opt> adds the autofill paths. C<--opt=GLOB> expands the glob and adds
+matching paths.
+
+=back
 
 =head1 SOURCE
 

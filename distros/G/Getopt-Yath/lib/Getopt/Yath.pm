@@ -2,7 +2,7 @@ package Getopt::Yath;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use Carp qw/croak/;
 
@@ -159,25 +159,21 @@ of yath as well.
         skip_non_opts => 1,                                                    # Skip non-opts, that is any argument that does not start with a '-' it will just skip.
         stops         => ['--'],                                               # Stop processing
         no_set_env    => 1,                                                    # Do not actually change %ENV
-        groups        => { ':{' => '}:' },                                     # Arguemnts between the :{ and }: will be captured into an arrayref, they can be used as option values, or stand-alone
+        groups        => { ':{' => '}:' },                                     # Arguments between the :{ and }: will be captured into an arrayref, they can be used as option values, or stand-alone
     );
 
-The C<$parsed> structure:
+C<$parsed> is a L<Getopt::Yath::State> object:
 
-    $parsed = {
-        'cleared' => {},                       # Options that were cleared with --no-opt
-        'skipped' => ['not_an_opt'],           # Skipped non options
-        'settings' => {                        # Blessed as Getopt::Yath::Settings
-            'settings_group' => {              # Blessed as Getopt::Yath::Settings::Group
-                'verbose'  => 1,               # The option and its value
-                'username' => 'fred',          # Another option and value
-            },
-        },
-        'stop'    => '--',                     # We stopped at '--', if there was no '--' this would be undef
-        'remains' => ['--will-not-process'],   # Stuff after the '--' that we did not process
-        'modules' => {'My::Package' => 2},     # Any module that provided options that were seen will be listed
-        'env'     => {'VERBOSE' => 1}          # Environment variabvles that would have been set if not for 'no_set_env'
-    };
+    $parsed->cleared;     # {} - Options that were cleared with --no-opt
+    $parsed->skipped;     # ['not_an_opt'] - Skipped non options
+    $parsed->settings;    # Blessed as Getopt::Yath::Settings
+                          #   ->settings_group (Blessed as Getopt::Yath::Settings::Group)
+                          #       ->verbose  == 1
+                          #       ->username == 'fred'
+    $parsed->stop;        # '--' - We stopped at '--', if there was no '--' this would be undef
+    $parsed->remains;     # ['--will-not-process'] - Stuff after the '--' that we did not process
+    $parsed->modules;     # {'My::Package' => 2} - Any module that provided options that were seen
+    $parsed->env;         # {'VERBOSE' => 1} - Environment variables that would have been set
 
 =head2 GENERATING COMMAND LINE HELP OUTPUT:
 
@@ -268,28 +264,14 @@ defined options, and does all the real work under the hood.
 
 =item $parsed = parse_options(\@ARGV, %PARAMS)
 
-This processes an arrayref of command line arguments into a structure that can
-be easily referenced. If there is a problem parsing, such as invalid options in
-the array, exceptions will be thrown.
+This processes an arrayref of command line arguments and returns a
+L<Getopt::Yath::State> object. If there is a problem parsing, such as invalid
+options in the array, exceptions will be thrown.
 
-The C<$parsed> structure will look like this:
+See L<Getopt::Yath::State> for the full list of accessors on the returned
+object.
 
-    $parsed = {
-        'cleared' => {},                       # Options that were cleared with --no-opt
-        'skipped' => ['not_an_opt'],           # Skipped non options
-        'settings' => {                        # Blessed as Getopt::Yath::Settings
-            'settings_group' => {              # Blessed as Getopt::Yath::Settings::Group
-                'verbose'  => 1,               # The option and its value
-                'username' => 'fred',          # Another option and value
-            },
-        },
-        'stop'    => '--',                     # We stopped at '--', if there was no '--' this would be undef
-        'remains' => ['--will-not-process'],   # Stuff after the '--' that we did not process
-        'modules' => {'My::Package' => 2},     # Any module that provided options that were seen will be listed
-        'env'     => {'VERBOSE' => 1}          # Environment variabvles that would have been set if not for 'no_set_env'
-    };
-
-Available parameters that effect parsing are:
+Available parameters that affect parsing are:
 
 =over 4
 
@@ -298,9 +280,9 @@ Available parameters that effect parsing are:
 =item stops => ['--']
 
 This is a list of string that if encountered should stop the parsing process.
-The string encountered will be put into the C<stop> field of the C<$parsed>
-structure. Any unparsed arguments after the stop will be put into the
-C<remains> key of the C<$parsed> structure.
+The string encountered will be available via C<< $parsed->stop >>. Any
+unparsed arguments after the stop will be available via
+C<< $parsed->remains >>.
 
 This is mostly useful for supporting the C<--> option.
 
@@ -315,37 +297,38 @@ Arguments between the specified start and end tokens will be grouped together in
 This will cause parsing to stop at any non-option. A non-option in this case is
 any argument that does not start with a C<->.
 
-The item stopped at will be placed in the C<stop> field of the C<$parsed>
-structure with the remaining arguments placed in the C<remains> field.
+The item stopped at will be available via C<< $parsed->stop >> with the
+remaining arguments available via C<< $parsed->remains >>.
 
 =item skip_non_opts => BOOL
 
 This will skip any non-option encountered. A non-option is any argument that
-does not start with C<->. All skipped items will be placed into the C<skipped>
-field of the <$parsed> structure.
+does not start with C<->. All skipped items will be available via
+C<< $parsed->skipped >>.
 
 =item skip_invalid_opts => BOOL
 
 This will skip any invalid option encountered. This includes any argument that
-starts with C<-> but is not a valid option. All skipped items will be placed
-into the C<skipped> field of the <$parsed> structure.
+starts with C<-> but is not a valid option. All skipped items will be available
+via C<< $parsed->skipped >>.
 
 =item stop_at_invalid_opts => BOOL
 
 This will cause parsing to stop at any invalid option. This includes any
 argument that starts with C<-> but is not a valid option.
 
-The item stopped at will be placed in the C<stop> field of the C<$parsed>
-structure with the remaining arguments placed in the C<remains> field.
+The item stopped at will be available via C<< $parsed->stop >> with the
+remaining arguments available via C<< $parsed->remains >>.
 
 =item no_set_env => BOOL
 
 Set this to true to prevent any modifications to C<%ENV>.
 
-The C<env> key of the C<$parsed> structure will contain the environment
-variable changes that would have been made.
+C<< $parsed->env >> will contain the environment variable changes that would
+have been made.
 
-B<Note:> The env key is always included even if C<%ENV> is modified directly.
+B<Note:> The env accessor is always populated even if C<%ENV> is modified
+directly.
 
 =back
 
@@ -372,10 +355,10 @@ Create a group of options with common parameters.
 This is used to define a single option. You must specify an option NAME and
 'type', which must be a valid L<Getopt::Yath::Option> subclass.
 
-The TILE is used to produce default values for the 'field' and 'name' fields,
-both of which can be specidied directly if the automatic values ar enot
+The TITLE is used to produce default values for the 'field' and 'name' fields,
+both of which can be specified directly if the automatic values are not
 sufficient. 'field' gets the value of title with dashes replaced by
-underscrores. 'name' gets the value of title with underscores replaced with
+underscores. 'name' gets the value of title with underscores replaced with
 dashes.
 
 Most of the time you can just list the type as the part after the last C<::> in
@@ -385,17 +368,38 @@ directly. However if you need to use a module that is not in the
 C<Getopt::Yath::Option::> namespace you will need to prefix the module with a
 C<+> to indicate that.
 
-    $export{option_post_process} = sub {
-        my $cb           = pop;
-        my $weight       = shift // 0;
-        my ($applicable) = @_;
+=item option_post_process sub { ... }
 
-        $applicable //= $common[-1]->{applicable} if @common;
+=item option_post_process $weight, sub { ... }
 
-        croak "You must provide a callback coderef" unless $cb && ref($cb) eq 'CODE';
+=item option_post_process $weight, $applicable, sub { ... }
 
-        $instance->_post([caller()], $weight, $applicable, $cb);
+Register a callback to run after all options have been parsed. The callback
+receives the L<Getopt::Yath::Instance> object and the parse state hashref as
+arguments.
+
+C<$weight> controls execution order (lower weights run first, default is 0).
+C<$applicable> is an optional coderef that determines whether this
+post-processor should run; if provided it receives the post-process entry, the
+instance, and the settings object. If used inside an C<option_group> block, the
+group's C<applicable> is inherited when none is specified.
+
+    option_post_process 100 => sub {
+        my ($instance, $state) = @_;
+        # Do something after all options are parsed
     };
+
+=item category_sort_map(%map)
+
+Set the sort order for option categories in documentation output. Categories
+with lower values are listed first. By default, "NO CATEGORY - FIX ME" is
+sorted to 99999 (last).
+
+    category_sort_map(
+        'Display Options' => 1,
+        'Runner Options'  => 2,
+        'Logging Options' => 3,
+    );
 
 =back
 
@@ -434,7 +438,7 @@ C<--opt=val>. C<--no-opt> can be used to clear the value.
 
 =item Bool
 
-Is either on or off. C<--opt> will turn it onn. C<--no-opt> will turn it off.
+Is either on or off. C<--opt> will turn it on. C<--no-opt> will turn it off.
 Default is off unless the C<default> is parameter is provided.
 
 =item Count
@@ -478,6 +482,24 @@ This is a combination of 'Auto' and 'Map' types. The no-arg form C<--opt> will
 add the default key+value pairs to the hash. The C<--opt=KEY=VAL> form will add
 additional values.
 
+=item PathList
+
+Like L<List|Getopt::Yath::Option::List>, but values are treated as file paths
+and may contain shell-style wildcards (globs) which are expanded. For example,
+C<--opt 'lib/*.pm'> will expand to all matching files.
+
+=item AutoPathList
+
+Like L<PathList|Getopt::Yath::Option::PathList> with autofill support. The
+no-arg form C<--opt> adds the autofill paths, while C<--opt=path> adds a
+specific path.
+
+=item BoolMap
+
+Match several C<--OPTION-XXX> and C<--no-OPTION-XXX> options based on a regex
+pattern, populating a hashref where each matched key is given a true or false
+value depending on the C<--no-> prefix. Requires a C<pattern> attribute.
+
 =back
 
 =back
@@ -508,7 +530,7 @@ override it with a custom value, but you should rarely ever need to.
 =item category => "Human Readable documentation category"
 
 When producing POD or command line documentation, options are put into
-"categories" which should be the human readabvle version of the C<group> field.
+"categories" which should be the human readable version of the C<group> field.
 
 Default is "NO CATEGORY - FIX ME".
 
@@ -717,9 +739,9 @@ have C<< set_env_vars => ['!VERBOSE'] >>.
 
 =item clear_env_vars => \@LIST
 
-A list of enviornment variables to clear after the options are all populated.
+A list of environment variables to clear after the options are all populated.
 This is useful if you want to use an env var to set an option, but want to make
-sure no child proceses see the environemnt variable.
+sure no child processes see the environment variable.
 
 =item set_env_vars => \@LIST
 

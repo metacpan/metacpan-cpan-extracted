@@ -23,19 +23,35 @@ if ($^O eq 'darwin') {
 elsif ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd' || $^O eq 'netbsd' || $^O eq 'dragonfly') {
     # Linux/BSD - use GTK/WebKit2
     push @extra_ccflags, '-DWEBVIEW_GTK=1';
-    my $gtk_cflags = `pkg-config --cflags gtk+-3.0 webkit2gtk-4.0 2>/dev/null`;
-    my $gtk_libs = `pkg-config --libs gtk+-3.0 webkit2gtk-4.0 2>/dev/null`;
-    chomp($gtk_cflags);
-    chomp($gtk_libs);
+
+    # Discover any installed webkit2gtk version via pkg-config
+    my ($gtk_cflags, $gtk_libs, $webkit_pkg);
+    my @webkit_candidates = grep { /^webkit2gtk-/ }
+        split /\n/, `pkg-config --list-all 2>/dev/null | awk '{print \$1}'`;
+    # Sort descending so we prefer the newest version
+    @webkit_candidates = sort { $b cmp $a } @webkit_candidates;
+    for my $pkg (@webkit_candidates) {
+        my $cflags = `pkg-config --cflags gtk+-3.0 $pkg 2>/dev/null`;
+        my $libs   = `pkg-config --libs gtk+-3.0 $pkg 2>/dev/null`;
+        chomp($cflags);
+        chomp($libs);
+        if ($cflags && $libs) {
+            ($gtk_cflags, $gtk_libs, $webkit_pkg) = ($cflags, $libs, $pkg);
+            last;
+        }
+    }
+
     if (!$gtk_cflags || !$gtk_libs) {
         warn <<'MSG';
 
-*** Chandra requires gtk+-3.0 and webkit2gtk-4.0 development libraries on Linux.
+*** Chandra requires gtk+-3.0 and webkit2gtk development libraries on Linux.
 ***
 *** Install them with your system package manager:
 ***
-***   Debian/Ubuntu:  sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev
-***   Fedora/RHEL:    sudo dnf install gtk3-devel webkit2gtk3-devel
+***   Debian/Ubuntu:  sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev
+***                   (or libwebkit2gtk-4.0-dev on older releases)
+***   Fedora/RHEL:    sudo dnf install gtk3-devel webkit2gtk4.1-devel
+***                   (or webkit2gtk3-devel on older releases)
 ***   Arch:           sudo pacman -S gtk3 webkit2gtk
 ***   Alpine:         sudo apk add gtk+3.0-dev webkit2gtk-dev
 ***   openSUSE:       sudo zypper install gtk3-devel webkit2gtk-gtk3-devel
@@ -77,6 +93,7 @@ WriteMakefile(
         'Cpanel::JSON::XS' => 0,
         'IO::Socket::UNIX' => 0,
         'IO::Select'       => 0,
+        'File::Raw'        => 0,
     },
     TEST_REQUIRES     => {
         'Test::More' => 0,

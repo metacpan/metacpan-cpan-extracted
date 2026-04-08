@@ -2,27 +2,14 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
 no warnings 'once';
-
-BEGIN {
-    plan skip_all => 'CHANDRA_SKIP_WINDOW set' if $ENV{CHANDRA_SKIP_WINDOW};
-    if ($^O ne 'darwin' && $^O ne 'MSWin32'
-        && !$ENV{DISPLAY} && !$ENV{WAYLAND_DISPLAY}) {
-        plan skip_all => 'No display server available';
-    }
-}
 
 use Chandra;
 use Chandra::Window;
+use Chandra::Test::Display;
 
-{
-    my $win = eval { Chandra::Window->new };
-    unless ($win) {
-        plan skip_all => 'multi-window not supported on this platform';
-    } else {
-        $win->close;
-    }
-}
+Chandra::Test::Display->skip_unless_display(module => 'Chandra::Window');
 
 # --- Constructor ---
 {

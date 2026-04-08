@@ -5,7 +5,7 @@ use warnings;
 use IPC::Cmd qw/can_run/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = '0.000040';
+our $VERSION = '0.000041';
 
 use parent 'DBIx::QuickDB::Driver';
 
@@ -34,6 +34,8 @@ sub version_string {
 
     # If no args provided one to use we fallback to the default from $PATH
     $binary ||= $SQLITE;
+
+    return 'unknown' unless $binary;
 
     # Call the binary with '-V', capturing and returning the output using backticks.
     return `$binary -version`;

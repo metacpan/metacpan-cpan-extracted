@@ -3,6 +3,7 @@ abstract: 'Advanced mocking library for Perl with support for dependency injecti
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  Class::Simple: '0'
   ExtUtils::MakeMaker: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
@@ -30,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Test-Mockingbird/issues
   repository: git://github.com/nigelhorne/Test-Mockingbird.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

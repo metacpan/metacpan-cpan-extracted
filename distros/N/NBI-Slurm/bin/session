@@ -4,6 +4,7 @@
 use v5.16;
 use Getopt::Long;
 use File::Basename;
+use Carp qw(confess);
 use Term::ANSIColor qw(:constants);
 use FindBin qw($RealBin);
 if (-e "$RealBin/../dist.ini") {
@@ -12,77 +13,90 @@ if (-e "$RealBin/../dist.ini") {
 } 
 use NBI::Slurm;
 my $BIN = basename($0);
-my $USER = $ENV{USER};
-my $config = NBI::Slurm::load_config("$USER/.nbislurm.config");
-my $DEFAULT_SESSION = $config->{'session'} // "";
-my $SPECIAL_SESSION = $config->{'special_session'} // "";
-my $NAME = "session";
-my $MEM_MB = $config->{'session_memory'} // 1000;
-my $CORES = $config->{'session_cpus'} // 1;
-my $DAYS = 0;
-my $HOURS = $config->{'session_hours'} // 4;
-my $OPT_INTEL;
-my $OPT_PARTITION;
-my $OPT_SPECIAL;
-my $OPT_VERBOSE;
-GetOptions(
-    'c|t|threads=i' => \$CORES,
-    'm|mem=s' => \$MEM_MB,
-    'd|days=i' => \$DAYS,
-    'h|hours=i' => \$HOURS,
-    'n|name=s' => \$NAME,
-    'q|queue=s' => \$OPT_PARTITION,
-    's|special' => \$OPT_SPECIAL,
-    'i|intel' => \$OPT_INTEL,
-    'verbose' => \$OPT_VERBOSE,
-    'version' => sub { say "session v", $NBI::Slurm::VERSION; exit(0); },
-    'help' => sub { usage(); exit(0); },
-) or usage(1);
 
-# Get memory
-$MEM_MB = parse_memory($MEM_MB);
+main() unless caller;
+1;
 
-if ($MEM_MB < 350) {
-    say STDERR RED, "[WARNING]", RESET, "Memory set to $MEM_MB Mb, automatically setting to $MEM_MB Gb", RESET;
-    $MEM_MB *= 1000;
-}
-# Get hours / days
-my $ADD_DAYS = 0;
-($ADD_DAYS, $HOURS) = hours_to_days_hours($HOURS);
-$DAYS += $ADD_DAYS;
+sub main {
+    my $USER = $ENV{USER};
+    my $config = NBI::Slurm::load_config("$USER/.nbislurm.config");
+    my $DEFAULT_SESSION = $config->{'session'} // "";
+    my $SPECIAL_SESSION = $config->{'special_session'} // "";
+    my $DEFAULT_HOURS = $config->{'session_hours'} // 4;
+    my $NAME = "session";
+    my $MEM_MB = $config->{'session_memory'} // 1000;
+    my $CORES = $config->{'session_cpus'} // 1;
+    my $DAYS = 0;
+    my $OPT_HOURS;
+    my $OPT_TIME;
+    my $OPT_INTEL;
+    my $OPT_PARTITION;
+    my $OPT_SPECIAL;
+    my $OPT_VERBOSE;
 
-# Get queue
-if (not $OPT_PARTITION) {
-    if ($config->{'queue'}) {
-        $OPT_PARTITION = $config->{'queue'};
-    } else {
-        $OPT_PARTITION = partition_tag($HOURS);
+    GetOptions(
+        'c|threads=i' => \$CORES,
+        'm|mem=s' => \$MEM_MB,
+        'd|days=i' => \$DAYS,
+        'h|hours=i' => \$OPT_HOURS,
+        'T|t|time=s' => \$OPT_TIME,
+        'n|name=s' => \$NAME,
+        'q|queue=s' => \$OPT_PARTITION,
+        's|special' => \$OPT_SPECIAL,
+        'i|intel' => \$OPT_INTEL,
+        'verbose' => \$OPT_VERBOSE,
+        'version' => sub { say "session v", $NBI::Slurm::VERSION; exit(0); },
+        'help' => sub { usage(); exit(0); },
+    ) or usage(1);
+
+    # Get memory
+    $MEM_MB = parse_memory($MEM_MB);
+
+    if ($MEM_MB < 350) {
+        say STDERR RED, "[WARNING]", RESET, "Memory set to $MEM_MB Mb, automatically setting to $MEM_MB Gb", RESET;
+        $MEM_MB *= 1000;
     }
+
+    my $time = session_resolve_time(
+        hours         => $OPT_HOURS,
+        time_string   => $OPT_TIME,
+        default_hours => $DEFAULT_HOURS,
+        days          => $DAYS,
+    );
+
+    # Get queue
+    if (not $OPT_PARTITION) {
+        if ($config->{'queue'}) {
+            $OPT_PARTITION = $config->{'queue'};
+        } else {
+            $OPT_PARTITION = partition_tag($time->{total_hours});
+        }
+    }
+
+    my $PARAMS = $DEFAULT_SESSION;
+    $PARAMS   .= $OPT_INTEL    ?  " --constraint=intel " : "";
+    $PARAMS   .= $OPT_SPECIAL  ?  " $SPECIAL_SESSION "   : "";
+
+    my $PARTITION //= $OPT_PARTITION;
+
+    say STDERR "-" x 40;
+    print STDERR YELLOW,
+            "job name    ", RESET, $NAME, "\n",
+    YELLOW, "memory      ", RESET, $MEM_MB, " Mb\n",
+    YELLOW, "cores       ", RESET, $CORES, "\n",
+    YELLOW, "time        ", RESET, $time->{slurm}, "\n",
+    YELLOW, "partition   ", RESET, $PARTITION, "\n";
+
+    say STDERR "-" x 40;
+    my $cmd = qq(srun --job-name=$NAME --mem=$MEM_MB -c $CORES --time=$time->{slurm} -n 1 --disable-status -s --pty --partition=$PARTITION $PARAMS -u bash -li);
+
+    say STDERR $cmd if ($OPT_VERBOSE);
+
+    if (has_srun() == 0) {
+        say STDERR RED, "[ERROR] srun not found... Are you on the cluster?", RESET;
+    }
+    exec($cmd);
 }
-
-my $PARAMS = $DEFAULT_SESSION;
-$PARAMS   .= $OPT_INTEL    ?  " --constraint=intel " : "";
-$PARAMS   .= $OPT_SPECIAL  ?  " $SPECIAL_SESSION "   : "";
-
-my $PARTITION //= $OPT_PARTITION;
-
-say STDERR "-" x 40;
-print STDERR YELLOW, 
-        "job name    ", RESET, $NAME, "\n",
-YELLOW, "memory      ", RESET, $MEM_MB, " Mb\n",
-YELLOW, "cores       ", RESET, $CORES, "\n",
-YELLOW, "time        ", RESET, "$DAYS days $HOURS hours", "\n",
-YELLOW, "partition   ", RESET, $PARTITION, "\n";
-
-say STDERR "-" x 40;
-my $cmd = qq(srun --job-name=$NAME --mem=$MEM_MB -c $CORES --time=$DAYS-$HOURS -n 1 --disable-status -s --pty --partition=$PARTITION $PARAMS -u bash -li);
-
-say STDERR $cmd if ($OPT_VERBOSE);
-
-if (has_srun() == 0) {
-    say STDERR RED, "[ERROR] srun not found... Are you on the cluster?", RESET;
-}
-exec($cmd);
 
 sub partition_tag {
     my $hours = shift;
@@ -94,11 +108,43 @@ sub partition_tag {
         return "qib-long,nbi-long";
     }
 }
+
+sub session_resolve_time {
+    my %args = @_;
+    confess "ERROR: --hours and --time are mutually exclusive\n"
+        if defined $args{hours} && defined $args{time_string};
+
+    my $hours = defined $args{time_string}
+        ? NBI::Opts::_time_to_hour($args{time_string})
+        : defined $args{hours}
+            ? $args{hours}
+            : $args{default_hours};
+
+    $hours += ($args{days} // 0) * 24;
+
+    return {
+        total_hours => $hours,
+        slurm       => session_hours_to_slurm($hours),
+    };
+}
+
 sub hours_to_days_hours {
     my $hours = shift;
     my $days = int($hours / 24);
     my $hours = $hours % 24;
     return ($days, $hours);
+}
+
+sub session_hours_to_slurm {
+    my $hours = shift;
+    my $seconds = int($hours * 3600);
+    my $days = int($seconds / 86400);
+    $seconds %= 86400;
+    my $hh = int($seconds / 3600);
+    $seconds %= 3600;
+    my $mm = int($seconds / 60);
+    my $ss = $seconds % 60;
+    return sprintf("%d-%02d:%02d:%02d", $days, $hh, $mm, $ss);
 }
 
 
@@ -126,7 +172,8 @@ Usage: $BIN [options]
 Options:
   -c, --threads   Number of CPU cores (default: 1)
   -m, --mem       Memory size in MB (default: 1000)
-  -h, --hours     Number of hours (default: 4)
+  -h, --hours     Number of hours (default: 4; mutually exclusive with --time)
+  -t, --time      Time string like 12h, 1d, 2h30m
   -n, --name      Job name (default: session)
   -q, --queue     Queue/partition name (default: determined by hours)
   -s, --special   Enable the special parameter string from the config file (default: off)
@@ -158,7 +205,7 @@ session - Start an interactive session on the cluster
 
 =head1 VERSION
 
-version 0.17.2
+version 0.19.0
 
 =head1 SYNOPSIS
 
@@ -168,6 +215,7 @@ version 0.17.2
     -c  --threads   Number of CPU cores (default: 1)
     -m  --mem       Memory size in MB (default: 1000)
     -h  --hours     Number of hours (default: 4)
+    -t  --time      Time string like 12h, 1d, 2h30m
     -d  --days      Number of days (added to hours)
     -n  --name      Job name (default: session)
     -q  --queue     Queue/partition name (default: determined by hours)
@@ -193,11 +241,17 @@ By default it is set to 1000, which is 1GB. If a number <=200 is provided, it wi
 
 =item B<-h, --hours> INT
 
-Number of hours. By default, it is set to 4.
+Number of hours. By default, it is set to 4. Mutually exclusive with C<--time>.
+
+=item B<-t, --time> STR
+
+Flexible time string, using the same format accepted by C<runjob>, such as
+C<12h>, C<1d>, or C<2h30m>. Mutually exclusive with C<--hours>.
 
 =item B<-d, --days> INT
 
-Number of days. Default is 0, and can be omitted (hours will update the days)
+Number of days. Default is 0, and can be omitted. This value is added to the
+requested duration from C<--hours> or C<--time>.
 
 =item B<-n, --name> STRING
 
@@ -222,6 +276,10 @@ Use Intel constraint. By default, it is turned off.
 Start an interactive session with 2 CPU cores, 2000 MB of memory, and 8 hours:
 
   session -c 2 -m 2GB -h 8
+
+Start an interactive session with a runjob-style time string:
+
+  session -c 2 -m 2GB -t 1d
 
 Start an interactive session with the default settings:
 

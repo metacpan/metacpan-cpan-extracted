@@ -1086,9 +1086,14 @@ YAML
   foreach my $username (qw(diṅnāga الخوارزميّ)) {
     $request = request('GET', 'http://example.com/foo/'.$username);
     is_equal(
-      $openapi->validate_request($request)->TO_JSON,
+      (my $result = $openapi->validate_request($request))->TO_JSON,
       { valid => true },
       'all path parameters are validated',
+    );
+    is_equal(
+      $result->data,
+      { request => { uri => { path => { username => $username } } } },
+      'data is correctly deserialized',
     );
   }
 
@@ -1152,9 +1157,23 @@ YAML
       'thing=one%20thing&thing=another%20thing',
       'coordinates=%7B%22lat%22%3A40.6%2C%22long%22%3A-73.9%7D'));
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    (my $result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'all query parameters are deserialized correctly',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        uri => {
+          query => {
+            thing => [ 'one thing', 'another thing' ],
+            coordinates => { lat => 40.6, long => -73.9 },
+          },
+        },
+      },
+    },
+    'data is correctly deserialized',
   );
 
 
@@ -1188,9 +1207,14 @@ YAML
 
   $request = request('GET', 'http://example.com/foo?page=4&pageSize=50');
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'entire querystring is deserialized correctly into an object',
+  );
+  is_equal(
+    $result->data,
+    { request => { uri => { query => { freeForm => { page => 4, pageSize => 50 } } } } },
+    'data is correctly deserialized',
   );
 
 
@@ -1217,9 +1241,14 @@ YAML
   $openapi->add_media_type('application/jsonpath', sub ($x) { $x });
   $request = request('GET', 'http://example.com/foo?%24.a.b%5B1%3A1%5D');
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'entire querystring is deserialized correctly as a string',
+  );
+  is_equal(
+    $result->data,
+    { request => { uri => { query => '$.a.b[1:1]' } } },
+    'data is correctly deserialized',
   );
 
 
@@ -1251,9 +1280,14 @@ YAML
 
   $request = request('GET', 'http://example.com/foo', [ Cookie => 'greeting=Hello%2C%20world%21' ]);
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'cookie parameter is validated',
+  );
+  is_equal(
+    $result->data,
+    { request => { header => { Cookie => { greeting => 'Hello, world!' } } } },
+    'cookie data was correctly deserialized',
   );
 
 
@@ -1293,9 +1327,14 @@ YAML
 
   $request = request('GET', 'http://example.com/foo', [ Cookie => 'greeting=Hello%2C%20world!; code=42' ]);
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'cookie parameter is validated',
+  );
+  is_equal(
+    $result->data,
+    { request => { header => { Cookie => { cookie => { greeting => 'Hello%2C%20world!', code => 42 } } } } },
+    'cookie data was correctly deserialized',
   );
 
 
@@ -1343,9 +1382,19 @@ YAML
 
   $request = request('GET', 'http://example.com/foo/12345678,90099', [ 'X-Token' => '12345678,90099' ]);
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'all path and header parameters are validated',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        uri => { path => { path_token => [ 12345678, 90099 ] } },
+        header => { 'X-Token' => [ 12345678, 90099 ] },
+      },
+    },
+    'header data was correctly deserialized',
   );
 
 
@@ -1645,9 +1694,99 @@ YAML
   );
 
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request, my $options = {}))->TO_JSON,
     { valid => true },
     'all path, header, query and cookie parameters are deserialized correctly',
+  );
+
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/{path−simple−string}/{path−simple−array−false}/{path−simple−array−true}/{path−simple−object−false}/{path−simple−object−true}/{cølör0}/{cølör1}/{cølör2}/{cølör3}/{cølör4}/{path−label−string}/{path−label−array−false}/{path−label−array−true}/{path−label−object−false}/{path−label−object−true}',
+      do { my $path_captures = {
+        'path−simple−array−false' => 'blue%E2%88%92black,blackish%EF%B9%A0green,100%F0%9D%91%A5brown',
+        'path−simple−array−true' => 'blue%E2%88%92black,blackish%EF%B9%A0green,100%F0%9D%91%A5brown',
+        'path−simple−object−false' => 'blue%E2%88%92black,yes!,blackish%EF%B9%A0green,%C2%BFno%3F,100%F0%9D%91%A5brown,fl%C2%A1p',
+        'path−simple−object−true' => 'blue%E2%88%92black=yes!,blackish%EF%B9%A0green=%C2%BFno%3F,100%F0%9D%91%A5brown=fl%C2%A1p',
+        'path−simple−string' => 'red%EF%B9%A0green',
+        'cølör0' => ';c%C3%B8l%C3%B6r0=red%EF%B9%A0green',
+        'cølör1' => ';c%C3%B8l%C3%B6r1=blue%E2%88%92black,blackish%EF%B9%A0green,100%F0%9D%91%A5brown',
+        'cølör2' => ';c%C3%B8l%C3%B6r2=blue%E2%88%92black;c%C3%B8l%C3%B6r2=blackish%EF%B9%A0green;c%C3%B8l%C3%B6r2=100%F0%9D%91%A5brown',
+        'cølör3' => ';c%C3%B8l%C3%B6r3=blue%E2%88%92black,yes!,blackish%EF%B9%A0green,%C2%BFno%3F,100%F0%9D%91%A5brown,fl%C2%A1p',
+        'cølör4' => ';blue%E2%88%92black=yes!;blackish%EF%B9%A0green=%C2%BFno%3F;100%F0%9D%91%A5brown=fl%C2%A1p',
+        'path−label−array−false' => '.blue%E2%88%92black,blackish%EF%B9%A0green,100%F0%9D%91%A5brown',
+        'path−label−array−true' => '.blue%E2%88%92black.blackish%EF%B9%A0green.100%F0%9D%91%A5brown',
+        'path−label−object−false' => '.blue%E2%88%92black,yes!,blackish%EF%B9%A0green,%C2%BFno%3F,100%F0%9D%91%A5brown,fl%C2%A1p',
+        'path−label−object−true' => '.blue%E2%88%92black=yes!.blackish%EF%B9%A0green=%C2%BFno%3F.100%F0%9D%91%A5brown=fl%C2%A1p',
+        'path−label−string' => '.red%EF%B9%A0gr.e.en',
+      };
+      path_captures => $path_captures,
+      uri_captures => {
+        host => 'st💩g',  # not 'xn--stg-ld23b'
+        subdir => '🐙',   # not '%F0%9F%90%99'
+        %$path_captures,
+      }},
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /{path−simple−string}/{path−simple−array−false}/{path−simple−array−true}/{path−simple−object−false}/{path−simple−object−true}/{cølör0}/{cølör1}/{cølör2}/{cølör3}/{cølör4}/{path−label−string}/{path−label−array−false}/{path−label−array−true}/{path−label−object−false}/{path−label−object−true} get)))),
+    },
+    '$options are correct',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        uri => {
+          server => {
+            host => 'st💩g',
+            subdir => '🐙',
+          },
+          path => {
+            'path−simple−string' => 'red﹠green',
+            'path−simple−array−false' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+            'path−simple−array−true' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+            'path−simple−object−false' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+            'path−simple−object−true' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+            'cølör0' => 'red﹠green',
+            'cølör1' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+            'cølör2' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+            'cølör3' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+            'cølör4' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+            'path−label−string' => 'red﹠gr.e.en',
+            'path−label−array−false' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+            'path−label−array−true' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+            'path−label−object−false' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+            'path−label−object−true' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+          },
+          query => {
+            'query−form−string' => 'blue/blåck',
+            'query−form−array−false' => [ qw(blue−black black/ish﹠green 100𝑥brown) ],
+            'query−form−array−true' => [ qw(blue−black black/ish﹠green 100𝑥brown) ],
+            'query−form−object−false' => { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+            'query−spaceDelimited−array' => [ qw(blue−black black/ish﹠green 100𝑥brown) ],
+            'query−spaceDelimited−object' => { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+            'query−pipeDelimited−array' => [ qw(blue−black black/ish﹠green 100𝑥brown) ],
+            'query−pipeDelimited−object' => { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+            'query−deepObject' => { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+          },
+        },
+        header => {
+          'header-simple-string' => 'red﹠green',
+          'header-simple-array-false' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+          'header-simple-array-true' => [ qw(blue−black blackish﹠green 100𝑥brown) ],
+          'header-simple-object-false' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+          'header-simple-object-true' => { 'blue−black' => 'yes!', 'blackish﹠green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+          Cookie => {
+            'cookie−form−string' => 'blue/blåck',
+            'cookie−form−array−true' => [ qw(blue−black black/ish﹠green 100𝑥brown) ],
+            'cookie-cookie-string' => 'blue/black',
+            'cookie-cookie-array-true' =>  [ qw(blue-black black/ish&green 100xbrown) ],
+          },
+        },
+      },
+    },
+    'deserialized data included in result',
   );
 
 
@@ -1671,9 +1810,22 @@ YAML
     .join('&', map join('=', @$_), pairs map uri_encode($_), qw(réd 100𝑥 grɘɇn ¡ja bløö ¿neîn)));
 
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'query parameter with style=form, explode=true is deserialized correctly into an object',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        uri => {
+          query => {
+            'query-form-object-true' => { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+          },
+        },
+      },
+    },
+    'deserialized data included in result',
   );
 
 
@@ -1695,9 +1847,20 @@ YAML
 
   $request = request('GET', 'http://example.com', [ Cookie => 'r%C3%A9d=100%F0%9D%91%A5&gr%C9%98%C9%87n=%C2%A1ja&bl%C3%B8%C3%B6=%C2%BFne%C3%AEn' ]);
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'single cookie parameter with style=form, explode=true is deserialized correctly into an object',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        header => {
+          Cookie => { 'cookie-form-object-true' => { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' } },
+        },
+      },
+    },
+    'deserialized data included in result',
   );
 
 
@@ -1721,9 +1884,22 @@ YAML
   $request = request('GET', 'http://example.com',
     [ Cookie => join('; ', map +($_->[0].'='.$_->[1]), pairs(qw(red 100x green ja bloo nein))) ]);
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'all query parameters are deserialized correctly',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        header => {
+          Cookie => {
+            'cookie-cookie-object-true' => { red => '100x', 'green' => 'ja', bloo => 'nein' },
+          },
+        },
+      },
+    },
+    'deserialized data included in result',
   );
 
 
@@ -1962,7 +2138,7 @@ YAML
           error => 'Content-Length cannot appear together with Transfer-Encoding',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema const)))->to_string,
           error => 'value does not match',
@@ -2024,7 +2200,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content)))->to_string,
           error => 'incorrect Content-Type "text/bloop"',
@@ -2036,12 +2212,12 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     {
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema const)))->to_string,
           error => 'value does not match',
@@ -2049,6 +2225,11 @@ YAML
       ],
     },
     'us-ascii text can be decoded and matched',
+  );
+  is_equal(
+    $result->data,
+    { request => { body => { content => 'ascii plain text' } } },
+    'body data was correctly parsed',
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'blOOp/HTML' ], 'html text (bloop style)');
@@ -2058,10 +2239,10 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content blOOp/HTml)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content blOOp/HTml)))->to_string,
-          error => 'EXCEPTION: unsupported media type "blOOp/HTml": add support with $openapi->add_media_type(...)',
+          error => 'EXCEPTION: unsupported media type "blOOp/HTML": add support with $openapi->add_media_type(...)',
         },
       ],
     },
@@ -2078,7 +2259,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content blOOp/HTml schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content blOOp/HTml schema not)))->to_string,
           error => 'subschema is true',
@@ -2098,7 +2279,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content unknown/encodingtype schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content unknown/encodingtype schema not)))->to_string,
           error => 'subschema is true',
@@ -2119,7 +2300,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content iMAgE/* schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content iMAgE/* schema not)))->to_string,
           error => 'subschema is true',
@@ -2137,7 +2318,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
           error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
@@ -2150,9 +2331,14 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
     chr(0xe9).'clair');
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'latin1 content can be successfully decoded',
+  );
+  is_equal(
+    $result->data,
+    { request => { body => { content => 'éclair' } } },
+    'body data was correctly parsed',
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
@@ -2163,7 +2349,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
           error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
@@ -2181,7 +2367,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: malformed UTF-8 character in JSON string/),
@@ -2199,7 +2385,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: /),
@@ -2212,9 +2398,14 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    ($result = $openapi->validate_request($request))->TO_JSON,
     { valid => true },
     'application/json is utf-8 encoded',
+  );
+  is_equal(
+    $result->data,
+    { request => { body => { content => { alpha => '123', beta => 'éclair' } } } },
+    'body data was correctly parsed',
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
@@ -2233,19 +2424,19 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/alpha',
+          instanceLocation => '/request/body/content/alpha',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties alpha pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties alpha pattern)))->to_string,
           error => 'pattern does not match',
         },
         {
-          instanceLocation => '/request/body/gamma',
+          instanceLocation => '/request/body/content/gamma',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties gamma const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties gamma const)))->to_string,
           error => 'value does not match',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties)))->to_string,
           error => 'not all properties are valid',
@@ -2287,7 +2478,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema minLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema minLength)))->to_string,
           error => 'length is less than 10',
@@ -2304,7 +2495,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content */* schema minLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content */* schema minLength)))->to_string,
           error => 'length is less than 10',
@@ -2335,7 +2526,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: malformed JSON string/),
@@ -2471,7 +2662,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema minLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema minLength)))->to_string,
           error => 'length is less than 10',
@@ -2556,7 +2747,7 @@ YAML
         },
         # no error from pattern - path value is a number
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern)))->to_string,
           error => 'pattern does not match',
@@ -2659,7 +2850,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema type)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema type)))->to_string,
           error => 'got string, not number',
@@ -2779,7 +2970,7 @@ YAML
           error => 'got string, not integer',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post requestBody content text/plain schema type)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post requestBody content text/plain schema type)))->to_string,
           error => 'got string, not integer',
@@ -2811,7 +3002,7 @@ YAML
           error => 'got string, not integer',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post requestBody content text/plain schema type)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path_plain}/bar/{path_encoded} post requestBody content text/plain schema type)))->to_string,
           error => 'got string, not integer',
@@ -3095,7 +3286,7 @@ YAML
 subtest $::TYPE.': max_depth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(max_traversal_depth => 15),
+    max_traversal_depth => 15,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
@@ -3152,13 +3343,13 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/foo',
+          instanceLocation => '/request/body/content/foo',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)))->to_string,
           error => 'additional property not permitted',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)))->to_string,
           error => 'not all additional properties are valid',
@@ -3401,7 +3592,7 @@ YAML
           error => 'cookie parameter not permitted',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post requestBody content */* schema)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post requestBody content */* schema)))->to_string,
           error => 'request body not permitted',
@@ -3616,13 +3807,13 @@ YAML
       errors => [
         # no error for 'length is less than 10'
         {
-          instanceLocation => '/request/body/b',
+          instanceLocation => '/request/body/content/b',
           keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/json schema properties b)),
           absoluteKeywordLocation => '/otherdoc/api/beta_subdir#/properties/b',
           error => 'property not permitted',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/json schema properties)),
           absoluteKeywordLocation => '/otherdoc/api/beta_subdir#/properties',
           error => 'not all properties are valid',
@@ -3641,19 +3832,19 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body/0',
+          instanceLocation => '/request/body/content/0',
           keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/yaml schema items 0 minLength)),
           absoluteKeywordLocation => '/otherdoc/api/second_beta_subdir#/items/0/minLength',
           error => 'length is less than 10',
         },
         {
-          instanceLocation => '/request/body/1',
+          instanceLocation => '/request/body/content/1',
           keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/yaml schema items 1)),
           absoluteKeywordLocation => '/otherdoc/api/second_beta_subdir#/items/1',
           error => 'item not permitted',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/yaml schema items)),
           absoluteKeywordLocation => '/otherdoc/api/second_beta_subdir#/items',
           error => 'not all items are valid',
@@ -3661,6 +3852,851 @@ YAML
       ],
     },
   'correct dialect is used (via json schema\'s $schema keyword) in a secondary document',
+  );
+};
+
+subtest $::TYPE.': example of cookie decomposition with encoding and media-type' => sub {
+  my ($openapi, $result);
+  my $schema = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
+paths:
+  /foo:
+    get:
+      parameters:
+        - in: cookie
+          name: token
+          content:
+            text/plain:
+              schema:
+                contentEncoding: base64
+                contentMediaType: application/json
+                contentSchema:
+                  type: object
+                  required: [ a, b ]
+                  additionalProperties:
+                    type: integer
+YAML
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    validate_content_schemas => 1,
+  );
+
+  # perl -wlE'require MIME::Base64; say MIME::Base64::encode_base64url(q!{"a":1,"b":2}!)'
+  $result = $openapi->validate_request(request(GET => 'http://example.com/foo',
+    [ Cookie => 'token=eyJhIjoxLCJiIjoyfQ' ]));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          header => {
+            Cookie => {
+              token => { a => 1, b => 2 },
+            },
+          },
+        },
+      },
+    ],
+    'json- and base64-encoded object is properly decoded and returned in the validation result',
+  );
+};
+
+subtest $::TYPE.': validation with schema defaults' => sub {
+
+  # 1. empty values for parameters provided:  [], {}
+  #  a. no defaults configs: no defaults in result; data is not populated with defaults.
+  #   b. with_defaults is enabled. defaults in result; data is populated with defaults.
+  #
+  # 2. parameter data is entirely missing (for query, no querystring; for Cookies and headers,
+  #    headers entirely missing)
+  #   a. no defaults configs: no defaults in result; data is not populated with defaults.
+  #   b. with_defaults is enabled. top-level defaults in result: default: false. data is populated
+  #      with top-level defaults.
+  #
+  # ---- schemas change here
+  #   c. with_defaults is enabled; now schemas are 'true' (not a hashref!). no defaults in result;
+  #      data is not populated with anything.
+  #   d. with_defaults is enabled; now schemas are missing. (only valid for media-types)
+  #
+  # 3. applicable to cookies only: Cookie header exists, but the named parameter does not exist.
+  #   a. no defaults configs: no defaults in result; data is not populated with defaults.
+  #   b. with_defaults is enabled. top-level defaults in result: default: false. data is populated
+  #      with top-level defaults.
+
+  my ($openapi, $result);
+  my $schema = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
+paths:
+  /{path-array}/{path-object}:    # styled parameters, and media-type parameters and body
+    get:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /querystring-array:             # querystring
+    get:
+      parameters: []
+  /querystring-object:            # querystring
+    get:
+      parameters: []
+YAML
+
+  ### styled parameters
+
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{parameters}->@* = map +(
+    +{
+      name => $_.'-array',
+      in => $_,
+      $_ eq 'path' ? (required => true) : (),
+      explode => ($_ eq 'cookie' ? true : false),
+      schema => {
+        type => 'array',
+        prefixItems => [ map +{ type => 'number', default => $_ }, 0..1 ],
+        items => { type => 'number', default => 42 },
+        $_ eq 'path' ? () : (default => [ 10, 11 ]),
+        default => false, # this is okay because we do not validate the default values
+      },
+    },
+    {
+      name => $_.'-object',
+      in => $_,
+      $_ eq 'cookie' ? (style => 'cookie') : (),
+      $_ eq 'path' ? (required => true) : (),
+      explode => ($_ eq 'cookie' ? true : false),
+      schema => {
+        type => 'object',
+        properties => +{ map +($_ => +{ type => 'string', default => $_.'_value' }), 'a'..'b' },
+        default => false,
+      },
+    },
+  ), qw(path query header cookie);
+
+  $openapi = OpenAPI::Modern->new(openapi_uri => $doc_uri_rel, openapi_schema => $schema);
+
+  # 1a
+  $result = $openapi->validate_request(request(GET => 'http://example.com//?query-array=&query-object=',
+    [ 'header-array' => '', 'header-object' => '', Cookie => 'cookie-array=4' ]));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          uri => {
+            path => {
+              'path-array' => [],
+              'path-object' => {},
+            },
+            query => {
+              'query-array' => [],
+              'query-object' => {},
+            },
+          },
+          header => {
+            'header-array' => [],
+            'header-object' => {},
+            Cookie => {
+              'cookie-array' => [ 4 ],
+              'cookie-object' => { 'cookie-array' => '4' },
+            },
+          },
+        },
+      },
+    ],
+    'styled parameter data with missing items/properties is deserialized, with no defaults by default',
+  );
+
+  # 2a
+  $result = $openapi->validate_request(request(GET => 'http://example.com//'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      { request => { uri => { path => { 'path-array' => [], 'path-object' => {} } } } },
+    ],
+    'styled parameters with missing data is deserialized, with no defaults by default',
+  );
+
+  # 3a
+  $result = $openapi->validate_request(request(GET => 'http://example.com//',
+    [ Cookie => 'alpha=1; beta=2' ]));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      { request => {
+          uri => { path => { 'path-array' => [], 'path-object' => {} } },
+          header => {
+            Cookie => {
+              'cookie-object' => { alpha => '1', beta => '2' },
+            },
+          },
+        },
+      },
+    ],
+    'styled cookie data with missing values is deserialized, with no defaults by default',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  # 1b
+  $result = $openapi->validate_request(request(GET => 'http://example.com//?query-array=&query-object=',
+    [ 'header-array' => '', 'header-object' => '', Cookie => 'cookie-array=4' ]));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/path/path-array/0' => 0,
+          '/request/uri/path/path-array/1' => 1,
+          '/request/uri/path/path-object/a' => 'a_value',
+          '/request/uri/path/path-object/b' => 'b_value',
+          '/request/uri/query/query-array/0' => 0,
+          '/request/uri/query/query-array/1' => 1,
+          '/request/uri/query/query-object/a' => 'a_value',
+          '/request/uri/query/query-object/b' => 'b_value',
+          '/request/header/header-array/0' => 0,
+          '/request/header/header-array/1' => 1,
+          '/request/header/header-object/a' => 'a_value',
+          '/request/header/header-object/b' => 'b_value',
+          '/request/header/Cookie/cookie-array/1' => 1,
+          '/request/header/Cookie/cookie-object/a' => 'a_value',
+          '/request/header/Cookie/cookie-object/b' => 'b_value',
+        },
+      },
+      {
+        request => {
+          uri => {
+            path => {
+              'path-array' => [ 0, 1 ],
+              'path-object' => { a => 'a_value', b => 'b_value' },
+            },
+            query => {
+              'query-array' => [ 0, 1 ],
+              'query-object' => { a => 'a_value', b => 'b_value' },
+            },
+          },
+          header => {
+            'header-array' => [ 0, 1 ],
+            'header-object' => { a => 'a_value', b => 'b_value' },
+            Cookie => {
+              'cookie-array' => [ 4, 1 ],
+              'cookie-object' => { 'cookie-array' => '4', a => 'a_value', b => 'b_value' },
+            },
+          },
+        },
+      },
+    ],
+    'styled parameter data with empty values, missing items or properties are included when with_defaults is set',
+  );
+
+  # 2b
+  $result = $openapi->validate_request(request(GET => 'http://example.com//'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/path/path-array/0' => 0,          # path parameters are never entirely missing
+          '/request/uri/path/path-array/1' => 1,
+          '/request/uri/path/path-object/a' => 'a_value',
+          '/request/uri/path/path-object/b' => 'b_value',
+          '/request/uri/query/query-array' => false,
+          '/request/uri/query/query-object' => false,
+          '/request/header/header-array' => false,
+          '/request/header/header-object' => false,
+          '/request/header/Cookie/cookie-array' => false,
+          '/request/header/Cookie/cookie-object' => false,
+          # no body default - how would we know what media-type to use?
+        },
+      },
+      {
+        request => {
+          uri => {
+            path => {
+              'path-array' => [ 0, 1 ],
+              'path-object' => { a => 'a_value', b => 'b_value' },
+            },
+            query => { 'query-array' => false, 'query-object' => false },
+          },
+          header => {
+            'header-array' => false,
+            'header-object' => false,
+            Cookie => { 'cookie-array' => false, 'cookie-object' => false },
+          },
+        },
+      }
+    ],
+    'styled parameter data now includes defaults when values are missing',
+  );
+
+  # 3b
+  $result = $openapi->validate_request(request(GET => 'http://example.com//',
+    [ Cookie => 'alpha=1; beta=2' ]));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/path/path-array/0' => 0,          # path parameters are never entirely missing
+          '/request/uri/path/path-array/1' => 1,
+          '/request/uri/path/path-object/a' => 'a_value',
+          '/request/uri/path/path-object/b' => 'b_value',
+          '/request/uri/query/query-array' => false,
+          '/request/uri/query/query-object' => false,
+          '/request/header/header-array' => false,
+          '/request/header/header-object' => false,
+          '/request/header/Cookie/cookie-array' => false,
+          '/request/header/Cookie/cookie-object/a' => 'a_value',
+          '/request/header/Cookie/cookie-object/b' => 'b_value',
+          # no body default - how would we know what media-type to use?
+        },
+      },
+      {
+        request => {
+          uri => {
+            path => {
+              'path-array' => [ 0, 1 ],
+              'path-object' => { a => 'a_value', b => 'b_value' },
+            },
+            query => { 'query-array' => false, 'query-object' => false },
+          },
+          header => {
+            'header-array' => false,
+            'header-object' => false,
+            Cookie => {
+              'cookie-array' => false,
+              'cookie-object' => {
+                alpha => '1',
+                beta => '2',
+                a => 'a_value',
+                b => 'b_value',
+              },
+            },
+          },
+        },
+      }
+    ],
+    'styled cookie data now includes defaults when some values are missing',
+  );
+
+
+  # 2c
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{parameters}[$_]{schema} = true
+    foreach 0..7; # (array, object) x (path, query, header, cookie)
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  $result = $openapi->validate_request(request(GET => 'http://example.com//'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {},
+      },
+      # we no longer know to style this as an array
+      { request => { uri => { path => { 'path-array' => '', 'path-object' => '' } } } },
+    ],
+    'styled parameter data does not include any defaults when schemas are a boolean',
+  );
+
+
+  ### media-type parameters and body
+
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{parameters}->@* = map +(
+    +{
+      name => $_.'-array',
+      in => $_,
+      content => {
+        'application/json' => {
+          schema => {
+            type => 'array',
+            prefixItems => [ map +{ type => 'number', default => $_ }, 0..1 ],
+            items => { type => 'number', default => 42 },
+            default => false, # this is okay because we do not validate the default values
+          },
+        },
+      },
+    },
+    {
+      name => $_.'-object',
+      in => $_,
+      content => {
+        'application/json' => {
+          schema => {
+            type => 'object',
+            properties => +{ map +($_ => +{ type => 'string', default => $_.'_value' }), 'a'..'b' },
+            default => false,
+          },
+        },
+      },
+    },
+  ), qw(path query header cookie);
+
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{requestBody}{content}{'application/json'}{schema}{properties}->%* = (
+    'body-array' => {
+      type => 'array',
+      prefixItems => [ map +{ type => 'number', default => $_ }, 0..1 ],
+      items => { type => 'number', default => 42 },
+      default => false, # never used: what media-type would we use?
+    },
+    'body-object' => {
+      type => 'object',
+      properties => +{ map +($_ => +{ type => 'string', default => $_.'_value' }), 'a'..'b' },
+      default => false, # never used: what media-type would we use?
+    },
+  );
+
+  $openapi = OpenAPI::Modern->new(openapi_uri => $doc_uri_rel, openapi_schema => $schema);
+
+  # 1a
+  $result = $openapi->validate_request(request(GET => 'http://example.com/[]/{}?query-array=[]&query-object={}',
+    [ 'header-array' => '[]', 'header-object' => '{}', Cookie => 'cookie-array=[]; cookie-object={}', 'Content-Type' => 'application/json' ],
+    '{"body-array":[],"body-object":{}}'));
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          uri => {
+            path => { 'path-array' => [], 'path-object' => {} },
+            query => { 'query-array' => [], 'query-object' => {} },
+          },
+          header => {
+            'header-array' => [],
+            'header-object' => {},
+            Cookie => { 'cookie-array' => [], 'cookie-object' => {} },
+          },
+          body => { content => { 'body-array' => [], 'body-object' => {} } },
+        },
+      },
+    ],
+    'media-type parameter and body data with incomplete values is deserialized, with no defaults',
+  );
+
+  # 2a
+  $result = $openapi->validate_request(request(GET => 'http://example.com/[]/{}'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      { request => { uri => { path => { 'path-array' => [], 'path-object' => {} } } } },
+    ],
+    'media-type parameters with missing data is deserialized, with no defaults by default',
+  );
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  # 1b
+  $result = $openapi->validate_request(request(GET => 'http://example.com/[]/{}?query-array=[]&query-object={}',
+    [ 'header-array' => '[]', 'header-object' => '{}', Cookie => 'cookie-array=[]; cookie-object={}', 'Content-Type' => 'application/json' ],
+    '{"body-array":[],"body-object":{}}'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/path/path-array/0' => 0,
+          '/request/uri/path/path-array/1' => 1,
+          '/request/uri/path/path-object/a' => 'a_value',
+          '/request/uri/path/path-object/b' => 'b_value',
+          '/request/uri/query/query-array/0' => 0,
+          '/request/uri/query/query-array/1' => 1,
+          '/request/uri/query/query-object/a' => 'a_value',
+          '/request/uri/query/query-object/b' => 'b_value',
+          '/request/header/header-array/0' => 0,
+          '/request/header/header-array/1' => 1,
+          '/request/header/header-object/a' => 'a_value',
+          '/request/header/header-object/b' => 'b_value',
+          '/request/header/Cookie/cookie-array/0' => 0,
+          '/request/header/Cookie/cookie-array/1' => 1,
+          '/request/header/Cookie/cookie-object/a' => 'a_value',
+          '/request/header/Cookie/cookie-object/b' => 'b_value',
+          '/request/body/content/body-array/0' => 0,
+          '/request/body/content/body-array/1' => 1,
+          '/request/body/content/body-object/a' => 'a_value',
+          '/request/body/content/body-object/b' => 'b_value',
+        },
+      },
+      {
+        request => {
+          uri => {
+            path => {
+              'path-array' => [ 0, 1 ],
+              'path-object' => { a => 'a_value', b => 'b_value' },
+            },
+            query => {
+              'query-array' => [ 0, 1 ],
+              'query-object' => { a => 'a_value', b => 'b_value' },
+            },
+          },
+          header => {
+            'header-array' => [ 0, 1 ],
+            'header-object' => { a => 'a_value', b => 'b_value' },
+            Cookie => {
+              'cookie-array' => [ 0, 1 ],
+              'cookie-object' => { a => 'a_value', b => 'b_value' },
+            },
+          },
+          body => {
+            content => {
+              'body-array' => [ 0, 1 ],
+              'body-object' => { a => 'a_value', b => 'b_value' },
+            },
+          },
+        },
+      },
+    ],
+    'media-type parameter and body data with empty values, missing items or properties are included when with_defaults is set',
+  );
+
+  # 2b
+  $result = $openapi->validate_request(request(GET => 'http://example.com/[]/{}'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/path/path-array/0' => 0,          # path parameters are never entirely missing
+          '/request/uri/path/path-array/1' => 1,
+          '/request/uri/path/path-object/a' => 'a_value',
+          '/request/uri/path/path-object/b' => 'b_value',
+          '/request/uri/query/query-array' => false,
+          '/request/uri/query/query-object' => false,
+          '/request/header/header-array' => false,
+          '/request/header/header-object' => false,
+          '/request/header/Cookie/cookie-array' => false,
+          '/request/header/Cookie/cookie-object' => false,
+          # no body default - how would we know what media-type to use?
+        },
+      },
+      {
+        request => {
+          uri => {
+            path => {
+              'path-array' => [ 0, 1 ],
+              'path-object' => { a => 'a_value', b => 'b_value' },
+            },
+            query => { 'query-array' => false, 'query-object' => false },
+          },
+          header => {
+            'header-array' => false,
+            'header-object' => false,
+            Cookie => { 'cookie-array' => false, 'cookie-object' => false, },
+          },
+          # no body default - how would we know what media-type to use?
+        },
+      },
+    ],
+    'media-type parameter and body data now includes defaults when values are missing',
+  );
+
+
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{requestBody}{content}{'application/json'}{schema} = true;
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{parameters}[$_]{content}{'application/json'}{schema} = true
+    foreach 0..7; # (array, object) x (path, query, header, cookie)
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  # 2c
+  $result = $openapi->validate_request(request(GET => 'http://example.com/1/2'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {},
+      },
+      { request => { uri => { path => { 'path-array' => 1, 'path-object' => 2 } } } },
+    ],
+    'media-type parameter and body data does not include any defaults when schemas are a boolean',
+  );
+
+
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{requestBody}{content}{'application/json'} = {};
+  $schema->{paths}{'/{path-array}/{path-object}'}{get}{parameters}[$_]{content}{'application/json'} = {}
+    foreach 0..7; # (array, object) x (path, query, header, cookie)
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  # 2d
+  $result = $openapi->validate_request(request(GET => 'http://example.com/1/2'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {},
+      },
+      { request => { uri => { path => { 'path-array' => 1, 'path-object' => 2 } } } },
+    ],
+    'media-type parameter and body data does not include any defaults when schemas do not exist',
+  );
+
+  ### querystring parameters
+
+  $schema->{paths}{'/querystring-array'}{get}{parameters}->@* = +{
+    name => 'querystring-array',
+    in => 'querystring',
+    content => {
+      'application/json' => {
+        schema => {
+          type => 'array',
+          prefixItems => [ map +{ type => 'number', default => $_ }, 0..1 ],
+          items => { type => 'number', default => 42 },
+          default => false, # this is okay because we do not validate the default values
+        },
+      },
+    },
+  };
+
+  $schema->{paths}{'/querystring-object'}{get}{parameters}->@* = +{
+    name => 'querystring-object',
+    in => 'querystring',
+    content => {
+      'application/json' => {
+        schema => {
+          type => 'object',
+          properties => +{ map +($_ => +{ type => 'string', default => $_.'_value' }), 'a'..'b' },
+          default => false,
+        },
+      },
+    },
+  };
+
+  $openapi = OpenAPI::Modern->new(openapi_uri => $doc_uri_rel, openapi_schema => $schema);
+
+  # 1a
+  $result = $openapi->validate_request(request(GET => 'http://example.com/querystring-array?[]'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      { request => { uri => { query => [] } } },
+    ],
+    'querystring array parameter data with incomplete values is deserialized, with no defaults by default',
+  );
+
+  # 1a
+  $result = $openapi->validate_request(request(GET => 'http://example.com/querystring-object?{}'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      { request => { uri => { query => {} } } },
+    ],
+    'querystring object parameter data with incomplete values is deserialized, with no defaults by default',
+  );
+
+  # 2a
+  $result = $openapi->validate_request(request(GET => 'http://example.com/querystring-array'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {},
+    ],
+    'missing querystring is deserialized, with no defaults by default',
+  );
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  # 1b
+  $result = $openapi->validate_request(request(GET => 'http://example.com/querystring-array?[]'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/query/0' => 0,
+          '/request/uri/query/1' => 1,
+        },
+      },
+      { request => { uri => { query => [ 0, 1 ] } } },
+    ],
+    'querystring array parameter data with empty values, missing items are included when with_defaults is set',
+  );
+
+  # 1b
+  $result = $openapi->validate_request(request(GET => 'http://example.com/querystring-object?{}'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/query/a' => 'a_value',
+          '/request/uri/query/b' => 'b_value',
+        },
+      },
+      { request => { uri => { query => { a => 'a_value', b => 'b_value' } } } },
+    ],
+    'querystring object parameter data with empty values, missing properties are included when with_defaults is set',
+  );
+
+  # 2b
+  $result = $openapi->validate_request(request(GET => 'http://example.com/querystring-array'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {
+          '/request/uri/query' => false,
+        },
+      },
+      { request => { uri => { query => false } } },
+    ],
+    'querystring parameter array data now includes defaults when values are missing',
+  );
+
+
+  $schema->{paths}{'/querystring-array'}{get}{parameters}[0]{content}{'application/json'}{schema} = true;
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  # 2c
+  $result = $openapi->validate_request(request(GET => 'http://example.com/querystring-array'));
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {},
+      },
+      {},
+    ],
+    'querystring parameter data does not include any defaults when schemas are a boolean',
+  );
+
+
+  $schema->{paths}{'/querystring-array'}{get}{parameters}[0]{content}{'application/json'} = {};
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  # 2d
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => true,
+        defaults => {},
+      },
+      {},
+    ],
+    'querystring parameter data does not include any defaults when schemas do not exist',
   );
 };
 

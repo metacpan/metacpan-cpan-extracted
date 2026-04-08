@@ -1,16 +1,31 @@
-0.08    2017-06-09 (PERLANCAR)
+0.091   2026-04-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Check mod->VERSION before $mod::VERSION to get version. Check
+          mod->AUTHORITY before $mod::AUTHORITY to get authority.
+
+        - [internal] Refactoring.
+
+        - [doc] Mention CPAN::Meta::X.
+
+
+0.090   2026-04-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Handle authority scheme 'darkpan'.
+
+
+0.08    2017-06-09  Released-By: PERLANCAR
 
 	- Update to use v1 MetaCPAN API because v0 has been shut down.
 
 
-0.07    2016-03-16 (PERLANCAR)
+0.07    2016-03-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.06    2015-08-26 (PERLANCAR)
+0.06    2015-08-26  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -19,7 +34,7 @@
           generates Completion POD section for Perinci::CmdLine::Inline scripts.
 
 
-0.05    2015-08-19 (PERLANCAR)
+0.05    2015-08-19  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -27,21 +42,21 @@
           which produces smaller completer script.
 
 
-0.04    2015-08-19 (PERLANCAR)
+0.04    2015-08-19  Released-By: PERLANCAR
 
         - [build] Rebuild with updated DZP:GenPericmdScript (0.23) which now
           generates a shell completer script for
           Perinci::CmdLine::Inline-generated scripts.
 
 
-0.03    2015-07-31 (PERLANCAR)
+0.03    2015-07-31  Released-By: PERLANCAR
 
 	- [ux] Merge App-CheckModuleVersion into our dist so users only
 	  need to install a single dist, check-module-version CLI uses
 	  pericmd-inline so it does not add any runtime deps.
 
 
-0.02    2015-07-10 (PERLANCAR)
+0.02    2015-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -49,6 +64,6 @@
 	  App::CheckModuleVersion.
 
 
-0.01     2015-07-10 (PERLANCAR)
+0.01     2015-07-10  Released-By: PERLANCAR
 
          - First release.

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.633-4-g3475aaa5
+package JSON::Schema::Modern; # git description: v0.634-14-g40555ec8
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.634';
+our $VERSION = '0.635';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -37,7 +37,7 @@ use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
 use JSON::Schema::Modern::Document;
-use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations is_schema json_pointer_type canonical_uri_type core_types_type core_formats_type load_cached_document);
+use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations is_schema json_pointer_type canonical_uri_type core_types_type core_formats_type load_cached_document jsonp_set);
 use namespace::clean;
 
 our @CARP_NOT = qw(
@@ -389,6 +389,8 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     depth => 0,
   };
 
+  $state->{data} = jsonp_set('', $state->{data_path}, ref $data ? dclone($data) : $data);
+
   my $valid;
   try {
     if (is_schema($schema_reference)) {
@@ -432,7 +434,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     # globally for the entire evaluation, so we store that value in a high bit.
     $state->{collect_annotations} = ($state->{collect_annotations}//0) << 8;
 
-    $valid = $self->_eval_subschema($data, $schema_info->{schema}, $state);
+    $valid = $self->_evaluate_subschema($data, $schema_info->{schema}, $state);
     warn 'result is false but there are no errors' if not $valid and not $state->{errors}->@*;
     warn 'result is true but there are errors' if $valid and $state->{errors}->@*;
   }
@@ -474,6 +476,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
           ? (annotations => $state->{annotations}) : ())
       : (errors => $state->{errors}),
     $state->{defaults} ? (defaults => $state->{defaults}) : (),
+    data => $state->{data},
   );
 }
 
@@ -677,8 +680,8 @@ sub _traverse_subschema ($self, $schema, $state) {
   return $valid;
 }
 
-sub _eval_subschema ($self, $data, $schema, $state) {
-  croak '_eval_subschema called in void context' if not defined wantarray;
+sub _evaluate_subschema ($self, $data, $schema, $state) {
+  croak '_evaluate_subschema called in void context' if not defined wantarray;
 
   # callers created a new $state for us, so we do not propagate upwards changes to depth, traversed
   # paths; but annotations, errors are arrayrefs so their contents will be shared
@@ -1299,7 +1302,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.634
+version 0.635
 
 =head1 SYNOPSIS
 
@@ -1412,7 +1415,7 @@ C<contentEncoding> (when present) is used to decode the applied data payload and
 C<contentMediaType> will be used as the media-type for decoding to produce the data payload which is
 then applied to the schema in C<contentSchema> for validation. (Note that treating these keywords as
 anything beyond simple annotations is contrary to the specification, therefore this option defaults
-to false.)
+to false.) The decoded data is also reflected in L<JSON::Schema::Modern::Result/data>.
 
 See L</add_media_type> and L</add_encoding> for adding additional type support.
 
@@ -1561,8 +1564,8 @@ will result in an C<defaults> entry of:
     '/my_array/1' => 'green'
   }
 
-To modify your data by adding the missing default data, see
-L<JSON::Schema::Modern::Utilities/jsonp_set>.
+This data can be manipulated with L<JSON::Schema::Modern::Utilities/jsonp_set>; it is also available
+already populated into the instance data via L<JSON::Schema::Modern::Result/data>.
 
 =head1 METHODS
 
@@ -2126,6 +2129,10 @@ C<hostname> and C<idn-hostname> require L<Data::Validate::Domain> version 0.13 (
 =item *
 
 C<idn-hostname> also requires L<Net::IDN::Encode>
+
+=item *
+
+C<uri> requires L<Data::Validate::URI>
 
 =back
 

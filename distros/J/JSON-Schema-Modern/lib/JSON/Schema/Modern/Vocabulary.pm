@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.634';
+our $VERSION = '0.635';
 
 use 5.020;
 use Moo::Role;
@@ -70,7 +70,7 @@ sub traverse_property_schema ($class, $schema, $state, $property) {
 }
 
 sub eval ($class, $data, $schema, $state) {
-  $state->{evaluator}->_eval_subschema($data, $schema, $state);
+  $state->{evaluator}->_evaluate_subschema($data, $schema, $state);
 }
 
 sub eval_subschema_at_uri ($class, $data, $schema, $state, $uri) {
@@ -82,7 +82,7 @@ sub eval_subschema_at_uri ($class, $data, $schema, $state, $uri) {
   my $scope_uri = $schema_info->{canonical_uri}->clone->fragment(undef);
   push $state->{dynamic_scope}->@*, $scope_uri if $state->{dynamic_scope}->[-1] ne $scope_uri;
 
-  return $state->{evaluator}->_eval_subschema($data, $schema_info->{schema},
+  return $state->{evaluator}->_evaluate_subschema($data, $schema_info->{schema},
     +{
       %$state,
       # keyword is assumed to be json pointer-encoded (if a suffix path is needed), so we just concat
@@ -107,7 +107,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.634
+version 0.635
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package Getopt::Yath::Option::Auto;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use parent 'Getopt::Yath::Option::Scalar';
 use Getopt::Yath::HashBase;
@@ -20,7 +20,7 @@ sub get_env_value {
     my ($var, $ref) = @_;
 
     return $$ref unless $var =~ m/^!/;
-    return $ref ? 0 : 1;
+    return $$ref ? 0 : 1;
 }
 
 
@@ -54,6 +54,26 @@ in an exception.
         short_examples => ['', '=Subtitle'],
         long_examples  => ['', '=Subtitle'],
     );
+
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option::Scalar> are inherited. The following
+are overridden or noteworthy:
+
+=over 4
+
+=item requires_arg: false
+
+=item allows_autofill: true
+
+=item requires_autofill: true
+
+C<--opt> uses the autofill value. C<--opt=val> uses the provided value.
+C<--opt VAL> is B<not> supported (the next argument is not consumed).
+
+=item can_set_env: true
+
+=back
 
 =head1 SOURCE
 

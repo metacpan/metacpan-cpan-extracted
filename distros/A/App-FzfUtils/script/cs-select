@@ -1,0 +1,314 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/FzfUtils/cs_select
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2026-04-08'; # DATE
+our $DIST = 'App-FzfUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/FzfUtils/cs_select",
+    program_name => "cs-select",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Select entries from template to clipboard
+# PODNAME: cs-select
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cs-select - Select entries from template to clipboard
+
+=head1 VERSION
+
+This document describes version 0.002 of cs-select (from Perl distribution App-FzfUtils), released on 2026-04-08.
+
+=head1 SYNOPSIS
+
+B<cs-select> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<cs-select> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<cs-select> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--wrap|/"--wrap=s, -w">>=I<L<posint|Sah::Schema::posint>>|B<L<-w|/"--wrap=s, -w">>=I<L<posint|Sah::Schema::posint>>] -- [I<L<template|/"--template=s">>]
+
+=head1 DESCRIPTION
+
+This is basically similar to:
+
+ % fzf --bind 'enter:execute(clipadd {})' < template.txt
+
+except that it does some pre-processing to let each template entry be a
+multiple-line text, and later do post-processing so the original entry is added
+to the clipboard.
+
+B<Template format>
+
+Template is an Org file with a particular format, where each entry is put under
+a level-2 heading. The level-1 heading can be used for grouping/categorizing.
+For example:
+
+ * Product > P1
+ ** Does P1 need to be replaced every 5 years?  :replacement:clipadd_1:
+ Yes, ideally every 3-5 years.
+ ** How to maintain P1 so it is in a good condition and can last longer?
+ Wash after every use, then dry.
+ Keep it clean.
+ And of course replace after 3-5 years.
+ * Product > P2
+ ** Entry 1  :clipadd_2:
+ ...
+ ** Entry 2
+ ...
+ * General > Support
+ ** Entry 3
+ ...
+ ** Entry 4
+ ...
+
+Before feeding to C<fzf>, this utility will convert each entry into a single
+line:
+
+ [id=1][title=Does P1 need to be replaced every 5 years?]Yes, ideally every 3-5 years.[category=Product > P1][tag=replacement][tag=clipadd_1]
+ [id=2][title=How to maintain P1 so it is in a good condition and can last longer?]Wash after every use, then dry. Keep it clean. And of course replace after 3-5 years.[category=Product > P1]
+ [id=3][title=Entry 1]...[tag=clipadd_2][category=Product > P2]
+ [id=4][title=Entry 2]...[category=Product > P2]
+ [id=5][title=Entry 3]...[category=General > Support]
+ [id=6][title=Entry 4]...[category=General > Support]
+
+after selection, another script (L<cs-select-helper>) will turn back the
+single-line entry into the original.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--template>=I<s>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--wrap>=I<s>, B<-w>
+
+(No description)
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C cs-select cs-select
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete cs-select 'p/*/`cs-select`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FzfUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FzfUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FzfUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

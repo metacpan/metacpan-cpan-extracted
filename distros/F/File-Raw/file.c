@@ -2729,7 +2729,7 @@ static AV* file_split_lines(pTHX_ SV *content) {
    XS Functions
    ============================================ */
 
-static XS(xs_slurp) {
+XS_INTERNAL(xs_slurp) {
     dXSARGS;
     const char *path;
 
@@ -2740,7 +2740,7 @@ static XS(xs_slurp) {
     XSRETURN(1);
 }
 
-static XS(xs_slurp_raw) {
+XS_INTERNAL(xs_slurp_raw) {
     dXSARGS;
     const char *path;
 
@@ -2751,7 +2751,7 @@ static XS(xs_slurp_raw) {
     XSRETURN(1);
 }
 
-static XS(xs_spew) {
+XS_INTERNAL(xs_spew) {
     dXSARGS;
     const char *path;
 
@@ -2766,7 +2766,7 @@ static XS(xs_spew) {
     XSRETURN(1);
 }
 
-static XS(xs_append) {
+XS_INTERNAL(xs_append) {
     dXSARGS;
     const char *path;
 
@@ -2781,7 +2781,7 @@ static XS(xs_append) {
     XSRETURN(1);
 }
 
-static XS(xs_size) {
+XS_INTERNAL(xs_size) {
     dXSARGS;
     const char *path;
     IV size;
@@ -2794,7 +2794,7 @@ static XS(xs_size) {
     XSRETURN(1);
 }
 
-static XS(xs_mtime) {
+XS_INTERNAL(xs_mtime) {
     dXSARGS;
     const char *path;
     IV mtime;
@@ -2807,7 +2807,7 @@ static XS(xs_mtime) {
     XSRETURN(1);
 }
 
-static XS(xs_exists) {
+XS_INTERNAL(xs_exists) {
     dXSARGS;
     const char *path;
 
@@ -2818,7 +2818,7 @@ static XS(xs_exists) {
     XSRETURN(1);
 }
 
-static XS(xs_is_file) {
+XS_INTERNAL(xs_is_file) {
     dXSARGS;
     const char *path;
 
@@ -2829,7 +2829,7 @@ static XS(xs_is_file) {
     XSRETURN(1);
 }
 
-static XS(xs_is_dir) {
+XS_INTERNAL(xs_is_dir) {
     dXSARGS;
     const char *path;
 
@@ -2840,7 +2840,7 @@ static XS(xs_is_dir) {
     XSRETURN(1);
 }
 
-static XS(xs_is_readable) {
+XS_INTERNAL(xs_is_readable) {
     dXSARGS;
     const char *path;
 
@@ -2851,7 +2851,7 @@ static XS(xs_is_readable) {
     XSRETURN(1);
 }
 
-static XS(xs_is_writable) {
+XS_INTERNAL(xs_is_writable) {
     dXSARGS;
     const char *path;
 
@@ -2862,7 +2862,7 @@ static XS(xs_is_writable) {
     XSRETURN(1);
 }
 
-static XS(xs_lines) {
+XS_INTERNAL(xs_lines) {
     dXSARGS;
     const char *path;
     AV *lines;
@@ -2947,7 +2947,7 @@ static XS(xs_lines) {
     XSRETURN(1);
 }
 
-static XS(xs_mmap_open) {
+XS_INTERNAL(xs_mmap_open) {
     dXSARGS;
     const char *path;
     int writable;
@@ -2973,7 +2973,7 @@ static XS(xs_mmap_open) {
     XSRETURN(1);
 }
 
-static XS(xs_mmap_data) {
+XS_INTERNAL(xs_mmap_data) {
     dXSARGS;
     HV *hash;
     SV **idx_sv;
@@ -2993,7 +2993,7 @@ static XS(xs_mmap_data) {
     XSRETURN(1);
 }
 
-static XS(xs_mmap_sync) {
+XS_INTERNAL(xs_mmap_sync) {
     dXSARGS;
     HV *hash;
     SV **idx_sv;
@@ -3013,7 +3013,7 @@ static XS(xs_mmap_sync) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_mmap_close) {
+XS_INTERNAL(xs_mmap_close) {
     dXSARGS;
     HV *hash;
     SV **idx_sv;
@@ -3034,7 +3034,7 @@ static XS(xs_mmap_close) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_mmap_DESTROY) {
+XS_INTERNAL(xs_mmap_DESTROY) {
     dXSARGS;
     HV *hash;
     SV **idx_sv;
@@ -3058,7 +3058,7 @@ static XS(xs_mmap_DESTROY) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_lines_iter) {
+XS_INTERNAL(xs_lines_iter) {
     dXSARGS;
     const char *path;
     IV idx;
@@ -3080,7 +3080,7 @@ static XS(xs_lines_iter) {
     XSRETURN(1);
 }
 
-static XS(xs_lines_iter_next) {
+XS_INTERNAL(xs_lines_iter_next) {
     dXSARGS;
     SV *rv;
     IV idx;
@@ -3174,7 +3174,7 @@ static XS(xs_lines_iter_next) {
     }
 }
 
-static XS(xs_lines_iter_eof) {
+XS_INTERNAL(xs_lines_iter_eof) {
     dXSARGS;
     SV *rv;
     IV idx;
@@ -3200,7 +3200,7 @@ static XS(xs_lines_iter_eof) {
     XSRETURN(1);
 }
 
-static XS(xs_lines_iter_close) {
+XS_INTERNAL(xs_lines_iter_close) {
     dXSARGS;
     SV *rv, *inner;
     IV idx;
@@ -3220,7 +3220,7 @@ static XS(xs_lines_iter_close) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_lines_iter_DESTROY) {
+XS_INTERNAL(xs_lines_iter_DESTROY) {
     dXSARGS;
     SV *rv;
     IV idx;
@@ -3383,7 +3383,7 @@ static FileLineCallback* file_get_callback(pTHX_ const char *name) {
 }
 
 /* Process lines with callback - MULTICALL optimized (Perl >= 5.14 only) */
-static XS(xs_each_line) {
+XS_INTERNAL(xs_each_line) {
     dXSARGS;
 #if PERL_VERSION >= 14
     dMULTICALL;
@@ -3503,7 +3503,7 @@ static XS(xs_each_line) {
 }
 
 /* Grep lines with callback or registered predicate name */
-static XS(xs_grep_lines) {
+XS_INTERNAL(xs_grep_lines) {
     dXSARGS;
     const char *path;
     SV *predicate;
@@ -3582,7 +3582,7 @@ static XS(xs_grep_lines) {
 }
 
 /* Count lines matching predicate */
-static XS(xs_count_lines) {
+XS_INTERNAL(xs_count_lines) {
     dXSARGS;
     const char *path;
     SV *predicate = NULL;
@@ -3702,7 +3702,7 @@ static XS(xs_count_lines) {
 }
 
 /* Find first line matching predicate */
-static XS(xs_find_line) {
+XS_INTERNAL(xs_find_line) {
     dXSARGS;
     const char *path;
     SV *predicate;
@@ -3778,15 +3778,13 @@ static XS(xs_find_line) {
 }
 
 /* Map lines with callback */
-static XS(xs_map_lines) {
+XS_INTERNAL(xs_map_lines) {
     dXSARGS;
     const char *path;
     SV *callback;
     IV idx;
     SV *line;
     AV *result;
-    CV *block_cv;
-
     if (items != 2) croak("Usage: file::map_lines(path, &callback)");
 
     path = SvPV_nolen(ST(0));
@@ -3797,7 +3795,6 @@ static XS(xs_map_lines) {
         croak("Second argument must be a code reference");
     }
 
-    block_cv = (CV*)SvRV(callback);
     idx = file_lines_open(aTHX_ path);
     if (idx < 0) {
         ST(0) = sv_2mortal(newRV_noinc((SV*)result));
@@ -3829,7 +3826,7 @@ static XS(xs_map_lines) {
 }
 
 /* Register a Perl callback */
-static XS(xs_register_line_callback) {
+XS_INTERNAL(xs_register_line_callback) {
     dXSARGS;
     const char *name;
     STRLEN name_len;
@@ -3873,7 +3870,7 @@ static XS(xs_register_line_callback) {
 }
 
 /* List registered callbacks */
-static XS(xs_list_line_callbacks) {
+XS_INTERNAL(xs_list_line_callbacks) {
     dXSARGS;
     AV *result;
     HE *entry;
@@ -3897,7 +3894,7 @@ static XS(xs_list_line_callbacks) {
    ============================================ */
 
 /* Register a Perl read hook */
-static XS(xs_register_read_hook) {
+XS_INTERNAL(xs_register_read_hook) {
     dXSARGS;
     SV *coderef;
     FileHookEntry *entry;
@@ -3923,7 +3920,7 @@ static XS(xs_register_read_hook) {
 }
 
 /* Register a Perl write hook */
-static XS(xs_register_write_hook) {
+XS_INTERNAL(xs_register_write_hook) {
     dXSARGS;
     SV *coderef;
     FileHookEntry *entry;
@@ -3949,7 +3946,7 @@ static XS(xs_register_write_hook) {
 }
 
 /* Clear all hooks for a phase */
-static XS(xs_clear_hooks) {
+XS_INTERNAL(xs_clear_hooks) {
     dXSARGS;
     const char *phase_name;
     FileHookPhase phase;
@@ -3991,7 +3988,7 @@ static XS(xs_clear_hooks) {
 }
 
 /* Check if hooks are registered for a phase */
-static XS(xs_has_hooks) {
+XS_INTERNAL(xs_has_hooks) {
     dXSARGS;
     const char *phase_name;
     FileHookPhase phase;
@@ -4022,7 +4019,7 @@ static XS(xs_has_hooks) {
 }
 
 /* New stat functions */
-static XS(xs_atime) {
+XS_INTERNAL(xs_atime) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::atime(path)");
@@ -4031,7 +4028,7 @@ static XS(xs_atime) {
     XSRETURN(1);
 }
 
-static XS(xs_ctime) {
+XS_INTERNAL(xs_ctime) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::ctime(path)");
@@ -4040,7 +4037,7 @@ static XS(xs_ctime) {
     XSRETURN(1);
 }
 
-static XS(xs_mode) {
+XS_INTERNAL(xs_mode) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::mode(path)");
@@ -4050,7 +4047,7 @@ static XS(xs_mode) {
 }
 
 /* Combined stat - all attributes in one syscall */
-static XS(xs_stat_all) {
+XS_INTERNAL(xs_stat_all) {
     dXSARGS;
     const char *path;
     HV *result;
@@ -4065,7 +4062,7 @@ static XS(xs_stat_all) {
     XSRETURN(1);
 }
 
-static XS(xs_is_link) {
+XS_INTERNAL(xs_is_link) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::is_link(path)");
@@ -4074,7 +4071,7 @@ static XS(xs_is_link) {
     XSRETURN(1);
 }
 
-static XS(xs_is_executable) {
+XS_INTERNAL(xs_is_executable) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::is_executable(path)");
@@ -4084,7 +4081,7 @@ static XS(xs_is_executable) {
 }
 
 /* File manipulation functions */
-static XS(xs_unlink) {
+XS_INTERNAL(xs_unlink) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::unlink(path)");
@@ -4093,7 +4090,7 @@ static XS(xs_unlink) {
     XSRETURN(1);
 }
 
-static XS(xs_copy) {
+XS_INTERNAL(xs_copy) {
     dXSARGS;
     const char *src;
     const char *dst;
@@ -4104,7 +4101,7 @@ static XS(xs_copy) {
     XSRETURN(1);
 }
 
-static XS(xs_move) {
+XS_INTERNAL(xs_move) {
     dXSARGS;
     const char *src;
     const char *dst;
@@ -4115,7 +4112,7 @@ static XS(xs_move) {
     XSRETURN(1);
 }
 
-static XS(xs_touch) {
+XS_INTERNAL(xs_touch) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::touch(path)");
@@ -4124,7 +4121,7 @@ static XS(xs_touch) {
     XSRETURN(1);
 }
 
-static XS(xs_clear_stat_cache) {
+XS_INTERNAL(xs_clear_stat_cache) {
     dXSARGS;
     if (items > 1) croak("Usage: file::clear_stat_cache() or file::clear_stat_cache(path)");
     
@@ -4139,7 +4136,7 @@ static XS(xs_clear_stat_cache) {
     XSRETURN(1);
 }
 
-static XS(xs_chmod) {
+XS_INTERNAL(xs_chmod) {
     dXSARGS;
     const char *path;
     int mode;
@@ -4150,7 +4147,7 @@ static XS(xs_chmod) {
     XSRETURN(1);
 }
 
-static XS(xs_mkdir) {
+XS_INTERNAL(xs_mkdir) {
     dXSARGS;
     const char *path;
     int mode = 0755;
@@ -4161,7 +4158,7 @@ static XS(xs_mkdir) {
     XSRETURN(1);
 }
 
-static XS(xs_rmdir) {
+XS_INTERNAL(xs_rmdir) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::rmdir(path)");
@@ -4170,7 +4167,7 @@ static XS(xs_rmdir) {
     XSRETURN(1);
 }
 
-static XS(xs_readdir) {
+XS_INTERNAL(xs_readdir) {
     dXSARGS;
     const char *path;
     AV *result;
@@ -4182,7 +4179,7 @@ static XS(xs_readdir) {
 }
 
 /* Path manipulation functions */
-static XS(xs_basename) {
+XS_INTERNAL(xs_basename) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::basename(path)");
@@ -4191,7 +4188,7 @@ static XS(xs_basename) {
     XSRETURN(1);
 }
 
-static XS(xs_dirname) {
+XS_INTERNAL(xs_dirname) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::dirname(path)");
@@ -4200,7 +4197,7 @@ static XS(xs_dirname) {
     XSRETURN(1);
 }
 
-static XS(xs_extname) {
+XS_INTERNAL(xs_extname) {
     dXSARGS;
     const char *path;
     if (items != 1) croak("Usage: file::extname(path)");
@@ -4209,7 +4206,7 @@ static XS(xs_extname) {
     XSRETURN(1);
 }
 
-static XS(xs_join) {
+XS_INTERNAL(xs_join) {
     dXSARGS;
     AV *parts;
     SSize_t i;
@@ -4227,7 +4224,7 @@ static XS(xs_join) {
 }
 
 /* Head and tail */
-static XS(xs_head) {
+XS_INTERNAL(xs_head) {
     dXSARGS;
     const char *path;
     AV *result;
@@ -4240,7 +4237,7 @@ static XS(xs_head) {
     XSRETURN(1);
 }
 
-static XS(xs_tail) {
+XS_INTERNAL(xs_tail) {
     dXSARGS;
     const char *path;
     AV *result;
@@ -4254,7 +4251,7 @@ static XS(xs_tail) {
 }
 
 /* Atomic spew */
-static XS(xs_atomic_spew) {
+XS_INTERNAL(xs_atomic_spew) {
     dXSARGS;
     const char *path;
     if (items != 2) croak("Usage: file::atomic_spew(path, data)");

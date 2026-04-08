@@ -2,7 +2,7 @@ package Getopt::Yath::Option::Map;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use Getopt::Yath::Util qw/decode_json/;
 
@@ -112,7 +112,7 @@ sub normalize_value {
         local $@;
         unless (eval { local $SIG{__DIE__}; $out = decode_json($input[0]); 1 }) {
             my ($err) = split /[\n\r]+/, $@;
-            $err =~ s{at \Q$INC{'Getopt/Yath/Util/JSON.pm'}\E line \d+\..*$}{};
+            $err =~ s{at \Q$INC{'Getopt/Yath/Util.pm'}\E line \d+\..*$}{};
             die "Could not decode JSON string: $err\n====\n$input[0]\n====\n";
         }
         return %$out;
@@ -162,6 +162,48 @@ have C<$h{foo} = 'bar'; $h{baz} = 'bat'>.
         short_examples => ['VAR=VAL', ' VAR=VAL'],
         description    => 'Set environment variables',
     );
+
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option> are inherited. The following are
+overridden or noteworthy:
+
+=over 4
+
+=item requires_arg: true
+
+=item allows_list: true
+
+Each use of C<--opt key=val> adds to the hash. C<--no-opt> empties it.
+
+=item normalize_value(@input)
+
+If the input looks like a JSON object (e.g., C<'{"a":"b"}'>), it is decoded and
+the key/value pairs are returned. Otherwise values are split on C<key_on>
+(default C<=>) to produce key/value pairs. If C<split_on> is set, values are
+split on that delimiter first.
+
+=item get_initial_value
+
+Checks C<from_env_vars>. For maps, the environment variable name is used as the
+key and the variable's value as the hash value. Returns an empty hashref if no
+environment values are found.
+
+=back
+
+=head1 ADDITIONAL ATTRIBUTES
+
+=over 4
+
+=item split_on => $delimiter
+
+A string or regex to split values on before extracting key/value pairs.
+
+=item key_on => $delimiter
+
+The delimiter between keys and values. Defaults to C<=>.
+
+=back
 
 =head1 SOURCE
 

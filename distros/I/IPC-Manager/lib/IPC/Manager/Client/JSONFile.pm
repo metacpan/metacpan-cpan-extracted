@@ -2,11 +2,14 @@ package IPC::Manager::Client::JSONFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000012';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
 use File::Temp ();
+
+my $HAVE_SHA;
+BEGIN { $HAVE_SHA = eval { require Digest::SHA; Digest::SHA->import('sha256_hex'); 1 } ? 1 : 0 }
 
 use IPC::Manager::Message;
 use IPC::Manager::Serializer::JSON;
@@ -16,10 +19,25 @@ use parent 'IPC::Manager::Client';
 use Object::HashBase qw{
     +_cache_state
     +_cache_mtime
+    +_cache_sha
+    +_cache_gen
+    +_cache_time
+    +_cache_sha_verified
     +_inotify
+    interval
 };
 
-sub viable { 1 }
+# Per-route write generation counter so that multiple client objects
+# sharing the same file in a single process always detect each other's
+# writes, even when filesystem mtime resolution is too coarse.
+my %_WRITE_GEN;
+
+sub viable { USE_INOTIFY || $HAVE_SHA }
+
+sub sanity {
+    return if USE_INOTIFY || $HAVE_SHA;
+    croak "JSONFile requires either Linux::Inotify2 or Digest::SHA for reliable cache invalidation";
+}
 
 # The route is the path to the JSON file.  The file stores:
 #   {
@@ -31,6 +49,8 @@ sub viable { 1 }
 sub spawn {
     my $class  = shift;
     my %params = @_;
+
+    $class->sanity;
 
     my $template = delete $params{template} // "PerlIPCMgr-$$-XXXXXX";
     my ($fh, $file) = File::Temp::tempfile($template, TMPDIR => 1, SUFFIX => '.json', UNLINK => 0);
@@ -50,9 +70,13 @@ sub unspawn {
 
 # --- Cache / change-detection ---
 
-sub _file_mtime {
+sub _file_sha {
     my $self = shift;
-    return (stat($self->{route}))[9];
+    croak "Digest::SHA is required for SHA-based cache invalidation" unless $HAVE_SHA;
+    open(my $fh, '<', $self->{route}) or return undef;
+    my $data = do { local $/; <$fh> };
+    close $fh;
+    return sha256_hex($data);
 }
 
 sub _init_inotify {
@@ -76,6 +100,10 @@ sub _cache_is_stale {
     # No cache yet
     return 1 unless defined $self->{+_CACHE_MTIME};
 
+    # Another client in this process wrote to the same file
+    my $current_gen = $_WRITE_GEN{$self->{route}} // 0;
+    return 1 if ($self->{+_CACHE_GEN} // 0) != $current_gen;
+
     if (my $i = $self->{+_INOTIFY}) {
         # If inotify has pending events the file has changed
         my @events = $i->read;
@@ -83,15 +111,44 @@ sub _cache_is_stale {
         return 0;
     }
 
-    # Fallback: compare mtime
-    my $current_mtime = $self->_file_mtime // return 1;
-    return $current_mtime != $self->{+_CACHE_MTIME} ? 1 : 0;
+    # Fallback: compare mtime, then SHA after an interval.
+    # Mtime has only 1-second resolution on many filesystems, so
+    # cross-process writes within the same second go undetected.
+    # Once the configured interval elapses with an unchanged mtime we
+    # fall back to a SHA comparison to catch those writes.
+    my $current_mtime = (stat($self->{route}))[9] // return 1;
+
+    if ($current_mtime != $self->{+_CACHE_MTIME}) {
+        delete $self->{+_CACHE_SHA_VERIFIED};
+        return 1;
+    }
+
+    # Mtime unchanged — if we already verified via SHA, trust it
+    # until the mtime changes again.
+    return 0 if $self->{+_CACHE_SHA_VERIFIED};
+
+    # Wait for the interval before falling back to SHA.
+    my $elapsed = time() - ($self->{+_CACHE_TIME} // 0);
+    return 0 if $elapsed < ($self->{+INTERVAL} // 1);
+
+    # Interval elapsed, mtime still unchanged — compare SHA.
+    my $current_sha = $self->_file_sha // return 1;
+    if ($current_sha ne ($self->{+_CACHE_SHA} // '')) {
+        return 1;
+    }
+
+    $self->{+_CACHE_SHA_VERIFIED} = 1;
+    return 0;
 }
 
 sub _update_cache {
     my ($self, $state) = @_;
     $self->{+_CACHE_STATE} = $state;
-    $self->{+_CACHE_MTIME} = $self->_file_mtime;
+    $self->{+_CACHE_MTIME} = (stat($self->{route}))[9];
+    $self->{+_CACHE_SHA}   = $self->_file_sha if $HAVE_SHA;
+    $self->{+_CACHE_GEN}   = $_WRITE_GEN{$self->{route}} // 0;
+    $self->{+_CACHE_TIME}  = time();
+    delete $self->{+_CACHE_SHA_VERIFIED};
 }
 
 sub _invalidate_cache {
@@ -147,6 +204,8 @@ sub _commit {
     print $fh IPC::Manager::Serializer::JSON->serialize($state);
     close $fh;
 
+    $_WRITE_GEN{$self->{route}}++;
+
     # Drain any inotify events caused by our own write so the cache
     # doesn't immediately appear stale on the next read.
     if (my $i = $self->{+_INOTIFY}) {
@@ -160,6 +219,8 @@ sub _commit {
 
 sub init {
     my $self = shift;
+
+    $self->sanity;
 
     $self->SUPER::init();
 

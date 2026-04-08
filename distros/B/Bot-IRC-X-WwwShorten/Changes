@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::WwwShorten
 
+1.06      2026-04-07 10:53:40-07:00 America/Los_Angeles
+        - Bump minimum Perl version to 16 due to MIME::Types now requiring it
+
 1.05      2025-06-13 10:24:39-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

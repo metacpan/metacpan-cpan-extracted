@@ -16,7 +16,7 @@ use Carp;
 
 BEGIN {
     require XML::Parser::Expat;
-    $VERSION = '2.56';
+    $VERSION = '2.57';
     die "Parser.pm and Expat.pm versions don't match"
       unless $VERSION eq $XML::Parser::Expat::VERSION;
 }
@@ -459,6 +459,17 @@ MIME multipart format. The string should not contain a trailing newline.
 This is an Expat option. Unless standalone is set to "yes" in the XML
 declaration, setting this to a true value allows the external DTD to be read,
 and parameter entities to be parsed and expanded.
+
+B<Implicit vs explicit parameter entity parsing:> When C<ParseParamEnt> is
+not set, parameter entity references (e.g. C<%foo;>) in the internal DTD
+subset are passed through to the B<Default> handler as literal text. This is
+the mode that XML::Twig and other DTD round-tripping tools rely on.
+
+When C<ParseParamEnt> is set to a true value, or when a declaration handler
+(B<Entity>, B<Element>, or B<Attlist>) is registered, parameter entity parsing
+is activated. In this mode, PE references are resolved by expat (via the
+B<ExternEnt> handler) and subsequent declarations are routed to their
+dedicated declaration handlers instead of the Default handler.
 
 =item * NoLWP
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Chandra::Socket::Connection;
 
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 require Chandra;
 

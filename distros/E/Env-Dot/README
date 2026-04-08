@@ -1,5 +1,5 @@
 This archive contains the distribution Env-Dot,
-version 0.020:
+version 0.021:
 
   Read .env file and turn its content into environment variables for different shells. Module and executable.
 

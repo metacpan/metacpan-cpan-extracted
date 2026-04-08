@@ -2,7 +2,7 @@ package Getopt::Yath::Option::PathList;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use parent 'Getopt::Yath::Option::List';
 use Getopt::Yath::HashBase;
@@ -37,7 +37,7 @@ sub default_short_examples {
     my $self = shift;
     my %params = @_;
 
-    my $list = $self->SUPER::default_long_examples(%params);
+    my $list = $self->SUPER::default_short_examples(%params);
     push @$list => (qq{ '*.*'}, qq{='*.*'});
     return $list;
 }
@@ -68,6 +68,20 @@ that get expanded.
         description   => "Specify one or more files as having been changed.",
         long_examples => [' path/to/file'],
     );
+
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option::List> are inherited. The following are
+overridden or noteworthy:
+
+=over 4
+
+=item normalize_value(@input)
+
+Values containing wildcard characters (C<*>) are expanded using Perl's
+C<glob()> function. All other processing is delegated to the parent class.
+
+=back
 
 =head1 SOURCE
 

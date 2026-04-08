@@ -1,5 +1,36 @@
 Revision history for Langertha
 
+0.400     2026-04-07 23:01:11Z
+
+    - New value object Langertha::Usage for token counting with from_hash /
+      from_response constructors and to_openai/anthropic/ollama_format
+      serializers.
+    - New value object Langertha::Cost for the monetary cost of a single
+      LLM call (input_usd / output_usd / total_usd / currency).
+    - New Langertha::Pricing — model→rule catalog with cost_for(usage,
+      model) returning a Cost.
+    - New Langertha::UsageRecord — Usage + Cost + tagged metadata
+      (provider, engine, model, route, api_key_id, duration_ms, tool
+      counts) with to_hash for ledger storage.
+    - New value object Langertha::Tool for canonical tool definitions
+      with from_openai / from_anthropic / from_list constructors and
+      to_openai / to_anthropic / to_ollama / to_hash serializers.
+    - New value object Langertha::ToolCall for canonical tool
+      invocations with from_openai / from_anthropic / from_ollama /
+      extract / extract_hermes_from_text constructors and to_openai /
+      to_anthropic_block / to_ollama serializers.
+    - New value object Langertha::ToolChoice with enum-typed canonical
+      type ('auto' / 'any' / 'none' / 'tool'), auto/any/none/specific
+      shortcut constructors, and to_openai / to_anthropic conversions.
+    - Refactor Langertha::Metrics, Langertha::Input, Langertha::Output,
+      Langertha::Input::Tools, Langertha::Output::Tools into thin
+      backwards-compatibility facades over the new value objects.
+      External APIs unchanged; existing callers keep working.
+    - The five facade modules now emit a one-time Carp::carp at load
+      time pointing callers at the new value objects.
+    - dist.ini sets irc = #langertha so PodWeaver injects an IRC
+      support block in every module's POD.
+
 0.309     2026-04-05 16:37:32Z
 
     - Fix Moose role composition: consolidate all separate `with` calls into

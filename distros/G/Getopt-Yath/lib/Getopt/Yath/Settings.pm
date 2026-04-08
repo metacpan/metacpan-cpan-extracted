@@ -2,7 +2,7 @@ package Getopt::Yath::Settings;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use Carp();
 
@@ -112,7 +112,7 @@ Getopt::Yath::Settings - Representation of parsed command line options.
 =head1 DESCRIPTION
 
 When you parse command line options using L<Getopt::Yath> an instance of this
-data structure is included in the returnd structure.
+data structure is included in the returned structure.
 
 =head1 SYNOPSIS
 

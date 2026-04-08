@@ -33,6 +33,7 @@ if ($ENV{EXTENDED_TESTING}) {
     'Email::Address::XS' => '1.04',
     'Data::Validate::Domain' => 0.13,
     'Net::IDN::Encode' => 0,
+    'Data::Validate::URI' => 0,
   };
 }
 
@@ -42,6 +43,7 @@ if ($ENV{AUTHOR_TESTING}) {
   eval { require Email::Address::XS; Email::Address::XS->VERSION(1.04); 1 } or fail $@;
   eval { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); 1 } or fail $@;
   eval { require Net::IDN::Encode; 1 } or fail $@;
+  eval { require Data::Validate::URI; 1 } or fail $@;
 }
 
 my $version = 'draft2020-12';
@@ -68,19 +70,19 @@ acceptance_tests(
           !$ENV{AUTHOR_TESTING} && !eval { require Email::Address::XS; Email::Address::XS->VERSION(1.04); 1 } ? qw(email.json idn-email.json) : (),
           !$ENV{AUTHOR_TESTING} && !eval { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); 1 } ? qw(hostname.json idn-hostname.json) : (),
           !$ENV{AUTHOR_TESTING} && !eval { require Net::IDN::Encode; 1 } ? 'idn-hostname.json' : (),
+          !$ENV{AUTHOR_TESTING} && !eval { require Data::Validate::URI; 1 } ? 'uri.json' : (),
         ] },
       # various edge cases that are difficult to accomodate
       { file => 'email.json', group_description => 'validation of e-mail addresses', test_description => [ 'an invalid domain', 'an invalid IPv4-address-literal' ] },
       { file => 'hostname.json', group_description => 'validation of host names', test_description => [ 'trailing dot', 'contains "--" in the 3rd and 4th position' ] },
       { file => 'hostname.json', group_description => 'validation of A-label (punycode) host names' },
-      { file => 'iri.json', group_description => 'validation of IRIs',  # see test suite issue 395
-        test_description => 'an invalid IRI based on IPv6' },
+      { file => 'iri.json', group_description => 'validation of IRIs',
+        test_description => [ 'an invalid IRI based on IPv6', 'an IPv6 address without enclosing brackets is invalid' ] },
       { file => 'idn-hostname.json',
         # IDN decoder, Data::Validate::Domain both have issues
         group_description => [ 'validation of internationalized host names', 'validation of separators in internationalized host names' ] },
-      { file => 'uri.json',
-        test_description => 'validation of URIs',
-        test_description => 'an invalid URI with comma in scheme' },  # Mojo::URL does not fully validate
+      { file => 'uri.json', group_description => 'validation of URIs',
+        test_description => [ 'lone percent sign is invalid', 'non-numeric port is invalid' ] },
       # note this test was added in TJSA 1.027
       { file => 'ecmascript-regex.json', group_description => '\a is not an ECMA 262 control escape', test_description => 'when used as a pattern' },
     ]),

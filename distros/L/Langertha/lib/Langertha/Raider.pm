@@ -1,6 +1,6 @@
 package Langertha::Raider;
 # ABSTRACT: Autonomous agent with conversation history and MCP tools
-our $VERSION = '0.309';
+our $VERSION = '0.400';
 use Moose;
 use Future::AsyncAwait;
 use Time::HiRes qw( gettimeofday tv_interval );
@@ -1486,7 +1486,7 @@ Langertha::Raider - Autonomous agent with conversation history and MCP tools
 
 =head1 VERSION
 
-version 0.309
+version 0.400
 
 =head1 SYNOPSIS
 
@@ -1954,13 +1954,17 @@ Extra constructor arguments can be passed via C<_plugin_args>.
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha/issues>.
 
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
 
 =head1 COPYRIGHT AND LICENSE
 

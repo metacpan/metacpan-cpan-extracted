@@ -94,6 +94,7 @@ my $signed = eval {
 ok(!$@,                        'sign_file did not die')           or diag "Error: $@";
 ok(defined $signed,         'sign_file returned a value');
 ok($signed =~ m/<3082/sm ,     'sign_file returned non-empty signature');
+ok($signed =~ m/\/M \(D:\d{14}[+-]\d{2}'\d{2}'\)/ ,     'sign_file use correct PDF dateformat');
 
 SKIP: {
     skip 'no signature to inspect', 2 unless defined $signed && length $signed;

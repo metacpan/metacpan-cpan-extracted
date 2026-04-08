@@ -1,0 +1,14 @@
+^\.git/
+\.bak$
+\.old$
+\.o$
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MYMETA\.\w+$
+\.bs$
+\.tar\.gz$
+^YY\.c$
+^JSON-YY-
+^\.

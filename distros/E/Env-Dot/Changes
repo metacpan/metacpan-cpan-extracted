@@ -1,5 +1,11 @@
 Revision history for Env-Dot
 
+0.021     2026-04-07 15:47:56+02:00 Europe/Stockholm
+            * Update workflow because perldocker image now supports earlier versions.
+            * Rework required-dotenv tests to generate .env files and scripts at runtime, since .env files are not included in the build by default.
+            * Add "use PerlIO::encoding" to bin/envdot.
+            * Fix script/envdot to bin/envdot in dist.ini.
+
 0.020     2026-03-05 11:53:04+01:00 Europe/Stockholm
             * Add parameter 'read => { required => <boolean> }' to 'use Env::Dot;'.
             * Remove unnecessary Cwd requirement from test file.

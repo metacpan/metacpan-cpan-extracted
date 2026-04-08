@@ -1835,7 +1835,7 @@ static XS(xs_func_accessor_fallback) {
 }
 
 /* Install function-style accessor in caller's namespace */
-static void install_func_accessor(pTHX_ const char *pkg, const char *prop_name, IV idx, ClassMeta *expected_class) {
+static void install_func_accessor(pTHX_ const char *pkg, const char *prop_name, IV idx, ClassMeta *expected_class, int force) {
     char full_name[256];
     CV *cv;
     SV *ckobj;
@@ -1844,11 +1844,20 @@ static void install_func_accessor(pTHX_ const char *pkg, const char *prop_name, 
 
     snprintf(full_name, sizeof(full_name), "%s::%s", pkg, prop_name);
 
-    /* Check if this accessor already exists - skip to avoid redefinition warning.
-     * This also preserves any user-defined subs that were defined before import. */
+    /* Check if this accessor already exists */
     cv = get_cvn_flags(full_name, strlen(full_name), 0);
     if (cv) {
-        return;  /* Already exists, skip to avoid redefinition warning */
+        if (!force) {
+            return;  /* Not forced: skip to preserve user-defined subs */
+        }
+        /* Forced (import_accessors/import_accessor): delete existing
+         * to avoid "Subroutine redefined" warning from newXS. */
+        {
+            HV *stash = gv_stashpvn(pkg, strlen(pkg), 0);
+            if (stash) {
+                (void)hv_delete(stash, prop_name, strlen(prop_name), G_DISCARD);
+            }
+        }
     }
 
     /* Allocate data for this accessor and register it */
@@ -1898,7 +1907,7 @@ static XS(xs_import_accessors) {
         if (meta->idx_to_prop[i]) {
             /* Pass NULL for same-class (skip validation), meta for cross-class */
             install_func_accessor(aTHX_ pkg_pv, meta->idx_to_prop[i], i,
-                                  NULL);  /* No class check — work with any compatible object */
+                                  NULL, 1);  /* No class check, force override */
         }
     }
 
@@ -1952,7 +1961,7 @@ static XS(xs_import_accessor) {
 
     /* Install with alias name — no class check, work with any compatible object */
     install_func_accessor(aTHX_ pkg_pv, alias_pv, idx,
-                          NULL);
+                          NULL, 1);  /* force override */
 
     XSRETURN_EMPTY;
 }

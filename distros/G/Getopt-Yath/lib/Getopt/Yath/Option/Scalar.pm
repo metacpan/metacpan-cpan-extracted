@@ -2,7 +2,7 @@ package Getopt::Yath::Option::Scalar;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use parent 'Getopt::Yath::Option';
 use Getopt::Yath::HashBase;
@@ -24,7 +24,7 @@ sub get_env_value {
     my ($var, $ref) = @_;
 
     return $$ref unless $var =~ m/^!/;
-    return $ref ? 0 : 1;
+    return $$ref ? 0 : 1;
 }
 
 
@@ -55,6 +55,24 @@ C<--opt=val>. C<--no-opt> can be used to clear the value.
         short_examples => [ ' foo'],
         default => 'john',
     );
+
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option> are inherited. The following are
+overridden or noteworthy:
+
+=over 4
+
+=item requires_arg: true
+
+A value must be provided (C<--opt VALUE> or C<--opt=VALUE>).
+
+=item can_set_env: true
+
+Scalar options can set environment variables. Negated env vars (C<!VAR>) are
+supported.
+
+=back
 
 =head1 SOURCE
 

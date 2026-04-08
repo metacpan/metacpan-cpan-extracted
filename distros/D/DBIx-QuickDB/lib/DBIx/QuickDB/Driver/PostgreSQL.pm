@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000040';
+our $VERSION = '0.000041';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -194,7 +194,7 @@ sub bootstrap {
     my $dir = $self->{+DIR};
     my $db_dir = $self->{+DATA_DIR};
     mkdir($db_dir) or die "Could not create data dir: $!";
-    $self->run_command([$self->{+INITDB}, '-E', 'UTF8', '-A', 'trust', '-D', $db_dir]);
+    $self->run_command([$self->{+INITDB}, '-E', 'UTF8', '--no-locale', '-A', 'trust', '-D', $db_dir]);
 
     $self->write_config;
     $self->start;

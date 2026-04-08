@@ -9,12 +9,13 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.171',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.172',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Cpanel::JSON::XS' => '4.38',
                                       'Data::Validate::Domain' => '0.13',
+                                      'Data::Validate::URI' => '0',
                                       'DateTime::Format::RFC3339' => '0',
                                       'Devel::Hide' => '0',
                                       'Email::Address::XS' => '1.04',
@@ -92,6 +93,7 @@ do { my $x = {
                                       'Class::XSAccessor' => '0',
                                       'Cpanel::JSON::XS' => '4.38',
                                       'Data::Validate::Domain' => '0.13',
+                                      'Data::Validate::URI' => '0',
                                       'DateTime::Format::RFC3339' => '0',
                                       'Email::Address::XS' => '1.04',
                                       'Net::IDN::Encode' => '0',

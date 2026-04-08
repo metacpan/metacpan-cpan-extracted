@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.634';
+our $VERSION = '0.635';
 
 use 5.020;
 use Moo;
@@ -20,7 +20,7 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use Storable 'dclone';
 use Feature::Compat::Try;
-use JSON::Schema::Modern::Utilities qw(is_type A assert_keyword_type E abort);
+use JSON::Schema::Modern::Utilities qw(is_type A assert_keyword_type E abort jsonp_set);
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -54,6 +54,7 @@ sub _eval_keyword_contentEncoding ($class, $data, $schema, $state) {
     # decode the data now, so we can report errors for the right keyword
     try {
       $state->{_content_ref} = $decoder->(\$data);
+      $state->{data} = jsonp_set($state->{data}, $state->{data_path}, $state->{_content_ref}->$*);
     }
     catch ($e) {
       chomp $e;
@@ -80,6 +81,7 @@ sub _eval_keyword_contentMediaType ($class, $data, $schema, $state) {
     # decode the data now, so we can report errors for the right keyword
     try {
       $state->{_content_ref} = $decoder->($state->{_content_ref} // \$data);
+      $state->{data} = jsonp_set($state->{data}, $state->{data_path}, $state->{_content_ref}->$*);
     }
     catch ($e) {
       chomp $e;
@@ -123,7 +125,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.634
+version 0.635
 
 =head1 DESCRIPTION
 

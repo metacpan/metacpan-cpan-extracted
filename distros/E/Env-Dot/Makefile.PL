@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Getopt::Long" => 0,
     "IO::File" => 0,
+    "PerlIO::encoding" => 0,
     "Pod::Usage" => 0,
     "Test::Perl::Critic" => 0,
     "constant" => 0,
@@ -35,23 +36,20 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Dumper" => 0,
     "File::Basename" => 0,
     "File::Path" => 0,
     "File::Temp" => 0,
     "FileHandle" => 0,
     "FindBin" => 0,
     "Test2::Require" => 0,
-    "Test2::Tools::GenTemp" => 0,
     "Test2::V0" => 0,
     "Test::Script" => "1.28",
     "base" => 0,
-    "lib" => 0,
-    "utf8" => 0
+    "lib" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
-    "TESTS" => "t/*.t t/file-read-order/*.t t/other/*.t t/required-dotenv/*.t"
+    "TESTS" => "t/*.t t/file-read-order/*.t t/other/*.t"
   }
 );
 
@@ -59,7 +57,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Cwd" => 0,
-  "Data::Dumper" => 0,
   "English" => 0,
   "Exporter" => 0,
   "File::Basename" => 0,
@@ -70,9 +67,9 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "Getopt::Long" => 0,
   "IO::File" => 0,
+  "PerlIO::encoding" => 0,
   "Pod::Usage" => 0,
   "Test2::Require" => 0,
-  "Test2::Tools::GenTemp" => 0,
   "Test2::V0" => 0,
   "Test::Perl::Critic" => 0,
   "Test::Script" => "1.28",
@@ -81,7 +78,6 @@ my %FallbackPrereqs = (
   "lib" => 0,
   "open" => 0,
   "strict" => 0,
-  "utf8" => 0,
   "warnings" => 0
 );
 

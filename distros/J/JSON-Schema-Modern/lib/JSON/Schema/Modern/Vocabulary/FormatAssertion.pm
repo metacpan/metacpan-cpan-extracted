@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.634';
+our $VERSION = '0.635';
 
 use 5.020;
 use Moo;
@@ -51,7 +51,7 @@ sub keywords ($class, $spec_version) {
     # A dotted quad (such as 127.0.0.1) is not considered a domain, but the use of
     # domain_disable_tld_validation results in a valid result anyway.
     # see https://github.com/houseabsolute/Data-Validate-Domain/pull/15
-    return 0 if $_[0] =~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/;
+    return 0 if $_[0] =~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\z/;
 
     # FIXME: draft7 hostname uses RFC1034, draft2019-09+ hostname uses RFC1123
     require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13);
@@ -159,7 +159,9 @@ sub keywords ($class, $spec_version) {
     },
     uri => sub {
       my $uri = Mojo::URL->new($_[0]);
-      fc($uri->to_unsafe_string) eq fc($_[0]) && $uri->is_abs && $_[0] !~ /[^[:ascii:]]/;
+      return if not fc($uri->to_unsafe_string) eq fc($_[0]) && $uri->is_abs && $_[0] !~ /[^[:ascii:]]/;
+      require Data::Validate::URI;
+      return Data::Validate::URI::is_uri($_[0]);
     },
     'uri-reference' => sub {
       fc(Mojo::URL->new($_[0])->to_unsafe_string) eq fc($_[0]) && $_[0] !~ /[^[:ascii:]]/;
@@ -219,6 +221,7 @@ my $warnings = {
   'idn-hostname' => sub { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); require Net::IDN::Encode; 1 },
   'date-time' => sub { require Time::Moment; require DateTime::Format::RFC3339; 1 },
   date => sub { require Time::Moment; 1 },
+  uri => sub { require Data::Validate::URI; 1 },
 };
 $warnings->{'idn-email'} = $warnings->{email};
 
@@ -284,7 +287,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.634
+version 0.635
 
 =head1 DESCRIPTION
 

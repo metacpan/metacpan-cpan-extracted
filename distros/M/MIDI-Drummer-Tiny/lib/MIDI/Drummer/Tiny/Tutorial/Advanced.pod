@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Advanced
 
 =head1 VERSION
 
-version 0.7002
+version 0.7004
 
 =head1 Advanced Grooves
 

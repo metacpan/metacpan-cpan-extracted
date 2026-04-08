@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.634';
+our $VERSION = '0.635';
 
 use 5.020;
 use strictures 2;
@@ -24,6 +24,7 @@ use Scalar::Util 'looks_like_number';
 use Storable 'dclone';
 use Feature::Compat::Try;
 use Mojo::JSON ();
+use Mojo::JSON::Pointer ();
 use JSON::PP ();
 use Types::Standard qw(Str InstanceOf Enum);
 use Mojo::File 'path';
@@ -41,6 +42,7 @@ our @EXPORT_OK = qw(
   is_elements_unique
   jsonp
   unjsonp
+  jsonp_get
   jsonp_set
   local_annotations
   canonical_uri
@@ -154,8 +156,7 @@ sub get_type ($value, $config = {}) {
   return 'array' if ref $value eq 'ARRAY';
 
   # floats in json will always be parsed into Math::BigFloat, when allow_bignum is enabled
-  if (length ref $value) {
-    my $ref = ref $value;
+  if (length(my $ref = ref $value)) {
     return $ref eq 'Math::BigInt' ? 'integer'
       : $ref eq 'Math::BigFloat' ? (!$config->{legacy_ints} && $value->is_int ? 'integer' : 'number')
       : (defined blessed($value) ? '' : 'reference to ').$ref;
@@ -312,32 +313,40 @@ sub unjsonp {
   return map s!~0!~!gr =~ s!~1!/!gr, split m!/!, $_[0];
 }
 
+sub jsonp_get ($data, $pointer) {
+  Mojo::JSON::Pointer->new($data)->get($pointer);
+}
+
 # assigns a value to a data structure at a specific json pointer location
 # operates destructively, in place, unless the root data or type is being modified
 sub jsonp_set ($data, $pointer, $value) {
-  if (not grep ref $data eq $_, qw(HASH ARRAY)) {
-    return $value if defined wantarray;
-    croak 'cannot write into non-reference in void context';
-  }
+  croak 'cannot write into a non-reference in void context'
+    if not grep ref $data eq $_, qw(HASH ARRAY) and not defined wantarray;
 
   # assigning to the root overwrites existing data
   if (not length $pointer) {
-    if (ref $data eq 'HASH' and ref $value ne 'HASH'
-        or ref $data eq 'ARRAY' and ref $value ne 'ARRAY') {
+    if (not ref $data or ref $data ne ref $value) {
       return $value if defined wantarray;
-      croak 'cannot write into reference of different type in void context';
+      croak 'cannot write into a reference of a different type in void context';
     }
 
-    $data->%* = $value->%* if ref $data eq 'HASH';
-    $data->@* = $value->@* if ref $data eq 'ARRAY';
+    if (ref $value eq 'HASH') {
+      $data = {} if not ref $data;
+      $data->%* = $value->%*;
+    }
+    if (ref $value eq 'ARRAY') {
+      $data = [] if not ref $data;
+      $data->@* = $value->@*;
+    }
+
     return $data;
   }
 
   my @keys = map +(s!~0!~!gr =~ s!~1!/!gr),
     (length $pointer ? (split /\//, $pointer, -1) : ($pointer));
 
-  croak 'cannot write hashref into a reference to an array in void context'
-    if @keys >= 2 and $keys[1] !~ /^\d+\z/a and ref $data eq 'ARRAY' and not defined wantarray;
+  croak 'cannot write a hashref into a reference to an array in void context'
+    if @keys >= 2 and $keys[1] !~ /^(?:\d+|-)\z/a and ref $data eq 'ARRAY' and not defined wantarray;
 
   shift @keys;  # always '', indicating the root
   my $curp = \$data;
@@ -346,14 +355,16 @@ sub jsonp_set ($data, $pointer, $value) {
     # if needed, first remove the existing data so we can replace with a new hash key or array index
     undef $curp->$*
       if not ref $curp->$*
-        or ref $curp->$* eq 'ARRAY' and $key !~ /^\d+\z/a;
+        or ref $curp->$* eq 'ARRAY' and $key !~ /^(?:\d+|-)\z/a;
 
     # use this existing hash key or array index location, or create new position
     use autovivification 'store';
     $curp = \(
-      ref $curp->$* eq 'HASH' || $key !~ /^\d+\z/a
+      ref $curp->$* eq 'HASH' || $key !~ /^(?:\d+|-)\z/a
         ? $curp->$*->{$key}
-        : $curp->$*->[$key]);
+        : $key =~ /^\d+\z/a
+        ? $curp->$*->[$key]
+        : $curp->$*->[$curp->$*->$#* + 1]);
   }
 
   $curp->$* = $value;
@@ -651,7 +662,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.634
+version 0.635
 
 =head1 SYNOPSIS
 
@@ -765,6 +776,11 @@ are appended.
   my @components = unjsonp('/paths/~1foo~1{foo_id}/get/responses');
 
 Splits a json pointer string into its path components, with correct unescaping.
+
+=head2 jsonp_get
+
+  # 4
+  my $val = jsonp_get({ a => 1, b => { c => 3, d => 4 } }, '/b/d');
 
 =head2 jsonp_set
 

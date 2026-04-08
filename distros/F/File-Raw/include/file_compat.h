@@ -43,6 +43,11 @@
 #  endif
 #endif
 
+/* XS_INTERNAL - available since 5.16, fallback for older Perls */
+#ifndef XS_INTERNAL
+#  define XS_INTERNAL(name) static XSPROTO(name)
+#endif
+
 /* Op sibling macros - introduced in 5.22, needed for call checkers */
 #ifndef OpHAS_SIBLING
 #  define OpHAS_SIBLING(o)      ((o)->op_sibling != NULL)

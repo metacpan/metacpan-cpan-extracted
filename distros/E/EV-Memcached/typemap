@@ -1,0 +1,2 @@
+EV::Memcached        T_PTROBJ
+EV::Loop             T_PTROBJ

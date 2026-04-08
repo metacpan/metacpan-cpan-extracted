@@ -41,10 +41,16 @@ File::Raw::spew($writable_file, "writable content\n");
 chmod 0444, $readable_only;
 chmod 0644, $writable_file;
 
-# Create an executable script
-my $exec_script = File::Spec->catfile($tmpdir, 'script.sh');
-File::Raw::spew($exec_script, "#!/bin/bash\necho hello\n");
-chmod 0755, $exec_script;
+# Create an executable script (use .bat on Win32 so is_executable recognises it)
+my $exec_script;
+if ($^O eq 'MSWin32') {
+    $exec_script = File::Spec->catfile($tmpdir, 'script.bat');
+    File::Raw::spew($exec_script, "\@echo off\necho hello\n");
+} else {
+    $exec_script = File::Spec->catfile($tmpdir, 'script.sh');
+    File::Raw::spew($exec_script, "#!/bin/bash\necho hello\n");
+    chmod 0755, $exec_script;
+}
 
 # ============================================
 # Path predicates in grep
@@ -109,7 +115,7 @@ subtest 'is_executable in grep' => sub {
     my @paths = (@test_files, $exec_script);
     my @exec = grep { File::Raw::is_executable($_) } @paths;
     ok(scalar(@exec) >= 1, 'is_executable found at least the script');
-    ok((grep { $_ eq $exec_script } @exec), 'script.sh is executable');
+    ok((grep { $_ eq $exec_script } @exec), 'script is executable');
 };
 
 subtest 'permission predicates in map' => sub {
@@ -355,8 +361,11 @@ subtest 'mode in map' => sub {
     my @modes = map { File::Raw::mode($_) } @paths;
     ok($modes[0] > 0, 'file has mode');
     ok($modes[1] > 0, 'script has mode');
-    # Check exec script has execute bit
-    ok($modes[1] & 0111, 'script has execute permission');
+    if ($^O ne 'MSWin32') {
+        ok($modes[1] & 0111, 'script has execute permission');
+    } else {
+        ok(1, 'mode retrieved on Win32 (no execute bits)');
+    }
 };
 
 # ============================================

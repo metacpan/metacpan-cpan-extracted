@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000040';
+our $VERSION = '0.000041';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -76,6 +76,7 @@ sub clear_old_cache {
 
         open(my $fh, '<', $file) or next;
         chomp(my $stamp = <$fh>);
+        close($fh);
 
         next unless $age <= (time - $stamp);
 
@@ -230,7 +231,8 @@ sub fetch_db {
     my %add_args;
     if (my $dir = $self->{+INSTANCE_DIR}) {
         require File::Temp;
-        $add_args{dir} = File::Temp::tempdir("$ENV{USER}-XXXXXX", CLEANUP => 0, DIR => $dir);
+        my $user = $ENV{USER} // $ENV{USERNAME} // 'quickdb';
+        $add_args{dir} = File::Temp::tempdir("$user-XXXXXX", CLEANUP => 0, DIR => $dir);
     }
 
     return $from->clone(autostart => 1, autostop => 1, cleanup => 1, %add_args, %{$spec->{clone_args} || {}}, %params);

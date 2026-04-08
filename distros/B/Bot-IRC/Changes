@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.48      2026-04-07 10:28:11-07:00 America/Los_Angeles
+        - Bump minimum Perl version to 16 due to MIME::Types now requiring it
+
 1.47      2026-02-25 08:52:58-08:00 America/Los_Angeles
         - Permit vars overrides of dbh attr and pragma
 

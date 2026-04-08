@@ -1,5 +1,14 @@
 Revision history for Chandra
 
+0.17 2026-04-07
+   - Add Chandra::Form - HTML Form helpers with two-way binding for Chandra applications
+   - Auto-detect any installed webkit2gtk version via pkg-config
+   - Fix splash test skip on headless Linux (probe with Window not Splash)
+
+0.16 2026-04-07
+   - Fix Win32 builds: gettimeofday/localtime_r/flock/urandom portability
+   - Fix headless Linux test failures to satisfy cpantesters
+
 0.15 2026-04-06
    - Add Chandra::Splash - For splash screen / loading state
    - Add Chandra::Log - For structured logging framework

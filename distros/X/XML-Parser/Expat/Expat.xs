@@ -14,6 +14,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 #undef convert
 
@@ -64,6 +65,9 @@ typedef struct {
   unsigned ns:1;
   unsigned no_expand:1;
   unsigned parseparam:1;
+  unsigned pe_implicit:1;
+
+  char *doctype_sysid;  /* DOCTYPE SYSTEM id for PE vs external DTD distinction */
 
   /* Callback handlers */
 
@@ -145,6 +149,7 @@ free_cbv(CallbackVector *cbv)
   if (cbv) {
     SvREFCNT_dec(cbv->self_sv);
     Safefree(cbv->st_serial_stack);
+    Safefree(cbv->doctype_sysid);
     Safefree(cbv);
   }
 }
@@ -200,7 +205,7 @@ append_error(XML_Parser parser, char * err)
 	XPUSHs(*errctx);
 	PUTBACK ;
 
-	count = perl_call_method("position_in_context", G_SCALAR);
+	count = call_method("position_in_context", G_SCALAR);
 
 	SPAGAIN ;
 
@@ -288,7 +293,7 @@ parse_stream(XML_Parser parser, SV * ioref)
     XPUSHs(ioref);
     PUTBACK ;
 
-    cnt = perl_call_method("getline", G_SCALAR);
+    cnt = call_method("getline", G_SCALAR);
 
     SPAGAIN;
 
@@ -352,7 +357,7 @@ parse_stream(XML_Parser parser, SV * ioref)
 	PUSHs(tsiz);
 	PUTBACK ;
 
-	cnt = perl_call_method("read", G_SCALAR);
+	cnt = call_method("read", G_SCALAR);
 
 	SPAGAIN ;
 
@@ -454,7 +459,7 @@ characterData(void *userData, const char *s, int len)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpvn((char*)s,len)));
   PUTBACK;
-  perl_call_sv(cbv->char_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->char_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -520,7 +525,7 @@ startElement(void *userData, const char *name, const char **atts)
 	    PUSHs(sv_2mortal(newUTF8SVpv((char*)*atts++,0)));
 	}
       PUTBACK;
-      perl_call_sv(cbv->start_sv, G_DISCARD|G_VOID);
+      call_sv(cbv->start_sv, G_DISCARD|G_VOID);
 
       FREETMPS;
       LEAVE;
@@ -556,7 +561,7 @@ endElement(void *userData, const char *name)
       PUSHs(cbv->self_sv);
       PUSHs(elname);
       PUTBACK;
-      perl_call_sv(cbv->end_sv, G_DISCARD|G_VOID);
+      call_sv(cbv->end_sv, G_DISCARD|G_VOID);
 
       FREETMPS;
       LEAVE;
@@ -582,7 +587,7 @@ processingInstruction(void *userData, const char *target, const char *data)
   PUSHs(sv_2mortal(newUTF8SVpv((char*)target,0)));
   PUSHs(sv_2mortal(newUTF8SVpv((char*)data,0)));
   PUTBACK;
-  perl_call_sv(cbv->proc_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->proc_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -602,7 +607,7 @@ commenthandle(void *userData, const char *string)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpv((char*) string, 0)));
   PUTBACK;
-  perl_call_sv(cbv->cmnt_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->cmnt_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -621,7 +626,7 @@ startCdata(void *userData)
     PUSHMARK(sp);
     XPUSHs(cbv->self_sv);
     PUTBACK;
-    perl_call_sv(cbv->startcd_sv, G_DISCARD|G_VOID);
+    call_sv(cbv->startcd_sv, G_DISCARD|G_VOID);
 
     FREETMPS;
     LEAVE;
@@ -641,7 +646,7 @@ endCdata(void *userData)
     PUSHMARK(sp);
     XPUSHs(cbv->self_sv);
     PUTBACK;
-    perl_call_sv(cbv->endcd_sv, G_DISCARD|G_VOID);
+    call_sv(cbv->endcd_sv, G_DISCARD|G_VOID);
 
     FREETMPS;
     LEAVE;
@@ -662,7 +667,7 @@ nsStart(void *userdata, const XML_Char *prefix, const XML_Char *uri){
   PUSHs(prefix ? sv_2mortal(newUTF8SVpv((char *)prefix, 0)) : &PL_sv_undef);
   PUSHs(uri ? sv_2mortal(newUTF8SVpv((char *)uri, 0)) : &PL_sv_undef);
   PUTBACK;
-  perl_call_method("NamespaceStart", G_DISCARD|G_VOID);
+  call_method("NamespaceStart", G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -681,7 +686,7 @@ nsEnd(void *userdata, const XML_Char *prefix) {
   PUSHs(cbv->self_sv);
   PUSHs(prefix ? sv_2mortal(newUTF8SVpv((char *)prefix, 0)) : &PL_sv_undef);
   PUTBACK;
-  perl_call_method("NamespaceEnd", G_DISCARD|G_VOID);
+  call_method("NamespaceEnd", G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -701,7 +706,7 @@ defaulthandle(void *userData, const char *string, int len)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpvn((char*)string, len)));
   PUTBACK;
-  perl_call_sv(cbv->dflt_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->dflt_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -728,7 +733,7 @@ elementDecl(void *data,
   PUSHs(sv_2mortal(newUTF8SVpv((char *)name, 0)));
   PUSHs(sv_2mortal(cmod));
   PUTBACK;
-  perl_call_sv(cbv->eledcl_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->eledcl_sv, G_DISCARD|G_VOID);
   FREETMPS;
   LEAVE;
 
@@ -766,7 +771,7 @@ attributeDecl(void *data,
   if (dflt && reqorfix)
     XPUSHs(&PL_sv_yes);
   PUTBACK;
-  perl_call_sv(cbv->attdcl_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->attdcl_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -799,7 +804,7 @@ entityDecl(void *data,
   if (isparam)
     XPUSHs(&PL_sv_yes);
   PUTBACK;
-  perl_call_sv(cbv->entdcl_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->entdcl_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -811,23 +816,35 @@ doctypeStart(void *userData,
 	     const char* sysid,
 	     const char* pubid,
 	     int hasinternal) {
-  dSP;
   CallbackVector *cbv = (CallbackVector*) userData;
 
-  ENTER;
-  SAVETMPS;
+  /* Always track the DOCTYPE sysid so externalEntityRef can distinguish
+     PE references from external DTD references when pe_implicit is set. */
+  Safefree(cbv->doctype_sysid);
+  cbv->doctype_sysid = NULL;
+  if (sysid) {
+    Newx(cbv->doctype_sysid, strlen(sysid) + 1, char);
+    strcpy(cbv->doctype_sysid, sysid);
+  }
 
-  PUSHMARK(sp);
-  EXTEND(sp, 5);
-  PUSHs(cbv->self_sv);
-  PUSHs(sv_2mortal(newUTF8SVpv((char*)name, 0)));
-  PUSHs(sysid ? sv_2mortal(newUTF8SVpv((char*)sysid, 0)) : &PL_sv_undef);
-  PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char*)pubid, 0)) : &PL_sv_undef);
-  PUSHs(hasinternal ? &PL_sv_yes : &PL_sv_no);
-  PUTBACK;
-  perl_call_sv(cbv->doctyp_sv, G_DISCARD|G_VOID);
-  FREETMPS;
-  LEAVE;
+  if (cbv->doctyp_sv && SvTRUE(cbv->doctyp_sv)) {
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(sp);
+    EXTEND(sp, 5);
+    PUSHs(cbv->self_sv);
+    PUSHs(sv_2mortal(newUTF8SVpv((char*)name, 0)));
+    PUSHs(sysid ? sv_2mortal(newUTF8SVpv((char*)sysid, 0)) : &PL_sv_undef);
+    PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char*)pubid, 0)) : &PL_sv_undef);
+    PUSHs(hasinternal ? &PL_sv_yes : &PL_sv_no);
+    PUTBACK;
+    call_sv(cbv->doctyp_sv, G_DISCARD|G_VOID);
+    FREETMPS;
+    LEAVE;
+  }
 }  /* End doctypeStart */
 
 static void
@@ -842,7 +859,7 @@ doctypeEnd(void *userData) {
   EXTEND(sp, 1);
   PUSHs(cbv->self_sv);
   PUTBACK;
-  perl_call_sv(cbv->doctypfin_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->doctypfin_sv, G_DISCARD|G_VOID);
   FREETMPS;
   LEAVE;
 }  /* End doctypeEnd */
@@ -868,7 +885,7 @@ xmlDecl(void *userData,
   PUSHs(standalone == -1 ? &PL_sv_undef
 	: (standalone ? &PL_sv_yes : &PL_sv_no));
   PUTBACK;
-  perl_call_sv(cbv->xmldec_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->xmldec_sv, G_DISCARD|G_VOID);
   FREETMPS;
   LEAVE;
 }  /* End xmlDecl */
@@ -896,7 +913,7 @@ unparsedEntityDecl(void *userData,
   PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char*) pubid, 0)) : &PL_sv_undef);
   PUSHs(sv_2mortal(newUTF8SVpv((char*) notation, 0)));
   PUTBACK;
-  perl_call_sv(cbv->unprsd_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->unprsd_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -923,7 +940,7 @@ notationDecl(void *userData,
   PUSHs(sysid ? sv_2mortal(newUTF8SVpv((char *) sysid, 0)) : &PL_sv_undef);
   PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char *) pubid, 0)) : &PL_sv_undef);
   PUTBACK;
-  perl_call_sv(cbv->notation_sv, G_DISCARD|G_VOID);
+  call_sv(cbv->notation_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -959,6 +976,23 @@ externalEntityRef(XML_Parser parser,
      routes all subsequent DTD declarations to the Default handler instead
      of the dedicated handlers.  See GH #53 and GH #173. */
   if (open == NULL && !cbv->parseparam) {
+    /* When PE parsing was implicitly enabled for declaration handlers,
+       route PE reference text to the Default handler so DTD
+       round-tripping still works (e.g. XML::Twig).
+
+       We must NOT fire XML_DefaultCurrent for the external DTD subset
+       reference — only for PE references in the internal subset.
+       Distinguish them by comparing sysid to the stored DOCTYPE sysid:
+       the external DTD uses the same sysid as the DOCTYPE declaration,
+       while PE references use the sysid from their entity declaration. */
+    if (cbv->pe_implicit) {
+      int is_ext_dtd = (sysid == NULL && cbv->doctype_sysid == NULL)
+        || (sysid != NULL && cbv->doctype_sysid != NULL
+            && strcmp(sysid, cbv->doctype_sysid) == 0);
+      if (!is_ext_dtd)
+        XML_DefaultCurrent(parser);
+    }
+
     XML_Parser entpar = XML_ExternalEntityParserCreate(parser, open, 0);
     if (entpar) {
       XML_Parse(entpar, "", 0, 1);
@@ -980,7 +1014,7 @@ externalEntityRef(XML_Parser parser,
   if (pubid)
     PUSHs(sv_2mortal(newUTF8SVpv((char*) pubid, 0)));
   PUTBACK ;
-  count = perl_call_sv(cbv->extent_sv, G_SCALAR);
+  count = call_sv(cbv->extent_sv, G_SCALAR);
 
   SPAGAIN ;
 
@@ -1015,7 +1049,7 @@ externalEntityRef(XML_Parser parser,
 	PUSHs(*pval);
 	PUSHs(result);
 	PUTBACK;
-	count = perl_call_pv("XML::Parser::Expat::Do_External_Parse",
+	count = call_pv("XML::Parser::Expat::Do_External_Parse",
 			     G_SCALAR | G_EVAL);
 	SPAGAIN;
 
@@ -1046,7 +1080,7 @@ externalEntityRef(XML_Parser parser,
 	  PUSHMARK(sp);
 	  PUSHs(cbv->self_sv);
 	  PUTBACK;
-	  perl_call_sv(cbv->extfin_sv, G_DISCARD|G_VOID);
+	  call_sv(cbv->extfin_sv, G_DISCARD|G_VOID);
 	  SPAGAIN;
 	}
 
@@ -1139,7 +1173,7 @@ unknownEncoding(void *unused, const char *name, XML_Encoding *info)
   }
 
   if (! EncodingTable) {
-    EncodingTable = perl_get_hv("XML::Parser::Expat::Encoding_Table", FALSE);
+    EncodingTable = get_hv("XML::Parser::Expat::Encoding_Table", FALSE);
     if (! EncodingTable)
       croak("Can't find XML::Parser::Expat::Encoding_Table");
   }
@@ -1155,7 +1189,7 @@ unknownEncoding(void *unused, const char *name, XML_Encoding *info)
     PUSHMARK(sp);
     XPUSHs(sv_2mortal(newSVpvn(buff,namelen)));
     PUTBACK;
-    perl_call_pv("XML::Parser::Expat::load_encoding", G_DISCARD|G_VOID);
+    call_pv("XML::Parser::Expat::load_encoding", G_DISCARD|G_VOID);
     
     encinfptr = hv_fetch(EncodingTable, buff, namelen, 0);
     FREETMPS;
@@ -1331,32 +1365,35 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	      cbv->nslst = (AV *) SvRV(*spp);
 
 	      RETVAL = XML_ParserCreate_MM(enc, &ms, nsdelim);
+	      if (! RETVAL) {
+	        free_cbv(cbv);
+	        croak("Could not create XML parser");
+	      }
 	      XML_SetNamespaceDeclHandler(RETVAL,nsStart, nsEnd);
 	    }
 	    else
 	    {
 	      RETVAL = XML_ParserCreate_MM(enc, &ms, NULL);
+	      if (! RETVAL) {
+	        free_cbv(cbv);
+	        croak("Could not create XML parser");
+	      }
 	    }
-	    
+
 	  cbv->p = RETVAL;
 	  XML_SetUserData(RETVAL, (void *) cbv);
 	  XML_SetElementHandler(RETVAL, startElement, endElement);
 	  XML_SetUnknownEncodingHandler(RETVAL, unknownEncoding, 0);
-	  XML_SetExternalEntityRefHandler(RETVAL, externalEntityRef);
-
+	  XML_SetStartDoctypeDeclHandler(RETVAL, doctypeStart);
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "ParseParamEnt",
 			 13, FALSE);
 
-	  if (spp && SvTRUE(*spp))
+	  if (spp && SvTRUE(*spp)) {
 	    cbv->parseparam = 1;
-
-	  /* Always enable parameter entity parsing so that PE references
-	     in the internal DTD subset don't cause expat to stop calling
-	     specific declaration handlers (Attlist, Element, Entity, etc.).
-	     When ParseParamEnt is not explicitly set, unresolvable PEs are
-	     silently treated as empty in externalEntityRef(). */
-	  XML_SetParamEntityParsing(RETVAL,
-	    XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetParamEntityParsing(RETVAL,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(RETVAL, externalEntityRef);
+	  }
 
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "UseForeignDTD",
 			 13, FALSE);
@@ -1670,6 +1707,8 @@ XML_SetExternalEntityRefHandler(parser, extent_sv)
 	  XMLP_UPD(extent_sv);
 	  if (SvTRUE(extent_sv))
 	    exthndlr = externalEntityRef;
+	  else if (cbv->pe_implicit)
+	    exthndlr = externalEntityRef;  /* keep C handler for PE support */
 
 	  XML_SetExternalEntityRefHandler(parser, exthndlr);
 	  PUSHRET;
@@ -1707,6 +1746,13 @@ XML_SetEntityDeclHandler(parser, entdcl_sv)
 	    enthndlr = entityDecl;
 
 	  XML_SetEntityDeclHandler(parser, enthndlr);
+
+	  if (SvTRUE(entdcl_sv) && !cbv->parseparam && !cbv->pe_implicit) {
+	    cbv->pe_implicit = 1;
+	    XML_SetParamEntityParsing(parser,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(parser, externalEntityRef);
+	  }
 	  PUSHRET;
 	}
 
@@ -1725,6 +1771,13 @@ XML_SetElementDeclHandler(parser, eledcl_sv)
 	    eldeclhndlr = elementDecl;
 
 	  XML_SetElementDeclHandler(parser, eldeclhndlr);
+
+	  if (SvTRUE(eledcl_sv) && !cbv->parseparam && !cbv->pe_implicit) {
+	    cbv->pe_implicit = 1;
+	    XML_SetParamEntityParsing(parser,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(parser, externalEntityRef);
+	  }
 	  PUSHRET;
 	}
 
@@ -1743,6 +1796,13 @@ XML_SetAttListDeclHandler(parser, attdcl_sv)
 	    attdeclhndlr = attributeDecl;
 
 	  XML_SetAttlistDeclHandler(parser, attdeclhndlr);
+
+	  if (SvTRUE(attdcl_sv) && !cbv->parseparam && !cbv->pe_implicit) {
+	    cbv->pe_implicit = 1;
+	    XML_SetParamEntityParsing(parser,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(parser, externalEntityRef);
+	  }
 	  PUSHRET;
 	}
 
@@ -1752,15 +1812,12 @@ XML_SetDoctypeHandler(parser, doctyp_sv)
 	SV *				doctyp_sv
     CODE:
 	{
-	  XML_StartDoctypeDeclHandler dtsthndlr =
-	    (XML_StartDoctypeDeclHandler) 0;
 	  CallbackVector * cbv = (CallbackVector*) XML_GetUserData(parser);
 
 	  XMLP_UPD(doctyp_sv);
-	  if (SvTRUE(doctyp_sv))
-	    dtsthndlr = doctypeStart;
-
-	  XML_SetStartDoctypeDeclHandler(parser, dtsthndlr);
+	  /* Always keep the C handler active for doctype_sysid tracking;
+	     doctypeStart checks doctyp_sv before calling Perl. */
+	  XML_SetStartDoctypeDeclHandler(parser, doctypeStart);
 	  PUSHRET;
 	}
 
@@ -2148,7 +2205,7 @@ XML_LoadEncoding(data, size)
 	  
 	      if (! EncodingTable) {
 		EncodingTable
-		  = perl_get_hv("XML::Parser::Expat::Encoding_Table",
+		  = get_hv("XML::Parser::Expat::Encoding_Table",
 				FALSE);
 		if (! EncodingTable)
 		  croak("Can't find XML::Parser::Expat::Encoding_Table");
@@ -2284,11 +2341,11 @@ XML_Do_External_Parse(parser, result)
 	  else if (SvROK(result) && isGV(SvRV(result))) {
 	    /* Lexical filehandle (open my $fh) - a reference to a glob */
 	    RETVAL = parse_stream(parser,
-				  sv_2mortal(newRV((SV*) GvIOp((GV*)SvRV(result)))));
+				  sv_2mortal(newRV_inc((SV*) GvIOp((GV*)SvRV(result)))));
 	  }
 	  else if (isGV(result)) {
 	    RETVAL = parse_stream(parser,
-				  sv_2mortal(newRV((SV*) GvIOp(result))));
+				  sv_2mortal(newRV_inc((SV*) GvIOp(result))));
 	  }
 	  else if (SvPOK(result)) {
 	    STRLEN  eslen;

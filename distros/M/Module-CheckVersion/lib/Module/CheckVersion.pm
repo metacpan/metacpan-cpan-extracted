@@ -1,124 +1,159 @@
 package Module::CheckVersion;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2017-06-09'; # DATE
-our $DIST = 'Module-CheckVersion'; # DIST
-our $VERSION = '0.08'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-use Exporter ();
-our @ISA = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2026-04-08'; # DATE
+our $DIST = 'Module-CheckVersion'; # DIST
+our $VERSION = '0.091'; # VERSION
+
 our @EXPORT_OK = qw(check_module_version);
 
 our %SPEC;
 
 $SPEC{check_module_version} = {
     v => 1.1,
-    summary => 'Check module (e.g. check latest version) with CPAN '.
-        '(or equivalent repo)',
-    description => <<'_',
+    summary => 'Check module version against the authority (CPAN or elsewhere)',
+    description => <<'MARKDOWN',
 
 Designed to be more general and able to provide more information in the future
 in addition to mere checking of latest version, but checking latest version is
 currently the only implemented feature.
 
 Can handle non-CPAN modules, as long as you put the appropriate `$AUTHORITY` in
-your modules and create the `Module::CheckVersion::<scheme>` to handle your
-authority scheme.
+your modules and create the `Module::CheckVersion::AuthorityScheme::<scheme>` to
+handle your authority scheme.
 
-_
+MARKDOWN
     args => {
         module => {
             schema => ['str*', match=>qr/\A\w+(::\w+)*\z/],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 This routine will try to load the module, and retrieve its `$VERSION`. If
 loading fails will assume module's installed version is undef.
 
-_
+MARKDOWN
             req => 1,
             pos => 0,
         },
         check_latest_version => {
             schema => 'bool',
             default => 1,
+            description => <<'MARKDOWN',
+
+If set to 0, will just check installed version.
+
+MARKDOWN
         },
         default_authority_scheme => {
             schema  => 'str',
             default => 'cpan',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
-If a module does not set `$AUTHORITY` (which contains string like
-`<scheme>:<extra>` like `cpan:PERLANCAR`), the default authority scheme will be
-determined from this setting. The module `Module::CheckVersion::<scheme>` module
-is used to implement actual checking.
+If a module does not set authority, the default authority scheme will be
+determined from this setting. The module
+`Module::CheckVersion::AuthorityScheme::<scheme>` module is used to implement
+actual checking.
 
-Can also be set to undef, in which case when module's `$AUTHORITY` is not
+How module's authority is retrieved: First, if `$module->can("AUTHORITY")` then
+`AUTHORITY` method is called. Otherwise, `$AUTHORITY` package variable is used.
+
+Can also be set to undef, in which case when module's authority is not
 available, will return 412 status.
 
-_
+MARKDOWN
         },
     },
 };
 sub check_module_version {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my %args = @_;
-
     my $mod = $args{module} or return [400, "Please specify module"];
-    my $defscheme = $args{default_authority_scheme} // 'cpan';
+    my $check_latest_version = $args{check_latest_version} // 1;
+    my $default_authority_scheme = $args{default_authority_scheme} // 'cpan';
 
-    my $scheme_mod;
+    my $res = {};
 
-    my $chkres = {};
-
-    my $code_load_scheme_mod = sub {
-        return [200] if $scheme_mod;
-
-        # GET AUTHORITY
-        my $auth;
-        {
-            $auth = ${"$mod\::AUTHORITY"};
-            last if $auth;
-            my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
-            eval { require $mod_pm; 1 };
-            if ($@) {
-                $chkres->{load_module_error} = $@;
+  LOAD_MODULE: {
+        (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+        eval { require $mod_pm; 1 };
+        $res->{load_module_error} = $@ if $@;
+        $res->{installed_version} = do {
+            if ($mod->can("VERSION")) {
+                $mod->VERSION;
             } else {
-                $auth = ${"$mod\::AUTHORITY"};
-                last if $auth;
+                ${"$mod\::VERSION"};
             }
-            $auth = "$defscheme:" if $defscheme;
-            last if $auth;
-            return [412, "Can't determine AUTHORITY for $mod"];
+        };
+    } # LOAD_MODULE
+
+  CHECK_LATEST_VERSION: {
+        last unless $check_latest_version;
+
+        my $authority;
+      GET_AUTHORITY: {
+            if ($mod->can("AUTHORITY")) {
+                $authority = $mod->AUTHORITY;
+            } else {
+                $authority = ${"$mod\::AUTHORITY"};
+            }
+            unless ($authority) {
+                $authority = "$default_authority_scheme:"
+                    if $default_authority_scheme;
+            }
+            unless ($authority) {
+                return [412, "Can't determine authority for module $mod"];
+            }
+        } # GET_AUTHORITY
+
+        return [412, "Module $mod\'s authority '$authority' does not contain scheme"]
+            unless $authority =~ /^(\w+):(.*)/;
+        my ($authority_scheme, $authority_content) = ($1, $2);
+
+        my $scheme_mod;
+      LOAD_CHECKER_MODULE: {
+            $scheme_mod = "Module::CheckVersion::AuthorityScheme::$authority_scheme";
+            (my $scheme_mod_pm = "$scheme_mod.pm") =~ s!::!/!g;
+            require $scheme_mod_pm;
+            return [500, "Cannot load checker module for authority scheme '$authority_scheme'"]
+                if $@;
+        } # LOAD_CHECKER_MODULE
+
+        my $clvres = &{"$scheme_mod\::check_latest_version"}(
+            $mod, $authority_scheme, $authority_content);
+
+        if ($clvres->[0] == 200) {
+            $res->{latest_version} = $clvres->[2];
+        } else {
+            $res->{check_latest_version_error} = $clvres->[1];
         }
 
-        return [412, "AUTHORITY in $mod does not contain scheme"]
-            unless $auth =~ /^(\w+):/;
-        my $auth_scheme = $1;
+    } # CHECK_LATEST_VERSION
 
-        $scheme_mod = "Module::CheckVersion::$auth_scheme";
-        my $mod_pm = $scheme_mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
-        require $mod_pm;
-        [200];
-    };
-
-    if ($args{check_latest_version} // 1) {
-        my $loadres = $code_load_scheme_mod->();
-        return $loadres unless $loadres->[0] == 200;
-        my $ver = ${"$mod\::VERSION"};
-        my $chkres = &{"$scheme_mod\::check_latest_version"}($mod,$ver,$chkres);
-        return $chkres unless $chkres->[0] == 200;
+    if ($res->{installed_version} && $res->{latest_version}) {
+        my $cmp = eval {
+            version->parse($res->{installed_version}) <=>
+                version->parse($res->{latest_version});
+        };
+        if ($@) {
+            $res->{compare_version_error} = @_;
+            $res->{is_latest_version} = undef;
+        } else {
+            $res->{is_latest_version} = $cmp >= 0 ? 1:0;
+        }
     }
 
-    [200, "OK", $chkres];
+    [200, "OK", $res];
 }
 
 1;
-# ABSTRACT: Check module (e.g. check latest version) with CPAN (or equivalent repo)
+# ABSTRACT: Check module version against the authority (CPAN or elsewhere)
 
 __END__
 
@@ -128,11 +163,11 @@ __END__
 
 =head1 NAME
 
-Module::CheckVersion - Check module (e.g. check latest version) with CPAN (or equivalent repo)
+Module::CheckVersion - Check module version against the authority (CPAN or elsewhere)
 
 =head1 VERSION
 
-This document describes version 0.08 of Module::CheckVersion (from Perl distribution Module-CheckVersion), released on 2017-06-09.
+This document describes version 0.091 of Module::CheckVersion (from Perl distribution Module-CheckVersion), released on 2026-04-08.
 
 =head1 SYNOPSIS
 
@@ -148,58 +183,7 @@ Check latest version of modules:
 
 =head1 FUNCTIONS
 
-
 =head2 check_module_version
-
-Usage:
-
- check_module_version(%args) -> [status, msg, result, meta]
-
-Check module (e.g. check latest version) with CPAN (or equivalent repo).
-
-Designed to be more general and able to provide more information in the future
-in addition to mere checking of latest version, but checking latest version is
-currently the only implemented feature.
-
-Can handle non-CPAN modules, as long as you put the appropriate C<$AUTHORITY> in
-your modules and create the C<< Module::CheckVersion::E<lt>schemeE<gt> >> to handle your
-authority scheme.
-
-This function is not exported by default, but exportable.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<check_latest_version> => I<bool> (default: 1)
-
-=item * B<default_authority_scheme> => I<str> (default: "cpan")
-
-If a module does not set C<$AUTHORITY> (which contains string like
-C<< E<lt>schemeE<gt>:E<lt>extraE<gt> >> like C<cpan:PERLANCAR>), the default authority scheme will be
-determined from this setting. The module C<< Module::CheckVersion::E<lt>schemeE<gt> >> module
-is used to implement actual checking.
-
-Can also be set to undef, in which case when module's C<$AUTHORITY> is not
-available, will return 412 status.
-
-=item * B<module>* => I<str>
-
-This routine will try to load the module, and retrieve its C<$VERSION>. If
-loading fails will assume module's installed version is undef.
-
-=back
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
 
 =head1 HOMEPAGE
 
@@ -209,6 +193,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Che
 
 Source repository is at L<https://github.com/perlancar/perl-Module-CheckVersion>.
 
+=head1 SEE ALSO
+
+The distribution comes with a CLI: L<check-module-version>.
+
+x_authority key in L<CPAN::Meta::X>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-CheckVersion>
@@ -216,20 +235,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-The distribution comes with a CLI: L<check-module-version>.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -6,7 +6,7 @@ use warnings;
 use Bit::Vector;
 use Getopt::Std;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 $| = 1;
 
@@ -31,8 +31,9 @@ sub run {
 		'h' => 0,
 		'v' => 0,
 	};
-	if (! getopts('bhv', $self->{'_opts'}) || @ARGV < 2
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('bhv', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 2) {
 
 		print STDERR "Usage: $0 [-b] [-h] [-v] [--version] hex_stream search\n";
 		print STDERR "\t-b\t\tPrint in binary (default hexadecimal).\n";
@@ -252,12 +253,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

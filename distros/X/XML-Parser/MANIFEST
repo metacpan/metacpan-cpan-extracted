@@ -4,6 +4,7 @@ Expat/encoding.h		Header file; describes *.enc structure
 Expat/Expat.pm			XML::Parser::Expat module
 Expat/Expat.xs			Extension library
 Expat/Makefile.PL		perl MakeMaker script for XML::Parser::Expat
+Expat/ppport.h
 Expat/typemap			XS typemap
 inc/Devel/CheckLib.pm
 LICENSE
@@ -52,22 +53,27 @@ share/x-sjis-unicode.enc	x-sjis-unicode encoding map
 t/astress.t			Test script
 t/bare_glob_filehandle.t
 t/cdata.t			Test script
+t/char_end_doc.t
 t/checklib_findcc.t
 t/checklib_tmpdir.t
 t/combine_chars.t		Test script
+t/context_tracking.t
 t/current_byte.t
 t/current_length.t		Test script
 t/debug_multibyte.t
 t/decl.t			Test script
 t/deep_nesting.t
 t/defaulted.t			Test script
+t/dtd_pe_default.t
 t/element_decl.t
+t/element_inspection.t
 t/encoding.t			Test script
 t/error_hint.t
 t/error_string.t
 t/expat_version.t
 t/ext.ent			External entity for parament.t test
 t/ext2.ent			External entity for parament.t test
+t/ext_ent_io_control.t
 t/extern_ent_lexical_glob.t
 t/external_ent.t		Test script
 t/file.t			Test script
@@ -77,15 +83,18 @@ t/foo.dtd			External DTD for parament.t test
 t/foreign_dtd.t
 t/g_void.t
 t/get_base.t
+t/load_encoding.t
 t/memory_leak_symtab.t
 t/namespaces.t			Test script
 t/nolwp.t
 t/parament.t			Test script
 t/parament_internal.t		Test script
 t/parse_error_context.t
+t/parse_start.t
 t/parsefile_base_restore.t
 t/partial.t			Test script
 t/position_overflow.t
+t/recognized_string.t
 t/security_api.t
 t/skip.t			Test script
 t/stream.t			Test script

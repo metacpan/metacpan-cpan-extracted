@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 use v5.26;
 use Object::Pad;
 
@@ -28,7 +28,7 @@ field $debug :param          = 0;
 field $log_all_events :param = undef;
 
 field $socket :param = undef;
-field $i3status :param = 1;
+field $i3status :param = '/usr/bin/i3status';
 
 field %workspace;
 field %output;
@@ -66,10 +66,14 @@ ADJUSTPARAMS {
   %window   = %{ delete $args->{window} }   if ref $args->{window} eq 'HASH';
   %binding  = %{ delete $args->{binding} }  if ref $args->{binding} eq 'HASH';
 
-  # us
   @groups   = @{ delete $args->{groups} } if ref $args->{groups} eq 'ARRAY';
   @swallows = @{ delete $args->{swallows} }
     if ref $args->{swallows} eq 'ARRAY';
+}
+
+method parse_path($path) {
+  $path =~ s/\$(\w+)/$ENV{$1} \/\/ "\$$1"/ge;
+  return $path;
 }
 
 method log_event($type, $event) {
@@ -80,6 +84,9 @@ method log_event($type, $event) {
   }
   elsif ($type eq 'workspace') {
     $msg = "Processing workspace event $event->{change} on $event->{current}{name}";
+  }
+  elsif ($type eq 'barconfig_update') {
+    $msg = "Processing barconfig_update event";
   }
   else {
     $msg = "Processing $type with payload $event->{change}";
@@ -135,30 +142,32 @@ method _get_property_from_root_window($key) {
   return $value;
 }
 
-method _set_property_on_root_window($key, $value) {
-  my $prop = $self->x11->atom($key);
-  my $utf8 = $self->x11->atom('UTF8_STRING');
-
-  $x11->ChangeProperty($xroot, $prop, $utf8, 8, 'Replace', $value);
-  $x11->flush;
-}
-
-method set_group_on_root_window($name) {
-  $self->_set_property_on_root_window('_I3_WOD_GROUP', $name);
-
-  return unless $i3status;
-
-  # If we do this we should send a sigusr1 to i3status
-  my $pt = Proc::ProcessTable->new(enable_ttys => 0);
-  my @pids = grep { $_->exec eq '/usr/bin/i3status' } @{ $pt->table };
-  kill('USR1', $_->pid) foreach @pids;
-}
-
 method get_group_from_root_window() {
   my $group = $self->_get_property_from_root_window('_I3_WOD_GROUP');
   return $group if $group;
   $self->set_group_on_root_window($groups[0]);
   return $groups[0];
+}
+
+method _set_property_on_root_window($key, $value) {
+  my $prop = $self->x11->atom($key);
+  my $utf8 = $self->x11->atom('UTF8_STRING');
+
+  $x11->ChangeProperty($xroot, $prop, $utf8, 8, 'Replace', $value);
+  $self->restart_i3_status;
+  $x11->flush;
+}
+
+method set_group_on_root_window($name) {
+  $self->_set_property_on_root_window('_I3_WOD_GROUP', $name);
+}
+
+method restart_i3_status() {
+  return unless $i3status;
+  $i3status = $self->parse_path($i3status);
+  my $pt = Proc::ProcessTable->new(enable_ttys => 0);
+  my @pids = grep { ($_->exec //'') eq $i3status } @{ $pt->table };
+  kill('USR1', $_->pid) foreach @pids;
 }
 
 method set_workspace_on_root_window($name) {
@@ -282,6 +291,11 @@ ADJUST {
       my $event   = shift;
 
       $self->log_event('barconfig_update', $event);
+
+      # This is hack because we seem to lose our x11 connection. Setting these
+      # to undef will reinit our x11 connections.
+      $x11 = undef;
+      $xroot = undef;
 
       # This event consists of a single serialized map reporting on options
       # from the barconfig of the specified bar_id that were updated in i3.
@@ -553,7 +567,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

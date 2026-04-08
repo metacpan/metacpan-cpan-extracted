@@ -417,7 +417,8 @@ YAML
     MultipleValuesAsArray => ' three ',
   ]);
   is_equal(
-    $openapi->validate_response($response, { path_template => '/foo', method => 'GET' })->TO_JSON,
+    (my $result = $openapi->validate_response($response,
+      { path_template => '/foo', method => 'GET' }))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -430,6 +431,11 @@ YAML
       ],
     },
     'headers that appear more than once are parsed into an array',
+  );
+  is_equal(
+    $result->data,
+    { response => { header => { MultipleValuesAsArray => [ qw(one one three) ] } } },
+    'header data was correctly parsed',
   );
 
 
@@ -470,7 +476,7 @@ YAML
           error => 'RFC9112 §6.1-10: "A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)"',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo get responses default $ref content text/* schema maxLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses my_default content text/* schema maxLength)))->to_string,
           error => 'length is greater than 3',
@@ -495,7 +501,7 @@ YAML
           error => 'RFC9112 §6.1-10: "A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request"',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo additionalOperations CONNECT responses default $ref content text/* schema maxLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses my_default content text/* schema maxLength)))->to_string,
           error => 'length is greater than 3',
@@ -519,7 +525,7 @@ YAML
           error => 'Content-Length cannot appear together with Transfer-Encoding',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo get responses default $ref content text/* schema maxLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses my_default content text/* schema maxLength)))->to_string,
           error => 'length is greater than 3',
@@ -592,7 +598,7 @@ YAML
           error => 'missing header: Content-Length',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content application/json schema type)),
           absoluteKeywordLocation => $doc_uri.'#/components/responses/default/content/application~1json/schema/type',
           error => 'got null, not object',
@@ -609,7 +615,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content)),
           absoluteKeywordLocation => $doc_uri.'#/components/responses/default/content',
           error => 'incorrect Content-Type "text/bloop"',
@@ -626,7 +632,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content bloop/html)),
           absoluteKeywordLocation => $doc_uri.'#/components/responses/default/content/bloop~1html',
           error => 'EXCEPTION: unsupported media type "bloop/html": add support with $openapi->add_media_type(...)',
@@ -637,11 +643,17 @@ YAML
   );
 
   is_equal(
-    $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
+    ($result = $openapi->validate_response(response(200,
+        [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
         chr(0xe9).'clair'),
-      { path_template => '/foo', method => 'POST' })->TO_JSON,
+      { path_template => '/foo', method => 'POST' }))->TO_JSON,
     { valid => true },
     'latin1 content can be successfully decoded',
+  );
+  is_equal(
+    $result->data,
+    { response => { body => { content => 'éclair' } } },
+    'body data was correctly parsed',
   );
 
   is_equal(
@@ -652,19 +664,19 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body/alpha',
+          instanceLocation => '/response/body/content/alpha',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content application/json schema properties alpha pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses default content application/json schema properties alpha pattern)))->to_string,
           error => 'pattern does not match',
         },
         {
-          instanceLocation => '/response/body/gamma',
+          instanceLocation => '/response/body/content/gamma',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content application/json schema properties gamma const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses default content application/json schema properties gamma const)))->to_string,
           error => 'value does not match',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content application/json schema properties)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses default content application/json schema properties)))->to_string,
           error => 'not all properties are valid',
@@ -677,11 +689,16 @@ YAML
 
   my $disapprove = v224.178.160.95.224.178.160; # utf-8-encoded "ಠ_ಠ"
   is_equal(
-    $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
         '{"alpha": "123", "gamma": "'.$disapprove.'"}'),
-      { path_template => '/foo', method => 'POST' })->TO_JSON,
+      { path_template => '/foo', method => 'POST' }))->TO_JSON,
     { valid => true },
     'decoded content matches the schema',
+  );
+  is_equal(
+    $result->data,
+    { response => { body => { content => { alpha => '123', gamma => 'ಠ_ಠ' } } } },
+    'body data was correctly parsed',
   );
 
 
@@ -760,7 +777,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default content text/plain schema minLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses default content text/plain schema minLength)))->to_string,
           error => 'length is less than 10',
@@ -777,7 +794,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default content text/plain schema minLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses default content text/plain schema minLength)))->to_string,
           error => 'length is less than 10',
@@ -809,7 +826,7 @@ YAML
           error => 'missing header: Content-Length',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default content text/plain schema minLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses default content text/plain schema minLength)))->to_string,
           error => 'length is less than 10',
@@ -832,7 +849,7 @@ YAML
           error => 'value does not match',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses 200 content */* schema maxLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses 200 content */* schema maxLength)))->to_string,
           error => 'length is greater than 0',
@@ -861,7 +878,7 @@ YAML
           error => 'response header not permitted',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses 204 content */* schema)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses 204 content */* schema)))->to_string,
           error => 'response body not permitted',
@@ -895,7 +912,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default content */* schema maxLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses default content */* schema maxLength)))->to_string,
           error => 'length is greater than 0',
@@ -932,13 +949,13 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body/foo',
+          instanceLocation => '/response/body/content/foo',
           keywordLocation => jsonp(qw(/paths /foo post responses 200 content application/json schema unevaluatedProperties)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses 200 content application/json schema unevaluatedProperties)))->to_string,
           error => 'additional property not permitted',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses 200 content application/json schema unevaluatedProperties)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses 200 content application/json schema unevaluatedProperties)))->to_string,
           error => 'not all additional properties are valid',
@@ -1020,7 +1037,7 @@ YAML
           error => 'response header not permitted',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses 200 content */* schema)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses 200 content */* schema)))->to_string,
           error => 'response body not permitted',
@@ -1028,6 +1045,191 @@ YAML
       ],
     },
     'custom error message when the entity is not permitted',
+  );
+};
+
+subtest $::TYPE.': validation with schema defaults' => sub {
+  my ($openapi, $result);
+  my $schema = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
+paths:
+  /:
+    get:
+      operationId: me
+      parameters: []
+      responses:
+        default:
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+YAML
+
+  $schema->{paths}{'/'}{get}{responses}{default}{headers}->%* = (
+    'header-array' => +{
+      explode => false,
+      schema => {
+        type => 'array',
+        prefixItems => [ map +{ type => 'number', default => $_ }, 0..1 ],
+        items => { type => 'number', default => 42 },
+      },
+    },
+    'header-object' => {
+      explode => false, # forces form style to use ?$name=$key0,$val0,$key1,$val1,$key2,$val2
+      schema => {
+        type => 'object',
+        properties => +{ map +($_ => +{ type => 'string', default => $_.'_value' }), 'a'..'b' },
+      },
+    },
+  );
+
+  $schema->{paths}{'/'}{get}{responses}{default}{content}{'application/json'}{schema}{properties}->%* = (
+    'body-array' => {
+      type => 'array',
+      prefixItems => [ map +{ type => 'number', default => $_ }, 0..1 ],
+      items => { type => 'number', default => 42 },
+    },
+    'body-object' => {
+      type => 'object',
+      properties => +{ map +($_ => +{ type => 'string', default => $_.'_value' }), 'a'..'b' },
+    },
+  );
+
+  $openapi = OpenAPI::Modern->new(openapi_uri => $doc_uri_rel, openapi_schema => $schema);
+
+  is_equal(
+    ($result = $openapi->validate_response(response('200',
+        [ 'header-array' => '', 'header-object' => '', 'Content-Type' => 'application/json' ],
+        '{"body-array":[],"body-object":{}}',
+    ), { operation_id => 'me' }))->TO_JSON,
+    { valid => true },
+    'no defaults are included by default',  # ha!
+  );
+  is_equal(
+    $result->data,
+    {
+      response => {
+        header => {
+          'header-array' => [],
+          'header-object' => {},
+        },
+        body => {
+          content => {
+            'body-array' => [],
+            'body-object' => {},
+          },
+        },
+      },
+    },
+    'data is correctly deserialized, without defaults',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  is_equal(
+    ($result = $openapi->validate_response(response('200',
+        [ 'header-array' => '', 'header-object' => '' ],
+    ), { operation_id => 'me' }))->TO_JSON,
+    {
+      valid => true,
+      defaults => {
+        '/response/header/header-array/0' => 0,
+        '/response/header/header-array/1' => 1,
+        '/response/header/header-object/a' => 'a_value',
+        '/response/header/header-object/b' => 'b_value',
+      },
+    },
+    'with empty headers, styled header defaults are included when with_defaults is set on the evaluator',
+  );
+  is_equal(
+    $result->data,
+    {
+      response => {
+        header => {
+          'header-array' => [ 0, 1 ],
+          'header-object' => { a => 'a_value', b => 'b_value' },
+        },
+      },
+    },
+    'styled parameter data now includes defaults',
+  );
+
+
+  $schema->{paths}{'/'}{get}{responses}{default}{headers}->%* = (
+    'header-array' => +{
+      content => {
+        'application/json' => {
+          schema => {
+            type => 'array',
+            prefixItems => [ map +{ type => 'number', default => $_ }, 0..1 ],
+            items => { type => 'number', default => 42 },
+            default => [ 10, 11, 12 ],
+          },
+        },
+      },
+    },
+    'header-object' => {
+      content => {
+        'application/json' => {
+          schema => {
+            type => 'object',
+            properties => +{ map +($_ => +{ type => 'string', default => $_.'_value' }), 'a'..'b' },
+            default => { x => 'j', y => 'k', z => 'l' },
+          },
+        },
+      },
+    },
+  );
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri_rel,
+    openapi_schema => $schema,
+    with_defaults => 1,
+  );
+
+  is_equal(
+    ($result = $openapi->validate_response(response('200',
+        [ 'header-array' => '[]', 'header-object' => '{}', 'Content-Type' => 'application/json' ],
+        '{"body-array":[],"body-object":{}}',
+    ), { operation_id => 'me' }))->TO_JSON,
+    {
+      valid => true,
+      defaults => {
+        '/response/header/header-array/0' => 0,
+        '/response/header/header-array/1' => 1,
+        '/response/header/header-object/a' => 'a_value',
+        '/response/header/header-object/b' => 'b_value',
+        '/response/body/content/body-array/0' => 0,
+        '/response/body/content/body-array/1' => 1,
+        '/response/body/content/body-object/a' => 'a_value',
+        '/response/body/content/body-object/b' => 'b_value',
+      },
+    },
+    'with empty parameters, media-type parameter and body defaults are included when with_defaults is set on the evaluator',
+  );
+  is_equal(
+    $result->data,
+    {
+      response => {
+        header => {
+          'header-array' => [ 0, 1 ],
+          'header-object' => { a => 'a_value', b => 'b_value' },
+        },
+        body => {
+          content => {
+            'body-array' => [ 0, 1 ],
+            'body-object' => { a => 'a_value', b => 'b_value' },
+          },
+        },
+      },
+    },
+    'media-type parameter and body data now includes defaults',
   );
 };
 

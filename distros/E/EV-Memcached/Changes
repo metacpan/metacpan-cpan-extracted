@@ -1,0 +1,9 @@
+Revision history for EV::Memcached
+
+0.01  2026-04-06
+    - Initial release
+    - Pure XS binary protocol, no external C library
+    - Full command set, multi-get (mget/mgets), fire-and-forget (SETQ/FLUSHQ)
+    - SASL PLAIN auth (manual + auto-auth on connect/reconnect)
+    - Pipelining, flow control, reconnection, connect/command timeouts
+    - TCP, Unix socket, keepalive, EV event loop integration

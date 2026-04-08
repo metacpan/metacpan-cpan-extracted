@@ -1,5 +1,30 @@
 Revision history for Perl extension Data::JSEmail
 
+0.03  2026-04-07
+	- Restructure make() header precedence to match RFC 8621 / Cyrus:
+	  1. header:* properties, 2. convenience properties, 3. defaults
+	- Add defaults callback to make($args, $getblob, $defaults_cb)
+	- Export default_header_defaults() for callers to defer to
+	- Add bodyStructure assembly: recursive MIME tree from bodyStructure
+	  property with partId/blobId leaf parts and multipart subParts
+	- Handle array ref header values (for :all support)
+	- Preserve raw header values from as_string (leading whitespace)
+	- Add asGroupedAddresses() - RFC 8621 EmailAddressGroup[] format
+	- Fix asText() for raw UTF-8 bytes
+	- Fix asDate() for comments, missing seconds, leading whitespace
+	- Fix asURLs() to return undef for non-URL values
+	- Add Data::UUID and Sys::Hostname dependencies
+
+0.02  2026-04-06
+	- Rewrite make() for RFC 8621 Email/set create format:
+	  textBody/htmlBody/bodyValues/attachments with partId and blobId
+	- Add header:* overrides from top-level and body parts
+	- Add body part metadata: cid, language, disposition, name
+	- Add cid validation (_valid_cid: no angle brackets, no whitespace)
+	- Use us-ascii for 7-bit content, UTF-8 for non-ASCII
+	- Single-part messages preserve Content-ID/Language/Disposition
+	- No auto-generate text/plain from htmlBody-only (match Cyrus)
+
 0.01  2026-04-05
 	- Review and fix against RFC 8621
 	- Fix bodyValues to only store text/* parts

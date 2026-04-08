@@ -3,7 +3,7 @@ package Chandra;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 require XSLoader;
 XSLoader::load('Chandra', $VERSION);

@@ -1,3 +1,8 @@
+0.03 2026-04-07T22:38:24+02:00
+ - Add test for non-existent option.
+ - Improve options check.
+ - Update copyright years.
+
 0.02 2023-11-26T14:54:34+01:00
  - Fix test depdendencies.
 

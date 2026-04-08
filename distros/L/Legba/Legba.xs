@@ -23,6 +23,11 @@
 #include "XSUB.h"
 #include "ppport.h"
 
+/* XS_INTERNAL - available since 5.16, fallback for older Perls */
+#ifndef XS_INTERNAL
+#  define XS_INTERNAL(name) static XSPROTO(name)
+#endif
+
 /* ============================================
    Compatibility macros
    ============================================ */
@@ -527,7 +532,7 @@ static OP* slot_clear_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) 
    XS slot accessor (fallback for unoptimized calls)
    ============================================ */
 
-static XS(xs_slot_accessor) {
+XS_INTERNAL(xs_slot_accessor) {
     dXSARGS;
     IV idx = CvXSUBANY(cv).any_iv;
     if (items) {
@@ -628,7 +633,7 @@ static void install_accessor(pTHX_ const char *pkg, const char *name, STRLEN nam
    XS functions
    ============================================ */
 
-static XS(xs_import) {
+XS_INTERNAL(xs_import) {
     dXSARGS;
     const char *pkg = HvNAME((HV*)CopSTASH(PL_curcop));
     int i;
@@ -653,7 +658,7 @@ static XS(xs_import) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_add) {
+XS_INTERNAL(xs_add) {
     dXSARGS;
     int i;
     for (i = 0; i < items; i++) {
@@ -665,7 +670,7 @@ static XS(xs_add) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_watch) {
+XS_INTERNAL(xs_watch) {
     dXSARGS;
     STRLEN name_len;
     const char *name;
@@ -689,7 +694,7 @@ static XS(xs_watch) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_unwatch) {
+XS_INTERNAL(xs_unwatch) {
     dXSARGS;
     STRLEN name_len;
     const char *name;
@@ -721,7 +726,7 @@ static XS(xs_unwatch) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_index) {
+XS_INTERNAL(xs_index) {
     dXSARGS;
     STRLEN name_len; const char *name; SV **svp;
     if (items < 1) XSRETURN_UNDEF;
@@ -731,7 +736,7 @@ static XS(xs_index) {
     XSRETURN_UNDEF;
 }
 
-static XS(xs_get_by_idx) {
+XS_INTERNAL(xs_get_by_idx) {
     dXSARGS;
     IV idx;
     if (items < 1) XSRETURN_UNDEF;
@@ -740,7 +745,7 @@ static XS(xs_get_by_idx) {
     XSRETURN_UNDEF;
 }
 
-static XS(xs_set_by_idx) {
+XS_INTERNAL(xs_set_by_idx) {
     dXSARGS;
     IV idx;
     if (items < 2) XSRETURN_EMPTY;
@@ -758,7 +763,7 @@ static XS(xs_set_by_idx) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_get) {
+XS_INTERNAL(xs_get) {
     dXSARGS;
     STRLEN name_len; const char *name; SV **svp;
     if (items < 1) XSRETURN_UNDEF;
@@ -769,7 +774,7 @@ static XS(xs_get) {
 }
 
 /* _set / set: create slot if missing; respects lock/freeze */
-static XS(xs_set) {
+XS_INTERNAL(xs_set) {
     dXSARGS;
     STRLEN name_len; const char *name;
     IV idx;
@@ -785,7 +790,7 @@ static XS(xs_set) {
     XSRETURN(1);
 }
 
-static XS(xs_slots) {
+XS_INTERNAL(xs_slots) {
     dXSARGS;
     HE *entry;
     PERL_UNUSED_VAR(items);
@@ -797,7 +802,7 @@ static XS(xs_slots) {
     return;
 }
 
-static XS(xs_exists) {
+XS_INTERNAL(xs_exists) {
     dXSARGS;
     STRLEN name_len; const char *name;
     if (items != 1) croak("Usage: Legba::exists($name)");
@@ -807,7 +812,7 @@ static XS(xs_exists) {
 }
 
 /* clear($name, ...) - clear value + watchers, skips locked/frozen */
-static XS(xs_clear_named) {
+XS_INTERNAL(xs_clear_named) {
     dXSARGS;
     int i;
     for (i = 0; i < items; i++) {
@@ -825,7 +830,7 @@ static XS(xs_clear_named) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_clear_by_idx) {
+XS_INTERNAL(xs_clear_by_idx) {
     dXSARGS;
     int i;
     for (i = 0; i < items; i++) {
@@ -847,7 +852,7 @@ static XS(xs_clear_by_idx) {
 }
 
 /* _delete($name) - set to undef, slot still exists; respects lock/freeze */
-static XS(xs_delete) {
+XS_INTERNAL(xs_delete) {
     dXSARGS;
     STRLEN name_len; const char *name; SV **svp;
     if (items < 1) XSRETURN_EMPTY;
@@ -864,7 +869,7 @@ static XS(xs_delete) {
 }
 
 /* _keys() - list all slot names */
-static XS(xs_keys) {
+XS_INTERNAL(xs_keys) {
     dXSARGS;
     HE *entry;
     PERL_UNUSED_VAR(items);
@@ -879,7 +884,7 @@ static XS(xs_keys) {
 }
 
 /* _clear() - clear all non-locked/frozen slot values (preserves slots/watchers) */
-static XS(xs_clear_all) {
+XS_INTERNAL(xs_clear_all) {
     dXSARGS;
     IV i;
     PERL_UNUSED_VAR(items);
@@ -891,7 +896,7 @@ static XS(xs_clear_all) {
 }
 
 /* _install_accessor($pkg, $slot_name) */
-static XS(xs_install_accessor_fn) {
+XS_INTERNAL(xs_install_accessor_fn) {
     dXSARGS;
     STRLEN pkg_len, name_len;
     const char *pkg_name, *name;
@@ -905,7 +910,7 @@ static XS(xs_install_accessor_fn) {
 }
 
 /* _slot_ptr($name) - UV of the dedicated SV* (stable across value changes) */
-static XS(xs_slot_ptr) {
+XS_INTERNAL(xs_slot_ptr) {
     dXSARGS;
     STRLEN name_len; const char *name; IV idx;
     if (items < 1) XSRETURN_UNDEF;
@@ -916,7 +921,7 @@ static XS(xs_slot_ptr) {
 }
 
 /* _registry() - hashref of slot_name => index for introspection */
-static XS(xs_registry) {
+XS_INTERNAL(xs_registry) {
     dXSARGS;
     PERL_UNUSED_VAR(items);
     ST(0) = sv_2mortal(newRV_inc((SV*)g_slot_index));
@@ -924,7 +929,7 @@ static XS(xs_registry) {
 }
 
 /* _make_get_op($name) - allocate a getter OP, return address as UV */
-static XS(xs_make_get_op) {
+XS_INTERNAL(xs_make_get_op) {
     dXSARGS;
     STRLEN name_len; const char *name; IV idx; OP *op;
     if (items < 1) XSRETURN_UNDEF;
@@ -938,7 +943,7 @@ static XS(xs_make_get_op) {
 }
 
 /* _make_set_op($name) - allocate a setter OP, return address as UV */
-static XS(xs_make_set_op) {
+XS_INTERNAL(xs_make_set_op) {
     dXSARGS;
     STRLEN name_len; const char *name; IV idx; OP *op;
     if (items < 1) XSRETURN_UNDEF;
@@ -954,7 +959,7 @@ static XS(xs_make_set_op) {
 }
 
 /* Lock / freeze */
-static XS(xs_lock) {
+XS_INTERNAL(xs_lock) {
     dXSARGS;
     STRLEN len; const char *n; SV **svp; IV idx;
     if (items < 1) croak("Usage: Legba::_lock($name)");
@@ -967,7 +972,7 @@ static XS(xs_lock) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_unlock) {
+XS_INTERNAL(xs_unlock) {
     dXSARGS;
     STRLEN len; const char *n; SV **svp; IV idx;
     if (items < 1) croak("Usage: Legba::_unlock($name)");
@@ -980,7 +985,7 @@ static XS(xs_unlock) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_freeze) {
+XS_INTERNAL(xs_freeze) {
     dXSARGS;
     STRLEN len; const char *n; SV **svp; IV idx;
     if (items < 1) croak("Usage: Legba::_freeze($name)");
@@ -993,7 +998,7 @@ static XS(xs_freeze) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_is_locked) {
+XS_INTERNAL(xs_is_locked) {
     dXSARGS;
     STRLEN len; const char *n; SV **svp;
     if (items < 1) XSRETURN_NO;
@@ -1004,7 +1009,7 @@ static XS(xs_is_locked) {
     XSRETURN_NO;
 }
 
-static XS(xs_is_frozen) {
+XS_INTERNAL(xs_is_frozen) {
     dXSARGS;
     STRLEN len; const char *n; SV **svp;
     if (items < 1) XSRETURN_NO;

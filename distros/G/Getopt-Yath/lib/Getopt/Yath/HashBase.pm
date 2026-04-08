@@ -2,7 +2,7 @@ package Getopt::Yath::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 #################################################################
 #                                                               #

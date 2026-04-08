@@ -1,10 +1,10 @@
 package Bot::IRC::Functions;
 # ABSTRACT: Bot::IRC add maybe helpful functions to the bot
 
-use 5.014;
+use 5.016;
 use exact;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.48'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -73,7 +73,7 @@ Bot::IRC::Functions - Bot::IRC add maybe helpful functions to the bot
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

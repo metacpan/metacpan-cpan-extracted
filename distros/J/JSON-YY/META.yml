@@ -1,0 +1,26 @@
+---
+abstract: 'Fast JSON encoder/decoder with document manipulation API, backed by yyjson'
+author:
+  - vividsnow
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-YY
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.014'
+resources:
+  repository: https://github.com/vividsnow/JSON-YY.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

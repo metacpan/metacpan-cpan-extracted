@@ -25,14 +25,8 @@ my $openapi = OpenAPI::Modern->new(
 components: {}
 YAML
 
-my $parameter_content;
-my $call_count = 0; # incremented when data is passed down for further processing
 no warnings 'redefine';
-*OpenAPI::Modern::_evaluate_subschema = sub ($, $dataref, $, $) {
-  ++$call_count;
-  $parameter_content = $dataref->$*;
-  1;
-};
+*OpenAPI::Modern::_evaluate_subschema = sub {1};
 
 my $keyword_path = '/paths/~1foo/get/parameters/0';
 
@@ -46,6 +40,7 @@ sub _init_test ($data_path, $param_obj_data) {
     vocabularies => OAS_VOCABULARIES,
     errors => [],
     depth => 0,
+    data => {},
   };
 
   # hack, to allow _fetch_from_uri and cache to work: patch schema, content
@@ -66,7 +61,7 @@ subtest 'path parameters' => sub {
     # name (test name)
     # param_obj (from OAD)
     # input (value of path_captures, as provided by find_path_item, or undef if missing)
-    # content => expected data to be passed to _evaluate_subschema (omit when evaluation is skipped)
+    # content => expected data that was parsed from serialized string; omit when nothing is to be found
     # errors => compared to what is collected from $state, defaults to []
     # todo
     {
@@ -85,7 +80,7 @@ subtest 'path parameters' => sub {
     # encoded with media-type
     {
       name => 'missing',
-      param_obj => { name => 'missing_json_content', content => { 'application/json' => { schema => {} } } },
+      param_obj => { name => 'missing_json_content', content => { 'application/json' => {} } },
       input => undef,
       errors => [
         {
@@ -98,7 +93,7 @@ subtest 'path parameters' => sub {
     },
     {
       name => 'non-ascii characters in path captures must be percent-encoded',
-      param_obj => { name => 'color', content => { 'application/json' => { schema => {} } } },
+      param_obj => { name => 'color', content => { 'application/json' => {} } },
       input => 'cølör',
       errors => [
         {
@@ -111,7 +106,7 @@ subtest 'path parameters' => sub {
     },
     {
       name => 'numeric string',
-      param_obj => { name => 'json_content', content => { 'application/json' => { schema => {} } } },
+      param_obj => { name => 'json_content', content => { 'application/json' => {} } },
       input => '3',
       content => 3, # numeric, not string!
     },
@@ -908,13 +903,10 @@ subtest 'path parameters' => sub {
       );
       fail('parameter object is valid'), note($result), return if not $result->valid;
 
-      undef $parameter_content;
-      my $previous_call_count = $call_count;
-
       my $state = _init_test('/request/uri/path', +{ $param_obj->%{qw(schema content)} });
 
-      my $valid = $openapi->_validate_path_parameter($state, $param_obj,
-        { defined $test->{input} ? ($param_obj->{name} => $test->{input}) : () });
+      my $valid = $openapi->_validate_parameter($state, $param_obj,
+        path_captures => { defined $test->{input} ? ($param_obj->{name} => $test->{input}) : () });
       die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
         $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 
@@ -928,13 +920,13 @@ subtest 'path parameters' => sub {
       );
 
       if (not exists $test->{content}) {
-        is($call_count, $previous_call_count, 'no content was extracted')
-          or note("extracted content:\n", $::encoder->encode($parameter_content));
+        ok(!keys $state->{data}->%*, 'no content was extracted')
+          or note("extracted content:\n", $::encoder->encode($state->{data}));
       }
       else {
-        is($call_count, $previous_call_count+1, 'schema would be evaluated');
+        ok(exists $state->{data}{request}{uri}{path}{$param_obj->{name}}, 'content was extracted');
         is_equal(
-          $parameter_content,
+          $state->{data}{request}{uri}{path}{$param_obj->{name}},
           $test->{content},
           defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
         );
@@ -950,7 +942,7 @@ subtest 'query parameters' => sub {
     # name (test name)
     # param_obj (from OAD)
     # queries => raw query string, without leading '?'
-    # content => expected data to be passed to _evaluate_subschema (omit when evaluation is omitted)
+    # content => expected data that was parsed from serialized string; omit when nothing is to be found
     # errors => compared to what is collected from $state, defaults to []
     # todo
     {
@@ -960,7 +952,7 @@ subtest 'query parameters' => sub {
     },
     {
       name => 'missing, required',
-      param_obj => { name => 'q', required => true, content => { 'text/plain' => { schema => {} } } },
+      param_obj => { name => 'q', required => true, content => { 'text/plain' => {} } },
       queries => 'foo=1&bar=2',
       errors => [
         {
@@ -973,13 +965,13 @@ subtest 'query parameters' => sub {
     },
     {
       name => 'empty string, allowEmptyValue=true',
-      param_obj => { name => 'q', allowEmptyValue => true, content => { 'text/plain' => { schema => {} } } },
+      param_obj => { name => 'q', allowEmptyValue => true, content => { 'text/plain' => {} } },
       queries => 'foo=1&q=&bar=2',
       # content not extracted, but also no errors
     },
     {
       name => 'empty string, allowEmptyValue=true, required',
-      param_obj => { name => 'q', allowEmptyValue => true, required => true, content => { 'text/plain' => { schema => {} } } },
+      param_obj => { name => 'q', allowEmptyValue => true, required => true, content => { 'text/plain' => {} } },
       queries => 'foo=1&q=&bar=2',
       errors => [
         {
@@ -991,12 +983,12 @@ subtest 'query parameters' => sub {
       ],
     },
     {
-      param_obj => { name => 'foo', content => { 'application/json' => { schema => {} } } },
+      param_obj => { name => 'foo', content => { 'application/json' => {} } },
       queries => 'foo=1&bar=2',
       content => 1, # number, not string!
     },
     {
-      param_obj => { name => 'foo', content => { 'application/json' => { schema => {} } } },
+      param_obj => { name => 'foo', content => { 'application/json' => {} } },
       queries => 'foo=%7B%22a%22:1,%22b%22:2%7D',
       content => { a => 1, b => 2 },
     },
@@ -1943,12 +1935,9 @@ subtest 'query parameters' => sub {
       );
       fail('parameter object is valid'), note($result), return if not $result->valid;
 
-      undef $parameter_content;
-      my $previous_call_count = $call_count;
-
       my $state = _init_test('/request/uri/query', +{ $param_obj->%{qw(schema content)} });
 
-      my $valid = $openapi->_validate_query_parameter($state, $param_obj, Mojo::URL->new('https://example.com/blah?'.$test->{queries})->query);
+      my $valid = $openapi->_validate_parameter($state, $param_obj, params => Mojo::URL->new('https://example.com/blah?'.$test->{queries})->query);
       die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
         $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 
@@ -1962,13 +1951,13 @@ subtest 'query parameters' => sub {
       );
 
       if (not exists $test->{content}) {
-        is($call_count, $previous_call_count, 'no content was extracted')
-          or note("extracted content:\n", $::encoder->encode($parameter_content));
+        ok(!keys $state->{data}->%*, 'no content was extracted')
+          or note("extracted content:\n", $::encoder->encode($state->{data}));
       }
       else {
-        is($call_count, $previous_call_count+1, 'schema would be evaluated');
+        ok(exists $state->{data}{request}{uri}{query}{$param_obj->{name}}, 'content was extracted');
         is_equal(
-          $parameter_content,
+          $state->{data}{request}{uri}{query}{$param_obj->{name}},
           $test->{content},
           defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
         );
@@ -1980,21 +1969,25 @@ subtest 'query parameters' => sub {
 subtest 'header parameters' => sub {
   my @tests = (
     # name (test name)
+    # header_name
     # header_obj (from OAD)
     # raw header values (as an arrayref; one item per header line)
-    # content => expected data to be passed to _evaluate_subschema
+    # content => expected data that was parsed from serialized string; omit when nothing is to be found
     # errors => compared to what is collected from $state, defaults to []
     # todo
     {
-      header_obj => { name => 'Accept' },
+      header_name => 'Accept',
+      header_obj => {},
       values => [ 'application/json' ],
     },
     {
-      header_obj => { name => 'Content-Type' },
+      header_name => 'Content-Type',
+      header_obj => {},
       values => [ 'application/json' ],
     },
     {
-      header_obj => { name => 'Authorization' },
+      header_name => 'Authorization',
+      header_obj => {},
       values => [ 'Basic whargarbl' ],
     },
     {
@@ -2075,26 +2068,20 @@ subtest 'header parameters' => sub {
     ],
 
     {
-      header_obj => { name => 'Missing', required => true },
+      name => 'missing but not required',
+      header_obj => {},
       values => undef,
-      errors => [
-        {
-          instanceLocation => '/response/header',
-          keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'missing header: Missing',
-        },
-      ],
     },
     {
-      header_obj => { name => 'Missing', required => true },
+      name => 'missing, required',
+      header_obj => { required => true },
       values => undef,
       errors => [
         {
           instanceLocation => '/response/header',
           keywordLocation => $keyword_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'missing header: Missing',
+          error => 'missing header: My-Header',
         },
       ],
     },
@@ -2181,14 +2168,12 @@ subtest 'header parameters' => sub {
 
     subtest 'header '
         .($test->{header_obj}{content} ? 'encoded with media-type' : 'style=simple')
-        .(length $test->{name} ? ', '.$test->{name}.': '
-          : length $test->{header_obj}{name} ? ', '.$test->{header_obj}{name}.': '
-          : ' ')
+        .(length $test->{name} ? ', '.$test->{name}.': ' : ' ')
         .(defined $test->{values} ? $::dumper->encode($test->{values}) : '<missing>')
         .' -> '.$::dumper->encode($test->{content}) => sub {
 
       my $param_obj = +{
-        name => 'My-Header',
+        name => $test->{header_name} // 'My-Header',
         exists $test->{header_obj}{content} ? () : (style => 'simple', schema => { type => 'string' }),
         $test->{header_obj}->%*,
         in => 'header',
@@ -2209,16 +2194,13 @@ subtest 'header parameters' => sub {
       );
       fail('header object is valid'), note($result), return if not $result->valid;
 
-      undef $parameter_content;
-      my $previous_call_count = $call_count;
-
       my $state = _init_test('/response/header', +{ $param_obj->%{qw(schema content)} });
 
       my $headers = Mojo::Headers->new;
       $headers->add(Encode::encode('UTF-8', $param_obj->{name}, Encode::DIE_ON_ERR | Encode::LEAVE_SRC), $test->{values}->@*)
         if defined $test->{values};
 
-      my $valid = $openapi->_validate_header_parameter($state, $param_obj->{name}, $header_obj, $headers);
+      my $valid = $openapi->_validate_parameter($state, $header_obj, $param_obj->%{name}, headers => $headers);
       die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
         $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 
@@ -2232,13 +2214,13 @@ subtest 'header parameters' => sub {
       );
 
       if (not exists $test->{content}) {
-        is($call_count, $previous_call_count, 'no content was extracted')
-          or note("extracted content:\n", $::encoder->encode($parameter_content));
+        ok(!keys $state->{data}->%*, 'no content was extracted')
+          or note("extracted content:\n", $::encoder->encode($state->{data}));
       }
       else {
-        is($call_count, $previous_call_count+1, 'schema would be evaluated');
+        ok(exists $state->{data}{response}{header}{$param_obj->{name}}, 'content was extracted');
         is_equal(
-          $parameter_content,
+          $state->{data}{response}{header}{$param_obj->{name}},
           $test->{content},
           defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
         );
@@ -2252,17 +2234,17 @@ subtest 'cookie parameters' => sub {
     # name (test name)
     # param_obj (from OAD)
     # cookie => raw Cookie header string
-    # content => expected data to be passed to _evaluate_subschema (omit when evaluation is omitted)
+    # content => expected data that was parsed from serialized string; omit when nothing is to be found
     # errors => compared to what is collected from $state, defaults to []
     # todo
 
     {
       name => 'missing header but not required',
-      param_obj => { content => { 'application/json' => { schema => { type => 'object' } } } },
+      param_obj => { content => { 'application/json' => {} } },
     },
     {
       name => 'missing header, required',
-      param_obj => { required => true, content => { 'text/plain' => { schema => {} } } },
+      param_obj => { required => true, content => { 'text/plain' => {} } },
       errors => [
         {
           instanceLocation => '/request/header/Cookie',
@@ -2291,13 +2273,13 @@ subtest 'cookie parameters' => sub {
       ],
     },
     {
-      param_obj => { name => 'foo', content => { 'application/json' => { schema => {} } } },
+      param_obj => { name => 'foo', content => { 'application/json' => {} } },
       cookie => 'foo=1',
       content => 1, # number, not string!
     },
     {
       name => 'adjacent to styled cookie parameters',
-      param_obj => { name => 'color', content => { 'application/json' => { schema => {} } } },
+      param_obj => { name => 'color', content => { 'application/json' => {} } },
       cookie => 'foo=bar; color=1',
       content => 1,  # numeric value, carefully avoiding comma
     },
@@ -2635,15 +2617,12 @@ subtest 'cookie parameters' => sub {
       );
       fail('parameter object is valid'), note($result), return if not $result->valid;
 
-      undef $parameter_content;
-      my $previous_call_count = $call_count;
-
       my $state = _init_test('/request/header/Cookie', +{ $param_obj->%{qw(schema content)} });
 
       my $headers = Mojo::Headers->new;
       $headers->add('Cookie', $test->{cookie}) if defined $test->{cookie};
 
-      my $valid = $openapi->_validate_cookie_parameter($state, $param_obj, $headers);
+      my $valid = $openapi->_validate_parameter($state, $param_obj, headers => $headers);
       die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
         $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 
@@ -2657,13 +2636,13 @@ subtest 'cookie parameters' => sub {
       );
 
       if (not exists $test->{content}) {
-        is($call_count, $previous_call_count, 'no content was extracted')
-          or note("extracted content:\n", $::encoder->encode($parameter_content));
+        ok(!keys $state->{data}->%*, 'no content was extracted')
+          or note("extracted content:\n", $::encoder->encode($state->{data}));
       }
       else {
-        is($call_count, $previous_call_count+1, 'schema would be evaluated');
+        ok(exists $state->{data}{request}{header}{Cookie}{$param_obj->{name}}, 'content was extracted');
         is_equal(
-          $parameter_content,
+          $state->{data}{request}{header}{Cookie}{$param_obj->{name}},
           $test->{content},
           defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
         );

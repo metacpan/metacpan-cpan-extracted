@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000040';
+our $VERSION = '0.000041';
 
 use File::Path qw/remove_tree/;
 use IPC::Cmd qw/can_run/;
@@ -35,7 +35,7 @@ sub _clone_dir_cp {
     my ($src, $dest, %params) = @_;
     my $err;
     remove_tree($dest, {safe => 1, keep_root => 1, error => \$err}) if -d $dest;
-    system($CP, '-a', $params{verbose} ? ( '-v' ) : (), "$src/", $dest) and die "$CP returned $?";
+    system($CP, '-a', $params{verbose} ? ( '-v' ) : (), "$src/.", $dest) and die "$CP returned $?";
 }
 
 sub _clone_dir_fcr {

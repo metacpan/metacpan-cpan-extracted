@@ -1,5 +1,13 @@
 Revision history for OpenAPI-Modern
 
+0.133     2026-04-07 18:37:11Z
+          - OpenAPI::Modern constructor now supports passing along arbitrary
+            configuration options to the JSON::Schema::Modern constructor
+          - message validation now also saves all deserialized data to the
+            result object, optionally with missing values populated from
+            "default" keywords (when "with_defaults" is set in the evaluator
+            object)
+
 0.132     2026-03-29 19:14:44Z
           - full support for parsing of "query" parameters: form,
             spaceDelimited, pipeDelimited and deepObject styles, as well as

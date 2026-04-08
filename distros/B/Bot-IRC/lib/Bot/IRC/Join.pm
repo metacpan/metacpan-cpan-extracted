@@ -1,10 +1,10 @@
 package Bot::IRC::Join;
 # ABSTRACT: Bot::IRC join and part channels and remember channels state
 
-use 5.014;
+use 5.016;
 use exact;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.48'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -130,7 +130,7 @@ Bot::IRC::Join - Bot::IRC join and part channels and remember channels state
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ use Test2::V0 -target => DBIx::QuickDB::Driver::MySQLCom;
 use Test2::Tools::QuickDB;
 
 BEGIN {
-    $ENV{PATH} = "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}" if -d "$ENV{HOME}/dbs/mysql8/bin";
+    $ENV{PATH} = "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}" if $ENV{HOME} && -d "$ENV{HOME}/dbs/mysql8/bin";
 }
 
 my @ENV_VARS;

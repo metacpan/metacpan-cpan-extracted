@@ -1,0 +1,22 @@
+Changes
+example/async.pl
+ignore.txt
+lib/Timer/Wheel.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basic.t
+t/02-every.t
+t/03-cancel.t
+t/04-ordering.t
+t/05-drain.t
+t/06-edge.t
+t/07-group.t
+t/08-pause.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

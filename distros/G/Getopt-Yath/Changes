@@ -1,3 +1,19 @@
+2.000009  2026-04-07 20:17:28-07:00 America/Los_Angeles
+
+    - Add Getopt::Yath::State object returned by parse_options/process_args
+    - Add multi-stage subcommand parsing example to Tutorial
+    - Add Getopt::Yath::Tutorial with step-by-step usage guide
+    - Add missing Cpanel::JSON::XS dependency to dist.ini
+    - Move Test2::V0 from runtime to test prerequisites
+    - Fix wrong %INC key in JSON error message cleanup
+    - Fix negated set_env_vars writing the un-negated value
+    - Fix fit_to_width ignoring the prefix parameter
+    - Fix default_short_examples calling SUPER::default_long_examples
+    - Fix get_env_value using $ref instead of $$ref for negated env vars
+    - Fix runtime crash in Settings::Group::remove_option
+    - Fix numerous POD typos and add METHODS sections to POD
+    - Expand test coverage
+
 2.000008  2026-03-29 10:33:03-07:00 America/Los_Angeles
 
     - Fix missing package declaration in BoolMap

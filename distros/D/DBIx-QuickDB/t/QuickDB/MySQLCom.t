@@ -1,5 +1,5 @@
 BEGIN {
-    $ENV{PATH} = "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}" if -d "$ENV{HOME}/dbs/mysql8/bin";
+    $ENV{PATH} = "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}" if $ENV{HOME} && -d "$ENV{HOME}/dbs/mysql8/bin";
 }
 
 $main::DRIVERS = ['MySQLCom'];

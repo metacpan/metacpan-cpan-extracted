@@ -1,0 +1,57 @@
+\begin{thebibliography}{5}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Di~Tommaso et~al.(2017)Di~Tommaso, Chatzou, Floden, Barja, Palumbo,
+  and Notredame]{di2017nextflow}
+Paolo Di~Tommaso, Maria Chatzou, Evan~W Floden, Pablo~Prieto Barja, Emilio
+  Palumbo, and Cedric Notredame.
+\newblock Nextflow enables reproducible computational workflows.
+\newblock \emph{Nature Biotechnology}, 35\penalty0 (4):\penalty0 316--319,
+  2017.
+\newblock \doi{10.1038/nbt.3820}.
+
+\bibitem[Lannelongue et~al.(2021)Lannelongue, Grealey, and
+  Inouye]{lannelongue2021green}
+Loïc Lannelongue, Jason Grealey, and Michael Inouye.
+\newblock Green algorithms: Quantifying the carbon footprint of computation.
+\newblock \emph{Advanced Science}, 8\penalty0 (12), May 2021.
+\newblock ISSN 2198-3844.
+\newblock \doi{10.1002/advs.202100707}.
+\newblock URL \url{http://dx.doi.org/10.1002/advs.202100707}.
+
+\bibitem[M\"{o}lder et~al.(2021)M\"{o}lder, Jablonski, Letcher, Hall,
+  Tomkins-Tinch, Sochat, Forster, Lee, Twardziok, Kanitz, Wilm, Holtgrewe,
+  Rahmann, Nahnsen, and K\"{o}ster]{molder2021snakemake}
+Felix M\"{o}lder, Kim~Philipp Jablonski, Brice Letcher, Michael~B. Hall,
+  Christopher~H. Tomkins-Tinch, Vanessa Sochat, Jan Forster, Soohyun Lee,
+  Sven~O. Twardziok, Alexander Kanitz, Andreas Wilm, Manuel Holtgrewe, Sven
+  Rahmann, Sven Nahnsen, and Johannes K\"{o}ster.
+\newblock Sustainable data analysis with snakemake.
+\newblock \emph{F1000Research}, 10:\penalty0 33, April 2021.
+\newblock ISSN 2046-1402.
+\newblock \doi{10.12688/f1000research.29032.2}.
+\newblock URL \url{http://dx.doi.org/10.12688/f1000research.29032.2}.
+
+\bibitem[Wang et~al.(2020)Wang, Chen, and Xiao]{slurm_adoption}
+Bo~Wang, Zhiguang Chen, and Nong Xiao.
+\newblock A survey of system scheduling for hpc and big data.
+\newblock In \emph{Proceedings of the 2020 4th International Conference on High
+  Performance Compilation, Computing and Communications}, HP3C 2020, page
+  178–183. ACM, June 2020.
+\newblock \doi{10.1145/3407947.3407977}.
+\newblock URL \url{http://dx.doi.org/10.1145/3407947.3407977}.
+
+\bibitem[Yoo et~al.(2003)Yoo, Jette, and Grondona]{jette2002slurm}
+Andy~B. Yoo, Morris~A. Jette, and Mark Grondona.
+\newblock Slurm: Simple linux utility for resource management.
+\newblock In \emph{Job Scheduling Strategies for Parallel Processing}, page
+  44–60. Springer Berlin Heidelberg, 2003.
+\newblock ISBN 9783540397274.
+\newblock \doi{10.1007/10968987_3}.
+\newblock URL \url{http://dx.doi.org/10.1007/10968987_3}.
+
+\end{thebibliography}

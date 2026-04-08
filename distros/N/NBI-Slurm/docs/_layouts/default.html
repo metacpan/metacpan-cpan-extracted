@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} — {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Design tokens ───────────────────────────────────────────────── */
+    :root {
+      --bg:           #f8f7f5;
+      --surface:      #ffffff;
+      --surface-alt:  #f0ede8;
+      --border:       #ddd8d0;
+      --border-mid:   #c8c2b8;
+      --text:         #1a1816;
+      --text-muted:   #6b6460;
+      --text-faint:   #9e9890;
+      --accent:        #1e4d8c;
+      --accent-hover: #1a3f73;
+      --accent-light: #e8eef7;
+      --green:        #2d7a45;
+      --red:          #a02020;
+      --code-bg:      #f0ede8;
+      --code-border:  #d8d2c8;
+      --radius:       6px;
+      --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+    }
+
+    /* ── Reset & base ────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 17px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* ── Top navigation bar ──────────────────────────────────────────── */
+    .topbar {
+      background: var(--accent);
+      color: #fff;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      height: 48px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    }
+    .topbar-logo {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-right: 0.5rem;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+    }
+    .topbar-logo span { opacity: 0.65; font-weight: 400; }
+    .topbar a { color: rgba(255,255,255,0.82); font-weight: 400; }
+    .topbar a:hover { color: #fff; text-decoration: none; }
+    .topbar a.active { color: #fff; font-weight: 600; border-bottom: 2px solid rgba(255,255,255,0.6); padding-bottom: 2px; }
+    .topbar-sep { color: rgba(255,255,255,0.25); }
+    .topbar-metacpan {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: var(--radius);
+      padding: 0.22rem 0.65rem;
+      font-size: 0.78rem;
+    }
+    .topbar-metacpan:hover { background: rgba(255,255,255,0.2); text-decoration: none !important; }
+    .topbar-github {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: rgba(255,255,255,0.82);
+      font-size: 0.8rem;
+    }
+    .topbar-github:hover { color: #fff; }
+
+    /* ── Page layout ─────────────────────────────────────────────────── */
+    .page-wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+    }
+    .page-wrap.has-sidebar {
+      display: grid;
+      grid-template-columns: 1fr 240px;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────────────── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      position: sticky;
+      top: 4rem;
+    }
+    .sidebar-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-section-title {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      padding: 0.5rem 0.9rem 0.3rem;
+      background: var(--surface-alt);
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-links { padding: 0.2rem 0; }
+    .sidebar-links a {
+      display: block;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.83rem;
+      color: var(--accent);
+      border-bottom: 1px solid #f2ede6;
+    }
+    .sidebar-links a:last-child { border-bottom: none; }
+    .sidebar-links a:hover { background: var(--accent-light); text-decoration: none; }
+    .sidebar-links a.current { background: var(--accent-light); font-weight: 600; color: var(--accent-hover); }
+    .sidebar-links a.external::after { content: " ↗"; font-size: 0.7rem; opacity: 0.6; }
+
+    /* ── Main content / Pod ──────────────────────────────────────────── */
+    .main-content { min-width: 0; }
+
+    .pod { font-size: 1rem; }
+    .pod h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 2.5rem 0 0.65rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid var(--accent);
+      letter-spacing: -0.02em;
+    }
+    .pod h1:first-child { margin-top: 0; }
+    .pod h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 2rem 0 0.5rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .pod h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin: 1.4rem 0 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.82rem;
+    }
+    .pod h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 1.2rem 0 0.3rem;
+      font-family: var(--font-mono);
+    }
+    .pod p { margin-bottom: 0.95rem; }
+    .pod ul, .pod ol { margin: 0.5rem 0 1rem 1.4rem; }
+    .pod li { margin-bottom: 0.3rem; }
+    .pod code {
+      font-family: var(--font-mono);
+      font-size: 0.87em;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+      color: #2a2420;
+    }
+    .pod pre {
+      font-family: var(--font-mono);
+      font-size: 0.845rem;
+      line-height: 1.6;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 0.5rem 0 1.2rem;
+      color: var(--text);
+    }
+    .pod pre code { background: none; border: none; padding: 0; font-size: inherit; }
+    .pod dl { margin: 0.5rem 0 1.2rem; }
+    .pod dt {
+      font-family: var(--font-mono);
+      font-size: 0.87rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 0.8rem;
+      background: var(--surface-alt);
+      display: inline-block;
+      padding: 0.1em 0.5em;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent);
+    }
+    .pod dd {
+      margin: 0.25rem 0 0.6rem 1.3rem;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+    }
+    .pod hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .pod table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1.4rem;
+      font-size: 0.88rem;
+    }
+    .pod table th {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.75rem;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .pod table td {
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.75rem;
+      vertical-align: top;
+    }
+    .pod table tr:nth-child(even) td { background: var(--surface); }
+    .pod table td code { font-size: 0.83em; }
+
+    /* ── Hero section ────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #1e3a6e 0%, #1e4d8c 60%, #2563ab 100%);
+      color: #fff;
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      border-bottom: 3px solid #163660;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 99px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      font-family: var(--font-mono);
+    }
+    .hero p {
+      font-size: 1.1rem;
+      opacity: 0.85;
+      max-width: 620px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.3rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none !important;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid #fff;
+    }
+    .btn-primary:hover { background: #e8eef7; color: var(--accent-hover); }
+    .btn-outline {
+      background: transparent;
+      color: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.7); }
+
+    /* ── Install box ─────────────────────────────────────────────────── */
+    .install-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .install-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 0.45rem;
+    }
+    .install-box pre {
+      margin: 0;
+      background: var(--code-bg);
+      border-color: var(--code-border);
+    }
+
+    /* ── Feature grid ────────────────────────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+      margin: 2rem 0;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.4rem;
+    }
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+      text-transform: none;
+    }
+    .feature-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── Callout / admonition ────────────────────────────────────────── */
+    .callout {
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin: 1.2rem 0;
+      font-size: 0.92rem;
+    }
+    .callout-title {
+      font-weight: 600;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .callout-info {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      color: #1a2f50;
+    }
+    .callout-info .callout-title { color: var(--accent); }
+    .callout-tip {
+      background: #edf7f0;
+      border-left: 4px solid var(--green);
+      color: #1a3324;
+    }
+    .callout-tip .callout-title { color: var(--green); }
+    .callout-warning {
+      background: #fdf7ed;
+      border-left: 4px solid #c97f1e;
+      color: #3d2c0a;
+    }
+    .callout-warning .callout-title { color: #c97f1e; }
+
+    /* ── TOC ─────────────────────────────────────────────────────────── */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .toc-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 0.6rem;
+    }
+    .toc ul { list-style: none; columns: 2; column-gap: 1.5rem; }
+    .toc ul li { break-inside: avoid; }
+    .toc ul li a { font-size: 0.83rem; line-height: 1.9; color: var(--accent); }
+    .toc ul ul { columns: 1; margin-left: 1rem; }
+    .toc ul ul li a { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* ── Config reference table ──────────────────────────────────────── */
+    .config-key {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .config-default {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      color: var(--text-muted);
+    }
+
+    /* ── Versions / chips ────────────────────────────────────────────── */
+    .chip {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid #c5d4ec;
+      border-radius: 4px;
+      padding: 0.08rem 0.4rem;
+      vertical-align: middle;
+    }
+    .chip-green {
+      background: #edf7f0;
+      color: var(--green);
+      border-color: #b2d9be;
+    }
+
+    /* ── MetaCPAN reference box ──────────────────────────────────────── */
+    .metacpan-ref {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.3rem;
+      margin: 2rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .metacpan-ref-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .metacpan-ref-body { min-width: 0; }
+    .metacpan-ref-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 0.3rem;
+    }
+    .metacpan-ref-links { display: flex; flex-wrap: wrap; gap: 0.4rem 0.6rem; margin-top: 0.5rem; }
+    .metacpan-ref-links a {
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      background: var(--accent-light);
+      border: 1px solid #c5d4ec;
+      border-radius: 4px;
+      padding: 0.1rem 0.5rem;
+    }
+    .metacpan-ref-links a:hover { background: #d4e2f5; text-decoration: none; }
+
+    /* ── Footer ──────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-faint);
+      margin-top: 3rem;
+    }
+    footer a { color: var(--text-muted); }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+
+    /* ── Breadcrumb ──────────────────────────────────────────────────── */
+    .breadcrumb {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--accent); }
+    .breadcrumb .sep { color: var(--border-mid); }
+    .breadcrumb .current { color: var(--text); font-weight: 500; }
+
+    /* ── Step indicators ─────────────────────────────────────────────── */
+    .step {
+      display: flex;
+      gap: 1.1rem;
+      margin: 1.5rem 0;
+      align-items: flex-start;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-top: 0.1rem;
+    }
+    .step-body { min-width: 0; flex: 1; }
+    .step-body h4 {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+      font-family: var(--font-body);
+    }
+    .step-body p { font-size: 0.9rem; margin-bottom: 0.4rem; }
+
+    /* ── Responsive ──────────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .page-wrap.has-sidebar { grid-template-columns: 1fr; }
+      .sidebar { position: static; order: -1; }
+      .toc ul { columns: 1; }
+      .hero h1 { font-size: 1.8rem; }
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 580px) {
+      .topbar { gap: 0.75rem; font-size: 0.78rem; }
+      .topbar-logo { font-size: 0.9rem; }
+      .hero { padding: 2.5rem 1.25rem 2rem; }
+      .page-wrap { padding: 1.5rem 1rem 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top navigation ────────────────────────────────────────────────── -->
+<nav class="topbar">
+  <a href="{{ site.baseurl }}/" class="topbar-logo" style="text-decoration:none">NBI<span>::</span>Slurm</a>
+
+  {% for item in site.nav %}
+  <a href="{{ site.baseurl }}{{ item.url }}"
+     {% if page.url == item.url or page.url == item.url | append: 'index.html' %}class="active"{% endif %}>
+    {{ item.title }}
+  </a>
+  {% endfor %}
+
+  <a href="https://github.com/quadram-institute-bioscience/NBI-Slurm" class="topbar-github" target="_blank" rel="noopener">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </svg>
+    GitHub
+  </a>
+
+  <a href="https://metacpan.org/dist/NBI-Slurm" class="topbar-metacpan" target="_blank" rel="noopener">
+    &#x1F4E6; MetaCPAN
+  </a>
+</nav>
+
+<!-- ── Breadcrumb (skip on home) ─────────────────────────────────────── -->
+{% if page.url != "/" and page.url != "/index.html" %}
+<div class="breadcrumb">
+  <a href="{{ site.baseurl }}/">NBI::Slurm</a>
+  <span class="sep">/</span>
+  <span class="current">{{ page.title }}</span>
+</div>
+{% endif %}
+
+<!-- ── Page body ─────────────────────────────────────────────────────── -->
+{% if page.hero %}
+<div class="hero">
+  <div class="hero-badge">Perl &middot; HPC &middot; SLURM</div>
+  <h1>{{ page.hero_title | default: site.title }}</h1>
+  <p>{{ page.hero_desc | default: site.description }}</p>
+  <div class="hero-actions">
+    <a href="{{ site.baseurl }}/tutorial/" class="btn btn-primary">Get Started</a>
+    <a href="https://metacpan.org/dist/NBI-Slurm" class="btn btn-outline" target="_blank" rel="noopener">API Reference ↗</a>
+    <a href="https://github.com/quadram-institute-bioscience/NBI-Slurm" class="btn btn-outline" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</div>
+{% endif %}
+
+{% if page.sidebar %}
+<div class="page-wrap has-sidebar">
+  <main class="main-content pod">
+    {{ content }}
+  </main>
+  <aside class="sidebar">
+    <!-- On-page nav -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">On this page</div>
+      <div class="sidebar-links">
+        {% for item in page.toc %}
+        <a href="#{{ item.id }}">{{ item.title }}</a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Documentation pages -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Documentation</div>
+      <div class="sidebar-links">
+        <a href="{{ site.baseurl }}/" {% if page.url == "/" %}class="current"{% endif %}>Home</a>
+        <a href="{{ site.baseurl }}/tutorial/" {% if page.url contains "tutorial" %}class="current"{% endif %}>Tutorial</a>
+        <a href="{{ site.baseurl }}/configuration/" {% if page.url contains "configuration" %}class="current"{% endif %}>Configuration</a>
+      </div>
+    </div>
+
+    <!-- MetaCPAN API Reference -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">API Reference</div>
+      <div class="sidebar-links">
+        <a href="https://metacpan.org/pod/NBI::Slurm" class="external" target="_blank" rel="noopener">NBI::Slurm</a>
+        <a href="https://metacpan.org/pod/NBI::Job" class="external" target="_blank" rel="noopener">NBI::Job</a>
+        <a href="https://metacpan.org/pod/NBI::Opts" class="external" target="_blank" rel="noopener">NBI::Opts</a>
+        <a href="https://metacpan.org/pod/NBI::Queue" class="external" target="_blank" rel="noopener">NBI::Queue</a>
+        <a href="https://metacpan.org/pod/NBI::QueuedJob" class="external" target="_blank" rel="noopener">NBI::QueuedJob</a>
+        <a href="https://metacpan.org/pod/NBI::EcoScheduler" class="external" target="_blank" rel="noopener">NBI::EcoScheduler</a>
+      </div>
+    </div>
+
+    <!-- CLI tools -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">CLI Tools</div>
+      <div class="sidebar-links">
+        <a href="https://metacpan.org/dist/NBI-Slurm/view/bin/runjob" class="external" target="_blank" rel="noopener">runjob</a>
+        <a href="https://metacpan.org/dist/NBI-Slurm/view/bin/lsjobs" class="external" target="_blank" rel="noopener">lsjobs</a>
+        <a href="https://metacpan.org/dist/NBI-Slurm/view/bin/waitjobs" class="external" target="_blank" rel="noopener">waitjobs</a>
+        <a href="https://metacpan.org/dist/NBI-Slurm/view/bin/whojobs" class="external" target="_blank" rel="noopener">whojobs</a>
+        <a href="https://metacpan.org/dist/NBI-Slurm/view/bin/session" class="external" target="_blank" rel="noopener">session</a>
+        <a href="https://metacpan.org/dist/NBI-Slurm/view/bin/shelf" class="external" target="_blank" rel="noopener">shelf</a>
+      </div>
+    </div>
+  </aside>
+</div>
+{% else %}
+<div class="page-wrap">
+  <main class="main-content pod">
+    {{ content }}
+  </main>
+</div>
+{% endif %}
+
+<!-- ── Footer ────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-links">
+    <a href="{{ site.baseurl }}/">Home</a>
+    <a href="{{ site.baseurl }}/tutorial/">Tutorial</a>
+    <a href="{{ site.baseurl }}/configuration/">Configuration</a>
+    <a href="https://metacpan.org/dist/NBI-Slurm" target="_blank" rel="noopener">MetaCPAN</a>
+    <a href="https://github.com/quadram-institute-bioscience/NBI-Slurm" target="_blank" rel="noopener">GitHub</a>
+  </div>
+  <p>NBI::Slurm &mdash; A Perl toolkit for SLURM HPC clusters &mdash; by <a href="https://metacpan.org/author/PROCH" target="_blank" rel="noopener">Andrea Telatin</a></p>
+</footer>
+
+</body>
+</html>

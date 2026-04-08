@@ -12,6 +12,7 @@ examples/devtools_example.pl
 examples/dialog_example.pl
 examples/dragdrop_example.pl
 examples/element_example.pl
+examples/form_example.pl
 examples/hot_reload_content.html
 examples/hot_reload_example.pl
 examples/log_example.pl
@@ -31,6 +32,7 @@ include/chandra/chandra_contextmenu.h
 include/chandra/chandra_devtools.h
 include/chandra/chandra_element.h
 include/chandra/chandra_error.h
+include/chandra/chandra_form.h
 include/chandra/chandra_internal.h
 include/chandra/chandra_log.h
 include/chandra/chandra_notify.h
@@ -61,6 +63,7 @@ lib/Chandra/DragDrop.pm
 lib/Chandra/Element.pm
 lib/Chandra/Error.pm
 lib/Chandra/Event.pm
+lib/Chandra/Form.pm
 lib/Chandra/HotReload.pm
 lib/Chandra/Log.pm
 lib/Chandra/Notify.pm
@@ -132,10 +135,13 @@ t/51_contextmenu.t
 t/52_contextmenu_edge.t
 t/57_log.t
 t/58_log_edge.t
+t/59_form.t
+t/60_form_edge.t
 t/61_splash.t
 t/62_splash_edge.t
 t/65_token.t
 t/66_token_edge.t
+t/lib/Chandra/Test/Display.pm
 typemap
 xs/app.xs
 xs/assets.xs
@@ -148,6 +154,7 @@ xs/devtools.xs
 xs/dialog.xs
 xs/dragdrop.xs
 xs/element.xs
+xs/form.xs
 xs/error.xs
 xs/event.xs
 xs/hotreload.xs

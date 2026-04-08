@@ -5,7 +5,7 @@ use warnings;
 
 package Data::JSEmail;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use JSON;
 use JSON::XS;
@@ -23,6 +23,8 @@ use DateTime::Format::Mail;
 use DateTime::Format::ISO8601::Format;
 
 use Digest::SHA;
+use Data::UUID;
+use Sys::Hostname;
 
 my $json = JSON::XS->new->utf8->canonical();
 
@@ -120,10 +122,22 @@ sub bodystructure {
     }
     $partno ||= '1';
     my $body = $eml->body();
+    my $raw_size = length($body); # size in octets of decoded content
     if ($type->{type} eq 'text') {
+      # Decode charset to Perl character string
+      my $decoded = eval { $eml->body_str() };
+      if (defined $decoded) {
+        $body = $decoded;
+      } else {
+        # Fallback: try UTF-8 decode
+        $body = eval { Encode::decode('UTF-8', $body) } // $body;
+      }
+      # RFC 8621: line endings in bodyValues MUST be \n not \r\n
+      my $text_body = $body;
+      $text_body =~ s/\r\n/\n/g;
       $values->{$partno} = {
-        value => $body,
-        isEncodingProblem => $JSON::false,
+        value => $text_body,
+        isEncodingProblem => (defined $decoded ? $JSON::false : $JSON::true),
         isTruncated => $JSON::false,
       };
     }
@@ -135,7 +149,7 @@ sub bodystructure {
       partId => "$partno",
       blobId => "m-$id-$partno",
       type => "$type->{type}/$type->{subtype}",
-      size => length($body),
+      size => $raw_size,
       headers => headers($eml),
       name => $disposition->{attributes}{filename} // $type->{attributes}{name},
       cid => asOneURL($eml->header('Content-Id')),
@@ -150,7 +164,11 @@ sub bodystructure {
 sub asDate {
   my $val = shift;
   return undef unless defined $val;
-  $val =~ s/\(.*//;
+  $val =~ s/\(.*//;  # strip comments
+  $val =~ s/^\s+//;  # strip leading whitespace
+  $val =~ s/\s+$//;  # strip trailing whitespace
+  # Add :00 seconds if missing (e.g. "23:32 -0330" → "23:32:00 -0330")
+  $val =~ s/(\s\d{2}:\d{2})\s+([-+]\d{4})/$1:00 $2/;
   my $dt = eval { DateTime::Format::Mail->parse_datetime($val) };
   return undef unless $dt;
   my $tz = $dt->time_zone;
@@ -177,22 +195,24 @@ sub asCommaList {
   return \@list;
 }
 
-# NOTE: this is totally bogus..
 sub asURLs {
   my $val = shift;
   return undef unless defined $val;
-  unless ($val =~ m/\<.*\>/) {
-    $val =~ s/^\s+//;
-    $val =~ s/ .*//; # strip everything after first whitespace
-    return undef unless length($val);
-    return [$val];
-  }
+  $val =~ s/^\s+//;
+  $val =~ s/\s+$//;
+  return undef unless length($val);
 
+  # Extract URLs from angle brackets
   my @list;
   while ($val =~ m/<([^>]+)>/gs) {
     push @list, $1;
   }
-  return \@list;
+  return \@list if @list;
+
+  # No angle brackets — treat whole value as a URL if it looks like one
+  return undef unless $val =~ m{^[a-zA-Z][a-zA-Z0-9+.-]*:};
+  $val =~ s/ .*//; # strip after first whitespace
+  return [$val];
 }
 
 sub asOneURL {
@@ -204,7 +224,14 @@ sub asOneURL {
 sub asText {
   my $val = shift;
   return undef unless defined $val;
-  my $res = encode_utf8(NFC(decode('MIME-Header', $val)));
+  # Decode MIME-Header encoded words, then NFC normalize
+  my $decoded = eval { decode('MIME-Header', $val) };
+  $decoded = $val unless defined $decoded;
+  # If still raw bytes (not flagged as UTF-8), try UTF-8 decode
+  if (!Encode::is_utf8($decoded) && $decoded =~ /[\x80-\xff]/) {
+    $decoded = eval { Encode::decode('UTF-8', $decoded) } // $decoded;
+  }
+  my $res = NFC($decoded);
   $res =~ s/^\s*//;
   $res =~ s/\s*$//;
   return $res;
@@ -220,11 +247,42 @@ sub asAddresses {
   return $arr;
 }
 
+sub asGroupedAddresses {
+  # RFC 8621: returns EmailAddressGroup[] — [{name, addresses}]
+  my $emails = shift;
+  return undef unless defined $emails;
+  my $addrs = eval { Email::MIME::Header::AddressList->from_mime_string($emails) };
+  return undef unless $addrs;
+  my @addrs = $addrs->groups();
+  my @res;
+  while (@addrs) {
+    my $group = shift @addrs;
+    my $list = shift @addrs;
+    my @addresses;
+    foreach my $addr (@$list) {
+      my $name = $addr->phrase();
+      my $email = $addr->address();
+      $email =~ s/\@(.*)/"@" . lc($1)/e if $email;
+      push @addresses, {
+        name => asText($name),
+        email => $email,
+      };
+    }
+    push @res, {
+      name => defined $group ? asText($group) : undef,
+      addresses => \@addresses,
+    };
+  }
+  return \@res;
+}
+
 sub asGroupAddresses {
+  # Internal format with sentinel entries (backward compat)
   my $emails = shift;
 
   return undef unless defined $emails;
-  my $addrs = Email::MIME::Header::AddressList->from_mime_string($emails);
+  my $addrs = eval { Email::MIME::Header::AddressList->from_mime_string($emails) };
+  return undef unless $addrs;
   my @addrs = $addrs->groups();
   my @res;
   while (@addrs) {
@@ -258,15 +316,25 @@ sub asGroupAddresses {
 
 sub headers {
   my $eml = shift;
-  my @list = $eml->header_obj->header_raw_pairs();
+  # Parse raw header string to preserve exact values including
+  # leading whitespace after colon (RFC 8621 raw header form)
+  my $raw = $eml->header_obj->as_string;
   my @res;
-  while (@list) {
-   my $name = shift @list;
-   my $value = shift @list;
-    push @res, {
-      name => $name,
-      value => $value,
-    };
+  # Unfold continuation lines first, then split on header boundaries
+  my @lines;
+  for my $line (split /\r?\n/, $raw) {
+    if ($line =~ /^\s/ && @lines) {
+      # Continuation line — append to previous
+      $lines[-1] .= "\r\n$line";
+    }
+    elsif ($line =~ /^([^:]+):(.*)/) {
+      push @lines, $line;
+    }
+  }
+  for my $line (@lines) {
+    if ($line =~ /^([^:]+):(.*)$/s) {
+      push @res, { name => $1, value => $2 };
+    }
   }
   return \@res;
 }
@@ -335,21 +403,26 @@ sub parseStructure {
   my $htmlBody = shift;
   my $attachments = shift;
 
+  my $textCount = $textBody ? scalar @$textBody : -1;
+  my $htmlCount = $htmlBody ? scalar @$htmlBody : -1;
+
   for (my $i = 0; $i < @$parts; $i++) {
     my $part = $parts->[$i];
     my $isMultipart = $part->{type} =~ m{^multipart/(.*)};
     my $subMultiType = $isMultipart ? $1 : '';
-    my $isInline = ($part->{disposition}//'none') ne 'attachment' &&
-        # Must be one of the allowed body types
-        ( $part->{type} eq 'text/plain' ||
-          $part->{type} eq 'text/html' ||
-          isInlineMediaType($part->{type}) ) &&
-        # If multipart/related, only the first part can be inline
-        # If a text part with a filename, and not the first item in the
-        # multipart, assume it is an attachment
+
+    # Determine part type (matching Cyrus classification)
+    my $isPlain = $part->{type} eq 'text/plain'
+               || $part->{type} eq 'text/richtext'
+               || $part->{type} eq 'text/enriched';
+    my $isHTML = $part->{type} eq 'text/html';
+    my $isInlineMedia = isInlineMediaType($part->{type});
+
+    my $isInline = ($part->{disposition} // '') ne 'attachment' &&
+        ($isPlain || $isHTML || $isInlineMedia) &&
         ($i == 0 ||
             ( $multipartType ne 'related' &&
-                ( isInlineMediaType($part->{type}) || !$part->{name} ) ) );
+                ( $isInlineMedia || !$part->{name} ) ) );
 
     if ($isMultipart) {
       parseStructure($part->{subParts}, $subMultiType,
@@ -358,33 +431,60 @@ sub parseStructure {
     }
     elsif ($isInline) {
       if ($multipartType eq 'alternative') {
-        if ($part->{type} eq 'text/plain') {
+        if ($isPlain && $textBody) {
           push @$textBody, $part;
-          next; #part
         }
-        elsif ($part->{type} eq 'text/html') {
+        elsif ($isHTML && $htmlBody) {
           push @$htmlBody, $part;
-          next; #part
+        }
+        else {
+          push @$attachments, $part;
+        }
+        next;
+      }
+      # Inside an alternative ancestor: seeing a text part means
+      # we can't also use it for HTML, and vice versa
+      if ($inAlternative) {
+        if ($isPlain) {
+          $htmlBody = undef;
+        }
+        elsif ($isHTML) {
+          $textBody = undef;
         }
       }
-      push @$textBody, $part;
-      push @$htmlBody, $part;
+      push @$textBody, $part if $textBody;
+      push @$htmlBody, $part if $htmlBody;
+      if ((!$textBody || !$htmlBody) && $isInlineMedia) {
+        push @$attachments, $part;
+      }
     }
     else {
       push @$attachments, $part;
     }
   }
 
-  # XXX - handle "we didn't find a matching part in a current alternative for text/plain AND text/html
+  # Alternative fallback: if only one type was found, copy to the other
+  if ($multipartType eq 'alternative' && $textBody && $htmlBody) {
+    if ($textCount == scalar @$textBody) {
+      # No text parts found, copy HTML parts to text
+      push @$textBody, @{$htmlBody}[$htmlCount .. $#$htmlBody];
+    }
+    if ($htmlCount == scalar @$htmlBody) {
+      # No HTML parts found, copy text parts to HTML
+      push @$htmlBody, @{$textBody}[$textCount .. $#$textBody];
+    }
+  }
 }
 
 sub _mkone {
   my $h = shift;
-  if ($h->{name} ne '') {
-    return "\"$h->{name}\" <$h->{email}>";
+  my $email = $h->{email};
+  my $name = $h->{name};
+  if (defined $name && $name ne '') {
+    return qq{"$name" <$email>};
   }
   else {
-    return "$h->{email}";
+    return $email;
   }
 }
 
@@ -415,123 +515,430 @@ sub _detect_encoding {
   return 'base64';
 }
 
+sub _valid_cid {
+  my $cid = shift;
+  return 1 unless defined $cid;
+  # Content-ID msg-id: no angle brackets, no whitespace, no NUL
+  die "Invalid cid: must not contain < or >\n" if $cid =~ /[<>]/;
+  die "Invalid cid: must not contain whitespace\n" if $cid =~ /\s/;
+  die "Invalid cid: must not be empty\n" if $cid eq '';
+  return 1;
+}
+
 sub _makeatt {
   my $att = shift;
   my $getblob = shift;
 
-  my %attributes = (
-    content_type => $att->{type},
-    name => $att->{name},
-    filename => $att->{name},
-    disposition => $att->{isInline} ? 'inline' : 'attachment',
-  );
+  my $disp = $att->{disposition} || ($att->{isInline} ? 'inline' : 'attachment');
 
-  my %headers;
-  if ($att->{cid}) {
-    $headers{'Content-ID'} = "<$att->{cid}>";
-  }
+  my %attributes = (
+    content_type => $att->{type} || 'application/octet-stream',
+    disposition => $disp,
+  );
+  $attributes{name} = $att->{name} if $att->{name};
+  $attributes{filename} = $att->{name} if $att->{name};
 
   my ($type, $content) = $getblob->($att->{blobId});
+  $content //= '';
 
-  $attributes{encoding} = _detect_encoding($content, $att->{type});
+  $attributes{encoding} = _detect_encoding($content, $attributes{content_type});
 
-  return Email::MIME->create(
+  my $part = Email::MIME->create(
     attributes => \%attributes,
-    headers => \%headers,
     body => $content,
   );
+
+  if ($att->{cid}) {
+    _valid_cid($att->{cid});
+    $part->header_str_set('Content-ID' => "<$att->{cid}>");
+  }
+  if ($att->{language} && ref($att->{language}) eq 'ARRAY') {
+    $part->header_str_set('Content-Language' => join(', ', @{$att->{language}}));
+  }
+
+  return $part;
+}
+
+my $_uuid_gen;
+sub default_header_defaults {
+  my ($name) = @_;
+  if (lc($name) eq 'date') {
+    return Date::Format::time2str("%a, %d %b %Y %H:%M:%S %z", time());
+  }
+  if (lc($name) eq 'message-id') {
+    $_uuid_gen ||= Data::UUID->new;
+    my $uuid = $_uuid_gen->to_string($_uuid_gen->create);
+    my $host = hostname();
+    return "<$uuid\@$host>";
+  }
+  return undef;
+}
+
+sub _apply_headers {
+  my ($mime, $headers) = @_;
+  while (@$headers) {
+    my $name = shift @$headers;
+    my $val = shift @$headers;
+    next unless defined $val;
+    if (ref($val) eq 'ARRAY') {
+      $mime->header_str_set($name => @$val);
+    } else {
+      $mime->header_str_set($name => $val);
+    }
+  }
+}
+
+sub _build_bodystructure {
+  my ($node, $bodyValues, $getblob) = @_;
+
+  my $type = $node->{type} || 'text/plain';
+
+  if ($type =~ m{^multipart/}i) {
+    # Multipart: recursively build subParts
+    my @parts;
+    for my $sub (@{$node->{subParts} || []}) {
+      push @parts, _build_bodystructure($sub, $bodyValues, $getblob);
+    }
+    my $mime = Email::MIME->create(
+      attributes => { content_type => $type },
+      parts => \@parts,
+    );
+    # Apply header:* from this node
+    _apply_bodystructure_headers($mime, $node);
+    return $mime;
+  }
+
+  # Leaf part: get content from partId/bodyValues or blobId
+  my $content = '';
+  if ($node->{partId} && $bodyValues->{$node->{partId}}) {
+    $content = $bodyValues->{$node->{partId}}{value} // '';
+  } elsif ($node->{blobId} && $getblob) {
+    my ($btype, $bcontent) = $getblob->($node->{blobId});
+    $content = $bcontent // '';
+  }
+
+  my $charset = 'us-ascii';
+  if ($type =~ m{^text/}i) {
+    $charset = ($content =~ /[^\x{00}-\x{7f}]/) ? 'UTF-8' : 'us-ascii';
+  }
+
+  my %attrs = (content_type => $type);
+  $attrs{charset} = $charset if $type =~ m{^text/}i;
+  $attrs{disposition} = $node->{disposition} if $node->{disposition};
+  $attrs{filename} = $node->{name} if $node->{name};
+  $attrs{name} = $node->{name} if $node->{name};
+
+  my $body = ($charset eq 'UTF-8' && $type =~ m{^text/}i)
+    ? Encode::encode_utf8($content) : $content;
+
+  my $mime = Email::MIME->create(
+    attributes => \%attrs,
+    body => $body,
+  );
+
+  # Set body part metadata
+  if (defined $node->{cid}) {
+    _valid_cid($node->{cid});
+    $mime->header_str_set('Content-ID' => "<$node->{cid}>");
+  }
+  if ($node->{language} && ref($node->{language}) eq 'ARRAY') {
+    $mime->header_str_set('Content-Language' => join(', ', @{$node->{language}}));
+  }
+
+  # Apply header:* from this node
+  _apply_bodystructure_headers($mime, $node);
+
+  return $mime;
+}
+
+sub _apply_bodystructure_headers {
+  my ($mime, $node) = @_;
+  for my $key (keys %$node) {
+    next unless $key =~ /^header:(.+)/;
+    my $hname = $1;
+    my $hval = $node->{$key};
+    # Skip Content-* headers that are managed by Email::MIME
+    next if $hname =~ /^Content-/i;
+    if (ref($hval) eq 'ARRAY') {
+      $mime->header_str_set($hname => @$hval);
+    } else {
+      $mime->header_str_set($hname => $hval) if defined $hval;
+    }
+  }
 }
 
 sub make {
   my $args = shift;
   my $getblob = shift;
+  my $defaults_cb = shift || \&default_header_defaults;
 
-  my @header = (
-    From => _mkemail($args->{from}),
-    To => _mkemail($args->{to}),
-    Cc => _mkemail($args->{cc}),
-    Bcc => _mkemail($args->{bcc}),
-    Subject => $args->{subject},
-    Date => Date::Format::time2str("%a, %d %b %Y %H:%M:%S %z", $args->{msgdate}),
-  );
-  if ($args->{messageId} && @{$args->{messageId}}) {
-    push @header, 'Message-ID' => '<' . $args->{messageId}[0] . '>';
+  # RFC 8621 Email/set create format:
+  #   from, to, cc, bcc, replyTo, sender: EmailAddress[]
+  #   subject: String
+  #   sentAt: Date (optional)
+  #   messageId, inReplyTo, references: String[]
+  #   textBody: EmailBodyPart[] (each with partId referencing bodyValues)
+  #   htmlBody: EmailBodyPart[] (each with partId referencing bodyValues)
+  #   bodyValues: Id[EmailBodyValue] (partId => {value: String})
+  #   attachments: EmailBodyPart[] (each with blobId)
+
+  # Follow RFC 8621 / Cyrus precedence:
+  #   1. header:* properties (already converted from typed forms by caller)
+  #   2. Convenience properties (only if header:* didn't set that header)
+  #   3. Defaults (only if neither header:* nor convenience set the header)
+
+  # Step 1: Collect top-level header:* overrides into a lookup
+  my %header_override;  # lc(name) => 1
+  for my $key (keys %$args) {
+    next unless $key =~ /^header:(.+)/;
+    $header_override{lc $1} = 1;
   }
-  if ($args->{inReplyTo} && @{$args->{inReplyTo}}) {
+
+  my @header;
+
+  # Step 2: Convenience properties (skip if header:* already provides it)
+  push @header, From => _mkemail($args->{from})
+    if $args->{from} && !$header_override{from};
+  push @header, To => _mkemail($args->{to})
+    if $args->{to} && !$header_override{to};
+  push @header, Cc => _mkemail($args->{cc})
+    if $args->{cc} && !$header_override{cc};
+  push @header, Bcc => _mkemail($args->{bcc})
+    if $args->{bcc} && !$header_override{bcc};
+  push @header, Subject => $args->{subject}
+    if defined($args->{subject}) && !$header_override{subject};
+  if (!$header_override{date}) {
+    if ($args->{sentAt}) {
+      push @header, Date => $args->{sentAt};
+    }
+    elsif ($args->{msgdate}) {
+      push @header, Date => Date::Format::time2str("%a, %d %b %Y %H:%M:%S %z", $args->{msgdate});
+    }
+  }
+  if ($args->{messageId} && ref($args->{messageId}) eq 'ARRAY' && @{$args->{messageId}}
+      && !$header_override{'message-id'}) {
+    push @header, 'Message-ID' => join(' ', map { "<$_>" } @{$args->{messageId}});
+  }
+  if ($args->{inReplyTo} && ref($args->{inReplyTo}) eq 'ARRAY' && @{$args->{inReplyTo}}
+      && !$header_override{'in-reply-to'}) {
     push @header, 'In-Reply-To' => join(' ', map { "<$_>" } @{$args->{inReplyTo}});
   }
-  if ($args->{references} && @{$args->{references}}) {
+  if ($args->{references} && ref($args->{references}) eq 'ARRAY' && @{$args->{references}}
+      && !$header_override{references}) {
     push @header, 'References' => join(' ', map { "<$_>" } @{$args->{references}});
   }
-  if ($args->{replyTo}) {
-    push @header, 'Reply-To' => _mkemail($args->{replyTo});
+  push @header, 'Reply-To' => _mkemail($args->{replyTo})
+    if $args->{replyTo} && !$header_override{'reply-to'};
+  push @header, Sender => _mkemail($args->{sender})
+    if $args->{sender} && !$header_override{sender};
+
+  # Step 2b: Add all header:* values
+  for my $key (keys %$args) {
+    next unless $key =~ /^header:(.+)/;
+    push @header, $1 => $args->{$key};
+  }
+  for my $partlist ($args->{textBody}, $args->{htmlBody}) {
+    next unless $partlist && ref($partlist) eq 'ARRAY';
+    for my $part (@$partlist) {
+      for my $key (keys %$part) {
+        next unless $key =~ /^header:(.+)/;
+        my $hname = $1;
+        # Only add if not already set by top-level header:* or convenience
+        my %have_so_far = map { lc($header[$_]) => 1 } grep { $_ % 2 == 0 } 0..$#header;
+        push @header, $hname => $part->{$key} unless $have_so_far{lc $hname};
+      }
+    }
   }
 
-  # massive switch
+  # Step 3: Defaults via callback (only if nothing set them)
+  my %have = map { lc($header[$_]) => 1 } grep { $_ % 2 == 0 } 0..$#header;
+  for my $name (qw(Date Message-ID)) {
+    next if $have{lc $name};
+    my $val = $defaults_cb->($name);
+    push @header, $name => $val if defined $val;
+  }
+
+  my $bodyValues = $args->{bodyValues} || {};
+
+  # bodyStructure mode: build MIME tree from bodyStructure recursively
+  if ($args->{bodyStructure}) {
+    my $MIME = _build_bodystructure($args->{bodyStructure}, $bodyValues, $getblob);
+
+    # Apply message-level headers to the top-level MIME part
+    while (@header) {
+      my $name = shift @header;
+      my $val = shift @header;
+      if (ref($val) eq 'ARRAY') {
+        # :all style - set multiple values
+        $MIME->header_str_set($name => @$val);
+      } else {
+        $MIME->header_str_set($name => $val) if defined $val;
+      }
+    }
+
+    my $res = $MIME->as_string();
+    $res =~ s/\r?\n/\r\n/gs;
+    return $res;
+  }
+
+  # Extract body content from bodyValues via textBody/htmlBody part references
+
+  my $textContent;
+  my $htmlContent;
+  my %textMeta;   # cid, language, disposition, name from body part
+  my %htmlMeta;
+
+  if ($args->{textBody} && ref($args->{textBody}) eq 'ARRAY') {
+    for my $part (@{$args->{textBody}}) {
+      my $partId = $part->{partId};
+      if ($partId && $bodyValues->{$partId}) {
+        $textContent = $bodyValues->{$partId}{value};
+        %textMeta = map { $_ => $part->{$_} } grep { defined $part->{$_} } qw(cid language disposition name);
+        last;
+      }
+      if ($part->{blobId} && $getblob) {
+        my ($type, $content) = $getblob->($part->{blobId});
+        $textContent = $content;
+        %textMeta = map { $_ => $part->{$_} } grep { defined $part->{$_} } qw(cid language disposition name);
+        last;
+      }
+    }
+  }
+
+  if ($args->{htmlBody} && ref($args->{htmlBody}) eq 'ARRAY') {
+    for my $part (@{$args->{htmlBody}}) {
+      my $partId = $part->{partId};
+      if ($partId && $bodyValues->{$partId}) {
+        $htmlContent = $bodyValues->{$partId}{value};
+        %htmlMeta = map { $_ => $part->{$_} } grep { defined $part->{$_} } qw(cid language disposition name);
+        last;
+      }
+      if ($part->{blobId} && $getblob) {
+        my ($type, $content) = $getblob->($part->{blobId});
+        $htmlContent = $content;
+        %htmlMeta = map { $_ => $part->{$_} } grep { defined $part->{$_} } qw(cid language disposition name);
+        last;
+      }
+    }
+  }
+
+  # Note: do NOT auto-generate text/plain from HTML. Per RFC 8621,
+  # if only htmlBody is provided, the server creates a single text/html
+  # part that appears in both textBody and htmlBody of the response.
+  # Generating a multipart/alternative would change the structure.
+
+  # Build MIME parts
   my $MIME;
+  my $textpart;
   my $htmlpart;
-  my $text = $args->{textBody} ? $args->{textBody} : htmltotext($args->{htmlBody});
-  my $textpart = Email::MIME->create(
-    attributes => {
-      content_type => 'text/plain',
-      charset => 'UTF-8',
-    },
-    body => Encode::encode_utf8($text),
-  );
-  if ($args->{htmlBody}) {
-    $htmlpart = Email::MIME->create(
-      attributes => {
-        content_type => 'text/html',
-        charset => 'UTF-8',
-      },
-      body => Encode::encode_utf8($args->{htmlBody}),
+
+  if (defined $textContent) {
+    my $charset = ($textContent =~ /[^\x{00}-\x{7f}]/) ? 'UTF-8' : 'us-ascii';
+    my %attrs = (content_type => 'text/plain', charset => $charset);
+    $attrs{disposition} = $textMeta{disposition} if $textMeta{disposition};
+    $attrs{filename} = $textMeta{name} if $textMeta{name};
+    $attrs{name} = $textMeta{name} if $textMeta{name};
+    $textpart = Email::MIME->create(
+      attributes => \%attrs,
+      body => $charset eq 'UTF-8' ? Encode::encode_utf8($textContent) : $textContent,
     );
+    if ($textMeta{cid}) {
+      _valid_cid($textMeta{cid});
+      $textpart->header_str_set('Content-ID' => "<$textMeta{cid}>");
+    }
+    if ($textMeta{language} && ref($textMeta{language}) eq 'ARRAY') {
+      $textpart->header_str_set('Content-Language' => join(', ', @{$textMeta{language}}));
+    }
   }
 
-  my @attachments = $args->{attachments} ? @{$args->{attachments}} : ();
+  if (defined $htmlContent) {
+    my $charset = ($htmlContent =~ /[^\x{00}-\x{7f}]/) ? 'UTF-8' : 'us-ascii';
+    my %attrs = (content_type => 'text/html', charset => $charset);
+    $attrs{disposition} = $htmlMeta{disposition} if $htmlMeta{disposition};
+    $attrs{filename} = $htmlMeta{name} if $htmlMeta{name};
+    $attrs{name} = $htmlMeta{name} if $htmlMeta{name};
+    $htmlpart = Email::MIME->create(
+      attributes => \%attrs,
+      body => $charset eq 'UTF-8' ? Encode::encode_utf8($htmlContent) : $htmlContent,
+    );
+    if ($htmlMeta{cid}) {
+      _valid_cid($htmlMeta{cid});
+      $htmlpart->header_str_set('Content-ID' => "<$htmlMeta{cid}>");
+    }
+    if ($htmlMeta{language} && ref($htmlMeta{language}) eq 'ARRAY') {
+      $htmlpart->header_str_set('Content-Language' => join(', ', @{$htmlMeta{language}}));
+    }
+  }
 
-  if (@attachments) {
-    my @attparts = map { _makeatt($_, $getblob) } @attachments;
-    # most complex case
-    if ($htmlpart) {
-      my $msgparts = Email::MIME->create(
-        attributes => {
-          content_type => 'multipart/alternative'
-        },
+  my @attparts;
+  if ($args->{attachments} && ref($args->{attachments}) eq 'ARRAY') {
+    for my $att (@{$args->{attachments}}) {
+      if ($att->{partId} && $bodyValues->{$att->{partId}}) {
+        # Content from bodyValues
+        my $content = $bodyValues->{$att->{partId}}{value} // '';
+        my $disp = $att->{disposition} || 'attachment';
+        my %attrs = (
+          content_type => $att->{type} || 'application/octet-stream',
+          disposition => $disp,
+        );
+        $attrs{filename} = $att->{name} if $att->{name};
+        $attrs{name} = $att->{name} if $att->{name};
+        $attrs{encoding} = _detect_encoding($content, $attrs{content_type});
+        my $part = Email::MIME->create(attributes => \%attrs, body => $content);
+        if ($att->{cid}) {
+          _valid_cid($att->{cid});
+          $part->header_str_set('Content-ID' => "<$att->{cid}>");
+        }
+        $part->header_str_set('Content-Language' => join(', ', @{$att->{language}}))
+          if $att->{language} && ref($att->{language}) eq 'ARRAY';
+        push @attparts, $part;
+      }
+      elsif ($att->{blobId} && $getblob) {
+        push @attparts, _makeatt($att, $getblob);
+      }
+    }
+  }
+
+  # Assemble the MIME structure
+  if (@attparts) {
+    my $body;
+    if ($textpart && $htmlpart) {
+      $body = Email::MIME->create(
+        attributes => { content_type => 'multipart/alternative' },
         parts => [$textpart, $htmlpart],
-      );
-      $MIME = Email::MIME->create(
-        header_str => [@header, 'Content-Type' => 'multipart/mixed'],
-        parts => [$msgparts, @attparts],
       );
     }
     else {
-      $MIME = Email::MIME->create(
-        header_str => [@header, 'Content-Type' => 'multipart/mixed'],
-        parts => [$textpart, @attparts],
-      );
+      $body = $textpart || $htmlpart;
     }
+    $MIME = Email::MIME->create(
+      attributes => { content_type => 'multipart/mixed' },
+      parts => [$body, @attparts],
+    );
+    _apply_headers($MIME, \@header);
+  }
+  elsif ($textpart && $htmlpart) {
+    $MIME = Email::MIME->create(
+      attributes => { content_type => 'multipart/alternative' },
+      parts => [$textpart, $htmlpart],
+    );
+    _apply_headers($MIME, \@header);
+  }
+  elsif ($textpart) {
+    # Add message headers to the existing part (preserves Content-ID etc.)
+    _apply_headers($textpart, \@header);
+    $MIME = $textpart;
+  }
+  elsif ($htmlpart) {
+    _apply_headers($htmlpart, \@header);
+    $MIME = $htmlpart;
   }
   else {
-    if ($htmlpart) {
-      $MIME = Email::MIME->create(
-        attributes => {
-          content_type => 'multipart/alternative',
-        },
-        header_str => \@header,
-        parts => [$textpart, $htmlpart],
-      );
-    }
-    else {
-      $MIME = Email::MIME->create(
-        attributes => {
-          content_type => 'text/plain',
-          charset => 'UTF-8',
-        },
-        header_str => \@header,
-        body => $args->{textBody},
-      );
-    }
+    $MIME = Email::MIME->create(
+      attributes => { content_type => 'text/plain', charset => 'us-ascii' },
+      body => '',
+    );
+    _apply_headers($MIME, \@header);
   }
 
   my $res = $MIME->as_string();

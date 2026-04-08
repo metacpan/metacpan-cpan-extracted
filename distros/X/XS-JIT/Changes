@@ -1,5 +1,11 @@
 Revision history for XS-JIT
 
+0.18	2026-04-07
+	- Fix Win32 linking: append -lperl5XX derived from $Config{libperl}
+	  (Windows DLLs must resolve all symbols at link time)
+	- Fix preprocessor detection on Win32: use File::Spec->devnull()
+	  instead of hardcoded /dev/null
+
 0.17	2026-04-06
 	- Various attempts at fixing cpantester failures
 

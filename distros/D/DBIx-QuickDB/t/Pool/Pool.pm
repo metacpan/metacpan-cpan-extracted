@@ -2,6 +2,7 @@ package Test::Pool;
 BEGIN { $INC{'Test/Pool.pm'} = __FILE__ }
 
 use Test2::V0 -target => 'DBIx::QuickDB::Pool';
+use File::Spec;
 use File::Temp qw/tempdir/;
 use Time::HiRes qw/time/;
 use Capture::Tiny qw/capture/;
@@ -461,8 +462,9 @@ subtest instance_dir => sub {
 
     my $found = 0;
     for my $path (readdir($dh)) {
-        next unless $path =~ m/^\Q$ENV{USER}\E-.*$/;
-        is("$instdir/$path", $db->dir, "Database was stored in the instance dir");
+        my $user = $ENV{USER} // $ENV{USERNAME} // 'quickdb';
+        next unless $path =~ m/^\Q$user\E-.*$/;
+        is(File::Spec->canonpath("$instdir/$path"), File::Spec->canonpath($db->dir), "Database was stored in the instance dir");
         $found++;
     }
 

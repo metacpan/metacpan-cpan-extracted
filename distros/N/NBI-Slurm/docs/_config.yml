@@ -1,0 +1,43 @@
+title: "NBI::Slurm"
+description: "A Perl toolkit for SLURM HPC job management — submit, monitor, and schedule jobs with ease."
+baseurl: "/NBI-Slurm"
+url: "https://quadram-institute-bioscience.github.io"
+
+author: "Andrea Telatin"
+github_repo: "https://github.com/quadram-institute-bioscience/NBI-Slurm"
+metacpan_url: "https://metacpan.org/dist/NBI-Slurm"
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+permalink: /:path/
+
+nav:
+  - title: "Home"
+    url: "/"
+  - title: "Tutorial"
+    url: "/tutorial/"
+  - title: "Configuration"
+    url: "/configuration/"
+
+metacpan_links:
+  - title: "NBI::Slurm"
+    url: "https://metacpan.org/pod/NBI::Slurm"
+  - title: "NBI::Job"
+    url: "https://metacpan.org/pod/NBI::Job"
+  - title: "NBI::Opts"
+    url: "https://metacpan.org/pod/NBI::Opts"
+  - title: "NBI::Queue"
+    url: "https://metacpan.org/pod/NBI::Queue"
+  - title: "NBI::QueuedJob"
+    url: "https://metacpan.org/pod/NBI::QueuedJob"
+  - title: "NBI::EcoScheduler"
+    url: "https://metacpan.org/pod/NBI::EcoScheduler"
+
+exclude:
+  - "v1.html"
+  - "Gemfile"
+  - "Gemfile.lock"

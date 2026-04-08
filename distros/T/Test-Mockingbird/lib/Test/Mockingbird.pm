@@ -34,11 +34,11 @@ Test::Mockingbird - Advanced mocking library for Perl with support for dependenc
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -951,6 +951,17 @@ sub _get_prototype {
 	my $code = $pkg->can($sub) or return;
 
 	return prototype($code);
+}
+
+=head2 DESTROY
+
+If C<Test::Mockingbird> goes out of scope, restore everything.
+
+=cut
+
+sub DESTROY
+{
+	restore_all();
 }
 
 =head1 SUPPORT

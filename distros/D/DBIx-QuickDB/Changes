@@ -1,3 +1,15 @@
+0.000041  2026-04-07 17:13:03-07:00 America/Los_Angeles
+
+    - Fix clone_dir cp fallback copying source dir into dest instead of contents
+    - Add unit tests for all clone_dir implementations
+    - Fix Windows warnings and test failures:
+      - SQLite version_string no longer warns when sqlite3 binary is missing
+      - Pool no longer warns about undefined $ENV{USER} on Windows
+      - Pool clear_old_cache closes file handle before remove_tree (Windows file locking)
+      - Test files no longer warn about undefined $ENV{HOME} on Windows
+      - Pool instance_dir test uses canonical paths for cross-platform comparison
+    - Fix PostgreSQL initdb failure when system locale is non-UTF8
+
 0.000040  2026-04-05 14:03:55-07:00 America/Los_Angeles
 
     - Make MySQL less noisy

@@ -3,8 +3,8 @@ NAME
     metadata being used in the wild
 
 VERSION
-    This document describes version 0.009 of CPAN::Meta::X (from Perl
-    distribution CPAN-Meta-X), released on 2022-10-28.
+    This document describes version 0.010 of CPAN::Meta::X (from Perl
+    distribution CPAN-Meta-X), released on 2026-04-08.
 
 DESCRIPTION
     The CPAN distribution metadata specification allows custom keys (those
@@ -26,6 +26,65 @@ CUSTOM DISTRIBUTION METADATA KEYS
     Dist::Zilla plugins used to build the distribution, and so on.
 
   x_authority key
+    Identify the person or organization responsible for the release and/or
+    maintenance of the distribution. Usually contains a URI. The following
+    schemes have been seen:
+
+    *   cpan
+
+        Format:
+
+         cpan:PAUSEID
+
+    *   github
+
+        Formats:
+
+         github:USERNAME            # actually insufficient data to locate the exact file that might contain $VERSION or distribution metadata
+         github:URL
+
+    *   gitlab
+
+        Formats:
+
+         github:USERNAME            # actually insufficient data to locate the exact file that might contain $VERSION or distribution metadata
+         github:URL
+
+    *   corp
+
+        Sometimes used in a private distribution.
+
+        Formats:
+
+         corp:SOMENAME
+
+    *   company
+
+        Sometimes used in a private distribution.
+
+        Formats:
+
+         company:SOMENAME
+
+    *   darkpan
+
+        Format:
+
+         darkpan:URL
+
+        Examples:
+
+         darkpan:/some/path
+         darkpan:file:/some/path
+         darkpan:https://github.com/USERNAME/REPO/raw/refs/heads/master
+         darkpan:https://www.cpan.org/
+
+        Used by me (PERLANCAR). Specify that a CPAN-like mirror is the
+        authority. Version and distribution metadata can be looked up by
+        first retrieving "URL"/modules/02packages.details.txt.gz> file,
+        parsing it, then retrieving the distribution archive specified in
+        it.
+
   x_contributors key
     List of contributors in a release.
 
@@ -108,7 +167,7 @@ CUSTOM PREREQS RELATIONSHIPS
     "x_alt_for" prereq relationship to Perinci::Access.
 
     IDEA: The more specific nature of alternate could be specified further
-    in additional relationsip e.g. "x_lightweight_alt_for",
+    in additional relationship e.g. "x_lightweight_alt_for",
     "x_tiny_alt_for", "x_windows_alt_for", etc, if needed.
 
   x_benchmarks relationship
@@ -179,8 +238,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

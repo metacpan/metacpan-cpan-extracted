@@ -118,13 +118,13 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/body/status',
+          instanceLocation => '/response/body/content/status',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties status const)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties status const)))->to_string,
           error => 'value does not match',
         },
         {
-          instanceLocation => '/response/body',
+          instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties)))->to_string,
           error => 'not all properties are valid',

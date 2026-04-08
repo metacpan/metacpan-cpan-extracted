@@ -7,6 +7,13 @@ use warnings;
 use Test2::Bundle::More;
 use Module::Runtime qw( use_module );
 
+# Loading the deprecated facade modules emits a one-time carp by design.
+# Suppress those during the load smoketest so test output stays clean.
+$SIG{__WARN__} = sub {
+  return if $_[0] =~ /backwards-compatibility facade/;
+  warn @_;
+};
+
 my @modules = qw(
   Langertha
   Langertha::Engine::Remote

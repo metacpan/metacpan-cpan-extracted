@@ -4,7 +4,7 @@ Test::Mockingbird - Advanced mocking library for Perl with support for dependenc
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -440,6 +440,10 @@ Returns::Set schema:
   call at any point during a test run.
 \- The output format is stable and suitable for human inspection, but not
   guaranteed to remain fixed for machine parsing.
+
+## DESTROY
+
+If `Test::Mockingbird` goes out of scope, restore everything.
 
 # SUPPORT
 

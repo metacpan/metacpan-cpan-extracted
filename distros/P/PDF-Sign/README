@@ -15,7 +15,7 @@ INSTALLATION
     make install
 
     # or in one step:
-    cpanm PDF-Sign-0.05.tar.gz
+    cpanm PDF-Sign-0.06.tar.gz
 
 DEPENDENCIES
 
@@ -35,9 +35,11 @@ TESTING
     # TSA test (requires network):
     TSA_TEST=1 make test
 
-COPYRIGHT AND LICENSE
+AUTHOR
 
-Citterio Massimiliano
+Citterio Massimiliano <mcitterio@cmcps.it>
+
+COPYRIGHT AND LICENSE
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself (GPL/Artistic License).

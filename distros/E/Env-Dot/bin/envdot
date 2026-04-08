@@ -4,13 +4,14 @@
 use strict;
 use warnings;
 use 5.010;
+use PerlIO::encoding;
 use open ':std', IO => ':encoding(UTF-8)';
 
 # ABSTRACT: Read .env file and turn its content into environment variables for different shells.
 
 # PODNAME: envdot
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
@@ -109,7 +110,7 @@ envdot - Read .env file and turn its content into environment variables for diff
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

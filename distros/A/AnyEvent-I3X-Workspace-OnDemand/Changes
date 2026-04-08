@@ -1,5 +1,16 @@
 Revision history for AnyEvent-I3X-Workspace-OnDemand
 
+0.011     2026-04-08 03:18:21Z
+
+  * Fix losing X11 connection on i3 reload. We connect really detect this, but!
+    luckely the barconfig_update sends an event and this helps us with
+    resetting the X11 connection and root window stuff. Since we do some
+    trickery as of 0.009 we deal with this kind of reconnecting. Hacky, but it
+    works.
+
+  * Fix updating i3status bar after workspace changes
+
+
 0.010     2026-03-20 01:32:01Z
 
   * When switching workspaces a workspace can be empty:

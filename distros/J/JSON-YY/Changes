@@ -1,0 +1,23 @@
+Revision history for JSON-YY
+
+0.01  2026-04-07
+    - Initial release
+    - Bundled yyjson 0.12.0
+    - Functional API: encode_json, decode_json, decode_json_ro
+    - OO API: JSON::XS-compatible (utf8, pretty, allow_nonref, etc.)
+    - Keyword API: custom ops via PL_keyword_plugin
+    - Doc API: 39 keywords for in-place JSON document manipulation
+      jdoc, jfrom, jread, jwrite
+      jget, jgetp/jdecode, jset, jdel, jhas, jclone
+      jencode, jpp, jraw
+      jstr, jnum, jbool, jnull, jarr, jobj
+      jtype, jlen, jkeys, jvals, jpaths
+      jis_obj, jis_arr, jis_str, jis_num, jis_int, jis_real, jis_bool, jis_null
+      jiter, jnext, jkey
+      jpatch (RFC 6902), jmerge (RFC 7386)
+      jeq, jfind
+    - Doc overloading: stringify, eq/ne, bool
+    - OO decode_doc method
+    - Zero-copy readonly decoder (decode_json_ro)
+    - Direct encoder bypassing yyjson for small payloads
+    - Magic-based struct storage (no hash lookup overhead)

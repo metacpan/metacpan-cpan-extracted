@@ -1,3 +1,19 @@
+0.19.0	2026-04-01
+
+* Harmonise 'session' CLI to accept -t TIME_STR in addition to -h HOURS_INT (similar to runjob)
+* Paper update 
+
+0.18.0  2026-03-30
+
+* [BUGFIX] Fixed delimiter in lsjobs and viewjobs: jobs with "|" in the name were not correctly parsed
+* nbilaunch: added `--scratch-dir` flag and `scratch=` config key for per-job scratch base path
+* nbilaunch: wildcard queues (e.g. `qib-*`) now auto-resolve to short/medium/long tier based on walltime
+* nbilaunch: script and log filenames now include tool name to avoid collisions across launchers
+* NBI::Launcher: `SAMPLE`/`OUTDIR`/`SCRATCH` defined before traps; Slurm logs include `%j` job ID
+* NBI::Launcher: `realpath` resolution now applies to `params` as well as `inputs`
+* NBI::Launcher::Kraken2: memory auto-calculated from DB folder size (`ceil(db_size * 1.4) + 100 GB`)
+* NBI::Launcher::Kraken2: version updated to 2.0.8; default runtime extended to 24h
+
 0.17.2	2026-03-19
 
 * License fixes for JOSS

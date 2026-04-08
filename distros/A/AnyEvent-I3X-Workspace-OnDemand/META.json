@@ -85,7 +85,7 @@
    "provides" : {
       "AnyEvent::I3X::Workspace::OnDemand" : {
          "file" : "lib/AnyEvent/I3X/Workspace/OnDemand.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -96,7 +96,7 @@
          "web" : "https://gitlab.com/waterkip/anyevent-i3x-workspace-ondemand"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

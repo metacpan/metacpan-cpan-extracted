@@ -8,7 +8,7 @@ no warnings 'once';
 use Term::ANSIColor qw(:constants);
 use Module::Install::Base;
 use base 'Module::Install::Base';
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use FindBin;
 use File::Glob     ();
@@ -203,9 +203,17 @@ install ::
         $initdb .= <<"." if $has_etc{acl};
 \t\$(NOECHO) \$(PERL) -Ilib -I"$local_lib_path" -I"$lib_path" -Iinc -MModule::Install::RTx::Runtime -e"RTxDatabase(qw(acl \$(NAME) \$(VERSION)))"
 .
-        $initdb .= <<"." if $has_etc{initialdata};
+        if ($has_etc{initialdata}) {
+            if ($extra_args->{initialdata_requires_plugin}) {
+                (my $plugin_name = $name) =~ s/-/::/g;
+                $initdb .= <<"CHECK";
+\t\$(NOECHO) \$(PERL) -Ilib -I"$local_lib_path" -I"$lib_path" -Iinc -MModule::Install::RTx::Runtime -e"RTxInitialdataRequiresPlugin('$plugin_name')"
+CHECK
+            }
+            $initdb .= <<"INSERT";
 \t\$(NOECHO) \$(PERL) -Ilib -I"$local_lib_path" -I"$lib_path" -Iinc -MModule::Install::RTx::Runtime -e"RTxDatabase(qw(insert \$(NAME) \$(VERSION)))"
-.
+INSERT
+        }
         $self->postamble("initdb ::\n$initdb\n");
         $self->postamble("initialize-database ::\n$initdb\n");
         if ($has_etc{upgrade}) {
@@ -347,7 +355,7 @@ they exist (assuming C<RTx('RT-Extension-Example')>):
     ./static => $RT::LocalPluginPath/RT-Extension-Example/static
     ./var    => $RT::LocalPluginPath/RT-Extension-Example/var
 
-Accepts an optional argument hashref after the extension name with two possible keys
+Accepts an optional argument hashref after the extension name with the following keys
 
 =head2 deprecated_rt
 
@@ -381,6 +389,14 @@ not 4.2.x.
 Takes an optional second argument which allows you to specify a custom
 error message. This message is passed to sprintf with two string
 arguments, the current RT version and the version you specify.
+
+=head2 initialdata_requires_plugin
+
+If set to a true value, the generated C<initdb> Makefile target will
+verify that the plugin is enabled in C<RT_SiteConfig.pm>
+before inserting initial data. This is useful when initialdata depends
+on the plugin being loaded (e.g. it references a new lifecycle
+definition or other features registered by the plugin).
 
 =head2 remove_files
 
@@ -457,7 +473,7 @@ Best Practical Solutions
 =head1 COPYRIGHT
 
 Copyright 2003, 2004, 2007 by Audrey Tang E<lt>cpan@audreyt.orgE<gt>.
-Copyright 2008-2025 Best Practical Solutions
+Copyright 2008-2026 Best Practical Solutions
 
 This software is released under the MIT license cited below.
 

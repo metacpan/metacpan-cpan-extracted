@@ -1,5 +1,8 @@
 Revision history for Email::Mailer
 
+1.23      2026-04-07 10:13:07-07:00 America/Los_Angeles
+        - Bump minimum Perl version to 16 due to MIME::Types now requiring it
+
 1.22      2025-06-13 10:25:20-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

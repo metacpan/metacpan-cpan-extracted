@@ -6,7 +6,7 @@ PDF::Sign - Sign PDF files with CMS/CAdES signatures and RFC3161 timestamps
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -184,6 +184,8 @@ Uses curl if available, falls back to LWP::UserAgent.
 =item * L<MIME::Base64> (core)
 
 =item * L<POSIX> (core)
+
+=item * L<Time::Local> (core)
 
 =item * External: C<openssl> binary
 

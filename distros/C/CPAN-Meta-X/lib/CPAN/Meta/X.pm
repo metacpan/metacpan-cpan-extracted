@@ -3,9 +3,9 @@
 package CPAN::Meta::X;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-28'; # DATE
+our $DATE = '2026-04-08'; # DATE
 our $DIST = 'CPAN-Meta-X'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Catalog of custom (x_*) keys in CPAN distribution metadata being used in the wild
@@ -22,7 +22,7 @@ CPAN::Meta::X - Catalog of custom (x_*) keys in CPAN distribution metadata being
 
 =head1 VERSION
 
-This document describes version 0.009 of CPAN::Meta::X (from Perl distribution CPAN-Meta-X), released on 2022-10-28.
+This document describes version 0.010 of CPAN::Meta::X (from Perl distribution CPAN-Meta-X), released on 2026-04-08.
 
 =head1 DESCRIPTION
 
@@ -50,6 +50,68 @@ include: perl version used to build the distribution, Dist::Zilla plugins used
 to build the distribution, and so on.
 
 =head2 x_authority key
+
+Identify the person or organization responsible for the release and/or
+maintenance of the distribution. Usually contains a URI. The following schemes
+have been seen:
+
+=over
+
+=item * cpan
+
+Format:
+
+ cpan:PAUSEID
+
+=item * github
+
+Formats:
+
+ github:USERNAME            # actually insufficient data to locate the exact file that might contain $VERSION or distribution metadata
+ github:URL
+
+=item * gitlab
+
+Formats:
+
+ github:USERNAME            # actually insufficient data to locate the exact file that might contain $VERSION or distribution metadata
+ github:URL
+
+=item * corp
+
+Sometimes used in a private distribution.
+
+Formats:
+
+ corp:SOMENAME
+
+=item * company
+
+Sometimes used in a private distribution.
+
+Formats:
+
+ company:SOMENAME
+
+=item * darkpan
+
+Format:
+
+ darkpan:URL
+
+Examples:
+
+ darkpan:/some/path
+ darkpan:file:/some/path
+ darkpan:https://github.com/USERNAME/REPO/raw/refs/heads/master
+ darkpan:https://www.cpan.org/
+
+Used by me (PERLANCAR). Specify that a CPAN-like mirror is the authority.
+Version and distribution metadata can be looked up by first retrieving
+C<URL>/modules/02packages.details.txt.gz> file, parsing it, then retrieving the
+distribution archive specified in it.
+
+=back
 
 =head2 x_contributors key
 
@@ -167,7 +229,7 @@ Example: L<Perinci::Access::Lite> distribution specifies a runtime C<x_alt_for>
 prereq relationship to L<Perinci::Access>.
 
 IDEA: The more specific nature of alternate could be specified further in
-additional relationsip e.g. C<x_lightweight_alt_for>, C<x_tiny_alt_for>,
+additional relationship e.g. C<x_lightweight_alt_for>, C<x_tiny_alt_for>,
 C<x_windows_alt_for>, etc, if needed.
 
 =head2 x_benchmarks relationship
@@ -262,7 +324,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

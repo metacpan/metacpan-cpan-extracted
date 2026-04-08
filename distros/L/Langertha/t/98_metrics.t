@@ -2,6 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 
+# Facade test — silence the deprecation warning emitted at load time.
+BEGIN { $SIG{__WARN__} = sub {
+  return if $_[0] =~ /backwards-compatibility facade/;
+  warn @_;
+}; }
 use Langertha::Metrics;
 
 # normalize_usage from prompt/completion style

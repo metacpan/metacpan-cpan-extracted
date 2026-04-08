@@ -12,7 +12,7 @@ our @CARP_NOT = (
 use Getopt::Yath::Util qw/mod2file fqmod/;
 use Getopt::Yath::Term qw/USE_COLOR color/;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use Getopt::Yath::HashBase qw{
     <title
@@ -607,6 +607,164 @@ To create a new type you want to start with this template:
 
     1;
 
+=head1 METHODS
+
+=head2 CONSTRUCTION
+
+=over 4
+
+=item $option = Getopt::Yath::Option->create(type => $type, %spec)
+
+Factory method that creates an option of the appropriate subclass. C<$type> can
+be a short name like C<'Bool'> (resolved to C<Getopt::Yath::Option::Bool>), a
+fully qualified class name, or a C<+>-prefixed class name for types outside the
+C<Getopt::Yath::Option::> namespace.
+
+=back
+
+=head2 INTROSPECTION
+
+=over 4
+
+=item $string = $option->trace_string()
+
+Returns a human-readable string like C<"Foo.pm line 42"> for error messages.
+
+=item $forms = $option->forms()
+
+Returns a hashref mapping all recognized command-line forms to their delta
+values. Positive delta (1) means the option sets a value, negative (-1) means
+it clears (the C<--no-> prefix forms).
+
+=item @args = $option->long_args()
+
+Returns the primary name and all alternate names for this option.
+
+=item $bool = $option->is_applicable($instance, $settings)
+
+Returns true if this option should be active given the current state. Calls the
+C<applicable> coderef if one was provided, otherwise returns true.
+
+=back
+
+=head2 VALUE HANDLING
+
+These methods are typically overridden by subclasses:
+
+=over 4
+
+=item $bool = $option->requires_arg()
+
+Must return true if the option requires an argument (e.g., C<--opt VALUE>).
+
+=item $option->add_value($ref, @values)
+
+Store the given values into the scalar reference C<$ref>. How values are stored
+depends on the option type.
+
+=item $bool = $option->is_populated($ref)
+
+Return true if C<$$ref> contains a meaningful value (i.e., the option has been
+set).
+
+=item @val = $option->no_arg_value($settings)
+
+Return the value to use when the option is specified without an argument and
+without autofill. Only relevant for types like Bool and Count.
+
+=item @val = $option->get_env_value($env_name, $ref)
+
+Return the value to write to the named environment variable. Only needed when
+C<can_set_env> returns true.
+
+=item @val = $option->normalize_value(@input)
+
+Pass values through the C<normalize> callback if one was provided.
+
+=item @bad = $option->check_value(\@values)
+
+Check values against C<allowed_values> if defined. Returns a list of values
+that failed validation.
+
+=item $option->clear_field($ref)
+
+Reset the option to its cleared state via C<get_clear_value>.
+
+=item $option->trigger(%params)
+
+Invoke the C<trigger> callback if one was provided.
+
+=back
+
+=head2 DEFAULTS AND INITIALIZATION
+
+=over 4
+
+=item $val = $option->get_initial_value($settings)
+
+Returns the initial value for the option, checking C<from_env_vars> first, then
+falling back to the C<initialize> attribute.
+
+=item @val = $option->get_default_value($settings)
+
+Returns the default value from the C<default> attribute.
+
+=item @val = $option->get_autofill_value($settings)
+
+Returns the autofill value from the C<autofill> attribute.
+
+=item $val = $option->get_clear_value()
+
+Returns the value to use when the option is cleared (via C<--no-opt>).
+
+=back
+
+=head2 DOCUMENTATION
+
+=over 4
+
+=item ($forms, $no_forms) = $option->doc_forms(%params)
+
+Returns two arrayrefs: one of the positive forms (e.g., C<--verbose>,
+C<-v ARG>) and one of the negative forms (e.g., C<--no-verbose>). Used by
+the documentation generators.
+
+=item $text = $option->cli_docs(%params)
+
+Generate CLI help text for this option, including forms, description,
+environment variable notes, and allowed values.
+
+=item $text = $option->pod_docs(%params)
+
+Generate POD documentation for this option.
+
+=item @examples = $option->long_examples(%params)
+
+=item @examples = $option->short_examples(%params)
+
+Return the example suffixes used in documentation (e.g., C<' ARG'>, C<'=ARG'>).
+Uses custom examples if provided, otherwise falls back to
+C<default_long_examples> or C<default_short_examples>.
+
+=back
+
+=head2 HOOKS
+
+=over 4
+
+=item $option->init_settings($state, $settings, $group, $ref)
+
+Called right after the initial value is set for each option. Other options may
+not have their initial values yet. Override in subclasses for early setup.
+
+=item $option->finalize_settings($state, $settings, $group, $ref)
+
+Called after all options have been parsed and post-processors have run, but
+before environment variables are set. Override in subclasses for late
+adjustments.
+
+=back
+
 =head1 EXAMPLES
 
 See the following modules source for examples:
@@ -630,6 +788,10 @@ See the following modules source for examples:
 =item L<Getopt::Yath::Option::AutoMap>
 
 =item L<Getopt::Yath::Option::BoolMap>
+
+=item L<Getopt::Yath::Option::PathList>
+
+=item L<Getopt::Yath::Option::AutoPathList>
 
 =back
 

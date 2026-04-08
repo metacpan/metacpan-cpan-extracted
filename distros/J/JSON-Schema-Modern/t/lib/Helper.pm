@@ -19,6 +19,7 @@ use if $ENV{NO_OPTIONAL_MODULES}, 'Devel::Hide', qw(
   Data::Validate::Domain
   Email::Address::XS
   Net::IDN::Encode
+  Data::Validate::URI
   Sereal
   Cpanel::JSON::XS
 );
@@ -52,6 +53,31 @@ my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
 # like sprintf, but all list items are JSON-encoded. assumes placeholders are %s!
 sub json_sprintf {
   sprintf(shift, map +(ref($_) =~ /^Math::Big(?:Int|Float)\z/ ? ref($_).'->new(\''.$_.'\')' : $encoder->indent(0)->encode($_)), @_);
+}
+
+# deep comparison, with strict typing
+sub is_equal ($got, $expected, $test_name = undef) {
+  context_do {
+    my $ctx = shift;
+    my ($got, $expected, $test_name) = @_;
+    my $equal = JSON::Schema::Modern::Utilities::is_equal($got, $expected, my $state = {});
+    if ($equal) {
+      $ctx->pass($test_name);
+    }
+    else {
+      $ctx->fail($test_name);
+      my $method =
+        # be less noisy for expected failures
+        (grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*) ? 'note'
+          : $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
+
+      $ctx->$method('structures differ'.($state->{path} ? ' starting at '.$state->{path} : ''));
+      my ($equal, $stack) = Test::Deep::cmp_details($got, $expected);
+      $ctx->$method(Test::Deep::deep_diag($stack)) if not $equal;
+      $ctx->$method("got result:\n".$encoder->encode($got));
+    }
+    return $equal;
+  } $got, $expected, $test_name;
 }
 
 # deep comparison, with Test::Deep syntax sugar

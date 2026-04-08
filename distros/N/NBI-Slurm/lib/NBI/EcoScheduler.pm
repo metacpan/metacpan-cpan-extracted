@@ -36,7 +36,7 @@ use Carp qw(carp);
 $NBI::EcoScheduler::VERSION = $NBI::Slurm::VERSION // '0.17.0';
 
 # ---------------------------------------------------------------------------
-# Hardcoded defaults — used when config keys are absent.
+# Hardcoded defaults - used when config keys are absent.
 # Mon-Fri: 00:00-06:00  (night window before peak morning commute)
 # Sat-Sun: 00:00-07:00 and 11:00-16:00  (weekend has longer cheap windows)
 # Avoid every day: 17:00-20:00  (evening peak)
@@ -109,16 +109,16 @@ sub find_eco_begin {
                      : undef;
         next unless defined $day_best;
 
-        # First candidate found — record it
+        # First candidate found - record it
         if (!defined $best_epoch) {
             ($best_epoch, $best_tier) = ($day_best, $day_tier);
         } elsif ($day_tier < $best_tier) {
-            # A later day offers a better tier — upgrade
+            # A later day offers a better tier - upgrade
             ($best_epoch, $best_tier) = ($day_best, $day_tier);
         }
 
         # Prefer starting sooner over waiting for a "perfect" distant slot:
-        # once we have a T1 or T2 (avoids peak hours) stop scanning —
+        # once we have a T1 or T2 (avoids peak hours) stop scanning -
         # a slightly imperfect slot today beats a perfect slot in 3 days.
         last if $best_tier <= 2;
     }
@@ -215,7 +215,7 @@ NBI::EcoScheduler - Find energy-efficient SLURM job start times
 
 =head1 VERSION
 
-version 0.17.2
+version 0.19.0
 
 =head1 SYNOPSIS
 
@@ -227,7 +227,7 @@ version 0.17.2
   if (defined $epoch) {
       my $begin = NBI::EcoScheduler::epoch_to_slurm($epoch);
       my $delay = NBI::EcoScheduler::format_delay($epoch);
-      print "Schedule job for $begin (in $delay) — tier $tier\n";
+      print "Schedule job for $begin (in $delay) - tier $tier\n";
   }
 
 =head1 DESCRIPTION
@@ -238,11 +238,11 @@ current time in window-boundary steps, scoring each candidate slot:
 
 =over 4
 
-=item * B<Tier 1> — Job fits entirely inside an eco window and avoids peak hours.
+=item * B<Tier 1> - Job fits entirely inside an eco window and avoids peak hours.
 
-=item * B<Tier 2> — Job avoids peak hours but overruns the eco window.
+=item * B<Tier 2> - Job avoids peak hours but overruns the eco window.
 
-=item * B<Tier 3> — Job starts in an eco window but overlaps peak hours (last resort).
+=item * B<Tier 3> - Job starts in an eco window but overlaps peak hours (last resort).
 
 =back
 
@@ -257,9 +257,9 @@ NBI::EcoScheduler - Find energy-efficient start times for SLURM jobs
 
 =head1 DEFAULT WINDOWS
 
-  Mon–Fri:  00:00–06:00
-  Sat–Sun:  00:00–07:00  and  11:00–16:00
-  Avoid:    17:00–20:00  (every day)
+  Mon-Fri:  00:00-06:00
+  Sat-Sun:  00:00-07:00  and  11:00-16:00
+  Avoid:    17:00-20:00  (every day)
 
 These are overridden by the corresponding keys in C<~/.nbislurm.config>.
 

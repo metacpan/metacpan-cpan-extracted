@@ -251,6 +251,7 @@ t/QuickDB/PostgreSQL.t
 t/QuickDB/QuickDB.pm
 t/QuickDB/SQLite.t
 t/Tools/QuickDB.t
+t/clone_dir.t
 t/schema/mariadb.sql
 t/schema/mysql.sql
 t/schema/mysqlcom.sql

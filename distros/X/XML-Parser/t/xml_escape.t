@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 11;
 use XML::Parser;
 
 # Test 1: module loads
@@ -30,3 +30,31 @@ is( $xp_saved->xml_escape("it's Bob's", "'"),
 is( $xp_saved->xml_escape(q{He said "it's"}, '"', "'"),
     'He said &quot;it&apos;s&quot;',
     'xml_escape escapes both quote types' );
+
+# Test 6: > character escaping
+is( $xp_saved->xml_escape('a > b', '>'),
+    'a &gt; b',
+    'xml_escape escapes > when requested' );
+
+# Test 7: > is NOT escaped by default (only & and < are)
+is( $xp_saved->xml_escape('a > b'),
+    'a > b',
+    'xml_escape does not escape > by default' );
+
+# Test 8: hex entity escaping for arbitrary characters
+is( $xp_saved->xml_escape("tab\there", "\t"),
+    'tab&#x9;here',
+    'xml_escape produces hex entity for tab character' );
+
+# Test 9: word character uses hex entity path too
+is( $xp_saved->xml_escape('abc_def', '_'),
+    'abc&#x5F;def',
+    'xml_escape produces hex entity for word characters' );
+
+# Test 10: multi-character extra arg croaks
+eval { $xp_saved->xml_escape('test', 'ab') };
+like( $@, qr/isn't a single character/,
+    'xml_escape croaks on multi-character extra argument' );
+
+# Test 11: empty input returns empty
+is( $xp_saved->xml_escape(''), '', 'xml_escape handles empty string' );

@@ -1,3 +1,9 @@
+0.000012  2026-04-07 16:36:22-07:00 America/Los_Angeles
+
+    - Fix JSONFile cache staleness detection when Linux::Inotify2 is absent
+    - JSONFile now requires either Linux::Inotify2 or Digest::SHA (recommended dep)
+    - Split inotify-affected tests into Inotify/NoInotify variants
+
 0.000011  2026-04-05 14:10:41-07:00 America/Los_Angeles
 
     - Reintegrate DBI and UnixSocket clients back into this dist

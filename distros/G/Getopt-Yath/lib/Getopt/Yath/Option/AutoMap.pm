@@ -2,7 +2,7 @@ package Getopt::Yath::Option::AutoMap;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use parent 'Getopt::Yath::Option::Map';
 use Getopt::Yath::HashBase;
@@ -46,6 +46,24 @@ additional values.
         description    => 'Set environment variables',
         autofill       => sub { +{ HOME => $ENV{HOME}, USER => $ENV{USER} } },
     );
+
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option::Map> are inherited. The following are
+overridden or noteworthy:
+
+=over 4
+
+=item requires_arg: false
+
+=item allows_autofill: true
+
+=item requires_autofill: true
+
+C<--opt> adds the autofill key/value pairs. C<--opt=KEY=VAL> adds a specific
+pair.
+
+=back
 
 =head1 SOURCE
 

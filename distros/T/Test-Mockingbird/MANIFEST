@@ -10,6 +10,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/00-load.t
+t/30-basic.t
 t/class.t
 t/comment-spelling.t
 t/cover.t

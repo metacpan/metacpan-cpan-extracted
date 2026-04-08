@@ -1661,6 +1661,7 @@ static OP* pp_nv_search(pTHX) {
     NV *results;
 
     SP -= 2;
+    PUTBACK;
 
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("search requires a code reference");
@@ -1695,6 +1696,7 @@ static OP* pp_nv_search(pTHX) {
         }
     }
 
+    SPAGAIN;
     EXTEND(SP, found);
     for (i = 0; i < found; i++) {
         PUSHs(sv_2mortal(newSVnv(results[i])));
@@ -1713,6 +1715,7 @@ static OP* pp_nv_delete(pTHX) {
     dTARGET;
 
     SP -= 2;
+    PUTBACK;
 
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("delete requires a code reference");
@@ -1760,6 +1763,7 @@ static OP* pp_nv_delete(pTHX) {
         }
     }
 
+    SPAGAIN;
     SETi(deleted);
     RETURN;
 }
@@ -1773,6 +1777,7 @@ static OP* pp_heap_func_search(pTHX) {
     IV i, found = 0;
 
     SP -= 2;
+    PUTBACK;
 
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("search requires a code reference");
@@ -1811,6 +1816,7 @@ static OP* pp_heap_func_search(pTHX) {
             }
         }
 
+        SPAGAIN;
         EXTEND(SP, found);
         for (i = 0; i < found; i++) {
             PUSHs(sv_2mortal(newSVnv(results[i])));
@@ -1852,6 +1858,7 @@ static OP* pp_heap_func_search(pTHX) {
             }
         }
 
+        SPAGAIN;
         EXTEND(SP, found);
         for (i = 0; i < found; i++) {
             PUSHs(results[i]);
@@ -1874,6 +1881,7 @@ static OP* pp_heap_func_delete(pTHX) {
     dTARGET;
 
     SP -= 2;
+    PUTBACK;
 
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("delete requires a code reference");
@@ -1924,6 +1932,7 @@ static OP* pp_heap_func_delete(pTHX) {
             }
         }
 
+        SPAGAIN;
         PUSHi(deleted);
         RETURN;
     }
@@ -1972,6 +1981,7 @@ static OP* pp_heap_func_delete(pTHX) {
             }
         }
 
+        SPAGAIN;
         PUSHi(deleted);
         RETURN;
     }
@@ -2213,7 +2223,8 @@ static OP* heap_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     OpMORESIB_set(pushop, cvop);
     OpLASTSIB_set(heapop, NULL);
 
-    newop = newUNOP(OP_CUSTOM, 0, heapop);
+    newop = newUNOP(OP_NULL, 0, heapop);
+    newop->op_type   = OP_CUSTOM;
     newop->op_ppaddr = ppfunc;
     newop->op_targ = pad_alloc(OP_CUSTOM, SVs_PADTMP);
 
@@ -2245,7 +2256,8 @@ static OP* heap_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     OpLASTSIB_set(valop, NULL);
     OpLASTSIB_set(heapop, NULL);
 
-    newop = newBINOP(OP_CUSTOM, 0, heapop, valop);
+    newop = newBINOP(OP_NULL, 0, heapop, valop);
+    newop->op_type   = OP_CUSTOM;
     newop->op_ppaddr = ppfunc;
     newop->op_targ = pad_alloc(OP_CUSTOM, SVs_PADTMP);
 

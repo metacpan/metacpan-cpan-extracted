@@ -76,7 +76,7 @@ sub dtd {
     $internal_exists = $internal;
 }
 
-my $p = new XML::Parser(
+my $p = XML::Parser->new(
     ParseParamEnt => 1,
     ErrorContext  => 2,
     Handlers      => {

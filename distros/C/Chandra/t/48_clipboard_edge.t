@@ -3,20 +3,13 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-
-BEGIN {
-    plan skip_all => 'CHANDRA_SKIP_CLIPBOARD set' if $ENV{CHANDRA_SKIP_CLIPBOARD};
-}
+use lib 't/lib';
 
 use Chandra::Clipboard;
+use Chandra::Test::Display;
 
-{
-    Chandra::Clipboard->set_text('probe');
-    my $got = Chandra::Clipboard->get_text;
-    unless (defined $got && $got eq 'probe') {
-        plan skip_all => 'Clipboard not available on this platform';
-    }
-}
+Chandra::Test::Display->skip_unless_clipboard;
+
 
 # ---- Large text ----
 {
@@ -79,7 +72,7 @@ use Chandra::Clipboard;
 }
 
 # ---- set_image with valid PNG ----
-{
+SKIP: {
     my $dir = tempdir(CLEANUP => 1);
     my $png_path = "$dir/test.png";
 
@@ -93,13 +86,12 @@ use Chandra::Clipboard;
     close $fh;
 
     my $ok = Chandra::Clipboard->set_image($png_path);
+    skip 'image clipboard not available (headless?)', 4 unless $ok;
     ok($ok, 'set_image with valid PNG');
-    if ($ok) {
-        ok(Chandra::Clipboard->has_image, 'has_image after set');
-        my $data = Chandra::Clipboard->get_image;
-        ok(defined $data, 'get_image returns data');
-        ok(length($data) > 0, 'image data is non-empty') if defined $data;
-    }
+    ok(Chandra::Clipboard->has_image, 'has_image after set');
+    my $data = Chandra::Clipboard->get_image;
+    ok(defined $data, 'get_image returns data');
+    ok(length($data) > 0, 'image data is non-empty') if defined $data;
 }
 
 # ---- Double clear ----

@@ -127,6 +127,17 @@ the _Expat_ object, not the Parser object.
         declaration, setting this to a true value allows the external DTD to be read,
         and parameter entities to be parsed and expanded.
 
+        **Implicit vs explicit parameter entity parsing:** When `ParseParamEnt` is
+        not set, parameter entity references (e.g. `%foo;`) in the internal DTD
+        subset are passed through to the **Default** handler as literal text. This is
+        the mode that XML::Twig and other DTD round-tripping tools rely on.
+
+        When `ParseParamEnt` is set to a true value, or when a declaration handler
+        (**Entity**, **Element**, or **Attlist**) is registered, parameter entity parsing
+        is activated. In this mode, PE references are resolved by expat (via the
+        **ExternEnt** handler) and subsequent declarations are routed to their
+        dedicated declaration handlers instead of the Default handler.
+
     - NoLWP
 
         This option has no effect if the ExternEnt or ExternEntFin handlers are

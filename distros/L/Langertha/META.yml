@@ -1,7 +1,7 @@
 ---
 abstract: 'The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId'
 author:
-  - 'Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>'
+  - 'Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>'
 build_requires:
   Math::Vector::Similarity: '0'
   Module::Runtime: '0'
@@ -41,10 +41,12 @@ requires:
   YAML::PP: '0'
   YAML::XS: '0'
 resources:
+  IRC: irc://irc.perl.org/#langertha
+  IRC_user: Getty
   bugtracker: https://github.com/Getty/langertha/issues
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.309'
+version: '0.400'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -131,6 +133,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
       version: '0.58'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@Author::GETTY/MetaResources'
+      version: '6.037'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::GETTY/InstallRelease'
@@ -295,7 +301,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.309'
+          tag: '0.400'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

@@ -106,7 +106,7 @@ See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/session)
 
 
 ```bash
-session [-t 2 -c 18 -m 32]
+session [-t 12h -c 18 -m 32]
 ```
 
 ### whojobs
@@ -143,9 +143,8 @@ And two classes to manage the output of the jobs:
 
 Features
 
-* Very experimental, very alpha, very buggy.
-* Easily create and configure SLURM jobs using the NBI::Job class.
-* Comes with binaries to submit jobs, list jobs, wait for jobs, etc.
+* Easily create and configure SLURM jobs using the NBI::Job class (for the Perl enthusiasts).
+* Comes with **binaries** to submit jobs, list jobs, wait for jobs, etc. (for anyone else)
   
 ## Installation
 

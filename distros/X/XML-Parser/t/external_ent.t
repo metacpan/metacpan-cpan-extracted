@@ -48,7 +48,7 @@ open( $ent_fh, '>', 'c.ent' ) or die "Couldn't open c.ent for writing";
 print $ent_fh "Hurrah for C";
 close($ent_fh);
 
-my $p = new XML::Parser( Handlers => { Char => \&txt } );
+my $p = XML::Parser->new( Handlers => { Char => \&txt } );
 
 $p->parse($docstring);
 

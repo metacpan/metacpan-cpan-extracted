@@ -1,7 +1,7 @@
 package Bot::IRC::History;
 # ABSTRACT: Bot::IRC selected channel history dumped to email
 
-use 5.014;
+use 5.016;
 use exact;
 
 use Date::Format 'time2str';
@@ -10,7 +10,7 @@ use Email::Mailer;
 use Email::Valid;
 use File::Grep 'fgrep';
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.48'; # VERSION
 
 sub init {
     my ($bot)       = @_;
@@ -151,7 +151,7 @@ Bot::IRC::History - Bot::IRC selected channel history dumped to email
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

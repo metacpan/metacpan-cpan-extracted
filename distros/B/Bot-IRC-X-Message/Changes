@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::Message
 
+1.08      2026-04-07 10:38:10-07:00 America/Los_Angeles
+        - Bump minimum Perl version to 16 due to MIME::Types now requiring it
+
 1.07      2025-06-13 10:23:46-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

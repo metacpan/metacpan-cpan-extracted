@@ -2,7 +2,7 @@ package Getopt::Yath::Term;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 our @EXPORT = qw/color USE_COLOR term_size fit_to_width/;
 use Importer Importer => 'import';
@@ -49,7 +49,7 @@ sub fit_to_width {
     push @out => $line if $line;
 
     if(defined $prefix) {
-        $_ =~ s/^/  /gm for @out;
+        $_ =~ s/^/$prefix/gm for @out;
     }
 
     return join "\n" => @out;
@@ -90,12 +90,27 @@ True if color can/should be used.
 
 =item $ansi_escape = color($color_name)
 
-Get the ANSI escape sequence for the specified color, or return an emptt string
+Get the ANSI escape sequence for the specified color, or return an empty string
 if color cannot be used.
 
-=item $new_text = fit_to_width($old_text)
+=item $new_text = fit_to_width($join, $text, %params)
 
-Wrap text to fit nicely in the terminal.
+Wrap text to fit nicely in the terminal. C<$join> is the string used to join
+words (typically C<" ">). C<$text> is a string (split on whitespace) or an
+arrayref of parts. Supported params:
+
+=over 4
+
+=item prefix => $string
+
+A string to prepend to each output line (e.g., C<"  "> for indentation).
+
+=item width => $columns
+
+Target width in columns. Defaults to the terminal width minus 20, with a
+minimum of 80.
+
+=back
 
 =item $cols = term_size()
 

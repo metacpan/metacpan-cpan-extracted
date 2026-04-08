@@ -1,5 +1,13 @@
 Revision history for Heap-PQ
 
+0.03  2026-04-08
+      - Fix newUNOP(OP_CUSTOM)/newBINOP(OP_CUSTOM) assertion failure on
+        debug perl builds (5.16, 5.18). Create ops as OP_NULL first,
+        then set op_type to OP_CUSTOM.
+      - Fix stack pointer assertion (rpp_popfree_to_NN) on perl 5.42+ with
+        reference-counted stack. Add PUTBACK after consuming args and
+        SPAGAIN before pushing results in search/delete custom ops.
+
 0.02  2026-04-07
       - Optimise the comparison function to be MULTICALL and use $a/$b instead of @_
       - Extend to be able to pass a key into the comparison function to stay within C where possible, removing the perl callback overhead entirely

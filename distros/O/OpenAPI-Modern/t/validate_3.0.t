@@ -79,19 +79,19 @@ YAML
           error => 'value does not match',
         },
         {
-          instanceLocation => '/request/body/not_nullable',
+          instanceLocation => '/request/body/content/not_nullable',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties not_nullable type)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties not_nullable type)))->to_string,
           error => 'got null, not string',
         },
         {
-          instanceLocation => '/request/body/nullable',
+          instanceLocation => '/request/body/content/nullable',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties nullable type)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties nullable type)))->to_string,
           error => 'got integer, not string or null',
         },
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties)))->to_string,
           error => 'not all properties are valid',

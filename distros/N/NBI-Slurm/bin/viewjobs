@@ -302,8 +302,12 @@ sub load_jobs {
 sub getjobs {
     # Create an anonymous hash, and return it
     my $jobs = {};
-    # Use specific format for efficiency - only get fields we need
-    my $cmd = q(squeue --format='%i|%u|%P|%j|%T|%M|%l|%N|%C|%m|%r');
+    # Use ASCII record separator (chr 30) as delimiter — safe against job names
+    # that contain '|' (e.g. Nextflow workflow names).
+    my $sep = chr(30);
+    my $fmt = join($sep, qw(%i %u %P %j %T %M %l %N %C %m %r));
+    $fmt =~ s/ //g;  # remove spaces between format codes
+    my $cmd = "squeue --format='$fmt'";
     my @output = `$cmd 2>&1`;
 
     # Check if command failed
@@ -317,7 +321,7 @@ sub getjobs {
         chomp $line;
         next if $line =~ /^\s*$/;
 
-        my @fields = split(/\|/, $line);
+        my @fields = split(/\x1e/, $line);
         $c++;
         if ($c == 1) {
             # Field names
@@ -1326,7 +1330,7 @@ viewjobs - Interactive TUI for viewing and managing SLURM jobs
 
 =head1 VERSION
 
-version 0.17.2
+version 0.19.0
 
 =head1 SYNOPSIS
 

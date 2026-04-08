@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     "bin/lsjobs",
     "bin/make_image_from_bioconda",
     "bin/make_package",
+    "bin/nbilaunch",
     "bin/printpath",
     "bin/printslurm",
     "bin/rm_package",
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Text::ASCIITable" => "0.22"
   },
-  "VERSION" => "0.17.2",
+  "VERSION" => "0.19.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

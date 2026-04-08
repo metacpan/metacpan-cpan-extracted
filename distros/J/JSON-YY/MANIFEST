@@ -1,0 +1,39 @@
+bench/bench.pl
+bench/bench_doc.pl
+bench/bench_keyword.pl
+Changes
+eg/api_extract.pl
+eg/config_edit.pl
+eg/doc_api.pl
+eg/iterators.pl
+eg/jq_like.pl
+eg/json_patch.pl
+eg/merge_patch.pl
+eg/ndjson.pl
+eg/value_constructors.pl
+lib/JSON/YY.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01_basic.t
+t/02_keyword_api.t
+t/03_use_flags.t
+t/04_keyword.t
+t/05_readonly.t
+t/06_doc.t
+t/07_edge_cases.t
+t/08_new_api.t
+t/09_roundtrip.t
+t/10_type_predicates.t
+t/11_stress.t
+t/12_pod.t
+t/13_file_io.t
+t/14_unicode.t
+t/15_minor_gaps.t
+xt/leak.t
+YY.xs
+yyjson.c
+yyjson.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

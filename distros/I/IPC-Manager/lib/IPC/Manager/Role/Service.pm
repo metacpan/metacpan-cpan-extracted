@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000012';
 
 # Not included in role:
 use Carp qw/croak/;

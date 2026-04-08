@@ -2,7 +2,7 @@ package Getopt::Yath::Settings::Group;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use Carp();
 
@@ -57,7 +57,7 @@ sub delete_option {
 sub remove_option {
     my $self = shift;
     my ($name) = @_;
-    delete ${$self}->{$name};
+    delete $self->{$name};
 }
 
 our $AUTOLOAD;

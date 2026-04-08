@@ -298,7 +298,14 @@ chandra_log_timestamp(pTHX)
     char buf[64];
 
     gettimeofday(&tv, NULL);
+#ifdef _WIN32
+    {
+        struct tm *tp = localtime(&tv.tv_sec);
+        if (tp) { t = *tp; } else { memset(&t, 0, sizeof(t)); }
+    }
+#else
     localtime_r(&tv.tv_sec, &t);
+#endif
     snprintf(buf, sizeof(buf), "%04d-%02d-%02d %02d:%02d:%02d.%03d",
              t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
              t.tm_hour, t.tm_min, t.tm_sec,

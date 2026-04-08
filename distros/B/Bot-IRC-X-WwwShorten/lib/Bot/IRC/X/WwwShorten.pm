@@ -1,12 +1,12 @@
 package Bot::IRC::X::WwwShorten;
 # ABSTRACT: Bot::IRC plugin for automatic URL shortening
 
-use 5.014;
+use 5.016;
 use exact;
 
 use WWW::Shorten qw( TinyURL makeashorterlink );
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -39,7 +39,7 @@ Bot::IRC::X::WwwShorten - Bot::IRC plugin for automatic URL shortening
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-WwwShorten/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-WwwShorten/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-WwwShorten/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-WwwShorten)

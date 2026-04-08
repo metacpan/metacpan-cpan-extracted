@@ -17,11 +17,11 @@ Test::Mockingbird::DeepMock - Declarative, structured mocking and spying for Per
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -902,6 +902,8 @@ sub _apply_time_plan {
 	}
 }
 
+1;
+
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
@@ -915,6 +917,24 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Test::Mockingbird::DeepMock
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+=over 4
+
+=item * Personal single user, single computer use: GPL2
+
+=item * All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.
+
+=back
 
 =cut
 

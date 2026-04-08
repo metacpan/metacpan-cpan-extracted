@@ -3,7 +3,7 @@ package File::Raw;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 # Use DynaLoader with RTLD_GLOBAL so C API symbols (file_hooks.h) are visible
 # to other XS modules that link against us at runtime.
@@ -529,6 +529,142 @@ use C<File::Raw::stat()> instead of calling individual functions:
     # FAST: 1 syscall
     my $st = File::Raw::stat($path);
     my ($size, $mtime, $is_file) = @{$st}{qw(size mtime is_file)};
+
+=head1 XS API
+
+File::Raw exposes a C API via C<include/file_hooks.h> that other XS modules
+can use to register read/write hooks at the C level, avoiding Perl callback
+overhead. The shared object is loaded with C<RTLD_GLOBAL> so symbols are
+visible to subsequently loaded XS modules.
+
+=head2 Types
+
+=over 4
+
+=item B<FileHookPhase>
+
+Enum identifying the hook phase:
+
+    FILE_HOOK_PHASE_READ    /* After reading, before returning to Perl */
+    FILE_HOOK_PHASE_WRITE   /* Before writing to disk */
+    FILE_HOOK_PHASE_OPEN    /* Before opening file */
+    FILE_HOOK_PHASE_CLOSE   /* After closing file */
+
+=item B<FileHookPriority>
+
+Predefined priority levels (lower runs first):
+
+    FILE_HOOK_PRIORITY_FIRST    =    0
+    FILE_HOOK_PRIORITY_EARLY    =  100
+    FILE_HOOK_PRIORITY_NORMAL   =  500
+    FILE_HOOK_PRIORITY_LATE     =  900
+    FILE_HOOK_PRIORITY_LAST     = 1000
+
+=item B<FileHookContext>
+
+Struct passed to C hook callbacks:
+
+    typedef struct {
+        const char   *path;       /* File path */
+        SV           *data;       /* Data SV (may be modified in place) */
+        FileHookPhase phase;      /* Which phase */
+        void         *user_data;  /* User-provided context */
+        int           cancel;     /* Set to 1 to cancel operation */
+    } FileHookContext;
+
+=item B<file_hook_func>
+
+C hook function signature:
+
+    typedef SV* (*file_hook_func)(pTHX_ FileHookContext *ctx);
+
+Return the (possibly modified) SV, or NULL to cancel the operation.
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=item B<file_register_hook_c>
+
+    int file_register_hook_c(pTHX_
+                             FileHookPhase phase,
+                             const char *name,
+                             file_hook_func func,
+                             int priority,
+                             void *user_data);
+
+Register a named C hook for a given phase. Returns 1 on success.
+Call during module initialisation only (not thread-safe).
+
+=item B<file_unregister_hook>
+
+    int file_unregister_hook(pTHX_ FileHookPhase phase, const char *name);
+
+Remove a hook by name. Returns 1 if found and removed.
+
+=item B<file_has_hooks>
+
+    int file_has_hooks(FileHookPhase phase);
+
+Fast check for registered hooks. Use before allocating a context.
+
+=item B<file_run_hooks>
+
+    SV* file_run_hooks(pTHX_ FileHookPhase phase, const char *path, SV *data);
+
+Execute all hooks for a phase in priority order. Returns the
+transformed SV, or NULL if a hook cancelled the operation.
+
+=item B<file_set_read_hook> / B<file_set_write_hook>
+
+    void file_set_read_hook(pTHX_ file_hook_func func, void *user_data);
+    void file_set_write_hook(pTHX_ file_hook_func func, void *user_data);
+
+Simple single-hook registration (overwrites any existing hook for the
+phase). Pass NULL to clear.
+
+=item B<file_get_read_hook> / B<file_get_write_hook>
+
+    file_hook_func file_get_read_hook(void);
+    file_hook_func file_get_write_hook(void);
+
+Return the currently registered hook function, or NULL.
+
+=back
+
+=head2 Convenience Macros
+
+    FILE_HAS_READ_HOOK()           /* true if a read hook is set */
+    FILE_HAS_WRITE_HOOK()          /* true if a write hook is set */
+    FILE_RUN_READ_HOOK(path, sv)   /* run hook or return sv unchanged */
+    FILE_RUN_WRITE_HOOK(path, sv)  /* run hook or return sv unchanged */
+
+=head2 Example (XS module)
+
+    #include "EXTERN.h"
+    #include "perl.h"
+    #include "XSUB.h"
+    #include <file_hooks.h>
+
+    static SV* my_rot13_hook(pTHX_ FileHookContext *ctx) {
+        STRLEN len;
+        char *p = SvPV(ctx->data, len);
+        STRLEN i;
+        for (i = 0; i < len; i++) {
+            if (p[i] >= 'a' && p[i] <= 'z')
+                p[i] = 'a' + (p[i] - 'a' + 13) % 26;
+            else if (p[i] >= 'A' && p[i] <= 'Z')
+                p[i] = 'A' + (p[i] - 'A' + 13) % 26;
+        }
+        return ctx->data;
+    }
+
+    MODULE = MyModule  PACKAGE = MyModule
+
+    BOOT:
+        file_set_read_hook(aTHX_ my_rot13_hook, NULL);
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ package PDF::Sign;
 #
 # Originally inspired by Martin Schuette <info@mschuette.name> (2012)
 #   https://mschuette.name/files/pdfsign.pl
-#   BSD 2-Clause License — retained below as required
+#   BSD 2-Clause License - retained below as required
 #
 # Imported for study and proof of concept: Massimiliano Citterio (2019)
 # Substantially rewritten and extended by Massimiliano Citterio (2023-2026)
@@ -92,7 +92,7 @@ BEGIN {
 # LWP fallback detection (curl preferred)
 my $HAS_LWP = eval { require LWP::UserAgent; 1 };
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw(
     config
@@ -112,7 +112,7 @@ our %EXPORT_TAGS = (
 );
 
 # ============================================================
-# Configuration — set these before calling any sub,
+# Configuration - set these before calling any sub,
 # or pass them as arguments where supported.
 # All configurable via our() from the calling script.
 # ============================================================
@@ -139,10 +139,10 @@ my $osslv = do {
     $v;
 };
 
-# cms command availability — LibreSSL 2.x and very old OpenSSL may lack it
+# cms command availability - LibreSSL 2.x and very old OpenSSL may lack it
 # fallback to smime if cms is not available.
 # Note: openssl cms -help writes to stderr, so we redirect stderr to stdout
-# using shell=1 here intentionally — input is a fixed string, no injection risk
+# using shell=1 here intentionally - input is a fixed string, no injection risk
 my $has_cms = do {
     my $out = `$osslcmd cms -help 2>&1`;
     $out =~ /Usage[\s:]{1,2}cms[\s\[]{1,2}options/i ? '1' : '';
@@ -152,7 +152,7 @@ my $has_cms = do {
 # sub: config
 # Configure PDF::Sign settings in one call.
 # Preferred over setting package variables directly.
-# All keys are optional — only provided keys are updated.
+# All keys are optional - only provided keys are updated.
 #
 # Example:
 #   PDF::Sign::config(
@@ -218,7 +218,8 @@ sub prepare_file {
         $^O eq 'freebsd' || $^O eq 'openbsd' ||
         $^O eq 'netbsd'  || $^O eq 'solaris') {
         $isodatetimetz = strftime("D:%Y%m%d%H%M%S%z", localtime);
-        $isodatetimetz =~ s/([+-]\d{2}):(\d{2})$/$1$2/;
+        # Minutes in PDF should be wrapped into single quotes
+        $isodatetimetz =~ s/([+-]\d{2}):?(\d{2})$/$1'$2'/;
     } else {
         # Calculate Time Zone Offset
         # (timegm-based: correct DST handling for all timezones,
@@ -233,8 +234,8 @@ sub prepare_file {
         my $abs  = abs($offset_sec);
         my $oh   = int($abs / 3600);
         my $om   = int(($abs % 3600) / 60);
-
-        my $tzo  = sprintf("%s%02d%02d", $sign, $oh, $om);
+        # Minutes in PDF should be wrapped into single quotes
+        my $tzo  = sprintf("%s%02d'%02d'", $sign, $oh, $om);
         $isodatetimetz = strftime("D:%Y%m%d%H%M%S", @lt) . $tzo;
     }
     $sigdict->{M} = PDFStr($isodatetimetz);
@@ -346,7 +347,10 @@ sub sign_file {
     my $byterange = sprintf("/ByteRange [0 %8d %8d %8d]", $sigbegin, $sigend, $eofsize);
     $data =~ s/\/ByteRange \[$zerorange\]/$byterange/e;
 
-    if ($sigend - $sigbegin != ($siglen + 1) * 2) { return $data; }
+    if ($sigend - $sigbegin != ($siglen + 1) * 2) {
+        warn "sign_file: Wrong range selected. Skipped.\n";
+        return $data; 
+    }
 
     my $streamtext         = substr($data, 0, $sigbegin) . substr($data, $sigend, $eofsize);
     my $streamtextfilename = "$tmpdir/pdfsign_streamtext_$$.pdf";
@@ -358,8 +362,14 @@ sub sign_file {
         in       => $streamtextfilename,
         certfile => $x509_chain || undef,
     );
-
+    
+    if (length($signature) > $siglen) { 
+        warn "sign_file: Can't apply sign. It's too big for siglen. Skipped.\n";
+        return $data;
+    }
+    
     my $sighex = PDFStrHex($signature)->as_pdf;
+    # remove last ">" char
     chop $sighex;
     substr($data, $sigbegin, length($sighex), $sighex);
 
@@ -383,13 +393,7 @@ sub prepare_ts {
     $sigdict->{Filter}    = PDFName("Adobe.PPKLite");
     # Ongoing investigation: first the chicken or the egg, the timestamp how do you know it first
     # seems to be correct not to indicate it here
-    if ($^O eq 'linux') {
-        #$sigdict->{M} = PDFStr(substr(strftime("D:%Y%m%d%H%M%S%z", localtime), 0, 19) . "'00'");
-    } else {
-        my @lt = localtime;
-        my $tz = $lt[8] ? 2 : 1;
-        #$sigdict->{M} = PDFStr(substr(strftime("D:%Y%m%d%H%M%S+0${tz}", localtime), 0, 19) . "'00'");
-    }
+    #$sigdict->{M} = PDFStr(strftime("D:%Y%m%d%H%M%S%z", localtime));
     $sigdict->{SubFilter} = PDFName('ETSI.RFC3161');
     $sigdict->{Contents}  = PDFStrHex("\0" x $siglen);
     $sigdict->{ByteRange} = PDFLiteral("[$zerorange]");
@@ -518,7 +522,7 @@ sub cms_sign {
 
     } else {
         # fallback: openssl smime (LibreSSL 2.x, old OpenSSL)
-        # smime produces S/MIME output — strip headers up to blank line,
+        # smime produces S/MIME output - strip headers up to blank line,
         # then strip PEM armor, decode base64
         warn "PDF::Sign: cms not available, falling back to smime\n" if $debug;
 
@@ -561,8 +565,8 @@ sub ts_query {
     my (%args) = @_;
     # args: in (file to timestamp), out (output .tsq file)
 
-    # sanitize paths — strip non path chars  to prevent shell injection
-    # (shell form used intentionally for stderr redirection, see note above)
+    # sanitize paths - strip non path chars  to prevent shell injection
+    # (shell form used intentionally for stderr redirection, see note below)
     (my $in_safe  = $args{in})  =~ s/[^\\\:\_\w\.\/\-]//g;
     (my $out_safe = $args{out}) =~ s/[^\\\:\_\w\.\/\-]//g;
 
@@ -612,7 +616,7 @@ sub ts_query {
 #   This is intentional per RFC3161, not a workaround.
 #
 # Note on binmode:
-#   The token is binary DER — binmode prevents Perl from mangling
+#   The token is binary DER - binmode prevents Perl from mangling
 #   0x0d bytes on Windows (CRLF translation).
 # ============================================================
 sub tsa_fetch {
@@ -633,7 +637,7 @@ sub tsa_fetch {
         local $/;
         open(my $fh, '-|', @cmd)
             or die "Cannot exec curl: $!";
-        binmode $fh;  # DER is binary — critical on Windows
+        binmode $fh;  # DER is binary - critical on Windows
         $timestamp = <$fh>;
         close $fh
             or die "curl tsa_fetch failed (exit " . ($? >> 8) . ")";
@@ -693,7 +697,7 @@ sub verify_signatures {
 
     die "verify_signatures: file not found: $pdf_path\n" unless -e $pdf_path;
 
-    # read raw PDF bytes — needed for ByteRange gap extraction
+    # read raw PDF bytes - needed for ByteRange gap extraction
     open(my $fh, '<:raw', $pdf_path) or die "Cannot read $pdf_path: $!";
     my $raw = do { local $/; <$fh> };
     close $fh;
@@ -759,7 +763,7 @@ sub verify_signatures {
         # estrai i primi 16 bytes hex del Contents per identificare il ByteRange
         my $contents_obj = $sigval->{Contents};
         my $contents_raw = $contents_obj ? $contents_obj->as_pdf : '';
-        # as_pdf produce <3082...0000> — estrai i primi caratteri hex significativi
+        # as_pdf produce <3082...0000> - estrai i primi caratteri hex significativi
         my $contents_prefix = '';
         if ($contents_raw =~ m{<([0-9a-fA-F]{16,})}) {
             $contents_prefix = lc(substr($1, 0, 16));
@@ -805,7 +809,7 @@ sub verify_signatures {
             next;
         }
 
-        # decode full hex to binary — then trim to actual ASN.1 length
+        # decode full hex to binary - then trim to actual ASN.1 length
         # do NOT use regex strip of trailing zeros: legitimate DER may end with 0x00
         # instead read the ASN.1 SEQUENCE length from the DER header
         my $der_full = pack('H*', $contents_hex);

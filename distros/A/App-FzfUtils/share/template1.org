@@ -1,0 +1,23 @@
+* Product > P1
+** Does P1 need to be replaced every 5 years?  :replacement:clipadd_1:
+Yes, ideally every 3-5 years.
+** How to maintain P1 so it is in a good condition and can last longer?
+Wash after every use, then dry.
+Keep it clean.
+And of course replace after 3-5 years.
+* Product > P2
+** Which is better, P1 or P2?                                     :clipadd_2:
+Each has its pro's and con's. P1 is more expensive but lasts longer. P2 is
+slightly more economical, but needs to be replaced more often. And its operating
+cost is higher.
+
+For more details, see reviews for P1 vs P2.
+** How to maintain P2 so it is in a good condition?
+Like P1, wash after every use, then dry.
+Keep it clean.
+And of course replace after 3-5 years.
+* General > Support
+** How do I contact customer support?
+By email to email@example.com or WhatsApp via +62-555-1234.
+** Is there an offline store to visit?
+Currently no, sorry. All transactions are via online marketplace.

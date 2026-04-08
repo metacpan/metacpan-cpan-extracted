@@ -1,7 +1,7 @@
 package Bot::IRC::X::Feeds;
 # ABSTRACT: Bot::IRC plugin to watch and notify on changes in RSS feeds
 
-use 5.014;
+use 5.016;
 use exact;
 
 use XML::RSS;
@@ -10,7 +10,7 @@ use LWP::Protocol::https;
 use Date::Parse 'str2time';
 use WWW::Shorten qw( TinyURL makeashorterlink );
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -149,7 +149,7 @@ Bot::IRC::X::Feeds - Bot::IRC plugin to watch and notify on changes in RSS feeds
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Feeds/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Feeds/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Feeds/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Feeds)

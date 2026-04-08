@@ -5,16 +5,17 @@ use warnings;
 use File::Temp qw(tempfile);
 use File::Spec;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # Find a working C preprocessor
 sub _find_preprocessor {
     my @candidates = qw(clang cpp gcc);
+    my $devnull = File::Spec->devnull();
 
     for my $cmd (@candidates) {
-        my $output = `$cmd --version 2>/dev/null`;
+        my $output = `$cmd --version 2>$devnull`;
         if ($? == 0) {
-            return $cmd eq 'gcc' ? "$cmd -E" : "$cmd -E";
+            return "$cmd -E";
         }
     }
 

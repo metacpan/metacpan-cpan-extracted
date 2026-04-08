@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "0",
+            "File::Raw" : "0",
             "IO::Select" : "0",
             "IO::Socket::UNIX" : "0",
             "perl" : "5.010"
@@ -52,6 +53,6 @@
          "web" : "https://github.com/javalikescript/webview-c"
       }
    },
-   "version" : "0.15",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

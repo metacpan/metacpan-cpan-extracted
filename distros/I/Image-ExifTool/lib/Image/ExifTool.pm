@@ -29,7 +29,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %jpegMarker %specialTags %fileTypeLookup $testLen $exeDir
             %static_vars $advFmtSelf $configFile @configFiles $noConfig);
 
-$VERSION = '13.50';
+$VERSION = '13.55';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -1202,7 +1202,7 @@ my @availableOptions = (
     [ 'UserParam',        { },    'user parameters for additional user-defined tag values' ],
     [ 'Validate',         undef,  'perform additional validation' ],
     [ 'Verbose',          0,      'print verbose messages (0-5, higher # = more verbose)' ],
-    [ 'WindowsLongPath',  1,      'enable support for long pathnames (enables WindowsWideFile)' ],
+    [ 'WindowsLongPath',  0,      'enable support for long pathnames (enables WindowsWideFile)' ],
     [ 'WindowsWideFile',  undef,  'force the use of Windows wide-character file routines' ], # (see forum15208)
     [ 'WriteMode',        'wcg',  'enable all write modes by default' ],
     [ 'XAttrTags',        undef,  'extract MacOS extended attribute tags' ],
@@ -1246,6 +1246,10 @@ sub DummyWriteProc { return 1; }
 # queued plug-in tags to add to lookup
 @Image::ExifTool::pluginTags = ( );
 %Image::ExifTool::pluginTags = ( );
+
+# memory purge variables
+my $purgeFlag = 0;
+my @purgeTags;
 
 my %systemTagsNotes = (
     Notes => q{
@@ -1457,12 +1461,15 @@ my %systemTagsNotes = (
     FileCreateDate => {
         Description => 'File Creation Date/Time',
         Notes => q{
-            the filesystem creation date/time.  Windows/Mac only.  In Windows, the file
-            creation date/time is preserved by default when writing if Win32API::File
-            and Win32::API are available.  On Mac, this tag is extracted only if it or
-            the MacOS group is specifically requested or the API L<RequestAll|../ExifTool.html#RequestAll> option is
-            set to 2 or higher.  Requires "setfile" for writing on Mac, which may be
-            installed by typing C<xcode-select --install> in the Terminal
+            the filesystem creation date/time.  Windows/Mac/Linux only.  In Windows, the
+            file creation date/time is preserved by default when writing if
+            Win32API::File and Win32::API are available.  On Mac, this tag is extracted
+            only if it or the MacOS group is specifically requested or the API
+            L<RequestAll|../ExifTool.html#RequestAll> option is set to 2 or higher.  On
+            Linux, this tag is read-only and extracted only if the filesystem supports
+            btime and "File::StatX" is available.  Requires "setfile" for writing on
+            Mac, which may be installed by typing C<xcode-select --install> in the
+            Terminal
         },
         Groups => { 1 => 'System', 2 => 'Time' },
         Writable => 1,
@@ -2674,11 +2681,13 @@ sub ClearOptions($)
 {
     local $_;
     my $self = shift;
-
-    $$self{OPTIONS} = { };  # clear all options
+    my $opts = $$self{OPTIONS} = { };  # clear all options
 
     # load default options
-    $$self{OPTIONS}{$$_[0]} = $$_[1] foreach @availableOptions;
+    $$opts{$$_[0]} = $$_[1] foreach @availableOptions;
+
+    # enable WindowsLongPath if Win32::API is available
+    $$opts{WindowsLongPath} = 1 if $^O eq 'MSWin32' and eval { require Win32::API };
 
     # keep necessary member variables in sync with options
     delete $$self{CUR_LANG};
@@ -2886,6 +2895,16 @@ sub ExtractInfo($;@)
         $self->FoundTag('FileAccessDate', $stat[8]) if defined $stat[8];
         my $cTag = $^O eq 'MSWin32' ? 'FileCreateDate' : 'FileInodeChangeDate';
         $self->FoundTag($cTag, $stat[10]) if defined $stat[10];
+        if ($^O eq 'linux' and @stat and eval { require File::StatX }) {
+            my $stat;
+            local $SIG{'__WARN__'} = \&SetWarning;
+            if ($raf) {
+                eval { $stat=File::StatX::fstatx($$raf{FILE_PT}, 0, File::StatX::STATX_BTIME()) };
+            } else {
+                eval { $stat=File::StatX::statx($filename, 0, File::StatX::STATX_BTIME()) };
+            }
+            $self->FoundTag('FileCreateDate', $stat->btime) if $stat and $stat->btime;
+        }
         $self->FoundTag('FilePermissions', $stat[2]) if defined $stat[2];
         # extract more system info if SystemTags option is set
         if (@stat) {
@@ -3583,7 +3602,7 @@ sub GetValue($$;$)
                                 $self->Warn("$convType $tag: " . CleanWarning()) if $evalWarning;
                             }
                             if (not defined $value) {
-                                if ($$tagInfo{PrintHex} and $val and IsInt($val) and
+                                if ($$tagInfo{PrintHex} and defined $val and IsInt($val) and
                                     $convType eq 'PrintConv')
                                 {
                                     $value = sprintf('Unknown (0x%x)',$val);
@@ -4337,6 +4356,21 @@ sub Init($)
     }
     # make sure our TextOut is a file reference
     $$self{OPTIONS}{TextOut} = \*STDOUT unless ref $$self{OPTIONS}{TextOut};
+}
+
+#------------------------------------------------------------------------------
+# Purge temporary tags from memory and set purge flag for next time
+# Inputs: 0) false=disable purging, true=enable purging, and
+#            purge now if number of digits in tags to purge >= flag
+sub Purge(;$)
+{
+    $purgeFlag = shift || 0;
+    if (@purgeTags and length(scalar @purgeTags) >= $purgeFlag) {
+        foreach (@purgeTags) {
+            delete $$_{Table}{$$_{TagID}} unless defined $$_{IsProtobuf};
+        }
+        undef @purgeTags;
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -8223,7 +8257,7 @@ sub ProcessJPEG($$;$)
         } elsif ($marker == 0xea) {         # APP10 (PhotoStudio Unicode comments, HDR gain curve)
             if ($$segDataPt =~ /^UNICODE\0/) {
                 $dumpType = 'PhotoStudio';
-                my $comment = $self->Decode(substr($$segDataPt,8), 'UCS2', 'MM');
+                my $comment = $self->Decode(substr($$segDataPt,8), 'UTF16', 'MM');
                 $self->FoundTag('Comment', $comment);
             } elsif ($$segDataPt =~ /^AROT\0\0.{4}/s) {
                 $dumpType = 'AROT', # (HDR gain curve? PH guess)
@@ -9212,6 +9246,9 @@ sub AddTagToTable($$;$$)
     # if someone thinks there isn't any tagInfo because a condition wasn't satisfied)
     unless (defined $$tagTablePtr{$tagID} or $specialTags{$tagID}) {
         $$tagTablePtr{$tagID} = $tagInfo;
+        if ($purgeFlag and $$tagInfo{Unknown} and not $$tagInfo{SubDirectory}) {
+            push @purgeTags, $tagInfo;
+        }
     }
     $$tagInfo{AddedUnknown} = 1 if $$tagInfo{Unknown};
     return $tagInfo;
@@ -9267,7 +9304,7 @@ sub HandleTag($$$$;%)
         my $start = $parms{Start} || 0;
         my $dLen = $dataPt ? length($$dataPt) : -1;
         my $size = $parms{Size};
-        $size = $dLen unless defined $size;
+        defined $size or $size = ($dLen > 0 ? $dLen : 0);
         # read from data in memory if possible
         if ($start >= 0 and $start + $size <= $dLen) {
             $format = $$tagInfo{Format} || $$tagTablePtr{FORMAT};
@@ -9342,6 +9379,7 @@ sub HandleTag($$$$;%)
                 DataPos  => $parms{DataPos},
                 DirStart => $subdirStart,
                 DirLen   => $subdirLen,
+                DirID    => $tag,
                 Parent   => $parms{Parent},
                 Base     => $parms{Base},
                 Multi    => $$subdir{Multi},
@@ -9864,7 +9902,7 @@ sub ProcessBinaryData($$$)
     my $nextIndex = 0;
     my $varSize = 0;
     foreach $index (@tags) {
-        my ($tagInfo, $val, $saveNextIndex, $len, $mask, $wasVar, $rational);
+        my ($tagInfo, $val, $saveNextIndex, $len, $mask, $wasVar, $rational, $offAdj);
         if ($$tagTablePtr{$index}) {
             $tagInfo = $self->GetTagInfo($tagTablePtr, $index);
             unless ($tagInfo) {
@@ -9919,7 +9957,7 @@ sub ProcessBinaryData($$$)
                 $format = $1;
                 $count = $2;
                 # evaluate count to allow count to be based on previous values
-                #### eval Format size (%val, $size, $self)
+                #### eval Format size (%val, $size, $varSize, $self)
                 $count = eval $count;
                 $@ and warn("Format $$tagInfo{Name}: $@"), next;
                 next if $count < 0;
@@ -9974,7 +10012,7 @@ sub ProcessBinaryData($$$)
                 $varSize += $count; # shift subsequent indices
                 unless (defined $val) {
                     $val = substr($$dataPt, $entry+$dirStart, $count);
-                    $val = $self->Decode($val, 'UCS2') if $format eq 'ustring' or $format eq 'ustr32';
+                    $val = $self->Decode($val, 'UTF16') if $format eq 'ustring' or $format eq 'ustr32';
                     $val =~ s/\0.*//s unless $format eq 'undef';  # truncate at null
                 }
                 $binVal = substr($$dataPt, $entry+$dirStart, $count) if $$self{OPTIONS}{SaveBin};
@@ -9998,7 +10036,7 @@ sub ProcessBinaryData($$$)
             } elsif ($varSize != $oldVarSize and $verbose > 2) {
                 my ($tmp, $sign) = ($varSize, '+');
                 $tmp < 0 and $tmp = -$tmp, $sign = '-';
-                $self->VPrint(2, sprintf("$$self{INDENT}\[offsets adjusted by ${sign}0x%.4x after 0x%.4x $$tagInfo{Name}]\n", $tmp, $index));
+                $offAdj = sprintf("$$self{INDENT}\[offsets adjusted by ${sign}0x%.4x after 0x%.4x $$tagInfo{Name}]\n", $tmp, $index);
             }
         }
         if ($unknown > 1) {
@@ -10037,6 +10075,7 @@ sub ProcessBinaryData($$$)
                 Extra  => $mask ? sprintf(', mask 0x%.2x',$mask) : undef,
             );
         }
+        $offAdj and $self->VPrint(2, $offAdj);
         # parse nested BinaryData directories
         if ($$tagInfo{SubDirectory}) {
             my $subdir = $$tagInfo{SubDirectory};

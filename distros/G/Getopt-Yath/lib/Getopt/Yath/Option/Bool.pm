@@ -2,7 +2,7 @@ package Getopt::Yath::Option::Bool;
 use strict;
 use warnings;
 
-our $VERSION = '2.000008';
+our $VERSION = '2.000009';
 
 use parent 'Getopt::Yath::Option';
 use Getopt::Yath::HashBase;
@@ -16,7 +16,7 @@ sub requires_autofill { 0 }
 
 sub no_arg_value { 1 }    # --bool
 
-# undef is not populated, otherwise qw have 1 or 0
+# undef is not populated, otherwise we have 1 or 0
 sub is_populated { defined(${$_[1]}) ? 1 : 0 }
 
 sub add_value   { ${$_[1]} = $_[2] }
@@ -54,7 +54,7 @@ Getopt::Yath::Option::Bool - Option type for boolean values (no arguments)
 
 =head1 DESCRIPTION
 
-Is either on or off. C<--opt> will turn it onn. C<--no-opt> will turn it off.
+Is either on or off. C<--opt> will turn it on. C<--no-opt> will turn it off.
 Default is off unless the C<default> is parameter is provided.
 
 =head1 SYNOPSIS
@@ -65,9 +65,27 @@ Default is off unless the C<default> is parameter is provided.
         default => 0,
     );
 
-=head1 EXPORTS
+=head1 METHODS
+
+All methods from L<Getopt::Yath::Option> are inherited. The following are
+overridden or noteworthy:
 
 =over 4
+
+=item requires_arg: false
+
+=item allows_arg: false
+
+Bool options take no argument. C<--opt> turns it on, C<--no-opt> turns it off.
+
+=item can_set_env: true
+
+Bool options can set environment variables. Negated env vars (C<!VAR>) are
+supported and will invert the boolean value.
+
+=item get_default_value
+
+Returns C<0> by default unless a custom C<default> is provided.
 
 =back
 

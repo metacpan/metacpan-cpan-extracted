@@ -79,7 +79,7 @@ sub enth1 {
     }
 }
 
-my $parser = new XML::Parser(
+my $parser = XML::Parser->new(
     ErrorContext  => 2,
     NoLWP         => 1,
     ParseParamEnt => 1,

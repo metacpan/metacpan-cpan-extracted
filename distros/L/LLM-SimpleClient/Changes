@@ -1,0 +1,10 @@
+Revision history for LLM-SimpleClient
+
+0.01  2026-04-07
+        - Initial release
+        - Support for Mistral AI provider
+        - Support for HuggingFace Router provider
+        - Support for OpenRouter provider
+        - Simple unified chat interface
+        - Configurable parameters (temperature, max_tokens, top_p)
+        - Logging support via Log4perl

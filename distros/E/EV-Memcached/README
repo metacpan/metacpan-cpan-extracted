@@ -1,0 +1,379 @@
+NAME
+    EV::Memcached - High-performance asynchronous memcached client using EV
+
+SYNOPSIS
+        use EV::Memcached;
+
+        my $mc = EV::Memcached->new(
+            host       => '127.0.0.1',
+            port       => 11211,
+            on_error   => sub { warn "memcached error: @_" },
+            on_connect => sub { warn "connected" },
+        );
+
+        $mc->set('foo', 'bar', sub {
+            my ($result, $err) = @_;
+            die $err if $err;
+
+            $mc->get('foo', sub {
+                my ($value, $err) = @_;
+                print "foo = $value\n";  # bar
+                $mc->disconnect;
+            });
+        });
+
+        EV::run;
+
+DESCRIPTION
+    EV::Memcached is a high-performance asynchronous memcached client that
+    implements the memcached binary protocol in pure XS with EV event loop
+    integration. No external C memcached client library is required.
+
+    Features:
+
+    *   Binary protocol for efficient encoding and pipelining
+
+    *   Automatic pipelining (multiple commands in flight)
+
+    *   Multi-get optimization via GETKQ + NOOP fence
+
+    *   Flow control (max_pending, waiting queue)
+
+    *   Automatic reconnection
+
+    *   Fire-and-forget mode (no callback)
+
+    *   TCP and Unix socket support
+
+    *   SASL PLAIN authentication (auto-auth on connect)
+
+    *   Connect and command timeouts
+
+    *   Key length validation (250-byte protocol limit)
+
+ANYEVENT INTEGRATION
+    AnyEvent has EV as one of its backends, so EV::Memcached can be used in
+    AnyEvent applications seamlessly.
+
+NO UTF-8 SUPPORT
+    This module handles all variables as bytes. Encode your UTF-8 strings
+    before passing them:
+
+        use Encode;
+
+        $mc->set(foo => encode_utf8($val), sub { ... });
+
+        $mc->get('foo', sub {
+            my $val = decode_utf8($_[0]);
+        });
+
+METHODS
+  new(%options)
+    Create a new EV::Memcached instance. All options are optional.
+
+        my $mc = EV::Memcached->new(
+            host     => '127.0.0.1',
+            port     => 11211,
+            on_error => sub { die @_ },
+        );
+
+    Options:
+
+    host => 'Str'
+    port => 'Int' (default 11211)
+        Hostname and port. Mutually exclusive with "path".
+
+    path => 'Str'
+        Unix socket path. Mutually exclusive with "host".
+
+    on_error => $cb->($errstr)
+        Error callback for connection-level errors. Default: "die".
+
+    on_connect => $cb->()
+        Called when connection is established.
+
+    on_disconnect => $cb->()
+        Called when disconnected.
+
+    connect_timeout => $ms
+        Connection timeout in milliseconds. 0 = no timeout (default). Only
+        applies to non-blocking TCP connects (not Unix sockets or immediate
+        localhost connections).
+
+    command_timeout => $ms
+        Command timeout in milliseconds. When set, if no response is
+        received within this interval, the connection is terminated with
+        "command timeout" error. The timer resets on every response from the
+        server. 0 = no timeout (default).
+
+    max_pending => $num
+        Maximum concurrent commands. 0 = unlimited (default).
+
+    waiting_timeout => $ms
+        Max time in local queue before cancellation. 0 = unlimited.
+
+    resume_waiting_on_reconnect => $bool
+        Keep waiting queue on disconnect for replay after reconnect.
+
+    reconnect => $bool
+        Enable automatic reconnection.
+
+    reconnect_delay => $ms (default 1000)
+    max_reconnect_attempts => $num (0 = unlimited)
+    priority => $num (-2 to +2)
+        EV watcher priority.
+
+    keepalive => $seconds
+        TCP keepalive interval.
+
+    username => 'Str'
+    password => 'Str'
+        SASL PLAIN authentication credentials. When both are set, the client
+        automatically authenticates after connecting (and after each
+        reconnect). Requires memcached started with "-S" flag and SASL
+        support compiled in.
+
+    loop => EV::Loop
+        EV loop to use. Default: "EV::default_loop".
+
+  connect($host, [$port])
+    Connect to memcached server. Port defaults to 11211.
+
+  connect_unix($path)
+    Connect via Unix socket.
+
+  disconnect
+    Disconnect from server. Stops reconnect timer. Pending command callbacks
+    receive "(undef, "disconnected")" error. "on_disconnect" fires after
+    pending callbacks have been cancelled.
+
+    For intentional disconnect, only "on_disconnect" fires. For
+    server-initiated close or errors, "on_disconnect" fires first, then
+    "on_error" fires with the reason (e.g., "connection closed by server",
+    "command timeout"). This lets you distinguish the two cases.
+
+  is_connected
+    Returns true if connected or connecting.
+
+  get($key, [$cb->($value, $err)])
+    Retrieve a value. On miss: "($value, $err)" are both "undef".
+
+  gets($key, [$cb->($result, $err)])
+    Retrieve with metadata. $result is "{ value, flags, cas }".
+
+  set($key, $value, [$expiry, [$flags,]] [$cb])
+    Store a value. Without callback: fire-and-forget.
+
+  add($key, $value, [$expiry, [$flags,]] [$cb])
+    Store only if key does not exist.
+
+  replace($key, $value, [$expiry, [$flags,]] [$cb])
+    Store only if key exists.
+
+  cas($key, $value, $cas, [$expiry, [$flags,]] [$cb])
+    Compare-and-swap: store only if CAS value matches.
+
+  delete($key, [$cb])
+    Delete a key.
+
+  incr($key, [$delta, [$initial, [$expiry,]]] [$cb])
+    Atomic increment. $delta defaults to 1. $expiry defaults to 0xFFFFFFFF
+    (don't create if key doesn't exist).
+
+        $mc->incr('counter', 1, sub {
+            my ($new_value, $err) = @_;
+        });
+
+        # Auto-create with initial value 100, TTL 300s:
+        $mc->incr('counter', 1, 100, 300, sub { ... });
+
+  decr($key, [$delta, [$initial, [$expiry,]]] [$cb])
+    Atomic decrement. Memcached clamps at 0 (never goes negative).
+
+  append($key, $data, [$cb])
+    Append data to existing value.
+
+  prepend($key, $data, [$cb])
+    Prepend data to existing value.
+
+  touch($key, $expiry, [$cb])
+    Update expiration time without fetching.
+
+  gat($key, $expiry, [$cb->($value, $err)])
+    Get and touch: retrieve value and update expiration.
+
+  gats($key, $expiry, [$cb->($result, $err)])
+    Get and touch with metadata.
+
+  mget(\@keys, [$cb->(\%results, $err)])
+    Multi-get using GETKQ + NOOP fence optimization. Results hash contains
+    only found keys:
+
+        $mc->mget([qw(k1 k2 k3)], sub {
+            my ($results, $err) = @_;
+            # $results = { k1 => 'val1', k3 => 'val3' }
+            # k2 was a miss (not in hash)
+        });
+
+  mgets(\@keys, [$cb->(\%results, $err)])
+    Like "mget" but returns full metadata per key:
+
+        $mc->mgets([qw(k1 k2)], sub {
+            my ($results, $err) = @_;
+            # $results = { k1 => { value => 'v', flags => 0, cas => 123 } }
+        });
+
+  version([$cb->($version, $err)])
+    Get server version string.
+
+  stats([$name,] [$cb->(\%stats, $err)])
+    Get server statistics. Optional $name for specific stat group.
+
+  flush([$expiry,] [$cb])
+    Invalidate all items. Optional delay in seconds.
+
+  noop([$cb])
+    No-operation. Useful as a pipeline fence.
+
+  quit([$cb])
+    Send quit command. Server will close connection.
+
+  sasl_auth($username, $password, [$cb])
+    Authenticate using SASL PLAIN mechanism. Called automatically on connect
+    when "username" and "password" constructor options are set.
+
+        $mc->sasl_auth('user', 'secret', sub {
+            my ($result, $err) = @_;
+            die "auth failed: $err" if $err;
+            # authenticated -- proceed with commands
+        });
+
+  sasl_list_mechs([$cb->($mechs, $err)])
+    Query available SASL mechanisms. Returns a space-separated string (e.g.,
+    "PLAIN").
+
+  reconnect($enable, [$delay_ms], [$max_attempts])
+    Configure automatic reconnection.
+
+  reconnect_enabled
+    Returns true if reconnect is enabled.
+
+  connect_timeout([$ms])
+    Get/set connection timeout in milliseconds.
+
+  command_timeout([$ms])
+    Get/set command timeout in milliseconds. When a response is received,
+    the timer resets. If no response arrives within the timeout, the
+    connection is disconnected with "command timeout" error.
+
+  pending_count
+    Number of commands awaiting server response.
+
+  waiting_count
+    Number of commands in local queue (flow control).
+
+  max_pending([$limit])
+    Get/set concurrent command limit.
+
+  waiting_timeout([$ms])
+    Get/set local queue timeout.
+
+  resume_waiting_on_reconnect([$bool])
+    Get/set waiting queue behavior on disconnect.
+
+  priority([$num])
+    Get/set EV watcher priority (-2 to +2).
+
+  keepalive([$seconds])
+    Get/set TCP keepalive.
+
+  skip_pending
+    Cancel all pending command callbacks with "(undef, "skipped")".
+
+  skip_waiting
+    Cancel all waiting command callbacks with "(undef, "skipped")".
+
+  on_error([$cb])
+  on_connect([$cb])
+  on_disconnect([$cb])
+    Get/set handler callbacks.
+
+DESTRUCTION BEHAVIOR
+    When an EV::Memcached object is destroyed while commands are still
+    pending or waiting, all pending callbacks receive "(undef,
+    "disconnected")" and all waiting callbacks likewise.
+
+    For predictable cleanup:
+
+        $mc->disconnect;
+        undef $mc;
+
+    Or cancel callbacks first:
+
+        $mc->skip_pending;
+        $mc->skip_waiting;
+        $mc->disconnect;
+
+    Circular references: If callbacks close over $mc, break the cycle before
+    the object goes out of scope:
+
+        $mc->on_error(undef);
+        $mc->on_connect(undef);
+        $mc->on_disconnect(undef);
+
+BENCHMARKS
+    Measured on Linux with TCP loopback connection, 100-byte values, Perl
+    5.40, memcached 1.6.41 ("bench/benchmark.pl"):
+
+                             50K cmds    200K cmds
+        Pipeline SET           213K        68K ops/sec
+        Pipeline GET           216K        67K ops/sec
+        Mixed workload         226K        69K ops/sec
+        Fire-and-forget SET   1.13M      1.29M ops/sec  (SETQ)
+        Multi-get (GETKQ)    1.30M       1.17M ops/sec  (per key)
+        Sequential round-trip   41K        38K ops/sec
+
+    Fire-and-forget mode (no callback) is roughly 5x faster than callback
+    mode due to zero Perl-side overhead per command. Multi-get is the
+    fastest path since quiet commands suppress miss responses.
+
+    Callback-based throughput scales inversely with batch size because Perl
+    SV allocation dominates when many closures are queued at once. In real
+    workloads (commands interleaved with responses), performance stays near
+    the 50K-column numbers.
+
+    Flow control ("max_pending") impact (200K commands):
+
+        unlimited       ~131K ops/sec
+        max_pending=500 ~126K ops/sec
+        max_pending=100 ~120K ops/sec
+        max_pending=50  ~117K ops/sec
+
+    Run "perl bench/benchmark.pl" for full results. Set "BENCH_COMMANDS",
+    "BENCH_VALUE_SIZE", "BENCH_HOST", and "BENCH_PORT" to customize.
+
+BINARY PROTOCOL
+    This module implements the memcached binary protocol directly in XS. The
+    binary protocol provides efficient encoding with a fixed 24-byte header,
+    support for pipelining via the opaque field, and quiet command variants
+    for reduced network traffic.
+
+    Multi-get uses the GETKQ (quiet get with key) opcode followed by a NOOP
+    fence. Only cache hits generate responses; misses are silent. The NOOP
+    response signals completion of the batch.
+
+    Fire-and-forget "set" uses the SETQ (quiet SET) opcode -- the server
+    suppresses the response entirely, eliminating network and parsing
+    overhead. Other commands that can fail (add, replace, delete, incr,
+    etc.) use normal opcodes even in fire-and-forget mode so error responses
+    are properly consumed.
+
+    Keys are validated against the 250-byte protocol limit.
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

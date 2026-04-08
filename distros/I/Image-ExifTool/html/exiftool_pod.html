@@ -4,7 +4,7 @@
 <head>
 <title>exiftool Application Documentation</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@nlvzh.p1s.plx.sd.apple.com" />
+<link rev="made" href="mailto:root@66b96.p1s.plx.sd.apple.com" />
 <style type='text/css'><!-- code { color: #800 } pre { margin-left: 2em } --></style></head>
 
 <body>
@@ -250,7 +250,7 @@ GeoTIFF        r/w/c  |  ID3            r    |  (and more)</code></pre>
 
 <pre><code>-@ ARGFILE                       Read command-line arguments from file
 -k          (-pause)             Pause before terminating
--list[w|f|wf|g[NUM]|d|x]         List various exiftool capabilities
+-list[w|f|r|wf|g[NUM]|d|x|geo]   List various exiftool capabilities
 -ver                             Print exiftool version number
 --                               End of options</code></pre>
 
@@ -268,7 +268,7 @@ GeoTIFF        r/w/c  |  ID3            r    |  (and more)</code></pre>
 
 <p><a href="#Advanced-options">Advanced options</a></p>
 
-<pre><code>-api OPT[[^]=[VAL]]              Set ExifTool API option
+<pre><code>-api [OPT[[^]=[VAL]]]            Set ExifTool API option
 -common_args                     Define common arguments
 -config CFGFILE                  Specify configuration file name
 -echo[NUM] TEXT                  Echo text to stdout or stderr
@@ -303,7 +303,7 @@ GeoTIFF        r/w/c  |  ID3            r    |  (and more)</code></pre>
 <dt id="TAG1"><b>--</b><i>TAG</i></dt>
 <dd>
 
-<p>Exclude specified tag from extracted information. Same as the <b>-x</b> option. Group names and wildcards are permitted as described above for <b>-</b><i>TAG</i>. Once excluded from the output, a tag may not be re-included by a subsequent option. May also be used following a <b>-tagsFromFile</b> option to exclude tags from being copied (when redirecting to another tag, it is the source tag that should be excluded), or to exclude groups from being deleted when deleting all information (eg. <code>-all= --exif:all</code> deletes all but EXIF information). But note that this will not exclude individual tags from a group delete (unless a family 2 group is specified, see note 4 below). Instead, individual tags may be recovered using the <b>-tagsFromFile</b> option (eg. <code>-all= -tagsfromfile @ -artist</code>).</p>
+<p>Exclude specified tag from extracted information. Same as the <b>-x</b> option. Group names and wildcards are permitted as described above for <b>-</b><i>TAG</i>. Once excluded from the output, a tag may not be re-included by a subsequent option. Also note that this excludes the tag from being used in a <code>-if</code> condition. May be used following a <b>-tagsFromFile</b> option to exclude tags from being copied (when redirecting to another tag, it is the source tag that should be excluded), or to exclude groups from being deleted when deleting all information (eg. <code>-all= --exif:all</code> deletes all but EXIF information). But note that this will not exclude individual tags from a group delete (unless a family 2 group is specified, see note 4 below). Instead, individual tags may be recovered using the <b>-tagsFromFile</b> option (eg. <code>-all= -tagsfromfile @ -artist</code>).</p>
 
 <p>To speed processing when reading XMP, exclusions in XMP groups also bypass processing of the corresponding XMP property and any contained properties. For example, <code>--xmp-crs:all</code> may speed processing significantly in cases where a large number of XMP-crs tags exist. To use this feature to bypass processing of a specific XMP property, the property name must be used instead of the ExifTool tag name (eg. <code>--xmp-crs:dabs</code>). Also, <code>XMP-all</code> may be used to to indicate any XMP namespace (eg. <code>--xmp-all:dabs</code>).</p>
 
@@ -366,7 +366,7 @@ MOV/MP4 Video:
 
 <p>A powerful redirection feature allows a destination tag to be specified for each copied tag. With this feature, information may be written to a tag with a different name or group. This is done using &quot;&#39;-<i>DSTTAG</i>&lt;<i>SRCTAG</i>&#39;&quot; or &quot;&#39;-<i>SRCTAG</i>&gt;<i>DSTTAG</i>&#39;&quot; on the command line after <b>-tagsFromFile</b>, and causes the value of <i>SRCTAG</i> to be copied from <i>SRCFILE</i> and written to <i>DSTTAG</i> in <i>FILE</i>. Has no effect unless <i>SRCTAG</i> exists in <i>SRCFILE</i>. Note that this argument must be quoted to prevent shell redirection, and there is no <code>=</code> sign as when assigning new values. Source and/or destination tags may be prefixed by a group name and/or suffixed by <code>#</code>. Wildcards are allowed in both the source and destination tag names. A destination group and/or tag name of <code>All</code> or <code>*</code> writes to the same family 1 group and/or tag name as the source (but the family may be specified by adding a leading number to the group name, eg. <code>0All</code> writes to the same family 0 group as the source). If no destination group is specified, the information is written to the preferred group. Whitespace around the <code>&gt;</code> or <code>&lt;</code> is ignored. As a convenience, <code>-tagsFromFile @</code> is assumed for any redirected tags which are specified without a prior <b>-tagsFromFile</b> option. Copied tags may also be added or deleted from a list, or conditionally deleted/replaced with arguments of the form &quot;&#39;-<i>SRCTAG</i>+&lt;<i>DSTTAG</i>&#39;&quot; or &quot;&#39;-<i>SRCTAG</i>-&lt;<i>DSTTAG</i>&#39;&quot; (but see Note 5 below).</p>
 
-<p>An extension of the redirection feature allows strings involving tag names to be used on the right hand side of the <code>&lt;</code> symbol with the syntax &quot;&#39;-<i>DSTTAG</i>&lt;<i>STR</i>&#39;&quot;, where tag names in <i>STR</i> are prefixed with a <code>$</code> symbol. See the <b>-p</b> option and the <a href="#Advanced-formatting-feature">&quot;Advanced formatting feature&quot;</a> section for more details about this syntax. Strings starting with a <code>=</code> sign must insert a single space after the <code>&lt;</code> to avoid confusion with the <code>&lt;=</code> operator which sets the tag value from the contents of a file. A single space at the start of the string is removed if it exists, but all other whitespace in the string is preserved. See note 8 below about using the redirection feature with list-type stags, shortcuts or when using wildcards in tag names.</p>
+<p>An extension of the redirection feature allows strings involving tag names to be used on the right hand side of the <code>&lt;</code> symbol with the syntax &quot;&#39;-<i>DSTTAG</i>&lt;<i>STR</i>&#39;&quot;, where tag names in <i>STR</i> are prefixed with a <code>$</code> symbol. See the <b>-p</b> option and the <a href="#Advanced-formatting-feature">&quot;Advanced formatting feature&quot;</a> section for more details about this syntax. Strings starting with a <code>=</code> sign must insert a single space after the <code>&lt;</code> to avoid confusion with the <code>&lt;=</code> operator which sets the tag value from the contents of a file. A single space at the start of the string is removed if it exists, but all other whitespace in the string is preserved. See note 8 below about using the redirection feature with list-type tags, shortcuts or when using wildcards in tag names.</p>
 
 <p>See <a href="#COPYING-EXAMPLES">&quot;COPYING EXAMPLES&quot;</a> for examples using <b>-tagsFromFile</b>.</p>
 
@@ -400,7 +400,7 @@ MOV/MP4 Video:
 
 <p>7) Structured tags are copied by default when copying tags. See the <b>-struct</b> option for details.</p>
 
-<p>8) With the redirection feature, copying a tag directly (ie. &quot;&#39;-<i>DSTTAG</i>&lt;<i>SRCTAG</i>&#39;&quot;) is not the same as interpolating its value inside a string (ie. &quot;&#39;-<i>DSTTAG</i>&lt;$<i>SRCTAG</i>&#39;&quot;) for source tags which are list-type tags, <a>shortcut tags</a>, or tag names containing wildcards. When copying directly, the values of each matching source tag are copied individually to the destination tag (as if they were separate assignments). However, when interpolated inside a string, list items and the values of shortcut tags are concatenated (with a separator set by the <b>-sep</b> option), and wildcards are not allowed.Another difference is that a minor warning is generated if a tag doesn&#39;t exist when interpolating its value in a string (with <code>$</code>), but isn&#39;t when copying the tag directly.</p>
+<p>8) With the redirection feature, copying a tag directly (ie. &quot;&#39;-<i>DSTTAG</i>&lt;<i>SRCTAG</i>&#39;&quot;) is not the same as interpolating its value inside a string (ie. &quot;&#39;-<i>DSTTAG</i>&lt;$<i>SRCTAG</i>&#39;&quot;) for source tags which are list-type tags, <a>shortcut tags</a>, or tag names containing wildcards. When copying directly, the values of each matching source tag are copied individually to the destination tag (as if they were separate assignments). However, when interpolated inside a string, list items and the values of shortcut tags are concatenated (with a separator set by the <b>-sep</b> option), and wildcards are not allowed. Another difference is that a minor warning is generated if a tag doesn&#39;t exist when interpolating its value in a string (with <code>$</code>), but isn&#39;t when copying the tag directly.</p>
 
 <p>Finally, the behaviour is different when a destination tag or group of <code>All</code> is used. When copying directly, a destination group and/or tag name of <code>All</code> writes to the same family 1 group and/or tag name as the source. But when interpolated in a string, the identity of the source tags are lost and the value is written to all possible groups/tags. For example, the string form must be used in the following command since the intent is to set the value of all existing date/time tags from <code>CreateDate</code>:</p>
 
@@ -569,7 +569,7 @@ exiftool -csv=a.csv dir</code></pre>
 <dt id="E--ex--ec--escapeHTML--escapeXML--escapeC"><b>-E</b>, <b>-ex</b>, <b>-ec</b> (<b>-escapeHTML</b>, <b>-escapeXML</b>, <b>-escapeC</b>)</dt>
 <dd>
 
-<p>Escape characters in output tag values for HTML (<b>-E</b>), XML (<b>-ex</b>) or C (<b>-ec</b>). For HTML, all characters with Unicode code points above U+007F are escaped as well as the following 5 characters: &amp; (&amp;amp;) &#39; (&amp;#39;) &quot; (&amp;quot;) &gt; (&amp;gt;) and &lt; (&amp;lt;). For XML, only these 5 characters are escaped. The <b>-E</b> option is implied with <b>-h</b>, and <b>-ex</b> is implied with <b>-X</b>. For C, all control characters and the backslash are escaped. The inverse conversion is applied when writing tags.</p>
+<p>Escape characters in output tag values for HTML (<b>-E</b>), XML (<b>-ex</b>) or C (<b>-ec</b>). For HTML, all characters with Unicode code points above U+007F are escaped as well as the following 5 characters: &amp; (&amp;amp;) &#39; (&amp;#39;) &quot; (&amp;quot;) &gt; (&amp;gt;) and &lt; (&amp;lt;). For XML, only these 5 characters are escaped. The <b>-E</b> option is implied with <b>-h</b>, <b>-ex</b> is implied with <b>-X</b>, <b>-ec</b> is implied with <b>-json</b>, and none of these options apply to the <b>-csv</b> output. For C, all control characters and the backslash are escaped. The inverse conversion is applied when writing tags.</p>
 
 </dd>
 <dt id="f--forcePrint"><b>-f</b> (<b>-forcePrint</b>)</dt>
@@ -722,7 +722,7 @@ File: $FileName - $DateTimeOriginal
 
 <p>produces output like this:</p>
 
-<pre><code>-- Generated by ExifTool 13.50 --
+<pre><code>-- Generated by ExifTool 13.55 --
 File: a.jpg - 2003:10:31 15:44:19
 (f/5.6, 1/60s, ISO 100)
 File: b.jpg - 2006:05:23 11:57:38
@@ -815,7 +815,7 @@ print_r($array);
 <p>Print verbose messages. <i>NUM</i> specifies the level of verbosity in the range 0-5, with higher numbers being more verbose. If <i>NUM</i> is not given, then each <b>-v</b> option increases the level of verbosity by 1. With any level greater than 0, most other options are ignored and normal console output is suppressed unless specific tags are extracted. Using <b>-v0</b> causes the console output buffer to be flushed after each line (which may be useful to avoid delays when piping exiftool output), and prints the name of each processed file when writing and the new file name when renaming, moving or copying. Verbose levels above <b>-v0</b> do not flush after each line. Also see the <b>-progress</b> option.</p>
 
 </dd>
-<dt id="w-EXT-or-FMT--textOut"><b>-w</b>[+|!] <i>EXT</i> or <i>FMT</i> (<b>-textOut</b>)</dt>
+<dt id="w-EXT-or-FMT--textOut"><b>-w</b>[+][!] <i>EXT</i> or <i>FMT</i> (<b>-textOut</b>)</dt>
 <dd>
 
 <p>Write console output to files with names ending in <i>EXT</i>, one for each source file. The output file name is obtained by replacing the source file extension (including the &#39;.&#39;) with the specified extension (and a &#39;.&#39; is added to the start of <i>EXT</i> if it doesn&#39;t already contain one). Alternatively, a <i>FMT</i> string may be used to give more control over the output file name and directory. In the format string, %d, %f and %e represent the directory, filename and extension of the source file, and %c represents a copy number which is automatically incremented if the file already exists. %d includes the trailing &#39;/&#39; if necessary, but %e does not include the leading &#39;.&#39;. For example:</p>

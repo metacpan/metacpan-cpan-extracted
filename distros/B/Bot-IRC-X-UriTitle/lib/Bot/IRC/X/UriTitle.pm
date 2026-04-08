@@ -1,7 +1,7 @@
 package Bot::IRC::X::UriTitle;
 # ABSTRACT: Bot::IRC plugin to parse and print URI titles
 
-use 5.014;
+use 5.016;
 use exact;
 
 use LWP::UserAgent;
@@ -9,7 +9,7 @@ use LWP::Protocol::https;
 use Text::Unidecode 'unidecode';
 use URI::Title 'title';
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -44,7 +44,7 @@ Bot::IRC::X::UriTitle - Bot::IRC plugin to parse and print URI titles
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-UriTitle/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-UriTitle/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-UriTitle/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-UriTitle)

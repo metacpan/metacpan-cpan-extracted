@@ -48,6 +48,10 @@ _chandra_store_flock(int fd, int op)
         flags |= LOCKFILE_EXCLUSIVE_LOCK;
     return LockFileEx(h, flags, 0, MAXDWORD, MAXDWORD, &ov) ? 0 : -1;
 }
+/* Undefine Perl's flock macro before replacing with our own */
+#ifdef flock
+#undef flock
+#endif
 #define flock(fd, op) _chandra_store_flock((fd), (op))
 #endif
 

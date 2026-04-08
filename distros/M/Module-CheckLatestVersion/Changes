@@ -1,0 +1,25 @@
+0.004   2026-04-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [bugfix] Typo in Synopsis.
+
+
+0.003   2026-04-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Show how to use in script.
+
+
+0.002   2026-04-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Observe PERL_MODULE_CHECKLATESTVERSION_SKIP.
+
+        - [incompatible change] Change environment variable name
+          PERL_MODULE_CHECKLATESTVERSION_{,OPT_}DIE.
+
+
+0.001   2026-04-08  Released-By: PERLANCAR
+
+        - First release.

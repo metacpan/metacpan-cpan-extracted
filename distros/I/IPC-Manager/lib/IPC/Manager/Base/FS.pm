@@ -2,7 +2,7 @@ package IPC::Manager::Base::FS;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000012';
 
 use File::Spec;
 

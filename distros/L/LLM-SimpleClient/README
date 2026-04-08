@@ -1,0 +1,31 @@
+LLM::SimpleClient
+=================
+
+Simple unified client for working with LLM providers.
+
+Description
+-----------
+Provides a single common interface for interacting with various large language model services through a standardized API.
+
+
+Installation
+------------
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Dependencies
+------------
+* Mojo::UserAgent
+* Log::Log4perl
+* JSON
+
+Author
+------
+Konstantin Pristine <kpristine@cpan.org>
+
+License
+-------
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

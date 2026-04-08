@@ -567,6 +567,9 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     SV **cccdlflags_sv = hv_fetch(config, "cccdlflags", 10, 0);
     SV **lddlflags_sv = hv_fetch(config, "lddlflags", 9, 0);
     SV **archlib_sv = hv_fetch(config, "archlib", 7, 0);
+#ifdef WIN32
+    SV **libperl_sv = hv_fetch(config, "libperl", 7, 0);
+#endif
 
     const char *cc = (cc_sv && *cc_sv) ? SvPV_nolen(*cc_sv) : "cc";
     const char *ccflags = (ccflags_sv && *ccflags_sv) ? SvPV_nolen(*ccflags_sv) : "";
@@ -607,8 +610,28 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     }
 
     /* Link to shared object with extra ldflags */
+#ifdef WIN32
+    /* On Win32, DLLs must resolve all symbols at link time.
+       Derive -lperl5XX from $Config{libperl} (e.g. "libperl542.a" -> "-lperl542") */
+    char perl_lib_flag[64] = "";
+    if (libperl_sv && *libperl_sv) {
+        const char *libperl = SvPV_nolen(*libperl_sv);
+        /* Strip leading "lib" and trailing ".a" to get e.g. "perl542" */
+        if (strncmp(libperl, "lib", 3) == 0) {
+            const char *start = libperl + 3;
+            const char *dot = strrchr(start, '.');
+            size_t len = dot ? (size_t)(dot - start) : strlen(start);
+            if (len < sizeof(perl_lib_flag) - 3) {
+                snprintf(perl_lib_flag, sizeof(perl_lib_flag), "-l%.*s", (int)len, start);
+            }
+        }
+    }
+    snprintf(cmd, sizeof(cmd), "%s %s %s -o \"%s\" \"%s\" %s 2>&1",
+             cc, lddlflags, extra_ldflags, so_file, o_file, perl_lib_flag);
+#else
     snprintf(cmd, sizeof(cmd), "%s %s %s -o \"%s\" \"%s\" 2>&1",
              cc, lddlflags, extra_ldflags, so_file, o_file);
+#endif
 
     ret = system(cmd);
     if (ret != 0) {
