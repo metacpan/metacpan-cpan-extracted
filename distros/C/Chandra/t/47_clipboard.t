@@ -87,7 +87,7 @@ use Chandra::Clipboard;
 {
     Chandra::Clipboard->clear;
     my $got = Chandra::Clipboard->get_text;
-    ok(!defined $got || $got eq '', 'get_text after clear is undef or empty');
+    ok(!$got, 'get_text after clear is undef or empty');
 }
 
 # ---- get_image with no image returns undef ----

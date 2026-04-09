@@ -2,7 +2,7 @@ package Getopt::Yath::Instance;
 use strict;
 use warnings;
 
-our $VERSION = '2.000009';
+our $VERSION = '2.000011';
 
 use Carp qw/croak/;
 

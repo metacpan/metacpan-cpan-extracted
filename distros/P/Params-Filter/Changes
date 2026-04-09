@@ -1,5 +1,23 @@
 Revision history for Params-Filter
 
+0.017001  2026-04-08
+    - Updated Changes file to document v0.017 test coverage improvements
+    - v0.017 added 9 new subtests across t/01-functional.t, t/02-oo-interface.t,
+      and t/04-make_filter.t to close branch and condition coverage gaps
+      identified in cpancover report; no code or API changes in v0.017
+    - Moved benchmark.t to xt/ as author-only tests; benchmarks compare the
+      module's own interfaces and are not relevant to end-user installs
+    - All 78 tests passing
+
+0.017  2026-04-08
+    - Improved test coverage: 9 new subtests targeting branch/condition gaps
+      found in cpancover report for v0.016
+    - Covered: wrong-key detection, scalar/array truncation paths, excluded-wins
+      logic, scalar-context undef return, non-hashref and empty-hashref
+      new_filter() branches, defensive apply() guard, accepted-absent closure path
+    - No code or API changes; tests only
+    - All 82 tests passing
+
 0.016  2026-02-15
     - Fixed distribution issue with MANIFEST.SKIP
 

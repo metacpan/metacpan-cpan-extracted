@@ -58,16 +58,13 @@ sub definitions {
 	@edit_data
 	@inserts_data
 	@effects_data
-	$project->{nama_version}
-	$project->{save_file_version_number}
-	$project->{sample_rate}
 	$fx->{applied}
 	$fx->{params}
 	$fx->{params_log}
 );
 @persistent_vars = qw(
 	$project->{nama_version}
-	$project->{save_file_version_number}
+	$project->{nama_commit}
 	$project->{timebase}
 	$project->{command_buffer}
 	$project->{track_version_comments}

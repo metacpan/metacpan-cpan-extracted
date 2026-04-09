@@ -42,10 +42,6 @@ my %params = (
         'namespace::clean' => 0,
         'strict'           => 0,
     },
-
-    META_MERGE => {
-        'resources' => { repository => 'https://github.com/thrig/Game-DijkstraMap', },
-    },
 );
 
 (   my $mm_version = ExtUtils::MakeMaker->VERSION(

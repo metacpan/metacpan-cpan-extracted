@@ -1,0 +1,31 @@
+Wed Apr  8 05:49:48 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.0]:
+	* Makefile
+	- new generic Makefile from CPAN::Maker::Bootstrapper
+	* README.md: generated
+	* VERSION: new
+	* bin/podextract
+	- renamed, modulino
+	* buildspec.yml: new
+	* lib/Pod/Extract.pm.in
+	- renamed, refactored to use CLI::Simple
+	* recommends: new
+	* release-notes.mk: new
+	* requires: new
+	* t/00-pod-extract.t: new
+	* test-requires: new
+	* version.mk: new
+	* .gitignore
+	- additions from CPAN::Maker::Bootstrapper
+
+Wed Nov 23 13:17:45 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+	* ChangeLog: new
+	* .gitignore: new
+	* README.md: new
+	* Makefile: new
+	* bin/podextract.pl: new
+	* lib/Pod/Extract.pm: new
+

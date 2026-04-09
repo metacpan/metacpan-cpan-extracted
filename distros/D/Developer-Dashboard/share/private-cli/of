@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::OpenFile qw(run_open_file_command);
+
+# main(@ARGV)
+# Runs the of open-file helper for Developer Dashboard.
+# Input: command-line arguments from @ARGV and optional STDIN.
+# Output: prints matching paths or execs the configured editor, then exits.
+run_open_file_command( args => \@ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+of - private open-file helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard of [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
+C<dashboard> command can keep file-opening behaviour available without
+installing a generic executable into the user's global PATH.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard of command through the private helper runtime.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+
+=head1 WHEN TO USE
+
+Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+
+=head1 HOW TO USE
+
+Users normally reach this helper through C<dashboard of>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/of> after helper staging.
+
+=head1 WHAT USES IT
+
+It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/of>.
+
+=head1 EXAMPLES
+
+  dashboard of
+
+That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/of>.
+
+=for comment FULL-POD-DOC END
+
+=cut

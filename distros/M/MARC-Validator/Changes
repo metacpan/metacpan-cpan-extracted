@@ -1,3 +1,7 @@
+0.15 2026-04-08T17:44:16+02:00
+ - Add check for 300a and 300b fields to bad strings (mm, cm, etc.).
+ - Add proposed values to ISBN issues.
+
 0.14 2026-03-25T10:16:40+01:00
  - API change: Rename struct() method to report() in
    MARC::Validator::Abstract and all plugins.

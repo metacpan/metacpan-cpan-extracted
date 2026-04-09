@@ -20,7 +20,9 @@ README
 SIGNATURE
 t/data/cnb000000168-correct_field_020a_isbn_not_present.xml
 t/data/cnb000008190-duplicates_in_035a_fields.xml
+t/data/cnb000018615-bad_string_in_300b.xml
 t/data/cnb000038388-comics_no_in_field_008.xml
+t/data/cnb000056540-bad_string_in_300a.xml
 t/data/cnb000119080-bad_book_material_index.xml
 t/data/cnb000295209-incorrect_field_008_syntax_space.xml
 t/data/cnb000344109-missing_008_illustrations.xml

@@ -1346,7 +1346,11 @@ sub PDL::copy {
     barf("Argument is an ".ref($value)." not an object") unless blessed($value);
     return $value->nullcreate if $value->isnull;
     # broadcastI(-1,[]) is just an identity vafftrans with broadcastid copying ;)
-    $value->broadcastI(-1,[])->sever;
+    my $is_inplace = $value->is_inplace;
+    $value->set_inplace(0) if $is_inplace;
+    my $ret = $value->broadcastI(-1,[])->sever;
+    $value->set_inplace(1) if $is_inplace;
+    $ret;
 }
 
 =head2 hdr_copy
@@ -3084,6 +3088,8 @@ sub PDL::reshape :lvalue {
     }
     $pdl->sever;
     my $nelem = $pdl->nelem;
+    barf "reshape: given non-scalar PDL as arg index $_"
+      for grep UNIVERSAL::isa($_[$_], 'PDL') && $_[$_]->nelem != 1, 1..$#_;
     my @dims = grep defined, @_[1..$#_];
     for my $dim(@dims) { barf "reshape: invalid dim size '$dim'" if $dim < 0 }
     @dims = grep($_ != 1, $pdl->dims) if @dims == 0; # get rid of dims of size 1
@@ -3178,6 +3184,7 @@ sub PDL::convert {
   barf $CONVERT_ERR unless Scalar::Util::looks_like_number($type);
   return $pdl if $pdl->get_datatype == $type;
   return $pdl->_convert_int($type)->sever if !$pdl->is_inplace;
+  $pdl->set_inplace(0);
   $pdl->set_datatype($type);
   $pdl;
 }
@@ -3827,6 +3834,7 @@ sub str_list {
         # Stick with default
         $findmax = 0;
       }
+      $len = max map $badflag && $_ eq "BAD" ? 3 : length(sprintf $format,$_), @$x; # we overrode, recalc
     } else {
       # Default ok
       $findmax = 0;

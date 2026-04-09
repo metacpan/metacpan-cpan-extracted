@@ -2022,14 +2022,22 @@ json_yy_keyword_plugin(pTHX_ char *keyword_ptr, STRLEN keyword_len, OP **op_ptr)
     if (!entry)
         return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
 
-    /* only activate if the symbol in current package points to our XS CV */
+    /* only activate if the symbol in current package is OUR XS CV,
+       not someone else's (e.g. JSON::XS also exports encode_json as XSUB) */
     {
+        HV *our_stash = gv_stashpvs("JSON::YY", 0);
+        if (!our_stash)
+            return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
         HV *stash = PL_curstash;
         GV **gvp = (GV **)hv_fetch(stash, keyword_ptr, keyword_len, 0);
         if (!gvp || !GvCV(*gvp))
             return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
         CV *cv = GvCV(*gvp);
         if (!CvISXSUB(cv))
+            return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
+        /* verify CV originates from JSON::YY, not another module's XSUB */
+        GV *cvgv = CvGV(cv);
+        if (!cvgv || GvSTASH(cvgv) != our_stash)
             return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
     }
 

@@ -1,6 +1,23 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 61f99fe61e49cb6480520da134eff9cfa208861e
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Apr 8 20:43:42 2026 -0700
+
+    v1.94 Added `vf_time_last_prop` support
+    
+    Optionally stores persistent user verification timestamp, not cleared at
+    logout.
+
+commit e02841c1a568092569c2501c195d42166fb601aa
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Mar 3 18:07:30 2026 -0800
+
+    Rebased docker image to debian-bookworm-slim
+    
+    CentOS is long dead
+
 commit 086643a88db8ddea22fa2688f936744efe6e0ea6
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Apr 2 18:59:13 2025 -0700
@@ -73,16 +90,4 @@ Date:   Wed Dec 7 20:46:26 2022 -0800
     in field HTML content. Default content does not use that, but it did not
     work if a site used custom templates that rely on error messages (e.g.
     for styling).
-
-commit 6d0c6f422dab440d3bddd084e9b6a7c2a5be5f08
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 1 16:44:50 2022 -0700
-
-    1.89 Minor old changes to FilloutForm
-
-commit e5655b72472e3e9b899270b4729df7f240558ade
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Apr 8 19:04:06 2022 -0700
-
-    1.88 Added array operations to Web::Clipboard
 

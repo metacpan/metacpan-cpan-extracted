@@ -404,40 +404,11 @@ my $startup_file = -e "$HOME/.perldlrc" ? "$HOME/.perldlrc" : startup_def();
 
 print "Reading $startup_file...\n";
 
-eval 'require "'.$startup_file.'"';
-my $PDL_OK = ($@ eq "");
-if ($PDL_OK) {
-   require PDL if not defined $PDL::VERSION;
-   print "Type 'demo' for online demos\n";
-   print "Loaded PDL v$PDL::VERSION (supports bad values)\n";
-   print "Type 'help' for online help\n" if $PDL::verbose;
-}else{
-   warn "WARNING: Error loading PDL: '$@' - trying blib. \n";
-   eval "use blib";
-   delete $INC{$startup_file};  # so require will try again!
-   eval 'require "'.$startup_file.'"';
-   $PDL_OK = ($@ eq "");
-   if ($PDL_OK) {
-      require PDL if not defined $PDL::VERSION;
-      print "Loaded PDL v$PDL::VERSION\n";
-   }else{
-      warn "WARNING: PDL startup not found only plain perl available\n";
-      $PERLDL::PROMPT = 'perl> ';  # so there is visual indication of no PDL
-
-      eval << 'EOD'; # Fallback eval routine - proper one defined in PDL::Core
-
-sub eval_and_report {
-  my $__code = shift; # Can be code ref or string
-  my $__string;
-  $__string = (ref $__code eq "CODE") ? '&$__code()' : $__code;
-  my $retval = eval $__string; # Use boring eval() which misses some errors
-  print $retval if $PERLDL::DO_PRINT && !ref($__code) && $__code !~ /;\n?\z/;
-  $@;
-}
-EOD
-
-   }
-}
+require $startup_file;
+require PDL if not defined $PDL::VERSION;
+print "Type 'demo' for online demos\n";
+print "Loaded PDL v$PDL::VERSION (supports bad values)\n";
+print "Type 'help' for online help\n" if $PDL::verbose;
 
 print "\nNote: AutoLoader not enabled ('use PDL::AutoLoader' recommended)\n\n"
   unless defined($PDL::AutoLoader::Rescan);
@@ -706,44 +677,29 @@ sub eval_and_report {
 
   $@ = ""; # clear $@ since we might not execute the eval below
 
-
   ## Compile the code ref to execute.  The code gets put inside {} braces
   ## so that there is a trivial loop (the simple block) for 'last' and 'next'
   ## to escape from.  (Otherwise perl 5.6.1 and 5.8 do a little fandango
   ## on stack if you type "last" at the shell).  --CED 18-Mar-2003
-
-  my $__coderef = (ref $__code eq "CODE") ? $__code : eval << "EOD"
-							    
-							    sub {
-							      {
-								$__code;
-							      }
-							    }
-EOD
-;
+  my $__coderef = ref $__code eq "CODE" ? $__code : eval "sub {{ $__code }}";
 
   %@ = (); # Workaround to prevent spurious loss of $@ in early (pre-5.14 anyway) versions of perl
 
-  if( (!$@) and (ref $__coderef eq 'CODE')) { 
-      eval {
-        my $sig_action = mksighandle();
-        my $retval = &$__coderef();
-        die $@ if $@;
-        print $retval if $PERLDL::DO_PRINT && !ref($__code) && $__code !~ /;\n?\z/;
-      };
+  if (!$@ and ref $__coderef eq 'CODE') {
+    eval {
+      my $sig_action = mksighandle();
+      my @retval = &$__coderef();
+      die $@ if $@;
+      print @retval if $PERLDL::DO_PRINT && !ref($__code) && $__code !~ /;\n?\z/;
+    };
   }
-  if ($@) {
-      my $mess = $@;
-
-      # Remove surplus parts
-
-      $mess =~ s/^\s*\(in cleanup\)\s+//;   # 'cleanup ...' from Usage:...
-      $mess =~ s/\n\s*\(in cleanup\).*$//;  # 'cleanup...'s at end
-      $mess =~ s/\s+at \(eval \d+\) line \d+\.?$//; # at eval ?? line ??.
-
-      return $mess;  # Report error
-  }
-  return "";
+  return "" if !$@;
+  my $mess = $@;
+  # Remove surplus parts
+  $mess =~ s/^\s*\(in cleanup\)\s+//;   # 'cleanup ...' from Usage:...
+  $mess =~ s/\n\s*\(in cleanup\).*$//;  # 'cleanup...'s at end
+  $mess =~ s/\s+at \(eval \d+\) line \d+\.?$//; # at eval ?? line ??.
+  $mess;  # Report error
 }
 
 

@@ -52,8 +52,21 @@ sub decode_body_text {
     return decode( 'UTF-8', $body, FB_CROAK );
 }
 
+sub form_body {
+    my (@pairs) = @_;
+    my @encoded;
+    while (@pairs) {
+        my ( $name, $value ) = splice @pairs, 0, 2;
+        push @encoded, uri_escape($name) . '=' . uri_escape( defined $value ? $value : '' );
+    }
+    return join '&', @encoded;
+}
+
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 chdir $home or die "Unable to chdir to $home: $!";
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
@@ -226,29 +239,133 @@ $store->save_page($nav_empty);
 my $nav_form = Developer::Dashboard::PageDocument->new(
     id     => 'nav/form.tt',
     title  => 'Form Nav',
-    layout => { form_tt => '<form id="nav-form"></form>', form => '<div id="nav-form-body"></div>' },
+    layout => { body => '<form id="nav-form"></form><div id="nav-form-body"></div>' },
 );
 $store->save_page($nav_form);
 my $nav_missing_file = File::Spec->catfile( $paths->dashboards_root, 'nav', 'broken.tt' );
 open my $nav_missing_fh, '>', $nav_missing_file or die $!;
 print {$nav_missing_fh} "not a bookmark\n";
 close $nav_missing_fh;
+my $nav_raw_tt_file = File::Spec->catfile( $paths->dashboards_root, 'nav', 'here.tt' );
+open my $nav_raw_tt_fh, '>', $nav_raw_tt_file or die $!;
+print {$nav_raw_tt_fh} <<'TT';
+[% index = '/app/index' %]
+[% foo = '/app/foobar' %]
+<a href=[% index %]>[% index %]</a>
+TT
+close $nav_raw_tt_fh;
 
 my $nav_render = $app->_nav_items_html(
     page            => $page,
     runtime_context => { params => {} },
 );
 like( $nav_render, qr/dashboard-nav-items/, 'shared nav renderer emits a nav container when valid nav tt files exist' );
-like( $nav_render, qr/nav-form/, 'shared nav renderer includes form_tt content from nav tt bookmarks' );
-like( $nav_render, qr/nav-form-body/, 'shared nav renderer includes form content from nav tt bookmarks' );
+like( $nav_render, qr/nav-form/, 'shared nav renderer includes HTML content from nav tt bookmarks' );
+like( $nav_render, qr/nav-form-body/, 'shared nav renderer includes HTML body fragments from nav tt bookmarks' );
+like( $nav_render, qr{<li data-nav-id="nav/here\.tt">\s*<a href=/app/index>/app/index</a>\s*</li>}s, 'shared nav renderer executes raw nav tt fragment files through Template Toolkit' );
 unlike( $nav_render, qr/broken\.tt/, 'shared nav renderer skips invalid nav tt bookmark files' );
 unlike( $nav_render, qr/empty\.tt/, 'shared nav renderer skips nav tt bookmarks that render an empty fragment' );
+open my $nav_broken_tt_fh, '>', $nav_raw_tt_file or die $!;
+print {$nav_broken_tt_fh} <<'TT';
+[% index = '/app/index' %]
+<a href="[% IF index %]">[% index %]</a>
+TT
+close $nav_broken_tt_fh;
+my $nav_broken_render = $app->_nav_items_html(
+    page            => $page,
+    runtime_context => { params => {} },
+);
+like( $nav_broken_render, qr/runtime-error/, 'shared nav renderer surfaces Template Toolkit syntax failures from raw nav tt fragments' );
+unlike( $nav_broken_render, qr/\[%\s*IF\s+index\s*%\]|\[%\s*index\s*%\]/, 'shared nav renderer does not leak raw nav tt source after Template Toolkit parse failures' );
 
 my $nav_self_render = $app->_nav_items_html(
     page            => $nav_form,
     runtime_context => { params => {} },
 );
 is( $nav_self_render, '', 'shared nav renderer does not inject nav items while rendering a nav bookmark itself' );
+
+{
+    my $layer_root = File::Spec->catdir( $home, 'nav-layer-root' );
+    my $layer_parent = File::Spec->catdir( $layer_root, 'parent' );
+    my $layer_leaf = File::Spec->catdir( $layer_parent, 'leaf' );
+    make_path( File::Spec->catdir( $layer_parent, '.developer-dashboard', 'dashboards', 'nav' ) );
+    make_path( File::Spec->catdir( $layer_parent, '.developer-dashboard', 'dashboards', 'partials' ) );
+    make_path( File::Spec->catdir( $layer_leaf, '.developer-dashboard', 'dashboards', 'nav' ) );
+
+    open my $parent_partial_fh, '>', File::Spec->catfile( $layer_parent, '.developer-dashboard', 'dashboards', 'partials', 'nav-fragment.tt' ) or die $!;
+    print {$parent_partial_fh} "parent-fragment\n";
+    close $parent_partial_fh;
+
+    open my $parent_nav_fh, '>', File::Spec->catfile( $layer_parent, '.developer-dashboard', 'dashboards', 'nav', 'parent-only.tt' ) or die $!;
+    print {$parent_nav_fh} <<'PAGE';
+TITLE: Parent Only
+:--------------------------------------------------------------------------------:
+BOOKMARK: nav/parent-only.tt
+:--------------------------------------------------------------------------------:
+HTML: <div id="parent-only-nav">parent only</div>
+PAGE
+    close $parent_nav_fh;
+
+    open my $parent_shared_nav_fh, '>', File::Spec->catfile( $layer_parent, '.developer-dashboard', 'dashboards', 'nav', 'shared.tt' ) or die $!;
+    print {$parent_shared_nav_fh} <<'PAGE';
+TITLE: Parent Shared
+:--------------------------------------------------------------------------------:
+BOOKMARK: nav/shared.tt
+:--------------------------------------------------------------------------------:
+HTML: <div id="shared-nav-parent">parent shared</div>
+PAGE
+    close $parent_shared_nav_fh;
+
+    open my $leaf_nav_fh, '>', File::Spec->catfile( $layer_leaf, '.developer-dashboard', 'dashboards', 'nav', 'leaf-only.tt' ) or die $!;
+    print {$leaf_nav_fh} <<'PAGE';
+TITLE: Leaf Only
+:--------------------------------------------------------------------------------:
+BOOKMARK: nav/leaf-only.tt
+:--------------------------------------------------------------------------------:
+HTML: <div id="leaf-only-nav">[% INCLUDE "partials/nav-fragment.tt" %]</div>
+PAGE
+    close $leaf_nav_fh;
+
+    open my $leaf_shared_nav_fh, '>', File::Spec->catfile( $layer_leaf, '.developer-dashboard', 'dashboards', 'nav', 'shared.tt' ) or die $!;
+    print {$leaf_shared_nav_fh} <<'PAGE';
+TITLE: Leaf Shared
+:--------------------------------------------------------------------------------:
+BOOKMARK: nav/shared.tt
+:--------------------------------------------------------------------------------:
+HTML: <div id="shared-nav-leaf">leaf shared</div>
+PAGE
+    close $leaf_shared_nav_fh;
+
+    chdir $layer_leaf or die $!;
+    my $layer_paths = Developer::Dashboard::PathRegistry->new( home => $home );
+    my $layer_store = Developer::Dashboard::PageStore->new( paths => $layer_paths );
+    my $layer_runtime = Developer::Dashboard::PageRuntime->new( paths => $layer_paths );
+    my $layer_files = Developer::Dashboard::FileRegistry->new( paths => $layer_paths );
+    my $layer_auth = Developer::Dashboard::Auth->new( files => $layer_files, paths => $layer_paths );
+    my $layer_sessions = Developer::Dashboard::SessionStore->new( paths => $layer_paths );
+    my $layer_app = Developer::Dashboard::Web::App->new(
+        auth     => $layer_auth,
+        pages    => $layer_store,
+        runtime  => $layer_runtime,
+        sessions => $layer_sessions,
+    );
+    my $layer_page = Developer::Dashboard::PageDocument->new(
+        id     => 'layered-page',
+        title  => 'Layered Page',
+        layout => { body => 'layered body' },
+    );
+    $layer_store->save_page($layer_page);
+    my $layer_nav_html = $layer_app->_nav_items_html(
+        page            => $layer_page,
+        runtime_context => { params => {} },
+    );
+    like( $layer_nav_html, qr/parent-only-nav/, 'nav renderer includes parent-layer nav fragments' );
+    like( $layer_nav_html, qr/leaf-only-nav/, 'nav renderer includes leaf-layer nav fragments' );
+    like( $layer_nav_html, qr/parent-fragment/, 'nav renderer resolves TT includes from ancestor dashboard layers' );
+    like( $layer_nav_html, qr/shared-nav-leaf/, 'nav renderer prefers the deepest matching nav bookmark id' );
+    unlike( $layer_nav_html, qr/shared-nav-parent/, 'nav renderer suppresses overridden parent nav fragments when a deeper layer replaces the same id' );
+    chdir $home or die $!;
+}
 
 my $fragment = $app->_page_fragment_html(
     Developer::Dashboard::PageDocument->new(
@@ -257,11 +374,23 @@ my $fragment = $app->_page_fragment_html(
     )
 );
 like( $fragment, qr/frag-body/, '_page_fragment_html includes the page body' );
-like( $fragment, qr/frag-form-tt/, '_page_fragment_html includes form_tt content' );
-like( $fragment, qr/frag-form/, '_page_fragment_html includes form content' );
+unlike( $fragment, qr/frag-form-tt/, '_page_fragment_html ignores removed form_tt content' );
+unlike( $fragment, qr/frag-form/, '_page_fragment_html ignores removed form content' );
 like( $fragment, qr/frag-output/, '_page_fragment_html includes runtime output fragments' );
 like( $fragment, qr/runtime-error/, '_page_fragment_html renders runtime errors' );
 is( $app->_page_fragment_html(), '', '_page_fragment_html returns empty html when no page is provided' );
+my $prepared_broken_page = $runtime->prepare_page(
+    page => Developer::Dashboard::PageDocument->new(
+        id     => 'broken-template',
+        title  => 'Broken Template',
+        layout => { body => '<div>before [% IF stash.name %] broken</div>' },
+    ),
+    runtime_context => { params => {}, current_page => '/app/broken-template' },
+    source          => 'saved',
+);
+my $broken_fragment = $app->_page_fragment_html($prepared_broken_page);
+like( $broken_fragment, qr/runtime-error/, '_page_fragment_html shows Template Toolkit syntax failures from broken bookmark bodies' );
+unlike( $broken_fragment, qr/\[%\s*IF\s+stash\.name\s*%\]/, '_page_fragment_html does not leak raw TT syntax from broken bookmark bodies' );
 
 my ( $not_found_code, $not_found_type, $not_found_body ) = @{ $app->handle( path => '/missing', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
 is( $not_found_code, 404, 'unknown routes return not found' );
@@ -304,6 +433,37 @@ SH
         [ $app->_ip_interface_pairs ],
         [ { iface => 'eth0', ip => '10.0.0.4' } ],
         '_ip_interface_pairs falls back to ifconfig parsing when the ip command yields no candidates',
+    );
+}
+
+{
+    my $fake_bin = File::Spec->catdir( $home, 'fake-win-bin' );
+    make_path($fake_bin);
+    my $ipconfig = File::Spec->catfile( $fake_bin, 'ipconfig' );
+    open my $ipconfig_fh, '>', $ipconfig or die $!;
+    print {$ipconfig_fh} <<'BAT';
+#!/bin/sh
+cat <<'EOF'
+
+Ethernet adapter Ethernet:
+
+   IPv4 Address. . . . . . . . . . . : 10.20.30.40
+
+Wireless LAN adapter Loopback:
+
+   IPv4 Address. . . . . . . . . . . : 127.0.0.1
+EOF
+BAT
+    close $ipconfig_fh;
+    chmod 0755, $ipconfig or die $!;
+    no warnings 'redefine';
+    local $ENV{PATH} = $fake_bin . ':' . $ENV{PATH};
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ip = sub { return (); };
+    local *Developer::Dashboard::Web::App::_ip_pairs_from_ifconfig = sub { return (); };
+    is_deeply(
+        [ $app->_ip_interface_pairs ],
+        [ { iface => 'Ethernet', ip => '10.20.30.40' } ],
+        '_ip_interface_pairs falls back to ipconfig parsing when Windows ipconfig output is available',
     );
 }
 
@@ -435,25 +595,38 @@ PAGE
 }
 
 is( $auth->trust_tier( remote_addr => '127.0.0.1', host => '127.0.0.1:7890' ), 'admin', 'exact loopback with numeric host is admin' );
-is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'localhost:7890' ), 'helper', 'localhost is not trusted as admin' );
+is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'localhost:7890' ), 'admin', 'localhost is trusted as admin when it resolves only to loopback' );
 is( $auth->trust_tier( remote_addr => '10.0.0.8', host => '127.0.0.1:7890' ), 'helper', 'non-loopback client is helper' );
 my @initial_users = $auth->list_users;
 is( scalar @initial_users, 0, 'auth store starts empty' );
 ok( !$auth->verify_user( username => 'helper', password => 'nope' ), 'missing user does not verify' );
 like( $auth->login_page( message => '<unsafe>' ), qr/&lt;unsafe&gt;/, 'login page escapes message content' );
+my $helper_host = 'dashboard-helper.example:7890';
 
-my ( $login_required_code, undef, $login_required_body ) = @{ $app->handle( path => '/', query => '', remote_addr => '127.0.0.1', headers => { host => 'localhost:7890' } ) };
-is( $login_required_code, 401, 'localhost requests require login' );
-like( $login_required_body, qr/Helper access requires login/, 'helper request sees login page' );
+my ( $login_required_code, undef, $login_required_body ) = @{ $app->handle( path => '/', query => '', remote_addr => '127.0.0.1', headers => { host => $helper_host } ) };
+is( $login_required_code, 401, 'non-loopback helper-host requests are unauthorized when no helper user exists' );
+is( $login_required_body, '', 'outsider requests return an empty body before helper users exist' );
+unlike( $login_required_body, qr/<form method="post" action="\/login">/, 'outsider requests without helper users do not receive a login form' );
 
 my ( $saved_login_required_code, undef, $saved_login_required_body ) = @{ $app->handle(
     path        => '/app/index',
     query       => 'from=helper',
     remote_addr => '127.0.0.1',
-    headers     => { host => 'localhost:7890' },
+    headers     => { host => $helper_host },
 ) };
-is( $saved_login_required_code, 401, 'helper access to a saved page requires login' );
-like( $saved_login_required_body, qr{<input[^>]*name="redirect_to"[^>]*value="/app/index\?from=helper"}, 'login page keeps the originally requested path and query for post-login redirect' );
+is( $saved_login_required_code, 401, 'outsider access to a saved page is unauthorized when no helper user exists' );
+is( $saved_login_required_body, '', 'forbidden outsider access to a saved page stays silent before helper users exist' );
+unlike( $saved_login_required_body, qr{<input[^>]*name="redirect_to"}, 'forbidden outsider requests do not expose a login redirect target before helper users exist' );
+
+my ( $disabled_login_code, undef, $disabled_login_body ) = @{ $app->handle(
+    path        => '/login',
+    method      => 'POST',
+    body        => form_body( username => 'helper', password => 'helper-pass-123' ),
+    remote_addr => '127.0.0.1',
+    headers     => { host => $helper_host },
+) };
+is( $disabled_login_code, 401, 'login submission is unauthorized when no helper user exists' );
+is( $disabled_login_body, '', 'login submission stays silent before helper users exist' );
 
 my $user = $auth->add_user( username => 'helper', password => 'helper-pass-123', role => 'helper' );
 is( $user->{role}, 'helper', 'helper user can be created' );
@@ -465,12 +638,25 @@ my @listed_users = $auth->list_users;
 is( scalar @listed_users, 2, 'created helper users are listed' );
 is_deeply( [ map { $_->{username} } @listed_users ], [ 'alpha', 'helper' ], 'listed users are sorted by username' );
 
+my ( $enabled_login_required_code, undef, $enabled_login_required_body ) = @{ $app->handle( path => '/', query => '', remote_addr => '127.0.0.1', headers => { host => $helper_host } ) };
+is( $enabled_login_required_code, 401, 'non-loopback helper-host requests require login once a helper user exists' );
+like( $enabled_login_required_body, qr/Helper access requires login/, 'outsider requests receive the login page after helper users exist' );
+
+my ( $enabled_saved_login_required_code, undef, $enabled_saved_login_required_body ) = @{ $app->handle(
+    path        => '/app/index',
+    query       => 'from=helper',
+    remote_addr => '127.0.0.1',
+    headers     => { host => $helper_host },
+) };
+is( $enabled_saved_login_required_code, 401, 'saved outsider access requires login once a helper user exists' );
+like( $enabled_saved_login_required_body, qr{<input[^>]*name="redirect_to"[^>]*value="/app/index\?from=helper"}, 'login page keeps the originally requested path and query for post-login redirect once helper users exist' );
+
 my ( $bad_login_code, undef, $bad_login_body ) = @{ $app->handle(
     path        => '/login',
     method      => 'POST',
-    body        => 'username=helper&password=wrong',
+    body        => form_body( username => 'helper', password => 'wrong' ),
     remote_addr => '127.0.0.1',
-    headers     => { host => 'localhost:7890' },
+    headers     => { host => $helper_host },
 ) };
 is( $bad_login_code, 401, 'bad login is rejected' );
 like( $bad_login_body, qr/Invalid username or password/, 'bad login renders error message' );
@@ -478,9 +664,9 @@ like( $bad_login_body, qr/Invalid username or password/, 'bad login renders erro
 my ( $login_code, undef, undef, $login_headers ) = @{ $app->handle(
     path        => '/login',
     method      => 'POST',
-    body        => 'username=helper&password=helper-pass-123',
+    body        => form_body( username => 'helper', password => 'helper-pass-123' ),
     remote_addr => '127.0.0.1',
-    headers     => { host => 'localhost:7890' },
+    headers     => { host => $helper_host },
 ) };
 is( $login_code, 302, 'valid helper login redirects' );
 is( $login_headers->{Location}, '/', 'valid helper login redirects to home' );
@@ -489,9 +675,13 @@ like( $login_headers->{'Set-Cookie'}, qr/^dashboard_session=/, 'valid helper log
 my ( $saved_login_code, undef, undef, $saved_login_headers ) = @{ $app->handle(
     path        => '/login',
     method      => 'POST',
-    body        => 'username=helper&password=helper-pass-123&redirect_to=%2Fapp%2Findex%3Ffrom%3Dhelper',
+    body        => form_body(
+        username    => 'helper',
+        password    => 'helper-pass-123',
+        redirect_to => '/app/index?from=helper',
+    ),
     remote_addr => '127.0.0.1',
-    headers     => { host => 'localhost:7890' },
+    headers     => { host => $helper_host },
 ) };
 is( $saved_login_code, 302, 'valid helper login for a saved page redirects' );
 is( $saved_login_headers->{Location}, '/app/index?from=helper', 'valid helper login returns to the originally requested saved page' );
@@ -506,7 +696,7 @@ my ( $helper_code, undef, $helper_body ) = @{ $app->handle(
     query       => '',
     remote_addr => '127.0.0.1',
     headers     => {
-        host   => 'localhost:7890',
+        host   => $helper_host,
         cookie => $login_headers->{'Set-Cookie'},
     },
 ) };
@@ -518,7 +708,7 @@ my ( $logout_code, undef, undef, $logout_headers ) = @{ $app->handle(
     method      => 'GET',
     remote_addr => '127.0.0.1',
     headers     => {
-        host   => 'localhost:7890',
+        host   => $helper_host,
         cookie => $login_headers->{'Set-Cookie'},
     },
 ) };
@@ -961,5 +1151,36 @@ __END__
 
 This test verifies extended web server bridging, auth behavior, and update
 manager edge cases.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file closes coverage gaps around web update and security behaviour.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/08-web-update-coverage.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/08-web-update-coverage.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

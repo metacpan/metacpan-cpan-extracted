@@ -3,3 +3,21 @@ HTML: [% IF env.current_page == '/app/test' %]
 [% ELSE %]
   <a href="/app/test">Test</a>
 [% END %]
+
+[% IF env.current_page == '/app/test2' %]
+  [Test 2]
+[% ELSE %]
+  <a href="/app/test2">Test 2</a>
+[% END %]
+
+[% IF env.current_page == '/app/api-dashboard' %]
+  [API]
+[% ELSE %]
+  <a href="/app/api-dashboard">API</a>
+[% END %]
+
+[% IF env.current_page == '/app/sql-dashboard' %]
+  [SQL]
+[% ELSE %]
+  <a href="/app/sql-dashboard">SQL</a>
+[% END %]

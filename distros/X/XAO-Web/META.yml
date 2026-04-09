@@ -41,9 +41,9 @@ requires:
   Time::HiRes: '1.9719'
   Unicode::Normalize: '1.18'
   XAO::Base: '1.28'
-  XAO::FS: '1.21'
+  XAO::FS: '1.27'
   perl: '5.010001'
 resources:
   repository: git://github.com/amaltsev/XAO-Web.git
-version: '1.93'
+version: '1.94'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

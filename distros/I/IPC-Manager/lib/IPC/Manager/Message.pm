@@ -2,7 +2,7 @@ package IPC::Manager::Message;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;

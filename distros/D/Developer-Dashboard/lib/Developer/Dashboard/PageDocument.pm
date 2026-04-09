@@ -3,12 +3,12 @@ package Developer::Dashboard::PageDocument;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
 our $LEGACY_SEP = ':--------------------------------------------------------------------------------:';
-our @LEGACY_KEYS = ( qw(TITLE ICON BOOKMARK STASH NOTE HTML FORM.TT FORM), map { sprintf 'CODE%d', $_ } 0 .. 1000 );
+our @LEGACY_KEYS = ( qw(TITLE ICON BOOKMARK STASH NOTE HTML), map { sprintf 'CODE%d', $_ } 0 .. 1000 );
 
 # new(%args)
 # Constructs a page document from normalized field values.
@@ -104,9 +104,7 @@ sub from_instruction {
         description => _trim_trailing_newline( join( "\n", @{ $sections{NOTE} || $sections{DESCRIPTION} || [] } ) ),
         state       => $state,
         layout      => {
-            body    => _trim_trailing_newline( join( "\n", @{ $sections{HTML} || [] } ) ),
-            form    => _trim_trailing_newline( join( "\n", @{ $sections{FORM} || [] } ) ),
-            form_tt => _trim_trailing_newline( join( "\n", @{ $sections{'FORM.TT'} || [] } ) ),
+            body => _trim_trailing_newline( join( "\n", @{ $sections{HTML} || [] } ) ),
         },
         meta        => {
             %meta,
@@ -183,9 +181,9 @@ sub canonical_instruction {
 }
 
 # legacy_instruction()
-# Serializes the page document to legacy colon-and-separator bookmark syntax.
+# Serializes the page document to older colon-and-separator bookmark syntax.
 # Input: none.
-# Output: legacy instruction document string.
+# Output: older instruction document string.
 sub legacy_instruction {
     my ($self) = @_;
     my @sections;
@@ -196,8 +194,6 @@ sub legacy_instruction {
     push @sections, [ 'NOTE', $self->{description} ] if defined $self->{description} && $self->{description} ne '';
     push @sections, [ 'STASH', _legacy_stash_text( $self->{state} || {} ) ];
     push @sections, [ 'HTML', $self->{layout}{body} ] if defined $self->{layout}{body} && $self->{layout}{body} ne '';
-    push @sections, [ 'FORM.TT', $self->{layout}{form_tt} ] if defined $self->{layout}{form_tt} && $self->{layout}{form_tt} ne '';
-    push @sections, [ 'FORM', $self->{layout}{form} ] if defined $self->{layout}{form} && $self->{layout}{form} ne '';
 
     if ( ref( $self->{meta}{codes} ) eq 'ARRAY' ) {
         for my $code ( @{ $self->{meta}{codes} } ) {
@@ -244,16 +240,14 @@ sub render_html {
     my $chrome_html = defined $opts{chrome_html} ? $opts{chrome_html} : '';
     my $nav_html = defined $opts{nav_html} ? $opts{nav_html} : '';
 
-    my $form_section = '';
-    if ( defined $self->{layout}{form_tt} && $self->{layout}{form_tt} ne '' ) {
-        $form_section .= $self->{layout}{form_tt};
-    }
-    if ( defined $self->{layout}{form} && $self->{layout}{form} ne '' ) {
-        $form_section .= $self->{layout}{form};
-    }
+    my $runtime_bootstrap = '';
     my $runtime_output = '';
     for my $chunk ( @{ $self->{meta}{runtime_outputs} || [] } ) {
         next if !defined $chunk || ref($chunk);
+        if ( $chunk =~ /\A<script>/ && $chunk =~ /(set_chain_value|dashboard_ajax_singleton_cleanup)/ ) {
+            $runtime_bootstrap .= $chunk;
+            next;
+        }
         $runtime_output .= $chunk;
     }
     my $runtime_errors = '';
@@ -369,7 +363,7 @@ $legacy_bootstrap
   $nav_html
   @{[ $desc ne '' ? qq{<p>$desc</p>} : '' ]}
   <section class="body">$body_html</section>
-  $form_section
+  $runtime_bootstrap
   $runtime_output
   $runtime_errors
 </main>
@@ -391,7 +385,7 @@ sub _decode_structured_json {
 }
 
 # _decode_stash_section($text)
-# Decodes legacy or modern STASH content into a hash reference.
+# Decodes older or modern STASH content into a hash reference.
 # Input: stash section text string.
 # Output: hash reference or empty hash reference on failure.
 sub _decode_stash_section {
@@ -403,13 +397,13 @@ sub _decode_stash_section {
         return $value if ref($value) eq 'HASH';
         return {};
     }
-    my $hash = eval "no warnings; +{ $text }";
+    my $hash = eval "+{ $text }";
     return ref($hash) eq 'HASH' ? $hash : {};
 }
 
 # _parse_legacy_sections($text)
-# Parses legacy bookmark syntax separated by the legacy separator line.
-# Input: full legacy bookmark text string.
+# Parses older bookmark syntax separated by the older separator line.
+# Input: full older bookmark text string.
 # Output: hash of section name to arrayref of lines.
 sub _parse_legacy_sections {
     my ($text) = @_;
@@ -430,9 +424,9 @@ sub _parse_legacy_sections {
 }
 
 # _legacy_stash_text($value)
-# Serializes a hash reference into a simple legacy STASH body.
+# Serializes a hash reference into a simple older STASH body.
 # Input: stash hash reference.
-# Output: Perl-like legacy stash text.
+# Output: Perl-like older stash text.
 sub _legacy_stash_text {
     my ($value) = @_;
     return '' if ref($value) ne 'HASH' || !keys %$value;
@@ -441,7 +435,7 @@ sub _legacy_stash_text {
 }
 
 # _legacy_value($value)
-# Serializes a Perl scalar, array, or hash into a legacy bookmark value string.
+# Serializes a Perl scalar, array, or hash into a older bookmark value string.
 # Input: scalar, array reference, or hash reference.
 # Output: Perl-ish text string.
 sub _legacy_value {
@@ -457,7 +451,7 @@ sub _legacy_value {
 }
 
 # _legacy_quote($text)
-# Escapes a scalar string for legacy single-quoted stash serialization.
+# Escapes a scalar string for older single-quoted stash serialization.
 # Input: text string.
 # Output: escaped string.
 sub _legacy_quote {
@@ -484,7 +478,7 @@ sub _template_value {
 }
 
 # _legacy_bootstrap()
-# Returns the legacy client bootstrap helpers used by old bookmark pages.
+# Returns the older client bootstrap helpers used by old bookmark pages.
 # Input: none.
 # Output: JavaScript bootstrap string.
 sub _legacy_bootstrap {
@@ -514,6 +508,97 @@ function dashboard_ajax_singleton_cleanup(name) {
       fetch(url, { method: 'POST', keepalive: true, credentials: 'same-origin' }).catch(function () {});
     }
   });
+}
+function dashboard_target_nodes(target) {
+  if (!target) return [];
+  if (typeof target === 'string') return Array.prototype.slice.call(document.querySelectorAll(target));
+  if (target instanceof Element) return [target];
+  if (target.length && typeof target !== 'string') return Array.prototype.slice.call(target);
+  return [];
+}
+function dashboard_render_value(value, options, formatter) {
+  let rendered = value;
+  if (options && options.type === 'json' && typeof value === 'string' && value !== '') {
+    try {
+      rendered = JSON.parse(value);
+    } catch (error) {
+      rendered = null;
+    }
+  }
+  if (typeof formatter === 'function') return formatter(rendered);
+  if (rendered === null || typeof rendered === 'undefined') return '';
+  if (typeof rendered === 'object') return JSON.stringify(rendered);
+  return String(rendered);
+}
+function dashboard_write_target(target, value, options, formatter) {
+  let nodes = dashboard_target_nodes(target);
+  let rendered = dashboard_render_value(value, options || {}, formatter);
+  nodes.forEach(function(node) {
+    if (options && options.type === 'html') {
+      node.innerHTML = rendered;
+      return;
+    }
+    if (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA') {
+      node.value = rendered;
+      return;
+    }
+    node.textContent = rendered;
+  });
+  return rendered;
+}
+function fetch_value(url, target, options, formatter) {
+  if (!url || !window.fetch) return Promise.resolve('');
+  let settings = Object.assign({ credentials: 'same-origin' }, (options && options.fetch) || {});
+  return window.fetch(url, settings).then(function(response) {
+    if (!response.ok) throw new Error('Request failed with status ' + response.status);
+    if (options && options.type === 'json') return response.text();
+    return response.text();
+  }).then(function(value) {
+    return dashboard_write_target(target, value, options || {}, formatter);
+  });
+}
+function dashboard_stream_settings(options) {
+  let fetchOptions = (options && options.fetch) || {};
+  let method = fetchOptions.method || options.method || 'GET';
+  let body = typeof fetchOptions.body !== 'undefined' ? fetchOptions.body : (typeof options.body !== 'undefined' ? options.body : null);
+  let headers = fetchOptions.headers || options.headers || {};
+  let credentials = fetchOptions.credentials || options.credentials || 'same-origin';
+  return {
+    method: method,
+    body: body,
+    headers: headers,
+    credentials: credentials
+  };
+}
+function stream_data(url, target, options, formatter) {
+  if (!url) return Promise.resolve('');
+  if (!window.XMLHttpRequest) return fetch_value(url, target, options, formatter);
+  let settings = dashboard_stream_settings(options || {});
+  return new Promise(function(resolve, reject) {
+    let xhr = new XMLHttpRequest();
+    xhr.open(settings.method, url, true);
+    xhr.withCredentials = settings.credentials !== 'omit';
+    Object.keys(settings.headers || {}).forEach(function(name) {
+      xhr.setRequestHeader(name, settings.headers[name]);
+    });
+    xhr.onprogress = function () {
+      dashboard_write_target(target, xhr.responseText, options || {}, formatter);
+    };
+    xhr.onload = function () {
+      if (xhr.status < 200 || xhr.status >= 300) {
+        reject(new Error('Request failed with status ' + xhr.status));
+        return;
+      }
+      resolve(dashboard_write_target(target, xhr.responseText, options || {}, formatter));
+    };
+    xhr.onerror = function () {
+      reject(new Error('Stream request failed'));
+    };
+    xhr.send(settings.body);
+  });
+}
+function stream_value(url, target, options, formatter) {
+  return stream_data(url, target, options, formatter);
 }
 var ready_status = {};
 function ready(options) {
@@ -602,5 +687,36 @@ transient encoded pages, and provider-generated pages.
 =head2 new, from_hash, from_json, from_instruction, merge_state, with_mode, as_hash, canonical_json, canonical_instruction, instruction_text, render_html
 
 Construct, mutate, serialize, and render page documents.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file parses bookmark document sections and normalizes bookmark source text.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::PageDocument> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::PageDocument -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

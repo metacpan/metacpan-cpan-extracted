@@ -2,7 +2,7 @@ package Data::HashMap::SS;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub import {
     $^H{"Data::HashMap::SS/hm_ss_put"}    = 1;

@@ -1,3 +1,8 @@
+0.435 2026-04-09
+- control parameters (usually passed to LAPACK as a character) changed to be OtherPars since handling broadcasting for those is problematic
+- fix msvd and mdsvd U and V', and mgsvd X
+- moved tritosym to PDL 2.104
+
 0.434 2026-03-22
 - fix select-function declarations for C23 (#30) - thanks @sebastic for report
 - change actual encoding of docs to UTF-8, not just saying so

@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use File::Spec;
 use Cwd qw(cwd);
@@ -34,7 +34,7 @@ sub load_global {
     my $merged = {};
     for my $file ( reverse $self->_global_config_files ) {
         next if !-f $file;
-        open my $fh, '<', $file or die "Unable to read $file: $!";
+        open my $fh, '<:raw', $file or die "Unable to read $file: $!";
         local $/;
         $merged = $self->_merge_hashes( $merged, json_decode(<$fh>) );
     }
@@ -48,10 +48,36 @@ sub load_global {
 sub save_global {
     my ( $self, $config ) = @_;
     my $file = $self->_global_config_file;
-    open my $fh, '>', $file or die "Unable to write $file: $!";
+    open my $fh, '>:raw', $file or die "Unable to write $file: $!";
     print {$fh} json_encode( $config || {} );
     close $fh;
+    $self->{paths}->secure_file_permissions($file);
     return $file;
+}
+
+# save_global_defaults($defaults)
+# Persists only missing global configuration defaults without overwriting
+# existing user settings in config.json.
+# Input: defaults hash reference.
+# Output: written file path string.
+sub save_global_defaults {
+    my ( $self, $defaults ) = @_;
+    $defaults ||= {};
+    my $current = $self->load_global;
+    my $merged = $self->_merge_hashes( $defaults, $current );
+    return $self->save_global($merged);
+}
+
+# ensure_global_file()
+# Ensures the writable config.json exists, seeding '{}' only when the file is
+# missing and leaving any existing file untouched.
+# Input: none.
+# Output: writable configuration file path string.
+sub ensure_global_file {
+    my ($self) = @_;
+    my $file = $self->_global_config_file;
+    return $file if -e $file;
+    return $self->save_global( {} );
 }
 
 # load_repo()
@@ -64,7 +90,7 @@ sub load_repo {
     my $repo = $self->{repo_root} || return {};
     my $file = File::Spec->catfile( $repo, '.developer-dashboard.json' );
     return {} if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
     local $/;
     return json_decode(<$fh>);
 }
@@ -96,10 +122,50 @@ sub _merge_hashes {
             $merged{$key} = $self->_merge_hashes( $left->{$key}, $right->{$key} );
             next;
         }
+        if ( ref( $left->{$key} ) eq 'ARRAY' && ref( $right->{$key} ) eq 'ARRAY' ) {
+            if ( $key eq 'collectors' ) {
+                $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'name' );
+                next;
+            }
+            if ( $key eq 'providers' ) {
+                $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'id' );
+                next;
+            }
+        }
         $merged{$key} = $right->{$key};
     }
 
     return \%merged;
+}
+
+# _merge_named_hash_array($left, $right, $identity_key)
+# Merges configuration arrays of hashes while preserving order and allowing
+# deeper layers to override matching logical identities.
+# Input: left and right array references plus the identity key string.
+# Output: merged array reference.
+sub _merge_named_hash_array {
+    my ( $self, $left, $right, $identity_key ) = @_;
+    my @merged = ();
+    my %positions;
+
+    for my $item ( @{ $left || [] }, @{ $right || [] } ) {
+        if (
+            ref($item) eq 'HASH'
+            && defined $identity_key
+            && $identity_key ne ''
+            && defined $item->{$identity_key}
+            && $item->{$identity_key} ne ''
+        ) {
+            if ( exists $positions{ $item->{$identity_key} } ) {
+                $merged[ $positions{ $item->{$identity_key} } ] = $item;
+                next;
+            }
+            $positions{ $item->{$identity_key} } = scalar @merged;
+        }
+        push @merged, $item;
+    }
+
+    return \@merged;
 }
 
 # collectors()
@@ -179,27 +245,28 @@ sub save_global_web_workers {
 }
 
 # web_settings()
-# Returns the current web service settings (host, port, workers, ssl).
+# Returns the current web service settings (host, port, workers, ssl, and optional SSL SAN aliases).
 # Loads from global config with sensible defaults if not configured.
 # Input: none.
-# Output: hash reference with host, port, workers, ssl keys.
+# Output: hash reference with host, port, workers, ssl, and ssl_subject_alt_names keys.
 sub web_settings {
     my ($self) = @_;
     my $cfg = $self->merged;
     my $web = $cfg->{web} || {};
 
     return {
-        host    => $web->{host} || '0.0.0.0',
-        port    => defined $web->{port} && $web->{port} =~ /^\d+$/ ? $web->{port} + 0 : 7890,
-        workers => defined $web->{workers} && $web->{workers} =~ /^\d+$/ && $web->{workers} > 0 ? $web->{workers} + 0 : 1,
-        ssl     => $web->{ssl} ? 1 : 0,
+        host                  => $web->{host} || '0.0.0.0',
+        port                  => defined $web->{port} && $web->{port} =~ /^\d+$/ ? $web->{port} + 0 : 7890,
+        workers               => defined $web->{workers} && $web->{workers} =~ /^\d+$/ && $web->{workers} > 0 ? $web->{workers} + 0 : 1,
+        ssl                   => $web->{ssl} ? 1 : 0,
+        ssl_subject_alt_names => $self->_normalize_ssl_subject_alt_names( $web->{ssl_subject_alt_names} ),
     };
 }
 
 # save_global_web_settings(%args)
-# Persists web service settings (host, port, workers, ssl) in the writable runtime config.
+# Persists web service settings (host, port, workers, ssl, and optional SSL SAN aliases) in the writable runtime config.
 # Only saves settings that are explicitly provided, leaving others untouched.
-# Input: named arguments (host, port, workers, ssl) - any or all can be omitted.
+# Input: named arguments (host, port, workers, ssl, ssl_subject_alt_names) - any or all can be omitted.
 # Output: hash reference containing the saved settings.
 sub save_global_web_settings {
     my ( $self, %args ) = @_;
@@ -227,6 +294,10 @@ sub save_global_web_settings {
         $result->{ssl} = $args{ssl} ? 1 : 0;
     }
 
+    if ( exists $args{ssl_subject_alt_names} ) {
+        $result->{ssl_subject_alt_names} = $self->_normalize_ssl_subject_alt_names( $args{ssl_subject_alt_names} );
+    }
+
     # Load current config and update with new values
     my $cfg = $self->load_global;
     $cfg->{web} = {} if ref( $cfg->{web} ) ne 'HASH';
@@ -238,6 +309,25 @@ sub save_global_web_settings {
     $self->save_global($cfg);
 
     return $result;
+}
+
+# _normalize_ssl_subject_alt_names($names)
+# Normalizes one configured SSL SAN list into simple trimmed strings.
+# Input: array reference of names/IPs or any other value.
+# Output: normalized array reference with blank entries removed.
+sub _normalize_ssl_subject_alt_names {
+    my ( $self, $names ) = @_;
+    return [] if ref($names) ne 'ARRAY';
+    my @normalized;
+    for my $name ( @{$names} ) {
+        next if !defined $name;
+        next if ref($name);
+        $name =~ s/^\s+//;
+        $name =~ s/\s+$//;
+        next if $name eq '';
+        push @normalized, $name;
+    }
+    return \@normalized;
 }
 
 # save_global_path_alias($name, $path)
@@ -393,7 +483,40 @@ Dashboard.
 Load and expose configuration domains used by the runtime.
 
 The web_settings() and save_global_web_settings() methods manage web service settings
-including host, port, workers, and ssl flag. These settings persist across restart,
-so dashboard restart inherits the previous serve session configuration.
+including host, port, workers, ssl flag, and optional C<ssl_subject_alt_names>
+entries used to extend the generated HTTPS certificate. These settings persist
+across restart, so dashboard restart inherits the previous serve session
+configuration.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file reads, merges, and writes layered dashboard configuration files.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::Config> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::Config -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

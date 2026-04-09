@@ -1,10 +1,13 @@
 use strict;
 use warnings;
+use utf8;
 
-use Cwd qw(cwd getcwd);
+use Cwd qw(abs_path cwd getcwd);
+use Encode qw(encode);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
+use Socket qw(AF_INET6 inet_pton pack_sockaddr_in6);
 use Test::More;
 
 use lib 'lib';
@@ -13,14 +16,31 @@ use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::Config;
+use Developer::Dashboard::Doctor;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::Platform qw(
+  command_argv_for_path
+  command_in_path
+  is_runnable_file
+  native_shell_name
+  normalize_shell_name
+  shell_quote_for
+  shell_command_argv
+);
 use Developer::Dashboard::Prompt;
 use POSIX qw(:sys_wait_h);
 use Developer::Dashboard::UpdateManager;
+
+sub _mode_octal {
+    my ($path) = @_;
+    my @stat = stat($path);
+    return undef if !@stat;
+    return sprintf '%04o', $stat[2] & 07777;
+}
 
 sub dies_like {
     my ( $code, $pattern, $label ) = @_;
@@ -28,8 +48,32 @@ sub dies_like {
     like( $error, $pattern, $label );
 }
 
+sub _portable_path {
+    my ($path) = @_;
+    return undef if !defined $path;
+    my $resolved = eval { abs_path($path) };
+    return defined $resolved && $resolved ne '' ? $resolved : $path;
+}
+
+sub is_same_path {
+    my ( $got, $expected, $label ) = @_;
+    is( _portable_path($got), _portable_path($expected), $label );
+}
+
+sub is_same_paths {
+    my ( $got, $expected, $label ) = @_;
+    is_deeply(
+        [ map { _portable_path($_) } @{ $got || [] } ],
+        [ map { _portable_path($_) } @{ $expected || [] } ],
+        $label,
+    );
+}
+
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 my $original_cwd = getcwd();
 
 my $workspace = File::Spec->catdir( $home, 'workspace' );
@@ -68,6 +112,154 @@ ok( -d $paths->config_root, 'config root created' );
 ok( -d $paths->auth_root, 'auth root created' );
 ok( -d $paths->users_root, 'users root created' );
 ok( !defined $paths->project_root_for( File::Spec->catdir( $home, 'not-a-repo' ) ), 'project_root_for returns undef outside repos' );
+is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard' ) ), '0700', 'home runtime root is owner-only' );
+is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'state' ) ), '0700', 'home runtime state root is owner-only' );
+is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'logs' ) ), '0700', 'home runtime logs root is owner-only' );
+is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'dashboards' ) ), '0700', 'home runtime dashboards root is owner-only' );
+is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'config' ) ), '0700', 'home runtime config root is owner-only' );
+is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'config', 'auth' ) ), '0700', 'home runtime auth root is owner-only' );
+is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'config', 'auth', 'users' ) ), '0700', 'home runtime users root is owner-only' );
+{
+    my $secure_home = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $secure_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $secure_paths = Developer::Dashboard::PathRegistry->new( home => $secure_home );
+    my $secure_files = Developer::Dashboard::FileRegistry->new( paths => $secure_paths );
+
+    my $written_prompt_log = $secure_files->write( 'prompt_log', "owner only\n" );
+    is( _mode_octal($written_prompt_log), '0600', 'home runtime file registry writes owner-only files' );
+    $secure_files->append( 'prompt_log', "append\n" );
+    is( _mode_octal($written_prompt_log), '0600', 'home runtime file registry appends keep owner-only file mode' );
+    my $touched_auth_log = $secure_files->touch('auth_log');
+    is( _mode_octal($touched_auth_log), '0600', 'home runtime file registry touch creates owner-only files' );
+
+    my $secure_config = Developer::Dashboard::Config->new(
+        files => $secure_files,
+        paths => $secure_paths,
+    );
+    my $saved_secure_global = $secure_config->save_global( { owner_only => 1 } );
+    is( _mode_octal($saved_secure_global), '0600', 'global config file is owner-only' );
+
+    my $secure_page_store = Developer::Dashboard::PageStore->new( paths => $secure_paths );
+    my $saved_secure_page = $secure_page_store->save_page(
+        Developer::Dashboard::PageDocument->from_hash(
+            {
+                id    => 'permissions-check',
+                title => 'Permissions Check',
+                html  => 'Blank page',
+            }
+        )
+    );
+    is( _mode_octal($saved_secure_page), '0600', 'saved home-runtime bookmark file is owner-only' );
+
+    my $secure_indicator_store = Developer::Dashboard::IndicatorStore->new( paths => $secure_paths );
+    my $saved_secure_indicator = $secure_indicator_store->set_indicator( permissions => ( status => 'ok', label => 'Permissions' ) );
+    ok( $saved_secure_indicator, 'indicator write succeeds for permission test' );
+    is(
+        _mode_octal( File::Spec->catfile( $secure_paths->indicator_dir('permissions'), 'status.json' ) ),
+        '0600',
+        'indicator status file is owner-only',
+    );
+
+    my $secure_collector = Developer::Dashboard::Collector->new( paths => $secure_paths );
+    my $collector_job_file = $secure_collector->write_job( sample => { name => 'sample', command => 'true' } );
+    is( _mode_octal($collector_job_file), '0600', 'collector job file is owner-only' );
+    my $collector_status_file = $secure_collector->write_result(
+        sample =>
+          (
+            stdout        => "ok\n",
+            stderr        => '',
+            exit_code     => 0,
+            output_format => 'text',
+          )
+    );
+    is( _mode_octal($collector_status_file), '0600', 'collector status file is owner-only' );
+    is(
+        _mode_octal( File::Spec->catfile( $secure_paths->collector_dir('sample'), 'stdout' ) ),
+        '0600',
+        'collector stdout file is owner-only',
+    );
+    is(
+        _mode_octal( File::Spec->catfile( $secure_paths->collector_dir('sample'), 'stderr' ) ),
+        '0600',
+        'collector stderr file is owner-only',
+    );
+    is(
+        _mode_octal( File::Spec->catfile( $secure_paths->collector_dir('sample'), 'combined' ) ),
+        '0600',
+        'collector combined file is owner-only',
+    );
+    is(
+        _mode_octal( File::Spec->catfile( $secure_paths->collector_dir('sample'), 'last_run' ) ),
+        '0600',
+        'collector last_run file is owner-only',
+    );
+
+    my $legacy_bookmarks = File::Spec->catdir( $secure_home, 'bookmarks' );
+    make_path($legacy_bookmarks);
+    chmod 0755, $legacy_bookmarks or die "Unable to chmod $legacy_bookmarks: $!";
+    my $legacy_file = File::Spec->catfile( $legacy_bookmarks, 'old.txt' );
+    open my $legacy_fh, '>', $legacy_file or die "Unable to write $legacy_file: $!";
+    print {$legacy_fh} "legacy\n";
+    close $legacy_fh;
+    chmod 0644, $legacy_file or die "Unable to chmod $legacy_file: $!";
+
+    my $doctor = Developer::Dashboard::Doctor->new( paths => $secure_paths );
+    local $ENV{RESULT};
+    delete $ENV{RESULT};
+    my $doctor_report = $doctor->run;
+    ok( !$doctor_report->{ok}, 'doctor flags legacy permission drift' );
+    is_deeply( $doctor_report->{hooks}, {}, 'doctor returns an empty hook set without RESULT data' );
+    dies_like( sub { Developer::Dashboard::Doctor->new() }, qr/Missing paths registry/, 'doctor requires paths' );
+    ok( !defined $doctor->_permission_issue_for_path(''), 'doctor ignores empty path audit input' );
+    ok( !defined $doctor->_permission_issue_for_path( File::Spec->catfile( $secure_home, 'missing-file' ) ), 'doctor ignores missing path audit input' );
+    is( Developer::Dashboard::Doctor::_mode_octal( File::Spec->catfile( $secure_home, 'missing-file' ) ), undef, 'doctor mode helper returns undef for missing paths' );
+    ok(
+        grep(
+            { $_->{path} eq $legacy_bookmarks && $_->{expected_mode} eq '0700' }
+              @{ $doctor_report->{issues} || [] }
+        ),
+        'doctor reports insecure legacy bookmark directory mode',
+    );
+    ok(
+        grep(
+            { $_->{path} eq $legacy_file && $_->{expected_mode} eq '0600' }
+              @{ $doctor_report->{issues} || [] }
+        ),
+        'doctor reports insecure legacy bookmark file mode',
+    );
+
+    my $legacy_exec = File::Spec->catfile( $legacy_bookmarks, 'run.sh' );
+    open my $legacy_exec_fh, '>', $legacy_exec or die "Unable to write $legacy_exec: $!";
+    print {$legacy_exec_fh} "#!/bin/sh\nexit 0\n";
+    close $legacy_exec_fh;
+    chmod 0755, $legacy_exec or die "Unable to chmod $legacy_exec: $!";
+    is(
+        $doctor->_permission_issue_for_path($legacy_exec)->{expected_mode},
+        '0700',
+        'doctor expects owner-only executable mode for executable files',
+    );
+
+    {
+        local $ENV{RESULT} = '[1]';
+        dies_like( sub { $doctor->_doctor_hook_results }, qr/Doctor hook RESULT must decode to a hash/, 'doctor rejects non-hash hook RESULT payloads' );
+    }
+    {
+        local $ENV{RESULT} = '{"00-hook.pl":{"exit_code":2}}';
+        is( $doctor->run->{hook_failures}, 1, 'doctor counts non-zero hook exits as failures' );
+    }
+    dies_like( sub { $doctor->_audit_root( label => 'bad' ) }, qr/Missing audit root path/, 'doctor audit_root requires a path' );
+    dies_like( sub { $doctor->_audit_root( path => $legacy_bookmarks ) }, qr/Missing audit root label/, 'doctor audit_root requires a label' );
+
+    my $fixed_doctor_report = $doctor->run( fix => 1 );
+    ok( !$fixed_doctor_report->{ok}, 'doctor fix report still records the repaired findings from this run' );
+    is( _mode_octal($legacy_bookmarks), '0700', 'doctor --fix tightens legacy bookmark directory permissions' );
+    is( _mode_octal($legacy_file), '0600', 'doctor --fix tightens legacy bookmark file permissions' );
+    my $post_fix_report = $doctor->run;
+    ok( $post_fix_report->{ok}, 'doctor reports success after fixes are applied' );
+}
 
 is( $paths->home, $home, 'home accessor works' );
 is( $paths->app_name, 'dashboard-test', 'custom app name set' );
@@ -110,9 +302,17 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
 }
 {
     chdir $local_repo or die $!;
-    is( $paths->project_runtime_root, File::Spec->catdir( $local_repo, '.developer-dashboard' ), 'project_runtime_root resolves only when the repo already contains a dashboard root' );
-    is( $paths->runtime_root, File::Spec->catdir( $local_repo, '.developer-dashboard' ), 'runtime_root prefers the project-local dashboard root when present' );
-    is_deeply(
+    is_same_path( $paths->project_runtime_root, File::Spec->catdir( $local_repo, '.developer-dashboard' ), 'project_runtime_root resolves only when the repo already contains a dashboard root' );
+    is_same_path( $paths->runtime_root, File::Spec->catdir( $local_repo, '.developer-dashboard' ), 'runtime_root prefers the project-local dashboard root when present' );
+    is_same_paths(
+        [ $paths->runtime_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+            File::Spec->catdir( $local_repo, '.developer-dashboard' ),
+        ],
+        'runtime_layers returns the inherited runtime chain from home to the active project layer',
+    );
+    is_same_paths(
         [ $paths->runtime_roots ],
         [
             File::Spec->catdir( $local_repo, '.developer-dashboard' ),
@@ -120,16 +320,16 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
         ],
         'runtime_roots returns project-local then home fallback roots',
     );
-    is( $paths->dashboards_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'dashboards' ), 'dashboards_root writes to the project-local runtime when present' );
-    is( $paths->cli_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'cli' ), 'cli_root writes to the project-local runtime when present' );
-    is( $paths->config_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'config' ), 'config_root writes to the project-local runtime when present' );
-    is( $paths->users_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'config', 'auth', 'users' ), 'users_root writes to the project-local runtime when present' );
-    is( $paths->sessions_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'state', 'sessions' ), 'sessions_root writes to the project-local runtime when present' );
+    is_same_path( $paths->dashboards_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'dashboards' ), 'dashboards_root writes to the project-local runtime when present' );
+    is_same_path( $paths->cli_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'cli' ), 'cli_root writes to the project-local runtime when present' );
+    is_same_path( $paths->config_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'config' ), 'config_root writes to the project-local runtime when present' );
+    is_same_path( $paths->users_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'config', 'auth', 'users' ), 'users_root writes to the project-local runtime when present' );
+    is_same_path( $paths->sessions_root, File::Spec->catdir( $local_repo, '.developer-dashboard', 'state', 'sessions' ), 'sessions_root writes to the project-local runtime when present' );
     chdir $home or die $!;
 }
 {
     chdir $local_repo or die $!;
-    is_deeply(
+    is_same_paths(
         [ $paths->cli_roots ],
         [
             File::Spec->catdir( $local_repo, '.developer-dashboard', 'cli' ),
@@ -137,7 +337,161 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
         ],
         'cli_roots returns project-local then home fallback roots',
     );
+    is_same_paths(
+        [ $paths->cli_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard', 'cli' ),
+            File::Spec->catdir( $local_repo, '.developer-dashboard', 'cli' ),
+        ],
+        'cli_layers returns home then project-local CLI inheritance roots',
+    );
+    is_same_paths(
+        [ $paths->config_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard', 'config' ),
+            File::Spec->catdir( $local_repo, '.developer-dashboard', 'config' ),
+        ],
+        'config_layers returns home then project-local config inheritance roots',
+    );
     chdir $home or die $!;
+}
+{
+    my $layer_root = File::Spec->catdir( $home, 'dd-oop-layers' );
+    my $layer_parent = File::Spec->catdir( $layer_root, 'parent' );
+    my $layer_leaf = File::Spec->catdir( $layer_parent, 'leaf' );
+    make_path( File::Spec->catdir( $layer_root, '.developer-dashboard' ) );
+    make_path( File::Spec->catdir( $layer_parent, '.developer-dashboard' ) );
+    make_path( File::Spec->catdir( $layer_leaf, '.developer-dashboard' ) );
+    chdir $layer_leaf or die $!;
+
+    my $layer_paths = Developer::Dashboard::PathRegistry->new( home => $home );
+    is_same_paths(
+        [ $layer_paths->runtime_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+            File::Spec->catdir( $layer_root, '.developer-dashboard' ),
+            File::Spec->catdir( $layer_parent, '.developer-dashboard' ),
+            File::Spec->catdir( $layer_leaf, '.developer-dashboard' ),
+        ],
+        'runtime_layers walks every .developer-dashboard ancestor from home to the current leaf layer',
+    );
+    is_same_paths(
+        [ $layer_paths->runtime_roots ],
+        [
+            File::Spec->catdir( $layer_leaf, '.developer-dashboard' ),
+            File::Spec->catdir( $layer_parent, '.developer-dashboard' ),
+            File::Spec->catdir( $layer_root, '.developer-dashboard' ),
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+        ],
+        'runtime_roots keeps deepest-first lookup order across every discovered layer',
+    );
+    is_same_path( $layer_paths->runtime_root, File::Spec->catdir( $layer_leaf, '.developer-dashboard' ), 'runtime_root writes to the deepest discovered layer' );
+    chdir $home or die $!;
+}
+{
+    my $outside_root = tempdir( CLEANUP => 1 );
+    my $outside_parent = File::Spec->catdir( $outside_root, 'parent' );
+    my $outside_leaf = File::Spec->catdir( $outside_parent, 'leaf' );
+    system( 'git', 'init', '-q', $outside_root ) == 0 or die 'Unable to initialize outside-home git fixture';
+    make_path( File::Spec->catdir( $outside_parent, '.developer-dashboard' ) );
+    make_path( File::Spec->catdir( $outside_leaf, '.developer-dashboard' ) );
+    chdir $outside_leaf or die $!;
+
+    my $outside_paths = Developer::Dashboard::PathRegistry->new( home => $home );
+    is_same_paths(
+        [ $outside_paths->runtime_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+            File::Spec->catdir( $outside_parent, '.developer-dashboard' ),
+            File::Spec->catdir( $outside_leaf, '.developer-dashboard' ),
+        ],
+        'runtime_layers still walks current and parent .developer-dashboard layers when the working tree lives outside HOME',
+    );
+    chdir $home or die $!;
+}
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::cwd = sub { return undef; };
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    my $paths_without_cwd = Developer::Dashboard::PathRegistry->new( home => $home );
+    is_same_paths(
+        [ $paths_without_cwd->runtime_layers ],
+        [ File::Spec->catdir( $home, '.developer-dashboard' ) ],
+        'runtime_layers falls back to the home layer when cwd is unavailable',
+    );
+    is_deeply( \@warnings, [], 'runtime_layers does not warn when cwd is unavailable' );
+}
+{
+    my $outside_no_repo = tempdir( CLEANUP => 1 );
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::cwd = sub { return $outside_no_repo; };
+    local *Developer::Dashboard::PathRegistry::current_project_root = sub { return undef; };
+    is_same_paths(
+        [ Developer::Dashboard::PathRegistry->new( home => $home )->runtime_layers ],
+        [ File::Spec->catdir( $home, '.developer-dashboard' ) ],
+        'runtime_layers falls back to the home layer when cwd is outside HOME and no project layer applies',
+    );
+}
+{
+    my $real_home = tempdir( CLEANUP => 1 );
+    my $alias_parent = tempdir( CLEANUP => 1 );
+    my $alias_home = File::Spec->catdir( $alias_parent, 'home-alias' );
+    SKIP: {
+        skip 'symlink regression requires symlink support', 1 if !eval { symlink( $real_home, $alias_home ); 1 };
+        make_path( File::Spec->catdir( $real_home, '.developer-dashboard' ) );
+        make_path( File::Spec->catdir( $real_home, 'dd-oop-layers', 'parent', '.developer-dashboard' ) );
+        make_path( File::Spec->catdir( $real_home, 'dd-oop-layers', 'parent', 'leaf', '.developer-dashboard' ) );
+        my $real_leaf = File::Spec->catdir( $real_home, 'dd-oop-layers', 'parent', 'leaf' );
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::cwd = sub { return $real_leaf; };
+        local *Developer::Dashboard::PathRegistry::current_project_root = sub { return undef; };
+        my $alias_paths = Developer::Dashboard::PathRegistry->new( home => $alias_home );
+        is_same_paths(
+            [ $alias_paths->runtime_layers ],
+            [
+                File::Spec->catdir( $alias_home, '.developer-dashboard' ),
+                File::Spec->catdir( $alias_home, 'dd-oop-layers', 'parent', '.developer-dashboard' ),
+                File::Spec->catdir( $alias_home, 'dd-oop-layers', 'parent', 'leaf', '.developer-dashboard' ),
+            ],
+            'runtime_layers survives canonical cwd paths when home is addressed through a symlink alias',
+        );
+    }
+}
+{
+    my $layer_parent = File::Spec->catdir( $home, 'dirname-guard-parent' );
+    my $layer_leaf = File::Spec->catdir( $layer_parent, 'leaf' );
+    make_path( File::Spec->catdir( $layer_leaf, '.developer-dashboard' ) );
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::cwd = sub { return $layer_leaf; };
+    local *Developer::Dashboard::PathRegistry::dirname = sub { return $_[0] };
+    is_same_paths(
+        [ Developer::Dashboard::PathRegistry->new( home => $home )->runtime_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+            File::Spec->catdir( $layer_leaf, '.developer-dashboard' ),
+        ],
+        'runtime_layers stops cleanly when dirname cannot advance to a parent layer',
+    );
+}
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_LAYERS} = join(
+        "\n",
+        File::Spec->catdir( $home, '.developer-dashboard' ),
+        File::Spec->catdir( $home, 'dd-oop-layers', 'parent', '.developer-dashboard' ),
+        File::Spec->catdir( $home, 'dd-oop-layers', 'parent', 'leaf', '.developer-dashboard' ),
+    );
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::cwd = sub { return undef; };
+    is_same_paths(
+        [ Developer::Dashboard::PathRegistry->new( home => $home )->runtime_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+            File::Spec->catdir( $home, 'dd-oop-layers', 'parent', '.developer-dashboard' ),
+            File::Spec->catdir( $home, 'dd-oop-layers', 'parent', 'leaf', '.developer-dashboard' ),
+        ],
+        'runtime_layers honors the explicit runtime layer chain exported by parent processes',
+    );
 }
 
 {
@@ -148,12 +502,205 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
         'dashboards_roots honors the bookmarks environment override',
     );
 }
+{
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS} = '~/bookmarks-layers-env';
+    is_deeply(
+        [ $paths->dashboards_layers ],
+        [ File::Spec->catdir( $home, 'bookmarks-layers-env' ) ],
+        'dashboards_layers honors the bookmarks environment override',
+    );
+}
+{
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS} = '~/config-layers-env';
+    is_deeply(
+        [ $paths->config_layers ],
+        [ File::Spec->catdir( $home, 'config-layers-env' ) ],
+        'config_layers honors the config environment override',
+    );
+}
 
 is_deeply(
     Developer::Dashboard::PathRegistry->new( home => $home )->named_paths,
     {},
     'named_paths returns an empty hash when no aliases are configured',
 );
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'linux';
+    is( normalize_shell_name('bash'), 'bash', 'normalize_shell_name keeps bash' );
+    is( normalize_shell_name('/usr/bin/zsh'), 'zsh', 'normalize_shell_name strips Unix shell paths' );
+    is_deeply( [ shell_command_argv('printf ok', shell => 'sh') ], [ 'sh', '-lc', 'printf ok' ], 'shell_command_argv builds POSIX shell argv' );
+    is( shell_quote_for( 'sh', q{O'Hara} ), q{'O'\''Hara'}, 'shell_quote_for escapes POSIX single quotes' );
+    dies_like( sub { normalize_shell_name('fish') }, qr/Unsupported shell 'fish'/, 'normalize_shell_name rejects unsupported shells explicitly' );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return '/usr/bin/bash' if $name eq 'bash';
+            return undef;
+        };
+        local $ENV{SHELL} = '';
+        is( native_shell_name(), 'bash', 'native_shell_name prefers bash when SHELL is unset and bash is available' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return '/usr/bin/zsh' if $name eq 'zsh';
+            return undef;
+        };
+        local $ENV{SHELL} = '';
+        is( native_shell_name(), 'zsh', 'native_shell_name falls back to zsh when bash is unavailable' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub { return undef; };
+        local $ENV{SHELL} = '';
+        is( native_shell_name(), 'sh', 'native_shell_name falls back to sh when no richer POSIX shell is available' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::normalize_shell_name = sub { return 'fish'; };
+        dies_like( sub { shell_command_argv('printf ok') }, qr/Unsupported shell 'fish'/, 'shell_command_argv rejects unsupported normalized shells explicitly' );
+    }
+    {
+        open my $fh, '>', 'unix-runner.pl' or die $!;
+        print {$fh} "#!/usr/bin/env perl\nprint qq{unix-ok\\n};\n";
+        close $fh;
+        is_deeply(
+            [ command_argv_for_path('unix-runner.pl') ],
+            [ $^X, 'unix-runner.pl' ],
+            'command_argv_for_path resolves Perl scripts through the current perl interpreter on Unix even when they carry a shebang',
+        );
+        unlink 'unix-runner.pl' or die $!;
+    }
+    {
+        open my $fh, '>', 'unix-runner' or die $!;
+        print {$fh} "#!/usr/bin/env perl\nprint qq{unix-ok\\n};\n";
+        close $fh;
+        chmod 0755, 'unix-runner' or die $!;
+        is_deeply(
+            [ command_argv_for_path('unix-runner') ],
+            [ $^X, 'unix-runner' ],
+            'command_argv_for_path resolves shebang-only Perl scripts through the current perl interpreter on Unix',
+        );
+        unlink 'unix-runner' or die $!;
+    }
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    is( normalize_shell_name('ps'), 'powershell', 'normalize_shell_name maps ps to powershell' );
+    is( normalize_shell_name('pwsh.exe'), 'pwsh', 'normalize_shell_name strips Windows PowerShell executable suffixes' );
+    is_deeply(
+        [ shell_command_argv('Write-Host ok', shell => 'powershell') ],
+        [ 'powershell', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', 'Write-Host ok' ],
+        'shell_command_argv builds Windows PowerShell argv',
+    );
+    local $ENV{PATHEXT} = '.EXE;.CMD;.BAT;.PS1';
+    is( native_shell_name('powershell.exe'), 'powershell', 'native_shell_name normalizes explicit powershell selectors' );
+    ok( is_runnable_file('tool.ps1'), 'is_runnable_file treats .ps1 files as runnable on Windows when the file exists' ) if do {
+        open my $fh, '>', 'tool.ps1' or die $!;
+        print {$fh} "Write-Host ok\n";
+        close $fh;
+        1;
+    };
+    is_deeply(
+        [ command_argv_for_path('tool.ps1') ],
+        [ 'powershell', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', 'tool.ps1' ],
+        'command_argv_for_path resolves PowerShell scripts on Windows',
+    );
+    ok( command_in_path('tool'), 'command_in_path resolves PATHEXT-backed PowerShell scripts on Windows' );
+    ok( is_runnable_file('tool'), 'is_runnable_file resolves PATHEXT-backed PowerShell scripts on Windows' );
+    {
+        open my $fh, '>', 'tool.cmd' or die $!;
+        print {$fh} "\@echo off\r\necho cmd-ok\r\n";
+        close $fh;
+    }
+    is_deeply(
+        [ command_argv_for_path('tool.cmd') ],
+        [ 'cmd.exe', '/d', '/c', 'tool.cmd' ],
+        'command_argv_for_path resolves .cmd scripts on Windows',
+    );
+    {
+        open my $fh, '>', 'hook.pl' or die $!;
+        print {$fh} "print qq{perl-ok\\n};\n";
+        close $fh;
+    }
+    is_deeply(
+        [ command_argv_for_path('hook.pl') ],
+        [ $^X, 'hook.pl' ],
+        'command_argv_for_path resolves Perl scripts on Windows through the current perl interpreter',
+    );
+    {
+        open my $fh, '>', 'runner.bat' or die $!;
+        print {$fh} "\@echo off\r\necho bat-ok\r\n";
+        close $fh;
+    }
+    is_deeply(
+        [ command_argv_for_path('runner.bat') ],
+        [ 'cmd.exe', '/d', '/c', 'runner.bat' ],
+        'command_argv_for_path resolves .bat scripts on Windows',
+    );
+    {
+        open my $fh, '>', 'runner.sh' or die $!;
+        print {$fh} "#!/bin/sh\necho sh-ok\n";
+        close $fh;
+    }
+    local $ENV{PATH} = $home . ':' . $ENV{PATH};
+    {
+        open my $fh, '>', File::Spec->catfile( $home, 'sh' ) or die $!;
+        print {$fh} "#!/bin/sh\nexit 0\n";
+        close $fh;
+        chmod 0755, File::Spec->catfile( $home, 'sh' ) or die $!;
+    }
+    ok( is_runnable_file('runner.sh'), 'is_runnable_file treats .sh files as runnable on Windows when a POSIX shell is available' );
+    my @runner_sh = command_argv_for_path('runner.sh');
+    is( $runner_sh[1], 'runner.sh', 'command_argv_for_path keeps the shell-script path when dispatching through an available POSIX shell on Windows' );
+    like( $runner_sh[0], qr{(?:^|/)sh$}, 'command_argv_for_path resolves .sh scripts through an available POSIX shell on Windows' );
+    {
+        open my $fh, '>', 'script.foo' or die $!;
+        print {$fh} "#!/usr/bin/env perl\nprint qq{shebang-ok\\n};\n";
+        close $fh;
+    }
+    ok( is_runnable_file('script.foo'), 'is_runnable_file treats shebang files as runnable on Windows' );
+    is_deeply(
+        [ command_argv_for_path('script.foo') ],
+        [ $^X, 'script.foo' ],
+        'command_argv_for_path falls back to perl for unknown extensions on Windows',
+    );
+    {
+        open my $fh, '>', 'notes.txt' or die $!;
+        print {$fh} "plain text\n";
+        close $fh;
+    }
+    ok( !is_runnable_file('notes.txt'), 'is_runnable_file rejects plain data files on Windows' );
+    is( shell_quote_for( 'powershell', q{O'Hara} ), q{'O''Hara'}, 'shell_quote_for escapes PowerShell single quotes' );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return 'pwsh' if $name eq 'pwsh';
+            return undef;
+        };
+        local $ENV{SHELL} = '';
+        is( native_shell_name(), 'pwsh', 'native_shell_name prefers pwsh on Windows when available' );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub { return undef; };
+        local $ENV{SHELL} = '';
+        is( native_shell_name(), 'powershell', 'native_shell_name falls back to powershell on Windows when pwsh is unavailable' );
+    }
+    unlink 'runner.bat' or die $!;
+    unlink 'runner.sh' or die $!;
+    unlink 'script.foo' or die $!;
+    unlink 'notes.txt' or die $!;
+    unlink File::Spec->catfile( $home, 'sh' ) or die $!;
+    unlink 'tool.ps1' or die $!;
+    unlink 'tool.cmd' or die $!;
+    unlink 'hook.pl' or die $!;
+}
 
 my $named_dir = $paths->resolve_dir('named');
 ok( !defined scalar $paths->ls('named'), 'ls returns undef for missing directory' );
@@ -170,12 +717,12 @@ is_deeply(
 my $with_dir_result = $paths->with_dir(
     'named',
     sub {
-        is( cwd(), $named_dir, 'with_dir changes into target directory' );
+        is_same_path( cwd(), $named_dir, 'with_dir changes into target directory' );
         return 'ok';
     }
 );
 is( $with_dir_result, 'ok', 'with_dir returns scalar result' );
-is( cwd(), $home, 'with_dir restores original cwd after scalar call' );
+is_same_path( cwd(), $home, 'with_dir restores original cwd after scalar call' );
 
 my @with_dir_list = $paths->with_dir(
     'named',
@@ -197,7 +744,7 @@ dies_like(
     qr/boom/,
     'with_dir rethrows callback exceptions',
 );
-is( cwd(), $home, 'with_dir restores cwd after callback errors' );
+is_same_path( cwd(), $home, 'with_dir restores cwd after callback errors' );
 
 my @located = $paths->locate_projects('alpha');
 is_deeply(
@@ -280,6 +827,48 @@ my $saved_global = {
 };
 $config->save_global($saved_global);
 is_deeply( $config->load_global, $saved_global, 'save_global round-trips config content' );
+my $saved_default_merge_path = $config->save_global_defaults(
+    {
+        default_mode => 'browse',
+        web          => {
+            host    => '127.0.0.1',
+            workers => 9,
+            ssl     => 1,
+        },
+        providers => [
+            {
+                title => 'Default Provider',
+            },
+        ],
+    }
+);
+ok( -f $saved_default_merge_path, 'save_global_defaults writes the merged config file' );
+is_deeply(
+    $config->load_global,
+    {
+        default_mode => 'render',
+        collectors   => [
+            {
+                name     => 'global.collector',
+                command  => q{printf 'global'},
+                cwd      => 'home',
+                interval => 5,
+            },
+        ],
+        web => {
+            host    => '127.0.0.1',
+            workers => 9,
+            ssl     => 1,
+        },
+        providers => [
+            {
+                title => 'Default Provider',
+            },
+        ],
+    },
+    'save_global_defaults preserves existing user settings while adding only missing defaults',
+);
+$config->save_global($saved_global);
 my $global_alias_config = Developer::Dashboard::Config->new( files => $files, paths => $paths, repo_root => $home );
 $global_alias_config->save_global_path_alias( 'foo', File::Spec->catdir( $home, 'foo-path' ) );
 is_deeply(
@@ -307,6 +896,25 @@ is( $global_alias_config->load_global->{web}{workers}, 3, 'save_global_web_worke
 is( $global_alias_config->web_workers, 3, 'web_workers reads the saved worker count from config' );
 dies_like( sub { $global_alias_config->save_global_web_workers(0) }, qr/positive integer/, 'save_global_web_workers rejects zero workers' );
 dies_like( sub { $global_alias_config->save_global_web_workers('abc') }, qr/positive integer/, 'save_global_web_workers rejects non-numeric worker counts' );
+is_deeply(
+    $global_alias_config->web_settings->{ssl_subject_alt_names},
+    [],
+    'web_settings defaults the HTTPS SAN alias list to an empty array reference',
+);
+is_deeply(
+    $global_alias_config->save_global_web_settings(
+        ssl_subject_alt_names => [ ' dashboard.local ', '192.168.88.5', '', '::1' ],
+    ),
+    {
+        ssl_subject_alt_names => [ 'dashboard.local', '192.168.88.5', '::1' ],
+    },
+    'save_global_web_settings persists the normalized HTTPS SAN alias list',
+);
+is_deeply(
+    $global_alias_config->web_settings->{ssl_subject_alt_names},
+    [ 'dashboard.local', '192.168.88.5', '::1' ],
+    'web_settings reads the configured HTTPS SAN alias list back from config',
+);
 is_deeply(
     $global_alias_config->save_global_path_alias( 'foo', File::Spec->catdir( $home, 'foo-path-updated' ) ),
     { name => 'foo', path => File::Spec->catdir( $home, 'foo-path-updated' ) },
@@ -397,6 +1005,95 @@ like( $html, qr/Page &lt;One&gt;/, 'render_html escapes title text' );
 like( $html, qr/Desc &quot;here&quot;/, 'render_html includes escaped note text' );
 like( $html, qr/Hello <world>/, 'render_html keeps bookmark HTML body intact' );
 
+my $modern_instruction = <<'PAGE';
+=== TITLE ===
+Modern Page
+=== ICON ===
+fa-rocket
+=== BOOKMARK ===
+modern-page
+=== NOTE ===
+Modern note
+=== STASH ===
+{"alpha":1}
+=== HTML ===
+<section>Modern body</section>
+=== CODE1 ===
+print "code one";
+=== CODE2 ===
+print "code two";
+PAGE
+my $modern_page = Developer::Dashboard::PageDocument->from_instruction($modern_instruction);
+is( $modern_page->as_hash->{id}, 'modern-page', 'from_instruction parses modern bookmark id sections' );
+is( $modern_page->as_hash->{meta}{icon}, 'fa-rocket', 'from_instruction parses ICON sections from modern bookmark source' );
+is_deeply( $modern_page->as_hash->{state}, { alpha => 1 }, 'from_instruction decodes JSON STASH sections from modern bookmark source' );
+is_deeply(
+    $modern_page->as_hash->{meta}{codes},
+    [
+        { id => 'CODE1', body => q{print "code one";} },
+        { id => 'CODE2', body => q{print "code two";} },
+    ],
+    'from_instruction preserves modern CODE sections in page metadata',
+);
+like( $modern_page->instruction_text, qr/^TITLE:\s+Modern Page/m, 'instruction_text aliases canonical legacy instruction output' );
+is( $modern_page->render_template('ignored'), $modern_page, 'render_template compatibility path still returns the page object' );
+is_deeply(
+    Developer::Dashboard::PageDocument::_decode_structured_json('{"mode":"modern"}'),
+    { mode => 'modern' },
+    '_decode_structured_json decodes structured JSON payloads',
+);
+is_deeply(
+    Developer::Dashboard::PageDocument::_decode_structured_json(''),
+    {},
+    '_decode_structured_json returns an empty hash for blank payloads',
+);
+is_deeply(
+    Developer::Dashboard::PageDocument::_decode_stash_section('["not","a","hash"]'),
+    {},
+    '_decode_stash_section rejects non-hash JSON payloads for STASH sections',
+);
+is(
+    Developer::Dashboard::PageDocument::_template_value( 'stash.profile.name', { stash => { profile => { name => 'Alice' } } } ),
+    'Alice',
+    '_template_value resolves nested placeholder paths',
+);
+is(
+    Developer::Dashboard::PageDocument::_template_value( 'stash.profile.missing', { stash => { profile => { name => 'Alice' } } } ),
+    '',
+    '_template_value returns an empty string for missing placeholder paths',
+);
+is(
+    Developer::Dashboard::PageDocument::_legacy_value( [ 'one', 2 ] ),
+    "[\n  'one',\n  2\n]",
+    '_legacy_value serializes array references for legacy stash output',
+);
+is(
+    Developer::Dashboard::PageDocument::_legacy_value( { two => 2 } ),
+    "{\n  two => 2\n}",
+    '_legacy_value serializes hash references for legacy stash output',
+);
+my $coded_legacy_page = Developer::Dashboard::PageDocument->new(
+    id          => 'coded-page',
+    title       => 'Coded Page',
+    description => 'Has codes',
+    layout      => { body => '<p>Body</p>' },
+    state       => { alpha => 1 },
+    meta        => {
+        icon  => 'fa-code',
+        codes => [
+            { id => 'CODE1', body => 'print "one";' },
+            'skip-me',
+            { id => 'BROKEN', body => 'print "broken";' },
+            { id => 'CODE2', body => 'print "two";' },
+        ],
+    },
+);
+my $coded_legacy_instruction = $coded_legacy_page->legacy_instruction;
+like( $coded_legacy_instruction, qr/^ICON:\s+fa-code/m, 'legacy_instruction includes ICON sections when present' );
+like( $coded_legacy_instruction, qr/^CODE1:\s+print "one";/m, 'legacy_instruction includes valid CODE1 sections' );
+like( $coded_legacy_instruction, qr/^CODE2:\s+print "two";/m, 'legacy_instruction includes valid CODE2 sections' );
+unlike( $coded_legacy_instruction, qr/^BROKEN:/m, 'legacy_instruction skips invalid code section identifiers' );
+
 my $page_store = Developer::Dashboard::PageStore->new( paths => $paths );
 dies_like( sub { Developer::Dashboard::PageStore->new }, qr/Missing paths registry/, 'page store requires paths' );
 dies_like( sub { $page_store->page_file('') }, qr/Missing page id/, 'page_file requires an id' );
@@ -467,6 +1164,7 @@ $collector->write_job(
 );
 ok( -f $collector_paths->{job}, 'write_job persists job metadata' );
 is( $collector->read_job('alpha.collector')->{command}, q{printf 'alpha'}, 'read_job returns job metadata' );
+ok( !defined $collector->read_job('missing.collector'), 'read_job returns undef for missing job files' );
 ok( !defined $collector->read_status('missing.collector'), 'read_status returns undef for missing status' );
 
 $collector->write_result(
@@ -487,6 +1185,16 @@ is( $collector->inspect_collector('alpha.collector')->{job}{name}, 'alpha.collec
 $collector->write_result( 'beta.collector', exit_code => 0 );
 is( $collector->read_output('beta.collector')->{stdout}, '', 'read_output falls back to empty stdout' );
 is( $collector->read_output('beta.collector')->{stderr}, '', 'read_output falls back to empty stderr' );
+is_deeply(
+    $collector->read_output('missing.collector'),
+    {
+        stdout   => '',
+        stderr   => '',
+        combined => '',
+        last_run => '',
+    },
+    'read_output returns empty artifacts for a missing collector',
+);
 $collector->write_result( 'beta.collector', exit_code => 0 );
 ok( -f $collector->collector_paths('beta.collector')->{status}, 'write_result overwrites existing collector files cleanly' );
 
@@ -595,6 +1303,87 @@ is(
     'sync_collectors skips rewriting indicators when the stored config-backed indicator already matches',
 );
 is( scalar @{ $indicators->sync_collectors([]) }, 0, 'sync_collectors ignores empty collector lists' );
+$indicators->set_indicator(
+    'stale.collector',
+    icon                 => 'OLD',
+    label                => 'stale.collector',
+    status               => 'ok',
+    managed_by_collector => 1,
+    collector_name       => 'stale.collector',
+    prompt_visible       => 1,
+);
+my $renamed_sync = $indicators->sync_collectors(
+    [
+        {
+            name      => 'fresh.collector',
+            indicator => {
+                icon => 'NEW',
+            },
+        },
+    ]
+);
+is( scalar @{$renamed_sync}, 4, 'sync_collectors rewrites the active collector indicator and removes all stale managed collector indicators after a config rename' );
+ok( !defined $indicators->get_indicator('stale.collector'), 'sync_collectors removes stale managed collector indicators after a collector rename' );
+ok( !defined $indicators->get_indicator('vpn'), 'sync_collectors removes older managed collector indicators that no longer exist in config' );
+ok( !defined $indicators->get_indicator('docker.collector'), 'sync_collectors removes renamed managed collector indicators that no longer exist in config' );
+is( $indicators->get_indicator('fresh.collector')->{collector_name}, 'fresh.collector', 'sync_collectors records the active collector name on managed indicators' );
+my @page_header_items = $indicators->page_header_items;
+my ($fresh_page_item) = grep { $_->{prog} eq 'fresh.collector' } @page_header_items;
+is( $fresh_page_item->{alias}, 'NEW', 'page header status prefers the configured indicator icon over the collector name' );
+{
+    my $race_home = tempdir(CLEANUP => 1);
+    my $race_paths = Developer::Dashboard::PathRegistry->new( home => $race_home );
+    my $race_indicators = Developer::Dashboard::IndicatorStore->new( paths => $race_paths );
+    $race_indicators->set_indicator(
+        'healthy.indicator',
+        collector_name       => 'healthy.collector',
+        icon                 => 'OLD',
+        label                => 'Stale Healthy',
+        managed_by_collector => 1,
+        prompt_visible       => 1,
+        status               => 'missing',
+    );
+
+    no warnings 'redefine';
+    my $original_set_indicator = \&Developer::Dashboard::IndicatorStore::set_indicator;
+    my $injected_ok_update = 0;
+    local *Developer::Dashboard::IndicatorStore::set_indicator = sub {
+        my ( $self, $name, %data ) = @_;
+        if ( !$injected_ok_update && $name eq 'healthy.indicator' && ( $data{status} || '' ) eq 'missing' ) {
+            $injected_ok_update = 1;
+            $original_set_indicator->(
+                $self,
+                $name,
+                collector_name       => 'healthy.collector',
+                icon                 => 'H',
+                label                => 'Healthy',
+                managed_by_collector => 1,
+                prompt_visible       => 1,
+                status               => 'ok',
+            );
+        }
+        return $original_set_indicator->( $self, $name, %data );
+    };
+
+    $race_indicators->sync_collectors(
+        [
+            {
+                name      => 'healthy.collector',
+                indicator => {
+                    icon  => 'H',
+                    label => 'Healthy',
+                    name  => 'healthy.indicator',
+                },
+            },
+        ]
+    );
+
+    is(
+        $race_indicators->get_indicator('healthy.indicator')->{status},
+        'ok',
+        'sync_collectors preserves a concurrent collector status update instead of writing stale missing state',
+    );
+}
 
 my $prompt = Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators );
 dies_like( sub { Developer::Dashboard::Prompt->new( paths => $paths ) }, qr/Missing indicator store/, 'prompt requires indicators' );
@@ -606,11 +1395,11 @@ my $plain_prompt = Developer::Dashboard::Prompt->new(
     paths      => $plain_paths,
     indicators => Developer::Dashboard::IndicatorStore->new( paths => $plain_paths ),
 )->render( cwd => File::Spec->catdir( $plain_home, 'here' ) );
-like( $plain_prompt, qr/\]\s+~/, 'prompt still renders the cwd when no indicators exist' );
+like( $plain_prompt, qr/\[~\/here\]/, 'prompt still renders the cwd when no indicators exist' );
 unlike( $plain_prompt, qr/\bDD\b/, 'prompt omits the DD fallback when no indicators exist' );
 
 my $prompt_output = $prompt->render( jobs => 3, cwd => File::Spec->catdir( $home, 'named-path' ) );
-like( $prompt_output, qr/🚨🐳/, 'compact prompt includes missing collector status glyphs' );
+like( $prompt_output, qr/🚨NEW/, 'compact prompt includes the renamed missing collector indicator glyph' );
 like( $prompt_output, qr/✅Z ✅b/, 'compact prompt includes success status glyphs in priority order' );
 unlike( $prompt_output, qr/alpha/, 'prompt skips hidden indicators' );
 like( $prompt_output, qr/~\/named-path/, 'prompt shortens home directory to tilde' );
@@ -627,7 +1416,7 @@ like(
         jobs => 0,
         cwd  => File::Spec->catdir( $workspace, 'Alpha-App' ),
     );
-    like( $branch_prompt, qr/\{Alpha-App:master\}/, 'prompt includes repo name and git branch' );
+    like( $branch_prompt, qr/\Q[~\/workspace\/Alpha-App] 🌿master\E/, 'prompt includes git branch in the legacy trailing branch format' );
 }
 {
     my $git_repo = File::Spec->catdir( $home, 'prompt-git-repo' );
@@ -708,6 +1497,11 @@ print {$local_cfg} <<'JSON';
   },
   "collectors": [
     {
+      "name": "home.collector",
+      "command": "printf 'local-home'",
+      "cwd": "home"
+    },
+    {
       "name": "local.collector",
       "command": "printf 'local'",
       "cwd": "home"
@@ -717,11 +1511,109 @@ print {$local_cfg} <<'JSON';
 JSON
 close $local_cfg;
 
+my $layered_parent = File::Spec->catdir( $home, 'repo-for-config', 'app-parent' );
+my $layered_leaf = File::Spec->catdir( $layered_parent, 'app-leaf' );
+make_path( File::Spec->catdir( $layered_parent, '.developer-dashboard', 'config' ) );
+make_path( File::Spec->catdir( $layered_leaf, '.developer-dashboard', 'config' ) );
+open my $parent_cfg, '>', File::Spec->catfile( $layered_parent, '.developer-dashboard', 'config', 'config.json' ) or die $!;
+print {$parent_cfg} <<'JSON';
+{
+  "path_aliases": {
+    "parent_only": "~/parent-only"
+  },
+  "collectors": [
+    {
+      "name": "parent.collector",
+      "command": "printf 'parent'",
+      "cwd": "home"
+    }
+  ],
+  "providers": [
+    {
+      "id": "shared-provider",
+      "title": "Parent Provider"
+    }
+  ]
+}
+JSON
+close $parent_cfg;
+open my $leaf_cfg, '>', File::Spec->catfile( $layered_leaf, '.developer-dashboard', 'config', 'config.json' ) or die $!;
+print {$leaf_cfg} <<'JSON';
+{
+  "path_aliases": {
+    "leaf_only": "~/leaf-only"
+  },
+  "collectors": [
+    {
+      "name": "leaf.collector",
+      "command": "printf 'leaf'",
+      "cwd": "home"
+    },
+    {
+      "name": "parent.collector",
+      "command": "printf 'leaf-parent'",
+      "cwd": "home"
+    }
+  ],
+  "providers": [
+    {
+      "id": "leaf-provider",
+      "title": "Leaf Provider"
+    },
+    {
+      "id": "shared-provider",
+      "title": "Leaf Provider Override"
+    }
+  ]
+}
+JSON
+close $leaf_cfg;
+
+{
+    my $utf8_home = tempdir( CLEANUP => 1 );
+    my $utf8_paths = Developer::Dashboard::PathRegistry->new( home => $utf8_home );
+    my $utf8_files = Developer::Dashboard::FileRegistry->new( paths => $utf8_paths );
+    my $utf8_config_file = File::Spec->catfile( $utf8_home, '.developer-dashboard', 'config', 'config.json' );
+    make_path( File::Spec->catdir( $utf8_home, '.developer-dashboard', 'config' ) );
+    open my $utf8_cfg, '>:raw', $utf8_config_file or die $!;
+    print {$utf8_cfg} encode(
+        'UTF-8',
+        <<'JSON'
+{
+  "collectors": [
+    {
+      "name": "emoji.collector",
+      "command": "printf 'emoji'",
+      "cwd": "home",
+      "indicator": {
+        "icon": "\uD83D\uDC33"
+      }
+    }
+  ]
+}
+JSON
+    );
+    close $utf8_cfg;
+
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS} = File::Spec->catdir( $utf8_home, '.developer-dashboard', 'config' );
+    my $isolated_paths = Developer::Dashboard::PathRegistry->new( home => $utf8_home );
+    my $isolated_files = Developer::Dashboard::FileRegistry->new( paths => $isolated_paths );
+    my $utf8_config = Developer::Dashboard::Config->new( paths => $isolated_paths, files => $isolated_files );
+    my $utf8_jobs = $utf8_config->collectors;
+    my $whale = chr 0x1F433;
+    is( $utf8_jobs->[0]{indicator}{icon}, $whale, 'config loader preserves UTF-8 collector indicator icons from config files' );
+
+    my $utf8_store = Developer::Dashboard::IndicatorStore->new( paths => $isolated_paths );
+    $utf8_store->sync_collectors($utf8_jobs);
+    is( $utf8_store->get_indicator('emoji.collector')->{icon}, $whale, 'indicator store preserves UTF-8 collector indicator icons after sync' );
+    is( $utf8_store->page_header_payload->{array}[0]{alias}, $whale, 'page status payload preserves UTF-8 collector indicator icons' );
+}
+
 {
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'repo.collector:config.two';
     chdir $repo or die $!;
-    is( $paths->current_project_root, $repo, 'current_project_root resolves the active git repo' );
-    is( $paths->repo_dashboard_root, File::Spec->catdir( $repo, '.developer-dashboard' ), 'repo_dashboard_root resolves an existing repo dashboard directory' );
+    is_same_path( $paths->current_project_root, $repo, 'current_project_root resolves the active git repo' );
+    is_same_path( $paths->repo_dashboard_root, File::Spec->catdir( $repo, '.developer-dashboard' ), 'repo_dashboard_root resolves an existing repo dashboard directory' );
     is_deeply(
         $config->load_repo,
         {
@@ -741,10 +1633,11 @@ close $local_cfg;
                 local_only => '~/local-only',
             },
             collectors => [
-                { name => 'local.collector', command => q{printf 'local'}, cwd => 'home' },
+                { name => 'home.collector',  command => q{printf 'local-home'}, cwd => 'home' },
+                { name => 'local.collector', command => q{printf 'local'},      cwd => 'home' },
             ],
         },
-        'load_global gives the project-local runtime config precedence while still merging nested hash domains such as path aliases',
+        'load_global gives the project-local runtime config precedence while merging nested hashes and collector arrays by collector name',
     );
     is( $config->merged->{default_mode}, 'source', 'merged gives repo config precedence over global config' );
     my $collectors = $config->collectors;
@@ -759,7 +1652,40 @@ close $local_cfg;
             },
         }
     );
-    is( $saved_global, $local_config_file, 'save_global writes into the project-local runtime config when it exists' );
+    is_same_path( $saved_global, $local_config_file, 'save_global writes into the project-local runtime config when it exists' );
+}
+{
+    chdir $layered_leaf or die $!;
+    my $layered_paths = Developer::Dashboard::PathRegistry->new( home => $home );
+    my $layered_files = Developer::Dashboard::FileRegistry->new( paths => $layered_paths );
+    my $layered_config = Developer::Dashboard::Config->new( paths => $layered_paths, files => $layered_files );
+    is_deeply(
+        $layered_config->load_global,
+        {
+            path_aliases => {
+                home_only   => '~/home-only',
+                saved_here  => '~/saved-here',
+                parent_only => '~/parent-only',
+                leaf_only   => '~/leaf-only',
+            },
+            collectors => [
+                { name => 'home.collector',   command => q{printf 'home'},        cwd => 'home' },
+                { name => 'parent.collector', command => q{printf 'leaf-parent'}, cwd => 'home' },
+                { name => 'leaf.collector',   command => q{printf 'leaf'},        cwd => 'home' },
+            ],
+            providers => [
+                { id => 'shared-provider', title => 'Leaf Provider Override' },
+                { id => 'leaf-provider',   title => 'Leaf Provider' },
+            ],
+        },
+        'load_global merges every runtime layer from home to leaf and lets deeper collectors and providers override matching names or ids',
+    );
+    is_deeply(
+        [ map { $_->{id} } @{ $layered_config->providers } ],
+        [ 'shared-provider', 'leaf-provider' ],
+        'providers exposes the layered provider set after id-based merge',
+    );
+    chdir $original_cwd or die $!;
 }
 {
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS} = 'repo.collector::config.two';
@@ -795,10 +1721,94 @@ chdir $original_cwd or die $!;
     ok( $sessions->get('fallback-session'), 'session store falls back to the home runtime session root when a local record is missing' );
     my $created_session = $sessions->create( username => 'localhelper', role => 'helper' );
     ok( -f File::Spec->catfile( $local_repo, '.developer-dashboard', 'state', 'sessions', $created_session->{session_id} . '.json' ), 'session store writes new sessions to the project-local runtime when available' );
+    is( $auth->trust_tier( remote_addr => '127.0.0.1', host => '127.0.0.1:7890' ), 'admin', 'auth trusts exact loopback host headers as admin traffic' );
+    is( $auth->trust_tier( remote_addr => '::1', host => '[::1]:7890' ), 'admin', 'auth trusts exact IPv6 loopback host headers as admin traffic' );
+    is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'localhost:7890' ), 'admin', 'auth trusts localhost hostnames that resolve only to loopback' );
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::Auth::getaddrinfo = sub {
+            return (
+                0,
+                {
+                    family => AF_INET6,
+                    addr   => pack_sockaddr_in6( 7890, inet_pton( AF_INET6, '::1' ) ),
+                },
+            );
+        };
+        is(
+            $auth->trust_tier( remote_addr => '::1', host => 'v6-loopback.local:7890' ),
+            'admin',
+            'auth trusts hostnames that resolve only to IPv6 loopback addresses',
+        );
+    }
+    is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'dashboard-ssl-alias.local:7890' ), 'helper', 'auth keeps non-loopback-resolving alias hosts in helper mode by default' );
+    is(
+        $auth->trust_tier(
+            remote_addr          => '127.0.0.1',
+            host                 => 'dashboard-ssl-alias.local:7890',
+            extra_loopback_hosts => ['dashboard-ssl-alias.local'],
+        ),
+        'admin',
+        'auth trusts configured loopback alias hostnames for local-admin traffic',
+    );
+    is( $auth->_canonical_ip('Dashboard-Helper.EXAMPLE'), 'dashboard-helper.example', 'auth canonical_ip lowercases non-IP host values' );
     $auth->remove_user('fallback');
     ok( !defined $auth->get_user('fallback'), 'auth remove_user removes matching records from all runtime roots' );
     $sessions->delete('fallback-session');
     ok( !defined $sessions->get('fallback-session'), 'session delete removes matching records from all runtime roots' );
+    chdir $home or die $!;
+}
+
+{
+    my $state_home = tempdir( CLEANUP => 1 );
+    my $layer_root = File::Spec->catdir( $state_home, 'state-layers' );
+    my $layer_parent = File::Spec->catdir( $layer_root, 'parent' );
+    my $layer_leaf = File::Spec->catdir( $layer_parent, 'leaf' );
+    for my $dir (
+        File::Spec->catdir( $layer_root, '.developer-dashboard', 'state', 'collectors', 'shared.collector' ),
+        File::Spec->catdir( $layer_root, '.developer-dashboard', 'state', 'indicators', 'shared-indicator' ),
+        File::Spec->catdir( $layer_parent, '.developer-dashboard', 'state', 'collectors', 'parent.collector' ),
+        File::Spec->catdir( $layer_parent, '.developer-dashboard', 'state', 'indicators', 'parent-indicator' ),
+        File::Spec->catdir( $layer_leaf, '.developer-dashboard', 'state', 'collectors', 'shared.collector' ),
+        File::Spec->catdir( $layer_leaf, '.developer-dashboard', 'state', 'indicators', 'shared-indicator' ),
+    ) {
+        make_path($dir);
+    }
+    open my $home_collect_status, '>', File::Spec->catfile( $layer_root, '.developer-dashboard', 'state', 'collectors', 'shared.collector', 'status.json' ) or die $!;
+    print {$home_collect_status} qq|{"name":"shared.collector","status":"home"}|;
+    close $home_collect_status;
+    open my $parent_collect_status, '>', File::Spec->catfile( $layer_parent, '.developer-dashboard', 'state', 'collectors', 'parent.collector', 'status.json' ) or die $!;
+    print {$parent_collect_status} qq|{"name":"parent.collector","status":"parent"}|;
+    close $parent_collect_status;
+    open my $leaf_collect_status, '>', File::Spec->catfile( $layer_leaf, '.developer-dashboard', 'state', 'collectors', 'shared.collector', 'status.json' ) or die $!;
+    print {$leaf_collect_status} qq|{"name":"shared.collector","status":"leaf"}|;
+    close $leaf_collect_status;
+    open my $home_indicator_status, '>', File::Spec->catfile( $layer_root, '.developer-dashboard', 'state', 'indicators', 'shared-indicator', 'status.json' ) or die $!;
+    print {$home_indicator_status} qq|{"name":"shared-indicator","label":"home"}|;
+    close $home_indicator_status;
+    open my $parent_indicator_status, '>', File::Spec->catfile( $layer_parent, '.developer-dashboard', 'state', 'indicators', 'parent-indicator', 'status.json' ) or die $!;
+    print {$parent_indicator_status} qq|{"name":"parent-indicator","label":"parent"}|;
+    close $parent_indicator_status;
+    open my $leaf_indicator_status, '>', File::Spec->catfile( $layer_leaf, '.developer-dashboard', 'state', 'indicators', 'shared-indicator', 'status.json' ) or die $!;
+    print {$leaf_indicator_status} qq|{"name":"shared-indicator","label":"leaf"}|;
+    close $leaf_indicator_status;
+
+    chdir $layer_leaf or die $!;
+    my $layer_paths = Developer::Dashboard::PathRegistry->new( home => $state_home );
+    my $collector_store = Developer::Dashboard::Collector->new( paths => $layer_paths );
+    my $indicator_store = Developer::Dashboard::IndicatorStore->new( paths => $layer_paths );
+    is( $collector_store->read_status('shared.collector')->{status}, 'leaf', 'collector reads prefer the deepest layer status' );
+    is_deeply(
+        [ map { $_->{name} } $collector_store->list_collectors ],
+        [ 'parent.collector', 'shared.collector' ],
+        'collector listing unions every layer while deduping by collector name',
+    );
+    is( $indicator_store->get_indicator('shared-indicator')->{label}, 'leaf', 'indicator reads prefer the deepest layer status' );
+    is_deeply(
+        [ map { $_->{name} } $indicator_store->list_indicators ],
+        [ 'parent-indicator', 'shared-indicator' ],
+        'indicator listing unions every layer while deduping by indicator name',
+    );
     chdir $home or die $!;
 }
 
@@ -1202,5 +2212,36 @@ __END__
 
 This test exercises low-level runtime units including paths, files, pages,
 collectors, indicators, prompts, and process helpers.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file covers lower-level unit behaviour across the core runtime helpers.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/07-core-units.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/07-core-units.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

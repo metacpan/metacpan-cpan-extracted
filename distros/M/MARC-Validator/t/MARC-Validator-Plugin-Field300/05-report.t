@@ -4,7 +4,7 @@ use warnings;
 use File::Object;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator::Plugin::Field300;
-use Test::More 'tests' => 29;
+use Test::More 'tests' => 45;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -84,3 +84,45 @@ is($errors->[0]->errors->[0]->params->{'field_008_illustrations'}, '||||',
 	'Get param for field 008 illustrations (||||).');
 is($errors->[0]->errors->[0]->params->{'field_300_b'}, '1 mapa',
 	'Get param for field 300$b (1 mapa).');
+
+# Test.
+$obj = MARC::Validator::Plugin::Field300->new(
+	'recommendation' => 1,
+	'record_id_def' => '015a',
+);
+$obj->init;
+$marc = MARC::File::XML->in($data_dir->file('cnb000056540-bad_string_in_300a.xml')->s);
+$obj->process($marc->next);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_300', 'Get name (field_300).');
+$errors = $ret->plugin_errors;
+is(@{$errors}, 1, 'Get errors count (1).');
+is($errors->[0]->record_id, 'cnb000056540', 'Get record id (cnb000056540).');
+is($errors->[0]->errors->[0]->error, "Bad string in field 300a.",
+	"Get error (Bad string in field 300a.).");
+is($errors->[0]->errors->[0]->params->{'field_300_a'}, '121 stran ;90 mm',
+	'Get param for field 300$a (121 stran ;90 mm).');
+
+# Test.
+$obj = MARC::Validator::Plugin::Field300->new(
+	'recommendation' => 1,
+	'record_id_def' => '015a',
+);
+$obj->init;
+$marc = MARC::File::XML->in($data_dir->file('cnb000018615-bad_string_in_300b.xml')->s);
+$obj->process($marc->next);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_300', 'Get name (field_300).');
+$errors = $ret->plugin_errors;
+is(@{$errors}, 1, 'Get errors count (1).');
+is($errors->[0]->record_id, 'cnb000018615', 'Get record id (cnb000018615).');
+is($errors->[0]->errors->[0]->error, "Bad string in field 300b.",
+	"Get error (Bad string in field 300b.).");
+is($errors->[0]->errors->[0]->params->{'field_300_b'}, 'ilustrace ;29 cm',
+	'Get param for field 300$b (ilustrace ;29 cm).');

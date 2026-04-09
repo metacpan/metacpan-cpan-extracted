@@ -12,13 +12,13 @@
 #define CHANDRA_LOG_H
 
 #include "chandra.h"
-#include <sys/time.h>
 #include <time.h>
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
 
 #ifndef _WIN32
+#include <sys/time.h>
 #include <sys/file.h>
 #include <unistd.h>
 #else
@@ -27,6 +27,29 @@
 #ifndef LOCK_EX
 #define LOCK_EX 2
 #define LOCK_UN 8
+#endif
+#endif
+
+/*
+ * On Win32 with MULTIPLICITY + PERL_IMPLICIT_SYS, gettimeofday is macro'd
+ * to PerlProc_gettimeofday which requires interpreter context.
+ * Use native Win32 API directly instead.
+ */
+#ifndef CHANDRA_GETTIMEOFDAY
+#ifdef _WIN32
+static void _chandra_log_gettimeofday(struct timeval *tv) {
+    FILETIME ft;
+    ULARGE_INTEGER ull;
+    GetSystemTimeAsFileTime(&ft);
+    ull.LowPart = ft.dwLowDateTime;
+    ull.HighPart = ft.dwHighDateTime;
+    ull.QuadPart -= 116444736000000000ULL;
+    tv->tv_sec  = (long)(ull.QuadPart / 10000000ULL);
+    tv->tv_usec = (long)((ull.QuadPart % 10000000ULL) / 10);
+}
+#define CHANDRA_GETTIMEOFDAY(tv) _chandra_log_gettimeofday(tv)
+#else
+#define CHANDRA_GETTIMEOFDAY(tv) gettimeofday((tv), NULL)
 #endif
 #endif
 
@@ -297,10 +320,11 @@ chandra_log_timestamp(pTHX)
     struct tm t;
     char buf[64];
 
-    gettimeofday(&tv, NULL);
+    CHANDRA_GETTIMEOFDAY(&tv);
 #ifdef _WIN32
     {
-        struct tm *tp = localtime(&tv.tv_sec);
+        time_t secs = (time_t)tv.tv_sec;
+        struct tm *tp = localtime(&secs);
         if (tp) { t = *tp; } else { memset(&t, 0, sizeof(t)); }
     }
 #else

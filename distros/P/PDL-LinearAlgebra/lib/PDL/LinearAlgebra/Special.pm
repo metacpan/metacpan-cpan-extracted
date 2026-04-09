@@ -8,16 +8,15 @@ use PDL::LinearAlgebra qw ( );
 use PDL::LinearAlgebra::Real;
 use PDL::LinearAlgebra::Complex;
 use PDL::Exporter;
-no warnings 'uninitialized';
-@EXPORT_OK  = qw( mhilb mvander mpart mhankel mtoeplitz mtri mpascal mcompanion);
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+use strict;
+use warnings;
+our @EXPORT_OK  = qw(mhilb mvander mpart mhankel mtoeplitz mtri mpascal mcompanion);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 our $VERSION = '0.14';
 $VERSION = eval $VERSION;
 
 our @ISA = ( 'PDL::Exporter');
-
-use strict;
 
 =encoding utf8
 
@@ -54,19 +53,19 @@ Construct Hilbert matrix from specifications list or template ndarray
 =cut
 
 sub mhilb {
-	if(ref($_[0]) && ref($_[0]) eq 'PDL'){
-		 my $pdl = shift;
-		 $pdl->mhilb(@_);
-	}
-	else{
-		PDL->mhilb(@_);
-	}
+  if(ref($_[0]) && ref($_[0]) eq 'PDL'){
+     my $pdl = shift;
+     $pdl->mhilb(@_);
+  }
+  else{
+    PDL->mhilb(@_);
+  }
 }
 sub PDL::mhilb {
-	my $class = shift;
-	my $pdl1 = scalar(@_)? $class->new_from_specification(@_) : $class->copy;
-	my $pdl2 = scalar(@_)? $class->new_from_specification(@_) : $class->copy;
-	1 /  ($pdl1->inplace->axisvals +  $pdl2->inplace->axisvals(1) + 1);
+  my $class = shift;
+  my $pdl1 = scalar(@_)? $class->new_from_specification(@_) : $class->copy;
+  my $pdl2 = scalar(@_)? $class->new_from_specification(@_) : $class->copy;
+  1 /  ($pdl1->inplace->axisvals +  $pdl2->inplace->axisvals(1) + 1);
 }
 
 =head2 mtri
@@ -75,7 +74,7 @@ sub PDL::mhilb {
 
 Return zeroed matrix with upper or lower triangular part from another matrix.
 Return trapezoid matrix if entry matrix is not square.
-Supports threading.
+Supports broadcasting.
 Uses L<tricpy|PDL::LinearAlgebra::Real/tricpy> or L<tricpy|PDL::LinearAlgebra::Complex/ctricpy>.
 
 =for usage
@@ -91,15 +90,15 @@ Uses L<tricpy|PDL::LinearAlgebra::Real/tricpy> or L<tricpy|PDL::LinearAlgebra::C
 =cut
 
 sub mtri{
-	my $m = shift;
-	$m->mtri(@_);
+  my $m = shift;
+  $m->mtri(@_);
 }
 
 sub PDL::mtri {
-	&PDL::LinearAlgebra::_2d_array;
-	my ($m, $upper) = @_;
-	$m->tricpy($upper, my $b = $m->_similar_null);
-	$b;
+  &PDL::LinearAlgebra::_2d_array;
+  my ($m, $upper) = @_;
+  $m->tricpy($upper // 0, my $b = $m->_similar_null);
+  $b;
 }
 
 =head2 mvander
@@ -113,8 +112,8 @@ mvander(M,P) is a rectangular version of mvander(P) with M Columns.
 =cut
 
 sub mvander($;$) {
-	my $exp =  @_ == 2 ? sequence(shift) : sequence($_[0]->dim(-1));
-	$_[0]->dummy(-2)**$exp;
+  my $exp =  @_ == 2 ? sequence(shift) : sequence($_[0]->dim(-1));
+  $_[0]->dummy(-2)**$exp;
 }
 
 =head2 mpart
@@ -138,9 +137,9 @@ Return antisymmetric and symmetric part of a real or complex square matrix.
 *mpart = \&PDL::mpart;
 
 sub PDL::mpart {
-	&PDL::LinearAlgebra::_square;
-	my ($m, $conj) = @_;
-	# antisymmetric and symmetric part
+  &PDL::LinearAlgebra::_square;
+  my ($m, $conj) = @_;
+  # antisymmetric and symmetric part
         return (0.5* ($m - $m->t($conj))),(0.5* ($m + $m->t($conj)));
 }
 
@@ -162,37 +161,36 @@ Handles complex data.
 
 The elements are:
 
-	H (i,j) = c (i+j),  i+j+1 <= m;
-	H (i,j) = r (i+j-m+1),  otherwise
-	where m is the size of the vector.
+  H (i,j) = c (i+j),  i+j+1 <= m;
+  H (i,j) = r (i+j-m+1),  otherwise
+  where m is the size of the vector.
 
 If c is a scalar number, its determinant can be computed by:
 
-			floor(n/2)    n
-	Det(H(n)) = (-1)      *      n
+      floor(n/2)    n
+  Det(H(n)) = (-1)      *      n
 
 =cut
 
 *mhankel = \&PDL::mhankel;
 
 sub PDL::mhankel {
-	my $di = $_[0]->dims_internal;
-	my ($m, $n) = @_;
-	$m = xvals($m) + 1 unless ref($m);
-	my @dims = $m->dims;
-	$n = PDL::zeroes($m) unless defined $n;
-	my $index = xvals($dims[$di]);
-	$index = $index->dummy(0) + $index;
-	if (@dims == 2){
-		$m = mstack($m,$n(,1:));
-		$n = $m->re->index($index)->r2C;
-		$n((1),).= $m((1),)->index($index);
-		return $n;
-	}
-	else{
-		$m = augment($m,$n(1:));
-		return $m->index($index)->sever;
-	}
+  my ($m, $n) = @_;
+  $m = xvals($m) + 1 unless ref($m);
+  my @dims = $m->dims;
+  $n = PDL::zeroes($m) unless defined $n;
+  my $index = xvals($dims[0]);
+  $index = $index->dummy(0) + $index;
+  if (@dims == 2){
+    $m = mstack($m,$n(,1:));
+    $n = $m->re->index($index)->r2C;
+    $n((1),).= $m((1),)->index($index);
+    return $n;
+  }
+  else{
+    $m = augment($m,$n(1:));
+    return $m->index($index)->sever;
+  }
 }
 
 =head2 mtoeplitz
@@ -212,24 +210,22 @@ Handles complex data.
 
 *mtoeplitz = \&PDL::mtoeplitz;
 sub PDL::mtoeplitz {
-	my $di = $_[0]->dims_internal;
-	my $slice_prefix = ',' x $di;
-	my ($m, $n) = @_;
-	$n = $m->copy unless defined $n;
-	my $mdim= $m->dim(-1);
-	my $ndim= $n->dim(-1);
-	my $res = $m->_similar($ndim,$mdim);
-	$ndim--;
-	my $min = $mdim <= $ndim ? $mdim : $ndim;
-	for(1..$min) {
-		$res->slice("$slice_prefix$_:,(@{[$_-1]})") .= $n->slice("${slice_prefix}1:@{[$ndim-$_+1]}");
-	}
-	$mdim--;
-	$min = $mdim < $ndim ? $mdim : $ndim;
-	for(0..$min){
-		$res->slice("${slice_prefix}($_),$_:") .= $m->slice("${slice_prefix}:@{[$mdim-$_]}");
-	}
-	return $res;
+  my ($m, $n) = @_;
+  $n = $m->copy unless defined $n;
+  my $mdim= $m->dim(-1);
+  my $ndim= $n->dim(-1);
+  my $res = $m->_similar($ndim,$mdim);
+  $ndim--;
+  my $min = $mdim <= $ndim ? $mdim : $ndim;
+  for(1..$min) {
+    $res->slice("$_:,(@{[$_-1]})") .= $n->slice("1:@{[$ndim-$_+1]}");
+  }
+  $mdim--;
+  $min = $mdim < $ndim ? $mdim : $ndim;
+  for(0..$min){
+    $res->slice("($_),$_:") .= $m->slice(":@{[$mdim-$_]}");
+  }
+  return $res;
 }
 
 =head2 mpascal
@@ -240,9 +236,9 @@ Return Pascal matrix (from Pascal's triangle) of order N.
 
  mpascal(N,uplo).
  uplo:
- 	0 => upper triangular (Cholesky factor),
- 	1 => lower triangular (Cholesky factor),
- 	2 => symmetric.
+   0 => upper triangular (Cholesky factor),
+   1 => lower triangular (Cholesky factor),
+   2 => symmetric.
 
 =for ref
 
@@ -252,29 +248,29 @@ The symmetric Pascal is positive definite, its inverse has integer entries.
 
 Their determinants are all equal to one and:
 
-	S = L * U
-	where S, L, U are symmetric, lower and upper pascal matrix respectively.
+  S = L * U
+  where S, L, U are symmetric, lower and upper pascal matrix respectively.
 
 
 =cut
 
 *mpascal = \&PDL::mpascal;
 sub PDL::mpascal {
-	my ($m, $n) = @_;
-	my $mat = eval {
-		require PDL::GSLSF::GAMMA;
-		if ($n > 1){
-			my $mat = xvals($m);
-			return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat + $mat->dummy(0),$mat))[0];
-		}else{
-			my $mat = xvals($m, $m);
-			return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat->tritosym,$mat->xchg(0,1)->tritosym))[0]->mtri($n);
-		}
-	};
-	return $mat if !$@;
-	warn("mpascal: can't compute binomial coefficients without".
-		" PDL::GSLSF::GAMMA\n");
-	return;
+  my ($m, $n) = @_;
+  my $mat = eval {
+    require PDL::GSLSF::GAMMA;
+    if ($n > 1){
+      my $mat = xvals($m);
+      return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat + $mat->dummy(0),$mat))[0];
+    }else{
+      my $mat = xvals($m, $m);
+      return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat->tritosym,$mat->xchg(0,1)->tritosym))[0]->mtri($n);
+    }
+  };
+  return $mat if !$@;
+  warn("mpascal: can't compute binomial coefficients without".
+    " PDL::GSLSF::GAMMA\n");
+  return;
 }
 
 =head2 mcompanion
@@ -287,28 +283,26 @@ coefficient of largest degree in p (here p is in descending order).
 
  mcompanion(PDL(p),SCALAR(charpol)).
  charpol:
- 	0 => first row is -P(1:n-1)/P(0),
- 	1 => last column is -P(1:n-1)/P(0),
+   0 => first row is -P(1:n-1)/P(0),
+   1 => last column is -P(1:n-1)/P(0),
 
 =cut
 
 *mcompanion = \&PDL::mcompanion;
 sub PDL::mcompanion{
-	my $di = $_[0]->dims_internal;
-	my $slice_prefix = ',' x $di;
-	my ($m, $char) = @_;
-	my( @dims, $dim, $ret);
-	$m = $m->{PDL} if (UNIVERSAL::isa($m, 'HASH') && exists $m->{PDL});
-	@dims = $m->dims;
-	$dim = $dims[-1] - 1;
-	my $id = identity($dim-1); $id = $id->r2C if $m->_is_complex;
-	if($char){
-		$ret = (-$m->slice("${slice_prefix}1:$dim")->dummy($di+1)/$m->slice("${slice_prefix}0"))->_call_method('mstack', $id->mstack(zeroes($m->dims_internal_values,$dim-1)->dummy($di)));
-	}
-	else{
-		$ret = $m->_similar($dim-1)->dummy($di+1)->_call_method('mstack', $id)->mstack(-$m->slice("${slice_prefix}$dim:1")->dummy($di)/$m->slice("${slice_prefix}(0)"));
-	}
-	$ret->sever;
+  my ($m, $char) = @_;
+  my( @dims, $dim, $ret);
+  $m = $m->{PDL} if (UNIVERSAL::isa($m, 'HASH') && exists $m->{PDL});
+  @dims = $m->dims;
+  $dim = $dims[-1] - 1;
+  my $id = identity($dim-1); $id = $id->r2C if $m->_is_complex;
+  if($char){
+    $ret = (-$m->slice("1:$dim")->dummy(1)/$m->slice("0"))->_call_method('mstack', $id->mstack(zeroes($dim-1)->dummy(0)));
+  }
+  else{
+    $ret = $m->_similar($dim-1)->dummy(1)->_call_method('mstack', $id)->mstack(-$m->slice("$dim:1")->dummy(0)/$m->slice("(0)"));
+  }
+  $ret->sever;
 }
 
 

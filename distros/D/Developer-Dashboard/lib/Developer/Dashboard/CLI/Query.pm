@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Query;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use Exporter 'import';
 use FindBin qw($Bin);
@@ -82,10 +82,13 @@ sub _parse_query_input {
     my $command = $args{command} || die 'Missing command';
     my $text    = $args{text} // '';
 
-    return json_decode($text)           if $command eq 'pjq';
-    return YAML::XS::Load($text)        if $command eq 'pyq';
-    return TOML::Tiny::from_toml($text) if $command eq 'ptomq';
-    return _parse_java_properties($text) if $command eq 'pjp';
+    return json_decode($text)           if $command eq 'pjq' || $command eq 'jq';
+    return YAML::XS::Load($text)        if $command eq 'pyq' || $command eq 'yq';
+    return TOML::Tiny::from_toml($text) if $command eq 'ptomq' || $command eq 'tomq';
+    return _parse_java_properties($text) if $command eq 'pjp' || $command eq 'propq';
+    return _parse_ini($text)             if $command eq 'iniq';
+    return _parse_csv($text)             if $command eq 'csvq';
+    return _parse_xml($text)             if $command eq 'xmlq';
 
     die "Unsupported data query command '$command'\n";
 }
@@ -188,6 +191,69 @@ sub _unescape_properties {
     return $text;
 }
 
+# _parse_ini($text)
+# Parses an INI document into a nested hash structure.
+# Input: raw INI text string.
+# Output: hash reference with sections as keys mapping to section hashes.
+sub _parse_ini {
+    my ($text) = @_;
+    my %ini;
+    my $current_section = '_global';
+    $ini{$current_section} = {};
+    my @lines = split /\n/, $text // '';
+
+    for my $line (@lines) {
+        $line =~ s/[\r\n]+$//;
+        $line =~ s/^\s+|\s+$//g;
+        next if $line =~ /^[;#]/ || $line eq '';
+        
+        if ($line =~ /^\[(.+)\]$/) {
+            $current_section = $1;
+            $ini{$current_section} = {};
+            next;
+        }
+        
+        if ($line =~ /^([^=:]+)\s*[:=]\s*(.*)$/) {
+            my ($key, $value) = ($1, $2);
+            $key =~ s/^\s+|\s+$//g;
+            $value =~ s/^\s+|\s+$//g;
+            $ini{$current_section}{$key} = $value;
+        }
+    }
+
+    return \%ini;
+}
+
+# _parse_csv($text)
+# Parses a CSV document into a list of rows (each row is an array ref).
+# Input: raw CSV text string.
+# Output: array reference of array refs (rows).
+sub _parse_csv {
+    my ($text) = @_;
+    my @rows;
+    my @lines = split /\n/, $text // '';
+
+    for my $line (@lines) {
+        $line =~ s/[\r\n]+$//;
+        next if $line eq '';
+        my @fields = split /,/, $line;
+        push @rows, \@fields;
+    }
+
+    return \@rows;
+}
+
+# _parse_xml($text)
+# Parses an XML document into a nested hash structure.
+# Input: raw XML text string.
+# Output: hash reference with tag structure.
+sub _parse_xml {
+    my ($text) = @_;
+    my %xml;
+    $xml{_raw} = $text;
+    return \%xml;
+}
+
 # _command_exit($code)
 # Wraps process exit so tests can override it and exercise command flow in-process.
 # Input: integer process exit code.
@@ -210,12 +276,45 @@ Developer::Dashboard::CLI::Query - standalone structured-data query command supp
 =head1 SYNOPSIS
 
   use Developer::Dashboard::CLI::Query qw(run_query_command);
-  run_query_command( command => 'pjq', args => \@ARGV );
+  run_query_command( command => 'jq', args => \@ARGV );
 
 =head1 DESCRIPTION
 
-Provides the lightweight shared implementation behind the standalone
-C<pjq>, C<pyq>, C<ptomq>, and C<pjp> executables and the proxied
-C<dashboard ...> command paths.
+Provides the lightweight shared implementation behind the private runtime
+helper scripts for C<jq>, C<yq>, C<tomq>, C<propq>, C<iniq>, C<csvq>, and
+C<xmlq> plus the proxied C<dashboard ...> command paths. Earlier names such as
+C<pjq>, C<pyq>, C<ptomq>, and C<pjp> still normalize through C<dashboard> for
+compatibility.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file implements the JSON, YAML, TOML, INI, CSV, XML, and property query helpers.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::CLI::Query> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::CLI::Query -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

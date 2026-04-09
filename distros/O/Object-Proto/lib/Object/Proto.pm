@@ -1,7 +1,7 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 require XSLoader;
 XSLoader::load('Object::Proto', $VERSION);
 
@@ -695,7 +695,7 @@ only once (first occurrence wins):
 	my @anc = Object::Proto::ancestors('Diamond');
 	# ('Left', 'Right', 'Base')  -- Base appears once
 
-=head2 Object::Proto::import_accessors($class, $target)
+=head2 Object::Proto::import_accessors($class, $prefix, $target)
 
 Import function-style accessors for maximum performance. This enables
 calling accessors as C<name $obj> instead of C<$obj-E<gt>name>, which
@@ -718,8 +718,26 @@ avoids method dispatch overhead.
 	my $n = $cat->name;
 	$cat->age(4);
 
+The optional C<$prefix> parameter prepends a string to each imported
+accessor name, which is useful for avoiding name collisions when
+importing from multiple classes:
+
+	BEGIN {
+	    Object::Proto::define('Dog', qw(name breed));
+	    Object::Proto::define('Cat', qw(name color));
+	    Object::Proto::import_accessors('Dog', 'dog_');
+	    Object::Proto::import_accessors('Cat', 'cat_');
+	}
+
+	my $d = new Dog name => 'Rex', breed => 'Lab';
+	dog_name $d;    # 'Rex'
+	dog_breed $d;   # 'Lab'
+
 The optional C<$target> parameter specifies which package to import into
-(defaults to caller).
+(defaults to caller). Pass C<undef> for C<$prefix> to skip prefixing
+when specifying a target:
+
+	Object::Proto::import_accessors('Cat', undef, 'MyPackage');
 
 =head2 Object::Proto::import_accessor($class, $prop, $alias, $target)
 

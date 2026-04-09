@@ -1,4 +1,20 @@
-#65;6800;1cRevision history for Test-MixedScripts:
+Revision history for Test-MixedScripts:
+
+v0.6.4    2026-04-08 20:13:11+01:00 Europe/London
+  [Documentation]
+  - Removed separate INSTALL file.
+
+  - Fixed broken Changes file.
+
+  - Updated copyright year.
+
+  [Tests]
+  - Added more author tests.
+
+  - Author tests will be kept in the xt directory.
+
+  [Other]
+  - Added doap.xml metadata to the distribution.
 
 v0.6.3    2025-08-03 11:54:16+01:00 Europe/London
   [Documentation]

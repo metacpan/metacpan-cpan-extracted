@@ -242,4 +242,53 @@ subtest 'Multiple filters with different rules' => sub {
     is $post->{title}, 'Test Post', 'Post filter works';
 };
 
+subtest 'new_filter with non-hashref argument defaults to empty config' => sub {
+    # $args is truthy but ref() does not match /hash/ - the fallback to {} must fire.
+    my $f_str   = Params::Filter->new_filter('a string');
+    my $f_aref  = Params::Filter->new_filter([1, 2, 3]);
+    my $f_int   = Params::Filter->new_filter(42);
+
+    ok $f_str,  'String arg: object constructed';
+    ok $f_aref, 'Arrayref arg: object constructed';
+    ok $f_int,  'Integer arg: object constructed';
+
+    # All should behave like new_filter({}) - no required or accepted fields
+    my ($r1) = $f_str->apply({ anything => 1 });
+    my ($r2) = $f_aref->apply({ anything => 1 });
+    my ($r3) = $f_int->apply({ anything => 1 });
+
+    ok $r1, 'String arg: apply succeeds with no config';
+    ok $r2, 'Arrayref arg: apply succeeds with no config';
+    ok $r3, 'Integer arg: apply succeeds with no config';
+};
+
+subtest 'new_filter with empty hashref fires OR defaults for all keys' => sub {
+    # All four keys absent: required/accepted/excluded default to [],
+    # and the debug chain evaluates all the way to 0.
+    my $f = Params::Filter->new_filter({});
+
+    ok $f, 'Object constructed from empty hashref';
+    is ref($f->{required}), 'ARRAY', 'required defaults to arrayref';
+    is ref($f->{accepted}), 'ARRAY', 'accepted defaults to arrayref';
+    is ref($f->{excluded}), 'ARRAY', 'excluded defaults to arrayref';
+    ok !$f->{debug}, 'debug defaults to 0';
+
+    my ($result) = $f->apply({ any => 'value' });
+    ok $result, 'apply succeeds with all-default config';
+};
+
+subtest 'apply with manually stripped object fields exercises || defaults' => sub {
+    # The || [] / || 0 guards in apply() are defensive - they only fire if
+    # someone manipulates the object after construction.
+    my $f = Params::Filter->new_filter({ required => ['id'], accepted => ['name'] });
+    delete $f->{accepted};
+    delete $f->{excluded};
+    delete $f->{debug};
+
+    my ($result, $msg) = $f->apply({ id => 1, name => 'Oscar' });
+
+    ok $result,          'apply survives missing accepted/excluded/debug keys';
+    is $result->{id}, 1, 'Required field present';
+};
+
 done_testing();

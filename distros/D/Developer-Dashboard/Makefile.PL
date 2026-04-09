@@ -6,21 +6,22 @@ use 5.038;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "a local home for development work",
   "AUTHOR" => "Developer Dashboard Contributors",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Developer-Dashboard",
   "EXE_FILES" => [
-    "bin/dashboard",
-    "bin/of",
-    "bin/open-file",
-    "bin/pjp",
-    "bin/pjq",
-    "bin/ptomq",
-    "bin/pyq"
+    "bin/dashboard"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.038",
@@ -29,6 +30,7 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Cwd" => 0,
     "Dancer2" => 0,
+    "Digest::MD5" => 0,
     "Digest::SHA" => 0,
     "Encode" => 0,
     "Exporter" => 0,
@@ -36,9 +38,12 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Find" => 0,
     "File::Path" => 0,
+    "File::ShareDir" => 0,
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "FindBin" => 0,
     "Getopt::Long" => 0,
+    "HTTP::Request" => 0,
     "IO::Compress::Gzip" => 0,
     "IO::Handle" => 0,
     "IO::Select" => 0,
@@ -46,12 +51,15 @@ my %WriteMakefileArgs = (
     "IO::Uncompress::Gunzip" => 0,
     "IPC::Open3" => 0,
     "JSON::XS" => 0,
+    "LWP::Protocol::https" => 0,
+    "LWP::UserAgent" => 0,
     "MIME::Base64" => 0,
     "POSIX" => 0,
     "Plack" => 0,
     "Plack::Runner" => 0,
     "Pod::Usage" => 0,
     "Scalar::Util" => 0,
+    "Socket" => 0,
     "Starman" => 0,
     "Symbol" => 0,
     "TOML::Tiny" => 0,
@@ -67,13 +75,14 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Temp" => 0,
     "HTTP::Request::Common" => 0,
     "HTTP::Response" => 0,
+    "IO::Socket::SSL" => 0,
+    "LWP::UserAgent" => 0,
     "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.33",
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -84,6 +93,7 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Cwd" => 0,
   "Dancer2" => 0,
+  "Digest::MD5" => 0,
   "Digest::SHA" => 0,
   "Encode" => 0,
   "Exporter" => 0,
@@ -91,19 +101,24 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::Find" => 0,
   "File::Path" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
+  "HTTP::Request" => 0,
   "HTTP::Request::Common" => 0,
   "HTTP::Response" => 0,
   "IO::Compress::Gzip" => 0,
   "IO::Handle" => 0,
   "IO::Select" => 0,
   "IO::Socket::INET" => 0,
+  "IO::Socket::SSL" => 0,
   "IO::Uncompress::Gunzip" => 0,
   "IPC::Open3" => 0,
   "JSON::XS" => 0,
+  "LWP::Protocol::https" => 0,
+  "LWP::UserAgent" => 0,
   "MIME::Base64" => 0,
   "POSIX" => 0,
   "Plack" => 0,
@@ -111,6 +126,7 @@ my %FallbackPrereqs = (
   "Plack::Test" => 0,
   "Pod::Usage" => 0,
   "Scalar::Util" => 0,
+  "Socket" => 0,
   "Starman" => 0,
   "Symbol" => 0,
   "TOML::Tiny" => 0,
@@ -138,3 +154,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

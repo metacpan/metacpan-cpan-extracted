@@ -14,6 +14,11 @@
 /* Include shared XOP compatibility for custom ops (5.14+ fallback) */
 #include "xop_compat.h"
 
+/* XS_INTERNAL - available since 5.16, fallback for older Perls */
+#ifndef XS_INTERNAL
+#  define XS_INTERNAL(name) static XSPROTO(name)
+#endif
+
 /* Version checking macro */
 #ifndef PERL_VERSION_GE
 #  define PERL_VERSION_GE(r,v,s) \

@@ -241,6 +241,8 @@ subtest 'maybe option attribute' => sub {
 };
 
 subtest 'List JSON parse error' => sub {
+    skip_all "Perl $] has unreliable \$@ handling" if "$]" < 5.014;
+
     package ListJsonErrTest;
     use Getopt::Yath;
 
@@ -262,6 +264,8 @@ subtest 'List JSON parse error' => sub {
 };
 
 subtest 'Map JSON parse error' => sub {
+    skip_all "Perl $] has unreliable \$@ handling" if "$]" < 5.014;
+
     package MapJsonErrTest;
     use Getopt::Yath;
 

@@ -92,6 +92,7 @@ use Carp;
 	$seek_end_margin			   $config->{seek_end_margin}
 	$use_pager     					$config->{use_pager}
 	$use_placeholders  				$config->{use_placeholders}
+	$use_autocomplete_popup			$config->{use_autocomplete_popup}
     $edit_playback_end_margin  		$config->{edit_playback_end_margin}
     $edit_crossfade_time  			$config->{edit_crossfade_time}
 	$default_fade_length 			$config->{engine_fade_default_length}

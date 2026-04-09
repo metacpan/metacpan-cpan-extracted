@@ -1,0 +1,43 @@
+---
+abstract: 'Lean Gherkin data table parser'
+author:
+  - 'Sven Willenbuecher <sven.willenbuecher@gmx.de>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test2::V1: '0'
+  Test::API: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.76'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  File::Spec::Functions: '0'
+  Module::Load::Conditional: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Table-Gherkin
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Data::Table::Gherkin:
+    file: lib/Data/Table/Gherkin.pm
+    version: v1.0.0
+requires:
+  Carp: '1.32'
+  Scalar::Util: '0'
+  perl: '5.010000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://codeberg.org/XSven/Data-Table-Gherkin/issues
+  repository: https://codeberg.org/XSven/Data-Table-Gherkin.git
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

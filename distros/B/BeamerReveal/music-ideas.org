@@ -1,0 +1,144 @@
+<!-- Put this once, outside .slides (e.g. just inside <body>) -->
+<audio id="bgm" preload="auto"></audio>
+
+<script type="module">
+  const audio = document.getElementById("bgm");
+
+  // Map slide IDs to actions
+  const START_ON = new Set(["slide-start-music"]);
+  const STOP_ON  = new Set(["slide-stop-music"]);
+
+  function currentSlideId() {
+    return Reveal.getCurrentSlide()?.id;
+  }
+
+  function maybeUpdateMusic() {
+    const id = currentSlideId();
+    if (!id) return;
+
+    if (START_ON.has(id)) {
+      // set your source once or per track
+      if (!audio.src) audio.src = "data:audio/mpeg;base64,...."; // or file URL
+      audio.loop = true;                 // or false if you want it to end
+      audio.play().catch(() => {});      // browsers may require user gesture
+    }
+
+    if (STOP_ON.has(id)) {
+      audio.pause();
+      audio.currentTime = 0;             // optional rewind
+    }
+  }
+
+  Reveal.on("ready", maybeUpdateMusic);        // when Reveal is ready :contentReference[oaicite:1]{index=1}
+  Reveal.on("slidechanged", maybeUpdateMusic); // run on every slide change :contentReference[oaicite:2]{index=2}
+
+  // Optional: stop when a specific fragment is reached
+  Reveal.on("fragmentshown", (e) => {          // fragment events :contentReference[oaicite:3]{index=3}
+    if (e.fragment?.matches?.("[data-music-stop]")) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  });
+</script>
+
+
+<section id="slide-start-music"> ... </section>
+<section> ... </section>
+<section id="slide-stop-music"> ... </section>
+
+<!-- Or stop on a fragment -->
+<section>
+  <p class="fragment" data-music-stop>Stop music now</p>
+</section>
+
+
+// simple fading:
+
+<audio id="bgm" preload="auto" loop></audio>
+
+<script type="module">
+  const audio = document.getElementById("bgm");
+
+ function fadeIn(audio, ms = 2000) {
+    audio.volume = 0;
+    audio.play().catch(()=>{});
+
+    const steps = 30;
+    const stepTime = ms / steps;
+    const delta = 1 / steps;
+
+    const iv = setInterval(() => {
+      audio.volume = Math.min(1, audio.volume + delta);
+      if (audio.volume === 1) clearInterval(iv);
+    }, stepTime);
+  }
+
+  function fadeOut(audio, ms = 2000) {
+    const steps = 30;
+    const stepTime = ms / steps;
+    const delta = audio.volume / steps;
+
+    const iv = setInterval(() => {
+      audio.volume = Math.max(0, audio.volume - delta);
+
+      if (audio.volume === 0) {
+        clearInterval(iv);
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1; // reset for next play
+      }
+    }, stepTime);
+  }
+
+  // Example with Reveal slide change
+  Reveal.on("slidechanged", () => {
+    if (Reveal.getCurrentSlide().id === "stop-music") {
+      fadeOut(audio, 2500);
+    }
+  });
+  </script>
+
+
+  // advanced fading:
+  
+  <audio id="bgm" src="music.mp3" preload="auto" loop></audio>
+
+<script type="module">
+  const audio = document.getElementById("bgm");
+
+  const ctx = new AudioContext();
+  const source = ctx.createMediaElementSource(audio);
+  const gain = ctx.createGain();
+
+  source.connect(gain).connect(ctx.destination);
+
+    function fadeIn(ms = 2000) {
+    const now = ctx.currentTime;
+
+    gain.gain.setValueAtTime(0, now);
+    audio.play().catch(()=>{});
+    gain.gain.linearRampToValueAtTime(1, now + ms/1000);
+  }
+
+  function fadeOut(ms = 2000) {
+    const now = ctx.currentTime;
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(gain.gain.value, now);
+    gain.gain.linearRampToValueAtTime(0, now + ms / 1000);
+
+    setTimeout(() => {
+      audio.pause();
+      gain.gain.value = 1; // reset
+    }, ms);
+  }
+
+  Reveal.on("slidechanged", () => {
+    if (Reveal.getCurrentSlide().id === "stop-music") {
+      fadeOut(2500);
+    }
+  });
+</script>
+
+// fade in : simple
+
+

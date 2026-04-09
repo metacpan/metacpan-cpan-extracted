@@ -869,6 +869,19 @@ CODE:
         }
     }
 
+    /* Bridge extensions */
+    if (_ext_count > 0) {
+        SV *ext_js = chandra_ext_generate_js(aTHX);
+        dSP;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(*wv_svp);
+        XPUSHs(sv_2mortal(ext_js));
+        PUTBACK;
+        call_method(method, G_DISCARD);
+        FREETMPS; LEAVE;
+    }
+
     /* Route CSS/JS */
     {
         dSP;
@@ -3022,3 +3035,50 @@ CODE:
 }
 OUTPUT:
     RETVAL
+
+void
+extend_bridge(self, name, source, ...)
+    SV *self
+    const char *name
+    const char *source
+PPCODE:
+{
+    char **deps = NULL;
+    int    dep_count = 0;
+    int    i;
+
+    PERL_UNUSED_VAR(self);
+
+    /* parse optional depends => [...] */
+    if (items > 3 && (items - 3) % 2 == 0) {
+        for (i = 3; i < items; i += 2) {
+            const char *key = SvPV_nolen(ST(i));
+            if (strcmp(key, "depends") == 0) {
+                SV *val = ST(i + 1);
+                if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
+                    AV *av = (AV *)SvRV(val);
+                    SSize_t alen = av_len(av) + 1;
+                    int j;
+                    dep_count = (int)alen;
+                    if (dep_count > 0) {
+                        Newx(deps, dep_count, char *);
+                        for (j = 0; j < dep_count; j++) {
+                            SV **svp = av_fetch(av, j, 0);
+                            deps[j] = savepv(svp ? SvPV_nolen(*svp) : "");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    chandra_ext_register(aTHX_ name, source, deps, dep_count);
+
+    if (deps) {
+        for (i = 0; i < dep_count; i++)
+            Safefree(deps[i]);
+        Safefree(deps);
+    }
+
+    XSRETURN(1);
+}

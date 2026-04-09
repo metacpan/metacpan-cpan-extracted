@@ -22,7 +22,7 @@ vbox (root)
 		   static
 		   static
 		   ...
-entry
+    entry
 
 Names:
 
@@ -43,33 +43,57 @@ $vbox = 		Tickit::Widget::VBox->new; # contains multiple items to scroll through
 $scrollbox = Tickit::Widget::ScrollBox->new->set_child( $vbox );
 $tickit = Tickit::Async->new( root => $root);
 $text->{tickit} = $tickit;
-$term = $tickit->term;
+$text->{term} = $term = $tickit->term;
 my $lines = $term->lines;
  
 $root->add($scrollbox, valign => 'top', force_size => $lines - 2); 
-my $label; 
-my $do_command = sub { my ( $self, $line ) = @_; 
-						print_to_terminal($line); 
-						$line =~ s/^.+?>\s*//;
-						process_line($line); 
-						$self->set_text(prompt());
-						$self->set_position(99); 
-					}; 
-$entry = Tickit::Widget::Entry->new( text 	 => 'enter command > ', on_enter => $do_command,);
-Tickit::Widget::Entry::Plugin::Completion->apply($entry, words => $text->{keywords} ); 
-#$tickit->bind_key( $key, $code ) # invoked as $code->( $tickit, $key )
-$entry->bind_keys( 'Up' 	=> sub { previous_command() }, 
-					'Down'	=> sub { next_command()     }, 
-); 
-#$entry->set_style( '<Up>' => ""); # not needed 
-$entry->set_text(prompt()); 
-$entry->set_position(99);
-$root->add($entry, valign => 'bottom');
-# add status line at bottom $label =
-# Tickit::Widget::Static->new(text => "got this:");
-# $root->add($label, valign => 'bottom');
-# $label->set_text("lehho");
-#prompt(); 
+
+}
+
+sub create_entry_widget {
+
+	my $do_command = sub { my ( $self, $line ) = @_; 
+							print_to_terminal($line); 
+							$line =~ s/^.+?>\s*//;
+							process_line($line); 
+							$self->set_text(prompt());
+							$self->set_position(99); 
+						}; 
+	$entry = Tickit::Widget::Entry->new( 
+		text 	 => prompt(),
+		on_enter => $do_command,
+	);
+	Tickit::Widget::Entry::Plugin::Completion->apply($entry, gen_words => \&gen_words, use_popup => $config->{use_autocomplete_popup}); 
+
+	my $backspace  = sub { 
+		my $stop_pos = length prompt();
+		$entry->text_delete( $entry->position - 1, 1 ) 
+			unless $entry->position <= $stop_pos 
+	};
+	my $spacebar = sub {
+		if ( $entry->position == length prompt() ) { toggle_transport() }
+		else { $entry->on_text(' ') }
+	};
+
+	$entry->bind_keys( 
+	'Up' 		=> sub { previous_command() }, 
+	'Down'		=> sub { next_command()     }, 
+	'C-a'	  	=> sub { $entry->set_position( length prompt() ) },
+	'Home'  	=> sub { $entry->set_position( length prompt() ) },
+	'C-k'		=> sub { $entry->text_delete(  $entry->position, 999) },
+	'C-u'   	=> sub { $entry->text_delete(  
+							length prompt(), 
+							$entry->position - length prompt() ) },
+	'C-h'   	=> $backspace,
+	'Backspace' => $backspace,
+    ' '			=> $spacebar,
+	); 
+
+	#$entry->set_text(prompt()); 
+	$entry->set_position(99);
+	$root->add($entry, valign => 'bottom');
+
+	$entry
 }
  
 sub print_to_terminal ($txt) {
@@ -79,10 +103,7 @@ sub print_to_terminal ($txt) {
 
 sub prompt { 
 	logsub((caller(0))[3]);
-		my $obj = shift;
 		my $prompt = join ' ', 'nama', git_branch_display(), bus_track_display(),'> ';
-		#$obj->set_text($prompt);
-		#$obj->set_position(99);
 }
 sub next_command {
 	$text->{command_index}++ unless $text->{command_index} == scalar $text->{command_history}->@*;
@@ -103,7 +124,7 @@ sub redirect_stdout {
 	$old_output_fh = select FH;
    	tie *FH, 'Tie::Simple', '', 
      		WRITE     => sub {  },
-			PRINT 		=> sub { my $text = $_[1]; print_to_terminal($text) };
+			PRINT 		=> sub { my $text = $_[1]; print_to_terminal($text) },
              PRINTF    => sub {  },
              READ      => sub {  },
              READLINE  => sub {  },
@@ -111,16 +132,16 @@ sub redirect_stdout {
              CLOSE     => sub {  };
 			
 }
+BEGIN { $SIG{__WARN__} = \&filter_print_to_terminal }
+$SIG{INT} = \&cleanup_exit;
+sub filter_print_to_terminal {
+	print_to_terminal(@_) unless $_[0] =~ /ScrollBox/;
+}
+
 sub restore_stdout {
 	select $old_output_fh;
 	close FH;
 }
-=comment
-sub prompt { 
-	logsub((caller(0))[3]);
-	join ' ', 'nama', git_branch_display(), bus_track_display(),'> '
-}
-=cut
 
 sub end_of_list_sound { system( $config->{hotkey_beep} ) }
 
@@ -249,41 +270,30 @@ sub load_keywords {
  	my %hyphenated = map{my $h = $_; $h =~ s/_/-/g; $h => $_ }grep{ /_/ } @keywords;
 	$text->{hyphenated_commands} = \%hyphenated;
 	push @keywords, keys %hyphenated;
-	push @keywords, grep{$_} map{split " ", $text->{commands}->{$_}->{short}} @keywords;
+	#push @keywords, grep{$_} map{split " ", $text->{commands}->{$_}->{short}} @keywords;
 	push @keywords, keys %{$text->{iam}};
 	push @keywords, keys %{$fx_cache->{partial_label_to_full}};
 	push @keywords, keys %{$text->{midi_cmd}} if $config->{use_midi};
 	push @keywords, "Audio::Nama::";
 	push @keywords, pwd_files();
-	@{$text->{keywords}} = @keywords
+	@{$text->{keywords}} = sort {lc $a cmp lc $b} @keywords
 	
+}
+sub gen_words {
+	my %args = @_;
+	my $word = $args{word};
+	my $keywords = $text->{keywords};
+	my $first = 0;
+	my $last = scalar @$keywords - 1;
+	for (my $i = 0;      $i <= $last; $i++)  { $first = $i,     last if @$keywords[$i] =~ /^$word/i }
+	return unless $first;
+	for (my $i = $first; $i <= $last; $i++)  { $last  = $i - 1, last if @$keywords[$i] !~ /^$word/i }
+	@$keywords[$first .. $last]
 }
 sub pwd_files {
 	my $dir = '.';
 	my $pwd = path($dir);
 	grep {-f} $pwd->children;
 }
-sub complete {
-    my ($string, $line, $start, $end) = @_;
-	#print join $/, $string, $line, $start, $end, $/;
-	my $term = $text->{term};
-    return $term->completion_matches($string,\&keyword);
-};
 
-sub keyword {
-		state $i;	
-        my ($string, $state) = @_;
-        return unless $text;
-        if($state) {
-            $i++;
-        }
-        else { # first call
-            $i = 0;
-        }
-        for (; $i<=$#{$text->{keywords}}; $i++) {
-            return $text->{keywords}->[$i] 
-				if $text->{keywords}->[$i] =~ /^\Q$string/;
-        };
-        return undef;
-};
 1;

@@ -3,24 +3,27 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use Capture::Tiny qw(capture);
-use DataHelper qw(j je);
+use Developer::Dashboard::DataHelper qw(j je);
+use File::Spec;
+use File::Temp qw(tempfile);
 use IO::Select;
 use IPC::Open3 qw(open3);
 use Symbol qw(gensym);
 use Developer::Dashboard::PageRuntime::StreamHandle;
 use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::Platform qw(command_argv_for_path command_in_path);
 use Developer::Dashboard::RuntimeManager ();
-use Folder ();
+use Developer::Dashboard::Folder ();
 use Template;
-use Zipper qw(Ajax acmdx zip unzip);
+use Developer::Dashboard::Zipper qw(Ajax acmdx zip unzip);
 
 my $SANDPIT_SEQ = 0;
 
 # new(%args)
-# Constructs the legacy-style page runtime used by browser-rendered bookmarks.
+# Constructs the older-style page runtime used by browser-rendered bookmarks.
 # Input: optional path registry and folder alias data.
 # Output: Developer::Dashboard::PageRuntime object.
 sub new {
@@ -33,7 +36,7 @@ sub new {
 }
 
 # prepare_page(%args)
-# Executes legacy CODE blocks, then applies Template Toolkit rendering.
+# Executes older CODE blocks, then applies Template Toolkit rendering.
 # Input: page document, source kind, and runtime context hash.
 # Output: updated page document object.
 sub prepare_page {
@@ -154,7 +157,7 @@ sub _runtime_value_text {
 }
 
 # _render_templates(%args)
-# Processes legacy HTML and FORM.TT sections through Template Toolkit.
+# Processes bookmark HTML sections through Template Toolkit.
 # Input: page document and runtime context hash.
 # Output: none; mutates page layout in place.
 sub _render_templates {
@@ -178,11 +181,11 @@ sub _render_templates {
     my $tt = Template->new(
         {
             EVAL_PERL   => 1,
-            INCLUDE_PATH => $self->{paths} ? $self->{paths}->dashboards_root : '.',
+            INCLUDE_PATH => $self->{paths} ? [ $self->{paths}->dashboards_roots ] : '.',
         }
     );
 
-    for my $field ( qw(body form_tt) ) {
+    for my $field (qw(body)) {
         my $template = $layout->{$field};
         next if !defined $template || $template eq '';
         my $rendered = '';
@@ -230,17 +233,8 @@ sub _render_templates {
             next;
         }
 
-        push @{ $page->{meta}{runtime_errors} ||= [] }, $tt->error;
-    }
-
-    if ( defined $layout->{form} && $layout->{form} ne '' ) {
-        my $form = $layout->{form};
-        $form =~ s/\[\%([\w\_]+)\%\]/_escape_html($page->{$1})/ge;
-        $form =~ s/\[\#([\w\_]+)\#\]/_escape_html($state->{$1})/ge;
-        if ( ref( $args{runtime_context}{params} ) eq 'HASH' ) {
-            $form =~ s/\{\{([\w\_\-]+)\}\}/_escape_html($args{runtime_context}{params}{$1})/ge;
-        }
-        $page->{layout}{form} = $form;
+        $page->{layout}{$field} = '';
+        push @{ $page->{meta}{runtime_errors} ||= [] }, '' . $tt->error;
     }
 }
 
@@ -258,7 +252,7 @@ sub _system_context {
 }
 
 # _run_single_block(%args)
-# Executes one CODE block inside the active legacy sandpit package.
+# Executes one CODE block inside the active older sandpit package.
 # Input: Perl code string, mutable stash hash, runtime context hash, and optional sandpit hash.
 # Output: hash reference with stdout, stderr, returns, and merged stash.
 sub _run_single_block {
@@ -269,7 +263,7 @@ sub _run_single_block {
     my $sandpit         = $args{sandpit};
     my $destroy_sandpit = !$sandpit ? 1 : 0;
 
-    Folder->configure(
+    Developer::Dashboard::Folder->configure(
         paths   => $self->{paths},
         aliases => $self->{aliases},
     );
@@ -281,7 +275,7 @@ sub _run_single_block {
     my $package = $sandpit->{package} || die 'Missing sandpit package';
     my $wrapped_code = $self->_code_header($state) . $code;
     my @returns;
-    local $Zipper::AJAX_CONTEXT = {
+    local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {
         allow_transient_urls => (
             defined $ENV{DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS}
               && $ENV{DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS} =~ /\A(?:1|true|yes|on)\z/i
@@ -325,7 +319,7 @@ sub stream_code_block {
     my $stdout_writer   = $args{stdout_writer} || \&_noop_writer;
     my $stderr_writer   = $args{stderr_writer} || \&_noop_writer;
 
-    Folder->configure(
+    Developer::Dashboard::Folder->configure(
         paths   => $self->{paths},
         aliases => $self->{aliases},
     );
@@ -337,7 +331,7 @@ sub stream_code_block {
     my $package = $sandpit->{package} || die 'Missing sandpit package';
     my $wrapped_code = $self->_code_header($state) . $code;
     my @returns;
-    local $Zipper::AJAX_CONTEXT = {
+    local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {
         allow_transient_urls => (
             defined $ENV{DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS}
               && $ENV{DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS} =~ /\A(?:1|true|yes|on)\z/i
@@ -396,6 +390,8 @@ sub stream_saved_ajax_file {
         params    => $params,
         singleton => $singleton,
     );
+    my @temp_files = grep { defined $_ && $_ ne '' }
+      @env{qw(DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE)};
 
     my $stdout = gensym;
     my $stderr = gensym;
@@ -404,7 +400,10 @@ sub stream_saved_ajax_file {
         local %ENV = ( %ENV, %env );
         open3( $stdin, $stdout, $stderr, @command );
     };
-    die $@ if $@;
+    if ($@) {
+        $self->_cleanup_saved_ajax_temp_files(@temp_files);
+        die $@;
+    }
     close $stdin;
 
     my $select = IO::Select->new( $stdout, $stderr );
@@ -435,14 +434,17 @@ sub stream_saved_ajax_file {
     };
 
     $self->_close_saved_ajax_streams( $select, $stdout, $stderr );
+    my $fatal_error = '';
     if ($disconnected) {
         $self->_terminate_saved_ajax_process($pid);
     }
     elsif ( $stream_error ne '' ) {
         $self->_terminate_saved_ajax_process($pid);
-        die $stream_error if !$self->_looks_like_stream_disconnect_error($stream_error);
+        $fatal_error = $stream_error if !$self->_looks_like_stream_disconnect_error($stream_error);
     }
     waitpid( $pid, 0 );
+    $self->_cleanup_saved_ajax_temp_files(@temp_files);
+    die $fatal_error if $fatal_error ne '';
     return {
         disconnected => $disconnected ? 1 : 0,
         exit_code => $? >> 8,
@@ -557,12 +559,13 @@ sub _stream_sysread {
 sub _saved_ajax_command {
     my ( $self, %args ) = @_;
     my $path = $args{path} || die 'Missing saved ajax file path';
+    return ( $^X, '-e', $self->_saved_ajax_perl_wrapper, $path ) if $path =~ /\.pl\z/i;
+    return command_argv_for_path($path) if $path =~ /\.(?:ps1|cmd|bat|sh|bash)\z/i;
+    return ( command_in_path('python3') || command_in_path('python') || 'python3', $path ) if $path =~ /\.py\z/i;
     open my $fh, '<', $path or die "Unable to read saved ajax file $path: $!";
     my $first_line = <$fh>;
     close $fh;
-    return ($path) if defined $first_line && $first_line =~ /^#!/;
-    return ( 'sh', $path ) if $path =~ /\.(?:sh|bash)\z/;
-    return ( 'python3', $path ) if $path =~ /\.py\z/;
+    return command_argv_for_path($path) if defined $first_line && $first_line =~ /^#!/;
     return ( $^X, '-e', $self->_saved_ajax_perl_wrapper, $path );
 }
 
@@ -572,16 +575,98 @@ sub _saved_ajax_command {
 # Output: hash of environment key/value pairs.
 sub _saved_ajax_env {
     my ( $self, %args ) = @_;
-    my $params = ref( $args{params} ) eq 'HASH' ? $args{params} : {};
-    return (
-        DEVELOPER_DASHBOARD_AJAX_FILE   => $args{path} || '',
-        DEVELOPER_DASHBOARD_AJAX_PAGE   => $args{page} || '',
+    my $params       = ref( $args{params} ) eq 'HASH' ? $args{params} : {};
+    my $params_json  = json_encode($params);
+    my $query_string = _query_string_from_params($params);
+    my %env = (
+        DEVELOPER_DASHBOARD_AJAX_FILE      => $args{path} || '',
+        DEVELOPER_DASHBOARD_AJAX_PAGE      => $args{page} || '',
         DEVELOPER_DASHBOARD_AJAX_SINGLETON => $self->_normalize_saved_ajax_singleton( $args{singleton} ),
-        DEVELOPER_DASHBOARD_AJAX_TYPE   => $args{type} || '',
-        DEVELOPER_DASHBOARD_AJAX_PARAMS => json_encode($params),
-        QUERY_STRING                    => _query_string_from_params($params),
-        REQUEST_METHOD                  => 'GET',
+        DEVELOPER_DASHBOARD_AJAX_TYPE      => $args{type} || '',
+        DEVELOPER_DASHBOARD_AJAX_PARAMS    => $params_json,
+        DEVELOPER_DASHBOARD_RUNTIME_LAYERS => $self->{paths} ? join( "\n", $self->{paths}->runtime_layers ) : '',
+        QUERY_STRING                       => $query_string,
+        REQUEST_METHOD                     => 'GET',
     );
+    if ( length($params_json) > _saved_ajax_inline_env_limit() ) {
+        $env{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE} = _saved_ajax_temp_file(
+            prefix  => 'developer-dashboard-ajax-params-',
+            suffix  => '.json',
+            content => $params_json,
+        );
+        $env{DEVELOPER_DASHBOARD_AJAX_PARAMS} = '{}';
+    }
+    if ( length($query_string) > _saved_ajax_inline_env_limit() ) {
+        $env{DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE} = _saved_ajax_temp_file(
+            prefix  => 'developer-dashboard-ajax-query-',
+            suffix  => '.txt',
+            content => $query_string,
+        );
+        $env{QUERY_STRING} = '';
+    }
+    if ( $self->{paths} ) {
+        my %runtime_env = $self->_runtime_local_perl_env;
+        @env{ keys %runtime_env } = values %runtime_env;
+    }
+    return %env;
+}
+
+# _runtime_local_perl_env()
+# Builds the PERL5LIB environment override that exposes runtime-local optional modules to saved Ajax subprocesses.
+# Input: none.
+# Output: hash containing the merged PERL5LIB value.
+sub _runtime_local_perl_env {
+    my ($self) = @_;
+    my $paths = $self->{paths} || return ();
+    my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
+    my @perl5lib = grep { defined $_ && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
+    for my $local_lib ( reverse $paths->runtime_local_lib_roots ) {
+        next if !-d $local_lib;
+        next if grep { $_ eq $local_lib } @perl5lib;
+        unshift @perl5lib, $local_lib;
+    }
+    return (
+        PERL5LIB => join( $path_sep, @perl5lib ),
+    );
+}
+
+# _saved_ajax_inline_env_limit()
+# Returns the maximum inline saved-Ajax env payload size before the runtime spills data to temp files.
+# Input: none.
+# Output: integer byte limit.
+sub _saved_ajax_inline_env_limit {
+    return 131_072;
+}
+
+# _saved_ajax_temp_file(%args)
+# Writes one saved-Ajax payload into a temp file so large request data does not exceed exec environment limits.
+# Input: hash with optional prefix, optional suffix, and raw text content.
+# Output: absolute temp file path string.
+sub _saved_ajax_temp_file {
+    my (%args) = @_;
+    my ( $fh, $path ) = tempfile(
+        ( $args{prefix} || 'developer-dashboard-ajax-' ) . 'XXXXXX',
+        TMPDIR => 1,
+        UNLINK => 0,
+        SUFFIX => $args{suffix} || '',
+    );
+    print {$fh} defined $args{content} ? $args{content} : '';
+    close $fh or die "Unable to close saved ajax temp file $path: $!";
+    return $path;
+}
+
+# _cleanup_saved_ajax_temp_files(@paths)
+# Removes any saved-Ajax temp files created to carry oversized request payloads between parent and child processes.
+# Input: zero or more temp file path strings.
+# Output: true value.
+sub _cleanup_saved_ajax_temp_files {
+    my ( $self, @paths ) = @_;
+    for my $path (@paths) {
+        next if !defined $path || $path eq '';
+        next if !-e $path;
+        unlink $path or die "Unable to remove saved ajax temp file $path: $!";
+    }
+    return 1;
 }
 
 # _normalize_saved_ajax_singleton($singleton)
@@ -639,17 +724,33 @@ sub _saved_ajax_perl_wrapper {
     return <<'PERL';
 use strict;
 use warnings;
-use DataHelper qw(j je);
+use Developer::Dashboard::DataHelper qw(j je);
 use Developer::Dashboard::JSON qw(json_decode);
-use Zipper qw(Ajax acmdx zip unzip);
+use Developer::Dashboard::Zipper qw(Ajax acmdx zip unzip);
 my $old_stdout = select STDOUT;
 $| = 1;
 select STDERR;
 $| = 1;
 select $old_stdout;
 
+my $ajax_params_json = $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS} || '{}';
+if ( ( $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE} || '' ) ne '' ) {
+    open my $params_fh, '<:raw', $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE}
+      or die "Unable to read $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE}: $!";
+    local $/;
+    $ajax_params_json = <$params_fh>;
+    close $params_fh or die "Unable to close $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE}: $!";
+}
+if ( ( $ENV{QUERY_STRING} || '' ) eq '' && ( $ENV{DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE} || '' ) ne '' ) {
+    open my $query_fh, '<:raw', $ENV{DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE}
+      or die "Unable to read $ENV{DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE}: $!";
+    local $/;
+    $ENV{QUERY_STRING} = <$query_fh>;
+    close $query_fh or die "Unable to close $ENV{DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE}: $!";
+}
+
 our $AJAX_STASH = {};
-our $AJAX_PARAMS = eval { json_decode( $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS} || '{}' ) };
+our $AJAX_PARAMS = eval { json_decode($ajax_params_json) };
 $AJAX_PARAMS = {} if ref($AJAX_PARAMS) ne 'HASH';
 my $singleton = $ENV{DEVELOPER_DASHBOARD_AJAX_SINGLETON} || '';
 $0 = "dashboard ajax: $singleton" if $singleton ne '';
@@ -696,7 +797,7 @@ PERL
 }
 
 # _code_header($state)
-# Builds the legacy lexical stash header injected before each CODE block.
+# Builds the older lexical stash header injected before each CODE block.
 # Input: mutable stash hash reference.
 # Output: Perl source string.
 sub _code_header {
@@ -728,8 +829,8 @@ sub _new_sandpit {
 package $package;
 use strict;
 use warnings;
-use DataHelper qw(j je);
-use Zipper qw(Ajax acmdx zip unzip);
+use Developer::Dashboard::DataHelper qw(j je);
+use Developer::Dashboard::Zipper qw(Ajax acmdx zip unzip);
 
 our \$stash = {};
 our \$runtime = {};
@@ -817,20 +918,6 @@ sub _destroy_sandpit {
     return;
 }
 
-# _escape_html($text)
-# Escapes scalar text for safe HTML interpolation in legacy FORM blocks.
-# Input: text scalar.
-# Output: escaped text scalar.
-sub _escape_html {
-    my ($text) = @_;
-    $text = '' if !defined $text;
-    $text =~ s/&/&amp;/g;
-    $text =~ s/</&lt;/g;
-    $text =~ s/>/&gt;/g;
-    $text =~ s/"/&quot;/g;
-    return $text;
-}
-
 # _runtime_legacy_value($value)
 # Serializes a Perl scalar, array, or hash into a Perl-ish runtime text form.
 # Input: scalar, array reference, or hash reference.
@@ -864,7 +951,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::PageRuntime - legacy bookmark renderer and CODE executor
+Developer::Dashboard::PageRuntime - older bookmark renderer and CODE executor
 
 =head1 SYNOPSIS
 
@@ -874,7 +961,7 @@ Developer::Dashboard::PageRuntime - legacy bookmark renderer and CODE executor
 =head1 DESCRIPTION
 
 This module applies Template Toolkit rendering to bookmark HTML and executes
-legacy C<CODE*> blocks while capturing STDOUT and STDERR for in-page display.
+older C<CODE*> blocks while capturing STDOUT and STDERR for in-page display.
 
 =head1 METHODS
 
@@ -882,5 +969,36 @@ legacy C<CODE*> blocks while capturing STDOUT and STDERR for in-page display.
 
 Construct the runtime, render bookmark templates, execute in-process CODE
 blocks, and stream saved Ajax files as real child processes.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file renders bookmark pages, runs CODE blocks, and executes saved Ajax handlers.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::PageRuntime> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::PageRuntime -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

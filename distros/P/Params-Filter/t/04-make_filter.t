@@ -248,4 +248,18 @@ subtest "No required fields" => sub {
 	is($result2->{name}, 'Test', "Variant 2: Other fields included");
 };
 
+subtest "Accepted-specific - optional accepted field absent from input" => sub {
+	plan tests => 3;
+
+	# The 'if exists $unfiltered->{$_}' guard in the accepted-specific closure
+	# must take its false branch when a listed accepted field is not in the input.
+	my $filter = make_filter(['id'], ['optional_name'], []);
+
+	my $result = $filter->({ id => 42 });  # optional_name intentionally absent
+
+	ok($result,                          "Succeeds when optional accepted field absent");
+	is($result->{id}, 42,                "Required field present");
+	ok(!exists $result->{optional_name}, "Absent accepted field not in output");
+};
+
 done_testing();

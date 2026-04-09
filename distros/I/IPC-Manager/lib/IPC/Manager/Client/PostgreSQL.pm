@@ -2,7 +2,7 @@ package IPC::Manager::Client::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
@@ -14,16 +14,14 @@ use Object::HashBase qw{
     +QDB
 };
 
-sub viable {
-    local $@;
-    eval {
-        require DBD::Pg;
-        DBD::Pg->VERSION('3.5.0');
-        require DBIx::QuickDB;
-        DBIx::QuickDB->VERSION('0.000040');
-        DBIx::QuickDB->check_driver('DBIx::QuickDB::Driver::PostgreSQL', {});
-        1;
-    } || 0;
+sub _viable {
+    require DBD::Pg;
+    DBD::Pg->VERSION('3.5.0');
+    require DBIx::QuickDB;
+    DBIx::QuickDB->VERSION('0.000040');
+    my ($ok, $fqn, $why) = DBIx::QuickDB->check_driver('DBIx::QuickDB::Driver::PostgreSQL', {bootstrap => 1, autostart => 1});
+    die $why unless $ok;
+    1;
 }
 
 sub escape { '"' }

@@ -92,7 +92,8 @@ $config hash with all required parameters is presented below:
     pass_encrypt        =>  'md5',          # optional, see below
     vf_key_prop         => 'verify_key',    # optional, see below
     vf_key_cookie       => 'key_customer',  # optional, see below
-    vf_time_prop        => 'verify_time',   # time of last verification
+    vf_time_prop        => 'verify_time',   # last login, until logout
+    vf_time_last_prop   => 'last_login_time'# last login, persistent (optional)
     vf_expire_time      => '600',           # seconds
     cb_uri              => 'IdentifyUser/customer' # optional
  }
@@ -277,7 +278,21 @@ Temporary verifiction key cookie.
 
 =item vf_time_prop
 
-Attribute of user object which stores the time of latest verified access.
+Attribute of a user or key object that stores the time of the most
+recent verified access.
+
+Cleared on logout. Use 'vf_time_last_prop' for a persistent value.
+
+=item vf_time_user_prop
+
+Optional attribute of a user object that stores the time of the most
+recent verified access. Useful when key_list_uri is in use and
+vf_time_prop point to a value within the key store, not the user.
+
+=item vf_time_last_prop
+
+Optional persistent user property name where the time of the most recent
+verified access is stored. It is not cleared on logout.
 
 =item vf_expire_time
 
@@ -787,6 +802,11 @@ sub check ($@) {
 
                 $clipboard->put("$cb_uri/key" => $key_cookie_value);
 
+                my %user_data;
+
+                $user_data{$config->{'vf_time_last_prop'}} = $current_time
+                    if $config->{'vf_time_last_prop'};
+
                 if($key_object) {
                     my $key_expire_prop=$config->{'key_expire_prop'} ||
                         throw $self "- key_expire_prop required";
@@ -796,13 +816,14 @@ sub check ($@) {
                         $key_expire_prop    => $current_time+$vf_expire_time,
                     );
 
-                    if($config->{'vf_time_user_prop'}) {
-                        $user->put($config->{'vf_time_user_prop'} => $current_time);
-                    }
+                    $user_data{$config->{'vf_time_user_prop'}} = $current_time
+                        if $config->{'vf_time_user_prop'};
                 }
                 else {
-                    $user->put($vf_time_prop => $current_time);
+                    $user_data{$vf_time_prop} = $current_time;
                 }
+
+                $user->put(%user_data) if %user_data;
 
                 if($vcookie && !$without_cookies) {
                     $self->siteconfig->add_cookie($vcookie);
@@ -1412,6 +1433,13 @@ sub login ($;%) {
 
     my $key_list_uri=$config->{'key_list_uri'};
 
+    my $now=time;
+
+    my %user_data;
+
+    $user_data{$config->{'vf_time_last_prop'}} = $now
+        if $config->{'vf_time_last_prop'};
+
     if($key_list_uri) {
         my $key_ref_prop=$config->{'key_ref_prop'} ||
             throw $self "- key_ref_prop required";
@@ -1429,8 +1457,6 @@ sub login ($;%) {
         my $key_list=$self->odb->fetch($key_list_uri);
         my $key_obj;
         my $key_id;
-
-        my $now=time;
 
         unless($without_cookies) {
             my $vf_key_cookie=$config->{'vf_key_cookie'};
@@ -1503,7 +1529,7 @@ sub login ($;%) {
         }
 
         if($config->{'vf_time_user_prop'}) {
-            $user->put($config->{'vf_time_user_prop'} => $now);
+            $user_data{$config->{'vf_time_user_prop'}} = $now;
         }
 
         $data->{'key_object'}=$key_obj;
@@ -1551,9 +1577,9 @@ sub login ($;%) {
     elsif($config->{'vf_key_prop'} && $config->{'vf_key_cookie'}) {
         my $random_key=XAO::Utils::generate_key($config->{'vf_key_length'} || 8);
 
-        $data->{'key'}=$random_key;
+        $data->{'key'} = $random_key;
 
-        $user->put($config->{'vf_key_prop'} => $random_key);
+        $user_data{$config->{'vf_key_prop'}} = $random_key;
 
         unless($without_cookies) {
             $self->siteconfig->add_cookie(
@@ -1569,8 +1595,13 @@ sub login ($;%) {
     # Setting login time
     #
     if(!$key_list_uri) {
-        $user->put($vf_time_prop => time);
+        $user_data{$vf_time_prop} = $now;
     }
+
+    # Storing user updates in one go (might be empty in rare case of
+    # key-only tracking).
+    #
+    $user->put(%user_data) if %user_data;
 
     # Setting user name cookie depending on id_cookie_type parameter.
     #
@@ -1670,11 +1701,11 @@ sub login_check ($%) {
 Logs the user out.
 
 Resets vf_time_prop if there is no vf_key_prop set as it is our only
-proof of authentication in this case. If vf_key_prop is in use then we
+proof of authentication in this case. If vf_key_prop is in use, then we
 clear the key, but leave the time alone -- helps to see when this user
 last logged in.
 
-Clears identification cookie as well fo hard logout mode. Sets user
+Clears identification cookie as well for hard logout mode. Sets user
 status to 'anonymous' (hard logout mode) or 'identified'.
 
 Will install data into clipboard in soft logout mode just the same way
@@ -1749,7 +1780,17 @@ sub logout ($@) {
         $deleted=1;
     }
 
-    if(!$deleted && $cb_data->{'verified'}) {
+    # Up to 1.93 the behavior was to only clear user level vf_time if
+    # really necessary. The misguided idea was to preserve vf_time_prop
+    # database value across logouts when the key is enough for security.
+    # The leads to inconsistent behavior that depends on whether the key
+    # is present and is deleted.
+    #
+    # With the introduction of persistent 'vf_time_last_prop' value, the
+    # 'vf_time_prop/vf_time_user_prop' is always cleared.
+    #
+    my $vf_time_last_prop = $config->{'vf_time_last_prop'};
+    if($vf_time_last_prop || (!$deleted && $cb_data->{'verified'})) {
         if($key_list_uri) {
             my $vf_time_user_prop=$config->{'vf_time_user_prop'};
             if($vf_time_user_prop) {

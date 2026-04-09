@@ -6,7 +6,8 @@ use PDL;
 use PDL::NiceSlice;
 use PDL::LinearAlgebra::Real;
 use constant N=>10;
-use Test::More tests => 2*N;
+use Test::More;
+use Test::PDL;
 
 for my $D (3..N+2) { #first differences
     #solve b_{n+1}-b_n=1 with homogeneous BCs
@@ -17,7 +18,7 @@ for my $D (3..N+2) { #first differences
     my $info=pdl(short,0);
     gtsv($c, $d, $e, $b, $info);
     my $r=sequence($D);
-    ok($b->approx($r)->all, "1st diff in D=$D") or diag "info: ", $info, "\nGot: ", $b, "\nExpected: ", $r;
+    is_pdl $b, $r, "1st diff in D=$D";
 }
 
 for my $D (3..N+2) { #second differences
@@ -30,5 +31,7 @@ for my $D (3..N+2) { #second differences
     gtsv($c, $d, $e, $b, $info);
     my $x=sequence($D);
     my $r=-$D/2-($D-1)/2*$x+1/2*$x*$x;
-    ok($b->approx($r)->all, "2nd diff in D=$D") or diag "info: ", $info, "\nGot: ", $b, "\nExpected: ", $r;
+    is_pdl $b, $r, "2nd diff in D=$D";
 }
+
+done_testing;

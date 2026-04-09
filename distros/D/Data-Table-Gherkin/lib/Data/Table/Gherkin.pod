@@ -1,0 +1,74 @@
+=pod
+
+=head1 NAME
+
+Data::Table::Gherkin - Lean Gherkin data table parser
+
+=head1 SYNOPSIS
+
+  use Data::Table::Gherkin ();
+
+  my $self = Data::Table::Gherkin->parse( <<'GDT', { has_header => 1 } );
+  | firstName   | lastName | birthDate  |
+  | Annie M. G. | Schmidt  | 1911-05-20 |
+  | Roald       | Dahl     | 1916-09-13 |
+  | Astrid      | Lindgren | 1907-11-14 |
+  GDT
+
+  # or
+
+  my $self = CLASS->parse( \*DATA, { has_header => 1 } );
+
+  for my $row ( @{ $self->rows } ) {
+  ...
+  }
+
+  __DATA__
+  | firstName   | lastName | birthDate  |
+  | Annie M. G. | Schmidt  | 1911-05-20 |
+  | Roald       | Dahl     | 1916-09-13 |
+  | Astrid      | Lindgren | 1907-11-14 |
+
+=head1 DESCRIPTION
+
+This class provides a Gherkin data table parser. The C<parse()> factory
+method (a class method) does the parsing. It has one required argument. This
+argument is either the string representation of a data table or it is a
+readable filehandle that in paragraph mode (C<$/> is set to C<''>) returns
+the string representation of a data table on each read. The last method
+argument is an optional hash reference. The C<has_header> key has to have
+a boolean value. You will set it, if the data table has a header row. This
+has an impact on the data structure returned by the C<rows()> object method.
+On success the C<parse()> method returns an object of this class; otherwise
+it carps on error and returns an C<undef> value.
+
+The C<rows()> object method returns an array reference. The array elements are
+hash references if the data table has a header row (C<has_header> is true);
+otherwise the array elements are array references.
+
+If you want to use a newline character in a data table column, you can write
+this as C<\n>. If you need a C<|> as part of the column, you can escape it
+as C<\|>. And finally, if you need a C<\>, you can escape that with C<\\>.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<Gherkin Data Tables|https://cucumber.io/docs/gherkin/reference#data-tables>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut

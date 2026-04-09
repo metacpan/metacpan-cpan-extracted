@@ -7,16 +7,15 @@
 
 /* delete these in CORE21 */
 pdl_error pdl_readdata_affine(pdl_trans *trans) {
-  return (pdl_error){PDL_EUSERERROR, "readdata called with no vtable entry", 0};
+  return pdl_make_error(PDL_EUSERERROR, "%s: readdata called with no vtable entry", trans->vtable->name);
 }
 pdl_error pdl_writebackdata_affine(pdl_trans *trans) {
-  return (pdl_error){PDL_EUSERERROR, "writebackdata called with no vtable entry", 0};
+  return pdl_make_error(PDL_EUSERERROR, "%s: writebackdata called with no vtable entry", trans->vtable->name);
 }
 
 /* generated from:
 pp_def( 'affine',
         P2Child => 1,
-        TwoWay => 1,
         AffinePriv => 1,
         GlobalNew => 'affine_new',
         OtherPars => 'PDL_Indx offset; PDL_Indx dims[]; PDL_Indx incs[]',
@@ -100,7 +99,7 @@ static PDL_Indx pdl_affine_vtable_realdims_starts[] = { 0, 0 };
 static PDL_Indx pdl_affine_vtable_realdims_ind_ids[] = { 0 };
 static char *pdl_affine_vtable_indnames[] = { "" };
 pdl_transvtable pdl_affine_vtable = {
-  0, PDL_ITRANS_ISAFFINE|PDL_ITRANS_TWOWAY|PDL_ITRANS_DO_DATAFLOW_ANY, pdl_affine_vtable_gentypes, 1, 2, pdl_affine_vtable_flags /*CORE21*/,
+  0, PDL_ITRANS_ISAFFINE|PDL_ITRANS_DO_DATAFLOW_ANY, pdl_affine_vtable_gentypes, 1, 2, pdl_affine_vtable_flags /*CORE21*/,
   pdl_affine_vtable_realdims, pdl_affine_vtable_parnames,
   pdl_affine_vtable_parflags, pdl_affine_vtable_partypes,
   pdl_affine_vtable_realdims_starts, pdl_affine_vtable_realdims_ind_ids, 0,

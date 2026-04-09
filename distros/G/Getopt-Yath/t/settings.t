@@ -34,6 +34,7 @@ subtest 'Settings::Group option get/set' => sub {
 };
 
 subtest 'Settings::Group option lvalue' => sub {
+    skip_all 'lvalue sub assignment unreliable before perl 5.026' if $] < 5.026;
     my $g = Getopt::Yath::Settings::Group->new(lv => 10);
     $g->option('lv') = 20;
     is($g->option('lv'), 20, 'lvalue assignment works');
@@ -233,6 +234,7 @@ subtest 'Settings::Group AUTOLOAD set' => sub {
 };
 
 subtest 'Settings::Group AUTOLOAD lvalue' => sub {
+    skip_all 'lvalue sub assignment unreliable before perl 5.026' if $] < 5.026;
     my $g = Getopt::Yath::Settings::Group->new(alv => 'x');
     $g->alv = 'y';
     is($g->alv, 'y', 'AUTOLOAD lvalue assignment works');

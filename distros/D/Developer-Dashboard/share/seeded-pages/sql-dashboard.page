@@ -1,0 +1,4098 @@
+TITLE: SQL Dashboard
+:--------------------------------------------------------------------------------:
+BOOKMARK: sql-dashboard
+:--------------------------------------------------------------------------------:
+STASH: 
+:--------------------------------------------------------------------------------:
+HTML: <style>
+.sql-shell { display:grid; gap:18px; color:#24313c; }
+.sql-banner { padding:12px 14px; border:1px solid #d5c36a; background:#fff6d6; color:#563f00; }
+.sql-banner.is-error { border-color:#d89a9a; background:#fff1f1; color:#7f1d1d; }
+.sql-main-tabs, .sql-subtabs { display:flex; gap:0; flex-wrap:wrap; align-items:flex-end; border-bottom:1px solid #aeb9c3; }
+.sql-main-tab, .sql-subtab { display:inline-block; margin:0 4px -1px 0; padding:10px 14px; border:1px solid #aeb9c3; border-bottom:1px solid #aeb9c3; background:linear-gradient(180deg, #f6f8fa 0%, #dfe7ef 100%); color:#20303b; text-decoration:none; font-weight:700; }
+.sql-main-tab.is-active, .sql-subtab.is-active { background:#ffffff; border-bottom-color:#ffffff; position:relative; top:1px; }
+.sql-panel { display:none; border:1px solid #bcc7cf; background:#ffffff; padding:16px; }
+.sql-panel.is-active { display:block; }
+.sql-grid { display:grid; gap:16px; }
+.sql-two-col { grid-template-columns: minmax(320px, 1fr) minmax(360px, 2fr); }
+.sql-card { border:1px solid #d8dee3; background:#fbfcfd; padding:14px; }
+.sql-card h3 { margin-top:0; }
+.sql-form-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+.sql-form-grid label, .sql-stack label { display:grid; gap:6px; font-weight:600; color:#24313c; }
+.sql-form-grid input, .sql-form-grid textarea, .sql-stack textarea, .sql-stack select, .sql-stack input { width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #b8c1c9; background:#fff; font-family:monospace; }
+.sql-stack { display:grid; gap:12px; }
+.sql-toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+.sql-action { display:inline-flex; align-items:center; gap:4px; padding:2px 0; border:none; background:transparent; color:#345068; text-decoration:none; font-weight:600; font-size:13px; line-height:1.3; }
+.sql-action:hover, .sql-action:focus { color:#102131; text-decoration:underline; }
+.sql-action.sql-action-quiet { color:#617181; font-weight:500; }
+.sql-badge { display:inline-block; padding:4px 8px; border:1px solid #d5dde3; background:#f8fafb; color:#465560; font-size:12px; }
+.sql-workspace-layout { display:grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); border:1px solid #cbd3da; background:#f7fafc; }
+.sql-workspace-nav { display:grid; gap:16px; align-content:start; padding:14px; border-right:1px solid #cbd3da; background:linear-gradient(180deg, #eef3f7 0%, #e6edf3 100%); }
+.sql-workspace-editor { display:grid; gap:14px; align-content:start; padding:18px; background:#fbfcfd; }
+.sql-nav-section { display:grid; gap:10px; }
+.sql-nav-section h3, .sql-nav-section h4 { margin:0; }
+.sql-nav-header { display:flex; gap:10px; align-items:center; justify-content:space-between; }
+.sql-list { border:1px solid #c2ccd4; background:#ffffff; }
+.sql-list-row { display:grid; grid-template-columns: minmax(0, 1fr) auto; gap:8px; align-items:start; padding:0; border-top:1px solid #d7dee4; }
+.sql-list-row:first-child { border-top:none; }
+.sql-list-row.is-active { background:#dce8f3; }
+.sql-list-item { display:block; padding:10px 12px; color:#1d2b35; text-decoration:none; min-width:0; }
+.sql-list-item.is-active { font-weight:700; }
+.sql-list-item small { display:block; margin-top:4px; color:#5b6873; font-weight:400; }
+.sql-inline-delete { display:inline-flex; align-items:center; justify-content:center; min-width:30px; padding:10px 8px; color:#7a2030; text-decoration:none; font-size:12px; font-weight:700; }
+.sql-inline-delete:hover, .sql-inline-delete:focus { text-decoration:none; color:#5a0f20; background:#f8dde2; }
+.sql-inline-fields { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+.sql-editor-frame { display:grid; gap:10px; border:1px solid #d2dae0; background:#ffffff; padding:12px; }
+.sql-editor-frame label { display:grid; gap:8px; font-weight:700; color:#24313c; }
+.sql-editor-frame textarea { width:100%; min-height:220px; max-height:72vh; box-sizing:border-box; padding:12px 14px; border:1px solid #b8c1c9; background:#fff; font-family:monospace; line-height:1.5; resize:none; overflow:hidden; }
+.sql-editor-actions { display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between; padding-top:8px; border-top:1px solid #dbe2e8; }
+.sql-editor-actions-left { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+.sql-editor-note { color:#63727e; font-size:12px; }
+.sql-result-info { min-height:120px; padding:12px; border:1px solid #c5d0d8; background:#16212a; color:#edf3f7; white-space:pre-wrap; overflow:auto; }
+.sql-result-html { margin-top:12px; overflow:auto; }
+.sql-result-html table { width:100%; border-collapse:collapse; }
+.sql-result-html th, .sql-result-html td { border:1px solid #d0d8df; padding:8px 10px; text-align:left; vertical-align:top; }
+.sql-result-html th { background:#eef3f7; }
+.sql-help { margin:0; color:#4b5a66; font-size:13px; }
+.sql-schema-grid { display:grid; grid-template-columns: minmax(260px, 1fr) minmax(320px, 1fr); gap:16px; }
+.sql-empty { padding:12px; border:1px dashed #bcc7cf; background:#f8fafb; color:#55636d; }
+.sql-checkbox { display:flex; gap:10px; align-items:center; font-weight:600; color:#24313c; }
+@media (max-width: 920px) {
+  .sql-two-col, .sql-schema-grid, .sql-workspace-layout { grid-template-columns: 1fr; }
+  .sql-workspace-nav { border-right:none; border-bottom:1px solid #cbd3da; }
+  .sql-editor-actions { align-items:flex-start; }
+}
+</style>
+<div class="sql-shell">
+  <div id="sql-banner" class="sql-banner" hidden></div>
+  <nav class="sql-main-tabs" aria-label="SQL Dashboard Sections">
+    <a href="#" class="sql-main-tab is-active" data-sql-main-tab="profiles" role="tab" aria-selected="true">Connection Profiles</a>
+    <a href="#" class="sql-main-tab" data-sql-main-tab="workspace" role="tab" aria-selected="false">SQL Workspace</a>
+    <a href="#" class="sql-main-tab" data-sql-main-tab="schema" role="tab" aria-selected="false">Schema Explorer</a>
+  </nav>
+
+  <section id="sql-panel-profiles" class="sql-panel is-active">
+    <div class="sql-grid sql-two-col">
+      <div class="sql-card">
+        <div class="sql-toolbar">
+          <a href="#" id="sql-profile-new" class="sql-action">New Profile</a>
+          <a href="#" id="sql-profile-save" class="sql-action">Save Profile</a>
+          <a href="#" id="sql-profile-delete" class="sql-action">Delete Profile</a>
+        </div>
+        <div id="sql-profile-tabs" class="sql-subtabs" aria-label="Saved Connection Profiles"></div>
+        <div id="sql-profile-tabs-empty" class="sql-empty">No saved profiles yet. Create one and install a driver with <code>dashboard cpan DBD::Driver</code>.</div>
+      </div>
+      <div class="sql-card">
+        <h3>Connection Profiles</h3>
+        <div class="sql-form-grid">
+          <label>Profile Name
+            <input id="sql-profile-name" type="text" placeholder="Reporting DB">
+          </label>
+          <label>Driver Module
+            <select id="sql-profile-driver"></select>
+          </label>
+          <label>DSN
+            <input id="sql-profile-dsn" type="text" placeholder="dbi:SQLite:dbname=/tmp/demo.db">
+          </label>
+          <label>User <small>(optional for SQLite and other passwordless connections)</small>
+            <input id="sql-profile-user" type="text" placeholder="demo">
+          </label>
+          <label>Password
+            <input id="sql-profile-password" type="password" placeholder="Stored only when requested">
+          </label>
+          <label>DBI Attrs JSON
+            <input id="sql-profile-attrs" type="text" placeholder='{"RaiseError":1,"PrintError":0,"AutoCommit":1}'>
+          </label>
+        </div>
+        <label class="sql-checkbox"><input id="sql-profile-save-password" type="checkbox"> Save password to the local runtime profile file</label>
+        <p id="sql-profile-driver-help" class="sql-help">Pick an installed driver to see a matching DSN example and runtime notes.</p>
+        <p class="sql-help">Profiles are stored under <code>.developer-dashboard/config/sql-dashboard/&lt;profile-name&gt;.json</code>. Shared URLs only carry the portable <code>connection</code> id built from DSN and user. SQLite and other passwordless/local DSNs can leave the user blank.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="sql-panel-workspace" class="sql-panel">
+    <div class="sql-workspace-layout">
+      <aside id="sql-workspace-nav" class="sql-workspace-nav">
+        <div class="sql-nav-section">
+          <div class="sql-toolbar">
+            <a href="#" id="sql-collection-new" class="sql-action">New Collection</a>
+            <a href="#" id="sql-collection-save" class="sql-action">Save Collection</a>
+            <a href="#" id="sql-collection-delete" class="sql-action">Delete Collection</a>
+          </div>
+          <label>Collection Name
+            <input id="sql-collection-name" type="text" placeholder="Reporting Queries">
+          </label>
+          <div id="sql-collection-tabs" class="sql-subtabs" aria-label="Saved SQL Collections"></div>
+          <div id="sql-collection-tabs-empty" class="sql-empty">No saved SQL collections yet. Collections stay separate from connection profiles.</div>
+        </div>
+        <div class="sql-nav-section">
+          <div class="sql-nav-header">
+            <strong id="sql-collection-item-list-title">Saved SQL</strong>
+            <a href="#" id="sql-collection-item-new" class="sql-action sql-action-quiet">New SQL</a>
+          </div>
+          <div id="sql-collection-item-list" class="sql-list" aria-label="Saved SQL Entries"></div>
+          <div id="sql-collection-item-tabs-empty" class="sql-empty">Select a collection to view its saved SQL entries.</div>
+          <span class="sql-badge">Collections and connection profiles are intentionally unrelated</span>
+        </div>
+      </aside>
+      <section id="sql-workspace-editor" class="sql-workspace-editor">
+        <div class="sql-toolbar">
+          <span id="sql-active-profile" class="sql-badge">No active profile selected</span>
+          <span id="sql-active-collection" class="sql-badge">No active collection</span>
+          <span id="sql-active-sql-name" class="sql-badge">Unsaved SQL</span>
+        </div>
+        <div class="sql-inline-fields">
+          <label>SQL Name
+            <input id="sql-collection-item-name" type="text" placeholder="Users By Status">
+          </label>
+        </div>
+        <div class="sql-editor-frame">
+          <label>SQL
+            <textarea id="sql-editor" rows="10" placeholder="select * from users"></textarea>
+          </label>
+          <div id="sql-editor-actions" class="sql-editor-actions">
+            <div class="sql-editor-actions-left">
+              <a href="#" id="sql-run" class="sql-action">&#127939; Run SQL</a>
+              <a href="#" id="sql-collection-item-save" class="sql-action">&#128190; Save SQL</a>
+            </div>
+            <span id="sql-editor-note" class="sql-editor-note">Edit SQL above, then use save to keep it in a collection or run to execute it with the active connection.</span>
+          </div>
+        </div>
+        <p class="sql-help">Use <code>SQLS_SEP</code> (<code>:------------------------------------------------------------------------------:</code>) between statements and <code>INSTRUCTION_SEP</code> (<code>:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:</code>) for <code>STASH</code>, <code>ROW</code>, <code>BEFORE</code>, and <code>AFTER</code> hooks.</p>
+        <pre id="sql-result-info" class="sql-result-info">Select a profile and run SQL.</pre>
+        <div id="sql-result-html" class="sql-result-html"></div>
+      </section>
+    </div>
+  </section>
+
+  <section id="sql-panel-schema" class="sql-panel">
+    <div class="sql-card">
+      <div class="sql-toolbar">
+        <span id="sql-schema-profile" class="sql-badge">Schema Explorer</span>
+        <a href="#" id="sql-schema-refresh" class="sql-action">Refresh Schema</a>
+      </div>
+      <div class="sql-schema-grid">
+        <div>
+          <h3>Tables</h3>
+          <div id="sql-table-tabs" class="sql-subtabs"></div>
+          <div id="sql-table-tabs-empty" class="sql-empty">Choose a profile and refresh the schema to load table tabs.</div>
+        </div>
+        <div>
+          <h3>Columns</h3>
+          <div id="sql-column-list" class="sql-empty">Select a table tab to view columns.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+(function () {
+  var state = {
+    main_tab: 'profiles',
+    profiles: [],
+    profile_draft: null,
+    drivers: [],
+    collections: [],
+    active_profile_name: '',
+    active_collection_name: '',
+    active_collection_item_id: '',
+    collection_item_draft: 0,
+    collection_name_draft: '',
+    collection_item_name_draft: '',
+    schema: { tables: [], columns: [], active_table: '' },
+    sql: '',
+    result_html: '',
+    result_info: 'Select a profile and run SQL.'
+  };
+  var endpointFallbacks = {
+    'profiles.bootstrap': '/ajax/sql-dashboard-profiles-bootstrap?type=json',
+    'profiles.save': '/ajax/sql-dashboard-profiles-save?type=json',
+    'profiles.delete': '/ajax/sql-dashboard-profiles-delete?type=json',
+    'collections.save': '/ajax/sql-dashboard-collections-save?type=json',
+    'collections.delete': '/ajax/sql-dashboard-collections-delete?type=json',
+    'sql.execute': '/ajax/sql-dashboard-execute?type=json',
+    'schema.browse': '/ajax/sql-dashboard-schema-browse?type=json'
+  };
+
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
+  function banner(message, isError) {
+    var node = byId('sql-banner');
+    if (!message) {
+      node.hidden = true;
+      node.textContent = '';
+      node.className = 'sql-banner';
+      return;
+    }
+    node.hidden = false;
+    node.className = 'sql-banner' + (isError ? ' is-error' : '');
+    node.textContent = message;
+  }
+
+  function endpoint(path) {
+    var root = (typeof window.configs !== 'undefined' && window.configs) ? window.configs : {};
+    var node = root;
+    path.split('.').forEach(function (part) {
+      node = node && typeof node === 'object' ? node[part] : undefined;
+    });
+    return node || endpointFallbacks[path] || '';
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function connectionIdFromParts(dsn, user) {
+    dsn = String(dsn || '').trim();
+    user = String(user || '').trim();
+    if (!dsn) return '';
+    return dsn + '|' + user;
+  }
+
+  function parseConnectionId(connectionId) {
+    connectionId = String(connectionId || '');
+    if (!connectionId) return null;
+    var index = connectionId.lastIndexOf('|');
+    if (index < 1) return null;
+    var dsn = connectionId.slice(0, index);
+    var user = connectionId.slice(index + 1);
+    if (!dsn) return null;
+    var driver = '';
+    var match = dsn.match(/^dbi:([^:]+):/i);
+    if (match && match[1]) driver = 'DBD::' + match[1];
+    return {
+      connection_id: connectionId,
+      dsn: dsn,
+      user: user,
+      driver: driver,
+      name: '',
+      attrs_json: '{"RaiseError":1,"PrintError":0,"AutoCommit":1}',
+      save_password: 0
+    };
+  }
+
+  function findProfile(name) {
+    return (state.profiles || []).filter(function (profile) {
+      return profile && profile.name === name;
+    })[0] || null;
+  }
+
+  function findProfileByConnection(connectionId) {
+    return (state.profiles || []).filter(function (profile) {
+      if (!profile) return false;
+      return String(profile.connection_id || connectionIdFromParts(profile.dsn, profile.user)) === String(connectionId || '');
+    })[0] || null;
+  }
+
+  function findCollection(name) {
+    return (state.collections || []).filter(function (collection) {
+      return collection && collection.name === name;
+    })[0] || null;
+  }
+
+  function currentProfile() {
+    return findProfile(state.active_profile_name) || state.profile_draft || null;
+  }
+
+  function currentCollection() {
+    return findCollection(state.active_collection_name);
+  }
+
+  function currentCollectionItem() {
+    var collection = currentCollection();
+    if (!collection || !collection.items) return null;
+    return (collection.items || []).filter(function (item) {
+      return item && item.id === state.active_collection_item_id;
+    })[0] || null;
+  }
+
+  function collectionItemIdFromName(name) {
+    name = String(name || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return name || 'sql-item';
+  }
+
+  function currentFormConnectionId() {
+    return connectionIdFromParts(byId('sql-profile-dsn').value, byId('sql-profile-user').value);
+  }
+
+  function profileNeedsLocalPassword(profile) {
+    profile = profile || {};
+    var dsn = String(profile.dsn || '').trim();
+    var user = String(profile.user || '').trim();
+    var password = String(profile.password || '');
+    var driver = String(profile.driver || '').trim();
+    if (!driver) {
+      var match = dsn.match(/^dbi:([^:]+):/i);
+      if (match && match[1]) driver = 'DBD::' + match[1];
+    }
+    if (driver === 'DBD::SQLite' && !user && password === '') {
+      return false;
+    }
+    return password === '';
+  }
+
+  function currentRoute() {
+    return {
+      tab: state.main_tab || '',
+      connection: currentFormConnectionId() || (currentProfile() && currentProfile().connection_id) || '',
+      collection: state.active_collection_name || '',
+      item: state.active_collection_item_id || '',
+      table: state.schema.active_table || '',
+      sql: byId('sql-editor').value || ''
+    };
+  }
+
+  function routeQuery(route) {
+    var params = new window.URLSearchParams();
+    if (route.tab) params.set('tab', route.tab);
+    if (route.connection) params.set('connection', route.connection);
+    if (route.collection) params.set('collection', route.collection);
+    if (route.item) params.set('item', route.item);
+    if (route.table) params.set('table', route.table);
+    if (route.sql) params.set('sql', route.sql);
+    return params.toString();
+  }
+
+  function readRoute() {
+    var params = new window.URLSearchParams(window.location.search || '');
+    return {
+      tab: params.get('tab') || '',
+      connection: params.get('connection') || '',
+      collection: params.get('collection') || '',
+      item: params.get('item') || '',
+      table: params.get('table') || '',
+      sql: params.get('sql') || ''
+    };
+  }
+
+  function syncRoute(replaceRoute) {
+    if (!window.history || !window.URLSearchParams) return;
+    var query = routeQuery(currentRoute());
+    var target = window.location.pathname + (query ? '?' + query : '');
+    var current = window.location.pathname + window.location.search;
+    if (target === current) return;
+    if (replaceRoute) {
+      window.history.replaceState(currentRoute(), '', target);
+      return;
+    }
+    window.history.pushState(currentRoute(), '', target);
+  }
+
+  function renderDriverOptions(selectedDriver) {
+    var select = byId('sql-profile-driver');
+    var selected = String(selectedDriver || select.value || '');
+    var drivers = (state.drivers || []).slice();
+    if (selected && drivers.indexOf(selected) === -1) {
+      drivers.push(selected);
+    }
+    drivers.sort(function (left, right) {
+      return String(left || '').localeCompare(String(right || ''));
+    });
+    select.innerHTML = '';
+    var blank = document.createElement('option');
+    blank.value = '';
+    blank.textContent = drivers.length ? 'Select installed driver' : 'Install a DBD::* driver first';
+    select.appendChild(blank);
+    drivers.forEach(function (driver) {
+      var option = document.createElement('option');
+      option.value = driver;
+      option.textContent = driver;
+      if (driver === selected) option.selected = true;
+      select.appendChild(option);
+    });
+    if (selected) select.value = selected;
+  }
+
+  function driverGuidance(driver) {
+    driver = String(driver || '').trim();
+    if (driver === 'DBD::SQLite') {
+      return {
+        template: 'dbi:SQLite:dbname=/tmp/demo.db',
+        help: 'SQLite keeps everything in one local file and can leave the user and password blank.'
+      };
+    }
+    if (driver === 'DBD::mysql') {
+      return {
+        template: 'dbi:mysql:database=app;host=127.0.0.1;port=3306',
+        help: 'MySQL usually needs a database name, host, port, user, and a locally-stored password.'
+      };
+    }
+    if (driver === 'DBD::Pg') {
+      return {
+        template: 'dbi:Pg:dbname=app;host=127.0.0.1;port=5432',
+        help: 'PostgreSQL usually needs dbname, host, port, user, and a locally-stored password.'
+      };
+    }
+    if (driver === 'DBD::ODBC') {
+      return {
+        template: 'dbi:ODBC:Driver=FreeTDS;Server=127.0.0.1;Port=1433;TDS_Version=7.4;Database=master;Encrypt=optional;TrustServerCertificate=yes',
+        help: 'SQL Server commonly uses DBD::ODBC with an ODBC driver such as FreeTDS or Microsoft ODBC Driver 18.'
+      };
+    }
+    if (driver === 'DBD::Oracle') {
+      return {
+        template: 'dbi:Oracle:host=127.0.0.1;port=1521;service_name=XEPDB1',
+        help: 'Oracle commonly uses service_name with DBD::Oracle and requires a local Oracle client home.'
+      };
+    }
+    var shortName = driverShortName(driver);
+    return {
+      template: shortName ? ('dbi:' + shortName + ':') : 'dbi:Driver:...',
+      help: shortName ? ('Adjust the DSN fields required by ' + shortName + ' before saving the profile.') : 'Install a DBD::* driver first, then pick it to see a matching DSN example.'
+    };
+  }
+
+  function renderProfileGuidance(selectedDriver) {
+    var guidance = driverGuidance(selectedDriver || byId('sql-profile-driver').value || '');
+    var dsnField = byId('sql-profile-dsn');
+    dsnField.setAttribute('placeholder', guidance.template);
+    byId('sql-profile-driver-help').innerHTML = 'Example DSN: <code>' + escapeHtml(guidance.template) + '</code>. ' + escapeHtml(guidance.help);
+  }
+
+  function loadProfileIntoForm(profile) {
+    profile = profile || {};
+    renderDriverOptions(profile.driver || '');
+    byId('sql-profile-name').value = profile.name || '';
+    byId('sql-profile-dsn').value = profile.dsn || '';
+    byId('sql-profile-user').value = profile.user || '';
+    byId('sql-profile-password').value = profile.password || '';
+    byId('sql-profile-save-password').checked = profile.save_password ? true : false;
+    byId('sql-profile-attrs').value = profile.attrs_json || '{"RaiseError":1,"PrintError":0,"AutoCommit":1}';
+    renderProfileGuidance(profile.driver || '');
+  }
+
+  function loadCollectionIntoForm(collection, item) {
+    collection = collection || {};
+    item = item || null;
+    state.collection_name_draft = collection.name || state.collection_name_draft || '';
+    state.collection_item_name_draft = item && item.name ? item.name : (state.collection_item_name_draft || '');
+    byId('sql-collection-name').value = state.collection_name_draft;
+    byId('sql-collection-item-name').value = state.collection_item_name_draft;
+  }
+
+  function autoResizeSqlEditor() {
+    var editor = byId('sql-editor');
+    if (!editor) return;
+    editor.style.height = 'auto';
+    var height = Math.max(editor.scrollHeight, 220);
+    editor.style.height = height + 'px';
+  }
+
+  function profilePayloadFromForm() {
+    var dsn = byId('sql-profile-dsn').value.trim();
+    var user = byId('sql-profile-user').value.trim();
+    return {
+      name: byId('sql-profile-name').value.trim(),
+      driver: byId('sql-profile-driver').value.trim(),
+      dsn: dsn,
+      user: user,
+      password: byId('sql-profile-password').value,
+      save_password: byId('sql-profile-save-password').checked ? 1 : 0,
+      attrs_json: byId('sql-profile-attrs').value.trim(),
+      connection_id: connectionIdFromParts(dsn, user)
+    };
+  }
+
+  function collectionPayloadFromState(collection) {
+    return {
+      name: String(collection && collection.name || '').trim(),
+      items: (collection && collection.items || []).map(function (item) {
+        return {
+          id: String(item && item.id || '').trim(),
+          name: String(item && item.name || '').trim(),
+          sql: item && item.sql ? String(item.sql) : ''
+        };
+      })
+    };
+  }
+
+  function upsertCollection(collection) {
+    var existingIndex = -1;
+    state.collections.forEach(function (item, index) {
+      if (item && item.name === collection.name) existingIndex = index;
+    });
+    if (existingIndex > -1) {
+      state.collections.splice(existingIndex, 1, collection);
+    } else {
+      state.collections.push(collection);
+    }
+    state.collections.sort(function (left, right) {
+      return String(left.name || '').localeCompare(String(right.name || ''));
+    });
+  }
+
+  function saveCollectionToServer(collection, originalName) {
+    return requestJson(endpoint('collections.save'), 'POST', {
+      collection: JSON.stringify(collectionPayloadFromState(collection)),
+      original_name: originalName || ''
+    }).then(function (payload) {
+      if (!payload || !payload.ok) throw new Error((payload && payload.error) || 'Unable to save SQL collection');
+      upsertCollection(payload.collection);
+      state.active_collection_name = payload.collection.name || '';
+      return payload.collection;
+    });
+  }
+
+  function driverShortName(driver) {
+    return String(driver || '').replace(/^DBD::/, '');
+  }
+
+  function updateDsnDriverPrefix() {
+    var driver = byId('sql-profile-driver').value.trim();
+    if (!driver) return;
+    var shortName = driverShortName(driver);
+    var guidance = driverGuidance(driver);
+    var dsnField = byId('sql-profile-dsn');
+    var dsn = dsnField.value.trim();
+    if (!dsn || dsn === ('dbi:' + shortName + ':')) {
+      dsnField.value = guidance.template;
+      return;
+    }
+    if (/^dbi:[^:]+:/i.test(dsn)) {
+      dsnField.value = dsn.replace(/^dbi:[^:]+:/i, 'dbi:' + shortName + ':');
+      return;
+    }
+    dsnField.value = 'dbi:' + shortName + ':' + dsn;
+  }
+
+  function applyRoute(route, options) {
+    options = options || {};
+    if (route.tab) {
+      state.main_tab = route.tab === 'collections' ? 'workspace' : route.tab;
+    }
+    if (route.connection) {
+      var matchedProfile = findProfileByConnection(route.connection);
+      if (matchedProfile) {
+        state.active_profile_name = matchedProfile.name || '';
+        state.profile_draft = null;
+        loadProfileIntoForm(matchedProfile);
+      } else {
+        state.active_profile_name = '';
+        state.profile_draft = parseConnectionId(route.connection);
+        if (state.profile_draft) {
+          loadProfileIntoForm(state.profile_draft);
+        }
+      }
+    } else if (!state.active_profile_name && !state.profile_draft && state.profiles.length) {
+      state.active_profile_name = state.profiles[0].name || '';
+      loadProfileIntoForm(state.profiles[0]);
+    }
+    if (route.collection && findCollection(route.collection)) {
+      state.active_collection_name = route.collection;
+    }
+    if (route.item) {
+      state.active_collection_item_id = route.item;
+      state.collection_item_draft = 0;
+    }
+    if (route.sql) {
+      state.sql = route.sql;
+    }
+    if (route.table) {
+      state.schema.active_table = route.table;
+    }
+    render(options);
+  }
+
+  function render(options) {
+    options = options || {};
+    var activeProfile = currentProfile();
+    if (!state.active_collection_name && state.collections.length) {
+      state.active_collection_name = state.collections[0].name || '';
+    }
+    var activeCollection = currentCollection();
+    var activeCollectionItem = currentCollectionItem();
+    if (activeCollection && activeCollection.items && activeCollection.items.length && !activeCollectionItem && state.active_collection_item_id) {
+      state.active_collection_item_id = '';
+    }
+    if (activeCollection && activeCollection.items && activeCollection.items.length && !activeCollectionItem && !state.active_collection_item_id && !state.collection_item_draft) {
+      state.active_collection_item_id = activeCollection.items[0].id || '';
+      activeCollectionItem = currentCollectionItem();
+    }
+    byId('sql-editor').value = state.sql || byId('sql-editor').value || '';
+    autoResizeSqlEditor();
+    byId('sql-active-profile').textContent = activeProfile ? ('Active Connection: ' + (activeProfile.name || activeProfile.connection_id || currentFormConnectionId())) : 'No active profile selected';
+    byId('sql-active-collection').textContent = activeCollection ? ('Collection: ' + activeCollection.name) : (state.collection_name_draft && state.collection_name_draft.trim() ? ('Collection: ' + state.collection_name_draft.trim()) : 'No active collection');
+    byId('sql-active-sql-name').textContent = activeCollectionItem ? ('Saved SQL: ' + activeCollectionItem.name) : (state.collection_item_name_draft && state.collection_item_name_draft.trim() ? ('Unsaved SQL: ' + state.collection_item_name_draft.trim()) : 'Unsaved SQL');
+    byId('sql-schema-profile').textContent = activeProfile ? ('Schema Explorer: ' + (activeProfile.name || activeProfile.connection_id || currentFormConnectionId())) : 'Schema Explorer';
+    byId('sql-result-info').textContent = state.result_info || 'Select a profile and run SQL.';
+    byId('sql-result-html').innerHTML = state.result_html || '';
+
+    Array.prototype.forEach.call(document.querySelectorAll('.sql-main-tab'), function (tab) {
+      var active = tab.getAttribute('data-sql-main-tab') === state.main_tab;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.sql-panel'), function (panel) {
+      panel.classList.toggle('is-active', panel.id === 'sql-panel-' + state.main_tab);
+    });
+
+    var profileTabs = byId('sql-profile-tabs');
+    profileTabs.innerHTML = '';
+    (state.profiles || []).forEach(function (profile) {
+      var tab = document.createElement('a');
+      tab.href = '#';
+      tab.className = 'sql-subtab' + (profile.name === state.active_profile_name ? ' is-active' : '');
+      tab.textContent = profile.name;
+      tab.setAttribute('data-sql-profile-tab', profile.name);
+      tab.addEventListener('click', function (event) {
+        event.preventDefault();
+        state.active_profile_name = profile.name;
+        state.profile_draft = null;
+        loadProfileIntoForm(profile);
+        render({ replaceRoute: false });
+      });
+      profileTabs.appendChild(tab);
+    });
+    byId('sql-profile-tabs-empty').style.display = (state.profiles || []).length ? 'none' : 'block';
+    if (activeProfile) {
+      loadProfileIntoForm(activeProfile);
+    }
+
+    var collectionTabs = byId('sql-collection-tabs');
+    collectionTabs.innerHTML = '';
+    (state.collections || []).forEach(function (collection) {
+      var tab = document.createElement('a');
+      tab.href = '#';
+      tab.className = 'sql-subtab' + (collection.name === state.active_collection_name ? ' is-active' : '');
+      tab.textContent = collection.name;
+      tab.setAttribute('data-sql-collection-tab', collection.name);
+      tab.addEventListener('click', function (event) {
+        event.preventDefault();
+        state.active_collection_name = collection.name;
+        state.active_collection_item_id = ((collection.items || [])[0] || {}).id || '';
+        state.collection_item_draft = 0;
+        state.collection_item_name_draft = '';
+        loadCollectionIntoForm(collection, currentCollectionItem());
+        state.main_tab = 'workspace';
+        render({ replaceRoute: false });
+      });
+      collectionTabs.appendChild(tab);
+    });
+    byId('sql-collection-tabs-empty').style.display = (state.collections || []).length ? 'none' : 'block';
+    var collectionItemList = byId('sql-collection-item-list');
+    collectionItemList.innerHTML = '';
+    byId('sql-collection-item-list-title').textContent = activeCollection ? ('Saved SQL in ' + activeCollection.name) : 'Saved SQL';
+    (activeCollection && activeCollection.items || []).forEach(function (item) {
+      var row = document.createElement('div');
+      row.className = 'sql-list-row' + (item.id === state.active_collection_item_id ? ' is-active' : '');
+      var link = document.createElement('a');
+      var preview = String(item.sql || '').split(/\r?\n/)[0] || 'Saved SQL';
+      link.href = '#';
+      link.className = 'sql-list-item' + (item.id === state.active_collection_item_id ? ' is-active' : '');
+      link.innerHTML = '<span>' + escapeHtml(item.name) + '</span><small>' + escapeHtml(preview) + '</small>';
+      link.setAttribute('data-sql-collection-item-link', item.id);
+      link.setAttribute('data-sql-collection-item-tab', item.id);
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        state.active_collection_item_id = item.id;
+        state.collection_item_draft = 0;
+        state.sql = item.sql || '';
+        loadCollectionIntoForm(activeCollection, item);
+        state.main_tab = 'workspace';
+        render({ replaceRoute: false });
+      });
+      row.appendChild(link);
+      var remove = document.createElement('a');
+      remove.href = '#';
+      remove.className = 'sql-inline-delete';
+      remove.textContent = '[X]';
+      remove.setAttribute('data-sql-collection-item-delete', item.id);
+      remove.setAttribute('aria-label', 'Delete ' + item.name);
+      remove.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var selectedCollection = currentCollection();
+        if (!selectedCollection) {
+          banner('Select a collection before deleting SQL.', true);
+          return;
+        }
+        var collectionPayload = collectionPayloadFromState(selectedCollection);
+        collectionPayload.items = (collectionPayload.items || []).filter(function (entry) {
+          return entry && entry.id !== item.id;
+        });
+        var nextItem = (collectionPayload.items || [])[0] || null;
+        saveCollectionToServer(collectionPayload, collectionPayload.name).then(function (savedCollection) {
+          state.active_collection_name = savedCollection.name;
+          state.active_collection_item_id = nextItem && nextItem.id ? nextItem.id : '';
+          state.collection_item_draft = state.active_collection_item_id ? 0 : 1;
+          state.collection_name_draft = savedCollection.name || '';
+          state.collection_item_name_draft = nextItem && nextItem.name ? nextItem.name : '';
+          state.sql = nextItem && nextItem.sql ? nextItem.sql : '';
+          loadCollectionIntoForm(savedCollection, nextItem);
+          banner('SQL removed from collection: ' + savedCollection.name, false);
+          render({ replaceRoute: false });
+        }).catch(function (error) {
+          banner('SQL delete failed: ' + error.message, true);
+        });
+      });
+      row.appendChild(remove);
+      collectionItemList.appendChild(row);
+    });
+    byId('sql-collection-item-tabs-empty').style.display = activeCollection && activeCollection.items && activeCollection.items.length ? 'none' : 'block';
+    loadCollectionIntoForm(activeCollection || {}, activeCollectionItem);
+
+    var tableTabs = byId('sql-table-tabs');
+    tableTabs.innerHTML = '';
+    (state.schema.tables || []).forEach(function (row) {
+      var tableName = row.TABLE_NAME || row.table_name || '';
+      if (!tableName) return;
+      var tab = document.createElement('a');
+      tab.href = '#';
+      tab.className = 'sql-subtab' + (tableName === state.schema.active_table ? ' is-active' : '');
+      tab.textContent = tableName;
+      tab.setAttribute('data-sql-table-tab', tableName);
+      tab.addEventListener('click', function (event) {
+        event.preventDefault();
+        state.schema.active_table = tableName;
+        state.main_tab = 'schema';
+        render({ replaceRoute: false });
+        refreshSchema(tableName);
+      });
+      tableTabs.appendChild(tab);
+    });
+    byId('sql-table-tabs-empty').style.display = (state.schema.tables || []).length ? 'none' : 'block';
+    renderColumns();
+    syncRoute(!!options.replaceRoute);
+  }
+
+  function renderColumns() {
+    var activeTable = state.schema.active_table;
+    var columns = (state.schema.columns || []).filter(function (row) {
+      return !activeTable || (row.TABLE_NAME || activeTable) === activeTable;
+    });
+    if (!columns.length) {
+      byId('sql-column-list').className = 'sql-empty';
+      byId('sql-column-list').innerHTML = activeTable ? ('No column metadata returned for ' + escapeHtml(activeTable) + '.') : 'Select a table tab to view columns.';
+      return;
+    }
+    var html = '<table><thead><tr><th>Column</th><th>Type</th><th>Length</th></tr></thead><tbody>';
+    columns.forEach(function (row) {
+      html += '<tr><td><pre>' + escapeHtml(row.COLUMN_NAME || '') + '</pre></td><td><pre>' + escapeHtml(row.DATA_TYPE || '') + '</pre></td><td><pre>' + escapeHtml(row.DATA_LENGTH || '') + '</pre></td></tr>';
+    });
+    html += '</tbody></table>';
+    byId('sql-column-list').className = '';
+    byId('sql-column-list').innerHTML = html;
+  }
+
+  function requestJson(url, method, body) {
+    method = method || 'GET';
+    var options = { method: method, headers: {} };
+    if (body) {
+      var form = new window.URLSearchParams();
+      Object.keys(body).forEach(function (key) {
+        form.append(key, body[key]);
+      });
+      options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+      options.body = form.toString();
+    }
+    return window.fetch(url, options).then(function (response) {
+      return response.text().then(function (text) {
+        var payload;
+        try {
+          payload = text ? JSON.parse(text) : {};
+        } catch (error) {
+          throw new Error(text || ('Invalid JSON response from ' + url));
+        }
+        if (!response.ok) {
+          throw new Error((payload && payload.error) || text || ('HTTP ' + response.status));
+        }
+        return payload;
+      });
+    });
+  }
+
+  function executeSql() {
+    var profile = profilePayloadFromForm();
+    profile.sql = byId('sql-editor').value;
+    state.sql = profile.sql;
+    return requestJson(endpoint('sql.execute'), 'POST', {
+      settings: JSON.stringify(profile)
+    }).then(function (payload) {
+      if (!payload.ok) throw new Error(payload.error || 'Unable to run SQL');
+      state.result_html = payload.html || '';
+      state.result_info = JSON.stringify(payload.details || {}, null, 2);
+      state.main_tab = 'workspace';
+      banner('SQL executed successfully.', false);
+      render({ replaceRoute: false });
+      return payload;
+    }).catch(function (error) {
+      state.result_html = '';
+      state.result_info = 'Execution failed.\n\n' + error.message;
+      state.main_tab = 'workspace';
+      banner('SQL execution failed: ' + error.message, true);
+      render({ replaceRoute: false });
+      throw error;
+    });
+  }
+
+  function maybeAutoRunSharedRoute(route) {
+    if (!route || !route.connection || !route.sql) return;
+    var payload = profilePayloadFromForm();
+    if (profileNeedsLocalPassword(payload)) {
+      banner('Shared SQL loaded. Add any required local credentials for this connection profile before running it here.', false);
+      render({ replaceRoute: true });
+      return;
+    }
+    executeSql().catch(function () {});
+  }
+
+  function refreshSchema(targetTable) {
+    var profile = profilePayloadFromForm();
+    if (targetTable) {
+      state.schema.active_table = targetTable;
+    }
+    profile.table_name = targetTable || state.schema.active_table || '';
+    requestJson(endpoint('schema.browse'), 'POST', {
+      settings: JSON.stringify(profile)
+    }).then(function (payload) {
+      if (!payload.ok) throw new Error(payload.error || 'Unable to load schema');
+      state.schema.tables = payload.tables || [];
+      state.schema.columns = payload.columns || [];
+      if (payload.selected_table) {
+        state.schema.active_table = payload.selected_table;
+      }
+      if (!state.schema.active_table && state.schema.tables.length) {
+        state.schema.active_table = state.schema.tables[0].TABLE_NAME || '';
+      }
+      state.main_tab = 'schema';
+      banner('Schema refreshed.', false);
+      render();
+    }).catch(function (error) {
+      banner('Schema refresh failed: ' + error.message, true);
+    });
+  }
+
+  function bootstrapProfiles() {
+    return requestJson(endpoint('profiles.bootstrap'), 'GET').then(function (payload) {
+      if (!payload || !payload.ok) {
+        banner((payload && payload.error) || 'Unable to load SQL connection profiles.', true);
+        return;
+      }
+      state.profiles = payload.profiles || [];
+      state.collections = payload.collections || [];
+      state.drivers = payload.drivers || [];
+      if (!state.active_profile_name && state.profiles.length) {
+        state.active_profile_name = state.profiles[0].name || '';
+      }
+      if (!state.active_collection_name && state.collections.length) {
+        state.active_collection_name = state.collections[0].name || '';
+        state.active_collection_item_id = (((state.collections[0] || {}).items || [])[0] || {}).id || '';
+      }
+      renderDriverOptions((state.profile_draft && state.profile_draft.driver) || '');
+      applyRoute(readRoute(), { replaceRoute: true });
+      banner(payload.errors && payload.errors.length ? payload.errors.join(' ') : '', (payload.errors || []).length > 0);
+      maybeAutoRunSharedRoute(readRoute());
+    }).catch(function (error) {
+      banner('Unable to load SQL connection profiles: ' + error.message, true);
+    });
+  }
+
+  byId('sql-profile-new').addEventListener('click', function (event) {
+    event.preventDefault();
+    state.active_profile_name = '';
+    state.profile_draft = {
+      attrs_json: '{"RaiseError":1,"PrintError":0,"AutoCommit":1}',
+      save_password: 0
+    };
+    loadProfileIntoForm(state.profile_draft);
+    state.main_tab = 'profiles';
+    render({ replaceRoute: false });
+  });
+
+  byId('sql-profile-save').addEventListener('click', function (event) {
+    event.preventDefault();
+    var profile = profilePayloadFromForm();
+    var originalName = state.active_profile_name || '';
+    requestJson(endpoint('profiles.save'), 'POST', {
+      profile: JSON.stringify(profile),
+      original_name: originalName
+    }).then(function (payload) {
+      if (!payload.ok) throw new Error(payload.error || 'Unable to save profile');
+      state.profiles = (state.profiles || []).filter(function (item) {
+        return item && item.name !== originalName;
+      });
+      state.profiles.push(payload.profile);
+      state.profiles.sort(function (left, right) {
+        return String(left.name || '').localeCompare(String(right.name || ''));
+      });
+      state.active_profile_name = payload.profile.name;
+      state.profile_draft = null;
+      banner('Profile saved: ' + payload.profile.name, false);
+      render({ replaceRoute: false });
+    }).catch(function (error) {
+      banner('Profile save failed: ' + error.message, true);
+    });
+  });
+
+  byId('sql-profile-delete').addEventListener('click', function (event) {
+    event.preventDefault();
+    if (!state.active_profile_name) {
+      banner('Select a profile to delete.', true);
+      return;
+    }
+    requestJson(endpoint('profiles.delete'), 'POST', {
+      name: state.active_profile_name
+    }).then(function (payload) {
+      if (!payload.ok) throw new Error(payload.error || 'Unable to delete profile');
+      state.profiles = (state.profiles || []).filter(function (profile) {
+        return profile && profile.name !== state.active_profile_name;
+      });
+      state.active_profile_name = '';
+      state.profile_draft = null;
+      banner('Profile deleted: ' + payload.removed, false);
+      render({ replaceRoute: false });
+    }).catch(function (error) {
+      banner('Profile delete failed: ' + error.message, true);
+    });
+  });
+
+  byId('sql-collection-new').addEventListener('click', function (event) {
+    event.preventDefault();
+    state.active_collection_name = '';
+    state.active_collection_item_id = '';
+    state.collection_item_draft = 1;
+    state.collection_name_draft = '';
+    state.collection_item_name_draft = '';
+    loadCollectionIntoForm({}, null);
+    state.main_tab = 'workspace';
+    render({ replaceRoute: false });
+  });
+
+  byId('sql-collection-save').addEventListener('click', function (event) {
+    event.preventDefault();
+    var originalName = state.active_collection_name || '';
+    var collection = currentCollection() || { items: [] };
+    collection = collectionPayloadFromState(collection);
+    collection.name = byId('sql-collection-name').value.trim();
+    if (!collection.name) {
+      banner('Collection name is required.', true);
+      return;
+    }
+    state.collection_name_draft = collection.name;
+    saveCollectionToServer(collection, originalName).then(function (savedCollection) {
+      if (originalName && originalName !== savedCollection.name) {
+        state.collections = state.collections.filter(function (item) {
+          return item && item.name !== originalName;
+        });
+        upsertCollection(savedCollection);
+      }
+      if (!state.active_collection_item_id && savedCollection.items && savedCollection.items.length && !state.collection_item_draft) {
+        state.active_collection_item_id = savedCollection.items[0].id || '';
+      }
+      state.collection_name_draft = savedCollection.name || '';
+      state.main_tab = 'workspace';
+      banner('Collection saved: ' + savedCollection.name, false);
+      render({ replaceRoute: false });
+    }).catch(function (error) {
+      banner('Collection save failed: ' + error.message, true);
+    });
+  });
+
+  byId('sql-collection-delete').addEventListener('click', function (event) {
+    event.preventDefault();
+    var name = state.active_collection_name || byId('sql-collection-name').value.trim();
+    if (!name) {
+      banner('Select a collection to delete.', true);
+      return;
+    }
+    requestJson(endpoint('collections.delete'), 'POST', {
+      name: name
+    }).then(function (payload) {
+      if (!payload || !payload.ok) throw new Error((payload && payload.error) || 'Unable to delete SQL collection');
+      state.collections = (state.collections || []).filter(function (collection) {
+        return collection && collection.name !== name;
+      });
+      state.active_collection_name = state.collections.length ? state.collections[0].name : '';
+      state.active_collection_item_id = (((state.collections[0] || {}).items || [])[0] || {}).id || '';
+      state.collection_item_draft = 0;
+      state.collection_name_draft = state.active_collection_name || '';
+      state.collection_item_name_draft = '';
+      loadCollectionIntoForm(currentCollection() || {}, currentCollectionItem());
+      banner('Collection deleted: ' + payload.removed, false);
+      render({ replaceRoute: false });
+    }).catch(function (error) {
+      banner('Collection delete failed: ' + error.message, true);
+    });
+  });
+
+  byId('sql-collection-item-new').addEventListener('click', function (event) {
+    event.preventDefault();
+    state.active_collection_item_id = '';
+    state.collection_item_draft = 1;
+    state.collection_item_name_draft = '';
+    byId('sql-collection-item-name').value = '';
+    byId('sql-active-sql-name').textContent = 'Unsaved SQL';
+    state.main_tab = 'workspace';
+    render({ replaceRoute: false });
+    byId('sql-collection-item-name').focus();
+  });
+
+  byId('sql-collection-item-save').addEventListener('click', function (event) {
+    event.preventDefault();
+    var collectionName = byId('sql-collection-name').value.trim() || state.active_collection_name || '';
+    var itemName = byId('sql-collection-item-name').value.trim();
+    var sql = byId('sql-editor').value;
+    if (!collectionName) {
+      banner('Collection name is required before saving SQL.', true);
+      return;
+    }
+    if (!itemName) {
+      banner('SQL name is required before saving SQL.', true);
+      return;
+    }
+    if (!sql.trim()) {
+      banner('SQL text is required before saving SQL.', true);
+      return;
+    }
+    state.collection_name_draft = collectionName;
+    state.collection_item_name_draft = itemName;
+    var collection = currentCollection();
+    if (!collection || collection.name !== collectionName) {
+      collection = { name: collectionName, items: [] };
+    }
+    collection = collectionPayloadFromState(collection);
+    collection.name = collectionName;
+    var requestedItemId = collectionItemIdFromName(itemName);
+    var activeItem = currentCollectionItem();
+    var itemId = requestedItemId;
+    if (!state.collection_item_draft && activeItem && activeItem.name === itemName) {
+      itemId = activeItem.id;
+    }
+    var replaced = false;
+    collection.items = (collection.items || []).map(function (item) {
+      if (item && item.id === itemId) {
+        replaced = true;
+        return { id: itemId, name: itemName, sql: sql };
+      }
+      return item;
+    });
+    if (!replaced) collection.items.push({ id: itemId, name: itemName, sql: sql });
+    collection.items.sort(function (left, right) {
+      return String(left.name || '').localeCompare(String(right.name || ''));
+    });
+    saveCollectionToServer(collection, state.active_collection_name || '').then(function (savedCollection) {
+      state.active_collection_name = savedCollection.name;
+      state.active_collection_item_id = itemId;
+      state.collection_item_draft = 0;
+      state.collection_name_draft = savedCollection.name || '';
+      state.collection_item_name_draft = itemName;
+      state.sql = sql;
+      state.main_tab = 'workspace';
+      banner('SQL saved to collection: ' + savedCollection.name, false);
+      render({ replaceRoute: false });
+    }).catch(function (error) {
+      banner('SQL collection save failed: ' + error.message, true);
+    });
+  });
+
+  byId('sql-run').addEventListener('click', function (event) {
+    event.preventDefault();
+    executeSql().catch(function () {});
+  });
+
+  byId('sql-schema-refresh').addEventListener('click', function (event) {
+    event.preventDefault();
+    refreshSchema();
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.sql-main-tab'), function (tab) {
+    tab.addEventListener('click', function (event) {
+      event.preventDefault();
+      state.main_tab = tab.getAttribute('data-sql-main-tab') || 'profiles';
+      render({ replaceRoute: false });
+      if (state.main_tab === 'schema') {
+        refreshSchema();
+      }
+    });
+  });
+
+  byId('sql-profile-driver').addEventListener('change', function () {
+    updateDsnDriverPrefix();
+    renderProfileGuidance(this.value);
+    syncRoute(true);
+  });
+
+  byId('sql-editor').addEventListener('input', function () {
+    state.sql = byId('sql-editor').value;
+    autoResizeSqlEditor();
+    byId('sql-editor-note').textContent = 'Edit SQL above, then use save to keep it in a collection or run to execute it with the active connection.';
+    syncRoute(true);
+  });
+
+  byId('sql-editor').addEventListener('blur', function () {
+    autoResizeSqlEditor();
+    byId('sql-editor-note').textContent = 'Edit SQL above, then use save to keep it in a collection or run to execute it with the active connection.';
+  });
+
+  byId('sql-collection-name').addEventListener('input', function () {
+    state.collection_name_draft = byId('sql-collection-name').value;
+  });
+
+  byId('sql-collection-item-name').addEventListener('input', function () {
+    state.collection_item_name_draft = byId('sql-collection-item-name').value;
+    if (!state.active_collection_item_id || state.collection_item_draft) {
+      byId('sql-active-sql-name').textContent = state.collection_item_name_draft.trim() ? ('Unsaved SQL: ' + state.collection_item_name_draft.trim()) : 'Unsaved SQL';
+    }
+  });
+
+  byId('sql-profile-dsn').addEventListener('input', function () {
+    syncRoute(true);
+  });
+
+  byId('sql-profile-user').addEventListener('input', function () {
+    syncRoute(true);
+  });
+
+  window.addEventListener('popstate', function (event) {
+    applyRoute((event && event.state) || readRoute(), { replaceRoute: true });
+  });
+
+  loadProfileIntoForm({
+    attrs_json: '{"RaiseError":1,"PrintError":0,"AutoCommit":1}',
+    save_password: 0
+  });
+  renderDriverOptions('');
+  renderProfileGuidance('');
+  bootstrapProfiles();
+}());
+</script>
+:--------------------------------------------------------------------------------:
+CODE1: Ajax jvar => 'configs.profiles.bootstrap', type => 'json', singleton => 'SQL_DASHBOARD_PROFILES_BOOTSTRAP', file => 'sql-dashboard-profiles-bootstrap', code => q{
+use Developer::Dashboard::Folder ();
+use Developer::Dashboard::JSON qw(json_encode json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub sql_dashboard_trim {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+\z//;
+    return $text;
+}
+
+sub sql_dashboard_escape_html {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
+    $text =~ s/"/&quot;/g;
+    return $text;
+}
+
+# sql_dashboard_connection_id($dsn, $user)
+# Purpose: build the shareable sql-dashboard connection id from DSN and user without exposing the password.
+# Input: DSN string and database username string.
+# Output: connection id string in the form "dsn|user".
+sub sql_dashboard_connection_id {
+    my ( $dsn, $user ) = @_;
+    $dsn  = sql_dashboard_trim($dsn);
+    $user = sql_dashboard_trim($user);
+    return '' if $dsn eq '';
+    return $dsn . '|' . $user;
+}
+
+# sql_dashboard_parse_connection_id($connection_id)
+# Purpose: recover DSN, user, and inferred driver details from one shareable sql-dashboard connection id.
+# Input: connection id string in the form "dsn|user".
+# Output: hash reference with connection_id, dsn, user, and driver keys or undef for invalid input.
+sub sql_dashboard_parse_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '' || $connection_id !~ /\A(.+)\|(.*)\z/;
+    my ( $dsn, $user ) = ( $1, $2 );
+    return undef if $dsn eq '';
+    my $driver = '';
+    if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+        $driver = 'DBD::' . $1;
+    }
+    return {
+        connection_id => $connection_id,
+        dsn           => $dsn,
+        user          => $user,
+        driver        => $driver,
+    };
+}
+
+# sql_dashboard_secure_dir($dir)
+# Purpose: ensure the sql-dashboard profile directory exists and is owner-only.
+# Input: absolute directory path for the sql-dashboard profile store.
+# Output: the same directory path after it has been created/tightened to 0700.
+sub sql_dashboard_secure_dir {
+    my ($dir) = @_;
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    return $dir;
+}
+
+# sql_dashboard_secure_file($path)
+# Purpose: tighten one existing sql-dashboard profile file to owner-only mode.
+# Input: absolute file path for a saved sql-dashboard profile json file.
+# Output: the same file path after it has been tightened to 0600.
+sub sql_dashboard_secure_file {
+    my ($path) = @_;
+    return $path if !-e $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+    return $path;
+}
+
+sub sql_dashboard_profile_dir {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'sql-dashboard' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+sub sql_dashboard_profile_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing profile name\n" if $name eq '';
+    die "Invalid profile name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+sub sql_dashboard_profile_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_profile_dir(), sql_dashboard_profile_filename($name) );
+}
+
+# sql_dashboard_collection_dir()
+# Purpose: resolve and secure the sql-dashboard collection directory used for saved SQL collections.
+# Input: none.
+# Output: absolute collection directory path with 0700 permissions enforced.
+sub sql_dashboard_collection_dir {
+    my $dir = File::Spec->catdir( sql_dashboard_profile_dir(), 'collections' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+# sql_dashboard_collection_filename($name)
+# Purpose: turn one sql-dashboard collection name into a safe JSON filename.
+# Input: collection name string.
+# Output: filename string ending in .json.
+sub sql_dashboard_collection_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing collection name\n" if $name eq '';
+    die "Invalid collection name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+# sql_dashboard_collection_path($name)
+# Purpose: resolve one sql-dashboard collection JSON path on disk.
+# Input: collection name string.
+# Output: absolute collection JSON file path.
+sub sql_dashboard_collection_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_collection_dir(), sql_dashboard_collection_filename($name) );
+}
+
+# sql_dashboard_normalize_profile($profile)
+# Purpose: enrich one sql-dashboard profile hash with the portable connection id used in share URLs.
+# Input: profile hash reference.
+# Output: normalized profile hash reference.
+sub sql_dashboard_normalize_profile {
+    my ($profile) = @_;
+    die "Profile must be a hash reference\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    $profile->{password}      = '' if !defined $profile->{password};
+    $profile->{connection_id} = sql_dashboard_connection_id( $profile->{dsn}, $profile->{user} );
+    return $profile;
+}
+
+sub sql_dashboard_decode_profile_payload {
+    my ($json_text) = @_;
+    die "Missing profile payload\n" if !defined $json_text || $json_text eq '';
+    my $profile = json_decode($json_text);
+    die "Profile payload must be a JSON object\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{password}      = defined $profile->{password} ? $profile->{password} : '';
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    die "Missing profile name\n" if $profile->{name} eq '';
+    die "Missing driver module\n" if $profile->{driver} eq '';
+    die "Missing DSN\n" if $profile->{dsn} eq '';
+    if ( $profile->{attrs_json} ne '' ) {
+        my $attrs = json_decode( $profile->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($attrs) ne 'HASH';
+    }
+    if ( !$profile->{save_password} ) {
+        delete $profile->{password};
+    }
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_decode_collection_payload($json_text)
+# Purpose: validate and normalize one sql-dashboard SQL collection payload from the browser.
+# Input: JSON text string containing collection metadata and SQL items.
+# Output: normalized collection hash reference.
+sub sql_dashboard_decode_collection_payload {
+    my ($json_text) = @_;
+    die "Missing collection payload\n" if !defined $json_text || $json_text eq '';
+    my $collection = json_decode($json_text);
+    die "Collection payload must be a JSON object\n" if ref($collection) ne 'HASH';
+    $collection->{name} = sql_dashboard_trim( $collection->{name} );
+    die "Missing collection name\n" if $collection->{name} eq '';
+    die "Collection items must be an array\n" if ref( $collection->{items} ) ne 'ARRAY';
+    my @items;
+    for my $item ( @{ $collection->{items} } ) {
+        die "Collection item must be a JSON object\n" if ref($item) ne 'HASH';
+        my $name = sql_dashboard_trim( $item->{name} );
+        my $id   = sql_dashboard_trim( $item->{id} );
+        my $sql  = defined $item->{sql} ? $item->{sql} : '';
+        die "Missing collection item name\n" if $name eq '';
+        if ( $id eq '' ) {
+            $id = lc($name);
+            $id =~ s/[^a-z0-9]+/-/g;
+            $id =~ s/^-+|-+\z//g;
+            $id = 'sql-item' if $id eq '';
+        }
+        push @items, {
+            id   => $id,
+            name => $name,
+            sql  => $sql,
+        };
+    }
+    @items = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @items;
+    $collection->{items} = \@items;
+    return $collection;
+}
+
+sub sql_dashboard_read_profile {
+    my ($name) = @_;
+    my $path = sql_dashboard_profile_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    my $profile = json_decode($json_text);
+    die "Invalid sql-dashboard profile file $path\n" if ref($profile) ne 'HASH';
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_read_collection($name)
+# Purpose: read one saved sql-dashboard collection JSON file from disk.
+# Input: collection name string.
+# Output: normalized collection hash reference.
+sub sql_dashboard_read_collection {
+    my ($name) = @_;
+    my $path = sql_dashboard_collection_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return sql_dashboard_decode_collection_payload($json_text);
+}
+
+sub sql_dashboard_list_profiles {
+    my @profiles;
+    my @errors;
+    my $dir = sql_dashboard_profile_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            my $profile = json_decode($json_text);
+            die "Profile file $path did not decode to a JSON object\n" if ref($profile) ne 'HASH';
+            push @profiles, sql_dashboard_normalize_profile($profile);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @profiles = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @profiles;
+    return ( \@profiles, \@errors );
+}
+
+# sql_dashboard_list_collections()
+# Purpose: read every saved sql-dashboard collection from disk and surface any parse failures.
+# Input: none.
+# Output: array reference of normalized collections and array reference of read errors.
+sub sql_dashboard_list_collections {
+    my @collections;
+    my @errors;
+    my $dir = sql_dashboard_collection_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            push @collections, sql_dashboard_decode_collection_payload($json_text);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @collections = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @collections;
+    return ( \@collections, \@errors );
+}
+
+# sql_dashboard_list_drivers()
+# Purpose: discover installed DBD::* modules visible to the sql-dashboard bookmark worker.
+# Input: none.
+# Output: array reference of sorted DBD::* module names.
+sub sql_dashboard_list_drivers {
+    my %drivers;
+    for my $inc (@INC) {
+        next if !defined $inc || ref($inc);
+        my $dir = File::Spec->catdir( $inc, 'DBD' );
+        next if !-d $dir;
+        opendir my $dh, $dir or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry !~ /\A([A-Za-z_][A-Za-z0-9_]*)\.pm\z/;
+            $drivers{ 'DBD::' . $1 } = 1;
+        }
+        closedir $dh;
+    }
+    return [ sort keys %drivers ];
+}
+
+# sql_dashboard_find_profile_by_connection_id($connection_id)
+# Purpose: resolve one shareable sql-dashboard connection id back to a saved local profile when it exists.
+# Input: connection id string.
+# Output: normalized profile hash reference or undef.
+sub sql_dashboard_find_profile_by_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '';
+    my ( $profiles, undef ) = sql_dashboard_list_profiles();
+    for my $profile ( @{$profiles} ) {
+        return $profile if ( $profile->{connection_id} || '' ) eq $connection_id;
+    }
+    return undef;
+}
+my $payload;
+eval {
+    my ( $profiles, $errors ) = sql_dashboard_list_profiles();
+    my ( $collections, $collection_errors ) = sql_dashboard_list_collections();
+    my $drivers = sql_dashboard_list_drivers();
+    $payload = {
+        ok          => 1,
+        profiles    => $profiles,
+        collections => $collections,
+        drivers     => $drivers,
+        errors      => [ @{$errors}, @{$collection_errors} ],
+    };
+    1;
+} or do {
+    my $error = $@ || 'Unknown sql-dashboard bootstrap failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+        ok          => 0,
+        error       => $error,
+        profiles    => [],
+        collections => [],
+        drivers     => [],
+        errors      => [],
+    };
+};
+print j $payload;
+
+};
+:--------------------------------------------------------------------------------:
+CODE2: Ajax jvar => 'configs.profiles.save', type => 'json', singleton => 'SQL_DASHBOARD_PROFILES_SAVE', file => 'sql-dashboard-profiles-save', code => q{
+use Developer::Dashboard::Folder ();
+use Developer::Dashboard::JSON qw(json_encode json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub sql_dashboard_trim {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+\z//;
+    return $text;
+}
+
+sub sql_dashboard_escape_html {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
+    $text =~ s/"/&quot;/g;
+    return $text;
+}
+
+# sql_dashboard_connection_id($dsn, $user)
+# Purpose: build the shareable sql-dashboard connection id from DSN and user without exposing the password.
+# Input: DSN string and database username string.
+# Output: connection id string in the form "dsn|user".
+sub sql_dashboard_connection_id {
+    my ( $dsn, $user ) = @_;
+    $dsn  = sql_dashboard_trim($dsn);
+    $user = sql_dashboard_trim($user);
+    return '' if $dsn eq '';
+    return $dsn . '|' . $user;
+}
+
+# sql_dashboard_parse_connection_id($connection_id)
+# Purpose: recover DSN, user, and inferred driver details from one shareable sql-dashboard connection id.
+# Input: connection id string in the form "dsn|user".
+# Output: hash reference with connection_id, dsn, user, and driver keys or undef for invalid input.
+sub sql_dashboard_parse_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '' || $connection_id !~ /\A(.+)\|(.*)\z/;
+    my ( $dsn, $user ) = ( $1, $2 );
+    return undef if $dsn eq '';
+    my $driver = '';
+    if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+        $driver = 'DBD::' . $1;
+    }
+    return {
+        connection_id => $connection_id,
+        dsn           => $dsn,
+        user          => $user,
+        driver        => $driver,
+    };
+}
+
+# sql_dashboard_secure_dir($dir)
+# Purpose: ensure the sql-dashboard profile directory exists and is owner-only.
+# Input: absolute directory path for the sql-dashboard profile store.
+# Output: the same directory path after it has been created/tightened to 0700.
+sub sql_dashboard_secure_dir {
+    my ($dir) = @_;
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    return $dir;
+}
+
+# sql_dashboard_secure_file($path)
+# Purpose: tighten one existing sql-dashboard profile file to owner-only mode.
+# Input: absolute file path for a saved sql-dashboard profile json file.
+# Output: the same file path after it has been tightened to 0600.
+sub sql_dashboard_secure_file {
+    my ($path) = @_;
+    return $path if !-e $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+    return $path;
+}
+
+sub sql_dashboard_profile_dir {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'sql-dashboard' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+sub sql_dashboard_profile_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing profile name\n" if $name eq '';
+    die "Invalid profile name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+sub sql_dashboard_profile_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_profile_dir(), sql_dashboard_profile_filename($name) );
+}
+
+# sql_dashboard_collection_dir()
+# Purpose: resolve and secure the sql-dashboard collection directory used for saved SQL collections.
+# Input: none.
+# Output: absolute collection directory path with 0700 permissions enforced.
+sub sql_dashboard_collection_dir {
+    my $dir = File::Spec->catdir( sql_dashboard_profile_dir(), 'collections' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+# sql_dashboard_collection_filename($name)
+# Purpose: turn one sql-dashboard collection name into a safe JSON filename.
+# Input: collection name string.
+# Output: filename string ending in .json.
+sub sql_dashboard_collection_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing collection name\n" if $name eq '';
+    die "Invalid collection name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+# sql_dashboard_collection_path($name)
+# Purpose: resolve one sql-dashboard collection JSON path on disk.
+# Input: collection name string.
+# Output: absolute collection JSON file path.
+sub sql_dashboard_collection_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_collection_dir(), sql_dashboard_collection_filename($name) );
+}
+
+# sql_dashboard_normalize_profile($profile)
+# Purpose: enrich one sql-dashboard profile hash with the portable connection id used in share URLs.
+# Input: profile hash reference.
+# Output: normalized profile hash reference.
+sub sql_dashboard_normalize_profile {
+    my ($profile) = @_;
+    die "Profile must be a hash reference\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    $profile->{password}      = '' if !defined $profile->{password};
+    $profile->{connection_id} = sql_dashboard_connection_id( $profile->{dsn}, $profile->{user} );
+    return $profile;
+}
+
+sub sql_dashboard_decode_profile_payload {
+    my ($json_text) = @_;
+    die "Missing profile payload\n" if !defined $json_text || $json_text eq '';
+    my $profile = json_decode($json_text);
+    die "Profile payload must be a JSON object\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{password}      = defined $profile->{password} ? $profile->{password} : '';
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    die "Missing profile name\n" if $profile->{name} eq '';
+    die "Missing driver module\n" if $profile->{driver} eq '';
+    die "Missing DSN\n" if $profile->{dsn} eq '';
+    if ( $profile->{attrs_json} ne '' ) {
+        my $attrs = json_decode( $profile->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($attrs) ne 'HASH';
+    }
+    if ( !$profile->{save_password} ) {
+        delete $profile->{password};
+    }
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_decode_collection_payload($json_text)
+# Purpose: validate and normalize one sql-dashboard SQL collection payload from the browser.
+# Input: JSON text string containing collection metadata and SQL items.
+# Output: normalized collection hash reference.
+sub sql_dashboard_decode_collection_payload {
+    my ($json_text) = @_;
+    die "Missing collection payload\n" if !defined $json_text || $json_text eq '';
+    my $collection = json_decode($json_text);
+    die "Collection payload must be a JSON object\n" if ref($collection) ne 'HASH';
+    $collection->{name} = sql_dashboard_trim( $collection->{name} );
+    die "Missing collection name\n" if $collection->{name} eq '';
+    die "Collection items must be an array\n" if ref( $collection->{items} ) ne 'ARRAY';
+    my @items;
+    for my $item ( @{ $collection->{items} } ) {
+        die "Collection item must be a JSON object\n" if ref($item) ne 'HASH';
+        my $name = sql_dashboard_trim( $item->{name} );
+        my $id   = sql_dashboard_trim( $item->{id} );
+        my $sql  = defined $item->{sql} ? $item->{sql} : '';
+        die "Missing collection item name\n" if $name eq '';
+        if ( $id eq '' ) {
+            $id = lc($name);
+            $id =~ s/[^a-z0-9]+/-/g;
+            $id =~ s/^-+|-+\z//g;
+            $id = 'sql-item' if $id eq '';
+        }
+        push @items, {
+            id   => $id,
+            name => $name,
+            sql  => $sql,
+        };
+    }
+    @items = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @items;
+    $collection->{items} = \@items;
+    return $collection;
+}
+
+sub sql_dashboard_read_profile {
+    my ($name) = @_;
+    my $path = sql_dashboard_profile_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    my $profile = json_decode($json_text);
+    die "Invalid sql-dashboard profile file $path\n" if ref($profile) ne 'HASH';
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_read_collection($name)
+# Purpose: read one saved sql-dashboard collection JSON file from disk.
+# Input: collection name string.
+# Output: normalized collection hash reference.
+sub sql_dashboard_read_collection {
+    my ($name) = @_;
+    my $path = sql_dashboard_collection_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return sql_dashboard_decode_collection_payload($json_text);
+}
+
+sub sql_dashboard_list_profiles {
+    my @profiles;
+    my @errors;
+    my $dir = sql_dashboard_profile_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            my $profile = json_decode($json_text);
+            die "Profile file $path did not decode to a JSON object\n" if ref($profile) ne 'HASH';
+            push @profiles, sql_dashboard_normalize_profile($profile);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @profiles = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @profiles;
+    return ( \@profiles, \@errors );
+}
+
+# sql_dashboard_list_collections()
+# Purpose: read every saved sql-dashboard collection from disk and surface any parse failures.
+# Input: none.
+# Output: array reference of normalized collections and array reference of read errors.
+sub sql_dashboard_list_collections {
+    my @collections;
+    my @errors;
+    my $dir = sql_dashboard_collection_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            push @collections, sql_dashboard_decode_collection_payload($json_text);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @collections = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @collections;
+    return ( \@collections, \@errors );
+}
+
+# sql_dashboard_list_drivers()
+# Purpose: discover installed DBD::* modules visible to the sql-dashboard bookmark worker.
+# Input: none.
+# Output: array reference of sorted DBD::* module names.
+sub sql_dashboard_list_drivers {
+    my %drivers;
+    for my $inc (@INC) {
+        next if !defined $inc || ref($inc);
+        my $dir = File::Spec->catdir( $inc, 'DBD' );
+        next if !-d $dir;
+        opendir my $dh, $dir or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry !~ /\A([A-Za-z_][A-Za-z0-9_]*)\.pm\z/;
+            $drivers{ 'DBD::' . $1 } = 1;
+        }
+        closedir $dh;
+    }
+    return [ sort keys %drivers ];
+}
+
+# sql_dashboard_find_profile_by_connection_id($connection_id)
+# Purpose: resolve one shareable sql-dashboard connection id back to a saved local profile when it exists.
+# Input: connection id string.
+# Output: normalized profile hash reference or undef.
+sub sql_dashboard_find_profile_by_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '';
+    my ( $profiles, undef ) = sql_dashboard_list_profiles();
+    for my $profile ( @{$profiles} ) {
+        return $profile if ( $profile->{connection_id} || '' ) eq $connection_id;
+    }
+    return undef;
+}
+my $payload;
+eval {
+    my $profile = sql_dashboard_decode_profile_payload( params->{profile} );
+    my $original_name = sql_dashboard_trim( params->{original_name} );
+    my $path = sql_dashboard_profile_path( $profile->{name} );
+    if ( $original_name ne '' && $original_name ne $profile->{name} ) {
+        my $original_path = sql_dashboard_profile_path($original_name);
+        unlink $original_path if -f $original_path;
+    }
+    open my $fh, '>', $path or die "Unable to write $path: $!";
+    print {$fh} json_encode($profile);
+    close $fh or die "Unable to close $path: $!";
+    sql_dashboard_secure_file($path);
+    $payload = {
+        ok      => 1,
+        profile => $profile,
+    };
+    1;
+} or do {
+    my $error = $@ || 'Unknown sql-dashboard profile save failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+        ok    => 0,
+        error => $error,
+    };
+};
+print j $payload;
+
+};
+:--------------------------------------------------------------------------------:
+CODE3: Ajax jvar => 'configs.profiles.delete', type => 'json', singleton => 'SQL_DASHBOARD_PROFILES_DELETE', file => 'sql-dashboard-profiles-delete', code => q{
+use Developer::Dashboard::Folder ();
+use Developer::Dashboard::JSON qw(json_encode json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub sql_dashboard_trim {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+\z//;
+    return $text;
+}
+
+sub sql_dashboard_escape_html {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
+    $text =~ s/"/&quot;/g;
+    return $text;
+}
+
+# sql_dashboard_connection_id($dsn, $user)
+# Purpose: build the shareable sql-dashboard connection id from DSN and user without exposing the password.
+# Input: DSN string and database username string.
+# Output: connection id string in the form "dsn|user".
+sub sql_dashboard_connection_id {
+    my ( $dsn, $user ) = @_;
+    $dsn  = sql_dashboard_trim($dsn);
+    $user = sql_dashboard_trim($user);
+    return '' if $dsn eq '';
+    return $dsn . '|' . $user;
+}
+
+# sql_dashboard_parse_connection_id($connection_id)
+# Purpose: recover DSN, user, and inferred driver details from one shareable sql-dashboard connection id.
+# Input: connection id string in the form "dsn|user".
+# Output: hash reference with connection_id, dsn, user, and driver keys or undef for invalid input.
+sub sql_dashboard_parse_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '' || $connection_id !~ /\A(.+)\|(.*)\z/;
+    my ( $dsn, $user ) = ( $1, $2 );
+    return undef if $dsn eq '';
+    my $driver = '';
+    if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+        $driver = 'DBD::' . $1;
+    }
+    return {
+        connection_id => $connection_id,
+        dsn           => $dsn,
+        user          => $user,
+        driver        => $driver,
+    };
+}
+
+# sql_dashboard_secure_dir($dir)
+# Purpose: ensure the sql-dashboard profile directory exists and is owner-only.
+# Input: absolute directory path for the sql-dashboard profile store.
+# Output: the same directory path after it has been created/tightened to 0700.
+sub sql_dashboard_secure_dir {
+    my ($dir) = @_;
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    return $dir;
+}
+
+# sql_dashboard_secure_file($path)
+# Purpose: tighten one existing sql-dashboard profile file to owner-only mode.
+# Input: absolute file path for a saved sql-dashboard profile json file.
+# Output: the same file path after it has been tightened to 0600.
+sub sql_dashboard_secure_file {
+    my ($path) = @_;
+    return $path if !-e $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+    return $path;
+}
+
+sub sql_dashboard_profile_dir {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'sql-dashboard' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+sub sql_dashboard_profile_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing profile name\n" if $name eq '';
+    die "Invalid profile name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+sub sql_dashboard_profile_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_profile_dir(), sql_dashboard_profile_filename($name) );
+}
+
+# sql_dashboard_collection_dir()
+# Purpose: resolve and secure the sql-dashboard collection directory used for saved SQL collections.
+# Input: none.
+# Output: absolute collection directory path with 0700 permissions enforced.
+sub sql_dashboard_collection_dir {
+    my $dir = File::Spec->catdir( sql_dashboard_profile_dir(), 'collections' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+# sql_dashboard_collection_filename($name)
+# Purpose: turn one sql-dashboard collection name into a safe JSON filename.
+# Input: collection name string.
+# Output: filename string ending in .json.
+sub sql_dashboard_collection_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing collection name\n" if $name eq '';
+    die "Invalid collection name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+# sql_dashboard_collection_path($name)
+# Purpose: resolve one sql-dashboard collection JSON path on disk.
+# Input: collection name string.
+# Output: absolute collection JSON file path.
+sub sql_dashboard_collection_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_collection_dir(), sql_dashboard_collection_filename($name) );
+}
+
+# sql_dashboard_normalize_profile($profile)
+# Purpose: enrich one sql-dashboard profile hash with the portable connection id used in share URLs.
+# Input: profile hash reference.
+# Output: normalized profile hash reference.
+sub sql_dashboard_normalize_profile {
+    my ($profile) = @_;
+    die "Profile must be a hash reference\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    $profile->{password}      = '' if !defined $profile->{password};
+    $profile->{connection_id} = sql_dashboard_connection_id( $profile->{dsn}, $profile->{user} );
+    return $profile;
+}
+
+sub sql_dashboard_decode_profile_payload {
+    my ($json_text) = @_;
+    die "Missing profile payload\n" if !defined $json_text || $json_text eq '';
+    my $profile = json_decode($json_text);
+    die "Profile payload must be a JSON object\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{password}      = defined $profile->{password} ? $profile->{password} : '';
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    die "Missing profile name\n" if $profile->{name} eq '';
+    die "Missing driver module\n" if $profile->{driver} eq '';
+    die "Missing DSN\n" if $profile->{dsn} eq '';
+    if ( $profile->{attrs_json} ne '' ) {
+        my $attrs = json_decode( $profile->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($attrs) ne 'HASH';
+    }
+    if ( !$profile->{save_password} ) {
+        delete $profile->{password};
+    }
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_decode_collection_payload($json_text)
+# Purpose: validate and normalize one sql-dashboard SQL collection payload from the browser.
+# Input: JSON text string containing collection metadata and SQL items.
+# Output: normalized collection hash reference.
+sub sql_dashboard_decode_collection_payload {
+    my ($json_text) = @_;
+    die "Missing collection payload\n" if !defined $json_text || $json_text eq '';
+    my $collection = json_decode($json_text);
+    die "Collection payload must be a JSON object\n" if ref($collection) ne 'HASH';
+    $collection->{name} = sql_dashboard_trim( $collection->{name} );
+    die "Missing collection name\n" if $collection->{name} eq '';
+    die "Collection items must be an array\n" if ref( $collection->{items} ) ne 'ARRAY';
+    my @items;
+    for my $item ( @{ $collection->{items} } ) {
+        die "Collection item must be a JSON object\n" if ref($item) ne 'HASH';
+        my $name = sql_dashboard_trim( $item->{name} );
+        my $id   = sql_dashboard_trim( $item->{id} );
+        my $sql  = defined $item->{sql} ? $item->{sql} : '';
+        die "Missing collection item name\n" if $name eq '';
+        if ( $id eq '' ) {
+            $id = lc($name);
+            $id =~ s/[^a-z0-9]+/-/g;
+            $id =~ s/^-+|-+\z//g;
+            $id = 'sql-item' if $id eq '';
+        }
+        push @items, {
+            id   => $id,
+            name => $name,
+            sql  => $sql,
+        };
+    }
+    @items = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @items;
+    $collection->{items} = \@items;
+    return $collection;
+}
+
+sub sql_dashboard_read_profile {
+    my ($name) = @_;
+    my $path = sql_dashboard_profile_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    my $profile = json_decode($json_text);
+    die "Invalid sql-dashboard profile file $path\n" if ref($profile) ne 'HASH';
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_read_collection($name)
+# Purpose: read one saved sql-dashboard collection JSON file from disk.
+# Input: collection name string.
+# Output: normalized collection hash reference.
+sub sql_dashboard_read_collection {
+    my ($name) = @_;
+    my $path = sql_dashboard_collection_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return sql_dashboard_decode_collection_payload($json_text);
+}
+
+sub sql_dashboard_list_profiles {
+    my @profiles;
+    my @errors;
+    my $dir = sql_dashboard_profile_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            my $profile = json_decode($json_text);
+            die "Profile file $path did not decode to a JSON object\n" if ref($profile) ne 'HASH';
+            push @profiles, sql_dashboard_normalize_profile($profile);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @profiles = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @profiles;
+    return ( \@profiles, \@errors );
+}
+
+# sql_dashboard_list_collections()
+# Purpose: read every saved sql-dashboard collection from disk and surface any parse failures.
+# Input: none.
+# Output: array reference of normalized collections and array reference of read errors.
+sub sql_dashboard_list_collections {
+    my @collections;
+    my @errors;
+    my $dir = sql_dashboard_collection_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            push @collections, sql_dashboard_decode_collection_payload($json_text);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @collections = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @collections;
+    return ( \@collections, \@errors );
+}
+
+# sql_dashboard_list_drivers()
+# Purpose: discover installed DBD::* modules visible to the sql-dashboard bookmark worker.
+# Input: none.
+# Output: array reference of sorted DBD::* module names.
+sub sql_dashboard_list_drivers {
+    my %drivers;
+    for my $inc (@INC) {
+        next if !defined $inc || ref($inc);
+        my $dir = File::Spec->catdir( $inc, 'DBD' );
+        next if !-d $dir;
+        opendir my $dh, $dir or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry !~ /\A([A-Za-z_][A-Za-z0-9_]*)\.pm\z/;
+            $drivers{ 'DBD::' . $1 } = 1;
+        }
+        closedir $dh;
+    }
+    return [ sort keys %drivers ];
+}
+
+# sql_dashboard_find_profile_by_connection_id($connection_id)
+# Purpose: resolve one shareable sql-dashboard connection id back to a saved local profile when it exists.
+# Input: connection id string.
+# Output: normalized profile hash reference or undef.
+sub sql_dashboard_find_profile_by_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '';
+    my ( $profiles, undef ) = sql_dashboard_list_profiles();
+    for my $profile ( @{$profiles} ) {
+        return $profile if ( $profile->{connection_id} || '' ) eq $connection_id;
+    }
+    return undef;
+}
+my $payload;
+eval {
+    my $name = sql_dashboard_trim( params->{name} );
+    die "Missing profile name\n" if $name eq '';
+    my $path = sql_dashboard_profile_path($name);
+    unlink $path or die "Unable to remove $path: $!" if -e $path;
+    $payload = {
+        ok      => 1,
+        removed => $name,
+    };
+    1;
+} or do {
+    my $error = $@ || 'Unknown sql-dashboard profile delete failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+        ok    => 0,
+        error => $error,
+    };
+};
+print j $payload;
+
+};
+:--------------------------------------------------------------------------------:
+CODE4: Ajax jvar => 'configs.collections.save', type => 'json', singleton => 'SQL_DASHBOARD_COLLECTIONS_SAVE', file => 'sql-dashboard-collections-save', code => q{
+use Developer::Dashboard::Folder ();
+use Developer::Dashboard::JSON qw(json_encode json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub sql_dashboard_trim {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+\z//;
+    return $text;
+}
+
+sub sql_dashboard_escape_html {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
+    $text =~ s/"/&quot;/g;
+    return $text;
+}
+
+# sql_dashboard_connection_id($dsn, $user)
+# Purpose: build the shareable sql-dashboard connection id from DSN and user without exposing the password.
+# Input: DSN string and database username string.
+# Output: connection id string in the form "dsn|user".
+sub sql_dashboard_connection_id {
+    my ( $dsn, $user ) = @_;
+    $dsn  = sql_dashboard_trim($dsn);
+    $user = sql_dashboard_trim($user);
+    return '' if $dsn eq '';
+    return $dsn . '|' . $user;
+}
+
+# sql_dashboard_parse_connection_id($connection_id)
+# Purpose: recover DSN, user, and inferred driver details from one shareable sql-dashboard connection id.
+# Input: connection id string in the form "dsn|user".
+# Output: hash reference with connection_id, dsn, user, and driver keys or undef for invalid input.
+sub sql_dashboard_parse_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '' || $connection_id !~ /\A(.+)\|(.*)\z/;
+    my ( $dsn, $user ) = ( $1, $2 );
+    return undef if $dsn eq '';
+    my $driver = '';
+    if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+        $driver = 'DBD::' . $1;
+    }
+    return {
+        connection_id => $connection_id,
+        dsn           => $dsn,
+        user          => $user,
+        driver        => $driver,
+    };
+}
+
+# sql_dashboard_secure_dir($dir)
+# Purpose: ensure the sql-dashboard profile directory exists and is owner-only.
+# Input: absolute directory path for the sql-dashboard profile store.
+# Output: the same directory path after it has been created/tightened to 0700.
+sub sql_dashboard_secure_dir {
+    my ($dir) = @_;
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    return $dir;
+}
+
+# sql_dashboard_secure_file($path)
+# Purpose: tighten one existing sql-dashboard profile file to owner-only mode.
+# Input: absolute file path for a saved sql-dashboard profile json file.
+# Output: the same file path after it has been tightened to 0600.
+sub sql_dashboard_secure_file {
+    my ($path) = @_;
+    return $path if !-e $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+    return $path;
+}
+
+sub sql_dashboard_profile_dir {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'sql-dashboard' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+sub sql_dashboard_profile_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing profile name\n" if $name eq '';
+    die "Invalid profile name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+sub sql_dashboard_profile_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_profile_dir(), sql_dashboard_profile_filename($name) );
+}
+
+# sql_dashboard_collection_dir()
+# Purpose: resolve and secure the sql-dashboard collection directory used for saved SQL collections.
+# Input: none.
+# Output: absolute collection directory path with 0700 permissions enforced.
+sub sql_dashboard_collection_dir {
+    my $dir = File::Spec->catdir( sql_dashboard_profile_dir(), 'collections' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+# sql_dashboard_collection_filename($name)
+# Purpose: turn one sql-dashboard collection name into a safe JSON filename.
+# Input: collection name string.
+# Output: filename string ending in .json.
+sub sql_dashboard_collection_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing collection name\n" if $name eq '';
+    die "Invalid collection name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+# sql_dashboard_collection_path($name)
+# Purpose: resolve one sql-dashboard collection JSON path on disk.
+# Input: collection name string.
+# Output: absolute collection JSON file path.
+sub sql_dashboard_collection_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_collection_dir(), sql_dashboard_collection_filename($name) );
+}
+
+# sql_dashboard_normalize_profile($profile)
+# Purpose: enrich one sql-dashboard profile hash with the portable connection id used in share URLs.
+# Input: profile hash reference.
+# Output: normalized profile hash reference.
+sub sql_dashboard_normalize_profile {
+    my ($profile) = @_;
+    die "Profile must be a hash reference\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    $profile->{password}      = '' if !defined $profile->{password};
+    $profile->{connection_id} = sql_dashboard_connection_id( $profile->{dsn}, $profile->{user} );
+    return $profile;
+}
+
+sub sql_dashboard_decode_profile_payload {
+    my ($json_text) = @_;
+    die "Missing profile payload\n" if !defined $json_text || $json_text eq '';
+    my $profile = json_decode($json_text);
+    die "Profile payload must be a JSON object\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{password}      = defined $profile->{password} ? $profile->{password} : '';
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    die "Missing profile name\n" if $profile->{name} eq '';
+    die "Missing driver module\n" if $profile->{driver} eq '';
+    die "Missing DSN\n" if $profile->{dsn} eq '';
+    if ( $profile->{attrs_json} ne '' ) {
+        my $attrs = json_decode( $profile->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($attrs) ne 'HASH';
+    }
+    if ( !$profile->{save_password} ) {
+        delete $profile->{password};
+    }
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_decode_collection_payload($json_text)
+# Purpose: validate and normalize one sql-dashboard SQL collection payload from the browser.
+# Input: JSON text string containing collection metadata and SQL items.
+# Output: normalized collection hash reference.
+sub sql_dashboard_decode_collection_payload {
+    my ($json_text) = @_;
+    die "Missing collection payload\n" if !defined $json_text || $json_text eq '';
+    my $collection = json_decode($json_text);
+    die "Collection payload must be a JSON object\n" if ref($collection) ne 'HASH';
+    $collection->{name} = sql_dashboard_trim( $collection->{name} );
+    die "Missing collection name\n" if $collection->{name} eq '';
+    die "Collection items must be an array\n" if ref( $collection->{items} ) ne 'ARRAY';
+    my @items;
+    for my $item ( @{ $collection->{items} } ) {
+        die "Collection item must be a JSON object\n" if ref($item) ne 'HASH';
+        my $name = sql_dashboard_trim( $item->{name} );
+        my $id   = sql_dashboard_trim( $item->{id} );
+        my $sql  = defined $item->{sql} ? $item->{sql} : '';
+        die "Missing collection item name\n" if $name eq '';
+        if ( $id eq '' ) {
+            $id = lc($name);
+            $id =~ s/[^a-z0-9]+/-/g;
+            $id =~ s/^-+|-+\z//g;
+            $id = 'sql-item' if $id eq '';
+        }
+        push @items, {
+            id   => $id,
+            name => $name,
+            sql  => $sql,
+        };
+    }
+    @items = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @items;
+    $collection->{items} = \@items;
+    return $collection;
+}
+
+sub sql_dashboard_read_profile {
+    my ($name) = @_;
+    my $path = sql_dashboard_profile_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    my $profile = json_decode($json_text);
+    die "Invalid sql-dashboard profile file $path\n" if ref($profile) ne 'HASH';
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_read_collection($name)
+# Purpose: read one saved sql-dashboard collection JSON file from disk.
+# Input: collection name string.
+# Output: normalized collection hash reference.
+sub sql_dashboard_read_collection {
+    my ($name) = @_;
+    my $path = sql_dashboard_collection_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return sql_dashboard_decode_collection_payload($json_text);
+}
+
+sub sql_dashboard_list_profiles {
+    my @profiles;
+    my @errors;
+    my $dir = sql_dashboard_profile_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            my $profile = json_decode($json_text);
+            die "Profile file $path did not decode to a JSON object\n" if ref($profile) ne 'HASH';
+            push @profiles, sql_dashboard_normalize_profile($profile);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @profiles = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @profiles;
+    return ( \@profiles, \@errors );
+}
+
+# sql_dashboard_list_collections()
+# Purpose: read every saved sql-dashboard collection from disk and surface any parse failures.
+# Input: none.
+# Output: array reference of normalized collections and array reference of read errors.
+sub sql_dashboard_list_collections {
+    my @collections;
+    my @errors;
+    my $dir = sql_dashboard_collection_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            push @collections, sql_dashboard_decode_collection_payload($json_text);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @collections = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @collections;
+    return ( \@collections, \@errors );
+}
+
+# sql_dashboard_list_drivers()
+# Purpose: discover installed DBD::* modules visible to the sql-dashboard bookmark worker.
+# Input: none.
+# Output: array reference of sorted DBD::* module names.
+sub sql_dashboard_list_drivers {
+    my %drivers;
+    for my $inc (@INC) {
+        next if !defined $inc || ref($inc);
+        my $dir = File::Spec->catdir( $inc, 'DBD' );
+        next if !-d $dir;
+        opendir my $dh, $dir or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry !~ /\A([A-Za-z_][A-Za-z0-9_]*)\.pm\z/;
+            $drivers{ 'DBD::' . $1 } = 1;
+        }
+        closedir $dh;
+    }
+    return [ sort keys %drivers ];
+}
+
+# sql_dashboard_find_profile_by_connection_id($connection_id)
+# Purpose: resolve one shareable sql-dashboard connection id back to a saved local profile when it exists.
+# Input: connection id string.
+# Output: normalized profile hash reference or undef.
+sub sql_dashboard_find_profile_by_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '';
+    my ( $profiles, undef ) = sql_dashboard_list_profiles();
+    for my $profile ( @{$profiles} ) {
+        return $profile if ( $profile->{connection_id} || '' ) eq $connection_id;
+    }
+    return undef;
+}
+my $payload;
+eval {
+    my $collection = sql_dashboard_decode_collection_payload( params->{collection} );
+    my $original_name = sql_dashboard_trim( params->{original_name} );
+    my $path = sql_dashboard_collection_path( $collection->{name} );
+    if ( $original_name ne '' && $original_name ne $collection->{name} ) {
+        my $original_path = sql_dashboard_collection_path($original_name);
+        unlink $original_path if -f $original_path;
+    }
+    open my $fh, '>', $path or die "Unable to write $path: $!";
+    print {$fh} json_encode($collection);
+    close $fh or die "Unable to close $path: $!";
+    sql_dashboard_secure_file($path);
+    $payload = {
+        ok         => 1,
+        collection => $collection,
+    };
+    1;
+} or do {
+    my $error = $@ || 'Unknown sql-dashboard collection save failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+        ok    => 0,
+        error => $error,
+    };
+};
+print j $payload;
+
+};
+:--------------------------------------------------------------------------------:
+CODE5: Ajax jvar => 'configs.collections.delete', type => 'json', singleton => 'SQL_DASHBOARD_COLLECTIONS_DELETE', file => 'sql-dashboard-collections-delete', code => q{
+use Developer::Dashboard::Folder ();
+use Developer::Dashboard::JSON qw(json_encode json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub sql_dashboard_trim {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+\z//;
+    return $text;
+}
+
+sub sql_dashboard_escape_html {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
+    $text =~ s/"/&quot;/g;
+    return $text;
+}
+
+# sql_dashboard_connection_id($dsn, $user)
+# Purpose: build the shareable sql-dashboard connection id from DSN and user without exposing the password.
+# Input: DSN string and database username string.
+# Output: connection id string in the form "dsn|user".
+sub sql_dashboard_connection_id {
+    my ( $dsn, $user ) = @_;
+    $dsn  = sql_dashboard_trim($dsn);
+    $user = sql_dashboard_trim($user);
+    return '' if $dsn eq '';
+    return $dsn . '|' . $user;
+}
+
+# sql_dashboard_parse_connection_id($connection_id)
+# Purpose: recover DSN, user, and inferred driver details from one shareable sql-dashboard connection id.
+# Input: connection id string in the form "dsn|user".
+# Output: hash reference with connection_id, dsn, user, and driver keys or undef for invalid input.
+sub sql_dashboard_parse_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '' || $connection_id !~ /\A(.+)\|(.*)\z/;
+    my ( $dsn, $user ) = ( $1, $2 );
+    return undef if $dsn eq '';
+    my $driver = '';
+    if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+        $driver = 'DBD::' . $1;
+    }
+    return {
+        connection_id => $connection_id,
+        dsn           => $dsn,
+        user          => $user,
+        driver        => $driver,
+    };
+}
+
+# sql_dashboard_secure_dir($dir)
+# Purpose: ensure the sql-dashboard profile directory exists and is owner-only.
+# Input: absolute directory path for the sql-dashboard profile store.
+# Output: the same directory path after it has been created/tightened to 0700.
+sub sql_dashboard_secure_dir {
+    my ($dir) = @_;
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    return $dir;
+}
+
+# sql_dashboard_secure_file($path)
+# Purpose: tighten one existing sql-dashboard profile file to owner-only mode.
+# Input: absolute file path for a saved sql-dashboard profile json file.
+# Output: the same file path after it has been tightened to 0600.
+sub sql_dashboard_secure_file {
+    my ($path) = @_;
+    return $path if !-e $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+    return $path;
+}
+
+sub sql_dashboard_profile_dir {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'sql-dashboard' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+sub sql_dashboard_profile_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing profile name\n" if $name eq '';
+    die "Invalid profile name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+sub sql_dashboard_profile_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_profile_dir(), sql_dashboard_profile_filename($name) );
+}
+
+# sql_dashboard_collection_dir()
+# Purpose: resolve and secure the sql-dashboard collection directory used for saved SQL collections.
+# Input: none.
+# Output: absolute collection directory path with 0700 permissions enforced.
+sub sql_dashboard_collection_dir {
+    my $dir = File::Spec->catdir( sql_dashboard_profile_dir(), 'collections' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+# sql_dashboard_collection_filename($name)
+# Purpose: turn one sql-dashboard collection name into a safe JSON filename.
+# Input: collection name string.
+# Output: filename string ending in .json.
+sub sql_dashboard_collection_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing collection name\n" if $name eq '';
+    die "Invalid collection name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+# sql_dashboard_collection_path($name)
+# Purpose: resolve one sql-dashboard collection JSON path on disk.
+# Input: collection name string.
+# Output: absolute collection JSON file path.
+sub sql_dashboard_collection_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_collection_dir(), sql_dashboard_collection_filename($name) );
+}
+
+# sql_dashboard_normalize_profile($profile)
+# Purpose: enrich one sql-dashboard profile hash with the portable connection id used in share URLs.
+# Input: profile hash reference.
+# Output: normalized profile hash reference.
+sub sql_dashboard_normalize_profile {
+    my ($profile) = @_;
+    die "Profile must be a hash reference\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    $profile->{password}      = '' if !defined $profile->{password};
+    $profile->{connection_id} = sql_dashboard_connection_id( $profile->{dsn}, $profile->{user} );
+    return $profile;
+}
+
+sub sql_dashboard_decode_profile_payload {
+    my ($json_text) = @_;
+    die "Missing profile payload\n" if !defined $json_text || $json_text eq '';
+    my $profile = json_decode($json_text);
+    die "Profile payload must be a JSON object\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{password}      = defined $profile->{password} ? $profile->{password} : '';
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    die "Missing profile name\n" if $profile->{name} eq '';
+    die "Missing driver module\n" if $profile->{driver} eq '';
+    die "Missing DSN\n" if $profile->{dsn} eq '';
+    if ( $profile->{attrs_json} ne '' ) {
+        my $attrs = json_decode( $profile->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($attrs) ne 'HASH';
+    }
+    if ( !$profile->{save_password} ) {
+        delete $profile->{password};
+    }
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_decode_collection_payload($json_text)
+# Purpose: validate and normalize one sql-dashboard SQL collection payload from the browser.
+# Input: JSON text string containing collection metadata and SQL items.
+# Output: normalized collection hash reference.
+sub sql_dashboard_decode_collection_payload {
+    my ($json_text) = @_;
+    die "Missing collection payload\n" if !defined $json_text || $json_text eq '';
+    my $collection = json_decode($json_text);
+    die "Collection payload must be a JSON object\n" if ref($collection) ne 'HASH';
+    $collection->{name} = sql_dashboard_trim( $collection->{name} );
+    die "Missing collection name\n" if $collection->{name} eq '';
+    die "Collection items must be an array\n" if ref( $collection->{items} ) ne 'ARRAY';
+    my @items;
+    for my $item ( @{ $collection->{items} } ) {
+        die "Collection item must be a JSON object\n" if ref($item) ne 'HASH';
+        my $name = sql_dashboard_trim( $item->{name} );
+        my $id   = sql_dashboard_trim( $item->{id} );
+        my $sql  = defined $item->{sql} ? $item->{sql} : '';
+        die "Missing collection item name\n" if $name eq '';
+        if ( $id eq '' ) {
+            $id = lc($name);
+            $id =~ s/[^a-z0-9]+/-/g;
+            $id =~ s/^-+|-+\z//g;
+            $id = 'sql-item' if $id eq '';
+        }
+        push @items, {
+            id   => $id,
+            name => $name,
+            sql  => $sql,
+        };
+    }
+    @items = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @items;
+    $collection->{items} = \@items;
+    return $collection;
+}
+
+sub sql_dashboard_read_profile {
+    my ($name) = @_;
+    my $path = sql_dashboard_profile_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    my $profile = json_decode($json_text);
+    die "Invalid sql-dashboard profile file $path\n" if ref($profile) ne 'HASH';
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_read_collection($name)
+# Purpose: read one saved sql-dashboard collection JSON file from disk.
+# Input: collection name string.
+# Output: normalized collection hash reference.
+sub sql_dashboard_read_collection {
+    my ($name) = @_;
+    my $path = sql_dashboard_collection_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return sql_dashboard_decode_collection_payload($json_text);
+}
+
+sub sql_dashboard_list_profiles {
+    my @profiles;
+    my @errors;
+    my $dir = sql_dashboard_profile_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            my $profile = json_decode($json_text);
+            die "Profile file $path did not decode to a JSON object\n" if ref($profile) ne 'HASH';
+            push @profiles, sql_dashboard_normalize_profile($profile);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @profiles = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @profiles;
+    return ( \@profiles, \@errors );
+}
+
+# sql_dashboard_list_collections()
+# Purpose: read every saved sql-dashboard collection from disk and surface any parse failures.
+# Input: none.
+# Output: array reference of normalized collections and array reference of read errors.
+sub sql_dashboard_list_collections {
+    my @collections;
+    my @errors;
+    my $dir = sql_dashboard_collection_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            push @collections, sql_dashboard_decode_collection_payload($json_text);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @collections = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @collections;
+    return ( \@collections, \@errors );
+}
+
+# sql_dashboard_list_drivers()
+# Purpose: discover installed DBD::* modules visible to the sql-dashboard bookmark worker.
+# Input: none.
+# Output: array reference of sorted DBD::* module names.
+sub sql_dashboard_list_drivers {
+    my %drivers;
+    for my $inc (@INC) {
+        next if !defined $inc || ref($inc);
+        my $dir = File::Spec->catdir( $inc, 'DBD' );
+        next if !-d $dir;
+        opendir my $dh, $dir or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry !~ /\A([A-Za-z_][A-Za-z0-9_]*)\.pm\z/;
+            $drivers{ 'DBD::' . $1 } = 1;
+        }
+        closedir $dh;
+    }
+    return [ sort keys %drivers ];
+}
+
+# sql_dashboard_find_profile_by_connection_id($connection_id)
+# Purpose: resolve one shareable sql-dashboard connection id back to a saved local profile when it exists.
+# Input: connection id string.
+# Output: normalized profile hash reference or undef.
+sub sql_dashboard_find_profile_by_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '';
+    my ( $profiles, undef ) = sql_dashboard_list_profiles();
+    for my $profile ( @{$profiles} ) {
+        return $profile if ( $profile->{connection_id} || '' ) eq $connection_id;
+    }
+    return undef;
+}
+my $payload;
+eval {
+    my $name = sql_dashboard_trim( params->{name} );
+    die "Missing collection name\n" if $name eq '';
+    my $path = sql_dashboard_collection_path($name);
+    unlink $path or die "Unable to remove $path: $!" if -e $path;
+    $payload = {
+        ok      => 1,
+        removed => $name,
+    };
+    1;
+} or do {
+    my $error = $@ || 'Unknown sql-dashboard collection delete failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+        ok    => 0,
+        error => $error,
+    };
+};
+print j $payload;
+
+};
+:--------------------------------------------------------------------------------:
+CODE6: Ajax jvar => 'configs.sql.execute', type => 'json', singleton => 'SQL_DASHBOARD_EXECUTE', file => 'sql-dashboard-execute', code => q{
+use Developer::Dashboard::Folder ();
+use Developer::Dashboard::JSON qw(json_encode json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub sql_dashboard_trim {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+\z//;
+    return $text;
+}
+
+sub sql_dashboard_escape_html {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
+    $text =~ s/"/&quot;/g;
+    return $text;
+}
+
+# sql_dashboard_connection_id($dsn, $user)
+# Purpose: build the shareable sql-dashboard connection id from DSN and user without exposing the password.
+# Input: DSN string and database username string.
+# Output: connection id string in the form "dsn|user".
+sub sql_dashboard_connection_id {
+    my ( $dsn, $user ) = @_;
+    $dsn  = sql_dashboard_trim($dsn);
+    $user = sql_dashboard_trim($user);
+    return '' if $dsn eq '';
+    return $dsn . '|' . $user;
+}
+
+# sql_dashboard_parse_connection_id($connection_id)
+# Purpose: recover DSN, user, and inferred driver details from one shareable sql-dashboard connection id.
+# Input: connection id string in the form "dsn|user".
+# Output: hash reference with connection_id, dsn, user, and driver keys or undef for invalid input.
+sub sql_dashboard_parse_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '' || $connection_id !~ /\A(.+)\|(.*)\z/;
+    my ( $dsn, $user ) = ( $1, $2 );
+    return undef if $dsn eq '';
+    my $driver = '';
+    if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+        $driver = 'DBD::' . $1;
+    }
+    return {
+        connection_id => $connection_id,
+        dsn           => $dsn,
+        user          => $user,
+        driver        => $driver,
+    };
+}
+
+# sql_dashboard_secure_dir($dir)
+# Purpose: ensure the sql-dashboard profile directory exists and is owner-only.
+# Input: absolute directory path for the sql-dashboard profile store.
+# Output: the same directory path after it has been created/tightened to 0700.
+sub sql_dashboard_secure_dir {
+    my ($dir) = @_;
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    return $dir;
+}
+
+# sql_dashboard_secure_file($path)
+# Purpose: tighten one existing sql-dashboard profile file to owner-only mode.
+# Input: absolute file path for a saved sql-dashboard profile json file.
+# Output: the same file path after it has been tightened to 0600.
+sub sql_dashboard_secure_file {
+    my ($path) = @_;
+    return $path if !-e $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+    return $path;
+}
+
+sub sql_dashboard_profile_dir {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'sql-dashboard' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+sub sql_dashboard_profile_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing profile name\n" if $name eq '';
+    die "Invalid profile name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+sub sql_dashboard_profile_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_profile_dir(), sql_dashboard_profile_filename($name) );
+}
+
+# sql_dashboard_collection_dir()
+# Purpose: resolve and secure the sql-dashboard collection directory used for saved SQL collections.
+# Input: none.
+# Output: absolute collection directory path with 0700 permissions enforced.
+sub sql_dashboard_collection_dir {
+    my $dir = File::Spec->catdir( sql_dashboard_profile_dir(), 'collections' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+# sql_dashboard_collection_filename($name)
+# Purpose: turn one sql-dashboard collection name into a safe JSON filename.
+# Input: collection name string.
+# Output: filename string ending in .json.
+sub sql_dashboard_collection_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing collection name\n" if $name eq '';
+    die "Invalid collection name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+# sql_dashboard_collection_path($name)
+# Purpose: resolve one sql-dashboard collection JSON path on disk.
+# Input: collection name string.
+# Output: absolute collection JSON file path.
+sub sql_dashboard_collection_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_collection_dir(), sql_dashboard_collection_filename($name) );
+}
+
+# sql_dashboard_normalize_profile($profile)
+# Purpose: enrich one sql-dashboard profile hash with the portable connection id used in share URLs.
+# Input: profile hash reference.
+# Output: normalized profile hash reference.
+sub sql_dashboard_normalize_profile {
+    my ($profile) = @_;
+    die "Profile must be a hash reference\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    $profile->{password}      = '' if !defined $profile->{password};
+    $profile->{connection_id} = sql_dashboard_connection_id( $profile->{dsn}, $profile->{user} );
+    return $profile;
+}
+
+sub sql_dashboard_decode_profile_payload {
+    my ($json_text) = @_;
+    die "Missing profile payload\n" if !defined $json_text || $json_text eq '';
+    my $profile = json_decode($json_text);
+    die "Profile payload must be a JSON object\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{password}      = defined $profile->{password} ? $profile->{password} : '';
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    die "Missing profile name\n" if $profile->{name} eq '';
+    die "Missing driver module\n" if $profile->{driver} eq '';
+    die "Missing DSN\n" if $profile->{dsn} eq '';
+    if ( $profile->{attrs_json} ne '' ) {
+        my $attrs = json_decode( $profile->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($attrs) ne 'HASH';
+    }
+    if ( !$profile->{save_password} ) {
+        delete $profile->{password};
+    }
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_decode_collection_payload($json_text)
+# Purpose: validate and normalize one sql-dashboard SQL collection payload from the browser.
+# Input: JSON text string containing collection metadata and SQL items.
+# Output: normalized collection hash reference.
+sub sql_dashboard_decode_collection_payload {
+    my ($json_text) = @_;
+    die "Missing collection payload\n" if !defined $json_text || $json_text eq '';
+    my $collection = json_decode($json_text);
+    die "Collection payload must be a JSON object\n" if ref($collection) ne 'HASH';
+    $collection->{name} = sql_dashboard_trim( $collection->{name} );
+    die "Missing collection name\n" if $collection->{name} eq '';
+    die "Collection items must be an array\n" if ref( $collection->{items} ) ne 'ARRAY';
+    my @items;
+    for my $item ( @{ $collection->{items} } ) {
+        die "Collection item must be a JSON object\n" if ref($item) ne 'HASH';
+        my $name = sql_dashboard_trim( $item->{name} );
+        my $id   = sql_dashboard_trim( $item->{id} );
+        my $sql  = defined $item->{sql} ? $item->{sql} : '';
+        die "Missing collection item name\n" if $name eq '';
+        if ( $id eq '' ) {
+            $id = lc($name);
+            $id =~ s/[^a-z0-9]+/-/g;
+            $id =~ s/^-+|-+\z//g;
+            $id = 'sql-item' if $id eq '';
+        }
+        push @items, {
+            id   => $id,
+            name => $name,
+            sql  => $sql,
+        };
+    }
+    @items = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @items;
+    $collection->{items} = \@items;
+    return $collection;
+}
+
+sub sql_dashboard_read_profile {
+    my ($name) = @_;
+    my $path = sql_dashboard_profile_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    my $profile = json_decode($json_text);
+    die "Invalid sql-dashboard profile file $path\n" if ref($profile) ne 'HASH';
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_read_collection($name)
+# Purpose: read one saved sql-dashboard collection JSON file from disk.
+# Input: collection name string.
+# Output: normalized collection hash reference.
+sub sql_dashboard_read_collection {
+    my ($name) = @_;
+    my $path = sql_dashboard_collection_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return sql_dashboard_decode_collection_payload($json_text);
+}
+
+sub sql_dashboard_list_profiles {
+    my @profiles;
+    my @errors;
+    my $dir = sql_dashboard_profile_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            my $profile = json_decode($json_text);
+            die "Profile file $path did not decode to a JSON object\n" if ref($profile) ne 'HASH';
+            push @profiles, sql_dashboard_normalize_profile($profile);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @profiles = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @profiles;
+    return ( \@profiles, \@errors );
+}
+
+# sql_dashboard_list_collections()
+# Purpose: read every saved sql-dashboard collection from disk and surface any parse failures.
+# Input: none.
+# Output: array reference of normalized collections and array reference of read errors.
+sub sql_dashboard_list_collections {
+    my @collections;
+    my @errors;
+    my $dir = sql_dashboard_collection_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            push @collections, sql_dashboard_decode_collection_payload($json_text);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @collections = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @collections;
+    return ( \@collections, \@errors );
+}
+
+# sql_dashboard_list_drivers()
+# Purpose: discover installed DBD::* modules visible to the sql-dashboard bookmark worker.
+# Input: none.
+# Output: array reference of sorted DBD::* module names.
+sub sql_dashboard_list_drivers {
+    my %drivers;
+    for my $inc (@INC) {
+        next if !defined $inc || ref($inc);
+        my $dir = File::Spec->catdir( $inc, 'DBD' );
+        next if !-d $dir;
+        opendir my $dh, $dir or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry !~ /\A([A-Za-z_][A-Za-z0-9_]*)\.pm\z/;
+            $drivers{ 'DBD::' . $1 } = 1;
+        }
+        closedir $dh;
+    }
+    return [ sort keys %drivers ];
+}
+
+# sql_dashboard_find_profile_by_connection_id($connection_id)
+# Purpose: resolve one shareable sql-dashboard connection id back to a saved local profile when it exists.
+# Input: connection id string.
+# Output: normalized profile hash reference or undef.
+sub sql_dashboard_find_profile_by_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '';
+    my ( $profiles, undef ) = sql_dashboard_list_profiles();
+    for my $profile ( @{$profiles} ) {
+        return $profile if ( $profile->{connection_id} || '' ) eq $connection_id;
+    }
+    return undef;
+}
+sub sql_dashboard_driver_module {
+    my ($settings) = @_;
+    my $driver = sql_dashboard_trim( $settings->{driver} );
+    if ( $driver eq '' ) {
+        my $dsn = sql_dashboard_trim( $settings->{dsn} );
+        if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+            $driver = 'DBD::' . $1;
+        }
+    }
+    die "Missing driver module\n" if $driver eq '';
+    die "Invalid driver module '$driver'\n" if $driver !~ /\A[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z0-9_]+)*\z/;
+    return $driver;
+}
+
+sub sql_dashboard_resolve_settings {
+    my ($settings) = @_;
+    die "SQL settings payload must be a JSON object\n" if ref($settings) ne 'HASH';
+    my %resolved = %{$settings};
+    if ( sql_dashboard_trim( $resolved{profile_name} ) ne '' ) {
+        my $profile = sql_dashboard_read_profile( $resolved{profile_name} );
+        %resolved = ( %{$profile}, %resolved );
+    }
+    elsif ( sql_dashboard_trim( $resolved{connection_id} ) ne '' ) {
+        my $profile = sql_dashboard_find_profile_by_connection_id( $resolved{connection_id} );
+        if ($profile) {
+            %resolved = ( %{$profile}, %resolved );
+            $resolved{profile_name} = $profile->{name};
+        }
+        my $parsed = sql_dashboard_parse_connection_id( $resolved{connection_id} );
+        if ($parsed) {
+            $resolved{dsn}    = $parsed->{dsn}    if sql_dashboard_trim( $resolved{dsn} ) eq '';
+            $resolved{user}   = $parsed->{user}   if sql_dashboard_trim( $resolved{user} ) eq '';
+            $resolved{driver} = $parsed->{driver} if sql_dashboard_trim( $resolved{driver} ) eq '';
+        }
+    }
+    $resolved{driver}     = sql_dashboard_driver_module( \%resolved );
+    $resolved{dsn}        = sql_dashboard_trim( $resolved{dsn} );
+    $resolved{user}       = sql_dashboard_trim( $resolved{user} );
+    $resolved{password}   = defined $resolved{password} ? $resolved{password} : '';
+    $resolved{attrs_json} = sql_dashboard_trim( $resolved{attrs_json} );
+    $resolved{connection_id} = sql_dashboard_connection_id( $resolved{dsn}, $resolved{user} );
+    die "Missing DSN\n" if $resolved{dsn} eq '';
+    return \%resolved;
+}
+
+sub sql_dashboard_require_db_stack {
+    my ($settings) = @_;
+    eval { require DBI; 1 } or die "Missing DBI. Install it with dashboard cpan DBI\n";
+    my $driver = $settings->{driver};
+    eval "require $driver; 1" or die "Missing $driver. Install it with dashboard cpan $driver\n";
+    return 1;
+}
+
+sub sql_dashboard_connect {
+    my ($settings) = @_;
+    sql_dashboard_require_db_stack($settings);
+    my $attrs = {
+        RaiseError => 1,
+        PrintError => 0,
+        AutoCommit => 1,
+    };
+    if ( $settings->{attrs_json} ne '' ) {
+        my $decoded = json_decode( $settings->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($decoded) ne 'HASH';
+        %{$attrs} = ( %{$attrs}, %{$decoded} );
+    }
+    my $dbh = DBI->connect( $settings->{dsn}, $settings->{user}, $settings->{password}, $attrs );
+    die "Unable to connect to $settings->{dsn}\n" if !$dbh;
+    return $dbh;
+}
+
+sub sql_dashboard_parse_sql_blocks {
+    my ( $sql_text, $sqls_sep, $instruction_sep ) = @_;
+    my @blocks;
+    for my $raw_block ( split /\Q$sqls_sep\E/s, $sql_text ) {
+        next if !defined $raw_block;
+        $raw_block =~ s/^\s+//;
+        $raw_block =~ s/\s+\z//;
+        next if $raw_block eq '';
+        my ( $sql, @raw_instructions ) = split /\Q$instruction_sep\E/s, $raw_block;
+        $sql = '' if !defined $sql;
+        $sql =~ s/^\s+//;
+        $sql =~ s/\s+\z//;
+        next if $sql eq '';
+        my %instructions;
+        for my $instruction (@raw_instructions) {
+            next if !defined $instruction;
+            $instruction =~ s/^\s+//;
+            $instruction =~ s/\s+\z//;
+            next if $instruction eq '';
+            if ( $instruction =~ /\ASTASH:\s*(.+)\z/s ) {
+                my $hash = eval "no strict; no warnings; { $1 }";
+                die "STASH Error: $@\n" if $@;
+                die "STASH instruction must return a hash reference\n" if ref($hash) ne 'HASH';
+                $instructions{stash} ||= [];
+                push @{ $instructions{stash} }, $hash;
+            }
+            elsif ( $instruction =~ /\AROW:\s*(.+)\z/s ) {
+                my $code = "sub {\nmy (\$row, \$row_number_ref, \$columns, \$sth, \$dbh, \$stash) = \@_;\n$1\n}";
+                my $sub = eval $code;
+                die "ROW Error: $@\n" if $@;
+                $instructions{row} = $sub;
+            }
+            elsif ( $instruction =~ /\ABEFORE:\s*(.+)\z/s ) {
+                my $code = "sub {\nmy (\$columns, \$sth, \$dbh, \$stash) = \@_;\n$1\n}";
+                my $sub = eval $code;
+                die "BEFORE Error: $@\n" if $@;
+                $instructions{before} = $sub;
+            }
+            elsif ( $instruction =~ /\AAFTER:\s*(.+)\z/s ) {
+                my $code = "sub {\nmy (\$columns, \$dbh, \$stash) = \@_;\n$1\n}";
+                my $sub = eval $code;
+                die "AFTER Error: $@\n" if $@;
+                $instructions{after} = $sub;
+            }
+            else {
+                die "Unknown instruction block: $instruction\n";
+            }
+        }
+        push @blocks, {
+            sql          => $sql,
+            instructions => \%instructions,
+        };
+    }
+    return \@blocks;
+}
+
+sub sql_dashboard_render_table_html {
+    my ( $columns, $rows, $statement_sql, $rows_affected ) = @_;
+    my $html = '<table><thead>';
+    $html .= '<tr><th colspan="' . ( scalar(@{$columns}) + 1 ) . '">SQL: <code>' . sql_dashboard_escape_html($statement_sql) . '</code></th></tr>';
+    if ( !@{$columns} ) {
+        $html .= '<tr><th>Rows affected: ' . sql_dashboard_escape_html($rows_affected) . '</th></tr></thead><tbody></tbody></table>';
+        return $html;
+    }
+    $html .= '<tr><th>#</th>';
+    for my $column ( @{$columns} ) {
+        $html .= '<th>' . sql_dashboard_escape_html($column) . '</th>';
+    }
+    $html .= '</tr></thead><tbody>';
+    for my $row_entry ( @{$rows} ) {
+        my $style = $row_entry->{hl} ? ' style="' . sql_dashboard_escape_html( $row_entry->{hl} ) . '"' : '';
+        $html .= '<tr' . $style . '><td><pre>' . sql_dashboard_escape_html( $row_entry->{row_number} ) . '</pre></td>';
+        for my $column ( @{$columns} ) {
+            my $value = $row_entry->{values}{$column};
+            if ( ref($value) eq 'HASH' && exists $value->{html} ) {
+                $html .= '<td>' . $value->{html} . '</td>';
+            }
+            else {
+                $html .= '<td><pre>' . sql_dashboard_escape_html($value) . '</pre></td>';
+            }
+        }
+        $html .= '</tr>';
+    }
+    $html .= '</tbody></table>';
+    return $html;
+}
+my $payload;
+eval {
+    my $settings = json_decode( params->{settings} || '{}' );
+    my $resolved = sql_dashboard_resolve_settings($settings);
+    my $sql_text = $settings->{sql} // '';
+    $sql_text = sql_dashboard_trim($sql_text);
+    die "Missing SQL\n" if $sql_text eq '';
+    my $sqls_sep        = ':------------------------------------------------------------------------------:';
+    my $instruction_sep = ':~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:';
+    my $blocks = sql_dashboard_parse_sql_blocks( $sql_text, $sqls_sep, $instruction_sep );
+    die "No SQL statements were parsed\n" if !@{$blocks};
+    my $dbh = sql_dashboard_connect($resolved);
+    my %stash;
+    my @results;
+    my @html;
+    for my $block ( @{$blocks} ) {
+        my $sql = $block->{sql};
+        my $sth = $dbh->prepare($sql);
+        $sth->execute();
+        my $columns = $sth->{NAME} || [];
+        for my $stash_update ( @{ $block->{instructions}{stash} || [] } ) {
+            %stash = ( %stash, %{$stash_update} );
+        }
+        if ( $block->{instructions}{before} ) {
+            $block->{instructions}{before}->( $columns, $sth, $dbh, \%stash );
+        }
+        my @rows;
+        my $row_number = 0;
+        if ( @{$columns} ) {
+            while ( my $row = $sth->fetchrow_hashref ) {
+                $row_number++;
+                my $options = {};
+                if ( $block->{instructions}{row} ) {
+                    my $row_result = $block->{instructions}{row}->( $row, \$row_number, $columns, $sth, $dbh, \%stash );
+                    $options = $row_result if ref($row_result) eq 'HASH';
+                }
+                next if $options->{next};
+                push @rows, {
+                    row_number => $row_number,
+                    hl         => $options->{hl} || '',
+                    values     => { %{$row} },
+                };
+            }
+        }
+        if ( $block->{instructions}{after} ) {
+            $block->{instructions}{after}->( $columns, $dbh, \%stash );
+        }
+        my $rows_affected = @{$columns} ? scalar(@rows) : $sth->rows;
+        my $statement_html = sql_dashboard_render_table_html( $columns, \@rows, $sql, $rows_affected );
+        push @html, $statement_html;
+        push @results, {
+            sql           => $sql,
+            row_count     => $rows_affected,
+            columns       => $columns,
+            rows          => \@rows,
+            rows_affected => @{$columns} ? 0 : $rows_affected,
+        };
+    }
+    $dbh->disconnect if $dbh && $dbh->can('disconnect');
+    $payload = {
+        ok      => 1,
+        html    => join( "\n", @html ),
+        results => \@results,
+        details => {
+            profile_name  => $resolved->{profile_name} || '',
+            connection_id => $resolved->{connection_id} || '',
+            driver        => $resolved->{driver},
+            dsn           => $resolved->{dsn},
+            user          => $resolved->{user},
+        },
+    };
+    1;
+} or do {
+    my $error = $@ || 'Unknown sql-dashboard execution failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+        ok    => 0,
+        error => $error,
+        html  => '',
+        results => [],
+    };
+};
+print j $payload;
+
+};
+:--------------------------------------------------------------------------------:
+CODE7: Ajax jvar => 'configs.schema.browse', type => 'json', singleton => 'SQL_DASHBOARD_SCHEMA_BROWSE', file => 'sql-dashboard-schema-browse', code => q{
+use Developer::Dashboard::Folder ();
+use Developer::Dashboard::JSON qw(json_encode json_decode);
+use File::Path qw(make_path);
+use File::Spec;
+
+sub sql_dashboard_trim {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+\z//;
+    return $text;
+}
+
+sub sql_dashboard_escape_html {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
+    $text =~ s/"/&quot;/g;
+    return $text;
+}
+
+# sql_dashboard_connection_id($dsn, $user)
+# Purpose: build the shareable sql-dashboard connection id from DSN and user without exposing the password.
+# Input: DSN string and database username string.
+# Output: connection id string in the form "dsn|user".
+sub sql_dashboard_connection_id {
+    my ( $dsn, $user ) = @_;
+    $dsn  = sql_dashboard_trim($dsn);
+    $user = sql_dashboard_trim($user);
+    return '' if $dsn eq '' || $user eq '';
+    return $dsn . '|' . $user;
+}
+
+# sql_dashboard_parse_connection_id($connection_id)
+# Purpose: recover DSN, user, and inferred driver details from one shareable sql-dashboard connection id.
+# Input: connection id string in the form "dsn|user".
+# Output: hash reference with connection_id, dsn, user, and driver keys or undef for invalid input.
+sub sql_dashboard_parse_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '' || $connection_id !~ /\A(.+)\|(.*)\z/;
+    my ( $dsn, $user ) = ( $1, $2 );
+    return undef if $dsn eq '';
+    my $driver = '';
+    if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+        $driver = 'DBD::' . $1;
+    }
+    return {
+        connection_id => $connection_id,
+        dsn           => $dsn,
+        user          => $user,
+        driver        => $driver,
+    };
+}
+
+# sql_dashboard_secure_dir($dir)
+# Purpose: ensure the sql-dashboard profile directory exists and is owner-only.
+# Input: absolute directory path for the sql-dashboard profile store.
+# Output: the same directory path after it has been created/tightened to 0700.
+sub sql_dashboard_secure_dir {
+    my ($dir) = @_;
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    return $dir;
+}
+
+# sql_dashboard_secure_file($path)
+# Purpose: tighten one existing sql-dashboard profile file to owner-only mode.
+# Input: absolute file path for a saved sql-dashboard profile json file.
+# Output: the same file path after it has been tightened to 0600.
+sub sql_dashboard_secure_file {
+    my ($path) = @_;
+    return $path if !-e $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+    return $path;
+}
+
+sub sql_dashboard_profile_dir {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'sql-dashboard' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+sub sql_dashboard_profile_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing profile name\n" if $name eq '';
+    die "Invalid profile name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+sub sql_dashboard_profile_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_profile_dir(), sql_dashboard_profile_filename($name) );
+}
+
+# sql_dashboard_collection_dir()
+# Purpose: resolve and secure the sql-dashboard collection directory used for saved SQL collections.
+# Input: none.
+# Output: absolute collection directory path with 0700 permissions enforced.
+sub sql_dashboard_collection_dir {
+    my $dir = File::Spec->catdir( sql_dashboard_profile_dir(), 'collections' );
+    return sql_dashboard_secure_dir($dir);
+}
+
+# sql_dashboard_collection_filename($name)
+# Purpose: turn one sql-dashboard collection name into a safe JSON filename.
+# Input: collection name string.
+# Output: filename string ending in .json.
+sub sql_dashboard_collection_filename {
+    my ($name) = @_;
+    $name = sql_dashboard_trim($name);
+    die "Missing collection name\n" if $name eq '';
+    die "Invalid collection name\n" if $name =~ /[[:cntrl:]]/;
+    $name =~ s{[\\/]+}{_}g;
+    return $name . '.json';
+}
+
+# sql_dashboard_collection_path($name)
+# Purpose: resolve one sql-dashboard collection JSON path on disk.
+# Input: collection name string.
+# Output: absolute collection JSON file path.
+sub sql_dashboard_collection_path {
+    my ($name) = @_;
+    return File::Spec->catfile( sql_dashboard_collection_dir(), sql_dashboard_collection_filename($name) );
+}
+
+# sql_dashboard_normalize_profile($profile)
+# Purpose: enrich one sql-dashboard profile hash with the portable connection id used in share URLs.
+# Input: profile hash reference.
+# Output: normalized profile hash reference.
+sub sql_dashboard_normalize_profile {
+    my ($profile) = @_;
+    die "Profile must be a hash reference\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    $profile->{password}      = '' if !defined $profile->{password};
+    $profile->{connection_id} = sql_dashboard_connection_id( $profile->{dsn}, $profile->{user} );
+    return $profile;
+}
+
+sub sql_dashboard_decode_profile_payload {
+    my ($json_text) = @_;
+    die "Missing profile payload\n" if !defined $json_text || $json_text eq '';
+    my $profile = json_decode($json_text);
+    die "Profile payload must be a JSON object\n" if ref($profile) ne 'HASH';
+    $profile->{name}          = sql_dashboard_trim( $profile->{name} );
+    $profile->{driver}        = sql_dashboard_trim( $profile->{driver} );
+    $profile->{dsn}           = sql_dashboard_trim( $profile->{dsn} );
+    $profile->{user}          = sql_dashboard_trim( $profile->{user} );
+    $profile->{attrs_json}    = sql_dashboard_trim( $profile->{attrs_json} );
+    $profile->{password}      = defined $profile->{password} ? $profile->{password} : '';
+    $profile->{save_password} = $profile->{save_password} ? 1 : 0;
+    die "Missing profile name\n" if $profile->{name} eq '';
+    die "Missing driver module\n" if $profile->{driver} eq '';
+    die "Missing DSN\n" if $profile->{dsn} eq '';
+    if ( $profile->{attrs_json} ne '' ) {
+        my $attrs = json_decode( $profile->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($attrs) ne 'HASH';
+    }
+    if ( !$profile->{save_password} ) {
+        delete $profile->{password};
+    }
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_decode_collection_payload($json_text)
+# Purpose: validate and normalize one sql-dashboard SQL collection payload from the browser.
+# Input: JSON text string containing collection metadata and SQL items.
+# Output: normalized collection hash reference.
+sub sql_dashboard_decode_collection_payload {
+    my ($json_text) = @_;
+    die "Missing collection payload\n" if !defined $json_text || $json_text eq '';
+    my $collection = json_decode($json_text);
+    die "Collection payload must be a JSON object\n" if ref($collection) ne 'HASH';
+    $collection->{name} = sql_dashboard_trim( $collection->{name} );
+    die "Missing collection name\n" if $collection->{name} eq '';
+    die "Collection items must be an array\n" if ref( $collection->{items} ) ne 'ARRAY';
+    my @items;
+    for my $item ( @{ $collection->{items} } ) {
+        die "Collection item must be a JSON object\n" if ref($item) ne 'HASH';
+        my $name = sql_dashboard_trim( $item->{name} );
+        my $id   = sql_dashboard_trim( $item->{id} );
+        my $sql  = defined $item->{sql} ? $item->{sql} : '';
+        die "Missing collection item name\n" if $name eq '';
+        if ( $id eq '' ) {
+            $id = lc($name);
+            $id =~ s/[^a-z0-9]+/-/g;
+            $id =~ s/^-+|-+\z//g;
+            $id = 'sql-item' if $id eq '';
+        }
+        push @items, {
+            id   => $id,
+            name => $name,
+            sql  => $sql,
+        };
+    }
+    @items = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @items;
+    $collection->{items} = \@items;
+    return $collection;
+}
+
+sub sql_dashboard_read_profile {
+    my ($name) = @_;
+    my $path = sql_dashboard_profile_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    my $profile = json_decode($json_text);
+    die "Invalid sql-dashboard profile file $path\n" if ref($profile) ne 'HASH';
+    return sql_dashboard_normalize_profile($profile);
+}
+
+# sql_dashboard_read_collection($name)
+# Purpose: read one saved sql-dashboard collection JSON file from disk.
+# Input: collection name string.
+# Output: normalized collection hash reference.
+sub sql_dashboard_read_collection {
+    my ($name) = @_;
+    my $path = sql_dashboard_collection_path($name);
+    sql_dashboard_secure_file($path);
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return sql_dashboard_decode_collection_payload($json_text);
+}
+
+sub sql_dashboard_list_profiles {
+    my @profiles;
+    my @errors;
+    my $dir = sql_dashboard_profile_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            my $profile = json_decode($json_text);
+            die "Profile file $path did not decode to a JSON object\n" if ref($profile) ne 'HASH';
+            push @profiles, sql_dashboard_normalize_profile($profile);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @profiles = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @profiles;
+    return ( \@profiles, \@errors );
+}
+
+# sql_dashboard_list_collections()
+# Purpose: read every saved sql-dashboard collection from disk and surface any parse failures.
+# Input: none.
+# Output: array reference of normalized collections and array reference of read errors.
+sub sql_dashboard_list_collections {
+    my @collections;
+    my @errors;
+    my $dir = sql_dashboard_collection_dir();
+    opendir my $dh, $dir or die "Unable to read $dir: $!";
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json\z/;
+        my $path = File::Spec->catfile( $dir, $entry );
+        next if !-f $path;
+        eval {
+            sql_dashboard_secure_file($path);
+            open my $fh, '<', $path or die "Unable to read $path: $!";
+            local $/;
+            my $json_text = <$fh>;
+            close $fh or die "Unable to close $path: $!";
+            push @collections, sql_dashboard_decode_collection_payload($json_text);
+            1;
+        } or do {
+            my $error = $@ || "Unable to read $path\n";
+            $error =~ s/\s+\z//;
+            push @errors, $error;
+        };
+    }
+    closedir $dh or die "Unable to close $dir: $!";
+    @collections = sort { ( $a->{name} || '' ) cmp ( $b->{name} || '' ) } @collections;
+    return ( \@collections, \@errors );
+}
+
+# sql_dashboard_list_drivers()
+# Purpose: discover installed DBD::* modules visible to the sql-dashboard bookmark worker.
+# Input: none.
+# Output: array reference of sorted DBD::* module names.
+sub sql_dashboard_list_drivers {
+    my %drivers;
+    for my $inc (@INC) {
+        next if !defined $inc || ref($inc);
+        my $dir = File::Spec->catdir( $inc, 'DBD' );
+        next if !-d $dir;
+        opendir my $dh, $dir or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry !~ /\A([A-Za-z_][A-Za-z0-9_]*)\.pm\z/;
+            $drivers{ 'DBD::' . $1 } = 1;
+        }
+        closedir $dh;
+    }
+    return [ sort keys %drivers ];
+}
+
+# sql_dashboard_find_profile_by_connection_id($connection_id)
+# Purpose: resolve one shareable sql-dashboard connection id back to a saved local profile when it exists.
+# Input: connection id string.
+# Output: normalized profile hash reference or undef.
+sub sql_dashboard_find_profile_by_connection_id {
+    my ($connection_id) = @_;
+    $connection_id = sql_dashboard_trim($connection_id);
+    return undef if $connection_id eq '';
+    my ( $profiles, undef ) = sql_dashboard_list_profiles();
+    for my $profile ( @{$profiles} ) {
+        return $profile if ( $profile->{connection_id} || '' ) eq $connection_id;
+    }
+    return undef;
+}
+sub sql_dashboard_driver_module {
+    my ($settings) = @_;
+    my $driver = sql_dashboard_trim( $settings->{driver} );
+    if ( $driver eq '' ) {
+        my $dsn = sql_dashboard_trim( $settings->{dsn} );
+        if ( $dsn =~ /\Adbi:([^:]+):/i ) {
+            $driver = 'DBD::' . $1;
+        }
+    }
+    die "Missing driver module\n" if $driver eq '';
+    die "Invalid driver module '$driver'\n" if $driver !~ /\A[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z0-9_]+)*\z/;
+    return $driver;
+}
+
+sub sql_dashboard_resolve_settings {
+    my ($settings) = @_;
+    die "SQL settings payload must be a JSON object\n" if ref($settings) ne 'HASH';
+    my %resolved = %{$settings};
+    if ( sql_dashboard_trim( $resolved{profile_name} ) ne '' ) {
+        my $profile = sql_dashboard_read_profile( $resolved{profile_name} );
+        %resolved = ( %{$profile}, %resolved );
+    }
+    elsif ( sql_dashboard_trim( $resolved{connection_id} ) ne '' ) {
+        my $profile = sql_dashboard_find_profile_by_connection_id( $resolved{connection_id} );
+        if ($profile) {
+            %resolved = ( %{$profile}, %resolved );
+            $resolved{profile_name} = $profile->{name};
+        }
+        my $parsed = sql_dashboard_parse_connection_id( $resolved{connection_id} );
+        if ($parsed) {
+            $resolved{dsn}    = $parsed->{dsn}    if sql_dashboard_trim( $resolved{dsn} ) eq '';
+            $resolved{user}   = $parsed->{user}   if sql_dashboard_trim( $resolved{user} ) eq '';
+            $resolved{driver} = $parsed->{driver} if sql_dashboard_trim( $resolved{driver} ) eq '';
+        }
+    }
+    $resolved{driver}     = sql_dashboard_driver_module( \%resolved );
+    $resolved{dsn}        = sql_dashboard_trim( $resolved{dsn} );
+    $resolved{user}       = sql_dashboard_trim( $resolved{user} );
+    $resolved{password}   = defined $resolved{password} ? $resolved{password} : '';
+    $resolved{attrs_json} = sql_dashboard_trim( $resolved{attrs_json} );
+    $resolved{connection_id} = sql_dashboard_connection_id( $resolved{dsn}, $resolved{user} );
+    die "Missing DSN\n" if $resolved{dsn} eq '';
+    return \%resolved;
+}
+
+sub sql_dashboard_require_db_stack {
+    my ($settings) = @_;
+    eval { require DBI; 1 } or die "Missing DBI. Install it with dashboard cpan DBI\n";
+    my $driver = $settings->{driver};
+    eval "require $driver; 1" or die "Missing $driver. Install it with dashboard cpan $driver\n";
+    return 1;
+}
+
+sub sql_dashboard_connect {
+    my ($settings) = @_;
+    sql_dashboard_require_db_stack($settings);
+    my $attrs = {
+        RaiseError => 1,
+        PrintError => 0,
+        AutoCommit => 1,
+    };
+    if ( $settings->{attrs_json} ne '' ) {
+        my $decoded = json_decode( $settings->{attrs_json} );
+        die "DBI attrs_json must decode to a JSON object\n" if ref($decoded) ne 'HASH';
+        %{$attrs} = ( %{$attrs}, %{$decoded} );
+    }
+    my $dbh = DBI->connect( $settings->{dsn}, $settings->{user}, $settings->{password}, $attrs );
+    die "Unable to connect to $settings->{dsn}\n" if !$dbh;
+    return $dbh;
+}
+
+sub sql_dashboard_parse_sql_blocks {
+    my ( $sql_text, $sqls_sep, $instruction_sep ) = @_;
+    my @blocks;
+    for my $raw_block ( split /\Q$sqls_sep\E/s, $sql_text ) {
+        next if !defined $raw_block;
+        $raw_block =~ s/^\s+//;
+        $raw_block =~ s/\s+\z//;
+        next if $raw_block eq '';
+        my ( $sql, @raw_instructions ) = split /\Q$instruction_sep\E/s, $raw_block;
+        $sql = '' if !defined $sql;
+        $sql =~ s/^\s+//;
+        $sql =~ s/\s+\z//;
+        next if $sql eq '';
+        my %instructions;
+        for my $instruction (@raw_instructions) {
+            next if !defined $instruction;
+            $instruction =~ s/^\s+//;
+            $instruction =~ s/\s+\z//;
+            next if $instruction eq '';
+            if ( $instruction =~ /\ASTASH:\s*(.+)\z/s ) {
+                my $hash = eval "no strict; no warnings; { $1 }";
+                die "STASH Error: $@\n" if $@;
+                die "STASH instruction must return a hash reference\n" if ref($hash) ne 'HASH';
+                $instructions{stash} ||= [];
+                push @{ $instructions{stash} }, $hash;
+            }
+            elsif ( $instruction =~ /\AROW:\s*(.+)\z/s ) {
+                my $code = "sub {\nmy (\$row, \$row_number_ref, \$columns, \$sth, \$dbh, \$stash) = \@_;\n$1\n}";
+                my $sub = eval $code;
+                die "ROW Error: $@\n" if $@;
+                $instructions{row} = $sub;
+            }
+            elsif ( $instruction =~ /\ABEFORE:\s*(.+)\z/s ) {
+                my $code = "sub {\nmy (\$columns, \$sth, \$dbh, \$stash) = \@_;\n$1\n}";
+                my $sub = eval $code;
+                die "BEFORE Error: $@\n" if $@;
+                $instructions{before} = $sub;
+            }
+            elsif ( $instruction =~ /\AAFTER:\s*(.+)\z/s ) {
+                my $code = "sub {\nmy (\$columns, \$dbh, \$stash) = \@_;\n$1\n}";
+                my $sub = eval $code;
+                die "AFTER Error: $@\n" if $@;
+                $instructions{after} = $sub;
+            }
+            else {
+                die "Unknown instruction block: $instruction\n";
+            }
+        }
+        push @blocks, {
+            sql          => $sql,
+            instructions => \%instructions,
+        };
+    }
+    return \@blocks;
+}
+
+sub sql_dashboard_render_table_html {
+    my ( $columns, $rows, $statement_sql, $rows_affected ) = @_;
+    my $html = '<table><thead>';
+    $html .= '<tr><th colspan="' . ( scalar(@{$columns}) + 1 ) . '">SQL: <code>' . sql_dashboard_escape_html($statement_sql) . '</code></th></tr>';
+    if ( !@{$columns} ) {
+        $html .= '<tr><th>Rows affected: ' . sql_dashboard_escape_html($rows_affected) . '</th></tr></thead><tbody></tbody></table>';
+        return $html;
+    }
+    $html .= '<tr><th>#</th>';
+    for my $column ( @{$columns} ) {
+        $html .= '<th>' . sql_dashboard_escape_html($column) . '</th>';
+    }
+    $html .= '</tr></thead><tbody>';
+    for my $row_entry ( @{$rows} ) {
+        my $style = $row_entry->{hl} ? ' style="' . sql_dashboard_escape_html( $row_entry->{hl} ) . '"' : '';
+        $html .= '<tr' . $style . '><td><pre>' . sql_dashboard_escape_html( $row_entry->{row_number} ) . '</pre></td>';
+        for my $column ( @{$columns} ) {
+            my $value = $row_entry->{values}{$column};
+            if ( ref($value) eq 'HASH' && exists $value->{html} ) {
+                $html .= '<td>' . $value->{html} . '</td>';
+            }
+            else {
+                $html .= '<td><pre>' . sql_dashboard_escape_html($value) . '</pre></td>';
+            }
+        }
+        $html .= '</tr>';
+    }
+    $html .= '</tbody></table>';
+    return $html;
+}
+my $payload;
+eval {
+    my $settings = json_decode( params->{settings} || '{}' );
+    my $resolved = sql_dashboard_resolve_settings($settings);
+    my $dbh = sql_dashboard_connect($resolved);
+    my $table_sth = $dbh->table_info( undef, undef, '%', 'TABLE' );
+    my @tables;
+    while ( my $row = $table_sth->fetchrow_hashref ) {
+        next if !defined $row->{TABLE_NAME} || $row->{TABLE_NAME} eq '';
+        push @tables, {
+            TABLE_NAME => $row->{TABLE_NAME},
+        };
+    }
+    $table_sth->finish if $table_sth && $table_sth->can('finish');
+    @tables = sort { $a->{TABLE_NAME} cmp $b->{TABLE_NAME} } @tables;
+    my $selected_table = sql_dashboard_trim( $settings->{table_name} );
+    $selected_table = $tables[0]{TABLE_NAME} if $selected_table eq '' && @tables;
+    my @columns;
+    if ( $selected_table ne '' ) {
+        my $column_sth = $dbh->column_info( undef, undef, $selected_table, '%' );
+        while ( my $row = $column_sth->fetchrow_hashref ) {
+            push @columns, {
+                TABLE_NAME  => $selected_table,
+                COLUMN_NAME => $row->{COLUMN_NAME},
+                DATA_TYPE   => $row->{DATA_TYPE},
+                DATA_LENGTH => $row->{DATA_LENGTH},
+            };
+        }
+        $column_sth->finish if $column_sth && $column_sth->can('finish');
+    }
+    $dbh->disconnect if $dbh && $dbh->can('disconnect');
+    $payload = {
+        ok             => 1,
+        selected_table => $selected_table,
+        tables         => \@tables,
+        columns        => \@columns,
+    };
+    1;
+} or do {
+    my $error = $@ || 'Unknown sql-dashboard schema failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+        ok             => 0,
+        error          => $error,
+        selected_table => '',
+        tables         => [],
+        columns        => [],
+    };
+};
+print j $payload;
+
+};

@@ -15,7 +15,7 @@ INSTALLATION
     make install
 
     # or in one step:
-    cpanm PDF-Sign-0.06.tar.gz
+    cpanm PDF-Sign-0.07.tar.gz
 
 DEPENDENCIES
 
@@ -37,7 +37,7 @@ TESTING
 
 AUTHOR
 
-Citterio Massimiliano <mcitterio@cmcps.it>
+Citterio Massimiliano <mcitterio@cmcps.it> (2026)
 
 COPYRIGHT AND LICENSE
 

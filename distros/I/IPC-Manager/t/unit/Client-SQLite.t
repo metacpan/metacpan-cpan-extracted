@@ -1,11 +1,11 @@
 use Test2::V0;
-use IPC::Manager::Client::SQLite;
-use IPC::Manager::Serializer::JSON;
 
 my $CLASS      = 'IPC::Manager::Client::SQLite';
 my $SERIALIZER = 'IPC::Manager::Serializer::JSON';
 
-skip_all "SQLite driver not available" unless $CLASS->viable;
+skip_all "SQLite driver not available" unless eval { require IPC::Manager::Client::SQLite; $CLASS->viable };
+
+use IPC::Manager::Serializer::JSON;
 
 subtest 'viable' => sub {
     ok($CLASS->viable, "SQLite is viable");

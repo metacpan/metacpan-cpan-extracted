@@ -218,7 +218,7 @@ pop(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_tail != HM_LRU_NONE) {
                 uint32_t idx = self->lru_tail;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now >= self->expires_at[idx]) {
+                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
                     hashmap_sa_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -272,7 +272,7 @@ shift(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_head != HM_LRU_NONE) {
                 uint32_t idx = self->lru_head;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now >= self->expires_at[idx]) {
+                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
                     hashmap_sa_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);

@@ -29,12 +29,13 @@
          "requires" : {
             "Devel::CheckLib" : "0",
             "ExtUtils::F77" : "1.26",
-            "PDL" : "2.096"
+            "PDL" : "2.104"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.096"
+            "PDL" : "2.104",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -56,6 +57,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.434",
+   "version" : "0.435",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

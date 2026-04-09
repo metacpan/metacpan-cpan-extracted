@@ -2,13 +2,19 @@
 Build.PL
 Changes
 lib/Future/IO/Resolver.pm
+lib/Future/IO/Resolver/Using/LibAsyncNS.pm
+lib/Future/IO/Resolver/Using/Socket.pm
 LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
 README
 t/00use.t
-t/01getaddrinfo.t
-t/02getnameinfo.t
-t/03res_query.t
+t/01getaddrinfo-libasyncns.t
+t/01getaddrinfo-socket.t
+t/01getaddrinfo.pl
+t/02getnameinfo-libasyncns.t
+t/02getnameinfo-socket.t
+t/02getnameinfo.pl
+t/03res_query-libasyncns.t
 t/99pod.t

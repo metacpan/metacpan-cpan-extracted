@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/Music-SimpleDrumMachine"
       }
    },
-   "version" : "0.0403",
+   "version" : "0.0501",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -299,6 +299,7 @@
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
                      "chan",
+                     "iff",
                      "ppqn",
                      "th",
                      "ths",

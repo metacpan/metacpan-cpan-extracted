@@ -4,7 +4,7 @@
 # Examples:
 #   perl eg/add-drums.pl 'gs wavetable' 90 # on windows
 #   perl eg/add-drums.pl fluid 90 # with fluidsynth
-#   perl eg/add-drums.pl usb 100 -1 # multi-timbral
+#   perl eg/add-drums.pl usb 100 -1 # multi-timbral device
 
 use Music::SimpleDrumMachine ();
 
@@ -35,18 +35,18 @@ my $dm = Music::SimpleDrumMachine->new(
 sub part_A {
     print "part_A\n";
     my %patterns = (
-        hihat => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
-        open  => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1)],
-        kick  => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
-        snare => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
-        tom   => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0)],
-        china => [qw(0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0)],
+        closed => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
+        open   => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1)],
+        kick   => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
+        snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
+        tom    => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0)],
+        china  => [qw(0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0)],
     );
     my $next = 'part_A';
     return $next, \%patterns;
 }
 sub fill_A {
-    print "fill_A\n";
+    print "fill A\n";
     my %patterns = (
         snare => [qw(1 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0)],
         tom   => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1)],

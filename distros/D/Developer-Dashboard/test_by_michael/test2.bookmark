@@ -1,0 +1,34 @@
+TITLE: Testing New Ajax Helper Functions
+:--------------------------------------------------------------------------------:
+BOOKMARK: test2
+:--------------------------------------------------------------------------------:
+HTML: <h1>[% title %]</h1>
+Foo: <span id="foo"></span><br>
+Bar: <div id="bar"></div>
+Mike: <span id="mike"></span><br>
+<script src="/js/jquery.js"></script>
+<script>
+var endpoints = {};
+$(document).ready(_ => {
+  fetch_value(endpoints.foo, '#foo');
+  stream_value(endpoints.bar, '#bar', {type: 'text'});
+  fetch_value(endpoints.mike, '#mike', {type: 'json'}, (value) => {
+    if (value.ok > 1) return 'OK';
+    else return 'Error';
+  });
+});
+</script>
+:--------------------------------------------------------------------------------:
+CODE1: Ajax jvar => 'endpoints.foo', file => 'foo', code => q{
+   print "This is foo echo";
+};
+:--------------------------------------------------------------------------------:
+CODE2: Ajax jvar => 'endpoints.bar', file => 'bar', singleton => 'BAR', code => q{
+   system qw( tail -f /var/log/test.log );
+};
+:--------------------------------------------------------------------------------:
+CODE3: Ajax jvar => 'endpoints.mike', file => 'mike', type => 'son', code => q{
+    use DataHelper qw( j );
+    print j { ok => 1 } if time > 1;
+    print j { ok => 0 } if time < 0;
+};

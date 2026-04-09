@@ -10,42 +10,32 @@
 #   docker run -p 8080:80 -v $(pwd):/opt/xao/projects/app amaltsev/xao-web
 #------------------------------------------------------------------------------
 
-# CentOS makes for an easier to use environment.
-#
-FROM centos:centos7
+FROM debian:bookworm-slim
 
 LABEL maintainer="Andrew Maltsev am@ejelta.com"
 
 # Software versions to pull. Use --build-arg to override:
 #  docker build --build-arg XAO_WEB_VERSION=1.66 -t xao-web:1.66 .
 #
-ARG XAO_BASE_VERSION=master
-ARG XAO_FS_VERSION=master
-ARG XAO_WEB_VERSION=master
-
-# MariaDB repository.
-#
-RUN echo "[mariadb]" > /etc/yum.repos.d/MariaDB.repo && \
-    echo "name=MariaDB" >> /etc/yum.repos.d/MariaDB.repo && \
-    echo "baseurl=http://yum.mariadb.org/10.3/centos7-amd64" >> /etc/yum.repos.d/MariaDB.repo && \
-    echo "gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB" >> /etc/yum.repos.d/MariaDB.repo && \
-    echo "gpgcheck=1" >> /etc/yum.repos.d/MariaDB.repo && \
-    rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+ARG XAO_BASE_VERSION=1.28
+ARG XAO_FS_VERSION=1.26
+ARG XAO_WEB_VERSION=1.93
 
 # Basic package dependencies
 #
-RUN yum upgrade -y              \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        g++ \
+        make \
+        perl \
+        cpanminus \
+        libwww-perl \
+        libssl-dev \
+        libmariadb-dev \
+        libmariadb3 \
     && \
-    yum install -y              \
-        gcc                     \
-        gcc-c++                 \
-        perl-App-cpanminus      \
-        perl-LWP-Protocol-https \
-        openssl-devel           \
-        MariaDB-devel           \
-        MariaDB-shared          \
-    && \
-    rm -rf /var/cache/yum
+    rm -rf /var/lib/apt/lists/*
 
 # Perl dependencies and XAO::Web
 #
@@ -57,9 +47,9 @@ RUN   cpanm -n \
         Plack::Middleware::Debug \
         Starman \
         DBD::MariaDB \
-        https://api.github.com/repos/amaltsev/XAO-Base/tarball/$XAO_BASE_VERSION \
-        https://api.github.com/repos/amaltsev/XAO-FS/tarball/$XAO_FS_VERSION \
-        https://api.github.com/repos/amaltsev/XAO-Web/tarball/$XAO_WEB_VERSION \
+        https://cpan.metacpan.org/authors/id/A/AM/AMALTSEV/XAO-Base-$XAO_BASE_VERSION.tar.gz \
+        https://cpan.metacpan.org/authors/id/A/AM/AMALTSEV/XAO-FS-$XAO_FS_VERSION.tar.gz \
+        https://cpan.metacpan.org/authors/id/A/AM/AMALTSEV/XAO-Web-$XAO_WEB_VERSION.tar.gz \
         2>&1 \
     && \
     rm -rf /root/.cpanm /usr/local/share/man

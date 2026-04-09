@@ -27,6 +27,7 @@ requires 'Data::MARC::Validator::Report::Plugin::Errors' => 0.02;
 requires 'DateTime' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
+requires 'List::Util' => 1.33;
 requires 'MARC::Field008' => 0;
 requires 'MARC::Leader' => 0.08;
 requires 'Mo::utils' => 0.06;
@@ -43,7 +44,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.14';
+version '0.15';
 
 # Run.
 WriteAll();

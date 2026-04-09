@@ -12,7 +12,7 @@ use MARC::Leader 0.08;
 use MARC::Field008;
 use MARC::Validator::Const;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub module_name {
 	my $self = shift;

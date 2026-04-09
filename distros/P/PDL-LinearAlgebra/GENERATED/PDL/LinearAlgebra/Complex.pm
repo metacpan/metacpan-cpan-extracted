@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.434';
+   our $VERSION = '0.435';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Complex $VERSION;
@@ -23,7 +23,7 @@ use DynaLoader;
 
 
 
-#line 81 "lib/PDL/LinearAlgebra/Complex.pd"
+#line 73 "lib/PDL/LinearAlgebra/Complex.pd"
 
 use strict;
 use PDL::LinearAlgebra::Real;
@@ -82,7 +82,7 @@ These routines accept either float or double ndarrays.
 
 Solves the equation
 
-	A * X = B
+  A * X = B
 
 where A is an C<n> by C<n> tridiagonal matrix, by Gaussian elimination with
 partial pivoting, and B is an C<n> by C<nrhs> matrix.
@@ -155,7 +155,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); [t]rwork(rworkn=CALC(5*$SIZE(minmn))))
+ Signature: (complex [io]A(m,n); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); [t]rwork(rworkn=CALC(5*$SIZE(minmn))); int jobu; int jobvt)
  Types: (float double)
 
 =for usage
@@ -198,7 +198,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+ Signature: (complex [io]A(m,n); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); int [t]iwork(iworkn); int jobz)
  Types: (float double)
 
 =for usage
@@ -241,7 +241,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(m,n); int jobu(); int jobv(); int jobq();complex  [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n);complex  [o]U(q,q);complex  [o]V(r,r);complex  [o]Q(s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(m,n);complex  [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n);complex  [o]U(q,q);complex  [o]V(r,r);complex  [o]Q(s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); int jobu; int jobv; int jobq)
  Types: (float double)
 
 =for usage
@@ -280,7 +280,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(n,n);complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); int jobvl; int jobvr)
  Types: (float double)
 
 =for usage
@@ -319,7 +319,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(n,n);complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); int jobvl; int jobvr; int balance; int sense)
  Types: (float double)
 
 =for usage
@@ -358,7 +358,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n); int jobvl();int jobvr();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))))
+ Signature: (complex [io]A(n,n);complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int jobvl; int jobvr)
  Types: (float double)
 
 =for usage
@@ -397,7 +397,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn))
+ Signature: (complex [io]A(n,n);complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn); int balanc; int jobvl; int jobvr; int sense)
  Types: (float double)
 
 =for usage
@@ -436,15 +436,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n);  int jobvs(); int sort();complex  [o]w(n);complex  [o]vs(p,p); int [o]sdim(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
+ Signature: (complex [io]A(n,n);complex  [o]w(n);complex  [o]vs(p,p); int [o]sdim(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); int jobvs; int sort; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($w, $vs, $sdim, $info) = cgees($A, $jobvs, $sort, $select_func);
- cgees($A, $jobvs, $sort, $w, $vs, $sdim, $info, $select_func);    # all arguments given
+ cgees($A, $jobvs, $sort, $select_func, $w, $vs, $sdim, $info);    # all arguments given
  ($w, $vs, $sdim, $info) = $A->cgees($jobvs, $sort, $select_func); # method call
- $A->cgees($jobvs, $sort, $w, $vs, $sdim, $info, $select_func);
+ $A->cgees($jobvs, $sort, $select_func, $w, $vs, $sdim, $info);
 
 =for ref
 
@@ -487,15 +487,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n);  int jobvs(); int sort(); int sense();complex  [o]w(n);complex [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
+ Signature: (complex [io]A(n,n);complex  [o]w(n);complex [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); int jobvs; int sort; int sense; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($w, $vs, $sdim, $rconde, $rcondv, $info) = cgeesx($A, $jobvs, $sort, $sense, $select_func);
- cgeesx($A, $jobvs, $sort, $sense, $w, $vs, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ cgeesx($A, $jobvs, $sort, $sense, $select_func, $w, $vs, $sdim, $rconde, $rcondv, $info);    # all arguments given
  ($w, $vs, $sdim, $rconde, $rcondv, $info) = $A->cgeesx($jobvs, $sort, $sense, $select_func); # method call
- $A->cgeesx($jobvs, $sort, $sense, $w, $vs, $sdim, $rconde, $rcondv, $info, $select_func);
+ $A->cgeesx($jobvs, $sort, $sense, $select_func, $w, $vs, $sdim, $rconde, $rcondv, $info);
 
 =for ref
 
@@ -538,15 +538,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); SV* select_func)
+ Signature: (complex [io]A(n,n);complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int jobvsl; int jobvsr; int sort; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($alpha, $beta, $VSL, $VSR, $sdim, $info) = cgges($A, $jobvsl, $jobvsr, $sort, $B, $select_func);
- cgges($A, $jobvsl, $jobvsr, $sort, $B, $alpha, $beta, $VSL, $VSR, $sdim, $info, $select_func);    # all arguments given
+ cgges($A, $jobvsl, $jobvsr, $sort, $B, $select_func, $alpha, $beta, $VSL, $VSR, $sdim, $info);    # all arguments given
  ($alpha, $beta, $VSL, $VSR, $sdim, $info) = $A->cgges($jobvsl, $jobvsr, $sort, $B, $select_func); # method call
- $A->cgges($jobvsl, $jobvsr, $sort, $B, $alpha, $beta, $VSL, $VSR, $sdim, $info, $select_func);
+ $A->cgges($jobvsl, $jobvsr, $sort, $B, $select_func, $alpha, $beta, $VSL, $VSR, $sdim, $info);
 
 =for ref
 
@@ -589,15 +589,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2)); SV* select_func)
+ Signature: (complex [io]A(n,n);complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2)); int jobvsl; int jobvsr; int sort; int sense; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = cggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $select_func);
- cggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ cggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $select_func, $alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info);    # all arguments given
  ($alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = $A->cggesx($jobvsl, $jobvsr, $sort, $sense, $B, $select_func); # method call
- $A->cggesx($jobvsl, $jobvsr, $sort, $sense, $B, $alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);
+ $A->cggesx($jobvsl, $jobvsr, $sort, $sense, $B, $select_func, $alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info);
 
 =for ref
 
@@ -718,7 +718,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+ Signature: (complex [io]A(n,n); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n))); int jobz; int range; int uplo)
  Types: (float double)
 
 =for usage
@@ -874,11 +874,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex [io]A(n,n);int itype();int jobz();int range();
-	  int uplo();complex [io]B(n,n);vl();vu();int il();
-	  int iu();abstol();int [o]m();[o]w(n);complex 
-	  [o]Z(p,p);int [o]ifail(n);int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));
-	)
+ Signature: (complex [io]A(n,n);int itype();complex 
+    [io]B(n,n);vl();vu();int il();
+    int iu();abstol();int [o]m();[o]w(n);complex 
+    [o]Z(p,p);int [o]ifail(n);int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));
+  ; int jobz; int range; int uplo)
  Types: (float double)
 
 =for usage
@@ -2035,9 +2035,9 @@ Complex version of L<PDL::LinearAlgebra::Real/getrs>
 
     Arguments
     =========
-	trans:   = 0:  No transpose;
-		 = 1:  Transpose;
-		 = 2:  Conjugate transpose;
+  trans:   = 0:  No transpose;
+     = 1:  Transpose;
+     = 2:  Conjugate transpose;
 
 =pod
 
@@ -2197,9 +2197,9 @@ Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 
     Arguments
     =========
-	trans:   = 0:  No transpose;
-		 = 1:  Transpose;
-		 = 2:  Conjugate transpose;
+  trans:   = 0:  No transpose;
+     = 1:  Transpose;
+     = 2:  Conjugate transpose;
 
 =pod
 
@@ -2242,9 +2242,9 @@ Complex version of L<PDL::LinearAlgebra::Real/latrs>
 
     Arguments
     =========
-	trans:   = 0:  No transpose;
-		 = 1:  Transpose;
-		 = 2:  Conjugate transpose;
+  trans:   = 0:  No transpose;
+     = 1:  Transpose;
+     = 2:  Conjugate transpose;
 
 =pod
 
@@ -3167,7 +3167,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex T(n,n); int side();int howmny();int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n))))
+ Signature: (complex T(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n))); int side; int howmny)
  Types: (float double)
 
 =for usage
@@ -3206,7 +3206,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex A(n,n); int side();int howmny();complex  B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+ Signature: (complex A(n,n);complex  B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))); int side; int howmny)
  Types: (float double)
 
 =for usage
@@ -3284,7 +3284,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex A(n,m); int norm(); [o]b(); [t]work(workn))
+ Signature: (complex A(n,m); [o]b(); [t]work(workn); int norm)
  Types: (float double)
 
 =for usage
@@ -3323,7 +3323,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
+ Signature: (complex A(n,n); [o]b(); [t]work(workn); int uplo; int norm)
  Types: (float double)
 
 =for usage
@@ -3362,7 +3362,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (complex A(m,n); int uplo(); int norm();int diag(); [o]b(); [t]work(workn))
+ Signature: (complex A(m,n); [o]b(); [t]work(workn); int uplo; int norm; int diag)
  Types: (float double)
 
 =for usage
@@ -3415,13 +3415,13 @@ Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 
     Arguments
     =========
-	transa:  = 0:  No transpose;
-		 = 1:  Transpose;
-		 = 2:  Conjugate transpose;
+  transa:  = 0:  No transpose;
+     = 1:  Transpose;
+     = 2:  Conjugate transpose;
 
-	transb:  = 0:  No transpose;
-		 = 1:  Transpose;
-		 = 2:  Conjugate transpose;
+  transb:  = 0:  No transpose;
+     = 1:  Transpose;
+     = 2:  Conjugate transpose;
 
 =pod
 
@@ -3982,7 +3982,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 4932 "lib/PDL/LinearAlgebra/Complex.pd"
+#line 4956 "lib/PDL/LinearAlgebra/Complex.pd"
 
 =head1 AUTHOR
 

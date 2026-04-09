@@ -57,7 +57,7 @@ sub process_line {
 	logpkg(__FILE__,__LINE__,'debug',"user input: $user_input");
 	if (defined $user_input and $user_input !~ /^\s*$/) {
 		push $text->{command_history}->@*, $user_input;
-		$text->{command_index}++;
+		$text->{command_index} = scalar $text->{command_history}->@*;
 		# convert hyphenated commands to underscore form
 		while( my($from, $to) = each %{$text->{hyphenated_commands}} ){ $user_input =~ s/$from/$to/g }
 			my $context = context();
@@ -423,14 +423,10 @@ sub showlist {
 
 	my @list = grep{ ! $_->hide } Audio::Nama::all_tracks();
 	my $section = [undef,undef,@list];
-	my ($screen_lines, $columns);
-	if( $text->{term} )
-	{
-		($screen_lines, $columns) = $text->{term}->get_screen_size();
-	}
 
-	return $section if scalar @list <= $screen_lines - 5
-					or ! $screen_lines; 
+	return $section ;
+=comment 
+	if scalar @list <= $screen_lines - 5 or ! $screen_lines; 
 
 	my @sections;
 
@@ -447,6 +443,7 @@ sub showlist {
 					map $tn{$_}, $this_bus, $bn{$this_bus}->tracks]
 	}
 	@sections
+=cut
 }
 
 

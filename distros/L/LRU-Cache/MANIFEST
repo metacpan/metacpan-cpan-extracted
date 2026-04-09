@@ -1,0 +1,25 @@
+Cache.c
+Changes
+include/lru_compat.h
+include/ppport.h
+include/xop_compat.h
+lib/LRU/Cache.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/001-load.t
+t/002-basic.t
+t/003-keys.t
+t/004-function-ops.t
+t/005-loop-patterns.t
+t/006-oldest-newest.t
+t/007-map-grep.t
+t/008-leak.t
+t/009-leak-extended.t
+t/010-ref-types.t
+t/011-nested-lru.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

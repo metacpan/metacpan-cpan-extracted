@@ -2,7 +2,7 @@ package Data::HashMap::I32S;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub import {
     $^H{"Data::HashMap::I32S/hm_i32s_put"}    = 1;

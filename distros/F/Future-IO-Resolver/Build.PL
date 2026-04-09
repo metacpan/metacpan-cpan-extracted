@@ -7,11 +7,12 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Future::IO::Resolver',
    requires => {
-      'Future::IO' => 0,
+      'perl' => '5.020',
+      'meta' => '0.008',
+
+      'Future::IO' => '0.19',
       'Future::Utils' => 0,
       'Net::LibAsyncNS' => 0,
-
-      'perl' => '5.020',
    },
    test_requires => {
       # Not mentioned in any of the test scripts, but we need /a/ working

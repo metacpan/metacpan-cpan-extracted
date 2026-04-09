@@ -1,11 +1,11 @@
 use Test2::V0;
-use IPC::Manager::Client::MySQL;
-use IPC::Manager::Serializer::JSON;
 
 my $CLASS      = 'IPC::Manager::Client::MySQL';
 my $SERIALIZER = 'IPC::Manager::Serializer::JSON';
 
-skip_all "MySQL driver not available" unless $CLASS->viable;
+skip_all "MySQL driver not available" unless eval { require IPC::Manager::Client::MySQL; $CLASS->viable };
+
+use IPC::Manager::Serializer::JSON;
 
 subtest 'viable' => sub {
     ok($CLASS->viable, "MySQL is viable");

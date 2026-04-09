@@ -2,7 +2,7 @@ package IPC::Manager::Client::AtomicPipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use File::Spec;
 use Atomic::Pipe;
@@ -16,7 +16,7 @@ use Object::HashBase qw{
     +pipe_cache
 };
 
-sub viable            { eval { require Atomic::Pipe; 1 } || 0 }
+sub _viable           { require Atomic::Pipe; Atomic::Pipe->VERSION('0.022'); 1 }
 sub suspend_supported { 0 }
 
 sub check_path { -p $_[1] }

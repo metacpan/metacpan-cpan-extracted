@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.434';
+   our $VERSION = '0.435';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Real $VERSION;
@@ -23,7 +23,7 @@ use DynaLoader;
 
 
 
-#line 79 "lib/PDL/LinearAlgebra/Real.pd"
+#line 71 "lib/PDL/LinearAlgebra/Real.pd"
 
 use strict;
 
@@ -101,7 +101,7 @@ These routines accept either float or double ndarrays.
 
 Solves the equation
 
-	A * X = B
+  A * X = B
 
 where A is an C<n> by C<n> tridiagonal matrix, by Gaussian elimination with
 partial pivoting, and B is an C<n> by C<nrhs> matrix.
@@ -174,7 +174,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info())
+ Signature: ([io]A(m,n); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info(); int jobu; int jobvt)
  Types: (float double)
 
 =for usage
@@ -289,7 +289,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+ Signature: ([io]A(m,n); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn); int jobz)
  Types: (float double)
 
 =for usage
@@ -304,13 +304,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Computes the singular value decomposition (SVD) of a real
 M-by-N matrix A.
 
-This routine use the Coppen's divide and conquer algorithm.
+This routine use the Cuppen's divide and conquer algorithm.
 It is much faster than the simple driver for large matrices, but uses more workspace.
 
     jobz:    Specifies options for computing all or part of matrix:
 
             = 0:  no columns of U or rows of V' are computed;
-	    = 1:  all M columns of U and all N rows of V' are
+      = 1:  all M columns of U and all N rows of V' are
                     returned in the arrays U and VT;
             = 2:  the first min(M,N) columns of U and the first
                     min(M,N) rows of V' are returned in the arrays U
@@ -389,7 +389,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(m,n); int jobu(); int jobv(); int jobq(); [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(q,q); [o]V(r,r); [o]Q(s,s); int [o]iwork(n); int [o]info())
+ Signature: ([io]A(m,n); [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(q,q); [o]V(r,r); [o]Q(s,s); int [o]iwork(n); int [o]info(); int jobu; int jobv; int jobq)
  Types: (float double)
 
 =for usage
@@ -404,17 +404,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Computes the generalized singular value decomposition (GSVD)
 of an M-by-N real matrix A and P-by-N real matrix B:
 
-	U'*A*Q = D1*( 0 R ),    V'*B*Q = D2*( 0 R )
+  U'*A*Q = D1*( 0 R ),    V'*B*Q = D2*( 0 R )
 
-	where U, V and Q are orthogonal matrices, and Z' is the transpose
-	of Z.
+  where U, V and Q are orthogonal matrices, and Z' is the transpose
+  of Z.
 
 Let K+L = the effective numerical rank of the matrix (A',B')',
 then R is a K+L-by-K+L nonsingular upper triangular matrix, D1 and
 D2 are M-by-(K+L) and P-by-(K+L) "diagonal" matrices and of the
 following structures, respectively:
 
-	If M-K-L >= 0,
+  If M-K-L >= 0,
 
                         K  L
            D1 =     K ( I  0 )
@@ -492,7 +492,7 @@ form by taking the nonsingular matrix X as
     =========
 
     jobu:   = 0:  U is not computed.
-	    = 1:  Orthogonal matrix U is computed;
+      = 1:  Orthogonal matrix U is computed;
 
     jobv:   = 0:  V is not computed.
             = 1:  Orthogonal matrix V is computed;
@@ -528,15 +528,15 @@ form by taking the nonsingular matrix X as
 
     U:      If jobu = 1, U contains the M-by-M orthogonal matrix U.
             If jobu = 0, U is not referenced.
-	    Need a minimum array of (1,1) if jobu = 0;
+      Need a minimum array of (1,1) if jobu = 0;
 
     V:      If jobv = 1, V contains the P-by-P orthogonal matrix V.
             If jobv = 0, V is not referenced.
-	    Need a minimum array of (1,1) if jobv = 0;
+      Need a minimum array of (1,1) if jobv = 0;
 
     Q:      If jobq = 1, Q contains the N-by-N orthogonal matrix Q.
             If jobq = 0, Q is not referenced.
-	    Need a minimum array of (1,1) if jobq = 0;
+      Need a minimum array of (1,1) if jobq = 0;
 
     iwork:  On exit, iwork stores the sorting information. More
             precisely, the following loop will sort alpha
@@ -590,7 +590,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info())
+ Signature: ([io]A(n,n); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info(); int jobvl; int jobvr)
  Types: (float double)
 
 =for usage
@@ -696,7 +696,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); int [t]iwork(iworkn))
+ Signature: ([io]A(n,n); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); int [t]iwork(iworkn); int jobvl; int jobvr; int balance; int sense)
  Types: (float double)
 
 =for usage
@@ -881,7 +881,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n); int jobvl();int jobvr();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info())
+ Signature: ([io]A(n,n);[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info(); int jobvl; int jobvr)
  Types: (float double)
 
 =for usage
@@ -906,14 +906,14 @@ being zero.
 The right eigenvector v(j) corresponding to the eigenvalue lambda(j)
 of (A,B) satisfies
 
-	A * v(j) = lambda(j) * B * v(j).
+  A * v(j) = lambda(j) * B * v(j).
 
 The left eigenvector u(j) corresponding to the eigenvalue lambda(j)
 of (A,B) satisfies
 
-	u(j)**H * A  = lambda(j) * u(j)**H * B .
+  u(j)**H * A  = lambda(j) * u(j)**H * B .
 
-	where u(j)**H is the conjugate-transpose of u(j).
+  where u(j)**H is the conjugate-transpose of u(j).
 
     Arguments
     =========
@@ -1010,7 +1010,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn))
+ Signature: ([io]A(n,n);[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn); int balanc; int jobvl; int jobvr; int sense)
  Types: (float double)
 
 =for usage
@@ -1041,14 +1041,14 @@ being zero.
 The right eigenvector v(j) corresponding to the eigenvalue lambda(j)
 of (A,B) satisfies
 
-	A * v(j) = lambda(j) * B * v(j) .
+  A * v(j) = lambda(j) * B * v(j) .
 
 The left eigenvector u(j) corresponding to the eigenvalue lambda(j)
 of (A,B) satisfies
 
-	u(j)**H * A  = lambda(j) * u(j)**H * B.
+  u(j)**H * A  = lambda(j) * u(j)**H * B.
 
-	where u(j)**H is the conjugate-transpose of u(j).
+  where u(j)**H is the conjugate-transpose of u(j).
 
 Further Details
 ===============
@@ -1066,12 +1066,12 @@ An approximate error bound on the chordal distance between the i-th
 computed generalized eigenvalue w and the corresponding exact
 eigenvalue lambda is
 
-	chord(w, lambda) <= EPS * norm(abnrm, bbnrm) / rconde(I)
+  chord(w, lambda) <= EPS * norm(abnrm, bbnrm) / rconde(I)
 
 An approximate error bound for the angle between the i-th computed
 eigenvector vl(i) or vr(i) is given by
 
-	EPS * norm(abnrm, bbnrm) / DIF(i).
+  EPS * norm(abnrm, bbnrm) / DIF(i).
 
 For further explanation of the reciprocal condition numbers rconde
 and rcondv, see section 4.11 of LAPACK User's Guide.
@@ -1247,15 +1247,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Signature: ([io]A(n,n); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn); int jobvs; int sort; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($wr, $wi, $vs, $sdim, $info) = gees($A, $jobvs, $sort, $select_func);
- gees($A, $jobvs, $sort, $wr, $wi, $vs, $sdim, $info, $select_func);    # all arguments given
+ gees($A, $jobvs, $sort, $select_func, $wr, $wi, $vs, $sdim, $info);    # all arguments given
  ($wr, $wi, $vs, $sdim, $info) = $A->gees($jobvs, $sort, $select_func); # method call
- $A->gees($jobvs, $sort, $wr, $wi, $vs, $sdim, $info, $select_func);
+ $A->gees($jobvs, $sort, $select_func, $wr, $wi, $vs, $sdim, $info);
 
 =for ref
 
@@ -1272,8 +1272,8 @@ A matrix is in real Schur form if it is upper quasi-triangular with
 1-by-1 and 2-by-2 blocks. 2-by-2 blocks will be standardized in the
 form
 
-	[  a  b  ]
-	[  c  a  ]
+  [  a  b  ]
+  [  c  a  ]
         where b*c < 0.
 
 The eigenvalues of such a block are a +- sqrt(bc).
@@ -1295,15 +1295,15 @@ The eigenvalues of such a block are a +- sqrt(bc).
             If sort = 0, select_func is not referenced.
             An eigenvalue wr(j)+sqrt(-1)*wi(j) is selected if
             select_func(SCALAR(wr(j)), SCALAR(wi(j))) is true; i.e.,
-	    if either one of a complex conjugate pair of eigenvalues
-	    is selected, then both complex eigenvalues are selected.
+      if either one of a complex conjugate pair of eigenvalues
+      is selected, then both complex eigenvalues are selected.
             Note that a selected complex eigenvalue may no longer
             satisfy select_func(wr(j),wi(j)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2 (see info below).
 
-    A:	    The N-by-N matrix A.
+    A:      The N-by-N matrix A.
             On exit, A has been overwritten by its real Schur form T.
 
     sdim:   If sort = 0, sdim = 0.
@@ -1342,9 +1342,9 @@ The eigenvalues of such a block are a +- sqrt(bc).
 =for example
 
  sub select_function{
-	my ($a, $b ) = @_;
-	# Stable "continuous time" eigenspace
-	return $a < 0 ? 1 : 0;
+  my ($a, $b ) = @_;
+  # Stable "continuous time" eigenspace
+  return $a < 0 ? 1 : 0;
  }
  $A = random (5,5);
  $wr= zeroes(5);
@@ -1379,15 +1379,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Signature: ([io]A(n,n); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); int [t]bwork(bworkn); int jobvs; int sort; int sense; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($wr, $wi, $vs, $sdim, $rconde, $rcondv, $info) = geesx($A, $jobvs, $sort, $sense, $select_func);
- geesx($A, $jobvs, $sort, $sense, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ geesx($A, $jobvs, $sort, $sense, $select_func, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info);    # all arguments given
  ($wr, $wi, $vs, $sdim, $rconde, $rcondv, $info) = $A->geesx($jobvs, $sort, $sense, $select_func); # method call
- $A->geesx($jobvs, $sort, $sense, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info, $select_func);
+ $A->geesx($jobvs, $sort, $sense, $select_func, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info);
 
 =for ref
 
@@ -1411,8 +1411,8 @@ A real matrix is in real Schur form if it is upper quasi-triangular
 with 1-by-1 and 2-by-2 blocks. 2-by-2 blocks will be standardized in
 the form
 
-	[  a  b  ]
-	[  c  a  ]
+  [  a  b  ]
+  [  c  a  ]
         where b*c < 0. The eigenvalues of such a block are a +- sqrt(bc).
 
     Arguments
@@ -1491,9 +1491,9 @@ the form
 =for example
 
  sub select_function{
-	my ($a, $b) = @_;
-	# Stable "discrete time" eigenspace
-	return sqrt($a**2 + $b**2) < 1 ? 1 : 0;
+  my ($a, $b) = @_;
+  # Stable "discrete time" eigenspace
+  return sqrt($a**2 + $b**2) < 1 ? 1 : 0;
  }
  $A = random (5,5);
  $wr= zeroes(5);
@@ -1530,15 +1530,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Signature: ([io]A(n,n);[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn); int jobvsl; int jobvsr; int sort; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info) = gges($A, $jobvsl, $jobvsr, $sort, $B, $select_func);
- gges($A, $jobvsl, $jobvsr, $sort, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info, $select_func);    # all arguments given
+ gges($A, $jobvsl, $jobvsr, $sort, $B, $select_func, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info);    # all arguments given
  ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info) = $A->gges($jobvsl, $jobvsr, $sort, $B, $select_func); # method call
- $A->gges($jobvsl, $jobvsr, $sort, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info, $select_func);
+ $A->gges($jobvsl, $jobvsr, $sort, $B, $select_func, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info);
 
 =for ref
 
@@ -1547,7 +1547,7 @@ the generalized eigenvalues, the generalized real Schur form (S,T),
 optionally, the left and/or right matrices of Schur vectors (VSL and
 VSR). This gives the generalized Schur factorization
 
-	(A,B) = ( (VSL)*S*(VSR)', (VSL)*T*(VSR)' )
+  (A,B) = ( (VSL)*S*(VSR)', (VSL)*T*(VSR)' )
 
 Optionally, it also orders the eigenvalues so that a selected cluster
 of eigenvalues appears in the leading diagonal blocks of the upper
@@ -1570,8 +1570,8 @@ to real generalized eigenvalues, while 2-by-2 blocks of S will be
 "standardized" by making the corresponding elements of T have the
 form:
 
-	[  a  0  ]
-	[  0  b  ]
+  [  a  0  ]
+  [  0  b  ]
 
 and the pair of corresponding 2-by-2 blocks in S and T will have a
 complex conjugate pair of generalized eigenvalues.
@@ -1660,9 +1660,9 @@ complex conjugate pair of generalized eigenvalues.
 =for example
 
  sub my_select{
-	my ($zr, $zi, $d) = @_;
-	# stable generalized eigenvalues for continuous time
-	return ( ($zr < 0 && $d > 0 ) || ($zr > 0 && $d < 0) ) ?  1 : 0;
+  my ($zr, $zi, $d) = @_;
+  # stable generalized eigenvalues for continuous time
+  return ( ($zr < 0 && $d > 0 ) || ($zr > 0 && $d < 0) ) ?  1 : 0;
  }
  $a = random(5,5);
  $b = random(5,5);
@@ -1699,15 +1699,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn); SV* select_func)
+ Signature: ([io]A(n,n);[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn); int jobvsl; int jobvsr; int sort; int sense; SV* select_func)
  Types: (float double)
 
 =for usage
 
  ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = ggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $select_func);
- ggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ ggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $select_func, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info);    # all arguments given
  ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = $A->ggesx($jobvsl, $jobvsr, $sort, $sense, $B, $select_func); # method call
- $A->ggesx($jobvsl, $jobvsr, $sort, $sense, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);
+ $A->ggesx($jobvsl, $jobvsr, $sort, $sense, $B, $select_func, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info);
 
 =for ref
 
@@ -1716,7 +1716,7 @@ Computes for a pair of N-by-N real nonsymmetric matrices
 optionally, the left and/or right matrices of Schur vectors (VSL and
 VSR).  This gives the generalized Schur factorization
 
-	(A,B) = ( (VSL) S (VSR)', (VSL) T (VSR)' )
+  (A,B) = ( (VSL) S (VSR)', (VSL) T (VSR)' )
 
 Optionally, it also orders the eigenvalues so that a selected cluster
 of eigenvalues appears in the leading diagonal blocks of the upper
@@ -1740,8 +1740,8 @@ to real generalized eigenvalues, while 2-by-2 blocks of S will be
 "standardized" by making the corresponding elements of T have the
 form:
 
-	[  a  0  ]
-	[  0  b  ]
+  [  a  0  ]
+  [  0  b  ]
 
 and the pair of corresponding 2-by-2 blocks in S and T will have a
 complex conjugate pair of generalized eigenvalues.
@@ -1752,12 +1752,12 @@ Further details
 An approximate (asymptotic) bound on the average absolute error of
 the selected eigenvalues is
 
-	EPS * norm((A, B)) / RCONDE( 1 ).
+  EPS * norm((A, B)) / RCONDE( 1 ).
 
 An approximate (asymptotic) bound on the maximum angular error in
 the computed deflating subspaces is
 
-	EPS * norm((A, B)) / RCONDV( 2 ).
+  EPS * norm((A, B)) / RCONDV( 2 ).
 
 See LAPACK User's Guide, section 4.11 for more information.
 
@@ -1862,10 +1862,10 @@ See LAPACK User's Guide, section 4.11 for more information.
 =for example
 
  sub my_select{
-	my ($zr, $zi, $d) = @_;
-	# Eigenvalue : (ZR/D) + sqrt(-1)*(ZI/D)
-	# stable generalized eigenvalues for discrete time
-	return (sqrt($zr**2 + $zi**2) < abs($d) ) ?  1 : 0;
+  my ($zr, $zi, $d) = @_;
+  # Eigenvalue : (ZR/D) + sqrt(-1)*(ZI/D)
+  # stable generalized eigenvalues for discrete time
+  return (sqrt($zr**2 + $zi**2) < abs($d) ) ?  1 : 0;
 
  }
  $a = random(5,5);
@@ -2064,7 +2064,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+ Signature: ([io]A(n,n); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n))); int jobz; int range; int uplo)
  Types: (float double)
 
 =for usage
@@ -2601,11 +2601,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: ([io]A(n,n); int itype(); int jobz(); int range();
-	  int uplo(); [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
-	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
-	  int [t]iwork(iworkn=CALC(5*$SIZE(n)));
-	)
+ Signature: ([io]A(n,n); int itype();
+    [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
+    int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
+    int [t]iwork(iworkn=CALC(5*$SIZE(n)));
+  ; int jobz; int range; int uplo)
  Types: (float double)
 
 =for usage
@@ -2785,15 +2785,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Computes the solution to a real system of linear equations
 
-	A * X = B,
-	where A is an N-by-N matrix and X and B are N-by-NRHS matrices.
+  A * X = B,
+  where A is an N-by-N matrix and X and B are N-by-NRHS matrices.
 
 The LU decomposition with partial pivoting and row interchanges is
 used to factor A as
 
-	A = P * L * U,
-	where P is a permutation matrix, L is unit lower triangular, and U is
-	upper triangular.
+  A = P * L * U,
+  where P is a permutation matrix, L is unit lower triangular, and U is
+  upper triangular.
 
 The factored form of A is then used to solve the
 system of equations A * X = B.
@@ -2866,8 +2866,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Uses the LU factorization to compute the solution to a real
 system of linear equations
 
-	A * X = B,
-	where A is an N-by-N matrix and X and B are N-by-NRHS matrices.
+  A * X = B,
+  where A is an N-by-N matrix and X and B are N-by-NRHS matrices.
 
 Error bounds on the solution and a condition estimate are also
 provided.
@@ -2883,9 +2883,9 @@ The following steps are performed:
 If fact = 2, real scaling factors are computed to equilibrate
 the system:
 
-	trans = 0:  diag(r)*A*diag(c)     *inv(diag(c))*X = diag(c)*B
-	trans = 1: (diag(r)*A*diag(c))' *inv(diag(r))*X = diag(c)*B
-	trans = 2: (diag(r)*A*diag(c))**H *inv(diag(r))*X = diag(c)*B
+  trans = 0:  diag(r)*A*diag(c)     *inv(diag(c))*X = diag(c)*B
+  trans = 1: (diag(r)*A*diag(c))' *inv(diag(r))*X = diag(c)*B
+  trans = 2: (diag(r)*A*diag(c))**H *inv(diag(r))*X = diag(c)*B
 
 Whether or not the system will be equilibrated depends on the
 scaling of the matrix A, but if equilibration is used, A is
@@ -2897,9 +2897,9 @@ or diag(c)*B (if trans = 1 or 2).
 If fact = 1 or 2, the LU decomposition is used to factor the
 matrix A (after equilibration if fact = 2) as
 
-	A = P * L * U,
-	where P is a permutation matrix, L is a unit lower triangular
-	matrix, and U is upper triangular.
+  A = P * L * U,
+  where P is a permutation matrix, L is a unit lower triangular
+  matrix, and U is upper triangular.
 
 =item 3
 
@@ -3043,13 +3043,13 @@ that it solves the original system before equilibration.
             any element of A or B that makes X(j) an exact solution).
 
     rpvgrw: Contains the reciprocal pivot growth factor norm(A)/norm(U).
-	    The "max absolute element" norm is used. If it is much less
-	    than 1, then the stability of the LU factorization of the
-	    (equilibrated) matrix A could be poor. This also means that
-	    the solution X, condition estimator rcond, and forward error
-	    bound ferr could be unreliable. If factorization fails with
-	    0<info<=N, then it contains the reciprocal pivot growth factor
-	    for the leading info columns of A.
+      The "max absolute element" norm is used. If it is much less
+      than 1, then the stability of the LU factorization of the
+      (equilibrated) matrix A could be poor. This also means that
+      the solution X, condition estimator rcond, and forward error
+      bound ferr could be unreliable. If factorization fails with
+      0<info<=N, then it contains the reciprocal pivot growth factor
+      for the leading info columns of A.
 
     info:   = 0:  successful exit
             < 0:  if info = -i, the i-th argument had an illegal value
@@ -3125,17 +3125,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Computes the solution to a real system of linear equations
 
-	A * X = B,
-	where A is an N-by-N symmetric matrix and X and B are N-by-NRHS
-	matrices.
+  A * X = B,
+  where A is an N-by-N symmetric matrix and X and B are N-by-NRHS
+  matrices.
 
 The diagonal pivoting method is used to factor A as
 
-	A = U * D * U',  if uplo = 0, or
-	A = L * D * L',  if uplo = 1,
-	where U (or L) is a product of permutation and unit upper (lower)
-	triangular matrices, and D is symmetric and block diagonal with
-	1-by-1 and 2-by-2 diagonal blocks.
+  A = U * D * U',  if uplo = 0, or
+  A = L * D * L',  if uplo = 1,
+  where U (or L) is a product of permutation and unit upper (lower)
+  triangular matrices, and D is symmetric and block diagonal with
+  1-by-1 and 2-by-2 diagonal blocks.
 
 The factored form of A is then
 used to solve the system of equations A * X = B.
@@ -3242,11 +3242,11 @@ The following steps are performed:
 If fact = 0, the diagonal pivoting method is used to factor A.
 The form of the factorization is
 
-	A = U * D * U',  if uplo = 0, or
-	A = L * D * L',  if uplo = 1,
-	where U (or L) is a product of permutation and unit upper (lower)
-	triangular matrices, and D is symmetric and block diagonal with
-	1-by-1 and 2-by-2 diagonal blocks.
+  A = U * D * U',  if uplo = 0, or
+  A = L * D * L',  if uplo = 1,
+  where U (or L) is a product of permutation and unit upper (lower)
+  triangular matrices, and D is symmetric and block diagonal with
+  1-by-1 and 2-by-2 diagonal blocks.
 
 =item 2
 
@@ -3409,16 +3409,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Computes the solution to a real system of linear equations
 
-	A * X = B,
-	where A is an N-by-N symmetric positive definite matrix and X and B
-	are N-by-NRHS matrices.
+  A * X = B,
+  where A is an N-by-N symmetric positive definite matrix and X and B
+  are N-by-NRHS matrices.
 
 The Cholesky decomposition is used to factor A as
 
-	A = U'* U,  if uplo = 0, or
-	A = L * L',  if uplo = 1,
-	where U is an upper triangular matrix and L is a lower triangular
-	matrix.
+  A = U'* U,  if uplo = 0, or
+  A = L * L',  if uplo = 1,
+  where U is an upper triangular matrix and L is a lower triangular
+  matrix.
 
 The factored form of A is then used to solve the system of
 equations A * X = B.
@@ -3499,9 +3499,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Uses the Cholesky factorization A = U'*U or A = L*L' to
 compute the solution to a real system of linear equations
 
-	A * X = B,
-	where A is an N-by-N symmetric positive definite matrix and X and B
-	are N-by-NRHS matrices.
+  A * X = B,
+  where A is an N-by-N symmetric positive definite matrix and X and B
+  are N-by-NRHS matrices.
 
 Error bounds on the solution and a condition estimate are also
 provided.
@@ -3515,7 +3515,7 @@ The following steps are performed:
 If fact = 2, real scaling factors are computed to equilibrate
 the system:
 
-	diag(s) * A * diag(s) * inv(diag(s)) * X = diag(s) * B
+  diag(s) * A * diag(s) * inv(diag(s)) * X = diag(s) * B
 
 Whether or not the system will be equilibrated depends on the
 scaling of the matrix A, but if equilibration is used, A is
@@ -3526,10 +3526,10 @@ overwritten by diag(s)*A*diag(s) and B by diag(s)*B.
 If fact = 1 or 2, the Cholesky decomposition is used to
 factor the matrix A (after equilibration if fact = 2) as
 
-	A = U'* U,  if uplo = 0, or
-	A = L * L',  if uplo = 1,
-	where U is an upper triangular matrix and L is a lower triangular
-	matrix.
+  A = U'* U,  if uplo = 0, or
+  A = L * L',  if uplo = 1,
+  where U is an upper triangular matrix and L is a lower triangular
+  matrix.
 
 =item 3
 
@@ -3838,7 +3838,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Computes the minimum-norm solution to a real linear least
 squares problem:
 
-	minimize || A * X - B ||
+  minimize || A * X - B ||
 
 using a complete orthogonal factorization of A.
 
@@ -3851,25 +3851,25 @@ matrix X.
 
 The routine first computes a QR factorization with column pivoting:
 
-	A * P = Q * [ R11 R12 ]
-		    [  0  R22 ]
+  A * P = Q * [ R11 R12 ]
+        [  0  R22 ]
 
-	with R11 defined as the largest leading submatrix whose estimated
-	condition number is less than 1/rcond.  The order of R11, rank,
-	is the effective rank of A.
+  with R11 defined as the largest leading submatrix whose estimated
+  condition number is less than 1/rcond.  The order of R11, rank,
+  is the effective rank of A.
 
 Then, R22 is considered to be negligible, and R12 is annihilated
 by orthogonal transformations from the right, arriving at the
 complete orthogonal factorization:
 
-	A * P = Q * [ T11 0 ] * Z
-		    [  0  0 ]
+  A * P = Q * [ T11 0 ] * Z
+        [  0  0 ]
 
 The minimum-norm solution is then
 
-	X = P * Z' [ inv(T11)*Q1'*B ]
-		   [	     0	    ]
-	where Q1 consists of the first rank columns of Q.
+  X = P * Z' [ inv(T11)*Q1'*B ]
+       [       0      ]
+  where Q1 consists of the first rank columns of Q.
 
     Arguments
     =========
@@ -3951,7 +3951,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Computes the minimum norm solution to a real linear least
 squares problem:
 
-	Minimize 2-norm(| b - A*x |).
+  Minimize 2-norm(| b - A*x |).
 
 using the singular value decomposition (SVD) of A. A is an M-by-N
 matrix which may be rank-deficient.
@@ -3977,7 +3977,7 @@ value.
             matrix X.  If m >= n and rank = n, the residual
             sum-of-squares for the solution in the i-th column is given
             by the sum of squares of elements n+1:m in that column.
-	    The leading dimension of the array B >= max(1,M,N).
+      The leading dimension of the array B >= max(1,M,N).
 
     s:      The singular values of A in decreasing order.
             The condition number of A in the 2-norm = s(1)/s(min(m,n)).
@@ -4047,7 +4047,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Computes the minimum-norm solution to a real linear least
 squares problem:
 
-	minimize 2-norm(| b - A*x |)
+  minimize 2-norm(| b - A*x |)
 
 using the singular value decomposition (SVD) of A. A is an M-by-N
 matrix which may be rank-deficient.
@@ -4100,7 +4100,7 @@ without guard digits, but we know of none.
             matrix X.  If m >= n and rank = n, the residual
             sum-of-squares for the solution in the i-th column is given
             by the sum of squares of elements n+1:m in that column.
-	    The leading dimension of the array B >= max(1,M,N).
+      The leading dimension of the array B >= max(1,M,N).
 
     s:      The singular values of A in decreasing order.
             The condition number of A in the 2-norm = s(1)/s(min(m,n)).
@@ -4170,11 +4170,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Solves the linear equality-constrained least squares (LSE)
 problem:
 
-	minimize || c - A*x ||_2   subject to   B*x = d
+  minimize || c - A*x ||_2   subject to   B*x = d
 
-	where A is an M-by-N matrix, B is a P-by-N matrix, c is a given
-	M-vector, and d is a given P-vector. It is assumed that
-	P <= N <= M+P, and
+  where A is an M-by-N matrix, B is a P-by-N matrix, c is a given
+  M-vector, and d is a given P-vector. It is assumed that
+  P <= N <= M+P, and
 
              rank(B) = P and  rank( ( A ) ) = N.
                                   ( ( B ) )
@@ -4254,11 +4254,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Solves a general Gauss-Markov linear model (GLM) problem:
 
-	minimize || y ||_2   subject to   d = A*x + B*y
-	   x
+  minimize || y ||_2   subject to   d = A*x + B*y
+     x
 
-	where A is an N-by-M matrix, B is an N-by-P matrix, and d is a
-	given N-vector. It is assumed that M <= N <= M+P, and
+  where A is an N-by-M matrix, B is an N-by-P matrix, and d is a
+  given N-vector. It is assumed that M <= N <= M+P, and
 
                rank(A) = M    and    rank( A B ) = N.
 
@@ -4271,10 +4271,10 @@ In particular, if matrix B is square nonsingular, then the problem
 GLM is equivalent to the following weighted linear least squares
 problem
 
-	minimize || inv(B)*(d-A*x) ||_2
-	   x
+  minimize || inv(B)*(d-A*x) ||_2
+     x
 
-	where inv(B) denotes the inverse of B.
+  where inv(B) denotes the inverse of B.
 
     Arguments
     =========
@@ -4345,11 +4345,11 @@ using partial pivoting with row interchanges.
 
 The factorization has the form
 
-	A = P * L * U
+  A = P * L * U
 
-	where P is a permutation matrix, L is lower triangular with unit
-	diagonal elements (lower trapezoidal if m > n), and U is upper
-	triangular (upper trapezoidal if m < n).
+  where P is a permutation matrix, L is lower triangular with unit
+  diagonal elements (lower trapezoidal if m > n), and U is upper
+  triangular (upper trapezoidal if m < n).
 
 This is the right-looking Level 3 BLAS version of the algorithm.
 
@@ -4419,11 +4419,11 @@ using partial pivoting with row interchanges.
 
 The factorization has the form
 
-	A = P * L * U
+  A = P * L * U
 
-	where P is a permutation matrix, L is lower triangular with unit
-	diagonal elements (lower trapezoidal if m > n), and U is upper
-	triangular (upper trapezoidal if m < n).
+  where P is a permutation matrix, L is lower triangular with unit
+  diagonal elements (lower trapezoidal if m > n), and U is upper
+  triangular (upper trapezoidal if m < n).
 
 This is the right-looking Level 2 BLAS version of the algorithm.
 
@@ -4492,10 +4492,10 @@ Computes the factorization of a real symmetric matrix A using
 the Bunch-Kaufman diagonal pivoting method.  The form of the
 factorization is
 
-	A = U*D*U'  or  A = L*D*L'
-	where U (or L) is a product of permutation and unit upper (lower)
-	triangular matrices, and D is symmetric and block diagonal with
-	1-by-1 and 2-by-2 diagonal blocks.
+  A = U*D*U'  or  A = L*D*L'
+  where U (or L) is a product of permutation and unit upper (lower)
+  triangular matrices, and D is symmetric and block diagonal with
+  1-by-1 and 2-by-2 diagonal blocks.
 
 This is the blocked version of the algorithm, calling Level 3 BLAS.
 
@@ -4618,10 +4618,10 @@ Computes the factorization of a real symmetric matrix A using
 the Bunch-Kaufman diagonal pivoting method.  The form of the
 factorization is
 
-	A = U*D*U'  or  A = L*D*L'
-	where U (or L) is a product of permutation and unit upper (lower)
-	triangular matrices, and D is symmetric and block diagonal with
-	1-by-1 and 2-by-2 diagonal blocks.
+  A = U*D*U'  or  A = L*D*L'
+  where U (or L) is a product of permutation and unit upper (lower)
+  triangular matrices, and D is symmetric and block diagonal with
+  1-by-1 and 2-by-2 diagonal blocks.
 
 This is the unblocked version of the algorithm, calling Level 2 BLAS.
 
@@ -4710,9 +4710,9 @@ positive definite matrix A.
 
 The factorization has the form
 
-	A = U' * U,  if uplo = 0, or
-	A = L  * L',  if uplo = 1,
-	where U is an upper triangular matrix and L is lower triangular.
+  A = U' * U,  if uplo = 0, or
+  A = L  * L',  if uplo = 1,
+  where U is an upper triangular matrix and L is lower triangular.
 
 This is the block version of the algorithm, calling Level 3 BLAS.
 
@@ -4787,9 +4787,9 @@ positive definite matrix A.
 
 The factorization has the form
 
-	A = U' * U,  if uplo = 0, or
-	A = L  * L',  if uplo = 1,
-	where U is an upper triangular matrix and L is lower triangular.
+  A = U' * U,  if uplo = 0, or
+  A = L  * L',  if uplo = 1,
+  where U is an upper triangular matrix and L is lower triangular.
 
 This is the unblocked version of the algorithm, calling Level 2 BLAS.
 
@@ -4888,7 +4888,7 @@ This method inverts U and then computes inv(A) by solving the system
  $info = null;
  getrf($a, $ipiv, $info);
  if ($info == 0){
-	getri($a, $ipiv, $info);
+  getri($a, $ipiv, $info);
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
@@ -4966,7 +4966,7 @@ C<sytrf>.
  $ipiv = zeroes(long, 100);
  sytrf($a, 0, $ipiv, ($info=null));
  if ($info == 0){
-	sytri($a, 0, $ipiv, $info);
+  sytri($a, 0, $ipiv, $info);
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
@@ -5034,7 +5034,7 @@ computed by C<potrf>.
  # Assume $a is symmetric positive definite
  potrf($a, 0, ($info = null));
  if ($info == 0){ # Hum... is it positive definite????
-	potri($a, 0,$info);
+  potri($a, 0,$info);
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
@@ -5225,7 +5225,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Solves a system of linear equations
 
-	A * X = B  or  A' * X = B
+  A * X = B  or  A' * X = B
 
 with a general N-by-N matrix A using the LU factorization computed
 by getrf.
@@ -5256,7 +5256,7 @@ by getrf.
  $b = random(100,50);
  getrf($a, $ipiv, ($info=null));
  if ($info == 0){
-	getrs($a, 0, $b, $ipiv, $info);
+  getrs($a, 0, $b, $ipiv, $info);
  }
  print "X is :\n $b" unless $info;
 
@@ -5330,7 +5330,7 @@ A = L*D*L' computed by C<sytrf>.
  # Assume $a is symmetric
  sytrf($a, 0, ($ipiv=zeroes(100)), ($info=null));
  if ($info == 0){
-	sytrs($a, 0, $b, $ipiv, $info);
+  sytrs($a, 0, $b, $ipiv, $info);
  }
  print("X is :\n".transpose($b))unless $info;
 
@@ -5399,7 +5399,7 @@ A = U'*U or A = L*L' computed by C<potrf>.
  # Assume $a is symmetric positive definite
  potrf($a, 0, ($info=null));
  if ($info == 0){
-	potrs($a, 0, $b, $info);
+  potrs($a, 0, $b, $info);
  }
  print("X is :\n".transpose($b))unless $info;
 
@@ -5442,10 +5442,10 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Solves a triangular system of the form
 
-	A * X = B  or  A' * X = B,
+  A * X = B  or  A' * X = B,
 
-	where A is a triangular matrix of order N, and B is an N-by-NRHS
-	matrix.
+  where A is a triangular matrix of order N, and B is an N-by-NRHS
+  matrix.
 
 A check is made to verify that A is nonsingular.
 
@@ -5530,7 +5530,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Solves one of the triangular systems
 
-	A *x = s*b  or  A'*x = s*b
+  A *x = s*b  or  A'*x = s*b
 
 with scaling to prevent overflow.  Here A is an upper or lower
 triangular matrix, A' denotes the transpose of A, x and b are
@@ -5655,7 +5655,7 @@ than max(underflow, 1/overflow).
     cnorm:  If normin = 0, cnorm is an output argument and cnorm(j)
             returns the 1-norm of the offdiagonal part of the j-th column
             of A.
-	    If normin = 1, cnorm is an input argument and cnorm(j)
+      If normin = 1, cnorm is an input argument and cnorm(j)
             contains the norm of the off-diagonal part of the j-th column
             of A.  If trans = 0, cnorm(j) must be greater than or equal
             to the infinity-norm, and if trans = 1, cnorm(j)
@@ -5942,15 +5942,15 @@ The norm of A is computed and an estimate is obtained for
 norm(inv(A)), then the reciprocal of the condition number is
 computed as
 
-	rcond = 1 / ( norm(A) * norm(inv(A)) ).
+  rcond = 1 / ( norm(A) * norm(inv(A)) ).
 
     Arguments
     =========
 
     norm:   Specifies whether the 1-norm condition number or the
             infinity-norm condition number is required:
-            = 0:	Infinity-norm.
-            = 1:	1-norm;
+            = 0:  Infinity-norm.
+            = 1:  1-norm;
 
     uplo:   = 0:  A is upper triangular;
             = 1:  A is lower triangular.
@@ -6020,19 +6020,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 geqp3 computes a QR factorization  using Level 3 BLAS with column pivoting of a
 matrix A:
 
-		A*P = Q*R
+    A*P = Q*R
 
 The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(1) H(2) . . . H(k), where k = min(m,n).
+  Q = H(1) H(2) . . . H(k), where k = min(m,n).
 
 Each H(i) has the form
 
-	H(i) = I - tau * v * v'
+  H(i) = I - tau * v * v'
 
-	where tau is a real/complex scalar, and v is a real/complex vector
-	with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in
-	A(i+1:m,i), and tau in tau(i).
+  where tau is a real/complex scalar, and v is a real/complex vector
+  with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in
+  A(i+1:m,i), and tau in tau(i).
 
     Arguments
     =========
@@ -6103,19 +6103,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 geqrf computes a QR factorization of a
 matrix A:
 
-	A = Q * R
+  A = Q * R
 
 The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(1) H(2) . . . H(k), where k = min(m,n).
+  Q = H(1) H(2) . . . H(k), where k = min(m,n).
 
 Each H(i) has the form
 
-	H(i) = I - tau * v * v'
+  H(i) = I - tau * v * v'
 
-	where tau is a real/complex scalar, and v is a real/complex vector
-	with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in
-	A(i+1:m,i), and tau in tau(i).
+  where tau is a real/complex scalar, and v is a real/complex vector
+  with v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in
+  A(i+1:m,i), and tau in tau(i).
 
     Arguments
     =========
@@ -6179,9 +6179,9 @@ Generates an M-by-N real matrix Q with orthonormal columns,
 which is defined as the first N columns of a product of K elementary
 reflectors of order M
 
-	Q  =  H(1) H(2) . . . H(k)
+  Q  =  H(1) H(2) . . . H(k)
 
-	as returned by geqrf or geqp3.
+  as returned by geqrf or geqp3.
 
     Arguments
     =========
@@ -6254,7 +6254,7 @@ Overwrites the general real M-by-N matrix C with
 
           Q = H(1) H(2) . . . H(k)
 
-	as returned by geqrf or geqp3.
+  as returned by geqrf or geqp3.
 
 Q is of order M if C<side> = 0 and of order N
 if C<side> = 1.
@@ -6334,7 +6334,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Computes an LQ factorization of a real M-by-N matrix A:
 
-	A = L * Q.
+  A = L * Q.
 
 The matrix Q is represented as a product of elementary reflectors
 
@@ -6342,11 +6342,11 @@ The matrix Q is represented as a product of elementary reflectors
 
 Each H(i) has the form
 
-	H(i) = I - tau * v * v'
+  H(i) = I - tau * v * v'
 
-	where tau is a real scalar, and v is a real vector with
-	v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i,i+1:n),
-	and tau in tau(i).
+  where tau is a real scalar, and v is a real vector with
+  v(1:i-1) = 0 and v(i) = 1; v(i+1:n) is stored on exit in A(i,i+1:n),
+  and tau in tau(i).
 
     Arguments
     =========
@@ -6411,9 +6411,9 @@ Generates an M-by-N real matrix Q with orthonormal rows,
 which is defined as the first M rows of a product of K elementary
 reflectors of order N
 
-	Q  =  H(k) . . . H(2) H(1)
+  Q  =  H(k) . . . H(2) H(1)
 
-	as returned by gelqf.
+  as returned by gelqf.
 
     Arguments
     =========
@@ -6565,19 +6565,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Computes a QL factorization of a real M-by-N matrix A:
 
-	A = Q * L
+  A = Q * L
 
 The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(k) . . . H(2) H(1), where k = min(m,n).
+  Q = H(k) . . . H(2) H(1), where k = min(m,n).
 
 Each H(i) has the form
 
-	H(i) = I - tau * v * v'
+  H(i) = I - tau * v * v'
 
-	where tau is a real scalar, and v is a real vector with
-	v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in
-	A(1:m-k+i-1,n-k+i), and tau in TAU(i).
+  where tau is a real scalar, and v is a real vector with
+  v(m-k+i+1:m) = 0 and v(m-k+i) = 1; v(1:m-k+i-1) is stored on exit in
+  A(1:m-k+i-1,n-k+i), and tau in TAU(i).
 
     Arguments
     =========
@@ -6644,9 +6644,9 @@ Generates an M-by-N real matrix Q with orthonormal columns,
 which is defined as the last N columns of a product of K elementary
 reflectors of order M
 
-	Q  =  H(k) . . . H(2) H(1)
+  Q  =  H(k) . . . H(2) H(1)
 
-	as returned by geqlf.
+  as returned by geqlf.
 
     Arguments
     =========
@@ -6799,19 +6799,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Computes an RQ factorization of a real M-by-N matrix A:
 
-	A = R * Q.
+  A = R * Q.
 
 The matrix Q is represented as a product of elementary reflectors
 
-	Q = H(1) H(2) . . . H(k), where k = min(m,n).
+  Q = H(1) H(2) . . . H(k), where k = min(m,n).
 
 Each H(i) has the form
 
-	H(i) = I - tau * v * v'
+  H(i) = I - tau * v * v'
 
-	where tau is a real scalar, and v is a real vector with
-	v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in
-	A(m-k+i,1:n-k+i-1), and tau in TAU(i).
+  where tau is a real scalar, and v is a real vector with
+  v(n-k+i+1:n) = 0 and v(n-k+i) = 1; v(1:n-k+i-1) is stored on exit in
+  A(m-k+i,1:n-k+i-1), and tau in TAU(i).
 
     Arguments
     =========
@@ -6879,9 +6879,9 @@ Generates an M-by-N real matrix Q with orthonormal rows,
 which is defined as the last M rows of a product of K elementary
 reflectors of order N
 
-	Q  =  H(1) H(2) . . . H(k)
+  Q  =  H(1) H(2) . . . H(k)
 
-	as returned by gerqf.
+  as returned by gerqf.
 
     Arguments
     =========
@@ -6954,7 +6954,7 @@ Overwrites the general real M-by-N matrix C with
 
           Q = H(1) H(2) . . . H(k)
 
-	as returned by gerqf.
+  as returned by gerqf.
 
 Q is of order M if C<side> = 0 and of order N
 if C<side> = 1.
@@ -7037,10 +7037,10 @@ to upper triangular form by means of orthogonal transformations.
 
 The upper trapezoidal matrix A is factored as
 
-	A = ( R  0 ) * Z,
+  A = ( R  0 ) * Z,
 
-	where Z is an N-by-N orthogonal matrix and R is an M-by-M upper
-	triangular matrix.
+  where Z is an N-by-N orthogonal matrix and R is an M-by-M upper
+  triangular matrix.
 
 The factorization is obtained by Householder's method.  The kth
 transformation matrix, Z( k ), which is used to introduce zeros into
@@ -7225,31 +7225,31 @@ Further Details
 The matrix Q is represented as a product of (ihi-ilo) elementary
 reflectors
 
-	Q = H(ilo) H(ilo+1) . . . H(ihi-1).
+  Q = H(ilo) H(ilo+1) . . . H(ihi-1).
 
 Each H(i) has the form
 
-	H(i) = I - tau * v * v'
-	where tau is a real scalar, and v is a real vector with
-	v(1:i) = 0, v(i+1) = 1 and v(ihi+1:n) = 0; v(i+2:ihi) is stored on
-	exit in A(i+2:ihi,i), and tau in tau(i).
+  H(i) = I - tau * v * v'
+  where tau is a real scalar, and v is a real vector with
+  v(1:i) = 0, v(i+1) = 1 and v(ihi+1:n) = 0; v(i+2:ihi) is stored on
+  exit in A(i+2:ihi,i), and tau in tau(i).
 
 The contents of A are illustrated by the following example, with
 n = 7, ilo = 2 and ihi = 6:
 
-	on entry,                        on exit,
+  on entry,                        on exit,
 
-	( a   a   a   a   a   a   a )    (  a   a   h   h   h   h   a )
-	(     a   a   a   a   a   a )    (      a   h   h   h   h   a )
-	(     a   a   a   a   a   a )    (      h   h   h   h   h   h )
-	(     a   a   a   a   a   a )    (      v2  h   h   h   h   h )
-	(     a   a   a   a   a   a )    (      v2  v3  h   h   h   h )
-	(     a   a   a   a   a   a )    (      v2  v3  v4  h   h   h )
-	(                         a )    (                          a )
+  ( a   a   a   a   a   a   a )    (  a   a   h   h   h   h   a )
+  (     a   a   a   a   a   a )    (      a   h   h   h   h   a )
+  (     a   a   a   a   a   a )    (      h   h   h   h   h   h )
+  (     a   a   a   a   a   a )    (      v2  h   h   h   h   h )
+  (     a   a   a   a   a   a )    (      v2  v3  h   h   h   h )
+  (     a   a   a   a   a   a )    (      v2  v3  v4  h   h   h )
+  (                         a )    (                          a )
 
-	where a denotes an element of the original matrix A, h denotes a
-	modified element of the upper Hessenberg matrix H, and vi denotes an
-	element of the vector defining H(i).
+  where a denotes an element of the original matrix A, h denotes a
+  modified element of the upper Hessenberg matrix H, and vi denotes an
+  element of the vector defining H(i).
 
     Arguments
     =========
@@ -7323,7 +7323,7 @@ Generates a real orthogonal matrix Q which is defined as the
 product of ihi-ilo elementary reflectors of order N, as returned by
 C<gehrd>:
 
-	Q = H(ilo) H(ilo+1) . . . H(ihi-1).
+  Q = H(ilo) H(ilo+1) . . . H(ihi-1).
 
     Arguments
     =========
@@ -7489,7 +7489,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n))))
+ Signature: (T(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n))); int side; int howmny)
  Types: (float double)
 
 =for usage
@@ -7507,8 +7507,8 @@ a real upper quasi-triangular matrix T.
 The right eigenvector x and the left eigenvector y of T corresponding
 to an eigenvalue w are defined by:
 
-	T*x = w*x,     y'*T = w*y'
-	where y' denotes the conjugate transpose of the vector y.
+  T*x = w*x,     y'*T = w*y'
+  where y' denotes the conjugate transpose of the vector y.
 
 If all eigenvectors are requested, the routine may either return the
 matrices X and/or Y of right or left eigenvectors of T, or the
@@ -7540,7 +7540,7 @@ magnitude has magnitude 1; here the magnitude of a complex number
     =========
 
     side:   = 0 :  compute both right and left eigenvectors;
-	    = 1 :  compute right eigenvectors only;
+      = 1 :  compute right eigenvectors only;
             = 2 :  compute left eigenvectors only.
 
     howmny: = 0:  compute all right and/or left eigenvectors;
@@ -7653,7 +7653,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (A(n,n); int side();int howmny();B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+ Signature: (A(n,n);B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))); int side; int howmny)
  Types: (float double)
 
 =for usage
@@ -7672,8 +7672,8 @@ The right generalized eigenvector x and the left generalized
 eigenvector y of (A,B) corresponding to a generalized eigenvalue
 w are defined by:
 
-	(A - wB) * x = 0  and  y**H * (A - wB) = 0
-	where y**H denotes the conjugate transpose of y.
+  (A - wB) * x = 0  and  y**H * (A - wB) = 0
+  where y**H denotes the conjugate transpose of y.
 
 If an eigenvalue w is determined by zero diagonal elements of both A
 and B, a unit vector is returned as the corresponding eigenvector.
@@ -7684,7 +7684,7 @@ the products Z*X and/or Q*Y, where Z and Q are input orthogonal
 matrices.  If (A,B) was obtained from the generalized real-Schur
 factorization of an original pair of matrices
 
-	(A0,B0) = (Q*A*Z**H,Q*B*Z**H),
+  (A0,B0) = (Q*A*Z**H,Q*B*Z**H),
 
 then Z*X and Q*Y are the matrices of right or left eigenvectors of
 A.
@@ -7699,7 +7699,7 @@ to the eigenvalue with positive imaginary part.
     =========
 
     side:   = 0 : compute both right and left eigenvectors;
-	    = 1 : compute right eigenvectors only;
+      = 1 : compute right eigenvectors only;
             = 2 : compute left eigenvectors only.
 
     howmny: = 0 : compute all right and/or left eigenvectors;
@@ -7944,12 +7944,12 @@ balanced matrix output by gebal.
             job must be the same as the argument job supplied to gebal.
 
     side:   = 0:  V contains left eigenvectors.
-	    = 1:  V contains right eigenvectors;
+      = 1:  V contains right eigenvectors;
 
     ilo:
     ihi:    The integers ilo and ihi determined by gebal.
             1 <= ilo <= ihi <= N, if N > 0; ilo=1 and ihi=0, if N=0.
-	    Here N is the the number of rows of the matrix A.
+      Here N is the the number of rows of the matrix A.
 
     scale:  Details of the permutation and scaling factors, as returned
             by gebal.
@@ -7993,7 +7993,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (A(n,m); int norm(); [o]b(); [t]work(workn))
+ Signature: (A(n,m); [o]b(); [t]work(workn); int norm)
  Types: (float double)
 
 =for usage
@@ -8065,7 +8065,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
+ Signature: (A(n,n); [o]b(); [t]work(workn); int uplo; int norm)
  Types: (float double)
 
 =for usage
@@ -8146,7 +8146,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
- Signature: (A(m,n);int uplo();int norm();int diag();[o]b(); [t]work(workn))
+ Signature: (A(m,n); [o]b(); [t]work(workn); int uplo; int norm; int diag)
  Types: (float double)
 
 =for usage
@@ -8186,7 +8186,7 @@ trapezoidal or triangular matrix A.
     uplo:   Specifies whether the matrix A is upper or lower trapezoidal.
             = 0:  Upper triangular part of A is referenced
             = 1:  Lower triangular part of A is referenced
-	    Note that A is triangular instead of trapezoidal if M = N.
+      Note that A is triangular instead of trapezoidal if M = N.
 
     diag:   Specifies whether or not the matrix A has unit diagonal.
             = 0:  Non-unit diagonal
@@ -8245,22 +8245,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Performs one of the matrix-matrix operations
 
-	C := alpha*op( A )*op( B ) + beta*C,
-	where  op( X ) is one of p( X ) = X   or   op( X ) = X',
-	alpha and beta are scalars, and A, B and C are matrices, with op( A )
-	an m by k matrix,  op( B )  a  k by n matrix and  C an m by n matrix.
+  C := alpha*op( A )*op( B ) + beta*C,
+  where  op( X ) is one of p( X ) = X   or   op( X ) = X',
+  alpha and beta are scalars, and A, B and C are matrices, with op( A )
+  an m by k matrix,  op( B )  a  k by n matrix and  C an m by n matrix.
 
     Parameters
     ==========
     transa:  On entry, transa specifies the form of op( A ) to be used in
              the matrix multiplication as follows:
-                transa = 0,	op( A ) = A.
-                transa = 1,	op( A ) = A'.
+                transa = 0,  op( A ) = A.
+                transa = 1,  op( A ) = A'.
 
     transb:  On entry, transb specifies the form of op( B ) to be used in
              the matrix multiplication as follows:
-                transb = 0,	op( B ) = B.
-                transb = 1,	op( B ) = B'.
+                transb = 0,  op( B ) = B.
+                transb = 1,  op( B ) = B'.
 
     alpha:   On entry, alpha specifies the scalar alpha.
 
@@ -8407,15 +8407,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 Performs one of the symmetric rank k operations
 
-	C := alpha*A*A' + beta*C,
+  C := alpha*A*A' + beta*C,
 
 or
 
-	C := alpha*A'*A + beta*C,
+  C := alpha*A'*A + beta*C,
 
-	where  alpha and beta  are scalars, C is an  n by n  symmetric matrix
-	and  A  is an  n by k  matrix in the first case and a  k by n  matrix
-	in the second case.
+  where  alpha and beta  are scalars, C is an  n by n  symmetric matrix
+  and  A  is an  n by k  matrix in the first case and a  k by n  matrix
+  in the second case.
 
     Parameters
     ==========
@@ -8430,8 +8430,8 @@ or
 
     trans:   On entry,  trans  specifies the operation to be performed as
              follows:
-                trans = 0	C := alpha*A*A' + beta*C.
-                trans = 1	C := alpha*A'*A + beta*C.
+                trans = 0  C := alpha*A*A' + beta*C.
+                trans = 1  C := alpha*A'*A + beta*C.
 
     alpha:   On entry, alpha specifies the scalar alpha.
              Unchanged on exit.
@@ -9004,7 +9004,7 @@ Works inplace.
     =========
 
     cmach:  Specifies the value to be returned by lamch:
-            = 0	LAMCH := eps
+            = 0  LAMCH := eps
             = 1 LAMCH := sfmin
             = 2 LAMCH := base
             = 3 LAMCH := eps*base
@@ -9035,6 +9035,7 @@ Works inplace.
 
 =pod
 
+Can operate inplace with C<cmach> as output C<precision>.
 Broadcasts over its inputs.
 
 =for bad
@@ -9183,7 +9184,7 @@ sub PDL::cplx_eigen {
 
 =for ref
 
-Compute adjoint matrix and characteristic polynomial.
+Compute adjoint matrix and characteristic polynomial
 
 =pod
 
@@ -9207,7 +9208,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 10580 "lib/PDL/LinearAlgebra/Real.pd"
+#line 10591 "lib/PDL/LinearAlgebra/Real.pd"
 
 =head1 AUTHOR
 
@@ -9218,7 +9219,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 9222 "lib/PDL/LinearAlgebra/Real.pm"
+#line 9223 "lib/PDL/LinearAlgebra/Real.pm"
 
 # Exit with OK status
 

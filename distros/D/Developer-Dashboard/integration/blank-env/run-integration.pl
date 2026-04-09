@@ -184,9 +184,9 @@ BOOKMARK
     my $init = _run_shell( 'dashboard init', 'cd ' . _shell_quote($project) . ' && dashboard init' );
     my $init_data = decode_json( $init->{stdout} );
     _assert_match( $init_data->{runtime_root} || '', qr/\.developer-dashboard/, 'dashboard init returns runtime root' );
-    _assert( grep { $_ eq 'welcome' } @{ $init_data->{pages} || [] }, 'dashboard init seeds welcome page' );
+    _assert( !grep { $_ eq 'welcome' } @{ $init_data->{pages} || [] }, 'dashboard init no longer seeds welcome page' );
     _assert( grep { $_ eq 'api-dashboard' } @{ $init_data->{pages} || [] }, 'dashboard init seeds api-dashboard page' );
-    _assert( grep { $_ eq 'db-dashboard' } @{ $init_data->{pages} || [] }, 'dashboard init seeds db-dashboard page' );
+    _assert( grep { $_ eq 'sql-dashboard' } @{ $init_data->{pages} || [] }, 'dashboard init seeds sql-dashboard page' );
 
     make_path($update_root);
     _write_text(
@@ -215,8 +215,8 @@ SH
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Runtime::Result;
-print Runtime::Result::stdout('01-runtime-update');
+use Developer::Dashboard::Runtime::Result;
+print Developer::Dashboard::Runtime::Result::stdout('01-runtime-update');
 PL
     );
     chmod 0755, File::Spec->catfile( $update_root, '02-runtime-result.pl' )
@@ -275,17 +275,16 @@ PL
 
     my $config_init = _run_shell( 'dashboard config init', 'dashboard config init' );
     _assert_match( $config_init->{stdout}, qr/config\.json/, 'dashboard config init writes config file' );
+    _assert_match(
+        _read_text( File::Spec->catfile( $configs, 'config.json' ) ),
+        qr/fake\.config\.collector/,
+        'dashboard config init leaves an existing config.json untouched',
+    );
     _write_text(
         File::Spec->catfile( $configs, 'config.json' ),
         <<'JSON'
 {
   "collectors": [
-    {
-      "name": "example.collector",
-      "command": "printf 'example collector output\n'",
-      "cwd": "home",
-      "interval": 60
-    },
     {
       "name": "fake.config.collector",
       "command": "printf 'fake config collector output\n'",
@@ -359,37 +358,34 @@ JSON
     my $collector_write = _run_shell( 'dashboard collector write-result', $project_cd . q{printf 'manual-output' | dashboard collector write-result manual.collector 0} );
     _assert( $collector_write->{exit_code} == 0, 'dashboard collector write-result accepts manual output' );
 
-    my $collector_run = _run_shell( 'dashboard collector run', $project_cd . 'dashboard collector run example.collector' );
-    _assert_match( $collector_run->{stdout}, qr/"exit_code"\s*:\s*0/, 'dashboard collector run succeeds for example collector' );
-
     my $fake_collector_run = _run_shell( 'dashboard collector run fake.config.collector', $project_cd . 'dashboard collector run fake.config.collector' );
     _assert_match( $fake_collector_run->{stdout}, qr/"exit_code"\s*:\s*0/, 'dashboard collector run succeeds for fake project config collector' );
 
     my $collector_list = _run_shell( 'dashboard collector list', $project_cd . 'dashboard collector list' );
-    _assert_match( $collector_list->{stdout}, qr/example\.collector|manual\.collector/, 'dashboard collector list shows stored collectors' );
+    _assert_match( $collector_list->{stdout}, qr/manual\.collector/, 'dashboard collector list shows stored collectors' );
     _assert_match( $collector_list->{stdout}, qr/fake\.config\.collector/, 'dashboard collector list shows fake project config collector' );
 
-    my $collector_job = _run_shell( 'dashboard collector job', $project_cd . 'dashboard collector job example.collector' );
+    my $collector_job = _run_shell( 'dashboard collector job', $project_cd . 'dashboard collector job fake.config.collector' );
     _assert_match( $collector_job->{stdout}, qr/"command"/, 'dashboard collector job returns job metadata' );
 
-    my $collector_status = _run_shell( 'dashboard collector status', $project_cd . 'dashboard collector status example.collector' );
+    my $collector_status = _run_shell( 'dashboard collector status', $project_cd . 'dashboard collector status fake.config.collector' );
     _assert_match( $collector_status->{stdout}, qr/"enabled"/, 'dashboard collector status returns status data' );
 
-    my $collector_output = _run_shell( 'dashboard collector output', $project_cd . 'dashboard collector output example.collector' );
-    _assert_match( $collector_output->{stdout}, qr/example collector output/, 'dashboard collector output returns prepared output' );
+    my $collector_output = _run_shell( 'dashboard collector output', $project_cd . 'dashboard collector output fake.config.collector' );
+    _assert_match( $collector_output->{stdout}, qr/fake config collector output/, 'dashboard collector output returns prepared output' );
 
-    my $collector_inspect = _run_shell( 'dashboard collector inspect', $project_cd . 'dashboard collector inspect example.collector' );
+    my $collector_inspect = _run_shell( 'dashboard collector inspect', $project_cd . 'dashboard collector inspect fake.config.collector' );
     _assert_match( $collector_inspect->{stdout}, qr/"job"|"status"|"output"/, 'dashboard collector inspect returns combined view' );
 
-    my $collector_start = _run_shell( 'dashboard collector start', $project_cd . 'dashboard collector start example.collector' );
+    my $collector_start = _run_shell( 'dashboard collector start', $project_cd . 'dashboard collector start fake.config.collector' );
     _assert_match( $collector_start->{stdout}, qr/\d+/, 'dashboard collector start returns a pid' );
 
     sleep 2;
 
-    my $collector_restart = _run_shell( 'dashboard collector restart', $project_cd . 'dashboard collector restart example.collector' );
+    my $collector_restart = _run_shell( 'dashboard collector restart', $project_cd . 'dashboard collector restart fake.config.collector' );
     _assert_match( $collector_restart->{stdout}, qr/\d+/, 'dashboard collector restart returns a pid' );
 
-    my $collector_stop = _run_shell( 'dashboard collector stop', $project_cd . 'dashboard collector stop example.collector' );
+    my $collector_stop = _run_shell( 'dashboard collector stop', $project_cd . 'dashboard collector stop fake.config.collector' );
     _assert_match( $collector_stop->{stdout}, qr/\d+/, 'dashboard collector stop returns the stopped pid' );
 
     my $collector_log = _run_shell( 'dashboard collector log', $project_cd . 'dashboard collector log' );
@@ -459,16 +455,28 @@ JSON
     my $container_ip = _trim( _run_shell( 'container ip', q{hostname -I | awk '{print $1}'} )->{stdout} );
     _assert( $container_ip ne '', 'container ip discovered for helper-access path' );
 
-    my $helper_root = _run_shell(
-        'curl helper root',
+    my $helper_root_disabled = _run_shell(
+        'curl helper root before helper user exists',
         'curl -sS -o /tmp/helper-root.html -w \'%{http_code}\' http://' . $container_ip . ':7890/'
     );
-    _assert_match( $helper_root->{stdout}, qr/^401$/, 'non-loopback self-access returns helper login' );
-    _assert_match( _read_text('/tmp/helper-root.html'), qr/<form[^>]*action="\/login"/, 'helper root serves login page' );
-    my $helper_dom = _run_browser_dom( 'browser helper root', "http://$container_ip:7890/", user_data_dir => $profile );
-    _assert_match( $helper_dom, qr/action="\/login"/, 'browser helper root renders login form' );
+    _assert_match( $helper_root_disabled->{stdout}, qr/^401$/, 'non-loopback self-access stays unauthorized before any helper user exists' );
+    _assert( _read_text('/tmp/helper-root.html') eq q{}, 'outsider bootstrap response keeps the body empty before any helper user exists' );
+    _assert( _read_text('/tmp/helper-root.html') !~ /<form[^>]*action="\/login"/, 'outsider bootstrap response does not expose the login form before any helper user exists' );
+    my $helper_disabled_dom = _run_browser_dom( 'browser helper root before helper user exists', "http://$container_ip:7890/", user_data_dir => $profile );
+    _assert_match( $helper_disabled_dom, qr/HTTP ERROR 401/, 'browser outsider bootstrap response resolves to a generic 401 browser error page before any helper user exists' );
+    _assert( $helper_disabled_dom !~ /Helper access is disabled until a helper user is added\./, 'browser outsider bootstrap response does not leak helper bootstrap guidance before any helper user exists' );
+    _assert( $helper_disabled_dom !~ /action="\/login"/, 'browser outsider bootstrap response omits the login form before any helper user exists' );
 
     _run_shell( 'dashboard auth add helper-login user', $project_cd . q{dashboard auth add-user helper_login helper-login-pass-123} );
+    my $helper_root = _run_shell(
+        'curl helper root after helper user exists',
+        'curl -sS -o /tmp/helper-root-after-enable.html -w \'%{http_code}\' http://' . $container_ip . ':7890/'
+    );
+    _assert_match( $helper_root->{stdout}, qr/^401$/, 'non-loopback self-access returns helper login after a helper user exists' );
+    _assert_match( _read_text('/tmp/helper-root-after-enable.html'), qr/<form[^>]*action="\/login"/, 'helper root serves login page after a helper user exists' );
+    my $helper_dom = _run_browser_dom( 'browser helper root after helper user exists', "http://$container_ip:7890/", user_data_dir => $profile );
+    _assert_match( $helper_dom, qr/action="\/login"/, 'browser helper root renders login form after a helper user exists' );
+
     my $login = _run_shell(
         'helper login',
         'curl -sS -c ' . _shell_quote($cookie) .
@@ -481,7 +489,7 @@ JSON
 
     my $helper_page = _run_shell(
         'helper page after login',
-        'curl -fsS -b ' . _shell_quote($cookie) . ' http://' . $container_ip . ':7890/app/welcome'
+        'curl -fsS -b ' . _shell_quote($cookie) . ' http://' . $container_ip . ':7890/app/api-dashboard'
     );
     _assert_match( $helper_page->{stdout}, qr/id="logout-url"/, 'helper page chrome renders logout link' );
 
@@ -886,5 +894,36 @@ installed C<dashboard> CLI and web runtime against a fake project.
 =head2 main, _run_shell, _wait_for_http, _run_browser_dom, _browser_command, _browser_binary, _single_subdir, _decode_json_tail, _reset_dir, _write_text, _read_text, _trim, _shell_quote, _assert, _assert_match
 
 Run and validate the host-built-tarball integration workflow.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Integration helper script in the Developer Dashboard codebase. This file drives the blank-environment tarball install and smoke verification flow inside the disposable integration container.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to make a repeatable host-or-container integration workflow explicit instead of burying release verification steps in ad-hoc shell history.
+
+=head1 WHEN TO USE
+
+Use this file when you are rerunning the documented integration workflow for its environment or debugging a release/install problem in that path.
+
+=head1 HOW TO USE
+
+Run the script as part of the documented integration plan for its environment. Treat failures here as release blockers, because these scripts represent the supported rerun path.
+
+=head1 WHAT USES IT
+
+It is used by maintainers running the documented install/runtime verification workflow for that environment, and by tests that validate the checked-in integration assets.
+
+=head1 EXAMPLES
+
+  perl integration/blank-env/run-integration.pl
+
+Run the script from the documented integration environment so it can find the expected tarball, browser, or container prerequisites.
+
+=for comment FULL-POD-DOC END
 
 =cut

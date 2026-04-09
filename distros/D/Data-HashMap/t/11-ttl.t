@@ -85,13 +85,13 @@ use Data::HashMap::SI;
 # ---- Put refreshes TTL on update ----
 
 {
-    my $m = Data::HashMap::II->new(0, 4);
+    my $m = Data::HashMap::II->new(0, 3);
     hm_ii_put $m, 1, 10;
     sleep 1;
     # Re-put refreshes TTL
     hm_ii_put $m, 1, 20;
     sleep 2;
-    # 3 seconds since original put, but only 2 since refresh (TTL=4)
+    # 3 seconds since original put, but only 2 since refresh (TTL=3)
     is(hm_ii_get $m, 1, 20, 'TTL: put refresh keeps entry alive');
 }
 
@@ -160,7 +160,7 @@ use Data::HashMap::SI;
     my $m = Data::HashMap::I16->new(0, 1);
     hm_i16_put $m, 1, 42;
     is(hm_i16_get $m, 1, 42, 'I16 TTL: before expiry');
-    sleep 3;
+    sleep 2;
     my $v = hm_i16_get $m, 1;
     ok(!defined $v, 'I16 TTL: after expiry returns undef');
     is(hm_i16_incr $m, 1, 1, 'I16 TTL: incr on expired key returns 1');
@@ -171,7 +171,7 @@ use Data::HashMap::SI;
 {
     my $m = Data::HashMap::SI16->new(0, 1);
     hm_si16_put $m, "x", 42;
-    sleep 3;
+    sleep 2;
     my $v = hm_si16_get $m, "x";
     ok(!defined $v, 'SI16 TTL: expired get returns undef');
     is(hm_si16_incr $m, "x", 1, 'SI16 TTL: incr on expired key returns 1');

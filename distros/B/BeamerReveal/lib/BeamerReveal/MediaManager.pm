@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::MediaManager;
-our $VERSION = '20260208.1851'; # VERSION
+our $VERSION = '20260408.1240'; # VERSION
 
 use strict;
 use warnings;
@@ -66,6 +66,7 @@ sub new {
   $self->{images}     = "$self->{base}/media/Images";	
   $self->{animations} = "$self->{base}/media/Animations";	
   $self->{stills}     = "$self->{base}/media/Stills";	
+  $self->{voiceovers} = "$self->{base}/media/Voiceovers";	
   $self->{iframes}    = "$self->{base}/media/Iframes";	
   $self->{slides}     = "$self->{base}/media/Slides";
   $self->{reveal}     = "$self->{base}/libs";
@@ -76,7 +77,7 @@ sub new {
     local $CWD = $self->{outputdir};
   
     # create animation path, but don't remove contents
-    for my $item ( qw(animations stills) ) {
+    for my $item ( qw(animations stills voiceovers) ) {
       File::Path::make_path( $self->{$item} );
     }
 
@@ -133,7 +134,8 @@ sub new {
 
   $self->{copyBackOrders}  = [];
   $self->{constructionBackOrders} = { 'animations' => {},
-				      'stills'     => {}
+				      'stills'     => {},
+				      'voiceovers' => {}
 				    };
 
   return $self;
@@ -311,9 +313,46 @@ sub stillFromStore {
 }
 
 
+sub voiceoverRegisterInStore {
+  my $self = shift;
+  my ( $voiceover ) = @_;
+  
+  my $logger = $BeamerReveal::Log::logger;
+  
+  $Data::Dumper::Terse = 1;
+  $Data::Dumper::Indent = 0;
+  my $voiceoverid  = Digest::SHA::hmac_sha256_hex( $voiceover->{text} . "|" .
+						   $voiceover->{voice} . "|" .
+						   $voiceover->{ext} );
+  my $voiceoverbase = "$self->{voiceovers}/$voiceoverid";
+  my $fullpathid = $voiceoverbase . $voiceover->{ext};
+
+  # this is the caching action: if the file is not readable it is not in the cache: register to generate!
+  unless ( -r ( $self->{outputdir} . '/' . $fullpathid ) ) {
+    $self->{constructionBackOrders}->{voiceovers}->{$voiceoverid} = 
+      {
+       base  => $self->{outputdir} . '/' . $voiceoverbase,
+       text  => $voiceover->{text},
+       voice => $voiceover->{voice},
+       tool  => $voiceover->{tool},
+       ext   => $voiceover->{ext},
+      };
+  }
+  return $fullpathid;
+}
+
+
+
+sub voiceoverFromStore {
+  my $self = shift;
+  my ( $voiceover, %optargs ) = @_;
+  return $self->_rawFromStore( 'Voiceovers', $voiceover, %optargs );
+}
+
+
 sub processAnimationBackOrders {
   my $self = shift;
-  my ( $animProgressId ) = @_;
+  my ( $progressId ) = @_;
   
   my $logger = $BeamerReveal::Log::logger;
   
@@ -322,7 +361,7 @@ sub processAnimationBackOrders {
   
   my $totalNofBackOrders = scalar keys %{$self->{constructionBackOrders}->{animations}};
   
-  $logger->progress( $animProgressId, 1, 'reusing cached data', 1 ) unless $totalNofBackOrders;
+  $logger->progress( $progressId, 1, 'reusing cached data', 1 ) unless $totalNofBackOrders;
   
   my $i = -1;
   while ( my ( $animid, $bo ) = each %{$self->{constructionBackOrders}->{animations}} ) {
@@ -368,14 +407,14 @@ sub processAnimationBackOrders {
       $frameCounter += $sliceSize;
     }
     
-    $logger->progress( $animProgressId, 0, "animation @{[$i+1]}/$totalNofBackOrders",
+    $logger->progress( $progressId, 0, "animation @{[$i+1]}/$totalNofBackOrders",
 		       $nofFrames + $nofCores * 3 );
     
     if ( $nofCores == 1 ) {
       # single-threaded
       for ( my $i = 0; $i < @$planning; ++$i ) {
 	_animWork( $planning->[$i], $nofCores, $fileContent, $animdir, $self, $animation,
-		   $sliceSize, $progress, $animProgressId );
+		   $sliceSize, $progress, $progressId );
       }
     } else {
       my @hobos;
@@ -386,7 +425,7 @@ sub processAnimationBackOrders {
 	   sub {
 	     _animWork( @_ )
 	   }, ( $planning->[$i], $nofCores, $fileContent, $animdir, $self, $animation,
-		$sliceSize, $progress, $animProgressId )
+		$sliceSize, $progress, $progressId )
 	  );
       }
       
@@ -404,7 +443,7 @@ sub processAnimationBackOrders {
 	  --$activeworkers;
 	}
 	
- 	$logger->progress( $animProgressId, $progress->get() );
+ 	$logger->progress( $progressId, $progress->get() );
 	
 	Time::HiRes::usleep(250);
       }
@@ -436,13 +475,13 @@ sub processAnimationBackOrders {
     File::Path::rmtree( $animdir ) unless( defined $self->{debug} );
     
     # all is done
-    $logger->progress( $animProgressId, 1, "animation @{[$i+1]}/$totalNofBackOrders", 1 );
+    $logger->progress( $progressId, 1, "animation @{[$i+1]}/$totalNofBackOrders", 1 );
   }
 }
 
 sub processStillBackOrders {
   my $self = shift;
-  my ( $stillProgressId ) = @_;
+  my ( $progressId ) = @_;
   
   my $logger = $BeamerReveal::Log::logger;
   ###############
@@ -450,7 +489,7 @@ sub processStillBackOrders {
   
   my $totalNofBackOrders = scalar keys %{$self->{constructionBackOrders}->{stills}};
   
-  $logger->progress( $stillProgressId, 1, 'reusing cached data', 1 ) unless $totalNofBackOrders;
+  $logger->progress( $progressId, 1, 'reusing cached data', 1 ) unless $totalNofBackOrders;
   
   my $i = -1;
   while ( my ( $stillid, $bo ) = each %{$self->{constructionBackOrders}->{stills}} ) {
@@ -459,9 +498,9 @@ sub processStillBackOrders {
     my $fileContent = $bo->{fileContent};
     my $stilldir    = $self->{outputdir} . '/' . $self->{stills} . '/' . $stillid;
     
-    $logger->progress( $stillProgressId, 0, "still @{[$i+1]}/$totalNofBackOrders", 5 );
+    $logger->progress( $progressId, 0, "still @{[$i+1]}/$totalNofBackOrders", 5 );
     
-    _stillWork( $fileContent, $stilldir, $self, $still, $stillProgressId );
+    _stillWork( $fileContent, $stilldir, $self, $still, $progressId );
     
     # run ffmpeg or avconv
     my $cmd = [ $self->{ffmpeg}, '-r', '1', '-i', 'frame-1.jpg', '-vf', 'crop=iw-mod(iw\,2):ih-mod(ih\,2)', 'still.mp4' ];
@@ -472,10 +511,47 @@ sub processStillBackOrders {
     File::Path::rmtree( $stilldir ) unless( defined $self->{debug} );
     
     # all is done
-    $logger->progress( $stillProgressId, 5 );
+    $logger->progress( $progressId, 5 );
   }
 }
+
+sub processVoiceoverBackOrders {
+  my $self = shift;
+  my ( $progressId ) = @_;
+  
+  my $logger = $BeamerReveal::Log::logger;
+  ###############
+  # treat stills
+  
+  my $totalNofBackOrders = scalar keys %{$self->{constructionBackOrders}->{voiceovers}};
+  
+  $logger->progress( $progressId, 1, 'reusing cached data', 1 ) unless $totalNofBackOrders;
+  
+  my $i = -1;
+  while ( my ( $voiceoverid, $bo ) = each %{$self->{constructionBackOrders}->{voiceovers}} ) {
+    ++$i;
+    $logger->progress( $progressId, 0, "still @{[$i+1]}/$totalNofBackOrders", 5 );
+
+    # write files
+    my $tFileName = "$bo->{base}.txt";
+    my $tFile = IO::File->new();
+    $tFile->open( ">$tFileName" )
+      or die( "Error: cannot open '$tFileName' for writing" );
+    print $tFile $bo->{text};
+    $tFile->close();
+
+    my $sFileName = "$bo->{base}$bo->{ext}";
+    my $cmd = [ $bo->{tool}, $tFileName, $sFileName, $bo->{voice} ];
+    BeamerReveal::IPC::Run::run( $cmd, 0, 8, undef, "Error: Text-to-speech failed" );
+
+    unlink $tFileName unless( defined $self->{debug} );
     
+    # all is done
+    $logger->progress( $progressId, 5 );
+  }
+}
+
+
 # =method imageFromStore()
   
 #   $path = $mm->imageFromStore( $image )
@@ -785,7 +861,7 @@ BeamerReveal::MediaManager - MediaManager
 
 =head1 VERSION
 
-version 20260208.1851
+version 20260408.1240
 
 =head1 SYNOPSIS
 
@@ -997,9 +1073,45 @@ the path of the still (in the media store)
 
 =back
 
-=head2 processConstructionBackOrders()
+=head2 voiceoverRegisterInStore()
 
-  $mm->processConnstructionBackOrders( $id )
+  $path = $mm->voiceoverRegisterInStore( $voiceover )
+
+Prepare and register the voiceover in back order such that it can be generated later by C<processConstructionBackOrders()>.
+
+=over 4
+
+=item . C<$voiceover>
+
+the $voiceover object as it was read from the C<.rvl> file.
+
+=item . C<$path>
+
+the path of the voiceover (in the media store)
+
+=back
+
+=head2 voiceoverFromStore()
+
+  $path = $mm->voiceoverFromStore( $voiceoverfile )
+
+Returns the media store path to the voiceover. If the voiceover is not yet constructed, it will be put in back order, such that it can be generated later by C<processConstructionBackOrders()>.
+
+=over 4
+
+=item . C<$voiceover>
+
+the $voiceover object as it was read from the C<.rvl> file.
+
+=item . C<$path>
+
+the path of the voiceover (in the media store)
+
+=back
+
+=head2 processAnimationBackOrders()
+
+  $mm->processAnimationBackOrders( $id )
 
 Generates all animations if they are not cached in the store.
 The generation is done in parallel using multithreading. If the method fails

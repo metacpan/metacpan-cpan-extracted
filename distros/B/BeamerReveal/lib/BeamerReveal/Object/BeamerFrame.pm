@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::Object::BeamerFrame;
-our $VERSION = '20260208.1851'; # VERSION
+our $VERSION = '20260408.1240'; # VERSION
 
 use parent 'BeamerReveal::Object';
 use Carp;
@@ -40,6 +40,7 @@ sub new {
   $self->{iframes}    = [];
   $self->{animations} = [];
   $self->{stills}     = [];
+  $self->{voiceovers} = [];
   $self->{hasnotes}   = 0;
   $self->{mtoracle}   = MIME::Types->new();
 
@@ -68,6 +69,8 @@ sub new {
     } elsif ( $+{command} eq 'still' ) {
       push @{$self->{stills}}, BeamerReveal::Object::readParameterLine( $+{payload} );
       $self->{stills}->[-1]->{tex} = $lines->[++$i];
+    } elsif ( $+{command} eq 'voiceover' ) {
+      push @{$self->{voiceovers}}, BeamerReveal::Object::readParameterLine( $+{payload} );
     } elsif ( $+{command} eq 'hasnote' ) {
       $self->{hasnotes} = 1;
     } else {
@@ -83,17 +86,18 @@ sub new {
 
 
 
-sub extractGenerationContent {
+sub extractContentToGenerate {
   my $self = shift;
   my ( $i, $mediaManager, $presentation ) = @_;
 
   my $logger = $BeamerReveal::Log::logger;
-  $logger->log( 2, "- extracting generation content from slide $i" );
+  $logger->log( 2, "- extracting content to generate from slide $i" );
 
-  my $generatedContent = {
-			  animations => [],
-			  stills => [],
-			 };
+  my $contentToGenerate = {
+			   animations => [],
+			   stills => [],
+			   voiceovers => [],
+			  };
   
   #########################
   # process all animations
@@ -101,7 +105,7 @@ sub extractGenerationContent {
     $logger->log( 4, "- extracting animation" );
     
     # 1. Generate the animation
-    push @{$generatedContent->{animations}}, $mediaManager->animationRegisterInStore( $animation );
+    push @{$contentToGenerate->{animations}}, $mediaManager->animationRegisterInStore( $animation );
   }
 
   #####################
@@ -110,10 +114,19 @@ sub extractGenerationContent {
     $logger->log( 4, "- adding still" );
 
     # 1. Generate the animation
-    push @{$generatedContent->{stills}}, $mediaManager->stillRegisterInStore( $still );
+    push @{$contentToGenerate->{stills}}, $mediaManager->stillRegisterInStore( $still );
   }
 
-  return $generatedContent;
+  #########################
+  # process all voiceoversg
+  foreach my $voiceover (@{$self->{voiceovers}}) {
+    $logger->log( 4, "- adding voiceover" );
+
+    # 1. Generate the animation
+    push @{$contentToGenerate->{voiceovers}}, $mediaManager->voiceoverRegisterInStore( $voiceover );
+  }
+
+  return $contentToGenerate;
 }
 
 
@@ -163,7 +176,13 @@ sub makeSlide {
     } else {
       $logger->log( 4, "- adding video" );
       $vTemplate = $templateStore->fetch( 'html', 'video.html' );
-      my ( $mimeType, $videoFile ) = $mediaManager->videoFromStore( $video->{file} );
+      my $videoFile;
+      if ( $video->{file} =~ /^https?:\/\// ) {
+	$videoFile = $video->{file};
+      }
+      else {
+	( undef, $videoFile ) = $mediaManager->videoFromStore( $video->{file} );
+      }
       $vStamps = { %commonStamps,
 		   VIDEO => $videoFile
 		 };
@@ -173,6 +192,7 @@ sub makeSlide {
 
   ###############################################
   # process all audio material / can be embedded
+  my $voCounter = 0;
   foreach my $audio (@{$self->{audios}}) {
     my %commonStamps = ( X => _topercent( $audio->{x} ),
 			 Y => _topercent( $audio->{y} ),
@@ -185,11 +205,20 @@ sub makeSlide {
 			 LOOP => exists $audio->{loop} ? 'loop' : '' );
     my $aStamps;
     my $aTemplate;
+
     if ( exists $audio->{embed} or $slideEmbed ) {
       $logger->log( 4, "- adding embedded audio" );
       $aTemplate = $templateStore->fetch( 'html', 'audio-embedded.html' );
-      my ( $mimeType, $audioContent ) = $mediaManager->audioFromStore( $audio->{file},
-								       to_embed => 1 );
+      my ( $mimeType, $audioContent );
+      if ( $audio->{file} =~ /^voiceover-/ ) {
+	( $mimeType, $audioContent ) =
+	  $mediaManager->voiceoverFromStore( $generatedContent->{voiceovers}->[$voCounter++],
+					     to_embed => 1 );
+      }
+      else {
+	( $mimeType, $audioContent ) = $mediaManager->audioFromStore( $audio->{file},
+								      to_embed => 1 );
+      }
       $aStamps = { %commonStamps,
 		   AUDIOID          => 'embedded-id-' . $embeddedID++,
 		   AUDIOEMBEDDEDB64 => $audioContent,
@@ -198,7 +227,19 @@ sub makeSlide {
     } else {
       $logger->log( 4, "- adding audio" );
       $aTemplate = $templateStore->fetch( 'html', 'audio.html' );
-      my ( $mimeType, $audioFile ) = $mediaManager->audioFromStore( $audio->{file} );
+      my $audioFile;
+      if ( $audio->{file} =~ /^https?:\/\// ) {
+	$audioFile = $audio->{file};
+      }
+      else {
+	if ( $audio->{file} =~ /^voiceover-/ ) {
+	  ( undef, $audioFile ) =
+	    $mediaManager->voiceoverFromStore( $generatedContent->{voiceovers}->[$voCounter++] );
+	}
+	else {
+	  ( undef, $audioFile ) = $mediaManager->audioFromStore( $audio->{file} );
+	}
+      }
       $aStamps = { %commonStamps,
 		   AUDIO => $audioFile,
 		 };
@@ -233,7 +274,13 @@ sub makeSlide {
     } else {
       $logger->log( 4, "- adding image" );
       $iTemplate = $templateStore->fetch( 'html', 'image.html' );
-      my( $mimeType, $imageFile ) = $mediaManager->imageFromStore( $image->{file} );
+      my $imageFile;
+      if ( $image->{file} =~ /^https?:\/\// ) {
+	$imageFile = $image->{file};
+      }
+      else {
+	( undef, $imageFile ) = $mediaManager->imageFromStore( $image->{file} );
+      }
       $iStamps = { %commonStamps,
 		   IMAGE => $imageFile };
     }
@@ -264,7 +311,13 @@ sub makeSlide {
     } else {
       $logger->log( 4, "- adding iframe" );
       $iTemplate = $templateStore->fetch( 'html', 'iframe.html' );
-      my ( undef, $iframeFile ) = $mediaManager->iframeFromStore( $iframe->{file} );
+      my $iframeFile;
+      if ( $iframe->{file} =~ /^https?:\/\// ) {
+	$iframeFile = $iframe->{file};
+      }
+      else {
+	( undef, $iframeFile ) = $mediaManager->iframeFromStore( $iframe->{file} );
+      }
       $iStamps = { %commonStamps,
 		   IFRAME => $iframeFile,
 		 };
@@ -294,7 +347,7 @@ sub makeSlide {
       $aTemplate = $templateStore->fetch( 'html', 'animation-embedded.html' );
       my ( $mimeType, $videoContent ) =
 	$mediaManager->animationFromStore( $generatedContent->{animations}->[$aCounter++],
-				      to_embed => 1 );
+					   to_embed => 1 );
       $aStamps =
 	{
 	 %commonStamps,
@@ -560,7 +613,7 @@ BeamerReveal::Object::BeamerFrame - BeamerFrame object
 
 =head1 VERSION
 
-version 20260208.1851
+version 20260408.1240
 
 =head1 SYNOPSIS
 
@@ -594,9 +647,9 @@ the beamerframe object
 
 =back
 
-=head2 extractGenerationContent()
+=head2 extractContentToGenerate()
 
-  $content = $bf->extractGenerationContent( $i, $mediaManager, $presentation )
+  $content = $bf->extractContentToGenerate( $i, $mediaManager, $presentation )
 
 extract the content to be generated (animations and stills) from this beamerframe.
 

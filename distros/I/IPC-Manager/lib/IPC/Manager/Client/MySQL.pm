@@ -2,7 +2,7 @@ package IPC::Manager::Client::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
@@ -14,16 +14,14 @@ use Object::HashBase qw{
     +QDB
 };
 
-sub viable {
-    local $@;
-    eval {
-        require DBD::mysql;
-        DBD::mysql->VERSION('4.00');
-        require DBIx::QuickDB;
-        DBIx::QuickDB->VERSION('0.000040');
-        DBIx::QuickDB->check_driver('DBIx::QuickDB::Driver::MySQL', {});
-        1;
-    } || 0;
+sub _viable {
+    require DBD::mysql;
+    DBD::mysql->VERSION('4.00');
+    require DBIx::QuickDB;
+    DBIx::QuickDB->VERSION('0.000040');
+    my ($ok, $fqn, $why) = DBIx::QuickDB->check_driver('DBIx::QuickDB::Driver::MySQL', {bootstrap => 1, autostart => 1});
+    die $why unless $ok;
+    1;
 }
 
 sub dsn       { $_[0]->{+ROUTE} }

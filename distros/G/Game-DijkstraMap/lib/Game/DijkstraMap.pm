@@ -1,7 +1,7 @@
 # -*- Perl -*-
 #
-# Dijkstra Map path finding. run perldoc(1) on this file for additional
-# documentation
+# Dijkstra Map path finding. Run perldoc(1) on this file for additional
+# documentation.
 
 package Game::DijkstraMap;
 
@@ -14,7 +14,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use constant SQRT2 => sqrt(2);
 
@@ -37,8 +37,8 @@ has costfn => (
 );
 has dimap  => ( is => 'rw' );
 has iters  => ( is => 'rwp', default => sub { 0 } );
-has next_m => ( is => 'rw', default => sub { 'next' } );
-has normfn => ( is => 'rw', default => sub { \&norm_4way } );
+has next_m => ( is => 'rw',  default => sub { 'next' } );
+has normfn => ( is => 'rw',  default => sub { \&norm_4way } );
 
 sub BUILD {
     my ( $self, $param ) = @_;
@@ -72,10 +72,11 @@ sub adjacent_values {
 sub adjacent_values_diag {
     my ( $dimap, $r, $c, $maxrow, $maxcol ) = @_;
     my @values;
-    push @values, $dimap->[ $r - 1 ][ $c - 1 ] if $r > 0       and $c > 0;
-    push @values, $dimap->[ $r - 1 ][ $c + 1 ] if $r > 0       and $c < $maxcol;
+    push @values, $dimap->[ $r - 1 ][ $c - 1 ] if $r > 0 and $c > 0;
+    push @values, $dimap->[ $r - 1 ][ $c + 1 ] if $r > 0 and $c < $maxcol;
     push @values, $dimap->[ $r + 1 ][ $c - 1 ] if $r < $maxrow and $c > 0;
-    push @values, $dimap->[ $r + 1 ][ $c + 1 ] if $r < $maxrow and $c < $maxcol;
+    push @values, $dimap->[ $r + 1 ][ $c + 1 ]
+      if $r < $maxrow and $c < $maxcol;
     return @values;
 }
 
@@ -165,7 +166,10 @@ sub map {
         }
     }
     $self->_set_iters(
-        $self->normfn->( $dimap, $self->min_cost, $self->max_cost, $self->bad_cost ) );
+        $self->normfn->(
+            $dimap, $self->min_cost, $self->max_cost, $self->bad_cost
+        )
+    );
     $self->dimap($dimap);
     return $self;
 }
@@ -184,7 +188,8 @@ sub next {
 
     for my $i ( -1, 1 ) {
         my $x = $c + $i;
-        push @adj, [ [ $r, $x ], $dimap->[$r][$x] ] if $x >= 0 and $x <= $maxcol;
+        push @adj, [ [ $r, $x ], $dimap->[$r][$x] ]
+          if $x >= 0 and $x <= $maxcol;
         for my $j ( -1 .. 1 ) {
             $x = $r + $i;
             my $y = $c + $j;
@@ -262,7 +267,8 @@ sub next_with {
     my $method = $self->next_m;
     my $coords = $self->$method( $r, $c, $self->max_cost );
     return undef unless $coords->@*;
-    my @costs = map $_->values( map $_->[0], $coords->@* ), $param->{objs}->@*;
+    my @costs = map $_->values( map $_->[0], $coords->@* ),
+      $param->{objs}->@*;
     my @ret;
   COORD: for my $p ( 0 .. $coords->$#* ) {
         my @weights;
@@ -270,7 +276,8 @@ sub next_with {
             next COORD if $costs[$k][$p] == $badcost;
             push @weights, $costs[$k][$p] * ( $param->{weights}->[$k] // 0 );
         }
-        my $newcost = sum0 $coords->[$p][1] * ( $param->{my_weight} // 1 ), @weights;
+        my $newcost = sum0 $coords->[$p][1] * ( $param->{my_weight} // 1 ),
+          @weights;
         push @ret, [ $coords->[$p][0], $newcost ] if $newcost < $curcost;
     }
 
@@ -352,12 +359,14 @@ sub norm_8way_euclid {
                 }
                 my $best = [ $maxcost, 0 ];
                 for my $nr (
-                    map( [ $_, 1 ], adjacent_values_sq( $dimap, $r, $c, $maxrow, $maxcol ) ),
-                    map( [ $_, SQRT2 ], adjacent_values_diag( $dimap, $r, $c, $maxrow, $maxcol ) )
+                    map( [ $_, 1 ],
+                        adjacent_values_sq( $dimap, $r, $c, $maxrow, $maxcol ) ),
+                    map( [ $_, SQRT2 ],
+                        adjacent_values_diag( $dimap, $r, $c, $maxrow, $maxcol ) )
                 ) {
                     next if $nr->[0] == $badcost;
                     $nr->[0] = abs $nr->[0];
-                    $best = $nr if $nr->[0] < $best->[0];
+                    $best    = $nr if $nr->[0] < $best->[0];
                     last if $best->[0] == $mincost;
                 }
                 if ( $value > $best->[0] + SQRT2 ) {
@@ -378,7 +387,10 @@ sub normalize {
     my $dimap = $self->dimap;
     croak "dimap not set" if !defined $dimap;
     $self->_set_iters(
-        $self->normfn->( $dimap, $self->min_cost, $self->max_cost, $self->bad_cost ) );
+        $self->normfn->(
+            $dimap, $self->min_cost, $self->max_cost, $self->bad_cost
+        )
+    );
     return $self;
 }
 
@@ -559,7 +571,7 @@ Dijkstra Maps" article. Such maps have various uses in roguelikes or
 other games. This implementation is not fast but should allow for
 prototyping of map-building and path-finding exercises.
 
-L<http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps>
+L<https://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps>
 
 The L</CONSIDERATIONS> section describes what this module does in
 more detail.
@@ -631,11 +643,12 @@ diagonal motions) but could instead be C<next_sq>.
 =item B<normfn>
 
 A code reference that is called by the B<normalize>, B<map>, and
-B<recalc> methods to weight the Dijkstra Map as appropriate. The
-default B<norm_4way> calculates weights using square or 4-way motion as
-seen in Brogue; other roguelikes will need an 8-way cost function if
-diagonal moves are in general permitted; this is possible with the
-B<norm_8way> function:
+B<recalc> methods to weight the Dijkstra Map as appropriate. The default
+B<norm_4way> calculates weights using square or 4-way motion as seen in
+Brogue, though diagonals are allowed if the map is open to those; set
+B<next_m> as detailed above if diagonal moves are illegal. Other
+roguelikes may need an 8-way cost function if diagonal moves are in
+general permitted; this is possible with the B<norm_8way> function:
 
     Game::DijkstraMap->new(
         normfn  => \&Game::DijkstraMap::norm_8way,
@@ -968,32 +981,16 @@ along diagonals.
 
 =head1 GRID BUGS
 
-=head2 Reporting Bugs
-
-Please report any bugs or feature requests to
-C<bug-game-dijkstramap at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Game-DijkstraMap>.
-
-Patches might best be applied towards:
-
-L<https://github.com/thrig/Game-DijkstraMap>
-
-=head2 Known Issues
-
 New code that is not much battle-tested, especially B<norm_8way_euclid>.
 Also a first implementation that suffers from "hmm, how should this
-work?" design.
+work?" design. Something much more efficient should likely be written,
+possibly with fewer features.
 
 B<norm_4way> is not very good with long and mostly unconnected
 corridors; this might be improved on by considering adjacent unseen
 cells after a cell changes in addition to full map iterations?
 
 =head1 SEE ALSO
-
-L<https://github.com/thrig/ministry-of-silly-vaults> has example code
-that uses this module (and a Common LISP implementation that supports
-path finding in arbitrary (as limited by ARRAY-RANK-LIMIT (or available
-memory (or so forth))) dimensions).
 
 L<Game::TextPatterns> may help generate or modify data that can be then
 fed to this module.
@@ -1003,13 +1000,12 @@ be more suitable to the task at hand.
 
 =head1 AUTHOR
 
-thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
+Jeremy Mates
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018,2019 by Jeremy Mates
+Copyright (C) 2018 by Jeremy Mates
 
-This program is distributed under the (Revised) BSD License:
-L<http://www.opensource.org/licenses/BSD-3-Clause>
+This program is distributed under the (Revised) BSD License.
 
 =cut

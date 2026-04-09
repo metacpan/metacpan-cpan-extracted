@@ -1,0 +1,13 @@
+Changes
+cpanfile
+lib/Data/Table/Gherkin.pm
+lib/Data/Table/Gherkin.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/critic.t
+t/load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

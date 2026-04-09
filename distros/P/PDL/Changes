@@ -1,3 +1,27 @@
+2.104 2026-04-09
+- allaxis*vals can now take 1-D ndarrays as start and endpoints
+- PP operation for inverse Transform::t_spherical
+- add PDL::Guide::NumPy doc (#361)
+- norm works inplace
+- $pdl->inplace->transpose now throws error
+- now throws exception if non-Inplace operation receives input with inplace set
+- t_quartic now exported, and with a correct inverse
+- add %PDL::{Math,Ops}::got_complex to record whether have complex versions
+- MatrixOps::svd now handles transpose transparently
+- AffinePriv now implies P2Child and Lvalue
+- BackCode (including from EquivCPOffsCode) now implies DefaultFlow and Lvalue
+- combcoords now does two-way flow
+- tricpy now can do strict upper/lower triangle
+- add MatrixOps::tritosym from PDL::LinearAlgebra with fixed Hermitian mode
+- now-unused (and always redundant) TwoWay PP key removed
+- add MatrixOps::gurney
+- automatically-generated docs now record inplace input/output
+- MatrixOps::svd can now do full SVD on request
+- Pars can now have \n in definition
+- perldl no longer has Perl-only fallback, do_print now prints list
+- t_projective now has src,dst options; m option need not be square
+- t_projective with src,dst now generalised to any number of dimensions
+
 2.103 2026-03-03
 - fix regression in *linvals so takes ndarrays as start and end again
 

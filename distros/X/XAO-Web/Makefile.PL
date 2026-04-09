@@ -120,7 +120,7 @@ WriteMakefile(
         'Time::HiRes'               => 1.9719,
         'Unicode::Normalize'        => 1.18,
         'XAO::Base'                 => 1.28,
-        'XAO::FS'                   => 1.21,
+        'XAO::FS'                   => 1.27,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

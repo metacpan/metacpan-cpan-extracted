@@ -522,11 +522,11 @@ use Data::HashMap::I16A;
 
 # incr on TTL map refreshes expiry to default_ttl
 {
-    my $m = Data::HashMap::II->new(0, 8);
+    my $m = Data::HashMap::II->new(0, 3);
     hm_ii_put $m, 1, 10;
     sleep 2;
-    hm_ii_incr $m, 1;  # refreshes TTL to default_ttl (8s from now)
-    sleep 4;
+    hm_ii_incr $m, 1;  # refreshes TTL to default_ttl (3s from now)
+    sleep 2;
     my $v = hm_ii_get $m, 1;
     is($v, 11, 'II incr refreshes TTL on default_ttl map');
 }
@@ -1447,6 +1447,31 @@ use Data::HashMap::I16A;
     my $m2 = Data::HashMap::II->thaw($frozen);
     is(hm_ii_size $m2, 1, 'II freeze/thaw: stale TTL entries excluded');
     is(hm_ii_get $m2, 11, 11, 'II freeze/thaw: live entry preserved');
+}
+
+# freeze/thaw preserves persist (no-TTL) entries on TTL maps
+{
+    my $m = Data::HashMap::II->new(0, 2);
+    hm_ii_put $m, 1, 100;
+    hm_ii_persist $m, 1;
+    hm_ii_put $m, 2, 200;
+    my $frozen = $m->freeze;
+    my $m2 = Data::HashMap::II->thaw($frozen);
+    sleep 3;
+    is(hm_ii_get $m2, 1, 100, 'II freeze/thaw: persisted entry survives past TTL');
+    is(hm_ii_get $m2, 2, undef, 'II freeze/thaw: TTL entry expires normally');
+}
+
+{
+    my $m = Data::HashMap::SS->new(0, 2);
+    hm_ss_put $m, "k", "v";
+    hm_ss_persist $m, "k";
+    hm_ss_put $m, "k2", "v2";
+    my $frozen = $m->freeze;
+    my $m2 = Data::HashMap::SS->thaw($frozen);
+    sleep 3;
+    is(hm_ss_get $m2, "k", "v", 'SS freeze/thaw: persisted entry survives past TTL');
+    is(hm_ss_get $m2, "k2", undef, 'SS freeze/thaw: TTL entry expires normally');
 }
 
 # thaw truncated data croaks

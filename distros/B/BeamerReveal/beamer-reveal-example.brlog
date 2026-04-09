@@ -1,0 +1,77 @@
+----------------------------------------------------------------------------
+--  beamer-reveal.pl                                       v20260408.1236 --
+--  (C) 2025-2026 Walter PM Daems <wdaems@cpan.org>                 GPLv3 --
+--  This script uses materials from:                                      --
+--    - reveal.js (C) Hakim El Hattab and contributors        MIT license --
+--    - Quarto    (C) Posit Software, PBC and contributors    MIT license --
+----------------------------------------------------------------------------
+- Using the following directories:
+  aux-files    : '.'
+  pdf-files    : '.'
+  output-files : '.'
+- Reading driver file ./beamer-reveal-example.rvl
+- Parsing driver file ./beamer-reveal-example.rvl
+  - extracting content to generate from slide 1
+  - extracting content to generate from slide 2
+  - extracting content to generate from slide 3
+  - extracting content to generate from slide 4
+    - adding voiceover
+  - extracting content to generate from slide 5
+  - extracting content to generate from slide 6
+  - extracting content to generate from slide 7
+  - extracting content to generate from slide 8
+  - extracting content to generate from slide 9
+  - extracting content to generate from slide 10
+  - extracting content to generate from slide 11
+  - extracting content to generate from slide 12
+  - extracting content to generate from slide 13
+  - extracting content to generate from slide 14
+  - extracting content to generate from slide 15
+  - extracting content to generate from slide 16
+  - extracting content to generate from slide 17
+  - extracting content to generate from slide 18
+  - extracting content to generate from slide 19
+    - extracting animation
+  - extracting content to generate from slide 20
+    - adding still
+- Installing quarto/reveal.js boilerplate
+- Generating the images
+- Generating the notes pages
+  - Reading LaTeX source file
+  - Writing LaTeX notes file
+- Generating animations
+  - Preparing media generation of 188 frames in 12 threads at 16 frames per thread
+        - /usr/bin/pdfcrop run in thread no 11 finished
+        - /usr/bin/pdftoppm run in thread no 11 finished
+        - /usr/bin/pdfcrop run in thread no 01 finished
+        - /usr/bin/pdfcrop run in thread no 00 finished
+        - /usr/bin/pdfcrop run in thread no 03 finished
+        - /usr/bin/pdfcrop run in thread no 08 finished
+        - /usr/bin/pdfcrop run in thread no 05 finished
+        - /usr/bin/pdfcrop run in thread no 06 finished
+        - /usr/bin/pdfcrop run in thread no 09 finished
+        - /usr/bin/pdfcrop run in thread no 10 finished
+        - /usr/bin/pdfcrop run in thread no 02 finished
+        - /usr/bin/pdfcrop run in thread no 07 finished
+        - /usr/bin/pdfcrop run in thread no 04 finished
+        - /usr/bin/pdftoppm run in thread no 01 finished
+        - /usr/bin/pdftoppm run in thread no 03 finished
+        - /usr/bin/pdftoppm run in thread no 00 finished
+        - /usr/bin/pdftoppm run in thread no 08 finished
+        - /usr/bin/pdftoppm run in thread no 05 finished
+        - /usr/bin/pdftoppm run in thread no 06 finished
+        - /usr/bin/pdftoppm run in thread no 09 finished
+        - /usr/bin/pdftoppm run in thread no 10 finished
+        - /usr/bin/pdftoppm run in thread no 02 finished
+        - /usr/bin/pdftoppm run in thread no 07 finished
+        - /usr/bin/pdftoppm run in thread no 04 finished
+  - returning to single-threaded operation
+        - /usr/bin/ffmpeg run in thread no 0 finished
+- Generating stills
+- Generating all new media
+        - /usr/bin/pdfcrop run in thread no 1 finished
+        - /usr/bin/pdftoppm run in thread no 1 finished
+        - /usr/bin/ffmpeg run in thread no 0 finished
+- Generating voice-overs
+- Generating all new media
+Error: Text-to-speech failed

@@ -21,9 +21,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Future::IO" : "0",
+            "Future::IO" : "0.19",
             "Future::Utils" : "0",
             "Net::LibAsyncNS" : "0",
+            "meta" : "0.008",
             "perl" : "5.020"
          }
       },
@@ -37,7 +38,15 @@
    "provides" : {
       "Future::IO::Resolver" : {
          "file" : "lib/Future/IO/Resolver.pm",
-         "version" : "0.02"
+         "version" : "0.03"
+      },
+      "Future::IO::Resolver::Using::LibAsyncNS" : {
+         "file" : "lib/Future/IO/Resolver/Using/LibAsyncNS.pm",
+         "version" : "0.03"
+      },
+      "Future::IO::Resolver::Using::Socket" : {
+         "file" : "lib/Future/IO/Resolver/Using/Socket.pm",
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -46,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

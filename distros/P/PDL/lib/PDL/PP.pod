@@ -1195,41 +1195,7 @@ ndarray, you can use the PDL STATE macros.
 
 =head2 Bad-value examples
 
-Using these macros, the above code could be specified as:
-
- Code => '$c() = $a() + $b();',
- BadCode => '
-    if ( $ISBAD(a()) || $ISBAD(b()) ) {
-       $SETBAD(c());
-    } else {
-       $c() = $a() + $b();
-    }',
-
-Since this is Perl, TMTOWTDI, so you could also write:
-
- BadCode => '
-    if ( $ISGOOD(a()) && $ISGOOD(b()) ) {
-       $c() = $a() + $b();
-    } else {
-       $SETBAD(c());
-    }',
-
-You can reduce code repetition using the C C<PDL_BAD_CODE> macro,
-supplying only the C<Code> section:
-
- Code => '
-    #ifdef PDL_BAD_CODE
-    if ( $ISGOOD(a()) && $ISGOOD(b()) ) {
-    #endif PDL_BAD_CODE
-       $c() = $a() + $b();
-    #ifdef PDL_BAD_CODE
-    } else {
-       $SETBAD(c());
-    }
-    #endif PDL_BAD_CODE
- ',
-
-As of 2.073, you can also use C<PDL_IF_BAD(iftrue,iffalse)>:
+As of 2.073, you are recommended to use C<PDL_IF_BAD(iftrue,iffalse)>:
 
  Code => '
     PDL_IF_BAD(if ( $ISGOOD(a()) && $ISGOOD(b()) ) {,)
@@ -1708,7 +1674,6 @@ C<EquivPDimExpr> and maybe a C<EquivDimCheck>:
   pp_def(
     'xchg',
     OtherPars => 'PDL_Indx n1; PDL_Indx n2;',
-    TwoWay => 1,
     P2Child => 1,
     AffinePriv => 1,
     EquivDimCheck => '
@@ -2589,6 +2554,7 @@ transformation back to the parent when C<BackCode> is supplied.
 
 Flag to indicate this is an affine transformation whose C<Priv> (contents
 of the C<pdl_trans>) contains data that will need allocating and freeing.
+As of 2.104, implies C<P2Child> and C<Lvalue>.
 
 =head3 GlobalNew
 
@@ -2603,13 +2569,15 @@ Forces C<Pars> to be C<PARENT> and C<CHILD>, the function's
 C<GenericTypes> to be all of them, no C<HaveBroadcasting> or C<CallCopy>,
 and turns on C<DefaultFlow> (so do not supply any of those args).
 Intended for affine transformations with dataflow.
+As of 2.104, implied by C<AffinePriv>.
 
 =head3 DefaultFlow
 
 If I<set>, sets in the C<pdl_transvtable> (see L<PDL::Internals>) the
-C<iflags> such that the trans will start with dataflow both forwards
-and backwards. Note that setting this to any value (including 0) will
-trigger the behaviour.
+C<iflags> such that the trans will start with forward dataflow,
+and backwards if C<BackCode> or C<AffinePriv>. Note that setting
+this to any value (including 0) will trigger the behaviour.
+As of 2.104, implied by C<BackCode> (including from C<EquivCPOffsCode>).
 
 =head3 HaveBroadcasting
 
@@ -2623,24 +2591,21 @@ will be used (or on a subclass). If this is true (which is the default
 for simple functions i.e. 2-arg with 0-dim signatures), instead the
 first argument's C<copy> method will be used.
 
-=head3 TwoWay
-
-If true, sets in the C<pdl_transvtable> (see L<PDL::Internals>) the
-C<iflags> such as to inform the trans's error checks connected to dataflow.
-
 =head3 Identity
 
 If true, sets C<RedoDims> C<EquivCPOffsCode> C<HandleBad> C<P2Child>
-C<TwoWay> such that the function is a dataflowing identity transformation.
+such that the function is a dataflowing identity transformation.
 
 =head3 BackCode
 
 For dataflowing functions, this value (which gets parsed) overrides the
 operation of that from children ndarrays to parents.
+As of 2.104, implies C<DefaultFlow> and C<Lvalue>.
 
 =head3 BadBackCode
 
-Same but taking account of bad values.
+Same but taking account of bad values. It is now recommended you
+use C<BackCode> with the C<PDL_IF_BAD> macro.
 
 =head3 EquivCPOffsCode
 
@@ -2665,6 +2630,8 @@ Example:
 
 If present, make the operation's XS function be C<lvalue>, like
 L<PDL::Slices/xchg>. Added in 2.096.
+As of 2.104, automatically set if there is backwards dataflow, see
+L</DefaultFlow>.
 
 =head1 Appendix B: PP macros and functions
 

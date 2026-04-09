@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+#
+# chandra-pack — Bundle a Chandra app into a distributable package
+#
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Chandra::Pack;
+
+my %opts = (
+    include => [],
+    exclude => [],
+);
+
+GetOptions(
+    'script=s'     => \$opts{script},
+    'name=s'       => \$opts{name},
+    'version=s'    => \$opts{version},
+    'icon=s'       => \$opts{icon},
+    'assets=s'     => \$opts{assets},
+    'output=s'     => \$opts{output},
+    'platform=s'   => \$opts{platform},
+    'identifier=s' => \$opts{identifier},
+    'perl=s'       => \$opts{perl},
+    'include=s@'   => $opts{include},
+    'exclude=s@'   => $opts{exclude},
+    'help'         => \$opts{help},
+) or usage(1);
+
+usage(0) if $opts{help};
+
+unless ($opts{script}) {
+    warn "Error: --script is required\n\n";
+    usage(1);
+}
+
+# Remove undef values
+my %args;
+for my $k (keys %opts) {
+    next if $k eq 'help';
+    $args{$k} = $opts{$k} if defined $opts{$k};
+}
+
+my $packer = Chandra::Pack->new(%args);
+
+print "Scanning dependencies...\n";
+my @deps = $packer->scan_deps;
+printf "Found %d dependencies\n", scalar @deps;
+
+print "Building for ${\$packer->platform}...\n";
+$packer->build(sub {
+    my ($result) = @_;
+    if ($result->{success}) {
+        printf "Built: %s (%s bytes)\n", $result->{path}, $result->{size};
+    } else {
+        die "Build failed\n";
+    }
+});
+
+sub usage {
+    my ($exit) = @_;
+    print <<USAGE;
+Usage: chandra-pack --script app.pl [options]
+
+Options:
+    --script FILE       Perl script to package (required)
+    --name NAME         Application name (default: from script)
+    --version VER       Version string (default: 0.0.1)
+    --icon FILE         Icon file (PNG or ICNS)
+    --assets DIR        Assets directory to include
+    --output DIR        Output directory (default: .)
+    --platform PLAT     Target: macos, linux, windows (default: current)
+    --identifier ID     Bundle identifier (default: org.perl.<name>)
+    --perl PATH         Perl binary path (default: current)
+    --include MODULE    Extra module to include (repeatable)
+    --exclude MODULE    Module to exclude (repeatable)
+    --help              Show this help
+
+Examples:
+    chandra-pack --script app.pl --name "My App" --output dist/
+    chandra-pack --script app.pl --icon icon.png --include DBI
+USAGE
+    exit($exit);
+}
+
+__END__
+
+=head1 NAME
+
+chandra-pack - Bundle a Chandra app for distribution
+
+=head1 SYNOPSIS
+
+    chandra-pack --script app.pl --name "My App" --output dist/
+
+=head1 DESCRIPTION
+
+Command-line tool for packaging Chandra applications into distributable
+bundles. Creates platform-appropriate packages (.app on macOS,
+AppImage-style directories on Linux, portable directories on Windows).
+
+=head1 SEE ALSO
+
+L<Chandra::Pack>
+
+=cut

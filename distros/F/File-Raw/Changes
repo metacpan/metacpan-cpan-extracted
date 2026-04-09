@@ -1,5 +1,17 @@
 Revision history for File-Raw
 
+0.07    2026-04-08
+        - Add file_join, file_mkpath, file_rm_rf to import mechanism
+        - file_join: platform-aware path joining (uses \ on Windows, / on POSIX)
+        - file_mkpath: recursive directory creation in C
+        - file_rm_rf: recursive directory removal in C
+        - Support selective import of variadic functions
+          (use File::Raw qw(join mkpath rm_rf))
+        - Fix variadic function import to install into caller's package
+        - Fix 1-arg and 2-arg custom op call checkers to enforce scalar
+          context on args (fixes file_slurp/file_spew with function call
+          return values as path)
+
 0.06    2026-04-08
         - Fix compilation on Cygwin: replace static XS() with XS_INTERNAL()
           to avoid conflict with dllexport requiring external linkage

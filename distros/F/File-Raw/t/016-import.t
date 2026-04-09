@@ -113,4 +113,37 @@ my $tmpdir = tempdir(CLEANUP => 1);
     is(File::Raw::slurp($dst), "content more", 'file_append works');
 }
 
+# Test 7: Variadic functions (join, mkpath, rm_rf)
+{
+    package TestVariadicImport;
+    use File::Raw qw(join mkpath rm_rf is_dir);
+    use Test::More;
+
+    ok(defined &file_join, 'file_join imported selectively');
+    ok(defined &file_mkpath, 'file_mkpath imported selectively');
+    ok(defined &file_rm_rf, 'file_rm_rf imported selectively');
+    ok(!defined &file_slurp, 'file_slurp NOT imported');
+    ok(!defined &file_spew, 'file_spew NOT imported');
+
+    my $sep = $^O eq 'MSWin32' ? '\\' : '/';
+    is(file_join('x', 'y'), "x${sep}y", 'file_join works via selective import');
+
+    my $d = file_join($tmpdir, 'variadic_test', 'deep');
+    file_mkpath($d);
+    ok(file_is_dir($d), 'file_mkpath works via selective import');
+    file_rm_rf(file_join($tmpdir, 'variadic_test'));
+    ok(!file_is_dir(file_join($tmpdir, 'variadic_test')), 'file_rm_rf works via selective import');
+}
+
+# Test 8: Variadic functions via :all
+{
+    package TestVariadicAll;
+    use File::Raw qw(:all);
+    use Test::More;
+
+    ok(defined &file_join, 'file_join imported via :all');
+    ok(defined &file_mkpath, 'file_mkpath imported via :all');
+    ok(defined &file_rm_rf, 'file_rm_rf imported via :all');
+}
+
 done_testing;

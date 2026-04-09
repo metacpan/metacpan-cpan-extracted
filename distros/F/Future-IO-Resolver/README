@@ -86,8 +86,9 @@ TODO
 
       * Some wrapping of other resolvers, like the POSIX get*ent family.
 
-      * Look into other backends - will be necessary for other resolver
-      types too.
+      * Allow for optional loading of backend resolver implementations, so
+      as not to depend on Net::LibAsyncNS all the time. Add support for
+      direct DNS-based resolving behaviour.
 
 AUTHOR
 

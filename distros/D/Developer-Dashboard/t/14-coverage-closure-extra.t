@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 use File::Path qw(make_path);
 use File::Spec;
@@ -23,7 +24,7 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Prompt;
 use Developer::Dashboard::SessionStore;
 use Developer::Dashboard::Web::App;
-use Folder;
+use Developer::Dashboard::Folder;
 
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
@@ -68,16 +69,16 @@ PAGE
 {
     make_path( File::Spec->catdir( $home, 'folder-env' ) );
     local $ENV{DEVELOPER_DASHBOARD_PATH_CUSTOM} = File::Spec->catdir( $home, 'folder-env' );
-    Folder->configure( paths => $paths, aliases => {} );
-    is( Folder->_resolve_path('custom'), File::Spec->catdir( $home, 'folder-env' ), 'Folder resolves DEVELOPER_DASHBOARD_PATH_* overrides' );
-    ok( !defined Folder->_resolve_path('missing-folder-alias'), 'Folder returns undef for unknown folder aliases' );
+    Developer::Dashboard::Folder->configure( paths => $paths, aliases => {} );
+    is( Developer::Dashboard::Folder->_resolve_path('custom'), File::Spec->catdir( $home, 'folder-env' ), 'Folder resolves DEVELOPER_DASHBOARD_PATH_* overrides' );
+    ok( !defined Developer::Dashboard::Folder->_resolve_path('missing-folder-alias'), 'Folder returns undef for unknown folder aliases' );
 
     my $list_dir = File::Spec->catdir( $home, 'folder-list' );
     make_path( File::Spec->catdir( $list_dir, 'subdir' ) );
     open my $fh, '>', File::Spec->catfile( $list_dir, 'item.txt' ) or die $!;
     print {$fh} "item\n";
     close $fh;
-    my @items = Folder->ls($list_dir);
+    my @items = Developer::Dashboard::Folder->ls($list_dir);
     is( scalar @items, 2, 'Folder lists both directory and file entries' );
     is( $items[0]{type}, 'folder', 'Folder sorts directories before files' );
     is( $items[1]{type}, 'file', 'Folder records file entries' );
@@ -478,10 +479,10 @@ SOURCE
         );
         is( $state{section}, 'HTML', 'web app editor-line highlighter updates section tracking from directives' );
     }
-    like(
-        $app->_highlight_section_text( 'body { color: red; }', { section => 'FORM', html_mode => 'style' } ),
-        qr/tok-attr|tok-value/,
-        'web app section highlighter routes FORM content through the HTML-aware highlighter',
+    is(
+        $app->_highlight_section_text( '<plain>', { section => 'FORM', html_mode => 'style' } ),
+        '&lt;plain&gt;',
+        'web app section highlighter treats removed FORM sections as plain escaped text',
     );
     like(
         $app->_highlight_section_text( '[% stash.name %]', { section => 'NOTE', html_mode => '' } ),
@@ -505,6 +506,10 @@ SOURCE
     );
 
     no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::command_in_path = sub {
+        my ($name) = @_;
+        return $name eq 'ifconfig' ? '/tmp/fake-ifconfig' : undef;
+    };
     local *Developer::Dashboard::Web::App::capture = sub (&) {
         my ($code) = @_;
         my $stdout = "wg0: flags\n    inet 10.8.0.2\neth0: flags\n    inet 192.168.1.9\n";
@@ -613,6 +618,14 @@ SOURCE
         prompt_visible => 1,
     );
     is( $app->_prompt_summary, '&#x2705;&#x1F433;', 'web app top status summary renders indicator status and alias pairs' );
+    like(
+        $app->_top_chrome_html(
+            Developer::Dashboard::PageDocument->new( id => 'coverage-top', layout => { body => 'Body' } ),
+            { edit => '/app/coverage-top/edit', render => '/app/coverage-top', source => '/app/coverage-top/source' },
+        ),
+        qr/Segoe UI Emoji.*Noto Color Emoji/s,
+        'web app top chrome uses an emoji-capable font stack for the browser status strip',
+    );
 }
 
 {
@@ -650,5 +663,36 @@ __END__
 
 This test exercises migration, fallback, private helper, and managed-child
 paths that are difficult to reach from the higher-level CLI and browser flows.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file covers remaining non-obvious branches required for the coverage gate.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/14-coverage-closure-extra.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/14-coverage-closure-extra.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

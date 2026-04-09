@@ -1,5 +1,793 @@
 Revision history for Developer Dashboard
 
+2.02  2026-04-08
+    - fixed packaged `t/09-runtime-manager.t` isolation so ambient live
+      dashboard-shaped processes on the host can no longer hijack the
+      `running_web` fallback assertion when the test is explicitly proving the
+      recorded pid path without managed-process discovery
+    - added an explicit `_find_web_processes` stub to that runtime-manager
+      regression, keeping source-tree, tarball, and PAUSE install runs stable
+      even on hosts that already have unrelated dashboard runtimes active
+    - fixed `t/22-api-dashboard-playwright.t` reload drift by waiting for the
+      persisted collection JSON to contain the saved request before the later
+      export/import/reload path, and by scoping request clicks to the active
+      visible collection panel so browser coverage no longer races against
+      collection-tree rerenders under full-suite load
+
+2.01  2026-04-08
+    - extended `dashboard serve --ssl` certificate generation so the local
+      self-signed cert now also covers the concrete non-wildcard bind host and
+      any configured `web.ssl_subject_alt_names`, including direct IPv4, IPv6,
+      and local alias-domain access
+    - fixed local alias-host access so loopback requests through `localhost`
+      or configured local aliases no longer fall into helper-only `401`
+      handling when they still arrive from loopback
+    - added focused SAN-alias coverage in `t/17-web-server-ssl.t`,
+      loopback-alias trust coverage in `t/07-core-units.t`, and a real
+      Chromium alias-host regression in `t/33-web-server-ssl-browser.t`
+
+2.00  2026-04-08
+    - fixed `dashboard serve --ssl` certificate generation so the local
+      self-signed cert now carries browser-correct SAN coverage for
+      `localhost`, `127.0.0.1`, and `::1`, uses a server leaf profile instead
+      of a CA profile, and no longer ships the broken legacy cert shape that
+      modern browsers reject more harshly
+    - fixed stale HTTPS runtime reuse so older legacy dashboard certs are
+      detected and regenerated automatically instead of being reused forever
+      after the implementation changes
+    - added focused SSL regression coverage in `t/17-web-server-ssl.t` for
+      SAN, key-usage, extended-key-usage, and stale-cert rotation
+    - added `t/33-web-server-ssl-browser.t` so a real Chromium browser now
+      covers the `dashboard serve --ssl` path, proving the privacy
+      interstitial appears instead of a reset connection and that the actual
+      dashboard page still loads once local trust is bypassed for the test
+      browser
+
+1.99  2026-04-08
+    - extended the seeded `sql-dashboard` browser workflow to live Docker-backed
+      MSSQL and Oracle fixtures in addition to the existing SQLite, MySQL, and
+      PostgreSQL coverage, while keeping `DBD::ODBC` and `DBD::Oracle` as
+      develop-only recommendations instead of shipping them in the base runtime
+    - fixed SQL dashboard schema browsing for `DBD::ODBC` by stopping the extra
+      `execute()` call on `table_info()` and `column_info()` statement handles,
+      which removes the MSSQL `SQL-HY010` function-sequence failure from the
+      browser workflow
+    - improved the SQL dashboard profile UX with driver-specific guidance and
+      seeded DSN templates for SQLite, MySQL, PostgreSQL, MSSQL/ODBC, and
+      Oracle, so blank profiles start from a usable connection example instead
+      of an unhelpful bare driver prefix
+    - added `SQL_DASHBOARD_SUPPORTS_DB.md` as the living support checklist and
+      verification report for the SQL workspace
+    - fixed packaged-tree release/integration tests so built tarballs no longer
+      fail on markdown docs that `dist.ini` intentionally excludes from the
+      distribution, while the source-tree suite still enforces those docs
+
+1.98  2026-04-08
+    - fixed `dashboard init` and `dashboard config init` so a missing
+      `config/config.json` is created as `{}` while an existing config file is
+      left untouched instead of being repopulated with a seeded example
+      collector
+    - moved dashboard-managed built-in helper staging into the dedicated home
+      namespace `~/.developer-dashboard/cli/dd/`, which keeps user commands in
+      `~/.developer-dashboard/cli/` separate from dashboard-owned helpers and
+      prevents child project layers from receiving built-in `dd/` helper seeds
+    - proved the SQL dashboard browser workflow against live Docker-backed
+      MySQL and PostgreSQL fixtures in addition to the deep SQLite matrix, and
+      kept `DBD::SQLite`, `DBD::mysql`, and `DBD::Pg` as develop-only
+      recommendations instead of shipped runtime prerequisites
+    - hardened the api-dashboard Playwright request-node click helper so the
+      covered suite stays green even when browser timing slows down enough for
+      the request tree to rerender between locator resolution and click
+
+1.97  2026-04-07
+    - fixed the `sql-dashboard` connection-id and shared-route model for
+      passwordless profiles such as SQLite, so a blank user now saves,
+      reloads, and auto-runs correctly instead of being rejected as missing
+      credentials
+    - added a 50-case real SQLite Playwright matrix in
+      `t/31-sql-dashboard-sqlite-playwright.t` covering profile UX, merged
+      workspace layout, saved SQL collection flow, schema browsing, portable
+      shared URLs, passwordless draft restoration, invalid SQL handling, and
+      file-permission checks against a live SQLite database
+    - added optional docker-backed MySQL and PostgreSQL browser coverage in
+      `t/32-sql-dashboard-rdbms-playwright.t`, while keeping `DBD::SQLite`,
+      `DBD::mysql`, and `DBD::Pg` out of shipped runtime prerequisites so
+      users still install only the DBI drivers they actually need
+
+1.96  2026-04-07
+    - fixed bookmark `HTML:` and shared `nav/*.tt` Template Toolkit syntax
+      failures so render mode now shows a visible runtime error instead of
+      leaking raw `[% ... %]` source back into the page
+    - stringified Template Toolkit exceptions before storing them in
+      `runtime_errors`, which restores browser-visible nav error reporting
+      instead of silently dropping broken nav fragments
+    - added browser, web-route, nav-renderer, and CLI coverage for broken TT
+      syntax in saved pages and raw nav fragments
+
+1.95  2026-04-07
+    - made `dashboard init` compare dashboard-managed helper files and shipped
+      starter bookmark files by MD5 inside Perl before writing, so unchanged
+      managed files are skipped instead of being rewritten
+    - added the reusable `Developer::Dashboard::SeedSync` helper and wired it
+      into built-in helper staging plus runtime bootstrap seeding
+    - declared the new `Digest::MD5` dependency in the runtime and release
+      metadata, and expanded CLI plus unit coverage around the non-rewrite
+      path for matching managed files
+
+1.94  2026-04-07
+    - fixed `dashboard init` helper staging so it no longer overwrites a
+      user-owned colliding file under `~/.developer-dashboard/cli/` when that
+      filename matches a built-in helper such as `jq`
+    - kept helper refresh non-destructive by only updating dashboard-managed
+      staged helpers while preserving unrelated files and directories in the
+      home runtime CLI root
+    - added unit and CLI smoke coverage for preserved user-owned home helper
+      collisions and documented the non-destructive helper staging contract
+
+1.93  2026-04-07
+    - fixed shared `nav/*.tt` rendering so raw Template Toolkit fragment files
+      such as `nav/here.tt` now render in the shared nav strip and through
+      `/app/nav/<name>.tt` instead of being ignored unless they were wrapped as
+      full bookmark documents
+    - kept invalid junk files out of the nav strip by only accepting raw
+      `nav/*.tt` files that actually look like TT or HTML fragments, and added
+      route plus browser-backed regression coverage for that path
+
+1.92  2026-04-07
+    - fixed `dashboard page render` so saved bookmark pages now run through
+      the same `PageRuntime->prepare_page` path as the browser, which restores
+      Template Toolkit rendering for bookmark `HTML:` sections instead of
+      printing raw `[% ... %]` placeholders
+    - added CLI smoke coverage for saved-page Template Toolkit rendering and
+      re-verified the browser bookmark smoke path with a real TT bookmark file
+
+1.91  2026-04-07
+    - stopped seeding the default `welcome` bookmark during `dashboard init`
+      and runtime bootstrap, so fresh runtimes now start with only
+      `api-dashboard` and `sql-dashboard`
+    - fixed update-manager regression coverage so the bootstrap test now pins
+      bookmark and config writes to an isolated home runtime instead of
+      accidentally reading the repo's own checked-out `.developer-dashboard`
+      tree
+
+1.90  2026-04-07
+    - fixed the packaged `t/21-refactor-coverage.t` `dashboard path
+      project-root` assertion so it now compares path identity instead of raw
+      strings, keeping macOS `/var/...` versus `/private/var/...` aliases from
+      breaking `cpanm` installs even though the command resolved the right repo
+    - added explicit testing/docs coverage for the path-helper portability
+      contract so packaged installs now treat canonical filesystem aliases as
+      the same project root
+
+1.89  2026-04-07
+    - fixed DD-OOP-LAYERS path discovery on symlink-heavy platforms such as
+      macOS by comparing canonical path identities instead of raw path strings,
+      so `/var/...` and `/private/var/...` aliases no longer collapse runtime
+      layer inheritance back to the home layer
+    - added regression coverage for canonical-cwd versus symlinked-home layer
+      discovery and re-verified the layered nav rendering path that depends on
+      the same runtime-layer contract
+
+1.88  2026-04-07
+    - fixed `dashboard serve` so it now starts configured collector loops
+      alongside the web service instead of leaving collectors untouched until a
+      later `dashboard restart`
+    - fixed collector startup error handling so runtime manager now surfaces
+      loop startup failures explicitly and stops any already-started collectors
+      from the same action instead of silently continuing in a broken state
+    - added runtime-manager and CLI smoke coverage for the collector lifecycle
+      contract so `serve`, `restart`, and `stop` stay aligned
+
+1.87  2026-04-07
+    - fixed the `t/07-core-units.t` doctor hook assertion so it now clears
+      ambient `RESULT` state before checking the empty-hook path, which keeps
+      install-time and inherited-environment test runs from failing on
+      unrelated hook data
+    - documented the doctor hook environment expectation in the testing notes
+      so future env-sensitive unit checks do not assume a clean process
+      environment unless they establish it explicitly
+
+1.86  2026-04-07
+    - added the `FULL-POD-DOC` contributor contract and enforced it in
+      release metadata so every repo-owned Perl file now documents what it is,
+      what it is for, why it exists, when to use it, how to use it, what uses
+      it, and at least one concrete example
+    - expanded POD across the public entrypoint, modules, tests, staged
+      private helpers, integration scripts, and update scripts instead of
+      leaving terse NAME/DESCRIPTION stubs that forced contributors to guess
+      file roles from the code alone
+    - documented the new POD floor in the README, main module manual, and
+      testing guide so contributor expectations and release checks stay aligned
+
+1.85  2026-04-07
+    - finished the `dashboard` switchboard extraction by moving the remaining
+      built-in command bodies out of `bin/dashboard` and into staged private
+      helper assets under `share/private-cli/`
+    - added the shared private `_dashboard-core` helper runtime so broad
+      built-in commands such as `init`, `serve`, `doctor`, `page`, `config`,
+      `collector`, `docker`, `shell`, `skills`, and related commands now run
+      outside the public entrypoint while `jq`/`of`/`ticket`/`path`/`paths`/`ps1`
+      keep their dedicated helper bodies
+    - fixed shell bootstrap handoff so generated shell helpers always re-enter
+      the public `dashboard` command through Perl instead of accidentally
+      calling the staged private core directly
+
+1.84  2026-04-07
+    - restored the thin `dashboard` switchboard model for lightweight
+      commands by moving the built-in helper script sources into
+      `share/private-cli/`, dispatching `jq`/`of`/`ticket`/`path`/`paths`/`ps1`
+      through staged helper scripts, and removing the direct
+      `CLI::Query`/`CLI::OpenFile`/`CLI::Ticket` loading path from
+      `bin/dashboard`
+    - fixed built-in helper staging so `dashboard init` and on-demand helper
+      extraction now always seed dashboard-managed helpers only under
+      `~/.developer-dashboard/cli/`, while layered lookup and hook execution
+      still apply to user-provided commands across `DD-OOP-LAYERS`
+    - restored the classic prompt branch detection path by parsing `git branch`
+      output for the trailing `🌿branch` suffix instead of relying on the
+      newer `git rev-parse --abbrev-ref HEAD` shortcut
+
+1.83  2026-04-07
+    - introduced the `DD-OOP-LAYERS` runtime contract so every existing
+      `.developer-dashboard/` layer from `~/.developer-dashboard` down to the
+      current working directory now participates in command lookup,
+      bookmark/nav lookup, config inheritance, collector/indicator state
+      lookup, auth/session fallback, and runtime-local `local/lib/perl5`
+      exposure
+    - fixed top-level CLI inheritance so non-repo current-directory and
+      parent-directory layers participate together, with the deepest matching
+      command winning while per-command hooks run from home to leaf across all
+      discovered layers
+    - fixed layered bookmark rendering so shared `nav/*.tt` fragments and TT
+      includes merge across inherited dashboard roots, and tightened config
+      array merging for layered `collectors` and `providers`
+
+1.82  2026-04-07
+    - fixed lazy top-level CLI resolution so `dashboard <command>` now checks
+      the current directory's `./.developer-dashboard/cli` before falling back
+      to the nearest git-backed project runtime and then
+      `~/.developer-dashboard/cli`, which restores local per-directory custom
+      commands even outside git repos
+    - kept home-runtime fallback working from non-repo directories that only
+      contain `./.developer-dashboard/` without a matching local CLI override
+    - expanded CLI smoke coverage around the non-git local override and the
+      non-repo home fallback command path
+
+1.81  2026-04-07
+    - kept the public `dashboard` entrypoint thinner by moving the shipped
+      `welcome`, `api-dashboard`, and `sql-dashboard` starter bookmark source
+      into `share/seeded-pages/` and loading those assets on demand during
+      `dashboard init` instead of embedding the bookmark bodies directly in
+      the command script
+    - fixed the seeded bookmark asset loader so installed copies resolve
+      those starter pages from the distribution share directory instead of a
+      repo-only relative path, which restores `dashboard init` after `cpanm`
+      installation in blank environments
+    - added explicit lightweight early-return paths for `dashboard ticket`
+      and `dashboard version`, and kept the existing `jq`/`yq`/`open-file`
+      style helpers on the lazy path so those commands do not build the full
+      web runtime first
+    - fixed `dashboard init` and `dashboard config init` so rerunning either
+      command preserves an existing `~/.developer-dashboard/config/config.json`
+      while still filling missing default collector config, helper commands,
+      and starter bookmarks
+    - tightened CLI smoke and loader coverage around the non-destructive init
+      path, the seeded-page asset loader, and the `/usr/bin/env perl`
+      shebang rule for shipped Perl scripts
+
+1.79  2026-04-06
+    - excluded `cover_db` from the release gather rules so a local
+      Devel::Cover run no longer leaks coverage artifacts into built tarballs
+    - tightened the release metadata coverage so the source tree now guards
+      the clean-tarball rule directly before `dzil build`
+    - kept the Windows Strawberry Perl path-resolution fix, the
+      Dockur/QEMU host-staged MSI flow, the Windows guest `cpanm --notest`
+      dependency policy, and the hardened SSL live-server regression test
+      from the earlier 1.78 work on the first clean release artifact
+
+1.78  2026-04-06
+    - fixed the Windows Strawberry Perl smoke bootstrap so a blank or
+      command-name-only Perl resolution no longer dies before the fallback
+      path resolver can run; the smoke now falls back through PowerShell
+      command metadata and `where.exe` before deriving Strawberry runtime
+      paths
+    - hardened the Windows QEMU/Dockur smoke flow so the host stages the
+      Strawberry Perl MSI into the OEM bundle, the launcher supports
+      configurable retained web/RDP ports plus reusable cached ISO workdirs,
+      and the Windows guest can install the built tarball with `cpanm --notest`
+      during the dependency layer while still running the full dashboard
+      runtime smoke afterward
+    - fixed `t/17-web-server-ssl.t` so an intermittent live TLS connect
+      failure reports the underlying `IO::Socket::SSL` error and fails the
+      remaining HTTPS assertions cleanly instead of crashing the test file on
+      an undefined socket handle
+    - updated the Windows verification docs, release metadata guard, main POD,
+      and software spec so the checked-in verification path matches the
+      shipped Windows smoke helpers and the verified Ubuntu blank-environment
+      tarball install path
+
+1.77  2026-04-06
+    - added a rerunnable Windows VM verification path with
+      `integration/windows/run-host-windows-smoke.sh`,
+      `integration/windows/run-qemu-windows-smoke.sh`, and the optional
+      live `t/29-windows-qemu-smoke.t` gate under `t/`
+    - taught the Windows QEMU launcher to load reusable env-file settings,
+      recover from stale `kvm` group sessions via `sg kvm`, support a
+      Dockur-backed VM path, and auto-resolve the current 64-bit Strawberry
+      Perl MSI from the official Strawberry Perl release feed when needed
+    - updated the Strawberry/QEMU Windows smoke docs, README, main POD, and
+      `SOFTWARE_SPEC.md` so the supported Windows baseline stays explicit:
+      PowerShell plus Strawberry Perl, with Git Bash and Scoop treated only
+      as optional setup helpers
+    - tightened Windows integration asset coverage so the checked-in smoke
+      launchers must stay executable and version-agnostic
+
+1.76  2026-04-06
+    - added a hide/show `Request Credentials` section to the seeded
+      `api-dashboard` workspace, with bookmark-local `Basic`, `API Token`,
+      `API Key`, `OAuth2`, `Apple Login`, `Amazon Login`, `Facebook Login`,
+      and `Microsoft Login` presets backed by Postman `request.auth`
+      import/export
+    - fixed api-dashboard request send so saved request auth now applies to
+      outgoing headers or query strings instead of forcing operators back to
+      manual header editing, while imported provider-style auth presets
+      hydrate back into the browser editor
+    - hardened project-local `config/api-dashboard` persistence to owner-only
+      `0700` / `0600` permissions because saved Postman collections can now
+      contain live request-auth secrets, and expanded browser plus saved-Ajax
+      coverage around that storage model
+    - updated README, main module POD, architecture/testing/integration
+      docs, security notes, and `SOFTWARE_SPEC.md` so the shipped
+      api-dashboard auth workflow and storage model stay documented
+
+1.75  2026-04-06
+    - refined the sql-dashboard workspace UI so the editor is the clear
+      primary focus: the SQL textarea now auto-resizes with the current
+      content, the heavy editor toolbar is replaced by one quiet action row,
+      and the redundant in-workspace schema-open button is removed in favour
+      of the top schema tab
+    - moved saved-SQL deletion to a compact inline `[X]` control beside each
+      saved query so the visible list stays tied to its collection and no
+      longer burns space with a large delete banner
+    - expanded `t/05-cli-smoke.t`, `t/26-sql-dashboard.t`, and
+      `t/27-sql-dashboard-playwright.t` to cover the quieter source markup,
+      content-based editor auto-resize, inline saved-SQL deletion, and
+      schema-tab browser flow
+    - updated README, main module POD, architecture/testing/integration
+      docs, and `SOFTWARE_SPEC.md` so the shipped sql-dashboard UX
+      description matches the implemented workspace layout
+
+1.74  2026-04-05
+    - fixed the sql-dashboard workspace split by merging SQL collections and
+      editing into one `SQL Workspace` tab with a phpMyAdmin-style
+      master-detail layout, keeping collection tabs plus the active
+      collection's saved SQL list together in a left navigation rail while the
+      editor and results stay together on the right
+    - fixed the multi-save overwrite bug in sql-dashboard so saving a new SQL
+      name into the same collection creates another saved SQL entry instead of
+      overwriting the currently selected one, and kept the active saved SQL
+      name visible in the workspace while switching between saved queries
+    - expanded `t/26-sql-dashboard.t`, `t/27-sql-dashboard-playwright.t`, and
+      `t/05-cli-smoke.t` to cover the merged workspace layout, multi-SQL
+      collection persistence, source markup, and active saved-SQL labeling
+    - fixed the release packaging blocker by excluding the tracked `LICENSE`
+      file from `GatherDir` so `[License]` can generate the built-dist license
+      file without duplicate-file aborts, and added a release-metadata guard
+      for that rule
+    - updated README, main module POD, architecture/testing/integration docs,
+      and `SOFTWARE_SPEC.md` so the shipped SQL workspace description matches
+      the merged workspace flow
+
+1.73  2026-04-05
+    - fixed the sql-dashboard share-state portability gap by replacing local
+      profile-name URL state with a portable `connection=dsn|user` id,
+      rebuilding draft connection profiles from shared URLs when the receiving
+      machine does not already have the saved connection, and auto-running the
+      shared SQL only when a matching locally saved password already exists
+    - added bookmark-local SQL collection persistence under
+      `config/sql-dashboard/collections/<collection-name>.json`, kept those
+      collection files independent from connection profiles, tightened the
+      collection directory and files to owner-only `0700` / `0600`, and made
+      the workspace load saved collections as tabs
+    - replaced the sql-dashboard free-text driver field with an installed
+      `DBD::*` dropdown that rewrites only the `dbi:<Driver>:` DSN prefix, ran
+      the sql-dashboard saved Ajax endpoints through singleton workers, and
+      expanded `t/26-sql-dashboard.t` plus
+      `t/27-sql-dashboard-playwright.t` to cover the new browser and saved
+      Ajax flow
+    - updated README, main module POD, architecture/testing/integration/
+      security docs, and `SOFTWARE_SPEC.md` so the shipped SQL workspace
+      description matches the collection model, portable connection URLs, and
+      singleton bookmark Ajax design
+
+1.72  2026-04-05
+    - fixed the sql-dashboard profile-permission gap by tightening
+      `config/sql-dashboard` to `0700`, writing saved profile JSON files at
+      `0600`, and repairing older insecure profile modes the next time the
+      bookmark bootstrap/profile-read path touches them
+    - extended `t/26-sql-dashboard.t` and
+      `t/27-sql-dashboard-playwright.t` so both saved-Ajax and real-browser
+      coverage now assert the owner-only sql-dashboard profile store
+    - updated README, main module POD, architecture/testing/security docs, and
+      `SOFTWARE_SPEC.md` so the shipped SQL workspace description matches the
+      secured project-local profile storage and makes clear that current SQL
+      text still lives in shareable URL state rather than a saved SQL file
+
+1.71  2026-04-05
+    - removed the stray `Developer::Dashboard::CPANManager` core module so the
+      generic SQL workspace stays isolated: `dashboard cpan <Module...>` now
+      remains script-local in `bin/dashboard`, while saved Ajax workers derive
+      `local/lib/perl5` directly from the active runtime root
+    - replaced the old direct manager-module unit coverage with
+      `t/28-runtime-cpan-env.t`, which verifies the runtime-local PERL5LIB
+      wiring and guards against reintroducing the dedicated manager module
+    - updated README, main module POD, architecture/testing/release docs,
+      `SOFTWARE_SPEC.md`, and bug logs so the shipped documentation matches the
+      isolated runtime-driver design
+
+1.70  2026-04-05
+    - replaced the seeded placeholder `db-dashboard` starter with a bookmark-local
+      `sql-dashboard` workspace that stores connection profiles under
+      `config/sql-dashboard/<profile-name>.json`, keeps shareable browser URL
+      state, executes SQL through generic `DBI`, browses schema metadata via
+      `table_info` and `column_info`, and preserves programmable `SQLS_SEP` /
+      `INSTRUCTION_SEP` statement hooks without moving the dashboard logic into
+      a dedicated core SQL module
+    - added `dashboard cpan <Module...>` for runtime-local optional Perl
+      modules, recording requested modules in `./.developer-dashboard/cpanfile`,
+      installing into `./.developer-dashboard/local`, and automatically adding
+      `DBI` when users request a `DBD::*` driver
+    - added SQL dashboard regression coverage in `t/26-sql-dashboard.t` and
+      real-browser coverage in `t/27-sql-dashboard-playwright.t`, added
+      runtime-driver regression coverage, and updated the testing docs,
+      integration plan, software spec, and release metadata to describe the
+      seeded SQL workspace and optional driver workflow
+
+1.69  2026-04-05
+    - removed the old split form-directive support from the parser, runtime
+      renderer, nav fragment renderer, and browser editor highlighter so
+      `HTML:` is the single supported bookmark markup section
+    - updated README, `Developer::Dashboard` POD, `SKILL.md`,
+      `Developer::Dashboard::SKILLS`, architecture docs, release docs, and
+      `SOFTWARE_SPEC.md` so public bookmark syntax guidance now documents
+      `HTML:` instead of a split form/body markup model
+    - tightened coverage and release-metadata tests so the removed bookmark
+      form directives cannot silently reappear in runtime rendering or public
+      documentation
+
+1.68  2026-04-05
+    - added a shipped skill authoring guide in `SKILL.md` that explains the
+      skill repository layout, command and hook model, bookmark routes,
+      bookmark syntax, browser helpers, custom CLI hook roots, and current
+      runtime boundaries for skill authors working without the source tree
+      open beside them
+    - added `Developer::Dashboard::SKILLS` as a shipped POD reference so the
+      same skill authoring guidance is available from the installed
+      distribution
+    - added `doc/skills.md`, updated README and `Developer::Dashboard` POD to
+      point readers at the new skill authoring references, and tightened the
+      release metadata test so future releases fail if the public docs stop
+      covering the expected skill authoring workflow
+
+1.67  2026-04-05
+    - removed internal-history terminology from markdown documentation,
+      release notes, bug logs, and shipped POD so public docs describe
+      bookmark compatibility and older runtime shapes directly
+    - tightened the release metadata test so markdown docs and shipped POD
+      now fail the release gate if they reintroduce that internal wording
+    - re-included `SOFTWARE_SPEC.md` in the built distribution so the tarball
+      ships the same public documentation set that the release-metadata test
+      enforces in the source tree
+
+1.66  2026-04-05
+    - restored the seeded `api-dashboard` request-token workflow by rendering
+      a request-specific token form above the editor whenever the selected
+      request uses `{{token}}` placeholders, carrying those values across
+      matching placeholders in other requests from the same collection, and
+      resolving the visible URL, headers, and body fields from the shared
+      collection-token values
+    - reworked the seeded `api-dashboard` collection browser so stored
+      collections render as tabs instead of one long stacked list, making it
+      practical to move between large imported collections without endless
+      scrolling
+    - restyled the seeded `api-dashboard` shell, collection, response, and
+      request tabs so they look like tabs instead of rounded action buttons,
+      and moved the Request Details, Response Body, and Response Headers tabs
+      below the response `pre` box while keeping Response Body selected after
+      each send
+    - expanded Playwright browser coverage in `t/22-api-dashboard-playwright.t`
+      and `t/24-api-dashboard-tabs-playwright.t` for token carry-over, the
+      collection tab strip, tab styling, and the response-tab placement and
+      default-selection behaviour
+    - updated README, main module POD, testing docs, bug logs, and release
+      metadata for the token-form workflow and tab-layout refinements
+
+1.65  2026-04-05
+    - fixed saved-Ajax execution for oversized browser payloads by spilling
+      large request params and query strings to temp files instead of passing
+      them inline through the child process environment
+    - fixed the seeded `api-dashboard` browser import flow so real file-input
+      uploads use a FileReader-first path, and large Postman collection saves
+      no longer die with `Argument list too long`
+    - fixed `api-dashboard` save/delete/import success handling so empty
+      `200` Ajax responses are treated as failures instead of showing false
+      success banners when nothing was persisted
+    - added oversized save coverage in `t/03-web-app.t`, saved-Ajax payload
+      spill coverage in the helper-coverage regression, and large-import
+      Playwright coverage in `t/25-api-dashboard-large-import-playwright.t`
+    - updated README, main module POD, testing docs, bug logs, and release
+      metadata for the large-import transport fix and stricter Ajax success
+      validation
+
+1.64  2026-04-04
+    - fixed the seeded `api-dashboard` import flow so importing a Postman
+      collection through the browser adds the collection to the Collections
+      tab and persists it under `config/api-dashboard/<collection-name>.json`
+      instead of appearing to do nothing
+    - reworked the seeded `api-dashboard` layout so Collections and Workspace
+      render as top-level tabs, and Request Details, Response Body, and
+      Response Headers render as inner workspace tabs rather than fighting for
+      side-by-side space
+    - added Playwright coverage for the browser import path, the optional
+      external-fixture import path under
+      `API_DASHBOARD_IMPORT_FIXTURE=/path/to/collection.postman_collection.json`,
+      and the new tabbed `api-dashboard` browser layout
+    - fixed managed collector indicator syncing so prompt, browser, and CLI
+      metadata refreshes no longer overwrite a concurrently-updated healthy
+      collector back to `missing` during restart windows
+    - updated README, main module POD, testing docs, bug logs, and release
+      metadata for the tabbed `api-dashboard` layout, browser import fix, and
+      collector-indicator restart consistency
+    - stabilized `t/09-runtime-manager.t` under `Devel::Cover` by bounding the
+      stubborn-process reap waits, so the covered release run finishes
+      cleanly after shutdown escalation paths are exercised
+
+1.61  2026-04-04
+    - moved seeded `api-dashboard` collection persistence from browser-only
+      state to runtime Postman JSON files under
+      `config/api-dashboard/<collection-name>.json`, including save, rename,
+      delete, and startup bootstrap loading of every stored collection
+    - kept the new persistence logic isolated inside the seeded
+      `api-dashboard` bookmark’s saved Ajax handlers instead of introducing
+      new core runtime modules for collection storage
+    - fixed bookmark-local saved Ajax handler bootstrapping plus `print
+      json_encode(...)` response generation so browser and web-app requests
+      return real JSON instead of runtime errors
+
+1.60  2026-04-04
+    - fixed the built-in `/js/jquery.js` compatibility shim so bookmark pages
+      can use jqXHR-style `$.ajax(...).done(...).fail(...)` chaining and the
+      `method` alias expected by the seeded `api-dashboard` workspace
+    - fixed api-dashboard response rendering so transient browser statuses such
+      as "Sending request..." no longer crash the page before the saved Ajax
+      sender runs
+    - browser-verified `GET https://api.ipify.org/?format=json` from the
+      seeded api-dashboard bookmark after the shim and render guards were
+      restored
+
+1.59  2026-04-04
+    - fixed the api-dashboard HTTPS packaging gap by declaring
+      `LWP::Protocol::https` in the runtime prerequisites, so saved LWP
+      request dispatch works against normal TLS API endpoints such as
+      `https://api.ipify.org/?format=json`
+
+1.58  2026-04-04
+    - extended the seeded `api-dashboard` bookmark so browser URLs track the
+      active collection, request, and tab for direct links plus back/forward
+      navigation inside the workspace
+    - added richer collection-management controls, per-tab response state, and
+      active-location highlighting in the Postman-style API workspace
+    - taught the saved LWP-backed request sender to classify JSON, text, PDF,
+      image, and TIFF responses so the browser renders formatted text or media
+      previews instead of dumping raw binary output
+
+1.57  2026-04-04
+    - rebuilt the seeded `api-dashboard` bookmark as a Postman-style
+      workspace with collection import/export, multiple request tabs, and
+      bookmark-backed request dispatch through saved Ajax handlers
+    - added collection bootstrap loading from the runtime `config/postman`
+      directory plus browser and unit coverage for the rendered workspace and
+      saved request sender endpoint
+    - declared the embedded api-dashboard sender runtime prerequisites in
+      Makefile.PL so blank `cpanm` installs pull `LWP::UserAgent`,
+      `HTTP::Request`, and `URI` instead of failing only in clean environments
+
+1.56  2026-04-04
+    - fixed older bookmark `stream_data` so saved Ajax endpoints update the
+      browser DOM through incremental XMLHttpRequest progress events instead of
+      waiting for the whole response to finish
+    - added unit and browser-backed regression coverage for bookmark pages that
+      call `stream_data(foo.bar, '.display')` from `$(document).ready(...)`
+
+1.55  2026-04-04
+    - fixed `dashboard of` / `dashboard open-file` to restore the older
+      `vim -p` execution path, so pressing Enter at the chooser opens all
+      matches in vim tabs instead of launching them without tab mode
+    - added smoke and unit regressions for blank-enter open-all behavior and
+      vim-family editor tab detection in the shared open-file implementation
+
+1.54  2026-04-04
+    - fixed scoped `dashboard of` / `dashboard open-file` search ordering so
+      exact helper/script matches such as `jq` and `jq.js` sort ahead of
+      broader substring matches such as `jquery.js`
+    - added smoke and unit regressions for `dashboard of . jq`, proving the
+      numbered chooser now shows `jq` and `jq.js` before `jquery.js`
+
+1.53  2026-04-04
+    - aligned `dashboard of` / `dashboard open-file` with the real prior
+      chooser semantics so a single unique match opens immediately while
+      multi-match searches prompt with numbered choices
+    - added compatibility multi-select parsing for comma-separated numbers,
+      numeric ranges, and blank-input-to-open-all in the shared open-file
+      implementation
+    - tightened smoke and unit coverage around the chooser prompt and
+      multi-file editor exec path
+
+1.52  2026-04-04
+    - restored the interactive `dashboard of` / `dashboard open-file` chooser
+      so multi-match searches print a numbered list, prompt for a selection,
+      and open the chosen file instead of degrading to a raw path dump
+    - restored a built-in editor fallback for open-file commands, defaulting
+      to `vim` when neither `--editor`, `VISUAL`, nor `EDITOR` is set, so
+      single-match lookups like `dashboard of . jq` open directly again
+    - added smoke and unit coverage for the numbered selection flow, the
+      selected-file editor exec path, and the default editor fallback
+
+1.51  2026-04-04
+    - added a private `ticket` helper under `~/.developer-dashboard/cli/` so
+      `dashboard ticket` is again part of the built-in toolchain without
+      reintroducing a public top-level executable into the installed PATH
+    - implemented shared tmux ticket-session logic that reuses an existing
+      session when present, creates a new `Code1` session when missing, and
+      seeds `TICKET_REF`, `B`, and `OB` into the tmux session environment
+    - added smoke, refactor, and release-metadata coverage for the staged
+      private ticket helper and its tmux dispatch behaviour
+
+1.50  2026-04-04
+    - restored private `of` and `open-file` helper staging under
+      `~/.developer-dashboard/cli/` so the runtime still seeds those helpers
+      without reintroducing public PATH pollution from the CPAN package
+    - kept `dashboard of` and `dashboard open-file` as the public behavior
+      surface while proving the private runtime wrappers still resolve Perl
+      modules and Java class names
+
+1.49  2026-04-04
+    - removed standalone `of` and `open-file` executables from the shipped
+      distribution so `dashboard` remains the only public CPAN-facing command
+      and the package no longer installs those generic helper names into the
+      global PATH
+    - kept `dashboard of` and `dashboard open-file` support in the main
+      command, so open-file resolution still works without exporting extra
+      public binaries
+
+1.48  2026-04-04
+    - fixed macOS cpanm installation test 14 failure where Runtime::Result
+      command name derivation was prioritizing stale DEVELOPER_DASHBOARD_COMMAND
+      env var over $0 script path, causing incorrect command name attribution
+      in hook result reports
+    - completed project module namespacing under Developer::Dashboard:: and
+      removed the unscoped project-owned module files from the shipped
+      distribution to avoid CPAN namespace pollution
+    - renamed CLI query subcommands by removing 'p' prefix: pjq→jq, pyq→yq,
+      ptomq→tomq, pjp→propq, plus added new subcommands: iniq (INI), csvq (CSV),
+      xmlq (XML) for expanded data format support
+    - prevented decomposed query subcommands from polluting system PATH by
+      excluding them from tarball installation and dispatching them through
+      private dashboard-managed helper files under ~/.developer-dashboard/cli/
+    - implemented new isolated skill system for installable Git-backed extensions:
+      * dashboard skills install <git-url> - install skill from Git repository
+      * dashboard skills uninstall <repo-name> - remove skill completely
+      * dashboard skills update <repo-name> - pull latest skill changes
+      * dashboard skills list - enumerate installed skills
+      * dashboard skill <repo-name> <cmd> @args - execute skill commands
+    - skill system features:
+      * each skill isolated under ~/.developer-dashboard/skills/<repo-name>/
+      * skill directory structure: cli/, config/, config/docker/, state/,
+        logs/, local/, cpanfile
+      * skill-local hook support: cli/<cmd>.d/ for command extensions
+      * skill isolation model prevents interference with main runtime or other skills
+      * skill app routes accessible under /skill/:repo-name/:route namespace
+      * skill bookmark bundles render under /skill/<repo-name>/bookmarks/<id>
+    - added comprehensive test suites for skill system lifecycle, isolated
+      dependency handling, private helper dispatch, and skill bookmark routes
+
+1.46  2026-04-04
+    - fixed saved bookmark Ajax helper ordering for real browser pages that
+      declare `var endpoints = {};` and call `fetch_value()` or
+      `stream_value()` from `$(document).ready(...)`, so saved
+      `set_chain_value(...)` bindings no longer throw a `ReferenceError`
+    - fixed browser top-right collector icon visibility by using an
+      emoji-capable font stack, so UTF-8 icons such as `🐳` and `💰` stay
+      visible instead of collapsing into fallback boxes
+    - fixed UTF-8 output handling for dashboard JSON/state files, prompt
+      rendering, `/system/status`, and `Runtime::Result->report()`, so
+      collector icons and hook report glyphs survive file, browser, and CLI
+      round trips consistently
+
+1.45  2026-04-03
+    - fixed collector indicator rendering so the configured icon is used in
+      both the browser top-right status strip and `dashboard ps1`, instead of
+      falling back to the collector name
+    - fixed stale renamed collector indicators by automatically removing old
+      managed indicator records when collector config names change, keeping
+      `/system/status` and prompt output free of duplicate old/new entries
+    - added `Runtime::Result->report()` so Perl-backed CLI commands can print
+      a compact post-hook run summary without hand-parsing `RESULT`
+    - added older bookmark `fetch_value()` and `stream_value()` helpers, and
+      moved saved Ajax endpoint bindings ahead of bookmark body scripts so
+      inline helper calls work on first render
+    - fixed checkout-local Perl runner inheritance so shebang-backed custom
+      command scripts still load the active dashboard `lib/` tree during
+      repository execution
+
+1.44  2026-04-03
+    - hardened the home runtime so directories under `~/.developer-dashboard`
+      are tightened to `0700`, regular runtime files are tightened to `0600`,
+      and generated owner-executable files keep owner-only execute bits
+    - added `dashboard doctor` to audit current and older dashboard roots for
+      file and folder permission drift, plus `dashboard doctor --fix` to repair
+      those permission mismatches in place while still honoring `doctor.d`
+      hook results
+    - updated README, POD, security/testing docs, and release metadata for the
+      runtime-permission hardening and doctor command
+
+1.43  2026-04-03
+    - tightened outsider bootstrap denial so requests from anything other than
+      exact `127.0.0.1` now return a silent `401` with an empty body before any
+      helper user exists, avoiding disclosure of helper-access setup details to
+      outsider clients
+    - kept the no-login-form outsider bootstrap guard while removing the old
+      explanatory response text from app tests, docs, and blank-environment
+      integration coverage
+
+1.42  2026-04-03
+    - added checked-in Windows verification assets for Strawberry Perl and QEMU so the repository now carries a real Windows smoke script plus a full-system VM launcher instead of relying on undocumented manual testing
+    - extended forced-Windows regression coverage for PATHEXT lookup and `.ps1`/`.cmd`/`.pl` dispatch so the fast test loop exercises Windows command resolution before the slower host and VM gates
+    - updated README, POD, testing docs, release docs, and the integration plan to require the layered Windows verification path before making Windows compatibility claims
+
+1.41  2026-04-03
+    - added a shared platform layer for shell selection, runnable-script resolution, and native shell command execution so collector commands, trusted page actions, updater scripts, custom CLI hooks, and saved Ajax files no longer assume `sh` or `bash`
+    - added `dashboard shell ps` and PowerShell bootstrap generation, using the PowerShell `prompt` function instead of a POSIX `PS1` export while keeping the existing `dashboard ps1` prompt renderer as the shared prompt command
+    - updated README, POD, release docs, integration notes, and regression coverage for Windows and Strawberry Perl oriented shell portability
+
+1.40  2026-04-03
+    - fixed SSL listener redirect handling so `dashboard serve --ssl` now redirects real plain-HTTP requests on the public port to the matching `https://...` URL instead of letting browsers hit a reset connection
+    - clarified outsider bootstrap semantics so the disabled-login `401` applies only when no helper user exists in the active runtime, which matters for project-local runtime overrides during browser verification
+    - updated README, POD, integration docs, mistake log, and regression coverage for the browser-verified outsider and SSL redirect behaviour
+
+1.39  2026-04-03
+    - changed outsider browser access so `localhost`, forwarded hosts, and non-loopback clients now receive `401 with an empty body` without a login page when no helper account exists yet
+    - kept outsider access on the helper-login path once a helper account exists, including saved-route return handling after successful login
+    - updated README, POD, release docs, and regression coverage for the helper-user bootstrap access policy
+
+1.38  2026-04-03
+    - changed the SSL-enabled PSGI app so non-HTTPS requests are redirected to the equivalent `https://...` URL before any dashboard route runs
+    - added SSL regression coverage proving `dashboard serve --ssl` redirects plain-HTTP app requests while still serving normal HTTPS requests
+    - updated README, POD, release docs, and release metadata for the HTTPS redirect behaviour
+
+1.37  2026-04-03
+    - added `dashboard shell zsh` support with a `precmd`-driven prompt refresh so macOS zsh sessions can reuse the dashboard prompt and ticket-aware status line without relying on bash-specific prompt behavior
+    - added `dashboard shell sh` support with the same bookmark-aware navigation helpers and a POSIX-friendly prompt command that does not depend on bash `\j` expansion
+    - kept `dashboard shell bash` on the existing dynamic jobs-aware prompt path while sharing the same `cdr`, `dd_cdr`, and `which_dir` helpers across all supported shells
+    - updated README, POD, release docs, and release metadata for the multi-shell bootstrap change
+
+1.36  2026-04-03
+    - changed `dashboard ps1` to follow the older `~/bin/ps1` layout more closely, using a `(YYYY-MM-DD HH:MM:SS)` prefix, a bracketed current path, and a trailing `🌿branch` marker instead of the old `{project:branch}` suffix
+    - taught `dashboard ps1` to load `TICKET_REF` from the current tmux session environment when the ticket workflow seeded it there but the current shell process did not export it yet
+    - updated README, POD, fixed-bug notes, and release metadata for the prompt-shape and tmux-ticket integration change
+
+1.35  2026-04-03
+    - removed release and deployment workflow detail from the main README and module POD so the user-facing documentation stays focused on product behavior instead of internal release procedure
+    - kept the operational release and tarball verification steps in `doc/update-and-release.md`, where the repository workflow detail belongs
+    - updated release metadata for the documentation-scope cleanup patch
+
+1.34  2026-04-03
+    - fixed tarball-test environment leakage by clearing `DEVELOPER_DASHBOARD_BOOKMARKS`, `DEVELOPER_DASHBOARD_CONFIGS`, and `DEVELOPER_DASHBOARD_CHECKERS` inside the affected test files, so local machine overrides no longer contaminate packaged test runs
+    - fixed macOS temp-path portability gaps by normalizing canonical paths in the affected assertions, so `/var/...` and `/private/var/...` temporary roots compare correctly during test and install verification
+    - fixed Linux-only test assumptions by skipping `/proc`-specific assertions on hosts where `/proc` is unavailable
+    - fixed CLI smoke setup drift by creating the runtime config directory before seeding `config.json`, preventing install-time test failure on clean environments
+    - updated README, POD, release docs, and release metadata for the macOS and packaged-test portability fixes
+
 1.33  2026-04-03
     - changed the root route so `/` now redirects to `/app/index` whenever a saved `index` bookmark exists, making the saved home page the default browser entrypoint
     - kept the existing blank-editor fallback on `/` when no saved `index` bookmark exists yet
@@ -52,9 +840,9 @@ Revision history for Developer Dashboard
     - added comprehensive test suite for configuration persistence with default values, save/load cycles, partial updates, and validation
 
 1.21  2026-04-02
-    - fixed malformed legacy bookmark icon bytes on saved page load by normalizing broken heading and item icon glyphs into stable browser-safe fallbacks and repairing common damaged joined emoji such as `🧑‍💻`
-    - kept saved edit and source routes on the repaired raw bookmark text from disk instead of always regenerating canonical source, so browser views preserve the repaired legacy icon markup
-    - added direct page-store and web-route regressions for malformed legacy bookmark icon bytes plus a browser-backed saved-page smoke verification against the reproduced `/tmp/index` issue
+    - fixed malformed older bookmark icon bytes on saved page load by normalizing broken heading and item icon glyphs into stable browser-safe fallbacks and repairing common damaged joined emoji such as `🧑‍💻`
+    - kept saved edit and source routes on the repaired raw bookmark text from disk instead of always regenerating canonical source, so browser views preserve the repaired older icon markup
+    - added direct page-store and web-route regressions for malformed older bookmark icon bytes plus a browser-backed saved-page smoke verification against the reproduced `/tmp/index` issue
 
 1.20  2026-04-02
     - fixed bookmark editor overlay drift by restoring live syntax highlighting inside a clipped overlay viewport that follows the textarea by transform instead of trying to scroll a second independent layer
@@ -62,9 +850,9 @@ Revision history for Developer Dashboard
     - added browser-backed and web-route regression coverage for the saved bookmark editor highlighting and scroll-sync behaviour
 
 1.19  2026-04-02
-    - fixed plain legacy `Folder` alias drift so direct calls such as `perl -MFolder -e 'print Folder->docker'` now lazy-load config-backed path aliases from the active runtime instead of rejecting aliases that `dashboard paths` already exposes
+    - fixed plain `Folder` alias compatibility drift so direct calls such as `perl -MFolder -e 'print Folder->docker'` now lazy-load config-backed path aliases from the active runtime instead of rejecting aliases that `dashboard paths` already exposes
     - kept explicit `Folder->configure(..., aliases => ...)` overrides intact while adding the lazy config-backed alias cache
-    - added legacy-helper regression coverage for repo-local config alias resolution through plain `Folder` usage
+    - added helper-compatibility regression coverage for repo-local config alias resolution through plain `Folder` usage
 
 1.18  2026-04-02
     - fixed singleton-managed saved Ajax lifecycle cleanup so `dashboard stop` and `dashboard restart` now terminate `dashboard ajax: ...` workers as part of the managed web shutdown path
@@ -87,7 +875,7 @@ Revision history for Developer Dashboard
 1.15  2026-04-02
     - added `singleton => 'NAME'` support to saved bookmark `Ajax(...)` helpers, emitting `/ajax/<file>?type=...&singleton=NAME` so browser refreshes can replace older long-running Perl ajax workers cleanly
     - renamed singleton-managed saved Ajax Perl workers to `dashboard ajax: NAME` and reused `_pkill_perl` before launching a replacement stream, preventing stale refresh-driven background workers from accumulating
-    - extended web and legacy-helper coverage for singleton Ajax urls, singleton process titles, and refresh-safe saved Ajax replacement behaviour
+    - extended web and helper-compatibility coverage for singleton Ajax urls, singleton process titles, and refresh-safe saved Ajax replacement behaviour
 
 1.14  2026-04-02
     - updated the GitHub Actions workflows to use `actions/checkout@v5` and opt JavaScript actions into Node 24, removing the hosted-runner deprecation path for the previous Node 20 checkout runtime
@@ -126,17 +914,17 @@ Revision history for Developer Dashboard
 
 1.07  2026-04-02
     - fixed `/js/jquery.js` for saved bookmark pages by serving a built-in local jQuery-style compatibility shim when no runtime file overrides it
-    - verified that legacy `Ajax jvar => 'foo.bar', file => 'foobar'` bookmark pages bind `foo.bar` to `/ajax/foobar?...` and that the saved ajax endpoint executes through the browser-facing route
+    - verified that older `Ajax jvar => 'foo.bar', file => 'foobar'` bookmark pages bind `foo.bar` to `/ajax/foobar?...` and that the saved ajax endpoint executes through the browser-facing route
     - updated README, POD, static-file docs, release docs, and release-sensitive tests for the new built-in `/js/jquery.js` behavior
 
 1.06  2026-04-02
     - fixed saved bookmark editor boot-script escaping so literal bookmark HTML such as `</script>` no longer breaks the source editor and leaks raw instruction text below the page
-    - fixed legacy bookmark bootstrap ordering so `Ajax jvar => ...` bindings run after `set_chain_value()` is defined, preventing play-route JavaScript `ReferenceError` failures
+    - fixed older bookmark bootstrap ordering so `Ajax jvar => ...` bindings run after `set_chain_value()` is defined, preventing play-route JavaScript `ReferenceError` failures
     - updated README, POD, changelog, fixed-bug notes, and troubleshooting docs to describe the bookmark editor/script bootstrap fixes
 
 1.05  2026-04-02
     - fixed saved bookmark editor boot-script escaping so literal bookmark HTML such as `</script>` no longer breaks the source editor and leaks raw instruction text below the page
-    - fixed legacy bookmark bootstrap ordering so `Ajax jvar => ...` bindings run after `set_chain_value()` is defined, preventing play-route JavaScript `ReferenceError` failures
+    - fixed older bookmark bootstrap ordering so `Ajax jvar => ...` bindings run after `set_chain_value()` is defined, preventing play-route JavaScript `ReferenceError` failures
     - removed the parallel `/page/...` browser route surface and moved saved render, edit, source, and action routes fully onto `/app/...`
     - fixed the web server constructor so `port => 0` keeps the requested ephemeral-port bind instead of collapsing back to the default `7890`
     - fixed the blank-environment runner so the helper-login flow now opens `/app/welcome` instead of the removed `/page/welcome` route, and made the browser step resolve or bootstrap Chromium when the prebuilt `dd-int-test:latest` image is stale
@@ -148,7 +936,7 @@ Revision history for Developer Dashboard
 
 1.04  2026-04-01
     - completed the browser migration onto explicit Dancer2 routes, so the HTTP route table now lives in `Developer::Dashboard::Web::DancerApp` instead of a single catch-all bridge into the old dispatcher
-    - kept `Developer::Dashboard::Web::App` as the page and action service layer, so saved-page rendering, helper auth, legacy `/app` compatibility, and transient-policy enforcement continue to behave the same behind the new Dancer2 route surface
+    - kept `Developer::Dashboard::Web::App` as the page and action service layer, so saved-page rendering, helper auth, existing `/app` compatibility, and transient-policy enforcement continue to behave the same behind the new Dancer2 route surface
     - added PSGI entrypoint and route-layer regression coverage for the Dancer2 server path, response headers, and route compatibility flow
 
 1.03  2026-04-01
@@ -158,8 +946,8 @@ Revision history for Developer Dashboard
 
 1.02  2026-04-01
     - fixed saved bookmark static asset lookup so `/js/*`, `/css/*`, and `/others/*` can resolve files from the effective runtime public tree and from `dashboards/public/...`, keeping saved local assets such as `dashboards/public/js/jquery.js` available after browser saves
-    - fixed legacy bookmark parsing so a standalone `---` line also terminates the current legacy section, preventing pasted prose after `CODE*` blocks from being compiled and shown as runtime syntax errors or leaked back into the editor
-    - added regressions for markdown-style legacy section breaks and for static file lookup from both runtime and bookmark-root public directories
+    - fixed bookmark instruction parsing so a standalone `---` line also terminates the current section, preventing pasted prose after `CODE*` blocks from being compiled and shown as runtime syntax errors or leaked back into the editor
+    - added regressions for markdown-style bookmark section breaks and for static file lookup from both runtime and bookmark-root public directories
 
 1.01  2026-04-01
     - fixed saved bookmark editor posts so `/page/<id>/edit` saves keep using named saved-bookmark routes and `/page/<id>` play links instead of falling back to transient `token=` URLs when transient web tokens are disabled
@@ -188,7 +976,7 @@ Revision history for Developer Dashboard
     - extended unit, metadata, and blank-environment integration coverage for process-backed ajax streaming and shebang-backed saved handlers
 
 0.97  2026-04-01
-    - changed legacy `/ajax` execution to run bookmark Ajax Perl code directly and stream raw output chunks back to the browser instead of buffering through a page render pass
+    - changed older `/ajax` execution to run bookmark Ajax Perl code directly and stream raw output chunks back to the browser instead of buffering through a page render pass
     - changed saved bookmark `Ajax file => ...` handlers to preserve live browser progress updates while transient token urls remain disabled by default
     - extended app, server, metadata, and coverage tests for streamed `/ajax` responses and saved bookmark file handlers
 
@@ -199,7 +987,7 @@ Revision history for Developer Dashboard
 
 0.95  2026-04-01
     - disabled browser execution of transient `token=` and `atoken=` payloads by default, so only saved bookmark-file routes execute unless `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS` is enabled explicitly
-    - kept saved bookmark posts and saved page routes working while rejecting transient root-editor runs, encoded action URLs, and legacy `/ajax?token=...` requests with an explicit `403` policy response
+    - kept saved bookmark posts and saved page routes working while rejecting transient root-editor runs, encoded action URLs, and older `/ajax?token=...` requests with an explicit `403` policy response
     - extended unit, release-metadata, and blank-environment integration coverage for the new transient web token policy
 
 0.94  2026-04-01
@@ -207,7 +995,7 @@ Revision history for Developer Dashboard
 
 0.93  2026-04-01
     - made a project-local `./.developer-dashboard` tree the first runtime lookup root for bookmarks, config, CLI commands and hooks, auth users, sessions, and isolated docker service folders, while still falling back to `~/.developer-dashboard` when the project-local item is missing
-    - seeded sanitized `api-dashboard` and `db-dashboard` bookmark pages during `dashboard init` alongside `welcome`, keeping the pages editable as normal saved bookmarks without carrying forward legacy company-specific text or credentials
+    - seeded sanitized `api-dashboard` and `db-dashboard` bookmark pages during `dashboard init` alongside `welcome`, keeping the pages editable as normal saved bookmarks without carrying forward older company-specific text or credentials
     - moved the blank-environment integration flow onto a real fake-project `./.developer-dashboard` tree so the tarball install verifies the same local-over-home precedence model used by the shipped runtime
 
 0.92  2026-04-01
@@ -221,7 +1009,7 @@ Revision history for Developer Dashboard
 
 0.90  2026-04-01
     - removed startup collector files and plugin packs so dashboard configuration JSON is the single source of truth for collectors, providers, path aliases, and docker overlays
-    - removed startup and plugin paths from the runtime surface, legacy Folder aliases, blank-environment integration flow, and supporting documentation
+    - removed startup and plugin paths from the runtime surface, compatibility `Folder` aliases, blank-environment integration flow, and supporting documentation
 
 0.89  2026-04-01
     - added an explicit Dist::Zilla runtime prerequisite for `JSON::XS` so the built tarball always declares the JSON backend dependency for PAUSE installs
@@ -262,13 +1050,13 @@ Revision history for Developer Dashboard
 
 0.82  2026-03-31
 
-    - fixed unconfigured legacy `Folder` access so `Folder->dd` and AUTOLOAD-backed root aliases such as `Folder->runtime_root` lazily bootstrap the default dashboard path registry from `$HOME` instead of dying or returning placeholder state
-    - added legacy helper coverage for the unconfigured `Folder` runtime access path so installed compatibility wrappers match `dashboard paths` even before explicit runtime wiring is applied
+    - fixed unconfigured `Folder` compatibility access so `Folder->dd` and AUTOLOAD-backed root aliases such as `Folder->runtime_root` lazily bootstrap the default dashboard path registry from `$HOME` instead of dying or returning placeholder state
+    - added compatibility helper coverage for the unconfigured `Folder` runtime access path so installed compatibility wrappers match `dashboard paths` even before explicit runtime wiring is applied
 
 0.80  2026-03-31
 
-    - fixed legacy `Folder` compatibility so AUTOLOAD resolves `runtime_root`, `bookmarks_root`, `config_root`, and `startup_root` through the existing legacy alias methods instead of rejecting the modern path names shown by `dashboard paths`
-    - added legacy helper coverage for the root-style `Folder` names so installed compatibility code can call the same runtime path names exposed by the CLI
+    - fixed `Folder` compatibility so AUTOLOAD resolves `runtime_root`, `bookmarks_root`, `config_root`, and `startup_root` through the existing older alias methods instead of rejecting the modern path names shown by `dashboard paths`
+    - added compatibility helper coverage for the root-style `Folder` names so installed compatibility code can call the same runtime path names exposed by the CLI
 
 0.79  2026-03-31
 
@@ -312,17 +1100,17 @@ Revision history for Developer Dashboard
 
 0.72  2026-03-31
 
-    - fixed legacy bookmark runtime output so returned hashes and arrays from `CODE*` blocks are dumped into the visible runtime output area while still merging into stash for Template Toolkit rendering
-    - documented that `CODE1: { a => 1 }` now both feeds `[% stash.a %]` and shows a legacy-style dumped value, while `CODE2: hide print $a` still keeps the printed `1`
+    - fixed older bookmark runtime output so returned hashes and arrays from `CODE*` blocks are dumped into the visible runtime output area while still merging into stash for Template Toolkit rendering
+    - documented that `CODE1: { a => 1 }` now both feeds `[% stash.a %]` and shows an older-style dumped value, while `CODE2: hide print $a` still keeps the printed `1`
 
 0.71  2026-03-31
 
-    - fixed bookmark runtime order so `CODE*` blocks run before Template Toolkit rendering and returned hashes can feed `[% stash.* %]` in `HTML:` and `FORM.TT:`
+    - fixed bookmark runtime order so `CODE*` blocks run before Template Toolkit rendering and returned hashes can feed `[% stash.* %]` in bookmark HTML
     - fixed the `hide` helper so `hide print $a` keeps the printed stdout while suppressing the Perl return value instead of dropping the whole block output
 
 0.70  2026-03-31
 
-    - fixed bookmark Template Toolkit rendering so `[% title %]` receives the `TITLE:` value inside `HTML:` and `FORM.TT:` sections
+    - fixed bookmark Template Toolkit rendering so `[% title %]` receives the `TITLE:` value inside bookmark HTML sections
     - fixed transient play and view-source URLs so they keep the raw bookmark instruction text instead of baking rendered values such as `[% stash.foo %]` into `1` after a render pass
 
 0.69  2026-03-31
@@ -433,8 +1221,8 @@ Revision history for Developer Dashboard
 
 0.44  2026-03-30
 
-    - fixed root-editor bookmark persistence so posting a legacy instruction document with `BOOKMARK: index` saves the page to the bookmark store and makes `/app/index` resolve immediately
-    - added a web regression that proves bookmarked root-editor posts are written to storage and load back through the legacy `/app/<name>` route
+    - fixed root-editor bookmark persistence so posting an older instruction document with `BOOKMARK: index` saves the page to the bookmark store and makes `/app/index` resolve immediately
+    - added a web regression that proves bookmarked root-editor posts are written to storage and load back through the older `/app/<name>` route
 
 0.43  2026-03-30
 

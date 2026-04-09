@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Resolver 0.02;
+package Future::IO::Resolver 0.03;
 
 use v5.20;
 use warnings;
@@ -11,8 +11,18 @@ use warnings;
 use feature qw( postderef signatures );
 no warnings qw( experimental::postderef experimental::signatures );
 
-use Future::IO qw( POLLIN );
-use Future::Utils qw( repeat );
+use meta;
+no warnings 'meta::experimental';
+
+use Carp;
+
+# TODO: Work out how to make the LibAsyncNS one optional
+our @BACKENDS = qw(
+   Future::IO::Resolver::Using::LibAsyncNS
+   Future::IO::Resolver::Using::Socket
+);
+
+require "${_}.pm" =~ s(::)(/)gr for @BACKENDS;
 
 =head1 NAME
 
@@ -52,49 +62,22 @@ flexibility and portability.
 
 =cut
 
-# TODO: This is all heavily specific to libasyncns right now.
-require Net::LibAsyncNS;
-
-use constant NS_CLASS_IN => 1;
-
-my $asyncns;
-my $runf;
-my $pending_failuref;
-
-sub _asyncns ()
-{
-   return $asyncns if $asyncns;
-
-   $asyncns = Net::LibAsyncNS->new( 1 );
-
-   my $fh = $asyncns->new_handle_for_fd;
-
-   ## This would be much neater with async/await
-   $runf = Future::Utils::repeat {
-      Future::IO->poll( $fh, POLLIN )->then( sub ( $ ) {
-         $asyncns->wait( 0 ) or
-            warn( "Future::IO::Resolver IO failure $!\n" ), return Future->done;
-
-         while( my $q = $asyncns->getnext ) {
-            my $f = $q->getuserdata;
-            $f->done( $q );
-         }
-         Future->done;
-      } )
-   } while => sub ( $f ) { !$f->failure };
-
-   $runf->on_fail( sub ( $err, @ ) {
-      say "Future::IO::Resolver run future failed - $err";
-      $pending_failuref = $runf;
-      undef $runf;
-   } );
-
-   return $asyncns;
-}
-
 =head1 METHODS
 
 =cut
+
+my $metapkg = meta::get_this_package;
+
+foreach my $method (qw( getaddrinfo getnameinfo res_query res_search )) {
+   $metapkg->add_named_sub( $method => sub ( $, %args ) {
+      foreach my $be ( @BACKENDS ) {
+         $be->can( $method ) and
+            return $be->$method( %args );
+      }
+
+      croak "Cannot find a Future::IO::Resolver backend to handle ->$method";
+   } );
+}
 
 =head2 getaddrinfo
 
@@ -112,38 +95,6 @@ C<family>, C<socktype>, C<protocol>, C<addr> and optionally C<canonname>.
 
 =cut
 
-sub getaddrinfo ( $, %args )
-{
-   my $asyncns = _asyncns();
-
-   if( $pending_failuref ) {
-      my $f = $pending_failuref;
-      undef $pending_failuref;
-      return $f;
-   }
-
-   my $host    = delete $args{host};
-   my $service = delete $args{service};
-
-   my $q = $asyncns->getaddrinfo( $host, $service, \%args );
-
-   my $f = $runf->new;
-   $q->setuserdata( $f );
-
-   my $queryf = $f->then( sub ( $q ) {
-      my ( $err, @res ) = $asyncns->getaddrinfo_done( $q );
-
-      if( !$err ) {
-         Future->done( @res );
-      }
-      else {
-         Future->fail( "$err\n", getaddrinfo => );
-      }
-   })->on_cancel( sub ( $ ) { $asyncns->cancel( $q ); } );
-
-   return Future->wait_any( $queryf, $runf->without_cancel );
-}
-
 =head2 getnameinfo
 
    ( $host, $service ) = await Future::IO::Resolver->getnameinfo( %args );
@@ -156,38 +107,6 @@ C<%args> should contain a C<addr> key and may optionally also specify
 C<flags>.
 
 =cut
-
-sub getnameinfo ( $, %args )
-{
-   my $asyncns = _asyncns();
-
-   if( $pending_failuref ) {
-      my $f = $pending_failuref;
-      undef $pending_failuref;
-      return $f;
-   }
-
-   my $addr  = delete $args{addr};
-   my $flags = delete $args{flags} // 0;
-
-   my $q = $asyncns->getnameinfo( $addr, $flags, 1, 1 );
-
-   my $f = $runf->new;
-   $q->setuserdata( $f );
-
-   my $queryf = $f->then( sub ( $q ) {
-      my ( $err, $host, $service ) = $asyncns->getnameinfo_done( $q );
-
-      if( !$err ) {
-         Future->done( $host, $service );
-      }
-      else {
-         Future->fail( "$err\n", getnameinfo => );
-      }
-   })->on_cancel( sub ( $ ) { $asyncns->cancel( $q ); } );
-
-   return Future->wait_any( $queryf, $runf->without_cancel );
-}
 
 =head2 res_query
 
@@ -203,39 +122,6 @@ specify C<class>; though a default of the C<IN> class is applied.
 
 =cut
 
-sub res_query ( $, %args )
-{
-   my $asyncns = _asyncns();
-
-   if( $pending_failuref ) {
-      my $f = $pending_failuref;
-      undef $pending_failuref;
-      return $f;
-   }
-
-   my $dname = delete $args{dname};
-   my $class = delete $args{class} // NS_CLASS_IN;
-   my $type  = delete $args{type};
-
-   my $q = $asyncns->res_query( $dname, $class, $type );
-
-   my $f = $runf->new;
-   $q->setuserdata( $f );
-
-   my $queryf = $f->then( sub ( $q ) {
-      my $answer = $asyncns->res_done( $q );
-
-      if( defined $answer ) {
-         Future->done( $answer );
-      }
-      else {
-         Future->fail( "$!", res_query => );
-      }
-   })->on_cancel( sub ( $ ) { $asyncns->cancel( $q ); } );
-
-   return Future->wait_any( $queryf, $runf->without_cancel );
-}
-
 =head2 res_search
 
    $answer = Future::IO::Resolver->res_search( %args );
@@ -250,39 +136,6 @@ specify C<class>; though a default of the C<IN> class is applied.
 
 =cut
 
-sub res_search ( $, %args )
-{
-   my $asyncns = _asyncns();
-
-   if( $pending_failuref ) {
-      my $f = $pending_failuref;
-      undef $pending_failuref;
-      return $f;
-   }
-
-   my $dname = delete $args{dname};
-   my $class = delete $args{class} // NS_CLASS_IN;
-   my $type  = delete $args{type};
-
-   my $q = $asyncns->res_search( $dname, $class, $type );
-
-   my $f = $runf->new;
-   $q->setuserdata( $f );
-
-   my $queryf = $f->then( sub ( $q ) {
-      my $answer = $asyncns->res_done( $q );
-
-      if( defined $answer ) {
-         Future->done( $answer );
-      }
-      else {
-         Future->fail( "$!", res_search => );
-      }
-   })->on_cancel( sub ( $ ) { $asyncns->cancel( $q ); } );
-
-   return Future->wait_any( $queryf, $runf->without_cancel );
-}
-
 =head1 TODO
 
 =over 4
@@ -293,7 +146,9 @@ Some wrapping of other resolvers, like the POSIX C<get*ent> family.
 
 =item *
 
-Look into other backends - will be necessary for other resolver types too.
+Allow for optional loading of backend resolver implementations, so as not to
+depend on L<Net::LibAsyncNS> all the time. Add support for direct DNS-based
+resolving behaviour.
 
 =back
 

@@ -15,7 +15,7 @@ use URI::Escape qw(uri_escape);
 
 use lib 'lib';
 
-use DataHelper qw(j je);
+use Developer::Dashboard::DataHelper qw(j je);
 use Developer::Dashboard::Auth;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PageDocument;
@@ -27,21 +27,34 @@ use Developer::Dashboard::SessionStore;
 use Developer::Dashboard::Web::App;
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 chdir $home or die "Unable to chdir to $home: $!";
 my $auto_projects = File::Spec->catdir( $home, 'projects' );
 make_path($auto_projects);
 
-use Folder;
-use Zipper qw(zip unzip _cmdx _cmdp __cmdx acmdx Ajax);
+use Developer::Dashboard::Folder;
+use Developer::Dashboard::Zipper qw(zip unzip _cmdx _cmdp __cmdx acmdx Ajax);
 
-is( Folder->dd, File::Spec->catdir( $home, '.developer-dashboard' ), 'Folder dd lazily bootstraps the runtime root before configure' );
-is( Folder->runtime_root, File::Spec->catdir( $home, '.developer-dashboard' ), 'Folder runtime_root lazily bootstraps through AUTOLOAD before configure' );
+sub form_body {
+    my (@pairs) = @_;
+    my @encoded;
+    while (@pairs) {
+        my ( $name, $value ) = splice @pairs, 0, 2;
+        push @encoded, uri_escape($name) . '=' . uri_escape( defined $value ? $value : '' );
+    }
+    return join '&', @encoded;
+}
+
+is( Developer::Dashboard::Folder->dd, File::Spec->catdir( $home, '.developer-dashboard' ), 'Folder dd lazily bootstraps the runtime root before configure' );
+is( Developer::Dashboard::Folder->runtime_root, File::Spec->catdir( $home, '.developer-dashboard' ), 'Folder runtime_root lazily bootstraps through AUTOLOAD before configure' );
 {
     my $runtime_home = File::Spec->catdir( $home, '.developer-dashboard' );
     make_path( File::Spec->catdir( $runtime_home, '.git' ) );
     chdir $runtime_home or die "Unable to chdir to $runtime_home: $!";
-    is( Folder->dd, $runtime_home, 'Folder dd does not append a nested runtime root when cwd is the home runtime repository' );
-    is( Folder->runtime_root, $runtime_home, 'Folder runtime_root stays at the home runtime root when cwd is the home runtime repository' );
+    is( Developer::Dashboard::Folder->dd, $runtime_home, 'Folder dd does not append a nested runtime root when cwd is the home runtime repository' );
+    is( Developer::Dashboard::Folder->runtime_root, $runtime_home, 'Folder runtime_root stays at the home runtime root when cwd is the home runtime repository' );
     chdir $home or die "Unable to chdir to $home: $!";
 }
 
@@ -58,22 +71,22 @@ my $paths = Developer::Dashboard::PathRegistry->new(
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $pages = Developer::Dashboard::PageStore->new( paths => $paths );
 
-Folder->configure(
+Developer::Dashboard::Folder->configure(
     paths   => $paths,
     aliases => { alias_demo => $project },
 );
 
-is( Folder->home, $home, 'Folder home resolves current home' );
-ok( Folder->tmp, 'Folder tmp resolves a temp dir' );
-is( Folder->dd, $paths->runtime_root, 'Folder dd resolves runtime root' );
-is( Folder->runtime_root, $paths->runtime_root, 'Folder AUTOLOAD resolves runtime_root through the legacy runtime alias' );
-is( Folder->bookmarks, $paths->dashboards_root, 'Folder bookmarks resolves dashboards root' );
-is( Folder->bookmarks_root, $paths->dashboards_root, 'Folder AUTOLOAD resolves bookmarks_root through the legacy bookmarks alias' );
-is( Folder->configs, $paths->config_root, 'Folder configs resolves config root' );
-is( Folder->config_root, $paths->config_root, 'Folder AUTOLOAD resolves config_root through the legacy configs alias' );
-ok( -d Folder->postman, 'Folder postman creates the neutral postman directory' );
+is( Developer::Dashboard::Folder->home, $home, 'Folder home resolves current home' );
+ok( Developer::Dashboard::Folder->tmp, 'Folder tmp resolves a temp dir' );
+is( Developer::Dashboard::Folder->dd, $paths->runtime_root, 'Folder dd resolves runtime root' );
+is( Developer::Dashboard::Folder->runtime_root, $paths->runtime_root, 'Folder AUTOLOAD resolves runtime_root through the legacy runtime alias' );
+is( Developer::Dashboard::Folder->bookmarks, $paths->dashboards_root, 'Folder bookmarks resolves dashboards root' );
+is( Developer::Dashboard::Folder->bookmarks_root, $paths->dashboards_root, 'Folder AUTOLOAD resolves bookmarks_root through the legacy bookmarks alias' );
+is( Developer::Dashboard::Folder->configs, $paths->config_root, 'Folder configs resolves config root' );
+is( Developer::Dashboard::Folder->config_root, $paths->config_root, 'Folder AUTOLOAD resolves config_root through the legacy configs alias' );
+ok( -d Developer::Dashboard::Folder->postman, 'Folder postman creates the neutral postman directory' );
 
-my $cd_result = Folder->cd(
+my $cd_result = Developer::Dashboard::Folder->cd(
     alias_demo => sub {
         my ($ctx) = @_;
         $ctx->{stay}->($ctx->{caller});
@@ -81,10 +94,10 @@ my $cd_result = Folder->cd(
     }
 );
 is( $cd_result, $project, 'Folder cd yields the target directory to the callback' );
-my @folder_listing = Folder->ls('alias_demo');
+my @folder_listing = Developer::Dashboard::Folder->ls('alias_demo');
 ok( @folder_listing >= 0, 'Folder ls returns entries for a real directory' );
-ok( grep( { $_ eq $project } Folder->locate('demo') ), 'Folder locate finds matching workspace directories' );
-is( Folder->alias_demo, $project, 'Folder AUTOLOAD resolves configured aliases' );
+ok( grep( { $_ eq $project } Developer::Dashboard::Folder->locate('demo') ), 'Folder locate finds matching workspace directories' );
+is( Developer::Dashboard::Folder->alias_demo, $project, 'Folder AUTOLOAD resolves configured aliases' );
 {
     my $repo = File::Spec->catdir( $workspace, 'folder-config-repo' );
     make_path( File::Spec->catdir( $repo, '.git' ) );
@@ -100,13 +113,13 @@ JSON
     close $fh;
     my $docker_alias = File::Spec->catdir( $home, 'docker-alias' );
     make_path($docker_alias);
-    local $Folder::PATHS = undef;
-    local %Folder::ALIASES = ();
-    local %Folder::CONFIG_ALIASES = ();
-    local $Folder::CONFIG_ALIASES_KEY = '';
+    local $Developer::Dashboard::Folder::PATHS = undef;
+    local %Developer::Dashboard::Folder::ALIASES = ();
+    local %Developer::Dashboard::Folder::CONFIG_ALIASES = ();
+    local $Developer::Dashboard::Folder::CONFIG_ALIASES_KEY = '';
     my $cwd = Cwd::cwd();
     chdir $repo or die "Unable to chdir to $repo: $!";
-    is( Folder->docker, $docker_alias, 'Folder AUTOLOAD lazily resolves config-backed path aliases in a plain Perl process' );
+    is( Developer::Dashboard::Folder->docker, $docker_alias, 'Folder AUTOLOAD lazily resolves config-backed path aliases in a plain Perl process' );
     chdir $cwd or die "Unable to chdir to $cwd: $!";
 }
 
@@ -133,7 +146,7 @@ my ( $ajax_singleton_stdout, undef, $ajax_singleton_result ) = capture {
 like( $ajax_singleton_stdout, qr/[?&]singleton=TRANSIENT/, 'Ajax carries the optional singleton value into transient ajax bindings' );
 is( $ajax_singleton_result, 'HIDE-THIS', 'Ajax still returns the hide marker when a transient singleton is supplied' );
 {
-    local $Zipper::AJAX_CONTEXT = {
+    local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {
         source               => 'saved',
         page_id              => 'coverage-page',
         runtime_root         => $paths->runtime_root,
@@ -149,9 +162,9 @@ is( $ajax_singleton_result, 'HIDE-THIS', 'Ajax still returns the hide marker whe
     };
     like( $saved_ajax_stdout, qr{/ajax/coverage\.json\?type=text&singleton=coverage-stream}, 'Ajax prints a saved bookmark ajax url with the default text type and singleton when a file name is supplied' );
     is( $saved_ajax_result, 'HIDE-THIS', 'saved bookmark Ajax still returns the hide marker' );
-    ok( -f Zipper::saved_ajax_file_path( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'saved bookmark Ajax stores the named ajax code file under the dashboards ajax tree' );
-    ok( -x Zipper::saved_ajax_file_path( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'saved bookmark Ajax marks the stored dashboards ajax tree file executable' );
-    is( Zipper::load_saved_ajax_code( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'print qq{{"ok":1}};', 'saved bookmark Ajax stored code can be loaded back from the dashboards ajax tree' );
+    ok( -f Developer::Dashboard::Zipper::saved_ajax_file_path( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'saved bookmark Ajax stores the named ajax code file under the dashboards ajax tree' );
+    ok( -x Developer::Dashboard::Zipper::saved_ajax_file_path( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'saved bookmark Ajax marks the stored dashboards ajax tree file executable' );
+    is( Developer::Dashboard::Zipper::load_saved_ajax_code( runtime_root => $paths->runtime_root, file => 'coverage.json' ), 'print qq{{"ok":1}};', 'saved bookmark Ajax stored code can be loaded back from the dashboards ajax tree' );
     my $saved_ajax_error = eval {
         Ajax(
             jvar => 'configs.coverage.saved',
@@ -162,7 +175,7 @@ is( $ajax_singleton_result, 'HIDE-THIS', 'Ajax still returns the hide marker whe
     like( $saved_ajax_error, qr/file is required/, 'saved bookmark Ajax requires a file name when transient token urls are disabled' );
 }
 {
-    my $existing_path = Zipper::saved_ajax_file_path(
+    my $existing_path = Developer::Dashboard::Zipper::saved_ajax_file_path(
         runtime_root => $paths->runtime_root,
         file         => 'existing.sh',
     );
@@ -173,7 +186,7 @@ is( $ajax_singleton_result, 'HIDE-THIS', 'Ajax still returns the hide marker whe
     close $fh;
     chmod 0700, $existing_path or die $!;
 
-    local $Zipper::AJAX_CONTEXT = {
+    local $Developer::Dashboard::Zipper::AJAX_CONTEXT = {
         source               => 'saved',
         page_id              => 'coverage-existing',
         runtime_root         => $paths->runtime_root,
@@ -188,7 +201,7 @@ is( $ajax_singleton_result, 'HIDE-THIS', 'Ajax still returns the hide marker whe
     };
     like( $stdout, qr{/ajax/existing\.sh\?type=text}, 'Ajax prints a saved bookmark ajax url when only an existing file name is supplied' );
     is( $result, 'HIDE-THIS', 'saved bookmark Ajax with only a file still returns the hide marker' );
-    is( Zipper::load_saved_ajax_code( runtime_root => $paths->runtime_root, file => 'existing.sh' ), "#!/bin/sh\nprintf 'existing coverage\\n'\n", 'saved bookmark Ajax with only a file leaves the existing executable content unchanged' );
+    is( Developer::Dashboard::Zipper::load_saved_ajax_code( runtime_root => $paths->runtime_root, file => 'existing.sh' ), "#!/bin/sh\nprintf 'existing coverage\\n'\n", 'saved bookmark Ajax with only a file leaves the existing executable content unchanged' );
 }
 
 is_deeply( je( j( { ok => 1 } ) ), { ok => 1 }, 'DataHelper je decodes JSON created by j' );
@@ -206,13 +219,7 @@ Modern Note
 {"name":"Modern"}
 
 === HTML ===
-<div>[% stash.name %] [% method("Folder","home") %] [% func("unused") %]</div>
-
-=== FORM.TT ===
-<span>[% ENV.HOME %] [% eval("print q{TT-EVAL}") %]</span>
-
-=== FORM ===
-[%title%] [#name#] {{filter}}
+<div>[% stash.name %] [% method("Developer::Dashboard::Folder","home") %] [% func("unused") %]</div>
 
 === CODE1 ===
 print "MODERN";
@@ -282,7 +289,7 @@ my $runtime = Developer::Dashboard::PageRuntime->new( paths => $paths );
 is( Developer::Dashboard::PageRuntime::_noop_writer('ignored'), '', '_noop_writer accepts ignored streamed chunks' );
 like( $runtime->_runtime_value_text( { ok => 1 } ), qr/ok => 1/, '_runtime_value_text renders structured runtime values' );
 {
-    my $saved_path = Zipper::saved_ajax_file_path(
+    my $saved_path = Developer::Dashboard::Zipper::saved_ajax_file_path(
         runtime_root => $paths->runtime_root,
         file         => 'coverage.json',
     );
@@ -302,6 +309,7 @@ like( $runtime->_runtime_value_text( { ok => 1 } ), qr/ok => 1/, '_runtime_value
     is( $saved_env{DEVELOPER_DASHBOARD_AJAX_SINGLETON}, 'coverage-stream', '_saved_ajax_env exposes the saved bookmark singleton name' );
     like( $saved_env{DEVELOPER_DASHBOARD_AJAX_PARAMS}, qr/"a"\s*:\s*"1 2"/, '_saved_ajax_env encodes request params as JSON' );
     like( $saved_env{QUERY_STRING}, qr/a=1%202/, '_saved_ajax_env rebuilds a query string for child process use' );
+    ok( !$saved_env{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE}, '_saved_ajax_env keeps small request params inline instead of spilling them to a temp file' );
 }
 is( $runtime->_quote_process_pattern_literal('name.+(test)?'), 'name\.\+\(test\)\?', '_quote_process_pattern_literal escapes regex metacharacters safely for singleton matching' );
 eval { $runtime->_normalize_saved_ajax_singleton("bad\nname") };
@@ -335,6 +343,82 @@ like( "$@", qr/Invalid ajax singleton name/, '_normalize_saved_ajax_singleton re
     like( $streamed, qr/child-err/, 'stream_saved_ajax_file forwards child stderr' );
     like( $streamed, qr/process-die/, 'stream_saved_ajax_file forwards uncaught perl die text' );
     ok( $stream_result->{exit_code} != 0, 'stream_saved_ajax_file reports the failing process exit code' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'huge-params.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} <<'PERL';
+my $blob = params()->{blob} // '';
+print "blob_length=" . length($blob) . "\n";
+print "query_length=" . length( $ENV{QUERY_STRING} || '' ) . "\n";
+print "params_file=" . ( $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE} || '' ) . "\n";
+print "query_file=" . ( $ENV{DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE} || '' ) . "\n";
+PERL
+    close $fh or die $!;
+    chmod 0700, $saved_path or die $!;
+
+    my $huge_blob = 'x' x 250_000;
+    my $streamed = '';
+    my $stream_result = $runtime->stream_saved_ajax_file(
+        path          => $saved_path,
+        page          => 'coverage-page',
+        type          => 'text',
+        params        => {
+            blob => $huge_blob,
+            file => 'huge-params.pl',
+            type => 'text',
+        },
+        stdout_writer => sub { $streamed .= $_[0] if defined $_[0] },
+        stderr_writer => sub { $streamed .= $_[0] if defined $_[0] },
+    );
+
+    is( $stream_result->{exit_code}, 0, 'stream_saved_ajax_file accepts oversized saved-Ajax params without failing execve' );
+    like( $streamed, qr/\bblob_length=250000\b/, 'stream_saved_ajax_file still passes oversized params to params()' );
+    like( $streamed, qr/\bquery_length=250035\b/, 'stream_saved_ajax_file reconstructs an oversized QUERY_STRING for the child process from the temp file payload' );
+    my ($params_file) = $streamed =~ /^params_file=(.+)$/m;
+    my ($query_file)  = $streamed =~ /^query_file=(.+)$/m;
+    ok( defined $params_file && $params_file ne '', 'stream_saved_ajax_file exposes a temp params file to the child process when params are oversized' );
+    ok( defined $query_file && $query_file ne '', 'stream_saved_ajax_file exposes a temp query file to the child process when the query string is oversized' );
+    ok( !-e $params_file, 'stream_saved_ajax_file cleans up the oversized params temp file after the child exits' );
+    ok( !-e $query_file, 'stream_saved_ajax_file cleans up the oversized query temp file after the child exits' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'huge-open3-failure.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} "print qq{should not run\\n};";
+    close $fh or die $!;
+    chmod 0700, $saved_path or die $!;
+
+    my @cleaned_paths;
+    my $error = eval {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageRuntime::open3 = sub { die "synthetic open3 failure\n" };
+        local *Developer::Dashboard::PageRuntime::_cleanup_saved_ajax_temp_files = sub {
+            my ( $self, @paths ) = @_;
+            push @cleaned_paths, @paths;
+            for my $path (@paths) {
+                next if !defined $path || $path eq '' || !-e $path;
+                unlink $path or die "Unable to remove saved ajax temp file $path: $!";
+            }
+            return 1;
+        };
+        $runtime->stream_saved_ajax_file(
+            path          => $saved_path,
+            page          => 'coverage-page',
+            type          => 'text',
+            params        => {
+                blob => ( 'x' x 250_000 ),
+                file => 'huge-open3-failure.pl',
+                type => 'text',
+            },
+            stdout_writer => sub { return 1 },
+            stderr_writer => sub { return 1 },
+        );
+        return '';
+    } || $@;
+    like( $error, qr/synthetic open3 failure/, 'stream_saved_ajax_file surfaces open3 launch failures for oversized payloads' );
+    is( scalar @cleaned_paths, 2, 'stream_saved_ajax_file still schedules both oversized temp files for cleanup when open3 dies before the child starts' );
+    ok( !grep { defined $_ && $_ ne '' && -e $_ } @cleaned_paths, 'stream_saved_ajax_file cleans oversized temp files even when open3 fails before execution' );
 }
 {
     my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'singleton-runner.pl' );
@@ -575,6 +659,17 @@ PL
     is( $prepared_class->{layout}{body}, 'plain body', 'prepare_page also works when called as a class method' );
 }
 {
+    my $eval_page = Developer::Dashboard::PageDocument->new(
+        layout => { body => 'prefix-[% eval("print qq{inline-eval};") %]-suffix' },
+    );
+    my $prepared_eval = $runtime->prepare_page(
+        page            => $eval_page,
+        source          => 'saved',
+        runtime_context => {},
+    );
+    is( $prepared_eval->{layout}{body}, 'prefix-inline-eval-suffix', 'prepare_page eval helper can run inline Perl blocks and inject stdout into HTML' );
+}
+{
     my $empty_page = Developer::Dashboard::PageDocument->new;
     my $class_runtime = Developer::Dashboard::PageRuntime->run_code_blocks( page => $empty_page );
     is_deeply( $class_runtime, { outputs => [], errors => [] }, 'run_code_blocks also works when called as a class method with no code blocks' );
@@ -594,19 +689,19 @@ my $prepared = $runtime->prepare_page(
     },
 );
 like( $prepared->{layout}{body}, qr/Modern/, 'Template Toolkit renders HTML with stash access' );
-like( $prepared->{layout}{body}, qr/\Q$home\E/, 'Template Toolkit method helper can call generic runtime methods' );
-like( $prepared->{layout}{form_tt}, qr/\Q$home\E/, 'Template Toolkit renders FORM.TT with ENV access' );
-like( $prepared->{layout}{form_tt}, qr/TT-EVAL/, 'Template Toolkit eval helper runs bookmark Perl snippets' );
-like( $prepared->{layout}{form}, qr/Modern Title Modern applied/, 'legacy FORM placeholder expansion still works' );
+like( $prepared->{layout}{body}, qr/\Q$home\E/, 'Template Toolkit method helper can call namespaced runtime methods' );
+ok( !exists $prepared->{layout}{form_tt} || !defined $prepared->{layout}{form_tt} || $prepared->{layout}{form_tt} eq '', 'prepare_page leaves removed FORM.TT layout empty' );
+ok( !exists $prepared->{layout}{form} || !defined $prepared->{layout}{form} || $prepared->{layout}{form} eq '', 'prepare_page leaves removed FORM layout empty' );
 like( join( '', @{ $prepared->{meta}{runtime_outputs} } ), qr/MODERN/, 'prepare_page executes CODE blocks and captures stdout' );
 
 my $tt_error_page = Developer::Dashboard::PageDocument->new(
     layout => { body => '[% THROW boom "bad" %]' },
 );
 $runtime->prepare_page( page => $tt_error_page, source => 'saved', runtime_context => {} );
-like( $tt_error_page->{layout}{body}, qr/THROW boom/, 'prepare_page leaves unsupported template directives untouched' );
+is( $tt_error_page->{layout}{body}, '', 'prepare_page clears the failed template body when Template Toolkit parsing fails' );
+like( join( '', @{ $tt_error_page->{meta}{runtime_errors} || [] } ), qr/boom error - bad|THROW boom|parse error|unexpected/i, 'prepare_page records a visible Template Toolkit runtime error for unsupported directives' );
 is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.', '_system_context defaults cwd when omitted' );
-is( Developer::Dashboard::PageRuntime::_escape_html('<x>'), '&lt;x&gt;', '_escape_html escapes HTML markup' );
+is( Developer::Dashboard::Web::App::_escape_html('<x>'), '&lt;x&gt;', '_escape_html escapes HTML markup' );
 
 my $auth = Developer::Dashboard::Auth->new( files => $files, paths => $paths );
 my $sessions = Developer::Dashboard::SessionStore->new( paths => $paths );
@@ -633,7 +728,7 @@ ok( $login_user->{username}, 'helper user can be created for login flow coverage
 my ( $login_code, undef, undef, $login_headers ) = @{ $app->handle(
     path        => '/login',
     method      => 'POST',
-    body        => 'username=helperx&password=helper-pass-123',
+    body        => form_body( username => 'helperx', password => 'helper-pass-123' ),
     remote_addr => '10.0.0.2',
     headers     => { host => 'localhost:7890' },
 ) };
@@ -669,5 +764,36 @@ __END__
 
 This test drives the remaining legacy compatibility helpers and runtime paths
 needed to keep the active library coverage high after the bookmark-model reset.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file covers compatibility helpers and generated runtime helper behaviour.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/12-legacy-helper-coverage.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/12-legacy-helper-coverage.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

@@ -130,6 +130,8 @@ my $c3 = combcoords($x,$y,$z);
 is_pdl $c3, float(5,6,7);
 $x++;
 is_pdl $c3, float(6,6,7);
+eval { $c3++ };
+like $@, qr/inward but no backward flow/;
 }
 
 {

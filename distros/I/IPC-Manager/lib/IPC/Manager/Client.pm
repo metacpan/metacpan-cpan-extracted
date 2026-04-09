@@ -2,7 +2,7 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed weaken/;
@@ -67,7 +67,17 @@ sub send_message { croak "Not Implemented" }
 sub spawn        { croak "Not Implemented" }
 sub write_stats  { croak "Not Implemented" }
 sub all_stats    { croak "Not Implemented" }
-sub viable       { croak "Not Implemented" }
+sub _viable      { croak "Not Implemented" }
+
+sub viable {
+    my $self_or_class = shift;
+    my $class = blessed($self_or_class) || $self_or_class;
+    local $@;
+    my $out;
+    my $ok = eval { $out = $self_or_class->_viable ? 1 : 0; 1 };
+    warn "'$class' is not viable: $@" unless $ok;
+    return $out // 0;
+}
 
 sub connect {
     my $class = shift;
@@ -476,6 +486,13 @@ Returns true if this protocol is usable in the current environment, i.e. all
 required modules are loadable and any runtime prerequisites (kernel features,
 available file types, etc.) are satisfied.  Always check C<viable> before
 calling C<spawn> with a protocol you have not explicitly required.
+
+This method is provided by the base class and is guaranteed never to throw an
+exception.  Subclasses should not override C<viable> directly; instead they
+must implement C<_viable>, which should either return a true value or throw an
+exception explaining why the protocol is not available.  The base-class
+C<viable> calls C<_viable> inside an C<eval> and translates any exception into
+a false return.
 
 =item $bool = $con->have_handles_for_select
 

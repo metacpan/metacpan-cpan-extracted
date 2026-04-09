@@ -8,7 +8,7 @@ use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 use English;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub module_name {
 	my $self = shift;

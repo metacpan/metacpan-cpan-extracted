@@ -648,7 +648,7 @@ DEFINE_KW_HOOK(sa, "SA", get_or_set, 3, build_kw_3arg)
 
 /* ---- TTL-aware iteration helper ---- */
 #define HM_TTL_SKIP_EXPIRED(self, i, now) \
-    (self->expires_at && self->expires_at[i] && (now) >= self->expires_at[i])
+    (self->expires_at && self->expires_at[i] && (now) > self->expires_at[i])
 
 
 MODULE = Data::HashMap    PACKAGE = Data::HashMap::I32

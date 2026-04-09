@@ -1,0 +1,2991 @@
+TITLE: API Dashboard
+:--------------------------------------------------------------------------------:
+BOOKMARK: api-dashboard
+:--------------------------------------------------------------------------------:
+NOTE: A Postman-style request workspace with collection import/export, multiple request tabs, and bookmark-backed request dispatch.
+:--------------------------------------------------------------------------------:
+HTML: <script src="/js/jquery.js"></script>
+<style>
+.api-postman-shell { display:grid; gap:18px; }
+.api-card { border:1px solid #d9d3c7; background:linear-gradient(180deg, #fffaf1 0%, #fffdf8 100%); border-radius:18px; box-shadow:0 10px 30px rgba(31,42,46,0.08); overflow:hidden; }
+.api-card h2, .api-card h3 { margin:0; }
+.api-sidebar-header, .api-main-toolbar { padding:16px 18px; border-bottom:1px solid #e6ddcf; background:#f7efe0; }
+.api-sidebar-body, .api-main-body { padding:18px; }
+.api-shell-tabs, .api-response-tabs, .api-collection-tabs, .api-tab-strip { display:flex; gap:6px; flex-wrap:wrap; align-items:flex-end; border-bottom:1px solid #d8ccb8; }
+.api-shell-tabs { padding:0 12px; }
+.api-response-tabs, .api-collection-tabs, .api-tab-strip { margin:0; }
+.api-shell-tab, .api-response-tab, .api-collection-tab, .api-tab {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid #d1b783;
+  border-bottom:0;
+  border-radius:12px 12px 0 0;
+  background:#efe3cd;
+  color:#6a4512;
+  cursor:pointer;
+  font-weight:700;
+  padding:10px 16px;
+  margin:0 0 -1px;
+}
+.api-shell-tab[aria-selected="true"], .api-response-tab[aria-selected="true"], .api-collection-tab[aria-selected="true"], .api-tab.is-active {
+  background:#fffdf8;
+  border-color:#d8ccb8;
+  color:#1f2a2e;
+}
+.api-shell-panel[hidden], .api-response-panel[hidden] { display:none !important; }
+.api-toolbar-group { display:flex; gap:10px; flex-wrap:wrap; }
+.api-toolbar-group button, .api-request-actions button { border:1px solid #d1b783; border-radius:999px; background:#fff7e7; color:#6a4512; cursor:pointer; font-weight:600; padding:9px 14px; }
+.api-toolbar-group button:hover, .api-request-actions button:hover { background:#f7e1af; }
+.api-toolbar-group input[type=file] { color:#6a4512; font-weight:600; max-width:280px; }
+.api-toolbar-group input[type=file]::file-selector-button { border:1px solid #d1b783; border-radius:999px; background:#fff7e7; color:#6a4512; cursor:pointer; font-weight:600; padding:9px 14px; margin-right:10px; }
+.api-toolbar-group input[type=file]::file-selector-button:hover { background:#f7e1af; }
+.api-collection-tree { display:grid; gap:12px; }
+.api-collection-card { border:1px solid #eadfca; border-radius:0 14px 14px 14px; padding:14px; background:#fffdf8; }
+.api-collection-card.is-active { border-color:#0b7a75; box-shadow:0 0 0 2px rgba(11,122,117,0.10); }
+.api-collection-card h3 { font-size:1rem; margin-bottom:8px; }
+.api-node-list { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.api-node-list ul { list-style:none; margin:8px 0 0 14px; padding:0 0 0 10px; display:grid; gap:6px; border-left:1px dashed #d8ccb8; }
+.api-node-button { width:100%; text-align:left; border:1px solid #e9dec8; border-radius:10px; background:#fff; padding:8px 10px; cursor:pointer; color:#1f2a2e; }
+.api-node-button:hover { border-color:#0b7a75; color:#0b7a75; }
+.api-node-button.is-active { border-color:#0b7a75; background:#e7f5f4; color:#0b7a75; font-weight:700; }
+.api-node-folder { font-weight:700; background:#f8f1e4; }
+.api-empty { color:#6a767b; font-style:italic; }
+.api-location { margin:0 0 12px; padding:10px 12px; border:1px dashed #d8ccb8; border-radius:12px; background:#fffdf8; color:#6a4512; font-size:0.92rem; line-height:1.5; }
+.api-tab-close { border:0; background:transparent; color:inherit; cursor:pointer; padding:0; font-size:1rem; line-height:1; }
+.api-editor-grid { display:grid; gap:14px; grid-template-columns:repeat(2, minmax(0, 1fr)); }
+.api-field { display:grid; gap:6px; }
+.api-field label { font-weight:700; color:#6a4512; }
+.api-field input, .api-field select, .api-field textarea { width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d8ccb8; border-radius:12px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:0.95rem; background:#fffefb; }
+.api-field textarea { min-height:140px; resize:vertical; }
+.api-field-full { grid-column:1 / -1; }
+.api-token-shell, .api-auth-shell { border:1px solid #e6ddcf; border-radius:14px; padding:12px; background:#fffaf1; }
+.api-token-help { margin:0; color:#6a767b; font-size:0.9rem; }
+.api-token-fields { display:grid; gap:10px; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); margin-top:12px; }
+.api-token-field { display:grid; gap:6px; }
+.api-token-field input { width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #d8ccb8; border-radius:12px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:0.95rem; background:#fffefb; }
+.api-auth-head { display:flex; gap:12px; justify-content:space-between; align-items:flex-start; }
+.api-auth-head label { display:block; margin-bottom:6px; }
+.api-auth-toggle { border:1px solid #d1b783; border-radius:999px; background:#fff7e7; color:#6a4512; cursor:pointer; font-weight:600; padding:9px 14px; white-space:nowrap; }
+.api-auth-toggle:hover { background:#f7e1af; }
+.api-auth-fields { display:grid; gap:14px; grid-template-columns:repeat(2, minmax(0, 1fr)); margin-top:12px; }
+.api-auth-group { display:grid; gap:12px; grid-template-columns:repeat(2, minmax(0, 1fr)); grid-column:1 / -1; }
+.api-auth-group[hidden] { display:none !important; }
+.api-auth-summary { margin:0; color:#6a767b; line-height:1.5; }
+.api-inline-toggles { display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+.api-inline-toggles label { font-weight:600; color:#1f2a2e; display:inline-flex; gap:6px; align-items:center; }
+.api-request-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.api-response-shell { display:grid; gap:0; }
+.api-response-panel { padding:0; }
+.api-response-box { border:1px solid #d8ccb8; border-radius:14px 14px 0 0; overflow:hidden; background:#fffdf8; }
+.api-response-box header { padding:10px 14px; background:#f7efe0; font-weight:700; color:#6a4512; border-bottom:1px solid #e6ddcf; }
+.api-response-box pre { margin:0; padding:14px; min-height:220px; white-space:pre-wrap; overflow:auto; background:#1f2a2e; color:#f4efe3; }
+.api-response-preview { display:none; padding:14px; min-height:220px; background:#f4f1eb; border-top:1px solid #e6ddcf; }
+.api-response-preview.is-visible { display:block; }
+.api-response-preview img, .api-response-preview iframe, .api-response-preview object { width:100%; max-width:100%; min-height:220px; border:0; border-radius:12px; background:#fff; }
+.api-response-meta { display:flex; gap:10px; flex-wrap:wrap; }
+.api-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#e6f4f3; color:#0b7a75; font-weight:700; }
+.api-chip.is-error { background:#fde9e9; color:#9f2020; }
+.api-banner { border:1px solid #d1b783; border-radius:14px; background:#fff6e2; color:#6a4512; padding:12px 14px; display:none; margin-bottom:12px; }
+@media (max-width: 980px) {
+  .api-editor-grid { grid-template-columns:1fr; }
+  .api-auth-fields, .api-auth-group { grid-template-columns:1fr; }
+  .api-auth-head { flex-direction:column; }
+}
+</style>
+<div class="api-postman-shell">
+  <div class="api-shell-tabs" role="tablist" aria-label="API Dashboard Sections">
+    <button type="button" id="api-shell-tab-collections" class="api-shell-tab" role="tab" aria-selected="false" aria-controls="api-shell-panel-collections" data-api-shell-tab="collections">Collections</button>
+    <button type="button" id="api-shell-tab-workspace" class="api-shell-tab" role="tab" aria-selected="false" aria-controls="api-shell-panel-workspace" data-api-shell-tab="workspace">Workspace</button>
+  </div>
+  <aside class="api-card api-shell-panel" id="api-shell-panel-collections" role="tabpanel" aria-labelledby="api-shell-tab-collections" data-api-shell-panel="collections">
+    <div class="api-sidebar-header">
+      <h2>Collections</h2>
+      <p style="margin:8px 0 0;color:#6a767b">Import and export Postman collection JSON, then open requests in local tabs.</p>
+    </div>
+    <div class="api-sidebar-body">
+      <div class="api-toolbar-group" style="margin-bottom:14px">
+        <button type="button" id="api-new-collection">New Collection</button>
+        <button type="button" id="api-rename-collection">Rename Collection</button>
+        <button type="button" id="api-delete-collection">Delete Collection</button>
+        <button type="button" id="api-export-collection">Export Postman Collection</button>
+        <input id="api-import-file" type="file" accept=".json,application/json" aria-label="Import Postman Collection">
+      </div>
+      <div id="api-banner" class="api-banner"></div>
+      <div id="api-collection-location" class="api-location">Current Location: Workspace root</div>
+      <div id="api-collection-tree" class="api-collection-tree"></div>
+    </div>
+  </aside>
+  <section class="api-card api-shell-panel" id="api-shell-panel-workspace" role="tabpanel" aria-labelledby="api-shell-tab-workspace" data-api-shell-panel="workspace">
+    <div class="api-main-toolbar">
+      <h2>Workspace</h2>
+      <p style="margin:8px 0 0;color:#6a767b">Use multiple tabs to compare requests, save useful calls into collections, and dispatch through the bookmark Ajax sender.</p>
+    </div>
+    <div class="api-main-body">
+      <div class="api-toolbar-group">
+        <button type="button" id="api-new-tab">New Tab</button>
+        <button type="button" id="api-duplicate-tab">Duplicate Tab</button>
+        <button type="button" id="api-save-request">Save Request To Collection</button>
+        <button type="button" id="api-delete-request">Delete Saved Request</button>
+      </div>
+      <div id="api-tab-strip" class="api-tab-strip"></div>
+      <div class="api-editor-grid">
+        <div class="api-field">
+          <label for="api-request-name">Request Name</label>
+          <input id="api-request-name" placeholder="List Orders">
+        </div>
+        <div class="api-field">
+          <label for="api-collection-name">Selected Collection</label>
+          <input id="api-collection-name" placeholder="Scratch Pad" readonly>
+        </div>
+        <div class="api-field">
+          <label for="api-request-method">Method</label>
+          <select id="api-request-method">
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+            <option>HEAD</option>
+            <option>OPTIONS</option>
+          </select>
+        </div>
+        <div class="api-field">
+          <label for="api-timeout">Timeout (seconds)</label>
+          <input id="api-timeout" type="number" min="1" max="600" value="120">
+        </div>
+        <div class="api-field api-field-full api-token-shell" id="api-token-shell" hidden>
+          <label for="api-token-fields">Request Token Values</label>
+          <p class="api-token-help">Fill placeholders used by the selected request. Values are shared across the active collection and carry over to matching tokens in other requests from the same collection.</p>
+          <div id="api-token-fields" class="api-token-fields"></div>
+        </div>
+        <div class="api-field api-field-full api-auth-shell" id="api-auth-shell">
+          <div class="api-auth-head">
+            <div>
+              <label for="api-auth-kind">Request Credentials</label>
+              <p class="api-token-help">Hide or show Postman-compatible request auth. Provider presets fill common OAuth defaults; the bookmark uses the values entered here when sending requests.</p>
+            </div>
+            <button type="button" id="api-auth-toggle" class="api-auth-toggle" aria-expanded="false" aria-controls="api-auth-fields">Show Credentials</button>
+          </div>
+          <div id="api-auth-fields" class="api-auth-fields" hidden>
+            <div class="api-field">
+              <label for="api-auth-kind">Credential Type</label>
+              <select id="api-auth-kind">
+                <option value="none">No Credentials</option>
+                <option value="basic">Basic</option>
+                <option value="api-token">API Token</option>
+                <option value="api-key">API Key</option>
+                <option value="oauth2">OAuth2</option>
+                <option value="apple-login">Apple Login</option>
+                <option value="amazon-login">Amazon Login</option>
+                <option value="facebook-login">Facebook Login</option>
+                <option value="microsoft-login">Microsoft Login</option>
+              </select>
+            </div>
+            <div class="api-field">
+              <label for="api-auth-summary">Credential Summary</label>
+              <p id="api-auth-summary" class="api-auth-summary">No request credentials configured.</p>
+            </div>
+            <div class="api-auth-group" data-api-auth-group="basic" hidden>
+              <div class="api-field">
+                <label for="api-auth-basic-username">Username</label>
+                <input id="api-auth-basic-username" placeholder="api-user">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-basic-password">Password</label>
+                <input id="api-auth-basic-password" type="password" placeholder="secret">
+              </div>
+            </div>
+            <div class="api-auth-group" data-api-auth-group="api-token" hidden>
+              <div class="api-field api-field-full">
+                <label for="api-auth-token">Token</label>
+                <input id="api-auth-token" placeholder="{{token}}">
+              </div>
+            </div>
+            <div class="api-auth-group" data-api-auth-group="api-key" hidden>
+              <div class="api-field">
+                <label for="api-auth-api-key-name">Key Name</label>
+                <input id="api-auth-api-key-name" placeholder="X-API-Key">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-api-key-value">Key Value</label>
+                <input id="api-auth-api-key-value" placeholder="{{api_key}}">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-api-key-in">Send In</label>
+                <select id="api-auth-api-key-in">
+                  <option value="header">Header</option>
+                  <option value="query">Query String</option>
+                </select>
+              </div>
+            </div>
+            <div class="api-auth-group" data-api-auth-group="oauth2 apple-login amazon-login facebook-login microsoft-login" hidden>
+              <div class="api-field">
+                <label for="api-auth-oauth-access-token">Access Token</label>
+                <input id="api-auth-oauth-access-token" placeholder="{{token}}">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-token-type">Token Type</label>
+                <input id="api-auth-oauth-token-type" placeholder="Bearer">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-add-to">Send Token In</label>
+                <select id="api-auth-oauth-add-to">
+                  <option value="header">Authorization Header</option>
+                  <option value="query">Query String</option>
+                </select>
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-client-id">Client ID</label>
+                <input id="api-auth-oauth-client-id" placeholder="{{client_id}}">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-client-secret">Client Secret</label>
+                <input id="api-auth-oauth-client-secret" type="password" placeholder="{{client_secret}}">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-scope">Scope</label>
+                <input id="api-auth-oauth-scope" placeholder="openid profile">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-audience">Audience</label>
+                <input id="api-auth-oauth-audience" placeholder="api://default">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-authorize-url">Authorize URL</label>
+                <input id="api-auth-oauth-authorize-url" placeholder="https://provider.test/authorize">
+              </div>
+              <div class="api-field">
+                <label for="api-auth-oauth-token-url">Access Token URL</label>
+                <input id="api-auth-oauth-token-url" placeholder="https://provider.test/token">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="api-field api-field-full">
+          <label for="api-request-url">URL</label>
+          <input id="api-request-url" placeholder="https://example.test/api/orders">
+        </div>
+        <div class="api-field api-field-full">
+          <label for="api-request-variables">Collection Variables</label>
+          <textarea id="api-request-variables" placeholder="base_url=https://example.test&#10;token=abc123"></textarea>
+        </div>
+        <div class="api-field api-field-full">
+          <label for="api-request-headers">Headers</label>
+          <textarea id="api-request-headers" placeholder="Accept: application/json&#10;Authorization: Bearer {{token}}"></textarea>
+        </div>
+        <div class="api-field api-field-full">
+          <label for="api-request-body">Body</label>
+          <textarea id="api-request-body" placeholder='{"status":"open"}'></textarea>
+        </div>
+        <div class="api-field api-field-full">
+          <label for="api-request-description">Description</label>
+          <textarea id="api-request-description" placeholder="Request notes or Postman collection description."></textarea>
+        </div>
+        <div class="api-field api-field-full">
+          <div class="api-inline-toggles">
+            <label><input id="api-follow-redirects" type="checkbox" checked> Follow redirects</label>
+            <label><input id="api-insecure-tls" type="checkbox"> Allow insecure TLS</label>
+          </div>
+        </div>
+      </div>
+      <div class="api-request-actions">
+        <button type="button" id="api-send-request">Send Request</button>
+        <button type="button" id="api-clear-response">Clear Response</button>
+      </div>
+      <div id="api-response-meta" class="api-response-meta"></div>
+      <div class="api-response-shell">
+        <section class="api-response-box">
+          <section class="api-response-panel" id="api-response-panel-request" role="tabpanel" aria-labelledby="api-response-tab-request" data-api-response-panel="request">
+            <header>Request Details</header>
+            <pre id="api-request-details">Ready.</pre>
+          </section>
+          <section class="api-response-panel" id="api-response-panel-body" role="tabpanel" aria-labelledby="api-response-tab-body" data-api-response-panel="body">
+            <header>Response Body</header>
+            <div id="api-response-preview" class="api-response-preview"></div>
+            <pre id="api-response-body">Ready.</pre>
+          </section>
+          <section class="api-response-panel" id="api-response-panel-headers" role="tabpanel" aria-labelledby="api-response-tab-headers" data-api-response-panel="headers">
+            <header>Response Headers</header>
+            <pre id="api-response-headers">Ready.</pre>
+          </section>
+        </section>
+        <div class="api-response-tabs" role="tablist" aria-label="API Response Sections">
+          <button type="button" id="api-response-tab-request" class="api-response-tab" role="tab" aria-selected="false" aria-controls="api-response-panel-request" data-api-response-tab="request">Request Details</button>
+          <button type="button" id="api-response-tab-body" class="api-response-tab" role="tab" aria-selected="false" aria-controls="api-response-panel-body" data-api-response-tab="body">Response Body</button>
+          <button type="button" id="api-response-tab-headers" class="api-response-tab" role="tab" aria-selected="false" aria-controls="api-response-panel-headers" data-api-response-tab="headers">Response Headers</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+var configs = {};
+(function () {
+  var STORAGE_KEY = 'developer-dashboard:api-dashboard:v7';
+  var POSTMAN_SCHEMA = 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json';
+  var state = null;
+
+  // uid(prefix)
+  // Purpose: create stable-looking local identifiers for collections, tabs, and requests.
+  // Input: optional string prefix.
+  // Output: string identifier.
+  function uid(prefix) {
+    return [prefix || 'id', Date.now().toString(36), Math.random().toString(36).slice(2, 10)].join('-');
+  }
+
+  // clone(value)
+  // Purpose: deep-clone plain JSON-safe state objects.
+  // Input: JSON-safe value.
+  // Output: cloned value.
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  // authTypeForKind(kind)
+  // Purpose: map one visible credential kind to the underlying Postman auth type.
+  // Input: credential kind string.
+  // Output: Postman auth type string.
+  function authTypeForKind(kind) {
+    if (kind === 'basic') return 'basic';
+    if (kind === 'api-token') return 'bearer';
+    if (kind === 'api-key') return 'apikey';
+    if (kind === 'oauth2' || kind === 'apple-login' || kind === 'amazon-login' || kind === 'facebook-login' || kind === 'microsoft-login') return 'oauth2';
+    return 'noauth';
+  }
+
+  // authKindFromType(type, provider)
+  // Purpose: infer the visible credential kind from a Postman auth type and optional provider hint.
+  // Input: Postman auth type string and provider string.
+  // Output: credential kind string.
+  function authKindFromType(type, provider) {
+    var normalizedType = String(type || '').toLowerCase();
+    var normalizedProvider = String(provider || '').toLowerCase();
+    if (normalizedType === 'basic') return 'basic';
+    if (normalizedType === 'bearer') return 'api-token';
+    if (normalizedType === 'apikey') return 'api-key';
+    if (normalizedType === 'oauth2') {
+      if (normalizedProvider === 'apple-login') return 'apple-login';
+      if (normalizedProvider === 'amazon-login') return 'amazon-login';
+      if (normalizedProvider === 'facebook-login') return 'facebook-login';
+      if (normalizedProvider === 'microsoft-login') return 'microsoft-login';
+      return 'oauth2';
+    }
+    return 'none';
+  }
+
+  // authDefaultsForKind(kind)
+  // Purpose: return bookmark-local provider defaults for one visible credential kind.
+  // Input: credential kind string.
+  // Output: defaults hash.
+  function authDefaultsForKind(kind) {
+    if (kind === 'api-key') return { key: 'X-API-Key', in: 'header' };
+    if (kind === 'oauth2') return { provider: '', token_type: 'Bearer', add_to: 'header', authorize_url: '', access_token_url: '' };
+    if (kind === 'apple-login') return { provider: 'apple-login', token_type: 'Bearer', add_to: 'header', authorize_url: 'https://appleid.apple.com/auth/authorize', access_token_url: 'https://appleid.apple.com/auth/token' };
+    if (kind === 'amazon-login') return { provider: 'amazon-login', token_type: 'Bearer', add_to: 'header', authorize_url: 'https://www.amazon.com/ap/oa', access_token_url: 'https://api.amazon.com/auth/o2/token' };
+    if (kind === 'facebook-login') return { provider: 'facebook-login', token_type: 'Bearer', add_to: 'header', authorize_url: 'https://www.facebook.com/dialog/oauth', access_token_url: 'https://graph.facebook.com/oauth/access_token' };
+    if (kind === 'microsoft-login') return { provider: 'microsoft-login', token_type: 'Bearer', add_to: 'header', authorize_url: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize', access_token_url: 'https://login.microsoftonline.com/common/oauth2/v2.0/token' };
+    return {};
+  }
+
+  // defaultAuthSettings()
+  // Purpose: build the default request-auth model used by the bookmark editor and Postman export/import.
+  // Input: none.
+  // Output: auth hash.
+  function defaultAuthSettings() {
+    return {
+      kind: 'none',
+      type: 'noauth',
+      open: false,
+      username: '',
+      password: '',
+      token: '',
+      key: 'X-API-Key',
+      value: '',
+      in: 'header',
+      access_token: '',
+      token_type: 'Bearer',
+      add_to: 'header',
+      client_id: '',
+      client_secret: '',
+      scope: '',
+      audience: '',
+      authorize_url: '',
+      access_token_url: '',
+      provider: ''
+    };
+  }
+
+  // normalizeAuthSettings(input)
+  // Purpose: sanitize request-auth settings loaded from browser state or imported Postman data.
+  // Input: candidate auth hash.
+  // Output: normalized auth hash.
+  function normalizeAuthSettings(input) {
+    var source = input && typeof input === 'object' ? input : {};
+    var auth = defaultAuthSettings();
+    Object.keys(auth).forEach(function (key) {
+      if (key === 'open') {
+        auth.open = !!source.open;
+        return;
+      }
+      if (Object.prototype.hasOwnProperty.call(source, key) && source[key] != null) auth[key] = String(source[key]);
+    });
+    var provider = auth.provider || source.provider || '';
+    var kind = source.kind ? String(source.kind) : authKindFromType(source.type || auth.type, provider);
+    auth.kind = kind || 'none';
+    auth.type = authTypeForKind(auth.kind);
+    var defaults = authDefaultsForKind(auth.kind);
+    Object.keys(defaults).forEach(function (key) {
+      if (!auth[key]) auth[key] = defaults[key];
+    });
+    if (auth.kind === 'none') auth.provider = '';
+    return auth;
+  }
+
+  // authPairsToHash(items)
+  // Purpose: convert a Postman auth parameter array into a lookup hash.
+  // Input: Postman auth entry array.
+  // Output: plain object.
+  function authPairsToHash(items) {
+    var hash = {};
+    (Array.isArray(items) ? items : []).forEach(function (item) {
+      if (!item || typeof item !== 'object' || !item.key) return;
+      hash[item.key] = item.value == null ? '' : String(item.value);
+    });
+    return hash;
+  }
+
+  // importAuthSettings(auth)
+  // Purpose: convert a Postman request auth object into the bookmark-local auth model.
+  // Input: Postman auth hash.
+  // Output: normalized auth hash.
+  function importAuthSettings(auth) {
+    if (!auth || typeof auth !== 'object') return defaultAuthSettings();
+    var type = String(auth.type || '').toLowerCase();
+    if (!type || type === 'noauth') return defaultAuthSettings();
+    var source = authPairsToHash(auth[type] || []);
+    return normalizeAuthSettings({
+      kind: authKindFromType(type, source.provider || ''),
+      type: type,
+      username: source.username || '',
+      password: source.password || '',
+      token: source.token || '',
+      key: source.key || 'X-API-Key',
+      value: source.value || '',
+      in: source.in || 'header',
+      access_token: source.accessToken || source.access_token || '',
+      token_type: source.tokenType || source.token_type || 'Bearer',
+      add_to: source.addTokenTo || source.add_to || 'header',
+      client_id: source.clientId || source.client_id || '',
+      client_secret: source.clientSecret || source.client_secret || '',
+      scope: source.scope || '',
+      audience: source.audience || '',
+      authorize_url: source.authUrl || source.authorize_url || '',
+      access_token_url: source.accessTokenUrl || source.access_token_url || '',
+      provider: source.provider || ''
+    });
+  }
+
+  // showBanner(message, isError)
+  // Purpose: render explicit success or error banners for workspace actions.
+  // Input: message string and boolean error flag.
+  // Output: none.
+  function showBanner(message, isError) {
+    var banner = document.getElementById('api-banner');
+    banner.textContent = message || '';
+    banner.style.display = message ? 'block' : 'none';
+    banner.style.borderColor = isError ? '#e3b0b0' : '#d1b783';
+    banner.style.background = isError ? '#fff0f0' : '#fff6e2';
+    banner.style.color = isError ? '#9f2020' : '#6a4512';
+  }
+
+  // defaultRequest(name)
+  // Purpose: build a new empty request model for a tab or collection item.
+  // Input: optional request name.
+  // Output: request hash.
+  function defaultRequest(name) {
+    return {
+      name: name || 'New Request',
+      method: 'GET',
+      url: 'https://example.test/api',
+      headers_text: 'Accept: application/json',
+      body: '',
+      description: '',
+      timeout_s: 120,
+      insecure_tls: false,
+      follow_redirects: true,
+      auth: defaultAuthSettings()
+    };
+  }
+
+  // scratchCollection()
+  // Purpose: seed a safe local collection when no saved collections exist.
+  // Input: none.
+  // Output: collection hash.
+  function scratchCollection() {
+    return {
+      id: uid('collection'),
+      name: 'Scratch Pad',
+      description: 'A local scratch collection for ad-hoc API calls.',
+      variable: [
+        { key: 'base_url', value: 'https://example.test' },
+        { key: 'token', value: '' }
+      ],
+      item: [
+        {
+          id: uid('request'),
+          kind: 'request',
+          name: 'Example GET',
+          request: defaultRequest('Example GET')
+        }
+      ]
+    };
+  }
+
+  // normalizeCollectionVariable(variable)
+  // Purpose: sanitize one collection variable entry.
+  // Input: candidate variable object.
+  // Output: normalized variable hash or null.
+  function normalizeCollectionVariable(variable) {
+    if (!variable || typeof variable !== 'object') return null;
+    var key = String(variable.key || '').trim();
+    if (!key) return null;
+    return {
+      key: key,
+      value: variable.value == null ? '' : String(variable.value)
+    };
+  }
+
+  // normalizeResponse(input)
+  // Purpose: normalize per-tab response state loaded from local storage.
+  // Input: candidate response payload.
+  // Output: normalized response hash or null.
+  function normalizeResponse(input) {
+    if (!input || typeof input !== 'object') return null;
+    var response = input.response && typeof input.response === 'object' ? input.response : {};
+    var request = input.request && typeof input.request === 'object' ? input.request : {};
+    return {
+      ok: !!input.ok,
+      error: input.error ? String(input.error) : '',
+      request: {
+        method: request.method ? String(request.method) : '',
+        url: request.url ? String(request.url) : '',
+        headers_text: request.headers_text ? String(request.headers_text) : '',
+        body: request.body ? String(request.body) : '',
+        timeout_s: request.timeout_s || 120,
+        follow_redirects: request.follow_redirects !== false,
+        insecure_tls: !!request.insecure_tls
+      },
+      response: {
+        status: response.status || 0,
+        reason: response.reason ? String(response.reason) : '',
+        elapsed_ms: response.elapsed_ms || 0,
+        content_type: response.content_type ? String(response.content_type) : '',
+        headers: Array.isArray(response.headers) ? response.headers : [],
+        body: response.body ? String(response.body) : '',
+        body_mode: response.body_mode ? String(response.body_mode) : 'text',
+        preview_media_type: response.preview_media_type ? String(response.preview_media_type) : '',
+        preview_url: response.preview_url ? String(response.preview_url) : '',
+        body_size_bytes: response.body_size_bytes || 0
+      }
+    };
+  }
+
+  // normalizeRequestData(input)
+  // Purpose: sanitize request settings loaded from collections, tabs, or imports.
+  // Input: candidate request hash.
+  // Output: normalized request hash.
+  function normalizeRequestData(input) {
+    var request = input && typeof input === 'object' ? input : {};
+    var data = defaultRequest(request.name || 'New Request');
+    if (request.method) data.method = String(request.method).toUpperCase();
+    if (request.url) data.url = String(request.url);
+    if (request.headers_text) data.headers_text = String(request.headers_text);
+    if (request.body) data.body = String(request.body);
+    if (request.description) data.description = String(request.description);
+    if (request.timeout_s) data.timeout_s = request.timeout_s;
+    if (request.insecure_tls) data.insecure_tls = true;
+    if (request.follow_redirects === false) data.follow_redirects = false;
+    data.auth = normalizeAuthSettings(request.auth || {});
+    return data;
+  }
+
+  // normalizeNode(node)
+  // Purpose: sanitize a collection tree node.
+  // Input: candidate folder or request node.
+  // Output: normalized node hash or null.
+  function normalizeNode(node) {
+    if (!node || typeof node !== 'object') return null;
+    if (Array.isArray(node.item)) {
+      return {
+        id: node.id || uid('folder'),
+        kind: 'folder',
+        name: node.name || 'Folder',
+        item: node.item.map(normalizeNode).filter(Boolean)
+      };
+    }
+    var request = normalizeRequestData(node.request || node);
+    return {
+      id: node.id || uid('request'),
+      kind: 'request',
+      name: node.name || request.name || 'Request',
+      request: request
+    };
+  }
+
+  // normalizeCollection(collection)
+  // Purpose: sanitize a Postman-style collection object for local use.
+  // Input: candidate collection hash.
+  // Output: normalized collection hash or null.
+  function normalizeCollection(collection) {
+    if (!collection || typeof collection !== 'object') return null;
+    return {
+      id: collection.id || uid('collection'),
+      name: collection.name || (collection.info && collection.info.name) || 'Collection',
+      description: collection.description || (collection.info && collection.info.description) || '',
+      variable: (collection.variable || []).map(normalizeCollectionVariable).filter(Boolean),
+      item: (collection.item || []).map(normalizeNode).filter(Boolean)
+    };
+  }
+
+  // normalizeTab(tab)
+  // Purpose: sanitize one workspace tab and its last response.
+  // Input: candidate tab hash.
+  // Output: normalized tab hash or null.
+  function normalizeTab(tab) {
+    if (!tab || typeof tab !== 'object') return null;
+    return {
+      id: tab.id || uid('tab'),
+      title: tab.title || (tab.request && tab.request.name) || 'New Tab',
+      collection_id: tab.collection_id || '',
+      request_id: tab.request_id || '',
+      request: normalizeRequestData(tab.request || {}),
+      response: normalizeResponse(tab.response || null)
+    };
+  }
+
+  // flattenRequests(items, out)
+  // Purpose: flatten a nested collection tree into request nodes only.
+  // Input: item array and output array.
+  // Output: output array.
+  function flattenRequests(items, out) {
+    (items || []).forEach(function (item) {
+      if (item.kind === 'folder') {
+        flattenRequests(item.item || [], out);
+        return;
+      }
+      out.push(item);
+    });
+    return out;
+  }
+
+  // findFirstRequest(collection)
+  // Purpose: choose a default request node from a collection.
+  // Input: normalized collection hash.
+  // Output: request node hash.
+  function findFirstRequest(collection) {
+    var requests = flattenRequests(collection.item || [], []);
+    return requests[0] || {
+      id: uid('request'),
+      kind: 'request',
+      name: 'New Request',
+      request: defaultRequest('New Request')
+    };
+  }
+
+  // tabFromRequest(node, collectionId)
+  // Purpose: open a request node inside a new workspace tab.
+  // Input: request node and owning collection id.
+  // Output: tab hash.
+  function tabFromRequest(node, collectionId) {
+    return {
+      id: uid('tab'),
+      title: node.name || (node.request && node.request.name) || 'Request',
+      collection_id: collectionId || '',
+      request_id: node.id || '',
+      request: normalizeRequestData(node.request || node),
+      response: null
+    };
+  }
+
+  // normalizeState(input)
+  // Purpose: sanitize the persisted workspace state.
+  // Input: candidate state hash.
+  // Output: normalized workspace state.
+  function normalizeState(input) {
+    var data = input && typeof input === 'object' ? input : {};
+    var collections = Array.isArray(data.collections) ? data.collections.map(normalizeCollection).filter(Boolean) : [];
+    var tabs = Array.isArray(data.tabs) ? data.tabs.map(normalizeTab).filter(Boolean) : [];
+    if (!collections.length) collections = [scratchCollection()];
+    if (!tabs.length) tabs = [tabFromRequest(findFirstRequest(collections[0]), collections[0].id)];
+    return {
+      collections: collections,
+      tabs: tabs,
+      active_tab_id: data.active_tab_id || tabs[0].id,
+      active_shell_tab: data.active_shell_tab === 'collections' ? 'collections' : 'workspace',
+      active_response_tab: data.active_response_tab === 'request' || data.active_response_tab === 'headers' ? data.active_response_tab : 'body',
+      selected_collection_id: data.selected_collection_id || collections[0].id,
+      selected_request_id: data.selected_request_id || (tabs[0].request_id || '')
+    };
+  }
+
+  // loadState()
+  // Purpose: load local workspace state from browser storage.
+  // Input: none.
+  // Output: normalized workspace state.
+  function loadState() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return normalizeState({});
+      return normalizeState(JSON.parse(raw));
+    } catch (error) {
+      showBanner('Unable to read saved API dashboard state: ' + error.message, true);
+      return normalizeState({});
+    }
+  }
+
+  // saveState()
+  // Purpose: persist the current workspace state to local storage.
+  // Input: none.
+  // Output: none.
+  function saveState() {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // setShellTab(name)
+  // Purpose: activate one top-level shell tab and persist the preference.
+  // Input: tab name string.
+  // Output: none.
+  function setShellTab(name) {
+    state.active_shell_tab = name === 'collections' ? 'collections' : 'workspace';
+    saveState();
+  }
+
+  // setResponseTab(name)
+  // Purpose: activate one response panel tab and persist the preference.
+  // Input: tab name string.
+  // Output: none.
+  function setResponseTab(name) {
+    if (name !== 'request' && name !== 'headers') name = 'body';
+    state.active_response_tab = name;
+    saveState();
+  }
+
+  // findCollection(collectionId)
+  // Purpose: resolve a collection by id from the current state.
+  // Input: collection id string.
+  // Output: collection hash or null.
+  function findCollection(collectionId) {
+    return (state.collections || []).find(function (collection) {
+      return collection.id === collectionId;
+    }) || null;
+  }
+
+  // findCollectionByName(name)
+  // Purpose: resolve a collection by name from the current state.
+  // Input: collection name string.
+  // Output: collection hash or null.
+  function findCollectionByName(name) {
+    return (state.collections || []).find(function (collection) {
+      return collection.name === name;
+    }) || null;
+  }
+
+  // collectionNameExists(name, exceptCollectionId)
+  // Purpose: detect collection name conflicts before saving or renaming.
+  // Input: collection name string and optional collection id to exclude.
+  // Output: boolean.
+  function collectionNameExists(name, exceptCollectionId) {
+    var trimmed = String(name || '').trim();
+    return (state.collections || []).some(function (collection) {
+      if (exceptCollectionId && collection.id === exceptCollectionId) return false;
+      return collection.name === trimmed;
+    });
+  }
+
+  // findNode(items, nodeId)
+  // Purpose: resolve a request or folder node by id from a nested tree.
+  // Input: items array and node id string.
+  // Output: node hash or null.
+  function findNode(items, nodeId) {
+    for (var i = 0; i < (items || []).length; i++) {
+      var item = items[i];
+      if (item.id === nodeId) return item;
+      if (item.kind === 'folder') {
+        var found = findNode(item.item || [], nodeId);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  // findRequestAcrossCollections(nodeId)
+  // Purpose: locate a request node anywhere in the workspace by id.
+  // Input: request node id string.
+  // Output: object with collection and node keys, or null.
+  function findRequestAcrossCollections(nodeId) {
+    var i;
+    for (i = 0; i < (state.collections || []).length; i++) {
+      var collection = state.collections[i];
+      var node = findNode(collection.item || [], nodeId);
+      if (node && node.kind === 'request') {
+        return {
+          collection: collection,
+          node: node
+        };
+      }
+    }
+    return null;
+  }
+
+  // findTab(tabId)
+  // Purpose: resolve a tab by id from the current state.
+  // Input: tab id string.
+  // Output: tab hash or null.
+  function findTab(tabId) {
+    return (state.tabs || []).find(function (tab) {
+      return tab.id === tabId;
+    }) || null;
+  }
+
+  // findTabForRequest(collectionId, requestId)
+  // Purpose: locate an already-open tab for a saved request.
+  // Input: collection id and request id strings.
+  // Output: tab hash or null.
+  function findTabForRequest(collectionId, requestId) {
+    return (state.tabs || []).find(function (tab) {
+      return tab.collection_id === collectionId && tab.request_id === requestId;
+    }) || null;
+  }
+
+  // adoptNodeIds(previousItems, incomingItems)
+  // Purpose: preserve browser-local node ids across bootstrap refreshes when names and ordering still match.
+  // Input: previous node array and incoming node array.
+  // Output: none.
+  function adoptNodeIds(previousItems, incomingItems) {
+    var oldItems = previousItems || [];
+    (incomingItems || []).forEach(function (item, index) {
+      var previous = oldItems[index];
+      if (!previous || previous.kind !== item.kind || previous.name !== item.name) return;
+      item.id = previous.id;
+      if (item.kind === 'folder') adoptNodeIds(previous.item || [], item.item || []);
+    });
+  }
+
+  // adoptCollectionIds(previousCollection, incomingCollection)
+  // Purpose: preserve browser-local collection and request ids when the same collection reloads from disk.
+  // Input: previous collection hash and incoming collection hash.
+  // Output: none.
+  function adoptCollectionIds(previousCollection, incomingCollection) {
+    if (!previousCollection || !incomingCollection) return;
+    incomingCollection.id = previousCollection.id;
+    adoptNodeIds(previousCollection.item || [], incomingCollection.item || []);
+  }
+
+  // activeTab()
+  // Purpose: resolve the currently active tab.
+  // Input: none.
+  // Output: tab hash or null.
+  function activeTab() {
+    return (state.tabs || []).find(function (tab) {
+      return tab.id === state.active_tab_id;
+    }) || null;
+  }
+
+  // ensureActiveTab()
+  // Purpose: guarantee the state points at an existing tab.
+  // Input: none.
+  // Output: none.
+  function ensureActiveTab() {
+    if (!activeTab() && state.tabs.length) state.active_tab_id = state.tabs[0].id;
+  }
+
+  // formatVariables(variable)
+  // Purpose: convert collection variables to editable textarea text.
+  // Input: variable array.
+  // Output: string.
+  function formatVariables(variable) {
+    return (variable || []).map(function (entry) {
+      return entry.key + '=' + (entry.value == null ? '' : entry.value);
+    }).join('\n');
+  }
+
+  // parseVariablesText(text)
+  // Purpose: parse editable textarea text into collection variables.
+  // Input: textarea string.
+  // Output: normalized variable array.
+  function parseVariablesText(text) {
+    return String(text || '').split(/\n/).map(function (line) {
+      var trimmed = line.trim();
+      if (!trimmed) return null;
+      var pos = trimmed.indexOf('=');
+      if (pos < 1) return null;
+      return normalizeCollectionVariable({
+        key: trimmed.slice(0, pos),
+        value: trimmed.slice(pos + 1)
+      });
+    }).filter(Boolean);
+  }
+
+  // variableMap(collection)
+  // Purpose: build a lookup hash for collection variables.
+  // Input: collection hash.
+  // Output: object map.
+  function variableMap(collection) {
+    var hash = {};
+    (collection && collection.variable || []).forEach(function (entry) {
+      hash[entry.key] = entry.value == null ? '' : String(entry.value);
+    });
+    return hash;
+  }
+
+  // applyVariables(collection, text)
+  // Purpose: expand {{token}} placeholders from the selected collection variables.
+  // Input: collection hash and source string.
+  // Output: expanded string.
+  function applyVariables(collection, text) {
+    var value = String(text == null ? '' : text);
+    var hash = variableMap(collection);
+    return value.replace(/\{\{([^{}]+)\}\}/g, function (match, token) {
+      var key = String(token || '').trim();
+      return Object.prototype.hasOwnProperty.call(hash, key) ? hash[key] : match;
+    });
+  }
+
+  // requestTokenNames(request)
+  // Purpose: extract unique {{token}} placeholders used by one request template.
+  // Input: normalized request hash.
+  // Output: sorted array of token-name strings.
+  function requestTokenNames(request) {
+    var joined = [
+      request && request.url || '',
+      request && request.headers_text || '',
+      request && request.body || ''
+    ].join('\n');
+    joined += '\n' + authTemplateValues(request && request.auth).join('\n');
+    var found = {};
+    joined.replace(/\{\{([^{}]+)\}\}/g, function (_, token) {
+      var key = String(token || '').trim();
+      if (key) found[key] = 1;
+      return _;
+    });
+    return Object.keys(found).sort();
+  }
+
+  // authTemplateValues(auth)
+  // Purpose: collect auth-field strings that may contain collection token placeholders.
+  // Input: normalized auth hash.
+  // Output: array of string values.
+  function authTemplateValues(auth) {
+    var value = normalizeAuthSettings(auth || {});
+    return [
+      value.username,
+      value.password,
+      value.token,
+      value.key,
+      value.value,
+      value.access_token,
+      value.client_id,
+      value.client_secret,
+      value.scope,
+      value.audience,
+      value.authorize_url,
+      value.access_token_url
+    ];
+  }
+
+  // upsertCollectionVariable(collection, key, value)
+  // Purpose: create or update one collection variable entry in place.
+  // Input: collection hash, variable key string, and variable value string.
+  // Output: none.
+  function upsertCollectionVariable(collection, key, value) {
+    if (!collection) return;
+    var entry = (collection.variable || []).find(function (item) {
+      return item.key === key;
+    });
+    if (entry) {
+      entry.value = value;
+      return;
+    }
+    collection.variable = collection.variable || [];
+    collection.variable.push({
+      key: key,
+      value: value
+    });
+  }
+
+  // ensureRequestTokens(collection, request)
+  // Purpose: make sure the active collection has variable entries for every token used by the active request.
+  // Input: collection hash and normalized request hash.
+  // Output: sorted token-name array.
+  function ensureRequestTokens(collection, request) {
+    var names = requestTokenNames(request);
+    names.forEach(function (name) {
+      upsertCollectionVariable(collection, name, variableMap(collection)[name] || '');
+    });
+    return names;
+  }
+
+  // setResolvedFieldValue(elementId, rawValue, resolvedValue)
+  // Purpose: populate one request editor field with resolved text while preserving the raw template text in a data attribute.
+  // Input: DOM element id string, raw template string, and resolved display string.
+  // Output: none.
+  function setResolvedFieldValue(elementId, rawValue, resolvedValue) {
+    var element = document.getElementById(elementId);
+    if (!element) return;
+    element.dataset.apiRawValue = rawValue == null ? '' : String(rawValue);
+    element.value = resolvedValue == null ? '' : String(resolvedValue);
+  }
+
+  // readResolvedFieldValue(elementId, collection)
+  // Purpose: recover the raw template value for one editor field unless the user has changed the resolved display text.
+  // Input: DOM element id string and collection hash for token expansion.
+  // Output: raw template or current edited string.
+  function readResolvedFieldValue(elementId, collection) {
+    var element = document.getElementById(elementId);
+    if (!element) return '';
+    var raw = element.dataset.apiRawValue || '';
+    var resolved = applyVariables(collection, raw);
+    return element.value === resolved ? raw : element.value;
+  }
+
+  // renderResolvedRequestFields(collection, tab)
+  // Purpose: repaint the request URL, headers, and body editors with collection-token expansion while preserving the raw templates.
+  // Input: collection hash and active tab hash.
+  // Output: none.
+  function renderResolvedRequestFields(collection, tab) {
+    setResolvedFieldValue('api-request-url', tab.request.url || '', applyVariables(collection, tab.request.url || ''));
+    setResolvedFieldValue('api-request-headers', tab.request.headers_text || '', applyVariables(collection, tab.request.headers_text || ''));
+    setResolvedFieldValue('api-request-body', tab.request.body || '', applyVariables(collection, tab.request.body || ''));
+  }
+
+  // renderTokenFields(collection, tab)
+  // Purpose: render the request-specific token input form above the editor and keep the resolved request fields in sync.
+  // Input: collection hash and active tab hash.
+  // Output: none.
+  function renderTokenFields(collection, tab) {
+    var shell = document.getElementById('api-token-shell');
+    var fields = document.getElementById('api-token-fields');
+    fields.innerHTML = '';
+    if (!collection || !tab) {
+      shell.hidden = true;
+      return;
+    }
+    var names = ensureRequestTokens(collection, tab.request);
+    if (!names.length) {
+      shell.hidden = true;
+      return;
+    }
+    shell.hidden = false;
+    names.forEach(function (name) {
+      var field = document.createElement('div');
+      field.className = 'api-token-field';
+      var label = document.createElement('label');
+      label.textContent = name;
+      label.setAttribute('for', 'api-token-input-' + name.replace(/[^A-Za-z0-9_-]+/g, '-'));
+      var input = document.createElement('input');
+      input.id = 'api-token-input-' + name.replace(/[^A-Za-z0-9_-]+/g, '-');
+      input.type = 'text';
+      input.value = variableMap(collection)[name] || '';
+      input.setAttribute('data-api-token-input', name);
+      input.placeholder = '{{' + name + '}}';
+      input.addEventListener('input', function () {
+        upsertCollectionVariable(collection, name, input.value);
+        document.getElementById('api-request-variables').value = formatVariables(collection.variable || []);
+        renderResolvedRequestFields(collection, activeTab());
+        renderAuthFields(collection, activeTab());
+        saveState();
+      });
+      input.addEventListener('change', function () {
+        upsertCollectionVariable(collection, name, input.value);
+        document.getElementById('api-request-variables').value = formatVariables(collection.variable || []);
+        renderAuthFields(collection, activeTab());
+        persistWorkspace(true);
+      });
+      field.appendChild(label);
+      field.appendChild(input);
+      fields.appendChild(field);
+    });
+  }
+
+  // authSummary(auth)
+  // Purpose: describe the currently selected request-auth mode in human-readable workspace text.
+  // Input: normalized auth hash.
+  // Output: summary string.
+  function authSummary(auth) {
+    var value = normalizeAuthSettings(auth || {});
+    if (value.kind === 'basic') return 'Basic auth will send an Authorization header with the current username and password.';
+    if (value.kind === 'api-token') return 'API Token auth will send an Authorization header with the current token value.';
+    if (value.kind === 'api-key') return 'API Key auth will send the current key in a header or query string, depending on the selected target.';
+    if (value.kind === 'oauth2') return 'OAuth2 auth stores a manual access token and optional client metadata for the current request.';
+    if (value.kind === 'apple-login' || value.kind === 'amazon-login' || value.kind === 'facebook-login' || value.kind === 'microsoft-login') {
+      return value.kind.replace(/-/g, ' ').replace(/\b\w/g, function (chr) { return chr.toUpperCase(); }) + ' uses the OAuth2 fields below with provider defaults.';
+    }
+    return 'No request credentials configured.';
+  }
+
+  // renderAuthFields(collection, tab)
+  // Purpose: render the hide/show request-auth editor and keep provider-specific fields aligned with the active request.
+  // Input: collection hash and active tab hash.
+  // Output: none.
+  function renderAuthFields(collection, tab) {
+    var toggle = document.getElementById('api-auth-toggle');
+    var shell = document.getElementById('api-auth-fields');
+    var summary = document.getElementById('api-auth-summary');
+    if (!tab) {
+      shell.hidden = true;
+      toggle.textContent = 'Show Credentials';
+      toggle.setAttribute('aria-expanded', 'false');
+      summary.textContent = 'No request credentials configured.';
+      return;
+    }
+    var auth = normalizeAuthSettings(tab.request.auth || {});
+    tab.request.auth = auth;
+    shell.hidden = !auth.open;
+    toggle.textContent = auth.open ? 'Hide Credentials' : 'Show Credentials';
+    toggle.setAttribute('aria-expanded', auth.open ? 'true' : 'false');
+    document.getElementById('api-auth-kind').value = auth.kind;
+    setResolvedFieldValue('api-auth-basic-username', auth.username, applyVariables(collection, auth.username));
+    setResolvedFieldValue('api-auth-basic-password', auth.password, applyVariables(collection, auth.password));
+    setResolvedFieldValue('api-auth-token', auth.token, applyVariables(collection, auth.token));
+    setResolvedFieldValue('api-auth-api-key-name', auth.key, applyVariables(collection, auth.key));
+    setResolvedFieldValue('api-auth-api-key-value', auth.value, applyVariables(collection, auth.value));
+    document.getElementById('api-auth-api-key-in').value = auth.in || 'header';
+    setResolvedFieldValue('api-auth-oauth-access-token', auth.access_token, applyVariables(collection, auth.access_token));
+    setResolvedFieldValue('api-auth-oauth-token-type', auth.token_type, applyVariables(collection, auth.token_type));
+    document.getElementById('api-auth-oauth-add-to').value = auth.add_to || 'header';
+    setResolvedFieldValue('api-auth-oauth-client-id', auth.client_id, applyVariables(collection, auth.client_id));
+    setResolvedFieldValue('api-auth-oauth-client-secret', auth.client_secret, applyVariables(collection, auth.client_secret));
+    setResolvedFieldValue('api-auth-oauth-scope', auth.scope, applyVariables(collection, auth.scope));
+    setResolvedFieldValue('api-auth-oauth-audience', auth.audience, applyVariables(collection, auth.audience));
+    setResolvedFieldValue('api-auth-oauth-authorize-url', auth.authorize_url, applyVariables(collection, auth.authorize_url));
+    setResolvedFieldValue('api-auth-oauth-token-url', auth.access_token_url, applyVariables(collection, auth.access_token_url));
+    summary.textContent = authSummary(auth);
+    Array.prototype.slice.call(document.querySelectorAll('[data-api-auth-group]')).forEach(function (node) {
+      var kinds = String(node.getAttribute('data-api-auth-group') || '').split(/\s+/);
+      node.hidden = kinds.indexOf(auth.kind) === -1;
+    });
+  }
+
+  // responseChip(text, isError)
+  // Purpose: build a response metadata badge.
+  // Input: label text and boolean error flag.
+  // Output: span element.
+  function responseChip(text, isError) {
+    var span = document.createElement('span');
+    span.className = 'api-chip' + (isError ? ' is-error' : '');
+    span.textContent = text;
+    return span;
+  }
+
+  // currentRoute()
+  // Purpose: capture the current browser-restorable workspace location.
+  // Input: none.
+  // Output: route hash with collection, request, and tab ids.
+  function currentRoute() {
+    var tab = activeTab();
+    return {
+      collection: state.selected_collection_id || (tab && tab.collection_id) || '',
+      request: state.selected_request_id || (tab && tab.request_id) || '',
+      tab: state.active_tab_id || ''
+    };
+  }
+
+  // routeQuery(route)
+  // Purpose: serialize a workspace location into URL query parameters.
+  // Input: route hash.
+  // Output: query string without leading question mark.
+  function routeQuery(route) {
+    var params = new window.URLSearchParams();
+    if (route.collection) params.set('collection', route.collection);
+    if (route.request) params.set('request', route.request);
+    if (route.tab) params.set('tab', route.tab);
+    return params.toString();
+  }
+
+  // readRoute()
+  // Purpose: parse the current browser URL into a workspace location.
+  // Input: none.
+  // Output: route hash.
+  function readRoute() {
+    var params = new window.URLSearchParams(window.location.search || '');
+    return {
+      collection: params.get('collection') || '',
+      request: params.get('request') || '',
+      tab: params.get('tab') || ''
+    };
+  }
+
+  // syncRoute(replaceRoute)
+  // Purpose: keep browser history aligned with the active workspace selection.
+  // Input: boolean replace flag.
+  // Output: none.
+  function syncRoute(replaceRoute) {
+    if (!window.history || !window.URLSearchParams) return;
+    var query = routeQuery(currentRoute());
+    var target = window.location.pathname + (query ? '?' + query : '');
+    var current = window.location.pathname + window.location.search;
+    if (target === current) return;
+    if (replaceRoute) {
+      window.history.replaceState(currentRoute(), '', target);
+      return;
+    }
+    window.history.pushState(currentRoute(), '', target);
+  }
+
+  // applyRoute(route, options)
+  // Purpose: restore workspace selection from a direct URL or browser navigation event.
+  // Input: route hash and options hash.
+  // Output: none.
+  function applyRoute(route, options) {
+    options = options || {};
+    if (route.collection && findCollection(route.collection)) {
+      state.selected_collection_id = route.collection;
+    }
+    if (route.tab) {
+      var existingTab = findTab(route.tab);
+      if (existingTab) {
+        state.active_tab_id = existingTab.id;
+        state.selected_collection_id = existingTab.collection_id || state.selected_collection_id;
+        state.selected_request_id = existingTab.request_id || route.request || '';
+        return;
+      }
+    }
+    if (route.request) {
+      var found = findRequestAcrossCollections(route.request);
+      if (found) {
+        state.selected_collection_id = found.collection.id;
+        state.selected_request_id = found.node.id;
+        var existingRequestTab = findTabForRequest(found.collection.id, found.node.id);
+        if (existingRequestTab) {
+          state.active_tab_id = existingRequestTab.id;
+        } else if (options.allow_open !== false) {
+          var opened = tabFromRequest(found.node, found.collection.id);
+          state.tabs.push(opened);
+          state.active_tab_id = opened.id;
+        }
+        return;
+      }
+    }
+    if (!state.selected_request_id && route.collection) {
+      state.selected_request_id = '';
+    }
+  }
+
+  // persistWorkspace(replaceRoute)
+  // Purpose: persist local state and synchronize the URL for browser navigation.
+  // Input: boolean replace flag.
+  // Output: none.
+  function persistWorkspace(replaceRoute) {
+    saveState();
+    syncRoute(!!replaceRoute);
+  }
+
+  // renderPreview(payload)
+  // Purpose: render browser previews for previewable media responses.
+  // Input: normalized response payload.
+  // Output: none.
+  function renderPreview(payload) {
+    var preview = document.getElementById('api-response-preview');
+    preview.className = 'api-response-preview';
+    preview.innerHTML = '';
+    if (!payload || !payload.ok || payload.response.body_mode !== 'preview' || !payload.response.preview_url) {
+      return;
+    }
+    var mediaType = payload.response.preview_media_type || '';
+    var node;
+    if (/^image\/(?!tiff?)/i.test(mediaType)) {
+      node = document.createElement('img');
+      node.src = payload.response.preview_url;
+      node.alt = 'API response preview';
+    } else if (/pdf/i.test(mediaType)) {
+      node = document.createElement('iframe');
+      node.src = payload.response.preview_url;
+      node.title = 'PDF response preview';
+    } else {
+      node = document.createElement('object');
+      node.data = payload.response.preview_url;
+      node.type = mediaType || 'application/octet-stream';
+    }
+    preview.appendChild(node);
+    preview.className += ' is-visible';
+  }
+
+  // renderResponse(payload)
+  // Purpose: render request and response details for the active tab.
+  // Input: normalized response payload or null.
+  // Output: none.
+  function renderResponse(payload) {
+    var meta = document.getElementById('api-response-meta');
+    var preview = document.getElementById('api-response-preview');
+    var body = document.getElementById('api-response-body');
+    var headers = document.getElementById('api-response-headers');
+    var request = document.getElementById('api-request-details');
+    var requestPayload = payload && payload.request || {};
+    var responsePayload = payload && payload.response || {};
+    meta.innerHTML = '';
+    preview.className = 'api-response-preview';
+    preview.innerHTML = '';
+    if (!payload) {
+      body.textContent = 'Ready.';
+      headers.textContent = 'Ready.';
+      request.textContent = 'Ready.';
+      return;
+    }
+    request.textContent = [
+      'Method: ' + (requestPayload.method || ''),
+      'URL: ' + (requestPayload.url || ''),
+      'Timeout: ' + (requestPayload.timeout_s || 120) + 's',
+      'Follow Redirects: ' + (requestPayload.follow_redirects === false ? 'No' : 'Yes'),
+      'Allow Insecure TLS: ' + (requestPayload.insecure_tls ? 'Yes' : 'No'),
+      '',
+      'Headers:',
+      requestPayload.headers_text || '(none)',
+      '',
+      'Body:',
+      requestPayload.body || '(empty)'
+    ].join('\n');
+    if (!payload.ok) {
+      meta.appendChild(responseChip('Request failed', true));
+      body.textContent = payload.error || 'Request failed.';
+      headers.textContent = '';
+      return;
+    }
+    meta.appendChild(responseChip('HTTP ' + responsePayload.status));
+    meta.appendChild(responseChip((responsePayload.elapsed_ms || 0) + 'ms'));
+    meta.appendChild(responseChip(responsePayload.content_type || 'unknown content type'));
+    meta.appendChild(responseChip((responsePayload.body_size_bytes || 0) + ' bytes'));
+    if (responsePayload.body_mode === 'preview') {
+      body.textContent = 'Preview rendered below.';
+      renderPreview(payload);
+    } else {
+      body.textContent = responsePayload.body || '';
+    }
+    headers.textContent = (responsePayload.headers || []).map(function (entry) {
+      return entry.key + ': ' + entry.value;
+    }).join('\n');
+  }
+
+  // currentLocationText()
+  // Purpose: build a human-readable breadcrumb for the left panel.
+  // Input: none.
+  // Output: string.
+  function currentLocationText() {
+    var collection = findCollection(state.selected_collection_id);
+    var tab = activeTab();
+    var parts = ['Current Location:'];
+    if (collection) parts.push(collection.name);
+    if (state.selected_request_id) {
+      var found = findRequestAcrossCollections(state.selected_request_id);
+      if (found) parts.push(found.node.name);
+    } else if (tab && tab.title) {
+      parts.push(tab.title);
+    } else {
+      parts.push('Workspace root');
+    }
+    return parts.join(' / ');
+  }
+
+  // renderNodeList(collectionId, items)
+  // Purpose: render one nested collection tree branch.
+  // Input: collection id and item array.
+  // Output: ul element.
+  function renderNodeList(collectionId, items) {
+    var list = document.createElement('ul');
+    list.className = 'api-node-list';
+    if (!items.length) {
+      var empty = document.createElement('li');
+      empty.className = 'api-empty';
+      empty.textContent = 'No requests saved in this collection yet.';
+      list.appendChild(empty);
+      return list;
+    }
+    items.forEach(function (item) {
+      var li = document.createElement('li');
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'api-node-button' + (item.kind === 'folder' ? ' api-node-folder' : '');
+      if (item.kind === 'request' && item.id === state.selected_request_id) button.className += ' is-active';
+      button.textContent = item.kind === 'folder' ? 'Folder: ' + item.name : item.name;
+      button.addEventListener('click', function () {
+        state.selected_collection_id = collectionId;
+        if (item.kind !== 'folder') {
+          state.selected_request_id = item.id;
+          openNodeInTab(collectionId, item.id);
+          return;
+        }
+        persistWorkspace(false);
+        renderAll();
+      });
+      li.appendChild(button);
+      if (item.kind === 'folder') li.appendChild(renderNodeList(collectionId, item.item || []));
+      list.appendChild(li);
+    });
+    return list;
+  }
+
+  // renderCollections()
+  // Purpose: render the collection sidebar and location breadcrumb.
+  // Input: none.
+  // Output: none.
+  function renderCollections() {
+    var tree = document.getElementById('api-collection-tree');
+    tree.innerHTML = '';
+    document.getElementById('api-collection-location').textContent = currentLocationText();
+    var activeCollection = findCollection(state.selected_collection_id) || state.collections[0];
+    if (!activeCollection) return;
+
+    var tabList = document.createElement('div');
+    tabList.className = 'api-collection-tabs';
+    tabList.setAttribute('role', 'tablist');
+    tabList.setAttribute('aria-label', 'Stored Collections');
+
+    state.collections.forEach(function (collection) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'api-collection-tab';
+      button.textContent = collection.name;
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', collection.id === activeCollection.id ? 'true' : 'false');
+      button.setAttribute('aria-controls', 'api-collection-panel');
+      button.addEventListener('click', function () {
+        state.selected_collection_id = collection.id;
+        state.selected_request_id = '';
+        persistWorkspace(false);
+        renderAll();
+      });
+      tabList.appendChild(button);
+    });
+    tree.appendChild(tabList);
+
+    var card = document.createElement('section');
+    card.className = 'api-collection-card is-active';
+    card.id = 'api-collection-panel';
+    card.setAttribute('role', 'tabpanel');
+    card.setAttribute('data-api-collection-panel', activeCollection.name);
+    var title = document.createElement('h3');
+    title.textContent = activeCollection.name;
+    card.appendChild(title);
+    if (activeCollection.description) {
+      var note = document.createElement('p');
+      note.textContent = activeCollection.description;
+      note.style.color = '#6a767b';
+      note.style.margin = '0 0 10px';
+      card.appendChild(note);
+    }
+    card.appendChild(renderNodeList(activeCollection.id, activeCollection.item || []));
+    tree.appendChild(card);
+  }
+
+  // renderShellTabs()
+  // Purpose: toggle the top-level Collections and Workspace tab panels.
+  // Input: none.
+  // Output: none.
+  function renderShellTabs() {
+    ['collections', 'workspace'].forEach(function (name) {
+      var button = document.getElementById('api-shell-tab-' + name);
+      var panel = document.getElementById('api-shell-panel-' + name);
+      var selected = state.active_shell_tab === name;
+      button.setAttribute('aria-selected', selected ? 'true' : 'false');
+      panel.hidden = !selected;
+    });
+  }
+
+  // renderTabs()
+  // Purpose: render the open request tabs and keep them browser-addressable.
+  // Input: none.
+  // Output: none.
+  function renderTabs() {
+    var strip = document.getElementById('api-tab-strip');
+    strip.innerHTML = '';
+    state.tabs.forEach(function (tab) {
+      var chip = document.createElement('div');
+      chip.className = 'api-tab' + (tab.id === state.active_tab_id ? ' is-active' : '');
+      chip.addEventListener('click', function () {
+        state.active_tab_id = tab.id;
+        state.selected_collection_id = tab.collection_id || state.selected_collection_id;
+        state.selected_request_id = tab.request_id || '';
+        persistWorkspace(false);
+        renderAll();
+      });
+      var label = document.createElement('span');
+      label.textContent = tab.title || 'Untitled Tab';
+      chip.appendChild(label);
+      var close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'api-tab-close';
+      close.textContent = 'x';
+      close.addEventListener('click', function (event) {
+        event.stopPropagation();
+        closeTab(tab.id);
+      });
+      chip.appendChild(close);
+      strip.appendChild(chip);
+    });
+  }
+
+  // renderEditor()
+  // Purpose: populate the editor form and response area from the active tab.
+  // Input: none.
+  // Output: none.
+  function renderEditor() {
+    ensureActiveTab();
+    var tab = activeTab();
+    if (!tab) {
+      document.getElementById('api-token-shell').hidden = true;
+      renderAuthFields(null, null);
+      renderResponse(null);
+      return;
+    }
+    var collection = findCollection(tab.collection_id || state.selected_collection_id) || findCollection(state.selected_collection_id);
+    document.getElementById('api-request-name').value = tab.request.name || tab.title || '';
+    document.getElementById('api-request-method').value = tab.request.method || 'GET';
+    renderResolvedRequestFields(collection, tab);
+    document.getElementById('api-request-description').value = tab.request.description || '';
+    document.getElementById('api-timeout').value = tab.request.timeout_s || 120;
+    document.getElementById('api-follow-redirects').checked = tab.request.follow_redirects !== false;
+    document.getElementById('api-insecure-tls').checked = !!tab.request.insecure_tls;
+    document.getElementById('api-request-variables').value = formatVariables(collection ? collection.variable : []);
+    document.getElementById('api-collection-name').value = collection ? collection.name : '';
+    renderTokenFields(collection, tab);
+    renderAuthFields(collection, tab);
+    renderResponse(tab.response || null);
+  }
+
+  // renderResponseTabs()
+  // Purpose: toggle the inner request/response tab panels.
+  // Input: none.
+  // Output: none.
+  function renderResponseTabs() {
+    ['request', 'body', 'headers'].forEach(function (name) {
+      var button = document.getElementById('api-response-tab-' + name);
+      var panel = document.getElementById('api-response-panel-' + name);
+      var selected = state.active_response_tab === name;
+      button.setAttribute('aria-selected', selected ? 'true' : 'false');
+      panel.hidden = !selected;
+    });
+  }
+
+  // syncActiveTabFromForm()
+  // Purpose: copy the current form values back into the active tab state.
+  // Input: none.
+  // Output: none.
+  function syncActiveTabFromForm() {
+    var tab = activeTab();
+    if (!tab) return;
+    var collection = findCollection(state.selected_collection_id) || findCollection(tab.collection_id) || null;
+    tab.request.name = document.getElementById('api-request-name').value.trim() || 'New Request';
+    tab.request.method = document.getElementById('api-request-method').value;
+    tab.request.url = readResolvedFieldValue('api-request-url', collection).trim();
+    tab.request.headers_text = readResolvedFieldValue('api-request-headers', collection);
+    tab.request.body = readResolvedFieldValue('api-request-body', collection);
+    tab.request.description = document.getElementById('api-request-description').value;
+    tab.request.timeout_s = parseInt(document.getElementById('api-timeout').value || '120', 10) || 120;
+    tab.request.follow_redirects = document.getElementById('api-follow-redirects').checked;
+    tab.request.insecure_tls = document.getElementById('api-insecure-tls').checked;
+    tab.request.auth = normalizeAuthSettings({
+      kind: document.getElementById('api-auth-kind').value,
+      open: !document.getElementById('api-auth-fields').hidden,
+      username: readResolvedFieldValue('api-auth-basic-username', collection),
+      password: readResolvedFieldValue('api-auth-basic-password', collection),
+      token: readResolvedFieldValue('api-auth-token', collection),
+      key: readResolvedFieldValue('api-auth-api-key-name', collection),
+      value: readResolvedFieldValue('api-auth-api-key-value', collection),
+      in: document.getElementById('api-auth-api-key-in').value,
+      access_token: readResolvedFieldValue('api-auth-oauth-access-token', collection),
+      token_type: readResolvedFieldValue('api-auth-oauth-token-type', collection),
+      add_to: document.getElementById('api-auth-oauth-add-to').value,
+      client_id: readResolvedFieldValue('api-auth-oauth-client-id', collection),
+      client_secret: readResolvedFieldValue('api-auth-oauth-client-secret', collection),
+      scope: readResolvedFieldValue('api-auth-oauth-scope', collection),
+      audience: readResolvedFieldValue('api-auth-oauth-audience', collection),
+      authorize_url: readResolvedFieldValue('api-auth-oauth-authorize-url', collection),
+      access_token_url: readResolvedFieldValue('api-auth-oauth-token-url', collection),
+      provider: authDefaultsForKind(document.getElementById('api-auth-kind').value).provider || ''
+    });
+    tab.title = tab.request.name;
+    if (collection) {
+      collection.variable = parseVariablesText(document.getElementById('api-request-variables').value);
+      ensureRequestTokens(collection, tab.request);
+      if (!tab.collection_id) tab.collection_id = collection.id;
+    }
+    saveState();
+    renderTabs();
+  }
+
+  // closeTab(tabId)
+  // Purpose: close one request tab and keep selection valid.
+  // Input: tab id string.
+  // Output: none.
+  function closeTab(tabId) {
+    state.tabs = state.tabs.filter(function (tab) { return tab.id !== tabId; });
+    if (!state.tabs.length) state.tabs.push(tabFromRequest(findFirstRequest(state.collections[0]), state.collections[0].id));
+    ensureActiveTab();
+    var tab = activeTab();
+    state.selected_collection_id = (tab && tab.collection_id) || state.selected_collection_id;
+    state.selected_request_id = (tab && tab.request_id) || '';
+    persistWorkspace(true);
+    renderAll();
+  }
+
+  // openNodeInTab(collectionId, nodeId)
+  // Purpose: open or focus a saved request from the collection tree.
+  // Input: collection id and request id strings.
+  // Output: none.
+  function openNodeInTab(collectionId, nodeId) {
+    var collection = findCollection(collectionId);
+    if (!collection) return;
+    var node = findNode(collection.item || [], nodeId);
+    if (!node || node.kind !== 'request') return;
+    setShellTab('workspace');
+    state.selected_collection_id = collectionId;
+    state.selected_request_id = node.id;
+    var existing = findTabForRequest(collectionId, nodeId);
+    if (existing) {
+      state.active_tab_id = existing.id;
+    } else {
+      state.tabs.push(tabFromRequest(node, collectionId));
+      state.active_tab_id = state.tabs[state.tabs.length - 1].id;
+    }
+    persistWorkspace(false);
+    renderAll();
+  }
+
+  // createBlankTab()
+  // Purpose: open a new unsaved request tab.
+  // Input: none.
+  // Output: none.
+  function createBlankTab() {
+    var collection = findCollection(state.selected_collection_id) || state.collections[0];
+    setShellTab('workspace');
+    state.tabs.push({
+      id: uid('tab'),
+      title: 'New Tab',
+      collection_id: collection ? collection.id : '',
+      request_id: '',
+      request: defaultRequest('New Request'),
+      response: null
+    });
+    state.active_tab_id = state.tabs[state.tabs.length - 1].id;
+    state.selected_request_id = '';
+    persistWorkspace(false);
+    renderAll();
+  }
+
+  // duplicateActiveTab()
+  // Purpose: clone the active request into a new tab.
+  // Input: none.
+  // Output: none.
+  function duplicateActiveTab() {
+    var tab = activeTab();
+    if (!tab) return;
+    setShellTab('workspace');
+    var copy = clone(tab);
+    copy.id = uid('tab');
+    copy.title = (copy.title || 'Request') + ' Copy';
+    copy.request.name = copy.title;
+    copy.request_id = '';
+    state.tabs.push(copy);
+    state.active_tab_id = copy.id;
+    state.selected_request_id = '';
+    persistWorkspace(false);
+    renderAll();
+  }
+
+  // saveRequestToCollection()
+  // Purpose: save or update the active request inside the selected collection.
+  // Input: none.
+  // Output: none.
+  function saveRequestToCollection() {
+    syncActiveTabFromForm();
+    setShellTab('workspace');
+    var tab = activeTab();
+    var collection = findCollection(state.selected_collection_id) || findCollection(tab.collection_id) || state.collections[0];
+    if (!collection) return;
+    state.selected_collection_id = collection.id;
+    tab.collection_id = collection.id;
+    if (tab.request_id) {
+      var existing = findNode(collection.item || [], tab.request_id);
+      if (existing && existing.kind === 'request') {
+        existing.name = tab.request.name;
+        existing.request = clone(tab.request);
+        state.selected_request_id = existing.id;
+        persistWorkspace(true);
+        renderAll();
+        persistCollectionToServer(collection, {
+          successMessage: 'Updated request "' + existing.name + '" in ' + collection.name + '.',
+          failureMessage: 'Unable to save the updated request to ' + collection.name + '.'
+        });
+        return;
+      }
+    }
+    var node = {
+      id: uid('request'),
+      kind: 'request',
+      name: tab.request.name,
+      request: clone(tab.request)
+    };
+    collection.item.push(node);
+    tab.request_id = node.id;
+    state.selected_request_id = node.id;
+    persistWorkspace(true);
+    renderAll();
+    persistCollectionToServer(collection, {
+      successMessage: 'Saved request "' + node.name + '" to ' + collection.name + '.',
+      failureMessage: 'Unable to save the request to ' + collection.name + '.'
+    });
+  }
+
+  // createCollection()
+  // Purpose: add a new empty collection to the workspace.
+  // Input: none.
+  // Output: none.
+  function createCollection() {
+    var name = window.prompt('Collection name', 'New Collection');
+    if (!name) return;
+    name = String(name || '').trim();
+    if (!name) return;
+    if (collectionNameExists(name)) {
+      showBanner('A collection named "' + name + '" already exists.', true);
+      return;
+    }
+    var collection = {
+      id: uid('collection'),
+      name: name,
+      description: '',
+      variable: [],
+      item: []
+    };
+    setShellTab('collections');
+    state.collections.push(collection);
+    state.selected_collection_id = state.collections[state.collections.length - 1].id;
+    state.selected_request_id = '';
+    persistWorkspace(false);
+    renderAll();
+    persistCollectionToServer(collection, {
+      successMessage: 'Created collection "' + name + '".',
+      failureMessage: 'Unable to create collection "' + name + '".'
+    });
+  }
+
+  // renameSelectedCollection()
+  // Purpose: rename the active collection.
+  // Input: none.
+  // Output: none.
+  function renameSelectedCollection() {
+    var collection = findCollection(state.selected_collection_id) || state.collections[0];
+    if (!collection) return;
+    var name = window.prompt('Rename collection', collection.name);
+    if (!name) return;
+    name = String(name || '').trim();
+    if (!name) return;
+    if (collectionNameExists(name, collection.id)) {
+      showBanner('A collection named "' + name + '" already exists.', true);
+      return;
+    }
+    var originalName = collection.name;
+    setShellTab('collections');
+    collection.name = name;
+    persistWorkspace(true);
+    renderAll();
+    persistCollectionToServer(collection, {
+      original_name: originalName,
+      successMessage: 'Renamed collection to "' + name + '".',
+      failureMessage: 'Unable to rename collection "' + originalName + '".'
+    });
+  }
+
+  // deleteSelectedCollection()
+  // Purpose: remove the active collection and any tabs that depend on it.
+  // Input: none.
+  // Output: none.
+  function deleteSelectedCollection() {
+    var collection = findCollection(state.selected_collection_id) || state.collections[0];
+    if (!collection) return;
+    if (!window.confirm('Delete collection "' + collection.name + '"?')) return;
+    var deletedName = collection.name;
+    setShellTab('collections');
+    state.collections = state.collections.filter(function (item) {
+      return item.id !== collection.id;
+    });
+    state.tabs = state.tabs.filter(function (tab) {
+      return tab.collection_id !== collection.id;
+    });
+    if (!state.collections.length) state.collections = [scratchCollection()];
+    if (!state.tabs.length) state.tabs = [tabFromRequest(findFirstRequest(state.collections[0]), state.collections[0].id)];
+    state.selected_collection_id = state.collections[0].id;
+    state.selected_request_id = '';
+    ensureActiveTab();
+    persistWorkspace(false);
+    renderAll();
+    deleteCollectionFromServer(deletedName, {
+      successMessage: 'Deleted collection "' + deletedName + '".',
+      failureMessage: 'Unable to delete collection "' + deletedName + '".'
+    });
+  }
+
+  // removeNode(items, nodeId)
+  // Purpose: delete one request node from a nested collection tree.
+  // Input: item array and node id string.
+  // Output: boolean success flag.
+  function removeNode(items, nodeId) {
+    var i;
+    for (i = 0; i < (items || []).length; i++) {
+      var item = items[i];
+      if (item.id === nodeId) {
+        items.splice(i, 1);
+        return true;
+      }
+      if (item.kind === 'folder' && removeNode(item.item || [], nodeId)) return true;
+    }
+    return false;
+  }
+
+  // deleteSavedRequest()
+  // Purpose: remove the active saved request from its collection tree.
+  // Input: none.
+  // Output: none.
+  function deleteSavedRequest() {
+    var tab = activeTab();
+    if (!tab || !tab.request_id) {
+      showBanner('The active tab is not linked to a saved request.', true);
+      return;
+    }
+    var collection = findCollection(tab.collection_id || state.selected_collection_id);
+    if (!collection) return;
+    if (!window.confirm('Delete saved request "' + (tab.request.name || tab.title) + '"?')) return;
+    if (!removeNode(collection.item || [], tab.request_id)) {
+      showBanner('Unable to delete the selected request from the collection tree.', true);
+      return;
+    }
+    tab.request_id = '';
+    state.selected_request_id = '';
+    persistWorkspace(true);
+    renderAll();
+    persistCollectionToServer(collection, {
+      successMessage: 'Deleted the saved request from ' + collection.name + '.',
+      failureMessage: 'Unable to update ' + collection.name + ' after deleting the request.'
+    });
+  }
+
+  // importRequest(request)
+  // Purpose: convert a Postman request object into the local request model.
+  // Input: Postman request hash.
+  // Output: local request hash.
+  function importRequest(request) {
+    var url = '';
+    if (request && request.url) {
+      url = typeof request.url === 'string' ? request.url : (request.url.raw || '');
+    }
+    return {
+      method: request && request.method ? String(request.method).toUpperCase() : 'GET',
+      url: url,
+      headers_text: (request && Array.isArray(request.header) ? request.header : []).map(function (header) {
+        return (header.key || '') + ': ' + (header.value || '');
+      }).join('\n'),
+      body: request && request.body && typeof request.body.raw === 'string' ? request.body.raw : '',
+      description: request && request.description ? String(request.description) : '',
+      timeout_s: 120,
+      insecure_tls: false,
+      follow_redirects: true,
+      name: request && request.name ? request.name : 'Request',
+      auth: importAuthSettings(request && request.auth)
+    };
+  }
+
+  // importPostmanNode(node)
+  // Purpose: convert one imported Postman tree node into local state.
+  // Input: Postman node hash.
+  // Output: local node hash or null.
+  function importPostmanNode(node) {
+    if (!node || typeof node !== 'object') return null;
+    if (Array.isArray(node.item)) {
+      return {
+        id: uid('folder'),
+        kind: 'folder',
+        name: node.name || 'Folder',
+        item: node.item.map(importPostmanNode).filter(Boolean)
+      };
+    }
+    var request = importRequest(node.request || node);
+    return {
+      id: uid('request'),
+      kind: 'request',
+      name: node.name || request.name || 'Request',
+      request: request
+    };
+  }
+
+  // importPostmanCollection(payload)
+  // Purpose: validate and normalize an imported Postman collection payload.
+  // Input: parsed JSON payload.
+  // Output: local collection hash.
+  function importPostmanCollection(payload) {
+    var source = payload && payload.collection ? payload.collection : payload;
+    if (!source || typeof source !== 'object') throw new Error('The imported JSON must contain a Postman collection object.');
+    if (!source.info || !source.info.name) throw new Error('The imported collection is missing info.name.');
+    return normalizeCollection({
+      name: source.info.name,
+      description: source.info.description || '',
+      variable: source.variable || [],
+      item: (source.item || []).map(importPostmanNode).filter(Boolean)
+    });
+  }
+
+  // exportAuthSettings(auth)
+  // Purpose: convert bookmark-local auth settings into a valid Postman request.auth payload.
+  // Input: normalized auth hash.
+  // Output: Postman auth hash or undefined when no auth is configured.
+  function exportAuthSettings(auth) {
+    var value = normalizeAuthSettings(auth || {});
+    if (value.kind === 'none') return undefined;
+    if (value.kind === 'basic') {
+      return {
+        type: 'basic',
+        basic: [
+          { key: 'username', value: value.username || '', type: 'string' },
+          { key: 'password', value: value.password || '', type: 'string' }
+        ]
+      };
+    }
+    if (value.kind === 'api-token') {
+      return {
+        type: 'bearer',
+        bearer: [
+          { key: 'token', value: value.token || '', type: 'string' }
+        ]
+      };
+    }
+    if (value.kind === 'api-key') {
+      return {
+        type: 'apikey',
+        apikey: [
+          { key: 'key', value: value.key || '', type: 'string' },
+          { key: 'value', value: value.value || '', type: 'string' },
+          { key: 'in', value: value.in || 'header', type: 'string' }
+        ]
+      };
+    }
+    var oauth = [
+      { key: 'accessToken', value: value.access_token || '', type: 'string' },
+      { key: 'tokenType', value: value.token_type || 'Bearer', type: 'string' },
+      { key: 'addTokenTo', value: value.add_to || 'header', type: 'string' }
+    ];
+    if (value.provider) oauth.push({ key: 'provider', value: value.provider, type: 'string' });
+    if (value.client_id) oauth.push({ key: 'clientId', value: value.client_id, type: 'string' });
+    if (value.client_secret) oauth.push({ key: 'clientSecret', value: value.client_secret, type: 'string' });
+    if (value.scope) oauth.push({ key: 'scope', value: value.scope, type: 'string' });
+    if (value.audience) oauth.push({ key: 'audience', value: value.audience, type: 'string' });
+    if (value.authorize_url) oauth.push({ key: 'authUrl', value: value.authorize_url, type: 'string' });
+    if (value.access_token_url) oauth.push({ key: 'accessTokenUrl', value: value.access_token_url, type: 'string' });
+    return {
+      type: 'oauth2',
+      oauth2: oauth
+    };
+  }
+
+  // resolveAuthSettings(auth, collection)
+  // Purpose: apply collection token expansion to the active request-auth settings before request dispatch.
+  // Input: normalized auth hash and collection hash.
+  // Output: resolved auth hash.
+  function resolveAuthSettings(auth, collection) {
+    var value = normalizeAuthSettings(auth || {});
+    Object.keys(value).forEach(function (key) {
+      if (key === 'open' || key === 'kind') return;
+      if (typeof value[key] === 'string') value[key] = applyVariables(collection, value[key]);
+    });
+    value.type = authTypeForKind(value.kind);
+    return value;
+  }
+
+  // exportPostmanNode(node)
+  // Purpose: convert one local node back into Postman-compatible JSON.
+  // Input: local node hash.
+  // Output: Postman node hash.
+  function exportPostmanNode(node) {
+    if (node.kind === 'folder') {
+      return {
+        name: node.name,
+        item: (node.item || []).map(exportPostmanNode)
+      };
+    }
+    var auth = exportAuthSettings(node.request.auth);
+    return {
+      name: node.name,
+      request: {
+        method: node.request.method || 'GET',
+        header: String(node.request.headers_text || '').split(/\n/).map(function (line) {
+          var trimmed = line.trim();
+          if (!trimmed) return null;
+          var pos = trimmed.indexOf(':');
+          if (pos < 1) return null;
+          return {
+            key: trimmed.slice(0, pos).trim(),
+            value: trimmed.slice(pos + 1).trim()
+          };
+        }).filter(Boolean),
+        body: node.request.body ? { mode: 'raw', raw: node.request.body } : undefined,
+        url: { raw: node.request.url || '' },
+        description: node.request.description || '',
+        auth: auth
+      }
+    };
+  }
+
+  // exportPostmanCollection(collection)
+  // Purpose: convert one local collection back into Postman v2.1 JSON.
+  // Input: local collection hash.
+  // Output: Postman collection hash.
+  function exportPostmanCollection(collection) {
+    return {
+      info: {
+        name: collection.name,
+        description: collection.description || '',
+        schema: POSTMAN_SCHEMA
+      },
+      variable: clone(collection.variable || []),
+      item: (collection.item || []).map(exportPostmanNode)
+    };
+  }
+
+  // importCollectionFile(file, inputElement)
+  // Purpose: read and import a Postman collection file from disk.
+  // Input: browser File object and optional input element for lifecycle cleanup.
+  // Output: none.
+  function importCollectionFile(file, inputElement) {
+    function finishImportPicker() {
+      if (!inputElement) return;
+      inputElement.value = '';
+      inputElement.dataset.importBusy = '';
+    }
+
+    function handleImportedText(text) {
+      try {
+        var parsed = JSON.parse(text);
+        var collection = importPostmanCollection(parsed);
+        if (collectionNameExists(collection.name)) {
+          showBanner('A collection named "' + collection.name + '" already exists.', true);
+          return;
+        }
+        setShellTab('collections');
+        $.ajax({
+          method: 'POST',
+          url: configs.collections.save,
+          dataType: 'json',
+          data: {
+            collection: JSON.stringify(exportPostmanCollection(collection)),
+            original_name: ''
+          }
+        }).done(function (response) {
+          try {
+            requireAjaxSuccess(response, 'Import failed: the collection save route returned an empty success response.');
+          } catch (error) {
+            showBanner('Import failed: ' + error.message, true);
+            return;
+          }
+          reloadCollectionsFromServer({
+            failureMessage: 'Imported collection "' + collection.name + '" but failed to reload collections.',
+            afterSuccess: function () {
+              var imported = findCollectionByName(collection.name);
+              if (imported) {
+                state.selected_collection_id = imported.id;
+                state.selected_request_id = '';
+                persistWorkspace(true);
+              }
+              showBanner('Imported Postman collection "' + collection.name + '".', false);
+            }
+          });
+        }).fail(function (xhr) {
+          showBanner('Import failed: ' + (xhr.responseText || 'Unable to store imported collection.'), true);
+        });
+      } catch (error) {
+        showBanner('Import failed: ' + error.message, true);
+      } finally {
+        finishImportPicker();
+      }
+    }
+
+    function readCollectionFileText(fileToRead) {
+      return new Promise(function (resolve, reject) {
+        if (!fileToRead) {
+          reject(new Error('No collection file selected.'));
+          return;
+        }
+        if (typeof FileReader === 'function') {
+          try {
+            var reader = new FileReader();
+            reader.onload = function () {
+              resolve(reader.result);
+            };
+            reader.onerror = function () {
+              reject(new Error('Unable to read the selected collection file.'));
+            };
+            reader.readAsText(fileToRead);
+            return;
+          } catch (error) {
+            if (typeof fileToRead.text !== 'function') {
+              reject(error);
+              return;
+            }
+          }
+        }
+        if (typeof fileToRead.text === 'function') {
+          fileToRead.text().then(resolve).catch(function () {
+            reject(new Error('Unable to read the selected collection file.'));
+          });
+          return;
+        }
+        reject(new Error('Unable to read the selected collection file.'));
+      });
+    }
+
+    if (!file) {
+      finishImportPicker();
+      return;
+    }
+    readCollectionFileText(file).then(handleImportedText).catch(function (error) {
+      showBanner('Import failed: ' + (error && error.message ? error.message : 'Unable to read the selected collection file.'), true);
+      finishImportPicker();
+    });
+  }
+
+  // exportCurrentCollection()
+  // Purpose: download the selected collection in Postman-compatible JSON.
+  // Input: none.
+  // Output: none.
+  function exportCurrentCollection() {
+    var collection = findCollection(state.selected_collection_id) || state.collections[0];
+    if (!collection) {
+      showBanner('Choose a collection to export first.', true);
+      return;
+    }
+    setShellTab('collections');
+    var payload = exportPostmanCollection(collection);
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url = window.URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = collection.name.replace(/[^A-Za-z0-9._-]+/g, '-') + '.postman_collection.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+
+  // bootstrapCollectionsFromPayload(payload)
+  // Purpose: normalize collection bootstrap ajax payloads.
+  // Input: bootstrap payload.
+  // Output: normalized collection array.
+  function bootstrapCollectionsFromPayload(payload) {
+    var raw = [];
+    if (Array.isArray(payload)) raw = payload;
+    else if (payload && Array.isArray(payload.collections)) raw = payload.collections;
+    else if (payload && typeof payload === 'object') raw = Object.keys(payload).map(function (key) { return payload[key]; });
+    return raw.map(importPostmanCollection).filter(Boolean);
+  }
+
+  // requireAjaxSuccess(response, fallbackMessage)
+  // Purpose: reject saved Ajax responses that returned HTTP 200 without the expected ok payload.
+  // Input: decoded Ajax response value and a fallback error message string.
+  // Output: the original response when it reports ok, otherwise throws an Error.
+  function requireAjaxSuccess(response, fallbackMessage) {
+    if (response && response.ok) return response;
+    if (response && response.error) throw new Error(response.error);
+    throw new Error(fallbackMessage || 'The request did not report success.');
+  }
+
+  // applyBootstrapCollections(bootstrapCollections)
+  // Purpose: replace the current collection set with the file-backed bootstrap collections while preserving local ids when possible.
+  // Input: normalized collection array.
+  // Output: none.
+  function applyBootstrapCollections(bootstrapCollections) {
+    var previousByName = {};
+    (state.collections || []).forEach(function (collection) {
+      previousByName[collection.name] = collection;
+    });
+    var nextCollections = (bootstrapCollections || []).map(function (collection) {
+      if (previousByName[collection.name]) adoptCollectionIds(previousByName[collection.name], collection);
+      return collection;
+    });
+    if (!nextCollections.length) nextCollections = [scratchCollection()];
+    state.collections = nextCollections;
+    state.tabs = (state.tabs || []).filter(function (tab) {
+      return !!findCollection(tab.collection_id);
+    });
+    if (!state.tabs.length) {
+      state.tabs = [tabFromRequest(findFirstRequest(state.collections[0]), state.collections[0].id)];
+    }
+    ensureActiveTab();
+    if (!findCollection(state.selected_collection_id) && state.collections.length) {
+      state.selected_collection_id = state.collections[0].id;
+    }
+    if (state.selected_request_id && !findRequestAcrossCollections(state.selected_request_id)) {
+      state.selected_request_id = '';
+    }
+    var tab = activeTab();
+    if (tab) {
+      state.selected_collection_id = tab.collection_id || state.selected_collection_id;
+      if (tab.request_id && !findRequestAcrossCollections(tab.request_id)) tab.request_id = '';
+      if (!state.selected_request_id) state.selected_request_id = tab.request_id || '';
+    }
+  }
+
+  // reloadCollectionsFromServer(options)
+  // Purpose: reload all file-backed collections from the runtime ajax bootstrap endpoint and refresh the current workspace state.
+  // Input: optional options hash with failureMessage.
+  // Output: jqXHR-style ajax handle.
+  function reloadCollectionsFromServer(options) {
+    options = options || {};
+    return $.ajax({
+      method: 'GET',
+      url: configs.collections.bootstrap,
+      dataType: 'json'
+    }).done(function (payload) {
+      try {
+        if (!payload || typeof payload !== 'object' || !Array.isArray(payload.collections)) {
+          throw new Error('The collection bootstrap response was not valid JSON.');
+        }
+        applyBootstrapCollections(bootstrapCollectionsFromPayload(payload));
+        applyRoute(readRoute(), { allow_open: true });
+        if (typeof options.afterSuccess === 'function') options.afterSuccess(payload);
+        persistWorkspace(true);
+      } catch (error) {
+        showBanner('Collection bootstrap failed: ' + error.message, true);
+      }
+      if (payload && payload.errors && payload.errors.length) showBanner(payload.errors.join(' | '), true);
+      renderAll();
+    }).fail(function (xhr) {
+      showBanner(options.failureMessage || ('Collection bootstrap failed: ' + (xhr.responseText || 'unknown error')), true);
+      renderAll();
+    });
+  }
+
+  // persistCollectionToServer(collection, options)
+  // Purpose: write one collection to config/api-dashboard as Postman JSON.
+  // Input: local collection hash and optional options hash with original_name, successMessage, and failureMessage.
+  // Output: jqXHR-style ajax handle.
+  function persistCollectionToServer(collection, options) {
+    options = options || {};
+    return $.ajax({
+      method: 'POST',
+      url: configs.collections.save,
+      dataType: 'json',
+      data: {
+        collection: JSON.stringify(exportPostmanCollection(collection)),
+        original_name: options.original_name || ''
+      }
+    }).done(function (response) {
+      try {
+        requireAjaxSuccess(response, 'Collection save failed: the save route returned an empty success response.');
+        persistWorkspace(true);
+        renderAll();
+        showBanner(options.successMessage || ('Saved collection "' + collection.name + '".'), false);
+      } catch (error) {
+        reloadCollectionsFromServer({
+          failureMessage: options.failureMessage || ('Collection save failed: ' + error.message)
+        });
+      }
+    }).fail(function (xhr) {
+      reloadCollectionsFromServer({
+        failureMessage: options.failureMessage || ('Collection save failed: ' + (xhr.responseText || 'unknown error'))
+      });
+    });
+  }
+
+  // deleteCollectionFromServer(name, options)
+  // Purpose: delete one stored collection file from config/api-dashboard.
+  // Input: collection name string and optional options hash with successMessage and failureMessage.
+  // Output: jqXHR-style ajax handle.
+  function deleteCollectionFromServer(name, options) {
+    options = options || {};
+    return $.ajax({
+      method: 'POST',
+      url: configs.collections.delete,
+      dataType: 'json',
+      data: {
+        name: name
+      }
+    }).done(function (response) {
+      try {
+        requireAjaxSuccess(response, 'Collection delete failed: the delete route returned an empty success response.');
+        persistWorkspace(true);
+        renderAll();
+        showBanner(options.successMessage || ('Deleted collection "' + name + '".'), false);
+      } catch (error) {
+        reloadCollectionsFromServer({
+          failureMessage: options.failureMessage || ('Collection delete failed: ' + error.message)
+        });
+      }
+    }).fail(function (xhr) {
+      reloadCollectionsFromServer({
+        failureMessage: options.failureMessage || ('Collection delete failed: ' + (xhr.responseText || 'unknown error'))
+      });
+    });
+  }
+
+  // sendActiveRequest()
+  // Purpose: dispatch the active request through the saved Ajax LWP sender.
+  // Input: none.
+  // Output: none.
+  function sendActiveRequest() {
+    syncActiveTabFromForm();
+    setShellTab('workspace');
+    setResponseTab('body');
+    var tab = activeTab();
+    var collection = findCollection(state.selected_collection_id) || findCollection(tab.collection_id) || state.collections[0];
+    if (!tab || !tab.request.url) {
+      renderResponse({ ok: false, error: 'Enter a request URL first.' });
+      return;
+    }
+    renderResponse({ ok: false, error: 'Sending request...' });
+    var payload = clone(tab.request);
+    payload.url = applyVariables(collection, payload.url);
+    payload.headers_text = applyVariables(collection, payload.headers_text);
+    payload.body = applyVariables(collection, payload.body);
+    payload.auth = resolveAuthSettings(payload.auth, collection);
+    $.ajax({
+      method: 'POST',
+      url: configs.send.request,
+      dataType: 'json',
+      data: {
+        settings: JSON.stringify(payload)
+      }
+    }).done(function (response) {
+      tab.response = normalizeResponse(response);
+      saveState();
+      renderResponse(tab.response);
+    }).fail(function (xhr) {
+      tab.response = normalizeResponse({ ok: false, error: xhr.responseText || 'Request dispatch failed.' });
+      saveState();
+      renderResponse(tab.response);
+    });
+  }
+
+  // bindForm()
+  // Purpose: attach browser event handlers to the workspace controls.
+  // Input: none.
+  // Output: none.
+  function bindForm() {
+    ['api-request-name', 'api-request-method', 'api-request-url', 'api-request-headers', 'api-request-body', 'api-request-description', 'api-timeout', 'api-follow-redirects', 'api-insecure-tls', 'api-request-variables', 'api-auth-basic-username', 'api-auth-basic-password', 'api-auth-token', 'api-auth-api-key-name', 'api-auth-api-key-value', 'api-auth-api-key-in', 'api-auth-oauth-access-token', 'api-auth-oauth-token-type', 'api-auth-oauth-add-to', 'api-auth-oauth-client-id', 'api-auth-oauth-client-secret', 'api-auth-oauth-scope', 'api-auth-oauth-audience', 'api-auth-oauth-authorize-url', 'api-auth-oauth-token-url'].forEach(function (id) {
+      var element = document.getElementById(id);
+      var eventName = element && element.tagName === 'SELECT' ? 'change' : 'input';
+      if (!element) return;
+      element.addEventListener(eventName, syncActiveTabFromForm);
+      if (eventName !== 'change') element.addEventListener('change', syncActiveTabFromForm);
+    });
+    document.getElementById('api-auth-toggle').addEventListener('click', function () {
+      var tab = activeTab();
+      if (!tab) return;
+      var auth = normalizeAuthSettings(tab.request.auth || {});
+      auth.open = !auth.open;
+      tab.request.auth = auth;
+      saveState();
+      renderEditor();
+    });
+    document.getElementById('api-auth-kind').addEventListener('change', function (event) {
+      var tab = activeTab();
+      if (!tab) return;
+      var auth = normalizeAuthSettings(tab.request.auth || {});
+      auth.kind = event.target.value || 'none';
+      auth.type = authTypeForKind(auth.kind);
+      auth.open = true;
+      var defaults = authDefaultsForKind(auth.kind);
+      Object.keys(defaults).forEach(function (key) {
+        auth[key] = defaults[key];
+      });
+      if (auth.kind === 'none') auth.provider = '';
+      tab.request.auth = auth;
+      saveState();
+      renderEditor();
+    });
+    document.getElementById('api-new-collection').addEventListener('click', createCollection);
+    document.getElementById('api-rename-collection').addEventListener('click', renameSelectedCollection);
+    document.getElementById('api-delete-collection').addEventListener('click', deleteSelectedCollection);
+    document.getElementById('api-new-tab').addEventListener('click', createBlankTab);
+    document.getElementById('api-duplicate-tab').addEventListener('click', duplicateActiveTab);
+    document.getElementById('api-save-request').addEventListener('click', saveRequestToCollection);
+    document.getElementById('api-delete-request').addEventListener('click', deleteSavedRequest);
+    document.getElementById('api-export-collection').addEventListener('click', exportCurrentCollection);
+    document.getElementById('api-send-request').addEventListener('click', sendActiveRequest);
+    document.getElementById('api-clear-response').addEventListener('click', function () {
+      setResponseTab('body');
+      var tab = activeTab();
+      if (tab) tab.response = null;
+      saveState();
+      renderResponse(null);
+      showBanner('', false);
+    });
+    function importFromPicker(event) {
+      if (event.target.dataset.importBusy === '1') return;
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+      event.target.dataset.importBusy = '1';
+      importCollectionFile(file, event.target);
+    }
+    document.getElementById('api-import-file').addEventListener('change', importFromPicker);
+    ['collections', 'workspace'].forEach(function (name) {
+      document.getElementById('api-shell-tab-' + name).addEventListener('click', function () {
+        setShellTab(name);
+        renderShellTabs();
+      });
+    });
+    ['request', 'body', 'headers'].forEach(function (name) {
+      document.getElementById('api-response-tab-' + name).addEventListener('click', function () {
+        setResponseTab(name);
+        renderResponseTabs();
+      });
+    });
+    window.addEventListener('popstate', function () {
+      applyRoute(readRoute(), { allow_open: true });
+      persistWorkspace(true);
+      renderAll();
+    });
+  }
+
+  // renderAll()
+  // Purpose: render the full workspace UI from the current state.
+  // Input: none.
+  // Output: none.
+  function renderAll() {
+    renderShellTabs();
+    renderCollections();
+    renderTabs();
+    renderEditor();
+    renderResponseTabs();
+  }
+
+  $(document).ready(function () {
+    state = loadState();
+    bindForm();
+    applyRoute(readRoute(), { allow_open: true });
+    persistWorkspace(true);
+    renderAll();
+    reloadCollectionsFromServer();
+  });
+}());
+</script>
+:--------------------------------------------------------------------------------:
+CODE1: Ajax jvar => 'configs.collections.bootstrap', type => 'json', file => 'api-dashboard-bootstrap', code => q{
+  BEGIN {
+    my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
+    if ( $ajax_file ne '' ) {
+      require File::Basename;
+      require File::Spec;
+      require lib;
+      my $root = File::Basename::dirname($ajax_file);
+      $root = File::Basename::dirname($root) for 1 .. 4;
+      my $candidate = File::Spec->catdir( $root, 'lib' );
+      lib->import($candidate) if -d $candidate;
+    }
+  }
+
+  use File::Path qw(make_path);
+  use File::Spec;
+  use Developer::Dashboard::Folder ();
+  use Developer::Dashboard::JSON qw(json_decode json_encode);
+  use Developer::Dashboard::PathRegistry ();
+
+  sub _api_dashboard_collection_root {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'api-dashboard' );
+    make_path( $dir, { mode => 0700 } ) if $dir ne '' && !-d $dir;
+    Developer::Dashboard::PathRegistry->new->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!" if $dir ne '' && -d $dir;
+    return $dir;
+  }
+
+  sub _api_dashboard_collection_name {
+    my ($collection) = @_;
+    die 'Collection info hash is required' if ref( $collection->{info} ) ne 'HASH';
+    my $name = defined $collection->{info}{name} ? $collection->{info}{name} : '';
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection info.name is required' if $name eq '';
+    return $name;
+  }
+
+  sub _api_dashboard_coerce_collection {
+    my ($input) = @_;
+    die 'Collection payload must be a hash reference' if ref($input) ne 'HASH';
+    my $collection = ref( $input->{collection} ) eq 'HASH' ? $input->{collection} : $input;
+    die 'Collection payload must be a hash reference' if ref($collection) ne 'HASH';
+    my $name = _api_dashboard_collection_name($collection);
+    $collection->{info}{name} = $name;
+    $collection->{info}{schema} ||= 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json';
+    $collection->{item} = [] if ref( $collection->{item} ) ne 'ARRAY';
+    $collection->{variable} = [] if ref( $collection->{variable} ) ne 'ARRAY';
+    return $collection;
+  }
+
+  sub _api_dashboard_slurp {
+    my ($file) = @_;
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    local $/;
+    my $raw = <$fh>;
+    close $fh or die "Unable to close $file: $!";
+    return $raw;
+  }
+
+  my $dir = _api_dashboard_collection_root();
+  my @collections;
+  my @errors;
+
+  my $dh;
+  if ( !opendir( $dh, $dir ) ) {
+    print json_encode(
+      {
+        collections => [],
+        errors      => ["Unable to read api-dashboard collection directory $dir: $!"],
+      }
+    );
+    return;
+  }
+
+  for my $entry ( sort readdir $dh ) {
+    next if $entry eq '.' || $entry eq '..';
+    next if $entry !~ /\.json\z/i;
+
+    my $path = File::Spec->catfile( $dir, $entry );
+    next if !-f $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+
+    my $raw = eval { _api_dashboard_slurp($path) };
+    if ($@) {
+      push @errors, $@;
+      next;
+    }
+
+    my $parsed = eval { json_decode($raw) };
+    if ($@) {
+      push @errors, "Unable to parse Postman JSON in $entry";
+      next;
+    }
+
+    my $collection = eval { _api_dashboard_coerce_collection($parsed) };
+    if ($@) {
+      push @errors, "Skipping $entry because it does not contain a Postman collection";
+      next;
+    }
+
+    push @collections, $collection;
+  }
+
+  closedir $dh or push @errors, "Unable to close api-dashboard collection directory $dir: $!";
+
+  print json_encode(
+    {
+      collections => \@collections,
+      errors      => \@errors,
+    }
+  );
+};
+:--------------------------------------------------------------------------------:
+CODE2: Ajax jvar => 'configs.collections.save', type => 'json', file => 'api-dashboard-collections-save', code => q{
+  BEGIN {
+    my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
+    if ( $ajax_file ne '' ) {
+      require File::Basename;
+      require File::Spec;
+      require lib;
+      my $root = File::Basename::dirname($ajax_file);
+      $root = File::Basename::dirname($root) for 1 .. 4;
+      my $candidate = File::Spec->catdir( $root, 'lib' );
+      lib->import($candidate) if -d $candidate;
+    }
+  }
+
+  use File::Basename qw(basename dirname);
+  use File::Path qw(make_path);
+  use File::Spec;
+  use Developer::Dashboard::Folder ();
+  use Developer::Dashboard::JSON qw(json_decode json_encode);
+  use Developer::Dashboard::PathRegistry ();
+
+  sub _api_dashboard_paths {
+    return Developer::Dashboard::PathRegistry->new;
+  }
+
+  sub _api_dashboard_collection_root {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'api-dashboard' );
+    make_path( $dir, { mode => 0700 } ) if $dir ne '' && !-d $dir;
+    _api_dashboard_paths()->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!" if $dir ne '' && -d $dir;
+    return $dir;
+  }
+
+  sub _api_dashboard_collection_name {
+    my ($collection) = @_;
+    die 'Collection info hash is required' if ref( $collection->{info} ) ne 'HASH';
+    my $name = defined $collection->{info}{name} ? $collection->{info}{name} : '';
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection info.name is required' if $name eq '';
+    return $name;
+  }
+
+  sub _api_dashboard_safe_filename {
+    my ($name) = @_;
+    $name = '' if !defined $name;
+    $name =~ s/[\x00-\x1F]+/ /g;
+    $name =~ s{[\\/:*?"<>|]+}{-}g;
+    $name =~ s/\s+/ /g;
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection name is required' if $name eq '' || $name eq '.' || $name eq '..';
+    return $name;
+  }
+
+  sub _api_dashboard_file_for_name {
+    my ($name) = @_;
+    return File::Spec->catfile( _api_dashboard_collection_root(), _api_dashboard_safe_filename($name) . '.json' );
+  }
+
+  sub _api_dashboard_coerce_collection {
+    my ($input) = @_;
+    die 'Collection payload must be a hash reference' if ref($input) ne 'HASH';
+    my $collection = ref( $input->{collection} ) eq 'HASH' ? $input->{collection} : $input;
+    die 'Collection payload must be a hash reference' if ref($collection) ne 'HASH';
+    my $name = _api_dashboard_collection_name($collection);
+    $collection->{info}{name} = $name;
+    $collection->{info}{schema} ||= 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json';
+    $collection->{item} = [] if ref( $collection->{item} ) ne 'ARRAY';
+    $collection->{variable} = [] if ref( $collection->{variable} ) ne 'ARRAY';
+    return $collection;
+  }
+
+  sub _api_dashboard_atomic_write_text {
+    my ( $file, $text ) = @_;
+    my $tmp = "$file.pending";
+    my $dir = dirname($file);
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    _api_dashboard_paths()->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
+    print {$fh} defined $text ? $text : '';
+    close $fh or die "Unable to close $tmp: $!";
+    _api_dashboard_paths()->secure_file_permissions($tmp);
+    chmod 0600, $tmp or die "Unable to chmod $tmp to 0600: $!";
+    unlink $file if -f $file;
+    rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
+    _api_dashboard_paths()->secure_file_permissions($file);
+    chmod 0600, $file or die "Unable to chmod $file to 0600: $!";
+    return $file;
+  }
+
+  my $collection_raw = params->{collection} // '';
+  die "collection payload is required" if $collection_raw eq '';
+  my $collection = json_decode($collection_raw);
+  die "collection payload must be a hash" if ref($collection) ne 'HASH';
+
+  my $stored = _api_dashboard_coerce_collection($collection);
+  my $name = _api_dashboard_collection_name($stored);
+  my $file = _api_dashboard_file_for_name($name);
+  my $original_name = scalar( params->{original_name} // '' );
+  my $original_file = $original_name ne '' ? _api_dashboard_file_for_name($original_name) : '';
+
+  die "Collection '$name' already exists"
+    if $original_name ne '' && -f $file && $original_file ne $file;
+
+  _api_dashboard_atomic_write_text( $file, json_encode($stored) );
+
+  if ( $original_file ne '' && $original_file ne $file && -f $original_file ) {
+    unlink $original_file or die "Unable to remove renamed collection file $original_file: $!";
+  }
+
+  print json_encode(
+    {
+      ok         => 1,
+      collection => $stored,
+      filename   => basename($file),
+      path       => $file,
+    }
+  );
+};
+:--------------------------------------------------------------------------------:
+CODE3: Ajax jvar => 'configs.collections.delete', type => 'json', file => 'api-dashboard-collections-delete', code => q{
+  BEGIN {
+    my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
+    if ( $ajax_file ne '' ) {
+      require File::Basename;
+      require File::Spec;
+      require lib;
+      my $root = File::Basename::dirname($ajax_file);
+      $root = File::Basename::dirname($root) for 1 .. 4;
+      my $candidate = File::Spec->catdir( $root, 'lib' );
+      lib->import($candidate) if -d $candidate;
+    }
+  }
+
+  use File::Basename qw(basename);
+  use File::Path qw(make_path);
+  use File::Spec;
+  use Developer::Dashboard::Folder ();
+  use Developer::Dashboard::JSON qw(json_encode);
+  use Developer::Dashboard::PathRegistry ();
+
+  sub _api_dashboard_collection_root {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'api-dashboard' );
+    make_path( $dir, { mode => 0700 } ) if $dir ne '' && !-d $dir;
+    Developer::Dashboard::PathRegistry->new->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!" if $dir ne '' && -d $dir;
+    return $dir;
+  }
+
+  sub _api_dashboard_safe_filename {
+    my ($name) = @_;
+    $name = '' if !defined $name;
+    $name =~ s/[\x00-\x1F]+/ /g;
+    $name =~ s{[\\/:*?"<>|]+}{-}g;
+    $name =~ s/\s+/ /g;
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection name is required' if $name eq '' || $name eq '.' || $name eq '..';
+    return $name;
+  }
+
+  sub _api_dashboard_file_for_name {
+    my ($name) = @_;
+    return File::Spec->catfile( _api_dashboard_collection_root(), _api_dashboard_safe_filename($name) . '.json' );
+  }
+
+  my $name = params->{name} // '';
+  die "collection name is required" if $name eq '';
+
+  my $file = _api_dashboard_file_for_name($name);
+  die "Collection '$name' does not exist" if !-f $file;
+
+  unlink $file or die "Unable to remove collection file $file: $!";
+
+  print json_encode(
+    {
+      ok       => 1,
+      filename => basename($file),
+      path     => $file,
+    }
+  );
+};
+:--------------------------------------------------------------------------------:
+CODE4: Ajax jvar => 'configs.send.request', type => 'json', file => 'api-dashboard-send-request', code => q{
+  use HTTP::Request;
+  use LWP::Protocol::https ();
+  use LWP::UserAgent;
+  use MIME::Base64 qw(encode_base64);
+  use Time::HiRes qw(time);
+  use URI ();
+  use Developer::Dashboard::DataHelper qw(j je);
+
+  sub _api_dashboard_headers {
+    my ($text) = @_;
+    my @pairs;
+    for my $line ( split /\n/, ( defined $text ? $text : '' ) ) {
+      $line =~ s/\r//g;
+      next if $line !~ /\S/;
+      my ( $key, $value ) = split /\s*:\s*/, $line, 2;
+      die "Invalid header line: $line" if !defined $key || !defined $value || $key eq '';
+      push @pairs, [ $key, $value ];
+    }
+    return \@pairs;
+  }
+
+  sub _api_dashboard_set_header_text {
+    my ( $text, $key, $value ) = @_;
+    my @kept;
+    for my $line ( split /\n/, ( defined $text ? $text : '' ) ) {
+      $line =~ s/\r//g;
+      next if $line !~ /\S/;
+      my ( $existing_key ) = split /\s*:\s*/, $line, 2;
+      next if defined $existing_key && lc($existing_key) eq lc($key);
+      push @kept, $line;
+    }
+    push @kept, "$key: $value" if defined $value && $value ne '';
+    return join "\n", @kept;
+  }
+
+  sub _api_dashboard_apply_query_param {
+    my ( $uri, $key, $value ) = @_;
+    return if !defined $uri || !defined $key || $key eq '' || !defined $value || $value eq '';
+    my @current = $uri->query_form;
+    my @pairs;
+    while (@current) {
+      my $existing_key   = shift @current;
+      my $existing_value = shift @current;
+      next if defined $existing_key && $existing_key eq $key;
+      push @pairs, $existing_key, $existing_value;
+    }
+    push @pairs, $key, $value;
+    $uri->query_form(@pairs);
+  }
+
+  sub _api_dashboard_apply_auth {
+    my ( $settings, $uri ) = @_;
+    my $auth = $settings->{auth};
+    return if ref($auth) ne 'HASH';
+    my $type = lc( $auth->{type} || '' );
+    return if $type eq '' || $type eq 'noauth';
+
+    if ( $type eq 'basic' ) {
+      my $username = defined $auth->{username} ? $auth->{username} : '';
+      my $password = defined $auth->{password} ? $auth->{password} : '';
+      my $value = 'Basic ' . encode_base64( "$username:$password", '' );
+      $settings->{headers_text} = _api_dashboard_set_header_text( $settings->{headers_text}, 'Authorization', $value );
+      return;
+    }
+
+    if ( $type eq 'bearer' ) {
+      my $token = defined $auth->{token} ? $auth->{token} : '';
+      return if $token eq '';
+      my $value = 'Bearer ' . $token;
+      $settings->{headers_text} = _api_dashboard_set_header_text( $settings->{headers_text}, 'Authorization', $value );
+      return;
+    }
+
+    if ( $type eq 'apikey' ) {
+      my $key = defined $auth->{key} ? $auth->{key} : '';
+      my $value = defined $auth->{value} ? $auth->{value} : '';
+      my $in = lc( $auth->{in} || 'header' );
+      if ( $in eq 'query' ) {
+        _api_dashboard_apply_query_param( $uri, $key, $value );
+        return;
+      }
+      $settings->{headers_text} = _api_dashboard_set_header_text( $settings->{headers_text}, $key, $value );
+      return;
+    }
+
+    if ( $type eq 'oauth2' ) {
+      my $token = defined $auth->{access_token} ? $auth->{access_token} : '';
+      return if $token eq '';
+      my $token_type = defined $auth->{token_type} && $auth->{token_type} ne '' ? $auth->{token_type} : 'Bearer';
+      my $add_to = lc( $auth->{add_to} || 'header' );
+      if ( $add_to eq 'query' ) {
+        _api_dashboard_apply_query_param( $uri, 'access_token', $token );
+        return;
+      }
+      $settings->{headers_text} = _api_dashboard_set_header_text( $settings->{headers_text}, 'Authorization', $token_type . ' ' . $token );
+      return;
+    }
+  }
+
+  sub _api_dashboard_is_textual {
+    my ( $content_type, $content ) = @_;
+    return 1 if ( $content_type || '' ) =~ m{(?:json|xml|javascript|html|text|x-www-form-urlencoded)}i;
+    return 0 if !defined $content;
+    return $content !~ /[\x00-\x08\x0B\x0C\x0E-\x1F]/;
+  }
+
+  sub _api_dashboard_preview_media_type {
+    my ($content_type) = @_;
+    my $type = lc( $content_type || '' );
+    $type =~ s/\s*;.*\z//;
+    return '' if $type eq '';
+    return $type if $type eq 'application/pdf';
+    return $type if $type =~ /\Aimage\/(?:png|jpe?g|gif|webp|bmp|svg\+xml|tiff?)\z/;
+    return '';
+  }
+
+  my $payload = { ok => 0 };
+
+  my $ok = eval {
+    my $settings_raw = params->{settings} // '';
+    die "settings payload is required" if $settings_raw eq '';
+    my $settings = je $settings_raw;
+    die "settings payload must be a hash" if ref($settings) ne 'HASH';
+
+    my $method = uc( $settings->{method} || 'GET' );
+    die "Unsupported HTTP method: $method" if $method !~ /\A(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\z/;
+
+    my $url = $settings->{url} // '';
+    die "Request URL is required" if $url eq '';
+    my $uri = URI->new($url);
+    die "Request URL must use http or https" if ( ( $uri->scheme || '' ) !~ /\Ahttps?\z/i );
+    _api_dashboard_apply_auth( $settings, $uri );
+
+    my $timeout_s = int( $settings->{timeout_s} || 120 );
+    $timeout_s = 120 if $timeout_s < 1 || $timeout_s > 600;
+    my $allow_insecure  = $settings->{insecure_tls} ? 1 : 0;
+    my $follow_redirect = exists $settings->{follow_redirects} ? ( $settings->{follow_redirects} ? 1 : 0 ) : 1;
+
+    my $ua = LWP::UserAgent->new(
+      agent             => 'Developer Dashboard API Dashboard/1.60',
+      env_proxy         => 1,
+      timeout           => $timeout_s,
+      max_redirect      => $follow_redirect ? 7 : 0,
+      protocols_allowed => [qw(http https)],
+      ssl_opts          => $allow_insecure
+        ? { verify_hostname => 0, SSL_verify_mode => 0x00 }
+        : { verify_hostname => 1 },
+    );
+
+    my $request = HTTP::Request->new( $method => $uri->as_string );
+    my $header_pairs = _api_dashboard_headers( $settings->{headers_text} );
+    for my $pair ( @{$header_pairs} ) {
+      $request->header( $pair->[0] => $pair->[1] );
+    }
+    $request->content( $settings->{body} ) if defined $settings->{body} && $settings->{body} ne '';
+
+    my $started  = time;
+    my $response = $ua->request($request);
+    my $elapsed_ms = int( ( time - $started ) * 1000 );
+    my @headers = map { +{ key => $_, value => scalar $response->header($_) } } $response->header_field_names;
+    my $content_type = $response->header('Content-Type') || '';
+    my $preview_media_type = _api_dashboard_preview_media_type($content_type);
+    my $raw_body = $response->content;
+    my $body_mode = 'text';
+    my $body = '';
+    my $preview_url = '';
+    if ($preview_media_type) {
+      $body_mode = 'preview';
+      $body = 'Preview available.';
+      $preview_url = 'data:' . $preview_media_type . ';base64,' . encode_base64( $raw_body, '' );
+    }
+    elsif ( ( $content_type || '' ) =~ /json/i ) {
+      my $decoded = $response->decoded_content;
+      my $pretty = eval { j je $decoded };
+      $body_mode = 'json';
+      $body = defined $pretty && $pretty ne '' ? $pretty : $decoded;
+    }
+    elsif ( _api_dashboard_is_textual( $content_type, $raw_body ) ) {
+      $body_mode = 'text';
+      $body = $response->decoded_content;
+    }
+    else {
+      $body_mode = 'text';
+      $body = 'Binary response omitted because it is not a previewable media type.';
+    }
+
+    $payload = {
+      ok      => $response->is_success ? 1 : 0,
+      error   => $response->is_success ? '' : $response->status_line,
+      request => {
+        method           => $method,
+        url              => $uri->as_string,
+        headers_text     => $settings->{headers_text} // '',
+        body             => $settings->{body} // '',
+        timeout_s        => $timeout_s,
+        follow_redirects => $follow_redirect ? 1 : 0,
+        insecure_tls     => $allow_insecure ? 1 : 0,
+      },
+      response => {
+        status             => $response->code,
+        reason             => $response->message,
+        elapsed_ms         => $elapsed_ms,
+        content_type       => $content_type,
+        headers            => \@headers,
+        body               => $body,
+        body_mode          => $body_mode,
+        preview_media_type => $preview_media_type,
+        preview_url        => $preview_url,
+        body_size_bytes    => length($raw_body),
+      },
+    };
+    1;
+  };
+  if ( !$ok ) {
+    my $error = $@ || 'Unknown API dashboard send failure';
+    $error =~ s/\s+\z//;
+    $payload = {
+      ok    => 0,
+      error => $error,
+    };
+  }
+
+  print j $payload;
+};

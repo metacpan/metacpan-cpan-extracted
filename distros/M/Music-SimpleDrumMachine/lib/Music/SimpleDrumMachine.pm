@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0403';
+our $VERSION = '0.0501';
 
 use v5.36;
 use feature 'try';
@@ -65,10 +65,19 @@ has drums => (
 sub _build_drums {
     my ($self) = @_;
     my $drums = {
-        kick  => { num => 36, chan => $self->chan < 0 ? 0 : $self->chan, pat => [] },
-        snare => { num => 38, chan => $self->chan < 0 ? 1 : $self->chan, pat => [] },
-        hihat => { num => 42, chan => $self->chan < 0 ? 2 : $self->chan, pat => [] },
-        fillcrash => { num => 49, chan => $self->chan < 0 ? 3 : $self->chan, pat => [] },
+        kick      => { num => 36, chan => $self->chan < 0 ?  0 : $self->chan, pat => [] },
+        snare     => { num => 38, chan => $self->chan < 0 ?  1 : $self->chan, pat => [] },
+        closed    => { num => 42, chan => $self->chan < 0 ?  2 : $self->chan, pat => [] },
+        fillcrash => { num => 49, chan => $self->chan < 0 ?  3 : $self->chan, pat => [] },
+        open      => { num => 46, chan => $self->chan < 0 ?  4 : $self->chan, pat => [] },
+        rimshot   => { num => 37, chan => $self->chan < 0 ?  5 : $self->chan, pat => [] },
+        clap      => { num => 39, chan => $self->chan < 0 ?  6 : $self->chan, pat => [] },
+        shaker    => { num => 70, chan => $self->chan < 0 ?  7 : $self->chan, pat => [] },
+        cowbell   => { num => 56, chan => $self->chan < 0 ?  8 : $self->chan, pat => [] },
+        cymbal    => { num => 57, chan => $self->chan < 0 ? 10 : $self->chan, pat => [] }, # skip 9
+        hi_tom    => { num => 48, chan => $self->chan < 0 ? 11 : $self->chan, pat => [] },
+        mid_tom   => { num => 47, chan => $self->chan < 0 ? 12 : $self->chan, pat => [] },
+        low_tom   => { num => 45, chan => $self->chan < 0 ? 13 : $self->chan, pat => [] },
     };
     return $drums;
 }
@@ -148,13 +157,6 @@ has prefill_part => (
 );
 
 
-has verbose => (
-    is      => 'ro',
-    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
-    default => sub { 0 },
-);
-
-
 has velo_max => (
     is      => 'rw',
     isa     => sub { croak "$_[0] is not valid" unless $_[0] =~ /^\d+$/ },
@@ -173,6 +175,13 @@ has velo_off => (
     is      => 'rw',
     isa     => sub { croak "$_[0] is not valid" unless $_[0] =~ /^\d+$/ },
     default => sub { 110 },
+);
+
+
+has verbose => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 0 },
 );
 
 has _queue => (
@@ -221,6 +230,7 @@ my %attrs = (
         _beat_count => 0, # how many beats?
         _bar_count  => 0, # how many measures?
         _hats       => 0, # 1st hihat beat bit
+        _part_inc   => 0, # number of next_part
         _trigger    => 0, # trigger a fill
         _filled     => 0, # we just filled
     },
@@ -269,7 +279,10 @@ sub BUILD {
             $self->_ticks($self->_ticks + 1);
 
             if ($self->_ticks % $self->_nth == 0) {
-                if (($self->_beat_count + $self->beats - $self->_trigger) % ($self->beats * $self->divisions - 1) == 0) {
+                if (
+                    ($self->filling || (ref($self->next_part) && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
+                    && ($self->_beat_count + $self->beats - $self->_trigger) % ($self->beats * $self->divisions - 1) == 0
+                ) {
                     $self->_adjust_drums(1); # fill!
                     $self->_filled($self->_filled + 1);
                 }
@@ -315,11 +328,11 @@ sub _adjust_cymbals($self) {
     if ($self->fill_crash) {
         if ($self->_filled) {
             $self->drums->{fillcrash}{pat}[0] = 1; # crash on one
-            $self->drums->{hihat}{pat}[0] = 0; # mutually exclusive
+            $self->drums->{closed}{pat}[0] = 0; # mutually exclusive
         }
         else {
             $self->drums->{fillcrash}{pat}[0] = 0; # not crashing
-            $self->drums->{hihat}{pat}[0] = $self->_hats; # restore hihat bit
+            $self->drums->{closed}{pat}[0] = $self->_hats; # restore hihat bit
         }
     }
     $self->_filled(0);
@@ -327,17 +340,31 @@ sub _adjust_cymbals($self) {
 
 sub _adjust_drums($self, $fill_flag) {
     say 'Beats: ' . $self->_beat_count if $self->verbose;
-    my ($next, $patterns);
+    my ($next, $patterns, $part, $name);
+    if (ref $self->next_part eq 'ARRAY') {
+        $name = $self->next_part->[ $self->_part_inc % $self->next_part->@* ];
+        $part = $self->parts->{$name};
+    }
     # play a fill or a part
-    if ($self->filling && $fill_flag) {
-        my $fill = $self->fills->{ $self->next_fill };
-        ($next, $patterns) = $fill->();
-        $self->next_fill($next);
+    if (($self->filling || $name =~ 'fill') && $fill_flag) {
+        $part ||= $self->fills->{ $self->next_fill };
+        ($next, $patterns) = $part->();
+        if ($next) {
+            $self->next_fill($next);
+        }
+        else {
+            $self->_part_inc($self->_part_inc + 1);
+        }
     }
     else {
-        my $part = $self->parts->{ $self->next_part };
+        $part ||= $self->parts->{ $self->next_part };
         ($next, $patterns) = $part->();
-        $self->next_part($next);
+        if ($next) {
+            $self->next_part($next);
+        }
+        else {
+            $self->_part_inc($self->_part_inc + 1);
+        }
     }
     # add the patterns to the drums
     for my $drum (keys %$patterns) {
@@ -350,7 +377,7 @@ sub _adjust_drums($self, $fill_flag) {
         }
     }
     if ($self->filling) {
-        $self->_hats($self->drums->{hihat}{pat}[0]); # save bit
+        $self->_hats($self->drums->{closed}{pat}[0]); # save bit
         $self->drums->{fillcrash}{pat} = [ (0) x ($self->beats * $self->divisions) ];
         $self->_adjust_cymbals;
     }
@@ -359,9 +386,9 @@ sub _adjust_drums($self, $fill_flag) {
 sub _default_part($self) {
     say '_default_part' if $self->verbose;
     my %patterns = (
-        hihat => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
-        kick  => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
-        snare => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
+        closed => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
+        kick   => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
+        snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
     );
     my $next = '_default_part';
     return $next, \%patterns;
@@ -431,7 +458,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0403
+version 0.0501
 
 =head1 SYNOPSIS
 
@@ -458,9 +485,9 @@ version 0.0403
   sub part_A {
       print "part A\n";
       my %patterns = (
-          hihat => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
-          kick  => [qw(1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1)],
-          snare => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 1 0)],
+          closed => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
+          kick   => [qw(1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1)],
+          snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 1 0)],
       );
       my $next = 'part_B';
       return $next, \%patterns;
@@ -468,9 +495,9 @@ version 0.0403
   sub part_B {
       print "part B\n";
       my %patterns = (
-          hihat => [qw(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)],
-          kick  => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
-          snare => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
+          closed => [qw(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)],
+          kick   => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
+          snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
       );
       my $next = 'part_A';
       return $next, \%patterns;
@@ -554,10 +581,22 @@ The known drums.
 
 Default:
 
-  kick  => { num => 36, chan => ..., pat => [] },
-  snare => { num => 38, chan => ..., pat => [] },
-  hihat => { num => 42, chan => ..., pat => [] },
-  fillcrash => { num => 49, chan => ..., pat => [] },
+  kick      => 36 # Bass Drum 1
+  snare     => 38 # Acoustic Snare
+  closed    => 42 # Closed Hi Hat
+  fillcrash => 49 # Crash Cymbal 1
+  open      => 46 # Open Hi Hat
+  rimshot   => 37 # Side Stick
+  clap      => 39 # Hand Clap
+  shaker    => 70 # Maracas
+  cowbell   => 56 # Cowbell
+  cymbal    => 57 # Crash Cymbal 2
+  hi_tom    => 48 # Hi Mid Tom
+  mid_tom   => 47 # Low Mid Tom
+  low_tom   => 45 # Low Tom
+
+But literally B<any> name could be used, as long as the number is a
+known MIDI percussion instrument number.
 
 =head2 fill_crash
 
@@ -573,9 +612,9 @@ Default: C<1>
   $fills = $dm->fills;
   $dm->fills($fills);
 
-List of code-refs of the fills to play.
+List of named code-refs of the fills to play.
 
-Default: C<[_default_fill()]>
+Default: C<{ _default_fill =E<gt> _default_fill() }>
 
 =head2 filling
 
@@ -600,7 +639,11 @@ Default: C<'_default_fill'>
   $next_part = $dm->next_part;
   $dm->next_part($next_part);
 
-Name of the part to play first and set subsequently in a part.
+Name of the part or list of parts to play first and also set
+subsequently in a part.
+
+If this is an array-reference, the named parts or fills are played in
+succession.
 
 Default: C<'_default_part'>
 
@@ -618,9 +661,13 @@ Default: C<[60, 64, 67]>
   $parts = $dm->parts;
   $dm->parts($parts);
 
-List of code-refs of the parts to play.
+List of named code-refs of the parts to play.
 
-Default: C<[_default_part()]>
+If a part has C<'fill'> in the name, it will be played for a single
+bar, on the 3rd bar of a 4-bar phrase iff the B<filling> attribute is
+set to zero.
+
+Default: C<{ _default_part =E<gt> _default_part() }>
 
 =head2 port_name
 
@@ -645,14 +692,6 @@ Default: C<24>
 Code-ref of the part to play for 1/2-bar fills.
 
 Default: C<\&_default_part>
-
-=head2 verbose
-
-  $verbose = $dm->verbose;
-
-Show progress.
-
-Default: C<0>
 
 =head2 velo_max
 
@@ -680,6 +719,14 @@ Default: C<-10>
 The velocity offset.
 
 Default: C<110>
+
+=head2 verbose
+
+  $verbose = $dm->verbose;
+
+Show progress.
+
+Default: C<0>
 
 =head1 METHODS
 

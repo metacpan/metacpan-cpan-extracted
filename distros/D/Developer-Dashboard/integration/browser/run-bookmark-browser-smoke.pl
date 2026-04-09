@@ -470,4 +470,35 @@ With no C<--bookmark-file>, it runs the built-in legacy jQuery/Ajax bookmark
 sample that checks the exact C<foo.bar> binding flow used by the bookmark
 regressions fixed in the 1.06 and 1.07 releases.
 
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Integration helper script in the Developer Dashboard codebase. This file runs browser-driven bookmark smoke checks against a live Developer Dashboard web instance.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to make a repeatable host-or-container integration workflow explicit instead of burying release verification steps in ad-hoc shell history.
+
+=head1 WHEN TO USE
+
+Use this file when you are rerunning the documented integration workflow for its environment or debugging a release/install problem in that path.
+
+=head1 HOW TO USE
+
+Run the script as part of the documented integration plan for its environment. Treat failures here as release blockers, because these scripts represent the supported rerun path.
+
+=head1 WHAT USES IT
+
+It is used by maintainers running the documented install/runtime verification workflow for that environment, and by tests that validate the checked-in integration assets.
+
+=head1 EXAMPLES
+
+  perl integration/browser/run-bookmark-browser-smoke.pl
+
+Run the script from the documented integration environment so it can find the expected tarball, browser, or container prerequisites.
+
+=for comment FULL-POD-DOC END
+
 =cut

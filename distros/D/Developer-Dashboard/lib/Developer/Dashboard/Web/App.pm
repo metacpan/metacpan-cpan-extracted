@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use Capture::Tiny qw(capture);
 use POSIX qw(strftime);
@@ -13,14 +13,15 @@ use URI::Escape qw(uri_unescape);
 use Cwd qw(cwd);
 
 use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::Platform qw(command_in_path);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::Codec qw(decode_payload);
-use Zipper ();
+use Developer::Dashboard::Zipper ();
 
 # new(%args)
 # Constructs the browser-facing dashboard web application.
-# Input: auth, pages, sessions, and optional actions/resolver objects.
+# Input: auth, pages, sessions, config, and optional actions/resolver objects.
 # Output: Developer::Dashboard::Web::App object.
 sub new {
     my ( $class, %args ) = @_;
@@ -30,6 +31,7 @@ sub new {
     return bless {
         actions  => $args{actions},
         auth     => $auth,
+        config   => $args{config},
         pages    => $pages,
         prompt   => $args{prompt},
         runtime  => $args{runtime} || Developer::Dashboard::PageRuntime->new,
@@ -89,12 +91,19 @@ sub authorize_request {
     my ( $self, %args ) = @_;
     my $headers = $args{headers} || {};
     my $tier = $self->{auth}->trust_tier(
-        remote_addr => $args{remote_addr},
-        host        => $headers->{host},
+        remote_addr          => $args{remote_addr},
+        host                 => $headers->{host},
+        extra_loopback_hosts => (
+            $self->{config}
+            ? ( $self->{config}->web_settings->{ssl_subject_alt_names} || [] )
+            : []
+        ),
     );
     my $session;
 
     if ( $tier ne 'admin' ) {
+        return $self->_helper_access_disabled_response
+          if !$self->{auth}->helper_users_enabled;
         $session = $self->{sessions}->from_cookie( $headers->{cookie}, remote_addr => $args{remote_addr} );
         if ( !$session ) {
             return [
@@ -156,9 +165,24 @@ sub dispatch_request {
     if ( $path =~ m{^/app/(.+)$} ) {
         return $self->legacy_app_response( id => $1, %args );
     }
+    if ( $path =~ m{^/skill/([^/]+)/(.+)$} ) {
+        return $self->skill_route_response( skill_name => $1, route => $2, %args );
+    }
     return $self->transient_action_response(%args) if $path eq '/action' && $method eq 'POST';
 
     return [ 404, 'text/plain; charset=utf-8', "Not found\n" ];
+}
+
+# _helper_access_disabled_response()
+# Builds the outsider-access denial used before any helper user exists.
+# Input: none.
+# Output: response array reference with a bare 401 plain-text error body.
+sub _helper_access_disabled_response {
+    return [
+        401,
+        'text/plain; charset=utf-8',
+        '',
+    ];
 }
 
 # _handle_login(%args)
@@ -169,6 +193,8 @@ sub _handle_login {
     my ( $self, %args ) = @_;
     my %form = _parse_query( $args{body} );
     my $redirect_to = $self->_sanitize_redirect_target( $form{redirect_to} );
+    return $self->_helper_access_disabled_response
+      if !$self->{auth}->helper_users_enabled;
     my $user = $self->{auth}->verify_user(
         username => $form{username},
         password => $form{password},
@@ -432,8 +458,82 @@ sub jquery_js_response {
   $.ajax = function (options) {
     var opts = options || {};
     var xhr = new XMLHttpRequest();
-    var method = opts.type || 'GET';
+    var method = opts.method || opts.type || 'GET';
+    var successArgs = null;
+    var failureArgs = null;
+    var alwaysArgs = null;
+    var finished = false;
+
+    function remember(callback, args, store) {
+      if (typeof callback !== 'function') return xhr;
+      if (args) {
+        callback.apply(xhr, args);
+        return xhr;
+      }
+      store.push(callback);
+      return xhr;
+    }
+
+    function runCallbacks(callbacks, args) {
+      callbacks.forEach(function (callback) {
+        callback.apply(xhr, args);
+      });
+    }
+
+    function finishSuccess(payload) {
+      if (finished) return;
+      finished = true;
+      successArgs = [payload, 'success', xhr];
+      alwaysArgs = [xhr, 'success'];
+      if (typeof opts.success === 'function') {
+        opts.success(payload, 'success', xhr);
+      }
+      if (typeof opts.complete === 'function') {
+        opts.complete(xhr, 'success');
+      }
+      runCallbacks(xhr._done_callbacks, successArgs);
+      runCallbacks(xhr._always_callbacks, alwaysArgs);
+    }
+
+    function finishFailure(status, error) {
+      if (finished) return;
+      finished = true;
+      failureArgs = [xhr, status, error];
+      alwaysArgs = [xhr, status];
+      if (typeof opts.error === 'function') {
+        opts.error(xhr, status, error);
+      }
+      if (typeof opts.complete === 'function') {
+        opts.complete(xhr, status);
+      }
+      runCallbacks(xhr._fail_callbacks, failureArgs);
+      runCallbacks(xhr._always_callbacks, alwaysArgs);
+    }
+
+    xhr._done_callbacks = [];
+    xhr._fail_callbacks = [];
+    xhr._always_callbacks = [];
+    xhr.done = function (callback) {
+      return remember(callback, successArgs, xhr._done_callbacks);
+    };
+    xhr.fail = function (callback) {
+      return remember(callback, failureArgs, xhr._fail_callbacks);
+    };
+    xhr.always = function (callback) {
+      return remember(callback, alwaysArgs, xhr._always_callbacks);
+    };
+    xhr.then = function (onDone, onFail) {
+      xhr.done(onDone);
+      xhr.fail(onFail);
+      return xhr;
+    };
     xhr.open(method, opts.url || '', true);
+
+    if (opts.headers && typeof opts.headers === 'object') {
+      Object.keys(opts.headers).forEach(function (key) {
+        xhr.setRequestHeader(key, opts.headers[key]);
+      });
+    }
 
     xhr.onreadystatechange = function () {
       var payload;
@@ -444,26 +544,22 @@ sub jquery_js_response {
           try {
             payload = payload === '' ? null : JSON.parse(payload);
           } catch (error) {
-            if (typeof opts.error === 'function') {
-              opts.error(xhr, 'parsererror', error);
-            }
+            finishFailure('parsererror', error);
             return;
           }
         }
-        if (typeof opts.success === 'function') {
-          opts.success(payload, 'success', xhr);
-        }
+        finishSuccess(payload);
         return;
       }
-      if (typeof opts.error === 'function') {
-        opts.error(xhr, 'error', xhr.statusText || 'error');
-      }
+      finishFailure('error', xhr.statusText || 'error');
     };
 
     xhr.onerror = function () {
-      if (typeof opts.error === 'function') {
-        opts.error(xhr, 'error', xhr.statusText || 'error');
-      }
+      finishFailure('error', xhr.statusText || 'error');
+    };
+
+    xhr.onabort = function () {
+      finishFailure('abort', xhr.statusText || 'abort');
     };
 
     if (opts.data && typeof opts.data === 'object' && !(opts.data instanceof FormData)) {
@@ -537,6 +633,28 @@ sub legacy_app_response {
         body_params  => $body_params,
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
+    );
+}
+
+# skill_route_response(%args)
+# Executes routes provided by installed skills.
+# Routes are namespaced under /skill/<repo-name>/<route>
+# Input: skill_name, route, query params, headers, and remote address.
+# Output: response array reference.
+sub skill_route_response {
+    my ( $self, %args ) = @_;
+    my $skill_name = $args{skill_name} || '';
+    my $route = $args{route} || '';
+    
+    return [ 400, 'text/plain; charset=utf-8', "Invalid skill name\n" ] if !$skill_name;
+    return [ 400, 'text/plain; charset=utf-8', "Invalid skill route\n" ] if !$route;
+    
+    require Developer::Dashboard::SkillDispatcher;
+    my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
+    return $dispatcher->route_response(
+        app        => $self,
+        skill_name => $skill_name,
+        route      => $route,
     );
 }
 
@@ -899,7 +1017,7 @@ function ddHighlightLine(line, state) {
 function ddHighlightSectionText(text, state) {
   const section = state.section || '';
   if (/^CODE\d+$/.test(section)) return ddHighlightPerlLine(text);
-  if (section === 'HTML' || section === 'FORM' || section === 'FORM.TT') return ddHighlightHtmlLine(text, state);
+  if (section === 'HTML') return ddHighlightHtmlLine(text, state);
   if (section === 'STASH' || section === 'NOTE') return ddHighlightNoteLine(text);
   return ddEscapeHtml(text);
 }
@@ -1132,7 +1250,7 @@ sub _highlight_section_text {
     my ( $self, $text, $state ) = @_;
     my $section = $state->{section} || '';
     return $self->_highlight_perl_text($text) if $section =~ /^CODE\d+$/;
-    return $self->_highlight_html_text( $text, $state ) if $section eq 'HTML' || $section eq 'FORM' || $section eq 'FORM.TT';
+    return $self->_highlight_html_text( $text, $state ) if $section eq 'HTML';
     return $self->_highlight_note_text($text) if $section eq 'STASH' || $section eq 'NOTE';
     return _escape_html($text);
 }
@@ -1391,22 +1509,29 @@ sub _nav_items_html {
     return '' if $page_id =~ m{\Anav/};
 
     my $paths = $self->{pages}{paths} || return '';
-    my $nav_root = File::Spec->catdir( $paths->dashboards_root, 'nav' );
-    return '' if !-d $nav_root;
-
-    opendir my $dh, $nav_root or return '';
-    my @entries = sort grep {
-        $_ ne '.' && $_ ne '..'
-          && $_ =~ /\.tt\z/
-          && -f File::Spec->catfile( $nav_root, $_ )
-    } readdir $dh;
-    closedir $dh;
-    return '' if !@entries;
+    my @roots = $paths->can('dashboards_layers') ? $paths->dashboards_layers : $paths->dashboards_roots;
+    my %nav_ids;
+    my @nav_ids;
+    for my $dashboards_root (@roots) {
+        my $nav_root = File::Spec->catdir( $dashboards_root, 'nav' );
+        next if !-d $nav_root;
+        opendir my $dh, $nav_root or next;
+        for my $entry ( sort grep {
+            $_ ne '.' && $_ ne '..'
+              && $_ =~ /\.tt\z/
+              && -f File::Spec->catfile( $nav_root, $_ )
+        } readdir $dh )
+        {
+            my $nav_id = 'nav/' . $entry;
+            push @nav_ids, $nav_id if !$nav_ids{$nav_id}++;
+        }
+        closedir $dh;
+    }
+    return '' if !@nav_ids;
 
     my @items;
     my $current_page = $args{runtime_context}{current_page} || '';
-    for my $entry (@entries) {
-        my $nav_id = 'nav/' . $entry;
+    for my $nav_id (@nav_ids) {
         my $nav_page = eval { $self->_load_named_page($nav_id) };
         next if !$nav_page || $@;
         $nav_page->{meta}{raw_instruction} = $nav_page->canonical_instruction;
@@ -1443,8 +1568,6 @@ sub _page_fragment_html {
     return '' if !$page;
 
     my $fragment = defined $page->{layout}{body} ? $page->{layout}{body} : '';
-    $fragment .= $page->{layout}{form_tt} if defined $page->{layout}{form_tt} && $page->{layout}{form_tt} ne '';
-    $fragment .= $page->{layout}{form} if defined $page->{layout}{form} && $page->{layout}{form} ne '';
 
     for my $chunk ( @{ $page->{meta}{runtime_outputs} || [] } ) {
         next if !defined $chunk || ref($chunk);
@@ -1520,7 +1643,7 @@ sub _load_named_page {
 }
 
 # _legacy_app_response(%args)
-# Loads a legacy /app/<name> resource as either a bookmark page or saved URL forward.
+# Loads an older /app/<name> resource as either a bookmark page or saved URL forward.
 # Input: bookmark id and request metadata.
 # Output: response array reference.
 sub _legacy_app_response {
@@ -1604,7 +1727,7 @@ sub _build_query {
 }
 
 # _legacy_ajax_response(%args)
-# Decodes and executes a legacy /ajax token payload.
+# Decodes and executes an older /ajax token payload.
 # Input: request params and metadata.
 # Output: response array reference.
 sub _legacy_ajax_response {
@@ -1630,7 +1753,7 @@ sub _legacy_ajax_response {
     elsif ( ( $params->{file} || '' ) ne '' ) {
         my $runtime_root = $self->{pages}{paths} ? $self->{pages}{paths}->runtime_root : '';
         $saved_path = eval {
-            Zipper::saved_ajax_file_path(
+            Developer::Dashboard::Zipper::saved_ajax_file_path(
                 file         => $params->{file},
                 runtime_root => $runtime_root,
             );
@@ -1643,7 +1766,7 @@ sub _legacy_ajax_response {
     }
     my $page = Developer::Dashboard::PageDocument->new(
         id    => ( $params->{page} || $params->{file} || '' ),
-        title => 'Legacy Ajax',
+        title => 'Bookmark Ajax',
     );
     return [
         200,
@@ -1679,7 +1802,7 @@ sub _legacy_ajax_response {
 }
 
 # _legacy_ajax_allowed($params)
-# Checks whether a legacy /ajax request is allowed under the transient token policy.
+# Checks whether an older /ajax request is allowed under the transient token policy.
 # Input: flat request parameter hash reference.
 # Output: boolean true when no token is present or transient token URLs are enabled.
 sub _legacy_ajax_allowed {
@@ -1848,7 +1971,7 @@ sub _top_chrome_html {
     <div><a href="%s" id="share-url">Right Click Copy &amp; Share or Bookmark This Page</a></div>
     <div style="margin-top:6px">%s</div>
   </div>
-  <div style="text-align:right;white-space:pre-wrap">%s<span id="status-on-top">%s</span></div>
+  <div style="text-align:right;white-space:pre-wrap;font-family:'Segoe UI Emoji','Noto Color Emoji','Segoe UI Symbol',Georgia,'Times New Roman',serif">%s<span id="status-on-top">%s</span></div>
 </div>
 <script>
 (function() {
@@ -1951,6 +2074,8 @@ sub _ip_interface_pairs {
     my ($self) = @_;
     my @pairs = $self->_ip_pairs_from_ip;
     return @pairs if @pairs;
+    @pairs = $self->_ip_pairs_from_ipconfig;
+    return @pairs if @pairs;
     return $self->_ip_pairs_from_ifconfig;
 }
 
@@ -1960,8 +2085,9 @@ sub _ip_interface_pairs {
 # Output: list of hashes with iface and ip keys.
 sub _ip_pairs_from_ip {
     my ($self) = @_;
+    return () if !command_in_path('ip');
     my ( $stdout, undef, $exit_code ) = capture {
-        system 'sh', '-c', 'command -v ip >/dev/null 2>&1 && ip -o -4 addr show up scope global';
+        system 'ip', '-o', '-4', 'addr', 'show', 'up', 'scope', 'global';
         return $? >> 8;
     };
     return () if $exit_code != 0 || !defined $stdout || $stdout eq '';
@@ -1973,14 +2099,43 @@ sub _ip_pairs_from_ip {
     return @pairs;
 }
 
+# _ip_pairs_from_ipconfig()
+# Reads IPv4 interface/address pairs using Windows ipconfig output when available.
+# Input: none.
+# Output: list of hashes with iface and ip keys.
+sub _ip_pairs_from_ipconfig {
+    my ($self) = @_;
+    return () if !command_in_path('ipconfig');
+    my ( $stdout, undef, $exit_code ) = capture {
+        system 'ipconfig';
+        return $? >> 8;
+    };
+    return () if $exit_code != 0 || !defined $stdout || $stdout eq '';
+    my @pairs;
+    my $iface = '';
+    for my $line ( split /\n/, $stdout ) {
+        if ( $line =~ /^\S.*adapter\s+(.+?):\s*$/i ) {
+            $iface = $1;
+            next;
+        }
+        next if $iface eq '';
+        next if $line !~ /IPv4[^:]*:\s*(\d+\.\d+\.\d+\.\d+)/i;
+        my $ip = $1;
+        next if $ip =~ /^127\./;
+        push @pairs, { iface => $iface, ip => $ip };
+    }
+    return @pairs;
+}
+
 # _ip_pairs_from_ifconfig()
 # Reads IPv4 interface/address pairs using `ifconfig` as a fallback on systems without `ip`.
 # Input: none.
 # Output: list of hashes with iface and ip keys.
 sub _ip_pairs_from_ifconfig {
     my ($self) = @_;
+    return () if !command_in_path('ifconfig');
     my ( $stdout, undef, $exit_code ) = capture {
-        system 'sh', '-c', 'command -v ifconfig >/dev/null 2>&1 && ifconfig';
+        system 'ifconfig';
         return $? >> 8;
     };
     return () if $exit_code != 0 || !defined $stdout || $stdout eq '';
@@ -2001,7 +2156,7 @@ sub _ip_pairs_from_ifconfig {
 }
 
 # _prompt_summary()
-# Renders the legacy-style page-header indicator summary for page chrome.
+# Renders the older page-header indicator summary for page chrome.
 # Input: none.
 # Output: short status strip string.
 sub _prompt_summary {
@@ -2016,13 +2171,16 @@ sub _prompt_summary {
 }
 
 # _page_status_payload()
-# Builds the legacy `/system/status` payload from the indicator store.
+# Builds the `/system/status` payload from the indicator store.
 # Input: none.
 # Output: hash reference with array, hash, and status maps.
 sub _page_status_payload {
     my ($self) = @_;
     my $indicators = $self->{prompt} ? $self->{prompt}{indicators} : undef;
     return { array => [], hash => {}, status => {} } if !$indicators || !$indicators->can('page_header_payload');
+    if ( $self->{config} && $self->{config}->can('collectors') ) {
+        $indicators->sync_collectors( $self->{config}->collectors );
+    }
     return $indicators->page_header_payload;
 }
 
@@ -2207,5 +2365,36 @@ Input: $type (js, css, or others), $filename (requested filename).
 Output: MIME type string suitable for Content-Type header.
 
 Supports: JS, CSS, JSON, XML, HTML, SVG, PNG, JPEG, GIF, WebP, ICO, and others.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file implements the authenticated web application routes and bookmark-facing web behaviour.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::Web::App> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::Web::App -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

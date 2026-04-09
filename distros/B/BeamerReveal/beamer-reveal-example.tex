@@ -25,7 +25,8 @@
 %% The Current Maintainer of this work is Walter Daems.
 %% 
 %%
-\documentclass[11pt,aspectratio=169,t]{beamer}%
+
+\documentclass[11pt,aspectratio=1610,t]{beamer}%
 \setbeamertemplate{navigation symbols}{}
 
 \usepackage[width=1920,autoslide=4000]{beamer-reveal}
@@ -40,6 +41,10 @@
 \author{Walter Daems}
 
 \setbeamertemplate{note page}{\insertnote}
+
+\setvoiceovertts{azuretts.py}
+\setvoiceover{en-GB:neural:Ryan}
+\setvoiceoverext{.ogg}
 
 \begin{document}
 
@@ -64,6 +69,7 @@
 \begin{frame}
   {Good news}
   {}
+  \voiceover {Slide making is fun}
   You can keep on making your slides the way you are used to!
   \begin{itemize}
   \item all the nice \LaTeX{} stuff at your fingertips
@@ -124,6 +130,7 @@
   Don't spend too much time on this slide
 }
 
+
 \begin{frame}[transition=zoom]
   {A dymmy slide}
   {number three}
@@ -166,6 +173,7 @@
   \end{columns}
   % this is an overlayed image (not consuming any space)
   \image[width=0.25,aspectratio=1,fit=contain] \at (0.1,0.6) {Media/beamer-reveal-WiresTp.png}
+  \image[width=0.1,aspectratio=1,fit=contain] \at (0.9,0.1) {https://www.digmanwaves.net/About/Pictures/WalterDaems.jpg}
 \end{frame}
 
 \begin{frame}

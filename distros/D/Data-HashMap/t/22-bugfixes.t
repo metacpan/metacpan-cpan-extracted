@@ -9,7 +9,6 @@ use Data::HashMap::IS;
 use Data::HashMap::SS;
 use Data::HashMap::SI;
 use Data::HashMap::SA;
-use Data::HashMap::IS;
 use Data::HashMap::IA;
 
 # ---- Issue #5: Integer truncation should croak ----

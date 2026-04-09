@@ -3,13 +3,15 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use File::Basename qw(dirname);
 use File::Spec;
 use FindBin qw($Bin);
+
+use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file);
 
 # new(%args)
 # Constructs the updater coordinator.
@@ -58,17 +60,8 @@ sub run {
         next if !-f File::Spec->catfile( $dir, $file );
 
         my $path = File::Spec->catfile( $dir, $file );
-        my @cmd;
-
-        if ( $file =~ /\.pl$/ ) {
-            @cmd = ( $^X, $path );
-        }
-        elsif ( $file =~ /\.sh$/ ) {
-            @cmd = ( 'sh', $path );
-        }
-        else {
-            next;
-        }
+        next if !$self->_is_supported_update_script($path);
+        my @cmd = command_argv_for_path($path);
 
         print "-" x 40, "\n";
         print ">> Run Update: $file...\n";
@@ -96,6 +89,18 @@ sub run {
     $self->_restart_collectors(@running);
 
     return \@results;
+}
+
+# _is_supported_update_script($path)
+# Determines whether one update file is a supported runnable update script on this platform.
+# Input: update file path string.
+# Output: boolean true when the file should be executed by run().
+sub _is_supported_update_script {
+    my ( $self, $path ) = @_;
+    return 0 if !defined $path || $path eq '';
+    return 1 if $path =~ /\.pl\z/i;
+    return 1 if $path =~ /\.(?:sh|bash|ps1|cmd|bat)\z/i;
+    return is_runnable_file($path) ? 1 : 0;
 }
 
 # _running_collectors()
@@ -159,5 +164,36 @@ collector shutdown and restart around the update process.
 =head2 new, updates_dir, run
 
 Construct and execute dashboard updates.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file runs the staged update scripts that maintain the dashboard runtime.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::UpdateManager> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::UpdateManager -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

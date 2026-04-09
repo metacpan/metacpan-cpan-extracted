@@ -1,6 +1,6 @@
 \b[O][L][D]_CODE\b
 ^\.github/
-^SOFTWARE_SPEC\.md$
+^cover_db/
 ^ELLEN\.md$
 ^examples/
 ^\.developer-dashboard/

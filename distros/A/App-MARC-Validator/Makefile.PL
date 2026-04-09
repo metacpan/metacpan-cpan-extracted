@@ -26,7 +26,9 @@ requires 'DateTime' => 0;
 requires 'English' => 0;
 requires 'Getopt::Std' => 0;
 requires 'IO::Barf' => 0;
+requires 'IO::Uncompress::AnyUncompress' => 0;
 requires 'List::Util' => 1.33;
+requires 'MARC::Batch' => 0;
 requires 'MARC::File::XML' => '1.0.4';
 requires 'MARC::Validator' => 0.14;
 requires 'MARC::Validator::Filter' => 0;
@@ -43,7 +45,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

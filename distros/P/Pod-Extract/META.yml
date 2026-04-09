@@ -1,0 +1,41 @@
+---
+abstract: Pod::Extract
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Extract
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Pod::Extract:
+    file: lib/Pod/Extract.pm
+    version: v1.0.0
+recommends:
+  Pod::Markdown: '0'
+requires:
+  CLI::Simple: v1.0.11
+  CLI::Simple::Constants: v1.0.11
+  CLI::Simple::Utils: v1.0.11
+  IO::Scalar: '2.113'
+  Module::Load: '0.36'
+  Readonly: '2.05'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/rlauer6/Pod-Extract/issues
+  homepage: http://github.com/rlauer6/Pod-Extract.git
+  repository: git://github.com/rlauer6/Pod-Extract.git
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

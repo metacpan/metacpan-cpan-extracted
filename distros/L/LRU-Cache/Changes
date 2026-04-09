@@ -1,0 +1,5 @@
+Revision history for LRU-Cache
+
+0.01    2026-04-06
+        - Initial release, port of lru from Ancient dist
+

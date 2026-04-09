@@ -51,6 +51,7 @@ lib/Audio/Nama/TrackEffect.pm
 lib/Audio/Nama/Graph.pm
 lib/Audio/Nama/Persistence.pm
 lib/Audio/Nama/EngineSetup.pm
+lib/Audio/Nama/Entry.pm
 lib/Audio/Nama/TrackIO.pm
 lib/Audio/Nama/Bus.pm
 lib/Audio/Nama/TrackComment.pm
@@ -72,7 +73,6 @@ lib/Audio/Nama/EffectNickname.pm
 lib/Audio/Nama/Memoize.pm
 lib/Audio/Nama/Wavinfo.pm
 lib/Audio/Nama/Effect.pm
-lib/Audio/Nama/Graphical.pm
 lib/Audio/Nama/EffectsRegistry.pm
 lib/Audio/Nama/IO.pm
 lib/Audio/Nama/Tempo.pm

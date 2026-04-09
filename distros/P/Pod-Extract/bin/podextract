@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#-*- mode: sh; -*-
+# modulino invocation
+
+MODULE_NAME=Pod::Extract
+MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
+
+perl $MODULE_PATH "$@"

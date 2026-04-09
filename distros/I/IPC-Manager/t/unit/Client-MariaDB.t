@@ -1,11 +1,11 @@
 use Test2::V0;
-use IPC::Manager::Client::MariaDB;
-use IPC::Manager::Serializer::JSON;
 
 my $CLASS      = 'IPC::Manager::Client::MariaDB';
 my $SERIALIZER = 'IPC::Manager::Serializer::JSON';
 
-skip_all "MariaDB driver not available" unless $CLASS->viable;
+skip_all "MariaDB driver not available" unless eval { require IPC::Manager::Client::MariaDB; $CLASS->viable };
+
+use IPC::Manager::Serializer::JSON;
 
 subtest 'viable' => sub {
     ok($CLASS->viable, "MariaDB is viable");

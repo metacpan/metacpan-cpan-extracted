@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.032000;
 
 use ExtUtils::MakeMaker;
 
@@ -21,10 +21,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "BeamerReveal",
   "EXE_FILES" => [
+    "bin/awspolly.pl",
+    "bin/azuretts.py",
+    "bin/azuretts.py~",
+    "bin/balabolka.pl",
     "bin/beamer-reveal.pl",
-    "bin/beamer-reveal.pl~"
+    "bin/festival.pl"
   ],
   "LICENSE" => "open_source",
+  "MIN_PERL_VERSION" => "5.032000",
   "NAME" => "BeamerReveal",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -64,7 +69,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20260208.1851",
+  "VERSION" => "20260408.1240",
   "test" => {
     "TESTS" => "t/*.t t/02-bin/*.t"
   }

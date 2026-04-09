@@ -10,7 +10,9 @@ README.md
 dist.ini
 eg/add-drums.pl
 eg/euclidean.pl
+eg/grooves.pl
 eg/list_devices.pl
+eg/user-defined.pl
 lib/Music/SimpleDrumMachine.pm
 t/00-compile.t
 t/01-methods.t

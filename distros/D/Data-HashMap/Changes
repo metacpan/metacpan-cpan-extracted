@@ -1,5 +1,13 @@
 Revision history for Data-HashMap
 
+0.07  2026-04-09
+    - Fix TTL expiry off-by-one: entries now live for their full TTL seconds
+    - Fix compilation on threaded perls (undef Perl malloc/free macros)
+    - Fix freeze/thaw: persisted entries no longer acquire default TTL on thaw
+    - Fix freeze/thaw: clamp boundary TTL to avoid 0-sentinel ambiguity
+    - Guard expires_at computation against uint32_t wrap-to-zero
+    - Widen TTL test margins for slow CPAN smokers (1236 tests)
+
 0.06  2026-03-23
     - Split XS into per-variant xs/*.xsi files
     - Pre-reserve in from_hash/merge to avoid repeated resizes

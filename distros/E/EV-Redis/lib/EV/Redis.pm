@@ -7,7 +7,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.08';
+    our $VERSION = '0.09';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 

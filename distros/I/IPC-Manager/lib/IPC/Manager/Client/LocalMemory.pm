@@ -2,7 +2,7 @@ package IPC::Manager::Client::LocalMemory;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Carp qw/croak/;
 
@@ -17,7 +17,7 @@ use IPC::Manager::Message;
 #   stats   => { id => { read => {}, sent => {} } }     -- persisted after disconnect
 my %STORES;
 
-sub viable { 1 }
+sub _viable { 1 }
 
 sub spawn {
     my $class  = shift;

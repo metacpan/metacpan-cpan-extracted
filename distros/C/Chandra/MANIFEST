@@ -1,8 +1,10 @@
+bin/chandra-pack
 Chandra.xs
 Changes
 examples/assets_example.pl
 examples/assets_mount_example.pl
 examples/bind_example.pl
+examples/bridge_extension_example.pl
 examples/chat_hub.pl
 examples/chat_window.pl
 examples/clipboard_example.pl
@@ -17,6 +19,10 @@ examples/hot_reload_content.html
 examples/hot_reload_example.pl
 examples/log_example.pl
 examples/multiwindow_example.pl
+examples/pack_example/app.pl
+examples/pack_example/assets/README
+examples/pack_example/lib/PackedCounter.pm
+examples/pack_example/pack.pl
 examples/routing_example.pl
 examples/shortcut_example.pl
 examples/socket_ipc_example.pl
@@ -27,6 +33,7 @@ examples/tray_example.pl
 include/chandra/chandra.h
 include/chandra/chandra_assets.h
 include/chandra/chandra_bind.h
+include/chandra/chandra_bridge_ext.h
 include/chandra/chandra_clipboard.h
 include/chandra/chandra_contextmenu.h
 include/chandra/chandra_devtools.h
@@ -55,6 +62,7 @@ lib/Chandra/App.pm
 lib/Chandra/Assets.pm
 lib/Chandra/Bind.pm
 lib/Chandra/Bridge.pm
+lib/Chandra/Bridge/Extension.pm
 lib/Chandra/Clipboard.pm
 lib/Chandra/ContextMenu.pm
 lib/Chandra/DevTools.pm
@@ -67,6 +75,7 @@ lib/Chandra/Form.pm
 lib/Chandra/HotReload.pm
 lib/Chandra/Log.pm
 lib/Chandra/Notify.pm
+lib/Chandra/Pack.pm
 lib/Chandra/Protocol.pm
 lib/Chandra/Shortcut.pm
 lib/Chandra/Socket/Client.pm
@@ -139,14 +148,19 @@ t/59_form.t
 t/60_form_edge.t
 t/61_splash.t
 t/62_splash_edge.t
+t/63_pack.t
+t/64_pack_edge.t
 t/65_token.t
 t/66_token_edge.t
+t/67_bridge_ext.t
+t/68_bridge_ext_edge.t
 t/lib/Chandra/Test/Display.pm
 typemap
 xs/app.xs
 xs/assets.xs
 xs/bind.xs
 xs/bridge.xs
+xs/bridge_extension.xs
 xs/clipboard.xs
 xs/contextmenu.xs
 xs/core.xs
@@ -154,9 +168,9 @@ xs/devtools.xs
 xs/dialog.xs
 xs/dragdrop.xs
 xs/element.xs
-xs/form.xs
 xs/error.xs
 xs/event.xs
+xs/form.xs
 xs/hotreload.xs
 xs/log.xs
 xs/notify.xs

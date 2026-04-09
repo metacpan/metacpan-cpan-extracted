@@ -35,7 +35,9 @@ requires:
   English: 0
   Getopt::Std: 0
   IO::Barf: 0
+  IO::Uncompress::AnyUncompress: 0
   List::Util: 1.33
+  MARC::Batch: 0
   MARC::File::XML: 1.0.4
   MARC::Validator: 0.14
   MARC::Validator::Filter: 0
@@ -46,4 +48,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-MARC-Validator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-MARC-Validator
-version: '0.07'
+version: '0.08'

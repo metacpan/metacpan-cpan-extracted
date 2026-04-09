@@ -2,7 +2,7 @@ package IPC::Manager::Client::MessageFiles;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Carp qw/croak confess/;
 use File::Spec;
@@ -18,7 +18,7 @@ use Object::HashBase qw{
     +ready_count
 };
 
-sub viable { 1 }
+sub _viable { 1 }
 
 sub check_path { -d $_[1] }
 sub make_path  { mkdir($_[1]) or die "Could not make dir '$_[1]': $!" }

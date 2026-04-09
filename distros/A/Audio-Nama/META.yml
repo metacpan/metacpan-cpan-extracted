@@ -16,7 +16,7 @@ name: Audio-Nama
 provides:
   Audio::Nama:
     file: lib/Audio/Nama.pm
-    version: '1.600'
+    version: '1.602'
   Audio::Nama::AnalyseLV2:
     file: lib/Audio/Nama/AnalyseLV2.pm
     version: '1'
@@ -87,9 +87,6 @@ provides:
   Audio::Nama::Graph:
     file: lib/Audio/Nama/Graph.pm
     version: '1'
-  Audio::Nama::Graphical:
-    file: lib/Audio/Nama/Graphical.pm
-    version: '1.071'
   Audio::Nama::HereMark:
     file: lib/Audio/Nama/Mark.pm
     version: '1'
@@ -275,6 +272,9 @@ provides:
   Audio::Nama::WetTrack:
     file: lib/Audio/Nama/Track.pm
     version: '1'
+  Tickit::Widget::Entry:
+    file: lib/Audio/Nama/Entry.pm
+    version: '0.42'
 requires:
   Data::Dumper::Concise: '0'
   Data::Section::Simple: '0'
@@ -309,11 +309,11 @@ requires:
   Text::Format: '0'
   Text::Template: '0'
   Tickit::Async: '0'
-  Tickit::Widget::Entry: '0'
   Tickit::Widget::Entry::Plugin::Completion: '0'
   Tickit::Widget::ScrollBox: '0'
   Tickit::Widget::Static: '0'
   Tickit::Widget::VBox: '0'
+  Tie::Simple: '0'
   Time::HiRes: '0'
   Try::Tiny: '0'
   YAML::Tiny: '0'
@@ -321,5 +321,5 @@ requires:
   perl: '5.036'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.600'
+version: '1.602'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,12 @@
 Revision history for PDF-Sign
 
+0.07  2026-4-08
+    - Fixed TARFLAGS --format=ustar to avoid PAX headers (CPANTS kwalitee)
+    - POD moved back inline into Sign.pm (MetaCPAN indexing)
+    - Separate license file
+    - OpenSSL 4.x forward compatibility (prevent silent smime regression)
+    - Cosmetic fixes
+
 0.06  2026-04-07
     - Fixed: Documentation typo corrections
     - If signature exceeds reserved space, PDF is returned unchanged with a
@@ -16,7 +23,7 @@ Revision history for PDF-Sign
 0.04  2026-04-06
     - Fixed: Calculation of Time Zone Offset for systems without %z
       (timegm-based: correct DST handling for all timezones,
-       replaces the previous CET/CEST-only approach)
+      replaces the previous CET/CEST-only approach)
     - Pod separated from code
     - Checked Compatibility with deps to Perl 5.10+ 
     - Fixed: strips non path chars from args of ts_query

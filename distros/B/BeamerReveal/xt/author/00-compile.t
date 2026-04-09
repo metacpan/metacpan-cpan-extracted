@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14;
+plan tests => 16;
 
 my @module_files = (
     'BeamerReveal.pm',
@@ -23,8 +23,10 @@ my @module_files = (
 );
 
 my @scripts = (
+    'bin/awspolly.pl',
+    'bin/balabolka.pl',
     'bin/beamer-reveal.pl',
-    'bin/beamer-reveal.pl~'
+    'bin/festival.pl'
 );
 
 # no fake home requested

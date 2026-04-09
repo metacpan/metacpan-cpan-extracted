@@ -10,13 +10,15 @@ use DateTime;
 use English;
 use Getopt::Std;
 use IO::Barf qw(barf);
+use IO::Uncompress::AnyUncompress qw($AnyUncompressError);
 use List::Util 1.33 qw(none);
+use MARC::Batch;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator 0.14;
 use MARC::Validator::Filter;
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -125,15 +127,38 @@ sub _list_plugins {
 	return 0;
 }
 
+sub _open_marc_input {
+	my ($self, $path, $fh_sr, $errno_sr) = @_;
+
+	# Compression autodetection.
+	${$fh_sr} = IO::Uncompress::AnyUncompress->new($path);
+	if (defined ${$fh_sr}) {
+		return 0;
+	}
+	${$errno_sr} = $AnyUncompressError;
+
+	return 1;
+}
+
 sub _process_validation {
 	my $self = shift;
 
 	$self->_init_plugins;
 	foreach my $marc_xml_file (@{$self->{'_marc_xml_files'}}) {
-		my $marc_file = MARC::File::XML->in($marc_xml_file);
-		if (! defined $marc_file) {
-			print STDERR "Cannot open MARC file '$marc_xml_file'.\n";
-			print STDERR "Error: $MARC::File::ERROR\n";
+		my ($fh, $errno);
+		if ($self->_open_marc_input($marc_xml_file, \$fh, \$errno)) {
+			print STDERR "Cannot open file '$marc_xml_file'.";
+			if (defined $errno) {
+				print STDERR "\tErrno: $errno\n";
+			}
+			return 1;
+		}
+		my $marc_batch = eval {
+			MARC::Batch->new('XML', $fh);
+		};
+		if ($EVAL_ERROR) {
+			print STDERR "Cannot open MARC XML stream.\n";
+			print STDERR "\tError: $EVAL_ERROR\n";
 			return 1;
 		}
 		my $num = 0;
@@ -141,7 +166,7 @@ sub _process_validation {
 		while (1) {
 			$num++;
 			my $record = eval {
-				$marc_file->next;
+				$marc_batch->next;
 			};
 			if ($EVAL_ERROR) {
 				print STDERR "Cannot process file '$marc_xml_file', record '$num'.".

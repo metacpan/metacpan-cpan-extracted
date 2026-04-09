@@ -3,6 +3,7 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
+eg/pather
 lib/Game/DijkstraMap.pm
 t/00-load.t
 t/dimap.t

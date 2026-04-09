@@ -1,5 +1,11 @@
 Revision history for Perl extension EV::Redis
 
+0.09 2026-04-08
+     - Add benchmarks section to POD
+     - Add 19 practical examples in eg/
+     - Hide bundled hiredis symbols (--exclude-libs)
+     - Add Alpine Linux and Valkey to CI
+
 0.08 2026-04-06
      - Fork from EV::Hiredis, rename to EV::Redis
      - Switch to ExtUtils::MakeMaker, update bundled hiredis to v1.3.0+

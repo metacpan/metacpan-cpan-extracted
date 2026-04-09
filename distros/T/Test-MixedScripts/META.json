@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "unicode",
       "security"
@@ -31,18 +31,21 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Zilla::Plugin::UsefulReadme" : "v0.1.2",
+            "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.3",
             "ExtUtils::Manifest" : "1.68",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Markdown::Github" : "0",
+            "Pod::Wordlist" : "0",
             "Software::Security::Policy::Individual" : "0.10",
             "Test::CPAN::Changes" : "0.19",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
+            "Test::Fixme" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
-            "Test::More" : "0.88",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -51,7 +54,8 @@
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.17",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0.015"
+            "Test::Vars" : "0.015",
+            "strict" : "0"
          }
       },
       "runtime" : {
@@ -89,7 +93,7 @@
    "provides" : {
       "Test::MixedScripts" : {
          "file" : "lib/Test/MixedScripts.pm",
-         "version" : "v0.6.3"
+         "version" : "v0.6.4"
       }
    },
    "release_status" : "stable",
@@ -103,10 +107,10 @@
          "web" : "https://github.com/robrwo/perl-Test-MixedScripts"
       }
    },
-   "version" : "v0.6.3",
+   "version" : "v0.6.4",
    "x_authority" : "cpan:RRWO",
-   "x_generated_by_perl" : "v5.34.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.42.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

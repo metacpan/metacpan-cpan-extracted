@@ -8,7 +8,7 @@ use Data::MARC::Validator::Report::Plugin 0.02;
 use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool check_required);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Constructor.
 sub new {
@@ -584,6 +584,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

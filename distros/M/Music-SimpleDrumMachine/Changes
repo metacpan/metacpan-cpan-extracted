@@ -1,5 +1,26 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0501 2026-04-08 21:35:43
+    - Add all the drums known to MIDI::Drummer::Tiny::Grooves.
+
+0.0500 2026-04-08 21:05:07
+    - Make arbitrary assignment of parts and fills possible.
+    - Improve documentation.
+
+0.0407 2026-04-08 14:54:09
+    - Improve documentation.
+    - Improve eg/grooves.pl.
+
+0.0406 2026-04-08 11:47:16
+    - Fix documentation.
+
+0.0405 2026-04-08 11:10:29
+    - Add a missing drum to eg/grooves.pl. Oof!
+
+0.0404 2026-04-08 10:40:39
+    - Rename the closed "hihat" to "closed."
+    - Add the eg/grooves.pl example program.
+
 0.0403 2026-04-05 15:42:35
     - Improve documentation.
     - Clean-up code a bit.

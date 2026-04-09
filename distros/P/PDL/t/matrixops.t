@@ -13,9 +13,9 @@ sub check_inplace {
   for my $inplace (0, 1) {
     my $in_copy = $in->copy;
     my $got;
-    $inplace
-      ? lives_ok { $cb->($in_copy->inplace); $got = $in_copy->copy } "$label inplace=$inplace runs"
-      : lives_ok { $got = $cb->($in_copy) } "$label inplace=$inplace runs";
+    lives_ok { if ($inplace) {$cb->($in_copy->inplace); $got = $in_copy->copy}
+      else { $got = $cb->($in_copy) }
+    } $label = "$label inplace=$inplace runs";
     is_pdl $got, $expected, "$label inplace=$inplace";
   }
 }
@@ -124,7 +124,7 @@ is_pdl $got, $bb->transpose, "A x actually == B";
 my $A = identity(4) + ones(4, 4); $A->slice('2,0') .= 0;
 my $B = sequence(1, 4);
 my ($x) = simq($A->copy, $B->transpose, 0);
-$x = $x->inplace->transpose;
+$x = $x->transpose;
 is_pdl $A x $x, $B, 'simq right result';
 }
 
@@ -173,6 +173,11 @@ is_pdl stretcher(pdl(2,3)), pdl('2 0;0 3'), "stretcher 2x2";
 is_pdl stretcher(pdl('2 3;3 4')), pdl('[2 0;0 3][3 0;0 4]'), "stretcher 2x2x2";
 is_pdl stretcher(ldouble('0.14142135623731 0.14142135623731')), ldouble('0.14142135623731 0;0 0.14142135623731'), "stretcher ldouble 2x2";
 }
+
+is_pdl gurney(pdl(1,2), 2, 3), pdl('1 0; 0 2; 0 0'), 'gurney works tall';
+is_pdl gurney(pdl(1,2), 3, 2), pdl('1 0 0; 0 2 0'), 'gurney works wide';
+is_pdl gurney(pdl(1,2,3), 3, 5), pdl('1 0 0; 0 2 0; 0 0 3; 0 0 0; 0 0 0'), 'gurney works big tall';
+is_pdl gurney(pdl(1,2,3), 5, 3), pdl('1 0 0 0 0; 0 2 0 0 0; 0 0 3 0 0'), 'gurney works big wide';
 
 {
 ### Check eigens with symmetric
@@ -274,47 +279,61 @@ my $svd_in = pdl([3,1,2,-1],[-1,3,0,2],[-2,3,0,0],[1,3,-1,2]);
 #2x2;
 my $this_svd_in = $svd_in->slice("0:1","0:1");
 my ($u,$s,$v) = svd($this_svd_in);
-my $ess = zeroes($this_svd_in->dim(0),$this_svd_in->dim(0));
-$ess->diagonal(0,1).=$s;
-is_pdl $this_svd_in, ($u x $ess x $v->transpose), "svd 2x2";
+is_pdl $u x stretcher($s) x $v->transpose, $this_svd_in, "svd 2x2"
+  or diag 'got:', $u, $s, $v;
 }
 
 {
 #3x3;
 my $this_svd_in = $svd_in->slice("0:2","0:2");
 my ($u,$s,$v) = svd($this_svd_in);
-my $ess = zeroes($this_svd_in->dim(0),$this_svd_in->dim(0));
-$ess->diagonal(0,1).=$s;
-is_pdl $this_svd_in, $u x $ess x $v->transpose, "svd 3x3";
+is_pdl $u x stretcher($s) x $v->transpose, $this_svd_in, "svd 3x3"
+  or diag 'got:', $u, $s, $v;
 }
 
 {
 #4x4;
 my $this_svd_in = $svd_in;
 my ($u,$s,$v) = svd($this_svd_in);
-my $ess =zeroes($this_svd_in->dim(0),$this_svd_in->dim(0));
-$ess->diagonal(0,1).=$s;
-is_pdl $this_svd_in,($u x $ess x $v->transpose),"svd 4x4";
+is_pdl $u x stretcher($s) x $v->transpose, $this_svd_in, "svd 4x4"
+  or diag 'got:', $u, $s, $v;
 }
 
 {
 #3x2
 my $this_svd_in = $svd_in->slice("0:1","0:2");
 my ($u,$s,$v) = svd($this_svd_in);
-my $ess = zeroes($this_svd_in->dim(0),$this_svd_in->dim(0));
-$ess->slice("$_","$_").=$s->slice("$_") foreach (0,1); #generic diagonal
-is_pdl $this_svd_in, $u x $ess x $v->transpose, "svd 3x2";
+is_pdl $u x stretcher($s) x $v->transpose, $this_svd_in, "svd 3x2";
 }
 
 {
 #2x3
 my $this_svd_in = $svd_in->slice("0:2","0:1");
-my ($u,$s,$v) = svd($this_svd_in->transpose);
-my $ess = zeroes($this_svd_in->dim(1),$this_svd_in->dim(1));
-$ess->slice("$_","$_").=$s->slice("$_") foreach (0..$this_svd_in->dim(1)-1); #generic diagonal
-is_pdl $this_svd_in, $v x $ess x $u->transpose, "svd 2x3";
+my ($u,$s,$v) = svd($this_svd_in);
+is_pdl $u x stretcher($s) x $v->transpose, $this_svd_in, "svd 2x3"
+  or diag "Got from SVD:\nu=${u}s=$s\nv=$v";
 }
 
+{
+# 5x3
+my $in = pdl '1 2 3 4 21; 5 6 7 8 22; 9 10 11 12 20';
+my ($u,$s,$v) = svd($in->t, 1);
+is_pdl $u x gurney($s, $in->t->dims) x $v->t, $in->t, "svd full tall"
+  or diag 'got:', $u, $s, $v;
+is_pdl $u->t x $u, identity(5), 'tall U is orthonormal' or diag "u=$u";
+is_pdl $v x $v->t, identity(3), 'tall Vt is orthonormal' or diag "v=$v";
+my $u_null = $u->slice("-1");
+is_pdl $in x $u_null, zeroes(1,3), 'tall correct left null-space';
+
+# 3x5
+($u,$s,$v) = svd($in, 1);
+is_pdl $u x gurney($s, $in->dims) x $v->t, $in, "svd full wide"
+  or diag 'got:', $u, $s, $v;
+is_pdl $u->t x $u, identity(3), 'wide U is orthonormal' or diag "u=$u";
+is_pdl $v x $v->t, identity(5), 'wide Vt is orthonormal' or diag "v=$v";
+my $v_null = $v->slice("-1");
+is_pdl $in x $v_null, zeroes(1,3), 'wide correct right null-space';
+}
 }
 
 {
@@ -356,13 +375,13 @@ is $y.'', "
 my $A = pdl '[1 2 3; 4 5 6; 7 8 9]';
 my $up = pdl '[1 2 3; 0 5 6; 0 0 9]';
 my $lo = pdl '[1 0 0; 4 5 0; 7 8 9]';
-is_pdl $A->tricpy(0), $up, 'upper triangle #1';
+is_pdl $A->tricpy(0), $up, 'upper triangle';
 tricpy($A, 0, my $got = null);
-is_pdl $got, $up, 'upper triangle #2';
-is_pdl $A->tricpy, $up, 'upper triangle #3';
-is_pdl $A->tricpy(1), $lo, 'lower triangle #1';
+is_pdl $got, $up, 'upper triangle';
+is_pdl $A->tricpy, $up, 'upper triangle';
+is_pdl $A->tricpy(1), $lo, 'lower triangle';
 tricpy($A, 1, $got = null);
-is_pdl $got, $lo, 'lower triangle #2';
+is_pdl $got, $lo, 'lower triangle';
 is_pdl $A->mstack($up), pdl('[1 2 3; 4 5 6; 7 8 9; 1 2 3; 0 5 6; 0 0 9]');
 is_pdl sequence(2,3)->augment(sequence(3,3)+10), pdl('[0 1 10 11 12; 2 3 13 14 15; 4 5 16 17 18]');
 my $B = pdl('[i 2+4i 3+5i; 0 3i 7+9i]');
@@ -370,6 +389,20 @@ is_pdl $B->t, pdl('[i 0; 2+4i 3i; 3+5i 7+9i]');
 is_pdl $B->t(1), pdl('[-i 0; 2-4i -3i; 3-5i 7-9i]');
 is_pdl sequence(3)->t, pdl('[0; 1; 2]');
 is_pdl pdl(3)->t->shape, indx([1,1]);
+my $strict_up = pdl '[0 2 3; 0 0 6; 0 0 0]';
+my $strict_lo = pdl '[0 0 0; 4 0 0; 7 8 0]';
+is_pdl $A->tricpy(-1), $strict_up, 'strict upper triangle';
+is_pdl $A->tricpy(2), $strict_lo, 'strict lower triangle';
+}
+
+{
+is_pdl +(my $m = sequence(3,3))->tritosym, my $exp = pdl('0 1 2; 1 4 5; 2 5 8'), 'tritosym';
+$m->inplace->tritosym; is_pdl $m, $exp, 'tritosym inplace';
+is_pdl +($m = sequence(3,3))->tritosym(1), $exp = pdl('0 3 6; 3 4 7; 6 7 8'), 'tritosym lower';
+$m->inplace->tritosym(1); is_pdl $m, $exp, 'tritosym lower inplace';
+is_pdl +($m = sequence(4,4)+i)->tritosym(1,1), $exp = pdl('0 4-i 8-i 12-i; 4+i 5 9-i 13-i; 8+i 9+i 10 14-i; 12+i 13+i 14+i 15'), 'tritosym lower hermitian';
+$m->inplace->tritosym(1,1); is_pdl $m, $exp, 'tritosym lower hermitian inplace';
+is_pdl $m, $m->t->conj, 'hermitian is actually hermitian';
 }
 
 done_testing;

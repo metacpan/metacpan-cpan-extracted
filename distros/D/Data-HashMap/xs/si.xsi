@@ -244,7 +244,7 @@ pop(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_tail != HM_LRU_NONE) {
                 uint32_t idx = self->lru_tail;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now >= self->expires_at[idx]) {
+                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
                     hashmap_si_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -292,7 +292,7 @@ shift(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_head != HM_LRU_NONE) {
                 uint32_t idx = self->lru_head;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now >= self->expires_at[idx]) {
+                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
                     hashmap_si_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -381,8 +381,10 @@ freeze(SV* self_sv)
                 sv_catpvn(buf, (const char*)&self->nodes[i].value, 8);
                 /* TTL: remaining seconds (0 = none) */
                 { uint32_t rem = 0;
-                  if (self->expires_at && self->expires_at[i] && self->expires_at[i] > now)
+                  if (self->expires_at && self->expires_at[i] && self->expires_at[i] >= now) {
                       rem = self->expires_at[i] - now;
+                      if (!rem) rem = 1;
+                  }
                   sv_catpvn(buf, (const char*)&rem, 4);
                 }
                 n_written++;
@@ -423,6 +425,7 @@ thaw(char* class, SV* data)
             int64_t val; memcpy(&val, p, 8); p += 8;
             uint32_t ttl; memcpy(&ttl, p, 4); p += 4;
             hashmap_si_put(map, kstr, kl, khash, kutf8, val, ttl);
+            if (ttl == 0 && map->expires_at) hashmap_si_persist(map, kstr, kl, khash, kutf8);
           }
         }
         if (p > end) croak("Truncated freeze data");

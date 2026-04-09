@@ -3,7 +3,7 @@ package File::Raw;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Use DynaLoader with RTLD_GLOBAL so C API symbols (file_hooks.h) are visible
 # to other XS modules that link against us at runtime.

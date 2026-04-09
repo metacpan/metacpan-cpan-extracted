@@ -968,6 +968,9 @@ static OP* file_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     OpMORESIB_set(pushop, cvop);
     OpLASTSIB_set(argop, NULL);
 
+    /* Force scalar context so function calls return exactly one value */
+    argop = op_contextualize(argop, G_SCALAR);
+
     /* Create as OP_NULL first to avoid -DDEBUGGING assertion in newUNOP,
        then convert to OP_CUSTOM */
     newop = newUNOP(OP_NULL, 0, argop);
@@ -1009,6 +1012,11 @@ static OP* file_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     OpMORESIB_set(pushop, cvop);
     OpLASTSIB_set(pathop, NULL);
     OpLASTSIB_set(dataop, NULL);
+
+    /* Force scalar context on both args so function calls
+       return exactly one value on the stack */
+    pathop = op_contextualize(pathop, G_SCALAR);
+    dataop = op_contextualize(dataop, G_SCALAR);
 
     /* Create as OP_NULL first to avoid -DDEBUGGING assertion in newBINOP,
        then convert to OP_CUSTOM */
@@ -4223,6 +4231,93 @@ XS_INTERNAL(xs_join) {
     XSRETURN(1);
 }
 
+/* mkpath: recursive mkdir */
+XS_INTERNAL(xs_mkpath) {
+    dXSARGS;
+    const char *path;
+    STRLEN path_len;
+    char buf[4096];
+    STRLEN i;
+    int created = 0;
+
+    if (items != 1) croak("Usage: file_mkpath(path)");
+    path = SvPV(ST(0), path_len);
+    if (path_len >= sizeof(buf)) croak("Path too long");
+
+    for (i = 0; i <= path_len; i++) {
+        if (i == path_len || path[i] == '/' || path[i] == '\\') {
+            if (i == 0) {
+                /* Root / or drive-relative */
+                buf[0] = path[0];
+                buf[1] = '\0';
+                continue;
+            }
+            memcpy(buf, path, i);
+            buf[i] = '\0';
+
+            /* Skip drive letter portion like C: */
+            if (i == 2 && buf[1] == ':') continue;
+
+            if (!file_is_dir_internal(buf)) {
+                if (file_mkdir_internal(buf, 0755))
+                    created = 1;
+            }
+        }
+    }
+
+    ST(0) = created || file_is_dir_internal(path) ? &PL_sv_yes : &PL_sv_no;
+    XSRETURN(1);
+}
+
+/* rm_rf: recursive remove directory */
+static void file_rm_rf_internal(pTHX_ const char *path) {
+    AV *entries;
+    SSize_t i, len;
+
+    if (!file_is_dir_internal(path)) {
+        file_unlink_internal(path);
+        return;
+    }
+
+    entries = file_readdir_internal(aTHX_ path);
+    len = av_len(entries) + 1;
+    for (i = 0; i < len; i++) {
+        SV **sv = av_fetch(entries, i, 0);
+        if (sv) {
+            AV *join_parts = newAV();
+            SV *child_sv;
+            const char *child;
+
+            av_push(join_parts, newSVpv(path, 0));
+            av_push(join_parts, newSVsv(*sv));
+            child_sv = file_join_internal(aTHX_ join_parts);
+            child = SvPV_nolen(child_sv);
+
+            if (file_is_dir_internal(child)) {
+                file_rm_rf_internal(aTHX_ child);
+            } else {
+                file_unlink_internal(child);
+            }
+
+            SvREFCNT_dec(child_sv);
+            SvREFCNT_dec((SV*)join_parts);
+        }
+    }
+    SvREFCNT_dec((SV*)entries);
+    file_rmdir_internal(path);
+}
+
+XS_INTERNAL(xs_rm_rf) {
+    dXSARGS;
+    const char *path;
+
+    if (items != 1) croak("Usage: file_rm_rf(path)");
+    path = SvPV_nolen(ST(0));
+    file_rm_rf_internal(aTHX_ path);
+    ST(0) = &PL_sv_yes;
+    XSRETURN(1);
+}
+
 /* Head and tail */
 XS_INTERNAL(xs_head) {
     dXSARGS;
@@ -4604,18 +4699,27 @@ static const ImportEntry import_funcs[] = {
     {"chmod", 2, XS_file_func_chmod, pp_file_chmod},
     {"append", 2, XS_file_func_append, pp_file_append},
     {"atomic_spew", 2, XS_file_func_atomic_spew, pp_file_atomic_spew},
+    /* variadic functions (args=0 means plain newXS, no custom op) */
+    {"join", 0, xs_join, NULL},
+    {"mkpath", 0, xs_mkpath, NULL},
+    {"rm_rf", 0, xs_rm_rf, NULL},
     {NULL, 0, NULL, NULL}
 };
 
 #define IMPORT_FUNCS_COUNT (sizeof(import_funcs) / sizeof(import_funcs[0]) - 1)
 
 static void install_import_entry(pTHX_ const char *pkg, const ImportEntry *e) {
-    char full_name[256];
-    snprintf(full_name, sizeof(full_name), "file_%s", e->name);
-    if (e->args == 1) {
-        install_file_func_1arg(aTHX_ pkg, full_name, e->xs_func, e->pp_func);
+    char short_name[256];
+    snprintf(short_name, sizeof(short_name), "file_%s", e->name);
+    if (e->args == 0) {
+        /* Variadic: plain newXS, no custom op */
+        char full_name[256];
+        snprintf(full_name, sizeof(full_name), "%s::%s", pkg, short_name);
+        newXS(full_name, e->xs_func, __FILE__);
+    } else if (e->args == 1) {
+        install_file_func_1arg(aTHX_ pkg, short_name, e->xs_func, e->pp_func);
     } else {
-        install_file_func_2arg(aTHX_ pkg, full_name, e->xs_func, e->pp_func);
+        install_file_func_2arg(aTHX_ pkg, short_name, e->xs_func, e->pp_func);
     }
 }
 
@@ -4961,6 +5065,8 @@ XS_EXTERNAL(boot_File__Raw) {
 
     /* Functions without custom op optimization */
     newXS("File::Raw::join", xs_join, __FILE__);
+    newXS("File::Raw::mkpath", xs_mkpath, __FILE__);
+    newXS("File::Raw::rm_rf", xs_rm_rf, __FILE__);
     newXS("File::Raw::each_line", xs_each_line, __FILE__);
     newXS("File::Raw::grep_lines", xs_grep_lines, __FILE__);
     newXS("File::Raw::count_lines", xs_count_lines, __FILE__);

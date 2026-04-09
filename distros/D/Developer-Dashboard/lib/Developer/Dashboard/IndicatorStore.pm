@@ -2,14 +2,18 @@ package Developer::Dashboard::IndicatorStore;
 
 use strict;
 use warnings;
+use utf8;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
+use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
+use Fcntl qw(:flock);
 use File::Spec;
 use Time::HiRes qw(time);
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::Platform qw(command_in_path);
 
 my $STATUS_ICONS = {
     ok => {
@@ -65,23 +69,39 @@ sub new {
 
 # set_indicator($name, %data)
 # Writes indicator state to the file-backed indicator store.
-# Input: indicator name plus state fields such as label, icon, and status.
+# Input: indicator name plus state fields such as label, icon, and status, and
+# optional internal preserve fields used when config sync must not clobber a
+# newer live status update.
 # Output: saved indicator hash reference.
 sub set_indicator {
     my ( $self, $name, %data ) = @_;
     my $dir  = $self->{paths}->indicator_dir($name);
     my $file = File::Spec->catfile( $dir, 'status.json' );
+    my $lock = File::Spec->catfile( $dir, '.lock' );
+    my $preserve_fields = delete $data{_preserve_existing_fields};
+    my @preserve_existing = ref($preserve_fields) eq 'ARRAY' ? @{$preserve_fields} : ();
+
+    open my $lock_fh, '>>', $lock or die "Unable to open $lock: $!";
+    flock( $lock_fh, LOCK_EX ) or die "Unable to lock $lock: $!";
+    my $existing = $self->_read_indicator_file($file) || {};
+
+    for my $field (@preserve_existing) {
+        next if !exists $existing->{$field};
+        $data{$field} = $existing->{$field};
+    }
 
     $data{name}       = $name;
-    $data{updated_at} = time;
+    $data{updated_at} = time if !exists $data{updated_at};
 
     my $tmp = "$file.pending";
-    open my $fh, '>', $tmp or die "Unable to write $tmp: $!";
+    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode( \%data );
     close $fh;
+    $self->{paths}->secure_file_permissions($tmp);
 
     unlink $file if -f $file;
     rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
+    $self->{paths}->secure_file_permissions($file);
 
     return \%data;
 }
@@ -92,12 +112,11 @@ sub set_indicator {
 # Output: indicator hash reference or undef when missing.
 sub get_indicator {
     my ( $self, $name ) = @_;
-    my $file = File::Spec->catfile( $self->{paths}->indicator_dir($name), 'status.json' );
-    return if !-f $file;
-
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    return json_decode(<$fh>);
+    for my $file ( $self->_indicator_file_candidates($name) ) {
+        my $item = $self->_read_indicator_file($file);
+        return $item if $item;
+    }
+    return;
 }
 
 # list_indicators()
@@ -106,18 +125,20 @@ sub get_indicator {
 # Output: sorted list of indicator hash references.
 sub list_indicators {
     my ($self) = @_;
-    my $root = $self->{paths}->indicators_root;
-    opendir my $dh, $root or return;
-
-    my @items;
-    while ( my $entry = readdir $dh ) {
-        next if $entry eq '.' || $entry eq '..';
-        my $item = eval { $self->get_indicator($entry) };
-        push @items, $item if $item;
+    my %items;
+    for my $root ( $self->{paths}->indicators_roots ) {
+        next if !-d $root;
+        opendir my $dh, $root or next;
+        while ( my $entry = readdir $dh ) {
+            next if $entry eq '.' || $entry eq '..';
+            next if $items{$entry};
+            my $item = eval { $self->get_indicator($entry) };
+            $items{$entry} = $item if $item;
+        }
+        closedir $dh;
     }
-    closedir $dh;
 
-    return sort { ($a->{priority} || 999) <=> ($b->{priority} || 999) || $a->{name} cmp $b->{name} } @items;
+    return sort { ($a->{priority} || 999) <=> ($b->{priority} || 999) || $a->{name} cmp $b->{name} } values %items;
 }
 
 # sync_collectors($jobs)
@@ -128,12 +149,16 @@ sub list_indicators {
 sub sync_collectors {
     my ( $self, $jobs ) = @_;
     return [] if ref($jobs) ne 'ARRAY';
+    return [] if !@{$jobs};
 
     my @written;
+    my %active_collectors;
     for my $job ( @{$jobs} ) {
         next if ref($job) ne 'HASH';
         next if ref( $job->{indicator} ) ne 'HASH';
+        next if !defined $job->{name} || $job->{name} eq '';
 
+        $active_collectors{ $job->{name} } = 1;
         my $name = $job->{indicator}{name} || $job->{name} || next;
         my $existing = eval { $self->get_indicator($name) } || {};
         my $label = defined $job->{indicator}{label} && $job->{indicator}{label} ne ''
@@ -145,6 +170,8 @@ sub sync_collectors {
             name           => $name,
             label          => $label,
             status         => defined $existing->{status} && $existing->{status} ne '' ? $existing->{status} : 'missing',
+            collector_name => $job->{name},
+            managed_by_collector => 1,
             prompt_visible => exists $job->{indicator}{prompt_visible}
               ? $job->{indicator}{prompt_visible}
               : exists $existing->{prompt_visible}
@@ -152,11 +179,50 @@ sub sync_collectors {
               : 1,
         );
         if ( !$self->_indicator_matches( $existing, \%candidate ) ) {
-            push @written, $self->set_indicator( $name, %candidate );
+            push @written, $self->set_indicator(
+                $name,
+                %candidate,
+                _preserve_existing_fields => [ qw(status updated_at stale) ],
+            );
         }
     }
 
+    for my $indicator ( $self->list_indicators ) {
+        next if ref($indicator) ne 'HASH';
+        next if !$indicator->{managed_by_collector};
+        my $collector_name = $indicator->{collector_name} || '';
+        next if $collector_name eq '';
+        next if $active_collectors{$collector_name};
+        $self->delete_indicator( $indicator->{name} );
+        push @written, { %{$indicator}, deleted => 1 };
+    }
+
     return \@written;
+}
+
+# delete_indicator($name)
+# Removes one persisted indicator record and its directory when present.
+# Input: indicator name string.
+# Output: true when cleanup completes.
+sub delete_indicator {
+    my ( $self, $name ) = @_;
+    return 1 if !defined $name || $name eq '';
+    for my $dir ( map { File::Spec->catdir( $_, $name ) } $self->{paths}->indicators_roots ) {
+        my $file = File::Spec->catfile( $dir, 'status.json' );
+        unlink $file if -f $file;
+        rmdir $dir if -d $dir;
+    }
+    return 1;
+}
+
+# _indicator_file_candidates($name)
+# Returns candidate indicator status files across every runtime layer in lookup
+# order from deepest to home.
+# Input: indicator name string.
+# Output: ordered list of file path strings.
+sub _indicator_file_candidates {
+    my ( $self, $name ) = @_;
+    return map { File::Spec->catfile( $_, $name, 'status.json' ) } $self->{paths}->indicators_roots;
 }
 
 # mark_stale($name, %opts)
@@ -193,7 +259,7 @@ sub refresh_core_indicators {
     my $cwd   = $args{cwd} || $self->{paths}->current_project_root || $self->{paths}->home;
     my $items = [];
 
-    my $docker_ok = ( system( 'sh', '-c', 'command -v docker >/dev/null 2>&1' ) >> 8 ) == 0 ? 1 : 0;
+    my $docker_ok = command_in_path('docker') ? 1 : 0;
     push @$items, $self->set_indicator(
         'docker',
         alias          => '🐳',
@@ -219,9 +285,19 @@ sub refresh_core_indicators {
     if ($project) {
         my $old = cwd();
         chdir $project or die "Unable to chdir to $project: $!";
-        my $dirty = ( system( 'sh', '-c', 'git diff --quiet --ignore-submodules HEAD -- >/dev/null 2>&1' ) >> 8 ) == 0 ? 0 : 1;
+        my ( $stdout, $stderr, $inside_exit ) = capture {
+            system( 'git', 'rev-parse', '--is-inside-work-tree' );
+            return $? >> 8;
+        };
+        my $inside_work_tree = $inside_exit == 0 && $stdout =~ /^\s*true\s*$/m ? 1 : 0;
+        if ($inside_work_tree) {
+            my ( undef, undef, $dirty_exit ) = capture {
+                system( 'git', 'diff', '--quiet', '--ignore-submodules', 'HEAD', '--' );
+                return $? >> 8;
+            };
+            $git_status = $dirty_exit == 0 ? 'clean' : 'dirty';
+        }
         chdir $old or die "Unable to restore cwd to $old: $!";
-        $git_status = $dirty ? 'dirty' : 'clean';
     }
     push @$items, $self->set_indicator(
         'git',
@@ -236,7 +312,7 @@ sub refresh_core_indicators {
 }
 
 # page_header_items()
-# Builds the legacy top-of-page status payload from stored indicators.
+# Builds the older top-of-page status payload from stored indicators.
 # Input: none.
 # Output: list of hashes with prog, alias, and status fields.
 sub page_header_items {
@@ -246,6 +322,8 @@ sub page_header_items {
         next if exists $indicator->{prompt_visible} && !$indicator->{prompt_visible};
         my $alias = defined $indicator->{alias} && $indicator->{alias} ne ''
           ? $indicator->{alias}
+          : defined $indicator->{icon} && $indicator->{icon} ne ''
+          ? $indicator->{icon}
           : defined $indicator->{label} && $indicator->{label} ne ''
           ? $indicator->{label}
           : $indicator->{name};
@@ -259,7 +337,7 @@ sub page_header_items {
 }
 
 # page_header_payload()
-# Builds the legacy `/system/status` response payload shape.
+# Builds the older `/system/status` response payload shape.
 # Input: none.
 # Output: hash reference with array, hash, and status maps.
 sub page_header_payload {
@@ -301,7 +379,7 @@ sub _page_status_icon {
 sub _indicator_matches {
     my ( $self, $existing, $candidate ) = @_;
     return 0 if ref($existing) ne 'HASH' || ref($candidate) ne 'HASH';
-    for my $key ( qw(name label alias icon status priority prompt_visible page_status_icon) ) {
+    for my $key ( qw(name label alias icon status priority prompt_visible page_status_icon collector_name managed_by_collector) ) {
         my $left  = exists $existing->{$key}  ? $existing->{$key}  : undef;
         my $right = exists $candidate->{$key} ? $candidate->{$key} : undef;
         $left  = '' if !defined $left;
@@ -309,6 +387,18 @@ sub _indicator_matches {
         return 0 if $left ne $right;
     }
     return 1;
+}
+
+# _read_indicator_file($file)
+# Reads and decodes one indicator status file when it exists.
+# Input: absolute indicator status file path.
+# Output: indicator hash reference or undef when the file is missing.
+sub _read_indicator_file {
+    my ( $self, $file ) = @_;
+    return if !-f $file;
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    local $/;
+    return json_decode(<$fh>);
 }
 
 # _status_icon_for($indicator, $map)
@@ -352,5 +442,36 @@ Construct and manage the indicator store.
 =head2 mark_stale, is_stale, refresh_core_indicators, page_header_items, page_header_payload
 
 Handle stale state and refresh built-in generic indicators.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file persists and retrieves indicator state across runtime updates.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::IndicatorStore> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::IndicatorStore -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

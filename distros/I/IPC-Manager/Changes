@@ -1,3 +1,18 @@
+0.000014  2026-04-08 14:58:59-07:00 America/Los_Angeles
+
+    - Refactor viable() into base-class wrapper around _viable() so it never throws
+    - Fix DB tests failing to skip when DBI is too old
+    - Fix DB viable() not detecting missing server binaries (initdb, mysqld, etc.)
+    - Fix inotify tests failing when Linux::Inotify2 < 2.3 is installed
+    - Enforce Atomic::Pipe minimum version 0.022 in viable check and tests
+    - Add JSON::PP prereq, remove unused Sub::Util, fix IO::Select version in dist.ini
+    - Add 180-second timeout with stack trace to integration tests
+
+0.000013  2026-04-08 08:14:28-07:00 America/Los_Angeles
+
+    - Fix SQLite DEFAULT FALSE incompatibility with older SQLite versions
+    - Fix UnixSocket broadcast test race on FreeBSD and older Linux kernels
+
 0.000012  2026-04-07 16:36:22-07:00 America/Los_Angeles
 
     - Fix JSONFile cache staleness detection when Linux::Inotify2 is absent

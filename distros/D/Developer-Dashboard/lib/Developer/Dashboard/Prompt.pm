@@ -2,12 +2,14 @@ package Developer::Dashboard::Prompt;
 
 use strict;
 use warnings;
+use utf8;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use File::Basename qw(basename);
+use POSIX qw(strftime);
 
 # new(%args)
 # Constructs the prompt renderer.
@@ -39,6 +41,7 @@ sub render {
     my $project = $self->{paths}->project_root_for($cwd);
     my $home = $self->{paths}->home;
     $cwd =~ s/^\Q$home\E/~/;
+    $cwd = "Home: $home" if $cwd eq '~';
 
     my @indicator_parts = $self->_indicator_parts(
         color   => $color,
@@ -46,27 +49,28 @@ sub render {
         mode    => $mode,
     );
 
-    my $status = @indicator_parts ? join( ' ', @indicator_parts ) : '';
-    my $project_label = $project ? basename($project) : '';
+    my $ticket = defined $ENV{TICKET_REF} ? $ENV{TICKET_REF} : '';
+    my @info_parts = @indicator_parts;
+    push @info_parts, "🎫:$ticket" if defined $ticket && $ticket ne '';
+    my $info = @info_parts ? join( ' ', @info_parts ) : '';
     my $branch = $self->_git_branch($project);
     my $jobs_suffix = $jobs ? " ($jobs jobs)" : '';
-    my $context = '';
-    if ( $project_label && $branch ) {
-        $context = "$project_label:$branch";
-    }
-    elsif ($project_label) {
-        $context = $project_label;
-    }
-    elsif ($branch) {
-        $context = $branch;
-    }
-    my $project_suffix = $context ? " {$context}" : '';
+    my $branch_suffix = $branch ? " 🌿$branch" : '';
 
-    return sprintf "[%s]%s %s%s\n> ",
-      scalar localtime,
-      ( $status ne '' ? " $status" : '' ),
+    return sprintf "(%s)%s [%s]%s%s\n> ",
+      $self->_timestamp,
+      ( $info ne '' ? " $info" : '' ),
       $cwd,
-      $jobs_suffix . $project_suffix;
+      $jobs_suffix,
+      $branch_suffix;
+}
+
+# _timestamp()
+# Renders the prompt timestamp in the older shell-helper format.
+# Input: none.
+# Output: local timestamp string as YYYY-MM-DD HH:MM:SS.
+sub _timestamp {
+    return strftime( '%Y-%m-%d %H:%M:%S', localtime );
 }
 
 # _indicator_parts(%args)
@@ -101,7 +105,8 @@ sub _indicator_parts {
 }
 
 # _git_branch($project_root)
-# Reads the current git branch for a project root if available.
+# Reads the current git branch for a project root if available using the older
+# `git branch` parsing style so the prompt matches the classic shell helper.
 # Input: project root directory path.
 # Output: branch name string or undef when unavailable.
 sub _git_branch {
@@ -111,13 +116,17 @@ sub _git_branch {
     my $old = cwd();
     chdir $project_root or return;
     my ( $stdout, undef, $exit_code ) = capture {
-        system 'git', 'rev-parse', '--abbrev-ref', 'HEAD';
+        system 'git', 'branch';
         return $? >> 8;
     };
     chdir $old or die "Unable to restore cwd to $old: $!";
     return if $exit_code != 0;
-    $stdout =~ s/\s+$// if defined $stdout;
-    return $stdout;
+    return if !defined $stdout || $stdout eq '';
+    for my $line ( split /\n/, $stdout ) {
+        next if !defined $line;
+        return $1 if $line =~ /^\*\s+(.+)$/;
+    }
+    return;
 }
 
 1;
@@ -151,5 +160,36 @@ Construct a prompt renderer.
 =head2 render
 
 Return the full prompt string.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file renders prompt output such as the shell prompt branch display.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::Prompt> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::Prompt -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

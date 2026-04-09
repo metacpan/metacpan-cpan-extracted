@@ -107,6 +107,7 @@ ok( grep( $_ eq $named_prefix_file, @prefixed ), 'named file lookup honors confi
     chdir $original_cwd or die "Unable to restore cwd to $original_cwd: $!";
 }
 
+my $print_error = '';
 my ( $print_stdout, undef ) = capture {
     local *Developer::Dashboard::CLI::OpenFile::_command_exit = sub { die "EXIT:$_[0]" };
     eval {
@@ -115,8 +116,9 @@ my ( $print_stdout, undef ) = capture {
             args  => [ '--print', 'home', 'alpha-notes' ],
         );
     };
-    like( $@, qr/^EXIT:0\b/, 'print-mode open-file path exits cleanly through the test hook' );
+    $print_error = $@;
 };
+like( $print_error, qr/^EXIT:0\b/, 'print-mode open-file path exits cleanly through the test hook' );
 like( $print_stdout, qr/\Q$notes_file\E/, 'print-mode open-file command emits the resolved path' );
 
 my $captured_exec = '';
@@ -133,6 +135,217 @@ eval {
 like( $@, qr/^EXEC/, 'editor-mode open-file path reaches the exec hook' );
 like( $captured_exec, qr/^fake-editor\n--wait\n\+12\n\Q$notes_file\E$/m, 'editor-mode open-file command builds the expected editor invocation' );
 
+my $duplicate_file = File::Spec->catfile( $project_root, 'alpha-second-notes.txt' );
+open my $duplicate_fh, '>', $duplicate_file or die "Unable to write $duplicate_file: $!";
+print {$duplicate_fh} "alpha second\n";
+close $duplicate_fh;
+
+my $scope_root = File::Spec->catdir( $project_root, 'scope-fixtures' );
+my $scope_cli_root = File::Spec->catdir( $scope_root, 'cli' );
+my $scope_js_root  = File::Spec->catdir( $scope_root, 'public', 'js' );
+make_path( $scope_cli_root, $scope_js_root );
+my $scope_jq = File::Spec->catfile( $scope_cli_root, 'jq' );
+open my $scope_jq_fh, '>', $scope_jq or die "Unable to write $scope_jq: $!";
+print {$scope_jq_fh} "#!/bin/sh\n";
+close $scope_jq_fh;
+my $scope_jq_js = File::Spec->catfile( $scope_js_root, 'jq.js' );
+open my $scope_jq_js_fh, '>', $scope_jq_js or die "Unable to write $scope_jq_js: $!";
+print {$scope_jq_js_fh} "window.jq = true;\n";
+close $scope_jq_js_fh;
+my $scope_jquery = File::Spec->catfile( $scope_js_root, 'jquery.js' );
+open my $scope_jquery_fh, '>', $scope_jquery or die "Unable to write $scope_jquery: $!";
+print {$scope_jquery_fh} "window.jquery = true;\n";
+close $scope_jquery_fh;
+my ( $scope_line, @scope_match ) = Developer::Dashboard::CLI::OpenFile::_resolve_open_file_matches(
+    paths => $registry,
+    args  => [ $scope_root, 'jq' ],
+);
+is( $scope_line, 0, 'scoped jq search keeps line number at zero' );
+is_deeply(
+    \@scope_match,
+    [ $scope_jq, $scope_jq_js, $scope_jquery ],
+    'scoped jq search ranks exact jq helper and jq.js ahead of jquery.js',
+);
+is(
+    Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
+        file     => '/tmp/tools/jq',
+        patterns => ['jq'],
+    ),
+    0,
+    'scope rank prefers exact basename matches',
+);
+is(
+    Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
+        file     => '/tmp/tools/jq.js',
+        patterns => ['jq'],
+    ),
+    1,
+    'scope rank prefers basename stem matches next',
+);
+is(
+    Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
+        file     => '/tmp/tools/jquery.js',
+        patterns => ['jq'],
+    ),
+    2,
+    'scope rank then prefers basename prefix matches',
+);
+is(
+    Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
+        file     => '/tmp/tools/my-jq-helper.js',
+        patterns => ['jq'],
+    ),
+    3,
+    'scope rank then falls back to basename substring matches',
+);
+is(
+    Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
+        file     => '/tmp/jq/helper-script',
+        patterns => ['jq'],
+    ),
+    4,
+    'scope rank handles path-component matches that are not basename hits',
+);
+is(
+    Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
+        file     => '/tmp/tools/helper-jq/path',
+        patterns => ['jq'],
+    ),
+    5,
+    'scope rank finally falls back to full-path substring matches',
+);
+is(
+    Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
+        file     => '',
+        patterns => ['jq'],
+    ),
+    50,
+    'scope rank handles empty file paths without crashing',
+);
+is_deeply(
+    [
+        Developer::Dashboard::CLI::OpenFile::_ordered_scope_matches(
+            patterns => ['jq'],
+            files    => [ '/tmp/tools/jquery.js', '/tmp/tools/jq.js', '/tmp/tools/jq' ],
+        )
+    ],
+    [ '/tmp/tools/jq', '/tmp/tools/jq.js', '/tmp/tools/jquery.js' ],
+    'ordered scope matches sorts by rank while preserving ties by discovery order',
+);
+
+my $interactive_error = '';
+my ( $interactive_stdout, $interactive_stderr ) = capture {
+    local *Developer::Dashboard::CLI::OpenFile::_command_exec = sub {
+        $captured_exec = join "\n", @_;
+        die "EXEC";
+    };
+    open my $stdin_fh, '<', \"2\n" or die 'Unable to open scalar stdin handle for open-file selection';
+    local *STDIN = $stdin_fh;
+    eval {
+        run_open_file_command(
+            paths => $registry,
+            args  => [ $project_root, 'alpha' ],
+        );
+    };
+    $interactive_error = $@;
+};
+like( $interactive_error, qr/^EXEC/, 'interactive open-file path reaches the exec hook' );
+like( $interactive_stdout, qr/^\d+: \Q$notes_file\E$/m, 'interactive open-file lists the first matching alpha file' );
+like( $interactive_stdout, qr/^\d+: \Q$duplicate_file\E$/m, 'interactive open-file lists the second matching alpha file' );
+like( $interactive_stdout, qr/> \z/, 'interactive open-file prompts with the legacy selector marker' );
+my ($interactive_selected) = $interactive_stdout =~ /^2:\s+(.*)$/m;
+is( $captured_exec, "vim\n-p\n$interactive_selected", 'interactive open-file falls back to vim tabs and opens the selected match' );
+is( $interactive_stderr, '', 'interactive open-file keeps stderr clean while prompting' );
+
+eval {
+    local *Developer::Dashboard::CLI::OpenFile::_command_exec = sub {
+        $captured_exec = join "\n", @_;
+        die "EXEC";
+    };
+    run_open_file_command(
+        paths => $registry,
+        args  => [ $notes_file ],
+    );
+};
+like( $@, qr/^EXEC/, 'single-match open-file path reaches the exec hook' );
+like( $captured_exec, qr/^vim\n-p\n\Q$notes_file\E$/m, 'single-match open-file falls back to vim tab mode when no editor is configured' );
+
+my $blank_select_error = '';
+my ( $blank_select_stdout, $blank_select_stderr ) = capture {
+    local *Developer::Dashboard::CLI::OpenFile::_command_exec = sub {
+        $captured_exec = join "\n", @_;
+        die "EXEC";
+    };
+    open my $stdin_fh, '<', \"\n" or die 'Unable to open scalar stdin handle for blank selection';
+    local *STDIN = $stdin_fh;
+    eval {
+        run_open_file_command(
+            paths => $registry,
+            args  => [ $project_root, 'alpha' ],
+        );
+    };
+    $blank_select_error = $@;
+};
+like( $blank_select_error, qr/^EXEC/, 'blank interactive open-file selection reaches the exec hook' );
+my @blank_exec = split /\n/, $captured_exec;
+is( shift @blank_exec, 'vim', 'blank interactive open-file selection still targets vim' );
+is( shift @blank_exec, '-p', 'blank interactive open-file selection uses vim tab mode' );
+is_deeply( [ sort @blank_exec ], [ sort ( $notes_file, $duplicate_file ) ], 'blank interactive open-file selection falls back to opening all matches' );
+is( $blank_select_stderr, '', 'blank interactive open-file selection keeps stderr clean' );
+like( $blank_select_stdout, qr/> \z/, 'blank interactive open-file selection still renders the chooser prompt' );
+
+my $multi_select_error = '';
+my ( $multi_select_stdout, $multi_select_stderr ) = capture {
+    local *Developer::Dashboard::CLI::OpenFile::_command_exec = sub {
+        $captured_exec = join "\n", @_;
+        die "EXEC";
+    };
+    open my $stdin_fh, '<', \"1,2\n" or die 'Unable to open scalar stdin handle for multi selection';
+    local *STDIN = $stdin_fh;
+    eval {
+        run_open_file_command(
+            paths => $registry,
+            args  => [ $project_root, 'alpha' ],
+        );
+    };
+    $multi_select_error = $@;
+};
+like( $multi_select_error, qr/^EXEC/, 'comma-separated interactive selection reaches the exec hook' );
+my @multi_exec = split /\n/, $captured_exec;
+is( shift @multi_exec, 'vim', 'comma-separated interactive selection still targets vim' );
+is( shift @multi_exec, '-p', 'comma-separated interactive selection uses vim tab mode' );
+is_deeply( [ sort @multi_exec ], [ sort ( $notes_file, $duplicate_file ) ], 'comma-separated interactive selection opens the chosen matches' );
+is( $multi_select_stderr, '', 'comma-separated interactive selection keeps stderr clean' );
+like( $multi_select_stdout, qr/> \z/, 'comma-separated interactive selection shows the chooser prompt' );
+
+my $range_select_error = '';
+my ( $range_select_stdout, $range_select_stderr ) = capture {
+    local *Developer::Dashboard::CLI::OpenFile::_command_exec = sub {
+        $captured_exec = join "\n", @_;
+        die "EXEC";
+    };
+    open my $stdin_fh, '<', \"1-2\n" or die 'Unable to open scalar stdin handle for range selection';
+    local *STDIN = $stdin_fh;
+    eval {
+        run_open_file_command(
+            paths => $registry,
+            args  => [ $project_root, 'alpha' ],
+        );
+    };
+    $range_select_error = $@;
+};
+like( $range_select_error, qr/^EXEC/, 'range interactive selection reaches the exec hook' );
+my @range_exec = split /\n/, $captured_exec;
+is( shift @range_exec, 'vim', 'range interactive selection still targets vim' );
+is( shift @range_exec, '-p', 'range interactive selection uses vim tab mode' );
+is_deeply( [ sort @range_exec ], [ sort ( $notes_file, $duplicate_file ) ], 'range interactive selection opens the chosen range' );
+
+ok( Developer::Dashboard::CLI::OpenFile::_editor_supports_tabs( command => ['vim'] ), 'vim supports tab-open mode' );
+ok( Developer::Dashboard::CLI::OpenFile::_editor_supports_tabs( command => ['nvim'] ), 'nvim supports tab-open mode' );
+ok( !Developer::Dashboard::CLI::OpenFile::_editor_supports_tabs( command => ['fake-editor'] ), 'non-vim editors do not receive tab-open mode' );
+is( $range_select_stderr, '', 'range interactive selection keeps stderr clean' );
+like( $range_select_stdout, qr/> \z/, 'range interactive selection shows the chooser prompt' );
+
 eval {
     run_open_file_command( paths => $registry, args => [] );
 };
@@ -142,6 +355,18 @@ eval {
     run_open_file_command( paths => $registry, args => [ '--print', $project_root, 'missing-pattern' ] );
 };
 like( $@, qr/^No files found/, 'open-file command rejects unmatched searches' );
+
+my $invalid_error = '';
+my ($invalid_stdout) = capture {
+    eval {
+        open my $stdin_fh, '<', \"not-a-number\n" or die 'Unable to open scalar stdin handle for invalid selection';
+        local *STDIN = $stdin_fh;
+        run_open_file_command( paths => $registry, args => [ $project_root, 'alpha' ] );
+    };
+    $invalid_error = $@;
+};
+like( $invalid_error, qr/^Invalid file selection 'not-a-number'/, 'open-file rejects non-numeric interactive selections' );
+like( $invalid_stdout, qr/> \z/, 'open-file invalid-selection path still renders the numbered prompt' );
 
 my ( $path_a, $file_a ) = Developer::Dashboard::CLI::Query::_split_query_args( '$d', $notes_file );
 is( $path_a, '$d', 'query splitting keeps the query path when it comes first' );
@@ -163,25 +388,25 @@ local *STDIN = $stdin_fh;
 is( Developer::Dashboard::CLI::Query::_read_query_input(''), $stdin_text, 'query input reads from STDIN when no file is supplied' );
 
 my $json_data = Developer::Dashboard::CLI::Query::_parse_query_input(
-    command => 'pjq',
+    command => 'jq',
     text    => qq|{"alpha":{"beta":[1,2],"gamma":"ok"}}|,
 );
 is_deeply( $json_data, { alpha => { beta => [ 1, 2 ], gamma => 'ok' } }, 'JSON query parsing works' );
 
 my $yaml_data = Developer::Dashboard::CLI::Query::_parse_query_input(
-    command => 'pyq',
+    command => 'yq',
     text    => "alpha:\n  beta: 3\n",
 );
 is_deeply( $yaml_data, { alpha => { beta => 3 } }, 'YAML query parsing works' );
 
 my $toml_data = Developer::Dashboard::CLI::Query::_parse_query_input(
-    command => 'ptomq',
+    command => 'tomq',
     text    => "[alpha]\nbeta = 4\n",
 );
 is_deeply( $toml_data, { alpha => { beta => 4 } }, 'TOML query parsing works' );
 
 my $props_data = Developer::Dashboard::CLI::Query::_parse_query_input(
-    command => 'pjp',
+    command => 'propq',
     text    => "alpha.beta=5\npath = one\\\\two\nwrapped = first\\\n second\n",
 );
 is_deeply(
@@ -216,16 +441,21 @@ like( $@, qr/Array index 'x' is invalid/, 'invalid array index dies clearly' );
 eval { Developer::Dashboard::CLI::Query::_extract_query_path( 'scalar', 'alpha' ) };
 like( $@, qr/does not resolve through a nested structure/, 'scalar traversal dies clearly' );
 
+my $scalar_return;
 my ($scalar_stdout) = capture {
-    ok( Developer::Dashboard::CLI::Query::_print_query_value('value'), 'scalar query output returns true' );
+    $scalar_return = Developer::Dashboard::CLI::Query::_print_query_value('value');
 };
+ok( $scalar_return, 'scalar query output returns true' );
 is( $scalar_stdout, "value\n", 'scalar query output prints a trailing newline' );
 
+my $ref_return;
 my ($ref_stdout) = capture {
-    ok( Developer::Dashboard::CLI::Query::_print_query_value( { answer => 42 } ), 'ref query output returns true' );
+    $ref_return = Developer::Dashboard::CLI::Query::_print_query_value( { answer => 42 } );
 };
+ok( $ref_return, 'ref query output returns true' );
 is_deeply( json_decode($ref_stdout), { answer => 42 }, 'ref query output prints canonical JSON' );
 
+my $query_error = '';
 my ( $query_stdout, undef ) = capture {
     local *Developer::Dashboard::CLI::Query::_command_exit = sub { die "EXIT:$_[0]" };
     my $stdin_json = qq|{"alpha":{"beta":7}}|;
@@ -233,12 +463,13 @@ my ( $query_stdout, undef ) = capture {
     local *STDIN = $query_stdin;
     eval {
         run_query_command(
-            command => 'pjq',
+            command => 'jq',
             args    => ['alpha.beta'],
         );
     };
-    like( $@, qr/^EXIT:0\b/, 'run_query_command exits through the test hook' );
+    $query_error = $@;
 };
+like( $query_error, qr/^EXIT:0\b/, 'run_query_command exits through the test hook' );
 is( $query_stdout, "7\n", 'run_query_command prints extracted scalar values' );
 
 {
@@ -283,11 +514,43 @@ __END__
 
 =head1 NAME
 
-15-cli-module-coverage.t - direct coverage tests for lightweight standalone CLI helper modules
+15-cli-module-coverage.t - direct coverage tests for dashboard CLI helper modules
 
 =head1 DESCRIPTION
 
-This test exercises the in-process helper code behind the standalone open-file
-and structured-data query executables so their library coverage stays at 100%.
+This test exercises the in-process helper code behind the built-in
+open-file and structured-data dashboard command paths so their library
+coverage stays at 100%.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file covers CLI module branches not exercised by the broader smoke tests.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/15-cli-module-coverage.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/15-cli-module-coverage.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

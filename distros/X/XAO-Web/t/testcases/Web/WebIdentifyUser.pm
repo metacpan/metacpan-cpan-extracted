@@ -1803,6 +1803,11 @@ sub test_db_key_list {
                     type        => 'integer',
                     minvalue    => 0,
                 },
+                lvf_time => {
+                    type        => 'integer',
+                    minvalue    => 0,
+                    maxvalue    => 99_999_999_999, # bigint
+                },
             },
         },
         MemberKeys => {
@@ -1848,7 +1853,7 @@ sub test_db_key_list {
                 mode        => 'login',
                 type        => 'member',
                 username    => 'm002',
-                password    => '12345',
+                password    => '12345', # Wrong password
             },
             results => {
                 cookies     => {
@@ -1857,6 +1862,7 @@ sub test_db_key_list {
                 text        => 'A',
                 fs => {
                     '/Members/m001/uvf_time'    => 0,
+                    '/Members/m001/lvf_time'    => 0, # not configured/unused
                 },
             },
         },
@@ -1875,6 +1881,9 @@ sub test_db_key_list {
                 text        => 'V',
                 fs => {
                     '/Members/m001/uvf_time'    => '~NOW',
+                    '/Members/m001/lvf_time'    => 0, # not configured/unused
+                    '/Members/m002/uvf_time'    => 0,
+                    '/Members/m002/lvf_time'    => 0, # not configured/unused
                     '/MemberKeys/1/verify_time' => '~NOW',
                     '/MemberKeys/1/expire_time' => '~NOW+120',
                 },
@@ -2115,7 +2124,7 @@ sub test_db_key_list {
         #
         t12     => {
             cookies => {
-                mid         => 2,
+                mid         => '2',
             },
             args => {
                 mode        => 'logout',
@@ -2131,6 +2140,9 @@ sub test_db_key_list {
                     '/IdentifyUser/member/verified' => undef,
                     '/IdentifyUser/member/name'     => 2,
                     '/IdentifyUser/member/id'       => 'm001',
+                },
+                fs => {
+                    '/Members/m001/uvf_time'        => '~NOW',
                 },
             },
         },
@@ -2207,7 +2219,8 @@ sub test_db_key_list {
                     '/IdentifyUser/member/id'       => undef,
                 },
                 fs          => {
-                    '/MemberKeys/1' => undef,
+                    '/MemberKeys/1'                 => undef,
+                    '/Members/m001/uvf_time'        => '~NOW', # When no vf_time_last_prop set
                 },
             },
         },
@@ -3687,7 +3700,103 @@ sub test_db_key_list {
                 },
             },
         },
-
+        #
+        # Persistent 'last-login' time in 'vf_time_last_prop', not
+        # cleared in logout.
+        #
+        t52a => {
+            sub_pre => sub {
+                $config->put('/identify_user/member/vf_time_last_prop' => 'lvf_time');
+            },
+            args => {
+                mode            => 'login',
+                type            => 'member',
+                username        => 'm001',
+                password        => '12345',
+            },
+            results => {
+                text        => 'V',
+                clipboard   => {
+                    '/IdentifyUser/member/verified'     => 1,
+                    '/IdentifyUser/member/name'         => 'm001',
+                    '/IdentifyUser/member/id'           => 'm001',
+                    '/IdentifyUser/member/key'          => '19',
+                },
+                fs => {
+                    '/Members/m001/uvf_time'    => '~NOW',
+                    '/Members/m001/lvf_time'    => '~NOW',
+                },
+            },
+        },
+        t52b     => {
+            args => {
+                mode        => 'logout',
+                type        => 'member',
+            },
+            cookies => {
+                mid         => 'm001',
+                mkey        => '19',
+            },
+            results => {
+                text        => 'I',
+                clipboard   => {
+                    '/IdentifyUser/member/object'       => { },
+                    '/IdentifyUser/member/name'         => 'm001',
+                    '/IdentifyUser/member/id'           => 'm001',
+                },
+                fs => {
+                    '/Members/m001/uvf_time'    => 0,
+                    '/Members/m001/lvf_time'    => '~NOW',
+                },
+            },
+        },
+        t52c     => {
+            args => {
+                mode        => 'logout',
+                type        => 'member',
+                hard_logout => 1,
+            },
+            cookies => {
+                mid         => 'm001',
+                mkey        => '19',
+            },
+            results => {
+                text        => 'A',
+                cookies         => {
+                    mid                                 => undef,
+                    mkey                                => undef,
+                },
+                clipboard   => {
+                    '/IdentifyUser/member/object'       => undef,
+                    '/IdentifyUser/member/name'         => undef,
+                    '/IdentifyUser/member/id'           => undef,
+                },
+                fs => {
+                    '/Members/m001/uvf_time'    => 0,
+                    '/Members/m001/lvf_time'    => '~NOW',
+                },
+            },
+        },
+        t52d     => {
+            args => {
+                mode        => 'check',
+                type        => 'member',
+            },
+            cookies => {
+            },
+            results => {
+                text        => 'A',
+                clipboard   => {
+                    '/IdentifyUser/member/object'       => undef,
+                    '/IdentifyUser/member/name'         => undef,
+                    '/IdentifyUser/member/id'           => undef,
+                },
+                fs => {
+                    '/Members/m001/uvf_time'    => 0,
+                    '/Members/m001/lvf_time'    => '~NOW',
+                },
+            },
+        },
     );
 
     $self->run_matrix(\%matrix,\%cjar);

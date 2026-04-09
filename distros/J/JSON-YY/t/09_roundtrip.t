@@ -60,4 +60,16 @@ for my $i (0..$#test_data) {
     is $d->[0], 9999999999999999, 'large int';
 }
 
+# keyword plugin must not hijack other modules' encode_json/decode_json
+{
+    my $data = [{a => 1, b => 2}];
+    my $xs_json = JSON::XS::encode_json($data);
+    like $xs_json, qr/\[/, 'JSON::XS encode_json not hijacked by keyword plugin';
+    is_deeply JSON::XS::decode_json($xs_json), $data, 'JSON::XS decode_json not hijacked';
+
+    # also test with concatenation (the original trigger)
+    my $with_nl = JSON::XS::encode_json($data) . "\n";
+    like $with_nl, qr/^\[.*\]\n$/, 'JSON::XS encode_json concat not hijacked';
+}
+
 done_testing;

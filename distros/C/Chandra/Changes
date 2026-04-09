@@ -1,5 +1,13 @@
 Revision history for Chandra
 
+0.19 2026-04-08
+   - Add Chandra::Pack - Bundle Chandra apps into distributable packages
+
+0.18 2026-04-08
+   - Add Chandra::Bridge::Extension - register custom JS modules on window.chandra
+   - Add App->extend_bridge() convenience method
+   - Fix clipboard test on FreeBSD: tolerate undef from get_text after set_text('')
+
 0.17 2026-04-07
    - Add Chandra::Form - HTML Form helpers with two-way binding for Chandra applications
    - Auto-detect any installed webkit2gtk version via pkg-config

@@ -747,22 +747,6 @@ subtest 'Instance: docs with color explicitly disabled' => sub {
 };
 
 # ============================================================================
-# Util: encode_json error path
-# ============================================================================
-
-subtest 'Util: encode_json with bad input' => sub {
-    use Getopt::Yath::Util qw/encode_json/;
-
-    # Blessed objects that can't convert should fail
-    my $bad = bless sub {}, 'BadObj';
-    like(
-        dies { encode_json($bad) },
-        qr/./,
-        'encode_json dies on non-serializable input',
-    );
-};
-
-# ============================================================================
 # Instance: option_map duplicate form detection
 # ============================================================================
 

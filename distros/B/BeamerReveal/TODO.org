@@ -1,19 +1,9 @@
 - [ ] Windows installer (for the perl package + the pdftoppm Poppler)
-- [X] make menu use short title entries instead of long ones
-- [X] insert facility for animations to generate multiple handouts slides
-- [X] insert speaker notes (graphical)
 - [ ] make filenames of ancillary files unique / not changing
-- [X] make inline version for all media objects
-- [X] finish embed mode (to embed !everything!)
-  - [X] embedding of slides and notes
-  - [X] embedding of animations and stills (plan uitgewerkt)
-- [X] fix problem with missing handout progress in stills
-      (make default handout progress based on pdf progress)
-- [X] enable autoslide option:
-  - [X] global
-  - [X] per slide
-- [X] nakijken negatieve plaatsing van elementen
-  (dit kan zonder problemen)
 - [ ] slide crossing music
-- [X] solve problem with multiple animations having the same filename for the video
-- [X] simplify progress flags: progress={0.7|handout:1/0.23,2/0.34}
+- [ ] hergebruik animation cache is broken, nakijken!
+- [ ] faciliteit toevoegen om online voorleestekst te laten genereren
+  \narrative[autoplay]{blabla blabla}
+- [ ] faciliteit toevoegen om ingesproken voorleestekst te gebruiken
+  \audio[autoplay]
+- [ ] als een slide audio of video bevat, een marker aanbrengen in een hoek in de html (of een tijdelijke, fading marker)

@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use Capture::Tiny qw(capture);
+use Cwd qw(cwd);
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptionsFromArray);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::Collector;
+use Developer::Dashboard::Config;
+use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::Prompt;
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+# _default_roots()
+# Resolves the standard workspace roots used by the lightweight prompt helper.
+# Input: none.
+# Output: ordered list of existing directory path strings.
+sub _default_roots {
+    my $home = $ENV{HOME} || '';
+    return grep { defined && -d } map { "$home/$_" } qw(projects src work);
+}
+
+# _tmux_ticket_ref()
+# Reads TICKET_REF from the active tmux session environment when available.
+# Input: none.
+# Output: ticket string or undef when tmux does not expose one.
+sub _tmux_ticket_ref {
+    my ( $stdout, undef, $exit_code ) = capture {
+        system 'tmux', 'show-environment', 'TICKET_REF';
+        return $? >> 8;
+    };
+    return if $exit_code != 0;
+    return if !defined $stdout || $stdout eq '';
+    for my $line ( split /\n/, $stdout ) {
+        next if !defined $line || $line eq '' || $line =~ /^-/;
+        return $1 if $line =~ /^TICKET_REF=(.+)$/;
+    }
+    return;
+}
+
+# _prime_ticket_ref_env()
+# Seeds TICKET_REF from tmux when the shell has not already exported it.
+# Input: none.
+# Output: true after best-effort environment priming.
+sub _prime_ticket_ref_env {
+    return 1 if defined $ENV{TICKET_REF} && $ENV{TICKET_REF} ne '';
+    my $ticket = _tmux_ticket_ref();
+    $ENV{TICKET_REF} = $ticket if defined $ticket && $ticket ne '';
+    return 1;
+}
+
+# main(@ARGV)
+# Runs the prompt renderer helper for Developer Dashboard.
+# Input: command-line arguments from @ARGV.
+# Output: prints one prompt string suitable for shell command substitution.
+my $jobs = 0;
+my $cwd  = cwd();
+my $mode = 'compact';
+my $color = 0;
+my $max_age = 300;
+GetOptionsFromArray(
+    \@ARGV,
+    'jobs=i'    => \$jobs,
+    'cwd=s'     => \$cwd,
+    'mode=s'    => \$mode,
+    'color!'    => \$color,
+    'max-age=i' => \$max_age,
+);
+
+my @roots = _default_roots();
+my $paths = Developer::Dashboard::PathRegistry->new(
+    home            => ( $ENV{HOME} || '' ),
+    cwd             => $cwd,
+    workspace_roots => \@roots,
+    project_roots   => \@roots,
+);
+my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
+my $collectors = Developer::Dashboard::Collector->new( paths => $paths );
+my $prompt = Developer::Dashboard::Prompt->new(
+    indicators => $indicators,
+    paths      => $paths,
+);
+
+$indicators->sync_collectors( $config->collectors );
+_prime_ticket_ref_env();
+
+print $prompt->render(
+    jobs    => $jobs,
+    cwd     => $cwd,
+    mode    => $mode,
+    color   => $color,
+    max_age => $max_age,
+);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ps1 - private prompt helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard ps1 [--jobs N] [--cwd DIR] [--mode compact|extended] [--color] [--max-age N]
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
+C<dashboard> command can keep prompt rendering on a lightweight handoff path.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard ps1 command through the private helper runtime.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+
+=head1 WHEN TO USE
+
+Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+
+=head1 HOW TO USE
+
+Users normally reach this helper through C<dashboard ps1>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/ps1> after helper staging.
+
+=head1 WHAT USES IT
+
+It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/ps1>.
+
+=head1 EXAMPLES
+
+  dashboard ps1
+
+That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/ps1>.
+
+=for comment FULL-POD-DOC END
+
+=cut

@@ -11,13 +11,17 @@ subtest 'base class abstract methods croak' => sub {
     for my $method (qw/have_ready_messages handles_for_select
                        reset_handles_for_peer_change handles_for_peer_change
                        get_messages peer_exists peer_pid peers
-                       read_stats send_message spawn write_stats all_stats viable/) {
+                       read_stats send_message spawn write_stats all_stats/) {
         like(
             dies { IPC::Manager::Client->$method },
             qr/Not Implemented/,
             "$method croaks in base class",
         );
     }
+};
+
+subtest 'viable returns false on base class' => sub {
+    ok(!IPC::Manager::Client->viable, "base class viable() returns false");
 };
 
 subtest 'have_pending_messages defaults to 0' => sub {

@@ -1,11 +1,11 @@
 use Test2::V0;
-use IPC::Manager::Client::PostgreSQL;
-use IPC::Manager::Serializer::JSON;
 
 my $CLASS      = 'IPC::Manager::Client::PostgreSQL';
 my $SERIALIZER = 'IPC::Manager::Serializer::JSON';
 
-skip_all "PostgreSQL driver not available" unless $CLASS->viable;
+skip_all "PostgreSQL driver not available" unless eval { require IPC::Manager::Client::PostgreSQL; $CLASS->viable };
+
+use IPC::Manager::Serializer::JSON;
 
 subtest 'viable' => sub {
     ok($CLASS->viable, "PostgreSQL is viable");

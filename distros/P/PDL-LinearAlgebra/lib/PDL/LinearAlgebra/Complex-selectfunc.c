@@ -26,6 +26,7 @@ extern Core *PDL;
 
 /* replace BLAS one so don't terminate on bad input */
 int xerbla_(char *sub, int *info) { return 0; }
+int xerbla_64_(char *sub, int *info) { return 0; }
 
 #define SEL_FUNC2(letter, letter2, type, pdl_type, args, init, uninit) \
   static SV* letter ## letter2 ## select_func = NULL; \

@@ -3,7 +3,7 @@
 #
 package PDL::Transform;
 
-our @EXPORT_OK = qw(apply invert map map unmap t_inverse t_compose t_wrap t_identity t_lookup t_linear t_scale t_offset  t_rot t_fits t_code  t_cylindrical t_radial t_quadratic t_cubic t_quadratic t_spherical t_projective );
+our @EXPORT_OK = qw(apply invert map map unmap t_inverse t_compose t_wrap t_identity t_lookup t_linear t_scale t_offset  t_rot t_fits t_code  t_cylindrical t_radial t_quadratic t_cubic t_quartic t_spherical t_spherical_inv t_projective );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -23,7 +23,7 @@ use DynaLoader;
 
 
 
-#line 2 "lib/PDL/Transform.pd"
+#line 5 "lib/PDL/Transform.pd"
 
 =head1 NAME
 
@@ -273,7 +273,7 @@ use warnings;
 
 
 
-#line 315 "lib/PDL/Transform.pd"
+#line 318 "lib/PDL/Transform.pd"
 
 =head2 apply
 
@@ -328,7 +328,7 @@ sub apply {
   return $result;
 }
 
-#line 373 "lib/PDL/Transform.pd"
+#line 376 "lib/PDL/Transform.pd"
 
 =head2 invert
 
@@ -371,39 +371,7 @@ sub invert {
 
 =for sig
 
- Signature: (k0(); pdl *in; pdl *out; pdl *map; SV *boundary; SV *method;
-                    long big; double blur; double sv_min; char flux; SV *bv)
- Types: (sbyte byte short ushort long ulong indx ulonglong longlong
-   float double ldouble)
-
-=head2 match
-
-=for usage
-
-  $y = $x->match($c);                  # Match $c's header and size
-  $y = $x->match([100,200]);           # Rescale to 100x200 pixels
-  $y = $x->match([100,200],{rect=>1}); # Rescale and remove rotation/skew.
-
-=for ref
-
-Resample a scientific image to the same coordinate system as another.
-
-The example above is syntactic sugar for
-
- $y = $x->map(t_identity, $c, ...);
-
-it resamples the input PDL with the identity transformation in
-scientific coordinates, and matches the pixel coordinate system to
-$c's FITS header.
-
-There is one difference between match and map: match makes the
-C<rectify> option to C<map> default to 0, not 1.  This only affects
-matching where autoscaling is required (i.e. the array ref example
-above).  By default, that example simply scales $x to the new size and
-maintains any rotation or skew in its scientific-to-pixel coordinate
-transform.
-
-=head2 map
+  Signature: (data(); PDL::Transform t)
 
 =for usage
 
@@ -703,6 +671,33 @@ do some smoothing over bad values:  if more than 1/3 of the weighted
 input-array footprint of a given output pixel is bad, then the output
 pixel gets marked bad.
 
+=head2 match
+
+=for usage
+
+  $y = $x->match($c);                  # Match $c's header and size
+  $y = $x->match([100,200]);           # Rescale to 100x200 pixels
+  $y = $x->match([100,200],{rect=>1}); # Rescale and remove rotation/skew.
+
+=for ref
+
+Resample a scientific image to the same coordinate system as another.
+
+The example above is syntactic sugar for
+
+ $y = $x->map(t_identity, $c, ...);
+
+it resamples the input PDL with the identity transformation in
+scientific coordinates, and matches the pixel coordinate system to
+$c's FITS header.
+
+There is one difference between match and map: match makes the
+C<rectify> option to C<map> default to 0, not 1.  This only affects
+matching where autoscaling is required (i.e. the array ref example
+above).  By default, that example simply scales $x to the new size and
+maintains any rotation or skew in its scientific-to-pixel coordinate
+transform.
+
 =pod
 
 Broadcasts over its inputs.
@@ -718,13 +713,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1537 "lib/PDL/Transform.pd"
+#line 1541 "lib/PDL/Transform.pd"
 
 sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 1542 "lib/PDL/Transform.pd"
+#line 1546 "lib/PDL/Transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
   }
@@ -749,20 +744,20 @@ sub map {
 
   # Generate an appropriate output ndarray for values to go in
   my ($out, @odims, $ohdr);
-  if(UNIVERSAL::isa($tmp,'PDL')) {
+  if (UNIVERSAL::isa($tmp,'PDL')) {
     @odims = $tmp->dims;
     if (defined(my $x = $tmp->gethdr)) { $ohdr = {%$x} }
-  } elsif(ref $tmp eq 'HASH') {
+  } elsif (ref $tmp eq 'HASH') {
     # (must be a fits header -- or would be filtered above)
     @odims = map $tmp->{"NAXIS$_"}, 1..$tmp->{NAXIS};
     $ohdr = {%$tmp}; # copy FITS header into output
-  } elsif(ref $tmp eq 'ARRAY') {
+  } elsif (ref $tmp eq 'ARRAY') {
     @odims = @$tmp;
   } else {
     barf("map: confused about dimensions of the output array...\n");
   }
 
-  if(scalar(@odims) < scalar($in->dims)) {
+  if (scalar(@odims) < scalar($in->dims)) {
     my @idims = $in->dims;
     push(@odims, splice(@idims,scalar(@odims)));
   }
@@ -809,10 +804,10 @@ sub map {
   my $f_in = (defined($in->hdr->{NAXIS}) ? t_fits($in,{ignore_rgb=>1}) : t_identity());
 
   unless((defined $out->gethdr && $out->hdr->{NAXIS})  or  $nofits) {
-      print "generating output FITS header..." if($PDL::Transform::debug);
+      print "generating output FITS header..." if $PDL::Transform::debug;
 
       $out->sethdr($in->hdr_copy) # Copy extraneous fields...
-        if(defined $in->hdr);
+        if defined $in->hdr;
 
       my $samp_ratio = 300;
 
@@ -829,7 +824,7 @@ sub map {
           # orange always rectifies the coordinates -- the output scientific
           # coordinates *must* align with the axes, or orange wouldn't make
           # sense.
-        print "using user's orange..." if($PDL::Transform::debug);
+        print "using user's orange..." if $PDL::Transform::debug;
         $orange = pdl($orange) unless(UNIVERSAL::isa($orange,'PDL'));
         barf "map: orange must be 2xN for an N-D transform"
           unless ( (($orange->dim(1)) == $nd )
@@ -846,8 +841,8 @@ sub map {
           ##############################
           # Real autoscaling happens here.
 
-          if(!$rectify and ref( $f_in ) !~ /Linear/i) {
-              if( $f_in->{name} ne 'identity' ) {
+          if (!$rectify and ref( $f_in ) !~ /Linear/i) {
+              if ( $f_in->{name} ne 'identity' ) {
                  print STDERR "Warning: map can't preserve nonlinear FITS distortions while autoscaling.\n";
               }
               $rectify=1;
@@ -871,8 +866,8 @@ sub map {
 
           # If input range is defined, sample that quadrilateral -- else
           # sample the quad defined by the boundaries of the input image.
-          if(defined $irange) {
-              print "using user's irange..." if($PDL::Transform::debug);
+          if (defined $irange) {
+              print "using user's irange..." if $PDL::Transform::debug;
               $irange = pdl($irange) unless(UNIVERSAL::isa($irange,'PDL'));
               barf "map: irange must be 2xN for an N-D transform"
                   unless ( (($irange->dim(1)) == $nd )
@@ -911,17 +906,17 @@ sub map {
       my ($scale) = $osize / pdl(($out->dims)[0..$nd-1]);
 
       my $justify = _opt($opt,['j','J','just','justify','Justify'],0);
-      if($justify) {
+      if ($justify) {
           $scale->slice("0") *= $justify;
           $scale .= $scale->max;
           $scale->slice("0") /= $justify;
       }
 
-      print "done with autoscale. Making fits header....\n" if($PDL::Transform::debug);
-      if( $rectify ) {
+      print "done with autoscale. Making fits header....\n" if $PDL::Transform::debug;
+      if ( $rectify ) {
           # Rectified header generation -- make a simple coordinate header with no
           # rotation or skew.
-          print "rectify\n" if($PDL::Transform::debug);
+          print "rectify\n" if $PDL::Transform::debug;
           for my $d(1..$nd) {
               $out->hdr->{"CRPIX$d"} = 1 + ($out->dim($d-1)-1)/2 ;
               $out->hdr->{"CDELT$d"} = $scale->at($d-1);
@@ -948,7 +943,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1768 "lib/PDL/Transform.pd"
+#line 1772 "lib/PDL/Transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -956,9 +951,9 @@ sub map {
           # where input is a linear transformation with offset and scaling is a simple scaling. We have
           # the scaling parameters and the matrix for !input -- we have only to merge them and then we
           # can write out the FITS header in CDi_j form.
-          print "non-rectify\n" if($PDL::Transform::debug);
+          print "non-rectify\n" if $PDL::Transform::debug;
           my $midpoint_val = (pdl(($out->dims)[0..$nd-1])/2 * $scale)->apply( $f_in );
-          print "midpoint_val is $midpoint_val\n" if($PDL::Transform::debug);
+          print "midpoint_val is $midpoint_val\n" if $PDL::Transform::debug;
           # linear transformation
           unless(ref($f_in) =~ m/Linear/) {
               croak("Whups -- got a nonlinear t_fits transformation.  Can't deal with it.");
@@ -966,11 +961,11 @@ sub map {
 
           my $inv_sc_mat = PDL::MatrixOps::stretcher($scale);
           my $mat = $f_in->{params}->{matrix} x $inv_sc_mat;
-          print "scale is $scale; mat is $mat\n" if($PDL::Transform::debug);
+          print "scale is $scale; mat is $mat\n" if $PDL::Transform::debug;
 
-          print "looping dims 1..$nd: " if($PDL::Transform::debug);
+          print "looping dims 1..$nd: " if $PDL::Transform::debug;
           for my $d(1..$nd) {
-              print "$d..." if($PDL::Transform::debug);
+              print "$d..." if $PDL::Transform::debug;
               $out->hdr->{"CRPIX$d"} = 1 + ($out->dim($d-1)-1)/2;
               $out->hdr->{"CRVAL$d"} = $midpoint_val->at($d-1);
               $out->hdr->{"NAXIS$d"} = $out->dim($d-1);
@@ -987,14 +982,14 @@ sub map {
                  || "");
               for my $e(1..$nd) {
                   $out->hdr->{"CD${d}_${e}"} = $mat->at($d-1,$e-1);
-                  print "setting CD${d}_${e} to ".$mat->at($d-1,$e-1)."\n" if($PDL::Transform::debug);
+                  print "setting CD${d}_${e} to ".$mat->at($d-1,$e-1)."\n" if $PDL::Transform::debug;
               }
           }
 
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1813 "lib/PDL/Transform.pd"
+#line 1817 "lib/PDL/Transform.pd"
           };
       }
     }
@@ -1027,7 +1022,7 @@ sub map {
   ## Sampling code:
   ## just transform and interpolate.
   ##  ( Kind of an anticlimax after all that, eh? )
-  if(!$integrate) {
+  if (!$integrate) {
     my $x = $in->interpND($idx,{method=>$method, bound=>$bound});
     $out->slice(":") .= $x; # trivial slice prevents header overwrite...
     return $out;
@@ -1038,8 +1033,8 @@ sub map {
   ## Condition the input and call the pixelwise C interpolator.
   ##
 
-  barf("PDL::Transform::map: Too many dims in transformation\n")
-        if($in->ndims < $idx->ndims-1);
+  barf "PDL::Transform::map: Too many dims in transformation\n"
+        if $in->ndims < $idx->ndims-1;
 
   ####################
   ## Condition the broadcasting -- pixelwise interpolator only broadcasts
@@ -1060,8 +1055,8 @@ sub map {
 
   ####################
   # Pack boundary string if necessary
-  if(defined $bound) {
-    if(ref $bound eq 'ARRAY') {
+  if (defined $bound) {
+    if (ref $bound eq 'ARRAY') {
       my ($s,$el);
       foreach $el(@$bound) {
         barf "Illegal boundary value '$el' in range"
@@ -1069,8 +1064,7 @@ sub map {
         $s .= $1;
       }
       $bound = $s;
-    }
-    elsif($bound !~ m/^[0123ftepx]+$/  && $bound =~ m/^([0123ftepx])/i ) {
+    } elsif ($bound !~ m/^[0123ftepx]+$/  && $bound =~ m/^([0123ftepx])/i) {
       $bound = $1;
     }
   }
@@ -1085,14 +1079,14 @@ sub map {
 
   $flux = ($flux =~ m/^[1fF]/);
   $big = $big * max(pdl(@idims[0..$nd]));
-  $blur = $blur->at(0) if(ref $blur);
-  $svmin =  $svmin->at(0)  if(ref $svmin);
+  $blur = $blur->at(0) if ref $blur;
+  $svmin =  $svmin->at(0)  if ref $svmin;
 
   my $bv = $in->badflag ? $in->badvalue->sclr : 0;
 
   ### The first argument is a dummy to set $GENERIC.
   $idx = double($idx) unless($idx->type == double);
-  print "Calling _map_int...\n" if($PDL::Transform::debug);
+  print "Calling _map_int...\n" if $PDL::Transform::debug;
   &PDL::_map_int( $in2->flat->index(0),
         $in2, $o2, $idx,
         $bound, $method, $big, $blur, $svmin, $flux, $bv);
@@ -1103,7 +1097,7 @@ sub map {
   }
   return $out;
 }
-#line 1107 "lib/PDL/Transform.pm"
+#line 1101 "lib/PDL/Transform.pm"
 
 *map = \&PDL::map;
 
@@ -1111,7 +1105,7 @@ sub map {
 
 
 
-#line 1928 "lib/PDL/Transform.pd"
+#line 1931 "lib/PDL/Transform.pd"
 
 ######################################################################
 
@@ -1142,7 +1136,7 @@ sub unmap {
   my($data) = shift;
   my(@params) = @_;
 
-  if(UNIVERSAL::isa($data,'PDL::Transform') && UNIVERSAL::isa($me,'PDL')) {
+  if (UNIVERSAL::isa($data,'PDL::Transform') && UNIVERSAL::isa($me,'PDL')) {
       my $x = $data;
       $data = $me;
       $me = $x;
@@ -1151,7 +1145,7 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 1971 "lib/PDL/Transform.pd"
+#line 1974 "lib/PDL/Transform.pd"
 
 =head2 t_inverse
 
@@ -1195,7 +1189,7 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2018 "lib/PDL/Transform.pd"
+#line 2021 "lib/PDL/Transform.pd"
 
 =head2 t_compose
 
@@ -1245,13 +1239,13 @@ sub compose {
     $me->{idim} = $f->{idim} if $f->{idim} > $me->{idim};
     $me->{odim} = $f->{odim} if $f->{odim} > $me->{odim};
     if (UNIVERSAL::isa($f,"PDL::Transform::Composition")) {
-      if($f->{is_inverse}) {
-        for(reverse(@{$f->{params}->{clist}})) {
+      if ($f->{is_inverse}) {
+        for (reverse(@{$f->{params}->{clist}})) {
           push(@clist,$_->inverse);
           $me->{name} .= " o inverse ( ".$_->{name}." )";
         }
       } else {
-        for(@{$f->{params}->{clist}}) {
+        for (@{$f->{params}->{clist}}) {
           push(@clist,$_);
           $me->{name} .= " o ".$_->{name};
         }
@@ -1291,7 +1285,7 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2117 "lib/PDL/Transform.pd"
+#line 2120 "lib/PDL/Transform.pd"
 
 =head2 t_wrap
 
@@ -1342,13 +1336,13 @@ sub _pow_op {
     my($x,$y,$c) = @_;
 
     barf("Can't raise anything to the power of a transform")
-        if($c || UNIVERSAL::isa($y,'PDL::Transform')) ;
+        if $c || UNIVERSAL::isa($y,'PDL::Transform');
 
     $x = $x->inverse
-        if($y < 0);
+        if $y < 0;
 
-    return $x if(abs($y) == 1);
-    return new PDL::Transform if(abs($y) == 0);
+    return $x if abs($y) == 1;
+    return PDL::Transform->new if abs($y) == 0;
 
     my(@l);
     for my $i(1..abs($y)) {
@@ -1358,7 +1352,7 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2190 "lib/PDL/Transform.pd"
+#line 2193 "lib/PDL/Transform.pd"
 
 =head2 t_identity
 
@@ -1392,7 +1386,7 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2228 "lib/PDL/Transform.pd"
+#line 2231 "lib/PDL/Transform.pd"
 
 =head2 t_lookup
 
@@ -1408,7 +1402,7 @@ You specify an N+1-D PDL that is interpreted as an N-D lookup table of
 column vectors (vector index comes last).  The last dimension has
 order equal to the output dimensionality of the transform.
 
-For added flexibility in data space, You can specify pre-lookup linear
+For added flexibility in data space, you can specify pre-lookup linear
 scaling and offset of the data.  Of course you can specify the
 interpolation method to be used.  The linear scaling stuff is a little
 primitive; if you want more, try composing the linear transform with
@@ -1469,17 +1463,16 @@ Interpolation method to be fed to L<interpND|PDL::Primitive/interpND>
 
 =back
 
-EXAMPLE
+=head3 EXAMPLE
 
-To scale logarithmically the Y axis of m51, try:
+=for example
 
+  # To scale logarithmically the Y axis of m51, try:
   $x = float rfits('m51.fits');
   $lookup = xvals(128,128) -> cat( 10**(yvals(128,128)/50) * 256/10**2.55 );
   $t = t_lookup($lookup);
   $y = $t->map($x);
-
-To do the same thing but with a smaller lookup table, try:
-
+  # To do the same thing but with a smaller lookup table, try:
   $lookup = 16 * xvals(17,17)->cat(10**(yvals(17,17)/(100/16)) * 16/10**2.55);
   $t = t_lookup($lookup,{scale=>1/16.0});
   $y = $t->map($x);
@@ -1488,7 +1481,7 @@ To do the same thing but with a smaller lookup table, try:
 it is a 17x17 -- so linear interpolation works right to the edge of the original
 domain.)
 
-NOTES
+=head3 NOTES
 
 Inverses are "only weakly supported" -- the best way to do it might be by
 judicious use of map() on the forward transformation.
@@ -1502,7 +1495,7 @@ sub t_lookup {
   my($source)= shift;
   my($o) = shift;
 
-  if(!defined($o) && ((ref $source) eq 'HASH')) {
+  if (!defined($o) && ((ref $source) eq 'HASH')) {
     Carp::cluck("lookup transform called as sub not method; using 'PDL::Transform' as class...\n");
     $o = $source;
     $source = $class;
@@ -1537,7 +1530,7 @@ sub t_lookup {
       unless ((ref $data) && (UNIVERSAL::isa($data,'PDL')));
       $main::foo = $data;
 
-    if($data->dim(0) > $me->{idim}) {
+    if ($data->dim(0) > $me->{idim}) {
       barf("Too many dims (".$data->dim(0).") for your table (".$me->{idim}.")\n");
     };
 
@@ -1564,11 +1557,11 @@ sub t_lookup {
   $me->{inv} = sub {
       my $data = shift;
       my $p = shift;
-      if(!defined($p->{'itable'})) {
-        if($me->{idim} != $me->{odim}) {
+      if (!defined($p->{'itable'})) {
+        if ($me->{idim} != $me->{odim}) {
          barf("t_lookup: can't calculate an inverse of a projection operation! (idim != odim)");
         }
-       print "t_lookup: Warning, table inversion is only weakly supported.  \n   I'll try to invert it using a pretty boneheaded algorithm...\n  (If it takes too long, consider writing a faster algorithm!)\n   Calculating inverse table (will be cached)...\n" if($PDL::verbose || $PDL::debug || $PDL::Transform::debug);
+       print "t_lookup: Warning, table inversion is only weakly supported.  \n   I'll try to invert it using a pretty boneheaded algorithm...\n  (If it takes too long, consider writing a faster algorithm!)\n   Calculating inverse table (will be cached)...\n" if $PDL::verbose || $PDL::debug || $PDL::Transform::debug;
         my $itable = zeroes($p->{table});
         my $minvals = $p->{table}->clump($me->{idim})->minimum;
         my $maxvals = $p->{table}->clump($me->{idim})->maximum;
@@ -1599,7 +1592,7 @@ sub t_lookup {
         # to find minimum distance.  But memory demands for that would be HUGE.  Instead we do an
         # elementwise calculation.
 
-        print "t_lookup: inverting ".$oloop->dim(0)." points...\n" if($PDL::verbose || $PDL::debug || $PDL::Transform::debug);
+        print "t_lookup: inverting ".$oloop->dim(0)." points...\n" if $PDL::verbose || $PDL::debug || $PDL::Transform::debug;
         my $pt = $p->{table}->mv(-1,0); # pt runs (index, x,y,...)
 
         my $itable_flattened = zeroes($oloop);
@@ -1623,7 +1616,7 @@ sub t_lookup {
             # Back it out to input-science coordinates, and stuff it in the inverse table.
             $itable_flattened->slice("($i)") .= $coord;
 
-            print " $i..." if( ($i%1000==0) && ( $PDL::verbose || $PDL::debug || $PDL::Transform::debug));
+            print " $i..." if $i%1000==0 && ($PDL::verbose || $PDL::debug || $PDL::Transform::debug);
         }
 
         {
@@ -1642,7 +1635,7 @@ sub t_lookup {
   return $me;
 }
 
-#line 2485 "lib/PDL/Transform.pd"
+#line 2487 "lib/PDL/Transform.pd"
 
 =head2 t_linear
 
@@ -1723,7 +1716,7 @@ pixel units).
 =item post, postoffset, shift, Shift
 
 The vector to be added to the data after it gets multiplied by the matrix
-(equivalent of CRPIX-1 in FITS, if youre converting from scientific to pixel
+(equivalent of CRPIX-1 in FITS, if you're converting from scientific to pixel
 units).
 
 =item d, dim, dims, Dims
@@ -1770,7 +1763,7 @@ sub new {
   #suppresses a warning if @_ has an odd number of elements and the
   #last is undef
 
-  if(!(ref $o)) {
+  if (!(ref $o)) {
     $o = {@_};
   }
 
@@ -1781,16 +1774,16 @@ sub new {
   $me->{params}{pre} = _opt($o,['pre','Pre','preoffset','offset',
                                   'Offset','PreOffset','Preoffset'],0);
   $me->{params}{pre} = PDL->pdl($me->{params}{pre})
-    if(defined $me->{params}{pre});
+    if defined $me->{params}{pre};
 
   $me->{params}{post} = _opt($o,['post','Post','postoffset','PostOffset',
                                    'shift','Shift'],0);
   $me->{params}{post} = PDL->pdl($me->{params}{post})
-    if(defined $me->{params}{post});
+    if defined $me->{params}{post};
 
   $me->{params}{matrix} = _opt($o,['m','matrix','Matrix','mat','Mat']);
   $me->{params}{matrix} = PDL->pdl($me->{params}{matrix})
-    if(defined $me->{params}{matrix});
+    if defined $me->{params}{matrix};
 
   $me->{params}{rot} = _opt($o,['r','rot','rota','rotation','Rotation'], 0);
   $me->{params}{rot} = PDL->pdl($me->{params}{rot});
@@ -1805,39 +1798,39 @@ sub new {
   # if necessary, generate a new matrix.
 
   my $rot = $me->{params}{rot};
-  if(defined($me->{params}{matrix})) {
+  if (defined($me->{params}{matrix})) {
     my $mat = $me->{params}{matrix} = $me->{params}{matrix}->slice(":,:");
     $me->{idim} = $mat->dim(0);
     $me->{odim} = $mat->dim(1);
 
   } else {
-    if(defined($me->{params}->{rot}) &&
+    if (defined($me->{params}->{rot}) &&
         UNIVERSAL::isa($me->{params}->{rot},'PDL')) {
-          $me->{idim} = $me->{odim} = 2 if($me->{params}{rot}->nelem == 1);
-          $me->{idim} = $me->{odim} = 3 if($me->{params}{rot}->nelem == 3);
+          $me->{idim} = $me->{odim} = 2 if $me->{params}{rot}->nelem == 1;
+          $me->{idim} = $me->{odim} = 3 if $me->{params}{rot}->nelem == 3;
     }
 
-    if(defined($scale) &&
+    if (defined($scale) &&
        UNIVERSAL::isa($scale,'PDL') &&
        $scale->getndims > 0) {
       $me->{idim} = $me->{odim} = $scale->dim(0);
       $me->{odim} = $scale->dim(0);
 
-    } elsif(defined($me->{params}{pre}) &&
+    } elsif (defined($me->{params}{pre}) &&
             UNIVERSAL::isa($me->{params}{pre},'PDL') &&
             $me->{params}{pre}->getndims > 0) {
       $me->{idim} = $me->{odim} = $me->{params}{pre}->dim(0);
 
-    } elsif(defined($me->{params}{post}) &&
+    } elsif (defined($me->{params}{post}) &&
             UNIVERSAL::isa($me->{params}{post},'PDL') &&
             $me->{params}{post}->getndims > 0) {
       $me->{idim} = $me->{odim} = $me->{params}{post}->dim(0);
-    } elsif(defined($o_dims)) {
+    } elsif (defined($o_dims)) {
       $me->{idim} = $me->{odim} = $o_dims;
     } elsif (UNIVERSAL::isa($rot,'PDL') && (my $nrots = $rot->nelem) > 1) {
       $me->{idim} = $me->{odim} = $nrots;
     } else {
-      print "PDL::Transform::Linear: assuming 2-D transform (set dims option to change)\n" if($PDL::Transform::debug);
+      print "PDL::Transform::Linear: assuming 2-D transform (set dims option to change)\n" if $PDL::Transform::debug;
       $me->{idim} = $me->{odim} = 2;
     }
 
@@ -1846,7 +1839,7 @@ sub new {
   }
 
   ### Handle rotation option
-  if(defined($rot)) {
+  if (defined($rot)) {
     # Subrotation closure -- rotates from axis $d->(0) --> $d->(1).
     my $subrot = sub {
                        my($d,$angle,$m)=@_;
@@ -1854,17 +1847,17 @@ sub new {
                        my($subm) = $i->dice($d,$d);
 
                        $angle = $angle->at(0)
-                         if(UNIVERSAL::isa($angle,'PDL'));
+                         if UNIVERSAL::isa($angle,'PDL');
 
                        my($x) = $angle * $PDL::Transform::DEG2RAD;
                        $subm .= $subm x PDL->pdl([cos($x),-sin($x)],[sin($x),cos($x)]);
                        $m .= $m x $i;
                      };
 
-    if(UNIVERSAL::isa($rot,'PDL') && $rot->nelem > 1) {
-      if($rot->ndims == 2) {
+    if (UNIVERSAL::isa($rot,'PDL') && $rot->nelem > 1) {
+      if ($rot->ndims == 2) {
         $me->{params}{matrix} x= $rot;
-      } elsif($rot->nelem == 3) {
+      } elsif ($rot->nelem == 3) {
         my $rm = identity(3);
 
         # Do these in reverse order to make it more like
@@ -1878,7 +1871,7 @@ sub new {
         barf("PDL::Transform::Linear: Got a strange rot option -- giving up.\n");
       }
     } else {
-        if($rot != 0  and  $me->{params}{matrix}->dim(0)>1) {
+        if ($rot != 0  and  $me->{params}{matrix}->dim(0)>1) {
           &$subrot(PDL->pdl(0,1),$rot,$me->{params}{matrix});
         }
     }
@@ -1891,7 +1884,7 @@ sub new {
 
   # Check for an inverse and apply it if possible
   my($o2);
-  if($me->{params}{matrix}->det($o2 = {lu=>undef})) {
+  if ($me->{params}{matrix}->det($o2 = {lu=>undef})) {
     $me->{params}{inverse} = $me->{params}{matrix}->inv($o2);
   } else {
     delete $me->{params}{inverse};
@@ -1913,7 +1906,7 @@ sub new {
     barf("Linear transform: transform is @{[$d+1]}-D; data is ".$in->dim(0))
         if $in->dim(0) <= $d;
     my $x = $in->slice("0:$d")->copy + $opt->{pre};
-    my $out = $in->is_inplace ? $in : $in->copy;
+    my $out = $in->new_or_inplace;
     $out->slice("0:$d") .= $x x $opt->{matrix} + $opt->{post};
     return $out;
   };
@@ -1924,7 +1917,7 @@ sub new {
     barf("Linear transform: transform is @{[$d+1]}-D; data is ".$in->dim(0))
         if $in->dim(0) <= $d;
     my $x = $in->slice("0:$d")->copy - $opt->{post};
-    my $out = $in->is_inplace ? $in : $in->copy;
+    my $out = $in->new_or_inplace;
     $out->slice("0:$d") .= $x x $opt->{inverse} - $opt->{pre};
     $out;
   } : undef;
@@ -1936,30 +1929,30 @@ sub stringify {
   my($me) = shift;  my($out) = SUPER::stringify $me;
   my $mp = $me->{params};
 
-  if(!($me->{is_inverse})){
+  if (!($me->{is_inverse})){
     $out .= "Pre-add: ".($mp->{pre})."\n"
-      if(defined $mp->{pre});
+      if defined $mp->{pre};
 
     $out .= "Post-add: ".($mp->{post})."\n"
-      if(defined $mp->{post});
+      if defined $mp->{post};
 
     $out .= "Forward matrix:".($mp->{matrix})
-      if(defined $mp->{matrix});
+      if defined $mp->{matrix};
 
     $out .= "Inverse matrix:".($mp->{inverse})
-      if(defined $mp->{inverse});
+      if defined $mp->{inverse};
   } else {
     $out .= "Pre-add: ".(-$mp->{post})."\n"
-      if(defined $mp->{post});
+      if defined $mp->{post};
 
     $out .= "Post-add: ".(-$mp->{pre})."\n"
-      if(defined $mp->{pre});
+      if defined $mp->{pre};
 
     $out .= "Forward matrix:".($mp->{inverse})
-      if(defined $mp->{inverse});
+      if defined $mp->{inverse};
 
     $out .= "Inverse matrix:".($mp->{matrix})
-      if(defined $mp->{matrix});
+      if defined $mp->{matrix};
   }
 
   $out =~ s/\n/\n  /go;
@@ -1967,7 +1960,7 @@ sub stringify {
 }
 }
 
-#line 2813 "lib/PDL/Transform.pd"
+#line 2815 "lib/PDL/Transform.pd"
 
 =head2 t_scale
 
@@ -1988,12 +1981,12 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2834 "lib/PDL/Transform.pd"
-        if(ref $y eq 'HASH');
+#line 2836 "lib/PDL/Transform.pd"
+        if ref $y eq 'HASH';
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2841 "lib/PDL/Transform.pd"
+#line 2843 "lib/PDL/Transform.pd"
 
 =head2 t_offset
 
@@ -2014,13 +2007,13 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2862 "lib/PDL/Transform.pd"
-        if(ref $y eq 'HASH');
+#line 2864 "lib/PDL/Transform.pd"
+        if ref $y eq 'HASH';
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2870 "lib/PDL/Transform.pd"
+#line 2872 "lib/PDL/Transform.pd"
 
 =head2 t_rot
 
@@ -2033,7 +2026,7 @@ sub t_offset {
 Convenience interface to L</t_linear>.
 
 t_rot produces a rotation transform in 2-D (scalar), 3-D (3-vector), or
-N-D (matrix).  It acts exactly the same as C<t_linear(rot=>shift)>.
+N-D (matrix).  It acts exactly the same as C<< t_linear(rot=>shift) >>.
 
 =cut
 
@@ -2042,13 +2035,13 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2892 "lib/PDL/Transform.pd"
-        if(ref $y eq 'HASH');
+#line 2894 "lib/PDL/Transform.pd"
+        if ref $y eq 'HASH';
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2902 "lib/PDL/Transform.pd"
+#line 2904 "lib/PDL/Transform.pd"
 
 =head2 t_fits
 
@@ -2088,20 +2081,20 @@ sub t_fits {
   my($hdr) = shift;
   my($opt) = shift;
 
-  if(ref $opt ne 'HASH') {
+  if (ref $opt ne 'HASH') {
     $opt = defined $opt ? {$opt,@_} : {} ;
   }
 
   $hdr = $hdr->gethdr
-    if(defined $hdr && UNIVERSAL::isa($hdr,'PDL'));
+    if defined $hdr && UNIVERSAL::isa($hdr,'PDL');
 
   croak('t_fits requires a FITS header hash\n')
-    if(!defined $hdr || ref $hdr ne 'HASH' || !defined($hdr->{NAXIS}));
+    if !defined $hdr || ref $hdr ne 'HASH' || !defined($hdr->{NAXIS});
 
-  my($n) = $hdr->{NAXIS}; $n = $n->at(0) if(UNIVERSAL::isa($n,'PDL'));
+  my($n) = $hdr->{NAXIS}; $n = $n->at(0) if UNIVERSAL::isa($n,'PDL');
 
   $n = 2
-    if($opt->{ignore_rgb} && $n==3 && $hdr->{NAXIS3} == 3);
+    if $opt->{ignore_rgb} && $n==3 && $hdr->{NAXIS3} == 3;
 
   my($matrix) = PDL->zeroes($n,$n);
   my($pre) = PDL->zeroes($n);
@@ -2113,7 +2106,7 @@ sub t_fits {
 
   my(@hgrab);
 
-  if(@hgrab = grep(m/^CD\d{1,3}_\d{1,3}$/,sort keys %$hdr)) {   # assignment
+  if (@hgrab = grep(m/^CD\d{1,3}_\d{1,3}$/,sort keys %$hdr)) {   # assignment
     #
     # CDi_j formalism
     #
@@ -2122,7 +2115,7 @@ sub t_fits {
       $matrix->slice("(".($1-1)."),(".($2-1).")") .= $hdr->{$h};
     }
     print "t_fits: Detected CDi_j matrix: \n",$matrix,"\n"
-      if($PDL::Transform::debug);
+      if $PDL::Transform::debug;
 
   } else {
 
@@ -2139,14 +2132,14 @@ sub t_fits {
     $cpm->diagonal(0,1) .= 1;     # PC: diagonal defaults to unity
     $cd .= 1;
 
-    if( @hgrab = grep(m/^PC\d{1,3}_\d{1,3}$/,sort keys %$hdr) ) {  # assignment
+    if (@hgrab = grep(m/^PC\d{1,3}_\d{1,3}$/,sort keys %$hdr)) {  # assignment
 
       for my $h(@hgrab) {
         $h =~ m/PC(\d{1,3})_(\d{1,3})$/ || die "t_fits - match failed! This should never happen!";
         $cpm->slice("(".($1-1)."),(".($2-1).")") .= $hdr->{$h};
       }
       print "t_fits: Detected PCi_j matrix: \n",$cpm,"\n"
-        if($PDL::Transform::debug && @hgrab);
+        if $PDL::Transform::debug && @hgrab;
 
     } elsif ($n==2 && grep defined $hdr->{$_}, qw(CROTA CROTA1 CROTA2)) {
 
@@ -2196,14 +2189,14 @@ sub t_fits {
   $me->{iunit} = \@iunit;
 
   # Check for nonlinear projection...
-#  if($hdr->{CTYPE1} =~ m/(\w\w\w\w)\-(\w\w\w)/) {
+#  if ($hdr->{CTYPE1} =~ m/(\w\w\w\w)\-(\w\w\w)/) {
 #      print "Nonlinear transformation found... ignoring nonlinear part...\n";
 #  }
 
   return $me;
 }
 
-#line 3065 "lib/PDL/Transform.pd"
+#line 3067 "lib/PDL/Transform.pd"
 
 =head2 t_code
 
@@ -2276,7 +2269,7 @@ things and generate equally weird results -- caveat scriptor!
 sub t_code {
   my($class) = 'PDL::Transform';
   my($func, $inv, $o) = @_;
-  if(ref $inv eq 'HASH') {
+  if (ref $inv eq 'HASH') {
     $o = $inv;
     $inv = undef;
   }
@@ -2296,7 +2289,7 @@ sub t_code {
   $me;
 }
 
-#line 3164 "lib/PDL/Transform.pd"
+#line 3166 "lib/PDL/Transform.pd"
 
 =head2 t_cylindrical
 
@@ -2391,7 +2384,7 @@ each piece of the image looks "natural" -- only scaled and not stretched.
 sub t_radial {
   my($class) = 'PDL::Transform';
   my($o) = $_[0];
-  if(ref $o ne 'HASH') {
+  if (ref $o ne 'HASH') {
     $o = { @_ };
   }
 
@@ -2408,14 +2401,14 @@ sub t_radial {
   $me->{params}{u} = _opt($o,['u','unit','Unit'],'radians');
   ### Replace this kludge with a units call
   $me->{params}{angunit} = ($me->{params}{u} =~ m/^d/i) ? $PDL::Transform::RAD2DEG : 1.0;
-  print "radial: conversion is $me->{params}{angunit}\n" if($PDL::Transform::debug);
+  print "radial: conversion is $me->{params}{angunit}\n" if $PDL::Transform::debug;
 
   $me->{name} = "radial (direct)";
 
   $me->{idim} = 2;
   $me->{odim} = 2;
 
-  if($me->{params}{r0}) {
+  if ($me->{params}{r0}) {
     $me->{otype} = ["Azimuth", "Ln radius" . ($me->{params}->{r0} != 1.0 ? "/$me->{params}->{r0}" : "")];
     $me->{ounit} = [$me->{params}->{u},'']; # true-but-null prevents copying
   } else {
@@ -2467,7 +2460,7 @@ sub t_radial {
   $me;
 }
 
-#line 3341 "lib/PDL/Transform.pd"
+#line 3343 "lib/PDL/Transform.pd"
 
 =head2 t_quadratic
 
@@ -2517,14 +2510,6 @@ unchanged.  (default=1)
 
 The relative strength of the pincushion. (default = 0.1)
 
-=item honest (default=0)
-
-Sets whether this is a true quadratic coordinate transform.  The more
-common form is pincushion or cylindrical distortion, which switches
-branches of the square root at the origin (for symmetric expansion).
-Setting honest to a non-false value forces true quadratic behavior,
-which is not mirror-symmetric about the origin.
-
 =item d, dim, dims, Dims
 
 The number of dimensions to quadratically scale (default is the
@@ -2537,7 +2522,7 @@ dimensionality of your input vectors)
 sub t_quadratic {
     my($class) = 'PDL::Transform';
     my($o) = $_[0];
-    if(ref $o ne 'HASH') {
+    if (ref $o ne 'HASH') {
         $o = {@_};
     }
     my($me) = $class->new;
@@ -2555,7 +2540,7 @@ sub t_quadratic {
         $d += $o->{str} * ($d * abs($d)) / $o->{l0};
         $d /= (abs($o->{str}) + 1);
         $d += $o->{origin};
-        if($data->is_inplace) {
+        if ($data->is_inplace) {
             $data .= $dd;
             return $data;
         }
@@ -2573,7 +2558,7 @@ sub t_quadratic {
         $d .= ((-1 + sqrt(1 + 4 * $s/$l * abs($d-$o) * (1+abs($s))))
             / 2 / $s * $l) * (1 - 2*($d < $o));
         $d += $o;
-        if($data->is_inplace) {
+        if ($data->is_inplace) {
             $data .= $dd;
             return $data;
         }
@@ -2582,7 +2567,7 @@ sub t_quadratic {
     $me;
 }
 
-#line 3460 "lib/PDL/Transform.pd"
+#line 3454 "lib/PDL/Transform.pd"
 
 =head2 t_cubic
 
@@ -2631,10 +2616,33 @@ dimensionality of your input vectors)
 
 =cut
 
+# needed since due to floating-point approx, is not *exactly* a cube-root
+sub _cuberoot {
+  my $x = shift;
+  my $as = 1 - 2*($x<0);
+  return $as * (abs($x) ** (1/3));
+};
+
+# solve:
+#  A x^3 + B x^2 + C x + D = 0
+# B is zero so this is greatly simplified; the discriminant is always negative
+# so there is always exactly one real root.
+sub _solve_depressed_cubic {
+  my ($A, $C, $D) = @_;
+  my $alpha =  27 * $A * $A * $D;
+  my $beta =  3 * $A * $C;
+  my $inner_root = sqrt( $alpha * $alpha   +   4 * $beta * $beta * $beta );
+  (-1 / (3 * $A)) *
+    (
+      + _cuberoot( 0.5 * ( $alpha + $inner_root ) )
+      + _cuberoot( 0.5 * ( $alpha - $inner_root ) )
+    )
+}
+
 sub t_cubic {
     my ($class) = 'PDL::Transform';
     my($o) = $_[0];
-    if(ref $o ne 'HASH') {
+    if (ref $o ne 'HASH') {
         $o = {@_};
     }
     my($me) = $class->new;
@@ -2644,12 +2652,6 @@ sub t_cubic {
     $me->{params}->{l0} = _opt($o,['r0','l','l0','length','Length'],pdl(1));
     $me->{params}->{st} = _opt($o,['s','st','str'],pdl(0));
     $me->{name} = "cubic";
-
-    $me->{params}->{cuberoot} = sub {
-        my $x = shift;
-        my $as = 1 - 2*($x<0);
-        return $as * (  abs($x) ** (1/3) );
-    };
 
     $me->{func} = sub {
         my($data,$o) = @_;
@@ -2670,7 +2672,7 @@ sub t_cubic {
 
         $d += $o->{origin};
 
-        if($data->is_inplace) {
+        if ($data->is_inplace) {
             $data .= $dd;
             return $data;
         }
@@ -2687,31 +2689,14 @@ sub t_cubic {
         $d -= $o->{origin};
         $d *= ($o->{st}+1);
 
-        # Now we have to solve:
-        #  A x^3 + B X^2 + C x + D dd = 0
-        # with the assignments above for A,B,C,D.
-        # Since B is zero, this is greatly simplified - the discriminant is always negative,
-        # so there is always exactly one real root.
-        #
-        # The only real hassle is creating a symmetric cube root; for convenience
-        # is stashed in the params hash.
-
         # First: create coefficients for mnemonics.
         my ($A, $C, $D) = ( $o->{st} / $l / $l, 1, - $d );
-        my $alpha =  27 * $A * $A * $D;
-        my $beta =  3 * $A * $C;
 
-        my $inner_root = sqrt( $alpha * $alpha   +   4 * $beta * $beta * $beta );
-
-        $d .= (-1 / (3 * $A)) *
-            (
-              + &{$o->{cuberoot}}( 0.5 * ( $alpha + $inner_root ) )
-              + &{$o->{cuberoot}}( 0.5 * ( $alpha - $inner_root ) )
-            );
+        $d .= _solve_depressed_cubic($A, $C, $D);
 
         $d += $me->{params}{origin};
 
-        if($data->is_inplace) {
+        if ($data->is_inplace) {
             $data .= $dd;
             return $data;
         } else {
@@ -2722,7 +2707,7 @@ sub t_cubic {
     $me;
 }
 
-#line 3606 "lib/PDL/Transform.pd"
+#line 3599 "lib/PDL/Transform.pd"
 
 =head2 t_quartic
 
@@ -2732,7 +2717,7 @@ sub t_cubic {
 
 =for ref
 
-Quartic scaling -- cylindrical pincushion (n-d; with inverse)
+Quartic scaling -- quartic pincushion (n-d; with inverse)
 
 Quartic scaling is a generalization of t_quadratic to a quartic
 expansion.  Only even powers of the input coordinates are retained,
@@ -2747,17 +2732,16 @@ the expansion is isotropic.
 
 The formula for the expansion is:
 
-    f(a) = ( <a> + <strength> * a^2/<L_0> ) / (abs(<strength>) + 1)
+    f(a) = ( <a> + <strength> * a^4/<L_0>^3 ) / (abs(<strength>) + 1)
 
 where <strength> is a scaling coefficient and <L_0> is a fundamental
 length scale.   Negative values of <strength> result in a pincushion
 contraction.
 
-Note that, because quadratic scaling does not have a strict inverse for
+Note that, because quartic scaling does not have a strict inverse for
 coordinate systems that cross the origin, we cheat slightly and use
-$x * abs($x)  rather than $x**2.  This does the Right thing for pincushion
-and barrel distortion, but means that t_quadratic does not behave exactly
-like t_cubic with a null cubic strength coefficient.
+$x**3 * abs($x)  rather than $x**4.  This does the Right thing for pincushion
+and barrel distortion.
 
 OPTIONS
 
@@ -2776,27 +2760,30 @@ unchanged.  (default=1)
 
 The relative strength of the pincushion. (default = 0.1)
 
-=item honest (default=0)
-
-Sets whether this is a true quadratic coordinate transform.  The more
-common form is pincushion or cylindrical distortion, which switches
-branches of the square root at the origin (for symmetric expansion).
-Setting honest to a non-false value forces true quadratic behavior,
-which is not mirror-symmetric about the origin.
-
 =item d, dim, dims, Dims
 
-The number of dimensions to quadratically scale (default is the
+The number of dimensions to quartically scale (default is the
 dimensionality of your input vectors)
 
 =back
 
 =cut
 
+# like sub _solve_depressed_cubic but for multi real solutions, returns 1
+# uses https://en.wikipedia.org/wiki/Casus_irreducibilis#Trigonometric_solution_in_terms_of_real_quantities
+sub _solve_depressed_cubic_multi {
+  require PDL::Math;
+  my ($p, $q) = @_;
+  barf "inverse t_quartic: \$p must be negative" if $p->ge(0)->any;
+  my $acos = PDL::Math::acos(3*$q/(2*$p) * sqrt(-3/$p));
+  my $cos = cos($acos/3);
+  2 * sqrt(-$p/3) * $cos;
+}
+
 sub t_quartic {
     my($class) = 'PDL::Transform';
     my($o) = $_[0];
-    if(ref $o ne 'HASH') {
+    if (ref $o ne 'HASH') {
         $o = {@_};
     }
     my($me) = $class->new;
@@ -2805,16 +2792,16 @@ sub t_quartic {
     $me->{params}->{l0} = _opt($o,['r0','l','l0','length','Length'],pdl(1));
     $me->{params}->{str} = _opt($o,['s','str','strength','Strength'],pdl(0.1));
     $me->{params}->{dim} = _opt($o,['d','dim','dims','Dims']);
-    $me->{name} = "quadratic";
+    $me->{name} = "quartic";
 
     $me->{func} = sub {
         my($data,$o) = @_;
         my($dd) = $data->copy - $o->{origin};
         my($d) =  (defined $o->{dim}) ? $dd->slice("0:".($o->{dim}-1)) : $dd;
-        $d += $o->{str} * ($d * abs($d)) / $o->{l0};
+        $d += $o->{str} * ($d**3 * abs($d)) / ($o->{l0} ** 3);
         $d /= (abs($o->{str}) + 1);
         $d += $o->{origin};
-        if($data->is_inplace) {
+        if ($data->is_inplace) {
             $data .= $dd;
             return $data;
         }
@@ -2829,10 +2816,35 @@ sub t_quartic {
         my($s) = $opt->{str};
         my($l) = $opt->{l0};
 
-        $d .= ((-1 + sqrt(1 + 4 * $s/$l * abs($d-$o) * (1+abs($s))))
-            / 2 / $s * $l) * (1 - 2*($d < $o));
+        # Formula (ignoring the sign-preserve, since the xform
+        # always moves away from origin):
+        # sdiv = (abs(s) + 1)
+        # b = ( <a> + <strength> * a^4/<L_0>^3 ) / (abs(<strength>) + 1)
+        #   = (a + s*a^4/L^3) / sdiv
+        # b * sdiv = a + s*a^4/L^3
+        # a + s*a^4/L^3 - b * sdiv = 0
+        # a^4*s/L^3 + a - b * sdiv = 0 # ordered by degree
+        # A = s/L^3
+        # B = 1
+        # C = -b * sdiv
+
+        my $sign = (1 - 2*($d < $o));
+        my ($A, $B, $C) = ($s/($l ** 3), 1, -abs($d-$o) * (1+abs($s)));
+
+        # Roots are (https://math.stackexchange.com/questions/3658305/is-there-formula-that-solves-quartic-equation-ax4bxc-0):
+        # x = s +- sqrt(-B/4As - s^2)
+        #  where s^2 = S satisfies cubic equation:
+        # S^3 - S*C/4A - (B/8A)^2 = 0
+
+        my $p = -$C / (4*$A);
+        my $q = -($B/(8*$A)) ** 2;
+        my $S = _solve_depressed_cubic(1, $p, $q);
+        my $sqrt_S = sqrt($S);
+        my $x = -$sqrt_S + sqrt($B / (4*$A*$sqrt_S) - $S);
+
+        $d .= $x * $sign;
         $d += $o;
-        if($data->is_inplace) {
+        if ($data->is_inplace) {
             $data .= $dd;
             return $data;
         }
@@ -2841,7 +2853,7 @@ sub t_quartic {
     $me;
 }
 
-#line 3729 "lib/PDL/Transform.pd"
+#line 3748 "lib/PDL/Transform.pd"
 
 =head2 t_spherical
 
@@ -2900,80 +2912,58 @@ comes online (a la Math::Units) any angular unit should be OK.
 =cut
 
 sub t_spherical {
-    my($class) = 'PDL::Transform';
-    my($o) = $_[0];
-    if(ref $o ne 'HASH') {
-        $o = { @_ } ;
-    }
-
-    my($me) = $class->new;
-
-    $me->{idim}=3;
-    $me->{odim}=3;
-
-    $me->{params}->{origin} = _opt($o,['o','origin','Origin']);
-    $me->{params}->{origin} //= PDL->zeroes(3);
-    $me->{params}->{origin} = PDL->pdl($me->{params}->{origin});
-
-    $me->{params}->{deg} = _opt($o,['d','degrees','Degrees']);
-
-    my $unit = _opt($o,['u','unit','Unit']);
-    $me->{params}{angunit} = ($unit && $unit =~ m/^d/i) ?
-        $PDL::Transform::DEG2RAD : undef;
-
-    $me->{name} = "spherical";
-
-    $me->{func} = sub {
-        my($data,$o) = @_;
-        my($d) = $data->copy - $o->{origin};
-
-        my($d0,$d1,$d2) = ($d->slice("(0)"),$d->slice("(1)"),$d->slice("(2)"));
-        my($out) =   ($d->is_inplace) ? $data : $data->copy;
-
-        $out->slice("(0)") .= PDL::atan2($d1, $d0);
-        $out->slice("(2)") .= PDL::sqrt($d0*$d0 + $d1*$d1 + $d2*$d2);
-        $out->slice("(1)") .= PDL::asin($d2 / $out->slice("(2)"));
-
-        $out->slice("0:1") /= $o->{angunit}
-          if(defined $o->{angunit});
-
-        $out;
-      };
-
-    $me->{inv} = sub {
-        my($d,$o) = @_;
-
-        my($theta,$phi,$r,$out) =
-    ( ($d->is_inplace) ?
-              ($d->slice("(0)")->copy, $d->slice("(1)")->copy, $d->slice("(2)")->copy, $d) :
-              ($d->slice("(0)"),       $d->slice("(1)"),       $d->slice("(2)"),       $d->copy)
-              );
-
-        my($x,$y,$z) =
-            ($out->slice("(0)"),$out->slice("(1)"),$out->slice("(2)"));
-
-        my($ph,$th);
-        if(defined $o->{angunit}){
-          $ph = $o->{angunit} * $phi;
-          $th = $o->{angunit} * $theta;
-        } else {
-          $ph = $phi;
-          $th = $theta;
-        }
-
-        $z .= $r * sin($ph);
-        $x .= $r * cos($ph);
-        $y .= $x * sin($th);
-        $x *= cos($th);
-        $out += $o->{origin};
-
-        $out;
-      };
-
-    $me;
+  my($class) = 'PDL::Transform';
+  my($o) = $_[0];
+  if (ref $o ne 'HASH') {
+      $o = { @_ } ;
   }
 
-#line 3865 "lib/PDL/Transform.pd"
+  my($me) = $class->new;
+
+  $me->{idim}=3;
+  $me->{odim}=3;
+
+  $me->{params}->{origin} = _opt($o,['o','origin','Origin']);
+  $me->{params}->{origin} //= PDL->zeroes(3);
+  $me->{params}->{origin} = PDL->pdl($me->{params}->{origin});
+
+  $me->{params}->{deg} = _opt($o,['d','degrees','Degrees']);
+
+  my $unit = _opt($o,['u','unit','Unit']);
+  $me->{params}{angunit} = ($unit && $unit =~ m/^d/i) ?
+      $PDL::Transform::DEG2RAD : undef;
+
+  $me->{name} = "spherical";
+
+  $me->{func} = sub {
+      my ($data,$o) = @_;
+      my $d = $data->copy - $o->{origin};
+      my ($d0,$d1,$d2) = ($d->slice("(0)"),$d->slice("(1)"),$d->slice("(2)"));
+      my $out =   ($d->is_inplace) ? $data : $data->copy;
+      $out->slice("(0)") .= PDL::atan2($d1, $d0);
+      $out->slice("(2)") .= PDL::sqrt($d0*$d0 + $d1*$d1 + $d2*$d2);
+      $out->slice("(1)") .= PDL::asin($d2 / $out->slice("(2)"));
+      $out->slice("0:1") /= $o->{angunit}
+        if defined $o->{angunit};
+      $out;
+    };
+
+  $me->{inv} = sub {
+    my ($d,$o) = @_;
+    PDL::t_spherical_inv($d, $o->{origin}, $o->{angunit} // 1);
+  };
+
+  $me;
+}
+#line 2959 "lib/PDL/Transform.pm"
+
+*t_spherical_inv = \&PDL::t_spherical_inv;
+
+
+
+
+
+#line 3873 "lib/PDL/Transform.pd"
 
 =head2 t_projective
 
@@ -2987,19 +2977,37 @@ Projective transformation
 
 Projective transforms are simple quadratic, quasi-linear
 transformations.  They are the simplest transformation that
-can continuously warp an image plane so that four arbitrarily chosen
-points exactly map to four other arbitrarily chosen points.  They
+can continuously warp an image plane so that C<ncoords + 2> arbitrarily chosen
+points exactly map to the same number of other arbitrarily chosen points.  They
 have the property that straight lines remain straight after transformation.
 
+=for example
+
+  # perspective projection 3D -> 2D
+  $t_proj = t_projective(
+    src => pdl('1 1 1; -1 1 1; -1 -1 1; 1 -1 1; 2 2 2; -2 -2 2'),
+    dst => pdl('0 1000; 1000 1000; 1000 0; 0 0; 0 1000; 1000 0'),
+  );
+  # orthographic projection 3D -> 2D
+  #   warning, numerically unstable as the Direct Linear Transform
+  #   is for perspective not this
+  $t_proj = t_projective(
+    # near top-left, near top-right, near bottom-left near bottom-right
+    #   far middle, far mid-right
+    src => my $src32 = pdl('-1  1 -1; 1  1 -1; -1 -1 -1; 1 -1 -1; 0 0 1; 1 0 1'),
+    dst => my $dst32 = pdl('0 0; 1000 0; 0 1000; 1000 1000; 500 500; 1000 500'),
+  );
+
 You can specify your projective transformation directly in homogeneous
-coordinates, or (in 2 dimensions only) as a set of four unique points that
+coordinates, or (as of 2.104, not just in 2 dimensions) as a set
+of unique points that
 are mapped one to the other by the transformation.
 
 Projective transforms are quasi-linear because they are most easily
 described as a linear transformation in homogeneous coordinates
 (e.g. (x',y',w) where w is a normalization factor: x = x'/w, etc.).
 In those coordinates, an N-D projective transformation is represented
-as simple multiplication of an N+1-vector by an N+1 x N+1 matrix,
+as simple multiplication of an N+1-vector by an M+1 x N+1 matrix,
 whose lower-right corner value is 1.
 
 If the bottom row of the matrix consists of all zeroes, then the
@@ -3017,20 +3025,43 @@ OPTIONS:
 
 =item m, mat, matrix, Matrix
 
-If specified, this is the homogeneous-coordinate matrix to use.  It must
-be N+1 x N+1, for an N-dimensional transformation.
+If specified, this is the homogeneous-coordinate matrix to use.
+Works with non-square matrix, so M+1 x N+1, for an N-to-M-dimensional
+transformation.
+
+=item src, from, I<and> dst, to
+
+If specified, this is the sets of points that should be mapped one
+to the other. Both C<src> and C<dst> must have the same number of
+points (C<N>).
+That number must be, where C<m,n> are the number of destination, source
+dimensions: C<((m+1)*(n+1)-1)/n>.
+The ndarrays are dimensioned C<(coords,N)>.
+The homogeneous-coordinate matrix is calculated from them.
+For example, specifying
+
+  src => pdl([ [0,0], [0,1], [5,9], [9,4] ])
+  dst => pdl([ [0,0], [0,1], [5,8], [9,3] ])
+
+maps the origin and the point (0,1) to themselves, the point (5,9)
+to (5,8), and the point (9,4) to (9,3).
+
+Added in 2.104. Works on any number of dimensions.
 
 =item p, point, points, Points
 
-If specified, this is the set of four points that should be mapped one to the other.
-The homogeneous-coordinate matrix is calculated from them.  You should feed in a
-2x2x4 PDL, where the 0 dimension runs over coordinate, the 1 dimension runs between input
-and output, and the 2 dimension runs over point.  For example, specifying
+You are encouraged to use the more general C<src,dst> options given above.
 
-  p=> pdl([ [[0,1],[0,1]], [[5,9],[5,8]], [[9,4],[9,3]], [[0,0],[0,0]] ])
+If specified, this is the set of C<ncoords + 2> points that should
+be mapped one to the other. Feed in a
+C<2 x 2 x 4> PDL, where the 0 dimension runs over
+coordinate, the 1 dimension runs between input
+and output, and the 2 dimension runs over points. For example, specifying
 
-maps the origin and the point (0,1) to themselves, the point (5,9) to (5,8), and
-the point (9,4) to (9,3).
+  p => pdl([ [[0,0],[0,0]], [[0,1],[0,1]], [[5,9],[5,8]], [[9,4],[9,3]] ])
+
+maps the origin and the point (0,1) to themselves, the point (5,9)
+to (5,8), and the point (9,4) to (9,3).
 
 This is similar to the behavior of fitwarp2d with a quadratic polynomial.
 
@@ -3038,94 +3069,116 @@ This is similar to the behavior of fitwarp2d with a quadratic polynomial.
 
 =cut
 
+sub sub_eps_to_0 {
+  my ($m, $eps) = @_;
+  $m * (abs($m) > $eps)
+}
+
+sub _normalise_points {
+  my ($pts) = @_;
+  my $d = $pts->dim(0); # pts: (dim,N) matrix where each row is a point
+  my $centroid = $pts->t->avgover;
+  my $shifted = $pts - $centroid; # shift points to origin
+  # 2. Scale so average distance to origin is sqrt(dim)
+  my $scale = sqrt($d) / avg($shifted->magnover); # keep coord vals close to 1
+  # T combines scaling and translation: T = Scale * Translate
+  my $T = identity($d + 1);
+  $T->diagonal(0,1)->slice(":-2") .= $scale;
+  $T->slice("(-1),:-2") .= -$scale * $centroid;
+  my $pts_h = $pts->append(1) x $T->t; # Convert to homogeneous coords, apply T
+  ($pts_h, $T);
+}
+
+sub block_rotate :lvalue {
+  my ($m, $width) = @_;
+  die "block_rotate: given undef width" if !defined $width;
+  my $height = $m->dim(1);
+  $m->rotate(-$width*sequence(indx,$height))->slice('0:'.($width-1));
+}
+
+# Construct the system of N equations to find the projective transform
+sub construct_DLT {
+  my ($pts_src, $pts_dst) = @_;
+  die "t_projective: must supply same number of src and dst points\n"
+    unless $pts_src->dim(1) == $pts_dst->dim(1);
+  my ($pts_src_h, $T_src) = _normalise_points($pts_src); # (n+1,N) homogeneous
+  my ($pts_dst_h, $T_dst) = _normalise_points($pts_dst); # (m+1,N) homogeneous
+  my ($src_dim, $N) = $pts_src_h->dims; # n+1
+  my ($dst_dim) = $pts_dst_h->dims;     # m+1
+  my $num_eqs = $N * ($dst_dim - 1); # Each point match provides (m) equations
+  my $num_vars = $src_dim * $dst_dim;
+  my $A = zeroes($num_vars-$src_dim, $num_eqs);
+  # Mapping: xp_last * (P_j * x) - xp_j * (P_last * x) = 0
+  # Fill coefficients for the j-th row of P
+  my $mult = $pts_dst_h->slice(-1) * $pts_src_h;
+  block_rotate($A, $src_dim) .= $mult->dummy(1,$dst_dim-1)->clump(1,2);
+  # Fill coefficients for the last row of P
+  $A = $A->append(-outer($pts_src_h, $pts_dst_h->slice(":-2"))->clump(1,2));
+  ($A, $T_src, $T_dst);
+}
+
+sub solve_DLT {
+  my ($A, $T_src, $T_dst) = @_;
+  my ($U, $S, $V) = svd($A, 1); # full SVD
+  my $P_norm = $V->slice(-1)->reshape(map $_->dim(0), $T_src, $T_dst); # reshape smallest singular value vector
+  $T_dst->inv x $P_norm x $T_src; # Denormalize
+}
+
 sub t_projective {
-  my($class) = 'PDL::Transform';
-  my($o) = $_[0];
-  if(ref $o ne 'HASH') {
-    $o = { @_ };
-  }
+  my $class = 'PDL::Transform';
+  my $o = ref $_[0] eq 'HASH' ? $_[0] : { @_ };
 
-  my($me) = $class->new;
-
+  my $me = $class->new;
   $me->{name} = "projective";
 
   ### Set options...
-
-  $me->{params}->{idim} = $me->{idim} = _opt($o,['d','dim','Dim']);
+  $me->{params}{idim} = $me->{idim} = _opt($o,['d','dim','Dim']);
 
   my $matrix;
-  if(defined ($matrix=_opt($o,['m','matrix','Matrix']))) {
-    $matrix = pdl($matrix);
-    die "t_projective: needs a square matrix"
-      if($matrix->dims != 2 || $matrix->dim(0) != $matrix->dim(1));
-
-    $me->{params}->{idim} = $matrix->dim(0)-1
-      unless(defined($me->{params}->{idim}));
-
-    $me->{idim} = $me->{params}->{idim};
-
+  if (defined ($matrix=_opt($o,['m','matrix','Matrix']))) {
+    $matrix = PDL->topdl($matrix);
+    $me->{params}{idim} //= $matrix->dim(0)-1;
     die "t_projective: matrix not compatible with given dimension (should be N+1xN+1)\n"
-      unless($me->{params}->{idim}==$matrix->dim(0)-1);
-
-    my $inv = $matrix->inv;
-    print STDERR "t_projective: warning - received non-invertible matrix\n"
-      unless(all($inv*0 == 0));
-
-    $me->{params}->{matrix} = $matrix;
-    $me->{params}->{matinv} = $inv;
-
-  } elsif(defined (my $p=pdl(_opt($o,['p','point','points','Point','Points'])))) {
-    die "t_projective: points array should be 2(x,y) x 2(in,out) x 4(point)\n\t(only 2-D points spec is available just now, sorry)\n"
-      unless($p->dims==3 && all(pdl($p->dims)==pdl(2,2,4)));
-
-    # Solve the system of N equations to find the projective transform
-    my ($p0,$p1,$p2,$p3) = ( $p->slice(":,(0),(0)"), $p->slice(":,(0),(1)"), $p->slice(":,(0),(2)"), $p->slice(":,(0),(3)") );
-    my ($P0,$P1,$P2,$P3) = ( $p->slice(":,(1),(0)"), $p->slice(":,(1),(1)"), $p->slice(":,(1),(2)"), $p->slice(":,(1),(3)") );
-#print "declaring PDL...\n"    ;
-    my $M = pdl( [ [$p0->at(0), $p0->at(1), 1,        0,        0, 0,  -$P0->at(0)*$p0->at(0), -$P0->at(0)*$p0->at(1)],
-                   [       0,        0, 0, $p0->at(0), $p0->at(1), 1,  -$P0->at(1)*$p0->at(0), -$P0->at(1)*$p0->at(1)],
-                   [$p1->at(0), $p1->at(1), 1,        0,        0, 0,  -$P1->at(0)*$p1->at(0), -$P1->at(0)*$p1->at(1)],
-                   [       0,        0, 0, $p1->at(0), $p1->at(1), 1,  -$P1->at(1)*$p1->at(0), -$P1->at(1)*$p1->at(1)],
-                   [$p2->at(0), $p2->at(1), 1,        0,        0, 0,  -$P2->at(0)*$p2->at(0), -$P2->at(0)*$p2->at(1)],
-                   [       0,        0, 0, $p2->at(0), $p2->at(1), 1,  -$P2->at(1)*$p2->at(0), -$P2->at(1)*$p2->at(1)],
-                   [$p3->at(0), $p3->at(1), 1,        0,        0, 0,  -$P3->at(0)*$p3->at(0), -$P3->at(0)*$p3->at(1)],
-                   [       0,        0, 0, $p3->at(0), $p3->at(1), 1,  -$P3->at(1)*$p3->at(0), -$P3->at(1)*$p3->at(1)]
-                   ] );
-#print "ok.  Finding inverse...\n";
-    my $h = ($M->inv x $p->slice(":,(1),:")->flat->slice("*1"))->slice("(0)");
-#    print "ok\n";
-    my $matrix = ones(3,3);
-    $matrix->flat->slice("0:7") .= $h;
-    $me->{params}->{matrix} = $matrix;
-
-    $me->{params}->{matinv} = $matrix->inv;
+      unless $me->{params}{idim} == $matrix->dim(0)-1;
+  } else {
+    my ($p, $pts_src, $pts_dst) = _opt($o,['p','point','points','Point','Points']);
+    if (defined $p) {
+      $p = PDL->topdl($p);
+      die "t_projective: points must be ncoord x 2(in,out) x ncoord+2(point)"
+        unless $p->dims==3 && all($p->shape == pdl(2,2,4));
+      ($pts_src, $pts_dst) = $p->mv(1,-1)->dog;
+    } else {
+      ($pts_src, $pts_dst) = map _opt($o,$_), ['src','from'], ['dst','to'];
+    }
+    die "t_projective: must supply either 'p', 'm', or 'src' and 'dst' options"
+      if grep !defined, $pts_src, $pts_dst;
+    my ($A, $T_src, $T_dst) = construct_DLT($pts_src, $pts_dst);
+    # Solve the system
+    $matrix = solve_DLT($A, $T_src, $T_dst);
   }
+  $me->{params}{matrix} = $matrix;
+  $me->{params}{matinv} = $matrix->inv if $matrix->dim(0) == $matrix->dim(1);
 
-  $me->{params}->{idim} = 2 unless defined $me->{params}->{idim};
-  $me->{params}->{odim} = $me->{params}->{idim};
-  $me->{idim} = $me->{params}->{idim};
-  $me->{odim} = $me->{params}->{odim};
+  $me->{idim} = $me->{odim} = $me->{params}{odim} = $me->{params}{idim} //= 2;
 
   $me->{func} = sub {
-    my($data,$o) = @_;
-    my($id) = $data->dim(0);
-    my($d) = $data->glue(0,ones($data->slice("0")));
-    my($out) = ($o->{matrix} x $d->slice("*1"))->slice("(0)");
-    return ($out->slice("0:".($id-1))/$out->slice("$id"));
+    my ($data,$o) = @_;
+    my $out = $data->append(1) x $o->{matrix}->t;
+    $out->slice("0:-2")/$out->slice("-1");
   };
 
   $me->{inv} = sub {
-    my($data,$o) = @_;
-    my($id) = $data->dim(0);
-    my($d) = $data->glue(0,ones($data->slice("0")));
-    my($out) = ($o->{matinv} x $d->slice("*1"))->slice("(0)");
-    return ($out->slice("0:".($id-1))/$out->slice("$id"));
+    my ($data,$o) = @_;
+    die "t_projective: uninvertible projection due to dimension change"
+      if !defined $o->{matinv};
+    my $out = $data->append(1) x $o->{matinv}->t;
+    $out->slice("0:-2")/$out->slice("-1");
   };
 
   $me;
 }
 
-#line 245 "lib/PDL/Transform.pd"
+#line 248 "lib/PDL/Transform.pd"
 
 =head1 AUTHOR
 
@@ -3190,7 +3243,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3194 "lib/PDL/Transform.pm"
+#line 3247 "lib/PDL/Transform.pm"
 
 # Exit with OK status
 

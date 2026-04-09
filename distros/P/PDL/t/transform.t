@@ -3,6 +3,7 @@ use warnings;
 use PDL::LiteF;
 use PDL::Transform;
 use PDL::Transform::Cartography; # raster2fits helps limit mem consumption
+use PDL::Constants qw(PI);
 use Test::More;
 use Test::PDL;
 use Test::Exception;
@@ -19,8 +20,77 @@ use Test::Exception;
 
   my $t2 = t_linear(scale=>[2,3]);
   is_deeply [@$t2{qw(idim odim)}],[2,2], "t_linear can make a 2-d transform";
-  is_pdl $pa->apply($t2), pdl( [2, 6], [6, 12] ), "2-d apply treats the higher dim";
+  is_pdl $pa->apply($t2), my $exp = pdl( [2, 6], [6, 12] ), "2-d apply treats the higher dim";
+  is_pdl $pa->apply(t_scale([2,3])), $exp, "t_scale works";
   is_pdl pdl(2,3)->invert($t2), pdl(1,1), "invert works";
+  is_pdl pdl(2,3)->apply(t_inverse($t2)), pdl(1,1), "t_inverse works";
+  my $t_off = t_offset([6,7]);
+  is_pdl pdl(2,3)->apply($t_off), pdl(8,10), "t_offset works";
+  is_pdl pdl(2,3)->apply(t_wrap($t_off, $t2)), pdl(5,16/3), "t_wrap works";
+  is_pdl pdl(-2,3)->apply(t_quadratic(s=>1)), pdl(-3,6), "t_quadratic works";
+  is_pdl pdl(-3,6)->invert(t_quadratic(s=>1)), pdl(-2,3), "t_quadratic inv";
+  is_pdl pdl(-2,3)->apply(t_cubic(s=>1)), pdl(-5,15), "t_cubic works";
+  is_pdl pdl(-5,15)->invert(t_cubic(s=>1)), pdl(-2,3), "t_cubic inv";
+  is_pdl pdl(-2,3)->apply(t_quartic(s=>1)), pdl(-9,42), "t_quartic works";
+  is_pdl pdl(-9,42)->invert(t_quartic(s=>1)), pdl(-2,3), "t_quartic inv";
+  is_pdl pdl(-3,4)->apply(t_radial()), pdl(4.068887,5), "t_radial works";
+  is_pdl pdl(4.068887,5)->invert(t_radial()), pdl(-3,4), {test_name=>"t_radial inv",rtol=>1e-5};
+
+  my $t_points = pdl('[0 0; 1 0] [1 0; 2 1] [0 1; -1 3] [1 1; 0 4]'); # xy,io,npoints
+  my $t_proj = t_projective(p=>$t_points);
+  is_pdl +(my $p_in = pdl('0.5 0; 1 0.5; 0.5 1; 0 0.5'))->apply($t_proj), my $p_out = pdl('1.5 0.5; 1 2.5; -0.5 3.5; 0 1.5'), 't_projective works';
+  is_pdl $p_out->invert($t_proj), $p_in, 't_projective inv';
+  $t_proj = t_projective(
+    src => my $src2 = $t_points->slice(",(0)"),
+    dst => my $dst2 = $t_points->slice(",(1)"),
+  );
+  my ($A_2) = PDL::Transform::construct_DLT($src2, $dst2);
+  is_pdl $A_2, pdl('
+    -1 -1 1 0 0 0  0.365966  0.365966 -0.365966;
+    0 0 0 -1 -1 1 -1.463864 -1.463864  1.463864;
+    1 -1 1 0 0 0  -1.097898  1.097898 -1.097898;
+    0 0 0 1 -1 1   0.731932 -0.731932  0.731932;
+    -1 1 1 0 0 0  -1.097898  1.097898  1.097898;
+    0 0 0 -1 1 1   0.731932 -0.731932 -0.731932;
+    1 1 1 0 0 0    0.365966  0.365966  0.365966;
+    0 0 0 1 1 1   -1.463864 -1.463864 -1.463864
+  '), 'right design matrix';
+  $t_proj = t_projective(
+    m => pdl('-500 0 500 0; 0 500 500 0; 0 0 1 0'),
+  );
+  is_pdl $t_proj->apply(my $in32 = pdl('0 -1 -1; 4 2 -10')), my $out32 = pdl('500 1000; 700 400'), 'project perspective 3->2 with matrix';
+  $t_proj = t_projective(
+    src => my $src32perspective = pdl('1 1 1; -1 1 1; -1 -1 1; 1 -1 1; 2 2 2; -2 -2 2'),
+    dst => my $dst32perspective = pdl('0 1000; 1000 1000; 1000 0; 0 0; 0 1000; 1000 0'),
+  );
+  is_pdl $t_proj->apply($in32), $out32, 'project perspective 3->2 with src/dst';
+  $t_proj = t_projective(
+    src => my $src3 = pdl('0 0 0; 1 0 0;  0 1 0; 1 1 0; 0 0 1'),
+    dst => my $dst3 = pdl('1 0 0; 2 1 0; -1 3 0; 0 4 0; 1 0 1'),
+  );
+  is_pdl +($p_in = pdl('
+    0.5 0 0; 1 0.5 0; 0.5 1 0; 0 0.5 0
+  '))->apply($t_proj), $p_out = pdl('
+    1.5 0.5 0; 1 2.5 0; -0.5 3.5 0; 0 1.5 0
+  '), 'project 3->3 with src/dst';
+  is_pdl $p_out->invert($t_proj), $p_in, 'invert 3->3 with src/dst';
+  $t_proj = t_projective(
+    # near top-left, near top-right, near bottom-left near bottom-right
+    #   far middle, far mid-right
+    src => my $src32 = pdl('-1  1 -1; 1  1 -1; -1 -1 -1; 1 -1 -1; 0 0 1; 1 0 1'),
+    dst => my $dst32 = pdl('0 0; 1000 0; 0 1000; 1000 1000; 500 500; 1000 500'),
+  );
+  is_pdl $t_proj->apply($src32), $dst32, {test_name=>'project ortho 3->2 with src/dst', atol=>10};
+
+  # y gets log scale, from example
+  my $lookup = 4 * xvals(5,5)->cat(10**(yvals(5,5)/(100/4)) * 4/10**2.55);
+  my $t_l = t_lookup($lookup,{scale=>1/4.0});
+  is_pdl pdl(3,10)->apply($t_l), pdl(3,0.056830), "t_lookup works";
+  is_pdl pdl(3,0.056830)->invert($t_l), pdl(3,10), {test_name=>"t_lookup inv",rtol=>1e-2};
+
+  my $t_c = t_code(sub { $_[0]+3 }, sub { $_[0]-3 });
+  is_pdl pdl(3,10)->apply($t_c), pdl(6,13), "t_code works";
+  is_pdl pdl(6,13)->invert($t_c), pdl(3,10), "t_code inv";
 
   my $t3 = t_rot([45,45,45]);
   is_pdl PDL::MatrixOps::identity(3)->apply($t3), pdl(<<'EOF'), 't_rot works';
@@ -31,6 +101,16 @@ EOF
   my $t5 = t_linear(scale=>[0.5], idim=>2, odim=>2, iunit=>[('radii')x2], ounit=>[('half-radii')x2]) x $t4;
   is_deeply $t5->{iunit}, [('metres')x2], 'compose right iunit';
   is_deeply $t5->{ounit}, [('half-radii')x2], 'compose right ounit';
+}
+
+{
+my $lonlatrad = allaxislinvals(double, pdl(-PI,-PI/2), pdl(PI,PI/2), 3,3)->append(1);
+is_pdl t_spherical()->inverse()->apply($lonlatrad), my $exp = pdl('
+  [0 0 -1; 0 0 -1; 0 0 -1]
+  [-1 0 0; 1 0 0; -1 0 0]
+  [0 0 1; 0 0 1; 0 0 1]
+');
+is_pdl t_spherical()->apply($exp)->sin, $lonlatrad->sin; # sin as -PI equiv to 0, PI
 }
 
 {
@@ -58,12 +138,12 @@ EOF
 # diab jerius' t_scale crash
 # (this is due to a problem with inplace flag handling in PDL <= 2.6; transform works around it)
 lives_ok {
-	my $pa = pdl(49,49);
-	my $t = t_linear({scale=>pdl([1,3]), offset=>pdl([12,8])});
-	my $pb = pdl( double, 2.2, 9.3);
-	$pa->inplace->apply($t);
-	my $q = 0;
-	$pa += $q;
+  my $pa = pdl(49,49);
+  my $t = t_linear({scale=>pdl([1,3]), offset=>pdl([12,8])});
+  is_pdl $pa->apply($t), my $exp = pdl(61, 171);
+  is_pdl $pa, pdl(49,49);
+  $pa->inplace->apply($t);
+  is_pdl $pa, $exp;
 };
 
 ##############################
@@ -80,7 +160,6 @@ lives_ok {
 }
 
 {
-	use PDL::IO::FITS;
 	my $m51 = raster2fits(sequence(long, 10, 10), @PDL::Transform::Cartography::PLATE_CARREE);
 	is_pdl $m51->map(t_identity,{method=>'s'}), $m51; #SHOULD be a no-op
 	is_pdl my $m51map = $m51->map(t_identity, $m51->hdr,{method=>'s'}), $m51, 'map works with FITS hashref';

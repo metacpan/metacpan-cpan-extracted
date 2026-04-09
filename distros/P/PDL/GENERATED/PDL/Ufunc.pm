@@ -858,6 +858,7 @@ See also L</diff2>, L</diffcentred>, L</partial>, L<PDL::Primitive/pchip_chim>.
 
 =pod
 
+Can operate inplace with C<x> as output C<dx>.
 Broadcasts over its inputs.
 
 =for bad
@@ -992,7 +993,7 @@ sub PDL::partial {
   my $ret = $f->$func;
   $dim ? $ret->mv(0, $dim) : $ret;
 }
-#line 996 "lib/PDL/Ufunc.pm"
+#line 997 "lib/PDL/Ufunc.pm"
 
 
 =head2 diff2
@@ -1158,7 +1159,7 @@ Synonym for L</average>.
 =cut
 
 *PDL::avgover = *avgover = \&PDL::average;
-#line 1162 "lib/PDL/Ufunc.pm"
+#line 1163 "lib/PDL/Ufunc.pm"
 
 
 =head2 caverage
@@ -1220,7 +1221,7 @@ Synonym for L</caverage>.
 =cut
 
 *PDL::cavgover = *cavgover = \&PDL::caverage;
-#line 1224 "lib/PDL/Ufunc.pm"
+#line 1225 "lib/PDL/Ufunc.pm"
 
 
 =head2 daverage
@@ -1282,7 +1283,7 @@ Synonym for L</daverage>.
 =cut
 
 *PDL::davgover = *davgover = \&PDL::daverage;
-#line 1286 "lib/PDL/Ufunc.pm"
+#line 1287 "lib/PDL/Ufunc.pm"
 
 
 =head2 minimum
@@ -1345,7 +1346,7 @@ Synonym for L</minimum>.
 =cut
 
 *PDL::minover = *minover = \&PDL::minimum;
-#line 1349 "lib/PDL/Ufunc.pm"
+#line 1350 "lib/PDL/Ufunc.pm"
 
 
 =head2 minimum_ind
@@ -1402,7 +1403,7 @@ Synonym for L</minimum_ind>.
 =cut
 
 *PDL::minover_ind = *minover_ind = \&PDL::minimum_ind;
-#line 1406 "lib/PDL/Ufunc.pm"
+#line 1407 "lib/PDL/Ufunc.pm"
 
 
 =head2 minimum_n_ind
@@ -1455,7 +1456,7 @@ sub PDL::minimum_n_ind {
   PDL::_minimum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1459 "lib/PDL/Ufunc.pm"
+#line 1460 "lib/PDL/Ufunc.pm"
 
 *minimum_n_ind = \&PDL::minimum_n_ind;
 
@@ -1474,7 +1475,7 @@ Synonym for L</minimum_n_ind>.
 =cut
 
 *PDL::minover_n_ind = *minover_n_ind = \&PDL::minimum_n_ind;
-#line 1478 "lib/PDL/Ufunc.pm"
+#line 1479 "lib/PDL/Ufunc.pm"
 
 
 =head2 maximum
@@ -1537,7 +1538,7 @@ Synonym for L</maximum>.
 =cut
 
 *PDL::maxover = *maxover = \&PDL::maximum;
-#line 1541 "lib/PDL/Ufunc.pm"
+#line 1542 "lib/PDL/Ufunc.pm"
 
 
 =head2 maximum_ind
@@ -1594,7 +1595,7 @@ Synonym for L</maximum_ind>.
 =cut
 
 *PDL::maxover_ind = *maxover_ind = \&PDL::maximum_ind;
-#line 1598 "lib/PDL/Ufunc.pm"
+#line 1599 "lib/PDL/Ufunc.pm"
 
 
 =head2 maximum_n_ind
@@ -1647,7 +1648,7 @@ sub PDL::maximum_n_ind {
   PDL::_maximum_n_ind_int($a, $c, $m_size);
   $set_out ? $_[1] = $c : $c;
 }
-#line 1651 "lib/PDL/Ufunc.pm"
+#line 1652 "lib/PDL/Ufunc.pm"
 
 *maximum_n_ind = \&PDL::maximum_n_ind;
 
@@ -1666,7 +1667,7 @@ Synonym for L</maximum_n_ind>.
 =cut
 
 *PDL::maxover_n_ind = *maxover_n_ind = \&PDL::maximum_n_ind;
-#line 1670 "lib/PDL/Ufunc.pm"
+#line 1671 "lib/PDL/Ufunc.pm"
 
 
 =head2 minmaximum
@@ -2218,7 +2219,7 @@ and therefore ignore whether the values are bad.
 
 *minmax = \&PDL::minmax;
 sub PDL::minmax { map $_->sclr, ($_[0]->flat->minmaximum)[0,1] }
-#line 2222 "lib/PDL/Ufunc.pm"
+#line 2223 "lib/PDL/Ufunc.pm"
 
 
 =head2 medover
@@ -2526,7 +2527,7 @@ sub PDL::oddpct {
 	$x->flat->oddpctover($p, my $tmp=PDL->nullcreate($x));
 	$tmp;
 }
-#line 2530 "lib/PDL/Ufunc.pm"
+#line 2531 "lib/PDL/Ufunc.pm"
 
 
 =head2 qsort
@@ -2552,6 +2553,7 @@ Quicksort a vector into ascending order.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -2662,6 +2664,7 @@ the 1st dimension is list order.  Higher dimensions are broadcasted over.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -2803,7 +2806,7 @@ from the PDL distribution, the copyright notice should be included in
 the file.
 
 =cut
-#line 2807 "lib/PDL/Ufunc.pm"
+#line 2810 "lib/PDL/Ufunc.pm"
 
 # Exit with OK status
 

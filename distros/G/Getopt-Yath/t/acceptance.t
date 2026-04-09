@@ -490,7 +490,7 @@ subtest 'Post-processors: validate and transform after parsing' => sub {
         my $jobs = $state->settings->pp->pp_jobs;
         # If mode is 'auto' and jobs > 1, switch to 'parallel'
         if ($state->settings->pp->pp_mode eq 'auto' && $jobs > 1) {
-            $state->settings->pp->pp_mode = 'parallel';
+            $state->settings->pp->pp_mode('parallel');
         }
     };
 

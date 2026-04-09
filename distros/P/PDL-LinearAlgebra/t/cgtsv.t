@@ -7,6 +7,7 @@ use PDL::NiceSlice;
 use PDL::LinearAlgebra::Complex;
 use constant N=>10;
 use Test::More;
+use Test::PDL;
 
 for my $D (3..N+2) { #first differences
     #solve (1+i)(b_{n+1}-b_n)=1-i with homogeneous BCs
@@ -17,8 +18,7 @@ for my $D (3..N+2) { #first differences
     my $info=pdl(short,0);
     cgtsv($c, $d, $e, $b, $info);
     my $r=sequence($D)*czip(1, -1)/czip(1, 1);
-    ok($b->approx($r)->all, "1st diff. native cgtsv in D=$D")
-      or diag "info: ", $info, "\nGot: ", $b, "\nExpected: ", $r;
+    is_pdl $b, $r, "1st diff. native cgtsv in D=$D";
 }
 
 for my $D (3..N+2){ #second differences
@@ -31,8 +31,7 @@ for my $D (3..N+2){ #second differences
     cgtsv($c, $d, $e, $b, $info);
     my $x=sequence(cdouble, $D);
     my $r=(-$D/2-($D-1)/2*$x+1/2*$x*$x)*(1-i())/(1+i());
-    ok($b->approx($r)->all, "2nd diff. cgtsv in D=$D")
-      or diag "info: ", $info, "\nGot: ", $b, "\nExpected: ", $r;
+    is_pdl $b, $r, "2nd diff. cgtsv in D=$D";
 }
 
 done_testing;

@@ -1,42 +1,9 @@
 BOOKMARK: test
 :--------------------------------------------------------------------------------:
-HTML: <script src="/js/jq.js"></script>
+HTML: <script src="/js/jquery.js"></script>
 <script>var foo = {};
-$(document).ready(function () {
-    let lastLength = 0;
-
-    $.ajax({
-        url: foo.bar,
-        type: 'GET',
-        dataType: 'text',
-        cache: false,
-
-        xhr: function () {
-            const xhr = new window.XMLHttpRequest();
-
-            xhr.onprogress = function () {
-                const response = xhr.responseText;
-
-                // Replace whole content with everything received so far
-                $('.display').text(response);
-
-                // If you want only the new chunk instead, use this:
-                // const newChunk = response.substring(lastLength);
-                // $('.display').append(newChunk);
-                // lastLength = response.length;
-            };
-
-            return xhr;
-        },
-
-        success: function (response) {
-            $('.display').text(response);
-        },
-
-        error: function (xhr, status, error) {
-            console.error('Stream error:', status, error);
-        }
-    });
+$(document).ready(_ => {
+   stream_data(foo.bar, '.display');
 });
 </script>
 TEST2: <span class=display></span>

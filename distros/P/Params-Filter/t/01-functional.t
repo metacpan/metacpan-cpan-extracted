@@ -234,4 +234,62 @@ subtest 'Undefined values in input' => sub {
     is $result->{phone}, '555-9999', 'Other field present';
 };
 
+subtest 'Wrong keys with correct count hits per-field existence check' => sub {
+    # Two keys present, two required - but they are the wrong keys.
+    # The upstream count pre-check passes; the per-field loop must catch it.
+    my ($result, $msg) = filter(
+        { wrong_key1 => 1, wrong_key2 => 2 },
+        ['name', 'email'],
+        [],
+    );
+
+    ok !$result, 'Fails when correct key count but wrong keys supplied';
+    like $msg, qr/required/, 'Error message mentions required fields';
+};
+
+subtest 'Scalar input longer than 20 chars is truncated in message' => sub {
+    my ($result, $msg) = filter(
+        'this string is longer than twenty characters',
+        [], ['_'],
+    );
+
+    ok $result, 'Long scalar input succeeds';
+    like $msg, qr/\.\.\./, 'Preview truncated with ellipsis';
+};
+
+subtest 'Single-element array with long string is truncated in message' => sub {
+    my ($result, $msg) = filter(
+        ['this string is longer than twenty characters'],
+        [], ['_'],
+    );
+
+    ok $result, 'Long single-element array input succeeds';
+    like $msg, qr/\.\.\./, 'Preview truncated with ellipsis';
+};
+
+subtest 'Excluded wins over accepted in functional filter' => sub {
+    # A field that appears in both the accepted and excluded lists.
+    # The exclusion guard inside the accepted loop must fire.
+    my ($result, $msg) = filter(
+        { name => 'Nina', password => 'secret' },
+        ['name'],
+        ['password'],   # accepted
+        ['password'],   # also excluded - excluded wins
+    );
+
+    ok $result, 'Filter succeeds';
+    is $result->{name}, 'Nina', 'Required field present';
+    ok !exists $result->{password}, 'Excluded wins over accepted';
+};
+
+subtest 'Returns undef in scalar context on failure' => sub {
+    my $result = filter(
+        { wrong => 1 },
+        ['name', 'email'],
+        [],
+    );
+
+    ok !defined $result, 'Returns undef (not a list) in scalar context on failure';
+};
+
 done_testing();

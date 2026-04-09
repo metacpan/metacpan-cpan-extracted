@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-SimpleDrumMachine
   repository: https://github.com/ology/Music-SimpleDrumMachine.git
-version: '0.0403'
+version: '0.0501'
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -217,6 +217,7 @@ x_Dist_Zilla:
           spell_cmd: 'aspell list'
           stopwords:
             - chan
+            - iff
             - ppqn
             - th
             - ths

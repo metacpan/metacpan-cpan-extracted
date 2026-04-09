@@ -145,6 +145,7 @@ sub create_mock_app {
     like($response->[2], qr/window\.jQuery = \$;/, 'jquery compatibility alias reuses the built-in jquery shim');
 }
 
+
 # Test: _serve_static_file resolves runtime-root dashboard/public assets
 {
     local $ENV{HOME} = tempdir(CLEANUP => 1);
@@ -204,5 +205,36 @@ Verifies MIME type detection, security checks, and file serving.
 - Directory traversal attack prevention
 - 404 handling for missing files
 - File content serving
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file tests static file serving behaviour in the authenticated web app.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/web_app_static_files.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/web_app_static_files.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

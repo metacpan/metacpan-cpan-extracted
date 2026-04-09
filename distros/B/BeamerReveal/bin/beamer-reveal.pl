@@ -2,7 +2,7 @@
 # -*- cperl -*-
 # PODNAME: beamer-reveal.pl
 # ABSTRACT: converts the .rvl file and the corresponding pdf file to a full reveal website
-our $VERSION = '20260208.1851'; # VERSION
+our $VERSION = '20260408.1240'; # VERSION
 
 
 use strict;
@@ -122,6 +122,10 @@ my $mmstillgen_id =
   $logger->registerTask( label    => "Still generation",
 			 progress => 0,
 			 total    => 1 );
+my $mmvovergen_id =
+  $logger->registerTask( label    => "Voice-over generation",
+			 progress => 0,
+			 total    => 1 );
 my $proc_id =
   $logger->registerTask( label    => "Slide processing",
 			 progress => 0,
@@ -133,7 +137,7 @@ my $mmcop_id =
 my $overall_id =
   $logger->registerTask( label    => "Overall progress",
 			 progress => 0,
-			 total    => 8 );
+			 total    => 9 );
 
 $logger->activate();
 
@@ -193,10 +197,10 @@ eval {
   for( my $i = 1; $i < @chunks; ++$i ) {
     my $object = $factory->createFromChunk( $chunks[$i], $chunksLineNrs[$i] );
     $object->{hasnotes} = ++$nofNotes if( $object->{hasnotes} ); #if notes, add sequence number
-    my $generatedContent = $object->extractGenerationContent( $i, $mediaManager, $presentation );
+    my $contentToGenerate = $object->extractContentToGenerate( $i, $mediaManager, $presentation );
     push @$slides, {
 		    slide => $object,
-		    generatedContent => $generatedContent
+		    contentToGenerate => $contentToGenerate
 		   };
   }
   1;
@@ -256,7 +260,7 @@ else {
 # - when processing the slidecollection.
 # Possible solution: work in two passes
 # Can we only treat animations/stills and the detection of notes in the first pass?
-# Make a method next to makeSlide() that is extractGenerationContent(), that only treats animations and stills
+# Make a method next to makeSlide() that is extractContentToGenerate(), that only treats animations and stills
 # and prepares the backorders with the required info.
 # then we can generate the backorders
 # processs the backorders
@@ -280,11 +284,16 @@ $logger->log( 0, "- Generating stills" );
 $logger->log( 0, "- Generating all new media" );
 $mediaManager->processStillBackOrders( $mmstillgen_id );
 
+$logger->progress( $overall_id, 5, 'voice-over generation' );
+$logger->log( 0, "- Generating voice-overs" );
+$logger->log( 0, "- Generating all new media" );
+$mediaManager->processVoiceoverBackOrders( $mmvovergen_id );
+
 ######################
 # process the content
 # generating the content
 $logger->log( 0, "- Processing the presentation" );
-$logger->progress( $overall_id, 5, 'processing presentation' );
+$logger->progress( $overall_id, 6, 'processing presentation' );
 
 my $slideCollection;
 my $i = 0;
@@ -292,14 +301,14 @@ my $nofSlides = @$slides;
 foreach my $object ( @$slides ) {
   $logger->progress( $proc_id, $i++, "slide $i/$nofSlides", $nofSlides );
   $slideCollection .= $object->{slide}->makeSlide( $i, $mediaManager, $presentation,
-						   $object->{generatedContent} );
+						   $object->{contentToGenerate} );
 }
 $logger->progress( $proc_id, $i );
 
 
 ################################
 # generate the copy back-orders
-$logger->progress( $overall_id, 6, 'media copying' );
+$logger->progress( $overall_id, 7, 'media copying' );
 
 $logger->log( 0, "- Collecting all existing media" );
 $mediaManager->processCopyBackOrders( $mmcop_id );
@@ -307,7 +316,7 @@ $mediaManager->processCopyBackOrders( $mmcop_id );
 
 ######################
 # write the main file
-$logger->progress( $overall_id, 7, 'writing presentation file' );
+$logger->progress( $overall_id, 8, 'writing presentation file' );
 
 $logger->log( 0, "- Producing presentation" );
 
@@ -337,7 +346,7 @@ $oFile->close();
 # finally let's create an index.html link
 $logger->log( 2, "- Creating index.html link" );
 link( "$oFileName", "$output_dir/index.html" );
-$logger->progress( $overall_id, 8, 'done' );
+$logger->progress( $overall_id, 9, 'done' );
 
 ########################
 # generate closing line
@@ -364,7 +373,7 @@ beamer-reveal.pl - converts the .rvl file and the corresponding pdf file to a fu
 
 =head1 VERSION
 
-version 20260208.1851
+version 20260408.1240
 
 =head1 SYNOPSIS
 

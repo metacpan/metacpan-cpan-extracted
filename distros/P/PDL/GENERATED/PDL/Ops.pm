@@ -3,7 +3,7 @@
 #
 package PDL::Ops;
 
-our @EXPORT_OK = qw(plus mult minus divide gt lt le ge eq ne shiftleft shiftright or2 and2 xor power atan2 modulo spaceship bitnot sqrt sin cos not exp log re im _cabs _rabs log10 assgn carg conj czip ipow abs2 r2C i2C );
+our @EXPORT_OK = qw(log10 assgn carg conj czip ipow abs2 r2C i2C );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -19,10 +19,10 @@ use DynaLoader;
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '+' => $overload_sub = sub {
+  sub overload_plus {
     Carp::confess("PDL::plus: overloaded '+' given undef")
       if grep !defined, @_[0,1];
     return PDL::plus(@_) unless ref $_[1]
@@ -30,25 +30,27 @@ use DynaLoader;
             && defined($foo = overload::Method($_[1], '+'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '+' => $overload_sub = \&overload_plus;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '+=' => sub {
+sub overload_plus_mutate {
   Carp::confess("PDL::plus: overloaded '+=' given undef")
     if grep !defined, @_[0,1];
   PDL::plus($_[0]->inplace, $_[1]); $_[0]
-};
-#line 44 "lib/PDL/Ops.pm"
+}
+use overload '+=' => \&overload_plus_mutate;
+#line 46 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '*' => $overload_sub = sub {
+  sub overload_mult {
     Carp::confess("PDL::mult: overloaded '*' given undef")
       if grep !defined, @_[0,1];
     return PDL::mult(@_) unless ref $_[1]
@@ -56,25 +58,27 @@ use overload '+=' => sub {
             && defined($foo = overload::Method($_[1], '*'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '*' => $overload_sub = \&overload_mult;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '*=' => sub {
+sub overload_mult_mutate {
   Carp::confess("PDL::mult: overloaded '*=' given undef")
     if grep !defined, @_[0,1];
   PDL::mult($_[0]->inplace, $_[1]); $_[0]
-};
-#line 70 "lib/PDL/Ops.pm"
+}
+use overload '*=' => \&overload_mult_mutate;
+#line 74 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '-' => $overload_sub = sub {
+  sub overload_minus {
     Carp::confess("PDL::minus: overloaded '-' given undef")
       if grep !defined, @_[0,1];
     return PDL::minus(@_) unless ref $_[1]
@@ -82,25 +86,27 @@ use overload '*=' => sub {
             && defined($foo = overload::Method($_[1], '-'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '-' => $overload_sub = \&overload_minus;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '-=' => sub {
+sub overload_minus_mutate {
   Carp::confess("PDL::minus: overloaded '-=' given undef")
     if grep !defined, @_[0,1];
   PDL::minus($_[0]->inplace, $_[1]); $_[0]
-};
-#line 96 "lib/PDL/Ops.pm"
+}
+use overload '-=' => \&overload_minus_mutate;
+#line 102 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '/' => $overload_sub = sub {
+  sub overload_divide {
     Carp::confess("PDL::divide: overloaded '/' given undef")
       if grep !defined, @_[0,1];
     return PDL::divide(@_) unless ref $_[1]
@@ -108,25 +114,27 @@ use overload '-=' => sub {
             && defined($foo = overload::Method($_[1], '/'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '/' => $overload_sub = \&overload_divide;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '/=' => sub {
+sub overload_divide_mutate {
   Carp::confess("PDL::divide: overloaded '/=' given undef")
     if grep !defined, @_[0,1];
   PDL::divide($_[0]->inplace, $_[1]); $_[0]
-};
-#line 122 "lib/PDL/Ops.pm"
+}
+use overload '/=' => \&overload_divide_mutate;
+#line 130 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '>' => $overload_sub = sub {
+  sub overload_gt {
     Carp::confess("PDL::gt: overloaded '>' given undef")
       if grep !defined, @_[0,1];
     return PDL::gt(@_) unless ref $_[1]
@@ -134,17 +142,18 @@ use overload '/=' => sub {
             && defined($foo = overload::Method($_[1], '>'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '>' => $overload_sub = \&overload_gt;
 }
-#line 140 "lib/PDL/Ops.pm"
+#line 149 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '<' => $overload_sub = sub {
+  sub overload_lt {
     Carp::confess("PDL::lt: overloaded '<' given undef")
       if grep !defined, @_[0,1];
     return PDL::lt(@_) unless ref $_[1]
@@ -152,17 +161,18 @@ use overload '/=' => sub {
             && defined($foo = overload::Method($_[1], '<'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '<' => $overload_sub = \&overload_lt;
 }
-#line 158 "lib/PDL/Ops.pm"
+#line 168 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '<=' => $overload_sub = sub {
+  sub overload_le {
     Carp::confess("PDL::le: overloaded '<=' given undef")
       if grep !defined, @_[0,1];
     return PDL::le(@_) unless ref $_[1]
@@ -170,17 +180,18 @@ use overload '/=' => sub {
             && defined($foo = overload::Method($_[1], '<='))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '<=' => $overload_sub = \&overload_le;
 }
-#line 176 "lib/PDL/Ops.pm"
+#line 187 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '>=' => $overload_sub = sub {
+  sub overload_ge {
     Carp::confess("PDL::ge: overloaded '>=' given undef")
       if grep !defined, @_[0,1];
     return PDL::ge(@_) unless ref $_[1]
@@ -188,17 +199,18 @@ use overload '/=' => sub {
             && defined($foo = overload::Method($_[1], '>='))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '>=' => $overload_sub = \&overload_ge;
 }
-#line 194 "lib/PDL/Ops.pm"
+#line 206 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '==' => $overload_sub = sub {
+  sub overload_eq {
     Carp::confess("PDL::eq: overloaded '==' given undef")
       if grep !defined, @_[0,1];
     return PDL::eq(@_) unless ref $_[1]
@@ -206,17 +218,18 @@ use overload '/=' => sub {
             && defined($foo = overload::Method($_[1], '=='))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '==' => $overload_sub = \&overload_eq;
 }
-#line 212 "lib/PDL/Ops.pm"
+#line 225 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '!=' => $overload_sub = sub {
+  sub overload_ne {
     Carp::confess("PDL::ne: overloaded '!=' given undef")
       if grep !defined, @_[0,1];
     return PDL::ne(@_) unless ref $_[1]
@@ -224,17 +237,18 @@ use overload '/=' => sub {
             && defined($foo = overload::Method($_[1], '!='))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '!=' => $overload_sub = \&overload_ne;
 }
-#line 230 "lib/PDL/Ops.pm"
+#line 244 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '<<' => $overload_sub = sub {
+  sub overload_shiftleft {
     Carp::confess("PDL::shiftleft: overloaded '<<' given undef")
       if grep !defined, @_[0,1];
     return PDL::shiftleft(@_) unless ref $_[1]
@@ -242,25 +256,27 @@ use overload '/=' => sub {
             && defined($foo = overload::Method($_[1], '<<'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '<<' => $overload_sub = \&overload_shiftleft;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '<<=' => sub {
+sub overload_shiftleft_mutate {
   Carp::confess("PDL::shiftleft: overloaded '<<=' given undef")
     if grep !defined, @_[0,1];
   PDL::shiftleft($_[0]->inplace, $_[1]); $_[0]
-};
-#line 256 "lib/PDL/Ops.pm"
+}
+use overload '<<=' => \&overload_shiftleft_mutate;
+#line 272 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '>>' => $overload_sub = sub {
+  sub overload_shiftright {
     Carp::confess("PDL::shiftright: overloaded '>>' given undef")
       if grep !defined, @_[0,1];
     return PDL::shiftright(@_) unless ref $_[1]
@@ -268,25 +284,27 @@ use overload '<<=' => sub {
             && defined($foo = overload::Method($_[1], '>>'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '>>' => $overload_sub = \&overload_shiftright;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '>>=' => sub {
+sub overload_shiftright_mutate {
   Carp::confess("PDL::shiftright: overloaded '>>=' given undef")
     if grep !defined, @_[0,1];
   PDL::shiftright($_[0]->inplace, $_[1]); $_[0]
-};
-#line 282 "lib/PDL/Ops.pm"
+}
+use overload '>>=' => \&overload_shiftright_mutate;
+#line 300 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '|' => $overload_sub = sub {
+  sub overload_or2 {
     Carp::confess("PDL::or2: overloaded '|' given undef")
       if grep !defined, @_[0,1];
     return PDL::or2($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
@@ -294,25 +312,27 @@ use overload '>>=' => sub {
             && defined($foo = overload::Method($_[1], '|'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '|' => $overload_sub = \&overload_or2;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '|=' => sub {
+sub overload_or2_mutate {
   Carp::confess("PDL::or2: overloaded '|=' given undef")
     if grep !defined, @_[0,1];
   PDL::or2($_[0]->inplace, $_[1]); $_[0]
-};
-#line 308 "lib/PDL/Ops.pm"
+}
+use overload '|=' => \&overload_or2_mutate;
+#line 328 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '&' => $overload_sub = sub {
+  sub overload_and2 {
     Carp::confess("PDL::and2: overloaded '&' given undef")
       if grep !defined, @_[0,1];
     return PDL::and2($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
@@ -320,25 +340,27 @@ use overload '|=' => sub {
             && defined($foo = overload::Method($_[1], '&'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '&' => $overload_sub = \&overload_and2;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '&=' => sub {
+sub overload_and2_mutate {
   Carp::confess("PDL::and2: overloaded '&=' given undef")
     if grep !defined, @_[0,1];
   PDL::and2($_[0]->inplace, $_[1]); $_[0]
-};
-#line 334 "lib/PDL/Ops.pm"
+}
+use overload '&=' => \&overload_and2_mutate;
+#line 356 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '^' => $overload_sub = sub {
+  sub overload_xor {
     Carp::confess("PDL::xor: overloaded '^' given undef")
       if grep !defined, @_[0,1];
     return PDL::xor($_[2]?@_[1,0]:@_[0,1]) unless ref $_[1]
@@ -346,25 +368,27 @@ use overload '&=' => sub {
             && defined($foo = overload::Method($_[1], '^'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '^' => $overload_sub = \&overload_xor;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '^=' => sub {
+sub overload_xor_mutate {
   Carp::confess("PDL::xor: overloaded '^=' given undef")
     if grep !defined, @_[0,1];
   PDL::xor($_[0]->inplace, $_[1]); $_[0]
-};
-#line 360 "lib/PDL/Ops.pm"
+}
+use overload '^=' => \&overload_xor_mutate;
+#line 384 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '**' => $overload_sub = sub {
+  sub overload_power {
     Carp::confess("PDL::power: overloaded '**' given undef")
       if grep !defined, @_[0,1];
     return PDL::power(@_) unless ref $_[1]
@@ -372,25 +396,27 @@ use overload '^=' => sub {
             && defined($foo = overload::Method($_[1], '**'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '**' => $overload_sub = \&overload_power;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '**=' => sub {
+sub overload_power_mutate {
   Carp::confess("PDL::power: overloaded '**=' given undef")
     if grep !defined, @_[0,1];
   PDL::power($_[0]->inplace, $_[1]); $_[0]
-};
-#line 386 "lib/PDL/Ops.pm"
+}
+use overload '**=' => \&overload_power_mutate;
+#line 412 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload 'atan2' => $overload_sub = sub {
+  sub overload_atan2 {
     Carp::confess("PDL::atan2: overloaded 'atan2' given undef")
       if grep !defined, @_[0,1];
     return PDL::atan2(@_) unless ref $_[1]
@@ -398,17 +424,18 @@ use overload '**=' => sub {
             && defined($foo = overload::Method($_[1], 'atan2'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload 'atan2' => $overload_sub = \&overload_atan2;
 }
-#line 404 "lib/PDL/Ops.pm"
+#line 431 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '%' => $overload_sub = sub {
+  sub overload_modulo {
     Carp::confess("PDL::modulo: overloaded '%' given undef")
       if grep !defined, @_[0,1];
     return PDL::modulo(@_) unless ref $_[1]
@@ -416,25 +443,27 @@ use overload '**=' => sub {
             && defined($foo = overload::Method($_[1], '%'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '%' => $overload_sub = \&overload_modulo;
 }
 
-#line 1453 "lib/PDL/PP.pm"
+#line 1461 "lib/PDL/PP.pm"
 # in1, in2, out, swap if true
-use overload '%=' => sub {
+sub overload_modulo_mutate {
   Carp::confess("PDL::modulo: overloaded '%=' given undef")
     if grep !defined, @_[0,1];
   PDL::modulo($_[0]->inplace, $_[1]); $_[0]
-};
-#line 430 "lib/PDL/Ops.pm"
+}
+use overload '%=' => \&overload_modulo_mutate;
+#line 459 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1438 "lib/PDL/PP.pm"
+#line 1445 "lib/PDL/PP.pm"
 {
   my ($foo, $overload_sub);
-  use overload '<=>' => $overload_sub = sub {
+  sub overload_spaceship {
     Carp::confess("PDL::spaceship: overloaded '<=>' given undef")
       if grep !defined, @_[0,1];
     return PDL::spaceship(@_) unless ref $_[1]
@@ -442,86 +471,94 @@ use overload '%=' => sub {
             && defined($foo = overload::Method($_[1], '<=>'))
             && $foo != $overload_sub; # recursion guard
     goto &$foo;
-  };
+  }
+  use overload '<=>' => $overload_sub = \&overload_spaceship;
 }
-#line 448 "lib/PDL/Ops.pm"
+#line 478 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1430 "lib/PDL/PP.pm"
-use overload '~' => sub {
+#line 1436 "lib/PDL/PP.pm"
+sub overload_bitnot {
   Carp::confess("PDL::bitnot: overloaded '~' given undef")
     if grep !defined, $_[0];
   PDL::bitnot($_[0]);
-};
-#line 459 "lib/PDL/Ops.pm"
+}
+use overload '~' => \&overload_bitnot;
+#line 490 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1430 "lib/PDL/PP.pm"
-use overload 'sqrt' => sub {
+#line 1436 "lib/PDL/PP.pm"
+sub overload_sqrt {
   Carp::confess("PDL::sqrt: overloaded 'sqrt' given undef")
     if grep !defined, $_[0];
   PDL::sqrt($_[0]);
-};
-#line 470 "lib/PDL/Ops.pm"
+}
+use overload 'sqrt' => \&overload_sqrt;
+#line 502 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1430 "lib/PDL/PP.pm"
-use overload 'sin' => sub {
+#line 1436 "lib/PDL/PP.pm"
+sub overload_sin {
   Carp::confess("PDL::sin: overloaded 'sin' given undef")
     if grep !defined, $_[0];
   PDL::sin($_[0]);
-};
-#line 481 "lib/PDL/Ops.pm"
 }
-{ package # hide from MetaCPAN
- PDL;
-
-#line 1430 "lib/PDL/PP.pm"
-use overload 'cos' => sub {
-  Carp::confess("PDL::cos: overloaded 'cos' given undef")
-    if grep !defined, $_[0];
-  PDL::cos($_[0]);
-};
-#line 492 "lib/PDL/Ops.pm"
-}
-{ package # hide from MetaCPAN
- PDL;
-
-#line 1430 "lib/PDL/PP.pm"
-use overload '!' => sub {
-  Carp::confess("PDL::not: overloaded '!' given undef")
-    if grep !defined, $_[0];
-  PDL::not($_[0]);
-};
-#line 503 "lib/PDL/Ops.pm"
-}
-{ package # hide from MetaCPAN
- PDL;
-
-#line 1430 "lib/PDL/PP.pm"
-use overload 'exp' => sub {
-  Carp::confess("PDL::exp: overloaded 'exp' given undef")
-    if grep !defined, $_[0];
-  PDL::exp($_[0]);
-};
+use overload 'sin' => \&overload_sin;
 #line 514 "lib/PDL/Ops.pm"
 }
 { package # hide from MetaCPAN
  PDL;
 
-#line 1430 "lib/PDL/PP.pm"
-use overload 'log' => sub {
+#line 1436 "lib/PDL/PP.pm"
+sub overload_cos {
+  Carp::confess("PDL::cos: overloaded 'cos' given undef")
+    if grep !defined, $_[0];
+  PDL::cos($_[0]);
+}
+use overload 'cos' => \&overload_cos;
+#line 526 "lib/PDL/Ops.pm"
+}
+{ package # hide from MetaCPAN
+ PDL;
+
+#line 1436 "lib/PDL/PP.pm"
+sub overload_not {
+  Carp::confess("PDL::not: overloaded '!' given undef")
+    if grep !defined, $_[0];
+  PDL::not($_[0]);
+}
+use overload '!' => \&overload_not;
+#line 538 "lib/PDL/Ops.pm"
+}
+{ package # hide from MetaCPAN
+ PDL;
+
+#line 1436 "lib/PDL/PP.pm"
+sub overload_exp {
+  Carp::confess("PDL::exp: overloaded 'exp' given undef")
+    if grep !defined, $_[0];
+  PDL::exp($_[0]);
+}
+use overload 'exp' => \&overload_exp;
+#line 550 "lib/PDL/Ops.pm"
+}
+{ package # hide from MetaCPAN
+ PDL;
+
+#line 1436 "lib/PDL/PP.pm"
+sub overload_log {
   Carp::confess("PDL::log: overloaded 'log' given undef")
     if grep !defined, $_[0];
   PDL::log($_[0]);
-};
-#line 525 "lib/PDL/Ops.pm"
+}
+use overload 'log' => \&overload_log;
+#line 562 "lib/PDL/Ops.pm"
 }
 
 
@@ -530,7 +567,7 @@ use overload 'log' => sub {
 
 
 
-#line 20 "lib/PDL/Ops.pd"
+#line 21 "lib/PDL/Ops.pd"
 
 use strict;
 use warnings;
@@ -556,7 +593,7 @@ by the module L<PDL::Primitive>.
 none
 
 =cut
-#line 560 "lib/PDL/Ops.pm"
+#line 597 "lib/PDL/Ops.pm"
 
 
 =head1 FUNCTIONS
@@ -578,16 +615,16 @@ none
 
 =for usage
 
- $c = $a + $b;                # overloads the Perl '+' operator
+ $c = $a + $b;                      # overloads the Perl '+' operator
  $a += $b;
- $c = plus($a, $b);           # using default value of swap=0
- $c = plus($a, $b, $swap);    # overriding default
- plus($a, $b, $c, $swap);     # all arguments given
- $c = $a->plus($b);           # method call
+ $c = PDL::plus($a, $b);            # using default value of swap=0
+ $c = PDL::plus($a, $b, $swap);     # overriding default
+ PDL::plus($a, $b, $c, $swap);      # all arguments given
+ $c = $a->plus($b);                 # method call
  $c = $a->plus($b, $swap);
  $a->plus($b, $c, $swap);
- $a->inplace->plus($b,$swap); # can be used inplace
- plus($a->inplace,$b,$swap);
+ $a->inplace->plus($b, $swap);      # can be used inplace
+ PDL::plus($a->inplace, $b, $swap);
 
 =for ref
 
@@ -595,6 +632,7 @@ add two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -624,16 +662,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a * $b;                # overloads the Perl '*' operator
+ $c = $a * $b;                      # overloads the Perl '*' operator
  $a *= $b;
- $c = mult($a, $b);           # using default value of swap=0
- $c = mult($a, $b, $swap);    # overriding default
- mult($a, $b, $c, $swap);     # all arguments given
- $c = $a->mult($b);           # method call
+ $c = PDL::mult($a, $b);            # using default value of swap=0
+ $c = PDL::mult($a, $b, $swap);     # overriding default
+ PDL::mult($a, $b, $c, $swap);      # all arguments given
+ $c = $a->mult($b);                 # method call
  $c = $a->mult($b, $swap);
  $a->mult($b, $c, $swap);
- $a->inplace->mult($b,$swap); # can be used inplace
- mult($a->inplace,$b,$swap);
+ $a->inplace->mult($b, $swap);      # can be used inplace
+ PDL::mult($a->inplace, $b, $swap);
 
 =for ref
 
@@ -641,6 +679,7 @@ multiply two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -670,16 +709,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a - $b;                 # overloads the Perl '-' operator
+ $c = $a - $b;                       # overloads the Perl '-' operator
  $a -= $b;
- $c = minus($a, $b);           # using default value of swap=0
- $c = minus($a, $b, $swap);    # overriding default
- minus($a, $b, $c, $swap);     # all arguments given
- $c = $a->minus($b);           # method call
+ $c = PDL::minus($a, $b);            # using default value of swap=0
+ $c = PDL::minus($a, $b, $swap);     # overriding default
+ PDL::minus($a, $b, $c, $swap);      # all arguments given
+ $c = $a->minus($b);                 # method call
  $c = $a->minus($b, $swap);
  $a->minus($b, $c, $swap);
- $a->inplace->minus($b,$swap); # can be used inplace
- minus($a->inplace,$b,$swap);
+ $a->inplace->minus($b, $swap);      # can be used inplace
+ PDL::minus($a->inplace, $b, $swap);
 
 =for ref
 
@@ -687,6 +726,7 @@ subtract two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -716,16 +756,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a / $b;                  # overloads the Perl '/' operator
+ $c = $a / $b;                        # overloads the Perl '/' operator
  $a /= $b;
- $c = divide($a, $b);           # using default value of swap=0
- $c = divide($a, $b, $swap);    # overriding default
- divide($a, $b, $c, $swap);     # all arguments given
- $c = $a->divide($b);           # method call
+ $c = PDL::divide($a, $b);            # using default value of swap=0
+ $c = PDL::divide($a, $b, $swap);     # overriding default
+ PDL::divide($a, $b, $c, $swap);      # all arguments given
+ $c = $a->divide($b);                 # method call
  $c = $a->divide($b, $swap);
  $a->divide($b, $c, $swap);
- $a->inplace->divide($b,$swap); # can be used inplace
- divide($a->inplace,$b,$swap);
+ $a->inplace->divide($b, $swap);      # can be used inplace
+ PDL::divide($a->inplace, $b, $swap);
 
 =for ref
 
@@ -733,6 +773,7 @@ divide two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -762,15 +803,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a > $b;              # overloads the Perl '>' operator
- $c = gt($a, $b);           # using default value of swap=0
- $c = gt($a, $b, $swap);    # overriding default
- gt($a, $b, $c, $swap);     # all arguments given
- $c = $a->gt($b);           # method call
+ $c = $a > $b;                    # overloads the Perl '>' operator
+ $c = PDL::gt($a, $b);            # using default value of swap=0
+ $c = PDL::gt($a, $b, $swap);     # overriding default
+ PDL::gt($a, $b, $c, $swap);      # all arguments given
+ $c = $a->gt($b);                 # method call
  $c = $a->gt($b, $swap);
  $a->gt($b, $c, $swap);
- $a->inplace->gt($b,$swap); # can be used inplace
- gt($a->inplace,$b,$swap);
+ $a->inplace->gt($b, $swap);      # can be used inplace
+ PDL::gt($a->inplace, $b, $swap);
 
 =for ref
 
@@ -778,6 +819,7 @@ the binary E<gt> (greater than) operation
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -807,15 +849,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a < $b;              # overloads the Perl '<' operator
- $c = lt($a, $b);           # using default value of swap=0
- $c = lt($a, $b, $swap);    # overriding default
- lt($a, $b, $c, $swap);     # all arguments given
- $c = $a->lt($b);           # method call
+ $c = $a < $b;                    # overloads the Perl '<' operator
+ $c = PDL::lt($a, $b);            # using default value of swap=0
+ $c = PDL::lt($a, $b, $swap);     # overriding default
+ PDL::lt($a, $b, $c, $swap);      # all arguments given
+ $c = $a->lt($b);                 # method call
  $c = $a->lt($b, $swap);
  $a->lt($b, $c, $swap);
- $a->inplace->lt($b,$swap); # can be used inplace
- lt($a->inplace,$b,$swap);
+ $a->inplace->lt($b, $swap);      # can be used inplace
+ PDL::lt($a->inplace, $b, $swap);
 
 =for ref
 
@@ -823,6 +865,7 @@ the binary E<lt> (less than) operation
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -852,15 +895,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a <= $b;             # overloads the Perl '<=' operator
- $c = le($a, $b);           # using default value of swap=0
- $c = le($a, $b, $swap);    # overriding default
- le($a, $b, $c, $swap);     # all arguments given
- $c = $a->le($b);           # method call
+ $c = $a <= $b;                   # overloads the Perl '<=' operator
+ $c = PDL::le($a, $b);            # using default value of swap=0
+ $c = PDL::le($a, $b, $swap);     # overriding default
+ PDL::le($a, $b, $c, $swap);      # all arguments given
+ $c = $a->le($b);                 # method call
  $c = $a->le($b, $swap);
  $a->le($b, $c, $swap);
- $a->inplace->le($b,$swap); # can be used inplace
- le($a->inplace,$b,$swap);
+ $a->inplace->le($b, $swap);      # can be used inplace
+ PDL::le($a->inplace, $b, $swap);
 
 =for ref
 
@@ -868,6 +911,7 @@ the binary E<lt>= (less equal) operation
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -897,15 +941,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a >= $b;             # overloads the Perl '>=' operator
- $c = ge($a, $b);           # using default value of swap=0
- $c = ge($a, $b, $swap);    # overriding default
- ge($a, $b, $c, $swap);     # all arguments given
- $c = $a->ge($b);           # method call
+ $c = $a >= $b;                   # overloads the Perl '>=' operator
+ $c = PDL::ge($a, $b);            # using default value of swap=0
+ $c = PDL::ge($a, $b, $swap);     # overriding default
+ PDL::ge($a, $b, $c, $swap);      # all arguments given
+ $c = $a->ge($b);                 # method call
  $c = $a->ge($b, $swap);
  $a->ge($b, $c, $swap);
- $a->inplace->ge($b,$swap); # can be used inplace
- ge($a->inplace,$b,$swap);
+ $a->inplace->ge($b, $swap);      # can be used inplace
+ PDL::ge($a->inplace, $b, $swap);
 
 =for ref
 
@@ -913,6 +957,7 @@ the binary E<gt>= (greater equal) operation
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -942,15 +987,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a == $b;             # overloads the Perl '==' operator
- $c = eq($a, $b);           # using default value of swap=0
- $c = eq($a, $b, $swap);    # overriding default
- eq($a, $b, $c, $swap);     # all arguments given
- $c = $a->eq($b);           # method call
+ $c = $a == $b;                   # overloads the Perl '==' operator
+ $c = PDL::eq($a, $b);            # using default value of swap=0
+ $c = PDL::eq($a, $b, $swap);     # overriding default
+ PDL::eq($a, $b, $c, $swap);      # all arguments given
+ $c = $a->eq($b);                 # method call
  $c = $a->eq($b, $swap);
  $a->eq($b, $c, $swap);
- $a->inplace->eq($b,$swap); # can be used inplace
- eq($a->inplace,$b,$swap);
+ $a->inplace->eq($b, $swap);      # can be used inplace
+ PDL::eq($a->inplace, $b, $swap);
 
 =for ref
 
@@ -958,6 +1003,7 @@ binary I<equal to> operation (C<==>)
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -987,15 +1033,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a != $b;             # overloads the Perl '!=' operator
- $c = ne($a, $b);           # using default value of swap=0
- $c = ne($a, $b, $swap);    # overriding default
- ne($a, $b, $c, $swap);     # all arguments given
- $c = $a->ne($b);           # method call
+ $c = $a != $b;                   # overloads the Perl '!=' operator
+ $c = PDL::ne($a, $b);            # using default value of swap=0
+ $c = PDL::ne($a, $b, $swap);     # overriding default
+ PDL::ne($a, $b, $c, $swap);      # all arguments given
+ $c = $a->ne($b);                 # method call
  $c = $a->ne($b, $swap);
  $a->ne($b, $c, $swap);
- $a->inplace->ne($b,$swap); # can be used inplace
- ne($a->inplace,$b,$swap);
+ $a->inplace->ne($b, $swap);      # can be used inplace
+ PDL::ne($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1003,6 +1049,7 @@ binary I<not equal to> operation (C<!=>)
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1031,16 +1078,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a << $b;                    # overloads the Perl '<<' operator
+ $c = $a << $b;                          # overloads the Perl '<<' operator
  $a <<= $b;
- $c = shiftleft($a, $b);           # using default value of swap=0
- $c = shiftleft($a, $b, $swap);    # overriding default
- shiftleft($a, $b, $c, $swap);     # all arguments given
- $c = $a->shiftleft($b);           # method call
+ $c = PDL::shiftleft($a, $b);            # using default value of swap=0
+ $c = PDL::shiftleft($a, $b, $swap);     # overriding default
+ PDL::shiftleft($a, $b, $c, $swap);      # all arguments given
+ $c = $a->shiftleft($b);                 # method call
  $c = $a->shiftleft($b, $swap);
  $a->shiftleft($b, $c, $swap);
- $a->inplace->shiftleft($b,$swap); # can be used inplace
- shiftleft($a->inplace,$b,$swap);
+ $a->inplace->shiftleft($b, $swap);      # can be used inplace
+ PDL::shiftleft($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1048,6 +1095,7 @@ bitwise leftshift C<$a> by C<$b>
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1076,16 +1124,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a >> $b;                     # overloads the Perl '>>' operator
+ $c = $a >> $b;                           # overloads the Perl '>>' operator
  $a >>= $b;
- $c = shiftright($a, $b);           # using default value of swap=0
- $c = shiftright($a, $b, $swap);    # overriding default
- shiftright($a, $b, $c, $swap);     # all arguments given
- $c = $a->shiftright($b);           # method call
+ $c = PDL::shiftright($a, $b);            # using default value of swap=0
+ $c = PDL::shiftright($a, $b, $swap);     # overriding default
+ PDL::shiftright($a, $b, $c, $swap);      # all arguments given
+ $c = $a->shiftright($b);                 # method call
  $c = $a->shiftright($b, $swap);
  $a->shiftright($b, $c, $swap);
- $a->inplace->shiftright($b,$swap); # can be used inplace
- shiftright($a->inplace,$b,$swap);
+ $a->inplace->shiftright($b, $swap);      # can be used inplace
+ PDL::shiftright($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1093,6 +1141,7 @@ bitwise rightshift C<$a> by C<$b>
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1121,16 +1170,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a | $b;               # overloads the Perl '|' operator
+ $c = $a | $b;                     # overloads the Perl '|' operator
  $a |= $b;
- $c = or2($a, $b);           # using default value of swap=0
- $c = or2($a, $b, $swap);    # overriding default
- or2($a, $b, $c, $swap);     # all arguments given
- $c = $a->or2($b);           # method call
+ $c = PDL::or2($a, $b);            # using default value of swap=0
+ $c = PDL::or2($a, $b, $swap);     # overriding default
+ PDL::or2($a, $b, $c, $swap);      # all arguments given
+ $c = $a->or2($b);                 # method call
  $c = $a->or2($b, $swap);
  $a->or2($b, $c, $swap);
- $a->inplace->or2($b,$swap); # can be used inplace
- or2($a->inplace,$b,$swap);
+ $a->inplace->or2($b, $swap);      # can be used inplace
+ PDL::or2($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1138,6 +1187,7 @@ bitwise I<or> of two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1166,16 +1216,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a & $b;                # overloads the Perl '&' operator
+ $c = $a & $b;                      # overloads the Perl '&' operator
  $a &= $b;
- $c = and2($a, $b);           # using default value of swap=0
- $c = and2($a, $b, $swap);    # overriding default
- and2($a, $b, $c, $swap);     # all arguments given
- $c = $a->and2($b);           # method call
+ $c = PDL::and2($a, $b);            # using default value of swap=0
+ $c = PDL::and2($a, $b, $swap);     # overriding default
+ PDL::and2($a, $b, $c, $swap);      # all arguments given
+ $c = $a->and2($b);                 # method call
  $c = $a->and2($b, $swap);
  $a->and2($b, $c, $swap);
- $a->inplace->and2($b,$swap); # can be used inplace
- and2($a->inplace,$b,$swap);
+ $a->inplace->and2($b, $swap);      # can be used inplace
+ PDL::and2($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1183,6 +1233,7 @@ bitwise I<and> of two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1211,16 +1262,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a ^ $b;               # overloads the Perl '^' operator
+ $c = $a ^ $b;                     # overloads the Perl '^' operator
  $a ^= $b;
- $c = xor($a, $b);           # using default value of swap=0
- $c = xor($a, $b, $swap);    # overriding default
- xor($a, $b, $c, $swap);     # all arguments given
- $c = $a->xor($b);           # method call
+ $c = PDL::xor($a, $b);            # using default value of swap=0
+ $c = PDL::xor($a, $b, $swap);     # overriding default
+ PDL::xor($a, $b, $c, $swap);      # all arguments given
+ $c = $a->xor($b);                 # method call
  $c = $a->xor($b, $swap);
  $a->xor($b, $c, $swap);
- $a->inplace->xor($b,$swap); # can be used inplace
- xor($a->inplace,$b,$swap);
+ $a->inplace->xor($b, $swap);      # can be used inplace
+ PDL::xor($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1228,6 +1279,7 @@ bitwise I<exclusive or> of two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1246,7 +1298,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 306 "lib/PDL/Ops.pd"
+#line 315 "lib/PDL/Ops.pd"
 
 =head2 xor2
 
@@ -1257,7 +1309,7 @@ Synonym for L</xor>.
 =cut
 
 *PDL::xor2 = *xor2 = \&PDL::xor;
-#line 1261 "lib/PDL/Ops.pm"
+#line 1313 "lib/PDL/Ops.pm"
 
 
 =head2 power
@@ -1269,16 +1321,16 @@ Synonym for L</xor>.
 
 =for usage
 
- $c = $a ** $b;                # overloads the Perl '**' operator
+ $c = $a ** $b;                      # overloads the Perl '**' operator
  $a **= $b;
- $c = power($a, $b);           # using default value of swap=0
- $c = power($a, $b, $swap);    # overriding default
- power($a, $b, $c, $swap);     # all arguments given
- $c = $a->power($b);           # method call
+ $c = PDL::power($a, $b);            # using default value of swap=0
+ $c = PDL::power($a, $b, $swap);     # overriding default
+ PDL::power($a, $b, $c, $swap);      # all arguments given
+ $c = $a->power($b);                 # method call
  $c = $a->power($b, $swap);
  $a->power($b, $c, $swap);
- $a->inplace->power($b,$swap); # can be used inplace
- power($a->inplace,$b,$swap);
+ $a->inplace->power($b, $swap);      # can be used inplace
+ PDL::power($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1286,6 +1338,7 @@ raise ndarray C<$a> to the power C<$b>
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1314,15 +1367,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a atan2 $b;             # overloads the Perl 'atan2' operator
- $c = atan2($a, $b);           # using default value of swap=0
- $c = atan2($a, $b, $swap);    # overriding default
- atan2($a, $b, $c, $swap);     # all arguments given
- $c = $a->atan2($b);           # method call
+ $c = atan2 $a, $b;                  # overloads the Perl 'atan2' operator
+ $c = PDL::atan2($a, $b);            # using default value of swap=0
+ $c = PDL::atan2($a, $b, $swap);     # overriding default
+ PDL::atan2($a, $b, $c, $swap);      # all arguments given
+ $c = $a->atan2($b);                 # method call
  $c = $a->atan2($b, $swap);
  $a->atan2($b, $c, $swap);
- $a->inplace->atan2($b,$swap); # can be used inplace
- atan2($a->inplace,$b,$swap);
+ $a->inplace->atan2($b, $swap);      # can be used inplace
+ PDL::atan2($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1330,6 +1383,7 @@ elementwise C<atan2> of two ndarrays
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1359,16 +1413,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a % $b;                  # overloads the Perl '%' operator
+ $c = $a % $b;                        # overloads the Perl '%' operator
  $a %= $b;
- $c = modulo($a, $b);           # using default value of swap=0
- $c = modulo($a, $b, $swap);    # overriding default
- modulo($a, $b, $c, $swap);     # all arguments given
- $c = $a->modulo($b);           # method call
+ $c = PDL::modulo($a, $b);            # using default value of swap=0
+ $c = PDL::modulo($a, $b, $swap);     # overriding default
+ PDL::modulo($a, $b, $c, $swap);      # all arguments given
+ $c = $a->modulo($b);                 # method call
  $c = $a->modulo($b, $swap);
  $a->modulo($b, $c, $swap);
- $a->inplace->modulo($b,$swap); # can be used inplace
- modulo($a->inplace,$b,$swap);
+ $a->inplace->modulo($b, $swap);      # can be used inplace
+ PDL::modulo($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1376,6 +1430,7 @@ elementwise C<modulo> operation
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1405,15 +1460,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $c = $a <=> $b;                   # overloads the Perl '<=>' operator
- $c = spaceship($a, $b);           # using default value of swap=0
- $c = spaceship($a, $b, $swap);    # overriding default
- spaceship($a, $b, $c, $swap);     # all arguments given
- $c = $a->spaceship($b);           # method call
+ $c = $a <=> $b;                         # overloads the Perl '<=>' operator
+ $c = PDL::spaceship($a, $b);            # using default value of swap=0
+ $c = PDL::spaceship($a, $b, $swap);     # overriding default
+ PDL::spaceship($a, $b, $c, $swap);      # all arguments given
+ $c = $a->spaceship($b);                 # method call
  $c = $a->spaceship($b, $swap);
  $a->spaceship($b, $c, $swap);
- $a->inplace->spaceship($b,$swap); # can be used inplace
- spaceship($a->inplace,$b,$swap);
+ $a->inplace->spaceship($b, $swap);      # can be used inplace
+ PDL::spaceship($a->inplace, $b, $swap);
 
 =for ref
 
@@ -1421,6 +1476,7 @@ elementwise "<=>" operation
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1449,13 +1505,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = ~$a;            # overloads the Perl '~' operator
- $b = bitnot($a);
- bitnot($a, $b);      # all arguments given
- $b = $a->bitnot;     # method call
+ $b = ~$a;                 # overloads the Perl '~' operator
+ $b = PDL::bitnot($a);
+ PDL::bitnot($a, $b);      # all arguments given
+ $b = $a->bitnot;          # method call
  $a->bitnot($b);
- $a->inplace->bitnot; # can be used inplace
- bitnot($a->inplace);
+ $a->inplace->bitnot;      # can be used inplace
+ PDL::bitnot($a->inplace);
 
 =for ref
 
@@ -1463,6 +1519,7 @@ unary bitwise negation
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1492,13 +1549,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = sqrt $a;      # overloads the Perl 'sqrt' operator
- $b = sqrt($a);
- sqrt($a, $b);      # all arguments given
- $b = $a->sqrt;     # method call
+ $b = sqrt $a;           # overloads the Perl 'sqrt' operator
+ $b = PDL::sqrt($a);
+ PDL::sqrt($a, $b);      # all arguments given
+ $b = $a->sqrt;          # method call
  $a->sqrt($b);
- $a->inplace->sqrt; # can be used inplace
- sqrt($a->inplace);
+ $a->inplace->sqrt;      # can be used inplace
+ PDL::sqrt($a->inplace);
 
 =for ref
 
@@ -1506,6 +1563,7 @@ elementwise square root
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1535,13 +1593,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = sin $a;      # overloads the Perl 'sin' operator
- $b = sin($a);
- sin($a, $b);      # all arguments given
- $b = $a->sin;     # method call
+ $b = sin $a;           # overloads the Perl 'sin' operator
+ $b = PDL::sin($a);
+ PDL::sin($a, $b);      # all arguments given
+ $b = $a->sin;          # method call
  $a->sin($b);
- $a->inplace->sin; # can be used inplace
- sin($a->inplace);
+ $a->inplace->sin;      # can be used inplace
+ PDL::sin($a->inplace);
 
 =for ref
 
@@ -1549,6 +1607,7 @@ the sin function
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1578,13 +1637,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = cos $a;      # overloads the Perl 'cos' operator
- $b = cos($a);
- cos($a, $b);      # all arguments given
- $b = $a->cos;     # method call
+ $b = cos $a;           # overloads the Perl 'cos' operator
+ $b = PDL::cos($a);
+ PDL::cos($a, $b);      # all arguments given
+ $b = $a->cos;          # method call
  $a->cos($b);
- $a->inplace->cos; # can be used inplace
- cos($a->inplace);
+ $a->inplace->cos;      # can be used inplace
+ PDL::cos($a->inplace);
 
 =for ref
 
@@ -1592,6 +1651,7 @@ the cos function
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1621,13 +1681,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = !$a;         # overloads the Perl '!' operator
- $b = not($a);
- not($a, $b);      # all arguments given
- $b = $a->not;     # method call
+ $b = !$a;              # overloads the Perl '!' operator
+ $b = PDL::not($a);
+ PDL::not($a, $b);      # all arguments given
+ $b = $a->not;          # method call
  $a->not($b);
- $a->inplace->not; # can be used inplace
- not($a->inplace);
+ $a->inplace->not;      # can be used inplace
+ PDL::not($a->inplace);
 
 =for ref
 
@@ -1635,6 +1695,7 @@ the elementwise I<not> operation
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1663,13 +1724,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = exp $a;      # overloads the Perl 'exp' operator
- $b = exp($a);
- exp($a, $b);      # all arguments given
- $b = $a->exp;     # method call
+ $b = exp $a;           # overloads the Perl 'exp' operator
+ $b = PDL::exp($a);
+ PDL::exp($a, $b);      # all arguments given
+ $b = $a->exp;          # method call
  $a->exp($b);
- $a->inplace->exp; # can be used inplace
- exp($a->inplace);
+ $a->inplace->exp;      # can be used inplace
+ PDL::exp($a->inplace);
 
 =for ref
 
@@ -1677,6 +1738,7 @@ the exponential function
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1705,13 +1767,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = log $a;      # overloads the Perl 'log' operator
- $b = log($a);
- log($a, $b);      # all arguments given
- $b = $a->log;     # method call
+ $b = log $a;           # overloads the Perl 'log' operator
+ $b = PDL::log($a);
+ PDL::log($a, $b);      # all arguments given
+ $b = $a->log;          # method call
  $a->log($b);
- $a->inplace->log; # can be used inplace
- log($a->inplace);
+ $a->inplace->log;      # can be used inplace
+ PDL::log($a->inplace);
 
 =for ref
 
@@ -1719,6 +1781,7 @@ the natural logarithm
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1747,10 +1810,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = re($complexv);
- re($complexv, $b);  # all arguments given
- $b = $complexv->re; # method call
+ $b = PDL::re($complexv);
+ PDL::re($complexv, $b);  # all arguments given
+ $b = $complexv->re;      # method call
  $complexv->re($b);
+ $complexv->re .= $data;  # usable as lvalue
 
 =for ref
 
@@ -1787,10 +1851,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = im($complexv);
- im($complexv, $b);  # all arguments given
- $b = $complexv->im; # method call
+ $b = PDL::im($complexv);
+ PDL::im($complexv, $b);  # all arguments given
+ $b = $complexv->im;      # method call
  $complexv->im($b);
+ $complexv->im .= $data;  # usable as lvalue
 
 =for ref
 
@@ -1827,9 +1892,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $b = _cabs($complexv);
- _cabs($complexv, $b);  # all arguments given
- $b = $complexv->_cabs; # method call
+ $b = PDL::_cabs($complexv);
+ PDL::_cabs($complexv, $b);  # all arguments given
+ $b = $complexv->_cabs;      # method call
  $complexv->_cabs($b);
 
 =for ref
@@ -1883,6 +1948,7 @@ the base 10 logarithm
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -2015,6 +2081,7 @@ complex conjugate.
 
 =pod
 
+Can operate inplace with C<complexv> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -2089,7 +2156,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $ans = $a->ipow($b);   # method call
  $a->ipow($b, $ans);
  $a->inplace->ipow($b); # can be used inplace
- ipow($a->inplace,$b);
+ ipow($a->inplace, $b);
 
 =for ref
 
@@ -2099,6 +2166,7 @@ Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squari
 
 =pod
 
+Can operate inplace with C<a> as output C<ans>.
 Broadcasts over its inputs.
 
 =for bad
@@ -2117,7 +2185,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 468 "lib/PDL/Ops.pd"
+#line 475 "lib/PDL/Ops.pd"
 
 =head2 abs
 
@@ -2128,7 +2196,7 @@ Returns the absolute value of a number.
 =cut
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
-#line 2132 "lib/PDL/Ops.pm"
+#line 2200 "lib/PDL/Ops.pm"
 
 
 =head2 abs2
@@ -2266,7 +2334,7 @@ sub PDL::i2C ($) {
 
 
 
-#line 525 "lib/PDL/Ops.pd"
+#line 532 "lib/PDL/Ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {
@@ -2283,20 +2351,32 @@ sub warn_non_numeric_op_wrapper {
 
 { package # hide from MetaCPAN
     PDL;
+sub overload_dotequals {
+  my @args = !$_[2] ? @_[1,0] : @_[0,1];
+  PDL::Ops::assgn(@args);
+  return $args[1];
+}
+sub overload_abs { PDL::abs($_[0]) }
+sub overload_plusplus {
+  $_[0] += ($PDL::Core::pdl_ones[$_[0]->get_datatype]
+    // barf "Couldn't find 'one' for type ", $_[0]->get_datatype
+  )
+}
+sub overload_minusminus {
+  $_[0] -= ($PDL::Core::pdl_ones[$_[0]->get_datatype]
+    // barf "Couldn't find 'one' for type ", $_[0]->get_datatype
+  )
+}
   use overload
     "eq"    => PDL::Ops::warn_non_numeric_op_wrapper(\&PDL::eq, 'eq'),
-    ".="    => sub {
-      my @args = !$_[2] ? @_[1,0] : @_[0,1];
-      PDL::Ops::assgn(@args);
-      return $args[1];
-    },
-    'abs' => sub { PDL::abs($_[0]) },
-    '++' => sub { $_[0] += ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
-    '--' => sub { $_[0] -= ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
+    ".="    => \&overload_dotequals,
+    'abs' => \&overload_abs,
+    '++' => \&overload_plusplus,
+    '--' => \&overload_minusminus,
     ;
 }
 
-#line 49 "lib/PDL/Ops.pd"
+#line 50 "lib/PDL/Ops.pd"
 
 =head1 AUTHOR
 
@@ -2308,7 +2388,19 @@ Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
-#line 2312 "lib/PDL/Ops.pm"
+
+#line 577 "lib/PDL/Ops.pd"
+our %got_complex = (
+  atan2 => 0,
+  cos => 1,
+  exp => 1,
+  log => 1,
+  log10 => 1,
+  pow => 1,
+  sin => 1,
+  sqrt => 1,
+);
+#line 2404 "lib/PDL/Ops.pm"
 
 # Exit with OK status
 

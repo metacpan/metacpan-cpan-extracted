@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('JSON::YY', $VERSION);
@@ -522,21 +522,23 @@ Paths use JSON Pointer syntax:
 
 Encode vs JSON::XS (higher is better):
 
-    small  (38B):   YY 16-27% faster
-    medium (11KB):  YY 8-12% faster
-    large  (806KB): YY 50-170% faster
+    small  (38B):   YY 5-19% faster
+    medium (11KB):  YY 3-5% faster
+    large  (806KB): YY 53-57% faster
 
 Decode vs JSON::XS:
 
-    small:  YY ~10% slower (SV allocation overhead)
-    medium: decode_json_ro 25% faster
-    large:  decode_json_ro ~16% faster
+    small:  YY 8-14% slower (SV allocation overhead)
+    medium: YY ~15% slower
+    large:  YY ~equal to 6% faster
 
 Doc API vs Perl decode-modify-encode:
 
     read single value:  Doc ~equal
-    modify + serialize: Doc 30% faster (small), 540% faster (medium)
+    modify + serialize: Doc 28% faster (small), 539% faster (medium)
     read from large:    Doc 380% faster (no materialization)
+    clone subtree:      Doc 404% faster
+    type/length check:  Doc 408% faster
 
 =head1 LIMITATIONS
 

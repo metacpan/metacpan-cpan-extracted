@@ -30,9 +30,9 @@ my $pdf_dep = $has_pdf_api2
 
 WriteMakefile(
     NAME             => 'PDF::Sign',
-    AUTHOR           => 'Massimiliano Citterio',
+    AUTHOR           => 'Massimiliano Citterio <mcitterio@cmcps.it>',
     VERSION_FROM     => 'lib/PDF/Sign.pm',
-    ABSTRACT_FROM    => 'lib/PDF/Sign.pod',
+    ABSTRACT_FROM    => 'lib/PDF/Sign.pm',
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.010',
     PREREQ_PM => {
@@ -71,6 +71,12 @@ WriteMakefile(
             },
         },
     },
+    META_ADD => {
+        provides => {
+            'PDF::Sign' => { file => 'lib/PDF/Sign.pm', version => '0.07' },
+        },
+    },  
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean => { FILES    => 'PDF-Sign-*' },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f"},
 );

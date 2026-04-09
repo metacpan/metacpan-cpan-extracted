@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 use Cwd qw(getcwd);
 use File::Path qw(make_path);
@@ -38,6 +39,9 @@ sub dies_like {
 
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 chdir $home or die "Unable to chdir to $home: $!";
 
 my $repo = File::Spec->catdir( $home, 'projects', 'coverage-app' );
@@ -217,8 +221,8 @@ my $form_page = Developer::Dashboard::PageDocument->new(
     },
 );
 my $form_html = $form_page->render_html( page_url => '/app/form-page' );
-like( $form_html, qr/<form>FORM<\/form>/, 'page render includes legacy FORM blocks' );
-like( $form_html, qr/<div>FORMTT<\/div>/, 'page render includes legacy FORM\.TT blocks' );
+unlike( $form_html, qr/<form>FORM<\/form>/, 'page render ignores removed FORM blocks' );
+unlike( $form_html, qr/<div>FORMTT<\/div>/, 'page render ignores removed FORM.TT blocks' );
 like( $form_html, qr/runtime-error/, 'page render includes runtime error markup' );
 
 my $saved_page = Developer::Dashboard::PageDocument->new(
@@ -552,14 +556,15 @@ is( $die_encoded->[0], 403, 'web app converts encoded action exceptions into 403
 
 my $prompt = Developer::Dashboard::Prompt->new( indicators => $indicators, paths => $paths );
 my $project_only_prompt = $prompt->render( cwd => $repo, jobs => 0 );
-like( $project_only_prompt, qr/\{coverage-app\}/, 'prompt renders project-only context when git branch is unavailable' );
+like( $project_only_prompt, qr{\Q[~/projects/coverage-app]\E}, 'prompt renders the bracketed cwd when git branch is unavailable' );
+unlike( $project_only_prompt, qr/\{coverage-app\}/, 'prompt no longer appends the old project-only brace context' );
 
 {
     no warnings 'redefine';
     local *Developer::Dashboard::Prompt::_git_branch = sub { return 'main' };
     local *Developer::Dashboard::PathRegistry::project_root_for = sub { return undef };
     my $branch_only_prompt = $prompt->render( cwd => File::Spec->catdir( $home, 'outside' ), jobs => 0 );
-    like( $branch_only_prompt, qr/\{main\}/, 'prompt renders branch-only context when no project root resolves' );
+    like( $branch_only_prompt, qr{\Q[~/outside] 🌿main\E}, 'prompt renders branch-only context as a trailing branch marker when no project root resolves' );
 }
 
 done_testing;
@@ -574,5 +579,36 @@ __END__
 
 This test hits the remaining private and fallback branches needed to keep the
 Developer Dashboard library coverage at 100 percent.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file covers additional branches needed to keep the coverage gate green.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/11-coverage-closure.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/11-coverage-closure.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

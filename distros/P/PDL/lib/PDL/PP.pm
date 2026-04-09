@@ -215,7 +215,7 @@ sub new {
 sub apply {
     my ($self, $pars) = @_;
     $self->report("Applying: $self\n");
-    croak($self->{doc}) if $self->should_apply($pars);
+    croak("$pars->{Name}: $self->{doc}") if $self->should_apply($pars);
 }
 
 package # hide from PAUSE/MetaCPAN
@@ -1058,9 +1058,9 @@ my $pars_re = $PDL::PP::PdlParObj::pars_re;
 $PDL::PP::deftbl =
   [
    PDL::PP::Rule->new(
-      [qw(RedoDims EquivCPOffsCode HandleBad P2Child TwoWay)],
+      [qw(RedoDims EquivCPOffsCode HandleBad P2Child)],
       ["Identity"],
-      "something to do with dataflow between CHILD & PARENT, I think.",
+      "sets up identity PARENT->CHILD transform with dataflow",
       sub {
         (PDL::PP::pp_line_numbers(__LINE__-1, '
           int i;
@@ -1077,7 +1077,7 @@ $PDL::PP::deftbl =
              for(i=0; i<$PDL(CHILD)->nvals; i++)  {
                 $EQUIVCPOFFS(i,i);
              }'),
-        1, 1, 1);
+        1, 1);
       }),
 
    # used as a flag for many of the routines
@@ -1210,8 +1210,11 @@ $PDL::PP::deftbl =
    PDL::PP::Rule->new("HaveBroadcasting","HaveThreading", sub {@_}), # compat
    PDL::PP::Rule::Croak->new([qw(P2Child GenericTypes)],
        'Cannot have both P2Child and GenericTypes defined'),
+   PDL::PP::Rule::Croak->new([qw(P2Child Inplace)],
+       'Cannot have both P2Child and Inplace defined'),
+   PDL::PP::Rule::Returns::One->new('P2Child', 'AffinePriv', 'AffinePriv => P2Child'),
    PDL::PP::Rule->new([qw(Pars HaveBroadcasting GenericTypes DefaultFlow AllFuncHeader RedoDimsFuncHeader)],
-		      ["P2Child","Name","StructName"],
+		      [qw(P2Child Name StructName)],
       sub {
         my (undef,$name,$sname) = @_;
         ("PARENT(); [oca]CHILD();",0,[PDL::Types::ppdefs_all()],1,
@@ -1221,8 +1224,7 @@ $PDL::PP::deftbl =
       }),
 
 # Question: where is ppdefs defined?
-# Answer: Core/Types.pm
-#
+# Answer: lib/PDL/Types.pm
    PDL::PP::Rule->new("GenericTypes", [],
        'Sets GenericTypes flag to all real types known to PDL::Types',
        sub {[PDL::Types::ppdefs()]}),
@@ -1238,10 +1240,6 @@ $PDL::PP::deftbl =
    PDL::PP::Rule::Returns->new("Priv", "AffinePriv", 'PDL_Indx incs[$PDL(CHILD)->ndims];PDL_Indx offs; '),
    PDL::PP::Rule::Returns->new("IsAffineFlag", "AffinePriv", "PDL_ITRANS_ISAFFINE"),
    PDL::PP::Rule::Returns::Zero->new("IsAffineFlag"),
-   PDL::PP::Rule::Returns->new("TwoWayFlag", "TwoWay", "PDL_ITRANS_TWOWAY"),
-   PDL::PP::Rule::Returns::Zero->new("TwoWayFlag"),
-   PDL::PP::Rule::Returns->new("DefaultFlowFlag", "DefaultFlow", "PDL_ITRANS_DO_DATAFLOW_ANY"),
-   PDL::PP::Rule::Returns::Zero->new("DefaultFlowFlag"),
 
    PDL::PP::Rule->new("RedoDims", [qw(EquivPDimExpr EquivDimCheck?)],
       sub {
@@ -1389,7 +1387,13 @@ $PDL::PP::deftbl =
         my ($in, $out) = @$arg;
         "  PDL_XS_INPLACE($in, $out)\n";
       }),
-   PDL::PP::Rule::Returns::EmptyString->new("InplaceCode", []),
+   PDL::PP::Rule->new("InplaceCode", [qw(Name SignatureObj)],
+      'catch inplace flag on non-implementing ops',
+      sub {
+        my ($name, $sig) = @_;
+        join '', map qq{  if (PDL_IS_INPLACE($_)) PDL->pdl_barf("$name: $_->inplace but not supported");\n},
+          $sig->names_in;
+      }),
    PDL::PP::Rule->new("InplaceDocValues",
      [qw(Name SignatureObj InplaceNormalised NoExport?)],
      'doc describing usage inplace',
@@ -1429,17 +1433,18 @@ $PDL::PP::deftbl =
        my $fullname = $::PDLOBJ."::$name";
        if ($one_arg) {
          $ret .= pp_line_numbers(__LINE__, <<EOF);
-use overload '$op' => sub {
+sub overload_$name {
   Carp::confess("$fullname: overloaded '$op' given undef")
     if grep !defined, \$_[0];
   $fullname(\$_[0]);
-};
+}
+use overload '$op' => \\&overload_$name;
 EOF
        } else {
          $ret .= pp_line_numbers(__LINE__, <<EOF);
 {
   my (\$foo, \$overload_sub);
-  use overload '$op' => \$overload_sub = sub {
+  sub overload_$name {
     Carp::confess("$fullname: overloaded '$op' given undef")
       if grep !defined, \@_[0,1];
     return $fullname($bitwise_passon) unless ref \$_[1]
@@ -1447,17 +1452,19 @@ EOF
             && defined(\$foo = overload::Method(\$_[1], '$op'))
             && \$foo != \$overload_sub; # recursion guard
     goto &\$foo;
-  };
+  }
+  use overload '$op' => \$overload_sub = \\&overload_$name;
 }
 EOF
        }
        $ret .= pp_line_numbers(__LINE__, <<EOF) if $mutator;
 # in1, in2, out, swap if true
-use overload '$op=' => sub {
+sub overload_${name}_mutate {
   Carp::confess("$fullname: overloaded '$op=' given undef")
     if grep !defined, \@_[0,1];
   $fullname(\$_[0]->inplace, \$_[1]); \$_[0]
-};
+}
+use overload '$op=' => \\&overload_${name}_mutate;
 EOF
        $::PDLOVERLOAD .= "$ret}\n";
        my @args = @{ $sig->args_callorder };
@@ -1477,9 +1484,25 @@ EOF
      }),
    PDL::PP::Rule::Returns->new("OverloadDocValues", []),
 
+   PDL::PP::Rule->new("DefaultFlowFlag", [qw(DefaultFlow? BackCode? AffinePriv?)],
+     'Set starting dataflow forward if DefaultFlow, back if (BackCode | AffinePriv)',
+     sub {
+       my ($df, $bc, $aff) = @_;
+       $bc || $aff ? "PDL_ITRANS_DO_DATAFLOW_ANY" :
+         $df ? "PDL_ITRANS_DO_DATAFLOW_F" :
+         0;
+     },
+   ),
+   PDL::PP::Rule->new('Lvalue', "DefaultFlowFlag",
+     'Lvalue <= DefaultFlowFlag value',
+     sub {
+       my ($flowflag) = @_;
+       $flowflag =~ /ANY/ ? 1 : 0;
+     },
+   ),
    PDL::PP::Rule->new([qw(UsageDoc ParamDoc)],
      [qw(Name Doc? SignatureObj OtherParsDefaults? ArgOrder?
-       OverloadDocValues InplaceDocValues ParamDesc? Lvalue? NoExport?
+       OverloadDocValues InplaceDocValues ParamDesc? Lvalue NoExport?
      )],
      'generate "usage" section of doc',
      sub {
@@ -1575,13 +1598,13 @@ EOF
    PDL::PP::Rule::Returns::Zero->new("NoPthread"), # assume we can pthread, unless indicated otherwise
    PDL::PP::Rule->new("PdlDoc", [qw(
       Name Pars OtherPars GenericTypes Doc UsageDoc BadDoc?
-      HaveBroadcasting NoPthread IsAffineFlag TwoWayFlag DefaultFlowFlag
-      ParamDoc
+      HaveBroadcasting NoPthread IsAffineFlag DefaultFlowFlag ParamDoc
+      InplaceNormalised?
       )],
       sub {
         my ($name,$pars,$otherpars,$gentypes,$doc,$usagedoc,$baddoc,
-          $havebroadcasting, $noPthreadFlag, $affflag, $revflag, $flowflag,
-          $paramdoc,
+          $havebroadcasting, $noPthreadFlag, $affflag, $flowflag, $paramdoc,
+          $inplace,
         ) = @_;
         return '' if !defined $doc # Allow explicit non-doc using Doc=>undef
             or $doc =~ /^\s*internal\s*$/i;
@@ -1589,18 +1612,26 @@ EOF
         # reference card information as well
         $doc = "=for ref\n\n".$doc if $doc !~ /\n/;
         $::DOCUMENTED++;
-        # Strip leading whitespace and trailing semicolons and whitespace
-        $pars =~ s/^\s*(.+[^;])[;\s]*$/$1/;
-        $otherpars =~ s/^\s*(.+[^;])[;\s]*$/$1/ if $otherpars;
-        my $sig = "$pars".( $otherpars ? "; $otherpars" : "");
-        my @typenames = map PDL::Type->new($_)->ioname, @$gentypes;
-        my @typesigparts = '';
-        while (@typenames) {
-          push @typesigparts, '' if length $typesigparts[-1] > 50;
-          $typesigparts[-1] .= ($typesigparts[-1]&&' ') . shift @typenames;
-        }
-        my $typesig = join "\n   ", @typesigparts;
         $doc =~ s/\n(=cut\s*\n)+(\s*\n)*$/\n/m; # Strip extra =cut's
+        my $sigdoc = '';
+        if ($doc !~ /^=for\s+sig\b/m) {
+          # Strip leading whitespace and trailing semicolons and whitespace
+          $pars =~ s/^\s*(.+[^;])[;\s]*$/$1/;
+          $otherpars =~ s/^\s*(.+[^;])[;\s]*$/$1/ if $otherpars;
+          my @typesigparts = '';
+          my @typenames = map PDL::Type->new($_)->ioname, @$gentypes;
+          while (@typenames) {
+            push @typesigparts, '' if length $typesigparts[-1] > 50;
+            $typesigparts[-1] .= ($typesigparts[-1]&&' ') . shift @typenames;
+          }
+          my $typesig = join "\n   ", @typesigparts;
+          $sigdoc = <<"EOD" ;
+XXX=for sig
+
+ Signature: ($pars@{[$otherpars ? "; $otherpars" : ""]})
+ Types: ($typesig)
+EOD
+        }
         if ( defined $baddoc ) {
                 # Strip leading newlines and any =cut markings
             $baddoc =~ s/\n(=cut\s*\n)+(\s*\n)*$/\n/m;
@@ -1608,20 +1639,17 @@ EOF
             $baddoc = "\n=for bad\n\n$baddoc";
         }
         my @misc = $havebroadcasting ? "Broadcasts over its inputs.\n" : "Does not broadcast.\n";
+        unshift @misc, "Can operate inplace with C<$inplace->[0]> as output C<$inplace->[1]>.\n" if $inplace;
         push @misc, "Can't use POSIX threads.\n" if $noPthreadFlag;
         push @misc, "Makes L<virtual affine|PDL::Indexing> ndarrays.\n" if $affflag;
-        push @misc, "Creates data-flow".(!$revflag ? "" : " back and forth").
+        push @misc, "Creates data-flow".($flowflag !~ /ANY/ ? "" : " back and forth").
           " by default.\n" if $flowflag;
         my $miscdocs = join '', grep $_, $paramdoc, @misc, $baddoc;
         my $baddoc_function_pod = <<"EOD" ;
 
 XXX=head2 $name
 
-XXX=for sig
-
- Signature: ($sig)
- Types: ($typesig)
-$usagedoc
+$sigdoc$usagedoc
 $doc
 
 =pod
@@ -1998,15 +2026,15 @@ EOF
       sub {make_xs_code('','',@_)}),
 
    PDL::PP::Rule->new("VTableDef",
-      ["VTableName","ParamStructType","RedoDimsFuncName","ReadDataFuncName",
-       "WriteBackDataFuncName","FreeFuncName",
-       "SignatureObj","HaveBroadcasting","NoPthread","Name",
-       "GenericTypes","IsAffineFlag","TwoWayFlag","DefaultFlowFlag",
-       "BadFlag"],
+      [qw(VTableName ParamStructType
+       RedoDimsFuncName ReadDataFuncName WriteBackDataFuncName FreeFuncName
+       SignatureObj HaveBroadcasting NoPthread Name
+       GenericTypes IsAffineFlag DefaultFlowFlag
+       BadFlag)],
       sub {
         my($vname,$ptype,$rdname,$rfname,$wfname,$ffname,
            $sig,$havebroadcasting, $noPthreadFlag, $name, $gentypes,
-           $affflag, $revflag, $flowflag, $badflag) = @_;
+           $affflag, $flowflag, $badflag) = @_;
         my ($pnames, $pobjs) = ($sig->names_sorted, $sig->objs);
         my $nparents = 0 + grep !$pobjs->{$_}->{FlagW}, @$pnames;
         my $npdls = scalar @$pnames;
@@ -2017,7 +2045,7 @@ EOF
         push @op_flags, 'PDL_TRANS_NO_PARALLEL' if $noPthreadFlag;
         push @op_flags, 'PDL_TRANS_OUTPUT_OTHERPAR' if $sig->other_any_out;
         my $op_flags = join('|', @op_flags) || '0';
-        my $iflags = join('|', grep $_, $affflag, $revflag, $flowflag) || '0';
+        my $iflags = join('|', grep $_, $affflag, $flowflag) || '0';
         my $gentypes_txt = join(", ", (map PDL::Type->new($_)->sym, @$gentypes), '-1');
         my @realdims = map 0+@{$_->{IndObjs}}, @$pobjs{@$pnames};
         my $realdims = join(", ", @realdims) || '0';
@@ -2067,8 +2095,8 @@ EOF
    PDL::PP::Rule->new([], [qw(Lvalue Name)],
      'If Lvalue key, make the XS routine be lvalue with CvLVALUE_on',
      sub {
-       my (undef, $name) = @_;
-       push @::PDL_LVALUE_SUBS, $name;
+       my ($lvalue, $name) = @_;
+       push @::PDL_LVALUE_SUBS, $name if $lvalue;
        ();
      }
    ),

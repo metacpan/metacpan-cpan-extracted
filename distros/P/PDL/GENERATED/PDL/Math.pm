@@ -23,7 +23,7 @@ use DynaLoader;
 
 
 
-#line 44 "lib/PDL/Math.pd"
+#line 45 "lib/PDL/Math.pd"
 
 use strict;
 use warnings;
@@ -88,6 +88,7 @@ The usual trigonometric function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -127,6 +128,7 @@ The usual trigonometric function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -166,6 +168,7 @@ The usual trigonometric function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -205,6 +208,7 @@ The standard hyperbolic function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -244,6 +248,7 @@ The standard hyperbolic function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -283,6 +288,7 @@ The usual trigonometric function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -322,6 +328,7 @@ The standard hyperbolic function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -364,6 +371,7 @@ Round to integer values in floating-point format.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -406,6 +414,7 @@ Round to integer values in floating-point format.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -456,6 +465,7 @@ try C<< ceil(abs($x)+0.5)*($x<=>0) >>.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -490,7 +500,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $c = $a->pow($b);     # method call
  $a->pow($b, $c);
  $a->inplace->pow($b); # can be used inplace
- pow($a->inplace,$b);
+ pow($a->inplace, $b);
 
 =for ref
 
@@ -498,6 +508,7 @@ Synonym for `**'.
 
 =pod
 
+Can operate inplace with C<a> as output C<c>.
 Broadcasts over its inputs.
 
 =for bad
@@ -537,6 +548,7 @@ The standard hyperbolic function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -576,6 +588,7 @@ The standard hyperbolic function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -615,6 +628,7 @@ The standard hyperbolic function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -656,6 +670,7 @@ The error function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -697,6 +712,7 @@ The complement of the error function.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -738,6 +754,7 @@ The regular Bessel function of the first kind, J_n
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -779,6 +796,7 @@ The regular Bessel function of the first kind, J_n
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -820,6 +838,7 @@ The regular Bessel function of the second kind, Y_n.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -861,6 +880,7 @@ The regular Bessel function of the second kind, Y_n.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -894,7 +914,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $b = $a->bessjn($n);     # method call
  $a->bessjn($n, $b);
  $a->inplace->bessjn($n); # can be used inplace
- bessjn($a->inplace,$n);
+ bessjn($a->inplace, $n);
 
 =for ref
 
@@ -905,6 +925,7 @@ of the function required.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -938,7 +959,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
  $b = $a->bessyn($n);     # method call
  $a->bessyn($n, $b);
  $a->inplace->bessyn($n); # can be used inplace
- bessyn($a->inplace,$n);
+ bessyn($a->inplace, $n);
 
 =for ref
 
@@ -949,6 +970,7 @@ of the function required.
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1074,6 +1096,7 @@ erfi
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1115,6 +1138,7 @@ ndtri
 
 =pod
 
+Can operate inplace with C<a> as output C<b>.
 Broadcasts over its inputs.
 
 =for bad
@@ -1171,7 +1195,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 357 "lib/PDL/Math.pd"
+#line 366 "lib/PDL/Math.pd"
 sub PDL::polyroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -1190,7 +1214,7 @@ sub PDL::polyroots {
   return @args_out if !$natcplx;
   $outs[0] .= PDL::czip(@args_out[0,1]);
 }
-#line 1194 "lib/PDL/Math.pm"
+#line 1218 "lib/PDL/Math.pm"
 
 *polyroots = \&PDL::polyroots;
 
@@ -1236,7 +1260,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 406 "lib/PDL/Math.pd"
+#line 415 "lib/PDL/Math.pd"
 sub PDL::polyfromroots {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -1259,7 +1283,7 @@ sub PDL::polyfromroots {
   }
   $natcplx ? $outs[0] : @outs;
 }
-#line 1263 "lib/PDL/Math.pm"
+#line 1287 "lib/PDL/Math.pm"
 
 *polyfromroots = \&PDL::polyfromroots;
 
@@ -1301,7 +1325,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 455 "lib/PDL/Math.pd"
+#line 464 "lib/PDL/Math.pd"
 sub PDL::polyval {
   my @args = map PDL->topdl($_), @_;
   my $natcplx = !$args[0]->type->real;
@@ -1325,7 +1349,7 @@ sub PDL::polyval {
   }
   $natcplx ? $outs[0] : @outs;
 }
-#line 1329 "lib/PDL/Math.pm"
+#line 1353 "lib/PDL/Math.pm"
 
 *polyval = \&PDL::polyval;
 
@@ -1620,7 +1644,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 530 "lib/PDL/Math.pd"
+#line 539 "lib/PDL/Math.pd"
 
 =head1 AUTHOR
 
@@ -1635,7 +1659,23 @@ distribution. If this file is separated from the PDL distribution,
 the PDL copyright notice should be included in the file.
 
 =cut
-#line 1639 "lib/PDL/Math.pm"
+
+#line 559 "lib/PDL/Math.pd"
+our %got_complex = (
+  acos => 1,
+  acosh => 1,
+  asin => 1,
+  atan => 1,
+  atanh => 1,
+  cosh => 1,
+  log => 1,
+  pow => 1,
+  sinh => 1,
+  sqrt => 1,
+  tan => 1,
+  tanh => 1,
+);
+#line 1679 "lib/PDL/Math.pm"
 
 # Exit with OK status
 

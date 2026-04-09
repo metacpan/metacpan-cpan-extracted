@@ -1,3 +1,13 @@
+2.000011  2026-04-08 15:36:55-07:00 America/Los_Angeles
+
+    - Skip JSON decode error tests on Perl < 5.014 (unreliable $@ handling)
+
+2.000010  2026-04-08 08:16:27-07:00 America/Los_Angeles
+
+    - Fix lvalue sub tests failing on Perl < 5.026 (skip or use setter form)
+    - Remove encode_json bad-input test that depends on Cpanel::JSON::XS version
+    - Fix decode_json_file failing to unlink on Windows (close fh before unlink)
+
 2.000009  2026-04-07 20:17:28-07:00 America/Los_Angeles
 
     - Add Getopt::Yath::State object returned by parse_options/process_args

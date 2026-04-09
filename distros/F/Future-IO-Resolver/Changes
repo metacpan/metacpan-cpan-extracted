@@ -1,5 +1,11 @@
 Revision history for Future-IO-Resolver
 
+0.03    2026-04-08
+        [CHANGES]
+         * Split LibAsyncNS-specific parts into their own module
+         * Added initial attempt at a module that uses Socket, via a forked
+           side-car process
+
 0.02    2026-01-28
         [CHANGES]
          * More robust error handling if the run loop fails

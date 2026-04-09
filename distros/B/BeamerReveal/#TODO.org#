@@ -1,0 +1,74 @@
+- [ ] Windows installer (for the perl package + the pdftoppm Poppler)
+- [ ] make filenames of ancillary files unique / not changing
+- [ ] slide crossing music
+- [ ] hergebruik animation cache is broken, nakijken!
+- [ ] faciliteit toevoegen om online voorleestekst te laten genereren
+  \narrative[autoplay]{blabla blabla}
+- [ ] faciliteit toevoegen om ingesproken voorleestekst te gebruiken
+  \audio[autoplay]
+- [ ] equip audio/video/animation media items with autoplay after a delay option
+  (add a field data-auto-play-after="3500" in the video html element, together with preload="auto" (for audio) or preload="metadata" (for video)
+
+  <section>
+  <h2>Slide with delayed media</h2>
+
+  <audio data-autoplay-after="3000" src="audio/clip.mp3" preload="auto"></audio>
+
+  <video data-autoplay-after="1500" src="video/clip.mp4" preload="metadata" controls></video>
+</section>
+
+
+(function () {
+  // Keep timers per slide so we can cancel them cleanly
+  const slideTimers = new WeakMap();
+
+  function clearTimers(slide) {
+    const timers = slideTimers.get(slide);
+    if (timers) timers.forEach(id => clearTimeout(id));
+    slideTimers.delete(slide);
+  }
+
+  function stopMedia(slide) {
+    slide.querySelectorAll('audio,video').forEach(m => {
+      try { m.pause(); } catch {}
+      // Optional: reset to start when leaving
+      // m.currentTime = 0;
+    });
+  }
+
+  function scheduleDelayedMedia(slide) {
+    clearTimers(slide);
+
+    const timers = [];
+    slide.querySelectorAll('audio[data-autoplay-after], video[data-autoplay-after]').forEach(media => {
+      const delay = parseInt(media.getAttribute('data-autoplay-after'), 10);
+      if (Number.isNaN(delay)) return;
+
+      const id = setTimeout(() => {
+        // Only play if this slide is still current
+        if (Reveal.getCurrentSlide() !== slide) return;
+
+        // Play may be blocked unless user has interacted
+        const p = media.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      }, delay);
+
+      timers.push(id);
+    });
+
+    slideTimers.set(slide, timers);
+  }
+
+  Reveal.on('ready', () => {
+    scheduleDelayedMedia(Reveal.getCurrentSlide());
+  });
+
+  Reveal.on('slidechanged', (e) => {
+    // cleanup old slide
+    clearTimers(e.previousSlide);
+    stopMedia(e.previousSlide);
+
+    // schedule new slide
+    scheduleDelayedMedia(e.currentSlide);
+  });
+})();

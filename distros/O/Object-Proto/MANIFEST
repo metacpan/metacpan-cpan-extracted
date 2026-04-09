@@ -65,6 +65,8 @@ t/049-object-weak-initarg.t
 t/050-exported-keywords.t
 t/051-plus-attr.t
 t/052-object-clone-deep.t
+t/053-import-accessor-collision.t
+t/054-import-accessors-prefix.t
 t/fix_subtests.pl
 t/lib/NeuralNet/Activation.pm
 t/lib/NeuralNet/Layer.pm

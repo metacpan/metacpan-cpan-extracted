@@ -10,6 +10,7 @@ typedef PDL_Long integer;
 
 /* replace BLAS one so don't terminate on bad input */
 int xerbla_(char *sub, int *info) { return 0; }
+int xerbla_64_(char *sub, int *info) { return 0; }
 
 void dfunc_wrapper(void *p, integer n, SV* dfunc)
 {

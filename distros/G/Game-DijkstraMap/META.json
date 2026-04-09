@@ -4,7 +4,7 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "bsd"
    ],
@@ -50,11 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "url" : "https://github.com/thrig/Game-DijkstraMap"
-      }
-   },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

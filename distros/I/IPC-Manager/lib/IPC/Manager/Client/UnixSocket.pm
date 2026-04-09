@@ -2,7 +2,7 @@ package IPC::Manager::Client::UnixSocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use File::Spec;
 use Carp qw/croak/;
@@ -16,7 +16,7 @@ use Object::HashBase qw{
     +socket_cache
 };
 
-sub viable { local $@; eval { require IO::Socket::UNIX; IO::Socket::UNIX->VERSION('1.55'); 1 } || 0 }
+sub _viable { require IO::Socket::UNIX; IO::Socket::UNIX->VERSION('1.55'); 1 }
 
 sub check_path { -S $_[1] }
 sub path_type  { 'UNIX Socket' }

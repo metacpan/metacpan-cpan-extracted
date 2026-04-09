@@ -20,7 +20,7 @@ use Test2::Util::DistFiles v0.2.0 qw( manifest_files is_perl_file );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.6.3';
+our $VERSION = 'v0.6.4';
 
 
 sub file_scripts_ok {
@@ -162,7 +162,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.6.3
+version v0.6.4
 
 =head1 SYNOPSIS
 
@@ -282,7 +282,7 @@ L<Detecting malicious Unicode|https://daniel.haxx.se/blog/2025/05/16/detecting-m
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Test-MixedScripts>
-and may be cloned from L<git://github.com/robrwo/perl-Test-MixedScripts.git>
+and may be cloned from L<https://github.com/robrwo/perl-Test-MixedScripts.git>
 
 See F<CONTRIBUTING.md> for more information.
 
@@ -311,7 +311,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Robert Rothenberg.
+This software is copyright (c) 2025-2026 by Robert Rothenberg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

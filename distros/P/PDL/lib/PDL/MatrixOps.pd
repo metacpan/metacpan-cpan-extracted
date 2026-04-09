@@ -64,7 +64,7 @@ element, you use the indices in the reverse order that you would in a
 math textbook.  If you prefer your matrices indexed in (row, column)
 order, you can try using the L<PDL::Matrix> object, which
 includes an implicit exchange of the first two dimensions but should
-be compatible with most of these matrix operations.  TIMTOWDTI.)
+be compatible with most of these matrix operations.  TIMTOWDTI.
 
 Matrices, row vectors, and column vectors can be multiplied with the 'x'
 operator (which is, of course, broadcastable):
@@ -159,6 +159,39 @@ sub identity {
 }
 EOD
 
+pp_add_exported('','gurney');
+pp_addpm(<<'EOD');
+
+=head2 gurney
+
+=for ref
+
+Turns a vector into non-square matrix. Takes two dims, one must
+match vector dim 0.
+
+This is useful for dealing with a full SVD:
+
+=for example
+
+  ($u,$s,$v) = svd($in, 1);
+  $reconstructed = $u x gurney($s, $in->dims) x $v->t; # same as $in
+
+=cut
+
+*gurney = \&PDL::gurney;
+sub PDL::gurney {
+  my ($diag, $d0, $d1) = @_;
+  Carp::confess "gurney: given undef \$d0 or \$d1" if grep !defined $d0, $d1;
+  my $diag_len = $diag->dim(0);
+  Carp::confess "diagonal length $diag_len does not match either given dim $d0 or $d1" if !grep $diag_len == $_, $d0, $d1;
+  my $diff = abs($d0 - $d1);
+  my $mat = stretcher($diag);
+  return $mat if !$diff;
+  return $mat->append(zeroes($diag->type, $diff)) if $d0 > $d1;
+  $mat->t->append(zeroes($diag->type, $diff))->t;
+}
+EOD
+
 ######################################################################
 pp_add_exported('','stretcher');
 pp_addpm(<<'EOD');
@@ -249,14 +282,17 @@ whether or not the matrix is singular.
 *PDL::inv = \&inv;
 sub inv {
   my $x = shift;
-  my $opt = shift;
-  $opt = {} unless defined($opt);
 
   barf "inverse needs a square PDL as a matrix\n"
-    unless(UNIVERSAL::isa($x,'PDL') &&
-	   $x->dims >= 2 &&
+    unless UNIVERSAL::isa($x,'PDL') &&
+	   $x->ndims >= 2 &&
 	   $x->dim(0) == $x->dim(1)
-	   );
+	   ;
+
+  my $opt = shift;
+  $opt = {} unless defined($opt);
+  my $is_inplace = $x->is_inplace;
+  $x->set_inplace(0);
 
   my ($lu,$perm,$par);
   if(exists($opt->{lu}) &&
@@ -280,10 +316,7 @@ sub inv {
   }
 
   my $out = lu_backsub($lu,$perm,$par,identity($x))->transpose->sever;
-
-  return $out
-    unless($x->is_inplace);
-
+  return $out if !$is_inplace;
   $x .= $out;
   $x;
 }
@@ -492,9 +525,15 @@ makes it slightly easier to access individual eigenvectors, since the
 0th dim of the output PDL runs across the eigenvectors and the 1st dim
 runs across their components.
 
-    ($ev,$e) = eigens_sym $x;  # Make eigenvector matrix
-    $vector = $ev->slice($n);       # Select nth eigenvector as a column-vector
-    $vector = $ev->slice("($n)");     # Select nth eigenvector as a row-vector
+=for example
+
+  ($ev,$e) = eigens_sym $x;  # Make eigenvector matrix
+  $vector = $ev->slice($n);       # Select nth eigenvector as a column-vector
+  $vector = $ev->slice("($n)");     # Select nth eigenvector as a row-vector
+  # or to sort in descending order:
+  $indices = qsorti($ev)->slice("-1:0");
+  $sorted_ev = $ev->slice($indices);    # sort values
+  $sorted_e = $e->slice(':', $indices); # sort eigenvectors
 
 As of 2.096, the eigenvalues are returned in ascending order.
 
@@ -582,9 +621,15 @@ the 0 dimension).  That makes it slightly easier to access individual
 eigenvectors, since the 0th dim of the output PDL runs across the
 eigenvectors and the 1st dim runs across their components.
 
-	($ev,$e) = eigens $x;  # Make eigenvector matrix
-	$vector = $ev->slice($n);   # Select nth eigenvector as a column-vector
-	$vector = $ev->slice("($n)"); # Select nth eigenvector as a row-vector
+=for example
+
+  ($ev,$e) = eigens $x;  # Make eigenvector matrix
+  $vector = $ev->slice($n);   # Select nth eigenvector as a column-vector
+  $vector = $ev->slice("($n)"); # Select nth eigenvector as a row-vector
+  # or to sort in descending order:
+  $indices = qsorti($ev)->slice("-1:0");
+  $sorted_ev = $ev->slice($indices);    # sort values
+  $sorted_e = $e->slice(':', $indices); # sort eigenvectors
 
 To compare with L<PDL::LinearAlgebra>:
 
@@ -610,66 +655,105 @@ To compare with L<PDL::LinearAlgebra>:
 EOF
 );
 
-######################################################################
-### svd
-pp_def(
-       "svd",
-       HandleBad => 0,
-       Pars => 'a(n,m); [t]w(wsize=CALC($SIZE(n) * ($SIZE(m) + $SIZE(n)))); [o]u(n,m); [o,phys]z(n); [o]v(n,n);',
-       GenericTypes => ['D'],
-       RedoDimsCode => '
-        if ($SIZE(m)<$SIZE(n))
-            $CROAK("svd requires input ndarrays to have m >= n; you have m=%td and n=%td. Try inputting the transpose.  See the docs for svd.",$SIZE(m),$SIZE(n));
-       ',
-       Code => '
-              extern void SVD( double *W, double *Z, int nRow, int nCol );
-              double *t = $P(w);
-              loop (m,n) %{
-                *t++ = $a();
-              %}
-              SVD($P(w), $P(z), $SIZE(m), $SIZE(n));
-              loop (n) %{
-                $z() = sqrt($z());
-              %}
-              t = $P(w);
-              loop (m,n) %{
-                $u() = *t++/$z();
-              %}
-              loop (n1,n0) %{
-                $v() = *t++;
-              %}
-',
-      , Doc => q{
+pp_def("svd",
+  HandleBad => 0,
+  Pars => 'a(n,m);
+    [o]u(nUCol=CALC($COMP(full) ? $SIZE(m) : PDLMIN($SIZE(m),$SIZE(n))),m);
+    [o]s(nSV=CALC(PDLMIN($SIZE(m),$SIZE(n))));
+    [o]v(nVCol=CALC($COMP(full) ? $SIZE(n) : PDLMIN($SIZE(m),$SIZE(n))),n);
+    [t]sbig(nSVbig=CALC($COMP(full) ? PDLMAX($SIZE(m),$SIZE(n)) : 0));
+    [t]vbig(vbigcols=CALC(
+        $COMP(full) ? PDLMAX($SIZE(n),$SIZE(m)) : 0
+      ),vbigrows=CALC(
+        PDLMAX($SIZE(n),$SIZE(m))
+      ));
+    [t]w(wcols=CALC(
+        $COMP(full) ? PDLMAX($SIZE(m),$SIZE(n)) :
+        $SIZE(m) >= $SIZE(n) ? 0 :
+        $SIZE(m)
+      ),wrows=CALC(
+        ($COMP(full) && $SIZE(m) >= $SIZE(n)) ? $SIZE(m) : $SIZE(n)
+      ));',
+  OtherPars => 'int full',
+  OtherParsDefaults => { full => 0 },
+  GenericTypes => ['D'],
+  CHeader => 'void SVD(double *U, double *V, double *S, int nRow, int nCol);',
+  Code => <<'EOF',
+char is_wide = $SIZE(m) < $SIZE(n);
+$GENERIC() *u_ptr = NULL, *v_ptr = NULL, *sv_ptr = NULL;
+int in_rows = PDLMAX($SIZE(n),$SIZE(m)),
+  in_cols = $COMP(full) ? PDLMAX($SIZE(n),$SIZE(m)) : PDLMIN($SIZE(n),$SIZE(m));
+broadcastloop %{
+  if ($COMP(full)) {
+    sv_ptr = $P(sbig);
+    u_ptr = $P(w);
+    v_ptr = $P(vbig);
+    if (is_wide) {
+      loop (wrows,wcols) %{ $w() = wrows < $SIZE(m) ? $a(n=>wcols,m=>wrows) : 0; %}
+    } else {
+      loop (wrows,wcols) %{ $w() = wrows < $SIZE(n) ? $a(n=>wrows,m=>wcols) : 0; %}
+    }
+  } else {
+    sv_ptr = $P(s);
+    if (is_wide) {
+      u_ptr = $P(w);
+      v_ptr = $P(u);
+      loop (wrows,wcols) %{ $w() = $a(m=>wcols,n=>wrows); %}
+    } else {
+      u_ptr = $P(u);
+      v_ptr = $P(v);
+      loop (m,nUCol) %{ $u() = $a(n=>nUCol); %}
+    }
+  }
+  SVD(u_ptr, v_ptr, sv_ptr, in_rows, in_cols);
+  if ($COMP(full)) {
+    loop (nSV) %{ $s() = $sbig(nSVbig=>nSV); %}
+    if (is_wide) {
+      loop (m,nUCol) %{ $u() = $w(wcols=>nUCol,wrows=>m); %}
+      loop (n,nVCol) %{ $v() = $vbig(vbigcols=>nVCol,vbigrows=>n); %}
+    } else {
+      loop (m,nUCol) %{ $u() = $vbig(vbigcols=>nUCol,vbigrows=>m); %}
+      loop (n,nVCol) %{ $v() = $w(wcols=>nVCol,wrows=>n); %}
+    }
+  } else {
+    if (is_wide)
+      loop (n,nVCol) %{ $v() = $w(wcols=>nVCol,wrows=>n); %}
+  }
+%}
+EOF
+  Doc => <<'EOF',
 =for ref
 
 Singular value decomposition of a matrix.
 
-C<svd> is broadcastable.
-
-Given an m x n matrix C<$a> that has m rows and n columns (m >= n),
+Given an m x n matrix C<$a> that has m rows and n columns,
 C<svd> computes matrices C<$u> and C<$v>, and a vector of the singular
-values C<$s>. Like most implementations, C<svd> computes what is
-commonly referred to as the "thin SVD" of C<$a>, such that C<$u> is m
-x n, C<$v> is n x n, and there are <=n singular values. As long as m
->= n, the original matrix can be reconstructed as follows:
+values C<$s>.
+C<svd> computes the "thin" (or "economy") SVD of C<$a>, such that C<$u> is m
+x min(m,n), C<$v> is min(m,n) x n, and there are min(m,n) singular values.
+As of 2.104, you do not need to transpose this yourself to ensure
+the input is "tall" (or square).
+The original matrix can be reconstructed as follows:
 
     ($u,$s,$v) = svd($x);
-    $ess = zeroes($x->dim(0),$x->dim(0));
-    $ess->slice("$_","$_").=$s->slice("$_") foreach (0..$x->dim(0)-1); #generic diagonal
-    $a_copy = $u x $ess x $v->transpose;
+    $x_copy = $u x stretcher($s) x $v->transpose;
+
+Also as of 2.104, you can now request the full SVD by passing
+a true value as the C<$full> parameter. In that case, C<$u> will
+be m x m, and C<$v> will be n x n. To reconstruct the original
+input, use:
+
+  ($u,$s,$v) = svd($in, 1);
+  $in_copy = $u x gurney($s, $in->dims) x $v->t; # same as $in
 
 If m==n, C<$u> and C<$v> can be thought of as rotation matrices that
 convert from the original matrix's singular coordinates to final
 coordinates, and from original coordinates to singular coordinates,
-respectively, and $ess is a diagonal scaling matrix.
+respectively, and C<stretcher($s)> is a diagonal scaling matrix.
 
-If n>m, C<svd> will barf. This can be avoided by passing in the
-transpose of C<$a>, and reconstructing the original matrix like so:
-
-    ($u,$s,$v) = svd($x->transpose);
-    $ess = zeroes($x->dim(1),$x->dim(1));
-    $ess->slice($_,$_).=$s->slice($_) foreach (0..$x->dim(1)-1); #generic diagonal
-    $x_copy = $v x $ess x $u->transpose;
+This uses J.C. Nash's implementation of a one-sided Jacobi rotation.
+Use LAPACK (i.e. L<PDL::LinearAlgebra>) for better performance if
+you need it.
 
 EXAMPLE
 
@@ -683,7 +767,8 @@ orientation of the ellipsoid of transformation:
       $r2 *= $s;        # implicit broadcasting for cheap mult.
       $x .= $r2 x $r1;  # a gets r2 x ess x r1
     }
-},);
+EOF
+);
 
 ######################################################################
 pp_add_exported('','lu_decomp');
@@ -702,9 +787,7 @@ LU decompose a matrix, with row permutation
 =for usage
 
   ($lu, $perm, $parity) = lu_decomp($x);
-
   $lu = lu_decomp($x, $perm, $par);  # $perm and $par are outputs!
-
   lu_decomp($x->inplace,$perm,$par); # Everything in place.
 
 =for description
@@ -1028,7 +1111,7 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   @broadcast = PDL::Core::dims_filled(\@A_dims, \@B_dims);
   # simq modifies A, so need 1 copy per broadcast else non-first run has wrong A
   ($x) = simq($A->dupN(1,1,map +($A_dims[$_]//1)==1?$broadcast[$_]:1, 0..$#broadcast)->copy, $B->transpose, 0);
-  $x = $x->inplace->transpose;
+  $x = $x->transpose;
 
   # or with PDL::LinearAlgebra wrappers of LAPACK
   $x = msolve($A, $B);
@@ -1037,7 +1120,7 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   use PDL::LinearAlgebra::Real;
   getrf($lu=$A->copy, $ipiv=null, $info=null);
   getrs($lu, 1, $x=$B->transpose->copy, $ipiv, $info=null); # again, need transpose
-  $x=$x->inplace->transpose;
+  $x=$x->transpose;
 
   # or with GSL
   use PDL::GSL::LINALG;
@@ -1045,7 +1128,7 @@ Solve A x = B for matrix A, by back substitution into A's LU decomposition.
   # $B and $x, first dim is because GSL treats as vector, higher dims broadcast
   # so we transpose in and back out
   LU_solve($lu, $p, $B->transpose, my $x=null);
-  $x=$x->inplace->transpose;
+  $x=$x->transpose;
 
   # proof of the pudding is in the eating:
   print $A x $x;
@@ -1225,14 +1308,14 @@ B<NB does not broadcast well>.
   splice @A_dims, 0, 2; splice @B_dims, 0, 1;
   @broadcast = PDL::Core::dims_filled(\@A_dims, \@B_dims);
   # simq modifies A, so need 1 copy per broadcast else non-first run has wrong A
-  ($x) = simq($A->dupN(1,1,map +($A_dims[$_]//1)==1?$broadcast[$_]:1, 0..$#broadcast)->copy, $B->transpose, 0);
-  $x = $x->inplace->transpose;
+  ($x) = simq($newA = $A->dupN(1,1,map +($A_dims[$_]//1)==1?$broadcast[$_]:1, 0..$#broadcast)->copy, $B->transpose, 0);
+  # $newA now contains modified $A for uses in further calls with flag=-1
+  $x = $x->transpose;
 
 C<$a> is an C<n x n> matrix (i.e., a vector of length C<n*n>), stored row-wise:
 that is, C<a(i,j) = a[ij]>, where C<ij = i*n + j>.
 
-While this is the transpose of the normal column-wise storage, this
-corresponds to normal PDL usage.  The contents of matrix a may be
+This corresponds to normal PDL usage.  The contents of matrix a may be
 altered (but may be required for subsequent calls with flag = -1).
 
 C<$y>, C<$x>, C<$ips> are vectors of length C<n>.
@@ -1295,6 +1378,8 @@ pp_def("tritosquare",
 
 Convert a triangular vector to lower-triangular square matrix storage.
 Does not touch upper half of output.
+
+See also L</tritosym>, L</tricpy>.
 ',
 );
 
@@ -1304,26 +1389,70 @@ pp_def('tricpy',
   OtherParsDefaults => {uplo => 0},
   ArgOrder => [qw(A uplo C)],
   GenericTypes => [ppdefs_all()],
-  Code => '
-if ($COMP(uplo)) { /* lower */
-  broadcastloop %{ loop(n,m=:n+1) %{ $C() = $A(); %} %}
-} else {
-  broadcastloop %{ loop(n,m=n) %{ $C() = $A(); %} %}
+  Code => <<'EOF',
+switch ($COMP(uplo)) {
+  case -1: /* strict upper */
+    broadcastloop %{ loop(n=:-1,m=n+1) %{ $C() = $A(); %} %}
+    break;
+  case 0: /* upper */
+    broadcastloop %{ loop(n,m=n) %{ $C() = $A(); %} %}
+    break;
+  case 1: /* lower */
+    broadcastloop %{ loop(n,m=:n+1) %{ $C() = $A(); %} %}
+    break;
+  case 2: /* strict lower */
+    broadcastloop %{ loop(n=1,m=:n) %{ $C() = $A(); %} %}
+    break;
+  default: $CROAK(" invalid value for uplo '%d', must be -1..2", $COMP(uplo));
 }
-',
+EOF
   Doc => <<'EOT',
 =for ref
 
-Copy triangular part to another matrix. If uplo == 0 copy upper triangular
-part.
+Copy triangular part to another matrix.
+
+C<uplo> meanings to copy: -1 strict upper triangular, 0 = upper, 1
+lower, 2 strict lower. The "strict" modes are as of 2.104.
 
 Originally by Grégory Vanuxem.
+See also L</tritosym>, L</tritosquare>.
 EOT
 );
 
+pp_add_exported('','tritosym');
+pp_addpm(<<'EOF');
+=head2 tritosym
+
+=for ref
+
+Returns symmetric or Hermitian matrix from lower or upper triangular matrix.
+Supports inplace and broadcasting.
+
+=for usage
+
+ PDL = tritosym(PDL, SCALAR(uplo), SCALAR(conj))
+ uplo : UPPER = 0 | LOWER = 1, default = 0
+ conj : Hermitian = 1 | Symmetric = 0, default = 0;
+
+Originally by Grégory Vanuxem. Added to PDL in 2.104.
+See also L</tricpy>, L</tritosquare>.
+
+=cut
+
+*tritosym = \&PDL::tritosym;
+sub PDL::tritosym {
+  my @dims = $_[0]->dims;
+  barf "Require square array but got (@dims)" unless @dims >= 2 && $dims[0] == $dims[1];
+  my ($m, $upper, $conj) = @_;
+  $conj = 0 if $m->type->real;
+  my $b = $m->new_or_inplace;
+  ($conj ? $m->conj : $m)->tricpy($upper ? 2 : -1, $b->t); # strict
+  $b->diagonal(0,1)->im .= 0 if $conj;
+  $b;
+}
+EOF
+
 pp_def('mstack',
-  DefaultFlow => 1,
-  TwoWay => 1,
   Pars => 'x(n,m);y(n,p);[o]out(n,q=CALC($SIZE(m)+$SIZE(p)));',
   GenericTypes => [ppdefs_all()],
   Code => '
@@ -1339,15 +1468,12 @@ loop (q=$SIZE(m),n) %{ $y(p=>q-$SIZE(m)) = $out(); %}
 
 Combine two 2D ndarrays into a single ndarray, along the second
 ("vertical") dim.
-This routine does backward and forward dataflow automatically.
 
 Originally by Grégory Vanuxem.
 EOT
 );
 
 pp_def('augment',
-  DefaultFlow => 1,
-  TwoWay => 1,
   Pars => 'x(n); y(p);[o]out(q=CALC($SIZE(n)+$SIZE(p)))',
   GenericTypes => [ppdefs_all()],
   Code => '
@@ -1362,7 +1488,6 @@ loop (q=$SIZE(n))  %{ $y(p=>q-$SIZE(n)) = $out(); %}
 =for ref
 
 Combine two ndarrays into a single ndarray along the 0-th ("horizontal") dim.
-This routine does backward and forward dataflow automatically.
 
 Originally by Grégory Vanuxem.
 EOT

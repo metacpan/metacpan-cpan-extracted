@@ -159,8 +159,8 @@ static void install_clearer(pTHX_ const char *class_name, const char *prop_name,
 static void install_predicate(pTHX_ const char *class_name, const char *prop_name, IV idx, ClassMeta *meta, SV *custom_name);
 static void install_destroy_wrapper(pTHX_ const char *class_name, ClassMeta *meta);
 static RoleMeta* get_role_meta(pTHX_ const char *role_name, STRLEN len);
-static XS(xs_prototype);
-static XS(xs_set_prototype);
+XS_INTERNAL(xs_prototype);
+XS_INTERNAL(xs_set_prototype);
 
 /* ============================================
    Built-in type checking (inline)
@@ -1328,7 +1328,7 @@ static OP* accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
    ============================================ */
 
 /* XS fallback for new (when call checker can't optimize) */
-static XS(xs_object_new_fallback) {
+XS_INTERNAL(xs_object_new_fallback) {
     dXSARGS;
     ClassMeta *meta = INT2PTR(ClassMeta*, CvXSUBANY(cv).any_iv);
     AV *obj_av;
@@ -1555,7 +1555,7 @@ static XS(xs_object_new_fallback) {
 }
 
 /* XS fallback accessor */
-static XS(xs_accessor_fallback) {
+XS_INTERNAL(xs_accessor_fallback) {
     dXSARGS;
     IV idx = CvXSUBANY(cv).any_iv;
     SV *self = ST(0);
@@ -1791,7 +1791,7 @@ static OP* func_accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckob
 }
 
 /* XS fallback for function-style accessor */
-static XS(xs_func_accessor_fallback) {
+XS_INTERNAL(xs_func_accessor_fallback) {
     dXSARGS;
     FuncAccessorData *data = INT2PTR(FuncAccessorData*, CvXSUBANY(cv).any_iv);
     IV idx = data->slot_idx;
@@ -1874,20 +1874,28 @@ static void install_func_accessor(pTHX_ const char *pkg, const char *prop_name, 
 }
 
 /* Object::Proto::import_accessors("Class", "targetpkg") - import fast accessors */
-static XS(xs_import_accessors) {
+XS_INTERNAL(xs_import_accessors) {
     dXSARGS;
-    STRLEN class_len, pkg_len;
-    const char *class_pv, *pkg_pv;
+    STRLEN class_len, pkg_len, prefix_len;
+    const char *class_pv, *pkg_pv, *prefix_pv;
     ClassMeta *meta;
     IV i;
     int is_same_class;
 
-    if (items < 1) croak("Usage: Object::Proto::import_accessors($class [, $package])");
+    if (items < 1) croak("Usage: Object::Proto::import_accessors($class [, $prefix [, $package]])");
 
     class_pv = SvPV(ST(0), class_len);
 
-    if (items > 1) {
-        pkg_pv = SvPV(ST(1), pkg_len);
+    /* Optional prefix (alias prepended to accessor names) */
+    prefix_pv = NULL;
+    prefix_len = 0;
+    if (items > 1 && SvOK(ST(1))) {
+        prefix_pv = SvPV(ST(1), prefix_len);
+        if (prefix_len == 0) prefix_pv = NULL;
+    }
+
+    if (items > 2) {
+        pkg_pv = SvPV(ST(2), pkg_len);
     } else {
         /* Default to caller's package */
         pkg_pv = CopSTASHPV(PL_curcop);
@@ -1905,8 +1913,17 @@ static XS(xs_import_accessors) {
     /* Install function-style accessors for each property */
     for (i = 1; i < meta->slot_count; i++) {
         if (meta->idx_to_prop[i]) {
+            const char *install_name;
+            char prefixed_name[256];
+            if (prefix_pv) {
+                snprintf(prefixed_name, sizeof(prefixed_name), "%s%s",
+                         prefix_pv, meta->idx_to_prop[i]);
+                install_name = prefixed_name;
+            } else {
+                install_name = meta->idx_to_prop[i];
+            }
             /* Pass NULL for same-class (skip validation), meta for cross-class */
-            install_func_accessor(aTHX_ pkg_pv, meta->idx_to_prop[i], i,
+            install_func_accessor(aTHX_ pkg_pv, install_name, i,
                                   NULL, 1);  /* No class check, force override */
         }
     }
@@ -1915,7 +1932,7 @@ static XS(xs_import_accessors) {
 }
 
 /* Object::Proto::import_accessor("Class", "prop", "alias") - import single accessor with alias */
-static XS(xs_import_accessor) {
+XS_INTERNAL(xs_import_accessor) {
     dXSARGS;
     STRLEN class_len, prop_len, alias_len, pkg_len;
     const char *class_pv, *prop_pv, *alias_pv, *pkg_pv;
@@ -1967,7 +1984,7 @@ static XS(xs_import_accessor) {
 }
 
 /* Object::Proto::import() - export 'object' to caller's namespace */
-static XS(xs_import) {
+XS_INTERNAL(xs_import) {
     dXSARGS;
     const char *caller_pkg;
     SV *full_name;
@@ -2082,7 +2099,7 @@ static void install_accessor(pTHX_ const char *class_name, const char *prop_name
 }
 
 /* XS fallback accessor with type checking */
-static XS(xs_accessor_typed_fallback) {
+XS_INTERNAL(xs_accessor_typed_fallback) {
     dXSARGS;
     SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
     IV idx = data->slot_idx;
@@ -2272,7 +2289,7 @@ static OP* accessor_typed_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *cko
 }
 
 /* XS fallback for reader-only accessor (get_X style) */
-static XS(xs_reader_fallback) {
+XS_INTERNAL(xs_reader_fallback) {
     dXSARGS;
     SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
     IV idx = data->slot_idx;
@@ -2350,7 +2367,7 @@ static XS(xs_reader_fallback) {
 }
 
 /* XS fallback for writer-only accessor (set_X style) */
-static XS(xs_writer_fallback) {
+XS_INTERNAL(xs_writer_fallback) {
     dXSARGS;
     SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
     IV idx = data->slot_idx;
@@ -2515,7 +2532,7 @@ static void install_accessor_typed(pTHX_ const char *class_name, const char *pro
 }
 
 /* XS fallback for clearer method (clear_X) */
-static XS(xs_clearer_fallback) {
+XS_INTERNAL(xs_clearer_fallback) {
     dXSARGS;
     SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
     IV idx = data->slot_idx;
@@ -2570,7 +2587,7 @@ static void install_clearer(pTHX_ const char *class_name, const char *prop_name,
 }
 
 /* XS fallback for predicate method (has_X) */
-static XS(xs_predicate_fallback) {
+XS_INTERNAL(xs_predicate_fallback) {
     dXSARGS;
     SlotOpData *data = INT2PTR(SlotOpData*, CvXSUBANY(cv).any_iv);
     IV idx = data->slot_idx;
@@ -2626,7 +2643,7 @@ static void install_predicate(pTHX_ const char *class_name, const char *prop_nam
    ============================================ */
 
 /* XS DESTROY wrapper that calls DEMOLISH */
-static XS(xs_destroy_wrapper) {
+XS_INTERNAL(xs_destroy_wrapper) {
     dXSARGS;
     ClassMeta *meta = INT2PTR(ClassMeta*, CvXSUBANY(cv).any_iv);
     SV *self = ST(0);
@@ -2866,7 +2883,7 @@ static ModifiedMethod* get_or_create_modified_method(pTHX_ ClassMeta *meta, cons
 }
 
 /* XS wrapper for modified methods */
-static XS(xs_modified_method_wrapper) {
+XS_INTERNAL(xs_modified_method_wrapper) {
     dXSARGS;
     ModifiedMethod *mod = INT2PTR(ModifiedMethod*, CvXSUBANY(cv).any_iv);
     MethodModifier *m;
@@ -3045,7 +3062,7 @@ static void add_modifier(pTHX_ ClassMeta *meta, const char *method_name, SV *cal
    XS API Functions
    ============================================ */
 
-static XS(xs_define) {
+XS_INTERNAL(xs_define) {
     dXSARGS;
     STRLEN class_len;
     const char *class_pv;
@@ -3379,7 +3396,7 @@ static XS(xs_define) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_prototype) {
+XS_INTERNAL(xs_prototype) {
     dXSARGS;
     AV *av;
     SV **svp;
@@ -3399,7 +3416,7 @@ static XS(xs_prototype) {
     XSRETURN(1);
 }
 
-static XS(xs_set_prototype) {
+XS_INTERNAL(xs_set_prototype) {
     dXSARGS;
     AV *av;
     MAGIC *mg;
@@ -3421,7 +3438,7 @@ static XS(xs_set_prototype) {
 }
 
 /* Get the full prototype chain as an arrayref */
-static XS(xs_prototype_chain) {
+XS_INTERNAL(xs_prototype_chain) {
     dXSARGS;
     AV *av;
     AV *chain;
@@ -3467,7 +3484,7 @@ done:
 }
 
 /* Check if object has a property in its own slots (not prototype) */
-static XS(xs_has_own_property) {
+XS_INTERNAL(xs_has_own_property) {
     dXSARGS;
     AV *av;
     SV **svp;
@@ -3508,7 +3525,7 @@ static XS(xs_has_own_property) {
 }
 
 /* Get the prototype depth (number of prototypes in chain) */
-static XS(xs_prototype_depth) {
+XS_INTERNAL(xs_prototype_depth) {
     dXSARGS;
     AV *av;
     AV *visited[MAX_PROTOTYPE_DEPTH];
@@ -3546,7 +3563,7 @@ done:
     XSRETURN_IV(depth);
 }
 
-static XS(xs_lock) {
+XS_INTERNAL(xs_lock) {
     dXSARGS;
     MAGIC *mg;
     
@@ -3562,7 +3579,7 @@ static XS(xs_lock) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_unlock) {
+XS_INTERNAL(xs_unlock) {
     dXSARGS;
     MAGIC *mg;
     
@@ -3579,7 +3596,7 @@ static XS(xs_unlock) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_freeze) {
+XS_INTERNAL(xs_freeze) {
     dXSARGS;
     MAGIC *mg;
     
@@ -3592,7 +3609,7 @@ static XS(xs_freeze) {
     XSRETURN_EMPTY;
 }
 
-static XS(xs_is_frozen) {
+XS_INTERNAL(xs_is_frozen) {
     dXSARGS;
     MAGIC *mg;
     
@@ -3606,7 +3623,7 @@ static XS(xs_is_frozen) {
     XSRETURN_NO;
 }
 
-static XS(xs_is_locked) {
+XS_INTERNAL(xs_is_locked) {
     dXSARGS;
     MAGIC *mg;
 
@@ -3709,7 +3726,7 @@ static SV* deep_clone_sv(pTHX_ SV *src, HV *seen_hv) {
 
 /* Object::Proto::clone($obj) - deep clone an object, arrayref, hashref,
  * scalarref, or plain scalar */
-static XS(xs_clone) {
+XS_INTERNAL(xs_clone) {
     dXSARGS;
     SV *src;
 
@@ -3743,7 +3760,7 @@ static XS(xs_clone) {
 }
 
 /* Object::Proto::properties($class) - return property names for a class */
-static XS(xs_properties) {
+XS_INTERNAL(xs_properties) {
     dXSARGS;
     STRLEN class_len;
     const char *class_pv;
@@ -3783,7 +3800,7 @@ static XS(xs_properties) {
 }
 
 /* Object::Proto::slot_info($class, $property) - return hashref with slot metadata */
-static XS(xs_slot_info) {
+XS_INTERNAL(xs_slot_info) {
     dXSARGS;
     STRLEN class_len, prop_len;
     const char *class_pv, *prop_pv;
@@ -3864,7 +3881,7 @@ static XS(xs_slot_info) {
 }
 
 /* Object::Proto::parent($class) - return parent class name or undef */
-static XS(xs_parent) {
+XS_INTERNAL(xs_parent) {
     dXSARGS;
     STRLEN class_len;
     const char *class_pv;
@@ -3899,7 +3916,7 @@ static XS(xs_parent) {
 }
 
 /* Object::Proto::ancestors($class) - return list of all ancestor class names (breadth-first) */
-static XS(xs_ancestors) {
+XS_INTERNAL(xs_ancestors) {
     dXSARGS;
     STRLEN class_len;
     const char *class_pv;
@@ -4042,7 +4059,7 @@ PERL_CALLCONV RegisteredType* object_get_registered_type(pTHX_ const char *name)
 }
 
 /* Object::Proto::register_type($name, $check_cb [, $coerce_cb]) */
-static XS(xs_register_type) {
+XS_INTERNAL(xs_register_type) {
     dXSARGS;
     STRLEN name_len;
     const char *name;
@@ -4083,7 +4100,7 @@ static XS(xs_register_type) {
 }
 
 /* Object::Proto::has_type($name) - check if a type is registered */
-static XS(xs_has_type) {
+XS_INTERNAL(xs_has_type) {
     dXSARGS;
     STRLEN name_len;
     const char *name;
@@ -4110,7 +4127,7 @@ static XS(xs_has_type) {
 }
 
 /* Object::Proto::list_types() - return list of registered type names */
-static XS(xs_list_types) {
+XS_INTERNAL(xs_list_types) {
     dXSARGS;
     AV *result = newAV();
     
@@ -4147,7 +4164,7 @@ static XS(xs_list_types) {
    ============================================ */
 
 /* XS implementation of instance() method for singletons */
-static XS(xs_singleton_instance) {
+XS_INTERNAL(xs_singleton_instance) {
     dXSARGS;
     ClassMeta *meta = INT2PTR(ClassMeta*, CvXSUBANY(cv).any_iv);
 
@@ -4218,7 +4235,7 @@ static XS(xs_singleton_instance) {
    ============================================ */
 
 /* Object::Proto::role("RoleName", @slot_specs) - define a role */
-static XS(xs_role) {
+XS_INTERNAL(xs_role) {
     dXSARGS;
     STRLEN role_len;
     const char *role_pv;
@@ -4261,7 +4278,7 @@ static XS(xs_role) {
 }
 
 /* Object::Proto::requires("RoleName", @method_names) - declare required methods */
-static XS(xs_requires) {
+XS_INTERNAL(xs_requires) {
     dXSARGS;
     STRLEN role_len;
     const char *role_pv;
@@ -4291,7 +4308,7 @@ static XS(xs_requires) {
 }
 
 /* Object::Proto::with("ClassName", @role_names) - apply roles to a class */
-static XS(xs_with) {
+XS_INTERNAL(xs_with) {
     dXSARGS;
     STRLEN class_len;
     const char *class_pv;
@@ -4333,7 +4350,7 @@ static XS(xs_with) {
 }
 
 /* Object::Proto::does("ClassName" or $obj, "RoleName") - check if class/object does role */
-static XS(xs_does) {
+XS_INTERNAL(xs_does) {
     dXSARGS;
     ClassMeta *meta;
     STRLEN role_len;
@@ -4374,7 +4391,7 @@ static XS(xs_does) {
    ============================================ */
 
 /* Object::Proto::before("Class::method", \&callback) */
-static XS(xs_before) {
+XS_INTERNAL(xs_before) {
     dXSARGS;
     STRLEN full_name_len;
     const char *full_name;
@@ -4415,7 +4432,7 @@ static XS(xs_before) {
 }
 
 /* Object::Proto::after("Class::method", \&callback) */
-static XS(xs_after) {
+XS_INTERNAL(xs_after) {
     dXSARGS;
     STRLEN full_name_len;
     const char *full_name;
@@ -4455,7 +4472,7 @@ static XS(xs_after) {
 }
 
 /* Object::Proto::around("Class::method", \&callback) */
-static XS(xs_around) {
+XS_INTERNAL(xs_around) {
     dXSARGS;
     STRLEN full_name_len;
     const char *full_name;
@@ -4495,7 +4512,7 @@ static XS(xs_around) {
 }
 
 /* Object::Proto::singleton("Class") - marks class as singleton and installs instance() method */
-static XS(xs_singleton) {
+XS_INTERNAL(xs_singleton) {
     dXSARGS;
     STRLEN class_len;
     const char *class_pv;

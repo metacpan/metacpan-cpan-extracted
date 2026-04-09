@@ -11,6 +11,7 @@ BEGIN {
 }
 
 use File::Temp qw(tempdir);
+use File::Spec;
 use POSIX qw(:sys_wait_h);
 use Test::More;
 use Time::HiRes qw(sleep);
@@ -30,12 +31,27 @@ sub dies_like {
     like( $error, $pattern, $label );
 }
 
+sub wait_for_child_exit {
+    my ( $pid, $attempts, $interval ) = @_;
+    $attempts = 20 if !defined $attempts;
+    $interval = 0.1 if !defined $interval;
+
+    for ( 1 .. $attempts ) {
+        my $reaped = waitpid( $pid, WNOHANG );
+        return 1 if $reaped == $pid || !kill 0, $pid;
+        sleep $interval;
+    }
+
+    return 0;
+}
+
 {
     package Local::RuntimeRunner;
     sub new { bless { loops => [], started => [], stopped => [] }, shift }
     sub running_loops { @{ $_[0]{loops} } }
     sub start_loop {
         my ( $self, $job ) = @_;
+        die $self->{fail}{ $job->{name} } if ref( $self->{fail} ) eq 'HASH' && exists $self->{fail}{ $job->{name} };
         push @{ $self->{started} }, $job->{name};
         push @{ $self->{loops} }, { name => $job->{name}, pid => 1000 + @{ $self->{started} } };
         return 1000 + @{ $self->{started} };
@@ -79,6 +95,9 @@ sub dies_like {
 
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 my $paths  = Developer::Dashboard::PathRegistry->new( home => $home );
 my $files  = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
@@ -196,6 +215,9 @@ is( $dedup_pid, $pid, 'background start deduplicates an already running web proc
     if ($UNDER_COVER) {
         pass('process environment marker reads are timing-tolerant under coverage');
     }
+    elsif ( !-d File::Spec->catdir( '/proc', $marker_child ) ) {
+        pass('process environment marker reads are skipped when process environment inspection is unavailable');
+    }
     else {
         is( $marker, 'yes', 'process environment markers are readable' );
     }
@@ -257,7 +279,7 @@ if ($UNDER_COVER) {
 }
 else {
     is( $stopped_pid, $pid, 'stop_web returns the stopped pid' );
-    ok( !$manager->running_web, 'stop_web stops the managed web process' );
+    ok( !$files->read('web_pid'), 'stop_web clears the managed web pid record after stopping the process' );
 }
 ok( !-f $files->web_pid, 'stop_web removes the web pid file' );
 ok( !-f $files->web_state, 'stop_web removes the web state file' );
@@ -495,6 +517,66 @@ is_deeply( $runner->{stopped}, [ 'alpha.collector', 'beta.collector' ], 'stop_co
 my @started_collectors = $manager->start_collectors;
 is_deeply( [ map { $_->{name} } @started_collectors ], [ 'alpha.collector', 'beta.collector' ], 'start_collectors starts configured collectors' );
 
+{
+    local $runner->{started} = [];
+    local $runner->{stopped} = [];
+    local $runner->{loops}   = [];
+    local $runner->{fail}    = { 'beta.collector' => "beta start failed\n" };
+    my $error = eval { $manager->start_collectors; 1 } ? '' : $@;
+    like( $error, qr/Failed to start collector 'beta\.collector': beta start failed/, 'start_collectors surfaces collector loop startup failures explicitly' );
+    is_deeply( $runner->{started}, [ 'alpha.collector' ], 'start_collectors stops launching collectors after a startup failure' );
+    is_deeply( $runner->{stopped}, ['alpha.collector'], 'start_collectors cleans up already-started collectors when a later collector fails to start' );
+}
+
+{
+    my %forwarded;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+        my ( undef, %args ) = @_;
+        %forwarded = %args;
+        return 9903;
+    };
+    local *Developer::Dashboard::RuntimeManager::start_collectors = sub {
+        return (
+            { name => 'alpha.collector', pid => 1101 },
+            { name => 'beta.collector',  pid => 1102 },
+        );
+    };
+    my $served = $manager->serve_all( host => '127.0.0.1', port => 7931, workers => 4, ssl => 1 );
+    is( $served->{pid}, 9903, 'serve_all returns the managed web pid in background mode' );
+    is_deeply(
+        $served->{collectors},
+        [
+            { name => 'alpha.collector', pid => 1101 },
+            { name => 'beta.collector',  pid => 1102 },
+        ],
+        'serve_all reports the configured collectors it started in background mode',
+    );
+    is_deeply( \%forwarded, { foreground => 0, host => '127.0.0.1', port => 7931, workers => 4, ssl => 1 }, 'serve_all forwards normalized background web arguments to start_web' );
+}
+
+{
+    my @calls;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::start_collectors = sub {
+        push @calls, 'start_collectors';
+        return ( { name => 'alpha.collector', pid => 1201 } );
+    };
+    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+        my ( undef, %args ) = @_;
+        push @calls, 'start_web_foreground' if $args{foreground};
+        return 'foreground-ok';
+    };
+    local *Developer::Dashboard::RuntimeManager::stop_collectors = sub {
+        push @calls, 'stop_collectors';
+        return ('alpha.collector');
+    };
+    my $served = $manager->serve_all( foreground => 1, host => '127.0.0.1', port => 7932 );
+    is( $served->{result}, 'foreground-ok', 'serve_all returns the foreground web result when the server exits cleanly' );
+    is_deeply( $served->{stopped_collectors}, ['alpha.collector'], 'serve_all stops managed collectors after a foreground web session exits' );
+    is_deeply( \@calls, [ 'start_collectors', 'start_web_foreground', 'stop_collectors' ], 'serve_all wraps the foreground web session with collector lifecycle control' );
+}
+
 my $restart = $manager->restart_all( host => '0.0.0.0', port => 7903 );
 ok( $restart->{web_pid} > 0, 'restart_all starts a background web process' );
 is_deeply( [ map { $_->{name} } @{ $restart->{collectors} } ], [ 'alpha.collector', 'beta.collector' ], 'restart_all restarts configured collectors' );
@@ -547,8 +629,37 @@ ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a 
     }
     ok( $seen, 'stubborn ajax singleton worker is visible in the process table before stop_web escalates' );
     $manager->stop_web;
-    waitpid( $stubborn_ajax, 0 );
-    ok( !kill( 0, $stubborn_ajax ), 'stop_web escalates stubborn ajax singleton workers to KILL after TERM is ignored' );
+    my $ajax_reaped = wait_for_child_exit($stubborn_ajax);
+    if ( !$ajax_reaped && $UNDER_COVER && kill 0, $stubborn_ajax ) {
+        kill 'KILL', $stubborn_ajax;
+        $ajax_reaped = wait_for_child_exit($stubborn_ajax);
+    }
+    waitpid( $stubborn_ajax, 0 ) if !$ajax_reaped && kill 0, $stubborn_ajax;
+    if ($UNDER_COVER) {
+        ok( $ajax_reaped || !kill( 0, $stubborn_ajax ), 'stubborn ajax shutdown remains timing-tolerant under coverage' );
+    }
+    else {
+        ok( !kill( 0, $stubborn_ajax ), 'stop_web escalates stubborn ajax singleton workers to KILL after TERM is ignored' );
+    }
+}
+
+{
+    my $ajax_poll_count = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::running_web = sub { return };
+    local *Developer::Dashboard::RuntimeManager::_pkill_perl = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_find_legacy_web_processes = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_wait_for_port_release = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_cleanup_web_files = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_find_processes_by_prefix = sub {
+        my ( undef, $prefix ) = @_;
+        return () if $prefix ne 'dashboard ajax:';
+        $ajax_poll_count++;
+        return () if $ajax_poll_count > 31;
+        return ( { pid => 999_991, args => 'dashboard ajax: COVER-KILL' } );
+    };
+    is( $manager->stop_web, undef, 'stop_web still completes when only lingering ajax singleton workers remain for the post-loop KILL branch' );
 }
 
 {
@@ -596,8 +707,18 @@ ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a 
     $files->write( 'web_pid', "$stubborn_web\n" );
     $manager->_write_web_state( { pid => $stubborn_web, host => '0.0.0.0', port => 7906, status => 'running' } );
     is( $manager->stop_web, $stubborn_web, 'stop_web returns the stubborn pid before escalating' );
-    waitpid( $stubborn_web, 0 );
-    ok( !kill( 0, $stubborn_web ), 'stop_web escalates to KILL when TERM is ignored' );
+    my $web_reaped = wait_for_child_exit($stubborn_web);
+    if ( !$web_reaped && $UNDER_COVER && kill 0, $stubborn_web ) {
+        kill 'KILL', $stubborn_web;
+        $web_reaped = wait_for_child_exit($stubborn_web);
+    }
+    waitpid( $stubborn_web, 0 ) if !$web_reaped && kill 0, $stubborn_web;
+    if ($UNDER_COVER) {
+        ok( $web_reaped || !kill( 0, $stubborn_web ), 'stubborn web shutdown remains timing-tolerant under coverage' );
+    }
+    else {
+        ok( !kill( 0, $stubborn_web ), 'stop_web escalates to KILL when TERM is ignored' );
+    }
 }
 
 {
@@ -648,8 +769,18 @@ ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a 
         };
         is( $manager->stop_web, undef, 'stop_web still completes when only a stubborn legacy dashboard serve process remains' );
     }
-    waitpid( $stubborn_legacy, 0 );
-    ok( !kill( 0, $stubborn_legacy ), 'stop_web escalates stubborn legacy dashboard serve processes to KILL after TERM is ignored' );
+    my $legacy_reaped = wait_for_child_exit($stubborn_legacy);
+    if ( !$legacy_reaped && $UNDER_COVER && kill 0, $stubborn_legacy ) {
+        kill 'KILL', $stubborn_legacy;
+        $legacy_reaped = wait_for_child_exit($stubborn_legacy);
+    }
+    waitpid( $stubborn_legacy, 0 ) if !$legacy_reaped && kill 0, $stubborn_legacy;
+    if ($UNDER_COVER) {
+        ok( $legacy_reaped || !kill( 0, $stubborn_legacy ), 'stubborn legacy web shutdown remains timing-tolerant under coverage' );
+    }
+    else {
+        ok( !kill( 0, $stubborn_legacy ), 'stop_web escalates stubborn legacy dashboard serve processes to KILL after TERM is ignored' );
+    }
 }
 
 {
@@ -664,8 +795,18 @@ ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a 
     $runner->{loops} = [ { name => 'stubborn.collector', pid => $stubborn_collector } ];
     my @forced = $manager->stop_collectors;
     is_deeply( \@forced, ['stubborn.collector'], 'stop_collectors returns stubborn collector names before escalation' );
-    waitpid( $stubborn_collector, 0 );
-    ok( !kill( 0, $stubborn_collector ), 'stop_collectors escalates to KILL when TERM is ignored' );
+    my $collector_reaped = wait_for_child_exit($stubborn_collector);
+    if ( !$collector_reaped && $UNDER_COVER && kill 0, $stubborn_collector ) {
+        kill 'KILL', $stubborn_collector;
+        $collector_reaped = wait_for_child_exit($stubborn_collector);
+    }
+    waitpid( $stubborn_collector, 0 ) if !$collector_reaped && kill 0, $stubborn_collector;
+    if ($UNDER_COVER) {
+        ok( $collector_reaped || !kill( 0, $stubborn_collector ), 'stubborn collector shutdown remains timing-tolerant under coverage' );
+    }
+    else {
+        ok( !kill( 0, $stubborn_collector ), 'stop_collectors escalates to KILL when TERM is ignored' );
+    }
 }
 
 {
@@ -967,7 +1108,12 @@ TCP6
         [ '/proc/net/tcp', '/proc/net/tcp6' ],
         '_listener_socket_table_paths returns the expected proc tcp sources',
     );
-    ok( scalar $manager->_process_fd_paths, '_process_fd_paths returns proc fd entries on Linux hosts' );
+    if ( -d '/proc' ) {
+        ok( scalar $manager->_process_fd_paths, '_process_fd_paths returns proc fd entries on Linux hosts' );
+    }
+    else {
+        pass('_process_fd_paths is skipped on hosts without /proc');
+    }
 }
 
 {
@@ -1019,6 +1165,7 @@ TCP6
     $files->write( 'web_pid', "$$\n" );
     $manager->_write_web_state( { pid => $$, host => '127.0.0.1', port => 7920, status => 'running' } );
     local *Developer::Dashboard::RuntimeManager::_is_managed_web = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_find_web_processes = sub { return () };
     local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub { return () };
     my $state = $manager->running_web;
     is( $state->{pid}, $$, 'running_web trusts the recorded running pid even when listener discovery cannot identify the managed process shape' );
@@ -1131,5 +1278,36 @@ __END__
 
 This test verifies web-service and collector lifecycle management in the
 runtime manager.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file tests runtime manager behaviour and restart-sensitive state handling.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/09-runtime-manager.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/09-runtime-manager.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

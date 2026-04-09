@@ -2,7 +2,7 @@ package IPC::Manager::Client::SharedMem;
 use strict;
 use warnings;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000014';
 
 use Carp qw/croak/;
 
@@ -30,10 +30,7 @@ sub _load_constants {
     $_S_IWUSR     = IPC::SysV::S_IWUSR();
 }
 
-sub viable {
-    local $@;
-    eval { require IPC::SysV; IPC::SysV->VERSION('2.09'); 1 } || 0;
-}
+sub _viable { require IPC::SysV; IPC::SysV->VERSION('2.09'); 1 }
 
 # Route format: "shmid:semid"
 

@@ -20,9 +20,9 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
     Object::Proto::define('Widget', qw(name value));
 
     # Import multiple times - should NOT warn
-    Object::Proto::import_accessors('Widget', 'main');
-    Object::Proto::import_accessors('Widget', 'main');
-    Object::Proto::import_accessors('Widget', 'main');
+    Object::Proto::import_accessors('Widget', undef, 'main');
+    Object::Proto::import_accessors('Widget', undef, 'main');
+    Object::Proto::import_accessors('Widget', undef, 'main');
 
     my @redefine_warnings = grep { /redefin/i } @warnings;
     is(scalar(@redefine_warnings), 0, 'no redefinition warnings from multiple imports')
@@ -65,10 +65,10 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
         main::Object::Proto::define('Activation', qw(relu relu_grad sigmoid sigmoid_grad));
 
         # Import into this package
-        main::Object::Proto::import_accessors('Activation', 'TestActivation');
+        main::Object::Proto::import_accessors('Activation', undef, 'TestActivation');
 
         # Import again (simulating module reload or duplicate use)
-        main::Object::Proto::import_accessors('Activation', 'TestActivation');
+        main::Object::Proto::import_accessors('Activation', undef, 'TestActivation');
 
         1;
     };
@@ -99,7 +99,7 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
         main::Object::Proto::define('Conflicting', qw(existing_func other_prop));
 
         # This should NOT overwrite and NOT warn
-        main::Object::Proto::import_accessors('Conflicting', 'ConflictTest');
+        main::Object::Proto::import_accessors('Conflicting', undef, 'ConflictTest');
 
         1;
     };
@@ -129,14 +129,14 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
     eval q{
         package TargetClass1;
-        main::Object::Proto::import_accessors('DataPoint', 'TargetClass1');
+        main::Object::Proto::import_accessors('DataPoint', undef, 'TargetClass1');
         1;
     };
     die $@ if $@;
 
     eval q{
         package TargetClass2;
-        main::Object::Proto::import_accessors('DataPoint', 'TargetClass2');
+        main::Object::Proto::import_accessors('DataPoint', undef, undef, 'TargetClass2');
         1;
     };
     die $@ if $@;
@@ -144,7 +144,7 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
     # Import again to both
     eval q{
         package TargetClass1;
-        main::Object::Proto::import_accessors('DataPoint', 'TargetClass1');
+        main::Object::Proto::import_accessors('DataPoint', undef, 'TargetClass1');
         1;
     };
     die $@ if $@;
@@ -160,8 +160,8 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
 # accessors work correctly after multiple imports
 {
     Object::Proto::define('TestItem', qw(foo bar));
-    Object::Proto::import_accessors('TestItem', 'main');
-    Object::Proto::import_accessors('TestItem', 'main');  # Duplicate
+    Object::Proto::import_accessors('TestItem', undef, 'main');
+    Object::Proto::import_accessors('TestItem', undef, 'main');  # Duplicate
 
     my $item = TestItem->new('hello', 42);
 

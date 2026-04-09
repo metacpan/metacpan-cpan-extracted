@@ -7,7 +7,7 @@ use Cpanel::JSON::XS();
 use Importer Importer => 'import';
 use File::Temp qw/ tempfile /;
 
-our $VERSION = '2.000009';
+our $VERSION = '2.000011';
 
 our @EXPORT_OK = qw{
     decode_json
@@ -41,6 +41,7 @@ sub decode_json_file {
 
     open(my $fh, '<', $file) or die "Could not open '$file': $!";
     my $json = do { local $/; <$fh> };
+    close($fh);
 
     if ($params{unlink}) {
         unlink($file) or warn "Could not unlink '$file': $!";

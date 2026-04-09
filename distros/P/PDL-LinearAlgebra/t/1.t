@@ -1,31 +1,32 @@
 use strict;
 use warnings;
 use PDL::LiteF;
-use PDL::MatrixOps qw(identity);
+use PDL::MatrixOps qw(identity stretcher gurney);
 use PDL::LinearAlgebra;
 use PDL::LinearAlgebra::Trans qw //;
 use PDL::LinearAlgebra::Real;
 use Test::More;
+use Test::PDL;
 
-sub fapprox {
-	my($a,$b) = @_;
-	(PDL->topdl($a)-$b)->abs->max < 0.001;
-}
 sub runtest {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($in, $method, $expected, $extra) = @_;
   $_ = $_->copy for $in;
   ($expected, my $expected_cplx) = ref($expected) eq 'ARRAY' ? @$expected : ($expected, $expected);
+  $_ = PDL->topdl($_) for grep defined && !ref, $expected, $expected_cplx;
   my @extra = map UNIVERSAL::isa($_, 'PDL') ? $_->copy : $_, @{$extra||[]};
   if (defined $expected) {
     my ($got) = $in->$method(@extra);
-    ok fapprox($got, $expected), $method or diag "got(".ref($got)."): $got\nexpected:$expected";
+    is_pdl +PDL->topdl($got), $expected, {test_name=>$method, require_equal_types=>0, atol=>1e-3};
   }
   $_ = $_->r2C for $in;
   my ($got) = $in->$method(map ref() && ref() ne 'CODE' ? $_->r2C : $_, @extra);
+  $got = PDL->topdl($got);
   my @cplx = ref($expected_cplx) eq 'ARRAY' ? @$expected_cplx : $expected_cplx;
-  my $ok = grep fapprox($got, PDL->topdl($_)->r2C), @cplx;
-  ok $ok, "native complex $method" or diag "got(".ref($got)."): $got\nexpected:@cplx";
+  @cplx = map PDL->topdl($_)->r2C, @cplx;
+  my @res = map [Test::PDL::eq_pdl($got, $_, {require_equal_types=>0, atol=>1e-3})], @cplx;
+  my $ok = grep $_->[0], @res;
+  ok $ok, "native complex $method" or diag explain map $_->[1], @res;
 }
 
 my $aa = random(2,2,2);
@@ -34,13 +35,13 @@ runtest($aa, 't', [undef,$aa->xchg(0,1)->conj], [1]);
 
 do './t/common.pl'; die if $@;
 
-ok all(approx pdl([1,1,-1],[-1,-1,2])->positivise, pdl([1,1,-1],[1,1,-2])), 'positivise'; # real only
+is_pdl pdl([1,1,-1],[-1,-1,2])->positivise, pdl([1,1,-1],[1,1,-2]), 'positivise'; # real only
 
 my $a = pdl([[1.7,3.2],[9.2,7.3]]);
 my $id = identity(2);
-ok(fapprox($a->minv x $a,$id));
+is_pdl $a->minv x $a,$id;
 
-ok(fapprox($a->mcrossprod->mposinv->tritosym x $a->mcrossprod,$id));
+is_pdl $a->mcrossprod->mposinv->tritosym x $a->mcrossprod,$id;
 
 ok($a->mcrossprod->mposdet !=0);
 
@@ -50,9 +51,7 @@ my $B = sequence(2, 4);
 getrf(my $lu=$A->copy, my $ipiv=null, my $info=null);
 # if don't transpose the $B input, get memory crashes
 getrs($lu, 1, my $x=$B->xchg(0,1)->copy, $ipiv, $info=null);
-$x = $x->xchg(0,1);
-my $got = $A x $x;
-ok fapprox($got, $B) or diag "got: $got";
+is_pdl $A x $x->t, $B;
 
 $A=pdl cdouble, <<'EOF';
 [
@@ -71,21 +70,55 @@ $B=pdl q[0.233178433563939+0.298197173371207i 1.09431208340166+1.30493506686269i
 PDL::LinearAlgebra::Complex::cgetrs($lu, 1, $x=$B->copy, $ipiv, $info=null);
 is $info, 0;
 $x = $x->dummy(0); # transpose; xchg rightly fails if 1-D
-$got = $A x $x;
-ok fapprox($got, $B->dummy(0)) or diag "got: $got";
-my $i=pdl('i'); # Can't use i() as it gets confused by PDL::Complex's i()
-my $complex_matrix=(1+sequence(2,2))*$i;
-$got=$complex_matrix->mdet;
-ok(fapprox($got, 2), "Complex mdet") or diag "got $got";
+is_pdl $A x $x, $B->dummy(0);
+is_pdl +((1+sequence(2,2))*i())->mdet, cdouble(2), "Complex mdet";
 
 $A = pdl '[[1+i 2+i][3+i 4+i]]';
 $B = identity(2);
-ok fapprox($got = $A x $B, $A), 'complex first' or diag "got: $got";
-ok fapprox($got = $B x $A, $A), 'complex second' or diag "got: $got";
+is_pdl $A x $B, $A, 'complex first';
+is_pdl $B x $A, $A, 'complex second';
 
 my $d = (identity(2) * 2)->sqrt;
-ok fapprox($got = $d->minv, my $exp = pdl '0.70710678 0; 0 0.70710678'), 'simple minv of double' or diag "got: $got";
+is_pdl scalar $d->minv, my $exp = pdl('0.70710678 0; 0 0.70710678'), 'simple minv of double';
 my $ld = (identity(2)->ldouble * 2)->sqrt;
-ok fapprox($got = $ld->minv, $exp->ldouble), 'simple minv of ldouble' or diag "got: $got";
+is_pdl scalar $ld->minv, $exp->ldouble, 'simple minv of ldouble';
+
+$A=pdl <<'EOF';
+[
+ [ 3  1]
+ [-1  3]
+ [-2  3]
+]
+EOF
+my ($u, $s, $vt) = msvd($A);
+is_pdl $u x gurney($s, $A->dims) x $vt, $A, "msvd 2,3";
+($u, $s, $vt) = mdsvd($A);
+is_pdl $u x gurney($s, $A->dims) x $vt, $A, "mdsvd 2,3";
+
+$A=pdl <<'EOF';
+[
+ [ 3  1  2]
+ [-1  3  0]
+]
+EOF
+($u, $s, $vt) = msvd($A);
+is_pdl $u x gurney($s, $A->dims) x $vt, $A, "msvd 3,2";
+($u, $s, $vt) = mdsvd($A);
+is_pdl $u x gurney($s, $A->dims) x $vt, $A, "mdsvd 3,2";
+
+$A = pdl([0.43,0.03],[0.75,0.72]);
+$B = sequence(2,2);
+(my $c, $s, my %ret) = mgsvd($A, $B, U => 1, V => 1, X => 1);
+($u, my $v, $x) = @ret{qw(U V X)};
+is_pdl $u x stretcher($c) x $x->t, $A, 'mgsvd A';
+is_pdl $v x stretcher($s) x $x->t, $B, 'mgsvd B';
+
+$A = pdl '1 2 3 4 21; 5 6 7 8 22; 9 10 11 12 20';
+($u, $s, $vt) = mdsvd($A);
+is_pdl $u x gurney($s, $A->dims) x $vt, $A, "mdsvd 5,3";
+is_pdl $u->t x $u, identity(3), 'U is orthonormal';
+is_pdl $vt->t x $vt, identity(5), 'Vt is orthonormal';
+my $v_null = $vt->slice(",-1");
+is_pdl $A x $v_null->t, zeroes(1,3), 'correct right null-space';
 
 done_testing;

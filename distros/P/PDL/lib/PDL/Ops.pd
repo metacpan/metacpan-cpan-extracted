@@ -16,6 +16,7 @@ my %is_real; @is_real{ppdefs()} = ();
 my @Rtypes = grep $_->real, types();
 my @Ctypes = grep !$_->real, types();
 my @Ftypes = grep !$_->integer, types();
+my %got_complex;
 
 pp_addpm({At=>'Top'},<<'EOD');
 
@@ -151,6 +152,14 @@ EOF
     );
 }
 
+sub g_c2 { # 2 so no warnings on redefine when run Makefile.PL, cf ::Math
+  my ($func, $arg) = @_;
+  return 0 if $func !~ /[a-z]/;
+  $got_complex{$func} = PDL::Core::Dev::got_complex_version($func, $arg);
+  print "got_complex_version($func, $arg): $got_complex{$func}\n";
+  $got_complex{$func};
+}
+
 #simple binary functions
 sub bifunc {
     my ($name,$func,$mutator,$doc,%extra) = @_;
@@ -158,7 +167,7 @@ sub bifunc {
     my $isop = $funcov =~ s/^op//;
     my $funcovp = protect_chars $funcov;
     $func = $func->[0] if ref $func eq 'ARRAY';
-    my $got_complex = PDL::Core::Dev::got_complex_version($func, 2);
+    my $got_complex = g_c2($func, 2);
     $extra{GenericTypes} = [ grep exists $is_real{$_}, @{$extra{GenericTypes}} ]
 	if !$got_complex and $extra{GenericTypes};
     $extra{HdrCode} .= << 'EOH';
@@ -215,7 +224,7 @@ sub ufunc {
     my $funcov = ref $func eq 'ARRAY' ? $func->[1] : $func;
     my $funcovp = protect_chars $funcov;
     $func = $func->[0] if ref $func eq 'ARRAY';
-    my $got_complex = PDL::Core::Dev::got_complex_version($func, 1);
+    my $got_complex = g_c2($func, 1);
     $extra{GenericTypes} = [ grep exists $is_real{$_}, @{$extra{GenericTypes}} ]
 	if !$got_complex and $extra{GenericTypes};
 
@@ -404,8 +413,6 @@ PDL_IF_BAD(if ( \$ISBAD(complexv()) ) \$SETBAD(b()); else,)
   $codestr
 	   }),
 	   !$backcode ? () : (
-	     DefaultFlow => 1,
-	     TwoWay => 1,
 	     BackCode => pp_line_numbers(__LINE__-1, qq{
 		PDL_IF_BAD(if ( \$ISBAD(b()) ) \$SETBAD(complexv()); else {,)
 		   $backcode
@@ -538,18 +545,35 @@ sub warn_non_numeric_op_wrapper {
 
 { package # hide from MetaCPAN
     PDL;
+sub overload_dotequals {
+  my @args = !$_[2] ? @_[1,0] : @_[0,1];
+  PDL::Ops::assgn(@args);
+  return $args[1];
+}
+sub overload_abs { PDL::abs($_[0]) }
+sub overload_plusplus {
+  $_[0] += ($PDL::Core::pdl_ones[$_[0]->get_datatype]
+    // barf "Couldn't find 'one' for type ", $_[0]->get_datatype
+  )
+}
+sub overload_minusminus {
+  $_[0] -= ($PDL::Core::pdl_ones[$_[0]->get_datatype]
+    // barf "Couldn't find 'one' for type ", $_[0]->get_datatype
+  )
+}
   use overload
     "eq"    => PDL::Ops::warn_non_numeric_op_wrapper(\&PDL::eq, 'eq'),
-    ".="    => sub {
-      my @args = !$_[2] ? @_[1,0] : @_[0,1];
-      PDL::Ops::assgn(@args);
-      return $args[1];
-    },
-    'abs' => sub { PDL::abs($_[0]) },
-    '++' => sub { $_[0] += ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
-    '--' => sub { $_[0] -= ($PDL::Core::pdl_ones[$_[0]->get_datatype]//barf "Couldn't find 'one' for type ", $_[0]->get_datatype) },
+    ".="    => \&overload_dotequals,
+    'abs' => \&overload_abs,
+    '++' => \&overload_plusplus,
+    '--' => \&overload_minusminus,
     ;
 }
 EOF
+
+my $gc_text = "our %got_complex = (\n";
+$gc_text .= "  $_ => $got_complex{$_},\n" for sort grep /[a-z]/, keys %got_complex;
+$gc_text .= ");\n";
+pp_addpm({At=>'Bot'}, $gc_text);
 
 pp_done();

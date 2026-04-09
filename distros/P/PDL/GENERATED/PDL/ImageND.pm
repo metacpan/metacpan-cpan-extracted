@@ -913,7 +913,7 @@ sub PDL::path_segs {
 =for sig
 
  Signature: (x(); y(); z();
-		float [o]coords(tri=3);)
+    float [o]coords(tri=3);)
  Types: (float double)
 
 =for usage
@@ -927,8 +927,8 @@ sub PDL::path_segs {
 
 Combine three coordinates into a single ndarray.
 
-Combine x, y and z to a single ndarray the first dimension
-of which is 3. This routine does dataflow automatically.
+Combine x, y and z into a single ndarray the first dimension
+of which is 3.
 
 =pod
 

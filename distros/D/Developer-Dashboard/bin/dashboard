@@ -2,13 +2,14 @@
 
 use strict;
 use warnings;
+use utf8;
 
-use Cwd qw(cwd);
+use Config ();
+use Capture::Tiny qw(capture);
+use Cwd qw(abs_path);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use File::Spec;
-use Getopt::Long qw(GetOptionsFromArray);
-use Getopt::Long ();
 use IO::Handle ();
 use IO::Select ();
 use IPC::Open3 qw(open3);
@@ -16,14 +17,33 @@ use JSON::XS ();
 use Pod::Usage qw(pod2usage);
 use Symbol qw(gensym);
 
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+use Developer::Dashboard::Platform qw(
+  command_argv_for_path
+  is_runnable_file
+  resolve_runnable_file
+);
+use Developer::Dashboard::InternalCLI ();
+
+my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+if ( -d $dashboard_lib ) {
+    my $path_sep = $Config::Config{path_sep} || ':';
+    my @existing = grep { defined && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
+    if ( !grep { $_ eq $dashboard_lib } @existing ) {
+        $ENV{PERL5LIB} = join $path_sep, $dashboard_lib, @existing;
+    }
+}
+
 my $cmd = shift @ARGV || '';
 _prime_command_result_env( $cmd, @ARGV ) if $cmd ne '';
 
 if ( $cmd eq '' ) {
     pod2usage(
-        -exitval => 1,
-        -verbose => 99,
-        -sections => [ qw(NAME SYNOPSIS) ],
+        -exitval  => 1,
+        -verbose  => 99,
+        -sections => [qw(NAME SYNOPSIS)],
     );
 }
 elsif ( $cmd eq 'help' || $cmd eq '--help' || $cmd eq '-h' ) {
@@ -33,833 +53,87 @@ elsif ( $cmd eq 'help' || $cmd eq '--help' || $cmd eq '-h' ) {
     );
 }
 
-if ( my $builtin = _standalone_builtin_executable($cmd) ) {
-    exec { $^X } $^X, $builtin, @ARGV;
-    die "Unable to exec $builtin: $!";
-}
-
-require Developer::Dashboard::Auth;
-require Developer::Dashboard::ActionRunner;
-require Developer::Dashboard::Codec;
-Developer::Dashboard::Codec->import(qw(encode_payload decode_payload));
-require Developer::Dashboard::CollectorRunner;
-require Developer::Dashboard::Collector;
-require Developer::Dashboard::Config;
-require Developer::Dashboard;
-require Developer::Dashboard::DockerCompose;
-require Developer::Dashboard::FileRegistry;
-require Developer::Dashboard::IndicatorStore;
-require Developer::Dashboard::JSON;
-Developer::Dashboard::JSON->import(qw(json_encode));
-require Developer::Dashboard::PageDocument;
-require Developer::Dashboard::PageRuntime;
-require Developer::Dashboard::PageResolver;
-require Developer::Dashboard::PageStore;
-require Developer::Dashboard::PathRegistry;
-require Developer::Dashboard::Prompt;
-require Developer::Dashboard::RuntimeManager;
-require Developer::Dashboard::SessionStore;
-require Developer::Dashboard::Web::App;
-require Developer::Dashboard::Web::Server;
-
-my $paths = Developer::Dashboard::PathRegistry->new(
-    workspace_roots => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
-    project_roots   => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
-);
-my $files      = Developer::Dashboard::FileRegistry->new( paths => $paths );
-my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
-my $collectors = Developer::Dashboard::Collector->new( paths => $paths );
-my $runner     = Developer::Dashboard::CollectorRunner->new(
-    collectors => $collectors,
-    files      => $files,
-    indicators => $indicators,
-    paths      => $paths,
-);
-my $config     = Developer::Dashboard::Config->new( files => $files, paths => $paths );
-my $pages      = Developer::Dashboard::PageStore->new( paths => $paths );
-my $page_runtime = Developer::Dashboard::PageRuntime->new(
-    files   => $files,
-    paths   => $paths,
-    aliases => $config->path_aliases,
-);
-my $auth = Developer::Dashboard::Auth->new(
-    files => $files,
-    paths => $paths,
-);
-my $actions = Developer::Dashboard::ActionRunner->new(
-    files => $files,
-    paths => $paths,
-);
-my $resolver = Developer::Dashboard::PageResolver->new(
-    actions => $actions,
-    config  => $config,
-    pages   => $pages,
-    paths   => $paths,
-);
-my $docker = Developer::Dashboard::DockerCompose->new(
-    config  => $config,
-    paths   => $paths,
-);
-my $prompt = Developer::Dashboard::Prompt->new(
-    paths      => $paths,
-    indicators => $indicators,
-);
-my $sessions = Developer::Dashboard::SessionStore->new( paths => $paths );
-my $runtime = Developer::Dashboard::RuntimeManager->new(
-    app_builder => sub {
-        my (%args) = @_;
-        my $web_auth = Developer::Dashboard::Auth->new( files => $files, paths => $paths );
-        my $web_pages = Developer::Dashboard::PageStore->new( paths => $paths );
-        my $web_sessions = Developer::Dashboard::SessionStore->new( paths => $paths );
-        my $app = Developer::Dashboard::Web::App->new(
-            actions  => $actions,
-            auth     => $web_auth,
-            pages    => $web_pages,
-            prompt   => $prompt,
-            runtime  => $page_runtime,
-            resolver => $resolver,
-            sessions => $web_sessions,
-        );
-        return Developer::Dashboard::Web::Server->new(
-            app     => $app,
-            host    => $args{host},
-            port    => $args{port},
-            workers => $args{workers},
-            ssl     => $args{ssl},
-        );
-    },
-    config => $config,
-    files  => $files,
-    paths  => $paths,
-    runner => $runner,
-);
-
-my $CONFIG_PATH_ALIASES_LOADED  = 0;
-my $SAVED_PAGES_MIGRATED        = 0;
-my $COLLECTOR_INDICATORS_SYNCED = 0;
-
-sub _load_configured_path_aliases {
-    return 1 if $CONFIG_PATH_ALIASES_LOADED;
-    $paths->register_named_paths( $config->path_aliases );
-    $CONFIG_PATH_ALIASES_LOADED = 1;
-    return 1;
-}
-
-sub _migrate_saved_pages {
-    return 1 if $SAVED_PAGES_MIGRATED;
-    $pages->migrate_legacy_json_pages;
-    $SAVED_PAGES_MIGRATED = 1;
-    return 1;
-}
-
-sub _collector_jobs {
-    return $config->collectors;
-}
-
-sub _sync_configured_collector_indicators {
-    return 1 if $COLLECTOR_INDICATORS_SYNCED;
-    $indicators->sync_collectors( _collector_jobs() );
-    $COLLECTOR_INDICATORS_SYNCED = 1;
-    return 1;
-}
-
-if ( $cmd eq 'ps1' ) {
-    _sync_configured_collector_indicators();
-    my $jobs = 0;
-    my $cwd  = cwd();
-    my $mode = 'compact';
-    my $color = 0;
-    my $max_age = 300;
-    GetOptionsFromArray(
-        \@ARGV,
-        'jobs=i' => \$jobs,
-        'cwd=s'  => \$cwd,
-        'mode=s' => \$mode,
-        'color!' => \$color,
-        'max-age=i' => \$max_age,
-    );
-    print $prompt->render( jobs => $jobs, cwd => $cwd, mode => $mode, color => $color, max_age => $max_age );
-    exit 0;
-}
-elsif ( $cmd eq 'paths' ) {
-    _load_configured_path_aliases();
-    my %out = (
-        home           => $paths->home,
-        home_runtime_root => $paths->home_runtime_root,
-        project_runtime_root => scalar $paths->project_runtime_root,
-        runtime_root   => $paths->runtime_root,
-        state_root     => $paths->state_root,
-        cache_root     => $paths->cache_root,
-        logs_root      => $paths->logs_root,
-        dashboards_root=> $paths->dashboards_root,
-        bookmarks_root => $paths->bookmarks_root,
-        cli_root       => $paths->cli_root,
-        collectors_root=> $paths->collectors_root,
-        indicators_root=> $paths->indicators_root,
-        config_root    => $paths->config_root,
-        current_project_root => scalar $paths->current_project_root,
-        %{ $paths->named_paths },
-    );
-    print json_encode(\%out);
-    exit 0;
-}
-elsif ( $cmd eq 'path' ) {
-    my $action = shift @ARGV || '';
-    if ( $action eq 'resolve' ) {
-        _load_configured_path_aliases();
-        my $name = shift @ARGV || die "Usage: dashboard path resolve <name>\n";
-        print $paths->resolve_dir($name), "\n";
-        exit 0;
-    }
-    elsif ( $action eq 'locate' ) {
-        my @found = $paths->locate_projects(@ARGV);
-        print json_encode( \@found );
-        exit 0;
-    }
-    elsif ( $action eq 'add' ) {
-        my $name = shift @ARGV || die "Usage: dashboard path add <name> <path>\n";
-        my $path = shift @ARGV || die "Usage: dashboard path add <name> <path>\n";
-        my $saved = $config->save_global_path_alias( $name, $path );
-        $paths->register_named_paths( { $name => $path } );
-        $saved->{resolved} = $paths->resolve_dir($name);
-        print json_encode($saved);
-        exit 0;
-    }
-    elsif ( $action eq 'del' ) {
-        my $name = shift @ARGV || die "Usage: dashboard path del <name>\n";
-        my $deleted = $config->remove_global_path_alias($name);
-        $paths->unregister_named_path($name);
-        print json_encode($deleted);
-        exit 0;
-    }
-    elsif ( $action eq 'project-root' ) {
-        my $root = $paths->current_project_root;
-        print defined $root ? "$root\n" : '';
-        exit 0;
-    }
-    elsif ( $action eq 'list' ) {
-        _load_configured_path_aliases();
-        my %out = (
-            home         => $paths->home,
-            home_runtime => $paths->home_runtime_root,
-            project_runtime => scalar $paths->project_runtime_root,
-            runtime      => $paths->runtime_root,
-            state        => $paths->state_root,
-            cache        => $paths->cache_root,
-            logs         => $paths->logs_root,
-            dashboards   => $paths->dashboards_root,
-            bookmarks    => $paths->bookmarks_root,
-            cli          => $paths->cli_root,
-            config       => $paths->config_root,
-            collectors   => $paths->collectors_root,
-            indicators   => $paths->indicators_root,
-            %{ $paths->named_paths },
-        );
-        print json_encode(\%out);
-        exit 0;
-    }
-}
-elsif ( $cmd eq 'encode' ) {
-    local $/;
-    my $text = <STDIN>;
-    print encode_payload($text), "\n";
-    exit 0;
-}
-elsif ( $cmd eq 'decode' ) {
-    local $/;
-    my $token = <STDIN>;
-    $token =~ s/\s+$//;
-    print decode_payload($token);
-    exit 0;
-}
-elsif ( $cmd eq 'indicator' ) {
-    _sync_configured_collector_indicators() if ( ( $ARGV[0] || '' ) eq 'list' );
-    my $action = shift @ARGV || '';
-    if ( $action eq 'set' ) {
-        my ( $name, $label, $icon, $status ) = @ARGV;
-        die "Usage: dashboard indicator set <name> <label> <icon> <status>\n" if !$status;
-        my $item = $indicators->set_indicator(
-            $name,
-            label          => $label,
-            icon           => $icon,
-            status         => $status,
-            priority       => 100,
-            prompt_visible => 1,
-        );
-        print json_encode($item);
-        exit 0;
-    }
-    elsif ( $action eq 'list' ) {
-        print json_encode( [ $indicators->list_indicators ] );
-        exit 0;
-    }
-    elsif ( $action eq 'refresh-core' ) {
-        my $cwd = shift @ARGV || cwd();
-        print json_encode( $indicators->refresh_core_indicators( cwd => $cwd ) );
-        exit 0;
-    }
-}
-elsif ( $cmd eq 'collector' ) {
-    my $action = shift @ARGV || '';
-    if ( $action eq 'write-result' ) {
-        my ( $name, $exit_code ) = @ARGV;
-        die "Usage: dashboard collector write-result <name> <exit_code>\n" if !defined $exit_code;
-        local $/;
-        my $stdout = <STDIN>;
-        $collectors->write_result(
-            $name,
-            exit_code => $exit_code,
-            stdout    => defined $stdout ? $stdout : '',
-            stderr    => '',
-        );
-        exit 0;
-    }
-    elsif ( $action eq 'status' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector status <name>\n";
-        print json_encode( $collectors->read_status($name) || {} );
-        exit 0;
-    }
-    elsif ( $action eq 'list' ) {
-        print json_encode( [ $collectors->list_collectors ] );
-        exit 0;
-    }
-    elsif ( $action eq 'job' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector job <name>\n";
-        print json_encode( $collectors->read_job($name) || {} );
-        exit 0;
-    }
-    elsif ( $action eq 'output' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector output <name>\n";
-        print json_encode( $collectors->read_output($name) || {} );
-        exit 0;
-    }
-    elsif ( $action eq 'inspect' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector inspect <name>\n";
-        print json_encode( $collectors->inspect_collector($name) || {} );
-        exit 0;
-    }
-    elsif ( $action eq 'log' ) {
-        print $files->read('collector_log') // '';
-        exit 0;
-    }
-    elsif ( $action eq 'run' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector run <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
-        die "Unknown collector '$name'\n" if !$job;
-        print json_encode( $runner->run_once($job) );
-        exit 0;
-    }
-    elsif ( $action eq 'start' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector start <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
-        die "Unknown collector '$name'\n" if !$job;
-        my $pid = $runner->start_loop($job);
-        print "$pid\n";
-        exit 0;
-    }
-    elsif ( $action eq 'stop' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector stop <name>\n";
-        my $pid = $runner->stop_loop($name);
-        print defined $pid ? "$pid\n" : '';
-        exit 0;
-    }
-    elsif ( $action eq 'restart' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector restart <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
-        die "Unknown collector '$name'\n" if !$job;
-        $runner->stop_loop($name);
-        my $pid = $runner->start_loop($job);
-        print "$pid\n";
-        exit 0;
-    }
-}
-elsif ( $cmd eq 'config' ) {
-    my $action = shift @ARGV || '';
-    if ( $action eq 'init' ) {
-        my $file = $config->save_global(
-            {
-                collectors => [
-                    {
-                        name     => 'example.collector',
-                        command  => "printf 'example collector output\\n'",
-                        cwd      => 'home',
-                        interval => 60,
-                    },
-                ],
-            }
-        );
-        print "$file\n";
-        exit 0;
-    }
-    elsif ( $action eq 'show' ) {
-        _load_configured_path_aliases();
-        print json_encode( $config->merged );
-        exit 0;
-    }
-}
-elsif ( $cmd eq 'auth' ) {
-    my $action = shift @ARGV || '';
-    if ( $action eq 'add-user' ) {
-        my ( $username, $password ) = @ARGV;
-        die "Usage: dashboard auth add-user <username> <password>\n" if !$username || !$password;
-        print json_encode(
-            $auth->add_user(
-                username => $username,
-                password => $password,
-            )
-        );
-        exit 0;
-    }
-    elsif ( $action eq 'list-users' ) {
-        print json_encode( [ $auth->list_users ] );
-        exit 0;
-    }
-    elsif ( $action eq 'remove-user' ) {
-        my $username = shift @ARGV || die "Usage: dashboard auth remove-user <username>\n";
-        $auth->remove_user($username);
-        print json_encode( { removed => $username } );
-        exit 0;
-    }
-}
-elsif ( $cmd eq 'init' ) {
-    _migrate_saved_pages();
-    my $migrated = [];
-    my $config_file = $config->save_global(
-        {
-            collectors => [
-                {
-                    name     => 'example.collector',
-                    command  => "printf 'example collector output\\n'",
-                    cwd      => 'home',
-                    interval => 60,
-                },
-            ],
-        }
-    );
-
-    my @pages = $pages->list_saved_pages;
-    _seed_init_page( $pages, \@pages, _welcome_page() );
-    _seed_init_page( $pages, \@pages, _api_dashboard_page() );
-    _seed_init_page( $pages, \@pages, _db_dashboard_page() );
-
-    print json_encode(
-        {
-            config_file => $config_file,
-            runtime_root => $paths->runtime_root,
-            migrated_pages => $migrated,
-            pages        => [ $pages->list_saved_pages ],
-        }
-    );
-    exit 0;
-}
-elsif ( $cmd eq 'version' ) {
+if ( $cmd eq 'version' ) {
+    require Developer::Dashboard;
     print $Developer::Dashboard::VERSION, "\n";
     exit 0;
 }
-elsif ( $cmd eq 'page' ) {
-    _load_configured_path_aliases();
-    _migrate_saved_pages();
-    my $action = shift @ARGV || '';
-    if ( $action eq 'new' ) {
-        my $id = shift @ARGV || '';
-        my $title = shift @ARGV || 'Untitled';
-        my $page = Developer::Dashboard::PageDocument->new(
-            id          => $id || undef,
-            title       => $title,
-            description => 'Project-neutral Developer Dashboard page',
-            layout      => {
-                body => "Replace this body with your own page content.",
-            },
-            state => {
-                project => '',
-            },
-            actions => [
-                { id => 'example', label => 'Example Action' },
-            ],
-        );
-        print $page->canonical_instruction;
-        exit 0;
-    }
-    elsif ( $action eq 'save' ) {
-        my $id = shift @ARGV || die "Usage: dashboard page save <id>\n";
-        local $/;
-        my $source = <STDIN>;
-        my $page = $source =~ /^\s*\{/
-          ? Developer::Dashboard::PageDocument->from_json($source)
-          : Developer::Dashboard::PageDocument->from_instruction($source);
-        $page->{id} = $id;
-        my $file = $pages->save_page($page);
-        print "$file\n";
-        exit 0;
-    }
-    elsif ( $action eq 'list' ) {
-        print json_encode( [ $resolver->list_pages ] );
-        exit 0;
-    }
-    elsif ( $action eq 'show' ) {
-        my $id = shift @ARGV || die "Usage: dashboard page show <id>\n";
-        my $page = $resolver->load_named_page($id);
-        print $page->canonical_instruction;
-        exit 0;
-    }
-    elsif ( $action eq 'encode' ) {
-        my $id = shift @ARGV;
-        my $page;
-        if ($id) {
-            $page = $pages->load_saved_page($id);
-        }
-        else {
-            local $/;
-            my $source = <STDIN>;
-            $page = $source =~ /^\s*\{/
-              ? Developer::Dashboard::PageDocument->from_json($source)
-              : Developer::Dashboard::PageDocument->from_instruction($source);
-        }
-        print $pages->encode_page($page), "\n";
-        exit 0;
-    }
-    elsif ( $action eq 'decode' ) {
-        my $token = shift @ARGV || do {
-            local $/;
-            scalar <STDIN>;
-        };
-        $token =~ s/\s+$// if defined $token;
-        my $page = $pages->load_transient_page($token);
-        print $page->canonical_instruction;
-        exit 0;
-    }
-    elsif ( $action eq 'urls' ) {
-        my $id = shift @ARGV || die "Usage: dashboard page urls <id>\n";
-        my $page = $pages->load_saved_page($id);
-        print json_encode(
-            {
-                edit   => $pages->editable_url($page),
-                render => $pages->render_url($page),
-                source => $pages->source_url($page),
-            }
-        );
-        exit 0;
-    }
-    elsif ( $action eq 'render' ) {
-        my $source = shift @ARGV || '';
-        my $page;
-        if ($source) {
-            if ( -f $source ) {
-                open my $fh, '<', $source or die "Unable to read $source: $!";
-                local $/;
-                my $raw = <$fh>;
-                $page = $raw =~ /^\s*\{/
-                  ? Developer::Dashboard::PageDocument->from_json($raw)
-                  : Developer::Dashboard::PageDocument->from_instruction($raw);
-            }
-            else {
-                $page = $resolver->load_named_page($source);
-            }
-        }
-        else {
-            local $/;
-            my $source = <STDIN>;
-            $page = $source =~ /^\s*\{/
-              ? Developer::Dashboard::PageDocument->from_json($source)
-              : Developer::Dashboard::PageDocument->from_instruction($source);
-        }
-        $page->with_mode('render');
-        print $page->render_html;
-        exit 0;
-    }
-    elsif ( $action eq 'source' ) {
-        my $source = shift @ARGV || die "Usage: dashboard page source <id|token>\n";
-        my $page = eval { $resolver->load_named_page($source) };
-        if ( !$page ) {
-            die $@ if $source !~ /^[A-Za-z0-9+\/=]+$/;
-            $page = $pages->load_transient_page($source);
-        }
-        $page->with_mode('source');
-        print $page->canonical_instruction;
-        exit 0;
-    }
-}
-elsif ( $cmd eq 'action' ) {
-    _load_configured_path_aliases();
-    _migrate_saved_pages();
-    my $sub = shift @ARGV || '';
-    if ( $sub eq 'run' ) {
-        my $page_id = shift @ARGV || die "Usage: dashboard action run <page_id> <action_id>\n";
-        my $action_id = shift @ARGV || die "Usage: dashboard action run <page_id> <action_id>\n";
-        my $page = $resolver->load_named_page($page_id);
-        my ($action) = grep { ref($_) eq 'HASH' && ( $_->{id} || '' ) eq $action_id } @{ $page->as_hash->{actions} || [] };
-        die "Unknown action '$action_id'\n" if !$action;
-        print json_encode(
-            $actions->run_page_action(
-                action => $action,
-                page   => $page,
-                source => $page->{meta}{source_kind} || 'saved',
-            )
-        );
-        exit 0;
-    }
-}
-elsif ( $cmd eq 'docker' ) {
-    _load_configured_path_aliases();
-    my $sub = shift @ARGV || '';
-    if ( $sub eq 'compose' ) {
-        my @addons;
-        my @modes;
-        my @services;
-        my $project_root = '';
-        my $dry_run = 0;
-        Getopt::Long::Configure(qw(pass_through no_getopt_compat no_auto_abbrev));
-        GetOptionsFromArray(
-            \@ARGV,
-            'addon=s@'   => \@addons,
-            'mode=s@'    => \@modes,
-            'service=s@' => \@services,
-            'project=s'  => \$project_root,
-            'dry-run!'   => \$dry_run,
-        );
-        Getopt::Long::Configure(qw(no_pass_through getopt_compat auto_abbrev));
-        my $result = $docker->resolve(
-            addons       => \@addons,
-            args         => \@ARGV,
-            modes        => \@modes,
-            services     => \@services,
-            project_root => $project_root || undef,
-        );
-        if ($dry_run) {
-            print json_encode($result);
-            exit 0;
-        }
-        chdir $result->{project_root} or die "Unable to chdir to $result->{project_root}: $!";
-        local @ENV{ keys %{ $result->{env} } } = values %{ $result->{env} } if %{ $result->{env} };
-        exec @{ $result->{command} };
-        die "Unable to exec docker compose: $!";
-    }
-}
-elsif ( $cmd eq 'serve' ) {
-    _load_configured_path_aliases();
-    _migrate_saved_pages();
-    my $action = @ARGV && $ARGV[0] !~ /^-/ ? shift @ARGV : '';
-    if ( $action eq 'logs' ) {
-        my $follow = 0;
-        my $lines;
-        GetOptionsFromArray(
-            \@ARGV,
-            'f'   => \$follow,
-            'n=i' => \$lines,
-        );
-        print $runtime->web_log(
-            follow => $follow,
-            ( defined $lines ? ( lines => $lines ) : () ),
-        );
-        exit 0;
-    }
-    if ( $action eq 'workers' ) {
-        my $workers = shift @ARGV;
-        my $host = '0.0.0.0';
-        my $port = 7890;
-        GetOptionsFromArray(
-            \@ARGV,
-            'host=s' => \$host,
-            'port=i' => \$port,
-        );
-        my $saved = $config->save_global_web_workers($workers);
-        my $running = $runtime->running_web;
-        my $pid;
-        if ( !$running ) {
-            $pid = $runtime->start_web(
-                host    => $host,
-                port    => $port,
-                workers => $saved->{workers},
-            );
-        }
-        print json_encode(
-            {
-                %{$saved},
-                ( defined $pid ? ( pid => $pid ) : () ),
-            }
-        );
-        exit 0;
-    }
-    unshift @ARGV, $action if defined $action && $action ne '';
-    my $settings = $config->web_settings;
-    my $host = $settings->{host};
-    my $port = $settings->{port};
-    my $workers = $settings->{workers};
-    my $ssl = $settings->{ssl};
-    my $foreground = 0;
-    GetOptionsFromArray(
-        \@ARGV,
-        'host=s'      => \$host,
-        'port=i'      => \$port,
-        'workers=i'   => \$workers,
-        'ssl!'        => \$ssl,
-        'foreground!' => \$foreground,
-    );
-    $config->save_global_web_settings(
-        host    => $host,
-        port    => $port,
-        workers => $workers,
-        ssl     => $ssl,
-    );
-    my $result = $runtime->start_web(
-        foreground => $foreground,
-        host       => $host,
-        port       => $port,
-        workers    => $workers,
-        ssl        => $ssl,
-    );
-    if (!$foreground) {
-        print json_encode(
-            {
-                host    => $host,
-                port    => $port,
-                workers => $workers,
-                ssl     => $ssl,
-                pid     => $result,
-            }
-        );
-    }
-    exit 0;
-}
-elsif ( $cmd eq 'stop' ) {
-    print json_encode( $runtime->stop_all );
-    exit 0;
-}
-elsif ( $cmd eq 'restart' ) {
-    _load_configured_path_aliases();
-    my $settings = $config->web_settings;
-    my $host = $settings->{host};
-    my $port = $settings->{port};
-    my $workers = $settings->{workers};
-    my $ssl = $settings->{ssl};
-    GetOptionsFromArray(
-        \@ARGV,
-        'host=s'    => \$host,
-        'port=i'    => \$port,
-        'workers=i' => \$workers,
-        'ssl!'      => \$ssl,
-    );
-    print json_encode(
-        $runtime->restart_all(
-            host    => $host,
-            port    => $port,
-            workers => $workers,
-            ssl     => $ssl,
-        )
-    );
-    exit 0;
-}
-elsif ( $cmd eq 'shell' ) {
-    my $shell = shift @ARGV || 'bash';
-    if ( $shell eq 'bash' ) {
-        my $dashboard_cmd = _shell_dashboard_command();
-        my $bootstrap = <<'BASH';
-cdr() {
-  local target
-  target="$(__DASHBOARD_CMD__ path resolve "$1" 2>/dev/null || true)"
-  if [ -z "$target" ]; then
-    target="$(__DASHBOARD_CMD__ path locate "$@" | perl -MJSON::XS -0777 -ne 'my $a=JSON::XS->new->decode($_); print $a->[0] // q{}')"
-  fi
-  if [ -n "$target" ]; then
-    cd "$target"
-  fi
+
+if ( my $helper_path = _builtin_helper_path($cmd) ) {
+    _exec_switchboard_command( $helper_path, @ARGV );
 }
 
-dd_cdr() {
-  cdr "$@"
+if ( my $custom_path = _custom_command_path($cmd) ) {
+    _exec_switchboard_command( $custom_path, @ARGV );
 }
 
-which_dir() {
-  __DASHBOARD_CMD__ path resolve "$1" 2>/dev/null || __DASHBOARD_CMD__ path locate "$@"
-}
-
-export PS1='$(__DASHBOARD_CMD__ ps1 --jobs \j --mode compact)'
-BASH
-        $bootstrap =~ s/__DASHBOARD_CMD__/$dashboard_cmd/g;
-        print $bootstrap;
-        exit 0;
-    }
-    die "Unsupported shell '$shell'\n";
-}
-else {
-    my $user_cli = _custom_command_path($cmd);
-    if ( -d $user_cli ) {
-        my $run = File::Spec->catfile( $user_cli, 'run' );
-        if ( -f $run && -x $run ) {
-            exec { $run } $run, @ARGV;
-            die "Unable to exec $run: $!";
-        }
-    }
-    if ( -f $user_cli && -x $user_cli ) {
-        exec { $user_cli } $user_cli, @ARGV;
-        die "Unable to exec $user_cli: $!";
-    }
-}
-
-# _standalone_builtin_executable($cmd)
-# Resolves a standalone built-in command executable that should be exec'd before loading the heavy runtime.
-# Input: top-level dashboard subcommand string.
-# Output: executable path string or undef when the command stays in the main script.
-sub _standalone_builtin_executable {
-    my ($cmd) = @_;
-    return if !$cmd;
-
-    my %map = map { $_ => $_ } qw(of open-file pjq pyq ptomq pjp);
-    my $name = $map{$cmd} || return;
-    my $path = File::Spec->catfile( $Bin, $name );
-    return if !-f $path;
-    return $path;
-}
+pod2usage(
+    -exitval  => 1,
+    -verbose  => 99,
+    -sections => [qw(NAME SYNOPSIS)],
+);
 
 # _prime_command_result_env($cmd, @argv)
-# Runs executable command hook files from ~/.developer-dashboard/cli/<cmd> and
-# exports their captured outputs as RESULT JSON for later hooks and the final
-# command implementation.
+# Runs executable per-command hook files from every DD-OOP-LAYERS CLI root and
+# exposes their captured output through RESULT JSON for later hooks and the
+# final command target.
 # Input: top-level command name plus the remaining argv list.
-# Output: true when hook processing completes.
+# Output: true value after hook execution completes.
 sub _prime_command_result_env {
     my ( $cmd, @argv ) = @_;
     delete $ENV{RESULT};
+    $ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if defined $cmd && $cmd ne '';
     return 1 if !defined $cmd || $cmd eq '';
 
-    my $hook_root = _command_hook_root($cmd);
-    return 1 if !-d $hook_root;
+    my @hook_roots = _command_hook_roots($cmd);
+    return 1 if !@hook_roots;
+    my $stream = $cmd eq 'doctor' ? 0 : 1;
 
-    opendir my $dh, $hook_root or return 1;
     my %results;
-    for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
-        my $path = File::Spec->catfile( $hook_root, $entry );
-        next if !-f $path || !-x $path;
-        next if $entry eq 'run';
+    for my $hook_root (@hook_roots) {
+        opendir my $dh, $hook_root or next;
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
+            my $path = File::Spec->catfile( $hook_root, $entry );
+            next if !is_runnable_file($path);
+            next if $entry eq 'run';
 
-        my $hook_result = _run_command_hook_streaming( $path, @argv );
-        $results{$entry} = {
-            stdout => $hook_result->{stdout},
-            stderr => $hook_result->{stderr},
-        };
-        $results{$entry}{exit_code} = $hook_result->{exit_code} if defined $hook_result->{exit_code};
-        $ENV{RESULT} = JSON::XS->new->canonical->encode( \%results );
+            my $hook_result = _run_command_hook_streaming(
+                $path,
+                stream => $stream,
+                argv   => \@argv,
+            );
+            my $result_key = exists $results{$entry} ? _command_hook_result_key($path) : $entry;
+            $results{$result_key} = {
+                stdout => $hook_result->{stdout},
+                stderr => $hook_result->{stderr},
+            };
+            $results{$result_key}{exit_code} = $hook_result->{exit_code} if defined $hook_result->{exit_code};
+            $ENV{RESULT} = JSON::XS->new->canonical->encode( \%results );
+        }
+        closedir $dh;
     }
-    closedir $dh;
 
     delete $ENV{RESULT} if !%results;
     return 1;
 }
 
-# _run_command_hook_streaming($path, @argv)
-# Runs one executable hook file, streams its stdout/stderr live, and captures
-# both channels for RESULT JSON propagation.
-# Input: executable path plus remaining dashboard argv list.
-# Output: hash reference with stdout, stderr, and exit_code.
+# _run_command_hook_streaming($path, %args)
+# Executes one hook file, streams its output live, and captures stdout/stderr so
+# later hooks and the final command can inspect RESULT JSON.
+# Input: executable hook path plus an optional stream flag and argv array ref.
+# Output: hash reference containing stdout, stderr, and exit_code.
 sub _run_command_hook_streaming {
-    my ( $path, @argv ) = @_;
-    open my $stdin, '<', '/dev/null' or die "Unable to open /dev/null for hook stdin: $!";
+    my ( $path, %args ) = @_;
+    my $stream = exists $args{stream} ? $args{stream} : 1;
+    my @argv = @{ $args{argv} || [] };
+    open my $stdin, '<', File::Spec->devnull() or die "Unable to open " . File::Spec->devnull() . " for hook stdin: $!";
     my $stderr = gensym();
     my $stdout;
-    my $pid = open3( $stdin, $stdout, $stderr, $path, @argv );
+    my @command = command_argv_for_path($path);
+    my $pid = open3( $stdin, $stdout, $stderr, @command, @argv );
     close $stdin;
 
-    my $selector = IO::Select->new( $stdout, $stderr );
+    my $selector  = IO::Select->new( $stdout, $stderr );
     my $stdout_fd = fileno($stdout);
     my $stderr_fd = fileno($stderr);
     my $stdout_text = '';
@@ -879,13 +153,13 @@ sub _run_command_hook_streaming {
             }
 
             if ( fileno($fh) == $stdout_fd ) {
-                print STDOUT $buffer;
+                print STDOUT $buffer if $stream;
                 $stdout_text .= $buffer;
                 next;
             }
 
             if ( fileno($fh) == $stderr_fd ) {
-                print STDERR $buffer;
+                print STDERR $buffer if $stream;
                 $stderr_text .= $buffer;
                 next;
             }
@@ -900,26 +174,32 @@ sub _run_command_hook_streaming {
     };
 }
 
-# _command_hook_root($cmd)
-# Resolves the per-command hook directory under the runtime CLI extension root.
+# _command_hook_roots($cmd)
+# Resolves every per-command hook directory across DD-OOP-LAYERS from home to
+# the deepest participating layer.
 # Input: top-level command name string.
-# Output: directory path string, preferring <command>/ over <command>.d/.
-sub _command_hook_root {
+# Output: ordered list of hook directory paths.
+sub _command_hook_roots {
     my ($cmd) = @_;
-    return '' if !defined $cmd || $cmd eq '';
-    for my $root ( _cli_runtime_roots() ) {
+    return () if !defined $cmd || $cmd eq '';
+    my @roots;
+    for my $root ( _cli_runtime_layers() ) {
         my $plain_root = File::Spec->catdir( $root, $cmd );
-        return $plain_root if -d $plain_root;
+        if ( -d $plain_root ) {
+            push @roots, $plain_root;
+            next;
+        }
         my $d_root = File::Spec->catdir( $root, $cmd . '.d' );
-        return $d_root if -d $d_root;
+        push @roots, $d_root if -d $d_root;
     }
-    return File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'cli', $cmd );
+    return @roots;
 }
 
 # _custom_command_path($cmd)
-# Resolves the effective custom command path from project-local and home CLI roots.
+# Resolves the effective layered custom command target from the deepest child
+# layer outward to the home runtime.
 # Input: top-level command name string.
-# Output: file or directory path string.
+# Output: file or directory path string, or empty string when absent.
 sub _custom_command_path {
     my ($cmd) = @_;
     return '' if !defined $cmd || $cmd eq '';
@@ -927,310 +207,117 @@ sub _custom_command_path {
         my $path = File::Spec->catfile( $root, $cmd );
         return $path if -e $path;
     }
-    return File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', $cmd );
+    return '';
+}
+
+# _builtin_helper_path($cmd)
+# Resolves one dashboard-managed built-in helper under the home runtime and
+# stages the shipped helper assets there on demand.
+# Input: top-level command name string.
+# Output: helper file path string or empty string when unsupported.
+sub _builtin_helper_path {
+    my ($cmd) = @_;
+    my $helper = Developer::Dashboard::InternalCLI::canonical_helper_name($cmd);
+    return '' if $helper eq '';
+    require Developer::Dashboard::PathRegistry;
+    my $paths = Developer::Dashboard::PathRegistry->new(
+        home            => $ENV{HOME},
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    Developer::Dashboard::InternalCLI::ensure_helpers( paths => $paths );
+    return Developer::Dashboard::InternalCLI::helper_path( paths => $paths, name => $helper );
+}
+
+# _exec_switchboard_command($path, @argv)
+# Replaces the current dashboard process with a resolved built-in helper or
+# layered custom command target.
+# Input: resolved file or directory path plus argv list for the target command.
+# Output: never returns on success; false when the target is not runnable.
+sub _exec_switchboard_command {
+    my ( $path, @argv ) = @_;
+    return 0 if !defined $path || $path eq '';
+    $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} ||= abs_path($0) || $0;
+    $ENV{DEVELOPER_DASHBOARD_REPO_LIB} ||= $dashboard_lib if defined $dashboard_lib && -d $dashboard_lib;
+
+    if ( -d $path ) {
+        my $run = _resolve_directory_runner($path);
+        if ($run) {
+            my @command = command_argv_for_path($run);
+            exec { $command[0] } @command, @argv;
+            die "Unable to exec $run: $!";
+        }
+    }
+    if ( my $command_path = resolve_runnable_file($path) ) {
+        my @command = command_argv_for_path($command_path);
+        exec { $command[0] } @command, @argv;
+        die "Unable to exec $command_path: $!";
+    }
+    return 0;
+}
+
+# _command_hook_result_key($path)
+# Builds a stable RESULT hash key for one hook path so same-named hooks from
+# different layers do not overwrite each other.
+# Input: absolute hook path string.
+# Output: stable hook result key string.
+sub _command_hook_result_key {
+    my ($path) = @_;
+    my $home = $ENV{HOME} || '';
+    return File::Spec->abs2rel( $path, $home ) if $home ne '';
+    return $path;
+}
+
+# _cli_runtime_layers()
+# Resolves the participating CLI roots for DD-OOP-LAYERS in home-to-leaf order.
+# Input: none.
+# Output: ordered list of CLI root directory paths.
+sub _cli_runtime_layers {
+    require Developer::Dashboard::PathRegistry;
+    my $paths = Developer::Dashboard::PathRegistry->new(
+        home            => $ENV{HOME},
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    return $paths->cli_layers;
 }
 
 # _cli_runtime_roots()
-# Returns project-local then home CLI roots for top-level command resolution before the heavy runtime loads.
+# Returns layered CLI roots in deepest-first lookup order for top-level command
+# resolution.
 # Input: none.
-# Output: ordered list of CLI root directory path strings.
+# Output: ordered list of CLI root directory paths.
 sub _cli_runtime_roots {
-    my @roots;
-    my %seen;
-    my $cwd = cwd();
-    my $project_root = _project_root_for($cwd);
-    for my $root (
-        ( defined $project_root && -d File::Spec->catdir( $project_root, '.developer-dashboard' )
-            ? File::Spec->catdir( $project_root, '.developer-dashboard', 'cli' )
-            : () ),
-        File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'cli' ),
-      )
-    {
-        next if !defined $root || $root eq '';
-        next if $seen{$root}++;
-        push @roots, $root;
-    }
-    return @roots;
+    return reverse _cli_runtime_layers();
 }
 
-# _project_root_for($start_dir)
-# Resolves the nearest project root containing a .git directory.
-# Input: starting directory path string.
-# Output: project root directory path string or undef.
-sub _project_root_for {
+# _resolve_directory_runner($dir)
+# Resolves the runnable entrypoint for one directory-backed command or helper.
+# Input: command directory path.
+# Output: runnable file path string or undef when no known runner exists.
+sub _resolve_directory_runner {
     my ($dir) = @_;
-    while ($dir) {
-        return $dir if -d File::Spec->catdir( $dir, '.git' );
-        my $parent = File::Spec->catdir( $dir, File::Spec->updir );
-        $parent = Cwd::abs_path($parent) if $parent ne $dir;
-        last if !$parent || $parent eq $dir;
-        $dir = $parent;
+    return if !defined $dir || $dir eq '' || !-d $dir;
+    for my $name (qw(run run.pl run.ps1 run.cmd run.bat run.sh run.bash)) {
+        my $path = File::Spec->catfile( $dir, $name );
+        my $resolved = resolve_runnable_file($path);
+        return $resolved if $resolved;
     }
     return;
 }
-
-# _seed_init_page($pages, $known_ids, $page)
-# Saves one seeded page when it does not already exist in the effective bookmark roots.
-# Input: page store, array reference of known ids, and page document object.
-# Output: true when the page already existed or was written.
-sub _seed_init_page {
-    my ( $pages, $known_ids, $page ) = @_;
-    my $id = $page->as_hash->{id} || return 1;
-    return 1 if grep { $_ eq $id } @{ $known_ids || [] };
-    $pages->save_page($page);
-    push @{ $known_ids || [] }, $id;
-    return 1;
-}
-
-# _welcome_page()
-# Builds the seeded welcome bookmark page for dashboard init.
-# Input: none.
-# Output: Developer::Dashboard::PageDocument object.
-sub _welcome_page {
-    return Developer::Dashboard::PageDocument->new(
-        id          => 'welcome',
-        title       => 'Welcome to Developer Dashboard',
-        description => 'A project-neutral local dashboard starter page.',
-        layout      => {
-            body => "Developer Dashboard is ready.\n\nUse dashboard page new/save to create more pages.\nUse dashboard serve to browse them.\nUse dashboard collector run to refresh prepared data.\nUse dashboard ps1 from your shell to render prompt status.",
-        },
-        state => {
-            project => '',
-        },
-        actions => [
-            { id => 'serve', label => 'Run dashboard serve' },
-            { id => 'ps1',   label => 'Use dashboard ps1 in your shell' },
-        ],
-    );
-}
-
-# _api_dashboard_page()
-# Builds the seeded API dashboard bookmark page inspired by the legacy request workspace without carrying forward sensitive defaults.
-# Input: none.
-# Output: Developer::Dashboard::PageDocument object.
-sub _api_dashboard_page {
-    return Developer::Dashboard::PageDocument->new(
-        id          => 'api-dashboard',
-        title       => 'API Dashboard',
-        description => 'A generic request workspace for trying endpoints with headers, body content, and response inspection.',
-        layout      => {
-            body => <<'HTML',
-<style>
-.api-dashboard-grid { display:grid; gap:16px; }
-.api-dashboard-card { border:1px solid #d9d3c7; padding:16px; background:#fffaf1; }
-.api-dashboard-row { display:grid; gap:12px; grid-template-columns: 140px 1fr; align-items:center; margin-bottom:12px; }
-.api-dashboard-row input, .api-dashboard-row select, .api-dashboard-row textarea { width:100%; box-sizing:border-box; padding:10px; font-family: monospace; }
-.api-dashboard-actions { display:flex; gap:12px; flex-wrap:wrap; }
-.api-dashboard-response { min-height:220px; white-space:pre-wrap; overflow:auto; background:#1f2a2e; color:#f4efe3; padding:12px; }
-</style>
-<div class="api-dashboard-grid">
-  <section class="api-dashboard-card">
-    <h2>Request</h2>
-    <div class="api-dashboard-row">
-      <label for="api-method">Method</label>
-      <select id="api-method">
-        <option>GET</option>
-        <option>POST</option>
-        <option>PUT</option>
-        <option>PATCH</option>
-        <option>DELETE</option>
-      </select>
-    </div>
-    <div class="api-dashboard-row">
-      <label for="api-url">URL</label>
-      <input id="api-url" placeholder="https://example.test/api" value="">
-    </div>
-    <div class="api-dashboard-row">
-      <label for="api-headers">Headers</label>
-      <textarea id="api-headers" rows="5" placeholder='{"Authorization":"Bearer ..."}'></textarea>
-    </div>
-    <div class="api-dashboard-row">
-      <label for="api-body">Body</label>
-      <textarea id="api-body" rows="8" placeholder='{"hello":"world"}'></textarea>
-    </div>
-    <div class="api-dashboard-actions">
-      <button type="button" id="api-send">Send Request</button>
-      <button type="button" id="api-clear">Clear Response</button>
-    </div>
-  </section>
-  <section class="api-dashboard-card">
-    <h2>Response</h2>
-    <div id="api-meta"></div>
-    <pre id="api-response" class="api-dashboard-response">Ready.</pre>
-  </section>
-</div>
-<script>
-(function () {
-  const methodEl = document.getElementById('api-method');
-  const urlEl = document.getElementById('api-url');
-  const headersEl = document.getElementById('api-headers');
-  const bodyEl = document.getElementById('api-body');
-  const responseEl = document.getElementById('api-response');
-  const metaEl = document.getElementById('api-meta');
-  document.getElementById('api-clear').addEventListener('click', function () {
-    metaEl.textContent = '';
-    responseEl.textContent = 'Ready.';
-  });
-  document.getElementById('api-send').addEventListener('click', async function () {
-    const url = urlEl.value.trim();
-    if (!url) {
-      responseEl.textContent = 'Enter a URL first.';
-      return;
-    }
-    let headers = {};
-    if (headersEl.value.trim()) {
-      try {
-        headers = JSON.parse(headersEl.value);
-      } catch (error) {
-        responseEl.textContent = 'Header JSON error: ' + error.message;
-        return;
-      }
-    }
-    const options = {
-      method: methodEl.value,
-      headers: headers
-    };
-    if (bodyEl.value.trim()) {
-      options.body = bodyEl.value;
-    }
-    responseEl.textContent = 'Sending request...';
-    metaEl.textContent = '';
-    try {
-      const started = Date.now();
-      const response = await fetch(url, options);
-      const text = await response.text();
-      metaEl.textContent = response.status + ' ' + response.statusText + ' in ' + (Date.now() - started) + 'ms';
-      responseEl.textContent = text;
-    } catch (error) {
-      responseEl.textContent = 'Request failed: ' + error.message;
-    }
-  });
-}());
-</script>
-HTML
-        },
-        state => {},
-        actions => [
-            { id => 'source', label => 'View Source', kind => 'builtin', builtin => 'page.source', safe => 1 },
-        ],
-    );
-}
-
-# _db_dashboard_page()
-# Builds the seeded DB dashboard bookmark page as a neutral SQL workspace without embedding connection details or credentials.
-# Input: none.
-# Output: Developer::Dashboard::PageDocument object.
-sub _db_dashboard_page {
-    return Developer::Dashboard::PageDocument->new(
-        id          => 'db-dashboard',
-        title       => 'DB Dashboard',
-        description => 'A generic SQL scratchpad and result workspace with no bundled credentials or vendor-specific defaults.',
-        layout      => {
-            body => <<'HTML',
-<style>
-.db-dashboard-grid { display:grid; gap:16px; }
-.db-dashboard-card { border:1px solid #d9d3c7; padding:16px; background:#fffaf1; }
-.db-dashboard-row { display:grid; gap:12px; margin-bottom:12px; }
-.db-dashboard-row input, .db-dashboard-row textarea { width:100%; box-sizing:border-box; padding:10px; font-family: monospace; }
-.db-dashboard-toolbar { display:flex; gap:12px; flex-wrap:wrap; }
-.db-dashboard-result { min-height:220px; white-space:pre-wrap; overflow:auto; background:#1f2a2e; color:#f4efe3; padding:12px; }
-</style>
-<div class="db-dashboard-grid">
-  <section class="db-dashboard-card">
-    <h2>Connection Notes</h2>
-    <div class="db-dashboard-row">
-      <label for="db-target">Target</label>
-      <input id="db-target" placeholder="Write the target database or environment name">
-    </div>
-    <div class="db-dashboard-row">
-      <label for="db-query">SQL</label>
-      <textarea id="db-query" rows="12" placeholder="select now();"></textarea>
-    </div>
-    <div class="db-dashboard-toolbar">
-      <button type="button" id="db-preview">Preview Query</button>
-      <button type="button" id="db-clear">Clear</button>
-    </div>
-  </section>
-  <section class="db-dashboard-card">
-    <h2>Scratch Output</h2>
-    <pre id="db-result" class="db-dashboard-result">Write a query and preview it here. Execution is intentionally left to your own project-specific tooling.</pre>
-  </section>
-</div>
-<script>
-(function () {
-  const targetEl = document.getElementById('db-target');
-  const queryEl = document.getElementById('db-query');
-  const resultEl = document.getElementById('db-result');
-  document.getElementById('db-clear').addEventListener('click', function () {
-    targetEl.value = '';
-    queryEl.value = '';
-    resultEl.textContent = 'Write a query and preview it here. Execution is intentionally left to your own project-specific tooling.';
-  });
-  document.getElementById('db-preview').addEventListener('click', function () {
-    const target = targetEl.value.trim() || '(unspecified target)';
-    const query = queryEl.value.trim() || '(empty query)';
-    resultEl.textContent = [
-      'Target: ' + target,
-      '',
-      'SQL Preview:',
-      query
-    ].join('\n');
-  });
-}());
-</script>
-HTML
-        },
-        state => {},
-        actions => [
-            { id => 'source', label => 'View Source', kind => 'builtin', builtin => 'page.source', safe => 1 },
-        ],
-    );
-}
-
-# _shell_dashboard_command()
-# Builds a shell-safe command that re-invokes the current dashboard entrypoint.
-# Input: none.
-# Output: shell command string suitable for generated shell bootstrap helpers.
-sub _shell_dashboard_command {
-    my $script = File::Spec->rel2abs($0);
-    my $repo_lib = File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', 'lib' ) );
-    if ( -f File::Spec->catfile( $repo_lib, 'Developer', 'Dashboard.pm' ) ) {
-        return join ' ',
-          _shell_quote($^X),
-          '-I' . _shell_quote($repo_lib),
-          _shell_quote($script);
-    }
-    return _shell_quote($script);
-}
-
-# _shell_quote($value)
-# Quotes a single shell token for safe interpolation into generated shell helpers.
-# Input: scalar string.
-# Output: single-quoted shell token string.
-sub _shell_quote {
-    my ($value) = @_;
-    $value = '' if !defined $value;
-    $value =~ s/'/'\\''/g;
-    return "'$value'";
-}
-
-pod2usage(
-    -exitval => 1,
-    -verbose => 99,
-    -sections => [ qw(NAME SYNOPSIS) ],
-);
 
 __END__
 
 =head1 NAME
 
-dashboard - command-line entrypoint for Developer Dashboard
+dashboard - thin command switchboard for Developer Dashboard
 
 =head1 SYNOPSIS
 
   dashboard help
   dashboard init
   dashboard update
+  dashboard doctor [--fix]
   dashboard ps1 [--jobs N] [--cwd PATH] [--mode compact|extended] [--color]
   dashboard paths
   dashboard path list
@@ -1241,10 +328,14 @@ dashboard - command-line entrypoint for Developer Dashboard
   dashboard path project-root
   dashboard of [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
   dashboard open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
-  dashboard pjq [path] [file]
-  dashboard pyq [path] [file]
-  dashboard ptomq [path] [file]
-  dashboard pjp [path] [file]
+  dashboard ticket [ticket-ref]
+  dashboard jq [path] [file]
+  dashboard yq [path] [file]
+  dashboard tomq [path] [file]
+  dashboard propq [path] [file]
+  dashboard iniq [path] [file]
+  dashboard csvq [path] [file]
+  dashboard xmlq [path] [file]
   dashboard encode < input.txt
   dashboard decode < token.txt
   dashboard indicator set <name> <label> <icon> <status>
@@ -1261,6 +352,11 @@ dashboard - command-line entrypoint for Developer Dashboard
   dashboard collector start <name>
   dashboard collector stop <name>
   dashboard collector restart <name>
+  dashboard skills install <git-url>
+  dashboard skills uninstall <repo-name>
+  dashboard skills update <repo-name>
+  dashboard skills list
+  dashboard skill <repo-name> <command> [args...]
   dashboard config init
   dashboard config show
   dashboard auth add-user <username> <password>
@@ -1280,77 +376,74 @@ dashboard - command-line entrypoint for Developer Dashboard
   dashboard serve [logs [-f] [-n N]|workers <N>] [--host HOST] [--port PORT] [--workers N] [--foreground]
   dashboard stop
   dashboard restart [--host HOST] [--port PORT] [--workers N]
-  dashboard shell [bash]
+  dashboard shell [bash|zsh|sh|ps|powershell|pwsh]
+  dashboard version
   dashboard <custom-subcommand> [args...]
 
 =head1 DESCRIPTION
 
-Developer Dashboard provides a project-neutral local developer cockpit with:
+The public C<dashboard> entrypoint is intentionally kept thin.
+
+It only:
 
 =over 4
 
 =item *
 
-saved and transient dashboard pages
+bootstraps the repo lib path when running from a checkout
 
 =item *
 
-file-backed collectors and indicators
+runs layered per-command hooks across C<DD-OOP-LAYERS>
 
 =item *
 
-prompt rendering for C<PS1>
+stages dashboard-managed built-in helpers under F<~/.developer-dashboard/cli/dd/>
 
 =item *
 
-background web-service lifecycle management
+resolves the effective command from the deepest child layer back to home
 
 =item *
 
-trusted and safer page actions
-
-=item *
-
-config-backed providers and aliases
-
-=item *
-
-project-aware Docker Compose resolution
-
-=item *
-
-user CLI extensions loaded from F<~/.developer-dashboard/cli>
-
-=item *
-
-built-in C<dashboard of> / C<dashboard open-file> resolution for direct files,
-C<file:line> references, Perl module names, Java class names, and recursive
-pattern matching
-
-=item *
-
-built-in C<dashboard pjq> / C<dashboard pyq> / C<dashboard ptomq> /
-C<dashboard pjp> parsing for JSON, YAML, TOML, and Java properties input
+execs the resolved helper or custom command
 
 =back
 
-Unknown top-level subcommands can be provided by executable files under
-F<~/.developer-dashboard/cli>. For example, C<dashboard foobar a b> will exec
-F<~/.developer-dashboard/cli/foobar> with C<a b> as argv, while preserving
-stdin, stdout, and stderr.
+The real built-in command implementations live outside this entrypoint, either
+in private staged helper scripts under F<share/private-cli/> or in reusable
+Perl modules loaded by those helpers.
 
-Per-command hook files can also be placed in either
-F<~/.developer-dashboard/cli/E<lt>commandE<gt>> or
-F<~/.developer-dashboard/cli/E<lt>commandE<gt>.d>. Executable files in that
-directory are run in sorted filename order before the real command runs,
-their stdout and stderr stream live to the terminal while still being
-accumulated into C<$ENV{RESULT}> as JSON, and non-executable files are
-skipped. Built-in commands such as C<dashboard pjq> use the same hook
-location. A directory-backed custom command may provide its real executable as
-F<~/.developer-dashboard/cli/E<lt>commandE<gt>/run>; that runner receives the
-final C<$ENV{RESULT}> value after the hook files finish. If a subcommand does
-not have a built-in implementation, the real command can be supplied as
-F<~/.developer-dashboard/cli/E<lt>commandE<gt>> or
-F<~/.developer-dashboard/cli/E<lt>commandE<gt>/run>.
+=for comment FULL-POD-DOC START
 
-Run C<dashboard> with no arguments for the quick synopsis, or C<dashboard help> for the full POD-backed manual.
+=head1 PURPOSE
+
+Public entrypoint script in the Developer Dashboard codebase. This file bootstraps the runtime, resolves DD-OOP-LAYERS hooks and command targets, stages private helpers, and hands execution off to the final command.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists as the one public executable users run. Its job is intentionally narrow: bootstrap the environment, evaluate layered hooks, resolve the final command, and hand off without owning the heavy implementation bodies itself.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing top-level command bootstrap, layered hook execution, helper staging, or command handoff behaviour.
+
+=head1 HOW TO USE
+
+Run C<dashboard E<lt>commandE<gt>>. If you are changing this file, keep it focused on bootstrap, layered hook execution, helper staging, command resolution, and C<exec>; move heavy behaviour into modules or staged helper scripts instead.
+
+=head1 WHAT USES IT
+
+It is used directly by end users, by tests that execute C<dashboard ...>, by staged shell helpers that re-enter the public command, and by release/integration smoke flows.
+
+=head1 EXAMPLES
+
+  dashboard paths
+  dashboard page list
+
+Both commands go through this public switchboard, which then resolves hooks and hands off to the real helper implementation.
+
+=for comment FULL-POD-DOC END
+
+=cut

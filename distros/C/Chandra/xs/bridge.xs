@@ -73,6 +73,12 @@ CODE:
     "})();\n";
 
     RETVAL = newSVpvn(CHANDRA_BRIDGE_JS, sizeof(CHANDRA_BRIDGE_JS) - 1);
+    /* append any registered extensions */
+    if (_ext_count > 0) {
+        SV *ext_js = chandra_ext_generate_js(aTHX);
+        sv_catsv(RETVAL, ext_js);
+        SvREFCNT_dec(ext_js);
+    }
 }
 OUTPUT:
     RETVAL
@@ -166,6 +172,14 @@ CODE:
     dst[dlen] = '\0';
     SvCUR_set(out, dlen);
     SvPOK_on(out);
+    /* append escaped extensions */
+    if (_ext_count > 0) {
+        SV *ext_js = chandra_ext_generate_js(aTHX);
+        SV *ext_esc = chandra_ext_escape_sv(aTHX_ ext_js);
+        sv_catsv(out, ext_esc);
+        SvREFCNT_dec(ext_js);
+        SvREFCNT_dec(ext_esc);
+    }
     RETVAL = out;
 }
 OUTPUT:

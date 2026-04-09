@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Grooves;
-$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7004';
+$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7006';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -59,15 +59,15 @@ use namespace::clean;
 #pod A groove is a numbered and named hash reference, with the following
 #pod structure:
 #pod
-#pod   { 1 => {
-#pod       cat    => "Basic Patterns",
-#pod       name   => "ONE AND SEVEN & FIVE AND THIRTEEN",
+#pod   1 => {
+#pod       cat  => "Basic Patterns",
+#pod       name => "ONE AND SEVEN & FIVE AND THIRTEEN",
 #pod       groove => sub {
-#pod         $self->_groove(
-#pod         $self->kick  => ['1000001000000000'],
-#pod         $self->snare => ['0000100000001000'],
-#pod       ),
-#pod     },
+#pod           $self->_groove(
+#pod               kick  => { num => $self->kick, pat => ['1000001000000000'] },
+#pod               snare => { num => $self->snare, pat => ['0000100000001000'] },
+#pod           );
+#pod       },
 #pod   },
 #pod   2 => { ... }, ... }
 #pod
@@ -256,11 +256,11 @@ sub search {
 sub _groove {
     my ($self, %patterns) = @_;
     if ($self->return_patterns) {
-        return \%patterns;
+        return map { $_ => [ split '', $patterns{$_}{pat}[0] ] } keys %patterns;
     }
     else {
         $self->drummer->sync_patterns(
-            %patterns,
+            (map { $patterns{$_}{num} => $patterns{$_}{pat} } keys %patterns),
             duration => $self->duration,
         );
     }
@@ -276,8 +276,8 @@ sub _grooves {
             name => "ONE AND SEVEN & FIVE AND THIRTEEN",
             groove => sub {
                 $self->_groove(
-                    kick  => ['1000001000000000'],
-                    snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000001000000000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 );
             },
         },
@@ -287,9 +287,9 @@ sub _grooves {
             name => "BOOTS N' CATS",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000010000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1000000010000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -298,9 +298,9 @@ sub _grooves {
             cat  => "Basic Patterns",
             name => "TINY HOUSE",
             groove => sub {
-                $self->_groove( # 123456789ABCDEF0
-                    $self->kick => ['1000100010001000'],
-                    $self->open => ['0010001000100010'],
+                $self->_groove(
+                    kick => { num => $self->kick, pat => ['1000100010001000'] },
+                    open => { num => $self->open, pat => => ['0010001000100010'] },
                 ),
             },
         },
@@ -310,8 +310,8 @@ sub _grooves {
             name => "GOOD TO GO",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1001001000100000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1001001000100000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -321,9 +321,9 @@ sub _grooves {
             name => "HIP HOP",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010001100000010'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1010001100000010'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -333,9 +333,9 @@ sub _grooves {
             name => "STANDARD BREAK 1",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000000100000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101011101010'],
+                    kick   => { num => $self->kick, pat => ['1000000000100000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101011101010'] },
                 ),
             },
         },
@@ -345,9 +345,9 @@ sub _grooves {
             name => "STANDARD BREAK 2",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000000100000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101110100010'],
+                    kick   => { num => $self->kick, pat => ['1000000000100000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101110100010'] },
                 ),
             },
         },
@@ -357,9 +357,9 @@ sub _grooves {
             name => "ROLLING BREAK",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000100100000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1000000100100000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -369,10 +369,10 @@ sub _grooves {
             name => "THE UNKNOWN DRUMMER",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1001001000100000'],
-                    $self->snare  => ['0100100100001000'],
-                    $self->closed => ['0110110100000100'],
-                    $self->open   => ['0000000010000010'],
+                    kick   => { num => $self->kick, pat => ['1001001000100000'] },
+                    snare  => { num => $self->snare, pat => ['0100100100001000'] },
+                    closed => { num => $self->closed, pat => ['0110110100000100'] },
+                    open   => { num => $self->open, pat => => ['0000000010000010'] },
                 ),
             },
         },
@@ -382,10 +382,10 @@ sub _grooves {
             name => "ROCK 1",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000110100000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
-                    $self->cymbal => ['1000000000000000'],
+                    kick   => { num => $self->kick, pat => ['1000000110100000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
+                    cymbal => { num => $self->cymbal, pat => ['1000000000000000'] },
                 ),
             },
         },
@@ -395,9 +395,9 @@ sub _grooves {
             name => "ROCK 2",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000110100000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1000000110100000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -407,10 +407,10 @@ sub _grooves {
             name => "ROCK 3",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000110100000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101000'],
-                    $self->open   => ['0000000000000010'],
+                    kick   => { num => $self->kick, pat => ['1000000110100000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101000'] },
+                    open  => { num => $self->open, pat => => ['0000000000000010'] },
                 ),
             },
         },
@@ -420,10 +420,10 @@ sub _grooves {
             name => "ROCK 4",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000110100000'],
-                    $self->snare  => ['0000100000001011'],
-                    $self->closed => ['1010101010101000'],
-                    $self->open   => ['0000000000000010'],
+                    kick   => { num => $self->kick, pat => ['1000000110100000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001011'] },
+                    closed => { num => $self->closed, pat => ['1010101010101000'] },
+                    open   => { num => $self->open, pat => => ['0000000000000010'] },
                 ),
             },
         },
@@ -433,8 +433,8 @@ sub _grooves {
             name => "ELECTRO 1 - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000001000000000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000001000000000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -444,8 +444,8 @@ sub _grooves {
             name => "ELECTRO 1 - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000001000100010'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000001000100010'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -457,8 +457,8 @@ sub _grooves {
             name => "ELECTRO 2 - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000000000100100'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000000000100100'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -468,8 +468,8 @@ sub _grooves {
             name => "ELECTRO 3 - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000001000010000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000001000010000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -479,8 +479,8 @@ sub _grooves {
             name => "ELECTRO 3 - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000001000010100'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000001000010100'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -490,8 +490,8 @@ sub _grooves {
             name => "ELECTRO 4",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000001000100100'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000001000100100'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -501,9 +501,9 @@ sub _grooves {
             name => "SIBERIAN NIGHTS",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001000000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1011101110111011'],
+                    kick   => { num => $self->kick, pat => ['1000001000000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1011101110111011'] },
                 ),
             },
         },
@@ -513,11 +513,11 @@ sub _grooves {
             name => "NEW WAVE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001011000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1101111111111111'],
-                    $self->open   => ['0010000000000000'],
-                    $self->shaker => ['0000100000001000'],
+                    kick   => { num => $self->kick, pat => ['1000001011000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1101111111111111'] },
+                    open   => { num => $self->open, pat => => ['0010000000000000'] },
+                    shaker => { num => $self->shaker, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -527,10 +527,10 @@ sub _grooves {
             name => "HOUSE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000100010001000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->open   => ['0010001000100010'],
-                    $self->cymbal => ['1000000000000000'],
+                    kick   => { num => $self->kick, pat => ['1000100010001000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    open   => { num => $self->open, pat => => ['0010001000100010'] },
+                    cymbal => { num => $self->cymbal, pat => ['1000000000000000'] },
                 ),
             },
         },
@@ -540,10 +540,10 @@ sub _grooves {
             name => "HOUSE 2",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001011000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1101101111011011'],
-                    $self->open   => ['0010010000100100'],
+                    kick   => { num => $self->kick, pat => ['1000001011000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1101101111011011'] },
+                    open   => { num => $self->open, pat => => ['0010010000100100'] },
                 ),
             },
         },
@@ -553,11 +553,11 @@ sub _grooves {
             name => "BRIT HOUSE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001011000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1101110111011101'],
-                    $self->open   => ['0010001000100010'],
-                    $self->cymbal => ['0010001000100010'],
+                    kick   => { num => $self->kick, pat => ['1000001011000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1101110111011101'] },
+                    open   => { num => $self->open, pat => => ['0010001000100010'] },
+                    cymbal => { num => $self->cymbal, pat => ['0010001000100010'] },
                 ),
             },
         },
@@ -567,11 +567,11 @@ sub _grooves {
             name => "FRENCH HOUSE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001011000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
-                    $self->open   => ['0101010101010101'],
-                    $self->shaker => ['1110101111101011'],
+                    kick   => { num => $self->kick, pat => ['1000001011000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
+                    open   => { num => $self->open, pat => => ['0101010101010101'] },
+                    shaker => { num => $self->shaker, pat => ['1110101111101011'] },
                 ),
             },
         },
@@ -581,11 +581,11 @@ sub _grooves {
             name => "DIRTY HOUSE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010100010101001'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['0000000000100001'],
-                    $self->open   => ['0010000000000010'],
-                    $self->clap   => ['0010100010101000'],
+                    kick   => { num => $self->kick, pat => ['1010100010101001'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['0000000000100001'] },
+                    open   => { num => $self->open, pat => => ['0010000000000010'] },
+                    clap   => { num => $self->clap, pat => ['0010100010101000'] },
                 ),
             },
         },
@@ -595,10 +595,10 @@ sub _grooves {
             name => "DEEP HOUSE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000100010001000'],
-                    $self->clap   => ['0000100000001000'],
-                    $self->closed => ['0100000101000000'],
-                    $self->open   => ['0010001000100010'],
+                    kick   => { num => $self->kick, pat => ['1000100010001000'] },
+                    clap   => { num => $self->clap, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['0100000101000000'] },
+                    open   => { num => $self->open, pat => => ['0010001000100010'] },
                 ),
             },
         },
@@ -608,11 +608,11 @@ sub _grooves {
             name => "DEEPER HOUSE",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1000100010001000'],
-                    $self->clap    => ['0100000001000000'],
-                    $self->open    => ['0010001000110010'],
-                    $self->shaker  => ['0001000010000000'],
-                    $self->mid_tom => ['0010000100100000'],
+                    kick    => { num => $self->kick, pat => ['1000100010001000'] },
+                    clap    => { num => $self->clap, pat => ['0100000001000000'] },
+                    open    => { num => $self->open, pat => => ['0010001000110010'] },
+                    shaker  => { num => $self->shaker, pat => ['0001000010000000'] },
+                    mid_tom => { num => $self->mid_tom, pat => ['0010000100100000'] },
                 ),
             },
         },
@@ -622,11 +622,11 @@ sub _grooves {
             name => "SLOW DEEP HOUSE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000100010001000'],
-                    $self->clap   => ['0000100000001000'],
-                    $self->closed => ['1000100010001000'],
-                    $self->open   => ['0011001101100010'],
-                    $self->shaker => ['1111111111111111'],
+                    kick   => { num => $self->kick, pat => ['1000100010001000'] },
+                    clap   => { num => $self->clap, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1000100010001000'] },
+                    open   => { num => $self->open, pat => => ['0011001101100010'] },
+                    shaker => { num => $self->shaker, pat => ['1111111111111111'] },
                 ),
             },
         },
@@ -636,10 +636,10 @@ sub _grooves {
             name => "FOOTWORK - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1001001010010010'],
-                    $self->clap    => ['0000000000001000'],
-                    $self->closed  => ['0010000000100000'],
-                    $self->rimshot => ['1111111111111111'],
+                    kick    => { num => $self->kick, pat => ['1001001010010010'] },
+                    clap    => { num => $self->clap, pat => ['0000000000001000'] },
+                    closed  => { num => $self->closed, pat => ['0010000000100000'] },
+                    rimshot => { num => $self->rimshot, pat => ['1111111111111111'] },
                 ),
             },
         },
@@ -649,10 +649,10 @@ sub _grooves {
             name => "FOOTWORK - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1001001010010010'],
-                    $self->clap    => ['0000000000001000'],
-                    $self->closed  => ['0010001100100010'],
-                    $self->rimshot => ['1111111111111111'],
+                    kick    => { num => $self->kick, pat => ['1001001010010010'] },
+                    clap    => { num => $self->clap, pat => ['0000000000001000'] },
+                    closed  => { num => $self->closed, pat => ['0010001100100010'] },
+                    rimshot => { num => $self->rimshot, pat => ['1111111111111111'] },
                 ),
             },
         },
@@ -662,9 +662,9 @@ sub _grooves {
             name => "MIAMI BASS - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001000100100'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1011101110111011'],
+                    kick   => { num => $self->kick, pat => ['1000001000100100'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1011101110111011'] },
                 ),
             },
         },
@@ -674,9 +674,9 @@ sub _grooves {
             name => "MIAMI BASS - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001000000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1011101110111011'],
+                    kick   => { num => $self->kick, pat => ['1000001000000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1011101110111011'] },
                 ),
             },
         },
@@ -686,10 +686,10 @@ sub _grooves {
             name => "SALLY",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1000001000100010'],
-                    $self->snare   => ['0000100000001000'],
-                    $self->closed  => ['1010101010101010'],
-                    $self->low_tom => ['1000001000100010'],
+                    kick    => { num => $self->kick, pat => ['1000001000100010'] },
+                    snare   => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed  => { num => $self->closed, pat => ['1010101010101010'] },
+                    low_tom => { num => $self->low_tom, pat => ['1000001000100010'] },
                 ),
             },
         },
@@ -699,9 +699,9 @@ sub _grooves {
             name => "ROCK THE PLANET",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1001001000000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1011101110111111'],
+                    kick   => { num => $self->kick, pat => ['1001001000000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1011101110111111'] },
                 ),
             },
         },
@@ -711,8 +711,8 @@ sub _grooves {
             name => "HIP HOP 1 - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000001100010010'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000001100010010'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -722,8 +722,8 @@ sub _grooves {
             name => "HIP HOP 1 - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000000100010000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000000100010000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -733,8 +733,8 @@ sub _grooves {
             name => "HIP HOP 2 - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000000111010101'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000000111010101'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -744,8 +744,8 @@ sub _grooves {
             name => "HIP HOP 2 - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1000000110010000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1000000110010000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -755,8 +755,8 @@ sub _grooves {
             name => "HIP HOP 3 - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1010000010100000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1010000010100000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -766,8 +766,8 @@ sub _grooves {
             name => "HIP HOP 3 - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1010000011010000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1010000011010000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -777,8 +777,8 @@ sub _grooves {
             name => "HIP HOP 4 - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1001000101100001'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1001000101100001'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -788,8 +788,8 @@ sub _grooves {
             name => "HIP HOP 4 - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1010000111100000'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1010000111100000'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -799,8 +799,8 @@ sub _grooves {
             name => "HIP HOP 5",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1010000110100001'],
-                    $self->snare => ['0000100000001000'],
+                    kick  => { num => $self->kick, pat => ['1010000110100001'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -810,9 +810,9 @@ sub _grooves {
             name => "HIP HOP 6",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010000000110001'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1010000000110001'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -822,9 +822,9 @@ sub _grooves {
             name => "HIP HOP 7",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000100100101'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1000000100100101'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -834,10 +834,10 @@ sub _grooves {
             name => "HIP HOP 8",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1001000010110000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1101101111011011'],
-                    $self->open   => ['0000010000000100'],
+                    kick   => { num => $self->kick, pat => ['1001000010110000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1101101111011011'] },
+                    open   => { num => $self->open, pat => => ['0000010000000100'] },
                 ),
             },
         },
@@ -847,9 +847,9 @@ sub _grooves {
             name => "TRAP - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001000001000'],
-                    $self->snare  => ['0000000010000000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1000001000001000'] },
+                    snare  => { num => $self->snare, pat => ['0000000010000000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -859,9 +859,9 @@ sub _grooves {
             name => "TRAP - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['0010100000000000'],
-                    $self->snare  => ['0000000010000000'],
-                    $self->closed => ['1110101010101110'],
+                    kick   => { num => $self->kick, pat => ['0010100000000000'] },
+                    snare  => { num => $self->snare, pat => ['0000000010000000'] },
+                    closed => { num => $self->closed, pat => ['1110101010101110'] },
                 ),
             },
         },
@@ -871,11 +871,11 @@ sub _grooves {
             name => "PLANET ROCK - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1000001000000000'],
-                    $self->snare   => ['0000100000001000'],
-                    $self->clap    => ['0000100000001000'],
-                    $self->closed  => ['1011101110111111'],
-                    $self->cowbell => ['1010101101011010'],
+                    kick    => { num => $self->kick, pat => ['1000001000000000'] },
+                    snare   => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap    => { num => $self->clap, pat => ['0000100000001000'] },
+                    closed  => { num => $self->closed, pat => ['1011101110111111'] },
+                    cowbell => { num => $self->cowbell, pat => ['1010101101011010'] },
                 ),
             },
         },
@@ -885,11 +885,11 @@ sub _grooves {
             name => "PLANET ROCK - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1000001000100100'],
-                    $self->snare   => ['0000100000001000'],
-                    $self->clap    => ['0000100000001000'],
-                    $self->closed  => ['1011101110111111'],
-                    $self->cowbell => ['1010101101011010'],
+                    kick    => { num => $self->kick, pat => ['1000001000100100'] },
+                    snare   => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap    => { num => $self->clap, pat => ['0000100000001000'] },
+                    closed  => { num => $self->closed, pat => ['1011101110111111'] },
+                    cowbell => { num => $self->cowbell, pat => ['1010101101011010'] },
                 ),
             },
         },
@@ -899,10 +899,10 @@ sub _grooves {
             name => "INNA CLUB",
             groove => sub {
                 $self->_groove( # 123456789ABCDEF0
-                    $self->kick  => ['0010000100100001'],
-                    $self->snare => ['0000100000001000'],
-                    $self->clap  => ['0000100000001000'],
-                    $self->open  => ['1010101010101010'],
+                    kick  => { num => $self->kick, pat => ['0010000100100001'] },
+                    snare => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap  => { num => $self->clap, pat => ['0000100000001000'] },
+                    open  => { num => $self->open, pat => => ['1010101010101010'] },
                 ),
             },
         },
@@ -912,9 +912,9 @@ sub _grooves {
             name => "ICE",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001000100010'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->shaker => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1000001000100010'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    shaker => { num => $self->shaker, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -924,10 +924,10 @@ sub _grooves {
             name => "BACK TO CALI - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001000000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->clap   => ['0000101010001010'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1000001000000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap   => { num => $self->clap, pat => ['0000101010001010'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -937,11 +937,11 @@ sub _grooves {
             name => "BACK TO CALI - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001000100100'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->clap   => ['1000101010001000'],
-                    $self->closed => ['1010101010100010'],
-                    $self->open   => ['0000000000001000'],
+                    kick   => { num => $self->kick, pat => ['1000001000100100'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap   => { num => $self->clap, pat => ['1000101010001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010100010'] },
+                    open   => { num => $self->open, pat => => ['0000000000001000'] },
                 ),
             },
         },
@@ -951,11 +951,11 @@ sub _grooves {
             name => "SNOOP STYLES",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1001001000010000'],
-                    $self->snare   => ['0000100000001000'],
-                    $self->clap    => ['0000100000001000'],
-                    $self->rimshot => ['0010010010010000'],
-                    $self->open    => ['1001001000010000'],
+                    kick    => { num => $self->kick, pat => ['1001001000010000'] },
+                    snare   => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap    => { num => $self->clap, pat => ['0000100000001000'] },
+                    rimshot => { num => $self->rimshot, pat => ['0010010010010000'] },
+                    open    => { num => $self->open, pat => => ['1001001000010000'] },
                 ),
             },
         },
@@ -965,11 +965,11 @@ sub _grooves {
             name => "THE GROOVE - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1001000100010010'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->shaker => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
-                    $self->open   => ['0000000100000000'],
+                    kick   => { num => $self->kick, pat => ['1001000100010010'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    shaker => { num => $self->shaker, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
+                    open   => { num => $self->open, pat => => ['0000000100000000'] },
                 ),
             },
         },
@@ -979,14 +979,14 @@ sub _grooves {
             name => "THE GROOVE - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1001000100010010'],
-                    $self->snare   => ['0000100000001000'],
-                    $self->shaker  => ['0000100000001000'],
-                    $self->closed  => ['1010101010000100'],
-                    $self->open    => ['0000000100111010'],
-                    $self->hi_tom  => ['0000000001100000'],
-                    $self->mid_tom => ['0000000000010100'],
-                    $self->low_tom => ['0000000000000011'],
+                    kick    => { num => $self->kick, pat => ['1001000100010010'] },
+                    snare   => { num => $self->snare, pat => ['0000100000001000'] },
+                    shaker  => { num => $self->shaker, pat => ['0000100000001000'] },
+                    closed  => { num => $self->closed, pat => ['1010101010000100'] },
+                    open    => { num => $self->open, pat => => ['0000000100111010'] },
+                    hi_tom  => { num => $self->hi_tom, pat => ['0000000001100000'] },
+                    mid_tom => { num => $self->mid_tom, pat => ['0000000000010100'] },
+                    low_tom => { num => $self->low_tom, pat => ['0000000000000011'] },
                 ),
             },
         },
@@ -996,11 +996,11 @@ sub _grooves {
             name => "BOOM BAP",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1010010001000100'],
-                    $self->snare   => ['0010001000100010'],
-                    $self->clap    => ['0010001000100010'],
-                    $self->closed  => ['1111111111111101'],
-                    $self->cowbell => ['0000000010000000'],
+                    kick    => { num => $self->kick, pat => ['1010010001000100'] },
+                    snare   => { num => $self->snare, pat => ['0010001000100010'] },
+                    clap    => { num => $self->clap, pat => ['0010001000100010'] },
+                    closed  => { num => $self->closed, pat => ['1111111111111101'] },
+                    cowbell => { num => $self->cowbell, pat => ['0000000010000000'] },
                 ),
             },
         },
@@ -1010,11 +1010,11 @@ sub _grooves {
             name => "MOST WANTED - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000001011000001'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->clap   => ['0000100000001000'],
-                    $self->closed => ['0010101010101010'],
-                    $self->cymbal => ['1000000000000000'],
+                    kick   => { num => $self->kick, pat => ['1000001011000001'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap   => { num => $self->clap, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['0010101010101010'] },
+                    cymbal => { num => $self->cymbal, pat => ['1000000000000000'] },
                 ),
             },
         },
@@ -1024,11 +1024,11 @@ sub _grooves {
             name => "MOST WANTED - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['0010001011000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->clap   => ['0000100000001000'],
-                    $self->closed => ['0010101010101010'],
-                    $self->open   => ['0010000000000000'],
+                    kick   => { num => $self->kick, pat => ['0010001011000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    clap   => { num => $self->clap, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['0010101010101010'] },
+                    open   => { num => $self->open, pat => => ['0010000000000000'] },
                 ),
             },
         },
@@ -1038,9 +1038,9 @@ sub _grooves {
             name => "AMEN BREAK - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010000000110000'],
-                    $self->snare  => ['0000000101001001'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1010000000110000'] },
+                    snare  => { num => $self->snare, pat => ['0000000101001001'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -1050,10 +1050,10 @@ sub _grooves {
             name => "AMEN BREAK - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1010000000110000'],
-                    $self->snare   => ['0000100101001001'],
-                    $self->rimshot => ['0000100000000000'],
-                    $self->closed  => ['1010101010101010'],
+                    kick    => { num => $self->kick, pat => ['1010000000110000'] },
+                    snare   => { num => $self->snare, pat => ['0000100101001001'] },
+                    rimshot => { num => $self->rimshot, pat => ['0000100000000000'] },
+                    closed  => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -1063,10 +1063,10 @@ sub _grooves {
             name => "AMEN BREAK - C",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1010000000100000'],
-                    $self->snare   => ['0000100101001001'],
-                    $self->rimshot => ['0000000000000010'],
-                    $self->closed  => ['1010101010101010'],
+                    kick    => { num => $self->kick, pat => ['1010000000100000'] },
+                    snare   => { num => $self->snare, pat => ['0000100101001001'] },
+                    rimshot => { num => $self->rimshot, pat => ['0000000000000010'] },
+                    closed  => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -1076,10 +1076,10 @@ sub _grooves {
             name => "AMEN BREAK - D",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010000000100000'],
-                    $self->snare  => ['0100100101000010'],
-                    $self->closed => ['1010101010001010'],
-                    $self->cymbal => ['0000000000100000'],
+                    kick   => { num => $self->kick, pat => ['1010000000100000'] },
+                    snare  => { num => $self->snare, pat => ['0100100101000010'] },
+                    closed => { num => $self->closed, pat => ['1010101010001010'] },
+                    cymbal => { num => $self->cymbal, pat => ['0000000000100000'] },
                 ),
             },
         },
@@ -1089,10 +1089,10 @@ sub _grooves {
             name => "THE FUNKY DRUMMER",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010001000100100'],
-                    $self->snare  => ['0000100101011001'],
-                    $self->closed => ['1111111011111011'],
-                    $self->open   => ['0000000100000100'],
+                    kick   => { num => $self->kick, pat => ['1010001000100100'] },
+                    snare  => { num => $self->snare, pat => ['0000100101011001'] },
+                    closed => { num => $self->closed, pat => ['1111111011111011'] },
+                    open   => { num => $self->open, pat => => ['0000000100000100'] },
                 ),
             },
         },
@@ -1102,10 +1102,10 @@ sub _grooves {
             name => "IMPEACH THE PRESIDENT",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000110000010'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101110001010'],
-                    $self->open   => ['0000000000100000'],
+                    kick   => { num => $self->kick, pat => ['1000000110000010'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101110001010'] },
+                    open   => { num => $self->open, pat => => ['0000000000100000'] },
                 ),
             },
         },
@@ -1115,9 +1115,9 @@ sub _grooves {
             name => "WHEN THE LEVEE BREAKS",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1100000100110000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1100000100110000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -1127,9 +1127,9 @@ sub _grooves {
             name => "IT'S A NEW DAY",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010000000110001'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101010101010'],
+                    kick   => { num => $self->kick, pat => ['1010000000110001'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -1139,9 +1139,9 @@ sub _grooves {
             name => "THE BIG BEAT",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1001001010000000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['0000100000001000'],
+                    kick   => { num => $self->kick, pat => ['1001001010000000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['0000100000001000'] },
                 ),
             },
         },
@@ -1151,11 +1151,11 @@ sub _grooves {
             name => "ASHLEY'S ROACHCLIP",
             groove => sub {
                 $self->_groove(
-                    $self->kick    => ['1010001011000000'],
-                    $self->snare   => ['0000100000001000'],
-                    $self->closed  => ['1010101010001010'],
-                    $self->open    => ['0000000000100000'],
-                    $self->cowbell => ['1010101010101010'],
+                    kick    => { num => $self->kick, pat => ['1010001011000000'] },
+                    snare   => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed  => { num => $self->closed, pat => ['1010101010001010'] },
+                    open    => { num => $self->open, pat => => ['0000000000100000'] },
+                    cowbell => { num => $self->cowbell, pat => ['1010101010101010'] },
                 ),
             },
         },
@@ -1165,10 +1165,10 @@ sub _grooves {
             name => "PAPA WAS TOO",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000000110100001'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['0000100010101011'],
-                    $self->cymbal => ['0000100000000000'],
+                    kick   => { num => $self->kick, pat => ['1000000110100001'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['0000100010101011'] },
+                    cymbal => { num => $self->cymbal, pat => ['0000100000000000'] },
                 ),
             },
         },
@@ -1178,9 +1178,9 @@ sub _grooves {
             name => "SUPERSTITION",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000100010001000'],
-                    $self->snare  => ['0000100000001000'],
-                    $self->closed => ['1010101111101011'],
+                    kick   => { num => $self->kick, pat => ['1000100010001000'] },
+                    snare  => { num => $self->snare, pat => ['0000100000001000'] },
+                    closed => { num => $self->closed, pat => ['1010101111101011'] },
                 ),
             },
         },
@@ -1190,9 +1190,9 @@ sub _grooves {
             name => "CISSY STRUT - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1001010001011010'],
-                    $self->snare  => ['0000100101100000'],
-                    $self->cymbal => ['0000000000001010'],
+                    kick   => { num => $self->kick, pat => ['1001010001011010'] },
+                    snare  => { num => $self->snare, pat => ['0000100101100000'] },
+                    cymbal => { num => $self->cymbal, pat => ['0000000000001010'] },
                 ),
             },
         },
@@ -1202,8 +1202,8 @@ sub _grooves {
             name => "CISSY STRUT - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick  => ['1001000101011010'],
-                    $self->snare => ['0010011011000000'],
+                    kick  => { num => $self->kick, pat => ['1001000101011010'] },
+                    snare => { num => $self->snare, pat => ['0010011011000000'] },
                 ),
             },
         },
@@ -1213,9 +1213,9 @@ sub _grooves {
             name => "CISSY STRUT - C",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000100101011010'],
-                    $self->snare  => ['0010111001000000'],
-                    $self->cymbal => ['0000000000001010'],
+                    kick   => { num => $self->kick, pat => ['1000100101011010'] },
+                    snare  => { num => $self->snare, pat => ['0010111001000000'] },
+                    cymbal => { num => $self->cymbal, pat => ['0000000000001010'] },
                 ),
             },
         },
@@ -1225,9 +1225,9 @@ sub _grooves {
             name => "CISSY STRUT - D",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1000100101011010'],
-                    $self->snare  => ['1010010011000000'],
-                    $self->cymbal => ['0000000000001010'],
+                    kick   => { num => $self->kick, pat => ['1000100101011010'] },
+                    snare  => { num => $self->snare, pat => ['1010010011000000'] },
+                    cymbal => { num => $self->cymbal, pat => ['0000000000001010'] },
                 ),
             },
         },
@@ -1237,9 +1237,9 @@ sub _grooves {
             name => "HOOK AND SLING - A",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010000001000110'],
-                    $self->snare  => ['0000101100101000'],
-                    $self->closed => ['1011010011010010'],
+                    kick   => { num => $self->kick, pat => ['1010000001000110'] },
+                    snare  => { num => $self->snare, pat => ['0000101100101000'] },
+                    closed => { num => $self->closed, pat => ['1011010011010010'] },
                 ),
             },
         },
@@ -1249,9 +1249,9 @@ sub _grooves {
             name => "HOOK AND SLING - B",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['0000000000000010'],
-                    $self->snare  => ['1000110100110011'],
-                    $self->closed => ['1101001011001010'],
+                    kick   => { num => $self->kick, pat => ['0000000000000010'] },
+                    snare  => { num => $self->snare, pat => ['1000110100110011'] },
+                    closed => { num => $self->closed, pat => ['1101001011001010'] },
                 ),
             },
         },
@@ -1261,9 +1261,9 @@ sub _grooves {
             name => "HOOK AND SLING - C",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1100000000001101'],
-                    $self->snare  => ['0010101100110010'],
-                    $self->closed => ['1010110101001100'],
+                    kick   => { num => $self->kick, pat => ['1100000000001101'] },
+                    snare  => { num => $self->snare, pat => ['0010101100110010'] },
+                    closed => { num => $self->closed, pat => ['1010110101001100'] },
                 ),
             },
         },
@@ -1273,9 +1273,9 @@ sub _grooves {
             name => "HOOK AND SLING - D",
             groove => sub {
                 $self->_groove(
-                    $self->kick   => ['1010010000010110'],
-                    $self->snare  => ['0000100100100001'],
-                    $self->closed => ['1010110100000000'],
+                    kick   => { num => $self->kick, pat => ['1010010000010110'] },
+                    snare  => { num => $self->snare, pat => ['0000100100100001'] },
+                    closed => { num => $self->closed, pat => ['1010110100000000'] },
                 ),
             },
         },
@@ -1286,18 +1286,18 @@ sub _grooves {
             name => "",
             groove => sub {
                 $self->_groove(       # 123456789ABCDEF0
-                    $self->kick    => ['0000000000000000'],
-                    $self->snare   => ['0000000000000000'],
-                    $self->rimshot => ['0000000000000000'],
-                    $self->clap    => ['0000000000000000'],
-                    $self->shaker  => ['0000000000000000'],
-                    $self->closed  => ['0000000000000000'],
-                    $self->open    => ['0000000000000000'],
-                    $self->cowbell => ['0000000000000000'],
-                    $self->cymbal  => ['0000000000000000'],
-                    $self->hi_tom  => ['0000000000000000'],
-                    $self->mid_tom => ['0000000000000000'],
-                    $self->low_tom => ['0000000000000000'],
+                    kick    => { num => $self->kick, pat => ['0000000000000000'] },
+                    snare   => { num => $self->snare, pat => ['0000000000000000'] },
+                    rimshot => { num => $self->rimshot, pat => ['0000000000000000'] },
+                    clap    => { num => $self->clap, pat => ['0000000000000000'] },
+                    shaker  => { num => $self->shaker, pat => ['0000000000000000'] },
+                    closed  => { num => $self->closed, pat => ['0000000000000000'] },
+                    open    => { num => $self->open, pat => => ['0000000000000000'] },
+                    cowbell => { num => $self->cowbell, pat => ['0000000000000000'] },
+                    cymbal  => { num => $self->cymbal, pat => ['0000000000000000'] },
+                    hi_tom  => { num => $self->hi_tom, pat => ['0000000000000000'] },
+                    mid_tom => { num => $self->mid_tom, pat => ['0000000000000000'] },
+                    low_tom => { num => $self->low_tom, pat => ['0000000000000000'] },
                 ),
             },
         },
@@ -1320,7 +1320,7 @@ MIDI::Drummer::Tiny::Grooves
 
 =head1 VERSION
 
-version 0.7004
+version 0.7006
 
 =head1 SYNOPSIS
 
@@ -1374,15 +1374,15 @@ are L<linked below|/SEE ALSO>.
 A groove is a numbered and named hash reference, with the following
 structure:
 
-  { 1 => {
-      cat    => "Basic Patterns",
-      name   => "ONE AND SEVEN & FIVE AND THIRTEEN",
+  1 => {
+      cat  => "Basic Patterns",
+      name => "ONE AND SEVEN & FIVE AND THIRTEEN",
       groove => sub {
-        $self->_groove(
-        $self->kick  => ['1000001000000000'],
-        $self->snare => ['0000100000001000'],
-      ),
-    },
+          $self->_groove(
+              kick  => { num => $self->kick, pat => ['1000001000000000'] },
+              snare => { num => $self->snare, pat => ['0000100000001000'] },
+          );
+      },
   },
   2 => { ... }, ... }
 

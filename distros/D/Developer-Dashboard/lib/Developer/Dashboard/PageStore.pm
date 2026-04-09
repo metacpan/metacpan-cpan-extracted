@@ -3,7 +3,7 @@ package Developer::Dashboard::PageStore;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 use utf8;
 
 use Encode qw(decode FB_CROAK FB_DEFAULT);
@@ -49,10 +49,11 @@ sub save_page {
     my $id = $page->as_hash->{id} || die 'Saved pages require an id';
     my $file = $self->page_file($id);
     my $dir = dirname($file);
-    make_path($dir) if !-d $dir;
+    $self->{paths}->ensure_dir($dir);
     open my $fh, '>', $file or die "Unable to save $file: $!";
     print {$fh} $page->canonical_instruction;
     close $fh;
+    $self->{paths}->secure_file_permissions($file);
     return $file;
 }
 
@@ -64,7 +65,7 @@ sub load_saved_page {
     my ( $self, $id ) = @_;
     my $file = $self->_existing_page_file($id);
     die "Page '$id' not found" if !$file;
-    my $page = $self->_load_page_file($file);
+    my $page = $self->_load_page_file( $file, id => $id );
     $page->{id} ||= $id;
     $page->{meta}{source_kind} = 'saved';
     $page->{meta}{raw_instruction} = $self->_read_saved_instruction($file);
@@ -147,7 +148,7 @@ sub list_saved_pages {
         for my $entry ( $self->_saved_page_entries_for_root($root) ) {
             my $id = $entry->{id};
             next if !defined $id || $id eq '';
-            my $ok = eval { $self->_load_page_file( $entry->{file} ); 1 };
+            my $ok = eval { $self->_load_page_file( $entry->{file}, id => $id ); 1 };
             next if !$ok;
             $ids{$id} = 1;
         }
@@ -179,9 +180,11 @@ sub migrate_legacy_json_pages {
         my $id = $page->as_hash->{id} || basename( $entry, '.json' );
         $page->{id} = $id;
         my $target = $self->page_file($id);
+        $self->{paths}->ensure_dir( dirname($target) );
         open my $out, '>', $target or die "Unable to save $target: $!";
         print {$out} $page->canonical_instruction;
         close $out;
+        $self->{paths}->secure_file_permissions($target);
         unlink $file or die "Unable to remove $file: $!";
         push @migrated, { from => $entry, id => $id, file => $target };
     }
@@ -225,17 +228,57 @@ sub _existing_page_file {
     return;
 }
 
-# _load_page_file($file)
-# Loads and parses one bookmark file from disk.
-# Input: bookmark file path string.
+# _load_page_file($file, %args)
+# Loads and parses one bookmark file from disk, with raw nav/*.tt fragment fallback.
+# Input: bookmark file path string plus optional saved-page id.
 # Output: Developer::Dashboard::PageDocument object.
 sub _load_page_file {
-    my ( $self, $file ) = @_;
-    return Developer::Dashboard::PageDocument->from_instruction( $self->_read_saved_instruction($file) );
+    my ( $self, $file, %args ) = @_;
+    my $instruction = $self->_read_saved_instruction($file);
+    my $page = eval { Developer::Dashboard::PageDocument->from_instruction($instruction) };
+    return $page if $page;
+
+    my $id = $args{id} || '';
+    if ( $id =~ m{\Anav/.+\.tt\z} && $self->_looks_like_raw_nav_fragment($instruction) ) {
+        return $self->_raw_nav_fragment_page(
+            id          => $id,
+            instruction => $instruction,
+        );
+    }
+
+    die( $@ || "Unable to load bookmark file $file" );
+}
+
+# _raw_nav_fragment_page(%args)
+# Wraps a raw nav/*.tt Template Toolkit fragment file as a renderable page document.
+# Input: saved nav id and raw instruction text string.
+# Output: Developer::Dashboard::PageDocument object.
+sub _raw_nav_fragment_page {
+    my ( $self, %args ) = @_;
+    my $id = $args{id} || die 'Missing raw nav fragment id';
+    my $instruction = defined $args{instruction} ? $args{instruction} : '';
+    return Developer::Dashboard::PageDocument->new(
+        id     => $id,
+        title  => basename($id),
+        layout => { body => $instruction },
+        meta   => { source_format => 'raw-nav-tt' },
+    );
+}
+
+# _looks_like_raw_nav_fragment($instruction)
+# Decides whether one nav/*.tt file is a real raw TT/HTML fragment instead of junk text.
+# Input: raw saved file text string.
+# Output: boolean true when the file looks like raw TT/HTML nav content.
+sub _looks_like_raw_nav_fragment {
+    my ( $self, $instruction ) = @_;
+    return 0 if !defined $instruction || $instruction eq '';
+    return 1 if $instruction =~ /\[%/;
+    return 1 if $instruction =~ /<\s*[A-Za-z!\/][^>]*>/;
+    return 0;
 }
 
 # _read_saved_instruction($file)
-# Reads one saved bookmark file and normalizes legacy-invalid UTF-8 bytes.
+# Reads one saved bookmark file and normalizes older-invalid UTF-8 bytes.
 # Input: bookmark file path string.
 # Output: decoded instruction text string that is safe to emit as UTF-8 HTML/text.
 sub _read_saved_instruction {
@@ -250,7 +293,7 @@ sub _read_saved_instruction {
 }
 
 # _normalize_legacy_icon_markup($text)
-# Repairs browser-visible icon placeholders left behind by malformed legacy bookmark bytes.
+# Repairs browser-visible icon placeholders left behind by malformed older bookmark bytes.
 # Input: decoded bookmark instruction text string.
 # Output: normalized instruction text string with stable fallback glyphs in icon HTML contexts.
 sub _normalize_legacy_icon_markup {
@@ -313,5 +356,36 @@ encoded page transport.
 =head2 new, page_file, save_page, load_saved_page, load_transient_page, encode_page, editable_url, render_url, source_url, list_saved_pages, migrate_legacy_json_pages
 
 Manage saved and transient pages.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file stores and retrieves bookmark pages from the layered runtime.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::PageStore> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::PageStore -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

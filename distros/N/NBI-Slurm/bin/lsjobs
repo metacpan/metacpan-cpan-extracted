@@ -339,7 +339,7 @@ sub print_summary {
 
     say '';
     say BOLD . CYAN . '╔════════════════════════════════════════════════════════════════╗' . RESET;
-    say BOLD . CYAN . '║' . RESET . '  ' . BOLD . 'SLURM Job Queue Summary' . RESET . ' ' x 38 . BOLD . CYAN . '║' . RESET;
+    say BOLD . CYAN . '║' . RESET . '  ' . BOLD . 'SLURM Job Queue Summary' . RESET . ' ' x 39 . BOLD . CYAN . '║' . RESET;
     say BOLD . CYAN . '╚════════════════════════════════════════════════════════════════╝' . RESET;
     say '';
 
@@ -819,7 +819,7 @@ lsjobs - List your jobs (or others), and delete them if you wish
 
 =head1 VERSION
 
-version 0.19.0
+version 0.19.1
 
 =head1 SYNOPSIS
 
@@ -923,6 +923,25 @@ List jobs with a simplified view (hide some columns):
   lsjobs --hide nodelist --hide reason --hide totaltime
 
 =back
+
+=head1 FORMAT
+
+The output looks like
+
+  ╔════════════════════════════════════════════════════════════════╗
+  ║  SLURM Job Queue Summary                                       ║
+  ╚════════════════════════════════════════════════════════════════╝
+  
+    ▶ Running:  115  ◷ Pending:    4
+  
+    → Showing: 2 of 119 total jobs
+  
+  ┌──────────┬──────────┬─────────────┬────────────┬───────┬────────────┬────────────┬──────┬────────┬────────┐
+  │ JobID    │ User     │ Queue       │ Name       │ State │ Time       │ TotalTime  │ CPUS │ Memory │ Reason │
+  ├──────────┼──────────┼─────────────┼────────────┼───────┼────────────┼────────────┼──────┼────────┼────────┤ 
+  │ 18938400 │ telatina │ qib-compute │ session    │ ▶ RUN │ 1-02:05:08 │ 1-09:00:00 │ 12   │ 24000M │ ✓ None │
+  │ 19091254 │ telatina │ qib-compute │ nf-NFCORE> │ ▶ RUN │ 19:57      │ 4:00:00    │ 1    │ 7G     │ ✓ None │
+  └──────────┴──────────┴─────────────┴────────────┴───────┴────────────┴────────────┴──────┴────────┴────────┘
 
 =head1 SEE ALSO
 

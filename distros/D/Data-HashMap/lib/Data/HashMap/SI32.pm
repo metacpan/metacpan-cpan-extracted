@@ -2,7 +2,7 @@ package Data::HashMap::SI32;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub import {
     $^H{"Data::HashMap::SI32/hm_si32_put"}     = 1;

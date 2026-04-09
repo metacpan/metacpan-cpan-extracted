@@ -28,7 +28,7 @@
             "DBI" : "1.644",
             "DBIx::QuickDB" : "0.000040",
             "Digest::SHA" : "0",
-            "IO::Select" : "1.55",
+            "IO::Select" : "0",
             "IO::Socket::UNIX" : "1.55",
             "IPC::SysV" : "2.09",
             "Linux::Inotify2" : "2.3",
@@ -47,15 +47,16 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Importer" : "0.026",
+            "JSON::PP" : "0",
             "List::Util" : "1.33",
             "Object::HashBase" : "0.015",
             "POSIX" : "0",
             "Role::Tiny" : "2.002004",
             "Scalar::Util" : "0",
-            "Sub::Util" : "1.40",
             "Test2::IPC" : "1.302219",
             "Test2::Util::UUID" : "0.002010",
             "Time::HiRes" : "0",
+            "UUID" : "0.35",
             "overload" : "0",
             "parent" : "0",
             "perl" : "5.012000"
@@ -67,7 +68,7 @@
             "DBD::mysql" : "4.00",
             "DBI" : "1.644",
             "DBIx::QuickDB" : "0.000040",
-            "IO::Select" : "1.55",
+            "IO::Select" : "0",
             "IO::Socket::UNIX" : "1.55",
             "IPC::SysV" : "2.09",
             "Linux::Inotify2" : "2.3"
@@ -92,7 +93,7 @@
          "url" : "https://github.com/exodist/IPC-Manager/"
       }
    },
-   "version" : "0.000012",
+   "version" : "0.000014",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

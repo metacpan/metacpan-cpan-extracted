@@ -1,3 +1,7 @@
+0.19.1	2026-04-09
+
+* Title fixed in lsjobs
+
 0.19.0	2026-04-01
 
 * Harmonise 'session' CLI to accept -t TIME_STR in addition to -h HOURS_INT (similar to runjob)

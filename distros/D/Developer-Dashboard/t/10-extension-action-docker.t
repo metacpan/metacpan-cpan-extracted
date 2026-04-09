@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Cwd qw(abs_path);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -21,8 +22,23 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SessionStore;
 use Developer::Dashboard::Web::App;
 
+sub _portable_path {
+    my ($path) = @_;
+    return undef if !defined $path;
+    my $resolved = eval { abs_path($path) };
+    return defined $resolved && $resolved ne '' ? $resolved : $path;
+}
+
+sub is_same_path {
+    my ( $got, $expected, $label ) = @_;
+    is( _portable_path($got), _portable_path($expected), $label );
+}
+
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
+local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 chdir $home or die "Unable to chdir to $home: $!";
 
 my $repo = File::Spec->catdir( $home, 'projects', 'demo-app' );
@@ -315,7 +331,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
         services => ['worker'],
     );
     chdir $old or die $!;
-    is( $resolved->{project_root}, $repo, 'docker compose resolver uses current project root' );
+    is_same_path( $resolved->{project_root}, $repo, 'docker compose resolver uses current project root' );
     ok( grep( { /compose\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes discovered base file' );
     ok( grep( { /compose\.project\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes project overlay' );
     ok( grep( { /compose\.worker\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes service overlay' );
@@ -324,11 +340,11 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( !grep( { /green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver prefers isolated development compose files over compose.yml for selected services' );
     ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files automatically for selected services' );
     is( $resolved->{env}{APP_MODE}, 'dev', 'docker compose resolver merges mode env' );
-    is( $resolved->{env}{DDDC}, File::Spec->catdir( $repo, '.developer-dashboard', 'config', 'docker' ), 'docker compose resolver exports DDDC as the effective project-local docker config root' );
+    is_same_path( $resolved->{env}{DDDC}, File::Spec->catdir( $repo, '.developer-dashboard', 'config', 'docker' ), 'docker compose resolver exports DDDC as the effective project-local docker config root' );
     is( $resolved->{env}{MAILHOG_ENABLED}, '1', 'docker compose resolver merges addon env' );
     is_deeply( [ @{ $resolved->{command} }[0,1] ], [ 'docker', 'compose' ], 'docker compose resolver produces docker compose command' );
     is_deeply( $resolved->{precedence}, [ qw(base project service addon mode) ], 'docker compose resolver exposes overlay precedence' );
-    is(
+    is_same_path(
         ( grep { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } )[0],
         File::Spec->catfile( $repo, '.developer-dashboard', 'docker', 'green', 'development.compose.yml' ),
         'docker compose resolver prefers project-local isolated service folders over the home fallback root',
@@ -483,5 +499,36 @@ __END__
 
 This test verifies config-driven extensions, page actions, encoded action
 transport, and docker compose resolution behavior.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Test file in the Developer Dashboard codebase. This file tests extension actions and Docker-related command behaviour.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+
+=head1 WHEN TO USE
+
+Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+
+=head1 HOW TO USE
+
+Run it directly with C<prove -lv t/10-extension-action-docker.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+
+=head1 WHAT USES IT
+
+It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+
+=head1 EXAMPLES
+
+  prove -lv t/10-extension-action-docker.t
+
+Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+
+=for comment FULL-POD-DOC END
 
 =cut

@@ -10,7 +10,7 @@ use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 use English;
 use Error::Pure::Utils qw(err_get);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub module_name {
 	my $self = shift;
@@ -68,6 +68,7 @@ sub process {
 						'error' => 'Bad ISBN in 020a field, extra characters.',
 						'params' => {
 							'Value' => $isbn,
+							'proposed_value' => $isbn_obj->as_string,
 						},
 					);
 				} else {
@@ -75,6 +76,7 @@ sub process {
 						'error' => 'Bad ISBN in 020a field, bad formatting.',
 						'params' => {
 							'Value' => $isbn,
+							'proposed_value' => $isbn_obj->as_string,
 						},
 					);
 				}

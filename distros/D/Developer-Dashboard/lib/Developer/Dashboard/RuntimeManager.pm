@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '2.02';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -151,7 +151,7 @@ sub running_web {
 }
 
 # stop_web()
-# Stops the managed web service, including legacy compatible process shapes.
+# Stops the managed web service, including older compatible process shapes.
 # Input: none.
 # Output: stopped pid or undef.
 sub stop_web {
@@ -211,9 +211,78 @@ sub start_collectors {
         my $schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
         next if $schedule eq 'manual';
         my $pid = eval { $self->{runner}->start_loop($job) };
+        if ($@) {
+            my $error = $@;
+            chomp $error;
+            for my $started (@started) {
+                eval { $self->{runner}->stop_loop( $started->{name} ) };
+            }
+            my $name = $job->{name} || '(unnamed)';
+            die "Failed to start collector '$name': $error\n";
+        }
         push @started, { name => $job->{name}, pid => $pid } if defined $pid;
     }
     return @started;
+}
+
+# serve_all(%args)
+# Starts the web service and ensures configured collector loops follow the same
+# lifecycle action.
+# Input: host, port, worker count, ssl flag, and foreground options.
+# Output: hash reference describing the started web pid/result and collector actions.
+sub serve_all {
+    my ( $self, %args ) = @_;
+    my $host = '0.0.0.0';
+    $host = $args{host} if defined $args{host};
+    my $port = 7890;
+    $port = $args{port} if defined $args{port};
+    my $workers = 1;
+    $workers = $args{workers} if defined $args{workers};
+    my $ssl = $args{ssl} ? 1 : 0;
+    my $foreground = $args{foreground} ? 1 : 0;
+
+    if ($foreground) {
+        my @collectors = $self->start_collectors;
+        my $result = eval {
+            $self->start_web(
+                foreground => 1,
+                host       => $host,
+                port       => $port,
+                workers    => $workers,
+                ssl        => $ssl,
+            );
+        };
+        my $error = $@;
+        my @stopped_collectors = $self->stop_collectors;
+        die $error if $error;
+        return {
+            foreground         => 1,
+            host               => $host,
+            port               => $port,
+            workers            => $workers,
+            ssl                => $ssl,
+            collectors         => \@collectors,
+            stopped_collectors => \@stopped_collectors,
+            result             => $result,
+        };
+    }
+
+    my $pid = $self->start_web(
+        foreground => 0,
+        host       => $host,
+        port       => $port,
+        workers    => $workers,
+        ssl        => $ssl,
+    );
+    my @collectors = $self->start_collectors;
+    return {
+        host       => $host,
+        port       => $port,
+        workers    => $workers,
+        ssl        => $ssl,
+        pid        => $pid,
+        collectors => \@collectors,
+    };
 }
 
 # stop_collectors()
@@ -287,7 +356,7 @@ sub web_state {
     my ($self) = @_;
     my $file = $self->{files}->web_state;
     return if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
     local $/;
     return json_decode( scalar <$fh> );
 }
@@ -334,7 +403,7 @@ sub _run_web_child {
         return 0 if $pid;
     }
     if ($redirect) {
-        open STDIN, '<', '/dev/null' or die $!;
+        open STDIN, '<', File::Spec->devnull() or die $!;
         open STDOUT, '>>', $self->{files}->dashboard_log or die $!;
         open STDERR, '>>', $self->{files}->dashboard_log or die $!;
     }
@@ -474,6 +543,7 @@ sub _follow_log_file {
     if ( !open( $fh, '<', $file ) ) {
         open my $create_fh, '>>', $file or die "Unable to create $file: $!";
         close $create_fh;
+        $self->{paths}->secure_file_permissions($file);
         open( $fh, '<', $file ) or die "Unable to read $file: $!";
     }
     seek $fh, 0, 2 or die "Unable to seek $file: $!";
@@ -503,10 +573,12 @@ sub _write_web_state {
     }
     my $file = $self->{files}->web_state;
     my $tmp = sprintf '%s.%s.%s.pending', $file, $$, time;
-    open my $fh, '>', $tmp or die "Unable to write $tmp: $!";
+    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode($payload);
     close $fh;
+    $self->{paths}->secure_file_permissions($tmp);
     rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
+    $self->{paths}->secure_file_permissions($file);
     return $payload;
 }
 
@@ -575,7 +647,7 @@ sub _find_processes_by_prefix {
 }
 
 # _find_web_processes()
-# Returns managed or legacy-compatible dashboard web processes.
+# Returns managed or older-compatible dashboard web processes.
 # Input: none.
 # Output: list of process hash references.
 sub _find_web_processes {
@@ -592,7 +664,7 @@ sub _find_web_processes {
 }
 
 # _find_legacy_web_processes()
-# Returns legacy-style dashboard serve processes.
+# Returns older-style dashboard serve processes.
 # Input: none.
 # Output: list of process hash references.
 sub _find_legacy_web_processes {
@@ -878,8 +950,39 @@ collector loops, including stop and restart orchestration.
 
 =head1 METHODS
 
-=head2 new, start_web, running_web, stop_web, start_collectors, stop_collectors, stop_all, restart_all, web_state, web_log
+=head2 new, start_web, running_web, stop_web, start_collectors, serve_all, stop_collectors, stop_all, restart_all, web_state, web_log
 
 Construct and manage the dashboard runtime.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+Perl module in the Developer Dashboard codebase. This file coordinates collector and indicator runtime lifecycle work.
+Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+
+=head1 WHY IT EXISTS
+
+It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+
+=head1 WHEN TO USE
+
+Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+
+=head1 HOW TO USE
+
+Load C<Developer::Dashboard::RuntimeManager> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+
+=head1 WHAT USES IT
+
+This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+
+=head1 EXAMPLES
+
+  perl -Ilib -MDeveloper::Dashboard::RuntimeManager -e 'print qq{loaded\n}'
+
+That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+
+=for comment FULL-POD-DOC END
 
 =cut

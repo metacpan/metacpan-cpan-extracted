@@ -7,7 +7,7 @@ use Log::Log4perl qw(get_logger :levels);
 use Exporter;
 use Carp qw(carp cluck confess croak);
 our @ISA = 'Exporter';
-our @EXPORT_OK = qw(logit loggit logpkg logsub initialize_logger);
+our @EXPORT_OK = qw(logit logpkg logsub initialize_logger);
 our $appender;
 
 sub initialize_logger {
@@ -33,11 +33,11 @@ Audio::Nama::Effect
 Audio::Nama::EffectsRegistry
 Audio::Nama::Engine
 Audio::Nama::EngineSetup
+Audio::Nama::Entry
 Audio::Nama::Fade
 Audio::Nama::Git
 Audio::Nama::Globals
 Audio::Nama::Grammar
-Audio::Nama::Graphical
 Audio::Nama::Graph
 Audio::Nama::Help
 Audio::Nama::Initializations
@@ -158,8 +158,6 @@ sub logit {
 }
 }
 sub logsub { logit(__LINE__,'SUB','debug',$_[0]) }
-
-*loggit = \&logit; # to avoid source filter on logit call below
 
 sub logpkg { 
 	my( $file, $line_no, $level, @message) = @_;

@@ -1,5 +1,10 @@
 Revision history for JSON-YY
 
+0.02  2026-04-08
+    - Fix keyword plugin hijacking other modules' XSUBs (e.g. JSON::XS's
+      encode_json). Now checks CvGV stash to verify the CV belongs to
+      JSON::YY before activating keyword compilation.
+
 0.01  2026-04-07
     - Initial release
     - Bundled yyjson 0.12.0

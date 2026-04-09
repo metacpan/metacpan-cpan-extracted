@@ -1,5 +1,11 @@
 Revision history for Object-Proto
 
+0.11	2026-04-08
+	- Add optional $prefix parameter to import_accessors($class, $prefix, $target)
+	  to prepend a string to all imported accessor names (avoids collisions)
+	- Fix compilation on Cygwin: replace static XS() with XS_INTERNAL()
+	  to avoid conflict with dllexport requiring external linkage
+
 0.10	2026-04-07
 	- Fix import_accessors/import_accessor to override existing OO accessors
 	  from a different class defined in the same package (collision bug)

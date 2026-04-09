@@ -1,5 +1,5 @@
 package Audio::Nama;
-our $VERSION = "1.600";
+our $VERSION = "1.602";
 use v5.36;
 #use Carp::Always;
 no warnings qw(uninitialized syntax);
@@ -35,9 +35,8 @@ use Text::Diff;
 use Text::Format;
 use Tickit;
 use Tickit::Async;
-use Tickit::Console;
-use Tickit::Widgets qw(Static Entry ScrollBox VBox);
-use Tickit::Widget::Entry::Plugin::History;
+use Tickit::Widgets qw(Static ScrollBox VBox);
+use Audio::Nama::Entry; # modified Tickit::Widget::Entry to bind printable keys
 use Tickit::Widget::Entry::Plugin::Completion;
 use Tie::Simple;
 use Try::Tiny;
@@ -65,7 +64,7 @@ use Audio::Nama::Util qw(:all);
 # Import the two user-interface classes
 
 use Audio::Nama::Text;
-use Audio::Nama::Graphical;
+# use Audio::Nama::Graphical; # not right now
 
 # They are descendents of a base class we define in the root namespace
 
@@ -150,7 +149,7 @@ use Audio::Nama::Bunch ();
 use Audio::Nama::Wavinfo ();
 use Audio::Nama::Midi ();
 use Audio::Nama::Latency ();
-use Audio::Nama::Log qw(logit loggit logpkg logsub initialize_logger);
+use Audio::Nama::Log qw(logit logpkg logsub initialize_logger);
 use Audio::Nama::TrackUtils ();
 
 use Audio::Nama::Tempo ();
@@ -164,6 +163,11 @@ sub main {
 	nama_cmd($config->{execute_on_project_load});
 	nama_cmd($config->{opts}->{X});
 	reconfigure_engine();
+	if (not $ti{3}){
+		say "Enter command to begin or type 'h' for help.";
+		$this_track = $tn{Main};
+	}
+	create_entry_widget();
 	$ui->loop();
 }
 
@@ -198,7 +202,9 @@ sub cleanup_exit {
 	# - SIGKILL
 	#project_snapshot(); 
 	Audio::Nama::Engine::sync_action('kill_and_reap');
+	$text->{term}->teardown;
 	restore_stdout();
+	say;
 	exit;
 }
 END { }
@@ -1151,7 +1157,7 @@ preset_register:
   parameters: none
 ladspa_register:
   type: effect
-  what: List all LADSPA plugins, that Ecasound/Nama can find.
+  what: List installed LADSPA plugins
   short: lrg
   parameters: none
 list_marks:
@@ -2759,7 +2765,7 @@ import_audio: _import_audio path {
 }
 frequency: value
 list_history: _list_history {
-	my @history = $Audio::Nama::text->{term}->GetHistory;
+	my @history = $Audio::Nama::text->{command_history}->@*;
 	my %seen;
 	Audio::Nama::pager( grep{ ! $seen{$_} and $seen{$_}++ } @history );
 }
@@ -4501,6 +4507,9 @@ realtime_profile: nonrealtime # other choices: realtime or auto
 
 use_metronome: 0
 
+use_autocomplete_popup: 0
+press_space_to_start_transport: 1 
+
 # The buffer size settings below apply only when JACK is *not* used
 ecasound_buffersize:
   realtime:
@@ -5284,7 +5293,7 @@ doxctl
 @@ banner
       ////////////////////////////////////////////////////////////////////
      /                                                                  /
-    /    Nama multitrack recorder v. $VERSION (c)2008-2019 Joel Roth      /
+    /    Nama multitrack recorder v. $VERSION (c)2008-2026 Joel Roth      /
    /                                                                  /
   /    Audio processing by Ecasound, courtesy of Kai Vehmanen        /
  /                                                                  /

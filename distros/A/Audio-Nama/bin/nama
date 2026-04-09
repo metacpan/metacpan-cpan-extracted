@@ -2230,7 +2230,7 @@ preset-register
 
 =back
 
-=head4 B<ladspa-register> (lrg) - List all LADSPA plugins, that Ecasound/Nama can find.
+=head4 B<ladspa-register> (lrg) - List installed LADSPA plugins
 
 =over 8
 

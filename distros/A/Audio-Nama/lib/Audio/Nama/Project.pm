@@ -85,6 +85,12 @@ sub initialize_project_data {
 
 	$project->{track_comments} = {};
 	$project->{track_version_comments} = {};
+	$project->{nama_version} = $VERSION;
+	( $project->{nama_commit} ) = 
+	qw( 
+		397c1fd33
+
+	);
 	$project->{repo} = undef;
 	$project->{artist} = undef;
 	$project->{bunch} = {};	
@@ -109,6 +115,8 @@ sub initialize_project_data {
 	reset_command_buffer();
 	$this_engine->reset_ecasound_selections_cache();
 
+	$text->{command_history} //= [];
+
 }
 
 sub create_project_dirs {
@@ -128,7 +136,7 @@ sub load_project {
 	if (not $project->{name} or not -d project_dir() and not $args{create})
 	{
 		no warnings 'uninitialized';
-		Audio::Nama::pager_newline(qq(Project "$project->{name}" not found. Loading project "untitled".)); 
+		Audio::Nama::pager_newline(qq(Project "$project->{name}" not found. Loading project "Untitled".)); 
 		load_project(name => 'Untitled', create => 1);
 
 	}
@@ -311,9 +319,6 @@ sub new_project_template {
 			);
 	} @tracks;
 
-	# Throw away command history
-	
-	$text->{term}->SetHistory();
 	
 	# Buses needn't set version info either
 	

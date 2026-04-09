@@ -1,4 +1,5 @@
-See also the git repository.
+1.05    Wed, 08 Apr 2026
+        Some cleanups and an eg/pather script.
 
 1.04    lunes, 21 de enero de 2019
         Add clone(), each_cell(), rebuild() methods. norm_*way* can now
