@@ -1,5 +1,169 @@
 Revision history for Developer Dashboard
 
+2.17  2026-04-10
+    - replaced the repeated FULL-POD-DOC template text across shipped Perl
+      modules, scripts, and staged helpers with file-specific documentation
+      that now describes each command surface, runtime layer, compatibility
+      shim, or web subsystem in terms of its real behavior and handoffs
+    - expanded `t/15-release-metadata.t` so release verification now rejects
+      the earlier copy-paste FULL-POD-DOC boilerplate and treats file-specific
+      shipped POD as part of the release contract
+    - tightened the FULL-POD-DOC contract so shipped Perl docs must now cover
+      common-path examples plus meaningful edge or debugging examples instead
+      of stopping at one shallow happy-path sample
+    - synced the contributor-definition docs in `README.md` and
+      `Developer::Dashboard.pm` with a 10-common / 10-edge example bank so the
+      next repo-wide documentation sweep has concrete example patterns to copy
+      in spirit instead of reintroducing boilerplate
+
+2.16  2026-04-09
+    - fixed macOS shell-smoke portability in `t/05-cli-smoke.t` so `cdr` and
+      `which_dir` assertions now compare canonical path identity instead of
+      failing on equivalent `/var/...` versus `/private/var/...` aliases
+
+2.15  2026-04-09
+    - fixed the GitHub coverage gate in `test.yml`, `release-cpan.yml`, and
+      `release-github.yml` so those workflows now match the `Devel::Cover`
+      `Total` line by regex instead of one brittle fixed-width spacing layout
+
+2.14  2026-04-09
+    - fixed the GitHub `Release To CPAN` workflow so the packaged-tree smoke
+      path now survives hosted-runner differences instead of failing on the
+      PowerShell resolver expectation, missing tracked integration assets,
+      inherited broken `OPENSSL_CONF`, or Ubuntu Chromium sandbox defaults
+    - fixed `dashboard shell` POSIX helper JSON decoding so `cdr` and
+      `which_dir` now use the same Perl interpreter that generated the shell
+      fragment, which prevents macOS `JSON::XS` ABI mismatches from a bare
+      `/usr/bin/perl -MJSON::XS` path
+    - fixed macOS path-portability coverage so `/var/...` and
+      `/private/var/...` aliases are treated as the same real path across the
+      `cdr`, `which_dir`, and `locate_dirs_under` regression suites
+
+2.13  2026-04-09
+    - fixed `dashboard of` and `dashboard open-file` so scoped search tokens
+      are now real case-insensitive regexes instead of quoted substring
+      matches, which means `dashboard of . 'Ok\.js$'` now matches `ok.js`
+      without drifting into `ok.json`
+    - fixed Java class lookup so it can now resolve source from local
+      `-sources.jar`, `-src.jar`, `src.zip`, `jar`, and `war` archives, and
+      can mirror a matching Maven source jar into the dashboard cache when no
+      live `.java` file exists locally
+    - fixed `cdr` and `which_dir` narrowing so later arguments are now treated
+      as regexes instead of quoted substring tokens beneath either the alias
+      root or the current directory
+
+2.12  2026-04-09
+    - fixed `cdr` so it now treats a saved first argument as the alias root,
+      then narrows beneath that root with AND-matched keywords from the
+      remaining arguments instead of falling straight back to top-level
+      project-name search
+    - fixed the non-alias `cdr` path so all arguments are now treated as
+      AND-matched directory keywords beneath the current directory, with one
+      match changing directory and multiple matches printed instead of picking
+      one silently
+    - kept the shell bootstrap thin by moving the target-selection logic into
+      `dashboard path cdr`, then expanded unit and shell smoke coverage for
+      alias-only, alias-plus-keywords, and pure-keyword search flows
+
+2.11  2026-04-09
+    - fixed oversized hook `RESULT` payload handling so `dashboard` now spills
+      large hook output into a file-backed `RESULT_FILE` channel before later
+      `exec()` calls would fail with `Argument list too long`, while
+      `Developer::Dashboard::Runtime::Result` still exposes the same logical
+      hook data to later hooks and the final command
+    - fixed starter-page upgrade bridging so `dashboard init` now recognizes
+      older dashboard-managed `sql-dashboard` digests from pre-manifest
+      runtimes and refreshes those stale shipped copies instead of leaving an
+      upgraded machine stuck on older SQL Dashboard browser UI
+
+2.10  2026-04-09
+    - fixed `.github/workflows/fuzz-js.yml` so the JS property/fuzz job now
+      installs the Perl runtime prerequisites before it shells into
+      `dashboard encode` / `dashboard decode`, preventing the workflow from
+      dying on `Capture::Tiny` before the first fuzz case actually runs
+    - expanded `t/34-scorecard-guardrails.t` so the workflow contract now
+      fails fast if the JS fuzz path ever drops the Perl setup or
+      `cpanm --installdeps --notest .` bootstrap again
+
+2.09  2026-04-09
+    - fixed the GitHub release automation gap by adding a tracked
+      `.github/workflows/release-github.yml` workflow that builds the dist,
+      retests it, and publishes a GitHub release asset set with the tarball,
+      checksum, and detached signature instead of leaving `Signed-Releases`
+      with nothing to inspect
+    - fixed the broken PAUSE workflow artifact lookup by teaching
+      `.github/workflows/release-cpan.yml` to find the `dzil build` tarball
+      from the repo root instead of a nonexistent `.build/` directory, and
+      aligned its coverage gate with the main CI workflow
+    - hardened the GitHub workflows against hung jobs by adding explicit
+      `concurrency` groups and `timeout-minutes` values, and added
+      `t/34-scorecard-guardrails.t` coverage for the new release/signing
+      workflow and workflow timeout/concurrency requirements
+
+2.08  2026-04-09
+    - fixed `t/07-core-units.t` covered-run detection so collector loop
+      coverage guards now recognize both `HARNESS_PERL_SWITCHES=-MDevel::Cover`
+      and `PERL5OPT=-MDevel::Cover`, preventing the live loop branch from
+      tearing down TAP after the assertions have already passed
+
+2.07  2026-04-09
+    - fixed `dashboard init` and runtime bootstrap so stale dashboard-managed
+      `api-dashboard` / `sql-dashboard` saved copies now refresh to the
+      current shipped seed instead of leaving older shipped browser UI behind,
+      while user-edited saved pages that diverge from the recorded managed
+      digest are preserved
+    - added a runtime seeded-page md5 manifest plus a bridge digest for the
+      older shipped `sql-dashboard` copy, so upgrades can refresh known
+      dashboard-managed starter pages without flattening real user edits
+    - expanded `t/04-update-manager.t`, `t/05-cli-smoke.t`,
+      `t/21-refactor-coverage.t`, and
+      `t/27-sql-dashboard-playwright.t` to cover the stale managed
+      starter-page refresh path through update, init, unit, and browser
+      flows
+
+2.06  2026-04-08
+    - rebuilt the seeded `sql-dashboard` workspace so the `SQL Workspace`
+      view now exposes inner `Collection` and `Run SQL` tabs, keeping the SQL
+      runner and result pane dominant while the collection rail stays one
+      click away instead of permanently consuming horizontal space
+    - improved `Schema Explorer` usability by adding a live table filter,
+      explicit copy/view-data actions for each table, and human type/length
+      labels derived from DBI metadata instead of leaking raw numeric type
+      codes and negative lengths into the browser
+    - expanded `t/26-sql-dashboard.t`,
+      `t/27-sql-dashboard-playwright.t`,
+      `t/31-sql-dashboard-sqlite-playwright.t`, and
+      `t/32-sql-dashboard-rdbms-playwright.t` to cover the new workspace
+      tabs, schema filter/copy/view-data flow, normalized metadata labels,
+      and the updated browser case counts
+
+2.05  2026-04-08
+    - tightened `t/26-sql-dashboard.t` so the schema-browser regression now
+      fails if `table_info` or `column_info` metadata handles ever call
+      `execute()`, matching the MSSQL/ODBC `SQL-HY010` failure mode seen on a
+      stale upgraded runtime
+    - documented the SQL Dashboard runtime-override shadow path, including the
+      need to inspect `dashboard page source sql-dashboard` when an upgraded
+      machine still behaves like an older saved override under
+      `~/.developer-dashboard/dashboards/sql-dashboard`
+
+2.04  2026-04-08
+    - treated `SCORECARD-GATEKEEPER` as a real delivery rule by adding a
+      tracked root `LICENSE`, tracking the published `SECURITY.md`, adding the
+      explicit `SCORECARD_ACTIONS.md` task checklist, and documenting the live
+      interactive-shell Scorecard gate in the public docs and release guide
+    - hardened the GitHub workflow layer with explicit least-privilege
+      `permissions:` blocks, full-SHA action pinning, removal of the
+      `curl https://cpanmin.us | perl` bootstrap path, and new Dependabot,
+      CodeQL, fuzzing, and packaging workflows
+    - added a real `fast-check` property suite plus Perl wrapper coverage so
+      the repository carries a detectable fuzzing signal backed by runnable
+      tests instead of workflow-only decoration
+    - moved required workflow `write` permissions down to job scope, pinned the
+      blank-environment Docker base image by digest, added a tracked
+      `.clusterfuzzlite/Dockerfile`, and normalized the tracked root `LICENSE`
+      content to a Scorecard-recognized Perl 5 dual-license text
+
 2.02  2026-04-08
     - fixed packaged `t/09-runtime-manager.t` isolation so ambient live
       dashboard-shaped processes on the host can no longer hijack the

@@ -39,9 +39,11 @@ plan skip_all => "Playwright module cache is unavailable: $@"
 my $home_root    = tempdir( 'dd-sql-playwright-home-XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 my $project_root = tempdir( 'dd-sql-playwright-project-XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 my $runtime_root = File::Spec->catdir( $project_root, '.developer-dashboard' );
+my $dashboards_root = File::Spec->catdir( $runtime_root, 'dashboards' );
 my $config_root  = File::Spec->catdir( $runtime_root, 'config', 'sql-dashboard' );
 my $collection_root = File::Spec->catdir( $config_root, 'collections' );
 my $local_lib    = File::Spec->catdir( $runtime_root, 'local', 'lib', 'perl5' );
+my $seed_manifest = File::Spec->catfile( $runtime_root, 'config', 'seeded-pages.json' );
 
 make_path($runtime_root);
 make_path( File::Spec->catdir( $local_lib, 'DBD' ) );
@@ -59,12 +61,31 @@ eval {
         label   => 'git init',
     );
 
+    my $stale_sql_dashboard = <<'BOOKMARK';
+TITLE: SQL Dashboard
+:--------------------------------------------------------------------------------:
+BOOKMARK: sql-dashboard
+:--------------------------------------------------------------------------------:
+HTML: <div id="stale-sql-dashboard">stale managed sql dashboard</div>
+BOOKMARK
+    _write_text( File::Spec->catfile( $dashboards_root, 'sql-dashboard' ), $stale_sql_dashboard );
+    _write_text(
+        $seed_manifest,
+        qq|{"sql-dashboard":{"asset":"sql-dashboard.page","md5":"|
+          . _md5_hex($stale_sql_dashboard)
+          . qq|"}}\n|,
+    );
+
     _run_command(
         command => [ $^X, "-I$repo_lib", $dashboard_bin, 'init' ],
         cwd     => $project_root,
         env     => { HOME => $home_root },
         label   => 'dashboard init',
     );
+    my $refreshed_sql_dashboard = _read_text( File::Spec->catfile( $dashboards_root, 'sql-dashboard' ) );
+    unlike( $refreshed_sql_dashboard, qr/stale managed sql dashboard/, 'dashboard init refreshes a stale managed sql-dashboard saved page before the browser session starts' );
+    like( $refreshed_sql_dashboard, qr/data-sql-workspace-tab="run"/, 'dashboard init refreshes the shipped SQL workspace subtab layout before the browser session starts' );
+    like( $refreshed_sql_dashboard, qr/id="sql-table-filter"/, 'dashboard init refreshes the shipped schema filter UI before the browser session starts' );
 
     $dashboard_pid = _start_dashboard_server(
         cwd           => $project_root,
@@ -151,6 +172,19 @@ async function main() {
     consoleMessages.push(message.type() + ': ' + message.text());
   });
   await page.goto(process.env.DASHBOARD_URL, { waitUntil: 'networkidle' });
+  await page.evaluate(() => {
+    const clipboard = {
+      writeText: async (value) => {
+        window.__sqlDashboardCopiedText = String(value || '');
+      }
+    };
+    try {
+      Object.defineProperty(navigator, 'clipboard', { configurable: true, value: clipboard });
+    } catch (error) {
+      navigator.clipboard = clipboard;
+    }
+    window.__sqlDashboardCopiedText = '';
+  });
   if (pageErrors.length) {
     throw new Error('page errors before interaction: ' + JSON.stringify(pageErrors));
   }
@@ -172,7 +206,8 @@ async function main() {
   await page.locator('#sql-profile-save-password').check();
   const saveResponse = await Promise.all([
     page.waitForResponse((response) => {
-      return response.url().includes('/ajax/sql-dashboard-profiles-save') && response.status() === 200;
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-profiles-save') && response.status() === 200;
     }),
     page.locator('#sql-profile-save').click()
   ]).then((values) => values[0]);
@@ -198,6 +233,8 @@ async function main() {
   await page.locator('[data-sql-main-tab="workspace"]').click();
   const workspaceLayout = await page.evaluate(() => {
     const workspacePanel = document.getElementById('sql-panel-workspace');
+    const workspaceTabs = Array.from(document.querySelectorAll('[data-sql-workspace-tab]')).map((node) => node.textContent || '');
+    const activeWorkspaceTab = document.querySelector('[data-sql-workspace-tab].is-active');
     const workspaceNav = document.getElementById('sql-workspace-nav');
     const workspaceEditor = document.getElementById('sql-workspace-editor');
     const collectionTabs = document.getElementById('sql-collection-tabs');
@@ -206,6 +243,8 @@ async function main() {
     const editorNote = document.getElementById('sql-editor-note');
     const openSchema = document.getElementById('sql-open-schema');
     return {
+      workspaceTabs,
+      activeWorkspaceTab: activeWorkspaceTab ? activeWorkspaceTab.textContent : '',
       navInWorkspace: !!(workspacePanel && workspaceNav && workspacePanel.contains(workspaceNav)),
       editorInWorkspace: !!(workspacePanel && workspaceEditor && workspacePanel.contains(workspaceEditor)),
       collectionTabsInNav: !!(workspaceNav && collectionTabs && workspaceNav.contains(collectionTabs)),
@@ -215,8 +254,8 @@ async function main() {
       removedOpenSchema: !openSchema
     };
   });
-  if (!workspaceLayout.navInWorkspace || !workspaceLayout.editorInWorkspace || !workspaceLayout.collectionTabsInNav || !workspaceLayout.itemListInNav || !workspaceLayout.actionsInEditor || !workspaceLayout.noteInActions || !workspaceLayout.removedOpenSchema) {
-    throw new Error('workspace layout did not merge collection navigation into one master-detail panel: ' + JSON.stringify(workspaceLayout));
+  if (!workspaceLayout.workspaceTabs.includes('Collection') || !workspaceLayout.workspaceTabs.includes('Run SQL') || !String(workspaceLayout.activeWorkspaceTab || '').includes('Run SQL') || !workspaceLayout.navInWorkspace || !workspaceLayout.editorInWorkspace || !workspaceLayout.collectionTabsInNav || !workspaceLayout.itemListInNav || !workspaceLayout.actionsInEditor || !workspaceLayout.noteInActions || !workspaceLayout.removedOpenSchema) {
+    throw new Error('workspace layout did not expose the new Collection/Run SQL subtabs and panels: ' + JSON.stringify(workspaceLayout));
   }
 
   const sqlText = [
@@ -269,7 +308,8 @@ async function main() {
 
   const executeResponse = await Promise.all([
     page.waitForResponse((response) => {
-      return response.url().includes('/ajax/sql-dashboard-execute') && response.status() === 200;
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-execute') && response.status() === 200;
     }),
     page.locator('#sql-run').click()
   ]).then((values) => values[0]);
@@ -305,11 +345,27 @@ async function main() {
     throw new Error('sql execute DOM missed the active profile details: ' + JSON.stringify(executeDom));
   }
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('#sql-collection-name').fill('Shared Queries');
+  const createCollectionResponse = await Promise.all([
+    page.waitForResponse((response) => {
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-collections-save') && response.status() === 200;
+    }),
+    page.locator('#sql-collection-save').click()
+  ]).then((values) => values[0]);
+  const createCollectionPayload = await createCollectionResponse.json();
+  if (!createCollectionPayload || !createCollectionPayload.ok) {
+    throw new Error('collection create request failed: ' + JSON.stringify(createCollectionPayload || {}));
+  }
+  await page.waitForFunction(() => !!document.querySelector('[data-sql-collection-tab="Shared Queries"]'));
+
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   await page.locator('#sql-collection-item-name').fill('Users Query');
   const collectionResponse = await Promise.all([
     page.waitForResponse((response) => {
-      return response.url().includes('/ajax/sql-dashboard-collections-save') && response.status() === 200;
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-collections-save') && response.status() === 200;
     }),
     page.locator('#sql-collection-item-save').click()
   ]).then((values) => values[0]);
@@ -322,12 +378,15 @@ async function main() {
       !!document.querySelector('[data-sql-collection-item-link="users-query"]');
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('#sql-collection-item-new').click();
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   await page.locator('#sql-collection-item-name').fill('Orders Query');
   await page.locator('#sql-editor').fill("select * from orders\n");
   const secondCollectionResponse = await Promise.all([
     page.waitForResponse((response) => {
-      return response.url().includes('/ajax/sql-dashboard-collections-save') && response.status() === 200;
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-collections-save') && response.status() === 200;
     }),
     page.locator('#sql-collection-item-save').click()
   ]).then((values) => values[0]);
@@ -342,6 +401,7 @@ async function main() {
       !!document.querySelector('[data-sql-collection-item-delete="users-query"]');
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('[data-sql-collection-item-link="users-query"]').click();
   await page.waitForTimeout(250);
   const restoredUsersCollection = await page.evaluate(() => {
@@ -359,6 +419,7 @@ async function main() {
     throw new Error('workspace did not keep the active saved SQL name visible for the selected query: ' + JSON.stringify(restoredUsersCollection));
   }
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('[data-sql-collection-item-link="orders-query"]').click();
   await page.waitForTimeout(250);
   const restoredOrdersCollection = await page.evaluate(() => {
@@ -386,9 +447,11 @@ async function main() {
     throw new Error('saved SQL delete affordance is not the compact inline [X] control: ' + JSON.stringify({ inlineDeleteText }));
   }
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   const deleteUsersResponse = await Promise.all([
     page.waitForResponse((response) => {
-      return response.url().includes('/ajax/sql-dashboard-collections-save') && response.status() === 200;
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-collections-save') && response.status() === 200;
     }),
     page.locator('[data-sql-collection-item-delete="users-query"]').click()
   ]).then((values) => values[0]);
@@ -414,7 +477,8 @@ async function main() {
 
   const schemaResponse = await Promise.all([
     page.waitForResponse((response) => {
-      return response.url().includes('/ajax/sql-dashboard-schema-browse') && response.status() === 200;
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-schema-browse') && response.status() === 200;
     }),
     page.locator('[data-sql-main-tab="schema"]').click()
   ]).then((values) => values[0]);
@@ -424,21 +488,70 @@ async function main() {
   }
   await page.waitForFunction(() => !!document.querySelector('[data-sql-table-tab="USERS"]'));
   const tableTabsText = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('[data-sql-table-tab]')).map((node) => node.textContent || '');
+    return Array.from(document.querySelectorAll('[data-sql-table-name]')).map((node) => node.textContent || '');
   });
   if (!tableTabsText.includes('USERS')) {
     throw new Error('schema browse DOM missed the USERS table tab: ' + JSON.stringify(tableTabsText));
   }
-  await page.locator('[data-sql-table-tab="USERS"]').click();
+  const filterValue = await page.locator('#sql-table-filter').inputValue();
+  if (filterValue !== '') {
+    throw new Error('schema table filter should start empty: ' + JSON.stringify({ filterValue }));
+  }
+  await page.locator('#sql-table-filter').fill('ord');
   await page.waitForTimeout(250);
+  const filteredTables = await page.locator('[data-sql-table-name]').allTextContents();
+  if (filteredTables.length !== 1 || !filteredTables.includes('ORDERS')) {
+    throw new Error('schema table filter did not narrow the list to the matching table: ' + JSON.stringify(filteredTables));
+  }
+  await page.locator('#sql-table-filter').fill('');
+  await page.locator('[data-sql-table-tab="USERS"]').click();
+  await page.waitForFunction(() => {
+    const columnList = document.getElementById('sql-column-list');
+    const text = columnList ? String(columnList.textContent || '') : '';
+    return text.includes('ID') && text.includes('NAME');
+  });
   const columnText = await page.locator('#sql-column-list').textContent();
   if (!String(columnText || '').includes('ID') || !String(columnText || '').includes('NAME')) {
     throw new Error('schema browse DOM missed the expected columns: ' + JSON.stringify({ columnText }));
   }
-
+  if (!String(columnText || '').includes('INTEGER') || !String(columnText || '').includes('VARCHAR2') || !String(columnText || '').includes('255')) {
+    throw new Error('schema browse DOM did not show normalized type and length labels: ' + JSON.stringify({ columnText }));
+  }
+  if (String(columnText || '').match(/-255|-9/)) {
+    throw new Error('schema browse DOM leaked negative/raw metadata values: ' + JSON.stringify({ columnText }));
+  }
   const schemaUrl = page.url();
   if (!schemaUrl.includes('tab=schema')) {
     throw new Error('schema route did not update the browser URL');
+  }
+  await page.locator('[data-sql-table-copy="USERS"]').click();
+  const copiedTable = await page.evaluate(() => window.__sqlDashboardCopiedText || '');
+  if (copiedTable !== 'USERS') {
+    throw new Error('schema table copy action did not copy the selected table name: ' + JSON.stringify({ copiedTable }));
+  }
+  const previewResponse = await Promise.all([
+    page.waitForResponse((response) => {
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-execute') && response.status() === 200;
+    }),
+    page.locator('[data-sql-table-query="USERS"]').click()
+  ]).then((values) => values[0]);
+  const previewPayload = await previewResponse.json();
+  if (!previewPayload || !previewPayload.ok) {
+    throw new Error('schema table view-data action failed: ' + JSON.stringify(previewPayload || {}));
+  }
+  const previewState = await page.evaluate(() => {
+    const activeMain = document.querySelector('[data-sql-main-tab].is-active');
+    const activeWorkspace = document.querySelector('[data-sql-workspace-tab].is-active');
+    const sql = document.getElementById('sql-editor');
+    return {
+      activeMain: activeMain ? activeMain.textContent : '',
+      activeWorkspace: activeWorkspace ? activeWorkspace.textContent : '',
+      sql: sql ? sql.value : ''
+    };
+  });
+  if (!String(previewState.activeMain || '').includes('SQL Workspace') || !String(previewState.activeWorkspace || '').includes('Run SQL') || !String(previewState.sql || '').includes('select * from USERS')) {
+    throw new Error('schema table view-data action did not switch back to the Run SQL workspace with a ready query: ' + JSON.stringify(previewState));
   }
 
   await page.goto(schemaUrl, { waitUntil: 'domcontentloaded' });
@@ -470,7 +583,8 @@ async function main() {
   await page.locator('[data-sql-main-tab="profiles"]').click();
   const deleteResponse = await Promise.all([
     page.waitForResponse((response) => {
-      return response.url().includes('/ajax/sql-dashboard-profiles-delete') && response.status() === 200;
+      return response.request().method() === 'POST' &&
+        response.url().includes('/ajax/sql-dashboard-profiles-delete') && response.status() === 200;
     }),
     page.locator('#sql-profile-delete').click()
   ]).then((values) => values[0]);
@@ -570,10 +684,10 @@ sub column_info {
     return bless {
         mode       => 'columns',
         table_name => $table_name,
-        NAME       => [ 'COLUMN_NAME', 'DATA_TYPE', 'DATA_LENGTH' ],
+        NAME       => [ 'COLUMN_NAME', 'DATA_TYPE', 'DATA_LENGTH', 'TYPE_NAME', 'COLUMN_SIZE' ],
         _rows      => [
-            { COLUMN_NAME => 'ID',   DATA_TYPE => 'NUMBER',   DATA_LENGTH => 22 },
-            { COLUMN_NAME => 'NAME', DATA_TYPE => 'VARCHAR2', DATA_LENGTH => 255 },
+            { COLUMN_NAME => 'ID',   DATA_TYPE => 4,  DATA_LENGTH => 22,   TYPE_NAME => 'INTEGER',  COLUMN_SIZE => 10 },
+            { COLUMN_NAME => 'NAME', DATA_TYPE => -9, DATA_LENGTH => -255, TYPE_NAME => 'VARCHAR2', COLUMN_SIZE => 255 },
         ],
     }, 'DBI::st';
 }
@@ -689,7 +803,10 @@ sub _run_command {
         return $? >> 8;
     };
 
-    is( $exit, 0, ( $args{label} || 'command' ) . ' exits successfully' ) or diag $stderr . $stdout;
+    is( $exit, 0, ( $args{label} || 'command' ) . ' exits successfully' ) or do {
+        diag $stderr . $stdout;
+        die( ( $args{label} || 'command' ) . " failed with exit $exit\n$stderr$stdout" );
+    };
     return {
         stdout => $stdout,
         stderr => $stderr,
@@ -783,6 +900,12 @@ sub _json_decode {
     return Developer::Dashboard::JSON::json_decode($text);
 }
 
+sub _md5_hex {
+    my ($text) = @_;
+    require Developer::Dashboard::SeedSync;
+    return Developer::Dashboard::SeedSync::content_md5($text);
+}
+
 __END__
 
 =head1 NAME
@@ -801,30 +924,43 @@ permissions.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file runs browser coverage for the sql-dashboard workspace.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for the sql-dashboard runtime and browser workflow. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because the sql-dashboard runtime and browser workflow has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing the sql-dashboard runtime and browser workflow, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/27-sql-dashboard-playwright.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/27-sql-dashboard-playwright.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. For browser-backed tests, make sure the external browser tooling they name is actually present instead of assuming the suite will fabricate it.
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/27-sql-dashboard-playwright.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/27-sql-dashboard-playwright.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

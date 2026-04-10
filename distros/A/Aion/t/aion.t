@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 1.4
+# 1.7
 # 
 # # SYNOPSIS
 # 
@@ -492,7 +492,7 @@ local ($::_g0 = do {$ex1->x}, $::_e0 = do {6}); ::ok defined($::_g0) == defined(
 # 
 # С помощью аспекта `eon` реализуется паттерн **Dependency Injection**.
 # 
-# Он связывает свойство с сервисом из контейнера `$Aion::pleroma`.
+# Он связывает свойство с сервисом из контейнера `Aion->pleroma`.
 # 
 # Значением аспекта может быть ключ сервиса, 1 или 2.
 # 
@@ -505,7 +505,7 @@ local ($::_g0 = do {$ex1->x}, $::_e0 = do {6}); ::ok defined($::_g0) == defined(
 #>> #@eon ex.counter
 #>> use Aion;
 #>> 
-#>> has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
+#>> has accomulator => (isa => 'AccomulatorEon', eon => 1);
 #>> 
 #>> 1;
 #@< EOF
@@ -516,7 +516,7 @@ local ($::_g0 = do {$ex1->x}, $::_e0 = do {6}); ::ok defined($::_g0) == defined(
 #>> #@eon
 #>> use Aion;
 #>> 
-#>> has power => (isa => Object['PowerEon'], eon => 2);
+#>> has power => (isa => 'PowerEon', eon => 2);
 #>> 
 #>> 1;
 #@< EOF
@@ -539,16 +539,20 @@ local ($::_g0 = do {$ex1->x}, $::_e0 = do {6}); ::ok defined($::_g0) == defined(
 ::done_testing; }; subtest 'eon => (1|2|$key)' => sub { 
 {
 	use Aion::Pleroma;
-	local $Aion::pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
+	my $pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
 		'ex.counter' => 'CounterEon#new',
 		AccomulatorEon => 'AccomulatorEon#new',
 		'PowerEon#power' => 'PowerEon#power',
 	});
+
+	local *Aion::pleroma = sub { $pleroma };
 	
-	my $counter = $Aion::pleroma->get('ex.counter');
+	my $counter = Aion->pleroma->get('ex.counter');
 
 local ($::_g0 = do {$counter->accomulator->power->counter}, $::_e0 = do {$counter}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '	$counter->accomulator->power->counter # -> $counter' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 }
+
+local ($::_g0 = do {Aion->pleroma->get('ex.counter')}, $::_e0 = do {undef}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Aion->pleroma->get(\'ex.counter\') # -> undef' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # См. [Aion::Pleroma](https://metacpan.org/pod/Aion::Pleroma).

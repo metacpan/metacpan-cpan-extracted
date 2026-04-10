@@ -154,8 +154,8 @@ msgstr "By default it is only enabled if the default is a subroutine."
 msgid "С помощью аспекта `eon` реализуется паттерн **Dependency Injection**."
 msgstr "The `eon` aspect implements the **Dependency Injection** pattern."
 
-msgid "Он связывает свойство с сервисом из контейнера `$Aion::pleroma`."
-msgstr "It associates a property with a service from the `$Aion::pleroma` container."
+msgid "Он связывает свойство с сервисом из контейнера `Aion->pleroma`."
+msgstr "It associates a property with a service from the `Aion->pleroma` container."
 
 msgid "Значением аспекта может быть ключ сервиса, 1 или 2."
 msgstr "The aspect value can be a service key, 1 or 2."

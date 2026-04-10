@@ -3,6 +3,7 @@ package Net::Nostr::Client;
 use strictures 2;
 
 use Carp qw(croak);
+use Scalar::Util qw(weaken);
 use AnyEvent;
 use AnyEvent::WebSocket::Client;
 use Net::Nostr::Message;
@@ -16,6 +17,8 @@ use Class::Tiny qw(
 
 sub new {
     my $class = shift;
+    my %args = @_;
+    croak "unknown argument(s): " . join(', ', sort keys %args) if %args;
     my $self = bless {}, $class;
     $self->_ws_client(AnyEvent::WebSocket::Client->new);
     $self->_callbacks({});
@@ -25,6 +28,7 @@ sub new {
 sub connect {
     my ($self, $url, $cb) = @_;
     croak "url is required" unless defined $url;
+    croak "callback must be a CODE ref" if defined $cb && ref($cb) ne 'CODE';
 
     my $cv = AnyEvent->condvar;
     $self->_ws_client->connect($url)->cb(sub {
@@ -39,7 +43,7 @@ sub connect {
     });
 
     if ($cb) {
-        $cv->cb(sub { eval { shift->recv }; $cb->() });
+        $cv->cb(sub { eval { shift->recv }; $cb->($@ || undef) });
         return;
     }
 
@@ -78,10 +82,54 @@ sub subscribe {
     $self->_conn->send($msg->serialize);
 }
 
+sub count {
+    my ($self, $sub_id, @filters) = @_;
+    croak "not connected" unless $self->is_connected;
+    my $msg = Net::Nostr::Message->new(
+        type            => 'COUNT',
+        subscription_id => $sub_id,
+        filters         => \@filters,
+    );
+    $self->_conn->send($msg->serialize);
+}
+
 sub close {
     my ($self, $sub_id) = @_;
     croak "not connected" unless $self->is_connected;
     my $msg = Net::Nostr::Message->new(type => 'CLOSE', subscription_id => $sub_id);
+    $self->_conn->send($msg->serialize);
+}
+
+sub neg_open {
+    my ($self, $sub_id, $filter, $initial_msg) = @_;
+    croak "not connected" unless $self->is_connected;
+    my $msg = Net::Nostr::Message->new(
+        type            => 'NEG-OPEN',
+        subscription_id => $sub_id,
+        filter          => $filter,
+        neg_msg         => $initial_msg,
+    );
+    $self->_conn->send($msg->serialize);
+}
+
+sub neg_msg {
+    my ($self, $sub_id, $neg_msg) = @_;
+    croak "not connected" unless $self->is_connected;
+    my $msg = Net::Nostr::Message->new(
+        type            => 'NEG-MSG',
+        subscription_id => $sub_id,
+        neg_msg         => $neg_msg,
+    );
+    $self->_conn->send($msg->serialize);
+}
+
+sub neg_close {
+    my ($self, $sub_id) = @_;
+    croak "not connected" unless $self->is_connected;
+    my $msg = Net::Nostr::Message->new(
+        type            => 'NEG-CLOSE',
+        subscription_id => $sub_id,
+    );
     $self->_conn->send($msg->serialize);
 }
 
@@ -106,6 +154,7 @@ sub authenticate {
 
 sub on {
     my ($self, $type, $cb) = @_;
+    croak "callback must be a CODE ref" unless defined $cb && ref($cb) eq 'CODE';
     $self->_callbacks->{$type} = $cb;
 }
 
@@ -117,8 +166,10 @@ sub _emit {
 
 sub _setup_handlers {
     my ($self) = @_;
+    weaken(my $weak_self = $self);
     $self->_conn->on(each_message => sub {
         my ($conn, $message) = @_;
+        my $self = $weak_self or return;
         my $msg = eval { Net::Nostr::Message->parse($message->body) };
         return warn "bad message from relay: $@\n" if $@;
 
@@ -130,15 +181,22 @@ sub _setup_handlers {
             $self->_emit('eose', $msg->subscription_id);
         } elsif ($msg->type eq 'NOTICE') {
             $self->_emit('notice', $msg->message);
+        } elsif ($msg->type eq 'COUNT') {
+            $self->_emit('count', $msg->subscription_id, $msg->count, $msg->approximate);
         } elsif ($msg->type eq 'CLOSED') {
             $self->_emit('closed', $msg->subscription_id, $msg->message);
         } elsif ($msg->type eq 'AUTH') {
             $self->challenge($msg->challenge);
             $self->_emit('auth', $msg->challenge);
+        } elsif ($msg->type eq 'NEG-MSG') {
+            $self->_emit('neg_msg', $msg->subscription_id, $msg->neg_msg);
+        } elsif ($msg->type eq 'NEG-ERR') {
+            $self->_emit('neg_err', $msg->subscription_id, $msg->message);
         }
     });
 
     $self->_conn->on(finish => sub {
+        my $self = $weak_self or return;
         $self->_conn(undef);
     });
 }
@@ -196,8 +254,9 @@ Net::Nostr::Client - WebSocket client for Nostr relays
 =head1 DESCRIPTION
 
 A WebSocket client for connecting to Nostr relays. Provides a callback-based
-interface for publishing events, managing subscriptions, and receiving relay
-messages. Supports NIP-42 authentication.
+interface for publishing events, managing subscriptions, receiving relay
+messages, counting events (NIP-45), and negentropy set reconciliation
+(NIP-77). Supports NIP-42 authentication.
 
 =head1 CONSTRUCTOR
 
@@ -206,7 +265,7 @@ messages. Supports NIP-42 authentication.
     my $client = Net::Nostr::Client->new;
 
 Creates a new client instance. No connection is established until
-C<connect> is called.
+C<connect> is called. Croaks on unknown arguments.
 
 =head1 METHODS
 
@@ -219,10 +278,21 @@ C<connect> is called.
 
 Connects to the relay at the given WebSocket URL. Blocks until the
 connection is established and returns C<$self> for chaining. Croaks
-if the connection fails or C<$url> is not provided.
+if the connection fails, C<$url> is not provided, or the callback
+is not a CODE ref.
 
-If a callback is provided, connects asynchronously and calls the
-callback once connected. Returns immediately without blocking.
+If a callback is provided, connects asynchronously and returns
+immediately without blocking. The callback receives a single argument:
+C<undef> on success, or an error string on failure.
+
+    $client->connect($url, sub {
+        my ($err) = @_;
+        if ($err) {
+            warn "Connection failed: $err";
+            return;
+        }
+        # connected successfully
+    });
 
 =head2 is_connected
 
@@ -258,12 +328,64 @@ filters. The relay will send matching stored events (via C<event>
 callback), then an EOSE message (via C<eose> callback), then live
 events as they arrive. Croaks if not connected.
 
+=head2 count
+
+    $client->count('query-id', $filter1, $filter2);
+
+Sends a COUNT message (NIP-45) to the relay with the given query ID and
+filters. The relay will respond with a count (received via the C<count>
+callback). Unlike C<subscribe>, COUNT is one-shot and does not create a
+live subscription. Croaks if not connected.
+
+    $client->on(count => sub {
+        my ($query_id, $count, $approximate) = @_;
+        say "Got $count events" . ($approximate ? ' (approximate)' : '');
+    });
+    $client->count('followers', Net::Nostr::Filter->new(
+        kinds => [3], '#p' => [$pubkey],
+    ));
+
 =head2 close
 
     $client->close('sub-id');
 
 Sends a CLOSE message to stop receiving events for the given
 subscription ID. Croaks if not connected.
+
+=head2 neg_open
+
+    $client->neg_open($sub_id, $filter, $initial_msg);
+
+Sends a NEG-OPEN message (NIP-77) to initiate negentropy set reconciliation.
+C<$filter> is a L<Net::Nostr::Filter> object, and C<$initial_msg> is the
+hex-encoded initial message from L<Net::Nostr::Negentropy/initiate>.
+The relay will respond with a C<neg_msg> callback. Croaks if not connected.
+
+Subscription IDs are in a separate namespace from C<subscribe>. If a
+NEG-OPEN is issued for a currently open subscription ID, the relay
+closes the existing session first.
+
+    use Net::Nostr::Negentropy;
+
+    my $ne = Net::Nostr::Negentropy->new;
+    # add local events via $ne->add_item(...)
+    $ne->seal;
+    $client->neg_open('sync1', $filter, $ne->initiate);
+
+=head2 neg_msg
+
+    $client->neg_msg($sub_id, $msg);
+
+Sends a NEG-MSG message (NIP-77) to continue a negentropy reconciliation
+round. C<$msg> is the hex-encoded message from L<Net::Nostr::Negentropy/reconcile>.
+Croaks if not connected.
+
+=head2 neg_close
+
+    $client->neg_close($sub_id);
+
+Sends a NEG-CLOSE message (NIP-77) to terminate a negentropy session and
+release relay resources. Croaks if not connected.
 
 =head2 authenticate
 
@@ -274,8 +396,8 @@ L<Net::Nostr::Key> object used to sign the authentication event,
 and C<$relay_url> is the relay's URL for the C<relay> tag.
 
 The client must have received an AUTH challenge from the relay first
-(stored in C<challenge>). Croaks if not connected or no challenge
-has been received.
+(stored in C<challenge>). Croaks if not connected, if C<$key> or
+C<$relay_url> is missing, or if no challenge has been received.
 
     $client->on(auth => sub {
         my ($challenge) = @_;
@@ -293,7 +415,10 @@ or C<undef> if no challenge has been received.
 
     $client->on($event_type => sub { ... });
 
-Registers a callback for relay messages. Supported event types:
+Registers a callback for relay messages. The callback must be a CODE
+ref; croaks otherwise. Only one callback may be registered per event
+type -- calling C<on> again for the same type replaces the previous
+callback. Supported event types:
 
 =over 4
 
@@ -313,6 +438,12 @@ Called when the relay finishes sending stored events for a subscription.
 
 Called when the relay sends a human-readable NOTICE.
 
+=item C<count> - C<sub { my ($query_id, $count, $approximate) = @_; }>
+
+Called when the relay responds to a COUNT request (NIP-45). C<$count> is
+the number of matching events, C<$approximate> is true if the count is
+probabilistic. HyperLogLog (C<hll>) values are not currently parsed.
+
 =item C<closed> - C<sub { my ($subscription_id, $message) = @_; }>
 
 Called when the relay closes a subscription.
@@ -322,10 +453,24 @@ Called when the relay closes a subscription.
 Called when the relay sends an AUTH challenge (NIP-42). The client
 should respond by calling C<authenticate>.
 
+=item C<neg_msg> - C<sub { my ($subscription_id, $msg) = @_; }>
+
+Called when the relay sends a NEG-MSG response (NIP-77). C<$msg> is the
+hex-encoded negentropy message to pass to L<Net::Nostr::Negentropy/reconcile>.
+
+=item C<neg_err> - C<sub { my ($subscription_id, $message) = @_; }>
+
+Called when the relay sends a NEG-ERR (NIP-77). The negentropy session
+is considered closed after this.
+
 =back
 
 =head1 SEE ALSO
 
-L<Net::Nostr>, L<Net::Nostr::Event>, L<Net::Nostr::Filter>, L<Net::Nostr::Relay>
+L<NIP-01|https://github.com/nostr-protocol/nips/blob/master/01.md>,
+L<NIP-45|https://github.com/nostr-protocol/nips/blob/master/45.md>,
+L<NIP-77|https://github.com/nostr-protocol/nips/blob/master/77.md>,
+L<Net::Nostr>, L<Net::Nostr::Event>, L<Net::Nostr::Filter>, L<Net::Nostr::Relay>,
+L<Net::Nostr::Negentropy>
 
 =cut

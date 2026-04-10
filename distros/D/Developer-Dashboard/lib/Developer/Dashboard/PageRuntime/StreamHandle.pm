@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime::StreamHandle;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 # TIEHANDLE(%args)
 # Creates a tied handle that forwards printed chunks to a callback.
@@ -69,30 +69,50 @@ Implement the tied-handle contract used by streamed bookmark Ajax execution.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file adapts streaming handles used by bookmark runtime and saved Ajax execution.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is the small stream object used by page runtime and web streaming code. It presents one consistent write interface for incremental output so bookmark runtime code and server-side streaming can push chunks without depending on a specific PSGI responder implementation.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because streaming output is easier to test when the stream sink is a small object instead of a raw callback buried in transport code. That separation also keeps disconnect handling and chunk capture explicit.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing streaming write semantics, buffering behavior, or tests around incremental page output and broken-pipe handling.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::PageRuntime::StreamHandle> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the callback or sink expected by the caller, then pass it into the part of the runtime that wants to emit streaming content. Keep transport-neutral streaming behavior here rather than tying it to one web-server code path.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by page-runtime streaming helpers, by web response code that needs incremental output, and by coverage tests around streamed bookmark and Ajax behavior.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::PageRuntime::StreamHandle -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::PageRuntime::StreamHandle -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/07-core-units.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

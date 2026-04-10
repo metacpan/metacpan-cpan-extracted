@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: ['5.40', '5.38', '5.36', '5.34', '5.32', '5.28', '5.24', '5.20']
+    name: Linux / Perl ${{ matrix.perl }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - name: Install nats-server
+        run: |
+          curl -fsSL https://github.com/nats-io/nats-server/releases/download/v2.10.24/nats-server-v2.10.24-linux-amd64.tar.gz | tar xz
+          sudo mv nats-server-v2.10.24-linux-amd64/nats-server /usr/local/bin/
+      - name: Start nats-server
+        run: nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
+      - name: Install deps
+        run: cpanm -n EV
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test
+        run: TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 make test
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: ['5.40', '5.36']
+    name: macOS / Perl ${{ matrix.perl }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - name: Install nats-server
+        run: brew install nats-server
+      - name: Start nats-server
+        run: nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
+      - name: Install deps
+        run: cpanm -n EV
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test
+        run: TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 make test
+
+  freebsd:
+    runs-on: ubuntu-latest
+    name: FreeBSD / Perl (system)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg install -y perl5 p5-EV nats-server gmake
+          run: |
+            nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
+            sleep 1
+            perl Makefile.PL && gmake
+            TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 gmake test

@@ -122,7 +122,7 @@ static SV* hook_reverse(pTHX_ FileHookContext *ctx) {
  */
 
 /* Install uppercase hook */
-static XS(xs_install_uppercase_hook) {
+XS_EXTERNAL(xs_install_uppercase_hook) {
     dXSARGS;
     const char *phase_name;
     FileHookPhase phase;
@@ -144,7 +144,7 @@ static XS(xs_install_uppercase_hook) {
 }
 
 /* Install lowercase hook */
-static XS(xs_install_lowercase_hook) {
+XS_EXTERNAL(xs_install_lowercase_hook) {
     dXSARGS;
     const char *phase_name;
 
@@ -163,7 +163,7 @@ static XS(xs_install_lowercase_hook) {
 }
 
 /* Install reverse hook (for encoding simulation) */
-static XS(xs_install_reverse_hook) {
+XS_EXTERNAL(xs_install_reverse_hook) {
     dXSARGS;
     const char *phase_name;
 
@@ -182,7 +182,7 @@ static XS(xs_install_reverse_hook) {
 }
 
 /* Clear hooks */
-static XS(xs_clear_hook) {
+XS_EXTERNAL(xs_clear_hook) {
     dXSARGS;
     const char *phase_name;
 
@@ -201,7 +201,7 @@ static XS(xs_clear_hook) {
 }
 
 /* Check if hook is set using C macro */
-static XS(xs_has_hook) {
+XS_EXTERNAL(xs_has_hook) {
     dXSARGS;
     const char *phase_name;
     int has;
@@ -222,7 +222,7 @@ static XS(xs_has_hook) {
 }
 
 /* Get hook function pointer (for testing) */
-static XS(xs_get_hook_ptr) {
+XS_EXTERNAL(xs_get_hook_ptr) {
     dXSARGS;
     const char *phase_name;
     file_hook_func func = NULL;
@@ -245,7 +245,7 @@ static XS(xs_get_hook_ptr) {
 }
 
 /* Test direct hook invocation from C */
-static XS(xs_transform_string) {
+XS_EXTERNAL(xs_transform_string) {
     dXSARGS;
     const char *transform;
     SV *input;

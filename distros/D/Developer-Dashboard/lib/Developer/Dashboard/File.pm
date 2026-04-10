@@ -3,7 +3,7 @@ package Developer::Dashboard::File;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use File::Spec;
 
@@ -74,30 +74,50 @@ Configure and read or write compatibility files.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file provides reusable file-system helpers for reading, writing, and normalizing runtime files.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is the narrow compatibility wrapper for older bookmark code that still expects a top-level C<File> package with alias-aware C<read> and C<write> methods. It maps friendly aliases to real paths and then performs the requested file operation.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists to keep older bookmark snippets working while the rest of the runtime uses newer namespaced modules. The compatibility surface is intentionally tiny so the old API does not leak further into new code.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when a compatibility bookmark or test still relies on C<File-E<gt>read>, C<File-E<gt>write>, or C<File-E<gt>configure>, or when you need to tighten the behavior of that old alias mechanism without breaking the compatibility contract.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::File> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Call C<configure> once with any alias map you need, then use C<read> or C<write> with either the alias or the concrete path. Treat it as a compatibility shim, not as the main runtime file abstraction.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by older bookmark code paths, by compatibility tests, and by release documentation that keeps the backward-compatible helper layer visible to maintainers.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::File -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::File -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/21-refactor-coverage.t t/00-load.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

@@ -97,7 +97,7 @@ eval {
       };
     ok( $payload->{ok}, 'sqlite sql-dashboard Playwright matrix reports success' )
       or diag _diagnostic_text($payload);
-    is( scalar @{ $payload->{cases} || [] }, 51, 'sqlite sql-dashboard Playwright matrix records 51 UX and limit cases' );
+    is( scalar @{ $payload->{cases} || [] }, 54, 'sqlite sql-dashboard Playwright matrix records 54 UX and limit cases' );
     for my $case ( @{ $payload->{cases} || [] } ) {
         ok( $case->{ok}, $case->{name} ) or diag _case_diagnostic($case);
     }
@@ -249,7 +249,7 @@ async function main() {
 
   await check('blank-user SQLite profile save succeeds', async () => {
     const saveResponse = await Promise.all([
-      page.waitForResponse((response) => response.url().includes('/ajax/sql-dashboard-profiles-save') && response.status() === 200),
+      page.waitForResponse((response) => response.request().method() === 'POST' && response.url().includes('/ajax/sql-dashboard-profiles-save') && response.status() === 200),
       page.locator('#sql-profile-save').click()
     ]).then((values) => values[0]);
     const payload = await saveResponse.json();
@@ -305,9 +305,16 @@ async function main() {
     const layout = await page.evaluate(() => {
       const panel = document.getElementById('sql-panel-workspace');
       const nav = document.getElementById('sql-workspace-nav');
-      return !!(panel && nav && panel.contains(nav));
+      const tabs = Array.from(document.querySelectorAll('[data-sql-workspace-tab]')).map((node) => node.textContent || '');
+      const active = document.querySelector('[data-sql-workspace-tab].is-active');
+      return {
+        navInWorkspace: !!(panel && nav && panel.contains(nav)),
+        tabs,
+        active: active ? active.textContent : ''
+      };
     });
-    ensure(layout, 'workspace nav should live inside the workspace panel');
+    ensure(layout.navInWorkspace && layout.tabs.includes('Collection') && layout.tabs.includes('Run SQL') && String(layout.active || '').includes('Run SQL'),
+      'workspace should expose Collection and Run SQL subtabs with Run SQL active by default: ' + JSON.stringify(layout));
   });
 
   await check('workspace layout keeps editor inside workspace', async () => {
@@ -374,7 +381,9 @@ async function main() {
   });
 
   await page.locator('#sql-editor').fill('select id, name, note from users order by id');
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('#sql-collection-name').fill('');
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   await page.locator('#sql-collection-item-name').fill('Users Query');
   await page.locator('#sql-collection-item-save').click();
   await check('missing collection name shows explicit error', async () => {
@@ -383,7 +392,9 @@ async function main() {
       'missing collection name should show an explicit error: ' + JSON.stringify({ banner }));
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('#sql-collection-name').fill(process.env.SQLITE_COLLECTION);
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   await page.locator('#sql-collection-item-name').fill('');
   await page.locator('#sql-collection-item-save').click();
   await check('missing SQL name shows explicit error', async () => {
@@ -392,6 +403,15 @@ async function main() {
       'missing SQL name should show an explicit error: ' + JSON.stringify({ banner }));
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
+  const collectionCreateResponse = await Promise.all([
+    page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
+    page.locator('#sql-collection-save').click()
+  ]).then((values) => values[0]);
+  const collectionCreatePayload = await collectionCreateResponse.json();
+  ensure(collectionCreatePayload && collectionCreatePayload.ok, 'collection create failed: ' + JSON.stringify(collectionCreatePayload || {}));
+
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   await page.locator('#sql-collection-item-name').fill('Users Query');
   await page.locator('#sql-editor').fill('');
   await page.locator('#sql-collection-item-save').click();
@@ -404,7 +424,7 @@ async function main() {
   await page.locator('#sql-editor').fill('select id, name, note from users order by id');
   await check('first collection save succeeds', async () => {
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
       page.locator('#sql-collection-item-save').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -424,12 +444,14 @@ async function main() {
     ensure(String(itemText || '').includes('Users Query'), 'first saved SQL item did not appear');
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('#sql-collection-item-new').click();
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   await page.locator('#sql-collection-item-name').fill('Orders Query');
   await page.locator('#sql-editor').fill('select id, total, status from orders order by id');
   await check('second SQL save adds another item', async () => {
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
       page.locator('#sql-collection-item-save').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -445,6 +467,7 @@ async function main() {
       'active saved SQL label should show Orders Query: ' + JSON.stringify({ label }));
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('[data-sql-collection-item-link="users-query"]').click();
   await page.waitForTimeout(250);
   await check('clicking first saved SQL restores its SQL text', async () => {
@@ -457,6 +480,7 @@ async function main() {
     ensure(String(label || '').includes('Users Query'), 'active saved SQL label should switch to Users Query: ' + JSON.stringify({ label }));
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('[data-sql-collection-item-link="orders-query"]').click();
   await page.waitForTimeout(250);
   await check('clicking second saved SQL restores its SQL text', async () => {
@@ -477,8 +501,9 @@ async function main() {
   });
 
   await check('inline delete removes only targeted SQL item', async () => {
+    await page.locator('[data-sql-workspace-tab="collections"]').click();
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
       page.locator('[data-sql-collection-item-delete="users-query"]').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -486,6 +511,7 @@ async function main() {
     await page.waitForFunction(() => !document.querySelector('[data-sql-collection-item-link="users-query"]') && !!document.querySelector('[data-sql-collection-item-link="orders-query"]'));
   });
 
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   const executableSql = [
     'select id, name, note from users order by id',
     ':~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~:',
@@ -499,7 +525,7 @@ async function main() {
 
   await check('select query executes successfully', async () => {
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
       page.locator('#sql-run').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -543,7 +569,7 @@ async function main() {
     const sql = await page.locator('#sql-editor').inputValue();
     ensure(sql === 'select * from definitely_missing_table', 'invalid SQL case should update the editor before execution: ' + JSON.stringify({ sql }));
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
       page.locator('#sql-run').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -572,7 +598,7 @@ async function main() {
     const sql = await page.locator('#sql-editor').inputValue();
     ensure(sql === 'select id from users order by id', 'invalid attrs case should restore a valid SQL query before execution: ' + JSON.stringify({ sql }));
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
       page.locator('#sql-run').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -594,7 +620,7 @@ async function main() {
   }, '{"RaiseError":1,"PrintError":0,"AutoCommit":1}');
 
   const schemaResponse = await Promise.all([
-    page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-schema-browse') && value.status() === 200),
+    page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-schema-browse') && value.status() === 200),
     page.locator('[data-sql-main-tab="schema"]').click()
   ]).then((values) => values[0]);
   const schemaPayload = await schemaResponse.json();
@@ -602,13 +628,22 @@ async function main() {
   await page.waitForTimeout(400);
 
   await check('schema browse loads users table', async () => {
-    const tabs = await page.locator('[data-sql-table-tab]').allTextContents();
+    const tabs = await page.locator('[data-sql-table-name]').allTextContents();
     ensure(tabs.includes('users'), 'schema tabs should include users: ' + JSON.stringify(tabs));
   });
 
   await check('schema browse loads orders table', async () => {
-    const tabs = await page.locator('[data-sql-table-tab]').allTextContents();
+    const tabs = await page.locator('[data-sql-table-name]').allTextContents();
     ensure(tabs.includes('orders'), 'schema tabs should include orders: ' + JSON.stringify(tabs));
+  });
+
+  await check('schema table filter narrows the table list live', async () => {
+    await page.locator('#sql-table-filter').fill('ord');
+    await page.waitForTimeout(200);
+    const tabs = await page.locator('[data-sql-table-name]').allTextContents();
+    ensure(tabs.length === 1 && tabs.includes('orders'),
+      'schema filter should narrow the table list to orders: ' + JSON.stringify(tabs));
+    await page.locator('#sql-table-filter').fill('');
   });
 
   await page.locator('[data-sql-table-tab="orders"]').click();
@@ -618,9 +653,36 @@ async function main() {
     ensure(String(columns || '').includes('total'), 'orders columns should include total: ' + JSON.stringify({ columns }));
   });
 
+  await check('schema column list shows normalized type labels instead of raw codes', async () => {
+    const columns = await page.locator('#sql-column-list').textContent();
+    ensure(String(columns || '').match(/REAL|INTEGER|TEXT/i),
+      'orders columns should show human type labels: ' + JSON.stringify({ columns }));
+  });
+
   await check('schema route updates browser URL', async () => {
     const url = page.url();
     ensure(url.includes('tab=schema'), 'schema route should update the URL: ' + url);
+  });
+
+  await check('schema view-data action opens the Run SQL tab with a ready query', async () => {
+    const response = await Promise.all([
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
+      page.locator('[data-sql-table-query="orders"]').click()
+    ]).then((values) => values[0]);
+    const payload = await response.json();
+    ensure(payload && payload.ok, 'schema view-data action failed: ' + JSON.stringify(payload || {}));
+    const state = await page.evaluate(() => {
+      const main = document.querySelector('[data-sql-main-tab].is-active');
+      const workspace = document.querySelector('[data-sql-workspace-tab].is-active');
+      const sql = document.getElementById('sql-editor');
+      return {
+        main: main ? main.textContent : '',
+        workspace: workspace ? workspace.textContent : '',
+        sql: sql ? sql.value : ''
+      };
+    });
+    ensure(String(state.main || '').includes('SQL Workspace') && String(state.workspace || '').includes('Run SQL') && String(state.sql || '').includes('select * from orders'),
+      'schema view-data should switch to the Run SQL workspace with a query ready: ' + JSON.stringify(state));
   });
 
   await page.locator('[data-sql-main-tab="workspace"]').click();
@@ -631,14 +693,14 @@ async function main() {
 
   await page.locator('[data-sql-main-tab="profiles"]').click();
   const deleteResponse = await Promise.all([
-    page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-profiles-delete') && value.status() === 200),
+    page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-profiles-delete') && value.status() === 200),
     page.locator('#sql-profile-delete').click()
   ]).then((values) => values[0]);
   const deletePayload = await deleteResponse.json();
   ensure(deletePayload && deletePayload.ok, 'profile delete before shared-url reload failed: ' + JSON.stringify(deletePayload || {}));
 
   await Promise.all([
-    page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
+    page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
     page.goto(savedRouteUrl, { waitUntil: 'networkidle' })
   ]);
   await page.waitForTimeout(400);
@@ -934,52 +996,48 @@ __END__
 
 31-sql-dashboard-sqlite-playwright.t - real SQLite Playwright matrix for the sql-dashboard bookmark
 
+=for comment FULL-POD-DOC START
+
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file drives the seeded
-C<sql-dashboard> bookmark through a real Chromium Playwright session against a
-real SQLite database instead of the older fake-DBI smoke path.
+This test is the executable regression contract for the sql-dashboard runtime and browser workflow. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to prove that the SQL dashboard is actually usable with a real local
-SQLite workflow, including blank-user connection profiles, shareable
-workspace URLs, schema browsing, error surfacing, collection management, and
-other UX-sensitive browser interactions that a fake driver cannot validate.
+It exists because the sql-dashboard runtime and browser workflow has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the SQL dashboard browser UX, connection
-profile model, SQL execution flow, schema browsing, shareable route state, or
-SQLite compatibility. Run it before release when you need confidence that the
-real browser path still works with an actual database.
+Use it when SQLite profile handling, SQL Workspace tabs, schema browsing, or browser-visible SQL execution changes.
 
 =head1 HOW TO USE
 
-Run it directly with:
-
-  prove -lv t/31-sql-dashboard-sqlite-playwright.t
-
-The current Perl environment must already be able to load C<DBI> and
-C<DBD::SQLite>. This test intentionally does not add those drivers to shipped
-runtime prerequisites, so install them separately for local verification when
-needed.
+Run it directly with C<prove -lv t/31-sql-dashboard-sqlite-playwright.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. For browser-backed tests, make sure the external browser tooling they name is actually present instead of assuming the suite will fabricate it. Make sure node, npx, git, Chromium, DBI, and DBD::SQLite are available; the test skips instead of faking success when that stack is missing.
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by focused browser regression work on the
-SQL dashboard, and by release verification when the maintainer wants real
-SQLite browser coverage beyond the fake-driver smoke test.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/31-sql-dashboard-sqlite-playwright.t
 
-  PERL5LIB=/tmp/sql-lib/lib/perl5:/tmp/sql-lib/lib/perl5/x86_64-linux-gnu-thread-multi \
-  prove -lv t/31-sql-dashboard-sqlite-playwright.t
+Run the focused regression test by itself while you are changing the behavior it owns.
 
-Use the first command when DBI and DBD::SQLite are already installed in the
-active Perl. Use the second when you have staged those drivers into a separate
-local::lib for browser verification.
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/31-sql-dashboard-sqlite-playwright.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
+
+=for comment FULL-POD-DOC END
 
 =cut

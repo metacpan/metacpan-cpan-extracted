@@ -1,0 +1,12 @@
+{
+  "name": "developer-dashboard-scorecard",
+  "private": true,
+  "description": "Scorecard-oriented JavaScript property tests for Developer Dashboard",
+  "scripts": {
+    "fuzz:scorecard": "node t/fuzz/scorecard-fast-check.mjs"
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.2"
+  }
+}
+

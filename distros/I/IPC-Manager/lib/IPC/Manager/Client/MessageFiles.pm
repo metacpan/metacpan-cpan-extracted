@@ -2,7 +2,7 @@ package IPC::Manager::Client::MessageFiles;
 use strict;
 use warnings;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp qw/croak confess/;
 use File::Spec;

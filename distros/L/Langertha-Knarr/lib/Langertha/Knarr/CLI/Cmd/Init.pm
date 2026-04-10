@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Init;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: Scan environment and generate Knarr configuration
 use Moo;
 use MooX::Cmd;
@@ -76,7 +76,7 @@ Langertha::Knarr::CLI::Cmd::Init - Scan environment and generate Knarr configura
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 DESCRIPTION
 
@@ -109,6 +109,10 @@ for the env scanning logic, and L<Langertha::Knarr> for the config format.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

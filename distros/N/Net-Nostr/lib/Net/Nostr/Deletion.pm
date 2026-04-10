@@ -5,11 +5,16 @@ use strictures 2;
 use Carp qw(croak);
 use Net::Nostr::Event;
 
+my $HEX64 = qr/\A[0-9a-f]{64}\z/;
+
 use Class::Tiny qw(reason _events _addresses _kinds);
 
 sub new {
     my $class = shift;
     my $self = bless { @_ }, $class;
+    my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
+    my @unknown = grep { !exists $known{$_} } keys %$self;
+    croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
     $self->_events($self->_events // []);
     $self->_addresses($self->_addresses // []);
     $self->_kinds($self->_kinds // {});
@@ -19,6 +24,7 @@ sub new {
 
 sub add_event {
     my ($self, $event_id, %opts) = @_;
+    croak "event_id must be 64-char lowercase hex" unless $event_id =~ $HEX64;
     my $kind = $opts{kind} // croak "add_event requires 'kind'";
     push @{$self->_events}, $event_id;
     $self->_kinds->{$kind} = 1;
@@ -63,6 +69,7 @@ sub from_event {
 
     my $self = $class->new(reason => $event->content);
     for my $tag (@{$event->tags}) {
+        next unless @$tag >= 2 && defined $tag->[1];
         if ($tag->[0] eq 'e') {
             push @{$self->_events}, $tag->[1];
         } elsif ($tag->[0] eq 'a') {
@@ -83,9 +90,17 @@ sub applies_to {
         return 1 if $target_event->id eq $id;
     }
 
-    # Check a tags for addressable events
+    # Check a tags for addressable events (kind:pubkey:d_tag)
     if ($target_event->is_addressable) {
         my $target_addr = $target_event->kind . ':' . $target_event->pubkey . ':' . $target_event->d_tag;
+        for my $addr (@{$self->_addresses}) {
+            return 1 if $addr eq $target_addr;
+        }
+    }
+
+    # Check a tags for replaceable events (kind:pubkey:)
+    if ($target_event->is_replaceable) {
+        my $target_addr = $target_event->kind . ':' . $target_event->pubkey . ':';
         for my $addr (@{$self->_addresses}) {
             return 1 if $addr eq $target_addr;
         }
@@ -111,6 +126,7 @@ Net::Nostr::Deletion - NIP-09 event deletion requests
     $del->add_event($event_id, kind => 1);
     $del->add_event($other_id, kind => 1);
     $del->add_address("30023:$pubkey:my-article", kind => 30023);
+    $del->add_address("10000:$pubkey:", kind => 10000);  # replaceable
 
     my $event = $del->to_event(pubkey => $my_pubkey);
     $key->sign_event($event);
@@ -143,14 +159,14 @@ but there is no guarantee that events will be deleted from all relays.
     my $del = Net::Nostr::Deletion->new(reason => 'posted by accident');
 
 Creates an empty deletion request. C<reason> is optional and becomes the
-event's C<content> field.
+event's C<content> field. Croaks on unknown arguments.
 
 =head2 from_event
 
     my $del = Net::Nostr::Deletion->from_event($event);
 
-Parses a kind 5 event into a Deletion object. Croaks if the event is
-not kind 5.
+Parses a kind 5 event into a Deletion object. Tags with fewer than
+two elements are silently skipped. Croaks if the event is not kind 5.
 
     my $del = Net::Nostr::Deletion->from_event($event);
     for my $id (@{$del->event_ids}) {
@@ -172,9 +188,11 @@ be included as a C<k> tag. Returns C<$self> for chaining.
 =head2 add_address
 
     $del->add_address("30023:$pubkey:my-article", kind => 30023);
+    $del->add_address("10000:$pubkey:", kind => 10000);  # replaceable
 
-Adds an addressable event coordinate (C<a> tag) to the deletion request.
-C<kind> is required. Returns C<$self> for chaining.
+Adds an event coordinate (C<a> tag) to the deletion request. The coordinate
+may be addressable (C<kind:pubkey:d_tag>) or replaceable (C<kind:pubkey:>
+with empty d_tag). C<kind> is required. Returns C<$self> for chaining.
 
 =head2 event_ids
 
@@ -186,7 +204,8 @@ Returns the list of event IDs referenced by C<e> tags.
 
     my $addrs = $del->addresses;  # arrayref
 
-Returns the list of addressable event coordinates referenced by C<a> tags.
+Returns the list of event coordinates referenced by C<a> tags (both
+addressable and replaceable).
 
 =head2 reason
 
@@ -217,7 +236,8 @@ Checks that:
 =item * The target event's pubkey matches the deletion request's pubkey
 
 =item * The target event's ID is referenced by an C<e> tag, or its
-addressable coordinate is referenced by an C<a> tag
+addressable coordinate (C<kind:pubkey:d_tag>) or replaceable coordinate
+(C<kind:pubkey:>) is referenced by an C<a> tag
 
 =back
 
@@ -227,6 +247,7 @@ addressable coordinate is referenced by an C<a> tag
 
 =head1 SEE ALSO
 
+L<NIP-09|https://github.com/nostr-protocol/nips/blob/master/09.md>,
 L<Net::Nostr>, L<Net::Nostr::Event>
 
 =cut

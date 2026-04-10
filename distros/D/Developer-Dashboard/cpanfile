@@ -5,6 +5,7 @@ requires 'Capture::Tiny';
 requires 'Getopt::Long';
 requires 'Digest::MD5';
 requires 'Digest::SHA';
+requires 'Archive::Zip';
 requires 'MIME::Base64';
 requires 'IO::Compress::Gzip';
 requires 'IO::Uncompress::Gunzip';

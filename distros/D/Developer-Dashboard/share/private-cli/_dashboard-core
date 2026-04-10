@@ -956,20 +956,18 @@ else {
 }
 
 # _seed_init_page($pages, $known_ids, $page)
-# Saves one seeded page when it does not already exist in the effective bookmark roots.
+# Saves or refreshes one seeded page when the existing target is still the last
+# known dashboard-managed copy, while preserving diverged user-edited pages.
 # Input: page store, array reference of known ids, and page document object.
 # Output: true when the page already existed or was written.
 sub _seed_init_page {
     my ( $pages, $known_ids, $page ) = @_;
     my $id = $page->as_hash->{id} || return 1;
-    if ( grep { $_ eq $id } @{ $known_ids || [] } ) {
-        my $current = eval { $pages->read_saved_entry($id) };
-        return 1
-          if defined $current
-          && Developer::Dashboard::SeedSync::same_content_md5( $current, $page->canonical_instruction );
-        return 1;
-    }
-    $pages->save_page($page);
+    Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
+        page  => $page,
+        pages => $pages,
+        paths => $paths,
+    );
     push @{ $known_ids || [] }, $id;
     return 1;
 }
@@ -1014,8 +1012,18 @@ sub _shell_dashboard_command {
 sub _shell_bootstrap {
     my ($shell) = @_;
     my $dashboard_cmd = _shell_dashboard_command($shell);
+    my $dashboard_json_matches = _shell_json_extract_command(
+        $shell,
+        'my $h=JSON::XS->new->decode($_); print join qq(\n), @{ $h->{matches} || [] }',
+    );
+    my $dashboard_json_target = _shell_json_extract_command(
+        $shell,
+        'my $h=JSON::XS->new->decode($_); print $h->{target} // q{}',
+    );
     my $bootstrap = _shell_navigation_bootstrap($shell) . "\n" . _shell_prompt_bootstrap($shell);
     $bootstrap =~ s/__DASHBOARD_CMD__/$dashboard_cmd/g;
+    $bootstrap =~ s/__DASHBOARD_JSON_MATCHES__/$dashboard_json_matches/g;
+    $bootstrap =~ s/__DASHBOARD_JSON_TARGET__/$dashboard_json_target/g;
     return $bootstrap;
 }
 
@@ -1031,32 +1039,31 @@ sub _shell_navigation_bootstrap {
 function Get-DashboardTarget {
   param([string[]]$DashboardArgs)
   if (-not $DashboardArgs -or $DashboardArgs.Count -eq 0) {
-    return $null
+    return [pscustomobject]@{ target = $null; matches = @() }
   }
-  $target = (__DASHBOARD_CMD__ path resolve $DashboardArgs[0] 2>$null | Select-Object -First 1)
-  if (-not $target) {
-    $json = __DASHBOARD_CMD__ path locate @DashboardArgs
-    if ($LASTEXITCODE -eq 0 -and $json) {
-      $parsed = $json | ConvertFrom-Json
-      if ($parsed -is [System.Array]) {
-        $target = $parsed[0]
-      }
-      elseif ($parsed) {
-        $target = $parsed
-      }
-    }
+  $json = __DASHBOARD_CMD__ path cdr @DashboardArgs
+  if ($LASTEXITCODE -ne 0 -or -not $json) {
+    return [pscustomobject]@{ target = $null; matches = @() }
   }
-  if ($target) {
-    return [string]$target
+  $parsed = $json | ConvertFrom-Json
+  $matches = @()
+  if ($parsed.matches) {
+    $matches = @($parsed.matches)
   }
-  return $null
+  return [pscustomobject]@{
+    target = if ($parsed.target) { [string]$parsed.target } else { $null }
+    matches = $matches
+  }
 }
 
 function cdr {
   param([Parameter(ValueFromRemainingArguments = $true)][string[]]$DashboardArgs)
-  $target = Get-DashboardTarget -DashboardArgs $DashboardArgs
-  if ($target) {
-    Set-Location $target
+  $selection = Get-DashboardTarget -DashboardArgs $DashboardArgs
+  if ($selection.matches.Count -gt 0) {
+    $selection.matches
+  }
+  if ($selection.target) {
+    Set-Location $selection.target
   }
 }
 
@@ -1064,23 +1071,24 @@ Set-Alias dd_cdr cdr
 
 function which_dir {
   param([Parameter(ValueFromRemainingArguments = $true)][string[]]$DashboardArgs)
-  if (-not $DashboardArgs -or $DashboardArgs.Count -eq 0) {
+  $selection = Get-DashboardTarget -DashboardArgs $DashboardArgs
+  if ($selection.matches.Count -gt 0) {
+    $selection.matches
     return
   }
-  $resolved = (__DASHBOARD_CMD__ path resolve $DashboardArgs[0] 2>$null | Select-Object -First 1)
-  if ($resolved) {
-    $resolved
-    return
+  if ($selection.target) {
+    $selection.target
   }
-  __DASHBOARD_CMD__ path locate @DashboardArgs
 }
 POWERSHELL
     }
     return <<'SH';
 cdr() {
-  target="$(__DASHBOARD_CMD__ path resolve "$1" 2>/dev/null || true)"
-  if [ -z "$target" ]; then
-    target="$(__DASHBOARD_CMD__ path locate "$@" | perl -MJSON::XS -0777 -ne 'my $a=JSON::XS->new->decode($_); print $a->[0] // q{}')"
+  payload="$(__DASHBOARD_CMD__ path cdr "$@")"
+  matches="$(printf '%s' "$payload" | __DASHBOARD_JSON_MATCHES__)"
+  target="$(printf '%s' "$payload" | __DASHBOARD_JSON_TARGET__)"
+  if [ -n "$matches" ]; then
+    printf '%s\n' "$matches"
   fi
   if [ -n "$target" ]; then
     cd "$target"
@@ -1092,9 +1100,37 @@ dd_cdr() {
 }
 
 which_dir() {
-  __DASHBOARD_CMD__ path resolve "$1" 2>/dev/null || __DASHBOARD_CMD__ path locate "$@"
+  payload="$(__DASHBOARD_CMD__ path cdr "$@")"
+  matches="$(printf '%s' "$payload" | __DASHBOARD_JSON_MATCHES__)"
+  target="$(printf '%s' "$payload" | __DASHBOARD_JSON_TARGET__)"
+  if [ -n "$matches" ]; then
+    printf '%s\n' "$matches"
+    return
+  fi
+  if [ -n "$target" ]; then
+    printf '%s\n' "$target"
+  fi
 }
 SH
+}
+
+# _shell_json_extract_command($shell, $perl_code)
+# Builds the shell-safe JSON decoding command used by generated shell helpers.
+# Input: normalized shell name plus one Perl one-liner body string.
+# Output: shell command string suitable for use on the right-hand side of a pipe.
+sub _shell_json_extract_command {
+    my ( $shell, $perl_code ) = @_;
+    my $repo_lib = $ENV{DEVELOPER_DASHBOARD_REPO_LIB} || File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', 'lib' ) );
+    my @command = ($^X);
+    if ( -f File::Spec->catfile( $repo_lib, 'Developer', 'Dashboard.pm' ) ) {
+        push @command, '-I' . $repo_lib;
+    }
+    push @command, '-MJSON::XS', '-0777', '-ne', $perl_code;
+
+    if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
+        return join ' ', '&', map { shell_quote_for( $shell, $_ ) } @command;
+    }
+    return join ' ', map { shell_quote_for( $shell, $_ ) } @command;
 }
 
 # _shell_prompt_bootstrap($shell)
@@ -1156,7 +1192,10 @@ _dashboard-core - internal staged built-in command runtime for Developer Dashboa
 This internal helper runs the heavier built-in Developer Dashboard commands
 after the public C<dashboard> entrypoint has already handled hook execution and
 switchboard dispatch. It is staged under F<~/.developer-dashboard/cli/dd/> as
-F<_dashboard-core> and is not meant to be called by users directly.
+F<_dashboard-core> and is not meant to be called by users directly. It also
+generates the shared shell bootstrap snippets that expose C<cdr>,
+C<dd_cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and
+PowerShell.
 
 __END__
 
@@ -1170,31 +1209,50 @@ _dashboard-core - contains the shared private built-in command runtime that the 
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file contains the shared private built-in command runtime that the staged helper scripts hand off into.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This private staged runtime owns the heavier built-in command implementations after C<bin/dashboard> has already done hook execution and helper dispatch. It is also where the generated shell bootstrap snippets come from, including C<cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and PowerShell.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists so the public entrypoint stays thin while dashboard-managed built-ins still share one internal command runtime. The staged helper wrappers can all hand off into this file instead of each carrying their own copy of command logic.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing built-in command dispatch after helper staging, shell bootstrap generation, or behavior shared across multiple staged helper wrappers.
 
 =head1 HOW TO USE
 
-This script is not meant to be called directly by users. The staged private helper wrappers exec into it after C<dashboard init> or on-demand helper staging has populated C<~/.developer-dashboard/cli/dd/>.
+Users do not call this file directly. C<dashboard init> or on-demand staging writes wrappers under F<~/.developer-dashboard/cli/dd/>, and those wrappers invoke C<_dashboard-core> with the built-in command name they represent.
 
 =head1 WHAT USES IT
 
-It is used by the staged built-in helper wrappers under C<~/.developer-dashboard/cli/dd/> after C<bin/dashboard> has extracted or refreshed them.
+It is used by every staged dashboard-managed helper under F<~/.developer-dashboard/cli/dd/>, by shell bootstrap generation, and by tests that verify the private-helper runtime contract.
 
 =head1 EXAMPLES
 
-  dashboard init
-  ~/.developer-dashboard/cli/dd/jq . foo.json
+Example 1:
 
-The first command stages the private helpers. The second shows the staged helper path that eventually hands off into C<_dashboard-core>.
+  dashboard paths
+
+Run the public built-in command path that stages or re-enters this helper.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/_dashboard-core --help
+
+Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository suite.
+
 
 =for comment FULL-POD-DOC END
 

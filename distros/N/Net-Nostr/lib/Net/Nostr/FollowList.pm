@@ -11,6 +11,8 @@ use Class::Tiny qw(_follows);
 
 sub new {
     my $class = shift;
+    my %args = @_;
+    croak "unknown argument(s): " . join(', ', sort keys %args) if %args;
     my $self = bless {}, $class;
     $self->_follows([]);
     return $self;
@@ -141,7 +143,7 @@ Re-adding an existing pubkey updates the entry in place.
 
     my $fl = Net::Nostr::FollowList->new;
 
-Creates an empty follow list.
+Creates an empty follow list. Croaks on unknown arguments.
 
 =head2 from_event
 
@@ -228,6 +230,7 @@ C<kind>, C<content>, and C<tags> fields are set automatically.
 
 =head1 SEE ALSO
 
+L<NIP-02|https://github.com/nostr-protocol/nips/blob/master/02.md>,
 L<Net::Nostr>, L<Net::Nostr::Event>, L<Net::Nostr::Key>
 
 =cut

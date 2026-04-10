@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '0.147';
+our $VERSION = '0.148';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -122,7 +122,7 @@ sub _valid_options {
         keep                => '[ 1-9 ][ 0-9 ]*', # undocumented
         default_number      => '[ 0-9 ]+',
         margin              => 'Array_Int',
-        mark                => 'Array_Int',
+        mark                => 'Array_Int_Idx',
         tabs_info           => 'Array_Int',
         tabs_prompt         => 'Array_Int',
         busy_string         => 'Str',
@@ -407,7 +407,7 @@ sub choose_a_directory {
     my ( $self, $opt ) = @_;
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
-    my $prompt_fmt = ( $opt->{cs_label} // 'Directory: ' ) . "%s";
+    my $prompt_fmt = ( $self->{cs_label} // 'Directory: ' ) . "%s";
     if ( length $self->{prompt} ) {
         $prompt_fmt .= "\n" . $self->{prompt};
     }
@@ -733,7 +733,7 @@ sub choose_a_subset {
         if ( @$new_idx ) {
             $cs .= $self->{cs_begin} . join( $self->{cs_separator}, map { defined $_ ? $_ : '' } @{$available}[@$new_idx] ) . $self->{cs_end};
         }
-        elsif ( $opt->{all_by_default} ) {
+        elsif ( $self->{all_by_default} ) {
             $cs .= $self->{cs_begin} . '*' . $self->{cs_end};
         }
         if ( defined $cs ) {
@@ -783,7 +783,7 @@ sub choose_a_subset {
         }
         push @$new_idx, reverse @tmp_idx;
         if ( $ok ) {
-            if ( ! @$new_idx && $opt->{all_by_default} ) {
+            if ( ! @$new_idx && $self->{all_by_default} ) {
                 $new_idx = [ 0 .. $#{$available} ];
             }
             my $return_indexes = $self->{index}; # because __restore_defaults resets $self->{index}
@@ -1001,7 +1001,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.147
+Version 0.148
 
 =cut
 

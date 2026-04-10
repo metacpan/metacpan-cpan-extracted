@@ -1,5 +1,5 @@
 package Langertha::Knarr::Config;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: YAML configuration loader and validator
 use Moo;
 use YAML::PP;
@@ -427,7 +427,7 @@ Langertha::Knarr::Config - YAML configuration loader and validator
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -606,6 +606,10 @@ Returns a string.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

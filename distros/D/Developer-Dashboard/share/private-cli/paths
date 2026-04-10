@@ -36,30 +36,63 @@ full runtime first.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard paths command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes C<dashboard paths>, the command that prints the
+active runtime path set as JSON. It is the shell-visible entrypoint for the
+layered runtime roots, helper directories, config roots, and other path values
+that the dashboard discovers for the current working directory.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because path reporting is a built-in dashboard feature, but the
+public switchboard should only dispatch to a helper while the path runtime owns
+the layered discovery and serialization rules.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the C<dashboard paths> CLI contract, the staged
+helper handoff, or the exact examples contributors use to inspect active
+runtime roots from the shell.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard paths>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/paths> after helper staging.
+Users run C<dashboard paths>. The staged helper forwards the request to the
+lightweight path runtime, which collects layered dashboard roots from
+C<~/.developer-dashboard> down to the current project, computes the effective
+paths for helpers, config, dashboards, and related runtime assets, and prints
+that payload as JSON for human inspection or shell consumption.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/paths>.
+It is used by shell bootstrap code, by users debugging layered runtime state,
+and by tests that verify the active runtime path payload and home-vs-project
+layer precedence.
 
 =head1 EXAMPLES
 
+Example 1:
+
   dashboard paths
 
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/paths>.
+Run the public built-in command path that stages or re-enters this helper.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/paths --help
+
+Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository suite.
+
 
 =for comment FULL-POD-DOC END
 

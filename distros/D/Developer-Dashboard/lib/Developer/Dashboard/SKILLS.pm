@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 1;
 
@@ -417,30 +417,50 @@ L<Developer::Dashboard::SkillDispatcher>
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file ships the public POD guide for skill authors working with Developer Dashboard.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is documentation-only and ships the long-form skill authoring reference inside the installed distribution. It explains the skill directory layout, command and hook model, bookmark routing, isolated dependency root, and environment variables visible to skill commands.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because a source-tree-only markdown guide is not enough for tarball and CPAN installs. The skill system needs a shipped manual that survives installation and can be read through C<perldoc> on a machine that does not have the Git checkout.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when the skill feature gains new layout rules, command semantics, environment variables, or bookmark routing behavior, or when the shipped skill authoring manual needs to stay aligned with C<SKILL.md>.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::SKILLS> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Treat it as installed reference documentation. Keep its content synchronized with the markdown skill guide and focus on explaining how skill authors should structure repos and commands rather than on internal implementation details.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by C<perldoc Developer::Dashboard::SKILLS>, by release metadata checks that compare the shipped docs to the markdown guide, and by contributors authoring or reviewing dashboard skills.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::SKILLS -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::SKILLS -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/19-skill-system.t t/20-skill-web-routes.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

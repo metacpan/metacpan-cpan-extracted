@@ -33,30 +33,50 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard config command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes the runtime configuration commands such as C<dashboard config init> and C<dashboard config show>. It is the small public face of the config subsystem.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because runtime config inspection and bootstrapping are built-ins, but the public command should stay a dispatch shell that hands configuration behavior off to the real config module.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the CLI config surface or when fixing how configuration commands are routed into the private runtime.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard config>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/config> after helper staging.
+Users run C<dashboard config init> or C<dashboard config show>. The staged helper forwards the request to the private runtime, which reads or writes the runtime config files and prints the result.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/config>.
+It is used during first-run setup, by contributors inspecting runtime config state, and by integration smoke that verifies config initialization in a blank environment.
 
 =head1 EXAMPLES
 
-  dashboard config
+Example 1:
 
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/config>.
+  dashboard config show
+
+Run the public built-in command path that stages or re-enters this helper.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/config --help
+
+Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository suite.
+
 
 =for comment FULL-POD-DOC END
 

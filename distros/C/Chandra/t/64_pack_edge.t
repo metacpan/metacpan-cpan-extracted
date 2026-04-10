@@ -8,6 +8,7 @@ use Cwd ();
 use_ok('Chandra::Pack');
 
 my $tmpdir = Cwd::abs_path(tempdir(CLEANUP => 1));
+my $is_darwin = $^O eq 'darwin';
 
 # Helper: create a minimal script
 sub make_script {
@@ -79,7 +80,9 @@ CODE
 
 # ── Special characters in app name ───────────────────────────────────
 
-{
+SKIP: {
+    skip 'macOS pack build tests only on darwin', 2 unless $is_darwin;
+
     my $script = make_script($tmpdir, 'special.pl');
     my $out = file_join($tmpdir, 'special_out');
     file_mkdir($out);
@@ -97,7 +100,9 @@ CODE
 
 # ── Empty app name fallback ──────────────────────────────────────────
 
-{
+SKIP: {
+    skip 'macOS pack build tests only on darwin', 2 unless $is_darwin;
+
     my $script = make_script($tmpdir, 'empty_name.pl');
     my $out = file_join($tmpdir, 'empty_name_out');
     file_mkdir($out);
@@ -114,7 +119,9 @@ CODE
 
 # ── No icon ──────────────────────────────────────────────────────────
 
-{
+SKIP: {
+    skip 'macOS pack build tests only on darwin', 2 unless $is_darwin;
+
     my $script = make_script($tmpdir, 'noicon.pl');
     my $out = file_join($tmpdir, 'noicon_out');
     file_mkdir($out);
@@ -132,7 +139,9 @@ CODE
 
 # ── Missing icon file ignored ────────────────────────────────────────
 
-{
+SKIP: {
+    skip 'macOS pack build tests only on darwin', 1 unless $is_darwin;
+
     my $script = make_script($tmpdir, 'bad_icon.pl');
     my $out = file_join($tmpdir, 'bad_icon_out');
     file_mkdir($out);
@@ -182,16 +191,20 @@ CODE
     for my $plat (qw(macos linux windows)) {
         my $out = file_join($tmpdir, "multi_$plat");
         file_mkdir($out);
-        my $p = Chandra::Pack->new(
-            script   => $script,
-            name     => 'Multi',
-            output   => $out,
-            platform => $plat,
-        );
-        my $result = $p->build;
-        ok($result->{success}, "build for $plat succeeds");
-        is($result->{platform}, $plat, "result platform is $plat");
-        ok($result->{path}, "result has path for $plat");
+        SKIP: {
+            skip 'macOS pack build tests only on darwin', 3 if $plat eq 'macos' && !$is_darwin;
+
+            my $p = Chandra::Pack->new(
+                script   => $script,
+                name     => 'Multi',
+                output   => $out,
+                platform => $plat,
+            );
+            my $result = $p->build;
+            ok($result->{success}, "build for $plat succeeds");
+            is($result->{platform}, $plat, "result platform is $plat");
+            ok($result->{path}, "result has path for $plat");
+        }
     }
 }
 
@@ -209,7 +222,9 @@ CODE
 
 # ── Launcher content correctness ─────────────────────────────────────
 
-{
+SKIP: {
+    skip 'macOS pack build tests only on darwin', 2 unless $is_darwin;
+
     my $script = make_script($tmpdir, 'launch.pl');
     my $out = file_join($tmpdir, 'launch_out');
     file_mkdir($out);

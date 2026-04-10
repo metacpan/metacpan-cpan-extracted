@@ -3,9 +3,11 @@ use warnings;
 
 use Capture::Tiny qw(capture);
 use Cwd qw(chdir cwd);
+use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
+use HTTP::Response;
 use Test::More;
 
 use lib 'lib';
@@ -78,6 +80,105 @@ close $java_fh;
     );
     ok( grep( $_ eq $java_file, @java_named ), 'Java class lookup resolves class file paths' );
     chdir $original_cwd or die "Unable to restore cwd to $original_cwd: $!";
+}
+my $m2_source_jar = File::Spec->catfile(
+    $ENV{HOME}, '.m2', 'repository', 'com', 'example', 'archive-demo', '1.0.0',
+    'archive-demo-1.0.0-sources.jar',
+);
+make_path( File::Spec->catdir( $ENV{HOME}, '.m2', 'repository', 'com', 'example', 'archive-demo', '1.0.0' ) );
+_write_zip_entries(
+    $m2_source_jar,
+    {
+        'com/example/Archived.java' => "package com.example;\npublic class Archived {}\n",
+    },
+);
+{
+    my $original_cwd = cwd();
+    chdir $project_root or die "Unable to chdir to $project_root: $!";
+    my @archive_named = Developer::Dashboard::CLI::OpenFile::_named_source_matches(
+        paths => $registry,
+        name  => 'com.example.Archived',
+    );
+    ok( @archive_named, 'Java class lookup returns a match extracted from a local source archive when no .java file exists in the project tree' );
+    like( $archive_named[0], qr{/\Qopen-file/java-sources/\E}, 'Java archive lookup extracts matching source files into the dashboard cache tree' );
+    open my $archive_source_fh, '<', $archive_named[0] or die "Unable to read $archive_named[0]: $!";
+    my $archive_source = do { local $/; <$archive_source_fh> };
+    close $archive_source_fh;
+    like( $archive_source, qr/public class Archived/, 'Java archive lookup preserves the extracted source content' );
+    chdir $original_cwd or die "Unable to restore cwd to $original_cwd: $!";
+}
+{
+    my $download_fixture = File::Spec->catfile( $ENV{HOME}, 'downloaded-sources.jar' );
+    my $expected_downloaded_jar = File::Spec->catfile(
+        $registry->cache_root,
+        'open-file',
+        'maven-sources',
+        'javax',
+        'jws',
+        'javax.jws-api',
+        '1.0.0',
+        'javax.jws-api-1.0.0-sources.jar',
+    );
+    unlink $expected_downloaded_jar if -f $expected_downloaded_jar;
+    _write_zip_entries(
+        $download_fixture,
+        {
+            'javax/jws/WebService.java' => "package javax.jws;\npublic \@interface WebService {}\n",
+        },
+    );
+    my $mirrored_url = '';
+    no warnings 'redefine';
+    local *LWP::UserAgent::get = sub {
+        return HTTP::Response->new(
+            200,
+            'OK',
+            [],
+            qq|{"response":{"docs":[{"g":"javax.jws","a":"javax.jws-api","v":"1.0.0","ec":["-sources.jar"]}]}}|,
+        );
+    };
+    local *LWP::UserAgent::mirror = sub {
+        my ( $self, $url, $target ) = @_;
+        $mirrored_url = $url;
+        open my $source_fh, '<', $download_fixture or die "Unable to read $download_fixture: $!";
+        my $payload = do { local $/; <$source_fh> };
+        close $source_fh;
+        open my $target_fh, '>', $target or die "Unable to write $target: $!";
+        binmode $target_fh;
+        print {$target_fh} $payload;
+        close $target_fh;
+        return HTTP::Response->new( 200, 'OK', [], '' );
+    };
+
+    my @download_docs = Developer::Dashboard::CLI::OpenFile::_maven_search_documents('javax.jws.WebService');
+    is( scalar(@download_docs), 1, 'maven search helper returns parsed document rows from the search response' );
+    is( $download_docs[0]{a}, 'javax.jws-api', 'maven search helper preserves artifact coordinates' );
+
+    my $downloaded_jar = Developer::Dashboard::CLI::OpenFile::_download_maven_source_jar(
+        paths => $registry,
+        doc   => $download_docs[0],
+    );
+    ok( defined $downloaded_jar && -f $downloaded_jar, 'maven source-jar downloader mirrors the source archive into the dashboard cache' );
+    is(
+        $downloaded_jar,
+        $expected_downloaded_jar,
+        'maven source-jar downloader writes the mirrored archive to the expected cache path',
+    );
+    like(
+        $mirrored_url,
+        qr{\Ahttps://repo1\.maven\.org/maven2/javax/jws/javax\.jws-api/1\.0\.0/javax\.jws-api-1\.0\.0-sources\.jar\z},
+        'maven source-jar downloader mirrors the expected Maven Central source-jar URL',
+    );
+
+    my @downloaded_named = Developer::Dashboard::CLI::OpenFile::_download_java_source_matches(
+        paths    => $registry,
+        name     => 'javax.jws.WebService',
+        relative => File::Spec->catfile( 'javax', 'jws', 'WebService.java' ),
+    );
+    ok( @downloaded_named, 'download helper extracts a matching Java source file from a mirrored Maven source jar' );
+    open my $downloaded_fh, '<', $downloaded_named[0] or die "Unable to read $downloaded_named[0]: $!";
+    my $downloaded_source = do { local $/; <$downloaded_fh> };
+    close $downloaded_fh;
+    like( $downloaded_source, qr/public \@interface WebService/, 'downloaded Java source extraction preserves the fetched source content' );
 }
 
 my $src_root = File::Spec->catdir( $ENV{HOME}, 'src' );
@@ -152,6 +253,14 @@ my $scope_jq_js = File::Spec->catfile( $scope_js_root, 'jq.js' );
 open my $scope_jq_js_fh, '>', $scope_jq_js or die "Unable to write $scope_jq_js: $!";
 print {$scope_jq_js_fh} "window.jq = true;\n";
 close $scope_jq_js_fh;
+my $scope_ok_js = File::Spec->catfile( $scope_js_root, 'ok.js' );
+open my $scope_ok_js_fh, '>', $scope_ok_js or die "Unable to write $scope_ok_js: $!";
+print {$scope_ok_js_fh} "window.ok = true;\n";
+close $scope_ok_js_fh;
+my $scope_ok_json = File::Spec->catfile( $scope_js_root, 'ok.json' );
+open my $scope_ok_json_fh, '>', $scope_ok_json or die "Unable to write $scope_ok_json: $!";
+print {$scope_ok_json_fh} "{\"ok\":true}\n";
+close $scope_ok_json_fh;
 my $scope_jquery = File::Spec->catfile( $scope_js_root, 'jquery.js' );
 open my $scope_jquery_fh, '>', $scope_jquery or die "Unable to write $scope_jquery: $!";
 print {$scope_jquery_fh} "window.jquery = true;\n";
@@ -165,6 +274,28 @@ is_deeply(
     \@scope_match,
     [ $scope_jq, $scope_jq_js, $scope_jquery ],
     'scoped jq search ranks exact jq helper and jq.js ahead of jquery.js',
+);
+my ( $scope_regex_line, @scope_regex_match ) = Developer::Dashboard::CLI::OpenFile::_resolve_open_file_matches(
+    paths => $registry,
+    args  => [ $scope_root, 'Ok\\.js$' ],
+);
+is( $scope_regex_line, 0, 'scoped regex search keeps line number at zero' );
+is_deeply(
+    \@scope_regex_match,
+    [$scope_ok_js],
+    'scoped regex search treats each pattern as a real regex and does not match ok.json for Ok\\.js$',
+);
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::OpenFile::_resolve_open_file_matches(
+                paths => $registry,
+                args  => [ $scope_root, 'broken(' ],
+            );
+        }
+    ),
+    qr/Invalid regex 'broken\('/,
+    'open-file scope search reports invalid regex patterns explicitly',
 );
 is(
     Developer::Dashboard::CLI::OpenFile::_scope_match_rank(
@@ -510,6 +641,23 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
 
 done_testing;
 
+sub _dies {
+    my ($code) = @_;
+    my $error = eval { $code->(); 1 } ? '' : $@;
+    return $error;
+}
+
+sub _write_zip_entries {
+    my ( $archive, $entries ) = @_;
+    my $zip = Archive::Zip->new();
+    for my $name ( sort keys %{$entries || {}} ) {
+        $zip->addString( $entries->{$name}, $name );
+    }
+    my $status = $zip->writeToFileNamed($archive);
+    die "Unable to write $archive\n" if $status != AZ_OK;
+    return 1;
+}
+
 __END__
 
 =head1 NAME
@@ -526,30 +674,43 @@ coverage stays at 100%.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file covers CLI module branches not exercised by the broader smoke tests.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for the hard-to-hit branches that keep library coverage honest. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because the hard-to-hit branches that keep library coverage honest has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing the hard-to-hit branches that keep library coverage honest, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/15-cli-module-coverage.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/15-cli-module-coverage.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/15-cli-module-coverage.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/15-cli-module-coverage.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

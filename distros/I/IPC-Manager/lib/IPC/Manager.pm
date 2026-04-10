@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp qw/croak/;
 
@@ -144,6 +144,7 @@ sub ipcm_spawn {
 
     my $guard           = delete $params{guard}           // 1;
     my $do_sanity_check = delete $params{do_sanity_check} // 0;
+    my $debug           = delete $params{debug}           // 0;
     my $serializer      = delete $params{serializer}      // ipcm_default_serializer();
     my $protocol        = delete $params{protocol}        // ipcm_default_protocol();
     my $protocols       = delete $params{protocols}       // ipcm_default_protocol_list();
@@ -178,6 +179,7 @@ sub ipcm_spawn {
         stash           => $stash,
         guard           => $guard,
         do_sanity_check => $do_sanity_check,
+        debug           => $debug,
     );
 }
 

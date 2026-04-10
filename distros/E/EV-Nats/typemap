@@ -1,0 +1,4 @@
+TYPEMAP
+
+EV::Nats	T_PTROBJ
+EV::Loop	T_PTROBJ

@@ -17,6 +17,7 @@ our @EXPORT_OK = qw(
     encode_nevent   decode_nevent
     encode_naddr    decode_naddr
     decode_bech32_entity
+    encode_nostr_uri decode_nostr_uri
 );
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
@@ -127,6 +128,8 @@ sub _decode_bare {
     my ($hrp, $data5) = _nostr_decode_bech32($bech32);
     croak "expected $expected_hrp prefix, got $hrp" unless $hrp eq $expected_hrp;
     my $bytes = translate_5to8($data5);
+    croak "$expected_hrp payload must be exactly 32 bytes, got " . length($bytes)
+        unless length($bytes) == 32;
     return unpack 'H*', $bytes;
 }
 
@@ -156,8 +159,12 @@ sub _decode_tlv {
     my @tlvs;
     my $pos = 0;
     while ($pos < length($payload)) {
+        croak "truncated TLV: missing length byte at offset $pos"
+            unless $pos + 1 < length($payload);
         my $type = unpack('C', substr($payload, $pos, 1));
         my $len  = unpack('C', substr($payload, $pos + 1, 1));
+        croak "truncated TLV: value extends beyond payload at offset $pos"
+            unless $pos + 2 + $len <= length($payload);
         my $val  = substr($payload, $pos + 2, $len);
         push @tlvs, [$type, $val];
         $pos += 2 + $len;
@@ -188,12 +195,15 @@ sub decode_nprofile {
     for my $tlv (@tlvs) {
         my ($type, $val) = @$tlv;
         if ($type == $TLV_SPECIAL) {
+            croak "nprofile: pubkey (type 0) must be exactly 32 bytes, got " . length($val)
+                unless length($val) == 32;
             $result{pubkey} = unpack 'H*', $val;
         } elsif ($type == $TLV_RELAY) {
             push @{$result{relays}}, $val;
         }
         # ignore unknown types per spec
     }
+    croak "nprofile: missing required pubkey (type 0)" unless defined $result{pubkey};
     return \%result;
 }
 
@@ -227,15 +237,22 @@ sub decode_nevent {
     for my $tlv (@tlvs) {
         my ($type, $val) = @$tlv;
         if ($type == $TLV_SPECIAL) {
+            croak "nevent: event id (type 0) must be exactly 32 bytes, got " . length($val)
+                unless length($val) == 32;
             $result{id} = unpack 'H*', $val;
         } elsif ($type == $TLV_RELAY) {
             push @{$result{relays}}, $val;
         } elsif ($type == $TLV_AUTHOR) {
+            croak "nevent: author (type 2) must be exactly 32 bytes, got " . length($val)
+                unless length($val) == 32;
             $result{author} = unpack 'H*', $val;
         } elsif ($type == $TLV_KIND) {
+            croak "nevent: kind (type 3) must be exactly 4 bytes, got " . length($val)
+                unless length($val) == 4;
             $result{kind} = unpack 'N', $val;
         }
     }
+    croak "nevent: missing required event id (type 0)" unless defined $result{id};
     return \%result;
 }
 
@@ -271,11 +288,18 @@ sub decode_naddr {
         } elsif ($type == $TLV_RELAY) {
             push @{$result{relays}}, $val;
         } elsif ($type == $TLV_AUTHOR) {
+            croak "naddr: pubkey (type 2) must be exactly 32 bytes, got " . length($val)
+                unless length($val) == 32;
             $result{pubkey} = unpack 'H*', $val;
         } elsif ($type == $TLV_KIND) {
+            croak "naddr: kind (type 3) must be exactly 4 bytes, got " . length($val)
+                unless length($val) == 4;
             $result{kind} = unpack 'N', $val;
         }
     }
+    croak "naddr: missing required identifier (type 0)" unless defined $result{identifier};
+    croak "naddr: missing required pubkey (type 2)" unless defined $result{pubkey};
+    croak "naddr: missing required kind (type 3)" unless defined $result{kind};
     return \%result;
 }
 
@@ -306,6 +330,32 @@ sub decode_bech32_entity {
     croak "unknown bech32 entity prefix: $hrp";
 }
 
+###############################################################################
+# NIP-21: nostr: URI scheme
+###############################################################################
+
+my %NOSTR_URI_TYPES = map { $_ => 1 } qw(npub note nprofile nevent naddr);
+
+sub encode_nostr_uri {
+    my ($bech32) = @_;
+    croak "bech32 string required" unless defined $bech32 && length $bech32;
+    my ($hrp) = _nostr_decode_bech32($bech32);
+    croak "nsec must not be used in nostr: URIs" if $hrp eq 'nsec';
+    croak "unsupported bech32 prefix for nostr: URI: $hrp"
+        unless $NOSTR_URI_TYPES{$hrp};
+    return "nostr:$bech32";
+}
+
+sub decode_nostr_uri {
+    my ($uri) = @_;
+    croak "nostr: URI required" unless defined $uri && length $uri;
+    croak "nostr: URI must start with nostr:" unless $uri =~ /\Anostr:/i;
+    my $bech32 = substr($uri, 6);
+    my ($hrp) = _nostr_decode_bech32($bech32);
+    croak "nsec must not be used in nostr: URIs" if $hrp eq 'nsec';
+    return decode_bech32_entity($bech32);
+}
+
 1;
 
 __END__
@@ -324,6 +374,7 @@ Net::Nostr::Bech32 - NIP-19 bech32-encoded entities
         encode_nevent   decode_nevent
         encode_naddr    decode_naddr
         decode_bech32_entity
+        encode_nostr_uri decode_nostr_uri
     );
 
     # Bare keys and ids
@@ -510,8 +561,38 @@ For TLV types (C<nprofile>, C<nevent>, C<naddr>), C<data> is a hashref.
     say $r->{type};  # 'npub'
     say $r->{data};  # '7e7e9c42...'
 
+=head2 encode_nostr_uri
+
+    my $uri = encode_nostr_uri($bech32_string);
+
+Wraps a NIP-19 bech32 string with the C<nostr:> URI scheme (NIP-21).
+Accepts C<npub>, C<note>, C<nprofile>, C<nevent>, and C<naddr>.
+Croaks if the input is an C<nsec> (private keys must not appear in URIs)
+or an unrecognized bech32 prefix.
+
+    my $npub = encode_npub('7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e');
+    my $uri = encode_nostr_uri($npub);
+    # nostr:npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg
+
+=head2 decode_nostr_uri
+
+    my $result = decode_nostr_uri($nostr_uri);
+    say $result->{type};  # 'npub', 'note', 'nprofile', 'nevent', 'naddr'
+    say $result->{data};  # hex string or hashref
+
+Strips the C<nostr:> prefix and decodes the NIP-19 bech32 entity.
+The prefix match is case-insensitive. Returns the same structure as
+C<decode_bech32_entity>. Croaks if the URI contains an C<nsec> or
+is missing the C<nostr:> prefix.
+
+    my $result = decode_nostr_uri('nostr:npub1sn0wdenkukak0d9dfczzeacvhkrgz92ak56egt7vdgzn8pv2wfqqhrjdv9');
+    say $result->{type};  # 'npub'
+    say $result->{data};  # '84dee6e676e5bb67b4ad4e042cf70cbd8681155db535942fcc6a0533858a7240'
+
 =head1 SEE ALSO
 
+L<NIP-19|https://github.com/nostr-protocol/nips/blob/master/19.md>,
+L<NIP-21|https://github.com/nostr-protocol/nips/blob/master/21.md>,
 L<Net::Nostr>, L<Net::Nostr::Key>, L<Bitcoin::Crypto::Bech32>
 
 =cut

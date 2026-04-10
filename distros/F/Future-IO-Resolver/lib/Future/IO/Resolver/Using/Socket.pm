@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Resolver::Using::Socket 0.03;
+package Future::IO::Resolver::Using::Socket 0.04;
 
 use v5.20;
 use warnings;
@@ -16,6 +16,11 @@ use Future::Utils qw( repeat );
 
 # We don't want to import these as they'll get in the way of our named methods
 use Socket qw();  # getaddrinfo getnameinfo
+
+use constant RESOLVER_PRIORITY => 50;
+
+use Future::IO::Resolver;
+Future::IO::Resolver->ADD_BACKEND( __PACKAGE__ );
 
 =head1 NAME
 

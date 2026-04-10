@@ -202,7 +202,7 @@ skeid - Skeid control-plane CLI and proxy launcher
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SUPPORT
 
@@ -210,6 +210,10 @@ version 0.001
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-skeid/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

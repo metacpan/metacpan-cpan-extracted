@@ -4,18 +4,9 @@
 #include "XSUB.h"
 
 #include "yyjson.h"
+#include "XSParseKeyword.h"
 
 #include <string.h>
-
-
-/* keyword plugin support */
-static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
-static XOP xop_decode_json;
-static XOP xop_encode_json;
-static XOP xop_decode_json_ro;
-static Perl_ppaddr_t pp_decode_json_addr;
-static Perl_ppaddr_t pp_encode_json_addr;
-static Perl_ppaddr_t pp_decode_json_ro_addr;
 
 /* flags stored in the JSON::YY object (IV inside the hash) */
 #define F_UTF8            0x01
@@ -172,8 +163,6 @@ static SV * yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val);
 /* ---- keyword plugin: Doc keyword ops ---- */
 
 /* pp_jdoc: parse JSON string → Doc */
-static XOP xop_jdoc;
-static Perl_ppaddr_t pp_jdoc_addr;
 static OP * pp_jdoc_impl(pTHX) {
     dSP;
     SV *json_sv = POPs;
@@ -197,8 +186,6 @@ static OP * pp_jdoc_impl(pTHX) {
 }
 
 /* pp_jget: get subtree ref (borrowing) */
-static XOP xop_jget;
-static Perl_ppaddr_t pp_jget_addr;
 static OP * pp_jget_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -217,8 +204,6 @@ static OP * pp_jget_impl(pTHX) {
 }
 
 /* pp_jgetp: get as Perl value */
-static XOP xop_jgetp;
-static Perl_ppaddr_t pp_jgetp_addr;
 static OP * pp_jgetp_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -239,8 +224,6 @@ static OP * pp_jgetp_impl(pTHX) {
 }
 
 /* pp_jset: set value at path */
-static XOP xop_jset;
-static Perl_ppaddr_t pp_jset_addr;
 static OP * pp_jset_impl(pTHX) {
     dSP;
     SV *value_sv = POPs;
@@ -292,8 +275,6 @@ static OP * pp_jset_impl(pTHX) {
 }
 
 /* pp_jdel: delete at path, return removed subtree as Doc */
-static XOP xop_jdel;
-static Perl_ppaddr_t pp_jdel_addr;
 static OP * pp_jdel_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -324,8 +305,6 @@ static OP * pp_jdel_impl(pTHX) {
 }
 
 /* pp_jhas: check if path exists */
-static XOP xop_jhas;
-static Perl_ppaddr_t pp_jhas_addr;
 static OP * pp_jhas_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -340,8 +319,6 @@ static OP * pp_jhas_impl(pTHX) {
 }
 
 /* pp_jclone: deep copy doc/subtree → new independent Doc */
-static XOP xop_jclone;
-static Perl_ppaddr_t pp_jclone_addr;
 static OP * pp_jclone_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -371,8 +348,6 @@ static OP * pp_jclone_impl(pTHX) {
 }
 
 /* pp_jencode: serialize doc/subtree to JSON bytes */
-static XOP xop_jencode;
-static Perl_ppaddr_t pp_jencode_addr;
 static OP * pp_jencode_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -406,8 +381,6 @@ static OP * pp_jencode_impl(pTHX) {
 }
 
 /* pp_jstr: create JSON string value */
-static XOP xop_jstr;
-static Perl_ppaddr_t pp_jstr_addr;
 static OP * pp_jstr_impl(pTHX) {
     dSP;
     SV *val_sv = POPs;
@@ -421,8 +394,6 @@ static OP * pp_jstr_impl(pTHX) {
 }
 
 /* pp_jnum: create JSON number value */
-static XOP xop_jnum;
-static Perl_ppaddr_t pp_jnum_addr;
 static OP * pp_jnum_impl(pTHX) {
     dSP;
     SV *val_sv = POPs;
@@ -442,8 +413,6 @@ static OP * pp_jnum_impl(pTHX) {
 }
 
 /* pp_jbool: create JSON boolean */
-static XOP xop_jbool;
-static Perl_ppaddr_t pp_jbool_addr;
 static OP * pp_jbool_impl(pTHX) {
     dSP;
     SV *val_sv = POPs;
@@ -455,8 +424,6 @@ static OP * pp_jbool_impl(pTHX) {
 }
 
 /* pp_jnull: create JSON null */
-static XOP xop_jnull;
-static Perl_ppaddr_t pp_jnull_addr;
 static OP * pp_jnull_impl(pTHX) {
     dSP;
     yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
@@ -467,8 +434,6 @@ static OP * pp_jnull_impl(pTHX) {
 }
 
 /* pp_jarr: create empty JSON array */
-static XOP xop_jarr;
-static Perl_ppaddr_t pp_jarr_addr;
 static OP * pp_jarr_impl(pTHX) {
     dSP;
     yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
@@ -479,8 +444,6 @@ static OP * pp_jarr_impl(pTHX) {
 }
 
 /* pp_jobj: create empty JSON object */
-static XOP xop_jobj;
-static Perl_ppaddr_t pp_jobj_addr;
 static OP * pp_jobj_impl(pTHX) {
     dSP;
     yyjson_mut_doc *doc = yyjson_mut_doc_new(NULL);
@@ -491,8 +454,6 @@ static OP * pp_jobj_impl(pTHX) {
 }
 
 /* pp_jtype: get type string */
-static XOP xop_jtype;
-static Perl_ppaddr_t pp_jtype_addr;
 static OP * pp_jtype_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -522,8 +483,6 @@ static OP * pp_jtype_impl(pTHX) {
 }
 
 /* pp_jlen: get array length or object key count */
-static XOP xop_jlen;
-static Perl_ppaddr_t pp_jlen_addr;
 static OP * pp_jlen_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -551,8 +510,6 @@ static OP * pp_jlen_impl(pTHX) {
 }
 
 /* pp_jkeys: get object keys as list */
-static XOP xop_jkeys;
-static Perl_ppaddr_t pp_jkeys_addr;
 static OP * pp_jkeys_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -621,8 +578,6 @@ get_iter(pTHX_ SV *sv) {
 }
 
 /* pp_jiter: create iterator for array/object at path */
-static XOP xop_jiter;
-static Perl_ppaddr_t pp_jiter_addr;
 static OP * pp_jiter_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -662,8 +617,6 @@ static OP * pp_jiter_impl(pTHX) {
 }
 
 /* pp_jnext: advance iterator, return next value as Doc or undef */
-static XOP xop_jnext;
-static Perl_ppaddr_t pp_jnext_addr;
 static OP * pp_jnext_impl(pTHX) {
     dSP;
     SV *iter_sv = POPs;
@@ -694,8 +647,6 @@ static OP * pp_jnext_impl(pTHX) {
 }
 
 /* pp_jkey: get current key from object iterator */
-static XOP xop_jkey;
-static Perl_ppaddr_t pp_jkey_addr;
 static OP * pp_jkey_impl(pTHX) {
     dSP;
     SV *iter_sv = POPs;
@@ -718,8 +669,6 @@ static OP * pp_jkey_impl(pTHX) {
 }
 
 /* pp_jpatch: apply RFC 6902 JSON Patch */
-static XOP xop_jpatch;
-static Perl_ppaddr_t pp_jpatch_addr;
 static OP * pp_jpatch_impl(pTHX) {
     dSP;
     SV *patch_sv = POPs;
@@ -741,8 +690,6 @@ static OP * pp_jpatch_impl(pTHX) {
 }
 
 /* pp_jmerge: apply RFC 7386 JSON Merge Patch */
-static XOP xop_jmerge;
-static Perl_ppaddr_t pp_jmerge_addr;
 static OP * pp_jmerge_impl(pTHX) {
     dSP;
     SV *patch_sv = POPs;
@@ -763,8 +710,6 @@ static OP * pp_jmerge_impl(pTHX) {
 }
 
 /* pp_jfrom: create Doc from Perl data (not JSON string) */
-static XOP xop_jfrom;
-static Perl_ppaddr_t pp_jfrom_addr;
 static OP * pp_jfrom_impl(pTHX) {
     dSP;
     SV *data = POPs;
@@ -793,8 +738,6 @@ static OP * pp_jfrom_impl(pTHX) {
 }
 
 /* pp_jvals: get object values as list */
-static XOP xop_jvals;
-static Perl_ppaddr_t pp_jvals_addr;
 static OP * pp_jvals_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -818,8 +761,6 @@ static OP * pp_jvals_impl(pTHX) {
 }
 
 /* pp_jeq: deep equality comparison */
-static XOP xop_jeq;
-static Perl_ppaddr_t pp_jeq_addr;
 static OP * pp_jeq_impl(pTHX) {
     dSP;
     SV *b_sv = POPs;
@@ -832,8 +773,6 @@ static OP * pp_jeq_impl(pTHX) {
 }
 
 /* pp_jpp: pretty-print encode */
-static XOP xop_jpp;
-static Perl_ppaddr_t pp_jpp_addr;
 static OP * pp_jpp_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -859,8 +798,6 @@ static OP * pp_jpp_impl(pTHX) {
 }
 
 /* pp_jraw: insert raw JSON string at path */
-static XOP xop_jraw;
-static Perl_ppaddr_t pp_jraw_addr;
 static OP * pp_jraw_impl(pTHX) {
     dSP;
     SV *json_sv = POPs;
@@ -910,8 +847,6 @@ static OP * pp_jraw_impl(pTHX) {
 
 /* type predicate macros -- all follow same pattern */
 #define PP_JIS(name, check_fn) \
-static XOP xop_##name; \
-static Perl_ppaddr_t pp_##name##_addr; \
 static OP * pp_##name##_impl(pTHX) { \
     dSP; \
     SV *path_sv = POPs; \
@@ -940,8 +875,6 @@ PP_JIS(jis_null,    yyjson_mut_is_null)
 #undef PP_JIS
 
 /* pp_jread: read JSON file → Doc */
-static XOP xop_jread;
-static Perl_ppaddr_t pp_jread_addr;
 static OP * pp_jread_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -965,8 +898,6 @@ static OP * pp_jread_impl(pTHX) {
 }
 
 /* pp_jwrite: write Doc to JSON file */
-static XOP xop_jwrite;
-static Perl_ppaddr_t pp_jwrite_addr;
 static OP * pp_jwrite_impl(pTHX) {
     dSP;
     SV *path_sv = POPs;
@@ -992,8 +923,6 @@ static OP * pp_jwrite_impl(pTHX) {
 }
 
 /* pp_jpaths: enumerate all leaf paths */
-static XOP xop_jpaths;
-static Perl_ppaddr_t pp_jpaths_addr;
 
 static void
 collect_paths(pTHX_ yyjson_mut_val *val, SV *prefix, AV *result) {
@@ -1078,8 +1007,6 @@ static OP * pp_jpaths_impl(pTHX) {
 }
 
 /* pp_jfind: find first array element where key == value */
-static XOP xop_jfind;
-static Perl_ppaddr_t pp_jfind_addr;
 static OP * pp_jfind_impl(pTHX) {
     dSP;
     SV *match_sv = POPs;   /* value to match */
@@ -1898,7 +1825,8 @@ pp_decode_json_ro_impl(pTHX) {
     RETURN;
 }
 
-/* build custom ops with 0-3 args */
+/* ---- XS::Parse::Keyword op builders ---- */
+
 static OP *
 make_custom_unop(pTHX_ Perl_ppaddr_t ppfunc, OP *arg) {
     OP *o = newUNOP(OP_NULL, 0, arg);
@@ -1908,22 +1836,13 @@ make_custom_unop(pTHX_ Perl_ppaddr_t ppfunc, OP *arg) {
 }
 
 static OP *
-make_custom_op0(pTHX_ Perl_ppaddr_t ppfunc) {
-    OP *o = newOP(OP_NULL, 0);
+make_custom_binop(pTHX_ Perl_ppaddr_t ppfunc, OP *a, OP *b) {
+    OP *o = newBINOP(OP_NULL, 0, a, b);
     o->op_type = OP_CUSTOM;
     o->op_ppaddr = ppfunc;
     return o;
 }
 
-static OP *
-make_custom_binop(pTHX_ Perl_ppaddr_t ppfunc, OP *left, OP *right) {
-    OP *o = newBINOP(OP_NULL, 0, left, right);
-    o->op_type = OP_CUSTOM;
-    o->op_ppaddr = ppfunc;
-    return o;
-}
-
-/* for N-arg ops: chain nested binops so all args end up on the stack */
 static OP *
 make_custom_3op(pTHX_ Perl_ppaddr_t ppfunc, OP *a, OP *b, OP *c) {
     OP *ab = newBINOP(OP_NULL, 0, a, b);
@@ -1943,229 +1862,214 @@ make_custom_4op(pTHX_ Perl_ppaddr_t ppfunc, OP *a, OP *b, OP *c, OP *d) {
     return o;
 }
 
-/* keyword dispatch table entry */
-typedef struct {
-    const char *name;
-    STRLEN len;
-    Perl_ppaddr_t *pp_addr;
-    int nargs;
-} kw_entry_t;
+/* ---- XS::Parse::Keyword hooks ---- */
 
-static kw_entry_t kw_table[] = {
-    /* existing keywords */
-    {"decode_json",    11, &pp_decode_json_addr,    1},
-    {"encode_json",    11, &pp_encode_json_addr,    1},
-    {"decode_json_ro", 14, &pp_decode_json_ro_addr, 1},
-    /* doc keywords */
-    {"jdoc",     4,  &pp_jdoc_addr,     1},
-    {"jget",     4,  &pp_jget_addr,     2},
-    {"jgetp",    5,  &pp_jgetp_addr,    2},
-    {"jset",     4,  &pp_jset_addr,     3},
-    {"jdel",     4,  &pp_jdel_addr,     2},
-    {"jhas",     4,  &pp_jhas_addr,     2},
-    {"jclone",   6,  &pp_jclone_addr,   2},
-    {"jencode",  7,  &pp_jencode_addr,  2},
-    {"jstr",     4,  &pp_jstr_addr,     1},
-    {"jnum",     4,  &pp_jnum_addr,     1},
-    {"jbool",    5,  &pp_jbool_addr,    1},
-    {"jnull",    5,  &pp_jnull_addr,    0},
-    {"jarr",     4,  &pp_jarr_addr,     0},
-    {"jobj",     4,  &pp_jobj_addr,     0},
-    {"jtype",    5,  &pp_jtype_addr,    2},
-    {"jlen",     4,  &pp_jlen_addr,     2},
-    {"jkeys",    5,  &pp_jkeys_addr,    2},
-    /* iterators */
-    {"jiter",    5,  &pp_jiter_addr,    2},
-    {"jnext",    5,  &pp_jnext_addr,    1},
-    {"jkey",     4,  &pp_jkey_addr,     1},
-    /* new keywords */
-    {"jpatch",   6,  &pp_jpatch_addr,   2},
-    {"jmerge",   6,  &pp_jmerge_addr,   2},
-    {"jfrom",    5,  &pp_jfrom_addr,    1},
-    {"jvals",    5,  &pp_jvals_addr,    2},
-    {"jeq",      3,  &pp_jeq_addr,      2},
-    /* encode/raw */
-    {"jpp",      3,  &pp_jpp_addr,      2},
-    {"jraw",     4,  &pp_jraw_addr,     3},
-    /* type predicates */
-    {"jis_obj",  7,  &pp_jis_obj_addr,  2},
-    {"jis_arr",  7,  &pp_jis_arr_addr,  2},
-    {"jis_str",  7,  &pp_jis_str_addr,  2},
-    {"jis_num",  7,  &pp_jis_num_addr,  2},
-    {"jis_int",  7,  &pp_jis_int_addr,  2},
-    {"jis_real", 8,  &pp_jis_real_addr, 2},
-    {"jis_bool", 8,  &pp_jis_bool_addr, 2},
-    {"jis_null", 8,  &pp_jis_null_addr, 2},
-    /* file I/O */
-    {"jread",    5,  &pp_jread_addr,    1},
-    {"jwrite",   6,  &pp_jwrite_addr,   2},
-    /* path enumeration */
-    {"jpaths",   6,  &pp_jpaths_addr,   2},
-    /* find */
-    {"jfind",    5,  &pp_jfind_addr,    4},
-    /* alias */
-    {"jdecode",  7,  &pp_jgetp_addr,   2},
-    {NULL, 0, NULL, 0}
+/* macro to define build callback + hooks for 0-arg keyword */
+#define XPK_KW0(name, ppfunc) \
+static int build_kw_##name(pTHX_ OP **out, XSParseKeywordPiece *args[], \
+                           size_t nargs, void *hookdata) { \
+    PERL_UNUSED_ARG(args); PERL_UNUSED_ARG(nargs); PERL_UNUSED_ARG(hookdata); \
+    OP *o = newOP(OP_NULL, 0); o->op_type = OP_CUSTOM; o->op_ppaddr = ppfunc; \
+    *out = o; return KEYWORD_PLUGIN_EXPR; \
+} \
+static const struct XSParseKeywordHooks hooks_##name = { \
+    .permit_hintkey = "JSON::YY/" #name, \
+    .pieces = (const struct XSParseKeywordPieceType []){ {0} }, \
+    .build = &build_kw_##name, \
 };
 
-/* keyword plugin hook */
-static int
-json_yy_keyword_plugin(pTHX_ char *keyword_ptr, STRLEN keyword_len, OP **op_ptr) {
-    kw_entry_t *entry = NULL;
-    for (kw_entry_t *e = kw_table; e->name; e++) {
-        if (keyword_len == e->len && memcmp(keyword_ptr, e->name, e->len) == 0) {
-            entry = e;
-            break;
-        }
-    }
+/* macro for 1-arg keyword */
+#define XPK_KW1(name, ppfunc) \
+static int build_kw_##name(pTHX_ OP **out, XSParseKeywordPiece *args[], \
+                           size_t nargs, void *hookdata) { \
+    PERL_UNUSED_ARG(nargs); PERL_UNUSED_ARG(hookdata); \
+    *out = make_custom_unop(aTHX_ ppfunc, args[0]->op); \
+    return KEYWORD_PLUGIN_EXPR; \
+} \
+static const struct XSParseKeywordHooks hooks_##name = { \
+    .permit_hintkey = "JSON::YY/" #name, \
+    .pieces = (const struct XSParseKeywordPieceType []){ XPK_TERMEXPR, {0} }, \
+    .build = &build_kw_##name, \
+};
 
-    if (!entry)
-        return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
+/* macro for 2-arg keyword */
+#define XPK_KW2(name, ppfunc) \
+static int build_kw_##name(pTHX_ OP **out, XSParseKeywordPiece *args[], \
+                           size_t nargs, void *hookdata) { \
+    PERL_UNUSED_ARG(nargs); PERL_UNUSED_ARG(hookdata); \
+    *out = make_custom_binop(aTHX_ ppfunc, args[0]->op, args[1]->op); \
+    return KEYWORD_PLUGIN_EXPR; \
+} \
+static const struct XSParseKeywordHooks hooks_##name = { \
+    .permit_hintkey = "JSON::YY/" #name, \
+    .pieces = (const struct XSParseKeywordPieceType []){ \
+        XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, {0} }, \
+    .build = &build_kw_##name, \
+};
 
-    /* only activate if the symbol in current package is OUR XS CV,
-       not someone else's (e.g. JSON::XS also exports encode_json as XSUB) */
-    {
-        HV *our_stash = gv_stashpvs("JSON::YY", 0);
-        if (!our_stash)
-            return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
-        HV *stash = PL_curstash;
-        GV **gvp = (GV **)hv_fetch(stash, keyword_ptr, keyword_len, 0);
-        if (!gvp || !GvCV(*gvp))
-            return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
-        CV *cv = GvCV(*gvp);
-        if (!CvISXSUB(cv))
-            return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
-        /* verify CV originates from JSON::YY, not another module's XSUB */
-        GV *cvgv = CvGV(cv);
-        if (!cvgv || GvSTASH(cvgv) != our_stash)
-            return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
-    }
+/* macro for 3-arg keyword */
+#define XPK_KW3(name, ppfunc) \
+static int build_kw_##name(pTHX_ OP **out, XSParseKeywordPiece *args[], \
+                           size_t nargs, void *hookdata) { \
+    PERL_UNUSED_ARG(nargs); PERL_UNUSED_ARG(hookdata); \
+    *out = make_custom_3op(aTHX_ ppfunc, args[0]->op, args[1]->op, args[2]->op); \
+    return KEYWORD_PLUGIN_EXPR; \
+} \
+static const struct XSParseKeywordHooks hooks_##name = { \
+    .permit_hintkey = "JSON::YY/" #name, \
+    .pieces = (const struct XSParseKeywordPieceType []){ \
+        XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, {0} }, \
+    .build = &build_kw_##name, \
+};
 
-    Perl_ppaddr_t ppfunc = *entry->pp_addr;
+/* macro for 4-arg keyword */
+#define XPK_KW4(name, ppfunc) \
+static int build_kw_##name(pTHX_ OP **out, XSParseKeywordPiece *args[], \
+                           size_t nargs, void *hookdata) { \
+    PERL_UNUSED_ARG(nargs); PERL_UNUSED_ARG(hookdata); \
+    *out = make_custom_4op(aTHX_ ppfunc, args[0]->op, args[1]->op, \
+                           args[2]->op, args[3]->op); \
+    return KEYWORD_PLUGIN_EXPR; \
+} \
+static const struct XSParseKeywordHooks hooks_##name = { \
+    .permit_hintkey = "JSON::YY/" #name, \
+    .pieces = (const struct XSParseKeywordPieceType []){ \
+        XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, XPK_COMMA, \
+        XPK_TERMEXPR, XPK_COMMA, XPK_TERMEXPR, {0} }, \
+    .build = &build_kw_##name, \
+};
 
-    if (entry->nargs == 0) {
-        *op_ptr = make_custom_op0(aTHX_ ppfunc);
-    } else if (entry->nargs == 1) {
-        lex_read_space(0);
-        OP *a = parse_termexpr(0);
-        if (!a) croak("Missing argument to %s", entry->name);
-        *op_ptr = make_custom_unop(aTHX_ ppfunc, a);
-    } else if (entry->nargs == 2) {
-        lex_read_space(0);
-        OP *a = parse_termexpr(0);
-        if (!a) croak("Missing first argument to %s", entry->name);
-        lex_read_space(0);
-        if (lex_peek_unichar(0) != ',')
-            croak("Expected comma after first argument to %s", entry->name);
-        lex_read_unichar(0);
-        lex_read_space(0);
-        OP *b = parse_termexpr(0);
-        if (!b) croak("Missing second argument to %s", entry->name);
-        *op_ptr = make_custom_binop(aTHX_ ppfunc, a, b);
-    } else { /* nargs >= 3 -- generic N-arg parser */
-        OP *args[4];
-        int i;
-        for (i = 0; i < entry->nargs && i < 4; i++) {
-            if (i > 0) {
-                lex_read_space(0);
-                if (lex_peek_unichar(0) != ',')
-                    croak("Expected comma in %s", entry->name);
-                lex_read_unichar(0);
-            }
-            lex_read_space(0);
-            args[i] = parse_termexpr(0);
-            if (!args[i]) croak("Missing argument %d to %s", i+1, entry->name);
-        }
-        if (entry->nargs == 3)
-            *op_ptr = make_custom_3op(aTHX_ ppfunc, args[0], args[1], args[2]);
-        else
-            *op_ptr = make_custom_4op(aTHX_ ppfunc, args[0], args[1], args[2], args[3]);
-    }
+/* functional API */
+XPK_KW1(encode_json,    pp_encode_json_impl)
+XPK_KW1(decode_json,    pp_decode_json_impl)
+XPK_KW1(decode_json_ro, pp_decode_json_ro_impl)
 
-    return KEYWORD_PLUGIN_EXPR;
-}
+/* doc creation */
+XPK_KW1(jdoc,   pp_jdoc_impl)
+XPK_KW1(jfrom,  pp_jfrom_impl)
+XPK_KW1(jread,  pp_jread_impl)
+
+/* value constructors */
+XPK_KW1(jstr,   pp_jstr_impl)
+XPK_KW1(jnum,   pp_jnum_impl)
+XPK_KW1(jbool,  pp_jbool_impl)
+XPK_KW0(jnull,  pp_jnull_impl)
+XPK_KW0(jarr,   pp_jarr_impl)
+XPK_KW0(jobj,   pp_jobj_impl)
+
+/* path ops */
+XPK_KW2(jget,     pp_jget_impl)
+XPK_KW2(jgetp,    pp_jgetp_impl)
+XPK_KW3(jset,     pp_jset_impl)
+XPK_KW2(jdel,     pp_jdel_impl)
+XPK_KW2(jhas,     pp_jhas_impl)
+XPK_KW2(jclone,   pp_jclone_impl)
+XPK_KW2(jwrite,   pp_jwrite_impl)
+XPK_KW2(jencode,  pp_jencode_impl)
+XPK_KW2(jpp,      pp_jpp_impl)
+XPK_KW3(jraw,     pp_jraw_impl)
+
+/* inspection */
+XPK_KW2(jtype,    pp_jtype_impl)
+XPK_KW2(jlen,     pp_jlen_impl)
+XPK_KW2(jkeys,    pp_jkeys_impl)
+XPK_KW2(jvals,    pp_jvals_impl)
+XPK_KW2(jpaths,   pp_jpaths_impl)
+XPK_KW4(jfind,    pp_jfind_impl)
+
+/* iteration */
+XPK_KW2(jiter,    pp_jiter_impl)
+XPK_KW1(jnext,    pp_jnext_impl)
+XPK_KW1(jkey,     pp_jkey_impl)
+
+/* patching */
+XPK_KW2(jpatch,   pp_jpatch_impl)
+XPK_KW2(jmerge,   pp_jmerge_impl)
+
+/* comparison */
+XPK_KW2(jeq,      pp_jeq_impl)
+
+/* type predicates */
+XPK_KW2(jis_obj,  pp_jis_obj_impl)
+XPK_KW2(jis_arr,  pp_jis_arr_impl)
+XPK_KW2(jis_str,  pp_jis_str_impl)
+XPK_KW2(jis_num,  pp_jis_num_impl)
+XPK_KW2(jis_int,  pp_jis_int_impl)
+XPK_KW2(jis_real, pp_jis_real_impl)
+XPK_KW2(jis_bool, pp_jis_bool_impl)
+XPK_KW2(jis_null, pp_jis_null_impl)
+
+/* alias: jdecode = jgetp */
+XPK_KW2(jdecode,  pp_jgetp_impl)
 
 MODULE = JSON::YY    PACKAGE = JSON::YY
 
 BOOT:
 {
-    /* register custom ops */
-    XopENTRY_set(&xop_decode_json, xop_name, "decode_json");
-    XopENTRY_set(&xop_decode_json, xop_desc, "decode JSON string (yyjson)");
-    XopENTRY_set(&xop_decode_json, xop_class, OA_UNOP);
-    Perl_custom_op_register(aTHX_ pp_decode_json_impl, &xop_decode_json);
-    pp_decode_json_addr = pp_decode_json_impl;
+    boot_xs_parse_keyword(0.40);
 
-    XopENTRY_set(&xop_encode_json, xop_name, "encode_json");
-    XopENTRY_set(&xop_encode_json, xop_desc, "encode to JSON string (yyjson)");
-    XopENTRY_set(&xop_encode_json, xop_class, OA_UNOP);
-    Perl_custom_op_register(aTHX_ pp_encode_json_impl, &xop_encode_json);
-    pp_encode_json_addr = pp_encode_json_impl;
+    /* functional API keywords */
+    register_xs_parse_keyword("encode_json",    &hooks_encode_json,    NULL);
+    register_xs_parse_keyword("decode_json",    &hooks_decode_json,    NULL);
+    register_xs_parse_keyword("decode_json_ro", &hooks_decode_json_ro, NULL);
 
-    XopENTRY_set(&xop_decode_json_ro, xop_name, "decode_json_ro");
-    XopENTRY_set(&xop_decode_json_ro, xop_desc, "decode JSON string readonly zero-copy (yyjson)");
-    XopENTRY_set(&xop_decode_json_ro, xop_class, OA_UNOP);
-    Perl_custom_op_register(aTHX_ pp_decode_json_ro_impl, &xop_decode_json_ro);
-    pp_decode_json_ro_addr = pp_decode_json_ro_impl;
+    /* doc creation */
+    register_xs_parse_keyword("jdoc",   &hooks_jdoc,   NULL);
+    register_xs_parse_keyword("jfrom",  &hooks_jfrom,  NULL);
+    register_xs_parse_keyword("jread",  &hooks_jread,  NULL);
 
-    /* register Doc keyword ops -- expanded inline since xsubpp
-       doesn't handle multi-line macros in BOOT */
-    {
-        struct { XOP *xop; Perl_ppaddr_t impl; Perl_ppaddr_t *addr;
-                 const char *name; const char *desc; int cls; } doc_ops[] = {
-            {&xop_jdoc,    pp_jdoc_impl,    &pp_jdoc_addr,    "jdoc",    "parse JSON to mutable doc", OA_UNOP},
-            {&xop_jget,    pp_jget_impl,    &pp_jget_addr,    "jget",    "get subtree ref",           OA_BINOP},
-            {&xop_jgetp,   pp_jgetp_impl,   &pp_jgetp_addr,   "jgetp",   "get as Perl value",         OA_BINOP},
-            {&xop_jset,    pp_jset_impl,    &pp_jset_addr,    "jset",    "set value at path",         OA_LISTOP},
-            {&xop_jdel,    pp_jdel_impl,    &pp_jdel_addr,    "jdel",    "delete at path",            OA_BINOP},
-            {&xop_jhas,    pp_jhas_impl,    &pp_jhas_addr,    "jhas",    "check path exists",         OA_BINOP},
-            {&xop_jclone,  pp_jclone_impl,  &pp_jclone_addr,  "jclone",  "deep copy subtree",         OA_BINOP},
-            {&xop_jencode, pp_jencode_impl, &pp_jencode_addr, "jencode", "serialize to JSON",         OA_BINOP},
-            {&xop_jstr,    pp_jstr_impl,    &pp_jstr_addr,    "jstr",    "create JSON string",        OA_UNOP},
-            {&xop_jnum,    pp_jnum_impl,    &pp_jnum_addr,    "jnum",    "create JSON number",        OA_UNOP},
-            {&xop_jbool,   pp_jbool_impl,   &pp_jbool_addr,   "jbool",   "create JSON boolean",       OA_UNOP},
-            {&xop_jnull,   pp_jnull_impl,   &pp_jnull_addr,   "jnull",   "create JSON null",          OA_BASEOP},
-            {&xop_jarr,    pp_jarr_impl,    &pp_jarr_addr,    "jarr",    "create empty JSON array",   OA_BASEOP},
-            {&xop_jobj,    pp_jobj_impl,    &pp_jobj_addr,    "jobj",    "create empty JSON object",  OA_BASEOP},
-            {&xop_jtype,   pp_jtype_impl,   &pp_jtype_addr,   "jtype",   "get JSON type",             OA_BINOP},
-            {&xop_jlen,    pp_jlen_impl,    &pp_jlen_addr,    "jlen",    "get container length",      OA_BINOP},
-            {&xop_jkeys,   pp_jkeys_impl,   &pp_jkeys_addr,   "jkeys",   "get object keys",           OA_BINOP},
-            {&xop_jiter,   pp_jiter_impl,   &pp_jiter_addr,   "jiter",   "create iterator",           OA_BINOP},
-            {&xop_jnext,   pp_jnext_impl,   &pp_jnext_addr,   "jnext",   "advance iterator",          OA_UNOP},
-            {&xop_jkey,    pp_jkey_impl,    &pp_jkey_addr,    "jkey",    "get current key",           OA_UNOP},
-            {&xop_jpatch,  pp_jpatch_impl,  &pp_jpatch_addr,  "jpatch",  "apply JSON Patch",          OA_BINOP},
-            {&xop_jmerge,  pp_jmerge_impl,  &pp_jmerge_addr,  "jmerge",  "apply merge patch",         OA_BINOP},
-            {&xop_jfrom,   pp_jfrom_impl,   &pp_jfrom_addr,   "jfrom",   "create Doc from Perl",      OA_UNOP},
-            {&xop_jvals,   pp_jvals_impl,   &pp_jvals_addr,   "jvals",   "get object values",         OA_BINOP},
-            {&xop_jeq,     pp_jeq_impl,     &pp_jeq_addr,     "jeq",     "deep equality",             OA_BINOP},
-            {&xop_jpp,     pp_jpp_impl,     &pp_jpp_addr,     "jpp",     "pretty encode",             OA_BINOP},
-            {&xop_jraw,    pp_jraw_impl,    &pp_jraw_addr,    "jraw",    "insert raw JSON",           OA_LISTOP},
-            {&xop_jis_obj, pp_jis_obj_impl, &pp_jis_obj_addr, "jis_obj", "is object",                 OA_BINOP},
-            {&xop_jis_arr, pp_jis_arr_impl, &pp_jis_arr_addr, "jis_arr", "is array",                  OA_BINOP},
-            {&xop_jis_str, pp_jis_str_impl, &pp_jis_str_addr, "jis_str", "is string",                 OA_BINOP},
-            {&xop_jis_num, pp_jis_num_impl, &pp_jis_num_addr, "jis_num", "is number",                 OA_BINOP},
-            {&xop_jis_int, pp_jis_int_impl, &pp_jis_int_addr, "jis_int", "is integer",                OA_BINOP},
-            {&xop_jis_real,pp_jis_real_impl,&pp_jis_real_addr,"jis_real","is float",                  OA_BINOP},
-            {&xop_jis_bool,pp_jis_bool_impl,&pp_jis_bool_addr,"jis_bool","is boolean",               OA_BINOP},
-            {&xop_jis_null,pp_jis_null_impl,&pp_jis_null_addr,"jis_null","is null",                  OA_BINOP},
-            {&xop_jread,   pp_jread_impl,   &pp_jread_addr,   "jread",   "read JSON file",            OA_UNOP},
-            {&xop_jwrite,  pp_jwrite_impl,  &pp_jwrite_addr,  "jwrite",  "write JSON file",           OA_BINOP},
-            {&xop_jpaths,  pp_jpaths_impl,  &pp_jpaths_addr,  "jpaths",  "enumerate paths",           OA_BINOP},
-            {&xop_jfind,   pp_jfind_impl,   &pp_jfind_addr,   "jfind",   "find in array",             OA_LISTOP},
-        };
-        int i;
-        for (i = 0; i < (int)(sizeof(doc_ops)/sizeof(doc_ops[0])); i++) {
-            XopENTRY_set(doc_ops[i].xop, xop_name, doc_ops[i].name);
-            XopENTRY_set(doc_ops[i].xop, xop_desc, doc_ops[i].desc);
-            XopENTRY_set(doc_ops[i].xop, xop_class, doc_ops[i].cls);
-            Perl_custom_op_register(aTHX_ doc_ops[i].impl, doc_ops[i].xop);
-            *doc_ops[i].addr = doc_ops[i].impl;
-        }
-    }
+    /* value constructors */
+    register_xs_parse_keyword("jstr",   &hooks_jstr,   NULL);
+    register_xs_parse_keyword("jnum",   &hooks_jnum,   NULL);
+    register_xs_parse_keyword("jbool",  &hooks_jbool,  NULL);
+    register_xs_parse_keyword("jnull",  &hooks_jnull,  NULL);
+    register_xs_parse_keyword("jarr",   &hooks_jarr,   NULL);
+    register_xs_parse_keyword("jobj",   &hooks_jobj,   NULL);
 
-    /* install keyword plugin */
-    next_keyword_plugin = PL_keyword_plugin;
-    PL_keyword_plugin = json_yy_keyword_plugin;
+    /* path operations */
+    register_xs_parse_keyword("jget",     &hooks_jget,     NULL);
+    register_xs_parse_keyword("jgetp",    &hooks_jgetp,    NULL);
+    register_xs_parse_keyword("jset",     &hooks_jset,     NULL);
+    register_xs_parse_keyword("jdel",     &hooks_jdel,     NULL);
+    register_xs_parse_keyword("jhas",     &hooks_jhas,     NULL);
+    register_xs_parse_keyword("jclone",   &hooks_jclone,   NULL);
+    register_xs_parse_keyword("jwrite",   &hooks_jwrite,   NULL);
+    register_xs_parse_keyword("jencode",  &hooks_jencode,  NULL);
+    register_xs_parse_keyword("jpp",      &hooks_jpp,      NULL);
+    register_xs_parse_keyword("jraw",     &hooks_jraw,     NULL);
+
+    /* inspection */
+    register_xs_parse_keyword("jtype",    &hooks_jtype,    NULL);
+    register_xs_parse_keyword("jlen",     &hooks_jlen,     NULL);
+    register_xs_parse_keyword("jkeys",    &hooks_jkeys,    NULL);
+    register_xs_parse_keyword("jvals",    &hooks_jvals,    NULL);
+    register_xs_parse_keyword("jpaths",   &hooks_jpaths,   NULL);
+    register_xs_parse_keyword("jfind",    &hooks_jfind,    NULL);
+
+    /* iteration */
+    register_xs_parse_keyword("jiter",    &hooks_jiter,    NULL);
+    register_xs_parse_keyword("jnext",    &hooks_jnext,    NULL);
+    register_xs_parse_keyword("jkey",     &hooks_jkey,     NULL);
+
+    /* patching */
+    register_xs_parse_keyword("jpatch",   &hooks_jpatch,   NULL);
+    register_xs_parse_keyword("jmerge",   &hooks_jmerge,   NULL);
+
+    /* comparison */
+    register_xs_parse_keyword("jeq",      &hooks_jeq,      NULL);
+
+    /* type predicates */
+    register_xs_parse_keyword("jis_obj",  &hooks_jis_obj,  NULL);
+    register_xs_parse_keyword("jis_arr",  &hooks_jis_arr,  NULL);
+    register_xs_parse_keyword("jis_str",  &hooks_jis_str,  NULL);
+    register_xs_parse_keyword("jis_num",  &hooks_jis_num,  NULL);
+    register_xs_parse_keyword("jis_int",  &hooks_jis_int,  NULL);
+    register_xs_parse_keyword("jis_real", &hooks_jis_real, NULL);
+    register_xs_parse_keyword("jis_bool", &hooks_jis_bool, NULL);
+    register_xs_parse_keyword("jis_null", &hooks_jis_null, NULL);
+
+    /* alias */
+    register_xs_parse_keyword("jdecode",  &hooks_jdecode,  NULL);
 }
 
 SV *
@@ -2243,10 +2147,9 @@ CODE:
     const char *json;
 
     if (self->flags & F_UTF8) {
-        json = SvPV(json_sv, len);
+        json = SvPV(json_sv, len);       /* utf8 mode: input is raw bytes */
     } else {
-        /* if not utf8 mode, upgrade to UTF-8 bytes */
-        json = SvPVutf8(json_sv, len);
+        json = SvPVutf8(json_sv, len);   /* character mode: encode to UTF-8 */
     }
 
     yyjson_read_err err;
@@ -2437,248 +2340,8 @@ CODE:
 OUTPUT:
     RETVAL
 
-# Doc keyword XS stubs -- installed into caller's namespace so the keyword
-# plugin can detect them. The actual work is done by the pp functions above.
 
-void
-_xs_jdoc(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jdoc: internal stub called directly");
-
-void
-_xs_jget(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jget: internal stub called directly");
-
-void
-_xs_jgetp(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jgetp: internal stub called directly");
-
-void
-_xs_jset(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jset: internal stub called directly");
-
-void
-_xs_jdel(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jdel: internal stub called directly");
-
-void
-_xs_jhas(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jhas: internal stub called directly");
-
-void
-_xs_jclone(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jclone: internal stub called directly");
-
-void
-_xs_jencode(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jencode: internal stub called directly");
-
-void
-_xs_jstr(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jstr: internal stub called directly");
-
-void
-_xs_jnum(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jnum: internal stub called directly");
-
-void
-_xs_jbool(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jbool: internal stub called directly");
-
-void
-_xs_jnull(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jnull: internal stub called directly");
-
-void
-_xs_jarr(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jarr: internal stub called directly");
-
-void
-_xs_jobj(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jobj: internal stub called directly");
-
-void
-_xs_jtype(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jtype: internal stub called directly");
-
-void
-_xs_jlen(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jlen: internal stub called directly");
-
-void
-_xs_jkeys(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jkeys: internal stub called directly");
-
-void
-_xs_jdecode(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jdecode: internal stub called directly");
-
-void
-_xs_jiter(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jiter: internal stub called directly");
-
-void
-_xs_jnext(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jnext: internal stub called directly");
-
-void
-_xs_jkey(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jkey: internal stub called directly");
-
-void
-_xs_jpatch(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jpatch: internal stub called directly");
-
-void
-_xs_jmerge(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jmerge: internal stub called directly");
-
-void
-_xs_jfrom(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jfrom: internal stub called directly");
-
-void
-_xs_jvals(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jvals: internal stub called directly");
-
-void
-_xs_jeq(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jeq: internal stub called directly");
-
-void
-_xs_jpp(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jpp: internal stub called directly");
-
-void
-_xs_jraw(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jraw: internal stub called directly");
-
-void
-_xs_jis_obj(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_obj: internal stub called directly");
-
-void
-_xs_jis_arr(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_arr: internal stub called directly");
-
-void
-_xs_jis_str(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_str: internal stub called directly");
-
-void
-_xs_jis_num(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_num: internal stub called directly");
-
-void
-_xs_jis_int(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_int: internal stub called directly");
-
-void
-_xs_jis_real(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_real: internal stub called directly");
-
-void
-_xs_jis_bool(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_bool: internal stub called directly");
-
-void
-_xs_jis_null(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jis_null: internal stub called directly");
-
-void
-_xs_jread(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jread: internal stub called directly");
-
-void
-_xs_jwrite(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jwrite: internal stub called directly");
-
-void
-_xs_jpaths(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jpaths: internal stub called directly");
-
-void
-_xs_jfind(...)
-PPCODE:
-    PERL_UNUSED_VAR(items);
-    croak("jfind: internal stub called directly");
+# XS helpers for Doc overloading
 
 SV *
 _doc_stringify(SV *self_sv)

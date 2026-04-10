@@ -5,7 +5,6 @@ use warnings;
 use utf8;
 
 use Config ();
-use Capture::Tiny qw(capture);
 use Cwd qw(abs_path);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
@@ -13,7 +12,6 @@ use File::Spec;
 use IO::Handle ();
 use IO::Select ();
 use IPC::Open3 qw(open3);
-use JSON::XS ();
 use Pod::Usage qw(pod2usage);
 use Symbol qw(gensym);
 
@@ -26,6 +24,7 @@ use Developer::Dashboard::Platform qw(
   resolve_runnable_file
 );
 use Developer::Dashboard::InternalCLI ();
+use Developer::Dashboard::Runtime::Result ();
 
 my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
 if ( -d $dashboard_lib ) {
@@ -81,7 +80,7 @@ pod2usage(
 # Output: true value after hook execution completes.
 sub _prime_command_result_env {
     my ( $cmd, @argv ) = @_;
-    delete $ENV{RESULT};
+    Developer::Dashboard::Runtime::Result::clear_current();
     $ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if defined $cmd && $cmd ne '';
     return 1 if !defined $cmd || $cmd eq '';
 
@@ -108,12 +107,12 @@ sub _prime_command_result_env {
                 stderr => $hook_result->{stderr},
             };
             $results{$result_key}{exit_code} = $hook_result->{exit_code} if defined $hook_result->{exit_code};
-            $ENV{RESULT} = JSON::XS->new->canonical->encode( \%results );
+            Developer::Dashboard::Runtime::Result::set_current( \%results );
         }
         closedir $dh;
     }
 
-    delete $ENV{RESULT} if !%results;
+    Developer::Dashboard::Runtime::Result::clear_current() if !%results;
     return 1;
 }
 
@@ -418,31 +417,50 @@ Perl modules loaded by those helpers.
 
 =head1 PURPOSE
 
-Public entrypoint script in the Developer Dashboard codebase. This file bootstraps the runtime, resolves DD-OOP-LAYERS hooks and command targets, stages private helpers, and hands execution off to the final command.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This is the one public executable users invoke. It bootstraps C<PERL5LIB> when running from a checkout, runs layered command hooks across C<DD-OOP-LAYERS>, stages dashboard-managed built-in helpers under F<~/.developer-dashboard/cli/dd/>, and then C<exec>s the final helper or custom command instead of owning the heavy implementation itself.
 
 =head1 WHY IT EXISTS
 
-It exists as the one public executable users run. Its job is intentionally narrow: bootstrap the environment, evaluate layered hooks, resolve the final command, and hand off without owning the heavy implementation bodies itself.
+It exists to keep the command surface stable while the implementation stays decomposed. The repo rule is that C<dashboard> remains a switchboard, so this file owns dispatch, helper staging, and hook execution rather than data queries, SQL workspaces, page rendering, or other subsystem logic.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing top-level command bootstrap, layered hook execution, helper staging, or command handoff behaviour.
+Use this file when you are changing top-level command discovery, the order of command hooks, how built-in helpers are staged, or the deepest-to-home lookup rules for layered custom commands.
 
 =head1 HOW TO USE
 
-Run C<dashboard E<lt>commandE<gt>>. If you are changing this file, keep it focused on bootstrap, layered hook execution, helper staging, command resolution, and C<exec>; move heavy behaviour into modules or staged helper scripts instead.
+Users run C<dashboard E<lt>subcommandE<gt>>. This script resolves whether that subcommand is a dashboard-managed helper or a user-layer command, primes the C<RESULT> hook state, and then hands off with C<exec>. If behavior belongs to a subsystem, move it into a module or private helper instead of expanding this file.
 
 =head1 WHAT USES IT
 
-It is used directly by end users, by tests that execute C<dashboard ...>, by staged shell helpers that re-enter the public command, and by release/integration smoke flows.
+It is used directly by end users, shell bootstraps, private staged helpers that re-enter the public command path, tests that execute dashboard commands, and release/integration smoke runs that verify the installed command surface.
 
 =head1 EXAMPLES
 
-  dashboard paths
-  dashboard page list
+Example 1:
 
-Both commands go through this public switchboard, which then resolves hooks and hands off to the real helper implementation.
+  dashboard paths
+
+Exercise thin command dispatch through one lightweight built-in helper.
+
+Example 2:
+
+  dashboard page source api-dashboard
+
+Use the public entrypoint to reach a heavier staged helper without embedding that implementation here.
+
+Example 3:
+
+  dashboard serve --foreground
+
+Run the public command through its server bootstrap path while keeping logs in the foreground.
+
+Example 4:
+
+  prove -lv t/30-dashboard-loader.t
+
+Rerun the loader contract test after changing how this public switchboard stages or dispatches helpers.
+
 
 =for comment FULL-POD-DOC END
 

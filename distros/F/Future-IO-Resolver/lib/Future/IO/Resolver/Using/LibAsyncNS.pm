@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Resolver::Using::LibAsyncNS 0.03;
+package Future::IO::Resolver::Using::LibAsyncNS 0.04;
 
 use v5.20;
 use warnings;
@@ -14,7 +14,13 @@ no warnings qw( experimental::postderef experimental::signatures );
 use Future::IO 0.19 qw( POLLIN );
 use Future::Utils qw( repeat );
 
-require Net::LibAsyncNS;
+use constant HAVE_LIBASYNCNS => eval { require Net::LibAsyncNS; };
+
+use constant RESOLVER_PRIORITY => 25;
+
+use Future::IO::Resolver;
+HAVE_LIBASYNCNS and
+   Future::IO::Resolver->ADD_BACKEND( __PACKAGE__ );
 
 use constant NS_CLASS_IN => 1;
 
@@ -29,7 +35,7 @@ C<Future::IO::Resolver::Using::LibAsyncNS> - implement L<Future::IO::Resolver> u
 =head1 DESCRIPTION
 
 This module provides a backend implementation for L<Future::IO::Resolver>
-which uses F<libasyncns> (via the C<Net::LibAsyncNS> module) to perform its
+which uses F<libasyncns> (via the L<Net::LibAsyncNS> module) to perform its
 lookups.
 
 This should not be used directly, but is instead made available via the main

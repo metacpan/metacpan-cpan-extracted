@@ -5,7 +5,7 @@ Aion - постмодернистская объектная система дл
 
 # VERSION
 
-1.7
+1.8
 
 # SYNOPSIS
 
@@ -492,7 +492,7 @@ $ex1->x     # -> 6
 
 С помощью аспекта `eon` реализуется паттерн **Dependency Injection**.
 
-Он связывает свойство с сервисом из контейнера `$Aion::pleroma`.
+Он связывает свойство с сервисом из контейнера `Aion->pleroma`.
 
 Значением аспекта может быть ключ сервиса, 1 или 2.
 
@@ -505,7 +505,7 @@ package CounterEon;
 #@eon ex.counter
 use Aion;
 
-has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
+has accomulator => (isa => 'AccomulatorEon', eon => 1);
 
 1;
 ```
@@ -516,7 +516,7 @@ package AccomulatorEon;
 #@eon
 use Aion;
 
-has power => (isa => Object['PowerEon'], eon => 2);
+has power => (isa => 'PowerEon', eon => 2);
 
 1;
 ```
@@ -539,16 +539,20 @@ sub power { shift->new }
 ```perl
 {
 	use Aion::Pleroma;
-	local $Aion::pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
+	my $pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
 		'ex.counter' => 'CounterEon#new',
 		AccomulatorEon => 'AccomulatorEon#new',
 		'PowerEon#power' => 'PowerEon#power',
 	});
+
+	local *Aion::pleroma = sub { $pleroma };
 	
-	my $counter = $Aion::pleroma->get('ex.counter');
+	my $counter = Aion->pleroma->get('ex.counter');
 
 	$counter->accomulator->power->counter # -> $counter
 }
+
+Aion->pleroma->get('ex.counter') # -> undef
 ```
 
 См. [Aion::Pleroma](https://metacpan.org/pod/Aion::Pleroma).

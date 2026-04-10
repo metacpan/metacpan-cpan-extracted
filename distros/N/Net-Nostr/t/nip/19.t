@@ -17,6 +17,7 @@ use Net::Nostr::Bech32 qw(
     decode_bech32_entity
 );
 use Net::Nostr::Key;
+use Bitcoin::Crypto::Bech32 qw(encode_bech32 translate_8to5);
 
 ###############################################################################
 # npub - public keys
@@ -337,6 +338,162 @@ subtest 'unknown TLV types are ignored' => sub {
     my $encoded = encode_nprofile(pubkey => 'a' x 64);
     my $decoded = decode_nprofile($encoded);
     is($decoded->{pubkey}, 'a' x 64, 'known fields decoded correctly');
+};
+
+###############################################################################
+# Malformed TLV: bounds checking
+###############################################################################
+
+subtest 'truncated TLV: missing length byte' => sub {
+    # Craft a payload with only a type byte (no length byte)
+    my $payload = pack('C', 0);  # type=0, no length
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nprofile', $data5, 'bech32');
+    like(dies { decode_nprofile($bech32) }, qr/truncated/i,
+        'croaks on missing length byte');
+};
+
+subtest 'truncated TLV: declared length exceeds payload' => sub {
+    # type=0, length=32, but only 2 bytes of value
+    my $payload = pack('CC', 0, 32) . ('x' x 2);
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nprofile', $data5, 'bech32');
+    like(dies { decode_nprofile($bech32) }, qr/truncated/i,
+        'croaks when value extends beyond payload');
+};
+
+###############################################################################
+# Bare type payload size validation (must be exactly 32 bytes)
+###############################################################################
+
+subtest 'bare decode rejects short payload' => sub {
+    # Encode only 16 bytes (not 32) with npub prefix
+    my $short = pack('H*', 'aa' x 16);
+    my $data5 = translate_8to5($short);
+    my $bech32 = encode_bech32('npub', $data5, 'bech32');
+    like(dies { decode_npub($bech32) }, qr/exactly 32 bytes/,
+        'npub rejects 16-byte payload');
+};
+
+subtest 'bare decode rejects long payload' => sub {
+    my $long = pack('H*', 'aa' x 33);
+    my $data5 = translate_8to5($long);
+    my $bech32 = encode_bech32('npub', $data5, 'bech32');
+    like(dies { decode_npub($bech32) }, qr/exactly 32 bytes/,
+        'npub rejects 33-byte payload');
+};
+
+subtest 'nsec decode rejects short payload' => sub {
+    my $short = pack('H*', 'bb' x 16);
+    my $data5 = translate_8to5($short);
+    my $bech32 = encode_bech32('nsec', $data5, 'bech32');
+    like(dies { decode_nsec($bech32) }, qr/exactly 32 bytes/,
+        'nsec rejects 16-byte payload');
+};
+
+subtest 'note decode rejects short payload' => sub {
+    my $short = pack('H*', 'cc' x 16);
+    my $data5 = translate_8to5($short);
+    my $bech32 = encode_bech32('note', $data5, 'bech32');
+    like(dies { decode_note($bech32) }, qr/exactly 32 bytes/,
+        'note rejects 16-byte payload');
+};
+
+###############################################################################
+# TLV: missing required fields
+###############################################################################
+
+subtest 'nprofile rejects missing pubkey' => sub {
+    # Encode an nprofile with only a relay TLV (no type 0)
+    my $relay = 'wss://r.com';
+    my $payload = pack('CC', 1, length($relay)) . $relay;
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nprofile', $data5, 'bech32');
+    like(dies { decode_nprofile($bech32) }, qr/missing required pubkey/,
+        'nprofile without pubkey croaks');
+};
+
+subtest 'nevent rejects missing event id' => sub {
+    # Encode a nevent with only a relay TLV (no type 0)
+    my $relay = 'wss://r.com';
+    my $payload = pack('CC', 1, length($relay)) . $relay;
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nevent', $data5, 'bech32');
+    like(dies { decode_nevent($bech32) }, qr/missing required event id/,
+        'nevent without event id croaks');
+};
+
+subtest 'naddr rejects missing required fields' => sub {
+    # Encode naddr with only identifier (missing pubkey and kind)
+    my $ident = 'test';
+    my $payload = pack('CC', 0, length($ident)) . $ident;
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('naddr', $data5, 'bech32');
+    like(dies { decode_naddr($bech32) }, qr/missing required pubkey/,
+        'naddr without pubkey croaks');
+};
+
+###############################################################################
+# TLV: wrong field lengths
+###############################################################################
+
+subtest 'nprofile rejects wrong-length pubkey' => sub {
+    # type 0, 16 bytes instead of 32
+    my $payload = pack('CC', 0, 16) . ('x' x 16);
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nprofile', $data5, 'bech32');
+    like(dies { decode_nprofile($bech32) }, qr/exactly 32 bytes/,
+        'nprofile rejects 16-byte pubkey');
+};
+
+subtest 'nevent rejects wrong-length event id' => sub {
+    my $payload = pack('CC', 0, 16) . ('x' x 16);
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nevent', $data5, 'bech32');
+    like(dies { decode_nevent($bech32) }, qr/exactly 32 bytes/,
+        'nevent rejects 16-byte event id');
+};
+
+subtest 'nevent rejects wrong-length author' => sub {
+    # valid event id (32 bytes), then author with 16 bytes
+    my $payload = pack('CC', 0, 32) . ("\x00" x 32);
+    $payload .= pack('CC', 2, 16) . ('x' x 16);
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nevent', $data5, 'bech32');
+    like(dies { decode_nevent($bech32) }, qr/exactly 32 bytes/,
+        'nevent rejects 16-byte author');
+};
+
+subtest 'nevent rejects wrong-length kind' => sub {
+    # valid event id, then kind with 2 bytes instead of 4
+    my $payload = pack('CC', 0, 32) . ("\x00" x 32);
+    $payload .= pack('CC', 3, 2) . ('xx');
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('nevent', $data5, 'bech32');
+    like(dies { decode_nevent($bech32) }, qr/exactly 4 bytes/,
+        'nevent rejects 2-byte kind');
+};
+
+subtest 'naddr rejects wrong-length pubkey' => sub {
+    my $ident = 'test';
+    my $payload = pack('CC', 0, length($ident)) . $ident;
+    $payload .= pack('CC', 2, 16) . ('x' x 16);  # wrong size pubkey
+    $payload .= pack('CC', 3, 4) . pack('N', 30023);
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('naddr', $data5, 'bech32');
+    like(dies { decode_naddr($bech32) }, qr/exactly 32 bytes/,
+        'naddr rejects 16-byte pubkey');
+};
+
+subtest 'naddr rejects wrong-length kind' => sub {
+    my $ident = 'test';
+    my $payload = pack('CC', 0, length($ident)) . $ident;
+    $payload .= pack('CC', 2, 32) . ("\x00" x 32);
+    $payload .= pack('CC', 3, 2) . ('xx');  # wrong size kind
+    my $data5 = translate_8to5($payload);
+    my $bech32 = encode_bech32('naddr', $data5, 'bech32');
+    like(dies { decode_naddr($bech32) }, qr/exactly 4 bytes/,
+        'naddr rejects 2-byte kind');
 };
 
 done_testing;

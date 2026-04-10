@@ -899,30 +899,49 @@ Run and validate the host-built-tarball integration workflow.
 
 =head1 PURPOSE
 
-Integration helper script in the Developer Dashboard codebase. This file drives the blank-environment tarball install and smoke verification flow inside the disposable integration container.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This integration script drives environment overrides and persisted configuration behavior in an environment that is closer to a real install than the unit tests. Read it when you need the exact orchestration steps, external tools, and explicit assertions for that broader check.
 
 =head1 WHY IT EXISTS
 
-It exists to make a repeatable host-or-container integration workflow explicit instead of burying release verification steps in ad-hoc shell history.
+It exists because environment overrides and persisted configuration behavior cannot be trusted from isolated unit coverage alone. The repository needs one place that shows how the bigger environment is created and what success looks like there.
 
 =head1 WHEN TO USE
 
-Use this file when you are rerunning the documented integration workflow for its environment or debugging a release/install problem in that path.
+Use this file when validating environment overrides and persisted configuration behavior, when the blank-environment or browser-smoke docs change, or when a release verification step fails outside the unit-test layer.
 
 =head1 HOW TO USE
 
-Run the script as part of the documented integration plan for its environment. Treat failures here as release blockers, because these scripts represent the supported rerun path.
+Run it directly from the repository root in the environment it expects, read the emitted paths and logs on failure, and prefer the documented wrapper path when one exists so the integration environment stays reproducible.
 
 =head1 WHAT USES IT
 
-It is used by maintainers running the documented install/runtime verification workflow for that environment, and by tests that validate the checked-in integration assets.
+Release verification, integration checklists, and contributors diagnosing environment-specific failures use this file.
 
 =head1 EXAMPLES
 
+Example 1:
+
+  integration/blank-env/run-host-integration.sh
+
+Use the host-side wrapper when you want the repository-managed Docker launch path instead of entering the container manually.
+
+Example 2:
+
+  DASHBOARD_TARBALL_IN_CONTAINER=/artifacts/Developer-Dashboard-2.17.tar.gz perl integration/blank-env/run-integration.pl
+
+Point the integration runner at one concrete tarball path inside the container.
+
+Example 3:
+
   perl integration/blank-env/run-integration.pl
 
-Run the script from the documented integration environment so it can find the expected tarball, browser, or container prerequisites.
+Run this integration helper directly from the repository root.
+
+Example 4:
+
+  prove -lv t/13-integration-assets.t
+
+Check the lightweight asset guardrails before launching the heavier integration path.
 
 =for comment FULL-POD-DOC END
 

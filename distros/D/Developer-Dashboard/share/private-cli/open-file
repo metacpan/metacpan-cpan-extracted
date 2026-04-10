@@ -36,30 +36,48 @@ installing a generic executable into the user's global PATH.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard open-file command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes C<dashboard open-file>, the long-form file lookup
+command. It is the user-facing wrapper for direct file opens, scoped regex
+search, Perl module lookup, Java dotted class lookup, and the final
+print-vs-editor action chosen by the shared open-file runtime.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because open-file behavior is richer than a one-line shell alias.
+The helper keeps the public command discoverable while leaving ranking,
+archive lookup, and editor-exec behavior in one tested Perl module.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the public C<dashboard open-file> argv contract,
+the staged-helper handoff, or the examples contributors use to understand the
+full-featured open-file behavior.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard open-file>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/open-file> after helper staging.
+Users run C<dashboard open-file [--print] [--line N] [--editor CMD]
+E<lt>file|scopeE<gt> [pattern ...]>. Direct paths and C<file:line> values are
+opened immediately. Scoped mode treats the first positional argument as the
+root and every remaining positional argument as a case-insensitive regex that
+must match. A single result opens or prints that file; multiple results are
+listed. Perl module names are converted to path lookups under C<@INC>, while
+Java class names are resolved through source trees, source jars, and cached
+Maven source downloads.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/open-file>.
+It is used by developers jumping to source files from the shell, by open-file
+regression tests, and by docs that explain direct paths, scoped regex lookup,
+Perl modules, Java classes, and print-vs-editor behavior.
 
 =head1 EXAMPLES
 
-  dashboard open-file
-
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/open-file>.
+  dashboard open-file lib 'OpenFile\.pm$'
+  dashboard open-file path/to/file.txt
+  dashboard open-file . "Ok\.js$"
+  dashboard open-file Developer::Dashboard::CLI::Paths
+  dashboard open-file javax.jws.WebService
+  dashboard open-file --print bookmarks api-dashboard
 
 =for comment FULL-POD-DOC END
 

@@ -61,9 +61,10 @@ sub part_B {
 sub part_C {
     say 'part C';
     # choose a random prime to use by the hihat
-    my ($p) = primes_list(\%primes);
+    my ($p, $q) = primes_list(\%primes);
     my %patterns = (
         closed => $mcr->euclid($p, 16),
+        open   => $mcr->euclid($q, 16),
         kick   => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
         snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
     );

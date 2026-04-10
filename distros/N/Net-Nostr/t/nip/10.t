@@ -424,4 +424,96 @@ subtest 'e tags sorted by reply stack: root then parent' => sub {
     is($e_tags[1][3], 'reply', 'reply comes second');
 };
 
+###############################################################################
+# Hex64 validation for root_id and reply_id
+###############################################################################
+
+subtest 'rejects invalid hex64 in root_id and reply_id' => sub {
+    ok(dies { Net::Nostr::Thread->new(root_id => 'not-valid-hex') },
+        'croaks on non-hex root_id');
+    ok(dies { Net::Nostr::Thread->new(root_id => 'AABB' x 16) },
+        'croaks on uppercase root_id');
+    ok(dies { Net::Nostr::Thread->new(root_id => 'aa' x 31) },
+        'croaks on too-short root_id');
+    ok(dies { Net::Nostr::Thread->new(reply_id => 'xyz') },
+        'croaks on non-hex reply_id');
+    ok(lives { Net::Nostr::Thread->new(root_id => 'aa' x 32) },
+        'accepts valid hex64 root_id');
+    ok(lives { Net::Nostr::Thread->new(root_id => 'aa' x 32, reply_id => 'bb' x 32) },
+        'accepts valid hex64 root_id and reply_id');
+};
+
+###############################################################################
+# new() POD example
+###############################################################################
+
+subtest 'new() POD example' => sub {
+    my $thread = Net::Nostr::Thread->new(
+        root_id    => 'aa' x 32,
+        root_relay => 'wss://relay.example.com',
+    );
+    is $thread->root_id, 'aa' x 32;
+    is $thread->root_relay, 'wss://relay.example.com';
+    is $thread->mentions, [];
+};
+
+subtest 'new() rejects unknown arguments' => sub {
+    like(
+        dies { Net::Nostr::Thread->new(root_id => 'aa' x 32, bogus => 'value') },
+        qr/unknown.+bogus/i,
+        'unknown argument rejected'
+    );
+};
+
+###############################################################################
+# from_event: short/malformed tags are safely skipped
+###############################################################################
+
+subtest 'from_event: short e tags are skipped' => sub {
+    my $event = make_event(
+        kind => 1,
+        tags => [
+            ['e'],                                           # too short, skipped
+            [],                                              # empty, skipped
+            ['e', $root_id, '', 'root', $alice_pk],          # valid
+        ],
+    );
+    my $thread = Net::Nostr::Thread->from_event($event);
+    ok $thread, 'parsed despite short tags';
+    is $thread->root_id, $root_id, 'root_id from valid tag';
+};
+
+subtest 'from_event: e tags without marker field fall back to positional' => sub {
+    my $event = make_event(
+        kind => 1,
+        tags => [
+            ['e', $root_id],           # 2 elements, no relay or marker
+        ],
+    );
+    my $thread = Net::Nostr::Thread->from_event($event);
+    is $thread->root_id, $root_id, 'positional parse works with minimal e tag';
+    is $thread->root_relay, '', 'root_relay defaults to empty string';
+};
+
+subtest 'reply: short p tags in parent are skipped' => sub {
+    my $parent = make_event(
+        kind   => 1,
+        pubkey => $bob_pk,
+        tags   => [
+            ['p'],                # too short, skipped
+            ['p', $carol_pk],     # valid
+        ],
+    );
+    my $reply = Net::Nostr::Thread->reply(
+        to      => $parent,
+        pubkey  => $alice_pk,
+        content => 'test',
+    );
+    my @p_tags = grep { $_->[0] eq 'p' } @{$reply->tags};
+    my @pks = map { $_->[1] } @p_tags;
+    ok !(grep { !defined $_ } @pks), 'no undef pubkeys from short p tags';
+    ok scalar(grep { $_ eq $carol_pk } @pks), 'valid p tag preserved';
+    ok scalar(grep { $_ eq $bob_pk } @pks), 'parent pubkey included';
+};
+
 done_testing;

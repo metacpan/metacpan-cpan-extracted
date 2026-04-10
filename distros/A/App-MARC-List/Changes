@@ -1,3 +1,10 @@
+0.08 2026-04-09T22:17:28+02:00
+ - Add check for input file.
+ - Fix minimal version of Test::Warn to 0.31.
+ - Fix sort in freq.
+ - Fix typo in abstract.
+ - Update copyright years.
+
 0.07 2025-04-16T13:09:02+02:00
  - Add DESCRIPTION to doc.
  - Add new example to marc-list doc.

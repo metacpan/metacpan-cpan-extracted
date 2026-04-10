@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Models;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: List configured models and their backends
 use Moo;
 use MooX::Cmd;
@@ -90,7 +90,7 @@ Langertha::Knarr::CLI::Cmd::Models - List configured models and their backends
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 DESCRIPTION
 
@@ -117,6 +117,10 @@ See L<knarr> for option details and L<Langertha::Knarr> for full documentation.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

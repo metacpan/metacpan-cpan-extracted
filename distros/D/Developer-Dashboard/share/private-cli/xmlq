@@ -34,30 +34,42 @@ This command provides XML extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard xmlq command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper owns the public C<dashboard xmlq> command. It accepts a
+path plus an optional input file, then hands the request to the shared query
+runtime so parsing, file-vs-STDIN handling, and output formatting stay
+consistent with the rest of the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because XML inspection is part of the dashboard query family, but the
+current XML behavior is intentionally minimal and should still stay behind the
+same staged-helper and shared-runtime contract as the other query helpers.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the public C<dashboard xmlq> argv contract, the XML
+helper examples, or the staged handoff into the shared query runtime.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard xmlq>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/xmlq> after helper staging.
+Users run C<dashboard xmlq [path] [file]>. The staged helper selects the XML
+backend in the shared query runtime, which accepts the file and path in either
+order, reads STDIN when no file is given, and currently exposes the raw XML
+payload under the C<_raw> key instead of pretending to support a full XML tree
+query language. Use C<_raw>, C<$d>, or C<.> when you need the whole payload.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/xmlq>.
+It is used by the public C<dashboard xmlq> command, by shell snippets that want
+a runtime-local XML inspection tool, and by query-helper coverage under C<t/>
+that locks in the current minimal raw-payload contract.
 
 =head1 EXAMPLES
 
-  dashboard xmlq
-
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/xmlq>.
+  printf '<root><value>demo</value></root>' | dashboard xmlq _raw
+  dashboard xmlq feed.xml '$d'
+  dashboard xmlq '$d' feed.xml
+  cat feed.xml | dashboard xmlq _raw
 
 =for comment FULL-POD-DOC END
 

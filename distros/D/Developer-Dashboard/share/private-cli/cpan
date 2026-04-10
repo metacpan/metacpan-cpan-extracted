@@ -33,30 +33,50 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard cpan command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes C<dashboard cpan>, the runtime-local dependency installer. It lets a project or home runtime add optional Perl modules such as C<DBD::SQLite> or C<DBD::ODBC> without changing the base distribution dependencies.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because the dashboard intentionally does not bundle every optional database driver or feature dependency. The staged helper gives users a first-class way to extend their runtime locally while keeping the base install small.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the CLI contract for runtime-local dependency installation, driver convenience behavior such as C<DBD::*> handling, or the handoff into the dependency-management implementation.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard cpan>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/cpan> after helper staging.
+Users run C<dashboard cpan E<lt>Module...E<gt>> from the runtime they want to extend. The staged helper forwards that request into the private runtime, which updates the runtime-local C<cpanfile> and installs into C<local/>.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/cpan>.
+It is used by developers enabling optional SQL dashboard drivers and by tests and docs that verify runtime-local dependency installation instead of shipping those modules by default.
 
 =head1 EXAMPLES
 
-  dashboard cpan
+Example 1:
 
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/cpan>.
+  dashboard cpan DBD::SQLite
+
+Run the public built-in command path that stages or re-enters this helper.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/cpan --help
+
+Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository suite.
+
 
 =for comment FULL-POD-DOC END
 

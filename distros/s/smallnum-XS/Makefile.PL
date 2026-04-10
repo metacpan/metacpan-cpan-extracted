@@ -15,11 +15,9 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test::More' => '0',
+	'Test2::Bundle::Numerical' => '0.01'
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
     },
     XSMULTI => 1,
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

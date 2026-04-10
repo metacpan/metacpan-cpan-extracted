@@ -1,4 +1,4 @@
-use Test::More;
+use Test2::Bundle::Numerical;
 use smallnum::XS '1';
 is(smallnum::XS::_num(\1), "1");
 is(smallnum::XS::_num(0.23765234354654), "0");

@@ -3,7 +3,7 @@ package Chandra::Pack;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use File::Raw qw(import);
 use Cwd ();
@@ -102,6 +102,7 @@ sub build {
 
 sub build_macos {
     my ($self) = @_;
+    Carp::croak('macOS builds are only supported on darwin hosts') unless $^O eq 'darwin';
     my $safe = _safe_name($self->{name});
     my $app_dir = file_join($self->{output}, "$safe.app");
     my $contents = file_join($app_dir, 'Contents');
@@ -307,6 +308,17 @@ CSRC
     }
 }
 
+sub _generate_launcher_macos {
+    my ($self) = @_;
+    my $perl = $self->{perl};
+    return <<'LAUNCHER';
+#!/bin/bash
+DIR="$(cd "$(dirname "$0")" && pwd)"
+export PERL5LIB="$DIR/../Resources/lib:$PERL5LIB"
+exec "$perl" "$DIR/../Resources/script.pl" "$@"
+LAUNCHER
+}
+
 sub _generate_launcher_linux {
     my ($self) = @_;
     my $perl = $self->{perl};
@@ -392,23 +404,35 @@ sub _copy_dir_recursive {
 
 sub _convert_icon_macos {
     my ($self, $png, $icns) = @_;
-    # Use sips + iconutil if available
+    # Use sips + iconutil if available, but suppress image conversion stderr
     my $iconset = "$icns.iconset";
     file_mkpath($iconset);
     my @sizes = (16, 32, 64, 128, 256, 512);
+    my $had_icon = 0;
+
     for my $s (@sizes) {
-        system('sips', '-z', $s, $s, $png, '--out',
-            file_join($iconset, "icon_${s}x${s}.png")) == 0 or next;
-        my $s2 = $s * 2;
-        if ($s2 <= 1024) {
-            system('sips', '-z', $s2, $s2, $png, '--out',
-                file_join($iconset, "icon_${s}x${s}\@2x.png"));
+        my $out_png = file_join($iconset, "icon_${s}x${s}.png");
+        {
+            open my $err, '>', '/dev/null' or last;
+            local *STDERR = $err;
+            if (system('sips', '-z', $s, $s, $png, '--out', $out_png) == 0) {
+                $had_icon = 1;
+                my $s2 = $s * 2;
+                if ($s2 <= 1024) {
+                    system('sips', '-z', $s2, $s2, $png, '--out',
+                        file_join($iconset, "icon_${s}x${s}\@2x.png"));
+                }
+            }
         }
     }
-    if (system('iconutil', '-c', 'icns', $iconset, '-o', $icns) != 0) {
-        # Fallback: just copy the PNG
-        file_copy($png, $icns);
+
+    if ($had_icon && system('iconutil', '-c', 'icns', $iconset, '-o', $icns) == 0) {
+        # success
+    } else {
+        # Fallback: just copy the PNG to preserve the icon reference
+        file_copy($png, $icns) unless file_is_file($icns);
     }
+
     # Clean up iconset
     file_rm_rf($iconset);
 }

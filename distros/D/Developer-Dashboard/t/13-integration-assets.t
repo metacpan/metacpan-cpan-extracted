@@ -1,10 +1,17 @@
 use strict;
 use warnings;
 
+use Capture::Tiny qw(capture);
 use Developer::Dashboard::JSON qw(json_decode);
 use Test::More;
 
 my $has_source_tree_docs = -f 'dist.ini';
+
+if ( $has_source_tree_docs && -d '.git' ) {
+    ok( _path_is_git_tracked('doc/integration-test-plan.md'), 'integration test plan document is tracked by git' );
+    ok( _path_is_git_tracked('doc/windows-testing.md'), 'Windows verification document is tracked by git' );
+    ok( _path_is_git_tracked('integration/browser/run-bookmark-browser-smoke.pl'), 'bookmark browser smoke script is tracked by git' );
+}
 
 ok( -f 'doc/integration-test-plan.md', 'integration test plan document exists' ) if $has_source_tree_docs;
 ok( -f 'integration/blank-env/Dockerfile', 'blank-environment Dockerfile exists' );
@@ -113,7 +120,7 @@ like( $host, qr/LOCAL_DZIL.*build/s, 'host launcher builds the tarball on the ho
 like( $host, qr/DASHBOARD_TARBALL/, 'host launcher exports the tarball path for docker compose' );
 like( $host, qr/run --rm blank-env/, 'host launcher runs the blank-environment integration service' );
 unlike( $host, qr/run --build --rm blank-env/, 'host launcher does not rebuild the integration image when using the prebuilt container path' );
-like( $host, qr/dd-int-test:latest/, 'host launcher POD documents the prebuilt dd-int-test image path' );
+like( $host, qr/integration\/blank-env\/Dockerfile/, 'host launcher POD documents the pinned blank-environment Dockerfile path' );
 
 open my $windows_smoke_fh, '<', 'integration/windows/run-strawberry-smoke.ps1' or die $!;
 my $windows_smoke = do { local $/; <$windows_smoke_fh> };
@@ -219,6 +226,15 @@ else {
 
 done_testing;
 
+sub _path_is_git_tracked {
+    my ($path) = @_;
+    return 0 if !defined $path || $path eq '';
+    my ( $stdout, $stderr, $status ) = capture {
+        system( 'git', 'ls-files', '--error-unmatch', '--', $path );
+    };
+    return $status == 0 ? 1 : 0;
+}
+
 __END__
 
 =head1 NAME
@@ -234,30 +250,43 @@ runner assets are present and cover the intended install and smoke flow.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file tests the checked-in integration assets used by container and Windows smoke flows.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for This test verifies that the blank-environment Docker integration plan and runner assets are present and cover the intended install and smoke flow. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because This test verifies that the blank-environment Docker integration plan and runner assets are present and cover the intended install and smoke flow has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing This test verifies that the blank-environment Docker integration plan and runner assets are present and cover the intended install and smoke flow, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/13-integration-assets.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/13-integration-assets.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/13-integration-assets.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/13-integration-assets.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

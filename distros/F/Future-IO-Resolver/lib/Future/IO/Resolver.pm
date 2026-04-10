@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Resolver 0.03;
+package Future::IO::Resolver 0.04;
 
 use v5.20;
 use warnings;
@@ -15,14 +15,6 @@ use meta;
 no warnings 'meta::experimental';
 
 use Carp;
-
-# TODO: Work out how to make the LibAsyncNS one optional
-our @BACKENDS = qw(
-   Future::IO::Resolver::Using::LibAsyncNS
-   Future::IO::Resolver::Using::Socket
-);
-
-require "${_}.pm" =~ s(::)(/)gr for @BACKENDS;
 
 =head1 NAME
 
@@ -54,13 +46,33 @@ involve communication with the outside world.
 
 =head2 Implementation Details
 
-Currently this module uses L<Net::LibAsyncNS> to offload the name resolver
-operations asynchronously. This limits its abilities, and also means it relies
-on having that library available. A later version of this module should expand
-on this, offering possibly multiple different resolver backends for more
-flexibility and portability.
+This module can optionally use L<Net::LibAsyncNS> to offload the name resolver
+operations asynchronously. If this is unavailable, it will instead use the
+regular resolver functions found in L<Socket>, made asynchronous by calling
+those functions from a forked side-car process. This is Implementated by a
+flexible plugin system that allows other backends to be provided as well, as
+may be found in other CPAN modules.
 
 =cut
+
+our @BACKENDS;
+
+sub ADD_BACKEND
+{
+   shift;
+   my ( $backend ) = @_;
+
+   my $prio = $backend->RESOLVER_PRIORITY;
+
+   my $idx = 0;
+   $idx++ while $idx < scalar @BACKENDS and $prio > $BACKENDS[$idx]->RESOLVER_PRIORITY;
+
+   splice @BACKENDS, $idx, 0, ( $backend );
+}
+
+# Attempt to load the distribution-supplied modules
+require Future::IO::Resolver::Using::Socket;
+require Future::IO::Resolver::Using::LibAsyncNS;
 
 =head1 METHODS
 
@@ -146,9 +158,8 @@ Some wrapping of other resolvers, like the POSIX C<get*ent> family.
 
 =item *
 
-Allow for optional loading of backend resolver implementations, so as not to
-depend on L<Net::LibAsyncNS> all the time. Add support for direct DNS-based
-resolving behaviour.
+Add support for direct DNS-based resolving behaviour; possibly in its own
+CPAN distribution.
 
 =back
 

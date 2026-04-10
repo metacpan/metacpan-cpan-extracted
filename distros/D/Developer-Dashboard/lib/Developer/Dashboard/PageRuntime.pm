@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -974,30 +974,50 @@ blocks, and stream saved Ajax files as real child processes.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file renders bookmark pages, runs CODE blocks, and executes saved Ajax handlers.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module executes and renders dashboard bookmark pages. It evaluates bookmark directives, runs code blocks, exposes browser-side helper functions such as C<fetch_value>, C<stream_value>, and C<stream_data>, and returns the HTML fragments or runtime errors that the web layer displays.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because bookmark execution is the heart of the product. Rendering, code execution, helper injection, and runtime state all need one owner so saved pages, transient pages, and seeded workspaces behave consistently.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing bookmark rendering, Template Toolkit exposure, code-block execution, Ajax helper generation, or the browser-side helper contracts used by pages such as C<api-dashboard> and C<sql-dashboard>.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::PageRuntime> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the file and path registries plus any path aliases, then feed it a normalized page document. Let it return render fragments or runtime errors rather than building bookmark execution logic in routes or helper scripts.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the web app render/source/edit flows, by skill bookmark rendering, by seeded dashboard pages, and by a large body of page/web regression tests.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::PageRuntime -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::PageRuntime -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/07-core-units.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

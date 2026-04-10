@@ -2,8 +2,10 @@ use strict;
 use warnings;
 use utf8;
 
+use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Capture::Tiny qw(capture);
-use Cwd qw(getcwd);
+use Cwd qw(abs_path getcwd);
+use Developer::Dashboard::CLI::SeededPages ();
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Encode qw(decode encode);
 use File::Path qw(make_path);
@@ -14,6 +16,29 @@ use LWP::UserAgent;
 use Developer::Dashboard::Runtime::Result;
 use Test::More;
 use Time::HiRes qw(sleep);
+
+sub _portable_path {
+    my ($path) = @_;
+    return undef if !defined $path;
+    my $resolved = eval { abs_path($path) };
+    return defined $resolved && $resolved ne '' ? $resolved : $path;
+}
+
+sub _portable_output_text {
+    my ($text) = @_;
+    return '' if !defined $text;
+    my $ends_with_newline = $text =~ /\n\z/ ? 1 : 0;
+    my @lines = split /\n/, $text;
+    @lines = map { _portable_path($_) } @lines;
+    my $normalized = join "\n", @lines;
+    $normalized .= "\n" if $ends_with_newline;
+    return $normalized;
+}
+
+sub is_same_path_output {
+    my ( $got, $expected, $label ) = @_;
+    is( _portable_output_text($got), _portable_output_text($expected), $label );
+}
 
 local $ENV{HOME} = tempdir(CLEANUP => 1);
 local $ENV{PERL5LIB} = join ':', grep { defined && $_ ne '' } '/home/mv/perl5/lib/perl5', ( $ENV{PERL5LIB} || () );
@@ -45,6 +70,7 @@ my $runtime_ps1 = File::Spec->catfile( $runtime_dd_cli_root, 'ps1' );
 my $runtime_dashboard_core = File::Spec->catfile( $runtime_dd_cli_root, '_dashboard-core' );
 my $runtime_api_dashboard = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'dashboards', 'api-dashboard' );
 my $runtime_sql_dashboard = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'dashboards', 'sql-dashboard' );
+my $seed_manifest_file = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'seeded-pages.json' );
 
 my $init = _run("$perl -I'$lib' '$dashboard' init");
 like($init, qr/runtime_root/, 'dashboard init works');
@@ -105,6 +131,47 @@ like($reinit, qr/config_file/, 'dashboard init can be re-run after a config alre
 is( ( stat $runtime_jq )[9], $managed_jq_mtime_before, 'dashboard init skips rewriting a dashboard-managed helper when its md5 already matches the shipped helper content' );
 is( ( stat $runtime_api_dashboard )[9], $managed_api_dashboard_mtime_before, 'dashboard init skips rewriting the api-dashboard seeded page when its md5 already matches the shipped seed content' );
 is( ( stat $runtime_sql_dashboard )[9], $managed_sql_dashboard_mtime_before, 'dashboard init skips rewriting the sql-dashboard seeded page when its md5 already matches the shipped seed content' );
+{
+    my $stale_sql_dashboard = <<'BOOKMARK';
+TITLE: SQL Dashboard
+:--------------------------------------------------------------------------------:
+BOOKMARK: sql-dashboard
+:--------------------------------------------------------------------------------:
+HTML: <div id="stale-sql-dashboard">stale managed sql dashboard</div>
+BOOKMARK
+    open my $stale_sql_fh, '>:raw', $runtime_sql_dashboard or die "Unable to write $runtime_sql_dashboard: $!";
+    print {$stale_sql_fh} $stale_sql_dashboard;
+    close $stale_sql_fh or die "Unable to close $runtime_sql_dashboard: $!";
+    open my $seed_manifest_fh, '>:raw', $seed_manifest_file or die "Unable to write $seed_manifest_file: $!";
+    print {$seed_manifest_fh} json_encode(
+        {
+            'sql-dashboard' => {
+                asset => 'sql-dashboard.page',
+                md5   => Developer::Dashboard::SeedSync::content_md5($stale_sql_dashboard),
+            },
+        }
+    );
+    print {$seed_manifest_fh} "\n";
+    close $seed_manifest_fh or die "Unable to close $seed_manifest_file: $!";
+
+    my $refresh_seed_init = _run("$perl -I'$lib' '$dashboard' init");
+    like( $refresh_seed_init, qr/runtime_root/, 'dashboard init refreshes a stale dashboard-managed seeded sql-dashboard copy' );
+    my $refreshed_sql_dashboard = _run("$perl -I'$lib' '$dashboard' page source sql-dashboard");
+    unlike( $refreshed_sql_dashboard, qr/stale-managed-sql-dashboard|stale managed sql dashboard/, 'dashboard init removes the stale managed sql-dashboard body when refreshing the shipped seed' );
+    like( $refreshed_sql_dashboard, qr/data-sql-workspace-tab="run"/, 'dashboard init refreshes sql-dashboard to the shipped Run SQL workspace layout when the saved page is a stale managed copy' );
+    like( $refreshed_sql_dashboard, qr/id="sql-table-filter"/, 'dashboard init refreshes sql-dashboard to the shipped schema filter layout when the saved page is a stale managed copy' );
+
+    my $user_sql_dashboard = $refreshed_sql_dashboard;
+    $user_sql_dashboard =~ s/SQL Workspace/User SQL Workspace/;
+    open my $user_sql_fh, '>:raw', $runtime_sql_dashboard or die "Unable to write $runtime_sql_dashboard: $!";
+    print {$user_sql_fh} $user_sql_dashboard;
+    close $user_sql_fh or die "Unable to close $runtime_sql_dashboard: $!";
+
+    my $preserve_seed_init = _run("$perl -I'$lib' '$dashboard' init");
+    like( $preserve_seed_init, qr/runtime_root/, 'dashboard init can be re-run after a user-edited sql-dashboard saved page diverges from the managed digest' );
+    my $preserved_user_sql_dashboard = _run("$perl -I'$lib' '$dashboard' page source sql-dashboard");
+    like( $preserved_user_sql_dashboard, qr/User SQL Workspace/, 'dashboard init preserves a user-edited sql-dashboard saved page instead of overwriting it' );
+}
 open my $preserved_config_fh, '<:raw', $global_config_file or die "Unable to read $global_config_file: $!";
 my $preserved_config_json = do { local $/; <$preserved_config_fh> };
 close $preserved_config_fh;
@@ -502,37 +569,72 @@ is( $foobar_resolved, $custom_path_root . "\n", 'dashboard path resolve supports
 my $path_list = _run("$perl -I'$lib' '$dashboard' path list");
 like( $path_list, qr/"foobar"\s*:\s*"\Q$custom_path_root\E"/, 'dashboard path list includes user-defined aliases' );
 
+my $alias_multi_one = File::Spec->catdir( $custom_path_root, 'alpha-foo' );
+my $alias_multi_two = File::Spec->catdir( $custom_path_root, 'alpha-foo-two' );
+my $alias_unique = File::Spec->catdir( $custom_path_root, 'nested', 'alpha-foo-bar' );
+make_path( $alias_multi_one, $alias_multi_two, $alias_unique );
+
+my $cwd_search_root = File::Spec->catdir( $ENV{HOME}, 'cdr-search-root' );
+my $cwd_search_multi_one = File::Spec->catdir( $cwd_search_root, 'team-alpha' );
+my $cwd_search_multi_two = File::Spec->catdir( $cwd_search_root, 'nested', 'team-alpha-ops' );
+my $cwd_search_unique = File::Spec->catdir( $cwd_search_root, 'nested', 'team-alpha-red' );
+make_path( $cwd_search_multi_one, $cwd_search_multi_two, $cwd_search_unique );
+
 my $shell_bootstrap = _run("$perl -I'$lib' '$dashboard' shell bash");
-like( $shell_bootstrap, qr/path resolve \"\$1\"/, 'dashboard shell bootstrap resolves named path aliases before project search' );
+like( $shell_bootstrap, qr/path cdr/, 'dashboard shell bootstrap delegates cdr target selection through the Perl path helper' );
+unlike( $shell_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell bootstrap does not decode helper JSON through a bare perl command that can drift to an incompatible interpreter' );
+like( $shell_bootstrap, qr/\Q$perl\E.*-MJSON::XS/s, 'dashboard shell bootstrap decodes helper JSON through the same perl interpreter that generated the bootstrap' );
 my $shell_bootstrap_file = File::Spec->catfile( $ENV{HOME}, 'dashboard-shell.sh' );
 open my $shell_bootstrap_fh, '>', $shell_bootstrap_file or die "Unable to write $shell_bootstrap_file: $!";
 print {$shell_bootstrap_fh} $shell_bootstrap;
 close $shell_bootstrap_fh;
 my $which_dir_bookmarks = _run("bash -lc '. \"$shell_bootstrap_file\"; which_dir bookmarks_root'");
-is( $which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the shell helper' );
+is_same_path_output( $which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the shell helper' );
 my $cdr_bookmarks = _run("bash -lc '. \"$shell_bootstrap_file\"; cdr bookmarks_root; pwd'");
-is( $cdr_bookmarks, $bookmarks_root, 'cdr navigates to bookmarks_root through the shell helper' );
+is_same_path_output( $cdr_bookmarks, $bookmarks_root, 'cdr navigates to bookmarks_root through the shell helper' );
 my $cdr_foobar = _run("bash -lc '. \"$shell_bootstrap_file\"; cdr foobar; pwd'");
-is( $cdr_foobar, $custom_path_root . "\n", 'cdr navigates to a user-defined alias through the shell helper' );
+is_same_path_output( $cdr_foobar, $custom_path_root . "\n", 'cdr navigates to a user-defined alias through the shell helper' );
+my $cdr_foobar_unique = _run("bash -lc '. \"$shell_bootstrap_file\"; cdr foobar alpha foo bar; pwd'");
+is_same_path_output( $cdr_foobar_unique, $alias_unique . "\n", 'cdr narrows a resolved alias with AND-matched keywords and enters the only matching subdirectory' );
+my $cdr_foobar_multi = _run("bash -lc '. \"$shell_bootstrap_file\"; cdr foobar alpha foo; pwd'");
+my $portable_cdr_foobar_multi = _portable_output_text($cdr_foobar_multi);
+like( $portable_cdr_foobar_multi, qr/^\Q@{[ _portable_path($alias_multi_one) ]}\E$/m, 'cdr prints the first alias-root search match when multiple subdirectories satisfy the keywords' );
+like( $portable_cdr_foobar_multi, qr/^\Q@{[ _portable_path($alias_multi_two) ]}\E$/m, 'cdr prints the second alias-root search match when multiple subdirectories satisfy the keywords' );
+like( $portable_cdr_foobar_multi, qr/\Q@{[ _portable_path($custom_path_root) ]}\E\n\z/, 'cdr stays at the resolved alias root when alias-root keyword search finds multiple directories' );
+my $cdr_foobar_regex = _run("bash -lc '. \"$shell_bootstrap_file\"; cdr foobar alpha-foo\$; pwd'");
+is_same_path_output( $cdr_foobar_regex, $alias_multi_one . "\n", 'cdr treats alias-root narrowing terms as regexes' );
+my $cdr_keywords_unique = _run("bash -lc '. \"$shell_bootstrap_file\"; cd \"$cwd_search_root\"; cdr alpha red; pwd'");
+is_same_path_output( $cdr_keywords_unique, $cwd_search_unique . "\n", 'cdr treats non-alias arguments as current-directory search keywords and enters a unique match' );
+my $cdr_keywords_multi = _run("bash -lc '. \"$shell_bootstrap_file\"; cd \"$cwd_search_root\"; cdr team alpha; pwd'");
+my $portable_cdr_keywords_multi = _portable_output_text($cdr_keywords_multi);
+like( $portable_cdr_keywords_multi, qr/^\Q@{[ _portable_path($cwd_search_multi_one) ]}\E$/m, 'cdr prints one current-directory search match when multiple directories satisfy non-alias keywords' );
+like( $portable_cdr_keywords_multi, qr/^\Q@{[ _portable_path($cwd_search_multi_two) ]}\E$/m, 'cdr prints the other current-directory search match when multiple directories satisfy non-alias keywords' );
+like( $portable_cdr_keywords_multi, qr/\Q@{[ _portable_path($cwd_search_root) ]}\E\n\z/, 'cdr leaves the shell in place when non-alias keyword search has multiple matches' );
+my $cdr_keywords_regex = _run("bash -lc '. \"$shell_bootstrap_file\"; cd \"$cwd_search_root\"; cdr team-alpha\$; pwd'");
+is_same_path_output( $cdr_keywords_regex, $cwd_search_multi_one . "\n", 'cdr treats non-alias search terms as regexes beneath the current directory' );
 like( $shell_bootstrap, qr/ps1 --jobs \\j --mode compact/, 'dashboard shell bash bootstrap keeps bash job-count prompt rendering' );
 
 my $zsh_bootstrap = _run("$perl -I'$lib' '$dashboard' shell zsh");
 like( $zsh_bootstrap, qr/add-zsh-hook precmd _dd_update_prompt/, 'dashboard shell zsh bootstrap refreshes the prompt through a precmd hook' );
 like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact/, 'dashboard shell zsh bootstrap uses zsh job counts for prompt rendering' );
-like( $zsh_bootstrap, qr/path resolve \"\$1\"/, 'dashboard shell zsh bootstrap keeps the path helper functions' );
+like( $zsh_bootstrap, qr/path cdr/, 'dashboard shell zsh bootstrap keeps the cdr path helper functions' );
 
 my $sh_bootstrap = _run("$perl -I'$lib' '$dashboard' shell sh");
-like( $sh_bootstrap, qr/path resolve \"\$1\"/, 'dashboard shell sh bootstrap keeps the path helper functions' );
+like( $sh_bootstrap, qr/path cdr/, 'dashboard shell sh bootstrap keeps the cdr path helper functions' );
 like( $sh_bootstrap, qr/ps1 --mode compact/, 'dashboard shell sh bootstrap renders the prompt through dashboard ps1' );
 unlike( $sh_bootstrap, qr/\\j/, 'dashboard shell sh bootstrap does not rely on bash-specific job expansion' );
+unlike( $sh_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell sh bootstrap does not decode helper JSON through a bare perl command either' );
+like( $sh_bootstrap, qr/\Q$perl\E.*-MJSON::XS/s, 'dashboard shell sh bootstrap decodes helper JSON through the same perl interpreter that generated the bootstrap' );
 my $sh_bootstrap_file = File::Spec->catfile( $ENV{HOME}, 'dashboard-shell-posix.sh' );
 open my $sh_bootstrap_fh, '>', $sh_bootstrap_file or die "Unable to write $sh_bootstrap_file: $!";
 print {$sh_bootstrap_fh} $sh_bootstrap;
 close $sh_bootstrap_fh;
 my $sh_which_dir_bookmarks = _run("sh -lc '. \"$sh_bootstrap_file\"; which_dir bookmarks_root'");
-is( $sh_which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the POSIX shell helper' );
+is_same_path_output( $sh_which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the POSIX shell helper' );
 my $sh_cdr_bookmarks = _run("sh -lc '. \"$sh_bootstrap_file\"; cdr bookmarks_root; pwd'");
-is( $sh_cdr_bookmarks, $bookmarks_root, 'cdr navigates to bookmarks_root through the POSIX shell helper' );
+is_same_path_output( $sh_cdr_bookmarks, $bookmarks_root, 'cdr navigates to bookmarks_root through the POSIX shell helper' );
+my $sh_cdr_foobar_unique = _run("sh -lc '. \"$sh_bootstrap_file\"; cdr foobar alpha foo bar; pwd'");
+is_same_path_output( $sh_cdr_foobar_unique, $alias_unique . "\n", 'cdr narrows aliases through the POSIX shell helper as well' );
 
 my $ps_bootstrap = _run("$perl -I'$lib' '$dashboard' shell ps");
 like( $ps_bootstrap, qr/function prompt \{/, 'dashboard shell ps bootstrap uses the PowerShell prompt function instead of a PS1 variable' );
@@ -654,6 +756,14 @@ my $jq_scope_script = File::Spec->catfile( $jq_scope_js_root, 'jq.js' );
 open my $jq_scope_script_fh, '>', $jq_scope_script or die "Unable to write $jq_scope_script: $!";
 print {$jq_scope_script_fh} "window.jq = true;\n";
 close $jq_scope_script_fh;
+my $jq_scope_ok_js = File::Spec->catfile( $jq_scope_js_root, 'ok.js' );
+open my $jq_scope_ok_js_fh, '>', $jq_scope_ok_js or die "Unable to write $jq_scope_ok_js: $!";
+print {$jq_scope_ok_js_fh} "window.ok = true;\n";
+close $jq_scope_ok_js_fh;
+my $jq_scope_ok_json = File::Spec->catfile( $jq_scope_js_root, 'ok.json' );
+open my $jq_scope_ok_json_fh, '>', $jq_scope_ok_json or die "Unable to write $jq_scope_ok_json: $!";
+print {$jq_scope_ok_json_fh} "{\"ok\":true}\n";
+close $jq_scope_ok_json_fh;
 my $jq_scope_jquery = File::Spec->catfile( $jq_scope_js_root, 'jquery.js' );
 open my $jq_scope_jquery_fh, '>', $jq_scope_jquery or die "Unable to write $jq_scope_jquery: $!";
 print {$jq_scope_jquery_fh} "window.jquery = true;\n";
@@ -666,6 +776,8 @@ open $fake_editor_log_fh, '<', $fake_editor_log or die "Unable to read $fake_edi
 $fake_editor_args = do { local $/; <$fake_editor_log_fh> };
 close $fake_editor_log_fh;
 is($fake_editor_args, "./cli/jq ./public/js/jq.js\n", 'dashboard of . jq opens the selected jq helper and jq.js before jquery.js');
+my $ok_regex_scope = _run("cd '$jq_scope_root' && $perl -I'$repo/lib' '$repo/bin/dashboard' of --print . 'Ok\\.js\$'");
+is( $ok_regex_scope, "./public/js/ok.js\n", 'dashboard of . treats scope keywords as regexes, so Ok\\.js$ matches ok.js but not ok.json' );
 
 my $of_print = _run("$perl -I'$lib' '$dashboard' of --print '$open_root' alpha");
 like($of_print, qr/\Q$open_target\E/, 'dashboard of is shorthand for open-file');
@@ -703,6 +815,22 @@ like($java_class, qr/\Q$java_target\E/, 'dashboard open-file resolves Java class
 
 my $runtime_java_class = _run("cd '$open_root' && $perl -I'$repo/lib' '$runtime_open_file' --print com.example.App");
 like($runtime_java_class, qr/\Q$java_target\E/, 'private runtime open-file helper resolves Java class names');
+my $m2_sources_dir = File::Spec->catdir( $ENV{HOME}, '.m2', 'repository', 'com', 'example', 'archive-demo', '1.0.0' );
+make_path($m2_sources_dir);
+my $m2_sources_jar = File::Spec->catfile( $m2_sources_dir, 'archive-demo-1.0.0-sources.jar' );
+_write_zip_entries(
+    $m2_sources_jar,
+    {
+        'com/example/Archived.java' => "package com.example;\npublic class Archived {}\n",
+    },
+);
+my $java_archive_source = _run("cd '$open_root' && $perl -I'$repo/lib' '$repo/bin/dashboard' open-file --print com.example.Archived");
+my ($java_archive_path) = $java_archive_source =~ /([^\n]+)\n?\z/;
+ok( defined $java_archive_path && -f $java_archive_path, 'dashboard open-file resolves Java classes from local source jars when the project tree has no matching .java file' );
+open my $java_archive_fh, '<', $java_archive_path or die "Unable to read $java_archive_path: $!";
+my $java_archive_text = do { local $/; <$java_archive_fh> };
+close $java_archive_fh;
+like( $java_archive_text, qr/public class Archived/, 'dashboard open-file preserves the extracted Java source content from source jars' );
 
 my $fake_ticket_bin = File::Spec->catdir( $ENV{HOME}, 'fake-ticket-bin' );
 make_path($fake_ticket_bin);
@@ -984,6 +1112,60 @@ my $update_result_data = json_decode($update_json);
 is( $update_result_data->{'01-cpan'}{stdout}, 'Test', 'dashboard update custom command receives stdout from executable update hook files' );
 like( $update_result_data->{'01-cpan'}{stderr}, qr/warned/, 'dashboard update custom command receives stderr from executable update hook files' );
 ok( !exists $update_result_data->{'data.file'}, 'dashboard update custom command skips non-executable files in the update hook folder' );
+
+my $huge_command = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'huge-result' );
+open my $huge_command_fh, '>', $huge_command or die "Unable to write $huge_command: $!";
+print {$huge_command_fh} <<'PL';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Developer::Dashboard::Runtime::Result ();
+my $result = Developer::Dashboard::Runtime::Result::current();
+my $entry = $result->{'01-big'} || {};
+print "stdout=", length( $entry->{stdout} // '' ), "\n";
+print "stderr=", length( $entry->{stderr} // '' ), "\n";
+print "result_file=", ( ( $ENV{RESULT_FILE} || '' ) ne '' ? 1 : 0 ), "\n";
+PL
+close $huge_command_fh;
+chmod 0755, $huge_command or die "Unable to chmod $huge_command: $!";
+
+my $huge_hook_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'cli', 'huge-result.d' );
+make_path($huge_hook_root);
+my $huge_hook = File::Spec->catfile( $huge_hook_root, '01-big' );
+open my $huge_hook_fh, '>', $huge_hook or die "Unable to write $huge_hook: $!";
+print {$huge_hook_fh} <<'PL';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print 'S' x 32;
+print STDERR 'E' x 1800000;
+PL
+close $huge_hook_fh;
+chmod 0755, $huge_hook or die "Unable to chmod $huge_hook: $!";
+my $huge_probe = File::Spec->catfile( $huge_hook_root, '02-probe' );
+open my $huge_probe_fh, '>', $huge_probe or die "Unable to write $huge_probe: $!";
+print {$huge_probe_fh} <<'PL';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Developer::Dashboard::Runtime::Result ();
+my $entry = Developer::Dashboard::Runtime::Result::entry('01-big') || {};
+print 'probe-stderr=', length( $entry->{stderr} // '' ), "\n";
+PL
+close $huge_probe_fh;
+chmod 0755, $huge_probe or die "Unable to chmod $huge_probe: $!";
+
+my ( $huge_stdout, $huge_stderr, $huge_exit ) = capture {
+    system 'sh', '-c', "$perl -I'$lib' '$dashboard' huge-result";
+    return $? >> 8;
+};
+is( $huge_exit, 0, 'dashboard custom commands still succeed when RESULT grows beyond the inline exec-safe environment size' );
+like( $huge_stdout, qr/probe-stderr=1800000\n/s, 'later hook files can still read oversized RESULT state through the fallback channel' );
+like( $huge_stdout, qr/stdout=32\n/s, 'final command still receives the oversized hook stdout length through Runtime::Result' );
+like( $huge_stdout, qr/stderr=1800000\n/s, 'final command still receives the oversized hook stderr length through Runtime::Result' );
+like( $huge_stdout, qr/result_file=1\n/s, 'final command sees the explicit RESULT_FILE fallback when hook output would otherwise overflow exec' );
+unlike( $huge_stderr, qr/Argument list too long/, 'oversized RESULT fallback avoids kernel exec failures from large hook payloads' );
+
 is( _run("$perl -I'$lib' '$dashboard' version"), "$expected_version\n", 'dashboard version prints the installed dashboard version' );
 
 my $toml_value = _run(qq{printf '[alpha]\\nbeta = 4\\n' | $perl -I'$lib' '$dashboard' tomq alpha.beta});
@@ -1288,6 +1470,17 @@ like( $fake_cpanm_args, qr/\bDBD::Mock\b/, 'dashboard cpan installs the requeste
 
 done_testing;
 
+sub _write_zip_entries {
+    my ( $archive, $entries ) = @_;
+    my $zip = Archive::Zip->new();
+    for my $name ( sort keys %{$entries || {}} ) {
+        $zip->addString( $entries->{$name}, $name );
+    }
+    my $status = $zip->writeToFileNamed($archive);
+    die "Unable to write $archive\n" if $status != AZ_OK;
+    return 1;
+}
+
 sub _run {
     my ($cmd) = @_;
     my ( $stdout, $stderr, $exit_code ) = capture {
@@ -1340,30 +1533,43 @@ This test verifies the main command-line entrypoints for Developer Dashboard.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file smoke-tests the public dashboard CLI, helper staging, auth, bookmarks, and doctor flows.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for the thin CLI, helper staging, and low-level runtime contracts. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because the thin CLI, helper staging, and low-level runtime contracts has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing the thin CLI, helper staging, and low-level runtime contracts, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/05-cli-smoke.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/05-cli-smoke.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/05-cli-smoke.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/05-cli-smoke.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

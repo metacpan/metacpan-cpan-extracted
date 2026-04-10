@@ -36,8 +36,7 @@
          },
          "requires" : {
             "JSON::MaybeXS" : "1.004004",
-            "Langertha" : "0.307",
-            "Langertha::Knarr" : "0.007",
+            "Langertha" : "0.400",
             "Mojolicious" : "9.0",
             "Moo" : "2.005005",
             "YAML::PP" : "0.038"
@@ -61,9 +60,11 @@
          "type" : "git",
          "url" : "https://github.com/Getty/langertha-skeid.git",
          "web" : "https://github.com/Getty/langertha-skeid"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#langertha",
+      "x_IRC_user" : "Getty"
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -73,7 +74,9 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "README.md"
+                  ],
                   "exclude_match" : [],
                   "include_dotfiles" : 1,
                   "prefix" : "",
@@ -191,6 +194,11 @@
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "@Author::GETTY/GithubMeta",
             "version" : "0.58"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@Author::GETTY/MetaResources",
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -405,7 +413,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.002",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

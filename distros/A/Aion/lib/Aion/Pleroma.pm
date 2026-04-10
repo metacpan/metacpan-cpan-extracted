@@ -38,7 +38,7 @@ has pleroma => (is => 'ro', isa => HashRef[Str], default => sub {
 	\%pleroma
 });
 
-# Совокупность порождённых эонов (сервисов)
+# Совокупность порождённых эонов-сервисов
 has eon => (is => 'ro', isa => HashRef[Object], lazy => 0, default => sub { +{'Aion::Pleroma' => shift} });
 
 # Получить эон из контейнера
@@ -106,7 +106,7 @@ Implements the dependency container pattern.
 
 An eon is created when requesting from a container via the C<get> or C<resolve> method, or via the C<eon> aspect as a lazy C<default>. Laziness can be canceled via the C<lazy> aspect.
 
-The container is in the C<$Aion::pleroma> variable and can be replaced with C<local>.
+The container can be obtained using C<< Aion-E<gt>pleroma >>.
 
 The configuration for creating eons is obtained from the C<PLEROMA> config and the annotation file (created by the C<Aion::Annotation> package). The annotation file can be replaced via the C<INI> config.
 

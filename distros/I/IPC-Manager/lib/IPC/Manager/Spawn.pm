@@ -2,9 +2,10 @@ package IPC::Manager::Spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use POSIX();
+use Time::HiRes();
 
 use Carp qw/croak/;
 use IPC::Manager::Serializer::JSON();
@@ -25,6 +26,7 @@ use Object::HashBase qw{
     <signal
 
     do_sanity_check
+    debug
 };
 
 sub init {
@@ -110,18 +112,34 @@ sub wait {
         eval { $client->disconnect; 1 } or warn $@;
     }
 
+    my %child_pids;
+
     while (1) {
         my @found;
         for my $peer ($con->peers) {
             next if $peer eq $con->id;
-            unless (eval { $con->peer_pid($peer); 1 }) { warn $@; next }
+            my $pid;
+            unless (eval { $pid = $con->peer_pid($peer); 1 }) { warn $@; next }
+            $child_pids{$pid} = 1 if $pid && $pid != $$;
             push @found => $peer;
         }
 
         last unless @found;
 
-        print "Waiting for clients to go away: " . join(', ' => sort @found) . "\n";
+        print STDERR "Waiting for clients to go away: " . join(', ' => sort @found) . "\n" if $self->{+DEBUG};
         sleep 1;
+    }
+
+    # Wait for child processes to fully exit before returning, so that
+    # unspawn() does not destroy shared resources while children are
+    # still running cleanup code.
+    my $deadline = Time::HiRes::time() + 10;
+    while (keys %child_pids && Time::HiRes::time() < $deadline) {
+        for my $pid (keys %child_pids) {
+            my $ret = waitpid($pid, POSIX::WNOHANG());
+            delete $child_pids{$pid} if $ret != 0;
+        }
+        Time::HiRes::sleep(0.05) if keys %child_pids;
     }
 }
 

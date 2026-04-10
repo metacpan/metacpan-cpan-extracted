@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -704,30 +704,50 @@ Construct and manage collector execution.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file executes collectors, captures output, and updates indicator-facing state.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module manages live collector execution. It turns stored collector jobs into processes, captures their output, updates collector state files, tracks pid ownership, and exposes the start/stop/restart/run/status lifecycle used by the CLI and web-facing status features.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because collector process control is more than a single C<system()> call. The dashboard needs a single owner for pid validation, output capture, environment preparation, enabled/disabled state, and restart behavior so the prompt and browser status strip can trust the result.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing collector process spawning, pid validation, restart semantics, background job cleanup, or the contract between collector execution and the persisted collector state.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::CollectorRunner> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the path registry and collector store, then call the lifecycle methods for one collector name. Keep process-management behavior here; the CLI wrappers should only parse arguments and print the returned state.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the C<dashboard collector ...> command family, by runtime restart/stop flows that manage collectors together with the web process, and by collector/runtimemanager regression tests.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::CollectorRunner -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::CollectorRunner -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/02-indicator-collector.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

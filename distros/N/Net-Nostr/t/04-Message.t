@@ -407,4 +407,562 @@ subtest 'POD: AUTH challenge parse' => sub {
     is $msg->challenge, 'challenge123', 'challenge parsed from POD example';
 };
 
+###############################################################################
+# COUNT message (NIP-45)
+###############################################################################
+
+subtest 'POD: COUNT response parse' => sub {
+    my $msg = Net::Nostr::Message->parse('["COUNT","q1",{"count":42}]');
+    is $msg->count, 42, 'count parsed from POD example';
+};
+
+subtest 'NOTICE constructor requires message' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'NOTICE') },
+        qr/message is required for NOTICE/,
+        'NOTICE without message croaks'
+    );
+};
+
+###############################################################################
+# EOSE subscription_id - relay-to-client, must accept any subscription_id
+###############################################################################
+
+subtest 'EOSE accepts any subscription_id' => sub {
+    ok(lives { Net::Nostr::Message->new(type => 'EOSE', subscription_id => '', ) },
+        'EOSE accepts empty subscription_id');
+    ok(lives { Net::Nostr::Message->new(type => 'EOSE', subscription_id => 'x' x 65) },
+        'EOSE accepts subscription_id > 64 chars');
+    ok(lives { Net::Nostr::Message->new(type => 'EOSE', subscription_id => 'sub1') },
+        'EOSE accepts valid subscription_id');
+};
+
+###############################################################################
+# CLOSED subscription_id - relay-to-client, must accept any subscription_id
+# (echoes back whatever the client sent, even if invalid)
+###############################################################################
+
+subtest 'CLOSED accepts any subscription_id' => sub {
+    ok(lives { Net::Nostr::Message->new(type => 'CLOSED', subscription_id => '', message => 'bye') },
+        'CLOSED accepts empty subscription_id');
+    ok(lives { Net::Nostr::Message->new(type => 'CLOSED', subscription_id => 'x' x 65, message => 'bye') },
+        'CLOSED accepts subscription_id > 64 chars');
+    ok(lives { Net::Nostr::Message->new(type => 'CLOSED', subscription_id => 'sub1', message => 'bye') },
+        'CLOSED accepts valid subscription_id');
+};
+
+###############################################################################
+# OK event_id validation
+###############################################################################
+
+subtest 'OK requires event_id' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'OK', accepted => 1, message => '') },
+        qr/event_id is required/,
+        'OK without event_id croaks'
+    );
+};
+
+subtest 'parse() OK rejects malformed event_id from wire' => sub {
+    my $raw = JSON->new->utf8->encode(['OK', 'not-hex', JSON::true, '']);
+    like(
+        dies { Net::Nostr::Message->parse($raw) },
+        qr/event_id must be 64-char lowercase hex/,
+        'OK with bad event_id rejected on parse'
+    );
+};
+
+subtest 'parse() OK accepts valid event_id from wire' => sub {
+    my $raw = JSON->new->utf8->encode(['OK', 'aa' x 32, JSON::true, '']);
+    my $msg;
+    ok(lives { $msg = Net::Nostr::Message->parse($raw) }, 'OK with valid event_id accepted');
+    is($msg->event_id, 'aa' x 32, 'event_id parsed correctly');
+};
+
+subtest 'new() rejects unknown arguments' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'NOTICE', message => 'hi', bogus => 'value') },
+        qr/unknown.+bogus/i,
+        'unknown argument rejected'
+    );
+};
+
+###############################################################################
+# parse() rejects EVENT with missing required event fields (from_wire)
+###############################################################################
+
+subtest 'parse() EVENT rejects missing event id' => sub {
+    my $h = $EVENT->to_hash;
+    delete $h->{id};
+    my $raw = JSON->new->utf8->encode(['EVENT', 'sub1', $h]);
+    like(dies { Net::Nostr::Message->parse($raw) }, qr/id is required/, 'missing id rejected');
+};
+
+subtest 'parse() EVENT rejects missing created_at' => sub {
+    my $h = $EVENT->to_hash;
+    delete $h->{created_at};
+    my $raw = JSON->new->utf8->encode(['EVENT', 'sub1', $h]);
+    like(dies { Net::Nostr::Message->parse($raw) }, qr/created_at is required/, 'missing created_at rejected');
+};
+
+subtest 'parse() EVENT rejects missing tags' => sub {
+    my $h = $EVENT->to_hash;
+    delete $h->{tags};
+    my $raw = JSON->new->utf8->encode(['EVENT', 'sub1', $h]);
+    like(dies { Net::Nostr::Message->parse($raw) }, qr/tags is required/, 'missing tags rejected');
+};
+
+subtest 'parse() EVENT rejects missing sig' => sub {
+    my $h = $EVENT->to_hash;
+    delete $h->{sig};
+    my $raw = JSON->new->utf8->encode(['EVENT', 'sub1', $h]);
+    like(dies { Net::Nostr::Message->parse($raw) }, qr/sig is required/, 'missing sig rejected');
+};
+
+subtest 'parse() client EVENT rejects missing event fields' => sub {
+    my $h = $EVENT->to_hash;
+    delete $h->{id};
+    my $raw = JSON->new->utf8->encode(['EVENT', $h]);
+    like(dies { Net::Nostr::Message->parse($raw) }, qr/id is required/, 'client EVENT missing id rejected');
+};
+
+subtest 'parse() AUTH event rejects missing event fields' => sub {
+    my $h = $EVENT->to_hash;
+    $h->{kind} = 22242;
+    # recompute the id since we changed kind; but the point is that removing
+    # a field is what we're testing
+    delete $h->{sig};
+    my $raw = JSON->new->utf8->encode(['AUTH', $h]);
+    like(dies { Net::Nostr::Message->parse($raw) }, qr/sig is required/, 'AUTH event missing sig rejected');
+};
+
+###############################################################################
+# parse() rejects non-object payloads with protocol-specific errors
+###############################################################################
+
+subtest 'parse() EVENT rejects non-object event (relay-to-client)' => sub {
+    my $raw = JSON->new->utf8->encode(['EVENT', 'sub1', 'not-a-hash']);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/EVENT event element must be a JSON object/,
+        'string event payload rejected with protocol error');
+};
+
+subtest 'parse() EVENT rejects non-object event (client-to-relay)' => sub {
+    my $raw = JSON->new->utf8->encode(['EVENT', 42]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/EVENT event element must be a JSON object/,
+        'numeric event payload rejected with protocol error');
+};
+
+subtest 'parse() EVENT rejects array event payload' => sub {
+    my $raw = JSON->new->utf8->encode(['EVENT', 'sub1', [1,2,3]]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/EVENT event element must be a JSON object/,
+        'array event payload rejected with protocol error');
+};
+
+subtest 'parse() REQ rejects non-object filter' => sub {
+    my $raw = JSON->new->utf8->encode(['REQ', 'sub1', 'not-a-hash']);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/REQ filter element must be a JSON object/,
+        'string filter rejected with protocol error');
+};
+
+subtest 'parse() REQ rejects array filter' => sub {
+    my $raw = JSON->new->utf8->encode(['REQ', 'sub1', [1,2,3]]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/REQ filter element must be a JSON object/,
+        'array filter rejected with protocol error');
+};
+
+subtest 'parse() COUNT rejects non-object filter' => sub {
+    my $raw = JSON->new->utf8->encode(['COUNT', 'sub1', 'not-a-hash']);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/COUNT filter element must be a JSON object/,
+        'string filter rejected with protocol error');
+};
+
+###############################################################################
+# Constructor validates field types/formats
+###############################################################################
+
+subtest 'new() OK validates event_id format' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'OK', event_id => 'not-hex', accepted => 1, message => '') },
+        qr/event_id must be 64-char lowercase hex/,
+        'OK rejects malformed event_id in constructor'
+    );
+    like(
+        dies { Net::Nostr::Message->new(type => 'OK', event_id => 'AA' x 32, accepted => 1, message => '') },
+        qr/event_id must be 64-char lowercase hex/,
+        'OK rejects uppercase hex event_id'
+    );
+    like(
+        dies { Net::Nostr::Message->new(type => 'OK', event_id => 'aa' x 16, accepted => 1, message => '') },
+        qr/event_id must be 64-char lowercase hex/,
+        'OK rejects short event_id'
+    );
+    ok(
+        lives { Net::Nostr::Message->new(type => 'OK', event_id => 'aa' x 32, accepted => 1, message => '') },
+        'OK accepts valid event_id in constructor'
+    );
+};
+
+subtest 'new() EVENT requires Net::Nostr::Event object' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'EVENT', event => { id => 'fake' }) },
+        qr/event must be a Net::Nostr::Event/,
+        'EVENT rejects hashref'
+    );
+    like(
+        dies { Net::Nostr::Message->new(type => 'EVENT', event => 'string') },
+        qr/event must be a Net::Nostr::Event/,
+        'EVENT rejects string'
+    );
+    ok(
+        lives { Net::Nostr::Message->new(type => 'EVENT', event => $EVENT) },
+        'EVENT accepts Net::Nostr::Event object'
+    );
+};
+
+subtest 'new() AUTH requires Net::Nostr::Event object for event path' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'AUTH', event => { kind => 22242 }) },
+        qr/event must be a Net::Nostr::Event/,
+        'AUTH rejects hashref event'
+    );
+    like(
+        dies { Net::Nostr::Message->new(type => 'AUTH', event => 'string') },
+        qr/event must be a Net::Nostr::Event/,
+        'AUTH rejects string event'
+    );
+};
+
+subtest 'new() NOTICE rejects non-scalar message' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'NOTICE', message => ['array']) },
+        qr/message must be a string/,
+        'NOTICE rejects arrayref message'
+    );
+    like(
+        dies { Net::Nostr::Message->new(type => 'NOTICE', message => { hash => 1 }) },
+        qr/message must be a string/,
+        'NOTICE rejects hashref message'
+    );
+};
+
+subtest 'new() EOSE requires defined subscription_id' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'EOSE') },
+        qr/subscription_id is required/,
+        'EOSE requires subscription_id'
+    );
+};
+
+subtest 'new() CLOSED requires defined subscription_id and message' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'CLOSED', message => 'bye') },
+        qr/subscription_id is required/,
+        'CLOSED requires subscription_id'
+    );
+    like(
+        dies { Net::Nostr::Message->new(type => 'CLOSED', subscription_id => 'sub1') },
+        qr/message is required/,
+        'CLOSED requires message'
+    );
+};
+
+subtest 'new() AUTH challenge rejects non-scalar' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'AUTH', challenge => ['array']) },
+        qr/challenge must be a string/,
+        'AUTH rejects arrayref challenge'
+    );
+    like(
+        dies { Net::Nostr::Message->new(type => 'AUTH', challenge => { hash => 1 }) },
+        qr/challenge must be a string/,
+        'AUTH rejects hashref challenge'
+    );
+};
+
+subtest 'new() OK rejects non-scalar message' => sub {
+    like(
+        dies { Net::Nostr::Message->new(type => 'OK', event_id => 'aa' x 32, accepted => 1, message => ['array']) },
+        qr/message must be a string/,
+        'OK rejects arrayref message'
+    );
+};
+
+###############################################################################
+# parse() validates non-ref scalars for string fields
+###############################################################################
+
+subtest 'parse() NOTICE rejects non-scalar message' => sub {
+    my $raw = JSON->new->utf8->encode(['NOTICE', { nested => 1 }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/NOTICE message must be a string/,
+        'NOTICE rejects object message');
+    $raw = JSON->new->utf8->encode(['NOTICE', [1, 2]]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/NOTICE message must be a string/,
+        'NOTICE rejects array message');
+};
+
+subtest 'parse() EOSE rejects non-scalar subscription_id' => sub {
+    my $raw = JSON->new->utf8->encode(['EOSE', { nested => 1 }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/EOSE subscription_id must be a string/,
+        'EOSE rejects object subscription_id');
+};
+
+subtest 'parse() CLOSED rejects non-scalar fields' => sub {
+    my $raw = JSON->new->utf8->encode(['CLOSED', ['arr'], 'msg']);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/CLOSED subscription_id must be a string/,
+        'CLOSED rejects non-scalar subscription_id');
+    $raw = JSON->new->utf8->encode(['CLOSED', 'sub1', { obj => 1 }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/CLOSED message must be a string/,
+        'CLOSED rejects non-scalar message');
+};
+
+subtest 'parse() OK rejects non-scalar message' => sub {
+    my $raw = JSON->new->utf8->encode(['OK', 'aa' x 32, JSON::true, [1,2]]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/OK message must be a string/,
+        'OK rejects array message');
+};
+
+subtest 'parse() AUTH rejects non-scalar challenge' => sub {
+    my $raw = JSON->new->utf8->encode(['AUTH', [1,2,3]]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/AUTH challenge must be a string/,
+        'AUTH rejects array challenge');
+};
+
+subtest 'parse() REQ rejects non-scalar subscription_id' => sub {
+    my $raw = JSON->new->utf8->encode(['REQ', ['arr'], {}]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/subscription_id must be a non-empty string/,
+        'REQ rejects non-scalar subscription_id');
+};
+
+subtest 'parse() CLOSE rejects non-scalar subscription_id' => sub {
+    my $raw = JSON->new->utf8->encode(['CLOSE', { obj => 1 }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/subscription_id must be a non-empty string/,
+        'CLOSE rejects non-scalar subscription_id');
+};
+
+subtest 'parse() EVENT rejects non-scalar subscription_id' => sub {
+    my $raw = JSON->new->utf8->encode(['EVENT', [1], $EVENT->to_hash]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/EVENT subscription_id must be a string/,
+        'EVENT rejects non-scalar subscription_id');
+};
+
+subtest 'parse() COUNT rejects non-scalar subscription_id' => sub {
+    my $raw = JSON->new->utf8->encode(['COUNT', { obj => 1 }, { count => 5 }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/subscription_id must be a non-empty string/,
+        'COUNT rejects non-scalar subscription_id');
+};
+
+###############################################################################
+# COUNT count field validation
+###############################################################################
+
+subtest 'new() COUNT validates count is a non-negative integer' => sub {
+    ok(lives {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => 0)
+    }, 'count 0 accepted');
+    ok(lives {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => 42)
+    }, 'count 42 accepted');
+    ok(lives {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => 93412452)
+    }, 'large count accepted (spec example)');
+    like(dies {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => -1)
+    }, qr/count must be a non-negative integer/, 'negative count rejected');
+    like(dies {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => 'abc')
+    }, qr/count must be a non-negative integer/, 'string count rejected');
+    like(dies {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => 3.5)
+    }, qr/count must be a non-negative integer/, 'float count rejected');
+    like(dies {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => [42])
+    }, qr/count must be a non-negative integer/, 'arrayref count rejected');
+    like(dies {
+        Net::Nostr::Message->new(type => 'COUNT', subscription_id => 'q1', count => {})
+    }, qr/count must be a non-negative integer/, 'hashref count rejected');
+};
+
+subtest 'parse() COUNT rejects non-integer count from wire' => sub {
+    my $raw = JSON->new->utf8->encode(['COUNT', 'q1', { count => 'abc' }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/count must be a non-negative integer/,
+        'string count from wire rejected');
+    $raw = JSON->new->utf8->encode(['COUNT', 'q1', { count => -1 }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/count must be a non-negative integer/,
+        'negative count from wire rejected');
+    $raw = JSON->new->utf8->encode(['COUNT', 'q1', { count => 3.5 }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/count must be a non-negative integer/,
+        'float count from wire rejected');
+    $raw = JSON->new->utf8->encode(['COUNT', 'q1', { count => [5] }]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/count must be a non-negative integer/,
+        'array count from wire rejected');
+};
+
+subtest 'parse() COUNT accepts valid integer counts from wire' => sub {
+    my $raw = JSON->new->utf8->encode(['COUNT', 'q1', { count => 0 }]);
+    my $msg = Net::Nostr::Message->parse($raw);
+    is $msg->count, 0, 'zero count accepted';
+
+    $raw = JSON->new->utf8->encode(['COUNT', 'q1', { count => 93412452 }]);
+    $msg = Net::Nostr::Message->parse($raw);
+    is $msg->count, 93412452, 'large count accepted (NIP-45 spec example)';
+};
+
+###############################################################################
+# NEG-ERR neg_limit field validation
+###############################################################################
+
+subtest 'new() NEG-ERR validates neg_limit is a non-negative integer' => sub {
+    ok(lives {
+        Net::Nostr::Message->new(
+            type => 'NEG-ERR', subscription_id => 'x',
+            message => 'blocked: too big', neg_limit => 100000,
+        )
+    }, 'neg_limit 100000 accepted');
+    ok(lives {
+        Net::Nostr::Message->new(
+            type => 'NEG-ERR', subscription_id => 'x',
+            message => 'blocked: too big', neg_limit => 0,
+        )
+    }, 'neg_limit 0 accepted');
+    like(dies {
+        Net::Nostr::Message->new(
+            type => 'NEG-ERR', subscription_id => 'x',
+            message => 'blocked: too big', neg_limit => -1,
+        )
+    }, qr/neg_limit must be a non-negative integer/, 'negative neg_limit rejected');
+    like(dies {
+        Net::Nostr::Message->new(
+            type => 'NEG-ERR', subscription_id => 'x',
+            message => 'blocked: too big', neg_limit => 'abc',
+        )
+    }, qr/neg_limit must be a non-negative integer/, 'string neg_limit rejected');
+    like(dies {
+        Net::Nostr::Message->new(
+            type => 'NEG-ERR', subscription_id => 'x',
+            message => 'blocked: too big', neg_limit => 3.5,
+        )
+    }, qr/neg_limit must be a non-negative integer/, 'float neg_limit rejected');
+    like(dies {
+        Net::Nostr::Message->new(
+            type => 'NEG-ERR', subscription_id => 'x',
+            message => 'blocked: too big', neg_limit => [100],
+        )
+    }, qr/neg_limit must be a non-negative integer/, 'arrayref neg_limit rejected');
+};
+
+subtest 'parse() NEG-ERR rejects non-integer neg_limit from wire' => sub {
+    my $raw = JSON->new->utf8->encode(['NEG-ERR', 'x', 'blocked: too big', 'abc']);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/neg_limit must be a non-negative integer/,
+        'string neg_limit from wire rejected');
+    $raw = JSON->new->utf8->encode(['NEG-ERR', 'x', 'blocked: too big', -5]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/neg_limit must be a non-negative integer/,
+        'negative neg_limit from wire rejected');
+    $raw = JSON->new->utf8->encode(['NEG-ERR', 'x', 'blocked: too big', [100]]);
+    like(dies { Net::Nostr::Message->parse($raw) },
+        qr/neg_limit must be a non-negative integer/,
+        'array neg_limit from wire rejected');
+};
+
+subtest 'parse() NEG-ERR accepts valid neg_limit from wire' => sub {
+    my $raw = JSON->new->utf8->encode(['NEG-ERR', 'x', 'blocked: too big', 100000]);
+    my $msg = Net::Nostr::Message->parse($raw);
+    is $msg->neg_limit, 100000, 'neg_limit 100000 parsed';
+};
+
+subtest 'POD: NEG-ERR neg_limit parse' => sub {
+    my $msg = Net::Nostr::Message->parse('["NEG-ERR","x","blocked: too big",100000]');
+    is $msg->neg_limit, 100000, 'neg_limit parsed from POD example';
+};
+
+###############################################################################
+# new() REQ and COUNT reject non-Filter elements in filters array
+###############################################################################
+
+subtest 'new() REQ rejects non-Filter filter elements' => sub {
+    like dies {
+        Net::Nostr::Message->new(
+            type => 'REQ', subscription_id => 'sub1',
+            filters => [{ kinds => [1] }],
+        )
+    }, qr/filter.*Net::Nostr::Filter/i, 'hashref filter rejected';
+    like dies {
+        Net::Nostr::Message->new(
+            type => 'REQ', subscription_id => 'sub1',
+            filters => ['not a filter'],
+        )
+    }, qr/filter.*Net::Nostr::Filter/i, 'string filter rejected';
+    like dies {
+        Net::Nostr::Message->new(
+            type => 'REQ', subscription_id => 'sub1',
+            filters => [undef],
+        )
+    }, qr/filter.*Net::Nostr::Filter/i, 'undef filter rejected';
+};
+
+subtest 'new() COUNT rejects non-Filter filter elements' => sub {
+    like dies {
+        Net::Nostr::Message->new(
+            type => 'COUNT', subscription_id => 'sub1',
+            filters => [{ kinds => [1] }],
+        )
+    }, qr/filter.*Net::Nostr::Filter/i, 'hashref filter rejected';
+    like dies {
+        Net::Nostr::Message->new(
+            type => 'COUNT', subscription_id => 'sub1',
+            filters => [Net::Nostr::Filter->new(kinds => [1]), 'bad'],
+        )
+    }, qr/filter.*Net::Nostr::Filter/i, 'mixed valid and invalid rejected';
+};
+
+###############################################################################
+# new() rejects mutually-exclusive arguments
+###############################################################################
+
+subtest 'new() AUTH rejects both event and challenge' => sub {
+    like dies {
+        Net::Nostr::Message->new(
+            type      => 'AUTH',
+            event     => Net::Nostr::Event->new(
+                id => 'a' x 64, pubkey => 'b' x 64, kind => 22242,
+                created_at => 1, content => '', tags => [], sig => 'c' x 128,
+            ),
+            challenge => 'test-challenge',
+        )
+    }, qr/mutually exclusive/i, 'event + challenge rejected';
+};
+
+subtest 'new() COUNT rejects both count and filters' => sub {
+    like dies {
+        Net::Nostr::Message->new(
+            type            => 'COUNT',
+            subscription_id => 'sub1',
+            count           => 42,
+            filters         => [Net::Nostr::Filter->new(kinds => [1])],
+        )
+    }, qr/mutually exclusive/i, 'count + filters rejected';
+};
+
 done_testing;

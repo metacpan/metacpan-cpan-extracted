@@ -30,8 +30,13 @@ if($ENV{AUTHOR_TESTING}) {
 
 my $test_requires = {
 	'autodie' => 0,
+	'File::Glob' => 0,
+	'File::stat' => 0,
+	'File::Slurp' => 0,
 	'Geo::Location::Point' => 0.09,
 	'IPC::System::Simple' => 0,	# http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
+	'POSIX' => 0,
+	'Readonly' => 0,
 	'Test::Carp' => 0,
 	'Test::Compile' => 0,
 	'Test::DescribeMe' => 0,
@@ -65,7 +70,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		=> 'Weather::Meteo',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/Weather/Meteo.pm',
 	ABSTRACT_FROM	=> 'lib/Weather/Meteo.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -83,6 +88,10 @@ WriteMakefile(
 		'JSON::MaybeXS' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
+		'Object::Configure' => 0,
+		'Params::Get' => 0.13,
+		'Params::Validate::Strict' => 0,
+		'Return::Set' => 0,
 		'Scalar::Util' => 0,
 		'Time::HiRes' => 0,
 		'URI' => 0,

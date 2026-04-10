@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::Server::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 # new(%args)
 # Constructs the lightweight daemon descriptor used by RuntimeManager.
@@ -82,30 +82,50 @@ Construct and query the lightweight daemon descriptor.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file provides daemon-specific server glue used by the web server runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is the small value object that carries resolved listen addresses for the web server. It records the public host and port, and when SSL is enabled it also records the internal backend host and port used behind the public TLS frontend.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists so daemon resolution can be passed around as a typed object instead of loose hashes. That keeps the public and internal socket details explicit in the runtime manager and web server code.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing what metadata the web server carries between port reservation, runner setup, and SSL frontend proxying.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::Web::Server::Daemon> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Create it with the resolved host and port values, then pass it into C<Developer::Dashboard::Web::Server> methods that need to build URLs or runners from those values.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used only by the web server lifecycle code and the tests that verify public versus internal daemon metadata under SSL and non-SSL serving.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::Web::Server::Daemon -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::Web::Server::Daemon -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/03-web-app.t t/08-web-update-coverage.t t/web_app_static_files.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

@@ -605,11 +605,19 @@ is_deeply(
         close $fh;
         1;
     };
-    is_deeply(
-        [ command_argv_for_path('tool.ps1') ],
-        [ 'powershell', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', 'tool.ps1' ],
-        'command_argv_for_path resolves PowerShell scripts on Windows',
-    );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return '/usr/bin/pwsh' if $name eq 'pwsh';
+            return undef;
+        };
+        is_deeply(
+            [ command_argv_for_path('tool.ps1') ],
+            [ '/usr/bin/pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', 'tool.ps1' ],
+            'command_argv_for_path resolves PowerShell scripts on Windows through the preferred runnable PowerShell binary',
+        );
+    }
     ok( command_in_path('tool'), 'command_in_path resolves PATHEXT-backed PowerShell scripts on Windows' );
     ok( is_runnable_file('tool'), 'is_runnable_file resolves PATHEXT-backed PowerShell scripts on Windows' );
     {
@@ -1819,7 +1827,10 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     indicators => $collector_indicators,
     paths      => $paths,
 );
-my $under_cover = ( $ENV{HARNESS_PERL_SWITCHES} || '' ) =~ /Devel::Cover/ ? 1 : 0;
+my $under_cover = (
+    ( $ENV{HARNESS_PERL_SWITCHES} || '' ) =~ /Devel::Cover/
+      || ( $ENV{PERL5OPT} || '' ) =~ /Devel::Cover/
+) ? 1 : 0;
 dies_like( sub { Developer::Dashboard::CollectorRunner->new }, qr/Missing collector store/, 'collector runner requires collector store' );
 dies_like( sub { Developer::Dashboard::CollectorRunner->new( collectors => $collector ) }, qr/Missing file registry/, 'collector runner requires files' );
 dies_like( sub { Developer::Dashboard::CollectorRunner->new( collectors => $collector, files => $files ) }, qr/Missing path registry/, 'collector runner requires paths' );
@@ -2217,30 +2228,43 @@ collectors, indicators, prompts, and process helpers.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file covers lower-level unit behaviour across the core runtime helpers.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for the thin CLI, helper staging, and low-level runtime contracts. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because the thin CLI, helper staging, and low-level runtime contracts has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing the thin CLI, helper staging, and low-level runtime contracts, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/07-core-units.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/07-core-units.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/07-core-units.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/07-core-units.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

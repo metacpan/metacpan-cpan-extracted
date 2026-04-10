@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.02
+2.17
 
 =head1 INTRODUCTION
 
@@ -481,10 +481,227 @@ generic package names.
 
 C<FULL-POD-DOC> is a repo contract. Every repo-owned Perl file must end with
 POD under C<__END__> that explains what the file is, what it is for, why it
-exists, when to use it, how to use it, what uses it, and at least one
-concrete example. Contributors should be able to open any module, script,
-helper, or test and understand its role without reverse-engineering the tree
-first.
+exists, when to use it, how to use it, what uses it, and multiple concrete
+examples. That documentation must be specific to the file's real job:
+runtime managers should describe the lifecycle they own, query helpers should
+describe the formats they parse, web modules should describe the routes or
+server edges they handle, and thin staged helpers should document the exact
+handoff they perform. Boilerplate that only swaps the filename is not enough.
+C<FULL-POD-DOC> also means each Perl module and script must document the real
+inputs it accepts, the outputs or side effects it produces, where it sits in
+the command or runtime flow, and multiple concrete examples that match actual
+usage instead of filler text. Those examples must cover the common path and at
+least one meaningful edge or debugging path when the file owns one, such as
+file-vs-STDIN behavior, single-vs-multiple search matches, print-vs-exec
+behavior, or create-vs-attach runtime flow. One-line POD, placeholder prose,
+or a repeated template with a different filename still fails the contract.
+Contributors should be able to open any module, script, helper, or test and
+understand its role without reverse-engineering the tree first.
+
+=head3 Common Documentation Example Patterns
+
+Good C<FULL-POD-DOC> should usually include examples like these when the file
+owns that behavior:
+
+=over 4
+
+=item *
+
+C<dashboard of lib 'OpenFile\.pm$'>: show the normal scoped-regex search path
+where the user knows the root and expects one file to win.
+
+=item *
+
+C<dashboard open-file path/to/file.txt>: show the direct-path path where no
+search is needed and the helper should hand the file straight to the editor.
+
+=item *
+
+C<dashboard path resolve dashboards>: show a plain alias lookup so readers can
+see the simplest path-registry call.
+
+=item *
+
+C<dashboard path cdr work alpha red>: show the normal alias-root narrowing flow
+where all extra terms must match one target directory.
+
+=item *
+
+C<dashboard paths | dashboard jq bookmarks_root>: show how one lightweight
+helper feeds another during shell debugging.
+
+=item *
+
+C<printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta>: show the common
+scalar extraction path for structured JSON.
+
+=item *
+
+C<printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta>: show that the same
+dotted-path contract carries across YAML input.
+
+=item *
+
+C<printf '[alpha]\nbeta = 4\n' | dashboard tomq alpha.beta>: show the TOML
+equivalent of the same query-helper workflow.
+
+=item *
+
+C<dashboard ticket DD-123>: show the explicit ticket/session path where the
+session name is provided by the user.
+
+=item *
+
+C<dashboard serve --ssl>: show the normal browser-serving path for the runtime
+manager and web-server layers.
+
+=back
+
+=head3 Edge Or Debugging Documentation Example Patterns
+
+Good C<FULL-POD-DOC> should also include examples like these when the file owns
+that edge:
+
+=over 4
+
+=item *
+
+C<dashboard of . 'Ok\.js$'>: explain that an exact suffix regex must match
+C<ok.js> without drifting into C<ok.json>.
+
+=item *
+
+C<dashboard open-file javax.jws.WebService>: explain the Java-source fallback
+path through source trees, jars, wars, or cached Maven source jars.
+
+=item *
+
+C<dashboard jq response.json '$d'>: explain the whole-document query path and
+the order-independent file/path argv contract.
+
+=item *
+
+C<dashboard propq '$d' app.properties>: explain that dotted property names stay
+intact and the root-document path should return the full parsed map.
+
+=item *
+
+C<dashboard csvq 1.1>: explain that CSV selection is row/column index based,
+not a fake header-name query language.
+
+=item *
+
+C<dashboard xmlq _raw>: explain that XML is currently a raw-payload helper and
+docs must not promise a deeper tree-query contract than the implementation
+owns.
+
+=item *
+
+C<dashboard path cdr alpha red>: explain the non-alias fallback path where all
+arguments become current-directory regexes.
+
+=item *
+
+C<dashboard path cdr work alpha>: explain the multiple-match path where the
+helper prints matches and stays at the alias root instead of silently choosing
+one.
+
+=item *
+
+C<TICKET_REF=DD-123 dashboard ticket>: explain the environment-fallback path
+and the create-vs-attach decision for tmux ticket sessions.
+
+=item *
+
+C<dashboard init>: explain the non-destructive seed-refresh edge where
+dashboard-managed starter pages refresh, but diverged user-owned pages stay
+untouched.
+
+=back
+
+=head2 Scorecard Gate
+
+C<SCORECARD-GATEKEEPER> is also a repo contract. Before saying work is done,
+before a release, and before a push that is meant to close a task, run the
+live GitHub Scorecard check through the authenticated interactive-shell path:
+
+  bash -ic "scorecard --repo=github.com/manif3station/developer-dashboard"
+
+Treat the result as a real gate:
+
+=over 4
+
+=item *
+
+record every failing or unknown check
+
+=item *
+
+turn those checks into an explicit task list
+
+=item *
+
+fix repository-side causes with TDD and verification
+
+=item *
+
+apply GitHub-side settings changes when the check depends on remote state
+
+=item *
+
+push the fixes
+
+=item *
+
+rerun Scorecard
+
+=item *
+
+repeat until every actionable check reaches C<10 / 10>
+
+=back
+
+Do not claim the repository is complete while Scorecard still shows a
+repository-fixable failure. If one check cannot become C<10 / 10> because of
+repo age, contributor makeup, badge-program state, missing admin permission,
+or other platform constraints, document that blocker with evidence instead of
+pretending the gate passed.
+
+Additional enforcement under C<SCORECARD-GATEKEEPER>:
+
+=over 4
+
+=item *
+
+do not use top-level GitHub Actions C<write> permissions; keep top-level
+permissions read-only or C<none>
+
+=item *
+
+move required C<write> permissions down to the specific job that needs them
+
+=item *
+
+keep GitHub Actions pinned by full commit SHA
+
+=item *
+
+keep container base images pinned by digest
+
+=item *
+
+keep a detectable fuzzing marker in the repo; this tree now uses both
+C<fast-check> and F<.clusterfuzzlite/Dockerfile>, and the JS fuzz workflow
+must bootstrap the Perl runtime before it invokes C<dashboard encode> or
+C<dashboard decode>
+
+=item *
+
+keep GitHub release signing real, not theoretical; a release is not
+Scorecard-complete until GitHub has a published release asset set that
+includes the tarball and its matching detached signature asset
+
+=back
 
 =head2 Main Concepts
 
@@ -743,7 +960,11 @@ in those directories are run in sorted filename order within each layer, with
 the layers themselves running top-down from home to the deepest current layer,
 non-executable files are skipped, and each hook now streams its own
 C<stdout> and C<stderr> live to the terminal while still accumulating those
-channels into C<RESULT> as JSON. Built-in commands such as C<dashboard jq>
+channels into C<RESULT> as JSON. If that JSON grows too large for a safe
+C<exec()> environment, C<dashboard> spills it into C<RESULT_FILE> and
+C<Developer::Dashboard::Runtime::Result> reads the same logical payload from
+there so later hooks and the final command still see the same result set
+without tripping C<Argument list too long>. Built-in commands such as C<dashboard jq>
 use the same hook directory. A
 directory-backed custom command can provide its real executable as
 F<~/.developer-dashboard/cli/E<lt>commandE<gt>/run>, and that runner receives
@@ -779,11 +1000,11 @@ Perl module names such as C<My::Module>
 
 =item *
 
-Java class names such as C<com.example.App>
+Java class names such as C<com.example.App> or C<javax.jws.WebService>
 
 =item *
 
-recursive pattern searches inside a resolved directory alias or path
+recursive regex searches inside a resolved directory alias or path
 
 =back
 
@@ -793,8 +1014,20 @@ C<--editor>, C<VISUAL>, C<EDITOR>, or C<vim> as the final fallback, and
 multiple matches render a numbered prompt. At that prompt you can press Enter
 to open all matches with C<vim -p>, type one number to open one file, type comma-separated
 numbers such as C<1,3>, or use a range such as C<2-5>. Scoped searches also
-rank exact helper/script names before broader substring matches, so
-C<dashboard of . jq> lists C<jq> and C<jq.js> ahead of C<jquery.js>.
+rank exact helper/script names before broader regex hits, so
+C<dashboard of . jq> lists C<jq> and C<jq.js> ahead of C<jquery.js>. Every
+scoped search token is treated as a case-insensitive regex, so
+C<dashboard of . 'Ok\.js$'> matches C<ok.js> but not C<ok.json>.
+
+Java class lookup first checks live F<.java> files under the current project,
+workspace roots, and C<@INC>-adjacent source trees. If no live source file
+exists, it also searches local source archives such as F<-sources.jar>,
+F<-src.jar>, F<src.zip>, F<war>, and F<jar> files under the current roots,
+F<~/.m2/repository>, Gradle caches, and C<JAVA_HOME>. When a local archive
+still does not provide the requested class, the helper can fetch a matching
+Maven source jar, cache it under
+F<~/.developer-dashboard/cache/open-file/>, and then open the extracted Java
+source.
 
 =head2 Data Query Commands
 
@@ -949,6 +1182,31 @@ instead of a hard-coded absolute home path so a shared fallback runtime
 remains portable across different developer accounts. Re-adding an existing
 alias updates it without error, and deleting a missing alias is also safe.
 
+C<cdr> now follows a two-stage path flow instead of only jumping to one alias
+or one top-level project name. If the first argument resolves as a saved alias
+and there are no later arguments, C<cdr alias> still goes straight there. If
+the first argument resolves as a saved alias and more arguments remain,
+C<cdr> enters the alias root, then searches every directory under that root
+with AND-matched regex keywords taken from the remaining arguments. One match
+means C<cd> into that directory; multiple matches mean print the full list and
+stay at the alias root. If the first argument is not a saved alias, C<cdr>
+treats every argument as an AND-matched regex search beneath the current
+directory. One match means C<cd> there; multiple matches mean print the list
+and leave the current directory unchanged. C<which_dir> follows the same
+selection logic but only prints the chosen target or match list instead of
+changing directory.
+
+Both C<cdr> and C<which_dir> therefore use regex narrowing arguments, not
+quoted substring tokens.
+
+Examples:
+
+  cdr foobar
+  cdr foobar alpha foo bar
+  cdr foobar 'alpha-foo$'
+  cdr alpha red
+  which_dir foobar alpha
+
 Use C<Developer::Dashboard::Folder> for runtime path helpers. It resolves the
 same runtime, bookmark, config, and configured alias names exposed by
 C<dashboard paths>, including names such as C<docker>, without relying on
@@ -970,6 +1228,8 @@ Resolve or open files from the CLI:
 
   dashboard of --print My::Module
   dashboard open-file --print com.example.App
+  dashboard open-file --print javax.jws.WebService
+  dashboard of --print . 'Ok\.js$'
   dashboard open-file --print path/to/file.txt
   dashboard open-file --print bookmarks api-dashboard
 
@@ -1209,11 +1469,26 @@ Generate shell bootstrap:
   dashboard shell ps
 
 The generated shell helper keeps the same bookmark-aware C<cdr>, C<dd_cdr>,
-and C<which_dir> functions across all supported shells. Bash still uses C<\j>
-for job counts, zsh refreshes C<PS1> through a C<precmd> hook with
-C<${#jobstates}>, POSIX C<sh> falls back to a prompt command that does not
-depend on bash-only prompt escapes, and PowerShell installs a C<prompt>
-function instead of using the POSIX C<PS1> variable.
+and C<which_dir> functions across all supported shells. C<cdr> first tries a
+saved alias, then falls back to an AND-matched directory search beneath the
+alias root or the current directory depending on whether that first argument
+was a known alias. One match changes directory, multiple matches print the
+list, and C<which_dir> prints the same selected target or match list without
+changing directory. Bash still uses C<\j> for job counts, zsh refreshes
+The shell-smoke regression coverage also compares those printed paths by
+canonical identity, so macOS C</var/...> and C</private/var/...> aliases do
+not fail equivalent C<pwd> / C<which_dir> checks. Bash still uses C<\j> for
+job counts, zsh refreshes
+C<PS1> through a C<precmd> hook with C<${#jobstates}>, POSIX C<sh> falls back
+to a prompt command that does not depend on bash-only prompt escapes, and
+PowerShell installs a C<prompt> function instead of using the POSIX C<PS1>
+variable.
+
+For the POSIX shell bootstrap, the generated helper now decodes its JSON
+payloads through the same Perl interpreter that generated the shell fragment
+instead of a bare C<perl -MJSON::XS ...> call. That keeps C<cdr> and
+C<which_dir> stable on macOS installs where C</usr/bin/perl> and a user-local
+C<~/perl5> XS stack do not belong to the same Perl build.
 
 On Windows, C<dashboard shell> auto-selects PowerShell by default, and
 interpreter-backed runtime entrypoints such as collector C<command> strings,
@@ -1305,6 +1580,9 @@ The CLI path helpers follow the same portability rule: commands such as
 C<dashboard path project-root> may surface the canonical filesystem path, and
 the supported contract treats macOS aliases such as C</var/...> and
 C</private/var/...> as the same project root instead of different repos.
+The same portability rule now also applies to the shell-helper and
+C<locate_dirs_under> regression suites, so equivalent temp roots are compared
+by real path identity instead of raw string spelling.
 
 =head2 Runtime Lifecycle
 
@@ -1408,14 +1686,22 @@ Measure library coverage with Devel::Cover:
   export PATH="$PWD/.perl5/bin:$PATH"
   cover -delete
   HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+  PERL5OPT=-MDevel::Cover prove -lr t
   cover -report text -select_re '^lib/' -coverage statement -coverage subroutine
 
 The repository target is 100% statement and subroutine coverage for C<lib/>.
+GitHub workflow coverage gates must match the C<Devel::Cover> C<Total> summary
+line by regex rather than one fixed-width spacing layout, because runner or
+module upgrades can change column padding without changing the real
+C<100.0 / 100.0 / 100.0> result.
 
 The coverage-closure suite includes managed collector loop start/stop paths
 under C<Devel::Cover>, including wrapped fork coverage in
 C<t/14-coverage-closure-extra.t>, so the covered run stays green without
 breaking TAP from daemon-style child processes.
+The C<t/07-core-units.t> collector loop guard treats both
+C<HARNESS_PERL_SWITCHES> and C<PERL5OPT> as valid C<Devel::Cover> signals,
+because this machine uses both launch styles during verification.
 The runtime-manager coverage cases also use bounded child reaping for stubborn
 process shutdown scenarios, so C<Devel::Cover> runs do not stall indefinitely
 after the escalation path has already been exercised.
@@ -1560,6 +1846,15 @@ init creates it as C<{}>. The command refreshes dashboard-managed helpers in
 F<~/.developer-dashboard/cli/dd/> and seeds starter bookmarks that are not
 already present.
 
+Starter bookmark refresh is non-destructive too. If a saved
+C<api-dashboard> or C<sql-dashboard> page still matches the last recorded
+dashboard-managed shipped copy, C<dashboard init> refreshes it to the
+current shipped seed. If the saved page has diverged from that managed
+digest, init treats it as a user edit and leaves it alone. The refresh bridge
+also recognizes known older dashboard-managed C<sql-dashboard> digests from
+runtimes that predate the seed manifest, so one stale shipped copy on an
+upgraded machine is refreshed instead of looking stuck on older browser UI.
+
 When C<dashboard init> refreshes a dashboard-managed helper or shipped
 starter file, it compares the existing content against the shipped content by
 MD5 inside Perl first. If the content already matches, init skips the copy
@@ -1663,26 +1958,41 @@ driver-specific connection guidance beside that dropdown, seeds a usable DSN
 template for SQLite, MySQL, PostgreSQL, MSSQL/ODBC, and Oracle when the DSN
 is blank, and rewrites only the C<dbi:E<lt>DriverE<gt>:> DSN prefix when you
 switch drivers. The main browser flow now merges collections and editing into
-one C<SQL Workspace> tab with a phpMyAdmin-style master-detail layout:
-collection tabs stay in the left navigation rail, the saved SQL list for the
-active collection appears directly below that heading, the right pane keeps
-the editor plus results together, and the active saved SQL name stays
-visible while you work. Saving a different SQL name into the same collection
-adds a second saved SQL entry instead of overwriting the selected one. The
-workspace editor now keeps the SQL textarea as the primary focus with
-content-based auto-resize, uses one quiet action row under the editor instead
-of a loud toolbar, removes the redundant in-workspace schema button in favour
-of the top C<Schema Explorer> tab, and moves saved-SQL deletion to a compact
-inline C<[X]> control beside each saved query so the list stays visually
-tied to its collection. The bookmark still renders profile tabs and schema
-tabs, executes SQL through generic C<DBI>, and uses DBI metadata calls such
-as C<table_info> and C<column_info> for the schema browser. The core browser
-workflow is now live verified against SQLite, MySQL, PostgreSQL, MSSQL via
-C<DBD::ODBC>, and Oracle via C<DBD::Oracle>. It preserves programmable
-statement blocks through C<SQLS_SEP> and C<INSTRUCTION_SEP>, including
-C<STASH>, C<ROW>, C<BEFORE>, and C<AFTER> hooks, so result rows can still be
-transformed locally before rendering into derived HTML, links, or button-like
-actions. Its saved Ajax endpoints run through singleton workers. No
+one C<SQL Workspace> tab with a phpMyAdmin-style master-detail layout with
+two inner workspace tabs: C<Collection> and C<Run SQL>. The C<Collection>
+view keeps collection tabs and the saved SQL list together in the left
+navigation rail, while C<Run SQL> keeps the editor plus results together on
+the right and leaves that runner view active by default because it is the
+main operator path. The active saved SQL name stays visible while you work,
+and saving a different SQL name into the same collection adds a second saved
+SQL entry instead of overwriting the selected one. The workspace editor now
+keeps the SQL textarea as the primary focus with content-based auto-resize,
+uses one quiet action row under the editor instead of a loud toolbar,
+removes the redundant in-workspace schema button in favour of the top
+C<Schema Explorer> tab, and moves saved-SQL deletion to a compact inline
+C<[X]> control beside each saved query so the list stays visually tied to
+its collection. The bookmark still renders profile tabs and schema tabs,
+executes SQL through generic C<DBI>, and uses DBI metadata calls such as
+C<table_info> and C<column_info> for the schema browser. Schema Explorer now
+also gives the table list a live filter box, renders human type labels and
+positive length labels from the DBI metadata instead of leaking raw numeric
+type codes, lets the user copy a table name directly, and adds a C<View
+Data> action that jumps back to C<Run SQL> with a ready C<select * from
+E<lt>tableE<gt>> query for the selected table. The core browser workflow is
+now live verified against SQLite, MySQL, PostgreSQL, MSSQL via
+C<DBD::ODBC>, and Oracle via C<DBD::Oracle>. Schema browse keeps reading
+C<table_info> / C<column_info> rows directly and must not call C<execute()>
+on those metadata handles, because ODBC drivers such as MSSQL can fail with
+C<SQL-HY010> on that misuse. Saved dashboard pages override shipped seeded
+pages, so an older F<~/.developer-dashboard/dashboards/sql-dashboard> copy
+can still shadow a newer shipped fix after upgrade; when SQL Dashboard
+behaviour looks stale, use C<dashboard page source sql-dashboard> to confirm
+which page source is live before debugging the browser route. It preserves
+programmable statement blocks through C<SQLS_SEP> and
+C<INSTRUCTION_SEP>, including C<STASH>, C<ROW>, C<BEFORE>, and C<AFTER>
+hooks, so result rows can still be transformed locally before rendering into
+derived HTML, links, or button-like actions. Its saved Ajax endpoints run
+through singleton workers. No
 C<DBD::*> driver ships in the base tarball by default; install only the one
 you need with C<dashboard cpan DBD::Driver> or user-space
 C<cpanm -L ~/perl5 DBD::Driver>, and the bookmark will return explicit
@@ -1844,30 +2154,50 @@ This library is free software; you can redistribute it and/or modify it under th
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file holds the top-level module version and the main user-facing manual for the project.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is the distribution manual for Developer Dashboard. It explains the user-facing runtime model, command surface, bookmark system, layered configuration, browser workspace features, and release expectations, while also carrying the canonical version number for the distribution.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists so the distribution ships one authoritative manual that survives a tarball install and matches the README in the source tree. That keeps CPAN users, local developers, and release verification looking at the same product-level documentation instead of a checkout-only guide.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when the visible behavior of the dashboard changes, when command semantics move, when seeded workspaces gain new capability, or when contributor rules in the shipped manual need to stay aligned with the README.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Edit this POD as a product manual, not as an implementation dump. Keep it synchronized with C<README.md>, keep the version line aligned with C<dist.ini>, and describe the runtime the way an installed user will experience it.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by C<perldoc Developer::Dashboard>, by release metadata tests, by CPAN consumers reading installed documentation, and by contributors checking that the shipped manual matches the source-tree README.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/00-load.t t/15-release-metadata.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

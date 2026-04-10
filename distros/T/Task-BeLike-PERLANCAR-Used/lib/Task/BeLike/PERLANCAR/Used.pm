@@ -2,9 +2,9 @@
 package Task::BeLike::PERLANCAR::Used;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-01'; # DATE
+our $DATE = '2026-04-10'; # DATE
 our $DIST = 'Task-BeLike-PERLANCAR-Used'; # DIST
-our $VERSION = '20231201.1'; # VERSION
+our $VERSION = '20260410.1'; # VERSION
 
 1;
 # ABSTRACT: All my modules which I currently use and install on a new perl installation
@@ -21,7 +21,7 @@ Task::BeLike::PERLANCAR::Used - All my modules which I currently use and install
 
 =head1 VERSION
 
-version 20231201.1
+version 20260410.1
 
 =head1 SYNOPSIS
 
@@ -65,13 +65,19 @@ dependencies.
 
 =head3 L<Acme::CPANModules::ArrayClassBuilder> 0
 
+=head3 L<Acme::CPANModules::ArrayData> 0
+
 =head3 L<Acme::CPANModules::Assert> 0
+
+=head3 L<Acme::CPANModules::BPOM::FoodRegistration> 0
 
 =head3 L<Acme::CPANModules::BloomFilters> 0
 
 =head3 L<Acme::CPANModules::BrowserUtilities> 0
 
 =head3 L<Acme::CPANModules::BrowsingTableInteractively> 0
+
+=head3 L<Acme::CPANModules::CLI::PasswordManager> 0
 
 =head3 L<Acme::CPANModules::CLI::Sort> 0
 
@@ -135,9 +141,13 @@ dependencies.
 
 =head3 L<Acme::CPANModules::EscapingAndQuoting> 0
 
+=head3 L<Acme::CPANModules::FireDiamond> 0
+
 =head3 L<Acme::CPANModules::FooThis> 0
 
 =head3 L<Acme::CPANModules::Foozilla> 0
+
+=head3 L<Acme::CPANModules::FormattingDate> 0
 
 =head3 L<Acme::CPANModules::Frameworks> 0
 
@@ -147,7 +157,11 @@ dependencies.
 
 =head3 L<Acme::CPANModules::GrepVariants> 0
 
+=head3 L<Acme::CPANModules::GroupingElementsOfArray> 0
+
 =head3 L<Acme::CPANModules::HTMLTable> 0
+
+=head3 L<Acme::CPANModules::HashData> 0
 
 =head3 L<Acme::CPANModules::HashUtilities> 0
 
@@ -155,11 +169,19 @@ dependencies.
 
 =head3 L<Acme::CPANModules::HidingModules> 0
 
+=head3 L<Acme::CPANModules::Import::CPANRatings::User::davidgaramond> 0
+
 =head3 L<Acme::CPANModules::Import::CPANRatings::User::perlancar> 0
 
 =head3 L<Acme::CPANModules::Import::CPANRatings::User::stevenharyanto> 0
 
+=head3 L<Acme::CPANModules::InfoFromCPANTesters> 0
+
+=head3 L<Acme::CPANModules::InterestingTies> 0
+
 =head3 L<Acme::CPANModules::Interop::Ruby> 0
+
+=head3 L<Acme::CPANModules::JSONVariants> 0
 
 =head3 L<Acme::CPANModules::KitchenSinks> 0
 
@@ -167,11 +189,15 @@ dependencies.
 
 =head3 L<Acme::CPANModules::ListsOfWordsAndNames> 0
 
+=head3 L<Acme::CPANModules::LoadingModules> 0
+
 =head3 L<Acme::CPANModules::LocalCPANIndex> 0
 
 =head3 L<Acme::CPANModules::LocalCPANMirror> 0
 
 =head3 L<Acme::CPANModules::Locale::ID> 0
+
+=head3 L<Acme::CPANModules::LoremIpsum> 0
 
 =head3 L<Acme::CPANModules::MIMETypes> 0
 
@@ -179,15 +205,21 @@ dependencies.
 
 =head3 L<Acme::CPANModules::ManagingMultipleRepositories> 0
 
+=head3 L<Acme::CPANModules::MatchingString> 0
+
 =head3 L<Acme::CPANModules::MockModules> 0
 
 =head3 L<Acme::CPANModules::ModernPreambles> 0
+
+=head3 L<Acme::CPANModules::ModifiedHashes> 0
 
 =head3 L<Acme::CPANModules::ModuleAutoinstallers> 0
 
 =head3 L<Acme::CPANModules::ModuleAutoloaders> 0
 
 =head3 L<Acme::CPANModules::MooseStyleClassBuilder> 0
+
+=head3 L<Acme::CPANModules::MultipleDispatch> 0
 
 =head3 L<Acme::CPANModules::NO_COLOR> 0
 
@@ -203,7 +235,11 @@ dependencies.
 
 =head3 L<Acme::CPANModules::OneLinerTools> 0
 
+=head3 L<Acme::CPANModules::OpeningFileInApp> 0
+
 =head3 L<Acme::CPANModules::OrderedHash> 0
+
+=head3 L<Acme::CPANModules::OrderingAndRunningTasks> 0
 
 =head3 L<Acme::CPANModules::Org> 0
 
@@ -253,13 +289,19 @@ dependencies.
 
 =head3 L<Acme::CPANModules::PortedFrom::Ruby> 0
 
+=head3 L<Acme::CPANModules::QuickGraph> 0
+
 =head3 L<Acme::CPANModules::RandomData> 0
 
 =head3 L<Acme::CPANModules::RandomPassword> 0
 
 =head3 L<Acme::CPANModules::RandomPerson> 0
 
+=head3 L<Acme::CPANModules::RandomText> 0
+
 =head3 L<Acme::CPANModules::ReadingFilesBackward> 0
+
+=head3 L<Acme::CPANModules::RemovingElementsFromArray> 0
 
 =head3 L<Acme::CPANModules::RenamingFiles> 0
 
@@ -279,7 +321,11 @@ dependencies.
 
 =head3 L<Acme::CPANModules::ShellCompleters> 0
 
+=head3 L<Acme::CPANModules::Similarity> 0
+
 =head3 L<Acme::CPANModules::SmartMatch> 0
+
+=head3 L<Acme::CPANModules::Soundex> 0
 
 =head3 L<Acme::CPANModules::StructuredDATA> 0
 
@@ -287,11 +333,21 @@ dependencies.
 
 =head3 L<Acme::CPANModules::Symlink> 0
 
+=head3 L<Acme::CPANModules::TableData> 0
+
+=head3 L<Acme::CPANModules::TemporaryChdir> 0
+
 =head3 L<Acme::CPANModules::TextTable> 0
 
 =head3 L<Acme::CPANModules::UUID> 0
 
 =head3 L<Acme::CPANModules::Unbless> 0
+
+=head3 L<Acme::CPANModules::UnixCommandImplementations> 0
+
+=head3 L<Acme::CPANModules::UnixCommandVariants> 0
+
+=head3 L<Acme::CPANModules::UnixCommandWrappers> 0
 
 =head3 L<Acme::CPANModules::UpsideDownTextWithUnicode> 0
 
@@ -300,6 +356,10 @@ dependencies.
 =head3 L<Acme::CPANModules::WordListBundle::Proverbs> 0
 
 =head3 L<Acme::CPANModules::WorkingWithCSV> 0
+
+=head3 L<Acme::CPANModules::WorkingWithDOC> 0
+
+=head3 L<Acme::CPANModules::WorkingWithPDF> 0
 
 =head3 L<Acme::CPANModules::WorkingWithTree> 0
 
@@ -449,11 +509,15 @@ dependencies.
 
 =head3 L<Acme::MetaSyntactic::unyil> 0
 
+=head3 L<Acme::PERLANCAR::Test::Require> 0
+
 =head3 L<Acme::Thing> 0
 
 =head3 L<Algorithm::Backoff> 0.006
 
 =head3 L<Algorithm::History::Levels> 0
+
+=head3 L<Alt::Sub::Delete::NewPackageSeparator> 0
 
 =head3 L<Android::Releases> 0
 
@@ -481,7 +545,11 @@ dependencies.
 
 =head3 L<App::BPOMUtils::NutritionFacts> 0
 
+=head3 L<App::BPOMUtils::NutritionLabelRef> 0
+
 =head3 L<App::BPOMUtils::RPO::Checker> 0
+
+=head3 L<App::BPOMUtils::RPO::Ingredients> 0
 
 =head3 L<App::BPOMUtils::Table::FoodAdditive> 0
 
@@ -533,6 +601,8 @@ dependencies.
 
 =head3 L<App::CSVUtils> 0.032
 
+=head3 L<App::CSVUtils::csv_mix_formulas> 0
+
 =head3 L<App::CSelUtils> 0.084
 
 =head3 L<App::CalcAccumulatedDiscounts> 0
@@ -549,6 +619,8 @@ dependencies.
 
 =head3 L<App::CheckDigitsUtils> 0
 
+=head3 L<App::CheckPerlReleaseFilename> 0
+
 =head3 L<App::ChemistryUtils> 0
 
 =head3 L<App::ChromeUtils> 0
@@ -558,6 +630,12 @@ dependencies.
 =head3 L<App::ColorThemeUtils> 0
 
 =head3 L<App::CommonMarkUtils> 0
+
+=head3 L<App::CommonPrefixUtils> 0
+
+=head3 L<App::CommonSuffixUtils> 0
+
+=head3 L<App::ComparerUtils> 0
 
 =head3 L<App::CompleteCLIs> 0
 
@@ -573,9 +651,13 @@ dependencies.
 
 =head3 L<App::CreateSelfSignedSSLCert> 0
 
+=head3 L<App::CrockfordBase32Utils> 0
+
 =head3 L<App::CronUtils> 0
 
 =head3 L<App::CrossPericmd> 0
+
+=head3 L<App::CryptPasswordUtilUtils> 0
 
 =head3 L<App::CryptoCurrencyUtils> 0
 
@@ -587,13 +669,19 @@ dependencies.
 
 =head3 L<App::DNSZoneUtils> 0
 
+=head3 L<App::DataBrowseUtils> 0
+
 =head3 L<App::DataDirUtils> 0
 
 =head3 L<App::DataPackUtils> 0
 
 =head3 L<App::DataSectionSeekableUtils> 0
 
+=head3 L<App::DataSizeSpeedUtils> 0
+
 =head3 L<App::DateUtils> 0
+
+=head3 L<App::DesktopNotifyUtils> 0
 
 =head3 L<App::DesktopOpenUtils> 0
 
@@ -639,6 +727,10 @@ dependencies.
 
 =head3 L<App::EbookUtils> 0
 
+=head3 L<App::EmacsLockfileUtils> 0
+
+=head3 L<App::EnvUtils> 0
+
 =head3 L<App::EscapeUtils> 0
 
 =head3 L<App::ExecIf> 0
@@ -673,6 +765,10 @@ dependencies.
 
 =head3 L<App::FileTestUtils> 0
 
+=head3 L<App::FilenameTimestampUtils> 0
+
+=head3 L<App::FilenameTypeUtils> 0
+
 =head3 L<App::FilenameUtils> 0
 
 =head3 L<App::FinanceUtils> 0
@@ -691,13 +787,19 @@ dependencies.
 
 =head3 L<App::FoodAdditivesUtils> 0
 
+=head3 L<App::FoodColorUtils> 0
+
 =head3 L<App::FormatCPANChanges::PERLANCAR> 0
+
+=head3 L<App::FzfUtils> 0
 
 =head3 L<App::GamesWordlist> 0
 
 =head3 L<App::GenPericmdCompleterScript> 0.123
 
 =head3 L<App::GenPericmdScript> 0
+
+=head3 L<App::GeometryUtils> 0
 
 =head3 L<App::GetoptLongDescriptiveUtils> 0
 
@@ -739,6 +841,8 @@ dependencies.
 
 =head3 L<App::HasPrereqs> 0
 
+=head3 L<App::HeightUtils> 0
+
 =head3 L<App::IDXUtils> 0
 
 =head3 L<App::IMDBUtils> 0
@@ -769,7 +873,15 @@ dependencies.
 
 =head3 L<App::IndonesianNumberUtils> 0
 
+=head3 L<App::InstagramURLUtils> 0
+
+=head3 L<App::InterpreterUtils> 0
+
 =head3 L<App::KBLIUtils> 0
+
+=head3 L<App::KDEActivityUtils> 0
+
+=head3 L<App::KemenkesUtils::RDA> 0
 
 =head3 L<App::KwaliteeUtils> 0
 
@@ -780,6 +892,8 @@ dependencies.
 =head3 L<App::LanguageExprUtils> 0
 
 =head3 L<App::LedgerUtils> 0
+
+=head3 L<App::LevenshteinUtils> 0
 
 =head3 L<App::LibreOfficeUtils> 0
 
@@ -845,6 +959,8 @@ dependencies.
 
 =head3 L<App::MetaCPANUtils> 0
 
+=head3 L<App::MineralUtils> 0
+
 =head3 L<App::ModuleAbstractCwaliteeUtils> 0
 
 =head3 L<App::ModuleFeaturesUtils> 0
@@ -862,6 +978,8 @@ dependencies.
 =head3 L<App::NetworkUtils> 0
 
 =head3 L<App::NumberUtilRangeUtils> 0
+
+=head3 L<App::NutrientUtils> 0
 
 =head3 L<App::OfficeUtils> 0.005
 
@@ -922,6 +1040,8 @@ dependencies.
 =head3 L<App::PhoneNumberUtils> 0
 
 =head3 L<App::PhysicsUnitUtils> 0
+
+=head3 L<App::PickArgs> 0
 
 =head3 L<App::PickRandomLines> 0
 
@@ -1009,13 +1129,23 @@ dependencies.
 
 =head3 L<App::SortByLines> 0
 
+=head3 L<App::SortExampleUtils> 0
+
+=head3 L<App::SortKeyUtils> 0
+
+=head3 L<App::SortSpecUtils> 0
+
 =head3 L<App::SortSubUtils> 0
+
+=head3 L<App::SorterUtils> 0
 
 =head3 L<App::Spanel::BuildBindZones> 0
 
 =head3 L<App::Spanel::BuildBindZonesFromPowerDNSDB> 0
 
 =head3 L<App::Spanel::TailWeblog> 0
+
+=head3 L<App::SpreadsheetOpenUtils> 0
 
 =head3 L<App::SpreadsheetUtils> 0
 
@@ -1051,11 +1181,13 @@ dependencies.
 
 =head3 L<App::TextFragmentUtils> 0
 
+=head3 L<App::TextSimilarityUtils> 0
+
 =head3 L<App::TextTableUtils> 0
 
 =head3 L<App::TextWrapUtils> 0
 
-=head3 L<App::ThisDist> 0.012
+=head3 L<App::ThisDist> 0.022
 
 =head3 L<App::ThisDist::OnMetaCPAN> 0
 
@@ -1085,6 +1217,8 @@ dependencies.
 
 =head3 L<App::VersioningSchemeUtils> 0
 
+=head3 L<App::VirtualBoxUtils> 0
+
 =head3 L<App::VitaminUtils> 0
 
 =head3 L<App::VivaldiUtils> 0
@@ -1109,6 +1243,8 @@ dependencies.
 
 =head3 L<App::YoutubeDlUtils> 0
 
+=head3 L<App::YtDlpUtils> 0
+
 =head3 L<App::ZodiacUtils> 0
 
 =head3 L<App::ZodiacUtils::Lite> 0
@@ -1131,6 +1267,8 @@ dependencies.
 
 =head3 L<App::calx> 0
 
+=head3 L<App::cdbookmark> 0
+
 =head3 L<App::chalk> 0
 
 =head3 L<App::coinbasepro::lite> 0
@@ -1140,6 +1278,8 @@ dependencies.
 =head3 L<App::column::run> 0
 
 =head3 L<App::corruptor> 0
+
+=head3 L<App::cpanm::allperls> 0
 
 =head3 L<App::cpanm::cpanmodules> 0
 
@@ -1205,6 +1345,8 @@ dependencies.
 
 =head3 L<App::finddo> 0
 
+=head3 L<App::findsort> 0
+
 =head3 L<App::finquote> 0
 
 =head3 L<App::finquotehist> 0
@@ -1215,7 +1357,7 @@ dependencies.
 
 =head3 L<App::genlines> 0
 
-=head3 L<App::genpw> 0.011
+=head3 L<App::genpw> 0.013
 
 =head3 L<App::genpw::base56> 0
 
@@ -1227,6 +1369,8 @@ dependencies.
 
 =head3 L<App::genpw::wordlist> 0.004
 
+=head3 L<App::genusername> 0
+
 =head3 L<App::github::cmd> 0.003
 
 =head3 L<App::gitwrap> 0
@@ -1235,9 +1379,17 @@ dependencies.
 
 =head3 L<App::grep::email> 0
 
+=head3 L<App::grep::similar::text> 0
+
+=head3 L<App::grep::sounds::like> 0
+
 =head3 L<App::grep::url> 0
 
 =head3 L<App::grepdate> 0
+
+=head3 L<App::hashdata> 0
+
+=head3 L<App::headtail> 0
 
 =head3 L<App::host::struct> 0
 
@@ -1257,7 +1409,9 @@ dependencies.
 
 =head3 L<App::idxdb> 0
 
-=head3 L<App::imgsize> 0
+=head3 L<App::imgsize> 0.006
+
+=head3 L<App::indent> 0
 
 =head3 L<App::inplace> 0
 
@@ -1316,6 +1470,8 @@ dependencies.
 =head3 L<App::lcpan::CmdBundle::metacpan> 0
 
 =head3 L<App::lcpan::CmdBundle::metasyntactic> 0
+
+=head3 L<App::lcpan::CmdBundle::namespace> 0
 
 =head3 L<App::lcpan::CmdBundle::nearest> 0
 
@@ -1379,6 +1535,10 @@ dependencies.
 
 =head3 L<App::pause::Unpacked> 0
 
+=head3 L<App::pdfresize> 0
+
+=head3 L<App::pdfsize> 0
+
 =head3 L<App::perlmv> 0.604
 
 =head3 L<App::perlmv::scriptlet::according_to_containing_dir> 0
@@ -1390,6 +1550,8 @@ dependencies.
 =head3 L<App::perlmv::scriptlet::add_prefix_datestamp> 0
 
 =head3 L<App::perlmv::scriptlet::add_suffix> 0
+
+=head3 L<App::perlmv::scriptlet::add_suffix_imgsize> 0
 
 =head3 L<App::perlmv::scriptlet::number_tracks> 0
 
@@ -1417,6 +1579,8 @@ dependencies.
 
 =head3 L<App::ppisel> 0
 
+=head3 L<App::prefixcat> 0
+
 =head3 L<App::pretty> 0
 
 =head3 L<App::printenv::perl> 0
@@ -1436,6 +1600,8 @@ dependencies.
 =head3 L<App::renlikewd> 0
 
 =head3 L<App::renwd> 0
+
+=head3 L<App::repeat> 0
 
 =head3 L<App::reposdb> 0
 
@@ -1457,6 +1623,8 @@ dependencies.
 
 =head3 L<App::ruler> 0
 
+=head3 L<App::safer> 0
+
 =head3 L<App::seq::intrange> 0
 
 =head3 L<App::seq::numseq> 0
@@ -1470,6 +1638,12 @@ dependencies.
 =head3 L<App::short> 0
 
 =head3 L<App::smtpstatus> 0
+
+=head3 L<App::sort_by_comparer> 0
+
+=head3 L<App::sort_by_sorter> 0
+
+=head3 L<App::sort_by_sortkey> 0
 
 =head3 L<App::sort_by_spec> 0
 
@@ -1517,6 +1691,8 @@ dependencies.
 
 =head3 L<App::unicomb> 0
 
+=head3 L<App::uniprint> 0
+
 =head3 L<App::upf> 0
 
 =head3 L<App::wcgrep> 0
@@ -1524,6 +1700,10 @@ dependencies.
 =head3 L<App::wget::retry> 0
 
 =head3 L<App::wordlist> 0.270
+
+=head3 L<App::wordlist::blossom> 0
+
+=head3 L<App::wordlist::wordle> 0
 
 =head3 L<App::wordstat> 0
 
@@ -1533,11 +1713,11 @@ dependencies.
 
 =head3 L<App::yamlsel> 0
 
-=head3 L<AppBase::Grep> 0.010
+=head3 L<AppBase::Grep> 0.014
 
 =head3 L<AppBase::Grep::ColorSchemes::Kuler> 0
 
-=head3 L<AppBase::Sort> 0
+=head3 L<AppBase::Sort> 0.004
 
 =head3 L<AppLib::CreateSelfSignedSSLCert> 0
 
@@ -1548,8 +1728,6 @@ dependencies.
 =head3 L<Array::Find> 0
 
 =head3 L<Array::Iter> 0
-
-=head3 L<Array::Iterator> 0
 
 =head3 L<Array::OverlapFinder> 0.003
 
@@ -1567,6 +1745,8 @@ dependencies.
 
 =head3 L<Array::Set::Naive> 0
 
+=head3 L<Array::Util::MultiTarget> 0
+
 =head3 L<Array::Util::Shuffle> 0
 
 =head3 L<ArrayData> 0.2.1
@@ -1578,6 +1758,18 @@ dependencies.
 =head3 L<ArrayData::Lingua::Word::EN::Wordle> 0
 
 =head3 L<ArrayData::Lingua::Word::ID::KBBI> 0
+
+=head3 L<ArrayData::Lingua::Word::ID::KBBI::ByClass::Adjective> 0
+
+=head3 L<ArrayData::Lingua::Word::ID::KBBI::ByClass::Adverb> 0
+
+=head3 L<ArrayData::Lingua::Word::ID::KBBI::ByClass::Noun> 0
+
+=head3 L<ArrayData::Lingua::Word::ID::KBBI::ByClass::Verb> 0
+
+=head3 L<ArrayData::Lingua::Word::ID::KBBI::FigureOfSpeech> 0
+
+=head3 L<ArrayData::Lingua::Word::ID::KBBI::Proverb> 0
 
 =head3 L<ArrayData::Lingua::Word::ID::Wordle> 0
 
@@ -1596,6 +1788,8 @@ dependencies.
 =head3 L<Begin::Eval::Env> 0
 
 =head3 L<Begin::Eval::FirstArg> 0
+
+=head3 L<Bencher> 1.041
 
 =head3 L<Bencher::BPM> 0
 
@@ -1671,6 +1865,8 @@ dependencies.
 
 =head3 L<Bencher::Scenario::EnsuringAllPatternsInString> 0
 
+=head3 L<Bencher::Scenario::ExceptionHandling> 0
+
 =head3 L<Bencher::Scenario::File::Which::Cached> 0
 
 =head3 L<Bencher::Scenario::FileWhichCached> 0
@@ -1684,6 +1880,8 @@ dependencies.
 =head3 L<Bencher::Scenario::GetoptModules> 0
 
 =head3 L<Bencher::Scenario::Glob> 0
+
+=head3 L<Bencher::Scenario::GraphConnectedComponentsModules> 0
 
 =head3 L<Bencher::Scenario::GraphTopologicalSortModules> 0
 
@@ -1705,11 +1903,15 @@ dependencies.
 
 =head3 L<Bencher::Scenario::Interpreters> 0
 
+=head3 L<Bencher::Scenario::Interpreters::Startup> 0
+
 =head3 L<Bencher::Scenario::List::MoreUtils> 0
 
 =head3 L<Bencher::Scenario::List::Util> 0
 
 =head3 L<Bencher::Scenario::ListFlatten> 0
+
+=head3 L<Bencher::Scenario::ListFlattenModules> 0
 
 =head3 L<Bencher::Scenario::ListingProcesses> 0
 
@@ -1738,6 +1940,8 @@ dependencies.
 =head3 L<Bencher::Scenario::PermuteNamedModules> 0
 
 =head3 L<Bencher::Scenario::RandomLineModules> 0
+
+=head3 L<Bencher::Scenario::RandomNumbers> 0
 
 =head3 L<Bencher::Scenario::RandomUserAgentModules> 0
 
@@ -1840,6 +2044,20 @@ dependencies.
 =head3 L<Bencher::Scenario::shuffle> 0
 
 =head3 L<Bencher::Scenario::strftimeq> 0
+
+=head3 L<Bencher::ScenarioBundle::Accessors> 0
+
+=head3 L<Bencher::ScenarioBundle::Algorithm::Diff> 0
+
+=head3 L<Bencher::ScenarioBundle::Graphics::ColorNames> 0
+
+=head3 L<Bencher::ScenarioBundle::Log::Any> 0
+
+=head3 L<Bencher::ScenarioBundle::Log::ger> 0
+
+=head3 L<Bencher::ScenarioBundle::Ref::Util> 0
+
+=head3 L<Bencher::ScenarioBundle::SmartMatch> 0
 
 =head3 L<Bencher::ScenarioUtil::Completion> 0
 
@@ -1995,6 +2213,12 @@ dependencies.
 
 =head3 L<Bencher::Scenarios::LocaleTextDomainIfEnv> 0
 
+=head3 L<Bencher::Scenarios::Log::Any> 0
+
+=head3 L<Bencher::Scenarios::Log::Dispatch> 0
+
+=head3 L<Bencher::Scenarios::Log::Dispatch::FileRotate> 0
+
 =head3 L<Bencher::Scenarios::Log::ger> 0
 
 =head3 L<Bencher::Scenarios::LogAny> 0
@@ -2077,11 +2301,15 @@ dependencies.
 
 =head3 L<Bencher::Scenarios::StringFunctions> 0
 
+=head3 L<Bencher::Scenarios::Text::Table::Sprintf> 0
+
 =head3 L<Bencher::Scenarios::TextANSIUtil> 0
 
 =head3 L<Bencher::Scenarios::TextLevenshteinFlexible> 0
 
 =head3 L<Bencher::Scenarios::TextTableTiny> 0
+
+=head3 L<Bencher::Scenarios::Tie> 0
 
 =head3 L<Bencher::Scenarios::TimeDurationParse> 0
 
@@ -2133,11 +2361,13 @@ dependencies.
 
 =head3 L<Business::ID::NOPPBB> 0
 
-=head3 L<Business::ID::NPWP> 0
+=head3 L<Business::ID::NPWP> 0.091
 
 =head3 L<Business::ID::POM> 0
 
 =head3 L<Business::ID::SIM> 0
+
+=head3 L<Business::ID::VehiclePlate> 0
 
 =head3 L<Business::Inventory::Valuation> 0.006
 
@@ -2150,6 +2380,8 @@ dependencies.
 =head3 L<CLI::Meta::cp> 0
 
 =head3 L<CLI::Meta::diff> 0
+
+=head3 L<CLI::Meta::less> 0
 
 =head3 L<CLI::Meta::mv> 0
 
@@ -2207,7 +2439,15 @@ dependencies.
 
 =head3 L<Carp::Patch::Config> 0
 
+=head3 L<Carp::Patch::ExcludePackage> 0
+
+=head3 L<Carp::Patch::OutputToBrowser> 0
+
 =head3 L<Carp::Patch::Verbose> 0
+
+=head3 L<CellFunc> 0
+
+=head3 L<CellFunc::File::stat_row> 0
 
 =head3 L<CentOS::Releases> 0
 
@@ -2241,7 +2481,7 @@ dependencies.
 
 =head3 L<Color::HSV::Util> 0
 
-=head3 L<Color::RGB::Util> 0.600
+=head3 L<Color::RGB::Util> 0.609
 
 =head3 L<Color::Theme> 0
 
@@ -2280,6 +2520,22 @@ dependencies.
 =head3 L<ColorThemes::Test> 0
 
 =head3 L<ColorTransforms::Standard> 0
+
+=head3 L<Comparer> 0
+
+=head3 L<Comparer::by_similarity> 0
+
+=head3 L<Comparer::date_in_text> 0
+
+=head3 L<Comparer::file_mtime> 0
+
+=head3 L<Comparer::file_num_links> 0
+
+=head3 L<Comparer::file_size> 0
+
+=head3 L<Comparer::from_sortkey> 0
+
+=head3 L<Comparer::similarity> 0
 
 =head3 L<Complete> 0.202
 
@@ -2343,6 +2599,8 @@ dependencies.
 
 =head3 L<Complete::Number> 0
 
+=head3 L<Complete::Nutrient> 0
+
 =head3 L<Complete::PPR> 0
 
 =head3 L<Complete::Path> 0.251
@@ -2379,7 +2637,7 @@ dependencies.
 
 =head3 L<Complete::Unix> 0.07
 
-=head3 L<Complete::Util> 0.618
+=head3 L<Complete::Util> 0.620
 
 =head3 L<Complete::Vivaldi> 0
 
@@ -2473,6 +2731,12 @@ dependencies.
 
 =head3 L<Data::Dump::Color> 0.246
 
+=head3 L<Data::Dump::HTML::Collapsible> 0
+
+=head3 L<Data::Dump::HTML::PopUp> 0
+
+=head3 L<Data::Dump::IfSmall> 0
+
 =head3 L<Data::Dump::ObjectAsString> 0
 
 =head3 L<Data::Dump::OneLine> 0
@@ -2486,6 +2750,8 @@ dependencies.
 =head3 L<Data::Dump::Patch::ReplaceWithDataDmp> 0
 
 =head3 L<Data::Dump::SExpression> 0
+
+=head3 L<Data::Dump::SkipObjects> 0
 
 =head3 L<Data::Dump::SortKeys> 0
 
@@ -2501,13 +2767,15 @@ dependencies.
 
 =head3 L<Data::Format::Pretty::YAML> 0
 
-=head3 L<Data::Graph::Util> 0
+=head3 L<Data::Graph::Util> 0.007
+
+=head3 L<Data::MiniDumpX> 0
 
 =head3 L<Data::ModeMerge> 0
 
 =head3 L<Data::Random::Tree> 0
 
-=head3 L<Data::Sah> 0.914
+=head3 L<Data::Sah> 0.917
 
 =head3 L<Data::Sah::Coerce> 0.050
 
@@ -2571,15 +2839,19 @@ dependencies.
 
 =head3 L<Data::Sah::CoerceBundle::To_num::From_str::num_id> 0
 
-=head3 L<Data::Sah::DefaultValue> 0
+=head3 L<Data::Sah::DefaultValue> 0.005
 
-=head3 L<Data::Sah::Filter> 0.015
+=head3 L<Data::Sah::Filter> 0.024
 
 =head3 L<Data::Sah::Filter::perl::Str::replace_dashes_with_underscores> 0
 
 =head3 L<Data::Sah::Filter::perl::Str::replace_underscores_with_dashes> 0
 
 =head3 L<Data::Sah::Filter::perl::Str::try_decode_json> 0
+
+=head3 L<Data::Sah::FilterBundle::Array> 0
+
+=head3 L<Data::Sah::FilterBundle::Filename::Safe> 0
 
 =head3 L<Data::Sah::FilterBundle::Phone> 0
 
@@ -2639,7 +2911,7 @@ dependencies.
 
 =head3 L<Data::Transmute::Rules::TreeNodeHash::StringifyParent> 0
 
-=head3 L<Data::Unixish> 1.572
+=head3 L<Data::Unixish> 1.574
 
 =head3 L<Data::Unixish::ANSI> 0
 
@@ -2701,7 +2973,17 @@ dependencies.
 
 =head3 L<Devel::Confess::Patch::UseDataDmp> 0
 
+=head3 L<Devel::Confess::Patch::UseDataDumpHTMLCollapsible> 0
+
+=head3 L<Devel::Confess::Patch::UseDataDumpHTMLPopUp> 0
+
+=head3 L<Devel::Confess::Patch::UseDataDumpIfSmall> 0
+
 =head3 L<Devel::Confess::Patch::UseDataDumpObjectAsString> 0
+
+=head3 L<Devel::Confess::Patch::UseDataDumpSkipObjects> 0
+
+=head3 L<Devel::Confess::Source::Patch::ExcludePackage> 0
 
 =head3 L<Devel::DieHandler::DumpDieArgs> 0
 
@@ -2865,6 +3147,8 @@ dependencies.
 
 =head3 L<Dist::Zilla::Plugin::Rinci::Wrap> 0
 
+=head3 L<Dist::Zilla::Plugin::Sah::SchemaBundle> 0
+
 =head3 L<Dist::Zilla::Plugin::Sah::Schemas> 0
 
 =head3 L<Dist::Zilla::Plugin::ScriptX> 0
@@ -2874,6 +3158,8 @@ dependencies.
 =head3 L<Dist::Zilla::Plugin::ShareDir::Clean> 0
 
 =head3 L<Dist::Zilla::Plugin::Sort::Sub> 0
+
+=head3 L<Dist::Zilla::Plugin::Sorter> 0
 
 =head3 L<Dist::Zilla::Plugin::TableData> 0
 
@@ -2898,6 +3184,8 @@ dependencies.
 =head3 L<Dist::Zilla::Role::CheckPackageDeclared> 0
 
 =head3 L<Dist::Zilla::Role::DumpPerinciCmdLineScript> 0
+
+=head3 L<Dist::Zilla::Role::GetDistFileURL> 0
 
 =head3 L<Dist::Zilla::Role::GetSharedFileURL> 0
 
@@ -2931,7 +3219,11 @@ dependencies.
 
 =head3 L<File::Digest> 0.009
 
+=head3 L<File::FindUniq> 0.004
+
 =head3 L<File::Flock::Retry> 0.631
+
+=head3 L<File::Lockfile::Emacs> 0
 
 =head3 L<File::MoreUtil> 0
 
@@ -2975,9 +3267,13 @@ dependencies.
 
 =head3 L<File::Unsaved> 0
 
+=head3 L<File::Util::Copy> 0
+
 =head3 L<File::Util::DirList> 0.002
 
-=head3 L<File::Util::Sort> 0
+=head3 L<File::Util::Rename> 0
+
+=head3 L<File::Util::Sort> 0.010
 
 =head3 L<File::Util::Symlink> 0
 
@@ -2991,13 +3287,13 @@ dependencies.
 
 =head3 L<File::chown> 0
 
-=head3 L<Filename::Archive> 0.032
+=head3 L<Filename::Archive> 0.033
 
 =head3 L<Filename::Audio> 0.004
 
 =head3 L<Filename::Backup> 0
 
-=head3 L<Filename::Compressed> 0
+=head3 L<Filename::Compressed> 0.050
 
 =head3 L<Filename::Ebook> 0
 
@@ -3007,7 +3303,33 @@ dependencies.
 
 =head3 L<Filename::Media> 0.003
 
-=head3 L<Filename::Video> 0.004
+=head3 L<Filename::Media::Info> 0
+
+=head3 L<Filename::Perl::Release> 0
+
+=head3 L<Filename::Timestamp> 0
+
+=head3 L<Filename::Type::Archive> 0
+
+=head3 L<Filename::Type::Audio> 0
+
+=head3 L<Filename::Type::Backup> 0
+
+=head3 L<Filename::Type::Compressed> 0
+
+=head3 L<Filename::Type::Ebook> 0
+
+=head3 L<Filename::Type::Executable> 0
+
+=head3 L<Filename::Type::Image> 0
+
+=head3 L<Filename::Type::Media> 0
+
+=head3 L<Filename::Type::Perl::Release> 0
+
+=head3 L<Filename::Type::Video> 0
+
+=head3 L<Filename::Video> 0.005
 
 =head3 L<Filesys::Cap> 0
 
@@ -3119,7 +3441,27 @@ dependencies.
 
 =head3 L<Git::Bunch> 0.627
 
+=head3 L<Git::Grouper> 0
+
+=head3 L<Graphics::ColorNames::FamousLogo> 0
+
+=head3 L<Graphics::ColorNames::FoodColor> 0
+
 =head3 L<Graphics::ColorNames::HTML_ID> 0
+
+=head3 L<Graphics::ColorNamesCMYK> 0
+
+=head3 L<Graphics::ColorNamesCMYK::All> 0
+
+=head3 L<Graphics::ColorNamesCMYK::BannersCom> 0
+
+=head3 L<Graphics::ColorNamesCMYK::JohnDecemberCom> 0
+
+=head3 L<Graphics::ColorNamesCMYK::Pantone> 0
+
+=head3 L<Graphics::ColorNamesCMYK::ToutesLesCouleursCom> 0
+
+=head3 L<Graphics::ColorNamesLite> 0
 
 =head3 L<Graphics::ColorNamesLite::All> 0
 
@@ -3185,6 +3527,8 @@ dependencies.
 
 =head3 L<Hash::DefHash::Normalize> 0
 
+=head3 L<Hash::Iter> 0
+
 =head3 L<Hash::Key::Quote> 0
 
 =head3 L<Hash::Subset> 0.007
@@ -3193,7 +3537,21 @@ dependencies.
 
 =head3 L<HashData> 0
 
+=head3 L<HashData::Color::CMYK::JohnDecemberCom> 0
+
+=head3 L<HashData::Color::CMYK::ToutesLesCouleursCom> 0
+
+=head3 L<HashData::Color::PantoneToCMYK> 0
+
+=head3 L<HashData::ColorCode::CMYK::JohnDecemberCom> 0
+
+=head3 L<HashData::ColorCode::CMYK::Pantone> 0
+
+=head3 L<HashData::ColorCode::CMYK::ToutesLesCouleursCom> 0
+
 =head3 L<HashDataBundle::CPAN> 0
+
+=head3 L<HashDataBundle::Display::Resolution> 0
 
 =head3 L<HashDataRoles::Standard> 0
 
@@ -3224,6 +3582,8 @@ dependencies.
 =head3 L<ISBN::SearchByTitle> 0
 
 =head3 L<IntRange::Iter> 0.003
+
+=head3 L<Interpreter::Info> 0
 
 =head3 L<JSON::Color> 0
 
@@ -3291,9 +3651,9 @@ dependencies.
 
 =head3 L<List::Util::ArrayRef::PP> 0
 
-=head3 L<List::Util::Find> 0
+=head3 L<List::Util::Find> 0.004
 
-=head3 L<List::Util::Uniq> 0.005
+=head3 L<List::Util::Uniq> 0.008
 
 =head3 L<List::Util::groupby> 0
 
@@ -3405,6 +3765,8 @@ dependencies.
 
 =head3 L<Log::ger::Output::FileWriteRotate> 0
 
+=head3 L<Log::ger::Output::Journald> 0
+
 =head3 L<Log::ger::Output::LogAny> 0.003
 
 =head3 L<Log::ger::Output::LogDispatchOutput> 0.003
@@ -3463,6 +3825,8 @@ dependencies.
 
 =head3 L<Math::Image::CalcResized> 0.004
 
+=head3 L<Math::Random::LogUniform> 0
+
 =head3 L<Math::ScientificNotation::Util> 0
 
 =head3 L<Media::Info> 0.131
@@ -3481,6 +3845,8 @@ dependencies.
 
 =head3 L<Module::CPANfile::FromDistINI> 0
 
+=head3 L<Module::CheckLatestVersion> 0.002
+
 =head3 L<Module::CheckVersion> 0
 
 =head3 L<Module::CoreList::List> 0
@@ -3497,7 +3863,11 @@ dependencies.
 
 =head3 L<Module::Features::Dummy> 0
 
+=head3 L<Module::Features::PasswordManager> 0
+
 =head3 L<Module::Features::PerlTrove> 0
+
+=head3 L<Module::Features::PluginSystem> 0
 
 =head3 L<Module::Features::PythonTrove> 0
 
@@ -3531,17 +3901,19 @@ dependencies.
 
 =head3 L<Module::Load::In::INIT> 0.004
 
-=head3 L<Module::Load::Util> 0.009
+=head3 L<Module::Load::Util> 0.011
 
 =head3 L<Module::Loadable> 0
 
-=head3 L<Module::Patch> 0.276
+=head3 L<Module::Patch> 0.277
 
 =head3 L<Module::Path::More> 0.32
 
 =head3 L<Module::Path::More::Patch::Hide> 0
 
 =head3 L<Module::Path::Patch::Hide> 0
+
+=head3 L<Module::Pluggable::_ModuleFeatures> 0
 
 =head3 L<Module::Release::Select> 0
 
@@ -3567,7 +3939,7 @@ dependencies.
 
 =head3 L<Number::Format::BigFloat> 0
 
-=head3 L<Number::Format::Metric> 0
+=head3 L<Number::Format::Metric> 0.603
 
 =head3 L<Number::Pad> 0
 
@@ -3598,6 +3970,8 @@ dependencies.
 =head3 L<Org::To::Text> 0.050
 
 =head3 L<Org::To::VCF> 0
+
+=head3 L<OrgINI> 0
 
 =head3 L<PERLANCAR::AppUtil::PerlStripper> 0
 
@@ -3751,7 +4125,7 @@ dependencies.
 
 =head3 L<Perinci::CmdLine::Util> 0.13
 
-=head3 L<Perinci::CmdLine::Util::Config> 1.725
+=head3 L<Perinci::CmdLine::Util::Config> 1.727
 
 =head3 L<Perinci::CmdLine::cryp> 0.006
 
@@ -3971,11 +4345,15 @@ dependencies.
 
 =head3 L<Permute::Named::Iter> 0
 
+=head3 L<Permute::Unnamed::Iter> 0
+
 =head3 L<Pipe::Find> 0
 
 =head3 L<Plack::App::dbi2http> 0
 
 =head3 L<Plugin::System> 0
+
+=head3 L<Plugin::System::_ModuleFeatures> 0
 
 =head3 L<Pod::Cookbook> 0
 
@@ -4019,6 +4397,8 @@ dependencies.
 
 =head3 L<Pod::Weaver::Plugin::Run> 0
 
+=head3 L<Pod::Weaver::Plugin::Sah::SchemaBundle> 0
+
 =head3 L<Pod::Weaver::Plugin::Sah::Schemas> 0
 
 =head3 L<Pod::Weaver::Plugin::ScriptX> 0
@@ -4038,6 +4418,8 @@ dependencies.
 =head3 L<Pod::Weaver::PluginBundle::Author::PERLANCAR> 0
 
 =head3 L<Pod::Weaver::PluginBundle::Author::PERLANCAR::NoRinci> 0
+
+=head3 L<Pod::Weaver::PluginBundle::Author::PERLANCAR::NoRinciAllowDupeSections> 0
 
 =head3 L<Pod::Weaver::Role::AddTextToSection> 0.06
 
@@ -4101,6 +4483,10 @@ dependencies.
 
 =head3 L<Progress::Any::Output::TermSpin> 0
 
+=head3 L<Progress::Any::SIGHandler> 0
+
+=head3 L<QRCode::Any> 0.002
+
 =head3 L<RSS::From::Forum::vBulletin> 0
 
 =head3 L<RSS::From::Twitter> 0
@@ -4161,6 +4547,28 @@ dependencies.
 
 =head3 L<Regexp::Pattern::Filename::Media::WhatsApp> 0
 
+=head3 L<Regexp::Pattern::Filename::Type::Archive> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Audio> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Backup> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Compressed> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Ebook> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Image> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Image::WhatsApp> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Media> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Media::WhatsApp> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Video> 0
+
+=head3 L<Regexp::Pattern::Filename::Type::Video::WhatsApp> 0
+
 =head3 L<Regexp::Pattern::Filename::Video> 0
 
 =head3 L<Regexp::Pattern::Filename::Video::WhatsApp> 0
@@ -4168,6 +4576,8 @@ dependencies.
 =head3 L<Regexp::Pattern::Float> 0
 
 =head3 L<Regexp::Pattern::Git> 0.002
+
+=head3 L<Regexp::Pattern::Instagram> 0
 
 =head3 L<Regexp::Pattern::Int> 0
 
@@ -4257,6 +4667,8 @@ dependencies.
 
 =head3 L<RoleBundle::TinyCommons::Tree> 0
 
+=head3 L<RowFunc> 0
+
 =head3 L<SExpression::Decode::Marpa> 0
 
 =head3 L<SPVM::Examples> 0.004
@@ -4283,11 +4695,89 @@ dependencies.
 
 =head3 L<Sah::PSchema> 0
 
+=head3 L<Sah::PSchemaBundle> 0
+
+=head3 L<Sah::PSchemaBundle::Array> 0
+
+=head3 L<Sah::PSchemaBundle::Perl> 0
+
+=head3 L<Sah::PSchemaBundle::Re> 0
+
 =head3 L<Sah::PSchemas> 0
 
 =head3 L<Sah::PSchemas::Perl> 0
 
 =head3 L<Sah::PSchemas::Re> 0
+
+=head3 L<Sah::SchemaBundle> 0
+
+=head3 L<Sah::SchemaBundle::Array> 0
+
+=head3 L<Sah::SchemaBundle::ArrayData> 0
+
+=head3 L<Sah::SchemaBundle::Binary> 0
+
+=head3 L<Sah::SchemaBundle::Bool> 0
+
+=head3 L<Sah::SchemaBundle::BorderStyle> 0
+
+=head3 L<Sah::SchemaBundle::Business::ID::BCA> 0
+
+=head3 L<Sah::SchemaBundle::Business::ID::Mandiri> 0
+
+=head3 L<Sah::SchemaBundle::Business::ID::NIK> 0
+
+=head3 L<Sah::SchemaBundle::Business::ID::NKK> 0
+
+=head3 L<Sah::SchemaBundle::Business::ID::NOPPBB> 0
+
+=head3 L<Sah::SchemaBundle::Business::ID::NPWP> 0
+
+=head3 L<Sah::SchemaBundle::Business::ID::SIM> 0
+
+=head3 L<Sah::SchemaBundle::CPAN> 0
+
+=head3 L<Sah::SchemaBundle::CellFunc> 0
+
+=head3 L<Sah::SchemaBundle::Chrome> 0
+
+=head3 L<Sah::SchemaBundle::Code> 0
+
+=head3 L<Sah::SchemaBundle::Collection> 0
+
+=head3 L<Sah::SchemaBundle::Color> 0
+
+=head3 L<Sah::SchemaBundle::ColorScheme> 0
+
+=head3 L<Sah::SchemaBundle::ColorTheme> 0
+
+=head3 L<Sah::SchemaBundle::Comparer> 0
+
+=head3 L<Sah::SchemaBundle::Country> 0
+
+=head3 L<Sah::SchemaBundle::Currency> 0
+
+=head3 L<Sah::SchemaBundle::DBI> 0
+
+=head3 L<Sah::SchemaBundle::DNS> 0
+
+=head3 L<Sah::SchemaBundle::Data::Sah> 0
+
+=head3 L<Sah::SchemaBundle::DataSizeSpeed> 0
+
+=head3 L<Sah::SchemaBundle::Identifier> 0
+
+=head3 L<Sah::SchemaBundle::Nutrient> 0
+
+=head3 L<Sah::SchemaBundle::Path> 0
+
+=head3 L<Sah::SchemaBundle::Perl> 0
+
+=head3 L<Sah::SchemaBundle::SortKey> 0
+
+=head3 L<Sah::SchemaBundle::Sorter> 0
+
+=head3 L<Sah::SchemaBundle::Unix> 0
 
 =head3 L<Sah::Schemas> 0
 
@@ -4304,6 +4794,20 @@ dependencies.
 =head3 L<Sah::Schemas::Bool> 0
 
 =head3 L<Sah::Schemas::BorderStyle> 0
+
+=head3 L<Sah::Schemas::Business::ID::BCA> 0
+
+=head3 L<Sah::Schemas::Business::ID::Mandiri> 0
+
+=head3 L<Sah::Schemas::Business::ID::NIK> 0
+
+=head3 L<Sah::Schemas::Business::ID::NKK> 0
+
+=head3 L<Sah::Schemas::Business::ID::NOPPBB> 0
+
+=head3 L<Sah::Schemas::Business::ID::NPWP> 0
+
+=head3 L<Sah::Schemas::Business::ID::SIM> 0
 
 =head3 L<Sah::Schemas::CPAN> 0
 
@@ -4322,6 +4826,8 @@ dependencies.
 =head3 L<Sah::Schemas::Color> 0
 
 =head3 L<Sah::Schemas::ColorTheme> 0
+
+=head3 L<Sah::Schemas::Comparer> 0
 
 =head3 L<Sah::Schemas::Country> 0
 
@@ -4363,6 +4869,8 @@ dependencies.
 
 =head3 L<Sah::Schemas::GraphicsColorNames> 0
 
+=head3 L<Sah::Schemas::HashData> 0
+
 =head3 L<Sah::Schemas::ISBN> 0
 
 =head3 L<Sah::Schemas::Int> 0
@@ -4401,7 +4909,11 @@ dependencies.
 
 =head3 L<Sah::Schemas::Software> 0
 
+=head3 L<Sah::Schemas::SortKey> 0
+
 =head3 L<Sah::Schemas::SortSub> 0
+
+=head3 L<Sah::Schemas::Sorter> 0
 
 =head3 L<Sah::Schemas::Str> 0
 
@@ -4437,7 +4949,7 @@ dependencies.
 
 =head3 L<Set::IntSpan::Util> 0
 
-=head3 L<Set::Streak> 0
+=head3 L<Set::Streak> 0.004
 
 =head3 L<Setup> 0
 
@@ -4491,7 +5003,11 @@ dependencies.
 
 =head3 L<Software::Release::Watch> 0
 
+=head3 L<Sort::BySimilarity> 0.002
+
 =head3 L<Sort::BySpec> 0.03
+
+=head3 L<Sort::Key::SortKey> 0
 
 =head3 L<Sort::Sub> 0.120
 
@@ -4503,19 +5019,77 @@ dependencies.
 
 =head3 L<Sort::Sub::by_several> 0
 
+=head3 L<Sort::Sub::by_sortexample> 0
+
 =head3 L<Sort::Sub::by_spec> 0
 
 =head3 L<Sort::Sub::data_struct_by_data_cmp> 0
 
 =head3 L<Sort::Sub::filevercmp> 0
 
+=head3 L<Sort::SubBundle::BySimilarity> 0
+
+=head3 L<Sort::SubBundle::DefHash> 0
+
 =head3 L<Sort::SubBundle::PERLANCAR> 0
 
+=head3 L<Sort::SubBundle::Rinci> 0
+
+=head3 L<Sort::SubBundle::Sah> 0
+
 =head3 L<Sort::SubList> 0
+
+=head3 L<SortExample> 0
+
+=head3 L<SortExample::Color::Rainbow::EN> 0
+
+=head3 L<SortExample::Letter::ByFrequency::ID> 0
+
+=head3 L<SortExample::Letter::ByScrabbleScore> 0
+
+=head3 L<SortKey> 0.2.0
+
+=head3 L<SortKey::Num::by_length> 0
+
+=head3 L<SortKey::Num::file_mtime> 0
+
+=head3 L<SortKey::Num::file_num_links> 0
+
+=head3 L<SortKey::Num::file_size> 0
+
+=head3 L<SortKey::Num::length> 0
+
+=head3 L<SortKey::Num::pattern_count> 0
+
+=head3 L<SortKey::Num::similarity> 0
+
+=head3 L<SortKey::Num::similarity_jaccard> 0
+
+=head3 L<SortKey::date_in_text> 0
+
+=head3 L<SortSpec> 0
+
+=head3 L<SortSpec::Perl::CPAN::ChangesGroup::PERLANCAR> 0
+
+=head3 L<Sorter> 0
+
+=head3 L<Sorter::by_similarity> 0
+
+=head3 L<Sorter::file_by_mtime> 0
+
+=head3 L<Sorter::file_by_num_links> 0
+
+=head3 L<Sorter::file_by_size> 0
+
+=head3 L<Sorter::from_comparer> 0
+
+=head3 L<Sorter::from_sortkey> 0
 
 =head3 L<Spreadsheet::Examples> 0
 
 =head3 L<Spreadsheet::Open> 0
+
+=head3 L<Str::Iter> 0
 
 =head3 L<String::CommonPrefix> 0
 
@@ -4527,11 +5101,13 @@ dependencies.
 
 =head3 L<String::Elide::Tiny> 0
 
+=head3 L<String::FillCharTemplate> 0
+
 =head3 L<String::Flogger::Patch::UseDataDmp> 0
 
 =head3 L<String::Flogger::Patch::UseDataDump> 0
 
-=head3 L<String::Indent> 0
+=head3 L<String::Indent> 0.040
 
 =head3 L<String::JS> 0
 
@@ -4551,7 +5127,7 @@ dependencies.
 
 =head3 L<String::Trim::NonRegex> 0
 
-=head3 L<String::Util::Match> 0
+=head3 L<String::Util::Match> 0.004
 
 =head3 L<String::Util::Range> 0.002
 
@@ -4585,9 +5161,19 @@ dependencies.
 
 =head3 L<TableData::Acme::CPANModules> 0
 
+=head3 L<TableData::Business::ID::BPOM::FoodAdditive> 0
+
+=head3 L<TableData::Business::ID::BPOM::NutritionLabelRef> 0
+
+=head3 L<TableData::Business::ID::KAN::Client::Lab::Testing> 0
+
 =head3 L<TableData::Calendar::Date::Holiday::ID> 0
 
+=head3 L<TableData::Health::Nutrient> 0.006
+
 =head3 L<TableData::Locale::US::State> 0
+
+=head3 L<TableData::Perl::CPAN::Release::Dynamic> 0
 
 =head3 L<TableData::Perl::CPAN::Release::Static::2022> 0
 
@@ -4601,6 +5187,8 @@ dependencies.
 
 =head3 L<TableData::Size::Mattress> 0
 
+=head3 L<TableData::WordList> 0
+
 =head3 L<TableDataBundle::Business::ID::BBIA> 0
 
 =head3 L<TableDataBundle::Business::ID::BPOM> 0
@@ -4612,6 +5200,12 @@ dependencies.
 =head3 L<TableDataBundle::Lingua::Word::EN::Adjective> 0
 
 =head3 L<TableDataBundle::Lingua::Word::EN::Adverb> 0
+
+=head3 L<TableDataBundle::Lingua::Word::EN::ByClass::Adjective> 0
+
+=head3 L<TableDataBundle::Lingua::Word::EN::ByClass::Adverb> 0
+
+=head3 L<TableDataBundle::Lingua::Word::EN::ByClass::Noun> 0
 
 =head3 L<TableDataBundle::Lingua::Word::EN::Noun> 0
 
@@ -4626,6 +5220,10 @@ dependencies.
 =head3 L<TableDataBundle::Software::License> 0
 
 =head3 L<TableDataBundle::Test> 0
+
+=head3 L<TableDataRole::Source::DBI> 0
+
+=head3 L<TableDataRole::Source::SQLite> 0
 
 =head3 L<TableDataRole::Spec::TableDef> 0
 
@@ -4697,7 +5295,7 @@ dependencies.
 
 =head3 L<Text::CSV_XS::TSV> 0
 
-=head3 L<Text::Chart> 0
+=head3 L<Text::Chart> 0.042
 
 =head3 L<Text::Column::Util> 0
 
@@ -4710,6 +5308,8 @@ dependencies.
 =head3 L<Text::Head> 0
 
 =head3 L<Text::NonWideChar::Util> 0
+
+=head3 L<Text::Safer> 0.003
 
 =head3 L<Text::Sprintf::Length> 0
 
@@ -4737,6 +5337,8 @@ dependencies.
 
 =head3 L<Text::Table::TickitWidget> 0
 
+=head3 L<Text::Table::Tiny::_ModuleFeatures> 0
+
 =head3 L<Text::Table::TinyBorderStyle> 0
 
 =head3 L<Text::Table::TinyColor> 0
@@ -4757,6 +5359,8 @@ dependencies.
 
 =head3 L<TextDoc::Examples> 0
 
+=head3 L<Tie::Array::ArrayData> 0
+
 =head3 L<Tie::Array::Expire> 0
 
 =head3 L<Tie::Array::File::LazyRead> 0
@@ -4764,6 +5368,10 @@ dependencies.
 =head3 L<Tie::Array::IntSpan> 0
 
 =head3 L<Tie::Array::Log> 0
+
+=head3 L<Tie::Array::NoOp> 0
+
+=head3 L<Tie::Array::TableData> 0
 
 =head3 L<Tie::FileHandle::Log> 0
 
@@ -4777,7 +5385,13 @@ dependencies.
 
 =head3 L<Tie::Handle::TailSwitch> 0
 
+=head3 L<Tie::Hash::HashData> 0
+
 =head3 L<Tie::Hash::Log> 0
+
+=head3 L<Tie::Hash::NoOp> 0
+
+=head3 L<Tie::Scalar::NoOp> 0
 
 =head3 L<Time::Duration::Parse::AsHash> 0
 
@@ -4822,6 +5436,8 @@ dependencies.
 =head3 L<URI::Escape::Path> 0
 
 =head3 L<URI::Info> 0
+
+=head3 L<URI::Parse::Instagram> 0
 
 =head3 L<UUID::Random::PERLANCAR> 0.005
 
@@ -4965,6 +5581,16 @@ dependencies.
 
 =head3 L<WordList::ID::KBBI> 0
 
+=head3 L<WordList::ID::KBBI::ByClass::Adjective> 0
+
+=head3 L<WordList::ID::KBBI::ByClass::Adverb> 0
+
+=head3 L<WordList::ID::KBBI::ByClass::Noun> 0
+
+=head3 L<WordList::ID::KBBI::FigureOfSpeech> 0
+
+=head3 L<WordList::ID::KBBI::Proverb> 0
+
 =head3 L<WordList::ID::Wordle> 0
 
 =head3 L<WordList::IT::BIP39> 0
@@ -5043,6 +5669,16 @@ dependencies.
 
 =head3 L<WordListBase::MetaSyntactic> 0
 
+=head3 L<WordListBundle::EN::ByCategory> 0
+
+=head3 L<WordListBundle::EN::ByClass::Adjective> 0
+
+=head3 L<WordListBundle::EN::ByClass::Adverb> 0
+
+=head3 L<WordListBundle::EN::ByClass::Noun> 0
+
+=head3 L<WordListBundle::ID::ByCategory> 0
+
 =head3 L<WordListRole::BinarySearch> 0
 
 =head3 L<WordListRole::Bloom> 0.006
@@ -5111,6 +5747,8 @@ dependencies.
 
 =head3 L<tainting> 0
 
+=head3 L<this_mod> 0
+
 =head3 L<version::dev> 0
 
 =head1 AUTHOR
@@ -5119,7 +5757,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

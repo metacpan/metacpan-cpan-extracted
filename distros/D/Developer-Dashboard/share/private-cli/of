@@ -36,30 +36,48 @@ installing a generic executable into the user's global PATH.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard of command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes C<dashboard of>, the short name for the dashboard
+open-file command. It is the shell-facing entrypoint for direct file opens,
+scoped regex search, Perl module lookup, Java dotted class lookup, and the
+print-vs-editor decision that happens after resolution.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because file lookup is a frequent interactive task and should stay
+fast to type, but the public switchboard still needs to stay thin. The helper
+lets users type C<dashboard of ...> while the heavy search and ranking rules
+stay in C<Developer::Dashboard::CLI::OpenFile>.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the short-form CLI contract for open-file behavior,
+the staged-helper handoff, or the exact examples contributors see when they
+look up how C<dashboard of> behaves.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard of>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/of> after helper staging.
+Users run C<dashboard of [--print] [--line N] [--editor CMD] E<lt>file|scopeE<gt>
+[pattern ...]>. Direct paths and C<file:line> arguments resolve immediately.
+In scoped mode the first positional argument is the search root or saved alias,
+and every extra positional argument is a case-insensitive regex that must match
+the candidate path. One hit opens or prints that file; multiple hits are
+listed. Perl module names such as C<Developer::Dashboard::CLI::Paths> resolve
+through C<@INC>, and Java class names such as C<javax.jws.WebService> resolve
+through source trees, source archives, or cached Maven source jars.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/of>.
+It is used by developers jumping to source files from the shell, by open-file
+regression tests, and by docs that explain scoped regex lookup, Perl module
+resolution, Java source lookup, and print-vs-editor behavior.
 
 =head1 EXAMPLES
 
-  dashboard of
-
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/of>.
+  dashboard of lib 'OpenFile\.pm$'
+  dashboard of . "Ok\.js$"
+  dashboard of Developer::Dashboard::CLI::Paths
+  dashboard of javax.jws.WebService
+  dashboard of --print bookmarks api-dashboard
 
 =for comment FULL-POD-DOC END
 

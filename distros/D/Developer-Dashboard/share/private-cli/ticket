@@ -36,30 +36,43 @@ installing a generic executable into the user's global PATH.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard ticket command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes C<dashboard ticket>, the command that creates or
+reuses a tmux session for a ticket and then attaches the terminal to it. It is
+the shell-facing entrypoint for the ticket-session workflow.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because ticket-session behavior is a built-in convenience feature,
+but the public switchboard should stay thin while the ticket module owns tmux
+session naming, environment seeding, and create-vs-attach logic.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the C<dashboard ticket> CLI contract, the staged
+helper handoff, or the examples contributors use to understand explicit ticket
+selection and C<TICKET_REF> fallback.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard ticket>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/ticket> after helper staging.
+Users run C<dashboard ticket E<lt>ticket-refE<gt>> or set C<TICKET_REF> and run
+C<dashboard ticket>. The staged helper forwards the request into the private
+runtime, which loads C<Developer::Dashboard::CLI::Ticket>, resolves the ticket
+name, seeds C<TICKET_REF>, C<B>, and C<OB> in the tmux session environment,
+creates a detached C<Code1> window when the session does not exist yet, and
+then attaches to that session.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/ticket>.
+It is used by ticket-session workflows in the shell, by prompt integrations
+that rely on consistent ticket environment variables, and by ticket regression
+tests that verify explicit ticket selection and environment fallback.
 
 =head1 EXAMPLES
 
   dashboard ticket
-
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/ticket>.
+  dashboard ticket DD-123
+  TICKET_REF=DD-123 dashboard ticket
+  dashboard ticket feature-branch-42
 
 =for comment FULL-POD-DOC END
 

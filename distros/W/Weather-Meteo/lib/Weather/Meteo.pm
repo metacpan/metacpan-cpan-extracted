@@ -7,11 +7,17 @@ use Carp;
 use CHI;
 use JSON::MaybeXS;
 use LWP::UserAgent;
+use Object::Configure;
+use Params::Get 0.13;
+use Params::Validate::Strict;
+use Return::Set;
 use Scalar::Util;
 use Time::HiRes;
 use URI;
 
 use constant FIRST_YEAR => 1940;
+use constant EXPIRES_IN => '1 hour';
+use constant MIN_INTERVAL => 0;	# default: no rate-limiting delay
 
 =head1 NAME
 
@@ -19,11 +25,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -107,41 +113,49 @@ If not provided, a default user agent is created.
 
 =back
 
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting C<$ENV{'WEATHER__METEO__carp_on_warn'}> causes warnings to use L<Carp>.
+For more information about runtime configuration,
+see L<Object::Configure>.
+
 =cut
 
 sub new {
 	my $class = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, \@_) || {};
 
 	if(!defined($class)) {
 		# Weather::Meteo::new() used rather than Weather::Meteo->new()
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	my $ua = $args{ua};
+	$params = Object::Configure::configure($class, $params);
+
+	my $ua = $params->{ua};
 	if(!defined($ua)) {
 		$ua = LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 		$ua->default_header(accept_encoding => 'gzip,deflate');
 	}
-	my $host = $args{host} || 'archive-api.open-meteo.com';
+	my $host = $params->{host} || 'archive-api.open-meteo.com';
 
 	# Set up caching (default to an in-memory cache if none provided)
-	my $cache = $args{cache} || CHI->new(
+	my $cache = $params->{cache} || CHI->new(
 		driver => 'Memory',
 		global => 1,
-		expires_in => '1 day',
+		expires_in => EXPIRES_IN,
 	);
 
 	# Set up rate-limiting: minimum interval between requests (in seconds)
-	my $min_interval = $args{min_interval} || 0;	# default: no delay
+	my $min_interval = $params->{min_interval} || MIN_INTERVAL;
 
 	return bless {
 		min_interval => $min_interval,
 		last_request => 0,	# Initialize last_request timestamp
-		%args,
+		%{$params},
 		cache => $cache,
 		host => $host,
 		ua => $ua
@@ -176,31 +190,26 @@ If all else fails, the module falls back to Europe/London.
 sub weather
 {
 	my $self = shift;
-	my %param;
+	my $params;
 
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
-	} elsif((scalar(@_) == 2) && Scalar::Util::blessed($_[0]) && ($_[0]->can('latitude'))) {
+	if((scalar(@_) == 2) && Scalar::Util::blessed($_[0]) && ($_[0]->can('latitude'))) {
 		# Two arguments - a location object and a date
 		my $location = $_[0];
-		$param{latitude} = $location->latitude();
-		$param{longitude} = $location->longitude();
-		$param{'date'} = $_[1];
+		$params->{latitude} = $location->latitude();
+		$params->{longitude} = $location->longitude();
+		$params->{'date'} = $_[1];
 		if($_[0]->can('tz') && $ENV{'TIMEZONEDB_KEY'}) {
-			$param{'tz'} = $_[0]->tz();
+			$params->{'tz'} = $_[0]->tz();
 		}
-	} elsif(ref($_[0])) {
-		Carp::croak('Usage: weather(latitude => $latitude, longitude => $longitude, date => "YYYY-MM-DD" [ , tz = $tz ])');
-		return;
-	} elsif((@_ % 2) == 0) {
-		%param = @_;
+	} else {
+		$params = Params::Get::get_params(undef, \@_);
 	}
 
-	my $latitude = $param{latitude};
-	my $longitude = $param{longitude};
-	my $location = $param{'location'};
-	my $date = $param{'date'};
-	my $tz = $param{'tz'} || 'Europe/London';
+	my $latitude = $params->{latitude};
+	my $longitude = $params->{longitude};
+	my $location = $params->{'location'};
+	my $date = $params->{'date'};
+	my $tz = $params->{'tz'} || 'Europe/London';
 
 	if((!defined($latitude)) && defined($location) &&
 	   Scalar::Util::blessed($location) && $location->can('latitude')) {
@@ -208,6 +217,9 @@ sub weather
 		$longitude = $location->longitude();
 	}
 	if((!defined($latitude)) || (!defined($longitude)) || (!defined($date))) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->error('Usage: weather(latitude => $latitude, longitude => $longitude, date => "YYYY-MM-DD")');
+		}
 		Carp::croak('Usage: weather(latitude => $latitude, longitude => $longitude, date => "YYYY-MM-DD")');
 		return;
 	}
@@ -227,6 +239,9 @@ sub weather
 	}
 
 	if(($latitude !~ /^-?\d+(\.\d+)?$/) || ($longitude !~ /^-?\d+(\.\d+)?$/)) {
+		if(my $logger = $self->{'logger'}) {
+			$self->error(__PACKAGE__ . ": Invalid latitude/longitude format ($latitude, $longitude)");
+		}
 		Carp::croak(__PACKAGE__, ": Invalid latitude/longitude format ($latitude, $longitude)");
 	}
 
@@ -240,6 +255,9 @@ sub weather
 	}
 
 	unless($date =~ /^\d{4}-\d{2}-\d{2}$/) {
+		if(my $logger = $self->{'logger'}) {
+			$self->error('Invalid date format. Expected YYYY-MM-DD');
+		}
 		croak('Invalid date format. Expected YYYY-MM-DD');
 	}
 
@@ -302,7 +320,7 @@ sub weather
 			# Cache the result before returning it
 			$self->{'cache'}->set($cache_key, $rc);
 
-			return $rc;	# No support for list context, yet
+			return Return::Set::set_return($rc, { type => 'hashref', min => 1 });	# No support for list context, yet
 		}
 	}
 
@@ -312,8 +330,8 @@ sub weather
 
 =head2 ua
 
-Accessor method to get and set UserAgent object used internally. You
-can call I<env_proxy> for example, to get the proxy information from
+Accessor method to get and set UserAgent object used internally.
+You can call I<env_proxy> for example, to get the proxy information from
 environment variables:
 
     $meteo->ua()->env_proxy(1);
@@ -332,14 +350,23 @@ sub ua {
 	my $self = shift;
 
 	if (@_) {
-		$self->{ua} = shift;
+		my $params = Params::Validate::Strict::validate_strict({
+			args => Params::Get::get_params('ua', @_),
+			schema => {
+				ua => {
+					type => 'object',
+					can => 'get'
+				}
+			}
+		});
+		$self->{ua} = $params->{ua};
 	}
-	return $self->{ua}
+	return $self->{ua};
 }
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh@bandsman.co.uk> >>
+Nigel Horne, C<< <njh@nigelhorne.com> >>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -347,8 +374,6 @@ it under the same terms as Perl itself.
 Lots of thanks to the folks at L<https://open-meteo.com>.
 
 =head1 BUGS
-
-This module is provided as-is without any warranty.
 
 Please report any bugs or feature requests to C<bug-weather-meteo at rt.cpan.org>,
 or through the web interface at
@@ -358,9 +383,19 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-Open Meteo API: L<https://open-meteo.com/en/docs#api_form>
+=over 4
+
+=item * L<Test Dashboard|https://nigelhorne.github.io/Weather-Meteo/coverage/>
+
+=item * Open Meteo API: L<https://open-meteo.com/en/docs#api_form>
+
+=item * L<Object::Configure>
+
+=back
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
@@ -394,7 +429,7 @@ L<http://deps.cpantesters.org/?module=Weather-Meteo>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023-2025 Nigel Horne.
+Copyright 2023-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

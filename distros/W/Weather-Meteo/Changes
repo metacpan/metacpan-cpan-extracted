@@ -1,8 +1,14 @@
 Revision history for Weather::Meteo
 
+0.13	Thu Apr  9 07:48:29 EDT 2026
+	Use Object::Configure to allow runtime configuration
+	Remove magic numbers
+	Added test dashboard
+	Validate the argument given to ua()
+
 0.12	Mon Feb 24 07:44:44 EST 2025
 	Corrected the documentation for tz
-	Handle "0.25" as a co-ordinate
+	Handle "-0.25" as a co-ordinate
 
 0.11	Fri Feb 14 08:11:25 EST 2025
 	More useful error message

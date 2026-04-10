@@ -1,5 +1,10 @@
 Revision history for Museum-Rijksmuseum-Object
 
+0.05    2026-04-10
+        Remove the stuff regarding the (no longer required) key parameter.
+        Fix an issue with the way resumption tokens are now presented in the response
+0.04    2026-04-09
+        Update to handle new Rijksmuseum API endpoint
 0.03    2023-02-08
         Fix unicode handling in JSON decoding
 0.02    2023-03-08

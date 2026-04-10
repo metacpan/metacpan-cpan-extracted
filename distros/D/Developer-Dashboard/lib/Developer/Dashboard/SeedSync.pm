@@ -3,7 +3,7 @@ package Developer::Dashboard::SeedSync;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Digest::MD5 qw(md5_hex);
 use Encode qw(encode_utf8);
@@ -77,46 +77,50 @@ files need to be rewritten.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file provides reusable
-MD5-based content comparison helpers for runtime seed files and staged helper
-scripts. Open this file when you need the implementation, regression
-coverage, or runtime entrypoint for that responsibility rather than guessing
-which part of the tree owns it.
+This module provides the MD5-based content comparison helpers used when the dashboard stages private helpers and seeds starter pages. It answers the question “did the shipped managed content actually change?” without relying on external checksum tools.
 
 =head1 WHY IT EXISTS
 
-It exists so C<dashboard init> and related bootstrap paths can skip copying
-identical managed files without relying on shell commands or external md5
-tools. Keeping the digest logic in Perl makes the copy contract portable,
-testable, and explicit.
+It exists because seed refresh and helper staging have to distinguish unchanged managed files from files that need a rewrite. Putting that digest logic in one module keeps the non-destructive bootstrap contract portable and testable.
 
 =head1 WHEN TO USE
 
-Use this file when you are deciding whether a dashboard-managed helper,
-seeded bookmark, or another shipped runtime file actually changed before
-rewriting it.
+Use this file when changing how managed seed files are compared, when adding a new dashboard-managed asset type, or when diagnosing why init/bootstrap did or did not refresh a managed runtime file.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::SeedSync> and call
-C<content_md5>, C<same_content_md5>, or C<file_matches_content_md5>.
-Use those helpers before rewriting a managed runtime file so identical files
-can be skipped cleanly.
+Call C<content_md5>, C<same_content_md5>, or C<file_matches_content_md5> before rewriting a managed file. The helpers accept either in-memory strings or an on-disk file path, so callers do not need shelling-out checksum code.
 
 =head1 WHAT USES IT
 
-This file is used by the private helper staging path, the seeded bookmark
-bootstrap/update flow, and the focused regression tests under C<t/>.
+It is used by helper staging, seeded-page refresh logic, historical managed-digest bridges, and tests that verify non-destructive managed file updates.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::SeedSync -e '
-    print Developer::Dashboard::SeedSync::same_content_md5("a\n", "a\n") ? "same\n" : "different\n";
-  '
+Example 1:
 
-  perl -Ilib -MDeveloper::Dashboard::SeedSync -e '
-    print Developer::Dashboard::SeedSync::content_md5("api-dashboard\n"), "\n";
-  '
+  perl -Ilib -MDeveloper::Dashboard::SeedSync -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/04-update-manager.t t/26-sql-dashboard.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

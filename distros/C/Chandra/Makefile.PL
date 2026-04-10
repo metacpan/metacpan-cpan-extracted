@@ -93,7 +93,7 @@ WriteMakefile(
         'Cpanel::JSON::XS' => 0,
         'IO::Socket::UNIX' => 0,
         'IO::Select'       => 0,
-        'File::Raw'        => 0,
+        'File::Raw'        => '0.08',
     },
     TEST_REQUIRES     => {
         'Test::More' => 0,

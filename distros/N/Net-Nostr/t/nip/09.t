@@ -183,6 +183,15 @@ subtest 'add_event croaks without kind' => sub {
     ok(dies { $del->add_event($event1_id) }, 'croaks without kind');
 };
 
+subtest 'add_event rejects invalid event_id' => sub {
+    my $del = Net::Nostr::Deletion->new;
+    ok(dies { $del->add_event('not-hex', kind => 1) }, 'rejects non-hex');
+    ok(dies { $del->add_event('abcd1234', kind => 1) }, 'rejects too short');
+    ok(dies { $del->add_event('A' x 64, kind => 1) }, 'rejects uppercase');
+    ok(dies { $del->add_event('g' x 64, kind => 1) }, 'rejects non-hex chars');
+    like(dies { $del->add_event('xyz', kind => 1) }, qr/64-char lowercase hex/, 'error message');
+};
+
 subtest 'add_address croaks without kind' => sub {
     my $del = Net::Nostr::Deletion->new;
     ok(dies { $del->add_address("30023:${alice_pk}:test") }, 'croaks without kind');
@@ -460,6 +469,86 @@ subtest 'deletion of a deletion request has no effect' => sub {
 };
 
 ###############################################################################
+# applies_to checks a tags for replaceable events
+###############################################################################
+
+subtest 'applies_to matches replaceable events via a tag' => sub {
+    my $target = make_event(
+        pubkey => $alice_pk, kind => 10000, content => 'replaceable',
+        created_at => 1000,
+    );
+    my $del_event = make_event(
+        pubkey => $alice_pk, kind => 5, content => '',
+        tags => [['a', "10000:${alice_pk}:"], ['k', '10000']],
+        created_at => 2000,
+    );
+    my $del = Net::Nostr::Deletion->from_event($del_event);
+    ok($del->applies_to($target, $alice_pk), 'applies_to matches replaceable event via a tag');
+};
+
+subtest 'applies_to matches kind 0 replaceable via a tag' => sub {
+    my $target = make_event(
+        pubkey => $alice_pk, kind => 0, content => '{"name":"test"}',
+        created_at => 1000,
+    );
+    my $del_event = make_event(
+        pubkey => $alice_pk, kind => 5, content => '',
+        tags => [['a', "0:${alice_pk}:"], ['k', '0']],
+        created_at => 2000,
+    );
+    my $del = Net::Nostr::Deletion->from_event($del_event);
+    ok($del->applies_to($target, $alice_pk), 'applies_to matches kind 0 via a tag');
+};
+
+subtest 'relay deletes replaceable events via a tag' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $replaceable = make_event(
+        pubkey => $alice_pk, kind => 10000,
+        content => 'replaceable event', sig => 'a' x 128,
+        created_at => 1000,
+    );
+
+    my $del = Net::Nostr::Deletion->new;
+    $del->add_address("10000:${alice_pk}:", kind => 10000);
+    my $del_event = $del->to_event(pubkey => $alice_pk, sig => 'a' x 128, created_at => 2000);
+
+    my $client = Net::Nostr::Client->new;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+
+    my @events;
+    my $ok_count = 0;
+
+    $client->on(ok => sub {
+        $ok_count++;
+        if ($ok_count == 2) {
+            $client->subscribe('q', Net::Nostr::Filter->new(kinds => [10000], authors => [$alice_pk]));
+        }
+    });
+
+    $client->on(event => sub {
+        my ($sub_id, $event) = @_;
+        push @events, $event;
+    });
+
+    $client->on(eose => sub { $cv->send });
+
+    $client->connect("ws://127.0.0.1:$port");
+    $client->publish($replaceable);
+    $client->publish($del_event);
+
+    $cv->recv;
+
+    is(scalar @events, 0, 'replaceable event deleted via a tag');
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+###############################################################################
 # Helpers
 ###############################################################################
 
@@ -471,5 +560,13 @@ sub free_port {
     close $sock;
     return $port;
 }
+
+subtest 'new() rejects unknown arguments' => sub {
+    like(
+        dies { Net::Nostr::Deletion->new(reason => 'spam', bogus => 'value') },
+        qr/unknown.+bogus/i,
+        'unknown argument rejected'
+    );
+};
 
 done_testing;

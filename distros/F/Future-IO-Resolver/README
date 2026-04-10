@@ -26,11 +26,12 @@ DESCRIPTION
 
  Implementation Details
 
-    Currently this module uses Net::LibAsyncNS to offload the name resolver
-    operations asynchronously. This limits its abilities, and also means it
-    relies on having that library available. A later version of this module
-    should expand on this, offering possibly multiple different resolver
-    backends for more flexibility and portability.
+    This module can optionally use Net::LibAsyncNS to offload the name
+    resolver operations asynchronously. If this is unavailable, it will
+    instead use the regular resolver functions found in Socket, made
+    asynchronous by calling those functions from a forked side-car process.
+    This is Implementated by a flexible plugin system that allows other
+    backends to be provided as well, as may be found in other CPAN modules.
 
 METHODS
 
@@ -86,9 +87,8 @@ TODO
 
       * Some wrapping of other resolvers, like the POSIX get*ent family.
 
-      * Allow for optional loading of backend resolver implementations, so
-      as not to depend on Net::LibAsyncNS all the time. Add support for
-      direct DNS-based resolving behaviour.
+      * Add support for direct DNS-based resolving behaviour; possibly in
+      its own CPAN distribution.
 
 AUTHOR
 

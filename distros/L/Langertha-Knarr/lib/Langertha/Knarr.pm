@@ -1,563 +1,350 @@
 package Langertha::Knarr;
-our $VERSION = '0.007';
-# ABSTRACT: LLM Proxy with Langfuse Tracing
-use strict;
-use warnings;
-use Mojolicious::Lite -signatures;
-use Mojo::URL;
-use JSON::MaybeXS qw( decode_json encode_json );
-use Log::Any qw( $log );
-use Langertha::Knarr::Config;
-use Langertha::Knarr::Router;
-use Langertha::Knarr::Tracing;
-use Langertha::Knarr::RequestLog;
-use Langertha::Knarr::Proxy::OpenAI;
-use Langertha::Knarr::Proxy::Anthropic;
-use Langertha::Knarr::Proxy::Ollama;
+# ABSTRACT: Universal LLM hub — proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI
+our $VERSION = '1.000';
+use Moose;
+use Future::AsyncAwait;
+use IO::Async::Loop;
+use Net::Async::HTTP::Server;
+use HTTP::Response;
+use JSON::MaybeXS;
+use Data::UUID;
+use Module::Runtime qw( use_module );
+use Scalar::Util qw( blessed );
+use Try::Tiny;
+use Langertha::Knarr::Session;
 
 
-sub build_app {
-  my ( $class, %opts ) = @_;
-  my $config_obj = $opts{config}
-    || Langertha::Knarr::Config->new(file => $opts{config_file});
-  my $router = Langertha::Knarr::Router->new(config => $config_obj);
-  my $tracing = Langertha::Knarr::Tracing->new(config => $config_obj);
-  my $request_log = Langertha::Knarr::RequestLog->new(config => $config_obj);
 
-  my $app = Mojolicious->new;
-  $app->secrets(['knarr-llm-proxy']);
+has handler => (
+  is => 'ro',
+  required => 1,
+);
 
-  # Configure user agent for passthrough proxying
-  $app->ua->connect_timeout(10);
-  $app->ua->request_timeout(300);
+has host => (
+  is => 'ro',
+  isa => 'Str',
+  default => '127.0.0.1',
+);
 
-  # Store objects in app helper
-  $app->helper(knarr_config      => sub { $config_obj });
-  $app->helper(knarr_router      => sub { $router });
-  $app->helper(knarr_tracing     => sub { $tracing });
-  $app->helper(knarr_request_log => sub { $request_log });
-  $app->helper(knarr_before_request_hook => sub { $opts{before_request} });
-  $app->helper(knarr_api_key_validator   => sub { $opts{api_key_validator} });
+has port => (
+  is => 'ro',
+  isa => 'Int',
+  default => 8088,
+);
 
-  # Auth middleware
-  if ($config_obj->has_proxy_api_key || $opts{api_key_validator}) {
-    $app->hook(before_dispatch => sub ($c) {
-      my $path = $c->req->url->path->to_string;
-      return if $path eq '/health';
+# Listen on one or more addresses. Each entry is either "host:port" or
+# { host => ..., port => ... }. Defaults to a single entry composed from
+# the host/port attributes above.
+has listen => (
+  is => 'ro',
+  isa => 'ArrayRef',
+  lazy => 1,
+  builder => '_build_listen',
+);
 
-      my ($raw_auth, $api_key) = _extract_request_api_key($c);
-
-      if ($config_obj->has_proxy_api_key) {
-        my $key = $config_obj->proxy_api_key;
-        unless ($api_key eq $key) {
-          $c->render(json => { error => { message => 'Invalid API key', type => 'authentication_error' } }, status => 401);
-          return $c->rendered;
-        }
-      }
-
-      if (my $validator = $c->knarr_api_key_validator) {
-        my $decision = eval {
-          $validator->($c, {
-            api_key     => $api_key,
-            raw_auth    => $raw_auth,
-            path        => $path,
-            method      => $c->req->method,
-            content_type => ($c->req->headers->content_type // ''),
-          });
-        };
-
-        if ($@) {
-          my $err = "$@";
-          $err =~ s/\s+$//;
-          $log->errorf("api_key_validator failed: %s", $err);
-          $c->render(json => { error => { message => "api_key_validator error: $err", type => 'server_error' } }, status => 500);
-          return $c->rendered;
-        }
-
-        my ($allow, $status, $message, $type);
-        if (ref($decision) eq 'HASH') {
-          $allow   = $decision->{allow} ? 1 : 0;
-          $status  = $decision->{status} // 403;
-          $message = $decision->{message} // 'Request not allowed for this API key';
-          $type    = $decision->{type} // 'authorization_error';
-        } elsif (defined $decision) {
-          $allow   = $decision ? 1 : 0;
-          $status  = 403;
-          $message = 'Request not allowed for this API key';
-          $type    = 'authorization_error';
-        } else {
-          $allow   = 0;
-          $status  = 403;
-          $message = 'Request not allowed for this API key';
-          $type    = 'authorization_error';
-        }
-
-        unless ($allow) {
-          $c->render(json => { error => { message => $message, type => $type } }, status => $status);
-          return $c->rendered;
-        }
-      }
-    });
-  }
-
-  # Health check
-  $app->routes->get('/health' => sub ($c) {
-    $c->render(json => { status => 'ok', proxy => 'knarr' });
-  });
-
-  # --- OpenAI format routes ---
-  $app->routes->post('/v1/chat/completions' => sub ($c) {
-    _handle_request($c, 'Langertha::Knarr::Proxy::OpenAI', 'chat');
-  });
-
-  $app->routes->get('/v1/models' => sub ($c) {
-    _handle_models_request($c, 'Langertha::Knarr::Proxy::OpenAI');
-  });
-
-  $app->routes->post('/v1/embeddings' => sub ($c) {
-    _handle_request($c, 'Langertha::Knarr::Proxy::OpenAI', 'embedding');
-  });
-
-  # --- Anthropic format routes ---
-  $app->routes->post('/v1/messages' => sub ($c) {
-    _handle_request($c, 'Langertha::Knarr::Proxy::Anthropic', 'chat');
-  });
-
-  # --- Ollama format routes ---
-  $app->routes->post('/api/chat' => sub ($c) {
-    _handle_request($c, 'Langertha::Knarr::Proxy::Ollama', 'chat');
-  });
-
-  $app->routes->get('/api/tags' => sub ($c) {
-    _handle_models_request($c, 'Langertha::Knarr::Proxy::Ollama');
-  });
-
-  $app->routes->get('/api/ps' => sub ($c) {
-    $c->render(json => { models => [] });
-  });
-
-  return $app;
+sub _build_listen {
+  my ($self) = @_;
+  return [ { host => $self->host, port => $self->port + 0 } ];
 }
 
+has loop => (
+  is => 'ro',
+  lazy => 1,
+  builder => '_build_loop',
+);
+sub _build_loop { IO::Async::Loop->new }
 
-sub _handle_request ($c, $proxy_class, $type) {
-  my $router      = $c->knarr_router;
-  my $tracing     = $c->knarr_tracing;
-  my $request_log = $c->knarr_request_log;
-  my $body        = $c->req->json;
+has protocols => (
+  is => 'ro',
+  isa => 'ArrayRef[Str]',
+  default => sub { [qw( OpenAI Anthropic Ollama A2A ACP AGUI )] },
+);
 
-  unless ($body) {
-    $c->render(json => { error => { message => 'Invalid JSON body', type => 'invalid_request_error' } }, status => 400);
-    return;
+# Optional shared secret. When set, every incoming request must present it
+# either as 'Authorization: Bearer <key>' or 'x-api-key: <key>'. The agent
+# card and well-known discovery routes are exempt because they need to be
+# anonymously fetchable.
+has auth_token => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  default => sub { undef },
+);
+
+has _protocol_objects => (
+  is => 'ro',
+  lazy => 1,
+  builder => '_build_protocol_objects',
+);
+
+has _routes => (
+  is => 'ro',
+  lazy => 1,
+  builder => '_build_routes',
+);
+
+has _sessions => (
+  is => 'ro',
+  default => sub { {} },
+);
+
+has _uuid => (
+  is => 'ro',
+  default => sub { Data::UUID->new },
+);
+
+has _json => (
+  is => 'ro',
+  default => sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) },
+);
+
+has _server => (
+  is => 'rw',
+);
+
+has _servers => (
+  is => 'rw',
+  default => sub { [] },
+);
+
+sub _build_protocol_objects {
+  my ($self) = @_;
+  my @objs;
+  for my $name ( @{ $self->protocols } ) {
+    my $class = $name =~ /::/ ? $name : "Langertha::Knarr::Protocol::$name";
+    use_module($class);
+    push @objs, $class->new( steerboard => $self );
   }
+  return \@objs;
+}
 
-  my $model_name = $proxy_class->extract_model($body);
-  my $stream     = $proxy_class->extract_stream($body);
-  my $messages   = $proxy_class->extract_messages($body);
-  my $params     = $proxy_class->extract_params($body);
-  my $format     = $proxy_class->format_name;
-
-  if (my $hook = $c->knarr_before_request_hook) {
-    my $ctx = {
-      proxy_class => $proxy_class,
-      type        => $type,
-      format      => $format,
-      body        => $body,
-      model_name  => $model_name,
-      stream      => $stream,
-      messages    => $messages,
-      params      => $params,
-    };
-
-    my $hook_result = eval { $hook->($c, $ctx) };
-    if ($@) {
-      my $err = "$@";
-      $err =~ s/\s+$//;
-      $log->errorf("before_request hook failed: %s", $err);
-      $c->render(json => $proxy_class->format_error("before_request hook error: $err", 'server_error'), status => 500);
-      return;
+sub _build_routes {
+  my ($self) = @_;
+  my @routes;
+  for my $proto ( @{ $self->_protocol_objects } ) {
+    for my $r ( @{ $proto->protocol_routes } ) {
+      push @routes, { %$r, protocol => $proto };
     }
-
-    if (ref($hook_result) eq 'HASH' && $hook_result->{stop}) {
-      my $status = $hook_result->{status} // 400;
-      my $message = $hook_result->{message} // 'Request blocked by before_request hook';
-      my $type_name = $hook_result->{type} // 'request_blocked';
-      $c->render(json => $proxy_class->format_error($message, $type_name), status => $status);
-      return;
-    }
-
-    $body       = $ctx->{body}       if exists $ctx->{body};
-    $model_name = $ctx->{model_name} if exists $ctx->{model_name};
-    $stream     = $ctx->{stream}     if exists $ctx->{stream};
-    $messages   = $ctx->{messages}   if exists $ctx->{messages};
-    $params     = $ctx->{params}     if exists $ctx->{params};
   }
-
-  # 1. Try explicit config / discovered models first
-  my ($engine, $resolved_model) = eval { $router->resolve($model_name, skip_default => 1) };
-
-  if ($engine) {
-    _route_to_engine($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $request_log, $type);
-    return;
-  }
-
-  # 2. Try passthrough (before default engine — passthrough uses client's own API key)
-  my $pt_format = $proxy_class->passthrough_format;
-  my $upstream   = $pt_format ? $c->knarr_config->passthrough_url_for($pt_format) : undef;
-
-  if ($upstream) {
-    my $trace_id = $tracing->start_trace(
-      model    => $model_name,
-      engine   => "passthrough:$pt_format",
-      messages => $messages,
-      params   => $params,
-      format   => $proxy_class->format_name,
-    );
-    my $log_handle = $request_log->start_request(
-      model    => $model_name,
-      format   => $proxy_class->format_name,
-      engine   => "passthrough:$pt_format",
-      path     => $c->req->url->path->to_string,
-      stream   => $body->{stream},
-      messages => $messages,
-      params   => $params,
-    );
-    _handle_passthrough($c, $proxy_class, $upstream, $body, $model_name, $tracing, $trace_id, $request_log, $log_handle);
-    return;
-  }
-
-  # 3. Try default engine as last resort
-  ($engine, $resolved_model) = eval { $router->resolve($model_name) };
-
-  if ($engine) {
-    _route_to_engine($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $request_log, $type);
-    return;
-  }
-
-  my $err = $@ || "Model '$model_name' not configured and passthrough disabled";
-  $c->render(json => $proxy_class->format_error($err, 'model_not_found'), status => 404);
+  return \@routes;
 }
 
-sub _route_to_engine ($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $request_log, $type) {
-  my $trace_id = $tracing->start_trace(
-    model    => $resolved_model,
-    engine   => ref($engine),
-    messages => $messages,
-    params   => $params,
-    format   => $proxy_class->format_name,
-  );
-  my $log_handle = $request_log->start_request(
-    model    => $resolved_model,
-    format   => $proxy_class->format_name,
-    engine   => ref($engine),
-    path     => $c->req->url->path->to_string,
-    stream   => $stream,
-    messages => $messages,
-    params   => $params,
-  );
-
-  if ($stream) {
-    _handle_streaming($c, $proxy_class, $engine, $messages, $params, $resolved_model, $tracing, $trace_id, $request_log, $log_handle);
-  } else {
-    _handle_sync($c, $proxy_class, $engine, $messages, $params, $resolved_model, $tracing, $trace_id, $request_log, $log_handle, $type);
-  }
+sub session {
+  my ($self, $id) = @_;
+  $id //= $self->_uuid->create_str;
+  $self->_sessions->{$id} //= Langertha::Knarr::Session->new( id => $id );
+  $self->_sessions->{$id}->touch;
+  return $self->_sessions->{$id};
 }
 
-sub _handle_sync ($c, $proxy_class, $engine, $messages, $params, $model, $tracing, $trace_id, $request_log, $log_handle, $type) {
-  my $result = eval {
-    if ($type eq 'embedding') {
-      my $input = $params->{input};
-      $engine->simple_embedding($input);
+sub _listen_addrs {
+  my ($self) = @_;
+  my @out;
+  for my $entry ( @{ $self->listen } ) {
+    if ( ref $entry eq 'HASH' ) {
+      push @out, { host => $entry->{host} // '127.0.0.1', port => $entry->{port} + 0 };
     } else {
-      my @chat_messages = map { ref $_ ? $_ : { role => 'user', content => $_ } } @$messages;
-      my $engine_messages = \@chat_messages;
-      my $engine_params = $params || {};
-
-      if ($proxy_class->can('prepare_engine_messages')) {
-        my $prepared_messages = $proxy_class->prepare_engine_messages($engine, $engine_messages, $engine_params);
-        if (ref($prepared_messages) eq 'ARRAY') {
-          $engine_messages = $prepared_messages;
-        }
-      }
-
-      if ($proxy_class->can('prepare_engine_params')) {
-        my $prepared_params = $proxy_class->prepare_engine_params($engine, $engine_params, $engine_messages);
-        if (ref($prepared_params) eq 'HASH') {
-          $engine_params = $prepared_params;
-        }
-      }
-
-      my $request;
-      my $tools = delete $engine_params->{tools};
-      delete $engine_params->{tool_choice} if exists $engine_params->{tool_choice};
-
-      if (
-        ref($tools) eq 'ARRAY'
-        && @$tools
-        && $engine->can('does')
-        && $engine->does('Langertha::Role::HermesTools')
-        && $engine->can('build_tool_chat_request')
-      ) {
-        my $hermes_tools = _normalize_tools_for_hermes($tools);
-        my $formatted_tools = $engine->format_tools($hermes_tools);
-        $request = $engine->build_tool_chat_request($engine_messages, $formatted_tools, %{$engine_params});
-      } else {
-        $request = $engine->chat_request(
-          $engine_messages,
-          (ref($tools) eq 'ARRAY' ? (tools => $tools) : ()),
-          %{$engine_params},
-        );
-      }
-
-      my $response = $engine->user_agent->request($request);
-      my $chat_result = $request->response_call->($response);
-      if ($engine->can('has_rate_limit') && $engine->has_rate_limit && ref $chat_result && $chat_result->isa('Langertha::Response')) {
-        $chat_result = $chat_result->clone_with(rate_limit => $engine->rate_limit);
-      }
-      $chat_result;
+      my ($h, $p) = split /:/, $entry, 2;
+      $h ||= '127.0.0.1';
+      push @out, { host => $h, port => ($p // 8088) + 0 };
     }
+  }
+  return @out;
+}
+
+sub start {
+  my ($self) = @_;
+  my @servers;
+  for my $a ( $self->_listen_addrs ) {
+    my $server = Net::Async::HTTP::Server->new(
+      on_request => sub {
+        my ($srv, $req) = @_;
+        $self->_dispatch($req);
+      },
+    );
+    $self->loop->add($server);
+    $server->listen(
+      addr => {
+        family   => 'inet',
+        socktype => 'stream',
+        port     => $a->{port},
+        ip       => $a->{host},
+      },
+    )->get;
+    push @servers, $server;
+  }
+  $self->_servers(\@servers);
+  $self->_server( $servers[0] );
+  return $self;
+}
+
+sub run {
+  my ($self) = @_;
+  $self->start unless $self->_server;
+  $self->loop->run;
+}
+
+sub _match_route {
+  my ($self, $method, $path) = @_;
+  for my $r ( @{ $self->_routes } ) {
+    next unless $r->{method} eq $method;
+    return $r if $r->{path} eq $path;
+  }
+  return undef;
+}
+
+sub _check_auth {
+  my ($self, $req, $action) = @_;
+  return 1 unless defined $self->auth_token && length $self->auth_token;
+  # Discovery endpoints stay anonymous so clients can introspect.
+  return 1 if $action eq 'a2a_card';
+  my $expected = $self->auth_token;
+  my $auth = scalar( $req->header('Authorization') ) // '';
+  if ( $auth =~ /^Bearer\s+(.+)$/i && $1 eq $expected ) {
+    return 1;
+  }
+  my $api_key = scalar( $req->header('x-api-key') ) // '';
+  return 1 if $api_key eq $expected && length $api_key;
+  return 0;
+}
+
+sub _dispatch {
+  my ($self, $req) = @_;
+  my $method = $req->method;
+  my $path   = $req->path;
+  my $route  = $self->_match_route( $method, $path );
+  unless ( $route ) {
+    return $self->_send_simple( $req, 404, 'application/json',
+      $self->_json->encode({ error => { message => "no route for $method $path" } }) );
+  }
+  my $action = $route->{action};
+  unless ( $self->_check_auth( $req, $action ) ) {
+    return $self->_send_simple( $req, 401, 'application/json',
+      $self->_json->encode({ error => { message => 'unauthorized' } }) );
+  }
+  my $proto  = $route->{protocol};
+  my $code = $self->can("_action_$action");
+  unless ( $code ) {
+    return $self->_send_simple( $req, 500, 'application/json',
+      $self->_json->encode({ error => { message => "unknown action $action" } }) );
+  }
+  try {
+    $self->$code( $proto, $req );
+  } catch {
+    my $err = $_;
+    $self->_send_simple( $req, 500, 'application/json',
+      $self->_json->encode({ error => { message => "$err" } }) );
+  };
+}
+
+sub _action_chat {
+  my ($self, $proto, $req) = @_;
+  my $body = $req->body;
+  my $sb_req = $proto->parse_chat_request( $req, \$body );
+  my $session = $self->session( $sb_req->session_id );
+  my $handler = $self->handler->route_model( $sb_req->model );
+
+  if ( $sb_req->stream ) {
+    return $self->_handle_stream( $proto, $req, $sb_req, $session, $handler );
+  }
+
+  my $f = $handler->handle_chat_f( $session, $sb_req );
+  $f->on_done( sub {
+    my ($response) = @_;
+    try {
+      my ($status, $headers, $body) = $proto->format_chat_response( $response, $sb_req );
+      $self->_send_simple( $req, $status, $headers->{'Content-Type'} // 'application/json', $body );
+    } catch {
+      my $err = $_;
+      $self->_send_simple( $req, 500, 'application/json',
+        $self->_json->encode({ error => { message => "$err" } }) );
+    };
+  });
+  $f->on_fail( sub {
+    my ($err) = @_;
+    $self->_send_simple( $req, 500, 'application/json',
+      $self->_json->encode({ error => { message => "$err" } }) );
+  });
+  $f->retain;
+}
+
+sub _handle_stream {
+  my ($self, $proto, $req, $sb_req, $session, $handler) = @_;
+
+  my $header = HTTP::Response->new( 200 );
+  $header->protocol('HTTP/1.1');
+  $header->header( 'Content-Type'  => $proto->stream_content_type );
+  $header->header( 'Cache-Control' => 'no-cache' );
+  $req->respond_chunk_header( $header );
+
+  my $write = sub {
+    my ($bytes) = @_;
+    return unless defined $bytes && length $bytes;
+    return if $req->is_closed;
+    $req->write_chunk( $bytes );
   };
 
-  if ($@) {
-    $log->errorf("Engine error: %s", $@);
-    $tracing->end_trace($trace_id, error => "$@");
-    $request_log->end_request($log_handle, error => "$@");
-    $c->render(json => $proxy_class->format_error("$@", 'server_error'), status => 500);
-    return;
-  }
-
-  my $response_data = $proxy_class->format_response($result, $model);
-
-  my $usage = (ref $result && $result->isa('Langertha::Response') && $result->has_usage)
-    ? { input => $result->prompt_tokens, output => $result->completion_tokens, total => $result->total_tokens }
-    : undef;
-
-  $tracing->end_trace($trace_id,
-    output => "$result",
-    model  => $model,
-    usage  => $usage,
-  );
-  $request_log->end_request($log_handle,
-    output => "$result",
-    usage  => $usage,
-  );
-
-  $c->render(json => $response_data);
-}
-
-sub _handle_streaming ($c, $proxy_class, $engine, $messages, $params, $model, $tracing, $trace_id, $request_log, $log_handle) {
-  $c->res->headers->content_type($proxy_class->streaming_content_type);
-  $c->res->headers->cache_control('no-cache');
-  $c->res->headers->header('Connection' => 'keep-alive');
-  $c->res->headers->header('X-Accel-Buffering' => 'no');
-
-  my $full_content = '';
-  my $usage;
-
-  my $write = $c->res->content->write_body_data('');
-  $c->res->code(200);
-
-  eval {
-    my @chat_messages = map { ref $_ ? $_ : { role => 'user', content => $_ } } @$messages;
-    $engine->simple_chat_stream(sub {
-      my ($chunk) = @_;
-      my $chunk_data = $proxy_class->format_stream_chunk($chunk, $model);
-      $full_content .= $chunk->content;
-      if ($chunk->can('usage') && $chunk->usage) {
-        $usage = $chunk->usage;
-      }
-      for my $line (@$chunk_data) {
-        $c->write_chunk($line);
-      }
-    }, @chat_messages);
-  };
-
-  if ($@) {
-    $log->errorf("Streaming error: %s", $@);
-    $tracing->end_trace($trace_id, error => "$@");
-    $request_log->end_request($log_handle, error => "$@");
-  } else {
-    $tracing->end_trace($trace_id,
-      output => $full_content,
-      model  => $model,
-      usage  => $usage,
-    );
-    $request_log->end_request($log_handle,
-      output => $full_content,
-      usage  => $usage,
-    );
-  }
-
-  # Write stream end marker
-  my $end_marker = $proxy_class->stream_end_marker;
-  $c->write_chunk($end_marker) if $end_marker;
-  $c->write_chunk('');
-}
-
-sub _handle_passthrough ($c, $proxy_class, $upstream_base, $body, $model_name, $tracing, $trace_id, $request_log, $log_handle) {
-  my $path  = $c->req->url->path->to_string;
-  my $query = $c->req->url->query->to_string;
-  my $url   = Mojo::URL->new("$upstream_base$path");
-  $url->query($query) if $query;
-
-  $log->infof("Passthrough: %s %s -> %s", $c->req->method, $path, $url);
-
-  # Forward client headers (auth, content-type, etc.)
-  # Strip encoding headers — proxy handles data uncompressed
-  my %fwd_headers;
-  for my $name (@{$c->req->headers->names}) {
-    my $lc = lc($name);
-    next if $lc eq 'host' || $lc eq 'content-length' || $lc eq 'transfer-encoding'
-         || $lc eq 'accept-encoding';
-    $fwd_headers{$name} = $c->req->headers->header($name);
-  }
-
-  $c->render_later;
-  my $ua = $c->app->ua;
-
-  my $tx = $ua->build_tx(
-    $c->req->method => $url,
-    \%fwd_headers,
-    json => $body,
-  );
-
-  my $stream = $body->{stream};
-
-  if ($stream) {
-    # Streaming passthrough: pipe response chunks to client as they arrive
-    my $full_response = '';
-    my $headers_sent  = 0;
-
-    $tx->res->content->unsubscribe('read')->on(read => sub {
-      my ($content, $bytes) = @_;
-
-      unless ($headers_sent) {
-        $c->res->code($tx->res->code // 200);
-        for my $name (@{$tx->res->headers->names}) {
-          my $lc = lc($name);
-          next if $lc eq 'content-length' || $lc eq 'transfer-encoding'
-               || $lc eq 'content-encoding';
-          $c->res->headers->header($name => $tx->res->headers->header($name));
+  my $f = $handler->handle_stream_f( $session, $sb_req );
+  $f->on_done( sub {
+    my ($stream) = @_;
+    $write->( $proto->format_stream_open($sb_req) );
+    my $pump; $pump = sub {
+      if ( $req->is_closed ) { undef $pump; return }
+      $stream->next_chunk_f->on_done( sub {
+        my ($delta) = @_;
+        if ( $req->is_closed ) { undef $pump; return }
+        if ( defined $delta ) {
+          $write->( $proto->format_stream_chunk( $delta, $sb_req ) );
+          $pump->();
         }
-        $c->res->headers->header('X-Accel-Buffering' => 'no');
-        $headers_sent = 1;
-      }
-
-      $full_response .= $bytes;
-      $c->write($bytes);
-    });
-
-    $ua->start($tx => sub {
-      my ($ua, $tx) = @_;
-
-      if (my $err = $tx->error) {
-        unless ($headers_sent) {
-          $tracing->end_trace($trace_id, error => $err->{message}) if $trace_id;
-          $request_log->end_request($log_handle, error => $err->{message});
-          $c->render(json => $proxy_class->format_error(
-            "Upstream error: " . ($err->{message} // 'unknown'), 'upstream_error',
-          ), status => 502);
-          return;
+        else {
+          $write->( $proto->format_stream_close($sb_req) );
+          $write->( $proto->format_stream_done($sb_req) );
+          $req->write_chunk_eof;
+          undef $pump;
         }
-      }
-
-      $c->finish;
-      if ($trace_id) {
-        $tracing->end_trace($trace_id,
-          output => $full_response,
-          model  => $model_name,
-        );
-      }
-      $request_log->end_request($log_handle,
-        output => $full_response,
-      );
-    });
-  } else {
-    # Non-streaming passthrough: wait for full response, forward it
-    $ua->start($tx => sub {
-      my ($ua, $tx) = @_;
-
-      if (my $err = $tx->error) {
-        $tracing->end_trace($trace_id, error => $err->{message}) if $trace_id;
-        $request_log->end_request($log_handle, error => $err->{message});
-        $c->render(json => $proxy_class->format_error(
-          "Upstream error: " . ($err->{message} // 'unknown'), 'upstream_error',
-        ), status => $err->{code} // 502);
-        return;
-      }
-
-      my $res = $tx->res;
-      $c->res->code($res->code);
-      for my $name (@{$res->headers->names}) {
-        my $lc = lc($name);
-        next if $lc eq 'content-length' || $lc eq 'transfer-encoding'
-             || $lc eq 'content-encoding';
-        $c->res->headers->header($name => $res->headers->header($name));
-      }
-      $c->res->body($res->body);
-      $c->rendered;
-
-      my $output = eval { decode_json($res->body) };
-      if ($trace_id) {
-        $tracing->end_trace($trace_id,
-          output => $output // $res->body,
-          model  => $model_name,
-        );
-      }
-      $request_log->end_request($log_handle,
-        output => $output // $res->body,
-      );
-    });
-  }
+      })->on_fail( sub {
+        my ($err) = @_;
+        $write->( $proto->format_stream_chunk( "[error: $err]", $sb_req ) );
+        $write->( $proto->format_stream_close($sb_req) );
+        $req->write_chunk_eof;
+        undef $pump;
+      });
+    };
+    $pump->();
+  });
+  $f->on_fail( sub {
+    my ($err) = @_;
+    $write->( $proto->format_stream_chunk( "[error: $err]", $sb_req ) );
+    $req->write_chunk_eof;
+  });
+  $f->retain;
 }
 
-sub _handle_models_request ($c, $proxy_class) {
-  my $router = $c->knarr_router;
-  my $models = $router->list_models;
-  $c->render(json => $proxy_class->format_models_response($models));
+sub _action_acp_agents { goto &_action_models }
+sub _action_a2a_card {
+  my ($self, $proto, $req) = @_;
+  my ($status, $headers, $body) = $proto->format_agent_card;
+  $self->_send_simple( $req, $status, $headers->{'Content-Type'} // 'application/json', $body );
 }
 
-sub _extract_request_api_key ($c) {
-  my $auth = $c->req->headers->header('Authorization');
-  my $x_api_key = $c->req->headers->header('x-api-key');
-
-  my $raw = defined($auth) ? $auth : (defined($x_api_key) ? $x_api_key : '');
-  my $api_key = $raw // '';
-  $api_key =~ s/^Bearer\s+//i;
-
-  return ($raw, $api_key);
+sub _action_models {
+  my ($self, $proto, $req) = @_;
+  my $models = $self->handler->list_models;
+  my ($status, $headers, $body) = $proto->format_models_response( $models );
+  $self->_send_simple( $req, $status, $headers->{'Content-Type'} // 'application/json', $body );
 }
 
-sub _normalize_tools_for_hermes ($tools) {
-  my @normalized;
-  for my $tool (@{$tools || []}) {
-    next unless ref($tool) eq 'HASH';
-
-    # OpenAI-style function tool
-    if (($tool->{type} // '') eq 'function' && ref($tool->{function}) eq 'HASH') {
-      my $f = $tool->{function};
-      next unless defined $f->{name} && length $f->{name};
-      push @normalized, {
-        name        => $f->{name},
-        description => ($f->{description} // ''),
-        inputSchema => ($f->{parameters} || { type => 'object', properties => {} }),
-      };
-      next;
-    }
-
-    # Anthropic-style tool
-    if (defined($tool->{name}) && length $tool->{name}) {
-      push @normalized, {
-        name        => $tool->{name},
-        description => ($tool->{description} // ''),
-        inputSchema => ($tool->{input_schema} || $tool->{inputSchema} || { type => 'object', properties => {} }),
-      };
-    }
-  }
-
-  return \@normalized;
+sub _send_simple {
+  my ($self, $req, $status, $ctype, $body) = @_;
+  my $resp = HTTP::Response->new( $status );
+  $resp->protocol('HTTP/1.1');
+  $resp->header( 'Content-Type'   => $ctype );
+  $resp->header( 'Content-Length' => length($body) );
+  $resp->content($body);
+  $req->respond($resp);
 }
 
+__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -568,450 +355,150 @@ __END__
 
 =head1 NAME
 
-Langertha::Knarr - LLM Proxy with Langfuse Tracing
+Langertha::Knarr - Universal LLM hub — proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 SYNOPSIS
 
-    # 1. Create a .env with your Langfuse credentials
-    #    (free tier at https://cloud.langfuse.com)
-    LANGFUSE_PUBLIC_KEY=pk-lf-...
-    LANGFUSE_SECRET_KEY=sk-lf-...
-    LANGFUSE_BASE_URL=https://cloud.langfuse.com
+The fastest way to use Knarr is the Docker image:
 
-    # 2. Start the proxy
-    docker run --env-file .env -p 8080:8080 raudssus/langertha-knarr
+    docker run -e ANTHROPIC_API_KEY -p 8080:8080 raudssus/langertha-knarr
+    ANTHROPIC_BASE_URL=http://localhost:8080 claude
 
-    # 3. Point your client at it
-    ANTHROPIC_BASE_URL=http://localhost:8080 claude    # Claude Code
-    OPENAI_BASE_URL=http://localhost:8080/v1 my-app    # OpenAI SDK apps
+The Perl API behind it:
 
-    # Every API call is now traced in Langfuse.
-    # The proxy forwards requests 1:1 using the client's own API key.
-    # Knarr doesn't need one.
+    use IO::Async::Loop;
+    use Langertha::Knarr;
+    use Langertha::Knarr::Config;
+    use Langertha::Knarr::Router;
+    use Langertha::Knarr::Handler::Router;
+
+    my $loop   = IO::Async::Loop->new;
+    my $config = Langertha::Knarr::Config->new(file => 'knarr.yaml');
+    my $router = Langertha::Knarr::Router->new(config => $config);
+
+    my $knarr = Langertha::Knarr->new(
+        handler => Langertha::Knarr::Handler::Router->new(router => $router),
+        loop    => $loop,
+        listen  => $config->listen,
+    );
+    $knarr->run;   # blocks; OpenWebUI etc. can now connect
 
 =head1 DESCRIPTION
 
-Knarr is an LLM proxy that sits between your client and the API, forwarding
-requests transparently while recording everything in Langfuse. The client's
-own API key is used — Knarr doesn't need API keys for the LLM providers, only
-Langfuse credentials to write the traces.
+Langertha::Knarr is a universal LLM hub that exposes any backend — a
+L<Langertha::Raider>, a raw L<Langertha::Engine>, a remote A2A or ACP
+agent, or any custom L<Langertha::Knarr::Handler> — over the standard
+LLM HTTP wire protocols spoken by OpenWebUI, the OpenAI / Anthropic /
+Ollama SDKs, and the agent ecosystems around A2A, ACP, and AG-UI.
 
-The simplest use case: debug your AI coding agent. Start Knarr, point Claude
-Code or any other LLM client at it, and see every prompt, response, token
-count and error in your Langfuse dashboard.
+By default a single running Knarr answers OpenAI
+C</v1/chat/completions>, Anthropic C</v1/messages>, Ollama
+C</api/chat>, A2A's C</.well-known/agent.json> plus JSON-RPC C</>,
+ACP's C</runs>, and AG-UI's C</awp> simultaneously on every listening
+port. The same handler implementation drives all of them.
 
-Named after the Norse cargo ship, Knarr carries your LLM calls safely to their
-destination — with full cargo documentation.
+Knarr 1.000 is built on L<IO::Async> and L<Net::Async::HTTP::Server>
+with native L<Future::AsyncAwait> integration into Langertha engines,
+so streaming works end-to-end token-by-token without any thread or
+event-loop bridges.
 
-=head2 Quick Start
+=head1 ARCHITECTURE
 
-Create a C<.env> file with your Langfuse credentials:
-
-    LANGFUSE_PUBLIC_KEY=pk-lf-...
-    LANGFUSE_SECRET_KEY=sk-lf-...
-    LANGFUSE_BASE_URL=https://cloud.langfuse.com
-
-Start the proxy:
-
-    docker run --env-file .env -p 8080:8080 raudssus/langertha-knarr
-
-Use it with Claude Code:
-
-    ANTHROPIC_BASE_URL=http://localhost:8080 claude
-
-Use it with any OpenAI SDK application:
-
-    OPENAI_BASE_URL=http://localhost:8080/v1 python my_app.py
-
-Every API call now shows up in your Langfuse dashboard with full input,
-output, token usage, latency, and error tracking. The proxy doesn't touch
-the API key — it just passes it through to the upstream API.
-
-=head2 Additional Docker Examples
-
-With provider API keys for engine routing (not just passthrough):
-
-    docker run --env-file .env \
-      -e OPENAI_API_KEY=sk-... \
-      -p 8080:8080 \
-      raudssus/langertha-knarr
-
-With a mounted config file:
-
-    docker run --env-file .env \
-      -v ./knarr.yaml:/app/knarr.yaml \
-      -p 8080:8080 \
-      raudssus/langertha-knarr \
-      container
-
-Local usage (without Docker):
-
-    knarr init > knarr.yaml
-    knarr start
-
-Programmatic usage:
-
-    use Langertha::Knarr;
-    my $app = Langertha::Knarr->build_app(config_file => 'knarr.yaml');
-
-=head2 Request Flow
-
-                       ┌─────────────────────────────────┐
-  Client               │           Knarr Proxy           │           Backend
-  ──────               │           ────────────          │           ───────
-  OpenAI format   ───► │  /v1/chat/completions           │
-  Anthropic format───► │  /v1/messages        ──Router──►│ ──► Langertha Engine ──► API
-  Ollama format   ───► │  /api/chat                      │
-                       │         │                       │
-                       │         ▼                       │
-                       │   Langfuse Tracing              │
-                       └─────────────────────────────────┘
-
-Every request is traced: the model name, engine used, full message input, output
-text, token usage, and any errors are sent to Langfuse automatically.
-
-=head2 API Formats and Routes
-
-Knarr listens on port 8080 for OpenAI and Anthropic requests, and port 11434
-for Ollama requests (matching the Ollama default).
-
-B<OpenAI format> (port 8080):
+Three pluggable layers:
 
 =over
 
-=item * C<POST /v1/chat/completions> — Chat completions
+=item B<Protocols>
 
-=item * C<POST /v1/embeddings> — Embeddings
+Wire formats live in C<Langertha::Knarr::Protocol::*>. Each consumes
+L<Langertha::Knarr::Protocol> and is loaded by default. See
+L<Langertha::Knarr::Protocol::OpenAI>,
+L<Langertha::Knarr::Protocol::Anthropic>,
+L<Langertha::Knarr::Protocol::Ollama>,
+L<Langertha::Knarr::Protocol::A2A>,
+L<Langertha::Knarr::Protocol::ACP>,
+L<Langertha::Knarr::Protocol::AGUI>.
 
-=item * C<GET /v1/models> — List available models
+=item B<Handlers>
 
-=back
+Backend logic — what answers the request. Knarr ships with
+L<Langertha::Knarr::Handler::Router> (the default, model→engine via
+L<Langertha::Knarr::Router>), L<Langertha::Knarr::Handler::Engine>
+(single engine), L<Langertha::Knarr::Handler::Raider> (per-session
+agent), L<Langertha::Knarr::Handler::Passthrough> (raw HTTP forward),
+L<Langertha::Knarr::Handler::A2AClient> /
+L<Langertha::Knarr::Handler::ACPClient> (consume remote agents), and
+L<Langertha::Knarr::Handler::Code> (coderef-backed for tests). Implement
+L<Langertha::Knarr::Handler> to write your own. Decorators
+(L<Langertha::Knarr::Handler::Tracing>,
+L<Langertha::Knarr::Handler::RequestLog>) wrap any inner handler and
+add behavior on top — they themselves consume the Handler role and
+compose freely.
 
-B<Anthropic format> (port 8080):
+=item B<Transport>
 
-=over
-
-=item * C<POST /v1/messages> — Messages API
-
-=back
-
-B<Ollama format> (port 11434):
-
-=over
-
-=item * C<POST /api/chat> — Chat
-
-=item * C<GET /api/tags> — List models
-
-=item * C<GET /api/ps> — Running models (always returns empty)
-
-=back
-
-B<Health check> (any port):
-
-=over
-
-=item * C<GET /health> — Returns C<{"status":"ok","proxy":"knarr"}>
-
-=back
-
-=head2 Passthrough Mode
-
-By default, when C<passthrough: true> is set (the default in container mode),
-requests are forwarded transparently to the upstream API using the client's own
-API key. This means you can point any OpenAI or Anthropic client at Knarr and
-it will just work, while Knarr adds Langfuse tracing on top.
-
-Passthrough defaults:
-
-=over
-
-=item * C<openai> passthrough → C<https://api.openai.com>
-
-=item * C<anthropic> passthrough → C<https://api.anthropic.com>
+Default is L<Net::Async::HTTP::Server> with chunked SSE / NDJSON
+streaming on one or more listen sockets. For Plack deployments,
+L<Langertha::Knarr::PSGI> wraps the same Knarr instance into a PSGI
+app (buffered — see its docs for the streaming caveat).
 
 =back
 
-Ollama requests are never passed through (no upstream Ollama passthrough URL).
+=head2 handler
 
-=head2 Engine Routing
+Required. An object consuming L<Langertha::Knarr::Handler>.
 
-When a model is explicitly configured in the config file (or discovered via
-C<auto_discover>), Knarr routes requests through the corresponding Langertha
-engine. This allows routing to alternative backends, local models, or services
-that do not natively speak the protocol the client is using.
+=head2 listen
 
-Example: an Ollama client can request C<gpt-4o>, and Knarr will route it
-through the OpenAI Langertha engine, returning an Ollama-formatted response.
+ArrayRef of C<host:port> strings or C<< { host => ..., port => ... } >>
+hashes. Defaults to a single entry composed from L</host> and L</port>.
 
-=head2 Routing Priority
+=head2 host
 
-For each incoming request, Knarr resolves the target in this order:
+Default C<127.0.0.1>. Used when L</listen> is not given.
 
-=over
+=head2 port
 
-=item 1. Explicit model config or auto-discovered model → route via Langertha engine
+Default C<8088>. Used when L</listen> is not given.
 
-=item 2. Passthrough enabled for this format → forward to upstream API
+=head2 loop
 
-=item 3. Default engine configured → route via default Langertha engine
+Optional L<IO::Async::Loop> instance. Defaults to a fresh one.
 
-=item 4. None of the above → 404 error
+=head2 protocols
 
-=back
+ArrayRef of protocol class basenames to load. Defaults to all six
+shipped protocols.
 
-=head2 Streaming
+=head2 auth_token
 
-All three formats support streaming:
+Optional shared secret. When set, every incoming request must present
+it as C<Authorization: Bearer> or C<x-api-key>. Discovery routes
+(C</.well-known/agent.json>) stay anonymous.
 
-=over
+=head2 start
 
-=item * OpenAI — SSE (Server-Sent Events), ends with C<data: [DONE]>
+    $knarr->start;
 
-=item * Anthropic — SSE, ends with C<event: message_stop>
+Binds all listen sockets and registers the dispatcher. Returns
+C<$self>. Does not enter the event loop.
 
-=item * Ollama — NDJSON (newline-delimited JSON), ends with C<{"done":true}>
+=head2 run
 
-=back
+    $knarr->run;   # blocks
 
-For passthrough requests, the stream is piped byte-for-byte from the upstream
-API to the client with no buffering.
+Calls L</start> if needed, then enters the L</loop> and blocks.
 
-=head2 Tool Calling Bridge
+=head2 session
 
-When request format and backend engine format differ, Knarr bridges tool-calling
-payloads between OpenAI and Anthropic shapes.
+    my $session = $knarr->session($id);
 
-=over
-
-=item * OpenAI format to Anthropic-compatible engines
-
-Converts request C<tools> and C<tool_choice> to Anthropic shape and maps
-assistant/user tool traffic between C<tool_calls> and C<tool_use>/C<tool_result>.
-
-=item * Anthropic format to OpenAI-compatible engines
-
-Converts Anthropic C<tools>/C<tool_choice> and content blocks to OpenAI
-C<tool_calls> + C<tool> messages.
-
-=item * Hermes XML tool output
-
-If a backend emits C<< <tool_call>{...}</tool_call> >> in text, Knarr parses it
-and exposes native tool call structures in OpenAI/Anthropic responses.
-
-=back
-
-For Hermes-capable engines, OpenAI/Anthropic tool definitions are normalized
-before being passed into the Hermes tool prompt path.
-
-=head2 Configuration File
-
-The config file is YAML. All string values support C<${ENV_VAR}> interpolation.
-
-    listen:
-      - "127.0.0.1:8080"
-      - "127.0.0.1:11434"
-
-    models:
-      gpt-4o:
-        engine: OpenAI
-        model: gpt-4o
-        api_key_env: OPENAI_API_KEY
-      local:
-        engine: OllamaOpenAI
-        url: http://localhost:11434/v1
-        model: llama3.2
-
-    default:
-      engine: OpenAI
-
-    auto_discover: true
-
-    passthrough:
-      openai: https://api.openai.com
-      anthropic: https://api.anthropic.com
-
-    proxy_api_key: ${KNARR_API_KEY}
-
-    langfuse:
-      url: https://cloud.langfuse.com
-      public_key: ${LANGFUSE_PUBLIC_KEY}
-      secret_key: ${LANGFUSE_SECRET_KEY}
-      trace_name: my-app
-
-Model config keys:
-
-=over
-
-=item * C<engine> (required) — Engine class selector. Resolution order:
-C<Langertha::Engine::E<lt>NameE<gt>>, then
-C<LangerthaX::Engine::E<lt>NameE<gt>>, or a fully-qualified class name
-
-=item * C<model> — Model name to pass to the engine
-
-=item * C<api_key_env> — Environment variable name holding the API key
-
-=item * C<api_key> — Literal API key (prefer C<api_key_env>)
-
-=item * C<url> — Custom base URL (for self-hosted or OpenAI-compatible endpoints)
-
-=item * C<system_prompt> — Default system prompt for all requests to this model
-
-=item * C<temperature> — Default temperature
-
-=item * C<response_size> — Default max response tokens
-
-=back
-
-=head2 Langfuse Tracing
-
-When C<LANGFUSE_PUBLIC_KEY> and C<LANGFUSE_SECRET_KEY> are set (or configured
-in the config file), Knarr automatically traces every request:
-
-=over
-
-=item * Trace created with model name, engine, format, and input messages
-
-=item * Generation recorded with start time, end time, output, and token usage
-
-=item * Errors recorded with level ERROR and the error message
-
-=item * Tags: C<knarr> added to every trace
-
-=back
-
-Traces are sent synchronously after each request. Configure the trace name with
-C<KNARR_TRACE_NAME> or C<langfuse.trace_name> in the config file.
-
-=head2 Programmatic Usage
-
-    use Langertha::Knarr;
-    use Langertha::Knarr::Config;
-
-    # From a config file
-    my $app = Langertha::Knarr->build_app(config_file => 'knarr.yaml');
-
-    # From a pre-built config object
-    my $config = Langertha::Knarr::Config->new(file => 'knarr.yaml');
-    my $app = Langertha::Knarr->build_app(config => $config);
-
-    # Use with any Mojolicious server
-    use Mojo::Server::Daemon;
-    my $daemon = Mojo::Server::Daemon->new(
-      app    => $app,
-      listen => ['http://127.0.0.1:8080'],
-    );
-    $daemon->run;
-
-=head2 Environment Variables
-
-=over
-
-=item * C<OPENAI_API_KEY> — OpenAI API key (auto-detected by C<knarr container>)
-
-=item * C<ANTHROPIC_API_KEY> — Anthropic API key (auto-detected)
-
-=item * C<GROQ_API_KEY> — Groq API key (auto-detected)
-
-=item * C<MISTRAL_API_KEY> — Mistral API key (auto-detected)
-
-=item * C<DEEPSEEK_API_KEY> — DeepSeek API key (auto-detected)
-
-=item * C<GEMINI_API_KEY> — Google Gemini API key (auto-detected)
-
-=item * C<OPENROUTER_API_KEY> — OpenRouter API key (auto-detected)
-
-=item * C<LANGFUSE_PUBLIC_KEY> — Langfuse public key (enables tracing)
-
-=item * C<LANGFUSE_SECRET_KEY> — Langfuse secret key (enables tracing)
-
-=item * C<LANGFUSE_URL> — Langfuse server URL (default: C<https://cloud.langfuse.com>)
-
-=item * C<KNARR_TRACE_NAME> — Name for Langfuse traces (default: C<knarr-proxy>)
-
-=item * C<KNARR_API_KEY> — Require this key in C<Authorization> or C<x-api-key> headers
-
-=back
-
-For CLI documentation, see L<knarr>.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<knarr> — Command-line interface
-
-=item * L<Langertha::Knarr::Config> — Configuration loading and validation
-
-=item * L<Langertha::Knarr::Router> — Model-to-engine routing
-
-=item * L<Langertha::Knarr::Tracing> — Langfuse tracing
-
-=item * L<Langertha::Knarr::Proxy::OpenAI> — OpenAI format handler
-
-=item * L<Langertha::Knarr::Proxy::Anthropic> — Anthropic format handler
-
-=item * L<Langertha::Knarr::Proxy::Ollama> — Ollama format handler
-
-=item * L<Langertha::Knarr::CLI> — CLI entry point
-
-=back
-
-=head2 build_app
-
-    my $app = Langertha::Knarr->build_app(%opts);
-
-Build and return a L<Mojolicious> application with all proxy routes wired up.
-
-Options:
-
-=over
-
-=item * C<config> — A pre-built L<Langertha::Knarr::Config> object
-
-=item * C<config_file> — Path to a YAML config file (used if C<config> not given)
-
-=item * C<before_request> — Optional C<CODEREF> run for every proxy request after JSON/body parsing
-
-    before_request => sub ($c, $ctx) {
-      # $ctx has: proxy_class, type, format, body, model_name, stream, messages, params
-      return { stop => 1, status => 403, message => 'blocked', type => 'authorization_error' }
-        if $ctx->{model_name} eq 'forbidden-model';
-      return; # allow
-    }
-
-Return C<< { stop => 1, ... } >> to block a request. You may also mutate
-C<$ctx> values (e.g., C<model_name>, C<params>) before routing.
-
-=item * C<api_key_validator> — Optional C<CODEREF> for custom key authorization
-
-    api_key_validator => sub ($c, $ctx) {
-      # $ctx has: api_key, raw_auth, path, method, content_type
-      return { allow => 1 } if $ctx->{api_key} eq 'special-key';
-      return { allow => 0, status => 403, message => 'forbidden' };
-    }
-
-Runs for every request except C</health>. If C<proxy_api_key> is configured,
-that static check runs first, then this validator.
-
-The validator may return:
-
-=over
-
-=item * truthy/falsey scalar (allow/deny)
-
-=item * decision hashref C<< { allow => 0|1, status => ..., message => ..., type => ... } >>
-
-=back
-
-=back
-
-Returns a L<Mojolicious> application ready to be passed to C<Mojo::Server::Daemon>
-or any other Mojolicious-compatible server.
+Returns the L<Langertha::Knarr::Session> for the given id, creating
+one on demand. Used internally by the dispatcher.
 
 =head1 SUPPORT
 
@@ -1019,6 +506,10 @@ or any other Mojolicious-compatible server.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

@@ -109,11 +109,16 @@ is( $render_code, 200, 'sql-dashboard saved route renders through the web app' )
 like( $render_body, qr/Connection Profiles/, 'sql-dashboard render exposes connection profile management' );
 like( $render_body, qr/SQL Workspace/, 'sql-dashboard render exposes the merged SQL workspace' );
 unlike( $render_body, qr/data-sql-main-tab="collections"/, 'sql-dashboard render merges SQL collections into the workspace instead of keeping a separate main tab' );
+like( $render_body, qr/data-sql-workspace-tab="collections"/, 'sql-dashboard render exposes the Collection workspace subtab' );
+like( $render_body, qr/data-sql-workspace-tab="run"/, 'sql-dashboard render exposes the Run SQL workspace subtab' );
 like( $render_body, qr/Schema Explorer/, 'sql-dashboard render exposes schema explorer controls' );
 like( $render_body, qr/Run SQL/, 'sql-dashboard render exposes the SQL execution action' );
 unlike( $render_body, qr/Open Schema Explorer/, 'sql-dashboard render removes the redundant open-schema button from the workspace' );
 like( $render_body, qr/<select id="sql-profile-driver"/, 'sql-dashboard render exposes the installed-driver dropdown instead of a free-text driver field' );
-like( $render_body, qr/id="sql-workspace-nav"/, 'sql-dashboard render exposes the workspace navigation rail' );
+like( $render_body, qr/id="sql-workspace-nav"/, 'sql-dashboard render exposes the workspace collection panel' );
+like( $render_body, qr/id="sql-table-filter"/, 'sql-dashboard render exposes the schema table filter box' );
+like( $render_body, qr/data-sql-table-copy/, 'sql-dashboard render exposes schema table copy actions' );
+like( $render_body, qr/data-sql-table-query/, 'sql-dashboard render exposes schema table view-data actions' );
 like( $render_body, qr/id="sql-active-sql-name"/, 'sql-dashboard render exposes the active saved SQL name badge' );
 like( $render_body, qr/id="sql-editor-actions"/, 'sql-dashboard render exposes one understated action row beneath the editor' );
 like( $render_body, qr/id="sql-editor-note"/, 'sql-dashboard render exposes the editor status note beside the understated action row' );
@@ -386,6 +391,18 @@ is_deeply(
     [ 'ID', 'NAME' ],
     'sql-dashboard schema endpoint returns generic DBI column_info rows for the selected table',
 );
+is_deeply(
+    [ map { $_->{TYPE_LABEL} } @{ $schema_payload->{columns} || [] } ],
+    [ 'INTEGER', 'VARCHAR2' ],
+    'sql-dashboard schema endpoint returns normalized type labels for browser display',
+);
+is_deeply(
+    [ map { $_->{LENGTH_LABEL} } @{ $schema_payload->{columns} || [] } ],
+    [ 10, 255 ],
+    'sql-dashboard schema endpoint returns normalized positive length labels for browser display',
+);
+is( $DBI::st::METADATA_EXECUTE_CALLS{tables} || 0, 0, 'sql-dashboard schema endpoint does not call execute on table_info metadata handles' );
+is( $DBI::st::METADATA_EXECUTE_CALLS{columns} || 0, 0, 'sql-dashboard schema endpoint does not call execute on column_info metadata handles' );
 
 my $missing_driver_settings = json_encode(
     {
@@ -543,10 +560,10 @@ sub column_info {
     return bless {
         mode       => 'columns',
         table_name => $table_name,
-        NAME       => [ 'COLUMN_NAME', 'DATA_TYPE', 'DATA_LENGTH' ],
+        NAME       => [ 'COLUMN_NAME', 'DATA_TYPE', 'DATA_LENGTH', 'TYPE_NAME', 'COLUMN_SIZE' ],
         _rows      => [
-            { COLUMN_NAME => 'ID',   DATA_TYPE => 'NUMBER',   DATA_LENGTH => 22 },
-            { COLUMN_NAME => 'NAME', DATA_TYPE => 'VARCHAR2', DATA_LENGTH => 255 },
+            { COLUMN_NAME => 'ID',   DATA_TYPE => 4,  DATA_LENGTH => 22, TYPE_NAME => 'INTEGER',  COLUMN_SIZE => 10 },
+            { COLUMN_NAME => 'NAME', DATA_TYPE => -9, DATA_LENGTH => -255, TYPE_NAME => 'VARCHAR2', COLUMN_SIZE => 255 },
         ],
     }, 'DBI::st';
 }
@@ -558,23 +575,14 @@ package DBI::st;
 use strict;
 use warnings;
 
+our %METADATA_EXECUTE_CALLS;
+
 sub execute {
     my ($self) = @_;
-    if ( ( $self->{mode} || '' ) eq 'tables' ) {
-        $self->{NAME} = [ 'TABLE_NAME' ];
-        $self->{_rows} = [
-            { TABLE_NAME => 'USERS' },
-            { TABLE_NAME => 'ORDERS' },
-        ];
-        return 1;
-    }
-    if ( ( $self->{mode} || '' ) eq 'columns' ) {
-        $self->{NAME} = [ 'COLUMN_NAME', 'DATA_TYPE', 'DATA_LENGTH' ];
-        $self->{_rows} = [
-            { COLUMN_NAME => 'ID',   DATA_TYPE => 'NUMBER',   DATA_LENGTH => 22 },
-            { COLUMN_NAME => 'NAME', DATA_TYPE => 'VARCHAR2', DATA_LENGTH => 255 },
-        ];
-        return 1;
+    my $mode = $self->{mode} || '';
+    if ( $mode eq 'tables' || $mode eq 'columns' ) {
+        $METADATA_EXECUTE_CALLS{$mode}++;
+        die "metadata handles must not call execute for $mode";
     }
 
     my $sql = $self->{sql} || '';
@@ -604,6 +612,10 @@ sub rows {
     return scalar @{ $self->{_rows} || [] };
 }
 
+sub finish {
+    return 1;
+}
+
 1;
 PERL
 }
@@ -626,30 +638,43 @@ and saved profile files stay owner-only.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file tests sql-dashboard data handling, persistence, and security-sensitive behaviour.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for the sql-dashboard runtime and browser workflow. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because the sql-dashboard runtime and browser workflow has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing the sql-dashboard runtime and browser workflow, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/26-sql-dashboard.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/26-sql-dashboard.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/26-sql-dashboard.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/26-sql-dashboard.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

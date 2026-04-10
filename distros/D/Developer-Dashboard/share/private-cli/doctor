@@ -33,30 +33,50 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard doctor command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes C<dashboard doctor> and C<dashboard doctor --fix>. It is the CLI front end for runtime permission audits and repairs.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because runtime permission repair is a built-in operational command, but the actual audit and repair policy belongs in the doctor module rather than in the public switchboard.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing doctor CLI flags or the handoff from the staged helper into the runtime permission audit code.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard doctor>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/doctor> after helper staging.
+Users run C<dashboard doctor> to inspect or C<dashboard doctor --fix> to repair. The staged helper passes the request into the private runtime, which loads the doctor service and prints its report.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/doctor>.
+It is used by operators hardening runtime permissions, by security smoke tests, and by integration flows that validate owner-only runtime modes.
 
 =head1 EXAMPLES
 
+Example 1:
+
   dashboard doctor
 
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/doctor>.
+Run the public built-in command path that stages or re-enters this helper.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/doctor --help
+
+Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository suite.
+
 
 =for comment FULL-POD-DOC END
 

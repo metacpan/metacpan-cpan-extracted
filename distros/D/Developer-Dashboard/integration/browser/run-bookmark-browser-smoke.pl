@@ -474,30 +474,49 @@ regressions fixed in the 1.06 and 1.07 releases.
 
 =head1 PURPOSE
 
-Integration helper script in the Developer Dashboard codebase. This file runs browser-driven bookmark smoke checks against a live Developer Dashboard web instance.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This integration script drives saved pages, bookmark rendering, and page-routing behavior in an environment that is closer to a real install than the unit tests. Read it when you need the exact orchestration steps, external tools, and explicit assertions for that broader check.
 
 =head1 WHY IT EXISTS
 
-It exists to make a repeatable host-or-container integration workflow explicit instead of burying release verification steps in ad-hoc shell history.
+It exists because saved pages, bookmark rendering, and page-routing behavior cannot be trusted from isolated unit coverage alone. The repository needs one place that shows how the bigger environment is created and what success looks like there.
 
 =head1 WHEN TO USE
 
-Use this file when you are rerunning the documented integration workflow for its environment or debugging a release/install problem in that path.
+Use this file when validating saved pages, bookmark rendering, and page-routing behavior, when the blank-environment or browser-smoke docs change, or when a release verification step fails outside the unit-test layer.
 
 =head1 HOW TO USE
 
-Run the script as part of the documented integration plan for its environment. Treat failures here as release blockers, because these scripts represent the supported rerun path.
+Run it directly from the repository root in the environment it expects, read the emitted paths and logs on failure, and prefer the documented wrapper path when one exists so the integration environment stays reproducible.
 
 =head1 WHAT USES IT
 
-It is used by maintainers running the documented install/runtime verification workflow for that environment, and by tests that validate the checked-in integration assets.
+Release verification, integration checklists, and contributors diagnosing environment-specific failures use this file.
 
 =head1 EXAMPLES
 
+Example 1:
+
+  perl integration/browser/run-bookmark-browser-smoke.pl --keep-temp
+
+Keep the temporary project, home, and browser profile directories around for debugging after a failure.
+
+Example 2:
+
+  perl integration/browser/run-bookmark-browser-smoke.pl --bookmark-file /tmp/sample.page --expect-ajax-path '/ajax/test?type=text' --expect-ajax-body 'ok'
+
+Exercise one saved Ajax endpoint as part of the bookmark smoke.
+
+Example 3:
+
+  perl integration/browser/run-bookmark-browser-smoke.pl --bookmark-file /tmp/sample.page --expect-page-fragment 'Hello' --expect-dom-fragment 'Hello'
+
+Point the smoke runner at one explicit bookmark file and assert both raw page and browser DOM output.
+
+Example 4:
+
   perl integration/browser/run-bookmark-browser-smoke.pl
 
-Run the script from the documented integration environment so it can find the expected tarball, browser, or container prerequisites.
+Run this integration helper directly from the repository root.
 
 =for comment FULL-POD-DOC END
 

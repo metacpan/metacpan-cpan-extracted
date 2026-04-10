@@ -1,3 +1,10 @@
+0.000015  2026-04-09 16:16:09-07:00 America/Los_Angeles
+
+    - Use Cpanel::JSON::XS directly and lazily reinitialize to survive global destruction
+    - Replace JSON::PP prereq with Cpanel::JSON::XS in dist.ini
+    - Fix Spawn::wait() to waitpid child processes before destroying shared resources
+    - Add debug flag to Spawn, reduce test suite noise
+
 0.000014  2026-04-08 14:58:59-07:00 America/Los_Angeles
 
     - Refactor viable() into base-class wrapper around _viable() so it never throws

@@ -3,7 +3,7 @@ package Developer::Dashboard::PageDocument;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 
@@ -692,30 +692,50 @@ Construct, mutate, serialize, and render page documents.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file parses bookmark document sections and normalizes bookmark source text.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module parses and normalizes dashboard bookmark instruction documents. It understands the separator-based bookmark format, extracts fields such as C<TITLE>, C<BOOKMARK>, C<STASH>, C<HTML>, and C<CODE*> blocks, and preserves the raw instruction when callers need source-stable editing behavior.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because bookmark parsing is a core format contract. The editor, renderer, source view, seeded pages, and saved page store all need the same understanding of how a bookmark document is shaped.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing bookmark syntax, source preservation, directive parsing, or any workflow that reads or writes the text instruction format behind saved pages.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::PageDocument> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Create or load a page document through the parsing helpers, then pass the normalized structure into the page runtime, page store, or web routes. Keep bookmark syntax rules in this module instead of scattering regex parsing around the codebase.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by page storage and rendering, by skill bookmark routing, by init/seed flows, and by tests that guard the bookmark document grammar.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::PageDocument -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::PageDocument -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/07-core-units.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

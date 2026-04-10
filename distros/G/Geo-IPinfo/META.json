@@ -4,7 +4,7 @@
       "ipinfo.io <support@ipinfo.io>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "geo",
       "network"
@@ -26,6 +26,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "HTTP::Response" : "0",
+            "Test::Mock::LWP::Dispatch" : "0",
             "Test::More" : "0"
          }
       },
@@ -58,6 +60,6 @@
          "web" : "https://github.com/ipinfo/perl"
       }
    },
-   "version" : "v3.3.0",
+   "version" : "v3.4.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

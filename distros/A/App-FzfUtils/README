@@ -2,8 +2,8 @@ NAME
     App::FzfUtils - Utilities related to fzf
 
 VERSION
-    This document describes version 0.002 of App::FzfUtils (from Perl
-    distribution App-FzfUtils), released on 2026-04-08.
+    This document describes version 0.003 of App::FzfUtils (from Perl
+    distribution App-FzfUtils), released on 2026-04-09.
 
 DESCRIPTION
     This distribution includes the following CLI utilities related to fzf:
@@ -68,6 +68,13 @@ FUNCTIONS
 
     after selection, another script (cs-select-helper) will turn back the
     single-line entry into the original.
+
+    Tags
+
+    Some Org tags are used to customize how the entry is displayed or copied
+    to clipboard.
+
+    no_copy_title. Do not copy the title to clipboard.
 
     This function is not exported.
 

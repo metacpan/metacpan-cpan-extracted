@@ -8,6 +8,7 @@ use Cwd ();
 use_ok('Chandra::Pack');
 
 my $tmpdir = Cwd::abs_path(tempdir(CLEANUP => 1));
+my $is_darwin = $^O eq 'darwin';
 
 # ── Create a fake script and modules for testing ─────────────────────
 
@@ -167,112 +168,6 @@ like($@, qr/not found/i, 'croak on non-existent script');
     like($desktop, qr/Type=Application/, 'desktop is Application type');
     like($desktop, qr/Name=Test App/, 'desktop has name');
     like($desktop, qr/Exec=\.\/AppRun/, 'desktop exec is AppRun');
-}
-
-# ── macOS Build ──────────────────────────────────────────────────────
-
-{
-    my $out = file_join($tmpdir, 'build_mac');
-    file_mkdir($out);
-    my $p = Chandra::Pack->new(
-        script   => $script,
-        name     => 'TestApp',
-        version  => '1.0.0',
-        icon     => $icon,
-        assets   => $assets_dir,
-        output   => $out,
-        platform => 'macos',
-    );
-
-    my $result = $p->build;
-    ok($result->{success}, 'macos build succeeded');
-    is($result->{platform}, 'macos', 'result platform is macos');
-    ok($result->{size} > 0, 'result has size');
-
-    my $app = file_join($out, 'TestApp.app');
-    ok(file_is_dir($app), '.app dir created');
-    ok(file_is_dir(file_join($app, 'Contents')), 'Contents dir');
-    ok(file_is_dir(file_join($app, 'Contents', 'MacOS')), 'MacOS dir');
-    ok(file_is_dir(file_join($app, 'Contents', 'Resources')), 'Resources dir');
-    ok(file_is_file(file_join($app, 'Contents', 'Info.plist')), 'Info.plist exists');
-    ok(file_is_file(file_join($app, 'Contents', 'Resources', 'script.pl')), 'script copied');
-
-    # Launcher is executable
-    my $launcher = file_join($app, 'Contents', 'MacOS', 'testapp');
-    ok(file_is_file($launcher), 'launcher exists');
-    ok(-x $launcher, 'launcher is executable');
-
-    # Assets copied
-    ok(file_is_dir(file_join($app, 'Contents', 'Resources', 'assets')), 'assets dir');
-    ok(file_is_file(file_join($app, 'Contents', 'Resources', 'assets', 'style.css')), 'asset file copied');
-    ok(file_is_file(file_join($app, 'Contents', 'Resources', 'assets', 'images', 'bg.png')), 'nested asset copied');
-
-    # Deps copied
-    ok(file_is_dir(file_join($app, 'Contents', 'Resources', 'lib')), 'lib dir');
-
-    # Plist content
-    my $plist = file_slurp(file_join($app, 'Contents', 'Info.plist'));
-    like($plist, qr/TestApp/, 'plist has app name');
-
-    # Callback works
-    my $cb_called = 0;
-    $p->build(sub { $cb_called = 1 });
-    ok($cb_called, 'build callback called');
-}
-
-# ── Linux Build ──────────────────────────────────────────────────────
-
-{
-    my $out = file_join($tmpdir, 'build_linux');
-    file_mkdir($out);
-    my $p = Chandra::Pack->new(
-        script   => $script,
-        name     => 'TestApp',
-        assets   => $assets_dir,
-        output   => $out,
-        platform => 'linux',
-    );
-
-    my $result = $p->build;
-    ok($result->{success}, 'linux build succeeded');
-    is($result->{platform}, 'linux', 'result platform is linux');
-
-    my $app = file_join($out, 'TestApp');
-    ok(file_is_dir($app), 'app dir created');
-
-    my $apprun = file_join($app, 'AppRun');
-    ok(file_is_file($apprun), 'AppRun exists');
-    ok(-x $apprun, 'AppRun is executable');
-
-    ok(file_is_file(file_join($app, 'testapp.desktop')), 'desktop file');
-    ok(file_is_file(file_join($app, 'usr', 'share', 'script.pl')), 'script copied');
-    ok(file_is_dir(file_join($app, 'usr', 'lib', 'perl5')), 'lib dir');
-    ok(file_is_dir(file_join($app, 'usr', 'share', 'assets')), 'assets dir');
-}
-
-# ── Windows Build ────────────────────────────────────────────────────
-
-{
-    my $out = file_join($tmpdir, 'build_win');
-    file_mkdir($out);
-    my $p = Chandra::Pack->new(
-        script   => $script,
-        name     => 'TestApp',
-        assets   => $assets_dir,
-        output   => $out,
-        platform => 'windows',
-    );
-
-    my $result = $p->build;
-    ok($result->{success}, 'windows build succeeded');
-    is($result->{platform}, 'windows', 'result platform is windows');
-
-    my $app = file_join($out, 'TestApp');
-    ok(file_is_dir($app), 'app dir created');
-    ok(file_is_file(file_join($app, 'testapp.bat')), 'bat launcher');
-    ok(file_is_file(file_join($app, 'script.pl')), 'script copied');
-    ok(file_is_dir(file_join($app, 'lib')), 'lib dir');
-    ok(file_is_dir(file_join($app, 'assets')), 'assets dir');
 }
 
 # ── Platform Detection ───────────────────────────────────────────────

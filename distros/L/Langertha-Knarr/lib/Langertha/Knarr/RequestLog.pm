@@ -1,5 +1,5 @@
 package Langertha::Knarr::RequestLog;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: Local disk logging of proxy requests
 use Moo;
 use Time::HiRes qw( gettimeofday tv_interval );
@@ -181,7 +181,7 @@ Langertha::Knarr::RequestLog - Local disk logging of proxy requests
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -282,6 +282,10 @@ Does nothing when C<$handle> is C<undef> (logging was disabled at start).
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

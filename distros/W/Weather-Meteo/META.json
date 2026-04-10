@@ -1,10 +1,10 @@
 {
    "abstract" : "Interface to L<https://open-meteo.com> for historical weather data",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -38,6 +38,10 @@
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
+            "Object::Configure" : "0",
+            "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0",
+            "Return::Set" : "0",
             "Scalar::Util" : "0",
             "Time::HiRes" : "0",
             "URI" : "0",
@@ -47,18 +51,20 @@
       },
       "test" : {
          "requires" : {
-            "DateTime" : "0",
+            "File::Glob" : "0",
+            "File::Slurp" : "0",
+            "File::stat" : "0",
             "Geo::Location::Point" : "0.09",
             "IPC::System::Simple" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
-            "Test::LWP::UserAgent" : "0",
             "Test::MockModule" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
-            "TimeZone::TimeZoneDB" : "0",
             "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
@@ -78,6 +84,6 @@
          "x_repository" : "https://github.com/nigelhorne/Weather-Meteo"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

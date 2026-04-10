@@ -36,30 +36,45 @@ loading the full runtime first.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard path command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes the C<dashboard path ...> subcommand family:
+resolve, locate, cdr, add, del, project-root, and list. It is the public CLI
+front end for saved path aliases, layered runtime path discovery, and the
+payload generation used by shell navigation helpers.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because path alias and navigation commands are built-ins, but the
+actual lookup and regex narrowing rules need to live in Perl so bash, zsh,
+POSIX sh, and PowerShell all use the same behavior.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing C<dashboard path> verbs, staged-helper argv
+handling, or the examples that describe alias resolution and C<cdr>-style
+regex narrowing.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard path>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/path> after helper staging.
+Users run C<dashboard path E<lt>verbE<gt> ...>. The staged helper loads the
+path command runtime and prints either JSON or line-oriented output. For
+C<dashboard path cdr>, the first argument is treated as a saved alias when one
+exists; otherwise it becomes the first search regex under the current
+directory. Any remaining narrowing arguments are case-insensitive regexes and
+all of them must match a candidate directory path.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/path>.
+It is used by the public path command family, by shell bootstraps that depend
+on C<dashboard path cdr>, and by path/cdr regression tests that verify alias
+lookup, current-directory fallback, and multiple-match behavior.
 
 =head1 EXAMPLES
 
-  dashboard path
-
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/path>.
+  dashboard path resolve dashboards
+  dashboard path add work ~/projects/work
+  dashboard path cdr work alpha red
+  dashboard path list
+  dashboard path project-root
 
 =for comment FULL-POD-DOC END
 

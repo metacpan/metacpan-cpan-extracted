@@ -13,6 +13,7 @@ use lib 't/lib';
 use TestFixtures qw(%FIATJAF_EVENT);
 
 use Net::Nostr;
+use Net::Nostr::Client;
 use Net::Nostr::Key;
 use Net::Nostr::Event;
 use Net::Nostr::Filter;
@@ -56,12 +57,11 @@ subtest 'event serialization format' => sub {
 
 subtest 'serialization types are correct for JSON' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc123',
+        pubkey => 'a' x 64,
         created_at => 1000,
         kind => 1,
         tags => [],
         content => 'test',
-        sig => ''
     );
     my $json = $event->json_serialize;
 
@@ -70,30 +70,30 @@ subtest 'serialization types are correct for JSON' => sub {
     like($json, qr/,1,/, 'kind serialized as number');
 
     # pubkey and content must be strings
-    like($json, qr/"abc123"/, 'pubkey serialized as string');
+    like($json, qr/"a{64}"/, 'pubkey serialized as string');
     like($json, qr/"test"/, 'content serialized as string');
 };
 
 subtest 'event id changes when content changes' => sub {
     my $event1 = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'hello',
-        sig => '', created_at => 1000, tags => []
+        pubkey => 'a' x 64, kind => 1, content => 'hello',
+        created_at => 1000, tags => []
     );
     my $event2 = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'world',
-        sig => '', created_at => 1000, tags => []
+        pubkey => 'a' x 64, kind => 1, content => 'world',
+        created_at => 1000, tags => []
     );
     isnt($event1->id, $event2->id, 'different content produces different id');
 };
 
 subtest 'event id changes when tags change' => sub {
     my $event1 = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'test',
-        sig => '', created_at => 1000, tags => []
+        pubkey => 'a' x 64, kind => 1, content => 'test',
+        created_at => 1000, tags => []
     );
     my $event2 = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'test',
-        sig => '', created_at => 1000, tags => [['p', 'def']]
+        pubkey => 'a' x 64, kind => 1, content => 'test',
+        created_at => 1000, tags => [['p', 'def']]
     );
     isnt($event1->id, $event2->id, 'different tags produces different id');
 };
@@ -105,9 +105,9 @@ subtest 'event id is 32-byte lowercase hex (64 chars)' => sub {
 
 subtest 'content special characters are escaped in serialization' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1,
+        pubkey => 'a' x 64, kind => 1,
         content => "line1\nline2\ttab\\backslash\"quote\r\x08\x0C",
-        sig => '', created_at => 1000, tags => []
+        created_at => 1000, tags => []
     );
     my $json = $event->json_serialize;
 
@@ -126,8 +126,8 @@ subtest 'content special characters are escaped in serialization' => sub {
 
 subtest 'empty content serializes correctly' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => '',
-        sig => '', created_at => 1000, tags => []
+        pubkey => 'a' x 64, kind => 1, content => '',
+        created_at => 1000, tags => []
     );
     my $json = $event->json_serialize;
     my $decoded = JSON::decode_json($json);
@@ -136,8 +136,8 @@ subtest 'empty content serializes correctly' => sub {
 
 subtest 'unicode content serializes as UTF-8' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => "\x{1F600}",
-        sig => '', created_at => 1000, tags => []
+        pubkey => 'a' x 64, kind => 1, content => "\x{1F600}",
+        created_at => 1000, tags => []
     );
     my $json = $event->json_serialize;
     my $decoded = JSON::decode_json($json);
@@ -150,8 +150,8 @@ subtest 'unicode content serializes as UTF-8' => sub {
 
 subtest 'tags are arrays of arrays' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'test',
-        sig => '', created_at => 1000,
+        pubkey => 'a' x 64, kind => 1, content => 'test',
+        created_at => 1000,
         tags => [
             ['e', '5c83da77af1dec6d7289834998ad7aafbd9e2191396d75ec3cc27f5a77226f36', 'wss://nostr.example.com'],
             ['p', 'f7234bd4c1394dda46d09f35bd384dd30cc552ad5541990f98844fb06676e9ca'],
@@ -186,41 +186,21 @@ subtest 'tags are arrays of arrays' => sub {
 
 subtest 'empty tags array serializes correctly' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'test',
-        sig => '', created_at => 1000, tags => []
+        pubkey => 'a' x 64, kind => 1, content => 'test',
+        created_at => 1000, tags => []
     );
     my $json = $event->json_serialize;
     my $decoded = JSON::decode_json($json);
     is($decoded->[4], [], 'empty tags serializes as empty array');
 };
 
-subtest 'add_pubkey_ref appends p tag' => sub {
+subtest 'tags are provided at construction time' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'test',
-        sig => '', created_at => 1000, tags => []
+        pubkey => 'a' x 64, kind => 1, content => 'test',
+        created_at => 1000,
+        tags => [['p', 'a' x 64], ['e', 'b' x 64], ['p', 'c' x 64]],
     );
-    $event->add_pubkey_ref('deadbeef' x 8);
-    is($event->tags, [['p', 'deadbeef' x 8]], 'p tag appended');
-};
-
-subtest 'add_event_ref appends e tag' => sub {
-    my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'test',
-        sig => '', created_at => 1000, tags => []
-    );
-    $event->add_event_ref('deadbeef' x 8);
-    is($event->tags, [['e', 'deadbeef' x 8]], 'e tag appended');
-};
-
-subtest 'multiple tags accumulate correctly' => sub {
-    my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 1, content => 'test',
-        sig => '', created_at => 1000, tags => []
-    );
-    $event->add_pubkey_ref('aaa');
-    $event->add_event_ref('bbb');
-    $event->add_pubkey_ref('ccc');
-    is($event->tags, [['p', 'aaa'], ['e', 'bbb'], ['p', 'ccc']], 'tags accumulate in order');
+    is($event->tags, [['p', 'a' x 64], ['e', 'b' x 64], ['p', 'c' x 64]], 'tags set at construction');
 };
 
 ###############################################################################
@@ -320,9 +300,9 @@ subtest 'signed event has all required fields' => sub {
 
 subtest 'kind 0 is user metadata (replaceable)' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'abc', kind => 0,
+        pubkey => 'a' x 64, kind => 0,
         content => '{"name":"alice","about":"hi","picture":"https://example.com/pic.jpg"}',
-        sig => '', created_at => 1000, tags => []
+        created_at => 1000, tags => []
     );
     is($event->kind, 0, 'kind 0 event created');
     my $decoded_content = JSON::decode_json($event->content);
@@ -491,7 +471,7 @@ subtest 'multiple filters in REQ are OR conditions' => sub {
 
     # matches_any: event matching either filter passes
     my $event = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 0, content => '', sig => '',
+        pubkey => 'a' x 64, kind => 0, content => '',
         created_at => 1000, tags => []
     );
     ok(Net::Nostr::Filter->matches_any($event, $f1, $f2), 'event matching second filter passes matches_any');
@@ -1327,7 +1307,7 @@ subtest 'limit is ignored for live events after initial query' => sub {
 subtest 'kind range classification' => sub {
     my $make = sub {
         Net::Nostr::Event->new(
-            pubkey => 'a', kind => $_[0], content => '', sig => '',
+            pubkey => 'a' x 64, kind => $_[0], content => '',
             created_at => 1, tags => []
         );
     };
@@ -1365,14 +1345,14 @@ subtest 'kind range classification' => sub {
 
 subtest 'filter kinds array: event matching any value passes' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 2, content => '', sig => '',
+        pubkey => 'a' x 64, kind => 2, content => '',
         created_at => 1000, tags => [],
     );
     my $filter = Net::Nostr::Filter->new(kinds => [1, 2, 3]);
     ok($filter->matches($event), 'kind 2 matches kinds => [1, 2, 3]');
 
     my $no_match = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 4, content => '', sig => '',
+        pubkey => 'a' x 64, kind => 4, content => '',
         created_at => 1000, tags => [],
     );
     ok(!$filter->matches($no_match), 'kind 4 does not match kinds => [1, 2, 3]');
@@ -1380,14 +1360,14 @@ subtest 'filter kinds array: event matching any value passes' => sub {
 
 subtest 'filter authors array: event matching any value passes' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'c' x 64, kind => 1, content => '', sig => '',
+        pubkey => 'c' x 64, kind => 1, content => '',
         created_at => 1000, tags => [],
     );
     my $filter = Net::Nostr::Filter->new(authors => ['a' x 64, 'b' x 64, 'c' x 64]);
     ok($filter->matches($event), 'pubkey c matches authors => [a, b, c]');
 
     my $no_match = Net::Nostr::Event->new(
-        pubkey => 'd' x 64, kind => 1, content => '', sig => '',
+        pubkey => 'd' x 64, kind => 1, content => '',
         created_at => 1000, tags => [],
     );
     ok(!$filter->matches($no_match), 'pubkey d does not match authors => [a, b, c]');
@@ -1395,11 +1375,11 @@ subtest 'filter authors array: event matching any value passes' => sub {
 
 subtest 'filter ids array: event matching any value passes' => sub {
     my $e1 = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 1, content => 'target', sig => '',
+        pubkey => 'a' x 64, kind => 1, content => 'target',
         created_at => 1000, tags => [],
     );
     my $e2 = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 1, content => 'other', sig => '',
+        pubkey => 'a' x 64, kind => 1, content => 'other',
         created_at => 2000, tags => [],
     );
     my $filter = Net::Nostr::Filter->new(ids => [$e1->id, $e2->id]);
@@ -1409,7 +1389,7 @@ subtest 'filter ids array: event matching any value passes' => sub {
 
 subtest 'filter tag array: event with multiple tags matches if any overlap' => sub {
     my $event = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 1, content => '', sig => '',
+        pubkey => 'a' x 64, kind => 1, content => '',
         created_at => 1000,
         tags => [['e', 'a' x 64], ['e', 'b' x 64]],
     );
@@ -1418,7 +1398,7 @@ subtest 'filter tag array: event with multiple tags matches if any overlap' => s
     ok($filter->matches($event), 'event with tag e=b matches #e => [b, c]');
 
     my $no_match = Net::Nostr::Event->new(
-        pubkey => 'a' x 64, kind => 1, content => '', sig => '',
+        pubkey => 'a' x 64, kind => 1, content => '',
         created_at => 1000,
         tags => [['e', 'd' x 64]],
     );
@@ -1433,13 +1413,13 @@ subtest 'empty filter with no conditions matches all events' => sub {
     my $filter = Net::Nostr::Filter->new();
     my $event = Net::Nostr::Event->new(
         pubkey => 'a' x 64, kind => 1, content => 'anything',
-        sig => '', created_at => 1000, tags => [['t', 'nostr']],
+        created_at => 1000, tags => [['t', 'nostr']],
     );
     ok($filter->matches($event), 'empty filter matches any event');
 
     my $event2 = Net::Nostr::Event->new(
         pubkey => 'b' x 64, kind => 30023, content => '',
-        sig => '', created_at => 9999, tags => [['d', 'test']],
+        created_at => 9999, tags => [['d', 'test']],
     );
     ok($filter->matches($event2), 'empty filter matches different event too');
 };
@@ -1553,28 +1533,28 @@ subtest 'relay returns OK with duplicate: prefix for duplicate events' => sub {
 subtest 'kind must be integer between 0 and 65535' => sub {
     ok(lives {
         Net::Nostr::Event->new(
-            pubkey => 'a' x 64, kind => 0, content => '', sig => '',
+            pubkey => 'a' x 64, kind => 0, content => '',
             created_at => 1000, tags => [],
         );
     }, 'kind 0 accepted');
 
     ok(lives {
         Net::Nostr::Event->new(
-            pubkey => 'a' x 64, kind => 65535, content => '', sig => '',
+            pubkey => 'a' x 64, kind => 65535, content => '',
             created_at => 1000, tags => [],
         );
     }, 'kind 65535 accepted');
 
     ok(dies {
         Net::Nostr::Event->new(
-            pubkey => 'a' x 64, kind => -1, content => '', sig => '',
+            pubkey => 'a' x 64, kind => -1, content => '',
             created_at => 1000, tags => [],
         );
     }, 'kind -1 rejected');
 
     ok(dies {
         Net::Nostr::Event->new(
-            pubkey => 'a' x 64, kind => 65536, content => '', sig => '',
+            pubkey => 'a' x 64, kind => 65536, content => '',
             created_at => 1000, tags => [],
         );
     }, 'kind 65536 rejected');

@@ -1,6 +1,14 @@
 Revision history for Term::Choose
 
 
+1.782   2026-04-09
+    - Updates and bugfixes available height and available width.
+    - Bugfix option mark: wrong mapping.
+    - Backward-incompatible changes: tabs_info, tabs_prompt, tabs_bottom_text.
+    - Minimum terminal size 4 x 2.
+    - line-fold: new option truncate_long_tabs.
+    - Update documentation.
+
 1.781   2026-03-25
     - Removed deprecated code in line-fold.
     - Bugfixes available height and available width.

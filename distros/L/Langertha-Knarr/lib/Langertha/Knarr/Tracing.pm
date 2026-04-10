@@ -1,5 +1,5 @@
 package Langertha::Knarr::Tracing;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: Automatic Langfuse tracing per proxy request
 use Moo;
 use Time::HiRes qw( gettimeofday );
@@ -257,7 +257,7 @@ Langertha::Knarr::Tracing - Automatic Langfuse tracing per proxy request
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -355,6 +355,10 @@ when tracing is disabled or the batch is empty.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

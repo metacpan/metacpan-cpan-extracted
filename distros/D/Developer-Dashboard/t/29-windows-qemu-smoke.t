@@ -55,30 +55,49 @@ and runs the host-side Windows QEMU smoke helper end to end.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file tests the Windows QEMU smoke harness wiring and rerun contract.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for This test is skipped unless C<DD_WINDOWS_QEMU_SMOKE=1> is set. When enabled, it expects the checked-in Windows QEMU env-file configuration to be available and runs the host-side Windows QEMU smoke helper end to end. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because This test is skipped unless C<DD_WINDOWS_QEMU_SMOKE=1> is set. When enabled, it expects the checked-in Windows QEMU env-file configuration to be available and runs the host-side Windows QEMU smoke helper end to end has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use it when the checked-in Windows QEMU smoke flow, env-file contract, or Windows host bootstrap path changes.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/29-windows-qemu-smoke.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/29-windows-qemu-smoke.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release.  Set DD_WINDOWS_QEMU_SMOKE=1 and provide the Windows QEMU env-file before running it; otherwise the test skips by design on normal Unix-only development hosts.
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
+  DD_WINDOWS_QEMU_SMOKE=1 prove -lv t/29-windows-qemu-smoke.t
+
+Run the optional Windows QEMU smoke once the prepared env file is in place.
+
+Example 2:
+
   prove -lv t/29-windows-qemu-smoke.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/29-windows-qemu-smoke.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 4:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

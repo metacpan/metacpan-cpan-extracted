@@ -12,6 +12,8 @@ my $build = Module::Build->new(
 
       'Future::IO' => '0.19',
       'Future::Utils' => 0,
+   },
+   suggests => {
       'Net::LibAsyncNS' => 0,
    },
    test_requires => {

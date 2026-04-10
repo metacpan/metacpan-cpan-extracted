@@ -12,7 +12,6 @@ script/cs-select
 script/cs-select-helper
 script/fzf2clip
 script/fzf2clip-loop
-share/#template1.txt#
 share/sample0.txt
 share/sample1.txt
 share/template1.org

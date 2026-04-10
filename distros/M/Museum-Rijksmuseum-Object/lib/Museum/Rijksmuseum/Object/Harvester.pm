@@ -31,7 +31,7 @@ L<Museum::Rijksmuseum::Object> calls, as it's coming from a different endpoint.
 
     use Museum::Rijksmuseum::Object::Harvester;
 
-    my $h      = Museum::Rijksmuseum::Object::Harvester->new( key => 'abc123xyz' );
+    my $h      = Museum::Rijksmuseum::Object::Harvester->new();
     my $status = $h->harvest(
         set      => 'subject:PublicDomainImages',
         from     => '2023-01-01',
@@ -49,9 +49,9 @@ L<Museum::Rijksmuseum::Object> calls, as it's coming from a different endpoint.
 
 =head2 new
 
-    my $h = Museum::Rijksmuseum::Object::Harvester->new( key => 'abc123xyz' );
+    my $h = Museum::Rijksmuseum::Object::Harvester->new();
 
-Create a new instance of the harvester. C<key> is required.
+Create a new instance of the harvester.
 
 =cut
 
@@ -113,14 +113,13 @@ sub harvest {
     my $callback = $args{callback};
     croak 'A "callback" parameter is required.' unless $callback;
 
-    my $url  = sprintf( 'https://www.rijksmuseum.nl/api/oai/%s', $self->key );
-    my $harv = HTTP::OAI::Harvester->new( baseURL => $url );
+    my $harv = HTTP::OAI::Harvester->new( baseURL => 'https://data.rijksmuseum.nl/oai' );
     # We'll handle resume ourselves, because I think the default way
     # wants to load _everything_ all in one go, or something. It's weird
     # and not useful anyway.
     $harv->resume(0);
 
-    $params->{metadataPrefix} = 'edm_dc';
+    $params->{metadataPrefix} = 'oai_dc';
     my $last_resumption_token = undef;
     my ( $li, $shutdown );
     do {
@@ -148,7 +147,8 @@ sub harvest {
             };
         } elsif ( !$shutdown ) {
             $last_resumption_token = $li->resumptionToken;
-            $params                = { resumptionToken => $last_resumption_token->resumptionToken };
+            $params                = { resumptionToken => $last_resumption_token->resumptionToken }
+                if $last_resumption_token;
             sleep( $delay / 1000.0 ) unless !$delay || !$last_resumption_token;
         }
     } while ( !$shutdown && $li->is_success && $last_resumption_token );
@@ -158,19 +158,6 @@ sub harvest {
         shutdownRequested => $shutdown,
     };
 }
-
-=head1 ATTRIBUTES
-
-=head2 key
-
-The API key provided by the Rijksmuseum.
-
-=cut
-
-has key => (
-    is       => 'rw',
-    required => 1,
-);
 
 =head1 AUTHOR
 
@@ -222,10 +209,6 @@ L<https://gitlab.com/eythian/museum-rijksmuseum-object>
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Museum-Rijksmuseum-Object>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Museum-Rijksmuseum-Object>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Museum-Rijksmuseum-Object>
@@ -239,7 +222,7 @@ L<https://metacpan.org/release/Museum-Rijksmuseum-Object>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by Robin Sheat.
+This software is Copyright (c) 2023-2026 by Robin Sheat.
 
 This is free software, licensed under:
 

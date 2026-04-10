@@ -13,7 +13,7 @@ BEGIN {
 use Capture::Tiny qw(capture);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
-use File::Temp qw(tempdir);
+use File::Temp qw(tempdir tempfile);
 use IO::Socket::INET;
 use IO::Socket::SSL ();
 use HTTP::Request::Common qw(GET);
@@ -62,6 +62,45 @@ sub _mode_octal {
     my @stat = stat($path);
     return undef if !@stat;
     return sprintf '%04o', $stat[2] & 07777;
+}
+
+sub _generate_legacy_cert_fixture {
+    my ( $cert_file, $key_file ) = @_;
+    my ( $config_fh, $config_file ) = tempfile( 'dd-legacy-openssl-XXXXXX', SUFFIX => '.cnf' );
+    print {$config_fh} <<'OPENSSL_CONFIG' or die "Unable to write legacy OpenSSL config $config_file: $!";
+[ req ]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+x509_extensions = legacy_req
+
+[ dn ]
+C = US
+ST = Local
+L = Local
+O = Developer Dashboard
+CN = localhost
+
+[ legacy_req ]
+basicConstraints = critical,CA:TRUE
+OPENSSL_CONFIG
+    close $config_fh or die "Unable to close legacy OpenSSL config $config_file: $!";
+
+    local $ENV{OPENSSL_CONF};
+    my @legacy_cmd = (
+        'openssl', 'req', '-new', '-x509', '-days', '365',
+        '-nodes',
+        '-config', $config_file,
+        '-out', $cert_file,
+        '-keyout', $key_file,
+    );
+    my ( $stdout, $stderr, $exit ) = capture {
+        system(@legacy_cmd);
+    };
+    unlink $config_file or die "Unable to remove legacy OpenSSL config $config_file: $!";
+    die "Unable to generate legacy cert fixture: $stderr$stdout" if $exit != 0;
+    return 1;
 }
 
 {
@@ -189,17 +228,7 @@ sub _mode_octal {
     my $key_file  = File::Spec->catfile( $cert_dir, 'server.key' );
     make_path($cert_dir);
 
-    my @legacy_cmd = (
-        'openssl', 'req', '-new', '-x509', '-days', '365',
-        '-nodes',
-        '-out', $cert_file,
-        '-keyout', $key_file,
-        '-subj', '/C=US/ST=Local/L=Local/O=Developer Dashboard/CN=localhost',
-    );
-    my ( $stdout, $stderr, $exit ) = capture {
-        system(@legacy_cmd);
-    };
-    die "Unable to generate legacy cert fixture: $stderr$stdout" if $exit != 0;
+    _generate_legacy_cert_fixture( $cert_file, $key_file );
 
     my $legacy_info = _openssl_cert_text($cert_file);
     unlike( $legacy_info, qr/Subject Alternative Name:/, 'legacy fixture intentionally lacks SAN coverage' );
@@ -797,30 +826,43 @@ Starman SSL configuration, and HTTP->HTTPS redirect middleware.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file tests the HTTPS frontend and SSL server behaviour.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for HTTPS serving, certificates, and browser-facing SSL behavior. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because HTTPS serving, certificates, and browser-facing SSL behavior has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing HTTPS serving, certificates, and browser-facing SSL behavior, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/17-web-server-ssl.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/17-web-server-ssl.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. 
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/17-web-server-ssl.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/17-web-server-ssl.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Query;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Exporter 'import';
 use FindBin qw($Bin);
@@ -290,30 +290,53 @@ compatibility.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file implements the JSON, YAML, TOML, INI, CSV, XML, and property query helpers.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is the shared parser and dispatcher behind the lightweight query
+commands for JSON, YAML, TOML, Java properties, INI, CSV, and XML. It owns the
+common contract for every query helper: accept an optional dotted path plus an
+optional file path in either order, read from STDIN when no file is given,
+parse the requested format, and print either a scalar value or canonical JSON
+for structured data.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because the dashboard ships a family of query commands that should
+feel consistent across file formats. Keeping parser selection, source
+selection, dotted-path traversal, and scalar-vs-structure output rules in one
+module prevents the helper wrappers from drifting apart and keeps release tests
+focused on one implementation.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing dotted-path semantics, format-specific parsing
+behavior, file-vs-STDIN selection, scalar-vs-JSON output, or the exact error
+surface for malformed input and missing path segments.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::CLI::Query> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Call C<run_query_command> from a staged helper such as C<jq> or C<tomq>,
+passing the helper name and the raw argv list. The module treats the first
+existing file argument as the input source, treats the remaining non-file
+argument as the dotted query path, accepts C<$d> or C<.> for the whole parsed
+document, and prints scalars as plain text while arrays and hashes are emitted
+as canonical JSON. The XML path is intentionally minimal right now: the helper
+stores the raw XML payload under C<_raw> rather than pretending to offer a full
+tree query language.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the private query helper scripts under C<share/private-cli/>,
+by install and release smoke runs that verify format-specific helpers, and by
+coverage tests that exercise parser choice, order-independent argv handling,
+root-document queries, and format-specific edge cases.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::CLI::Query -e 'print qq{loaded\n}'
-
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta
+  dashboard jq response.json '$d'
+  printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta
+  printf 'alpha.beta=5\nname=demo\n' | dashboard propq '$d'
+  printf 'alpha,beta\n7,8\n' | dashboard csvq 1.1
+  printf '<root><value>demo</value></root>' | dashboard xmlq _raw
 
 =for comment FULL-POD-DOC END
 

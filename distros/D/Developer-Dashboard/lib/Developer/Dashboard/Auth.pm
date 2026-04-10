@@ -3,7 +3,7 @@ package Developer::Dashboard::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Fcntl qw(:mode);
 use Digest::SHA qw(sha256_hex);
@@ -378,30 +378,50 @@ Manage trust decisions, helper users, and login UI.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file manages user authentication, password storage, and session-facing auth checks.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module owns helper-user authentication. It stores helper users in the runtime, verifies passwords, renders login-page state, and applies the access rules that distinguish local admin access from helper-user access for non-loopback clients.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because authentication policy should not be scattered across route code. Centralizing helper-user verification and login-page behavior keeps the auth boundary explicit and makes it possible to test the outsider-versus-helper rules directly.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing helper password requirements, login-page messaging, user storage, or the verification logic that decides whether a submitted helper login is valid.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::Auth> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the runtime file and path registries, then use methods such as C<add_user>, C<verify_user>, C<list_users>, and C<login_page>. Route handlers should call into this module instead of parsing auth data themselves.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the web app login flow, by CLI helper-user administration commands, by session/bootstrap logic that decides whether outsider access should be challenged, and by focused auth regression tests.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::Auth -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::Auth -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/03-web-app.t t/08-web-update-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

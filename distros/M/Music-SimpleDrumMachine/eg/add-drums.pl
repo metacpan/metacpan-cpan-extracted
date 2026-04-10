@@ -18,7 +18,6 @@ my $dm = Music::SimpleDrumMachine->new(
     chan      => $chan,
     add_drums => [
         { drum => 'tom', num => 47 },
-        { drum => 'open', num => 46 },
         { drum => 'china', num => 52 },
     ],
     parts      => { part_A => \&part_A },

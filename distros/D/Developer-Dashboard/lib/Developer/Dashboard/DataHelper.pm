@@ -3,7 +3,7 @@ package Developer::Dashboard::DataHelper;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Exporter 'import';
 
@@ -55,30 +55,50 @@ Encode and decode JSON values.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file provides shared data shaping, rendering, and utility helpers used across the runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module keeps the tiny C<j()> and C<je()> compatibility helpers used by older bookmark code blocks. It maps those short names onto the project-standard JSON::XS encoder and decoder so older bookmark snippets can keep working without dragging a larger helper layer into the page runtime.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because some bookmark code still expects the older helper names. Preserving them in one compatibility module lets the runtime stay backward-compatible without letting old helper naming spread through new code.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when you are touching older bookmark snippets that call C<j()> or C<je()>, or when the project-wide JSON behavior changes and the compatibility layer has to stay in sync.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::DataHelper> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Import C<j> and C<je> in the bookmark or compatibility path that needs them. Newer runtime code should normally prefer C<Developer::Dashboard::JSON>, but this module remains the right place for the short historical helper names that old bookmark snippets still call.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by older bookmark code, by compatibility-oriented tests, and by release metadata that keeps the shipped compatibility surface explicit.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::DataHelper -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::DataHelper -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/21-refactor-coverage.t t/00-load.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

@@ -1,0 +1,3 @@
+EV::Kafka        T_PTROBJ
+EV::Kafka::Conn  T_PTROBJ
+EV::Loop         T_PTROBJ

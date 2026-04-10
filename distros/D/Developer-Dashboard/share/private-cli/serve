@@ -33,30 +33,50 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard serve command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes C<dashboard serve>, the command that starts the dashboard web server in background or foreground mode and can also print or follow logs and worker information.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because serving the dashboard is a built-in runtime operation, but the CLI wrapper should remain staged and thin while the runtime and web server modules own process and transport behavior.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing serve CLI flags, foreground/background behavior, or the handoff into the runtime manager and web server stack.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard serve>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/serve> after helper staging.
+Users run C<dashboard serve> or one of its log/worker submodes. The staged helper forwards the request into the private runtime, which launches or inspects the managed web process.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/serve>.
+It is used by local dashboard startup, by integration smoke runs, and by runtime manager tests that verify background serving and log inspection.
 
 =head1 EXAMPLES
 
-  dashboard serve
+Example 1:
 
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/serve>.
+  dashboard serve --foreground
+
+Run the public built-in command path that stages or re-enters this helper.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/serve --help
+
+Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository suite.
+
 
 =for comment FULL-POD-DOC END
 

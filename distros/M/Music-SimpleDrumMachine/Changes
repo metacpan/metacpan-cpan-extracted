@@ -1,5 +1,10 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0502 2026-04-09 10:42:05
+    - Fix-up the eg/ programs.
+    - Add the eg/odd-meter.pl example program.
+    - Improve documentation.
+
 0.0501 2026-04-08 21:35:43
     - Add all the drums known to MIDI::Drummer::Tiny::Grooves.
 

@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "LLM Proxy with Langfuse Tracing",
+  "ABSTRACT" => "Universal LLM hub \x{2014} proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI",
   "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de> L<https://raudssus.de/>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -26,25 +26,33 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Langertha::Knarr",
   "PREREQ_PM" => {
-    "File::ShareDir::ProjectDistDir" => 0,
+    "Data::UUID" => 0,
+    "Future" => 0,
+    "Future::AsyncAwait" => "0.66",
+    "HTTP::Request" => 0,
+    "HTTP::Response" => 0,
+    "IO::Async" => "0.802",
     "JSON::MaybeXS" => 0,
-    "Langertha" => "0.307",
+    "Langertha" => "0.400",
     "Log::Any" => 0,
     "MIME::Base64" => 0,
     "Module::Runtime" => 0,
-    "Mojolicious" => "9.0",
     "Moo" => 0,
     "MooX::Cmd" => 0,
     "MooX::Options" => 0,
+    "Moose" => 0,
+    "Net::Async::HTTP" => 0,
+    "Net::Async::HTTP::Server" => 0,
     "Time::HiRes" => 0,
+    "Try::Tiny" => 0,
     "YAML::PP" => 0
   },
   "TEST_REQUIRES" => {
-    "MooX::Cmd::Tester" => 0,
-    "Test2::Suite" => 0,
-    "Test::Mojo" => 0
+    "Capture::Tiny" => 0,
+    "Path::Tiny" => 0,
+    "Test2::Suite" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "1.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,20 +60,28 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "File::ShareDir::ProjectDistDir" => 0,
+  "Capture::Tiny" => 0,
+  "Data::UUID" => 0,
+  "Future" => 0,
+  "Future::AsyncAwait" => "0.66",
+  "HTTP::Request" => 0,
+  "HTTP::Response" => 0,
+  "IO::Async" => "0.802",
   "JSON::MaybeXS" => 0,
-  "Langertha" => "0.307",
+  "Langertha" => "0.400",
   "Log::Any" => 0,
   "MIME::Base64" => 0,
   "Module::Runtime" => 0,
-  "Mojolicious" => "9.0",
   "Moo" => 0,
   "MooX::Cmd" => 0,
-  "MooX::Cmd::Tester" => 0,
   "MooX::Options" => 0,
+  "Moose" => 0,
+  "Net::Async::HTTP" => 0,
+  "Net::Async::HTTP::Server" => 0,
+  "Path::Tiny" => 0,
   "Test2::Suite" => 0,
-  "Test::Mojo" => 0,
   "Time::HiRes" => 0,
+  "Try::Tiny" => 0,
   "YAML::PP" => 0
 );
 

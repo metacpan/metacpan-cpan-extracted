@@ -3,7 +3,7 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -169,30 +169,50 @@ Construct and execute dashboard updates.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file runs the staged update scripts that maintain the dashboard runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module runs the ordered update hook chain for C<dashboard update>. It discovers executable update scripts, runs them in sorted order, streams their stdout and stderr, updates the structured C<RESULT> state between hooks, and coordinates collector stop/start around the update window.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because update hooks are a first-class runtime workflow, not a one-off shell loop. The dashboard needs one module that owns ordering, streaming, structured hook results, and collector lifecycle around updates.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing update hook discovery, update streaming behavior, RESULT propagation between update hooks, or the way updates stop and restart collectors.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::UpdateManager> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the file registry, path registry, and collector runner, then call its run method from the update command. Keep update hook execution policy in this module rather than in the command wrapper.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the C<dashboard update> flow, by runtime bootstrap/update smoke tests, and by coverage that verifies update hook ordering and collector restart semantics.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::UpdateManager -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::UpdateManager -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/04-update-manager.t t/26-sql-dashboard.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

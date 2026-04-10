@@ -1,5 +1,19 @@
 Revision history for Langertha-Skeid
 
+0.002     2026-04-10 00:37:36Z
+
+    - Drop Langertha::Knarr dependency. Skeid no longer goes through
+      the Knarr namespace facades for format conversion or metrics —
+      it talks to Langertha::Usage / Cost / Pricing / UsageRecord /
+      Tool / ToolCall / ToolChoice directly from Langertha core. Bump
+      Langertha floor to 0.400.
+    - Skeid::Proxy hot path unchanged: still raw HTTP forwarding via
+      Mojo::UserAgent + class-method calls on the new value objects,
+      no per-request object construction overhead.
+    - Skeid::Proxy: fix duplicate $choice variable in
+      _openai_response_to_anthropic uncovered during the port.
+    - dist.ini sets irc = #langertha (on irc.perl.org).
+
 0.001     2026-03-15 01:22:05Z
 
     - Make usage storage layer pluggable: `record_usage` delegates to

@@ -172,4 +172,12 @@ subtest 'to_tags returns tags array' => sub {
     is($tags, [['p', 'a' x 64, 'wss://r.com/', 'alice']], 'correct tags');
 };
 
+subtest 'new() rejects unknown arguments' => sub {
+    like(
+        dies { Net::Nostr::FollowList->new(bogus => 'value') },
+        qr/unknown.+bogus/i,
+        'unknown argument rejected'
+    );
+};
+
 done_testing;

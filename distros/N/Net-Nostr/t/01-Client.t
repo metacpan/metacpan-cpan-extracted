@@ -83,6 +83,34 @@ subtest 'connect with callback (async)' => sub {
     $relay->stop;
 };
 
+subtest 'POD: async connect with error callback' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $url = "ws://127.0.0.1:$port";
+    my $client = Net::Nostr::Client->new;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+
+    $client->connect($url, sub {
+        my ($err) = @_;
+        if ($err) {
+            warn "Connection failed: $err";
+            $cv->send;
+            return;
+        }
+        # connected successfully
+        ok(!$err, 'no error on success');
+        $cv->send;
+    });
+
+    $cv->recv;
+
+    $client->disconnect;
+    $relay->stop;
+};
+
 ###############################################################################
 # Publish (EVENT) and receive OK
 ###############################################################################
@@ -392,6 +420,51 @@ subtest 'authenticate sends AUTH event and receives OK' => sub {
     $relay->stop;
 };
 
+###############################################################################
+# POD example: count method
+###############################################################################
+
+subtest 'POD: count method with callback' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $pubkey = 'a' x 64;
+
+    my $client = Net::Nostr::Client->new;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+
+    my ($got_query_id, $got_count, $got_approximate);
+    $client->on(count => sub {
+        my ($query_id, $count, $approximate) = @_;
+        $got_query_id = $query_id;
+        $got_count = $count;
+        $got_approximate = $approximate;
+        $cv->send;
+    });
+
+    $client->connect("ws://127.0.0.1:$port");
+    $client->count('followers', Net::Nostr::Filter->new(
+        kinds => [3], '#p' => [$pubkey],
+    ));
+
+    $cv->recv;
+
+    is $got_query_id, 'followers', 'query_id passed to callback';
+    is $got_count, 0, 'count passed to callback';
+    ok !$got_approximate, 'approximate passed to callback';
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+subtest 'count before connect croaks' => sub {
+    my $client = Net::Nostr::Client->new;
+    my $filter = Net::Nostr::Filter->new(kinds => [1]);
+    ok dies { $client->count('q1', $filter) }, 'count before connect dies';
+};
+
 subtest 'authenticate before connect croaks' => sub {
     my $client = Net::Nostr::Client->new;
     my $key = Net::Nostr::Key->new;
@@ -417,6 +490,125 @@ subtest 'authenticate without challenge croaks' => sub {
 
     $client->disconnect;
     $relay->stop;
+};
+
+###############################################################################
+# Async connect: callback error semantics
+###############################################################################
+
+subtest 'async connect callback receives undef on success' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $client = Net::Nostr::Client->new;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $got_err = 'SENTINEL';
+
+    $client->connect("ws://127.0.0.1:$port", sub {
+        ($got_err) = @_;
+        $cv->send;
+    });
+
+    $cv->recv;
+    is($got_err, undef, 'callback receives undef on success');
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+subtest 'async connect callback receives error on failure' => sub {
+    my $port = free_port();
+    # Don't start anything on this port
+    my $client = Net::Nostr::Client->new;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $got_err;
+
+    $client->connect("ws://127.0.0.1:$port", sub {
+        ($got_err) = @_;
+        $cv->send;
+    });
+
+    $cv->recv;
+    ok(defined $got_err, 'callback receives error on failure');
+    like($got_err, qr/connect failed/, 'error message describes failure');
+};
+
+###############################################################################
+# on() callback validation
+###############################################################################
+
+subtest 'on() croaks if callback is not a code ref' => sub {
+    my $client = Net::Nostr::Client->new;
+    like(dies { $client->on('event', 'not a sub') },
+        qr/callback.*code/i, 'string callback rejected');
+    like(dies { $client->on('ok', [1, 2]) },
+        qr/callback.*code/i, 'arrayref callback rejected');
+    like(dies { $client->on('notice', { hash => 1 }) },
+        qr/callback.*code/i, 'hashref callback rejected');
+    like(dies { $client->on('eose', 42) },
+        qr/callback.*code/i, 'numeric callback rejected');
+    like(dies { $client->on('auth', undef) },
+        qr/callback.*code/i, 'undef callback rejected');
+};
+
+subtest 'on() accepts code ref' => sub {
+    my $client = Net::Nostr::Client->new;
+    ok(lives { $client->on('event', sub { }) }, 'code ref accepted');
+};
+
+subtest 'on() replaces previous callback for same type' => sub {
+    my $client = Net::Nostr::Client->new;
+    my @calls;
+    $client->on('notice', sub { push @calls, 'first' });
+    $client->on('notice', sub { push @calls, 'second' });
+    # Trigger via _emit to verify only second fires
+    $client->_emit('notice', 'test');
+    is \@calls, ['second'], 'second callback replaced first';
+};
+
+###############################################################################
+# connect() callback validation
+###############################################################################
+
+subtest 'connect() croaks if callback is not a code ref' => sub {
+    my $client = Net::Nostr::Client->new;
+    like(dies { $client->connect('ws://localhost:9999', 'not a sub') },
+        qr/callback.*code/i, 'string callback rejected');
+    like(dies { $client->connect('ws://localhost:9999', [1]) },
+        qr/callback.*code/i, 'arrayref callback rejected');
+};
+
+subtest 'new() rejects unknown arguments' => sub {
+    like(
+        dies { Net::Nostr::Client->new(bogus => 'value') },
+        qr/unknown.+bogus/i,
+        'unknown argument rejected'
+    );
+};
+
+###############################################################################
+# neg_open / neg_msg / neg_close: require connection
+###############################################################################
+
+subtest 'neg_open croaks when not connected' => sub {
+    my $client = Net::Nostr::Client->new;
+    like dies { $client->neg_open('sub1', Net::Nostr::Filter->new(kinds => [1]), 'ab') },
+        qr/not connected/i, 'not connected';
+};
+
+subtest 'neg_msg croaks when not connected' => sub {
+    my $client = Net::Nostr::Client->new;
+    like dies { $client->neg_msg('sub1', 'ab') },
+        qr/not connected/i, 'not connected';
+};
+
+subtest 'neg_close croaks when not connected' => sub {
+    my $client = Net::Nostr::Client->new;
+    like dies { $client->neg_close('sub1') },
+        qr/not connected/i, 'not connected';
 };
 
 done_testing;

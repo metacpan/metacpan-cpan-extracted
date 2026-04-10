@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use overload;
 require XSLoader;
 XSLoader::load('smallnum::XS', $VERSION);
@@ -27,7 +27,7 @@ smallnum::XS - faster transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 0.08
+Version 0.11
 
 =cut
 

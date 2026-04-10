@@ -12,7 +12,7 @@ use List::Util qw(max);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -67,6 +67,9 @@ sub run {
 		err 'Subfield is required.';
 	}
 
+	if (! -r $self->{'_marc_xml_file'}) {
+		err "File '$self->{'_marc_xml_file'}' doesn't exist.";
+	}
 	my $marc_file = MARC::File::XML->in($self->{'_marc_xml_file'});
 	my $ret_hr = {};
 	my $num = 1;
@@ -120,7 +123,7 @@ sub run {
 				reverse sort {
 					$ret_hr->{$a} <=> $ret_hr->{$b}
 					||
-					$a cmp $b
+					$b cmp $a
 				}
 				keys %{$ret_hr};
 		} else {
@@ -178,6 +181,7 @@ Returns 1 for error, 0 for success.
 
  run():
          Bad field definition. Must be a 'leader' or numeric value of the field.
+         File '%s' doesn't exist.
          Subfield is required.
 
 =head1 EXAMPLE
@@ -361,12 +365,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2025 Michal Josef Špaček
+© 2022-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

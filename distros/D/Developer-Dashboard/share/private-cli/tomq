@@ -34,30 +34,36 @@ This command provides TOML path extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard tomq command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper owns the public C<dashboard tomq> command. It accepts an
+optional dotted TOML path plus an optional input file, then hands the request
+to the shared query runtime so parsing, file-vs-STDIN handling, and output
+formatting stay consistent with the rest of the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because the dashboard ships a private, repo-local TOML inspection tool instead of depending on a globally installed parser binary. Keeping C<tomq> as a staged helper also preserves the thin-switchboard contract in C<bin/dashboard>.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when you are changing how C<dashboard tomq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard tomq>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/tomq> after helper staging.
+Users run C<dashboard tomq [path] [file]>. The staged helper selects the TOML
+backend in the shared query runtime, which accepts the file and path in either
+order, reads STDIN when no file is given, prints scalar hits as plain text, and
+prints the whole parsed document when the path is C<$d> or C<.>.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/tomq>.
+It is used by the public C<dashboard tomq> command, by shell snippets that want a runtime-local TOML query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
 
 =head1 EXAMPLES
 
-  dashboard tomq
-
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/tomq>.
+  printf '[alpha]\nbeta = 4\n' | dashboard tomq alpha.beta
+  dashboard tomq settings.toml '$d'
+  dashboard tomq '$d' settings.toml
+  printf '[service]\nname = "demo"\n' | dashboard tomq service.name
 
 =for comment FULL-POD-DOC END
 

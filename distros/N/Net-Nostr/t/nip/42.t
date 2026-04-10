@@ -727,4 +727,162 @@ subtest 'client stores challenge for relay' => sub {
     $relay->stop;
 };
 
+###############################################################################
+# AUTH relay URL matching: scheme, host, port, and path
+###############################################################################
+
+subtest 'relay rejects AUTH when port differs' => sub {
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        relay_url         => "ws://127.0.0.1:$port",
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $key = Net::Nostr::Key->new;
+    my $client = Net::Nostr::Client->new;
+    my ($got_challenge, $auth_accepted);
+
+    $client->on(auth => sub { $got_challenge = $_[0] });
+    $client->on(ok => sub { $auth_accepted = $_[1] });
+    $client->connect("ws://127.0.0.1:$port");
+
+    my $cv = AnyEvent->condvar;
+    my $w = AnyEvent->timer(after => 0.1, cb => sub { $cv->send });
+    $cv->recv;
+
+    my $auth_event = $key->create_event(
+        kind    => 22242,
+        content => '',
+        tags    => [
+            ['relay', "ws://127.0.0.1:9999"],
+            ['challenge', $got_challenge],
+        ],
+    );
+    my $msg = Net::Nostr::Message->new(type => 'AUTH', event => $auth_event);
+    $client->_conn->send($msg->serialize);
+
+    $cv = AnyEvent->condvar;
+    $w = AnyEvent->timer(after => 0.1, cb => sub { $cv->send });
+    $cv->recv;
+
+    is $auth_accepted, 0, 'port mismatch rejected';
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+subtest 'relay rejects AUTH when scheme differs' => sub {
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        relay_url         => "ws://127.0.0.1:$port",
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $key = Net::Nostr::Key->new;
+    my $client = Net::Nostr::Client->new;
+    my ($got_challenge, $auth_accepted);
+
+    $client->on(auth => sub { $got_challenge = $_[0] });
+    $client->on(ok => sub { $auth_accepted = $_[1] });
+    $client->connect("ws://127.0.0.1:$port");
+
+    my $cv = AnyEvent->condvar;
+    my $w = AnyEvent->timer(after => 0.1, cb => sub { $cv->send });
+    $cv->recv;
+
+    my $auth_event = $key->create_event(
+        kind    => 22242,
+        content => '',
+        tags    => [
+            ['relay', "wss://127.0.0.1:$port"],
+            ['challenge', $got_challenge],
+        ],
+    );
+    my $msg = Net::Nostr::Message->new(type => 'AUTH', event => $auth_event);
+    $client->_conn->send($msg->serialize);
+
+    $cv = AnyEvent->condvar;
+    $w = AnyEvent->timer(after => 0.1, cb => sub { $cv->send });
+    $cv->recv;
+
+    is $auth_accepted, 0, 'scheme mismatch rejected';
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+subtest 'relay rejects AUTH when path differs' => sub {
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        relay_url         => "ws://127.0.0.1:$port",
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $key = Net::Nostr::Key->new;
+    my $client = Net::Nostr::Client->new;
+    my ($got_challenge, $auth_accepted);
+
+    $client->on(auth => sub { $got_challenge = $_[0] });
+    $client->on(ok => sub { $auth_accepted = $_[1] });
+    $client->connect("ws://127.0.0.1:$port");
+
+    my $cv = AnyEvent->condvar;
+    my $w = AnyEvent->timer(after => 0.1, cb => sub { $cv->send });
+    $cv->recv;
+
+    my $auth_event = $key->create_event(
+        kind    => 22242,
+        content => '',
+        tags    => [
+            ['relay', "ws://127.0.0.1:$port/custom"],
+            ['challenge', $got_challenge],
+        ],
+    );
+    my $msg = Net::Nostr::Message->new(type => 'AUTH', event => $auth_event);
+    $client->_conn->send($msg->serialize);
+
+    $cv = AnyEvent->condvar;
+    $w = AnyEvent->timer(after => 0.1, cb => sub { $cv->send });
+    $cv->recv;
+
+    is $auth_accepted, 0, 'path mismatch rejected';
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+###############################################################################
+# AUTH relay URL matching: NIP-42 normalization (bracketed IPv6, case, ports)
+###############################################################################
+
+# "URL normalization techniques can be applied. For most cases just checking
+# if the domain name is correct should be enough."
+
+subtest 'relay URL matching supports bracketed IPv6 addresses' => sub {
+    ok(Net::Nostr::Relay::_relay_host_matches(
+        'ws://[::1]:8080', 'ws://[::1]:8080'),
+        'bracketed IPv6 exact match');
+    ok(Net::Nostr::Relay::_relay_host_matches(
+        'wss://[2001:db8::1]:443', 'wss://[2001:db8::1]'),
+        'bracketed IPv6 with default port normalization');
+    ok(Net::Nostr::Relay::_relay_host_matches(
+        'wss://[2001:DB8::1]', 'wss://[2001:db8::1]'),
+        'bracketed IPv6 case-insensitive');
+};
+
+subtest 'relay URL matching normalizes scheme and host case' => sub {
+    ok(Net::Nostr::Relay::_relay_host_matches(
+        'WSS://Relay.Example.COM', 'wss://relay.example.com'),
+        'scheme and host case-insensitive');
+};
+
+subtest 'relay URL matching normalizes default ports' => sub {
+    ok(Net::Nostr::Relay::_relay_host_matches(
+        'ws://relay.example.com:80', 'ws://relay.example.com'),
+        'ws default port 80');
+    ok(Net::Nostr::Relay::_relay_host_matches(
+        'wss://relay.example.com:443', 'wss://relay.example.com'),
+        'wss default port 443');
+};
+
 done_testing;

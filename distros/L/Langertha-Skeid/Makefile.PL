@@ -27,8 +27,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Langertha::Skeid",
   "PREREQ_PM" => {
     "JSON::MaybeXS" => "1.004004",
-    "Langertha" => "0.307",
-    "Langertha::Knarr" => "0.007",
+    "Langertha" => "0.400",
     "Mojolicious" => "9.0",
     "Moo" => "2.005005",
     "YAML::PP" => "0.038"
@@ -38,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::File::ShareDir" => 0,
     "Test::Mojo" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,8 +46,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "JSON::MaybeXS" => "1.004004",
-  "Langertha" => "0.307",
-  "Langertha::Knarr" => "0.007",
+  "Langertha" => "0.400",
   "Mojolicious" => "9.0",
   "Moo" => "2.005005",
   "Test2::Suite" => 0,

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use v5.36;
 use feature 'try';
@@ -458,7 +458,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0501
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -503,7 +503,7 @@ version 0.0501
       return $next, \%patterns;
   }
   sub fill_A {
-      print "fill_A\n";
+      print "Fill A\n";
       my %patterns = (
           snare => [qw(1 0 1 0 1 1 1 1 0 1 0 1 1 0 1 0)],
       );
@@ -614,7 +614,7 @@ Default: C<1>
 
 List of named code-refs of the fills to play.
 
-Default: C<{ _default_fill =E<gt> _default_fill() }>
+Default: C<{ _default_fill =E<gt> \&_default_fill }>
 
 =head2 filling
 
@@ -667,13 +667,15 @@ If a part has C<'fill'> in the name, it will be played for a single
 bar, on the 3rd bar of a 4-bar phrase iff the B<filling> attribute is
 set to zero.
 
-Default: C<{ _default_part =E<gt> _default_part() }>
+Default: C<{ _default_part =E<gt> \&_default_part }>
 
 =head2 port_name
 
   $port = $dm->port_name;
 
-The name of the MIDI output port.
+The name of the MIDI output port. This can be the full name or a
+unique part of the name, like C<'usb'> for C<'USB MIDI Interface'>,
+for instance. Case is ignored.
 
 Default: C<usb>
 

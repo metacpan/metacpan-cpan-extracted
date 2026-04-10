@@ -12,8 +12,6 @@ use Developer::Dashboard::CLI::SeededPages;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
-use Developer::Dashboard::SeedSync;
-
 my $paths = Developer::Dashboard::PathRegistry->new(
     workspace_roots => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
     project_roots   => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
@@ -34,16 +32,13 @@ for my $seed (
   )
 {
     my ( $id, $page ) = @{$seed};
-    if ( grep { $_ eq $id } @pages ) {
-        my $current = eval { $pages->read_saved_entry($id) };
-        next
-          if defined $current
-          && Developer::Dashboard::SeedSync::same_content_md5( $current, $page->canonical_instruction );
-        next;
-    }
-    $pages->save_page($page);
-    push @pages, $id;
-    print "Created $id page\n";
+    my $status = Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
+        page  => $page,
+        pages => $pages,
+        paths => $paths,
+    );
+    push @pages, $id if !grep { $_ eq $id } @pages;
+    print ucfirst($status) . " $id page\n" if $status eq 'created' || $status eq 'updated';
 }
 
 print "Runtime bootstrap complete\n";
@@ -63,30 +58,49 @@ API and SQL dashboard pages when they do not already exist.
 
 =head1 PURPOSE
 
-Update script in the Developer Dashboard codebase. This file creates the baseline runtime directories and seed files used during update and install flows.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged update script owns one explicit phase of runtime update, bootstrap, and staged maintenance behavior. Read it when you need the real runtime side effects, logging, and failure behavior for that phase rather than inferring it from the higher-level command wrapper.
 
 =head1 WHY IT EXISTS
 
-It exists to keep update/bootstrap phases explicit, rerunnable, and separately testable.
+It exists so the update pipeline stays explicit, inspectable, and testable one phase at a time. That keeps failures visible and avoids hiding important runtime changes inside one oversized installer step.
 
 =head1 WHEN TO USE
 
-Use this file when you are working on the staged update/bootstrap pipeline or debugging update-time runtime preparation.
+Use this file when changing runtime update, bootstrap, and staged maintenance behavior, when debugging the staged update pipeline, or when the higher-level dashboard update flow fails and you need to isolate this phase.
 
 =head1 HOW TO USE
 
-Run it through the dashboard update/bootstrap flow rather than inventing a parallel manual setup path. Keep the phase idempotent and explicit so reruns are safe.
+Run it through C<dashboard update> for the supported path, or invoke the file directly from the source tree when you need to debug only this phase. Keep the phase explicit, idempotent where intended, and noisy on failure.
 
 =head1 WHAT USES IT
 
-It is used by the runtime update/bootstrap pipeline, by the related update manager logic, and by tests that verify update behaviour.
+The staged runtime update pipeline, update-manager verification, and contributors debugging install or bootstrap regressions use this file.
 
 =head1 EXAMPLES
 
+Example 1:
+
+  prove -lv t/26-sql-dashboard.t t/27-sql-dashboard-playwright.t
+
+Rerun the SQL dashboard seed tests after changing how this bootstrap phase refreshes managed starter pages.
+
+Example 2:
+
   dashboard update
 
-That higher-level command is the supported path that eventually reaches this staged update phase.
+Run the supported end-user path that can reach this update phase.
+
+Example 3:
+
+  perl updates/01-bootstrap-runtime.pl
+
+Invoke only this phase while debugging the update pipeline in a source checkout.
+
+Example 4:
+
+  prove -lv t/04-update-manager.t
+
+Rerun the focused update-manager coverage after changing update behavior.
 
 =for comment FULL-POD-DOC END
 

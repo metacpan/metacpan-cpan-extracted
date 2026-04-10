@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.038",
   "NAME" => "Developer::Dashboard",
   "PREREQ_PM" => {
+    "Archive::Zip" => 0,
     "Capture::Tiny" => 0,
     "Cwd" => 0,
     "Dancer2" => 0,
@@ -78,11 +79,10 @@ my %WriteMakefileArgs = (
     "HTTP::Request::Common" => 0,
     "HTTP::Response" => 0,
     "IO::Socket::SSL" => 0,
-    "LWP::UserAgent" => 0,
     "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.02",
+  "VERSION" => "2.17",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,6 +90,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::Zip" => 0,
   "Capture::Tiny" => 0,
   "Cwd" => 0,
   "Dancer2" => 0,

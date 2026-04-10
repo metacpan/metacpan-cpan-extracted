@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('JSON::YY', $VERSION);
@@ -48,11 +48,10 @@ sub import {
         }
     }
     my $caller = caller;
+
+    # activate keywords via XS::Parse::Keyword hint keys
     if ($want_doc) {
-        no strict 'refs';
-        for my $kw (@DOC_KEYWORDS) {
-            *{"${caller}::${kw}"} = \&{"_xs_${kw}"};
-        }
+        $^H{"JSON::YY/$_"} = 1 for @DOC_KEYWORDS;
     }
     if (@flags) {
         my $coder = $class->new;
@@ -71,6 +70,8 @@ sub import {
             Carp::croak("'$e' is not exported by JSON::YY")
                 unless grep { $_ eq $e } @EXPORT_OK;
             *{"${caller}::$e"} = \&{$e};
+            # also enable keyword for exported functions
+            $^H{"JSON::YY/$e"} = 1;
         }
     }
 }
@@ -149,12 +150,12 @@ JSON library written in ANSI C. It provides three API layers:
 
 =over 4
 
-=item B<Functional/Keyword API> - C<encode_json>/C<decode_json> compiled as
-custom Perl ops via the keyword plugin, eliminating function call overhead.
+=item Functional/Keyword API - C<encode_json>/C<decode_json> compiled as
+custom Perl ops via L<XS::Parse::Keyword>, eliminating function call overhead.
 
-=item B<OO API> - JSON::XS-compatible interface with chaining setters.
+=item OO API - JSON::XS-compatible interface with chaining setters.
 
-=item B<Doc API> - Operate directly on yyjson's mutable document tree using
+=item Doc API - Operate directly on yyjson's mutable document tree using
 path-based keywords. Avoids full Perl materialization for surgical JSON edits.
 
 =back
@@ -182,8 +183,10 @@ for medium/large documents. Modification attempts croak.
 
 =back
 
-When imported, these names are registered as Perl keywords that compile
-to custom ops, bypassing the normal function dispatch.
+When imported via C<qw()>, these compile to custom ops via
+L<XS::Parse::Keyword>, bypassing normal function dispatch. Keywords
+are lexically scoped. The C<-flag> import style installs pre-configured
+closures instead (not compiled as keywords).
 
 =head1 OO API
 
@@ -272,6 +275,8 @@ Use C<""> for root. Use C</arr/-> to append to an array.
 =item jget $doc, $path
 
 Get a subtree reference (returns a Doc that shares the parent's tree).
+Croaks if path not found. Use C<jhas> to check first, or C<jgetp> for
+undef-on-missing behavior.
 
 =item jgetp $doc, $path
 
@@ -520,25 +525,36 @@ Paths use JSON Pointer syntax:
 
 =head1 PERFORMANCE
 
-Encode vs JSON::XS (higher is better):
+=head2 Encode (ops/sec, higher is better)
 
-    small  (38B):   YY 5-19% faster
-    medium (11KB):  YY 3-5% faster
-    large  (806KB): YY 53-57% faster
+                    JSON::XS    JSON::YY     delta
+    small  (38B)    6.4M        6.7M         +4%
+    medium (11KB)   26.8K       27.3K        +2%
+    large  (806KB)  153         234         +53%
 
-Decode vs JSON::XS:
+=head2 Decode (ops/sec, higher is better)
 
-    small:  YY 8-14% slower (SV allocation overhead)
-    medium: YY ~15% slower
-    large:  YY ~equal to 6% faster
+                    JSON::XS    JSON::YY     delta
+    small  (38B)    4.2M        3.5M        -17%
+    medium (11KB)   16.9K       14.1K       -16%
+    large  (806KB)  249         267          +8%
 
-Doc API vs Perl decode-modify-encode:
+Encode is consistently faster, especially on large payloads where
+yyjson's optimized serializer dominates. Decode is slightly slower
+on small/medium payloads due to Perl SV allocation overhead.
 
-    read single value:  Doc ~equal
-    modify + serialize: Doc 28% faster (small), 539% faster (medium)
-    read from large:    Doc 380% faster (no materialization)
-    clone subtree:      Doc 404% faster
-    type/length check:  Doc 408% faster
+=head2 Doc API vs decode-modify-encode cycle
+
+                            Perl        Doc         speedup
+    read one value          3.0M/s      3.1M/s      ~equal
+    modify + serialize      1.6M/s      2.2M/s      +42%
+    read from large doc     14.6K/s     73.7K/s     +405%
+    modify large + encode   7.4K/s      47.3K/s     +536%
+    clone subtree           15.0K/s     75.2K/s     +400%
+    type/length check       14.4K/s     74.6K/s     +418%
+
+The Doc API avoids full Perl materialization, providing 4-5x speedup
+for surgical operations on medium/large documents.
 
 =head1 LIMITATIONS
 

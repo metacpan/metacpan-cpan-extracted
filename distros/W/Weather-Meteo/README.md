@@ -4,7 +4,7 @@ Weather::Meteo - Interface to [https://open-meteo.com](https://open-meteo.com) f
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -80,6 +80,12 @@ Creates a new instance. Acceptable options include:
     An object to use for HTTP requests.
     If not provided, a default user agent is created.
 
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting `$ENV{'WEATHER__METEO__carp_on_warn'}` causes warnings to use [Carp](https://metacpan.org/pod/Carp).
+For more information about runtime configuration,
+see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
+
 ## weather
 
     use Geo::Location::Point;
@@ -105,8 +111,8 @@ If all else fails, the module falls back to Europe/London.
 
 ## ua
 
-Accessor method to get and set UserAgent object used internally. You
-can call _env\_proxy_ for example, to get the proxy information from
+Accessor method to get and set UserAgent object used internally.
+You can call _env\_proxy_ for example, to get the proxy information from
 environment variables:
 
     $meteo->ua()->env_proxy(1);
@@ -121,7 +127,7 @@ You can also set your own User-Agent object:
 
 # AUTHOR
 
-Nigel Horne, `<njh@bandsman.co.uk>`
+Nigel Horne, `<njh@nigelhorne.com>`
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -129,8 +135,6 @@ it under the same terms as Perl itself.
 Lots of thanks to the folks at [https://open-meteo.com](https://open-meteo.com).
 
 # BUGS
-
-This module is provided as-is without any warranty.
 
 Please report any bugs or feature requests to `bug-weather-meteo at rt.cpan.org`,
 or through the web interface at
@@ -140,9 +144,13 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
-Open Meteo API: [https://open-meteo.com/en/docs#api\_form](https://open-meteo.com/en/docs#api_form)
+- [Test Dashboard](https://nigelhorne.github.io/Weather-Meteo/coverage/)
+- Open Meteo API: [https://open-meteo.com/en/docs#api\_form](https://open-meteo.com/en/docs#api_form)
+- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
@@ -172,6 +180,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2023-2025 Nigel Horne.
+Copyright 2023-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2

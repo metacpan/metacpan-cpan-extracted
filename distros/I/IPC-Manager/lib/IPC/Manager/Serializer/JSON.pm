@@ -2,26 +2,20 @@ package IPC::Manager::Serializer::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use parent 'IPC::Manager::Serializer';
 
-our $JSON;
+use Cpanel::JSON::XS;
 
-BEGIN {
-    local $@;
-    my $class;
-    $class //= eval { require Cpanel::JSON::XS; 'Cpanel::JSON::XS' };
-    $class //= eval { require JSON::XS;         'JSON::XS' };
-    $class //= eval { require JSON::PP;         'JSON::PP' };
+my $JSON;
 
-    die "Could not find 'Cpanel::JSON::XS', 'JSON::XS', or 'JSON::PP'" unless $class;
-
-    $JSON = $class->new->ascii(1)->convert_blessed(1)->allow_nonref(1);
+sub _json {
+    return $JSON //= Cpanel::JSON::XS->new->ascii(1)->convert_blessed(1)->allow_nonref(1);
 }
 
-sub serialize   { $JSON->encode($_[1]) }
-sub deserialize { $JSON->decode($_[1]) }
+sub serialize   { _json()->encode($_[1]) }
+sub deserialize { _json()->decode($_[1]) }
 
 1;
 

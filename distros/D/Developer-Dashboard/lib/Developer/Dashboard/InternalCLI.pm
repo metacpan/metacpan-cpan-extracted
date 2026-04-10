@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use File::Basename qw(dirname);
 use File::Spec;
@@ -264,30 +264,50 @@ Build and seed the built-in private helper command files.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file stages, resolves, and names the private built-in helper scripts under the home runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module owns the dashboard-managed private helper assets. It decides which built-in command names exist, stages the corresponding helper files under F<~/.developer-dashboard/cli/dd/>, and resolves the helper paths that the public C<dashboard> entrypoint should C<exec> into.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because built-in helper staging is a product contract of its own. The switchboard must know which helpers are dashboard-managed and how to refresh them without mixing that policy into every command or shell bootstrap path.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when adding, renaming, or removing built-in helper commands, when changing the private helper namespace, or when fixing helper staging drift between shipped assets and the home runtime copy.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::InternalCLI> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Call C<ensure_helpers> with the active paths object to stage or refresh managed helpers, use C<canonical_helper_name> to normalize helper aliases, and use C<helper_path> when the switchboard needs the final staged executable path.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by C<bin/dashboard>, by init/update flows that stage built-ins, by shell bootstrap generation, and by tests that verify helper extraction and private-helper packaging.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::InternalCLI -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::InternalCLI -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/07-core-units.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

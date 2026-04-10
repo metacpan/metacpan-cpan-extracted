@@ -3,7 +3,7 @@ package Developer::Dashboard::PageResolver;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Developer::Dashboard::PageDocument;
 
@@ -169,30 +169,50 @@ Resolve saved and generated pages.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file resolves bookmark pages and action-backed routes across layered runtime roots.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module resolves which page object should answer a browser request. It decides whether a request targets a saved bookmark, a config-backed provider page, or another page source, and it hands the resulting page object to the rest of the web stack in a normalized shape.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because the browser surface includes more than one page source. Keeping that routing logic in one resolver prevents the web app from mixing saved bookmark lookup, provider-page lookup, and action wiring in the same route code.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when adding a new page source, changing the order in which page providers are consulted, or fixing browser routes that land on the wrong saved/config-backed page.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::PageResolver> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the config, page store, action runner, and paths services, then ask it to resolve the requested page identifier. Treat the returned structure as the canonical page object for the render and source flows.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the web app routes, by provider-backed pages such as dashboard workspaces, and by tests that verify page selection across saved and config-backed sources.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::PageResolver -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::PageResolver -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/07-core-units.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

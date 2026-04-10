@@ -1,0 +1,138 @@
+#!perl
+
+## name md5($PID)
+## failures 1
+## cut
+
+$buff .= sha1( ++$counter, $PID );
+
+## name md5(time)
+## failures 1
+## cut
+
+my $bytes = md5_hex( time . rand . {} . $$ );
+
+## name anonymous structures
+## failures 3
+## cut
+
+sha1_b64( { } );
+
+sha256_base64( {} );
+
+digest_data_hex( [ ] );
+
+## name method calls
+## failures 1
+## cut
+
+$ctx->digest( $PID . localtime . rand . rand );
+
+## name Ado
+## failures 1
+## cut
+
+return Mojo::Util::sha1_hex(rand() . $$ . {} . time);
+
+## name Amon2
+## failures 1
+## cut
+
+return Digest::SHA::sha1_hex(rand() . $$ . {} . Time::HiRes::time());
+
+## name PAGI-Middleware-Session-Store-Cookie
+## failures 1
+## cut
+
+return join('', map { chr(int(rand(256))) } 1 .. $n);
+
+## name Plack-Middleware-Session-Simple
+## failures 1
+## cut
+
+Digest::SHA1::sha1_hex(rand() . $$ . {} . time);
+
+## name Apache-Session
+## failures 2
+## cut
+
+substr(Digest::MD5::md5_hex(Digest::MD5::md5_hex(time(). {}. rand(). $$)), 0, $length);
+
+## name HTTP-Session
+## failures 2
+## cut
+
+return substr( Digest::SHA1::sha1_hex( Time::HiRes::gettimeofday() . $unique ), 0, $sid_length );
+
+return substr( Digest::MD5::md5_hex( Time::HiRes::gettimeofday() . $unique ), 0, $sid_length );
+
+## name Business-OnlinePayment-StoredTransaction
+## failures 1
+## cut
+
+my $seckey = Digest::MD5::md5_hex(rand());
+
+## name Apache2-AuthAny
+## failures 1
+## cut
+
+my $sCookie = md5_hex(time . rand);
+
+## name Starch
+## failures 1
+## cut
+
+return join( '', ++$counter, time, rand, $$, {}, refaddr($self) )
+
+## name Plack-Middleware-Session
+## failures 1
+## cut
+
+    $params{'sid_generator'} ||= sub {
+        Digest::SHA::sha1_hex(rand() . $$ . {} . time)
+    };
+
+## name Authen-SASL
+## failures 2
+## cut
+
+cnonce       => md5_hex($CNONCE || join (":", $$, time, rand)),
+
+## name Authen-DigestMD5
+## failures 2
+## cut
+
+    $this->{cnonce}=md5_hex(join(':', time, rand, $$))
+        unless defined $this->{cnonce};
+
+## name Catalyst-Plugin-Session
+## failures 1
+## cut
+
+sub session_hash_seed {
+    my $c = shift;
+    return join( "", ++$counter, time, rand, $$, {}, overload::StrVal($c), );
+}
+
+## name Mojolicious
+## failures 1
+## cut
+
+return sha1_sum($$ . steady_time() . rand);
+
+## name Monotonic
+## failures 1
+## cut
+
+md5_bytes( Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC())  );
+
+## name Object-Signature
+## failures 0
+## cut
+
+sub signature {
+        local $Storable::canonical = 1;
+        Digest::MD5::md5_hex(
+                Storable::nfreeze(shift)
+                );
+}

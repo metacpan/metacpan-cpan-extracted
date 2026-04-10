@@ -3,7 +3,7 @@ package Developer::Dashboard::FileRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use File::Spec;
 
@@ -209,30 +209,50 @@ Return known runtime file paths.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file resolves named runtime files and keeps file-backed resources consistent.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is the runtime file-system façade. It resolves the concrete files and directories under the layered runtime tree, loads and writes dashboard-managed files, and gives higher-level services a single place to ask for runtime paths and file content without rebuilding path logic themselves.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because many subsystems need to read and write runtime files, but they should not each re-implement path resolution and permission handling. Centralizing file access keeps layered lookup and file ownership consistent across the runtime.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing how runtime files are discovered, written, or permissioned, especially for config, dashboard pages, state files, or staged helper assets.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::FileRegistry> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with a path registry and use it as the file access layer for modules that need runtime data. Keep raw path math and secure write behavior here rather than repeating it in feature modules.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by config, auth, page, session, init, and web modules throughout the runtime, along with the tests that verify layered file lookup and non-destructive writes.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::FileRegistry -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::FileRegistry -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/07-core-units.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

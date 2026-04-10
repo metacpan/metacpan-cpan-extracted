@@ -1,5 +1,5 @@
 package Langertha::Knarr::Router;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: Model name to Langertha engine routing with caching
 use Moo;
 use Carp qw( croak );
@@ -196,7 +196,7 @@ Langertha::Knarr::Router - Model name to Langertha engine routing with caching
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -273,6 +273,10 @@ for C<GET /v1/models> and C<GET /api/tags>.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

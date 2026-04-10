@@ -1,5 +1,10 @@
 Revision history for Future-IO-Resolver
 
+0.04    2026-04-09
+        [CHANGES]
+         * Make Net::LibAsyncNS an optional dependency, by only loading the
+           libasyncns backend if the module is available
+
 0.03    2026-04-08
         [CHANGES]
          * Split LibAsyncNS-specific parts into their own module

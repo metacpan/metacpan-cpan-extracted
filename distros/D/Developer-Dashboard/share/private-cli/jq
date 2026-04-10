@@ -34,30 +34,37 @@ This command provides JSON path extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard jq command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper owns the public C<dashboard jq> command. It accepts an
+optional dotted JSON path plus an optional input file, then hands the request
+to the shared query runtime so parsing, file-vs-STDIN handling, and output
+formatting stay consistent with the rest of the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because the dashboard ships a private, repo-local JSON inspection tool instead of depending on a globally installed parser binary. Keeping C<jq> as a staged helper also preserves the thin-switchboard contract in C<bin/dashboard>.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when you are changing how C<dashboard jq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard jq>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/jq> after helper staging.
+Users run C<dashboard jq [path] [file]>. The staged helper under
+F<~/.developer-dashboard/cli/dd/jq> re-enters the shared query runtime, which
+parses JSON, accepts the file and path in either order, reads STDIN when no
+file is given, prints scalar hits as plain text, and prints the whole parsed
+document when the path is C<$d> or C<.>.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/jq>.
+It is used by the public C<dashboard jq> command, by shell snippets that want a runtime-local JSON query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
 
 =head1 EXAMPLES
 
-  dashboard jq
-
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/jq>.
+  printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta
+  dashboard jq response.json '$d'
+  dashboard jq '$d' response.json
+  printf '{"ok":true}' | dashboard jq ok
 
 =for comment FULL-POD-DOC END
 

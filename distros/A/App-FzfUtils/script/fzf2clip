@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-08'; # DATE
+our $DATE = '2026-04-09'; # DATE
 our $DIST = 'App-FzfUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FzfUtils/fzf2clip",
@@ -40,7 +40,7 @@ fzf2clip - Select using fzf, then add selection to clipboard
 
 =head1 VERSION
 
-This document describes version 0.002 of fzf2clip (from Perl distribution App-FzfUtils), released on 2026-04-08.
+This document describes version 0.003 of fzf2clip (from Perl distribution App-FzfUtils), released on 2026-04-09.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Chandra
 
+0.20 2026-04-09
+  - Update deps - bump min version of File::Raw to 0.08 to get file_join
+  - Make tests environment agnostic
+
 0.19 2026-04-08
    - Add Chandra::Pack - Bundle Chandra apps into distributable packages
 

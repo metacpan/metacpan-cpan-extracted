@@ -33,30 +33,50 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-Private helper script in the Developer Dashboard codebase. This file dispatches the dashboard auth command through the private helper runtime.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This staged helper exposes helper-user administration commands such as C<dashboard auth add-user>, C<list-users>, and C<remove-user>. It gives the CLI a focused auth-management entrypoint without putting user-management code in C<bin/dashboard>.
 
 =head1 WHY IT EXISTS
 
-It exists so C<bin/dashboard> can stay thin under the LAZY-THIN-CMD rule while still providing built-in commands through staged helper scripts under C<~/.developer-dashboard/cli/dd/>.
+It exists because helper login management is part of the product surface, but the public switchboard should only dispatch to a staged helper, not own password and user-storage behavior itself.
 
 =head1 WHEN TO USE
 
-Use this file when you need to understand how a built-in C<dashboard> subcommand is staged and handed off after helper extraction into the home runtime.
+Use this file when changing the CLI auth command surface or when fixing how helper-user administration is handed off to the auth runtime.
 
 =head1 HOW TO USE
 
-Users normally reach this helper through C<dashboard auth>. For debugging, inspect the staged copy under C<~/.developer-dashboard/cli/dd/auth> after helper staging.
+Users run C<dashboard auth ...>. The staged helper forwards the subcommand and arguments into the private built-in runtime, which loads the auth module and updates the runtime user store.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> after helper staging has placed the home-runtime wrapper at C<~/.developer-dashboard/cli/dd/auth>.
+It is used by administrators creating or removing helper users, by integration smoke that verifies helper login setup, and by auth command coverage tests.
 
 =head1 EXAMPLES
 
-  dashboard auth
+Example 1:
 
-That is the user-facing route. After helper staging you can also inspect the home-runtime wrapper under C<~/.developer-dashboard/cli/dd/auth>.
+  dashboard auth helper login
+
+Run the public built-in command path that stages or re-enters this helper.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/auth --help
+
+Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository suite.
+
 
 =for comment FULL-POD-DOC END
 

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Cwd qw(cwd);
 use Developer::Dashboard::Config;
@@ -53,6 +53,11 @@ sub run_paths_command {
         print json_encode( [ $paths->locate_projects(@argv) ] );
         return 1;
     }
+    if ( $action eq 'cdr' ) {
+        $load_configured_path_aliases->();
+        print json_encode( _cdr_payload( paths => $paths, args => \@argv ) );
+        return 1;
+    }
     if ( $action eq 'add' ) {
         my $name = shift @argv || die "Usage: dashboard path add <name> <path>\n";
         my $path = shift @argv || die "Usage: dashboard path add <name> <path>\n";
@@ -80,7 +85,7 @@ sub run_paths_command {
         return 1;
     }
 
-    die "Usage: dashboard path <resolve|locate|add|del|project-root|list> ...\n";
+    die "Usage: dashboard path <resolve|locate|cdr|add|del|project-root|list> ...\n";
 }
 
 # _build_paths()
@@ -96,6 +101,40 @@ sub _build_paths {
         workspace_roots => \@roots,
         project_roots   => \@roots,
     );
+}
+
+# _cdr_payload(%args)
+# Resolves the shell helper target for cdr/which_dir without pushing fuzzy
+# search logic into shell code.
+# Input: hash containing a path registry under "paths" and an argv array
+# reference under "args".
+# Output: hash reference with "target" and "matches" keys.
+sub _cdr_payload {
+    my (%args) = @_;
+    my $paths = $args{paths} || die "Missing paths registry\n";
+    my $argv  = $args{args}  || [];
+    die "cdr args must be an array reference\n" if ref($argv) ne 'ARRAY';
+
+    my @terms = @{$argv};
+    return { target => '', matches => [] } if !@terms;
+
+    my $first = $terms[0];
+    my $alias_target = eval { $paths->resolve_dir($first) };
+    if ( defined $alias_target && $alias_target ne '' ) {
+        shift @terms;
+        return { target => $alias_target, matches => [] } if !@terms;
+        my @matches = $paths->locate_dirs_under( $alias_target, @terms );
+        return {
+            target  => @matches == 1 ? $matches[0] : $alias_target,
+            matches => @matches == 1 ? [] : \@matches,
+        };
+    }
+
+    my @matches = $paths->locate_dirs_under( cwd(), @terms );
+    return {
+        target  => @matches == 1 ? $matches[0] : '',
+        matches => @matches == 1 ? [] : \@matches,
+    };
 }
 
 # _paths_payload($paths)
@@ -164,7 +203,9 @@ Developer::Dashboard::CLI::Paths - lightweight path and paths helper dispatch
 
 Implements the lightweight C<dashboard path> and C<dashboard paths> commands so
 the public entrypoint can hand off path-related work to an extracted helper
-script under F<~/.developer-dashboard/cli/>.
+script under F<~/.developer-dashboard/cli/>. That includes the shared
+target-selection logic used by shell helpers such as C<cdr> and
+C<which_dir>.
 
 =head1 FUNCTIONS
 
@@ -176,30 +217,42 @@ Dispatch the path helper command.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file implements the reusable path-reporting logic behind the path and paths helpers.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module is the command runtime behind C<dashboard paths> and C<dashboard path ...>. It prints the active runtime roots, resolves named aliases, persists alias add/delete operations, and computes the JSON payload used by shell helpers such as C<cdr> and C<which_dir>.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because path reporting and shell-navigation semantics should live in Perl, not in duplicated shell code. That keeps the layered runtime rules, alias loading, and regex-based directory narrowing consistent across bash, zsh, POSIX sh, and PowerShell.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing the output of C<dashboard paths>, the behavior of C<dashboard path resolve/add/del/list/project-root>, or the C<cdr> payload contract consumed by shell helpers.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::CLI::Paths> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Call C<run_paths_command> with the public command name and argv list. The
+module builds a lightweight path registry, loads configured aliases on demand,
+and returns either JSON payloads or newline-delimited path output depending on
+the selected subcommand. For C<dashboard path cdr>, the first argument is
+treated as a saved alias when one exists; otherwise it becomes the first search
+regex under the current directory. Any remaining narrowing terms are
+case-insensitive regexes and all of them must match a candidate path. A single
+match becomes the target directory; multiple matches are returned as a list
+while the target stays at the alias root or current directory.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the staged path helpers, by the shell bootstrap generated from
+C<_dashboard-core>, and by tests that cover alias resolution, regex narrowing,
+current-directory fallback, layered runtime lookup, and platform-portable shell
+output.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::CLI::Paths -e 'print qq{loaded\n}'
-
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  dashboard paths
+  dashboard path resolve bookmarks
+  dashboard path cdr project alpha ".*service"
+  dashboard path add work ~/projects/work
+  dashboard path list
 
 =for comment FULL-POD-DOC END
 

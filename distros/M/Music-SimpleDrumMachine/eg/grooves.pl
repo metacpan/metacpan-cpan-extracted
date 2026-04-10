@@ -4,6 +4,7 @@
 # Examples:
 #   perl eg/grooves.pl 'gs wavetable' 90 # on windows
 #   perl eg/grooves.pl fluid 90 # with fluidsynth
+#   perl eg/grooves.pl fluid 100 9 house # change style
 #   perl eg/grooves.pl usb 100 -1 # multi-timbral device
 
 use v5.36;
@@ -23,10 +24,6 @@ my $dm = Music::SimpleDrumMachine->new(
     port_name => $port,
     bpm       => $bpm,
     chan      => $chan,
-    add_drums => [
-        { drum => 'open', num => 46 },
-        { drum => 'cymbal', num => 57 },
-    ],
     next_part => 'part',
     parts     => { part => \&part },
     verbose   => 1,

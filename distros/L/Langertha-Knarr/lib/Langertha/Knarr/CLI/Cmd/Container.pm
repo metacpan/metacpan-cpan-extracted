@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Container;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: Auto-start Knarr from environment variables (Docker mode)
 use Moo;
 use MooX::Cmd;
@@ -163,27 +163,68 @@ sub execute {
 
   _log("");
 
-  # Container mode: always listen on all interfaces
+  # Container mode: always listen on all interfaces. Knarr 1.000 listens on a
+  # single port; the Ollama and OpenAI/Anthropic protocols share that port now
+  # because they live behind one Knarr server with all protocols loaded.
   my $h = $self->host;
-  my @listen_addrs = ("$h:8080", "$h:11434");
 
   require Langertha::Knarr;
-  my $app = Langertha::Knarr->build_app(config => $config);
+  require Langertha::Knarr::Router;
+  require Langertha::Knarr::Handler::Router;
+  require IO::Async::Loop;
 
-  my @listen_urls = map { "http://$_" } @listen_addrs;
+  my $loop = IO::Async::Loop->new;
+  my $router = Langertha::Knarr::Router->new( config => $config );
+  my $passthrough;
+  if ( my $upstreams = $config->passthrough ) {
+    if ( %$upstreams ) {
+      require Langertha::Knarr::Handler::Passthrough;
+      $passthrough = Langertha::Knarr::Handler::Passthrough->new(
+        upstreams => $upstreams,
+        loop      => $loop,
+      );
+    }
+  }
+  my $handler = Langertha::Knarr::Handler::Router->new(
+    router => $router,
+    ( $passthrough ? ( passthrough => $passthrough ) : () ),
+  );
+
+  require Langertha::Knarr::Tracing;
+  my $tracing = Langertha::Knarr::Tracing->new( config => $config );
+  if ( $tracing->_enabled ) {
+    require Langertha::Knarr::Handler::Tracing;
+    $handler = Langertha::Knarr::Handler::Tracing->new(
+      wrapped => $handler,
+      tracing => $tracing,
+    );
+    _log("Tracing: Langfuse enabled");
+  }
+
+  require Langertha::Knarr::RequestLog;
+  my $rlog = Langertha::Knarr::RequestLog->new( config => $config );
+  if ( $rlog->_enabled ) {
+    require Langertha::Knarr::Handler::RequestLog;
+    $handler = Langertha::Knarr::Handler::RequestLog->new(
+      wrapped     => $handler,
+      request_log => $rlog,
+    );
+    _log("RequestLog: enabled (file=" . ($rlog->log_file // '-') . " dir=" . ($rlog->log_dir // '-') . ")");
+  }
+
+  my $knarr = Langertha::Knarr->new(
+    handler => $handler,
+    loop    => $loop,
+    listen  => [ "$h:8080", "$h:11434" ],
+    ( $config->has_proxy_api_key ? ( auth_token => $config->proxy_api_key ) : () ),
+  );
 
   _log("Starting server:");
-  _log("  Port 8080  — OpenAI / Anthropic API");
-  _log("  Port 11434 — Ollama API");
-  _log("  Health     — http://$h:8080/health");
+  _log("  http://$h:8080   — OpenAI / Anthropic / A2A / ACP / AG-UI");
+  _log("  http://$h:11434  — Ollama (alias)");
   _log("");
 
-  my $daemon = Mojo::Server::Daemon->new(
-    app    => $app,
-    listen => \@listen_urls,
-  );
-  $daemon->workers($self->workers) if $daemon->can('workers');
-  $daemon->run;
+  $knarr->run;
 }
 
 sub _log { print STDERR "[knarr] $_[0]\n" }
@@ -210,7 +251,7 @@ Langertha::Knarr::CLI::Cmd::Container - Auto-start Knarr from environment variab
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 DESCRIPTION
 
@@ -246,6 +287,10 @@ examples and environment variable reference.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

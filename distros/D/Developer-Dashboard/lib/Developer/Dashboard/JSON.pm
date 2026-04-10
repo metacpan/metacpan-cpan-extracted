@@ -3,7 +3,7 @@ package Developer::Dashboard::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Exporter 'import';
 use JSON::XS ();
@@ -57,30 +57,50 @@ Decode JSON text into a Perl value.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file centralizes JSON::XS-based encode and decode helpers for the project.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module centralizes JSON handling on top of C<JSON::XS>. It provides one canonical pretty encoder and one decoder so the runtime, helper scripts, and tests all use the same backend and the same output style.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because the project has a hard rule to use C<JSON::XS> and to avoid drifting JSON styles. By routing JSON encode/decode through one module, the dashboard avoids backend mismatch and keeps test fixtures and CLI output stable.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when a feature needs JSON text, when pretty/canonical output expectations change, or when you are auditing the codebase for JSON backend drift.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::JSON> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Import C<json_encode> and C<json_decode> from this module instead of constructing C<JSON::XS> ad hoc in feature code. Small compatibility helpers such as C<Developer::Dashboard::DataHelper> should still route back here.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used across the runtime by config, web, path, collector, skill, and helper flows, as well as by tests that assume canonical JSON output.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::JSON -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::JSON -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/21-refactor-coverage.t t/00-load.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

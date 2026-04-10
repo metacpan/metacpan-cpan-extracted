@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-08'; # DATE
+our $DATE = '2026-04-09'; # DATE
 our $DIST = 'App-FzfUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -174,6 +174,13 @@ line:
 after selection, another script (<prog:cs-select-helper>) will turn back the
 single-line entry into the original.
 
+**Tags**
+
+Some Org tags are used to customize how the entry is displayed or copied to
+clipboard.
+
+**no_copy_title**. Do not copy the title to clipboard.
+
 MARKDOWN
     args => {
         template => {
@@ -213,18 +220,22 @@ sub cs_select {
         my $id = 0;
         for my $h1 (grep { $_->isa("Org::Parser::Tiny::Node::Headline") && $_->level == 1 } @{ $doc->children }) {
             my $category = $h1->title;
-            my @tags = @{ $h1->tags };
+            my @h1_tags = @{ $h1->tags };
             for my $h2 (grep { $_->isa("Org::Parser::Tiny::Node::Headline") && $_->level == 2 } @{ $h1->children }) {
                 $id++;
                 my $title = $h2->title;
                 my $content = $h2->as_string;
+                my @h2_tags = @{ $h2->tags };
                 $content =~ s/\A.+\R//; # dump the raw heading
 
+                my $no_copy_title = (grep {$_ eq 'no_copy_title'} @h1_tags, @h2_tags);
+
                 my $clip_content;
+                my $clip_title = ($no_copy_title ? "" : $title . ":\n");
                 if ($args{wrap}) {
-                    $clip_content = $title . ":\n" . Text::ANSI::Util::ta_wrap($content, $args{wrap});
+                    $clip_content = $clip_title . Text::ANSI::Util::ta_wrap($content, $args{wrap});
                 } else {
-                    $clip_content = $title . ":\n" . $content;
+                    $clip_content = $clip_title . $content;
                 }
 
                 (my $line_content = $content) =~ s/\R+/ /g;
@@ -271,7 +282,7 @@ App::FzfUtils - Utilities related to fzf
 
 =head1 VERSION
 
-This document describes version 0.002 of App::FzfUtils (from Perl distribution App-FzfUtils), released on 2026-04-08.
+This document describes version 0.003 of App::FzfUtils (from Perl distribution App-FzfUtils), released on 2026-04-09.
 
 =head1 DESCRIPTION
 
@@ -344,6 +355,13 @@ line:
 
 after selection, another script (L<cs-select-helper>) will turn back the
 single-line entry into the original.
+
+B<Tags>
+
+Some Org tags are used to customize how the entry is displayed or copied to
+clipboard.
+
+B<no_copy_title>. Do not copy the title to clipboard.
 
 This function is not exported.
 

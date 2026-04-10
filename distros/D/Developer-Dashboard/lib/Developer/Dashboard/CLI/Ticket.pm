@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Ticket;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -187,30 +187,47 @@ the dashboard toolchain without installing a public top-level executable.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file builds and opens configured ticket URLs from dashboard settings.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module owns the ticket-session runtime behind C<dashboard ticket>. It
+resolves the requested ticket reference, builds the C<tmux> environment for
+that ticket, decides whether the session already exists, creates the session
+when needed, and attaches the terminal to the chosen ticket session.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because ticket-session behavior needs to stay deterministic and
+testable. Keeping session naming, environment variables, create-vs-attach
+decisions, and tmux error handling in one module prevents wrappers and prompt
+helpers from inventing different rules.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing how C<dashboard ticket> chooses the ticket name,
+what tmux environment variables it seeds, or how create/attach failures are
+reported back to the user.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::CLI::Ticket> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Call C<run_ticket_command> from the staged helper, passing the raw argv list.
+With an explicit ticket argument, that becomes both the tmux session name and
+the seeded C<TICKET_REF>/C<B>/C<OB> environment set. Without an explicit
+argument, the module falls back to C<$ENV{TICKET_REF}> when present. If the
+session does not exist it creates a detached C<Code1> window in the current
+working directory before attaching; if the session already exists it skips
+creation and attaches directly.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the C<dashboard ticket> helper, by prompt/bootstrap flows that
+want consistent ticket-session environment variables, and by regression tests
+that verify explicit ticket selection, environment fallback, and tmux
+create/attach error handling.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::CLI::Ticket -e 'print qq{loaded\n}'
-
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  dashboard ticket DD-123
+  dashboard ticket
+  TICKET_REF=DD-123 dashboard ticket
+  dashboard ticket feature-branch-42
 
 =for comment FULL-POD-DOC END
 

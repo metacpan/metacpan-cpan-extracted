@@ -3,7 +3,7 @@ package Developer::Dashboard::Doctor;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use File::Find ();
 use File::Spec;
@@ -208,30 +208,50 @@ Construct the doctor service and audit the known dashboard roots.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file audits and repairs dashboard runtime permissions and health checks.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module audits and optionally repairs runtime permissions. It checks the home runtime and older dashboard roots for owner-only directory and file modes, applies the expected C<0700>/C<0600> policy where needed, and returns a structured report that the CLI can print or act on.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because runtime security should be inspectable and fixable from inside the product instead of depending on a manual shell checklist. That gives users and tests one trusted place to check whether the dashboard runtime is private enough.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing the runtime permission policy, the report format for C<dashboard doctor>, or the set of files and directories that should be audited and repaired.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::Doctor> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the active path registry, call C<run(fix =E<gt> 0)> to audit or C<run(fix =E<gt> 1)> to repair, and let the CLI wrapper render the resulting report. Site-specific doctor hooks should remain in the command hook layer, not inside this module.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the C<dashboard doctor> helper, by security and integration tests, and by contributors verifying that init/update paths do not leave insecure runtime permissions behind.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::Doctor -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::Doctor -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/00-load.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

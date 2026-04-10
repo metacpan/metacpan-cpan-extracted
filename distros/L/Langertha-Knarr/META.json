@@ -1,5 +1,5 @@
 {
-   "abstract" : "LLM Proxy with Langfuse Tracing",
+   "abstract" : "Universal LLM hub \u2014 proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI",
    "author" : [
       "Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>"
    ],
@@ -29,26 +29,38 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "HTTP::Message::PSGI" : "0",
+            "Plack" : "0"
+         },
          "requires" : {
-            "File::ShareDir::ProjectDistDir" : "0",
+            "Data::UUID" : "0",
+            "Future" : "0",
+            "Future::AsyncAwait" : "0.66",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "IO::Async" : "0.802",
             "JSON::MaybeXS" : "0",
-            "Langertha" : "0.307",
+            "Langertha" : "0.400",
             "Log::Any" : "0",
             "MIME::Base64" : "0",
             "Module::Runtime" : "0",
-            "Mojolicious" : "9.0",
             "Moo" : "0",
             "MooX::Cmd" : "0",
             "MooX::Options" : "0",
+            "Moose" : "0",
+            "Net::Async::HTTP" : "0",
+            "Net::Async::HTTP::Server" : "0",
             "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
             "YAML::PP" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "MooX::Cmd::Tester" : "0",
-            "Test2::Suite" : "0",
-            "Test::Mojo" : "0"
+            "Capture::Tiny" : "0",
+            "Path::Tiny" : "0",
+            "Test2::Suite" : "0"
          }
       }
    },
@@ -62,9 +74,11 @@
          "type" : "git",
          "url" : "https://github.com/Getty/langertha-knarr.git",
          "web" : "https://github.com/Getty/langertha-knarr"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#langertha",
+      "x_IRC_user" : "Getty"
    },
-   "version" : "0.007",
+   "version" : "1.000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -74,7 +88,9 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "README.md"
+                  ],
                   "exclude_match" : [],
                   "include_dotfiles" : 1,
                   "prefix" : "",
@@ -192,6 +208,11 @@
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "@Author::GETTY/GithubMeta",
             "version" : "0.58"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@Author::GETTY/MetaResources",
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -406,7 +427,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.007",
+                  "tag" : "1.000",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

@@ -1,5 +1,9 @@
 Revision history for File-Raw
 
+0.08	2026-04-09
+        - Fix more compilation issues on Cygwin: replace static XS() with XS_INTERNAL()
+   	in file_api_test.c
+
 0.07    2026-04-08
         - Add file_join, file_mkpath, file_rm_rf to import mechanism
         - file_join: platform-aware path joining (uses \ on Windows, / on POSIX)

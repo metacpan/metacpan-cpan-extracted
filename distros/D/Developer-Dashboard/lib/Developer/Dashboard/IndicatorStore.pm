@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -447,30 +447,50 @@ Handle stale state and refresh built-in generic indicators.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file persists and retrieves indicator state across runtime updates.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module persists prompt and browser status indicators. It stores indicator definitions and live status updates, merges collector-managed indicators with user-managed ones, and provides the ordered indicator data used by the prompt renderer and the browser status strip.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because indicators are shared state that multiple features read and write. Prompt rendering, collector status, and browser chrome all need one source of truth for icon, label, priority, prompt visibility, and current status.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing indicator JSON layout, sorting rules, collector-managed indicator behavior, or the persistence semantics of prompt-visible versus hidden indicators.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::IndicatorStore> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the active runtime paths, then call the store and list methods rather than editing indicator state files directly. Collector code should report into this store instead of inventing its own indicator persistence.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the indicator command helper, by collector refresh paths, by the prompt renderer, by the browser status page, and by regression tests that verify indicator ownership and ordering.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::IndicatorStore -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::IndicatorStore -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/02-indicator-collector.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

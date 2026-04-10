@@ -18,12 +18,16 @@ Museum::Rijksmuseum::Object - Access the Rijksmuseum object metadata API
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
+=head1 DEPRECATION ALERT
+
+The Rijksmuseum has removed the API that this object API module uses, the best replacement is to use the OAI-PMH API directly, perhaps using C<HTTP::OAI>.
+C<Museum::Rijksmuseum::Object::Harvest> continues to work as it was already using OAI-PMH (though has been updated with a new base URL.)
 
 =head1 SYNOPSIS
 
@@ -243,10 +247,6 @@ L<https://gitlab.com/eythian/museum-rijksmuseum-object>
 =item * RT: CPAN's request tracker (or here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Museum-Rijksmuseum-Object>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Museum-Rijksmuseum-Object>
 
 =item * Search CPAN
 

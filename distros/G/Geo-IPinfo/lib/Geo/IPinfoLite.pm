@@ -11,7 +11,7 @@ use Geo::DetailsLite;
 use Net::CIDR;
 use Net::CIDR::Set;
 
-our $VERSION = '3.3.0';
+our $VERSION = '3.4.0';
 use constant DEFAULT_CACHE_MAX_SIZE => 4096;
 use constant DEFAULT_CACHE_TTL      => 86_400;
 use constant DEFAULT_TIMEOUT        => 2;
@@ -562,7 +562,7 @@ my %default_countries_currencies = (
     'BD' => { 'code' => 'BDT', 'symbol' => '৳' },
     'BE' => { 'code' => 'EUR', 'symbol' => '€' },
     'BF' => { 'code' => 'XOF', 'symbol' => 'CFA' },
-    'BG' => { 'code' => 'BGN', 'symbol' => 'лв' },
+    'BG' => { 'code' => 'EUR', 'symbol' => '€' },
     'BH' => { 'code' => 'BHD', 'symbol' => '.د.ب' },
     'BI' => { 'code' => 'BIF', 'symbol' => 'FBu' },
     'BJ' => { 'code' => 'XOF', 'symbol' => 'CFA' },

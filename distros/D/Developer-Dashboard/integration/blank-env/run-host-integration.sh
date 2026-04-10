@@ -47,7 +47,8 @@ This script either uses a supplied host tarball via C<TARBALL=/path/to/tar.gz>
 or installs Dist::Zilla into a local F<.perl5> toolchain when needed, builds
 the C<Developer-Dashboard> tarball on the host, exports the resulting artifact
 path as C<DASHBOARD_TARBALL>, and then runs the blank-environment Docker
-integration flow against the prebuilt C<dd-int-test:latest> image.
+integration flow against the pinned blank-environment image build defined by
+F<integration/blank-env/Dockerfile>.
 
 =cut
 __END__

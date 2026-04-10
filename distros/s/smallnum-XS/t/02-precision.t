@@ -1,4 +1,4 @@
-use Test::More;
+use Test2::Bundle::Numerical;
 use smallnum::XS '0.1', '0.55555555';
 
 is(9 * 0.01, "0.1");

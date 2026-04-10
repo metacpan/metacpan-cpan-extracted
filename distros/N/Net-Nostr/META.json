@@ -33,19 +33,17 @@
       "runtime" : {
          "requires" : {
             "AnyEvent" : "0",
-            "AnyEvent::Socket" : "0",
+            "AnyEvent::HTTP" : "0",
             "AnyEvent::WebSocket::Client" : "0",
             "AnyEvent::WebSocket::Server" : "0",
-            "Bitcoin::Crypto::Bech32" : "0",
+            "Bitcoin::BIP39" : "0",
+            "Bitcoin::Crypto" : "0",
             "Class::Tiny" : "0",
-            "Crypt::KeyDerivation" : "0",
-            "Crypt::Mac::HMAC" : "0",
-            "Crypt::PK::ECC" : "0",
             "Crypt::PK::ECC::Schnorr" : "0",
-            "Crypt::PRNG" : "0",
-            "Crypt::Stream::ChaCha" : "0",
-            "Digest::SHA" : "0",
+            "Crypt::ScryptKDF" : "0",
+            "CryptX" : "0",
             "JSON" : "0",
+            "perl" : "5.016",
             "strictures" : "2"
          }
       },
@@ -53,7 +51,8 @@
          "requires" : {
             "Clone" : "0",
             "Test2::V0" : "0",
-            "Test::Pod" : "0"
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
          }
       }
    },
@@ -66,6 +65,6 @@
          "url" : "https://github.com/NicholasBHubbard/Net-Nostr"
       }
    },
-   "version" : "0.002000",
+   "version" : "1.000001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

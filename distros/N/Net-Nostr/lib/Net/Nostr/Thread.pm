@@ -15,9 +15,20 @@ use Class::Tiny qw(
     mentions
 );
 
+my $HEX64 = qr/\A[0-9a-f]{64}\z/;
+
 sub new {
     my $class = shift;
     my $self = bless { @_ }, $class;
+    my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
+    my @unknown = grep { !exists $known{$_} } keys %$self;
+    croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
+    if (defined $self->{root_id}) {
+        croak "root_id must be 64-char lowercase hex" unless $self->{root_id} =~ $HEX64;
+    }
+    if (defined $self->{reply_id}) {
+        croak "reply_id must be 64-char lowercase hex" unless $self->{reply_id} =~ $HEX64;
+    }
     $self->mentions($self->mentions // []);
     return $self;
 }
@@ -62,7 +73,7 @@ sub reply {
 
     push @p_candidates, $to->pubkey;
     for my $tag (@{$to->tags}) {
-        next unless $tag->[0] eq 'p';
+        next unless @$tag >= 2 && $tag->[0] eq 'p';
         push @p_candidates, $tag->[1];
     }
 
@@ -101,15 +112,15 @@ sub quote {
 sub from_event {
     my ($class, $event) = @_;
 
-    my @e_tags = grep { $_->[0] eq 'e' } @{$event->tags};
+    my @e_tags = grep { @$_ >= 2 && $_->[0] eq 'e' } @{$event->tags};
     return undef unless @e_tags;
 
     # Check for marked tags
     my ($root_tag, $reply_tag);
     for my $tag (@e_tags) {
-        if (defined $tag->[3] && $tag->[3] eq 'root') {
+        if (@$tag > 3 && defined $tag->[3] && $tag->[3] eq 'root') {
             $root_tag = $tag;
-        } elsif (defined $tag->[3] && $tag->[3] eq 'reply') {
+        } elsif (@$tag > 3 && defined $tag->[3] && $tag->[3] eq 'reply') {
             $reply_tag = $tag;
         }
     }
@@ -119,11 +130,11 @@ sub from_event {
         return $class->new(
             root_id      => $root_tag->[1],
             root_relay   => $root_tag->[2] // '',
-            root_pubkey  => $root_tag->[4] // '',
+            root_pubkey  => (@$root_tag > 4 ? ($root_tag->[4] // '') : ''),
             ($reply_tag ? (
                 reply_id     => $reply_tag->[1],
                 reply_relay  => $reply_tag->[2] // '',
-                reply_pubkey => $reply_tag->[4] // '',
+                reply_pubkey => (@$reply_tag > 4 ? ($reply_tag->[4] // '') : ''),
             ) : ()),
         );
     }
@@ -212,6 +223,28 @@ structure from existing events.
 
 Uses marked C<e> tags (preferred) with C<root> and C<reply> markers.
 Also parses deprecated positional C<e> tags for backward compatibility.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $thread = Net::Nostr::Thread->new(%fields);
+
+Creates a new C<Net::Nostr::Thread> object.  Typically returned by
+L</from_event>; calling C<new> directly is useful for testing or
+manual construction.
+
+    my $thread = Net::Nostr::Thread->new(
+        root_id    => 'aa' x 32,
+        root_relay => 'wss://relay.example.com',
+    );
+
+Accepted fields: C<root_id>, C<root_relay>, C<root_pubkey>,
+C<reply_id>, C<reply_relay>, C<reply_pubkey>, C<mentions> (defaults
+to C<[]>).
+
+C<root_id> and C<reply_id> are validated as 64-character lowercase hex
+strings. Croaks on unknown arguments.
 
 =head1 CLASS METHODS
 
@@ -337,6 +370,7 @@ reply (the "middle" tags). Empty arrayref for marked tags.
 
 =head1 SEE ALSO
 
+L<NIP-10|https://github.com/nostr-protocol/nips/blob/master/10.md>,
 L<Net::Nostr>, L<Net::Nostr::Event>
 
 =cut

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.781';
+our $VERSION = '1.782';
 
 use Exporter qw( import );
 
@@ -26,10 +26,17 @@ sub validate_options {
         next if ! defined $opt->{$key};
         if ( $valid->{$key} =~ /^Array/ ) {
             croak "$caller: option '$key' => the passed value has to be an ARRAY reference." if ref $opt->{$key} ne 'ARRAY';
-            if ( $valid->{$key} eq 'Array_Int' ) {
+            if ( $valid->{$key} eq 'Array_Int_Idx' ) {
                 for ( @{$opt->{$key}} ) {
                     defined or croak "$caller: option '$key' => undefined array element";
                     /^[0-9]+\z/ or croak "$caller: option '$key' => $_ is an invalid array element";
+                }
+            }
+            elsif ( $valid->{$key} eq 'Array_Int' ) {
+                for ( @{$opt->{$key}} ) {
+                    if ( defined ) {
+                        /^[0-9]+\z/ or croak "$caller: option '$key' => $_ is an invalid array element";
+                    }
                 }
             }
         }

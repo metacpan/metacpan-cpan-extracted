@@ -7,8 +7,8 @@ msgstr "Implements the dependency container pattern."
 msgid "Эон создаётся при запросе из контейнера через метод `get` или `resolve`, либо через аспект `eon` как ленивый `default`. Ленивость можно отменить через аспект `lazy`."
 msgstr "An eon is created when requesting from a container via the `get` or `resolve` method, or via the `eon` aspect as a lazy `default`. Laziness can be canceled via the `lazy` aspect."
 
-msgid "Контейнер находится в переменной `$Aion::pleroma` и его можно заменить с помощью `local`."
-msgstr "The container is in the `$Aion::pleroma` variable and can be replaced with `local`."
+msgid "Контейнер можно получить с помощью `Aion->pleroma`."
+msgstr "The container can be obtained using `Aion->pleroma`."
 
 msgid "Конфигурацию для создания эонов получает из конфига `PLEROMA` и файла аннотаций (создаётся пакетом `Aion::Annotation`). Файл аннотаций можно заменить через конфиг `INI`."
 msgstr "The configuration for creating eons is obtained from the `PLEROMA` config and the annotation file (created by the `Aion::Annotation` package). The annotation file can be replaced via the `INI` config."

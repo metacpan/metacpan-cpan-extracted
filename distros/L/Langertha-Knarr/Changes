@@ -1,5 +1,82 @@
 Revision history for Langertha-Knarr
 
+1.000     2026-04-10 00:00:20Z
+
+    - MAJOR REWRITE. Mojolicious is gone; the new core is built on
+      IO::Async + Net::Async::HTTP::Server + Future::AsyncAwait for
+      native async streaming and seamless integration with Langertha
+      engines. Existing knarr.yaml configs and the knarr CLI commands
+      (start, container, models, check, init) keep working.
+
+    - Six wire protocols loaded by default on every listening port:
+      OpenAI (/v1/chat/completions, /v1/models, SSE), Anthropic
+      (/v1/messages, named-event SSE), Ollama (/api/chat, /api/tags,
+      NDJSON streaming), A2A (Google Agent2Agent JSON-RPC at / with
+      /.well-known/agent.json discovery), ACP (BeeAI/IBM /agents,
+      /runs), and AG-UI (CopilotKit /awp event stream).
+
+    - Pluggable Handler architecture replaces the old Knarr::Proxy
+      classes:
+        Knarr::Handler::Router        — model→engine via Knarr::Router
+        Knarr::Handler::Engine        — single Langertha engine wrapper
+        Knarr::Handler::Raider        — per-session Langertha::Raider
+        Knarr::Handler::Code          — coderef-backed for tests/fakes
+        Knarr::Handler::Passthrough   — raw HTTP forward to upstream
+        Knarr::Handler::A2AClient     — consume remote A2A agents
+        Knarr::Handler::ACPClient     — consume remote ACP agents
+        Knarr::Handler::Tracing       — Langfuse tracing decorator
+        Knarr::Handler::RequestLog    — JSONL request logging decorator
+
+    - Langfuse tracing and per-request JSONL logging restored as
+      decorator handlers and auto-mounted by knarr start / knarr
+      container when their respective config sections are present.
+
+    - Multi-listen restored: the listen attribute is always an
+      arrayref (default composed from host + port), supports any
+      number of host:port entries. knarr container binds 8080 +
+      11434 simultaneously so existing Ollama clients work without
+      reconfiguration.
+
+    - proxy_api_key authentication enforced by the new dispatcher.
+      Clients must present 'Authorization: Bearer <token>' or
+      'x-api-key: <token>' when KNARR_API_KEY (or yaml proxy_api_key)
+      is set. The /.well-known/agent.json discovery route stays
+      anonymous.
+
+    - PSGI adapter (Knarr::PSGI) for deploying behind any Plack
+      server (Starman, Twiggy, mod_perl, ...). Streaming is buffered
+      in this mode; use the native server for real-time streaming.
+
+    - Universal protocol translator pattern: an OpenAI-fronted Knarr
+      with a Handler::A2AClient backend exposes a remote A2A agent to
+      OpenAI clients (and similarly for ACP).
+
+    - Drops the Knarr namespace facades for Langertha utility code
+      (Knarr::Metrics, Knarr::Input, Knarr::Output, Knarr::Input::Tools,
+      Knarr::Output::Tools). Use Langertha::Usage / Tool / ToolCall /
+      ToolChoice / Pricing / Cost / UsageRecord directly from
+      Langertha core.
+
+    - cpanfile drops Mojolicious, Test::Mojo, MooseX::Role::Parameterized,
+      HTTP::Message, File::ShareDir::ProjectDistDir; adds IO::Async,
+      Net::Async::HTTP, Net::Async::HTTP::Server, Future::AsyncAwait,
+      Moose, Path::Tiny (test), Capture::Tiny (test).
+
+    - Bump Langertha floor to 0.400 for the new value object API.
+
+    - dist.ini sets irc = #langertha (on irc.perl.org).
+
+    - Test suite expanded from 200 to 320 unit tests + author POD
+      syntax. New coverage:
+        * end-to-end live streaming for Anthropic / A2A / ACP / AG-UI
+          (OpenAI and Ollama already covered)
+        * Handler::Passthrough sync + streaming through a real backend
+        * Handler::Router with passthrough fallback
+        * Multi-listen on real sockets
+        * Tracing and RequestLog decorators
+        * CLI smoketest for knarr models / check / init
+        * proxy_api_key auth enforcement
+
 0.007     2026-03-10 20:05:00Z
 
   - Resolve configured engines through both `Langertha::Engine::*` and

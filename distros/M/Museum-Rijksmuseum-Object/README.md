@@ -29,8 +29,6 @@ You can also look for information at:
     https://gitlab.com/eythian/museum-rijksmuseum-object
 * RT, CPAN's request tracker (or here)
     https://rt.cpan.org/NoAuth/Bugs.html?Dist=Museum-Rijksmuseum-Object
-* CPAN Ratings
-    https://cpanratings.perl.org/d/Museum-Rijksmuseum-Object
 * Search CPAN
     https://metacpan.org/release/Museum-Rijksmuseum-Object
 

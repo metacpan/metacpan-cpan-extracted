@@ -2,7 +2,7 @@ package Aion;
 
 use common::sense;
 
-our $VERSION = "1.7";
+our $VERSION = "1.8";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -137,15 +137,20 @@ sub coerce_aspect {
 	$feature->{construct}->add_preset("\$val = ${\$feature->meta}\{isa}->coerce(\$val);", 1) if ISA =~ /wo|rw/;
 }
 
-our $pleroma;
+my $pleroma;
+
+sub pleroma {
+	require Aion::Pleroma;
+	$pleroma = Aion::Pleroma->new;
+	*pleroma = sub { $pleroma };
+	$pleroma
+}
 
 # eon => $key
 sub eon_aspect {
 	my ($key, $feature) = @_;
 
 	die "eon is not compatible with default!" if $feature->{opt}{default};
-
-	require Aion::Pleroma, $pleroma = Aion::Pleroma->new unless $pleroma;
 
 	if($key eq 1) {
 		my $isa = $feature->{isa};
@@ -160,7 +165,7 @@ sub eon_aspect {
 		
 	}
 
-	default_aspect(sub { $pleroma->resolve($key) }, $feature);
+	default_aspect(sub { Aion->pleroma->resolve($key) }, $feature);
 }
 
 # lazy => 1|0
@@ -534,7 +539,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-1.7
+1.8
 
 =head1 SYNOPSIS
 
@@ -1018,7 +1023,7 @@ By default it is only enabled if the default is a subroutine.
 
 The C<eon> aspect implements the B<Dependency Injection> pattern.
 
-It associates a property with a service from the C<$Aion::pleroma> container.
+It associates a property with a service from the C<< Aion-E<gt>pleroma >> container.
 
 The aspect value can be a service key, 1 or 2.
 
@@ -1036,7 +1041,7 @@ File lib/CounterEon.pm:
 	#@eon ex.counter
 	use Aion;
 	
-	has accomulator => (isa => Object['AccomulatorEon'], eon => 1);
+	has accomulator => (isa => 'AccomulatorEon', eon => 1);
 	
 	1;
 
@@ -1046,7 +1051,7 @@ File lib/AccomulatorEon.pm:
 	#@eon
 	use Aion;
 	
-	has power => (isa => Object['PowerEon'], eon => 2);
+	has power => (isa => 'PowerEon', eon => 2);
 	
 	1;
 
@@ -1066,16 +1071,20 @@ We use pleroma locally:
 
 	{
 		use Aion::Pleroma;
-		local $Aion::pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
+		my $pleroma = Aion::Pleroma->new(ini => undef, pleroma => {
 			'ex.counter' => 'CounterEon#new',
 			AccomulatorEon => 'AccomulatorEon#new',
 			'PowerEon#power' => 'PowerEon#power',
 		});
+	
+		local *Aion::pleroma = sub { $pleroma };
 		
-		my $counter = $Aion::pleroma->get('ex.counter');
+		my $counter = Aion->pleroma->get('ex.counter');
 	
 		$counter->accomulator->power->counter # -> $counter
 	}
+	
+	Aion->pleroma->get('ex.counter') # -> undef
 
 See L<Aion::Pleroma>.
 

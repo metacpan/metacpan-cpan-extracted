@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion
 
+1.8 2026-04-09T19:37:48Z
+
+    - $Aion::pleroma replace to Aion->pleroma for autoinitialization
+
 1.7 2026-03-10T07:20:53Z
 
     - added autoware for eons

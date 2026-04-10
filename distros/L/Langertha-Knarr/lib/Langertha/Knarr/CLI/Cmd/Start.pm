@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Start;
-our $VERSION = '0.007';
+our $VERSION = '1.000';
 # ABSTRACT: Start the Knarr proxy server
 use Moo;
 use MooX::Cmd;
@@ -105,22 +105,66 @@ sub execute {
   }
 
   require Langertha::Knarr;
-  my $app = Langertha::Knarr->build_app(config => $config);
+  require Langertha::Knarr::Router;
+  require Langertha::Knarr::Handler::Router;
+  require IO::Async::Loop;
 
-  my @listen_urls = map { "http://$_" } @$listen_addrs;
+  my $loop = IO::Async::Loop->new;
+
+  my $router = Langertha::Knarr::Router->new( config => $config );
+
+  my $passthrough;
+  if ( my $upstreams = $config->passthrough ) {
+    if ( %$upstreams ) {
+      require Langertha::Knarr::Handler::Passthrough;
+      $passthrough = Langertha::Knarr::Handler::Passthrough->new(
+        upstreams => $upstreams,
+        loop      => $loop,
+      );
+    }
+  }
+
+  my $handler = Langertha::Knarr::Handler::Router->new(
+    router => $router,
+    ( $passthrough ? ( passthrough => $passthrough ) : () ),
+  );
+
+  # Wrap with tracing decorator when langfuse credentials are configured.
+  require Langertha::Knarr::Tracing;
+  my $tracing = Langertha::Knarr::Tracing->new( config => $config );
+  if ( $tracing->_enabled ) {
+    require Langertha::Knarr::Handler::Tracing;
+    $handler = Langertha::Knarr::Handler::Tracing->new(
+      wrapped => $handler,
+      tracing => $tracing,
+    );
+  }
+
+  # Wrap with request log decorator when log_file or log_dir is configured.
+  require Langertha::Knarr::RequestLog;
+  my $rlog = Langertha::Knarr::RequestLog->new( config => $config );
+  if ( $rlog->_enabled ) {
+    require Langertha::Knarr::Handler::RequestLog;
+    $handler = Langertha::Knarr::Handler::RequestLog->new(
+      wrapped     => $handler,
+      request_log => $rlog,
+    );
+  }
+
+  my $knarr = Langertha::Knarr->new(
+    handler => $handler,
+    loop    => $loop,
+    listen  => [ @$listen_addrs ],
+    ( $config->has_proxy_api_key ? ( auth_token => $config->proxy_api_key ) : () ),
+  );
 
   print "Starting Knarr on:\n";
-  print "  $_\n" for @listen_urls;
+  print "  http://$_\n" for @$listen_addrs;
   print "Models: ", scalar(keys %{$config->models}), " configured";
   print ", auto-discover enabled" if $config->auto_discover;
   print "\n";
 
-  my $daemon = Mojo::Server::Daemon->new(
-    app    => $app,
-    listen => \@listen_urls,
-  );
-  $daemon->workers($self->workers) if $daemon->can('workers');
-  $daemon->run;
+  $knarr->run;
 }
 
 1;
@@ -137,7 +181,7 @@ Langertha::Knarr::CLI::Cmd::Start - Start the Knarr proxy server
 
 =head1 VERSION
 
-version 0.007
+version 1.000
 
 =head1 DESCRIPTION
 
@@ -166,6 +210,10 @@ configuration file format.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

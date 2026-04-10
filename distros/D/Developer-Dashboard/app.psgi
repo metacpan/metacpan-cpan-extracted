@@ -78,30 +78,50 @@ running under C<plackup -s Starman>.
 
 =head1 PURPOSE
 
-PSGI entrypoint script in the Developer Dashboard codebase. This file assembles the default PSGI web stack for Developer Dashboard and returns the Plack application object.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This PSGI entrypoint assembles the default dashboard web stack from the file registry, config store, page store, auth service, action runner, session store, and web app wrapper, then returns one PSGI application coderef. It is the non-CLI way to boot the same browser experience that C<dashboard serve> runs through the server wrapper.
 
 =head1 WHY IT EXISTS
 
-It exists so the web stack can be launched through standard PSGI tooling without forcing callers to rebuild the wiring themselves.
+It exists so the dashboard can be hosted under standard PSGI tools such as C<plackup> without reimplementing object wiring in an ad hoc shell script. That keeps the web bootstrap path debuggable and makes framework-level smoke tests possible outside the CLI lifecycle manager.
 
 =head1 WHEN TO USE
 
-Use this file when you need the PSGI app directly, when debugging web bootstrap issues, or when verifying the web stack under Plack or Starman.
+Use this file when you are debugging web bootstrap order, checking how the browser stack is assembled, or running the dashboard behind a PSGI host instead of the built-in serve/restart commands.
 
 =head1 HOW TO USE
 
-Run it through PSGI tooling such as C<plackup>. When editing it, keep it as wiring code that assembles the normal dashboard web objects and returns the PSGI app.
+Run it through a PSGI server. Keep edits limited to construction and wiring of the standard runtime services; route behavior belongs in C<Developer::Dashboard::Web::App> and transport behavior belongs in C<Developer::Dashboard::Web::Server>.
 
 =head1 WHAT USES IT
 
-It is used by PSGI servers such as C<plackup>, by web-server smoke tests, and by anyone who wants the assembled web application without going through the CLI server wrapper.
+It is used by C<plackup>, by PSGI-oriented smoke tests, and by contributors who need the assembled app object without going through the process-management code in C<dashboard serve>.
 
 =head1 EXAMPLES
 
+Example 1:
+
   plackup -s Starman app.psgi
 
-That starts the assembled dashboard web application through the standard PSGI server stack.
+Start the dashboard through PSGI with the default Starman host and port.
+
+Example 2:
+
+  DEVELOPER_DASHBOARD_WEB_PORT=7891 plackup -s Starman app.psgi
+
+Boot the same PSGI app on an explicit alternate port while debugging browser behavior.
+
+Example 3:
+
+  prove -lv t/03-web-app.t
+
+Rerun the focused web-app route regression after changing this bootstrap wiring.
+
+Example 4:
+
+  prove -lv t/17-web-server-ssl.t
+
+Recheck the HTTPS-facing bootstrap path when SSL-related web wiring changes.
+
 
 =for comment FULL-POD-DOC END
 

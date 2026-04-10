@@ -3,7 +3,7 @@ package Developer::Dashboard::Zipper;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Exporter 'import';
 use File::Basename qw(dirname);
@@ -261,30 +261,50 @@ executable files so the web runtime can run them as real processes.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file implements the bookmark helper DSL, including Ajax helpers and bookmark utility functions.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module keeps the older bookmark and Ajax helper compatibility surface alive. It builds tokenised URLs, saved Ajax endpoints, and helper snippets such as C<Ajax()> while routing the actual encoding work through the modern codec module.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because older bookmarks still expect the historical helper names and URL-building patterns. Keeping those wrappers in one module preserves compatibility without forcing newer runtime code to keep re-implementing the old API directly.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing older Ajax helper behavior, saved Ajax file validation, token URL generation, or the compatibility wrappers that older bookmark instructions still reference.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::Zipper> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Import the specific helper you need, such as C<zip>, C<unzip>, or C<Ajax>, and let this module generate the compatibility structure or snippet. Newer code should prefer the lower-level runtime and codec modules where possible.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by older bookmark pages, by saved Ajax compatibility paths, by page-runtime helper injection, and by tests that guard the backward-compatible helper layer.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::Zipper -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::Zipper -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/21-refactor-coverage.t t/00-load.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

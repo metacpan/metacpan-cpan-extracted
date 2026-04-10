@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -958,30 +958,50 @@ Construct and manage the dashboard runtime.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file coordinates collector and indicator runtime lifecycle work.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module manages the dashboard runtime processes. It starts, stops, and restarts the web listener, tracks the web pid, coordinates collector lifecycle around restart/stop flows, and exposes the process-management behavior behind the serve/restart/stop command family.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because runtime lifecycle management needs one owner for pid files, process validation, restart ordering, and port-release races. That keeps the browser server and collector loops moving together instead of leaving each command to improvise process control.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing how the web process is launched, how restart waits for ports to free up, how collectors are stopped and restarted with the web process, or how runtime state is validated before a lifecycle command acts.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::RuntimeManager> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Construct it with the path registry and any required collaborators, then call the lifecycle methods from CLI helpers. Keep process orchestration here and let the command wrappers only parse arguments and print results.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the C<dashboard serve>, C<dashboard restart>, and C<dashboard stop> helpers, by integration smoke that exercises lifecycle commands, and by tests that cover pid handling and process validation.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::RuntimeManager -e 'print qq{loaded\n}'
+Example 1:
 
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  perl -Ilib -MDeveloper::Dashboard::RuntimeManager -e 1
+
+Do a direct compile-and-load check against the module from a source checkout.
+
+Example 2:
+
+  prove -lv t/00-load.t t/21-refactor-coverage.t
+
+Run the focused regression tests that most directly exercise this module's behavior.
+
+Example 3:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
+
+Recheck the module under the repository coverage gate rather than relying on a load-only probe.
+
+Example 4:
+
+  prove -lr t
+
+Put any module-level change back through the entire repository suite before release.
+
 
 =for comment FULL-POD-DOC END
 

@@ -17,11 +17,12 @@ my $dm = Music::SimpleDrumMachine->new(
     port_name => $port,
     bpm       => $bpm,
     chan      => $chan,
-    add_drums => [
-        { drum => 'open', num => 46 },
-        { drum => 'tom', num => 47 },
-    ],
-    parts     => { part_A => \&part_A, part_B => \&part_B, fill_A => \&fill_A, fill_B => \&fill_B },
+    parts     => {
+        part_A => \&part_A,
+        part_B => \&part_B,
+        fill_A => \&fill_A,
+        fill_B => \&fill_B,
+    },
     next_part => [qw( part_A part_B fill_A part_A part_B fill_B )],
     filling   => 0,
     verbose   => 1,
@@ -41,11 +42,11 @@ sub part_A {
 sub part_B {
     say 'Part B';
     my %patterns = (
-        closed => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
-        open   => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1)],
-        kick   => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
-        snare  => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
-        tom    => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0)],
+        closed  => [qw(1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0)],
+        open    => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1)],
+        kick    => [qw(1 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0)],
+        snare   => [qw(0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0)],
+        mid_tom => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0)],
     );
     my $next = '';
     return $next, \%patterns;
@@ -61,8 +62,8 @@ sub fill_A {
 sub fill_B {
     say 'Fill B';
     my %patterns = (
-        snare => [qw(1 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0)],
-        tom   => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1)],
+        snare   => [qw(1 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0)],
+        mid_tom => [qw(0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1)],
     );
     my $next = '';
     return $next, \%patterns;

@@ -471,7 +471,7 @@ sub _run_rdbms_matrix {
           };
         ok( $payload->{ok}, "$args{label} sql-dashboard Playwright matrix reports success" )
           or diag _diagnostic_text($payload);
-        is( scalar @{ $payload->{cases} || [] }, 20, "$args{label} sql-dashboard Playwright matrix records 20 browser cases" );
+        is( scalar @{ $payload->{cases} || [] }, 22, "$args{label} sql-dashboard Playwright matrix records 22 browser cases" );
         for my $case ( @{ $payload->{cases} || [] } ) {
             ok( $case->{ok}, "$args{label}: $case->{name}" ) or diag _case_diagnostic($case);
         }
@@ -602,7 +602,7 @@ async function main() {
 
   await check('profile save succeeds', async () => {
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-profiles-save') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-profiles-save') && value.status() === 200),
       page.locator('#sql-profile-save').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -628,6 +628,19 @@ async function main() {
   await page.locator('[data-sql-main-tab="workspace"]').click();
   await page.locator('#sql-editor').fill('select id, name from users order by id');
 
+  await check('workspace subtabs default to Run SQL', async () => {
+    const layout = await page.evaluate(() => {
+      const tabs = Array.from(document.querySelectorAll('[data-sql-workspace-tab]')).map((node) => node.textContent || '');
+      const active = document.querySelector('[data-sql-workspace-tab].is-active');
+      return {
+        tabs,
+        active: active ? active.textContent : ''
+      };
+    });
+    ensure(layout.tabs.includes('Collection') && layout.tabs.includes('Run SQL') && String(layout.active || '').includes('Run SQL'),
+      'workspace should expose Collection and Run SQL subtabs with Run SQL active by default: ' + JSON.stringify(layout));
+  });
+
   await check('workspace route includes portable connection id', async () => {
     const url = page.url();
     ensure(url.includes('connection='), 'workspace URL should include a connection parameter: ' + url);
@@ -640,11 +653,20 @@ async function main() {
     ensure(!url.includes('password'), 'workspace URL should not leak passwords: ' + url);
   });
 
+  await page.locator('[data-sql-workspace-tab="collections"]').click();
   await page.locator('#sql-collection-name').fill(process.env.DB_COLLECTION);
+  const collectionCreateResponse = await Promise.all([
+    page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
+    page.locator('#sql-collection-save').click()
+  ]).then((values) => values[0]);
+  const collectionCreatePayload = await collectionCreateResponse.json();
+  ensure(collectionCreatePayload && collectionCreatePayload.ok, 'collection create failed: ' + JSON.stringify(collectionCreatePayload || {}));
+
+  await page.locator('[data-sql-workspace-tab="run"]').click();
   await page.locator('#sql-collection-item-name').fill('Users Query');
   await check('collection save succeeds', async () => {
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-collections-save') && value.status() === 200),
       page.locator('#sql-collection-item-save').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -667,7 +689,7 @@ async function main() {
 
   await check('select query executes successfully', async () => {
     const response = await Promise.all([
-      page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
+      page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-execute') && value.status() === 200),
       page.locator('#sql-run').click()
     ]).then((values) => values[0]);
     const payload = await response.json();
@@ -688,7 +710,7 @@ async function main() {
   });
 
   const schemaResponse = await Promise.all([
-    page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-schema-browse') && value.status() === 200),
+    page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-schema-browse') && value.status() === 200),
     page.locator('[data-sql-main-tab="schema"]').click()
   ]).then((values) => values[0]);
   const schemaPayload = await schemaResponse.json();
@@ -696,20 +718,29 @@ async function main() {
   await page.waitForTimeout(400);
 
   await check('schema browse loads first table', async () => {
-    const tabs = await page.locator('[data-sql-table-tab]').allTextContents();
+    const tabs = await page.locator('[data-sql-table-name]').allTextContents();
     ensure(tabs.includes(process.env.DB_EXPECT_TABLE_A),
       'schema tabs should include the first expected table: ' + JSON.stringify(tabs));
   });
 
   await check('schema browse loads second table', async () => {
-    const tabs = await page.locator('[data-sql-table-tab]').allTextContents();
+    const tabs = await page.locator('[data-sql-table-name]').allTextContents();
     ensure(tabs.includes(process.env.DB_EXPECT_TABLE_B),
       'schema tabs should include the second expected table: ' + JSON.stringify(tabs));
   });
 
+  await check('schema table filter narrows the table list live', async () => {
+    await page.locator('#sql-table-filter').fill(process.env.DB_EXPECT_TABLE_B.slice(0, 3));
+    await page.waitForTimeout(200);
+    const tabs = await page.locator('[data-sql-table-name]').allTextContents();
+    ensure(tabs.some((value) => String(value || '') === process.env.DB_EXPECT_TABLE_B),
+      'schema filter should keep the matching table visible: ' + JSON.stringify(tabs));
+    await page.locator('#sql-table-filter').fill('');
+  });
+
   await page.locator('[data-sql-main-tab="profiles"]').click();
   const deleteResponse = await Promise.all([
-    page.waitForResponse((value) => value.url().includes('/ajax/sql-dashboard-profiles-delete') && value.status() === 200),
+    page.waitForResponse((value) => value.request().method() === 'POST' && value.url().includes('/ajax/sql-dashboard-profiles-delete') && value.status() === 200),
     page.locator('#sql-profile-delete').click()
   ]).then((values) => values[0]);
   const deletePayload = await deleteResponse.json();
@@ -1033,71 +1064,48 @@ __END__
 
 32-sql-dashboard-rdbms-playwright.t - docker-backed MySQL, PostgreSQL, MSSQL, and Oracle browser coverage for the sql-dashboard bookmark
 
+=for comment FULL-POD-DOC START
+
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file runs real Chromium
-Playwright coverage against docker-backed MySQL, PostgreSQL, MSSQL, and Oracle
-services so the SQL dashboard is verified beyond the SQLite workflow. The live
-fixtures use the official C<mysql:5.7>, C<postgres:16>,
-C<mcr.microsoft.com/mssql/server:2022-latest>, and
-C<gvenzl/oracle-xe:21-slim-faststart> images because that combination matches
-the host-side Perl driver stacks verified for this repository.
+This test is the executable regression contract for the sql-dashboard runtime and browser workflow. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to prove that the SQL dashboard browser UX still works against
-server-backed drivers, not only SQLite. The file covers profile setup,
-driver-specific DSN guidance, shareable workspace routes, query execution,
-schema browsing, collection persistence, and the expected "local credentials
-required" UX after a shared route outlives the saved local password-bearing
-profile.
+It exists because the sql-dashboard runtime and browser workflow has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you change the SQL dashboard connection profile flow, saved
-workspace route model, server-backed DBI execution, schema browser behavior, or
-saved SQL workspace UX. Run it before release when you need confidence that the
-browser flow works with MySQL, PostgreSQL, MSSQL, and Oracle, not just SQLite.
+Use it when the Docker-backed MySQL, PostgreSQL, MSSQL, or Oracle browser paths change, especially profile setup, schema explorer behavior, or SQL execution UX.
 
 =head1 HOW TO USE
 
-Run it directly with:
-
-  prove -lv t/32-sql-dashboard-rdbms-playwright.t
-
-The current Perl environment must already be able to load C<DBI> plus the
-relevant driver modules such as C<DBD::mysql>, C<DBD::Pg>, C<DBD::ODBC>, and
-C<DBD::Oracle>. Docker, Chromium, Node, npx, and git must also be available
-locally. This test intentionally does not add those DB drivers to shipped
-runtime prerequisites, so install them separately when you want live RDBMS
-browser coverage. On this host the MySQL fixture uses the official
-C<mysql:5.7> image because the available C<DBD::mysql> stack does not complete
-a non-SSL C<MySQL 8.4> auth handshake, MSSQL uses C<DBD::ODBC> with a
-user-space C<unixODBC> + C<FreeTDS> stack, and Oracle uses C<DBD::Oracle> with
-a user-space Oracle home plus C<libaio>.
+Run it directly with C<prove -lv t/32-sql-dashboard-rdbms-playwright.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. For browser-backed tests, make sure the external browser tooling they name is actually present instead of assuming the suite will fabricate it. Because this matrix reaches real containers and drivers, treat skips as environment signals and real failures as product regressions. Make sure node, npx, git, docker, Chromium, DBI, and the relevant DBD drivers are available. The test skips when that external matrix is not ready rather than pretending the cross-database path is covered.
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by maintainers doing SQL dashboard UX and
-cross-database verification, and by release verification when the maintainer
-wants real docker-backed browser coverage for MySQL, PostgreSQL, MSSQL, and
-Oracle.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/32-sql-dashboard-rdbms-playwright.t
 
-  PERL5LIB=/tmp/sql-lib/lib/perl5:/tmp/sql-lib/lib/perl5/x86_64-linux-gnu-thread-multi \
-  prove -lv t/32-sql-dashboard-rdbms-playwright.t
+Run the focused regression test by itself while you are changing the behavior it owns.
 
-  LD_LIBRARY_PATH="$HOME/opt/unixodbc/lib:$HOME/opt/freetds/lib:$HOME/opt/libaio/lib:$HOME/opt/oracle-client/product/21c/dbhomeXE/lib" \
-  ORACLE_HOME="$HOME/opt/oracle-client/product/21c/dbhomeXE" \
-  PERL5LIB="$HOME/perl5/lib/perl5:$HOME/perl5/lib/perl5/x86_64-linux-gnu-thread-multi" \
-  prove -lv t/32-sql-dashboard-rdbms-playwright.t
+Example 2:
 
-Use the first command when the active Perl already has the DBI drivers. Use the
-second when you have staged the server-backed DBD modules into a separate
-local::lib for live browser verification. Use the third when you also need the
-user-space ODBC and Oracle client libraries on the loader path.
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/32-sql-dashboard-rdbms-playwright.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
+
+=for comment FULL-POD-DOC END
 
 =cut

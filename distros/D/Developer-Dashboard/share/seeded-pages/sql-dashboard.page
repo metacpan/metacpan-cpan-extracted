@@ -26,9 +26,11 @@ HTML: <style>
 .sql-action:hover, .sql-action:focus { color:#102131; text-decoration:underline; }
 .sql-action.sql-action-quiet { color:#617181; font-weight:500; }
 .sql-badge { display:inline-block; padding:4px 8px; border:1px solid #d5dde3; background:#f8fafb; color:#465560; font-size:12px; }
-.sql-workspace-layout { display:grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); border:1px solid #cbd3da; background:#f7fafc; }
-.sql-workspace-nav { display:grid; gap:16px; align-content:start; padding:14px; border-right:1px solid #cbd3da; background:linear-gradient(180deg, #eef3f7 0%, #e6edf3 100%); }
-.sql-workspace-editor { display:grid; gap:14px; align-content:start; padding:18px; background:#fbfcfd; }
+.sql-workspace-panels { border:1px solid #cbd3da; background:#f7fafc; }
+.sql-workspace-panel { display:none; padding:18px; }
+.sql-workspace-panel.is-active { display:block; }
+.sql-workspace-nav { display:grid; gap:16px; align-content:start; padding:14px; border:1px solid #cbd3da; background:linear-gradient(180deg, #eef3f7 0%, #e6edf3 100%); }
+.sql-workspace-editor { display:grid; gap:14px; align-content:start; padding:0; background:#fbfcfd; }
 .sql-nav-section { display:grid; gap:10px; }
 .sql-nav-section h3, .sql-nav-section h4 { margin:0; }
 .sql-nav-header { display:flex; gap:10px; align-items:center; justify-content:space-between; }
@@ -41,6 +43,8 @@ HTML: <style>
 .sql-list-item small { display:block; margin-top:4px; color:#5b6873; font-weight:400; }
 .sql-inline-delete { display:inline-flex; align-items:center; justify-content:center; min-width:30px; padding:10px 8px; color:#7a2030; text-decoration:none; font-size:12px; font-weight:700; }
 .sql-inline-delete:hover, .sql-inline-delete:focus { text-decoration:none; color:#5a0f20; background:#f8dde2; }
+.sql-inline-action { display:inline-flex; align-items:center; justify-content:center; min-width:54px; padding:10px 8px; color:#345068; text-decoration:none; font-size:12px; font-weight:700; }
+.sql-inline-action:hover, .sql-inline-action:focus { text-decoration:none; color:#102131; background:#dce8f3; }
 .sql-inline-fields { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
 .sql-editor-frame { display:grid; gap:10px; border:1px solid #d2dae0; background:#ffffff; padding:12px; }
 .sql-editor-frame label { display:grid; gap:8px; font-weight:700; color:#24313c; }
@@ -55,11 +59,13 @@ HTML: <style>
 .sql-result-html th { background:#eef3f7; }
 .sql-help { margin:0; color:#4b5a66; font-size:13px; }
 .sql-schema-grid { display:grid; grid-template-columns: minmax(260px, 1fr) minmax(320px, 1fr); gap:16px; }
+.sql-schema-toolbar { display:grid; gap:10px; margin-bottom:12px; }
+.sql-schema-toolbar label { display:grid; gap:6px; font-weight:600; color:#24313c; }
+.sql-schema-toolbar input { width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #b8c1c9; background:#fff; font-family:monospace; }
 .sql-empty { padding:12px; border:1px dashed #bcc7cf; background:#f8fafb; color:#55636d; }
 .sql-checkbox { display:flex; gap:10px; align-items:center; font-weight:600; color:#24313c; }
 @media (max-width: 920px) {
-  .sql-two-col, .sql-schema-grid, .sql-workspace-layout { grid-template-columns: 1fr; }
-  .sql-workspace-nav { border-right:none; border-bottom:1px solid #cbd3da; }
+  .sql-two-col, .sql-schema-grid { grid-template-columns: 1fr; }
   .sql-editor-actions { align-items:flex-start; }
 }
 </style>
@@ -112,8 +118,13 @@ HTML: <style>
   </section>
 
   <section id="sql-panel-workspace" class="sql-panel">
-    <div class="sql-workspace-layout">
-      <aside id="sql-workspace-nav" class="sql-workspace-nav">
+    <div class="sql-subtabs" aria-label="SQL Workspace Views">
+      <a href="#" class="sql-subtab" data-sql-workspace-tab="collections" role="tab" aria-selected="false">Collection</a>
+      <a href="#" class="sql-subtab is-active" data-sql-workspace-tab="run" role="tab" aria-selected="true">Run SQL</a>
+    </div>
+    <div class="sql-workspace-panels">
+      <section id="sql-workspace-panel-collections" class="sql-workspace-panel">
+        <aside id="sql-workspace-nav" class="sql-workspace-nav">
         <div class="sql-nav-section">
           <div class="sql-toolbar">
             <a href="#" id="sql-collection-new" class="sql-action">New Collection</a>
@@ -135,7 +146,9 @@ HTML: <style>
           <div id="sql-collection-item-tabs-empty" class="sql-empty">Select a collection to view its saved SQL entries.</div>
           <span class="sql-badge">Collections and connection profiles are intentionally unrelated</span>
         </div>
-      </aside>
+        </aside>
+      </section>
+      <section id="sql-workspace-panel-run" class="sql-workspace-panel is-active">
       <section id="sql-workspace-editor" class="sql-workspace-editor">
         <div class="sql-toolbar">
           <span id="sql-active-profile" class="sql-badge">No active profile selected</span>
@@ -163,6 +176,7 @@ HTML: <style>
         <pre id="sql-result-info" class="sql-result-info">Select a profile and run SQL.</pre>
         <div id="sql-result-html" class="sql-result-html"></div>
       </section>
+      </section>
     </div>
   </section>
 
@@ -175,7 +189,12 @@ HTML: <style>
       <div class="sql-schema-grid">
         <div>
           <h3>Tables</h3>
-          <div id="sql-table-tabs" class="sql-subtabs"></div>
+          <div class="sql-schema-toolbar">
+            <label>Find Table
+              <input id="sql-table-filter" type="text" placeholder="Type to filter table names">
+            </label>
+          </div>
+          <div id="sql-table-tabs" class="sql-list"></div>
           <div id="sql-table-tabs-empty" class="sql-empty">Choose a profile and refresh the schema to load table tabs.</div>
         </div>
         <div>
@@ -190,6 +209,7 @@ HTML: <style>
 (function () {
   var state = {
     main_tab: 'profiles',
+    workspace_tab: 'run',
     profiles: [],
     profile_draft: null,
     drivers: [],
@@ -200,7 +220,7 @@ HTML: <style>
     collection_item_draft: 0,
     collection_name_draft: '',
     collection_item_name_draft: '',
-    schema: { tables: [], columns: [], active_table: '' },
+    schema: { tables: [], columns: [], active_table: '', filter: '' },
     sql: '',
     result_html: '',
     result_info: 'Select a profile and run SQL.'
@@ -341,6 +361,7 @@ HTML: <style>
   function currentRoute() {
     return {
       tab: state.main_tab || '',
+      workspace: state.workspace_tab || '',
       connection: currentFormConnectionId() || (currentProfile() && currentProfile().connection_id) || '',
       collection: state.active_collection_name || '',
       item: state.active_collection_item_id || '',
@@ -352,6 +373,7 @@ HTML: <style>
   function routeQuery(route) {
     var params = new window.URLSearchParams();
     if (route.tab) params.set('tab', route.tab);
+    if (route.workspace) params.set('workspace', route.workspace);
     if (route.connection) params.set('connection', route.connection);
     if (route.collection) params.set('collection', route.collection);
     if (route.item) params.set('item', route.item);
@@ -364,6 +386,7 @@ HTML: <style>
     var params = new window.URLSearchParams(window.location.search || '');
     return {
       tab: params.get('tab') || '',
+      workspace: params.get('workspace') || '',
       connection: params.get('connection') || '',
       collection: params.get('collection') || '',
       item: params.get('item') || '',
@@ -562,10 +585,48 @@ HTML: <style>
     dsnField.value = 'dbi:' + shortName + ':' + dsn;
   }
 
+  function tableReference(tableName) {
+    return String(tableName || '').split('.').map(function (part) {
+      part = String(part || '').trim();
+      if (!part) return '';
+      if (/^[A-Za-z_][A-Za-z0-9_$#]*$/.test(part)) return part;
+      return '"' + part.replace(/"/g, '""') + '"';
+    }).filter(function (part) {
+      return part !== '';
+    }).join('.');
+  }
+
+  function copyText(text) {
+    text = String(text || '');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      try {
+        var input = document.createElement('textarea');
+        input.value = text;
+        input.setAttribute('readonly', 'readonly');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   function applyRoute(route, options) {
     options = options || {};
     if (route.tab) {
       state.main_tab = route.tab === 'collections' ? 'workspace' : route.tab;
+    }
+    if (route.workspace === 'collections' || route.workspace === 'run') {
+      state.workspace_tab = route.workspace;
     }
     if (route.connection) {
       var matchedProfile = findProfileByConnection(route.connection);
@@ -632,6 +693,14 @@ HTML: <style>
     Array.prototype.forEach.call(document.querySelectorAll('.sql-panel'), function (panel) {
       panel.classList.toggle('is-active', panel.id === 'sql-panel-' + state.main_tab);
     });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-sql-workspace-tab]'), function (tab) {
+      var active = tab.getAttribute('data-sql-workspace-tab') === state.workspace_tab;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.sql-workspace-panel'), function (panel) {
+      panel.classList.toggle('is-active', panel.id === 'sql-workspace-panel-' + state.workspace_tab);
+    });
 
     var profileTabs = byId('sql-profile-tabs');
     profileTabs.innerHTML = '';
@@ -671,6 +740,7 @@ HTML: <style>
         state.collection_item_name_draft = '';
         loadCollectionIntoForm(collection, currentCollectionItem());
         state.main_tab = 'workspace';
+        state.workspace_tab = 'collections';
         render({ replaceRoute: false });
       });
       collectionTabs.appendChild(tab);
@@ -696,6 +766,7 @@ HTML: <style>
         state.sql = item.sql || '';
         loadCollectionIntoForm(activeCollection, item);
         state.main_tab = 'workspace';
+        state.workspace_tab = 'run';
         render({ replaceRoute: false });
       });
       row.appendChild(link);
@@ -726,6 +797,7 @@ HTML: <style>
           state.collection_item_name_draft = nextItem && nextItem.name ? nextItem.name : '';
           state.sql = nextItem && nextItem.sql ? nextItem.sql : '';
           loadCollectionIntoForm(savedCollection, nextItem);
+          state.workspace_tab = 'collections';
           banner('SQL removed from collection: ' + savedCollection.name, false);
           render({ replaceRoute: false });
         }).catch(function (error) {
@@ -740,13 +812,20 @@ HTML: <style>
 
     var tableTabs = byId('sql-table-tabs');
     tableTabs.innerHTML = '';
-    (state.schema.tables || []).forEach(function (row) {
+    var tableFilter = String(state.schema.filter || '').toLowerCase();
+    var visibleTables = (state.schema.tables || []).filter(function (row) {
+      var tableName = String(row && (row.TABLE_NAME || row.table_name || '') || '');
+      return !tableFilter || tableName.toLowerCase().indexOf(tableFilter) > -1;
+    });
+    visibleTables.forEach(function (row) {
       var tableName = row.TABLE_NAME || row.table_name || '';
       if (!tableName) return;
+      var tableRow = document.createElement('div');
+      tableRow.className = 'sql-list-row' + (tableName === state.schema.active_table ? ' is-active' : '');
       var tab = document.createElement('a');
       tab.href = '#';
-      tab.className = 'sql-subtab' + (tableName === state.schema.active_table ? ' is-active' : '');
-      tab.textContent = tableName;
+      tab.className = 'sql-list-item' + (tableName === state.schema.active_table ? ' is-active' : '');
+      tab.innerHTML = '<span data-sql-table-name="' + escapeHtml(tableName) + '"><code>' + escapeHtml(tableName) + '</code></span><small>Load columns</small>';
       tab.setAttribute('data-sql-table-tab', tableName);
       tab.addEventListener('click', function (event) {
         event.preventDefault();
@@ -755,9 +834,52 @@ HTML: <style>
         render({ replaceRoute: false });
         refreshSchema(tableName);
       });
-      tableTabs.appendChild(tab);
+      tableRow.appendChild(tab);
+      var copy = document.createElement('a');
+      copy.href = '#';
+      copy.className = 'sql-inline-action';
+      copy.textContent = 'Copy';
+      copy.setAttribute('data-sql-table-copy', tableName);
+      copy.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        copyText(tableName).then(function () {
+          banner('Copied table name: ' + tableName, false);
+        }).catch(function (error) {
+          banner('Unable to copy table name: ' + error.message, true);
+        });
+      });
+      tableRow.appendChild(copy);
+      var query = document.createElement('a');
+      query.href = '#';
+      query.className = 'sql-inline-action';
+      query.textContent = 'View Data';
+      query.setAttribute('data-sql-table-query', tableName);
+      query.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        state.schema.active_table = tableName;
+        state.active_collection_item_id = '';
+        state.collection_item_draft = 1;
+        state.collection_item_name_draft = tableName + ' Preview';
+        byId('sql-collection-item-name').value = state.collection_item_name_draft;
+        state.sql = 'select * from ' + tableReference(tableName);
+        byId('sql-editor').value = state.sql;
+        autoResizeSqlEditor();
+        state.main_tab = 'workspace';
+        state.workspace_tab = 'run';
+        render({ replaceRoute: false });
+        executeSql().catch(function () {});
+      });
+      tableRow.appendChild(query);
+      tableTabs.appendChild(tableRow);
     });
-    byId('sql-table-tabs-empty').style.display = (state.schema.tables || []).length ? 'none' : 'block';
+    var emptyTableMessage = 'Choose a profile and refresh the schema to load table tabs.';
+    if ((state.schema.tables || []).length && !visibleTables.length) {
+      emptyTableMessage = 'No tables match the current filter.';
+    }
+    byId('sql-table-tabs-empty').textContent = emptyTableMessage;
+    byId('sql-table-tabs-empty').style.display = visibleTables.length ? 'none' : 'block';
     renderColumns();
     syncRoute(!!options.replaceRoute);
   }
@@ -774,7 +896,7 @@ HTML: <style>
     }
     var html = '<table><thead><tr><th>Column</th><th>Type</th><th>Length</th></tr></thead><tbody>';
     columns.forEach(function (row) {
-      html += '<tr><td><pre>' + escapeHtml(row.COLUMN_NAME || '') + '</pre></td><td><pre>' + escapeHtml(row.DATA_TYPE || '') + '</pre></td><td><pre>' + escapeHtml(row.DATA_LENGTH || '') + '</pre></td></tr>';
+      html += '<tr><td><pre>' + escapeHtml(row.COLUMN_NAME || '') + '</pre></td><td><pre>' + escapeHtml(row.TYPE_LABEL || row.TYPE_NAME || row.DATA_TYPE || '') + '</pre></td><td><pre>' + escapeHtml(row.LENGTH_LABEL || row.COLUMN_SIZE || row.DATA_LENGTH || '') + '</pre></td></tr>';
     });
     html += '</tbody></table>';
     byId('sql-column-list').className = '';
@@ -819,6 +941,7 @@ HTML: <style>
       state.result_html = payload.html || '';
       state.result_info = JSON.stringify(payload.details || {}, null, 2);
       state.main_tab = 'workspace';
+      state.workspace_tab = 'run';
       banner('SQL executed successfully.', false);
       render({ replaceRoute: false });
       return payload;
@@ -826,6 +949,7 @@ HTML: <style>
       state.result_html = '';
       state.result_info = 'Execution failed.\n\n' + error.message;
       state.main_tab = 'workspace';
+      state.workspace_tab = 'run';
       banner('SQL execution failed: ' + error.message, true);
       render({ replaceRoute: false });
       throw error;
@@ -856,7 +980,7 @@ HTML: <style>
       state.schema.tables = payload.tables || [];
       state.schema.columns = payload.columns || [];
       if (payload.selected_table) {
-        state.schema.active_table = payload.selected_table;
+      state.schema.active_table = payload.selected_table;
       }
       if (!state.schema.active_table && state.schema.tables.length) {
         state.schema.active_table = state.schema.tables[0].TABLE_NAME || '';
@@ -962,6 +1086,7 @@ HTML: <style>
     state.collection_item_name_draft = '';
     loadCollectionIntoForm({}, null);
     state.main_tab = 'workspace';
+    state.workspace_tab = 'collections';
     render({ replaceRoute: false });
   });
 
@@ -988,6 +1113,7 @@ HTML: <style>
       }
       state.collection_name_draft = savedCollection.name || '';
       state.main_tab = 'workspace';
+      state.workspace_tab = 'collections';
       banner('Collection saved: ' + savedCollection.name, false);
       render({ replaceRoute: false });
     }).catch(function (error) {
@@ -1015,6 +1141,7 @@ HTML: <style>
       state.collection_name_draft = state.active_collection_name || '';
       state.collection_item_name_draft = '';
       loadCollectionIntoForm(currentCollection() || {}, currentCollectionItem());
+      state.workspace_tab = 'collections';
       banner('Collection deleted: ' + payload.removed, false);
       render({ replaceRoute: false });
     }).catch(function (error) {
@@ -1030,6 +1157,7 @@ HTML: <style>
     byId('sql-collection-item-name').value = '';
     byId('sql-active-sql-name').textContent = 'Unsaved SQL';
     state.main_tab = 'workspace';
+    state.workspace_tab = 'run';
     render({ replaceRoute: false });
     byId('sql-collection-item-name').focus();
   });
@@ -1085,6 +1213,7 @@ HTML: <style>
       state.collection_item_name_draft = itemName;
       state.sql = sql;
       state.main_tab = 'workspace';
+      state.workspace_tab = 'run';
       banner('SQL saved to collection: ' + savedCollection.name, false);
       render({ replaceRoute: false });
     }).catch(function (error) {
@@ -1110,6 +1239,14 @@ HTML: <style>
       if (state.main_tab === 'schema') {
         refreshSchema();
       }
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-sql-workspace-tab]'), function (tab) {
+    tab.addEventListener('click', function (event) {
+      event.preventDefault();
+      state.workspace_tab = tab.getAttribute('data-sql-workspace-tab') || 'run';
+      state.main_tab = 'workspace';
+      render({ replaceRoute: false });
     });
   });
 
@@ -1148,6 +1285,10 @@ HTML: <style>
 
   byId('sql-profile-user').addEventListener('input', function () {
     syncRoute(true);
+  });
+  byId('sql-table-filter').addEventListener('input', function () {
+    state.schema.filter = this.value || '';
+    render({ replaceRoute: true });
   });
 
   window.addEventListener('popstate', function (event) {
@@ -3380,6 +3521,50 @@ sub sql_dashboard_connect {
     return $dbh;
 }
 
+sub sql_dashboard_type_name_map {
+    my ($dbh) = @_;
+    return {} if !$dbh || !$dbh->can('type_info_all');
+    my $all = eval { $dbh->type_info_all() };
+    return {} if !$all || ref($all) ne 'ARRAY' || ref( $all->[0] ) ne 'HASH';
+    my $index = $all->[0];
+    return {} if !exists $index->{DATA_TYPE} || !exists $index->{TYPE_NAME};
+    my %map;
+    for my $row ( @{$all}[ 1 .. $#$all ] ) {
+        next if ref($row) ne 'ARRAY';
+        my $data_type = $row->[ $index->{DATA_TYPE} ];
+        my $type_name = $row->[ $index->{TYPE_NAME} ];
+        next if !defined $data_type || !defined $type_name;
+        $type_name = sql_dashboard_trim($type_name);
+        next if $type_name eq '';
+        $map{$data_type} ||= $type_name;
+    }
+    return \%map;
+}
+
+sub sql_dashboard_column_type_label {
+    my ( $row, $type_name_map ) = @_;
+    for my $field (qw(TYPE_NAME LOCAL_TYPE_NAME DATA_TYPE_NAME SQL_DATA_TYPE_NAME)) {
+        my $value = sql_dashboard_trim( $row->{$field} );
+        return $value if $value ne '' && $value !~ /\A-?\d+\z/;
+    }
+    my $data_type = $row->{DATA_TYPE};
+    return $type_name_map->{$data_type} if defined $data_type && $type_name_map->{$data_type};
+    return '' if !defined $data_type || $data_type eq '';
+    return $data_type =~ /\A-?\d+\z/ ? ( 'SQL type ' . $data_type ) : $data_type;
+}
+
+sub sql_dashboard_column_length_label {
+    my ($row) = @_;
+    for my $field (qw(COLUMN_SIZE DATA_LENGTH CHAR_OCTET_LENGTH BUFFER_LENGTH)) {
+        my $value = $row->{$field};
+        next if !defined $value || $value eq '';
+        next if $value !~ /\A-?\d+(?:\.\d+)?\z/;
+        next if $value <= 0;
+        return 0 + $value;
+    }
+    return '';
+}
+
 sub sql_dashboard_parse_sql_blocks {
     my ( $sql_text, $sqls_sep, $instruction_sep ) = @_;
     my @blocks;
@@ -3958,6 +4143,50 @@ sub sql_dashboard_connect {
     return $dbh;
 }
 
+sub sql_dashboard_type_name_map {
+    my ($dbh) = @_;
+    return {} if !$dbh || !$dbh->can('type_info_all');
+    my $all = eval { $dbh->type_info_all() };
+    return {} if !$all || ref($all) ne 'ARRAY' || ref( $all->[0] ) ne 'HASH';
+    my $index = $all->[0];
+    return {} if !exists $index->{DATA_TYPE} || !exists $index->{TYPE_NAME};
+    my %map;
+    for my $row ( @{$all}[ 1 .. $#$all ] ) {
+        next if ref($row) ne 'ARRAY';
+        my $data_type = $row->[ $index->{DATA_TYPE} ];
+        my $type_name = $row->[ $index->{TYPE_NAME} ];
+        next if !defined $data_type || !defined $type_name;
+        $type_name = sql_dashboard_trim($type_name);
+        next if $type_name eq '';
+        $map{$data_type} ||= $type_name;
+    }
+    return \%map;
+}
+
+sub sql_dashboard_column_type_label {
+    my ( $row, $type_name_map ) = @_;
+    for my $field (qw(TYPE_NAME LOCAL_TYPE_NAME DATA_TYPE_NAME SQL_DATA_TYPE_NAME)) {
+        my $value = sql_dashboard_trim( $row->{$field} );
+        return $value if $value ne '' && $value !~ /\A-?\d+\z/;
+    }
+    my $data_type = $row->{DATA_TYPE};
+    return $type_name_map->{$data_type} if defined $data_type && $type_name_map->{$data_type};
+    return '' if !defined $data_type || $data_type eq '';
+    return $data_type =~ /\A-?\d+\z/ ? ( 'SQL type ' . $data_type ) : $data_type;
+}
+
+sub sql_dashboard_column_length_label {
+    my ($row) = @_;
+    for my $field (qw(COLUMN_SIZE DATA_LENGTH CHAR_OCTET_LENGTH BUFFER_LENGTH)) {
+        my $value = $row->{$field};
+        next if !defined $value || $value eq '';
+        next if $value !~ /\A-?\d+(?:\.\d+)?\z/;
+        next if $value <= 0;
+        return 0 + $value;
+    }
+    return '';
+}
+
 sub sql_dashboard_parse_sql_blocks {
     my ( $sql_text, $sqls_sep, $instruction_sep ) = @_;
     my @blocks;
@@ -4049,6 +4278,7 @@ eval {
     my $settings = json_decode( params->{settings} || '{}' );
     my $resolved = sql_dashboard_resolve_settings($settings);
     my $dbh = sql_dashboard_connect($resolved);
+    my $type_name_map = sql_dashboard_type_name_map($dbh);
     my $table_sth = $dbh->table_info( undef, undef, '%', 'TABLE' );
     my @tables;
     while ( my $row = $table_sth->fetchrow_hashref ) {
@@ -4070,6 +4300,10 @@ eval {
                 COLUMN_NAME => $row->{COLUMN_NAME},
                 DATA_TYPE   => $row->{DATA_TYPE},
                 DATA_LENGTH => $row->{DATA_LENGTH},
+                TYPE_NAME   => $row->{TYPE_NAME},
+                COLUMN_SIZE => $row->{COLUMN_SIZE},
+                TYPE_LABEL  => sql_dashboard_column_type_label( $row, $type_name_map ),
+                LENGTH_LABEL => sql_dashboard_column_length_label($row),
             };
         }
         $column_sth->finish if $column_sth && $column_sth->can('finish');

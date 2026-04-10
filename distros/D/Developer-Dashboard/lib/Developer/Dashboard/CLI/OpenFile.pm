@@ -3,14 +3,20 @@ package Developer::Dashboard::CLI::OpenFile;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.17';
 
+use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Cwd qw(cwd);
+use Digest::MD5 qw(md5_hex);
 use Exporter 'import';
 use File::Find ();
+use File::Path qw(make_path);
 use File::Spec;
 use FindBin qw($Bin);
 use Getopt::Long qw(GetOptionsFromArray);
+use JSON::XS qw(decode_json);
+use LWP::UserAgent;
+use URI::Escape qw(uri_escape_utf8);
 use lib "$Bin/../../lib";
 
 use Developer::Dashboard::PathRegistry;
@@ -208,24 +214,26 @@ sub _scope_match_rank {
     my $rank = 0;
     for my $pattern (@patterns) {
         next if !defined $pattern || $pattern eq '';
+        my $regex = _compile_open_file_regex($pattern);
         my $score = 50;
+        my @components = grep { defined && $_ ne '' } split m{[\\/]+}, $file;
 
-        if ( lc($basename) eq lc($pattern) ) {
+        if ( $basename =~ /\A(?:$pattern)\z/i ) {
             $score = 0;
         }
-        elsif ( lc($stem) eq lc($pattern) ) {
+        elsif ( $stem =~ /\A(?:$pattern)\z/i ) {
             $score = 1;
         }
-        elsif ( $basename =~ /^\Q$pattern\E/i ) {
+        elsif ( $basename =~ /\A(?:$pattern)/i ) {
             $score = 2;
         }
-        elsif ( $basename =~ /\Q$pattern\E/i ) {
+        elsif ( $basename =~ $regex ) {
             $score = 3;
         }
-        elsif ( $file =~ m{(?:^|[\\/])\Q$pattern\E(?:[\\/]|$)}i ) {
+        elsif ( grep { $_ =~ /\A(?:$pattern)\z/i } @components ) {
             $score = 4;
         }
-        elsif ( $file =~ /\Q$pattern\E/i ) {
+        elsif ( $file =~ $regex ) {
             $score = 5;
         }
 
@@ -283,15 +291,15 @@ sub _resolve_open_file_matches {
     }
 
     my @files;
+    my @regexes = map { _compile_open_file_regex($_) } @patterns;
     File::Find::find(
         {
             no_chdir => 1,
             wanted   => sub {
                 return if !-f $_;
                 my $path = $File::Find::name;
-                for my $pattern (@patterns) {
-                    next if !defined $pattern || $pattern eq '';
-                    return if $path !~ /\Q$pattern\E/i;
+                for my $regex (@regexes) {
+                    return if $path !~ $regex;
                 }
                 push @files, $path;
             },
@@ -334,9 +342,16 @@ sub _named_source_matches {
                 File::Spec->catdir( 'src', 'test', 'java' ),
             ],
         );
+        push @matches,
+          _java_archive_source_matches(
+            paths    => $paths,
+            roots    => \@roots,
+            name     => $name,
+            relative => $relative,
+          );
     }
 
-    return @matches;
+    return _unique_matches(@matches);
 }
 
 # _open_file_roots(%args)
@@ -383,6 +398,256 @@ sub _existing_named_files {
     return sort @found;
 }
 
+# _compile_open_file_regex($pattern)
+# Compiles one user-supplied open-file token as the regex matcher used by the command.
+# Input: one search token string.
+# Output: compiled regex object, or dies when the token is not a valid regex.
+sub _compile_open_file_regex {
+    my ($pattern) = @_;
+    return if !defined $pattern || $pattern eq '';
+    my $regex = eval { qr/$pattern/i };
+    die "Invalid regex '$pattern': $@\n" if !$regex;
+    return $regex;
+}
+
+# _java_archive_source_matches(%args)
+# Resolves Java source files from local or downloaded source archives when no live .java file exists.
+# Input: path registry object, root array reference, class name string, and relative Java source path string.
+# Output: ordered list of extracted Java source file paths.
+sub _java_archive_source_matches {
+    my (%args) = @_;
+    my $paths    = $args{paths}    || die 'Missing path registry';
+    my $roots    = $args{roots}    || [];
+    my $name     = $args{name}     || return;
+    my $relative = $args{relative} || return;
+
+    my @matches;
+    for my $archive ( _candidate_java_source_archives( paths => $paths, roots => $roots ) ) {
+        push @matches,
+          _extract_java_sources_from_archive(
+            paths    => $paths,
+            archive  => $archive,
+            relative => $relative,
+          );
+    }
+    if ( !@matches ) {
+        push @matches,
+          _download_java_source_matches(
+            paths    => $paths,
+            name     => $name,
+            relative => $relative,
+          );
+    }
+    return _unique_matches(@matches);
+}
+
+# _candidate_java_source_archives(%args)
+# Builds the ordered archive list used for Java source lookup outside direct filesystem source trees.
+# Input: path registry object plus the root array reference already searched for plain files.
+# Output: ordered list of candidate archive file paths.
+sub _candidate_java_source_archives {
+    my (%args) = @_;
+    my $paths = $args{paths} || die 'Missing path registry';
+    my $roots = $args{roots} || [];
+    my @archives;
+    my %seen;
+
+    for my $root ( _java_source_archive_roots( paths => $paths, roots => $roots ) ) {
+        File::Find::find(
+            {
+                no_chdir => 1,
+                wanted   => sub {
+                    return if !-f $_;
+                    my $path = $File::Find::name;
+                    return if $path !~ /(?:-sources\.jar|-src\.jar|src\.zip|source\.zip|\.war|\.jar)\z/i;
+                    return if $seen{$path}++;
+                    push @archives, $path;
+                },
+            },
+            $root,
+        );
+    }
+
+    return @archives;
+}
+
+# _java_source_archive_roots(%args)
+# Returns the filesystem roots that can contain Java source archives for open-file lookup.
+# Input: path registry object plus the current open-file roots array reference.
+# Output: ordered list of existing directory path strings.
+sub _java_source_archive_roots {
+    my (%args) = @_;
+    my $paths = $args{paths} || die 'Missing path registry';
+    my $roots = $args{roots} || [];
+    my @candidates = (
+        @$roots,
+        File::Spec->catdir( $paths->home, '.m2', 'repository' ),
+        File::Spec->catdir( $paths->home, '.gradle', 'caches' ),
+        grep { defined && $_ ne '' } ( $ENV{JAVA_HOME}, $ENV{JDK_HOME} ),
+    );
+
+    my %seen;
+    return grep { defined && $_ ne '' && -d $_ && !$seen{$_}++ } @candidates;
+}
+
+# _extract_java_sources_from_archive(%args)
+# Extracts matching Java source members from one zip-like archive into the dashboard cache tree.
+# Input: path registry object, archive file path string, and relative Java source path string.
+# Output: ordered list of extracted source file path strings.
+sub _extract_java_sources_from_archive {
+    my (%args) = @_;
+    my $paths    = $args{paths}    || die 'Missing path registry';
+    my $archive  = $args{archive}  || return;
+    my $relative = $args{relative} || return;
+    my $zip      = Archive::Zip->new();
+    return if $zip->read($archive) != AZ_OK;
+
+    my @matches;
+    for my $entry ( _matching_java_archive_entries( zip => $zip, relative => $relative ) ) {
+        my $member = $zip->memberNamed($entry) || next;
+        my $target = _cached_archive_source_path(
+            paths   => $paths,
+            archive => $archive,
+            entry   => $entry,
+        );
+        my ( $volume, $directories ) = File::Spec->splitpath($target);
+        make_path( File::Spec->catpath( $volume, $directories, '' ) );
+        open my $fh, '>', $target or die "Unable to write $target: $!";
+        print {$fh} $member->contents;
+        close $fh;
+        push @matches, $target;
+    }
+
+    return @matches;
+}
+
+# _matching_java_archive_entries(%args)
+# Finds archive member names whose trailing path matches one requested Java source path.
+# Input: Archive::Zip object and relative Java source path string.
+# Output: ordered list of matching archive member path strings.
+sub _matching_java_archive_entries {
+    my (%args) = @_;
+    my $zip      = $args{zip}      || return;
+    my $relative = $args{relative} || return;
+    my $suffix   = $relative;
+    $suffix =~ s{\\}{/}g;
+
+    my @entries;
+    for my $member ( $zip->members ) {
+        my $name = $member->fileName || next;
+        next if $name !~ /(?:\A|\/)\Q$suffix\E\z/;
+        push @entries, $name;
+    }
+
+    return @entries;
+}
+
+# _cached_archive_source_path(%args)
+# Builds the stable cache location used for one extracted Java source member.
+# Input: path registry object, archive file path string, and archive member path string.
+# Output: extracted source file path string.
+sub _cached_archive_source_path {
+    my (%args) = @_;
+    my $paths   = $args{paths}   || die 'Missing path registry';
+    my $archive = $args{archive} || die 'Missing archive path';
+    my $entry   = $args{entry}   || die 'Missing archive entry';
+    my $digest  = md5_hex( join "\0", $archive, $entry );
+    my @parts   = grep { defined && $_ ne '' } split m{/+}, $entry;
+
+    return File::Spec->catfile(
+        $paths->cache_root,
+        'open-file',
+        'java-sources',
+        $digest,
+        @parts,
+    );
+}
+
+# _download_java_source_matches(%args)
+# Downloads Maven source jars when local archive lookup cannot satisfy the requested Java class.
+# Input: path registry object, fully qualified class name string, and relative Java source path string.
+# Output: ordered list of extracted Java source file path strings.
+sub _download_java_source_matches {
+    my (%args) = @_;
+    my $paths    = $args{paths}    || die 'Missing path registry';
+    my $name     = $args{name}     || return;
+    my $relative = $args{relative} || return;
+
+    my @matches;
+    for my $doc ( _maven_search_documents($name) ) {
+        next if ref($doc) ne 'HASH';
+        next if !grep { defined && $_ eq '-sources.jar' } @{ $doc->{ec} || [] };
+        my $archive = _download_maven_source_jar( paths => $paths, doc => $doc ) or next;
+        push @matches,
+          _extract_java_sources_from_archive(
+            paths    => $paths,
+            archive  => $archive,
+            relative => $relative,
+          );
+        last if @matches;
+    }
+
+    return @matches;
+}
+
+# _maven_search_documents($name)
+# Queries Maven Central for one fully qualified Java class name.
+# Input: fully qualified Java class name string.
+# Output: ordered list of Maven search document hash references.
+sub _maven_search_documents {
+    my ($name) = @_;
+    return if !defined $name || $name eq '';
+
+    my $query = uri_escape_utf8(qq{fc:"$name"});
+    my $url   = "https://search.maven.org/solrsearch/select?q=$query&rows=20&wt=json";
+    my $ua    = LWP::UserAgent->new( timeout => 10 );
+    my $res   = $ua->get($url);
+    return if !$res->is_success;
+
+    my $payload = eval { decode_json( $res->decoded_content ) };
+    return if !$payload || ref($payload) ne 'HASH';
+    return @{ $payload->{response}{docs} || [] };
+}
+
+# _download_maven_source_jar(%args)
+# Downloads one Maven Central source jar into the dashboard cache tree when it is missing.
+# Input: path registry object and one Maven search document hash reference.
+# Output: local source-jar path string or undef on failure.
+sub _download_maven_source_jar {
+    my (%args) = @_;
+    my $paths = $args{paths} || die 'Missing path registry';
+    my $doc   = $args{doc}   || return;
+    return if ref($doc) ne 'HASH';
+    return if !defined $doc->{g} || !defined $doc->{a} || !defined $doc->{v};
+
+    my $group_path = join '/', split /\./, $doc->{g};
+    my $file       = "$doc->{a}-$doc->{v}-sources.jar";
+    my $target     = File::Spec->catfile(
+        $paths->cache_root,
+        'open-file',
+        'maven-sources',
+        split( /\//, $group_path ),
+        $doc->{a},
+        $doc->{v},
+        $file,
+    );
+    return $target if -f $target;
+
+    my ( $volume, $directories ) = File::Spec->splitpath($target);
+    make_path( File::Spec->catpath( $volume, $directories, '' ) );
+
+    my $url = join '/',
+      'https://repo1.maven.org/maven2',
+      $group_path,
+      $doc->{a},
+      $doc->{v},
+      $file;
+    my $ua  = LWP::UserAgent->new( timeout => 20 );
+    my $res = $ua->mirror( $url, $target );
+    return if !$res->is_success && $res->code != 304;
+    return -f $target ? $target : undef;
+}
+
 # _command_exit($code)
 # Wraps process exit so tests can override it and exercise command flow in-process.
 # Input: integer process exit code.
@@ -425,30 +690,44 @@ C<dashboard open-file> command paths.
 
 =head1 PURPOSE
 
-Perl module in the Developer Dashboard codebase. This file implements the ranked open-file helper logic used by the dashboard open-file commands.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This module implements the search and resolution logic behind C<dashboard of> and C<dashboard open-file>. It can open direct paths, search within scopes, resolve Perl module names, resolve Java dotted class names through source trees and source archives, and rank file matches before opening or printing them.
 
 =head1 WHY IT EXISTS
 
-It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts. That separation makes the runtime easier to test, safer to change, and easier for contributors to navigate.
+It exists because open-file behavior is much richer than a one-line shell wrapper. The dashboard needs one tested place that owns regex matching, module lookup, archive inspection, editor command selection, and the fallback rules between direct paths and scoped search.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug.
+Use this file when changing regex matching, how Java source is found, how Perl modules are mapped to files, how multiple matches are ranked, or how the helper chooses between printing and launching an editor.
 
 =head1 HOW TO USE
 
-Load C<Developer::Dashboard::CLI::OpenFile> from Perl code under C<lib/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS/METHODS sections. This file is not a standalone executable.
+Call C<run_open_file_command> with the raw argv array from the helper command,
+or use the lower-level lookup routines from tests. Direct file paths and
+C<file:line> targets are handled immediately. Scoped lookup mode treats the
+first non-option argument as the search root or saved alias and every remaining
+argument as a case-insensitive regex that must match the candidate path. A
+single hit opens or prints that file, while multiple hits are ranked and shown
+as a chooser or plain list. Perl module lookup maps C<Foo::Bar> to
+C<Foo/Bar.pm>; Java lookup maps dotted class names to C<.java> source files,
+source archives, or cached Maven source jars before the helper decides whether
+to print the path or exec the configured editor.
 
 =head1 WHAT USES IT
 
-This file is used by whichever runtime path owns this responsibility: the public C<dashboard> entrypoint, staged private helper scripts under C<share/private-cli/>, the web runtime, update flows, and the focused regression tests under C<t/>.
+It is used by the private C<of> and C<open-file> helper scripts, by shell
+users who want repo-local open-file behavior, and by the CLI coverage tests
+that exercise direct-path, regex, Perl-module, Java-source, ranking, and
+print-vs-editor flows.
 
 =head1 EXAMPLES
 
-  perl -Ilib -MDeveloper::Dashboard::CLI::OpenFile -e 'print qq{loaded\n}'
-
-That example is only a quick load check. For real usage, follow the public routines already described in the inline code comments and any existing SYNOPSIS section.
+  dashboard open-file path/to/file.txt
+  dashboard open-file lib 'OpenFile\.pm$'
+  dashboard of . "Ok\.js$"
+  dashboard open-file javax.jws.WebService
+  dashboard of Developer::Dashboard::CLI::Paths
+  dashboard open-file --print bookmarks api-dashboard
 
 =for comment FULL-POD-DOC END
 

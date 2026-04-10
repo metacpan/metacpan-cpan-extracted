@@ -126,12 +126,14 @@ subtest 'load private key from DER file' => sub {
 
 subtest 'save_privkey writes PEM file and round-trips' => sub {
     my $key = Net::Nostr::Key->new;
-    my $tmp = File::Temp->new(SUFFIX => '.pem');
-    my $path = $tmp->filename;
-    close $tmp;
+    my $dir = File::Temp->newdir;
+    my $path = "$dir/privkey.pem";
 
     $key->save_privkey($path);
     ok(-f $path, 'file created');
+
+    my $mode = (stat $path)[2] & 07777;
+    is($mode, 0600, 'file created with mode 0600');
 
     my $loaded = Net::Nostr::Key->new(privkey => $path);
     ok($loaded->privkey_loaded, 'private key loaded from saved file');
@@ -211,6 +213,64 @@ subtest 'create_event accepts tags and created_at' => sub {
     );
     is($event->tags, [['t', 'nostr']], 'tags preserved');
     is($event->created_at, 1700000000, 'created_at preserved');
+};
+
+subtest 'sign_event rejects pubkey mismatch' => sub {
+    my $key = Net::Nostr::Key->new;
+    my $other_key = Net::Nostr::Key->new;
+    my $event = Net::Nostr::Event->new(
+        pubkey => $other_key->pubkey_hex, kind => 1,
+        content => 'wrong key', tags => [],
+    );
+    like(dies { $key->sign_event($event) },
+        qr/pubkey does not match/,
+        'sign_event rejects event with wrong pubkey');
+};
+
+subtest 'sign_event rejects tampered id' => sub {
+    my $key = Net::Nostr::Key->new;
+    my $event = Net::Nostr::Event->new(
+        id => 'f' x 64,
+        pubkey => $key->pubkey_hex, kind => 1,
+        content => 'tampered', tags => [],
+    );
+    like(dies { $key->sign_event($event) },
+        qr/id does not match/,
+        'sign_event rejects event with wrong id');
+};
+
+subtest 'sign_event replaces existing sig' => sub {
+    my $key = Net::Nostr::Key->new;
+    my $event = Net::Nostr::Event->new(
+        pubkey => $key->pubkey_hex, kind => 1,
+        content => 'resign me', tags => [],
+        sig => 'a' x 128,
+    );
+    $key->sign_event($event);
+    isnt($event->sig, 'a' x 128, 'old sig replaced');
+    ok($event->validate, 'new sig validates');
+};
+
+subtest 'new() rejects unknown arguments' => sub {
+    like(
+        dies { Net::Nostr::Key->new(bogus => 'value') },
+        qr/unknown.+bogus/i,
+        'unknown argument rejected'
+    );
+};
+
+subtest 'new() rejects both privkey and pubkey' => sub {
+    my $key = Net::Nostr::Key->new;
+    like(
+        dies {
+            Net::Nostr::Key->new(
+                privkey => \$key->privkey_der,
+                pubkey  => \$key->pubkey_der,
+            )
+        },
+        qr/mutually exclusive/i,
+        'privkey + pubkey rejected'
+    );
 };
 
 done_testing;

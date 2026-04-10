@@ -52,18 +52,18 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.02', 'repo version bumped for the runtime-manager ambient process isolation release' );
-like( $pm, qr/^2\.02$/m, 'main POD version matches the module version' );
+is( $version, '2.17', 'repo version bumped for the FULL-POD-DOC quality rewrite' );
+like( $pm, qr/^2\.17$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
-    like( $dist, qr/^version = 2\.02$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^version = 2\.17$/m, 'dist.ini version matches the module version in the source tree' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
     like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
 else {
-    like( $meta, qr/"version"\s*:\s*"2\.02"/, 'META.json version matches the module version in the built distribution' );
+    like( $meta, qr/"version"\s*:\s*"2\.17"/, 'META.json version matches the module version in the built distribution' );
 }
-like( $changes, qr/^2\.02\s+2026-04-08$/m, 'Changes top entry matches the bumped version' );
+like( $changes, qr/^2\.17\s+2026-04-10$/m, 'Changes top entry matches the bumped version' );
 
 for my $path (
     qw(
@@ -106,8 +106,11 @@ like( $makefile, qr/["']HTTP::Request["']\s*=>\s*0/, 'Makefile.PL declares the a
 like( $makefile, qr/["']LWP::Protocol::https["']\s*=>\s*0/, 'Makefile.PL declares the api-dashboard HTTPS protocol runtime prerequisite' );
 like( $makefile, qr/["']URI["']\s*=>\s*0/, 'Makefile.PL declares the api-dashboard URI runtime prerequisite' );
 like( $makefile, qr/["']Digest::MD5["']\s*=>\s*0/, 'Makefile.PL declares the MD5 helper prerequisite for init seed comparisons' );
+like( $makefile, qr/["']Archive::Zip["']\s*=>\s*0/, 'Makefile.PL declares the archive helper runtime prerequisite for Java source lookup' );
 like( $cpanfile, qr/requires ['"]Digest::MD5['"];/, 'cpanfile declares the MD5 helper prerequisite for init seed comparisons' );
+like( $cpanfile, qr/requires ['"]Archive::Zip['"];/, 'cpanfile declares the archive helper runtime prerequisite for Java source lookup' );
 like( $dist, qr/^Digest::MD5 = 0$/m, 'dist.ini declares the MD5 helper prerequisite for dzil builds' ) if $dist ne '';
+like( $dist, qr/^Archive::Zip = 0$/m, 'dist.ini declares the archive helper prerequisite for dzil builds' ) if $dist ne '';
 for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor skills skill)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
@@ -121,6 +124,8 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/dashboard tomq/, 'docs describe the renamed tomq subcommand' );
     like( $doc, qr/dashboard propq/, 'docs describe the renamed propq subcommand' );
     like( $doc, qr/dashboard of \. jq|jq\.js.*jquery\.js|jquery\.js.*jq\.js/s, 'docs describe the scoped open-file ranking behaviour' );
+    like( $doc, qr/Ok\\\.js\$|ok\.json|case-insensitive regex/i, 'docs describe regex-based scoped open-file matching explicitly' );
+    like( $doc, qr/javax\.jws\.WebService|Maven source jar|~\/\.developer-dashboard\/cache\/open-file/i, 'docs describe Java source lookup through archives and cached Maven downloads' );
     like( $doc, qr/vim -p|C<vim -p>/, 'docs describe vim tab mode for blank-enter open-all' );
     like( $doc, qr/stream_data\(url, target, options, formatter\)|C<stream_data\(url, target, options, formatter\)>/, 'docs describe the bookmark stream_data helper' );
     like( $doc, qr/XMLHttpRequest/, 'docs describe incremental browser streaming through XMLHttpRequest' );
@@ -147,8 +152,12 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/config\/sql-dashboard\/collections/, 'docs describe the runtime config/sql-dashboard collection storage path' );
     like( $doc, qr/portable `connection` id|portable C<connection> id|dsn\|user/, 'docs describe the portable sql-dashboard connection id model' );
     like( $doc, qr/table_info|column_info/, 'docs describe generic DBI schema metadata browsing for sql-dashboard' );
+    like( $doc, qr/Collection.*Run SQL|Run SQL.*Collection/s, 'docs describe the sql-dashboard inner workspace tabs' );
     like( $doc, qr/auto-resiz|auto resiz|large auto-resizing editor/, 'docs describe the sql-dashboard large auto-resizing editor' );
-    like( $doc, qr/inline `\[X\]`|inline C<\[X\]>|inline \[X\]/, 'docs describe inline saved-SQL deletion' );
+    like( $doc, qr/inline\s+(?:`\[X\]`|C<\[X\]>|\[X\])/, 'docs describe inline saved-SQL deletion' );
+    like( $doc, qr/live filter|table list a live filter|schema table filter/i, 'docs describe schema table filtering' );
+    like( $doc, qr/View Data|copy a table name|copy a table/i, 'docs describe schema copy and view-data actions' );
+    like( $doc, qr/human type labels|positive length labels|raw numeric type codes/i, 'docs describe normalized schema type and length labels' );
     like( $doc, qr/SQLS_SEP.*INSTRUCTION_SEP|INSTRUCTION_SEP.*SQLS_SEP/s, 'docs describe programmable sql-dashboard statement separators' );
     like( $doc, qr/singleton workers|singleton saved-Ajax workers|singleton saved Ajax workers/, 'docs describe singleton sql-dashboard Ajax workers' );
     like( $doc, qr/dashboard cpan DBD::Driver|DBD::\*/, 'docs describe optional DBD driver installation instead of bundling one database driver' );
@@ -163,6 +172,7 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/config\.json.*\{\}|creates it as `\{\}`|creates it as C<\{\}>/s, 'docs describe empty-object config bootstrapping instead of example collector seeding' );
     like( $doc, qr/preserve(?:s|d)?\s+.*user-owned.*~\/\.developer-dashboard\/cli|~\/\.developer-dashboard\/cli.*user-owned.*preserve|non-destructive.*~\/\.developer-dashboard\/cli/s, 'docs describe non-destructive preservation of user-owned files under the home runtime CLI root' );
     like( $doc, qr/MD5.*skip(?:s|ping)?.*rewrit|skip(?:s|ping)?.*MD5.*rewrit/s, 'docs describe MD5-based skipping for unchanged managed init files' );
+    like( $doc, qr/cdr.*regex|regex.*cdr|which_dir.*regex/i, 'docs describe regex-based cdr and which_dir narrowing' );
     like( $doc, qr/share\/seeded-pages/, 'docs describe shipped seeded bookmark assets outside the main command script' );
     like( $doc, qr/distribution share dir|distribution share directory|cpanm install.*source checkout/s, 'docs describe installed seeded bookmark asset lookup through the dist share directory' );
     like( $doc, qr/stays thin for all built-in commands|thin for all built-in commands.*_dashboard-core|_dashboard-core.*share\/private-cli/s, 'docs describe the thin lazy loader path for all built-in commands' );
@@ -220,6 +230,26 @@ like( $agents_override, qr/DD-OOP-LAYERS/, 'AGENTS.override.md documents the lay
 like( $agents_override, qr/FULL-POD-DOC/, 'AGENTS.override.md documents the FULL-POD-DOC rule' ) if $agents_override ne '';
 like( $readme, qr/FULL-POD-DOC/, 'README documents the FULL-POD-DOC contributor contract' ) if $readme ne '';
 like( $pm, qr/FULL-POD-DOC/, 'main module POD documents the FULL-POD-DOC contributor contract' );
+like( $readme, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'README defines FULL-POD-DOC as real input/output documentation, not boilerplate' ) if $readme ne '';
+like( $pm, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'main module POD defines FULL-POD-DOC as real input/output documentation, not boilerplate' );
+like( $readme, qr/common\s+path.*edge|edge.*common\s+path/is, 'README defines FULL-POD-DOC examples as common-path plus edge-case coverage' ) if $readme ne '';
+like( $pm, qr/common\s+path.*edge|edge.*common\s+path/is, 'main module POD defines FULL-POD-DOC examples as common-path plus edge-case coverage' );
+
+if ( $readme ne '' ) {
+    my ($readme_common) = $readme =~ /#### Common Documentation Example Patterns\s*(.*?)(?:\n#### |\z)/s;
+    my ($readme_edge)   = $readme =~ /#### Edge Or Debugging Documentation Example Patterns\s*(.*?)(?:\n### |\z)/s;
+    my @readme_common_items = $readme_common =~ /^\-\s+`/mg;
+    my @readme_edge_items   = $readme_edge   =~ /^\-\s+`/mg;
+    cmp_ok( scalar(@readme_common_items), '>=', 10, 'README keeps at least ten common documentation example patterns' );
+    cmp_ok( scalar(@readme_edge_items),   '>=', 10, 'README keeps at least ten edge/debugging documentation example patterns' );
+}
+
+my ($pod_common) = $pm =~ /=head3 Common Documentation Example Patterns\s*(.*?)(?:\n=head[23] |\z)/s;
+my ($pod_edge)   = $pm =~ /=head3 Edge Or Debugging Documentation Example Patterns\s*(.*?)(?:\n=head2 |\z)/s;
+my @pod_common_items = $pod_common =~ /^=item \*/mg;
+my @pod_edge_items   = $pod_edge   =~ /^=item \*/mg;
+cmp_ok( scalar(@pod_common_items), '>=', 10, 'main POD keeps at least ten common documentation example patterns' );
+cmp_ok( scalar(@pod_edge_items),   '>=', 10, 'main POD keeps at least ten edge/debugging documentation example patterns' );
 
 for my $path ( _perl_doc_paths() ) {
     my $content = _slurp($path);
@@ -231,6 +261,44 @@ for my $path ( _perl_doc_paths() ) {
     like( $content, qr/^=head1 HOW TO USE$/m, "$path documents HOW TO USE" );
     like( $content, qr/^=head1 WHAT USES IT$/m, "$path documents WHAT USES IT" );
     like( $content, qr/^=head1 EXAMPLES$/m, "$path documents EXAMPLES" );
+}
+
+my @forbidden_full_pod_boilerplate = (
+    qr/Perl module in the Developer Dashboard codebase\./,
+    qr/Private helper script in the Developer Dashboard codebase\./,
+    qr/Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it\./,
+    qr/It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts\./,
+    qr/Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug\./,
+    qr/Load C<Developer::Dashboard::[A-Za-z:]+> from Perl code under C<lib\/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS\/METHODS sections\./,
+    qr/This file is used by whichever runtime path owns this responsibility:/,
+    qr/That example is only a quick load check\./,
+);
+
+for my $path ( _shipped_perl_doc_paths() ) {
+    my $content = _slurp($path);
+    for my $pattern (@forbidden_full_pod_boilerplate) {
+        unlike( $content, $pattern, "$path no longer uses the generic FULL-POD-DOC boilerplate" );
+    }
+
+    my $how_to_use = _section_body( $content, 'HOW TO USE' );
+    my $normalized_how_to_use = $how_to_use;
+    $normalized_how_to_use =~ s/\s+/ /g;
+    $normalized_how_to_use =~ s/^\s+|\s+$//g;
+    cmp_ok(
+        length($normalized_how_to_use),
+        '>=',
+        140,
+        "$path documents HOW TO USE with enough operational detail",
+    );
+
+    my $examples = _section_body( $content, 'EXAMPLES' );
+    my @example_lines = grep { /\S/ } map { s/^\s+//r } split /\n/, $examples;
+    cmp_ok(
+        scalar(@example_lines),
+        '>=',
+        2,
+        "$path documents at least two concrete examples",
+    );
 }
 
 done_testing();
@@ -294,6 +362,44 @@ sub _perl_doc_paths {
     return sort grep { !$seen{$_}++ } @paths;
 }
 
+sub _shipped_perl_doc_paths {
+    my @paths;
+    push @paths, grep { -f $_ } (
+        _repo_path('app.psgi'),
+        _repo_path('bin', 'dashboard'),
+    );
+
+    for my $root ( _repo_path('lib'), _repo_path( 'share', 'private-cli' ) ) {
+        next if !-d $root;
+        find(
+            {
+                no_chdir => 1,
+                wanted   => sub {
+                    return if !-f $_;
+                    return if $_ =~ m{/OLD_CODE/};
+                    return if $_ !~ /\.(?:pm|pl)\z/ && $_ !~ m{/share/private-cli/[^/]+\z};
+                    push @paths, $File::Find::name;
+                },
+            },
+            $root,
+        );
+    }
+
+    my %seen;
+    return sort grep { !$seen{$_}++ } @paths;
+}
+
+sub _section_body {
+    my ( $content, $section ) = @_;
+    return '' if !defined $content || !defined $section;
+
+    if ( $content =~ /^=head1 \Q$section\E\s*\n(.*?)(?=^=head1 |\z)/ms ) {
+        return $1;
+    }
+
+    return '';
+}
+
 __END__
 
 =head1 NAME
@@ -331,9 +437,30 @@ It is used by developers during TDD, by the full C<prove -lr t> suite, by covera
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/15-release-metadata.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the release metadata and documentation contract checks by themselves while editing docs or version metadata.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/15-release-metadata.t
+
+Confirm the metadata guardrails still behave under the covered test path.
+
+Example 3:
+
+  dzil build
+
+Follow the metadata assertions with a real distribution build, because this test protects the release contract.
+
+Example 4:
+
+  prove -lr t
+
+Run the whole suite after the focused metadata check to keep the documentation contract aligned with runtime behavior.
+
 
 =for comment FULL-POD-DOC END
 

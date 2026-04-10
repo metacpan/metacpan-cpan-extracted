@@ -21,7 +21,10 @@ subtest 'base class abstract methods croak' => sub {
 };
 
 subtest 'viable returns false on base class' => sub {
-    ok(!IPC::Manager::Client->viable, "base class viable() returns false");
+    my $viable;
+    my $warns = warnings { $viable = IPC::Manager::Client->viable };
+    ok(!$viable, "base class viable() returns false");
+    like($warns, [qr/not viable/], "viable() warned about base class");
 };
 
 subtest 'have_pending_messages defaults to 0' => sub {

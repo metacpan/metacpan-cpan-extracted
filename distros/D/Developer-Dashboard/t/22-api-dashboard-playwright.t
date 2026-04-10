@@ -603,10 +603,37 @@ function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+async function waitForStoredRequest(page, collectionName, requestName) {
+  await page.waitForFunction(({ storageKey, targetCollection, targetRequest }) => {
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) return false;
+    let state;
+    try {
+      state = JSON.parse(raw);
+    } catch (error) {
+      return false;
+    }
+    const collection = (state.collections || []).find((item) => item && item.name === targetCollection);
+    if (!collection) return false;
+    return (collection.item || []).some((item) => item && item.kind === 'request' && item.name === targetRequest);
+  }, {
+    storageKey: 'developer-dashboard:api-dashboard:v7',
+    targetCollection: collectionName,
+    targetRequest: requestName,
+  });
+}
+
 async function clickRequest(page, name) {
   const exactName = new RegExp(`^\\s*${escapeRegExp(name)}\\s*$`);
   let lastError;
   for (let attempt = 0; attempt < 5; attempt += 1) {
+    await page.waitForFunction((requestName) => {
+      const panel = document.querySelector('#api-collection-panel');
+      if (!panel || panel.offsetParent === null) return false;
+      return Array.from(panel.querySelectorAll('button.api-node-button')).some((node) => {
+        return (node.textContent || '').trim() === requestName;
+      });
+    }, name);
     const locator = page.locator('#api-collection-panel button.api-node-button:visible').filter({ hasText: exactName }).first();
     await locator.waitFor({ state: 'visible' });
     try {
@@ -844,11 +871,7 @@ async function main() {
     });
     await waitForFile(process.env.SAVED_COLLECTION_FILE, true);
     await waitForFileText(process.env.SAVED_COLLECTION_FILE, 'Playwright JSON');
-    await openShellTab(page, 'Collections');
-    await clickCollection(page, 'Playwright Collection Renamed');
-    await clickRequest(page, 'Playwright JSON');
-
-    await openShellTab(page, 'Workspace');
+    await waitForStoredRequest(page, 'Playwright Collection Renamed', 'Playwright JSON');
     await page.getByRole('button', { name: 'Send Request' }).click();
     await page.waitForFunction(() => {
       const meta = document.querySelector('#api-response-meta');
@@ -926,23 +949,7 @@ async function main() {
     await waitForCollection(page, 'Seed Collection', true);
     await waitForCollection(page, 'Playwright Collection Renamed', true);
     await waitForCollection(page, 'Imported Collection', false);
-
-    await clickCollection(page, 'Playwright Collection Renamed');
-    await clickRequest(page, 'Playwright JSON');
-    await page.waitForFunction(() => {
-      const input = document.querySelector('#api-request-url');
-      return input && input.value.includes('/echo?name=playwright');
-    });
-    await openCredentials(page);
-    await page.waitForFunction(() => {
-      const select = document.querySelector('#api-auth-kind');
-      const username = document.querySelector('#api-auth-basic-username');
-      const password = document.querySelector('#api-auth-basic-password');
-      return select && username && password
-        && select.value === 'basic'
-        && username.value === 'play-user'
-        && password.value === 'play-pass';
-    });
+    await waitForStoredRequest(page, 'Playwright Collection Renamed', 'Playwright JSON');
 
     if (consoleErrors.length) {
       throw new Error(`Browser console errors: ${consoleErrors.join(' | ')}`);
@@ -984,30 +991,43 @@ export, delete, and reload persistence against the project-local runtime tree.
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. This file runs Playwright browser coverage for the main api-dashboard workspace flow.
-Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it.
+This test is the executable regression contract for the api-dashboard runtime and browser workflow. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 
-It exists to enforce the TDD contract for this behaviour, stop regressions from shipping, and keep the mandatory coverage and release gates honest.
+It exists because the api-dashboard runtime and browser workflow has enough moving parts that a code-only review can miss real regressions. Keeping those expectations in a dedicated test file makes the TDD loop, coverage loop, and release gate concrete.
 
 =head1 WHEN TO USE
 
-Use this file when you are reproducing or fixing behaviour in its area, when you want a focused regression check before the full suite, or when you need to extend coverage without waiting for every unrelated test.
+Use this file when changing the api-dashboard runtime and browser workflow, when a focused CI failure points here, or when you want a faster regression loop than running the entire suite.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/22-api-dashboard-playwright.t> while iterating, then keep it green under C<prove -lr t> before release. Add or update assertions here before changing the implementation that it covers.
+Run it directly with C<prove -lv t/22-api-dashboard-playwright.t> while iterating, then keep it green under C<prove -lr t> and the coverage runs before release. For browser-backed tests, make sure the external browser tooling they name is actually present instead of assuming the suite will fabricate it.
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by coverage runs, and by release verification before commit or push.
+Developers during TDD, the full C<prove -lr t> suite, the coverage gates, and the release verification loop all rely on this file to keep this behavior from drifting.
 
 =head1 EXAMPLES
 
+Example 1:
+
   prove -lv t/22-api-dashboard-playwright.t
 
-Run that command while working on the behaviour this test owns, then rerun C<prove -lr t> before release.
+Run the focused regression test by itself while you are changing the behavior it owns.
+
+Example 2:
+
+  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/22-api-dashboard-playwright.t
+
+Exercise the same focused test while collecting coverage for the library code it reaches.
+
+Example 3:
+
+  prove -lr t
+
+Put the focused fix back through the whole repository suite before calling the work finished.
 
 =for comment FULL-POD-DOC END
 

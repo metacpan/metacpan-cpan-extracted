@@ -1,8 +1,12 @@
-20231201.1  2023-12-01  Released-By: PERLANCAR; Urgency: low
+20260410.1  2026-04-10  Released-By: PERLANCAR
 
-            - No functional changes.
+        - Update. Fix error in generated POD due to missing
+          Acme/CPANModules/PERLANCAR/Retired.pm.
 
-            - Add note.
+
+20260410.0  2026-04-10  Released-By: PERLANCAR
+
+        - Update.
 
 
 20231201.0  2023-12-01  Released-By: PERLANCAR

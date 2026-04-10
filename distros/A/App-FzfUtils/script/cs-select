@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-08'; # DATE
+our $DATE = '2026-04-09'; # DATE
 our $DIST = 'App-FzfUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FzfUtils/cs_select",
@@ -40,7 +40,7 @@ cs-select - Select entries from template to clipboard
 
 =head1 VERSION
 
-This document describes version 0.002 of cs-select (from Perl distribution App-FzfUtils), released on 2026-04-08.
+This document describes version 0.003 of cs-select (from Perl distribution App-FzfUtils), released on 2026-04-09.
 
 =head1 SYNOPSIS
 
@@ -96,6 +96,13 @@ line:
 
 after selection, another script (L<cs-select-helper>) will turn back the
 single-line entry into the original.
+
+B<Tags>
+
+Some Org tags are used to customize how the entry is displayed or copied to
+clipboard.
+
+B<no_copy_title>. Do not copy the title to clipboard.
 
 =head1 OPTIONS
 
