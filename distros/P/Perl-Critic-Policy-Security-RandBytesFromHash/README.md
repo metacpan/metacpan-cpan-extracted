@@ -2,6 +2,15 @@
 
 Perl::Critic::Policy::Security::RandBytesFromHash - flag common anti-patterns for generating random bytes
 
+# SYNOPSIS
+
+In your `perlcriticrc` file, add
+
+```
+[Perl::Critic::Policy::Security::RandBytesFromHash]
+severity = 1
+```
+
 # DESCRIPTION
 
 In the previous century, most operating systems didn't provide a good source of random bytes.
@@ -15,7 +24,7 @@ They used cryptographic hashes around sources of pseudo-random noise, like
 It seemed good enough. Hashing functions like MD5 or SHA were state-of-the-art and the output looked random.
 That was naive, because the seed values were always predicable:
 
-- Perl's built-in `rand` only generates is seeded by 32-bits and is predicable enough that the seed can be reverse-engineered after a few iterations.
+- Perl's built-in `rand` is seeded by 32-bits and is predicable enough that the seed can be reverse-engineered after a few iterations.
 - The `time` function is predictable, and is leaked by protocols like HTTP.
 - The `$PID` comes from a small pool of value values, and it's common for child processes (such as workers for a web service) to have sequential ids.
 - Perl data structures have predictable reference addresses.
@@ -31,11 +40,27 @@ Anything that looks like the bad sources of randomness outlined above will be fl
 
 What can you use instead?  Modules like [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom), [Crypt::SysRandom](https://metacpan.org/pod/Crypt%3A%3ASysRandom) or [Crypt::PRNG](https://metacpan.org/pod/Crypt%3A%3APRNG).
 
+# RECENT CHANGES
+
+Changes for version v0.1.1 (2026-04-10)
+
+- Bugs
+    - Specified a minimum version of PPI with signature support.
+    - Restricted internal regexes to ASCII.
+- Documentation
+    - Added a SYNOPSIS.
+    - Fixed typos.
+- Tests
+    - Updated Perl::Critic author tests to apply the policy to itself.
+
+See the `Changes` file for more details.
+
 # REQUIREMENTS
 
 This module lists the following modules as runtime dependencies:
 
 - [List::Util](https://metacpan.org/pod/List%3A%3AUtil)
+- [PPI](https://metacpan.org/pod/PPI) version 1.281 or later
 - [Perl::Critic::Policy](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3APolicy)
 - [Perl::Critic::Utils](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3AUtils)
 - [Readonly](https://metacpan.org/pod/Readonly) version 2.01 or later
@@ -96,7 +121,7 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+If the bug you are reporting has security implications that make it inappropriate to send to a public issue tracker,
 then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
 # SOURCE

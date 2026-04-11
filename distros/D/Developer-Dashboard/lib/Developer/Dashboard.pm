@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.17
+2.26
 
 =head1 INTRODUCTION
 
@@ -475,273 +475,45 @@ Project-owned modules now live only under the C<Developer::Dashboard::>
 namespace so the distribution does not pollute the CPAN ecosystem with
 generic package names.
 
-=head1 DOCUMENTATION
-
-=head2 Contributor Documentation Contract
-
-C<FULL-POD-DOC> is a repo contract. Every repo-owned Perl file must end with
-POD under C<__END__> that explains what the file is, what it is for, why it
-exists, when to use it, how to use it, what uses it, and multiple concrete
-examples. That documentation must be specific to the file's real job:
-runtime managers should describe the lifecycle they own, query helpers should
-describe the formats they parse, web modules should describe the routes or
-server edges they handle, and thin staged helpers should document the exact
-handoff they perform. Boilerplate that only swaps the filename is not enough.
-C<FULL-POD-DOC> also means each Perl module and script must document the real
-inputs it accepts, the outputs or side effects it produces, where it sits in
-the command or runtime flow, and multiple concrete examples that match actual
-usage instead of filler text. Those examples must cover the common path and at
-least one meaningful edge or debugging path when the file owns one, such as
-file-vs-STDIN behavior, single-vs-multiple search matches, print-vs-exec
-behavior, or create-vs-attach runtime flow. One-line POD, placeholder prose,
-or a repeated template with a different filename still fails the contract.
-Contributors should be able to open any module, script, helper, or test and
-understand its role without reverse-engineering the tree first.
-
-=head3 Common Documentation Example Patterns
-
-Good C<FULL-POD-DOC> should usually include examples like these when the file
-owns that behavior:
-
-=over 4
-
-=item *
-
-C<dashboard of lib 'OpenFile\.pm$'>: show the normal scoped-regex search path
-where the user knows the root and expects one file to win.
-
-=item *
-
-C<dashboard open-file path/to/file.txt>: show the direct-path path where no
-search is needed and the helper should hand the file straight to the editor.
-
-=item *
-
-C<dashboard path resolve dashboards>: show a plain alias lookup so readers can
-see the simplest path-registry call.
-
-=item *
-
-C<dashboard path cdr work alpha red>: show the normal alias-root narrowing flow
-where all extra terms must match one target directory.
-
-=item *
-
-C<dashboard paths | dashboard jq bookmarks_root>: show how one lightweight
-helper feeds another during shell debugging.
-
-=item *
-
-C<printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta>: show the common
-scalar extraction path for structured JSON.
-
-=item *
-
-C<printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta>: show that the same
-dotted-path contract carries across YAML input.
-
-=item *
-
-C<printf '[alpha]\nbeta = 4\n' | dashboard tomq alpha.beta>: show the TOML
-equivalent of the same query-helper workflow.
-
-=item *
-
-C<dashboard ticket DD-123>: show the explicit ticket/session path where the
-session name is provided by the user.
-
-=item *
-
-C<dashboard serve --ssl>: show the normal browser-serving path for the runtime
-manager and web-server layers.
-
-=back
-
-=head3 Edge Or Debugging Documentation Example Patterns
-
-Good C<FULL-POD-DOC> should also include examples like these when the file owns
-that edge:
-
-=over 4
-
-=item *
-
-C<dashboard of . 'Ok\.js$'>: explain that an exact suffix regex must match
-C<ok.js> without drifting into C<ok.json>.
-
-=item *
-
-C<dashboard open-file javax.jws.WebService>: explain the Java-source fallback
-path through source trees, jars, wars, or cached Maven source jars.
-
-=item *
-
-C<dashboard jq response.json '$d'>: explain the whole-document query path and
-the order-independent file/path argv contract.
-
-=item *
-
-C<dashboard propq '$d' app.properties>: explain that dotted property names stay
-intact and the root-document path should return the full parsed map.
-
-=item *
-
-C<dashboard csvq 1.1>: explain that CSV selection is row/column index based,
-not a fake header-name query language.
-
-=item *
-
-C<dashboard xmlq _raw>: explain that XML is currently a raw-payload helper and
-docs must not promise a deeper tree-query contract than the implementation
-owns.
-
-=item *
-
-C<dashboard path cdr alpha red>: explain the non-alias fallback path where all
-arguments become current-directory regexes.
-
-=item *
-
-C<dashboard path cdr work alpha>: explain the multiple-match path where the
-helper prints matches and stays at the alias root instead of silently choosing
-one.
-
-=item *
-
-C<TICKET_REF=DD-123 dashboard ticket>: explain the environment-fallback path
-and the create-vs-attach decision for tmux ticket sessions.
-
-=item *
-
-C<dashboard init>: explain the non-destructive seed-refresh edge where
-dashboard-managed starter pages refresh, but diverged user-owned pages stay
-untouched.
-
-=back
-
-=head2 Scorecard Gate
-
-C<SCORECARD-GATEKEEPER> is also a repo contract. Before saying work is done,
-before a release, and before a push that is meant to close a task, run the
-live GitHub Scorecard check through the authenticated interactive-shell path:
-
-  bash -ic "scorecard --repo=github.com/manif3station/developer-dashboard"
-
-Treat the result as a real gate:
-
-=over 4
-
-=item *
-
-record every failing or unknown check
-
-=item *
-
-turn those checks into an explicit task list
-
-=item *
-
-fix repository-side causes with TDD and verification
-
-=item *
-
-apply GitHub-side settings changes when the check depends on remote state
-
-=item *
-
-push the fixes
-
-=item *
-
-rerun Scorecard
-
-=item *
-
-repeat until every actionable check reaches C<10 / 10>
-
-=back
-
-Do not claim the repository is complete while Scorecard still shows a
-repository-fixable failure. If one check cannot become C<10 / 10> because of
-repo age, contributor makeup, badge-program state, missing admin permission,
-or other platform constraints, document that blocker with evidence instead of
-pretending the gate passed.
-
-Additional enforcement under C<SCORECARD-GATEKEEPER>:
-
-=over 4
-
-=item *
-
-do not use top-level GitHub Actions C<write> permissions; keep top-level
-permissions read-only or C<none>
-
-=item *
-
-move required C<write> permissions down to the specific job that needs them
-
-=item *
-
-keep GitHub Actions pinned by full commit SHA
-
-=item *
-
-keep container base images pinned by digest
-
-=item *
-
-keep a detectable fuzzing marker in the repo; this tree now uses both
-C<fast-check> and F<.clusterfuzzlite/Dockerfile>, and the JS fuzz workflow
-must bootstrap the Perl runtime before it invokes C<dashboard encode> or
-C<dashboard decode>
-
-=item *
-
-keep GitHub release signing real, not theoretical; a release is not
-Scorecard-complete until GitHub has a published release asset set that
-includes the tarball and its matching detached signature asset
-
-=back
-
 =head2 Main Concepts
 
 =over 4
 
 =item * Path Registry
 
-L<Developer::Dashboard::PathRegistry> resolves the runtime roots that
+C<Developer::Dashboard::PathRegistry> resolves the runtime roots that
 everything else depends on, such as dashboards, config, collectors,
 indicators, CLI hooks, logs, and cache.
 
 =item * File Registry
 
-L<Developer::Dashboard::FileRegistry> resolves stable file locations on top of
+C<Developer::Dashboard::FileRegistry> resolves stable file locations on top of
 the path registry so the rest of the system can read and write well-known
 runtime files without duplicating path logic.
 
 =item * Page Model
 
-L<Developer::Dashboard::PageDocument> and L<Developer::Dashboard::PageStore>
+C<Developer::Dashboard::PageDocument> and C<Developer::Dashboard::PageStore>
 implement the saved and transient page model, including bookmark-style source
 documents, encoded transient pages, and persistent bookmark storage.
 
 =item * Page Resolver
 
-L<Developer::Dashboard::PageResolver> resolves saved pages and provider pages
+C<Developer::Dashboard::PageResolver> resolves saved pages and provider pages
 so browser pages and actions can come from both built-in and config-backed
 sources.
 
 =item * Actions
 
-L<Developer::Dashboard::ActionRunner> executes built-in actions and trusted
+C<Developer::Dashboard::ActionRunner> executes built-in actions and trusted
 local command actions with cwd, env, timeout, background support, and encoded
 action transport, letting pages act as operational dashboards instead of static
 documents.
 
 =item * Collectors
 
-L<Developer::Dashboard::Collector> and
-L<Developer::Dashboard::CollectorRunner> implement file-backed prepared-data
+C<Developer::Dashboard::Collector> and
+C<Developer::Dashboard::CollectorRunner> implement file-backed prepared-data
 jobs with managed loop metadata, timeout/env handling, interval and cron-style
 scheduling, process-title validation, duplicate prevention, and collector
 inspection data. This is the prepared-state layer that feeds indicators,
@@ -749,16 +521,16 @@ prompt status, and operational pages.
 
 =item * Indicators and Prompt
 
-L<Developer::Dashboard::IndicatorStore> and L<Developer::Dashboard::Prompt>
+C<Developer::Dashboard::IndicatorStore> and C<Developer::Dashboard::Prompt>
 expose cached state to shell prompts and dashboards, including compact versus
 extended prompt rendering, stale-state marking, generic built-in indicator
 refresh, and page-header status payloads for the web UI.
 
 =item * Web Layer
 
-L<Developer::Dashboard::Web::DancerApp>,
-L<Developer::Dashboard::Web::App>, and
-L<Developer::Dashboard::Web::Server> provide the browser interface on port
+C<Developer::Dashboard::Web::DancerApp>,
+C<Developer::Dashboard::Web::App>, and
+C<Developer::Dashboard::Web::Server> provide the browser interface on port
 C<7890>, with Dancer2 owning the HTTP route table while the web-app service
 handles page rendering, login/logout, helper sessions, and the
 exact-loopback admin trust model.
@@ -802,20 +574,20 @@ helper instead of a public standalone binary.
 
 =item * Runtime Manager
 
-L<Developer::Dashboard::RuntimeManager> manages the background web service and
+C<Developer::Dashboard::RuntimeManager> manages the background web service and
 collector lifecycle with process-title validation, C<pkill>-style fallback
 shutdown, and restart orchestration, tying the browser and prepared-state
 loops together as one runtime.
 
 =item * Update Manager
 
-L<Developer::Dashboard::UpdateManager> runs ordered update scripts and
+C<Developer::Dashboard::UpdateManager> runs ordered update scripts and
 restarts validated collector loops when needed, giving the runtime a
 controlled bootstrap and upgrade path.
 
 =item * Docker Compose Resolver
 
-L<Developer::Dashboard::DockerCompose> resolves project-aware compose files,
+C<Developer::Dashboard::DockerCompose> resolves project-aware compose files,
 explicit overlay layers, services, addons, modes, env injection, and the
 final C<docker compose> command so container workflows can live inside the
 same dashboard ecosystem instead of in separate wrapper scripts.
@@ -968,12 +740,19 @@ without tripping C<Argument list too long>. Built-in commands such as C<dashboar
 use the same hook directory. A
 directory-backed custom command can provide its real executable as
 F<~/.developer-dashboard/cli/E<lt>commandE<gt>/run>, and that runner receives
-the final C<RESULT> environment variable. After each hook finishes, the updated
-C<RESULT> JSON is written back into the environment before the next sorted hook
-starts, so later hook scripts can react to earlier hook output.
+the final C<RESULT> plus C<LAST_RESULT> environment variables. After each hook
+finishes, the updated C<RESULT> JSON is written back into the environment
+before the next sorted hook starts, and C<LAST_RESULT> is rewritten to the
+structured result for the hook that just ran, so later hook scripts can react
+to earlier hook output and also inspect the immediate previous hook in a stable
+shape. C<LAST_RESULT> carries C<file>, C<exit>, C<STDOUT>, and C<STDERR>.
+Only an explicit C<[[STOP]]> marker in one hook's C<stderr> stops the
+remaining hook files for that command. A non-zero exit code alone is still
+recorded, but it does not skip later hooks.
 
-Perl hook code can use C<Runtime::Result> to decode C<RESULT> safely and read
-per-hook C<stdout>, C<stderr>, exit codes, or the last recorded hook entry.
+Perl hook code can use C<Runtime::Result> to decode C<RESULT> safely, read the
+immediate C<last_result>, and inspect per-hook C<stdout>, C<stderr>, exit
+codes, or the last recorded hook entry.
 If a Perl-backed command wants a compact final summary after its hook files
 run, it can also call C<Developer::Dashboard::Runtime::Result-E<gt>report()> to print a simple
 success/error report for each sorted hook file.
@@ -1031,8 +810,9 @@ source.
 
 =head2 Data Query Commands
 
-These built-in commands parse structured text and optionally extract a dotted
-path:
+These built-in commands parse structured text and can then either extract a
+dotted path or evaluate a Perl expression against the decoded document through
+C<$d>:
 
 =over 4
 
@@ -1058,10 +838,20 @@ If the selected value is a hash or array, the command prints canonical JSON.
 If the selected value is a scalar, it prints the scalar plus a trailing
 newline.
 
-The file path and query path are order-independent, and C<$d> selects the
+The file path and query text are order-independent, and C<$d> selects the
 whole parsed document. For example, C<cat file.json | dashboard jq '$d'> and
-C<dashboard jq file.json '$d'> return the same result. The same contract
-applies to C<yq>, C<tomq>, C<propq>, C<iniq>, C<csvq>, and C<xmlq>.
+C<dashboard jq file.json '$d'> return the same result. If the query text uses
+C<$d> inside a Perl expression, the command evaluates that expression against
+the decoded document. For example, C<echo '{"foo":[1],"bar":[2]}' | dashboard
+jq 'sort keys %$d'> prints C<["bar","foo"]>. The same contract applies to
+C<yq>, C<tomq>, C<propq>, C<iniq>, C<csvq>, and C<xmlq>.
+
+C<xmlq> follows the same decoded-data model as the other query commands. XML
+elements decode into nested hashes and arrays, repeated sibling tags become
+arrays, attributes live under C<_attributes>, and mixed text lives under
+C<_text>. That means C<printf '<root><value>demo</value></root>' | dashboard
+xmlq root.value> prints C<demo>, while C<dashboard xmlq feed.xml '$d'> prints
+the full decoded XML tree as canonical JSON.
 
 =head1 MANUAL
 
@@ -1146,9 +936,12 @@ F<~/.developer-dashboard/cli/update> or
 F<~/.developer-dashboard/cli/update/run> in any inherited layer, with the
 deepest matching layer winning the final command path. Its hook files can live
 under F<update/> or F<update.d>, and the real command receives the final
-C<RESULT> JSON through the environment after those hook files run. Each later
-hook also sees the latest rewritten C<RESULT> from the earlier hook set, and
-Perl code can read that payload through C<Runtime::Result>.
+C<RESULT> and C<LAST_RESULT> payloads through the environment after those hook
+files run. Each later hook also sees the latest rewritten C<RESULT> from the
+earlier hook set, the immediate previous hook through C<LAST_RESULT>, and an
+explicit C<[[STOP]]> marker in one hook's C<stderr> skips the remaining hook
+files before control returns to the real update command. Perl code can read
+those payloads through C<Runtime::Result>.
 
 Use C<dashboard version> to print the installed Developer Dashboard version.
 
@@ -1497,17 +1290,16 @@ and update scripts now resolve C<.ps1>, C<.cmd>, C<.bat>, and C<.pl>
 runners without assuming C<sh> or C<bash>. That keeps Strawberry Perl installs
 usable without requiring a Unix shell just to load the dashboard runtime.
 
-The checked-in Windows verification assets follow the same layered approach:
-fast forced-Windows unit coverage in C<t/>, a real Strawberry Perl host smoke
-in F<integration/windows/run-strawberry-smoke.ps1>, and a host-side rerun
-helper in F<integration/windows/run-host-windows-smoke.sh> that delegates to
-F<integration/windows/run-qemu-windows-smoke.sh> for release-grade Windows
-compatibility claims. The supported baseline on Windows is PowerShell plus
-Strawberry Perl. Git Bash is optional. Scoop is optional. They are setup
-helpers, not runtime requirements for the installed C<dashboard> command. In
-the Dockur-backed path, the launcher stages the Strawberry Perl MSI from the
-Linux host into the OEM bundle and can keep multiple retained Windows guests
-alive on configurable host web/RDP ports while it reruns the same smoke.
+The repository-only Windows verification assets follow the same layered
+approach: fast forced-Windows unit coverage in C<t/>, a real Strawberry Perl
+host smoke in the source checkout, and a host-side rerun helper that delegates
+to the QEMU launcher for release-grade Windows compatibility claims. The
+supported baseline on Windows is PowerShell plus Strawberry Perl. Git Bash is
+optional. Scoop is optional. They are setup helpers, not runtime requirements
+for the installed C<dashboard> command. In the Dockur-backed path, the launcher
+stages the Strawberry Perl MSI from the Linux host into the OEM bundle and can
+keep multiple retained Windows guests alive on configurable host web/RDP ports
+while it reruns the same smoke.
 
 =head2 Browser Access Model
 
@@ -1713,7 +1505,8 @@ Tests that depend on a missing or empty environment variable now establish that
 state explicitly inside the test file, rather than assuming the parent shell
 or install harness starts clean.
 
-For fast saved-bookmark browser regressions, run the dedicated smoke script:
+From a source checkout, for fast saved-bookmark browser regressions, run the
+dedicated smoke script:
 
   integration/browser/run-bookmark-browser-smoke.pl
 
@@ -1804,13 +1597,13 @@ the user-space native client libraries to be exposed through C<PERL5LIB>,
 C<LD_LIBRARY_PATH>, and, for Oracle, C<ORACLE_HOME>. Those drivers are not
 shipped as base runtime prerequisites.
 
-For Windows-targeted changes, also run the Strawberry Perl smoke on a Windows
-host:
+From a source checkout, for Windows-targeted changes, also run the Strawberry
+Perl smoke on a Windows host:
 
   powershell -ExecutionPolicy Bypass -File integration/windows/run-strawberry-smoke.ps1 -Tarball C:\path\Developer-Dashboard-*.tar.gz
 
-Before calling a release Windows-compatible, also run the same smoke through
-the host-side Windows VM helper:
+Before calling a release Windows-compatible from the source checkout, also run
+the same smoke through the host-side Windows VM helper:
 
   WINDOWS_QEMU_ENV_FILE=.developer-dashboard/windows-qemu.env \
   integration/windows/run-host-windows-smoke.sh
@@ -1996,9 +1789,9 @@ through singleton workers. No
 C<DBD::*> driver ships in the base tarball by default; install only the one
 you need with C<dashboard cpan DBD::Driver> or user-space
 C<cpanm -L ~/perl5 DBD::Driver>, and the bookmark will return explicit
-install guidance when a selected driver is missing. For a living support
-checklist, verification matrix, and per-database notes, see
-F<SQL_DASHBOARD_SUPPORTS_DB.md>.
+install guidance when a selected driver is missing. The repository also ships
+a dedicated SQL dashboard support guide with the verification matrix and
+per-database notes for that workspace.
 
 =head2 Skills System
 
@@ -2009,20 +1802,135 @@ Install a skill from a Git repository:
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills install https://github.com/user/example-skill.git
 
+The repository is cloned into its own isolated skill root under
+F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. Developer Dashboard does
+not merge the skill's C<cli/>, C<dashboards/>, C<config/>, C<cpanfile>,
+C<aptfile>, or Docker files into the normal runtime folders.
+
 List installed skills:
 
   dashboard skills list
+  dashboard skills list -o table
 
-Returns JSON output showing installed skills with metadata: skill name,
-path to installed skill directory, and configuration status.
+The default output is JSON. It returns a C<skills> array where each item
+reports:
+
+=over 4
+
+=item *
+
+repo name
+
+=item *
+
+installed path
+
+=item *
+
+C<enabled> as a JSON boolean
+
+=item *
+
+CLI command, page, docker service, collector, and indicator counts
+
+=item *
+
+JSON booleans for C<has_config>, C<has_aptfile>, and C<has_cpanfile>
+
+=back
+
+Use C<-o table> for a terminal view with the columns C<Repo>, C<Enabled>,
+C<CLI>, C<Pages>, C<Docker>, C<Collectors>, and C<Indicators>. The
+C<Enabled> column uses green and red tick markers so disabled skills stand out
+immediately.
+
+Inspect one installed skill:
+
+  dashboard skills usage example-skill
+  dashboard skills usage example-skill -o table
+
+The default output is JSON. It returns the installed skill state even when the
+skill is disabled, including:
+
+=over 4
+
+=item *
+
+CLI commands plus whether each command has hooks and how many
+
+=item *
+
+bookmark pages and C<dashboards/nav/*> entries
+
+=item *
+
+docker service folders and the files inside each one
+
+=item *
+
+the merged config key such as C<_example-skill>
+
+=item *
+
+declared collectors, their repo-qualified names, and indicator metadata
+
+=back
 
 Update a skill to the latest version:
 
   dashboard skills update example-skill
 
+Disable a skill without uninstalling it:
+
+  dashboard skills disable example-skill
+
+Disabling keeps the checkout under
+F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/> but removes it from
+normal runtime lookup. That means:
+
+=over 4
+
+=item *
+
+C<dashboard skill E<lt>repo-nameE<gt> E<lt>commandE<gt>> and
+C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> stop dispatching into that
+skill
+
+=item *
+
+C</app/E<lt>repo-nameE<gt>> and C</app/E<lt>repo-nameE<gt>/E<lt>pageE<gt>>
+stop serving that skill's pages
+
+=item *
+
+skill collectors, docker roots, config, and shared nav stop joining the
+active runtime
+
+=item *
+
+C<dashboard skills list> and
+C<dashboard skills usage E<lt>repo-nameE<gt>> still report the installed skill
+so it can be inspected and re-enabled later
+
+=back
+
+Enable a previously disabled skill:
+
+  dashboard skills enable example-skill
+
+Enabling removes the local disabled marker and restores the skill to command
+dispatch, browser routes, collector loading, docker lookup, config merge, and
+shared nav rendering.
+
 Execute a skill command:
 
   dashboard skill example-skill somecmd arg1 arg2
+  dashboard example-skill.somecmd arg1 arg2
+
+The dotted form is the short public route. If C<example-skill> is installed and
+ships C<cli/somecmd>, C<dashboard example-skill.somecmd> resolves the correct
+isolated skill root, runs sorted hooks from C<cli/somecmd.d/>, and then runs the
+main command.
 
 Uninstall a skill:
 
@@ -2038,15 +1946,27 @@ Skill commands (executable scripts, never installed to system PATH)
 
 =item B<cli/E<lt>cmdE<gt>.d/>
 
-Hook files for commands (pre/post hooks in sorted order)
+Hook files for commands (sorted pre-command hooks)
+
+=item B<dashboards/>
+
+Skill-shipped pages, including C<dashboards/index>
+
+=item B<dashboards/nav/>
+
+Skill nav fragments and bookmark pages loaded into
+C</app/E<lt>repo-nameE<gt>> routes and into the shared nav strip rendered
+above normal saved C</app/E<lt>pageE<gt>> routes such as C</app/index>
 
 =item B<config/config.json>
 
-Skill metadata and configuration
+Skill-local JSON config, merged into runtime config under
+C<_E<lt>repo-nameE<gt>>. Any declared C<collectors> join the managed fleet
+under repo-qualified names such as C<example-skill.status>
 
 =item B<config/docker/>
 
-Skill-local Docker Compose files
+Skill-local Docker Compose roots that participate in layered docker service lookup
 
 =item B<state/>
 
@@ -2055,6 +1975,10 @@ Persistent skill state and data
 =item B<logs/>
 
 Skill output logs
+
+=item B<aptfile>
+
+Optional system packages installed before Perl dependencies
 
 =item B<cpanfile>
 
@@ -2066,24 +1990,154 @@ Skills are completely isolated from the main dashboard runtime and from other
 skills. Removing a skill is simple: C<dashboard skills uninstall E<lt>repo-nameE<gt>>
 cleanly removes only that skill's directory.
 
+Hook lifecycle details:
+
+=over 4
+
+=item *
+
+hooks run in sorted filename order from C<cli/E<lt>commandE<gt>.d/>
+
+=item *
+
+each hook result is appended to C<RESULT>
+
+=item *
+
+the immediately previous hook payload is exposed through C<LAST_RESULT>
+
+=item *
+
+later hooks are skipped only when a hook writes the explicit marker
+C<[[STOP]]> to C<stderr>
+
+=item *
+
+ordinary non-zero exit codes are recorded but do not act like an implicit stop
+request
+
+=back
+
+Skill fleet integration:
+
+=over 4
+
+=item *
+
+collectors declared in a skill C<config/config.json> join the same managed
+fleet used by the system config
+
+=item *
+
+C<dashboard serve>, C<dashboard restart>, and C<dashboard stop> manage those
+skill collectors together with the system-owned collectors
+
+=item *
+
+skill collector names are normalized to
+C<E<lt>repo-nameE<gt>.E<lt>collector-nameE<gt>> so collector process titles,
+status rows, and indicator state stay unambiguous
+
+=item *
+
+indicator configuration attached to those skill collectors participates in the
+normal prompt and browser status flow
+
+=item *
+
+disabled skills are excluded from that fleet until they are re-enabled
+
+=back
+
+Skill browser routes:
+
+=over 4
+
+=item *
+
+C</app/E<lt>repo-nameE<gt>> renders C<dashboards/index>
+
+=item *
+
+C</app/E<lt>repo-nameE<gt>/E<lt>pageE<gt>> renders C<dashboards/E<lt>pageE<gt>>
+
+=item *
+
+C<dashboards/nav/*> is loaded into those skill app routes and into the shared
+nav strip above normal saved C</app/E<lt>pageE<gt>> routes such as
+C</app/index>, so every installed skill can contribute top-level nav at once
+
+=item *
+
+the older C</skill/E<lt>repo-nameE<gt>/bookmarks/E<lt>idE<gt>> route still works for direct bookmark rendering
+
+=item *
+
+disabled skills drop out of both the dedicated skill routes and the shared nav
+strip until they are re-enabled
+
+=back
+
+Skill dependency and docker layering:
+
+=over 4
+
+=item *
+
+if an C<aptfile> exists, its package list is installed first
+
+=item *
+
+if a C<cpanfile> exists, its Perl dependencies are then installed into the
+skill-local C<local/> tree
+
+=item *
+
+skill C<config/docker/...> roots participate in docker service discovery after
+the home runtime docker config and before deeper project-layer overrides
+
+=item *
+
+disabled skills are skipped by docker root discovery until they are
+re-enabled
+
+=back
+
 =head3 Skill Authoring
 
 To build a new skill, start with a Git repository that contains C<cli/>,
-C<config/config.json>, and optional C<dashboards/>, C<state/>, C<logs/>,
-C<local/>, and C<cpanfile> files under the skill root. Skill commands are
-file-based commands run through
-C<dashboard skill E<lt>repo-nameE<gt> E<lt>commandE<gt>>, skill hook files
-live under C<cli/E<lt>commandE<gt>.d/>, and skill bookmarks render from
-C</skill/E<lt>repo-nameE<gt>/bookmarks/E<lt>idE<gt>>.
+C<config/config.json>, and optional C<dashboards/>, C<dashboards/nav/>,
+C<state/>, C<logs/>, C<local/>, C<aptfile>, and C<cpanfile> files under the
+skill root. Skill commands are file-based commands run through either
+C<dashboard skill E<lt>repo-nameE<gt> E<lt>commandE<gt>> or the short
+C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> form. Skill hook files live
+under C<cli/E<lt>commandE<gt>.d/>, skill app pages render from
+C</app/E<lt>repo-nameE<gt>> and C</app/E<lt>repo-nameE<gt>/E<lt>idE<gt>>, and
+the older C</skill/E<lt>repo-nameE<gt>/bookmarks/E<lt>idE<gt>> route still
+resolves direct bookmark renders. If C<config/config.json> declares
+collectors, those collectors join the normal managed fleet under
+repo-qualified names such as C<example-skill.status>, which means
+C<dashboard serve>, C<dashboard restart>, and C<dashboard stop> treat them the
+same way they treat system-owned collectors.
 
-The full skill authoring reference lives in F<SKILL.md> and the shipped POD
-module C<Developer::Dashboard::SKILLS>. Those guides cover the isolated skill
+The repository also ships a dedicated skill authoring guide, and the installed
+reference is available through the POD module
+C<Developer::Dashboard::SKILLS>. Together they cover the isolated skill
 layout, environment variables such as C<DEVELOPER_DASHBOARD_SKILL_ROOT>,
 bookmark syntax like C<TITLE:>, C<BOOKMARK:>, C<HTML:>, and C<CODE1:>,
 bookmark browser helpers such as C<fetch_value()>, C<stream_value()>, and
-C<stream_data()>, and when to use dashboard-wide custom CLI hook folders
-such as F<~/.developer-dashboard/cli/E<lt>commandE<gt>.d> instead of a
-skill-local hook tree.
+C<stream_data()>, underscored config merge keys such as C<_example-skill>,
+C<aptfile>-then-C<cpanfile> dependency install order, skill docker layering,
+and when to use dashboard-wide custom CLI hook folders such as
+F<~/.developer-dashboard/cli/E<lt>commandE<gt>.d> instead of a skill-local
+hook tree.
+
+For operators rather than authors, C<dashboard skills list>,
+C<dashboard skills usage E<lt>repo-nameE<gt>>,
+C<dashboard skills disable E<lt>repo-nameE<gt>>, and
+C<dashboard skills enable E<lt>repo-nameE<gt>> are the supported controls for
+inventorying and toggling installed skills without deleting their isolated
+runtime trees.
 
 =head1 FAQ
 
@@ -2104,9 +2158,12 @@ What remains intentionally lightweight is breadth, not architecture:
 - provider pages and action handlers are implemented in a compact v1 form
 - bookmark-file pages are supported, with Template Toolkit rendering and one clean sandpit package per page run so C<CODE*> blocks can share state within a bookmark render without leaking runtime globals into later requests
 
-=head2 Does it require a web framework?
+=head2 How is the browser UI served?
 
-No. The current distribution includes a minimal HTTP layer implemented with core Perl-oriented modules.
+The browser UI runs as the dashboard web service you start with
+C<dashboard serve>. Internally that service is a PSGI application served
+through the shipped web runtime, while CLI-only commands continue to work
+without keeping the browser service running.
 
 =head2 Why does a custom hostname sometimes require login?
 
@@ -2133,14 +2190,18 @@ The project uses C<JSON::XS> for JSON encoding and decoding, including shell hel
 
 =head2 What does the project use for command capture and HTTP clients?
 
-The project uses C<Capture::Tiny> for command-output capture via C<capture>, with exit codes returned from the capture block rather than read separately. There is currently no outbound HTTP client in the core runtime, so C<LWP::UserAgent> is not yet required by an active code path.
+The project uses C<Capture::Tiny> for command-output capture via C<capture>,
+with exit codes returned from the capture block rather than read separately.
+It uses C<LWP::UserAgent> for real outbound HTTP in active runtime paths such
+as the saved C<api-dashboard> request runner and the Java source lookup or
+mirror path behind C<dashboard of> and C<dashboard open-file>.
 
 =head1 SEE ALSO
 
-L<Developer::Dashboard::PathRegistry>,
-L<Developer::Dashboard::PageStore>,
-L<Developer::Dashboard::CollectorRunner>,
-L<Developer::Dashboard::Prompt>
+L</Main Concepts>,
+L</Working With Collectors>,
+L</Runtime Lifecycle>,
+L</Skills System>
 
 =head1 AUTHOR
 
@@ -2149,56 +2210,5 @@ Developer Dashboard Contributors
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
-
-=for comment FULL-POD-DOC START
-
-=head1 PURPOSE
-
-This module is the distribution manual for Developer Dashboard. It explains the user-facing runtime model, command surface, bookmark system, layered configuration, browser workspace features, and release expectations, while also carrying the canonical version number for the distribution.
-
-=head1 WHY IT EXISTS
-
-It exists so the distribution ships one authoritative manual that survives a tarball install and matches the README in the source tree. That keeps CPAN users, local developers, and release verification looking at the same product-level documentation instead of a checkout-only guide.
-
-=head1 WHEN TO USE
-
-Use this file when the visible behavior of the dashboard changes, when command semantics move, when seeded workspaces gain new capability, or when contributor rules in the shipped manual need to stay aligned with the README.
-
-=head1 HOW TO USE
-
-Edit this POD as a product manual, not as an implementation dump. Keep it synchronized with C<README.md>, keep the version line aligned with C<dist.ini>, and describe the runtime the way an installed user will experience it.
-
-=head1 WHAT USES IT
-
-It is used by C<perldoc Developer::Dashboard>, by release metadata tests, by CPAN consumers reading installed documentation, and by contributors checking that the shipped manual matches the source-tree README.
-
-=head1 EXAMPLES
-
-Example 1:
-
-  perl -Ilib -MDeveloper::Dashboard -e 1
-
-Do a direct compile-and-load check against the module from a source checkout.
-
-Example 2:
-
-  prove -lv t/00-load.t t/15-release-metadata.t
-
-Run the focused regression tests that most directly exercise this module's behavior.
-
-Example 3:
-
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
-
-Recheck the module under the repository coverage gate rather than relying on a load-only probe.
-
-Example 4:
-
-  prove -lr t
-
-Put any module-level change back through the entire repository suite before release.
-
-
-=for comment FULL-POD-DOC END
 
 =cut

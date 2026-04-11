@@ -28,16 +28,17 @@ iniq - INI query command for Developer Dashboard
 
 =head1 DESCRIPTION
 
-This command provides INI path extraction for Developer Dashboard.
+This command provides INI query extraction for Developer Dashboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This staged helper owns the public C<dashboard iniq> command. It accepts an
-optional dotted INI path plus an optional input file, then hands the request to
-the shared query runtime so parsing, file-vs-STDIN handling, and output
-formatting stay consistent with the rest of the dashboard toolchain.
+optional dotted INI path or C<$d>-based Perl expression plus an optional input
+file, then hands the request to the shared query runtime so parsing,
+file-vs-STDIN handling, and output formatting stay consistent with the rest of
+the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
@@ -53,7 +54,9 @@ Users run C<dashboard iniq [path] [file]>. The staged helper selects the INI
 backend in the shared query runtime, which accepts the file and path in either
 order, reads STDIN when no file is given, treats section keys as dotted paths
 such as C<alpha.beta>, and prints the whole parsed document when the path is
-C<$d> or C<.>.
+C<$d> or C<.>. If the query text uses C<$d> inside a Perl expression, the
+helper evaluates that expression against the decoded INI document before
+formatting the result.
 
 =head1 WHAT USES IT
 
@@ -64,6 +67,7 @@ It is used by the public C<dashboard iniq> command, by shell snippets that want 
   printf '[alpha]\nbeta=6\n' | dashboard iniq alpha.beta
   dashboard iniq config.ini '$d'
   dashboard iniq '$d' config.ini
+  printf '[foo]\na=1\n[bar]\nb=2\n' | dashboard iniq 'sort keys %$d'
   printf '[service]\nname=demo\n' | dashboard iniq service.name
 
 =for comment FULL-POD-DOC END

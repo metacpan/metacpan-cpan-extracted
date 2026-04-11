@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.37
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.38
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 
 =head1 SYNOPSIS
 
@@ -1056,6 +1056,7 @@ sub import {
         # Set UTF-8 for STDOUT and STDERR.
         utf8 => sub {
             my @fh = @_ ? @_ : ( *STDOUT, *STDERR );
+            return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
             binmode $_, "encoding(UTF-8)" for @fh;
         },
 

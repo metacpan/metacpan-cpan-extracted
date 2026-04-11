@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,8 +24,8 @@ requires:
   Carp: '0'
   Exporter: '0'
   List::Util: '1.33'
-  Term::Choose: '1.773'
-  Term::Choose::Util: '0.145'
+  Term::Choose: '1.782'
+  Term::Choose::Util: '0.148'
   parent: '0'
   perl: '5.010001'
   strict: '0'
@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/Term-Form/issues
   repository: https://github.com/kuerbis/Term-Form.git
-version: '0.562'
+version: '0.563'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

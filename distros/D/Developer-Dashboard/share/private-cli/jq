@@ -28,16 +28,17 @@ jq - JSON query command for Developer Dashboard
 
 =head1 DESCRIPTION
 
-This command provides JSON path extraction for Developer Dashboard.
+This command provides JSON query extraction for Developer Dashboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This staged helper owns the public C<dashboard jq> command. It accepts an
-optional dotted JSON path plus an optional input file, then hands the request
-to the shared query runtime so parsing, file-vs-STDIN handling, and output
-formatting stay consistent with the rest of the dashboard toolchain.
+optional dotted JSON path or C<$d>-based Perl expression plus an optional input
+file, then hands the request to the shared query runtime so parsing,
+file-vs-STDIN handling, and output formatting stay consistent with the rest of
+the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
@@ -53,7 +54,9 @@ Users run C<dashboard jq [path] [file]>. The staged helper under
 F<~/.developer-dashboard/cli/dd/jq> re-enters the shared query runtime, which
 parses JSON, accepts the file and path in either order, reads STDIN when no
 file is given, prints scalar hits as plain text, and prints the whole parsed
-document when the path is C<$d> or C<.>.
+document when the path is C<$d> or C<.>. If the query text uses C<$d> inside a
+Perl expression, the helper evaluates that expression against the decoded JSON
+document before formatting the result.
 
 =head1 WHAT USES IT
 
@@ -64,6 +67,7 @@ It is used by the public C<dashboard jq> command, by shell snippets that want a 
   printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta
   dashboard jq response.json '$d'
   dashboard jq '$d' response.json
+  printf '{"foo":[1,2],"bar":[3,4]}' | dashboard jq 'sort keys %$d'
   printf '{"ok":true}' | dashboard jq ok
 
 =for comment FULL-POD-DOC END

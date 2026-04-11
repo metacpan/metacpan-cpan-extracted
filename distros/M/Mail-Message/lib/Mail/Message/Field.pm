@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.04.
+# This code is part of Perl distribution Mail-Message version 4.05.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Message::Field;{
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 }
 
 use parent 'Mail::Reporter';
@@ -386,8 +386,8 @@ sub fold($$;$)
 	my $wrap  = shift || $default_wrap_length;
 	$line   //= '';
 
-	$line    =~ s/\n(\s)/$1/gms;            # Remove accidental folding
-	CORE::length($line) or return " \n";    # empty field
+	$line    =~ s/\n(\s?)/$1/gms;         # Remove accidental folding
+	CORE::length($line) or return " \n";  # empty field
 
 	my $lname = CORE::length($name);
 	$lname <= $wrap -5  # Cannot find a real limit in the spec
@@ -399,17 +399,19 @@ sub fold($$;$)
 		my $min = $max >> 2;
 		last if CORE::length($line) < $max;
 
-			$line =~ s/^ ( .{$min,$max}   # $max to 30 chars
+		# First, with try to get a block which ends on a ; or , to keep attributes
+		# on the same line.  Only then we fold on any blank.
+			$line =~ s/^ ( .{$min,$max}   # some text
 			              [;,]            # followed at a ; or ,
 			             )[ \t]           # and then a WSP
 			          //x
-		||	$line =~ s/^ ( .{$min,$max} ) # $max to 30 chars
-			             [ \t]            # followed by a WSP
+		|| $line =~ s/^ ( .{$min,$max}    # some text
+			             )[ \t]           # and then a WSP
 			          //x
 		||	$line =~ s/^ ( .{$max,}? )    # longer, but minimal chars
 			             [ \t]            # followed by a WSP
 			          //x
-		||	$line =~ s/^ (.*) //x;        # everything
+		||	$line =~ s/^ (.*) //sx;       # everything
 
 		push @folded, " $1\n";
 	}

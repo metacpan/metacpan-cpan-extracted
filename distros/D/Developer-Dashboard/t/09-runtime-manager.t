@@ -11,6 +11,7 @@ BEGIN {
 }
 
 use File::Temp qw(tempdir);
+use File::Path qw(make_path);
 use File::Spec;
 use POSIX qw(:sys_wait_h);
 use Test::More;
@@ -518,6 +519,62 @@ my @started_collectors = $manager->start_collectors;
 is_deeply( [ map { $_->{name} } @started_collectors ], [ 'alpha.collector', 'beta.collector' ], 'start_collectors starts configured collectors' );
 
 {
+    my $skill_config_dir = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'fleet-skill', 'config' );
+    make_path($skill_config_dir);
+    open my $skill_cfg, '>', File::Spec->catfile( $skill_config_dir, 'config.json' ) or die $!;
+    print {$skill_cfg} <<'JSON';
+{
+  "collectors": [
+    {
+      "name": "health",
+      "command": "true",
+      "cwd": "home",
+      "interval": 30,
+      "indicator": {
+        "label": "Fleet Skill"
+      }
+    }
+  ]
+}
+JSON
+    close $skill_cfg;
+
+    my $skill_runner = Local::RuntimeRunner->new;
+    my $skill_manager = Developer::Dashboard::RuntimeManager->new(
+        app_builder => sub {
+            my (%args) = @_;
+            return Local::RuntimeServer->new(
+                foreground_file => $foreground_file,
+                host            => $args{host},
+                port            => $args{port},
+            );
+        },
+        config => $config,
+        files  => $files,
+        paths  => $paths,
+        runner => $skill_runner,
+    );
+
+    my @skill_started = $skill_manager->start_collectors;
+    is_deeply(
+        [ map { $_->{name} } @skill_started ],
+        [ 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
+        'start_collectors includes installed skill collectors in the managed fleet under repo-qualified names',
+    );
+
+    open my $disabled_skill_fh, '>', File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'fleet-skill', '.disabled' ) or die $!;
+    close $disabled_skill_fh;
+    @{ $skill_runner->{started} } = ();
+    my @disabled_skill_started = $skill_manager->start_collectors;
+    is_deeply(
+        [ map { $_->{name} } @disabled_skill_started ],
+        [ 'alpha.collector', 'beta.collector' ],
+        'start_collectors skips collectors contributed by disabled skills',
+    );
+    unlink File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'fleet-skill', '.disabled' ) or die $!;
+}
+
+{
     local $runner->{started} = [];
     local $runner->{stopped} = [];
     local $runner->{loops}   = [];
@@ -579,7 +636,11 @@ is_deeply( [ map { $_->{name} } @started_collectors ], [ 'alpha.collector', 'bet
 
 my $restart = $manager->restart_all( host => '0.0.0.0', port => 7903 );
 ok( $restart->{web_pid} > 0, 'restart_all starts a background web process' );
-is_deeply( [ map { $_->{name} } @{ $restart->{collectors} } ], [ 'alpha.collector', 'beta.collector' ], 'restart_all restarts configured collectors' );
+is_deeply(
+    [ map { $_->{name} } @{ $restart->{collectors} } ],
+    [ 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
+    'restart_all restarts configured collectors including the installed skill fleet',
+);
 ok( $manager->running_web, 'restart_all leaves the web process running' );
 my $stop_all = $manager->stop_all;
 ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a running service' );

@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.2.5",
+  "VERSION" => "v0.2.6",
   "test" => {
     "TESTS" => "t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t"
   }

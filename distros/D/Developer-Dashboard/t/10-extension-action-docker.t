@@ -126,6 +126,18 @@ make_path($global_purple_root);
 open my $global_purple_fh, '>', File::Spec->catfile( $global_purple_root, 'compose.yml' ) or die $!;
 print {$global_purple_fh} "services:\n  purple:\n    image: alpine\n";
 close $global_purple_fh;
+my $skill_orange_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'alpha-skill', 'config', 'docker', 'orange' );
+make_path($skill_orange_root);
+open my $skill_orange_fh, '>', File::Spec->catfile( $skill_orange_root, 'compose.yml' ) or die $!;
+print {$skill_orange_fh} "services:\n  orange:\n    image: alpine\n";
+close $skill_orange_fh;
+my $skill_green_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'beta-skill', 'config', 'docker', 'green' );
+make_path($skill_green_root);
+open my $skill_green_fh, '>', File::Spec->catfile( $skill_green_root, 'compose.yml' ) or die $!;
+print {$skill_green_fh} "services:\n  green:\n    environment:\n      GREEN_DEV: skill\n";
+close $skill_green_fh;
+open my $skill_green_disabled_fh, '>', File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'beta-skill', '.disabled' ) or die $!;
+close $skill_green_disabled_fh;
 my $local_docker_green_root = File::Spec->catdir( $repo, '.developer-dashboard', 'docker', 'green' );
 make_path($local_docker_green_root);
 open my $local_green_dev_fh, '>', File::Spec->catfile( $local_docker_green_root, 'development.compose.yml' ) or die $!;
@@ -337,17 +349,17 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( grep( { /compose\.worker\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes service overlay' );
     ok( grep( { /compose\.dev\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes mode overlay' );
     ok( grep( { /compose\.mailhog\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes config addon overlay' );
-    ok( !grep( { /green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver prefers isolated development compose files over compose.yml for selected services' );
     ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files automatically for selected services' );
+    ok( !grep( { /skills\/beta-skill\/config\/docker\/green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver excludes docker roots contributed by disabled skills' );
     is( $resolved->{env}{APP_MODE}, 'dev', 'docker compose resolver merges mode env' );
     is_same_path( $resolved->{env}{DDDC}, File::Spec->catdir( $repo, '.developer-dashboard', 'config', 'docker' ), 'docker compose resolver exports DDDC as the effective project-local docker config root' );
     is( $resolved->{env}{MAILHOG_ENABLED}, '1', 'docker compose resolver merges addon env' );
     is_deeply( [ @{ $resolved->{command} }[0,1] ], [ 'docker', 'compose' ], 'docker compose resolver produces docker compose command' );
     is_deeply( $resolved->{precedence}, [ qw(base project service addon mode) ], 'docker compose resolver exposes overlay precedence' );
     is_same_path(
-        ( grep { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } )[0],
+        ( grep { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } )[-1],
         File::Spec->catfile( $repo, '.developer-dashboard', 'docker', 'green', 'development.compose.yml' ),
-        'docker compose resolver prefers project-local isolated service folders over the home fallback root',
+        'docker compose resolver leaves the deepest project-local isolated service folder as the last overriding development compose layer',
     );
     ok( grep( { $_ eq 'green' } @{ $resolved->{services} } ), 'docker compose resolver infers service names from passthrough docker compose args' );
     is( $resolved->{command}[-1], 'green', 'docker compose resolver preserves passthrough docker compose service args' );
@@ -365,10 +377,12 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     );
     chdir $old or die $!;
     ok( grep( { $_ eq 'green' } @{ $resolved->{services} } ), 'docker compose resolver auto-loads isolated services by default when no service is specified' );
+    ok( grep( { $_ eq 'orange' } @{ $resolved->{services} } ), 'docker compose resolver auto-loads isolated services contributed by installed skills' );
     ok( grep( { $_ eq 'purple' } @{ $resolved->{services} } ), 'docker compose resolver auto-loads isolated services without requiring activation markers' );
     ok( !grep( { $_ eq 'blue' } @{ $resolved->{services} } ), 'docker compose resolver skips isolated services marked disabled' );
-    ok( !grep( { /green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver omits compose.yml when a matching isolated development compose file exists during plain docker compose passthrough' );
     ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files during plain docker compose passthrough' );
+    ok( !grep( { /skills\/beta-skill\/config\/docker\/green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose passthrough excludes compose roots contributed by disabled skills' );
+    ok( grep( { /skills\/alpha-skill\/config\/docker\/orange\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes skill docker compose roots during plain docker compose passthrough' );
     ok( grep( { /purple\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes non-disabled isolated compose folders during plain docker compose passthrough' );
     ok( !grep( { /blue\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver does not include disabled isolated compose folders' );
     is( $resolved->{command}[-1], 'config', 'docker compose resolver preserves passthrough config invocation with active auto-discovery' );

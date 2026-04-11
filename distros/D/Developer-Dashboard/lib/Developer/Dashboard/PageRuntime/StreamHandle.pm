@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime::StreamHandle;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 # TIEHANDLE(%args)
 # Creates a tied handle that forwards printed chunks to a callback.

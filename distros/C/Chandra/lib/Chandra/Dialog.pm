@@ -3,7 +3,7 @@ package Chandra::Dialog;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.

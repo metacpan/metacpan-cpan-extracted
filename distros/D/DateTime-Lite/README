@@ -1,0 +1,1520 @@
+NAME
+    DateTime::Lite - Lightweight, low-dependency drop-in replacement for
+    DateTime
+
+SYNOPSIS
+        use DateTime::Lite;
+
+        my $dt = DateTime::Lite->new(
+            year       => 2026,
+            month      => 4,
+            day        => 10,
+            hour       => 6,
+            minute     => 10,
+            second     => 30,
+            nanosecond => 0,
+            time_zone  => 'Asia/Tokyo',
+            locale     => 'ja-JP',
+        ) || die( DateTime::Lite->error );
+
+        my $now   = DateTime::Lite->now( time_zone => 'UTC' );
+        my $today = DateTime::Lite->today( time_zone => 'Asia/Tokyo' );
+
+        my $from_epoch = DateTime::Lite->from_epoch( epoch => time() );
+        my $from_doy   = DateTime::Lite->from_day_of_year(
+            year        => 2026,
+            day_of_year => 100,
+            time_zone   => 'UTC',
+        );
+        my $eom = DateTime::Lite->last_day_of_month( year => 2026, month => 2 );
+
+        # Cloning (using XS)
+        my $copy = $dt->clone;
+
+        # Accessors
+        $dt->year;          # 2026
+        $dt->month;         # 4 (can be 1-12)
+        # alias
+        $dt->mon;
+        $dt->day;           # 10 (can be 1-31)
+        # alias
+        $dt->day_of_month
+        $dt->hour;          # 6 (can be 0-23)
+        $dt->minute;        # 10 (can be 0-59)
+        $dt->second;        # 30 (can be 0-61 only on leap-second days)
+        $dt->nanosecond;    # 0 (can be 0-999_999_999)
+
+        $dt->day_of_week;   # 5 (1=Mon .. 7=Sun)
+        $dt->day_of_year;   # 99 (1-366)
+        $dt->day_abbr;      # "金" (but would be "Fri" if the locale were 'en-US')
+        $dt->day_name;      # "金曜日" (but would be "Friday" if the locale were 'en-US')
+        $dt->month_0;       # 3 (can be 0-11)
+        # alias
+        $dt->mon_0;
+        $dt->month_abbr;    # "4月" (but would be "Apr" if the locale were 'en-US')
+        $dt->month_name;    # "4月" (but would be "April" if the locale were 'en-US')
+        $dt->quarter;       # 2 (can be 1-4)
+        $dt->week;          # ( 2026, 15 ) ($week_year, $week_number)
+        $dt->week_number;   # 15 (can be 1-53)
+        $dt->week_year;     # 2026 (ISO week year)
+
+        $dt->epoch;         # 1775769030 (Unix timestamp; integer)
+        $dt->hires_epoch;   # 1775769030 (floating-point epoch; IEEE 754 double, ~microsecond precision)
+        # hires_epoch: limited to ~microsecond precision by IEEE 754 double
+        # For full nanosecond precision, combine epoch() and nanosecond() manually:
+        say sprintf "%d.%09d", $dt->epoch, $dt->nanosecond;  # 1775769030.000000005
+        # or
+        # use Math::BigFloat;
+        # say Math::BigFloat->new( $dt->epoch ) + Math::BigFloat->new( $dt->nanosecond ) / 1_000_000_000
+        # -> 1775769030.0000001
+        $dt->jd;            # 2461140.38229167 (Julian Day Number)
+        $dt->mjd;           # 61139.8822916667 (Modified Julian Day)
+
+        $dt->offset;                # 32400 (UTC offset in seconds)
+        $dt->time_zone;             # "Asia/Tokyo" (DateTime::Lite::TimeZone object)
+        $dt->time_zone_long_name;   # "Asia/Tokyo"
+        $dt->time_zone_short_name;  # "JST"
+        $dt->locale;                # ja-JP (DateTime::Locale::FromCLDR object)
+        $dt->is_dst;                # 1 or 0
+        $dt->is_leap_year;          # 1 or 0
+        $dt->is_finite;             # 1 for normal objects
+        $dt->is_infinite;           # 0 for normal objects
+
+        # Internal Rata Die representation
+        my( $days, $secs, $ns ) = $dt->utc_rd_values;         # 739715, 76230, 0
+        my $rd_secs             = $dt->utc_rd_as_seconds;     # 63911452230
+        my( $ld, $ls, $lns )    = $dt->local_rd_values;       # 739716, 22230, 0
+        my $local_secs          = $dt->local_rd_as_seconds;   # 63911484630
+        my $utc_y               = $dt->utc_year;              # 2027
+
+        # Formatting
+        $dt->iso8601;                        # "2026-04-10T06:10:30"
+        # alias
+        $dt->datetime;
+        $dt->ymd;                            # "2026-04-10"
+        $dt->ymd('/');                       # "2026/04/10"
+        $dt->hms;                            # "06:10:30"
+        $dt->dmy('.');                       # "10.04.2026"
+        $dt->mdy('-');                       # "10-04-2026"
+        $dt->rfc3339;                        # "2026-04-10T06:10:30+09:00"
+        $dt->strftime('%Y-%m-%d %H:%M:%S');  # "2026-04-10 06:10:30"
+        $dt->format_cldr('yyyy/MM/dd');      # "2026/04/10" (Unicode CLDR pattern)
+        "$dt";                               # stringify via iso8601 (or formatter)
+
+        # Arithmetic
+        $dt->add( years => 1, months  => 2, days    => 3,
+                  hours => 4, minutes => 5, seconds => 6 );
+        $dt->subtract( weeks => 2 );
+
+        my $dur = DateTime::Lite::Duration->new( months => 6 );
+        $dt->add_duration( $dur );
+        $dt->subtract_duration( $dur );
+
+        my $diff     = $dt->subtract_datetime( $other );           # Duration
+        my $abs_diff = $dt->subtract_datetime_absolute( $other );  # clock-only Duration
+        my $dd       = $dt->delta_days( $other );
+        my $dmd      = $dt->delta_md( $other );
+        my $dms      = $dt->delta_ms( $other );
+
+        # Mutators
+        $dt->set( year => 2027, month => 1, day => 1 );
+        $dt->set_year(2027);    $dt->set_month(1);    $dt->set_day(1);
+        $dt->set_hour(0);       $dt->set_minute(0);   $dt->set_second(0);
+        $dt->set_nanosecond(0);
+        $dt->set_time_zone('America/New_York');
+        $dt->set_locale('en-US');  # sets a new DateTime::Locale::FromCLDR object
+        $dt->set_formatter( $formatter );
+        $dt->truncate( to => 'day' );   # 'year','month','week','day','hour','minute','second'
+
+        # Comparison
+        my @sorted = sort { $a <=> $b } @datetimes;  # overloaded <=>
+        DateTime::Lite->compare( $dt1, $dt2 );       # -1, 0, 1
+        DateTime::Lite->compare_ignore_floating( $dt1, $dt2 );
+        $dt->is_between( $lower, $upper );
+
+        # Class-level settings
+        DateTime::Lite->DefaultLocale('fr-FR');
+        my $class = $dt->duration_class;  # 'DateTime::Lite::Duration'
+
+        # Constants
+        DateTime::Lite::INFINITY();        # +Inf
+        DateTime::Lite::NEG_INFINITY();    # -Inf
+        DateTime::Lite::NAN();             # NaN
+        DateTime::Lite::MAX_NANOSECONDS(); # 1_000_000_000
+        DateTime::Lite::SECONDS_PER_DAY(); # 86400
+
+        # Error handling
+        my $dt2 = DateTime::Lite->new( %bad_args ) ||
+            die( DateTime::Lite->error );
+        # Chaining: bad calls return a NullObject so the chain continues safely;
+        # check the return value of the last call in the chain.
+        my $result = $dt->some_method->another_method ||
+            die( $dt->error );
+
+VERSION
+        v0.1.0
+
+DESCRIPTION
+    "DateTime::Lite" is a lightweight, memory-efficient, drop-in replacement
+    for DateTime with the following design goals:
+
+    Low dependency footprint
+        Runtime dependencies are limited to: DateTime::Lite::TimeZone
+        (bundled SQLite timezone data, with automatic fallback to
+        DateTime::TimeZone if DBD::SQLite is unavailable),
+        DateTime::Locale::FromCLDR (locale data via Locale::Unicode::Data's
+        SQLite backend), Locale::Unicode, and core modules.
+
+        The heavy Specio, Params::ValidationCompiler, Try::Tiny, and
+        "namespace::autoclean" are eliminated entirely.
+
+    Low memory footprint
+        "DateTime" loads a cascade of modules which inflates %INC
+        significantly. "DateTime::Lite" avoids this via selective lazy
+        loading.
+
+    Accurate timezone data from TZif binaries
+        "DateTime::TimeZone" derives its zone data from the IANA Olson
+        *source* files ("africa", "northamerica", etc.) via a custom text
+        parser ("DateTime::TimeZone::OlsonDB"), then pre-generates one ".pm"
+        file per zone at distribution build time. This introduces an extra
+        parsing step that is not part of the official IANA toolchain.
+
+        "DateTime::Lite::TimeZone" instead compiles the IANA source files
+        with zic(1), which is the official IANA compiler, and reads the
+        resulting TZif binary files directly, following RFC 9636
+        <https://www.rfc-editor.org/rfc/rfc9636> (TZif versions 1 through
+        4). Timestamps are stored as signed 64-bit integers, giving a range
+        of roughly "+/-" 292 billion years.
+
+        Crucially, the POSIX footer TZ string embedded in every TZif v2+
+        file, such as "EST5EDT,M3.2.0,M11.1.0", is extracted and stored in
+        the SQLite database.
+
+        This string encodes the recurring DST rule for all dates beyond the
+        last explicit transition. At runtime, "DateTime::Lite::TimeZone"
+        evaluates the footer rule via an XS implementation of the IANA
+        "tzcode" reference algorithm (see "dtl_posix.h", derived from
+        "tzcode2026a/localtime.c", public domain), ensuring correct timezone
+        calculations for any date in the future without expanding the full
+        transition table.
+
+    XS-accelerated hot paths
+        The XS layer covers all CPU-intensive calendar arithmetic
+        ("_rd2ymd", "_ymd2rd", "_seconds_as_components", all leap-second
+        helpers), plus new functions not in the original: "_rd_to_epoch",
+        "_epoch_to_rd", "_normalize_nanoseconds", and "_compare_rd".
+
+    Compatible API
+        The public API mirrors DateTime as closely as possible, so existing
+        code using "DateTime" should work with "DateTime::Lite" as a drop-in
+        replacement.
+
+    Full BCP 47 / CLDR locale support
+        "DateTime" is limited to the set of pre-generated
+        "DateTime::Locale::*" modules, one per locale. "DateTime::Lite"
+        accepts any valid BCP 47 / Unicode CLDR locale tag, including
+        complex forms with Unicode extensions ("-u-"), transform extensions
+        ("-t-"), and script subtags.
+
+            my $dt = DateTime::Lite->now( locale => 'en' );    # simple form
+            my $dt = DateTime::Lite->now( locale => 'en-GB' ); # simple form
+            # And more complex forms too
+            my $dt = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+            my $dt = DateTime::Lite->now( locale => 'ja-Kana-t-it' );
+            my $dt = DateTime::Lite->now( locale => 'ar-SA-u-nu-latn' );
+
+        Locale data is resolved dynamically by DateTime::Locale::FromCLDR
+        via Locale::Unicode::Data, so tags like
+        "he-IL-u-ca-hebrew-tz-jeruslm" or "ja-Kana-t-it" work transparently
+        without any additional installed modules.
+
+    No die() in normal operation
+        Following the Module::Generic / Locale::Unicode error-handling
+        philosophy, "DateTime::Lite" never calls "die()" in normal error
+        paths.
+
+        Instead it sets a DateTime::Lite::Exception object and returns
+        "undef" in scalar context, or an empty list in list context.
+
+        However, if you really want this module to "die" upon error, you can
+        pass the "fatal" option with a true value upon object instantiation.
+
+KNOWN DIFFERENCES FROM DateTime
+    Validation
+        "DateTime" uses Specio / Params::ValidationCompiler for constructor
+        validation. "DateTime::Lite" performs equivalent checks manually.
+        Error messages are similar but not identical.
+
+    No warnings::register abuse
+        "DateTime::Lite" uses "warnings::enabled" consistently and does not
+        depend on the "warnings::register" mechanism for user-facing output.
+
+METHODS NOT IMPLEMENTED
+    None at this time. If you encounter a method missing from the DateTime
+    API, please file a report.
+
+CONSTRUCTORS
+  new
+    Accepted parameters are:
+
+    *   "year" (required)
+
+    *   "month"
+
+    *   "day"
+
+    *   "hour"
+
+    *   "minute"
+
+    *   "second"
+
+    *   "nanosecond"
+
+    *   "time_zone"
+
+    *   "locale"
+
+    *   "formatter"
+
+    *   "fatal"
+
+    Returns the new object upon success, or sets an error and returns
+    "undef" in scalar context, or an empty list in list context. In chaining
+    (object context), it returns a dummy object ("DateTime::Lite::Null") to
+    avoid the typical "Can't call method '%s' on an undefined value"
+
+  from_day_of_year
+        my $dt2 = DateTime::Lite->from_day_of_year(
+            year        => 2026,
+            day_of_year => 100,
+            time_zone   => 'UTC',
+            locale      => 'fr-FR',
+        );
+
+    Constructs from a year and day-of-year (1-366).
+
+    Returns the new object upon success, or sets an error and returns
+    "undef" in scalar context, or an empty list in list context. In chaining
+    (object context), it returns a dummy object ("DateTime::Lite::Null") to
+    avoid the typical "Can't call method '%s' on an undefined value"
+
+  from_epoch
+        my $dt = DateTime::Lite->from_epoch(
+            epoch     => 1775769030,
+            time_zone => 'Asia/Tokyo',
+            locale    => 'ja-JP',
+            formatter => $formatter,
+        );
+
+    Constructs from a Unix epoch value (integer or float). Non-integer
+    values are rounded to the nearest microsecond.
+
+    It accepts the "time_zone", "locale", and "formatter" parameters.
+
+    The returned object will be in the "UTC" time zone.
+
+    If you provide the "time_zone" argument, it will be applied *after* the
+    object is instantiated. Thus, the epoch value provided will always be
+    set in the UTC time zone.
+
+    For example:
+
+        my $dt = DateTime->from_epoch(
+            epoch     => 0,
+            time_zone => 'Asia/Tokyo'
+        );
+        say $dt; # Prints 1970-01-01T09:00:00 as Asia/Tokyo is +09:00 from UTC.
+        $dt->set_time_zone('UTC');
+        say $dt; # Prints 1970-01-01T00:00:00
+
+    Returns the new object upon success, or sets an error and returns
+    "undef" in scalar context, or an empty list in list context. In chaining
+    (object context), it returns a dummy object ("DateTime::Lite::Null") to
+    avoid the typical "Can't call method '%s' on an undefined value"
+
+  from_object
+        my $dt1 = DateTime->new;
+        my $dt = DateTime::Lite->from_object(
+            object    => $dt1,
+            time_zone => 'Asia/Tokyo',
+            locale    => 'ja-JP'
+        );
+
+    Converts any object implementing "utc_rd_values()" to a "DateTime::Lite"
+    instance.
+
+    Returns the new object upon success, or sets an error and returns
+    "undef" in scalar context, or an empty list in list context. In chaining
+    (object context), it returns a dummy object ("DateTime::Lite::Null") to
+    avoid the typical "Can't call method '%s' on an undefined value"
+
+  last_day_of_month
+        my $dt = DateTime::Lite->last_day_of_month(
+            year  => 2026,
+            month => 4,
+        );
+        say $dt;  # 2026-04-30T00:00:00
+
+        my $dt = DateTime::Lite->last_day_of_month(
+            year      => 2026,
+            month     => 4,
+            time_zone => 'Asia/Tokyo',
+            locale    => 'ja-JP',
+            hour      => 6,
+            minute    => 10,
+            second    => 30
+        );
+        say $dt;  # 2026-04-30T06:10:30
+
+    Constructs on the last day of the given month.
+
+    Returns the new object upon success, or sets an error and returns
+    "undef" in scalar context, or an empty list in list context. In chaining
+    (object context), it returns a dummy object ("DateTime::Lite::Null") to
+    avoid the typical "Can't call method '%s' on an undefined value"
+
+  now
+        my $now = DateTime::Lite->now(
+            time_zone => 'Asia/Tokyo',
+            locale    => 'ja-JP'
+        );
+
+    Returns the current datetime (calls "from_epoch( epoch =" time )>).
+
+    Returns the new object upon success, or sets an error and returns
+    "undef" in scalar context, or an empty list in list context. In chaining
+    (object context), it returns a dummy object ("DateTime::Lite::Null") to
+    avoid the typical "Can't call method '%s' on an undefined value"
+
+  today
+        my $dt = DateTime::Lite->today(
+            time_zone => 'Asia/Tokyo',
+            locale    => 'ja-JP'
+        );
+
+    Returns the current date truncated to midnight.
+
+    This is equivalent to:
+
+        DateTime::Lite->now( @_ )->truncate( to => 'day' );
+
+    Returns the new object upon success, or sets an error and returns
+    "undef" in scalar context, or an empty list in list context. In chaining
+    (object context), it returns a dummy object ("DateTime::Lite::Null") to
+    avoid the typical "Can't call method '%s' on an undefined value"
+
+  clone
+        my $copy = $dt->clone;
+        $copy->set_time_zone( 'Asia/Tokyo' );  # does not affect $dt
+
+    Returns a new "DateTime::Lite" object that is an independent deep copy
+    of the invocant. All scalar fields are duplicated, and nested objects
+    ("tz" and "locale") are also independently copied, so mutating the clone
+    does not affect the original.
+
+ACCESSORS
+  year
+        my $year = $dt->year;  # e.g. 2026
+
+    Returns the year component of the datetime.
+
+  month
+        my $m = $dt->month;  # 1..12
+
+    Returns the month as a number from 1 (January) to 12 (December).
+
+  mon
+    Alias for "month".
+
+  day
+        my $d = $dt->day;
+
+    Returns the day of the month (1-31).
+
+  day_of_month
+    Alias for "day".
+
+  hour
+        my $h = $dt->hour;
+
+    Returns the hour (0-23).
+
+  minute
+        my $min = $dt->minute;
+
+    Returns the minute (0-59).
+
+  second
+        my $s = $dt->second;
+
+    Returns the second (0-59, or 60 on a leap second).
+
+  second
+        my $s = $dt->second;
+
+    Returns the second component of the datetime. The range is normally
+    0-59, but may be 60 or 61 in exceptional cases:
+
+    60  A positive leap second. The IERS (International Earth Rotation and
+        Reference Systems Service) occasionally inserts an extra second at
+        the end of a UTC day to keep atomic time aligned with the Earth's
+        rotation. When that happens, the clock reads "23:59:60" before
+        rolling over to midnight. Since 1972, all leap seconds have been
+        positive (seconds have been added, never removed).
+
+    61  Reserved by the POSIX standard for a hypothetical double leap
+        second. This has never occurred in practice and is considered
+        extremely unlikely, but the upper bound of 61 is preserved for full
+        standards compliance.
+
+    In practice, the vast majority of datetime objects will always return a
+    value in 0..59. The constructor accepts values up to 61 and will return
+    an error for anything higher.
+
+  nanosecond
+        my $ns = $dt->nanosecond;
+
+    Returns the fractional-second component in nanoseconds (0-999_999_999).
+
+  day_of_week
+        my $dow = $dt->day_of_week;  # 1=Mon .. 7=Sun
+
+    Returns the day of week as a number from 1 (Monday) to 7 (Sunday),
+    following the ISO 8601 convention.
+
+  day_of_year
+        my $doy = $dt->day_of_year;
+
+    Returns the day of the year (1-366).
+
+  day_abbr
+        my $abbr = $dt->day_abbr;  # e.g. "Mon"
+
+    Returns the abbreviated weekday name for the current locale.
+
+  day_name
+        my $name = $dt->day_name;  # e.g. "Monday"
+
+    Returns the full weekday name for the current locale.
+
+  month_0
+        my $m0 = $dt->month_0;  # 0=Jan .. 11=Dec
+
+    Returns the month as a zero-based number (0-11).
+
+  mon_0
+    Alias for "month_0".
+
+  month_abbr
+        my $abbr = $dt->month_abbr;  # e.g. "Jan"
+
+    Returns the abbreviated month name for the current locale.
+
+  month_name
+        my $name = $dt->month_name;  # e.g. "January"
+
+    Returns the full month name for the current locale.
+
+  week
+        my( $wy, $wn ) = $dt->week;
+
+    Returns a two-element list "( $week_year, $week_number )" according to
+    ISO 8601 week numbering.
+
+  week_number
+        my $wn = $dt->week_number;
+
+    Returns the ISO 8601 week number (1-53).
+
+  week_year
+        my $wy = $dt->week_year;
+
+    Returns the year that the ISO 8601 week belongs to. This may differ from
+    "year" for days near the start or end of the calendar year.
+
+  quarter
+        my $q = $dt->quarter;
+
+    Returns the quarter of the year (1-4).
+
+  epoch
+        my $ts = $dt->epoch;
+
+    Returns the Unix timestamp (seconds since 1970-01-01T00:00:00 UTC) as an
+    integer.
+
+  hires_epoch
+        my $ts = $dt->hires_epoch;
+
+    Returns the Unix timestamp as a floating-point number (IEEE 754 double)
+    that includes sub-second precision.
+
+    Precision caveat: a 64-bit double has ~15-16 significant decimal digits.
+    A Unix timestamp around 2026 already consumes 10 digits for the integer
+    part, leaving only ~6 digits for the fractional part. This means
+    precision is effectively limited to the microsecond range (~1 µs);
+    nanosecond values smaller than a few hundred nanoseconds will be lost in
+    floating-point rounding.
+
+    For full nanosecond precision, combine "epoch" and "nanosecond"
+    directly:
+
+        printf "%d.%09d\n", $dt->epoch, $dt->nanosecond;
+
+  jd
+        my $jd = $dt->jd;
+
+    Returns the Julian Day Number as a floating-point number.
+
+  mjd
+        my $mjd = $dt->mjd;
+
+    Returns the Modified Julian Day (Julian Day minus 2,400,000.5).
+
+  offset
+        my $off = $dt->offset;
+
+    Returns the UTC offset in seconds for the current datetime, such as
+    32400 for "+09:00".
+
+  time_zone
+        my $tz = $dt->time_zone;
+
+    Returns the DateTime::Lite::TimeZone object associated with this
+    datetime.
+
+  time_zone_long_name
+        my $name = $dt->time_zone_long_name;
+
+    Returns the long name of the time zone, such as "America/New_York".
+
+  time_zone_short_name
+        my $abbr = $dt->time_zone_short_name;
+
+    Returns the short abbreviation of the time zone in effect at this
+    datetime (e.g. "EST" or "EDT").
+
+  locale
+        my $loc = $dt->locale;
+
+    Returns the DateTime::Locale::FromCLDR object associated with this
+    datetime.
+
+  is_leap_year
+        if( $dt->is_leap_year ) { ... }
+
+    Returns true if the year of this datetime is a leap year.
+
+  is_dst
+        if( $dt->is_dst ) { ... }
+
+    Returns true if daylight saving time is in effect at this datetime.
+
+  is_finite
+    Returns true (always, for non-infinite objects). See
+    DateTime::Lite::Infinite for the infinite case.
+
+  is_infinite
+    Returns false (always, for non-infinite objects).
+
+  stringify
+        my $str = $dt->stringify;
+        print "$dt";   # same thing
+
+    Returns the string representation of this datetime. If a formatter has
+    been set via "set_formatter", it delegates to
+    "$formatter->format_datetime( $self )"; otherwise it returns the
+    "iso8601" string.
+
+    This method is also called by the "" overloading operator.
+
+  utc_rd_values
+        my( $days, $secs, $ns ) = $dt->utc_rd_values;
+
+    Returns a three-element list "( $utc_rd_days, $utc_rd_secs, $rd_nanosecs
+    )", the internal UTC Rata Die representation.
+
+  utc_rd_as_seconds
+        my $rd_secs = $dt->utc_rd_as_seconds;
+
+    Returns the internal UTC representation as a single integer:
+    "utc_rd_days * 86400 + utc_rd_secs".
+
+  utc_year
+        my $uy = $dt->utc_year;
+
+    Returns an internal approximation initialised to "year + 1" to break the
+    circular dependency that arises when computing the UTC offset (you need
+    an approximate year to look up the timezone offset, but you need the
+    offset to know the exact UTC year). The stored value is deliberately
+    equal to or greater than the real UTC year, so it is not suitable for
+    direct use in application code. To obtain the actual UTC year, use:
+
+        $dt->clone->set_time_zone('UTC')->year;
+
+  local_rd_values
+        my( $days, $secs, $ns ) = $dt->local_rd_values;
+
+    Returns a three-element list "( $local_rd_days, $local_rd_secs,
+    $rd_nanosecs )", the internal local-time Rata Die representation.
+
+  local_rd_as_seconds
+        my $rd_secs = $dt->local_rd_as_seconds;
+
+    Returns the internal local-time representation as a single integer:
+    "local_rd_days * 86400 + local_rd_secs".
+
+  duration_class
+        my $class = $dt->duration_class;
+
+    Returns the string "DateTime::Lite::Duration", the class used to
+    construct duration objects.
+
+  DefaultLocale
+        # Read the current default
+        my $loc = DateTime::Lite->DefaultLocale;
+
+        # Change the default to French
+        DateTime::Lite->DefaultLocale( 'fr-FR' );
+
+    Class method. Gets or sets the default locale used when constructing new
+    "DateTime::Lite" objects that do not specify an explicit locale.
+
+    The argument must be a valid CLDR locale tag, such as "en-US", "ja-JP",
+    "fr-FR", or even "ja-Kana-t-it", or "he-IL-u-ca-hebrew-tz-jeruslm". The
+    initial default is "en-US".
+
+CONSTANTS
+    The following constants are exported as zero-argument subs. They are
+    used internally and exposed for completeness.
+
+  INFINITY
+        use DateTime::Lite qw();
+        my $inf = DateTime::Lite::INFINITY();
+
+    Returns positive infinity ("100**100**100**100").
+
+  NEG_INFINITY
+        my $neg = DateTime::Lite::NEG_INFINITY();
+
+    Returns negative infinity ("-INFINITY").
+
+  NAN
+        my $nan = DateTime::Lite::NAN();
+
+    Returns Not-a-Number ("INFINITY - INFINITY").
+
+  MAX_NANOSECONDS
+        my $max_ns = DateTime::Lite::MAX_NANOSECONDS();
+
+    Returns "1_000_000_000" (10^9), the number of nanoseconds in one second.
+
+  SECONDS_PER_DAY
+        my $spd = DateTime::Lite::SECONDS_PER_DAY();
+
+    Returns 86400, the number of seconds in one day (excluding leap
+    seconds).
+
+FORMATTING
+  strftime( @patterns )
+    POSIX-style formatting. Supports all standard %x specifiers plus
+    "%{method_name}" and %NNN for nanoseconds.
+
+  format_cldr( @patterns )
+    CLDR / Unicode date format patterns (as used in DateTime). Supports all
+    standard CLDR symbols.
+
+  iso8601
+        my $str = $dt->iso8601;
+
+    Returns the datetime as an ISO 8601 string, such as
+    "2026-04-09T12:34:56".
+
+  datetime
+    Alias for "iso8601".
+
+  ymd( [$sep] )
+        my $date = $dt->ymd;          # "2026-04-09"
+        my $date = $dt->ymd( '/' );   # "2026/04/09"
+
+    Returns the date portion as "YYYY-MM-DD" (default separator "-").
+
+  hms( [$sep] )
+        my $time = $dt->hms;          # "12:34:56"
+        my $time = $dt->hms( '.' );   # "12.34.56"
+
+    Returns the time portion as "HH:MM:SS" (default separator ":">).
+
+  dmy( [$sep] )
+        my $dmy = $dt->dmy;           # "09-04-2026"
+
+    Returns the date as "DD-MM-YYYY".
+
+  mdy( [$sep] )
+        my $mdy = $dt->mdy;           # "04-09-2026"
+
+    Returns the date as "MM-DD-YYYY".
+
+  rfc3339
+        my $str = $dt->rfc3339;       # "2026-04-09T12:34:56+09:00"
+
+    Returns an RFC 3339 string. For a UTC datetime this is the same as
+    "iso8601" with a "Z" suffix; for other timezones it appends the numeric
+    offset.
+
+ARITHMETIC
+  add( %args )
+        $dt->add( years => 1, months => 3 );
+        $dt->add( hours => 2, minutes => 30 );
+
+    Adds a duration to the datetime in-place (mutates $self). Accepts the
+    same keys as "new" in DateTime::Lite::Duration: "years", "months",
+    "weeks", "days", "hours", "minutes", "seconds", "nanoseconds".
+
+    Returns $self to allow chaining.
+
+  subtract( %args )
+        $dt->subtract( days => 7 );
+
+    Subtracts a duration from the datetime in-place (mutates $self).
+    Equivalent to "$dt->add" with all values negated.
+
+  add_duration( $dur )
+        my $dur = DateTime::Lite::Duration->new( months => 2 );
+        $dt->add_duration( $dur );
+
+    Adds a DateTime::Lite::Duration object to the datetime in-place (mutates
+    $self).
+
+    Returns $self to allow chaining.
+
+  subtract_duration( $dur )
+        $dt->subtract_duration( $dur );
+
+    Subtracts a DateTime::Lite::Duration object from the datetime in-place
+    (mutates $self). Equivalent to "$dt->add_duration( $dur->inverse )".
+
+  subtract_datetime( $dt )
+    Returns a DateTime::Lite::Duration representing the difference between
+    two "DateTime::Lite" objects (calendar-aware).
+
+  subtract_datetime_absolute( $dt )
+    Returns a DateTime::Lite::Duration representing the absolute UTC
+    difference in seconds/nanoseconds.
+
+  delta_days( $dt )
+        my $dur = $dt1->delta_days( $dt2 );
+        printf "%d days apart\n", $dur->days;
+
+    Returns a DateTime::Lite::Duration containing only a "days" component
+    representing the number of whole days between $self and $dt.
+
+  delta_md( $dt )
+        my $dur = $dt1->delta_md( $dt2 );
+
+    Returns a DateTime::Lite::Duration with "months" and "days" components
+    (calendar-aware difference).
+
+  delta_ms( $dt )
+        my $dur = $dt1->delta_ms( $dt2 );
+
+    Returns a DateTime::Lite::Duration with "minutes" and "seconds"
+    components (absolute clock difference).
+
+SETTERS
+  set
+        $dt->set( hour => 0, minute => 0, second => 0 );
+
+    Sets one or more datetime components in-place. Accepted keys are any of
+    "year", "month", "day", "hour", "minute", "second", "nanosecond".
+    Returns $self.
+
+  set_year
+        $dt->set_year(2030);
+
+    Sets the year component. Returns $self.
+
+  set_month
+        $dt->set_month(12);
+
+    Sets the month (1-12). Returns $self.
+
+  set_day
+        $dt->set_month(31);
+
+    Sets the day of the month. Returns $self.
+
+  set_hour
+        $dt->set_hour(14);
+
+    Sets the hour (0-23). Returns $self.
+
+  set_minute
+        $dt->set_minute(40);
+
+    Sets the minute (0-59). Returns $self.
+
+  set_second
+        $dt->set_second(30);
+
+    Sets the second (0-59). Returns $self.
+
+  set_nanosecond
+        $dt->set_nanosecond(1000);
+
+    Sets the nanosecond component (0-999_999_999). Returns $self.
+
+  set_locale
+        $dt->set_locale( 'zh-TW' );
+
+    Sets the locale. Accepts a CLDR locale string, such as "fr-FR", or a
+    DateTime::Locale::FromCLDR object. Returns $self.
+
+  set_formatter
+        $dt->set_formatter( $my_formatter );
+
+    Sets the formatter object used by "stringify". Must respond to
+    "format_datetime". Pass "undef" to revert to the default ISO 8601
+    representation.
+
+  set_time_zone
+        $dt->set_time_zone( 'Asia/Tokyo' );
+
+    Changes the time zone of the datetime in-place. Accepts a time zone name
+    string, such as "America/New_York", or a DateTime::Lite::TimeZone
+    object. Returns $self.
+
+  truncate
+        $dt->truncate( to => 'day' );   # sets h/m/s/ns to zero
+
+    Truncates the datetime to the given precision level. Accepted values for
+    "to": "year", "month", "week", "local_week", "day", "hour", "minute",
+    "second".
+
+COMPARISON
+  compare( $dt1, $dt2 )
+    Class or instance method. Compares two "DateTime::Lite" objects. Returns
+    -1 if $dt1 is earlier, 0 if equal, 1 if later.
+
+    Uses the XS "_compare_rd()" fast-path when the XS layer is loaded.
+
+        my $cmp = DateTime::Lite->compare( $dt1, $dt2 );
+
+    Can also be used via the overloaded "<=>" and "cmp" operators:
+
+        my @sorted = sort { $a <=> $b } @datetimes;
+
+  compare_ignore_floating( $dt1, $dt2 )
+    Like "compare", but treats floating-timezone datetimes as if they share
+    the same UTC offset as the other operand. Useful when comparing local
+    wall-clock times regardless of timezone.
+
+  is_between( $lower, $upper )
+    Returns true if $self is strictly between the two boundaries.
+
+  error
+        my $dt = DateTime::Lite->new( %bad_args );
+        if( !defined( $dt ) )
+        {
+            my $err = DateTime::Lite->error;
+            warn "Error: $err";
+        }
+
+    Instance and class method. When called with a message, constructs a
+    DateTime::Lite::Exception object, stores it internally, and either warns
+    (if "fatal" mode is off) or "die"s (if "fatal" mode is on). Returns
+    "undef" in scalar context, an empty list in list context.
+
+    When called without arguments, returns the most recent error object (or
+    "undef" if no error has occurred).
+
+  pass_error
+        sub my_method
+        {
+            my $self = shift( @_ );
+            my $tz = DateTime::Lite::TimeZone->new( name => 'Invalid' ) ||
+                return( $self->pass_error );
+            ...
+        }
+
+    Propagates the error stored in another object (or the class-level error)
+    into the current object's error slot, without constructing a new
+    exception. Used internally when a lower-level call fails and the caller
+    wants to surface the same error to its own caller.
+
+SERIALISATION
+    "STORABLE_freeze" and "STORABLE_thaw" are implemented, compatible with
+    Storable.
+
+    "FREEZE" and "THAW" are also implemented compatible with Sereal or CBOR
+
+ERROR HANDLING
+    On error, this class methods set an exception object, and return "undef"
+    in scalar context, or an empty list in list context. The exception
+    object is accessible via:
+
+        my $err = DateTime::Lite->error;   # class method
+        my $err = $dt->error;              # instance method
+
+    The exception object stringifies to a human-readable message including
+    file and line number.
+
+    "error" detects the context is chaining, or object, and thus instead of
+    returning "undef", it will return a dummy instance of
+    "DateTime::Lite::Null" to avoid the typical perl error "Can't call
+    method '%s' on an undefined value".
+
+    So for example:
+
+        $dt->now( %bad_arguments )->subtract( %params );
+
+    If there was an error in "now", the chain will execute, but the last
+    one, "subtract" in this example, will return "undef", so you can and
+    even should check the return value:
+
+        $dt->now( %bad_arguments )->subtract( %params ) ||
+            die( $dt->error );
+
+PERFORMANCE
+    This section compares "DateTime::Lite" with the reference implementation
+    DateTime 1.66 on four axes: module footprint, load time, memory, and CPU
+    throughput. The figures below were recorded on an "aarch64" machine
+    running Perl 5.36.1. Run "scripts/benchmark.pl" (bundled in this
+    distribution) to reproduce them on your own hardware.
+
+    The goal of this comparison is not to disparage DateTime, which is a
+    mature, feature-complete, and battle-tested library, but to make the
+    trade-offs explicit so you can choose the right tool for your context.
+
+  Module footprint
+    The number of files loaded into %INC, directly and indirectly through
+    dependencies, when "use DateTime" or "use DateTime::Lite" is evaluated:
+
+                              DateTime 1.66   DateTime::Lite
+        -------               -------------   --------------
+        use Module                      137               67
+        TimeZone class alone            105               47
+        Runtime prereqs (META)           23               11
+
+    "DateTime" depends on Specio, Params::ValidationCompiler,
+    namespace::autoclean, and several supporting modules that collectively
+    account for the extra overhead. "DateTime::Lite" replaces this
+    validation layer with lightweight hand-written checks and uses
+    DateTime::Locale::FromCLDR instead of the heavier DateTime::Locale
+    stack.
+
+    "DateTime::TimeZone" loads 105 modules because it ships one ".pm" file
+    per IANA zone, such as "DateTime::TimeZone::America::New_York", all
+    loaded on the first "new()" call. "DateTime::Lite::TimeZone" loads,
+    directly and indirectly, 47 modules and stores all zone data in a single
+    SQLite file instead.
+
+  Load time
+    Measured as "time()" around a cold "require" (modules not yet in %INC):
+
+                                   DateTime 1.66   DateTime::Lite
+        -------                    -------------   --------------
+        require Module                     48 ms            32 ms
+        require TimeZone standalone       180 ms           100 ms
+
+    Startup time matters in short-lived scripts (cron jobs, CLI tools, CGI)
+    where the process initialisation is a significant fraction of total
+    runtime. For a long-running Plack/Mojolicious service, this cost is paid
+    once and amortised over millions of requests.
+
+  Memory (RSS after loading)
+    Measured in a clean Perl process immediately after "use Module":
+
+                              DateTime 1.66   DateTime::Lite
+        -------               -------------   --------------
+        use Module (~28 MB)        ~28 MB           ~37 MB
+        TimeZone class only        ~19 MB           ~16 MB
+
+    The "use Module" row is somewhat misleading on its own: "DateTime::Lite"
+    loads "DBD::SQLite", which embeds a complete compiled SQLite engine (~14
+    MB of native code) regardless of how many timezone objects you create.
+    When measuring the "TimeZone" class in isolation, the component that
+    actually handles date arithmetic, "DateTime::Lite::TimeZone" is lighter
+    (~16 MB vs ~19 MB) because it does not pre-load all Olson zone data into
+    RAM.
+
+    "DateTime::TimeZone" pre-loads all IANA Olson definitions into memory on
+    the first "new()" call (roughly 3-4 MB of compiled Perl structures on
+    top of the module overhead). "DateTime::Lite::TimeZone" queries a
+    compact SQLite database on demand and keeps those structures on disk.
+
+  CPU throughput (10,000 iterations, µs per call)
+                                            DateTime 1.66   DateTime::Lite
+        -------                             -------------   --------------
+        new( UTC )                                 ~13 µs          ~10 µs
+        new( named zone, string )                  ~25 µs          ~64 µs  (*)
+        new( named zone, all caches enabled )      ~25 µs          ~14 µs
+        now( UTC )                                 ~11 µs          ~10 µs
+        year + month + day + epoch                ~0.5 µs         ~0.4 µs
+        clone + add( days + hours )                ~35 µs          ~25 µs
+        strftime                                  ~3.5 µs         ~3.6 µs
+        TimeZone->new (warm, no mem cache)          ~2 µs          ~19 µs  (*)
+        TimeZone->new (mem cache enabled)           ~2 µs         ~0.4 µs
+
+    Rows marked "(*)" reflect the default behaviour without the memory
+    cache. With "DateTime::Lite::TimeZone->enable_mem_cache" active,
+    "TimeZone-"new> drops to ~0.4 µs and "new(named zone)" drops to ~14 µs,
+    which is faster than "DateTime" (~25 µs). See "TimeZone caching model"
+    for the full explanation.
+
+    For UTC construction, "now()", accessors, arithmetic, and formatting,
+    "DateTime::Lite" is equivalent or faster. The XS-accelerated clone and
+    the lighter validation layer account for the gain in arithmetic.
+
+  TimeZone caching model
+    This is the single most important trade-off to understand.
+
+    DateTime::TimeZone loads the complete set of IANA time zone rules into
+    RAM the first time any named zone is constructed (~180 ms startup, ~4 MB
+    of in-memory hash structures). Every subsequent
+    "DateTime::TimeZone->new( name => $name )" call is served from that hash
+    in about 4 µs. If you construct thousands of "DateTime" objects per
+    second in a long-lived process, this model is very fast after the
+    initial warm-up.
+
+    DateTime::Lite::TimeZone stores the same IANA data in a compact SQLite
+    database ("tz.sqlite3", included in the distribution). The first call
+    for a given zone name runs a query (~22 ms) and populates a per-instance
+    cache; subsequent calls for the same zone use a cached "DBD::SQLite"
+    prepared statement and return in ~130 µs. There is no process-wide
+    singleton by default, so two calls with the same name each incur the 130
+    µs cost.
+
+    Optional memory cache: "DateTime::Lite::TimeZone" also provides an
+    opt-in process-level memory cache that matches or beats
+    "DateTime::TimeZone" on per-call speed:
+
+        # Enable once at application start-up:
+        DateTime::Lite::TimeZone->enable_mem_cache;
+
+        # Or per call:
+        my $tz = DateTime::Lite::TimeZone->new(
+            name          => 'America/New_York',
+            use_cache_mem => 1,
+        );
+
+    With the memory cache active, repeated "new()" calls for the same zone
+    return the cached object from a plain hash lookup in about 0.8 µs:
+
+                                  DateTime::TimeZone   DateTime::Lite::TimeZone
+        ------                    -----------------   ------------------------
+        Cold first call                    ~225 ms                      ~22 ms
+        Warm (no mem cache)                  ~2 µs                      ~19 µs
+        Warm (mem cache only)                ~2 µs                      ~0.4 µs
+        Warm (mem+span+footer cache)         ~2 µs                      ~0.4 µs
+        new(named zone, all caches)         ~25 µs                      ~14 µs
+
+    Practical guidance:
+
+    *   For long-lived services constructing datetime objects with named
+        zones, call "DateTime::Lite::TimeZone->enable_mem_cache" once at
+        startup. This activates three layers of caching:
+
+        1. the object cache (avoids SQLite construction);
+        2. the span cache (avoids the UTC offset query); and
+        3. the footer cache (avoids the POSIX DST rule calculation).
+
+        With all layers warm, "new(named zone)" costs ~14 µs, which is
+        faster than "DateTime" (~25 µs).
+
+    *   If you prefer explicit control, pass "use_cache_mem => 1" on each
+        individual "new()" call, or construct one "TimeZone" object and
+        reuse it:
+
+            my $tz = DateTime::Lite::TimeZone->new( name => 'America/New_York' );
+            my $dt = DateTime::Lite->new( ..., time_zone => $tz );
+
+    *   For batch processing (log parsing, ETL, report generation) where
+        timezone construction is a small fraction of total I/O time, the
+        difference is imperceptible regardless of which option you choose.
+
+    *   For short-lived scripts and command-line tools, "DateTime::Lite"
+        wins on both startup time (~120 ms vs ~320 ms) and memory (~19 MB vs
+        ~28 MB).
+
+  Running the benchmark
+    A self-contained benchmark script is included in the distribution:
+
+        cd DateTime-Lite-vX.X.X
+        perl Makefile.PL && make  # make sure the XS code is compiled
+        perl -Iblib/lib -Iblib/arch scripts/benchmark.pl
+
+        # More iterations for stable numbers:
+        perl -Iblib/lib -Iblib/arch scripts/benchmark.pl --iterations 50000
+
+        # Machine-readable CSV output:
+        perl -Iblib/lib -Iblib/arch scripts/benchmark.pl --csv > results.csv
+
+USAGE
+  0-based Versus 1-based Numbers
+    "DateTime::Lite" follows a simple rule for 0-based vs. 1-based numbers.
+
+    Month, day of month, day of week, and day of year are 1-based. Every
+    1-based method also has a "_0" variant. For example, "day_of_week"
+    returns 1 (Monday) through 7 (Sunday), while "day_of_week_0" returns 0
+    through 6.
+
+    All *time*-related values (hour, minute, second) are 0-based.
+
+    Years are neither, as they can be positive or negative. There is a year
+    0.
+
+    There is no "quarter_0" method.
+
+  Floating DateTimes
+    The default time zone for new "DateTime::Lite" objects (except where
+    stated otherwise) is the "floating" time zone. This concept comes from
+    the iCal standard. A floating datetime is not anchored to any particular
+    time zone and does not include leap seconds, since those require a real
+    time zone to apply.
+
+    Date math and comparison between a floating datetime and one with a real
+    time zone produce results of limited validity, because one includes leap
+    seconds and the other does not.
+
+    If you plan to use objects with a real time zone, it is strongly
+    recommended that you do not mix them with floating datetimes.
+
+  Determining the Local Time Zone Can Be Slow
+    If $ENV{TZ} is not set, looking up the local time zone may involve
+    reading several files in /etc. If you know the local time zone will not
+    change during your program's lifetime and you need many objects for that
+    zone, cache it once:
+
+        my $local_tz = DateTime::Lite::TimeZone->new( name => 'local' );
+
+        my $dt = DateTime::Lite->new( ..., time_zone => $local_tz );
+
+    "DateTime::Lite::TimeZone" also provides a process-level cache that
+    eliminates this cost entirely:
+
+        DateTime::Lite::TimeZone->enable_mem_cache;
+        my $dt = DateTime::Lite->new( ..., time_zone => 'local' );
+
+  Far Future DST
+    For dates very far in the future (thousands of years from now),
+    "DateTime" with named time zones can consume large amounts of memory
+    because "DateTime::TimeZone" pre-computes all DST transitions from the
+    present to that date.
+
+    "DateTime::Lite" is not affected by this problem.
+    "DateTime::Lite::TimeZone" uses a compact SQLite database and a POSIX
+    footer TZ string to derive the correct offset for any future date
+    without expanding the full transition table.
+
+  Globally Setting a Default Time Zone
+    Warning: this is very dangerous. Use at your own risk.
+
+    You can force "DateTime::Lite" to use a specific default time zone by
+    setting:
+
+        $ENV{PERL_DATETIME_DEFAULT_TZ} = 'America/New_York';
+
+    This affects all code that creates a "DateTime::Lite" object, including
+    any CPAN modules you use. Audit your dependencies before using this in
+    production.
+
+  Upper and Lower Bounds
+    Internally, dates are stored as the number of days before or after
+    "0001-01-01", held in a Perl integer. The usable range depends on your
+    platform's integer size ($Config{ivsize}):
+
+    *   32-bit Perl: approximately year "+/-1,469,903"
+
+    *   64-bit Perl: approximately year "+/-12,626,367,463,883,278"
+
+  Overloading
+    "DateTime::Lite" overloads the following operators:
+
+    *   "+" - adds a DateTime::Lite::Duration to a datetime, returning a new
+        datetime.
+
+    *   "-" - either subtracts a duration from a datetime (returning a new
+        datetime), or subtracts two datetimes (returning a
+        DateTime::Lite::Duration).
+
+    *   "<=>" and "cmp" - numeric and string comparison, for use with "sort"
+        and comparison operators.
+
+    *   "" (stringification) - calls stringify, which delegates to the
+        formatter if set, otherwise returns the iso8601 string.
+
+    *   "bool" - always true for finite objects.
+
+    The "fallback" parameter is set, so derived operators ("+=", "-=", etc.)
+    work as expected. Do not expect "++" or "--" to be useful.
+
+        my $dt2 = $dt + $duration;  # new datetime
+        my $dt3 = $dt - $duration;  # new datetime
+        my $dur = $dt - $other_dt;  # Duration
+
+        for my $dt ( sort @datetimes ) { ... }  # uses <=>
+
+  Formatters And Stringification
+    You can supply a "formatter" object to control how a datetime is
+    stringified. Any constructor accepts a "formatter" argument:
+
+        my $fmt = DateTime::Format::Unicode->new( locale => 'fr-FR' );
+        my $dt  = DateTime::Lite->new( year => 2026, formatter => $fmt );
+
+    Or set it afterwards:
+
+        $dt->set_formatter( $fmt );
+        my $current_fmt = $dt->formatter;
+
+    Once set, $dt will call "$fmt->format_datetime($dt)" instead of iso8601.
+    Pass "undef" to revert to the default.
+
+    A formatter must implement a "format_datetime($dt)" method. The
+    DateTime::Format::Unicode module (available separately on CPAN) provides
+    a full-featured CLDR formatter with support for date/time intervals and
+    additional pattern tokens not covered by format_cldr.
+
+CLDR PATTERNS
+    The CLDR (Unicode Common Locale Data Repository) pattern language is
+    more powerful and more complex than strftime. Unlike strftime, patterns
+    are plain letters with no prefix, so any literal text must be quoted.
+
+  Quoting and escaping
+    Surround literal ASCII letters with single quotes ("'"). To include a
+    literal single quote, write two consecutive single quotes (''). Spaces
+    and non-letter characters are always passed through unchanged.
+
+        my $p1 = q{'Today is ' EEEE};           # "Today is Thursday"
+        my $p2 = q{'It is now' h 'o''clock' a}; # "It is now 9 o'clock AM"
+
+  Pattern length and padding
+    Most patterns pad with leading zeroes when the specifier is longer than
+    one character. For example, "h" gives 9 but "hh" gives 09. The exception
+    is that five of a letter usually means the narrow form, such as "EEEEE"
+    gives "T" for Thursday, not a five-character wide value.
+
+  Format vs. stand-alone forms
+    Many tokens have a *format* form (used inside a larger string) and a
+    *stand-alone* form (used alone, such as in a calendar header). They are
+    distinguished by case: "M" is format, "L" is stand-alone for months;
+    "E"/"e" is format, "c" is stand-alone for weekdays.
+
+  Token reference
+        Era
+          G{1,3}   abbreviated era (BC, AD)
+          GGGG     wide era (Before Christ, Anno Domini)
+          GGGGG    narrow era
+
+        Year
+          y        year, zero-padded as needed
+          yy       two-digit year (special case)
+          Y{1,}    week-of-year calendar year (from week_year)
+          u{1,}    same as y, but yy is not special
+
+        Quarter
+          Q{1,2}   quarter as number (1-4)
+          QQQ      abbreviated format quarter
+          QQQQ     wide format quarter
+          q{1,2}   quarter as number (stand-alone)
+          qqq      abbreviated stand-alone quarter
+          qqqq     wide stand-alone quarter
+
+        Month
+          M{1,2}   numerical month (format)
+          MMM      abbreviated format month name
+          MMMM     wide format month name
+          MMMMM    narrow format month name
+          L{1,2}   numerical month (stand-alone)
+          LLL      abbreviated stand-alone month name
+          LLLL     wide stand-alone month name
+          LLLLL    narrow stand-alone month name
+
+        Week
+          w{1,2}   week of year (from week_number)
+          W        week of month (from week_of_month)
+
+        Day
+          d{1,2}   day of month
+          D{1,3}   day of year
+          F        day of week in month (from weekday_of_month)
+          g{1,}    modified Julian day (from mjd)
+
+        Weekday
+          E{1,3}   abbreviated format weekday
+          EEEE     wide format weekday
+          EEEEE    narrow format weekday
+          e{1,2}   locale-based numeric weekday (1 = first day of week for locale)
+          eee      abbreviated format weekday (same as E{1,3})
+          eeee     wide format weekday
+          eeeee    narrow format weekday
+          c        numeric weekday, Monday = 1 (stand-alone)
+          ccc      abbreviated stand-alone weekday
+          cccc     wide stand-alone weekday
+          ccccc    narrow stand-alone weekday
+
+        Period
+          a        AM or PM (localized)
+
+        Hour
+          h{1,2}   hour 1-12
+          H{1,2}   hour 0-23
+          K{1,2}   hour 0-11
+          k{1,2}   hour 1-24
+          j{1,2}   locale-preferred hour (12h or 24h)
+
+        Minute / Second
+          m{1,2}   minute
+          s{1,2}   second
+          S{1,}    fractional seconds (without decimal point)
+          A{1,}    millisecond of day
+
+        Time zone
+          z{1,3}   short time zone name
+          zzzz     long time zone name
+          Z{1,3}   time zone offset (e.g. -0500)
+          ZZZZ     short name + offset (e.g. CDT-0500)
+          ZZZZZ    sexagesimal offset (e.g. -05:00)
+          v{1,3}   short time zone name
+          vvvv     long time zone name
+          V{1,3}   short time zone name
+          VVVV     long time zone name
+
+    The following tokens are not supported by "format_cldr()" but are
+    supported by DateTime::Format::Unicode:
+
+    *   "b" / "B" - period and flexible period of day ("noon", "at
+        night"...)
+
+    *   "O" / "OOOO" - localized GMT format ("GMT-8", "GMT-08:00")
+
+    *   "r" - related Gregorian year
+
+    *   "x"/"X" - ISO 8601 timezone offsets with optional "Z"
+
+  CLDR Available Formats
+    The CLDR data includes locale-specific pre-defined format skeletons. A
+    skeleton is a pattern key that maps to a locale-appropriate rendering
+    pattern. For example, the skeleton "MMMd" maps to "MMM d" in "en-US"
+    (giving "Apr 9") and to "d MMM" in "fr-FR" (giving "9 avr.").
+
+    Retrieve the locale-specific pattern via the locale object and pass it
+    to "format_cldr":
+
+        say $dt->format_cldr( $dt->locale->available_format('MMMd') );
+        say $dt->format_cldr( $dt->locale->available_format('yQQQ') );
+        say $dt->format_cldr( $dt->locale->available_format('hm') );
+
+    See "available_formats" in DateTime::Locale::FromCLDR for the full list
+    of skeletons for any given locale.
+
+  DateTime::Format::Unicode
+    For more advanced formatting, including features not covered by
+    "format_cldr()", use DateTime::Format::Unicode (available separately on
+    CPAN). It provides:
+
+    *   Support for the additional tokens listed above ("b", "B", "O", "r",
+        "x", "X")
+
+    *   Formatting of datetime intervals, such as "Apr 9 - 12, 2026"
+
+    *   Full CLDR number system support (Arabic-Indic numerals, etc.)
+
+    *   Any CLDR locale, including complex tags such as
+        "es-419-u-ca-gregory"
+
+        use DateTime::Format::Unicode;
+
+        my $fmt = DateTime::Format::Unicode->new(
+            locale  => 'ja-JP',
+            pattern => 'GGGGy年M月d日（EEEE）',
+        ) || die( DateTime::Format::Unicode->error );
+
+        say $fmt->format_datetime( $dt );
+
+        # Interval formatting:
+        my $fmt2 = DateTime::Format::Unicode->new(
+            locale  => 'en',
+            pattern => 'GyMMMd',
+        );
+        say $fmt2->format_interval( $dt1, $dt2 );  # e.g. "Apr 9 - 12, 2026"
+
+HOW DATETIME MATH WORKS
+    Date math in "DateTime::Lite" follows the same model as DateTime. The
+    key distinction is between *calendar units* (months, days) and *clock
+    units* (minutes, seconds, nanoseconds). Understanding this distinction
+    is essential for correct results.
+
+  Duration buckets
+    A DateTime::Lite::Duration stores its components in five independent
+    *buckets*: months, days, minutes, seconds, nanoseconds. Each bucket is
+    kept as a signed integer. The buckets are not normalised against each
+    other: a duration of "{ months => 1, days => 31 }" is distinct from "{
+    months => 2, days => 0 }" because the number of days in a month varies.
+
+  Calendar vs. clock units
+    *Calendar units* (months, days) are relative: their real duration
+    depends on the datetime to which they are applied. *Clock units*
+    (minutes, seconds, nanoseconds) are absolute.
+
+    When add applies a duration, calendar units are applied first, then
+    clock units:
+
+        $dt->add( months => 1, hours => 2 );
+        # Step 1: advance by 1 month  (calendar)
+        # Step 2: advance by 2 hours  (clock)
+
+  End-of-month handling
+    Adding months to a date whose day is beyond the end of the target month
+    requires a policy decision. DateTime::Lite::Duration supports three
+    "end_of_month" modes:
+
+    *   "wrap" (default) - wrap into the next month. January 31 + 1 month =
+        March 3 (or 2 in leap years).
+
+    *   "limit" - clamp to the last day of the target month. January 31 + 1
+        month = February 28 (or 29 in leap years).
+
+    *   "preserve" - like "limit", but remember that the original day was at
+        the end of month, so a further addition of one month will also land
+        on the last day.
+
+  Subtraction
+    "$dt1->subtract_datetime( $dt2 )" returns a duration representing the
+    difference. The calendar part is computed in months and days (from the
+    local dates), and the clock part in seconds and nanoseconds (from the
+    UTC representations). This is the most commonly useful result.
+
+    "$dt1->subtract_datetime_absolute( $dt2 )" returns a duration in pure
+    clock units (seconds and nanoseconds), based on the UTC epoch
+    difference. This is useful when you need an exact elapsed time
+    independent of DST changes.
+
+  Leap seconds
+    "DateTime::Lite" handles leap seconds when the time zone is not
+    floating. Adding a duration in clock units across a leap second boundary
+    will correctly account for the extra second.
+
+SEE ALSO
+    DateTime, DateTime::Lite::Duration, DateTime::Lite::Exception,
+    DateTime::Lite::Infinite, DateTime::Locale::FromCLDR,
+    Locale::Unicode::Data, DateTime::Format::Unicode
+
+CREDITS
+    Credits to the original author of DateTime, Dave Rolsky and all the
+    contributors for their great work on which this module DateTime::Lite is
+    derived.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+COPYRIGHT & LICENSE
+    Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+    All rights reserved
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

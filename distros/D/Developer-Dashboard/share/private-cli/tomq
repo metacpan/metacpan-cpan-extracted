@@ -28,16 +28,17 @@ tomq - TOML query command for Developer Dashboard
 
 =head1 DESCRIPTION
 
-This command provides TOML path extraction for Developer Dashboard.
+This command provides TOML query extraction for Developer Dashboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This staged helper owns the public C<dashboard tomq> command. It accepts an
-optional dotted TOML path plus an optional input file, then hands the request
-to the shared query runtime so parsing, file-vs-STDIN handling, and output
-formatting stay consistent with the rest of the dashboard toolchain.
+optional dotted TOML path or C<$d>-based Perl expression plus an optional input
+file, then hands the request to the shared query runtime so parsing,
+file-vs-STDIN handling, and output formatting stay consistent with the rest of
+the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
@@ -52,7 +53,9 @@ Use this file when you are changing how C<dashboard tomq> chooses between STDIN 
 Users run C<dashboard tomq [path] [file]>. The staged helper selects the TOML
 backend in the shared query runtime, which accepts the file and path in either
 order, reads STDIN when no file is given, prints scalar hits as plain text, and
-prints the whole parsed document when the path is C<$d> or C<.>.
+prints the whole parsed document when the path is C<$d> or C<.>. If the query
+text uses C<$d> inside a Perl expression, the helper evaluates that expression
+against the decoded TOML document before formatting the result.
 
 =head1 WHAT USES IT
 
@@ -63,6 +66,7 @@ It is used by the public C<dashboard tomq> command, by shell snippets that want 
   printf '[alpha]\nbeta = 4\n' | dashboard tomq alpha.beta
   dashboard tomq settings.toml '$d'
   dashboard tomq '$d' settings.toml
+  printf '[foo]\na = 1\n[bar]\nb = 2\n' | dashboard tomq 'sort keys %$d'
   printf '[service]\nname = "demo"\n' | dashboard tomq service.name
 
 =for comment FULL-POD-DOC END

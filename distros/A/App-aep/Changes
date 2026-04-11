@@ -1,5 +1,36 @@
 Revision history for perl application aep (Advanced Entry Point)
 
+0.013     2026-04-10 17:38:51 UTC
+  - Added TCP transport for lock server/client (--lock-server-host, --lock-server-port, --lock-transport)
+  - Server now listens on both Unix socket and TCP simultaneously
+  - Client supports auto, tcp, and unix transport modes with fallback
+  - Added parallel groups in lock-server-order using || operator (e.g. "db,redis1||redis2,nginx")
+  - Added --lock-client-timeout option to start command after timeout without server permission
+  - Added --quiet and --verbose options for log level control
+  - Added proper health check protocol: client sends health_check, server responds with JSON status
+  - Updated docker-compose.yml to use TCP transport instead of shared volumes
+  - Updated POD documentation for all new options
+
+0.012     2026-04-10 17:01:02 UTC
+  - Implemented command execution via POE::Wheel::Run
+  - Implemented lock server/client protocol with ordered startup
+  - Added 5 lock trigger types: time, text, regex, connect, script
+  - Added config file reading (YAML) with env/file/args merge
+  - Added lock client connection retry logic
+  - Added Dockerfile (Carton-based) and docker-compose.yml
+  - Added unit tests (34 tests) and integration tests (12 tests)
+  - Fixed cross-session POE event dispatching
+  - Fixed blocking I/O in trigger connect and script handlers
+  - Fixed memory leak on client disconnect
+  - Fixed signal handlers to kill child processes and clean up sockets
+  - Fixed duplicate Getopt option specifications
+  - Removed unused imports and dead code
+  - Added STDOUT/STDERR autoflush for container environments
+  - Comprehensive POD rewrite with examples and full option documentation
+
+0.011     2026-04-10 16:53:01 UTC
+  - First CPAN release with core framework
+
 0.010     2025-02-13 21:54:36 GMT
   - Preparing for first release
   - Corrected POD error

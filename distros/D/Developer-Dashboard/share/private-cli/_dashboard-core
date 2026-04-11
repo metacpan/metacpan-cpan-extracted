@@ -896,40 +896,12 @@ elsif ( $cmd eq 'doctor' ) {
     exit 0;
 }
 elsif ( $cmd eq 'skills' ) {
-    require Developer::Dashboard::SkillManager;
-    my $skill_mgr = Developer::Dashboard::SkillManager->new();
-    
-    my $action = shift @ARGV || '';
-    
-    if ( $action eq 'install' ) {
-        my $git_url = shift @ARGV || '';
-        die "Usage: dashboard skills install <git-url>\n" if !$git_url;
-        my $result = $skill_mgr->install($git_url);
-        print json_encode($result);
-        exit( $result->{error} ? 1 : 0 );
-    }
-    elsif ( $action eq 'uninstall' ) {
-        my $repo_name = shift @ARGV || '';
-        die "Usage: dashboard skills uninstall <repo-name>\n" if !$repo_name;
-        my $result = $skill_mgr->uninstall($repo_name);
-        print json_encode($result);
-        exit( $result->{error} ? 1 : 0 );
-    }
-    elsif ( $action eq 'update' ) {
-        my $repo_name = shift @ARGV || '';
-        die "Usage: dashboard skills update <repo-name>\n" if !$repo_name;
-        my $result = $skill_mgr->update($repo_name);
-        print json_encode($result);
-        exit( $result->{error} ? 1 : 0 );
-    }
-    elsif ( $action eq 'list' ) {
-        my $skills = $skill_mgr->list();
-        print json_encode({ skills => $skills });
-        exit 0;
-    }
-    else {
-        die "Unknown skills action: $action\nUsage: dashboard skills [install|uninstall|update|list]\n";
-    }
+    require Developer::Dashboard::CLI::Skills;
+    my $ok = Developer::Dashboard::CLI::Skills::run_skills_command(
+        command => $cmd,
+        args    => \@ARGV,
+    );
+    exit( $ok ? 0 : 1 );
 }
 elsif ( $cmd eq 'skill' ) {
     require Developer::Dashboard::SkillDispatcher;

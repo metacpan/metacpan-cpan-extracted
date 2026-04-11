@@ -6,7 +6,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version = '4.01';
+my $version  = '4.02';
 my $git      = "https://github.com/markov2/perl5-Mail-Box-POP3";
 my $publish  = "../public_html/mail-box-pop3";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -61,12 +61,8 @@ my %requires = (
 	'Log::Report'     => '1.42',
 	'Socket'          => 0,
 
-	'Mail::Box::FastScalar'        => '4.0',
-	'Mail::Box::Net'               => '4.0',
-	'Mail::Box::Test'              => '4.0',
-	'Mail::Box::Parser::Perl'      => '4.0',
-	'Mail::Transport::Receive'     => '4.0',
-	'Mail::Reporter'               => '4.0',
+	'Mail::Box'       => '4.02',
+	'Mail::Transport' => '4.01',
 );
 
 WriteMakefile

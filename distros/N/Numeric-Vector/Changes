@@ -1,0 +1,10 @@
+Revision history for Numeric-Vector
+
+0.02    2026-04-11
+        - Fix "used only once" warning for imported but unused nvec_* functions
+          (add GvMULTI_on after glob creation in xs_nvec_install)
+        - Use XS_INTERNAL() instead of static XS() for internal XS functions
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

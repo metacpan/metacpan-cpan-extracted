@@ -31,6 +31,7 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Data::Section::Simple' => 0,
+		'I18N::LangTags::Detect' => 0,
 	}, dist => $dist,
 	clean	   => { FILES => 'Locale-CA-*' },
 	META_MERGE		=> {

@@ -1,14 +1,7 @@
 Revision history for Data-PubSub-Shared
 
+0.02  2026-04-10
+    - XS::Parse::Keyword is now a required dependency
+
 0.01  2026-04-09
     - Initial release
-    - Int variant: lock-free MPMC publish (atomic fetch-and-add)
-    - Str variant: mutex-protected publish, variable-length circular arena
-    - Lock-free subscribers for both variants (seqlock-style)
-    - Batch operations: publish_multi, drain, poll_wait_multi, poll_cb
-    - Per-subscriber overflow counting
-    - Futex-based blocking poll with timeout
-    - PID-based stale lock recovery (Str mode)
-    - eventfd integration for event-loop subscribers
-    - File-backed, anonymous, and memfd-backed modes
-    - Optional keyword API via XS::Parse::Keyword

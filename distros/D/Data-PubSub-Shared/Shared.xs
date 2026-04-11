@@ -6,7 +6,6 @@
 #include "ppport.h"
 #include "pubsub.h"
 
-#ifdef HAVE_XS_PARSE_KEYWORD
 #include "XSParseKeyword.h"
 
 static int build_kw_1arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata) {
@@ -75,8 +74,6 @@ DEFINE_PS_KW(str, "Str", lag,     1, build_kw_1arg)
     register_xs_parse_keyword("ps_" #variant "_" #kw, \
         &hooks_ps_##variant##_##kw, (void*)func_name)
 
-#endif /* HAVE_XS_PARSE_KEYWORD */
-
 #define EXTRACT_HANDLE(classname, sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
@@ -94,9 +91,7 @@ MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int
 PROTOTYPES: DISABLE
 
 BOOT:
-#ifdef HAVE_XS_PARSE_KEYWORD
     boot_xs_parse_keyword(0.40);
-    sv_setiv(get_sv("Data::PubSub::Shared::HAVE_KEYWORDS", GV_ADD), 1);
     REGISTER_PS_KW(int, publish, "Data::PubSub::Shared::Int::publish");
     REGISTER_PS_KW(int, poll,    "Data::PubSub::Shared::Int::Sub::poll");
     REGISTER_PS_KW(int, lag,     "Data::PubSub::Shared::Int::Sub::lag");
@@ -109,7 +104,6 @@ BOOT:
     REGISTER_PS_KW(str, publish, "Data::PubSub::Shared::Str::publish");
     REGISTER_PS_KW(str, poll,    "Data::PubSub::Shared::Str::Sub::poll");
     REGISTER_PS_KW(str, lag,     "Data::PubSub::Shared::Str::Sub::lag");
-#endif
 
 SV *
 new(class, path, capacity)

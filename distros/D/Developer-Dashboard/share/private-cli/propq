@@ -28,16 +28,17 @@ propq - Java properties query command for Developer Dashboard
 
 =head1 DESCRIPTION
 
-This command provides Java properties path extraction for Developer Dashboard.
+This command provides Java properties query extraction for Developer Dashboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This staged helper owns the public C<dashboard propq> command. It accepts an
-optional Java-properties key path plus an optional input file, then hands the
-request to the shared query runtime so parsing, file-vs-STDIN handling, and
-output formatting stay consistent with the rest of the dashboard toolchain.
+optional Java-properties key path or C<$d>-based Perl expression plus an
+optional input file, then hands the request to the shared query runtime so
+parsing, file-vs-STDIN handling, and output formatting stay consistent with the
+rest of the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
@@ -53,7 +54,9 @@ Users run C<dashboard propq [path] [file]>. The staged helper selects the
 Java-properties backend in the shared query runtime, which accepts the file and
 path in either order, reads STDIN when no file is given, preserves dotted keys
 such as C<alpha.beta>, and prints the whole parsed document when the path is
-C<$d> or C<.>.
+C<$d> or C<.>. If the query text uses C<$d> inside a Perl expression, the
+helper evaluates that expression against the decoded Java-properties document
+before formatting the result.
 
 =head1 WHAT USES IT
 
@@ -64,6 +67,7 @@ It is used by the public C<dashboard propq> command, by shell snippets that want
   printf 'alpha.beta=5\nname=demo\n' | dashboard propq alpha.beta
   dashboard propq app.properties '$d'
   dashboard propq '$d' app.properties
+  printf 'foo=1\nbar=2\n' | dashboard propq 'sort keys %$d'
   printf 'name = demo\n' | dashboard propq name
 
 =for comment FULL-POD-DOC END

@@ -33,6 +33,7 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'File::Temp' => 0,
 		'Getopt::Long' => 0,
+		'HTML::Entities' => 0,
 		'Module::Load::Conditional' => 0,
 		'IPC::Open3' => 0,
 		'JSON::MaybeXS' => 0,

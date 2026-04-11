@@ -3,7 +3,7 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -248,11 +248,7 @@ sub _discover_service_names {
     my $service_map  = $args{service_map} || {};
     my %names = map { $_ => 1 } grep { defined && $_ ne '' } keys %{$service_map};
 
-    for my $root (
-        File::Spec->catdir( $project_root, '.developer-dashboard', 'docker' ),
-        $self->_home_docker_config_root,
-      )
-    {
+    for my $root ( $self->_service_lookup_roots( project_root => $project_root, service => '__all__' ) ) {
         next if !-d $root;
         opendir my $dh, $root or next;
         while ( my $entry = readdir $dh ) {
@@ -279,24 +275,52 @@ sub _service_folder_is_disabled {
         service      => $service,
     );
     return 0 if !@roots;
-    my $service_root = File::Spec->catdir( $roots[0], $service );
-    return 1 if -f File::Spec->catfile( $service_root, 'disabled.yml' );
+    for my $root ( reverse @roots ) {
+        my $service_root = File::Spec->catdir( $root, $service );
+        next if !-d $service_root;
+        return 1 if -f File::Spec->catfile( $service_root, 'disabled.yml' );
+        return 0;
+    }
 
     return 0;
 }
 
 # _service_lookup_roots(%args)
-# Returns the docker roots that should be searched for one isolated service with project-local precedence over home runtime fallbacks.
+# Returns the docker roots that should be searched for one isolated service across home config, installed skills, and deeper runtime layers.
 # Input: service name and optional project_root.
 # Output: ordered list of docker root directory path strings.
 sub _service_lookup_roots {
     my ( $self, %args ) = @_;
     my $service      = $args{service} || return;
     my $project_root = $args{project_root} || cwd();
-    my $project_docker_root = File::Spec->catdir( $project_root, '.developer-dashboard', 'docker' );
-    my $project_service_root = File::Spec->catdir( $project_docker_root, $service );
-    return ($project_docker_root) if -d $project_service_root;
-    return ( $self->_home_docker_config_root );
+    my @roots;
+    my %seen;
+    my $home_runtime_root = $self->{paths}->home_runtime_root;
+
+    for my $runtime_root ( $self->{paths}->runtime_layers ) {
+        my @candidates = ();
+        my $config_docker_root = File::Spec->catdir( $runtime_root, 'config', 'docker' );
+        push @candidates, $config_docker_root;
+        if ( $runtime_root ne $home_runtime_root ) {
+            push @candidates, File::Spec->catdir( $runtime_root, 'docker' );
+        }
+        if ( $runtime_root eq $home_runtime_root ) {
+            push @candidates, $self->{paths}->installed_skill_docker_roots;
+        }
+
+        for my $root (@candidates) {
+            next if !defined $root || $root eq '';
+            next if $seen{$root}++;
+            if ( $service eq '__all__' ) {
+                push @roots, $root;
+                next;
+            }
+            my $service_root = File::Spec->catdir( $root, $service );
+            push @roots, $root if -d $service_root;
+        }
+    }
+
+    return @roots;
 }
 
 # _infer_services_from_args(%args)

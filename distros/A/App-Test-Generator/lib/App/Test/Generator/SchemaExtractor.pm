@@ -24,7 +24,7 @@ use IPC::Open3;
 use JSON::MaybeXS qw(encode_json decode_json);
 use Symbol qw(gensym);
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =head1 SYNOPSIS
 
@@ -1153,14 +1153,20 @@ Private methods are not included, unless C<include_private> is used in C<new()>.
 The extractor supports several configuration parameters:
 
     my $extractor = App::Test::Generator::SchemaExtractor->new(
-        input_file          => 'lib/MyModule.pm',  # Required
-        output_dir          => 'schemas/',         # Default: 'schemas'
-        verbose             => 1,                  # Default: 0
-        include_private     => 1,                  # Default: 0
-        max_parameters      => 50,                 # Default: 20
+        input_file           => 'lib/MyModule.pm',  # Required
+        output_dir           => 'schemas/',         # Optional - only needed if writing schemas
+        verbose              => 1,                  # Default: 0
+        include_private      => 1,                  # Default: 0
+        max_parameters       => 50,                 # Default: 20
         confidence_threshold => 0.7,               # Default: 0.5
-	strict_pod	=> 0|1|2,	# Default: 0 (off)
+        strict_pod           => 0|1|2,              # Default: 0 (off)
     );
+
+C<output_dir> is optional.
+It is only required if schema files will be
+written to disk. Callers that pass C<no_write =E<gt> 1> to C<extract_all>
+do not need to supply it. If C<output_dir> is omitted and C<_write_schema>
+is called, it will croak with a clear error message.
 
 =cut
 
@@ -1174,7 +1180,9 @@ sub new {
 
 	my $self = {
 		input_file => $params->{input_file},
-		output_dir => $params->{output_dir} || 'schemas',
+		# output_dir is optional — only required if _write_schema will be called.
+		# Callers using extract_all(no_write => 1) do not need to supply it.
+		output_dir => $params->{output_dir},
 		verbose	=> $params->{verbose} // 0,
 		confidence_threshold => $params->{confidence_threshold} // 0.5,
 		include_private => $params->{include_private} // 0,	# include _private methods
@@ -1195,6 +1203,24 @@ sub new {
 Extract schemas for all methods in the module.
 
 Returns a hashref of method_name => schema.
+
+    my $schemas = $extractor->extract_all();
+
+    # Suppress writing .yml files to disk (returns schemas only)
+    my $schemas = $extractor->extract_all(no_write => 1);
+
+Accepts an optional hashref or named parameters:
+
+=over 4
+
+=item * C<no_write>
+
+When set to a true value, schema files are not written to C<output_dir>.
+The schemas hashref is still fully populated and returned.
+This is useful when the caller wants to inspect or augment schemas
+before deciding whether and where to write them.
+
+=back
 
 The extraction process performs comprehensive validation of the agreement between
 POD documentation and the actual code, controlled by the C<strict_pod> option
@@ -1241,16 +1267,17 @@ validation report can be generated using the C<generate_pod_validation_report> m
   FOREACH method
   DO
     analyze the method
-    write a schema file for that method
+    write a schema file for that method (unless no_write is set)
   END
 
 =cut
 
 sub extract_all {
-	my $self = $_[0];
+	my $self = shift;
+	my $params = Params::Get::get_params(undef, @_) || {};
 
 	$self->_log("Parsing $self->{input_file}...");
-	$self->_log("Strict POD mode: " . (qw(off warn fatal))[$self->{strict_pod}]);
+	$self->_log('Strict POD mode: ' . (qw(off warn fatal))[$self->{strict_pod}]);
 
 	my $document = PPI::Document->new($self->{input_file}) or die "Failed to parse $self->{input_file}: $!";
 
@@ -1273,7 +1300,8 @@ sub extract_all {
 		$schema->{'module'} = $package_name;
 
 		# Write individual schema file
-		$self->_write_schema($method->{name}, $schema);
+		# Only write schema files if no_write is not set
+		$self->_write_schema($method->{name}, $schema) unless $params->{no_write};
 	}
 
 	return \%schemas;
@@ -2547,7 +2575,7 @@ my @params;
 
 for my $p (@sig_params) {
 	push @params, {
-		name     => "arg$pos",
+		name => "arg$pos",
 		optional => $p->optional ? 1 : 0,
 		position => $pos,
 		type => $p->type->name
@@ -2560,18 +2588,18 @@ my $returns;
 if (my $r = $sig->returns_scalar) {
 	$returns = {
 		context => 'scalar',
-		type    => $r ? $r->name : 'unknown',
+		type => $r ? $r->name : 'unknown',
 	};
 } elsif ($r = $sig->returns_list) {
 	$returns = {
 		context => 'list',
-		type    => $r ? $r->name : 'unknown',
+		type => $r ? $r->name : 'unknown',
 	};
 }
 
 print encode_json({
 	parameters => \@params,
-	returns    => $returns,
+	returns => $returns,
 });
 PERL
 
@@ -2588,10 +2616,19 @@ PERL
 	# Run in an isolated Perl process
 	my ($wtr, $rdr, $err) = (undef, undef, gensym);
 	local %ENV;
+
+	# Apply memory limit if BSD::Resource is available.
+	# This module is Unix-only and not available on Windows,
+	# so we guard the call and skip silently if not present.
 	eval {
-		use BSD::Resource;
-		setrlimit(RLIMIT_AS, 50_000_000, 50_000_000);
+		require BSD::Resource;
+		BSD::Resource::setrlimit(
+			BSD::Resource::RLIMIT_AS(),
+			50_000_000,
+			50_000_000
+		);
 	};
+	# Ignore failure — resource limiting is best-effort only
 
 	my $pid = open3($wtr, $rdr, $err, $^X, '-T');
 
@@ -2960,7 +2997,7 @@ sub _analyze_output {
 	$self->_enhance_boolean_detection(\%output, $pod, $code, $method_name);
 	$self->_detect_list_context(\%output, $code);
 	$self->_detect_void_context(\%output, $code, $method_name);
-	$self->_detect_chaining_pattern(\%output, $code, $method_name);
+	$self->_detect_chaining_pattern(\%output, $code);
 	$self->_detect_error_conventions(\%output, $code);
 
 	$self->_validate_output(\%output) if keys %output;
@@ -3555,7 +3592,7 @@ sub _detect_void_context {
 
 # Detect method chaining patterns
 sub _detect_chaining_pattern {
-	my ($self, $output, $code, $method_name) = @_;
+	my ($self, $output, $code) = @_;
 	return unless $code;
 
 	# Count returns of $self
@@ -3723,23 +3760,23 @@ sub _infer_type_from_expression {
 		return { type => 'hashref' };
 	}
 
-    # Check for hash
-    if ($expr =~ /^\%\w+/ || $expr =~ /^\%\{/) {
-        return { type => 'hash' };
-    }
+	# Check for hash
+	if ($expr =~ /^\%\w+/ || $expr =~ /^\%\{/) {
+		return { type => 'hash' };
+	}
 
 	# Check for strings
 	if ($expr =~ /^['"]/ || $expr =~ /['"]$/) {
 		return { type => 'string' };
 	}
 
-    # Check for numbers
-    if ($expr =~ /^-?\d+$/) {
-        return { type => 'integer' };
-    }
-    if ($expr =~ /^-?\d+\.\d+$/) {
-        return { type => 'number' };
-    }
+	# Check for numbers
+	if ($expr =~ /^-?\d+$/) {
+		return { type => 'integer' };
+	}
+	if ($expr =~ /^-?\d+\.\d+$/) {
+		return { type => 'number' };
+	}
 
 	# Check for booleans
 	if ($expr =~ /^[01]$/) {
@@ -6025,16 +6062,20 @@ sub _detect_value_constraints {
 	return \@relationships;
 }
 
-=head2 _write_schema
-
-Write a schema to a YAML file.
-
-=cut
+# Write a single method schema to a YAML file in output_dir.
+#
+# Entry:      $method_name is a non-empty string; $schema is a hashref.
+# Exit:       YAML file written to output_dir/$method_name.yml.
+# Side effects: Creates output_dir if it does not exist.
+# Notes:      Croaks if output_dir was not set in new().
 
 sub _write_schema {
 	my ($self, $method_name, $schema) = @_;
 
-	die if(!defined($self->{'output_dir'}));
+	# output_dir is required here — croak early with a clear message
+	# rather than letting make_path fail with a cryptic error
+	croak(__PACKAGE__, ': output_dir must be provided to new() when writing schema files') unless defined $self->{output_dir};
+
 	make_path($self->{output_dir}) unless -d $self->{output_dir};
 
 	my $filename = "$self->{output_dir}/${method_name}.yml";

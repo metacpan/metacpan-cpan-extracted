@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Perl::Critic::Policy::Security::RandBytesFromHash",
   "PREREQ_PM" => {
     "List::Util" => 0,
+    "PPI" => "1.281",
     "Perl::Critic::Policy" => 0,
     "Perl::Critic::Utils" => 0,
     "Readonly" => "2.01",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Perl::Critic::Policy" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::Util" => 0,
   "Module::Metadata" => "1.000015",
+  "PPI" => "1.281",
   "Perl::Critic::Policy" => 0,
   "Perl::Critic::Utils" => 0,
   "Readonly" => "2.01",

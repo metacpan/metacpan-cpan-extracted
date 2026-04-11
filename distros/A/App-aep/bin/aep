@@ -21,8 +21,11 @@ use App::aep;
 use Data::Dumper;
 use Carp qw(cluck longmess shortmess);
 
+STDOUT->autoflush(1);
+STDERR->autoflush(1);
+
 # Version of this software
-our $VERSION = '0.010';
+our $VERSION = '0.013';
 
 # Config defaults
 my $opt_conf_def = { 'AEP_SOCKETPATH' => '/tmp/aep.sock', };
@@ -32,7 +35,7 @@ my @opt_desc = (
     'aep %o <some-arg>',
     [
         'config-env',
-        'Read config values from the enviroment only.',
+        'Read config values from the environment only.',
         {
             'default' => 0,
         },
@@ -41,7 +44,10 @@ my @opt_desc = (
         'config-file=s',
         'Read config from a config file only.',
         {
-            'default' => '$unset',
+            'default'   => '$unset',
+            'callbacks' => {
+                'exists' => sub { _check_exists( shift ) },
+            },
         },
     ],
     [
@@ -68,7 +74,7 @@ my @opt_desc = (
     [],
     [
         'env-prefix=s',
-        'What prefix to look for aep config enviromentals, default is AEP_',
+        'What prefix to look for aep config environmentals, default is AEP_',
         {
             'default' => 'AEP_',
         },
@@ -82,8 +88,8 @@ my @opt_desc = (
         }
     ],
     [
-        'command-args',
-        'The arguments to add to the command, default is nothing.',
+        'command-args=s',
+        'The arguments to add to the command comma separated, default is nothing.',
         {
             'default' => "",
         },
@@ -91,9 +97,12 @@ my @opt_desc = (
     [ 'command-norestart', 'If the command exits then do not attempt to restart it.', ],
     [
         'command-restart=i',
-        'If the command exits how many times to retry it, default 0 (seconds).',
+        'If the command exits how many times to retry it, default 0. Set to -1 for infinite.',
         {
-            'default' => 0,
+            'default'   => 0,
+            'callbacks' => {
+                'is_positive' => sub { _check_positive_number( shift ) },
+            },
         },
     ],
     [
@@ -137,11 +146,19 @@ my @opt_desc = (
         },
     ],
     [
-        'lock-server-order',
+        'lock-server-order=s',
         'The list of ids and the order to allow them to run, '
-        . 'operators, for example: db,redis1,redis2,redis3,redis4,nginx',
+        . 'comma separated. Use || for parallel groups, e.g.: db,redis1||redis2,nginx',
         {
             'default' => '',
+        },
+    ],
+    [
+        'lock-server-exhaust-action=s',
+        'What to do when all clients in the order have started. '
+        . 'Valid options: "exit", "idle", "restart", "execute". Default is idle.',
+        {
+            'default' => 'idle',
         },
     ],
     [],
@@ -166,19 +183,33 @@ my @opt_desc = (
         'lock-client-retry-delay=i',
         'How long to wait before retrying, default 5 (seconds)',
         {
+            'default' => 5,
+        },
+    ],
+    [
+        'lock-client-timeout=i',
+        'Maximum seconds to wait for the lock server to send run. 0 = wait forever. Default 0.',
+        {
             'default' => 0,
+        },
+    ],
+    [
+        'lock-transport=s',
+        'Transport to use for lock client: tcp, unix, or auto (try TCP then Unix). Default auto.',
+        {
+            'default' => 'auto',
         },
     ],
     [],
     [
-        'lock-server-host=s',
+        'lock-client-host=s',
         'What host to connect to, defaults to: aep-master',
         {
             'default' => 'aep-master'
         },
     ],
     [
-        'lock-server-port=i',
+        'lock-client-port=i',
         'What port to connect to, defaults to 60000',
         {
             'default' => 60000,
@@ -186,7 +217,7 @@ my @opt_desc = (
     ],
     [
         'lock-trigger=s',
-        'Please read --help-confog lock-trigger, default is: none:time:10000 (milliseconds)',
+        'Please read --help-config lock-trigger, default is: none:time:10000 (milliseconds)',
         {
             'default' => 'none:time:10000'
         },
@@ -196,6 +227,21 @@ my @opt_desc = (
         'What ID we should say we are, mandatory when acting as a lock-client',
         {
             'default' => $$,
+        },
+    ],
+    [],
+    [
+        'quiet',
+        'Suppress informational output, only show errors.',
+        {
+            'default' => 0,
+        },
+    ],
+    [
+        'verbose',
+        'Show detailed debug output including packet contents.',
+        {
+            'default' => 0,
         },
     ],
     [],
@@ -222,50 +268,8 @@ my @opt_desc = (
         },
     ],
 );
-my $opt_index = do
-{
-    my $opt_map;
-    my $opt_num = 0 - 1;
-    foreach my $opt_read ( @opt_desc )
-    {
-
-        # Increment out count every iteration
-        $opt_num++;
-
-        # Skip lines of text and blank arrays
-        if    ( ref( $opt_read ) ne 'ARRAY' )   { next }
-        elsif ( scalar( @{ $opt_read } ) == 0 ) { next }
-
-        # Create a map to the item
-        $opt_map->{ $opt_read->[ 0 ] } = $opt_num;
-    }
-
-    # Return the map
-    $opt_map;
-};
-my @opt_spec = (
-    [
-        'command-restart=i',
-        'maximum number of command restarts',
-        {
-            'callbacks' => {
-                'is_positive' => sub { _check_positive_number( shift ) },
-            },
-        },
-    ],
-    [
-        'config-file=s',
-        'specify a configuration file to use',
-        {
-            'callbacks' => {
-                'exists' => sub { _check_exists( shift ) },
-            },
-        },
-    ],
-);
-
 # Read in our options
-my ( $opt, $usage ) = describe_options( @opt_desc, @opt_spec );
+my ( $opt, $usage ) = describe_options( @opt_desc );
 
 if ( $opt->help )
 {
@@ -293,14 +297,24 @@ sub main ( @args )
 
     # Create an appropriate heap for our session
     my $func_map = _create_heap( $args[ 0 ], $args[ 1 ] );
-    $func_map->{ '_' }->{ 'debug' }    = sub { _func_debug( @_ ) };
-    $func_map->{ '_' }->{ 'set_exit' } = $exit_func;
+
+    my $log_level = $opt->quiet ? 'quiet' : ( $opt->verbose ? 'verbose' : 'info' );
+    $func_map->{ '_' }->{ 'log_level' } = $log_level;
+    $func_map->{ '_' }->{ 'debug' }     = sub { _func_debug( $log_level, @_ ) };
+    $func_map->{ '_' }->{ 'set_exit' }  = $exit_func;
 
     my $session = POE::Session::PlainCall->create(
         'package'   => 'App::aep',
         'ctor_args' => [ $options ],
         'heap'      => $func_map,
-        'states'    => [ qw( _start sig_int sig_term sig_chld scheduler ) ],
+        'states'    => [
+            qw(
+                _start sig_int sig_term sig_chld sig_usr scheduler
+                command_start command_stdout command_stderr command_close command_error
+                lock_trigger_fire lock_trigger_connect lock_trigger_script
+                lock_client_timeout_fire lock_client_timeout_cancel
+            )
+        ],
     );
 
     $poe_kernel->run();
@@ -320,7 +334,7 @@ sub _create_heap ( $opt, $usage )
     # As it will be accessed a lot, keep a copy here
     my $env_prefix = $opt->env_prefix;
 
-    # Collect appropriate enviromental variables and stash them in the funcmap/heap
+    # Collect appropriate environmental variables and stash them in the funcmap/heap
     foreach my $env_key ( keys %ENV )
     {
         my $env_val = $ENV{ $env_key };
@@ -334,30 +348,55 @@ sub _create_heap ( $opt, $usage )
         }
     }
 
-    # Process the resultant config
-    # TODO
-    $map->{ '_' }->{ 'config' } = $map->{ '_' }->{ 'default' };
+    # Process the resultant config by merging sources in the specified order
+    my $merged = { %{ $opt_conf_def } };
+
+    # Read config file if specified
+    my $file_config = {};
+    my $config_file = $opt->config_file;
+    if ( defined $config_file && $config_file ne '$unset' && -e $config_file )
+    {
+        my $yaml_content = do {
+            open my $fh, '<', $config_file or die "Cannot open config file '$config_file': $!";
+            local $/;
+            <$fh>;
+        };
+        $file_config = YAML::XS::Load( $yaml_content ) || {};
+    }
+
+    # Build source maps for merging
+    my $sources = {
+        'env'  => $map->{ '_' }->{ 'aep' } || {},
+        'file' => $file_config,
+        'args' => {},
+    };
+
+    # Use AEP_ prefixed env vars as config keys directly (preserve full key name)
+    my $env_config = {};
+    for my $key ( keys %{ $sources->{ 'env' } } )
+    {
+        $env_config->{ $key } = $sources->{ 'env' }->{ $key };
+    }
+    $sources->{ 'env' } = $env_config;
+
+    # Determine merge order
+    my $order_str = $opt->config_order || 'env,file,args';
+    my @order = split( /,/, $order_str );
+
+    # Apply sources in order (later overrides earlier)
+    for my $source_name ( @order )
+    {
+        $source_name =~ s{^\s+|\s+$}{}g;
+        my $source_data = $sources->{ $source_name } || {};
+        for my $key ( keys %{ $source_data } )
+        {
+            $merged->{ $key } = $source_data->{ $key };
+        }
+    }
+
+    $map->{ '_' }->{ 'config' } = $merged;
 
     return $map;
-}
-
-# Helper functions for repeated calls
-sub _default_opt_lookup ( $def_opt_name )
-{
-    my $def = $opt_desc[ $opt_index->{ $def_opt_name } ];
-    if ( scalar( @{ $def } ) >= 2 )
-    {
-        $def = $def->[ 2 ];
-    }
-    if ( $def->{ 'default' } )
-    {
-        $def = $def->{ 'default' };
-    }
-    else
-    {
-        $def = 0;
-    }
-    return $def;
 }
 
 sub _check_exists ( $val )
@@ -368,12 +407,25 @@ sub _check_exists ( $val )
 
 sub _check_positive_number ( $val )
 {
-    return ( $val >= 0 ) ? 1 : undef;
+    return ( $val >= 0 || $val == -1 ) ? 1 : undef;
 }
 
 # Show debug messages
-sub _func_debug ( $pipe, $line, $message )
+# $log_level: 'quiet', 'info', or 'verbose' (global setting from --quiet/--verbose)
+# $level: 'error', 'info', or 'debug' (per-message level, defaults to 'info')
+sub _func_debug ( $log_level, $pipe, $line, $message, $level = 'info' )
 {
+    # Filter messages based on log level
+    if ( $log_level eq 'quiet' && $level ne 'error' )
+    {
+        return;
+    }
+    if ( $log_level eq 'info' && $level eq 'debug' )
+    {
+        return;
+    }
+    # 'verbose' shows everything
+
     my @buffer;
 
     if ( $message && ref( $message ) eq 'HASH' )
@@ -427,8 +479,9 @@ exit do
         $exit_code = 255;
     }
 
+    my $final_log_level = $opt->quiet ? 'quiet' : ( $opt->verbose ? 'verbose' : 'info' );
     _func_debug(
-        'STDERR', __LINE__,
+        $final_log_level, 'STDERR', __LINE__,
         {
             'lines' => [ "Child exiting with: $exit_code", "Status: $exit_reason", 'Perl exception: ' . $!, ]
         }
@@ -439,7 +492,7 @@ exit do
 
 __END__
 
-# ABSTRACT: turns baubles into trinkets
+# ABSTRACT: Advanced Entry Point for container process management
 
 =head1 NAME
 

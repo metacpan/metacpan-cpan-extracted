@@ -362,7 +362,7 @@ Inherited, see L<Mail::Message::Field/"Access to the content">
 =item $any-E<gt>B<decode>(STRING, %options)
 
 Decode field encoded C<STRING> to an utf8 string.  The input C<STRING> is part of
-a header field, and as such, may contain encoded words in C<=?...?.?...?=>
+a header field, and as such, may contain encoded words in “C<< =?...?.?...?= >>”
 format defined by RFC2047.  The C<STRING> may contain multiple encoded parts,
 maybe using different character sets.
 
@@ -374,7 +374,7 @@ Be warned: language information, which is defined in RFC2231, is ignored.
 
 Encodings with unknown charsets are left untouched [requires v2.085,
 otherwise croaked].  Unknown characters within an charset are replaced by
-a '?'.
+a “C<?>”.
 
  -Option --Default
   is_text  true
@@ -433,8 +433,7 @@ C<STRING> is a strandard iso language name.
 
 =item name => STRING
 
-[3.002] When the name of the field is given, the first encoded line will
-be shorter.
+When the name of the field is given, the first encoded line will be shorter.
 
 =back
 
@@ -474,7 +473,7 @@ syntax is accepted, and the new syntax is produced.
 
 This method returns two elements: the phrase (or C<undef>) followed
 by the resulting string.  The phrase will be removed from the optional
-quotes.  Be warned that C<""> will return an empty, valid phrase.
+quotes.  Be warned that “C<"">” will return an empty, valid phrase.
 
 » example: 
 
@@ -607,8 +606,8 @@ Cast by C<encode()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

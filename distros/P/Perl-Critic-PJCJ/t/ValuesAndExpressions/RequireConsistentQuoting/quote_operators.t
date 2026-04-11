@@ -114,9 +114,11 @@ subtest "qq() operator" => sub {
   bad $Policy, 'my $x = qq{simple[brackets]}', 'use ""',
     "qq{} with brackets should use double quotes";
 
-  # When qq() is appropriate (has double quotes)
-  good $Policy, 'my $x = qq(has "double" quotes)',
-    "qq() appropriate when content has double quotes";
+  # qq() with only double quotes should use single quotes
+  bad $Policy, 'my $x = qq(has "double" quotes)', "use ''",
+    "qq() with only double quotes should use single quotes";
+  bad $Policy, 'my $x = qq(<td class="%s">T</td>)', "use ''",
+    "qq() with HTML containing double quotes should use single quotes";
 
   # When qq() is justified due to special characters and optimal delimiter
   good $Policy, 'my $x = qq(string with $var and "quotes")',

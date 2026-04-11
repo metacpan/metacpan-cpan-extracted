@@ -1,4 +1,18 @@
 Revision history for Perl-Critic-Policy-Security-RandBytesFromHash:
 
+v0.1.1    2026-04-10 15:34:48+01:00 Europe/London
+  [Bugs]
+  - Specified a minimum version of PPI with signature support.
+
+  - Restricted internal regexes to ASCII.
+
+  [Documentation]
+  - Added a SYNOPSIS.
+
+  - Fixed typos.
+
+  [Tests]
+  - Updated Perl::Critic author tests to apply the policy to itself.
+
 v0.1.0    2026-04-10 10:32:15+01:00 Europe/London
   - Initial release.

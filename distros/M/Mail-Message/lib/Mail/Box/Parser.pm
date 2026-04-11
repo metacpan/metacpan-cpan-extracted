@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.04.
+# This code is part of Perl distribution Mail-Message version 4.05.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Box::Parser;{
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 }
 
 use parent 'Mail::Reporter';
@@ -44,7 +44,7 @@ sub init(@)
 
 sub fixHeaderErrors(;$)
 {	my $self = shift;
-	@_ ? ($self->{MBP_fix} = shift) : $self->{MBPL_fix};
+	@_ ? ($self->{MBP_fix} = shift) : $self->{MBP_fix};
 }
 
 

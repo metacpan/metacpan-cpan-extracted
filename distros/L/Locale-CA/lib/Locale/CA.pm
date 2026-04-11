@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use Carp;
 use Data::Section::Simple;
+use I18N::LangTags::Detect;
 
 =head1 NAME
 
@@ -11,11 +12,11 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -102,27 +103,13 @@ sub new {
 
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
 # https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
-sub _get_language
-{
-	if(my $language = $ENV{'LANGUAGE'}) {
-		foreach my $l(split/:/, $language) {
-			if(($l eq 'en') || ($l eq 'fr')) {
-				return $l;
-			}
+sub _get_language {
+	for my $tag (I18N::LangTags::Detect::detect()) {
+		if ($tag =~ /^([a-z]{2})/i) {
+			return lc $1;
 		}
 	}
-	foreach my $variable('LC_ALL', 'LC_MESSAGES', 'LANG') {
-		my $val = $ENV{$variable};
-		next unless(defined($val));
-
-		$val = substr($val, 0, 2);
-		if(($val eq 'en') || ($val eq 'fr')) {
-			return $val;
-		}
-	}
-	if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
-		return 'en';
-	}
+	return 'en' if ($ENV{LANG} && $ENV{LANG} =~ /^C(?:\.|$)/);
 	return;	# undef
 }
 
@@ -204,7 +191,7 @@ Based on L<Locale::US> - Copyright (c) 2002 - C<< $present >> Terrence Brannon.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2025 Nigel Horne.
+Copyright 2012-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
@@ -226,6 +213,7 @@ NL:NEWFOUNDLAND
 NL:NEWFOUNDLAND AND LABRADOR
 NT:NORTHWEST TERRITORIES
 NS:NOVA SCOTIA
+NU:NUNAVUT
 ON:ONTARIO
 PE:PRINCE EDWARD ISLAND
 QC:QUEBEC
@@ -242,6 +230,7 @@ NL:TERRE-NEUVE
 NL:TERRE-NEUVE-ET-LABRADOR
 NT:TERRITOIRES DU NORD-OUEST
 NS:NOUVELLE-ÉCOSSE
+NU:NUNAVUT
 ON:ONTARIO
 PE:ÎLE-DU-PRINCE-ÉDOUARD
 QC:QUÉBEC

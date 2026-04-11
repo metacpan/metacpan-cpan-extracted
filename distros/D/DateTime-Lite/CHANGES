@@ -1,0 +1,64 @@
+Revision history for Perl distribution DateTime-Lite
+
+v0.1.0 2026-04-10T06:12:47+0900
+    - Initial release.
+    - Full port of DateTime 1.66 API.
+    - Dependencies reduced from ~10 non-core to 3 (DateTime::TimeZone,
+      DateTime::Locale::FromCLDR, Locale::Unicode).
+    - Specio, Params::ValidationCompiler, Try::Tiny, namespace::autoclean all
+      eliminated.
+    - XS layer ported from DateTime.xs with 4 new functions:
+      _rd_to_epoch, _epoch_to_rd, _normalize_nanoseconds, _compare_rd.
+    - Pure-Perl fallback (DateTime::Lite::PP) for environments without a C compiler.
+    - No die() in normal error paths: DateTime::Lite::Exception used throughout,
+      errors returned as undef in scalar context.
+    - DateTime::Lite::Infinite provides singleton Future/Past objects.
+    - Locale data via DateTime::Locale::FromCLDR + Locale::Unicode::Data (SQLite backend,
+      no generated Perl locale files).
+    - Includes DateTime::Lite::TimeZone based thoroughly on the IANA Olson data
+      accessible with a SQLite database.
+    - Replaced the shallow Perl clone() with an XS deep copy (DateTime-Lite.xs):
+      - Root object scalar fields are copied with newSVsv().
+      - Nested blessed hashrefs (tz, locale) are copied with a new static
+        helper dtl_clone_flat_hv(), then re-blessed into the original stash.
+        The RV is created first with newRV_noinc() before calling sv_bless(),
+        which requires an RV not a raw HV pointer.
+      - The local_c cache (plain hashref) is also deep-copied, eliminating
+        any shared state between original and clone.
+      - Non-HV references (formatter objects, etc.) are shallow-copied with
+        newSVsv(), acceptable since formatters are effectively immutable.
+    - Implemented a TZif footer POSIX parser in XS, based on IANA code (public domain).
+    - New file dtl_posix.h: self-contained C header containing eight functions
+      derived from tzcode localtime.c (is_digit, getzname, getqzname, getnum,
+      getsecs, getoffset, getrule, transtime) plus dtl_year_to_jan1() and the
+      public entry point dtl_posix_tz_lookup(). All symbols prefixed dtl_;
+      no dynamic allocation, no system calls, no global state.
+    - New XS function DateTime::Lite::posix_tz_lookup(class_or_self,
+      unix_secs, tz_string): parses any POSIX TZ footer and returns
+      { offset, is_dst, short_name } or undef. Handles Jn, n, Mm.w.d
+      rules; quoted <name> abbreviations; fractional offsets; negative and
+      >24 h transition times (RFC 9636 s3.3.2 v3+ extensions); southern-
+      hemisphere DST (start > end).
+    - DateTime::Lite::TimeZone::_posix_tz_lookup() is now a thin Perl wrapper that
+      delegates to the XS function.
+    - Implemented process-level memory cache to DateTime::Lite::TimeZone.
+      The cache is opt-in and activated either per-call or class-wide:
+        use_cache_mem => 1 argument to new() enables it for that call;
+        DateTime::Lite::TimeZone->enable_mem_cache enables it globally.
+      Three new class methods: enable_mem_cache(), disable_mem_cache(),
+      clear_mem_cache(). Cache is keyed by both input name and canonical
+      name after alias resolution, so "US/Eastern" and "America/New_York"
+      share the same cached object.
+    - Implemented three-layer span cache to DateTime::Lite::TimeZone, active
+      when use_cache_mem => 1 or enable_mem_cache() is set:
+        Layer 1 - object cache: TimeZone->new() returns the cached object
+          keyed by zone name and canonical name, bypassing SQLite entirely.
+        Layer 2 - span cache: _lookup_span() and _lookup_span_local() store
+          the last matched span boundaries per cached TZ object. Subsequent
+          calls within the same span return the cached result in ~0.5 us
+          instead of ~45 us (SQL query). SQL extended with utc_start/utc_end
+          and local_start/local_end columns for range checks.
+        Layer 3 - POSIX footer cache: For zones with a footer TZ string
+          (e.g. America/New_York), the DST rule calculation result is cached
+          by calendar day. Pre-check added BEFORE the SQL query so future
+          dates skip the database entirely on subsequent calls.

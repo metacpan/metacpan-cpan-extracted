@@ -1,3 +1,7 @@
+1.000002   2026-04-10
+
+  - Catch dying user callbacks in Client to prevent breaking the connection
+
 1.000001   2026-04-09
 
   - Fix dependency declarations to use top-level CPAN distributions only

@@ -6,7 +6,7 @@ use warnings;
 use IO::Select;
 use Chandra::Socket::Connection;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 require Chandra;
 

@@ -1,4 +1,5 @@
 Changes
+cpanfile
 ignore.txt
 lib/Locale/CA.pm
 LICENSE
@@ -14,6 +15,9 @@ t/boiler.t
 t/ca.t
 t/changes.t
 t/comment-spelling.t
+t/conf/all_province_codes.yaml
+t/conf/all_province_names.yaml
+t/conf/new.yaml
 t/coverage.t
 t/critic.t
 t/cv.t
@@ -21,6 +25,7 @@ t/dist.t
 t/eof.t
 t/eol.t
 t/errors.t
+t/fuzz.t
 t/gv.t
 t/kwalitee.t
 t/manifest.t

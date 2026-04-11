@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.04.
+# This code is part of Perl distribution Mail-Message version 4.05.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,13 +10,14 @@
 
 
 package Mail::Message::TransferEnc::Base64;{
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 }
 
 use parent 'Mail::Message::TransferEnc';
 
 use strict;
 use warnings;
+use utf8;
 
 use Log::Report   'mail-message', import => [ qw/warning/ ];
 

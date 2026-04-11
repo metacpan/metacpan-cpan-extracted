@@ -3,11 +3,12 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use File::Spec;
 use JSON::XS qw(encode_json decode_json);
 use Capture::Tiny qw(capture);
+use File::Basename qw(dirname);
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file resolve_runnable_file);
 
@@ -32,8 +33,9 @@ sub dispatch {
     return { error => 'Missing skill name' } if !$skill_name;
     return { error => 'Missing command name' } if !$command;
 
-    my $skill_path = $self->{manager}->get_skill_path($skill_name);
+    my $skill_path = $self->{manager}->get_skill_path( $skill_name, include_disabled => 1 );
     return { error => "Skill '$skill_name' not found" } if !$skill_path;
+    return { error => "Skill '$skill_name' is disabled" } if !$self->{manager}->is_enabled($skill_name);
 
     my $cmd_path = $self->command_path( $skill_name, $command );
     return { error => "Command '$command' not found in skill '$skill_name'" } if !$cmd_path;
@@ -70,8 +72,9 @@ sub dispatch {
 sub execute_hooks {
     my ( $self, $skill_name, $command, @args ) = @_;
     return { hooks => {}, result_state => {} } if !$skill_name || !$command;
-    my $skill_path = $self->{manager}->get_skill_path($skill_name);
+    my $skill_path = $self->{manager}->get_skill_path( $skill_name, include_disabled => 1 );
     return { hooks => {}, result_state => {} } if !$skill_path;
+    return { hooks => {}, result_state => {} } if !$self->{manager}->is_enabled($skill_name);
 
     my $hooks_dir = File::Spec->catdir( $skill_path, 'cli', "$command.d" );
     return { hooks => {}, result_state => {} } if !-d $hooks_dir;
@@ -129,6 +132,18 @@ sub get_skill_config {
     return $config;
 }
 
+# config_fragment($skill_name)
+# Wraps one installed skill config under its underscored runtime key for merged config use.
+# Input: skill repo name.
+# Output: hash ref containing one underscored skill key and its decoded config.
+sub config_fragment {
+    my ( $self, $skill_name ) = @_;
+    return {} if !$skill_name;
+    my $config = $self->get_skill_config($skill_name);
+    return {} if ref($config) ne 'HASH' || !%{$config};
+    return { '_' . $skill_name => $config };
+}
+
 # get_skill_path($skill_name)
 # Returns the path to an installed skill.
 # Input: skill repo name.
@@ -152,48 +167,168 @@ sub command_path {
 }
 
 # route_response(%args)
-# Serves isolated skill bookmark routes under /skill/<repo>/<route>.
+# Serves isolated skill browser routes and the older /skill bookmark namespace.
 # Input: skill name, route path, and optional web app for rendering.
 # Output: array reference HTTP response.
 sub route_response {
     my ( $self, %args ) = @_;
     my $skill_name = $args{skill_name} || '';
-    my $route      = $args{route} || '';
+    my $route      = defined $args{route} ? $args{route} : '';
     my $skill_path = $self->{manager}->get_skill_path($skill_name)
       or return [ 404, 'text/plain; charset=utf-8', "Skill '$skill_name' not found\n" ];
 
     my @parts = grep { defined && $_ ne '' } split m{/+}, $route;
-    return [ 404, 'text/plain; charset=utf-8', "Skill route '$route' not found\n" ] if !@parts;
+    my $dashboards_root = File::Spec->catdir( $skill_path, 'dashboards' );
+    return [ 404, 'text/plain; charset=utf-8', "Skill '$skill_name' does not provide dashboards\n" ]
+      if !-d $dashboards_root;
 
-    if ( $parts[0] eq 'bookmarks' ) {
-        my $dashboards_root = File::Spec->catdir( $skill_path, 'dashboards' );
-        return [ 404, 'text/plain; charset=utf-8', "Skill '$skill_name' does not provide bookmarks\n" ]
-          if !-d $dashboards_root;
-
+    if ( @parts && $parts[0] eq 'bookmarks' ) {
         if ( @parts == 1 ) {
             opendir( my $dh, $dashboards_root ) or die "Unable to read $dashboards_root: $!";
-            my @items = sort grep { $_ ne '.' && $_ ne '..' && -f File::Spec->catfile( $dashboards_root, $_ ) } readdir($dh);
+            my @items = sort grep {
+                   $_ ne '.'
+                && $_ ne '..'
+                && $_ ne 'nav'
+                && -f File::Spec->catfile( $dashboards_root, $_ )
+            } readdir($dh);
             closedir($dh);
             return [ 200, 'application/json; charset=utf-8', encode_json( { skill => $skill_name, bookmarks => \@items } ) ];
         }
 
-        my $id = join '/', @parts[ 1 .. $#parts ];
-        my $file = File::Spec->catfile( $dashboards_root, $id );
-        return [ 404, 'text/plain; charset=utf-8', "Skill bookmark '$id' not found\n" ] if !-f $file;
-
-        require Developer::Dashboard::PageDocument;
-        open my $fh, '<', $file or die "Unable to read $file: $!";
-        local $/;
-        my $instruction = <$fh>;
-        close $fh;
-        my $page = Developer::Dashboard::PageDocument->from_instruction($instruction);
-        $page->{id} = $id;
-        $page->{meta}{source_kind} = 'skill';
-        $page->{meta}{raw_instruction} = $instruction;
-        return $args{app}->_page_response( $page, 'render' );
+        my $legacy_id = join '/', @parts[ 1 .. $#parts ];
+        return $self->_skill_page_response(
+            %args,
+            skill_name => $skill_name,
+            skill_path => $skill_path,
+            route_id   => $legacy_id,
+        );
     }
 
-    return [ 404, 'text/plain; charset=utf-8', "Skill route '$route' not found\n" ];
+    my $route_id = @parts ? join( '/', @parts ) : 'index';
+    return $self->_skill_page_response(
+        %args,
+        skill_name => $skill_name,
+        skill_path => $skill_path,
+        route_id   => $route_id,
+    );
+}
+
+# skill_nav_pages($skill_name)
+# Loads the skill-local nav/*.tt or bookmark pages used by /app/<skill> routes.
+# Input: skill repo name.
+# Output: array ref of prepared page documents before runtime state is applied.
+sub skill_nav_pages {
+    my ( $self, $skill_name ) = @_;
+    return [] if !$skill_name;
+    my $skill_path = $self->{manager}->get_skill_path($skill_name) or return [];
+    my $nav_root = File::Spec->catdir( $skill_path, 'dashboards', 'nav' );
+    return [] if !-d $nav_root;
+
+    opendir my $dh, $nav_root or die "Unable to read $nav_root: $!";
+    my @pages;
+    for my $entry (
+        sort grep {
+               $_ ne '.'
+            && $_ ne '..'
+            && -f File::Spec->catfile( $nav_root, $_ )
+        } readdir $dh
+      )
+    {
+        push @pages, $self->_load_skill_page(
+            skill_name => $skill_name,
+            skill_path => $skill_path,
+            route_id   => 'nav/' . $entry,
+        );
+    }
+    closedir $dh;
+    return \@pages;
+}
+
+# all_skill_nav_pages()
+# Loads nav bookmark pages from every installed skill in deterministic skill order.
+# Input: none.
+# Output: array ref of prepared page documents before runtime state is applied.
+sub all_skill_nav_pages {
+    my ($self) = @_;
+    my @pages;
+    for my $skill_root ( $self->{manager}{paths}->installed_skill_roots ) {
+        my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
+        next if !defined $skill_name || $skill_name eq '';
+        push @pages, @{ $self->skill_nav_pages($skill_name) || [] };
+    }
+    return \@pages;
+}
+
+# _skill_page_response(%args)
+# Loads one skill page and optionally hands it to the web app renderer.
+# Input: skill name, skill path, route id, and optional app plus request metadata.
+# Output: response array reference.
+sub _skill_page_response {
+    my ( $self, %args ) = @_;
+    my $page = eval {
+        $self->_load_skill_page(
+            skill_name => $args{skill_name},
+            skill_path => $args{skill_path},
+            route_id   => $args{route_id},
+        );
+    };
+    return [ 404, 'text/plain; charset=utf-8', "Skill bookmark '$args{route_id}' not found\n" ] if !$page || $@;
+    return [ 200, 'text/plain; charset=utf-8', $page->{meta}{raw_instruction} || $page->canonical_instruction ]
+      if !$args{app};
+
+    my $app = $args{app};
+    $page = $app->_page_with_runtime_state(
+        $page,
+        query_params => $args{query_params} || {},
+        body_params  => $args{body_params}  || {},
+        path         => $args{path} || '/app/' . $page->{id},
+        remote_addr  => $args{remote_addr},
+        headers      => $args{headers} || {},
+    );
+    $page = $app->{runtime}->prepare_page(
+        page            => $page,
+        source          => 'skill',
+        runtime_context => { params => { %{ $args{query_params} || {} }, %{ $args{body_params} || {} } } },
+    );
+    return $app->_page_response( $page, 'render' );
+}
+
+# _load_skill_page(%args)
+# Loads one skill page document from dashboards/<id> and namespaces its page id under /app/<skill>/...
+# Input: skill name, skill path, and relative route id such as index, foo, or nav/file.tt.
+# Output: page document object.
+sub _load_skill_page {
+    my ( $self, %args ) = @_;
+    my $skill_name = $args{skill_name} || die 'Missing skill name';
+    my $skill_path = $args{skill_path} || die 'Missing skill path';
+    my $route_id   = $args{route_id}   || die 'Missing route id';
+    my $file = File::Spec->catfile( $skill_path, 'dashboards', split m{/+}, $route_id );
+    die "Skill bookmark '$route_id' not found" if !-f $file;
+
+    require Developer::Dashboard::PageDocument;
+    open my $fh, '<', $file or die "Unable to read $file: $!";
+    local $/;
+    my $instruction = <$fh>;
+    close $fh;
+
+    my $page = eval { Developer::Dashboard::PageDocument->from_instruction($instruction) };
+    if ( !$page && $route_id =~ m{\Anav/.+\.tt\z} ) {
+        $page = Developer::Dashboard::PageDocument->new(
+            id     => $skill_name . '/' . $route_id,
+            title  => $route_id,
+            layout => { body => $instruction },
+            meta   => { source_format => 'raw-nav-tt' },
+        );
+    }
+    die( $@ || "Unable to parse skill bookmark '$route_id'" ) if !$page;
+
+    $page->{id} = $skill_name . ( $route_id eq 'index' ? '' : '/' . $route_id );
+    $page->{meta}{source_kind}      = 'skill';
+    $page->{meta}{skill_name}       = $skill_name;
+    $page->{meta}{skill_route_id}   = $route_id;
+    $page->{meta}{skill_path}       = $skill_path;
+    $page->{meta}{raw_instruction}  = $instruction;
+    return $page;
 }
 
 # _skill_env(%args)

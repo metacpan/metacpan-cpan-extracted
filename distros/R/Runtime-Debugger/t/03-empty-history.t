@@ -66,6 +66,7 @@ sub _define_help_stdout {
         ' p DATA         - Data printer (colored).',
         ' d DATA         - Data dumper.',
         ' dd DATA, [N=3] - Dump internals (with depth).',
+        ' vars           - Show available variables.',
         ' q              - Quit debugger.',
         ''
     ]

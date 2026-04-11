@@ -354,14 +354,14 @@ All classes are written to be extensible.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

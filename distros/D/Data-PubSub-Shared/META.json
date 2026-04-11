@@ -28,11 +28,13 @@
       "configure" : {
          "requires" : {
             "Devel::PPPort" : "0",
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "XS::Parse::Keyword::Builder" : "0.40"
          }
       },
       "runtime" : {
          "requires" : {
+            "XS::Parse::Keyword" : "0.40",
             "perl" : "5.022"
          }
       },
@@ -43,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

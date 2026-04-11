@@ -3,13 +3,12 @@ package Developer::Dashboard::CLI::Query;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Exporter 'import';
-use FindBin qw($Bin);
-use lib "$Bin/../../lib";
 
 use TOML::Tiny ();
+use XML::Parser ();
 use YAML::XS ();
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
@@ -31,7 +30,7 @@ sub run_query_command {
         command => $command,
         text    => $raw,
     );
-    my $value = $path eq '' ? $data : _extract_query_path( $data, $path );
+    my $value = _select_query_value( $data, $path );
     _print_query_value($value);
     _command_exit(0);
 }
@@ -53,7 +52,7 @@ sub _split_query_args {
         push @rest, $arg;
     }
 
-    my $path = @rest ? $rest[0] : '';
+    my $path = @rest ? join( ' ', @rest ) : '';
     return ( $path, $file );
 }
 
@@ -128,6 +127,67 @@ sub _extract_query_path {
     }
 
     return $value;
+}
+
+# _path_uses_perl_expression($path)
+# Decides whether a query path should be treated as a Perl expression over $d instead of dotted traversal.
+# Input: raw query path string.
+# Output: true when the path requires Perl-expression evaluation.
+sub _path_uses_perl_expression {
+    my ($path) = @_;
+    return 0 if !defined $path || $path eq '' || $path eq '$d' || $path eq '.';
+    return 0 if $path =~ /^\$d(?:\.[A-Za-z0-9_]+)*\z/;
+    return index( $path, '$d' ) >= 0 ? 1 : 0;
+}
+
+# _select_query_value($data, $path)
+# Chooses either dotted-path traversal or Perl-expression evaluation for the requested query selector.
+# Input: parsed Perl data structure and raw path or expression string.
+# Output: selected scalar, hash ref, array ref, or undef.
+sub _select_query_value {
+    my ( $data, $path ) = @_;
+    return $data if !defined $path || $path eq '';
+    return _evaluate_query_expression( $data, $path ) if _path_uses_perl_expression($path);
+    return _extract_query_path( $data, $path );
+}
+
+# _evaluate_query_expression($data, $expr)
+# Evaluates a user-supplied Perl expression with $d bound to the decoded query data.
+# Input: parsed Perl data structure and expression string.
+# Output: scalar result, array ref for list results, or undef.
+sub _evaluate_query_expression {
+    my ( $data, $expr ) = @_;
+    my $code = eval <<"PERL_EVAL";
+sub {
+    my (\$d) = \@_;
+    return do { $expr };
+}
+PERL_EVAL
+    die "Query expression '$expr' failed: $@" if $@;
+
+    if ( $expr =~ /^\s*scalar\b/ ) {
+        my $scalar = eval { scalar $code->($data) };
+        die "Query expression '$expr' failed: $@" if $@;
+        return $scalar;
+    }
+
+    my @list = eval { $code->($data) };
+    die "Query expression '$expr' failed: $@" if $@;
+    return \@list if _expression_prefers_list_output($expr);
+    return \@list if @list > 1;
+    return $list[0] if @list == 1;
+    return [];
+}
+
+# _expression_prefers_list_output($expr)
+# Detects common list-oriented Perl query expressions so one-item list results stay list-shaped.
+# Input: raw query expression string.
+# Output: true when the expression should keep list context output as an array ref.
+sub _expression_prefers_list_output {
+    my ($expr) = @_;
+    return 0 if !defined $expr || $expr =~ /^\s*scalar\b/;
+    return 0 if $expr =~ /\bjoin\b/;
+    return $expr =~ /\b(?:sort|map|grep|keys|values)\b/ ? 1 : 0;
 }
 
 # _print_query_value($value)
@@ -249,9 +309,67 @@ sub _parse_csv {
 # Output: hash reference with tag structure.
 sub _parse_xml {
     my ($text) = @_;
-    my %xml;
-    $xml{_raw} = $text;
-    return \%xml;
+    my $parser = XML::Parser->new( Style => 'Tree' );
+    my $tree = $parser->parse($text);
+    return _xml_tree_to_data($tree);
+}
+
+# _xml_tree_to_data($tree)
+# Converts the XML::Parser tree output into a hash/array/scalar structure that dotted paths and $d expressions can traverse.
+# Input: XML::Parser tree array reference.
+# Output: hash reference keyed by the document root tag.
+sub _xml_tree_to_data {
+    my ($tree) = @_;
+    die 'XML tree must be an array reference' if ref($tree) ne 'ARRAY' || @{$tree} < 2;
+    my ( $root_name, $root_children ) = @{$tree};
+    return {
+        $root_name => _xml_element_payload($root_children),
+    };
+}
+
+# _xml_element_payload($children)
+# Converts one XML::Parser child array into the dashboard XML query payload form.
+# Input: XML::Parser child array reference.
+# Output: scalar text, hash ref, or array-backed element payload.
+sub _xml_element_payload {
+    my ($children) = @_;
+    die 'XML element payload must be an array reference' if ref($children) ne 'ARRAY';
+    my $attrs = $children->[0];
+    my @items = @{$children}[ 1 .. $#$children ];
+    my @text;
+    my %elements;
+    my %repeated;
+
+    while (@items) {
+        my $name = shift @items;
+        my $value = shift @items;
+        if ( defined $name && $name eq '0' ) {
+            push @text, $value if defined $value && $value !~ /^\s*$/;
+            next;
+        }
+
+        my $decoded = _xml_element_payload($value);
+        if ( exists $elements{$name} ) {
+            if ( !$repeated{$name} ) {
+                $elements{$name} = [ $elements{$name} ];
+                $repeated{$name} = 1;
+            }
+            push @{ $elements{$name} }, $decoded;
+            next;
+        }
+        $elements{$name} = $decoded;
+    }
+
+    my $text = join '', @text;
+    my $has_attrs = ref($attrs) eq 'HASH' && keys %{$attrs};
+    my $has_children = keys %elements ? 1 : 0;
+
+    return $text if !$has_attrs && !$has_children;
+
+    my %node = %elements;
+    $node{_attributes} = $attrs if $has_attrs;
+    $node{_text} = $text if $text ne '';
+    return \%node;
 }
 
 # _command_exit($code)
@@ -292,35 +410,37 @@ compatibility.
 
 This module is the shared parser and dispatcher behind the lightweight query
 commands for JSON, YAML, TOML, Java properties, INI, CSV, and XML. It owns the
-common contract for every query helper: accept an optional dotted path plus an
-optional file path in either order, read from STDIN when no file is given,
-parse the requested format, and print either a scalar value or canonical JSON
-for structured data.
+common contract for every query helper: accept an optional dotted path or
+C<$d>-based Perl expression plus an optional file path in either order, read
+from STDIN when no file is given, parse the requested format, and print either
+a scalar value or canonical JSON for structured data.
 
 =head1 WHY IT EXISTS
 
 It exists because the dashboard ships a family of query commands that should
 feel consistent across file formats. Keeping parser selection, source
-selection, dotted-path traversal, and scalar-vs-structure output rules in one
-module prevents the helper wrappers from drifting apart and keeps release tests
-focused on one implementation.
+selection, dotted-path traversal, C<$d> expression handling, and
+scalar-vs-structure output rules in one module prevents the helper wrappers
+from drifting apart and keeps release tests focused on one implementation.
 
 =head1 WHEN TO USE
 
-Use this file when changing dotted-path semantics, format-specific parsing
-behavior, file-vs-STDIN selection, scalar-vs-JSON output, or the exact error
-surface for malformed input and missing path segments.
+Use this file when changing dotted-path semantics, C<$d> expression semantics,
+format-specific parsing behavior, file-vs-STDIN selection, scalar-vs-JSON
+output, or the exact error surface for malformed input and missing path
+segments.
 
 =head1 HOW TO USE
 
 Call C<run_query_command> from a staged helper such as C<jq> or C<tomq>,
 passing the helper name and the raw argv list. The module treats the first
-existing file argument as the input source, treats the remaining non-file
-argument as the dotted query path, accepts C<$d> or C<.> for the whole parsed
-document, and prints scalars as plain text while arrays and hashes are emitted
-as canonical JSON. The XML path is intentionally minimal right now: the helper
-stores the raw XML payload under C<_raw> rather than pretending to offer a full
-tree query language.
+existing file argument as the input source, rejoins the remaining non-file
+arguments into one query string, accepts C<$d> or C<.> for the whole parsed
+document, uses dotted traversal for plain path strings, and evaluates real
+C<$d>-based Perl expressions such as C<sort keys %$d> against the decoded data.
+Scalars print as plain text while arrays and hashes are emitted as canonical
+JSON. The XML path now decodes XML into nested hashes and arrays so dotted
+paths and C<$d> expressions work there too.
 
 =head1 WHAT USES IT
 
@@ -333,10 +453,12 @@ root-document queries, and format-specific edge cases.
 
   printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta
   dashboard jq response.json '$d'
+  dashboard jq response.json 'sort keys %$d'
   printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta
   printf 'alpha.beta=5\nname=demo\n' | dashboard propq '$d'
   printf 'alpha,beta\n7,8\n' | dashboard csvq 1.1
-  printf '<root><value>demo</value></root>' | dashboard xmlq _raw
+  printf '<root><value>demo</value></root>' | dashboard xmlq root.value
+  printf '<root><item id="1">x</item><item id="2">y</item></root>' | dashboard xmlq 'join q(,), map { $_->{_attributes}{id} } @{ $d->{root}{item} }'
 
 =for comment FULL-POD-DOC END
 

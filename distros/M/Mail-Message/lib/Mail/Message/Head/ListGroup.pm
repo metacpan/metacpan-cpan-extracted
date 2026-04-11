@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.04.
+# This code is part of Perl distribution Mail-Message version 4.05.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -13,7 +13,7 @@
 #XXX Add Simplelists
 
 package Mail::Message::Head::ListGroup;{
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 }
 
 use parent 'Mail::Message::Head::FieldGroup';
@@ -94,7 +94,7 @@ sub from($)
 	elsif(defined($field) && $field =~ m/(ezmlm)/i )
 	{	$type    = 'Ezmlm' }
 	elsif(my $fml = $head->get('X-MLServer'))
-	{	($software, $version) = $fml =~ m/^\s*(\S+)\s*\[\S*\s*([^\]]*?)\s*\]/;
+	{	($software, $version) = $fml =~ m/^\s*([^\s\[]+)\s*\[\S*\s*([^\]]*?)\s*\]/;
 		$type    = 'FML';
 	}
 	elsif(defined($field = $head->get('List-Subscribe') || $head->get('List-Unsubscribe')) && $field =~ m/sympa/i)

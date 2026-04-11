@@ -73,6 +73,7 @@ Inherited, see L<Mail::Reporter/"Constructors">
   head_type   Mail::Message    Mail::Message::Replace::MailHeader
   labels      Mail::Message    +{}
   messageId   Mail::Message    undef
+  message_id  Mail::Message    undef
   modified    Mail::Message    false
   trusted     Mail::Message    false
 
@@ -120,6 +121,8 @@ Passed to L<Mail::Message::Replace::MailHeader::new(Modify)|Mail::Message::Repla
 
 =item messageId => $id
 
+=item message_id => $id
+
 =item modified => BOOLEAN
 
 =item trusted => BOOLEAN
@@ -147,6 +150,22 @@ Extends L<"Attributes" in Mail::Message|Mail::Message/"Attributes">.
 =item $obj-E<gt>B<MailFrom>( [STRING] )
 
 Your email address.
+
+=item $obj-E<gt>B<bodyType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<fieldType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<headType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<messageId>()
+
+Inherited, see L<Mail::Message/"Attributes">
 
 =back
 
@@ -302,14 +321,14 @@ default of C<quote> is "E<gt> ", in stead of "E<gt>".
 Copy all header fields with the specified NAMES from the source to the
 reply message.
 
-=item Message-ID => STRING
+=item Message-ID => $field|$line
 
 =item ReplyAll => BOOLEAN
 
 Reply to the group?  Translated into L<reply(group_reply)|Mail::Message::Construct::Reply/"Constructing a message">, which has
 as default the exact oposite of this option, being C<true>.
 
-=item Subject => STRING|CODE
+=item Subject => $field|$line|CODE
 
 =item To => $body|$address|\@addresses
 
@@ -389,10 +408,6 @@ Inherited, see L<Mail::Message/"The message">
 Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<isPart>()
-
-Inherited, see L<Mail::Message/"The message">
-
-=item $obj-E<gt>B<messageId>()
 
 Inherited, see L<Mail::Message/"The message">
 
@@ -752,6 +767,10 @@ Improves base, see L<Mail::Message/"Internals">
 
 Inherited, see L<Mail::Message/"Internals">
 
+=item $obj-E<gt>B<isTrusted>()
+
+Inherited, see L<Mail::Message/"Internals">
+
 =item $obj-E<gt>B<readBody>( $parser, $head, [$bodytype] )
 
 Inherited, see L<Mail::Message/"Internals">
@@ -897,8 +916,8 @@ Cast by C<build()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

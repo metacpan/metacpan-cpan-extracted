@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '0.562';
+our $VERSION = '0.563';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
@@ -62,7 +62,7 @@ sub _valid_options {
         hide_cursor        => '[ 0 1 2 ]',         # hide_cursor == 2 # documentation
         page               => '[ 0 1 2 ]',         # undocumented
         keep               => '[ 1-9 ][ 0-9 ]*',   # undocumented
-        read_only          => 'Array_Int',
+        read_only          => 'Array_Int_Idx',
         skip_items         => 'Regexp',
                                                    # only keys are checked, passed values are ignored
                                                    # it's up to the user to remove the skipped items from the returned array
@@ -1170,7 +1170,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.562
+Version 0.563
 
 =cut
 
@@ -1396,7 +1396,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2025 Matthäus Kiem.
+Copyright 2014-2026 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

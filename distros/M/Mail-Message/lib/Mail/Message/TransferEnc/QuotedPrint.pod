@@ -83,7 +83,7 @@ Inherited, see L<Mail::Message::TransferEnc/"Encoding">
 Decoding is tricky, and not without loss of information.  Lines will
 stay separate lines, although they might have been joined before the
 encoding split them up.  Characters which are not printable will be
-replaced by their octal value, and carriage returns (C<'=0D'>) at
+replaced by their octal value, and carriage returns (“C<=0D>”) at
 end of line are removed.
 Improves base, see L<Mail::Message::TransferEnc/"Encoding">
 
@@ -99,8 +99,8 @@ Improves base, see L<Mail::Message::TransferEnc/"Encoding">
 =item $obj-E<gt>B<encode>($body, %options)
 
 Encoding is to quoted-printable is a careful process: All characters
-outside the normal printing range, and including C<'='> are encoded.
-They are translated into a C<'='> followed by a two digit hex of the
+outside the normal printing range, and including “C<< = >>” are encoded.
+They are translated into a “C<< = >>” followed by a two digit hex of the
 ascii value of the character.  The same treatment is for white-spaces
 at the end of a line.
 
@@ -175,8 +175,8 @@ Cast by C<create()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

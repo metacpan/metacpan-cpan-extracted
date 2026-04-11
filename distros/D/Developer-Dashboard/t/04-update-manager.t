@@ -42,42 +42,56 @@ my $updater = Developer::Dashboard::UpdateManager->new(
 chdir $repo or die $!;
 my $result = $updater->run;
 ok(ref($result) eq 'ARRAY', 'update returns array of step results');
-ok(@$result >= 3, 'all update steps executed');
+if ( -d "$repo/updates" ) {
+    ok(@$result >= 3, 'all update steps executed');
 
-ok(-f $files->global_config, 'global config written');
-is_deeply( json_decode( $files->read('global_config') ), {}, 'update bootstrap creates an empty config.json instead of seeding example collectors' );
-ok(-f $paths->dashboards_root . '/api-dashboard', 'api-dashboard page written');
-ok(-f $paths->dashboards_root . '/sql-dashboard', 'sql-dashboard page written');
-ok(!-f $paths->dashboards_root . '/welcome', 'welcome page is no longer written');
-ok(-f $paths->config_root . '/shell/bashrc.sh', 'shell bootstrap written');
+    ok(-f $files->global_config, 'global config written');
+    is_deeply( json_decode( $files->read('global_config') ), {}, 'update bootstrap creates an empty config.json instead of seeding example collectors' );
+    ok(-f $paths->dashboards_root . '/api-dashboard', 'api-dashboard page written');
+    ok(-f $paths->dashboards_root . '/sql-dashboard', 'sql-dashboard page written');
+    ok(!-f $paths->dashboards_root . '/welcome', 'welcome page is no longer written');
+    ok(-f $paths->config_root . '/shell/bashrc.sh', 'shell bootstrap written');
 
-my $stale_sql_dashboard = <<'BOOKMARK';
+    my $stale_sql_dashboard = <<'BOOKMARK';
 TITLE: SQL Dashboard
 :--------------------------------------------------------------------------------:
 BOOKMARK: sql-dashboard
 :--------------------------------------------------------------------------------:
 HTML: <div id="stale-sql-dashboard">stale update copy</div>
 BOOKMARK
-my $stale_sql_path = $paths->dashboards_root . '/sql-dashboard';
-open my $stale_sql_fh, '>:raw', $stale_sql_path or die "Unable to write $stale_sql_path: $!";
-print {$stale_sql_fh} $stale_sql_dashboard;
-close $stale_sql_fh or die "Unable to close $stale_sql_path: $!";
-my $seed_manifest_path = $paths->config_root . '/seeded-pages.json';
-make_path( $paths->config_root ) if !-d $paths->config_root;
-open my $seed_manifest_fh, '>:raw', $seed_manifest_path or die "Unable to write $seed_manifest_path: $!";
-print {$seed_manifest_fh} qq|{"sql-dashboard":{"asset":"sql-dashboard.page","md5":"|
-  . Developer::Dashboard::SeedSync::content_md5($stale_sql_dashboard)
-  . qq|"}}\n|;
-close $seed_manifest_fh or die "Unable to close $seed_manifest_path: $!";
+    my $stale_sql_path = $paths->dashboards_root . '/sql-dashboard';
+    open my $stale_sql_fh, '>:raw', $stale_sql_path or die "Unable to write $stale_sql_path: $!";
+    print {$stale_sql_fh} $stale_sql_dashboard;
+    close $stale_sql_fh or die "Unable to close $stale_sql_path: $!";
+    my $seed_manifest_path = $paths->config_root . '/seeded-pages.json';
+    make_path( $paths->config_root ) if !-d $paths->config_root;
+    open my $seed_manifest_fh, '>:raw', $seed_manifest_path or die "Unable to write $seed_manifest_path: $!";
+    print {$seed_manifest_fh} qq|{"sql-dashboard":{"asset":"sql-dashboard.page","md5":"|
+      . Developer::Dashboard::SeedSync::content_md5($stale_sql_dashboard)
+      . qq|"}}\n|;
+    close $seed_manifest_fh or die "Unable to close $seed_manifest_path: $!";
 
-my $refresh_result = $updater->run;
-ok( ref($refresh_result) eq 'ARRAY', 'update rerun still returns the step results array after a stale managed seed is present' );
-open my $refreshed_sql_fh, '<:raw', $stale_sql_path or die "Unable to read $stale_sql_path: $!";
-my $refreshed_sql_dashboard = do { local $/; <$refreshed_sql_fh> };
-close $refreshed_sql_fh or die "Unable to close $stale_sql_path: $!";
-unlike( $refreshed_sql_dashboard, qr/stale update copy/, 'update rerun refreshes a stale dashboard-managed sql-dashboard saved page' );
-like( $refreshed_sql_dashboard, qr/data-sql-workspace-tab="run"/, 'update rerun refreshes the current SQL workspace subtab layout into sql-dashboard' );
-like( $refreshed_sql_dashboard, qr/id="sql-table-filter"/, 'update rerun refreshes the current schema filter UI into sql-dashboard' );
+    my $refresh_result = $updater->run;
+    ok( ref($refresh_result) eq 'ARRAY', 'update rerun still returns the step results array after a stale managed seed is present' );
+    open my $refreshed_sql_fh, '<:raw', $stale_sql_path or die "Unable to read $stale_sql_path: $!";
+    my $refreshed_sql_dashboard = do { local $/; <$refreshed_sql_fh> };
+    close $refreshed_sql_fh or die "Unable to close $stale_sql_path: $!";
+    unlike( $refreshed_sql_dashboard, qr/stale update copy/, 'update rerun refreshes a stale dashboard-managed sql-dashboard saved page' );
+    like( $refreshed_sql_dashboard, qr/data-sql-workspace-tab="run"/, 'update rerun refreshes the current SQL workspace subtab layout into sql-dashboard' );
+    like( $refreshed_sql_dashboard, qr/id="sql-table-filter"/, 'update rerun refreshes the current schema filter UI into sql-dashboard' );
+}
+else {
+    is_deeply( $result, [], 'built distribution without checkout-only updates returns no update steps' );
+}
+
+my $missing_updates_root = tempdir( CLEANUP => 1 );
+my $missing_updates_path = $missing_updates_root . '/does-not-exist';
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::UpdateManager::updates_dir = sub { $missing_updates_path };
+    my $missing_result = $updater->run;
+    is_deeply( $missing_result, [], 'update returns an empty step list when the checkout-only updates directory is absent' );
+}
 
 done_testing;
 

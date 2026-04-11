@@ -1,5 +1,67 @@
 Revision history for App-Test-Generator
 
+0.31	Fri Apr 10 08:07:40 EDT 2026
+
+    - Added TER3 (LCSAJ path coverage) column to mutation files table in
+      the test dashboard index, showing percentage and raw fraction
+      (e.g. "71.8% (352/491)")
+    - Added TER1, TER2 and TER3 metrics to per-file mutation report pages,
+      replacing the plain "Statement" and "Branch" labels with their
+      formal Test Effectiveness Ratio names
+    - Renamed the LCSAJ column header in the mutation files table to TER3
+    - With min set to zero on an integer, sometimes negative or floats could be created - added abs() and int() calls as needed
+    - Added --generate_mutant_tests=DIR option to generate_index.pl to
+      produce a timestamped test stub file (t/mutant_YYYYMMDD_HHMMSS.t)
+      for surviving mutants. High/Medium difficulty survivors get TODO
+      test stubs; Low difficulty survivors get comment-only hints.
+      Multiple mutations on the same source line are deduplicated into
+      one stub listing all variants — one good test kills them all.
+      Boundary value suggestions are generated for numeric mutations,
+      clamped and deduplicated for non-negative contexts such as
+      scalar() and length(). Environment variable hints are added where
+      the source line references $ENV{...}. The enclosing subroutine
+      name is shown in each stub for navigation context. File is skipped
+      if there are no survivors or low-difficulty hints to report.
+    - LCSAJ path dots on per-file mutation pages are now coloured blue
+      (covered) or red (not covered), based on whether any line in the
+      path range was executed during testing. Uncovered paths show
+      [NOT COVERED] in the hover tooltip. The LCSAJ legend is updated
+      to explain both colours.
+    - Replaced TER3-only column in mutation files table with a
+      TER1 / TER2 / TER3 triple, each component shown as a
+      colour-coded badge (green/yellow/red). TER1=Statement,
+      TER2=Branch, TER3=LCSAJ path coverage. Any component
+      without data shows a grey n/a badge. Column header carries
+      a tooltip defining all three metrics.
+    - Added --generate_test=mutant option to generate_index.pl (used
+      alongside --generate_mutant_tests=DIR). For NUM_BOUNDARY survivors,
+      attempts to produce a runnable YAML schema file in t/conf/ using
+      App::Test::Generator::SchemaExtractor rather than a TODO stub.
+      The schema is augmented with boundary values from the surviving
+      mutant (the exact boundary value plus one either side) and picked
+      up automatically by t/fuzz.t on the next test run. Falls back to
+      a TODO stub if SchemaExtractor fails, the enclosing sub cannot be
+      found, or confidence in the extracted schema is too low. The
+      --generate_test option is designed to accept future classes beyond
+      'mutant'. Updated generate_test_dashboard Step 7 to pass
+      --generate_test=mutant by default.
+    - Made output_dir optional in App::Test::Generator::SchemaExtractor
+      new() -- it is now only required if schema files will be written.
+      extract_all() gains a no_write option to suppress file output and
+      return schemas only, for use by callers that want to inspect or
+      augment schemas before deciding where to write them.
+    - Added --generate_fuzz flag to generate_index.pl. Scans t/conf/
+      for existing YAML schema files and writes timestamped augmented
+      copies (mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml) with boundary
+      values from surviving NUM_BOUNDARY mutants merged in. The original
+      schema is never modified. Augmented schemas are picked up
+      automatically by t/fuzz.t. Schemas with no matching survivors are
+      skipped (with a verbose note). Boundary values are merged into
+      whichever edge key already exists in the schema (edge_case_array
+      or edge_cases), with deduplication. Schemas already prefixed with
+      mutant_fuzz_ are skipped to prevent cascading augmentation.
+      Updated generate_test_dashboard Step 7 to pass --generate_fuzz.
+
 0.30	Thu Apr  2 07:17:16 EDT 2026
 	Added mutation levels.
 		Setting to fast will reduce the number of mutants by deduping and removing unnecessary mutants.

@@ -241,7 +241,7 @@ open my $duplicate_fh, '>', $duplicate_file or die "Unable to write $duplicate_f
 print {$duplicate_fh} "alpha second\n";
 close $duplicate_fh;
 
-my $scope_root = File::Spec->catdir( $project_root, 'scope-fixtures' );
+my $scope_root = File::Spec->catdir( $project_root, 'jq-parent', 'scope-fixtures' );
 my $scope_cli_root = File::Spec->catdir( $scope_root, 'cli' );
 my $scope_js_root  = File::Spec->catdir( $scope_root, 'public', 'js' );
 make_path( $scope_cli_root, $scope_js_root );
@@ -273,7 +273,7 @@ is( $scope_line, 0, 'scoped jq search keeps line number at zero' );
 is_deeply(
     \@scope_match,
     [ $scope_jq, $scope_jq_js, $scope_jquery ],
-    'scoped jq search ranks exact jq helper and jq.js ahead of jquery.js',
+    'scoped jq search ranks exact jq helper and jq.js ahead of jquery.js and ignores unrelated parent-path matches outside the chosen scope root',
 );
 my ( $scope_regex_line, @scope_regex_match ) = Developer::Dashboard::CLI::OpenFile::_resolve_open_file_matches(
     paths => $registry,
@@ -507,6 +507,10 @@ my ( $path_b, $file_b ) = Developer::Dashboard::CLI::Query::_split_query_args( $
 is( $path_b, 'alpha.beta', 'query splitting keeps the query path when it comes second' );
 is( $file_b, $notes_file, 'query splitting keeps the file path when it comes first' );
 
+my ( $path_c, $file_c ) = Developer::Dashboard::CLI::Query::_split_query_args( 'sort', 'keys', '%$d', $notes_file );
+is( $path_c, 'sort keys %$d', 'query splitting rejoins split Perl-expression argv pieces into one query path' );
+is( $file_c, $notes_file, 'query splitting still extracts the file path when Perl-expression argv pieces are split' );
+
 my $json_file = File::Spec->catfile( $project_root, 'sample.json' );
 open my $json_fh, '>', $json_file or die "Unable to write $json_file: $!";
 print {$json_fh} qq|{"alpha":{"beta":[1,2],"gamma":"ok"}}|;
@@ -558,10 +562,88 @@ eval {
 };
 like( $@, qr/Unsupported data query command/, 'unsupported query command dies clearly' );
 
+my $xml_data = Developer::Dashboard::CLI::Query::_parse_query_input(
+    command => 'xmlq',
+    text    => '<root><value>demo</value><item id="1">x</item><item id="2">y</item></root>',
+);
+is_deeply(
+    $xml_data,
+    {
+        root => {
+            value => 'demo',
+            item  => [
+                { _attributes => { id => '1' }, _text => 'x' },
+                { _attributes => { id => '2' }, _text => 'y' },
+            ],
+        },
+    },
+    'XML query parsing decodes the document into nested Perl data instead of returning only raw XML',
+);
+
 is( Developer::Dashboard::CLI::Query::_extract_query_path( $json_data, 'alpha.gamma' ), 'ok', 'nested hash extraction works' );
 is( Developer::Dashboard::CLI::Query::_extract_query_path( $json_data, 'alpha.beta.1' ), 2, 'array extraction works' );
 is( Developer::Dashboard::CLI::Query::_extract_query_path( { 'alpha.beta' => 9 }, 'alpha.beta' ), 9, 'exact dotted-key extraction works before segment splitting' );
 is_deeply( Developer::Dashboard::CLI::Query::_extract_query_path( $json_data, '$d' ), $json_data, 'whole-document selector returns the full data structure' );
+is( Developer::Dashboard::CLI::Query::_extract_query_path( $xml_data, 'root.item.1._attributes.id' ), '2', 'XML dotted-path extraction works against decoded XML attribute hashes' );
+
+ok( !Developer::Dashboard::CLI::Query::_path_uses_perl_expression('$d.alpha.beta'), 'plain $d dotted selectors stay on the dotted-path traversal route' );
+ok( !Developer::Dashboard::CLI::Query::_path_uses_perl_expression('.'), 'dot shorthand stays on the dotted-path traversal route' );
+ok( Developer::Dashboard::CLI::Query::_path_uses_perl_expression('sort keys %$d'), 'paths that use $d as a Perl expression are detected for eval handling' );
+
+is_deeply(
+    Developer::Dashboard::CLI::Query::_select_query_value( $json_data, '' ),
+    $json_data,
+    'query selection returns the whole document for an empty query path',
+);
+
+my $query_expression_scalar = Developer::Dashboard::CLI::Query::_select_query_value( $json_data, '$d->{alpha}{gamma}' );
+is( $query_expression_scalar, 'ok', 'query selection evaluates scalar Perl expressions against decoded data' );
+
+my $query_expression_list = Developer::Dashboard::CLI::Query::_select_query_value( { foo => [ 1, 2 ], bar => [ 3 ] }, 'sort keys %$d' );
+is_deeply( $query_expression_list, [ 'bar', 'foo' ], 'query selection preserves list-valued Perl expressions as arrays' );
+
+my $query_expression_single_list = Developer::Dashboard::CLI::Query::_select_query_value( { alpha => { beta => 2 } }, 'sort keys %$d' );
+is_deeply( $query_expression_single_list, ['alpha'], 'query selection keeps one-item list expressions as arrays instead of collapsing them to scalars' );
+
+my $query_expression_empty = Developer::Dashboard::CLI::Query::_select_query_value( $json_data, 'grep { $_ eq q(nope) } sort keys %$d' );
+is_deeply( $query_expression_empty, [], 'query selection preserves empty list Perl-expression results as empty arrays' );
+
+my $query_expression_plain_empty = Developer::Dashboard::CLI::Query::_select_query_value( $json_data, 'do { my $copy = $d; () }' );
+is_deeply( $query_expression_plain_empty, [], 'query selection returns an empty array for non-list-preferring Perl expressions that yield no values' );
+
+my $query_expression_join = Developer::Dashboard::CLI::Query::_select_query_value( { foo => [ 7, 8 ] }, 'join q(-), @{ $d->{foo} }' );
+is( $query_expression_join, '7-8', 'query selection keeps join-based Perl expressions scalar even though they contain list operators internally' );
+
+my $query_expression_zero = Developer::Dashboard::CLI::Query::_select_query_value( $json_data, 'scalar grep { $_ eq q(nope) } sort keys %$d' );
+is( $query_expression_zero, 0, 'query selection preserves scalar Perl-expression results without turning them into empty arrays' );
+
+my $query_expression_error = _dies(
+    sub {
+        Developer::Dashboard::CLI::Query::_select_query_value( $json_data, 'do { my $x = $d->{missing}; die q(nope) }' );
+    }
+);
+like( $query_expression_error, qr/Query expression .* failed:/, 'query selection surfaces Perl-expression failures clearly' );
+
+my $query_expression_compile_error = _dies(
+    sub {
+        Developer::Dashboard::CLI::Query::_select_query_value( $json_data, '$d->{' );
+    }
+);
+like( $query_expression_compile_error, qr/Query expression .* failed:/, 'query selection surfaces Perl-expression compile failures clearly' );
+
+my $xml_tree_error = _dies(
+    sub {
+        Developer::Dashboard::CLI::Query::_xml_tree_to_data('nope');
+    }
+);
+like( $xml_tree_error, qr/XML tree must be an array reference/, 'XML tree decoding dies clearly for invalid tree inputs' );
+
+my $xml_payload_error = _dies(
+    sub {
+        Developer::Dashboard::CLI::Query::_xml_element_payload('nope');
+    }
+);
+like( $xml_payload_error, qr/XML element payload must be an array reference/, 'XML payload decoding dies clearly for invalid payload inputs' );
 
 eval { Developer::Dashboard::CLI::Query::_extract_query_path( $json_data, 'alpha.missing' ) };
 like( $@, qr/Missing path segment 'missing'/, 'missing hash segment dies clearly' );

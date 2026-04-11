@@ -590,6 +590,55 @@ subtest 'new() rejects unknown arguments' => sub {
 };
 
 ###############################################################################
+# Dying callback does not break message delivery
+###############################################################################
+
+subtest 'dying event callback does not break subsequent messages' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $client1 = Net::Nostr::Client->new;
+    my $client2 = Net::Nostr::Client->new;
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+
+    my $call_count = 0;
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+
+    $client1->on(event => sub {
+        my ($sub_id, $event) = @_;
+        $call_count++;
+        die "boom" if $call_count == 1;
+        $cv->send if $call_count == 2;
+    });
+
+    $client2->on(ok => sub {});
+
+    $client1->connect("ws://127.0.0.1:$port");
+    $client2->connect("ws://127.0.0.1:$port");
+
+    my $filter = Net::Nostr::Filter->new(kinds => [1]);
+    $client1->subscribe('s1', $filter);
+
+    # Publish two events — first triggers the die, second should still arrive
+    $client2->publish(make_event(content => 'first',  created_at => 1000));
+    $client2->publish(make_event(content => 'second', created_at => 2000));
+
+    $cv->recv;
+
+    is $call_count, 2, 'second event delivered despite first callback dying';
+    ok grep({ /callback 'event' died: boom/ } @warnings),
+        'warning emitted for dying callback';
+
+    $client1->disconnect;
+    $client2->disconnect;
+    $relay->stop;
+};
+
+###############################################################################
 # neg_open / neg_msg / neg_close: require connection
 ###############################################################################
 

@@ -54,6 +54,7 @@ Inherited, see L<Mail::Reporter/"Constructors">
   head_type   Mail::Message            Mail::Message::Head::Complete
   labels      Mail::Message            +{}
   messageId   Mail::Message            undef
+  message_id  Mail::Message            undef
   modified    Mail::Message            false
   size        Mail::Box::Message       undef
   trusted     Mail::Message            false
@@ -79,6 +80,8 @@ Inherited, see L<Mail::Reporter/"Constructors">
 
 =item messageId => $id
 
+=item message_id => $id
+
 =item modified => BOOLEAN
 
 =item size => $bytes
@@ -97,9 +100,25 @@ Extends L<"Attributes" in Mail::Box::Net::Message|Mail::Box::Net::Message/"Attri
 
 =over 4
 
+=item $obj-E<gt>B<bodyType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<fieldType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
 =item $obj-E<gt>B<folder>( [$folder] )
 
 Inherited, see L<Mail::Box::Message/"Attributes">
+
+=item $obj-E<gt>B<headType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<messageId>()
+
+Inherited, see L<Mail::Message/"Attributes">
 
 =item $obj-E<gt>B<seqnr>( [$integer] )
 
@@ -206,10 +225,6 @@ Inherited, see L<Mail::Message/"The message">
 Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<isPart>()
-
-Inherited, see L<Mail::Message/"The message">
-
-=item $obj-E<gt>B<messageId>()
 
 Inherited, see L<Mail::Message/"The message">
 
@@ -437,6 +452,10 @@ Inherited, see L<Mail::Box::Message/"Internals">
 
 Inherited, see L<Mail::Message/"Internals">
 
+=item $obj-E<gt>B<isTrusted>()
+
+Inherited, see L<Mail::Message/"Internals">
+
 =item $obj-E<gt>B<loadBody>()
 
 Inherited, see L<Mail::Box::Net::Message/"Internals">
@@ -523,9 +542,9 @@ Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
-The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
-find a mail transfer agent to sent this message.  Specify a mailer
-explicitly using the C<via> options.
+The message L<send()|Mail::Message/"The message"> mechanism had not enough information to
+automatically find a mail transfer agent to sent this message.  Specify a
+mailer explicitly using the C<via> options.
 Cast by C<send()>
 
 =item Error: cannot coerce a $type object into a $me object.
@@ -538,7 +557,7 @@ Unknown alternative for the C<include> option of L<reply()|Mail::Message::Constr
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
 Cast by C<reply()>
 
-=item Error: cannot read message from a $source}.
+=item Error: cannot read message from a $source.
 
 Cast by C<read()>
 
@@ -625,14 +644,14 @@ Cast by C<loadBody()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-POP3 version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-POP3 version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

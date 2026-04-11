@@ -441,6 +441,9 @@ my $help = _run("$perl -I'$lib' '$dashboard' help");
 like($help, qr/Description:/, 'dashboard help renders the fuller POD help');
 like($help, qr/dashboard serve \[logs \[-f\] \[-n N\]\|workers <N>\]/, 'dashboard help documents serve logs tail/follow flags and serve workers commands');
 like($help, qr/dashboard ticket \[ticket-ref\]/, 'dashboard help documents the built-in ticket subcommand');
+like($help, qr/dashboard skills enable <repo-name>/, 'dashboard help documents skill enable');
+like($help, qr/dashboard skills disable <repo-name>/, 'dashboard help documents skill disable');
+like($help, qr/dashboard skills usage <repo-name> \[-o json\|table\]/, 'dashboard help documents skill usage inspection');
 
 my $serve_workers_port = _find_free_port();
 my $serve_workers = _run("$perl -I'$lib' '$dashboard' serve workers 3 --port $serve_workers_port");
@@ -681,6 +684,54 @@ exit 0
 SH
 close $fake_cpanm_fh;
 chmod 0755, $fake_cpanm or die "Unable to chmod $fake_cpanm: $!";
+my $skill_repo_root = File::Spec->catdir( $ENV{HOME}, 'skill-fixtures' );
+my $skill_repo = File::Spec->catdir( $skill_repo_root, 'demo-skill' );
+make_path( File::Spec->catdir( $skill_repo, 'cli', 'foo.d' ) );
+make_path( File::Spec->catdir( $skill_repo, 'config' ) );
+make_path( File::Spec->catdir( $skill_repo, 'dashboards', 'nav' ) );
+open my $skill_command_fh, '>', File::Spec->catfile( $skill_repo, 'cli', 'foo' ) or die "Unable to write skill command: $!";
+print {$skill_command_fh} "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint join('|', \@ARGV), qq{\\n};\n";
+close $skill_command_fh;
+chmod 0755, File::Spec->catfile( $skill_repo, 'cli', 'foo' ) or die "Unable to chmod skill command: $!";
+open my $skill_hook_fh, '>', File::Spec->catfile( $skill_repo, 'cli', 'foo.d', '00-pre.pl' ) or die "Unable to write skill hook: $!";
+print {$skill_hook_fh} "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{skill-hook\\n};\n";
+close $skill_hook_fh;
+chmod 0755, File::Spec->catfile( $skill_repo, 'cli', 'foo.d', '00-pre.pl' ) or die "Unable to chmod skill hook: $!";
+open my $skill_config_fh, '>', File::Spec->catfile( $skill_repo, 'config', 'config.json' ) or die "Unable to write skill config: $!";
+print {$skill_config_fh} qq|{"skill_name":"demo-skill"}\n|;
+close $skill_config_fh;
+open my $skill_index_fh, '>', File::Spec->catfile( $skill_repo, 'dashboards', 'index' ) or die "Unable to write skill index: $!";
+print {$skill_index_fh} "TITLE: Demo Skill Index\n:--------------------------------------------------------------------------------:\nBOOKMARK: index\n:--------------------------------------------------------------------------------:\nHTML:\nDemo Skill Index\n";
+close $skill_index_fh;
+open my $skill_page_fh, '>', File::Spec->catfile( $skill_repo, 'dashboards', 'foo' ) or die "Unable to write skill page: $!";
+print {$skill_page_fh} "TITLE: Demo Skill Foo\n:--------------------------------------------------------------------------------:\nBOOKMARK: foo\n:--------------------------------------------------------------------------------:\nHTML:\nDemo Skill Foo\n";
+close $skill_page_fh;
+open my $skill_nav_fh, '>', File::Spec->catfile( $skill_repo, 'dashboards', 'nav', 'demo.tt' ) or die "Unable to write skill nav: $!";
+print {$skill_nav_fh} "<div>Demo Skill Nav</div>\n";
+close $skill_nav_fh;
+{
+    my $cwd_before_skill_repo = getcwd();
+    chdir $skill_repo or die "Unable to chdir to $skill_repo: $!";
+    my ( $stdout, $stderr, $exit ) = capture {
+        system 'git', 'init', '--quiet';
+        return $? >> 8 if $? != 0;
+        system 'git', 'config', 'user.email', 'test@example.com';
+        return $? >> 8 if $? != 0;
+        system 'git', 'config', 'user.name', 'Test';
+        return $? >> 8 if $? != 0;
+        system 'git', 'add', '.';
+        return $? >> 8 if $? != 0;
+        system 'git', 'commit', '-m', 'Initial demo skill';
+        return $? >> 8;
+    };
+    is( $exit, 0, 'skill fixture repository initializes cleanly for CLI smoke coverage' ) or diag $stderr;
+    chdir $cwd_before_skill_repo or die "Unable to chdir back to $cwd_before_skill_repo: $!";
+}
+my $skill_install = _run("PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' skills install 'file://$skill_repo'");
+like( $skill_install, qr/"repo_name"\s*:\s*"demo-skill"/, 'dashboard skills install clones the skill into the isolated skills root' );
+my $skill_dotted_dispatch = _run("$perl -I'$lib' '$dashboard' demo-skill.foo alpha beta");
+like( $skill_dotted_dispatch, qr/skill-hook/, 'dashboard <skill>.<command> runs skill-local hooks before the skill command body' );
+like( $skill_dotted_dispatch, qr/alpha\|beta/, 'dashboard <skill>.<command> forwards remaining args to the skill command body' );
 
 my $open_root = File::Spec->catdir( $ENV{HOME}, 'open-file-fixtures' );
 make_path($open_root);
@@ -880,6 +931,10 @@ my $json_root = _run("$perl -I'$lib' '$dashboard' jq '\$d' '$json_file'");
 is_deeply( json_decode($json_root), { alpha => { beta => 2 } }, 'jq accepts file then root query with order-independent args' );
 my $json_root_stdin = _run("cat '$json_file' | $perl -I'$lib' '$dashboard' jq '\$d'");
 is( $json_root_stdin, $json_root, 'jq returns the same whole-document result from stdin and file input' );
+my $json_keys = _run(qq{printf '{"foo":[1,2,3,4],"bar":[4,5,6]}' | $perl -I'$lib' '$dashboard' jq 'sort keys %\$d'});
+is_deeply( json_decode($json_keys), [ 'bar', 'foo' ], 'jq evaluates Perl expressions against decoded stdin data through $d' );
+my $json_keys_file = _run("$perl -I'$lib' '$dashboard' jq '$json_file' 'sort' 'keys' '%\$d'");
+is_deeply( json_decode($json_keys_file), ['alpha'], 'jq rejoins split expression argv pieces when the file path comes first' );
 my $json_direct = _run(qq{printf '{"alpha":{"beta":2}}' | $perl -I'$lib' '$runtime_jq' alpha.beta});
 is( $json_direct, $json_value, 'private runtime jq matches dashboard jq output' );
 
@@ -893,6 +948,8 @@ my $yaml_root = _run("$perl -I'$lib' '$dashboard' yq '$yaml_file' '\$d'");
 is_deeply( json_decode($yaml_root), { alpha => { beta => '3' } }, 'yq accepts file then root query with order-independent args' );
 my $yaml_root_stdin = _run("cat '$yaml_file' | $perl -I'$lib' '$dashboard' yq '\$d'");
 is( $yaml_root_stdin, $yaml_root, 'yq returns the same whole-document result from stdin and file input' );
+my $yaml_keys = _run(qq{printf 'foo:\\n  - 1\\nbar:\\n  - 2\\n' | $perl -I'$lib' '$dashboard' yq 'sort keys %\$d'});
+is_deeply( json_decode($yaml_keys), [ 'bar', 'foo' ], 'yq evaluates Perl expressions against decoded YAML data through $d' );
 my $yaml_direct = _run(qq{printf 'alpha:\\n  beta: 3\\n' | $perl -I'$lib' '$runtime_yq' alpha.beta});
 is( $yaml_direct, $yaml_value, 'private runtime yq matches dashboard yq output' );
 
@@ -1166,6 +1223,93 @@ like( $huge_stdout, qr/stderr=1800000\n/s, 'final command still receives the ove
 like( $huge_stdout, qr/result_file=1\n/s, 'final command sees the explicit RESULT_FILE fallback when hook output would otherwise overflow exec' );
 unlike( $huge_stderr, qr/Argument list too long/, 'oversized RESULT fallback avoids kernel exec failures from large hook payloads' );
 
+my $stop_command = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'hook-stop-check' );
+open my $stop_command_fh, '>', $stop_command or die "Unable to write $stop_command: $!";
+print {$stop_command_fh} <<'PL';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "__DD_RESULT_BEGIN__\n", ( $ENV{RESULT} // '' ), "\n__DD_RESULT_END__\n";
+print "__DD_LAST_RESULT_BEGIN__\n", ( $ENV{LAST_RESULT} // '' ), "\n__DD_LAST_RESULT_END__\n";
+PL
+close $stop_command_fh;
+chmod 0755, $stop_command or die "Unable to chmod $stop_command: $!";
+
+my $stop_hook_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'cli', 'hook-stop-check.d' );
+make_path($stop_hook_root);
+my $stop_probe = File::Spec->catfile( $ENV{HOME}, 'hook-stop-last-result.json' );
+my $stop_sentinel = File::Spec->catfile( $ENV{HOME}, 'hook-stop-third-ran.txt' );
+my $stop_first = File::Spec->catfile( $stop_hook_root, '00-first.pl' );
+open my $stop_first_fh, '>', $stop_first or die "Unable to write $stop_first: $!";
+print {$stop_first_fh} <<'PL';
+#!/usr/bin/env perl
+print "ABC\n";
+PL
+close $stop_first_fh;
+chmod 0755, $stop_first or die "Unable to chmod $stop_first: $!";
+my $stop_second = File::Spec->catfile( $stop_hook_root, '01-stop.pl' );
+open my $stop_second_fh, '>', $stop_second or die "Unable to write $stop_second: $!";
+print {$stop_second_fh} <<"PL";
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib '$repo/lib';
+use JSON::XS qw(encode_json);
+use Developer::Dashboard::Runtime::Result ();
+my \$last = Developer::Dashboard::Runtime::Result->last_result() || {};
+open my \$fh, '>', '$stop_probe' or die \$!;
+print {\$fh} encode_json(\$last);
+close \$fh;
+print "stop-hook\n";
+warn "[[STOP]] stop requested by 01-stop.pl\\n";
+PL
+close $stop_second_fh;
+chmod 0755, $stop_second or die "Unable to chmod $stop_second: $!";
+my $stop_third = File::Spec->catfile( $stop_hook_root, '02-never.pl' );
+open my $stop_third_fh, '>', $stop_third or die "Unable to write $stop_third: $!";
+print {$stop_third_fh} <<"PL";
+#!/usr/bin/env perl
+use strict;
+use warnings;
+open my \$fh, '>', '$stop_sentinel' or die \$!;
+print {\$fh} "ran\\n";
+close \$fh;
+print "third-hook\\n";
+PL
+close $stop_third_fh;
+chmod 0755, $stop_third or die "Unable to chmod $stop_third: $!";
+
+my ( $stop_stdout, $stop_stderr, $stop_exit ) = capture {
+    system 'sh', '-c', "$perl -I'$lib' '$dashboard' hook-stop-check";
+    return $? >> 8;
+};
+is( $stop_exit, 0, 'dashboard returns to the main command after a hook emits the explicit stop marker' );
+like( $stop_stdout, qr/^ABC\n/s, 'dashboard still streams stdout from hooks that ran before the stop marker' );
+like( $stop_stdout, qr/stop-hook\n/s, 'dashboard still streams stdout from the hook that requested stop' );
+unlike( $stop_stdout, qr/third-hook\n/s, 'dashboard skips later hook scripts after a stop marker appears on stderr' );
+like( $stop_stderr, qr/\[\[STOP\]\] stop requested by 01-stop\.pl/, 'dashboard keeps the explicit stop marker visible on stderr' );
+ok( !-e $stop_sentinel, 'dashboard does not execute later hook files once the stop marker is seen' );
+open my $stop_probe_fh, '<', $stop_probe or die "Unable to read $stop_probe: $!";
+my $stop_previous = json_decode( do { local $/; <$stop_probe_fh> } );
+close $stop_probe_fh;
+like( $stop_previous->{file}, qr/\Qhook-stop-check.d\E.*\Q00-first.pl\E\z/, 'Runtime::Result last_result exposes the previous hook file path inside the next hook' );
+is( $stop_previous->{exit}, 0, 'Runtime::Result last_result exposes the previous hook exit code inside the next hook' );
+is( $stop_previous->{STDOUT}, "ABC\n", 'Runtime::Result last_result exposes the previous hook stdout inside the next hook' );
+is( $stop_previous->{STDERR}, '', 'Runtime::Result last_result exposes the previous hook stderr inside the next hook' );
+my ($stop_result_json) = $stop_stdout =~ /__DD_RESULT_BEGIN__\n([\s\S]*?)\n__DD_RESULT_END__/;
+ok( defined $stop_result_json && $stop_result_json ne '', 'main command receives RESULT after hook-stop execution' );
+my $stop_result_data = json_decode($stop_result_json);
+ok( exists $stop_result_data->{'00-first.pl'}, 'main command RESULT keeps the first hook entry' );
+ok( exists $stop_result_data->{'01-stop.pl'}, 'main command RESULT keeps the stopping hook entry' );
+ok( !exists $stop_result_data->{'02-never.pl'}, 'main command RESULT skips hooks after the explicit stop marker' );
+my ($stop_last_json) = $stop_stdout =~ /__DD_LAST_RESULT_BEGIN__\n([\s\S]*?)\n__DD_LAST_RESULT_END__/;
+ok( defined $stop_last_json && $stop_last_json ne '', 'main command receives LAST_RESULT after hook-stop execution' );
+my $stop_last_data = json_decode($stop_last_json);
+like( $stop_last_data->{file}, qr/\Qhook-stop-check.d\E.*\Q01-stop.pl\E\z/, 'main command LAST_RESULT points at the stopping hook file' );
+is( $stop_last_data->{exit}, 0, 'main command LAST_RESULT keeps the stopping hook exit code' );
+is( $stop_last_data->{STDOUT}, "stop-hook\n", 'main command LAST_RESULT keeps the stopping hook stdout' );
+like( $stop_last_data->{STDERR}, qr/\[\[STOP\]\] stop requested by 01-stop\.pl/, 'main command LAST_RESULT keeps the stopping hook stderr' );
+
 is( _run("$perl -I'$lib' '$dashboard' version"), "$expected_version\n", 'dashboard version prints the installed dashboard version' );
 
 my $toml_value = _run(qq{printf '[alpha]\\nbeta = 4\\n' | $perl -I'$lib' '$dashboard' tomq alpha.beta});
@@ -1178,6 +1322,8 @@ my $toml_root = _run("$perl -I'$lib' '$dashboard' tomq '\$d' '$toml_file'");
 is_deeply( json_decode($toml_root), { alpha => { beta => 4 } }, 'tomq accepts file then root query with order-independent args' );
 my $toml_root_stdin = _run("cat '$toml_file' | $perl -I'$lib' '$dashboard' tomq '\$d'");
 is( $toml_root_stdin, $toml_root, 'tomq returns the same whole-document result from stdin and file input' );
+my $toml_keys = _run(qq{printf '[foo]\\na = 1\\n[bar]\\nb = 2\\n' | $perl -I'$lib' '$dashboard' tomq 'sort keys %\$d'});
+is_deeply( json_decode($toml_keys), [ 'bar', 'foo' ], 'tomq evaluates Perl expressions against decoded TOML data through $d' );
 my $toml_direct = _run(qq{printf '[alpha]\\nbeta = 4\\n' | $perl -I'$lib' '$runtime_tomq' alpha.beta});
 is( $toml_direct, $toml_value, 'private runtime tomq matches dashboard tomq output' );
 
@@ -1191,22 +1337,50 @@ my $props_root = _run("$perl -I'$lib' '$dashboard' propq '$props_file' '\$d'");
 is_deeply( json_decode($props_root), { 'alpha.beta' => '5', name => 'demo' }, 'propq accepts file then root query with order-independent args' );
 my $props_root_stdin = _run("cat '$props_file' | $perl -I'$lib' '$dashboard' propq '\$d'");
 is( $props_root_stdin, $props_root, 'propq returns the same whole-document result from stdin and file input' );
+my $props_keys = _run(qq{printf 'foo=1\\nbar=2\\n' | $perl -I'$lib' '$dashboard' propq 'sort keys %\$d'});
+is_deeply( json_decode($props_keys), [ 'bar', 'foo' ], 'propq evaluates Perl expressions against decoded properties data through $d' );
 my $props_direct = _run(qq{printf 'alpha.beta=5\\nname = demo\\n' | $perl -I'$lib' '$runtime_propq' alpha.beta});
 is( $props_direct, $props_value, 'private runtime propq matches dashboard propq output' );
 
 my $ini_value = _run(qq{printf '[alpha]\\nbeta=6\\n' | $perl -I'$lib' '$dashboard' iniq alpha.beta});
 is( $ini_value, "6\n", 'iniq extracts scalar INI values' );
+my $ini_keys = _run(qq{printf '[foo]\\na=1\\n[bar]\\nb=2\\n' | $perl -I'$lib' '$dashboard' iniq 'sort keys %\$d'});
+is_deeply( json_decode($ini_keys), [ '_global', 'bar', 'foo' ], 'iniq evaluates Perl expressions against decoded INI data through $d' );
 my $ini_direct = _run(qq{printf '[alpha]\\nbeta=6\\n' | $perl -I'$lib' '$runtime_iniq' alpha.beta});
 is( $ini_direct, $ini_value, 'private runtime iniq matches dashboard iniq output' );
 
 my $csv_value = _run(qq{printf 'alpha,beta\\n7,8\\n' | $perl -I'$lib' '$dashboard' csvq 1.1});
 is( $csv_value, "8\n", 'csvq extracts scalar CSV values by row and column index' );
+my $csv_expression = _run(qq{printf 'alpha,beta\\n7,8\\n' | $perl -I'$lib' '$dashboard' csvq 'join q(-), map { \$d->[1][\$_] } 0 .. \$#{ \$d->[1] }'});
+is( $csv_expression, "7-8\n", 'csvq evaluates Perl expressions against decoded CSV row arrays through $d' );
 my $csv_direct = _run(qq{printf 'alpha,beta\\n7,8\\n' | $perl -I'$lib' '$runtime_csvq' 1.1});
 is( $csv_direct, $csv_value, 'private runtime csvq matches dashboard csvq output' );
 
-my $xml_value = _run(qq{printf '<root><value>demo</value></root>' | $perl -I'$lib' '$dashboard' xmlq _raw});
-is( $xml_value, "<root><value>demo</value></root>\n", 'xmlq can return the raw XML payload through the supported root key' );
-my $xml_direct = _run(qq{printf '<root><value>demo</value></root>' | $perl -I'$lib' '$runtime_xmlq' _raw});
+my $xml_file = File::Spec->catfile( $open_root, 'sample.xml' );
+open my $xml_fh, '>', $xml_file or die "Unable to write $xml_file: $!";
+print {$xml_fh} '<root><value>demo</value><item id="1">x</item><item id="2">y</item></root>';
+close $xml_fh;
+my $xml_value = _run(qq{printf '<root><value>demo</value><item id="1">x</item><item id="2">y</item></root>' | $perl -I'$lib' '$dashboard' xmlq root.value});
+is( $xml_value, "demo\n", 'xmlq extracts scalar XML values from the decoded XML tree' );
+my $xml_root = _run("$perl -I'$lib' '$dashboard' xmlq '\$d' '$xml_file'");
+is_deeply(
+    json_decode($xml_root),
+    {
+        root => {
+            value => 'demo',
+            item  => [
+                { _attributes => { id => '1' }, _text => 'x' },
+                { _attributes => { id => '2' }, _text => 'y' },
+            ],
+        },
+    },
+    'xmlq returns the decoded XML tree for the whole-document selector',
+);
+my $xml_root_stdin = _run("cat '$xml_file' | $perl -I'$lib' '$dashboard' xmlq '\$d'");
+is( $xml_root_stdin, $xml_root, 'xmlq returns the same decoded whole-document result from stdin and file input' );
+my $xml_expression = _run(qq{printf '<root><value>demo</value><item id="1">x</item><item id="2">y</item></root>' | $perl -I'$lib' '$dashboard' xmlq 'join q(,), map { \$_->{_attributes}{id} } \@{ \$d->{root}{item} }'});
+is( $xml_expression, "1,2\n", 'xmlq evaluates Perl expressions against decoded XML data through $d' );
+my $xml_direct = _run(qq{printf '<root><value>demo</value><item id="1">x</item><item id="2">y</item></root>' | $perl -I'$lib' '$runtime_xmlq' root.value});
 is( $xml_direct, $xml_value, 'private runtime xmlq matches dashboard xmlq output' );
 
 my $cli_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'cli' );

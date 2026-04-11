@@ -66,6 +66,11 @@ if ( my $custom_path = _custom_command_path($cmd) ) {
     _exec_switchboard_command( $custom_path, @ARGV );
 }
 
+if ( my ( $skill_name, $skill_command ) = _skill_dotted_command_parts($cmd) ) {
+    my $helper_path = _builtin_helper_path('skill');
+    _exec_switchboard_command( $helper_path, $skill_name, $skill_command, @ARGV );
+}
+
 pod2usage(
     -exitval  => 1,
     -verbose  => 99,
@@ -81,6 +86,7 @@ pod2usage(
 sub _prime_command_result_env {
     my ( $cmd, @argv ) = @_;
     Developer::Dashboard::Runtime::Result::clear_current();
+    Developer::Dashboard::Runtime::Result::clear_last_result();
     $ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if defined $cmd && $cmd ne '';
     return 1 if !defined $cmd || $cmd eq '';
 
@@ -108,11 +114,23 @@ sub _prime_command_result_env {
             };
             $results{$result_key}{exit_code} = $hook_result->{exit_code} if defined $hook_result->{exit_code};
             Developer::Dashboard::Runtime::Result::set_current( \%results );
+            Developer::Dashboard::Runtime::Result::set_last_result(
+                {
+                    file   => $path,
+                    exit   => $hook_result->{exit_code},
+                    STDOUT => $hook_result->{stdout},
+                    STDERR => $hook_result->{stderr},
+                }
+            );
+            return 1 if Developer::Dashboard::Runtime::Result::stop_requested( $hook_result->{stderr} );
         }
         closedir $dh;
     }
 
-    Developer::Dashboard::Runtime::Result::clear_current() if !%results;
+    if ( !%results ) {
+        Developer::Dashboard::Runtime::Result::clear_current();
+        Developer::Dashboard::Runtime::Result::clear_last_result();
+    }
     return 1;
 }
 
@@ -226,6 +244,23 @@ sub _builtin_helper_path {
     );
     Developer::Dashboard::InternalCLI::ensure_helpers( paths => $paths );
     return Developer::Dashboard::InternalCLI::helper_path( paths => $paths, name => $helper );
+}
+
+# _skill_dotted_command_parts($cmd)
+# Resolves dashboard <skill>.<command> shorthand into one installed skill name and one skill-local command.
+# Input: top-level command token such as skill-name.run-test.
+# Output: skill name and command name strings, or an empty list when the token is not an installed skill shorthand.
+sub _skill_dotted_command_parts {
+    my ($cmd) = @_;
+    return if !defined $cmd || $cmd eq '' || $cmd !~ /\./;
+    my ( $skill_name, $skill_command ) = split /\./, $cmd, 2;
+    return if !defined $skill_name || $skill_name eq '';
+    return if !defined $skill_command || $skill_command eq '';
+    my $skills_root = File::Spec->catdir( $ENV{HOME} || '', '.developer-dashboard', 'skills' );
+    my $skill_root = File::Spec->catdir( $skills_root, $skill_name );
+    return if !-d $skill_root;
+    return if -f File::Spec->catfile( $skill_root, '.disabled' );
+    return ( $skill_name, $skill_command );
 }
 
 # _exec_switchboard_command($path, @argv)
@@ -352,9 +387,12 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard collector stop <name>
   dashboard collector restart <name>
   dashboard skills install <git-url>
+  dashboard skills enable <repo-name>
+  dashboard skills disable <repo-name>
   dashboard skills uninstall <repo-name>
   dashboard skills update <repo-name>
   dashboard skills list
+  dashboard skills usage <repo-name> [-o json|table]
   dashboard skill <repo-name> <command> [args...]
   dashboard config init
   dashboard config show
@@ -417,7 +455,11 @@ Perl modules loaded by those helpers.
 
 =head1 PURPOSE
 
-This is the one public executable users invoke. It bootstraps C<PERL5LIB> when running from a checkout, runs layered command hooks across C<DD-OOP-LAYERS>, stages dashboard-managed built-in helpers under F<~/.developer-dashboard/cli/dd/>, and then C<exec>s the final helper or custom command instead of owning the heavy implementation itself.
+This is the one public executable users invoke. It bootstraps C<PERL5LIB>
+when running from a checkout, runs layered command hooks across
+C<DD-OOP-LAYERS>, stages dashboard-managed built-in helpers under
+F<~/.developer-dashboard/cli/dd/>, and then C<exec>s the final helper or
+custom command instead of owning the heavy implementation itself.
 
 =head1 WHY IT EXISTS
 
@@ -429,7 +471,12 @@ Use this file when you are changing top-level command discovery, the order of co
 
 =head1 HOW TO USE
 
-Users run C<dashboard E<lt>subcommandE<gt>>. This script resolves whether that subcommand is a dashboard-managed helper or a user-layer command, primes the C<RESULT> hook state, and then hands off with C<exec>. If behavior belongs to a subsystem, move it into a module or private helper instead of expanding this file.
+Users run C<dashboard E<lt>subcommandE<gt>>. This script resolves whether that
+subcommand is a dashboard-managed helper or a user-layer command, primes the
+C<RESULT> and C<LAST_RESULT> hook state, honors the explicit C<[[STOP]]>
+stderr marker when one hook wants to stop the remaining hook chain, and then
+hands off with C<exec>. If behavior belongs to a subsystem, move it into a
+module or private helper instead of expanding this file.
 
 =head1 WHAT USES IT
 
@@ -456,6 +503,17 @@ Example 3:
 Run the public command through its server bootstrap path while keeping logs in the foreground.
 
 Example 4:
+
+  mkdir -p ~/.developer-dashboard/cli/update.d
+  printf '#!/bin/sh\necho first\n' > ~/.developer-dashboard/cli/update.d/00-first
+  printf '#!/bin/sh\necho stop >&2; echo "[[STOP]]" >&2\n' > ~/.developer-dashboard/cli/update.d/01-stop
+  chmod +x ~/.developer-dashboard/cli/update.d/00-first ~/.developer-dashboard/cli/update.d/01-stop
+  dashboard update
+
+Exercise the explicit stop-marker hook path, where one hook ends the remaining
+hook chain but control still returns to the main command.
+
+Example 5:
 
   prove -lv t/30-dashboard-loader.t
 

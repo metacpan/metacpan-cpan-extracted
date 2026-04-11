@@ -1,0 +1,254 @@
+NAME
+    EV::cares - high-performance async DNS resolver using c-ares and EV
+
+SYNOPSIS
+        use EV;
+        use EV::cares qw(:status :types);
+
+        my $r = EV::cares->new(
+            servers => ['8.8.8.8', '1.1.1.1'],
+            timeout => 5,
+            tries   => 3,
+        );
+
+        # simple A + AAAA resolve
+        $r->resolve('example.com', sub {
+            my ($status, @addrs) = @_;
+            if ($status == ARES_SUCCESS) {
+                print "resolved: @addrs\n";
+            } else {
+                warn "failed: " . EV::cares::strerror($status) . "\n";
+            }
+        });
+
+        # auto-parsed DNS search
+        $r->search('example.com', T_MX, sub {
+            my ($status, @mx) = @_;
+            printf "MX %d %s\n", $_->{priority}, $_->{host} for @mx;
+        });
+
+        # raw DNS query
+        $r->query('example.com', C_IN, T_A, sub {
+            my ($status, $buf) = @_;
+            # $buf is the raw DNS response packet
+        });
+
+        EV::run;
+
+DESCRIPTION
+    EV::cares integrates the c-ares <https://c-ares.org/> asynchronous DNS
+    library directly with the EV event loop at the C level. Socket I/O and
+    timer management happen entirely in XS with zero Perl-level event
+    processing overhead.
+
+    Multiple queries run concurrently. c-ares handles server rotation,
+    retries, timeouts, and search-domain appending.
+
+    Requires c-ares >= 1.22.0 (provided automatically by Alien::cares).
+
+CONSTRUCTOR
+  new
+        my $r = EV::cares->new(%opts);
+
+    All options are optional.
+
+    servers => \@addrs | "addr1,addr2,..."
+        DNS server addresses. Default: system resolv.conf servers.
+
+    timeout => $seconds
+        Per-try timeout (fractional seconds).
+
+    maxtimeout => $seconds
+        Maximum total timeout across all tries.
+
+    tries => $n
+        Number of query attempts.
+
+    ndots => $n
+        Threshold for treating a name as absolute (skip search suffixes).
+
+    flags => $flags
+        Bitmask of "ARES_FLAG_*" constants.
+
+    lookups => $string
+        Lookup order: "b" for DNS, "f" for /etc/hosts.
+
+    rotate => 1
+        Round-robin among servers.
+
+    tcp_port => $port
+    udp_port => $port
+        Non-standard DNS port.
+
+    ednspsz => $bytes
+        EDNS0 UDP payload size.
+
+    resolvconf => $path
+        Path to an alternative resolv.conf.
+
+    hosts_file => $path
+        Path to an alternative hosts file.
+
+    udp_max_queries => $n
+        Max queries per UDP connection before reconnect.
+
+    qcache => $max_ttl
+        Enable query result cache; $max_ttl is the upper TTL bound in
+        seconds. 0 disables the cache.
+
+QUERY METHODS
+    Every query method takes a callback as the last argument. The first
+    argument to the callback is always a status code ("ARES_SUCCESS" on
+    success).
+
+  resolve
+        $r->resolve($name, sub { my ($status, @addrs) = @_ });
+
+    Resolves $name via "ares_getaddrinfo" with "AF_UNSPEC", returning both
+    IPv4 and IPv6 address strings.
+
+  getaddrinfo
+        $r->getaddrinfo($node, $service, \%hints, $cb);
+
+    Full getaddrinfo. $service and "\%hints" may be "undef". Hint keys:
+    "family", "socktype", "protocol", "flags" ("ARES_AI_*"). Callback
+    receives "($status, @ip_strings)".
+
+  search
+        $r->search($name, $type, sub { my ($status, @records) = @_ });
+
+    DNS search (appends search domains from resolv.conf), always using
+    "C_IN" class. Results are auto-parsed based on $type:
+
+        T_A, T_AAAA    ($status, @ip_strings)
+        T_MX           ($status, @{ {priority, host} })
+        T_SRV          ($status, @{ {priority, weight, port, target} })
+        T_TXT          ($status, @strings)
+        T_NS           ($status, @hostnames)
+        T_SOA          ($status, {mname, rname, serial, refresh,
+                                  retry, expire, minttl})
+        T_PTR          ($status, @hostnames)
+        T_NAPTR        ($status, @{ {order, preference, flags,
+                                     service, regexp, replacement} })
+        T_CAA          ($status, @{ {critical, property, value} })
+        T_CNAME etc.   ($status, $raw_buffer)
+
+  query
+        $r->query($name, $class, $type, sub { my ($status, $buf) = @_ });
+
+    Raw DNS query without search-domain appending. Returns the unmodified
+    DNS response packet.
+
+  gethostbyname
+        $r->gethostbyname($name, $family, sub { my ($status, @addrs) = @_ });
+
+    Legacy resolver. $family is "AF_INET" or "AF_INET6".
+
+  reverse
+        $r->reverse($ip, sub { my ($status, @hostnames) = @_ });
+
+    Reverse DNS (PTR) lookup for an IPv4 or IPv6 address string.
+
+  getnameinfo
+        $r->getnameinfo($packed_sockaddr, $flags, sub {
+            my ($status, $node, $service) = @_;
+        });
+
+    Full getnameinfo. $packed_sockaddr comes from "pack_sockaddr_in" in
+    Socket or "pack_sockaddr_in6" in Socket. $flags is a bitmask of
+    "ARES_NI_*" constants.
+
+CHANNEL METHODS
+  cancel
+    Cancel all pending queries. Each outstanding callback fires with
+    "ARES_ECANCELLED".
+
+  set_servers
+        $r->set_servers('8.8.8.8', '1.1.1.1');
+
+    Replace the DNS server list.
+
+  servers
+        my $csv = $r->servers;   # "8.8.8.8,1.1.1.1"
+
+    Returns the current server list as a comma-separated string.
+
+  set_local_dev
+        $r->set_local_dev('eth0');
+
+    Bind outgoing queries to a network device.
+
+  set_local_ip4
+        $r->set_local_ip4('192.168.1.100');
+
+    Bind outgoing queries to a local IPv4 address.
+
+  set_local_ip6
+        $r->set_local_ip6('::1');
+
+    Bind outgoing queries to a local IPv6 address.
+
+  active_queries
+        my $n = $r->active_queries;
+
+    Returns the number of outstanding queries.
+
+  reinit
+        $r->reinit;
+
+    Re-read system DNS configuration (resolv.conf, hosts file) without
+    destroying the channel. Useful for long-running daemons where the
+    resolver configuration may change at runtime.
+
+  destroy
+        $r->destroy;
+
+    Explicitly release the c-ares channel and stop all watchers. Pending
+    callbacks fire with "ARES_ECANCELLED" or "ARES_EDESTRUCTION". Safe to
+    call from within a callback. Also called automatically when the object
+    is garbage-collected.
+
+FUNCTIONS
+  strerror
+        my $msg = EV::cares::strerror($status);
+        my $msg = EV::cares->strerror($status);   # also works
+
+    Returns a human-readable string for a status code.
+
+  lib_version
+        my $ver = EV::cares::lib_version();   # e.g. "1.34.6"
+
+    Returns the c-ares library version string.
+
+CALLBACK SAFETY
+    Callbacks are invoked from within "ares_process_fd", called from EV I/O
+    and timer watchers. Exceptions thrown inside callbacks are caught
+    ("G_EVAL") and emitted as warnings; they do not propagate to the caller.
+
+    It is safe to call "cancel", "destroy", or "undef" the resolver from
+    within a callback. Remaining pending queries will receive
+    "ARES_ECANCELLED".
+
+    Lookups that use only local sources ("lookups => 'f'") may complete
+    synchronously during the initiating method call.
+
+EXPORT TAGS
+        :status    ARES_SUCCESS  ARES_ENODATA  ARES_ETIMEOUT  ...
+        :types     T_A  T_AAAA  T_MX  T_SRV  T_TXT  T_NS  T_SOA  ...
+        :classes   C_IN  C_CHAOS  C_HS  C_ANY
+        :flags     ARES_FLAG_USEVC  ARES_FLAG_EDNS  ARES_FLAG_DNS0x20  ...
+        :ai        ARES_AI_CANONNAME  ARES_AI_ADDRCONFIG  ARES_AI_NOSORT  ...
+        :ni        ARES_NI_NOFQDN  ARES_NI_NUMERICHOST  ...
+        :families  AF_INET  AF_INET6  AF_UNSPEC
+        :all       all of the above
+
+SEE ALSO
+    EV, Alien::cares, <https://c-ares.org/>
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

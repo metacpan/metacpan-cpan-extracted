@@ -1,0 +1,46 @@
+---
+abstract: 'Lightweight, low-dependency drop-in replacement for DateTime'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302120'
+  Test::Pod: '1.52'
+  Time::Local: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Lite
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - inc
+requires:
+  Config: '0'
+  Cwd: '0'
+  DateTime::Locale::FromCLDR: v0.8.0
+  JSON: '2.20'
+  Locale::Unicode: v0.4.0
+  POSIX: '0'
+  Scalar::Util: '0'
+  Wanted: v0.1.0
+  overload: '0'
+  overloading: '0'
+  perl: '5.010001'
+  strict: '0'
+  warnings: '0'
+  warnings::register: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/DateTime-Lite/issues
+  repository: https://gitlab.com/jackdeguest/DateTime-Lite
+version: v0.1.0
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

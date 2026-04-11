@@ -1,0 +1,9 @@
+0.01 2026-04-10
+    - Initial release
+    - Str variant: mutex-protected request queue with circular arena
+    - Int variant: lock-free Vyukov MPMC request queue
+    - Per-slot futex for targeted response delivery
+    - Generation counter for ABA-safe cancel/recycle
+    - PID-based stale lock and slot recovery
+    - Dual eventfd for async EV integration
+    - File-backed, anonymous, and memfd shared memory

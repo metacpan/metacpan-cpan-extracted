@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Cwd qw(realpath);
 use File::Path qw(make_path remove_tree);
@@ -78,8 +78,8 @@ sub uninstall {
     
     return { error => 'Missing repo name' } if !$repo_name;
     
-    my $skill_path = File::Spec->catdir( $self->{skills_root}, $repo_name );
-    return { error => "Skill '$repo_name' not found" } if !-d $skill_path;
+    my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
+    return { error => "Skill '$repo_name' not found" } if !defined $skill_path || !-d $skill_path;
     my $real_root = realpath( $self->{skills_root} ) || $self->{skills_root};
     my $real_path = realpath($skill_path) || $skill_path;
     return { error => "Refusing to uninstall path outside skills root: $skill_path" }
@@ -107,8 +107,8 @@ sub update {
     
     return { error => 'Missing repo name' } if !$repo_name;
     
-    my $skill_path = File::Spec->catdir( $self->{skills_root}, $repo_name );
-    return { error => "Skill '$repo_name' not found" } if !-d $skill_path;
+    my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
+    return { error => "Skill '$repo_name' not found" } if !defined $skill_path || !-d $skill_path;
 
     my ( $stdout, $stderr, $exit ) = capture {
         system( 'git', '-C', $skill_path, 'pull', '--ff-only' );
@@ -125,6 +125,57 @@ sub update {
         success   => 1,
         repo_name => $repo_name,
         message   => "Skill '$repo_name' updated successfully",
+        metadata  => $self->_skill_metadata( $repo_name, $skill_path ),
+    };
+}
+
+# enable($repo_name)
+# Re-enables an installed skill by removing its disabled marker.
+# Input: skill repo name.
+# Output: hash ref with success status, enabled flag, and metadata.
+sub enable {
+    my ( $self, $repo_name ) = @_;
+    return { error => 'Missing repo name' } if !$repo_name;
+
+    my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
+    return { error => "Skill '$repo_name' not found" } if !$skill_path;
+
+    my $marker = $self->_disabled_marker_path($skill_path);
+    if ( -f $marker ) {
+        unlink $marker or return { error => "Unable to remove disabled marker for skill '$repo_name': $!" };
+    }
+
+    return {
+        success   => 1,
+        repo_name => $repo_name,
+        enabled   => JSON::XS::true(),
+        message   => "Skill '$repo_name' enabled successfully",
+        metadata  => $self->_skill_metadata( $repo_name, $skill_path ),
+    };
+}
+
+# disable($repo_name)
+# Disables an installed skill without uninstalling it.
+# Input: skill repo name.
+# Output: hash ref with success status, enabled flag, and metadata.
+sub disable {
+    my ( $self, $repo_name ) = @_;
+    return { error => 'Missing repo name' } if !$repo_name;
+
+    my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
+    return { error => "Skill '$repo_name' not found" } if !$skill_path;
+
+    my $marker = $self->_disabled_marker_path($skill_path);
+    open my $fh, '>', $marker or return { error => "Unable to write disabled marker for skill '$repo_name': $!" };
+    print {$fh} "disabled\n";
+    close $fh;
+    $self->{paths}->secure_file_permissions($marker);
+
+    return {
+        success   => 1,
+        repo_name => $repo_name,
+        enabled   => JSON::XS::false(),
+        message   => "Skill '$repo_name' disabled successfully",
         metadata  => $self->_skill_metadata( $repo_name, $skill_path ),
     };
 }
@@ -157,12 +208,37 @@ sub list {
 # Input: skill repo name.
 # Output: skill path string or undef.
 sub get_skill_path {
-    my ( $self, $repo_name ) = @_;
+    my ( $self, $repo_name, %args ) = @_;
     
     return if !$repo_name;
     
     my $skill_path = File::Spec->catdir( $self->{skills_root}, $repo_name );
-    return -d $skill_path ? $skill_path : undef;
+    return if !-d $skill_path;
+    return if !$args{include_disabled} && $self->_skill_disabled($skill_path);
+    return $skill_path;
+}
+
+# is_enabled($repo_name)
+# Reports whether an installed skill is enabled for runtime lookup.
+# Input: skill repo name.
+# Output: boolean true for enabled installed skills, false otherwise.
+sub is_enabled {
+    my ( $self, $repo_name ) = @_;
+    return 0 if !$repo_name;
+    my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 ) or return 0;
+    return $self->_skill_disabled($skill_path) ? 0 : 1;
+}
+
+# usage($repo_name)
+# Returns detailed usage metadata for one installed skill even when disabled.
+# Input: skill repo name.
+# Output: hash ref with detailed skill metadata or an error hash.
+sub usage {
+    my ( $self, $repo_name ) = @_;
+    return { error => 'Missing repo name' } if !$repo_name;
+    my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
+    return { error => "Skill '$repo_name' not found" } if !$skill_path;
+    return $self->_skill_usage( $repo_name, $skill_path );
 }
 
 # _extract_repo_name($git_url)
@@ -212,13 +288,29 @@ sub _prepare_skill_layout {
 }
 
 # _install_skill_dependencies($skill_path)
-# Installs one skill's Perl dependencies into its isolated local library when a cpanfile exists.
+# Installs one skill's system and Perl dependencies in install order.
 # Input: absolute skill root directory path.
 # Output: result hash reference with success or error state.
 sub _install_skill_dependencies {
     my ( $self, $skill_path ) = @_;
+    my $aptfile = File::Spec->catfile( $skill_path, 'aptfile' );
     my $cpanfile = File::Spec->catfile( $skill_path, 'cpanfile' );
-    return { success => 1, skipped => 1 } if !-f $cpanfile;
+    return { success => 1, skipped => 1 } if !-f $aptfile && !-f $cpanfile;
+
+    my @apt_packages = $self->_skill_apt_packages($skill_path);
+    if (@apt_packages) {
+        my ( $stdout, $stderr, $exit ) = capture {
+            system( 'apt-get', 'install', '-y', @apt_packages );
+        };
+        return {
+            error => "Failed to install skill apt dependencies for $skill_path: $stderr",
+        } if $exit != 0;
+    }
+
+    return {
+        success => 1,
+        skipped => 1,
+    } if !-f $cpanfile;
 
     my $local_root = File::Spec->catdir( $skill_path, 'local' );
     make_path($local_root) if !-d $local_root;
@@ -238,6 +330,28 @@ sub _install_skill_dependencies {
     };
 }
 
+# _skill_apt_packages($skill_path)
+# Reads one skill aptfile into a trimmed package list, ignoring blank lines and comments.
+# Input: absolute skill root directory path.
+# Output: ordered list of apt package name strings.
+sub _skill_apt_packages {
+    my ( $self, $skill_path ) = @_;
+    my $aptfile = File::Spec->catfile( $skill_path, 'aptfile' );
+    return () if !-f $aptfile;
+    open my $fh, '<', $aptfile or die "Unable to read $aptfile: $!";
+    my @packages;
+    while ( my $line = <$fh> ) {
+        chomp $line;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next if $line eq '';
+        next if $line =~ /^#/;
+        push @packages, $line;
+    }
+    close $fh;
+    return @packages;
+}
+
 # _skill_metadata($repo_name, $skill_path)
 # Summarizes the isolated filesystem and command surface for one installed skill.
 # Input: repo name string and absolute skill root directory path.
@@ -245,33 +359,27 @@ sub _install_skill_dependencies {
 sub _skill_metadata {
     my ( $self, $repo_name, $skill_path ) = @_;
     my $cli_root = File::Spec->catdir( $skill_path, 'cli' );
-    my @commands;
-    if ( -d $cli_root ) {
-        opendir( my $dh, $cli_root ) or die "Unable to read $cli_root: $!";
-        @commands = sort grep {
-            $_ ne '.' && $_ ne '..'
-              && -f File::Spec->catfile( $cli_root, $_ )
-              && $_ !~ /\.d\z/
-        } readdir($dh);
-        closedir($dh);
-    }
+    my @commands = map { $_->{name} } @{ $self->_cli_command_details($skill_path) };
 
-    my @docker_services;
     my $docker_root = File::Spec->catdir( $skill_path, 'config', 'docker' );
-    if ( -d $docker_root ) {
-        opendir( my $dh, $docker_root ) or die "Unable to read $docker_root: $!";
-        @docker_services = sort grep {
-            $_ ne '.' && $_ ne '..' && -d File::Spec->catdir( $docker_root, $_ )
-        } readdir($dh);
-        closedir($dh);
-    }
+    my @docker_services = map { $_->{name} } @{ $self->_docker_service_details($skill_path) };
+    my $pages = $self->_page_details($skill_path);
+    my $collectors = $self->_collector_details( $repo_name, $skill_path );
+    my $indicators_count = scalar grep { $_->{has_indicator} } @{$collectors};
 
     return {
         name            => $repo_name,
         path            => $skill_path,
         cli_commands    => \@commands,
-        has_config      => -f File::Spec->catfile( $skill_path, 'config', 'config.json' ) ? 1 : 0,
-        has_cpanfile    => -f File::Spec->catfile( $skill_path, 'cpanfile' ) ? 1 : 0,
+        enabled         => $self->_skill_disabled($skill_path) ? JSON::XS::false() : JSON::XS::true(),
+        cli_commands_count => scalar(@commands),
+        pages_count        => scalar( @{ $pages->{entries} } ),
+        docker_services_count => scalar(@docker_services),
+        collectors_count   => scalar( @{$collectors} ),
+        indicators_count   => $indicators_count,
+        has_aptfile     => -f File::Spec->catfile( $skill_path, 'aptfile' ) ? JSON::XS::true() : JSON::XS::false(),
+        has_config      => -f File::Spec->catfile( $skill_path, 'config', 'config.json' ) ? JSON::XS::true() : JSON::XS::false(),
+        has_cpanfile    => -f File::Spec->catfile( $skill_path, 'cpanfile' ) ? JSON::XS::true() : JSON::XS::false(),
         config_root     => File::Spec->catdir( $skill_path, 'config' ),
         docker_root     => $docker_root,
         docker_services => \@docker_services,
@@ -280,6 +388,206 @@ sub _skill_metadata {
         cli_root        => $cli_root,
         local_root      => File::Spec->catdir( $skill_path, 'local' ),
     };
+}
+
+# _skill_usage($repo_name, $skill_path)
+# Builds a detailed description of one installed skill for the usage command.
+# Input: skill repo name and absolute skill root directory path.
+# Output: metadata hash reference with command, page, docker, and collector details.
+sub _skill_usage {
+    my ( $self, $repo_name, $skill_path ) = @_;
+    my $pages = $self->_page_details($skill_path);
+    my $docker = $self->_docker_service_details($skill_path);
+    my $collectors = $self->_collector_details( $repo_name, $skill_path );
+    return {
+        %{ $self->_skill_metadata( $repo_name, $skill_path ) },
+        cli => $self->_cli_command_details($skill_path),
+        pages => $pages,
+        docker => {
+            root     => File::Spec->catdir( $skill_path, 'config', 'docker' ),
+            services => $docker,
+        },
+        config => {
+            root        => File::Spec->catdir( $skill_path, 'config' ),
+            file        => File::Spec->catfile( $skill_path, 'config', 'config.json' ),
+            merged_key  => '_' . $repo_name,
+            has_config  => -f File::Spec->catfile( $skill_path, 'config', 'config.json' ) ? JSON::XS::true() : JSON::XS::false(),
+            has_aptfile => -f File::Spec->catfile( $skill_path, 'aptfile' ) ? JSON::XS::true() : JSON::XS::false(),
+            has_cpanfile => -f File::Spec->catfile( $skill_path, 'cpanfile' ) ? JSON::XS::true() : JSON::XS::false(),
+        },
+        collectors => $collectors,
+    };
+}
+
+# _cli_command_details($skill_path)
+# Enumerates executable skill commands and their hook metadata.
+# Input: absolute skill root directory path.
+# Output: array reference of command metadata hashes.
+sub _cli_command_details {
+    my ( $self, $skill_path ) = @_;
+    my $cli_root = File::Spec->catdir( $skill_path, 'cli' );
+    my @commands;
+    if ( -d $cli_root ) {
+        opendir( my $dh, $cli_root ) or die "Unable to read $cli_root: $!";
+        for my $entry (
+            sort grep {
+                $_ ne '.' && $_ ne '..'
+                  && -f File::Spec->catfile( $cli_root, $_ )
+                  && $_ !~ /\.d\z/
+            } readdir($dh)
+          )
+        {
+            my $hooks_root = File::Spec->catdir( $cli_root, $entry . '.d' );
+            my @hooks = $self->_sorted_files($hooks_root);
+            push @commands, {
+                name       => $entry,
+                path       => File::Spec->catfile( $cli_root, $entry ),
+                hooks_root => $hooks_root,
+                has_hooks  => @hooks ? JSON::XS::true() : JSON::XS::false(),
+                hook_count => scalar(@hooks),
+                hooks      => [ map { File::Spec->catfile( $hooks_root, $_ ) } @hooks ],
+            };
+        }
+        closedir($dh);
+    }
+    return \@commands;
+}
+
+# _page_details($skill_path)
+# Enumerates bookmark and nav pages shipped by one skill.
+# Input: absolute skill root directory path.
+# Output: hash reference with page and nav entry arrays.
+sub _page_details {
+    my ( $self, $skill_path ) = @_;
+    my $dashboards_root = File::Spec->catdir( $skill_path, 'dashboards' );
+    my @entries;
+    if ( -d $dashboards_root ) {
+        opendir( my $dh, $dashboards_root ) or die "Unable to read $dashboards_root: $!";
+        @entries = sort grep {
+               $_ ne '.'
+            && $_ ne '..'
+            && $_ ne 'nav'
+            && -f File::Spec->catfile( $dashboards_root, $_ )
+        } readdir($dh);
+        closedir($dh);
+    }
+
+    my $nav_root = File::Spec->catdir( $dashboards_root, 'nav' );
+    my @nav_entries = map { 'nav/' . $_ } $self->_sorted_files($nav_root);
+    return {
+        root        => $dashboards_root,
+        entries     => \@entries,
+        nav_root    => $nav_root,
+        nav_entries => \@nav_entries,
+    };
+}
+
+# _docker_service_details($skill_path)
+# Enumerates docker service folders and their files for one skill.
+# Input: absolute skill root directory path.
+# Output: array reference of docker service metadata hashes.
+sub _docker_service_details {
+    my ( $self, $skill_path ) = @_;
+    my $docker_root = File::Spec->catdir( $skill_path, 'config', 'docker' );
+    my @services;
+    if ( -d $docker_root ) {
+        opendir( my $dh, $docker_root ) or die "Unable to read $docker_root: $!";
+        for my $entry (
+            sort grep {
+                $_ ne '.' && $_ ne '..' && -d File::Spec->catdir( $docker_root, $_ )
+            } readdir($dh)
+          )
+        {
+            my $service_root = File::Spec->catdir( $docker_root, $entry );
+            push @services, {
+                name  => $entry,
+                root  => $service_root,
+                files => [ map { File::Spec->catfile( $service_root, $_ ) } $self->_sorted_files($service_root) ],
+            };
+        }
+        closedir($dh);
+    }
+    return \@services;
+}
+
+# _collector_details($repo_name, $skill_path)
+# Enumerates collectors declared in one skill config and derives indicator metadata.
+# Input: skill repo name and absolute skill root directory path.
+# Output: array reference of collector metadata hashes.
+sub _collector_details {
+    my ( $self, $repo_name, $skill_path ) = @_;
+    my $config = $self->_read_skill_config_file($skill_path);
+    my $collectors = $config->{collectors};
+    return [] if ref($collectors) ne 'ARRAY';
+    my @items;
+    for my $job ( @{$collectors} ) {
+        next if ref($job) ne 'HASH';
+        next if !defined $job->{name} || $job->{name} eq '';
+        my $qualified_name = $job->{name} =~ /^\Q$repo_name\E\./ ? $job->{name} : $repo_name . '.' . $job->{name};
+        my $indicator = ref( $job->{indicator} ) eq 'HASH' ? $job->{indicator} : {};
+        push @items, {
+            name           => $job->{name},
+            qualified_name => $qualified_name,
+            command        => $job->{command},
+            cwd            => $job->{cwd},
+            schedule       => $job->{schedule},
+            interval       => $job->{interval},
+            has_indicator  => %{$indicator} ? JSON::XS::true() : JSON::XS::false(),
+            indicator      => $indicator,
+        };
+    }
+    return \@items;
+}
+
+# _read_skill_config_file($skill_path)
+# Reads one skill config/config.json file directly.
+# Input: absolute skill root directory path.
+# Output: decoded hash reference or empty hash reference on invalid/missing JSON.
+sub _read_skill_config_file {
+    my ( $self, $skill_path ) = @_;
+    my $config_file = File::Spec->catfile( $skill_path, 'config', 'config.json' );
+    return {} if !-f $config_file;
+    open my $fh, '<', $config_file or return {};
+    local $/;
+    my $json_text = <$fh>;
+    close $fh;
+    my $config = eval { decode_json($json_text) };
+    return ref($config) eq 'HASH' ? $config : {};
+}
+
+# _sorted_files($root)
+# Lists plain files under one directory in deterministic sorted order.
+# Input: directory path string.
+# Output: sorted list of child file names.
+sub _sorted_files {
+    my ( $self, $root ) = @_;
+    return () if !$root || !-d $root;
+    opendir( my $dh, $root ) or die "Unable to read $root: $!";
+    my @files = sort grep {
+           $_ ne '.'
+        && $_ ne '..'
+        && -f File::Spec->catfile( $root, $_ )
+    } readdir($dh);
+    closedir($dh);
+    return @files;
+}
+
+# _skill_disabled($skill_path)
+# Checks whether one installed skill has been disabled locally.
+# Input: absolute skill root directory path.
+# Output: boolean true when the disabled marker exists.
+sub _skill_disabled {
+    my ( $self, $skill_path ) = @_;
+    return -f $self->_disabled_marker_path($skill_path) ? 1 : 0;
+}
+
+# _disabled_marker_path($skill_path)
+# Returns the filesystem path of the skill-disabled marker file.
+# Input: absolute skill root directory path.
+# Output: marker file path string.
+sub _disabled_marker_path {
+    my ( $self, $skill_path ) = @_;
+    return File::Spec->catfile( $skill_path, '.disabled' );
 }
 
 1;

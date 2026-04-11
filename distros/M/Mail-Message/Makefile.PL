@@ -2,10 +2,10 @@ use ExtUtils::MakeMaker;
 
 require 5.016;
 
-my $version  = '4.04';
+my $version  = '4.05';
 my $git      = "https://github.com/markov2/perl5-Mail-Message";
 my $publish  = "../public_html/mail-message";
-my $homepage = "http://perl.overmeer.net/CPAN/";
+my $homepage = "http://perl.overmeer.net/mailbox/";
 
 my %oodist   = (
 	oodoc_version => 3.05,

@@ -42,11 +42,11 @@ Extends L<"OVERLOADED" in Mail::Box|Mail::Box/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<""> stringification
+=item overload: B<'""'> stringification
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<@{}> use as ARRAY
+=item overload: B<'@{}'> use as ARRAY
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
@@ -114,7 +114,7 @@ Inherited, see L<Mail::Box/"Constructors">
 
 =item extract => INTEGER|CODE|METHOD|'LAZY'|'ALWAYS'
 
-=item field_type => CLASS
+=item field_type => $class
 
 =item fix_headers => BOOLEAN
 
@@ -122,9 +122,9 @@ Inherited, see L<Mail::Box/"Constructors">
 
 =item folderdir => $directory
 
-=item head_delayed_type => CLASS
+=item head_delayed_type => $class
 
-=item head_type => CLASS
+=item head_type => $class
 
 =item keep_dups => BOOLEAN
 
@@ -132,15 +132,15 @@ Inherited, see L<Mail::Box/"Constructors">
 
 =item lock_timeout => $seconds
 
-=item lock_type => CLASS|STRING|ARRAY
+=item lock_type => $class|$name|\@names
 
 =item lock_wait => $seconds
 
-=item locker => OBJECT
+=item locker => $locker
 
 =item manager => $manager
 
-=item message_type => CLASS
+=item message_type => $class
 
 =item multipart_type => CLASS
 
@@ -550,14 +550,14 @@ Cast by C<addMessage()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

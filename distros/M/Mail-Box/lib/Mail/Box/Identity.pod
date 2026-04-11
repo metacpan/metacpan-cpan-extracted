@@ -350,16 +350,16 @@ not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
+=item Error: invalid collection $name.
+
+The collection with C<$name> does not exist and can not be created.
+Cast by C<add()>
+
 =item Error: it is not permitted to add subfolders to $folder.
 
 The L<inferiors()|Mail::Box::Identity/"Attributes"> flag prohibits the creation of subfolders to this
 folder.
 Cast by C<addSubfolder()>
-
-=item Error: nvalid collection $name.
-
-The collection with C<$name> does not exist and can not be created.
-Cast by C<add()>
 
 =item Error: the toplevel folder cannot be removed this way
 
@@ -385,14 +385,14 @@ Cast by C<location()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

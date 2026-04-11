@@ -52,18 +52,23 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.17', 'repo version bumped for the FULL-POD-DOC quality rewrite' );
-like( $pm, qr/^2\.17$/m, 'main POD version matches the module version' );
+is( $version, '2.26', 'repo version bumped for the release tarball trim of repo-only assets' );
+like( $pm, qr/^2\.26$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
-    like( $dist, qr/^version = 2\.17$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^version = 2\.26$/m, 'dist.ini version matches the module version in the source tree' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini excludes integration assets so repo-only verification helpers do not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^node_modules\/$/m, 'dist.ini excludes node_modules so JavaScript dependency trees do not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^test_by_michael\/$/m, 'dist.ini excludes test_by_michael so private scratch fixtures do not leak into release tarballs' );
+    like( $dist, qr/^exclude_match = \^updates\/$/m, 'dist.ini excludes checkout-only update scripts so user-defined update remains the installed runtime contract' );
+    like( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini excludes Markdown files so repo-internal docs do not leak into release tarballs' );
     like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
 else {
-    like( $meta, qr/"version"\s*:\s*"2\.17"/, 'META.json version matches the module version in the built distribution' );
+    like( $meta, qr/"version"\s*:\s*"2\.26"/, 'META.json version matches the module version in the built distribution' );
 }
-like( $changes, qr/^2\.17\s+2026-04-10$/m, 'Changes top entry matches the bumped version' );
+like( $changes, qr/^2\.26\s+2026-04-11$/m, 'Changes top entry matches the bumped version' );
 
 for my $path (
     qw(
@@ -101,16 +106,36 @@ for my $module (
 unlike( $makefile, qr/bin\/pjq|bin\/pyq|bin\/ptomq|bin\/pjp|bin\/jq|bin\/yq|bin\/tomq|bin\/propq|bin\/iniq|bin\/csvq|bin\/xmlq|bin\/of|bin\/open-file/, 'Makefile.PL does not install generic helper commands into the global PATH' );
 unlike( $makefile, qr/["']HTTP::Daemon["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Daemon metadata' );
 unlike( $makefile, qr/["']HTTP::Status["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Status metadata' );
-like( $makefile, qr/["']LWP::UserAgent["']\s*=>\s*0/, 'Makefile.PL declares the api-dashboard HTTP client runtime prerequisite' );
-like( $makefile, qr/["']HTTP::Request["']\s*=>\s*0/, 'Makefile.PL declares the api-dashboard request object runtime prerequisite' );
-like( $makefile, qr/["']LWP::Protocol::https["']\s*=>\s*0/, 'Makefile.PL declares the api-dashboard HTTPS protocol runtime prerequisite' );
-like( $makefile, qr/["']URI["']\s*=>\s*0/, 'Makefile.PL declares the api-dashboard URI runtime prerequisite' );
-like( $makefile, qr/["']Digest::MD5["']\s*=>\s*0/, 'Makefile.PL declares the MD5 helper prerequisite for init seed comparisons' );
-like( $makefile, qr/["']Archive::Zip["']\s*=>\s*0/, 'Makefile.PL declares the archive helper runtime prerequisite for Java source lookup' );
-like( $cpanfile, qr/requires ['"]Digest::MD5['"];/, 'cpanfile declares the MD5 helper prerequisite for init seed comparisons' );
-like( $cpanfile, qr/requires ['"]Archive::Zip['"];/, 'cpanfile declares the archive helper runtime prerequisite for Java source lookup' );
-like( $dist, qr/^Digest::MD5 = 0$/m, 'dist.ini declares the MD5 helper prerequisite for dzil builds' ) if $dist ne '';
-like( $dist, qr/^Archive::Zip = 0$/m, 'dist.ini declares the archive helper prerequisite for dzil builds' ) if $dist ne '';
+for my $module (
+    qw(
+    JSON::XS
+    YAML::XS
+    TOML::Tiny
+    Capture::Tiny
+    Getopt::Long
+    Digest::MD5
+    Digest::SHA
+    Archive::Zip
+    MIME::Base64
+    IO::Compress::Gzip
+    IO::Uncompress::Gunzip
+    Dancer2
+    Plack
+    Starman
+    HTTP::Request
+    LWP::Protocol::https
+    LWP::UserAgent
+    Template
+    URI
+    URI::Escape
+    XML::Parser
+    )
+  )
+{
+    like( $makefile, qr/["']\Q$module\E["']\s*=>\s*0/, "Makefile.PL declares runtime prerequisite $module" );
+    like( $cpanfile, qr/requires ['"]\Q$module\E['"];/, "cpanfile declares runtime prerequisite $module" );
+    like( $dist, qr/^\Q$module\E = 0$/m, "dist.ini declares runtime prerequisite $module" ) if $dist ne '';
+}
 for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor skills skill)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
@@ -173,14 +198,17 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/preserve(?:s|d)?\s+.*user-owned.*~\/\.developer-dashboard\/cli|~\/\.developer-dashboard\/cli.*user-owned.*preserve|non-destructive.*~\/\.developer-dashboard\/cli/s, 'docs describe non-destructive preservation of user-owned files under the home runtime CLI root' );
     like( $doc, qr/MD5.*skip(?:s|ping)?.*rewrit|skip(?:s|ping)?.*MD5.*rewrit/s, 'docs describe MD5-based skipping for unchanged managed init files' );
     like( $doc, qr/cdr.*regex|regex.*cdr|which_dir.*regex/i, 'docs describe regex-based cdr and which_dir narrowing' );
+    like( $doc, qr/sort keys %\$d|Perl expression.*\$d|\$d.*Perl expression/is, 'docs describe Perl-expression query support through $d' );
+    like( $doc, qr/_attributes|_text|decoded XML tree|xmlq.*root\.value/is, 'docs describe decoded XML query output instead of a raw xml wrapper' );
     like( $doc, qr/share\/seeded-pages/, 'docs describe shipped seeded bookmark assets outside the main command script' );
     like( $doc, qr/distribution share dir|distribution share directory|cpanm install.*source checkout/s, 'docs describe installed seeded bookmark asset lookup through the dist share directory' );
     like( $doc, qr/stays thin for all built-in commands|thin for all built-in commands.*_dashboard-core|_dashboard-core.*share\/private-cli/s, 'docs describe the thin lazy loader path for all built-in commands' );
     like( $doc, qr/DD-OOP-LAYERS/, 'docs describe the layered runtime inheritance contract explicitly' );
     like( $doc, qr/raw TT\/HTML fragment files under `nav\/` also work|raw TT\/HTML fragment files under C<nav\/> also work|raw `nav\/\*\.tt` TT\/HTML fragment rendering/i, 'docs describe raw nav tt fragment support explicitly' );
     like( $doc, qr/local\/lib\/perl5/, 'docs describe layered runtime local Perl library exposure' );
+    like( $doc, qr/LAST_RESULT/, 'docs describe the immediate previous-hook LAST_RESULT payload' );
+    like( $doc, qr/\[\[STOP\]\]/, 'docs describe the explicit stderr stop marker for hook chains' );
     unlike( $doc, qr/CPANManager/, 'docs do not describe a dedicated CPAN manager module for the sql-dashboard runtime driver flow' );
-    like( $doc, qr/SKILL\.md/, 'docs point readers at the skill authoring guide' );
     like( $doc, qr/Developer::Dashboard::SKILLS/, 'docs point readers at the shipped skill POD module' );
     unlike( $doc, qr/standalone `of` and `open-file`|standalone of and open-file/, 'docs no longer advertise public standalone of/open-file executables' );
     unlike( $doc, qr/standalone `ticket` executable|standalone ticket executable/, 'docs no longer advertise a public standalone ticket executable' );
@@ -190,18 +218,23 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
 
 for my $doc ( grep { defined && $_ ne '' } ( $skill_guide, $skills_pod ) ) {
     like( $doc, qr/dashboard skills install/, 'skill authoring docs explain installation' );
-    like( $doc, qr/dashboard skill example-skill/, 'skill authoring docs explain command dispatch' );
+    like( $doc, qr/dashboard skill example-skill|dashboard example-skill\.hello/, 'skill authoring docs explain command dispatch' );
     like( $doc, qr{~/.developer-dashboard/skills/<repo-name>/|F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>}, 'skill authoring docs describe the isolated skill root' );
     like( $doc, qr/cli\/<command>\.d|cli\/E<lt>commandE<gt>\.d/, 'skill authoring docs explain skill hook directories' );
     like( $doc, qr/dashboards\//, 'skill authoring docs explain skill bookmark storage' );
-    like( $doc, qr{/skill/<repo-name>/bookmarks/<id>|/skill/E<lt>repo-nameE<gt>/bookmarks/E<lt>idE<gt>}, 'skill authoring docs explain skill bookmark routes' );
+    like( $doc, qr{/app/<repo-name>|/app/E<lt>repo-nameE<gt>|/skill/<repo-name>/bookmarks/<id>|/skill/E<lt>repo-nameE<gt>/bookmarks/E<lt>idE<gt>}, 'skill authoring docs explain skill bookmark routes' );
     like( $doc, qr/TITLE:.*BOOKMARK:.*HTML:.*CODE1:/s, 'skill authoring docs explain bookmark section syntax' );
     like( $doc, qr/fetch_value\(|stream_value\(|stream_data\(/, 'skill authoring docs explain bookmark browser helpers' );
     like( $doc, qr/Ajax\(file\s*=>\s*'name'|C<Ajax\(file =E<gt> 'name'/, 'skill authoring docs explain saved Ajax endpoints' );
     like( $doc, qr/nav\/\*\.tt|nav\/foo\.tt/, 'skill authoring docs explain nav bookmark structure' );
     like( $doc, qr{~/.developer-dashboard/cli/<command>\.d|~/.developer-dashboard/cli/E<lt>commandE<gt>\.d}, 'skill authoring docs explain dashboard-wide custom CLI hooks' );
     like( $doc, qr/DEVELOPER_DASHBOARD_SKILL_ROOT/, 'skill authoring docs explain the skill command environment' );
+    like( $doc, qr/LAST_RESULT/, 'skill authoring docs explain previous-hook payloads' );
+    like( $doc, qr/\[\[STOP\]\]/, 'skill authoring docs explain explicit hook stop markers' );
+    like( $doc, qr/_example-skill|_<repo-name>|_E<lt>repo-nameE<gt>|_something/, 'skill authoring docs explain underscored skill config merge keys' );
+    like( $doc, qr/aptfile/, 'skill authoring docs explain isolated apt dependency installation' );
     like( $doc, qr/cpanfile/, 'skill authoring docs explain isolated dependency installation' );
+    like( $doc, qr/config\/docker/, 'skill authoring docs explain skill docker roots' );
     like( $doc, qr/FAQ/i, 'skill authoring docs include an FAQ section' );
     unlike( $doc, qr/FORM\.TT:|FORM:/, 'skill authoring docs no longer document removed FORM bookmark directives' );
 }
@@ -222,39 +255,60 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/dashboard skills install/, 'README documents skill installation' );
     like( $doc, qr/dashboard skills uninstall/, 'README documents skill uninstallation' );
     like( $doc, qr/dashboard skills update/, 'README documents skill updates' );
-    like( $doc, qr/dashboard skill example-skill/, 'README documents isolated skill command dispatch' );
+    like( $doc, qr/dashboard skills enable/, 'README documents skill enablement' );
+    like( $doc, qr/dashboard skills disable/, 'README documents skill disablement' );
+    like( $doc, qr/dashboard skills usage/, 'README documents skill usage inspection' );
+    like( $doc, qr/dashboard skills list -o table|dashboard skills usage example-skill -o table/, 'README documents table output for skill inspection' );
+    like( $doc, qr/dashboard skill example-skill|dashboard example-skill\.somecmd/, 'README documents isolated skill command dispatch' );
+    like( $doc, qr/aptfile/, 'README documents skill apt dependency bootstrap' );
+    like( $doc, qr/_example-skill|_<repo-name>/, 'README documents underscored skill config merge keys' );
+    like( $doc, qr{/app/<repo-name>|/app/<repo-name>/<page>}, 'README documents app-style skill routes' );
+    like( $doc, qr/disabled skills.*re-enabled|re-enabled.*disabled skills/is, 'README documents disabled-skill runtime exclusion and restoration' );
 }
 like( $release_doc, qr/dzil build/, 'release doc still documents the dzil build step' ) if $release_doc ne '';
 like( $release_doc, qr/cpanm .*Developer-Dashboard-1\.\d+\.tar\.gz/, 'release doc still documents tarball installation verification' ) if $release_doc ne '';
 like( $agents_override, qr/DD-OOP-LAYERS/, 'AGENTS.override.md documents the layered runtime contract' ) if $agents_override ne '';
 like( $agents_override, qr/FULL-POD-DOC/, 'AGENTS.override.md documents the FULL-POD-DOC rule' ) if $agents_override ne '';
-like( $readme, qr/FULL-POD-DOC/, 'README documents the FULL-POD-DOC contributor contract' ) if $readme ne '';
-like( $pm, qr/FULL-POD-DOC/, 'main module POD documents the FULL-POD-DOC contributor contract' );
-like( $readme, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'README defines FULL-POD-DOC as real input/output documentation, not boilerplate' ) if $readme ne '';
-like( $pm, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'main module POD defines FULL-POD-DOC as real input/output documentation, not boilerplate' );
-like( $readme, qr/common\s+path.*edge|edge.*common\s+path/is, 'README defines FULL-POD-DOC examples as common-path plus edge-case coverage' ) if $readme ne '';
-like( $pm, qr/common\s+path.*edge|edge.*common\s+path/is, 'main module POD defines FULL-POD-DOC examples as common-path plus edge-case coverage' );
+unlike( $readme, qr/FULL-POD-DOC/, 'README no longer embeds the contributor-only FULL-POD-DOC contract in the product manual' ) if $readme ne '';
+unlike( $pm, qr/FULL-POD-DOC/, 'main module POD no longer embeds the contributor-only FULL-POD-DOC contract' );
+unlike( $readme, qr/\b[A-Za-z0-9_\/.-]+\.md\b/, 'README does not point readers at repo-internal markdown filenames' ) if $readme ne '';
+unlike( $pm, qr/\b[A-Za-z0-9_\/.-]+\.md\b/, 'main module POD does not point readers at repo-internal markdown filenames' );
+unlike( $readme, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'README no longer carries file-level FULL-POD-DOC contributor guidance' ) if $readme ne '';
+unlike( $pm, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'main module POD no longer carries file-level FULL-POD-DOC contributor guidance' );
+unlike( $readme, qr/common\s+path.*edge|edge.*common\s+path/is, 'README no longer carries the contributor example-bank wording' ) if $readme ne '';
+unlike( $pm, qr/common\s+path.*edge|edge.*common\s+path/is, 'main module POD no longer carries the contributor example-bank wording' );
+like( $readme, qr/How is the browser UI served\?|browser UI runs as the dashboard web service.*dashboard serve/is, 'README explains the browser service entrypoint instead of framing it as a framework requirement' ) if $readme ne '';
+like( $pm, qr/How is the browser UI served\?|browser UI runs as the dashboard web service.*dashboard serve/is, 'main module explains the browser service entrypoint instead of framing it as a framework requirement' );
+unlike( $pm, qr/=head2 Does it require a web framework\?/m, 'main module no longer carries the misleading web framework FAQ heading' );
+unlike( $readme, qr/minimal HTTP layer implemented with core Perl-oriented modules/i, 'README no longer claims the web stack avoids a framework' ) if $readme ne '';
+unlike( $pm, qr/minimal HTTP layer implemented with core Perl-oriented modules/i, 'main module no longer claims the web stack avoids a framework' );
+like( $readme, qr/LWP::UserAgent.*api-dashboard|api-dashboard.*LWP::UserAgent|LWP::UserAgent.*open-file|open-file.*LWP::UserAgent/is, 'README describes active LWP::UserAgent usage' ) if $readme ne '';
+like( $pm, qr/LWP::UserAgent.*api-dashboard|api-dashboard.*LWP::UserAgent|LWP::UserAgent.*open-file|open-file.*LWP::UserAgent/is, 'main module POD describes active LWP::UserAgent usage' );
+unlike( $readme, qr/no outbound HTTP client in the core runtime/i, 'README no longer claims outbound HTTP is unused' ) if $readme ne '';
+unlike( $pm, qr/no outbound HTTP client in the core runtime/i, 'main module POD no longer claims outbound HTTP is unused' );
 
-if ( $readme ne '' ) {
-    my ($readme_common) = $readme =~ /#### Common Documentation Example Patterns\s*(.*?)(?:\n#### |\z)/s;
-    my ($readme_edge)   = $readme =~ /#### Edge Or Debugging Documentation Example Patterns\s*(.*?)(?:\n### |\z)/s;
-    my @readme_common_items = $readme_common =~ /^\-\s+`/mg;
-    my @readme_edge_items   = $readme_edge   =~ /^\-\s+`/mg;
-    cmp_ok( scalar(@readme_common_items), '>=', 10, 'README keeps at least ten common documentation example patterns' );
-    cmp_ok( scalar(@readme_edge_items),   '>=', 10, 'README keeps at least ten edge/debugging documentation example patterns' );
-}
-
-my ($pod_common) = $pm =~ /=head3 Common Documentation Example Patterns\s*(.*?)(?:\n=head[23] |\z)/s;
-my ($pod_edge)   = $pm =~ /=head3 Edge Or Debugging Documentation Example Patterns\s*(.*?)(?:\n=head2 |\z)/s;
-my @pod_common_items = $pod_common =~ /^=item \*/mg;
-my @pod_edge_items   = $pod_edge   =~ /^=item \*/mg;
-cmp_ok( scalar(@pod_common_items), '>=', 10, 'main POD keeps at least ten common documentation example patterns' );
-cmp_ok( scalar(@pod_edge_items),   '>=', 10, 'main POD keeps at least ten edge/debugging documentation example patterns' );
+my $main_see_also = _section_body( $pm, 'SEE ALSO' );
+like( $main_see_also, qr/L<\/Main Concepts>/, 'main module SEE ALSO links to the local Main Concepts section' );
+like( $main_see_also, qr/L<\/Working With Collectors>/, 'main module SEE ALSO links to the local collector guide section' );
+like( $main_see_also, qr/L<\/Runtime Lifecycle>/, 'main module SEE ALSO links to the local runtime lifecycle section' );
+like( $main_see_also, qr/L<\/Skills System>/, 'main module SEE ALSO links to the local skills guide section' );
+unlike(
+    $main_see_also,
+    qr/L<Developer::Dashboard::PathRegistry>|L<Developer::Dashboard::PageStore>|L<Developer::Dashboard::CollectorRunner>|L<Developer::Dashboard::Prompt>/,
+    'main module SEE ALSO avoids brittle private-module links that can degrade into broken rendered targets',
+);
+unlike(
+    $pm,
+    qr/L<Developer::Dashboard::[A-Za-z:]+>/,
+    'main module product manual avoids brittle private-module POD links and stays self-contained',
+);
 
 for my $path ( _perl_doc_paths() ) {
     my $content = _slurp($path);
     like( $content, qr/^__END__$/m, "$path keeps Perl POD after __END__" );
     like( $content, qr/^=head1 NAME$/m, "$path documents NAME" );
+    unlike( _extract_pod($content), qr/\b[A-Za-z0-9_\/.-]+\.md\b/, "$path POD does not point readers at repo-internal markdown filenames" );
+    next if $path eq _repo_path( 'lib', 'Developer', 'Dashboard.pm' );
     like( $content, qr/^=head1 PURPOSE$/m, "$path documents PURPOSE" );
     like( $content, qr/^=head1 WHY IT EXISTS$/m, "$path documents WHY IT EXISTS" );
     like( $content, qr/^=head1 WHEN TO USE$/m, "$path documents WHEN TO USE" );
@@ -279,6 +333,8 @@ for my $path ( _shipped_perl_doc_paths() ) {
     for my $pattern (@forbidden_full_pod_boilerplate) {
         unlike( $content, $pattern, "$path no longer uses the generic FULL-POD-DOC boilerplate" );
     }
+
+    next if $path eq _repo_path( 'lib', 'Developer', 'Dashboard.pm' );
 
     my $how_to_use = _section_body( $content, 'HOW TO USE' );
     my $normalized_how_to_use = $how_to_use;

@@ -84,6 +84,8 @@ static const char CHANDRA_BRIDGE_JS[] =
     "    };\n"
     "})();\n";
 
+#define CHANDRA_BRIDGE_JS_LEN (sizeof(CHANDRA_BRIDGE_JS) - 1)
+
 /* ============================================================================
  * Router JS Code — static constant (replaces Chandra::App->_router_js)
  * ============================================================================ */

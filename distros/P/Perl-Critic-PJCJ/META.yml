@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/pjcj/Perl-Critic-PJCJ/issues
   homepage: https://pjcj.net/perl.html
   repository: git://github.com/pjcj/Perl-Critic-PJCJ.git
-version: v0.2.5
+version: v0.2.6
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -210,7 +210,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.2.5
+          tag: v0.2.6
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

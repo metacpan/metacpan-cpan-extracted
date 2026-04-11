@@ -28,22 +28,23 @@ xmlq - XML query command for Developer Dashboard
 
 =head1 DESCRIPTION
 
-This command provides XML extraction for Developer Dashboard.
+This command provides XML query extraction for Developer Dashboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This staged helper owns the public C<dashboard xmlq> command. It accepts a
-path plus an optional input file, then hands the request to the shared query
-runtime so parsing, file-vs-STDIN handling, and output formatting stay
-consistent with the rest of the dashboard toolchain.
+path or C<$d>-based Perl expression plus an optional input file, then hands the
+request to the shared query runtime so parsing, file-vs-STDIN handling, and
+output formatting stay consistent with the rest of the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists because XML inspection is part of the dashboard query family, but the
-current XML behavior is intentionally minimal and should still stay behind the
-same staged-helper and shared-runtime contract as the other query helpers.
+It exists because XML inspection is part of the dashboard query family and
+should stay behind the same staged-helper and shared-runtime contract as the
+other query helpers. The helper now exposes decoded XML trees instead of making
+callers dig raw XML back out of a wrapper field.
 
 =head1 WHEN TO USE
 
@@ -54,22 +55,23 @@ helper examples, or the staged handoff into the shared query runtime.
 
 Users run C<dashboard xmlq [path] [file]>. The staged helper selects the XML
 backend in the shared query runtime, which accepts the file and path in either
-order, reads STDIN when no file is given, and currently exposes the raw XML
-payload under the C<_raw> key instead of pretending to support a full XML tree
-query language. Use C<_raw>, C<$d>, or C<.> when you need the whole payload.
+order, reads STDIN when no file is given, decodes XML into nested Perl hashes
+and arrays, stores XML attributes under C<_attributes>, stores mixed text under
+C<_text>, and lets dotted paths or C<$d>-based Perl expressions walk that
+decoded tree. Use C<$d> or C<.> when you need the whole decoded document.
 
 =head1 WHAT USES IT
 
 It is used by the public C<dashboard xmlq> command, by shell snippets that want
 a runtime-local XML inspection tool, and by query-helper coverage under C<t/>
-that locks in the current minimal raw-payload contract.
+that locks in the decoded-tree contract.
 
 =head1 EXAMPLES
 
-  printf '<root><value>demo</value></root>' | dashboard xmlq _raw
+  printf '<root><value>demo</value></root>' | dashboard xmlq root.value
   dashboard xmlq feed.xml '$d'
   dashboard xmlq '$d' feed.xml
-  cat feed.xml | dashboard xmlq _raw
+  printf '<root><item id="1">x</item><item id="2">y</item></root>' | dashboard xmlq 'join q(,), map { $_->{_attributes}{id} } @{ $d->{root}{item} }'
 
 =for comment FULL-POD-DOC END
 

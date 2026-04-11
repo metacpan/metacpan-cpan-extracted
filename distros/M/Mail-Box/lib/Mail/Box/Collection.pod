@@ -32,11 +32,11 @@ Extends L<"OVERLOADED" in User::Identity::Collection|User::Identity::Collection/
 
 =over 4
 
-=item overload: B<""> stringification
+=item overload: B<'""'> stringification
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
-=item overload: B<@{}> array dereference
+=item overload: B<'@{}'> array dereference
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
@@ -107,10 +107,6 @@ Inherited, see L<User::Identity::Item/"Attributes">
 
 Returns the type of folder (on this location).  When specified, then
 C<$folderclass> must be a L<Mail::Box|Mail::Box> extension.
-
-=encoding utf8
-
-=pod
 
 =item $obj-E<gt>B<itemType>()
 
@@ -266,7 +262,7 @@ not.  Probably you should investigate this and probably inform the author
 of the package.
 Cast by C<notImplemented()>
 
-=item Error: nvalid collection $name.
+=item Error: invalid collection $name.
 
 The collection with C<$name> does not exist and can not be created.
 Cast by C<add()>
@@ -285,14 +281,14 @@ Cast by C<addRole()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

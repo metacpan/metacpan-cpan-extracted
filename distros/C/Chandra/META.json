@@ -46,13 +46,7 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/javalikescript/webview-c.git",
-         "web" : "https://github.com/javalikescript/webview-c"
-      }
-   },
-   "version" : "0.20",
+   "resources" : {},
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

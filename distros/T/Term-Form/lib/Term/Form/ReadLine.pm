@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '0.562';
+our $VERSION = '0.563';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -480,7 +480,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.562
+Version 0.563
 
 =cut
 
@@ -672,7 +672,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022-2025 Matthäus Kiem.
+Copyright 2022-2026 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

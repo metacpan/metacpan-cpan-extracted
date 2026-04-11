@@ -1,5 +1,11 @@
 Revision history for Chandra
 
+0.21 2026-04-11
+  - Add Edge/WebView2 backend for Windows (Chromium-based rendering)
+  - Automatic fallback to MSHTML when WebView2 Runtime unavailable
+  - Document WebView2 requirements in POD
+  - Deduplicate bridge JavaScript into shared header (chandra_bridge_js.h)
+
 0.20 2026-04-09
   - Update deps - bump min version of File::Raw to 0.08 to get file_join
   - Make tests environment agnostic

@@ -102,11 +102,6 @@ WriteMakefile(
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/javalikescript/webview-c.git',
-                web  => 'https://github.com/javalikescript/webview-c',
-            },
         },
     },
 );

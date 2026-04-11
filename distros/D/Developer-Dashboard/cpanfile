@@ -13,10 +13,12 @@ requires 'Dancer2';
 requires 'Plack';
 requires 'Starman';
 requires 'HTTP::Request';
+requires 'LWP::Protocol::https';
 requires 'LWP::UserAgent';
 requires 'Template';
 requires 'URI';
 requires 'URI::Escape';
+requires 'XML::Parser';
 
 on 'develop' => sub {
     recommends 'DBI';

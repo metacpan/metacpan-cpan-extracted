@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  aep-master:
+    build: .
+    command:
+      - "--lock-server"
+      - "--lock-server-order=db,app"
+      - "--lock-server-exhaust-action=exit"
+    expose:
+      - "60000"
+
+  db:
+    build: .
+    command:
+      - "--lock-client"
+      - "--lock-id=db"
+      - "--command=echo"
+      - "--command-args=db started"
+      - "--lock-trigger=none:time:1000"
+      - "--lock-transport=tcp"
+      - "--lock-client-host=aep-master"
+    depends_on:
+      - aep-master
+
+  app:
+    build: .
+    command:
+      - "--lock-client"
+      - "--lock-id=app"
+      - "--command=echo"
+      - "--command-args=app started"
+      - "--lock-trigger=none:time:1000"
+      - "--lock-transport=tcp"
+      - "--lock-client-host=aep-master"
+    depends_on:
+      - aep-master

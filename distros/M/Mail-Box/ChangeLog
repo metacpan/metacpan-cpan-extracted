@@ -8,6 +8,13 @@ TODO: Mail::Box::Message::new(body_type) not used?
 #!!! number 3.  Use (at least) version 4 for new developments.
 #!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
+version 4.02: Fri 10 Apr 11:03:23 CEST 2026
+
+	Improvements:
+	- Mail::Box synopsis reorg.
+	- remove version of introduction indicators '[3*]' because we are
+	  not backwards compatible with 3 anyway.
+
 version 4.01: Sat 13 Dec 12:13:49 CET 2025
 
 	Fixes:

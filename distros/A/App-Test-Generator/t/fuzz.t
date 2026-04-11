@@ -3,6 +3,10 @@
 use strict;
 use warnings;
 
+use Test::Needs {
+	'App::Test::Generator' => '0.19',
+	'perl' => 5.036,	# Later A::T::G need this version
+};
 use FindBin qw($Bin);
 use IPC::Run3;
 use IPC::System::Simple qw(system);

@@ -51,6 +51,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'List::Util' => '0',
+                                      'PPI' => '1.281',
                                       'Perl::Critic::Policy' => '0',
                                       'Perl::Critic::Utils' => '0',
                                       'Readonly' => '2.01',

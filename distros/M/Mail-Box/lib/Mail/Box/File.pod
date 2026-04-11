@@ -30,11 +30,11 @@ Extends L<"OVERLOADED" in Mail::Box|Mail::Box/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<""> stringification
+=item overload: B<'""'> stringification
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<@{}> use as ARRAY
+=item overload: B<'@{}'> use as ARRAY
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
@@ -110,7 +110,7 @@ in memory, is implemented like this:
 
 =item extract => INTEGER|CODE|METHOD|'LAZY'|'ALWAYS'
 
-=item field_type => CLASS
+=item field_type => $class
 
 =item fix_headers => BOOLEAN
 
@@ -118,9 +118,9 @@ in memory, is implemented like this:
 
 =item folderdir => $directory
 
-=item head_delayed_type => CLASS
+=item head_delayed_type => $class
 
-=item head_type => CLASS
+=item head_type => $class
 
 =item keep_dups => BOOLEAN
 
@@ -148,15 +148,15 @@ produced by default.
 
 =item lock_timeout => $seconds
 
-=item lock_type => CLASS|STRING|ARRAY
+=item lock_type => $class|$name|\@names
 
 =item lock_wait => $seconds
 
-=item locker => OBJECT
+=item locker => $locker
 
 =item manager => $manager
 
-=item message_type => CLASS
+=item message_type => $class
 
 =item multipart_type => CLASS
 
@@ -419,7 +419,7 @@ Inherited, see L<Mail::Box/"Internals">
 =item $any-E<gt>B<folderToFilename>( $foldername, $folderdir, [$subext] )
 
 Translate a C<$foldername> into a filename, using the C<$folderdir> value
-to replace a leading C<=>.  The optional C<$subext> is only used for MBOX
+to replace a leading “C<<= >>”.  The optional C<$subext> is only used for MBOX
 folders.
 
 =item $class-E<gt>B<foundIn>( [$foldername], %options )
@@ -445,7 +445,7 @@ C<$type> and C<$config>, a new configuration is set.
 
 =item $obj-E<gt>B<moveAwaySubFolder>($directory, $extension)
 
-The C<$directory> is renamed by appending the C<$extension>, which defaults to C<".d">,
+The C<$directory> is renamed by appending the C<$extension>, which defaults to “C<.d>”,
 to make place for a folder file on that specific location.  C<false> is
 returned if this failed.
 
@@ -590,9 +590,23 @@ Inherited, see L<Mail::Box/"Cleanup">
 
 =back
 
-=head2 DETAILS
+=head1 DETAILS
 
-=head3 File based folders
+Extends L<"DETAILS" in Mail::Box|Mail::Box/"DETAILS">.
+
+=head2 Different kinds of folders
+
+Extends L<"Different kinds of folders" in Mail::Box|Mail::Box/"Different kinds of folders">.
+
+=head2 Available folder types
+
+Extends L<"Available folder types" in Mail::Box|Mail::Box/"Available folder types">.
+
+=head2 Folder class implementation
+
+Extends L<"Folder class implementation" in Mail::Box|Mail::Box/"Folder class implementation">.
+
+=head2 File based folders
 
 File based folders maintain a folder (a set of messages) in one
 single file.  The advantage is that your folder has only one
@@ -604,10 +618,6 @@ for instance by adding a message separator, and this will cause
 problems.  Where access to all messages at once is faster in file
 based folders, access to a single message is (much) slower, because
 the whole folder must be read.
-
-=head1 DETAILS
-
-Extends L<"DETAILS" in Mail::Box|Mail::Box/"DETAILS">.
 
 =head1 DIAGNOSTICS
 
@@ -760,14 +770,14 @@ Cast by C<addMessage()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

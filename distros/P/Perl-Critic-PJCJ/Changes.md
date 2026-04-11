@@ -1,5 +1,12 @@
 # Revision history for Perl::Critic::PJCJ
 
+## v0.2.6 - 2026-04-11
+
+- Suggest single quotes for qq/q strings containing only double quotes
+  - `qq("hello")` and `q("hello")` now correctly suggest `'` instead of
+    keeping the quote operator
+- Clean and optimise code
+
 ## v0.2.5 - 2026-03-22
 
 - Fix false violation for escaped backslashes in double-quoted strings

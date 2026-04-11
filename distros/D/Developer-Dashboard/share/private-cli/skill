@@ -55,23 +55,29 @@ It is used by installed dashboard skills, by skill integration tests, and by con
 
 Example 1:
 
-  dashboard skill example-skill
+  dashboard skill example-skill hello
 
-Run the public built-in command path that stages or re-enters this helper.
+Run the explicit public skill dispatcher path for one installed skill command.
 
 Example 2:
+
+  dashboard example-skill.hello
+
+Run the short dotted route that the public C<dashboard> switchboard resolves back into this helper.
+
+Example 3:
 
   ~/.developer-dashboard/cli/dd/skill --help
 
 Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
 
-Example 3:
+Example 4:
 
   prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
 
 Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
 
-Example 4:
+Example 5:
 
   prove -lr t
 

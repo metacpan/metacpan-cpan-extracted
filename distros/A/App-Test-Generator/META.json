@@ -42,6 +42,7 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Getopt::Long" : "0",
+            "HTML::Entities" : "0",
             "IPC::Open3" : "0",
             "JSON::MaybeXS" : "0",
             "Module::Load::Conditional" : "0",
@@ -101,6 +102,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

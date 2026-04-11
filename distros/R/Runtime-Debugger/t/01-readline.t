@@ -128,7 +128,7 @@ sub _define_expected_vars {
         @vars_global, @vars_scalar, @vars_array, @vars_hash,
     );
 
-    my @commands              = ( 'd', 'dd', 'help', 'hist', 'p', 'q' );
+    my @commands              = ( 'd', 'dd', 'help', 'hist', 'p', 'q', 'vars' );
     my @commands_and_vars_all = ( sort { $a cmp $b } @commands, @vars_all );
 
     {
@@ -164,6 +164,7 @@ sub _define_help_stdout {
         ' p DATA         - Data printer (colored).',
         ' d DATA         - Data dumper.',
         ' dd DATA, [N=3] - Dump internals (with depth).',
+        ' vars           - Show available variables.',
         ' q              - Quit debugger.',
         ''
     ]

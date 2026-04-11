@@ -4,7 +4,7 @@ use v5.26.0;
 use strict;
 use warnings;
 
-use Test2::V0    qw( done_testing is like ok subtest );
+use Test2::V0    qw( done_testing is ok subtest );
 use feature      qw( signatures );
 use experimental qw( signatures );
 
@@ -22,8 +22,8 @@ subtest "Policy methods" => sub {
   is $themes[0], "cosmetic", "default theme is cosmetic";
 
   my @types = $Policy->applies_to;
-  is @types, 7, "applies_to returns 7 token types";
-  like $types[0], qr/Quote/, "applies_to returns quote token types";
+  is @types,                  7, "applies_to returns 7 token types";
+  is +(grep /Quote/, @types), 6, "applies_to returns 6 quote token types";
 
   is $Policy->delimiter_preference_order("("), 0, "() has preference 0";
   is $Policy->delimiter_preference_order("["), 1, "[] has preference 1";

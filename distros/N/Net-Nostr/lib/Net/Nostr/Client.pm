@@ -160,8 +160,8 @@ sub on {
 
 sub _emit {
     my ($self, $type, @args) = @_;
-    my $cb = $self->_callbacks->{$type};
-    $cb->(@args) if $cb;
+    my $cb = $self->_callbacks->{$type} or return;
+    eval { $cb->(@args); 1 } or warn "callback '$type' died: $@";
 }
 
 sub _setup_handlers {

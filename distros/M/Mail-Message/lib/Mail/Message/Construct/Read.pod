@@ -55,8 +55,8 @@ with your internal administration, which may have security implications.
 =item body_type => $type
 
 Force a body C<$type> (any specific extension of the L<Mail::Message::Body|Mail::Message::Body> class)
-to be used to store the message content.  When the body is a multipart or
-nested, this will be overruled.
+to be used to store the message content.  Multipart and nested message parts
+pick their own type.
 
 =item parser_class => $type
 
@@ -94,7 +94,7 @@ you probably process folders yourself, which is a Bad Thing!
   Hi, greetings!
   MSG
 
-  # promail example
+  # procmail example
   my $fromline = <STDIN>;
   my $msg      = Mail::Message->read(\*STDIN);
   my $coerced  = $mboxfolder->addMessage($msg);
@@ -106,7 +106,7 @@ you probably process folders yourself, which is a Bad Thing!
 
 =over 4
 
-=item Error: cannot read message from a $source}.
+=item Error: cannot read message from a $source.
 
 Cast by C<read()>
 
@@ -114,8 +114,8 @@ Cast by C<read()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

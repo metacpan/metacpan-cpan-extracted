@@ -143,7 +143,7 @@ Inherited, see L<Mail::Box::Parser/"Parsing">
 
 =item $obj-E<gt>B<openFile>(%options)
 
-[3.012] Open the file to be parsed.
+Open the file to be parsed.
 
 =item $obj-E<gt>B<readHeader>()
 
@@ -239,8 +239,8 @@ Cast by C<readHeader()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

@@ -4,9 +4,17 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test 
 
 # VERSION
 
-Version 0.28
+Version 0.30
 
 # SYNOPSIS
+
+`App::Test::Generator` is a suite to help the testing of CPAN modules.
+It consists of 4 modules:
+
+- Fuzz Tester
+- Mutation Testing
+- LCSAJ Metrics
+- Test Dashboard
 
 From the command line:
 
@@ -22,10 +30,10 @@ From Perl:
     use App::Test::Generator qw(generate);
 
     # Generate to STDOUT
-    App::Test::Generator::generate("t/conf/add.yml");
+    App::Test::Generator->generate("t/conf/add.yml");
 
     # Generate directly to a file
-    App::Test::Generator::generate('t/conf/add.yml', 't/add_fuzz.t');
+    App::Test::Generator->generate('t/conf/add.yml', 't/add_fuzz.t');
 
     # Holy grail mode - read a Perl file, generate tests, and run them
     # This is a long way away yet, but see t/schema_input.t for a proof of concept
@@ -78,6 +86,143 @@ It then generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based 
 - Optional static corpus tests from Perl `%cases` or YAML file (`yaml_cases` key)
 - Functional or OO mode (via `$new`)
 - Reproducible runs via `$seed` and configurable iterations via `$iterations`
+
+# MUTATION-GUIDED TEST GENERATION
+
+`App::Test::Generator` includes a pipeline that automatically closes the
+feedback loop between mutation testing, schema extraction, and fuzz
+testing. The goal is that surviving mutants drive the creation of new
+tests that kill them on the next run, without manual intervention.
+
+## The Pipeline
+
+    mutation survivor
+        |
+        v
+    SchemaExtractor extracts the schema for the enclosing sub
+        |
+        v
+    Schema augmented with boundary values from the mutant
+        |
+        v
+    Augmented schema written to t/conf/
+        |
+        v
+    t/fuzz.t picks up the new schema and runs fuzz tests
+        |
+        v
+    Mutation killed on next run
+
+## How to Use It
+
+The pipeline is driven by three flags passed to
+`scripts/generate_index.pl`, which is invoked automatically by
+`scripts/generate_test_dashboard` on each CI push.
+
+### Step 1: Generate TODO stubs for all survivors
+
+    scripts/generate_index.pl --generate_mutant_tests=t
+
+Produces `t/mutant_YYYYMMDD_HHMMSS.t` containing:
+
+- TODO stubs for HIGH and MEDIUM difficulty survivors, with
+boundary value suggestions, environment variable hints, and the
+enclosing subroutine name for navigation context.
+- Comment-only hints for LOW difficulty survivors.
+
+Multiple mutations on the same source line are deduplicated into one
+stub. One good test kills all variants on that line.
+
+### Step 2: Generate runnable schemas for NUM\_BOUNDARY survivors
+
+    scripts/generate_index.pl \
+        --generate_mutant_tests=t \
+        --generate_test=mutant
+
+For each NUM\_BOUNDARY survivor, calls
+[App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) to extract the schema for
+the enclosing subroutine. If the confidence level is sufficient, the
+schema is augmented with the boundary value from the mutant (plus one
+value either side) and written to `t/conf/` as a runnable YAML file.
+["fuzz.t" in t](https://metacpan.org/pod/t#fuzz.t) picks it up automatically on the next test run.
+
+Falls back to a TODO stub if:
+
+- SchemaExtractor cannot parse the file
+- The enclosing sub cannot be determined
+- The extracted schema confidence is `very_low` or `none`
+
+### Step 3: Augment existing schemas with survivor boundary values
+
+    scripts/generate_index.pl \
+        --generate_mutant_tests=t \
+        --generate_test=mutant \
+        --generate_fuzz
+
+Scans `t/conf/` for existing YAML schema files (hand-written or
+previously generated) and writes augmented copies with boundary values
+from surviving NUM\_BOUNDARY mutants merged in. The original schema is
+never modified. Augmented copies are written as
+`t/conf/mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml` and picked up
+automatically by `t/fuzz.t`.
+
+Schemas whose filename already starts with `mutant_fuzz_` are skipped
+to prevent cascading augmentation. Schemas with no matching survivors
+are skipped, with a note if `--verbose` is active.
+
+### Putting It All Together
+
+The recommended invocation in `scripts/generate_test_dashboard`
+Step 7 runs all three stages together:
+
+    scripts/generate_index.pl \
+        --generate_mutant_tests=t \
+        --generate_test=mutant \
+        --generate_fuzz
+
+The GitHub Actions workflow in `.github/workflows/dashboard.yml`
+then commits any new `t/mutant_*.t` and `t/conf/mutant_*.yml` files
+to the repository so they accumulate over time as the test suite
+improves.
+
+## Confidence Levels
+
+[App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) assigns a confidence level
+to each extracted schema:
+
+- `high` / `medium` / `low` - Schema is used for test generation
+- `very_low` / `none` - Falls back to TODO stub
+
+Confidence is based on how much type and constraint information could
+be inferred from the source code and its POD documentation. Methods
+with explicit parameter validation ([Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict),
+[Params::Get](https://metacpan.org/pod/Params%3A%3AGet)) or comprehensive POD will produce higher-confidence
+schemas.
+
+## Files Produced
+
+- `t/mutant_YYYYMMDD_HHMMSS.t`
+
+    TODO stub file for all survivors. Committed to the repository by the
+    GitHub Actions workflow.
+
+- `t/conf/mutant_MODNAME_FUNCTION_YYYYMMDD_HHMMSS.yml`
+
+    Runnable YAML schema for a NUM\_BOUNDARY survivor where SchemaExtractor
+    confidence was sufficient. Picked up by `t/fuzz.t`.
+
+- `t/conf/mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml`
+
+    Augmented copy of an existing schema with survivor boundary values
+    merged in. Picked up by `t/fuzz.t`.
+
+## See Also
+
+- [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) - Schema extraction
+from Perl source code
+- ["generate\_index.pl" in scripts](https://metacpan.org/pod/scripts#generate_index.pl) - Dashboard generator and
+pipeline driver
+- ["generate\_test\_dashboard" in scripts](https://metacpan.org/pod/scripts#generate_test_dashboard) - Full pipeline runner
 
 # CONFIGURATION
 
@@ -172,6 +317,8 @@ The current supported variables are
 
 - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 - `properties`, enable [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) Property tests (default: 0)
+
+    \*item \* `test_security`, send some security string based tests (default: 0)
 
 All values default to `true`.
 
@@ -358,7 +505,7 @@ When provided, the generated `t/fuzz.t` will call `srand($seed)` so fuzz runs ar
 
 ### `$iterations`
 
-An optional integer controlling how many fuzz iterations to perform (default 50).
+An optional integer controlling how many fuzz iterations to perform (default 30).
 
 ### `%edge_cases`
 
@@ -409,7 +556,7 @@ During fuzzing iterations, there's a 40% probability that a test case will use a
       - " "
 
     seed: 42
-    iterations: 50
+    iterations: 30
 
 ### Semantic Data Generators
 
@@ -757,7 +904,7 @@ Generate the test:
 The generated test will include:
 
 - Traditional edge-case tests for boundary conditions
-- Random fuzzing with 50 iterations (or as configured)
+- Random fuzzing with 30 iterations (or as configured)
 - Property-based tests that verify the transforms with 1000 trials each
 
 ### What Properties Are Tested?

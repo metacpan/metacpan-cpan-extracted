@@ -1,6 +1,13 @@
 Revision history for e
 
 =================
+1.38 - 2026-04-10
+=================
+
+Added vars() to repl help.
+Added check to avoid warnings if using during DESTROY.
+
+=================
 1.37 - 2025-12-16
 =================
 

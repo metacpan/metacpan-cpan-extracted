@@ -36,16 +36,16 @@ Extends L<"DESCRIPTION" in Mail::Identity|Mail::Identity/"DESCRIPTION">.
 
 =over 4
 
-=item overload: B<""> stringification
+=item overload: B<'""'> stringification
 
 When the object is used in string context, it will return the encoded
 representation of the e-mail address, just like L<string()|Mail::Message::Field::Address/"Access to the content"> does.
 
-=item overload: B<boolean> true/falase
+=item overload: B<'bool'> use as boolean
 
 The object used as boolean will always return C<true>
 
-=item overload: B<cmp> string comparison
+=item overload: B<'cmp'> string comparison
 
 Two address objects are the same when their email addresses are the same.
 
@@ -249,8 +249,8 @@ Cast by C<addCollection()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

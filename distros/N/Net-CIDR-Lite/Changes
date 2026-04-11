@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::CIDR::Lite.
 
+0.23  2026-04-10
+    - Security: (CVE-2026-40199) Fix IPv4 mapped IPv6 packed length. 
+    - Security: (CVE-2026-40198) Reject invalid uncompressed IPv6.
 0.22  2021-04-04
     - Security: IPv4 octets with leading zeroes are no longer allowed.
       https://blog.urth.org/2021/03/29/security-issues-in-perl-ip-address-distros/

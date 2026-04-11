@@ -13,6 +13,8 @@ use JSON::XS qw(decode_json);
 use Test::More;
 
 use lib 'lib';
+use Developer::Dashboard::Config;
+use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::SkillManager;
@@ -23,11 +25,24 @@ my $repo_bin  = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
 my $test_repos = tempdir( CLEANUP => 1 );
 my $fake_bin = tempdir( CLEANUP => 1 );
 my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
+my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
+my $dependency_log = File::Spec->catfile( $fake_bin, 'dependency-install.log' );
 _write_file(
     File::Spec->catfile( $fake_bin, 'cpanm' ),
     <<"SH",
 #!/bin/sh
 printf '%s\\n' "\$*" >> "$cpanm_log"
+printf 'CPANM:%s\\n' "\$*" >> "$dependency_log"
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'apt-get' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$apt_log"
+printf 'APT:%s\\n' "\$*" >> "$dependency_log"
 exit 0
 SH
     0755,
@@ -52,6 +67,7 @@ use strict;
 use warnings;
 print "hook-alpha\n";
 PL
+    aptfile_body => "git\ncurl\n",
     bookmark_body => <<'BOOKMARK',
 TITLE: Skill Bookmark
 :--------------------------------------------------------------------------------:
@@ -72,7 +88,14 @@ ok( -d File::Spec->catdir( $install->{path}, 'logs' ), 'install prepares isolate
 ok( -d File::Spec->catdir( $install->{path}, 'local' ), 'install prepares isolated local dependency root' );
 ok( -f File::Spec->catfile( $install->{path}, 'config', 'config.json' ), 'install ensures isolated skill config exists' );
 ok( -f File::Spec->catfile( $install->{path}, 'cpanfile' ), 'test skill includes cpanfile for dependency handling' );
+ok( -f File::Spec->catfile( $install->{path}, 'aptfile' ), 'test skill includes aptfile for dependency handling' );
+ok( -f $apt_log, 'install runs apt-get for isolated skill apt dependencies when an aptfile is present' );
 ok( -f $cpanm_log, 'install runs cpanm for isolated skill dependencies when a cpanfile is present' );
+open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $dependency_log: $!";
+my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
+close $dependency_log_fh;
+is( $dependency_steps[0] =~ /^APT:/ ? 1 : 0, 1, 'skill install runs aptfile processing before cpanfile processing' );
+is( $dependency_steps[1] =~ /^CPANM:/ ? 1 : 0, 1, 'skill install runs cpanfile processing after aptfile processing' );
 
 my $listed = $manager->list();
 is( scalar(@$listed), 1, 'list returns the installed skill only once' );
@@ -81,10 +104,22 @@ is_deeply(
     ['run-test'],
     'list reports the isolated skill cli commands',
 );
+ok( $listed->[0]{enabled}, 'list reports installed skills as enabled by default' );
+is( $listed->[0]{pages_count}, 1, 'list reports the number of non-nav skill pages' );
+is( $listed->[0]{docker_services_count}, 1, 'list reports the number of skill docker services' );
+is( $listed->[0]{has_aptfile}, 1, 'list reports aptfile presence for one installed skill' );
 ok(
     index( $listed->[0]{path}, File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'alpha-skill' ) ) == 0,
     'installed skill lives only under the isolated skills root',
 );
+
+my $usage = $manager->usage('alpha-skill');
+ok( !$usage->{error}, 'usage returns detailed metadata for an installed skill' ) or diag $usage->{error};
+is( $usage->{name}, 'alpha-skill', 'usage reports the installed repo name' );
+ok( $usage->{enabled}, 'usage reports enabled status for active skills' );
+ok( scalar( grep { $_->{name} eq 'run-test' && $_->{has_hooks} } @{ $usage->{cli} } ), 'usage lists cli commands together with hook presence' );
+ok( scalar( grep { $_ eq 'welcome' } @{ $usage->{pages}{entries} } ), 'usage lists non-nav dashboard pages' );
+ok( scalar( grep { $_->{name} eq 'postgres' } @{ $usage->{docker}{services} } ), 'usage lists docker services' );
 
 my $dispatch = $dispatcher->dispatch( 'alpha-skill', 'run-test', 'one', 'two' );
 ok( !$dispatch->{error}, 'dispatcher runs a skill command successfully' ) or diag $dispatch->{error};
@@ -95,12 +130,74 @@ ok( exists $dispatch->{hooks}{'00-pre.pl'}, 'dispatch returns captured hook meta
 my $config = $dispatcher->get_skill_config('alpha-skill');
 is( $config->{skill_name}, 'alpha-skill', 'dispatcher reads isolated skill config' );
 
+my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+my $fleet_config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+$fleet_config->save_global(
+    {
+        collectors => [
+            {
+                name    => 'system.collector',
+                command => q{printf 'system'},
+                cwd     => 'home',
+            },
+        ],
+    }
+);
+_write_file(
+    File::Spec->catfile( $install->{path}, 'config', 'config.json' ),
+    <<'JSON',
+{
+  "skill_name": "alpha-skill",
+  "collectors": [
+    {
+      "name": "status",
+      "command": "printf 'alpha-status'",
+      "cwd": "home",
+      "interval": 15,
+      "indicator": {
+        "label": "Alpha Status",
+        "icon": "A"
+      }
+    }
+  ]
+}
+JSON
+    0644,
+);
+my $fleet_jobs = $fleet_config->collectors;
+is_deeply(
+    [ map { $_->{name} } @{$fleet_jobs} ],
+    [ 'system.collector', 'alpha-skill.status' ],
+    'config collector fleet includes installed skill collectors under repo-qualified names',
+);
+is( $fleet_jobs->[1]{skill_name}, 'alpha-skill', 'skill collectors carry their source skill name in fleet metadata' );
+is( $fleet_jobs->[1]{indicator}{label}, 'Alpha Status', 'skill collector indicator config survives fleet loading' );
+my $usage_with_collectors = $manager->usage('alpha-skill');
+is( $usage_with_collectors->{collectors}[0]{qualified_name}, 'alpha-skill.status', 'usage reports repo-qualified collector names' );
+ok( $usage_with_collectors->{collectors}[0]{has_indicator}, 'usage reports when a collector has an indicator' );
+
 my ( $cli_install_stdout, $cli_install_stderr, $cli_install_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'list' );
 };
 is( $cli_install_exit >> 8, 0, 'dashboard skills list exits cleanly' );
 my $cli_list = decode_json($cli_install_stdout);
 is( scalar( @{ $cli_list->{skills} } ), 1, 'dashboard skills list reports installed skills' );
+ok( $cli_list->{skills}[0]{enabled}, 'dashboard skills list reports enabled state in JSON output' );
+
+my ( $cli_usage_stdout, $cli_usage_stderr, $cli_usage_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'usage', 'alpha-skill' );
+};
+is( $cli_usage_exit >> 8, 0, 'dashboard skills usage exits cleanly' );
+my $cli_usage = decode_json($cli_usage_stdout);
+is( $cli_usage->{name}, 'alpha-skill', 'dashboard skills usage returns detailed skill metadata' );
+ok( scalar( grep { $_->{name} eq 'run-test' && $_->{has_hooks} } @{ $cli_usage->{cli} } ), 'dashboard skills usage includes per-command hook metadata' );
+
+my ( $cli_table_stdout, $cli_table_stderr, $cli_table_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'list', '-o', 'table' );
+};
+is( $cli_table_exit >> 8, 0, 'dashboard skills list -o table exits cleanly' );
+like( $cli_table_stdout, qr/Repo/i, 'table output includes a repo column heading' );
+like( $cli_table_stdout, qr/alpha-skill/, 'table output includes the installed skill name' );
 
 _append_repo_commit(
     $alpha_repo,
@@ -130,6 +227,41 @@ my $beta_install = $manager->install( 'file://' . $beta_repo );
 ok( !$beta_install->{error}, 'second skill installs without interfering with the first one' ) or diag $beta_install->{error};
 is( scalar( @{ $manager->list } ), 2, 'multiple isolated skills can coexist' );
 
+my $disable = $manager->disable('alpha-skill');
+ok( !$disable->{error}, 'disable marks an installed skill as disabled' ) or diag $disable->{error};
+ok( !$manager->list->[0]{enabled}, 'disabled skills remain listed but report a disabled state' );
+is( $dispatcher->dispatch( 'alpha-skill', 'run-test', 'disabled' )->{error}, "Skill 'alpha-skill' is disabled", 'disabled skills no longer dispatch commands' );
+is_deeply(
+    [ map { $_->{name} } @{ $fleet_config->collectors } ],
+    ['system.collector'],
+    'disabled skills no longer contribute collectors to the managed fleet',
+);
+my ( $cli_disable_stdout, $cli_disable_stderr, $cli_disable_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'disable', 'alpha-skill' );
+};
+is( $cli_disable_exit >> 8, 0, 'dashboard skills disable exits cleanly for an already disabled skill' );
+my $cli_disable = decode_json($cli_disable_stdout);
+ok( !$cli_disable->{enabled}, 'dashboard skills disable reports disabled JSON state' );
+my $disabled_usage = $manager->usage('alpha-skill');
+ok( !$disabled_usage->{enabled}, 'usage still works for disabled skills and reports them as disabled' );
+
+my $enable = $manager->enable('alpha-skill');
+ok( !$enable->{error}, 'enable restores a disabled skill' ) or diag $enable->{error};
+ok( $manager->list->[0]{enabled}, 're-enabled skills report an enabled state again' );
+my $reenabled_dispatch = $dispatcher->dispatch( 'alpha-skill', 'run-test', 're-enabled' );
+like( $reenabled_dispatch->{stdout}, qr/updated:re-enabled/, 're-enabled skills can dispatch commands again' );
+is_deeply(
+    [ map { $_->{name} } @{ $fleet_config->collectors } ],
+    [ 'system.collector', 'alpha-skill.status' ],
+    're-enabled skills rejoin the managed collector fleet',
+);
+my ( $cli_enable_stdout, $cli_enable_stderr, $cli_enable_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'enable', 'alpha-skill' );
+};
+is( $cli_enable_exit >> 8, 0, 'dashboard skills enable exits cleanly for an already enabled skill' );
+my $cli_enable = decode_json($cli_enable_stdout);
+ok( $cli_enable->{enabled}, 'dashboard skills enable reports enabled JSON state' );
+
 my $uninstall = $manager->uninstall('beta-skill');
 ok( !$uninstall->{error}, 'uninstall removes the targeted skill cleanly' ) or diag $uninstall->{error};
 ok( !$manager->get_skill_path('beta-skill'), 'uninstall removes only the targeted skill path' );
@@ -140,6 +272,12 @@ my ( $skill_stdout, $skill_stderr, $skill_exit ) = capture {
 };
 is( $skill_exit >> 8, 0, 'dashboard skill dispatch exits cleanly' );
 like( $skill_stdout, qr/updated:cli/, 'dashboard skill dispatch routes through the isolated skill command' );
+
+my ( $dotted_skill_stdout, $dotted_skill_stderr, $dotted_skill_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'alpha-skill.run-test', 'cli-dot' );
+};
+is( $dotted_skill_exit >> 8, 0, 'dashboard <skill>.<command> dispatch exits cleanly' );
+like( $dotted_skill_stdout, qr/updated:cli-dot/, 'dashboard <skill>.<command> routes into the installed skill command' );
 
 my ( $uninstall_stdout, $uninstall_stderr, $uninstall_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'uninstall', 'alpha-skill' );
@@ -175,6 +313,9 @@ sub _create_skill_repo {
     _write_file( File::Spec->catfile( 'config', 'config.json' ), qq|{"skill_name":"$name"}\n|, 0644 );
     _write_file( File::Spec->catfile( 'config', 'docker', 'postgres', 'compose.yml' ), "services: {}\n", 0644 );
     _write_file( 'cpanfile', "requires 'JSON::XS';\n", 0644 );
+    if ( defined $args{aptfile_body} ) {
+        _write_file( 'aptfile', $args{aptfile_body}, 0644 );
+    }
     if ( defined $args{bookmark_body} ) {
         _write_file( File::Spec->catfile( 'dashboards', 'welcome' ), $args{bookmark_body}, 0644 );
     }

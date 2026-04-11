@@ -87,14 +87,14 @@
       "bugtracker" : {
          "web" : "https://github.com/markov2/perl5-Mail-Message/issues"
       },
-      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "homepage" : "http://perl.overmeer.net/mailbox/",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Mail-Message.git",
          "web" : "https://github.com/markov2/perl5-Mail-Message"
       }
    },
-   "version" : "4.04",
+   "version" : "4.05",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

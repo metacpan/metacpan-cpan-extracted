@@ -285,7 +285,7 @@ then C<undef> is returned.  The attribute is still encoded.
 
   print $field->attribute('bitmap') || 'no'; # --> no
 
-  $field->atrribute(filename => '/tmp/xyz');
+  $field->attribute(filename => '/tmp/xyz');
   $field->print;
     # --> Content-Type: text/plain; charset="us-ascii";
     #       filename="/tmp/xyz"
@@ -303,7 +303,7 @@ Keys may appear more than once and must be interpreted case insensitive
 
 =item $obj-E<gt>B<comment>( [STRING] )
 
-Returns the unfolded comment (part after a semi-colon) in a structureed
+Returns the unfolded comment (part after a semi-colon) in a structured
 header-line. optionally after setting it to a new C<STRING> first.
 When C<undef> is specified as C<STRING>, the comment is removed.
 Whether the field is structured is defined by L<isStructured()|Mail::Message::Field/"The field">.
@@ -859,8 +859,8 @@ Cast by C<consume()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

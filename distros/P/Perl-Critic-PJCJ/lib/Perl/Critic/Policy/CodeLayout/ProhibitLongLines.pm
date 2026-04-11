@@ -1,4 +1,4 @@
-package Perl::Critic::Policy::CodeLayout::ProhibitLongLines v0.2.5;
+package Perl::Critic::Policy::CodeLayout::ProhibitLongLines v0.2.6;
 
 use v5.26.0;
 use strict;
@@ -134,7 +134,7 @@ Perl::Critic::Policy::CodeLayout::ProhibitLongLines - Prohibit long lines
 
 =head1 VERSION
 
-version v0.2.5
+version v0.2.6
 
 =head1 SYNOPSIS
 

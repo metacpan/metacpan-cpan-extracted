@@ -14,7 +14,7 @@ BEGIN {
 # Test input: getter/setter method
 # -------------------------------
 my $code = <<'PERL';
-package Weather::Meteo;
+package GetSet::Test;
 
 =head2 ua
 
@@ -23,34 +23,34 @@ Accessor method to get and set UserAgent object used internally.
 =cut
 
 sub ua {
-    my $self = shift;
+	my $self = shift;
 
-    if (@_) {
-        my $params = Params::Validate::Strict::validate_strict({
-            args => Params::Get::get_params('ua', @_),
-            schema => {
-                ua => {
-                    type => 'object',
-                    can  => 'get'
-                }
-            }
-        });
-        $self->{ua} = $params->{ua};
-    }
+	if (@_) {
+		my $params = Params::Validate::Strict::validate_strict({
+			args => Params::Get::get_params('ua', @_),
+			schema => {
+				ua => {
+					type => 'object',
+					can  => 'get'
+				}
+			}
+		});
+		$self->{ua} = $params->{ua};
+	}
 
-    return $self->{ua};
+	return $self->{ua};
 }
 
 sub getter_only {
-    my $self = shift;
-    return $self->{foo};
+	my $self = shift;
+	return $self->{foo};
 }
 
 sub setter_only {
-    my $self = shift;
-    my $foo = shift;
-    $self->{foo} = $foo;
-    return $self;
+	my $self = shift;
+	my $foo = shift;
+	$self->{foo} = $foo;
+	return $self;
 }
 
 sub mutator {
@@ -66,22 +66,22 @@ Returns UserAgent object
 =cut
 
 sub agent {
-    my $self = shift;
-    return $self->{ua};
+	my $self = shift;
+	return $self->{ua};
 }
 
 sub ua2 {
-    my $self = shift;
-    if (@_) {
-        my $p = Params::Validate::Strict::validate_strict({
-            args => Params::Get::get_params('ua', @_),
-            schema => {
-                ua => { type => 'object' }
-            }
-        });
-        $self->{ua2} = $p->{ua};
-    }
-    return $self->{ua2};
+	my $self = shift;
+	if (@_) {
+		my $p = Params::Validate::Strict::validate_strict({
+			args => Params::Get::get_params('ua', @_),
+			schema => {
+				ua => { type => 'object' }
+			}
+		});
+		$self->{ua2} = $p->{ua};
+	}
+	return $self->{ua2};
 }
 
 =head2 is_tablet
@@ -121,20 +121,21 @@ close $fh;
 # Run schema extractor
 # -------------------------------
 my $extractor = App::Test::Generator::SchemaExtractor->new(
-    input_file => $filename,
+	input_file => $filename,
 );
 
 my $schemas;
+# Use no_write => 1 since we only want the schema data,
+# not files written to disk — output_dir is not needed
 lives_ok {
-    $schemas = $extractor->extract_all;
+	$schemas = $extractor->extract_all(no_write => 1);
 } 'Schema extraction did not die';
-
 
 ok($schemas, 'Schemas extracted');
 
 ok(
-    exists $schemas->{ua},
-    'ua method schema generated'
+	exists $schemas->{ua},
+	'ua method schema generated'
 );
 
 my $schema = $schemas->{ua};
@@ -143,53 +144,53 @@ my $schema = $schemas->{ua};
 # Assertions: accessor detection
 # -------------------------------
 is(
-    $schema->{accessor}{type},
-    'getset',
-    'Detected getter/setter accessor'
+	$schema->{accessor}{type},
+	'getset',
+	'Detected getter/setter accessor'
 );
 
 is(
-    $schema->{accessor}{property},
-    'ua',
-    'Correct accessor property detected'
+	$schema->{accessor}{property},
+	'ua',
+	'Correct accessor property detected'
 );
 
 # -------------------------------
 # Assertions: instantiation
 # -------------------------------
 is(
-    $schema->{new},
-    'Weather::Meteo',
-    'Getter/setter requires object instantiation'
+	$schema->{new},
+	'GetSet::Test',
+	'Getter/setter requires object instantiation'
 );
 
 # -------------------------------
 # Assertions: output typing
 # -------------------------------
 ok(
-    exists $schema->{output},
-    'Output schema exists'
+	exists $schema->{output},
+	'Output schema exists'
 );
 
 is(
-    $schema->{output}{type},
-    'object',
-    'Getter/setter output treated as object (not numeric/string)'
+	$schema->{output}{type},
+	'object',
+	'Getter/setter output treated as object (not numeric/string)'
 );
 
 # -------------------------------
 # Assertions: input typing
 # -------------------------------
 is(
-    $schema->{input}{ua}{type},
-    'object',
-    'Setter input correctly typed as object'
+	$schema->{input}{ua}{type},
+	'object',
+	'Setter input correctly typed as object'
 );
 
 is(
-    $schemas->{getter_only}{accessor}{type},
-    'getter',
-    'Detected getter-only accessor'
+	$schemas->{getter_only}{accessor}{type},
+	'getter',
+	'Detected getter-only accessor'
 );
 
 # Getter-only should NOT have input at all
@@ -197,52 +198,48 @@ ok((!defined($schemas->{getter_only}{input})), 'Getter takes no input');
 ok(defined($schemas->{getter_only}{output}{type}), 'Getter-only returns something');
 
 is(
-    $schemas->{setter_only}{accessor}{type},
-    'setter',
-    'Detected setter-only accessor'
+	$schemas->{setter_only}{accessor}{type},
+	'setter',
+	'Detected setter-only accessor'
 );
 
 is(
-    $schemas->{setter_only}{input}{foo}{type},
-    'string',
-    'Setter-only input defaulted sanely'
+	$schemas->{setter_only}{input}{foo}{type},
+	'string',
+	'Setter-only input defaulted sanely'
 );
 
 is(
-    $schemas->{agent}{output}{isa},
-    'LWP::UserAgent',
-    'POD-derived object isa propagated'
+	$schemas->{agent}{output}{isa},
+	'LWP::UserAgent',
+	'POD-derived object isa propagated'
 );
 
 is(
-    $schemas->{ua2}{accessor}{type},
-    'getset',
-    'PVS-based getter/setter detected'
+	$schemas->{ua2}{accessor}{type},
+	'getset',
+	'PVS-based getter/setter detected'
 );
 
 is(
-    $schemas->{ua2}{output}{type},
-    'object',
-    'Object type propagated from validator'
+	$schemas->{ua2}{output}{type},
+	'object',
+	'Object type propagated from validator'
 );
 
 # Getter-only should not have phantom parameters
 ok(
-    !exists $schemas->{getter_only}{parameters},
-    'Pure getter does not generate parameter list'
+	!exists $schemas->{getter_only}{parameters},
+	'Pure getter does not generate parameter list'
 );
 
 # Getter-only should have medium output confidence
-is(
-    $schemas->{getter_only}{_confidence}{output}{level},
-    'medium',
-    'Pure getter marked medium confidence'
-);
+is($schemas->{getter_only}{_confidence}{output}{level}, 'medium', 'Pure getter marked medium confidence');
 
 # Setter-only should instantiate object
 is(
 	$schemas->{setter_only}{new},
-	'Weather::Meteo',
+	'GetSet::Test',
 	'Setter requires object instantiation'
 );
 

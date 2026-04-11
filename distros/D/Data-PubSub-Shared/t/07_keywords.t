@@ -5,9 +5,6 @@ use Test::More;
 
 use Data::PubSub::Shared;
 
-plan skip_all => 'XS::Parse::Keyword not available'
-    unless $Data::PubSub::Shared::HAVE_KEYWORDS;
-
 # --- Int keyword API ---
 {
     use Data::PubSub::Shared::Int;
@@ -79,6 +76,28 @@ plan skip_all => 'XS::Parse::Keyword not available'
     my $got = ps_str_poll $sub;
     is $got, $str, 'ps_str_publish/poll preserves UTF-8';
     ok utf8::is_utf8($got), 'ps_str_poll preserves UTF-8 flag';
+}
+
+# --- Int32 keyword API ---
+{
+    use Data::PubSub::Shared::Int32;
+
+    my $ps = Data::PubSub::Shared::Int32->new(undef, 64);
+    my $sub = $ps->subscribe;
+    ps_int32_publish $ps, 42;
+    is ps_int32_lag $sub, 1, 'ps_int32_lag';
+    is ps_int32_poll $sub, 42, 'ps_int32_poll';
+}
+
+# --- Int16 keyword API ---
+{
+    use Data::PubSub::Shared::Int16;
+
+    my $ps = Data::PubSub::Shared::Int16->new(undef, 64);
+    my $sub = $ps->subscribe;
+    ps_int16_publish $ps, -100;
+    is ps_int16_lag $sub, 1, 'ps_int16_lag';
+    is ps_int16_poll $sub, -100, 'ps_int16_poll';
 }
 
 # --- Keywords with expressions ---

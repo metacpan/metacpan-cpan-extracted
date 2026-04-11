@@ -2,7 +2,7 @@ package IPC::Manager::Spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 
 use POSIX();
 use Time::HiRes();
@@ -103,16 +103,34 @@ sub terminate {
     $con->broadcast({terminate => 1});
 }
 
-sub wait {
+sub _collect_peer_pids {
     my $self = shift;
     my ($con) = @_;
+
+    my %pids;
+    for my $peer ($con->peers) {
+        next if $peer eq $con->id;
+        my $pid;
+        unless (eval { $pid = $con->peer_pid($peer); 1 }) { next }
+        $pids{$pid} = 1 if $pid && $pid != $$;
+    }
+
+    return \%pids;
+}
+
+sub wait {
+    my $self = shift;
+    my ($con, %params) = @_;
     $con //= $self->connect('spawn');
+
+    my %child_pids;
+    if (my $pre = $params{child_pids}) {
+        %child_pids = %$pre;
+    }
 
     for my $client (IPC::Manager::Client->local_clients($self->{+ROUTE})) {
         eval { $client->disconnect; 1 } or warn $@;
     }
-
-    my %child_pids;
 
     while (1) {
         my @found;
@@ -199,8 +217,13 @@ sub shutdown {
 
     my $con = $self->connect('spawn');
 
+    # Snapshot peer PIDs before terminate, while all peers are still
+    # registered.  After terminate the service may disconnect and exit
+    # before wait() gets a chance to see it.
+    my $child_pids = $self->_collect_peer_pids($con);
+
     $self->terminate($con);
-    $self->wait($con);
+    $self->wait($con, child_pids => $child_pids);
 
     my $sanity_err;
     if ($self->do_sanity_check) {

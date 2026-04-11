@@ -1,6 +1,12 @@
 Revision history for Runtime-Debugger
 
 =================
+1.13 - 2026-04-10
+=================
+
+Added vars() to show available variables.
+
+=================
 1.12 - 2025-12-16
 =================
 

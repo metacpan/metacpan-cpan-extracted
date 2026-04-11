@@ -1,16 +1,20 @@
 /*
  * webview-win32.c — Windows backend for webview.h
  *
- * Uses MSHTML (Internet Explorer) COM embedding via OLE.
+ * Tries Edge/WebView2 at runtime; falls back to MSHTML (IE11) if unavailable.
  * Included by webview.h when WEBVIEW_WINAPI is defined.
  *
  * Required link libraries: ole32, oleaut32, uuid, comctl32, gdi32
+ * Optional runtime: WebView2Loader.dll + Edge WebView2 Runtime
  */
 
 #include <stdio.h>
 #include <shlobj.h>
 #include <commdlg.h>   /* OPENFILENAMEA, GetOpenFileNameA, GetSaveFileNameA */
 #include <shellapi.h>  /* NOTIFYICONDATAA, Shell_NotifyIconA */
+
+/* Include Edge/WebView2 backend for runtime detection */
+#include "webview-edge.c"
 
 /* ---- OLE / IWebBrowser2 helpers ---- */
 
@@ -342,15 +346,22 @@ static LRESULT CALLBACK webview_wndproc(HWND hwnd, UINT msg, WPARAM wParam, LPAR
     return 0;
   }
   case WM_SIZE: {
-    if (w && w->priv.browser) {
-      IOleInPlaceObject *ipo = NULL;
-      w->priv.browser->lpVtbl->QueryInterface(
-          w->priv.browser, &IID_IOleInPlaceObject, (void **)&ipo);
-      if (ipo) {
-        RECT rc;
-        GetClientRect(hwnd, &rc);
-        ipo->lpVtbl->SetObjectRects(ipo, &rc, &rc);
-        ipo->lpVtbl->Release(ipo);
+    if (w) {
+      /* Handle WebView2 resize */
+      if (w->priv.webview2) {
+        webview2_resize(w);
+      }
+      /* Handle MSHTML resize */
+      else if (w->priv.browser) {
+        IOleInPlaceObject *ipo = NULL;
+        w->priv.browser->lpVtbl->QueryInterface(
+            w->priv.browser, &IID_IOleInPlaceObject, (void **)&ipo);
+        if (ipo) {
+          RECT rc;
+          GetClientRect(hwnd, &rc);
+          ipo->lpVtbl->SetObjectRects(ipo, &rc, &rc);
+          ipo->lpVtbl->Release(ipo);
+        }
       }
     }
     return 0;
@@ -428,7 +439,23 @@ WEBVIEW_API int webview_init(struct webview *w) {
     return -1;
   }
 
-  /* Create OLE browser object */
+  w->priv.is_fullscreen = FALSE;
+  w->priv.webview2 = NULL;
+  w->priv.browser = NULL;
+
+  /* Try WebView2 first (modern Edge/Chromium) */
+  if (webview2_available()) {
+    int result = webview2_init(w);
+    if (result == 0) {
+      /* WebView2 initialized successfully */
+      ShowWindow(w->priv.hwnd, SW_SHOW);
+      UpdateWindow(w->priv.hwnd);
+      return 0;
+    }
+    /* WebView2 init failed, fall through to MSHTML */
+  }
+
+  /* Fallback: Create OLE/MSHTML browser object */
   IOleObject *ole = NULL;
   HRESULT hr = CoCreateInstance(&CLSID_WebBrowser, NULL, CLSCTX_INPROC_SERVER,
                                 &IID_IOleObject, (void **)&ole);
@@ -492,6 +519,12 @@ WEBVIEW_API int webview_loop(struct webview *w, int blocking) {
 }
 
 WEBVIEW_API int webview_eval(struct webview *w, const char *js) {
+  /* Use WebView2 if available */
+  if (w->priv.webview2) {
+    return webview2_eval(w, js);
+  }
+
+  /* Fallback to MSHTML */
   IWebBrowser2 *wb = NULL;
   IDispatch *doc_disp = NULL;
   IHTMLDocument2 *doc = NULL;
@@ -665,6 +698,11 @@ WEBVIEW_API void webview_terminate(struct webview *w) {
 }
 
 WEBVIEW_API void webview_exit(struct webview *w) {
+  /* Clean up WebView2 if used */
+  if (w->priv.webview2) {
+    webview2_cleanup(w);
+  }
+  /* Clean up MSHTML if used */
   if (w->priv.browser) {
     w->priv.browser->lpVtbl->Close(w->priv.browser, OLECLOSE_NOSAVE);
     w->priv.browser->lpVtbl->Release(w->priv.browser);

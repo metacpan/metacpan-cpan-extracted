@@ -256,4 +256,97 @@ SKIP: {
     ok($result->{size} > 0, 'size is positive');
 }
 
+# ── Config class method ─────────────────────────────────────────────
+
+{
+    # Test config getter/setter
+    Chandra::Pack->config(
+        identity => 'Test Identity',
+        apple_id => 'test@example.com',
+        team_id  => 'TESTTEAM',
+    );
+    
+    is(Chandra::Pack->config('identity'), 'Test Identity', 'config getter works');
+    is(Chandra::Pack->config('apple_id'), 'test@example.com', 'config stores apple_id');
+    is(Chandra::Pack->config('team_id'), 'TESTTEAM', 'config stores team_id');
+    
+    # Get all config
+    my %cfg = Chandra::Pack->config();
+    ok(exists $cfg{identity}, 'config() returns all keys');
+    is($cfg{identity}, 'Test Identity', 'config() values correct');
+    
+    # Reset for other tests
+    Chandra::Pack->config(identity => '-', apple_id => undef, team_id => undef);
+}
+
+# ── Distribute option in constructor ─────────────────────────────────
+
+{
+    my $script = make_script($tmpdir, 'dist.pl');
+    my $p = Chandra::Pack->new(
+        script     => $script,
+        distribute => 1,
+    );
+    is($p->distribute, 1, 'distribute option stored');
+    
+    my $p2 = Chandra::Pack->new(script => $script);
+    is($p2->distribute, 0, 'distribute defaults to 0');
+}
+
+# ── Distribute on macOS (ad-hoc signing) ─────────────────────────────
+
+SKIP: {
+    skip 'macOS distribute tests only on darwin', 3 unless $is_darwin;
+    skip 'codesign not available', 3 unless `which codesign 2>/dev/null` =~ /codesign/;
+    
+    my $script = make_script($tmpdir, 'dist_mac.pl');
+    my $out = file_join($tmpdir, 'dist_mac_out');
+    file_mkdir($out);
+    
+    # Use ad-hoc signing (identity => '-') to avoid needing real creds
+    Chandra::Pack->config(identity => '-');
+    
+    my $p = Chandra::Pack->new(
+        script     => $script,
+        name       => 'DistTest',
+        output     => $out,
+        platform   => 'macos',
+        distribute => 1,
+    );
+    
+    my $result = $p->build;
+    ok($result->{success}, 'distribute build succeeds with ad-hoc signing');
+    ok($result->{signed}, 'result indicates signed');
+    ok($result->{dmg_path} && file_is_file($result->{dmg_path}), 'DMG created');
+}
+
+# ── Distribute on Linux (skips if no appimagetool) ───────────────────
+
+SKIP: {
+    skip 'Linux distribute tests skipped on non-Linux', 2 if $^O eq 'darwin' || $^O eq 'MSWin32';
+    
+    my $has_appimagetool = `which appimagetool 2>/dev/null` =~ /appimagetool/;
+    
+    my $script = make_script($tmpdir, 'dist_linux.pl');
+    my $out = file_join($tmpdir, 'dist_linux_out');
+    file_mkdir($out);
+    
+    my $p = Chandra::Pack->new(
+        script     => $script,
+        name       => 'DistLinux',
+        output     => $out,
+        platform   => 'linux',
+        distribute => 1,
+    );
+    
+    my $result = $p->build;
+    ok($result->{success}, 'Linux distribute build succeeds');
+    
+    if ($has_appimagetool) {
+        ok($result->{appimage_path} && file_is_file($result->{appimage_path}), 'AppImage created');
+    } else {
+        ok(!$result->{appimage_path}, 'No AppImage when tool missing (expected)');
+    }
+}
+
 done_testing;

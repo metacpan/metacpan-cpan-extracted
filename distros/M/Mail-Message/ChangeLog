@@ -13,6 +13,21 @@ Limitations to be fixed:
 #!!! number 3.  Use (at least) version 4 for new developments.
 #!!! Convert? See https://github.com/markov2/perl5-Mail-Box/wiki/
 
+version 4.05: Fri 10 Apr 11:00:52 CEST 2026
+
+	Fixes:
+	- parse X-MLServer [Edoardo Geraci]
+	- $msg->string must end with a newline [Andy Beverley]
+	- fold fields with newline [Edoardo Geraci]
+
+	Improvements:
+	- Mail::Message->new(message_id) replaces messageId: parameters should
+	  not use camel-casing.  Old attribute now deprecated.
+	- Mail::Message add clean attributes for fieldType, headType, bodyType,
+	  and isTrusted.
+	- remove version of introduction indicators '[3*]', because version 4 is
+	  not backwards compatible anyway.
+
 version 4.04: Wed  4 Feb 15:52:45 CET 2026
 
 	Fixes:

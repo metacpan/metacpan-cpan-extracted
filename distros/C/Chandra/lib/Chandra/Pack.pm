@@ -3,10 +3,95 @@ package Chandra::Pack;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use File::Raw qw(import);
 use Cwd ();
+
+# ── Configuration Storage ────────────────────────────────────────────
+
+our %CONFIG = (
+    # macOS
+    identity        => '-',          # ad-hoc signing by default
+    apple_id        => undef,
+    team_id         => undef,
+    notary_keychain => undef,
+    
+    # Windows (future)
+    sign_cert       => undef,
+    sign_password   => undef,
+);
+
+sub config {
+    my $class = shift;
+    
+    # Getter: config() or config('key')
+    if (@_ == 0) {
+        return %CONFIG;
+    }
+    if (@_ == 1 && !ref $_[0]) {
+        return $CONFIG{$_[0]};
+    }
+    
+    # Setter: config(key => val, ...)
+    my %args = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+    
+    # Load from env vars if not provided
+    $args{identity}        //= $ENV{CHANDRA_IDENTITY};
+    $args{apple_id}        //= $ENV{CHANDRA_APPLE_ID};
+    $args{team_id}         //= $ENV{CHANDRA_TEAM_ID};
+    $args{notary_keychain} //= $ENV{CHANDRA_NOTARY_KEYCHAIN};
+    $args{sign_cert}       //= $ENV{CHANDRA_SIGN_CERT};
+    $args{sign_password}   //= $ENV{CHANDRA_SIGN_PASSWORD};
+    
+    for my $key (keys %args) {
+        if (exists $CONFIG{$key}) {
+            $CONFIG{$key} = $args{$key};
+        } else {
+            Carp::carp("Unknown config key: $key");
+        }
+    }
+    
+    # Save to file if requested
+    if (delete $args{save}) {
+        _save_config();
+    }
+    
+    return $class;
+}
+
+sub _config_file {
+    my $home = $ENV{HOME} || (getpwuid($<))[7] || '.';
+    return file_join($home, '.chandra', 'pack.conf');
+}
+
+sub _load_config {
+    my $file = _config_file();
+    return unless file_is_file($file);
+    my $content = file_slurp($file);
+    for my $line (split /\n/, $content) {
+        next if $line =~ /^\s*#/ || $line =~ /^\s*$/;
+        if ($line =~ /^(\w+)\s*=\s*(.*)$/) {
+            $CONFIG{$1} = $2 if exists $CONFIG{$1};
+        }
+    }
+}
+
+sub _save_config {
+    my $file = _config_file();
+    my $dir = file_dirname($file);
+    file_mkpath($dir) unless file_is_dir($dir);
+    my $content = "# Chandra::Pack configuration\n";
+    for my $key (sort keys %CONFIG) {
+        next unless defined $CONFIG{$key};
+        $content .= "$key = $CONFIG{$key}\n";
+    }
+    file_spew($file, $content);
+    chmod 0600, $file;  # Protect credentials
+}
+
+# Load config on module load
+_load_config();
 
 sub new {
     my ($class, %args) = @_;
@@ -27,6 +112,7 @@ sub new {
         perl       => $args{perl}       || $^X,
         include    => $args{include}    || [],
         exclude    => $args{exclude}    || [],
+        distribute => $args{distribute} || 0,
         _deps      => undef,
     }, $class;
 }
@@ -42,6 +128,7 @@ sub output     { $_[0]->{output} }
 sub platform   { $_[0]->{platform} }
 sub identifier { $_[0]->{identifier} }
 sub perl       { $_[0]->{perl} }
+sub distribute { $_[0]->{distribute} }
 
 # ── Dependency Scanning ──────────────────────────────────────────────
 
@@ -141,12 +228,19 @@ sub build_macos {
     # Assets
     $self->_copy_assets(file_join($resources, 'assets')) if $self->{assets};
 
-    return {
+    my $result = {
         success  => 1,
         path     => $app_dir,
         platform => 'macos',
         size     => _dir_size($app_dir),
     };
+
+    # Distribution pipeline: codesign → notarize → DMG
+    if ($self->{distribute}) {
+        $result = $self->_distribute_macos($result);
+    }
+
+    return $result;
 }
 
 sub build_linux {
@@ -183,12 +277,19 @@ sub build_linux {
     # Assets
     $self->_copy_assets(file_join($share, 'assets')) if $self->{assets};
 
-    return {
+    my $result = {
         success  => 1,
         path     => $app_dir,
         platform => 'linux',
         size     => _dir_size($app_dir),
     };
+
+    # Distribution pipeline: AppImage
+    if ($self->{distribute}) {
+        $result = $self->_distribute_linux($result);
+    }
+
+    return $result;
 }
 
 sub build_windows {
@@ -218,6 +319,225 @@ sub build_windows {
         platform => 'windows',
         size     => _dir_size($app_dir),
     };
+}
+
+# ── Distribution Pipelines ───────────────────────────────────────────
+
+sub _distribute_macos {
+    my ($self, $result) = @_;
+    my $app_path = $result->{path};
+    my $identity = $CONFIG{identity} || '-';
+    
+    # Step 1: Code sign
+    my $sign_result = $self->_codesign_macos($app_path, $identity);
+    unless ($sign_result->{success}) {
+        return { %$result, success => 0, error => $sign_result->{error} };
+    }
+    $result->{signed} = 1;
+    
+    # Step 2: Notarize (skip for ad-hoc signing)
+    if ($identity ne '-' && $CONFIG{apple_id} && $CONFIG{team_id}) {
+        my $notarize_result = $self->_notarize_macos($app_path);
+        unless ($notarize_result->{success}) {
+            return { %$result, success => 0, error => $notarize_result->{error} };
+        }
+        $result->{notarized} = 1;
+    }
+    
+    # Step 3: Create DMG
+    my $dmg_result = $self->_create_dmg_macos($app_path);
+    unless ($dmg_result->{success}) {
+        return { %$result, success => 0, error => $dmg_result->{error} };
+    }
+    $result->{dmg_path} = $dmg_result->{path};
+    $result->{size} = file_size($dmg_result->{path});
+    
+    return $result;
+}
+
+sub _codesign_macos {
+    my ($self, $app_path, $identity) = @_;
+    
+    # Generate entitlements for hardened runtime
+    my $entitlements = $self->_generate_entitlements_macos();
+    require File::Temp;
+    my $ent_file = File::Temp->new(SUFFIX => '.plist', UNLINK => 1);
+    print $ent_file $entitlements;
+    close $ent_file;
+    
+    my @cmd = (
+        'codesign',
+        '--deep',
+        '--force',
+        '--sign', $identity,
+        '--options', 'runtime',
+        '--entitlements', "$ent_file",
+        $app_path
+    );
+    
+    my $output = `@cmd 2>&1`;
+    if ($? != 0) {
+        return { success => 0, error => "codesign failed: $output" };
+    }
+    
+    return { success => 1 };
+}
+
+sub _generate_entitlements_macos {
+    return <<'ENTITLEMENTS';
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+</dict>
+</plist>
+ENTITLEMENTS
+}
+
+sub _notarize_macos {
+    my ($self, $app_path) = @_;
+    
+    # Create ZIP for submission
+    my $zip_path = "$app_path.zip";
+    my $zip_cmd = "ditto -c -k --keepParent \Q$app_path\E \Q$zip_path\E 2>&1";
+    my $zip_out = `$zip_cmd`;
+    if ($? != 0) {
+        return { success => 0, error => "Failed to create ZIP: $zip_out" };
+    }
+    
+    # Submit to notarization service
+    my @submit_cmd = (
+        'xcrun', 'notarytool', 'submit',
+        '--apple-id', $CONFIG{apple_id},
+        '--team-id', $CONFIG{team_id},
+        '--wait',
+    );
+    
+    if ($CONFIG{notary_keychain}) {
+        push @submit_cmd, '--keychain-profile', $CONFIG{notary_keychain};
+    } else {
+        # Will prompt for password
+        push @submit_cmd, '--password', '@env:CHANDRA_NOTARY_PASSWORD';
+    }
+    
+    push @submit_cmd, $zip_path;
+    
+    my $submit_out = `@submit_cmd 2>&1`;
+    unlink $zip_path;
+    
+    if ($? != 0) {
+        return { success => 0, error => "Notarization failed: $submit_out" };
+    }
+    
+    # Staple the ticket
+    my $staple_cmd = "xcrun stapler staple \Q$app_path\E 2>&1";
+    my $staple_out = `$staple_cmd`;
+    if ($? != 0) {
+        return { success => 0, error => "Stapling failed: $staple_out" };
+    }
+    
+    return { success => 1 };
+}
+
+sub _create_dmg_macos {
+    my ($self, $app_path) = @_;
+    
+    my $safe = _safe_name($self->{name});
+    my $vol_name = $self->{name};
+    my $dmg_path = file_join($self->{output}, "$safe.dmg");
+    my $temp_dmg = "$dmg_path.tmp";
+    
+    # Create temporary DMG
+    my $size = _dir_size($app_path);
+    my $size_mb = int($size / 1_000_000) + 50;  # Add 50MB headroom
+    
+    # Create DMG
+    my @hdiutil = (
+        'hdiutil', 'create',
+        '-volname', $vol_name,
+        '-srcfolder', $app_path,
+        '-ov',
+        '-format', 'UDBZ',  # Compressed
+        $dmg_path
+    );
+    
+    my $output = `@hdiutil 2>&1`;
+    if ($? != 0) {
+        return { success => 0, error => "DMG creation failed: $output" };
+    }
+    
+    return { success => 1, path => $dmg_path };
+}
+
+sub _distribute_linux {
+    my ($self, $result) = @_;
+    my $app_dir = $result->{path};
+    
+    # Check for appimagetool
+    my $appimagetool = _find_command('appimagetool');
+    unless ($appimagetool) {
+        Carp::carp("appimagetool not found; skipping AppImage creation");
+        return $result;
+    }
+    
+    # Create AppImage
+    my $appimage_result = $self->_create_appimage($app_dir, $appimagetool);
+    unless ($appimage_result->{success}) {
+        return { %$result, success => 0, error => $appimage_result->{error} };
+    }
+    
+    $result->{appimage_path} = $appimage_result->{path};
+    $result->{size} = file_size($appimage_result->{path});
+    
+    return $result;
+}
+
+sub _create_appimage {
+    my ($self, $app_dir, $appimagetool) = @_;
+    
+    my $safe = _safe_name($self->{name});
+    my $appimage_path = file_join($self->{output}, "$safe.AppImage");
+    
+    # Ensure proper AppDir structure
+    # AppRun should already exist from build_linux
+    # Ensure .desktop file is at root level
+    my $desktop_file = file_join($app_dir, lc($safe) . '.desktop');
+    unless (file_is_file($desktop_file)) {
+        return { success => 0, error => "Missing .desktop file" };
+    }
+    
+    # Run appimagetool
+    my $cmd = "\Q$appimagetool\E \Q$app_dir\E \Q$appimage_path\E 2>&1";
+    my $output = `$cmd`;
+    if ($? != 0) {
+        return { success => 0, error => "appimagetool failed: $output" };
+    }
+    
+    # Make executable
+    chmod 0755, $appimage_path;
+    
+    return { success => 1, path => $appimage_path };
+}
+
+sub _find_command {
+    my ($cmd) = @_;
+    my $path = `which $cmd 2>/dev/null`;
+    chomp $path;
+    return $path if $path && -x $path;
+    
+    # Check common locations
+    for my $dir ('/usr/local/bin', '/usr/bin', "$ENV{HOME}/bin", "$ENV{HOME}/.local/bin") {
+        my $full = "$dir/$cmd";
+        return $full if -x $full;
+    }
+    
+    return undef;
 }
 
 # ── Template Generators ──────────────────────────────────────────────
@@ -537,6 +857,14 @@ Chandra::Pack - Bundle Chandra apps into distributable packages
 
     use Chandra::Pack;
 
+    # Configure credentials (once, persists to ~/.chandra/pack.conf)
+    Chandra::Pack->config(
+        identity    => 'Developer ID Application: Your Name',
+        apple_id    => 'you@example.com',
+        team_id     => 'ABCD1234',
+        save        => 1,
+    );
+
     my $packer = Chandra::Pack->new(
         script     => 'app.pl',
         name       => 'My App',
@@ -545,21 +873,15 @@ Chandra::Pack - Bundle Chandra apps into distributable packages
         assets     => 'assets/',
         output     => 'dist/',
         identifier => 'com.example.myapp',
+        distribute => 1,  # Full release pipeline
     );
 
-    # Scan dependencies
-    my @deps = $packer->scan_deps;
-
-    # Build package
+    # Build with distribution (sign, notarize, DMG on macOS; AppImage on Linux)
     $packer->build(sub {
         my ($result) = @_;
         print "Built: $result->{path}\n" if $result->{success};
+        print "DMG: $result->{dmg_path}\n" if $result->{dmg_path};
     });
-
-    # Or build for a specific platform
-    $packer->build_macos;
-    $packer->build_linux;
-    $packer->build_windows;
 
 =head1 DESCRIPTION
 
@@ -567,7 +889,45 @@ Chandra::Pack bundles a Perl script and its dependencies into a
 distributable application package. It creates C<.app> bundles on macOS,
 AppImage-style directories on Linux, and portable directories on Windows.
 
-=head1 METHODS
+When C<distribute =E<gt> 1> is set, the full release pipeline runs:
+
+=over 4
+
+=item * B<macOS>: codesign → notarize → staple → DMG
+
+=item * B<Linux>: AppImage (via appimagetool)
+
+=item * B<Windows>: Directory build (installer support planned)
+
+=back
+
+=head1 CLASS METHODS
+
+=head2 config(%args)
+
+Configure credentials for signing and notarization. Call once before
+building. Settings can be persisted to C<~/.chandra/pack.conf>.
+
+    Chandra::Pack->config(
+        # macOS signing/notarization
+        identity         => 'Developer ID Application: ...',
+        apple_id         => 'your@email.com',
+        team_id          => 'ABCD1234',
+        notary_keychain  => 'notary-profile',  # from notarytool store-credentials
+        
+        # Persist to disk
+        save             => 1,
+    );
+
+Environment variables are used as fallbacks:
+
+    CHANDRA_IDENTITY
+    CHANDRA_APPLE_ID
+    CHANDRA_TEAM_ID
+    CHANDRA_NOTARY_KEYCHAIN
+    CHANDRA_NOTARY_PASSWORD
+
+=head1 INSTANCE METHODS
 
 =head2 new(%args)
 
@@ -583,6 +943,7 @@ AppImage-style directories on Linux, and portable directories on Windows.
         perl       => '/usr/bin/perl',# default: current perl
         include    => ['DBI'],        # extra modules to include
         exclude    => ['Test::More'], # modules to skip
+        distribute => 1,              # run full distribution pipeline
     );
 
 =head2 scan_deps
@@ -595,17 +956,55 @@ detected dependencies.
 Build for the configured platform. Calls C<$callback> with a result
 hashref containing C<success>, C<path>, C<platform>, and C<size>.
 
+When C<distribute =E<gt> 1>:
+
+=over 4
+
+=item * macOS: adds C<signed>, C<notarized>, C<dmg_path>
+
+=item * Linux: adds C<appimage_path>
+
+=back
+
 =head2 build_macos
 
-Build a macOS C<.app> bundle.
+Build a macOS C<.app> bundle. With C<distribute =E<gt> 1>, also signs,
+notarizes, and creates a DMG.
 
 =head2 build_linux
 
-Build a Linux AppImage-style directory.
+Build a Linux AppImage-style directory. With C<distribute =E<gt> 1>,
+runs appimagetool to create a standalone AppImage.
 
 =head2 build_windows
 
 Build a Windows portable directory.
+
+=head1 DISTRIBUTION DETAILS
+
+=head2 macOS Code Signing
+
+Uses hardened runtime with entitlements for JIT and unsigned memory
+(required for Perl). Ad-hoc signing (C<identity =E<gt> '-'>) skips
+notarization but still works locally.
+
+=head2 macOS Notarization
+
+Requires Apple Developer account. Store credentials once with:
+
+    xcrun notarytool store-credentials notary-profile \
+        --apple-id your@email.com \
+        --team-id ABCD1234 \
+        --password your-app-specific-password
+
+Then configure:
+
+    Chandra::Pack->config(notary_keychain => 'notary-profile');
+
+=head2 Linux AppImage
+
+Requires C<appimagetool> in PATH. Install from:
+L<https://github.com/AppImage/AppImageKit/releases>
 
 =head1 SEE ALSO
 

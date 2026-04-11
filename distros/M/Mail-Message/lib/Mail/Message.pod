@@ -44,9 +44,10 @@ Mail::Message - general message object
     To             => 'you@example.com',
     From           => 'me@example.com',
     Subject        => "My subject",
-    data           => "Some plain text content"
+    data           => "Some plain text content.\n"
   )->send(via => 'postfix');
 
+  # See related Mail::Message::Construct::* manuals
   my $msg       = Mail::Message->read(\@lines);
   my $reply_msg = $msg->reply(...);
   my $frwd_msg  = $msg->forward(...);
@@ -144,6 +145,7 @@ Inherited, see L<Mail::Reporter/"Constructors">
   head_type   Mail::Message::Head::Complete
   labels      +{}
   messageId   undef
+  message_id  undef
   modified    false
   trusted     false
 
@@ -185,10 +187,14 @@ specifics once the message is added to one.
 
 =item messageId => $id
 
-The C<$id> string on which this message can be recognized.  If none specified
-and not defined in the header --but one is needed-- there will be one
-assigned to the message to be able to pass unique message-ids between
-objects.
+Deprecated alternative to C<message_id>.
+
+=item message_id => $id
+
+[4.05] The C<$id> string on which this message can be recognized.  If none
+specified and not defined in the header --but one is needed-- there will
+be one assigned to the message to be able to pass unique message-ids
+between objects.
 
 =item modified => BOOLEAN
 
@@ -210,7 +216,40 @@ body data is decoded or used for transmission.
 
 Extends L<"Attributes" in Mail::Reporter|Mail::Reporter/"Attributes">.
 
+=over 4
+
+=item $obj-E<gt>B<bodyType>()
+
+[4.05] The class to contain the text of normal bodies.  This can be
+L<Mail::Message::Body::Lines|Mail::Message::Body::Lines> (default, kept in an ARRAY of lines),
+L<Mail::Message::Body::String|Mail::Message::Body::String> (kept in a single string), or
+L<Mail::Message::Body::File|Mail::Message::Body::File> (kept externally in a file).  The multipart
+and nested body types are not configured here.
+
+=item $obj-E<gt>B<fieldType>()
+
+[4.05] The class used to manange the field in the header.  This is either
+L<Mail::Message::Field::Fast|Mail::Message::Field::Fast> or L<Mail::Message::Field::Full|Mail::Message::Field::Full>.  Defaults
+to the preference of the used head class (C<::Fast>).
+
+=item $obj-E<gt>B<headType>()
+
+[4.05] The class used to administer the header fields.  This is either
+L<Mail::Message::Head::Complete|Mail::Message::Head::Complete> (default) or L<Mail::Message::Head::Partial|Mail::Message::Head::Partial>.
+
+=item $obj-E<gt>B<messageId>()
+
+Retrieve the message's id.  Every message has a unique message-id.  This id
+is used mainly for recognizing discussion threads.
+
+=back
+
 =head2 Constructing a message
+
+Complex construction of messages is implemented in different Perl modules,
+which have their own manual page.  Although coded in separate files and
+described in separate manuals, they are all directly addressable from the
+L<Mail::Message|Mail::Message> class.
 
 =over 4
 
@@ -307,9 +346,9 @@ reference to the containing body.
 
 =item $obj-E<gt>B<endsOnNewline>()
 
-[3.018] Return C<true> when the printed message has a trailing "\n".  In
-rare cases, that's not the case.  For instance, when the body is read
-from a file which was generated without trailing new-line.
+Return C<true> when the printed message has a trailing "\n".  In rare cases,
+that's not the case.  For instance, when the body is read from a file
+which was generated without trailing new-line.
 
 =item $obj-E<gt>B<isDummy>()
 
@@ -325,11 +364,6 @@ this will return C<false>.
 Returns C<true> if the message is a part of another message.  This is
 the case for L<Mail::Message::Part|Mail::Message::Part> extensions of C<Mail::Message>.
 
-=item $obj-E<gt>B<messageId>()
-
-Retrieve the message's id.  Every message has a unique message-id.  This id
-is used mainly for recognizing discussion threads.
-
 =item $obj-E<gt>B<partNumber>()
 
 Returns a string representing the location of this part.  In case the
@@ -342,8 +376,11 @@ see RFC2060 section 6.4.5.
 
 =item $obj-E<gt>B<print>( [$fh] )
 
-Print the message to the FILE-HANDLE, which defaults to the selected
+Print the message to the C<$fh> (file handle), which defaults to the selected
 filehandle, without the encapsulation sometimes required by a folder
+
+» example: 
+
   $message->print(\*STDERR);  # to the error output
   $message->print;            # to the selected file
 
@@ -366,16 +403,14 @@ for possible options L<Mail::Transport::Send::new()|Mail::Transport::Send/"METHO
 L<Mail::Transport::Send::send()|Mail::Transport::Send/"Sending mail">.  That object also provides a C<trySend()>
 method which gives more low-level control.
 
+See C<examples/send.pl> in the distribution of L<Mail::Box|Mail::Box>.
+
 » example: 
 
   $message->send;
-
-is short (but little less flexibile) for
-
+  # is short (but little less flexibile) for
   my $mailer = Mail::Transport::SMTP->new(@smtpopts);
   $mailer->send($message, @sendopts);
-
-See examples/send.pl in the distribution of L<Mail::Box|Mail::Box>.
 
 » example: 
 
@@ -474,9 +509,7 @@ want to be smart, doing the better (but slower) job.
 » example: the get() short-cut for header fields
 
   print $msg->get('Content-Type'), "\n";
-
-Is equivalent to:
-
+  # is equivalent to:
   print $msg->head->get('Content-Type')->body, "\n";
 
 =item $obj-E<gt>B<guessTimestamp>()
@@ -536,13 +569,11 @@ then C<undef> is returned.  See L<Mail::Message::Field::study()|Mail::Message::F
 » example: the study() short-cut for header fields
 
   print $msg->study('to'), "\n";
-
-Is equivalent to:
-
+  # is equivalent to:
   print $msg->head->study('to'), "\n";       # and
   print $msg->head->get('to')->study, "\n";
 
-or better:
+  # or better:
   if(my $to = $msg->study('to')) { print "$to\n" }
   if(my $to = $msg->get('to')) { print $to->study, "\n" }
 
@@ -868,14 +899,18 @@ can also be coerced directly from a L<Mail::Message::Body|Mail::Message::Body>.
   my $coerced = Mail::Box::Mbox::Message->coerce($message);
   $folder->addMessage($coerced);
 
-Simpler replacement for the previous two lines:
-
+  # simpler replacement for the previous two lines:
   my $coerced = $folder->addMessage($message);
 
 =item $obj-E<gt>B<isDelayed>()
 
 Check whether the message is delayed (not yet read from file).  Returns
 C<true> or C<false>, dependent on the body type.
+
+=item $obj-E<gt>B<isTrusted>()
+
+[4.05] Returns whether the message comes from an external source, which
+requires extra checking.  Trusted messages must have correct use of CRLF.
 
 =item $obj-E<gt>B<readBody>( $parser, $head, [$bodytype] )
 
@@ -1005,14 +1040,13 @@ L<Mail::Message::Field|Mail::Message::Field> objects.
 
 =head3 The body
 
-The body contains the "payload": the data to be transferred.
-The data can be encoded, only accessible with a specific application,
-and may use some weird character-set, like Vietnamese; the MailBox
-distribution tries to assist you with handling these e-mails without
-the need to know all the details.  This additional information
-("meta-information") about the body data is stored in the header.
-The header contains more information, for instance about the message
-transport and relations to other messages.
+The body contains the "payload": the data to be transferred.  The data
+can be encoded, only accessible with a specific application, and may
+use some weird character-set; MailBox tries to assist you with handling
+these e-mails without the need to know all the details.  This additional
+information ("meta-information") about the body data is stored in the
+header.  The header contains more information, for instance about the
+message transport and relations to other messages.
 
 =head2 Message object implementation
 
@@ -1026,10 +1060,10 @@ The general idea about the structure of a message is
                    |
                    `-has-many--Mail::Message::Field
 
-However: there are about 7 kinds of body objects, 3 kinds of headers and
-3 kinds of fields.  You will usually not see too much of these kinds,
+However: there are about 7 kinds of body objects, 3 kinds of headers,
+and 3 kinds of fields.  You will usually not see too much of these variations,
 because they are merely created for performance reasons and can be used
-all the same, with the exception of the multipart bodies.
+all in the same for normal libarary usage.
 
 A multipart body is either a L<Mail::Message::Body::Multipart|Mail::Message::Body::Multipart>
 (mime type C<multipart/*>) or a L<Mail::Message::Body::Nested|Mail::Message::Body::Nested>
@@ -1201,9 +1235,9 @@ Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
-The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
-find a mail transfer agent to sent this message.  Specify a mailer
-explicitly using the C<via> options.
+The message L<send()|Mail::Message/"The message"> mechanism had not enough information to
+automatically find a mail transfer agent to sent this message.  Specify a
+mailer explicitly using the C<via> options.
 Cast by C<send()>
 
 =item Error: cannot coerce a $type object into a $me object.
@@ -1216,7 +1250,7 @@ Unknown alternative for the C<include> option of L<reply()|Mail::Message::Constr
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
 Cast by C<reply()>
 
-=item Error: cannot read message from a $source}.
+=item Error: cannot read message from a $source.
 
 Cast by C<read()>
 
@@ -1295,8 +1329,8 @@ Cast by C<build()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

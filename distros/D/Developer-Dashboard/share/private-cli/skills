@@ -55,23 +55,29 @@ It is used by developers managing installed skills, by skill lifecycle tests, an
 
 Example 1:
 
-  dashboard skills list
+  dashboard skills install git@github.com:user/example-skill.git
 
-Run the public built-in command path that stages or re-enters this helper.
+Install one Git-backed skill into its isolated runtime root.
 
 Example 2:
+
+  dashboard skills list
+
+Inspect installed skill metadata, including whether each skill ships config, docker roots, C<aptfile>, or C<cpanfile>.
+
+Example 3:
 
   ~/.developer-dashboard/cli/dd/skills --help
 
 Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
 
-Example 3:
+Example 4:
 
-  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+  prove -lv t/05-cli-smoke.t t/19-skill-system.t
 
 Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
 
-Example 4:
+Example 5:
 
   prove -lr t
 

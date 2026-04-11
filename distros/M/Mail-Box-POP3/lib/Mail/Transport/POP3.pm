@@ -1,8 +1,8 @@
-# This code is part of Perl distribution Mail-Box-POP3 version 4.01.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Mail-Box-POP3 version 4.02.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
-# This software is copyright (c) 2001-2025 by Mark Overmeer.
+# This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -10,7 +10,7 @@
 
 
 package Mail::Transport::POP3;{
-our $VERSION = '4.01';
+our $VERSION = '4.02';
 }
 
 use parent 'Mail::Transport::Receive';
@@ -56,6 +56,9 @@ sub useSSL() { $_[0]->{MTP_ssl} }
 
 sub SSLOptions() { $_[0]->{MTP_ssl_opts} }
 
+
+sub supportsUIDL() { ! exists $_[0]->{MTP_nouidl} }
+
 #--------------------
 
 sub ids(;@)
@@ -68,7 +71,7 @@ sub ids(;@)
 sub messages()
 {	my $self = shift;
 
-	wantarray
+	! wantarray
 		or error __x"cannot get all messages of pop3 at once via messages().";
 
 	$self->{MTP_messages};
@@ -102,7 +105,7 @@ sub message($;$)
 	pop @$message if @$message && $message->[-1] =~ m/^[\012\015]*$/;
 
 	$self->{MTP_fetched}{$uidl} = undef   # mark this ID as fetched
-		unless exists $self->{MTP_nouidl};
+		if $self->supportsUIDL;
 
 	$message;
 }
@@ -165,8 +168,7 @@ sub disconnect()
 
 sub fetched(;$)
 {	my $self = shift;
-	return if exists $self->{MTP_nouidl};
-	$self->{MTP_fetched};
+	$self->supportsUIDL ? $self->{MTP_fetched} : undef;
 }
 
 
@@ -181,8 +183,8 @@ sub socket()
 	my $socket = $self->_connection;
 	return $socket if defined $socket;
 
-	exists $self->{MTP_nouidl}
-		or error __x"can not re-connect reliably to server which doesn't support UIDL";
+	$self->supportsUIDL
+		or error __x"can not re-connect reliably to server which doesn't support UIDL.";
 
 	# (Re-)establish the connection
 	$socket = $self->login or return;

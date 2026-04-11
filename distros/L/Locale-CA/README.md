@@ -1,16 +1,10 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/Locale-CA.svg?branch=master)](https://travis-ci.org/nigelhorne/Locale-CA)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/78biwdwbpo72j6cq?svg=true)](https://ci.appveyor.com/project/nigelhorne/locale-ca)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/Locale-CA/badge)](https://dependencyci.com/github/nigelhorne/Locale-CA)
-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Locale-CA/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Locale-CA?branch=master)
-[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/6535371310181089/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/6535371310181089/heads/master/)
-
 # NAME
 
 Locale::CA - two letter codes for province identification in Canada and vice versa
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -87,6 +81,6 @@ Based on [Locale::US](https://metacpan.org/pod/Locale%3A%3AUS) - Copyright (c) 2
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2012-2025 Nigel Horne.
+Copyright 2012-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2

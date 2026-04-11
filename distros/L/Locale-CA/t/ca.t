@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 22;
+use Test::Most tests => 23;
 use Test::NoWarnings;
 
 BEGIN {
@@ -14,7 +14,7 @@ ALL: {
 
 	my @p = $u->all_province_codes();
 
-	cmp_ok(scalar(@p), '==', 12, 'There are 12 provinces');
+	cmp_ok(scalar(@p), '==', 13, 'There are 13 provinces');
 
 	foreach my $p(@p) {
 		cmp_ok(length($p), '==', 2, "$p should be two letters");

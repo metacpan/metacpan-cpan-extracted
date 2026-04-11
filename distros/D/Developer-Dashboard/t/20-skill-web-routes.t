@@ -10,7 +10,9 @@ use File::Temp qw(tempdir);
 use Test::More;
 
 use lib 'lib';
+use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::PageStore;
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::Web::App;
 
@@ -22,48 +24,112 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
 my $repo = _create_skill_repo('route-skill');
 my $install = $manager->install( 'file://' . $repo );
 ok( !$install->{error}, 'route skill installs cleanly' ) or diag $install->{error};
+my $other_repo = _create_skill_repo( 'other-skill', nav_label => 'Other Skill Nav' );
+my $other_install = $manager->install( 'file://' . $other_repo );
+ok( !$other_install->{error}, 'second route skill installs cleanly' ) or diag $other_install->{error};
+
+my $store = Developer::Dashboard::PageStore->new( paths => $paths );
+$store->save_page(
+    Developer::Dashboard::PageDocument->from_instruction(<<'BOOKMARK')
+TITLE: Shared Index
+:--------------------------------------------------------------------------------:
+BOOKMARK: index
+:--------------------------------------------------------------------------------:
+HTML:
+Shared Index
+BOOKMARK
+);
 
 my $app = Developer::Dashboard::Web::App->new(
     auth     => bless( {}, 'Local::AuthStub' ),
-    pages    => bless( {}, 'Local::PagesStub' ),
+    pages    => $store,
     sessions => bless( {}, 'Local::SessionsStub' ),
     config   => {},
 );
 
-my $missing = $app->dispatch_request(
-    path    => '/skill/missing-skill/bookmarks',
-    method  => 'GET',
-    headers => {},
+my $missing = $app->handle(
+    path        => '/app/missing-skill/foo',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
 );
-is( $missing->[0], 404, 'missing skill routes return 404' );
+is( $missing->[0], 404, 'missing nested skill routes return 404' );
 
-my $list = $app->dispatch_request(
-    path    => '/skill/route-skill/bookmarks',
-    method  => 'GET',
-    headers => {},
+my $index = $app->handle(
+    path        => '/app/route-skill',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
 );
-is( $list->[0], 200, 'installed skill bookmark listing returns success' );
-like( $list->[2], qr/welcome/, 'bookmark listing exposes the isolated skill bookmark id' );
+is( $index->[0], 200, 'installed skill index route returns success' );
+like( $index->[2], qr/Skill Route Index/, 'installed skill index route renders the skill index bookmark' );
+like( $index->[2], qr/Skill Route Nav/, 'installed skill index route renders skill nav fragments' );
+like( $index->[2], qr/Other Skill Nav/, 'installed skill index route also renders nav fragments from other installed skills' );
 
-my $render = $app->dispatch_request(
-    path    => '/skill/route-skill/bookmarks/welcome',
-    method  => 'GET',
-    headers => {},
+my $render = $app->handle(
+    path        => '/app/route-skill/foo',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
 );
-is( $render->[0], 200, 'installed skill bookmark render route returns success' );
-like( $render->[2], qr/Skill Route Bookmark/, 'skill bookmark render returns the isolated bookmark html' );
+is( $render->[0], 200, 'installed skill page route returns success' );
+like( $render->[2], qr/Skill Route Foo/, 'skill page route renders the requested skill bookmark html' );
+like( $render->[2], qr/Skill Route Nav/, 'installed skill page route renders skill nav fragments' );
+like( $render->[2], qr/Other Skill Nav/, 'installed skill page route renders nav contributed by other installed skills too' );
 
-my $missing_bookmark = $app->dispatch_request(
-    path    => '/skill/route-skill/bookmarks/missing',
-    method  => 'GET',
-    headers => {},
+my $shared_index = $app->handle(
+    path        => '/app/index',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $shared_index->[0], 200, 'saved non-skill index route returns success' );
+like( $shared_index->[2], qr/Shared Index/, 'saved non-skill index route renders the shared saved page body' );
+like( $shared_index->[2], qr/Skill Route Nav/, 'saved non-skill index route renders nav from installed skills' );
+like( $shared_index->[2], qr/Other Skill Nav/, 'saved non-skill index route renders nav from every installed skill' );
+
+my $disable = $manager->disable('other-skill');
+ok( !$disable->{error}, 'other-skill disables cleanly for route coverage' ) or diag $disable->{error};
+
+my $disabled_shared_index = $app->handle(
+    path        => '/app/index',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $disabled_shared_index->[0], 200, 'shared index still renders after disabling one skill' );
+like( $disabled_shared_index->[2], qr/Skill Route Nav/, 'shared index keeps nav from enabled skills after a disable' );
+unlike( $disabled_shared_index->[2], qr/Other Skill Nav/, 'shared index drops nav from disabled skills' );
+
+my $disabled_skill = $app->handle(
+    path        => '/app/other-skill',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $disabled_skill->[0], 404, 'disabled skill routes are no longer served' );
+
+my $legacy_render = $app->handle(
+    path        => '/skill/route-skill/bookmarks/foo',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $legacy_render->[0], 200, 'legacy /skill/<repo>/bookmarks/<id> route still returns success' );
+like( $legacy_render->[2], qr/Skill Route Foo/, 'legacy skill bookmark route still renders the requested skill bookmark html' );
+
+my $missing_bookmark = $app->handle(
+    path        => '/app/route-skill/missing',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
 );
 is( $missing_bookmark->[0], 404, 'missing skill bookmark routes return 404' );
 
 done_testing();
 
 sub _create_skill_repo {
-    my ($name) = @_;
+    my ( $name, %args ) = @_;
     my $repo = File::Spec->catdir( $test_repos, $name );
     make_path($repo);
     my $cwd = getcwd();
@@ -77,15 +143,33 @@ sub _create_skill_repo {
     _write_file( File::Spec->catfile( 'cli', 'noop' ), "#!/usr/bin/env perl\nprint qq{noop\\n};\n", 0755 );
     _write_file( File::Spec->catfile( 'config', 'config.json' ), qq|{"skill_name":"$name"}\n|, 0644 );
     _write_file(
-        File::Spec->catfile( 'dashboards', 'welcome' ),
+        File::Spec->catfile( 'dashboards', 'index' ),
         <<'BOOKMARK',
-TITLE: Skill Route Bookmark
+TITLE: Skill Route Index
 :--------------------------------------------------------------------------------:
-BOOKMARK: welcome
+BOOKMARK: index
 :--------------------------------------------------------------------------------:
 HTML:
-Skill Route Bookmark
+Skill Route Index
 BOOKMARK
+        0644,
+    );
+    _write_file(
+        File::Spec->catfile( 'dashboards', 'foo' ),
+        <<'BOOKMARK',
+TITLE: Skill Route Foo
+:--------------------------------------------------------------------------------:
+BOOKMARK: foo
+:--------------------------------------------------------------------------------:
+HTML:
+Skill Route Foo
+BOOKMARK
+        0644,
+    );
+    make_path( File::Spec->catdir( 'dashboards', 'nav' ) );
+    _write_file(
+        File::Spec->catfile( 'dashboards', 'nav', 'skill.tt' ),
+        '<div>' . ( $args{nav_label} || 'Skill Route Nav' ) . "</div>\n",
         0644,
     );
     _run_or_die(qw(git add .));
@@ -112,10 +196,6 @@ sub _run_or_die {
 package Local::AuthStub;
 sub trust_tier { return 'admin' }
 sub helper_users_enabled { return 1 }
-
-package Local::PagesStub;
-sub editable_url { return '/' }
-sub render_url   { return '/' }
 
 package Local::SessionsStub;
 

@@ -27,11 +27,12 @@ name: Perl-Critic-Policy-Security-RandBytesFromHash
 provides:
   Perl::Critic::Policy::Security::RandBytesFromHash:
     file: lib/Perl/Critic/Policy/Security/RandBytesFromHash.pm
-    version: v0.1.0
+    version: v0.1.1
 recommends:
   Ref::Util::XS: '0'
 requires:
   List::Util: '0'
+  PPI: '1.281'
   Perl::Critic::Policy: '0'
   Perl::Critic::Utils: '0'
   Readonly: '2.01'
@@ -43,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Perl-Critic-Policy-Security-RandBytesFromHash/issues
   repository: git://github.com/robrwo/Perl-Critic-Policy-Security-RandBytesFromHash.git
-version: v0.1.0
+version: v0.1.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

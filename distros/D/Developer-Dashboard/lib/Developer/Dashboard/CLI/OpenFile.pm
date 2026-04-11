@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFile;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Cwd qw(cwd);
@@ -12,12 +12,10 @@ use Exporter 'import';
 use File::Find ();
 use File::Path qw(make_path);
 use File::Spec;
-use FindBin qw($Bin);
 use Getopt::Long qw(GetOptionsFromArray);
 use JSON::XS qw(decode_json);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
-use lib "$Bin/../../lib";
 
 use Developer::Dashboard::PathRegistry;
 
@@ -177,14 +175,17 @@ sub _unique_matches {
 sub _ordered_scope_matches {
     my (%args) = @_;
     my @patterns = @{ $args{patterns} || [] };
-    my @files    = _unique_matches( @{ $args{files} || [] } );
+    my @entries  = @{ $args{entries} || [] };
+    @entries = map { { file => $_, match_path => $_ } } _unique_matches( @{ $args{files} || [] } )
+      if !@entries;
 
     my @ranked;
-    for my $index ( 0 .. $#files ) {
+    for my $index ( 0 .. $#entries ) {
         push @ranked, {
-            file  => $files[$index],
+            file  => $entries[$index]{file},
             rank  => _scope_match_rank(
-                file     => $files[$index],
+                file      => $entries[$index]{file},
+                match_path => $entries[$index]{match_path},
                 patterns => \@patterns,
             ),
             index => $index,
@@ -204,10 +205,11 @@ sub _ordered_scope_matches {
 # Output: numeric rank where lower values are stronger matches.
 sub _scope_match_rank {
     my (%args) = @_;
-    my $file     = $args{file}     || '';
-    my @patterns = @{ $args{patterns} || [] };
-    my ($basename) = $file =~ m{([^/\\]+)$};
-    $basename ||= $file;
+    my $file       = $args{file}       || '';
+    my $match_path = $args{match_path} || $file;
+    my @patterns   = @{ $args{patterns} || [] };
+    my ($basename) = $match_path =~ m{([^/\\]+)$};
+    $basename ||= $match_path;
     my $stem = $basename;
     $stem =~ s{\.[^.]+$}{};
 
@@ -216,7 +218,7 @@ sub _scope_match_rank {
         next if !defined $pattern || $pattern eq '';
         my $regex = _compile_open_file_regex($pattern);
         my $score = 50;
-        my @components = grep { defined && $_ ne '' } split m{[\\/]+}, $file;
+        my @components = grep { defined && $_ ne '' } split m{[\\/]+}, $match_path;
 
         if ( $basename =~ /\A(?:$pattern)\z/i ) {
             $score = 0;
@@ -233,7 +235,7 @@ sub _scope_match_rank {
         elsif ( grep { $_ =~ /\A(?:$pattern)\z/i } @components ) {
             $score = 4;
         }
-        elsif ( $file =~ $regex ) {
+        elsif ( $match_path =~ $regex ) {
             $score = 5;
         }
 
@@ -290,7 +292,7 @@ sub _resolve_open_file_matches {
         @patterns = grep { defined && $_ ne '' } ( $first, @argv );
     }
 
-    my @files;
+    my @entries;
     my @regexes = map { _compile_open_file_regex($_) } @patterns;
     File::Find::find(
         {
@@ -298,18 +300,23 @@ sub _resolve_open_file_matches {
             wanted   => sub {
                 return if !-f $_;
                 my $path = $File::Find::name;
+                my $relative = File::Spec->abs2rel( $path, $scope );
+                $relative =~ s{\A\.[/\\]}{};
                 for my $regex (@regexes) {
-                    return if $path !~ $regex;
+                    return if $relative !~ $regex;
                 }
-                push @files, $path;
+                push @entries, {
+                    file       => $path,
+                    match_path => $relative,
+                };
             },
         },
         $scope,
     );
 
-    @files = _ordered_scope_matches(
+    my @files = _ordered_scope_matches(
         patterns => \@patterns,
-        files    => \@files,
+        entries  => \@entries,
     );
     return ( $line, @files );
 }

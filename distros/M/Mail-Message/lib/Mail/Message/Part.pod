@@ -64,6 +64,7 @@ Improves base, see L<Mail::Reporter/"Constructors">
   head_type   Mail::Message    Mail::Message::Head::Complete
   labels      Mail::Message    +{}
   messageId   Mail::Message    undef
+  message_id  Mail::Message    undef
   modified    Mail::Message    false
   trusted     Mail::Message    false
 
@@ -91,6 +92,8 @@ or a L<Mail::Message::Body::Nested|Mail::Message::Body::Nested>.
 
 =item messageId => $id
 
+=item message_id => $id
+
 =item modified => BOOLEAN
 
 =item trusted => BOOLEAN
@@ -102,6 +105,26 @@ or a L<Mail::Message::Body::Nested|Mail::Message::Body::Nested>.
 =head2 Attributes
 
 Extends L<"Attributes" in Mail::Message|Mail::Message/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<bodyType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<fieldType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<headType>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=item $obj-E<gt>B<messageId>()
+
+Inherited, see L<Mail::Message/"Attributes">
+
+=back
 
 =head2 Constructing a message
 
@@ -203,10 +226,6 @@ Inherited, see L<Mail::Message/"The message">
 Inherited, see L<Mail::Message/"The message">
 
 =item $obj-E<gt>B<isPart>()
-
-Inherited, see L<Mail::Message/"The message">
-
-=item $obj-E<gt>B<messageId>()
 
 Inherited, see L<Mail::Message/"The message">
 
@@ -424,13 +443,17 @@ Inherited, see L<Mail::Message/"Internals">
 Transforms a C<$body> or C<$message> to a real message part.  The C<$multipart>
 refers to the parental body.
 
-When ta C<$body> is specified, extra C<@headers> can be supplied as well.
+When a C<$body> is specified, extra C<@headers> can be supplied as well.
 Bodies are coerced into message parts by calling L<buildFromBody()|Mail::Message::Part/"METHODS">.
 If you specify a C<$message> residing in a folder, this message will
 automatically be cloned.
 Improves base, see L<Mail::Message/"Internals">
 
 =item $obj-E<gt>B<isDelayed>()
+
+Inherited, see L<Mail::Message/"Internals">
+
+=item $obj-E<gt>B<isTrusted>()
 
 Inherited, see L<Mail::Message/"Internals">
 
@@ -520,9 +543,9 @@ Cast by C<forward()>
 
 =item Error: No default mailer found to send message.
 
-The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
-find a mail transfer agent to sent this message.  Specify a mailer
-explicitly using the C<via> options.
+The message L<send()|Mail::Message/"The message"> mechanism had not enough information to
+automatically find a mail transfer agent to sent this message.  Specify a
+mailer explicitly using the C<via> options.
 Cast by C<send()>
 
 =item Error: cannot include reply source as $kind.
@@ -531,7 +554,7 @@ Unknown alternative for the C<include> option of L<reply()|Mail::Message::Constr
 choices are C<NO>, C<INLINE>, and C<ATTACH>.
 Cast by C<reply()>
 
-=item Error: cannot read message from a $source}.
+=item Error: cannot read message from a $source.
 
 Cast by C<read()>
 
@@ -604,8 +627,8 @@ Cast by C<destruct()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

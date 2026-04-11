@@ -16,37 +16,36 @@ Mail::Box - manage a mailbox, a folder with messages
 
 =head1 SYNOPSIS
 
+  use Mail::Mbox::Mbox ();
+  my $emails = Mail::Mbox::Mbox->new(folder => $ENV{MAIL});
+  print $folder->name;
+
+  print $folder->message(0);    # get the first message.
+  $folder->message(3)->delete;  # delete the third message
+  say "Folder size = ", $folder->nrMessages;
+
+  # Iterate over the messages.
+  foreach my $msg ($folder->messages) {...} # all messages
+  foreach my $msg (@$folder) {...}          # all messages
+
+  $folder->addMessage(Mail::Message->new(...));
+
+Managing multiple mailboxes:
+
   use Mail::Box::Manager;
   my $mgr    = Mail::Box::Manager->new;
   my $folder = $mgr->open(folder => $ENV{MAIL}, ...);
-  print $folder->name;
-
-  # Get the first message.
-  print $folder->message(0);
-
-  # Delete the third message
-  $folder->message(3)->delete;
-
-  # Get the number of messages in scalar context.
-  my $emails = $folder->messages;
-
-  # Iterate over the messages.
-  foreach ($folder->messages) {...} # all messages
-  foreach (@$folder) {...}          # all messages
-
-  $folder->addMessage(Mail::Box::Message->new(...));
 
 Tied-interface:
 
-  tie my(@inbox), 'Mail::Box::Tie::ARRAY', $inbox;
+  tie my(@inbox), 'Mail::Box::Tie::ARRAY', $folder;
+  tie my(%inbox), 'Mail::Box::Tie::HASH', $inbox;
 
   # Four times the same:
   $inbox[3]->print;                 # tied
   $folder->[3]->print;              # overloaded folder
   $folder->message(3)->print;       # usual
   print $folder->[3];               # overloaded message
-
-  tie my(%inbox), 'Mail::Box::Tie::HASH', $inbox;
 
   # Twice times the same
   $inbox{$msgid}->print;            # tied
@@ -81,7 +80,7 @@ Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
 
 =over 4
 
-=item overload: B<""> stringification
+=item overload: B<'""'> stringification
 
 The folder objects stringify to their name.  This simplifies especially
 print statements and sorting a lot.
@@ -94,7 +93,7 @@ print statements and sorting a lot.
       print "$folder contains $msgcount messages\n";
   }
 
-=item overload: B<@{}> use as ARRAY
+=item overload: B<'@{}'> use as ARRAY
 
 When the folder is used as if it is a reference to an array, it will
 show the messages, like L<messages()|Mail::Box/"The messages"> and L<message()|Mail::Box/"The messages"> would do.
@@ -288,7 +287,7 @@ sure you always need all the messages in the folder.
       $header->get('from') =~ m/\bmy\@example.com\b/i;
   }
 
-=item field_type => CLASS
+=item field_type => $class
 
 The type of the fields to be used in a header. Must extend
 L<Mail::Message::Field|Mail::Message::Field>.
@@ -303,29 +302,29 @@ See L<Mail::Box::Parser::Perl::new(fix_header_errors)|Mail::Box::Parser/"METHODS
 =item folder => $name
 
 Which folder to open (for reading or writing). When used for reading (the
-C<access> option set to C<"r"> or C<"a">) the mailbox should already exist
+C<access> option set to “C<r>” or “C<a>”) the mailbox should already exist
 and must be readable. The file or directory of the mailbox need not exist if it
-is opened for reading and writing (C<"rw">).  Write-permission is checked when
+is opened for reading and writing (“C<rw>”).  Write-permission is checked when
 opening an existing mailbox.
 
-The folder name can be preceded by a C<"=">, to indicate that it is named
+The folder name can be preceded by a “C<< = >>”, to indicate that it is named
 relative to the directory specified in new(folderdir).  Otherwise, it is
 taken as relative or absolute path.
 
 =item folderdir => $directory
 
 Where are folders to be found by default?  A folder-name may be preceded by
-a equals-sign (C<=>, a C<mutt> convension) to explicitly state that the folder
+a equals-sign (“C<< = >>”, a C<mutt> convension) to explicitly state that the folder
 is located below the default directory.  For example: in case
-C<folderdir =E<gt> '/tmp'> and C<folder =E<gt> '=abc'>, the name of the
+“C<< folderdir => '/tmp'>>” and “C<< folder => '=abc' >>”, the name of the
 folder-file is C<'/tmp/abc'>.  Each folder type has already some default set.
 
-=item head_delayed_type => CLASS
+=item head_delayed_type => $class
 
 The headers which are delayed: which will be read from file when it
 is needed, but not before.
 
-=item head_type => CLASS
+=item head_type => $class
 
 The type of header which contains all header information.  Must extend
 L<Mail::Message::Head::Complete|Mail::Message::Head::Complete>.
@@ -349,21 +348,21 @@ When the lock file is older than the specified number of C<$seconds>, it is
 considered a mistake.  The original lock is released, and accepted for
 this folder.
 
-=item lock_type => CLASS|STRING|ARRAY
+=item lock_type => $class|$name|\@names
 
-The type of the locker object.  This may be the full name of a CLASS
-which extends L<Mail::Box::Locker|Mail::Box::Locker>, or one of the known locker types
+The type of the locker object.  This may be a C<$class>
+which extends L<Mail::Box::Locker|Mail::Box::Locker>, or one of the known locker types by C<$name>:
 C<DotLock>, C<Flock>, C<FcntlLock>, C<Mutt>, C<NFS>, C<POSIX>, or C<NONE>.
 If an ARRAY is specified, then a Multi locker is built which uses the
-specified list.
+specified list of locker C<@names>.
 
 =item lock_wait => $seconds
 
 How many C<$seconds> to wait before failing on opening this folder.
 
-=item locker => OBJECT
+=item locker => $locker
 
-An OBJECT which extends L<Mail::Box::Locker|Mail::Box::Locker>, and will handle folder locking
+An object which extends L<Mail::Box::Locker|Mail::Box::Locker>, and will handle folder locking
 replacing the default lock behavior.
 
 =item manager => $manager
@@ -371,12 +370,12 @@ replacing the default lock behavior.
 A reference to the object which manages this folder -- typically an
 L<Mail::Box::Manager|Mail::Box::Manager> instance.
 
-=item message_type => CLASS
+=item message_type => $class
 
 What kind of message objects are stored in this type of folder.  The
 default is constructed from the folder class followed by C<::Message>.
-For instance, the message type for C<Mail::Box::POP3> is
-C<Mail::Box::POP3::Message>
+For instance, the message type for L<Mail::Box::POP3|Mail::Box::POP3> is
+L<Mail::Box::POP3::Message|Mail::Box::POP3::Message>.
 
 =item multipart_type => CLASS
 
@@ -399,7 +398,7 @@ implicit ways, including on the moment the program is terminated.
 
 Flags whether to trust the data in the folder or not.  Folders which
 reside in your C<folderdir> will be trusted by default (even when the
-names if not specified staring with C<=>).  Folders which are outside
+names if not specified staring with “C<< = >>”).  Folders which are outside
 the folderdir or read from STDIN (L<Mail::Message::Construct::read()|Mail::Message::Construct::Read/"Constructing a message">) are
 not trused by default, and require some extra checking.
 
@@ -1063,7 +1062,7 @@ create flag, or L<Mail::Box::new(create)|Mail::Box/"Constructors">.
 
 =item folderdir => $directory
 
-When the foldername is preceded by a C<=>, the C<$directory>
+When the foldername is preceded by a “C<< = >>”, the C<$directory>
 will be searched for the named folder.
 
 =back
@@ -1094,7 +1093,7 @@ each folder class will at least support the C<folderdir> option:
 =item folderdir => $directory
 
 The location where the folders of this class are stored by default.  If the
-user specifies a name starting with a C<=>, that indicates that the folder is
+user specifies a name starting with a “C<< = >>”, that indicates that the folder is
 to be found in this default C<$directory>.
 
 =back
@@ -1513,14 +1512,14 @@ Cast by C<addMessage()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

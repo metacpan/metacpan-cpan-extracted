@@ -28,16 +28,17 @@ yq - YAML query command for Developer Dashboard
 
 =head1 DESCRIPTION
 
-This command provides YAML path extraction for Developer Dashboard.
+This command provides YAML query extraction for Developer Dashboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This staged helper owns the public C<dashboard yq> command. It accepts an
-optional dotted YAML path plus an optional input file, then hands the request
-to the shared query runtime so parsing, file-vs-STDIN handling, and output
-formatting stay consistent with the rest of the dashboard toolchain.
+optional dotted YAML path or C<$d>-based Perl expression plus an optional input
+file, then hands the request to the shared query runtime so parsing,
+file-vs-STDIN handling, and output formatting stay consistent with the rest of
+the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
@@ -52,7 +53,9 @@ Use this file when you are changing how C<dashboard yq> chooses between STDIN an
 Users run C<dashboard yq [path] [file]>. The staged helper selects the YAML
 backend in the shared query runtime, which accepts the file and path in either
 order, reads STDIN when no file is given, prints scalar hits as plain text, and
-prints the whole parsed document when the path is C<$d> or C<.>.
+prints the whole parsed document when the path is C<$d> or C<.>. If the query
+text uses C<$d> inside a Perl expression, the helper evaluates that expression
+against the decoded YAML document before formatting the result.
 
 =head1 WHAT USES IT
 
@@ -63,6 +66,7 @@ It is used by the public C<dashboard yq> command, by shell snippets that want a 
   printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta
   dashboard yq config.yml '$d'
   dashboard yq '$d' config.yml
+  printf 'foo:\n  - 1\nbar:\n  - 2\n' | dashboard yq 'sort keys %$d'
   printf 'items:\n  - name: demo\n' | dashboard yq items.0.name
 
 =for comment FULL-POD-DOC END

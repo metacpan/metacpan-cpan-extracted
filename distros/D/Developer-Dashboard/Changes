@@ -1,5 +1,122 @@
 Revision history for Developer Dashboard
 
+2.26  2026-04-11
+    - added `dashboard skills enable <repo-name>` and
+      `dashboard skills disable <repo-name>` so installed skills can be
+      toggled without uninstalling their isolated runtime trees
+    - expanded `dashboard skills list` to report enabled state plus CLI,
+      page, docker, collector, and indicator counts in JSON, with optional
+      `-o table` output for terminal inspection
+    - added `dashboard skills usage <repo-name>` with default JSON output and
+      optional `-o table` rendering, including CLI hook metadata, page/nav
+      inventory, docker service files, merged config key, and collector
+      indicator details even for disabled skills
+    - removed disabled skills from normal runtime lookup so dotted command
+      dispatch, browser routes, collector loading, config merge, docker root
+      discovery, and shared nav rendering stop using them until they are
+      explicitly re-enabled
+    - updated the README, main POD, integration plan, and release-metadata
+      gate so the supported skill inventory and activation lifecycle stays
+      documented and regression-checked
+
+2.25  2026-04-10
+    - excluded the repo-only `integration/` verification helpers from the
+      release tarball so CPAN and PAUSE installs ship runtime assets instead
+      of internal release tooling
+    - excluded the checkout-only top-level `updates/` scripts from the
+      release tarball because the installed `dashboard update` contract is a
+      user-provided layered command under `.developer-dashboard/cli/update`
+      and `.developer-dashboard/cli/update.d`
+    - tightened the release-metadata gate, shipped docs, and built-dist tests
+      so repo-only verification/bootstrap folders are treated as source-tree
+      assets rather than required tarball content
+
+2.24  2026-04-10
+    - loaded installed skill collectors declared in skill
+      `config/config.json` into the same managed fleet used by the system
+      config, so `dashboard serve`, `dashboard restart`, and
+      `dashboard stop` now manage skill-owned collectors too
+    - normalized installed skill collector names to
+      `<repo-name>.<collector-name>` so collector process titles, loop
+      metadata, and indicator rows stay unambiguous across multiple skills
+      and the main runtime
+    - loaded `dashboards/nav/*` from every installed skill into the shared
+      nav strip on normal `/app/<page>` routes such as `/app/index`, while
+      keeping those nav fragments available on the skill routes themselves
+    - updated the README, main POD, shipped skill reference, and integration
+      plan so the documented skill contract now covers fleet-loaded skill
+      collectors, repo-qualified collector names, and global installed-skill
+      nav rendering
+    - audited the shipped `Developer::Dashboard.pm` manual end to end,
+      replaced brittle top-level private-module POD links with self-contained
+      code references, replaced `SEE ALSO` module links with stable local
+      section links, and expanded the release-metadata guard so broken links
+      and the old web-framework FAQ wording do not drift back in
+    - removed repo-internal `.md` filename references from the synced
+      top-level product manuals and shipped Perl POD, then extended the
+      release-metadata guard so user-facing manuals do not point readers at
+      internal markdown filenames again
+    - excluded `node_modules/` and `test_by_michael/` from gathered release
+      tarballs and added a release-metadata guard so local dependency caches
+      and private scratch trees cannot leak into PAUSE artifacts
+
+2.23  2026-04-10
+    - taught `dashboard skills install` and the installed skill runtime to
+      keep Git-backed skill repos self-contained under
+      `~/.developer-dashboard/skills/<repo-name>/` instead of assuming their
+      files are merged into the normal runtime trees
+    - added dotted skill command dispatch such as
+      `dashboard example-skill.somecmd`, app-style skill browser routes under
+      `/app/<repo-name>` and `/app/<repo-name>/<page>`, underscored merged
+      config keys such as `_example-skill`, and skill nav auto-loading from
+      `dashboards/nav/*`
+    - installed skill `aptfile` packages before `cpanfile` dependencies and
+      included skill `config/docker/...` roots in layered docker service
+      discovery between the home runtime docker config and deeper project
+      overrides
+    - fixed packaged-tree loading for installed skills and helper runtimes by
+      removing source-tree `FindBin` assumptions from shipped library modules,
+      then reran the packaged-tree and blank-environment gates against the new
+      release tarball
+
+2.21  2026-04-10
+    - taught the shared `*q` query runtime to rejoin split query arguments and
+      evaluate real `$d`-based Perl expressions such as `sort keys %$d`
+      against decoded JSON, YAML, TOML, Java properties, INI, CSV, and XML
+      data, no matter whether the source came from STDIN or a file argument
+    - replaced the old raw-XML wrapper behavior in `xmlq` with decoded XML
+      hashes and arrays, including `_attributes` and `_text` fields that can
+      be traversed through dotted paths or `$d` expressions just like the
+      other query commands
+    - expanded release metadata guardrails so non-core runtime Perl
+      dependencies now have to be declared consistently in `Makefile.PL`,
+      `cpanfile`, and `dist.ini`, and documented that rule in contributor
+      testing guidance
+
+2.20  2026-04-10
+    - added explicit command-hook stop semantics so a hook now stops the
+      remaining `<command>.d` chain only when its `stderr` contains the
+      marker `[[STOP]]`, while ordinary non-zero exits are still recorded but
+      do not skip later hooks
+    - added `LAST_RESULT` and `LAST_RESULT_FILE` support in
+      `Developer::Dashboard::Runtime::Result`, giving each later hook and the
+      final command one stable `{ file, exit, STDOUT, STDERR }` view of the
+      immediately previous hook
+    - expanded hook documentation, smoke coverage, and unit coverage so the
+      stop marker plus previous-hook handoff are part of the documented and
+      tested CLI hook lifecycle contract
+
+2.19  2026-04-10
+    - removed the contributor-only `FULL-POD-DOC` and Scorecard gate prose
+      from `README.md` and `Developer::Dashboard.pm` so the top-level manual
+      is back to being a product guide instead of a repo-process checklist
+    - corrected the top-level FAQ to describe the real web stack as
+      Dancer2-on-PSGI through Plack/Starman and to describe active
+      `LWP::UserAgent` usage in `api-dashboard` and Java source lookup
+    - moved the contributor-contract clarification into contributor-facing docs
+      such as `doc/testing.md` and `agents.md`, while keeping the product
+      manual synced across `README.md` and `Developer::Dashboard.pm`
+
 2.17  2026-04-10
     - replaced the repeated FULL-POD-DOC template text across shipped Perl
       modules, scripts, and staged helpers with file-specific documentation

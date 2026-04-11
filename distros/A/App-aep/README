@@ -1,183 +1,292 @@
 SYNOPSIS
-        shell$ aep --help
+        # Standalone: run a command with restart on failure
+        shell$ aep --command /usr/bin/myapp --command-args "--foreground" --command-restart -1
+
+        # Lock server: orchestrate startup order for docker-compose
+        shell$ aep --lock-server --lock-server-order "db,redis,app" \
+                   --lock-server-exhaust-action exit
+
+        # Lock server with parallel groups (redis1 and redis2 start simultaneously)
+        shell$ aep --lock-server --lock-server-order "db,redis1||redis2,nginx"
+
+        # Lock client via TCP (default for Docker networking)
+        shell$ aep --lock-client --lock-id db --command /usr/bin/postgres \
+                   --lock-trigger "both:text:ready to accept connections" \
+                   --lock-transport tcp --lock-client-host aep-master
+
+        # Lock client with timeout (start after 30s even without server)
+        shell$ aep --lock-client --lock-id db --command /usr/bin/postgres \
+                   --lock-client-timeout 30
+
+        # Docker health check (returns JSON status)
+        shell$ aep --docker-health-check
+
+        # Quiet mode (errors only)
+        shell$ aep --quiet --lock-client --lock-id db --command /usr/bin/myapp
+
+        # Verbose mode (includes packet dumps)
+        shell$ aep --verbose --lock-server --lock-server-order "db,app"
 
 DESCRIPTION
-    You are reading the wrong documentation; please refer to
-    App::CorrectModule.
+    AEP (Advanced Entry Point) is a container entrypoint tool that runs
+    commands within Docker containers and provides a lock server/client
+    mechanism for orchestrating multi-container startup order.
+
+    In multi-container environments (docker-compose, Kubernetes pods),
+    services often start simultaneously but depend on each other. AEP solves
+    this by providing a lock server that controls the order in which
+    services start, waiting for each service to report readiness before
+    allowing the next to begin.
+
+    AEP communicates between containers over both TCP and Unix domain
+    sockets using a JSON protocol. TCP transport is the default for Docker
+    networking, eliminating the need for shared volumes. It supports five
+    trigger types for detecting when a service is ready: time delay, text
+    match, regex match, TCP connect probe, and external script.
+
+    The lock-server-order option supports parallel groups using the "||"
+    operator. For example, "db,redis1||redis2,nginx" starts db first, then
+    redis1 and redis2 simultaneously, then nginx after both are ready.
 
 ARGUMENTS
-  config related
+  Config related
    config-env
     Default value: disabled
 
-    Only read command line options from the enviroment
+    Only read configuration from environment variables.
 
    config-file
     Default value: disabled
 
-    Only read command line options from the enviroment
+    Read configuration from a YAML file.
 
    config-args
     Default value: disabled
 
-    Only listen to command line arguments
+    Only read configuration from command line arguments.
 
    config-merge (default)
     Default value: enabled
 
-    Merge together env, config and args to generate a config
+    Merge together env, config file and args to generate the final
+    configuration.
 
    config-order (default)
-    Default value: 'env,conf,args' (left to right)
+    Default value: 'env,file,args' (left to right)
 
-    The order to merge options together,
+    The order to merge configuration sources. Later sources override earlier
+    ones.
 
-  environment related
+  Environment related
    env-prefix (default)
-    Default value: aep-
+    Default value: AEP_
 
-    When scanning the enviroment aep will look for this prefix to know which
-    environment variables it should pay attention to.
+    When scanning the environment, aep will look for this prefix to identify
+    which environment variables it should use as configuration. For example,
+    setting "AEP_SOCKETPATH=/var/run/aep.sock" overrides the default socket
+    path.
 
   Command related (what to run)
    command (string)
-    What to actually run within the container, default is print aes help.
+    What to actually run within the container. Default is "aep --help".
 
    command-args (string)
-    The arguments to add to the command comma seperated, default is nothing.
+    The arguments to add to the command, comma separated. Default is
+    nothing.
 
-    Example: --list,--as-service,--with-long "arg",--foreground
+    Example: "--list,--as-service,--with-long "arg",--foreground"
+
+   command-norestart
+    If the command exits, do not attempt to restart it. Exit immediately.
 
    command-restart (integer)
-    If the command exits how many times to retry it, default 0 set to -1 for
-    infinate
+    If the command exits, how many times to retry it. Default 0. Set to -1
+    for infinite restarts.
 
    command-restart-delay (integer)
-    The time in milliseconds to wait before retrying the command, default
-    1000
+    The time in milliseconds to wait before retrying the command. Default
+    1000.
 
   Lock commands (server)
-    These are for if you have concerns of 'race' conditions.
+    These options control the lock server, which orchestrates the startup
+    order of multiple containers to prevent race conditions.
 
    lock-server
     Default value: disabled
 
-    Act like a lock server, this means we will expect other aeps to connect
-    to us, we in turn will say when they should actually start, this is to
-    counter-act race issues when starting multi image containers such as
-    docker-compose.
+    Act as a lock server. Other aep instances (lock clients) will connect
+    and wait for permission to start their commands.
 
    lock-server-host (string)
-    What host to bind to, defaults to 0.0.0.0
+    What host to bind to. Defaults to 0.0.0.0.
 
    lock-server-port (integer)
-    What port to bind to, defaults to 60000
+    What port to bind to. Defaults to 60000.
 
-   lock-server-default-run
-    Default value: disabled
+   lock-server-default (string)
+    Default value: ignore
 
-    If we get sent an ID we do not know what to do with, tell it to run.
+    If a client connects with a lock-id not in the order list, what action
+    to take.
 
-   lock-server-default-ignore
-    Default value: enabled
+    *   ignore - Do not send a run signal. The client will wait
+        indefinitely.
 
-    If we get sent an ID we do not know what to do with, ignore it.
+    *   run - Immediately tell the unknown client to start.
+
+    *   runlast - Queue the client and run it after the order list is
+        exhausted.
 
    lock-server-order (string)
-    The list of ids and the order to allow them to run, allows OR ||
-    operators, for example: db,redis1||redis2,redis1||redis2,nginx
+    The list of lock-ids and the order to allow them to run, comma
+    separated. Use "||" within a step to run multiple clients in parallel.
 
-    Beware the the lock-server-default-ignore config flag!
+    Example: "db,redis,nginx"
+
+    Example with parallel groups: "db,redis1||redis2,nginx"
+
+    In the parallel example, "db" starts first, then "redis1" and "redis2"
+    start simultaneously. Only after both report trigger success does
+    "nginx" start.
+
+    Each entry must match a lock-id sent by a connecting client. The server
+    sends a "run" signal to each client in order, waiting for each to report
+    success (via its lock-trigger) before advancing to the next.
 
    lock-server-exhaust-action (string)
     Default value: idle
 
-    What to do if all clients have been started (list end), options are:
+    What to do when all clients in the order list have reported success.
 
-    *   exit- Exit 0
+    *   exit - Exit with code 0.
 
-    *   idle - Do nothing, just sit there doing nothing
+    *   idle - Do nothing, keep the server running.
 
-    *   restart - Reset the lock-server-order list and continue operating
+    *   restart - Reset the order list and start the cycle again.
 
-    *   execute - Read in any passed commands and args and run them like a
-        normal aep
+    *   execute - Start the server's own command (from --command).
 
   Lock commands (client)
    lock-client
     Default value: disabled
 
-    Become a lock client, this will mean your aep will connect to another
-    aep to learn when it should run its command.
+    Become a lock client. This aep will connect to a lock server and wait
+    for permission to start its command.
 
-   lock-server-host (string)
-    What host to connect to, defaults to 'aep-master'
+   lock-client-host (string)
+    What host to connect to. Defaults to "aep-master" (assumes Docker DNS).
 
-   lock-server-port (integer)
-    What port to connect to, defaults to 60000
+   lock-client-port (integer)
+    What port to connect to. Defaults to 60000.
+
+   lock-client-noretry
+    If the connection to the lock server fails, exit immediately instead of
+    retrying. Overrides lock-client-retry.
+
+   lock-client-retry (integer)
+    Maximum number of connection retry attempts. Set to 0 for infinite
+    retries. Defaults to 3.
+
+   lock-client-retry-delay (integer)
+    How long to wait in seconds before retrying the connection. Defaults to
+    5.
+
+   lock-client-timeout (integer)
+    Maximum seconds to wait for the lock server to send the "run" signal. If
+    the timeout expires without receiving permission, the command starts
+    anyway and a warning is logged. Set to 0 (default) to wait forever.
+
+   lock-transport (string)
+    Default value: auto
+
+    Which transport to use for connecting to the lock server.
+
+    *   auto - Try TCP first, fall back to Unix socket if TCP fails.
+
+    *   tcp - Use TCP only. Connect to lock-client-host:lock-client-port.
+
+    *   unix - Use Unix socket only.
 
    lock-trigger (string)
     Default: none:time:10000
 
-    What to look for to know that our target command has executed correctly,
-    if the target command dies or exits before this filter can complete, the
-    success will never be reported, if you have also set restart options the
-    lock-trigger will continue to try to validate the service.
+    How to determine that the command started successfully. After the
+    trigger fires, the client reports success to the lock server, which then
+    allows the next client in the order to start.
 
-    The syntax for the filters is:
+    The syntax is:
 
         handle:filter:specification
 
-    handle can be stderr, stdout, both or none
+    "handle" can be "stderr", "stdout", "both", or "none".
 
-    So an example for a filter that will match 'now serving requests':
-
-        both:text:now serving requests
-
-    Several standard filters are availible:
+    Available filters:
 
     *   time - Wait this many milliseconds and then report success.
 
-        Example: none:time:2000
+        Example: "none:time:2000"
 
-    *   regex - Wait till this regex matches to report success.
+    *   regex - Wait until this regex matches output.
 
-        Example: both:regex:ok|success
+        Example: "both:regex:ok|success"
 
-    *   text - Wait till this line of text is seen.
+    *   text - Wait until this exact text appears in output.
 
-        Example: both:text:success
+        Example: "both:text:success"
 
-    *   script - Run a script or binary somewhere else on the system and use
-        its exit code to determine success or failure.
+    *   script - Run an external script and use its exit code (0 = success).
+        Runs with a 30-second timeout. Retries every second on failure.
 
-        Example: none:script:/opt/check_state
+        Example: "none:script:/opt/check_state"
 
-    *   connect - Try to connect to a tcp port, no data is sent and any
-        recieved is ignored. Will be treated as success if the connect its
-        self succeeds.
+    *   connect - Try to connect to a TCP host:port. No data is sent or
+        received. Retries every second on failure.
 
-        Example: none:connect:127.0.0.1:6767
+        Example: "none:connect:127.0.0.1:6767"
 
    lock-id (string)
-    What ID we should say we are
+    The identity this client reports to the lock server. Must match an entry
+    in the server's "--lock-server-order" list (unless
+    "--lock-server-default" is set to "run" or "runlast").
+
+  Output control
+   quiet
+    Suppress informational output. Only errors and the final exit message
+    are shown.
+
+   verbose
+    Show detailed debug output including packet contents (the serialized
+    JSON sent and received).
+
+  Other
+   docker-health-check
+    Connect to the lock server and request a health status report. The
+    server responds with JSON containing the current order progress,
+    connected clients, and which services have been cleared or are still
+    waiting.
+
+    Returns exit code 0 (healthy) with JSON on stdout, or exit code 1
+    (unhealthy) if the connection fails.
+
+ENVIRONMENT
+    AEP_SOCKETPATH
+        Path to the Unix domain socket for lock server/client communication.
+        Default: "/tmp/aep.sock"
 
 BUGS
     For any feature requests or bug reports please visit:
 
-    * Github <https://github.com/PaulGWebster/p5-App-aep>
+    <https://github.com/PaulGWebster/p5-App-aep>
 
-    You may also catch up to the author 'daemon' on IRC:
+    You may also find the author 'daemon' on IRC:
 
-    * irc.libera.org
-
-    * #perl
+    *   irc.libera.org #perl
 
 AUTHOR
     Paul G Webster <daemon@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by Paul G Webster.
+    This software is copyright (c) 2023-2026 by Paul G Webster.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

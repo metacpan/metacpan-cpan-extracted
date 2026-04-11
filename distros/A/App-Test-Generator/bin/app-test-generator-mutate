@@ -455,7 +455,7 @@ for my $file (@files) {
 		# We point PERL5LIB at it so prove picks up the mutated module instead of
 		# the original, without -Mblib overriding us by loading the project's own
 		# blib/ first.
-		local $ENV{PERL5LIB} = File::Spec->catfile($workspace, $opt{lib}) . ($ENV{PERL5LIB} ? ":$ENV{PERL5LIB}" : '');
+		local $ENV{PERL5LIB} = File::Spec->catfile($workspace, $opt{lib});
 
 		my $compile = system($^X, '-c', File::Spec->catfile($workspace, $file));
 		next if $compile != 0;

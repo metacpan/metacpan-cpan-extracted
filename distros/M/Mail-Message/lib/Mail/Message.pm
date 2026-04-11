@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.04.
+# This code is part of Perl distribution Mail-Message version 4.05.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Message;{
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 }
 
 use parent 'Mail::Reporter';
@@ -47,7 +47,7 @@ sub init($)
 
 	my $head;
 	if(defined($head = $args->{head})) { $self->head($head) }
-	elsif(my $msgid = $args->{messageId} || $args->{messageID})
+	elsif(my $msgid = $args->{message_id} || $args->{messageId} || $args->{messageID})
 	{	$self->takeMessageId($msgid);
 	}
 
@@ -57,8 +57,8 @@ sub init($)
 		$body->message($self);
 	}
 
-	$self->{MM_body_type}  = $args->{body_type}  if defined $args->{body_type};
-	$self->{MM_head_type}  = $args->{head_type}  if defined $args->{head_type};
+	$self->{MM_body_type}  = $args->{body_type}  // 'Mail::Message::Body::Lines';
+	$self->{MM_head_type}  = $args->{head_type}  // 'Mail::Message::Head::Complete';
 	$self->{MM_field_type} = $args->{field_type} if defined $args->{field_type};
 
 	my $labels = $args->{labels} || [];
@@ -97,6 +97,14 @@ sub clone(@)
 sub messageId() { $_[0]->{MM_message_id} || $_[0]->takeMessageId}
 sub messageID() { $_[0]->messageId }   # compatibility
 
+
+sub fieldType() { $_[0]->{MM_field_type} }
+sub headType()  { $_[0]->{MM_head_type} }
+sub bodyType()  { $_[0]->{MM_body_type} }
+
+#--------------------
+
+#--------------------
 
 sub container() { undef } # overridden by Mail::Message::Part
 
@@ -523,7 +531,7 @@ sub readFromParser($;$)
 {	my ($self, $parser, $bodytype) = @_;
 
 	my $head = $self->readHead($parser) //
-		Mail::Message::Head::Complete->new(message => $self, field_type => $self->{MM_field_type});
+		Mail::Message::Head::Complete->new(message => $self, field_type => $self->fieldType);
 
 	my $body = $self->readBody($parser, $head, $bodytype) or return;
 	$self->head($head);
@@ -534,9 +542,9 @@ sub readFromParser($;$)
 
 sub readHead($;$)
 {	my ($self, $parser, $headtype) = @_;
-	$headtype //= $self->{MM_head_type} // 'Mail::Message::Head::Complete';
+	$headtype //= $self->headType;
 
-	$headtype->new(message => $self, field_type => $self->{MM_field_type})
+	$headtype->new(message => $self, field_type => $self->fieldType)
 		->read($parser);
 }
 
@@ -545,7 +553,7 @@ sub readBody($$;$$)
 {	my ($self, $parser, $head, $getbodytype) = @_;
 
 	my $bodytype
-	  = ! $getbodytype   ? ($self->{MM_body_type} // 'Mail::Message::Body::Lines')
+	  = ! $getbodytype   ? $self->bodyType
 	  : ref $getbodytype ? $getbodytype->($self, $head)
 	  :    $getbodytype;
 
@@ -571,7 +579,7 @@ sub readBody($$;$$)
 				if $enc =~ m/^(?:none|7bit|8bit|binary)$/i && ! $bodytype->isNested;
 		}
 
-		$body = $bodytype->new(message => $self, checked => $self->{MM_trusted}, charset => undef);
+		$body = $bodytype->new(message => $self, checked => $self->isTrusted, charset => undef);
 		$body->contentInfoFrom($head);
 	}
 
@@ -605,6 +613,9 @@ sub takeMessageId(;$)
 
 	$self->{MM_message_id} = $msgid || $self->head->createMessageId;
 }
+
+
+sub isTrusted() { $_[0]->{MM_trusted} }
 
 #--------------------
 

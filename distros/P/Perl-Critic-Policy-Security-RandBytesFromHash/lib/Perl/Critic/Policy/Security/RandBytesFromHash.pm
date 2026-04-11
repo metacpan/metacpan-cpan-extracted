@@ -9,12 +9,13 @@ use parent 'Perl::Critic::Policy';
 
 use List::Util qw( any );
 use Perl::Critic::Utils qw( :severities :classification :ppi );
+use PPI 1.281; # signatures support
 use Readonly 2.01;
 use Ref::Util qw( is_plain_arrayref );
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 Readonly my $DESC => 'random bytes generated using a hash';
 Readonly my $EXPL => 'A hash seeded with poor sources of entropy is still a poor source of entropy, use system entropy instead.';
@@ -33,7 +34,7 @@ Readonly my $DIGEST_REGEX => qr/\A (
         ( \w+:: )*
         ( md[2456] | sha( 1 | 224 | 256 ) | digest_data | (hex|b64)?digest(_hash)? | join )
         ( _ ( hex | b64u? | base64 | sum | bytes ) )?
-        ) \z/nx;
+        ) \z/anx;
 
 sub violates ( $self, $elem, $ ) {
 
@@ -60,13 +61,13 @@ sub _is_bad_seed_source( $self, $elem ) {
     return 0 if $elem->isa("PPI::Token::Whitespace");
 
     return 1
-      if $elem =~ /\A ( (CORE::)?rand | (Time::HiRes::)? (time|gettimeofday|localtime|gmtime|clock_gettime) | refaddr ) \z/nx
+      if $elem =~ /\A ( (CORE::)?rand | (Time::HiRes::)? (time|gettimeofday|localtime|gmtime|clock_gettime) | refaddr ) \z/anx
       && ( is_perl_builtin_with_optional_argument($elem)
         || is_function_call($elem) );
 
     return 1 if $elem eq '$$' && is_perl_global($elem);
 
-    return 1 if $elem =~ /\A \$ (PID|PROCESS_ID) \z/nx && $elem->isa("PPI::Token::Symbol");
+    return 1 if $elem =~ /\A \$ (PID|PROCESS_ID) \z/anx && $elem->isa("PPI::Token::Symbol");
 
     return 1 if $elem =~ /\A \{ \s* \} \z/x && $elem->isa("PPI::Structure");
 
@@ -97,7 +98,14 @@ Perl::Critic::Policy::Security::RandBytesFromHash - flag common anti-patterns fo
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
+
+=head1 SYNOPSIS
+
+In your F<perlcriticrc> file, add
+
+    [Perl::Critic::Policy::Security::RandBytesFromHash]
+    severity = 1
 
 =head1 DESCRIPTION
 
@@ -114,7 +122,7 @@ That was naive, because the seed values were always predicable:
 
 =item *
 
-Perl's built-in C<rand> only generates is seeded by 32-bits and is predicable enough that the seed can be reverse-engineered after a few iterations.
+Perl's built-in C<rand> is seeded by 32-bits and is predicable enough that the seed can be reverse-engineered after a few iterations.
 
 =item *
 
@@ -176,7 +184,7 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+If the bug you are reporting has security implications that make it inappropriate to send to a public issue tracker,
 then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR

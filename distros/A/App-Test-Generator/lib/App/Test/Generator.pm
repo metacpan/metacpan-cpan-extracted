@@ -36,7 +36,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -51,9 +51,24 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test 
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =head1 SYNOPSIS
+
+C<App::Test::Generator> is a suite to help the testing of CPAN modules.
+It consists of 4 modules:
+
+=over 4
+
+=item * Fuzz Tester
+
+=item * Mutation Testing
+
+=item * LCSAJ Metrics
+
+=item * Test Dashboard
+
+=back
 
 From the command line:
 
@@ -90,8 +105,6 @@ From Perl:
     system("$^X -I$dir $tempfile");
     unlink $tempfile;
   }
-
-=encoding utf8
 
 =head1 OVERVIEW
 
@@ -140,6 +153,171 @@ It then generates a L<Test::Most>-based fuzzing harness combining:
 =item * Reproducible runs via C<$seed> and configurable iterations via C<$iterations>
 
 =back
+
+=head1 MUTATION-GUIDED TEST GENERATION
+
+C<App::Test::Generator> includes a pipeline that automatically closes the
+feedback loop between mutation testing, schema extraction, and fuzz
+testing. The goal is that surviving mutants drive the creation of new
+tests that kill them on the next run, without manual intervention.
+
+=head2 The Pipeline
+
+    mutation survivor
+        |
+        v
+    SchemaExtractor extracts the schema for the enclosing sub
+        |
+        v
+    Schema augmented with boundary values from the mutant
+        |
+        v
+    Augmented schema written to t/conf/
+        |
+        v
+    t/fuzz.t picks up the new schema and runs fuzz tests
+        |
+        v
+    Mutation killed on next run
+
+=head2 How to Use It
+
+The pipeline is driven by three flags passed to
+C<scripts/generate_index.pl>, which is invoked automatically by
+C<scripts/generate_test_dashboard> on each CI push.
+
+=head3 Step 1: Generate TODO stubs for all survivors
+
+    scripts/generate_index.pl --generate_mutant_tests=t
+
+Produces C<t/mutant_YYYYMMDD_HHMMSS.t> containing:
+
+=over 4
+
+=item * TODO stubs for HIGH and MEDIUM difficulty survivors, with
+boundary value suggestions, environment variable hints, and the
+enclosing subroutine name for navigation context.
+
+=item * Comment-only hints for LOW difficulty survivors.
+
+=back
+
+Multiple mutations on the same source line are deduplicated into one
+stub. One good test kills all variants on that line.
+
+=head3 Step 2: Generate runnable schemas for NUM_BOUNDARY survivors
+
+    scripts/generate_index.pl \
+        --generate_mutant_tests=t \
+        --generate_test=mutant
+
+For each NUM_BOUNDARY survivor, calls
+L<App::Test::Generator::SchemaExtractor> to extract the schema for
+the enclosing subroutine. If the confidence level is sufficient, the
+schema is augmented with the boundary value from the mutant (plus one
+value either side) and written to C<t/conf/> as a runnable YAML file.
+L<t/fuzz.t> picks it up automatically on the next test run.
+
+Falls back to a TODO stub if:
+
+=over 4
+
+=item * SchemaExtractor cannot parse the file
+
+=item * The enclosing sub cannot be determined
+
+=item * The extracted schema confidence is C<very_low> or C<none>
+
+=back
+
+=head3 Step 3: Augment existing schemas with survivor boundary values
+
+    scripts/generate_index.pl \
+        --generate_mutant_tests=t \
+        --generate_test=mutant \
+        --generate_fuzz
+
+Scans C<t/conf/> for existing YAML schema files (hand-written or
+previously generated) and writes augmented copies with boundary values
+from surviving NUM_BOUNDARY mutants merged in. The original schema is
+never modified. Augmented copies are written as
+C<t/conf/mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml> and picked up
+automatically by C<t/fuzz.t>.
+
+Schemas whose filename already starts with C<mutant_fuzz_> are skipped
+to prevent cascading augmentation. Schemas with no matching survivors
+are skipped, with a note if C<--verbose> is active.
+
+=head3 Putting It All Together
+
+The recommended invocation in C<scripts/generate_test_dashboard>
+Step 7 runs all three stages together:
+
+    scripts/generate_index.pl \
+        --generate_mutant_tests=t \
+        --generate_test=mutant \
+        --generate_fuzz
+
+The GitHub Actions workflow in C<.github/workflows/dashboard.yml>
+then commits any new C<t/mutant_*.t> and C<t/conf/mutant_*.yml> files
+to the repository so they accumulate over time as the test suite
+improves.
+
+=head2 Confidence Levels
+
+L<App::Test::Generator::SchemaExtractor> assigns a confidence level
+to each extracted schema:
+
+=over 4
+
+=item * C<high> / C<medium> / C<low> - Schema is used for test generation
+
+=item * C<very_low> / C<none> - Falls back to TODO stub
+
+=back
+
+Confidence is based on how much type and constraint information could
+be inferred from the source code and its POD documentation. Methods
+with explicit parameter validation (L<Params::Validate::Strict>,
+L<Params::Get>) or comprehensive POD will produce higher-confidence
+schemas.
+
+=head2 Files Produced
+
+=over 4
+
+=item * C<t/mutant_YYYYMMDD_HHMMSS.t>
+
+TODO stub file for all survivors. Committed to the repository by the
+GitHub Actions workflow.
+
+=item * C<t/conf/mutant_MODNAME_FUNCTION_YYYYMMDD_HHMMSS.yml>
+
+Runnable YAML schema for a NUM_BOUNDARY survivor where SchemaExtractor
+confidence was sufficient. Picked up by C<t/fuzz.t>.
+
+=item * C<t/conf/mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml>
+
+Augmented copy of an existing schema with survivor boundary values
+merged in. Picked up by C<t/fuzz.t>.
+
+=back
+
+=head2 See Also
+
+=over 4
+
+=item * L<App::Test::Generator::SchemaExtractor> - Schema extraction
+from Perl source code
+
+=item * L<scripts/generate_index.pl> - Dashboard generator and
+pipeline driver
+
+=item * L<scripts/generate_test_dashboard> - Full pipeline runner
+
+=back
+
+=encoding utf8
 
 =head1 CONFIGURATION
 
@@ -1753,8 +1931,16 @@ sub generate
 sub _load_schema {
 	my $schema_file = $_[0];
 
+	if(!defined($schema_file)) {
+		croak(__PACKAGE__, ': Usage: _load_schema($schema_file)');
+	}
+
+	if(length($schema_file) == 0) {
+		croak(__PACKAGE__, ': _load_schema given empty filename');
+	}
+
 	if(!-r $schema_file) {
-		croak(__PACKAGE__, ": generate($schema_file): $!");
+		croak(__PACKAGE__, ": _load_schema($schema_file): $!");
 	}
 
 	# --- Load configuration safely (require so config can use 'our' variables) ---
@@ -2655,9 +2841,7 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'MD5 hashes (32 hex characters)',
-		},
-
-		sha256 => {
+		}, sha256 => {
 			code => q{
 				Gen {
 					join('', map { sprintf('%x', int(rand(16))) } 1..64);

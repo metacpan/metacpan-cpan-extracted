@@ -1,0 +1,11 @@
+0.01  2026-04-09
+    - Initial release
+    - resolve() - getaddrinfo with AF_UNSPEC
+    - getaddrinfo() - full getaddrinfo with hints
+    - search() - auto-parsed DNS search (A, AAAA, MX, SRV, TXT, NS, SOA, PTR, NAPTR, CAA)
+    - query() - raw DNS query
+    - gethostbyname(), reverse(), getnameinfo()
+    - set_servers(), servers(), set_local_dev/ip4/ip6()
+    - reinit() - hot-reload system DNS configuration
+    - Direct EV event loop integration via sock_state_cb
+    - Requires c-ares >= 1.22.0 (via Alien::cares)

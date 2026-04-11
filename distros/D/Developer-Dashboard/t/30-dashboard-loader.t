@@ -69,13 +69,6 @@ my @perl_scripts = (
     File::Spec->catfile( $repo_root, 'bin', 'dashboard' ),
     File::Spec->catfile( $repo_root, 'app.psgi' ),
     (
-    map { File::Spec->catfile( $repo_root, 'updates', $_ ) } qw(
-      01-bootstrap-runtime.pl
-      02-install-deps.pl
-      03-shell-bootstrap.pl
-    ),
-    ),
-    (
     map { File::Spec->catfile( $repo_root, 'share', 'private-cli', $_ ) } qw(
       jq
       yq
@@ -117,8 +110,18 @@ my @perl_scripts = (
       20-skill-web-routes.t
     ),
     ),
-    File::Spec->catfile( $repo_root, 'integration', 'blank-env', 'run-integration.pl' ),
 );
+
+push @perl_scripts,
+  map { File::Spec->catfile( $repo_root, 'updates', $_ ) } qw(
+    01-bootstrap-runtime.pl
+    02-install-deps.pl
+    03-shell-bootstrap.pl
+  )
+  if -d File::Spec->catdir( $repo_root, 'updates' );
+
+push @perl_scripts, File::Spec->catfile( $repo_root, 'integration', 'blank-env', 'run-integration.pl' )
+  if -d File::Spec->catdir( $repo_root, 'integration' );
 
 for my $path (@perl_scripts) {
     my $content = _slurp($path);

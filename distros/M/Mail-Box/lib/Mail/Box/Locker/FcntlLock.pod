@@ -171,6 +171,10 @@ Cast by C<lock()>
 To check whether the filename is used to flock a folder, the file must be
 opened.  Apparently this fails, which does not mean that the folder is
 locked neither that it is unlocked.
+
+=pod
+
+=encoding utf8
 Cast by C<isLocked()>
 
 =item Fault: unable to open FcntlLock lock file $file for $folder
@@ -183,14 +187,14 @@ Cast by C<lock()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Cwd qw(abs_path cwd);
 use File::Basename qw(dirname);
@@ -271,6 +271,36 @@ sub skill_root {
     my ( $self, $name ) = @_;
     die 'Missing skill name' if !defined $name || $name eq '';
     return $self->_ensure_dir( File::Spec->catdir( $self->skills_root, $name ) );
+}
+
+# installed_skill_roots()
+# Returns every installed skill root in deterministic sorted order.
+# Input: none.
+# Output: ordered list of installed skill root directory path strings.
+sub installed_skill_roots {
+    my ( $self, %args ) = @_;
+    my $skills_root = $self->skills_root;
+    return () if !-d $skills_root;
+    opendir my $dh, $skills_root or die "Unable to read $skills_root: $!";
+    my @roots = map { File::Spec->catdir( $skills_root, $_ ) }
+      sort
+      grep {
+             $_ ne '.'
+          && $_ ne '..'
+          && -d File::Spec->catdir( $skills_root, $_ )
+          && ( $args{include_disabled} || !-f File::Spec->catfile( $skills_root, $_, '.disabled' ) )
+      } readdir $dh;
+    closedir $dh;
+    return @roots;
+}
+
+# installed_skill_docker_roots()
+# Returns the config/docker roots contributed by installed skills in deterministic sorted order.
+# Input: none.
+# Output: ordered list of skill docker configuration root directory path strings.
+sub installed_skill_docker_roots {
+    my ( $self, %args ) = @_;
+    return map { File::Spec->catdir( $_, 'config', 'docker' ) } $self->installed_skill_roots(%args);
 }
 
 # collectors_root()

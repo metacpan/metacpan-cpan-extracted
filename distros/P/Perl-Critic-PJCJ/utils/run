@@ -127,7 +127,7 @@ confirm() {
   pi "About to: $description"
   local answer
   read -rp "Continue? [yes/NO] " answer
-  if [[ ${answer,,} != "yes" ]]; then
+  if [[ ${answer,,} != "yes" && ${answer,,} != "y" ]]; then
     pf "Aborted"
   fi
 }
@@ -326,7 +326,7 @@ release() {
   else
     local answer
     read -rp "Continue after PR review? [yes/NO] " answer
-    if [[ ${answer,,} != "yes" ]]; then
+    if [[ ${answer,,} != "yes" && ${answer,,} != "y" ]]; then
       pf "Aborted"
     fi
   fi

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Encode qw(encode);
 use File::Basename qw(basename dirname);
@@ -12,15 +12,15 @@ use File::Temp qw(tempfile);
 use Fcntl qw(F_GETFD F_SETFD FD_CLOEXEC SEEK_SET);
 use JSON::XS qw(decode_json encode_json);
 
-my $RESULT_FILE_HANDLE;
-my $RESULT_FILE_PATH = '';
+my %CHANNEL_FILE_HANDLE;
+my %CHANNEL_FILE_PATH;
 
 # current()
 # Decodes the current RESULT environment variable into a hash reference.
 # Input: none.
 # Output: hash reference keyed by hook filename.
 sub current {
-    my $json = _current_json();
+    my $json = _channel_json( 'RESULT', 'RESULT_FILE' );
     return {} if !defined $json || $json eq '';
     my $data = decode_json($json);
     die 'RESULT must decode to a hash' if ref($data) ne 'HASH';
@@ -37,26 +37,7 @@ sub set_current {
     my ( $data, %args ) = @_;
     die 'RESULT state must be a hash' if ref($data) ne 'HASH';
     return clear_current() if !%{$data};
-
-    my $json = encode_json($data);
-    if ( length($json) <= _max_inline_bytes(%args) ) {
-        _clear_result_file();
-        $ENV{RESULT} = $json;
-        delete $ENV{RESULT_FILE};
-        return 'inline';
-    }
-
-    my ( $fh, $path ) = _open_result_file();
-    print {$fh} $json;
-    truncate( $fh, tell($fh) ) or die "Unable to truncate RESULT file $path: $!";
-    seek( $fh, 0, SEEK_SET ) or die "Unable to rewind RESULT file $path: $!";
-
-    _clear_result_file();
-    $RESULT_FILE_HANDLE = $fh;
-    $RESULT_FILE_PATH   = $path;
-    delete $ENV{RESULT};
-    $ENV{RESULT_FILE} = $path;
-    return 'file';
+    return _set_channel( 'RESULT', 'RESULT_FILE', $data, %args );
 }
 
 # clear_current()
@@ -64,10 +45,62 @@ sub set_current {
 # Input: none.
 # Output: empty string.
 sub clear_current {
-    delete $ENV{RESULT};
-    delete $ENV{RESULT_FILE};
-    _clear_result_file();
-    return '';
+    return _clear_channel( 'RESULT', 'RESULT_FILE' );
+}
+
+# last_result()
+# Decodes the current LAST_RESULT environment variable into a hash reference.
+# Input: none.
+# Output: hash reference for the most recent hook result or undef.
+sub last_result {
+    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
+    my $json = _channel_json( 'LAST_RESULT', 'LAST_RESULT_FILE' );
+    return if !defined $json || $json eq '';
+    my $data = decode_json($json);
+    die 'LAST_RESULT must decode to a hash' if ref($data) ne 'HASH';
+    return $data;
+}
+
+# set_last_result($data, %args)
+# Serializes the most recent hook result into LAST_RESULT or LAST_RESULT_FILE.
+# Input: hash reference describing the latest hook result plus an optional
+# max_inline_bytes integer.
+# Output: storage mode string: inline, file, or empty.
+sub set_last_result {
+    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
+    my ( $data, %args ) = @_;
+    die 'LAST_RESULT state must be a hash' if ref($data) ne 'HASH';
+    return clear_last_result() if !%{$data};
+    return _set_channel( 'LAST_RESULT', 'LAST_RESULT_FILE', $data, %args );
+}
+
+# clear_last_result()
+# Removes the active LAST_RESULT payload from both inline and file-backed
+# channels.
+# Input: none.
+# Output: empty string.
+sub clear_last_result {
+    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
+    return _clear_channel( 'LAST_RESULT', 'LAST_RESULT_FILE' );
+}
+
+# stop_requested($stderr_or_hash)
+# Detects the explicit hook stop marker emitted on stderr.
+# Input: stderr string or a hash containing stderr/STDERR.
+# Output: boolean flag.
+sub stop_requested {
+    shift if @_ && defined $_[0] && !ref($_[0]) && $_[0] eq __PACKAGE__;
+    my ($value) = @_;
+    my $stderr = '';
+    if ( ref($value) eq 'HASH' ) {
+        $stderr = defined $value->{STDERR}
+          ? $value->{STDERR}
+          : ( defined $value->{stderr} ? $value->{stderr} : '' );
+    }
+    elsif ( defined $value ) {
+        $stderr = $value;
+    }
+    return $stderr =~ /\[\[STOP\]\]/ ? 1 : 0;
 }
 
 # names()
@@ -186,16 +219,7 @@ sub report {
 # Input: none.
 # Output: JSON string or empty string.
 sub _current_json {
-    my $json = $ENV{RESULT};
-    return $json if defined $json && $json ne '';
-
-    my $path = $ENV{RESULT_FILE} || '';
-    return '' if $path eq '';
-    open my $fh, '<:raw', $path or die "Unable to read RESULT file $path: $!";
-    local $/;
-    my $file_json = <$fh>;
-    close $fh or die "Unable to close RESULT file $path: $!";
-    return defined $file_json ? $file_json : '';
+    return _channel_json( 'RESULT', 'RESULT_FILE' );
 }
 
 # _max_inline_bytes(%args)
@@ -218,7 +242,7 @@ sub _max_inline_bytes {
 # read through RESULT_FILE without inflating the process environment.
 # Input: none.
 # Output: filehandle and portable fd-backed path string.
-sub _open_result_file {
+sub _open_channel_file {
     my ( $fh, $path ) = tempfile( 'dashboard-result-XXXXXX', TMPDIR => 1, UNLINK => 1 );
     binmode $fh, ':raw';
 
@@ -232,16 +256,74 @@ sub _open_result_file {
     return ( $fh, $fd_path );
 }
 
-# _clear_result_file()
-# Releases the inherited RESULT_FILE handle when inline RESULT JSON is enough or
-# when the payload is being cleared entirely.
-# Input: none.
+# _channel_json($env_name, $file_env_name)
+# Loads one hook payload from inline env JSON or its file-backed fallback.
+# Input: env var names for the inline and file-backed channels.
+# Output: JSON string or empty string.
+sub _channel_json {
+    my ( $env_name, $file_env_name ) = @_;
+    my $json = $ENV{$env_name};
+    return $json if defined $json && $json ne '';
+
+    my $path = $ENV{$file_env_name} || '';
+    return '' if $path eq '';
+    open my $fh, '<:raw', $path or die "Unable to read $env_name file $path: $!";
+    local $/;
+    my $file_json = <$fh>;
+    close $fh or die "Unable to close $env_name file $path: $!";
+    return defined $file_json ? $file_json : '';
+}
+
+# _set_channel($env_name, $file_env_name, $data, %args)
+# Serializes one hash payload into an inline env var or a file-backed fallback.
+# Input: env var names, hash payload, and optional max_inline_bytes integer.
+# Output: storage mode string.
+sub _set_channel {
+    my ( $env_name, $file_env_name, $data, %args ) = @_;
+    my $json = encode_json($data);
+    if ( length($json) <= _max_inline_bytes(%args) ) {
+        _clear_channel_file($file_env_name);
+        $ENV{$env_name} = $json;
+        delete $ENV{$file_env_name};
+        return 'inline';
+    }
+
+    my ( $fh, $path ) = _open_channel_file();
+    print {$fh} $json;
+    truncate( $fh, tell($fh) ) or die "Unable to truncate $env_name file $path: $!";
+    seek( $fh, 0, SEEK_SET ) or die "Unable to rewind $env_name file $path: $!";
+
+    _clear_channel_file($file_env_name);
+    $CHANNEL_FILE_HANDLE{$file_env_name} = $fh;
+    $CHANNEL_FILE_PATH{$file_env_name}   = $path;
+    delete $ENV{$env_name};
+    $ENV{$file_env_name} = $path;
+    return 'file';
+}
+
+# _clear_channel($env_name, $file_env_name)
+# Removes one inline/file-backed hook payload channel from the environment.
+# Input: env var names for the inline and file-backed channels.
+# Output: empty string.
+sub _clear_channel {
+    my ( $env_name, $file_env_name ) = @_;
+    delete $ENV{$env_name};
+    delete $ENV{$file_env_name};
+    _clear_channel_file($file_env_name);
+    return '';
+}
+
+# _clear_channel_file($file_env_name)
+# Releases one inherited file-backed payload handle.
+# Input: file-backed env var name.
 # Output: none.
-sub _clear_result_file {
-    return if !$RESULT_FILE_HANDLE;
-    close $RESULT_FILE_HANDLE or die "Unable to close RESULT file handle for $RESULT_FILE_PATH: $!";
-    undef $RESULT_FILE_HANDLE;
-    $RESULT_FILE_PATH = '';
+sub _clear_channel_file {
+    my ($file_env_name) = @_;
+    return if !$CHANNEL_FILE_HANDLE{$file_env_name};
+    close $CHANNEL_FILE_HANDLE{$file_env_name}
+      or die "Unable to close result file handle for $CHANNEL_FILE_PATH{$file_env_name}: $!";
+    delete $CHANNEL_FILE_HANDLE{$file_env_name};
+    delete $CHANNEL_FILE_PATH{$file_env_name};
 }
 
 # _command_name()
@@ -289,8 +371,11 @@ Developer::Dashboard::Runtime::Result - helper accessors for dashboard hook RESU
   my $all    = Developer::Dashboard::Runtime::Result::current();
   my $mode   = Developer::Dashboard::Runtime::Result::set_current($all);
   my $stdout = Developer::Dashboard::Runtime::Result::stdout('00-first.pl');
+  my $prev   = Developer::Dashboard::Runtime::Result::last_result();
+  my $stop   = Developer::Dashboard::Runtime::Result::stop_requested($prev);
   my $last   = Developer::Dashboard::Runtime::Result::last_entry();
   Developer::Dashboard::Runtime::Result::clear_current();
+  Developer::Dashboard::Runtime::Result::clear_last_result();
 
 =head1 DESCRIPTION
 
@@ -298,37 +383,59 @@ This module decodes the hook-result payload populated by C<dashboard> command
 hook execution. Small payloads stay inline in C<RESULT>. Oversized payloads
 spill into C<RESULT_FILE> before later C<exec()> calls would hit the kernel
 arg/env limit. The helper accessors hide that transport detail and provide one
-consistent way to read per-hook stdout, stderr, and exit codes from Perl hook
-scripts.
+consistent way to read per-hook stdout, stderr, exit codes, the immediate
+previous hook result in C<LAST_RESULT>, and the explicit C<[[STOP]]> marker
+contract from Perl hook scripts.
 
 =head1 FUNCTIONS
 
-=head2 current, set_current, clear_current, names, has, entry, stdout, stderr, exit_code, last_name, last_entry, report
+=head2 current, set_current, clear_current, last_result, set_last_result, clear_last_result, stop_requested, names, has, entry, stdout, stderr, exit_code, last_name, last_entry, report
 
 Decode, write, clear, and report the current hook-result payload, whether it is
-stored inline in C<RESULT> or spilled into C<RESULT_FILE>.
+stored inline in C<RESULT> or spilled into C<RESULT_FILE>. The same helpers
+also manage the immediate previous-hook payload in C<LAST_RESULT> /
+C<LAST_RESULT_FILE> and detect the explicit C<[[STOP]]> stderr marker.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This module manages the structured C<RESULT> state passed between command hooks and their final command target. It serializes hook stdout, stderr, and exit codes, decodes that state for later hooks, and transparently spills oversized payloads into C<RESULT_FILE> when the environment would become too large.
+This module manages the structured C<RESULT> and C<LAST_RESULT> state passed
+between command hooks and their final command target. It serializes hook
+stdout, stderr, and exit codes, tracks the immediate previous hook in one
+stable hash shape, decodes that state for later hooks, and transparently
+spills oversized payloads into C<RESULT_FILE> or C<LAST_RESULT_FILE> when the
+environment would become too large.
 
 =head1 WHY IT EXISTS
 
-It exists because hook chaining needs a transport format that is explicit and portable. Encoding that state in one module keeps hook readers and writers synchronized and avoids argument-list failures when a long hook chain produces too much output for C<ENV{RESULT}> alone.
+It exists because hook chaining needs a transport format that is explicit and
+portable. Encoding that state in one module keeps hook readers and writers
+synchronized, makes the immediate previous-hook handoff predictable, gives the
+runtime one explicit place to detect the C<[[STOP]]> marker, and avoids
+argument-list failures when a long hook chain produces too much output for
+C<ENV{RESULT}> alone.
 
 =head1 WHEN TO USE
 
-Use this file when changing hook result serialization, RESULT versus RESULT_FILE overflow rules, or the reporting helpers used by command-hook scripts.
+Use this file when changing hook result serialization, C<RESULT> versus
+C<RESULT_FILE> overflow rules, C<LAST_RESULT> handoff behavior, or the stop
+marker/reporting helpers used by command-hook scripts.
 
 =head1 HOW TO USE
 
-Use C<set_current>, C<clear_current>, and the decode/report helpers rather than manipulating C<ENV{RESULT}> by hand. Hook scripts should read structured state through this module instead of parsing JSON blobs themselves.
+Use C<set_current>, C<set_last_result>, C<clear_current>,
+C<clear_last_result>, and the decode/report helpers rather than manipulating
+C<ENV{RESULT}> or C<ENV{LAST_RESULT}> by hand. Hook scripts should read
+structured state through this module instead of parsing JSON blobs
+themselves, and they should use C<stop_requested> when they need to react to
+the explicit stop marker.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> command-hook priming, update hooks, skill hook dispatch, and tests that cover RESULT overflow and chained hook behavior.
+It is used by C<bin/dashboard> command-hook priming, custom CLI hook scripts,
+update hooks, skill hook dispatch, and tests that cover result overflow,
+previous-hook chaining, and explicit stop-marker behavior.
 
 =head1 EXAMPLES
 
@@ -340,17 +447,30 @@ Do a direct compile-and-load check against the module from a source checkout.
 
 Example 2:
 
-  prove -lv t/21-refactor-coverage.t t/00-load.t
+  perl -MDeveloper::Dashboard::Runtime::Result -e 'print Developer::Dashboard::Runtime::Result::stop_requested("[[STOP]] from hook\n") ? "stop\n" : "go\n"'
+
+Probe the explicit stop-marker contract directly from one Perl process.
+
+Example 3:
+
+  perl -MDeveloper::Dashboard::Runtime::Result -e 'my $last = Developer::Dashboard::Runtime::Result::last_result() || {}; print($last->{file} // "none", "\n")'
+
+Inspect the immediate previous hook payload without parsing C<ENV{LAST_RESULT}>
+manually.
+
+Example 4:
+
+  prove -lv t/21-refactor-coverage.t t/05-cli-smoke.t
 
 Run the focused regression tests that most directly exercise this module's behavior.
 
-Example 3:
+Example 5:
 
   HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
 
 Recheck the module under the repository coverage gate rather than relying on a load-only probe.
 
-Example 4:
+Example 6:
 
   prove -lr t
 

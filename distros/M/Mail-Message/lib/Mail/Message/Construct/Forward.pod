@@ -52,38 +52,39 @@ matter, as long as it is present.  See C<Mail::Message::Body::Multipart>.
 
 =over 2
 
-=item Bcc => $string|$address|\@addresses
+=item Bcc => $field|$string|$address|\@addresses
 
 Receivers of blind carbon copies: their names will not be published to
 other message receivers.
 
-=item Cc => $string|$address|\@addresses
+=item Cc => $field|$string|$address|\@addresses
 
 The carbon-copy receivers, by default none.
 
-=item Date => DATE
+=item Date => $field|$date
 
-The date to be used in the message sent.
+The content of the Date field to be used in the message sent.  By default,
+the correctly formatted timestamp of 'now' is added.
 
-=item From => $string|$address|\@addresses
+=item From => $field|$string|$address|\@addresses
 
 Your identification, by default taken from the C<To> field of the
 source message.
 
-=item Message-ID => STRING
+=item Message-ID => $msgid
 
 Supply a STRING as specific message-id for the forwarded message.
 By default, one is generated for you.  If there are no angles around
 your id, they will be added.
 
-=item Subject => STRING|CODE
+=item Subject => $field|$string|CODE
 
-Force the subject line to the specific STRING, or the result of the
-subroutine specified by CODE.  The subroutine will be called passing
+Force the subject line to the specific C<$field>, C<$string>, or the result of
+the subroutine specified by CODE.  The subroutine will be called passing
 the subject of the original message as only argument.  By default,
 the L<forwardSubject()|Mail::Message::Construct::Forward/"Constructing a message"> method is used.
 
-=item To => $string|$address|\@addresses
+=item To => $field|$string|$address|\@addresses
 
 The destination of your message. Obligatory.  The addresses may be
 specified as string, a L<Mail::Address|Mail::Address> object, or as ARRAY of
@@ -108,7 +109,7 @@ It is only possible to inline textual messages, therefore binary or
 multi-part messages will always be enclosed as attachment.
 Read the details in section L</Creating a forward>.
 
-=item preamble => STRING|$body
+=item preamble => $string|$body
 
 Part which is attached before the forwarded message.  If no preamble
 is given, then it is constructed from the prelude and postlude.  When
@@ -136,7 +137,7 @@ is ignored.
 
 =over 2
 
-=item preamble => BODY|PART
+=item preamble => $body|$part
 
 =back
 
@@ -155,16 +156,15 @@ is ignored.  Signatures are not stripped.  Signatures are not stripped.
 
 =over 2
 
-=item preamble => BODY|PART
+=item preamble => $body|$part
 
 =back
 
 =item $obj-E<gt>B<forwardInline>(%options)
 
-This method is equivalent in behavior to L<forward()|Mail::Message::Construct::Forward/"Constructing a message"> with the
-option C<include> set to C<'INLINE'>.  You can specify most of
-the fields which are available to L<forward()|Mail::Message::Construct::Forward/"Constructing a message"> except
-C<include> and C<body>.
+This method is equivalent in behavior to L<forward()|Mail::Message::Construct::Forward/"Constructing a message"> with the option
+C<include> set to C<'INLINE'>.  You can specify most of the fields which
+are available to L<forward()|Mail::Message::Construct::Forward/"Constructing a message"> except C<include> and C<body>.
 
  -Option         --Default
   is_attached      "[The forwarded message is attached]\n"
@@ -176,7 +176,7 @@ C<include> and C<body>.
 
 =over 2
 
-=item is_attached => STRING
+=item is_attached => $text
 
 A forward on binary messages can not be inlined.  Therefore, they are
 automatically translated into an attachment, as made by L<forwardAttach()|Mail::Message::Construct::Forward/"Constructing a message">.
@@ -203,11 +203,15 @@ The line(s) which will be added before the quoted forwarded lines.
 If nothing is specified, the result of the L<forwardPrelude()|Mail::Message::Construct::Forward/"Constructing a message"> method
 is used.  When C<undef> is specified, no prelude will be added.
 
-=item quote => CODE|STRING
+Be not confused with the C<preamble>, which specifies the whole first
+part of the constructed message: the prelude will become the start of
+such part.
 
-Mangle the lines of an C<INLINE>d reply with CODE, or by prepending a
-STRING to each line.  The routine specified by CODE is called when the
-line is in C<$_>.
+=item quote => CODE|$leader
+
+Mangle the lines of an C<INLINE>d reply with CODE, or by prepending
+a C<$leader> characters to each line.  The routine specified by CODE is
+called when the line is in C<$_>.
 
 By default, nothing is added before each line.  This option is processed
 after the body has been decoded.
@@ -235,7 +239,7 @@ required.  Some other options, like C<preamble>, are ignored.
 
 =over 2
 
-=item body => BODY
+=item body => $body
 
 =back
 
@@ -407,8 +411,8 @@ Cast by C<forwardNo()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

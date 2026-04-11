@@ -42,12 +42,8 @@
             "IO::Socket::IP" : "0",
             "List::Util" : "0",
             "Log::Report" : "1.42",
-            "Mail::Box::FastScalar" : "4.0",
-            "Mail::Box::Net" : "4.0",
-            "Mail::Box::Parser::Perl" : "4.0",
-            "Mail::Box::Test" : "4.0",
-            "Mail::Reporter" : "4.0",
-            "Mail::Transport::Receive" : "4.0",
+            "Mail::Box" : "4.02",
+            "Mail::Transport" : "4.01",
             "Socket" : "0"
          }
       },
@@ -72,7 +68,7 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-POP3"
       }
    },
-   "version" : "4.01",
+   "version" : "4.02",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2001,

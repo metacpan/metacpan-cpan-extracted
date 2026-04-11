@@ -448,6 +448,10 @@ Some example uses:
     p \%hash
     p $object
 
+## vars
+
+Dumps avaiable variables
+
 ## \_uniq
 
 Returns a unique list of elements.

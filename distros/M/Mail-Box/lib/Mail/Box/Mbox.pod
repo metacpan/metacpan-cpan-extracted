@@ -29,11 +29,11 @@ Extends L<"OVERLOADED" in Mail::Box::File|Mail::Box::File/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<""> stringification
+=item overload: B<'""'> stringification
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
-=item overload: B<@{}> use as ARRAY
+=item overload: B<'@{}'> use as ARRAY
 
 Inherited, see L<Mail::Box/"OVERLOADED">
 
@@ -100,7 +100,7 @@ Inherited, see L<Mail::Box/"Constructors">
 
 =item extract => INTEGER|CODE|METHOD|'LAZY'|'ALWAYS'
 
-=item field_type => CLASS
+=item field_type => $class
 
 =item fix_headers => BOOLEAN
 
@@ -108,9 +108,9 @@ Inherited, see L<Mail::Box/"Constructors">
 
 =item folderdir => $directory
 
-=item head_delayed_type => CLASS
+=item head_delayed_type => $class
 
-=item head_type => CLASS
+=item head_type => $class
 
 =item keep_dups => BOOLEAN
 
@@ -120,15 +120,15 @@ Inherited, see L<Mail::Box/"Constructors">
 
 =item lock_timeout => $seconds
 
-=item lock_type => CLASS|STRING|ARRAY
+=item lock_type => $class|$name|\@names
 
 =item lock_wait => $seconds
 
-=item locker => OBJECT
+=item locker => $locker
 
 =item manager => $manager
 
-=item message_type => CLASS
+=item message_type => $class
 
 =item multipart_type => CLASS
 
@@ -397,16 +397,16 @@ Inherited, see L<Mail::Box/"Internals">
 =item $any-E<gt>B<folderToFilename>( $foldername, $folderdir, [$extension] )
 
 Translate a folder name into a filename, using the
-C<$folderdir> value to replace a leading C<=>.  If no C<$extension> is specified and
+C<$folderdir> value to replace a leading “C<< = >>”.  If no C<$extension> is specified and
 this method is called as instance method, new(subfolder_extension) is used.
-Otherwise, the extension default to C<'.d'>.
+Otherwise, the extension default to “C<.d>”.
 Improves base, see L<Mail::Box::File/"Internals">
 
 =item $class-E<gt>B<foundIn>( [$foldername], %options )
 
 If no C<$foldername> is specified, then the value of the C<folder> option
 is taken.  A mbox folder is a file which starts with a separator
-line: a line with C<'From '> as first characters.  Blank lines which
+line: a line with “C<From␣>” as first characters.  Blank lines which
 start the file are ignored, which is not for all MUA's acceptable.
 Improves base, see L<Mail::Box/"Internals">
 
@@ -519,10 +519,6 @@ Inherited, see L<Mail::Box/"Cleanup">
 
 =back
 
-=head2 DETAILS
-
-Extends L<"DETAILS" in Mail::Box::File|Mail::Box::File/"DETAILS">.
-
 =head1 DETAILS
 
 Extends L<"DETAILS" in Mail::Box::File|Mail::Box::File/"DETAILS">.
@@ -538,6 +534,10 @@ Extends L<"Available folder types" in Mail::Box::File|Mail::Box::File/"Available
 =head2 Folder class implementation
 
 Extends L<"Folder class implementation" in Mail::Box::File|Mail::Box::File/"Folder class implementation">.
+
+=head2 File based folders
+
+Extends L<"File based folders" in Mail::Box::File|Mail::Box::File/"File based folders">.
 
 =head2 How MBOX folders work
 
@@ -693,14 +693,14 @@ Cast by C<addMessage()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box version 4.01,
-built on December 13, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box version 4.02,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2001-2025 by Mark Overmeer.
+This software is copyright (c) 2001-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,13 +3,12 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use File::Basename qw(dirname);
 use File::Spec;
-use FindBin qw($Bin);
 
 use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file);
 
@@ -53,6 +52,8 @@ sub run {
 
     my @results;
     my $dir = $self->updates_dir;
+
+    return \@results if !-d $dir;
 
     opendir my $dh, $dir or die "Unable to open updates directory $dir: $!";
     for my $file ( sort readdir $dh ) {

@@ -40,8 +40,8 @@ use feature qw( say );
 use parent  qw( Exporter );
 use subs    qw( _uniq p );
 
-our $VERSION = '1.12';
-our @EXPORT  = qw( repl dd d p );
+our $VERSION = '1.13';
+our @EXPORT  = qw( repl dd d p vars );
 our %PEEKS;
 
 =head1 NAME
@@ -932,6 +932,7 @@ sub _build_step {
         (
               help
             | hist
+            | vars
         ) \b
         (.*)
     $ /\$repl->$1($2)/x;
@@ -1218,6 +1219,7 @@ sub _define_commands {
         "d",       # Exporting it.
         "dd",      # Exporting it.
         "q",       # Used in _repl_step to stop the repl.
+        "vars",    # Dump available variables.
     );
 }
 
@@ -1253,6 +1255,7 @@ sub _define_help {
  p DATA         - Data printer (colored).
  d DATA         - Data dumper.
  dd DATA, [N=3] - Dump internals (with depth).
+ vars           - Show available variables.
  q              - Quit debugger.
 HELP
 }
@@ -1458,6 +1461,25 @@ Some example uses:
 sub p {
     my @args = @_ ? @_ : ( $_ );
     _p( @args );
+}
+
+=head2 vars
+
+Dumps avaiable variables
+
+=cut 
+
+sub vars {
+    my ( $self ) = @_;
+
+    my @vars =
+      grep { !/^&/ }
+      grep { /[a-z]/ } @{ $self->{vars_all} };
+
+
+    for my $var ( @vars ) {
+        say "  $var";
+    }
 }
 
 # Misc

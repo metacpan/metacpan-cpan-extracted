@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.563   2026-04-10
+    - Term::Choose minimum version 1.782.
+    - Adjusting a data type to the new Term::Choose version.
+
 0.562   2025-06-11
     - Update xt files.
 

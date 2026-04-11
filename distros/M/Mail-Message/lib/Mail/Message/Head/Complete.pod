@@ -322,11 +322,11 @@ See also L<Mail::Message::Head::Partial::removeFields()|Mail::Message::Head::Par
 at the end of the name), which accepts a string or regular expression
 as argument to select the fields to be removed.
 
-WARNING WARNING WARNING: for performance reasons, the header administration
+B<Warning>: for performance reasons, the header administration
 uses weak references (see L<Scalar::Util> method weaken()> to figure-out
-which fields have been removed.  A header is a hash of field for fast search
-and an array of weak references to remember the order of the fields, required
-for printing.  If the field is removed from the hash, the weak-ref is set to
+which fields have been removed.  A header is a HASH of fields for fast search
+plus an ARRAY of weak references to remember the order of the fields, required
+for printing.  If the field is removed from the HASH, the weak-ref is set to
 C<undef> and the field not printed.
 
 However... it is easy to disturb this process.  Example:
@@ -689,8 +689,8 @@ Cast by C<build()>
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message version 4.04,
-built on February 04, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message version 4.05,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/mailbox/>
 
 =head1 LICENSE
 

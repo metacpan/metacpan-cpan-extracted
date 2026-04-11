@@ -69,6 +69,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "URI" => 0,
     "URI::Escape" => 0,
+    "XML::Parser" => 0,
     "YAML::XS" => 0,
     "lib" => 0,
     "strict" => 0,
@@ -82,7 +83,7 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.17",
+  "VERSION" => "2.26",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -137,6 +138,7 @@ my %FallbackPrereqs = (
   "Time::Local" => 0,
   "URI" => 0,
   "URI::Escape" => 0,
+  "XML::Parser" => 0,
   "YAML::XS" => 0,
   "lib" => 0,
   "strict" => 0,

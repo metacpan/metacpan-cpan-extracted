@@ -720,7 +720,7 @@ static inline int pubsub_str_publish_locked(PubSubHandle *h, const char *str,
     PubSubHeader *hdr = h->hdr;
     PubSubStrSlot *slots = (PubSubStrSlot *)h->slots;
 
-    uint64_t pos = hdr->write_pos;
+    uint64_t pos = __atomic_load_n(&hdr->write_pos, __ATOMIC_RELAXED);
     uint32_t idx = pos & h->cap_mask;
     PubSubStrSlot *slot = &slots[idx];
 

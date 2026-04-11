@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Mail-Message version 4.04.
+# This code is part of Perl distribution Mail-Message version 4.05.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Mail::Message;{
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 }
 
 
@@ -25,7 +25,7 @@ use IO::Lines  ();
 
 sub string()
 {	my $self = shift;
-	$self->head->string . $self->body->string;
+	$self->head->string . $self->body->string . ($self->endsOnNewline ? '' : "\n");
 }
 
 
@@ -42,7 +42,7 @@ sub file()
 {	my $self = shift;
 	my $file = IO::Lines->new;
 	$self->print($file);
-	$file->seek(0,0);
+	$file->seek(0, 0);
 	$file;
 }
 

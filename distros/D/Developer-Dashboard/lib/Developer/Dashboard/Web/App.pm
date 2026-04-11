@@ -3,11 +3,12 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '2.17';
+our $VERSION = '2.26';
 
 use Capture::Tiny qw(capture);
 use POSIX qw(strftime);
 use File::Spec;
+use Scalar::Util qw(blessed);
 use URI;
 use URI::Escape qw(uri_unescape);
 use Cwd qw(cwd);
@@ -90,11 +91,12 @@ sub handle {
 sub authorize_request {
     my ( $self, %args ) = @_;
     my $headers = $args{headers} || {};
+    my $config_has_web_settings = blessed( $self->{config} ) && $self->{config}->can('web_settings');
     my $tier = $self->{auth}->trust_tier(
         remote_addr          => $args{remote_addr},
         host                 => $headers->{host},
         extra_loopback_hosts => (
-            $self->{config}
+            $config_has_web_settings
             ? ( $self->{config}->web_settings->{ssl_subject_alt_names} || [] )
             : []
         ),
@@ -1507,6 +1509,7 @@ sub _nav_items_html {
     my $page = $args{page} || return '';
     my $page_id = $page->as_hash->{id} || '';
     return '' if $page_id =~ m{\Anav/};
+    return '' if ( $page->{meta}{skill_route_id} || '' ) =~ m{\Anav/};
 
     my $paths = $self->{pages}{paths} || return '';
     my @roots = $paths->can('dashboards_layers') ? $paths->dashboards_layers : $paths->dashboards_roots;
@@ -1527,8 +1530,6 @@ sub _nav_items_html {
         }
         closedir $dh;
     }
-    return '' if !@nav_ids;
-
     my @items;
     my $current_page = $args{runtime_context}{current_page} || '';
     for my $nav_id (@nav_ids) {
@@ -1550,6 +1551,30 @@ sub _nav_items_html {
                 current_page => $current_page,
             },
         );
+        my $fragment = $self->_page_fragment_html($nav_page);
+        next if $fragment eq '';
+        push @items, qq{<li data-nav-id="} . _escape_html($nav_id) . qq{">$fragment</li>};
+    }
+
+    require Developer::Dashboard::SkillDispatcher;
+    my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $paths );
+    for my $nav_page ( @{ $dispatcher->all_skill_nav_pages || [] } ) {
+        $nav_page = $self->{runtime}->prepare_page(
+            page            => $self->_page_with_runtime_state(
+                $nav_page,
+                query_params => $args{runtime_context}{params} || {},
+                body_params  => {},
+                path         => $self->_saved_page_url($page_id),
+                remote_addr  => $self->{_current_request_context}{remote_addr},
+                headers      => { host => $self->{_current_request_context}{host} || '' },
+            ),
+            source          => 'skill',
+            runtime_context => {
+                %{ $args{runtime_context} || { params => {} } },
+                current_page => $current_page,
+            },
+        );
+        my $nav_id = $nav_page->as_hash->{id} || '';
         my $fragment = $self->_page_fragment_html($nav_page);
         next if $fragment eq '';
         push @items, qq{<li data-nav-id="} . _escape_html($nav_id) . qq{">$fragment</li>};
@@ -1669,6 +1694,8 @@ sub _legacy_app_response {
 
     my $raw = eval { $self->{pages}->read_saved_entry($id) };
     if ( !defined $raw || $@ ) {
+        my $skill_response = $self->_skill_app_fallback_response( id => $id, %args );
+        return $skill_response if $skill_response;
         return $self->_missing_named_page_response($id);
     }
     my $target = _trim($raw);
@@ -1688,6 +1715,40 @@ sub _legacy_app_response {
         body        => '',
         remote_addr => $args{remote_addr},
         headers     => $args{headers} || {},
+    );
+}
+
+# _skill_app_fallback_response(%args)
+# Attempts the /app/<skill> or /app/<skill>/<page> fallback before the blank saved-page editor opens.
+# Input: unresolved app id plus normalized request metadata.
+# Output: response array reference for a matched skill route, a 404 for missing namespaced skill routes, or undef when the id is not a skill route.
+sub _skill_app_fallback_response {
+    my ( $self, %args ) = @_;
+    my $id = $args{id} || return;
+    my ( $skill_name, @rest ) = split m{/+}, $id;
+    return if !$skill_name;
+
+    require Developer::Dashboard::SkillDispatcher;
+    require Developer::Dashboard::SkillManager;
+    my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
+    my $manager = Developer::Dashboard::SkillManager->new();
+    my $installed_skill = $manager->get_skill_path( $skill_name, include_disabled => 1 );
+    if ( !$installed_skill ) {
+        return @rest ? [ 404, 'text/plain; charset=utf-8', "Not found\n" ] : undef;
+    }
+    if ( !$dispatcher->get_skill_path($skill_name) ) {
+        return [ 404, 'text/plain; charset=utf-8', "Not found\n" ];
+    }
+
+    return $dispatcher->route_response(
+        app          => $self,
+        skill_name   => $skill_name,
+        route        => join( '/', @rest ),
+        query_params => $args{query_params} || {},
+        body_params  => $args{body_params}  || {},
+        remote_addr  => $args{remote_addr},
+        headers      => $args{headers} || {},
+        path         => '/app/' . $id,
     );
 }
 

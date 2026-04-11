@@ -38,7 +38,7 @@ requires:
   File::Temp: '0'
   IO::Scalar: '0'
   Log::Report: '1.42'
-  Mail::Message: '4.00'
+  Mail::Message: '4.05'
   Mail::Transport: '4.00'
   Object::Realize::Later: '4.00'
   POSIX: '0'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/markov2/perl5-Mail-Box/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Mail-Box.git
-version: '4.01'
+version: '4.02'
 x_oodist:
   email: markov@cpan.org
   first_year: 2001
@@ -67,6 +67,8 @@ x_oodist:
     -
       export: website
       markup: html
+      meta:
+        main_manual: Mail::Box
       publish: ../public_html/mail-box/doctree
       serializer: json
   include:
