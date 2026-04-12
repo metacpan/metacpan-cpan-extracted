@@ -2,7 +2,7 @@ package IPC::Manager::Client::MessageFiles;
 use strict;
 use warnings;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000018';
 
 use Carp qw/croak confess/;
 use File::Spec;
@@ -148,7 +148,7 @@ sub get_messages {
 
     push @out => $self->read_resume_file;
 
-    return sort { $a->stamp <=> $b->stamp } @out;
+    return $self->sort_messages(@out);
 }
 
 sub _write_message_file {

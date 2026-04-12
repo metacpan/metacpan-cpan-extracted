@@ -320,7 +320,7 @@ void c_fill(char *framebuffer,
     uint16_t target16 = 0;
     uint8_t target8 = 0;
 
-auto_read_pixel : {
+    auto_read_pixel : {
         unsigned int rx = (unsigned int)(x + xoffset);
         unsigned int ry = (unsigned int)(y + yoffset);
         unsigned int index = rx * (unsigned int)bytes_per_pixel + ry * bytes_per_line;
@@ -2089,4 +2089,4 @@ void c_monochrome(char *pixels,
     }
 }
 
-/* END */
+/* END C Section */

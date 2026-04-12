@@ -1,6 +1,6 @@
 # Graphics::Framebuffer Images For Examples
 
-[![Graphics::Framebuffer Logo](../../GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
+[![Graphics::Framebuffer Logo](../pics/GFB.png?raw=true "Graphics::Framebuffer Click For Demo Video")](https://www.youtube.com/watch?v=X8RpFBq6F9I)
 
 ## IMPORTANT
 
@@ -28,14 +28,6 @@ project without their written permission and/or license.
 
 [![RWBY Beuowolf](RWBY_Beuowolf.png?raw=true "RWBY Beuowolf")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/RWBY_Beuowolf.png)
 
-## RWBY Crescent Rose Ruby
-
-[![RWBY Crescent Rose with Ruby](RWBY_Crescent_Rose_Ruby.png?raw=true "RWBY Crescent Rose with Ruby")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/RWBY_Crescent_Rose_Ruby.png)
-
-## RWBY White
-
-[![RWBY White](RWBY_White.jpg?raw=true "RWBY Ruby with White Background")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/RWBY_White.jpg)
-
 ## Ryuko
 
 [![Ryuko](Ryuko.jpg?raw=true "Anime Ryuko")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/Ryuko.jpg)
@@ -44,10 +36,23 @@ project without their written permission and/or license.
 
 [![Solid](Solid.jpg?raw=true "Anime with Solid Background")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/Solid.jpg)
 
-## Supercar Animation
+## Atari
 
-[![Supercar](Supercar.gif?raw=true "Supercar Animation")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/Supercar.gif)
+[![Atari](Atari.jpg?raw=true "Atari logo in 3d perspective")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/Atari.jpg)
 
-## USA Flag Animation
+## Lollipop Chainsaw
 
-[![USA Flag](usa.gif?raw=true "USA Flag Animation")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/usa.gif)
+[![Lollipop Chainsaw](LollipopChainsaw.jpg?raw=true "Lollipop Chainsaw")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/LollipopChainsaw.jpg)
+
+## Heavenly Sword
+
+[![Heavenly Sword](HeavenlySword.png?raw=true "Heavenly Sword")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/HeavenlySword.png)
+
+## Sonic Mania
+
+[![Sonic Mania](SonicMania.png?raw=true "Sonic Mania")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/SonicMania.png)
+
+# Duck Fire
+
+[![Duck Fire](DuckFire.gif?raw=true "Duck Fire")](https://github.com/richcsst/Graphics-Framebuffer/blob/master/examples/images/DuckFire.gif)
+

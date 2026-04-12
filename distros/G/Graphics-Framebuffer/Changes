@@ -1,5 +1,32 @@
 Change log for Graphics::Framebuffer
 
+6.96   April 11, 2026
+
+       Updates to the manual.
+
+6.95   April 04, 2026
+
+       Implemented a searchable manual in GitHub markdown format.  I suggest
+	   simply reading it online on GitHub, or you can view it with:
+	   
+	       pandoc MANUAL.md | lynx -stdin
+
+6.94   April 01, 2026
+
+       So many opportunities for a joke here.  However, these are real.
+
+       Fixed bug in "examples/vector-usa.txt".
+
+       "examples/primitives.pl" Coded to check for the Virtualbox framebuffer
+	   ID and it turns on forced flushing if found.  This seems to mostly
+	   overcome the new VirtualBox weirdness.
+
+	   Added sanity checks to Makefile.PL
+
+6.93   March 29, 2026
+
+       New images and installation assistance.
+
 6.92   March 25, 2026
 
        Added a more helpful install process.

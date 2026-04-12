@@ -6,7 +6,7 @@ use strict;
 #               # Seriously, leave warnings off for live code.
 
 BEGIN {
-    our $VERSION = '0.02';    # Increment this as you develop the code.
+    our $VERSION = '0.03';    # Increment this as you develop the code.
 }
 
 use Graphics::Framebuffer;    # There are things to import, if you want, but

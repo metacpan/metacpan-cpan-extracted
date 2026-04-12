@@ -3,7 +3,7 @@ package Chandra::Pack;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use File::Raw qw(import);
 use Cwd ();

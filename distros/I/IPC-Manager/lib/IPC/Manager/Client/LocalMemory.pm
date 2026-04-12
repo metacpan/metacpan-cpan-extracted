@@ -2,7 +2,7 @@ package IPC::Manager::Client::LocalMemory;
 use strict;
 use warnings;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000018';
 
 use Carp qw/croak/;
 
@@ -105,7 +105,7 @@ sub get_messages {
         $self->{stats}{read}{$msg->{from}}++;
         push @out, $msg;
     }
-    return sort { $a->stamp <=> $b->stamp } @out;
+    return $self->sort_messages(@out);
 }
 
 sub send_message {

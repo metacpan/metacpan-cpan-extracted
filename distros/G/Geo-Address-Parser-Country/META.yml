@@ -1,0 +1,38 @@
+---
+abstract: 'Resolve a place string component to a canonical country name'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Address-Parser-Country
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Locale::AU: '0'
+  Locale::CA: '0'
+  Locale::Object::Country: '0'
+  Locale::US: '0'
+  Object::Configure: '0'
+  Params::Get: '0.13'
+  Params::Validate::Strict: '0.1'
+  Return::Set: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser-Country
+  homepage: https://metacpan.org/pod/Geo::Address::Parser::Country
+  repository: git://github.com/nigelhorne/Geo-Address-Parser-Country.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

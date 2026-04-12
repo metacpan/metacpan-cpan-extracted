@@ -23,7 +23,7 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.27';
+$VERSIONE = '0.28';
 $VERSIONE = $VERSIONE;
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
@@ -161,7 +161,7 @@ for my $target (@ARGV) {
 
         # get $name_as_perlsyntax
         my $name_as_perlsyntax = $name_as_filesystem;
-        $name_as_perlsyntax =~ s#^lib/(Char/)?##;
+        $name_as_perlsyntax =~ s#^lib/##;
         $name_as_perlsyntax =~ s#\.(pl|pm)$##i;
         $name_as_perlsyntax =~ s#/#::#g;
         die "'NAME_AS_PERLSYNTAX' not found.\n" unless $name_as_perlsyntax;
@@ -207,13 +207,6 @@ for my $target (@ARGV) {
             File::Copy           2.02
             File::Path           1.0401
             FindBin              1.42
-            IOas::CP932          0.06
-            IOas::CP932IBM       0.06
-            IOas::CP932NEC       0.06
-            IOas::CP932X         0.06
-            IOas::SJIS2004       0.06
-            Jacode4e::RoundTrip  2.13.81.8
-            UTF8::R2             0.05
             strict               1.01
         ));
         my %requires = (qw(
@@ -238,23 +231,6 @@ for my $target (@ARGV) {
             }
         }
         delete @requires{keys %provides};
-        if ($package eq 'Char') {
-            delete @requires{qw(
-                Ebig5hkscs
-                Ebig5plus
-                Egb18030
-                Egbk 
-                Ehp15
-                Einformixv6als
-                Ekps9566
-                Euhc
-            )};
-            delete @provides{qw(
-                Esjis
-                Sjis
-            )};
-        }
-
         #                                                12345678
         my $requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$requires{$_}',}} sort keys %requires;
 
@@ -1244,6 +1220,7 @@ sub _runtests {
     my $not_ok_script = 0;
     my $total_ok = 0;
     my $total_not_ok = 0;
+    my $total_skip = 0;
 
     # cygwin warning:
     #   MS-DOS style path detected: C:/cpan/Char-X.XX
@@ -1258,53 +1235,67 @@ sub _runtests {
         }
     }
 
+    my $start_time = time();
     my $scriptno = 0;
     for my $script (@script) {
         next if not -e $script;
 
-        my $testno = 1;
         my $ok = 0;
         my $not_ok = 0;
+        my $skip = 0;
         if (my @result = qx{$^X $script}) {
             if (my($tests) = shift(@result) =~ /^1..([0-9]+)/) {
                 for my $result (@result) {
-                    if ($result =~ /^ok /) {
-                        $ok++;
+                    # Read TAP test number directly to avoid offset from comment lines
+                    if ($result =~ /^ok (\d+)/) {
+                        my $tapno = $1;
+                        if ($result =~ /\bSKIP\b/i) {
+                            $skip++;
+                        }
+                        else {
+                            $ok++;
+                        }
                     }
-                    elsif ($result =~ /^not ok /) {
-                        push @{$fail_testno[$scriptno]}, $testno;
+                    elsif ($result =~ /^not ok (\d+)/) {
+                        my $tapno = $1;
+                        push @{$fail_testno[$scriptno]}, $tapno;
                         $not_ok++;
                     }
-                    $testno++;
+                    # TAP comment lines (^#) and other lines are silently ignored
                 }
-                if ($ok == $tests) {
-                    printf("$script ok\n");
+                if ($not_ok == 0) {
+                    if ($skip > 0) {
+                        printf("$script ok (skipped: %d)\n", $skip);
+                    }
+                    else {
+                        printf("$script ok\n");
+                    }
                     $ok_script++;
                 }
                 else {
-                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
+                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok+$skip);
                     $not_ok_script++;
                 }
             }
         }
-        $total_ok += $ok;
+        $total_ok   += $ok;
         $total_not_ok += $not_ok;
+        $total_skip += $skip;
         $scriptno++;
     }
 
+    my $elapsed = time() - $start_time;
+
     if (scalar(@script) == $ok_script) {
-        printf <<'END', scalar(@script), $total_ok + $total_not_ok;
-All tests successful.
-Files=%d, Tests=%d
-Result: PASS
-END
+        my $skip_msg = $total_skip > 0 ? " (skipped: $total_skip)" : '';
+        printf("All tests successful.\n");
+        printf("Files=%d, Tests=%d%s, %d wallclock secs\n",
+            scalar(@script), $total_ok + $total_not_ok + $total_skip,
+            $skip_msg, $elapsed);
+        printf("Result: PASS\n");
     }
     else {
-        print <<'END';
-
-Test Summary Report
--------------------
-END
+        print "\nTest Summary Report\n-------------------\n";
         my $scriptno = 0;
         for my $fail_testno (@fail_testno) {
             if (defined $fail_testno) {
@@ -1313,9 +1304,12 @@ END
             }
             $scriptno++;
         }
-        printf("Files=%d, Tests=%d\n", scalar(@script), $total_ok + $total_not_ok);
+        printf("Files=%d, Tests=%d, %d wallclock secs\n",
+            scalar(@script), $total_ok + $total_not_ok + $total_skip, $elapsed);
         printf("Result: FAIL\n");
-        printf("Failed %d/%d test programs. %d/%d subtests failed.\n", $not_ok_script, scalar(@script), $total_not_ok, $total_ok + $total_not_ok);
+        printf("Failed %d/%d test programs. %d/%d subtests failed.\n",
+            $not_ok_script, scalar(@script),
+            $total_not_ok, $total_ok + $total_not_ok + $total_skip);
     }
 }
 

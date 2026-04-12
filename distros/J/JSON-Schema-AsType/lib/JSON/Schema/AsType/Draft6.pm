@@ -1,283 +1,91 @@
 package JSON::Schema::AsType::Draft6;
 our $AUTHORITY = 'cpan:YANICK';
-# ABSTRACT: Role processing draft6 JSON Schema 
-$JSON::Schema::AsType::Draft6::VERSION = '0.4.4';
+$JSON::Schema::AsType::Draft6::VERSION = '1.0.0';
+# ABSTRACT: A draft 6 JSON Schema
 
-use strict;
+
+use 5.42.0;
 use warnings;
 
-use Moose::Role;
-
-use Type::Utils;
-use Scalar::Util qw/ looks_like_number /;
-use List::Util qw/ reduce pairmap pairs /;
-use List::MoreUtils qw/ any all none uniq zip /;
-use Types::Standard qw/InstanceOf HashRef StrictNum Any Str ArrayRef Int slurpy Dict Optional slurpy /; 
+use feature ':5.42';
+use JSON::Schema::AsType::Visit;
 
 use JSON;
+use List::Util qw/ uniq /;
 
-use JSON::Schema::AsType;
+use Moose;
 
-use JSON::Schema::AsType::Draft6::Types '-all';
+extends qw/ JSON::Schema::AsType /;
 
-with 'JSON::Schema::AsType::Draft4';
+with 'JSON::Schema::AsType::Draft6::Keywords';
+
+use feature qw/ signatures /;
+
+my $_uri_port = 1;
+has '+uri' => default => sub($self) {
+    my $id =
+      eval { $self->schema->{'$id'} } // 'http://254.0.0.1:' . $_uri_port++;
+    $self->clear_parent_schema;
+    return $id;
+};
+
+has '+draft' => default => 6;
+
+has '+metaschema' => (
+    default => sub($self) {
+        _metaschema();
+    }
+);
 
 override all_keywords => sub {
     my $self = shift;
-    
+
     # $ref trumps all
     return '$ref' if $self->schema->{'$ref'};
 
     return uniq '$id', super();
 };
 
-override _build_type => sub {
-    my $self = shift;
+around sub_schema => sub ( $orig, $self, $subschema, $uri ) {
 
-    return super() if ref $self->schema eq 'HASH';
-
-    use JSON;
-    return( ( $self->schema eq JSON::true) ? Any : ~Any );
-    
+    # ah AH, resolve the subschema id
+    if ( my $id = $self->_has_id($subschema) ) {
+        $uri = $self->resolve_uri($id) unless $subschema->{'$ref'};
+    }
+    $orig->( $self, $subschema, $uri );
 };
 
-sub _keyword_const {
-    my $self = shift;
+sub _schema_trigger( $self, $schema, @ ) {
+    JSON::Schema::AsType::Visit::visit(
+        $schema,
+        sub {
+            return unless ref $_ eq 'HASH';
 
-    $self->_keyword_enum([@_]);
-}
+            my $id = $self->_has_id($_) or return;
 
-sub _keyword_contains {
-   my( $self, $type ) = @_;
+            # that doesn't look like a 'id' for the schema
+            return if ref $id;
 
-   return Contains[
-       $self->sub_schema($type)->type
-   ];
-    
-};
-
-sub _keyword_exclusiveMaximum {
-    my( $self, $maximum ) = @_;
-
-    ExclusiveMaximum[$maximum];
-}
-
-sub _keyword_exclusiveMinimum {
-    my( $self, $maximum ) = @_;
-
-    ExclusiveMinimum[$maximum];
-}
-
-sub _keyword_propertyNames {
-    my( $self, $schema ) = @_;
-
-    PropertyNames[ $self->sub_schema($schema)->type ];
-}
-
-sub _keyword_items {
-    my( $self, $items ) = @_;
-
-    if ( Boolean->check($items) ) {
-        return if $items;
-        return Items[JSON::false];
-    }
-
-    if( ref $items eq 'HASH' ) {
-        my $type = $self->sub_schema($items)->type;
-
-        return Items[$type];
-    }
-
-    # TODO forward declaration not workie
-    my @types;
-    for ( @$items ) {
-        push @types, $self->sub_schema($_)->type;
-    }
-
-    return Items[\@types];
-}
-
-sub _keyword_dependencies {
-    my( $self, $dependencies ) = @_;
-
-    return Dependencies[
-        pairmap {
-            $a => ( ref $b eq 'HASH' or ref $b eq 'JSON::PP::Boolean' ) ? $self->sub_schema($b) 
-                    : $b } %$dependencies
-    ];
-
-}
-
-__PACKAGE__->meta->add_method( '_keyword_$id' => sub {
-        my $self = shift;
-        $self->_keyword_id(@_);
-} );
-
-
-JSON::Schema::AsType->new(
-        specification => 'draft6',
-        uri           => 'https://json-schema.org/draft-06/schema',
-        schema        => from_json <<'END_JSON' )->type;
-{
-    "$schema": "https://json-schema.org/draft-06/schema#",
-    "$id": "https://json-schema.org/draft-06/schema#",
-    "title": "Core schema meta-schema",
-    "definitions": {
-        "schemaArray": {
-            "type": "array",
-            "minItems": 1,
-            "items": { "$ref": "#" }
-        },
-        "nonNegativeInteger": {
-            "type": "integer",
-            "minimum": 0
-        },
-        "nonNegativeIntegerDefault0": {
-            "allOf": [
-                { "$ref": "#/definitions/nonNegativeInteger" },
-                { "default": 0 }
-            ]
-        },
-        "simpleTypes": {
-            "enum": [
-                "array",
-                "boolean",
-                "integer",
-                "null",
-                "number",
-                "object",
-                "string"
-            ]
-        },
-        "stringArray": {
-            "type": "array",
-            "items": { "type": "string" },
-            "uniqueItems": true,
-            "default": []
+            $self->sub_schema( $_, $id );
+            return;
         }
-    },
-    "type": ["object", "boolean"],
-    "properties": {
-        "$id": {
-            "type": "string",
-            "format": "uri-reference"
-        },
-        "$schema": {
-            "type": "string",
-            "format": "uri"
-        },
-        "$ref": {
-            "type": "string",
-            "format": "uri-reference"
-        },
-        "title": {
-            "type": "string"
-        },
-        "description": {
-            "type": "string"
-        },
-        "default": {},
-        "examples": {
-            "type": "array",
-            "items": {}
-        },
-        "multipleOf": {
-            "type": "number",
-            "exclusiveMinimum": 0
-        },
-        "maximum": {
-            "type": "number"
-        },
-        "exclusiveMaximum": {
-            "type": "number"
-        },
-        "minimum": {
-            "type": "number"
-        },
-        "exclusiveMinimum": {
-            "type": "number"
-        },
-        "maxLength": { "$ref": "#/definitions/nonNegativeInteger" },
-        "minLength": { "$ref": "#/definitions/nonNegativeIntegerDefault0" },
-        "pattern": {
-            "type": "string",
-            "format": "regex"
-        },
-        "additionalItems": { "$ref": "#" },
-        "items": {
-            "anyOf": [
-                { "$ref": "#" },
-                { "$ref": "#/definitions/schemaArray" }
-            ],
-            "default": {}
-        },
-        "maxItems": { "$ref": "#/definitions/nonNegativeInteger" },
-        "minItems": { "$ref": "#/definitions/nonNegativeIntegerDefault0" },
-        "uniqueItems": {
-            "type": "boolean",
-            "default": false
-        },
-        "contains": { "$ref": "#" },
-        "maxProperties": { "$ref": "#/definitions/nonNegativeInteger" },
-        "minProperties": { "$ref": "#/definitions/nonNegativeIntegerDefault0" },
-        "required": { "$ref": "#/definitions/stringArray" },
-        "additionalProperties": { "$ref": "#" },
-        "definitions": {
-            "type": "object",
-            "additionalProperties": { "$ref": "#" },
-            "default": {}
-        },
-        "properties": {
-            "type": "object",
-            "additionalProperties": { "$ref": "#" },
-            "default": {}
-        },
-        "patternProperties": {
-            "type": "object",
-            "additionalProperties": { "$ref": "#" },
-            "propertyNames": { "format": "regex" },
-            "default": {}
-        },
-        "dependencies": {
-            "type": "object",
-            "additionalProperties": {
-                "anyOf": [
-                    { "$ref": "#" },
-                    { "$ref": "#/definitions/stringArray" }
-                ]
-            }
-        },
-        "propertyNames": { "$ref": "#" },
-        "const": {},
-        "enum": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true
-        },
-        "type": {
-            "anyOf": [
-                { "$ref": "#/definitions/simpleTypes" },
-                {
-                    "type": "array",
-                    "items": { "$ref": "#/definitions/simpleTypes" },
-                    "minItems": 1,
-                    "uniqueItems": true
-                }
-            ]
-        },
-        "format": { "type": "string" },
-        "allOf": { "$ref": "#/definitions/schemaArray" },
-        "anyOf": { "$ref": "#/definitions/schemaArray" },
-        "oneOf": { "$ref": "#/definitions/schemaArray" },
-        "not": { "$ref": "#" }
-    },
-    "default": {}
+    );
 }
-END_JSON
 
-1;
+sub _has_id ( $self, $schema = {} ) {
+    return unless ref $schema eq 'HASH';
+    return $schema->{'$id'};
+}
 
-__END__
+sub _metaschema {
+    state $METASCHEMA = __PACKAGE__->new(
+        uri    => "https://json-schema.org/draft-06/schema",
+        schema => from_json join '',
+        <DATA>,
+    );
+
+    return $METASCHEMA;
+}
 
 =pod
 
@@ -285,19 +93,15 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::AsType::Draft6 - Role processing draft6 JSON Schema 
+JSON::Schema::AsType::Draft6 - A draft 6 JSON Schema
 
 =head1 VERSION
 
-version 0.4.4
+version 1.0.0
 
-=head1 DESCRIPTION
+=head1 DESCRIPTION 
 
-This role is not intended to be used directly. It is used internally
-by L<JSON::Schema::AsType> objects.
-
-Importing this module auto-populate the Draft4 schema in the
-L<JSON::Schema::AsType> schema cache.
+Internal module for L<JSON::Schema:::AsType>. 
 
 =head1 AUTHOR
 
@@ -305,9 +109,166 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Yanick Champoux.
+This software is copyright (c) 2026 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__DATA__
+{
+	"$schema": "https://json-schema.org/draft-06/schema#",
+	"$id": "https://json-schema.org/draft-06/schema#",
+	"title": "Core schema meta-schema",
+	"definitions": {
+		"schemaArray": {
+			"type": "array",
+			"minItems": 1,
+			"items": { "$ref": "#" }
+		},
+		"nonNegativeInteger": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"nonNegativeIntegerDefault0": {
+			"allOf": [
+				{ "$ref": "#/definitions/nonNegativeInteger" },
+				{ "default": 0 }
+			]
+		},
+		"simpleTypes": {
+			"enum": [
+				"array",
+				"boolean",
+				"integer",
+				"null",
+				"number",
+				"object",
+				"string"
+			]
+		},
+		"stringArray": {
+			"type": "array",
+			"items": { "type": "string" },
+			"uniqueItems": true,
+			"default": []
+		}
+	},
+	"type": ["object", "boolean"],
+	"properties": {
+		"$id": {
+			"type": "string",
+			"format": "uri-reference"
+		},
+		"$schema": {
+			"type": "string",
+			"format": "uri"
+		},
+		"$ref": {
+			"type": "string",
+			"format": "uri-reference"
+		},
+		"title": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+		"default": {},
+		"examples": {
+			"type": "array",
+			"items": {}
+		},
+		"multipleOf": {
+			"type": "number",
+			"exclusiveMinimum": 0
+		},
+		"maximum": {
+			"type": "number"
+		},
+		"exclusiveMaximum": {
+			"type": "number"
+		},
+		"minimum": {
+			"type": "number"
+		},
+		"exclusiveMinimum": {
+			"type": "number"
+		},
+		"maxLength": { "$ref": "#/definitions/nonNegativeInteger" },
+		"minLength": { "$ref": "#/definitions/nonNegativeIntegerDefault0" },
+		"pattern": {
+			"type": "string",
+			"format": "regex"
+		},
+		"additionalItems": { "$ref": "#" },
+		"items": {
+			"anyOf": [
+				{ "$ref": "#" },
+				{ "$ref": "#/definitions/schemaArray" }
+			],
+			"default": {}
+		},
+		"maxItems": { "$ref": "#/definitions/nonNegativeInteger" },
+		"minItems": { "$ref": "#/definitions/nonNegativeIntegerDefault0" },
+		"uniqueItems": {
+			"type": "boolean",
+			"default": false
+		},
+		"contains": { "$ref": "#" },
+		"maxProperties": { "$ref": "#/definitions/nonNegativeInteger" },
+		"minProperties": { "$ref": "#/definitions/nonNegativeIntegerDefault0" },
+		"required": { "$ref": "#/definitions/stringArray" },
+		"additionalProperties": { "$ref": "#" },
+		"definitions": {
+			"type": "object",
+			"additionalProperties": { "$ref": "#" },
+			"default": {}
+		},
+		"properties": {
+			"type": "object",
+			"additionalProperties": { "$ref": "#" },
+			"default": {}
+		},
+		"patternProperties": {
+			"type": "object",
+			"additionalProperties": { "$ref": "#" },
+			"propertyNames": { "format": "regex" },
+			"default": {}
+		},
+		"dependencies": {
+			"type": "object",
+			"additionalProperties": {
+				"anyOf": [
+					{ "$ref": "#" },
+					{ "$ref": "#/definitions/stringArray" }
+				]
+			}
+		},
+		"propertyNames": { "$ref": "#" },
+		"const": {},
+		"enum": {
+			"type": "array",
+			"minItems": 1,
+			"uniqueItems": true
+		},
+		"type": {
+			"anyOf": [
+				{ "$ref": "#/definitions/simpleTypes" },
+				{
+					"type": "array",
+					"items": { "$ref": "#/definitions/simpleTypes" },
+					"minItems": 1,
+					"uniqueItems": true
+				}
+			]
+		},
+		"format": { "type": "string" },
+		"allOf": { "$ref": "#/definitions/schemaArray" },
+		"anyOf": { "$ref": "#/definitions/schemaArray" },
+		"oneOf": { "$ref": "#/definitions/schemaArray" },
+		"not": { "$ref": "#" }
+	},
+	"default": {}
+}

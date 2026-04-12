@@ -50,6 +50,7 @@ include/chandra/chandra_splash.h
 include/chandra/chandra_store.h
 include/chandra/chandra_window.h
 include/webview-cocoa.c
+include/webview-edge.c
 include/webview-gtk.c
 include/webview-tray-cocoa.c
 include/webview-tray-gtk.c
@@ -87,6 +88,8 @@ lib/Chandra/Tray.pm
 lib/Chandra/Window.pm
 Makefile.PL
 MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 ppport.h
 README
 t/01_basic.t
@@ -183,5 +186,3 @@ xs/splash.xs
 xs/store.xs
 xs/tray.xs
 xs/window.xs
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

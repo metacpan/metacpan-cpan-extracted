@@ -10,6 +10,7 @@ pmake.bat
 MANIFEST
 LICENSE
 CONTRIBUTING
+SECURITY.md
 t/1001_podtest.t
 t/1401_miyan2000_2014-03-10_OKWave.t
 t/1402_cinquecent_2012-10-21_OKWave.t
@@ -933,3 +934,7 @@ t/6003_getcode_jis.t
 t/6004_getcode_sjis.t
 t/6005_getcode_euc.t
 t/6006_getcode_utf8.t
+t/9010_check_manifest.t
+t/9020_check_source_encoding.t
+t/9050_pod_G11.t
+t/9051_pod_G12.t

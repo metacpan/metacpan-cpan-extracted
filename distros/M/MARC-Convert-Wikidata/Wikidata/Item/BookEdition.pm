@@ -11,7 +11,7 @@ use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 
 sub wikidata {
 	my $self = shift;
@@ -92,30 +92,16 @@ sub _description {
 		if (defined $self->{'transform_object'}->publication_date) {
 			$ret .= ' z roku '.$self->{'transform_object'}->publication_date;
 		} elsif (defined $self->{'transform_object'}->start_time) {
-			# XXX cnb003591924
-			if ($self->{'transform_object'}->start_time
-				== $self->{'transform_object'}->end_time) {
-
-				$ret .= ' z roku '.$self->{'transform_object'}->start_time;
-			} else {
-				$ret .= ' z let '.$self->{'transform_object'}->start_time.'-'.
-					$self->{'transform_object'}->end_time;
-			}
+			$ret .= ' z let '.$self->{'transform_object'}->start_time.'-'.
+				$self->{'transform_object'}->end_time;
 		}
 
 	} elsif ($lang eq 'en') {
 		if (defined $self->{'transform_object'}->publication_date) {
 			$ret = $self->{'transform_object'}->publication_date.' ';
 		} elsif (defined $self->{'transform_object'}->start_time) {
-			# XXX cnb003591924
-			if ($self->{'transform_object'}->start_time
-				== $self->{'transform_object'}->end_time) {
-
-				$ret = $self->{'transform_object'}->start_time.' ';
-			} else {
-				$ret = $self->{'transform_object'}->start_time.'-'.
-					$self->{'transform_object'}->end_time.' ';
-			}
+			$ret = $self->{'transform_object'}->start_time.'-'.
+				$self->{'transform_object'}->end_time.' ';
 		}
 		if (@lang == 1 && $lang[0] eq 'cze') {
 			$ret .= 'Czech';

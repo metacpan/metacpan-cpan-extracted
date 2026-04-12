@@ -20,7 +20,7 @@ use constant {
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '6.12';
+    our $VERSION = '6.13';
 }
 
 our $F;
@@ -36,8 +36,9 @@ my $small    = FALSE; # Force a small screen for debugging core dumps
 my $help     = FALSE; # Shows a brief help screen
 my $man      = FALSE; # Shows the full POD manual
 my $errors   = FALSE; # Show errors
-my $FLUSH    = FALSE; # Force screen flush
 my $show_func;
+
+# Forced flushing has been removed and an automatic flush is triggered if VirtualVox is detected in the module itself.
 
 GetOptions(
 	'help|?'           => \$help,
@@ -52,7 +53,6 @@ GetOptions(
     'ignore-x-windows' => \$ignore_x,
     'small'            => \$small,
 	'errors'           => \$errors,
-	'flush'            => \$FLUSH,
 );
 
 pod2usage(1) if ($help); # Show brief help
@@ -98,6 +98,8 @@ if (defined($new_x)) { # Ignore kernel structure and force a specific resolution
 		'IGNORE_X_WINDOWS' => $ignore_x,
 	);
 }
+
+# $F->{'IS_VBOX'} = FALSE;
 # Trap all means to end, and exit cleanly
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { eval { $F->text_mode(); exec('reset'); }; };
 
@@ -139,7 +141,7 @@ my $DORKSMILE;
 # Pre-load the images
 
 foreach my $file (@files) {
-    next if ($file =~ /^\.+/ || $file =~ /usa\.gif|Test/i || -d "$images_path/$file"); # Ignore the test pattern and directories
+    next if ($file =~ /^\.+/ || $file =~ /Test/i || -d "$images_path/$file"); # Ignore the test pattern and directories
 	if ($file =~ /\.gif$/i) {
 		print_it($F, "Loading Animation > $file", '00FFFFFF', undef, 1);
 		my $image;
@@ -442,7 +444,6 @@ sub plotting {
 				'y'          => $y,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
 	}
 }
 
@@ -470,7 +471,6 @@ sub lines {
 				'antialiased' => $aa,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 } ## end sub lines
 
@@ -502,7 +502,6 @@ sub angle_lines {
 		);
         $angle = ($F->acceleration()) ? $angle + .5 : $angle + 1;
         $angle -= 360 if ($angle >= 360);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -527,7 +526,6 @@ sub boxes {
 				'yy'         => int(rand($YY)),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -553,7 +551,6 @@ sub filled_boxes {
 				'filled' => 1,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -593,7 +590,6 @@ sub gradient_boxes {
                 }
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -637,7 +633,6 @@ sub hatch_filled_boxes {
                 'hatch'  => $HATCHES[int(rand(scalar(@HATCHES)))]
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
     $F->attribute_reset();
 }
@@ -659,7 +654,6 @@ sub texture_filled_boxes {
                 'texture' => $image
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -686,7 +680,6 @@ sub rounded_boxes {
 				'radius'     => 4 + rand($XX / 16),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -714,7 +707,6 @@ sub filled_rounded_boxes {
 				'filled' => 1,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -751,7 +743,6 @@ sub hatch_filled_rounded_boxes {
 				'hatch'  => $HATCHES[int(rand(scalar(@HATCHES)))],
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
     $F->attribute_reset();
 }
@@ -792,7 +783,6 @@ sub gradient_rounded_boxes {
                 }
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -814,7 +804,6 @@ sub texture_filled_rounded_boxes {
                 'texture' => $image
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -839,7 +828,6 @@ sub circles {
 				'radius'     => rand($center_y),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -865,7 +853,6 @@ sub filled_circles {
 				'filled' => 1,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -900,7 +887,6 @@ sub hatch_filled_circles {
 				'hatch'  => $HATCHES[int(rand(scalar(@HATCHES)))],
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
     $F->attribute_reset();
 }
@@ -935,7 +921,6 @@ sub gradient_circles {
                 }
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -955,7 +940,6 @@ sub texture_filled_circles {
                 'texture' => $image
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -982,7 +966,6 @@ sub arcs {
 				'end_degrees'   => rand(360),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1009,7 +992,6 @@ sub poly_arcs {
 				'end_degrees'   => rand(360),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1036,7 +1018,6 @@ sub filled_pies {
 				'end_degrees' => rand(360),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1072,7 +1053,6 @@ sub hatch_filled_pies {
 				'hatch'         => $HATCHES[int(rand(scalar(@HATCHES)))],
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
     $F->attribute_reset();
 }
@@ -1108,7 +1088,6 @@ sub gradient_pies {
                 }
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1133,7 +1112,6 @@ sub texture_filled_pies {
                 'texture'       => $image,
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1159,7 +1137,6 @@ sub ellipses {
 				'yradius'    => rand($center_y),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1186,7 +1163,6 @@ sub filled_ellipses {
 				'filled'  => 1,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1222,7 +1198,6 @@ sub hatch_filled_ellipses {
 				'hatch' => $HATCHES[int(rand(scalar(@HATCHES)))],
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
     $F->attribute_reset();
 }
@@ -1257,7 +1232,6 @@ sub gradient_ellipses {
                 }
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1278,7 +1252,6 @@ sub texture_filled_ellipses {
                 'texture' => $image
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1307,7 +1280,6 @@ sub polygons {
                 'antialiased' => $aa,
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1337,7 +1309,6 @@ sub filled_polygons {
                 'filled'      => 1,
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1376,7 +1347,6 @@ sub hatch_filled_polygons {
                 'hatch'       => $HATCHES[int(rand(scalar(@HATCHES)))]
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
     $F->attribute_reset();
 }
@@ -1412,7 +1382,6 @@ sub gradient_polygons {
                 }
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1437,7 +1406,6 @@ sub texture_filled_polygons {
                 'texture'     => $image
             }
         );
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1465,7 +1433,6 @@ sub beziers {
 				'points'      => 100,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1498,7 +1465,6 @@ sub truetype_fonts {
             $b->{'x'} = rand($F->{'XX_CLIP'} - $b->{'pwidth'});
             $F->ttf_print($b);
         }
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1535,7 +1501,6 @@ sub truetype_printing {
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
         }
     );
-	$F->_flush_screen() if ($FLUSH);
     $F->clip_reset();
 }
 
@@ -1573,7 +1538,6 @@ sub rotate_truetype_fonts {
 		$F->vsync();
         $angle++;
         $angle = 270 if ($angle >= 360);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1607,7 +1571,7 @@ sub flood_fill {
 				],
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
+
         $F->set_color(
 			{
 				'red'   => int(rand(256)),
@@ -1628,7 +1592,7 @@ sub flood_fill {
 				],
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
+
         $F->set_color(
 			{
 				'red'   => int(rand(256)),
@@ -1644,7 +1608,7 @@ sub flood_fill {
 				'radius' => 200 * $xm,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
+
         $F->set_color(
 			{
 				'red'   => int(rand(256)),
@@ -1660,7 +1624,6 @@ sub flood_fill {
 				'y'       => int(500 * $ym),
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
 
         $F->set_color(
 			{
@@ -1676,7 +1639,6 @@ sub flood_fill {
 				'y' => 880 * $ym,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     } else {
         $F->set_color(
 			{
@@ -1700,7 +1662,7 @@ sub flood_fill {
 				],
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
+
         $F->set_color(
 			{
 				'red'   => int(rand(256)),
@@ -1715,7 +1677,6 @@ sub flood_fill {
 				'y' => 3,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1769,7 +1730,6 @@ sub color_replace {
             }
         );
     }
-	$F->_flush_screen() if ($FLUSH);
 	$F->clip_reset();
 }
 
@@ -1794,7 +1754,6 @@ sub blitting {
         $image->{'x'} = abs(rand($XX - $image->{'width'}));
         $image->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $image->{'height'}));
         $F->blit_write($image);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1835,7 +1794,6 @@ sub blit_move {
 		);
         $x++;
         $y += .5;
-		$F->_flush_screen() if ($FLUSH);
 		sleep .0166666667;
         $F->vsync();
     }
@@ -1885,7 +1843,6 @@ sub rotate {
         $angle++;
         $angle = 0 if ($angle >= 360);
         $count++;
-		$F->_flush_screen() if ($FLUSH);
     }
 
     $angle = 0;
@@ -1914,7 +1871,6 @@ sub rotate {
         $angle--;
         $angle = 0 if ($angle <= -360);
         $count++;
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1947,7 +1903,6 @@ sub flipping {
 			sleep .0166666667;
             $F->vsync();
         }
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -1975,7 +1930,6 @@ sub monochrome {
         $mono->{'x'} = abs(rand($XX - $mono->{'width'}));
         $mono->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $mono->{'height'}));
         $F->blit_write($mono);
-		$F->_flush_screen() if ($FLUSH);
     }
 }
 
@@ -2027,7 +1981,6 @@ sub animated {
 					}
 				}
 			}
-			$F->_flush_screen() if ($FLUSH);
             last if ($XX <= 320);
         }
     }
@@ -2081,7 +2034,7 @@ sub mode_drawing {
 				'filled' => 1,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
+
         $F->set_color(
 			{
 				'red'   => 0,
@@ -2098,7 +2051,6 @@ sub mode_drawing {
 				'filled' => 1,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
 
         $F->set_color(
 			{
@@ -2116,7 +2068,6 @@ sub mode_drawing {
 				'filled' => 1,
 			}
 		);
-		$F->_flush_screen() if ($FLUSH);
 
         if ($mode == XOR_MODE) {
 			sleep 1;
@@ -2145,7 +2096,6 @@ sub mode_drawing {
 					'filled' => 1,
 				}
 			);
-			$F->_flush_screen() if ($FLUSH);
 
             $F->set_color(
 				{
@@ -2164,7 +2114,6 @@ sub mode_drawing {
 				}
 			);
             $F->blit_write($image2);
-			$F->_flush_screen() if ($FLUSH);
         } ## end if ($mode == XOR_MODE)
     } ## end else [ if ($mode == MASK_MODE)]
 } ## end sub mode_drawing
@@ -2184,11 +2133,9 @@ sub alpha_drawing {
 
     $F->normal_mode();
     $F->blit_write($image);
-	$F->_flush_screen() if ($FLUSH);
 
     $F->alpha_mode();
     $F->blit_write($image2);
-	$F->_flush_screen() if ($FLUSH);
 
     $F->set_color(
 		{
@@ -2207,7 +2154,6 @@ sub alpha_drawing {
 			'filled' => 1,
 		}
 	);
-	$F->_flush_screen() if ($FLUSH);
 
     $F->set_color(
 		{
@@ -2226,7 +2172,6 @@ sub alpha_drawing {
 			'filled' => 1,
 		}
 	);
-	$F->_flush_screen() if ($FLUSH);
 
     $F->set_color(
 		{
@@ -2245,7 +2190,6 @@ sub alpha_drawing {
 			'filled' => 1,
 		}
 	);
-	$F->_flush_screen() if ($FLUSH);
 } ## end sub alpha_drawing
 
 sub mask_drawing {
@@ -2269,11 +2213,9 @@ sub mask_drawing {
     } until ($image2->{'image'} ne $image1->{'image'});
     $F->normal_mode();
     $F->blit_write($image1);
-	$F->_flush_screen() if ($FLUSH);
     $F->mask_mode();
 
     $F->blit_write($image2);
-	$F->_flush_screen() if ($FLUSH);
 } ## end sub mask_drawing
 
 sub unmask_drawing {
@@ -2297,11 +2239,9 @@ sub unmask_drawing {
     } until ($image2->{'image'} ne $image1->{'image'});
     $F->normal_mode();
     $F->blit_write($image1);
-	$F->_flush_screen() if ($FLUSH);
     $F->unmask_mode();
 
     $F->blit_write($image2);
-	$F->_flush_screen() if ($FLUSH);
 } ## end sub unmask_drawing
 
 sub print_it {
@@ -2334,7 +2274,7 @@ sub print_it {
                 'antialias'    => 0
             }
         );
-		$fb->_flush_screen() if ($FLUSH);
+
         $fb->clip_set(
 			{
 				'x' => 0,
@@ -2345,7 +2285,7 @@ sub print_it {
 		);
         $fb->cls();
         $fb->ttf_print($b);
-		$fb->_flush_screen() if ($FLUSH);
+
         $fb->clip_set(
 			{
 				'x'  => 0,

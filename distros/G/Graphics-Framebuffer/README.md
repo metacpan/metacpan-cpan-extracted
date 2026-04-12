@@ -1,22 +1,24 @@
 # Graphics::Framebuffer
 
-[![Graphics::Framebuffer Logo](GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
+[![Graphics::Framebuffer Logo](pics/GFB.png?raw=true "Graphics::Framebuffer Click For Demo Video")](https://www.youtube.com/watch?v=X8RpFBq6F9I)
 
 ### Windows Incompatibility, Linux Only
 
-![Windows Incompatible](Win-No.png?raw=true "Windows Incompatible") ![Linux Logo](Linux.png?raw=true "Linux Only")
+![Windows Incompatible](pics/Win-No.png?raw=true "Windows Incompatible") ![Linux Logo](pics/Linux.png?raw=true "Linux Only")
 
-Note, this module does NOT work (natively) in Microsoft Windows.  It will only function in "emulation" mode, and you will not see any screen output.  See the documentation on emulation mode for more details.
+Note, this module does NOT work (natively) in Microsoft Windows.  If run from Windows, it will only function in "emulation" mode, and you will not see any screen output.  See the documentation on emulation mode for more details.
 
 Use a Virtual Machine like VirtualBox or Docker to use on Windows, with a Linux distribution installed.
 
-![Divider](pink.jpg?raw=true "Divider")
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## PREREQUISITES
 
 This module was developed for Linux and only Linux; not because of some fanatical appreciation for Linux, but because of how it accesses a Linux framebuffer.  If you know how to get it to work on Windows, Darwin, or even FreeBSD, then let me know how to do it.  Meanwwhile, it's Linux only.
 
 This module REQUIRES access to the video framebuffer, usually ```/dev/fb0```.  You must be using a video device and driver that exposes this device to software.  Video cards with their proprietary drivers are not likely to work.  However, most open-sourced drivers, seem to work fine.  VirtualBox drivers work too.  You must also have the appropriate permissions to write to this device (usually membership with group ```video```).
+
+You may be able to edit the kernel configuration forcing a framebuffer, and compile it in or as a module.
 
 Sometimes you can force a VESA framebuffer console driver to be loaded by adding a video mode to the grub command line.  You can do this with some proprietary video drivers that don't have their own framebuffer drivers.
 
@@ -94,7 +96,7 @@ To test the installation properly.  Log into the text console (not X).  Go to th
 
 The scripts beginning with 'thread' requires ' *Sys::CPU* '.  It is not listed as a prerequisite for this module (as it isn't), but if you want to run the threaded scripts, then this is a required module.  It demonstrates how to use this module in a threaded environment.
 
-Mario Roy's MCE test scripts have been added (well, a script to go get them) to demonstrate alternate multiprocessing methods of using Graphics::Framebuffer, even with Perls built without threads support.
+Mario Roy's MCE test scripts have been added (well, a script to go get them) to demonstrate alternate multiprocessing methods of using Graphics::Framebuffer, even with Perls built without threads support.  You will need to have the modules ```MCE::Shared``` and ```MCE::Hobo``` installed.
 
 ## GETTING STARTED
 
@@ -102,34 +104,36 @@ There is a script template in the ```examples``` directory in this package.  You
 
 ## SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the 'perldoc' command.
+After installing, you can find documentation for this module with the 'perl-doc' command.
 
-`perldoc Graphics::Framebuffer` *(You may have to install 'perldoc', but this usually works.)*
+`perldoc Graphics::Framebuffer` *(You may have to install 'perl-doc', but this usually works.)*
 
 or
 
-`man Graphics::Framebuffer` *(Installing 'perldoc' usually enables Perl module man pages)*
+`man Graphics::Framebuffer` *(Installing 'perl-doc' usually enables Perl module man pages)*
 
 You can also look for information at:
 
-* **MetaCPAN** - https://metacpan.org/pod/Graphics::Framebuffer
+* **Manual** - [https://github.com/richcsst/Graphics-Framebuffer/blob/master/MANUAL.md](https://github.com/richcsst/Graphics-Framebuffer/blob/master/MANUAL.md) - A separate indexed manual written in GitHub markdown.  The module POD still exists, but this is easier to read.
 
-* **YouTube** - https://www.youtube.com/channel/UCxhjUfniyPze02GU4sWBJrw
+* **MetaCPAN** - [https://metacpan.org/pod/Graphics::Framebuffer](https://metacpan.org/pod/Graphics::Framebuffer)
 
-* **GitHub** - https://github.com/richcsst/Graphics-Framebuffer
+* **YouTube** - [https://www.youtube.com/watch?v=X8RpFBq6F9I](https://www.youtube.com/watch?v=X8RpFBq6F9I)
 
-* **GitHub Clone** - https://github.com/richcsst/Graphics-Framebuffer.git
+* **GitHub** - [https://github.com/richcsst/Graphics-Framebuffer](https://github.com/richcsst/Graphics-Framebuffer)
 
-* **Mario Roy's Multiprocessing Examples** - https://github.com/marioroy/mce-examples 
+* **GitHub Clone** - [https://github.com/richcsst/Graphics-Framebuffer.git](https://github.com/richcsst/Graphics-Framebuffer.git)
+
+* **Mario Roy's Multiprocessing Examples** - [https://github.com/marioroy/mce-examples](https://github.com/marioroy/mce-examples)
 
 ## LICENSE AND COPYRIGHT
 
-Copyright © 2013-2025 Richard Kelsch
+Copyright © 2013-2026 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See [http://dev.perl.org/licenses/](http://dev.perl.org/licenses/) for more information.
 
-## OTHER GITHUB PROJECTS
+## MY GITHUB PROJECTS
 
-* **GitHub** Repositories - https://github.com/richcsst
+* **GitHub** Repositories - [https://github.com/richcsst](https://github.com/richcsst)

@@ -12,6 +12,8 @@ use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
 use App::GitKtti;
 
+use constant REGEX_MASTER  => '^(master|main)$';
+
 App::GitKtti::showVersion();
 
 my $ret               = 99;
@@ -31,6 +33,19 @@ my $version_maj       = "";
 my $version_min       = "";
 my $version_patch     = "";
 my $version_number    = 0;
+my $master_branch     = "";
+my @master_branches   = ();
+
+## Get master branch real name (locally)
+@master_branches = App::GitKtti::git_getLocalBranchesFilter(REGEX_MASTER, \$ret);
+
+if ( @master_branches ne 1 ) {
+  App::GitKtti::printError("Master branch not found or more than one! (looked for '" . REGEX_MASTER . "' ). Abort!");
+  exit(2);
+}
+else {
+  $master_branch = $master_branches[0];
+}
 
 App::GitKtti::printSection("Repository Information");
 
@@ -39,11 +54,11 @@ print(App::GitKtti::BRIGHT_WHITE . "Current directory: " . App::GitKtti::RESET .
 print(App::GitKtti::BRIGHT_WHITE . "Repository path:   " . App::GitKtti::RESET . App::GitKtti::CYAN . $current_repo_path . App::GitKtti::RESET . "\n");
 print(App::GitKtti::BRIGHT_WHITE . "Repository name:   " . App::GitKtti::RESET . App::GitKtti::CYAN . $current_repo . App::GitKtti::RESET . "\n");
 
-if($current_branch =~ /^master$/) {
+if($current_branch =~ /${\(REGEX_MASTER)}/){
   $lasttag = App::GitKtti::git_getLastTagFromCurrentBranch(\$ret);
 }
 else {
-  if ( !App::GitKtti::isResponseYes("! WARNING ! You are not on master branch. Tagging should be made on master branch. Are you sure?") ||
+  if ( !App::GitKtti::isResponseYes("! WARNING ! You are not on $master_branch branch. Tagging should be made on $master_branch branch. Are you sure?") ||
        !App::GitKtti::isResponseYes("! WARNING ! Are you sure to be sure?") ) {
     App::GitKtti::printError("You are not sure ! Aborted !");
     exit(2);
@@ -57,7 +72,7 @@ if ( $tagname eq "" ) {
 App::GitKtti::printSubSection("Tagging Summary");
 
 print(App::GitKtti::BRIGHT_WHITE . "Branch:  " . App::GitKtti::RESET);
-if ($current_branch =~ /^master$/) {
+if ($current_branch =~ /${\(REGEX_MASTER)}/) {
   App::GitKtti::printBranch($current_branch, "master");
 } else {
   App::GitKtti::printBranch($current_branch);

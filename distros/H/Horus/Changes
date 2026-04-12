@@ -1,5 +1,9 @@
 Revision history for Horus
 
+0.05    2026-04-11
+        - Refactor custom ops to use proper op tree restructuring
+        - Cleaner pp functions using TOPs/POPs instead of POPMARK
+
 0.01    2026-03-26
         First version, released on an unsuspecting world.
 

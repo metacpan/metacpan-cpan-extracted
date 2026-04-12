@@ -1,6 +1,6 @@
 # Installing Graphics::Framebuffer Instructions
 
-[![Graphics::Framebuffer Logo](../GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
+[![Graphics::Framebuffer Logo](../pics/GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
 
 ## OPERATING SYSTEM REQUIREMENT
 
@@ -122,6 +122,8 @@ install Graphics::Framebuffer
 ```
 
 ## INSTALLING WITH PERLBREW (and installing Perlbrew)
+
+* **NOTE:**  Installing a customized Perl is an advanced process.  Do not do this unless you know what you are doing.  The version of Perl installed by the package install is usually fine for most.
 
 If you do not want to use the package version of Perl, but would rather use a customized and more optimized version of Perl, then do the following:
 

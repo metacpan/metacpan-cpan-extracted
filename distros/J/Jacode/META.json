@@ -1,6 +1,6 @@
 {
     "name" : "Jacode",
-    "version" : "2.13.4.31",
+    "version" : "2.13.4.32",
     "abstract" : "Perl program for Japanese character code conversion",
     "author" : [
         "ina <ina@cpan.org>"
@@ -35,7 +35,8 @@
                 "lib" : "0",
                 "perl" : "5.00503",
                 "strict" : "1.01",
-                "vars" : "0"
+                "vars" : "0",
+                "warnings" : "0"
             }
         },
         "configure" : {
@@ -49,7 +50,8 @@
                 "lib" : "0",
                 "perl" : "5.00503",
                 "strict" : "1.01",
-                "vars" : "0"
+                "vars" : "0",
+                "warnings" : "0"
             }
         },
         "runtime" : {
@@ -63,7 +65,8 @@
                 "lib" : "0",
                 "perl" : "5.00503",
                 "strict" : "1.01",
-                "vars" : "0"
+                "vars" : "0",
+                "warnings" : "0"
             }
         }
     }

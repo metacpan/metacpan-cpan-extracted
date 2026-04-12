@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.440   2026-04-11
+    - Raised required minimum version for Term::TablePrint (Bugfix scientific notation).
+
 2.439   2026-02-23
     - Raised required minimum version for Term::Choose and Term::TablePrint.
     - New output option expanded line spacing.

@@ -56,15 +56,15 @@
    "provides" : {
       "CPAN::Maker" : {
          "file" : "lib/CPAN/Maker.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "CPAN::Maker::Constants" : {
          "file" : "lib/CPAN/Maker/Constants.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "CPAN::Maker::Utils" : {
          "file" : "lib/CPAN/Maker/Utils.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "File::Process" : {
          "file" : "lib/File/Process.pm",
@@ -78,15 +78,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/rlauer6/make-cpan-dist/issues"
+         "web" : "http://github.com/rlauer6/CPAN-Maker/issues"
       },
-      "homepage" : "http://github.com/rlauer6/make-cpan-dist",
+      "homepage" : "http://github.com/rlauer6/CPAN-Maker",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/rlauer6/make-cpan-dist.git",
-         "web" : "http://github.com/rlauer6/make-cpan-dist"
+         "url" : "git://github.com/rlauer6/CPAN-Maker.git",
+         "web" : "http://github.com/rlauer6/CPAN-Maker"
       }
    },
-   "version" : "v1.7.1",
+   "version" : "v1.7.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

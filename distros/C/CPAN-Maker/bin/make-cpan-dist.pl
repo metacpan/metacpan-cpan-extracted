@@ -31,7 +31,7 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny;
 use version;
 
-our $VERSION = '1.7.1'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.7.2'; ## no critic (RequireInterpolationOfMetachars)
 
 caller or __PACKAGE__->main();
 
@@ -52,7 +52,13 @@ sub help {
 
   my $file = pod_where( { -inc => $TRUE }, 'CPAN::Maker' );
 
-  return pod2usage( { -input => $file, -exitval => 1, -verbose => 1 } );
+  return pod2usage(
+    { -input    => $file,
+      -exitval  => 1,
+      -sections => 'USAGE',
+      -verbose  => 99,
+    }
+  );
 }
 
 ########################################################################
@@ -1210,6 +1216,7 @@ sub get_requires {
     $requires,
     chomp            => $TRUE,
     skip_blank_lines => $TRUE,
+    skip_comments    => $TRUE,
     filter           => sub {
       my ( $fh, $all_lines, $args, $line ) = @_;
       $line = filter( $fh, $all_lines, $args, $line );
@@ -1223,7 +1230,7 @@ sub get_requires {
     process => sub {
       my $line = pop @_;
 
-      $line =~ s/^[+]([^+]*)$/$1/xsm;
+      $line =~ s/^[+]//xsm;
 
       my ( $module, $version ) = split /\s+/xsm, $line;
 
@@ -1516,7 +1523,7 @@ sub main {
 
 __DATA__
 ---
-version: "1.7.1"
+version: "1.7.2"
 min_perl_version: "type:string"
 min-perl-version: "type:string"
 project:

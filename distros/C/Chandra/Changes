@@ -1,5 +1,8 @@
 Revision history for Chandra
 
+0.22 2026-04-11
+  - make manifest to include edge header
+
 0.21 2026-04-11
   - Add Edge/WebView2 backend for Windows (Chromium-based rendering)
   - Automatic fallback to MSHTML when WebView2 Runtime unavailable

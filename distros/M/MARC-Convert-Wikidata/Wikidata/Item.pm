@@ -27,7 +27,7 @@ Readonly::Hash our %EXT_ID_MAPPING => (
 	'lccn' => 'P243',
 );
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 
 # Constructor.
 sub new {
@@ -189,7 +189,11 @@ sub wikidata_editors {
 sub wikidata_end_time {
 	my $self = shift;
 
-	if (! defined $self->{'transform_object'}->end_time) {
+	if (! defined $self->{'transform_object'}->end_time
+
+		# Unfinished periodical.
+		|| $self->{'transform_object'}->end_time eq '9999') {
+
 		return;
 	}
 
@@ -463,7 +467,7 @@ sub wikidata_krameriuses {
 	foreach my $k (@{$self->{'transform_object'}->krameriuses}) {
 
 		# Rewriting to Czech Digital Library
-		if ($k->kramerius_id eq 'mzk') {
+		if ($k->kramerius_id eq 'mzk' || $k->kramerius_id eq 'nkp') {
 			push @krameriuses, Wikibase::Datatype::Statement->new(
 				'references' => [$self->wikidata_reference],
 				'snak' => Wikibase::Datatype::Snak->new(

@@ -2,7 +2,7 @@ package IPC::Manager::Service::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000018';
 
 use Carp qw/croak/;
 use Time::HiRes qw/sleep time/;
@@ -26,6 +26,8 @@ use Object::HashBase qw{
     +requests
 
     +buffer
+
+    +spawn
 };
 
 sub init {
@@ -40,6 +42,18 @@ sub init {
     $self->{+INTERVAL} //= 0.2;
 
     $self->{+NAME} //= gen_uuid();
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    # Disconnect the client before the spawn is destroyed, otherwise the
+    # spawn's unspawn() may remove shared resources (e.g. SysV semaphores)
+    # that the client's disconnect/write_stats still needs.
+    if (my $client = delete $self->{+CLIENT}) {
+        local $@;
+        eval { $client->disconnect; 1 } or warn $@;
+    }
 }
 
 sub select_handles {

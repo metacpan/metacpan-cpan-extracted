@@ -1,19 +1,11 @@
 Revision History for Text-NeatTemplate
 ======================================
 
-v0.1600 2023-01-05
+v0.1601 2026-04-12
 ------------------
 
-* 2023-01-05 19:11:54 +1100
-  Added camelise format, and a script to test formatting.
-* 2021-12-06 14:17:29 +1100
-  more formatting
-
-v0.1400 2020-12-29
-------------------
-
-* 2020-12-29 20:35:29 +1100
-  New formatting for simple YYYY-MM-DD dates.
+* 2026-04-12 16:45:14 +1000
+  fixed munging complaint
 
 ====================================
 End of changes in the last 1000 days

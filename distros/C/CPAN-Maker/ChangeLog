@@ -1,3 +1,32 @@
+Thu Apr  9 11:05:19 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.7.2]:
+	* release-notes-1.7.2.md: new
+	* build-github: build for debian:trixie
+	* .github/workflows/build.yml: likewise
+	* release-notes.mk: new
+        * .gitignore: + *.diffs, *.lst
+        * VERSION: bump
+        * src/main/perl/lib/README.md: generated
+        * configure.ac
+	(ads_PERL_MODULE)
+	- added Module::CPANfile, Module::ScanDeps::Static
+        * src/main/bash/bin/make-cpan-dist.in
+	- package .pm AND .pod files
+	- do not add .pod files to provides
+	- skip scanning .pod files
+	(module2path): somehow got removed...adding back in
+        * src/main/perl/bin/Makefile.am: SUBDIRS, not SUBDIRScd
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(get_requires): skip comments
+	(help): just show USAGE
+	* src/main/perl/lib/CPAN/Maker.pm.in
+	- update project URL
+	- minor tweaks
+	* cpan/Makefile.am
+	- cleanup in aisle 3
+	- cpan/buildspec.yml: update repo name
+
 Tue Mar 17 09:02:03 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.7.1]:

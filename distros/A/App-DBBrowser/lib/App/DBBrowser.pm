@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.016;
 
-our $VERSION = '2.439';
+our $VERSION = '2.440';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -550,7 +550,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.439
+Version 2.440
 
 =head1 DESCRIPTION
 

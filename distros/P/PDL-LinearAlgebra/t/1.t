@@ -121,4 +121,10 @@ is_pdl $vt->t x $vt, identity(5), 'Vt is orthonormal';
 my $v_null = $vt->slice(",-1");
 is_pdl $A x $v_null->t, zeroes(1,3), 'correct right null-space';
 
+my $rank2 = pdl([1,0,1],[-2,-3,1],[3,3,0]);
+for my $in ($rank2, $rank2->cdouble) {
+  my $res = $in->mnull;
+  is_pdl $in x $res, zeroes($in->type, $res->dim(0), $in->dim(1)), 'mnull '.$in->type;
+}
+
 done_testing;

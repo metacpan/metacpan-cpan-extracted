@@ -1,438 +1,507 @@
 package JSON::Schema::AsType::Draft4::Types;
 our $AUTHORITY = 'cpan:YANICK';
+$JSON::Schema::AsType::Draft4::Types::VERSION = '1.0.0';
 # ABSTRACT: JSON-schema v4 keywords as types
-$JSON::Schema::AsType::Draft4::Types::VERSION = '0.4.4';
 
-use strict;
+
+use 5.42.0;
 use warnings;
 
+use Test::Deep::NoTest qw/ eq_deeply /;
+
+use Math::BigFloat;
+use Hash::Merge qw/ merge /;
 use Type::Utils -all;
-use Types::Standard qw/ 
-    Str StrictNum HashRef ArrayRef 
-    Int
-    Dict slurpy Optional Any
-    Tuple
-    ConsumerOf
-    InstanceOf
-/;
+use Types::Standard qw/
+  Str StrictNum HashRef ArrayRef
+  Int
+  Dict Slurpy Optional Any slurpy
+  Tuple
+  ConsumerOf
+  InstanceOf
+  /;
 
 use Type::Library
-    -base,
-    -declare => qw( 
-        Minimum
-        ExclusiveMinimum
-        Maximum
-        ExclusiveMaximum
-        MultipleOf
+  -base,
+  -declare => qw(
+  Minimum
+  ExclusiveMinimum
+  Maximum
+  ExclusiveMaximum
+  MultipleOf
 
-        Null
-        Boolean
-        Array
-        Object
-        String
-        Integer
-        Pattern
-        Number
+  Null
+  Boolean
+  Array
+  Object
+  String
+  Integer
+  Pattern
+  Number
 
-        Required
+  Required
 
-        Not
+  Not
 
-        OneOf
-        AllOf
-        AnyOf
+  OneOf
+  AllOf
+  AnyOf
 
-        MaxLength
-        MinLength
+  MaxLength
+  MinLength
 
-        Items
-        AdditionalItems
-        MaxItems
-        MinItems
+  Items
+  AdditionalItems
+  MaxItems
+  MinItems
 
-        Properties
-        PatternProperties
-        AdditionalProperties
-        MaxProperties
-        MinProperties
+  Properties
+  PatternProperties
+  AdditionalProperties
+  MaxProperties
+  MinProperties
 
+  Dependencies
+  Dependency
 
-        Dependencies
-        Dependency
+  Enum
 
-        Enum
+  UniqueItems
 
-        UniqueItems
+  Schema
 
-        Schema
-
-    );
+  );
 
 use List::MoreUtils qw/ all any zip none /;
-use List::Util qw/ pairs pairmap reduce uniq /;
-use List::AllUtils qw/ none uniq /;
+use List::Util      qw/ pairs pairmap reduce uniq /;
+use List::AllUtils  qw/ none uniq /;
 
 use JSON qw/ to_json from_json /;
 
 use JSON::Schema::AsType;
+use JSON::Schema::AsType::Annotations;
 
 declare AdditionalProperties,
-    constraint_generator => sub {
-        my( $known_properties, $type_or_boolean ) = @_;
+  constraint_generator => sub {
+    my ( $known_properties, $type_or_boolean ) = @_;
 
-        sub {
-            return 1 unless Object->check($_);
-            my @add_keys = grep { 
-                my $key = $_;
-                none {
-                    ref $_ ? $key =~ $_ : $key eq $_
-                } @$known_properties
-            } keys %$_;
+    sub {
+        return 1 unless Object->check($_);
 
-            if ( eval { $type_or_boolean->can('check') } ) {
-                my $obj = $_;
-                return all { $type_or_boolean->check($obj->{$_}) } @add_keys;
-            }
-            else {
-                return not( @add_keys and not $type_or_boolean );
-            }
+        my @add_keys = grep {
+            my $key = $_;
+            none { ref $_ ? $key =~ $_ : $key eq $_ } @$known_properties
+        } keys %$_;
+
+        add_annotation( 'additionalProperties', @add_keys );
+
+        if ( eval { $type_or_boolean->can('check') } ) {
+            my $obj = $_;
+            return all { $type_or_boolean->check( $obj->{$_} ) } @add_keys;
         }
-    };
 
-declare UniqueItems,
-    where {
-        return 1 unless Array->check($_);
-        @$_ == uniq map { to_json $_ , { allow_nonref => 1 } } @$_
-    };
+        return not( @add_keys and not $type_or_boolean );
+    }
+  };
+
+declare UniqueItems, where {
+    return 1 unless Array->check($_);
+    @$_ == uniq map { to_json $_, { allow_nonref => 1, canonical => 1 } } @$_
+};
 
 my $json = JSON->new->allow_nonref->canonical;
 
-sub same_structs {
-    my @s = @_;
+declare Enum, constraint_generator => sub {
+    my @items = @_;
 
-    my @refs = grep { $_ } map { ref } @s;
+    sub {
+        my $j = $_;
 
-    return if @refs == 1;
+        # TODO horrible corner case for the test suite, worth it?
+        any { eq_deeply( $_, $j ) } @items;
+    }
+};
 
-    no warnings 'uninitialized';
+# Dependencies[ foo => $type, bar => [ 'baz' ] ]
+# TODO name of generated type should be better
+declare Dependencies, constraint_generator => sub {
+    my %deps = @_;
 
-    return $s[0] eq $s[1] unless @refs;
+    return reduce { $a & $b } pairmap { Dependency [ $a => $b ] } %deps;
+};
 
-    @refs = uniq @refs;
-    return unless @refs == 1;
+# Depencency[ foo => $type ]
+declare Dependency, constraint_generator => sub {
+    my ( $property, $dep ) = @_;
 
-    if ( ref $s[0] eq 'ARRAY' ) {
-        return all { same_structs($a,$b) } zip @{$s[0]}, @{$s[1]};
+    sub {
+        return 1 unless Object->check($_);
+        return 1 unless exists $_->{$property};
+
+        my $obj = $_;
+
+        return all { exists $obj->{$_} } @$dep if ref $dep eq 'ARRAY';
+
+        return $dep->check($_);
+    }
+};
+
+declare PatternProperties, constraint_generator => sub {
+    my %props = @_;
+
+    sub {
+        return 1 unless Object->check($_);
+
+        my $obj = $_;
+
+        my @keys;
+        for my $key ( keys %props ) {
+            push @keys, grep { /$key/ } keys %$obj;
+        }
+
+        add_annotation( 'patternProperties', @keys );
+
+        for my $key ( keys %props ) {
+            return
+              unless all { $props{$key}->check( $obj->{$_} ) }
+              grep { /$key/ } keys %$_;
+        }
+
+        return 1;
+
+    }
+};
+declare Properties, constraint_generator => sub {
+    my %types = @_;
+
+    %types = pairmap { $a => Optional [$b] } %types;
+
+    return ~HashRef    # not an object, don't care
+      | (
+        Dict [ %types, Slurpy [Any] ] & sub {
+            my $value = $_;
+            add_annotation( 'properties',
+                grep { exists $value->{$_} } keys %types );
+            return 1;
+        }
+      );
+};
+
+declare Items, constraint_generator => sub {
+    my $types = shift;
+
+    if ( Boolean->check($types) ) {
+        return $types ? Any : sub { !@$_ };
     }
 
-    all { same_structs($s[0]{$_},$s[1]{$_}) } uniq map { keys %$_ } @s;
-}
+    my $type =
+      ref $types eq 'ARRAY'
+      ? Tuple [ ( map { Optional [$_] } @$types ), slurpy Any ]
+      : Tuple [ slurpy ArrayRef [$types] ];
 
-declare Enum,
-    constraint_generator => sub {
-        my @items = @_;
-
-        sub {
-            my $j = $_;
-            any { same_structs($_,$j) } @items;
-        }
-    };
-
-    # Dependencies[ foo => $type, bar => [ 'baz' ] ]
-# TODO name of generated type should be better
-declare Dependencies,
-    constraint_generator => sub {
-        my %deps = @_;
-
-        return reduce { $a & $b } pairmap { Dependency[$a => $b] } %deps;
-    };
-
-    # Depencency[ foo => $type ]
-declare Dependency,
-    constraint_generator => sub {
-        my( $property, $dep) = @_;
-
-        sub {
-            return 1 unless Object->check($_);
-            return 1 unless exists $_->{$property};
-
-            my $obj = $_;
-
-            return all { exists $obj->{$_} } @$dep if ref $dep eq 'ARRAY';
-
-            return $dep->check($_);
-        }
-    };
-
-declare PatternProperties,
-    constraint_generator => sub {
-        my %props = @_;
-
-        sub {
-            return 1 unless Object->check($_);
-
-            my $obj = $_;
-            for my $key ( keys %props ) {
-                return unless all { $props{$key}->check($obj->{$_}) } grep { /$key/ } keys %$_;
+    return ~ArrayRef | (
+        $type & sub {
+            if ( ref $types eq 'ARRAY' ) {
+                add_annotation( 'items', 0 .. $types->$#* );
             }
-
+            else {
+                add_annotation( 'items', 0 .. $_->$#* );
+            }
             return 1;
-
         }
-    };
-declare Properties,
-    constraint_generator => sub {
-        my @types = @_;
+    );
 
-        @types = pairmap { $a => Optional[$b] } @types;
+};
 
-        my $type = Dict[@types,slurpy Any];
+declare AdditionalItems, constraint_generator => sub {
+    if ( @_ > 1 ) {
+        my $to_skip = shift;
+        my $schema  = shift;
+        return sub {
 
-        sub {
-            return 1 unless Object->check($_);
-            return $type->check($_);
+            return unless ref eq 'ARRAY';
+            my @additional = splice @$_, $to_skip;
+
+            if ( ref $schema eq 'JSON::PP::Boolean' ) {
+                my $verdict = @additional;
+                $verdict = !$verdict unless $schema;
+                return $verdict;
+            }
+
+            return all { $schema->check($_) } @additional;
         }
-    };
-
-declare Items,
-    constraint_generator => sub {
-        my $types = shift;
-
-        if ( Boolean->check($types) ) {
-            return $types ? Any : sub { !@$_ };
-        }
-
-        my $type =  ref $types eq 'ARRAY'
-            ? Tuple[ ( map { Optional[$_] } @$types ), slurpy Any ]
-            : Tuple[ slurpy ArrayRef[ $types ] ];
-
-        return ~ArrayRef | $type;
-
-    };
-
-declare AdditionalItems,
-    constraint_generator=> sub {
-        if( @_ > 1 ) {
-            my $to_skip = shift;
-            my $schema = shift;
+    }
+    else {
+        my $size = shift;
+        if ( ref $size eq 'JSON::PP::Boolean' ) {
             return sub {
-                all { $schema->check($_) } splice @$_, $to_skip; 
+                my $s = ref($_) eq 'ARRAY' ? @_ : 0;
+                $DB::single = 1;
+                return !!$size ? $s : !$s;
             }
         }
-        else {
-            my $size = shift;
-            return sub { @$_ <= $size };
+        return sub {
+            my $s = ref($_) eq 'ARRAY' ? @_ : 0;
+            $s <= $size;
+        };
+    }
+};
+
+declare MaxLength, constraint_generator => sub {
+    my $length = shift;
+    sub {
+        !String->check($_) or $length >= length;
+    }
+};
+
+declare MinLength, constraint_generator => sub {
+    my $length = shift;
+    sub {
+        !String->check($_) or $length <= length;
+    }
+};
+
+declare AllOf, constraint_generator => sub {
+    my @types = @_;
+    sub {
+        my $value = $_;
+
+        my $matched = 1;
+        my $scope   = {};
+
+        for my $type (@types) {
+            my %scope;
+            return 0 unless annotation_scope(
+                sub {
+                    return 0 unless $type->check($value);
+
+                    $scope = annotation_merge($scope);
+
+                    return 1;
+                }
+            );
         }
-    };
 
-declare MaxLength,
-    constraint_generator => sub {
-        my $length = shift;
-        sub {
-            !String->check($_) or  $length >= length;
+        annotation_merge($scope);
+
+        return 1;
+    }
+};
+
+declare AnyOf, constraint_generator => sub {
+    my @types = @_;
+    sub {
+        my $value = $_;
+
+        my $matched = 0;
+        my $scope   = {};
+
+        for my $type (@types) {
+            annotation_scope(
+                sub {
+                    return unless $type->check($value);
+
+                    $scope   = annotation_merge($scope);
+                    $matched = 1;
+                }
+            );
         }
-    };
 
-declare MinLength,
-    constraint_generator => sub {
-        my $length = shift;
-        sub {
-            !String->check($_) or  $length <= length;
+        if ($matched) {
+            annotation_merge($scope);
         }
-    };
 
-declare AllOf,
-    constraint_generator => sub {
-        my @types = @_;
-        sub {
-            my $v = $_;
-            all { $_->check($v) } @types;
+        return $matched;
+    }
+};
+
+declare OneOf, constraint_generator => sub {
+    my @types = @_;
+    sub {
+        my $value = $_;
+
+        my $matched = 0;
+        my $scope   = {};
+
+        for my $type (@types) {
+            return 0 unless annotation_scope(
+                sub {
+                    return 1 unless $type->check($value);
+
+                    return 0 if $matched;
+
+                    $scope   = annotation_merge($scope);
+                    $matched = 1;
+
+                    return 1;
+
+                }
+            );
         }
-    };
 
-declare AnyOf,
-    constraint_generator => sub {
-        my @types = @_;
-        sub {
-            my $v = $_;
-            any { $_->check($v) } @types;
+        if ($matched) {
+            annotation_merge($scope);
         }
-    };
 
-declare OneOf,
-    constraint_generator => sub {
-        my @types = @_;
-        sub {
-            my $v = $_;
-            1 == grep { $_->check($v) } @types;
-        }
-    };
+        return $matched;
+    }
+};
 
-declare MaxProperties,
-    constraint_generator => sub {
-        my $nbr = shift;
-        sub { !Object->check($_) or $nbr >= keys %$_; },
-    };
+declare MaxProperties, constraint_generator => sub {
+    my $nbr = shift;
+    sub { !Object->check($_) or $nbr >= keys %$_; },;
+};
 
-declare MinProperties,
-    constraint_generator => sub {
-        my $nbr = shift;
-        sub { 
-            !Object->check($_) 
-                or $nbr <= scalar keys %$_ 
-        },
-    };
+declare MinProperties, constraint_generator => sub {
+    my $nbr = shift;
+    sub {
+        !Object->check($_)
+          or $nbr <= scalar keys %$_;
+    },;
+};
 
-declare Not,
-    constraint_generator => sub {
-        my $type = shift;
-        sub { not $type->check($_) },
-    };
-
+declare Not, constraint_generator => sub {
+    my $type = shift;
+    sub { not $type->check($_) },;
+};
 
 # ~Str or ~String?
-declare Pattern,
-    constraint_generator => sub {
-        my $regex = shift;
-        sub { !String->check($_) or /$regex/ },
-    };
+declare Pattern, constraint_generator => sub {
+    my $regex = shift;
+    sub { !String->check($_) or /$regex/ },;
+};
 
+declare Object => as HashRef, where sub { ref eq 'HASH' };
 
-declare Object => as HashRef ,where sub { ref eq 'HASH' };
-
-declare Required,
-    constraint_generator => sub {
-        my @keys = @_;
-        sub {
-            return 1 unless Object->check($_);
-            my $obj = $_;
-            all { exists $obj->{$_} } @keys;
-        }
-    };
+declare Required, constraint_generator => sub {
+    my @keys = @_;
+    sub {
+        return 1 unless Object->check($_);
+        my $obj = $_;
+        all { exists $obj->{$_} } @keys;
+    }
+};
 
 declare Array => as ArrayRef;
 
 declare Boolean => where sub { ref =~ /JSON/ };
 
-declare LaxNumber =>
-    as StrictNum,
-    where sub {
-        return !(!defined || ref);
-    };
+declare
+  LaxNumber => as StrictNum,
+  where sub {
+    return !( !defined || ref );
+  };
 
-declare Number =>
-    where sub {
-        return 0 if !defined || ref;
+declare Number => where sub {
+    return 0 if !defined || ref;
 
-        my $b_obj = B::svref_2object(\$_);
-        my $flags = $b_obj->FLAGS;
-        return( $flags & ( B::SVp_IOK | B::SVp_NOK ) and not ($flags & B::SVp_POK) );
-    };
+    my $b_obj = B::svref_2object( \$_ );
+    my $flags = $b_obj->FLAGS;
+    return ( $flags & ( B::SVp_IOK | B::SVp_NOK )
+          and not( $flags & B::SVp_POK ) );
+};
 
-declare LaxInteger => 
-    as Int,
-    where sub { return !(!defined || ref ) };
+declare
+  LaxInteger => as Int,
+  where sub { return !( !defined || ref ) };
 
-declare Integer =>
-    where sub {
-        return 0 if !defined || ref;
+declare Integer => where sub {
+    return 0 unless Int->check($_);
 
-        my $b_obj = B::svref_2object(\$_);
-        my $flags = $b_obj->FLAGS;
-        return( $flags & B::SVp_IOK and not ($flags & B::SVp_POK) );
-    };
+    # weeeird stuff stolen from JSON
+    my $b_obj = B::svref_2object( \$_ );
 
-declare LaxString => as Str,
-    where sub { return defined && not ref; };
+    my $flags = $b_obj->FLAGS;
+    my $verdict =
+      $flags & ( B::SVp_IOK | B::SVp_NOK ) && !( $flags & B::SVp_POK() );
+    return !!$verdict;
+};
 
-declare String => as Str,
-    where sub {
-        return 0 if !defined || ref;
+declare
+  LaxString => as Str,
+  where sub { return defined && not ref; };
 
-        my $b_obj = B::svref_2object(\$_);
-        my $flags = $b_obj->FLAGS;
-        return ($flags & B::SVp_POK);
-    };
+declare
+  String => as Str,
+  where sub {
+    return 0 if !defined || ref;
+
+    my $b_obj = B::svref_2object( \$_ );
+    my $flags = $b_obj->FLAGS;
+    return ( $flags & B::SVp_POK );
+  };
 
 declare Null => where sub { not defined };
 
-declare 'MaxItems',
-    constraint_generator => sub {
-        my $max = shift;
+declare 'MaxItems', constraint_generator => sub {
+    my $max = shift;
 
-        return sub {
-            ref ne 'ARRAY' or @$_ <= $max;
-        };
+    return sub {
+        ref ne 'ARRAY' or @$_ <= $max;
     };
+};
 
-declare 'MinItems',
-    constraint_generator => sub {
-        my $min = shift;
+declare 'MinItems', constraint_generator => sub {
+    my $min = shift;
 
-        return sub {
-            ref ne 'ARRAY' or @$_ >= $min;
-        };
+    return sub {
+        ref ne 'ARRAY' or @$_ >= $min;
     };
+};
 
-declare 'MultipleOf',
-    constraint_generator => sub {
-        my $num =shift;
+declare 'MultipleOf', constraint_generator => sub {
+    my $num = shift;
 
-        return sub {
-            !Number->check($_)
-                or ($_ / $num) !~ /\./;
-        }
+    return sub {
+        return 1 unless Number->check($_);
+        my ( $q, $r ) = Math::BigFloat->new($_)->bdiv($num);
+        return !$r;
+    }
+};
+
+declare Minimum, constraint_generator => sub {
+    my $minimum = shift;
+    return sub {
+        !Number->check($_)
+          or $_ >= $minimum;
     };
+};
 
-declare Minimum,
-    constraint_generator => sub {
-        my $minimum = shift;
-        return sub {
-            ! Number->check($_)
-                or $_ >= $minimum;
-        };
+declare ExclusiveMinimum, constraint_generator => sub {
+    my $minimum = shift;
+    return sub {
+        !StrictNum->check($_)
+          or $_ > $minimum;
+    }
+};
+
+declare Maximum, constraint_generator => sub {
+    my $max = shift;
+    return sub {
+        !StrictNum->check($_)
+          or $_ <= $max;
     };
+};
 
-declare ExclusiveMinimum,
-    constraint_generator => sub {
-        my $minimum = shift;
-        return sub { 
-            ! StrictNum->check($_)
-                or $_ > $minimum;
-        }
-    };
+declare ExclusiveMaximum, constraint_generator => sub {
+    my $max = shift;
+    return sub {
+        !StrictNum->check($_)
+          or $_ < $max;
+    }
+};
 
-declare Maximum,
-    constraint_generator => sub {
-        my $max = shift;
-        return sub {
-            ! StrictNum->check($_)
-                or $_ <= $max;
-        };
-    };
+declare Schema, as InstanceOf ['Type::Tiny'];
 
-declare ExclusiveMaximum,
-    constraint_generator => sub {
-        my $max = shift;
-        return sub { 
-            ! StrictNum->check($_)
-                or $_ < $max;
-        }
-    };
+coerce Schema, from HashRef, via {
+    my $schema = JSON::Schema::AsType->new( draft => 4, schema => $_ );
 
-declare Schema, as InstanceOf['Type::Tiny'];
+    if ( $schema->validate_schema ) {
+        die "not a valid draft4 json schema\n";
+    }
 
-coerce Schema,
-    from HashRef,
-    via { 
-        my $schema = JSON::Schema::AsType->new( draft_version => 4, schema => $_ );
-
-        if ( $schema->validate_schema ) {
-            die "not a valid draft4 json schema\n";
-        }
-
-        $schema->type 
-    };
+    $schema->type
+};
 
 1;
 
@@ -448,52 +517,11 @@ JSON::Schema::AsType::Draft4::Types - JSON-schema v4 keywords as types
 
 =head1 VERSION
 
-version 0.4.4
+version 1.0.0
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION 
 
-    use JSON::Schema::AsType::Draft4::Types '-all';
-
-    my $type = Object & 
-        Properties[
-            foo => Minimum[3]
-        ];
-
-    $type->check({ foo => 5 });  # => 1
-    $type->check({ foo => 1 });  # => 0
-
-=head1 EXPORTED TYPES
-
-        Null Boolean Array Object String Integer Pattern Number Enum
-
-        OneOf AllOf AnyOf 
-
-        Required Not
-
-        Minimum ExclusiveMinimum Maximum ExclusiveMaximum MultipleOf
-
-        MaxLength MinLength
-
-        Items AdditionalItems MaxItems MinItems UniqueItems
-
-        Properties PatternProperties AdditionalProperties MaxProperties MinProperties
-
-        Dependencies Dependency
-
-=head2 Schema
-
-Only verifies that the variable is a L<Type::Tiny>. 
-
-Can coerce the value from a hashref defining the schema.
-
-    my $schema = Schema->coerce( \%schema );
-
-    # equivalent to
-
-    $schema = JSON::Schema::AsType::Draft4->new(
-        draft_version => 4,
-        schema => \%schema;
-    )->type;
+Internal module for L<JSON::Schema:::AsType>. 
 
 =head1 AUTHOR
 
@@ -501,7 +529,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Yanick Champoux.
+This software is copyright (c) 2026 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

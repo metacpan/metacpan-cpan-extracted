@@ -1,0 +1,7 @@
+Revision history for Perl module Filesys::Fuse3
+
+0.020 2026-04-11
+
+ - Forked from Fuse (https://github.com/dpavlin/perl-fuse.git)
+   and updated to work with fuse3:
+   - getdir, ftruncate and fgetattr functions are gone

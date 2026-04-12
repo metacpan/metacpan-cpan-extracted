@@ -1,0 +1,10 @@
+Revision history for SimpleMock
+
+0.01    2025-01-01
+        - Initial alpha release
+        - SUBS model for mocking subroutine calls
+        - DBI model with DBD::SimpleMock driver
+        - LWP model for mocking HTTP requests
+        - PATH_TINY model for mocking Path::Tiny operations
+        - Scoped mock support via register_mocks_scoped / ScopeGuard
+        - Auto-loading of SimpleMock::Mocks::* modules via require override

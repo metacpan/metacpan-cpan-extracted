@@ -2,84 +2,101 @@
 #include "EXTERN.h"         // globals/constant import locations
 #include "perl.h"           // Perl symbols, structures and constants definition
 #include "XSUB.h"           // xsubpp functions and macros
+#include <math.h>
 
-int makehist (unsigned char * str, int * hist, int len) {
+#if PERL_VERSION >= 14
+static XOP entropy_xop;
+#endif
+
+static int makehist(const unsigned char *str, int *hist, int len) {
 	int chars[256];
-	int histlen = 0;
-	for (int i = 0; i < 256; i++) chars[i]=-1;
-	for (int i = 0; i < len; i++) {
-		if(chars[(int)str[i]] == -1){
-			chars[(int)str[i]] = histlen;
+	int histlen = 0, i;
+	for (i = 0; i < 256; i++) chars[i] = -1;
+	for (i = 0; i < len; i++) {
+		int c = (int)str[i];
+		if (chars[c] == -1) {
+			chars[c] = histlen;
 			histlen++;
 		}
-		hist[chars[(int)str[i]]]++;
+		hist[chars[c]]++;
 	}
 	return histlen;
 }
 
-double entropy (char * str) {
+static double entropy(const char *str) {
 	int len = strlen(str);
-	int * hist = (int*)calloc(len,sizeof(int));
-	int histlen = makehist(str, hist, len);
-	double out = 0;
-	for (int i = 0; i < histlen; i++) {
-		out -= (double)hist[i] / len * log2((double)hist[i] / len);
+	int hist[256] = {0};  /* Max 256 unique chars, stack allocated */
+	int histlen, i;
+	double out = 0.0;
+	if (len == 0) return 0.0;
+	histlen = makehist((const unsigned char *)str, hist, len);
+	for (i = 0; i < histlen; i++) {
+		double p = (double)hist[i] / len;
+		out -= p * log2(p);
 	}
 	return out;
 }
 
 #if PERL_VERSION >= 14
-static XOP shannon_xop;
 
-static OP *
-shannon_entropy_op(pTHX) {
+static OP* pp_entropy(pTHX) {
 	dSP;
-	SV *sv;
-	int evap_step = -1;
-	I32 ax = TOPMARK + 1;
-	I32 items = (SP - PL_stack_base - TOPMARK) - 1;
-	if (items < 1)
-		croak("entropy requires at least 1 argument");
-	sv = PL_stack_base[ax];
-	sv = newSVnv(entropy(SvPV_nolen(sv)));
-	SP = PL_stack_base + POPMARK;
-	EXTEND(SP, 1);
-	PUSHs(sv);
-	PUTBACK;
-	return NORMAL;
+	SV *sv = TOPs;
+	STRLEN len;
+	const char *str = SvPV(sv, len);
+	double result = entropy(str);
+	POPs;
+	mPUSHn(result);
+	RETURN;
 }
 
-static OP *
-shannon_ck_entropy(pTHX_ OP *entersubop, GV *namegv, SV *protosv) {
+static OP* entropy_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
+	OP *pushop, *argop, *nextop, *newop;
 	PERL_UNUSED_ARG(namegv);
-	PERL_UNUSED_ARG(protosv);
-	entersubop->op_ppaddr = shannon_entropy_op;
-	return entersubop;
+	PERL_UNUSED_ARG(ckobj);
+	pushop = cLISTOPx(entersubop)->op_first;
+	if (!pushop) return entersubop;
+	if (pushop->op_type == OP_NULL && cLISTOPx(pushop)->op_first) {
+		pushop = cLISTOPx(pushop)->op_first;
+	}
+	argop = OpSIBLING(pushop);
+	if (!argop) return entersubop;
+	nextop = OpSIBLING(argop);
+	if (!nextop) return entersubop;
+	if (OpSIBLING(nextop)) return entersubop;
+	OpMORESIB_set(pushop, nextop);
+	OpLASTSIB_set(argop, NULL);
+	newop = newUNOP(OP_CUSTOM, 0, argop);
+	newop->op_ppaddr = pp_entropy;
+	op_free(entersubop);
+	return newop;
 }
+
 #endif
 
 MODULE = Shannon::Entropy::XS  PACKAGE = Shannon::Entropy::XS
 PROTOTYPES: ENABLE
 
-SV *
+double
 entropy(string)
-	SV * string;
+	SV *string
 	CODE:
-		RETVAL = newSVnv(entropy(SvPV_nolen(string)));
+		STRLEN len;
+		const char *str = SvPV(string, len);
+		RETVAL = entropy(str);
 	OUTPUT:
 		RETVAL
 
 BOOT:
-	{
-		/* Register custom op - XOP API requires 5.14+ */
 #if PERL_VERSION >= 14
-		XopENTRY_set(&shannon_xop, xop_name, "shannon");
-		XopENTRY_set(&shannon_xop, xop_desc, "shannon entropy");
-		XopENTRY_set(&shannon_xop, xop_class, OA_BASEOP);
-		Perl_custom_op_register(aTHX_ shannon_entropy_op, &shannon_xop);
-		CV* shannon_entropy_cv = get_cv("Shannon::Entropy::XS::entropy", 0);
-		cv_set_call_checker(shannon_entropy_cv, shannon_ck_entropy, (SV *)shannon_entropy_cv);
-#endif
+{
+	CV *entropy_cv;
+	XopENTRY_set(&entropy_xop, xop_name, "entropy");
+	XopENTRY_set(&entropy_xop, xop_desc, "Shannon entropy calculation");
+	Perl_custom_op_register(aTHX_ pp_entropy, &entropy_xop);
+	entropy_cv = get_cv("Shannon::Entropy::XS::entropy", 0);
+	if (entropy_cv) {
+		cv_set_call_checker(entropy_cv, entropy_call_checker, (SV *)entropy_cv);
 	}
-
-
+}
+#endif

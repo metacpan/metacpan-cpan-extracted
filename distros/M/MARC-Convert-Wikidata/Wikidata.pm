@@ -14,7 +14,7 @@ use MARC::Leader;
 use Mo::utils 0.08 qw(check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 
 # Constructor.
 sub new {
@@ -525,12 +525,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2025 Michal Josef Špaček
+© 2021-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.32
+0.33
 
 =cut

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.16.0;
 
-our $VERSION = '0.179';
+our $VERSION = '0.180';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -485,8 +485,7 @@ sub __copy_table {
             }
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
                 if ( $self->{binary_filter} == 2 ) {
-                    ( $str = sprintf( "%v02X", $tbl_orig->[$i][$j] // $self->{undef} ) ) =~ tr/./ /;
-                    push @$tmp_row, $str;
+                    push @$tmp_row, sprintf( '%*v02X', ' ', $tbl_orig->[$i][$j] // $self->{undef} );
                 }
                 else {
                     push @$tmp_row, $self->{binary_string};
@@ -669,6 +668,11 @@ sub __calc_avail_col_width {
                 for my $col ( @col_idx ) {
                     if ( $width->{cols_calc}[$col] < $width->{cols}[$col] ) {
                         ++$width->{cols_calc}[$col];
+                        if (    $width->{fract_calc}[$col] < $width->{fract}[$col]
+                             && $width->{int}[$col] + $width->{fract_calc}[$col] < $width->{cols_calc}[$col] ##
+                        ) {
+                            ++$width->{fract_calc}[$col]
+                        }
                         --$remainder_w;
                         if ( $remainder_w == 0 ) {
                             last REMAINDER_W;
@@ -820,7 +824,7 @@ sub __print_single_row {
         }
         if ( $self->{binary_filter} && substr( $key, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
             if ( $self->{binary_filter} == 2 ) {
-                ( $key = sprintf("%v02X", $tbl_orig->[0][$col] // $self->{undef} ) ) =~ tr/./ /;
+                $key = sprintf( '%*v02X', ' ', $tbl_orig->[0][$col] // $self->{undef} );
             }
             else {
                 $key = $self->{binary_string};
@@ -985,7 +989,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.179
+Version 0.180
 
 =cut
 

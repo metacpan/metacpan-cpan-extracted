@@ -24,6 +24,7 @@ no_index:
     - inc
 requires:
   File::Map: '0.64'
+  IO::Handle: '0'
   Imager: '0.80'
   Inline: '0.53'
   Inline::C: '0.53'
@@ -32,5 +33,5 @@ requires:
   Math::Gradient: '0.03'
   Term::ReadKey: '0'
   perl: '5.020'
-version: '6.92'
+version: '6.96'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

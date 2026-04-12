@@ -20,7 +20,7 @@ use constant {
 
 use strict;
 
-our $VERSION = '0.435';
+our $VERSION = '0.436';
 $VERSION =~ tr/_//d;
 
 our @ISA = qw/PDL::Exporter/;
@@ -29,7 +29,7 @@ our @EXPORT_OK = qw/diag issym minv mtriinv msyminv mposinv mdet mposdet mrcond
   mdsvd msvd mgsvd mpinv mlu mhessen mchol mqr mql mlq mrq meigen meigenx
   mgeigen  mgeigenx msymeigen msymeigenx msymgeigen msymgeigenx
   msolve mtrisolve msymsolve mpossolve msolvex msymsolvex mpossolvex
-  mrank mlls mllsy mllss mglm mlse mnorm mgschur mgschurx
+  mrank mlls mllsy mllss mglm mlse tritosym mnorm mgschur mgschurx
   mcrossprod mcond morth mschur mschurx
   NO WARN BARF setlaerror getlaerorr laerror/;
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
@@ -55,7 +55,7 @@ PDL::LinearAlgebra - Linear Algebra utils for PDL
 
 This module provides a convenient interface to L<PDL::LinearAlgebra::Real>
 and L<PDL::LinearAlgebra::Complex>. Since
-Blas and Lapack use a column major ordering scheme some routines here need to transpose matrices before
+BLAS and LAPACK use a column major ordering scheme some routines here need to transpose matrices before
 calling fortran routines and transpose back (see the documentation of each routine). If you need
 optimized code use directly  L<PDL::LinearAlgebra::Real> and
 L<PDL::LinearAlgebra::Complex>.
@@ -385,7 +385,7 @@ sub PDL::mcrossprod {
 
 Computes the rank of a matrix, using a singular value decomposition,
 returning a Perl scalar.
-from Lapack.
+from LAPACK.
 
 =for usage
 
@@ -462,7 +462,7 @@ sub PDL::mnorm {
 Computes determinant of a general square matrix using LU factorization.
 Supports broadcasting.
 Uses L<getrf|PDL::LinearAlgebra::Real/getrf> or L<cgetrf|PDL::LinearAlgebra::Complex/cgetrf>
-from Lapack.
+from LAPACK.
 
 =for usage
 
@@ -494,7 +494,7 @@ sub PDL::mdet {
 
 Compute determinant of a symmetric or Hermitian positive definite square matrix using Cholesky factorization.
 Supports broadcasting.
-Uses L<potrf|PDL::LinearAlgebra::Real/potrf> or L<cpotrf|PDL::LinearAlgebra::Complex/cpotrf> from Lapack.
+Uses L<potrf|PDL::LinearAlgebra::Real/potrf> or L<cpotrf|PDL::LinearAlgebra::Complex/cpotrf> from LAPACK.
 
 =for usage
 
@@ -673,7 +673,7 @@ sub PDL::mnull {
 Computes inverse of a general square matrix using LU factorization. Supports inplace and broadcasting.
 Uses L<getrf|PDL::LinearAlgebra::Real/getrf> and L<getri|PDL::LinearAlgebra::Real/getri>
 or L<cgetrf|PDL::LinearAlgebra::Complex/cgetrf> and L<cgetri|PDL::LinearAlgebra::Complex/cgetri>
-from Lapack and returns C<inverse, info> in array context.
+from LAPACK and returns C<inverse, info> in array context.
 
 =for usage
 
@@ -702,7 +702,7 @@ sub PDL::minv {
 =for ref
 
 Computes inverse of a triangular matrix. Supports inplace and broadcasting.
-Uses L<trtri|PDL::LinearAlgebra::Real/trtri> or L<ctrtri|PDL::LinearAlgebra::Complex/ctrtri> from Lapack.
+Uses L<trtri|PDL::LinearAlgebra::Real/trtri> or L<ctrtri|PDL::LinearAlgebra::Complex/ctrtri> from LAPACK.
 Returns C<inverse, info> in array context.
 
 =for usage
@@ -739,7 +739,7 @@ Computes inverse of a symmetric square matrix using the Bunch-Kaufman diagonal p
 Supports inplace and broadcasting.
 Uses L<sytrf|PDL::LinearAlgebra::Real/sytrf> and L<sytri|PDL::LinearAlgebra::Real/sytri> or
 L<csytrf|PDL::LinearAlgebra::Complex/csytrf> and L<csytri|PDL::LinearAlgebra::Complex/csytri>
-from Lapack and returns C<inverse, info> in array context.
+from LAPACK and returns C<inverse, info> in array context.
 
 =for usage
 
@@ -774,7 +774,7 @@ Computes inverse of a symmetric positive definite square matrix using Cholesky f
 Supports inplace and broadcasting.
 Uses L<potrf|PDL::LinearAlgebra::Real/potrf> and L<potri|PDL::LinearAlgebra::Real/potri> or
 L<cpotrf|PDL::LinearAlgebra::Complex/cpotrf> and L<cpotri|PDL::LinearAlgebra::Complex/cpotri>
-from Lapack and returns C<inverse, info> in array context.
+from LAPACK and returns C<inverse, info> in array context.
 
 =for usage
 
@@ -846,7 +846,7 @@ sub PDL::mpinv{
 
 Computes LU factorization.
 Uses L<getrf|PDL::LinearAlgebra::Real/getrf> or L<cgetrf|PDL::LinearAlgebra::Complex/cgetrf>
-from Lapack and returns L, U, pivot and info.
+from LAPACK and returns L, U, pivot and info.
 Works on transposed array.
 
 =for usage
@@ -894,7 +894,7 @@ Computes Cholesky decomposition of a symmetric matrix also known as symmetric sq
 If inplace flag is set, overwrite  the leading upper or lower triangular part of A else returns
 triangular matrix. Returns C<cholesky, info> in array context.
 Supports broadcasting.
-Uses L<potrf|PDL::LinearAlgebra::Real/potrf> or L<cpotrf|PDL::LinearAlgebra::Complex/cpotrf> from Lapack.
+Uses L<potrf|PDL::LinearAlgebra::Real/potrf> or L<cpotrf|PDL::LinearAlgebra::Complex/cpotrf> from LAPACK.
 
 =for usage
 
@@ -939,7 +939,7 @@ or
 
 Uses L<gehrd|PDL::LinearAlgebra::Real/gehrd> and L<orghr|PDL::LinearAlgebra::Real/orghr> or
 L<cgehrd|PDL::LinearAlgebra::Complex/cgehrd> and L<cunghr|PDL::LinearAlgebra::Complex/cunghr>
-from Lapack and returns C<H> in scalar context else C<H> and C<Q>.
+from LAPACK and returns C<H> in scalar context else C<H> and C<Q>.
 Works on transposed array.
 
 =for usage
@@ -978,7 +978,7 @@ Computes Schur form, works inplace.
 
 Supports broadcasting for unordered eigenvalues.
 Uses L<gees|PDL::LinearAlgebra::Real/gees> or L<cgees|PDL::LinearAlgebra::Complex/cgees>
-from Lapack and returns schur(T) in scalar context.
+from LAPACK and returns schur(T) in scalar context.
 Works on transposed array(s).
 
 =for usage
@@ -1106,7 +1106,7 @@ sub PDL::mschur {
 
 Computes Schur form, works inplace.
 Uses L<geesx|PDL::LinearAlgebra::Real/geesx> or L<cgeesx|PDL::LinearAlgebra::Complex/cgeesx>
-from Lapack and returns schur(T) in scalar context.
+from LAPACK and returns schur(T) in scalar context.
 Works on transposed array.
 
 =for usage
@@ -1226,7 +1226,7 @@ Computes generalized Schur decomposition of the pair (A,B).
   B = Q x T x Z'
 
 Uses L<gges|PDL::LinearAlgebra::Real/gges> or L<cgges|PDL::LinearAlgebra::Complex/cgges>
-from Lapack.
+from LAPACK.
 Works on transposed array.
 
 =for usage
@@ -1370,7 +1370,7 @@ Computes generalized Schur decomposition of the pair (A,B).
   B = Q x T x Z'
 
 Uses L<ggesx|PDL::LinearAlgebra::Real/ggesx> or L<cggesx|PDL::LinearAlgebra::Complex/cggesx>
-from Lapack. Works on transposed array.
+from LAPACK. Works on transposed array.
 
 =for usage
 
@@ -1483,7 +1483,7 @@ Computes QR decomposition.
 Handles complex data.
 Uses L<geqrf|PDL::LinearAlgebra::Real/geqrf> and L<orgqr|PDL::LinearAlgebra::Real/orgqr>
 or L<cgeqrf|PDL::LinearAlgebra::Complex/cgeqrf> and L<cungqr|PDL::LinearAlgebra::Complex/cungqr>
-from Lapack and returns C<Q> in scalar context. Works on transposed array.
+from LAPACK and returns C<Q> in scalar context. Works on transposed array.
 
 =for usage
 
@@ -1530,7 +1530,7 @@ Computes RQ decomposition.
 Handles complex data.
 Uses L<gerqf|PDL::LinearAlgebra::Real/gerqf> and L<orgrq|PDL::LinearAlgebra::Real/orgrq>
 or L<cgerqf|PDL::LinearAlgebra::Complex/cgerqf> and L<cungrq|PDL::LinearAlgebra::Complex/cungrq>
-from Lapack and returns C<Q> in scalar context. Works on transposed array.
+from LAPACK and returns C<Q> in scalar context. Works on transposed array.
 
 =for usage
 
@@ -1598,7 +1598,7 @@ Computes QL decomposition.
 Handles complex data.
 Uses L<geqlf|PDL::LinearAlgebra::Real/geqlf> and L<orgql|PDL::LinearAlgebra::Real/orgql>
 or L<cgeqlf|PDL::LinearAlgebra::Complex/cgeqlf> and L<cungql|PDL::LinearAlgebra::Complex/cungql>
-from Lapack and returns C<Q> in scalar context. Works on transposed array.
+from LAPACK and returns C<Q> in scalar context. Works on transposed array.
 
 =for usage
 
@@ -1666,7 +1666,7 @@ Computes LQ decomposition.
 Handles complex data.
 Uses L<gelqf|PDL::LinearAlgebra::Real/gelqf> and L<orglq|PDL::LinearAlgebra::Real/orglq>
 or L<cgelqf|PDL::LinearAlgebra::Complex/cgelqf> and L<cunglq|PDL::LinearAlgebra::Complex/cunglq>
-from Lapack and returns C<Q> in scalar context. Works on transposed array.
+from LAPACK and returns C<Q> in scalar context. Works on transposed array.
 
 =for usage
 
@@ -1725,7 +1725,7 @@ Solves linear system of equations using LU decomposition.
 Returns X in scalar context else X, LU, pivot vector and info.
 B is overwritten by X if its inplace flag is set.
 Supports broadcasting.
-Uses L<gesv|PDL::LinearAlgebra::Real/gesv> or L<cgesv|PDL::LinearAlgebra::Complex/cgesv> from Lapack.
+Uses L<gesv|PDL::LinearAlgebra::Real/gesv> or L<cgesv|PDL::LinearAlgebra::Complex/cgesv> from LAPACK.
 Works on transposed arrays.
 
 =for usage
@@ -1763,7 +1763,7 @@ Solves linear system of equations using LU decomposition.
   A * X = B
 
 Can optionally equilibrate the matrix.
-Uses L<gesvx|PDL::LinearAlgebra::Real/gesvx> or L<cgesvx|PDL::LinearAlgebra::Complex/cgesvx> from Lapack.
+Uses L<gesvx|PDL::LinearAlgebra::Real/gesvx> or L<cgesvx|PDL::LinearAlgebra::Complex/cgesvx> from LAPACK.
 Works on transposed arrays.
 
 =for usage
@@ -1868,7 +1868,7 @@ Solves linear system of equations with triangular matrix A.
 
 B is overwritten by X if its inplace flag is set.
 Supports broadcasting.
-Uses L<trtrs|PDL::LinearAlgebra::Real/trtrs> or L<ctrtrs|PDL::LinearAlgebra::Complex/ctrtrs> from Lapack.
+Uses L<trtrs|PDL::LinearAlgebra::Real/trtrs> or L<ctrtrs|PDL::LinearAlgebra::Complex/ctrtrs> from LAPACK.
 Work on transposed array(s).
 
 =for usage
@@ -1914,7 +1914,7 @@ Solves linear system of equations using diagonal pivoting method with symmetric 
 Returns X in scalar context else X, block diagonal matrix D (and the
 multipliers), pivot vector an info. B is overwritten by X if its inplace flag is set.
 Supports broadcasting.
-Uses L<sysv|PDL::LinearAlgebra::Real/sysv> or L<csysv|PDL::LinearAlgebra::Complex/csysv> from Lapack.
+Uses L<sysv|PDL::LinearAlgebra::Real/sysv> or L<csysv|PDL::LinearAlgebra::Complex/csysv> from LAPACK.
 Works on transposed array(s).
 
 =for usage
@@ -1956,7 +1956,7 @@ Solves linear system of equations using diagonal pivoting method with symmetric 
   A * X = B
 
 Uses L<sysvx|PDL::LinearAlgebra::Real/sysvx> or L<csysvx|PDL::LinearAlgebra::Complex/csysvx>
-from Lapack. Works on transposed array.
+from LAPACK. Works on transposed array.
 
 =for usage
 
@@ -2029,7 +2029,7 @@ symmetric positive definite matrix A.
 Returns X in scalar context else X, U or L and info.
 B is overwritten by X if its inplace flag is set.
 Supports broadcasting.
-Uses L<posv|PDL::LinearAlgebra::Real/posv> or L<cposv|PDL::LinearAlgebra::Complex/cposv> from Lapack.
+Uses L<posv|PDL::LinearAlgebra::Real/posv> or L<cposv|PDL::LinearAlgebra::Complex/cposv> from LAPACK.
 Works on transposed array(s).
 
 =for usage
@@ -2073,7 +2073,7 @@ symmetric positive definite matrix A
 
 Can optionally equilibrate the matrix.
 Uses L<posvx|PDL::LinearAlgebra::Real/posvx> or
-L<cposvx|PDL::LinearAlgebra::Complex/cposvx> from Lapack.
+L<cposvx|PDL::LinearAlgebra::Complex/cposvx> from LAPACK.
 Works on transposed array(s).
 
 =for usage
@@ -2169,7 +2169,7 @@ sub PDL::mpossolvex {
 Solves overdetermined or underdetermined real linear systems using QR or LQ factorization.
 
 If M > N in the M-by-N matrix A, returns the residual sum of squares too.
-Uses L<gels|PDL::LinearAlgebra::Real/gels> or L<cgels|PDL::LinearAlgebra::Complex/cgels> from Lapack.
+Uses L<gels|PDL::LinearAlgebra::Real/gels> or L<cgels|PDL::LinearAlgebra::Complex/cgels> from LAPACK.
 Works on transposed arrays.
 
 =for usage
@@ -2217,7 +2217,7 @@ Computes the minimum-norm solution to a real linear least squares problem
 using a complete orthogonal factorization.
 
 Uses L<gelsy|PDL::LinearAlgebra::Real/gelsy> or L<cgelsy|PDL::LinearAlgebra::Complex/cgelsy>
-from Lapack. Works on transposed arrays.
+from LAPACK. Works on transposed arrays.
 
 =for usage
 
@@ -2273,13 +2273,13 @@ sub PDL::mllsy {
 Computes the minimum-norm solution to a real linear least squares problem
 using a singular value decomposition.
 
-Uses L<gelss|PDL::LinearAlgebra::Real/gelss> or L<gelsd|PDL::LinearAlgebra::Real/gelsd> from Lapack.
+Uses L<gelss|PDL::LinearAlgebra::Real/gelss> or L<gelsd|PDL::LinearAlgebra::Real/gelsd> from LAPACK.
 Works on transposed arrays.
 
 =for usage
 
  ( PDL(X), ( HASH(result) ) )= mllss(PDL(A), PDL(B), SCALAR(method))
- method: specifies which method to use (see Lapack for further details)
+ method: specifies which method to use (see LAPACK for further details)
   '(c)gelss' or '(c)gelsd', default = '(c)gelsd'
  Returned values:
     X (SCALAR CONTEXT),
@@ -2345,7 +2345,7 @@ sub PDL::mllss {
 Solves a general Gauss-Markov Linear Model (GLM) problem.
 Supports broadcasting.
 Uses L<ggglm|PDL::LinearAlgebra::Real/ggglm> or L<cggglm|PDL::LinearAlgebra::Complex/cggglm>
-from Lapack. Works on transposed arrays.
+from LAPACK. Works on transposed arrays.
 
 =for usage
 
@@ -2386,7 +2386,7 @@ sub PDL::mglm{
 
 Solves a linear equality-constrained least squares (LSE) problem.
 Uses L<gglse|PDL::LinearAlgebra::Real/gglse> or L<cgglse|PDL::LinearAlgebra::Complex/cgglse>
-from Lapack. Works on transposed arrays.
+from LAPACK. Works on transposed arrays.
 
 =for usage
 
@@ -2446,7 +2446,7 @@ Eigenvectors are normalized (Euclidean norm = 1) and largest component real.
 The eigenvalues and eigenvectors returned are complex ndarrays.
 If only eigenvalues are requested, info is returned in array context.
 Supports broadcasting.
-Uses L<geev|PDL::LinearAlgebra::Real/geev> or L<cgeev|PDL::LinearAlgebra::Complex/cgeev> from Lapack.
+Uses L<geev|PDL::LinearAlgebra::Real/geev> or L<cgeev|PDL::LinearAlgebra::Complex/cgeev> from LAPACK.
 Works on transposed arrays.
 
 =for usage
@@ -2485,7 +2485,7 @@ Computes eigenvalues, one-norm and, optionally, the left and/or right eigenvecto
 Eigenvectors are normalized (Euclidean norm = 1) and largest component real.
 The eigenvalues and eigenvectors returned are complex ndarrays.
 Uses L<geevx|PDL::LinearAlgebra::Real/geevx> or
-L<cgeevx|PDL::LinearAlgebra::Complex/cgeevx> from Lapack.
+L<cgeevx|PDL::LinearAlgebra::Complex/cgeevx> from LAPACK.
 Works on transposed arrays.
 
 =for usage
@@ -2588,7 +2588,7 @@ Computes generalized eigenvalues and, optionally, the left and/or right generali
 for a pair of N-by-N real nonsymmetric matrices (A,B) .
 The alpha from ratio alpha/beta is a complex ndarray.
 Supports broadcasting. Uses L<ggev|PDL::LinearAlgebra::Real/ggev> or
-L<cggev|PDL::LinearAlgebra::Complex/cggev> from Lapack.
+L<cggev|PDL::LinearAlgebra::Complex/cggev> from LAPACK.
 Works on transposed arrays.
 
 =for usage
@@ -2628,7 +2628,7 @@ Computes generalized eigenvalues, one-norms and, optionally, the left and/or rig
 eigenvectors for a pair of N-by-N real nonsymmetric matrices (A,B).
 The alpha from ratio alpha/beta is a complex ndarray.
 Uses L<ggevx|PDL::LinearAlgebra::Real/ggevx> or
-L<cggevx|PDL::LinearAlgebra::Complex/cggevx> from Lapack.
+L<cggevx|PDL::LinearAlgebra::Complex/cggevx> from LAPACK.
 Works on transposed arrays.
 
 =for usage
@@ -2738,7 +2738,7 @@ complex Hermitian matrix (spectral decomposition).
 The eigenvalues are computed from lower or upper triangular matrix.
 If only eigenvalues are requested, info is returned in array context.
 Supports broadcasting and works inplace if eigenvectors are requested.
-From Lapack, uses L<syev|PDL::LinearAlgebra::Real/syev> or L<syevd|PDL::LinearAlgebra::Real/syevd> for real
+From LAPACK, uses L<syev|PDL::LinearAlgebra::Real/syev> or L<syevd|PDL::LinearAlgebra::Real/syevd> for real
 and L<cheev|PDL::LinearAlgebra::Complex/cheev> or L<cheevd|PDL::LinearAlgebra::Complex/cheevd> for complex.
 Works on transposed array(s).
 
@@ -2775,7 +2775,7 @@ sub PDL::msymeigen {
 
 Computes eigenvalues and, optionally eigenvectors of a symmetric square matrix (spectral decomposition).
 The eigenvalues are computed from lower or upper triangular matrix and can be selected by specifying a
-range. From Lapack, uses L<syevx|PDL::LinearAlgebra::Real/syevx> or
+range. From LAPACK, uses L<syevx|PDL::LinearAlgebra::Real/syevx> or
 L<syevr|PDL::LinearAlgebra::Real/syevr> for real and L<cheevx|PDL::LinearAlgebra::Complex/cheevx>
 or L<cheevr|PDL::LinearAlgebra::Complex/cheevr> for complex. Works on transposed arrays.
 
@@ -2792,7 +2792,7 @@ or L<cheevr|PDL::LinearAlgebra::Complex/cheevr> for complex. Works on transposed
  range:    PDL(2), lower and upper bounds interval or smallest and largest indices
     1<=range<=N for indice
  abstol:        specifies error tolerance for eigenvalues
- method:        specifies which method to use (see Lapack for further details)
+ method:        specifies which method to use (see LAPACK for further details)
     'syevx' (default)
     'syevr'
     'cheevx' (default)
@@ -2881,7 +2881,7 @@ Computes eigenvalues and, optionally eigenvectors of a real generalized
 symmetric-definite or Hermitian-definite eigenproblem.
 The eigenvalues are computed from lower or upper triangular matrix
 If only eigenvalues are requested, info is returned in array context.
-Supports broadcasting. From Lapack, uses L<sygv|PDL::LinearAlgebra::Real/sygv> or L<sygvd|PDL::LinearAlgebra::Real/sygvd> for real
+Supports broadcasting. From LAPACK, uses L<sygv|PDL::LinearAlgebra::Real/sygv> or L<sygvd|PDL::LinearAlgebra::Real/sygvd> for real
 or L<chegv|PDL::LinearAlgebra::Complex/chegv> or L<chegvd|PDL::LinearAlgebra::Complex/chegvd> for complex.
 Works on transposed array(s).
 
@@ -2930,7 +2930,7 @@ Computes eigenvalues and, optionally eigenvectors of a real generalized
 symmetric-definite or Hermitian eigenproblem.
 The eigenvalues are computed from lower or upper triangular matrix and can be selected by specifying a
 range. Uses L<sygvx|PDL::LinearAlgebra::Real/syevx> or L<cheevx|PDL::LinearAlgebra::Complex/cheevx>
-from Lapack. Works on transposed arrays.
+from LAPACK. Works on transposed arrays.
 
 =for usage
 
@@ -3022,7 +3022,7 @@ Return singular values in scalar context else left (U),
 singular values, right (V' (hermitian for complex)) singular vectors and info.
 Supports broadcasting.
 If only singulars values are requested, info is only returned in array context.
-Uses L<gesdd|PDL::LinearAlgebra::Real/gesdd> or L<cgesdd|PDL::LinearAlgebra::Complex/cgesdd> from Lapack.
+Uses L<gesdd|PDL::LinearAlgebra::Real/gesdd> or L<cgesdd|PDL::LinearAlgebra::Complex/cgesdd> from LAPACK.
 
 =for usage
 
@@ -3064,7 +3064,7 @@ Return singular values in scalar context else left (U),
 singular values, right (V' (hermitian for complex) singular vector and info.
 Supports broadcasting.
 If only singular values are requested, info is returned in array context.
-Uses L<gesvd|PDL::LinearAlgebra::Real/gesvd> or L<cgesvd|PDL::LinearAlgebra::Complex/cgesvd> from Lapack.
+Uses L<gesvd|PDL::LinearAlgebra::Real/gesvd> or L<cgesvd|PDL::LinearAlgebra::Complex/cgesvd> from LAPACK.
 
 =for usage
 
@@ -3106,7 +3106,7 @@ Computes generalized (or quotient) singular value decomposition.
 If the effective rank of (A',B')' is 0 return only unitary V, U, Q.
 Handles complex data.
 Uses L<ggsvd|PDL::LinearAlgebra::Real/ggsvd> or
-L<cggsvd|PDL::LinearAlgebra::Complex/cggsvd> from Lapack. Works on transposed arrays.
+L<cggsvd|PDL::LinearAlgebra::Complex/cggsvd> from LAPACK. Works on transposed arrays.
 
 =for usage
 

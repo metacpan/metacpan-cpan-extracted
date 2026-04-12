@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.180   2026-04-11
+        - Refactored binary to hexadecimal conversion.
+        - Bugfix formatting fraction.
+
 0.179   2026-03-27
         - Code refactoring.
         - Update scientific notation.

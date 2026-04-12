@@ -2,55 +2,54 @@ use strict;
 use warnings;
 
 use MARC::Convert::Wikidata::Utils qw(clean_number_of_pages);
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
 # Test.
 my $input_number_of_pages = '575 s. ;';
 my $ret = clean_number_of_pages($input_number_of_pages);
-is($ret, 575, "Number of pages '$input_number_of_pages' after cleanup.");
+is($ret, 575, "Number of pages '$input_number_of_pages' after cleanup (575).");
 
 # Test.
 $input_number_of_pages = '219 s. :';
 $ret = clean_number_of_pages($input_number_of_pages);
-is($ret, 219, "Number of pages '$input_number_of_pages' after cleanup.");
+is($ret, 219, "Number of pages '$input_number_of_pages' after cleanup (219).");
 
 # Test.
 $input_number_of_pages = '175 s.';
 $ret = clean_number_of_pages($input_number_of_pages);
-is($ret, 175, "Number of pages '$input_number_of_pages' after cleanup.");
+is($ret, 175, "Number of pages '$input_number_of_pages' after cleanup (175).");
 
 # Test.
 $input_number_of_pages = '75 stran :';
 $ret = clean_number_of_pages($input_number_of_pages);
-is($ret, 75, "Number of pages '$input_number_of_pages' after cleanup.");
+is($ret, 75, "Number of pages '$input_number_of_pages' after cleanup (75).");
 
 # Test.
 $input_number_of_pages = '[39] s. :';
 $ret = clean_number_of_pages($input_number_of_pages);
-is($ret, 39, "Number of pages '$input_number_of_pages' after cleanup.");
+is($ret, 39, "Number of pages '$input_number_of_pages' after cleanup (39).");
 
 # Test.
-$input_number_of_pages = '85 s., [6] l. barev. obr. příl. :';
+$input_number_of_pages = decode_utf8('85 s., [6] l. barev. obr. příl. :');
 $ret = clean_number_of_pages($input_number_of_pages);
-is($ret, 85, "Number of pages '$input_number_of_pages' after cleanup.");
+is($ret, 91, encode_utf8("Number of pages '$input_number_of_pages' after cleanup (91)."));
 
 # Test.
 $input_number_of_pages = '72, [8] s. :';
 $ret = clean_number_of_pages($input_number_of_pages);
-is($ret, 72, "Number of pages '$input_number_of_pages' after cleanup.");
+is($ret, 80, "Number of pages '$input_number_of_pages' after cleanup (80).");
 
 # Test.
-# TODO Implement
-## $input_number_of_pages = '65 nečíslovaných stran :';
-## $ret = clean_number_of_pages($input_number_of_pages);
-## is($ret, 65, "Number of pages '$input_number_of_pages' after cleanup.");
+$input_number_of_pages = '27, 313, [130], 32 s. :';
+$ret = clean_number_of_pages($input_number_of_pages);
+is($ret, 502, "Number of pages '$input_number_of_pages' after cleanup (502).");
 
 # Test.
-# TODO Implement
-## $input_number_of_pages = '85 s., [6] l. barev. obr. příl. :';
-## $ret = clean_number_of_pages($input_number_of_pages);
-## is($ret, 85, "Number of pages '$input_number_of_pages' after cleanup.");
+$input_number_of_pages = decode_utf8('65 nečíslovaných stran :');
+$ret = clean_number_of_pages($input_number_of_pages);
+is($ret, 65, encode_utf8("Number of pages '$input_number_of_pages' after cleanup."));
 
 # Test.
 # TODO Implement

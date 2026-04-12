@@ -8,7 +8,9 @@ cnb000080974.xml - Book series with ISSN (490 field).
 cnb000087983.xml - Translator (700 field).
 cnb000103538.xml - Multiple publishers (710 field).
 cnb000121825.mrc - Date of birth (100 field).
+cnb000144384.xml - Co-publisher in field 500.
 cnb000403605.mrc - Multiple publishers (260 field). Series (490 field).
+cnb000456624.xml - Field 550 example.
 cnb000510591.xml - Two languages (041 field).
 cnb000573607.mrc
 cnb000576456.mrc
@@ -24,12 +26,14 @@ cnb001002340.mrc - Right and bad ISBNs.
 cnb001042253.mrc - Publication date in format [19--].
 cnb001657758.mrc - Two series (490 field).
 cnb002031137.xml - Has three languages (041 field).
+cnb002162963.xml - Multiple numbers in pages.
 cnb002181872.mrc - Editor (100 field).
 cnb002276974.mrc - Two ISBNs in the same publishing place.
 cnb002341867.mrc - Four ISBNs in two publishing houses with two book covers.
                    Titles of separate works (505 field).
 cnb002467522.mrc - Publisher (264 field). Illustrator (700 field).
 cnb002536669.mrc - Two publishers, two places (264 field). Two ISBNs (020 field). Book series.
+cnb002564059.xml - 9999 in 008 field.
 cnb002662450.xml - Three ISBNs (020 field). Two publishing houses and box.
 cnb002835707.xml - 264c has bad date of publication from book, right publication date is in 008, note in 500
 cnb002896853.mrc - Different ČČNB (015 field, z subfield)
@@ -41,4 +45,3 @@ cnb003369415.mrc - Has weird format of number of pages (300 field).
 cnb003565872.xml - Has cycle (787 field).
 cnb003591924.xml - Slovak edition.
 cnb003633764.xml - Bad ISBN only.
-

@@ -1,5 +1,5 @@
 package Text::NeatTemplate;
-$Text::NeatTemplate::VERSION = '0.1600';
+$Text::NeatTemplate::VERSION = '0.1601';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Text::NeatTemplate - a fast, middleweight template engine.
 
 =head1 VERSION
 
-version 0.1600
+version 0.1601
 
 =head1 SYNOPSIS
 

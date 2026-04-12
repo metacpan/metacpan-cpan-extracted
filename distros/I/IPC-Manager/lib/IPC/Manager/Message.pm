@@ -2,7 +2,7 @@ package IPC::Manager::Message;
 use strict;
 use warnings;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000018';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -14,9 +14,13 @@ use Object::HashBase qw{
     <to
     <broadcast
     <stamp
+    <stamp_ord
     <id
     <content
 };
+
+my $_last_stamp = 0;
+my $_last_ord   = 0;
 
 sub init {
     my $self = shift;
@@ -28,7 +32,23 @@ sub init {
 
     $self->{+ID}    //= gen_uuid();
     $self->{+STAMP} //= time;
+
+    unless (defined $self->{+STAMP_ORD}) {
+        # Assign a per-process ordinal that increments when the stamp
+        # hasn't changed, so sort-by-stamp can break ties and preserve
+        # send order even on systems with coarse Time::HiRes resolution.
+        if ($self->{+STAMP} == $_last_stamp) {
+            $_last_ord++;
+        }
+        else {
+            $_last_stamp = $self->{+STAMP};
+            $_last_ord   = 0;
+        }
+        $self->{+STAMP_ORD} = $_last_ord;
+    }
 }
+
+sub sort_messages { sort { $a->{+STAMP} <=> $b->{+STAMP} || ($a->{+STAMP_ORD} // 0) <=> ($b->{+STAMP_ORD} // 0) } @_ }
 
 sub is_terminate {
     my $self = shift;

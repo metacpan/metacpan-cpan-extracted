@@ -3,8 +3,10 @@
 \bCVS\b
 ,v$
 ^.git/
+^.gitignore
 .boring
 
+dist.ini
 
 # distro files
 ^Graphics-Colourset-*
@@ -19,13 +21,6 @@
 # Module::Build
 ^Build$
 ^_build/
-
-# Mod-devaid files
-^darcs_prebuild.pl$
-^mod_devaid.conf$
-^old_version.txt$
-^version.txt$
-.todo
 
 # Temp, old, vi and emacs files.
 ~$

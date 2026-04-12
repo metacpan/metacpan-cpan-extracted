@@ -1,13 +1,32 @@
-# README
+.# README
 
 ![badge](https://github.com/rlauer6/make-cpan-dist/actions/workflows/build.yml/badge.svg)
 
 This project is yet another attempt to create a repeatable, __easy to
 use__ script for creating CPAN distributions.
 
+!! NEW !!
+
+> Checkout
+> [CPAN::Maker::Bootstrapper](https://github.com/rlauer6/CPAN-Maker-Bootstrapper.git)
+> the new companion project that leverages `CPAN::Maker` to automatically
+> create a project skeleton complete with a `buildspec.yml` and
+> `Makefile`.  Using the bootstrapper you'll be able to create a CPAN
+> distribution from you Perl module in seconds!
+
+```
+mkdir My-Module
+cpan-maker-bootstrapper -m My::Module
+```
+
+That's it. Start editing `lib/My/Module.pm.in` and re-build:
+
+```
+make
+```
+
 # Table of Contents
 
-* [README](#readme)
 * [Overview](#overview)
 * [Quick Start](#quick-start)
 * [More Details](#more-details)
@@ -65,33 +84,23 @@ Debian based system then you may have success using `apt` to install
 the necessary dependencies. There are also some Perl module
 dependencies that are checked when you run `./configure`.
 
-The `build` script in the root directory attempts to build the
-software for several different Linux distro flavors.
+The `build-github` script in the root directory is executed by GitHub
+actions to verify the build. If you want to build the project manually:
 
 ```
-git clone https://github.com/rlauer6/make-cpan-dist
-cd make-cpan-dist
-./build
-```
-
-If you want to do this in pieces take a look at the [build
-script](build).
-
-The build script essentially does the following after installing
-dependencies:
-
-```
+git clone https://github.com/rlauer6/CPAN-Maker.git
+cd CPAN-Maker
 ./bootstrap
 ./configure
-make & make install
+make
 ```
 
-> HINT: If you want to install locally, set `--prefix` during the
-> configure process or update the `build` script.
+Then to create a CPAN distribution:
 
 ```
-./configure --prefix=$HOME/local
-make && make install
+cd cpan
+make cpan
+cpanm -n -v CPAN-Maker-1.7.2.tar.
 ```
 
 [Back to Table of Contents](#table-of-contents)
@@ -661,6 +670,6 @@ know.
 
 # Author
 
-Rob Lauer <rlauer6@comcast.net>
+Rob Lauer <rlauer@treasurersbriefcase.com>
 
 [Back to Table of Contents](#table-of-contents)

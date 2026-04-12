@@ -5,7 +5,7 @@ use warnings;
 # Load XS functions from Chandra bootstrap
 use Chandra ();
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 NAME
 

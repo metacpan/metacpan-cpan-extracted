@@ -27,13 +27,101 @@ static int horus_parse_ns(pTHX_ SV *ns_sv, unsigned char *ns_out) {
 
 #if PERL_VERSION >= 14
 
-/* ── Macro: generate ck_* check function ─────────────────────────
- * Each ck function replaces the entersub op_ppaddr with our pp_*  */
+/* ── Macro: ppaddr swap (for variable-arity functions) ───────────
+ * Quick approach that leaves entersub intact - use for optional args */
 
 #define HORUS_CK(name) \
 static OP *horus_ck_##name(pTHX_ OP *o, GV *namegv, SV *protosv) { \
     PERL_UNUSED_ARG(namegv); PERL_UNUSED_ARG(protosv); \
     o->op_ppaddr = pp_horus_##name; return o; \
+}
+
+/* ── Macro: proper call checker for zero-arg functions ─────────── */
+
+#define HORUS_CK_NOARG(name) \
+static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
+    OP *pushop, *nextop, *newop; \
+    PERL_UNUSED_ARG(namegv); PERL_UNUSED_ARG(protosv); \
+    \
+    pushop = cLISTOPx(entersubop)->op_first; \
+    if (!pushop) return entersubop; \
+    \
+    if (pushop->op_type == OP_NULL && cLISTOPx(pushop)->op_first) { \
+        pushop = cLISTOPx(pushop)->op_first; \
+    } \
+    \
+    nextop = OpSIBLING(pushop); \
+    if (!nextop) return entersubop; \
+    if (OpSIBLING(nextop)) return entersubop; \
+    \
+    newop = newOP(OP_CUSTOM, 0); \
+    newop->op_ppaddr = pp_horus_##name; \
+    op_free(entersubop); \
+    return newop; \
+}
+
+/* ── Macro: proper call checker for unary functions ────────────── */
+
+#define HORUS_CK_UNARY(name) \
+static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
+    OP *pushop, *argop, *nextop, *newop; \
+    PERL_UNUSED_ARG(namegv); PERL_UNUSED_ARG(protosv); \
+    \
+    pushop = cLISTOPx(entersubop)->op_first; \
+    if (!pushop) return entersubop; \
+    \
+    if (pushop->op_type == OP_NULL && cLISTOPx(pushop)->op_first) { \
+        pushop = cLISTOPx(pushop)->op_first; \
+    } \
+    \
+    argop = OpSIBLING(pushop); \
+    if (!argop) return entersubop; \
+    \
+    nextop = OpSIBLING(argop); \
+    if (!nextop) return entersubop; \
+    if (OpSIBLING(nextop)) return entersubop; \
+    \
+    OpMORESIB_set(pushop, nextop); \
+    OpLASTSIB_set(argop, NULL); \
+    \
+    newop = newUNOP(OP_CUSTOM, 0, argop); \
+    newop->op_ppaddr = pp_horus_##name; \
+    op_free(entersubop); \
+    return newop; \
+}
+
+/* ── Macro: proper call checker for binary functions ──────────── */
+
+#define HORUS_CK_BINARY(name) \
+static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
+    OP *pushop, *arg1, *arg2, *nextop, *newop; \
+    PERL_UNUSED_ARG(namegv); PERL_UNUSED_ARG(protosv); \
+    \
+    pushop = cLISTOPx(entersubop)->op_first; \
+    if (!pushop) return entersubop; \
+    \
+    if (pushop->op_type == OP_NULL && cLISTOPx(pushop)->op_first) { \
+        pushop = cLISTOPx(pushop)->op_first; \
+    } \
+    \
+    arg1 = OpSIBLING(pushop); \
+    if (!arg1) return entersubop; \
+    \
+    arg2 = OpSIBLING(arg1); \
+    if (!arg2) return entersubop; \
+    \
+    nextop = OpSIBLING(arg2); \
+    if (!nextop) return entersubop; \
+    if (OpSIBLING(nextop)) return entersubop; \
+    \
+    OpMORESIB_set(pushop, nextop); \
+    OpLASTSIB_set(arg1, NULL); \
+    OpLASTSIB_set(arg2, NULL); \
+    \
+    newop = newBINOP(OP_CUSTOM, 0, arg1, arg2); \
+    newop->op_ppaddr = pp_horus_##name; \
+    op_free(entersubop); \
+    return newop; \
 }
 
 /* ── XOP descriptors (forward declarations) ──────────────────── */
@@ -62,14 +150,15 @@ static XOP horus_xop_uuid_parse, horus_xop_uuid_validate,
            horus_xop_uuid_cmp, horus_xop_uuid_convert,
            horus_xop_uuid_time, horus_xop_uuid_is_nil, horus_xop_uuid_is_max;
 
-/* ── pp_* : Format constant ops ──────────────────────────────── */
+/* ── pp_* : Format constant ops (proper restructuring) ───────── */
 
 #define PP_CONST_IV(name, val) \
 static OP *pp_horus_##name(pTHX) { \
-    dSP; I32 markix = POPMARK; SP = PL_stack_base + markix; \
-    XPUSHs(sv_2mortal(newSViv(val))); PUTBACK; return NORMAL; \
+    dSP; \
+    mPUSHi(val); \
+    RETURN; \
 } \
-HORUS_CK(name)
+HORUS_CK_NOARG(name)
 
 PP_CONST_IV(fmt_str,       HORUS_FMT_STR)
 PP_CONST_IV(fmt_hex,       HORUS_FMT_HEX)
@@ -82,144 +171,176 @@ PP_CONST_IV(fmt_binary,    HORUS_FMT_BINARY)
 PP_CONST_IV(fmt_upper_str, HORUS_FMT_UPPER_STR)
 PP_CONST_IV(fmt_upper_hex, HORUS_FMT_UPPER_HEX)
 
-/* ── pp_* : Namespace constant ops ───────────────────────────── */
+/* ── pp_* : Namespace constant ops (proper restructuring) ────── */
 
 #define PP_CONST_PV(name, str, slen) \
 static OP *pp_horus_##name(pTHX) { \
-    dSP; I32 markix = POPMARK; SP = PL_stack_base + markix; \
-    XPUSHs(sv_2mortal(newSVpvn(str, slen))); PUTBACK; return NORMAL; \
+    dSP; \
+    mPUSHp(str, slen); \
+    RETURN; \
 } \
-HORUS_CK(name)
+HORUS_CK_NOARG(name)
 
 PP_CONST_PV(ns_dns,  "6ba7b810-9dad-11d1-80b4-00c04fd430c8", 36)
 PP_CONST_PV(ns_url,  "6ba7b811-9dad-11d1-80b4-00c04fd430c8", 36)
 PP_CONST_PV(ns_oid,  "6ba7b812-9dad-11d1-80b4-00c04fd430c8", 36)
 PP_CONST_PV(ns_x500, "6ba7b814-9dad-11d1-80b4-00c04fd430c8", 36)
 
-/* ── pp_* : Generator ops (optional format arg) ──────────────── */
+/* ── pp_* : Generator ops (proper restructuring) ─────────────── */
+
+/* Macro for 0-or-1 arg generator call checker */
+#define HORUS_CK_GEN01(name) \
+static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
+    OP *pushop, *argop, *nextop, *newop; \
+    int argc = 0; \
+    PERL_UNUSED_ARG(namegv); PERL_UNUSED_ARG(protosv); \
+    \
+    pushop = cLISTOPx(entersubop)->op_first; \
+    if (!pushop) return entersubop; \
+    \
+    if (pushop->op_type == OP_NULL && cLISTOPx(pushop)->op_first) { \
+        pushop = cLISTOPx(pushop)->op_first; \
+    } \
+    \
+    OP *cur = OpSIBLING(pushop); \
+    while (cur && OpSIBLING(cur)) { argc++; cur = OpSIBLING(cur); } \
+    \
+    if (argc == 0) { \
+        newop = newOP(OP_CUSTOM, 0); \
+        newop->op_ppaddr = pp_horus_##name##_noarg; \
+    } else if (argc == 1) { \
+        argop = OpSIBLING(pushop); \
+        nextop = OpSIBLING(argop); \
+        OpMORESIB_set(pushop, nextop); \
+        OpLASTSIB_set(argop, NULL); \
+        newop = newUNOP(OP_CUSTOM, 0, argop); \
+        newop->op_ppaddr = pp_horus_##name##_fmt; \
+    } else { \
+        return entersubop; \
+    } \
+    op_free(entersubop); \
+    return newop; \
+}
 
 /* uuid_v4 - hottest path, no state needed */
-static OP *pp_horus_uuid_v4(pTHX) {
+static OP *pp_horus_uuid_v4_noarg(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
     unsigned char uuid[16];
-
-    if (items > 0) fmt = SvIV(PL_stack_base[ax]);
-
     horus_uuid_v4(uuid);
-
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
+    RETURN;
 }
-HORUS_CK(uuid_v4)
+
+static OP *pp_horus_uuid_v4_fmt(pTHX) {
+    dSP;
+    int fmt = POPi;
+    unsigned char uuid[16];
+    horus_uuid_v4(uuid);
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
+    RETURN;
+}
+HORUS_CK_GEN01(uuid_v4)
 
 /* uuid_v1 - time-based, needs MY_CXT */
-static OP *pp_horus_uuid_v1(pTHX) {
+static OP *pp_horus_uuid_v1_noarg(pTHX) {
     dSP;
     dMY_CXT;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
     unsigned char uuid[16];
-
-    if (items > 0) fmt = SvIV(PL_stack_base[ax]);
-
     horus_uuid_v1(uuid, &MY_CXT.v1_state);
-
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
+    RETURN;
 }
-HORUS_CK(uuid_v1)
+
+static OP *pp_horus_uuid_v1_fmt(pTHX) {
+    dSP;
+    dMY_CXT;
+    int fmt = POPi;
+    unsigned char uuid[16];
+    horus_uuid_v1(uuid, &MY_CXT.v1_state);
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
+    RETURN;
+}
+HORUS_CK_GEN01(uuid_v1)
 
 /* uuid_v6 - reordered time, needs MY_CXT */
-static OP *pp_horus_uuid_v6(pTHX) {
+static OP *pp_horus_uuid_v6_noarg(pTHX) {
     dSP;
     dMY_CXT;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
     unsigned char uuid[16];
-
-    if (items > 0) fmt = SvIV(PL_stack_base[ax]);
-
     horus_uuid_v6(uuid, &MY_CXT.v1_state, &MY_CXT.v6_state);
-
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
+    RETURN;
 }
-HORUS_CK(uuid_v6)
+
+static OP *pp_horus_uuid_v6_fmt(pTHX) {
+    dSP;
+    dMY_CXT;
+    int fmt = POPi;
+    unsigned char uuid[16];
+    horus_uuid_v6(uuid, &MY_CXT.v1_state, &MY_CXT.v6_state);
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
+    RETURN;
+}
+HORUS_CK_GEN01(uuid_v6)
 
 /* uuid_v7 - unix epoch, needs MY_CXT */
-static OP *pp_horus_uuid_v7(pTHX) {
+static OP *pp_horus_uuid_v7_noarg(pTHX) {
     dSP;
     dMY_CXT;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
     unsigned char uuid[16];
-
-    if (items > 0) fmt = SvIV(PL_stack_base[ax]);
-
     horus_uuid_v7(uuid, &MY_CXT.v7_state);
-
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
+    RETURN;
 }
-HORUS_CK(uuid_v7)
+
+static OP *pp_horus_uuid_v7_fmt(pTHX) {
+    dSP;
+    dMY_CXT;
+    int fmt = POPi;
+    unsigned char uuid[16];
+    horus_uuid_v7(uuid, &MY_CXT.v7_state);
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
+    RETURN;
+}
+HORUS_CK_GEN01(uuid_v7)
 
 /* uuid_nil */
-static OP *pp_horus_uuid_nil(pTHX) {
+static OP *pp_horus_uuid_nil_noarg(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
     unsigned char uuid[16];
-
-    if (items > 0) fmt = SvIV(PL_stack_base[ax]);
-
     horus_uuid_nil(uuid);
-
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
+    RETURN;
 }
-HORUS_CK(uuid_nil)
+
+static OP *pp_horus_uuid_nil_fmt(pTHX) {
+    dSP;
+    int fmt = POPi;
+    unsigned char uuid[16];
+    horus_uuid_nil(uuid);
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
+    RETURN;
+}
+HORUS_CK_GEN01(uuid_nil)
 
 /* uuid_max */
-static OP *pp_horus_uuid_max(pTHX) {
+static OP *pp_horus_uuid_max_noarg(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
     unsigned char uuid[16];
-
-    if (items > 0) fmt = SvIV(PL_stack_base[ax]);
-
     horus_uuid_max(uuid);
-
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
+    RETURN;
 }
-HORUS_CK(uuid_max)
+
+static OP *pp_horus_uuid_max_fmt(pTHX) {
+    dSP;
+    int fmt = POPi;
+    unsigned char uuid[16];
+    horus_uuid_max(uuid);
+    mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
+    RETURN;
+}
+HORUS_CK_GEN01(uuid_max)
 
 /* ── pp_* : Multi-arg generator ops ──────────────────────────── */
 
@@ -312,53 +433,122 @@ static OP *pp_horus_uuid_v5(pTHX) {
 }
 HORUS_CK(uuid_v5)
 
-/* uuid_v8(custom_data, fmt?) */
-static OP *pp_horus_uuid_v8(pTHX) {
+/* uuid_v8(custom_data, fmt?) - 1 or 2 args */
+
+/* Macro for 1-or-2 arg call checker */
+#define HORUS_CK_GEN12(name, pp1, pp2) \
+static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
+    OP *pushop, *arg1, *arg2, *nextop, *newop; \
+    int argc = 0; \
+    PERL_UNUSED_ARG(namegv); PERL_UNUSED_ARG(protosv); \
+    \
+    pushop = cLISTOPx(entersubop)->op_first; \
+    if (!pushop) return entersubop; \
+    \
+    if (pushop->op_type == OP_NULL && cLISTOPx(pushop)->op_first) { \
+        pushop = cLISTOPx(pushop)->op_first; \
+    } \
+    \
+    OP *cur = OpSIBLING(pushop); \
+    while (cur && OpSIBLING(cur)) { argc++; cur = OpSIBLING(cur); } \
+    \
+    if (argc == 1) { \
+        arg1 = OpSIBLING(pushop); \
+        nextop = OpSIBLING(arg1); \
+        OpMORESIB_set(pushop, nextop); \
+        OpLASTSIB_set(arg1, NULL); \
+        newop = newUNOP(OP_CUSTOM, 0, arg1); \
+        newop->op_ppaddr = pp1; \
+    } else if (argc == 2) { \
+        arg1 = OpSIBLING(pushop); \
+        arg2 = OpSIBLING(arg1); \
+        nextop = OpSIBLING(arg2); \
+        OpMORESIB_set(pushop, nextop); \
+        OpLASTSIB_set(arg1, NULL); \
+        OpLASTSIB_set(arg2, NULL); \
+        newop = newBINOP(OP_CUSTOM, 0, arg1, arg2); \
+        newop->op_ppaddr = pp2; \
+    } else { \
+        return entersubop; \
+    } \
+    op_free(entersubop); \
+    return newop; \
+}
+
+static OP *pp_horus_uuid_v8_data(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
+    SV *sv_data = TOPs;
     unsigned char uuid[16];
     STRLEN data_len;
-    const char *data_str;
+    const char *data_str = SvPV(sv_data, data_len);
 
-    if (items < 1) croak("uuid_v8 requires custom data argument");
-    if (items > 1) fmt = SvIV(PL_stack_base[ax + 1]);
-
-    data_str = SvPV(PL_stack_base[ax], data_len);
     if (data_len < 16) croak("Horus: uuid_v8 requires 16 bytes of custom data");
-
     horus_uuid_v8(uuid, (const unsigned char *)data_str);
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR)));
+    RETURN;
 }
-HORUS_CK(uuid_v8)
 
-/* ── pp_* : Batch op ─────────────────────────────────────────── */
-
-/* uuid_v4_bulk(count, fmt?) - returns list */
-static OP *pp_horus_uuid_v4_bulk(pTHX) {
+static OP *pp_horus_uuid_v8_data_fmt(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
-    int fmt = HORUS_FMT_STR;
-    int count, i;
+    int fmt = POPi;
+    SV *sv_data = TOPs;
+    unsigned char uuid[16];
+    STRLEN data_len;
+    const char *data_str = SvPV(sv_data, data_len);
 
-    if (items < 1) croak("uuid_v4_bulk requires count argument");
+    if (data_len < 16) croak("Horus: uuid_v8 requires 16 bytes of custom data");
+    horus_uuid_v8(uuid, (const unsigned char *)data_str);
 
-    count = SvIV(PL_stack_base[ax]);
-    if (items > 1) fmt = SvIV(PL_stack_base[ax + 1]);
+    SETs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
+    RETURN;
+}
+HORUS_CK_GEN12(uuid_v8, pp_horus_uuid_v8_data, pp_horus_uuid_v8_data_fmt)
 
-    SP = PL_stack_base + markix;
+/* ── pp_* : Batch op (proper restructuring) ──────────────────── */
+
+/* uuid_v4_bulk(count) - returns list with default format */
+static OP *pp_horus_uuid_v4_bulk_count(pTHX) {
+    dSP;
+    int count = POPi;
+    int i;
 
     if (count <= 0) {
-        PUTBACK;
-        return NORMAL;
+        RETURN;
+    }
+
+    EXTEND(SP, count);
+
+    if (count <= 256) {
+        for (i = 0; i < count; i++) {
+            unsigned char uuid[16];
+            horus_uuid_v4(uuid);
+            PUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR)));
+        }
+    } else {
+        unsigned char *buf;
+        Newx(buf, (STRLEN)count * 16, unsigned char);
+        horus_random_bulk(buf, (size_t)count * 16);
+        for (i = 0; i < count; i++) {
+            unsigned char *uuid = buf + i * 16;
+            horus_stamp_version_variant(uuid, 4);
+            PUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR)));
+        }
+        Safefree(buf);
+    }
+
+    RETURN;
+}
+
+/* uuid_v4_bulk(count, fmt) - returns list with specified format */
+static OP *pp_horus_uuid_v4_bulk_count_fmt(pTHX) {
+    dSP;
+    int fmt = POPi;
+    int count = POPi;
+    int i;
+
+    if (count <= 0) {
+        RETURN;
     }
 
     EXTEND(SP, count);
@@ -381,117 +571,82 @@ static OP *pp_horus_uuid_v4_bulk(pTHX) {
         Safefree(buf);
     }
 
-    PUTBACK;
-    return NORMAL;
+    RETURN;
 }
-HORUS_CK(uuid_v4_bulk)
+HORUS_CK_GEN12(uuid_v4_bulk, pp_horus_uuid_v4_bulk_count, pp_horus_uuid_v4_bulk_count_fmt)
 
-/* ── pp_* : Utility ops ──────────────────────────────────────── */
+/* ── pp_* : Utility ops (proper restructuring) ───────────────── */
 
 /* uuid_parse(input) -> binary SV */
 static OP *pp_horus_uuid_parse(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *input = TOPs;
     unsigned char uuid[16];
     STRLEN in_len;
-    const char *in_str;
+    const char *in_str = SvPV(input, in_len);
 
-    if (items < 1) croak("uuid_parse requires 1 argument");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
     if (horus_parse_uuid(uuid, in_str, in_len) != HORUS_PARSE_OK)
         croak("Horus: cannot parse UUID string");
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSVpvn((const char *)uuid, 16)));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSVpvn((const char *)uuid, 16)));
+    RETURN;
 }
-HORUS_CK(uuid_parse)
+HORUS_CK_UNARY(uuid_parse)
 
 /* uuid_validate(input) -> 1/0 */
 static OP *pp_horus_uuid_validate(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *input = TOPs;
     STRLEN in_len;
-    const char *in_str;
+    const char *in_str = SvPV(input, in_len);
 
-    if (items < 1) croak("uuid_validate requires 1 argument");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
-
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSViv(horus_uuid_validate(in_str, in_len))));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSViv(horus_uuid_validate(in_str, in_len))));
+    RETURN;
 }
-HORUS_CK(uuid_validate)
+HORUS_CK_UNARY(uuid_validate)
 
 /* uuid_version(input) -> int */
 static OP *pp_horus_uuid_version(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *input = TOPs;
     unsigned char uuid[16];
     STRLEN in_len;
-    const char *in_str;
+    const char *in_str = SvPV(input, in_len);
 
-    if (items < 1) croak("uuid_version requires 1 argument");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
     if (horus_parse_uuid(uuid, in_str, in_len) != HORUS_PARSE_OK)
         croak("Horus: cannot parse UUID string");
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSViv(horus_uuid_version_bin(uuid))));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSViv(horus_uuid_version_bin(uuid))));
+    RETURN;
 }
-HORUS_CK(uuid_version)
+HORUS_CK_UNARY(uuid_version)
 
 /* uuid_variant(input) -> int */
 static OP *pp_horus_uuid_variant(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *input = TOPs;
     unsigned char uuid[16];
     STRLEN in_len;
-    const char *in_str;
+    const char *in_str = SvPV(input, in_len);
 
-    if (items < 1) croak("uuid_variant requires 1 argument");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
     if (horus_parse_uuid(uuid, in_str, in_len) != HORUS_PARSE_OK)
         croak("Horus: cannot parse UUID string");
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSViv(horus_uuid_variant_bin(uuid))));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSViv(horus_uuid_variant_bin(uuid))));
+    RETURN;
 }
-HORUS_CK(uuid_variant)
+HORUS_CK_UNARY(uuid_variant)
 
 /* uuid_cmp(a, b) -> -1/0/1 */
 static OP *pp_horus_uuid_cmp(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *sv_b = POPs;
+    SV *sv_a = TOPs;
     unsigned char a[16], b[16];
     STRLEN a_len, b_len;
-    const char *a_str, *b_str;
+    const char *a_str = SvPV(sv_a, a_len);
+    const char *b_str = SvPV(sv_b, b_len);
     int cmp;
-
-    if (items < 2) croak("uuid_cmp requires 2 arguments");
-
-    a_str = SvPV(PL_stack_base[ax], a_len);
-    b_str = SvPV(PL_stack_base[ax + 1], b_len);
 
     if (horus_parse_uuid(a, a_str, a_len) != HORUS_PARSE_OK)
         croak("Horus: cannot parse first UUID");
@@ -500,109 +655,78 @@ static OP *pp_horus_uuid_cmp(pTHX) {
 
     cmp = horus_uuid_cmp_bin(a, b);
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSViv((cmp < 0) ? -1 : (cmp > 0) ? 1 : 0)));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSViv((cmp < 0) ? -1 : (cmp > 0) ? 1 : 0)));
+    RETURN;
 }
-HORUS_CK(uuid_cmp)
+HORUS_CK_BINARY(uuid_cmp)
 
 /* uuid_convert(input, fmt) -> formatted string */
 static OP *pp_horus_uuid_convert(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *sv_fmt = POPs;
+    SV *sv_input = TOPs;
     unsigned char uuid[16];
     STRLEN in_len;
-    const char *in_str;
-    int fmt;
-
-    if (items < 2) croak("uuid_convert requires input and format arguments");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
-    fmt = SvIV(PL_stack_base[ax + 1]);
+    const char *in_str = SvPV(sv_input, in_len);
+    int fmt = SvIV(sv_fmt);
 
     if (horus_parse_uuid(uuid, in_str, in_len) != HORUS_PARSE_OK)
         croak("Horus: cannot parse UUID string");
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(horus_uuid_to_sv(aTHX_ uuid, fmt)));
+    RETURN;
 }
-HORUS_CK(uuid_convert)
+HORUS_CK_BINARY(uuid_convert)
 
 /* uuid_time(input) -> NV epoch seconds */
 static OP *pp_horus_uuid_time(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *input = TOPs;
     unsigned char uuid[16];
     STRLEN in_len;
-    const char *in_str;
+    const char *in_str = SvPV(input, in_len);
 
-    if (items < 1) croak("uuid_time requires 1 argument");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
     if (horus_parse_uuid(uuid, in_str, in_len) != HORUS_PARSE_OK)
         croak("Horus: cannot parse UUID string");
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSVnv(horus_uuid_extract_time(uuid))));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSVnv(horus_uuid_extract_time(uuid))));
+    RETURN;
 }
-HORUS_CK(uuid_time)
+HORUS_CK_UNARY(uuid_time)
 
 /* uuid_is_nil(input) -> 1/0 */
 static OP *pp_horus_uuid_is_nil(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *input = TOPs;
     unsigned char uuid[16];
     STRLEN in_len;
-    const char *in_str;
+    const char *in_str = SvPV(input, in_len);
     int result = 0;
 
-    if (items < 1) croak("uuid_is_nil requires 1 argument");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
     if (horus_parse_uuid(uuid, in_str, in_len) == HORUS_PARSE_OK)
         result = horus_uuid_is_nil_bin(uuid);
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSViv(result)));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSViv(result)));
+    RETURN;
 }
-HORUS_CK(uuid_is_nil)
+HORUS_CK_UNARY(uuid_is_nil)
 
 /* uuid_is_max(input) -> 1/0 */
 static OP *pp_horus_uuid_is_max(pTHX) {
     dSP;
-    I32 markix = POPMARK;
-    I32 ax = markix + 1;
-    I32 items = SP - PL_stack_base - markix - 1;
+    SV *input = TOPs;
     unsigned char uuid[16];
     STRLEN in_len;
-    const char *in_str;
+    const char *in_str = SvPV(input, in_len);
     int result = 0;
 
-    if (items < 1) croak("uuid_is_max requires 1 argument");
-
-    in_str = SvPV(PL_stack_base[ax], in_len);
     if (horus_parse_uuid(uuid, in_str, in_len) == HORUS_PARSE_OK)
         result = horus_uuid_is_max_bin(uuid);
 
-    SP = PL_stack_base + markix;
-    XPUSHs(sv_2mortal(newSViv(result)));
-    PUTBACK;
-    return NORMAL;
+    SETs(sv_2mortal(newSViv(result)));
+    RETURN;
 }
-HORUS_CK(uuid_is_max)
+HORUS_CK_UNARY(uuid_is_max)
 
 /* ── Macro: XOP + call checker registration ──────────────────── */
 
@@ -610,6 +734,20 @@ HORUS_CK(uuid_is_max)
     XopENTRY_set(&horus_xop_##c_name, xop_name, "horus_" #c_name); \
     XopENTRY_set(&horus_xop_##c_name, xop_desc, desc); \
     Perl_custom_op_register(aTHX_ pp_horus_##c_name, &horus_xop_##c_name);
+
+/* Register both variants of a 0-or-1 arg function under same XOP */
+#define HORUS_REG_XOP_GEN01(c_name, desc) \
+    XopENTRY_set(&horus_xop_##c_name, xop_name, "horus_" #c_name); \
+    XopENTRY_set(&horus_xop_##c_name, xop_desc, desc); \
+    Perl_custom_op_register(aTHX_ pp_horus_##c_name##_noarg, &horus_xop_##c_name); \
+    Perl_custom_op_register(aTHX_ pp_horus_##c_name##_fmt, &horus_xop_##c_name);
+
+/* Register both variants of a 1-or-2 arg function */
+#define HORUS_REG_XOP_GEN12(c_name, pp1, pp2, desc) \
+    XopENTRY_set(&horus_xop_##c_name, xop_name, "horus_" #c_name); \
+    XopENTRY_set(&horus_xop_##c_name, xop_desc, desc); \
+    Perl_custom_op_register(aTHX_ pp1, &horus_xop_##c_name); \
+    Perl_custom_op_register(aTHX_ pp2, &horus_xop_##c_name);
 
 #define HORUS_REG_CK(perl_name, c_name) { \
     CV *cv = get_cv("Horus::" perl_name, 0); \
@@ -634,18 +772,22 @@ static void horus_register_custom_ops(pTHX) {
     HORUS_REG_XOP(ns_oid,  "UUID namespace: OID")
     HORUS_REG_XOP(ns_x500, "UUID namespace: X500")
 
-    HORUS_REG_XOP(uuid_v1,  "generate UUID v1")
+    /* Generators with 0-or-1 arg (proper op tree restructuring) */
+    HORUS_REG_XOP_GEN01(uuid_v1,  "generate UUID v1")
+    HORUS_REG_XOP_GEN01(uuid_v4,  "generate UUID v4")
+    HORUS_REG_XOP_GEN01(uuid_v6,  "generate UUID v6")
+    HORUS_REG_XOP_GEN01(uuid_v7,  "generate UUID v7")
+    HORUS_REG_XOP_GEN01(uuid_nil, "generate NIL UUID")
+    HORUS_REG_XOP_GEN01(uuid_max, "generate MAX UUID")
+
+    /* Generators with 1-or-2 args */
+    HORUS_REG_XOP_GEN12(uuid_v8, pp_horus_uuid_v8_data, pp_horus_uuid_v8_data_fmt, "generate UUID v8")
+    HORUS_REG_XOP_GEN12(uuid_v4_bulk, pp_horus_uuid_v4_bulk_count, pp_horus_uuid_v4_bulk_count_fmt, "generate UUID v4 batch")
+
+    /* Complex generators (ppaddr swap - too many optional arg combinations) */
     HORUS_REG_XOP(uuid_v2,  "generate UUID v2")
     HORUS_REG_XOP(uuid_v3,  "generate UUID v3")
-    HORUS_REG_XOP(uuid_v4,  "generate UUID v4")
     HORUS_REG_XOP(uuid_v5,  "generate UUID v5")
-    HORUS_REG_XOP(uuid_v6,  "generate UUID v6")
-    HORUS_REG_XOP(uuid_v7,  "generate UUID v7")
-    HORUS_REG_XOP(uuid_v8,  "generate UUID v8")
-    HORUS_REG_XOP(uuid_nil, "generate NIL UUID")
-    HORUS_REG_XOP(uuid_max, "generate MAX UUID")
-
-    HORUS_REG_XOP(uuid_v4_bulk, "generate UUID v4 batch")
 
     HORUS_REG_XOP(uuid_parse,    "parse UUID string")
     HORUS_REG_XOP(uuid_validate, "validate UUID string")

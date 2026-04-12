@@ -1,0 +1,29 @@
+---
+abstract: 'write filesystems in Perl using Fuse3'
+author:
+  - 'Dominique Dumont <domi.dumont@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Filesys-Fuse3
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Filesys::Statvfs: '0'
+  Lchown: '0'
+  Unix::Mknod: '0'
+resources:
+  bugtracker: http://github.com/dod38fr/perl-fuse3/issues
+  license: http://www.gnu.org/licenses/lgpl-2.1.html
+  repository: http://github.com/dod38fr/perl-fuse3
+version: '0.020'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

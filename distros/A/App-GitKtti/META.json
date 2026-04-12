@@ -54,6 +54,6 @@
          "web" : "https://github.com/saumon/gitktti"
       }
    },
-   "version" : "v2.0.3",
+   "version" : "v2.0.4",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

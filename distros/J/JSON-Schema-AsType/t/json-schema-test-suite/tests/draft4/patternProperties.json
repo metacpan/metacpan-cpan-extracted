@@ -29,7 +29,17 @@
                 "valid": false
             },
             {
-                "description": "ignores non-objects",
+                "description": "ignores arrays",
+                "data": [],
+                "valid": true
+            },
+            {
+                "description": "ignores strings",
+                "data": "",
+                "valid": true
+            },
+            {
+                "description": "ignores other non-objects",
                 "data": 12,
                 "valid": true
             }
@@ -104,6 +114,21 @@
                 "description": "regexes are case sensitive, 2",
                 "data": { "a_X_3": 3 },
                 "valid": false
+            }
+        ]
+    },
+    {
+        "description": "patternProperties with null valued instance properties",
+        "schema": {
+            "patternProperties": {
+                "^.*bar$": {"type": "null"}
+            }
+        },
+        "tests": [
+            {
+                "description": "allows null values",
+                "data": {"foobar": null},
+                "valid": true
             }
         ]
     }

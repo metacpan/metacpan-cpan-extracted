@@ -1,3 +1,17 @@
+0.33 2026-04-11T14:26:15+02:00
+ - Add error if field 008 isn't present.
+ - Add example (cnb000144384).
+ - Add use case for clean_serial_order().
+ - Data file cnb000121825 to XML.
+ - Fix situation with 008 field and type of date = t.
+ - Improve number of page counting.
+ - Not create 9999 in end_time.
+ - Remove all other characters than number from edition number.
+ - Remove all other characters than number from series ordinal.
+ - Rewrite check for 'marc_record' parameter in Transform to Mo::utils.
+ - Use NKP Kramerius as Czech Digital Library.
+ - Update copyright years.
+
 0.32 2025-10-21T13:17:51+02:00
  - Add 'series_ordinal_raw' parameter to Series object.
  - Add tests.

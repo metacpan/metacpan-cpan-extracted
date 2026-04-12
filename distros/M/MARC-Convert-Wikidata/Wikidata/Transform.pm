@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Data::Kramerius;
 use Error::Pure qw(err);
-use List::Util qw(any none);
+use List::Util 1.33 qw(any none);
 use MARC::Convert::Wikidata::Object 0.13;
 use MARC::Convert::Wikidata::Object::ExternalId 0.05;
 use MARC::Convert::Wikidata::Object::ISBN;
@@ -20,6 +20,7 @@ use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_numbe
 	clean_subtitle clean_title);
 use MARC::Field008 0.03;
 use MARC::Leader 0.05;
+use Mo::utils 0.08 qw(check_isa check_required);
 use Readonly;
 use Scalar::Util qw(blessed);
 use URI;
@@ -39,7 +40,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 
 # Constructor.
 sub new {
@@ -57,14 +58,9 @@ sub new {
 	# Process parameters.
 	set_params($self, @params);
 
-	if (! defined $self->{'marc_record'}) {
-		err "Parameter 'marc_record' is required.";
-	}
-	if (! blessed($self->{'marc_record'})
-		|| ! $self->{'marc_record'}->isa('MARC::Record')) {
-
-		err "Parameter 'marc_record' must be a MARC::Record object.";
-	}
+	# Check 'marc_record'.
+	check_required($self, 'marc_record');
+	check_isa($self, 'marc_record', 'MARC::Record');
 
 	$self->{'_kramerius'} = Data::Kramerius->new;
 
@@ -341,7 +337,13 @@ sub _number_of_pages {
 sub _process_field008 {
 	my $self = shift;
 
-	my $field008_string = $self->{'marc_record'}->field('008')->as_string;
+	my $field008 = $self->{'marc_record'}->field('008');
+	if (! defined $field008) {
+		err "Field 008 isn't present.",
+			'MARC', $self->{'marc_record'}->as_formatted,
+		;
+	}
+	my $field008_string = $field008->as_string;
 
 	$self->{'_field008'} = MARC::Field008->new(
 		'ignore_data_errors' => $self->{'ignore_data_errors'},
@@ -542,7 +544,11 @@ sub _publication_date {
 	my $self = shift;
 
 	my $publication_date = $self->{'_field008'}->date1;
-	if ($self->{'_field008'}->date2 ne '    ') {
+	if ($self->{'_field008'}->date2 ne '    '
+
+		# Copyright date.
+		&& $self->{'_field008'}->type_of_date ne 't') {
+
 		$publication_date .= '-'.$self->{'_field008'}->date2;
 	}
 #	my $publication_date = $self->_subfield('264', 'c');

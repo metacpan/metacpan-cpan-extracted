@@ -20,6 +20,7 @@ use Term::ANSIColor;
 
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
 
+my $VERSION = '2.01';
 my ($COLS,$ROWS,$w,$h) = GetTerminalSize(*STDOUT);
 $COLS = 80 if ($COLS < 80);
 $ROWS = 25 if ($ROWS < 25);
@@ -28,18 +29,22 @@ my $pad = int(($COLS - 23)/2);
 my $line = '-' x $pad . ' Graphics::Framebuffer ' . '-' x $pad;
 
 if (-e 'Makefile') { # We need a clean slate;
-	exec('make veryclean;reset;perl Makefile.PL');
+	my $cmd = (scalar(@ARGV)) ? "make veryclean; reset; perl Makefile.PL $ARGV[0]" : 'make veryclean; reset; perl Makefile.PL';
+	exec($cmd);
 }
+
+my $FORCE_VIDEO_FAIL = FALSE;
+
+$FORCE_VIDEO_FAIL = TRUE if (scalar(@ARGV) && $ARGV[0] eq 'force');
 
 my $blink = "\e[5m";
 
 # Graphics::Framebuffer banner
 my $banner = '';
-while (my $line = <DATA>) {
-	$banner .= $line;
+while (my $l = <DATA>) {
+	$banner .= $l;
 }
 print $banner;
-
 
 if ($^O ne 'linux') { # Some people will still try
     print colored(['white on_red']," This module only works on Linux.\n\n");
@@ -68,7 +73,7 @@ my $user = _username_for_tests();
 
 print colored(['bright_yellow'], ' Is '), colored(['cyan'], $user), colored(['bright_yellow'],' a member of '), colored(['green'], 'video'), '? ... ';
 
-if (_user_in_group($user, 'video')) {
+if (! $FORCE_VIDEO_FAIL && _user_in_group($user, 'video')) {
 	print colored(['bright_green'], 'Yes'), "\n";
 } else {
 	print colored(['bright_red'], 'No'), "\n";
@@ -86,6 +91,7 @@ unless($pmt =~ /^Y/i) {
     print "\n\nInstall Aborted.\n\n";
     exit(1);
 }
+
 # This portion of the code actually merges the C and Perl portions in the "src"
 # directory and writes the "lib/Graphics/Framebuffer.pm" file.  The one that is
 # there before this operation is merely a placeholder for CPAN, and was created
@@ -94,7 +100,6 @@ unless($pmt =~ /^Y/i) {
 
 # Why did I do this?  Simple, managing the version and the C code is a lot
 # easier this way, and eliminates the Inline::C quirks.
-
 
 # Process the src files
 print colored(['bright_yellow'],'             Loading C code'), ' ... ';
@@ -137,6 +142,8 @@ if ($meta =~ /^(.*?)\n/s) {
     $template =~ s/\#\# EMAIL \#\#/$email/sg;
     $Eml = $email;
     print colored(['bright_yellow'],'                     Author') . ' ... ', colored(['bright_green'],"$email") . "\n";
+} else {
+	die "\nMalformed src/metadata.txt file.  Aborting\n";
 }
 
 print colored(['bright_yellow'],'Framebuffer.pm Modification'), ' ... ';
@@ -243,14 +250,15 @@ my $mm = WriteMakefile(
     PREREQ_PRINT   => TRUE,
     PREREQ_FATAL   => FALSE,
     PREREQ_PM      => {
-        'Math::Bezier'       => '0.01',
-        'Math::Gradient'     => '0.03',
-        'List::Util'         => '1.20',
-        'File::Map'          => '0.64',
-        'Term::ReadKey'      => '0',
-        'Imager'             => '0.80',
-        'Inline'             => '0.53',
-        'Inline::C'          => '0.53',
+		'IO::Handle'     => '0',
+        'Math::Bezier'   => '0.01',
+        'Math::Gradient' => '0.03',
+        'List::Util'     => '1.20',
+        'File::Map'      => '0.64',
+        'Term::ReadKey'  => '0',
+        'Imager'         => '0.80',
+        'Inline'         => '0.53',
+        'Inline::C'      => '0.53',
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *.inl *log *bak *old'},

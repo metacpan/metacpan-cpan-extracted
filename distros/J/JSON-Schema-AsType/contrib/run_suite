@@ -1,0 +1,6 @@
+function run_suite;
+
+	set -x TEST_SCHEMA (perl -e'print join ":", @ARGV' $argv);
+	perl -Ilib t/zzz-*
+
+end;

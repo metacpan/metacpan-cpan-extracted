@@ -39,7 +39,7 @@ is_deeply($ret->illustrators, [], 'Broučci: Get illustrators.');
 is_deeply($ret->isbns, [], 'Broučci: Get ISBN-10.');
 is_deeply($ret->krameriuses, [], 'Broučci: Get Kramerius objects.');
 is_deeply($ret->languages, ['cze'], 'Broučci: Get language.');
-is($ret->number_of_pages, 85, 'Broučci: Get number of pages.');
+is($ret->number_of_pages, 91, 'Broučci: Get number of pages.');
 # TODO + ?
 is($ret->publication_date, 1919, 'Broučci: Get publication date.');
 is($ret->publishers->[0]->name, 'Alois Hynek', 'Broučci: Get publisher.');

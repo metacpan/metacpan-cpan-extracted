@@ -1,5 +1,16 @@
 Revision history for JSON-Schema-AsType
 
+1.0.0 2026-04-11
+ [API CHANGES]
+ - Rewrite and addition of drafts 7, 2019-09, and 2020-12.
+
+ [BUG FIXES]
+ [DOCUMENTATION]
+ [ENHANCEMENTS]
+ [NEW FEATURES]
+ [STATISTICS]
+ - code churn: 76 files changed, 6882 insertions(+), 2387 deletions(-)
+
 0.4.4 2024-04-16
  [BUG FIXES]
  - Draft 6 url is https, not http.
@@ -29,8 +40,7 @@ Revision history for JSON-Schema-AsType
  - set the minimal perl version to 5.14 (GH#13)
  - change some types that had their `validation_explain` explode for perl
    +5.22.
-
- [STATISTICS]
+ - STATISTICS
  - code churn: 7 files changed, 104 insertions(+), 9 deletions(-)
 
 0.4.0 2017-04-06
@@ -71,14 +81,12 @@ Revision history for JSON-Schema-AsType
  - code churn: 7 files changed, 86 insertions(+), 5 deletions(-)
 
 0.0.2 2015-12-09
- - Minimum Path::Tiny version of 0.062 (for `visit()`)
- - Set minimum Perl to be 5.10.0.
-
+ [Minimum Path::Tiny version of 0.062 (for `visit()`)]
+ [Set minimum Perl to be 5.10.0.]
  [STATISTICS]
  - code churn: 4 files changed, 22 insertions(+), 2 deletions(-)
 
 0.0.1 2015-12-06
- - First version, unleashed on an unsuspecting world.
-
+ [First version, unleashed on an unsuspecting world.]
  [STATISTICS]
  - code churn: 74 files changed, 5230 insertions(+), 10 deletions(-)

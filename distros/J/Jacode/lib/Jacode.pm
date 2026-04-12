@@ -5,10 +5,10 @@ package Jacode;
 #
 # https://metacpan.org/dist/Jacode
 #
-# Copyright (c) 2018, 2019, 2020, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2.13.4.31';
+$VERSION = '2.13.4.32';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -58,7 +58,7 @@ Jacode - Perl program for Japanese character code conversion
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode;
-  
+
        ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, $option])
                   $got_INPUT_encoding = Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, $option])
               ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line)

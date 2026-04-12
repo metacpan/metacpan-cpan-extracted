@@ -84,6 +84,35 @@ function build_module_index {
 }
 
 ########################################################################
+function module2path {
+########################################################################
+    module="$1";
+
+    path="$(echo $1 | perl -npe 's/::/\//g').pm"
+
+    if [[ -e "$path" ]]; then
+        echo $path;
+        return;
+    fi
+
+    root="${PROJECT_HOME}/${perl5libdir}/"
+
+    if ! [[ -d "$root" ]]; then
+      root="$PROJECT_HOME"
+    fi
+
+    for a in $(find $root -name '*.pm'); do
+        if grep -q "^package $module;" $a; then
+            echo "${a##$root}";
+            return;
+        elif [[ $a = "$root$path" ]]; then
+            echo "${a##$root}";
+            return;
+        fi
+    done
+}
+
+########################################################################
 function module2path_indexed {
 ########################################################################
     local module="$1"
@@ -206,12 +235,7 @@ function cleanup {
     [[ -n "$resources"     ]] && rm -f "$resources"
     [[ -n "$builddir"      ]] && rm -rf "$builddir"
     [[ -n "$tmp_gitdir"    ]] && rm -rf "$tmp_gitdir"
-    
-    if [[ -n "$workdir" ]]; then
-        for a in *.tmp; do
-            rm -f "${workdir}/$a"
-        done
-    fi
+    [[ -n "workdir"        ]] && find "$workdir" -maxdepth 1 -name '*.tmp' -exec rm -f {} \;
 }
 
 # default dependency finder
@@ -631,6 +655,7 @@ builddir=$(mktemp -d)
 trap cleanup EXIT
 
 module_file="$(module2path $MODULE)"
+
 if [[ -n "$module_file" ]]; then
     mkdir -p "${builddir}/lib/$(dirname $module_file)";
 fi
@@ -712,7 +737,9 @@ fi
 # own set of files to package
 
 if [[ "$recurse_directories" = "yes" ]]; then
-    find -L ${PROJECT_HOME}/${perl5libdir} -not -path '*/.git/*' -type f -name '*.pm' > $package_files;
+    find -L ${PROJECT_HOME}/${perl5libdir} \
+         -not -path '*/.git/*' -type f \
+         \( -name '*.pm' -o -name '*.pod' \) > $package_files;
     MODULE_PATH="--module-path ${perl5libdir}"
 else
     if [[ -s "$provides" ]]; then
@@ -729,12 +756,6 @@ else
         done
 
         rm "$_module_index"
-
-#        for a in $(cat $provides); do
-#            if [[ -n "$a" ]]; then
-#                echo "${PROJECT_HOME}/${perl5libdir}/$(module2path $a)" >> $package_files
-#            fi
-#        done
     else
         # must package the module at least?
         echo "${PROJECT_HOME}/${perl5libdir}/$module_file" >$package_files
@@ -757,8 +778,11 @@ for a in $(cat $package_files | sort -u); do
     required_module=${a##${PROJECT_HOME}/${perl5libdir}/}
 
     if test -n "$required_module"; then
-        echo $required_module >> ${workdir}/provides.tmp
-    
+        # only .pm, ignore .pod files
+        if echo "$required_module" | grep -q '\.pm$'; then
+            echo $required_module >> ${workdir}/provides.tmp
+        fi
+        # ...but make sure they are in the distribution
         mkdir -p $(dirname ${builddir}/lib/$required_module)
         cp $a ${builddir}/lib/$required_module
     fi
@@ -773,15 +797,18 @@ if [[ -s "$exe_files" ]]; then
 fi
 
 if [[ -z "$dependency_file" ]]; then
-    echo "NO dependency file scanning..."
+    echo "NO dependency file found..."
 
-    for a in $(cat $package_files | sort -u); do
+    # only scan .pm files
+    for a in $(cat $package_files | sort -u | grep -q '\.pm$' ); do
+        echo "...scanning: $a"
         scan $a ${workdir}/requires.tmp;
     done
     
     # find dependencies for .pl files
     if [[ -s "$exe_files" ]]; then
         for a in $(cat $exe_files); do
+            echo "...scanning: $a"
             scan $a ${workdir}/requires.tmp;
         done
     fi
@@ -789,8 +816,8 @@ else
     if [ $(basename $dependency_file) = "cpanfile" ]; then
         if command -v >/dev/null 2>&1; then
             cpanfile-dump "$dependency_file" >${workdir}/requires.tmp
-        else
-            WARN "cpanfile-dump not found!"
+        else 
+            WARN "cpanfile-dump not found! Install Module::CPANfile"
         fi
     else
         cp $dependency_file ${workdir}/requires.tmp

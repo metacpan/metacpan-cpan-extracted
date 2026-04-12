@@ -1,5 +1,16 @@
 Revision history for Physics-Ellipsometry-VASE
 
+0.02    2026-04-03
+        - Auto-detect and parse J.A. Woollam VASE instrument files
+        - Weighted fitting using measured sigma columns from Woollam data
+        - Multi-angle color-coded plotting via PDL::Graphics::Gnuplot
+        - Relative-step finite differences for numerical Jacobian
+        - Store covariance matrix, iteration count, and model values after fit
+        - Added Woollam format tests (t/03-woollam.t)
+        - Added examples: Cauchy thin-film model, Tauc-Lorentz oscillator
+        - Full POD documentation
+        - CPAN packaging (MANIFEST, MANIFEST.SKIP, LICENSE)
+
 0.01    2026-03-27
         - Initial release
         - VASE object with load_data, set_model, fit methods

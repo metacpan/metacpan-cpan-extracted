@@ -23,6 +23,7 @@ Direct drawing for 32/24/16 bit framebuffers (others would be supported if asked
 Drawing is this simple
 
  $fb->cls('OFF'); # Clear screen and turn off the console cursor
+ $fb->graphics_mode();
 
  $fb->set_color({'red' => 255, 'green' => 255, 'blue' => 255, 'alpha' => 255});
  $fb->plot({'x' => 28, 'y' => 79});
@@ -32,6 +33,7 @@ Drawing is this simple
  $fb->box({'x' => 95, 'y' => 100, 'xx' => 400, 'yy' => 600, 'filled' => 1});
  # ... and many many more
 
+ $fb->text_mode();
  $fb->cls('ON'); # Clear screen and turn on the console cursor
 
 Methods requiring parameters require a hash (or anonymous hash) reference passed to the method (for speed).  All parameters have easy to understand english names, all lower case, to understand exactly what the method is doing.
@@ -64,15 +66,25 @@ Make sure you have read/write access to the framebuffer device.  Usually this ju
 
 Read the file "installing/INSTALL" and follow its instructions.
 
-When you install this module, please do it within a console, not a console window in X-Windows, but the actual Linux/FreeBSD console outside of X-Windows.
+When you install this module, please do it within a console, not a console window in X-Windows, but the actual Linux console outside of X-Windows.
 
 If you are in X-Windows, and don't know how to get to a console, then just hit CTRL-ALT-F1 (actually CTRL-ALT-F1 through CTRL-ALT-F6 works) and it should show you a console.  ALT-F7 or ALT-F8 will get you back to X-Windows.
+
+=head1 MANUAL LOCATION
+
+It is HIGHLY recommended that you read the "MANUAL.md" file instead of the Perl POD in this module.  It is searchable.  You can either read it directly on GitHub:
+
+ L<https://github.com/richcsst/Graphics-Framebuffer/blob/master/MANUAL.md>
+
+or via the command:
+
+ pandoc MANUAL.md | lynx -stdin
 
 =head1 OPERATIONAL THEORY
 
 How many Perl modules actually tell you how they work?  Well, I will tell you how this one works.
 
-The framebuffer is simply a special file that is mapped to the screen on Unix style systems like Linux or FreeBSD.  How the driver does this can be different.  Some may actually directly map the display memory to this file, and some install a second copy of the display to normal memory and copy it to the display on every vertical blank, usually with a fast DMA transfer.
+The framebuffer is simply a special file that is mapped to the screen on Unix style systems like Linux.  How the driver does this can be different.  Some may actually directly map the display memory to this file, and some install a second copy of the display to normal memory and copy it to the display on every vertical blank, usually with a fast DMA transfer.
 
 This module maps that file to a string, and that ends up making the string exactly the same size as the physical display.  Plotting is simply a matter of calculating where in the string that pixel is and modifying it, via "substr" (never using "=" directly).  It's that simple.
 
@@ -378,20 +390,20 @@ use threads ('yield', 'stringify', 'stack_size' => 131076, 'exit' => 'threads_on
 use threads::shared;
 ##THREADS##
 
-use POSIX       ();
 use POSIX       qw(modf);
+use IO::Handle;
 use Time::HiRes qw(sleep time);                                     # The time accuracy has to be milliseconds on many routines
 use Math::Bezier;                                                   # Bezier curve calculations done here.
 use Math::Gradient qw( gradient array_gradient multi_gradient );    # Awesome gradient calculation module
 use List::Util     qw(min max);                                     # min and max are very handy!
-use File::Map qw/:map :extra/;                                               # Absolutely necessary to map the screen to a string.
+use File::Map      qw/:map :extra/;                                 # Absolutely necessary to map the screen to a string.
 use Term::ReadKey;
 use Imager;                                                         # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
 use Imager::Fill;                                                   # For hatch fills
 use Imager::Fountain;                                               #
 use Imager::Font::Wrap;
-use Graphics::Framebuffer::Mouse;                                   # The mouse handler
+use Graphics::Framebuffer::Mouse;                                   # The mouse handler (useless)
 use Graphics::Framebuffer::Splash;                                  # The splash code is here
 
 Imager->preload;                                                    # The Imager documentation says to do this, but doesn't give much of an explanation why.
@@ -483,6 +495,7 @@ sub DESTROY {    # Always clean up after yourself before exiting
     unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
     _reset()                  if ($self->{'RESET'});       # Exit by calling 'reset' first
 } ## end sub DESTROY
+#
 
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
 
@@ -564,10 +577,8 @@ This instantiates the framebuffer object
 
 Framebuffer device name.  If this is not defined, then it tries the following devices in the following order:
 
-    Linux
-
-      *  /dev/fb0 - 31
-      *  /dev/graphics/fb0 - 31
+   *  /dev/fb0 - 31
+   *  /dev/graphics/fb0 - 31
 
 If none of these work, then the module goes into emulation mode.
 
@@ -723,6 +734,8 @@ sub new {
         'HATCHES' => [@HATCHES],    # Pull in hatches from Imager
         'FFMPEG'  => $FFMPEG,       # Location of FFMPEG binary or undef.
         'OS'      => $os,           # Name of the operating system (helps with dump debugging)
+
+        'LAST_FLUSHED' => time,
 
         # Set up the user defined graphics primitives and attributes default values
         'Imager-Has-TrueType'  => $Imager::formats{'tt'}  || 0,    # If you installed Imager properly, all of these should have valid values.  However, only one is needed for font operation.
@@ -1035,6 +1048,7 @@ sub new {
     if ((!$has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                          # We have to be in binary mode first
         select($self->{'FB'});
+		$self->{'FB'}->autoflush(TRUE);
         $| = 1;
         if ($self->{'ACCELERATED'}) {                                                                                                    # Pull in the C structure for the Framebuffer
             (                                                                                                                            # These need to be accurate to give accurate output
@@ -1194,16 +1208,16 @@ sub new {
             }
         } ## end if ($self->{'fscreeninfo'...})
 
-        $self->{'GPU'}                       = $self->{'fscreeninfo'}->{'id'};                                                                                                                  # The name of the GPU or video driver
-        $self->{'VXRES'}                     = $self->{'vscreeninfo'}->{'xres_virtual'};                                                                                                        # The virtual width of the screen
-        $self->{'VYRES'}                     = $self->{'vscreeninfo'}->{'yres_virtual'};                                                                                                        # The virtual height of the screen
-        $self->{'XRES'}                      = $self->{'vscreeninfo'}->{'xres'};                                                                                                                # The physical width of the screen
-        $self->{'YRES'}                      = $self->{'vscreeninfo'}->{'yres'};                                                                                                                # The physical height of the screen
-        $self->{'XOFFSET'}                   = $self->{'vscreeninfo'}->{'xoffset'} || 0;                                                                                                        # The horizontal offset of the screen from the beginning of the virtual screen
-        $self->{'YOFFSET'}                   = $self->{'vscreeninfo'}->{'yoffset'} || 0;                                                                                                        # The vertical offset of the screen from the beginning of the virtual screen
-        $self->{'BITS'}                      = $self->{'vscreeninfo'}->{'bits_per_pixel'};                                                                                                      # The bits per pixel of the screen
-        $self->{'BYTES'}                     = $self->{'BITS'} / 8;                                                                                                                             # The number of bytes per pixel
-        $self->{'BYTES_PER_LINE'}            = $self->{'fscreeninfo'}->{'line_length'};                                                                                                         # The length of a single scan line in bytes
+        $self->{'GPU'}                       = $self->{'fscreeninfo'}->{'id'};              # The name of the GPU or video driver
+        $self->{'VXRES'}                     = $self->{'vscreeninfo'}->{'xres_virtual'};    # The virtual width of the screen
+        $self->{'VYRES'}                     = $self->{'vscreeninfo'}->{'yres_virtual'};    # The virtual height of the screen
+        $self->{'XRES'}                      = $self->{'vscreeninfo'}->{'xres'};            # The physical width of the screen
+        $self->{'YRES'}                      = $self->{'vscreeninfo'}->{'yres'};            # The physical height of the screen
+        $self->{'XOFFSET'}                   = $self->{'vscreeninfo'}->{'xoffset'} || 0;    # The horizontal offset of the screen from the beginning of the virtual screen
+        $self->{'YOFFSET'}                   = $self->{'vscreeninfo'}->{'yoffset'} || 0;    # The vertical offset of the screen from the beginning of the virtual screen
+        $self->{'BITS'}                      = $self->{'vscreeninfo'}->{'bits_per_pixel'};  # The bits per pixel of the screen
+        $self->{'BYTES'}                     = $self->{'BITS'} / 8;                         # The number of bytes per pixel
+        $self->{'BYTES_PER_LINE'}            = $self->{'fscreeninfo'}->{'line_length'};     # The length of a single scan line in bytes
         $self->{'PIXELS'}                    = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
         $self->{'SIZE'}                      = $self->{'PIXELS'} * $self->{'BYTES'};
         $self->{'fscreeninfo'}->{'smem_len'} = $self->{'BYTES_PER_LINE'} * $self->{'VYRES'} if (!defined($self->{'fscreeninfo'}->{'smem_len'}) || $self->{'fscreeninfo'}->{'smem_len'} <= 0);
@@ -1214,7 +1228,6 @@ sub new {
         $self->{'fscreeninfo'}->{'accel'}    = $self->{'ACCEL_TYPES'}->[$self->{'fscreeninfo'}->{'accel'}];
 
         if ($self->{'BITS'} == 32 && $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'} == 0) {
-
             # The video driver doesn't use the alpha channel, but we do, so force it.
             $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'} = 8;
             $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
@@ -1355,6 +1368,8 @@ to F9.  One of them is set aside for X-Windows/Wayland.
 
         bless($self, $class);
     } ## end else [ if ((!$has_X) && defined...)]
+
+    $self->{'FB'}->autoflush(TRUE);
     $self->{'MIN_BYTES'} = max(3, $self->{'BYTES'});    # Helpful with Imager calls and avoids time wasting calculations
     $self->{'X_FACTOR'}  = 3840 / $self->{'XRES'};
     $self->{'Y_FACTOR'}  = 2160 / $self->{'YRES'};
@@ -1372,6 +1387,7 @@ to F9.  One of them is set aside for X-Windows/Wayland.
         }
     } ## end foreach my $font (qw(FreeSans Ubuntu-R Arial Oxygen-Sans Garuda LiberationSans-Regular Loma Helvetica))
     $self->_flush_screen();
+    $self->{'IS_VBOX'} = ($self->{'GPU'} =~ /vmwgfxdrmfb/i) ? TRUE : FALSE;
     unless ($self->{'RESET'}) {    # This is to restore the screen as it was when script started
         $self->{'START_SCREEN'} = '' . $self->{'SCREEN'};    # Force Perl to copy the string, not the reference
     }
@@ -1397,6 +1413,7 @@ sub _fix_mapping {    # File::Map SHOULD make this obsolete
         eval { close($self->{'FB'}); };
         open($self->{'FB'}, '+<', $self->{'FB_DEVICE'});
         binmode($self->{'FB'});
+		$self->{'FB'}->autoflush(TRUE);
         $self->_flush_screen();
     } ## end unless (defined($self->{'FB'...}))
     $self->{'MAP_ATTEMPTS'}++;
@@ -2242,7 +2259,7 @@ sub plot {
     } ## end else [ if ($self->{'ACCELERATED'...})]
     $self->{'X'} = $x;
     $self->{'Y'} = $y;
-    $| = 1;
+    $self->_flush_screen() if ($self->{'IS_VBOX'});
 } ## end sub plot
 
 =head2 setpixel
@@ -2519,7 +2536,7 @@ sub drawto {
 
     if ($self->{'ACCELERATED'}) {
         c_line($self->{'SCREEN'}, $start_x, $start_y, $x_end, $y_end, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $self->{'COLOR_ALPHA'}, $self->{'DRAW_MODE'}, $self->{'BYTES'}, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $antialiased,);
-        $| = 1;
+        $self->_flush_screen() if ($self->{'IS_VBOX'});
     } else {
         my $width;
         my $height;
@@ -2654,13 +2671,17 @@ sub _flush_screen {
     # Since the framebuffer is mappeed as a string device, Perl buffers the output, and this must be flushed.
     my $self = shift;
 
-    unless ($self->{'DEVICE'} eq 'EMULATED') {
-        select(STDERR);
-        $| = 1;
+    if ($self->{'LAST_FLUSHED'} <= time) {
+        if ($self->{'DEVICE'} eq 'EMULATED') {
+            select(STDERR);
+            $| = 1;
+        } else {
+            select($self->{'FB'}) if (defined($self->{'FB'}));
+            $| = 1;
+            $self->{'FB'}->flush();
+        }
+        $self->{'LAST_FLUSHED'} = time + (1/15);
     }
-    select($self->{'FB'}) if (defined($self->{'FB'}));
-    $| = 1;
-    sync $self->{'SCREEN'}, TRUE;
 } ## end sub _flush_screen
 
 sub _adj_plot {
@@ -4595,7 +4616,7 @@ sub fill {
             $self->blit_write($saved);
         } else {
             c_fill($self->{'SCREEN'}, $x, $y, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $color_alpha, $self->{'DRAW_MODE'}, $bytes, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'},);
-            $| = 1;
+            $self->_flush_screen() if ($self->{'IS_VBOX'});
         }
     } ## end else
 } ## end sub fill
@@ -4995,7 +5016,7 @@ sub blit_read {
             $scrn .= substr($fb,  $idx, $W);
         }
     } ## end else [ if ($h > 1 && $self->{...})]
-    $| = 1;
+    $self->_flush_screen() if ($self->{'IS_VBOX'});
     return ({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h, 'image' => $scrn });
 } ## end sub blit_read
 
@@ -5170,7 +5191,7 @@ sub blit_write {
             $self->_fix_mapping();
         }
     } ## end else [ if ($self->{'ACCELERATED'...})]
-    $| = 1;
+    $self->_flush_screen() if ($self->{'IS_VBOX'});
 } ## end sub blit_write
 
 sub _blit_adjust_for_clipping {
@@ -5397,7 +5418,7 @@ sub blit_transform {
         warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
 
         $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
-        $| = 1;
+        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'merge'}->{'dest_blit_data'}->{'x'},
@@ -5435,7 +5456,7 @@ sub blit_transform {
                 $new = "$image";
             }
         } ## end else [ if ($self->{'ACCELERATED'...})]
-        $| = 1;
+        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -5475,7 +5496,7 @@ sub blit_transform {
                 $data = $self->{'RAW_BACKGROUND_COLOR'} x (($wh**2) * $bytes);
 
                 c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes, $bits);
-                $| = 1;
+                $self->_flush_screen() if ($self->{'IS_VBOX'});
                 return (
                     {
                         'x'      => $params->{'blit_data'}->{'x'},
@@ -5519,7 +5540,7 @@ sub blit_transform {
             };
             warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         } ## end else
-        $| = 1;
+        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -5564,7 +5585,7 @@ sub blit_transform {
         };
         warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         $data = $self->_convert_24_to_16($data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
-        $| = 1;
+        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -5586,7 +5607,7 @@ sub blit_transform {
         if ($params->{'center'} == CENTER_Y || $params->{'center'} == CENTER_XY) {
             $y = $self->{'Y_CLIP'} + int(($YY - $height) / 2);
         }
-        $| = 1;
+        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $x,
@@ -5762,7 +5783,7 @@ sub monochrome {
     }
     if ($self->{'ACCELERATED'}) {
         c_monochrome($params->{'image'}, $size, $color_order, $inc, $params->{'bits'});
-        $| = 1;
+        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return ($params->{'image'});
     } else {
         for (my $byte = 0; $byte < length($params->{'image'}); $byte += $inc) {
@@ -5798,7 +5819,7 @@ sub monochrome {
             } ## end else [ if ($inc == 2) ]
         } ## end for (my $byte = 0; $byte...)
     } ## end else [ if ($self->{'ACCELERATED'...})]
-    $| = 1;
+    $self->_flush_screen() if ($self->{'IS_VBOX'});
     return ($params->{'image'});
 } ## end sub monochrome
 
@@ -7699,3 +7720,4 @@ Clone
 =back
 
 =cut
+

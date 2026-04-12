@@ -1,6 +1,6 @@
 # Graphics::Framebuffer Examples
 
-[![Graphics::Framebuffer Logo](../GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
+[![Graphics::Framebuffer Logo](../pics/GFB.png?raw=true "Graphics::Framebuffer Click For Demo Video")](https://www.youtube.com/watch?v=X8RpFBq6F9I)
 
 ## Example File Descriptions
 

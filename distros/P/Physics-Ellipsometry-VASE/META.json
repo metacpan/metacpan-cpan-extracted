@@ -1,7 +1,7 @@
 {
    "abstract" : "Variable Angle Spectroscopic Ellipsometry data fitting",
    "author" : [
-      "jtrujil1"
+      "Jovan Trujillo <jtrujil1@asu.edu>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -16,18 +16,20 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "data",
+         "examples"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0.96"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -46,12 +48,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jtrujil43/Ellipsometry/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jtrujil43/Ellipsometry.git",
          "web" : "https://github.com/jtrujil43/Ellipsometry"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@ package IPC::Manager::Client::AtomicPipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000018';
 
 use File::Spec;
 use Atomic::Pipe;
@@ -103,7 +103,7 @@ sub get_messages {
 
     @{$self->{+BUFFER}} = ();
 
-    return sort { $a->stamp <=> $b->stamp } @out;
+    return $self->sort_messages(@out);
 }
 
 sub send_message {

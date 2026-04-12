@@ -1,0 +1,75 @@
+{
+   "abstract" : "Generic mocking framework for Perl modules",
+   "author" : [
+      "Clive Holloway <clive.holloway@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SimpleMock",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "cover_db"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBI" : "0",
+            "HTTP::Status" : "0",
+            "LWP::UserAgent" : "0",
+            "Path::Tiny" : "0",
+            "URI" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Digest::SHA" : "0",
+            "Exporter" : "0",
+            "Hash::Merge" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "2.34",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBI" : "0",
+            "HTTP::Status" : "0",
+            "LWP::UserAgent" : "0",
+            "Path::Tiny" : "0",
+            "Test::Most" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cliveholloway/perl_simplemock.git",
+         "web" : "https://github.com/cliveholloway/perl_simplemock"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

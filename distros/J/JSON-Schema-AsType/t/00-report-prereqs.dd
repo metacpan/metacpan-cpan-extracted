@@ -6,32 +6,46 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Software::Security::Policy::Individual' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'Clone' => '0',
+                                      'DDP' => '0',
+                                      'Exporter::Tiny' => '0',
+                                      'Hash::Merge' => '0',
                                       'JSON' => '0',
+                                      'JSON::Pointer' => '0',
                                       'LWP::Simple' => '0',
                                       'List::AllUtils' => '0',
                                       'List::MoreUtils' => '0',
                                       'List::Util' => '0',
+                                      'List::UtilsBy' => '0',
+                                      'Math::BigFloat' => '0',
+                                      'Module::Runtime' => '0',
                                       'Moose' => '0',
                                       'Moose::Role' => '0',
                                       'Moose::Util' => '0',
-                                      'MooseX::ClassAttribute' => '0',
                                       'MooseX::MungeHas' => '0',
                                       'Path::Tiny' => '0.062',
+                                      'PerlX::Maybe' => '0',
+                                      'Ref::Util' => '0',
                                       'Scalar::Util' => '0',
+                                      'Test::Deep::NoTest' => '0',
                                       'Type::Library' => '0',
                                       'Type::Tiny' => '0',
                                       'Type::Tiny::Class' => '0',
                                       'Type::Utils' => '0',
                                       'Types::Standard' => '0',
                                       'URI' => '0',
-                                      'perl' => 'v5.14.0',
+                                      'base' => '0',
+                                      'experimental' => '0',
+                                      'feature' => '0',
+                                      'perl' => 'v5.42.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -41,16 +55,18 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Data::Dumper' => '0',
+                                   'Data::Printer' => '0',
                                    'Exporter' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Memoize' => '0',
                                    'Path::Tiny' => '0.062',
-                                   'Test::Deep' => '0',
+                                   'Test2::V1' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
-                                   'lib' => '0',
                                    'parent' => '0'
                                  }
                  }

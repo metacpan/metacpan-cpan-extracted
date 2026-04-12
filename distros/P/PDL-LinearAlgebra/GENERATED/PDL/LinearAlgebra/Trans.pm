@@ -18,7 +18,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.435';
+   our $VERSION = '0.436';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Trans $VERSION;

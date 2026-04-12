@@ -2,7 +2,7 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000016';
+our $VERSION = '0.000018';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed weaken/;
@@ -46,6 +46,8 @@ sub post_disconnect_hook { }
 
 sub reconnect { shift->connect(@_, reconnect => 1) }
 sub pid_check { croak "Client used from wrong PID" if $_[0]->{+PID} != $$; $_[0] }
+
+sub sort_messages { shift; IPC::Manager::Message::sort_messages(@_) }
 
 sub have_pending_messages { 0 }
 sub have_ready_messages   { croak "Not Implemented" }

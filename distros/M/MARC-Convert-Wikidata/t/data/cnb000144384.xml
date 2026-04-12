@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01035nam a22003012 a4500</leader>
+  <controlfield tag="001">srk19960144384</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20190523093307.0</controlfield>
+  <controlfield tag="008">960313s1981    xr a   e f    00| 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000144384</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">ABA001</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">677</subfield>
+    <subfield code="x">Textilní průmysl</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">19</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">677</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(035)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Příručka textilního odborníka /</subfield>
+    <subfield code="c">pod ved. Zdeňka Pospíšila zprac. kol. aut.</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">SNTL,</subfield>
+    <subfield code="c">1981</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">2 sv. ;</subfield>
+    <subfield code="c">8°</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Spoluvyd.: Alfa, Bratislava</subfield>
+  </datafield>
+  <datafield tag="505" ind1="0" ind2=" ">
+    <subfield code="a">Část 1. 773 s. il., tb., -- Část 2. s. 775-1294, il., tb.</subfield>
+  </datafield>
+  <datafield tag="521" ind1="8" ind2=" ">
+    <subfield code="a">Určeno [též] posl. všech typů odb. textilních škol</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">textilní průmysl</subfield>
+    <subfield code="7">ph116446</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">příručky</subfield>
+    <subfield code="7">fd133209</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Pospíšil, Zdeněk,</subfield>
+    <subfield code="d">1924-1987</subfield>
+    <subfield code="7">jk01100730</subfield>
+    <subfield code="4">edt</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="s">Část 1-2</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Průmysl textilní - příručky</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Textilie - výroba - příručky</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000144384</subfield>
+  </datafield>
+</record>
+
+</collection>

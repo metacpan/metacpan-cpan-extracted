@@ -1,0 +1,17 @@
+Changes
+cpanfile
+lib/Geo/Address/Parser/Country.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/edge_cases.t
+t/eof.t
+t/eol.t
+t/extended_tests.t
+t/function.t
+t/integration.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

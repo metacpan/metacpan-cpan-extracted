@@ -1,11 +1,18 @@
 Changes
 examples/fit_linear.pl
+examples/plot_fit.pl
+examples/vase_tauc_lorentz_fit.pl
+examples/vase_test_fit.pl
 lib/Physics/Ellipsometry/VASE.pm
+LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README.md
 t/01-basic.t
 t/02-fit.t
+t/03-woollam.t
 t/data/sample.dat
+t/data/woollam_sample.dat
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

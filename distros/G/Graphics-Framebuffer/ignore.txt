@@ -20,3 +20,4 @@ build
 t/*.pl
 t/pod.t
 ignore.txt
+pod_extract.pl

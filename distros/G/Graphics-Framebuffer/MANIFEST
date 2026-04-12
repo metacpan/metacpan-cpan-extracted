@@ -7,12 +7,12 @@ examples/images/Blonde_Pigtails.jpg
 examples/images/Halloween.jpg
 examples/images/README.md
 examples/images/RWBY_Beuowolf.png
-examples/images/RWBY_Crescent_Rose_Ruby.png
-examples/images/RWBY_White.jpg
+examples/images/HeavenlySword.png
+examples/images/SonicMania.png
+examples/images/LollipopChainsaw.jpg
 examples/images/Ryuko.jpg
 examples/images/Solid.jpg
-examples/images/Supercar.gif
-examples/images/usa.gif
+examples/images/DuckFire.gif
 examples/multiprocessing/get-mce-demos
 examples/multiprocessing/README.md
 examples/multiprocessing/README-MCE.md
@@ -28,9 +28,9 @@ examples/text_mode.pl
 examples/vector.pl
 examples/vector-usa.gfb
 examples/viewpic.pl
-SuperMe.jpg
-GFB.png
-pink.jpg
+pics/author.jpg
+pics/GFB.png
+pics/pink.jpg
 ignore.txt
 installing/detect.sh
 installing/FAQ.md
@@ -50,9 +50,10 @@ src/Framebuffer.c
 src/Framebuffer.pm
 src/metadata.txt
 src/README.md
-t/01-primitives.t
-Win-No.png
-Linux.png
+t/01-splash.t
+pics/Win-No.png
+pics/Linux.png
+pics/TinyPrint.jpg
 LICENSE
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

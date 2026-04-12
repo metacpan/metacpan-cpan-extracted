@@ -1,0 +1,70 @@
+{
+   "abstract" : "Resolve a place string component to a canonical country name",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-Address-Parser-Country",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Locale::AU" : "0",
+            "Locale::CA" : "0",
+            "Locale::Object::Country" : "0",
+            "Locale::US" : "0",
+            "Object::Configure" : "0",
+            "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0.1",
+            "Return::Set" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Geo-Address-Parser-Country@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser-Country",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser-Country"
+      },
+      "homepage" : "https://metacpan.org/pod/Geo::Address::Parser::Country",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Geo-Address-Parser-Country.git",
+         "web" : "https://github.com/nigelhorne/Geo-Address-Parser-Country"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

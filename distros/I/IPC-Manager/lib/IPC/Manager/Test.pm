@@ -747,7 +747,7 @@ sub test_disconnect_with_handler {
     });
 
     is(scalar @handled, 2, "Handler received 2 pending messages");
-    my @contents = map { $_->content->{msg} } sort { $a->stamp <=> $b->stamp } @handled;
+    my @contents = map { $_->content->{msg} } IPC::Manager::Message::sort_messages(@handled);
     is(\@contents, ['waiting_1', 'waiting_2'], "Handler got correct message contents");
 
     $con1->disconnect;
@@ -798,9 +798,10 @@ sub test_general_messages_to_service {
             my ($self, $msg) = @_;
             my $c = $msg->content;
             return unless ref($c) eq 'HASH' && defined $c->{text};
-            open my $fh, '>>', $general_file or die "open: $!";
+            open my $fh, '>', "$general_file.tmp" or die "open: $!";
             print $fh $c->{text}, "\n";
-            close $fh;
+            close $fh or die "close: $!";
+            rename "$general_file.tmp", $general_file or die "rename: $!";
         },
 
         handle_request => sub {
@@ -813,13 +814,13 @@ sub test_general_messages_to_service {
     $handle->client->send_message(gen_svc => {text => 'plain_hello'});
 
     my $waited = 0;
-    until (-e $general_file || $waited > 5) {
+    until (-s $general_file || $waited > 5) {
         Time::HiRes::sleep(0.1);
         $waited += 0.1;
     }
-    ok(-e $general_file, "on_general_message callback fired");
+    ok(-s $general_file, "on_general_message callback fired");
 
-    if (-e $general_file) {
+    if (-s $general_file) {
         open my $fh, '<', $general_file or die "open: $!";
         chomp(my $line = <$fh>);
         close $fh;

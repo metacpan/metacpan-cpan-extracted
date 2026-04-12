@@ -4,7 +4,7 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
-use List::Util qw(none);
+use List::Util 1.33 qw(none sum);
 use Readonly;
 use Roman;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_isbn clean_iss
 	clean_subtitle clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.32;
+our $VERSION = 0.33;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -129,7 +129,6 @@ sub clean_edition_number {
 
 	# Remove special meanings.
 	$ret_edition_number =~ s/,//msg;
-	$ret_edition_number =~ s/\s+a\s+//ms;
 
 	# Edition.
 	my $v1 = decode_utf8('Vydání');
@@ -246,6 +245,9 @@ sub clean_edition_number {
 	# Remove :
 	$ret_edition_number =~ s/\s*:\s*//ms;
 
+	# Detect first number.
+	$ret_edition_number =~ s/^(\d+)(?!.*\d).*$/$1/ms;
+
 	# Rename roman to arabic
 	if (isroman($ret_edition_number)) {
 		$ret_edition_number = arabic($ret_edition_number);
@@ -309,10 +311,23 @@ sub clean_number_of_pages {
 	}
 
 	my $ret_number_of_pages = $number_of_pages;
-	$ret_number_of_pages =~ s/^\[(\d+)\]/$1/ms;
-	$ret_number_of_pages =~ s/^(\d+)\s*(s\.|stran).*$/$1/ms;
-	# XXX First number.
-	$ret_number_of_pages =~ s/^(\d+)\s*,\s*.*/$1/ms;
+
+	# Remove []
+	$ret_number_of_pages =~ s/\[(\d+)\]/$1/msg;
+
+	# Remove text informations.
+	my $pril = decode_utf8('příl');
+	my $neci = decode_utf8('nečíslovaných');
+	$ret_number_of_pages =~ s/\s*(stran|s|$pril|$neci|l|barev|obr)\.*\s*//msg;
+
+	# Remove other characters like ':' and ';'.
+	$ret_number_of_pages =~ s/[:;]//msg;
+
+	# TODO Support roman numbers.
+	if ($ret_number_of_pages =~ m/^[\ \d,]+$/ms) {
+		my @numbers = split m/\s*,\s*/ms, $ret_number_of_pages;
+		$ret_number_of_pages = sum(@numbers);
+	}
 
 	if ($ret_number_of_pages !~ m/^\d+$/ms) {
 		if ($DEBUG) {
@@ -524,6 +539,8 @@ sub clean_series_ordinal {
 
 	my $c = decode_utf8('(č|Č)');
 	$ret_series_ordinal =~ s/^$c\.\s*//ms;
+	$c = decode_utf8('seš');
+	$ret_series_ordinal =~ s/^$c\.\s*//ms;
 	$c = decode_utf8('(č|Č)íslo');
 	$ret_series_ordinal =~ s/^$c\s*//ms;
 	$c = decode_utf8('(Výstava|Výst)');
@@ -532,6 +549,7 @@ sub clean_series_ordinal {
 	$ret_series_ordinal =~ s/$c\.?\s*//ms;
 	$c = decode_utf8('(díl)');
 	$ret_series_ordinal =~ s/$c\.?\s*//ms;
+	$ret_series_ordinal =~ s/(vol)\.?\s*//ms;
 
 	$ret_series_ordinal =~ s/(\d+),\s*(\d+)/$1-$2/ms;
 
@@ -546,6 +564,9 @@ sub clean_series_ordinal {
 			my $first_addition = substr $first, 0, ($first_len - $second_len);
 			$ret_series_ordinal = $first.'-'.$first_addition.$second;
 		}
+	} else {
+		# XXX Remove all other characters.
+		$ret_series_ordinal =~ s/^(\d+).*$/$1/ms;
 	}
 
 	return $ret_series_ordinal;
@@ -902,12 +923,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2025 Michal Josef Špaček
+© 2021-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.32
+0.33
 
 =cut

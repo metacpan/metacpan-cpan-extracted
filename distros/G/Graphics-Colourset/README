@@ -1,85 +1,249 @@
+NAME
 
-==== NAME ====
+    Graphics::Colourset - create sets of colours.
 
-Graphics::Colourset - create sets of colours.
+VERSION
 
+    version 0.06
 
-==== VERSION ====
+SYNOPSIS
 
-This describes version ``0.01'' of Graphics::Colourset.
+        use Graphics::Colourset;
+    
+        my $cs1 = Graphics::Colourset->new(hue=>60, shade=>1);
+        my @colsets = Graphics::Colourset->make_n_coloursets(number=>3,
+            hues=>\@hues,shades=>\@shades);
+    
+        my $col_str = $cs1->as_hex_string('foreground');
 
+DESCRIPTION
 
-==== DESCRIPTION ====
+    This module generates the colour definitions of a set of colours
+    suitable for using as the basis of a colour-scheme for an X-Windows
+    window-manager. They can also be used for CSS colour descriptions for
+    Web-pages. The colours are defined as the traditional "hex string", or
+    as the more recent "rgb string".
 
-This module generates the colour definitions of a set of colours suitable
-for using as the basis of a colour-scheme for an X-Windows window-manager.
-They can also be used for CSS colour descriptions for Web-pages. The colours
-are defined as the usual "hex string", or as the more recent "rgb string".
+    The aim of this is to avoid having to generate harmonious colour
+    schemes by hand but to input a minimum number of parameters and to
+    create all the colours from that.
 
-The aim of this is to avoid having to generate harmonious colour schemes by
-hand but to input a minimum number of parameters and to create all the
-colours from that.
+DETAILS
 
+ Coloursets
 
-==== REQUIRES ====
+    A "colourset" is a set of five colours, suitable for defining one type
+    of component in a window-manager or web-site "theme" or "colour
+    scheme". All colours in a colourset have the same hue, but have
+    different saturation and value (different "strengths") in keeping with
+    their different roles.
 
-    Graphics::ColorObject
-    Getopt::Long
-    Getopt::ArgvFile
-    Pod::Usage
-    Test::More
+    They are oriented towards being used for generating colours for buttons
+    and borders.
 
+    background
 
-==== INSTALLATION ====
+      The background colour is the main colour of the colourset, to be used
+      for the background of the "component" (whatever that may be).
 
-To install this module, run the following commands:
+    topshadow
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
+      The topshadow colour is a colour slightly lighter than the background
+      colour, suitable for using to define a "top shadow" colour.
 
-Or, if you're on a platform (like DOS or Windows) that doesn't like the "./"
-notation, you can do this:
+    bottomshadow
 
-   perl Build.PL
-   perl Build
-   perl Build test
-   perl Build install
+      The bottomshadow colour is a colour slightly darker than the
+      background colour, suitable for using to define a "bottom shadow"
+      colour.
 
-In order to install somewhere other than the default, such as in a directory
-under your home directory, like "/home/fred/perl" go
+    foreground
 
-   perl Build.PL --install_base /home/fred/perl
+      The foreground colour is the colour designated to be used for the
+      foreground, for text and the like. It is either much lighter or much
+      darker than the background colour, in order to contrast suitably.
 
-as the first step instead.
+    foreground_inactive
 
-This will install the files underneath /home/fred/perl.
+      The "inactive" foreground colour is a colour which is intended to be
+      used for things which are "greyed out", or not active. It is a colour
+      which contrasts with the background, but not as much as the
+      "foreground" colour.
 
-You will then need to make sure that you alter the PERL5LIB variable to find
-the modules, and the PATH variable to find the script.
+    There are two parameters which determine the colours of a colourset.
 
-Therefore you will need to change: your path, to include
-/home/fred/perl/script (where the script will be)
+    hue
 
-        PATH=/home/fred/perl/script:${PATH}
+      The hue in a 360 degree colour wheel. As a special tweak, if the hue
+      equals 360, it is taken to be no hue at all (grey). This doesn't
+      actually lose any hues, since 360 is normally exactly the same as
+      zero (red).
 
-the PERL5LIB variable to add /home/fred/perl/lib
+    shade
 
-        PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+      The general "lightness" of the background. This is a range from 1 to
+      4, with 1 being the darkest and 4 being the lightest. This also
+      determines the foreground colour, since a dark background will need a
+      light foreground and visa-versa.
 
+      If the shade is outside this range, a random shade will be picked.
 
-==== AUTHOR ====
+ Base and Alternative Coloursets
 
-    Kathryn Andersen (RUBYKAT)
-    perlkat AT katspace dot com
-    http://www.katspace.com
+    The "base" colourset is considered to be the main colourset; additional
+    coloursets can be generated which are related to the base colourset in
+    a contrasting-but-harmonious way.
 
+    One test for the harmoniousness is to compare two coloursets and decide
+    whether they would be "ugly" together. This is done in a rule-of-thumb
+    way, which isn't perfect.
 
-==== COPYRIGHT AND LICENCE ====
+CLASS METHODS
 
-Copyright (c) 2005 by Kathryn Andersen
+ new
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+    Create a new colourset, given an input hue, and foreground/background
+    disposition.
+
+    $my colset = Graphics::Colourset->new( hue=>$hue, shade=>1, );
+
+ make_n_coloursets
+
+    my @colsets = Graphics::Colourset::make_n_coloursets(number=>$num,
+    shades=>[1,0,3,4], hues=>[10,50,undef,undef], styles=>\@styles);
+
+    Make $num coloursets, based on the given shades and hues; if a shade is
+    zero or undef, a random shade will be chosen; if a hue is undef, a
+    random hue will be chosen. The coloursets will be generated, but
+    checked with is_ugly to ensure that it isn't ugly. They will also be
+    checked to make sure that they aren't the same as the other coloursets.
+
+    styles (optional): The possible colourset styles. By default, this is
+    complement, splitcomp, triad, tetrad, analog, mono.
+
+    Note that larger numbers will take longer and be more difficult to
+    generate.
+
+ attempt_n_coloursets
+
+    my @colsets = Graphics::Colourset::attempt_n_coloursets(number=>$num,
+    shades=>[1,0,3,4], hues=>[10,50,undef,undef]);
+
+    Make $num coloursets, based on the given shades and hues; if a shade is
+    zero or undef, a random shade will be chosen; if a hue is undef, a
+    random hue will be chosen. The coloursets will be generated, but
+    checked with is_ugly to ensure that it isn't ugly. They will also be
+    checked to make sure that they aren't the same as the other coloursets.
+
+    If a colourset is ugly, an empty set is returned.
+
+    Note that larger numbers will take longer and be more difficult to
+    generate.
+
+OBJECT METHODS
+
+ as_hex_string
+
+    my $colstr = $self->as_hex_string('foreground');
+
+    Return the given colour as a hex colour string such as #99FF00
+
+ as_rgb_string
+
+    my $colstr = $self->as_rgb_string('foreground');
+
+    Return the given colour as an X colour string such as rgb:99/FF/00
+
+ greener_hue
+
+    my $green = $self->greener_hue();
+
+    Calculate a hue which is closer to green than the scheme's own hue
+
+ redder_hue
+
+    my $red = $self->redder_hue();
+
+    Calculate a hue which is closer to red than the scheme's own hue
+
+ equals
+
+    Checks if the given colourset equals the passed-in one.
+
+    if ($colset->equals($other_colset)) { ... }
+
+ is_ugly
+
+    my $ret = $colset1->is_ugly($colset2);
+
+    Compares two coloursets and declares whether they would be ugly
+    together. This is naturally a subjective assessment on the part of the
+    author, but hopefully helpful.
+
+REQUIRES
+
+        Graphics::ColorObject
+        Getopt::Long
+        Getopt::ArgvFile
+        Pod::Usage
+        Test::More
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+    Or, if you're on a platform (like DOS or Windows) that doesn't like the
+    "./" notation, you can do this:
+
+       perl Build.PL
+       perl Build
+       perl Build test
+       perl Build install
+
+    In order to install somewhere other than the default, such as in a
+    directory under your home directory, like "/home/fred/perl" go
+
+       perl Build.PL --install_base /home/fred/perl
+
+    as the first step instead.
+
+    This will install the files underneath /home/fred/perl.
+
+    You will then need to make sure that you alter the PERL5LIB variable to
+    find the modules, and the PATH variable to find the script.
+
+    Therefore you will need to change: your path, to include
+    /home/fred/perl/script (where the script will be)
+
+            PATH=/home/fred/perl/script:${PATH}
+
+    the PERL5LIB variable to add /home/fred/perl/lib
+
+            PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+SEE ALSO
+
+    perl(1).
+
+BUGS
+
+    Please report any bugs or feature requests to the author.
+
+AUTHOR
+
+        Kathryn Andersen (RUBYKAT)
+        perlkat AT katspace dot com
+        http://www.katspace.com
+
+COPYRIGHT AND LICENCE
+
+    Copyright (c) 2005 by Kathryn Andersen
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

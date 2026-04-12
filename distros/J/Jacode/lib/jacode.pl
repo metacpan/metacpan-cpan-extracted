@@ -6,13 +6,45 @@ package jacode;
 #
 # https://metacpan.org/dist/Jacode
 #
-# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+#
+######################################################################
+#
+# Compatibility: Perl 4.036 through current Perl 5.
+# This file is UTF-8 encoded (verified at runtime by the regex above).
+#
+# File structure:
+#   BEGIN          -- use strict / use vars guards (Perl4-portable)
+#   $0 eq __FILE__ -- standalone pkf (Perl Kanji Filter) command mode
+#   init()         -- public initializer; calls the four sub-initializers:
+#     _init_regex        -- compile $re_* / $esc_* / $undef_* globals
+#     _init_kana_table   -- build %h2z / %z2h from embedded JIS table
+#     _init_convf        -- register %convf / %h2zf / %z2hf dispatch tables
+#     _init_encode_table -- populate Ken Lunde CJKV SJIS<->EUC lookup tables
+#     _init_jcode_alias  -- install jcode:: namespace aliases
+#   jis_inout / get_inout   -- JIS escape sequence control
+#   getcode / _count_ctype  -- encoding auto-detection
+#   convert / to / what / trans -- public conversion API
+#   sjis2jis .. utf82utf8   -- core encoding converters (XtoY + _XtoY pairs)
+#   s2e / e2s / u2s / e2u / s2u / u2e -- single-char low-level converters
+#   jis2jis / sjis2sjis / euc2euc / utf82utf8 -- identity + h2z/z2h
+#   cache / nocache / flush / flushcache -- cache control
+#   h2z_* / z2h_* / init_z2h_* / init_h2z_* -- kana width converters
+#   init_sjis2utf8 / init_utf82sjis / init_k2u / init_u2k -- lazy loaders
+#   tr / _maketable / _expnd1 / _expnd2 -- DBCS-aware transliteration
+#
 ######################################################################
 
 # Perl4 script and also Perl5 script
 sub BEGIN {
     eval q{ use strict; };
     eval q{
+        # Global variables declared here for Perl 5 strict compatibility.
+        # All these are also implicitly global in Perl 4 (no-op there).
+        # Scalars: conversion state, regex strings, escape sequences,
+        #          undefined-char substitutes, cache flag.
+        # Hashes:  conversion dispatch tables, lookup caches, kana maps.
+        # Arrays:  tr() operand lists and pkf read-ahead buffer.
         use vars (
             '$esc_ASCII',
             '$INPUT_encoding',
@@ -140,7 +172,7 @@ sub BEGIN {
 
 $support_jcode_package_too = 1;
 
-$VERSION = '2.13.4.31';
+$VERSION = '2.13.4.32';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -387,11 +419,30 @@ END
 }
 
 #---------------------------------------------------------------------
-# Initialize variables
+# Initialize all state — calls the four sub-initializers below.
+# Idempotent: safe to call multiple times (subsequent calls are no-ops
+# because $version is set on first call).
 #---------------------------------------------------------------------
 sub init {
     $version = $VERSION;
 
+    &_init_regex;
+    &_init_kana_table;
+    &_init_convf;
+    &_init_encode_table;
+    &_init_jcode_alias;
+}
+
+#---------------------------------------------------------------------
+# _init_regex — compile all regular expressions used for encoding
+# detection and character classification.
+#
+# Called once by init().  Results are stored in package globals
+# ($re_*, $esc_*, $undef_*, $cache).
+#---------------------------------------------------------------------
+sub _init_regex {
+
+    # Binary-marker bytes (not valid in any Japanese text encoding)
     $re_bin = '[\x00-\x06\x7f\xff]';
 
     $re_esc_jis0208_1978        = '\e\$\@';     # "\x1b\x24\x40"             '@' JIS C 6226-1978
@@ -469,12 +520,25 @@ sub init {
       . '|[\xf1-\xf3][\x80-\xbf][\x80-\xbf][\x80-\xbf]'
       . '|[\xf4-\xf4][\x80-\x8f][\x80-\xbf][\x80-\xbf]';
 
-    # use 'geta' for cancel tofu (undefined character code)
-    $undef_sjis = "\x81\xac";
-    $undef_euc  = "\xa2\xae";
-    $undef_utf8 = "\xe3\x80\x93";
+    # Substitute character for undefined code points (tofu/geta)
+    $undef_sjis = "\x81\xac";   # SJIS: 〓 (geta)
+    $undef_euc  = "\xa2\xae";   # EUC: 〓 (geta)
+    $undef_utf8 = "\xe3\x80\x93"; # UTF-8: 〓 (U+3013 GETA MARK)
 
+    # Enable conversion cache by default
     $cache = 1;
+}
+
+#---------------------------------------------------------------------
+# _init_kana_table — build the JIS X0201 <-> JIS X0208 kana mapping
+# (%h2z, %z2h) from an embedded table and verify its integrity.
+#
+# The table is stored as raw JIS bytes (without escape sequences)
+# and shifted to EUC range via tr/\x21-\x7e/\xa1-\xfe/.
+# Splitting into %h2z/%h2z_high handles both regular and high-byte
+# sided entries.
+#---------------------------------------------------------------------
+sub _init_kana_table {
 
     # JIS X0201 -> JIS X0208 KANA conversion table.  Looks weird?
     # Not that much.  This is simply JIS text without escape sequences.
@@ -533,6 +597,17 @@ __TABLE_END__
     if ( scalar( keys %z2h ) != scalar( keys %h2z ) ) {
         die "scalar(keys %z2h) != scalar(keys %h2z).";
     }
+}
+
+#---------------------------------------------------------------------
+# _init_convf — register all encoding-conversion function references
+# into %convf, %h2zf, and %z2hf dispatch tables.
+#
+# %convf  keys: "$INPUT_encoding\034$OUTPUT_encoding"
+# %h2zf   keys: encoding name   (halfwidth kana -> fullwidth)
+# %z2hf   keys: encoding name   (fullwidth kana -> halfwidth)
+#---------------------------------------------------------------------
+sub _init_convf {
 
     $convf{ join($;, 'euc',  'euc' ) } = *euc2euc;
     $convf{ join($;, 'euc',  'jis' ) } = *euc2jis;
@@ -563,6 +638,25 @@ __TABLE_END__
     $z2hf{'jis'}  = *z2h_jis;
     $z2hf{'sjis'} = *z2h_sjis;
     $z2hf{'utf8'} = *z2h_utf8;
+}
+
+#---------------------------------------------------------------------
+# _init_encode_table — populate the four Ken Lunde CJKV lookup tables
+# used for byte-level SJIS <-> EUC-JP conversion.
+#
+# Source: Appendix A of "CJKV Information Processing" (Ken Lunde),
+# 1st and 2nd editions.
+#
+# Tables:
+#   %Ken_Lunde_CJKV_AppA_sjis2euc1st_a  -- SJIS 1st byte (even row)
+#   %Ken_Lunde_CJKV_AppA_sjis2euc1st_b  -- SJIS 1st byte (odd row)
+#   %Ken_Lunde_CJKV_AppA_sjis2euc2nd_a  -- SJIS 2nd byte (even row)
+#   %Ken_Lunde_CJKV_AppA_sjis2euc2nd_b  -- SJIS 2nd byte (odd row)
+#   %Ken_Lunde_CJKV_AppA_euc2sjis1st    -- EUC 1st byte -> SJIS 1st byte
+#   %Ken_Lunde_CJKV_AppA_euc2sjis2nd_odd  -- EUC 2nd byte (odd row)
+#   %Ken_Lunde_CJKV_AppA_euc2sjis2nd_even -- EUC 2nd byte (even row)
+#---------------------------------------------------------------------
+sub _init_encode_table {
 
     # Appendix A. Japanese Code Conversion Table
     # Understanding Japanese Information Processing
@@ -1155,6 +1249,17 @@ __TABLE_END__
 0xfd,0xfb,
 0xfe,0xfc,
     );
+}
+
+#---------------------------------------------------------------------
+# _init_jcode_alias — install jacode:: symbols into the jcode::
+# namespace so that existing code using &jcode'xxx continues to work.
+#
+# Each glob is assigned twice (idempotent double-assignment is a
+# Perl4-portable way to suppress the "used only once" warning).
+# The AUTOLOAD alternative is left as a comment for reference.
+#---------------------------------------------------------------------
+sub _init_jcode_alias {
 
     # package jacode;
     # sub AUTOLOAD {
@@ -1263,7 +1368,11 @@ sub get_inout {
 }
 
 #---------------------------------------------------------------------
-# Recognize character code (by Kazumasa Utashiro-san 2000/09/29)
+# getcode_utashiro_2000_09_29 — original encoding detector by Utashiro
+# (preserved for reference / jcode.pl compatibility).
+#
+# Simpler than getcode(): counts SJIS and EUC byte runs, picks the
+# longer match.  Does not handle UTF-8.
 #---------------------------------------------------------------------
 sub getcode_utashiro_2000_09_29 {
     local (*s) = @_;
@@ -1318,7 +1427,19 @@ sub max_utashiro_2000_09_29 {
 }
 
 #---------------------------------------------------------------------
-# Recognize character code
+# getcode — detect the character encoding of string *s.
+#
+# Returns encoding name in scalar context, (matched_bytes, name) in list.
+# Encoding names: 'jis', 'sjis', 'euc', 'utf8', 'binary', or undef.
+#
+# Detection strategy (in order):
+#   1. Pure ASCII / empty  -> undef
+#   2. Binary marker bytes -> 'binary'
+#   3. 1-byte input        -> classify by range
+#   4. 2-byte input        -> compare against popular codepoint lists
+#   5. JIS escape present  -> 'jis'
+#   6. 3+ bytes            -> parse each encoding, pick best fit,
+#                             break ties with _count_ctype() + priority
 #---------------------------------------------------------------------
 sub getcode {
     local (*s) = @_;
@@ -1568,7 +1689,18 @@ sub getcode {
 }
 
 #---------------------------------------------------------------------
-# Count ctype of string
+# _count_ctype — count the number of character-type transitions in
+# a string parsed under the given encoding.
+#
+# Used as a tiebreaker in getcode(): the encoding that produces fewer
+# ctype transitions is more likely correct (e.g. a run of hiragana
+# counts as 1, not N individual characters).
+#
+# Recognized ctypes per encoding:
+#   sjis: ASCII, half-kana, fullwidth numeric/alpha/hiragana/katakana, other
+#   euc:  ASCII, half-kana, fullwidth numeric/alpha/hiragana/katakana, other
+#   utf8: ASCII, half-kana, fullwidth numeric/alpha/hiragana/katakana, other
+#   binary: each byte counts as its own type
 #---------------------------------------------------------------------
 sub _count_ctype {
     local ( $encoding, $_ ) = @_;
@@ -1627,7 +1759,19 @@ sub _count_ctype {
 }
 
 #---------------------------------------------------------------------
-# Convert any code to specified code
+# convert — convert string *s from INPUT_encoding to OUTPUT_encoding.
+#
+# Arguments: (*s, $OUTPUT_encoding, $INPUT_encoding, $option)
+#   $INPUT_encoding  may be undef -> auto-detected via getcode()
+#   $OUTPUT_encoding 'noconv'   -> keep original encoding
+#   $option          'z'/'h'   -> h2z / z2h kana conversion
+#
+# Returns (glob_ref, input_enc) in list context, input_enc in scalar.
+# Returns (undef, undef) if encoding cannot be determined.
+# Returns (undef, 'binary') if input is binary.
+#
+# For encodings not in %convf (e.g. iso-8859-1), falls back to
+# Encode::from_to() on Perl >= 5.8.
 #---------------------------------------------------------------------
 sub convert {
     local ( *s, $OUTPUT_encoding, $INPUT_encoding, $option ) = @_;
@@ -1665,15 +1809,17 @@ sub convert {
 
 #---------------------------------------------------------------------
 # Easy return-by-value interfaces
+# These thin wrappers call to() and return the converted string.
+# Usage: $out = &jacode'jis($str [, $from_enc [, $option]])
 #---------------------------------------------------------------------
 sub jis  { &to( 'jis',  @_ ); }
-#---------------------------------------------------------------------
 sub euc  { &to( 'euc',  @_ ); }
-#---------------------------------------------------------------------
 sub sjis { &to( 'sjis', @_ ); }
-#---------------------------------------------------------------------
 sub utf8 { &to( 'utf8', @_ ); }
 
+#---------------------------------------------------------------------
+# to — return-by-value front-end for convert().
+#   &jacode'to($OUTPUT_enc, $string [, $INPUT_enc [, $option]])
 #---------------------------------------------------------------------
 sub to {
     local ( $OUTPUT_encoding, $s, $INPUT_encoding, $option ) = @_;
@@ -1682,11 +1828,16 @@ sub to {
 }
 
 #---------------------------------------------------------------------
+# what — return the encoding name of $string (calls getcode()).
+#---------------------------------------------------------------------
 sub what {
     local ($s) = @_;
     &getcode(*s);
 }
 
+#---------------------------------------------------------------------
+# trans — return-by-value front-end for tr().
+#   &jacode'trans($string, $from, $to [, $option])
 #---------------------------------------------------------------------
 sub trans {
     local ($s) = shift;
@@ -1706,6 +1857,12 @@ sub sjis2jis {
     $n;
 }
 
+#---------------------------------------------------------------------
+# _sjis2jis — inner converter called by sjis2jis().
+# Dispatches a matched run to the appropriate JIS escape sequence:
+#   ASCII run  -> ESC ( B  + as-is
+#   Half kana  -> ESC ( I  + tr to 0x21-0x5f range
+#   SJIS DBCS  -> ESC $ B  + via s2e() byte mapping + tr to 0x21-0x7e
 #---------------------------------------------------------------------
 sub _sjis2jis {
     local ($s) = shift;
@@ -1736,6 +1893,13 @@ sub euc2jis {
     $n;
 }
 
+#---------------------------------------------------------------------
+# _euc2jis — inner converter called by euc2jis().
+# Dispatches a matched run to the appropriate JIS escape sequence:
+#   SS2 (0x8e) prefix  -> ESC ( I  half-width kana
+#   SS3 (0x8f) prefix  -> ESC $ ( D  JIS X0212
+#   ASCII run           -> ESC ( B  + as-is
+#   EUC DBCS            -> ESC $ B  + tr to 0x21-0x7e
 #---------------------------------------------------------------------
 sub _euc2jis {
     local ($s) = shift;
@@ -1771,6 +1935,13 @@ sub jis2euc {
 }
 
 #---------------------------------------------------------------------
+# _jis2euc — inner converter called by jis2euc().
+# Maps each JIS escape-sequence run to EUC-JP byte sequence:
+#   ESC ( B/J  -> ASCII passthrough
+#   ESC ( I    -> SS2 (0x8e) prefix + tr to 0xa1-0xfe
+#   ESC $ ( D  -> SS3 (0x8f) prefix + tr
+#   ESC $ @/B  -> tr to 0xa1-0xfe (2-byte EUC)
+#---------------------------------------------------------------------
 sub _jis2euc {
     local ( $esc, $s ) = @_;
     if ( $esc =~ /^$re_esc_asc/o ) {
@@ -1801,6 +1972,14 @@ sub jis2sjis {
     $n;
 }
 
+#---------------------------------------------------------------------
+# _jis2sjis — inner converter called by jis2sjis().
+# Maps each JIS escape-sequence run to SJIS byte sequence:
+#   ESC ( B/J  -> ASCII passthrough
+#   ESC ( I    -> half-width kana: tr to 0xa1-0xfe
+#   ESC $ ( D  -> JIS X0212: replace with $undef_sjis (no SJIS mapping)
+#   ESC $ @/B  -> tr to 0xa1-0xfe then e2s() DBCS mapping
+#   Bug fix vs jcode.pl 2.13: $n = length($s) not $n = length
 #---------------------------------------------------------------------
 sub _jis2sjis {
 
@@ -1856,6 +2035,10 @@ sub sjis2euc {
 }
 
 #---------------------------------------------------------------------
+# s2e — convert a single SJIS character (1 or 2 bytes) to EUC-JP.
+# Uses %Ken_Lunde_CJKV_AppA_sjis2euc* lookup tables.
+# Results are cached in %s2e when $cache is true.
+#---------------------------------------------------------------------
 sub s2e {
     local ($code) = @_;
     local ( $c1, $c2 ) = unpack( 'CC', $code );
@@ -1901,6 +2084,11 @@ sub euc2sjis {
     $n;
 }
 
+#---------------------------------------------------------------------
+# e2s — convert a single EUC-JP character (2 or 3 bytes) to SJIS.
+# Handles SS2 (0x8e, half kana) and SS3 (0x8f, JIS X0212->undef_sjis).
+# Uses %Ken_Lunde_CJKV_AppA_euc2sjis* lookup tables.
+# Results are cached in %e2s when $cache is true.
 #---------------------------------------------------------------------
 sub e2s {
     local ($code) = @_;
@@ -1948,6 +2136,12 @@ sub utf82jis {
 }
 
 #---------------------------------------------------------------------
+# _utf82jis — inner converter called by utf82jis().
+# Dispatches a matched run to the appropriate JIS escape sequence:
+#   ASCII run  -> ESC ( B  + as-is
+#   UTF-8 kana -> ESC ( I  via %u2k table + tr to 0x21-0x7e
+#   UTF-8 DBCS -> ESC $ B  via u2e() + tr to 0x21-0x7e
+#---------------------------------------------------------------------
 sub _utf82jis {
     local ($u) = @_;
     if ( $u =~ /^$re_ascii/o ) {
@@ -1969,6 +2163,10 @@ sub _utf82jis {
 #---------------------------------------------------------------------
 # UTF-8 to EUC-JP
 #---------------------------------------------------------------------
+# utf82euc — convert UTF-8 string to EUC-JP in-place (*u).
+# Calls utf82utf8() first when $option is set (h2z/z2h pre-processing).
+# Returns count of converted multibyte characters.
+#---------------------------------------------------------------------
 sub utf82euc {
     local ( *u, $option ) = @_;
     &utf82utf8( *u, $option ) if $option;
@@ -1977,6 +2175,10 @@ sub utf82euc {
     $n;
 }
 
+#---------------------------------------------------------------------
+# _utf82euc — inner byte-level UTF-8 to EUC-JP converter.
+#   UTF-8 kana  -> SS2 (0x8e) + u2k byte via %u2k
+#   Other UTF-8 -> u2e() lookup
 #---------------------------------------------------------------------
 sub _utf82euc {
     local ($u) = @_;
@@ -1990,6 +2192,10 @@ sub _utf82euc {
     $u;
 }
 
+#---------------------------------------------------------------------
+# u2e — convert a single UTF-8 character to EUC-JP.
+# Chains: UTF-8 -> SJIS (u2s/u2s cache) -> EUC (s2e/s2e cache).
+# Result is cached in %u2e when $cache is true.
 #---------------------------------------------------------------------
 sub u2e {
     local ($code) = @_;
@@ -2007,6 +2213,10 @@ sub u2e {
 #---------------------------------------------------------------------
 # UTF-8 to SJIS
 #---------------------------------------------------------------------
+# utf82sjis — convert UTF-8 string to SJIS in-place (*u).
+# Calls utf82utf8() first when $option is set (h2z/z2h pre-processing).
+# Returns count of converted multibyte characters.
+#---------------------------------------------------------------------
 sub utf82sjis {
     local ( *u, $option ) = @_;
     &utf82utf8( *u, $option ) if $option;
@@ -2015,6 +2225,11 @@ sub utf82sjis {
     $n;
 }
 
+#---------------------------------------------------------------------
+# u2s — convert a single UTF-8 character to SJIS.
+# Lookup order: %u2s cache -> %JP170559 -> %utf82sjis_1 -> %utf82sjis_2
+# -> $undef_sjis.  JP170559 covers vendor-specific / NTT DoCoMo mappings.
+# Results are cached in %u2s when $cache is true.
 #---------------------------------------------------------------------
 sub u2s {
     local ($utf8);
@@ -2065,6 +2280,13 @@ sub jis2utf8 {
 }
 
 #---------------------------------------------------------------------
+# _jis2utf8 — inner converter called by jis2utf8().
+# Maps each JIS escape-sequence run to UTF-8:
+#   ESC ( B/J  -> ASCII passthrough
+#   ESC ( I    -> half-width kana via %k2u
+#   ESC $ ( D  -> JIS X0212: replace with $undef_utf8
+#   ESC $ @/B  -> DBCS: tr to EUC range then e2u()
+#---------------------------------------------------------------------
 sub _jis2utf8 {
     local ( $esc, $s ) = @_;
     if ( $esc =~ /^$re_esc_asc/o ) {
@@ -2087,6 +2309,10 @@ sub _jis2utf8 {
 #---------------------------------------------------------------------
 # EUC-JP to UTF-8
 #---------------------------------------------------------------------
+# euc2utf8 — convert EUC-JP string to UTF-8 in-place (*u).
+# Calls euc2euc() first when $option is set (h2z/z2h pre-processing).
+# Returns count of converted multibyte characters.
+#---------------------------------------------------------------------
 sub euc2utf8 {
     local ( *u, $option ) = @_;
     &euc2euc( *u, $option ) if $option;
@@ -2095,6 +2321,11 @@ sub euc2utf8 {
     $n;
 }
 
+#---------------------------------------------------------------------
+# _euc2utf8 — inner byte-level EUC-JP to UTF-8 converter.
+#   EUC 0212 (SS3) -> $undef_utf8 (no mapping)
+#   EUC kana (SS2) -> half-width kana via %k2u
+#   EUC DBCS        -> e2u() lookup
 #---------------------------------------------------------------------
 sub _euc2utf8 {
     local ($s) = @_;
@@ -2111,6 +2342,10 @@ sub _euc2utf8 {
     $s;
 }
 
+#---------------------------------------------------------------------
+# e2u — convert a single EUC-JP character to UTF-8.
+# Converts EUC byte pair to SJIS via arithmetic, then looks up
+# %sjis2utf8_1 / %sjis2utf8_2.  Result cached in %e2u when $cache.
 #---------------------------------------------------------------------
 sub e2u {
     local ( $c1, $c2, $euc, $sjis );
@@ -2149,6 +2384,10 @@ sub e2u {
 #---------------------------------------------------------------------
 # SJIS to UTF-8
 #---------------------------------------------------------------------
+# sjis2utf8 — convert SJIS string to UTF-8 in-place (*s).
+# Calls sjis2sjis() first when $option is set (h2z/z2h pre-processing).
+# Returns count of converted multibyte characters.
+#---------------------------------------------------------------------
 sub sjis2utf8 {
     local ( *s, $option ) = @_;
     &sjis2sjis( *s, $option ) if $option;
@@ -2157,6 +2396,11 @@ sub sjis2utf8 {
     $n;
 }
 
+#---------------------------------------------------------------------
+# s2u — convert a single SJIS character to UTF-8.
+# Lookup order: %s2u cache -> %k2u (half kana) -> %sjis2utf8_1
+#              -> %sjis2utf8_2 -> $undef_utf8.
+# Results are cached in %s2u when $cache is true.
 #---------------------------------------------------------------------
 sub s2u {
     local ($sjis);
@@ -2192,7 +2436,15 @@ sub s2u {
 }
 
 #---------------------------------------------------------------------
-# JIS to JIS, SJIS to SJIS, EUC-JP to EUC-JP, UTF-8 to UTF-8
+# Identity converters — normalize escape sequences and apply h2z/z2h.
+#
+# jis2jis:   normalizes JIS escape sequences to current $esc_0208/$esc_asc
+#            and applies h2z_jis/z2h_jis when $option is 'z'/'h'.
+# sjis2sjis:  applies h2z_sjis/z2h_sjis when $option is 'z'/'h'.
+# euc2euc:   applies h2z_euc/z2h_euc   when $option is 'z'/'h'.
+# utf82utf8: applies h2z_utf8/z2h_utf8  when $option is 'z'/'h'.
+#
+# All return 0 (no characters converted by the identity step itself).
 #---------------------------------------------------------------------
 sub jis2jis {
     local ( *s, $option ) = @_;
@@ -2211,6 +2463,8 @@ sub jis2jis {
 }
 
 #---------------------------------------------------------------------
+# sjis2sjis — SJIS identity conversion (applies h2z/z2h if $option set).
+#---------------------------------------------------------------------
 sub sjis2sjis {
     local ( *s, $option ) = @_;
     local ($n) = 0;
@@ -2226,6 +2480,8 @@ sub sjis2sjis {
 }
 
 #---------------------------------------------------------------------
+# euc2euc — EUC-JP identity conversion (applies h2z/z2h if $option set).
+#---------------------------------------------------------------------
 sub euc2euc {
     local ( *s, $option ) = @_;
     local ($n) = 0;
@@ -2240,6 +2496,8 @@ sub euc2euc {
     $n;
 }
 
+#---------------------------------------------------------------------
+# utf82utf8 — UTF-8 identity conversion (applies h2z/z2h if $option set).
 #---------------------------------------------------------------------
 sub utf82utf8 {
     local ( *s, $option ) = @_;
@@ -2258,12 +2516,16 @@ sub utf82utf8 {
 #---------------------------------------------------------------------
 # Cache control subroutines
 #---------------------------------------------------------------------
+# cache — enable conversion cache; returns previous setting.
+#---------------------------------------------------------------------
 sub cache {
     local ($previous) = $cache;
     $cache = 1;
     $previous;
 }
 
+#---------------------------------------------------------------------
+# nocache — disable conversion cache; returns previous setting.
 #---------------------------------------------------------------------
 sub nocache {
     local ($previous) = $cache;
@@ -2272,10 +2534,15 @@ sub nocache {
 }
 
 #---------------------------------------------------------------------
+# flush — alias for flushcache() (kept for jcode.pl compatibility).
+#---------------------------------------------------------------------
 sub flush {
     &flushcache();
 }
 
+#---------------------------------------------------------------------
+# flushcache — clear all conversion caches (%e2s, %s2e, %e2u, %u2e,
+#              %s2u, %u2s).  Call after changing conversion direction.
 #---------------------------------------------------------------------
 sub flushcache {
     undef %e2s;
@@ -2298,6 +2565,9 @@ sub h2z_jis {
 }
 
 #---------------------------------------------------------------------
+# _h2z_jis — inner half->full kana converter for JIS strings.
+# Processes one token at a time; handles voiced/semi-voiced compounds.
+#---------------------------------------------------------------------
 sub _h2z_jis {
     local ($s) = @_;
     $s =~ s/(([\x21-\x5f])([\x5e\x5f])?)/
@@ -2311,6 +2581,9 @@ sub _h2z_jis {
 # by NAKATA Yoshinori
 
 #---------------------------------------------------------------------
+# h2z_euc — convert half-width kana to full-width in EUC-JP string.
+# Handles voiced (dakuten) and semi-voiced (handakuten) compounds.
+#---------------------------------------------------------------------
 sub h2z_euc {
     local ( *s, $n ) = @_;
     $s =~ s/\x8e([\xa1-\xdf])(\x8e([\xde\xdf]))?/
@@ -2319,6 +2592,9 @@ sub h2z_euc {
     $n;
 }
 
+#---------------------------------------------------------------------
+# h2z_sjis — convert half-width kana to full-width in SJIS string.
+# Handles voiced/semi-voiced compounds; uses e2s() for DBCS output.
 #---------------------------------------------------------------------
 sub h2z_sjis {
     local ( *s, $n ) = @_;
@@ -2329,6 +2605,9 @@ sub h2z_sjis {
     $n;
 }
 
+#---------------------------------------------------------------------
+# h2z_utf8 — convert half-width kana to full-width in UTF-8 string.
+# Lazily initializes %h2z_utf8 on first call via init_h2z_utf8().
 #---------------------------------------------------------------------
 sub h2z_utf8 {
     local ( *s, $n ) = @_;
@@ -2348,6 +2627,8 @@ sub z2h_jis {
 }
 
 #---------------------------------------------------------------------
+# _z2h_jis — inner full->half kana dispatcher for JIS strings.
+#---------------------------------------------------------------------
 sub _z2h_jis {
     local ($s) = @_;
     $s =~ s/((\%[!-~]|![\#\"&VW+,<])+|([^!%][!-~]|![^\#\"&VW+,<])+)/
@@ -2356,6 +2637,9 @@ sub _z2h_jis {
     $s;
 }
 
+#---------------------------------------------------------------------
+# __z2h_jis — innermost full->half kana emitter for JIS strings.
+# Returns ESC ( I + half-kana bytes, or ESC $ B + original if no mapping.
 #---------------------------------------------------------------------
 sub __z2h_jis {
     local ($s) = @_;
@@ -2367,6 +2651,9 @@ sub __z2h_jis {
 }
 
 #---------------------------------------------------------------------
+# z2h_euc — convert full-width kana to half-width in EUC-JP string.
+# Lazily initializes %z2h_euc on first call via init_z2h_euc().
+#---------------------------------------------------------------------
 sub z2h_euc {
     local ( *s, $n ) = @_;
     &init_z2h_euc unless %z2h_euc;
@@ -2377,6 +2664,9 @@ sub z2h_euc {
 }
 
 #---------------------------------------------------------------------
+# z2h_sjis — convert full-width kana to half-width in SJIS string.
+# Lazily initializes %z2h_sjis on first call via init_z2h_sjis().
+#---------------------------------------------------------------------
 sub z2h_sjis {
     local ( *s, $n ) = @_;
     &init_z2h_sjis unless %z2h_sjis;
@@ -2384,6 +2674,9 @@ sub z2h_sjis {
     $n;
 }
 
+#---------------------------------------------------------------------
+# z2h_utf8 — convert full-width kana to half-width in UTF-8 string.
+# Lazily initializes %z2h_utf8 on first call via init_z2h_utf8().
 #---------------------------------------------------------------------
 sub z2h_utf8 {
     local ( *s, $n ) = @_;
@@ -10894,6 +11187,15 @@ sub init_u2k {
 #---------------------------------------------------------------------
 # TR subroutine for DBCS
 #---------------------------------------------------------------------
+# tr — transliterate characters in *s according to $from/$to mapping.
+#
+# Works on any encoding by operating at the byte-pair (DBCS) level.
+# JIS input is converted to EUC internally and restored after.
+# $option /d deletes characters in $from with no $to counterpart.
+#
+# Caches the %table translation map when $from/$to/$option unchanged.
+# Bug fix vs jcode.pl 2.13: also invalidates cache on $option change.
+#---------------------------------------------------------------------
 sub tr {
 
     # $prev_from, $prev_to, %table are persistent variables
@@ -10952,6 +11254,10 @@ sub tr {
 }
 
 #---------------------------------------------------------------------
+# _maketable — build %table translation map from $from/$to/$option.
+# Handles JIS->EUC conversion of operands, range expansion (_expnd1/2),
+# and /d (delete) option for missing target characters.
+#---------------------------------------------------------------------
 sub _maketable {
     local ($ascii) = '(\\\\[\\-\\\\]|[\0-\x5b\x5d-\x7f])';
 
@@ -10970,6 +11276,9 @@ sub _maketable {
 }
 
 #---------------------------------------------------------------------
+# _expnd1 — expand a single-byte character range (e.g. A-Z) to a
+# string of all characters in the range.
+#---------------------------------------------------------------------
 sub _expnd1 {
     local ($s) = @_;
     $s =~ s/\\([\x00-\xff])/$1/g;
@@ -10982,6 +11291,9 @@ sub _expnd1 {
     $s;
 }
 
+#---------------------------------------------------------------------
+# _expnd2 — expand a double-byte character range (e.g. \xa4\xa1-\xa4\xf3)
+# to a string of all DBCS characters in the range (same lead byte only).
 #---------------------------------------------------------------------
 sub _expnd2 {
     local ($s) = @_;
@@ -12044,7 +12356,7 @@ This software is free software; you can redistribute it and/or modify it under t
 
 This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023 INABA Hitoshi L<ina@cpan.org> in a CPAN
+Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi L<ina@cpan.org> in a CPAN
 
 The latest version of "jacode.pl" is available here:
 

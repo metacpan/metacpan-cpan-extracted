@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02680nam a2200589 a 4500</leader>
+  <controlfield tag="001">cpk20112162963</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20160616161236.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">110125s1979    xr a          000 | lat  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb002162963</subfield>
+    <subfield code="z">cnb000397301</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Váz.) :</subfield>
+    <subfield code="c">Kčs 42,00</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)40081457</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">lat</subfield>
+    <subfield code="a">ger</subfield>
+    <subfield code="a">hun</subfield>
+    <subfield code="a">cze</subfield>
+    <subfield code="h">lat</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">00</subfield>
+    <subfield code="x">Věda. Všeobecnosti. Základy vědy a kultury. Vědecká práce</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">12</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">37.016</subfield>
+    <subfield code="x">Učební osnovy. Vyučovací předměty. Učebnice</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">22</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">0/9</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">811.124</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">811.112.2</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">811.162.1</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(075)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Komenský, Jan Amos,</subfield>
+    <subfield code="d">1592-1670</subfield>
+    <subfield code="7">jk01061444</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="240" ind1="1" ind2="0">
+    <subfield code="a">Orbis sensualium pictus.</subfield>
+    <subfield code="l">Česky &amp; Latinsky &amp; Maďarsky &amp; Německy</subfield>
+    <subfield code="7">aun2012692444</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Joh. Amos Comenii Orbis sensualium pictus quadrilinguis :</subfield>
+    <subfield code="b">hoc est: omnium fundamentalium, in mundo rerum ... = Die sichtbare Welt in vier Sprachen = A Láthato Világ négyféle nyelven = Swět spatřugicy /</subfield>
+    <subfield code="c">[epilog napsala Jiřina Popelová]</subfield>
+  </datafield>
+  <datafield tag="246" ind1="1" ind2=" ">
+    <subfield code="i">Název v tiráži:</subfield>
+    <subfield code="a">Orbis pictus</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="0">
+    <subfield code="a">Orbis sensualium pictus quadrilinguis</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="1">
+    <subfield code="a">Sichtbare Welt in vier Sprachen</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="1">
+    <subfield code="a">Láthato Világ négyféle nyelven</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="1">
+    <subfield code="a">Swět spatřugicy</subfield>
+  </datafield>
+  <datafield tag="246" ind1="1" ind2="4">
+    <subfield code="a">Orbis sensualium pictus</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">2., nezměn. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">V Praze :</subfield>
+    <subfield code="b">Státní pedagogické nakladatelství,</subfield>
+    <subfield code="c">1979</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">27, 313, [130], 32 s. :</subfield>
+    <subfield code="b">il. ;</subfield>
+    <subfield code="c">23 cm</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Přetisk čtyřjaz. vydání v Levoči 1685</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">2800 výt.</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje rejstříky</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Jubilejní vydání významného pedagogického díla je i cennou kulturně historickou památkou, která je příspěvkem k poznání společenského a kulturního vývoje lidstva.</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Souběžný německý, maďarský, český úvod, text, epilog a rejstříky</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">všeobecné znalosti</subfield>
+    <subfield code="7">ph127322</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">latina</subfield>
+    <subfield code="7">ph122187</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">němčina</subfield>
+    <subfield code="7">ph115512</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">polština</subfield>
+    <subfield code="7">ph124318</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">učebnice</subfield>
+    <subfield code="7">fd133770</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:08d9bba0-bcbf-11e4-b2e2-005056827e52</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Komenský, Jan Amos: Orbis sensualium pictus - faksimile</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Latina - učebnice názorné humanistické</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Němčina - učebnice názorné humanistické</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Maďarština - učebnice názorné humanistické</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Čeština - učebnice názorné humanistické</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">002162963</subfield>
+  </datafield>
+</record>
+
+</collection>

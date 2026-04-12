@@ -45,8 +45,8 @@ eval {
 		'marc_record' => 'bad',
 	);
 };
-is($EVAL_ERROR, "Parameter 'marc_record' must be a MARC::Record object.\n",
-	"Parameter 'marc_record' must be a MARC::Record object (not exist).");
+is($EVAL_ERROR, "Parameter 'marc_record' must be a 'MARC::Record' object.\n",
+	"Parameter 'marc_record' must be a 'MARC::Record' object (not exist).");
 clean();
 
 # Test.
@@ -56,6 +56,6 @@ eval {
 		'marc_record' => $mock,
 	);
 };
-is($EVAL_ERROR, "Parameter 'marc_record' must be a MARC::Record object.\n",
-	"Parameter 'marc_record' must be a MARC::Record object (another object).");
+is($EVAL_ERROR, "Parameter 'marc_record' must be a 'MARC::Record' object.\n",
+	"Parameter 'marc_record' must be a 'MARC::Record' object (another object).");
 clean();

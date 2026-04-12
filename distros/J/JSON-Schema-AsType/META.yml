@@ -3,21 +3,23 @@ abstract: 'generates Type::Tiny types out of JSON schemas'
 author:
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
 build_requires:
+  Data::Dumper: '0'
+  Data::Printer: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Memoize: '0'
   Path::Tiny: '0.062'
-  Test::Deep: '0'
+  Test2::V1: '0'
   Test::Exception: '0'
   Test::More: '0'
-  lib: '0'
   parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,53 +28,150 @@ name: JSON-Schema-AsType
 provides:
   JSON::Schema::AsType:
     file: lib/JSON/Schema/AsType.pm
-    version: v0.4.4
+    version: v1.0.0
+  JSON::Schema::AsType::Annotations:
+    file: lib/JSON/Schema/AsType/Annotations.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09:
+    file: lib/JSON/Schema/AsType/Draft2019_09.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09::Types:
+    file: lib/JSON/Schema/AsType/Draft2019_09/Types.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09::Vocabulary::Applicator:
+    file: lib/JSON/Schema/AsType/Draft2019_09/Vocabulary/Applicator.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09::Vocabulary::Content:
+    file: lib/JSON/Schema/AsType/Draft2019_09/Vocabulary/Content.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09::Vocabulary::Core:
+    file: lib/JSON/Schema/AsType/Draft2019_09/Vocabulary/Core.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09::Vocabulary::Format:
+    file: lib/JSON/Schema/AsType/Draft2019_09/Vocabulary/Format.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09::Vocabulary::Metadata:
+    file: lib/JSON/Schema/AsType/Draft2019_09/Vocabulary/Metadata.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2019_09::Vocabulary::Validation:
+    file: lib/JSON/Schema/AsType/Draft2019_09/Vocabulary/Validation.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12:
+    file: lib/JSON/Schema/AsType/Draft2020_12.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Types:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Types.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Applicator:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Applicator.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Content:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Content.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Core:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Core.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Format:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Format.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Formatannotation:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Formatannotation.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Metadata:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Metadata.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Unevaluated:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Unevaluated.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft2020_12::Vocabulary::Validation:
+    file: lib/JSON/Schema/AsType/Draft2020_12/Vocabulary/Validation.pm
+    version: v1.0.0
   JSON::Schema::AsType::Draft3:
     file: lib/JSON/Schema/AsType/Draft3.pm
-    version: v0.4.4
+    version: v1.0.0
+  JSON::Schema::AsType::Draft3::Keywords:
+    file: lib/JSON/Schema/AsType/Draft3/Keywords.pm
+    version: v1.0.0
   JSON::Schema::AsType::Draft3::Types:
     file: lib/JSON/Schema/AsType/Draft3/Types.pm
-    version: v0.4.4
+    version: v1.0.0
   JSON::Schema::AsType::Draft4:
     file: lib/JSON/Schema/AsType/Draft4.pm
-    version: v0.4.4
+    version: v1.0.0
+  JSON::Schema::AsType::Draft4::Keywords:
+    file: lib/JSON/Schema/AsType/Draft4/Keywords.pm
+    version: v1.0.0
   JSON::Schema::AsType::Draft4::Types:
     file: lib/JSON/Schema/AsType/Draft4/Types.pm
-    version: v0.4.4
+    version: v1.0.0
   JSON::Schema::AsType::Draft6:
     file: lib/JSON/Schema/AsType/Draft6.pm
-    version: v0.4.4
+    version: v1.0.0
+  JSON::Schema::AsType::Draft6::Keywords:
+    file: lib/JSON/Schema/AsType/Draft6/Keywords.pm
+    version: v1.0.0
   JSON::Schema::AsType::Draft6::Types:
     file: lib/JSON/Schema/AsType/Draft6/Types.pm
-    version: v0.4.4
+    version: v1.0.0
+  JSON::Schema::AsType::Draft7:
+    file: lib/JSON/Schema/AsType/Draft7.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft7::Keywords:
+    file: lib/JSON/Schema/AsType/Draft7/Keywords.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Draft7::Types:
+    file: lib/JSON/Schema/AsType/Draft7/Types.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Registry:
+    file: lib/JSON/Schema/AsType/Registry.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Type:
+    file: lib/JSON/Schema/AsType/Type.pm
+    version: v1.0.0
+  JSON::Schema::AsType::Visit:
+    file: lib/JSON/Schema/AsType/Visit.pm
+    version: v1.0.0
 requires:
+  Carp: '0'
   Clone: '0'
+  DDP: '0'
+  Exporter::Tiny: '0'
+  Hash::Merge: '0'
   JSON: '0'
+  JSON::Pointer: '0'
   LWP::Simple: '0'
   List::AllUtils: '0'
   List::MoreUtils: '0'
   List::Util: '0'
+  List::UtilsBy: '0'
+  Math::BigFloat: '0'
+  Module::Runtime: '0'
   Moose: '0'
   Moose::Role: '0'
   Moose::Util: '0'
-  MooseX::ClassAttribute: '0'
   MooseX::MungeHas: '0'
   Path::Tiny: '0.062'
+  PerlX::Maybe: '0'
+  Ref::Util: '0'
   Scalar::Util: '0'
+  Test::Deep::NoTest: '0'
   Type::Library: '0'
   Type::Tiny: '0'
   Type::Tiny::Class: '0'
   Type::Utils: '0'
   Types::Standard: '0'
   URI: '0'
-  perl: v5.14.0
+  base: '0'
+  experimental: '0'
+  feature: '0'
+  perl: v5.42.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/yanick/JSON-Schema-AsType/issues
   homepage: https://github.com/yanick/JSON-Schema-AsType
   repository: https://github.com/yanick/JSON-Schema-AsType.git
-version: 0.4.4
+version: 1.0.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
@@ -83,6 +182,6 @@ x_contributors:
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
   - 'Ruslan Zakirov <ruz@bestpractical.com>'
   - 'Yanick Champoux <yanick@cpan.org>'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

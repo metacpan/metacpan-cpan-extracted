@@ -1,0 +1,38 @@
+# Version control
+\B\.git\b
+\.gitignore$
+
+# Build artifacts
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MYMETA\.\w+$
+^Physics-Ellipsometry-VASE-
+
+# Editor / IDE
+~$
+\.swp$
+\.swo$
+\#$
+\.vscode/
+\.github/
+
+# OS files
+\.DS_Store$
+Thumbs\.db$
+
+# Aider
+^\.aider
+
+# Experimental data (not part of the distribution)
+^data/
+
+# Generated plots
+\.png$
+
+# test_fit.pl at root (use examples/ versions instead)
+^test_fit\.pl$
+
+# examine_datafile helper
+^examples/examine_datafile\.pl$

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01704nam a22004091  4500</leader>
+  <controlfield tag="001">bk197306013</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20220315074346.0</controlfield>
+  <controlfield tag="008">970912s1973    xr     e      00| 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000456624</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)42009780</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">OSA001</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">72</subfield>
+    <subfield code="x">Architektura</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">21</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">728.82</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">911.375</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(437.324)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(036)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Sedlák, Jan,</subfield>
+    <subfield code="d">1943-2016</subfield>
+    <subfield code="7">jk01110549</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Náměšť nad Oslavou :</subfield>
+    <subfield code="b">státní zámek, město a památky v okolí /</subfield>
+    <subfield code="c">Jan Sedlák ; fot. snímky [kol.] ; mapka okolí Jiří Hedánek ; plánek zámku Jaroslav Houžvic</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Olympia,</subfield>
+    <subfield code="c">1973</subfield>
+    <subfield code="f">(Mír 5)</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">96 s. ;</subfield>
+    <subfield code="c">8°</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Na obálce použito barev. fot. Jindřicha Seckého</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">20000 výt.</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Angl. název</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Souhrny a vysvětl. k fot. přel. do ruš. Margita Rogačová, do něm. Helena Krausová a do angl. Joy Kadečková</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje bibliografii</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Německé a ruské resumé</subfield>
+  </datafield>
+  <datafield tag="550" ind1=" " ind2=" ">
+    <subfield code="a">Vydavatel: Krajské středisko státní památkové péče a ochrany přírody v Brně</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">zámky</subfield>
+    <subfield code="7">ph127734</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">města</subfield>
+    <subfield code="7">ph115399</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Náměšť nad Oslavou (Česko)</subfield>
+    <subfield code="7">ge130270</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">průvodce</subfield>
+    <subfield code="7">fd133154</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Státní ústav památkové péče a ochrany přírody.</subfield>
+    <subfield code="b">Krajské středisko (Brno, Česko)</subfield>
+    <subfield code="7">pag2012728605</subfield>
+    <subfield code="4">isb</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:95cefb80-cb8d-11ec-af1b-005056827e51</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000456624</subfield>
+  </datafield>
+</record>
+
+</collection>

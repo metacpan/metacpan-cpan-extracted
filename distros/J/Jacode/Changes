@@ -1,5 +1,27 @@
 Revision history for this software.
 
+2.13.4.32 2026-04-12 00:00:00
+  - update pmake.bat (VERSIONE 0.27 -> 0.28)
+    - dist: remove Char-family dead code (3 locations)
+    - dist: remove 7 unrelated entries from requires_version table
+    - _runtests: read TAP test number directly (fix 'Failed test' offset bug)
+    - _runtests: add wallclock elapsed time to summary output
+    - _runtests: add SKIP line counting and reporting
+  - add SECURITY.md
+  - add t/9010_check_manifest.t (MANIFEST integrity check)
+  - add t/9020_check_source_encoding.t (UTF-8 encoding verification)
+  - add t/9050_pod_G11.t (Pod::Checker < 1.60)
+  - add t/9051_pod_G12.t (Pod::Checker >= 1.60)
+  - update MANIFEST (add SECURITY.md and 9xxx tests)
+  - update README (add VERSION, ENCODING NAMES, API REFERENCE, PKF COMMAND sections)
+  - refactoring of jacode.pl (no functional change)
+    A) split init() into _init_regex(), _init_kana_table(), _init_convf(),
+       _init_encode_table(), _init_jcode_alias()
+    B) add descriptive comments to all conversion subroutines
+    C) audit use vars declarations (all confirmed in use; no change)
+    D) add file structure map to header, clarify internal doc
+  - created by INABA Hitoshi
+
 2.13.4.31 2023-03-21 00:00:00
   - update POD
   - created by INABA Hitoshi
