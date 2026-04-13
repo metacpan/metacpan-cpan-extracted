@@ -18,7 +18,7 @@ sub DESTROY {
 
 =head1 NAME
 
-SimpleMock::ScopeGuard
+SimpleMock::ScopeGuard - Automatic cleanup of scoped mock layers
 
 =head1 SYNOPSIS
 

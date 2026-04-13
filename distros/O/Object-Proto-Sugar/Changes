@@ -1,5 +1,10 @@
 Revision history for Object-Proto-Sugar
 
+0.05	2026-04-12
+	- Add accessor_alias keyword for package-level function accessor prefixing
+	- accessor_alias applies to accessor, reader, and writer when set to 1
+	- Per-class alias preserved across inheritance for import_accessors
+
 0.03	2026-04-05
 	- Explictly require type constants to be imported into a package
 	- Extend with more sugar constants (porting my MooX::LazierAttributes syntax)

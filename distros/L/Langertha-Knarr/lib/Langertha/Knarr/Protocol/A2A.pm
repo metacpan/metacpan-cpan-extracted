@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::A2A;
 # ABSTRACT: Google Agent2Agent (A2A) wire protocol for Knarr
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use JSON::MaybeXS;
 use Data::UUID;
@@ -181,7 +181,7 @@ Langertha::Knarr::Protocol::A2A - Google Agent2Agent (A2A) wire protocol for Kna
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 

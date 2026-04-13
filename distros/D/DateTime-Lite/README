@@ -20,6 +20,19 @@ SYNOPSIS
         my $now   = DateTime::Lite->now( time_zone => 'UTC' );
         my $today = DateTime::Lite->today( time_zone => 'Asia/Tokyo' );
 
+        # Timezone from GPS coordinates (nearest IANA zone by haversine distance)
+        use DateTime::Lite::TimeZone;
+        my $tz = DateTime::Lite::TimeZone->new(
+            latitude  => 35.658581,
+            longitude => 139.745433,   # Tokyo Tower
+        );
+        my $dt_local = DateTime::Lite->now( time_zone => $tz );
+        say $dt_local->time_zone_long_name;  # Asia/Tokyo
+
+        # BCP47 -u-tz- locale extension: timezone inferred from locale tag
+        my $dt_bcp47 = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+        say $dt_bcp47->time_zone_long_name;  # Asia/Jerusalem
+
         my $from_epoch = DateTime::Lite->from_epoch( epoch => time() );
         my $from_doy   = DateTime::Lite->from_day_of_year(
             year        => 2026,
@@ -152,7 +165,7 @@ SYNOPSIS
             die( $dt->error );
 
 VERSION
-        v0.1.0
+        v0.3.0
 
 DESCRIPTION
     "DateTime::Lite" is a lightweight, memory-efficient, drop-in replacement
@@ -210,10 +223,10 @@ DESCRIPTION
         code using "DateTime" should work with "DateTime::Lite" as a drop-in
         replacement.
 
-    Full BCP 47 / CLDR locale support
+    Full Unicode CLDR / BCP 47 locale support
         "DateTime" is limited to the set of pre-generated
         "DateTime::Locale::*" modules, one per locale. "DateTime::Lite"
-        accepts any valid BCP 47 / Unicode CLDR locale tag, including
+        accepts any valid Unicode CLDR / BCP 47 locale tag, including
         complex forms with Unicode extensions ("-u-"), transform extensions
         ("-t-"), and script subtags.
 
@@ -228,6 +241,19 @@ DESCRIPTION
         via Locale::Unicode::Data, so tags like
         "he-IL-u-ca-hebrew-tz-jeruslm" or "ja-Kana-t-it" work transparently
         without any additional installed modules.
+
+        Additionally, if the locale tag carries a Unicode timezone extension
+        ("-u-tz-"), and no explicit "time_zone" argument is provided to the
+        constructor, "DateTime::Lite" will automatically resolve the
+        corresponding IANA canonical timezone name from it:
+
+            # time_zone is inferred as 'Asia/Jerusalem' from the -u-tz-jeruslm extension
+            my $dt = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+            say $dt->time_zone;            # Asia/Jerusalem
+            say $dt->time_zone_long_name;  # Asia/Jerusalem
+
+        An explicit "time_zone" argument always takes priority over the
+        locale extension.
 
     No die() in normal operation
         Following the Module::Generic / Locale::Unicode error-handling
@@ -274,7 +300,20 @@ CONSTRUCTORS
 
     *   "time_zone"
 
+        The time zone for the datetime. Accepts a zone name, such as
+        "Asia/Tokyo"), a fixed-offset string, such as "+09:00", a
+        DateTime::Lite::TimeZone object, "UTC", "floating", or "local".
+
+        If omitted, and the "locale" argument carries a BCP47 "-u-tz-"
+        extension, such as "he-IL-u-ca-hebrew-tz-jeruslm", the corresponding
+        IANA canonical timezone is resolved automatically. If neither is
+        provided, the default floating timezone is used (or
+        $ENV{PERL_DATETIME_DEFAULT_TZ} if set).
+
     *   "locale"
+
+        Any valid locale as defined by the Unicode CLDR (Common Locale Data
+        Repository), and BCP47. See Locale::Unicode
 
     *   "formatter"
 
@@ -381,7 +420,16 @@ CONSTRUCTORS
             locale    => 'ja-JP'
         );
 
+        # time_zone inferred from the -u-tz- BCP47 extension:
+        my $now2 = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+        say $now2->time_zone;            # Asia/Jerusalem
+        say $now2->time_zone_long_name;  # Asia/Jerusalem
+
     Returns the current datetime (calls "from_epoch( epoch =" time )>).
+
+    If "time_zone" is omitted and the "locale" carries a BCP47 "-u-tz-"
+    extension, as in the example above, the timezone is inferred
+    automatically. See "new" for the full priority rules.
 
     Returns the new object upon success, or sets an error and returns
     "undef" in scalar context, or an empty list in list context. In chaining

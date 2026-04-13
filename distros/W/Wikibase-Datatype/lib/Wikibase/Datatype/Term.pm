@@ -7,7 +7,7 @@ use Mo qw(build is);
 use Mo::utils 0.01 qw(check_required);
 use Wikibase::Datatype::Utils qw(check_language_term);
 
-our $VERSION = 0.39;
+our $VERSION = 0.40;
 
 has language => (
 	is => 'ro',
@@ -165,12 +165,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2025 Michal Josef Špaček
+© 2020-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.39
+0.40
 
 =cut

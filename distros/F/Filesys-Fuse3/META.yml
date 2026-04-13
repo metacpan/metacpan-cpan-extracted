@@ -22,8 +22,8 @@ requires:
   Lchown: '0'
   Unix::Mknod: '0'
 resources:
-  bugtracker: http://github.com/dod38fr/perl-fuse3/issues
+  bugtracker: http://github.com/dod38fr/perl-filesys-fuse3/issues
   license: http://www.gnu.org/licenses/lgpl-2.1.html
-  repository: http://github.com/dod38fr/perl-fuse3
-version: '0.020'
+  repository: http://github.com/dod38fr/perl-filesys-fuse3
+version: '0.021'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

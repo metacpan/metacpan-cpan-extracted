@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler;
 # ABSTRACT: Role for Knarr backend handlers (Raider, Engine, Code, ...)
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose::Role;
 use Future::AsyncAwait;
 use Langertha::Knarr::Stream;
@@ -29,8 +29,6 @@ sub handle_transcription_f {
   die "transcription not supported by " . ref($self) . "\n";
 }
 
-# Returns the sub-handler responsible for a given model id, or self.
-sub route_model { return $_[0] }
 
 1;
 
@@ -46,7 +44,7 @@ Langertha::Knarr::Handler - Role for Knarr backend handlers (Raider, Engine, Cod
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -119,12 +117,6 @@ L<Langertha::Knarr::Stream> whose C<next_chunk_f> yields chunk strings.
 
 Required. Returns an arrayref of model descriptors as hashes with at
 least an C<id> key.
-
-=head2 route_model
-
-    my $sub_handler = $handler->route_model($model_id);
-
-Optional. Default returns C<$self>.
 
 =head1 SUPPORT
 

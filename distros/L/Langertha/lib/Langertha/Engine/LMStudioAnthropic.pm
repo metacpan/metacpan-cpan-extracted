@@ -1,6 +1,6 @@
 package Langertha::Engine::LMStudioAnthropic;
 # ABSTRACT: LM Studio via Anthropic-compatible API
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moose;
 
 extends 'Langertha::Engine::AnthropicBase';
@@ -35,7 +35,7 @@ Langertha::Engine::LMStudioAnthropic - LM Studio via Anthropic-compatible API
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

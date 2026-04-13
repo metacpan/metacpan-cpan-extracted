@@ -11,7 +11,7 @@ use open ':std', IO => ':encoding(UTF-8)';
 
 # PODNAME: envdot
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use English      qw( -no_match_vars );                   # Avoids regex performance penalty in perl 5.18 and earlier
 use Getopt::Long qw( :config auto_version auto_help );
@@ -110,7 +110,7 @@ envdot - Read .env file and turn its content into environment variables for diff
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

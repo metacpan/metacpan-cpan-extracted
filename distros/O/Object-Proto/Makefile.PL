@@ -5,9 +5,11 @@ use ExtUtils::MakeMaker;
 use Config;
 
 # Platform-specific linker flags for symbol export
+# Only add --export-dynamic on platforms where GNU ld is used.
+# Solaris/SunOS use their own ld which doesn't support this flag.
 my %platform_args;
 if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd' || $^O eq 'netbsd' ||
-    $^O eq 'solaris' || $^O eq 'sunos' || $^O eq 'dragonfly') {
+    $^O eq 'dragonfly') {
     $platform_args{LDDLFLAGS} = $Config{lddlflags} . ' -Wl,--export-dynamic';
 }
 elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {

@@ -2,11 +2,13 @@
 ## no critic (Subroutines::ProtectPrivateSubs)
 use strict;
 use warnings;
-use Test2::V0;
+
+use Test2::V1             qw( -utf8 );
+use Test2::Tools::Subtest qw( subtest_streamed );
 
 use Env::Dot::ScriptFunctions qw( );
 
-subtest 'Private Subroutine _convert_var_to_sh()' => sub {
+subtest_streamed 'Private Subroutine _convert_var_to_sh()' => sub {
 
     {
         my %var = (
@@ -16,7 +18,7 @@ subtest 'Private Subroutine _convert_var_to_sh()' => sub {
         );
         my $expect  = q{THIS_VAR='this var value'; export THIS_VAR};
         my $cmdline = Env::Dot::ScriptFunctions::_convert_var_to_sh( \%var );
-        is( $cmdline, $expect, 'Correct Bourne Shell command' );
+        T2->is( $cmdline, $expect, 'Correct Bourne Shell command' );
     }
 
     {
@@ -27,7 +29,7 @@ subtest 'Private Subroutine _convert_var_to_sh()' => sub {
         );
         my $expect  = q{THIS_VAR="this var value"};
         my $cmdline = Env::Dot::ScriptFunctions::_convert_var_to_sh( \%var );
-        is( $cmdline, $expect, 'Correct Bourne Shell command' );
+        T2->is( $cmdline, $expect, 'Correct Bourne Shell command' );
     }
 
     {
@@ -38,13 +40,13 @@ subtest 'Private Subroutine _convert_var_to_sh()' => sub {
         );
         my $expect  = q{THIS_VAR="this var value"};
         my $cmdline = Env::Dot::ScriptFunctions::_convert_var_to_sh( \%var );
-        is( $cmdline, $expect, 'Correct Bourne Shell command' );
+        T2->is( $cmdline, $expect, 'Correct Bourne Shell command' );
     }
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Private Subroutine _convert_var_to_csh()' => sub {
+subtest_streamed 'Private Subroutine _convert_var_to_csh()' => sub {
 
     {
         my %var = (
@@ -54,7 +56,7 @@ subtest 'Private Subroutine _convert_var_to_csh()' => sub {
         );
         my $expect  = q{setenv THIS_VAR 'this var value'};
         my $cmdline = Env::Dot::ScriptFunctions::_convert_var_to_csh( \%var );
-        is( $cmdline, $expect, 'Correct C Shell command' );
+        T2->is( $cmdline, $expect, 'Correct C Shell command' );
     }
 
     {
@@ -65,7 +67,7 @@ subtest 'Private Subroutine _convert_var_to_csh()' => sub {
         );
         my $expect  = q{setenv THIS_VAR "this var value"};
         my $cmdline = Env::Dot::ScriptFunctions::_convert_var_to_csh( \%var );
-        is( $cmdline, $expect, 'Correct Bourne Shell command' );
+        T2->is( $cmdline, $expect, 'Correct Bourne Shell command' );
     }
 
     {
@@ -76,13 +78,13 @@ subtest 'Private Subroutine _convert_var_to_csh()' => sub {
         );
         my $expect  = q{set THIS_VAR "this var value"};
         my $cmdline = Env::Dot::ScriptFunctions::_convert_var_to_csh( \%var );
-        is( $cmdline, $expect, 'Correct Bourne Shell command' );
+        T2->is( $cmdline, $expect, 'Correct Bourne Shell command' );
     }
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Private Subroutine convert_variables_into_commands()' => sub {
+subtest_streamed 'Private Subroutine convert_variables_into_commands()' => sub {
 
     {
         my @vars = (
@@ -102,7 +104,7 @@ THIS_VAR='this var value'; export THIS_VAR
 THAT_VAR='that var value'; export THAT_VAR
 END_OF_TEXT
         my $out = Env::Dot::ScriptFunctions::convert_variables_into_commands( 'sh', @vars );
-        is( $out, $expect, 'Correct Bourne Shell command' );
+        T2->is( $out, $expect, 'Correct Bourne Shell command' );
     }
 
     {
@@ -123,10 +125,10 @@ THAT_VAR='that var value'
 THIS_VAR="this var value"; export THIS_VAR
 END_OF_TEXT
         my $out = Env::Dot::ScriptFunctions::convert_variables_into_commands( 'sh', @vars );
-        is( $out, $expect, 'Correct Bourne Shell command' );
+        T2->is( $out, $expect, 'Correct Bourne Shell command' );
     }
 
-    done_testing;
+    T2->done_testing;
 };
 
-done_testing;
+T2->done_testing;

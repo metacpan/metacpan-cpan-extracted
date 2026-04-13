@@ -3,7 +3,7 @@ package App::Test::Generator::CoverageGuidedFuzzer;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ for App::Test::Generator
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =head1 SYNOPSIS
 

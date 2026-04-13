@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Tracing;
 # ABSTRACT: Decorator handler that records every request as a Langfuse trace
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -133,11 +133,6 @@ async sub handle_stream_f {
 
 sub list_models { $_[0]->wrapped->list_models }
 
-sub route_model {
-  my ($self, $model) = @_;
-  return $self->wrapped->route_model($model);
-}
-
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -153,7 +148,7 @@ Langertha::Knarr::Handler::Tracing - Decorator handler that records every reques
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -174,7 +169,7 @@ inner handler resolves (or fails). Streaming requests accumulate every
 delta into a single output before closing the trace, so the Langfuse
 view shows the full assembled response.
 
-C<knarr start> and C<knarr container> mount this automatically when
+C<knarr start> mounts this automatically when
 the config supplies Langfuse credentials.
 
 =head2 wrapped

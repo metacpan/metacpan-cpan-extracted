@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 use File::Spec;
 use Cwd qw(cwd);

@@ -1,0 +1,48 @@
+---
+abstract: 'Perl API for Bugzilla REST API'
+author:
+  - 'Dean Hamstead <dean@fragfest.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Trap: '0'
+  perl: v5.24.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+  perl: v5.24.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Bugzilla
+no_index:
+  directory:
+    - examples
+    - t
+requires:
+  Carp: '0'
+  Moo: '0'
+  Types::Standard: '0'
+  URI::Escape: '0'
+  WebService::Client: '0'
+  namespace::clean: '0'
+  perl: v5.24.0
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/djzort/perl-WebService-Bugzilla/issues
+  homepage: https://github.com/djzort/perl-WebService-Bugzilla
+  repository: https://github.com/djzort/perl-WebService-Bugzilla.git
+version: '0.001'
+x_author_pledge:
+  version: 1
+x_generated_by_perl: v5.40.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

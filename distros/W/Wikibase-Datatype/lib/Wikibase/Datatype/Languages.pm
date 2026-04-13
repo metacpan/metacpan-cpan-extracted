@@ -14,10 +14,12 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'mul' => 'multiple languages', # Q20923490
 
 	# Codes in https://doc.wikimedia.org/mediawiki-core/master/php/Names_8php_source.html
-	# Updated 2025-01-01 in mediawiki/includes/languages/data/Names.php, commit 7d8b613868efc281ee91200be5e8a599cf59b52b
+	# Repository: https://github.com/wikimedia/mediawiki.git
+	# Updated 2026-04-12 in mediawiki/includes/Languages/Data/Names.php, commit 5360f7180c90c188b11047e2e8be18da9b6cf332
 	'aa' => 'Qafár af', # Afar
 	'aae' => 'Arbërisht', # Arbëresh
 	'ab' => 'аԥсшәа', # Abkhaz
+	'abr' => 'Abron', # Bono
 	'abs' => 'bahasa ambon', # Ambonese Malay, T193566
 	'ace' => 'Acèh', # Aceh
 	'acf' => 'Kwéyòl Sent Lisi', # Saint Lucian Creole
@@ -28,6 +30,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'aeb-arab' => 'تونسي', # Tunisian Arabic (Arabic Script)
 	'aeb-latn' => 'Tûnsî', # Tunisian Arabic (Latin Script)
 	'af' => 'Afrikaans', # Afrikaans
+	'aig' => 'Aanteegan an\' Baabyuudan', # Antiguan and Barbudan Creole English
 	'aln' => 'Gegë', # Gheg Albanian
 	'als' => 'Alemannisch', # Alemannic -- not a valid code, for compatibility. See gsw.
 	'alt' => 'алтай тил', # Altai, T254854
@@ -80,6 +83,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'bm' => 'bamanankan', # Bambara
 	'bn' => 'বাংলা', # Bengali
 	'bo' => 'བོད་ཡིག', # Tibetan
+	'bol' => 'bòo pìkkà', # Bole
 	'bpy' => 'বিষ্ণুপ্রিয়া মণিপুরী', # Bishnupriya Manipuri
 	'bqi' => 'بختیاری', # Bakthiari
 	'br' => 'brezhoneg', # Breton
@@ -88,6 +92,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'btm' => 'Batak Mandailing', # Batak Mandailing
 	'bto' => 'Iriga Bicolano', # Rinconada Bikol
 	'bug' => 'Basa Ugi', # Buginese
+	'bug-bugi' => 'ᨅᨔ ᨕᨘᨁᨗ', # Buginese (Buginese script), T389916
 	'bxr' => 'буряад', # Buryat (Russia)
 	'ca' => 'català', # Catalan
 	'cbk-zam' => 'Chavacano de Zamboanga', # Zamboanga Chavacano, T124657
@@ -129,6 +134,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'dga' => 'Dagaare', # Southern Dagaare
 	'din' => 'Thuɔŋjäŋ', # Dinka
 	'diq' => 'Zazaki', # Zazaki
+	'dlg' => 'долган тыла', # Dolgan
 	'dsb' => 'dolnoserbski', # Lower Sorbian
 	'dtp' => 'Kadazandusun', # Central Dusun
 	'dty' => 'डोटेली', # Doteli
@@ -207,6 +213,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'hke' => 'kihunde', # Hunde
 	'hno' => 'ہندکو', # Hindko
 	'ho' => 'Hiri Motu', # Hiri Motu
+	'hoc-latn' => 'Ho', # Ho (Latin script), T393086
 	'hr' => 'hrvatski', # Croatian
 	'hrx' => 'Hunsrik', # Riograndenser Hunsrückisch
 	'hsb' => 'hornjoserbsce', # Upper Sorbian
@@ -232,6 +239,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'inh' => 'гӀалгӀай', # Ingush
 	'io' => 'Ido', # Ido
 	'is' => 'íslenska', # Icelandic
+	'isv' => 'medžuslovjansky', # Interslavic
 	'isv-cyrl' => 'меджусловјанскы', # Interslavic (Cyrillic)
 	'isv-latn' => 'medžuslovjansky', # Interslavic (Latin)
 	'it' => 'italiano', # Italian
@@ -241,10 +249,12 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'jbo' => 'la .lojban.', # Lojban
 	'jut' => 'jysk', # Jutish / Jutlandic
 	'jv' => 'Jawa', # Javanese
+	'jv-java' => 'ꦗꦮ', # Javanese (Javanese script)
 	'ka' => 'ქართული', # Georgian
 	'kaa' => 'Qaraqalpaqsha', # Karakalpak
 	'kab' => 'Taqbaylit', # Kabyle
 	'kai' => 'Karai-karai', # Karekare
+	'kaj' => 'Jju', # Jju
 	'kbd' => 'адыгэбзэ', # Kabardian
 	'kbd-cyrl' => 'адыгэбзэ', # Kabardian (Cyrillic)
 	'kbp' => 'Kabɩyɛ', # Kabiyè
@@ -277,8 +287,10 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'kri' => 'Krio', # Krio
 	'krj' => 'Kinaray-a', # Kinaray-a
 	'krl' => 'karjal', # Karelian
-	'ks' => 'कॉशुर / کٲشُر', # Kashmiri (multiple scripts - defaults to Perso-Arabic)
+	'ks' => 'کٲشُر', # Kashmiri (defaults to Perso-Arabic script)
+	# Backwards compatibility
 	'ks-arab' => 'کٲشُر', # Kashmiri (Perso-Arabic script)
+	# Backwards compatibility, deprecated, to be removed
 	'ks-deva' => 'कॉशुर', # Kashmiri (Devanagari script)
 	'ksh' => 'Ripoarisch', # Ripuarian
 	'ksw' => 'စှီၤ', # S'gaw Karen
@@ -300,7 +312,9 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'li' => 'Limburgs', # Limburgian
 	'lij' => 'Ligure', # Ligurian
 	'liv' => 'Līvõ kēļ', # Livonian
+	'ljp' => 'Lampung Api', # Lampung Api
 	'lki' => 'لەکی', # Laki
+	'lkt' => 'Lakȟótiyapi', # Lakota
 	'lld' => 'Ladin', # Ladin
 	'lmo' => 'lombard', # Lombard - T283423
 	'ln' => 'lingála', # Lingala
@@ -349,10 +363,10 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'mzn' => 'مازِرونی', # Mazanderani
 	'na' => 'Dorerin Naoero', # Nauruan
 	'nah' => 'Nāhuatl', # Nahuatl (added to ISO 639-3 on 2006-10-31)
-	'nan' => '閩南語 / Bân-lâm-gú', # Minnan (multiple scripts), T10217, T354937
+	'nan' => '閩南語 / Bân-lâm-gí', # Minnan (multiple scripts), T10217, T354937
 	'nan-hant' => '閩南語（傳統漢字）', # Minnan (Traditional Han script), T354937
-	'nan-latn-pehoeji' => 'Bân-lâm-gú (Pe̍h-ōe-jī)', # Minnan (Pe̍h-ōe-jī), T354937
-	'nan-latn-tailo' => 'Bân-lâm-gú (Tâi-lô)', # Minnan (Tâi-lô), T354937
+	'nan-latn-pehoeji' => 'Bân-lâm-gí (Pe̍h-ōe-jī)', # Minnan (Pe̍h-ōe-jī), T354937
+	'nan-latn-tailo' => 'Bân-lâm-gí (Tâi-lô)', # Minnan (Tâi-lô), T354937
 	'nap' => 'Napulitano', # Neapolitan, T45793
 	'nb' => 'norsk bokmål', # Norwegian (Bokmal)
 	'nds' => 'Plattdüütsch', # Low German ''or'' Low Saxon
@@ -391,6 +405,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'pag' => 'Pangasinan', # Pangasinan
 	'pam' => 'Kapampangan', # Pampanga
 	'pap' => 'Papiamentu', # Papiamentu
+	'pap-aw' => 'Papiamento (Aruba)', # Papiamento (Aruba), T387000
 	'pcd' => 'Picard', # Picard
 	'pcm' => 'Naijá', # Nigerian Pidgin
 	'pdc' => 'Deitsch', # Pennsylvania German
@@ -402,6 +417,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'pms' => 'Piemontèis', # Piedmontese
 	'pnb' => 'پنجابی', # Western Punjabi
 	'pnt' => 'Ποντιακά', # Pontic/Pontic Greek
+	'ppl' => 'Nawat', # Nawat
 	'prg' => 'prūsiskan', # Prussian
 	'ps' => 'پښتو', # Pashto
 	'pt' => 'português', # Portuguese
@@ -431,6 +447,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'ryu' => 'うちなーぐち', # Okinawan
 	'sa' => 'संस्कृतम्', # Sanskrit
 	'sah' => 'саха тыла', # Sakha
+	'sas' => 'Sasak', # Sasak
 	'sat' => 'ᱥᱟᱱᱛᱟᱲᱤ', # Santali
 	'sc' => 'sardu', # Sardinian
 	'scn' => 'sicilianu', # Sicilian
@@ -452,7 +469,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'shi' => 'Taclḥit', # Tachelhit, Shilha (multiple scripts - defaults to Latin)
 	'shi-latn' => 'Taclḥit', # Tachelhit (Latin script)
 	'shi-tfng' => 'ⵜⴰⵛⵍⵃⵉⵜ', # Tachelhit (Tifinagh script)
-	'shn' => 'ၽႃႇသႃႇတႆး ', # Shan
+	'shn' => 'တႆး', # Shan
 	'shy' => 'tacawit', # Shawiya (Multiple scripts - defaults to Latin)
 	'shy-latn' => 'tacawit', # Shawiya (Latin script) - T194047
 	'si' => 'සිංහල', # Sinhalese
@@ -542,6 +559,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'wal' => 'wolaytta', # Wolaytta
 	'war' => 'Winaray', # Waray-Waray
 	'wls' => 'Fakaʻuvea', # Wallisian
+	'wlx' => 'waale', # Wali
 	'wo' => 'Wolof', # Wolof
 	'wuu' => '吴语', # Wu (multiple scripts - defaults to Simplified Han)
 	'wuu-hans' => '吴语（简体）', # Wu (Simplified Han)
@@ -553,6 +571,7 @@ Readonly::Hash our %TERM_LANGUAGES => (
 	'yi' => 'ייִדיש', # Yiddish
 	'yo' => 'Yorùbá', # Yoruba
 	'yrl' => 'Nhẽẽgatú', # Nheengatu
+	'yua' => 'maaya t’aan', # Yucatec Maya
 	'yue' => '粵語', # Cantonese (multiple scripts - defaults to Traditional Han)
 	'yue-hans' => '粵语（简体）', # Cantonese (Simplified Han)
 	'yue-hant' => '粵語（繁體）', # Cantonese (Traditional Han)
@@ -639,6 +658,8 @@ Readonly::Hash our %TERM_LANGUAGES => (
 
 	# Other, used in Q111803082
 	'ak' => 'Akan',
+	# Other, used in Q3286974
+	'fr-ca' => 'Canadian French',
 );
 Readonly::Hash our %LANGUAGES => (
 	%TERM_LANGUAGES,
@@ -649,7 +670,7 @@ Readonly::Hash our %LANGUAGES => (
 	'zxx' => 'no linguistic content', # Q22282939
 );
 
-our $VERSION = 0.39;
+our $VERSION = 0.40;
 
 sub all_language_codes {
 	return keys %LANGUAGES;
@@ -720,6 +741,7 @@ Returns array with codes.
  # aa
  # aae
  # ab
+ # abr
  # abs
  # ace
  # acf
@@ -731,6 +753,7 @@ Returns array with codes.
  # aeb-latn
  # af
  # agq
+ # aig
  # ak
  # aln
  # als
@@ -792,6 +815,7 @@ Returns array with codes.
  # bm
  # bn
  # bo
+ # bol
  # bpy
  # bqi
  # bqz
@@ -801,6 +825,7 @@ Returns array with codes.
  # btm
  # bto
  # bug
+ # bug-bugi
  # bxr
  # byv
  # ca
@@ -846,6 +871,7 @@ Returns array with codes.
  # dga
  # din
  # diq
+ # dlg
  # dsb
  # dtp
  # dty
@@ -884,6 +910,7 @@ Returns array with codes.
  # fo
  # fon
  # fr
+ # fr-ca
  # frc
  # frp
  # frr
@@ -931,6 +958,7 @@ Returns array with codes.
  # hke
  # hno
  # ho
+ # hoc-latn
  # hr
  # hrx
  # hsb
@@ -957,6 +985,7 @@ Returns array with codes.
  # io
  # is
  # isu
+ # isv
  # isv-cyrl
  # isv-latn
  # it
@@ -966,10 +995,12 @@ Returns array with codes.
  # jbo
  # jut
  # jv
+ # jv-java
  # ka
  # kaa
  # kab
  # kai
+ # kaj
  # kbd
  # kbd-cyrl
  # kbp
@@ -1028,7 +1059,9 @@ Returns array with codes.
  # li
  # lij
  # liv
+ # ljp
  # lki
+ # lkt
  # lld
  # lmo
  # ln
@@ -1145,6 +1178,7 @@ Returns array with codes.
  # pms
  # pnb
  # pnt
+ # ppl
  # prg
  # ps
  # pt
@@ -1177,6 +1211,7 @@ Returns array with codes.
  # ryu
  # sa
  # sah
+ # sas
  # sat
  # sc
  # scn
@@ -1296,6 +1331,7 @@ Returns array with codes.
  # war
  # wes
  # wls
+ # wlx
  # wo
  # wuu
  # wuu-hans
@@ -1312,6 +1348,7 @@ Returns array with codes.
  # yi
  # yo
  # yrl
+ # yua
  # yue
  # yue-hans
  # yue-hant
@@ -1353,6 +1390,7 @@ Returns array with codes.
  # aa
  # aae
  # ab
+ # abr
  # abs
  # ace
  # acf
@@ -1364,6 +1402,7 @@ Returns array with codes.
  # aeb-latn
  # af
  # agq
+ # aig
  # ak
  # aln
  # als
@@ -1425,6 +1464,7 @@ Returns array with codes.
  # bm
  # bn
  # bo
+ # bol
  # bpy
  # bqi
  # bqz
@@ -1434,6 +1474,7 @@ Returns array with codes.
  # btm
  # bto
  # bug
+ # bug-bugi
  # bxr
  # byv
  # ca
@@ -1479,6 +1520,7 @@ Returns array with codes.
  # dga
  # din
  # diq
+ # dlg
  # dsb
  # dtp
  # dty
@@ -1517,6 +1559,7 @@ Returns array with codes.
  # fo
  # fon
  # fr
+ # fr-ca
  # frc
  # frp
  # frr
@@ -1564,6 +1607,7 @@ Returns array with codes.
  # hke
  # hno
  # ho
+ # hoc-latn
  # hr
  # hrx
  # hsb
@@ -1590,6 +1634,7 @@ Returns array with codes.
  # io
  # is
  # isu
+ # isv
  # isv-cyrl
  # isv-latn
  # it
@@ -1599,10 +1644,12 @@ Returns array with codes.
  # jbo
  # jut
  # jv
+ # jv-java
  # ka
  # kaa
  # kab
  # kai
+ # kaj
  # kbd
  # kbd-cyrl
  # kbp
@@ -1661,7 +1708,9 @@ Returns array with codes.
  # li
  # lij
  # liv
+ # ljp
  # lki
+ # lkt
  # lld
  # lmo
  # ln
@@ -1777,6 +1826,7 @@ Returns array with codes.
  # pms
  # pnb
  # pnt
+ # ppl
  # prg
  # ps
  # pt
@@ -1809,6 +1859,7 @@ Returns array with codes.
  # ryu
  # sa
  # sah
+ # sas
  # sat
  # sc
  # scn
@@ -1927,6 +1978,7 @@ Returns array with codes.
  # war
  # wes
  # wls
+ # wlx
  # wo
  # wuu
  # wuu-hans
@@ -1943,6 +1995,7 @@ Returns array with codes.
  # yi
  # yo
  # yrl
+ # yua
  # yue
  # yue-hans
  # yue-hant
@@ -1981,12 +2034,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2025 Michal Josef Špaček
+© 2020-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.39
+0.40
 
 =cut

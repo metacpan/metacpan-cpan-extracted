@@ -1,5 +1,13 @@
 Revision history for Object-Proto
 
+0.12	2026-04-12
+	- Fix func accessors (import_accessor) bypassing lazy attribute evaluation,
+	  returning undef instead of triggering the builder
+	- Fix Perl_xs_boot_epilog compilation failure on older perls (5.16, 5.20)
+	  where C preprocessor argument counting conflicts with aTHX_ expansion
+	- Fix Solaris linker failure: remove --export-dynamic flag which is
+	  unsupported by the Solaris native ld
+
 0.11	2026-04-08
 	- Add optional $prefix parameter to import_accessors($class, $prefix, $target)
 	  to prepend a string to all imported accessor names (avoids collisions)

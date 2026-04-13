@@ -28,6 +28,7 @@ my @files = (
     't/file-read-order/dummy.env-second',
     't/file-read-order/dummy.env-static',
     't/file-read-order/dummy.env-third',
+    't/lib/Env/Dot/Test/ChdirGuard.pm',
     't/lib/Env/Dot/Test/Utils.pm',
     't/lib/Test2/Deny/Platform/DOSOrDerivative.pm',
     't/lib/Test2/Require/Platform/DOSOrDerivative.pm',

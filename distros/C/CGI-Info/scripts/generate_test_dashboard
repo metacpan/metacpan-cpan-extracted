@@ -43,7 +43,8 @@ if [ -z "$LCSAJ_TARGETS" ]; then
 fi
 echo "LCSAJ_TARGETS=$LCSAJ_TARGETS"
 mkdir -p coverage
-PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime -Mblib" prove -l t
+# PERL5LIB must be set separately from PERL5OPT so lib/ is in @INC when the debugger module initialises, before -Mblib takes effect
+PERL5LIB="./lib:./blib/lib" PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime" prove -l t
 
 # --- Step 5b: Merge per-process LCSAJ hit files ---
 echo "Merging LCSAJ hits..."
@@ -75,6 +76,17 @@ else
 	echo "lcsaj_hits.json MISSING"
 fi
 
+# --- Step 5d: Diagnose LCSAJ hit file sources ---
+echo "Diagnosing LCSAJ hit file sources..."
+echo "Per-process hit files in cover_html/lcsaj_hits/:"
+ls -la cover_html/lcsaj_hits/ 2>/dev/null || echo "  Directory missing or empty"
+echo "Searching entire workspace for hits_*.json files:"
+find . -name 'hits_*.json' 2>/dev/null || echo "  None found"
+echo "Merged lcsaj_hits.json content (first 500 chars):"
+head -c 500 cover_html/lcsaj_hits.json 2>/dev/null || echo "  File missing"
+echo "LCSAJ_TARGETS value:"
+echo "${LCSAJ_TARGETS:0:500}"
+
 # --- Step 6: Run mutation analysis ---
 echo "Running mutation analysis..."
 mkdir -p mutation_html/lib cover_html
@@ -92,7 +104,15 @@ app-test-generator-mutate \
 
 set -e
 
-# --- Step 7: Create the test dashboard
-scripts/generate_index.pl --generate_mutant_tests=t
+# --- Step 7: Create the test dashboard ---
+# --generate_mutant_tests=t writes TODO stubs for surviving mutants.
+# --generate_test=mutant attempts runnable YAML schemas for NUM_BOUNDARY
+# survivors via SchemaExtractor where confidence is sufficient.
+# --generate_fuzz augments existing t/conf/ schemas with boundary values
+# from surviving mutants, writing timestamped copies for t/fuzz.t.
+scripts/generate_index.pl \
+	--generate_mutant_tests=t \
+	--generate_test=mutant \
+	--generate_fuzz
 
 echo "Done! Check cover_html/index.html locally, or https://nigelhorne.github.io/${GITHUB_REPOSITORY#*/}/coverage/ when deployed."

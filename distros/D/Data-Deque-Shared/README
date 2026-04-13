@@ -1,0 +1,96 @@
+NAME
+    Data::Deque::Shared - Shared-memory double-ended queue for Linux
+
+SYNOPSIS
+        use Data::Deque::Shared;
+
+        my $dq = Data::Deque::Shared::Int->new(undef, 100);
+        $dq->push_back(1);
+        $dq->push_back(2);
+        $dq->push_front(0);
+        say $dq->pop_front;   # 0
+        say $dq->pop_back;    # 2
+
+        # blocking with timeout
+        $dq->push_back_wait(42, 5.0);
+        my $v = $dq->pop_front_wait(5.0);
+
+        # file-backed / memfd
+        $dq = Data::Deque::Shared::Int->new('/tmp/dq.shm', 100);
+        $dq = Data::Deque::Shared::Int->new_memfd("my_dq", 100);
+        my $fd = $dq->memfd;
+        $dq = Data::Deque::Shared::Int->new_from_fd($fd);
+
+DESCRIPTION
+    Double-ended queue (deque) in shared memory. Ring buffer with CAS-based
+    push/pop at both ends. Futex blocking when empty or full.
+
+    Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Push / Pop
+        $dq->push_back($val);          $dq->push_front($val);
+        $dq->push_back_wait($val, $t); $dq->push_front_wait($val, $t);
+        my $v = $dq->pop_front;        my $v = $dq->pop_back;
+        my $v = $dq->pop_front_wait($t); my $v = $dq->pop_back_wait($t);
+
+  Status
+        $dq->size;  $dq->capacity;  $dq->is_empty;  $dq->is_full;
+        $dq->clear;    # NOT concurrency-safe
+        my $n = $dq->drain;  # concurrency-safe, returns count drained
+        $dq->stats;    # {size, capacity, pushes, pops, waits, timeouts, mmap_size}
+
+  Common
+        $dq->path;  $dq->memfd;  $dq->sync;  $dq->unlink;
+
+  eventfd
+        $dq->eventfd;  $dq->notify;  $dq->eventfd_consume;
+        $dq->eventfd_set($fd);  $dq->fileno;
+
+STATS
+    stats() returns: "size", "capacity", "pushes", "pops", "waits",
+    "timeouts", "mmap_size".
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+BENCHMARKS
+    Single-process (1M ops, x86_64 Linux, Perl 5.40):
+
+        push_back + pop_front (FIFO)    6.5M/s
+        push_back + pop_back (LIFO)     6.3M/s
+        push_front + pop_front (LIFO)   6.4M/s
+        push_front + pop_back (FIFO)    6.5M/s
+
+    Multi-process (8 workers, 200K ops each):
+
+        cap=16     5.7M/s aggregate
+        cap=64     5.9M/s aggregate
+        cap=256    5.8M/s aggregate
+
+SEE ALSO
+    Data::Stack::Shared - LIFO stack
+
+    Data::Queue::Shared - FIFO queue
+
+    Data::ReqRep::Shared - request-reply
+
+    Data::Pool::Shared - fixed-size object pool
+
+    Data::Log::Shared - append-only log (WAL)
+
+    Data::Buffer::Shared - typed shared array
+
+    Data::Sync::Shared - synchronization primitives
+
+    Data::HashMap::Shared - concurrent hash table
+
+    Data::PubSub::Shared - publish-subscribe ring
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    Same terms as Perl itself.
+

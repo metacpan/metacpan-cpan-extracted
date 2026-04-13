@@ -897,31 +897,11 @@ elsif ( $cmd eq 'doctor' ) {
 }
 elsif ( $cmd eq 'skills' ) {
     require Developer::Dashboard::CLI::Skills;
-    my $ok = Developer::Dashboard::CLI::Skills::run_skills_command(
+    my $exit_code = Developer::Dashboard::CLI::Skills::run_skills_command(
         command => $cmd,
         args    => \@ARGV,
     );
-    exit( $ok ? 0 : 1 );
-}
-elsif ( $cmd eq 'skill' ) {
-    require Developer::Dashboard::SkillDispatcher;
-    my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
-    
-    my $skill_name = shift @ARGV || '';
-    my $skill_cmd = shift @ARGV || '';
-    
-    die "Usage: dashboard skill <skill-name> <command> [args...]\n" if !$skill_name || !$skill_cmd;
-    
-    my $result = $dispatcher->dispatch( $skill_name, $skill_cmd, @ARGV );
-    
-    if ( $result->{error} ) {
-        print STDERR $result->{error}, "\n";
-        exit 1;
-    }
-    
-    print $result->{stdout} if $result->{stdout};
-    print STDERR $result->{stderr} if $result->{stderr};
-    exit( $result->{exit_code} || 0 );
+    exit $exit_code;
 }
 else {
     die "Unsupported built-in dashboard command '$cmd'\n";

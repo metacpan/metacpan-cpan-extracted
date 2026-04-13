@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -323,6 +323,26 @@ Key takeaways:
 =item * Strings E<le> 7 bytes stored inline in node (zero arena overhead)
 
 =back
+
+=head1 SEE ALSO
+
+L<Data::Buffer::Shared> - typed shared array
+
+L<Data::Queue::Shared> - FIFO queue
+
+L<Data::PubSub::Shared> - publish-subscribe ring
+
+L<Data::ReqRep::Shared> - request-reply
+
+L<Data::Sync::Shared> - synchronization primitives
+
+L<Data::Pool::Shared> - fixed-size object pool
+
+L<Data::Stack::Shared> - LIFO stack
+
+L<Data::Deque::Shared> - double-ended queue
+
+L<Data::Log::Shared> - append-only log (WAL)
 
 =head1 AUTHOR
 

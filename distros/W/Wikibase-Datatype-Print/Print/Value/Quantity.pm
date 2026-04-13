@@ -6,10 +6,11 @@ use warnings;
 
 use Error::Pure qw(err);
 use Readonly;
+use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -43,6 +44,21 @@ sub print {
 
 	# Output.
 	my $ret = $obj->value;
+	if ($obj->lower_bound) {
+		if ($obj->upper_bound) {
+			my $tolerance = $obj->value - $obj->lower_bound;
+			if ($tolerance != $obj->upper_bound - $obj->value) {
+				err 'Unsupported asymetric tolerance.';
+			}
+			$ret .= decode_utf8('±').$tolerance;
+		} else {
+			err 'Unsupported lower bound without upper bound.';
+		}
+	} else {
+		if ($obj->upper_bound) {
+			err 'Unsupported upper bound without lower bound.';
+		}
+	}
 	if ($unit) {
 		$ret .= ' ('.$unit.')';
 	}
@@ -95,20 +111,23 @@ Returns list of lines in array context.
  use strict;
  use warnings;
 
+ use Unicode::UTF8 qw(encode_utf8);
  use Wikibase::Datatype::Print::Value::Quantity;
  use Wikibase::Datatype::Value::Quantity;
 
  # Object.
  my $obj = Wikibase::Datatype::Value::Quantity->new(
+         'lower_bound' => 9,
          'unit' => 'Q190900',
+         'upper_bound' => 11,
          'value' => 10,
  );
 
  # Print.
- print Wikibase::Datatype::Print::Value::Quantity::print($obj)."\n";
+ print encode_utf8(Wikibase::Datatype::Print::Value::Quantity::print($obj))."\n";
 
  # Output:
- # 10 (Q190900)
+ # 10±1 (Q190900)
 
 =head1 EXAMPLE2
 
@@ -145,7 +164,8 @@ Returns list of lines in array context.
 
 L<Error::Pure>,
 L<Exporter>,
-L<Readonly>.
+L<Readonly>,
+L<Unicode::UTF8>.
 
 =head1 SEE ALSO
 
@@ -169,12 +189,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2025 Michal Josef Špaček
+© 2020-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

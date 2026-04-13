@@ -85,7 +85,7 @@ sub validate_mocks {
 
 =head1 NAME
 
-SimpleMock::Model::LWP_UA
+SimpleMock::Model::LWP_UA - Mock model for LWP::UserAgent HTTP requests
 
 =head1 DESCRIPTION
 
@@ -136,8 +136,11 @@ The response can be a simple content string, or a hashref with the following key
 =over
 
 =item * code - HTTP status code (default: 200)
+
 =item * message - HTTP status message (default: derived from code)
+
 =item * content - The body of the response (default: empty string)
+
 =item * headers - A hashref of HTTP headers to include in the response (default: empty)
 
 =back

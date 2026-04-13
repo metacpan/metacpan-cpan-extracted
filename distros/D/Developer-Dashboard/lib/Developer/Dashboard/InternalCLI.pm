@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 use File::Basename qw(dirname);
 use File::Spec;
@@ -18,7 +18,7 @@ sub helper_names {
     return qw(
       jq yq tomq propq iniq csvq xmlq
       of open-file ticket path paths ps1
-      encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor skills skill
+      encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor skills
     );
 }
 
@@ -101,6 +101,11 @@ sub ensure_helpers {
         push @written, $target;
     }
 
+    _remove_retired_managed_helper(
+        paths => $paths,
+        name  => 'skill',
+    );
+
     return \@written;
 }
 
@@ -128,6 +133,27 @@ sub _stage_managed_helper {
     open my $fh, '>:raw', $target or die "Unable to write $target: $!";
     print {$fh} $content;
     close $fh or die "Unable to close $target: $!";
+    return 1;
+}
+
+# _remove_retired_managed_helper(%args)
+# Removes one no-longer-supported dashboard-managed helper from the staged home
+# runtime when the target is still owned by dashboard.
+# Input: path registry object plus retired helper name.
+# Output: boolean true when a managed legacy helper was removed, false
+# otherwise.
+sub _remove_retired_managed_helper {
+    my (%args) = @_;
+    my $paths = $args{paths} || die 'Missing paths registry';
+    my $name  = $args{name}  || die 'Missing retired helper name';
+    my $target = File::Spec->catfile( _helper_install_root($paths), $name );
+    return 0 if !-e $target;
+    return 0 if !-f $target;
+    open my $fh, '<:raw', $target or die "Unable to read $target: $!";
+    my $content = do { local $/; <$fh> };
+    close $fh or die "Unable to close $target: $!";
+    return 0 if !_is_dashboard_managed_helper( $content, $name );
+    unlink $target or die "Unable to remove retired helper $target: $!";
     return 1;
 }
 

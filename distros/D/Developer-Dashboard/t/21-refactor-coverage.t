@@ -28,6 +28,8 @@ use Developer::Dashboard::SeedSync ();
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::SkillManager;
 
+my $repo_root = getcwd();
+
 sub _portable_path {
     my ($path) = @_;
     return undef if !defined $path;
@@ -497,6 +499,7 @@ ok( grep( $_ =~ m{/\Qticket\E$}, @$seeded_helpers ), 'ensure_helpers writes the 
 ok( grep( $_ =~ m{/\Qpath\E$}, @$seeded_helpers ), 'ensure_helpers writes the private path helper' );
 ok( grep( $_ =~ m{/\Qpaths\E$}, @$seeded_helpers ), 'ensure_helpers writes the private paths helper' );
 ok( grep( $_ =~ m{/\Qps1\E$}, @$seeded_helpers ), 'ensure_helpers writes the private ps1 helper' );
+ok( !grep( $_ =~ m{/\Qskill\E$}, @$seeded_helpers ), 'ensure_helpers no longer stages the removed singular skill helper' );
 ok(
     Developer::Dashboard::SeedSync::file_matches_content_md5(
         File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'dd', 'jq' ),
@@ -574,6 +577,32 @@ ok(
     my $managed_verify = do { local $/; <$managed_verify_fh> };
     close $managed_verify_fh;
     is( $managed_verify, $managed_body, '_stage_managed_helper leaves an already-managed matching helper unchanged on disk' );
+}
+{
+    my $cleanup_home = tempdir( CLEANUP => 1 );
+    my $cleanup_paths = Developer::Dashboard::PathRegistry->new( home => $cleanup_home );
+    my $cleanup_cli_root = File::Spec->catdir( $cleanup_home, '.developer-dashboard', 'cli', 'dd' );
+    make_path($cleanup_cli_root);
+    my $legacy_skill = File::Spec->catfile( $cleanup_cli_root, 'skill' );
+    open my $legacy_skill_fh, '>', $legacy_skill or die "Unable to write $legacy_skill: $!";
+    print {$legacy_skill_fh} Developer::Dashboard::InternalCLI::_managed_helper_content('jq');
+    close $legacy_skill_fh;
+    open my $legacy_read_fh, '<', $legacy_skill or die "Unable to read $legacy_skill: $!";
+    my $legacy_body = do { local $/; <$legacy_read_fh> };
+    close $legacy_read_fh;
+    $legacy_body =~ s/developer-dashboard-managed-helper: jq/developer-dashboard-managed-helper: skill/;
+    open my $legacy_write_fh, '>', $legacy_skill or die "Unable to rewrite $legacy_skill: $!";
+    print {$legacy_write_fh} $legacy_body;
+    close $legacy_write_fh;
+
+    ok(
+        Developer::Dashboard::InternalCLI::_remove_retired_managed_helper(
+            paths => $cleanup_paths,
+            name  => 'skill',
+        ),
+        '_remove_retired_managed_helper removes a dashboard-managed legacy skill helper',
+    );
+    ok( !-e $legacy_skill, '_remove_retired_managed_helper deletes the retired managed helper from disk' );
 }
 ok(
     Developer::Dashboard::InternalCLI::_is_dashboard_managed_helper(
@@ -1351,6 +1380,8 @@ ok(
 }
 
 my $test_repos = tempdir( CLEANUP => 1 );
+my $test_cwd = tempdir( CLEANUP => 1 );
+chdir $test_cwd or die "Unable to chdir to $test_cwd: $!";
 my $fake_bin = tempdir( CLEANUP => 1 );
 my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
 my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
@@ -1430,6 +1461,72 @@ my $manual_skill_root = $skill_paths->skill_root('layout-skill');
 make_path($manual_skill_root);
 ok( $manager->_prepare_skill_layout($manual_skill_root), '_prepare_skill_layout succeeds for a partially populated skill root' );
 ok( -f File::Spec->catfile( $manual_skill_root, 'config', 'config.json' ), '_prepare_skill_layout creates a missing config.json file' );
+
+my $layered_project_root = File::Spec->catdir( $test_repos, 'layered-project' );
+my $layered_work_root = File::Spec->catdir( $layered_project_root, 'workspace' );
+make_path( File::Spec->catdir( $layered_project_root, '.developer-dashboard' ) );
+make_path( File::Spec->catdir( $layered_project_root, '.git' ) );
+make_path($layered_work_root);
+my $layered_home_only_repo = _create_skill_repo( $test_repos, 'home-layer-skill', with_cpanfile => 0 );
+ok( !$manager->install( 'file://' . $layered_home_only_repo )->{error}, 'home-only layered fixture skill installs cleanly' );
+my $shared_layer_repo = _create_skill_repo( $test_repos, 'shared-layer-skill', with_cpanfile => 0 );
+ok( !$manager->install( 'file://' . $shared_layer_repo )->{error}, 'shared layered fixture skill installs into the home layer first' );
+{
+    my $cwd = getcwd();
+    chdir $shared_layer_repo or die "Unable to chdir to $shared_layer_repo: $!";
+    _write_file(
+        File::Spec->catfile( 'cli', 'run-test' ),
+        "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{project-layer\\n};\n",
+        0755,
+    );
+    _run_or_die(qw(git add .));
+    _run_or_die( 'git', 'commit', '-m', 'Project layer variant' );
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+}
+{
+    my $cwd = getcwd();
+    chdir $layered_work_root or die "Unable to chdir to $layered_work_root: $!";
+    my $layered_paths = Developer::Dashboard::PathRegistry->new( home => File::Spec->catdir( $ENV{HOME}, 'skills-home' ) );
+    my $layered_manager = Developer::Dashboard::SkillManager->new( paths => $layered_paths );
+    is(
+        $layered_paths->skills_root,
+        File::Spec->catdir( $layered_project_root, '.developer-dashboard', 'skills' ),
+        'skills_root writes to the deepest participating DD-OOP-LAYER',
+    );
+    is_deeply(
+        [ $layered_paths->skills_roots ],
+        [
+            File::Spec->catdir( $layered_project_root, '.developer-dashboard', 'skills' ),
+            File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills' ),
+        ],
+        'skills_roots resolves layered skill roots in deepest-first lookup order',
+    );
+    ok( !$layered_manager->install( 'file://' . $shared_layer_repo )->{error}, 'layered manager installs the shared skill into the project layer without clashing with the home copy' );
+    is_deeply(
+        [ $layered_paths->skill_roots_for('shared-layer-skill') ],
+        [
+            File::Spec->catdir( $layered_project_root, '.developer-dashboard', 'skills', 'shared-layer-skill' ),
+            File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'shared-layer-skill' ),
+        ],
+        'skill_roots_for resolves one layered skill in deepest-first lookup order',
+    );
+    is(
+        $layered_manager->get_skill_path('shared-layer-skill'),
+        File::Spec->catdir( $layered_project_root, '.developer-dashboard', 'skills', 'shared-layer-skill' ),
+        'get_skill_path prefers the deepest matching layered skill',
+    );
+    is(
+        $layered_manager->get_skill_path('home-layer-skill'),
+        File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'home-layer-skill' ),
+        'get_skill_path still inherits home-layer skills when no deeper override exists',
+    );
+    is_deeply(
+        [ map { File::Basename::basename($_) } $layered_paths->installed_skill_roots ],
+        [ 'shared-layer-skill', 'dep-skill', 'home-layer-skill', 'layout-skill' ],
+        'installed_skill_roots exposes the effective layered skill set once per repo name',
+    );
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+}
 
 my $no_dep_repo = _create_skill_repo( $test_repos, 'no-dep-skill', with_cpanfile => 0 );
 ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager installs skills without a cpanfile' );
@@ -1525,6 +1622,27 @@ _write_file( File::Spec->catfile( $invalid_config_root, 'config', 'config.json' 
 is_deeply( $dispatcher->get_skill_config('hookless-skill'), {}, 'get_skill_config falls back to an empty hash for invalid JSON config' );
 is( $dispatcher->get_skill_path(''), undef, 'get_skill_path returns undef for empty skill names' );
 is( $dispatcher->get_skill_path('dep-skill'), $manager->get_skill_path('dep-skill'), 'get_skill_path returns the installed skill path for valid skills' );
+{
+    my $fallback_dispatcher = bless {
+        manager => bless(
+            {
+                paths => bless( {}, 'Local::NoSkillLayerPaths' ),
+            },
+            'Local::FallbackSkillManager'
+        ),
+    }, 'Developer::Dashboard::SkillDispatcher';
+    no warnings qw(redefine once);
+    local *Local::FallbackSkillManager::get_skill_path = sub {
+        my ( $self, $skill_name ) = @_;
+        return '' if !$skill_name;
+        return '/tmp/fallback-skill-root';
+    };
+    is_deeply(
+        [ $fallback_dispatcher->_skill_layers('fallback-skill') ],
+        ['/tmp/fallback-skill-root'],
+        '_skill_layers falls back to manager get_skill_path when the path registry does not expose layered helpers',
+    );
+}
 is( $dispatcher->command_path( '', 'run-test' ), undef, 'command_path returns undef for missing skill names' );
 is( $dispatcher->command_path( 'dep-skill', '' ), undef, 'command_path returns undef for missing command names' );
 is( $dispatcher->command_path( 'missing-skill', 'run-test' ), undef, 'command_path returns undef for unknown skills' );
@@ -1572,12 +1690,53 @@ is_deeply( $dispatcher->skill_nav_pages('no-nav-skill'), [], 'skill_nav_pages re
     my %env = $dispatcher->_skill_env(
         skill_name   => 'dep-skill',
         skill_path   => $manager->get_skill_path('dep-skill'),
+        skill_layers => [ $manager->get_skill_path('dep-skill') ],
         command      => 'run-test',
         result_state => { alpha => { stdout => "ok\n" } },
     );
     like( $env{PERL5LIB}, qr/\Q$local_lib\E/, '_skill_env prepends the skill-local perl library when present' );
     like( $env{RESULT}, qr/alpha/, '_skill_env serializes RESULT state for skill hooks and commands' );
 }
+is(
+    $dispatcher->_hook_result_key('/tmp/skill/cli/run-test.d/00-pre.pl'),
+    'run-test.d/00-pre.pl',
+    '_hook_result_key namespaces duplicate hook basenames by their hook directory',
+);
+is_deeply(
+    $dispatcher->_merge_named_hash_array(
+        [ { name => 'alpha', interval => 10 } ],
+        [ { name => 'alpha', interval => 20 }, { name => 'beta', interval => 30 } ],
+        'name',
+    ),
+    [
+        { name => 'alpha', interval => 20 },
+        { name => 'beta',  interval => 30 },
+    ],
+    '_merge_named_hash_array replaces matching logical entries while preserving new ones',
+);
+is_deeply(
+    $dispatcher->_merge_skill_hashes(
+        {
+            collectors => [ { name => 'alpha', interval => 10 } ],
+            providers  => [ { id => 'main', title => 'Home' } ],
+        },
+        {
+            collectors => [ { name => 'alpha', interval => 20 }, { name => 'beta', interval => 30 } ],
+            providers  => [ { id => 'main', title => 'Leaf' }, { id => 'extra', title => 'Extra' } ],
+        },
+    ),
+    {
+        collectors => [
+            { name => 'alpha', interval => 20 },
+            { name => 'beta',  interval => 30 },
+        ],
+        providers => [
+            { id => 'main',  title => 'Leaf' },
+            { id => 'extra', title => 'Extra' },
+        ],
+    },
+    '_merge_skill_hashes merges collector and provider arrays by logical identity for layered skill config',
+);
 {
     my $files = Developer::Dashboard::FileRegistry->new( paths => $skill_paths );
     my $config = Developer::Dashboard::Config->new( files => $files, paths => $skill_paths );
@@ -1589,7 +1748,7 @@ is_deeply( $dispatcher->skill_nav_pages('no-nav-skill'), [], 'skill_nav_pages re
 }
 {
     for my $module_path (
-        qw(
+        map { File::Spec->catfile( $repo_root, $_ ) } qw(
           lib/Developer/Dashboard/CLI/OpenFile.pm
           lib/Developer/Dashboard/CLI/Query.pm
           lib/Developer/Dashboard/UpdateManager.pm

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Kathryn Andersen <perlkat\@katspace.org>"
   ],
   "dist_name" => "Graphics-Colourset",
-  "dist_version" => "0.06",
+  "dist_version" => "0.0601",
   "license" => "perl",
   "module_name" => "Graphics::Colourset",
   "recursive_test_files" => 1,

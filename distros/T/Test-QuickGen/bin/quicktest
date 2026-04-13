@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+
+use v5.16;
+use utf8;
+use open qw(:std :encoding(UTF-8));
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+use App::Prove;
+
+my $max_runs;
+my $help;
+# allow the program to proceed if it doesn't find the given options, they are
+# forwarded to prove.
+Getopt::Long::Configure('pass_through');
+GetOptions(
+  'max-runs|n=i' => \$max_runs,
+  'help|h' => \$help,
+) or pod2usage(2);
+pod2usage(-verbose => 2) if $help;
+
+my @test_args = @ARGV or pod2usage(2);
+
+my $runs = 0;
+my $preset_seed = $ENV{PERL_RAND_SEED};
+
+while (1) {
+  $runs++;
+
+  if (defined $max_runs && $runs > $max_runs) {
+    say "✅ Reached maximum runs ($max_runs), no failures detected.";
+    last;
+  }
+  
+  say "=== Run #$runs ===";
+
+  my $seed = $preset_seed // srand();
+  # pass on seed to child processes spawned by prove
+  $ENV{PERL_RAND_SEED} = $seed;
+
+  my $app = App::Prove->new;
+  $app->process_args(@test_args);
+
+  unless ($app->run) {
+    # safe, as srand is guaranteed to only be called once
+    say "❌ Test failed on run #$runs, PERL_RAND_SEED: ", $seed;
+    exit 1;
+  }
+}
+
+__END__
+
+=head1 NAME
+
+  quicktest - Run prove repeatedly until failure.
+
+=head1 SYNOPSIS
+
+  quicktest [options] [--max-runs N] <file_or_folder>
+
+  quicktest -lv t/
+  quicktest -lr t/
+  quicktest --max-runs 100 -lr t/
+
+=head1 DESCRIPTION
+
+C<quicktest> repeatedly runs tests using C<prove> until a failure occurs
+or an optional maximum number of runs is reached.
+
+It is useful for detecting intermittent (flaky) test failures.
+
+=head1 OPTIONS
+
+=head2 --max-runs N, -n N
+
+Stop after running the test suite C<N> times, even if no failures occur.
+
+If not provided, tests will run indefinitely until a failure happens.
+
+=head2 prove options
+
+All other options are passed directly to C<prove>. See L<prove> for full details.
+
+=head1 ENVIRONMENT
+
+=head2 PERL_RAND_SEED
+
+If set, this seed will be reused for every run. Otherwise, a new random
+seed is generated for each run and passed to child processes.
+
+=head1 EXAMPLES
+
+Run tests until failure:
+
+  quicktest -l t/
+
+Run up to 50 times:
+
+  quicktest --max-runs 50 -l t/
+
+Run tests with a failed seed:
+
+  PERL_RAND_SEED=1234 prove -l t/
+
+=head1 AUTHOR
+
+Antonis Kalou <kalouantonis@protonmail.com>
+
+=cut

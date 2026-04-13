@@ -6,7 +6,7 @@ use warnings;
 
 use Wikibase::Datatype::Value::String;
 
-our $VERSION = 0.39;
+our $VERSION = 0.40;
 
 sub new {
 	my $class = shift;
@@ -138,12 +138,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2025
+© Michal Josef Špaček 2020-2026
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.39
+0.40
 
 =cut

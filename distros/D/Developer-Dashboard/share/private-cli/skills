@@ -33,23 +33,23 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard skills>, the command family that installs, updates, lists, and uninstalls skills.
+This staged helper exposes C<dashboard skills>, the command family that installs, updates, lists, enables, disables, and uninstalls skills while also serving as the private handoff target for dotted skill command execution.
 
 =head1 WHY IT EXISTS
 
-It exists because skill lifecycle management is a built-in feature, but the wrapper should stage a command and leave Git/layout logic to the skill manager.
+It exists because skill lifecycle management is a built-in feature, but the wrapper should stage a command and leave Git/layout logic to the skill manager and skill command dispatch to the dedicated runtime module.
 
 =head1 WHEN TO USE
 
-Use this file when changing the C<dashboard skills> CLI verbs or the handoff into the skill manager.
+Use this file when changing the C<dashboard skills> CLI verbs or the dotted-command handoff into the skill runtime.
 
 =head1 HOW TO USE
 
-Users run C<dashboard skills install>, C<update>, C<list>, or C<uninstall>. The staged helper forwards the request into the private runtime, which loads the skill manager and performs the requested lifecycle action.
+Users run C<dashboard skills install>, C<update>, C<enable>, C<disable>, C<list>, C<usage>, or C<uninstall>. The staged helper forwards those lifecycle requests into the private runtime, which loads the skill manager and performs the requested action. The public dotted form C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> also lands here through an internal action so installed skill commands keep one private helper surface.
 
 =head1 WHAT USES IT
 
-It is used by developers managing installed skills, by skill lifecycle tests, and by documentation that explains the isolated skill runtime.
+It is used by developers managing installed skills, by dotted skill command dispatch, by skill lifecycle tests, and by documentation that explains the isolated skill runtime.
 
 =head1 EXAMPLES
 
@@ -67,17 +67,23 @@ Inspect installed skill metadata, including whether each skill ships config, doc
 
 Example 3:
 
+  dashboard example-skill.hello
+
+Run an installed skill command through the public dotted route, which the switchboard forwards into this staged helper.
+
+Example 4:
+
   ~/.developer-dashboard/cli/dd/skills --help
 
 Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
 
-Example 4:
+Example 5:
 
   prove -lv t/05-cli-smoke.t t/19-skill-system.t
 
 Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
 
-Example 5:
+Example 6:
 
   prove -lr t
 

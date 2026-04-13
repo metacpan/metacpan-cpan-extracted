@@ -67,6 +67,7 @@ t/051-plus-attr.t
 t/052-object-clone-deep.t
 t/053-import-accessor-collision.t
 t/054-import-accessors-prefix.t
+t/055-lazy-reader-func-accessor.t
 t/fix_subtests.pl
 t/lib/NeuralNet/Activation.pm
 t/lib/NeuralNet/Layer.pm

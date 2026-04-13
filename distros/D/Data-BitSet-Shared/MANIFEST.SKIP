@@ -1,0 +1,16 @@
+^\.git/
+\.gitignore$
+\.o$
+\.so$
+\.bs$
+\.bak$
+\.old$
+\.tar\.gz$
+^blib/
+^pm_to_blib$
+^ppport\.h$
+^Shared\.c$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^MANIFEST\.bak$

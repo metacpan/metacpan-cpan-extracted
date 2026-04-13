@@ -10,6 +10,7 @@ BEGIN {
     };
 }
 
+use Cwd qw(getcwd);
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec;
@@ -93,6 +94,10 @@ sub wait_for_child_exit {
         return 1;
     }
 }
+
+my $original_cwd = getcwd();
+my $test_cwd = tempdir(CLEANUP => 1);
+chdir $test_cwd or die "Unable to chdir to $test_cwd: $!";
 
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
@@ -695,13 +700,17 @@ ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a 
         kill 'KILL', $stubborn_ajax;
         $ajax_reaped = wait_for_child_exit($stubborn_ajax);
     }
-    waitpid( $stubborn_ajax, 0 ) if !$ajax_reaped && kill 0, $stubborn_ajax;
+waitpid( $stubborn_ajax, 0 ) if !$ajax_reaped && kill 0, $stubborn_ajax;
     if ($UNDER_COVER) {
         ok( $ajax_reaped || !kill( 0, $stubborn_ajax ), 'stubborn ajax shutdown remains timing-tolerant under coverage' );
     }
     else {
         ok( !kill( 0, $stubborn_ajax ), 'stop_web escalates stubborn ajax singleton workers to KILL after TERM is ignored' );
     }
+}
+
+END {
+    chdir $original_cwd if defined $original_cwd && length $original_cwd;
 }
 
 {

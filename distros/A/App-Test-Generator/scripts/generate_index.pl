@@ -214,7 +214,7 @@ Readonly my %config => (
 	lcsaj_root => 'cover_html/mutation_html/lib',
 	lcsaj_hits_file     => 'cover_html/lcsaj_hits.json', # Runtime.pm writes here
 	output => 'cover_html/index.html',	# published to gh-pages
-	max_retry => 3,
+	max_retry => 5,
 	min_locale_samples => 3,
 	verbose => 1,
 );
@@ -456,10 +456,20 @@ if($prev_data) {
 	for my $file (keys %{$cover_db->{summary}}) {
 		next if $file eq 'Total';
 		next if $file =~ /^\//;    # skip absolute paths
+
+		# Normalise blib/ paths and deduplicate against lib/ entries
+		my $delta_key = $file;
+		if($file =~ /^blib\/lib\/(.+)$/) {
+			next if exists $cover_db->{summary}{"lib/$1"};
+			$delta_key = "lib/$1";
+		}
+
 		my $curr = $cover_db->{summary}{$file}{total}{percentage} // 0;
-		my $prev = $prev_data->{summary}{$file}{total}{percentage} // 0;
+		my $prev = $prev_data->{summary}{$file}{total}{percentage}
+			// $prev_data->{summary}{$delta_key}{total}{percentage}
+			// 0;
 		my $delta = sprintf('%.1f', $curr - $prev);
-		$deltas{$file} = $delta;
+		$deltas{$delta_key} = $delta;
 	}
 }
 
@@ -479,15 +489,22 @@ my ($total_files, $total_coverage, $low_coverage_count) = (0, 0, 0);
 
 for my $file (sort keys %{$cover_db->{summary}}) {
 	next if $file eq 'Total';
+	next if $file =~ /^\//;    # skip absolute paths (installed modules)
 
-	# Check it's in our repo e.g. bin or blib
-	if($file =~ /^\//) {
-		# delete $cover_db->{summary};
-		next;
+	# Normalise blib/lib/ paths to lib/ for display.
+	# Devel::Cover instruments blib/ during testing but we
+	# want to show lib/ paths to match the source tree.
+	my $display_file = $file;
+	if($file =~ /^blib\/lib\/(.+)$/) {
+		my $lib_path = "lib/$1";
+		# If a native lib/ version exists, skip this blib/ entry
+		# to avoid duplicate rows
+		next if exists $cover_db->{summary}{$lib_path};
+		$display_file = $lib_path;
 	}
 
 	my $info = $cover_db->{summary}{$file};
-	my $html_file = $file;
+	my $html_file = $display_file;
 	$html_file =~ s|/|-|g;
 	$html_file =~ s|\.pm$|-pm|;
 	$html_file =~ s|\.pl$|-pl|;
@@ -530,7 +547,7 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 		$delta_html = '<td class="neutral" title="No previous data">&#9679;</td>';
 	}
 
-	my $source_url = $github_base . $file;
+	my $source_url = $github_base . $display_file;
 	my $has_coverage = (
 		defined $info->{statement}{percentage} ||
 		defined $info->{branch}{percentage} ||
@@ -565,7 +582,7 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 
 	push @html, sprintf(
 		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line" target="_blank">%s</a> %s<canvas class="sparkline" width="80" height="20" data-points="$points_attr"></canvas></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>},
-		$row_class, $html_file, $file, $source_link,
+		$row_class, $html_file, $display_file, $source_link,
 		$info->{statement}{percentage} // 0,
 		$info->{branch}{percentage} // 0,
 		$info->{condition}{percentage} // 0,
@@ -594,9 +611,15 @@ for my $file (keys %{$cover_db->{summary}}) {
 	next if $file eq 'Total';
 	next if $file =~ /^\//;	# skip absolute paths (installed modules)
 
+	# Skip blib/ entries that have a corresponding lib/ entry
+	# to avoid counting the same file twice in the totals
+	if($file =~ /^blib\/lib\/(.+)$/) {
+		next if exists $cover_db->{summary}{"lib/$1"};
+	}
+
 	my $info = $cover_db->{summary}{$file};
 	$sum_stmt   += $info->{statement}{percentage}  // 0;
-	$sum_branch += $info->{branch}{percentage}     // 0;
+	$sum_branch += $info->{branch}{percentage} // 0;
 	$sum_cond   += $info->{condition}{percentage}  // 0;
 	$sum_sub    += $info->{subroutine}{percentage} // 0;
 	$sum_total  += $info->{total}{percentage}      // 0;
@@ -1053,7 +1076,7 @@ HTML
 my $dist_name = $config{github_repo};
 my $cpan_api = "https://api.cpantesters.org/v3/summary/" . uri_escape($dist_name);
 
-my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 15);
+my $http = HTTP::Tiny->new(agent => 'cpan-coverage-html/1.0', timeout => 30);
 
 my $retry = 0;
 my $success = 0;
@@ -1068,7 +1091,10 @@ while($retry < $config{max_retry}) {
 		last;
 	}
 	$retry++;
-	sleep(2 ** $retry);
+	# Cap sleep at 16 seconds — exponential backoff but don't wait forever
+	my $sleep_secs = 2 ** $retry;
+	$sleep_secs = 16 if $sleep_secs > 16;
+	sleep($sleep_secs);
 }
 
 my $version;	# current version
@@ -1250,7 +1276,7 @@ if($version) {
 					),
 					" $confidence_html</p>";
 			}
-			push @html, '<h3>Failure Summary</h3>';
+			push @html, '<h3>Failure Summary (all reports)</h3>';
 			push @html, '<ul>';
 
 			my %clusters = (
@@ -1371,6 +1397,10 @@ if($version) {
 				fail_perl_versions => \@fail_perl_versions,
 				pass_perl_versions => \@pass_perl_versions,
 			);
+
+			# warn 'Root causes found: ', scalar(@root_causes) . "\n";
+			# warn 'Pass reports: ', scalar(@pass_reports) . "\n";
+
 			if (@root_causes) {
 				push @html, <<'HTML';
 <h3>Likely Root Causes</h3>
@@ -1580,7 +1610,11 @@ HTML
 	# push @html, "<A HREF=\"$cpan_api\">$cpan_api</A>";
 	push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
 } else {
-	push @html, "<a href=\"$cpan_api\">$cpan_api</a>: $res->{status} $res->{reason}";
+	my $reason = $res->{status} == 599
+		? 'CPAN Testers API temporarily unreachable'
+		: "$res->{status} $res->{reason}";
+	push @html, "<p><em>CPAN Testers data unavailable: $reason. "
+		. "Check <a href=\"$cpan_api\">$cpan_api</a> manually.</em></p>";
 }
 
 # Output the Mutation Overview
@@ -1806,8 +1840,72 @@ sub collect_dependency_versions {
 	}
 }
 
+# --------------------------------------------------
+# detect_universal_failure
+#
+# Purpose:    Detect when failures occur across all
+#             tested Perl versions and OS types,
+#             suggesting a broken release rather than
+#             a version- or platform-specific issue.
+#
+# Entry:      $fail_reports - arrayref of fail report hashrefs
+#             $pass_reports - arrayref of pass report hashrefs
+#
+# Exit:       Returns a root cause hashref, or undef
+#             if the pattern is not present.
+#
+# Side effects: None.
+#
+# Notes:      Triggered when: there are failures on 3+
+#             distinct Perl versions AND 2+ distinct OS
+#             types AND pass reports are absent or very
+#             sparse (< 10% of total reports).
+# --------------------------------------------------
+sub detect_universal_failure {
+	my ($fail_reports, $pass_reports) = @_;
+
+	return unless @{$fail_reports} >= 3;
+
+	# Count distinct Perl versions and OS types in failures
+	my %fail_perls = map { $_->{perl} => 1 }
+		grep { $_->{perl} } @{$fail_reports};
+	my %fail_os = map { $_->{osname} => 1 }
+		grep { $_->{osname} } @{$fail_reports};
+
+	# Need failures on 3+ Perl versions and 2+ OS types
+	return unless scalar(keys %fail_perls) >= 3;
+	return unless scalar(keys %fail_os)    >= 2;
+
+	# Check that passes are absent or very sparse
+	my $total = scalar(@{$fail_reports}) + scalar(@{$pass_reports});
+	my $pass_ratio = $total ? scalar(@{$pass_reports}) / $total : 0;
+
+	# If more than 10% are passing, this is not universal failure
+	return unless $pass_ratio < 0.10;
+
+	my @perl_list = sort keys %fail_perls;
+	my @os_list   = sort keys %fail_os;
+
+	return {
+		type       => 'universal',
+		label      => 'Possibly broken release (failures on all tested configurations)',
+		confidence => sprintf('%.2f', 1 - $pass_ratio),
+		evidence   => [
+			sprintf('Failures on %d Perl versions: %s',
+				scalar(@perl_list),
+				join(', ', @perl_list)
+			),
+			sprintf('Failures on %d OS types: %s',
+				scalar(@os_list),
+				join(', ', @os_list)
+			),
+			'Likely causes: missing file in tarball, broken Makefile.PL, or undeclared dependency',
+		],
+	};
+}
+
 sub detect_version_cliffs {
-	my ($deps) = @_;
+	my $deps = $_[0];
 	my @suspects;
 
 	for my $mod (sort keys %$deps) {
@@ -2090,6 +2188,13 @@ sub detect_root_causes {
 	my (%args) = @_;
 	my @hints;
 
+	# Check for universal failure pattern first — if present,
+	# it is almost certainly the most important root cause
+	push @hints, detect_universal_failure(
+		$args{fail_reports} || [],
+		$args{pass_reports} || [],
+	);
+
 	push @hints, detect_os_root_cause($args{fail_reports}, \%config) if $args{fail_reports};
 	push @hints, detect_locale_root_cause($args{fail_reports}, \%config);
 
@@ -2101,10 +2206,68 @@ sub detect_root_causes {
 			);
 	}
 
+	push @hints, detect_scattered_failures(
+		$args{fail_reports} || [],
+		$args{pass_reports} || [],
+	);
+
 	@hints = grep { defined } @hints;
 	@hints = sort { $b->{confidence} <=> $a->{confidence} } @hints;
 
 	return @hints;
+}
+
+# --------------------------------------------------
+# detect_scattered_failures
+#
+# Purpose:    Detect when failures and passes coexist
+#             across the same Perl versions and OS
+#             types with no clear cliff pattern,
+#             suggesting flaky tests or optional
+#             dependency differences rather than a
+#             compatibility issue.
+#
+# Entry:      $fail_reports - arrayref of fail hashrefs
+#             $pass_reports - arrayref of pass hashrefs
+#
+# Exit:       Returns a root cause hashref, or undef
+#             if the pattern is not present.
+#
+# Side effects: None.
+#
+# Notes:      Triggered when: there are failures on 3+
+#             Perl versions, passes exist on some of
+#             the same versions, and no version cliff
+#             is detectable. Confidence is intentionally
+#             low since this is a weak signal.
+# --------------------------------------------------
+sub detect_scattered_failures {
+	my ($fail_reports, $pass_reports) = @_;
+
+	return unless @{$fail_reports} >= 3 && @{$pass_reports} >= 3;
+
+	# Build sets of Perl versions seen in each grade
+	my %fail_perls = map { perl_series($_->{perl}) => 1 }
+		grep { $_->{perl} } @{$fail_reports};
+	my %pass_perls = map { perl_series($_->{perl}) => 1 }
+		grep { $_->{perl} } @{$pass_reports};
+
+	# Count how many Perl series appear in both fail and pass
+	my $overlap = grep { exists $pass_perls{$_} } keys %fail_perls;
+
+	# Need significant overlap — failures and passes on same versions
+	return unless $overlap >= 2;
+
+	return {
+		type       => 'scattered',
+		label      => 'Scattered failures (no clear version or OS pattern)',
+		confidence => 0.40,
+		evidence   => [
+			sprintf('Failures and passes both seen on %d common Perl series', $overlap),
+			'Possible causes: flaky tests, optional dependency differences, or CGI environment assumptions',
+			'Review test output from failing reports for specific error messages',
+		],
+	};
 }
 
 sub make_key
@@ -3460,11 +3623,11 @@ sub _mutation_index {
 		my $complexity = _cyclomatic_complexity($file);
 
 		my $complexity_class = $complexity >= $config{med_threshold} ? 'badge-bad'
-					: $score >= $config{low_threshold} ? 'badge-warn'
-					: 'badge-good';
-		my $complexity_tooltip = $complexity >= $config{med_threshold} ? 'Good'
-				 : $complexity >= $config{low_threshold} ? 'Medium'
-				 : 'Bad';
+			: $complexity >= $config{low_threshold} ? 'badge-warn'
+			: 'badge-good';
+		my $complexity_tooltip = $complexity >= $config{med_threshold} ? 'Needs improvement'
+			: $complexity >= $config{low_threshold} ? 'Moderate'
+			: 'Good';
 
 		my $complexity_html = sprintf(
 			'<span class="coverage-badge %s" title="%s">%d</span>',
@@ -4425,7 +4588,8 @@ document.addEventListener("mousemove", function(e) {
 # _coverage_totals
 #
 # Extract structural coverage totals from a Devel::Cover JSON
-# report. Returns four scalar values in list context:
+# report, computed only across the project's own files.
+# Returns four scalar values in list context:
 #
 #   ($statement_total, $statement_hit,
 #    $branch_total,    $branch_hit)
@@ -4433,17 +4597,13 @@ document.addEventListener("mousemove", function(e) {
 # This matches how the routine is used elsewhere in this file.
 #
 # NOTE:
-# Devel::Cover stores totals under:
-#
-#   $cov->{summary}->{Total}
-#
-# while per-file data appears under:
-#
-#   $cov->{summary}->{filename}
-#
-# This routine extracts only the aggregated totals.
+# Devel::Cover's pre-aggregated Total key includes all
+# instrumented files — CPAN dependencies, blib/ copies,
+# and absolute paths — which massively deflates the
+# reported percentage. We recompute from individual file
+# entries, applying the same own-file filter used in the
+# coverage table and badge calculation.
 # ------------------------------------------------------------
-
 sub _coverage_totals
 {
 	my $cov = $_[0];
@@ -4453,15 +4613,32 @@ sub _coverage_totals
 	return (0,0,0,0) unless ref $cov eq 'HASH';
 	return (0,0,0,0) unless $cov->{summary};
 
-	my $total = $cov->{summary}->{Total} || {};
+	my ($stmt_total, $stmt_hit, $branch_total, $branch_hit) = (0, 0, 0, 0);
 
-	# Extract statement coverage
-	my $stmt_total = $total->{statement}{total}   || 0;
-	my $stmt_hit   = $total->{statement}{covered} || 0;
+	for my $file (keys %{ $cov->{summary} }) {
+		# Skip the pre-aggregated Total — it includes CPAN modules
+		next if $file eq 'Total';
 
-	# Extract branch coverage
-	my $branch_total = $total->{branch}{total}   || 0;
-	my $branch_hit   = $total->{branch}{covered} || 0;
+		# Skip absolute paths (installed CPAN modules)
+		next if $file =~ /^\//;
+
+		# Skip blib/ entries that have a corresponding lib/ entry
+		# to avoid double-counting the same file
+		if($file =~ /^blib\/lib\/(.+)$/) {
+			next if exists $cov->{summary}{"lib/$1"};
+		}
+
+		# Only count own project files
+		next unless $file =~ /^(?:lib|blib|bin)\//;
+
+		my $info = $cov->{summary}{$file};
+
+		# Accumulate raw totals and hits across own files
+		$stmt_total   += $info->{statement}{total}   || 0;
+		$stmt_hit += $info->{statement}{covered} || 0;
+		$branch_total += $info->{branch}{total} || 0;
+		$branch_hit   += $info->{branch}{covered} || 0;
+	}
 
 	return ($stmt_total, $stmt_hit, $branch_total, $branch_hit);
 }
@@ -4474,7 +4651,7 @@ sub _coverage_totals
 # root, so we try multiple match strategies.
 # ------------------------------------------------------------
 sub _coverage_for_file {
-    my ($cov, $file) = @_;
+	my ($cov, $file) = @_;
 
     return unless $cov && $cov->{summary};
     my $summary = $cov->{summary};

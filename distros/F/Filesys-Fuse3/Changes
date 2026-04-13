@@ -1,5 +1,11 @@
 Revision history for Perl module Filesys::Fuse3
 
+0.021 2026-04-12
+
+  * fix(Makefile.PL): fix error message for Debian
+  * fix(Makefile.PL): fix bugtracker and repository URLs
+  * fix(Makefile.PL): fix test before cpan-upload
+
 0.020 2026-04-11
 
  - Forked from Fuse (https://github.com/dpavlin/perl-fuse.git)

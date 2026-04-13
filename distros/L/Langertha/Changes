@@ -1,5 +1,13 @@
 Revision history for Langertha
 
+0.401     2026-04-12 21:24:49Z
+
+    - Guard list_models in OpenAICompatible against engines that do not
+      support listModels operation; use StaticModels for Perplexity and
+      NousResearch instead of hitting a 404.
+    - Fix Moose warning in ToolChoice by importing only enum from
+      Moose::Util::TypeConstraints.
+
 0.400     2026-04-07 23:01:11Z
 
     - New value object Langertha::Usage for token counting with from_hash /

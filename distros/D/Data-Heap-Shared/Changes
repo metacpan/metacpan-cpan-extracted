@@ -1,0 +1,7 @@
+Revision history for Data::Heap::Shared
+
+0.02  2026-04-12
+    - Make clear() concurrency-safe (mutex-protected)
+
+0.01  2026-04-12
+    - Initial release

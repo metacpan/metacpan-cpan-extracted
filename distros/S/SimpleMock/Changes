@@ -1,10 +1,28 @@
 Revision history for SimpleMock
 
-0.01    2025-01-01
+0.02    2026-04-12
+        - Renamed LWP model to LWP_UA for consistency with other model names
+        - Added abstracts to NAME sections for Model::SUBS, Model::LWP_UA,
+          Model::PATH_TINY, and ScopeGuard (fixes missing notes on MetaCPAN)
+        - Fixed =item list formatting in DBD::SimpleMock and Model::LWP_UA POD
+          (items were running together on MetaCPAN due to missing blank lines)
+        - Rewrote POD for Model::SUBS and Model::DBI with clearer examples
+        - Fixed register_mocks() examples across all POD (was using hashref
+          syntax instead of flat hash)
+        - Fixed multiple typos in POD across Mocks::Path::Tiny and Model::PATH_TINY
+        - Fixed stale 'use DBD::Mock' import in Model::DBI
+        - Added missing modules to t/00-load.t
+        - Added MANIFEST.SKIP, Changes file
+        - Updated Makefile.PL: added missing dependencies, TEST_REQUIRES,
+          MIN_PERL_VERSION, META_MERGE; removed stale dependencies
+        - Storable >= 2.34 now required (older versions have a known bug)
+        - EUMM fallback for TEST_REQUIRES on Perl < 5.18
+
+0.01    2026-04-12
         - Initial alpha release
         - SUBS model for mocking subroutine calls
         - DBI model with DBD::SimpleMock driver
-        - LWP model for mocking HTTP requests
+        - LWP_UA model for mocking LWP::UserAgent HTTP requests
         - PATH_TINY model for mocking Path::Tiny operations
         - Scoped mock support via register_mocks_scoped / ScopeGuard
         - Auto-loading of SimpleMock::Mocks::* modules via require override

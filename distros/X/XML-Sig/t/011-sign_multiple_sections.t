@@ -46,10 +46,7 @@ SKIP: {
 
 
 SKIP: {
-    eval {
-        require Crypt::OpenSSL::DSA;
-    };
-    skip "Crypt::OpenSSL::DSA not installed", 3 if ($@);
+    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 3 if (!test_dsa_ok());
 # Test signing with a DSA key
 my $dsasig = XML::Sig->new({ key => 't/dsa.private.key' });
 my $dsa_signed_xml = $dsasig->sign($xml);

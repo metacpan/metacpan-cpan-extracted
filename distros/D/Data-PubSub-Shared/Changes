@@ -1,5 +1,9 @@
 Revision history for Data-PubSub-Shared
 
+0.03  2026-04-12
+    - Add SEE ALSO cross-links to family modules
+
+
 0.02  2026-04-10
     - XS::Parse::Keyword is now a required dependency
 

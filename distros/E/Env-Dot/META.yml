@@ -9,7 +9,11 @@ build_requires:
   FileHandle: '0'
   FindBin: '0'
   Test2::Require: '0'
-  Test2::V0: '0'
+  Test2::Suite: '1.302200'
+  Test2::Tools::GenTemp: '1.302200'
+  Test2::Tools::Subtest: '0'
+  Test2::V0: '1.302200'
+  Test2::V1: '1.302200'
   Test::Script: '1.28'
   base: '0'
   lib: '0'
@@ -48,7 +52,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Env-Dot
   homepage: https://metacpan.org/dist/Env-Dot
   repository: git://github.com/mikkoi/env-dot.git
-version: '0.021'
+version: '0.022'
 x_contributors:
   - 'David Kaufman <david@gigawatt.org>'
   - 'Twata <twata_1@yahoo.co.jp>'

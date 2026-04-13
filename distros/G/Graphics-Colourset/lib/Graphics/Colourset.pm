@@ -1,6 +1,8 @@
 package Graphics::Colourset;
-$Graphics::Colourset::VERSION = '0.06';
+
 # vim:ts=8 sw=4 sts=4 ai
+
+our $VERSION = '0.0601'; # VERSION
 
 =head1 NAME
 
@@ -8,7 +10,7 @@ Graphics::Colourset - create sets of colours.
 
 =head1 VERSION
 
-version 0.06
+version 0.0601
 
 =head1 SYNOPSIS
 

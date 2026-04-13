@@ -1,6 +1,6 @@
 package Langertha::Knarr;
 # ABSTRACT: Universal LLM hub — proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use Future::AsyncAwait;
 use IO::Async::Loop;
@@ -11,6 +11,7 @@ use Data::UUID;
 use Module::Runtime qw( use_module );
 use Scalar::Util qw( blessed );
 use Try::Tiny;
+use Log::Any qw( $log );
 use Langertha::Knarr::Session;
 
 
@@ -64,6 +65,24 @@ has protocols => (
 # either as 'Authorization: Bearer <key>' or 'x-api-key: <key>'. The agent
 # card and well-known discovery routes are exempt because they need to be
 # anonymously fetchable.
+has router => (
+  is => 'ro',
+  isa => 'Maybe[Object]',
+  default => sub { undef },
+);
+
+has raw_passthrough => (
+  is => 'ro',
+  isa => 'Maybe[Object]',
+  default => sub { undef },
+);
+
+has tracing => (
+  is => 'ro',
+  isa => 'Maybe[Object]',
+  default => sub { undef },
+);
+
 has auth_token => (
   is => 'ro',
   isa => 'Maybe[Str]',
@@ -231,6 +250,7 @@ sub _dispatch {
     $self->$code( $proto, $req );
   } catch {
     my $err = $_;
+    $log->errorf("Request error (%s): %s", $action, $err);
     $self->_send_simple( $req, 500, 'application/json',
       $self->_json->encode({ error => { message => "$err" } }) );
   };
@@ -240,8 +260,15 @@ sub _action_chat {
   my ($self, $proto, $req) = @_;
   my $body = $req->body;
   my $sb_req = $proto->parse_chat_request( $req, \$body );
+
+  # Raw passthrough: pipe bytes 1:1 to upstream, skip handler chain
+  if ($self->raw_passthrough && $self->router
+      && $self->router->is_passthrough_model($sb_req->model)) {
+    return $self->_handle_raw_passthrough( $proto, $req, $sb_req );
+  }
+
   my $session = $self->session( $sb_req->session_id );
-  my $handler = $self->handler->route_model( $sb_req->model );
+  my $handler = $self->handler;
 
   if ( $sb_req->stream ) {
     return $self->_handle_stream( $proto, $req, $sb_req, $session, $handler );
@@ -255,12 +282,14 @@ sub _action_chat {
       $self->_send_simple( $req, $status, $headers->{'Content-Type'} // 'application/json', $body );
     } catch {
       my $err = $_;
+      $log->errorf("Chat response error: %s", $err);
       $self->_send_simple( $req, 500, 'application/json',
         $self->_json->encode({ error => { message => "$err" } }) );
     };
   });
   $f->on_fail( sub {
     my ($err) = @_;
+    $log->errorf("Chat handler error: %s", $err);
     $self->_send_simple( $req, 500, 'application/json',
       $self->_json->encode({ error => { message => "$err" } }) );
   });
@@ -304,6 +333,7 @@ sub _handle_stream {
         }
       })->on_fail( sub {
         my ($err) = @_;
+        $log->errorf("Stream chunk error: %s", $err);
         $write->( $proto->format_stream_chunk( "[error: $err]", $sb_req ) );
         $write->( $proto->format_stream_close($sb_req) );
         $req->write_chunk_eof;
@@ -314,10 +344,89 @@ sub _handle_stream {
   });
   $f->on_fail( sub {
     my ($err) = @_;
+    $log->errorf("Stream handler error: %s", $err);
     $write->( $proto->format_stream_chunk( "[error: $err]", $sb_req ) );
     $req->write_chunk_eof;
   });
   $f->retain;
+}
+
+sub _handle_raw_passthrough {
+  my ($self, $proto, $req, $sb_req) = @_;
+  my $pt = $self->raw_passthrough;
+  my $model = $sb_req->model // 'unknown';
+  my $protocol = $sb_req->protocol;
+
+  # Build upstream URL from passthrough config
+  my $url = $pt->_upstream_url($protocol);
+  my $http_req = HTTP::Request->new(POST => $url);
+
+  # Forward all client headers except hop-by-hop / connection-specific
+  my %skip = map { lc($_) => 1 } qw( host content-length connection transfer-encoding );
+  for my $pair ($req->headers) {
+    my ($name, $value) = @$pair;
+    next if $skip{lc($name)};
+    $http_req->header($name => $value);
+  }
+  $http_req->content($req->body);
+
+  $log->infof("Passthrough %s [%s] -> %s", $model, $protocol, $url);
+
+  # Lightweight tracing for passthrough requests
+  my $trace = $self->tracing ? $self->tracing->start_trace(
+    model    => $model,
+    engine   => 'passthrough',
+    format   => $protocol,
+    messages => $sb_req->messages,
+  ) : undef;
+
+  if ($sb_req->stream) {
+    my $f = $pt->_http->do_request(
+      request   => $http_req,
+      on_header => sub {
+        my ($response) = @_;
+        my $header = HTTP::Response->new($response->code);
+        $header->protocol('HTTP/1.1');
+        $header->header('Content-Type'  => scalar $response->header('Content-Type'));
+        $header->header('Cache-Control' => 'no-cache');
+        $req->respond_chunk_header($header);
+
+        return sub {
+          my ($data) = @_;
+          if (!defined $data) {
+            $req->write_chunk_eof unless $req->is_closed;
+            $self->tracing->end_trace($trace, output => '[stream]') if $trace;
+            return;
+          }
+          $req->write_chunk($data) unless $req->is_closed;
+        };
+      },
+    );
+    $f->on_fail(sub {
+      my ($err) = @_;
+      $log->errorf("Passthrough stream error [%s]: %s", $model, $err);
+      $self->tracing->end_trace($trace, error => "$err") if $trace;
+      $req->write_chunk_eof unless $req->is_closed;
+    });
+    $f->retain;
+  } else {
+    my $f = $pt->_http->do_request(request => $http_req);
+    $f->on_done(sub {
+      my ($resp) = @_;
+      $self->_send_simple($req, $resp->code,
+        scalar $resp->header('Content-Type') // 'application/json',
+        $resp->decoded_content);
+      $self->tracing->end_trace($trace, output => '[passthrough]') if $trace;
+    });
+    $f->on_fail(sub {
+      my ($err) = @_;
+      $log->errorf("Passthrough error [%s]: %s", $model, $err);
+      $self->tracing->end_trace($trace, error => "$err") if $trace;
+      $self->_send_simple($req, 502, 'application/json',
+        $self->_json->encode({ error => { message => "passthrough failed: $err" } }));
+    });
+    $f->retain;
+  }
 }
 
 sub _action_acp_agents { goto &_action_models }
@@ -359,7 +468,7 @@ Langertha::Knarr - Universal LLM hub — proxy, server, and translator across Op
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

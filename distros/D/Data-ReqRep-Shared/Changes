@@ -1,4 +1,7 @@
-0.01 2026-04-10
+0.02  2026-04-12
+    - Add SEE ALSO cross-links to family modules
+
+0.01  2026-04-10
     - Initial release
     - Str variant: mutex-protected request queue with circular arena
     - Int variant: lock-free Vyukov MPMC request queue

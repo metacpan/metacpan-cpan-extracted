@@ -41,15 +41,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/dod38fr/perl-fuse3/issues"
+         "web" : "http://github.com/dod38fr/perl-filesys-fuse3/issues"
       },
       "license" : [
          "http://www.gnu.org/licenses/lgpl-2.1.html"
       ],
       "repository" : {
-         "url" : "http://github.com/dod38fr/perl-fuse3"
+         "url" : "http://github.com/dod38fr/perl-filesys-fuse3"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

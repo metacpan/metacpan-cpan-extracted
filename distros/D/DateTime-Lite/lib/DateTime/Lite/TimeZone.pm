@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.1.0
+## Version v0.3.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/10
+## Modified 2026/04/13
 ## All rights reserved
 ## 
 ## 
@@ -90,7 +90,7 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.3.0';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
@@ -187,10 +187,25 @@ sub new
         %args = @_;
     }
 
-    my $name        = $args{name};
+    my $name        = delete( $args{name} );
     my $use_cache   = delete( $args{use_cache_mem} ) // $USE_MEM_CACHE // 0;
-    return( $class->error( "Parameter 'name' is required." ) )
-        unless( defined( $name ) && length( $name ) );
+    my $latitude    = delete( $args{latitude} )  // delete( $args{lat} );
+    my $longitude   = delete( $args{longitude} ) // delete( $args{lon} );
+
+    # If latitude and longitude are provided instead of a name, resolve the
+    # nearest IANA timezone using the coordinates stored in the zones table.
+    if( !defined( $name ) || !length( $name ) )
+    {
+        if( defined( $latitude ) && defined( $longitude ) )
+        {
+            $name = $class->_nearest_zone( $latitude, $longitude ) ||
+                return( $class->pass_error );
+        }
+        else
+        {
+            return( $class->error( "Parameter 'name' is required (or provide 'latitude' and 'longitude')." ) );
+        }
+    }
 
     # Package-level memory cache: return immediately if the canonical name
     # is already cached. The cache is keyed BEFORE alias resolution so
@@ -212,7 +227,23 @@ sub new
 
     $args{fatal} //= 0;
 
-    # Special cases: floating and UTC never need a DB lookup
+    # Special cases: floating, UTC, and local never need a DB lookup
+    if( $name eq 'local' )
+    {
+        # Resolve the local timezone name from the environment or OS.
+        # We try the following methods in order, all using only core modules:
+        #   1. $ENV{TZ} if set, valid, and not 'local' (to avoid infinite loop)
+        #   2. /etc/localtime symlink target (most Linux and macOS systems)
+        #   3. /etc/timezone plain text file (Debian/Ubuntu)
+        #   4. /etc/TIMEZONE with TZ= line (Solaris)
+        #   5. /etc/sysconfig/clock with ZONE= or TIMEZONE= line (RedHat)
+        #   6. /etc/default/init with TZ= line (older Unix)
+        my $local_name = $class->_resolve_local_tz_name ||
+            return( $class->error( "Cannot determine local time zone. Please set \$ENV{TZ}." ) );
+        # Recurse with the resolved name
+        return( $class->new( name => $local_name, %args ) );
+    }
+
     if( $name eq 'floating' )
     {
         return( bless(
@@ -1064,6 +1095,235 @@ sub tz_version
 
 sub tzif_version { return( $_[0]->{tzif_version} ); }
 
+# NOTE: Windows timezone name -> IANA mapping
+# Source: DateTime::TimeZone::Local::Win32 by Dave Rolsky and David Pinkowitz.
+# Built lazily via state in _local_tz_mswin32; consumes no memory on non-Windows
+# platforms.
+sub _build_win_to_iana
+{
+    return(
+    {
+    'Afghanistan'                     => 'Asia/Kabul',
+    'Afghanistan Standard Time'       => 'Asia/Kabul',
+    'Alaskan'                         => 'America/Anchorage',
+    'Alaskan Standard Time'           => 'America/Anchorage',
+    'Aleutian Standard Time'          => 'America/Adak',
+    'Altai Standard Time'             => 'Asia/Barnaul',
+    'Arab'                            => 'Asia/Riyadh',
+    'Arab Standard Time'              => 'Asia/Riyadh',
+    'Arabian'                         => 'Asia/Muscat',
+    'Arabian Standard Time'           => 'Asia/Muscat',
+    'Arabic Standard Time'            => 'Asia/Baghdad',
+    'Argentina Standard Time'         => 'America/Argentina/Buenos_Aires',
+    'Armenian Standard Time'          => 'Asia/Yerevan',
+    'Astrakhan Standard Time'         => 'Europe/Astrakhan',
+    'Atlantic'                        => 'America/Halifax',
+    'Atlantic Standard Time'          => 'America/Halifax',
+    'AUS Central'                     => 'Australia/Darwin',
+    'AUS Central Standard Time'       => 'Australia/Darwin',
+    'Aus Central W. Standard Time'    => 'Australia/Eucla',
+    'AUS Eastern'                     => 'Australia/Sydney',
+    'AUS Eastern Standard Time'       => 'Australia/Sydney',
+    'Azerbaijan Standard Time'        => 'Asia/Baku',
+    'Azores'                          => 'Atlantic/Azores',
+    'Azores Standard Time'            => 'Atlantic/Azores',
+    'Bahia Standard Time'             => 'America/Bahia',
+    'Bangkok'                         => 'Asia/Bangkok',
+    'Bangkok Standard Time'           => 'Asia/Bangkok',
+    'Bangladesh Standard Time'        => 'Asia/Dhaka',
+    'Beijing'                         => 'Asia/Shanghai',
+    'Belarus Standard Time'           => 'Europe/Minsk',
+    'Bougainville Standard Time'      => 'Pacific/Bougainville',
+    'Canada Central'                  => 'America/Regina',
+    'Canada Central Standard Time'    => 'America/Regina',
+    'Cape Verde Standard Time'        => 'Atlantic/Cape_Verde',
+    'Caucasus'                        => 'Asia/Yerevan',
+    'Caucasus Standard Time'          => 'Asia/Yerevan',
+    'Cen. Australia'                  => 'Australia/Adelaide',
+    'Cen. Australia Standard Time'    => 'Australia/Adelaide',
+    'Central'                         => 'America/Chicago',
+    'Central America Standard Time'   => 'America/Tegucigalpa',
+    'Central Asia'                    => 'Asia/Almaty',
+    'Central Asia Standard Time'      => 'Asia/Almaty',
+    'Central Brazilian Standard Time' => 'America/Cuiaba',
+    'Central Europe'                  => 'Europe/Prague',
+    'Central Europe Standard Time'    => 'Europe/Prague',
+    'Central European'                => 'Europe/Belgrade',
+    'Central European Standard Time'  => 'Europe/Warsaw',
+    'Central Pacific'                 => 'Pacific/Guadalcanal',
+    'Central Pacific Standard Time'   => 'Pacific/Guadalcanal',
+    'Central Standard Time'           => 'America/Chicago',
+    'Central Standard Time (Mexico)'  => 'America/Mexico_City',
+    'Chatham Islands Standard Time'   => 'Pacific/Chatham',
+    'China'                           => 'Asia/Shanghai',
+    'China Standard Time'             => 'Asia/Shanghai',
+    'Cuba Standard Time'              => 'America/Havana',
+    'Dateline'                        => '-1200',
+    'Dateline Standard Time'          => 'Etc/GMT+12',
+    'E. Africa'                       => 'Africa/Nairobi',
+    'E. Africa Standard Time'         => 'Africa/Nairobi',
+    'E. Australia'                    => 'Australia/Brisbane',
+    'E. Australia Standard Time'      => 'Australia/Brisbane',
+    'E. Europe'                       => 'Europe/Helsinki',
+    'E. Europe Standard Time'         => 'Europe/Chisinau',
+    'E. South America'                => 'America/Sao_Paulo',
+    'E. South America Standard Time'  => 'America/Sao_Paulo',
+    'Easter Island Standard Time'     => 'Pacific/Easter',
+    'Eastern'                         => 'America/New_York',
+    'Eastern Standard Time'           => 'America/New_York',
+    'Eastern Standard Time (Mexico)'  => 'America/Cancun',
+    'Egypt'                           => 'Africa/Cairo',
+    'Egypt Standard Time'             => 'Africa/Cairo',
+    'Ekaterinburg'                    => 'Asia/Yekaterinburg',
+    'Ekaterinburg Standard Time'      => 'Asia/Yekaterinburg',
+    'Fiji'                            => 'Pacific/Fiji',
+    'Fiji Standard Time'              => 'Pacific/Fiji',
+    'FLE'                             => 'Europe/Helsinki',
+    'FLE Standard Time'               => 'Europe/Helsinki',
+    'Georgian Standard Time'          => 'Asia/Tbilisi',
+    'GFT'                             => 'Europe/Athens',
+    'GFT Standard Time'               => 'Europe/Athens',
+    'GMT'                             => 'Europe/London',
+    'GMT Standard Time'               => 'Europe/London',
+    'Greenland Standard Time'         => 'America/Godthab',
+    'Greenwich'                       => 'GMT',
+    'Greenwich Standard Time'         => 'GMT',
+    'GTB'                             => 'Europe/Athens',
+    'GTB Standard Time'               => 'Europe/Athens',
+    'Haiti Standard Time'             => 'America/Port-au-Prince',
+    'Hawaiian'                        => 'Pacific/Honolulu',
+    'Hawaiian Standard Time'          => 'Pacific/Honolulu',
+    'India'                           => 'Asia/Kolkata',
+    'India Standard Time'             => 'Asia/Kolkata',
+    'Iran'                            => 'Asia/Tehran',
+    'Iran Standard Time'              => 'Asia/Tehran',
+    'Israel'                          => 'Asia/Jerusalem',
+    'Israel Standard Time'            => 'Asia/Jerusalem',
+    'Jordan Standard Time'            => 'Asia/Amman',
+    'Kaliningrad Standard Time'       => 'Europe/Kaliningrad',
+    'Kamchatka Standard Time'         => 'Asia/Kamchatka',
+    'Korea'                           => 'Asia/Seoul',
+    'Korea Standard Time'             => 'Asia/Seoul',
+    'Libya Standard Time'             => 'Africa/Tripoli',
+    'Line Islands Standard Time'      => 'Pacific/Kiritimati',
+    'Lord Howe Standard Time'         => 'Australia/Lord_Howe',
+    'Magadan Standard Time'           => 'Asia/Magadan',
+    'Magallanes Standard Time'        => 'America/Punta_Arenas',
+    'Marquesas Standard Time'         => 'Pacific/Marquesas',
+    'Mauritius Standard Time'         => 'Indian/Mauritius',
+    'Mexico'                          => 'America/Mexico_City',
+    'Mexico Standard Time'            => 'America/Mexico_City',
+    'Mexico Standard Time 2'          => 'America/Chihuahua',
+    'Mid-Atlantic'                    => 'Atlantic/South_Georgia',
+    'Mid-Atlantic Standard Time'      => 'Atlantic/South_Georgia',
+    'Middle East Standard Time'       => 'Asia/Beirut',
+    'Montevideo Standard Time'        => 'America/Montevideo',
+    'Morocco Standard Time'           => 'Africa/Casablanca',
+    'Mountain'                        => 'America/Denver',
+    'Mountain Standard Time'          => 'America/Denver',
+    'Mountain Standard Time (Mexico)' => 'America/Mazatlan',
+    'Myanmar Standard Time'           => 'Asia/Rangoon',
+    'N. Central Asia Standard Time'   => 'Asia/Novosibirsk',
+    'Namibia Standard Time'           => 'Africa/Windhoek',
+    'Nepal Standard Time'             => 'Asia/Katmandu',
+    'New Zealand'                     => 'Pacific/Auckland',
+    'New Zealand Standard Time'       => 'Pacific/Auckland',
+    'Newfoundland'                    => 'America/St_Johns',
+    'Newfoundland Standard Time'      => 'America/St_Johns',
+    'Norfolk Standard Time'           => 'Pacific/Norfolk',
+    'North Asia East Standard Time'   => 'Asia/Irkutsk',
+    'North Asia Standard Time'        => 'Asia/Krasnoyarsk',
+    'North Korea Standard Time'       => 'Asia/Pyongyang',
+    'Omsk Standard Time'              => 'Asia/Omsk',
+    'Pacific'                         => 'America/Los_Angeles',
+    'Pacific SA'                      => 'America/Santiago',
+    'Pacific SA Standard Time'        => 'America/Santiago',
+    'Pacific Standard Time'           => 'America/Los_Angeles',
+    'Pacific Standard Time (Mexico)'  => 'America/Tijuana',
+    'Pakistan Standard Time'          => 'Asia/Karachi',
+    'Paraguay Standard Time'          => 'America/Asuncion',
+    'Prague Bratislava'               => 'Europe/Prague',
+    'Qyzylorda Standard Time'         => 'Asia/Qyzylorda',
+    'Romance'                         => 'Europe/Paris',
+    'Romance Standard Time'           => 'Europe/Paris',
+    'Russia Time Zone 10'             => 'Asia/Srednekolymsk',
+    'Russia Time Zone 11'             => 'Asia/Anadyr',
+    'Russia Time Zone 3'              => 'Europe/Samara',
+    'Russian'                         => 'Europe/Moscow',
+    'Russian Standard Time'           => 'Europe/Moscow',
+    'SA Eastern'                      => 'America/Cayenne',
+    'SA Eastern Standard Time'        => 'America/Cayenne',
+    'SA Pacific'                      => 'America/Bogota',
+    'SA Pacific Standard Time'        => 'America/Bogota',
+    'SA Western'                      => 'America/Guyana',
+    'SA Western Standard Time'        => 'America/Guyana',
+    'Saint Pierre Standard Time'      => 'America/Miquelon',
+    'Sakhalin Standard Time'          => 'Asia/Sakhalin',
+    'Samoa'                           => 'Pacific/Apia',
+    'Samoa Standard Time'             => 'Pacific/Apia',
+    'Sao Tome Standard Time'          => 'Africa/Sao_Tome',
+    'Saratov Standard Time'           => 'Europe/Saratov',
+    'Saudi Arabia'                    => 'Asia/Riyadh',
+    'Saudi Arabia Standard Time'      => 'Asia/Riyadh',
+    'SE Asia'                         => 'Asia/Bangkok',
+    'SE Asia Standard Time'           => 'Asia/Bangkok',
+    'Singapore'                       => 'Asia/Singapore',
+    'Singapore Standard Time'         => 'Asia/Singapore',
+    'South Africa'                    => 'Africa/Harare',
+    'South Africa Standard Time'      => 'Africa/Harare',
+    'South Sudan Standard Time'       => 'Africa/Juba',
+    'Sri Lanka'                       => 'Asia/Colombo',
+    'Sri Lanka Standard Time'         => 'Asia/Colombo',
+    'Sudan Standard Time'             => 'Africa/Khartoum',
+    'Syria Standard Time'             => 'Asia/Damascus',
+    'Sydney Standard Time'            => 'Australia/Sydney',
+    'Taipei'                          => 'Asia/Taipei',
+    'Taipei Standard Time'            => 'Asia/Taipei',
+    'Tasmania'                        => 'Australia/Hobart',
+    'Tasmania Standard Time'          => 'Australia/Hobart',
+    'Tocantins Standard Time'         => 'America/Araguaina',
+    'Tokyo'                           => 'Asia/Tokyo',
+    'Tokyo Standard Time'             => 'Asia/Tokyo',
+    'Tomsk Standard Time'             => 'Asia/Tomsk',
+    'Tonga Standard Time'             => 'Pacific/Tongatapu',
+    'Transbaikal Standard Time'       => 'Asia/Chita',
+    'Turkey Standard Time'            => 'Europe/Istanbul',
+    'Turks And Caicos Standard Time'  => 'America/Grand_Turk',
+    'Ulaanbaatar Standard Time'       => 'Asia/Ulaanbaatar',
+    'US Eastern'                      => 'America/Indianapolis',
+    'US Eastern Standard Time'        => 'America/Indianapolis',
+    'US Mountain'                     => 'America/Phoenix',
+    'US Mountain Standard Time'       => 'America/Phoenix',
+    'UTC'                             => 'UTC',
+    'UTC+13'                          => 'Etc/GMT-13',
+    'UTC+12'                          => 'Etc/GMT-12',
+    'UTC-02'                          => 'America/Noronha',
+    'UTC-08'                          => 'Etc/GMT+8',
+    'UTC-09'                          => 'Etc/GMT+9',
+    'UTC-11'                          => 'Etc/GMT+11',
+    'Venezuela Standard Time'         => 'America/Caracas',
+    'Vladivostok'                     => 'Asia/Vladivostok',
+    'Vladivostok Standard Time'       => 'Asia/Vladivostok',
+    'Volgograd Standard Time'         => 'Europe/Volgograd',
+    'W. Australia'                    => 'Australia/Perth',
+    'W. Australia Standard Time'      => 'Australia/Perth',
+    'W. Central Africa Standard Time' => 'Africa/Luanda',
+    'W. Europe'                       => 'Europe/Berlin',
+    'W. Europe Standard Time'         => 'Europe/Berlin',
+    'W. Mongolia Standard Time'       => 'Asia/Hovd',
+    'Warsaw'                          => 'Europe/Warsaw',
+    'West Asia'                       => 'Asia/Karachi',
+    'West Asia Standard Time'         => 'Asia/Tashkent',
+    'West Bank Standard Time'         => 'Asia/Gaza',
+    'West Pacific'                    => 'Pacific/Guam',
+    'West Pacific Standard Time'      => 'Pacific/Guam',
+    'Western Brazilian Standard Time' => 'America/Rio_Branco',
+    'Yakutsk'                         => 'Asia/Yakutsk',
+    'Yakutsk Standard Time'           => 'Asia/Yakutsk',
+    'Yukon Standard Time'             => 'America/Whitehorse',
+    });
+}
+
 sub _dbh
 {
     my $self = shift( @_ );
@@ -1284,6 +1544,253 @@ sub _get_zone_info
     $sth->finish;
     $self->_decode_sql_arrays( [qw( countries )], $row ) if( defined( $row ) );
     return( $row );
+}
+
+sub _local_tz_android
+{
+    my $class = shift( @_ );
+
+    # Method 1: $ENV{TZ}
+    my $name = $class->_local_tz_env( 'TZ' );
+    return( $name ) if( defined( $name ) );
+
+    # Method 2: getprop persist.sys.timezone (Android system property)
+    {
+        local $@;
+        my $n = eval
+        {
+            my $r = `getprop persist.sys.timezone 2>/dev/null`;
+            chomp( $r );
+            return( $r );
+        };
+        if( !$@ &&
+            defined( $n ) &&
+            length( $n ) &&
+            $class->is_valid_name( $n ) )
+        {
+            return( $n );
+        }
+    }
+
+    # Android always defaults to UTC if nothing else is found
+    return( 'UTC' );
+}
+
+sub _local_tz_env
+{
+    my $class = shift( @_ );
+    my @vars  = @_;
+    foreach my $var ( @vars )
+    {
+        if( defined( $ENV{ $var } ) &&
+            length( $ENV{ $var } ) &&
+            $ENV{ $var } ne 'local' &&
+            $ENV{ $var } =~ m{^[\w/+\-]+$} )
+        {
+            return( $ENV{ $var } );
+        }
+    }
+    return;
+}
+
+sub _local_tz_env_only
+{
+    my $class = shift( @_ );
+    # Platforms with no filesystem or registry to query: check $ENV{TZ} only
+    return( $class->_local_tz_env( 'TZ' ) );
+}
+
+sub _local_tz_mswin32
+{
+    my $class = shift( @_ );
+
+    # Method 1: $ENV{TZ}
+    my $name = $class->_local_tz_env( 'TZ' );
+    return( $name ) if( defined( $name ) );
+
+    # Method 2: Windows Registry via Win32::TieRegistry (non-core, optional)
+    # The Windows->IANA mapping is built lazily via state so it consumes no
+    # memory on non-Windows platforms.
+    {
+        local $@;
+        eval{ require Win32::TieRegistry };
+        if( !$@ )
+        {
+            my $win_name = $class->_win32_tz_from_registry;
+            if( defined( $win_name ) )
+            {
+                state $map = $class->_build_win_to_iana;
+                my $iana   = $map->{ $win_name };
+                if( defined( $iana ) &&
+                    $class->is_valid_name( $iana ) )
+                {
+                    return( $iana );
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+sub _local_tz_unix
+{
+    my $class = shift( @_ );
+
+    # Method 1: $ENV{TZ}
+    my $name = $class->_local_tz_env( 'TZ' );
+    return( $name ) if( defined( $name ) );
+
+    # Method 2: /etc/localtime symlink or binary match against /usr/share/zoneinfo
+    {
+        require File::Spec;  # Core module
+        my $lt = File::Spec->catfile( '/etc', 'localtime' );
+        if( -r( $lt ) && -s( $lt ) )
+        {
+            my $real;
+            if( -l( $lt ) )
+            {
+                # Will resolve the link
+                $real = Cwd::abs_path( $lt );
+            }
+            $real ||= $class->_match_zoneinfo_file( $lt );
+            if( defined( $real ) )
+            {
+                my( undef, $dirs, $file ) = File::Spec->splitpath( $real );
+                my @parts = grep{ defined && length } File::Spec->splitdir( $dirs ), $file;
+                foreach my $x ( reverse( 0 .. $#parts ) )
+                {
+                    my $tzname = $x < $#parts
+                        ? join( '/', @parts[ $x .. $#parts ] )
+                        : $parts[$x];
+                    return( $tzname ) if( $class->is_valid_name( $tzname ) );
+                }
+            }
+        }
+    }
+
+    # Method 3: /etc/timezone plain text file (Debian/Ubuntu)
+    {
+        my $f = '/etc/timezone';
+        if( -f( $f ) && -r( $f ) )
+        {
+            if( open( my $fh, '<', $f ) )
+            {
+                my $n = <$fh>;
+                chomp( $n );
+                close( $fh );
+                $n =~ s/^\s+|\s+$//g;
+                return( $n ) if( $n && $class->is_valid_name( $n ) );
+            }
+        }
+    }
+
+    # Method 4: /etc/TIMEZONE with TZ= line (Solaris, HP-UX)
+    {
+        my $f = '/etc/TIMEZONE';
+        if( -f( $f ) && -r( $f ) )
+        {
+            if( open( my $fh, '<', $f ) )
+            {
+                while( <$fh> )
+                {
+                    if( /^\s*TZ\s*=\s*(\S+)/ &&
+                        $class->is_valid_name( $1 ) )
+                    {
+                        return( $1 );
+                    }
+                }
+                close( $fh );
+            }
+        }
+    }
+
+    # Method 5: /etc/sysconfig/clock with ZONE= or TIMEZONE= line (RedHat/CentOS)
+    {
+        my $f = '/etc/sysconfig/clock';
+        if( -f( $f ) && -r( $f ) )
+        {
+            if( open( my $fh, '<', $f ) )
+            {
+                while( <$fh> )
+                {
+                    if( /^(?:TIME)?ZONE="([^"]+)"/ &&
+                        $class->is_valid_name( $1 ) )
+                    {
+                        return( $1 );
+                    }
+                }
+                close( $fh );
+            }
+        }
+    }
+
+    # Method 6: /etc/default/init with TZ= line (older Unix)
+    {
+        my $f = '/etc/default/init';
+        if( -f( $f ) && -r( $f ) )
+        {
+            if( open( my $fh, '<', $f ) )
+            {
+                while( <$fh> )
+                {
+                    if( /^TZ=(\S+)/ &&
+                        $class->is_valid_name( $1 ) )
+                    {
+                        return( $1 );
+                    }
+                }
+                close( $fh );
+            }
+        }
+    }
+
+    return;
+}
+
+sub _local_tz_vms
+{
+    my $class = shift( @_ );
+    # VMS uses several environment variables for timezone
+    return( $class->_local_tz_env(
+        qw( TZ SYS$TIMEZONE_RULE SYS$TIMEZONE_NAME UCX$TZ TCPIP$TZ )
+    ) );
+}
+
+# NOTE: OS aliases
+{
+    no warnings 'once';
+    # Unix-like: use the full Unix detection chain
+    # NOTE: _local_tz_aix -> _local_tz_unix
+    *_local_tz_aix     = \&_local_tz_unix;
+    # NOTE: _local_tz_cygwin -> _local_tz_unix
+    *_local_tz_cygwin  = \&_local_tz_unix;   # Cygwin on Windows
+    # NOTE: _local_tz_darwin -> _local_tz_unix
+    *_local_tz_darwin  = \&_local_tz_unix;   # macOS ($^O eq 'darwin')
+    # NOTE: _local_tz_freebsd -> _local_tz_unix
+    *_local_tz_freebsd = \&_local_tz_unix;
+    # NOTE: _local_tz_hpux -> _local_tz_unix
+    *_local_tz_hpux    = \&_local_tz_unix;   # HPUX IANA names; HP-UX-proprietary names require $ENV{TZ}
+    # NOTE: _local_tz_netbsd -> _local_tz_unix
+    *_local_tz_netbsd  = \&_local_tz_unix;
+    # NOTE: _local_tz_openbsd -> _local_tz_unix
+    *_local_tz_openbsd = \&_local_tz_unix;
+    # NOTE: _local_tz_os2 -> _local_tz_unix
+    *_local_tz_os2     = \&_local_tz_unix;   # OS/2 has a /etc filesystem
+    # NOTE: _local_tz_solaris -> _local_tz_unix
+    *_local_tz_solaris = \&_local_tz_unix;
+    # Win32 variants
+    # NOTE: _local_tz_netware -> _local_tz_mswin32
+    *_local_tz_netware = \&_local_tz_mswin32;
+    # Env-only platforms: no filesystem or registry to query
+    # NOTE: _local_tz_symbian -> _local_tz_env_only (Symbian OS is not Win32)
+    *_local_tz_symbian = \&_local_tz_env_only;
+    # NOTE: _local_tz_epoc -> _local_tz_env_only
+    *_local_tz_epoc    = \&_local_tz_env_only;  # EPOC (Symbian predecessor)
+    # NOTE: _local_tz_dos -> _local_tz_env_only
+    *_local_tz_dos     = \&_local_tz_env_only;  # MS-DOS
+    # NOTE: _local_tz_macos -> _local_tz_env_only
+    *_local_tz_macos   = \&_local_tz_env_only;  # Mac OS 9 and earlier (not macOS/darwin)
 }
 
 # Look up a span by UTC time (the common case).
@@ -1602,6 +2109,151 @@ SQL
     return( $row );
 }
 
+sub _match_zoneinfo_file
+{
+    my( $class, $file_to_match ) = @_;
+    my $zoneinfo_dir = '/usr/share/zoneinfo';
+    my $this_dir = Cwd::realpath( $zoneinfo_dir );
+    if( !defined( $this_dir ) )
+    {
+        return( $class->error( "Failed to resolve the zoneinfo directory location '$zoneinfo_dir'." ) );
+    }
+    elsif( !-e( $this_dir ) )
+    {
+        return( $class->error( "The resolved directory for '$zoneinfo_dir' points to $this_dir, which does not exist." ) );
+    }
+    elsif( !-x( $this_dir ) || !-r( $this_dir ) )
+    {
+        return( $class->error( "The resolved directory '$this_dir' does not have the necessary read/execute permissions." ) );
+    }
+    $zoneinfo_dir = $this_dir;
+
+    require File::Basename;
+    require File::Compare;
+    require File::Find;
+
+    my $size = -s( $file_to_match );
+    my $real_name;
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__};
+        File::Find::find(
+        {
+            wanted => sub
+            {
+                if( !defined( $real_name ) &&
+                    -f( $_ ) &&
+                    !-l( $_ ) &&
+                    $size == -s( $_ ) &&
+                    File::Basename::basename( $_ ) ne 'posixrules' &&
+                    File::Compare::compare( $_, $file_to_match ) == 0 )
+                {
+                    $real_name = $_;
+                    # Bail out of File::Find early using die with a sentinel
+                    die({ found => 1 });
+                }
+            },
+            no_chdir => 1,
+        },
+        $zoneinfo_dir );
+    };
+    if( $@ )
+    {
+        # Re-raise anything that is not our own sentinel
+        unless( ref( $@ ) eq 'HASH' && $@->{found} )
+        {
+            return( $class->error( "Error while searching zoneinfo directory: $@" ) );
+        }
+    }
+    return( $real_name );
+}
+
+sub _nearest_zone
+{
+    my( $class, $latitude, $longitude ) = @_;
+
+    return( $class->error( "Parameter 'latitude' must be a number." ) )
+        unless( defined( $latitude ) && Scalar::Util::looks_like_number( $latitude ) );
+    return( $class->error( "Parameter 'longitude' must be a number." ) )
+        unless( defined( $longitude ) && Scalar::Util::looks_like_number( $longitude ) );
+    return( $class->error( "Latitude must be between -90 and 90." ) )
+        unless( $latitude >= -90 && $latitude <= 90 );
+    return( $class->error( "Longitude must be between -180 and 180." ) )
+        unless( $longitude >= -180 && $longitude <= 180 );
+
+    my $sth;
+    unless( $sth = $class->_get_cached_statement( 'nearest_zone' ) )
+    {
+        my $dbh = $class->_dbh || return( $self->pass_error );
+        # Use the haversine formula entirely within SQLite to find the nearest zone.
+        # Only canonical zones with coordinates are considered.
+        # haversine(lat1, lon1, lat2, lon2):
+        #   a = sin((lat2-lat1)/2)^2 + cos(lat1)*cos(lat2)*sin((lon2-lon1)/2)^2
+        #   distance = 2 * asin(sqrt(a))
+        # in radians; no need for Earth radius since we are only ranking, not computing
+        # actual distance.
+        my $query = <<'SQL';
+SELECT
+    name,
+    (
+        2.0 * asin( sqrt(
+            ( sin( ( (latitude  - ?) * 0.017453292519943 ) / 2.0 ) *
+              sin( ( (latitude  - ?) * 0.017453292519943 ) / 2.0 ) )
+            +
+            cos( ? * 0.017453292519943 ) *
+            cos( latitude * 0.017453292519943 ) *
+            ( sin( ( (longitude - ?) * 0.017453292519943 ) / 2.0 ) *
+              sin( ( (longitude - ?) * 0.017453292519943 ) / 2.0 ) )
+        ) )
+    ) AS distance
+FROM zones
+WHERE canonical = 1
+  AND latitude  IS NOT NULL
+  AND longitude IS NOT NULL
+ORDER BY distance ASC
+LIMIT 1
+SQL
+        local $@;
+        $sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $self->error( "Cannot prepare nearest_zone: ", ( $@ || $dbh->errstr ), "\nQuery was: $query" ) );
+        $class->_set_cached_statement( nearest_zone => $sth );
+    }
+
+    my $rv = eval{ $sth->execute( $latitude, $latitude, $latitude, $longitude, $longitude ) };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $self->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: $@" ) );
+    }
+    elsif( !defined( $rv ) )
+    {
+        $sth->finish;
+        return( $self->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
+    }
+
+    my $row = eval{ $sth->fetchrow_hashref };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $self->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: $@" ) );
+    }
+    # We check for definedness, which means an error in DBI
+    elsif( !defined( $row ) && $sth->errstr )
+    {
+        $sth->finish;
+        return( $self->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
+    }
+    $sth->finish;
+    unless( defined( $row ) && defined( $row->{name} ) )
+    {
+        return( $class->error( "No timezone found for coordinates ($latitude, $longitude)." ) );
+    }
+    return( $row->{name} );
+}
+
 # _posix_tz_lookup( $unix_secs, $footer_tz_string )
 #
 # Thin wrapper around the XS function DateTime::Lite::posix_tz_lookup(), which
@@ -1672,6 +2324,21 @@ SQL
     return( $row ? $row->[0] : $name );
 }
 
+sub _resolve_local_tz_name
+{
+    my $class = shift( @_ );
+    # Dispatch to an OS-specific method if one exists, otherwise fall back
+    # to the Unix implementation (covers Linux, macOS via alias, BSDs, etc.)
+    # However, we do not support macOS since this means any version of MacOS 9 and earlier.
+    # MacOSX is $^O code with 'darwin'
+    my $meth = '_local_tz_' . lc( $^O );
+    if( my $code = $class->can( $meth ) )
+    {
+        return( $code->( $class ) );
+    }
+    return( $class->_local_tz_unix );
+}
+
 sub _set_cached_statement
 {
     my $self = shift( @_ );
@@ -1696,6 +2363,62 @@ sub _set_get_prop
     my $prop = shift( @_ ) || die( "No object property was provided." );
     $self->{ $prop } = shift( @_ ) if( @_ );
     return( $self->{ $prop } );
+}
+
+sub _win32_tz_from_registry
+{
+    my $class = shift( @_ );
+    local $@;
+    my $reg = eval
+    {
+        no warnings 'once';
+        Win32::TieRegistry->import( 'KEY_READ', Delimiter => '/' );
+        my $lm = $Win32::TieRegistry::Registry->Open(
+            'LMachine/', { Access => Win32::TieRegistry::KEY_READ() }
+        );
+        $lm;
+    };
+    return if( $@ || !defined( $reg ) );
+
+    if( ref( $reg ) ne 'HASH' )
+    {
+        return( $class->error( "I was expecting an hash reference to be returned from Win32::TieRegistry::Registry->Open, but instead I got '", overload::StrVal( $reg ), "'" ) );
+    }
+
+    my $tzi = $reg->{'SYSTEM/CurrentControlSet/Control/TimeZoneInformation/'};
+    return unless( defined( $tzi ) );
+
+    # Windows Vista and newer
+    if( defined( $tzi->{'/TimeZoneKeyName'} ) &&
+        $tzi->{'/TimeZoneKeyName'} ne '' )
+    {
+        my $n = $tzi->{'/TimeZoneKeyName'};
+        # Strip trailing null garbage (Windows 2008 Server)
+        $n =~ s/\0.*$//s;
+        return( $n );
+    }
+
+    # Windows NT/2000/XP/2003: match StandardName against zone sub-keys
+    foreach my $key (
+        'SOFTWARE/Microsoft/Windows NT/CurrentVersion/Time Zones/',
+        'SOFTWARE/Microsoft/Windows/CurrentVersion/Time Zones/',
+    )
+    {
+        my $zones = $reg->{ $key };
+        next unless( defined( $zones ) );
+        my $std = $tzi->{'/StandardName'};
+        next unless( defined( $std ) );
+        for my $zone ( $zones->SubKeyNames )
+        {
+            if( defined( $zones->{ $zone . '/Std' } ) &&
+                $zones->{ $zone . '/Std' } eq $std )
+            {
+                return( $zone );
+            }
+        }
+    }
+
+    return;
 }
 
 # NOTE: END
@@ -1766,6 +2489,19 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
 
     # Single-argument shorthand
     my $tz4 = DateTime::Lite::TimeZone->new( 'Europe/Paris' );
+
+    # Using latitude and longitude
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658558,
+        longitude => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+
+    # You can also use 'lat' and 'lon'
+    my $tz = DateTime::Lite::TimeZone->new(
+        lat => 35.658558,
+        lon => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+    say $tz->name;  # Asia/Tokyo
 
     # Memory cache (three-layer: object + span + POSIX footer)
     # Enable once at application start-up for best performance:
@@ -1984,6 +2720,19 @@ If L<DateTime::TimeZone> is not available, then it dies.
         fatal => 1, # Makes all error fatal
     );
 
+    # Using latitude and longitude
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658558,
+        longitude => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+
+    # You can also use 'lat' and 'lon'
+    my $tz = DateTime::Lite::TimeZone->new(
+        lat => 35.658558,
+        lon => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+    say $tz->name;  # Asia/Tokyo
+
 A new C<DateTime::Lite::TimeZone> object can be instantiated by either passing the timezone as a single argument, or as an hash, such as C<< name => 'Asia/Tokyo' >>
 
 Recognised forms:
@@ -1996,7 +2745,66 @@ Recognised forms:
 
 =item Fixed-offset strings such as C<+09:00>, C<-0500>.
 
-=item The special names C<UTC> and C<floating>.
+=item The special names C<UTC>, C<floating>, and C<local>.
+
+The C<local> name instructs C<DateTime::Lite::TimeZone> to determine the system's local timezone automatically, without requiring any external modules. The detection strategy is OS-specific, relying on L<$^O|perlvar/"$^O">:
+
+=over 8
+
+=item B<Linux, macOS (darwin), FreeBSD, OpenBSD, NetBSD, Solaris, AIX, HP-UX, OS/2, Cygwin>
+
+Tries, in order:
+
+=over 12
+
+=item * C<$ENV{TZ}>
+
+=item * the C</etc/localtime> symlink target or a binary match against C</usr/share/zoneinfo>
+
+=item * C</etc/timezone> (Debian/Ubuntu)
+
+=item * C</etc/TIMEZONE> with a C<TZ=> line (Solaris, HP-UX)
+
+=item * C</etc/sysconfig/clock> with a C<ZONE=> or C<TIMEZONE=> line (RedHat/CentOS)
+
+=item * C</etc/default/init> with a C<TZ=> line (older Unix)
+
+=back
+
+=item B<Windows (MSWin32, NetWare)>
+
+Tries C<$ENV{TZ}> first, then reads the timezone name from the Windows Registry (C<SYSTEM/CurrentControlSet/Control/TimeZoneInformation>) and maps it to an IANA name using the CLDR C<windowsZones.xml> table.
+Requires C<Win32::TieRegistry> (available on CPAN; not a hard dependency).
+
+=item B<Android>
+
+Tries C<$ENV{TZ}>, then C<getprop persist.sys.timezone>, then falls back to C<UTC>.
+
+=item B<VMS>
+
+Checks the environment variables C<TZ>, C<SYS$TIMEZONE_RULE>, C<SYS$TIMEZONE_NAME>, C<UCX$TZ>, and C<TCPIP$TZ>.
+
+=item B<Symbian, EPOC, MS-DOS, Mac OS 9 and earlier>
+
+Checks C<$ENV{TZ}> only.
+
+=back
+
+If the local timezone cannot be determined, an error is set and C<undef> is returned in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>.
+
+=item Coordinates via C<latitude> and C<longitude> arguments.
+
+As an alternative to a C<name>, you can pass decimal-degree coordinates to have C<DateTime::Lite::TimeZone> resolve the nearest IANA timezone automatically:
+
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658558,
+        longitude => 139.745504,
+    );
+    say $tz->name;  # Asia/Tokyo
+
+The resolution uses the reference coordinates stored in the IANA C<zone1970.tab> file (one representative point per canonical zone) and finds the nearest zone by the L<haversine great-circle distance|https://grokipedia.com/page/Haversine_formula>. This is an B<approximation>: it is accurate for most locations, but may give incorrect results near timezone boundaries, in disputed territories, or for enclaves such as Kaliningrad. If you need boundary-precise resolution, consider L<Geo::Location::TimeZoneFinder> instead.
+
+C<latitude> must be in the range C<-90> to C<90>; C<longitude> in C<-180> to C<180>. An L<error object|DateTime::Lite::Exception> is set and C<undef> is returned in scalar context, or an empty list in list context, if the values are out of range or if no zone with coordinates is found in the database.
 
 =back
 

@@ -1,0 +1,315 @@
+NAME
+    Data::Pool::Shared - Fixed-size shared-memory object pool for Linux
+
+SYNOPSIS
+        use Data::Pool::Shared;
+
+        # Raw byte pool — 100 slots of 64 bytes each
+        my $pool = Data::Pool::Shared->new('/tmp/pool.shm', 100, 64);
+        my $idx = $pool->alloc;           # allocate a slot
+        $pool->set($idx, "hello world");  # write data
+        my $data = $pool->get($idx);      # read data
+        $pool->free($idx);                # release slot
+
+        # Typed pools
+        my $ints = Data::Pool::Shared::I64->new('/tmp/ints.shm', 1000);
+        my $i = $ints->alloc;
+        $ints->set($i, 42);
+        $ints->add($i, 8);            # atomic add, returns 50
+        $ints->cas($i, 50, 99);       # atomic CAS
+        say $ints->get($i);           # 99
+
+        my $floats = Data::Pool::Shared::F64->new('/tmp/f.shm', 100);
+        my $strs = Data::Pool::Shared::Str->new('/tmp/s.shm', 100, 256);
+
+        # Guard — auto-free on scope exit
+        {
+            my ($idx, $guard) = $pool->alloc_guard;
+            $pool->set($idx, $data);
+            # ... use slot ...
+        }  # auto-freed
+
+        # Lock-free primitives
+        my $prev = $ints->cmpxchg($i, 99, 200);  # CAS returning old value
+        $prev = $ints->xchg($i, 300);            # atomic exchange
+
+        # Batch operations
+        my $slots = $pool->alloc_n(10);           # allocate 10 slots
+        $pool->free_n($slots);                    # batch free
+
+        # Zero-copy and raw pointers
+        my $sv  = $pool->slot_sv($idx);           # read-only SV over slot memory
+        my $ptr = $pool->ptr($idx);               # C pointer (UV) for FFI/OpenGL
+        my @all = @{ $pool->allocated_slots };    # list all allocated indices
+
+        # Convenience
+        my $j = $ints->alloc_set(42);         # alloc + set
+        $j = $ints->try_alloc_set(42);        # non-blocking
+
+        # Crash recovery
+        my $n = $pool->recover_stale;         # free slots owned by dead PIDs
+
+        # Cross-process via fork
+        if (fork == 0) {
+            my $child = Data::Pool::Shared::I64->new('/tmp/ints.shm', 1000);
+            my $i = $child->alloc;
+            $child->set($i, $$);
+            exit;
+        }
+
+        # Anonymous (fork-inherited)
+        $pool = Data::Pool::Shared::I64->new(undef, 100);
+
+        # memfd (fd-passable)
+        $pool = Data::Pool::Shared::I64->new_memfd("my_pool", 100);
+        my $fd = $pool->memfd;
+
+DESCRIPTION
+    Data::Pool::Shared provides a fixed-size object pool in shared memory.
+    Slots are allocated and freed explicitly, like a memory allocator but
+    for cross-process shared objects.
+
+    Unlike Data::Buffer::Shared (index-based array access), Pool provides
+    allocate/free semantics: you request a slot, use it, and return it. The
+    pool tracks which slots are in use via a lock-free bitmap.
+
+    Linux-only. Requires 64-bit Perl.
+
+  Variants
+    Data::Pool::Shared - raw byte slots (any elem_size)
+    Data::Pool::Shared::I64 - int64_t (atomic get/set/cas/add)
+    Data::Pool::Shared::F64 - double
+    Data::Pool::Shared::I32 - int32_t (atomic get/set/cas/add)
+    Data::Pool::Shared::Str - fixed-length strings
+
+  Allocation
+    Allocation uses a CAS-based bitmap scan (lock-free). Each 64-slot group
+    is managed by one atomic uint64_t word. On contention, CAS retries
+    automatically. When the pool is full, "alloc" blocks on a futex until a
+    slot is freed.
+
+  Crash Safety
+    Each slot records the PID of its allocator. "recover_stale" scans for
+    slots owned by dead processes and frees them. Call periodically or on
+    startup for crash recovery.
+
+CONSTRUCTORS
+        # Raw pool
+        my $p = Data::Pool::Shared->new($path, $capacity, $elem_size);
+        my $p = Data::Pool::Shared->new(undef, $capacity, $elem_size);  # anonymous
+        my $p = Data::Pool::Shared->new_memfd($name, $capacity, $elem_size);
+        my $p = Data::Pool::Shared->new_from_fd($fd);
+
+        # I64 / I32 / F64 pools (elem_size is implicit)
+        my $p = Data::Pool::Shared::I64->new($path, $capacity);
+        my $p = Data::Pool::Shared::I32->new($path, $capacity);
+        my $p = Data::Pool::Shared::F64->new($path, $capacity);
+        my $p = Data::Pool::Shared::I64->new_memfd($name, $capacity);
+
+        # All variants support new_from_fd
+        my $p = Data::Pool::Shared::I64->new_from_fd($fd);
+
+        # Str pool
+        my $p = Data::Pool::Shared::Str->new($path, $capacity, $max_len);
+        my $p = Data::Pool::Shared::Str->new_memfd($name, $capacity, $max_len);
+        my $p = Data::Pool::Shared::Str->new_from_fd($fd);
+
+METHODS
+  Allocation
+        my $idx = $pool->alloc;             # block until available
+        my $idx = $pool->alloc($timeout);   # with timeout (seconds)
+        my $idx = $pool->alloc(0);          # non-blocking
+        my $idx = $pool->try_alloc;         # non-blocking (alias)
+
+    Returns slot index on success, "undef" on failure/timeout.
+
+        $pool->free($idx);                  # release slot (returns true/false)
+
+  Batch Operations
+        my $slots = $pool->alloc_n($n);            # allocate N slots (blocking)
+        my $slots = $pool->alloc_n($n, $timeout);  # with timeout
+        my $slots = $pool->alloc_n($n, 0);         # non-blocking
+        # returns arrayref of indices, or undef (all-or-nothing)
+
+        my $freed = $pool->free_n(\@indices);      # batch free, returns count freed
+        # single used-decrement + single futex wake (faster than N individual frees)
+
+        my $slots = $pool->allocated_slots;  # arrayref of all allocated indices
+
+  Data Access
+        my $val = $pool->get($idx);         # read slot
+        $pool->set($idx, $val);             # write slot
+
+    For I64/I32 variants:
+
+        my $ok  = $pool->cas($idx, $old, $new);     # atomic CAS, returns bool
+        my $old = $pool->cmpxchg($idx, $old, $new); # atomic CAS, returns old value
+        my $old = $pool->xchg($idx, $val);          # atomic exchange, returns old
+        my $val = $pool->add($idx, $delta);          # atomic add, returns new value
+        my $val = $pool->incr($idx);                 # atomic increment
+        my $val = $pool->decr($idx);                 # atomic decrement
+
+    For Str variant:
+
+        my $max = $pool->max_len;           # maximum string length
+
+  Raw Pointers
+        my $ptr = $pool->ptr($idx);     # raw C pointer to slot data (UV)
+        my $ptr = $pool->data_ptr;      # pointer to start of data section
+
+    "ptr" returns the memory address of a slot's data as an unsigned
+    integer. Use with FFI::Platypus, OpenGL "_c" functions, or XS code that
+    needs a "void*".
+
+    "data_ptr" returns the base of the contiguous data region. Slots are
+    laid out as "data_ptr + idx * elem_size".
+
+    Warning: The returned pointer becomes dangling if the pool object is
+    destroyed. Do not use after the pool goes out of scope.
+
+  Zero-Copy Access
+        my $sv = $pool->slot_sv($idx);  # SV backed by slot memory
+
+    Returns a read-only scalar whose PV points directly into the shared
+    memory slot. Reading the scalar reads the slot with no "memcpy". Useful
+    for large slots where avoiding copy matters.
+
+    The scalar must not outlive the pool object. To modify the slot, use
+    set().
+
+  Status
+        my $ok  = $pool->is_allocated($idx);
+        my $cap = $pool->capacity;
+        my $esz = $pool->elem_size;
+        my $n   = $pool->used;              # allocated count
+        my $n   = $pool->available;         # free count
+        my $pid = $pool->owner($idx);       # PID of allocator
+
+  Recovery
+        my $n = $pool->recover_stale;       # free slots owned by dead PIDs
+        $pool->reset;                       # free all slots (exclusive access only)
+
+  Guards
+        my ($idx, $guard) = $pool->alloc_guard;           # auto-free on scope exit
+        my ($idx, $guard) = $pool->alloc_guard($timeout);
+        my ($idx, $guard) = $pool->try_alloc_guard;       # non-blocking
+
+  Convenience
+        my $idx = $pool->alloc_set($val);           # alloc + set
+        my $idx = $pool->alloc_set($val, $timeout); # with timeout
+        my $idx = $pool->try_alloc_set($val);       # non-blocking
+
+        $pool->each_allocated(sub { my $idx = shift; ... });
+
+  Common Methods
+        my $p  = $pool->path;        # backing file (undef if anon)
+        my $fd = $pool->memfd;       # memfd fd (-1 if not memfd)
+        $pool->sync;                 # msync to disk
+        $pool->unlink;               # remove backing file
+        my $s  = $pool->stats;       # diagnostic hashref
+
+   eventfd Integration
+        my $fd = $pool->eventfd;           # create eventfd
+        $pool->eventfd_set($fd);           # use existing fd
+        my $fd = $pool->fileno;            # current eventfd (-1 if none)
+        $pool->notify;                     # signal eventfd
+        my $n  = $pool->eventfd_consume;   # drain counter
+
+STATS
+    stats() returns a hashref with diagnostic counters. All values are
+    approximate under concurrency.
+
+    "capacity" — total slot count (immutable)
+    "elem_size" — bytes per slot (immutable)
+    "used" — currently allocated slot count
+    "available" — currently free slot count ("capacity - used")
+    "waiters" — processes currently blocked on "alloc"
+    "mmap_size" — total mmap region size in bytes
+    "allocs" — cumulative successful allocations
+    "frees" — cumulative frees (including stale recovery)
+    "waits" — "alloc" calls that entered the retry loop
+    "timeouts" — "alloc" calls that timed out
+    "recoveries" — slots freed by "recover_stale"
+
+SECURITY
+    The shared memory region (mmap) is writable by all processes that open
+    it. A malicious process with write access to the backing file or memfd
+    can corrupt header fields (bitmap, counters, slot data) and cause other
+    processes to crash, spin, or return incorrect data. Do not share backing
+    files with untrusted processes. Use anonymous mode or memfd with
+    restricted fd passing for isolation.
+
+PERFORMANCE
+    *   Allocation scans a bitmap of ceil(capacity/64) words. O(capacity/64)
+        worst case, O(1) amortized with scan_hint.
+
+    *   Each allocation is a single CAS on one bitmap word. Under
+        contention, CAS retries on the same word are ~10ns each.
+
+    *   When pool is full, "alloc" blocks on a futex (zero CPU). Woken by a
+        single "FUTEX_WAKE" syscall on "free".
+
+    *   "free_n" batches N frees into a single "used" decrement and a single
+        "FUTEX_WAKE" syscall — faster than N individual frees.
+
+    *   "slot_sv" provides zero-copy access to slot data, avoiding "memcpy"
+        overhead for large slots.
+
+    *   Typed variants (I64, I32) use atomic load/store/CAS/add directly on
+        the mmap'd memory — no locking overhead.
+
+BENCHMARKS
+    Measured on a single-socket x86_64 Linux system, Perl 5.40.
+
+        Single process (1M ops):
+          I64 alloc + free          3.3M/s
+          I64 get/set              ~10M/s
+          I64 add/incr             ~10M/s
+          I64 cas                   9.8M/s
+          Str set (48B)            ~10M/s
+          Str get (48B)             7.5M/s
+          alloc_set + free          1.9M/s
+
+        Multi-process (8 workers, 200K ops each, cap=64):
+          I64 alloc/free            4.7M/s aggregate
+          I64 alloc/set/get/free    5.1M/s aggregate
+          I64 atomic add           22.9M/s aggregate
+          Str alloc/set/get/free    4.9M/s aggregate
+
+        Batch (single process, alloc_n + free_n):
+          batch=1                   ~2.3M/s
+          batch=16                  ~400K/s  (vs ~200K individual)
+          batch=64                  ~110K/s  (vs ~50K individual, 2x gain)
+
+    Bottleneck is Perl XS call overhead, not the CAS or futex.
+
+SEE ALSO
+    Data::Buffer::Shared - typed shared array (index-based, no alloc/free)
+
+    Data::Stack::Shared - LIFO stack
+
+    Data::Deque::Shared - double-ended queue
+
+    Data::Queue::Shared - FIFO queue
+
+    Data::ReqRep::Shared - request-reply
+
+    Data::Log::Shared - append-only log (WAL)
+
+    Data::Sync::Shared - synchronization primitives
+
+    Data::HashMap::Shared - concurrent hash table
+
+    Data::PubSub::Shared - publish-subscribe ring
+
+    Data::Heap::Shared - priority queue
+
+    Data::Graph::Shared - directed weighted graph
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

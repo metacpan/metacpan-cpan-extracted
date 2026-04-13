@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::JSON qw(json_encode);
@@ -14,8 +14,8 @@ use Developer::Dashboard::SkillManager;
 # Dispatches the lightweight dashboard skills helper command.
 # Input: command name under "command" and remaining argv array reference under
 # "args".
-# Output: prints JSON or table output to STDOUT and returns true, or dies with
-# a usage message when the arguments are invalid.
+# Output: prints JSON or table output to STDOUT and returns the process exit
+# code, or dies with a usage message when the arguments are invalid.
 sub run_skills_command {
     my (%args) = @_;
     my $command = $args{command} || die "Missing command name\n";
@@ -30,31 +30,31 @@ sub run_skills_command {
         my $git_url = shift @argv || die "Usage: dashboard skills install <git-url>\n";
         my $result = $manager->install($git_url);
         print json_encode($result);
-        return !$result->{error};
+        return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'uninstall' ) {
         my $repo_name = shift @argv || die "Usage: dashboard skills uninstall <repo-name>\n";
         my $result = $manager->uninstall($repo_name);
         print json_encode($result);
-        return !$result->{error};
+        return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'update' ) {
         my $repo_name = shift @argv || die "Usage: dashboard skills update <repo-name>\n";
         my $result = $manager->update($repo_name);
         print json_encode($result);
-        return !$result->{error};
+        return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'enable' ) {
         my $repo_name = shift @argv || die "Usage: dashboard skills enable <repo-name>\n";
         my $result = $manager->enable($repo_name);
         print json_encode($result);
-        return !$result->{error};
+        return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'disable' ) {
         my $repo_name = shift @argv || die "Usage: dashboard skills disable <repo-name>\n";
         my $result = $manager->disable($repo_name);
         print json_encode($result);
-        return !$result->{error};
+        return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'list' ) {
         my $output = 'json';
@@ -62,11 +62,11 @@ sub run_skills_command {
         my $skills = $manager->list();
         if ( $output eq 'json' ) {
             print json_encode( { skills => $skills } );
-            return 1;
+            return 0;
         }
         if ( $output eq 'table' ) {
             print _skills_table($skills);
-            return 1;
+            return 0;
         }
         die "Usage: dashboard skills list [-o json|table]\n";
     }
@@ -77,14 +77,28 @@ sub run_skills_command {
         my $usage = $manager->usage($repo_name);
         if ( $output eq 'json' ) {
             print json_encode($usage);
-            return !$usage->{error};
+            return $usage->{error} ? 1 : 0;
         }
         if ( $output eq 'table' ) {
             die $usage->{error} . "\n" if $usage->{error};
             print _usage_table($usage);
-            return 1;
+            return 0;
         }
         die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
+    }
+    if ( $action eq '_exec' ) {
+        require Developer::Dashboard::SkillDispatcher;
+        my $skill_name = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
+        my $skill_cmd  = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
+        my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
+        my $result = $dispatcher->dispatch( $skill_name, $skill_cmd, @argv );
+        if ( $result->{error} ) {
+            print STDERR $result->{error}, "\n";
+            return 1;
+        }
+        print $result->{stdout} if $result->{stdout};
+        print STDERR $result->{stderr} if $result->{stderr};
+        return $result->{exit_code} || 0;
     }
 
     die "Unknown skills action: $action\nUsage: dashboard skills [install|uninstall|update|enable|disable|list|usage]\n";
@@ -264,11 +278,11 @@ action parsing inline.
 
 =head1 PURPOSE
 
-This module is the command runtime behind C<dashboard skills>. It owns the CLI parsing for skill install, update, uninstall, enable, disable, list, and usage; prints canonical JSON by default; and renders optional table output for human inspection.
+This module is the command runtime behind C<dashboard skills>. It owns the CLI parsing for skill install, update, uninstall, enable, disable, list, and usage; prints canonical JSON by default; renders optional table output for human inspection; and handles the internal dotted-command handoff used by C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
 
 =head1 WHY IT EXISTS
 
-It exists because the skill lifecycle contract grew beyond a single inline branch. Keeping that contract in one dedicated module makes it easier to evolve the CLI, preserve JSON output guarantees, and keep disabled-skill semantics consistent across management commands.
+It exists because the skill lifecycle contract grew beyond a single inline branch. Keeping that contract in one dedicated module makes it easier to evolve the CLI, preserve JSON output guarantees, keep disabled-skill semantics consistent across management commands, and route dotted skill command execution without restoring a separate singular helper.
 
 =head1 WHEN TO USE
 
@@ -276,11 +290,11 @@ Use this file when changing the public C<dashboard skills ...> verbs, the JSON p
 
 =head1 HOW TO USE
 
-Call C<run_skills_command> with the public helper name and argv array reference. The module builds a lightweight path registry, constructs a skill manager, dispatches the requested action, and prints either canonical JSON or sectioned tables depending on C<-o json> or C<-o table>. The default output for C<list> and C<usage> is JSON.
+Call C<run_skills_command> with the public helper name and argv array reference. The module builds a lightweight path registry, constructs a skill manager, dispatches the requested action, and prints either canonical JSON or sectioned tables depending on C<-o json> or C<-o table>. The default output for C<list> and C<usage> is JSON. The thin C<dashboard> switchboard also routes dotted skill execution through this helper with an internal action so the public execution contract stays C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
 
 =head1 WHAT USES IT
 
-It is used by the staged C<skills> private helper, by CLI smoke and skill lifecycle tests, and by contributors verifying how disabled skills remain installed yet drop out of runtime lookup.
+It is used by the staged C<skills> private helper, by dotted skill command dispatch from the public switchboard, by CLI smoke and skill lifecycle tests, and by contributors verifying how disabled skills remain installed yet drop out of runtime lookup.
 
 =head1 EXAMPLES
 

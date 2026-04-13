@@ -1,5 +1,50 @@
 Revision history for Langertha-Knarr
 
+1.001     2026-04-12 22:22:19Z
+
+    - Raw passthrough: unconfigured models are now piped 1:1 as raw
+      HTTP bytes to the upstream API. All protocol metadata (tool_use,
+      usage, cache_control, stop_reason, content block indices) is
+      preserved. Client auth headers are forwarded transparently.
+
+    - Langfuse tracing for passthrough requests: every raw passthrough
+      call creates a Langfuse trace with model, protocol, and timing.
+
+    - 'knarr container' is now a deprecated alias for
+      'knarr start --from-env'. The --from-env flag builds config from
+      environment variables when no config file is found.
+
+    - --port is now repeatable: -p 8080 -p 11434 binds multiple ports.
+      --host defaults to 0.0.0.0.
+
+    - KNARR_DEBUG=1 environment variable enables verbose logging
+      (equivalent to --verbose / -v).
+
+    - Logging always active: Log::Any::Adapter::Stderr is now always
+      set (warning level by default, trace level with --verbose).
+      Errors in request handling are logged to stderr.
+
+    - Anthropic system prompt: handle array-of-content-blocks format
+      sent by Claude Code (was: only plain string).
+
+    - Removed route_model from Handler role — decorator chain
+      (Tracing, RequestLog) is no longer bypassed.
+
+    - Dockerfile rewritten: cpm instead of cpanm, cpanfile-based
+      installation, non-root user, Docker-cache-friendly layers.
+
+    - Bump Langertha floor to 0.401.
+
+    - Added IO::Async::SSL to cpanfile (required for HTTPS passthrough).
+
+    - Test suite expanded to 343 tests. New coverage:
+        * Raw passthrough with mock Langfuse tracing
+        * Passthrough with and without tracing enabled
+
+    - Documentation updated: CLAUDE.md, README.md, bin/knarr POD
+      reflect new architecture, --from-env, repeatable --port,
+      KNARR_DEBUG, raw passthrough behavior.
+
 1.000     2026-04-10 00:00:20Z
 
     - MAJOR REWRITE. Mojolicious is gone; the new core is built on

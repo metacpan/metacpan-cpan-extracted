@@ -1,0 +1,13 @@
+Revision history for Sort-DJB
+
+0.2   2026-04-13
+    - Relicensed as GPLv2 (see LICENSE file)
+    - Version bump (metadata only, no code changes)
+
+0.01  2026-04-12
+    - Initial release
+    - XS bindings for djbsort-20260210 (bitonic sorting networks)
+    - Bundled portable C implementation (works on all platforms)
+    - 12 sort functions: int32, uint32, int64, uint64, float32, float64
+      in both ascending and descending variants
+    - Sort::DJB::Pure - pure Perl implementation for testing and portability

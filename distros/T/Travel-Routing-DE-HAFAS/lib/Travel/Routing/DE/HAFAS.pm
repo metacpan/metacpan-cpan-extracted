@@ -19,7 +19,7 @@ use Travel::Status::DE::HAFAS;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # {{{ Endpoint Definition
 
@@ -437,10 +437,10 @@ sub add_message {
 	for my $message ( @{ $self->{messages} } ) {
 		if (
 			(
-				not( not defined $code or not defined $message->{code} )
+				not( defined $code and defined $message->{code} )
 				or $code eq $message->{code}
 			)
-			and ( not( not defined $text or not defined $message->{text} )
+			and ( not( defined $text and defined $message->{text} )
 				or $text eq $message->{text} )
 		  )
 		{
@@ -554,7 +554,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 
@@ -745,7 +745,7 @@ Travel::Routing::DE::HAFAS::Connection(3pm)
 
 =head1 AUTHOR
 
-Copyright (C) 2023-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2023-2026 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

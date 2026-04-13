@@ -7,7 +7,7 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::InstanceOf::FemaleGivenName;
 
-our $VERSION = 0.39;
+our $VERSION = 0.40;
 
 sub new {
 	my $class = shift;
@@ -97,8 +97,7 @@ Returns Wikibase::Datatype::Snak instance.
 
 =head1 EXAMPLE
 
-=for comment
-filename=fixture_create_and_print_statement_wd_instance_of_female_given_name.pl
+=for comment filename=fixture_create_and_print_statement_wd_instance_of_female_given_name.pl
 
  use strict;
  use warnings;
@@ -153,12 +152,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2025 Michal Josef Špaček
+© 2020-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.39
+0.40
 
 =cut

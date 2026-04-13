@@ -6,7 +6,8 @@ use warnings;
 use Test::More tests => 13;
 use Test::Exception;
 use MIME::Base64;
-
+use Test::Lib;
+use Test::XML::Sig;
 BEGIN {
     use_ok( 'XML::Sig' );
 }
@@ -81,10 +82,7 @@ ok( $is_valid2 == 1 );
 
 
 SKIP: {
-    eval {
-        require Crypt::OpenSSL::DSA;
-    };
-    skip "Crypt::OpenSSL::DSA not installed", 2 if ($@);
+    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 2 if (!test_dsa_ok());
     my $sig3 = XML::Sig->new( { key => 't/dsa.private.key' } );
     isa_ok( $sig3, 'XML::Sig' );
     my $signed3 = $sig3->sign($xml);

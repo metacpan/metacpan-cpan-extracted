@@ -268,8 +268,11 @@ These are the available flags you can set in the `META` section of your mocks re
 =over
 
 =item * `allow_unmocked_queries`: If set to 1, unmocked queries will return an empty result set and not throw an exception.
+
 =item * `connect_fail`: If set to 1, simulates a connection failure when connecting to the mock database.
+
 =item * `prepare_fail`: If set to 1, simulates a failure when preparing a statement.
+
 =item * `execute_fail`: If set to 1, simulates a failure when executing a statement.
 
 =back

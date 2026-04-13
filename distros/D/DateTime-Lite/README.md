@@ -21,6 +21,19 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
     my $now   = DateTime::Lite->now( time_zone => 'UTC' );
     my $today = DateTime::Lite->today( time_zone => 'Asia/Tokyo' );
 
+    # Timezone from GPS coordinates (nearest IANA zone by haversine distance)
+    use DateTime::Lite::TimeZone;
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658581,
+        longitude => 139.745433,   # Tokyo Tower
+    );
+    my $dt_local = DateTime::Lite->now( time_zone => $tz );
+    say $dt_local->time_zone_long_name;  # Asia/Tokyo
+
+    # BCP47 -u-tz- locale extension: timezone inferred from locale tag
+    my $dt_bcp47 = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+    say $dt_bcp47->time_zone_long_name;  # Asia/Jerusalem
+
     my $from_epoch = DateTime::Lite->from_epoch( epoch => time() );
     my $from_doy   = DateTime::Lite->from_day_of_year(
         year        => 2026,
@@ -154,7 +167,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 # VERSION
 
-    v0.1.0
+    v0.3.0
 
 # DESCRIPTION
 
@@ -188,9 +201,9 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
     The public API mirrors [DateTime](https://metacpan.org/pod/DateTime) as closely as possible, so existing code using `DateTime` should work with `DateTime::Lite` as a drop-in replacement.
 
-- Full BCP 47 / CLDR locale support
+- Full Unicode CLDR / BCP 47 locale support
 
-    `DateTime` is limited to the set of pre-generated `DateTime::Locale::*` modules, one per locale. `DateTime::Lite` accepts any valid BCP 47 / Unicode CLDR locale tag, including complex forms with Unicode extensions (`-u-`), transform extensions (`-t-`), and script subtags.
+    `DateTime` is limited to the set of pre-generated `DateTime::Locale::*` modules, one per locale. `DateTime::Lite` accepts any valid Unicode CLDR / BCP 47 locale tag, including complex forms with Unicode extensions (`-u-`), transform extensions (`-t-`), and script subtags.
 
         my $dt = DateTime::Lite->now( locale => 'en' );    # simple form
         my $dt = DateTime::Lite->now( locale => 'en-GB' ); # simple form
@@ -200,6 +213,15 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
         my $dt = DateTime::Lite->now( locale => 'ar-SA-u-nu-latn' );
 
     Locale data is resolved dynamically by [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR) via [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData), so tags like `he-IL-u-ca-hebrew-tz-jeruslm` or `ja-Kana-t-it` work transparently without any additional installed modules.
+
+    Additionally, if the locale tag carries a [Unicode timezone extension](https://metacpan.org/pod/Locale%3A%3AUnicode#Unicode-extensions) (`-u-tz-`), and no explicit `time_zone` argument is provided to the constructor, `DateTime::Lite` will automatically resolve the corresponding IANA canonical timezone name from it:
+
+        # time_zone is inferred as 'Asia/Jerusalem' from the -u-tz-jeruslm extension
+        my $dt = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+        say $dt->time_zone;            # Asia/Jerusalem
+        say $dt->time_zone_long_name;  # Asia/Jerusalem
+
+    An explicit `time_zone` argument always takes priority over the locale extension.
 
 - No die() in normal operation
 
@@ -237,7 +259,15 @@ Accepted parameters are:
 - `second`
 - `nanosecond`
 - `time_zone`
+
+    The time zone for the datetime. Accepts a zone name, such as `Asia/Tokyo`), a fixed-offset string, such as `+09:00`, a [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone) object, `UTC`, `floating`, or `local`.
+
+    If omitted, and the `locale` argument carries a BCP47 `-u-tz-` extension, such as `he-IL-u-ca-hebrew-tz-jeruslm`, the corresponding IANA canonical timezone is resolved automatically. If neither is provided, the default floating timezone is used (or `$ENV{PERL_DATETIME_DEFAULT_TZ}` if set).
+
 - `locale`
+
+    Any valid locale as defined by the Unicode CLDR (Common Locale Data Repository), and BCP47. See [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode)
+
 - `formatter`
 - `fatal`
 
@@ -328,7 +358,14 @@ Returns the new object upon success, or sets an [error](https://metacpan.org/pod
         locale    => 'ja-JP'
     );
 
+    # time_zone inferred from the -u-tz- BCP47 extension:
+    my $now2 = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+    say $now2->time_zone;            # Asia/Jerusalem
+    say $now2->time_zone_long_name;  # Asia/Jerusalem
+
 Returns the current datetime (calls `from_epoch( epoch =` time )>).
+
+If `time_zone` is omitted and the `locale` carries a BCP47 `-u-tz-` extension, as in the example above, the timezone is inferred automatically. See ["new"](#new) for the full priority rules.
 
 Returns the new object upon success, or sets an [error](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (`DateTime::Lite::Null`) to avoid the typical `Can't call method '%s' on an undefined value`
 

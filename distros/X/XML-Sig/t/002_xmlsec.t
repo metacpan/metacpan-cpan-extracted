@@ -12,10 +12,7 @@ my $signed = $sig->sign($xml);
 ok($signed, "XML is signed");
 
 SKIP: {
-    eval {
-        require Crypt::OpenSSL::DSA;
-    };
-    skip "Crypt::OpenSSL::DSA is not installed", 1 if ($@);
+    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 1 if (!test_dsa_ok());
     my $sig2 = XML::Sig->new( { key => 't/dsa.private.key' } );
     my $result = $sig2->verify($signed);
     ok($result, "XML verified with DSA key" );

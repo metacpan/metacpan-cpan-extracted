@@ -41,6 +41,6 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Lite/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Lite
-version: v0.1.0
+version: v0.3.0
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

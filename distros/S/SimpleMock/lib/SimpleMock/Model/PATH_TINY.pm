@@ -36,7 +36,7 @@ sub validate_mocks {
 
 =head1 NAME
 
-SimpleMock::Model::PATH_TINY
+SimpleMock::Model::PATH_TINY - Mock model for Path::Tiny operations
 
 =head1 DESCRIPTION
 

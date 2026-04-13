@@ -22,6 +22,7 @@ requires 'DateTime' => 0;
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Readonly' => 0;
+requires 'Unicode::UTF8' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Wikibase-Datatype-Print/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Wikibase-Datatype-Print';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Wikibase-Datatype-Print';
@@ -60,7 +61,7 @@ test_requires 'Wikibase::Datatype::Value::Sense' => 0.29;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.19';
+version '0.20';
 
 # Run.
 WriteAll();

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 use Cwd qw(cwd);
 use Developer::Dashboard::Config;

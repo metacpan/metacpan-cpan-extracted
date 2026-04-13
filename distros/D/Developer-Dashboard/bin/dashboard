@@ -67,8 +67,8 @@ if ( my $custom_path = _custom_command_path($cmd) ) {
 }
 
 if ( my ( $skill_name, $skill_command ) = _skill_dotted_command_parts($cmd) ) {
-    my $helper_path = _builtin_helper_path('skill');
-    _exec_switchboard_command( $helper_path, $skill_name, $skill_command, @ARGV );
+    my $helper_path = _builtin_helper_path('skills');
+    _exec_switchboard_command( $helper_path, '_exec', $skill_name, $skill_command, @ARGV );
 }
 
 pod2usage(
@@ -256,10 +256,15 @@ sub _skill_dotted_command_parts {
     my ( $skill_name, $skill_command ) = split /\./, $cmd, 2;
     return if !defined $skill_name || $skill_name eq '';
     return if !defined $skill_command || $skill_command eq '';
-    my $skills_root = File::Spec->catdir( $ENV{HOME} || '', '.developer-dashboard', 'skills' );
-    my $skill_root = File::Spec->catdir( $skills_root, $skill_name );
-    return if !-d $skill_root;
-    return if -f File::Spec->catfile( $skill_root, '.disabled' );
+    require Developer::Dashboard::PathRegistry;
+    require Developer::Dashboard::SkillManager;
+    my $paths = Developer::Dashboard::PathRegistry->new(
+        home            => $ENV{HOME},
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+    return if !$manager->get_skill_path($skill_name);
     return ( $skill_name, $skill_command );
 }
 
@@ -393,7 +398,6 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard skills update <repo-name>
   dashboard skills list
   dashboard skills usage <repo-name> [-o json|table]
-  dashboard skill <repo-name> <command> [args...]
   dashboard config init
   dashboard config show
   dashboard auth add-user <username> <password>

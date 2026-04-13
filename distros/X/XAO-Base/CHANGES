@@ -1,6 +1,14 @@
 https://github.com/amaltsev/XAO-Base
 ------------------------------------
 
+commit 73ed95bd0e833a37236dcbf0feafed441d58bfc3
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sun Apr 12 20:01:41 2026 -0700
+
+    v1.29 Made 'blib' optional in XAO::TestUtils
+    
+    Makes it easier to use in non-module testing.
+
 commit 1718ae377d748b008dec266862c0293236bf52aa
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Thu Sep 17 19:55:49 2020 -0700
@@ -64,10 +72,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Thu Aug 29 13:58:56 2019 -0700
 
     Added Cache::Uncached backend
-
-commit d2c86775604d0c0d1d679872ebffcac194c961d7
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Feb 27 15:55:31 2019 -0800
-
-    1.25 Fixed fround() for 7.42/0.8 edge case
 

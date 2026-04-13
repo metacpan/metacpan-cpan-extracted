@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.26
+2.34
 
 =head1 INTRODUCTION
 
@@ -878,6 +878,9 @@ Build the distribution:
 The release gather rules exclude local coverage output such as F<cover_db>, so
 covered runs before C<dzil build> do not leak Devel::Cover artifacts into the
 shipped tarball.
+The built distribution also ships a plain F<README> companion so CPAN and
+kwalitee consumers still receive a top-level readme without re-including the
+checkout-only documentation set.
 
 Run the CLI directly from the repository:
 
@@ -1497,6 +1500,11 @@ because this machine uses both launch styles during verification.
 The runtime-manager coverage cases also use bounded child reaping for stubborn
 process shutdown scenarios, so C<Devel::Cover> runs do not stall indefinitely
 after the escalation path has already been exercised.
+The focused skill regression in C<t/19-skill-system.t> now also exercises
+C<PathRegistry::installed_skill_docker_roots()> directly, including the
+default enabled-only view and the explicit C<include_disabled =E<gt> 1> path,
+so skill docker layering changes do not silently pull the C<lib/> total below
+the required C<100.0 / 100.0 / 100.0>.
 The packaged C<t/09-runtime-manager.t> fallback assertions also stub ambient
 managed-web discovery explicitly, so tarball and PAUSE installs do not get
 contaminated by unrelated live dashboard-shaped processes already running on
@@ -1802,10 +1810,28 @@ Install a skill from a Git repository:
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills install https://github.com/user/example-skill.git
 
-The repository is cloned into its own isolated skill root under
-F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. Developer Dashboard does
-not merge the skill's C<cli/>, C<dashboards/>, C<config/>, C<cpanfile>,
-C<aptfile>, or Docker files into the normal runtime folders.
+The repository is cloned into its own isolated skill root under the deepest
+participating C<DD-OOP-LAYERS> runtime. In a home-only session that is
+F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. In a deeper project
+layer that already has its own F<.developer-dashboard/>, the install target
+becomes
+F<E<lt>that-layerE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>.
+Developer Dashboard does not merge the skill's C<cli/>, C<dashboards/>,
+C<config/>, C<cpanfile>, C<aptfile>, or Docker files into the normal runtime
+folders.
+
+Skill lookup also follows C<DD-OOP-LAYERS>, but a same-named deeper skill is
+now layered instead of flattening the whole repo. The home
+F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/> checkout is the base
+layer, and any deeper
+F<.developer-dashboard/skills/E<lt>repo-nameE<gt>/> checkout becomes an
+inherited layer for that same skill. Runtime lookup walks those
+participating skill layers for C<cli/E<lt>commandE<gt>>,
+C<cli/E<lt>commandE<gt>.d>, C<dashboards/*>, C<dashboards/nav/*>,
+C<config/config.json>, and C<local/lib/perl5>. If a child layer omits a file,
+folder, or config key, lookup falls back to the base layer. If multiple
+layers provide the same file or config key, the deepest layer still wins that
+override.
 
 List installed skills:
 
@@ -1884,15 +1910,13 @@ Disable a skill without uninstalling it:
 
   dashboard skills disable example-skill
 
-Disabling keeps the checkout under
-F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/> but removes it from
-normal runtime lookup. That means:
+Disabling keeps the checkout in its current layered skills root but removes it
+from normal runtime lookup. That means:
 
 =over 4
 
 =item *
 
-C<dashboard skill E<lt>repo-nameE<gt> E<lt>commandE<gt>> and
 C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> stop dispatching into that
 skill
 
@@ -1924,11 +1948,13 @@ shared nav rendering.
 
 Execute a skill command:
 
-  dashboard skill example-skill somecmd arg1 arg2
   dashboard example-skill.somecmd arg1 arg2
 
-The dotted form is the short public route. If C<example-skill> is installed and
+The dotted form is the public route. If C<example-skill> is installed and
 ships C<cli/somecmd>, C<dashboard example-skill.somecmd> resolves the correct
+layered skill command. If the active child layer for that same repo omits
+C<cli/somecmd>, the command falls back to the nearest inherited skill layer
+that still provides it.
 isolated skill root, runs sorted hooks from C<cli/somecmd.d/>, and then runs the
 main command.
 
@@ -1936,7 +1962,9 @@ Uninstall a skill:
 
   dashboard skills uninstall example-skill
 
-Each installed skill lives under F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/> with:
+Each installed skill lives under
+F<E<lt>participating-layerE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>
+with:
 
 =over 4
 
@@ -2108,8 +2136,7 @@ re-enabled
 To build a new skill, start with a Git repository that contains C<cli/>,
 C<config/config.json>, and optional C<dashboards/>, C<dashboards/nav/>,
 C<state/>, C<logs/>, C<local/>, C<aptfile>, and C<cpanfile> files under the
-skill root. Skill commands are file-based commands run through either
-C<dashboard skill E<lt>repo-nameE<gt> E<lt>commandE<gt>> or the short
+skill root. Skill commands are file-based commands run through the dotted
 C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> form. Skill hook files live
 under C<cli/E<lt>commandE<gt>.d/>, skill app pages render from
 C</app/E<lt>repo-nameE<gt>> and C</app/E<lt>repo-nameE<gt>/E<lt>idE<gt>>, and
@@ -2209,6 +2236,9 @@ Developer Dashboard Contributors
 
 =head1 LICENSE
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. The repository root C<LICENSE> file carries a
+canonical GPL text for GitHub and Scorecard detection, and the alternative
+Artistic text lives in C<LICENSE-Artistic-1.0-Perl>.
 
 =cut

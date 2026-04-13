@@ -14,6 +14,7 @@ plan skip_all => 'Scorecard guardrails are source-tree-only checks'
   if !-d File::Spec->catdir( $ROOT, '.git' ) || !-f $repo_workflow;
 
 ok( _git_tracks('LICENSE'), 'root LICENSE is tracked for Scorecard license detection' );
+ok( _git_tracks('LICENSE-Artistic-1.0-Perl'), 'alternate Artistic license text is tracked explicitly for the Perl 5 dual-license contract' );
 ok( _git_tracks('SECURITY.md'), 'root SECURITY.md is tracked for Scorecard security-policy detection' );
 ok( _git_tracks('.github/dependabot.yml'), 'Dependabot config is tracked for Scorecard dependency-update-tool detection' );
 ok( _git_tracks('.github/workflows/codeql.yml'), 'CodeQL workflow is tracked for Scorecard SAST detection' );
@@ -23,7 +24,11 @@ ok( _git_tracks('.github/workflows/release-github.yml'), 'GitHub release workflo
 ok( _git_tracks('.clusterfuzzlite/Dockerfile'), 'ClusterFuzzLite Dockerfile is tracked for Scorecard fuzzing detection' );
 
 my $license = _slurp('LICENSE');
-like( $license, qr/Perl_5|same terms as Perl 5|Artistic License|GNU General Public License/i, 'LICENSE states the Perl 5 licensing terms' );
+like( $license, qr/\AGNU GENERAL PUBLIC LICENSE/, 'LICENSE uses a canonical GPL text that GitHub can classify' );
+unlike( $license, qr/The "Artistic License"/, 'LICENSE keeps the alternate Artistic text out of the root file so GitHub does not classify it as an unknown composite blob' );
+
+my $license_artistic = _slurp('LICENSE-Artistic-1.0-Perl');
+like( $license_artistic, qr/\AThe "Artistic License"/, 'alternate Artistic license file ships the canonical Artistic text' );
 
 my $security = _slurp('SECURITY.md');
 like( $security, qr/Reporting A Vulnerability/i, 'SECURITY.md documents vulnerability reporting' );

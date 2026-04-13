@@ -1,0 +1,18 @@
+Revision history for Data-Sync-Shared
+
+0.03  2026-04-13
+    - Add SEE ALSO cross-links to all family modules
+
+0.02  2026-04-12
+    - Fix eventfd_set self-assignment fd guard
+    - Add SEE ALSO cross-links to family modules
+
+
+0.01  2026-04-11
+    - Initial release
+    - Five primitives: Semaphore, Barrier, RWLock, Condvar, Once
+    - Futex-based blocking, mmap shared memory, PID stale recovery
+    - File-backed, anonymous, and memfd modes
+    - eventfd integration for event loops
+    - Guard objects for scope-based auto-release
+    - Timeouts on all blocking operations

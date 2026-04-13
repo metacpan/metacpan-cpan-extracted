@@ -16,7 +16,10 @@ use Developer::Dashboard::PageStore;
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::Web::App;
 
+my $original_cwd = getcwd();
 local $ENV{HOME} = tempdir( CLEANUP => 1 );
+my $test_cwd = tempdir( CLEANUP => 1 );
+chdir $test_cwd or die "Unable to chdir to $test_cwd: $!";
 my $test_repos = tempdir( CLEANUP => 1 );
 my $paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
 my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
@@ -127,6 +130,10 @@ my $missing_bookmark = $app->handle(
 is( $missing_bookmark->[0], 404, 'missing skill bookmark routes return 404' );
 
 done_testing();
+
+END {
+    chdir $original_cwd if defined $original_cwd && length $original_cwd;
+}
 
 sub _create_skill_repo {
     my ( $name, %args ) = @_;

@@ -35,7 +35,7 @@
             "BEGIN::Lift" : "0.07",
             "Carp" : "0",
             "Devel::Hook" : "0",
-            "Object::Proto" : "0.09",
+            "Object::Proto" : "0.12",
             "perl" : "5.008003"
          }
       },
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.04,
+   "version" : 0.05,
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

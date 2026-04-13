@@ -1,0 +1,27 @@
+.github/workflows/ci.yml
+bench/multiprocess.pl
+bench/single.pl
+Changes
+eg/backtracking.pl
+eg/balanced_parens.pl
+eg/basic.pl
+eg/depth_first.pl
+eg/ev_eventfd.pl
+eg/expression_eval.pl
+eg/memfd_fork.pl
+eg/str_undo.pl
+eg/worker_stack.pl
+lib/Data/Stack/Shared.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+Shared.xs
+stack.h
+t/01-basic.t
+xt/asan.t
+xt/fd_leak.t
+xt/stress.t
+xt/valgrind.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

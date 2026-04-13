@@ -4,6 +4,11 @@ This is not a complete list of changes.  See repository for full details:
 
     https://github.com/Perl/version.pm
 
+0.9934
+  * Reorder "v" check to avoid forward goto
+  * Fix string comparisons with $] to use numeric comparison instead
+  * Remove unnecessary shebang in version.pm
+
 0.9933
   * Fix two warnings in recent code
 

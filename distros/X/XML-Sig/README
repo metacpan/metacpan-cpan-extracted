@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.69
+    version 0.70
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -42,7 +42,7 @@ PREREQUISITES
 
     *   Crypt::PK::RSA
 
-    *   Crypt::OpenSSL::DSA (Optional - required for DSA signatures)
+    *   Crypt::OpenSSL::DSA (>= 0.20 Optional - required for DSA signatures)
 
     *   Crypt::PK::ECC
 
@@ -195,6 +195,14 @@ USAGE
     Arguments: none
 
     Returns: Crypt::OpenSSL::X509: Certificate used to sign the XML
+
+   check_dsa_version()
+    Verify the required Crypt::OpenSSL::DSA is installed
+
+    Arguments: none
+
+    Returns: integer (1 True, 0 False) if a valid version of
+    Crypt::OpenSSL::DSA is installed
 
 ABOUT DIGITAL SIGNATURES
     Just as one might want to send an email message that is

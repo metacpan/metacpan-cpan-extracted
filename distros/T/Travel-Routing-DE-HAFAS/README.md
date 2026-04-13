@@ -28,11 +28,11 @@ Debian repository and are not covered by its quality assurance process.
 To install the latest release, run:
 
 ```
-wget https://lib.finalrewind.org/deb/libtravel-status-de-deutschebahn-perl_latest_all.deb \
+wget https://lib.finalrewind.org/deb/libtravel-status-de-hafas-perl_latest_all.deb \
      https://lib.finalrewind.org/deb/libtravel-routing-de-hafas-perl_latest_all.deb
-sudo apt install ./libtravel-status-de-deutschebahn-perl_latest_all.deb \
+sudo apt install ./libtravel-status-de-hafas-perl_latest_all.deb \
                  ./libtravel-routing-de-hafas-perl_latest_all.deb
-rm libtravel-status-de-deutschebahn-perl_latest_all.deb \
+rm libtravel-status-de-hafas-perl_latest_all.deb \
    libtravel-routing-de-hafas-perl_latest_all.deb
 ```
 
@@ -172,3 +172,12 @@ docker run --rm derfnull/hafas:latest --version
 
 Documentation is not available in this image. Please refer to the
 [online hafas manual](https://man.finalrewind.org/1/hafas/) instead.
+
+## References
+
+Mirrors of the hafas / Travel::Routing::DE::HAFAS repository are available at
+
+* [Chaosdorf](https://chaosdorf.de/git/derf/travel-routing-de-hafas)
+* [Codeberg](https://codeberg.org/derf/Travel-Routing-DE-HAFAS/)
+* [Finalrewind](https://git.finalrewind.org/derf/Travel-Routing-DE-HAFAS/)
+* [GitHub](https://github.com/derf/travel-routing-de-hafas)

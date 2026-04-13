@@ -21,7 +21,7 @@ no_index:
 provides:
   Google::GeoCoder::Smart:
     file: lib/Google/GeoCoder/Smart.pm
-    version: v2.6.6
+    version: v2.6.8
 requires:
   HTTP::Tiny: '0'
   JSON::PP: '0'
@@ -29,5 +29,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: https://github.com/ttgrules/Google-Geocoder-Smart
-version: v2.6.6
+version: v2.6.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

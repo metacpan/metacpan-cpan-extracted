@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Router;
 # ABSTRACT: Knarr handler that resolves model names via Langertha::Knarr::Router and dispatches to engines
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -29,10 +29,16 @@ has passthrough => (
 sub _resolve {
   my ($self, $model) = @_;
   $model //= 'default';
+  if ($self->passthrough) {
+    # With passthrough: try without default engine first so unknown models
+    # go to passthrough instead of being routed to the default engine.
+    my @r = eval { $self->router->resolve($model, skip_default => 1) };
+    return @r if @r;
+    return ();  # not found or error → passthrough
+  }
   my @r = eval { $self->router->resolve($model) };
   return @r unless $@;
-  die $@ unless $self->passthrough;
-  return ();  # signal: use passthrough
+  die $@;
 }
 
 async sub handle_chat_f {
@@ -117,7 +123,7 @@ Langertha::Knarr::Handler::Router - Knarr handler that resolves model names via 
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,37 @@
+.github/workflows/ci.yml
+bench/contention.pl
+bench/multiprocess.pl
+bench/single.pl
+Changes
+eg/atomic_counters.pl
+eg/basic.pl
+eg/connection_pool.pl
+eg/ev_eventfd.pl
+eg/ffi_sort.pl
+eg/guard.pl
+eg/memfd_fork.pl
+eg/opengl_particles.pl
+eg/pdl_interop.pl
+eg/pipeline.pl
+eg/pool_buffer_bridge.pl
+eg/pool_with_hashmap.pl
+eg/shared_metrics.pl
+eg/stale_recovery.pl
+lib/Data/Pool/Shared.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+pool.h
+README
+Shared.xs
+t/01-basic.t
+t/02-multiprocess.t
+t/03-memfd-eventfd.t
+t/04-edge-cases.t
+xt/asan.t
+xt/crash_recovery.t
+xt/fd_leak.t
+xt/stress.t
+xt/valgrind.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

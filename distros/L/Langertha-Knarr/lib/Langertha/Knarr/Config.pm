@@ -1,5 +1,5 @@
 package Langertha::Knarr::Config;
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 # ABSTRACT: YAML configuration loader and validator
 use Moo;
 use YAML::PP;
@@ -427,7 +427,7 @@ Langertha::Knarr::Config - YAML configuration loader and validator
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

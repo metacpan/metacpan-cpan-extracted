@@ -36,6 +36,8 @@ t/09.storable.t
 t/10.timezone.t
 t/11.accessors.t
 t/12.tz_database.t
+t/13.bcp47_tz.t
+t/14.tz_coordinates.t
 t/90.pod.t
 t/91.coverage.t
 t/92.manifest.t

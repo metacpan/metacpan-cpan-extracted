@@ -26,6 +26,8 @@ like( $source, qr/Developer::Dashboard::InternalCLI/, 'dashboard entrypoint dele
 like( $source, qr/_exec_switchboard_command/, 'dashboard entrypoint only resolves and execs staged commands' );
 like( $source, qr/_custom_command_path/, 'dashboard entrypoint resolves layered custom commands' );
 like( $source, qr/_builtin_helper_path/, 'dashboard entrypoint resolves staged private built-in helpers' );
+like( $source, qr/_builtin_helper_path\('skills'\)/, 'dashboard dotted skill dispatch reuses the staged skills helper' );
+like( $source, qr/_exec_switchboard_command\( \$helper_path, '_exec', \$skill_name, \$skill_command, \@ARGV \)/, 'dashboard dotted skill dispatch hands skill commands through the internal skills exec route' );
 
 my $share_seeded_root = File::Spec->catdir( $repo_root, 'share', 'seeded-pages' );
 ok( -d $share_seeded_root, 'seeded bookmark assets are shipped outside the dashboard entrypoint' );
@@ -101,7 +103,6 @@ my @perl_scripts = (
       shell
       doctor
       skills
-      skill
     ),
     ),
     (

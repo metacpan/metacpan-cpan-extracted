@@ -82,6 +82,10 @@ if ($has_integration_assets) {
     close $runner_fh;
     like( $runner, qr/Developer-Dashboard\.tar\.gz/, 'integration runner consumes mounted tarball artifact' );
     like( $runner, qr/tar -xzf/, 'integration runner extracts the tarball inside the container' );
+    like( $runner, qr/_versioned_install_tarball_path/, 'integration runner derives a versioned cpanm install tarball path from the extracted distribution version' );
+    like( $runner, qr/_copy_file\( \$tarball, \$install_tarball \)/, 'integration runner stages the mounted tarball into a versioned local copy before cpanm install' );
+    like( $runner, qr/cpanm install host-built tarball.*\$install_tarball/s, 'integration runner installs the versioned local tarball copy with cpanm' );
+    unlike( $runner, qr/cpanm install host-built tarball.*\$tarball/s, 'integration runner does not hand the generic mounted tarball path directly to cpanm' );
     like( $runner, qr/dashboard update/, 'integration runner exercises dashboard update' );
     like( $runner, qr/Runtime::Result/, 'integration runner exercises Runtime::Result-aware hook chaining' );
     like( $runner, qr/dashboard docker compose --project .* --dry-run config/, 'integration runner exercises docker compose dry-run' );

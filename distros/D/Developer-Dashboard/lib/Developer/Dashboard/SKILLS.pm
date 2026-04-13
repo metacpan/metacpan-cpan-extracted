@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 1;
 
@@ -25,7 +25,6 @@ Skill lifecycle:
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills update example-skill
   dashboard skills list
-  dashboard skill example-skill hello arg1 arg2
   dashboard example-skill.hello arg1 arg2
   dashboard skills uninstall example-skill
 
@@ -83,7 +82,6 @@ Install it:
 
 Run its command:
 
-  dashboard skill example-skill hello
   dashboard example-skill.hello
 
 Open its bookmark:
@@ -93,8 +91,12 @@ Open its bookmark:
 
 =head1 LAYOUT
 
-Installed skills live under
-F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>.
+Installed skills live under the active C<DD-OOP-LAYERS> skills roots such as
+F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/> or
+F<E<lt>projectE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>.
+Installing a skill writes into the deepest participating layer. Resolving a
+skill by repo name also follows C<DD-OOP-LAYERS>, so the deepest matching repo
+name is the active skill and shadows the same repo name from higher layers.
 
 The prepared layout is:
 
@@ -103,8 +105,7 @@ The prepared layout is:
 =item B<cli/>
 
 Executable skill commands. These are run through
-C<dashboard skill E<lt>repo-nameE<gt> E<lt>commandE<gt>> or the short
-C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> form and are not installed
+C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> and are not installed
 into the system PATH.
 
 =item B<cli/E<lt>commandE<gt>.d/>
@@ -127,8 +128,8 @@ browser status treat them the same way they treat system-owned collectors.
 
 Reserved root for skill-local Docker or Compose files. The dispatcher exposes
 this path through C<DEVELOPER_DASHBOARD_SKILL_DOCKER_ROOT>, and docker service
-lookup includes installed skill docker roots after the home runtime docker
-config and before deeper project layers.
+lookup includes installed skill docker roots from each participating runtime
+layer instead of treating the home skill tree as the only skill-docker source.
 
 =item B<dashboards/>
 

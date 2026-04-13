@@ -1,6 +1,6 @@
 package Langertha::Pricing;
 # ABSTRACT: Model→price catalog producing Langertha::Cost from Langertha::Usage
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moose;
 use Langertha::Cost;
 
@@ -53,7 +53,7 @@ Langertha::Pricing - Model→price catalog producing Langertha::Cost from Langer
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SUPPORT
 

@@ -4,7 +4,7 @@ Graphics::Colourset - create sets of colours.
 
 # VERSION
 
-version 0.06
+version 0.0601
 
 # SYNOPSIS
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Wikibase::Datatype::Value::Quantity;
 
-our $VERSION = 0.39;
+our $VERSION = 0.40;
 
 sub new {
 	my $class = shift;
@@ -14,9 +14,9 @@ sub new {
 	my @params = (
 		'datatype' => 'quantity',
 		'datavalue' => Wikibase::Datatype::Value::Quantity->new(
+			'lower_bound' => 3,
+			'upper_bound' => 5,
 			'value' => 4,
-			'upper_limit' => 4,
-			'lower_limit' => 3,
 		),
 		'property' => 'P123456789',
 	);
@@ -98,16 +98,17 @@ Returns string.
  use warnings;
 
  use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::NumberOfLimbs::FourTolerance;
+ use Unicode::UTF8 qw(encode_utf8);
  use Wikibase::Datatype::Print::Snak;
 
  # Object.
  my $obj = Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::NumberOfLimbs::FourTolerance->new;
 
  # Print out.
- print scalar Wikibase::Datatype::Print::Snak::print($obj);
+ print scalar encode_utf8(Wikibase::Datatype::Print::Snak::print($obj));
 
  # Output:
- # P123456789: 4
+ # P123456789: 4±1
 
 =head1 DEPENDENCIES
 
@@ -140,12 +141,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2025
+© Michal Josef Špaček 2020-2026
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.39
+0.40
 
 =cut

@@ -1,6 +1,6 @@
 package Langertha::Role::OpenAICompatible;
 # ABSTRACT: Role for OpenAI-compatible API format
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moose::Role;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -55,6 +55,11 @@ sub list_models_response {
 
 sub list_models {
   my ($self, %opts) = @_;
+
+  # Guard: if supported_operations excludes listModels, fall back to current model
+  unless ($self->can_operation('listModels')) {
+    return [$self->model];
+  }
 
   # Check cache unless force_refresh requested
   unless ($opts{force_refresh}) {
@@ -342,7 +347,7 @@ Langertha::Role::OpenAICompatible - Role for OpenAI-compatible API format
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

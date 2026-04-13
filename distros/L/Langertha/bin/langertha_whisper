@@ -50,7 +50,7 @@ langertha_whisper - Simple transcription with a Whisper compatible server or Ope
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

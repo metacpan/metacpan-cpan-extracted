@@ -47,7 +47,7 @@
    "provides" : {
       "Google::GeoCoder::Smart" : {
          "file" : "lib/Google/GeoCoder/Smart.pm",
-         "version" : "v2.6.6"
+         "version" : "v2.6.8"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "https://github.com/ttgrules/Google-Geocoder-Smart"
       }
    },
-   "version" : "v2.6.6",
+   "version" : "v2.6.8",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

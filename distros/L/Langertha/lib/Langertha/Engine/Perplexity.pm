@@ -1,10 +1,12 @@
 package Langertha::Engine::Perplexity;
 # ABSTRACT: Perplexity Sonar API
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
+
+with 'Langertha::Role::StaticModels';
 
 
 sub _build_supported_operations {[qw(
@@ -24,6 +26,13 @@ sub _build_api_key {
 
 sub default_model { 'sonar' }
 
+sub _build_static_models {[
+  { id => 'sonar' },
+  { id => 'sonar-pro' },
+  { id => 'sonar-reasoning' },
+  { id => 'sonar-reasoning-pro' },
+]}
+
 __PACKAGE__->meta->make_immutable;
 
 
@@ -41,7 +50,7 @@ Langertha::Engine::Perplexity - Perplexity Sonar API
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

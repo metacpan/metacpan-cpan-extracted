@@ -32,7 +32,7 @@ use Carp;
 
 # ABSTRACT: Read environment variables from a .env file
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use constant {
     OPTION_FILE_TYPE                         => q{file:type},
@@ -124,7 +124,9 @@ sub _get_parent_dotenv_filepath {
         $parent_filepath = File::Spec->catfile( $parent_path, '.env' );
         return $parent_filepath if ( defined $parent_path && -f $parent_filepath );
     }
-    return;
+
+    # Explicitly return undef as sub doc decrees.
+    return undef;    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 }
 
 sub _interpret_dotenv {
@@ -134,7 +136,7 @@ sub _interpret_dotenv {
         OPTION_READ_ALLOW_MISSING_PARENT() => DEFAULT_OPTION_READ_ALLOW_MISSING_PARENT,
         'file:type'                        => DEFAULT_OPTION_FILE_TYPE,
         'var:allow_interpolate'            => 0,
-    );    # Options related to reading the file. Applied as they are read.
+    );               # Options related to reading the file. Applied as they are read.
     my @vars;
     my $row_num = 1;
     foreach (@rows) {
@@ -295,7 +297,7 @@ Env::Dot::Functions - Read environment variables from a .env file
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

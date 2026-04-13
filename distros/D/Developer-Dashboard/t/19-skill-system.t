@@ -6,7 +6,7 @@ use utf8;
 
 use Capture::Tiny qw(capture);
 use Cwd qw(getcwd);
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use File::Spec;
 use File::Temp qw(tempdir);
 use JSON::XS qw(decode_json);
@@ -22,6 +22,8 @@ use Developer::Dashboard::SkillManager;
 local $ENV{HOME} = tempdir( CLEANUP => 1 );
 my $repo_root = getcwd();
 my $repo_bin  = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
+my $test_cwd = tempdir( CLEANUP => 1 );
+chdir $test_cwd or die "Unable to chdir to $test_cwd: $!";
 my $test_repos = tempdir( CLEANUP => 1 );
 my $fake_bin = tempdir( CLEANUP => 1 );
 my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
@@ -91,6 +93,11 @@ ok( -f File::Spec->catfile( $install->{path}, 'cpanfile' ), 'test skill includes
 ok( -f File::Spec->catfile( $install->{path}, 'aptfile' ), 'test skill includes aptfile for dependency handling' );
 ok( -f $apt_log, 'install runs apt-get for isolated skill apt dependencies when an aptfile is present' );
 ok( -f $cpanm_log, 'install runs cpanm for isolated skill dependencies when a cpanfile is present' );
+is_deeply(
+    [ $paths->installed_skill_docker_roots ],
+    [ File::Spec->catdir( $install->{path}, 'config', 'docker' ) ],
+    'installed_skill_docker_roots lists the docker config root for enabled installed skills',
+);
 open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $dependency_log: $!";
 my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
 close $dependency_log_fh;
@@ -109,8 +116,8 @@ is( $listed->[0]{pages_count}, 1, 'list reports the number of non-nav skill page
 is( $listed->[0]{docker_services_count}, 1, 'list reports the number of skill docker services' );
 is( $listed->[0]{has_aptfile}, 1, 'list reports aptfile presence for one installed skill' );
 ok(
-    index( $listed->[0]{path}, File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'alpha-skill' ) ) == 0,
-    'installed skill lives only under the isolated skills root',
+    index( $listed->[0]{path}, File::Spec->catdir( $paths->skills_root, 'alpha-skill' ) ) == 0,
+    'installed skill lives under the active DD-OOP-LAYER skills root',
 );
 
 my $usage = $manager->usage('alpha-skill');
@@ -230,6 +237,19 @@ is( scalar( @{ $manager->list } ), 2, 'multiple isolated skills can coexist' );
 my $disable = $manager->disable('alpha-skill');
 ok( !$disable->{error}, 'disable marks an installed skill as disabled' ) or diag $disable->{error};
 ok( !$manager->list->[0]{enabled}, 'disabled skills remain listed but report a disabled state' );
+is_deeply(
+    [ $paths->installed_skill_docker_roots ],
+    [ File::Spec->catdir( $manager->get_skill_path('beta-skill'), 'config', 'docker' ) ],
+    'installed_skill_docker_roots hides disabled skill docker roots by default',
+);
+is_deeply(
+    [ $paths->installed_skill_docker_roots( include_disabled => 1 ) ],
+    [
+        File::Spec->catdir( $install->{path}, 'config', 'docker' ),
+        File::Spec->catdir( $beta_install->{path}, 'config', 'docker' ),
+    ],
+    'installed_skill_docker_roots can include disabled skill docker roots when requested',
+);
 is( $dispatcher->dispatch( 'alpha-skill', 'run-test', 'disabled' )->{error}, "Skill 'alpha-skill' is disabled", 'disabled skills no longer dispatch commands' );
 is_deeply(
     [ map { $_->{name} } @{ $fleet_config->collectors } ],
@@ -267,11 +287,164 @@ ok( !$uninstall->{error}, 'uninstall removes the targeted skill cleanly' ) or di
 ok( !$manager->get_skill_path('beta-skill'), 'uninstall removes only the targeted skill path' );
 ok( $manager->get_skill_path('alpha-skill'), 'uninstall preserves other installed skills' );
 
-my ( $skill_stdout, $skill_stderr, $skill_exit ) = capture {
+my $layered_project_root = File::Spec->catdir( $test_repos, 'layered-project' );
+my $layered_work_root = File::Spec->catdir( $layered_project_root, 'workspace' );
+make_path( File::Spec->catdir( $layered_project_root, '.developer-dashboard' ) );
+make_path( File::Spec->catdir( $layered_project_root, '.git' ) );
+make_path($layered_work_root);
+
+my $layered_home_repo = _create_skill_repo(
+    'shared-skill',
+    command_body => <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "home-layer\n";
+PL
+    config_body => <<'JSON',
+{
+  "skill_name": "shared-skill",
+  "base_only": "home",
+  "nested": {
+    "base": "home",
+    "shared": "home"
+  }
+}
+JSON
+    bookmark_body => <<'BOOKMARK',
+TITLE: Shared Skill Welcome
+:--------------------------------------------------------------------------------:
+BOOKMARK: welcome
+:--------------------------------------------------------------------------------:
+HTML:
+Home layer welcome
+BOOKMARK
+    nav_body => "<div>Home layer nav</div>\n",
+);
+my $layered_home_only_repo = _create_skill_repo(
+    'home-only-skill',
+    command_body => <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "home-only\n";
+PL
+);
+
+my $layered_home_paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
+my $layered_home_manager = Developer::Dashboard::SkillManager->new( paths => $layered_home_paths );
+ok( !$layered_home_manager->install( 'file://' . $layered_home_repo )->{error}, 'home layer installs a shared skill' );
+ok( !$layered_home_manager->install( 'file://' . $layered_home_only_repo )->{error}, 'home layer installs a home-only skill' );
+_append_repo_commit(
+    $layered_home_repo,
+    File::Spec->catfile( 'cli', 'run-test' ),
+    <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "project-layer\n";
+PL
+);
+
+{
+    my $cwd = getcwd();
+    chdir $layered_work_root or die "Unable to chdir to $layered_work_root: $!";
+
+    my $layered_paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
+    my $layered_manager = Developer::Dashboard::SkillManager->new( paths => $layered_paths );
+    my $layered_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $layered_paths );
+
+    my $layered_install = $layered_manager->install( 'file://' . $layered_home_repo );
+    ok( !$layered_install->{error}, 'deepest DD-OOP-LAYER installs a project-local skill copy' ) or diag $layered_install->{error};
+    ok(
+        index( $layered_install->{path}, File::Spec->catdir( $layered_project_root, '.developer-dashboard', 'skills', 'shared-skill' ) ) == 0,
+        'skill install writes into the deepest participating DD-OOP-LAYER',
+    );
+    is(
+        $layered_manager->get_skill_path('shared-skill'),
+        File::Spec->catdir( $layered_project_root, '.developer-dashboard', 'skills', 'shared-skill' ),
+        'layered skill lookup resolves the deepest matching skill first',
+    );
+    is(
+        $layered_manager->get_skill_path('home-only-skill'),
+        File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'home-only-skill' ),
+        'layered skill lookup still inherits home-only skills',
+    );
+    my $layered_skill_root = $layered_manager->get_skill_path('shared-skill');
+    unlink File::Spec->catfile( $layered_skill_root, 'cli', 'run-test' )
+      or die "Unable to remove layered skill command fixture: $!";
+    unlink File::Spec->catfile( $layered_skill_root, 'dashboards', 'welcome' )
+      or die "Unable to remove layered skill bookmark fixture: $!";
+    remove_tree( File::Spec->catdir( $layered_skill_root, 'dashboards', 'nav' ) );
+    _write_file(
+        File::Spec->catfile( $layered_skill_root, 'config', 'config.json' ),
+        <<'JSON',
+{
+  "skill_name": "shared-skill",
+  "nested": {
+    "leaf": "project",
+    "shared": "project"
+  }
+}
+JSON
+        0644,
+    );
+    is_deeply(
+        $layered_dispatcher->get_skill_config('shared-skill'),
+        {
+            skill_name => 'shared-skill',
+            base_only  => 'home',
+            nested     => {
+                base   => 'home',
+                leaf   => 'project',
+                shared => 'project',
+            },
+        },
+        'skill config merges inherited skill config keys and falls back to the base layer for missing keys',
+    );
+    my $layered_dispatch = $layered_dispatcher->dispatch( 'shared-skill', 'run-test' );
+    like( $layered_dispatch->{stdout}, qr/home-layer/, 'dispatcher falls back to the inherited base-layer skill command when the child-layer command file is missing' );
+    my $layered_home_dispatch = $layered_dispatcher->dispatch( 'home-only-skill', 'run-test' );
+    like( $layered_home_dispatch->{stdout}, qr/home-only/, 'dispatcher can still reach inherited home-layer skills beneath a project layer' );
+    my ( $layered_dotted_stdout, $layered_dotted_stderr, $layered_dotted_exit ) = capture {
+        system( $^X, '-I', 'lib', $repo_bin, 'shared-skill.run-test' );
+    };
+    is( $layered_dotted_exit >> 8, 0, 'dashboard <skill>.<command> resolves layered project-local skills' );
+    like( $layered_dotted_stdout, qr/home-layer/, 'dashboard <skill>.<command> falls back to the inherited base-layer skill command when the child-layer command file is missing' );
+    my ( $layered_inherited_stdout, $layered_inherited_stderr, $layered_inherited_exit ) = capture {
+        system( $^X, '-I', 'lib', $repo_bin, 'home-only-skill.run-test' );
+    };
+    is( $layered_inherited_exit >> 8, 0, 'dashboard <skill>.<command> resolves inherited home-layer skills from deeper layers' );
+    like( $layered_inherited_stdout, qr/home-only/, 'dashboard <skill>.<command> keeps inherited home-layer skills available' );
+    my $layered_bookmark_list = $layered_dispatcher->route_response( skill_name => 'shared-skill', route => 'bookmarks' );
+    is( $layered_bookmark_list->[0], 200, 'skill bookmark listings fall back to inherited base-layer files when the child layer does not provide them' );
+    is_deeply(
+        decode_json( $layered_bookmark_list->[2] ),
+        {
+            skill     => 'shared-skill',
+            bookmarks => ['welcome'],
+        },
+        'skill bookmark listings include inherited base-layer bookmark files when the child layer is missing them',
+    );
+    my $layered_bookmark = $layered_dispatcher->route_response( skill_name => 'shared-skill', route => 'bookmarks/welcome' );
+    is( $layered_bookmark->[0], 200, 'skill bookmark routes fall back to inherited base-layer files when the child-layer bookmark file is missing' );
+    like( $layered_bookmark->[2], qr/Home layer welcome/, 'skill bookmark routes render the inherited base-layer bookmark content' );
+    my $layered_nav_pages = $layered_dispatcher->skill_nav_pages('shared-skill');
+    is( scalar @{$layered_nav_pages}, 1, 'skill nav discovery falls back to the inherited base-layer nav folder when the child layer is missing it' );
+    like( $layered_nav_pages->[0]{layout}{body}, qr/Home layer nav/, 'skill nav discovery returns the inherited base-layer nav content' );
+
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+}
+
+my ( $removed_skill_stdout, $removed_skill_stderr, $removed_skill_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skill', 'alpha-skill', 'run-test', 'cli' );
 };
-is( $skill_exit >> 8, 0, 'dashboard skill dispatch exits cleanly' );
-like( $skill_stdout, qr/updated:cli/, 'dashboard skill dispatch routes through the isolated skill command' );
+is( $removed_skill_exit >> 8, 1, 'dashboard skill no longer dispatches installed skill commands' );
+like(
+    $removed_skill_stdout . $removed_skill_stderr,
+    qr/Unsupported built-in dashboard command 'skill'|Usage:/s,
+    'dashboard skill now fails as a removed public command',
+);
 
 my ( $dotted_skill_stdout, $dotted_skill_stderr, $dotted_skill_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'alpha-skill.run-test', 'cli-dot' );
@@ -283,7 +456,11 @@ my ( $uninstall_stdout, $uninstall_stderr, $uninstall_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'uninstall', 'alpha-skill' );
 };
 is( $uninstall_exit >> 8, 0, 'dashboard skills uninstall exits cleanly' );
-is_deeply( $manager->list, [], 'all skills can be removed cleanly without file hunting elsewhere' );
+is_deeply(
+    [ map { $_->{name} } @{ $manager->list } ],
+    [ 'home-only-skill', 'shared-skill' ],
+    'uninstall removes the targeted base skill without touching layered skills from other DD-OOP-LAYERS',
+);
 
 done_testing();
 
@@ -310,7 +487,7 @@ sub _create_skill_repo {
     if ( defined $args{hook_body} ) {
         _write_file( File::Spec->catfile( 'cli', 'run-test.d', '00-pre.pl' ), $args{hook_body}, 0755 );
     }
-    _write_file( File::Spec->catfile( 'config', 'config.json' ), qq|{"skill_name":"$name"}\n|, 0644 );
+    _write_file( File::Spec->catfile( 'config', 'config.json' ), $args{config_body} || qq|{"skill_name":"$name"}\n|, 0644 );
     _write_file( File::Spec->catfile( 'config', 'docker', 'postgres', 'compose.yml' ), "services: {}\n", 0644 );
     _write_file( 'cpanfile', "requires 'JSON::XS';\n", 0644 );
     if ( defined $args{aptfile_body} ) {
@@ -318,6 +495,10 @@ sub _create_skill_repo {
     }
     if ( defined $args{bookmark_body} ) {
         _write_file( File::Spec->catfile( 'dashboards', 'welcome' ), $args{bookmark_body}, 0644 );
+    }
+    if ( defined $args{nav_body} ) {
+        make_path( File::Spec->catdir( 'dashboards', 'nav' ) );
+        _write_file( File::Spec->catfile( 'dashboards', 'nav', 'skill.tt' ), $args{nav_body}, 0644 );
     }
 
     _run_or_die(qw(git add .));

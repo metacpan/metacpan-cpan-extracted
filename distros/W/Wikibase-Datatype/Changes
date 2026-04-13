@@ -1,3 +1,10 @@
+0.40 2026-04-12T12:21:22+02:00
+ - Fix tolerance in
+   Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::NumberOfLimbs::FourTolerance.
+ - Regen examples with tolerances for new version of print.
+ - Update languages.
+ - Update copyright years.
+
 0.39 2025-08-03T12:36:49+02:00
  [API changes]
  - Change possible objects for Item aliases/labels/description to use of

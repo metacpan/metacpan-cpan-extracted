@@ -1,0 +1,16 @@
+Developer Dashboard
+===================
+
+A local home for development work.
+
+This plain README ships in the distribution tarball so CPAN and kwalitee
+consumers still receive a top-level readme without re-including the checkout-
+only documentation set.
+
+For the installed command surface, run:
+
+  dashboard help
+  dashboard version
+
+The full installed product manual is available through the
+Developer::Dashboard POD and the rest of the shipped Perl documentation.

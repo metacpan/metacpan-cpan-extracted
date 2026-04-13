@@ -1,8 +1,8 @@
 package Langertha::ToolChoice;
 # ABSTRACT: Immutable canonical tool-selection policy with cross-provider conversion
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moose;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints qw( enum );
 
 # Canonical types: 'auto' (let model decide), 'any' (must call any tool),
 # 'none' (no tool calling), 'tool' (must call this specific tool).
@@ -118,7 +118,7 @@ Langertha::ToolChoice - Immutable canonical tool-selection policy with cross-pro
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SUPPORT
 

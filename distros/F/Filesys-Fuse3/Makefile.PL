@@ -93,7 +93,7 @@ unless ($fusever) {
     my $explanation;
     if ($^O eq 'linux') {
         if (-e '/etc/debian_version') {
-            $explanation = 'You need to install "libfuse-dev" to provide build support for this module';
+            $explanation = 'You need to install "libfuse3-dev" to provide build support for this module';
         }
         elsif (-e '/etc/redhat-release') {
             $explanation = 'You need to install "fuse-devel" to provide build support for this module';
@@ -184,8 +184,8 @@ WriteMakefile(
     META_MERGE => {
         resources => {
             license => 'http://www.gnu.org/licenses/lgpl-2.1.html',
-            bugtracker => 'http://github.com/dod38fr/perl-fuse3/issues',
-            repository => 'http://github.com/dod38fr/perl-fuse3'
+            bugtracker => 'http://github.com/dod38fr/perl-filesys-fuse3/issues',
+            repository => 'http://github.com/dod38fr/perl-filesys-fuse3'
         },
     },
     'LIBS'          => $libs, # e.g., '-lm'

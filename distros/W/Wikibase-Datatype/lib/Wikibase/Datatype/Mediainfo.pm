@@ -8,7 +8,7 @@ use Mo qw(build default is);
 use Mo::utils qw(check_number check_number_of_items);
 use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.39;
+our $VERSION = 0.40;
 
 has descriptions => (
 	default => [],
@@ -482,12 +482,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2025 Michal Josef Špaček
+© 2020-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.39
+0.40
 
 =cut

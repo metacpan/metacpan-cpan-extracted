@@ -18,7 +18,7 @@ our @EXPORT_OK = qw(
     clear_mocks
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # mocks get stored in a stack, with globals as the first element
 our @MOCK_STACK = ( {} );
@@ -290,14 +290,14 @@ is a hash where the keys are the model we are mocking, ie:
                      | (driver)  |
                      +-----------+
 
-Flow:
-  use SimpleMock  ->  installs CORE::GLOBAL::require override
-  use MyModule    ->  override loads SimpleMock::Mocks::MyModule
-                      (if it exists), auto-registers matching subs
-  register_mocks  ->  Model::*::validate_mocks() normalises data,
-                      merges into Layer 0
-  scoped mocks    ->  push new layer, ScopeGuard::DESTROY pops it
-  mock lookup     ->  traverse stack top-to-bottom, first match wins
+  Flow:
+    use SimpleMock  ->  installs CORE::GLOBAL::require override
+    use MyModule    ->  override loads SimpleMock::Mocks::MyModule
+                        (if it exists), auto-registers matching subs
+    register_mocks  ->  Model::*::validate_mocks() normalises data,
+                        merges into Layer 0
+    scoped mocks    ->  push new layer, ScopeGuard::DESTROY pops it
+    mock lookup     ->  traverse stack top-to-bottom, first match wins
 
 =head1 METHODS
 

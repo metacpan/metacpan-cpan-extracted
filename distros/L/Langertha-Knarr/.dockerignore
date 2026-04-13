@@ -15,7 +15,6 @@ t/
 README.md
 CLAUDE.md
 dist.ini
-cpanfile
 
 # Docker files
 Dockerfile

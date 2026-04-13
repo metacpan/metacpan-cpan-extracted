@@ -36,7 +36,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -51,7 +51,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test 
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =head1 SYNOPSIS
 
@@ -1716,8 +1716,7 @@ sub generate
 			if(defined($accessor{type})) {
 				if($accessor{type} eq 'getter') {
 					$position_code .= "my \$prev_value = \$obj->{$accessor{property}};";
-				}
-				if($accessor{type} eq 'getset') {
+				} elsif($accessor{type} eq 'getset') {
 					$position_code .= 'if(scalar(@alist) == 1) { ';
 					$position_code .= "cmp_ok(\$result, 'eq', \$alist[0], 'getset function returns what was put in'); ok(\$obj->$function() eq \$result, 'test getset accessor');";
 					$position_code .= '}';
@@ -1744,7 +1743,7 @@ sub generate
 			}
 			if(scalar(keys %input) == 0) {
 				if(defined($accessor{type}) && ($accessor{type} eq 'getter')) {
-					$call_code .= "cmp_ok(\$result, 'eq', \$obj->{$accessor{property}}, 'getter function returns correct item');";
+					$call_code .= "cmp_ok(\$result, 'eq', \$obj->{$accessor{property}}, 'getter function returns correct item') if(defined(\$result));";
 				}
 			}
 		}

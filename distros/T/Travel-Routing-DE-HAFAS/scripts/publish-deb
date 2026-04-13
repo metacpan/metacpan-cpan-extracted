@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+VERSION="$1"
+BASE="libtravel-routing-de-hafas"
+OUTFILE="out/${BASE}-perl_${VERSION}-1-1_all.deb"
+DEBFILE="/var/www/html/deb/${BASE}-perl_${VERSION}-1_all.deb"
+
+test -n "${VERSION}"
+
+git checkout main
+
+git pull
+git submodule update --init
+
+git checkout "${VERSION}"
+
+scripts/makedeb-docker
+
+chmod 644 "${OUTFILE}"
+mv "${OUTFILE}" "${DEBFILE}"
+ln -s "${BASE}-perl_${VERSION}-1_all.deb" /var/www/html/deb/${BASE}-perl_latest.deb
+aptly repo add finalrewind "${DEBFILE}"
+aptly publish update stable
+chmod -R a+rX ~/.aptly/public

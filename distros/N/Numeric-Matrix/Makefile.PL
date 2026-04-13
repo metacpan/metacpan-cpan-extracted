@@ -37,11 +37,10 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Test::More' => '0',
+        'Test2::Bundle::Numerical' => '0',
     },
     PREREQ_PM => {
     },
-    
     # XS compilation
     OBJECT           => 'nmat$(OBJ_EXT)',
     DEFINE           => $define,

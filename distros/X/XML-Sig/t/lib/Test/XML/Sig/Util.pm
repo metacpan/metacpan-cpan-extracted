@@ -12,6 +12,7 @@ our @EXPORT = qw(
     get_tmp_file
     slurp_file
     test_xmlsec1_ok
+    test_dsa_ok
  );
 
 our @EXPORT_OK;
@@ -59,6 +60,9 @@ sub test_xmlsec1_ok {
     }
 }
 
+sub test_dsa_ok {
+    return XML::Sig::check_dsa_version();
+}
 #########################################################################
 # get_xmlsec_features
 #

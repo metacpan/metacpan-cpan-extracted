@@ -6,10 +6,7 @@ use Test::XML::Sig;
 my $xmlsec  = get_xmlsec_features;
 
 SKIP: {
-    eval {
-        require Crypt::OpenSSL::DSA;
-    };
-    skip "Crypt::OpenSSL::DSA not installed", 5 if ($@);
+    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 5 if (!test_dsa_ok());
 my $sig = XML::Sig->new(
     {
         x509 => 1,

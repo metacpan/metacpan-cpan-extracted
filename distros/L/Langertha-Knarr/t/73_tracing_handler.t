@@ -85,7 +85,7 @@ my $session = Langertha::Knarr::Session->new( id => 's' );
   is( $tracer->events->[1]{output}, 'alpha', 'stream output accumulated' );
 }
 
-# --- Tracing skips models proxy via list_models / route_model ---
+# --- Tracing skips list_models ---
 {
   my $tracer = MockTracer->new;
   my $wrapped  = Langertha::Knarr::Handler::Code->new( code => sub { '' } );
@@ -95,7 +95,6 @@ my $session = Langertha::Knarr::Session->new( id => 's' );
   my $models = $h->list_models;
   ok( scalar @$models, 'models passed through' );
   is( scalar @{ $tracer->events }, 0, 'list_models does not start a trace' );
-  is( $h->route_model('anything'), $wrapped, 'route_model returns wrapped' );
 }
 
 done_testing;

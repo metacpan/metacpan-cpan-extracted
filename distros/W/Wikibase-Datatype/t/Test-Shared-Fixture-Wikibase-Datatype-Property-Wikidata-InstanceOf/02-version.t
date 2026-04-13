@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf::VERSION, 0.39, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf::VERSION, 0.4, 'Version.');

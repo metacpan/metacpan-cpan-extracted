@@ -1,5 +1,54 @@
 Revision history for Developer Dashboard
 
+2.34  2026-04-12
+    - fixed same-repo DD-OOP-LAYERS skill fallback so a deeper
+      `skills/<repo-name>/` layer no longer shadows the whole inherited skill
+      repo when it only overrides part of it
+    - layered skill command dispatch, bookmark lookup, nav discovery, skill
+      hook execution, skill config merge, and skill-local `local/lib/perl5`
+      exposure so missing child-layer files, folders, or config keys now fall
+      back to the base skill layer while deepest overrides still win
+    - added TDD coverage for same-repo layered skill fallback across dotted
+      command dispatch, bookmark routes, nav discovery, and merged skill
+      config, then updated the synced manuals and verification docs to keep
+      that contract explicit
+
+2.33  2026-04-11
+    - removed the singular `dashboard skill <repo-name> <command>` public
+      command so installed skill execution now stays on the dotted
+      `dashboard <repo-name>.<command>` route
+    - rerouted dotted skill execution through the remaining private
+      `skills` helper and removed the retired private `skill` helper asset
+      from the staged/runtime release surface
+    - taught helper staging to remove the old managed `skill` helper from the
+      home runtime and updated the synced manuals, skill authoring guide, and
+      release metadata to document the dotted-only command contract
+    - fixed the blank-environment tarball install path by staging the mounted
+      release artifact to a versioned local tarball name before `cpanm`, so
+      the integration harness always installs the host-built dist instead of
+      drifting to a CPAN lookup when the bind-mounted filename is generic
+
+2.31  2026-04-11
+    - applied the DD-OOP-LAYERS contract to skills so install now writes into
+      the deepest participating layer while skill lookup inherits from deepest
+      layer back to home
+    - made same-named deeper skills shadow higher-layer copies by repo name
+      across command dispatch, dotted skill commands, config merge, collector
+      loading, nav discovery, and docker skill roots
+    - restored the hard `100%` `lib/` coverage gate by adding direct
+      regression coverage for `PathRegistry::installed_skill_docker_roots()`,
+      including the disabled-skill filtering path and the explicit
+      `include_disabled => 1` behavior
+    - restored the release kwalitee gate by shipping a plain `README` in the
+      built tarball while keeping checkout-only Markdown files excluded from
+      release artifacts
+    - updated the product docs and release metadata so the layered skill
+      contract is explicit instead of still documenting skills as home-only,
+      and so the built tarball now carries a top-level readme again
+    - fixed live Scorecard license detection by replacing the composite root
+      `LICENSE` blob with a canonical GPL text and shipping the alternative
+      Artistic text separately in `LICENSE-Artistic-1.0-Perl`
+
 2.26  2026-04-11
     - added `dashboard skills enable <repo-name>` and
       `dashboard skills disable <repo-name>` so installed skills can be

@@ -3,12 +3,12 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 use File::Spec;
 use JSON::XS qw(encode_json decode_json);
 use Capture::Tiny qw(capture);
-use File::Basename qw(dirname);
+use File::Basename qw(dirname basename);
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file resolve_runnable_file);
 
@@ -37,15 +37,17 @@ sub dispatch {
     return { error => "Skill '$skill_name' not found" } if !$skill_path;
     return { error => "Skill '$skill_name' is disabled" } if !$self->{manager}->is_enabled($skill_name);
 
-    my $cmd_path = $self->command_path( $skill_name, $command );
+    my ( $cmd_path, $command_skill_path ) = $self->_command_location( $skill_name, $command );
     return { error => "Command '$command' not found in skill '$skill_name'" } if !$cmd_path;
 
     my $hook_result = $self->execute_hooks( $skill_name, $command, @args );
     return $hook_result if $hook_result->{error};
+    my @skill_layers = $self->_skill_layers($skill_name);
 
     my %env = $self->_skill_env(
         skill_name   => $skill_name,
-        skill_path   => $skill_path,
+        skill_path   => $command_skill_path || $skill_path,
+        skill_layers => \@skill_layers,
         command      => $command,
         result_state => $hook_result->{result_state} || {},
     );
@@ -75,34 +77,39 @@ sub execute_hooks {
     my $skill_path = $self->{manager}->get_skill_path( $skill_name, include_disabled => 1 );
     return { hooks => {}, result_state => {} } if !$skill_path;
     return { hooks => {}, result_state => {} } if !$self->{manager}->is_enabled($skill_name);
-
-    my $hooks_dir = File::Spec->catdir( $skill_path, 'cli', "$command.d" );
-    return { hooks => {}, result_state => {} } if !-d $hooks_dir;
+    my @skill_layers = $self->_skill_layers($skill_name);
+    return { hooks => {}, result_state => {} } if !@skill_layers;
 
     my %results;
-    opendir( my $dh, $hooks_dir ) or return {};
-    for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
-        my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
-        next unless is_runnable_file($hook_path);
+    for my $layer_path (@skill_layers) {
+        my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$command.d" );
+        next if !-d $hooks_dir;
+        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+            my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
+            next unless is_runnable_file($hook_path);
 
-        my %env = $self->_skill_env(
-            skill_name   => $skill_name,
-            skill_path   => $skill_path,
-            command      => $command,
-            result_state => \%results,
-        );
-        my @command = command_argv_for_path($hook_path);
-        my ( $stdout, $stderr, $exit ) = capture {
-            local %ENV = ( %ENV, %env );
-            system( @command, @args );
-        };
-        $results{$entry} = {
-            stdout    => $stdout,
-            stderr    => $stderr,
-            exit_code => $exit,
-        };
+            my %env = $self->_skill_env(
+                skill_name   => $skill_name,
+                skill_path   => $layer_path,
+                skill_layers => \@skill_layers,
+                command      => $command,
+                result_state => \%results,
+            );
+            my @command = command_argv_for_path($hook_path);
+            my ( $stdout, $stderr, $exit ) = capture {
+                local %ENV = ( %ENV, %env );
+                system( @command, @args );
+            };
+            my $result_key = exists $results{$entry} ? $self->_hook_result_key($hook_path) : $entry;
+            $results{$result_key} = {
+                stdout    => $stdout,
+                stderr    => $stderr,
+                exit_code => $exit,
+            };
+        }
+        closedir($dh);
     }
-    closedir($dh);
     return {
         hooks        => \%results,
         result_state => \%results,
@@ -117,19 +124,25 @@ sub get_skill_config {
     my ( $self, $skill_name ) = @_;
     
     return {} if !$skill_name;
-    
-    my $skill_path = $self->{manager}->get_skill_path($skill_name);
-    return {} if !$skill_path;
-    
-    my $config_file = File::Spec->catfile( $skill_path, 'config', 'config.json' );
-    return {} if !-f $config_file;
-    
-    open( my $fh, '<', $config_file ) or return {};
-    my $json_text = do { local $/; <$fh> };
-    close($fh);
-    
-    my $config = eval { decode_json($json_text) } || {};
-    return $config;
+
+    my @skill_layers = $self->_skill_layers($skill_name);
+    return {} if !@skill_layers;
+
+    my $merged = {};
+    for my $skill_path (@skill_layers) {
+        my $config_file = File::Spec->catfile( $skill_path, 'config', 'config.json' );
+        next if !-f $config_file;
+
+        open( my $fh, '<', $config_file ) or return {};
+        my $json_text = do { local $/; <$fh> };
+        close($fh);
+
+        my $config = eval { decode_json($json_text) } || {};
+        return {} if ref($config) ne 'HASH';
+        $merged = $self->_merge_skill_hashes( $merged, $config );
+    }
+
+    return $merged;
 }
 
 # config_fragment($skill_name)
@@ -162,8 +175,8 @@ sub get_skill_path {
 sub command_path {
     my ( $self, $skill_name, $command ) = @_;
     return if !$skill_name || !$command;
-    my $skill_path = $self->{manager}->get_skill_path($skill_name) or return;
-    return resolve_runnable_file( File::Spec->catfile( $skill_path, 'cli', $command ) );
+    my ($cmd_path) = $self->_command_location( $skill_name, $command );
+    return $cmd_path;
 }
 
 # route_response(%args)
@@ -174,24 +187,18 @@ sub route_response {
     my ( $self, %args ) = @_;
     my $skill_name = $args{skill_name} || '';
     my $route      = defined $args{route} ? $args{route} : '';
-    my $skill_path = $self->{manager}->get_skill_path($skill_name)
-      or return [ 404, 'text/plain; charset=utf-8', "Skill '$skill_name' not found\n" ];
+    my @skill_layers = $self->_skill_layers($skill_name);
+    return [ 404, 'text/plain; charset=utf-8', "Skill '$skill_name' not found\n" ] if !@skill_layers;
 
     my @parts = grep { defined && $_ ne '' } split m{/+}, $route;
-    my $dashboards_root = File::Spec->catdir( $skill_path, 'dashboards' );
+    my @dashboards_roots = map { File::Spec->catdir( $_, 'dashboards' ) } @skill_layers;
     return [ 404, 'text/plain; charset=utf-8', "Skill '$skill_name' does not provide dashboards\n" ]
-      if !-d $dashboards_root;
+      if !grep { -d $_ } @dashboards_roots;
 
     if ( @parts && $parts[0] eq 'bookmarks' ) {
         if ( @parts == 1 ) {
-            opendir( my $dh, $dashboards_root ) or die "Unable to read $dashboards_root: $!";
-            my @items = sort grep {
-                   $_ ne '.'
-                && $_ ne '..'
-                && $_ ne 'nav'
-                && -f File::Spec->catfile( $dashboards_root, $_ )
-            } readdir($dh);
-            closedir($dh);
+            my @items = $self->_skill_bookmark_entries($skill_name);
+            return [ 404, 'text/plain; charset=utf-8', "Skill '$skill_name' does not provide dashboards\n" ] if !@items;
             return [ 200, 'application/json; charset=utf-8', encode_json( { skill => $skill_name, bookmarks => \@items } ) ];
         }
 
@@ -199,7 +206,6 @@ sub route_response {
         return $self->_skill_page_response(
             %args,
             skill_name => $skill_name,
-            skill_path => $skill_path,
             route_id   => $legacy_id,
         );
     }
@@ -208,7 +214,6 @@ sub route_response {
     return $self->_skill_page_response(
         %args,
         skill_name => $skill_name,
-        skill_path => $skill_path,
         route_id   => $route_id,
     );
 }
@@ -220,27 +225,16 @@ sub route_response {
 sub skill_nav_pages {
     my ( $self, $skill_name ) = @_;
     return [] if !$skill_name;
-    my $skill_path = $self->{manager}->get_skill_path($skill_name) or return [];
-    my $nav_root = File::Spec->catdir( $skill_path, 'dashboards', 'nav' );
-    return [] if !-d $nav_root;
+    my %route_ids = $self->_skill_nav_route_ids($skill_name);
+    return [] if !%route_ids;
 
-    opendir my $dh, $nav_root or die "Unable to read $nav_root: $!";
     my @pages;
-    for my $entry (
-        sort grep {
-               $_ ne '.'
-            && $_ ne '..'
-            && -f File::Spec->catfile( $nav_root, $_ )
-        } readdir $dh
-      )
-    {
+    for my $entry ( sort keys %route_ids ) {
         push @pages, $self->_load_skill_page(
             skill_name => $skill_name,
-            skill_path => $skill_path,
-            route_id   => 'nav/' . $entry,
+            route_id   => $route_ids{$entry},
         );
     }
-    closedir $dh;
     return \@pages;
 }
 
@@ -268,7 +262,6 @@ sub _skill_page_response {
     my $page = eval {
         $self->_load_skill_page(
             skill_name => $args{skill_name},
-            skill_path => $args{skill_path},
             route_id   => $args{route_id},
         );
     };
@@ -294,16 +287,16 @@ sub _skill_page_response {
 }
 
 # _load_skill_page(%args)
-# Loads one skill page document from dashboards/<id> and namespaces its page id under /app/<skill>/...
-# Input: skill name, skill path, and relative route id such as index, foo, or nav/file.tt.
+# Loads one layered skill page document from dashboards/<id> and namespaces its
+# page id under /app/<skill>/...
+# Input: skill name and relative route id such as index, foo, or nav/file.tt.
 # Output: page document object.
 sub _load_skill_page {
     my ( $self, %args ) = @_;
     my $skill_name = $args{skill_name} || die 'Missing skill name';
-    my $skill_path = $args{skill_path} || die 'Missing skill path';
     my $route_id   = $args{route_id}   || die 'Missing route id';
-    my $file = File::Spec->catfile( $skill_path, 'dashboards', split m{/+}, $route_id );
-    die "Skill bookmark '$route_id' not found" if !-f $file;
+    my ( $file, $skill_path ) = $self->_page_location( $skill_name, $route_id );
+    die "Skill bookmark '$route_id' not found" if !defined $file || !-f $file;
 
     require Developer::Dashboard::PageDocument;
     open my $fh, '<', $file or die "Unable to read $file: $!";
@@ -339,10 +332,12 @@ sub _skill_env {
     my ( $self, %args ) = @_;
     my $skill_path = $args{skill_path} || die 'Missing skill path';
     my $local_root = File::Spec->catdir( $skill_path, 'local' );
-    my $local_lib  = File::Spec->catdir( $local_root, 'lib', 'perl5' );
     my $path_sep   = $^O eq 'MSWin32' ? ';' : ':';
     my @perl5lib   = grep { defined && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
-    unshift @perl5lib, $local_lib if -d $local_lib;
+    for my $layer_path ( reverse @{ $args{skill_layers} || [] } ) {
+        my $local_lib = File::Spec->catdir( $layer_path, 'local', 'lib', 'perl5' );
+        unshift @perl5lib, $local_lib if -d $local_lib;
+    }
 
     return (
         DEVELOPER_DASHBOARD_SKILL_NAME        => $args{skill_name},
@@ -357,6 +352,186 @@ sub _skill_env {
         RESULT                                => encode_json( $args{result_state} || {} ),
         PERL5LIB                              => join( $path_sep, @perl5lib ),
     );
+}
+
+# _skill_layers($skill_name)
+# Returns the participating installed roots for one skill in inheritance order.
+# Input: skill repository name string and optional include_disabled flag.
+# Output: ordered list of skill root directory path strings from home to leaf.
+sub _skill_layers {
+    my ( $self, $skill_name, %args ) = @_;
+    return () if !$skill_name;
+    my $paths = $self->{manager}{paths};
+    return $paths->skill_layers( $skill_name, %args ) if $paths->can('skill_layers');
+    my $skill_path = $self->{manager}->get_skill_path( $skill_name, %args ) or return ();
+    return ($skill_path);
+}
+
+# _skill_lookup_roots($skill_name)
+# Returns the participating installed roots for one skill in effective lookup order.
+# Input: skill repository name string and optional include_disabled flag.
+# Output: ordered list of skill root directory path strings from leaf to home.
+sub _skill_lookup_roots {
+    my ( $self, $skill_name, %args ) = @_;
+    return reverse $self->_skill_layers( $skill_name, %args );
+}
+
+# _command_location($skill_name, $command)
+# Resolves one runnable skill command across every participating skill layer.
+# Input: skill repository name string and command name string.
+# Output: resolved runnable file path and the skill layer root that provided it.
+sub _command_location {
+    my ( $self, $skill_name, $command ) = @_;
+    return if !$skill_name || !$command;
+    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+        my $cmd_path = resolve_runnable_file( File::Spec->catfile( $skill_path, 'cli', $command ) );
+        return ( $cmd_path, $skill_path ) if $cmd_path;
+    }
+    return;
+}
+
+# _page_location($skill_name, $route_id)
+# Resolves one skill dashboard file across every participating skill layer.
+# Input: skill repository name string and route id string such as index or nav/foo.tt.
+# Output: file path string and the skill layer root that provided it.
+sub _page_location {
+    my ( $self, $skill_name, $route_id ) = @_;
+    return if !$skill_name || !$route_id;
+    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+        my $file = File::Spec->catfile( $skill_path, 'dashboards', split m{/+}, $route_id );
+        return ( $file, $skill_path ) if -f $file;
+    }
+    return;
+}
+
+# _skill_bookmark_entries($skill_name)
+# Enumerates non-nav bookmark files contributed by one layered skill with deepest
+# duplicates overriding shallower layers.
+# Input: skill repository name string.
+# Output: sorted list of bookmark entry names.
+sub _skill_bookmark_entries {
+    my ( $self, $skill_name ) = @_;
+    return () if !$skill_name;
+    my %entries;
+    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+        my $dashboards_root = File::Spec->catdir( $skill_path, 'dashboards' );
+        next if !-d $dashboards_root;
+        opendir( my $dh, $dashboards_root ) or die "Unable to read $dashboards_root: $!";
+        for my $entry (
+            grep {
+                   $_ ne '.'
+                && $_ ne '..'
+                && $_ ne 'nav'
+                && -f File::Spec->catfile( $dashboards_root, $_ )
+            } readdir($dh)
+          )
+        {
+            $entries{$entry} ||= 1;
+        }
+        closedir($dh);
+    }
+    return sort keys %entries;
+}
+
+# _skill_nav_route_ids($skill_name)
+# Enumerates nav/*.tt routes contributed by one layered skill with deepest
+# duplicates overriding shallower layers.
+# Input: skill repository name string.
+# Output: hash of nav filenames to route ids.
+sub _skill_nav_route_ids {
+    my ( $self, $skill_name ) = @_;
+    return () if !$skill_name;
+    my %routes;
+    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+        my $nav_root = File::Spec->catdir( $skill_path, 'dashboards', 'nav' );
+        next if !-d $nav_root;
+        opendir my $dh, $nav_root or die "Unable to read $nav_root: $!";
+        for my $entry (
+            grep {
+                   $_ ne '.'
+                && $_ ne '..'
+                && -f File::Spec->catfile( $nav_root, $_ )
+            } readdir $dh
+          )
+        {
+            $routes{$entry} ||= 'nav/' . $entry;
+        }
+        closedir $dh;
+    }
+    return %routes;
+}
+
+# _hook_result_key($hook_path)
+# Builds a deterministic unique result key for duplicate hook basenames across
+# layered skill hook directories.
+# Input: absolute hook file path string.
+# Output: result key string.
+sub _hook_result_key {
+    my ( $self, $hook_path ) = @_;
+    my $leaf = basename( dirname($hook_path) );
+    return $leaf . '/' . basename($hook_path);
+}
+
+# _merge_skill_hashes($left, $right)
+# Recursively merges layered skill config hashes so deeper layers override keys
+# while missing keys continue to fall back to inherited base layers.
+# Input: two hash references where right-hand values override left-hand values.
+# Output: merged hash reference.
+sub _merge_skill_hashes {
+    my ( $self, $left, $right ) = @_;
+    $left  ||= {};
+    $right ||= {};
+
+    my %merged = (%{$left});
+    for my $key ( keys %{$right} ) {
+        if ( ref( $left->{$key} ) eq 'HASH' && ref( $right->{$key} ) eq 'HASH' ) {
+            $merged{$key} = $self->_merge_skill_hashes( $left->{$key}, $right->{$key} );
+            next;
+        }
+        if ( ref( $left->{$key} ) eq 'ARRAY' && ref( $right->{$key} ) eq 'ARRAY' ) {
+            if ( $key eq 'collectors' ) {
+                $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'name' );
+                next;
+            }
+            if ( $key eq 'providers' ) {
+                $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'id' );
+                next;
+            }
+        }
+        $merged{$key} = $right->{$key};
+    }
+
+    return \%merged;
+}
+
+# _merge_named_hash_array($left, $right, $identity_key)
+# Merges named array entries so deeper skill layers can override logical items
+# without discarding unmatched inherited items.
+# Input: left and right array references plus the identity key string.
+# Output: merged array reference.
+sub _merge_named_hash_array {
+    my ( $self, $left, $right, $identity_key ) = @_;
+    my @merged = ();
+    my %positions;
+
+    for my $item ( @{ $left || [] }, @{ $right || [] } ) {
+        if (
+            ref($item) eq 'HASH'
+            && defined $identity_key
+            && $identity_key ne ''
+            && defined $item->{$identity_key}
+            && $item->{$identity_key} ne ''
+        ) {
+            if ( exists $positions{ $item->{$identity_key} } ) {
+                $merged[ $positions{ $item->{$identity_key} } ] = $item;
+                next;
+            }
+            $positions{ $item->{$identity_key} } = scalar @merged;
+        }
+        push @merged, $item;
+    }
+
+    return \@merged;
 }
 
 1;
@@ -409,7 +584,7 @@ Construct it with a skill manager, call C<dispatch> for one command invocation, 
 
 =head1 WHAT USES IT
 
-It is used by the C<dashboard skill> command, by the skill bookmark web routes, by skill installation flows that later need execution, and by skill-system and web-route regression tests.
+It is used by dotted C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> dispatch routed through the C<skills> helper, by the skill bookmark web routes, by skill installation flows that later need execution, and by skill-system and web-route regression tests.
 
 =head1 EXAMPLES
 

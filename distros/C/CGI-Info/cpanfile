@@ -44,7 +44,7 @@ on 'test' => sub {
 	requires 'Test::CleanNamespaces';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
-	requires 'Test::Mockingbird';
+	requires 'Test::Mockingbird', '0.08';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';

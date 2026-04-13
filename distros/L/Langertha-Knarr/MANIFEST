@@ -69,4 +69,5 @@ t/73_tracing_handler.t
 t/74_requestlog_handler.t
 t/75_cli_smoketest.t
 t/76_auth.t
+t/77_raw_passthrough_tracing.t
 t/author-pod-syntax.t

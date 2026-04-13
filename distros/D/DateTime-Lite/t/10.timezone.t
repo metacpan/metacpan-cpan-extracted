@@ -9,12 +9,6 @@ use Test::More;
 use Scalar::Util ();
 use Time::Local qw( timegm );
 
-BEGIN
-{
-    eval { require DateTime::Lite::TimeZone };
-    plan( skip_all => "DateTime::Lite::TimeZone not available: $@" ) if( $@ );
-}
-
 use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
 use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
 
@@ -79,6 +73,22 @@ subtest 'Constructor - alias resolution (new schema: aliases JOIN zones)' => sub
     ok( defined( $east ),                    'US/Eastern: new() succeeds' );
     is( $east->name, 'America/New_York',     'US/Eastern: resolves alias via aliases table' );
     is( $east->is_olson, 1,                  'US/Eastern: resolved zone is_olson' );
+};
+
+# NOTE: Constructor - 'local' timezone name
+subtest "Constructor - 'local' timezone name" => sub
+{
+    local $ENV{TZ} = 'Asia/Tokyo';
+    my $tz = DateTime::Lite::TimeZone->new( name => 'local' );
+    ok( defined( $tz ),          "'local' with TZ=Asia/Tokyo: new() succeeds" );
+    is( $tz->name, 'Asia/Tokyo', "'local' resolves to Asia/Tokyo via \$ENV{TZ}" );
+    ok( $tz->is_olson,           "'local' resolved zone is_olson" );
+    ok( !$tz->is_floating,       "'local' resolved zone is not floating" );
+
+    my $dt = DateTime::Lite->now( time_zone => 'local' );
+    ok( defined( $dt ),           "DateTime::Lite->now( time_zone => 'local' ) succeeds" );
+    is( $dt->time_zone_long_name, 'Asia/Tokyo',
+        "datetime with time_zone => 'local' has correct zone" );
 };
 
 # NOTE: country_codes (new schema: zones.countries JSON array)

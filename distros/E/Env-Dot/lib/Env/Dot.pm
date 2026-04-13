@@ -9,7 +9,7 @@ use Carp;
 
 # ABSTRACT: Read environment variables from .env file
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 # We define our own import routine because
 # this is the point (when `use Env::Dot` is called)
@@ -107,7 +107,7 @@ Env::Dot - Read environment variables from .env file
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

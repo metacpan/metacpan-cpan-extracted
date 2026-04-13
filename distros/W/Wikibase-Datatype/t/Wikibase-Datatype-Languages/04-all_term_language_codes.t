@@ -7,4 +7,4 @@ use Wikibase::Datatype::Languages qw(all_term_language_codes);
 
 # Test.
 my @ret = all_term_language_codes();
-is(scalar @ret, 613, 'Get term language codes count (613).');
+is(scalar @ret, 629, 'Get term language codes count (629).');

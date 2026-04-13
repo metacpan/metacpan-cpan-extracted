@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Term;
 
 # Test.
-is($Wikibase::Datatype::Term::VERSION, 0.39, 'Version.');
+is($Wikibase::Datatype::Term::VERSION, 0.4, 'Version.');

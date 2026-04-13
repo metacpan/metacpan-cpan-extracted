@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::Engine;
 # ABSTRACT: Knarr handler that proxies directly to a Langertha engine
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -110,7 +110,7 @@ Langertha::Knarr::Handler::Engine - Knarr handler that proxies directly to a Lan
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

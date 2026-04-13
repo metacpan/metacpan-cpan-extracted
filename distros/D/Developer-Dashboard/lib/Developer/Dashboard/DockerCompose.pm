@@ -3,7 +3,7 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -304,9 +304,7 @@ sub _service_lookup_roots {
         if ( $runtime_root ne $home_runtime_root ) {
             push @candidates, File::Spec->catdir( $runtime_root, 'docker' );
         }
-        if ( $runtime_root eq $home_runtime_root ) {
-            push @candidates, $self->{paths}->installed_skill_docker_roots;
-        }
+        push @candidates, $self->{paths}->installed_skill_docker_roots_for_runtime($runtime_root);
 
         for my $root (@candidates) {
             next if !defined $root || $root eq '';

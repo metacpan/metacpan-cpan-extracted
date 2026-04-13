@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.1.0
+## Version v0.3.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/10
+## Modified 2026/04/13
 ## All rights reserved
 ## 
 ## 
@@ -24,8 +24,9 @@ BEGIN
         @QuarterLengths @LeapYearQuarterLengths
     );
     use Config;
+    use DateTime::Locale::FromCLDR;
+    use POSIX qw( floor fmod );
     use Scalar::Util ();
-    use POSIX        qw( floor fmod );
     use Wanted;
     use overload (
         fallback => 1,
@@ -39,7 +40,7 @@ BEGIN
         'ne'     => '_string_not_equals_overload',
     );
 
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.3.0';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -81,7 +82,6 @@ BEGIN
 
 require DateTime::Lite::Duration;
 require DateTime::Lite::TimeZone;
-require DateTime::Locale::FromCLDR;
 
 # NOTE: Constants
 sub INFINITY        () { 100**100**100**100 }
@@ -324,13 +324,19 @@ sub _new
     $p{minute}     //= 0;
     $p{second}     //= 0;
     $p{nanosecond} //= 0;
-    $p{time_zone}  //= $class->_default_time_zone;
+    # NOTE: time_zone is intentionally NOT defaulted here anymore; we need to
+    # resolve any BCP47 -u-tz- extension from the locale first.
+    # $p{time_zone}  //= $class->_default_time_zone;
     # Should errors be fatal?
     $p{fatal}      //= ( $FATAL_EXCEPTIONS // 0 );
 
     my $self = bless( {}, $class );
 
-    $self->_set_locale( $p{locale} );
+    $p{time_zone} = $class->_resolve_time_zone( $p{locale}, $p{time_zone} ) //
+        $class->_default_time_zone;
+
+    # _set_locale now returns the DateTime::Locale::FromCLDR object
+    my $cldr = $self->_set_locale( $p{locale} ) || return( $class->pass_error );
 
     $self->{tz} = ref( $p{time_zone} )
         ? $p{time_zone}
@@ -535,17 +541,17 @@ sub duration_class () { 'DateTime::Lite::Duration' }
 sub epoch
 {
     my $self = shift( @_ );
-    return( $self->{utc_c}{epoch} ) if( exists( $self->{utc_c}{epoch} ) );
+    return( $self->{utc_c}->{epoch} ) if( exists( $self->{utc_c}->{epoch} ) );
 
     if( $IsPurePerl )
     {
-        return( $self->{utc_c}{epoch}
+        return( $self->{utc_c}->{epoch}
             = ( $self->{utc_rd_days} - 719163 ) * SECONDS_PER_DAY
               + $self->{utc_rd_secs} );
     }
     else
     {
-        return( $self->{utc_c}{epoch}
+        return( $self->{utc_c}->{epoch}
             = $self->_rd_to_epoch( $self->{utc_rd_days}, $self->{utc_rd_secs} ) );
     }
 }
@@ -823,8 +829,11 @@ sub from_epoch
 
     my $self = $class->_new( %p, %args, time_zone => 'UTC' ) || return( $class->pass_error );
 
-    $self->_maybe_future_dst_warning( $self->year, $p{time_zone} );
-    $self->set_time_zone( $p{time_zone} ) if( exists( $p{time_zone} ) );
+    my $target_tz = $class->_resolve_time_zone( $p{locale}, $p{time_zone} );
+    $self->_maybe_future_dst_warning( $self->year, $target_tz );
+    $self->set_time_zone( $target_tz ) if( defined( $target_tz ) );
+    # $self->set_time_zone( $target_tz )
+    #     unless( !defined( $target_tz ) || $target_tz eq 'floating' );
 
     return( $self );
 }
@@ -864,25 +873,26 @@ sub from_object
     }
 
     my %args;
-    @args{ qw( year month day ) }    = $class->_rd2ymd( $rd_days );
+    @args{ qw( year month day ) }     = $class->_rd2ymd( $rd_days );
     @args{ qw( hour minute second ) } = $class->_seconds_as_components( $rd_secs );
     $args{nanosecond} = $rd_nanosecs;
     $args{second}    += $leap_seconds;
 
     # Build in UTC first (the RD values we extracted are UTC-based).
-    # Strip any time_zone from %p here - we apply it explicitly below.
+    # Strip any time_zone from %p here. We apply it explicitly below.
     my $target_tz = delete( $p{time_zone} );
 
     my $new = $class->new( %p, %args, time_zone => 'UTC' ) ||
         return( $class->pass_error );
 
     # Apply timezone in priority order:
-    #   1. Caller-supplied time_zone (from %p)
+    #   1. Caller-supplied time_zone (from %p), or BCP47 -u-tz- from locale
     #   2. Source object's time_zone (if it has one)
     #   3. Default floating timezone
-    if( defined( $target_tz ) )
+    my $resolved_tz = $class->_resolve_time_zone( $p{locale}, $target_tz );
+    if( defined( $resolved_tz ) )
     {
-        $new->set_time_zone( $target_tz );
+        $new->set_time_zone( $resolved_tz );
     }
     elsif( $object->can( 'time_zone' ) )
     {
@@ -1160,7 +1170,7 @@ sub set
 
     if( $p{locale} )
     {
-        warnings::warn( 'You passed a locale to the set() method. Use set_locale() instead.' )
+        warn( 'You passed a locale to the set() method. Use set_locale() instead.' )
             if( warnings::enabled() );
     }
 
@@ -1178,18 +1188,27 @@ sub set_formatter
     return( $self );
 }
 sub set_hour       { return( shift->set( hour       => @_ ) ); }
-sub set_minute     { return( shift->set( minute     => @_ ) ); }
-sub set_month      { return( shift->set( month      => @_ ) ); }
-sub set_nanosecond { return( shift->set( nanosecond => @_ ) ); }
-sub set_second     { return( shift->set( second     => @_ ) ); }
 
 sub set_locale
 {
     my $self   = shift( @_ );
     my $locale = shift( @_ );
-    $self->_set_locale( $locale );
+    $self->_set_locale( $locale ) || return( $self->pass_error );
+    # If the new locale carries a BCP47 -u-tz- extension and the object is
+    # currently in the floating timezone (i.e. no explicit timezone was ever
+    # set), infer the timezone from the locale extension.
+    if( $self->{tz}->is_floating )
+    {
+        my $resolved = $self->_resolve_time_zone( $locale, undef );
+        $self->set_time_zone( $resolved ) if( defined( $resolved ) );
+    }
     return( $self );
 }
+
+sub set_minute     { return( shift->set( minute     => @_ ) ); }
+sub set_month      { return( shift->set( month      => @_ ) ); }
+sub set_nanosecond { return( shift->set( nanosecond => @_ ) ); }
+sub set_second     { return( shift->set( second     => @_ ) ); }
 
 sub set_time_zone
 {
@@ -1543,11 +1562,11 @@ sub week
 
     # Memoised: computing week values requires day_of_year and day_of_week
     # which are already in local_c, so this is cheap after the first call.
-    unless( exists( $self->{utc_c}{week_year} ) )
+    unless( exists( $self->{utc_c}->{week_year} ) )
     {
-        $self->{utc_c}{week_year} = $self->_week_values;
+        $self->{utc_c}->{week_year} = $self->_week_values;
     }
-    return( @{ $self->{utc_c}{week_year} }[0, 1] );
+    return( @{$self->{utc_c}->{week_year}}[0, 1] );
 }
 
 sub week_number { ( $_[0]->week )[1] }
@@ -2698,29 +2717,6 @@ sub _duration_object_from_args
 
 sub _era_index { $_[0]->{local_c}->{year} <= 0 ? 0 : 1 }
 
-sub _subtract_overload
-{
-    my( $date1, $date2, $reversed ) = @_;
-    ( $date2, $date1 ) = ( $date1, $date2 ) if( $reversed );
-
-    if( Scalar::Util::blessed( $date2 ) && $date2->isa( 'DateTime::Lite::Duration' ) )
-    {
-        my $new = $date1->clone;
-        $new->add_duration( $date2->inverse );
-        return( $new );
-    }
-    elsif( Scalar::Util::blessed( $date2 ) && $date2->can( 'utc_rd_values' ) )
-    {
-        return( $date1->subtract_datetime( $date2 ) );
-    }
-    else
-    {
-        my $class     = ref( $date1 );
-        my $dt_string = overload::StrVal( $date1 );
-        die( "Cannot subtract $date2 from a $class object ($dt_string). Only a DateTime::Lite::Duration or compatible object can be subtracted." );
-    }
-}
-
 sub _format_nanosecs
 {
     my $self  = shift( @_ );
@@ -2783,6 +2779,14 @@ sub _handle_offset_modifier
             }
         }
     }
+}
+
+# NOTE: Private helper: not a method; checks that a value is an integer (or integer-string)
+sub _is_integer
+{
+    my $v = shift( @_ );
+    return(0) unless( defined( $v ) );
+    return( $v =~ /\A-?[0-9]+\z/ ? 1 : 0 );
 }
 
 sub _maybe_future_dst_warning
@@ -2849,6 +2853,67 @@ sub _offset_for_local_datetime
     return( $self->{tz}->offset_for_local_datetime( $self ) );
 }
 
+sub _resolve_time_zone
+{
+    my( $class, $locale, $time_zone ) = @_;
+
+    # Explicit time_zone always takes priority
+    if( defined( $time_zone ) &&
+        length( $time_zone ) )
+    {
+        return( $time_zone );
+    }
+
+    # Try to infer from the BCP47 -u-tz- locale extension.
+    # Must be done BEFORE passing the locale to _set_locale, because
+    # DateTime::Locale::FromCLDR->new() calls $locale->core which strips all -u-
+    # extensions, making them inaccessible afterwards.
+    # Three cases handled:
+    #   1. Plain string: instantiate a temporary Locale::Unicode to read ->tz
+    #   2. Locale::Unicode object: ->tz is directly accessible
+    #   3. DateTime::Locale::FromCLDR object: core() has already stripped
+    #      the -u- extensions, so tz will be undef; but this may change in
+    #      the future so we try it out anyway.
+    my $tz_code;
+    if( defined( $locale ) &&
+        !ref( $locale ) &&
+        length( $locale ) )
+    {
+        require Locale::Unicode;
+        # Plain string: parse it to get the -u-tz- extension
+        my $loc = Locale::Unicode->new( $locale );
+        $tz_code = $loc->tz if( $loc );
+    }
+    elsif( defined( $locale ) &&
+           Scalar::Util::blessed( $locale ) &&
+           $locale->isa( 'Locale::Unicode' ) )
+    {
+        # Already a Locale::Unicode object; extensions are intact
+        $tz_code = $locale->tz;
+    }
+    elsif( defined( $locale ) &&
+           Scalar::Util::blessed( $locale ) &&
+           $locale->isa( 'DateTime::Locale::FromCLDR' ) &&
+           $locale->can( 'locale' ) )
+    {
+        # DateTime::Locale::FromCLDR object. core() has already stripped
+        # the -u- extensions, so tz will be undef; but this may change in
+        # the future so we try it out anyway.
+        $tz_code = $locale->locale->tz;
+    }
+
+    if( defined( $tz_code ) &&
+        length( $tz_code ) )
+    {
+        require Locale::Unicode;
+        my $names = Locale::Unicode->tz_id2names( $tz_code );
+        return( $names->[0] ) if( $names && scalar( @$names ) );
+    }
+
+    # Nothing found: return undef and let the caller decide the fallback
+    return;
+}
+
 sub _set_get_prop
 {
     my $self = shift( @_ );
@@ -2862,18 +2927,26 @@ sub _set_locale
     my $self   = shift( @_ );
     my $locale = shift( @_ );
 
-    if( defined( $locale ) && ref( $locale ) )
+    # Assuming this is either DateTime::Locale::FromData or DateTime::Locale::FromCLDR
+    # But we need better check than this. However, if we check too strictly, we
+    # might break things.
+    if( defined( $locale ) && Scalar::Util::blessed( $locale ) )
     {
         $self->{locale} = $locale;
     }
+    elsif( defined( $locale ) )
+    {
+        # If this is an unblessed reference, return an error
+        return( $self->error( "Locale provided (", overload::StrVal( $locale ), ") is not a string." ) )
+            if( ref( $locale ) );
+        $locale = DateTime::Locale::FromCLDR->new( $locale ) ||
+            return( $self->pass_error( DateTime::Locale::FromCLDR->error ) );
+    }
     else
     {
-        $self->{locale} = $locale
-            ? ( DateTime::Locale::FromCLDR->new( $locale ) ||
-                die( DateTime::Locale::FromCLDR->error ) )
-            : $self->DefaultLocale;
+        $locale = $self->DefaultLocale;
     }
-    return;
+    return( $self->{locale} = $locale );
 }
 
 sub _string_compare_overload
@@ -2900,6 +2973,29 @@ sub _string_equals_overload
 }
 
 sub _string_not_equals_overload { return( !_string_equals_overload( @_ ) ) }
+
+sub _subtract_overload
+{
+    my( $date1, $date2, $reversed ) = @_;
+    ( $date2, $date1 ) = ( $date1, $date2 ) if( $reversed );
+
+    if( Scalar::Util::blessed( $date2 ) && $date2->isa( 'DateTime::Lite::Duration' ) )
+    {
+        my $new = $date1->clone;
+        $new->add_duration( $date2->inverse );
+        return( $new );
+    }
+    elsif( Scalar::Util::blessed( $date2 ) && $date2->can( 'utc_rd_values' ) )
+    {
+        return( $date1->subtract_datetime( $date2 ) );
+    }
+    else
+    {
+        my $class     = ref( $date1 );
+        my $dt_string = overload::StrVal( $date1 );
+        die( "Cannot subtract $date2 from a $class object ($dt_string). Only a DateTime::Lite::Duration or compatible object can be subtracted." );
+    }
+}
 
 # Algorithm from https://en.wikipedia.org/wiki/ISO_week_date#Calculating_the_week_number_of_a_given_date
 # Pure arithmetic - no clone, no add(), no risk of recursion.
@@ -2936,15 +3032,6 @@ sub _weeks_in_year
     return( ( $dow == 4 || ( $dow == 3 && $self->_is_leap_year( $year ) ) )
         ? 53
         : 52 );
-}
-
-# NOTE: Private helper: check that a value is an integer (or integer-string)
-
-sub _is_integer
-{
-    my $v = shift( @_ );
-    return(0) unless( defined( $v ) );
-    return( $v =~ /\A-?[0-9]+\z/ ? 1 : 0 );
 }
 
 1;
@@ -3021,6 +3108,19 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
     my $now   = DateTime::Lite->now( time_zone => 'UTC' );
     my $today = DateTime::Lite->today( time_zone => 'Asia/Tokyo' );
+
+    # Timezone from GPS coordinates (nearest IANA zone by haversine distance)
+    use DateTime::Lite::TimeZone;
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658581,
+        longitude => 139.745433,   # Tokyo Tower
+    );
+    my $dt_local = DateTime::Lite->now( time_zone => $tz );
+    say $dt_local->time_zone_long_name;  # Asia/Tokyo
+
+    # BCP47 -u-tz- locale extension: timezone inferred from locale tag
+    my $dt_bcp47 = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+    say $dt_bcp47->time_zone_long_name;  # Asia/Jerusalem
 
     my $from_epoch = DateTime::Lite->from_epoch( epoch => time() );
     my $from_doy   = DateTime::Lite->from_day_of_year(
@@ -3155,7 +3255,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.1.0
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -3191,9 +3291,9 @@ The XS layer covers all CPU-intensive calendar arithmetic (C<_rd2ymd>, C<_ymd2rd
 
 The public API mirrors L<DateTime> as closely as possible, so existing code using C<DateTime> should work with C<DateTime::Lite> as a drop-in replacement.
 
-=item Full BCP 47 / CLDR locale support
+=item Full Unicode CLDR / BCP 47 locale support
 
-C<DateTime> is limited to the set of pre-generated C<DateTime::Locale::*> modules, one per locale. C<DateTime::Lite> accepts any valid BCP 47 / Unicode CLDR locale tag, including complex forms with Unicode extensions (C<-u->), transform extensions (C<-t->), and script subtags.
+C<DateTime> is limited to the set of pre-generated C<DateTime::Locale::*> modules, one per locale. C<DateTime::Lite> accepts any valid Unicode CLDR / BCP 47 locale tag, including complex forms with Unicode extensions (C<-u->), transform extensions (C<-t->), and script subtags.
 
     my $dt = DateTime::Lite->now( locale => 'en' );    # simple form
     my $dt = DateTime::Lite->now( locale => 'en-GB' ); # simple form
@@ -3203,6 +3303,15 @@ C<DateTime> is limited to the set of pre-generated C<DateTime::Locale::*> module
     my $dt = DateTime::Lite->now( locale => 'ar-SA-u-nu-latn' );
 
 Locale data is resolved dynamically by L<DateTime::Locale::FromCLDR> via L<Locale::Unicode::Data>, so tags like C<he-IL-u-ca-hebrew-tz-jeruslm> or C<ja-Kana-t-it> work transparently without any additional installed modules.
+
+Additionally, if the locale tag carries a L<Unicode timezone extension|Locale::Unicode/"Unicode extensions"> (C<-u-tz->), and no explicit C<time_zone> argument is provided to the constructor, C<DateTime::Lite> will automatically resolve the corresponding IANA canonical timezone name from it:
+
+    # time_zone is inferred as 'Asia/Jerusalem' from the -u-tz-jeruslm extension
+    my $dt = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+    say $dt->time_zone;            # Asia/Jerusalem
+    say $dt->time_zone_long_name;  # Asia/Jerusalem
+
+An explicit C<time_zone> argument always takes priority over the locale extension.
 
 =item No die() in normal operation
 
@@ -3256,7 +3365,13 @@ Accepted parameters are:
 
 =item * C<time_zone>
 
+The time zone for the datetime. Accepts a zone name, such as C<Asia/Tokyo>), a fixed-offset string, such as C<+09:00>, a L<DateTime::Lite::TimeZone> object, C<UTC>, C<floating>, or C<local>.
+
+If omitted, and the C<locale> argument carries a BCP47 C<-u-tz-> extension, such as C<he-IL-u-ca-hebrew-tz-jeruslm>, the corresponding IANA canonical timezone is resolved automatically. If neither is provided, the default floating timezone is used (or C<$ENV{PERL_DATETIME_DEFAULT_TZ}> if set).
+
 =item * C<locale>
+
+Any valid locale as defined by the Unicode CLDR (Common Locale Data Repository), and BCP47. See L<Locale::Unicode>
 
 =item * C<formatter>
 
@@ -3351,7 +3466,14 @@ Returns the new object upon success, or sets an L<error|DateTime::Lite::Exceptio
         locale    => 'ja-JP'
     );
 
+    # time_zone inferred from the -u-tz- BCP47 extension:
+    my $now2 = DateTime::Lite->now( locale => 'he-IL-u-ca-hebrew-tz-jeruslm' );
+    say $now2->time_zone;            # Asia/Jerusalem
+    say $now2->time_zone_long_name;  # Asia/Jerusalem
+
 Returns the current datetime (calls C<from_epoch( epoch => time )>).
+
+If C<time_zone> is omitted and the C<locale> carries a BCP47 C<-u-tz-> extension, as in the example above, the timezone is inferred automatically. See L</new> for the full priority rules.
 
 Returns the new object upon success, or sets an L<error|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>
 

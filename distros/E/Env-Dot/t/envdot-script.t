@@ -3,10 +3,14 @@
 
 use strict;
 use warnings;
-use Test2::V0;
 
 use FindBin    qw( $RealBin );
 use File::Spec ();
+
+use Test2::V1             qw( -utf8 );
+use Test2::Tools::Subtest qw( subtest_streamed );
+use Test::Script 1.28;
+
 my $lib_path;
 
 BEGIN {
@@ -16,27 +20,25 @@ use lib "$lib_path";
 
 use Test2::Deny::Platform::DOSOrDerivative;
 
-use Test::Script 1.28;
-
-subtest 'Script compiles' => sub {
+subtest_streamed 'Script compiles' => sub {
     script_compiles('bin/envdot');
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Script runs --version' => sub {
+subtest_streamed 'Script runs --version' => sub {
     script_runs( [ 'bin/envdot', '--version', ] );
     script_runs( [ 'bin/envdot', '--version', ], { interpreter_options => ['-T'], }, 'Runs with taint check enabled' );
 
     my $stdout;
     script_runs( [ 'bin/envdot', '--version', ], { stdout => \$stdout, }, 'Verify output' );
-    like( ( split qr/\n/msx, $stdout )[0], qr/^ bin [\/\\] envdot (\s version \s .* |) $/msx,      'Correct stdout' );
-    like( ( split qr/\n/msx, $stdout )[1], qr/^ [(] Getopt::Long::GetOptions [[:space:]]{1,} /msx, 'Correct stdout' );
+    T2->like( ( split qr/\n/msx, $stdout )[0], qr/^ bin [\/\\] envdot (\s version \s .* |) $/msx,      'Correct stdout' );
+    T2->like( ( split qr/\n/msx, $stdout )[1], qr/^ [(] Getopt::Long::GetOptions [[:space:]]{1,} /msx, 'Correct stdout' );
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Script runs --dotenv' => sub {
+subtest_streamed 'Script runs --dotenv' => sub {
     script_runs( [ 'bin/envdot', '--dotenv', 't/envdot-script-first.env', ] );
     script_runs(
         [ 'bin/envdot', '--dotenv', 't/envdot-script-first.env', ],
@@ -51,12 +53,12 @@ ENVDOT_SCRIPT_TEST_2='two'; export ENVDOT_SCRIPT_TEST_2
 ENVDOT_SCRIPT_COMMON='first'; export ENVDOT_SCRIPT_COMMON
 EOF
     script_runs( [ 'bin/envdot', '--dotenv', 't/envdot-script-first.env', ], { stdout => \$stdout, }, 'Verify output' );
-    is( $stdout, $stdout_result, 'Correct stdout' );
+    T2->is( $stdout, $stdout_result, 'Correct stdout' );
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Script runs ENVDOT_FILEPATHS=path' => sub {
+subtest_streamed 'Script runs ENVDOT_FILEPATHS=path' => sub {
     my $path = File::Spec->rel2abs( File::Spec->catfile( File::Spec->curdir(), 't', 'envdot-script-first.env' ) );
 
     local %ENV = ( %ENV, ENVDOT_FILEPATHS => $path );
@@ -72,12 +74,12 @@ ENVDOT_SCRIPT_TEST_2='two'; export ENVDOT_SCRIPT_TEST_2
 ENVDOT_SCRIPT_COMMON='first'; export ENVDOT_SCRIPT_COMMON
 EOF
     script_runs( [ 'bin/envdot', ], { stdout => \$stdout, }, 'Verify output' );
-    is( $stdout, $stdout_result, 'Correct stdout' );
+    T2->is( $stdout, $stdout_result, 'Correct stdout' );
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Script runs ENVDOT_FILEPATHS=path_first:path_second' => sub {
+subtest_streamed 'Script runs ENVDOT_FILEPATHS=path_first:path_second' => sub {
     my $path1 = File::Spec->rel2abs( File::Spec->catfile( File::Spec->curdir(), 't', 'envdot-script-first.env' ) );
     my $path2 = File::Spec->rel2abs( File::Spec->catfile( File::Spec->curdir(), 't', 'envdot-script-second.env' ) );
 
@@ -95,12 +97,12 @@ ENVDOT_SCRIPT_TEST_4='4.0'; export ENVDOT_SCRIPT_TEST_4
 ENVDOT_SCRIPT_COMMON='second'; export ENVDOT_SCRIPT_COMMON
 EOF
     script_runs( [ 'bin/envdot', ], { stdout => \$stdout, }, 'Verify output' );
-    is( $stdout, $stdout_result, 'Correct stdout' );
+    T2->is( $stdout, $stdout_result, 'Correct stdout' );
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Script runs ENVDOT_FILEPATHS=path_second:path_first' => sub {
+subtest_streamed 'Script runs ENVDOT_FILEPATHS=path_second:path_first' => sub {
     my $path1 = File::Spec->rel2abs( File::Spec->catfile( File::Spec->curdir(), 't', 'envdot-script-first.env' ) );
     my $path2 = File::Spec->rel2abs( File::Spec->catfile( File::Spec->curdir(), 't', 'envdot-script-second.env' ) );
 
@@ -118,12 +120,12 @@ ENVDOT_SCRIPT_TEST_2='two'; export ENVDOT_SCRIPT_TEST_2
 ENVDOT_SCRIPT_COMMON='first'; export ENVDOT_SCRIPT_COMMON
 EOF
     script_runs( [ 'bin/envdot', ], { stdout => \$stdout, }, 'Verify output' );
-    is( $stdout, $stdout_result, 'Correct stdout' );
+    T2->is( $stdout, $stdout_result, 'Correct stdout' );
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Script fails due to faulty option' => sub {
+subtest_streamed 'Script fails due to faulty option' => sub {
     my $file     = 't/envdot-script-third.env';
     my $filepath = File::Spec->rel2abs($file);
     script_fails( [ 'bin/envdot', '--dotenv', $file, ], { exit => 22, }, 'Fails because of faulty option' );
@@ -133,17 +135,17 @@ subtest 'Script fails due to faulty option' => sub {
         qr{^ Error: \s Unknown \s envdot \s option: \s 'read:faulty_option' \s line \s 3 \s file \s '$filepath' $}msx,
         'Fails with correct output' );
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Script fails due to missing dotenv file' => sub {
+subtest_streamed 'Script fails due to missing dotenv file' => sub {
     my $file     = 't/envdot-script-not-existing.env';
     my $filepath = File::Spec->rel2abs($file);
     script_fails( [ 'bin/envdot', '--dotenv', $file, ], { exit => 2, }, 'Fails because of missing dotenv file' );
 
     script_stderr_like( qr{^ Error: \s File \s not \s found: \s '$file' $}msx, 'Fails with correct output' );
 
-    done_testing;
+    T2->done_testing;
 };
 
-done_testing;
+T2->done_testing;

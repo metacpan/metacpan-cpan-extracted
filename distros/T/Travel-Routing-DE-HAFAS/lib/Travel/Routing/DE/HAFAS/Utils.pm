@@ -9,7 +9,7 @@ use 5.014;
 use parent 'Exporter';
 our @EXPORT = qw(handle_day_change);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub handle_day_change {
 	my (%opt)       = @_;
@@ -55,7 +55,7 @@ None.
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 METHODS
 
@@ -81,7 +81,7 @@ None.
 
 =head1 AUTHOR
 
-Copyright (C) 2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2023-2026 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

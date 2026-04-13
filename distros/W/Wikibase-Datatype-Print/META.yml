@@ -59,10 +59,11 @@ requires:
   Error::Pure: 0.15
   Exporter: 0
   Readonly: 0
+  Unicode::UTF8: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print/issues
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Print
-version: '0.19'
+version: '0.20'

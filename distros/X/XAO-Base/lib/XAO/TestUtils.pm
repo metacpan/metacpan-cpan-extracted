@@ -197,14 +197,14 @@ EOT
 
         # Human friendlier output version
         #
+        my $use_blib = -d 'blib' ? "\nuse blib;" : '';
         my $pltest="$testdir/$testfile.pl";
         open(F,"> $pltest") || die "Can't create test script ($pltest): $!\n";
         print F <<EOT;
 #!$^X
 #### GENERATED AUTOMATICALLY, DO NOT EDIT ####
 use strict;
-use warnings;
-use blib;
+use warnings;$use_blib
 use Test::Unit::Lite;
 use XAO::Utils;
 

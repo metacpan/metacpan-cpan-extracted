@@ -11,7 +11,7 @@ use URI::Escape qw(uri_escape_utf8);
 
 our @EXPORT = qw(geocode parse);
 
-our $VERSION = "v2.6.6";
+our $VERSION = "v2.6.8";
 
 =head1 NAME
 

@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::RequestLog;
 # ABSTRACT: Decorator handler that writes per-request JSON logs via Knarr::RequestLog
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use Future;
 use Future::AsyncAwait;
@@ -115,7 +115,6 @@ async sub handle_stream_f {
 }
 
 sub list_models { $_[0]->wrapped->list_models }
-sub route_model { $_[0]->wrapped->route_model( $_[1] ) }
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -132,7 +131,7 @@ Langertha::Knarr::Handler::RequestLog - Decorator handler that writes per-reques
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -153,7 +152,7 @@ Sync requests log a single line with the result; streaming requests
 accumulate every delta and log one line with the assembled output
 when the stream closes.
 
-C<knarr start> and C<knarr container> mount this automatically when
+C<knarr start> mounts this automatically when
 C<KNARR_LOG_FILE> / C<KNARR_LOG_DIR> (or the YAML C<logging:> section)
 is set.
 

@@ -34,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.12
+Version 1.13
 
 =cut
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 =head1 SYNOPSIS
 
@@ -2186,6 +2186,8 @@ sub cache
 
 	if($cache) {
 		croak(ref($self), ':cache($cache) is not an object') if(!Scalar::Util::blessed($cache));
+		croak(ref($self), ':cache($cache) does not support the get() method') if(!$cache->can('get'));
+		croak(ref($self), ':cache($cache) does not support the set() method') if(!$cache->can('set'));
 		$self->{'cache'} = $cache;
 	}
 	return $self->{'cache'};

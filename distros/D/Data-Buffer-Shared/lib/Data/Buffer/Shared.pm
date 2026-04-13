@@ -1,7 +1,7 @@
 package Data::Buffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Data::Buffer::Shared', $VERSION);
@@ -129,6 +129,26 @@ Explicit locking (for batch operations):
     buf_xx_unlock_wr $buf;  # seqlock end + write unlock
     buf_xx_lock_rd $buf;    # read lock
     buf_xx_unlock_rd $buf;  # read unlock
+
+=head1 SEE ALSO
+
+L<Data::HashMap::Shared> - concurrent hash table
+
+L<Data::Queue::Shared> - FIFO queue
+
+L<Data::PubSub::Shared> - publish-subscribe ring
+
+L<Data::ReqRep::Shared> - request-reply
+
+L<Data::Sync::Shared> - synchronization primitives
+
+L<Data::Pool::Shared> - fixed-size object pool
+
+L<Data::Stack::Shared> - LIFO stack
+
+L<Data::Deque::Shared> - double-ended queue
+
+L<Data::Log::Shared> - append-only log (WAL)
 
 =head1 AUTHOR
 

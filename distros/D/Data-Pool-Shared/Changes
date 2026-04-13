@@ -1,0 +1,19 @@
+Revision history for Data::Pool::Shared
+
+0.02  2026-04-13
+    - Add SEE ALSO cross-links to all family modules
+    - Fix eventfd_set self-assignment guard
+    - Add capacity*elem_size overflow check
+
+0.01  2026-04-11
+    - Initial release
+    - Fixed-size shared-memory object pool with CAS bitmap allocation
+    - Variants: Raw, I64, F64, I32, Str
+    - Futex-based blocking when pool is exhausted
+    - PID-based stale slot recovery (recover_stale)
+    - Batch operations: alloc_n, free_n
+    - Zero-copy read: slot_sv
+    - Guard objects for auto-free on scope exit
+    - File-backed, anonymous, and memfd backing modes
+    - eventfd integration for event-loop wakeup
+    - Atomic ops: cas, cmpxchg, xchg, add, incr, decr (I64/I32)

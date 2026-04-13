@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::AGUI;
 # ABSTRACT: AG-UI (Agent-UI) event protocol for Knarr
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use JSON::MaybeXS;
 use Data::UUID;
@@ -138,7 +138,7 @@ Langertha::Knarr::Protocol::AGUI - AG-UI (Agent-UI) event protocol for Knarr
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 

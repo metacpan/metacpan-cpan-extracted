@@ -1,0 +1,8 @@
+Revision history for Data::Log::Shared
+
+0.02  2026-04-12
+    - Add truncate/truncation for concurrency-safe log trimming
+    - each_entry auto-skips truncated entries
+
+0.01  2026-04-11
+    - Initial release

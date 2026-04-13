@@ -18,20 +18,21 @@ knarr - Langertha LLM Proxy with Langfuse Tracing
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
     knarr <command> [options]
 
-    knarr start                              # Start with ./knarr.yaml
-    knarr start -c production.yaml -p 9090   # Custom config and port
-    knarr container                          # Auto-start from environment (Docker mode)
-    knarr init > knarr.yaml                  # Generate config from environment
-    knarr init -e .env -e .env.local         # Scan .env files
-    knarr models                             # List configured models
-    knarr models --format json               # JSON output
-    knarr check                              # Validate config file
+    knarr start                                # Start with ./knarr.yaml
+    knarr start --from-env                     # Auto-detect config from ENV
+    knarr start --from-env -p 8080 -p 11434   # ENV config, explicit ports
+    knarr start -c production.yaml -p 9090     # Custom config and port
+    knarr init > knarr.yaml                    # Generate config from environment
+    knarr init -e .env -e .env.local           # Scan .env files
+    knarr models                               # List configured models
+    knarr models --format json                 # JSON output
+    knarr check                                # Validate config file
 
 =head1 DESCRIPTION
 
@@ -46,9 +47,7 @@ file format, routing behaviour, and environment variable reference.
 
 =over
 
-=item B<start> — Start the proxy server using a config file
-
-=item B<container> — Auto-start from environment variables, no config file needed (Docker mode)
+=item B<start> — Start the proxy server (with config file or C<--from-env>)
 
 =item B<init> — Scan environment and .env files for API keys, print generated YAML config
 
@@ -68,7 +67,7 @@ Config file path. Defaults to C<./knarr.yaml>.
 
 =item B<-v>, B<--verbose>
 
-Enable verbose logging to stderr.
+Enable verbose logging to stderr. Also enabled by C<KNARR_DEBUG=1>.
 
 =back
 
@@ -76,13 +75,19 @@ Enable verbose logging to stderr.
 
 =over
 
+=item B<--from-env>
+
+Build config from environment variables when no config file is found.
+This is how the Docker image starts.
+
 =item B<-p>, B<--port> I<port>
 
-Port to listen on. Overrides the C<listen> setting in the config file.
+Port to listen on. Repeatable (e.g. C<-p 8080 -p 11434>). Defaults to
+8080 and 11434.
 
 =item B<-H>, B<--host> I<host>
 
-Host to bind to. Overrides the C<listen> setting in the config file.
+Host to bind to. Defaults to C<0.0.0.0>.
 
 =item B<-w>, B<--workers> I<n>
 
@@ -91,24 +96,6 @@ Number of worker processes. Defaults to C<1>.
 =item B<-n>, B<--trace-name> I<name>
 
 Langfuse trace name. Overrides C<KNARR_TRACE_NAME> and the config file.
-
-=back
-
-=head1 CONTAINER OPTIONS
-
-=over
-
-=item B<-H>, B<--host> I<host>
-
-Host to bind to. Defaults to C<0.0.0.0> (all interfaces).
-
-=item B<-w>, B<--workers> I<n>
-
-Number of worker processes. Defaults to C<1>.
-
-=item B<-n>, B<--trace-name> I<name>
-
-Langfuse trace name.
 
 =back
 

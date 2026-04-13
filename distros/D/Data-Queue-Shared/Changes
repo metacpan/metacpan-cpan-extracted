@@ -1,5 +1,9 @@
 Revision history for Data-Queue-Shared
 
+0.02  2026-04-12
+    - Add SEE ALSO cross-links to family modules
+
+
 0.01  2026-04-05
     - Initial release
     - Int queue: lock-free Vyukov bounded MPMC

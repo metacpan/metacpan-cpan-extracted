@@ -1,0 +1,24 @@
+.github/workflows/ci.yml
+bench/single.pl
+bitset.h
+Changes
+eg/basic.pl
+eg/bloom_filter.pl
+eg/ev_eventfd.pl
+eg/membership.pl
+eg/memfd_fork.pl
+eg/rate_limiter.pl
+eg/resource_slots.pl
+eg/set_operations.pl
+eg/shared_flags.pl
+lib/Data/BitSet/Shared.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+Shared.xs
+t/01-basic.t
+xt/fd_leak.t
+xt/stress.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

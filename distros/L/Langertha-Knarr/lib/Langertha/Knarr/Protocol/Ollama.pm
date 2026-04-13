@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::Ollama;
 # ABSTRACT: Ollama-compatible wire protocol (/api/chat, /api/tags) for Knarr
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
@@ -117,7 +117,7 @@ Langertha::Knarr::Protocol::Ollama - Ollama-compatible wire protocol (/api/chat,
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 

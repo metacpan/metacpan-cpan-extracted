@@ -1,5 +1,60 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.3.0 2026-04-13T07:30:23+0900
+    - Added GPS coordinate-based timezone resolution to DateTime::Lite::TimeZone::new().
+      Passing C<latitude> and C<longitude> (decimal degrees) instead of C<name>
+      finds the nearest canonical IANA timezone using the haversine great-circle
+      distance against the reference coordinates stored in the C<zones> table of C<tz.sqlite3> (derived from
+      IANA C<zone1970.tab>). No new dependencies.
+      Note: this is an approximation based on one representative point per zone;
+      it is accurate for most locations but may give incorrect results near timezone
+      boundaries or in enclaves. For more boundary-precise resolution, see
+      L<Geo::Location::TimeZoneFinder>.
+    - Added private method _nearest_zone() to DateTime::Lite::TimeZone, implementing
+      the haversine query entirely within SQLite via asin(), sqrt(), cos() and sin()
+      functions. Only canonical zones with coordinates are considered.
+    - Added input validation for latitude (-90..90) and longitude (-180..180), with
+      proper error() returns rather than die().
+    - Updated DateTime::Lite::TimeZone POD to document the coordinate-based resolution,
+      its approximation caveat, and the valid parameter ranges.
+    - Added t/14.tz_coordinates.t with 10 subtests covering: Tokyo, Paris, New York,
+      Taipei, Sydney, Buenos Aires (southern hemisphere); integration with
+      DateTime::Lite->now(); and input validation for missing, out-of-range, and
+      non-numeric parameters.
+
+v0.2.0 2026-04-11T20:48:09+0900
+    - BCP47 -u-tz- locale extension support: if the locale tag carries a
+      Unicode timezone extension, such as C<he-IL-u-ca-hebrew-tz-jeruslm>,
+      and no explicit C<time_zone> argument is supplied to the constructor,
+      the corresponding IANA canonical timezone name is resolved automatically
+      via C<Locale::Unicode->tz_id2names()>.
+      Explicit C<time_zone> always takes priority.
+      No new dependencies: the BCP47 timezone to Olson canonical timezone
+      resolution uses the static in-memory hash in C<Locale::Unicode>, so no
+      SQLite query, and thus super fast.
+    - _set_locale() rewritten: now uses C<Scalar::Util::blessed()> instead
+      of C<ref()> to distinguish objects from unblessed references; This was
+      a carry over from the way DateTime is doing.
+      Returns the C<DateTime::Locale::FromCLDR> object instead of C<undef> to allow
+      the BCP47 timezone resolution in C<_new()>.
+      Unblessed references now return a proper error instead of an undefined behaviour;
+      replaced C<die()> with C<pass_error()> for consistency with the no-die philosophy.
+    - Added support for 'local' timezone name in DateTime::Lite::TimeZone::new().
+      The local timezone is resolved automatically without any external module
+      dependency, using OS-specific detection strategies:
+        - Unix/Linux/macOS/FreeBSD/OpenBSD/NetBSD/Solaris/AIX/HP-UX/OS2/Cygwin:
+          $ENV{TZ}, /etc/localtime symlink or binary match, /etc/timezone,
+          /etc/TIMEZONE, /etc/sysconfig/clock, /etc/default/init.
+        - Windows (MSWin32, NetWare): $ENV{TZ} then Windows Registry via
+          Win32::TieRegistry (optional, not a hard dependency).
+        - Android: $ENV{TZ}, getprop persist.sys.timezone, then 'UTC'.
+        - VMS: TZ, SYS$TIMEZONE_RULE, SYS$TIMEZONE_NAME, UCX$TZ, TCPIP$TZ.
+        - Symbian, EPOC, MS-DOS, Mac OS 9 and earlier: $ENV{TZ} only.
+    - Added OS dispatch aliases for darwin, cygwin, freebsd, openbsd, netbsd, solaris,
+      aix, hpux, os2, netware, symbian, epoc, dos, macos.
+    - Updated DateTime::Lite::TimeZone POD to document 'local' resolution strategy per OS.
+    - Added t/10.timezone.t subtest for 'local' timezone resolution via $ENV{TZ}.
+
 v0.1.0 2026-04-10T06:12:47+0900
     - Initial release.
     - Full port of DateTime 1.66 API.

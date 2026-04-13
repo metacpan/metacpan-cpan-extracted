@@ -35,6 +35,7 @@ t/comment-spelling.t
 t/conf/as_string.yml
 t/conf/AUTOLOAD.yml
 t/conf/browser_type.yml
+t/conf/cache.yml
 t/conf/cgi_host_url.yml
 t/conf/cookie.yml
 t/conf/domain_name.yml

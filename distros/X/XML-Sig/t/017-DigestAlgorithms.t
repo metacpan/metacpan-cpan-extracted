@@ -8,11 +8,8 @@ my @hash_alg = qw/sha224 sha256 sha384 sha512/;
 push @hash_alg, 'ripemd160' if $xmlsec->{ripemd160};
 push @hash_alg, 'sha1' if $xmlsec->{sha1_support};
 SKIP: {
-    eval {
-        require Crypt::OpenSSL::DSA;
-    };
     my $algs = scalar @hash_alg;
-    skip "Crypt::OpenSSL::DSA not installed", 4 * $algs if ($@);
+    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 4 * $algs if (!test_dsa_ok());
 foreach my $alg (@hash_alg) {
     my $sig = XML::Sig->new(
         {

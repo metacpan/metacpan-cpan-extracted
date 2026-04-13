@@ -1,6 +1,6 @@
 package Langertha::Role::Chat;
 # ABSTRACT: Role for APIs with normal chat functionality
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moose::Role;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -240,7 +240,7 @@ Langertha::Role::Chat - Role for APIs with normal chat functionality
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

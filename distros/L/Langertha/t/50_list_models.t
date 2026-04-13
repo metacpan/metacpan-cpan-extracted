@@ -359,10 +359,8 @@ subtest 'list_models URL correctness for all OpenAICompatible engines' => sub {
     [ 'Langertha::Engine::Cerebras',     qr{cerebras\.ai/v1/models$} ],
     [ 'Langertha::Engine::OpenRouter',   qr{openrouter\.ai/api/v1/models$} ],
     [ 'Langertha::Engine::Replicate',    qr{replicate\.com/v1/models$} ],
-    [ 'Langertha::Engine::NousResearch', qr{nousresearch\.com/v1/models$} ],
     [ 'Langertha::Engine::AKIOpenAI',    qr{aki\.io/v1/models$} ],
     [ 'Langertha::Engine::DeepSeek',     qr{deepseek\.com/models$} ],
-    [ 'Langertha::Engine::Perplexity',   qr{perplexity\.ai/models$} ],
     [ 'Langertha::Engine::Mistral',      qr{mistral\.ai/v1/models$} ],
   );
 
@@ -385,6 +383,38 @@ subtest 'Mistral list_models_path override' => sub {
 
   my $openai = Langertha::Engine::OpenAI->new(api_key => 'test-key');
   is($openai->list_models_path, '/models', 'OpenAI uses default /models');
+};
+
+subtest 'Perplexity static models' => sub {
+  plan tests => 5;
+
+  use_ok('Langertha::Engine::Perplexity');
+
+  my $engine = Langertha::Engine::Perplexity->new(api_key => 'test-key');
+
+  my $model_ids = $engine->list_models;
+  is(ref($model_ids), 'ARRAY', 'Returns arrayref');
+  ok(scalar(@$model_ids) >= 4, 'Has at least 4 models');
+  ok((grep { $_ eq 'sonar' } @$model_ids), 'Contains sonar');
+
+  my $full = $engine->list_models(full => 1);
+  is(ref($full->[0]), 'HASH', 'Full mode returns model hashrefs');
+};
+
+subtest 'NousResearch static models' => sub {
+  plan tests => 5;
+
+  use_ok('Langertha::Engine::NousResearch');
+
+  my $engine = Langertha::Engine::NousResearch->new(api_key => 'test-key');
+
+  my $model_ids = $engine->list_models;
+  is(ref($model_ids), 'ARRAY', 'Returns arrayref');
+  ok(scalar(@$model_ids) >= 2, 'Has at least 2 models');
+  ok((grep { $_ eq 'Hermes-4-70B' } @$model_ids), 'Contains Hermes-4-70B');
+
+  my $full = $engine->list_models(full => 1);
+  is(ref($full->[0]), 'HASH', 'Full mode returns model hashrefs');
 };
 
 subtest 'MiniMax static models' => sub {
@@ -451,6 +481,16 @@ subtest 'HuggingFace list_models with search' => sub {
   my $request = $engine->list_models_request(search => 'llama');
   like($request->uri, qr{search=llama}, 'Search parameter in URL');
   like($request->uri, qr{inference_provider=all}, 'inference_provider filter in URL');
+};
+
+subtest 'OpenAICompatible list_models guard for unsupported operations' => sub {
+  plan tests => 2;
+
+  my $engine = Langertha::Engine::Perplexity->new(api_key => 'test-key');
+  ok(!$engine->can_operation('listModels'), 'Perplexity does not support listModels operation');
+
+  my $nous = Langertha::Engine::NousResearch->new(api_key => 'test-key');
+  ok(!$nous->can_operation('listModels'), 'NousResearch does not support listModels operation');
 };
 
 done_testing;

@@ -1,5 +1,5 @@
 package Langertha::Knarr::Router;
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 # ABSTRACT: Model name to Langertha engine routing with caching
 use Moo;
 use Carp qw( croak );
@@ -144,7 +144,7 @@ sub _discover_models {
       }
     };
     if ($@) {
-      $log->warnf("Model discovery failed for %s: %s", $engine_class, $@);
+      $log->debugf("Model discovery skipped for %s: %s", $engine_class, $@);
     }
   }
 }
@@ -181,6 +181,13 @@ sub list_models {
   return \@models;
 }
 
+sub is_passthrough_model {
+  my ($self, $model) = @_;
+  return 0 unless defined $model && length $model;
+  my @r = eval { $self->resolve($model, skip_default => 1) };
+  return @r ? 0 : 1;
+}
+
 
 1;
 
@@ -196,7 +203,7 @@ Langertha::Knarr::Router - Model name to Langertha engine routing with caching
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

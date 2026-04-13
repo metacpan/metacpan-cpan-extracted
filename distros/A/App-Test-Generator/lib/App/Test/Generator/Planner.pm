@@ -9,11 +9,11 @@ use App::Test::Generator::Planner::Fixture;
 use App::Test::Generator::Planner::Mock;
 use App::Test::Generator::Planner::Grouping;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 

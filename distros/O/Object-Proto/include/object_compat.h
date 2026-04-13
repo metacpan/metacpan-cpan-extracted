@@ -127,15 +127,16 @@
 #endif
 
 /* Perl_xs_boot_epilog - introduced in 5.21.6 (use 5.22 as safe boundary)
- * Use PERL_IMPLICIT_CONTEXT not USE_ITHREADS - that's what controls aTHX_ expansion */
+ * On older perls, just return from the boot function.
+ * We define a single-arg wrapper to avoid aTHX_ preprocessing issues:
+ * the C preprocessor counts macro args before expanding aTHX_, so
+ * Perl_xs_boot_epilog(aTHX_ ax) is seen as 1 arg, not 2. */
 #if !PERL_VERSION_GE(5,22,0)
-#  ifndef Perl_xs_boot_epilog
-#    ifdef PERL_IMPLICIT_CONTEXT
-#      define Perl_xs_boot_epilog(ctx, ax) XSRETURN_YES
-#    else
-#      define Perl_xs_boot_epilog(ax) XSRETURN_YES
-#    endif
+#  ifndef OBJECT_PROTO_XS_BOOT_EPILOG
+#    define OBJECT_PROTO_XS_BOOT_EPILOG(ax) XSRETURN_YES
 #  endif
+#else
+#  define OBJECT_PROTO_XS_BOOT_EPILOG(ax) Perl_xs_boot_epilog(aTHX_ ax)
 #endif
 
 /* XS_EXTERNAL - introduced in 5.16 */

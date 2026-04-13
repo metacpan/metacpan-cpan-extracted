@@ -4,7 +4,7 @@
       "John Peacock <jpeacock@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -58,6 +58,6 @@
          "web" : "https://github.com/Perl/version.pm"
       }
    },
-   "version" : "0.9933",
+   "version" : "0.9934",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

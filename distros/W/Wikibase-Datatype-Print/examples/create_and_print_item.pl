@@ -10,8 +10,8 @@ use Wikibase::Datatype::Reference;
 use Wikibase::Datatype::Sitelink;
 use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
+use Wikibase::Datatype::Term;
 use Wikibase::Datatype::Value::Item;
-use Wikibase::Datatype::Value::Monolingual;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 
@@ -114,48 +114,48 @@ my $statement2 = Wikibase::Datatype::Statement->new(
 # Main item.
 my $obj = Wikibase::Datatype::Item->new(
         'aliases' => [
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'cs',
                         'value' => decode_utf8('Douglas Noël Adams'),
                 ),
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'cs',
                         'value' => 'Douglas Noel Adams',
                 ),
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'cs',
                         'value' => 'Douglas N. Adams',
                 ),
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'en',
                         'value' => 'Douglas Noel Adams',
                 ),
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'en',
                         'value' => decode_utf8('Douglas Noël Adams'),
                 ),
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'en',
                         'value' => 'Douglas N. Adams',
                 ),
         ],
         'descriptions' => [
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'cs',
                         'value' => decode_utf8('anglický spisovatel, humorista a dramatik'),
                 ),
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'en',
                         'value' => 'English writer and humorist',
                 ),
         ],
         'id' => 'Q42',
         'labels' => [
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'cs',
                         'value' => 'Douglas Adams',
                 ),
-                Wikibase::Datatype::Value::Monolingual->new(
+                Wikibase::Datatype::Term->new(
                         'language' => 'en',
                         'value' => 'Douglas Adams',
                 ),

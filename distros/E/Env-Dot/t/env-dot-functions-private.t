@@ -3,14 +3,16 @@
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strict;
 use warnings;
-use Test2::V0;
 
 use Carp;
+use Cwd        qw( getcwd abs_path );
 use FileHandle ();
 use File::Path qw( make_path );
 use File::Spec ();
 use File::Temp ();
-use Cwd        qw( getcwd abs_path );
+
+use Test2::V1             qw( -utf8 -x );
+use Test2::Tools::Subtest qw( subtest_streamed );
 
 use Env::Dot::Functions ();
 
@@ -24,7 +26,7 @@ sub create_case_one {
         DIR      => File::Spec->tmpdir,
     );
     my $dir_path = abs_path( $dir->dirname );
-    note "Created temp dir: $dir_path";
+    T2->note("Created temp dir: $dir_path");
     make_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' ) );
 
     my $fh_root_env = FileHandle->new( File::Spec->catfile( $dir_path, 'root', '.env' ), 'w' );
@@ -70,34 +72,34 @@ DIR_COMMON_VAR="dir"
 SUBDIR_COMMON_VAR="dir"
 END_OF_FILE
 
-subtest 'Private Subroutine _interpret_opts()' => sub {
+subtest_streamed 'Private Subroutine _interpret_opts()' => sub {
 
     {
         my $opts_str = 'exact=1';
         my $opts     = Env::Dot::Functions::_interpret_opts($opts_str);
         my %expected = ( exact => 1, );
-        is( $opts, \%expected, 'Read options successfully' );
+        T2->is( $opts, \%expected, 'Read options successfully' );
     }
 
     {
         my $opts_str = 'exact=0';
         my $opts     = Env::Dot::Functions::_interpret_opts($opts_str);
         my %expected = ( exact => 0, );
-        is( $opts, \%expected, 'Read options successfully' );
+        T2->is( $opts, \%expected, 'Read options successfully' );
     }
 
     {
         my $opts_str = 'exact=123';
         my $opts     = Env::Dot::Functions::_interpret_opts($opts_str);
         my %expected = ( exact => 123, );
-        is( $opts, \%expected, 'Read options successfully' );
+        T2->is( $opts, \%expected, 'Read options successfully' );
     }
 
     {
         my $opts_str = 'exact=1.234';
         my $opts     = Env::Dot::Functions::_interpret_opts($opts_str);
         my %expected = ( exact => 1.234, );
-        is( $opts, \%expected, 'Read options successfully' );
+        T2->is( $opts, \%expected, 'Read options successfully' );
     }
 
     {
@@ -107,7 +109,7 @@ subtest 'Private Subroutine _interpret_opts()' => sub {
             exact => 1,
             234   => 1,    # Option without a value is interpreted as boolean with true value.
         );
-        is( $opts, \%expected, 'Read options successfully, but options not valid' );
+        T2->is( $opts, \%expected, 'Read options successfully, but options not valid' );
     }
 
     {
@@ -120,13 +122,13 @@ subtest 'Private Subroutine _interpret_opts()' => sub {
             key_4 => 'more text',
             key_5 => q{},
         );
-        is( $opts, \%expected, 'Read options successfully' );
+        T2->is( $opts, \%expected, 'Read options successfully' );
     }
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Private Subroutine _interpret_dotenv()' => sub {
+subtest_streamed 'Private Subroutine _interpret_dotenv()' => sub {
 
     my $dummy_fp = '/dummy/path/to/.env';
 
@@ -137,7 +139,7 @@ subtest 'Private Subroutine _interpret_dotenv()' => sub {
 FIRST_VAR='My first var'
 END_OF_TEXT
 
-        like(
+        T2->like(
             dies { Env::Dot::Functions::_interpret_dotenv( $dummy_fp, split qr{\n}msx, $dotenv ) },
             qr{^ Unknown \s envdot \s option: \s 'unknown:option'! \s line \s 1 \s file \s '$dummy_fp' .* $}msx,
             'Died because of unknown option error',
@@ -151,7 +153,7 @@ FIRST_VAR='My first var'
 # envdot (bad:option)
 END_OF_TEXT
 
-        like(
+        T2->like(
             dies { Env::Dot::Functions::_interpret_dotenv( $dummy_fp, split qr{\n}msx, $dotenv ) },
             qr{^ Unknown \s envdot \s option: \s 'bad:option'! \s line \s 2 \s file \s '$dummy_fp' .* $}msx,
             'Died because of bad option error',
@@ -167,7 +169,7 @@ SIXTH_VAR = !"#¤&%123.456
 # envdot (:r)
 END_OF_TEXT
 
-        like(
+        T2->like(
             dies { Env::Dot::Functions::_interpret_dotenv( $dummy_fp, split qr{\n}msx, $dotenv ) },
             qr{^ Unknown \s envdot \s option: \s ':r'! \s line \s 4 \s file \s '$dummy_fp' .* $}msx,
             'Died because of invalid line error',
@@ -183,7 +185,7 @@ SIXTH_VAR = !"#¤&%123.456
 qwerty
 END_OF_TEXT
 
-        like(
+        T2->like(
             dies { Env::Dot::Functions::_interpret_dotenv( $dummy_fp, split qr{\n}msx, $dotenv ) },
             qr{^ Invalid \s line: \s 'qwerty'! \s line \s 4 \s file \s '$dummy_fp' .* $}msx,
             'Died because of invalid line error',
@@ -209,7 +211,7 @@ END_OF_TEXT
         my @vars     = @{ $r{'vars'} };
         my %opts     = %{ $r{'opts'} };
         my %def_opts = ( allow_interpolate => 0, );
-        is(
+        T2->is(
             \@vars,
             [
                 { name => q{FIRST_VAR},  value => q{My first var},    opts => \%def_opts, },
@@ -220,7 +222,7 @@ END_OF_TEXT
             ],
             'dotenv file correctly interpreted'
         );
-        is(
+        T2->is(
             \%opts,
             {
                 'read:from_parent'          => 1,
@@ -255,7 +257,7 @@ END_OF_TEXT
         my %opts     = %{ $r{'opts'} };
         my %def_opts = ( allow_interpolate => 0, );
         ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-        is(
+        T2->is(
             \@vars,
             [
                 { name => q{THIRD_VAR},   value => q{My third var},                                   opts => \%def_opts, },
@@ -268,7 +270,7 @@ END_OF_TEXT
             ],
             'dotenv file correctly interpreted'
         );
-        is(
+        T2->is(
             \%opts,
             {
                 'read:from_parent'          => 1,
@@ -291,7 +293,7 @@ END_OF_TEXT
         my @vars     = @{ $r{'vars'} };
         my %opts     = %{ $r{'opts'} };
         my %def_opts = ( allow_interpolate => 0, );
-        is(
+        T2->is(
             \@vars,
             [
                 { name => q{FIFTH_VAR}, value => q{123},     opts => \%def_opts, },
@@ -299,7 +301,7 @@ END_OF_TEXT
             ],
             'dotenv file correctly interpreted'
         );
-        is(
+        T2->is(
             \%opts,
             {
                 'read:from_parent'          => 0,
@@ -311,10 +313,10 @@ END_OF_TEXT
         );
     }
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Private subroutine _read_dotenv_file_recursively()' => sub {
+subtest_streamed 'Private subroutine _read_dotenv_file_recursively()' => sub {
     my ( $temp_dir, $temp_dir_path ) = create_case_one( $CASE_ONE_ROOT_ENV, $CASE_TWO_DIR_ENV, $CASE_ONE_SUBDIR_ENV, );
 
     # my $dir_path = File::Spec->catdir( $temp_dir_path, 'root', 'dir' );
@@ -326,7 +328,7 @@ subtest 'Private subroutine _read_dotenv_file_recursively()' => sub {
     my $org_dir = getcwd;
     chdir $subdir_path || croak;
 
-    like(
+    T2->like(
         ## no critic (RegularExpressions::ProhibitComplexRegexes)
         dies { Env::Dot::Functions::_read_dotenv_file_recursively($subdir_filepath) },
 
@@ -338,10 +340,10 @@ subtest 'Private subroutine _read_dotenv_file_recursively()' => sub {
 
     chdir $org_dir || croak;
 
-    done_testing;
+    T2->done_testing;
 };
 
-subtest 'Private subroutine _get_parent_dotenv_filepath()' => sub {
+subtest_streamed 'Private subroutine _get_parent_dotenv_filepath()' => sub {
     my ( $temp_dir, $temp_dir_path ) = create_case_one( $CASE_ONE_ROOT_ENV, $CASE_ONE_DIR_ENV, $CASE_ONE_SUBDIR_ENV, );
 
     my $root_path       = File::Spec->catdir( $temp_dir_path, 'root' );
@@ -356,26 +358,26 @@ subtest 'Private subroutine _get_parent_dotenv_filepath()' => sub {
     chdir $subdir_path || croak;
 
     my $parent_filepath = Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath);
-    is( $parent_filepath, $dir_filepath, 'correct parent dir and .env file' );
+    T2->is( $parent_filepath, $dir_filepath, 'correct parent dir and .env file' );
 
     $parent_filepath = Env::Dot::Functions::_get_parent_dotenv_filepath($parent_filepath);
-    is( $parent_filepath, $root_filepath, 'correct parent dir and .env file' );
+    T2->is( $parent_filepath, $root_filepath, 'correct parent dir and .env file' );
 
-    # # This is bit dangerous because the user could have .env file
+    # # This is a bit dangerous because the user could have .env file
     # # in root or in /tmp.
     # # Fix this.
     # $parent_filepath = Env::Dot::Functions::_get_parent_dotenv_filepath($parent_filepath);
-    # is( $parent_filepath, undef, 'correct parent dir and .env file' );
+    # T2->is( $parent_filepath, undef, 'correct parent dir and .env file' );
 
     # Jump over middle directory.
     unlink $dir_filepath;
-    note "Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath)";
+    T2->note("Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath)");
     $parent_filepath = Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath);
-    is( $parent_filepath, $root_filepath, 'correct parent dir and .env file' );
+    T2->is( $parent_filepath, $root_filepath, 'correct parent dir and .env file' );
 
     chdir $org_dir || croak;
 
-    done_testing;
+    T2->done_testing;
 };
 
-done_testing;
+T2->done_testing;

@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
 	PREREQ_PM => {
 		'BEGIN::Lift' => '0.07',
 		'Devel::Hook' => '0',
-		'Object::Proto' => '0.09',
+		'Object::Proto' => '0.12',
 		'Carp' => '0',
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

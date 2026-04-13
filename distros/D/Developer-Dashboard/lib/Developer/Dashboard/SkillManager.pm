@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.26';
+our $VERSION = '2.34';
 
 use Cwd qw(realpath);
 use File::Path qw(make_path remove_tree);
@@ -27,13 +27,13 @@ sub new {
       );
 
     return bless {
-        paths       => $paths,
-        skills_root => $paths->skills_root,
+        paths => $paths,
     }, $class;
 }
 
 # install($git_url)
-# Clones a Git repository as a skill into ~/.developer-dashboard/skills/<repo-name>/
+# Clones a Git repository as a skill into the deepest participating
+# DD-OOP-LAYERS skills root.
 # Input: Git URL (can be git@, https://, file:///, etc.)
 # Output: hash ref with success status and repo name.
 sub install {
@@ -43,10 +43,11 @@ sub install {
     my $repo_name = _extract_repo_name($git_url);
     return { error => "Unable to extract repo name from $git_url" } if !$repo_name;
 
-    my $skill_path = File::Spec->catdir( $self->{skills_root}, $repo_name );
+    my $skills_root = $self->{paths}->skills_root;
+    my $skill_path = File::Spec->catdir( $skills_root, $repo_name );
     return { error => "Skill '$repo_name' already installed at $skill_path" } if -d $skill_path;
 
-    $self->{paths}->ensure_dir( $self->{skills_root} );
+    $self->{paths}->ensure_dir($skills_root);
 
     my ( $stdout, $stderr, $exit ) = capture {
         system( 'git', 'clone', $git_url, $skill_path );
@@ -70,7 +71,8 @@ sub install {
 }
 
 # uninstall($repo_name)
-# Removes a skill completely from ~/.developer-dashboard/skills/<repo-name>/
+# Removes the effective layered skill instance completely from its active skills
+# root.
 # Input: skill repo name.
 # Output: hash ref with success status.
 sub uninstall {
@@ -80,10 +82,16 @@ sub uninstall {
     
     my $skill_path = $self->get_skill_path( $repo_name, include_disabled => 1 );
     return { error => "Skill '$repo_name' not found" } if !defined $skill_path || !-d $skill_path;
-    my $real_root = realpath( $self->{skills_root} ) || $self->{skills_root};
     my $real_path = realpath($skill_path) || $skill_path;
-    return { error => "Refusing to uninstall path outside skills root: $skill_path" }
-      if index( $real_path, $real_root . '/' ) != 0;
+    my $inside_layer = 0;
+    for my $skills_root ( $self->{paths}->skills_roots ) {
+        my $real_root = realpath($skills_root) || $skills_root;
+        if ( index( $real_path, $real_root . '/' ) == 0 ) {
+            $inside_layer = 1;
+            last;
+        }
+    }
+    return { error => "Refusing to uninstall path outside skills root: $skill_path" } if !$inside_layer;
 
     my $error;
     remove_tree( $skill_path, { error => \$error } );
@@ -186,20 +194,13 @@ sub disable {
 # Output: array ref of skill metadata hashes.
 sub list {
     my ($self) = @_;
-    
-    return [] if !-d $self->{skills_root};
-    
-    opendir( my $dh, $self->{skills_root} ) or return [];
     my @skills;
-    
-    for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
-        my $skill_path = File::Spec->catdir( $self->{skills_root}, $entry );
-        next unless -d $skill_path;
-        
+
+    for my $skill_path ( $self->{paths}->installed_skill_roots( include_disabled => 1 ) ) {
+        my $entry = basename($skill_path);
         push @skills, $self->_skill_metadata( $entry, $skill_path );
     }
-    
-    closedir($dh);
+
     return \@skills;
 }
 
@@ -209,13 +210,13 @@ sub list {
 # Output: skill path string or undef.
 sub get_skill_path {
     my ( $self, $repo_name, %args ) = @_;
-    
     return if !$repo_name;
-    
-    my $skill_path = File::Spec->catdir( $self->{skills_root}, $repo_name );
-    return if !-d $skill_path;
-    return if !$args{include_disabled} && $self->_skill_disabled($skill_path);
-    return $skill_path;
+
+    for my $skill_path ( $self->{paths}->installed_skill_roots(%args) ) {
+        next if basename($skill_path) ne $repo_name;
+        return $skill_path;
+    }
+    return;
 }
 
 # is_enabled($repo_name)
@@ -620,17 +621,19 @@ Manages the lifecycle of installed dashboard skills:
 - List: Show all installed skills
 - Resolve: Find skill paths and metadata
 
-Skills are isolated under ~/.developer-dashboard/skills/<repo-name>/
+Skills are isolated under the active DD-OOP-LAYERS skills root such as
+~/.developer-dashboard/skills/<repo-name>/ or
+<project>/.developer-dashboard/skills/<repo-name>/
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This module installs, updates, removes, and lists dashboard skills. It manages the on-disk skill root under F<~/.developer-dashboard/skills/>, clones or updates Git-backed skill repos, prepares the expected directory layout, and helps the rest of the runtime locate installed skills.
+This module installs, updates, removes, and lists dashboard skills. It manages the on-disk skill roots under the active C<DD-OOP-LAYERS> chain, clones or updates Git-backed skill repos, prepares the expected directory layout, and helps the rest of the runtime locate the effective skill for one repo name from deepest layer back to home.
 
 =head1 WHY IT EXISTS
 
-It exists because skill lifecycle management is not the same as skill execution. The dashboard needs one module that owns where skills live, how they are installed or refreshed, and how command and bookmark dispatchers find them later.
+It exists because skill lifecycle management is not the same as skill execution. The dashboard needs one module that owns where skills live, how they are installed or refreshed, how layered skill roots shadow one another, and how command and bookmark dispatchers find the effective skill later.
 
 =head1 WHEN TO USE
 

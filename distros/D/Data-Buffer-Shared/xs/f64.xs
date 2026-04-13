@@ -17,8 +17,8 @@ DESTROY(SV* self_sv)
         if (!SvROK(self_sv)) return;
         BufHandle* h = INT2PTR(BufHandle*, SvIV(SvRV(self_sv)));
         if (!h) return;
-        buf_close_map(h);
         sv_setiv(SvRV(self_sv), 0);
+        buf_close_map(h);
 
 SV*
 get(SV* self_sv, UV idx)

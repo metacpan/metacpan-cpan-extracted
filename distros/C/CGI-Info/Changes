@@ -1,5 +1,9 @@
 Revision history for CGI-Info
 
+1.13	Sun Apr 12 08:49:24 EDT 2026
+	Fixed test failures on Windows, e.g. https://www.cpantesters.org/cpan/report/5bf7930a-7048-1014-8eeb-cabb5837fa32
+	Bump Test::Mockingbird version, fixes https://www.cpantesters.org/cpan/report/5992cad6-3527-11f1-a62b-8d83cf1a6737
+
 1.12	Sun Apr  5 17:46:12 EDT 2026
 	as_string should not return undef
 	Added mutation tests and LCSAJ data to the test dashboard

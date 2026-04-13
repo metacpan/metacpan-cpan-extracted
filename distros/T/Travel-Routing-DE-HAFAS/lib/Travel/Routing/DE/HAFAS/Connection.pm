@@ -11,7 +11,7 @@ use DateTime::Duration;
 use Travel::Routing::DE::HAFAS::Utils;
 use Travel::Routing::DE::HAFAS::Connection::Section;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 Travel::Routing::DE::HAFAS::Connection->mk_ro_accessors(
 	qw(changes duration sched_dep rt_dep sched_arr rt_arr dep arr dep_platform arr_platform dep_loc arr_loc dep_cancelled arr_cancelled is_cancelled load)
@@ -213,7 +213,7 @@ Travel::Routing::DE::HAFAS::Connection - A single connection between two stops
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 
@@ -339,7 +339,7 @@ Travel::Routing::DE::HAFAS(3pm), Travel::Routing::DE::HAFAS::Connection::Section
 
 =head1 AUTHOR
 
-Copyright (C) 2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2023-2026 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

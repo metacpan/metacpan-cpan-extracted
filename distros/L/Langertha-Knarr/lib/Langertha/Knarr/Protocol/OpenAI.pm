@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::OpenAI;
 # ABSTRACT: OpenAI-compatible wire protocol (chat/completions, models) for Knarr
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
@@ -31,6 +31,12 @@ sub protocol_routes {
 sub parse_chat_request {
   my ($self, $http_req, $body_ref) = @_;
   my $data = $self->_json->decode( $$body_ref || '{}' );
+  # Capture auth headers for passthrough
+  my %fwd;
+  for my $h (qw( authorization )) {
+    my $v = scalar $http_req->header($h);
+    $fwd{$h} = $v if defined $v && length $v;
+  }
   return Langertha::Knarr::Request->new(
     protocol    => 'openai',
     raw         => $data,
@@ -41,6 +47,7 @@ sub parse_chat_request {
     max_tokens  => $data->{max_tokens},
     tools       => $data->{tools},
     session_id  => $data->{user} // scalar( $http_req->header('X-Session-Id') ),
+    extra       => { forward_headers => \%fwd },
   );
 }
 
@@ -101,7 +108,7 @@ Langertha::Knarr::Protocol::OpenAI - OpenAI-compatible wire protocol (chat/compl
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 package Langertha::Knarr::Protocol::ACP;
 # ABSTRACT: BeeAI/IBM Agent Communication Protocol (ACP) for Knarr
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use JSON::MaybeXS;
 use Data::UUID;
@@ -136,7 +136,7 @@ Langertha::Knarr::Protocol::ACP - BeeAI/IBM Agent Communication Protocol (ACP) f
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 

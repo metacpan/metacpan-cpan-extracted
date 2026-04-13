@@ -1,5 +1,17 @@
 Revision history for XML-Sig
 
+0.70 -- Sun Apr 12 16:03:32 ADT 2026
+
+  [Notable Changes since 0.69]
+  - This version allow better exception handling by capturing the
+  XML::LibXML croak that occurs when load_xml fails.
+  - Fixed smoker builds when Crypt::OpenSSL::DSA < 0.20
+
+  [Change Log]
+  - 66f99a9 (origin/dsa, dsa) Crypt::OpenSSL::DSA >= 0.20 required if it is installed
+  - 47fcc92 Should croak if XML is blank or load_xml fails
+  - fd03a4e v0.69
+
 0.69 -- Sat Jan 10 20:16:50 AST 2026
 
   [Notable Changes since 0.67]

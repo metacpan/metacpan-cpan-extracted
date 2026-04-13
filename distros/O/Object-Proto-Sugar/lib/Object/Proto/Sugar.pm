@@ -8,7 +8,7 @@ use Devel::Hook;
 use Object::Proto;
 use Carp qw/croak/;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 use constant ro => 'ro';
 use constant is_ro => ( is => ro );
@@ -29,7 +29,7 @@ use constant dhash => (isa => 'HashRef', default => {});
 use constant darray => (isa => 'ArrayRef', default => []);
 use constant dstr => (isa => 'Str', default => "");
 
-our (%valid_types, @type_list, %valid_constants, %modifier_dispatch);
+our (%valid_types, @type_list, %valid_constants, %modifier_dispatch, %accessor_aliases);
 
 BEGIN {
 	@type_list  = @{ Object::Proto::list_types() };
@@ -48,19 +48,21 @@ BEGIN {
 
 sub import {
 	my ($pkg, @import) = @_;
-	no strict 'refs';
 	my $caller = caller();
-	my (@spec, @modifiers, @extends, @with, @requires, $is_role);
+	my (@spec, @modifiers, @extends, @with, @requires, $is_role, $accessor_alias);
 	$is_role = 1 if grep { $_ eq '-role' } @import;
 
 	if (grep { $_ eq '-types' } @import) {
+		no strict 'refs';
 		*{"${caller}::${_}"} = sub { $_ } for @type_list;
 	}
 	if (grep { $_ eq '-constants' } @import) {
+		no strict 'refs';
 		*{"${caller}::${_}"} = \&{"Object::Proto::Sugar::${_}"} for keys %valid_constants;
 	}
 
 	for my $name (@import) {
+		no strict 'refs';
 		next if $name =~ /^-/;
 		if ($name =~ /^[A-Z]/) {
 			croak "Unknown type '$name' requested from Object::Proto::Sugar"
@@ -117,6 +119,10 @@ sub import {
 		($caller, 'requires') => sub { push @requires, @_ }
 	);
 
+	BEGIN::Lift::install(
+		($caller, 'accessor_alias') => sub { $accessor_alias = $_[0] }
+	);
+
 	for my $mod_type (qw/before after around/) {
 		BEGIN::Lift::install(
 			($caller, $mod_type) => sub {
@@ -158,9 +164,14 @@ sub import {
 		}
 		Object::Proto::with($caller, @with) if @with;
 
+		$accessor_aliases{$caller} = $accessor_alias if $accessor_alias;
+
+		my %func_to_attr;
 		while (@spec_copy) {
 			my ($name, $spec) = (shift @spec_copy, shift @spec_copy);
-			push @func_names, _install_func_accessors($caller, $name, $spec);
+			my @fnames = _install_func_accessors($caller, $name, $spec, $accessor_alias);
+			$func_to_attr{$_} = $name for @fnames;
+			push @func_names, @fnames;
 		}
 
 		if (@func_names) {
@@ -170,6 +181,7 @@ sub import {
 
 		{
 			no strict 'refs';
+			no warnings 'redefine';
 			*{"${caller}::import_accessors"} = sub {
 				my ($class, @names) = @_;
 				my $target = caller();
@@ -177,13 +189,15 @@ sub import {
 				# so code compiled after this gets custom ops
 				unless (@names) {
 					for my $pkg (_mro($class)) {
-						Object::Proto::import_accessors($pkg, $target);
+						my $alias = $accessor_aliases{$pkg} || '';
+						Object::Proto::import_accessors($pkg, ($alias ? "${alias}_" : ""), $target);
 					}
 				} else {
 					for my $name (@names) {
+						my $attr = $func_to_attr{$name} || $name;
 						for my $pkg (_mro($class)) {
 							if (defined &{"${pkg}::${name}"}) {
-								Object::Proto::import_accessor($pkg, $name, $name, $target);
+								Object::Proto::import_accessor($pkg, $attr, $name, $target);
 								last;
 							}
 						}
@@ -388,20 +402,24 @@ sub _configure_weak_ref {
 }
 
 sub _install_func_accessors {
-	my ($caller, $name, $spec) = @_;
+	my ($caller, $name, $spec, $alias) = @_;
 	my @installed;
 	if (exists $spec->{accessor}) {
-		my $fname = $spec->{accessor} eq '1' ? $name : $spec->{accessor};
+		my $fname = ($alias && $spec->{accessor} eq '1')
+			? $alias . '_' . $name
+			: $spec->{accessor} eq '1' ? $name : $spec->{accessor};
 		Object::Proto::import_accessor($caller, $name, $fname, $caller);
 		push @installed, $fname;
 	}
 	if (exists $spec->{reader} && !ref $spec->{reader}) {
 		my $fname = $spec->{reader} eq '1' ? "get_$name" : $spec->{reader};
+		$fname = $alias . '_' . $fname if $alias && $spec->{reader} eq '1';
 		Object::Proto::import_accessor($caller, $name, $fname, $caller);
 		push @installed, $fname;
 	}
 	if (exists $spec->{writer} && !ref $spec->{writer}) {
 		my $fname = $spec->{writer} eq '1' ? "set_$name" : $spec->{writer};
+		$fname = $alias . '_' . $fname if $alias && $spec->{writer} eq '1';
 		Object::Proto::import_accessor($caller, $name, $fname, $caller);
 		push @installed, $fname;
 	}
@@ -418,7 +436,7 @@ Object::Proto::Sugar - Moo-se-like syntax for Object::Proto
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -678,6 +696,55 @@ declaration order; C<after> modifiers run in declaration order.
 
 The C<$method> name may be unqualified (resolved to the current package)
 or fully qualified (C<'Other::Package::method'>).
+
+=head2 accessor_alias $prefix
+
+Set a package-level prefix for all function-style accessors installed via
+C<accessor =E<gt> 1>, C<reader =E<gt> 1>, and C<writer =E<gt> 1>. The
+prefix is prepended with an underscore separator. Custom accessor/reader/writer
+names (i.e. not C<1>) are not affected.
+
+	package Point;
+	use Object::Proto::Sugar;
+
+	accessor_alias 'pt';
+
+	has x => ( is => 'rw', accessor => 1 );
+	has y => ( is => 'rw', accessor => 1 );
+
+	# Installs: pt_x(), pt_y() instead of x(), y()
+	# Method accessors $obj->x, $obj->y still work
+
+When used with C<reader> and C<writer>:
+
+	accessor_alias 'db';
+
+	has name => ( is => 'rw', accessor => 1, reader => 1, writer => 1 );
+	# accessor: db_name()
+	# reader:   db_get_name()
+	# writer:   db_set_name()
+
+Each class in an inheritance chain can have its own alias. When
+C<import_accessors> is called, each class's accessors use that class's
+alias:
+
+	package Vehicle;
+	use Object::Proto::Sugar;
+	accessor_alias 'v';
+	has speed => ( is => 'rw', accessor => 1 );
+
+	package Car;
+	use Object::Proto::Sugar;
+	extends 'Vehicle';
+	accessor_alias 'c';
+	has brand => ( is => 'rw', accessor => 1 );
+
+	package main;
+	Car->import_accessors;
+	# Imports: c_brand() from Car, v_speed() from Vehicle
+
+Without C<accessor_alias>, C<accessor =E<gt> 1> installs a function named
+after the attribute as before.
 
 =head1 ROLES
 

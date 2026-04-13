@@ -1,5 +1,14 @@
 Revision history for Env-Dot
 
+0.022     2026-04-12 21:09:04+02:00 Europe/Stockholm
+            * Rename variable var to variable.
+            * Downgrade LICENSE files to match the current Software::License distro version files with typos, whitespace and all.
+            * Improve GitHub Action workflow for Linux.
+            * Fix broken GitHub Action workflow for Windows.
+            * Explicitely return undef from a sub as sub doc decrees. Suppress warning.
+            * Rewrite all tests using Test2::V1.
+            * Rewrite t/required-dotenv.t using Test2::Tools::GenTemp.
+
 0.021     2026-04-07 15:47:56+02:00 Europe/Stockholm
             * Update workflow because perldocker image now supports earlier versions.
             * Rework required-dotenv tests to generate .env files and scripts at runtime, since .env files are not included in the build by default.

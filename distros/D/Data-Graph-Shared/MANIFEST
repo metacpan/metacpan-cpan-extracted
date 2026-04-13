@@ -1,0 +1,23 @@
+.github/workflows/ci.yml
+bench/single.pl
+Changes
+eg/basic.pl
+eg/bfs.pl
+eg/connected_components.pl
+eg/cross_process.pl
+eg/dependency_graph.pl
+eg/dijkstra.pl
+eg/pagerank.pl
+eg/topological_sort.pl
+graph.h
+lib/Data/Graph/Shared.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+Shared.xs
+t/01-basic.t
+xt/fd_leak.t
+xt/stress.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

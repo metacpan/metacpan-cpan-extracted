@@ -19,28 +19,51 @@ prove -lv t/10-config.t  # Single test, verbose
 ### Request Flow
 
 ```
-Client → [OpenAI|Anthropic|Ollama format] → Knarr Proxy → Router → Langertha Engine → Backend
-                                               ↓
-                                          Langfuse Tracing
+Client → [OpenAI|Anthropic|Ollama format] → Knarr Proxy
+                                               │
+                                    ┌──────────┴──────────┐
+                                    │                     │
+                              Model configured?      Passthrough
+                                    │                     │
+                              Router → Engine        Raw HTTP 1:1
+                                    │                     │
+                              Langfuse Tracing       Langfuse Tracing
 ```
+
+Unconfigured models go through **raw passthrough** — all HTTP bytes (headers,
+body, SSE chunks) are piped 1:1 to the upstream API. This preserves tool_use,
+usage data, cache_control, and all protocol-specific metadata.
 
 ### Module Structure
 
-- **Langertha::Knarr** — Mojolicious app builder, route wiring
+- **Langertha::Knarr** — IO::Async server, dispatch, raw passthrough
 - **Langertha::Knarr::Config** — YAML config loader, validation, env scanning
 - **Langertha::Knarr::Router** — Model → Engine routing with caching + auto-discovery
 - **Langertha::Knarr::Tracing** — Langfuse trace/generation per request
-- **Langertha::Knarr::Proxy::OpenAI** — `/v1/chat/completions`, `/v1/models`, `/v1/embeddings`
-- **Langertha::Knarr::Proxy::Anthropic** — `/v1/messages`
-- **Langertha::Knarr::Proxy::Ollama** — `/api/chat`, `/api/tags`, `/api/ps`
+- **Langertha::Knarr::RequestLog** — JSONL per-request logging
+- **Langertha::Knarr::Protocol::OpenAI** — `/v1/chat/completions`, `/v1/models`, `/v1/embeddings`
+- **Langertha::Knarr::Protocol::Anthropic** — `/v1/messages`
+- **Langertha::Knarr::Protocol::Ollama** — `/api/chat`, `/api/tags`, `/api/ps`
+- **Langertha::Knarr::Protocol::A2A** — Google Agent2Agent JSON-RPC
+- **Langertha::Knarr::Protocol::ACP** — BeeAI/Linux Foundation ACP
+- **Langertha::Knarr::Protocol::AGUI** — CopilotKit AG-UI
+- **Langertha::Knarr::Handler** — Moose role for all handlers
+- **Langertha::Knarr::Handler::Router** — Model routing, passthrough fallback
+- **Langertha::Knarr::Handler::Passthrough** — Raw HTTP forwarding to upstream APIs
+- **Langertha::Knarr::Handler::Tracing** — Langfuse decorator (wraps any handler)
+- **Langertha::Knarr::Handler::RequestLog** — JSONL logging decorator
+- **Langertha::Knarr::Handler::Engine** — Single Langertha engine handler
+- **Langertha::Knarr::Handler::Raider** — Per-session Langertha::Raider
+- **Langertha::Knarr::Handler::Code** — Coderef handler (tests/fakes)
+- **Langertha::Knarr::Handler::A2AClient** — Remote A2A agent consumer
+- **Langertha::Knarr::Handler::ACPClient** — Remote ACP agent consumer
 - **Langertha::Knarr::CLI** — MooX::Cmd entry point
-- **Langertha::Knarr::CLI::Cmd::Start** — `knarr start`
+- **Langertha::Knarr::CLI::Cmd::Start** — `knarr start` (also `--from-env` for Docker)
 - **Langertha::Knarr::CLI::Cmd::Models** — `knarr models`
 - **Langertha::Knarr::CLI::Cmd::Check** — `knarr check`
 - **Langertha::Knarr::CLI::Cmd::Init** — `knarr init` (env scanning, config generation)
-- **Langertha::Knarr::CLI::Cmd::Container** — `knarr container` (auto-start from ENV, Docker mode)
 
-### Three Streaming Formats
+### Streaming Formats
 
 | Format | Protocol | End Marker |
 |--------|----------|------------|
@@ -50,18 +73,19 @@ Client → [OpenAI|Anthropic|Ollama format] → Knarr Proxy → Router → Lange
 
 ## OOP Framework
 
-Moo (not Moose). CLI uses MooX::Cmd + MooX::Options.
+- **Moose**: Knarr.pm, Handler role, all Handler::* modules, Protocol::* modules, Request, Session, Stream
+- **Moo**: CLI, Config, Router, Tracing, RequestLog
+
+CLI uses MooX::Cmd + MooX::Options.
 
 ## Config Format
 
-Default: listens on 127.0.0.1:8080 (OpenAI/Anthropic) + 127.0.0.1:11434 (Ollama).
-vLLM default port 8000 can be added.
+Default host `0.0.0.0`, ports 8080 + 11434.
 
 ```yaml
 listen:
-  - "127.0.0.1:8080"
-  - "127.0.0.1:11434"
-  # - "127.0.0.1:8000"  # vLLM port
+  - "0.0.0.0:8080"
+  - "0.0.0.0:11434"
 models:
   gpt-4o:
     engine: OpenAI
@@ -78,28 +102,35 @@ passthrough:
 
 ### Passthrough Mode
 
-Passthrough is the default: requests go directly to upstream APIs using the
-client's own API key. Models with explicit config are routed via Langertha
-engines instead. Enabled by default in container mode. Config: `passthrough: true`
-or per-format with URLs.
+Passthrough is the default: unconfigured models go directly to upstream APIs
+using the client's own API key and headers (piped 1:1 as raw bytes). Models
+with explicit config are routed via Langertha engines instead. Both paths
+get Langfuse tracing.
+
+Config: `passthrough: true` or per-format with URLs.
 
 ## Testing
 
 ```bash
 prove -l t/         # All tests
 prove -lv t/10-config.t   # Config tests
-prove -lv t/50-integration.t  # Integration with Test::Mojo
 ```
 
 ## CLI
 
 ```bash
-knarr start                           # Start proxy (requires config file)
-knarr start --port 9090               # Custom port
-knarr container                       # Auto-start from ENV (Docker mode)
-knarr models                          # List models
-knarr models --format json            # JSON output
-knarr check                           # Validate config
-knarr init                            # Generate config from env
-knarr init -e .env -e .env.local      # Scan .env files
+knarr start                                # Start with ./knarr.yaml
+knarr start -c production.yaml             # Custom config
+knarr start --from-env                     # Auto-detect config from ENV
+knarr start --from-env -p 8080 -p 11434   # ENV config, custom ports
+knarr start -p 9090                        # Single port
+knarr models                               # List models
+knarr models --format json                 # JSON output
+knarr check                                # Validate config
+knarr init                                 # Generate config from env
+knarr init -e .env -e .env.local           # Scan .env files
 ```
+
+## Environment
+
+- `KNARR_DEBUG=1` — Enable verbose logging (same as `--verbose`)

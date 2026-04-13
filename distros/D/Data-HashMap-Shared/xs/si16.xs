@@ -25,8 +25,8 @@ DESTROY(SV* self_sv)
         if (!SvROK(self_sv)) return;
         ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
         if (!h) return;
-        shm_close_map(h);
         sv_setiv(SvRV(self_sv), 0);
+        shm_close_map(h);
 
 bool
 put(SV* self_sv, SV* key_sv, int16_t value)

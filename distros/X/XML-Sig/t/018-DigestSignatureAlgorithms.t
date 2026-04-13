@@ -9,11 +9,8 @@ push @hash, 'ripemd160' if $xmlsec->{ripemd160};
 push @hash, 'sha1' if $xmlsec->{sha1_support};
 
 SKIP: {
-    eval {
-        require Crypt::OpenSSL::DSA;
-    };
     my $algs = scalar @hash;
-    skip "Crypt::OpenSSL::DSA not installed", 3 * $algs * 9 if ($@);
+    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 3 * $algs * 9 if (!test_dsa_ok());
 # DSA key size determinst the signature length and therfore the signature hashing algorithm
 foreach my $key ('t/dsa.private.key', 't/dsa.private-2048.key', 't/dsa.private-3072.key') {
     # DSA Keys with noX509

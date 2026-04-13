@@ -1170,6 +1170,7 @@ typedef struct {
 struct FuncAccessorData_s {
     IV slot_idx;
     ClassMeta *expected_class;  /* Class this accessor expects */
+    SlotSpec *spec;             /* Slot spec (for lazy support), may be NULL */
     IV registry_id;             /* ID in g_func_accessor_registry */
 };
 
@@ -1655,10 +1656,43 @@ static OP* pp_object_func_get(pTHX) {
     }
 
     /* Direct array access — no SvOK needed (func path has no prototype chain) */
+    sv = NULL;
     if (idx <= AvFILLp(av)) {
         sv = AvARRAY(av)[idx];
-        if (sv) {
+        if (sv && SvOK(sv)) {
             SETs(sv);
+            RETURN;
+        }
+    }
+
+    /* Lazy initialization for func accessors */
+    if (data->spec && data->spec->is_lazy) {
+        SlotSpec *spec = data->spec;
+        SV *built_val = NULL;
+        if (spec->has_builder && spec->builder_name) {
+            const char *builder = SvPV_nolen(spec->builder_name);
+            int count;
+            ENTER; SAVETMPS; PUSHMARK(SP);
+            XPUSHs(obj);
+            PUTBACK;
+            count = call_method(builder, G_SCALAR);
+            SPAGAIN;
+            if (count > 0) built_val = newSVsv(POPs);
+            else built_val = newSV(0);
+            PUTBACK; FREETMPS; LEAVE;
+        } else if (spec->has_default && spec->default_sv) {
+            if (SvROK(spec->default_sv)) {
+                SV *inner = SvRV(spec->default_sv);
+                if (SvTYPE(inner) == SVt_PVAV) built_val = newRV_noinc((SV*)newAV());
+                else if (SvTYPE(inner) == SVt_PVHV) built_val = newRV_noinc((SV*)newHV());
+                else built_val = newSVsv(spec->default_sv);
+            } else {
+                built_val = newSVsv(spec->default_sv);
+            }
+        }
+        if (built_val) {
+            av_store(av, idx, built_val);
+            SETs(built_val);
             RETURN;
         }
     }
@@ -1824,18 +1858,51 @@ XS_INTERNAL(xs_func_accessor_fallback) {
         ST(0) = ST(1);
     } else {
         /* Direct array access */
+        SV *sv = NULL;
         if (idx <= AvFILLp(av)) {
-            SV *sv = AvARRAY(av)[idx];
-            ST(0) = (sv && SvOK(sv)) ? sv : &PL_sv_undef;
+            sv = AvARRAY(av)[idx];
+        }
+        if ((!sv || !SvOK(sv)) && data->spec && data->spec->is_lazy) {
+            /* Lazy initialization */
+            SlotSpec *spec = data->spec;
+            SV *built_val = NULL;
+            if (spec->has_builder && spec->builder_name) {
+                dSP;
+                const char *builder = SvPV_nolen(spec->builder_name);
+                int count;
+                ENTER; SAVETMPS; PUSHMARK(SP);
+                XPUSHs(ST(0));
+                PUTBACK;
+                count = call_method(builder, G_SCALAR);
+                SPAGAIN;
+                if (count > 0) built_val = newSVsv(POPs);
+                else built_val = newSV(0);
+                PUTBACK; FREETMPS; LEAVE;
+            } else if (spec->has_default && spec->default_sv) {
+                if (SvROK(spec->default_sv)) {
+                    SV *inner = SvRV(spec->default_sv);
+                    if (SvTYPE(inner) == SVt_PVAV) built_val = newRV_noinc((SV*)newAV());
+                    else if (SvTYPE(inner) == SVt_PVHV) built_val = newRV_noinc((SV*)newHV());
+                    else built_val = newSVsv(spec->default_sv);
+                } else {
+                    built_val = newSVsv(spec->default_sv);
+                }
+            }
+            if (built_val) {
+                av_store(av, idx, built_val);
+                ST(0) = built_val;
+            } else {
+                ST(0) = &PL_sv_undef;
+            }
         } else {
-            ST(0) = &PL_sv_undef;
+            ST(0) = (sv && SvOK(sv)) ? sv : &PL_sv_undef;
         }
     }
     XSRETURN(1);
 }
 
 /* Install function-style accessor in caller's namespace */
-static void install_func_accessor(pTHX_ const char *pkg, const char *prop_name, IV idx, ClassMeta *expected_class, int force) {
+static void install_func_accessor(pTHX_ const char *pkg, const char *prop_name, IV idx, ClassMeta *expected_class, int force, SlotSpec *spec) {
     char full_name[256];
     CV *cv;
     SV *ckobj;
@@ -1864,6 +1931,7 @@ static void install_func_accessor(pTHX_ const char *pkg, const char *prop_name, 
     Newx(data, 1, FuncAccessorData);
     data->slot_idx = idx;
     data->expected_class = expected_class;  /* NULL for same-class, set for cross-class */
+    data->spec = spec;                      /* NULL if no spec, used for lazy support */
     registry_id = register_func_accessor_data(aTHX_ data);
 
     cv = newXS(full_name, xs_func_accessor_fallback, __FILE__);
@@ -1924,7 +1992,8 @@ XS_INTERNAL(xs_import_accessors) {
             }
             /* Pass NULL for same-class (skip validation), meta for cross-class */
             install_func_accessor(aTHX_ pkg_pv, install_name, i,
-                                  NULL, 1);  /* No class check, force override */
+                                  NULL, 1,
+                                  (meta->slots && i < meta->slot_count) ? meta->slots[i] : NULL);
         }
     }
 
@@ -1978,7 +2047,8 @@ XS_INTERNAL(xs_import_accessor) {
 
     /* Install with alias name — no class check, work with any compatible object */
     install_func_accessor(aTHX_ pkg_pv, alias_pv, idx,
-                          NULL, 1);  /* force override */
+                          NULL, 1,
+                          (meta->slots && idx < meta->slot_count) ? meta->slots[idx] : NULL);
 
     XSRETURN_EMPTY;
 }
@@ -4631,5 +4701,5 @@ XS_EXTERNAL(boot_Object__Proto) {
     /* Register cleanup for global destruction */
     Perl_call_atexit(aTHX_ object_cleanup_globals, NULL);
 
-    Perl_xs_boot_epilog(aTHX_ ax);
+    OBJECT_PROTO_XS_BOOT_EPILOG(ax);
 }

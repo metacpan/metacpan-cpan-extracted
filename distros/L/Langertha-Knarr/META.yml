@@ -26,8 +26,9 @@ requires:
   HTTP::Request: '0'
   HTTP::Response: '0'
   IO::Async: '0.802'
+  IO::Async::SSL: '0'
   JSON::MaybeXS: '0'
-  Langertha: '0.400'
+  Langertha: '0.401'
   Log::Any: '0'
   MIME::Base64: '0'
   Module::Runtime: '0'
@@ -46,7 +47,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha-knarr/issues
   homepage: https://github.com/Getty/langertha-knarr
   repository: https://github.com/Getty/langertha-knarr.git
-version: '1.000'
+version: '1.001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -317,7 +318,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.000'
+          tag: '1.001'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

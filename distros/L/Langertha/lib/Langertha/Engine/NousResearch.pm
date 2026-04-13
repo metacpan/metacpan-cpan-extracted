@@ -1,12 +1,12 @@
 package Langertha::Engine::NousResearch;
 # ABSTRACT: Nous Research Inference API
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 use Moose;
 use Carp qw( croak );
 
 extends 'Langertha::Engine::OpenAIBase';
 
-with 'Langertha::Role::Tools', 'Langertha::Role::HermesTools';
+with 'Langertha::Role::Tools', 'Langertha::Role::HermesTools', 'Langertha::Role::StaticModels';
 
 
 sub _build_supported_operations {[qw(
@@ -25,6 +25,11 @@ sub _build_api_key {
 }
 
 sub default_model { 'Hermes-4-70B' }
+
+sub _build_static_models {[
+  { id => 'Hermes-4-70B' },
+  { id => 'Hermes-4-405B' },
+]}
 
 has reasoning => (
   is => 'ro',
@@ -76,7 +81,7 @@ Langertha::Engine::NousResearch - Nous Research Inference API
 
 =head1 VERSION
 
-version 0.400
+version 0.401
 
 =head1 SYNOPSIS
 

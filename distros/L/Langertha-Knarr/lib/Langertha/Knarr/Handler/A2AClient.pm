@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::A2AClient;
 # ABSTRACT: Steerboard handler that consumes a remote A2A (Agent2Agent) agent
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 use Moose;
 use Future::AsyncAwait;
 use JSON::MaybeXS;
@@ -111,7 +111,7 @@ Langertha::Knarr::Handler::A2AClient - Steerboard handler that consumes a remote
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

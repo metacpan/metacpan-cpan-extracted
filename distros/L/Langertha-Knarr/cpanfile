@@ -1,5 +1,5 @@
 
-requires 'Langertha', '0.400';
+requires 'Langertha', '0.401';
 requires 'Moose';
 requires 'Moo';
 requires 'MooX::Cmd';
@@ -9,6 +9,7 @@ requires 'Future::AsyncAwait', '>= 0.66';
 requires 'IO::Async', '>= 0.802';
 requires 'Net::Async::HTTP::Server';
 requires 'Net::Async::HTTP';
+requires 'IO::Async::SSL';
 requires 'YAML::PP';
 requires 'JSON::MaybeXS';
 requires 'HTTP::Request';
