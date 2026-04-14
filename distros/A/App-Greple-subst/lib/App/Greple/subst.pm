@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.3305
+Version 2.3701
 
 =head1 SYNOPSIS
 
@@ -15,6 +15,7 @@ greple -Msubst --dict I<dictionary> [ options ]
   Dictionary:
     --dict      dictionary file
     --dictdata  dictionary data
+    --dictpair  dictionary entry pair
 
   Check:
     --check=[ng,ok,any,outstand,all,none]
@@ -53,24 +54,56 @@ If the dictionary file contains following data:
 above command finds the first pattern which does not match the second
 string, that is "colour" and "centre" in this case.
 
-Field C<//> in dictionary data is ignored, so this file can be written
-like this:
+In practice, the last two elements of a space-separated string are
+treated as a pattern and a replacement string, respectively.
+
+Dictionary data can also be written separated by C<//> as follows:
 
     colou?r      //  color
     cent(er|re)  //  center
+
+There must be spaces before and after the C<//>.  In this format,
+strings before and after it are treated as a pattern and replacement
+string, rather than last two element.  Leading spaces and spaces
+before and after C<//> are ignored, but all other whitespace is valid.
 
 You can use same file by B<greple>'s B<-f> option and string after
 C<//> is ignored as a comment in that case.
 
     greple -f DICT ...
 
-Option B<--dictdata> can be used to provide dictionary data in command
-line.
+Option B<--dictdata> can be used to provide dictionary data in the
+command line.
 
-    greple --dictdata $'colou?r color\ncent(er|re) center\n'
+    greple -Msubst \
+           --dictdata $'colou?r color\ncent(er|re) center\n'
+
+Option B<--dictpair> can be used to provide raw dictionary entries in
+the command line.  In this case, no processing is done regarding
+whitespace, comments, or DEFINE expansion.
+
+    greple -Msubst \
+           --dictpair 'colou?r' color \
+           --dictpair 'cent(er|re)' center
 
 Dictionary entry starting with a sharp sign (C<#>) is a comment and
 ignored.
+
+=head2 DEFINE
+
+You can define a named regex pattern in the dictionary file using the
+Perl's DEFINE syntax:
+
+    (?(DEFINE)(?<name>pattern))
+
+The defined pattern can be referenced in the dictionary entries using
+C<(?&name)> syntax.
+
+    (?(DEFINE)(?<digit>\d+))
+    (?&digit)/(?&digit)/(?&digit)  //  YYYY/MM/DD
+
+You can define multiple patterns and use them in combination.  The
+pattern definition must appear before its reference.
 
 =head2 Overlapped pattern
 
@@ -104,6 +137,11 @@ Specify dictionary file.
 =item B<--dictdata>=I<data>
 
 Specify dictionary data by text.
+
+=item B<--dictpair> I<pattern> I<replacement>
+
+Specify dictionary entry pair.  This option takes two parameters.  The
+first is a pattern and the second is a substitution string.
 
 =item B<--check>=C<outstand>|C<ng>|C<ok>|C<any>|C<all>|C<none>
 
@@ -243,7 +281,7 @@ Created from following guideline document.
     発行：2015年9月
     一般財団法人テクニカルコミュニケーター協会 
     Japan Technical Communicators Association
-    https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
+    https://jtca.org/tcwp/wp-content/uploads/2023/06/katakana_guide_3_20171222.pdf
 
 =item B<--jtca>
 
@@ -360,7 +398,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2017-2023 Kazumasa Utashiro.
+Copyright ©︎ 2017-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -368,10 +406,10 @@ it under the same terms as Perl itself.
 =cut
 
 
-use v5.14;
+use v5.18;
 package App::Greple::subst;
 
-our $VERSION = '2.3305';
+our $VERSION = '2.3701';
 
 use warnings;
 use utf8;
@@ -393,6 +431,7 @@ use Carp;
 use Data::Dumper;
 use Text::ParseWords qw(shellwords);
 use Encode;
+use List::Util qw(max sum mesh);
 use Getopt::EX::Colormap qw(colorize);
 use Getopt::EX::LabeledParam;
 use App::Greple::Common;
@@ -415,7 +454,7 @@ our @opt_format;
 our @default_opt_format = ( '%s' );
 our $opt_subst_select;
 our $opt_linefold;
-our $opt_ignore_space = 1;
+our $opt_ignore_space = 0;
 our $opt_warn_overlap = 1;
 our $opt_warn_include = 0;
 our $opt_stat_style = "default";
@@ -426,6 +465,8 @@ our %opt_stat_item = (
     );
 our $opt_show_comment = 0;
 our $opt_show_numbers = 1;
+our $opt_show_dictdir = 0;
+
 my %stat;
 
 my $current_file;
@@ -440,6 +481,11 @@ sub subst_initialize {
 
     state $once_called++ and return;
 
+    if ($opt_show_dictdir) {
+	say "$ENV{GREPLE_SUBST_DICT}";
+	exit;
+    }
+
     Getopt::EX::LabeledParam
 	->new(HASH => \%opt_stat_item)
 	->load_params(@opt_stat_item);
@@ -451,6 +497,13 @@ sub subst_initialize {
     my $config = { linefold  => $opt_linefold,
 		   dictname  => $opt_dictname,
 		   printdict => $opt_printdict };
+    if (@opt_subst_from) {
+	die if @opt_subst_from != @opt_subst_to;
+	push @dicts, App::Greple::subst::Dict->new(
+	    DATA => [ mesh \@opt_subst_from, \@opt_subst_to ],
+	    CONFIG => $config,
+	    );
+    }
     for my $data (@opt_dictdata) {
 	push @dicts, App::Greple::subst::Dict->new(
 	    DATA => $data,
@@ -482,7 +535,6 @@ sub subst_begin {
 
 use Text::VisualWidth::PP;
 use Text::VisualPrintf qw(vprintf vsprintf);
-use List::Util qw(max any sum first);
 
 sub vwidth {
     if (not defined $_[0] or length $_[0] == 0) {
@@ -632,16 +684,17 @@ sub subst_search {
 			$to : $matched);
 	    };
 	    my(@ok, @ng);
+	    bless $_, 'App::Greple::Grep::Match' for @match;
 	    for (@match) {
-		my $matched = substr $text, $_->[0], $_->[1] - $_->[0];
+		my $matched = substr $text, $_->min, $_->max - $_->min;
 		if ($matched =~ s/$ignorechar_re//gr ne $to) {
-		    $_->[2] = $index * 2;
+		    $_->index = $index * 2;
 		    push @ng, $_;
 		} else {
-		    $_->[2] = $index * 2 + 1;
+		    $_->index = $index * 2 + 1;
 		    push @ok, $_;
 		}
-		$_->[3] = $callback;
+		$_->callback = $callback;
 	    }
 	    $effective[ $index * 2     ] = 1 if $ng || ( @ng && $outstand );
 	    $effective[ $index * 2 + 1 ] = 1 if $ok || ( @ng && $outstand );
@@ -649,6 +702,7 @@ sub subst_search {
 	    @matched = merge_regions { nojoin => 1 }, @matched, @match;
 	}
     }
+    bless $_, 'App::Greple::Grep::Match' for @matched;
     ##
     ## --select
     ##
@@ -666,9 +720,9 @@ sub subst_search {
 	}) {
 	    $select[$_] = 1;
 	}
-	@matched = grep $select[$_->[2]], @matched;
+	@matched = grep $select[$_->index], @matched;
     }
-    grep $effective[$_->[2]], @matched;
+    grep $effective[$_->index], @matched;
 }
 
 1;
@@ -677,6 +731,8 @@ __DATA__
 
 builtin         dict=s @opt_dictfile
 builtin     dictdata=s @opt_dictdata
+builtin   subst-from=s @opt_subst_from
+builtin     subst-to=s @opt_subst_to
 builtin   stat-style=s $opt_stat_style
 builtin    stat-item=s @opt_stat_item
 builtin    printdict!  $opt_printdict
@@ -690,6 +746,7 @@ builtin warn-overlap!  $opt_warn_overlap
 builtin warn-include!  $opt_warn_include
 builtin ignore-space!  $opt_ignore_space
 builtin show-comment!  $opt_show_comment
+builtin    exdictdir!  $opt_show_dictdir
 
 # override greple's original option
 option --select --subst-select
@@ -699,6 +756,9 @@ option default \
 	--prologue subst_initialize \
 	--begin subst_begin \
 	--le +&subst_search --no-regioncolor
+
+option --dictpair \
+	--subst-from $<shift> --subst-to $<shift>
 
 ##
 ## Now these options are implemented by -Mupdate module
@@ -734,8 +794,6 @@ option	--subst-color-dark --colormap --dyncmap \
 
 option --exdict  --dict $ENV{GREPLE_SUBST_DICT}/$<shift>
 
-option --exdictdir --prologue 'sub{ say "$ENV{GREPLE_SUBST_DICT}"; exit }'
-
 option --jtca-katakana-guide --exdict jtca-katakana-guide-3.dict
 option --jtf-style-guide     --exdict jtf-style-guide-3.dict
 option --ms-style-guide      --exdict ms-style-guide.dict
@@ -744,6 +802,7 @@ option --sccc2     --exdict sccc2.dict
 option --jtca      --exdict jtca.dict
 option --jtf       --exdict jtf.dict
 option --microsoft --exdict ms-amend.dict --exdict ms-style-guide.dict
+option --macos     --exdict macos.dict
 
 # deprecated. don't use.
 option --ms --microsoft

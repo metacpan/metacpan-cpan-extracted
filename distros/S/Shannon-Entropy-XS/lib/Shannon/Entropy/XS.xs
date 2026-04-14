@@ -4,6 +4,16 @@
 #include "XSUB.h"           // xsubpp functions and macros
 #include <math.h>
 
+#ifndef OpSIBLING
+#  define OpSIBLING(o)              ((o)->op_sibling)
+#endif
+#ifndef OpMORESIB_set
+#  define OpMORESIB_set(o, sib)     ((o)->op_sibling = (sib))
+#endif
+#ifndef OpLASTSIB_set
+#  define OpLASTSIB_set(o, parent)  ((o)->op_sibling = NULL)
+#endif
+
 #if PERL_VERSION >= 14
 static XOP entropy_xop;
 #endif

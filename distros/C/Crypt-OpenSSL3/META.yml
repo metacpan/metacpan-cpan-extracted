@@ -24,130 +24,133 @@ name: Crypt-OpenSSL3
 provides:
   Crypt::OpenSSL3:
     file: lib/Crypt/OpenSSL3.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::ASN1::Enumerated:
     file: lib/Crypt/OpenSSL3/ASN1/Enumerated.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::ASN1::Integer:
     file: lib/Crypt/OpenSSL3/ASN1/Integer.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::ASN1::Object:
     file: lib/Crypt/OpenSSL3/ASN1/Object.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::ASN1::String:
     file: lib/Crypt/OpenSSL3/ASN1/String.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::ASN1::Time:
     file: lib/Crypt/OpenSSL3/ASN1/Time.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::ASN1::Time::Generalized:
     file: lib/Crypt/OpenSSL3/ASN1/Time/Generalized.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::ASN1::Time::UTC:
     file: lib/Crypt/OpenSSL3/ASN1/Time/UTC.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::BIO:
     file: lib/Crypt/OpenSSL3/BIO.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::BIO::Address:
     file: lib/Crypt/OpenSSL3/BIO/Address.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::BIO::PollDescriptor:
     file: lib/Crypt/OpenSSL3/BIO/PollDescriptor.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::BigNum:
     file: lib/Crypt/OpenSSL3/BigNum.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::BigNum::Context:
     file: lib/Crypt/OpenSSL3/BigNum/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::Cipher:
     file: lib/Crypt/OpenSSL3/Cipher.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::Cipher::Context:
     file: lib/Crypt/OpenSSL3/Cipher/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::Error:
     file: lib/Crypt/OpenSSL3/Error.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::KDF:
     file: lib/Crypt/OpenSSL3/KDF.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::KDF::Context:
     file: lib/Crypt/OpenSSL3/KDF/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::MAC:
     file: lib/Crypt/OpenSSL3/MAC.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::MAC::Context:
     file: lib/Crypt/OpenSSL3/MAC/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::MD:
     file: lib/Crypt/OpenSSL3/MD.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::MD::Context:
     file: lib/Crypt/OpenSSL3/MD/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::PKey:
     file: lib/Crypt/OpenSSL3/PKey.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::PKey::Context:
     file: lib/Crypt/OpenSSL3/PKey/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::Random:
     file: lib/Crypt/OpenSSL3/Random.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::Random::Context:
     file: lib/Crypt/OpenSSL3/Random/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::SSL:
     file: lib/Crypt/OpenSSL3/SSL.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::SSL::Cipher:
     file: lib/Crypt/OpenSSL3/SSL/Cipher.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::SSL::Context:
     file: lib/Crypt/OpenSSL3/SSL/Context.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::SSL::Method:
     file: lib/Crypt/OpenSSL3/SSL/Method.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::SSL::Session:
     file: lib/Crypt/OpenSSL3/SSL/Session.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::Signature:
     file: lib/Crypt/OpenSSL3/Signature.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509:
     file: lib/Crypt/OpenSSL3/X509.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509::Algorithm:
     file: lib/Crypt/OpenSSL3/X509/Algorithm.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509::Extension:
     file: lib/Crypt/OpenSSL3/X509/Extension.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509::Name:
     file: lib/Crypt/OpenSSL3/X509/Name.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509::Name::Entry:
     file: lib/Crypt/OpenSSL3/X509/Name/Entry.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509::Store:
     file: lib/Crypt/OpenSSL3/X509/Store.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509::VerifyParam:
     file: lib/Crypt/OpenSSL3/X509/VerifyParam.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::OpenSSL3::X509::VerifyResult:
     file: lib/Crypt/OpenSSL3/X509/VerifyResult.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   XSLoader: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
-version: '0.003'
-x_generated_by_perl: v5.42.0
+resources:
+  bugtracker: https://github.com/Leont/crypt-openssl3/issues
+  repository: git://github.com/Leont/crypt-openssl3.git
+version: '0.004'
+x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

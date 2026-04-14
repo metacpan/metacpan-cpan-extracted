@@ -7,6 +7,16 @@ require 5.008008;
 
 our $DEFS = '';
 
+# A cpantester's build of perl is/was specifying "LIBS=-lquadmath" in the Perl_MM_OPT
+# envirnoment variable - which overrides the assignment to $options{LIBS} below,
+# at line 120.
+# See (eg) https://www.cpantesters.org/cpan/report/dab208d0-71b3-1014-beba-d9dcb6a500a3 .
+# The following substitution regex works around the problem.
+{
+  no warnings 'uninitialized'; # It doesn't matter if $ENV{PERL_MM_OPT} is uninitialized.
+  $ENV{PERL_MM_OPT} =~ s/\sLIBS=\-lquadmath|^LIBS=\-lquadmath//;
+}
+
 my $do_complex_h = 0; # Let the Makefile.PL decide whether to support the double _Complex and
                    # long double _Complex data types.
 #$do_complex_h = 1; # Force inclusion of the double _Complex, long double _Complex and __float128 _Complex data types
@@ -153,7 +163,7 @@ if($] < 5.035010) {
     print "Not defining MPC_PV_NV_BUG\n\n";
   }
 }
-else { print "Not defining MPFR_PV_NV_BUG as perl version >= 5.035010\n\n" }
+else { print "Not defining MPC_PV_NV_BUG as perl version >= 5.035010\n\n" }
 
 ####################################
 

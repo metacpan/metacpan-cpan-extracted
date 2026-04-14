@@ -12,5 +12,5 @@ hooks = [
 ]
 
 [FileGatherer]
-exclude_match = [ '^images/', '^docs/' ]
+exclude_match = [ '^images/' ]
 

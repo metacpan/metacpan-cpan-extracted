@@ -1,3 +1,32 @@
+0.009   2026-04-14  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix logic related to do_check.
+
+        - [tweak] Only die when latest version is defined.
+
+
+0.008   2026-04-14  Released-By: PERLANCAR; Urgency: medium
+
+        - [tweak] Only cache result when versions are defined.
+
+
+0.007   2026-04-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add 'do_check' option.
+
+        - [doc] Document the 'log_level' option.
+
+
+0.006   2026-04-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add logging & 'log_level' option.
+
+
+0.005   2026-04-13  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Do not check negative result.
+
+
 0.004   2026-04-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.3.0
+## Version v0.4.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
@@ -40,7 +40,7 @@ BEGIN
         'ne'     => '_string_not_equals_overload',
     );
 
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.4.0';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -98,12 +98,12 @@ sub FREEZE;
 sub STORABLE_freeze;
 sub STORABLE_thaw;
 sub THAW;
+sub TO_JSON;
 sub add;
 sub add_duration;
 sub am_or_pm;
 sub ce_year;
 sub christian_era;
-sub clone;
 sub compare;
 sub compare_ignore_floating;
 sub datetime;
@@ -121,6 +121,7 @@ sub delta_days;
 sub delta_md;
 sub delta_ms;
 sub dmy;
+sub end_of;
 sub epoch;
 sub era_abbr;
 sub era_name;
@@ -187,6 +188,7 @@ sub set_nanosecond;
 sub set_second;
 sub set_time_zone;
 sub set_year;
+sub start_of;
 sub stringify;
 sub subtract;
 sub subtract_datetime;
@@ -233,6 +235,7 @@ sub _new;
 sub _new_from_self;
 sub _normalize_seconds;
 sub _offset_for_local_datetime;
+sub _resolve_time_zone;
 sub _set_get_prop;
 sub _set_locale;
 sub _string_compare_overload;
@@ -536,6 +539,49 @@ sub delta_ms
 # NOTE: sub dmy is autoloaded
 
 sub duration_class () { 'DateTime::Lite::Duration' }
+
+# See also start_of()
+sub end_of
+{
+    my $self = shift( @_ );
+    my $unit = shift( @_ ) ||
+        return( $self->error( "Parameter 'unit' is required for end_of()." ) );
+
+    my %valid = map{ $_ => 1 } qw(
+        year decade century quarter month week local_week day hour minute second
+    );
+    unless( $valid{ $unit } )
+    {
+        return( $self->error( "Invalid unit '$unit' for end_of()." ) );
+    }
+
+    # Strategy: move to start_of the next unit, then subtract 1 nanosecond.
+    # This correctly handles variable-length units (months, years, etc.)
+    # without hardcoding boundary values.
+    my %next_unit = (
+        second     => [ second     => 1  ],
+        minute     => [ minute     => 1  ],
+        hour       => [ hour       => 1  ],
+        day        => [ day        => 1  ],
+        week       => [ week       => 1  ],
+        local_week => [ week       => 1  ],
+        month      => [ month      => 1  ],
+        quarter    => [ month      => 3  ],
+        year       => [ year       => 1  ],
+        decade     => [ year       => 10 ],
+        century    => [ year       => 100],
+    );
+
+    # Clone internally, compute, then overwrite self
+    my $copy = $self->clone || return( $self->pass_error );
+    $copy->start_of( $unit ) || return( $self->pass_error );
+    my( $add_unit, $add_val ) = @{$next_unit{ $unit }};
+    $copy->add( "${add_unit}s" => $add_val ) || return( $self->pass_error );
+    $copy->subtract( nanoseconds => 1 ) || return( $self->pass_error );
+
+    %$self = %$copy;
+    return( $self );
+}
 
 # NOTE: epoch
 sub epoch
@@ -1181,12 +1227,14 @@ sub set
 }
 
 sub set_day        { return( shift->set( day        => @_ ) ); }
+
 sub set_formatter
 {
     my $self = shift( @_ );
     $self->{formatter} = shift( @_ );
     return( $self );
 }
+
 sub set_hour       { return( shift->set( hour       => @_ ) ); }
 
 sub set_locale
@@ -1259,6 +1307,62 @@ sub set_time_zone
 }
 
 sub set_year { $_[0]->set( year => $_[1] ) }
+
+# See also end_of()
+sub start_of
+{
+    my $self = shift( @_ );
+    my $unit = shift( @_ ) ||
+     return( $self->error( "Parameter 'unit' is required for start_of()." ) );
+
+    # Most units map directly to truncate(), which already handles
+    # year, quarter, month, week, local_week, day, hour, minute, second.
+    # We handle decade and century ourselves.
+    if( $unit eq 'decade' )
+    {
+        my $decade_year = int( $self->year / 10 ) * 10;
+        my $new_dt = $self->_new_from_self(
+            year       => $decade_year,
+            month      => 1,
+            day        => 1,
+            hour       => 0,
+            minute     => 0,
+            second     => 0,
+            nanosecond => 0,
+            _skip_validation => 1,
+        ) || return( $self->pass_error );
+        %$self = %$new_dt;
+        return( $self );
+    }
+    elsif( $unit eq 'century' )
+    {
+        # Century: year 1-100 -> year 1, year 101-200 -> year 101, etc.
+        my $century_year = ( int( ( $self->year - 1 ) / 100 ) * 100 ) + 1;
+        my $new_dt = $self->_new_from_self(
+            year       => $century_year,
+            month      => 1,
+            day        => 1,
+            hour       => 0,
+            minute     => 0,
+            second     => 0,
+            nanosecond => 0,
+            _skip_validation => 1,
+        ) || return( $self->pass_error );
+        %$self = %$new_dt;
+        return( $self );
+    }
+    else
+    {
+        my %valid = map{ $_ => 1 } qw(
+            year quarter month week local_week day hour minute second
+        );
+        unless( $valid{ $unit } )
+        {
+            return( $self->error( "Invalid unit '$unit' for start_of()." ) );
+        }
+        return( $self->truncate( to => $unit ) );
+    }
+}
 
 # NOTE: strftime
 {
@@ -3220,13 +3324,24 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
     # Mutators
     $dt->set( year => 2027, month => 1, day => 1 );
-    $dt->set_year(2027);    $dt->set_month(1);    $dt->set_day(1);
-    $dt->set_hour(0);       $dt->set_minute(0);   $dt->set_second(0);
+    $dt->set_year(2027);
+    $dt->set_month(1);
+    $dt->set_day(1);
+    $dt->set_hour(0);
+    $dt->set_minute(0);
+    $dt->set_second(0);
     $dt->set_nanosecond(0);
     $dt->set_time_zone('America/New_York');
     $dt->set_locale('en-US');  # sets a new DateTime::Locale::FromCLDR object
     $dt->set_formatter( $formatter );
     $dt->truncate( to => 'day' );   # 'year','month','week','day','hour','minute','second'
+
+    # Works for second, minute, hour, day, week, local_week, month, quarter,
+    # year, decade, century
+    $dt->end_of( 'month' );
+    say $dt;  # 2026-04-30T23:59:59.999999999
+    $dt->start_of( 'month' );
+    say $dt;  # 2026-04-01T00:00:00
 
     # Comparison
     my @sorted = sort { $a <=> $b } @datetimes;  # overloaded <=>
@@ -3255,7 +3370,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.3.0
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -3997,6 +4112,52 @@ Sets the formatter object used by L</stringify>. Must respond to C<format_dateti
 
 Changes the time zone of the datetime in-place. Accepts a time zone name string, such as C<America/New_York>, or a L<DateTime::Lite::TimeZone> object. Returns C<$self>.
 
+=head2 end_of
+
+    my $dt = DateTime::Lite->new(
+        year      => 2026,
+        month     => 4,
+        day       => 15,
+        hour      => 14,
+        minute    => 32,
+        second    => 47,
+        time_zone => 'UTC',
+    );
+    $dt->end_of( 'month' );
+    say $dt;  # 2026-04-30T23:59:59.999999999
+
+Modifies the object in place to represent the last instant of the given unit.
+Supported units are: C<second>, C<minute>, C<hour>, C<day>, C<week>, C<local_week>, C<month>, C<quarter>, C<year>, C<decade>, C<century>.
+
+The result is the last nanosecond before the start of the next unit, so the timezone and variable-length units such as months and years are handled correctly without hardcoding boundary values.
+
+Returns the modified object on success, or sets an L<error object|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>
+
+See also L</start_of> and L</truncate>.
+
+=head2 start_of
+
+    my $dt = DateTime::Lite->new(
+        year      => 2026,
+        month     => 4,
+        day       => 15,
+        hour      => 14,
+        minute    => 32,
+        second    => 47,
+        time_zone => 'UTC',
+    );
+    $dt->start_of( 'month' );
+    say $dt;  # 2026-04-01T00:00:00
+
+Modifies the object in place to represent the first instant of the given unit.
+Supported units are: C<second>, C<minute>, C<hour>, C<day>, C<week>, C<local_week>, C<month>, C<quarter>, C<year>, C<decade>, C<century>.
+
+For most units this delegates to L</truncate>. C<decade> and C<century> are handled independently: C<start_of('decade')> for 2026 returns 2020-01-01, and C<start_of('century')> returns 2001-01-01.
+
+Returns the modified object on success, or sets an L<error object|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>
+
+See also L</end_of> and L</truncate>.
+
 =head2 truncate
 
     $dt->truncate( to => 'day' );   # sets h/m/s/ns to zero
@@ -4049,6 +4210,69 @@ When called without arguments, returns the most recent error object (or C<undef>
     }
 
 Propagates the error stored in another object (or the class-level error) into the current object's error slot, without constructing a new exception. Used internally when a lower-level call fails and the caller wants to surface the same error to its own caller.
+
+=head1 LOW-LEVEL XS UTILITIES
+
+=head2 posix_tz_lookup
+
+    my $r = DateTime::Lite->posix_tz_lookup( 1775769030, 'EST5EDT,M3.2.0,M11.1.0' );
+    my $r = $dt->posix_tz_lookup( 1775769030, 'EST5EDT,M3.2.0,M11.1.0' );
+    if( defined( $r ) )
+    {
+        say $r->{offset};     # -14400  (seconds east of UTC)
+        say $r->{is_dst};     # 1
+        say $r->{short_name}; # "EDT"
+    }
+
+Given a Unix timestamp (signed 64-bit integer, representing the number of seconds since 1970-01-01T00:00:00 UTC), and a POSIX TZ footer string, it parses the footer string, and resolves the UTC offset, DST flag, and timezone abbreviation for the given Unix timestamp.
+
+This is the low-level function used internally by L<DateTime::Lite::TimeZone> to handle dates beyond the last explicit transition stored in the TZif database.
+
+The first argument may be either a class name or an instance; both forms are accepted.
+
+The POSIX TZ footer string comes from the TZif v2+ files, and looks like C<EST5EDT,M3.2.0,M11.1.0> or C<JST-9> or C<< <+0545>-5:45 >>.
+
+The implementation is in C via F<dtl_posix.h>, derived from the IANA C<tzcode> reference implementation (public domain). It handles all POSIX TZ string rule forms (C<Jn> julian day, C<n> zero-based julian day, and C<Mm.w.d> month/week/day), as well as the L<RFC 9636|https://www.rfc-editor.org/rfc/rfc9636.html> extensions for TZif v3+:
+
+=over 4
+
+=item C<Jn>
+
+Julian day (1-365, no leap day)
+
+=item C<n>
+
+zero-based Julian day (0-365, counts leap day)
+
+=item C<Mm.w.d>
+
+month/week/day rule (e.g. C<M3.2.0> = second Sunday of March)
+
+=back
+
+It also handles quoted angle-bracket abbreviations such as C<< <+0545> >>, fractional offsets, negative and greater-than-24-hour transition times (L<RFC 9636 section 3.3.2|https://www.rfc-editor.org/rfc/rfc9636.html#name-tz-string-extension> extensions for TZif v3+), and southern-hemisphere DST where the DST period wraps around the year boundary (start > end).
+
+Returns a hashref with three keys on success:
+
+=over 4
+
+=item C<offset>
+
+The UTC offset in seconds east of UTC (negative for zones west of UTC, such as C<-18000> for EST).
+
+=item C<is_dst>
+
+C<1> if the timestamp falls within a DST period, C<0> otherwise.
+
+=item C<short_name>
+
+The timezone abbreviation, such as C<EDT>, C<JST>, or C<< +0545 >>.
+
+=back
+
+Returns C<undef> if C<$tz_string> cannot be parsed.
+
+This method is primarily intended for advanced use cases, such as building custom timezone libraries on top of C<DateTime::Lite::TimeZone>. Most users will not need to call it directly.
 
 =head1 SERIALISATION
 

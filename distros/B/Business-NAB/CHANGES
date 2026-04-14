@@ -1,10 +1,18 @@
 ==================================================
-Changes from 2025-03-09 00:00:00 +0000 to present.
+Changes from 2025-04-13 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.03 at 2026-03-09 08:47:09 +0000
+version 0.04 at 2026-04-13 10:01:16 +0000
 -----------------------------------------
+
+  Change: 835ac898feb3531defa5c7f51bc0317eeb6491a3
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-04-13 12:00:00 +0000
+
+    update dist.ini to point at bugtracker/repo
+
+    and also require MinimumPerl 
 
   Change: c3eb4bafa2f52ee35028e5f5e26034edc50c911e
   Author: Lee Johnson <lee@payprop.com>

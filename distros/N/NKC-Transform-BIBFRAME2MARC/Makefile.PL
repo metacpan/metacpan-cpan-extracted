@@ -21,9 +21,12 @@ readme_from 'BIBFRAME2MARC.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
+requires 'Exporter' => 0;
 requires 'File::Object' => 0;
+requires 'File::Spec::Functions' => 0;
 requires 'File::Share' => 0;
 requires 'Perl6::Slurp' => 0;
+requires 'Readonly' => 0;
 requires 'XML::LibXML' => 0;
 requires 'XML::LibXSLT' => 0;
 requires 'perl' => '5.8.0';
@@ -33,10 +36,12 @@ resources 'repository' => 'git://github.com/michal-josef-spacek/NKC-Transform-BI
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
 test_requires 'File::Object' => 0;
+test_requires 'Perl6::Slurp' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

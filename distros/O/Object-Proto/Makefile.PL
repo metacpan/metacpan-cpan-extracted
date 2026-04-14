@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use Config;
+use File::Spec;
 
 # Platform-specific linker flags for symbol export
 # Only add --export-dynamic on platforms where GNU ld is used.
@@ -58,3 +59,21 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+# Install include headers alongside the module
+package MY;
+sub postamble {
+    my $self = shift;
+    my $inc_dir = File::Spec->catdir('$(INST_LIB)', 'Object', 'Proto', 'include');
+    return <<"MAKE";
+config :: $inc_dir/.exists
+\t\$(NOECHO) \$(NOOP)
+
+$inc_dir/.exists :: include/object_types.h include/object_compat.h include/xop_compat.h
+\t\$(MKPATH) $inc_dir
+\t\$(CP) include/object_types.h $inc_dir/object_types.h
+\t\$(CP) include/object_compat.h $inc_dir/object_compat.h
+\t\$(CP) include/xop_compat.h $inc_dir/xop_compat.h
+\t\$(TOUCH) $inc_dir/.exists
+MAKE
+}

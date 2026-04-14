@@ -4,7 +4,7 @@
       "Robin Murray <mvsjes@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -87,6 +87,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "v2.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "v2.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

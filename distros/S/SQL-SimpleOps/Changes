@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2026.101.1 Sat Apr 11 08:04:04 PM -03 2026
+	- fix: where format error, the 'and/or' without additional clause; by CCELSO
+	- fix: clause where: "fld => []" (empty) is "fld is null"; by CCELSO
+
 2026.095.1 Sun Apr  5 20:20:51 2026
 	- news: Options 'select/having' added; by CCELSO
 	- news: Options 'select/buffer_reverse' added; by CCELSO

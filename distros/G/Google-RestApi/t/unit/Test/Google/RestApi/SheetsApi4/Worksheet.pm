@@ -124,8 +124,22 @@ sub enable_header_col : Tests() {
   return;
 }
 
-sub header_row : Tests() {
+sub header_row : Tests(5) {
   my $self = shift;
+
+  my $ws0 = $self->mock_worksheet();
+  is $ws0->header_row(), undef, 'Header row returns undef when not enabled';
+
+  $ws0->enable_header_row();
+  ok $ws0->header_row_enabled(), 'Header row is enabled';
+
+  $ws0->row(1, [qw(id name address)]);
+  is_deeply $ws0->header_row(1), [qw(id name address)], 'Header row returns row 1 values';
+
+  $ws0->enable_header_row(0);
+  ok !$ws0->header_row_enabled(), 'Header row is disabled';
+  is $ws0->header_row(), undef, 'Header row returns undef after disabling';
+
   return;
 }
 
@@ -139,8 +153,20 @@ sub tie_ranges : Tests() {
   return;
 }
 
-sub tie_cols : Tests() {
+sub tie_cols : Tests(4) {
   my $self = shift;
+
+  my $ws0 = $self->mock_worksheet();
+  my $ws0_name = mock_worksheet_name();
+  $ws0->row(1, [qw(id name address)]);
+  $ws0->enable_header_row();
+
+  is_hash my $tied = $ws0->tie_cols(), 'tie_cols with no args uses header row';
+  tied(%$tied)->fetch_range(1);
+  is $tied->{id}->range(),      "'$ws0_name'!A:A", "Key 'id' maps to col A";
+  is $tied->{name}->range(),    "'$ws0_name'!B:B", "Key 'name' maps to col B";
+  is $tied->{address}->range(), "'$ws0_name'!C:C", "Key 'address' maps to col C";
+
   return;
 }
 

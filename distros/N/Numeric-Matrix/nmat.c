@@ -500,15 +500,19 @@ static void mat_abs_data(double *out, const double *a, size_t n) {
 
 static void mat_exp_data(double *out, const double *a, size_t n) {
     /* No SIMD exp - use scalar */
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         out[i] = exp(a[i]);
+    }
     }
 }
 
 static void mat_log_data(double *out, const double *a, size_t n) {
     /* No SIMD log - use scalar */
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         out[i] = log(a[i]);
+    }
     }
 }
 
@@ -598,8 +602,10 @@ static double mat_max_data(const double *a, size_t n) {
     if (n == 0) return -DBL_MAX;
     
     double maxv = a[0];
-    for (size_t i = 1; i < n; i++) {
+    { size_t i;
+    for (i = 1; i < n; i++) {
         if (a[i] > maxv) maxv = a[i];
+    }
     }
     return maxv;
 }
@@ -608,8 +614,10 @@ static double mat_min_data(const double *a, size_t n) {
     if (n == 0) return DBL_MAX;
     
     double minv = a[0];
-    for (size_t i = 1; i < n; i++) {
+    { size_t i;
+    for (i = 1; i < n; i++) {
         if (a[i] < minv) minv = a[i];
+    }
     }
     return minv;
 }
@@ -678,7 +686,8 @@ static void mat_softmax_rows_inplace(Mat *mat) {
     IV cols = mat->cols;
     vDSP_Length vcols = (vDSP_Length)cols;
     
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         double *row = mat->data + r * cols;
         double maxv, sum, neg_max;
         int n = (int)cols;
@@ -699,6 +708,7 @@ static void mat_softmax_rows_inplace(Mat *mat) {
         /* Normalize: row[i] /= sum */
         vDSP_vsdivD(row, 1, &sum, row, 1, vcols);
     }
+    }
 }
 #else
 /* Scalar fallback */
@@ -706,27 +716,35 @@ static void mat_softmax_rows_inplace(Mat *mat) {
     IV rows = mat->rows;
     IV cols = mat->cols;
     
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         double *row = mat->data + r * cols;
         
         /* Find max for numerical stability */
         double maxv = row[0];
-        for (IV c = 1; c < cols; c++) {
+        { IV c;
+        for (c = 1; c < cols; c++) {
             if (row[c] > maxv) maxv = row[c];
+        }
         }
         
         /* exp(x - max) and sum */
         double sum = 0.0;
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             row[c] = exp(row[c] - maxv);
             sum += row[c];
+        }
         }
         
         /* Normalize */
         double inv_sum = 1.0 / sum;
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             row[c] *= inv_sum;
         }
+        }
+    }
     }
 }
 #endif
@@ -761,9 +779,11 @@ static void mat_silu_inplace(Mat *mat) {
     
     Safefree(temp);
 #else
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         double x = data[i];
         data[i] = x / (1.0 + exp(-x));
+    }
     }
 #endif
 }
@@ -811,10 +831,12 @@ static void mat_gelu_inplace(Mat *mat) {
     Safefree(temp);
     Safefree(x3);
 #else
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         double x = data[i];
         double x3 = x * x * x;
         data[i] = 0.5 * x * (1.0 + tanh(sqrt_2_over_pi * (x + coeff * x3)));
+    }
     }
 #endif
 }
@@ -830,7 +852,8 @@ static Mat* mat_rms_norm(pTHX_ const Mat *X, const double *gamma) {
     /* Use vDSP for sum of squares */
     vDSP_Length vcols = (vDSP_Length)cols;
     
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         const double *xrow = X->data + r * cols;
         double *yrow = Y->data + r * cols;
         
@@ -847,8 +870,10 @@ static Mat* mat_rms_norm(pTHX_ const Mat *X, const double *gamma) {
         /* Scale by gamma: yrow = yrow * gamma */
         vDSP_vmulD(yrow, 1, gamma, 1, yrow, 1, vcols);
     }
+    }
 #else
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         const double *xrow = X->data + r * cols;
         double *yrow = Y->data + r * cols;
         
@@ -858,9 +883,12 @@ static Mat* mat_rms_norm(pTHX_ const Mat *X, const double *gamma) {
         double inv_rms = 1.0 / rms;
         
         /* Normalize and scale */
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             yrow[c] = xrow[c] * inv_rms * gamma[c];
         }
+        }
+    }
     }
 #endif
     
@@ -884,7 +912,8 @@ static void mat_layer_norm(pTHX_ const Mat *X, const double *gamma, const double
     double *temp;
     Newx(temp, cols, double);
     
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         const double *xrow = X->data + r * cols;
         double *yrow = Y->data + r * cols;
         
@@ -909,10 +938,12 @@ static void mat_layer_norm(pTHX_ const Mat *X, const double *gamma, const double
         vDSP_vmulD(yrow, 1, gamma, 1, yrow, 1, vcols);
         vDSP_vaddD(yrow, 1, beta, 1, yrow, 1, vcols);
     }
+    }
     
     Safefree(temp);
 #else
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         const double *xrow = X->data + r * cols;
         double *yrow = Y->data + r * cols;
         
@@ -922,17 +953,22 @@ static void mat_layer_norm(pTHX_ const Mat *X, const double *gamma, const double
         
         /* Compute variance */
         double var = 0.0;
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             double d = xrow[c] - mean[r];
             var += d * d;
+        }
         }
         var /= (double)cols;
         inv_std[r] = 1.0 / sqrt(var + eps);
         
         /* Normalize and scale */
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             yrow[c] = (xrow[c] - mean[r]) * inv_std[r] * gamma[c] + beta[c];
         }
+        }
+    }
     }
 #endif
     
@@ -954,35 +990,45 @@ static void mat_layer_norm_bwd(pTHX_ const Mat *dY, const Mat *X,
     Newxz(dbeta, cols, double);
     
     /* Pass 1: compute dgamma and dbeta */
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         const double *xrow = X->data + r * cols;
         const double *dyrow = dY->data + r * cols;
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             double x_norm = (xrow[c] - mean[r]) * inv_std[r];
             dgamma[c] += dyrow[c] * x_norm;
             dbeta[c] += dyrow[c];
         }
+        }
+    }
     }
     
     /* Pass 2: compute dX */
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         const double *xrow = X->data + r * cols;
         const double *dyrow = dY->data + r * cols;
         double *dxrow = dX->data + r * cols;
         
         /* Compute sums needed for dX */
         double sum_dy = 0.0, sum_dy_xhat = 0.0;
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             double x_norm = (xrow[c] - mean[r]) * inv_std[r];
             sum_dy += dyrow[c] * gamma[c];
             sum_dy_xhat += dyrow[c] * gamma[c] * x_norm;
         }
+        }
         
         double inv_n = 1.0 / (double)cols;
-        for (IV c = 0; c < cols; c++) {
+        { IV c;
+        for (c = 0; c < cols; c++) {
             double x_norm = (xrow[c] - mean[r]) * inv_std[r];
             dxrow[c] = inv_std[r] * (gamma[c] * dyrow[c] - inv_n * (sum_dy + x_norm * sum_dy_xhat));
         }
+        }
+    }
     }
     
     *dX_out = dX;
@@ -997,14 +1043,18 @@ static double* mat_row_sum(pTHX_ const Mat *A) {
     
 #if NMAT_HAVE_BLAS && defined(__APPLE__)
     vDSP_Length vcols = (vDSP_Length)A->cols;
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         const double *row = A->data + r * A->cols;
         vDSP_sveD(row, 1, &sums[r], vcols);
     }
+    }
 #else
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         const double *row = A->data + r * A->cols;
         sums[r] = mat_sum_data(row, A->cols);
+    }
     }
 #endif
     return sums;
@@ -1019,7 +1069,8 @@ static double* mat_col_sum(pTHX_ const Mat *A) {
     /* Process 2 doubles at a time with NEON */
     size_t vec_len = A->cols & ~1UL;
     
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         const double *row = A->data + r * A->cols;
         size_t c = 0;
         for (; c < vec_len; c += 2) {
@@ -1031,10 +1082,12 @@ static double* mat_col_sum(pTHX_ const Mat *A) {
             sums[c] += row[c];
         }
     }
+    }
 #elif NMAT_HAVE_AVX2 || NMAT_HAVE_AVX
     size_t vec_len = A->cols & ~3UL;
     
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         const double *row = A->data + r * A->cols;
         size_t c = 0;
         for (; c < vec_len; c += 4) {
@@ -1046,10 +1099,12 @@ static double* mat_col_sum(pTHX_ const Mat *A) {
             sums[c] += row[c];
         }
     }
+    }
 #elif NMAT_HAVE_SSE2
     size_t vec_len = A->cols & ~1UL;
     
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         const double *row = A->data + r * A->cols;
         size_t c = 0;
         for (; c < vec_len; c += 2) {
@@ -1061,12 +1116,17 @@ static double* mat_col_sum(pTHX_ const Mat *A) {
             sums[c] += row[c];
         }
     }
+    }
 #else
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         const double *row = A->data + r * A->cols;
-        for (IV c = 0; c < A->cols; c++) {
+        { IV c;
+        for (c = 0; c < A->cols; c++) {
             sums[c] += row[c];
         }
+        }
+    }
     }
 #endif
     return sums;
@@ -1076,14 +1136,18 @@ static double* mat_col_sum(pTHX_ const Mat *A) {
 static void mat_add_vec_rows_inplace(Mat *A, const double *vec) {
 #if NMAT_HAVE_BLAS && defined(__APPLE__)
     vDSP_Length vcols = (vDSP_Length)A->cols;
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         double *row = A->data + r * A->cols;
         vDSP_vaddD(row, 1, vec, 1, row, 1, vcols);
     }
+    }
 #else
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         double *row = A->data + r * A->cols;
         mat_add_data(row, row, vec, A->cols);
+    }
     }
 #endif
 }
@@ -1092,14 +1156,18 @@ static void mat_add_vec_rows_inplace(Mat *A, const double *vec) {
 static void mat_mul_vec_rows_inplace(Mat *A, const double *vec) {
 #if NMAT_HAVE_BLAS && defined(__APPLE__)
     vDSP_Length vcols = (vDSP_Length)A->cols;
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         double *row = A->data + r * A->cols;
         vDSP_vmulD(row, 1, vec, 1, row, 1, vcols);
     }
+    }
 #else
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         double *row = A->data + r * A->cols;
         mat_mul_data(row, row, vec, A->cols);
+    }
     }
 #endif
 }
@@ -1131,8 +1199,10 @@ XS_INTERNAL(xs_mat_ones) {
     
     Mat *mat = mat_create(aTHX_ rows, cols);
     size_t n = (size_t)rows * (size_t)cols;
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         mat->data[i] = 1.0;
+    }
     }
     
     ST(0) = sv_2mortal(mat_wrap(aTHX_ mat));
@@ -1148,8 +1218,10 @@ XS_INTERNAL(xs_mat_randn) {
     
     Mat *mat = mat_create(aTHX_ rows, cols);
     size_t n = (size_t)rows * (size_t)cols;
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         mat->data[i] = mat_randn();
+    }
     }
     
     ST(0) = sv_2mortal(mat_wrap(aTHX_ mat));
@@ -1176,9 +1248,11 @@ XS_INTERNAL(xs_mat_from_array) {
     }
     
     Mat *mat = mat_create(aTHX_ rows, cols);
-    for (IV i = 0; i < len; i++) {
+    { IV i;
+    for (i = 0; i < len; i++) {
         SV **elem = av_fetch(av, i, 0);
         mat->data[i] = elem ? SvNV(*elem) : 0.0;
+    }
     }
     
     ST(0) = sv_2mortal(mat_wrap(aTHX_ mat));
@@ -1582,8 +1656,10 @@ XS_INTERNAL(xs_mat_norm) {
     size_t n = (size_t)A->rows * (size_t)A->cols;
     
     double sum_sq = 0.0;
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         sum_sq += A->data[i] * A->data[i];
+    }
     }
     
     XSRETURN_NV(sqrt(sum_sq));
@@ -1618,10 +1694,14 @@ XS_INTERNAL(xs_mat_transpose) {
     Mat *A = mat_from_sv(aTHX_ ST(0));
     Mat *T = mat_create(aTHX_ A->cols, A->rows);
     
-    for (IV r = 0; r < A->rows; r++) {
-        for (IV c = 0; c < A->cols; c++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
+        { IV c;
+        for (c = 0; c < A->cols; c++) {
             T->data[c * T->cols + r] = A->data[r * A->cols + c];
         }
+        }
+    }
     }
     
     ST(0) = sv_2mortal(mat_wrap(aTHX_ T));
@@ -1674,9 +1754,11 @@ XS_INTERNAL(xs_mat_matmul) {
 #else
         /* Fallback: transpose B first, then multiply */
         Mat *BT = mat_create(aTHX_ B->cols, B->rows);
-        for (IV r = 0; r < B->rows; r++)
-            for (IV c = 0; c < B->cols; c++)
+        { IV r; IV c;
+        for (r = 0; r < B->rows; r++)
+            for (c = 0; c < B->cols; c++)
                 BT->data[c * BT->cols + r] = B->data[r * B->cols + c];
+        }
         mat_matmul_tiled(A, BT, C);
         nmat_aligned_free(BT->data);
         Safefree(BT);
@@ -1698,9 +1780,11 @@ XS_INTERNAL(xs_mat_matmul) {
 #else
         /* Fallback: transpose A first, then multiply */
         Mat *AT = mat_create(aTHX_ A->cols, A->rows);
-        for (IV r = 0; r < A->rows; r++)
-            for (IV c = 0; c < A->cols; c++)
+        { IV r; IV c;
+        for (r = 0; r < A->rows; r++)
+            for (c = 0; c < A->cols; c++)
                 AT->data[c * AT->cols + r] = A->data[r * A->cols + c];
+        }
         mat_matmul_tiled(AT, B, C);
         nmat_aligned_free(AT->data);
         Safefree(AT);
@@ -1765,9 +1849,11 @@ XS_INTERNAL(xs_mat_rms_norm) {
     
     double *gamma;
     Newx(gamma, gamma_len, double);
-    for (IV i = 0; i < gamma_len; i++) {
+    { IV i;
+    for (i = 0; i < gamma_len; i++) {
         SV **v = av_fetch(gamma_av, i, 0);
         gamma[i] = v ? SvNV(*v) : 0.0;
+    }
     }
     
     Mat *Y = mat_rms_norm(aTHX_ X, gamma);
@@ -1797,11 +1883,13 @@ XS_INTERNAL(xs_mat_layer_norm) {
     double *gamma, *beta;
     Newx(gamma, cols, double);
     Newx(beta, cols, double);
-    for (IV i = 0; i < cols; i++) {
+    { IV i;
+    for (i = 0; i < cols; i++) {
         SV **gv = av_fetch(gamma_av, i, 0);
         SV **bv = av_fetch(beta_av, i, 0);
         gamma[i] = gv ? SvNV(*gv) : 1.0;
         beta[i] = bv ? SvNV(*bv) : 0.0;
+    }
     }
     
     Mat *Y;
@@ -1816,9 +1904,11 @@ XS_INTERNAL(xs_mat_layer_norm) {
     AV *inv_std_av = newAV();
     av_extend(mean_av, X->rows - 1);
     av_extend(inv_std_av, X->rows - 1);
-    for (IV r = 0; r < X->rows; r++) {
+    { IV r;
+    for (r = 0; r < X->rows; r++) {
         av_store(mean_av, r, newSVnv(mean[r]));
         av_store(inv_std_av, r, newSVnv(inv_std[r]));
+    }
     }
     Safefree(mean);
     Safefree(inv_std);
@@ -1857,15 +1947,19 @@ XS_INTERNAL(xs_mat_layer_norm_bwd) {
     Newx(inv_std, rows, double);
     Newx(gamma, cols, double);
     
-    for (IV r = 0; r < rows; r++) {
+    { IV r;
+    for (r = 0; r < rows; r++) {
         SV **mv = av_fetch(mean_av, r, 0);
         SV **iv = av_fetch(inv_std_av, r, 0);
         mean[r] = mv ? SvNV(*mv) : 0.0;
         inv_std[r] = iv ? SvNV(*iv) : 1.0;
     }
-    for (IV c = 0; c < cols; c++) {
+    }
+    { IV c;
+    for (c = 0; c < cols; c++) {
         SV **gv = av_fetch(gamma_av, c, 0);
         gamma[c] = gv ? SvNV(*gv) : 1.0;
+    }
     }
     
     Mat *dX;
@@ -1881,9 +1975,11 @@ XS_INTERNAL(xs_mat_layer_norm_bwd) {
     AV *dbeta_av = newAV();
     av_extend(dgamma_av, cols - 1);
     av_extend(dbeta_av, cols - 1);
-    for (IV c = 0; c < cols; c++) {
+    { IV c;
+    for (c = 0; c < cols; c++) {
         av_store(dgamma_av, c, newSVnv(dgamma[c]));
         av_store(dbeta_av, c, newSVnv(dbeta[c]));
+    }
     }
     Safefree(dgamma);
     Safefree(dbeta);
@@ -1904,8 +2000,10 @@ XS_INTERNAL(xs_mat_row_sum) {
     
     AV *av = newAV();
     av_extend(av, A->rows - 1);
-    for (IV r = 0; r < A->rows; r++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
         av_store(av, r, newSVnv(sums[r]));
+    }
     }
     Safefree(sums);
     
@@ -1922,8 +2020,10 @@ XS_INTERNAL(xs_mat_col_sum) {
     
     AV *av = newAV();
     av_extend(av, A->cols - 1);
-    for (IV c = 0; c < A->cols; c++) {
+    { IV c;
+    for (c = 0; c < A->cols; c++) {
         av_store(av, c, newSVnv(sums[c]));
+    }
     }
     Safefree(sums);
     
@@ -1946,8 +2046,10 @@ XS_INTERNAL(xs_mat_row) {
     AV *av = newAV();
     av_extend(av, A->cols - 1);
     double *row = A->data + r * A->cols;
-    for (IV c = 0; c < A->cols; c++) {
+    { IV c;
+    for (c = 0; c < A->cols; c++) {
         av_store(av, c, newSVnv(row[c]));
+    }
     }
     
     ST(0) = sv_2mortal(newRV_noinc((SV*)av));
@@ -1975,9 +2077,11 @@ XS_INTERNAL(xs_mat_set_row) {
               (int)len, (int)A->cols);
     
     double *row = A->data + r * A->cols;
-    for (IV c = 0; c < A->cols; c++) {
+    { IV c;
+    for (c = 0; c < A->cols; c++) {
         SV **v = av_fetch(av, c, 0);
         row[c] = v ? SvNV(*v) : 0.0;
+    }
     }
     
     XSRETURN(1);
@@ -2023,9 +2127,11 @@ XS_INTERNAL(xs_mat_add_vec_rows) {
     
     double *vec;
     Newx(vec, len, double);
-    for (IV c = 0; c < len; c++) {
+    { IV c;
+    for (c = 0; c < len; c++) {
         SV **v = av_fetch(av, c, 0);
         vec[c] = v ? SvNV(*v) : 0.0;
+    }
     }
     
     Mat *B = mat_create(aTHX_ A->rows, A->cols);
@@ -2055,9 +2161,11 @@ XS_INTERNAL(xs_mat_mul_vec_rows) {
     
     double *vec;
     Newx(vec, len, double);
-    for (IV c = 0; c < len; c++) {
+    { IV c;
+    for (c = 0; c < len; c++) {
         SV **v = av_fetch(av, c, 0);
         vec[c] = v ? SvNV(*v) : 0.0;
+    }
     }
     
     Mat *B = mat_create(aTHX_ A->rows, A->cols);
@@ -2088,9 +2196,11 @@ XS_INTERNAL(xs_mat_from_vector) {
               (int)len, (int)rows, (int)cols, (int)(rows*cols));
     
     Mat *mat = mat_create(aTHX_ rows, cols);
-    for (IV i = 0; i < len; i++) {
+    { IV i;
+    for (i = 0; i < len; i++) {
         SV **v = av_fetch(av, i, 0);
         mat->data[i] = v ? SvNV(*v) : 0.0;
+    }
     }
     
     ST(0) = sv_2mortal(mat_wrap(aTHX_ mat));
@@ -2106,8 +2216,10 @@ XS_INTERNAL(xs_mat_to_vector) {
     
     AV *av = newAV();
     av_extend(av, n - 1);
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         av_store(av, i, newSVnv(A->data[i]));
+    }
     }
     
     ST(0) = sv_2mortal(newRV_noinc((SV*)av));
@@ -2125,8 +2237,10 @@ XS_INTERNAL(xs_mat_to_array) {
     
     AV *av = newAV();
     av_extend(av, n - 1);
-    for (size_t i = 0; i < n; i++) {
+    { size_t i;
+    for (i = 0; i < n; i++) {
         av_store(av, i, newSVnv(A->data[i]));
+    }
     }
     
     ST(0) = sv_2mortal(newRV_noinc((SV*)av));
@@ -2259,10 +2373,14 @@ static OP* pp_mat_transpose(pTHX) {
     Mat *A = mat_from_sv(aTHX_ TOPs);
     Mat *B = mat_create(aTHX_ A->cols, A->rows);
     
-    for (IV r = 0; r < A->rows; r++) {
-        for (IV c = 0; c < A->cols; c++) {
+    { IV r;
+    for (r = 0; r < A->rows; r++) {
+        { IV c;
+        for (c = 0; c < A->cols; c++) {
             B->data[c * B->cols + r] = A->data[r * A->cols + c];
         }
+        }
+    }
     }
     POPs;
     PUSHs(sv_2mortal(mat_wrap(aTHX_ B)));

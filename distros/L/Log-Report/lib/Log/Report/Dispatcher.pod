@@ -110,7 +110,7 @@ for smooth Getopt::Long integration.
 
 =back
 
-=head2 Accessors
+=head2 Attributes
 
 =over 4
 
@@ -319,7 +319,7 @@ instance created with L<Log::Report::__()|Log::Report/"Messages (optionally tran
 will get translated as well.  Otherwise, all will be in English.
 
 Exactly what will be added depends on the actual mode of the dispatcher
-(change it with L<mode()|Log::Report::Dispatcher/"Accessors">, initiate it with L<new(mode)|Log::Report::Dispatcher/"Constructors">).
+(change it with L<mode()|Log::Report::Dispatcher/"Attributes">, initiate it with L<new(mode)|Log::Report::Dispatcher/"Constructors">).
 
                          mode mode mode mode
   REASON   SOURCE   TE!  NORM VERB ASSE DEBUG
@@ -411,14 +411,14 @@ Cast by C<new()>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.44,
-built on December 22, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.45,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2007-2025 by Mark Overmeer.
+This software is copyright (c) 2007-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

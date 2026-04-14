@@ -4,7 +4,7 @@
       "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,9 +36,15 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Dancer2::Session::Sereal" : "0.003",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0"
+         },
          "requires" : {
             "Dancer2" : "0.207",
-            "Log::Report" : "1.42",
+            "Log::Report" : "1.45",
             "Log::Report::Template" : "0",
             "Scalar::Util" : "0"
          }
@@ -62,7 +68,7 @@
          "web" : "https://github.com/markov2/perl5-Dancer2-Plugin-LogReport"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2015,
@@ -73,12 +79,15 @@
          }
       ],
       "include" : [
-         "../Log-Report"
+         "../Log-Report",
+         "../Log-Report-Optional"
       ],
       "oodoc_version" : 3.04,
       "parser" : {
          "pmhead" : null,
-         "skip_links" : [],
+         "skip_links" : [
+            "Dancer2::Logger::Syslog"
+         ],
          "syntax" : "markov"
       },
       "raw" : {

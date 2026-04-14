@@ -26,7 +26,7 @@
 	use IO::File;
 	use Test::More;
 
-	our $VERSION = "2023.302.1";
+	our $VERSION = "2026.101.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); };
 
@@ -2166,10 +2166,6 @@ sub testRC()
 		diag("Command: ".$cmd);
 		&DONE() if ($ENV{EXIT_ON_FIRT_ERROR});
 		return 1;
-	}
-	else
-	{
-#		diag("test-D".$cod." ".$hdr." ".$tbl." successful");
 	}
 	diag($dbh->getLastSQL()) if (defined($ENV{SQL_SIMPLE_DB_SHOW_SQL}) && $ENV{SQL_SIMPLE_DB_SHOW_SQL} eq "1");
 	return $rc;

@@ -7,7 +7,7 @@ use SimpleMock::Util qw(
 );
 use Data::Dumper;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 our %DELEGATED;
 

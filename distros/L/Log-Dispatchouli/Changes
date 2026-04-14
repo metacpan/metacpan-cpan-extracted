@@ -1,5 +1,8 @@
 Revision history for Log-Dispatchouli
 
+3.101     2026-04-13 13:31:24-04:00 America/New_York
+        - fix auto-using of Log::Fmt::XS, which was straight up broken
+
 3.100     2026-04-01 10:35:56-04:00 America/New_York
         - when present, use Log::Fmt::XS for emitting logfmt
         - abstract out logfmt tests for use in both Log::Fmt and Log::Fmt::XS

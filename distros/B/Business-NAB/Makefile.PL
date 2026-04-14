@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Business-NAB",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Business::NAB",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t t/lib/Business/NAB/*.t t/lib/Business/NAB/AccountInformation/*.t t/lib/Business/NAB/Acknowledgement/*.t t/lib/Business/NAB/Australian/DirectEntry/*.t t/lib/Business/NAB/Australian/DirectEntry/Payments/*.t t/lib/Business/NAB/Australian/DirectEntry/Report/*.t t/lib/Business/NAB/BPAY/*.t t/lib/Business/NAB/BPAY/Payments/*.t t/lib/Business/NAB/BPAY/Payments/Results/*.t t/lib/Business/NAB/BPAY/Remittance/*.t t/lib/Business/NAB/BPAY/Remittance/File/*.t"
   }

@@ -2,7 +2,7 @@ package IPC::Manager::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use Carp qw/croak confess/;
 use List::Util qw/max/;
@@ -39,6 +39,7 @@ use Object::HashBase(
         +on_sig
         +handle_request
         +handle_response
+        <post_fork
     },
 
     map { "<$_" } @ACTIONS,
@@ -51,6 +52,12 @@ sub signals_to_grab { keys %{$_[0]->{+ON_SIG}} }
 sub handle_request  { $_[0]->{+HANDLE_REQUEST}->(@_) }
 sub handle_response { $_[0]->{+HANDLE_RESPONSE}->(@_) }
 
+sub post_fork_hook {
+    my $self = shift;
+    my $cb = $self->{+POST_FORK} or return;
+    $cb->($self);
+}
+
 sub init {
     my $self = shift;
 
@@ -61,6 +68,8 @@ sub init {
     $self->{+USE_POSIX_EXIT}   //= $self->IPC::Manager::Role::Service::use_posix_exit();
     $self->{+INTERCEPT_ERRORS}      //= $self->IPC::Manager::Role::Service::intercept_errors();
     $self->{+EXPOSE_ERROR_DETAILS}  //= $self->IPC::Manager::Role::Service::expose_error_details();
+
+    croak "'post_fork' must be a coderef" if $self->{+POST_FORK} && ref($self->{+POST_FORK}) ne 'CODE';
 
     if ($self->{+ON_ALL}) {
         $self->{+HANDLE_REQUEST}  //= sub { return () };
@@ -234,6 +243,14 @@ Callback for handling requests. Required unless C<on_all> is provided.
 =item handle_response => \&callback
 
 Callback for handling responses. Defaults to confessing if not provided.
+
+=item post_fork => \&callback
+
+Callback called in the child process after C<ipcm_service> forks but before
+the service takes over. Use this to implement a double-fork pattern: fork
+inside the callback, have the middle process do its work and exit, and let the
+grandchild return to become the service. The callback receives the service
+instance as its argument.
 
 =item on_all => \&callback
 

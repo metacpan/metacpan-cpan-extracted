@@ -1,5 +1,8 @@
 Revision history for Object-Proto
 
+0.13	2026-04-14
+	- Add object_register_type_xs_ex() user-data API, include_dir() and installable headers for downstream XS modules
+
 0.12	2026-04-12
 	- Fix func accessors (import_accessor) bypassing lazy attribute evaluation,
 	  returning undef instead of triggering the builder

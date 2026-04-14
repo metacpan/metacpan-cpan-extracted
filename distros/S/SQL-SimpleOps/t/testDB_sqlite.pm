@@ -45,7 +45,7 @@ sub SQLite_do()
 	my $dir = shift;
 	if (!defined($ENV{SQL_SIMPLE_SQLITE}) || $ENV{SQL_SIMPLE_SQLITE} eq "")
 	{
-		&SQLite_envfail();
+		&SQLite_envfail("\$ENV{SQL_SIMPLE_SQLITE} is missing");
 		return 0;
 	}
 

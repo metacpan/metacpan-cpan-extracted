@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::MIKKOI;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 # ABSTRACT: BeLike::MIKKOI when you build your dists
 
@@ -73,6 +73,7 @@ sub configure {
             'AuthorSignatureTest',
             ['Test::Software::Policies' => {
                     'include_policy' => [
+                        'AIDisclosure',
                         'Contributing',
                         'CodeOfConduct',
                         'License',
@@ -82,4 +83,8 @@ sub configure {
         );
     return;
 }
+
+__PACKAGE__->meta()->make_immutable();
+no Moose;
+
 1;

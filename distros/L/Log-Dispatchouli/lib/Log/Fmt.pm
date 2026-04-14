@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Fmt 3.100;
+package Log::Fmt 3.101;
 # ABSTRACT: a little parser and emitter of structured log lines
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -334,7 +334,7 @@ Log::Fmt - a little parser and emitter of structured log lines
 
 =head1 VERSION
 
-version 3.100
+version 3.101
 
 =head1 OVERVIEW
 

@@ -1,5 +1,9 @@
 Revision history for RT-Extension-AWS-Assets
 
+0.08 2026-04-14
+ - Resolve reserved RDS instance sync failure
+ - Support paging reserved RDS instances
+
 0.07 2025-12-22
  - Improve detection of newly purchased RDS reserved instances during sync
 

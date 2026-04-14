@@ -165,6 +165,8 @@ sub ipcm_service {
         return $out;
     }
 
+    $new_inst->post_fork_hook();
+
     if ($exec) {
         my $cmd = $exec->{cmd} // [];
         my $json = $exec->{json};

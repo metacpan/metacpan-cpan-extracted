@@ -1125,6 +1125,93 @@ sub test_request_error_detailed {
     $handle = undef;
 }
 
+sub test_post_fork_hook {
+    # Verifies that the post_fork_hook allows a double-fork pattern where the
+    # middle process goes off to do its own work and the grandchild becomes
+    # the service.
+
+    my $marker_dir   = File::Temp::tempdir(CLEANUP => 1);
+    my $middle_file  = File::Spec->catfile($marker_dir, 'middle_pid');
+    my $service_file = File::Spec->catfile($marker_dir, 'service_pid');
+
+    my $handle = ipcm_service(
+        'pfh_svc',
+        class => 'IPC::Manager::Service',
+
+        post_fork => sub {
+            my $self = shift;
+
+            my $pid = fork // die "Could not fork in post_fork: $!";
+
+            if ($pid) {
+                # Middle process: write our PID and exit
+                open my $fh, '>', $middle_file or die "open: $!";
+                print $fh "$$\n";
+                close $fh;
+                POSIX::_exit(0);
+            }
+
+            # Grandchild: return to become the service
+        },
+
+        on_start => sub {
+            my $self = shift;
+            open my $fh, '>', $service_file or die "open: $!";
+            print $fh "$$\n";
+            close $fh;
+        },
+
+        handle_request => sub {
+            my ($self, $req, $msg) = @_;
+            return "pfh_$$";
+        },
+    );
+
+    # Wait for the middle process marker
+    my $waited = 0;
+    until (-e $middle_file || $waited > 10) {
+        Time::HiRes::sleep(0.1);
+        $waited += 0.1;
+    }
+    ok(-e $middle_file, "Middle process ran and wrote marker");
+
+    # The service should be functional
+    my $resp = $handle->sync_request(pfh_svc => 'ping');
+    ok($resp->{response}, "Service responded");
+
+    # Wait for service on_start marker
+    $waited = 0;
+    until (-e $service_file || $waited > 10) {
+        Time::HiRes::sleep(0.1);
+        $waited += 0.1;
+    }
+    ok(-e $service_file, "Service on_start ran");
+
+    # Read the PIDs
+    open my $mfh, '<', $middle_file or die "open: $!";
+    chomp(my $middle_pid = <$mfh>);
+    close $mfh;
+
+    open my $sfh, '<', $service_file or die "open: $!";
+    chomp(my $svc_pid = <$sfh>);
+    close $sfh;
+
+    my $handle_svc_pid = $handle->service_pid;
+
+    # The service PID should be the grandchild, not the middle process
+    isnt($svc_pid, $middle_pid, "Service PID ($svc_pid) differs from middle process PID ($middle_pid)");
+    is($handle_svc_pid, $svc_pid, "Handle reports correct service PID");
+
+    # Verify the response came from the grandchild
+    like($resp->{response}, qr/^pfh_\d+$/, "Response includes a PID");
+    is($resp->{response}, "pfh_$svc_pid", "Response came from the grandchild service process");
+
+    # Reap the middle process so it doesn't linger as a zombie
+    waitpid($middle_pid, 0) if $middle_pid;
+
+    $handle = undef;
+}
+
 1;
 
 __END__
@@ -1308,6 +1395,15 @@ the error.  This is the default behaviour (C<expose_error_details> off).
 Tests that with C<< expose_error_details => 1 >> an exception in
 C<handle_request> sends an error response whose C<ipcm_error> contains the
 actual exception text.  Verifies the service continues operating.
+
+=item IPC::Manager::Test->test_post_fork_hook
+
+Tests the C<post_fork> callback (which drives C<post_fork_hook>).  The callback
+performs a double-fork: the middle process writes a marker file and exits, while
+the grandchild returns and becomes the service.  The test verifies that the
+middle process ran, the service is functional (responds to requests), and the
+PID reported by the handle matches the grandchild rather than the middle
+process.
 
 =back
 

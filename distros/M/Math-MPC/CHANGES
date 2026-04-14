@@ -1,3 +1,9 @@
+
+1.41
+ - Enable quadmath builds on cygwin smoker. See (eg):
+   https://www.cpantesters.org/cpan/report/dab208d0-71b3-1014-beba-d9dcb6a500a3 .
+ - Add more tests to t/mpc_swap.t.
+
 1.40
  - Accommodate arithmetic overloading of Math::MPFR objects.
  - Jump straight to version 1.40 now that mpc-1.4.0 is out.

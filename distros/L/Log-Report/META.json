@@ -64,7 +64,7 @@
          "web" : "https://github.com/markov2/perl5-Log-Report"
       }
    },
-   "version" : "1.44",
+   "version" : "1.45",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2007,
@@ -84,6 +84,9 @@
          {
             "export" : "website",
             "markup" : "html",
+            "meta" : {
+               "main_manual" : "Log::Report"
+            },
             "publish" : "../public_html/log-report/doctree",
             "serializer" : "json"
          }

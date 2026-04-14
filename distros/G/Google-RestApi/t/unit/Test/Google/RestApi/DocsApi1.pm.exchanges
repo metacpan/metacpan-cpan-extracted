@@ -43,31 +43,23 @@ response:
       },
       "documentStyle": {
         "background": {
-          "color": {
-            "color": {
-              "rgbColor": {
-                "red": 1,
-                "green": 1,
-                "blue": 1
-              }
-            }
-          }
+          "color": {}
         },
         "pageNumberStart": 1,
         "marginTop": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "marginBottom": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "marginRight": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "marginLeft": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "pageSize": {
@@ -126,7 +118,6 @@ response:
               "direction": "LEFT_TO_RIGHT",
               "spacingMode": "COLLAPSE_LISTS",
               "spaceAbove": {
-                "magnitude": 6,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -183,15 +174,12 @@ response:
                 "dashStyle": "SOLID"
               },
               "indentFirstLine": {
-                "magnitude": 115.19999999999999,
                 "unit": "PT"
               },
               "indentStart": {
-                "magnitude": 115.19999999999999,
                 "unit": "PT"
               },
               "indentEnd": {
-                "magnitude": 139.92000000000002,
                 "unit": "PT"
               },
               "keepLinesTogether": false,
@@ -206,9 +194,8 @@ response:
           {
             "namedStyleType": "HEADING_1",
             "textStyle": {
-              "bold": true,
               "fontSize": {
-                "magnitude": 24,
+                "magnitude": 20,
                 "unit": "PT"
               }
             },
@@ -216,7 +203,7 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 24,
+                "magnitude": 20,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -231,9 +218,9 @@ response:
           {
             "namedStyleType": "HEADING_2",
             "textStyle": {
-              "bold": true,
+              "bold": false,
               "fontSize": {
-                "magnitude": 18,
+                "magnitude": 16,
                 "unit": "PT"
               }
             },
@@ -245,7 +232,7 @@ response:
                 "unit": "PT"
               },
               "spaceBelow": {
-                "magnitude": 4,
+                "magnitude": 6,
                 "unit": "PT"
               },
               "keepLinesTogether": true,
@@ -256,7 +243,16 @@ response:
           {
             "namedStyleType": "HEADING_3",
             "textStyle": {
-              "bold": true,
+              "bold": false,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.2627451,
+                    "green": 0.2627451,
+                    "blue": 0.2627451
+                  }
+                }
+              },
               "fontSize": {
                 "magnitude": 14,
                 "unit": "PT"
@@ -266,7 +262,7 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 14,
+                "magnitude": 16,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -281,7 +277,15 @@ response:
           {
             "namedStyleType": "HEADING_4",
             "textStyle": {
-              "bold": true,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.4,
+                    "green": 0.4,
+                    "blue": 0.4
+                  }
+                }
+              },
               "fontSize": {
                 "magnitude": 12,
                 "unit": "PT"
@@ -291,11 +295,11 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 12,
+                "magnitude": 14,
                 "unit": "PT"
               },
               "spaceBelow": {
-                "magnitude": 2,
+                "magnitude": 4,
                 "unit": "PT"
               },
               "keepLinesTogether": true,
@@ -306,7 +310,15 @@ response:
           {
             "namedStyleType": "HEADING_5",
             "textStyle": {
-              "bold": true,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.4,
+                    "green": 0.4,
+                    "blue": 0.4
+                  }
+                }
+              },
               "fontSize": {
                 "magnitude": 11,
                 "unit": "PT"
@@ -316,11 +328,11 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 11,
+                "magnitude": 12,
                 "unit": "PT"
               },
               "spaceBelow": {
-                "magnitude": 2,
+                "magnitude": 4,
                 "unit": "PT"
               },
               "keepLinesTogether": true,
@@ -330,56 +342,6 @@ response:
           },
           {
             "namedStyleType": "HEADING_6",
-            "textStyle": {
-              "bold": true,
-              "fontSize": {
-                "magnitude": 10,
-                "unit": "PT"
-              }
-            },
-            "paragraphStyle": {
-              "namedStyleType": "NORMAL_TEXT",
-              "direction": "LEFT_TO_RIGHT",
-              "spaceAbove": {
-                "magnitude": 10,
-                "unit": "PT"
-              },
-              "spaceBelow": {
-                "magnitude": 2,
-                "unit": "PT"
-              },
-              "keepLinesTogether": true,
-              "keepWithNext": true,
-              "pageBreakBefore": false
-            }
-          },
-          {
-            "namedStyleType": "TITLE",
-            "textStyle": {
-              "bold": true,
-              "fontSize": {
-                "magnitude": 36,
-                "unit": "PT"
-              }
-            },
-            "paragraphStyle": {
-              "namedStyleType": "NORMAL_TEXT",
-              "direction": "LEFT_TO_RIGHT",
-              "spaceAbove": {
-                "magnitude": 24,
-                "unit": "PT"
-              },
-              "spaceBelow": {
-                "magnitude": 6,
-                "unit": "PT"
-              },
-              "keepLinesTogether": true,
-              "keepWithNext": true,
-              "pageBreakBefore": false
-            }
-          },
-          {
-            "namedStyleType": "SUBTITLE",
             "textStyle": {
               "italic": true,
               "foregroundColor": {
@@ -392,19 +354,15 @@ response:
                 }
               },
               "fontSize": {
-                "magnitude": 24,
+                "magnitude": 11,
                 "unit": "PT"
-              },
-              "weightedFontFamily": {
-                "fontFamily": "Georgia",
-                "weight": 400
               }
             },
             "paragraphStyle": {
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 18,
+                "magnitude": 12,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -415,12 +373,72 @@ response:
               "keepWithNext": true,
               "pageBreakBefore": false
             }
+          },
+          {
+            "namedStyleType": "TITLE",
+            "textStyle": {
+              "fontSize": {
+                "magnitude": 26,
+                "unit": "PT"
+              }
+            },
+            "paragraphStyle": {
+              "namedStyleType": "NORMAL_TEXT",
+              "direction": "LEFT_TO_RIGHT",
+              "spaceAbove": {
+                "unit": "PT"
+              },
+              "spaceBelow": {
+                "magnitude": 3,
+                "unit": "PT"
+              },
+              "keepLinesTogether": true,
+              "keepWithNext": true,
+              "pageBreakBefore": false
+            }
+          },
+          {
+            "namedStyleType": "SUBTITLE",
+            "textStyle": {
+              "italic": false,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.4,
+                    "green": 0.4,
+                    "blue": 0.4
+                  }
+                }
+              },
+              "fontSize": {
+                "magnitude": 15,
+                "unit": "PT"
+              },
+              "weightedFontFamily": {
+                "fontFamily": "Arial",
+                "weight": 400
+              }
+            },
+            "paragraphStyle": {
+              "namedStyleType": "NORMAL_TEXT",
+              "direction": "LEFT_TO_RIGHT",
+              "spaceAbove": {
+                "unit": "PT"
+              },
+              "spaceBelow": {
+                "magnitude": 16,
+                "unit": "PT"
+              },
+              "keepLinesTogether": true,
+              "keepWithNext": true,
+              "pageBreakBefore": false
+            }
           }
         ]
       },
-      "revisionId": "AIxLkStAMWnSrI99oGj6a3FaQi6QjqvsMLHtFkTIO3iVJHqr7SkIn6xlIULrhFzkVl-7oSkORmW7QZLxrBxolcFiTRXUhkn9V8lL29UXqrE",
+      "revisionId": "AMHacu4kkzS5p_DCCa5nbmu5LR4XPRjxKF4np5sUwL4jyZKODTEzoSV_gzAr7LwN4U82ZwxQOC_u1kVOIzKc7_D5AhCmnX5DT254Xs5BVsVp",
       "suggestionsViewMode": "SUGGESTIONS_INLINE",
-      "documentId": "1MWAvf2TMAjehoYM7Oa8C1JhDcZKcxjA3UaVhV11pvFA",
+      "documentId": "1W4czaoAny6SnF3rONfUdbrIBAPxw4AvGCOctOqeiXHY",
       "tabs": [
         {
           "tabProperties": {
@@ -465,31 +483,23 @@ response:
             },
             "documentStyle": {
               "background": {
-                "color": {
-                  "color": {
-                    "rgbColor": {
-                      "red": 1,
-                      "green": 1,
-                      "blue": 1
-                    }
-                  }
-                }
+                "color": {}
               },
               "pageNumberStart": 1,
               "marginTop": {
-                "magnitude": 56.692913385826778,
+                "magnitude": 72,
                 "unit": "PT"
               },
               "marginBottom": {
-                "magnitude": 56.692913385826778,
+                "magnitude": 72,
                 "unit": "PT"
               },
               "marginRight": {
-                "magnitude": 56.692913385826778,
+                "magnitude": 72,
                 "unit": "PT"
               },
               "marginLeft": {
-                "magnitude": 56.692913385826778,
+                "magnitude": 72,
                 "unit": "PT"
               },
               "pageSize": {
@@ -548,7 +558,6 @@ response:
                     "direction": "LEFT_TO_RIGHT",
                     "spacingMode": "COLLAPSE_LISTS",
                     "spaceAbove": {
-                      "magnitude": 6,
                       "unit": "PT"
                     },
                     "spaceBelow": {
@@ -605,15 +614,12 @@ response:
                       "dashStyle": "SOLID"
                     },
                     "indentFirstLine": {
-                      "magnitude": 115.19999999999999,
                       "unit": "PT"
                     },
                     "indentStart": {
-                      "magnitude": 115.19999999999999,
                       "unit": "PT"
                     },
                     "indentEnd": {
-                      "magnitude": 139.92000000000002,
                       "unit": "PT"
                     },
                     "keepLinesTogether": false,
@@ -628,9 +634,8 @@ response:
                 {
                   "namedStyleType": "HEADING_1",
                   "textStyle": {
-                    "bold": true,
                     "fontSize": {
-                      "magnitude": 24,
+                      "magnitude": 20,
                       "unit": "PT"
                     }
                   },
@@ -638,7 +643,7 @@ response:
                     "namedStyleType": "NORMAL_TEXT",
                     "direction": "LEFT_TO_RIGHT",
                     "spaceAbove": {
-                      "magnitude": 24,
+                      "magnitude": 20,
                       "unit": "PT"
                     },
                     "spaceBelow": {
@@ -653,9 +658,9 @@ response:
                 {
                   "namedStyleType": "HEADING_2",
                   "textStyle": {
-                    "bold": true,
+                    "bold": false,
                     "fontSize": {
-                      "magnitude": 18,
+                      "magnitude": 16,
                       "unit": "PT"
                     }
                   },
@@ -667,7 +672,7 @@ response:
                       "unit": "PT"
                     },
                     "spaceBelow": {
-                      "magnitude": 4,
+                      "magnitude": 6,
                       "unit": "PT"
                     },
                     "keepLinesTogether": true,
@@ -678,7 +683,16 @@ response:
                 {
                   "namedStyleType": "HEADING_3",
                   "textStyle": {
-                    "bold": true,
+                    "bold": false,
+                    "foregroundColor": {
+                      "color": {
+                        "rgbColor": {
+                          "red": 0.2627451,
+                          "green": 0.2627451,
+                          "blue": 0.2627451
+                        }
+                      }
+                    },
                     "fontSize": {
                       "magnitude": 14,
                       "unit": "PT"
@@ -688,7 +702,7 @@ response:
                     "namedStyleType": "NORMAL_TEXT",
                     "direction": "LEFT_TO_RIGHT",
                     "spaceAbove": {
-                      "magnitude": 14,
+                      "magnitude": 16,
                       "unit": "PT"
                     },
                     "spaceBelow": {
@@ -703,7 +717,15 @@ response:
                 {
                   "namedStyleType": "HEADING_4",
                   "textStyle": {
-                    "bold": true,
+                    "foregroundColor": {
+                      "color": {
+                        "rgbColor": {
+                          "red": 0.4,
+                          "green": 0.4,
+                          "blue": 0.4
+                        }
+                      }
+                    },
                     "fontSize": {
                       "magnitude": 12,
                       "unit": "PT"
@@ -713,11 +735,11 @@ response:
                     "namedStyleType": "NORMAL_TEXT",
                     "direction": "LEFT_TO_RIGHT",
                     "spaceAbove": {
-                      "magnitude": 12,
+                      "magnitude": 14,
                       "unit": "PT"
                     },
                     "spaceBelow": {
-                      "magnitude": 2,
+                      "magnitude": 4,
                       "unit": "PT"
                     },
                     "keepLinesTogether": true,
@@ -728,7 +750,15 @@ response:
                 {
                   "namedStyleType": "HEADING_5",
                   "textStyle": {
-                    "bold": true,
+                    "foregroundColor": {
+                      "color": {
+                        "rgbColor": {
+                          "red": 0.4,
+                          "green": 0.4,
+                          "blue": 0.4
+                        }
+                      }
+                    },
                     "fontSize": {
                       "magnitude": 11,
                       "unit": "PT"
@@ -738,11 +768,11 @@ response:
                     "namedStyleType": "NORMAL_TEXT",
                     "direction": "LEFT_TO_RIGHT",
                     "spaceAbove": {
-                      "magnitude": 11,
+                      "magnitude": 12,
                       "unit": "PT"
                     },
                     "spaceBelow": {
-                      "magnitude": 2,
+                      "magnitude": 4,
                       "unit": "PT"
                     },
                     "keepLinesTogether": true,
@@ -752,56 +782,6 @@ response:
                 },
                 {
                   "namedStyleType": "HEADING_6",
-                  "textStyle": {
-                    "bold": true,
-                    "fontSize": {
-                      "magnitude": 10,
-                      "unit": "PT"
-                    }
-                  },
-                  "paragraphStyle": {
-                    "namedStyleType": "NORMAL_TEXT",
-                    "direction": "LEFT_TO_RIGHT",
-                    "spaceAbove": {
-                      "magnitude": 10,
-                      "unit": "PT"
-                    },
-                    "spaceBelow": {
-                      "magnitude": 2,
-                      "unit": "PT"
-                    },
-                    "keepLinesTogether": true,
-                    "keepWithNext": true,
-                    "pageBreakBefore": false
-                  }
-                },
-                {
-                  "namedStyleType": "TITLE",
-                  "textStyle": {
-                    "bold": true,
-                    "fontSize": {
-                      "magnitude": 36,
-                      "unit": "PT"
-                    }
-                  },
-                  "paragraphStyle": {
-                    "namedStyleType": "NORMAL_TEXT",
-                    "direction": "LEFT_TO_RIGHT",
-                    "spaceAbove": {
-                      "magnitude": 24,
-                      "unit": "PT"
-                    },
-                    "spaceBelow": {
-                      "magnitude": 6,
-                      "unit": "PT"
-                    },
-                    "keepLinesTogether": true,
-                    "keepWithNext": true,
-                    "pageBreakBefore": false
-                  }
-                },
-                {
-                  "namedStyleType": "SUBTITLE",
                   "textStyle": {
                     "italic": true,
                     "foregroundColor": {
@@ -814,11 +794,68 @@ response:
                       }
                     },
                     "fontSize": {
-                      "magnitude": 24,
+                      "magnitude": 11,
+                      "unit": "PT"
+                    }
+                  },
+                  "paragraphStyle": {
+                    "namedStyleType": "NORMAL_TEXT",
+                    "direction": "LEFT_TO_RIGHT",
+                    "spaceAbove": {
+                      "magnitude": 12,
+                      "unit": "PT"
+                    },
+                    "spaceBelow": {
+                      "magnitude": 4,
+                      "unit": "PT"
+                    },
+                    "keepLinesTogether": true,
+                    "keepWithNext": true,
+                    "pageBreakBefore": false
+                  }
+                },
+                {
+                  "namedStyleType": "TITLE",
+                  "textStyle": {
+                    "fontSize": {
+                      "magnitude": 26,
+                      "unit": "PT"
+                    }
+                  },
+                  "paragraphStyle": {
+                    "namedStyleType": "NORMAL_TEXT",
+                    "direction": "LEFT_TO_RIGHT",
+                    "spaceAbove": {
+                      "unit": "PT"
+                    },
+                    "spaceBelow": {
+                      "magnitude": 3,
+                      "unit": "PT"
+                    },
+                    "keepLinesTogether": true,
+                    "keepWithNext": true,
+                    "pageBreakBefore": false
+                  }
+                },
+                {
+                  "namedStyleType": "SUBTITLE",
+                  "textStyle": {
+                    "italic": false,
+                    "foregroundColor": {
+                      "color": {
+                        "rgbColor": {
+                          "red": 0.4,
+                          "green": 0.4,
+                          "blue": 0.4
+                        }
+                      }
+                    },
+                    "fontSize": {
+                      "magnitude": 15,
                       "unit": "PT"
                     },
                     "weightedFontFamily": {
-                      "fontFamily": "Georgia",
+                      "fontFamily": "Arial",
                       "weight": 400
                     }
                   },
@@ -826,11 +863,10 @@ response:
                     "namedStyleType": "NORMAL_TEXT",
                     "direction": "LEFT_TO_RIGHT",
                     "spaceAbove": {
-                      "magnitude": 18,
                       "unit": "PT"
                     },
                     "spaceBelow": {
-                      "magnitude": 4,
+                      "magnitude": 16,
                       "unit": "PT"
                     },
                     "keepLinesTogether": true,
@@ -845,38 +881,38 @@ response:
       ]
     }
   headers:
-    - x-l2-request-path
-    - l2-managed-5
-    - date
-    - 'Sun, 15 Feb 2026 20:52:07 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - server
-    - ESF
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - date
+  - Mon, 13 Apr 2026 23:45:37 GMT
+  - x-l2-request-path
+  - l2-managed-5
+  - content-type
+  - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::DocsApi1::create_document
 
 ---
 query_params:
-  fields: 'nextPageToken, files(id, name)'
+  fields: nextPageToken, files(id, name)
   q: mimeType = 'application/vnd.google-apps.document' and (name = 'Test Document')
 request: GET /drive/v3/files
 response:
@@ -885,48 +921,44 @@ response:
     {
       "files": [
         {
-          "id": "1MWAvf2TMAjehoYM7Oa8C1JhDcZKcxjA3UaVhV11pvFA",
-          "name": "Test Document"
-        },
-        {
-          "id": "1nO_EzGC_J0cjjOIAi_HFwijWIeSJ8B2f-zHEPeuGrZA",
+          "id": "1W4czaoAny6SnF3rONfUdbrIBAPxw4AvGCOctOqeiXHY",
           "name": "Test Document"
         }
       ]
     }
   headers:
-    - server
-    - ESF
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - 'Origin, X-Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:52:10 GMT'
-    - pragma
-    - no-cache
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - Origin, X-Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:45:40 GMT
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - accept-ranges
+  - none
+  - server
+  - ESF
+  - pragma
+  - no-cache
+  - x-frame-options
+  - SAMEORIGIN
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::DocsApi1::page_callback
 
 ---
 query_params:
-  fields: 'nextPageToken, files(id, name)'
+  fields: nextPageToken, files(id, name)
   q: mimeType = 'application/vnd.google-apps.document' and (name contains 'Test')
 request: GET /drive/v3/files
 response:
@@ -935,42 +967,38 @@ response:
     {
       "files": [
         {
-          "id": "1MWAvf2TMAjehoYM7Oa8C1JhDcZKcxjA3UaVhV11pvFA",
-          "name": "Test Document"
-        },
-        {
-          "id": "1nO_EzGC_J0cjjOIAi_HFwijWIeSJ8B2f-zHEPeuGrZA",
+          "id": "1W4czaoAny6SnF3rONfUdbrIBAPxw4AvGCOctOqeiXHY",
           "name": "Test Document"
         }
       ]
     }
   headers:
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - 'Origin, X-Origin,Accept-Encoding'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - server
-    - ESF
-    - pragma
-    - no-cache
-    - date
-    - 'Sun, 15 Feb 2026 20:52:11 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
+  - accept-ranges
+  - none
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - date
+  - Mon, 13 Apr 2026 23:45:41 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - Origin, X-Origin,Accept-Encoding
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-frame-options
+  - SAMEORIGIN
+  - pragma
+  - no-cache
+  - server
+  - ESF
   message: OK
 source: Test::Google::RestApi::DocsApi1::page_callback
 

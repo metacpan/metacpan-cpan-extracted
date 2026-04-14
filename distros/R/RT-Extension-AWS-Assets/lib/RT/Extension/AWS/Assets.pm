@@ -5,7 +5,7 @@ package RT::Extension::AWS::Assets;
 use Paws;
 use Paws::Credential::Explicit;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -309,10 +309,17 @@ sub FetchMultipleAssetsFromAWS {
             eval {
                 my $service = Paws->service($args{'ServiceType'}, credentials => $credentials, region => $args{'Region'});
 
-                # The RDS version does have paging, but leaving it out for consistency with EC2
-                # Set Max to the Max allowed. Will need to update when we go over 100 in a region
-                $res = $service->DescribeReservedDBInstances(MaxRecords => 100);
+                if ( $args{'Token'} ) {
+                    $res = $service->DescribeReservedDBInstances(
+                        MaxRecords => $args{'MaxResults'},
+                        Marker     => $args{'Token'},
+                    );
+                }
+                else {
+                    $res = $service->DescribeReservedDBInstances( MaxRecords => $args{'MaxResults'} );
+                }
                 $aws_resources = $res->ReservedDBInstances;
+                $token         = $res->Marker;
             };
         }
         else {
@@ -425,7 +432,16 @@ sub UpdateAWSAsset {
             ($ret, $msg) = $asset->AddCustomFieldValue( Field => $cf_name, Value => "Linux/UNIX" );
         }
         else {
-            ($ret, $msg) = $asset->AddCustomFieldValue( Field => $cf_name, Value => $paws_obj->$method );
+            my $new_value = $paws_obj->$method;
+            if ( defined $new_value && length $new_value ) {
+                ( $ret, $msg ) = $asset->AddCustomFieldValue( Field => $cf_name, Value => $new_value );
+            }
+            elsif ( defined( my $old_value = $asset->FirstCustomFieldValue($cf_name) ) ) {
+                ( $ret, $msg ) = $asset->DeleteCustomFieldValue( Field => $cf_name, Value => $old_value );
+            }
+            else {
+                next;
+            }
         }
 
         if ( $msg && $msg =~ /That is already the current value/ ) {
@@ -606,7 +622,7 @@ sub UpdateAWSAssets {
         # New purchased reserved db instance's Lease ID could be empty
         if ( !$asset_found && $args{'ServiceType'} eq 'RDS' && $args{'ReservedInstances'} ) {
             my $name = $resource->ReservedDBInstanceId;
-            $assets->FromSQL(qq<Catalog = '$catalog' AND 'CF.{$asset_id_cf}' IS NULL AND Name = '$name'>);
+            $assets->FromSQL(qq<Catalog = '$catalog' AND 'CF.{$asset_id_cf}.Content' IS NULL AND Name = '$name'>);
             $asset_found = 1 if $assets->Count;
         }
 
@@ -657,7 +673,7 @@ href="http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AWS-Assets">
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by Best Practical Solutions, LLC
+This software is Copyright (c) 2024-2026 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

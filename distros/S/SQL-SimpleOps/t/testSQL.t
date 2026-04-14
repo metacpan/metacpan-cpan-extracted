@@ -35,7 +35,7 @@
 	use warnings;
 	use Test::More;
 
-	our $VERSION = "2026.095.1";
+	our $VERSION = "2026.101.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -192,7 +192,7 @@ sub callDeleteWith()
 {
 	&my_cmd
 	(
-		f=> "S0700",
+		f=> "0700",
 		s=> sub
 	       	{
 	       		$mymod->Delete( table => "tab_noalias", force => 1,
@@ -203,7 +203,7 @@ sub callDeleteWith()
 	);
 	&my_cmd
 	(
-		f=> "S0701",
+		f=> "0701",
 		s=> sub
 	       	{
 	       		$mymod->Delete( table => "tab_alias1", force => 1,
@@ -214,7 +214,7 @@ sub callDeleteWith()
 	);
 	&my_cmd
 	(
-		f=> "S0702",
+		f=> "0702",
 		s=> sub
 	       	{
 	       		$mymod->Delete( table => "tab_real1", force => 1,
@@ -225,7 +225,7 @@ sub callDeleteWith()
 	);
 	&my_cmd
 	(
-		f=> "S0710",
+		f=> "0710",
 		s=> sub
 	       	{
 	       		$mymod->Delete( table => "tab_noalias1", force => 1,
@@ -236,7 +236,7 @@ sub callDeleteWith()
 	);
 	&my_cmd
 	(
-		f=> "S0711",
+		f=> "0711",
 		s=> sub
 	       	{
 	       		$mymod->Delete( table => "tab_alias1", force => 1,
@@ -253,7 +253,7 @@ sub callInsertWith()
 {
 	&my_cmd
 	(
-		f=> "S0600",
+		f=> "0600",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_noalias", fields => { "fld_alias1" => "value1" },
@@ -264,7 +264,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0601",
+		f=> "0601",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_noalias", fields => [ "fld_alias1" ], values => [ "value1" ],
@@ -275,7 +275,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0602",
+		f=> "0602",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_noalias", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2" },
@@ -286,7 +286,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0603",
+		f=> "0603",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_noalias", fields => [ "fld_alias1","fld_alias2" ], values => [ "value1","value2" ],
@@ -297,7 +297,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0604",
+		f=> "0604",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_noalias", fields => [ "fld_alias1" ], values => [ "value1","value2" ],
@@ -308,7 +308,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0605",
+		f=> "0605",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_noalias", fields => [ "tab_noalias.fld_alias1" ], values => [ "value1" ],
@@ -319,7 +319,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0607",
+		f=> "0607",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_noalias", fields => [ "bad_table.fld_alias1" ], values => [ "value1" ],
@@ -330,7 +330,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0608",
+		f=> "0608",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_alias1", fields => { "fld_alias1" => "value1" },
@@ -341,7 +341,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0609",
+		f=> "0609",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_real1", fields => { "fld_alias1" => "value1" },
@@ -352,7 +352,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0610",
+		f=> "0610",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_alias1", fields => { "tab_alias1.fld_alias1" => "value1" },
@@ -363,7 +363,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0611",
+		f=> "0611",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_real1", fields => { "tab_real1.fld_alias1" => "value1" },
@@ -374,7 +374,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0612",
+		f=> "0612",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_alias1", fields => { "tab_alias1.fld_real1" => "value1" },
@@ -385,7 +385,7 @@ sub callInsertWith()
 	);
 	&my_cmd
 	(
-		f=> "S0613",
+		f=> "0613",
 		s=> sub
 	       	{
 	       		$mymod->Insert( table => "tab_real1", fields => { "tab_real1.fld_real1" => "value1" },
@@ -402,7 +402,7 @@ sub callUpdateWith()
 {
 	&my_cmd
 	(
-		f=> "S0800",
+		f=> "0800",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_noalias", fields => { "fld_alias1" => "value1" }, force => 1,
@@ -413,7 +413,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0802",
+		f=> "0802",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_noalias", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2" }, force => 1,
@@ -424,7 +424,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0803",
+		f=> "0803",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_alias1", fields => { "fld_alias1" => "value1" }, force => 1,
@@ -435,7 +435,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0804",
+		f=> "0804",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_real1", fields => { "fld_alias1" => "value1" }, force => 1,
@@ -446,7 +446,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0805",
+		f=> "0805",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_alias1", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2", }, force => 1,
@@ -457,7 +457,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0806",
+		f=> "0806",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_real1", fields => { "fld_alias1" => "value1", "fld_alias2" => "value2", }, force => 1,
@@ -468,7 +468,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0810",
+		f=> "0810",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_alias1", fields => { "fld_noalias" => "value1" }, force => 1,
@@ -479,7 +479,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0811",
+		f=> "0811",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_real1", fields => { "fld_noalias" => "value1" }, force => 1,
@@ -490,7 +490,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0812",
+		f=> "0812",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_noalias", fields => { "tab_noalias.fld_alias1" => "value1" }, force => 1,
@@ -501,7 +501,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0813",
+		f=> "0813",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_noalias", fields => { "tab_noalias.fld_alias1" => "value1", "tab_noalias.fld_alias2" => "value2" }, force => 1,
@@ -512,7 +512,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0814",
+		f=> "0814",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_alias1", fields => { "tab_alias1.fld_alias1" => "value1" }, force => 1,
@@ -523,7 +523,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0815",
+		f=> "0815",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => "value1" }, force => 1,
@@ -534,7 +534,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0816",
+		f=> "0816",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_alias1", fields => { "tab_alias1.fld_noalias" => "value1" }, force => 1,
@@ -545,7 +545,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0817",
+		f=> "0817",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_noalias" => "value1" }, force => 1,
@@ -556,7 +556,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0818",
+		f=> "0818",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_alias1", fields => { "bad_alias1.fld_alias1" => "value1" }, force => 1,
@@ -567,7 +567,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0819",
+		f=> "0819",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => "tab_real1", fields => { "bad_alias1.fld_alias1" => "value1" }, force => 1,
@@ -578,7 +578,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0820",
+		f=> "0820",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_noalias1","tab_noalias2"], fields => { "tab_noalias1.fld_alias1" => "value1", "tab_noalias2.fld_alias2" => "value2", }, force => 1,
@@ -589,7 +589,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0821",
+		f=> "0821",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_alias1","tab_noalias2"], fields => { "bad_alias1.fld_alias1" => "value1" }, force => 1,
@@ -600,7 +600,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0822",
+		f=> "0822",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_alias1","tab_alias2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_real2.fld_alias2" => "value2" }, force => 1,
@@ -611,7 +611,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0823",
+		f=> "0823",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_alias1","tab_real2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_alias2.fld_alias2" => "value2" }, force => 1,
@@ -622,7 +622,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0824",
+		f=> "0824",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_alias1","tab_alias2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_real2.fld_noalias" => "value2" }, force => 1,
@@ -633,7 +633,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0825",
+		f=> "0825",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_alias1","tab_real2"], fields => { "tab_alias1.fld_alias1" => "value1", "tab_alias2.fld_noalias" => "value2" }, force => 1,
@@ -644,7 +644,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0826",
+		f=> "0826",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_alias1","tab_real2"], fields => { "bad_alias.fld_alias1" => "value1" }, force => 1,
@@ -655,7 +655,7 @@ sub callUpdateWith()
 	);
 	&my_cmd
 	(
-		f=> "S0827",
+		f=> "0827",
 		s=> sub
 	       	{
 	       		$mymod->Update( table => ["tab_alias1","tab_real2"], fields => { "bad_alias.fld_alias1" => "value1", "tab_alias1.fld_alias1" => "value2" }, force => 1,
@@ -672,7 +672,7 @@ sub callSelectSimplesWith()
 {
 	&my_cmd
 	(
-		f=> "S0900",
+		f=> "0900",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => "fld_alias1",
@@ -683,7 +683,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0901",
+		f=> "0901",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => [ "fld_alias1" ],
@@ -694,7 +694,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0902",
+		f=> "0902",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => "fld_alias1",
@@ -705,7 +705,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0903",
+		f=> "0903",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ],
@@ -716,7 +716,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0904",
+		f=> "0904",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => "fld_alias1",
@@ -727,7 +727,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0905",
+		f=> "0905",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ "fld_alias1" ],
@@ -738,7 +738,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0906",
+		f=> "0906",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ "fld_real1" ],
@@ -749,7 +749,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0907",
+		f=> "0907",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ "fld_real1" ],
@@ -760,7 +760,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0908",
+		f=> "0908",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ "fld_noalias" ],
@@ -771,7 +771,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0909",
+		f=> "0909",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ "fld_noalias" ],
@@ -782,7 +782,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0910",
+		f=> "0910",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => "tab_noalias.fld_alias1",
@@ -793,7 +793,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0911",
+		f=> "0911",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ "tab_alias1.fld_alias1" ],
@@ -804,7 +804,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0912",
+		f=> "0912",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ "tab_real1.fld_alias1" ],
@@ -815,7 +815,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0913",
+		f=> "0913",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ "tab_alias1.fld_alias1" ],
@@ -826,7 +826,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0914",
+		f=> "0914",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ "tab_real1.fld_alias1" ],
@@ -837,7 +837,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0915",
+		f=> "0915",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ "bad_alias1.fld_alias1" ],
@@ -849,7 +849,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0916",
+		f=> "0916",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ "bad_real1.fld_alias1" ],
@@ -861,7 +861,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0917",
+		f=> "0917",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => [ "bad_alias1.fld_alias1" ],
@@ -873,7 +873,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0918",
+		f=> "0918",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => [ "bad_real1.fld_alias1" ],
@@ -886,7 +886,7 @@ sub callSelectSimplesWith()
 
 	&my_cmd
 	(
-		f=> "S0919",
+		f=> "0919",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => "fld_alias1",
@@ -897,7 +897,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0920",
+		f=> "0920",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => [ "fld_alias1" ],
@@ -908,7 +908,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0921",
+		f=> "0921",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => "fld_alias1",
@@ -920,7 +920,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0922",
+		f=> "0922",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_real1" ],
@@ -931,7 +931,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0923",
+		f=> "0923",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => "fld_alias1",
@@ -943,7 +943,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0924",
+		f=> "0924",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ "fld_real1" ],
@@ -954,7 +954,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0925",
+		f=> "0925",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_noalias" ],
@@ -965,7 +965,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0926",
+		f=> "0926",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ "fld_noalias" ],
@@ -976,7 +976,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0927",
+		f=> "0927",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => "tab_noalias.fld_alias1",
@@ -988,7 +988,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0928",
+		f=> "0928",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1" ],
@@ -999,7 +999,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0929",
+		f=> "0929",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_real1.fld_alias1" ],
@@ -1010,7 +1010,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0930",
+		f=> "0930",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1" ],
@@ -1021,7 +1021,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0931",
+		f=> "0931",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ "tab_real1.fld_alias1" ],
@@ -1032,7 +1032,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0932",
+		f=> "0932",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ "bad_alias1.fld_alias1" ],
@@ -1044,7 +1044,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0933",
+		f=> "0933",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ "bad_real1.fld_alias1" ],
@@ -1056,7 +1056,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0934",
+		f=> "0934",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => [ "bad_alias1.fld_alias1" ],
@@ -1068,7 +1068,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S0935",
+		f=> "0935",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => [ "bad_real1.fld_alias1" ],
@@ -1084,7 +1084,7 @@ sub callSelectSimplesWith()
 
 	&my_cmd
 	(
-		f=> "S1000",
+		f=> "1000",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => [ {"fld_alias1"=>"my1"} ],
@@ -1095,7 +1095,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1001",
+		f=> "1001",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ {"fld_alias1"=>"my1"} ],
@@ -1106,7 +1106,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1002",
+		f=> "1002",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ {"fld_alias1"=>"my1"} ],
@@ -1117,7 +1117,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1003",
+		f=> "1003",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ {"fld_real1"=>"my1"} ],
@@ -1128,7 +1128,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1004",
+		f=> "1004",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ {"fld_real1"=>"my1"} ],
@@ -1139,7 +1139,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1005",
+		f=> "1005",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ {"fld_noalias"=>"my1"} ],
@@ -1150,7 +1150,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1006",
+		f=> "1006",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ {"fld_noalias"=>"my1"} ],
@@ -1161,7 +1161,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1007",
+		f=> "1007",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ {"tab_alias1.fld_alias1"=>"my1"} ],
@@ -1172,7 +1172,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1008",
+		f=> "1008",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => [ {"tab_real1.fld_alias1"=>"my1"} ],
@@ -1183,7 +1183,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1009",
+		f=> "1009",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ {"tab_alias1.fld_alias1"=>"my1"} ],
@@ -1194,7 +1194,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1010",
+		f=> "1010",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ {"tab_real1.fld_alias1"=>"my1"} ],
@@ -1205,7 +1205,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1011",
+		f=> "1011",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ {"bad_alias1.fld_alias1"=>"my1"} ],
@@ -1217,7 +1217,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1012",
+		f=> "1012",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1", fields => [ {"bad_real1.fld_alias1"=>"my1"} ],
@@ -1229,7 +1229,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1013",
+		f=> "1013",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => [ {"bad_alias1.fld_alias1"=>"my1"} ],
@@ -1241,7 +1241,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1014",
+		f=> "1014",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias", fields => [ {"bad_real1.fld_alias1"=>"my1"} ],
@@ -1253,7 +1253,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1015",
+		f=> "1015",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => [ {"fld_alias1"=>"my1"} ],
@@ -1264,7 +1264,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1016",
+		f=> "1016",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"fld_real1"=>"my1"} ],
@@ -1275,7 +1275,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1017",
+		f=> "1017",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ {"fld_real1"=>"my1"} ],
@@ -1286,7 +1286,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1018",
+		f=> "1018",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"fld_noalias"=>"my1"} ],
@@ -1297,7 +1297,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1019",
+		f=> "1019",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ {"fld_noalias"=>"my1"} ],
@@ -1308,7 +1308,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1020",
+		f=> "1020",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"} ],
@@ -1319,7 +1319,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1021",
+		f=> "1021",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_real1.fld_alias1"=>"my1"} ],
@@ -1330,7 +1330,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1022",
+		f=> "1022",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"} ],
@@ -1341,7 +1341,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1023",
+		f=> "1023",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ {"tab_real1.fld_alias1"=>"my1"} ],
@@ -1352,7 +1352,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1024",
+		f=> "1024",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ {"bad_alias1.fld_alias1"=>"my1"} ],
@@ -1364,7 +1364,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1025",
+		f=> "1025",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ {"bad_real1.fld_alias1"=>"my1"} ],
@@ -1376,7 +1376,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1026",
+		f=> "1026",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => [ {"bad_alias1.fld_alias1"=>"my1"} ],
@@ -1388,7 +1388,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1027",
+		f=> "1027",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => [ {"bad_real1.fld_alias1"=>"my1"} ],
@@ -1400,7 +1400,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1028",
+		f=> "1028",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_noalias1",
@@ -1411,7 +1411,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1029",
+		f=> "1029",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1",
@@ -1422,7 +1422,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1030",
+		f=> "1030",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_real1",
@@ -1433,7 +1433,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1031",
+		f=> "1031",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => "tab_alias1", fields => "*",
@@ -1444,7 +1444,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1032",
+		f=> "1032",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => "*",
@@ -1455,7 +1455,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1032",
+		f=> "1032",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_alias1","tab_noalias"], fields => "*",
@@ -1466,7 +1466,7 @@ sub callSelectSimplesWith()
 	);
 	&my_cmd
 	(
-		f=> "S1033",
+		f=> "1033",
 		s=> sub
 	       	{
 	       		$mymod->Select( table => ["tab_noalias1","tab_noalias2"],
@@ -1485,7 +1485,7 @@ sub callSelectHavingWith()
 {
 	&my_cmd
 	(
-		f=> "S1101",
+		f=> "1101",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_noalias", having => [ "count(fld_alias1)" => 1 ], make_only=>1 )
@@ -1495,7 +1495,7 @@ sub callSelectHavingWith()
 	);
 	&my_cmd
 	(
-		f=> "S1102",
+		f=> "1102",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], having => [ "count(fld_alias1)" => "value1" ], make_only=>1 )
@@ -1505,7 +1505,7 @@ sub callSelectHavingWith()
 	);
 	&my_cmd
 	(
-		f=> "S1103",
+		f=> "1103",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_real1", fields => [ "fld_alias1" ], having => [ "count(fld_alias1)" => "value1" ], make_only=>1 )
@@ -1515,7 +1515,7 @@ sub callSelectHavingWith()
 	);
 	&my_cmd
 	(
-		f=> "S1104",
+		f=> "1104",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_real1", fields => [ "fld_alias1" ], having =>
@@ -1536,7 +1536,7 @@ sub callWhereWith()
 {
 	&my_cmd
 	(
-		f=> "S2001",
+		f=> "2001",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_noalias", where => [ "fld_alias1" => 1 ], make_only=>1 )
@@ -1546,7 +1546,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2002",
+		f=> "2002",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_alias1", where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1556,7 +1556,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2003",
+		f=> "2003",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_real1", where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1566,7 +1566,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2004",
+		f=> "2004",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_alias1", where => [ "fld_noalias1" => "value1" ], make_only=>1 )
@@ -1576,7 +1576,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2005",
+		f=> "2005",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_alias1", where => [ "fld_real1" => "value1" ], make_only=>1 )
@@ -1586,7 +1586,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2006",
+		f=> "2006",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_noalias", where => [ "tab_noalias.fld_alias1" => "value1" ], make_only=>1 )
@@ -1596,7 +1596,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2007",
+		f=> "2007",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_alias1", where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1606,7 +1606,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2008",
+		f=> "2008",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_real1", where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1616,7 +1616,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2009",
+		f=> "2009",
 		s=> sub
 		{
 			$mymod->Delete( table => "tab_real1", where => [ "tab_alias1.fld_alias1" => "xx'xx" ], make_only=>1 )
@@ -1626,7 +1626,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2020",
+		f=> "2020",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_noalias", fields => { "fld_alias1" => "value2" }, where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1636,7 +1636,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2021",
+		f=> "2021",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1646,7 +1646,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2022",
+		f=> "2022",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_real1", fields => { "fld_alias1" => "value2" }, where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1656,7 +1656,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2023",
+		f=> "2023",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "fld_noalias1" => "value1" ], make_only=>1 )
@@ -1666,7 +1666,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2024",
+		f=> "2024",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "fld_real1" => "value1" ], make_only=>1 )
@@ -1676,7 +1676,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2025",
+		f=> "2025",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_noalias", fields => { "fld_alias1" => "value2" }, where => [ "tab_noalias.fld_alias1" => "value1" ], make_only=>1 )
@@ -1686,7 +1686,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2026",
+		f=> "2026",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_alias1", fields => { "fld_alias1" => "value2" }, where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1696,7 +1696,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2027",
+		f=> "2027",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_real1", fields => { "fld_alias1" => "value2" }, where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1706,7 +1706,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2028",
+		f=> "2028",
 		s=> sub
 		{
 			$mymod->Update( table => ["tab_noalias1","tab_noalias2"], fields => { "tab_noalias1.fld_alias1" => "value2", "tab_noalias2.fld_alias2" => "value1" }, where => [ "tab_noalias1.fld_alias1" => "value1", "tab_noalias2.fld_alias2" => "value2" ], make_only=>1 )
@@ -1716,7 +1716,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2029",
+		f=> "2029",
 		s=> sub
 		{
 			$mymod->Update( table => ["tab_alias1","tab_alias2"], fields => { "tab_alias1.fld_alias1" => "value2", "tab_alias2.fld_alias2" => "value1" }, where => [ "tab_alias1.fld_alias1" => "value1", "tab_alias2.fld_alias2" => "value2" ], make_only=>1 )
@@ -1726,7 +1726,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2030",
+		f=> "2030",
 		s=> sub
 		{
 			$mymod->Update( table => ["tab_real1","tab_real2"], fields => { "tab_real1.fld_alias1" => "value2", "tab_real2.fld_alias2" => "value1" }, where => [ "tab_real1.fld_alias1" => "value1", "tab_real2.fld_alias2" => "value2" ], make_only=>1 )
@@ -1736,7 +1736,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2031",
+		f=> "2031",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => undef }, where => [ "tab_real1.fld_alias1" => undef ], make_only=>1 )
@@ -1746,7 +1746,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2032",
+		f=> "2032",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => undef }, where => [ "tab_real1.fld_alias1" => [ "!", undef ] ], make_only=>1 )
@@ -1756,7 +1756,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2033",
+		f=> "2033",
 		s=> sub
 		{
 			$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => "xx'xx" }, where => [ "tab_real1.fld_alias1" => "yy'yy" ], make_only=>1 )
@@ -1766,7 +1766,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2050",
+		f=> "2050",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_noalias", where => [ "fld_alias1" => 1 ], make_only=>1 )
@@ -1776,7 +1776,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2051",
+		f=> "2051",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1786,7 +1786,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2052",
+		f=> "2052",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_real1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1796,7 +1796,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2053",
+		f=> "2053",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_noalias1" => "value1" ], make_only=>1 )
@@ -1806,7 +1806,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2054",
+		f=> "2054",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_real1" => "value1" ], make_only=>1 )
@@ -1816,7 +1816,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2055",
+		f=> "2055",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_noalias", fields => [ "fld_alias1" ], where => [ "tab_noalias.fld_alias1" => "value1" ], make_only=>1 )
@@ -1826,7 +1826,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2056",
+		f=> "2056",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1836,7 +1836,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2057",
+		f=> "2057",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_real1", fields => [ "fld_alias1" ], where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1846,7 +1846,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2058",
+		f=> "2058",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_noalias1","tab_noalias2"], fields => [ "tab_noalias1.fld_alias1", "tab_noalias2.fld_alias2" ], where => [ "tab_noalias1.fld_alias1" => "value1", "tab_noalias2.fld_alias2" => "value2" ], make_only=>1 )
@@ -1856,7 +1856,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2059",
+		f=> "2059",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1", "tab_alias2.fld_alias2" ], where => [ "tab_alias1.fld_alias1" => "value1", "tab_alias2.fld_alias2" => "value2" ], make_only=>1 )
@@ -1866,7 +1866,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2060",
+		f=> "2060",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_real1","tab_real2"], fields => [ "tab_real1.fld_alias1", "tab_real2.fld_alias2" ], where => [ "tab_real1.fld_alias1" => "value1", "tab_real2.fld_alias2" => "value2" ], make_only=>1 )
@@ -1876,7 +1876,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2061",
+		f=> "2061",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1", "tab_alias2.fld_alias2" ], where => [ "tab_alias1.fld_alias1" => "\\tab_alias2.fld_alias2" ], make_only=>1 )
@@ -1886,7 +1886,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2062",
+		f=> "2062",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1", "tab_alias2.fld_alias2" ], where => [ "tab_alias1.fld_real1" => "\\tab_alias2.fld_real2" ], make_only=>1 )
@@ -1896,7 +1896,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2063",
+		f=> "2063",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1", "tab_alias2.fld_alias2" ], where => [ "tab_real1.fld_alias1" => "\\tab_real2.fld_alias2" ], make_only=>1 )
@@ -1906,7 +1906,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2064",
+		f=> "2064",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1", "tab_alias2.fld_alias2" ], where => [ "tab_real1.fld_real1" => "\\tab_real2.fld_real2" ], make_only=>1 )
@@ -1916,7 +1916,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2065",
+		f=> "2065",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ {"fld_alias1"=>"my1"} ], where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1926,7 +1926,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2066",
+		f=> "2066",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_real1", fields => [ {"fld_alias1"=>"my1"} ], where => [ "fld_alias1" => "value1" ], make_only=>1 )
@@ -1936,7 +1936,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2067",
+		f=> "2067",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ {"fld_alias1"=>"my1"} ], where => [ "fld_noalias1" => "value1" ], make_only=>1 )
@@ -1946,7 +1946,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2068",
+		f=> "2068",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ {"fld_alias1"=>"my1"} ], where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1956,7 +1956,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2069",
+		f=> "2069",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_real1", fields => [ {"fld_alias1"=>"my1"} ], where => [ "tab_alias1.fld_alias1" => "value1" ], make_only=>1 )
@@ -1966,7 +1966,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2070",
+		f=> "2070",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ {"fld_alias1"=>"my1"} ], where => [ "tab_alias1.fld_real1" => "value1" ], make_only=>1 )
@@ -1976,7 +1976,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2071",
+		f=> "2071",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ {"fld_alias1"=>"my1"} ], where => [ "tab_real1.fld_real1" => "value1" ], make_only=>1 )
@@ -1986,7 +1986,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2071",
+		f=> "2071",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_alias1.fld_alias1" => "\\tab_alias2.fld_alias2" ], make_only=>1 ),
@@ -1996,7 +1996,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2072",
+		f=> "2072",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_alias1.fld_real1" => "\\tab_alias2.fld_real2" ], make_only=>1 )
@@ -2006,7 +2006,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2073",
+		f=> "2073",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_real1.fld_alias1" => "\\tab_real2.fld_alias2" ], make_only=>1 )
@@ -2016,7 +2016,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2074",
+		f=> "2074",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_real1.fld_real1" => "\\tab_real2.fld_real2" ], make_only=>1 )
@@ -2026,7 +2026,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2075",
+		f=> "2075",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "my1" => "\\my2" ], make_only=>1 )
@@ -2037,7 +2037,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2076",
+		f=> "2076",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_alias1.my1" => "\\tab_alias2.my2" ], make_only=>1 )
@@ -2047,7 +2047,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2077",
+		f=> "2077",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_real1.my1" => "\\tab_real2.my2" ], make_only=>1 )
@@ -2057,7 +2057,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2078",
+		f=> "2078",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_noalias1.my1" => "\\tab_alias2.my2" ], make_only=>1 )
@@ -2067,7 +2067,7 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
-		f=> "S2079",
+		f=> "2079",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"tab_alias1.fld_alias1"=>"my1"}, {"tab_alias2.fld_alias2"=>"my2"} ], where => [ "tab_alias1.my1" => "\\tab_noalias2.my2" ], make_only=>1 )
@@ -2083,77 +2083,77 @@ sub callWithout()
 {
 	&my_cmd
 	(
-		f=> "S0110",
+		f=> "0110",
 		s=> sub { $mymod->Delete( table=>"t1", where => [ fld => 123 ], make_only=>1 ) },
 		t=> 'Delete( table=>"t1", where => [ fld => 123 ] )',
 		r=> "DELETE FROM t1 WHERE fld = '123'",
 	);
 	&my_cmd
 	(
-		f=> "S0120",
+		f=> "0120",
 		s=> sub { $mymod->Insert( table=>"t1", fields => { a => 1, b => 2, c => 3 }, make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => { a => 1, b => 2, c => 3 } )',
 		r=> "INSERT INTO t1 (a,b,c) VALUES ('1','2','3')",
 	);
 	&my_cmd
 	(
-		f=> "S0121",
+		f=> "0121",
 		s=> sub { $mymod->Insert( table=>"t1", fields => { a => undef, b => undef, c => undef }, make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => { a => undef, b => undef, c => undef } )',
 		r=> "INSERT INTO t1 (a,b,c) VALUES (NULL,NULL,NULL)",
 	);
 	&my_cmd
 	(
-		f=> "S0122",
+		f=> "0122",
 		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a","b","c" ], values => [ 1,2,3 ], make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ 1,2,3 ] )',
 		r=> "INSERT INTO t1 (a,b,c) VALUES ('1','2','3')",
 	);
 	&my_cmd
 	(
-		f=> "S0123",
+		f=> "0123",
 		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a","b","c" ], values => [ undef,undef,undef ], make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ undef,undef,undef ] )',
 		r=> "INSERT INTO t1 (a,b,c) VALUES (NULL,NULL,NULL)",
 	);
 	&my_cmd
 	(
-		f=> "S0124",
+		f=> "0124",
 		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ 1,2,3 ], make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ 1,2,3 ] )',
 		r=> "INSERT INTO t1 (a) VALUES ('1'),('2'),('3')",
 	);
 	&my_cmd
 	(
-		f=> "S0125",
+		f=> "0125",
 		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ undef,undef,undef ], make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ undef,undef,undef ] )',
 		r=> "INSERT INTO t1 (a) VALUES (NULL),(NULL),(NULL)",
 	);
 	&my_cmd
 	(
-		f=> "S0126",
+		f=> "0126",
 		s=> sub { $mymod->Insert( table=>"t1", fields => { a => "xx'xx" }, make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => { a => "xx\'xx" )',
 		r=> "INSERT INTO t1 (a) VALUES ('xx\\\'xx')",
 	);
 	&my_cmd
 	(
-		f=> "S0127",
+		f=> "0127",
 		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ "xx'xx" ], make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => [ "a" ], values => [ "xx\'xx" ] )',
 		r=> "INSERT INTO t1 (a) VALUES ('xx\\\'xx')",
 	);
 	&my_cmd
 	(
-		f=> "S0128",
+		f=> "0128",
 		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ "xx'xx","yy'yy" ], make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => [ "a" ], values => [ "xx\'xx","yy\'yy" ] )',
 		r=> "INSERT INTO t1 (a) VALUES ('xx\\\'xx'),('yy\\\'yy')",
 	);
 	&my_cmd
 	(
-		f=> "S0130",
+		f=> "0130",
 		s=> sub { $mymod->Update( table=>"t1", fields => { a => 1, b => 2 }, where => [ c => [ "!", 3 ] ], make_only=>1 ) },
 		t=> 'Update( table=>"t1", fields => { a => 1, b => 2 }, where => [ c => [ "!", 3 ] ] )',
 		r=> "UPDATE t1 SET b = '2', a = '1' WHERE c != '3'",
@@ -2161,77 +2161,77 @@ sub callWithout()
 	);
 	&my_cmd
 	(
-		f=> "S0140",
+		f=> "0140",
 		s=> sub { $mymod->Update( table=>"t1", fields => { a => '\\concat(a,"xxxx")' }, force => 1, make_only=>1 ) },
 		t=> 'Update( table=>"t1", fields => { a => \'\\concat(a,"xxxx")\' }, force => 1 )',
 		r=> "UPDATE t1 SET a = concat(a,\"xxxx\")",
 	);
 	&my_cmd
 	(
-		f=> "S0150",
+		f=> "0150",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "a","b","c"], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "a","b","c"] )',
 		r=> "SELECT a, b, c FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0160",
+		f=> "0160",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>4 ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>4 ] )',
 		r=> "SELECT a, b, c FROM t1 WHERE d = '4'",
 	);
 	&my_cmd
 	(
-		f=> "S0170",
+		f=> "0170",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>4, e=>5 ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>4, e=>5 ] )',
 		r=> "SELECT a, b, c FROM t1 WHERE d = '4' AND e = '5'",
 	);
 	&my_cmd
 	(
-		f=> "S0180",
+		f=> "0180",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>'\substr(e,1,8)' ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "a","b","c"], where => [ d=>\'\\substr(e,1,8)\' ] )',
 		r=> "SELECT a, b, c FROM t1 WHERE d = substr(e,1,8)",
 	);
 	&my_cmd
 	(
-		f=> "S0190",
+		f=> "0190",
 		s=> sub { $mymod->Select( table=>["t1","t2"], fields => [ "t1.a","t2.b" ], where => [ 't1.a' => '\t2.b' ], make_only=>1) },
 		t=> 'Select( table=>["t1","t2"], fields => [ "t1.a","t2.b" ], where => [ "t1.a" => "\\t2.b" ] )',
 		r=> "SELECT t1.a, t2.b FROM t1, t2 WHERE t1.a = t2.b",
 	);
 	&my_cmd
 	(
-		f=> "S0200",
+		f=> "0200",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ {"a"=>"aa"} ], where => [ 'a' => '0' ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ {"a"=>"aa"} ], where => [ \'a\' => \'0\' ] )',
 		r=> "SELECT a aa FROM t1 WHERE a = '0'",
 	);
 	&my_cmd
 	(
-		f=> "S0210",
+		f=> "0210",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ {"t1.a"=>"aa"} ], where => [ 't1.a' => '0' ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ {"t1.a"=>"aa"} ], where => [ \'t1.a\' => \'0\' ] )',
 		r=> "SELECT t1.a aa FROM t1 WHERE a = '0'",
 	);
 	&my_cmd
 	(
-		f=> "S0220",
+		f=> "0220",
 		s=> sub { $mymod->Select( table=>["t1","t2"], fields => [ {"t1.a"=>"aa"} , {"t2.b"=>"bb"} ], where => [ 't1.a' => '\\t2.b' ], make_only=>1) },
 		t=> 'Select( table=>["t1","t2"], fields => [ {"t1.a"=>"aa"}, {"t2.b"=>"bb"} ], where => [ "t1.a" => "\\t2.b" ] )',
 		r=> "SELECT t1.a aa, t2.b bb FROM t1, t2 WHERE t1.a = t2.b",
 	);
 	&my_cmd
 	(
-		f=> "S0230",
+		f=> "0230",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ {"sum(a)"=>"a1"}, {"sum(t1.a)"=>"a2"}, {"\\sum(a)"=>"a3"} ], where => [ 'a' => '0' ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ {"sum(a)"=>"a1"}, {"sum(t1.a)"=>"a2"}, {"\\sum(a)"=>"a3"} ], where => [ \'a\' => \'0\' ] )',
 		r=> "SELECT sum(a) a1, sum(t1.a) a2, sum(a) a3 FROM t1 WHERE a = '0'",
 	);
 	&my_cmd
 	(
-		f=> "S0320",
+		f=> "0320",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "distinct","a" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "distinct", "a" ] )', 
 		r=> "SELECT DISTINCT a FROM t1",
@@ -2239,7 +2239,7 @@ sub callWithout()
 	);
 	&my_cmd
 	(
-		f=> "S0330",
+		f=> "0330",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "distinct" => "a" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "distinct" => "a" ] )', 
 		r=> "SELECT DISTINCT a FROM t1",
@@ -2247,49 +2247,49 @@ sub callWithout()
 	);
 	&my_cmd
 	(
-		f=> "S0340",
+		f=> "0340",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "count(*)" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "count(*)" ] )', 
 		r=> "SELECT count(*) FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0350",
+		f=> "0350",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "max(t1.a)" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "max(t1.a)" ] )', 
 		r=> "SELECT max(t1.a) FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0360",
+		f=> "0360",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "max(a)" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "max(a)" ] )', 
 		r=> "SELECT max(a) FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0370",
+		f=> "0370",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "substr(a,1,8)" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "substr(a,1,8)" ] )', 
 		r=> "SELECT substr(a,1,8) FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0380",
+		f=> "0380",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "\\aaa.bbb.ccc" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "\\aaa.bbb.ccc" ] )', 
 		r=> "SELECT aaa.bbb.ccc FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0390",
+		f=> "0390",
 		s=> sub { $mymod->Select( table=>"t1", fields => [ "distinct","\\aaa.bbb.ccc" ], make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [ "distinct","\\aaa.bbb.ccc" ] )', 
 		r=> "SELECT DISTINCT aaa.bbb.ccc FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0400",
+		f=> "0400",
 		s=> sub { $mymod->Select( table=>["t1","t2"], fields => [ "t1.a","t2.b" ], where => [ 't1.a' => 't2.b' ], make_only=>1, sql_save=>1 ) },
 		t=> 'Select( table=>["t1","t2"], fields => [ "t1.a","t2.b" ], where => [ \'t1.a\' => \'t2.b\' ], sql_save=>1 )',
 		r=> "SELECT t1.a, t2.b FROM t1, t2 WHERE t1.a = t2.b",
@@ -2298,161 +2298,161 @@ sub callWithout()
 	);
 	&my_cmd
 	(
-		f=> "S0410",
+		f=> "0410",
 		s=> sub { $mymod->Select( table=>"t1", order_by => "t1.a",  make_only=>1) },
 		t=> 'Select( table=>"t1", order_by => "t1.a" )', 
 		r=> "SELECT * FROM t1 ORDER BY t1.a",
 	);
 	&my_cmd
 	(
-		f=> "S0420",
+		f=> "0420",
 		s=> sub { $mymod->Select( table=>"t1", order_by => [ {"t1.a" => "asc"} ] ,  make_only=>1) },
 		t=> 'Select( table=>"t1", order_by => [ {"t1.a" => "asc"} ] )', 
 		r=> "SELECT * FROM t1 ORDER BY t1.a ASC",
 	);
 	&my_cmd
 	(
-		f=> "S0430",
+		f=> "0430",
 		s=> sub { $mymod->Select( table=>"t1", order_by => [ {"t1.a" => "desc"} ] ,  make_only=>1) },
 		t=> 'Select( table=>"t1", order_by => [ {"t1.a" => "desc"} ] )', 
 		r=> "SELECT * FROM t1 ORDER BY t1.a DESC",
 	);
 	&my_cmd
 	(
-		f=> "S0440",
+		f=> "0440",
 		s=> sub { $mymod->Select( table=>"t1", order_by => [ "t1.a", "t1.b" ] ,  make_only=>1) },
 		t=> 'Select( table=>"t1", order_by => [ "t1.a", "t1.b" ] )', 
 		r=> "SELECT * FROM t1 ORDER BY t1.a, t1.b",
 	);
 	&my_cmd
 	(
-		f=> "S0450",
+		f=> "0450",
 		s=> sub { $mymod->Select( table=>"t1", order_by => [ {"t1.a" => "asc"}, "t1.b" ] ,  make_only=>1) },
 		t=> 'Select( table=>"t1", order_by => [ {"t1.a" => "asc"}, "t1.b" ] )', 
 		r=> "SELECT * FROM t1 ORDER BY t1.a ASC, t1.b",
 	);
 	&my_cmd
 	(
-		f=> "S0460",
+		f=> "0460",
 		s=> sub { $mymod->Select( table=>"t1", order_by => [ "t1.a",{"t1.b"=>"desc"} ] ,  make_only=>1) },
 		t=> 'Select( table=>"t1", order_by => [ "t1.a", {"t1.b"=>"desc"} ] )', 
 		r=> "SELECT * FROM t1 ORDER BY t1.a, t1.b DESC",
 	);
 	&my_cmd
 	(
-		f=> "S0470",
+		f=> "0470",
 		s=> sub { $mymod->Select( table=>"t1", order_by => {"t1.b"=>"desc"},  make_only=>1) },
 		t=> 'Select( table=>"t1", order_by => {"t1.b"=>"desc"} )', 
 		r=> "SELECT * FROM t1 ORDER BY t1.b DESC",
 	);
 	&my_cmd
 	(
-		f=> "S0480",
+		f=> "0480",
 		s=> sub { $mymod->Select( table=>"t1", fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t1.fgh"=>"_fgh"}], where => [ "_abc" => 123 ],  make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t1.fgh"=>"_fgh"}], where => [ "_abc" => 123 ] )', 
 		r=> "SELECT t1.abc _abc, t1.cde, t1.fgh _fgh FROM t1 WHERE abc = '123'",
 	);
 	&my_cmd
 	(
-		f=> "S0481",
+		f=> "0481",
 		s=> sub { $mymod->Select( table=>"t1", fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t1.fgh"=>"_fgh"}], where => [ "_abc" => 123, "cde" => 234, "t1.abc" => 345],  make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t1.fgh"=>"_fgh"}], where => [ "_abc" => 123, "cde" => 234, "t1.abc" => 345] )', 
 		r=> "SELECT t1.abc _abc, t1.cde, t1.fgh _fgh FROM t1 WHERE abc = '123' AND cde = '234' AND abc = '345'",
 	);
 	&my_cmd
 	(
-		f=> "S0490",
+		f=> "0490",
 		s=> sub { $mymod->Select( table=>["t1","t2"], fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t2.fgh"=>"_fgh"},"t2.ijk"], where => [ "_abc" => 123, "cde" => 234, "t1.abc" => 345, "ijk" => 456],  make_only=>1) },
 		t=> 'Select( table=>["t1","t2"], fields => [{"t1.abc"=>"_abc"},"t1.cde",{"t2.fgh"=>"_fgh"},"t2.ijk"], where => [ "_abc" => 123, "cde" => 234, "t1.abc" => 345, "ijk" => 456] )',
 		r=> "SELECT t1.abc _abc, t1.cde, t2.fgh _fgh, t2.ijk FROM t1, t2 WHERE t1.abc = '123' AND cde = '234' AND t1.abc = '345' AND ijk = '456'",
 	);
 	&my_cmd
 	(
-		f=> "S0500",
+		f=> "0500",
 		s=> sub { $mymod->Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "substr(_a,1,4)" => 1234 ],  make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "substr(_a,1,4)" => 1234 ] )',
 		r=> "SELECT t1.abc _a FROM t1 WHERE substr(abc,1,4) = '1234'",
 	);
 	&my_cmd
 	(
-		f=> "S0510",
+		f=> "0510",
 		s=> sub { $mymod->Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "concat(substr(_a,1,4),1)" => 1231 ],  make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "concat(substr(_a,1,3),1)" => 1231 ] )',
 		r=> "SELECT t1.abc _a FROM t1 WHERE concat(substr(abc,1,4),1) = '1231'",
 	);
 	&my_cmd
 	(
-		f=> "S0520",
+		f=> "0520",
 		s=> sub { $mymod->Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "func1(func2(_a))" => 1231 ],  make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "func1(func2(_a))" => 1231 ] )',
 		r=> "SELECT t1.abc _a FROM t1 WHERE func1(func2(abc)) = '1231'",
 	);
 	&my_cmd
 	(
-		f=> "S0530",
+		f=> "0530",
 		s=> sub { $mymod->Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "func1(_a)" => 123, "func1(t1.abc)" => 456 ],  make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "func1(_a)" => 123, "func1(t1.abc)" => 456 ] )',
 		r=> "SELECT t1.abc _a FROM t1 WHERE func1(abc) = '123' AND func1(t1.abc) = '456'",
 	);
 	&my_cmd
 	(
-		f=> "S0540",
+		f=> "0540",
 		s=> sub { $mymod->Select( table=>"t1", fields => ["count(t1.abc)"],  make_only=>1) },
 		t=> 'Select( table=>"t1", fields => [count(t1.abc)] )',
 		r=> "SELECT count(t1.abc) FROM t1",
 	);
    &my_cmd
 	(
-			f=> "S0541",
+			f=> "0541",
 			s=> sub { $mymod->Select( table=>"t1", fields => [{"count(t1.abc)"=>"a"}],  make_only=>1) },
 			t=> 'Select( table=>"t1", fields => [{count(t1.abc)=>"a"}] )',
 			r=> "SELECT count(t1.abc) a FROM t1",
 	);
    &my_cmd
 	(
-			f=> "S0542",
+			f=> "0542",
 			s=> sub { $mymod->Select( table=>"t1", fields => [{"count(*)"=>"a"}],  make_only=>1) },
 			t=> 'Select( table=>"t1", fields => [{count(*)=>"a"}] )',
 			r=> "SELECT count(*) a FROM t1",
 	);
    &my_cmd
 	(
-			f=> "S0543",
+			f=> "0543",
 			s=> sub { $mymod->Select( table=>"t1", fields => [{"count()"=>"a"}],  make_only=>1) },
 			t=> 'Select( table=>"t1", fields => [{count()=>"a"}] )',
 			r=> "SELECT count() a FROM t1",
 	);
 	&my_cmd
 	(
-		f=> "S0550",
+		f=> "0550",
 		s=> sub { $mymod->Select( table=>["t1","t2"], fields => ["count(t1.abc)"],  make_only=>1) },
 		t=> 'Select( table=>["t1","t2"], fields => [count(t1.abc)] )',
 		r=> "SELECT count(t1.abc) FROM t1, t2",
 	);
    &my_cmd
 	(
-			f=> "S0551",
+			f=> "0551",
 			s=> sub { $mymod->Select( table=>["t1","t2"], fields => [{"count(t1.abc)"=>"a"}],  make_only=>1) },
 			t=> 'Select( table=>["t1","t2"], fields => [{count(t1.abc)=>"a"}] )',
 			r=> "SELECT count(t1.abc) a FROM t1, t2",
 	);
    &my_cmd
 	(
-			f=> "S0552",
+			f=> "0552",
 			s=> sub { $mymod->Select( table=>["t1","t2"], fields => [{"count(*)"=>"a"}],  make_only=>1) },
 			t=> 'Select( table=>["t1","t2"], fields => [{count(*)=>"a"}] )',
 			r=> "SELECT count(*) a FROM t1, t2",
 	);
    &my_cmd
 	(
-			f=> "S0553",
+			f=> "0553",
 			s=> sub { $mymod->Select( table=>["t1","t2"], fields => [{"count()"=>"a"}],  make_only=>1) },
 			t=> 'Select( table=>["t1","t2"], fields => [{count()=>"a"}] )',
 			r=> "SELECT count() a FROM t1, t2",
 	);
    &my_cmd
 	(
-			f=> "S0560",
+			f=> "0560",
 			s=> sub { $mymod->Select( table=>["t1","t2"], fields => ["func1()","func2(f1)",{"func3(f2)"=>"aa"},"func4(t1.f1)",{"func5(t2.f2)"=>"bb"}],  make_only=>1) },
 			t=> 'Select( table=>["t1","t2"], fields => ["func1()","func2(f1)",{"func3(f2)"=>"aa"},"func4(t1.f1)",{"func5(t2.f2)"=>"bb"}] )',
 			r=> "SELECT func1(), func2(f1), func3(f2) aa, func4(t1.f1), func5(t2.f2) bb FROM t1, t2",
@@ -2468,7 +2468,7 @@ sub callSelectCursorWith()
 	$cursor{last} = 100;
 	&my_cmd
 	(
-		f=> "S1010",
+		f=> "1010",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100 )', 
 		n=> 'Command=NEXT, Cursor is first(1) and last(100)',
@@ -2479,7 +2479,7 @@ sub callSelectCursorWith()
 	$cursor{last} = 200;
 	&my_cmd
 	(
-		f=> "S1011",
+		f=> "1011",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100 )', 
 		n=> 'Command=BACK, Cursor is first(101) and last(200)',
@@ -2490,7 +2490,7 @@ sub callSelectCursorWith()
 	$cursor{last} = 100;
 	&my_cmd
 	(
-		f=> "S1012",
+		f=> "1012",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100 )', 
 		n=> 'Command=RELOAD, Cursor is first(1) and last(100)',
@@ -2501,7 +2501,7 @@ sub callSelectCursorWith()
 	$cursor{last} = 100;
 	&my_cmd
 	(
-		f=> "S1013",
+		f=> "1013",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_LAST, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_LAST, limit=>100 )', 
 		n=> 'Command=LAST, Cursor is first(1) and last(100)',
@@ -2510,7 +2510,7 @@ sub callSelectCursorWith()
 	);
 	&my_cmd
 	(
-		f=> "S1014",
+		f=> "1014",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>0, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>0 )', 
 		r=> "SELECT a, b, c FROM t1 ORDER BY a ASC",
@@ -2521,7 +2521,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1015",
+		f=> "1015",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100 )',
 		n=> 'Option cursor_command is omited, curso_info was ignored',
@@ -2532,7 +2532,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1016",
+		f=> "1016",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_TOP, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_TOP )',
 		n=> 'The cursor_info was ignored',
@@ -2543,7 +2543,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1017",
+		f=> "1017",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_NEXT, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_NEXT )',
 		n=> '',
@@ -2554,7 +2554,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1018",
+		f=> "1018",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_BACK, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_BACK ',
 		n=> '',
@@ -2565,7 +2565,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1019",
+		f=> "1019",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_LAST, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_LAST )',
 		n=> '',
@@ -2576,7 +2576,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1020",
+		f=> "1020",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, cursor_command=>SQL_SIMPLE_CURSOR_RELOAD',
 		n=> '',
@@ -2587,7 +2587,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1021",
+		f=> "1021",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], limit=>100 )',
 		n=> 'Cursor command is omitted, cursor_info was ignored',
@@ -2598,7 +2598,7 @@ sub callSelectCursorWith()
 	$cursor{last} = ['a',100];
 	&my_cmd
 	(
-		f=> "S1022",
+		f=> "1022",
 		s=> sub { $mymod->SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>["t1","t2"], fields => [ "t1.a","t1.b","t2.c"], where => ["t1.a" => "\\t2.a"], cursor_info => \%cursor, cursor_key=>["t1.a","t2.c"], cursor_command=>SQL_SIMPLE_CURSOR_RELOAD, limit=>100 )',
 		n=> '',
@@ -2608,7 +2608,7 @@ sub callSelectCursorWith()
 	%cursor = {};
 	&my_cmd
 	(
-		f=> "S1023",
+		f=> "1023",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>100 )', 
 		r=> "SELECT a, b, c FROM t1 ORDER BY a ASC LIMIT 100",
@@ -2617,7 +2617,7 @@ sub callSelectCursorWith()
 	);
 	&my_cmd
 	(
-		f=> "S1024",
+		f=> "1024",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", limit=>100 )', 
 		r=> "SELECT a, b, c FROM t1 ORDER BY a ASC LIMIT 100",
@@ -2626,7 +2626,7 @@ sub callSelectCursorWith()
 	);
 	&my_cmd
 	(
-		f=> "S1025",
+		f=> "1025",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100 )', 
 		n=> 'Command=NEXT, Cursor is empty',
@@ -2635,7 +2635,7 @@ sub callSelectCursorWith()
 	);
 	&my_cmd
 	(
-		f=> "S1026",
+		f=> "1026",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100 )', 
 		n=> 'Command=BACK, Cursor is empty',
@@ -2650,7 +2650,7 @@ sub callSelectGroupByWith()
 {
 	&my_cmd
 	(
-		f=> "S1400",
+		f=> "1400",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_alias1" ], make_only=>1 )
@@ -2660,7 +2660,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1401",
+		f=> "1401",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_real1" ], make_only=>1 )
@@ -2670,7 +2670,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1402",
+		f=> "1402",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_noalias" ], make_only=>1 )
@@ -2680,7 +2680,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1403",
+		f=> "1403",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_alias1","fld_alias2" ], make_only=>1 )
@@ -2690,7 +2690,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1404",
+		f=> "1404",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_real1","fld_real2" ], make_only=>1 )
@@ -2700,7 +2700,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1405",
+		f=> "1405",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "fld_noalias1","fld_noalias2" ], make_only=>1 )
@@ -2710,7 +2710,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1406",
+		f=> "1406",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_alias1.fld_alias1" ], make_only=>1 )
@@ -2720,7 +2720,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1407",
+		f=> "1407",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_alias1.fld_real1" ], make_only=>1 )
@@ -2730,7 +2730,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1408",
+		f=> "1408",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_real1.fld_alias1" ], make_only=>1 )
@@ -2740,7 +2740,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1409",
+		f=> "1409",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_real1.fld_real1" ], make_only=>1 )
@@ -2750,7 +2750,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1410",
+		f=> "1410",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], group_by => [ "tab_real1.fld_noalias1" ], make_only=>1 )
@@ -2760,7 +2760,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1411",
+		f=> "1411",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_alias1","fld_alias2" ], group_by => [ "tab_real1.fld_alias1","tab_real2.fld_alias2" ], make_only=>1 )
@@ -2771,7 +2771,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1412",
+		f=> "1412",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_alias1","fld_alias2" ], group_by => [ "tab_real1.fld_real1","tab_real2.fld_real2" ], make_only=>1 )
@@ -2782,7 +2782,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1413",
+		f=> "1413",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "fld_alias1","fld_alias2" ], group_by => [ "tab_real1.fld_noalias1","tab_real2.fld_noalias2" ], make_only=>1 )
@@ -2793,7 +2793,7 @@ sub callSelectGroupByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1414",
+		f=> "1414",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ {"fld_alias1"=>"my1"},{"fld_alias2"=>"my2"} ], group_by => [ "tab_alias1.my1","tab_real1.my2" ], make_only=>1 )
@@ -2811,7 +2811,7 @@ sub callSelectOrderByWith()
 {
 	&my_cmd
 	(
-		f=> "S1500",
+		f=> "1500",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"asc"} ], make_only=>1 )
@@ -2822,7 +2822,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1501",
+		f=> "1501",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"ASC"} ], make_only=>1 )
@@ -2833,7 +2833,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1502",
+		f=> "1502",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"AsC"} ], make_only=>1 )
@@ -2844,7 +2844,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1503",
+		f=> "1503",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_real1"=>"asc"} ], make_only=>1 )
@@ -2854,7 +2854,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1504",
+		f=> "1504",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_noalias1"=>"asc"} ], make_only=>1 )
@@ -2864,7 +2864,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1505",
+		f=> "1505",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"fld_alias1"=>"desc"} ], make_only=>1 )
@@ -2874,7 +2874,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1506",
+		f=> "1506",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_alias1.fld_alias1"=>"asc"} ], make_only=>1 )
@@ -2884,7 +2884,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1507",
+		f=> "1507",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_real1.fld_real1"=>"desc"} ], make_only=>1 )
@@ -2894,7 +2894,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1508",
+		f=> "1508",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_alias1.fld_real1"=>"desc"} ], make_only=>1 )
@@ -2904,7 +2904,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1509",
+		f=> "1509",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_real1.fld_alias1"=>"desc"} ], make_only=>1 )
@@ -2914,7 +2914,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1510",
+		f=> "1510",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_noalias.fld_noalias1"=>"asc"} ], make_only=>1 )
@@ -2924,7 +2924,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1511",
+		f=> "1511",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_noalias.fld_alias1"=>"asc"} ], make_only=>1 )
@@ -2934,7 +2934,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1512",
+		f=> "1512",
 		s=> sub
 		{
 			$mymod->Select( table => "tab_alias1", fields => [ "fld_alias1" ], order_by => [ {"tab_noalias.fld_real1"=>"asc"} ], make_only=>1 )
@@ -2944,7 +2944,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1513",
+		f=> "1513",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => [ {"tab_alias1.fld_alias1"=>"asc"},{"tab_alias2.fld_alias2"=>"asc"} ], make_only=>1 )
@@ -2954,7 +2954,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1514",
+		f=> "1514",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => [ {"tab_real1.fld_alias1"=>"asc"},{"tab_real2.fld_alias2"=>"asc"} ],make_only=>1 )
@@ -2964,7 +2964,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1515",
+		f=> "1515",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => [ "tab_real1.fld_alias1","tab_real2.fld_alias2" ], make_only=>1 )
@@ -2974,7 +2974,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1516",
+		f=> "1516",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => "tab_real1.fld_alias1", make_only=>1 )
@@ -2984,7 +2984,7 @@ sub callSelectOrderByWith()
 	);
 	&my_cmd
 	(
-		f=> "S1517",
+		f=> "1517",
 		s=> sub
 		{
 			$mymod->Select( table => ["tab_alias1","tab_alias2"], fields => [ "tab_alias1.fld_alias1","tab_alias2.fld_alias2" ], order_by => {"tab_real1.fld_alias1"=>"desc"}, make_only=>1 )
@@ -3001,7 +3001,7 @@ sub callSelectSubqueryWith()
 {
 	&my_cmd
 	(
-		f=> "S1600",
+		f=> "1600",
 		s=> sub
 		{
 			$mymod->Select
@@ -3025,7 +3025,7 @@ sub callSelectSubqueryWith()
 	);
 	&my_cmd
 	(
-		f=> "S1601",
+		f=> "1601",
 		s=> sub
 		{
 			$mymod->Select
@@ -3044,12 +3044,63 @@ sub callSelectSubqueryWith()
 				make_only=>1
 			);
 		},
-		t=> 'Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ "!", \$mymod->SelectSubQuery( table => "ta_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ] ) ] } )',
+		t=> 'Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ "!", \$mymod->SelectSubQuery( table => "taib_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ] ) ] } )',
 		r=> "SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 NOT IN (SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2')",
 	);
 	&my_cmd
 	(
-		f=> "S1603",
+		f=> "1602",
+		s=> sub
+		{
+			$mymod->Select
+			(
+		       		table => "tab_alias1",
+				fields => [ "fld_alias1" ],
+				where =>
+				[
+					'fld_alias1' => 1,
+					"fld_alias1" => [ "!", $mymod->SelectSubQuery
+					(
+						table => "tab_alias2",
+						fields => [ "fld_alias2" ],
+						where => [ "fld_alias2" => "value2" ],
+					)],
+				],
+				make_only=>1
+			);
+		},
+		t=> 'Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ "!", \$mymod->SelectSubQuery( table => "ta_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ] ) ] } )',
+		r=> "SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 = '1' AND fld_real1 NOT IN (SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2')",
+	);
+	&my_cmd
+	(
+		f=> "1603",
+		s=> sub
+		{
+			$mymod->Select
+			(
+		       		table => "tab_alias1",
+				fields => [ "fld_alias1" ],
+				where =>
+				[
+					'fld_alias1' => 1,
+					'or',
+					"fld_alias1" => [ "!", $mymod->SelectSubQuery
+					(
+						table => "tab_alias2",
+						fields => [ "fld_alias2" ],
+						where => [ "fld_alias2" => "value2" ],
+					)],
+				],
+				make_only=>1
+			);
+		},
+		t=> 'Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ "!", \$mymod->SelectSubQuery( table => "ta_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ] ) ] } )',
+		r=> "SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 = '1' OR fld_real1 NOT IN (SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2')",
+	);
+	&my_cmd
+	(
+		f=> "1604",
 		s=> sub
 		{
 			$mymod->Select
@@ -3074,7 +3125,7 @@ sub callSelectSubqueryWith()
 	);
 	&my_cmd
 	(
-		f=> "S1604",
+		f=> "1605",
 		s=> sub
 		{
 			$mymod->Select
@@ -3099,7 +3150,7 @@ sub callSelectSubqueryWith()
 	);
 	&my_cmd
 	(
-		f=> "S1605",
+		f=> "1606",
 		s=> sub
 		{
 			$mymod->Select
@@ -3135,7 +3186,6 @@ sub callSelectSubqueryWith()
 		t=> 'Select( table => "tab_alias1", fields => [ "fld_alias1" ], where => [ "fld_alias1" => [ \$mymod->Select( table => "tab_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value2" ], subquery => 1 ), "..", \$mymod->Select( table => "tab_alias2", fields => [ "fld_alias2" ], where => [ "fld_alias2" => "value3" ], subquery => 1,), ], "fld_noalias1" => "value1" ] )',
 		r=> "SELECT fld_real1 fld_alias1 FROM tab_real1 tab_alias1 WHERE fld_real1 BETWEEN ((SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value2'),(SELECT fld_real2 fld_alias2 FROM tab_real2 tab_alias2 WHERE fld_real2 = 'value3')) AND fld_noalias1 = 'value1'",
 	);
-
 }
 
 ################################################################################
@@ -3143,11 +3193,15 @@ sub callSelectSubqueryWith()
 sub my_cmd()
 {
 	my $argv = {@_};
+	my $tid = "S".$argv->{f}."-".$myStage;
 
-	my $tid = $argv->{f}."-".$myStage;
+	## check if specific test by ARGV
+	return if (@ARGV && grep(/^$tid$/i,@ARGV)==0);
+
+	## make tests
 
 	diag("################################################################");
-	diag("test-".$tid.": ".$argv->{t});
+	diag("test[".$tid."] ".$argv->{t});
 
 	$mymod->setDumper(1) if ($ENV{DEBUG});
 	&{$argv->{s}};

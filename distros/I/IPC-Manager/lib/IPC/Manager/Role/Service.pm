@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -49,8 +49,9 @@ sub handle_class { 'IPC::Manager::Service::Handle' }
 
 sub signals_to_grab { () }
 
-sub redirect      { }
-sub pre_fork_hook { }
+sub redirect       { }
+sub pre_fork_hook  { }
+sub post_fork_hook { }
 
 sub run_on_all             { }
 sub run_on_cleanup         { }
@@ -645,6 +646,15 @@ no-op.
 =item $self->pre_fork_hook()
 
 Override to run code before forking workers. Default implementation is a no-op.
+
+=item $self->post_fork_hook()
+
+Called in the child process after C<ipcm_service> forks but before the service
+takes over. Override this to implement a double-fork/daemonize pattern: fork
+inside the hook, have the middle process do its work and exit within the hook,
+and let the grandchild return from the hook to become the service.
+
+Default implementation is a no-op.
 
 =item $self->run_on_all($activity)
 

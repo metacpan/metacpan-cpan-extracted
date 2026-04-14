@@ -5,41 +5,41 @@ response:
   content: |
     {
      "kind": "calendar#setting",
-     "etag": "\"1486727568613000\"",
+     "etag": "\"1776114053940570\"",
      "id": "timezone",
-     "value": "America/Halifax"
+     "value": "UTC"
     }
   headers:
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - expires
-    - 'Sun, 15 Feb 2026 20:54:07 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
-    - cache-control
-    - 'private, max-age=0, must-revalidate, no-transform'
-    - x-l2-request-path
-    - l2-managed-14
-    - date
-    - 'Sun, 15 Feb 2026 20:54:07 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
+  - accept-ranges
+  - none
+  - cache-control
+  - private, max-age=0, must-revalidate, no-transform
+  - date
+  - Mon, 13 Apr 2026 23:51:23 GMT
+  - expires
+  - Mon, 13 Apr 2026 23:51:23 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-14
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Settings::get
 
@@ -50,41 +50,41 @@ response:
   content: |
     {
      "kind": "calendar#setting",
-     "etag": "\"1486727568613000\"",
+     "etag": "\"1776114053940570\"",
      "id": "timezone",
-     "value": "America/Halifax"
+     "value": "UTC"
     }
   headers:
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - expires
-    - 'Sun, 15 Feb 2026 20:54:09 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
-    - cache-control
-    - 'private, max-age=0, must-revalidate, no-transform'
-    - x-l2-request-path
-    - l2-managed-14
-    - date
-    - 'Sun, 15 Feb 2026 20:54:09 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
+  - date
+  - Mon, 13 Apr 2026 23:51:25 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - expires
+  - Mon, 13 Apr 2026 23:51:25 GMT
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - accept-ranges
+  - none
+  - cache-control
+  - private, max-age=0, must-revalidate, no-transform
+  - x-l2-request-path
+  - l2-managed-14
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Settings::value
 

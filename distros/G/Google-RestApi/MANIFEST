@@ -129,6 +129,7 @@ t/unit/Test/Google/RestApi/GmailApi1/Message.pm
 t/unit/Test/Google/RestApi/GmailApi1/Message.pm.exchanges
 t/unit/Test/Google/RestApi/GmailApi1/Thread.pm
 t/unit/Test/Google/RestApi/GmailApi1/Thread.pm.exchanges
+t/unit/Test/Google/RestApi/ScopeCheck.pm
 t/unit/Test/Google/RestApi/SheetsApi4.pm
 t/unit/Test/Google/RestApi/SheetsApi4.pm.exchanges
 t/unit/Test/Google/RestApi/SheetsApi4/Range.pm
@@ -167,6 +168,7 @@ t/unit/Test/Google/RestApi/TasksApi1/TaskList.pm
 t/unit/Test/Google/RestApi/TasksApi1/TaskList.pm.exchanges
 t/unit/Test/Google/RestApi/Types.pm
 t/unit/Test/Google/RestApi/Utils.pm
+t/unit/Test/Google/RestApi/Utils.pm.exchanges
 tutorial/99_delete_all.pl
 tutorial/calendar/10_calendar_basics.pl
 tutorial/calendar/20_events.pl

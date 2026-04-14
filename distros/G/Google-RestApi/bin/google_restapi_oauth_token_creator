@@ -5,29 +5,23 @@
 use FindBin ();
 use lib "$FindBin::RealBin/../lib";
 
+use Cwd qw( abs_path );
 use File::Basename qw( dirname );
 use Storable qw( store );
 use Term::Prompt qw( prompt );
 use Type::Params qw( signature );
-use Types::Standard qw( Str StrMatch );
+use Types::Standard qw( Str StrMatch ArrayRef Optional );
 use YAML::Any qw( Dump LoadFile );
 
 use Google::RestApi::Auth::OAuth2Client ();
 
-# set the scope for the project you are working one.
-# for this package, drive and spreadsheets are required.
-my @scope = (
-  'https://www.googleapis.com/auth/calendar',
-  'https://www.googleapis.com/auth/documents',
-  'https://www.googleapis.com/auth/drive',
-  'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/tasks',
-);
-
 my $config_file = $ARGV[0] or die "A config file name must be provided. See 'perldoc $0'.\n";
 my $config = eval { LoadFile($config_file); };
 die "Unable to load YAML config file '$config_file': $@\n" if $@;
+
+# Support an optional 'google_restapi' top-level key so the config file can
+# be shared with other apps. Use that section if present, else use the root.
+$config = $config->{google_restapi} // $config;
 
 print "Validating config:\n", Dump($config);
 my $check = signature(
@@ -36,6 +30,7 @@ my $check = signature(
     class         => StrMatch[qr/^OAuth2Client$/],
     client_id     => Str,
     client_secret => Str,
+    scope         => Optional[ArrayRef[Str]],
     token_file    => Str,
   ],
 );
@@ -44,7 +39,7 @@ $check->(%{ $config->{auth} });
 my $oauth2 = Google::RestApi::Auth::OAuth2Client->new(
   client_id     => $config->{auth}->{client_id},
   client_secret => $config->{auth}->{client_secret},
-  scope         => \@scope,
+  defined $config->{auth}->{scope} ? (scope => $config->{auth}->{scope}) : (),
 );
 
 # We need to set these parameters this way in order to ensure 
@@ -104,82 +99,241 @@ Token successfully stored in file $token_file.
 END2
     ;
 
+# Run the scope check to verify the token scopes and API enablement.
+my $test_runner = "$FindBin::RealBin/../t/run_unit_tests.t";
+if (!-f $test_runner) {
+  print <<END_MISSING;
+
+NOTE: The scope check test could not be found at:
+  $test_runner
+
+This check is only available when running from a cloned copy of the
+repository. To verify that your token scopes and APIs are correctly
+configured, clone the repo and run the check manually:
+
+  git clone https://github.com/mvsjes2/p5-google-restapi.git
+  cd p5-google-restapi
+  GOOGLE_RESTAPI_CONFIG=$config_file \\
+    TEST_CLASS='Test::Google::RestApi::ScopeCheck' \\
+    prove -v t/run_unit_tests.t
+
+A failing test will print the Google Cloud Console URL needed to
+enable each missing API directly in the output.
+
+END_MISSING
+} else {
+  print "Running scope check to verify token scopes and API enablement...\n\n";
+
+  my $abs_config  = abs_path($config_file);
+  local $ENV{GOOGLE_RESTAPI_CONFIG} = $abs_config;
+  local $ENV{TEST_CLASS}            = 'Test::Google::RestApi::ScopeCheck';
+
+  open(my $fh, '-|', $^X,
+    "-I$FindBin::RealBin/../lib",
+    "-I$FindBin::RealBin/../t/lib",
+    "-I$FindBin::RealBin/../t/unit",
+    $test_runner,
+  ) or die "Cannot run scope check: $!";
+
+  my (@failures, $last_failure);
+  while (my $line = <$fh>) {
+    print $line;
+    if ($line =~ /^not ok \d+ - (.+)/) {
+      $last_failure = { message => $1, url => undef };
+      push @failures, $last_failure;
+    } elsif ($last_failure && $line =~ /^#\s+(https?:\S+)/) {
+      $last_failure->{url} = $1;
+      $last_failure = undef;
+    } elsif ($line !~ /^#/) {
+      $last_failure = undef;
+    }
+  }
+  close($fh);
+
+  print "\n", "=" x 60, "\n";
+  if (@failures) {
+    printf "SCOPE CHECK: %d issue(s) found:\n\n", scalar @failures;
+    for my $f (@failures) {
+      print "  * $f->{message}\n";
+      print "    $f->{url}\n" if $f->{url};
+      print "\n";
+    }
+    print "Once resolved, re-run the scope check with:\n\n";
+    print "  GOOGLE_RESTAPI_CONFIG=$abs_config \\\n";
+    print "    TEST_CLASS='Test::Google::RestApi::ScopeCheck' \\\n";
+    print "    prove -v t/run_unit_tests.t\n";
+  } else {
+    print "SCOPE CHECK: all APIs reachable. Your token is ready to use.\n";
+  }
+  print "=" x 60, "\n";
+}
+
 __END__
 
 =head1 SYNOPSIS
 
-Script to create an OAuth2 token that can be stored and used later to authorize our
-REST API access. 
+Script to create an OAuth2 token that can be stored and used later to authorize
+REST API access to your Google account.
 
 Based on code from https://gist.github.com/hexaddikt/6738162
 
-To create a config file for use as a perl script:
+=head1 INITIAL GOOGLE CLOUD SETUP
+
+Before running this script you need a Google Cloud project with OAuth credentials
+and the relevant APIs enabled. This is a one-time setup per project.
+
+=head2 1. Create a Google Cloud Project
 
 =over
 
-    1. Read over https://stackoverflow.com/questions/11485271/google-oauth-2-authorization-error-redirect-uri-mismatch
-       It has a lot of useful background information.
-    2. Obtain a client_id and client_secret from your Google Developer's console page.
+=item * Go to L<https://console.cloud.google.com> and sign in.
 
-=over
+=item * Click the project dropdown at the top and select B<New Project>.
 
-    a. Go to https://console.cloud.google.com/apis/dashboard, sign in,
-       and create a project.
-    b. Go to the 'Credentials' tab on the left, and then '+ Create Credientials'
-       at the top of the screen and select 'OAuth client ID' from the dropdown.
-    c. Select 'Desktop app' (for a simple script) or 'Web application' (for a web
-       site). The rest of these instructions pertain to the easier 'Desktop app'.
-       It's best to get this more simple config working first, then move to more
-       complex setups once you're familiar with the process.
-    d. Pick a name for your script app and click on 'Create'. Copy the 'Client ID'
-       and 'Client Secret' for the next step.
+=item * Give it a name and click B<Create>.
 
 =back
 
-    3. Create a yaml file with the following format:
-    
+=head2 2. Enable the APIs You Need
+
 =over
 
-        ---
+=item * In the left menu go to B<APIs & Services E<gt> Library>.
+
+=item * Search for and enable each API you intend to use. For this package the
+relevant APIs are:
+
+=over
+
+=item * Google Drive API
+
+=item * Google Sheets API
+
+=item * Google Calendar API
+
+=item * Google Docs API
+
+=item * Gmail API
+
+=item * Tasks API
+
+=back
+
+You only need to enable the APIs you actually plan to use. Each failing scope
+check test will print the exact Cloud Console URL to enable that specific API.
+
+=back
+
+=head2 3. Configure the OAuth Consent Screen
+
+=over
+
+=item * Go to B<APIs & Services E<gt> OAuth consent screen>.
+
+=item * Choose B<External> and click B<Create>.
+
+=item * Fill in the required fields (app name, support email) and click B<Save and Continue>
+through the remaining steps.
+
+=item * On the B<Test users> page, add the Google account(s) you will use for testing.
+Only listed users can authorise your app while it remains in Testing mode.
+
+=back
+
+=head2 4. Create OAuth Credentials
+
+=over
+
+=item * Go to B<APIs & Services E<gt> Credentials>.
+
+=item * Click B<+ Create Credentials> and select B<OAuth client ID>.
+
+=item * Choose B<Desktop app>, give it a name, and click B<Create>.
+
+=item * Copy the B<Client ID> and B<Client Secret> shown in the confirmation dialog.
+
+=back
+
+=head2 5. Create a Config File
+
+Create a YAML file with your credentials. If the config file is shared with
+other applications, nest the Google::RestApi configuration under an optional
+C<google_restapi> top-level key; otherwise place it at the root:
+
+    ---
+    # shared config — google_restapi section is used by this package:
+    google_restapi:
         auth:
             class: OAuth2Client
             client_id: <client-id-from-google>
             client_secret: <client-secret-from-google>
-            token_file: <file-name-to-store-your-generated-token> # just file name, not path.
+            token_file: <filename-for-the-stored-token>  # filename only, not a path
+            scope:
+                - https://www.googleapis.com/auth/drive
+                - https://www.googleapis.com/auth/spreadsheets
+                # add further scopes as needed:
+                # - https://www.googleapis.com/auth/calendar
+                # - https://www.googleapis.com/auth/documents
+                # - https://www.googleapis.com/auth/gmail.modify
+                # - https://www.googleapis.com/auth/tasks
+    other_app:
+        some_key: some_value
 
-    The token file will be stored in the same directory as the config file.
+    # or, without the google_restapi wrapper (root-level config):
+    ---
+    auth:
+        class: OAuth2Client
+        client_id: <client-id-from-google>
+        client_secret: <client-secret-from-google>
+        token_file: <filename-for-the-stored-token>
+        scope:
+            - https://www.googleapis.com/auth/drive
+            - https://www.googleapis.com/auth/spreadsheets
 
-    Once this process is complete, this same config file will be used by this package
-    to access the Google API.
+The C<scope> list controls which Google APIs the token is authorised to access.
+Only include the scopes for APIs you actually use — requesting unnecessary scopes
+may cause Google to show a warning during authorisation. If omitted, a minimal
+default scope is used (userinfo only).
 
-=back
+The token file will be written to the same directory as this config file. The
+same config file is used by this package at runtime to access the Google APIs.
 
-    4. Run this script with the first arg pointing to the yaml file above, and follow
-       the directions on the screen, which will take you through the following steps:
+=head2 6. Run This Script
+
+    perl bin/google_restapi_oauth_token_creator /path/to/your/config.yaml
+
+Follow the prompts:
 
 =over
 
-    a. Copy the URL printed out, and paste the URL in a browser to load the page. 
-    b. On the resulting page, click OK (possibly after being asked to log in to
-       your Google account). 
-    c. You will be redirected to a page that provides a string that you should copy
-       and paste back into the terminal window, so this script can exchange it for
-       an access token from Google, and store the token. That will be the token for
-       this package.
+=item * Copy the printed URL and paste it into a browser.
+
+=item * Log in to your Google account if prompted, then click B<Allow>.
+
+=item * Copy the authorisation code from the resulting page and paste it back
+into the terminal.
 
 =back
 
-    5. Once you have the YAML config file and token file created, you can now use them with
-       this package:
+The script will store the token and then run a scope check to confirm that all
+enabled APIs are reachable. Any failing check will print the Cloud Console URL
+needed to enable that API.
 
-=over
+=head2 7. Use the Token
 
-        use Google::RestApi;
-        my $rest_api = new Google::RestApi->new(config_file => <path to config file>);
+    use Google::RestApi;
+    my $rest_api = Google::RestApi->new(config_file => '/path/to/your/config.yaml');
 
-=back
+See L<Google::RestApi> for further details.
 
-      See Google::RestApi doc for further information on how to initialize this object
-      with the token file.
+=head1 RE-RUNNING THE SCOPE CHECK
 
-=back
+If you enable additional APIs later and want to verify without re-creating the
+token, run:
+
+    GOOGLE_RESTAPI_CONFIG=/path/to/your/config.yaml \
+      TEST_CLASS='Test::Google::RestApi::ScopeCheck' \
+      prove -v t/run_unit_tests.t
+
+This requires a cloned copy of the repository. See the NOTE printed by this
+script if the test file is not found.

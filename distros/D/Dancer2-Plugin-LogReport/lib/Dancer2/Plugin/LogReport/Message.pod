@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Dancer2::Plugin::LogReport::Message - extended Log::Report message class
+Dancer2::Plugin::LogReport::Message - extended Log::Report::Message class
 
 =head1 INHERITANCE
 
@@ -14,7 +14,7 @@ Dancer2::Plugin::LogReport::Message - extended Log::Report message class
   In your template:
 
   [% FOR message IN messages %]
-    <div class="alert alert-[% message.bootstrap_color %]">
+    <div class="alert alert-[% message.bootstrapColor %]">
       [% message.toString | html_entity %]
     </div>
   [% END %]
@@ -36,15 +36,15 @@ Extends L<"OVERLOADED" in Log::Report::Message|Log::Report::Message/"OVERLOADED"
 
 =over 4
 
-=item overload: B<""> stringification
+=item overload: B<'""'> stringification
 
 Inherited, see L<Log::Report::Message/"OVERLOADED">
 
-=item overload: B<&()> function
+=item overload: B<'&{}'> used as function
 
 Inherited, see L<Log::Report::Message/"OVERLOADED">
 
-=item overload: B<.> concatenation
+=item overload: B<'.'> concatenation
 
 Inherited, see L<Log::Report::Message/"OVERLOADED">
 
@@ -54,11 +54,102 @@ Inherited, see L<Log::Report::Message/"OVERLOADED">
 
 Extends L<"METHODS" in Log::Report::Message|Log::Report::Message/"METHODS">.
 
+=head2 Constructors
+
+Extends L<"Constructors" in Log::Report::Message|Log::Report::Message/"Constructors">.
+
 =over 4
 
-=item $obj-E<gt>B<bootstrap_color>()
+=item $obj-E<gt>B<clone>(%options, $variables)
 
-Get a suitable bootstrap context color for the message. This can be
+Inherited, see L<Log::Report::Message/"Constructors">
+
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Log::Report::Message/"Constructors">
+
+ -Option   --Defined in          --Default
+  _append    Log::Report::Message  undef
+  _category  Log::Report::Message  undef
+  _class     Log::Report::Message  undef
+  _classes   Log::Report::Message  undef
+  _context   Log::Report::Message  undef
+  _count     Log::Report::Message  undef
+  _domain    Log::Report::Message  <from "use Log::Report">
+  _expand    Log::Report::Message  false
+  _join      Log::Report::Message  $" $LIST_SEPARATOR
+  _lang      Log::Report::Message  <from locale>
+  _msgctxt   Log::Report::Message  undef
+  _msgid     Log::Report::Message  undef
+  _plural    Log::Report::Message  undef
+  _prepend   Log::Report::Message  undef
+  _tag       Log::Report::Message  []
+  _tags      Log::Report::Message  []
+  _to        Log::Report::Message  undef
+  reason                           undef
+
+=over 2
+
+=item _append => $text|$message
+
+=item _category => INTEGER
+
+=item _class => $tags|\@tags
+
+=item _classes => $tags|\@tags
+
+=item _context => $keyword|\@keywords
+
+=item _count => INTEGER|ARRAY|HASH
+
+=item _domain => $name|$object
+
+=item _expand => BOOLEAN
+
+=item _join => $separator
+
+=item _lang => ISO
+
+=item _msgctxt => $context
+
+=item _msgid => $msgid
+
+=item _plural => $msgid
+
+=item _prepend => $text|$message
+
+=item _tag => $tags|\@tags
+
+=item _tags => $tags|\@tags
+
+=item _to => $dispatcher
+
+=item reason => $reason
+
+The C<$reason> reflects the exception level which is attached to message,
+often derived from a caught exception.
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Log::Report::Message|Log::Report::Message/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<addTags>(@tags)
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<append>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<bootstrapColor>()
+
+[2.03] Get a suitable bootstrap context color for the message. This can be
 used as per the SYNOPSIS.
 
 CSS class C<success> is used for L<Dancer2::Plugin::LogReport::success()|Dancer2::Plugin::LogReport/"Handlers">
@@ -66,9 +157,130 @@ messages, C<info> colors are used for messages C<notice> and below,
 C<warning> is used for C<warning> and C<mistake>, C<danger> is used for
 all other messages.
 
-=item $obj-E<gt>B<reason>()
+=item $obj-E<gt>B<bootstrap_color>()
 
-Get or set the reason of a message
+Deprecated.  See L<bootstrapColor()|Dancer2::Plugin::LogReport::Message/"Attributes">.
+
+=item $obj-E<gt>B<classes>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<context>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<count>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<domain>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<errno>( [$errno] )
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<msgctxt>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<msgid>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<prepend>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<reason>( [$reason] )
+
+Get or set the reason of a message.
+
+=item $obj-E<gt>B<tags>()
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<to>( [$name] )
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=item $obj-E<gt>B<valueOf>($parameter)
+
+Inherited, see L<Log::Report::Message/"Attributes">
+
+=back
+
+=head2 Processing
+
+Extends L<"Processing" in Log::Report::Message|Log::Report::Message/"Processing">.
+
+=over 4
+
+=item $obj-E<gt>B<concat>( $text|$message, [$prepend] )
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=item $obj-E<gt>B<freeze>(%options)
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=item $obj-E<gt>B<inClass>($tag|Regexp)
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=item $obj-E<gt>B<taggedWith>($tag|Regexp)
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=item $class-E<gt>B<thaw>(\%data, %options)
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=item $obj-E<gt>B<toHTML>( [$locale] )
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=item $obj-E<gt>B<toString>( [$locale] )
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=item $obj-E<gt>B<untranslated>()
+
+Inherited, see L<Log::Report::Message/"Processing">
+
+=back
+
+=head2 Serialization
+
+[2.03] Log messages are/can be stored in the Session object.  The Session
+object may be cached in a file, in various formats.  To be able to save
+and restore these message objects from this session serialization, we
+need to freeze and thaw the object at the right moment.  This happens
+transparently.
+
+For session serialization in the database, put this in your
+configuration:
+
+  engines:
+    session:
+      DBIC:
+        serializer: JSON
+        serialize_options:
+          allow_tags: 1
+        deserialize_options:
+          allow_tags: 1
+
+=over 4
+
+=item $obj-E<gt>B<FREEZE>($serializer)
+
+JSON (both JSON::XS and JSON::PP) and Sereal should work as
+C<$serializer>: they both support the CBOR::XS interface.
+
+=item $class-E<gt>B<THAW>($serializer, $msg)
+
+Z<>
 
 =back
 
@@ -78,14 +290,14 @@ Extends L<"DETAILS" in Log::Report::Message|Log::Report::Message/"DETAILS">.
 
 =head1 SEE ALSO
 
-This module is part of Dancer2-Plugin-LogReport version 2.02,
-built on November 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Dancer2-Plugin-LogReport version 2.03,
+built on April 13, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2015-2025 by Mark Overmeer.
+This software is copyright (c) 2015-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

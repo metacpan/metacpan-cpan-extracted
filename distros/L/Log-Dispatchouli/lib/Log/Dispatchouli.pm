@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.100;
+package Log::Dispatchouli 3.101;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 # Not dangerous.  Accepted without change.
@@ -499,7 +499,7 @@ BEGIN {
   $LOG_FMT_PACKAGE = 'Log::Fmt';
   my $ok = eval { require Log::Fmt::XS; };
   if ($ok && ! $ENV{LOG_FMT_NO_XS}) {
-    $LOG_FMT_PACKAGE = 'Log::Fmt::WithXS';
+    $LOG_FMT_PACKAGE = 'Log::Fmt::XS';
   }
 }
 
@@ -918,7 +918,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.100
+version 3.101
 
 =head1 SYNOPSIS
 

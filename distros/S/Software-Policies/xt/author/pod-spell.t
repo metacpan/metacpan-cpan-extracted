@@ -10,6 +10,8 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( lib bin script ) );
 __DATA__
+AIDisclosure
+Basic
 CodeOfConduct
 Contributing
 ContributorCovenant

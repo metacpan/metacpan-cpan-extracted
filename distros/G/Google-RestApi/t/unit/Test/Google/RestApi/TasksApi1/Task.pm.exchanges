@@ -1,5 +1,5 @@
 ---
-request: PATCH /tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA
+request: PATCH /tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ
 request_content:
   status: completed
 response:
@@ -7,49 +7,49 @@ response:
   content: |
     {
       "kind": "tasks#task",
-      "id": "OE1rcmNRdjZTVWo0ZWNiOA",
-      "etag": "\"VoytohN7Zy0\"",
+      "id": "Z3o0bTBWZ3Q3QTkxUG5nMQ",
+      "etag": "\"rWPracrQIB0\"",
       "title": "Persistent Test Task",
-      "updated": "2026-02-15T21:00:51.328Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA",
+      "updated": "2026-04-13T23:56:02.637Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ",
       "position": "00000000000000000000",
       "status": "completed",
-      "completed": "2026-02-15T21:00:51.185Z",
+      "completed": "2026-04-13T23:56:02.230Z",
       "links": [],
-      "webViewLink": "https://tasks.google.com/task/8MkrcQv6SUj4ecb8?sa=6"
+      "webViewLink": "https://tasks.google.com/task/gz4m0Vgt7A91Png1?sa=6"
     }
   headers:
-    - x-l2-request-path
-    - l2-managed-14
-    - date
-    - 'Sun, 15 Feb 2026 21:00:51 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - server
-    - ESF
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-l2-request-path
+  - l2-managed-14
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:56:02 GMT
   message: OK
 source: Test::Google::RestApi::TasksApi1::Task::complete_and_uncomplete
 
 ---
-request: PATCH /tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA
+request: PATCH /tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ
 request_content:
   completed: ~
   status: needsAction
@@ -58,48 +58,48 @@ response:
   content: |
     {
       "kind": "tasks#task",
-      "id": "OE1rcmNRdjZTVWo0ZWNiOA",
-      "etag": "\"txcOcSYUloo\"",
+      "id": "Z3o0bTBWZ3Q3QTkxUG5nMQ",
+      "etag": "\"DSD0wTOxGuA\"",
       "title": "Persistent Test Task",
-      "updated": "2026-02-15T21:00:52.938Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA",
+      "updated": "2026-04-13T23:56:05.105Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ",
       "position": "00000000000000000000",
       "status": "needsAction",
       "links": [],
-      "webViewLink": "https://tasks.google.com/task/8MkrcQv6SUj4ecb8?sa=6"
+      "webViewLink": "https://tasks.google.com/task/gz4m0Vgt7A91Png1?sa=6"
     }
   headers:
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-l2-request-path
-    - l2-managed-14
-    - x-frame-options
-    - SAMEORIGIN
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - server
-    - ESF
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 21:00:52 GMT'
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-14
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:56:05 GMT
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   message: OK
 source: Test::Google::RestApi::TasksApi1::Task::complete_and_uncomplete
 
 ---
-request: POST /tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks
+request: POST /tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks
 request_content:
   notes: Some notes
   title: Test Task
@@ -108,177 +108,177 @@ response:
   content: |
     {
       "kind": "tasks#task",
-      "id": "eUNPT1dFSTJhWEt6Y21xdg",
-      "etag": "\"VhDnTM9Cryg\"",
+      "id": "SzFKblZRLVpRV3ZHZUNBcQ",
+      "etag": "\"7G0Yy7C-evs\"",
       "title": "Test Task",
-      "updated": "2026-02-15T21:00:55.295Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/eUNPT1dFSTJhWEt6Y21xdg",
+      "updated": "2026-04-13T23:56:07.151Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/SzFKblZRLVpRV3ZHZUNBcQ",
       "position": "00000000000000000000",
       "notes": "Some notes",
       "status": "needsAction",
       "links": [],
-      "webViewLink": "https://tasks.google.com/task/yCOOWEI2aXKzcmqv?sa=6"
+      "webViewLink": "https://tasks.google.com/task/K1JnVQ-ZQWvGeCAq?sa=6"
     }
   headers:
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-l2-request-path
-    - l2-managed-14
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 21:00:55 GMT'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Mon, 13 Apr 2026 23:56:07 GMT
+  - x-l2-request-path
+  - l2-managed-14
+  - content-type
+  - application/json; charset=UTF-8
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
   message: OK
 source: Test::Google::RestApi::TasksApi1::Task::create_and_delete
 
 ---
-request: GET /tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/eUNPT1dFSTJhWEt6Y21xdg
+request: GET /tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/SzFKblZRLVpRV3ZHZUNBcQ
 response:
   code: 200
   content: |
     {
       "kind": "tasks#task",
-      "id": "eUNPT1dFSTJhWEt6Y21xdg",
-      "etag": "\"VhDnTM9Cryg\"",
+      "id": "SzFKblZRLVpRV3ZHZUNBcQ",
+      "etag": "\"7G0Yy7C-evs\"",
       "title": "Test Task",
-      "updated": "2026-02-15T21:00:55.295Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/eUNPT1dFSTJhWEt6Y21xdg",
+      "updated": "2026-04-13T23:56:07.151Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/SzFKblZRLVpRV3ZHZUNBcQ",
       "position": "00000000000000000000",
       "notes": "Some notes",
       "status": "needsAction",
       "links": [],
-      "webViewLink": "https://tasks.google.com/task/yCOOWEI2aXKzcmqv?sa=6"
+      "webViewLink": "https://tasks.google.com/task/K1JnVQ-ZQWvGeCAq?sa=6"
     }
   headers:
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - x-l2-request-path
-    - l2-managed-14
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 21:00:56 GMT'
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-14
+  - date
+  - Mon, 13 Apr 2026 23:56:08 GMT
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::TasksApi1::Task::create_and_delete
 
 ---
-request: DELETE /tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/eUNPT1dFSTJhWEt6Y21xdg
+request: DELETE /tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/SzFKblZRLVpRV3ZHZUNBcQ
 response:
   code: 204
   content: ''
   headers:
-    - server
-    - ESF
-    - content-length
-    - 0
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - Origin
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 21:00:58 GMT'
-    - x-l2-request-path
-    - l2-managed-14
+  - date
+  - Mon, 13 Apr 2026 23:56:09 GMT
+  - x-l2-request-path
+  - l2-managed-14
+  - content-type
+  - application/json; charset=UTF-8
+  - vary
+  - Origin
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - content-length
+  - '0'
+  - x-xss-protection
+  - '0'
   message: No Content
 source: Test::Google::RestApi::TasksApi1::Task::create_and_delete
 
 ---
-request: POST /tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA/move
+request: POST /tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ/move
 response:
   code: 200
   content: |
     {
       "kind": "tasks#task",
-      "id": "OE1rcmNRdjZTVWo0ZWNiOA",
-      "etag": "\"txcOcSYUloo\"",
+      "id": "Z3o0bTBWZ3Q3QTkxUG5nMQ",
+      "etag": "\"DSD0wTOxGuA\"",
       "title": "Persistent Test Task",
-      "updated": "2026-02-15T21:00:52.938Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA",
+      "updated": "2026-04-13T23:56:05.105Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ",
       "position": "00000000000000000000",
       "status": "needsAction",
       "links": [],
-      "webViewLink": "https://tasks.google.com/task/8MkrcQv6SUj4ecb8?sa=6"
+      "webViewLink": "https://tasks.google.com/task/gz4m0Vgt7A91Png1?sa=6"
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 21:01:00 GMT'
-    - server
-    - ESF
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - x-frame-options
-    - SAMEORIGIN
-    - x-l2-request-path
-    - l2-managed-14
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-14
+  - date
+  - Mon, 13 Apr 2026 23:56:11 GMT
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::TasksApi1::Task::move
 
 ---
-request: PATCH /tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA
+request: PATCH /tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ
 request_content:
   title: Updated Task
 response:
@@ -286,76 +286,76 @@ response:
   content: |
     {
       "kind": "tasks#task",
-      "id": "OE1rcmNRdjZTVWo0ZWNiOA",
-      "etag": "\"8elOfpavQSc\"",
+      "id": "Z3o0bTBWZ3Q3QTkxUG5nMQ",
+      "etag": "\"jSix8AIrRPU\"",
       "title": "Updated Task",
-      "updated": "2026-02-15T21:01:03.310Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/lists/N1hUd1pCV2FuZUhsU19ENQ/tasks/OE1rcmNRdjZTVWo0ZWNiOA",
+      "updated": "2026-04-13T23:56:14.623Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/lists/bXpXNXdyTXhPTWRzSnNnag/tasks/Z3o0bTBWZ3Q3QTkxUG5nMQ",
       "position": "00000000000000000000",
       "status": "needsAction",
       "links": [],
-      "webViewLink": "https://tasks.google.com/task/8MkrcQv6SUj4ecb8?sa=6"
+      "webViewLink": "https://tasks.google.com/task/gz4m0Vgt7A91Png1?sa=6"
     }
   headers:
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - x-l2-request-path
-    - l2-managed-14
-    - x-frame-options
-    - SAMEORIGIN
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - server
-    - ESF
-    - date
-    - 'Sun, 15 Feb 2026 21:01:03 GMT'
-    - content-type
-    - application/json; charset=UTF-8
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-14
+  - date
+  - Mon, 13 Apr 2026 23:56:14 GMT
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::TasksApi1::Task::update
 
 ---
-request: DELETE /tasks/v1/users/@me/lists/N1hUd1pCV2FuZUhsU19ENQ
+request: DELETE /tasks/v1/users/@me/lists/bXpXNXdyTXhPTWRzSnNnag
 response:
   code: 204
   content: ''
   headers:
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - Origin
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - server
-    - ESF
-    - content-length
-    - 0
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - date
-    - 'Sun, 15 Feb 2026 21:01:04 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - x-l2-request-path
-    - l2-managed-14
+  - x-xss-protection
+  - '0'
+  - content-length
+  - '0'
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - x-content-type-options
+  - nosniff
+  - vary
+  - Origin
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-14
+  - date
+  - Mon, 13 Apr 2026 23:56:16 GMT
   message: No Content
 source: Test::Google::RestApi::TasksApi1::Task::_teardown_live_task_list
 

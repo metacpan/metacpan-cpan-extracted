@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Perl::Critic::Policy" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::MD::Context;
-$Crypt::OpenSSL3::MD::Context::VERSION = '0.003';
+$Crypt::OpenSSL3::MD::Context::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::MD::Context - message digest instances
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 METHODS
 
@@ -62,6 +62,8 @@ version 0.003
 =head2 sign
 
 =head2 sign_init
+
+=head2 sign_init_ex
 
 =head2 sign_final
 

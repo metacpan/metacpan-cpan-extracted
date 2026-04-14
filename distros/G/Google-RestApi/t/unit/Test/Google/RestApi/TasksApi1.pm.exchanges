@@ -7,78 +7,78 @@ response:
   content: |
     {
       "kind": "tasks#taskList",
-      "id": "ZVdLejVWMDY2SkRLY1Z6Zw",
-      "etag": "\"o7atQyznnnY\"",
+      "id": "c0NEaGRSQTQxMjhxcmJVeA",
+      "etag": "\"mgpYDD0d69k\"",
       "title": "Test Task List",
-      "updated": "2026-02-15T20:50:46.183Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/ZVdLejVWMDY2SkRLY1Z6Zw"
+      "updated": "2026-04-13T23:51:16.353Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/c0NEaGRSQTQxMjhxcmJVeA"
     }
   headers:
-    - x-l2-request-path
-    - l2-managed-14
-    - date
-    - 'Sun, 15 Feb 2026 20:50:46 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
+  - date
+  - Mon, 13 Apr 2026 23:51:16 GMT
+  - x-l2-request-path
+  - l2-managed-14
+  - content-type
+  - application/json; charset=UTF-8
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
 
 ---
-request: DELETE /tasks/v1/users/@me/lists/ZVdLejVWMDY2SkRLY1Z6Zw
+request: DELETE /tasks/v1/users/@me/lists/c0NEaGRSQTQxMjhxcmJVeA
 response:
   code: 204
   content: ''
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:50:47 GMT'
-    - x-l2-request-path
-    - l2-managed-14
-    - server
-    - ESF
-    - content-length
-    - 0
-    - vary
-    - Origin
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - x-xss-protection
+  - '0'
+  - content-length
+  - '0'
+  - vary
+  - Origin
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - date
+  - Mon, 13 Apr 2026 23:51:17 GMT
+  - x-l2-request-path
+  - l2-managed-14
+  - content-type
+  - application/json; charset=UTF-8
   message: No Content
 source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
 
 ---
 query_params:
-  fields: 'nextPageToken, items(id, title)'
+  fields: nextPageToken, items(id, title)
 request: GET /tasks/v1/users/@me/lists
 response:
   code: 200
@@ -86,48 +86,44 @@ response:
     {
       "items": [
         {
-          "id": "MDUzODQwNjYxNDM2Mjk4NTMxNjU6MDow",
-          "title": "Default"
-        },
-        {
-          "id": "NlNSZDQ1MWR3aUJjajZSXw",
-          "title": "St Hill Trip 2022"
+          "id": "MDYxNjkyOTEyMjM0MDYwNTA3NjA6MDow",
+          "title": "My Tasks"
         }
       ]
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:50:49 GMT'
-    - x-l2-request-path
-    - l2-managed-14
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-14
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:51:19 GMT
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   message: OK
 source: Test::Google::RestApi::TasksApi1::list_task_lists
 
 ---
 query_params:
-  fields: 'nextPageToken, items(id, title)'
+  fields: nextPageToken, items(id, title)
 request: GET /tasks/v1/users/@me/lists
 response:
   code: 200
@@ -135,42 +131,38 @@ response:
     {
       "items": [
         {
-          "id": "MDUzODQwNjYxNDM2Mjk4NTMxNjU6MDow",
-          "title": "Default"
-        },
-        {
-          "id": "NlNSZDQ1MWR3aUJjajZSXw",
-          "title": "St Hill Trip 2022"
+          "id": "MDYxNjkyOTEyMjM0MDYwNTA3NjA6MDow",
+          "title": "My Tasks"
         }
       ]
     }
   headers:
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-l2-request-path
-    - l2-managed-14
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:50:52 GMT'
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - date
+  - Mon, 13 Apr 2026 23:51:21 GMT
+  - x-l2-request-path
+  - l2-managed-14
+  - content-type
+  - application/json; charset=UTF-8
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::TasksApi1::list_task_lists_max_pages
 

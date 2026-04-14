@@ -2,7 +2,7 @@ package IPC::Manager::Client::JSONFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;

@@ -5,7 +5,7 @@ use Data::Dumper qw(Dumper);
 use Exporter     qw(import);
 use Digest::SHA  qw(sha256_hex);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(
     all_file_subs

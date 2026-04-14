@@ -176,7 +176,7 @@ if(MPC_HEADER_V >= 66304) {
 }
 
     @Math::MPC::EXPORT_OK = (@tagged, @radius, @ball);
-    our $VERSION = '1.40';
+    our $VERSION = '1.41';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);

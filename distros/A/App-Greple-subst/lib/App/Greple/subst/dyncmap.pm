@@ -74,7 +74,7 @@ as Perl itself.
 
 package App::Greple::subst::dyncmap;
 
-use v5.14;
+use v5.18;
 use strict;
 use warnings;
 

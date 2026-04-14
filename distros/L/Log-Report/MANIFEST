@@ -42,6 +42,7 @@ t/09message.t
 t/10interp.t
 t/11concat.t
 t/12missing.t
+t/13freeze.t
 t/31stack.t
 t/41die.t
 t/42exc-dbix-class.t

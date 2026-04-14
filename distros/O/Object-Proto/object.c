@@ -26,6 +26,8 @@ typedef enum {
 /* Type check/coerce function signatures for external plugins */
 typedef bool (*ObjectTypeCheckFunc)(pTHX_ SV *val);
 typedef SV*  (*ObjectTypeCoerceFunc)(pTHX_ SV *val);
+typedef bool (*ObjectTypeCheckFuncEx)(pTHX_ SV *val, void *data);
+typedef SV*  (*ObjectTypeCoerceFuncEx)(pTHX_ SV *val, void *data);
 
 /* Registered type entry (for plugins) */
 typedef struct {
@@ -34,6 +36,9 @@ typedef struct {
     ObjectTypeCoerceFunc coerce;    /* C function for coercion */
     SV *perl_check;                 /* Fallback Perl callback */
     SV *perl_coerce;                /* Fallback Perl coercion */
+    ObjectTypeCheckFuncEx check_ex;   /* C function with user-data */
+    ObjectTypeCoerceFuncEx coerce_ex; /* C coerce with user-data */
+    void *data;                     /* Opaque user-data for _ex functions */
 } RegisteredType;
 
 /* Per-slot specification - parsed from "name:Type:default(val)" */
@@ -267,6 +272,10 @@ static SV* apply_slot_coercion(pTHX_ SV *val, SlotSpec *spec) {
         val = POPs;
         PUTBACK;
     }
+    /* C-registered type coercion with user-data (fast path) */
+    if (spec->type_id == TYPE_CUSTOM && spec->registered && spec->registered->coerce_ex) {
+        val = spec->registered->coerce_ex(aTHX_ val, spec->registered->data);
+    }
     /* C-registered type coercion (fast path) */
     if (spec->type_id == TYPE_CUSTOM && spec->registered && spec->registered->coerce) {
         val = spec->registered->coerce(aTHX_ val);
@@ -295,7 +304,12 @@ static bool check_slot_type(pTHX_ SV *val, SlotSpec *spec) {
     
     if (!spec->registered) return true;
     
-    /* Try C function first (fast path - ~5 cycles) */
+    /* Try C function with user-data first (fast path - ~5 cycles) */
+    if (spec->registered->check_ex) {
+        return spec->registered->check_ex(aTHX_ val, spec->registered->data);
+    }
+
+    /* Try C function next (fast path - ~5 cycles) */
     if (spec->registered->check) {
         return spec->registered->check(aTHX_ val);
     }
@@ -834,8 +848,11 @@ static OP* pp_object_new(pTHX) {
                                 croak("Type constraint failed for '%s' in new(): expected %s",
                                       spec->name, type_id_to_name(spec->type_id));
                             }
-                        } else if (spec->registered && spec->registered->check) {
-                            if (!spec->registered->check(aTHX_ val_sv)) {
+                        } else if (spec->registered && (spec->registered->check_ex || spec->registered->check)) {
+                            bool ok = spec->registered->check_ex
+                                ? spec->registered->check_ex(aTHX_ val_sv, spec->registered->data)
+                                : spec->registered->check(aTHX_ val_sv);
+                            if (!ok) {
                                 croak("Type constraint failed for '%s' in new(): expected %s",
                                       spec->name, spec->registered->name);
                             }
@@ -895,8 +912,11 @@ static OP* pp_object_new(pTHX) {
                             croak("Type constraint failed for '%s' in new(): expected %s",
                                   spec->name, type_id_to_name(spec->type_id));
                         }
-                    } else if (spec->registered && spec->registered->check) {
-                        if (!spec->registered->check(aTHX_ val_sv)) {
+                    } else if (spec->registered && (spec->registered->check_ex || spec->registered->check)) {
+                        bool ok = spec->registered->check_ex
+                            ? spec->registered->check_ex(aTHX_ val_sv, spec->registered->data)
+                            : spec->registered->check(aTHX_ val_sv);
+                        if (!ok) {
                             croak("Type constraint failed for '%s' in new(): expected %s",
                                   spec->name, spec->registered->name);
                         }
@@ -4112,6 +4132,43 @@ PERL_CALLCONV void object_register_type_xs(pTHX_ const char *name,
     type->coerce = coerce;  /* Direct C function pointer - no Perl overhead */
     type->perl_check = NULL;
     type->perl_coerce = NULL;
+    type->check_ex = NULL;
+    type->coerce_ex = NULL;
+    type->data = NULL;
+    
+    hv_store(g_type_registry, name, name_len, newSViv(PTR2IV(type)), 0);
+}
+
+/* C-level registration with user-data for external XS modules (called from BOOT)
+   Allows a single pair of C functions to serve multiple dynamically-created types */
+PERL_CALLCONV void object_register_type_xs_ex(pTHX_ const char *name,
+                                              ObjectTypeCheckFuncEx check,
+                                              ObjectTypeCoerceFuncEx coerce,
+                                              void *data) {
+    RegisteredType *type;
+    STRLEN name_len = strlen(name);
+    
+    if (!g_type_registry) {
+        g_type_registry = newHV();
+    }
+    
+    SV **existing = hv_fetch(g_type_registry, name, name_len, 0);
+    if (existing) {
+        croak("Type '%s' is already registered", name);
+    }
+    
+    Newxz(type, 1, RegisteredType);
+    Newx(type->name, name_len + 1, char);
+    Copy(name, type->name, name_len, char);
+    type->name[name_len] = '\0';
+    
+    type->check = NULL;
+    type->coerce = NULL;
+    type->perl_check = NULL;
+    type->perl_coerce = NULL;
+    type->check_ex = check;
+    type->coerce_ex = coerce;
+    type->data = data;
     
     hv_store(g_type_registry, name, name_len, newSViv(PTR2IV(type)), 0);
 }

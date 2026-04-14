@@ -132,13 +132,24 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
     # Mutators
     $dt->set( year => 2027, month => 1, day => 1 );
-    $dt->set_year(2027);    $dt->set_month(1);    $dt->set_day(1);
-    $dt->set_hour(0);       $dt->set_minute(0);   $dt->set_second(0);
+    $dt->set_year(2027);
+    $dt->set_month(1);
+    $dt->set_day(1);
+    $dt->set_hour(0);
+    $dt->set_minute(0);
+    $dt->set_second(0);
     $dt->set_nanosecond(0);
     $dt->set_time_zone('America/New_York');
     $dt->set_locale('en-US');  # sets a new DateTime::Locale::FromCLDR object
     $dt->set_formatter( $formatter );
     $dt->truncate( to => 'day' );   # 'year','month','week','day','hour','minute','second'
+
+    # Works for second, minute, hour, day, week, local_week, month, quarter,
+    # year, decade, century
+    $dt->end_of( 'month' );
+    say $dt;  # 2026-04-30T23:59:59.999999999
+    $dt->start_of( 'month' );
+    say $dt;  # 2026-04-01T00:00:00
 
     # Comparison
     my @sorted = sort { $a <=> $b } @datetimes;  # overloaded <=>
@@ -167,7 +178,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 # VERSION
 
-    v0.3.0
+    v0.4.0
 
 # DESCRIPTION
 
@@ -885,6 +896,52 @@ Sets the formatter object used by ["stringify"](#stringify). Must respond to `fo
 
 Changes the time zone of the datetime in-place. Accepts a time zone name string, such as `America/New_York`, or a [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone) object. Returns `$self`.
 
+## end\_of
+
+    my $dt = DateTime::Lite->new(
+        year      => 2026,
+        month     => 4,
+        day       => 15,
+        hour      => 14,
+        minute    => 32,
+        second    => 47,
+        time_zone => 'UTC',
+    );
+    $dt->end_of( 'month' );
+    say $dt;  # 2026-04-30T23:59:59.999999999
+
+Modifies the object in place to represent the last instant of the given unit.
+Supported units are: `second`, `minute`, `hour`, `day`, `week`, `local_week`, `month`, `quarter`, `year`, `decade`, `century`.
+
+The result is the last nanosecond before the start of the next unit, so the timezone and variable-length units such as months and years are handled correctly without hardcoding boundary values.
+
+Returns the modified object on success, or sets an [error object](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (`DateTime::Lite::Null`) to avoid the typical `Can't call method '%s' on an undefined value`
+
+See also ["start\_of"](#start_of) and ["truncate"](#truncate).
+
+## start\_of
+
+    my $dt = DateTime::Lite->new(
+        year      => 2026,
+        month     => 4,
+        day       => 15,
+        hour      => 14,
+        minute    => 32,
+        second    => 47,
+        time_zone => 'UTC',
+    );
+    $dt->start_of( 'month' );
+    say $dt;  # 2026-04-01T00:00:00
+
+Modifies the object in place to represent the first instant of the given unit.
+Supported units are: `second`, `minute`, `hour`, `day`, `week`, `local_week`, `month`, `quarter`, `year`, `decade`, `century`.
+
+For most units this delegates to ["truncate"](#truncate). `decade` and `century` are handled independently: `start_of('decade')` for 2026 returns 2020-01-01, and `start_of('century')` returns 2001-01-01.
+
+Returns the modified object on success, or sets an [error object](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3AException) and returns `undef` in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (`DateTime::Lite::Null`) to avoid the typical `Can't call method '%s' on an undefined value`
+
+See also ["end\_of"](#end_of) and ["truncate"](#truncate).
+
 ## truncate
 
     $dt->truncate( to => 'day' );   # sets h/m/s/ns to zero
@@ -937,6 +994,61 @@ When called without arguments, returns the most recent error object (or `undef` 
     }
 
 Propagates the error stored in another object (or the class-level error) into the current object's error slot, without constructing a new exception. Used internally when a lower-level call fails and the caller wants to surface the same error to its own caller.
+
+# LOW-LEVEL XS UTILITIES
+
+## posix\_tz\_lookup
+
+    my $r = DateTime::Lite->posix_tz_lookup( 1775769030, 'EST5EDT,M3.2.0,M11.1.0' );
+    my $r = $dt->posix_tz_lookup( 1775769030, 'EST5EDT,M3.2.0,M11.1.0' );
+    if( defined( $r ) )
+    {
+        say $r->{offset};     # -14400  (seconds east of UTC)
+        say $r->{is_dst};     # 1
+        say $r->{short_name}; # "EDT"
+    }
+
+Given a Unix timestamp (signed 64-bit integer, representing the number of seconds since 1970-01-01T00:00:00 UTC), and a POSIX TZ footer string, it parses the footer string, and resolves the UTC offset, DST flag, and timezone abbreviation for the given Unix timestamp.
+
+This is the low-level function used internally by [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone) to handle dates beyond the last explicit transition stored in the TZif database.
+
+The first argument may be either a class name or an instance; both forms are accepted.
+
+The POSIX TZ footer string comes from the TZif v2+ files, and looks like `EST5EDT,M3.2.0,M11.1.0` or `JST-9` or `<+0545>-5:45`.
+
+The implementation is in C via `dtl_posix.h`, derived from the IANA `tzcode` reference implementation (public domain). It handles all POSIX TZ string rule forms (`Jn` julian day, `n` zero-based julian day, and `Mm.w.d` month/week/day), as well as the [RFC 9636](https://www.rfc-editor.org/rfc/rfc9636.html) extensions for TZif v3+:
+
+- `Jn`
+
+    Julian day (1-365, no leap day)
+
+- `n`
+
+    zero-based Julian day (0-365, counts leap day)
+
+- `Mm.w.d`
+
+    month/week/day rule (e.g. `M3.2.0` = second Sunday of March)
+
+It also handles quoted angle-bracket abbreviations such as `<+0545>`, fractional offsets, negative and greater-than-24-hour transition times ([RFC 9636 section 3.3.2](https://www.rfc-editor.org/rfc/rfc9636.html#name-tz-string-extension) extensions for TZif v3+), and southern-hemisphere DST where the DST period wraps around the year boundary (start > end).
+
+Returns a hashref with three keys on success:
+
+- `offset`
+
+    The UTC offset in seconds east of UTC (negative for zones west of UTC, such as `-18000` for EST).
+
+- `is_dst`
+
+    `1` if the timestamp falls within a DST period, `0` otherwise.
+
+- `short_name`
+
+    The timezone abbreviation, such as `EDT`, `JST`, or `+0545`.
+
+Returns `undef` if `$tz_string` cannot be parsed.
+
+This method is primarily intended for advanced use cases, such as building custom timezone libraries on top of `DateTime::Lite::TimeZone`. Most users will not need to call it directly.
 
 # SERIALISATION
 

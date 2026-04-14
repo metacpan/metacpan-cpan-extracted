@@ -63,6 +63,18 @@ typedef bool (*ObjectTypeCheckFunc)(pTHX_ SV *val);
 typedef SV* (*ObjectTypeCoerceFunc)(pTHX_ SV *val);
 
 /*
+ * Extended type check function signature with user-data.
+ * Allows a single C function to serve multiple dynamically-created types
+ * by passing context (e.g., an enum's value table).
+ */
+typedef bool (*ObjectTypeCheckFuncEx)(pTHX_ SV *val, void *data);
+
+/*
+ * Extended type coercion function signature with user-data.
+ */
+typedef SV* (*ObjectTypeCoerceFuncEx)(pTHX_ SV *val, void *data);
+
+/*
  * Register a type with C-level check and coerce functions.
  * Call this from your BOOT section.
  *
@@ -89,8 +101,27 @@ typedef struct {
     ObjectTypeCoerceFunc coerce;
     SV *perl_check;
     SV *perl_coerce;
+    ObjectTypeCheckFuncEx check_ex;
+    ObjectTypeCoerceFuncEx coerce_ex;
+    void *data;
 } RegisteredType;
 
 extern RegisteredType* object_get_registered_type(pTHX_ const char *name);
+
+/*
+ * Register a type with C-level check and coerce functions that receive user-data.
+ * Allows a single pair of C functions to serve multiple types by passing
+ * per-type context (e.g., enum value tables, bitmasks).
+ *
+ * Parameters:
+ *   name   - Type name
+ *   check  - C function to validate values (receives data pointer)
+ *   coerce - C function to coerce values (optional, pass NULL)
+ *   data   - Opaque pointer passed to check/coerce on every call
+ */
+extern void object_register_type_xs_ex(pTHX_ const char *name,
+                                       ObjectTypeCheckFuncEx check,
+                                       ObjectTypeCoerceFuncEx coerce,
+                                       void *data);
 
 #endif /* OBJECT_TYPES_H */

@@ -32,6 +32,9 @@ Log::Report::Message - a piece of text to be translated
   print __"\tCongratulations,\n";
   print "\t", __("Congratulations,"), "\n";  # same
 
+  # Object serialization support
+  my $clone = Log::Report::Message->thaw($msg->freeze);
+
 =head1 DESCRIPTION
 
 Any use of a constructor function exported by L<Log::Report|Log::Report>, like
@@ -214,7 +217,7 @@ L<Log::Report::Dispatcher::Try::wasFatal(tag)|Log::Report::Dispatcher::Try/"Stat
 category (group, class) of the exception.
 
 The C<$tags> is interpreted as comma- and/or blank separated list of class
-tokens (barewords), the ARRAY lists all tags separately. See L<tags()|Log::Report::Message/"Accessors">.
+tokens (barewords), the ARRAY lists all tags separately. See L<tags()|Log::Report::Message/"Attributes">.
 
 =item _tags => $tags|\@tags
 
@@ -223,15 +226,19 @@ Alternative name for C<_tag>
 =item _to => $dispatcher
 
 Specify the C<$dispatcher> as destination explicitly. Short
-for  C<< report {to => NAME}, ... >>  See L<to()|Log::Report::Message/"Accessors">
+for  C<< report {to => NAME}, ... >>  See L<to()|Log::Report::Message/"Attributes">
 
 =back
 
 =back
 
-=head2 Accessors
+=head2 Attributes
 
 =over 4
+
+=item $obj-E<gt>B<addTags>(@tags)
+
+[1.45] Add zero or more tags to this message.
 
 =item $obj-E<gt>B<append>()
 
@@ -240,7 +247,7 @@ after this one.  Usually C<undef>.
 
 =item $obj-E<gt>B<classes>()
 
-Deprecated alternative for L<tags()|Log::Report::Message/"Accessors">.
+Deprecated alternative for L<tags()|Log::Report::Message/"Attributes">.
 
 =item $obj-E<gt>B<context>()
 
@@ -276,7 +283,7 @@ Returns the string which is prepended to this one.  Usually C<undef>.
 
 =item $obj-E<gt>B<tags>()
 
-Returns the LIST of tags which are defined for this message; message
+[1.44] Returns the LIST of tags which are defined for this message; message
 group indicators, as often found in exception-based programming.
 
 =item $obj-E<gt>B<to>( [$name] )
@@ -341,14 +348,31 @@ it is appended in the final display.
   print __"Hello" . ' ' . __"World!\n";
   print __("Hello")->concat(' ')->concat(__"World!")->concat("\n");
 
+=item $obj-E<gt>B<freeze>(%options)
+
+Convert the data of this message into a (nested) HASH which optimally
+preserves its content.  Pass this to L<thaw()|Log::Report::Message/"Processing"> to get the object back.
+
+The returned HASH can be serialized safely with (for instance) YAML
+or JSON.  Then, it can be reconstructed from the de-serialized data.
+At the moment, all facts can be preserved.
+
+» example: to thaw a frozen
+
+  my $clone = Log::Report::Message->thaw($msg->freeze);
+
 =item $obj-E<gt>B<inClass>($tag|Regexp)
 
 Deprecated alternative for L<taggedWith()|Log::Report::Message/"Processing">.
 
 =item $obj-E<gt>B<taggedWith>($tag|Regexp)
 
-Returns C<true> if the message carries the specified C<$tag> (string) or
+[1.44] Returns C<true> if the message carries the specified C<$tag> (string) or
 matches the Regexp.  The trueth value is the (first matching) tag.
+
+=item $class-E<gt>B<thaw>(\%data, %options)
+
+Z<>
 
 =item $obj-E<gt>B<toHTML>( [$locale] )
 
@@ -680,14 +704,14 @@ In either case, the translation will be looked-up only once.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.44,
-built on December 22, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.45,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2007-2025 by Mark Overmeer.
+This software is copyright (c) 2007-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

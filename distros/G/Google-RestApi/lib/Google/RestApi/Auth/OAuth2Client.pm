@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.1';
 
 use Google::RestApi::Setup;
 
@@ -110,6 +110,13 @@ sub refresh_token {
   my $server = $self->oauth2_webserver();
   $server->update_access_token($self->access_token());
   return $self->access_token()->refresh();
+}
+
+sub refresh_headers {
+  my $self = shift;
+  INFO("Refreshing auth headers after 401");
+  delete $self->{headers};
+  return $self->headers();
 }
 
 sub oauth2_client {
@@ -235,6 +242,12 @@ OAuth2 redirect url. 'urn:ietf:wg:oauth:2.0:oob' will be used if you don't speci
 =back
 
 See L<https://developers.google.com/accounts/docs/OAuth2> for details.
+
+=head2 refresh_headers
+
+Called automatically by RestApi when a 401 Unauthorized response is received.
+Clears the cached authorization headers and fetches a new OAuth access token
+by refreshing the stored refresh token.
 
 =head1 OAUTH2 SETUP
 

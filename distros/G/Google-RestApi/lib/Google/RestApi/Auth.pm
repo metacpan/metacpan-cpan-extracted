@@ -1,11 +1,12 @@
 package Google::RestApi::Auth;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.1';
 
 use Google::RestApi::Setup;
 
 sub params {{}}
 sub headers {[]};
+sub refresh_headers {[]};
 
 1;
 
@@ -26,3 +27,9 @@ to return the proper headers for that auth class.
 
 The default behaviour is to return nothing for each, so the derived class
 has to return at least something for one of them to be functional.
+
+=head2 refresh_headers
+
+Called automatically by RestApi when a 401 Unauthorized response is received.
+Derived classes should override this to refresh the OAuth token and return
+new authorization headers. The default implementation returns an empty list.

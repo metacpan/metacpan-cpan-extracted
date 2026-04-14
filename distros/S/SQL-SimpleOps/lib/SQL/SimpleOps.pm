@@ -93,7 +93,7 @@
 		$err
 	);
 
-	our $VERSION = "2026.095.1";
+	our $VERSION = "2026.101.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -2053,6 +2053,8 @@ sub _getWhereRecursive()
 	## format where
 	my @where_tmp;
 	my $oper_pend = 0;
+	my $oper_text;
+
 	for (my $ix=0; $ix < @{$where};)
 	{
 		undef(@where_tmp) if (@where_tmp && join('',@where_tmp) eq '');
@@ -2067,28 +2069,26 @@ sub _getWhereRecursive()
 			my @where_aux;
 			return SQL_SIMPLE_RC_SYNTAX if ($self->_getWhereRecursive($command,$level+1,$value1,\@where_aux));
 
-			## valida se requer AND/OR
-			push(@where_tmp,"AND") if ($oper_pend && @where_tmp);
-			## salva o where recursivo
-			push(@where_tmp,join(" ",@where_aux));
-			$oper_pend = 1;
+			## append if have valid clauses
+			if (@where_aux)
+			{
+				## valida se requer AND/OR
+				push(@where_tmp,$oper_text||"AND") if ($oper_pend && @where_tmp);
+				## salva o where recursivo
+				push(@where_tmp,join(" ",@where_aux));
+				$oper_pend = 1;
+			}
 			next;
 		}
 
 		## check and/or logical connector
 		if ($value1 =~ /^(and|\&\&|or|\|\|)$/i)
 		{
-			push(@where_tmp,uc($value1)) if ($oper_pend && @where_tmp);
-			$oper_pend = 0;
+			$oper_text = uc($value1) if ($oper_pend && @where_tmp);
+			$oper_pend = 2;
 			next;
 		}
-
-		## valida se requer AND/OR
-		if ($oper_pend && @where_tmp)
-		{
-			push(@where_tmp,"AND");
-			$oper_pend = 0;
-		}
+		elsif ($oper_pend != 2) { $oper_text = "AND"; }
 
 		## process value if not escape
 		if (!($value1 =~ /^\\(.*)/))
@@ -2124,6 +2124,7 @@ sub _getWhereRecursive()
 		## finis where if no more values
 		if ($ix >= @{$where})
 		{
+			push(@where_tmp,$oper_text||"AND") if ($oper_pend && @where_tmp);
 			push(@where_tmp,$value1);
 			last;
 		}
@@ -2207,6 +2208,7 @@ sub _getWhereRecursive()
 					my $not = ($operator eq "!=") ? " NOT" : "";
 					
 					## no _escapeQuote required, already done in value2 build
+					push(@where_tmp,$oper_text||"AND") if ($oper_pend && @where_tmp);
 					(@_value2 == 3 && $_value2[1] eq "'..'") ?
 						push(@where_tmp,$value1.$not." BETWEEN (".$quote.$_value2[0].$quote.",".$quote.$_value2[2].$quote.")"):
 						push(@where_tmp,$value1.$not." IN (".$quote.join("$quote,$quote",@_value2).$quote.")");
@@ -2225,9 +2227,9 @@ sub _getWhereRecursive()
 						my $v = $1;
 						if ($v =~ /^(\(SELECT\s+.*\))$/)
 						{
-							if	($operator eq "=") { push(@where_tmp,$value1." IN ".$1); }
-							elsif	($operator eq "!=") { push(@where_tmp,$value1." NOT IN ".$1); }
-							else	{ push(@where_tmp,$value1." ".$operator." ".$1); }
+							if	($operator eq "=") { push(@where_aux,$value1." IN ".$1); }
+							elsif	($operator eq "!=") { push(@where_aux,$value1." NOT IN ".$1); }
+							else	{ push(@where_aux,$value1." ".$operator." ".$1); }
 						}
 						elsif ($v =~ /^(.*?)\..*?$/ && grep(/^$1$/,@{$self->{work}{tables_valids}}))
 						{
@@ -2261,9 +2263,15 @@ sub _getWhereRecursive()
 				$where_aux[0] = "(".$where_aux[0];
 				$where_aux[@where_aux-1] .= ")";
 			}
-			push(@where_tmp,join(" ".$where_opr." ",@where_aux)) if (@where_aux);
+			push(@where_tmp,$oper_text||"AND") if ($oper_pend && @where_tmp);
+			(@where_aux) ?
+				push(@where_tmp,join(" ".$where_opr." ",@where_aux)) :
+				push(@where_tmp,$value1." IS NULL");
 			next;
 		}
+
+		## enforce operands if required
+		push(@where_tmp,$oper_text||"AND") if ($oper_pend && @where_tmp);
 
 		## value2 is single value
 		if (!defined($value2))

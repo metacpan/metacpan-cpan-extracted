@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.1';
 
 use Google::RestApi::Setup;
 
@@ -106,7 +106,11 @@ sub api {
 
   if (!$response || !$response->is_success()) {
     $self->_stat('error');
-    LOGDIE("Rest API failure:\n", Dump( $self->transaction() ));
+    my $activation_url = _activation_url($self->transaction());
+    LOGDIE(
+      ($activation_url ? "API not enabled in Google Cloud Console. Visit:\n  $activation_url\n" : ()),
+      "Rest API failure:\n", Dump( $self->transaction() ),
+    );
   }
 
   # used for to avoid google 403's and 429's as with integration tests.
@@ -122,6 +126,7 @@ sub _api {
   # default is exponential backoff, initial delay 1.
   my $tries = 0;
   my $last_error;
+  my $refreshed_auth = 0;
   my $response = retry sub { $self->{ua}->request($req); },
     retry_if => sub {
       my $h = shift;
@@ -132,6 +137,15 @@ sub _api {
         return 1;
       }
       $last_error = $r->status_line() if !$r->is_success();
+      if ($r->code() == 401 && !$refreshed_auth) {
+        $refreshed_auth = 1;
+        WARN("Got 401, refreshing auth token and retrying");
+        my @new_auth = @{ $self->auth()->refresh_headers() };
+        while (my ($name, $val) = splice(@new_auth, 0, 2)) {
+          $req->header($name => $val);
+        }
+        return 1;
+      }
       if ($r->code() =~ /^(403|429|50[0234])$/) {
         WARN("Retrying: $last_error");
         return 1;
@@ -242,6 +256,18 @@ sub _caller_external {
     ($package, undef, $line, $subroutine) = caller(++$i);
   } while($package && $package =~ m[^(Google::RestApi|Cache|Try)]);
   return "$package:$line => $subroutine";
+}
+
+# extract the activation URL from a 403 "API not enabled" error response, if present.
+sub _activation_url {
+  my ($transaction) = @_;
+  my $details = eval { $transaction->{decoded_response}{error}{details} };
+  return unless ref $details eq 'ARRAY';
+  for my $detail (@$details) {
+    my $url = eval { $detail->{metadata}{activationUrl} };
+    return $url if $url;
+  }
+  return;
 }
 
 # the maximum number of attempts to call the google api endpoint before giving up.
@@ -391,6 +417,39 @@ Each layer only knows about its own URI segment and its parent accessor.
 This pattern applies uniformly across all six APIs (Drive, Sheets,
 Calendar, Gmail, Tasks, Docs).
 
+=head2 Page Callbacks
+
+Many list methods across the API support a C<page_callback> parameter for
+processing paginated results. The callback is called with the raw API result
+hashref after each page is fetched. Return a true value to continue fetching,
+or false to stop early.
+
+ # print progress while listing files:
+ my @files = $drive->list(
+   filter        => "name contains 'report'",
+   page_callback => sub {
+     my ($result) = @_;
+     print "Fetched a page of results...\n";
+     return 1;  # continue fetching
+   },
+ );
+
+ # stop after finding what you need:
+ my $target;
+ my @messages = $gmail_api->messages(
+   max_pages     => 0,       # allow unlimited pages
+   page_callback => sub {
+     my ($result) = @_;
+     foreach my $msg (@{ $result->{messages} || [] }) {
+       if ($msg->{id} eq $some_id) {
+         $target = $msg;
+         return 0;  # stop pagination
+       }
+     }
+     return 1;  # keep going
+   },
+ );
+
 =head1 SUBROUTINES
 
 =over
@@ -412,6 +471,10 @@ See below for more details.
 =back
 
 You can specify any of the arguments in the optional YAML config file. Any passed-in arguments will override what is in the config file.
+
+If the config file is shared with other applications, place the Google::RestApi
+configuration under a C<google_restapi> top-level key. That section takes
+precedence; if absent, the root of the file is used as before.
 
 The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::* classes (e.g. 'OAuth2Client'), or, for convenience sake,
 you may specify a hash of the required arguments to create an instance of that class:
@@ -475,39 +538,6 @@ above, but can be accessed directly if you have no need to provide a callback.
 Returns some statistics on how many get/put/post etc calls were made. Useful for performance tuning during development.
 
 =back
-
-=head1 PAGE CALLBACKS
-
-Many list methods across the API support a C<page_callback> parameter for
-processing paginated results. The callback is called with the raw API result
-hashref after each page is fetched. Return a true value to continue fetching,
-or false to stop early.
-
- # print progress while listing files:
- my @files = $drive->list(
-   filter        => "name contains 'report'",
-   page_callback => sub {
-     my ($result) = @_;
-     print "Fetched a page of results...\n";
-     return 1;  # continue fetching
-   },
- );
-
- # stop after finding what you need:
- my $target;
- my @messages = $gmail_api->messages(
-   max_pages     => 0,       # allow unlimited pages
-   page_callback => sub {
-     my ($result) = @_;
-     foreach my $msg (@{ $result->{messages} || [] }) {
-       if ($msg->{id} eq $some_id) {
-         $target = $msg;
-         return 0;  # stop pagination
-       }
-     }
-     return 1;  # keep going
-   },
- );
 
 =head1 NAVIGATION
 
@@ -628,6 +658,32 @@ Please report a bug or missing api call by creating an issue at the git repo.
 =item
 
 Robin Murray mvsjes@cpan.org
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item
+
+Dimitrios Kechagias
+
+=item
+
+Mohammad S Anwar
+
+=item
+
+qorron
+
+=item
+
+rocketgithub
+
+=item
+
+Todd Wade
 
 =back
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Module-CheckLatestVersion",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Module::CheckLatestVersion",
   "PREREQ_PM" => {
     "Cache::File::Simple" => 0,
     "Exporter" => "5.57",
+    "Log::ger" => "0.038",
+    "Log::ger::Format" => "0.018",
+    "Log::ger::Format::MultilevelLog" => 0,
     "Module::CheckVersion" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -28,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +45,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.038",
+  "Log::ger::Format" => "0.018",
+  "Log::ger::Format::MultilevelLog" => 0,
   "Module::CheckVersion" => 0,
   "Test::More" => 0,
   "strict" => 0,

@@ -4,7 +4,7 @@ use warnings;
 use Carp qw(confess);
 use Storable qw(dclone);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 require Path::Tiny;
 

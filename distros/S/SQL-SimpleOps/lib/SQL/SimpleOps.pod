@@ -1126,6 +1126,11 @@ B<Example1:>
 
        fld220 => [ "!", '\\fld230' ],         # ... fld220 != fld240  # without quote
 
+       fld230 => 1, fld231 => [],             # ... fld230 = 1 and fld231 IS NULL
+
+       fld240 => 1, or, fld241 => [],         # ... fld240 = 1 or  fld241 IS NULL
+
+       fld250 => 1, [ fld251 => [] ],         # ... fld250 = 1 and fld251 IS NULL
      ],
 
   );

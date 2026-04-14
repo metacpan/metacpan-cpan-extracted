@@ -45,12 +45,12 @@ sub MySQL_do()
 	my $dir = shift;
 	if (!defined($ENV{SQL_SIMPLE_MYSQL}) || $ENV{SQL_SIMPLE_MYSQL} eq "")
 	{
-		&MySQL_envfail();
+		&MySQL_envfail("\$ENV{SQL_SIMPLE_MYSQL} is missing");
 		return 0;
 	}
 	if (!defined($ENV{SQL_SIMPLE_MYSQL_DB}) || $ENV{SQL_SIMPLE_MYSQL_DB} eq "")
 	{
-		&MySQL_envfail("SQL_SIMPLE_MYSQL_DB is missing");
+		&MySQL_envfail("\$ENV{SQL_SIMPLE_MYSQL_DB} is missing");
 		return 0;
 	}
 

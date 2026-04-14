@@ -1,0 +1,348 @@
+=encoding utf8
+
+=head1 NAME
+
+subst - テキスト検索と置換のための Greple モジュール
+
+=head1 VERSION
+
+Version 2.3701
+
+=head1 SYNOPSIS
+
+greple -Msubst --dict I<dictionary> [ オプション ]。
+
+  Dictionary:
+    --dict      dictionary file
+    --dictdata  dictionary data
+    --dictpair  dictionary entry pair
+
+  Check:
+    --check=[ng,ok,any,outstand,all,none]
+    --select=N
+    --linefold
+    --stat
+    --with-stat
+    --stat-style=[default,dict]
+    --stat-item={match,expect,number,ok,ng,dict}=[0,1]
+    --subst
+    --[no-]warn-overlap
+    --[no-]warn-include
+
+  File Update:
+    --diff
+    --diffcmd command
+    --create
+    --replace
+    --overwrite
+
+=head1 DESCRIPTION
+
+この B<greple> モジュールは、辞書データに基づくテキストファイルのチェックと置換をサポートします。
+
+辞書ファイルはB<--dict>オプションで与えられ、各行にはマッチするパターンと期待される文字列のペアが含まれます。
+
+    greple -Msubst --dict DICT
+
+辞書ファイルが以下のようなデータを含んでいる場合
+
+    colou?r      color
+    cent(er|re)  center
+
+上記のコマンドは、2番目の文字列にマッチしない最初のパターン、つまり、この場合、"color "と "center "を見つけます。
+
+実際には、スペースで区切られた文字列の最後の2つの要素は、それぞれパターンと置換文字列として扱われます。
+
+辞書データは、次のようにC<//>で区切って書くこともできます：
+
+    colou?r      //  color
+    cent(er|re)  //  center
+
+C<//>の前後には空白を入れなければなりません。この形式では、その前後の文字列は、最後の2つの要素ではなく、パターン文字列と置換文字列として扱われます。先頭の空白とC<//>の前後の空白は無視されますが、その他の空白はすべて有効です。
+
+B<greple>のB<-f>オプションで同じファイルを使うこともでき、その場合はC<//>の後ろの文字列はコメントとして無視されます。
+
+    greple -f DICT ...
+
+オプションB<--dictdata>は、コマンド行で辞書データを提供するために使用できます。
+
+    greple -Msubst \
+           --dictdata $'colou?r color\ncent(er|re) center\n'
+
+オプション B<--dictpair> を使用すると、コマンドラインから生の辞書エントリを指定できます。この場合、空白、コメント、または DEFINE の展開に関する処理は一切行われません。
+
+    greple -Msubst \
+           --dictpair 'colou?r' color \
+           --dictpair 'cent(er|re)' center
+
+シャープ記号(C<#>)で始まる辞書項目はコメントとなり、無視されます。
+
+=head2 DEFINE
+
+PerlのDEFINE構文を使用して、辞書ファイル内で名前付き正規表現パターンを定義できます：
+
+    (?(DEFINE)(?<name>pattern))
+
+定義されたパターンは、C<(?&name)> 構文を使用して辞書エントリ内で参照できます。
+
+    (?(DEFINE)(?<digit>\d+))
+    (?&digit)/(?&digit)/(?&digit)  //  YYYY/MM/DD
+
+複数のパターンを定義し、それらを組み合わせて使用することができます。パターン定義は、その参照よりも前に記述する必要があります。
+
+=head2 Overlapped pattern
+
+マッチした文字列が、以前に別のパターンでマッチした文字列と同じか短い場合は、単に無視される (デフォルトでは B<--no-warn-include>)。したがって、矛盾するパターンを宣言する必要がある場合は、長い方のパターンを先に配置します。
+
+マッチした文字列が前にマッチした文字列と重なる場合、警告 (B<--warn-overlap> がデフォルト) が出され、無視されます。
+
+=head2 Terminal color
+
+このバージョンでは、L<Getopt::EX::termcolor> モジュールを使用します。これは、コマンドを実行した端末、または環境変数B<TERM_BGCOLOR>に応じて、B<--light-screen>またはB<--dark-screen>オプションを設定します。
+
+一部の端末 (例: "Apple_Terminal" や "iTerm") は自動的に検出され、何もする必要はありません。それ以外の場合は、B<TERM_BGCOLOR>環境変数に#000000（黒）〜#FFFFFF（白）の数字を設定し、端末の背景色に依存します。
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--dict>=I<file>
+
+辞書ファイルを指定します。
+
+=item B<--dictdata>=I<data>
+
+辞書データをテキストで指定します。
+
+=item B<--dictpair> I<pattern> I<replacement>
+
+辞書項目ペアを指定します。このオプションは2つのパラメータをとます。1つ目はパターンで、2つ目は置換文字列です。
+
+=item B<--check>=C<outstand>|C<ng>|C<ok>|C<any>|C<all>|C<none>
+
+オプションB<--check>は、C<ng>, C<ok>, C<any>, C<outstand>, C<all>, C<none>から引数を取ります。
+
+デフォルトのC<outstand>では、同じファイルに予想外の単語があった場合のみ、予想外の単語と予想外の単語の両方についての情報を表示します。
+
+C<ng>を指定すると、予期しない単語についての情報を表示します。値C<ok>を指定すると、予想される単語についての情報を表示します。値C<any>の場合は両方です。
+
+C<all>とC<none>はB<--stat>オプションと一緒に使われたときだけ意味があり、マッチしなかったパターンに関する情報を表示します。
+
+=item B<--select>=I<N>
+
+I<N>番目のエントリを辞書から選択します。引数はL<Getopt::EX::Numbers>モジュールによって解釈されます。範囲はB<--select>=C<1:3,7:9>のように定義することができます。B<--stat>オプションで数値を取得することができます。
+
+=item B<--linefold>
+
+B<--linefold>オプションは、対象データがテキストの途中で折り返されている場合に使用します。行をまたぐ文字列にマッチする正規表現パターンが作成されます。ただし、置換される文字列には改行が含まれません。正規表現の動作を多少混乱させるので、なるべく使わないでください。
+
+=item B<--stat>
+
+=item B<--with-stat>
+
+統計情報を表示します。B<--check>オプションと併用します。
+
+B<--with-stat>オプションは通常の出力の後に統計情報を出力し、B<--stat>は統計情報のみを出力します。
+
+=item B<--stat-style>=C<default>|C<dict>
+
+B<--stat>とB<--check=any>にB<--stat-style=dict>オプションを併用すると、作業文書に対して辞書風の出力を行うことができます。
+
+=item B<--stat-item> I<item>=[0,1]
+
+統計情報に表示される項目を指定します。デフォルト値は
+
+    match=1
+    expect=1
+    number=1
+    ng=1
+    ok=1
+    dict=0
+
+patternフィールドを表示する必要がない場合は、このように使用します。
+
+    --stat-item match=0
+
+複数のパラメータを一度に設定することができます。
+
+    --stat-item match=number=0,ng=1,ok=1
+
+=item B<--subst>
+
+マッチしたパターンを期待される文字列に置き換えます。マッチした文字列の改行文字は無視されます。置換文字列のないパターンは変更されません。
+
+=item B<--[no-]warn-overlap>
+
+オーバーラップしたパターンを警告します。デフォルトはonです。
+
+=item B<--[no-]warn-include>
+
+含まれるパターンを警告します。デフォルトはオフ。
+
+=back
+
+=head2 FILE UPDATE OPTIONS
+
+=over 7
+
+=item B<--diff>
+
+=item B<--diffcmd>=I<command>
+
+B<--diff>オプションは、変換前のテキストと変換後のテキストの差分を出力します。
+
+B<--diff>オプションで使用するdiffコマンド名を指定します。デフォルトは "diff -u" です。
+
+=item B<--create>
+
+新規ファイルを作成し、結果を書き込む。元のファイル名の末尾に".new "が付加されます。
+
+=item B<--replace>
+
+対象ファイルを変換後の結果で置き換えます。元ファイルはバックアップ名に".bak "を付けてリネームされます。
+
+=item B<--overwrite>
+
+バックアップを取らずに、変換後のファイルを上書きします。
+
+=back
+
+=head1 DICTIONARY
+
+本モジュールには、サンプル辞書が含まれています。これらは共有ディレクトリにインストールされ、B<--exdict>オプションでアクセスすることができます。
+
+    greple -Msubst --exdict jtca-katakana-guide-3.dict
+
+=over 7
+
+=item B<--exdict> I<dictionary>
+
+辞書ファイルとしては、配布されているI<dictionary> flieを使用します。
+
+=item B<--exdictdir>
+
+辞書ディレクトリを表示します。
+
+=item B<--exdict> jtca-katakana-guide-3.dict
+
+=item B<--jtca-katakana-guide>
+
+以下のガイドラインに基づいて作成されています。
+
+    外来語（カタカナ）表記ガイドライン 第3版
+    制定：2015年8月
+    発行：2015年9月
+    一般財団法人テクニカルコミュニケーター協会 
+    Japan Technical Communicators Association
+    https://jtca.org/tcwp/wp-content/uploads/2023/06/katakana_guide_3_20171222.pdf
+
+=item B<--jtca>
+
+B<--jtca-katakana-guide>をカスタマイズしたもの。オリジナルの辞書は公開されたデータから自動生成されたものです。この辞書は、実用のためにカスタマイズされています。
+
+=item B<--exdict> jtf-style-guide-3.dict
+
+=item B<--jtf-style-guide>
+
+以下のガイドラインに基づいて作成されています。
+
+    JTF日本語標準スタイルガイド（翻訳用）
+    第3.0版
+    2019年8月20日
+    一般社団法人 日本翻訳連盟（JTF）
+    翻訳品質委員会
+    https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf
+
+=item B<--jtf>
+
+カスタマイズB<--jtf-style-guide>。オリジナル辞書は公開データから自動生成されます。この辞書は、実用に耐えるようにカスタマイズされています。
+
+=item B<--exdict> sccc2.dict
+
+=item B<--sccc2>
+
+2014年に出版された「C/C++ セキュアコーディング 第2版」で使用された辞書。
+
+    https://www.jpcert.or.jp/securecoding_book_2nd.html
+
+=item B<--exdict> ms-style-guide.dict
+
+=item B<--ms-style-guide>
+
+Microsoftのローカライズスタイルガイドから生成された辞書。
+
+    https://www.microsoft.com/ja-jp/language/styleguides
+
+本記事から生成されたデータです。
+
+    https://www.atmarkit.co.jp/news/200807/25/microsoft.html
+
+=item B<--microsoft>
+
+カスタマイズされたB<--ms-style-guide>。オリジナルの辞書は、公開されたデータから自動生成されたものです。本辞書は、実用化に向けてカスタマイズしたものです。
+
+修正辞書は、L<こちら|https://github.com/kaz-utashiro/greple-subst/blob/master/share/ms-amend.dict>で見ることができます。更新の要望があれば、issueを送るか、pull-requestを送信してください。
+
+=back
+
+=head1 JAPANESE
+
+このモジュールは、日本語のテキスト編集をサポートするためにオリジナルで作成されました。
+
+=head2 KATAKANA
+
+日本語のカタカナ語は、同じ言葉を表すのにいくつものバリエーションがあるので、統一することが重要ですが、かなり面倒な作業です。次の例では
+
+    イ[エー]ハトー?([ヴブボ]ォ?)  //  イーハトーヴォ
+
+左のパターンは、次の単語全てにマッチします。
+
+    イエハトブ
+    イーハトヴ
+    イーハトーヴ
+    イーハトーヴォ
+    イーハトーボ
+    イーハトーブ
+
+このモジュールは、これらの単語を検出し、修正するのに役立つ。
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::subst
+
+=head1 SEE ALSO
+
+L<https://github.com/kaz-utashiro/greple>
+
+L<https://github.com/kaz-utashiro/greple-subst>
+
+L<https://github.com/kaz-utashiro/greple-update>
+
+L<https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf>
+
+L<https://www.jtf.jp/jp/style_guide/styleguide_top.html>,
+L<https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf>
+
+L<https://www.microsoft.com/ja-jp/language/styleguides>,
+L<https://www.atmarkit.co.jp/news/200807/25/microsoft.html>
+
+L<文化庁 国語施策・日本語教育 国語施策情報 内閣告示・内閣訓令 外来語の表記|https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/gairai/index.html>
+
+L<https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415>
+
+L<イーハトーブ|https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%BC%E3%83%8F%E3%83%88%E3%83%BC%E3%83%96>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright ©︎ 2017-2025 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

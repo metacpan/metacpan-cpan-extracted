@@ -7,7 +7,7 @@ response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "properties": {
         "title": "mock_spreadsheet1",
         "locale": "en_GB",
@@ -153,157 +153,157 @@ response:
           }
         }
       ],
-      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk/edit"
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM/edit"
     }
   headers:
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - server
-    - ESF
-    - x-l2-request-path
-    - l2-managed-6
-    - date
-    - 'Sun, 15 Feb 2026 20:54:22 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-6
+  - date
+  - Mon, 13 Apr 2026 23:50:57 GMT
   message: OK
 source: Test::Unit::TestBase::startup
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - updateSpreadsheetProperties:
-        fields: iterativeCalculationSettings.maxIterations
-        properties:
-          iterativeCalculationSettings:
-            maxIterations: 10
+  - updateSpreadsheetProperties:
+      fields: iterativeCalculationSettings.maxIterations
+      properties:
+        iterativeCalculationSettings:
+          maxIterations: 10
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - x-l2-request-path
-    - l2-managed-6
-    - date
-    - 'Sun, 15 Feb 2026 20:54:24 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
+  - x-l2-request-path
+  - l2-managed-6
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - date
+  - Mon, 13 Apr 2026 23:50:59 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - accept-ranges
+  - none
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_iteration_settings
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - updateSpreadsheetProperties:
-        fields: iterativeCalculationSettings.convergenceThreshold
-        properties:
-          iterativeCalculationSettings:
-            convergenceThreshold: 0.001
+  - updateSpreadsheetProperties:
+      fields: iterativeCalculationSettings.convergenceThreshold
+      properties:
+        iterativeCalculationSettings:
+          convergenceThreshold: 0.001
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
-    - x-l2-request-path
-    - l2-managed-6
-    - date
-    - 'Sun, 15 Feb 2026 20:54:25 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Mon, 13 Apr 2026 23:51:00 GMT
+  - x-l2-request-path
+  - l2-managed-6
+  - content-type
+  - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_iteration_settings
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - addProtectedRange:
-        protectedRange:
-          description: Test protection
-          range:
-            endColumnIndex: 5
-            endRowIndex: 10
-            sheetId: 0
-            startColumnIndex: 0
-            startRowIndex: 0
+  - addProtectedRange:
+      protectedRange:
+        description: Test protection
+        range:
+          endColumnIndex: 5
+          endRowIndex: 10
+          sheetId: 0
+          startColumnIndex: 0
+          startRowIndex: 0
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {
           "addProtectedRange": {
             "protectedRange": {
-              "protectedRangeId": 1832055915,
+              "protectedRangeId": 1558403201,
               "range": {
                 "startRowIndex": 0,
                 "endRowIndex": 10,
@@ -319,390 +319,390 @@ response:
       ]
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:54:27 GMT'
-    - x-l2-request-path
-    - l2-managed-6
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-6
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:51:01 GMT
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_protected_range
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - updateProtectedRange:
-        fields: 'range,description'
-        protectedRange:
-          description: Updated protection
-          protectedRangeId: 1832055915
-          range:
-            endColumnIndex: 3
-            endRowIndex: 15
-            sheetId: 0
-            startColumnIndex: 0
-            startRowIndex: 5
+  - updateProtectedRange:
+      fields: range,description
+      protectedRange:
+        description: Updated protection
+        protectedRangeId: 1558403201
+        range:
+          endColumnIndex: 3
+          endRowIndex: 15
+          sheetId: 0
+          startColumnIndex: 0
+          startRowIndex: 5
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - x-l2-request-path
-    - l2-managed-6
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:54:28 GMT'
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-6
+  - date
+  - Mon, 13 Apr 2026 23:51:03 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_protected_range
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - deleteProtectedRange:
-        protectedRangeId: 1832055915
+  - deleteProtectedRange:
+      protectedRangeId: 1558403201
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 20:54:29 GMT'
-    - x-l2-request-path
-    - l2-managed-6
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-6
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:51:04 GMT
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_protected_range
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - updateSpreadsheetProperties:
-        fields: title
-        properties:
-          title: My Spreadsheet
+  - updateSpreadsheetProperties:
+      fields: title
+      properties:
+        title: My Spreadsheet
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:54:31 GMT'
-    - x-l2-request-path
-    - l2-managed-6
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - x-l2-request-path
+  - l2-managed-6
+  - accept-ranges
+  - none
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - date
+  - Mon, 13 Apr 2026 23:51:05 GMT
+  - content-type
+  - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_update_spreadsheet_properties
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - updateSpreadsheetProperties:
-        fields: locale
-        properties:
-          locale: en_US
+  - updateSpreadsheetProperties:
+      fields: locale
+      properties:
+        locale: en_US
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - x-l2-request-path
-    - l2-managed-6
-    - date
-    - 'Sun, 15 Feb 2026 20:54:32 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - x-l2-request-path
+  - l2-managed-6
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:51:07 GMT
+  - accept-ranges
+  - none
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_update_spreadsheet_properties
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - updateSpreadsheetProperties:
-        fields: timeZone
-        properties:
-          timeZone: America/New_York
+  - updateSpreadsheetProperties:
+      fields: timeZone
+      properties:
+        timeZone: America/New_York
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - date
-    - 'Sun, 15 Feb 2026 20:54:34 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - x-l2-request-path
-    - l2-managed-6
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-6
+  - date
+  - Mon, 13 Apr 2026 23:51:08 GMT
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_update_spreadsheet_properties
 
 ---
-request: POST /v4/spreadsheets/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk:batchUpdate
+request: POST /v4/spreadsheets/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM:batchUpdate
 request_content:
   requests:
-    - updateSpreadsheetProperties:
-        fields: autoRecalc
-        properties:
-          autoRecalc: ON_CHANGE
+  - updateSpreadsheetProperties:
+      fields: autoRecalc
+      properties:
+        autoRecalc: ON_CHANGE
 response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk",
+      "spreadsheetId": "1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM",
       "replies": [
         {}
       ]
     }
   headers:
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:54:35 GMT'
-    - x-l2-request-path
-    - l2-managed-6
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-6
+  - date
+  - Mon, 13 Apr 2026 23:51:09 GMT
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::ss_update_spreadsheet_properties
 
 ---
-request: DELETE /drive/v3/files/1NOcYMgohYXldeATVKasqWVcUIYzTG__7uUybMJ9g9Zk
+request: DELETE /drive/v3/files/1BdeBrunsGbbpP4PfAx2VFDGlhJNlPPqrnCQo6IwwYnM
 response:
   code: 204
   content: ''
   headers:
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - vary
-    - 'Origin, X-Origin'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - x-frame-options
-    - SAMEORIGIN
-    - content-length
-    - 0
-    - server
-    - ESF
-    - content-type
-    - text/html
-    - date
-    - 'Sun, 15 Feb 2026 20:54:37 GMT'
-    - pragma
-    - no-cache
+  - vary
+  - Origin, X-Origin
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - pragma
+  - no-cache
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Mon, 13 Apr 2026 23:51:12 GMT
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - content-type
+  - text/html
+  - content-length
+  - '0'
+  - x-xss-protection
+  - '0'
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
   message: No Content
 source: Test::Unit::TestBase::shutdown
 
 ---
 query_params:
-  fields: 'nextPageToken, files(id, name)'
+  fields: nextPageToken, files(id, name)
   q: mimeType = 'application/vnd.google-apps.spreadsheet' and (name contains 'mock_spreadsheet')
 request: GET /drive/v3/files
 response:
   code: 200
   content: "{\n  \"files\": []\n}\n"
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:54:39 GMT'
-    - pragma
-    - no-cache
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - 'Origin, X-Origin,Accept-Encoding'
+  - pragma
+  - no-cache
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - date
+  - Mon, 13 Apr 2026 23:51:13 GMT
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - Origin, X-Origin,Accept-Encoding
+  - accept-ranges
+  - none
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
   message: OK
 source: Test::Unit::TestBase::shutdown
 

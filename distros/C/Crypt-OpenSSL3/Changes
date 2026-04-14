@@ -1,5 +1,9 @@
 Revision history for Crypt-OpenSSL3
 
+0.004     2026-04-13 20:13:47+02:00 Europe/Brussels
+          - Add sign_init_ex to MD::Context
+          - Only enable X509::VerifyParam::get_purpose on OpenSSL 3.5+
+
 0.003     2026-04-05 21:18:34+02:00 Europe/Brussels
           - Add many ASN1 and X509 related types
 

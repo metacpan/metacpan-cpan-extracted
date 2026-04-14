@@ -163,6 +163,35 @@ sub api_callback : Tests(8) {
   return;
 }
 
+sub refresh_auth_on_401 : Tests(5) {
+  my $self = shift;
+
+  my $api = mock_rest_api();
+
+  # 401 followed by 200: should succeed after one token refresh.
+  my $call_count = 0;
+  $self->_sub_override('Furl', 'request', sub {
+    return Furl::Response->new(1, 401, 'Unauthorized', [], '{}') if ++$call_count == 1;
+    return Furl::Response->new(1, 200, 'OK', [], '{}');
+  });
+
+  lives_ok sub { $api->api(uri => 'https://x') }, '401 recovered after token refresh';
+  is $call_count, 2, 'Request attempted twice after 401';
+  is $api->transaction()->{tries}, 2, 'Transaction records 2 tries';
+
+  # Persistent 401: should fail without re-retrying indefinitely.
+  $call_count = 0;
+  $self->_sub_override('Furl', 'request', sub {
+    $call_count++;
+    return Furl::Response->new(1, 401, 'Unauthorized', [], '{}');
+  });
+
+  throws_ok sub { $api->api(uri => 'https://x') }, qr/Unauthorized/i, 'Persistent 401 still throws';
+  is $call_count, 2, 'Request attempted exactly twice for persistent 401';
+
+  return;
+}
+
 sub max_attempts : Tests(4) {
   my $self = shift;
 

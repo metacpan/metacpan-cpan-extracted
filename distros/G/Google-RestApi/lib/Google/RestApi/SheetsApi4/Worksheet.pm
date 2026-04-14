@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.1';
 
 use Google::RestApi::Setup;
 
@@ -326,7 +326,17 @@ sub name_value_pairs {
   return \%pairs;
 }
 
-sub tie_cols { shift->_tie('range_col', @_); }
+sub tie_cols {
+  my $self = shift;
+  if (!@_ && $self->header_row_enabled()) {
+    my $headers = $self->header_row()
+      or LOGDIE("Header row is enabled but returned no values");
+    my %ranges = map { $headers->[$_] => [$_ + 1] }
+                 grep { defined $headers->[$_] } 0..$#$headers;
+    return $self->_tie('range_col', %ranges);
+  }
+  return $self->_tie('range_col', @_);
+}
 sub tie_rows { shift->_tie('range_row', @_); }
 sub tie_cells { shift->_tie('range_cell', @_); }
 sub tie_ranges { shift->_tie('range_factory', @_); }
@@ -536,33 +546,44 @@ Same as above, but operates on a cell.
 
 =item enable_header_row(enable<boolean>)
 
-This turns on/off the header row so that column headings can be used as keys to tied hashes. See header_row.
+Enables or disables use of the first row as column headers. Call this
+before calling C<header_row> or C<tie_cols>. Pass a true value (or no
+argument) to enable; pass a false value to disable and clear any cached
+header data.
+
+ $ws->enable_header_row();     # enable
+ $ws->enable_header_row(0);    # disable and clear cache
 
 =item header_row(refresh<boolean>)
 
-Returns an array of values in the first row that act as simple
-headers for the columns. The values are cached in the worksheet
-so that multiple calls will only invoke the API once, unless you
-pass a true value to the routine to refresh them.
+Returns an arrayref of values from the first row, which are treated as
+column headers. The result is cached so that subsequent calls do not hit
+the API again. Pass a true value to force a refresh.
 
-This is used internally to check for indexed column names such as
-'Id', 'Name' or 'Address' etc. It may be of limited use externally.
+ $ws->enable_header_row();
+ my $headers = $ws->header_row();   # ['Id', 'Name', 'Address']
+ $ws->row(1, ['Id', 'Name', 'Address']);
+ my $fresh = $ws->header_row(1);    # force re-fetch after update
+
+You must call C<enable_header_row> before calling this, otherwise it
+returns C<undef>.
 
 This will only work on simple headers that don't use fancy formatting
-spread over multiple merged cells/rows.
+spread over multiple merged cells or rows.
 
 =item enable_header_col(enable<boolean>)
 
-This turns on/off the header row so that column headings can be used as keys to tied hashes. See header_col.
+Same concept as C<enable_header_row>, but for the first column. You must
+pass C<i really want to do this> to enable it, because a worksheet with
+thousands of rows would load all of them into memory as headers.
 
-You must pass C<i really want to do this> to turn it on. This is because you may have a worksheet with thousands of rows that end up being 'headers'. This is less of an issue with header row.
+ $ws->enable_header_col('i really want to do this');
+ $ws->enable_header_col(0);   # disable and clear cache
 
 =item header_col(refresh<boolean>)
 
-A less practical version of header_row, uses the first column to
-label each row. Since this is cached, if the spreadsheet is large,
-this can potentially use a lot of memory. Therefore, you must call
-enable_header_col first, with C<i really want to do this> value, to obtain these column values.
+Same as C<header_row> but reads the first column instead of the first row.
+See C<enable_header_col> for the reason this requires an explicit opt-in.
 
 =item name_value_pairs(name_col<range>, value_col<range>);
 
@@ -576,13 +597,14 @@ A spreadsheet with the values:
  Name    Value
  Fred    1
  Charlie 2
- 
+
 ...will return the hash:
 
  Fred    => 1,
  Charlie => 2,
 
 This allows you to store and retrieve a hash with little muss or fuss.
+If C<enable_header_row> is set, the first row is skipped automatically.
 
 =item tie_ranges(ranges<array<hash|<string>>>...);
 
@@ -598,15 +620,30 @@ either a 'key => range<range>' or a plain <range<string>>.
 If you need to represent the range as anything but a string, you must
 specify the key=>range format ({id => [1, 2]} or {id => {col => 1, row => 1}}).
 
-=item tie_cols(ranges<array<range>>...);
+=item tie_cols(ranges<hash>...);
 
-Same as tie_ranges (above), but ties Range::Col objects. Specify
-range strings, or column headings to represent the columns.
+Ties Range::Col objects into a hash, keyed by the names you supply.
 
- $tied = $ws->tie_cols({id => 'A'}, 'Name');
- $tied->{id} = [1001, 1002, 1003];
- $tied->{Name} = ['Herb Ellis', 'Bela Fleck', 'Freddie Mercury'];
+ $tied = $ws->tie_cols(id => 'A', name => 'B', address => 'C');
+ $tied->{id}      = [1001, 1002, 1003];
+ $tied->{name}    = ['Herb Ellis', 'Bela Fleck', 'Freddie Mercury'];
+ $tied->{address} = ['123 Main St', '456 Oak Ave', '789 Pine Rd'];
  tied(%$tied)->submit_values();
+
+If C<enable_header_row> has been called and C<tie_cols> is called with
+no arguments, the header row values are read from row 1 and used
+automatically as the hash keys, with each key tied to the corresponding
+column:
+
+ $ws->row(1, ['Id', 'Name', 'Address']);
+ $ws->enable_header_row();
+ my $tied = $ws->tie_cols();   # keys: Id => col A, Name => col B, Address => col C
+ $tied->{Id}      = [1001, 1002, 1003];
+ $tied->{Name}    = ['Herb Ellis', 'Bela Fleck', 'Freddie Mercury'];
+ $tied->{Address} = ['123 Main St', '456 Oak Ave', '789 Pine Rd'];
+ tied(%$tied)->submit_values();
+
+Columns with an undefined header value are skipped.
 
 =item tie_rows(ranges<array<range>>...);
 

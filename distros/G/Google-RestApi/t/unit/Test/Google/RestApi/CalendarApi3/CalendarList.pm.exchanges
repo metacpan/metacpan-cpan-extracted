@@ -5,24 +5,37 @@ response:
   content: |
     {
      "kind": "calendar#calendarListEntry",
-     "etag": "\"1749496229953071\"",
-     "id": "test.user@gmail.com",
-     "summary": "test.user@gmail.com",
-     "timeZone": "America/Halifax",
-     "colorId": "17",
-     "backgroundColor": "#9a9cff",
+     "etag": "\"1776114053940570\"",
+     "id": "mvsjes2.test.restapi@gmail.com",
+     "summary": "mvsjes2.test.restapi@gmail.com",
+     "timeZone": "UTC",
+     "colorId": "14",
+     "backgroundColor": "#9fe1e7",
      "foregroundColor": "#000000",
      "selected": true,
      "accessRole": "owner",
-     "defaultReminders": [],
+     "defaultReminders": [
+      {
+       "method": "popup",
+       "minutes": 30
+      }
+     ],
      "notificationSettings": {
       "notifications": [
        {
-        "type": "eventResponse",
+        "type": "eventCreation",
         "method": "email"
        },
        {
-        "type": "agenda",
+        "type": "eventChange",
+        "method": "email"
+       },
+       {
+        "type": "eventCancellation",
+        "method": "email"
+       },
+       {
+        "type": "eventResponse",
         "method": "email"
        }
       ]
@@ -35,36 +48,36 @@ response:
      }
     }
   headers:
-    - server
-    - ESF
-    - cache-control
-    - 'private, max-age=0, must-revalidate, no-transform'
-    - expires
-    - 'Sun, 15 Feb 2026 21:01:06 GMT'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 21:01:06 GMT'
-    - x-l2-request-path
-    - l2-managed-14
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-14
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - cache-control
+  - private, max-age=0, must-revalidate, no-transform
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - expires
+  - Mon, 13 Apr 2026 23:54:48 GMT
+  - date
+  - Mon, 13 Apr 2026 23:54:48 GMT
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
   message: OK
 source: Test::Google::RestApi::CalendarApi3::CalendarList::get
 

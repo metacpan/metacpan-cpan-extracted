@@ -15,7 +15,7 @@ use Ref::Util qw( is_plain_arrayref );
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 Readonly my $DESC => 'random bytes generated using a hash';
 Readonly my $EXPL => 'A hash seeded with poor sources of entropy is still a poor source of entropy, use system entropy instead.';
@@ -69,10 +69,6 @@ sub _is_bad_seed_source( $self, $elem ) {
 
     return 1 if $elem =~ /\A \$ (PID|PROCESS_ID) \z/anx && $elem->isa("PPI::Token::Symbol");
 
-    return 1 if $elem =~ /\A \{ \s* \} \z/x && $elem->isa("PPI::Structure");
-
-    return 1 if $elem =~ /\A \[ \s* \] \z/x && $elem->isa("PPI::Structure");
-
     if ( $elem->isa("PPI::Structure") ) {
         return any { $self->_is_bad_seed_source($_) } $elem->children
     }
@@ -98,7 +94,7 @@ Perl::Critic::Policy::Security::RandBytesFromHash - flag common anti-patterns fo
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -130,7 +126,7 @@ The C<time> function is predictable, and is leaked by protocols like HTTP.
 
 =item *
 
-The C<$PID> comes from a small pool of value values, and it's common for child processes (such as workers for a web service) to have sequential ids.
+The C<$PID> comes from a small pool of values, and it's common for child processes (such as workers for a web service) to have sequential ids.
 
 =item *
 

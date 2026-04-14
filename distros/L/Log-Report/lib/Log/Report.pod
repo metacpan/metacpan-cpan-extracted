@@ -1243,10 +1243,10 @@ Cast by C<report()>
 
 =item Error: only one dispatcher name accepted in SCALAR context.
 
-In SCALAR context, only one dispatcher name accepted
-The L<dispatcher()|Log::Report/"Report production and configuration"> method returns the L<Log::Report::Dispatcher|Log::Report::Dispatcher>
-objects which it has accessed.  When multiple names where given, it
-wishes to return a LIST of objects, not the count of them.
+In SCALAR context, only one dispatcher name accepted The L<dispatcher()|Log::Report/"Report production and configuration">
+method returns the L<Log::Report::Dispatcher|Log::Report::Dispatcher> objects which it has accessed.
+When multiple names where given, it wishes to return a LIST of objects,
+not the count of them.
 Cast by C<dispatcher()>
 
 =item Error: syntax flag must be either SHORT or REPORT, not `$flag' in $fn line $line
@@ -1277,14 +1277,14 @@ Cast by C<import()>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.44,
-built on December 22, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.45,
+built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2007-2025 by Mark Overmeer.
+This software is copyright (c) 2007-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

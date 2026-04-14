@@ -8,7 +8,7 @@ subst::Dict - Dictionary object for App::Greple::subst
 
 package App::Greple::subst::Dict {
 
-    use v5.14;
+    use v5.18;
     use warnings;
     use utf8;
     use open IO => ':utf8', ':std';
@@ -22,6 +22,7 @@ package App::Greple::subst::Dict {
 	has DATA    => ;
 	has LIST    => default => [] ;
 	has CONFIG  => default => {} ;
+	has DEFINE  => default => {} ;
 	sub BUILD {
 	    my($obj, $args) = @_;
 	    if (my $file = $obj->FILE) {
@@ -53,12 +54,17 @@ package App::Greple::subst::Dict {
     sub read_data {
 	my $obj = shift or die;
 	my $data = shift;
-	$obj->NAME("DATA");
-	if (utf8::is_utf8 $data) {
-	    $data = encode 'utf8', $data;
+	if (ref $data eq 'ARRAY') {
+	    $obj->NAME("PAIRS");
+	    $obj->load_pairs(@$data) if @$data;
+	} else {
+	    $obj->NAME("DATA");
+	    if (utf8::is_utf8 $data) {
+		$data = encode 'utf8', $data;
+	    }
+	    open my $fh, "<", \$data;
+	    $obj->read_fh($fh);
 	}
-	open my $fh, "<", \$data;
-	$obj->read_fh($fh);
 	$obj;
     }
 
@@ -83,15 +89,50 @@ package App::Greple::subst::Dict {
 	my $flag = FLAG_REGEX;
 	$flag |= FLAG_COOK if $conf->{linefold};
 	while (<$fh>) {
-	    chomp;
+	    s/\R\z//;
 	    say if $conf->{printdict};
 	    if (not /^\s*[^#]/) {
 		$obj->add_comment($_);
 		next;
 	    }
-	    my @param = grep { not m{^//+$} } split ' ';
+	    if (/^\Q(?(DEFINE)(?<\E(?<name>[^>]+)/) {
+		$obj->{DEFINE}->{$+{name}} = $_;
+		$obj->add_comment($_);
+		next;
+	    }
+	    my @param;
+	    if ((@param = split(m{\h+//\h+}, $_, 2)) == 2) {
+		$param[0] =~ s/^\h+//;
+	    } else {
+		@param = split ' ';
+	    }
 	    splice @param, 0, -2; # leave last one or two
 	    my($pattern, $correct) = @param;
+	    my %define;
+	    (sub {
+		my($str, $seen) = @_;
+		$seen //= {};
+		while ($str =~ /\(\?&(?<name>[^)]+)\)/g) {
+		    my $name = $+{name};
+		    next if $seen->{$name}++;
+		    my $def = $obj->{DEFINE}->{$name}
+			// die "undefined pattern: $name\n";
+		    $define{$name} //= $def;
+		    __SUB__->($def, $seen);
+		}
+	    })->($pattern);
+	    $pattern .= $_ for values %define;
+	    $obj->add($pattern, $correct, flag => $flag);
+	}
+	$obj;
+    }
+
+    sub load_pairs {
+	my $obj = shift or die;
+	my $conf = $obj->CONFIG;
+	my $flag = FLAG_REGEX;
+	$flag |= FLAG_COOK if $conf->{linefold};
+	while (my($pattern, $correct) = splice @_, 0, 2) {
 	    $obj->add($pattern, $correct, flag => $flag);
 	}
 	$obj;
@@ -161,7 +202,7 @@ package App::Greple::subst::Dict {
 
 package App::Greple::subst::Dict::Ent {
 
-    use v5.14;
+    use v5.18;
     use warnings;
 
     use Exporter 'import';

@@ -1,20 +1,16 @@
-# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.02.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.03.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
-# This software is copyright (c) 2015-2025 by Mark Overmeer.
+# This software is copyright (c) 2015-2026 by Mark Overmeer.
 
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package Dancer2::Logger::LogReport;{
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 }
 
 # ABSTRACT: Dancer2 logger engine for Log::Report

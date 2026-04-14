@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '1.44';
+my $version  = '1.45';
 my $webpages = '../public_html';
 my $git      = 'https://github.com/markov2/perl5-Log-Report';
 my $publish  = '../public_html/log-report';
@@ -49,21 +49,24 @@ my %oodist   = (
 		publish        => "$publish/raw",
 	},
 
-	generate => [
-	  {	format         => 'pod3',
-		podtail        => undef,
-	  },
-	  {	format         => 'html',
-		webpages       => "$webpages/logreport/html",
-		publish        => "$publish/htmlpkg",
-		docroot        => "/logreport/html",
-		templates      => "html",
-		stylesheet     => "/logreport/html/oodoc.css",
-	  },
-	  {	export       => 'website',
+	generate => [ {
+		format       => 'pod3',
+		podtail      => undef,
+	  }, {
+		format       => 'html',
+		webpages     => "$webpages/logreport/html",
+		publish      => "$publish/htmlpkg",
+		docroot      => "/logreport/html",
+		templates    => "html",
+		stylesheet   => "/logreport/html/oodoc.css",
+	  }, {
+		export       => 'website',
 		serializer   => 'json',
 		markup       => 'html',
 		publish      => "$publish/doctree",
+		meta         => {
+			main_manual => 'Log::Report',
+		},
 	  },
 	],
 );

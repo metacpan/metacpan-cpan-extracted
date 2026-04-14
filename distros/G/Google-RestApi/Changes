@@ -1,5 +1,19 @@
 Revision history for Perl extension Google::RestApi.
 
+2.2.1 2026-04-14
+        - Add CONTRIBUTORS section to POD/README.
+        - Read OAuth scope from config file instead of hard-coding in token creator.
+        - Support optional google_restapi top-level key in config files.
+
+2.2.0 2026-04-13
+        - Add enable_header_row/header_row tests.
+        - Auto-tie columns from header row when tie_cols() called with no args.
+        - Add 401 retry with automatic OAuth token refresh.
+        - Surface Google Cloud Console activation URL in API-not-enabled errors.
+        - Add ScopeCheck test to verify OAuth scopes and API enablement.
+        - Run scope check automatically from token creator script.
+        - Improve token creator docs with full Cloud Console setup instructions.
+
 2.1.1 2026-03-02
         - Fixed doc that claude incorrectly updated.
         - Replaced pod2doc script with standard one.

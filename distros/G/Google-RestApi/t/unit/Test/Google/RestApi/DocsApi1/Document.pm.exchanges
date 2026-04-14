@@ -1,5 +1,5 @@
 ---
-request: GET /v1/documents/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss
+request: GET /v1/documents/1PNaC0wnxBNBVpNj8j-JqT17ew0vO3h0W6V8SO9icqRs
 response:
   code: 200
   content: |
@@ -41,31 +41,23 @@ response:
       },
       "documentStyle": {
         "background": {
-          "color": {
-            "color": {
-              "rgbColor": {
-                "red": 1,
-                "green": 1,
-                "blue": 1
-              }
-            }
-          }
+          "color": {}
         },
         "pageNumberStart": 1,
         "marginTop": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "marginBottom": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "marginRight": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "marginLeft": {
-          "magnitude": 56.692913385826778,
+          "magnitude": 72,
           "unit": "PT"
         },
         "pageSize": {
@@ -124,7 +116,6 @@ response:
               "direction": "LEFT_TO_RIGHT",
               "spacingMode": "COLLAPSE_LISTS",
               "spaceAbove": {
-                "magnitude": 6,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -181,15 +172,12 @@ response:
                 "dashStyle": "SOLID"
               },
               "indentFirstLine": {
-                "magnitude": 115.19999999999999,
                 "unit": "PT"
               },
               "indentStart": {
-                "magnitude": 115.19999999999999,
                 "unit": "PT"
               },
               "indentEnd": {
-                "magnitude": 139.92000000000002,
                 "unit": "PT"
               },
               "keepLinesTogether": false,
@@ -204,9 +192,8 @@ response:
           {
             "namedStyleType": "HEADING_1",
             "textStyle": {
-              "bold": true,
               "fontSize": {
-                "magnitude": 24,
+                "magnitude": 20,
                 "unit": "PT"
               }
             },
@@ -214,7 +201,7 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 24,
+                "magnitude": 20,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -229,9 +216,9 @@ response:
           {
             "namedStyleType": "HEADING_2",
             "textStyle": {
-              "bold": true,
+              "bold": false,
               "fontSize": {
-                "magnitude": 18,
+                "magnitude": 16,
                 "unit": "PT"
               }
             },
@@ -243,7 +230,7 @@ response:
                 "unit": "PT"
               },
               "spaceBelow": {
-                "magnitude": 4,
+                "magnitude": 6,
                 "unit": "PT"
               },
               "keepLinesTogether": true,
@@ -254,7 +241,16 @@ response:
           {
             "namedStyleType": "HEADING_3",
             "textStyle": {
-              "bold": true,
+              "bold": false,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.2627451,
+                    "green": 0.2627451,
+                    "blue": 0.2627451
+                  }
+                }
+              },
               "fontSize": {
                 "magnitude": 14,
                 "unit": "PT"
@@ -264,7 +260,7 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 14,
+                "magnitude": 16,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -279,7 +275,15 @@ response:
           {
             "namedStyleType": "HEADING_4",
             "textStyle": {
-              "bold": true,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.4,
+                    "green": 0.4,
+                    "blue": 0.4
+                  }
+                }
+              },
               "fontSize": {
                 "magnitude": 12,
                 "unit": "PT"
@@ -289,11 +293,11 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 12,
+                "magnitude": 14,
                 "unit": "PT"
               },
               "spaceBelow": {
-                "magnitude": 2,
+                "magnitude": 4,
                 "unit": "PT"
               },
               "keepLinesTogether": true,
@@ -304,7 +308,15 @@ response:
           {
             "namedStyleType": "HEADING_5",
             "textStyle": {
-              "bold": true,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.4,
+                    "green": 0.4,
+                    "blue": 0.4
+                  }
+                }
+              },
               "fontSize": {
                 "magnitude": 11,
                 "unit": "PT"
@@ -314,11 +326,11 @@ response:
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 11,
+                "magnitude": 12,
                 "unit": "PT"
               },
               "spaceBelow": {
-                "magnitude": 2,
+                "magnitude": 4,
                 "unit": "PT"
               },
               "keepLinesTogether": true,
@@ -328,56 +340,6 @@ response:
           },
           {
             "namedStyleType": "HEADING_6",
-            "textStyle": {
-              "bold": true,
-              "fontSize": {
-                "magnitude": 10,
-                "unit": "PT"
-              }
-            },
-            "paragraphStyle": {
-              "namedStyleType": "NORMAL_TEXT",
-              "direction": "LEFT_TO_RIGHT",
-              "spaceAbove": {
-                "magnitude": 10,
-                "unit": "PT"
-              },
-              "spaceBelow": {
-                "magnitude": 2,
-                "unit": "PT"
-              },
-              "keepLinesTogether": true,
-              "keepWithNext": true,
-              "pageBreakBefore": false
-            }
-          },
-          {
-            "namedStyleType": "TITLE",
-            "textStyle": {
-              "bold": true,
-              "fontSize": {
-                "magnitude": 36,
-                "unit": "PT"
-              }
-            },
-            "paragraphStyle": {
-              "namedStyleType": "NORMAL_TEXT",
-              "direction": "LEFT_TO_RIGHT",
-              "spaceAbove": {
-                "magnitude": 24,
-                "unit": "PT"
-              },
-              "spaceBelow": {
-                "magnitude": 6,
-                "unit": "PT"
-              },
-              "keepLinesTogether": true,
-              "keepWithNext": true,
-              "pageBreakBefore": false
-            }
-          },
-          {
-            "namedStyleType": "SUBTITLE",
             "textStyle": {
               "italic": true,
               "foregroundColor": {
@@ -390,19 +352,15 @@ response:
                 }
               },
               "fontSize": {
-                "magnitude": 24,
+                "magnitude": 11,
                 "unit": "PT"
-              },
-              "weightedFontFamily": {
-                "fontFamily": "Georgia",
-                "weight": 400
               }
             },
             "paragraphStyle": {
               "namedStyleType": "NORMAL_TEXT",
               "direction": "LEFT_TO_RIGHT",
               "spaceAbove": {
-                "magnitude": 18,
+                "magnitude": 12,
                 "unit": "PT"
               },
               "spaceBelow": {
@@ -413,47 +371,107 @@ response:
               "keepWithNext": true,
               "pageBreakBefore": false
             }
+          },
+          {
+            "namedStyleType": "TITLE",
+            "textStyle": {
+              "fontSize": {
+                "magnitude": 26,
+                "unit": "PT"
+              }
+            },
+            "paragraphStyle": {
+              "namedStyleType": "NORMAL_TEXT",
+              "direction": "LEFT_TO_RIGHT",
+              "spaceAbove": {
+                "unit": "PT"
+              },
+              "spaceBelow": {
+                "magnitude": 3,
+                "unit": "PT"
+              },
+              "keepLinesTogether": true,
+              "keepWithNext": true,
+              "pageBreakBefore": false
+            }
+          },
+          {
+            "namedStyleType": "SUBTITLE",
+            "textStyle": {
+              "italic": false,
+              "foregroundColor": {
+                "color": {
+                  "rgbColor": {
+                    "red": 0.4,
+                    "green": 0.4,
+                    "blue": 0.4
+                  }
+                }
+              },
+              "fontSize": {
+                "magnitude": 15,
+                "unit": "PT"
+              },
+              "weightedFontFamily": {
+                "fontFamily": "Arial",
+                "weight": 400
+              }
+            },
+            "paragraphStyle": {
+              "namedStyleType": "NORMAL_TEXT",
+              "direction": "LEFT_TO_RIGHT",
+              "spaceAbove": {
+                "unit": "PT"
+              },
+              "spaceBelow": {
+                "magnitude": 16,
+                "unit": "PT"
+              },
+              "keepLinesTogether": true,
+              "keepWithNext": true,
+              "pageBreakBefore": false
+            }
           }
         ]
       },
-      "revisionId": "AIxLkSvicWO0N4nOvAL5xRN-VBuhRUZp3S7xBk0WsDgPem4HLyLH60hxRkwJVbFNR5IFHRvfb7IfKuGyyGqWxNKP23FkPelQwRTTOqnkCXQ",
+      "revisionId": "AMHacu6V9Od2m0hOFhOfXLssc9nHGKH3AXBzPlYCxGiLKhzZRjXMsEde70JaC-HQyErynZDkYDHzcDrQkLaeywM9k6XiHHx27WKeFBMTjED0",
       "suggestionsViewMode": "SUGGESTIONS_INLINE",
-      "documentId": "13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss"
+      "documentId": "1PNaC0wnxBNBVpNj8j-JqT17ew0vO3h0W6V8SO9icqRs"
     }
   headers:
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - x-l2-request-path
-    - l2-managed-5
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:51:02 GMT'
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-5
+  - date
+  - Mon, 13 Apr 2026 23:46:48 GMT
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::DocsApi1::Document::get_document
 
 ---
 query_params:
   fields: title
-request: GET /v1/documents/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss
+request: GET /v1/documents/1PNaC0wnxBNBVpNj8j-JqT17ew0vO3h0W6V8SO9icqRs
 response:
   code: 200
   content: |
@@ -461,43 +479,43 @@ response:
       "title": "Mock Document"
     }
   headers:
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - server
-    - ESF
-    - x-l2-request-path
-    - l2-managed-5
-    - date
-    - 'Sun, 15 Feb 2026 20:51:04 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-5
+  - date
+  - Mon, 13 Apr 2026 23:46:50 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Google::RestApi::DocsApi1::Document::get_with_fields
 
 ---
-request: POST /v1/documents/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss/:batchUpdate
+request: POST /v1/documents/1PNaC0wnxBNBVpNj8j-JqT17ew0vO3h0W6V8SO9icqRs/:batchUpdate
 request_content:
   requests:
-    - insertText:
-        location:
-          index: 1
-        text: Hello World
+  - insertText:
+      location:
+        index: 1
+      text: Hello World
 response:
   code: 200
   content: |
@@ -506,70 +524,70 @@ response:
         {}
       ],
       "writeControl": {
-        "requiredRevisionId": "AIxLkSu5hDrXspKr9esJoJfgCXzty8iOz2OtKSbJ8wOWvQLkzhfYz9TiKvA9S7PNccrGmDHzv9K1hhhvMrTG-1wzVnRzmY3UE8bpwP_XvXA"
+        "requiredRevisionId": "AMHacu7JeOJYeDzCpyB3u2ZurQ9_aIm42EpLg5_mZuGWwtEsMniTBfKbtU1GY_EHQnnzBSAS6Egf1AisR3SM2wLYKhHVSPQfnLyCfBj6z7pp"
       },
-      "documentId": "13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss"
+      "documentId": "1PNaC0wnxBNBVpNj8j-JqT17ew0vO3h0W6V8SO9icqRs"
     }
   headers:
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - x-l2-request-path
-    - l2-managed-5
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:51:06 GMT'
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - x-xss-protection
+  - '0'
+  - date
+  - Mon, 13 Apr 2026 23:46:52 GMT
+  - x-l2-request-path
+  - l2-managed-5
+  - content-type
+  - application/json; charset=UTF-8
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
   message: OK
 source: Test::Google::RestApi::DocsApi1::Document::submit_requests
 
 ---
-request: DELETE /drive/v3/files/13fiMOtndXnk9q8o7_M84NWMELC-WLL48gFZ3fN5H0ss
+request: DELETE /drive/v3/files/1PNaC0wnxBNBVpNj8j-JqT17ew0vO3h0W6V8SO9icqRs
 response:
   code: 204
   content: ''
   headers:
-    - pragma
-    - no-cache
-    - date
-    - 'Sun, 15 Feb 2026 20:51:08 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - text/html
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - vary
-    - 'Origin, X-Origin'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - server
-    - ESF
-    - content-length
-    - 0
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - Origin, X-Origin
+  - pragma
+  - no-cache
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Mon, 13 Apr 2026 23:46:54 GMT
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - content-type
+  - text/html
+  - content-length
+  - '0'
+  - x-xss-protection
+  - '0'
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
   message: No Content
 source: Test::Google::RestApi::DocsApi1::Document::_teardown_live_document
 

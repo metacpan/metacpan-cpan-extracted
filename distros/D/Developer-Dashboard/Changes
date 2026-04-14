@@ -1,5 +1,15 @@
 Revision history for Developer Dashboard
 
+2.35  2026-04-13
+    - added a tarball-level CPANTS kwalitee guard so the built
+      `Developer-Dashboard-X.XX.tar.gz` must score 100 percent before release
+      instead of relying on weaker source-tree probes
+    - wired the release workflow to install `Module::CPANTS::Analyse` and run
+      the focused `t/36-release-kwalitee.t` gate after `dzil build`
+    - documented the tarball-only kwalitee verification path in the synced
+      manuals and release notes so PAUSE and CPANTS drift can be checked
+      against the exact shipped artifact
+
 2.34  2026-04-12
     - fixed same-repo DD-OOP-LAYERS skill fallback so a deeper
       `skills/<repo-name>/` layer no longer shadows the whole inherited skill

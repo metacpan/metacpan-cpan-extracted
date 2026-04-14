@@ -27,7 +27,7 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
-	our $VERSION = "2026.095.1";
+	our $VERSION = "2026.101.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -177,6 +177,55 @@
 	);
 	&my_where
 	(
+		f=> "0122",
+		t=> "t1",
+		w=> [ "id"=> [ "!", "info", ], 'id2' => [] ],
+		r=> "id != 'info' AND id2 IS NULL"
+	);
+	&my_where
+	(
+		f=> "0123",
+		t=> "t1",
+		w=> [ "id"=> [ "!", "info", ], 'or', 'id2' => [] ],
+		r=> "id != 'info' OR id2 IS NULL"
+	);
+	&my_where
+	(
+		f=> "0124",
+		t=> "t1",
+		w=> [ "id"=> [ "!", "info", ], 'id2' => undef ],
+		r=> "id != 'info' AND id2 IS NULL"
+	);
+	&my_where
+	(
+		f=> "0125",
+		t=> "t1",
+		w=> [ "id"=> [ "!", "info", ], ['id2' => []] ],
+		r=> "id != 'info' AND id2 IS NULL"
+	);
+	&my_where
+	(
+		f=> "0126",
+		t=> "t1",
+		w=> [ "id"=> [ "!", "info", ], 'or', ['id2' => []] ],
+		r=> "id != 'info' OR id2 IS NULL"
+	);
+	&my_where
+	(
+		f=> "0127",
+		t=> "t1",
+		w=> [ "id"=> [ "!", "info", ], ['id2' => undef ]],
+		r=> "id != 'info' AND id2 IS NULL"
+	);
+	&my_where
+	(
+		f=> "0128",
+		t=> "t1",
+		w=> [ "id"=> [ "!", "info", ], 'or', ['id2' => undef ]],
+		r=> "id != 'info' OR id2 IS NULL"
+	);
+	&my_where
+	(
 		f=> "0200",
 		t=> ["t1","t2"],
 		w=> [ "t1.id" => "\\t2.id" ],
@@ -321,14 +370,14 @@
 		f=> "0240",
 		t=> "t1",
 		w=> [ a => 1, [ [ b => [], "or", c => 2 ] ] ],
-		r=> "a = '1' AND c = '2'",
+		r=> "a = '1' AND (b IS NULL OR c = '2')",
 	);
 	&my_where
 	(
 		f=> "0241",
 		t=> "t1",
 		w=> [ a => 1, [ [ b => [] ], "or", [ c => 2 ] ] ],
-		r=> "a = '1' AND c = '2'",
+		r=> "a = '1' AND (b IS NULL OR c = '2')",
 	);
 	&my_where
         (
@@ -358,7 +407,12 @@
 sub my_where()
 {
 	my $argv = {@_};
+	my $tid = "W".$argv->{f};
 
+	## check if specific test by ARGV
+	return if (@ARGV && grep(/^$tid$/i,@ARGV)==0);
+
+	## make tests
 	my $w = join(" ",Dumper($argv->{w}));
 	$w =~ s/[\n\r]//g;
 	$w =~ tr/\t/ /;
@@ -371,7 +425,7 @@ sub my_where()
 	}
 
 	diag("################################################################");
-	diag("test-W".$argv->{f}.": where => ".$w);
+	diag("test[".$tid."] where => ".$w);
 
 	my $buffer;
 	$mymod->getWhere

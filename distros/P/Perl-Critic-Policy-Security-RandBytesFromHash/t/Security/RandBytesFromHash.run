@@ -12,15 +12,15 @@ $buff .= sha1( ++$counter, $PID );
 
 my $bytes = md5_hex( time . rand . {} . $$ );
 
-## name anonymous structures
+## name anonymous structures plus
 ## failures 3
 ## cut
 
-sha1_b64( { } );
+sha1_b64( { } . time );
 
-sha256_base64( {} );
+sha256_base64( {} . rand );
 
-digest_data_hex( [ ] );
+digest_data_hex( [ ] . $$ );
 
 ## name method calls
 ## failures 1

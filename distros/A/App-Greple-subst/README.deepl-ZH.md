@@ -4,7 +4,7 @@ subst - 用于文本搜索和替换的Greple模块
 
 # VERSION
 
-Version 2.3305
+Version 2.3701
 
 # SYNOPSIS
 
@@ -13,6 +13,7 @@ greple -Msubst --dict _dictionary_ \[ 选项 \]。
     Dictionary:
       --dict      dictionary file
       --dictdata  dictionary data
+      --dictpair  dictionary entry pair
 
     Check:
       --check=[ng,ok,any,outstand,all,none]
@@ -48,20 +49,44 @@ greple -Msubst --dict _dictionary_ \[ 选项 \]。
 
 上述命令找到第一个与第二个字符串不匹配的模式，即本例中的 "颜色 "和 "中心"。
 
-字典数据中的字段`//`被忽略，所以这个文件可以这样写。
+实际上，空格分隔字符串的最后两个元素分别被视为模式和替换字符串。
+
+字典数据也可以如下写法用 `//` 分隔：
 
     colou?r      //  color
     cent(er|re)  //  center
+
+`//` 前后必须有空格。在这种格式中，其前后的字符串被视为模式和替换字符串，而不是最后两个元素。前导空格和 `//` 前后的空格将被忽略，但所有其他空白均有效。
 
 你可以通过**greple**的**-f**选项使用同一个文件，在这种情况下，`/`后面的字符串作为注释被忽略。
 
     greple -f DICT ...
 
-选项**--dictdata**可以用来在命令行中提供字典数据。
+选项 **--dictdata** 可用于在命令行中提供字典数据。
 
-    greple --dictdata $'colou?r color\ncent(er|re) center\n'
+    greple -Msubst \
+           --dictdata $'colou?r color\ncent(er|re) center\n'
+
+选项 **--dictpair** 用于在命令行中提供原始的词典条目。在这种情况下，不会对空格、注释或 DEFINE 展开进行任何处理。
+
+    greple -Msubst \
+           --dictpair 'colou?r' color \
+           --dictpair 'cent(er|re)' center
 
 以尖锐符号（`#`）开始的字典条目是一个注释，被忽略。
+
+## DEFINE
+
+您可以在字典文件中使用 Perl 的 DEFINE 语法定义一个命名正则表达式模式：
+
+    (?(DEFINE)(?<name>pattern))
+
+定义好的模式可在字典条目中通过 `(?&name)` 语法进行引用。
+
+    (?(DEFINE)(?<digit>\d+))
+    (?&digit)/(?&digit)/(?&digit)  //  YYYY/MM/DD
+
+您可以定义多个模式并组合使用。模式定义必须出现在其引用的前面。
 
 ## Overlapped pattern
 
@@ -85,9 +110,13 @@ greple -Msubst --dict _dictionary_ \[ 选项 \]。
 
     用文本指定字典数据。
 
+- **--dictpair** _pattern_ _replacement_
+
+    指定字典条目对。该选项需要两个参数。第一个参数是模式，第二个参数是替换字符串。
+
 - **--check**=`outstand`|`ng`|`ok`|`any`|`all`|`none`
 
-    选项**--检查**的参数来自`ng`、`ok`、`any`、`outstand`、`all`和`none`。
+    选项 **--check** 的参数来自 `ng`、`ok`、`any`、`outstand`、`all` 和 `none`。
 
     在默认值`outstand`下，只有在同一文件中发现意外字词时，命令才会显示预期和意外字词的信息。
 
@@ -152,7 +181,7 @@ greple -Msubst --dict _dictionary_ \[ 选项 \]。
 
     选项**--diff**产生原始文本和转换后文本的差异输出。
 
-    指定**--diff**选项使用的diff命令名称。默认为 "diff -u"。
+    指定 **--diff** 选项使用的 diff 命令名称。默认为 "diff -u"。
 
 - **--create**
 
@@ -190,7 +219,7 @@ greple -Msubst --dict _dictionary_ \[ 选项 \]。
         発行：2015年9月
         一般財団法人テクニカルコミュニケーター協会 
         Japan Technical Communicators Association
-        https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
+        https://jtca.org/tcwp/wp-content/uploads/2023/06/katakana_guide_3_20171222.pdf
 
 - **--jtca**
 
@@ -273,11 +302,13 @@ greple -Msubst --dict _dictionary_ \[ 选项 \]。
 
 [https://www.jtca.org/standardization/katakana\_guide\_3\_20171222.pdf](https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf)
 
-[https://www.jtf.jp/jp/style\_guide/styleguide\_top.html](https://www.jtf.jp/jp/style_guide/styleguide_top.html), [https://www.jtf.jp/jp/style\_guide/pdf/jtf\_style\_guide.pdf](https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf)
+[https://www.jtf.jp/jp/style\_guide/styleguide\_top.html](https://www.jtf.jp/jp/style_guide/styleguide_top.html),
+[https://www.jtf.jp/jp/style\_guide/pdf/jtf\_style\_guide.pdf](https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf)
 
-[https://www.microsoft.com/ja-jp/language/styleguides](https://www.microsoft.com/ja-jp/language/styleguides), [https://www.atmarkit.co.jp/news/200807/25/microsoft.html](https://www.atmarkit.co.jp/news/200807/25/microsoft.html)
+[https://www.microsoft.com/ja-jp/language/styleguides](https://www.microsoft.com/ja-jp/language/styleguides),
+[https://www.atmarkit.co.jp/news/200807/25/microsoft.html](https://www.atmarkit.co.jp/news/200807/25/microsoft.html)
 
-[文化庁 國語施策・日本語教育 國語施策情報 內閣告示・內閣訓令 外來語の表記](https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/gairai/index.html)
+[文化庁 国語施策・日本語教育 国語施策情報 内閣告示・内閣訓令 外来語の表記](https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/gairai/index.html)
 
 [https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415](https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415)
 
@@ -289,7 +320,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2017-2023 Kazumasa Utashiro.
+Copyright ©︎ 2017-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

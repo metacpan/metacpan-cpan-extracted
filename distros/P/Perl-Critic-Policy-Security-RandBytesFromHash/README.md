@@ -26,7 +26,7 @@ That was naive, because the seed values were always predicable:
 
 - Perl's built-in `rand` is seeded by 32-bits and is predicable enough that the seed can be reverse-engineered after a few iterations.
 - The `time` function is predictable, and is leaked by protocols like HTTP.
-- The `$PID` comes from a small pool of value values, and it's common for child processes (such as workers for a web service) to have sequential ids.
+- The `$PID` comes from a small pool of values, and it's common for child processes (such as workers for a web service) to have sequential ids.
 - Perl data structures have predictable reference addresses.
 - Internal counters have predictable content, as most of the leading digits will not change between invocations.
 
@@ -42,16 +42,12 @@ What can you use instead?  Modules like [Crypt::URandom](https://metacpan.org/po
 
 # RECENT CHANGES
 
-Changes for version v0.1.1 (2026-04-10)
+Changes for version v0.1.2 (2026-04-13)
 
 - Bugs
-    - Specified a minimum version of PPI with signature support.
-    - Restricted internal regexes to ASCII.
+    - Removed reliance on anonymous empty structures like {} or \[\] as they lead to too many false positives (GH#1).
 - Documentation
-    - Added a SYNOPSIS.
     - Fixed typos.
-- Tests
-    - Updated Perl::Critic author tests to apply the policy to itself.
 
 See the `Changes` file for more details.
 

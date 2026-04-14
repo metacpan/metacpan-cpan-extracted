@@ -1,5 +1,43 @@
 Revision history for Perl extension App-Greple-subst
 
+2.3701 2026-04-14T09:08:55Z
+
+    - update ms-amend.dict
+
+2.37 2025-04-24T01:07:54Z
+
+    - require App::Greple::update@1.04
+    - update dictionary data
+    - Mask POD keywords before translation
+
+2.36 2024-12-11T10:47:18Z
+
+    - use s/\R\z// to remove linebreaks
+
+2.35 2024-05-13T09:44:55Z
+
+    - introduce --dictpair option to specify raw dictionary entry
+    - add test for comment and // separator in dictionary data
+
+2.34 2024-05-08T05:13:36Z
+
+    - release 2.34
+
+2.33_9902 2024-04-04T01:11:36Z
+
+    - include docs/ directory in the distribtion
+
+2.33_9901 2024-04-03T13:14:26Z
+
+    - introduce --macos option
+    - implement --exdictdir option by builtin
+    - update share/macos.dict
+
+2.33_99 2024-03-26T12:15:36Z
+
+    - change dictionary format with // separator
+    - now pattern/replacement can include spaces with // format
+
 2.3305 2024-03-15T04:08:35Z
 
     - update ms-amend.dict

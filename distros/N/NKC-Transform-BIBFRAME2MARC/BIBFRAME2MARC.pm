@@ -9,7 +9,7 @@ use File::Share ':all';
 use XML::LibXML;
 use XML::LibXSLT;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub new {
 	my ($class, @params) = @_;
@@ -222,6 +222,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

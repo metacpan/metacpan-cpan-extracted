@@ -1,40 +1,47 @@
 package Module::CheckLatestVersion;
 
+use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
+use Log::ger::Format::MultilevelLog (); # for scan prereqs
+use Log::ger::Format 'MultilevelLog';
 
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-04-08'; # DATE
+our $DATE = '2026-04-14'; # DATE
 our $DIST = 'Module-CheckLatestVersion'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 ## no critic: Modules::ProhibitAutomaticExportation
 our @EXPORT = qw(check_latest_version);
 
 sub check_latest_version {
-    return if
+    my $opts = ref $_[0] eq 'HASH' ? {%{ shift()} } : {};
+    my $mod = shift; $mod = caller() unless $mod;
+    $opts->{die} //= $ENV{PERL_MODULE_CHECKLATESTVERSION_OPT_DIE};
+    $opts->{log_level} //= 'debug';
+    $opts->{do_check} //= 0 if
         $ENV{HARNESS_ACTIVE} ||
         $ENV{RELEASE_TESTING} ||
         $ENV{AUTOMATED_TESTING} ||
         $ENV{PERL_MODULE_CHECKLATESTVERSION_SKIP};
 
-    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
-
-    my $opts = ref $_[0] eq 'HASH' ? shift : {};
-    my $mod = shift; $mod = caller() unless $mod;
-    $opts->{die} //= $ENV{PERL_MODULE_CHECKLATESTVERSION_OPT_DIE};
+    if (defined($opts->{do_check}) && !$opts->{do_check}) {
+        log('debug', "Skipping checking version of module $mod ...");
+        return;
+    }
 
     require Cache::File::Simple;
     my $cachekey = __PACKAGE__ . '|' . $mod;
+    log($opts->{log_level}, "Checking version of module $mod from cache ...");
     my $res = Cache::File::Simple::cache($cachekey);
     unless ($res) {
         # cache miss
+        log($opts->{log_level}, "Checking version of module $mod (cache miss) ...");
         require Module::CheckVersion;
         $res = Module::CheckVersion::check_module_version(module => $mod);
-        Cache::File::Simple::cache($cachekey, $res);
-
     }
 
     if ($res->[0] != 200) {
@@ -42,17 +49,24 @@ sub check_latest_version {
         return;
     }
 
-    unless ($res->[2]{is_latest_version}) {
+    if ($res->[2]{is_latest_version}) {
+        log($opts->{log_level}, "Module $mod (installed version: $res->[2]{installed_version}) is latest version ($res->[2]{latest_version})");
+        # cache only positive result AND when version is defined
+        if (defined($res->[2]{installed_version}) && defined($res->[2]{latest_version})) {
+            log($opts->{log_level}, "Caching version check result ...");
+            Cache::File::Simple::cache($cachekey, $res);
+        }
+    } else {
         my $msg = "Module $mod (installed version: " .
             (defined($res->[2]{installed_version}) ? $res->[2]{installed_version} : "undef") .
             ") is not the latest version (" .
             (defined($res->[2]{latest_version}) ? $res->[2]{latest_version} : "undef") .
             ").";
-        if ($opts->{die}) {
+        if ($opts->{die} && defined $res->[2]{latest_version}) {
             $msg .= " Please update to the latest version first.";
             die $msg;
         } else {
-            $msg .= " Please consider updateing to the latest version.";
+            $msg .= " Please consider updating to the latest version.";
             warn $msg;
         }
     }
@@ -73,7 +87,7 @@ Module::CheckLatestVersion - Warn/die when a module is not the latest version
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::CheckLatestVersion (from Perl distribution Module-CheckLatestVersion), released on 2026-04-08.
+This document describes version 0.009 of Module::CheckLatestVersion (from Perl distribution Module-CheckLatestVersion), released on 2026-04-14.
 
 =head1 SYNOPSIS
 
@@ -130,7 +144,7 @@ not the latest version, a warning is emitted.
 
 When one of these environment variables are set, will skip checking (no-op):
 C<HARNESS_ACTIVE>, C<RELEASE_TESTING>, C<AUTOMATED_TESTING>,
-C<PERL_MODULE_CHECKLATESTVERSION_SKIP>.
+C<PERL_MODULE_CHECKLATESTVERSION_SKIP>. Unless when C<do_check> is set to true.
 
 Options:
 
@@ -139,6 +153,16 @@ Options:
 =item * die
 
 Bool. If set to true, will die instead of warn.
+
+=item * log_level
+
+Str or number. Set the log level of log statements that inform about module
+checking.
+
+=item * do_check
+
+Bool, default is undef. Can be used to force checking or disable checking
+without regard to environment variables.
 
 =back
 
@@ -167,6 +191,12 @@ L<Module::CheckVersion>
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 

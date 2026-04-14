@@ -1,8 +1,8 @@
-# This code is part of Perl distribution Log-Report version 1.44.
+# This code is part of Perl distribution Log-Report version 1.45.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
-# This software is copyright (c) 2007-2025 by Mark Overmeer.
+# This software is copyright (c) 2007-2026 by Mark Overmeer.
 
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -10,7 +10,7 @@
 
 
 package Log::Report::Message;{
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 }
 
 
@@ -49,8 +49,7 @@ sub new($@)
 		$s{_count}   = ref $c eq 'ARRAY' ? @$c : keys %$c;
 	}
 
-	defined $s{_join}
-		or $s{_join} = $";
+	$s{_join} //= $";
 
 	if($s{_msgid})
 	{	$s{_append}  = defined $s{_append} ? $1.$s{_append} : $1
@@ -63,8 +62,8 @@ sub new($@)
 	{	s/\s+$//, s/^\s+// for $s{_plural};
 	}
 
-	my $tags  = delete $s{_tag} // delete $s{_tags} // delete $s{_class} // delete $s{_classes} // [];
-	$s{_tags} = ref $tags eq 'ARRAY' ? $tags : [ split /[,\s]+/, $tags ];
+	my $tags  = delete $s{_tag} // delete $s{_tags} // delete $s{_class} // delete $s{_classes};
+	$s{_tags} = ref $tags eq 'ARRAY' ? $tags : [ split /[,\s]+/, $tags ] if defined $tags;
 
 	bless \%s, $class;
 }
@@ -89,8 +88,11 @@ sub context() { $_[0]->{_context}}
 sub msgctxt() { $_[0]->{_msgctxt}}
 
 
-sub tags() { @{$_[0]->{_tags}} }
+sub tags() { @{$_[0]->{_tags} || []} }
 *classes = \&tags;
+
+
+sub addTags() { push @{shift->{_tags}}, @_ }
 
 
 sub to(;$)
@@ -180,6 +182,38 @@ sub concat($;$)
 	$what = $self->{_append} . $what if defined $self->{_append};
 	(ref $self)->new(%$self, _append => $what);
 }
+
+
+sub freeze()
+{	my ($self, %args) = @_;
+	my %data = %$self;
+	if(my $p = $data{_prepend})
+	{	$data{_prepend} = blessed $p && $p->isa(__PACKAGE__) ? $p->freeze(%args) : "$p";
+	}
+	if(my $a = $data{_append})
+	{	$data{_append} = blessed $a && $a->isa(__PACKAGE__) ? $a->freeze(%args) : "$a";
+	}
+	if(my $d = $data{_domain})
+	{	$data{_domain} = $d->name if blessed $d && $d->isa('Log::Report::Minimal::Domain');
+	}
+	$data{_lr_version} = $Log::Report::VERSION // '3.14';
+	\%data;
+}
+
+
+sub thaw($%)
+{	my ($class, $data, %args) = @_;
+	my %data = %$data;
+	if(my $p = $data{_prepend})
+	{	$data{_prepend} = ref $p eq 'HASH' ? $class->thaw($p, %args) : $p;
+	}
+	if(my $a = $data{_append})
+	{	$data{_append}  = ref $a eq 'HASH' ? $class->thaw($a, %args) : $a;
+	}
+	delete $data{_lr_version};
+	$class->new(%data);
+}
+
 
 #--------------------
 

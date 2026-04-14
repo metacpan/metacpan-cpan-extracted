@@ -19,7 +19,6 @@
 			{
 				license => 'http://www.gnu.org/licenses/gpl-3.0.html',
 				homepage => 'https://sourceforge.net/p/csi-sql-simpleops/wiki/Home/',
-#				bugtracker => { web => 'https://sourceforge.net/p/csi-sql-simpleops/tickets/' },
 				bugtracker => 'https://sourceforge.net/p/csi-sql-simpleops/tickets/',
 				repository =>
 				{
@@ -49,7 +48,11 @@
 			'Test::More' => 0,
 			'DBD::SQLite' => 0,
 		},
-		dist => { COMPRESS => "gzip -9", SUFFIX => "gz" },
+		dist =>
+		{
+		       	COMPRESS => "gzip -9",
+		       	SUFFIX => "gz",
+	       	},
 	);
 	#
 	## test makemaker version and supported options

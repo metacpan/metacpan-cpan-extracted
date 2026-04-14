@@ -12,6 +12,8 @@ my $rop = Math::MPC->new();
 my $op1  = Math::MPC->new(-0.3, 1.2);
 my $op2 = Math::MPC->new(6.2, -2.6);
 
+cmp_ok($op1, '==', Math::MPC->new(-0.3, 1.2), "SANITY TEST 1");
+
 my $inf_mpfr = Math::MPFR->new(); # NaN
 my $nan = Math::MPFR::Rmpfr_get_NV($inf_mpfr, 0);
 
@@ -26,7 +28,9 @@ if(MPC_VERSION < 66304) {
   like($@, qr/^Rmpc_agm function requires mpc version 1\.3\.0/, "Function croaks in pre mpc-1.3.0");
 }
 else {
+  cmp_ok($op1, '==', Math::MPC->new(-0.3, 1.2), "SANITY TEST 2");
   Rmpc_eta_fund($rop, $op1, MPC_RNDNN);
+  cmp_ok($op1, '==', Math::MPC->new(-0.3, 1.2), "SANITY TEST 3");
   cmp_ok("$rop", 'eq', '(7.2829981913846153e-1 -5.6948215660904557e-2)', "Rmpc_eta_fund output is ok");
 
   cmp_ok($op1, '==', Math::MPC->new(-0.3, 1.2), '\$op1 was not modified by Rmpc_eta_fund()');

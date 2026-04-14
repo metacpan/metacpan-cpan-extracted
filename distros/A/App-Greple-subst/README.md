@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/kaz-utashiro/greple-subst/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-subst/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-subst.svg)](https://metacpan.org/release/App-Greple-subst)
+[![Actions Status](https://github.com/kaz-utashiro/greple-subst/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/kaz-utashiro/greple-subst/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-subst.svg)](https://metacpan.org/release/App-Greple-subst)
 # NAME
 
 subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.3305
+Version 2.3701
 
 # SYNOPSIS
 
@@ -14,6 +14,7 @@ greple -Msubst --dict _dictionary_ \[ options \]
     Dictionary:
       --dict      dictionary file
       --dictdata  dictionary data
+      --dictpair  dictionary entry pair
 
     Check:
       --check=[ng,ok,any,outstand,all,none]
@@ -52,24 +53,56 @@ If the dictionary file contains following data:
 above command finds the first pattern which does not match the second
 string, that is "colour" and "centre" in this case.
 
-Field `//` in dictionary data is ignored, so this file can be written
-like this:
+In practice, the last two elements of a space-separated string are
+treated as a pattern and a replacement string, respectively.
+
+Dictionary data can also be written separated by `//` as follows:
 
     colou?r      //  color
     cent(er|re)  //  center
+
+There must be spaces before and after the `//`.  In this format,
+strings before and after it are treated as a pattern and replacement
+string, rather than last two element.  Leading spaces and spaces
+before and after `//` are ignored, but all other whitespace is valid.
 
 You can use same file by **greple**'s **-f** option and string after
 `//` is ignored as a comment in that case.
 
     greple -f DICT ...
 
-Option **--dictdata** can be used to provide dictionary data in command
-line.
+Option **--dictdata** can be used to provide dictionary data in the
+command line.
 
-    greple --dictdata $'colou?r color\ncent(er|re) center\n'
+    greple -Msubst \
+           --dictdata $'colou?r color\ncent(er|re) center\n'
+
+Option **--dictpair** can be used to provide raw dictionary entries in
+the command line.  In this case, no processing is done regarding
+whitespace, comments, or DEFINE expansion.
+
+    greple -Msubst \
+           --dictpair 'colou?r' color \
+           --dictpair 'cent(er|re)' center
 
 Dictionary entry starting with a sharp sign (`#`) is a comment and
 ignored.
+
+## DEFINE
+
+You can define a named regex pattern in the dictionary file using the
+Perl's DEFINE syntax:
+
+    (?(DEFINE)(?<name>pattern))
+
+The defined pattern can be referenced in the dictionary entries using
+`(?&name)` syntax.
+
+    (?(DEFINE)(?<digit>\d+))
+    (?&digit)/(?&digit)/(?&digit)  //  YYYY/MM/DD
+
+You can define multiple patterns and use them in combination.  The
+pattern definition must appear before its reference.
 
 ## Overlapped pattern
 
@@ -101,6 +134,11 @@ digit depending on terminal background color.
 - **--dictdata**=_data_
 
     Specify dictionary data by text.
+
+- **--dictpair** _pattern_ _replacement_
+
+    Specify dictionary entry pair.  This option takes two parameters.  The
+    first is a pattern and the second is a substitution string.
 
 - **--check**=`outstand`|`ng`|`ok`|`any`|`all`|`none`
 
@@ -229,7 +267,7 @@ directory and accessed by **--exdict** option.
         発行：2015年9月
         一般財団法人テクニカルコミュニケーター協会 
         Japan Technical Communicators Association
-        https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
+        https://jtca.org/tcwp/wp-content/uploads/2023/06/katakana_guide_3_20171222.pdf
 
 - **--jtca**
 
@@ -341,7 +379,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2017-2023 Kazumasa Utashiro.
+Copyright ©︎ 2017-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

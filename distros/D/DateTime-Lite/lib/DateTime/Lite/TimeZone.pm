@@ -2802,7 +2802,7 @@ As an alternative to a C<name>, you can pass decimal-degree coordinates to have 
     );
     say $tz->name;  # Asia/Tokyo
 
-The resolution uses the reference coordinates stored in the IANA C<zone1970.tab> file (one representative point per canonical zone) and finds the nearest zone by the L<haversine great-circle distance|https://grokipedia.com/page/Haversine_formula>. This is an B<approximation>: it is accurate for most locations, but may give incorrect results near timezone boundaries, in disputed territories, or for enclaves such as Kaliningrad. If you need boundary-precise resolution, consider L<Geo::Location::TimeZoneFinder> instead.
+The resolution uses the reference coordinates stored in the IANA C<zone1970.tab> file (one representative point per canonical zone) and finds the nearest zone by the L<haversine great-circle distance|https://en.wikipedia.org/wiki/Haversine_formula>. This is an B<approximation>: it is accurate for most locations, but may give incorrect results near timezone boundaries, in disputed territories, or for enclaves such as Kaliningrad. If you need boundary-precise resolution, consider L<Geo::Location::TimeZoneFinder> instead.
 
 C<latitude> must be in the range C<-90> to C<90>; C<longitude> in C<-180> to C<180>. An L<error object|DateTime::Lite::Exception> is set and C<undef> is returned in scalar context, or an empty list in list context, if the values are out of range or if no zone with coordinates is found in the database.
 

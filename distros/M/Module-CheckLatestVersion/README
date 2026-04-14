@@ -3,9 +3,9 @@ NAME
     version
 
 VERSION
-    This document describes version 0.004 of Module::CheckLatestVersion
+    This document describes version 0.009 of Module::CheckLatestVersion
     (from Perl distribution Module-CheckLatestVersion), released on
-    2026-04-08.
+    2026-04-14.
 
 SYNOPSIS
     In Your/Module.pm:
@@ -59,13 +59,24 @@ FUNCTIONS
 
     When one of these environment variables are set, will skip checking
     (no-op): "HARNESS_ACTIVE", "RELEASE_TESTING", "AUTOMATED_TESTING",
-    "PERL_MODULE_CHECKLATESTVERSION_SKIP".
+    "PERL_MODULE_CHECKLATESTVERSION_SKIP". Unless when "do_check" is set to
+    true.
 
     Options:
 
     *   die
 
         Bool. If set to true, will die instead of warn.
+
+    *   log_level
+
+        Str or number. Set the log level of log statements that inform about
+        module checking.
+
+    *   do_check
+
+        Bool, default is undef. Can be used to force checking or disable
+        checking without regard to environment variables.
 
 ENVIRONMENT
   PERL_MODULE_CHECKLATESTVERSION_OPT_DIE
@@ -87,6 +98,9 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

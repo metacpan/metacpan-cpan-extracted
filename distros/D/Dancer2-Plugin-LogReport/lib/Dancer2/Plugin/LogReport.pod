@@ -141,9 +141,9 @@ of when each one should be used.
 L<Log::Report class functionality|Log::Report::Message.pod#class-STRING-ARRAY>
 to class messages (which can then be tested later):
 
-  notice __x"Class me up", _class => 'label';
+  notice __x"Tag me up", _tag => 'label';
   ...
-  if ($msg->inClass('label')) ...
+  if ($msg->taggedWith('label')) ...
 
 L<Dancer2::Plugin::LogReport|Dancer2::Plugin::LogReport> has a special message class, C<no_session>,
 which prevents the message from being saved to the messages session
@@ -340,7 +340,26 @@ no need to use this specific plugin. Instead, you should simply
 C<use Log::Report> to negate the need of loading all the Dancer2
 specific code.
 
-=head2 In use
+=head3 Session serialization
+
+The Dancer2 session is used to maintain L<Log::Report::Message|Log::Report::Message> objects.
+However, the session is stored in the database in serialized form
+(usually in JSON syntax).  To make this work, the message objects
+need to be frozen.
+
+Add this to your config:
+
+  engines:
+    session:
+      DBIC:
+        ...
+        serializer: JSON
+        serialize_options:
+          allow_tags: 1
+        deserialize_options:
+          allow_tags: 1
+
+=head2 In Use
 
 =head3 Logging debug information
 
@@ -517,6 +536,8 @@ the following configuration to do so:
 With the above configuration, you will only be emailed of severe errors, but can
 view the full log information in /var/log/myapp.log
 
+=encoding UTF-8
+
 =head1 CONFIGURATION
 
 All configuration is optional. The example configuration file below shows the
@@ -552,14 +573,14 @@ Cast by C<fatal_handler()>
 
 =head1 SEE ALSO
 
-This module is part of Dancer2-Plugin-LogReport version 2.02,
-built on November 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Dancer2-Plugin-LogReport version 2.03,
+built on April 13, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2015-2025 by Mark Overmeer.
+This software is copyright (c) 2015-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

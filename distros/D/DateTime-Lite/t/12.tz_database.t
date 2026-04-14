@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use lib './lib';
 use Test::More;
-use POSIX qw( mktime );
+use Time::Local qw( timegm );
 
 BEGIN
 {
@@ -445,15 +445,15 @@ subtest 'Historical offset lookups via spans' => sub
 {
     my @tests = (
         # zone                   unix_ts                              exp_off  exp_dst  exp_abbr  label
-        [ 'Asia/Tokyo',          mktime(0,0,15,1,3,51),               32400,  0, 'JST',  'Tokyo 1951 (historical)' ],
-        [ 'Asia/Tokyo',          mktime(0,0,15,1,3,80),               32400,  0, 'JST',  'Tokyo 1980 (historical)' ],
-        [ 'America/New_York',    mktime(0,0,15,14,6,100),            -14400,  1, 'EDT',  'NY 2000-07 summer (historical)' ],
-        [ 'America/New_York',    mktime(0,0,15,14,11,100),           -18000,  0, 'EST',  'NY 2000-12 winter (historical)' ],
-        [ 'America/New_York',    mktime(0,0,15,14,6,106),            -14400,  1, 'EDT',  'NY 2006-07 summer (historical)' ],
-        [ 'America/New_York',    mktime(0,0,15,14,11,106),           -18000,  0, 'EST',  'NY 2006-12 winter (historical)' ],
-        [ 'Europe/Paris',        mktime(0,0,15,14,5,95),               7200,  1, 'CEST', 'Paris 1995 summer (historical)' ],
-        [ 'Europe/Paris',        mktime(0,0,15,14,11,95),              3600,  0, 'CET',  'Paris 1995 winter (historical)' ],
-        [ 'Etc/UTC',             mktime(0,0,12,1,0,126),                  0,  0, 'UTC',  'UTC any date' ],
+        [ 'Asia/Tokyo',          timegm(0,0,15,1,3,1951),               32400,  0, 'JST',  'Tokyo 1951 (historical)' ],
+        [ 'Asia/Tokyo',          timegm(0,0,15,1,3,1980),               32400,  0, 'JST',  'Tokyo 1980 (historical)' ],
+        [ 'America/New_York',    timegm(0,0,15,14,6,2000),            -14400,  1, 'EDT',  'NY 2000-07 summer (historical)' ],
+        [ 'America/New_York',    timegm(0,0,15,14,11,2000),           -18000,  0, 'EST',  'NY 2000-12 winter (historical)' ],
+        [ 'America/New_York',    timegm(0,0,15,14,6,2006),            -14400,  1, 'EDT',  'NY 2006-07 summer (historical)' ],
+        [ 'America/New_York',    timegm(0,0,15,14,11,2006),           -18000,  0, 'EST',  'NY 2006-12 winter (historical)' ],
+        [ 'Europe/Paris',        timegm(0,0,15,14,5,1995),               7200,  1, 'CEST', 'Paris 1995 summer (historical)' ],
+        [ 'Europe/Paris',        timegm(0,0,15,14,11,1995),              3600,  0, 'CET',  'Paris 1995 winter (historical)' ],
+        [ 'Etc/UTC',             timegm(0,0,12,1,0,2026),                  0,  0, 'UTC',  'UTC any date' ],
     );
 
     foreach my $t ( @tests )

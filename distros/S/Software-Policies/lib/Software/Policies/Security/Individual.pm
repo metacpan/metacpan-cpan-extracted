@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: Security / Individual
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp;
 
@@ -84,7 +84,7 @@ Software::Policies::Security::Individual - Create project policy file: Security 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =for Pod::Coverage create get_available_classes_and_versions
 

@@ -7,7 +7,7 @@ response:
   code: 200
   content: |
     {
-      "spreadsheetId": "1HR-pGnrDHYK0jWHA4_Seu_E6a6_eLgB7Ik_X_6hdnv0",
+      "spreadsheetId": "1p0uSYYU1mnFpt3LpUIMm1yfGivQiJbSfAz3yhuWwM7s",
       "properties": {
         "title": "mock_spreadsheet1",
         "locale": "en_GB",
@@ -153,42 +153,42 @@ response:
           }
         }
       ],
-      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1HR-pGnrDHYK0jWHA4_Seu_E6a6_eLgB7Ik_X_6hdnv0/edit"
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1p0uSYYU1mnFpt3LpUIMm1yfGivQiJbSfAz3yhuWwM7s/edit"
     }
   headers:
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - x-l2-request-path
-    - l2-managed-6
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 20:58:01 GMT'
+  - x-l2-request-path
+  - l2-managed-6
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:49:25 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Unit::TestBase::startup
 
 ---
 query_params:
-  fields: 'sheets.properties(title,sheetId)'
-request: GET /v4/spreadsheets/1HR-pGnrDHYK0jWHA4_Seu_E6a6_eLgB7Ik_X_6hdnv0
+  fields: sheets.properties(title,sheetId)
+request: GET /v4/spreadsheets/1p0uSYYU1mnFpt3LpUIMm1yfGivQiJbSfAz3yhuWwM7s
 response:
   code: 200
   content: |
@@ -203,103 +203,103 @@ response:
       ]
     }
   headers:
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:58:02 GMT'
-    - x-l2-request-path
-    - l2-managed-6
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-l2-request-path
+  - l2-managed-6
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:49:26 GMT
   message: OK
 source: Test::Google::RestApi::SheetsApi4::Range::_constructor
 
 ---
-request: DELETE /drive/v3/files/1HR-pGnrDHYK0jWHA4_Seu_E6a6_eLgB7Ik_X_6hdnv0
+request: DELETE /drive/v3/files/1p0uSYYU1mnFpt3LpUIMm1yfGivQiJbSfAz3yhuWwM7s
 response:
   code: 204
   content: ''
   headers:
-    - date
-    - 'Sun, 15 Feb 2026 20:58:05 GMT'
-    - pragma
-    - no-cache
-    - content-type
-    - text/html
-    - content-length
-    - 0
-    - server
-    - ESF
-    - x-frame-options
-    - SAMEORIGIN
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - 'Origin, X-Origin'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - x-xss-protection
+  - '0'
+  - content-length
+  - '0'
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - pragma
+  - no-cache
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - content-type
+  - text/html
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - date
+  - Mon, 13 Apr 2026 23:49:28 GMT
+  - x-content-type-options
+  - nosniff
+  - vary
+  - Origin, X-Origin
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   message: No Content
 source: Test::Unit::TestBase::shutdown
 
 ---
 query_params:
-  fields: 'nextPageToken, files(id, name)'
+  fields: nextPageToken, files(id, name)
   q: mimeType = 'application/vnd.google-apps.spreadsheet' and (name contains 'mock_spreadsheet')
 request: GET /drive/v3/files
 response:
   code: 200
   content: "{\n  \"files\": []\n}\n"
   headers:
-    - x-frame-options
-    - SAMEORIGIN
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - 'Origin, X-Origin,Accept-Encoding'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - content-type
-    - application/json; charset=UTF-8
-    - pragma
-    - no-cache
-    - date
-    - 'Sun, 15 Feb 2026 20:58:06 GMT'
-    - server
-    - ESF
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
+  - x-xss-protection
+  - '0'
+  - transfer-encoding
+  - chunked
+  - pragma
+  - no-cache
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - vary
+  - Origin, X-Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - date
+  - Mon, 13 Apr 2026 23:49:30 GMT
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - content-type
+  - application/json; charset=UTF-8
   message: OK
 source: Test::Unit::TestBase::shutdown
 

@@ -1,9 +1,20 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 require XSLoader;
 XSLoader::load('Object::Proto', $VERSION);
+
+use File::Spec;
+
+sub include_dir {
+	my $pm = $INC{'Object/Proto.pm'};
+	return unless $pm;
+	my $dir = File::Spec->catdir(
+		(File::Spec->splitpath($pm))[0,1], 'Proto', 'include'
+	);
+	return -d $dir ? $dir : undef;
+}
 
 1;
 
@@ -386,11 +397,27 @@ Returns arrayref of all registered type names.
 External XS modules can register types with C-level check functions
 that bypass Perl callback overhead entirely (~5 cycles vs ~100 cycles).
 
-=head3 C API Reference
+=head3 Linking
+
+Your XS module needs to link against the Object::Proto module. The functions
+are exported with C<PERL_CALLCONV> visibility.
 
 Include C<object_types.h> in your XS module:
 
 	#include "object_types.h"
+
+Use C<Object::Proto-E<gt>include_dir()> to locate the installed header
+directory for use in your C<Makefile.PL>:
+
+	# Makefile.PL
+	use Object::Proto;
+	my $inc = Object::Proto->include_dir;
+	WriteMakefile(
+	    INC => "-I$inc",
+	    ...
+	);
+
+=head3 C API Reference
 
 =head4 object_register_type_xs
 
@@ -433,6 +460,45 @@ the same SV or a new mortal). Return NULL if coercion fails.
 
 Look up a registered type by name. Returns NULL if not found.
 Useful for introspection or chaining type checks.
+
+=head4 object_register_type_xs_ex
+
+	void object_register_type_xs_ex(pTHX_ const char *name,
+	                                ObjectTypeCheckFuncEx check,
+	                                ObjectTypeCoerceFuncEx coerce,
+	                                void *data);
+
+User-data variant. When a single pair of check/coerce C functions needs
+to serve multiple dynamically-created types (e.g., enums, parameterized
+types), use this variant which passes a per-type opaque data pointer on
+every call.
+
+Parameters:
+
+=over 4
+
+=item * C<name> - Type name
+
+=item * C<check> - C function to validate values (receives data pointer)
+
+=item * C<coerce> - C function to coerce values (optional, pass NULL)
+
+=item * C<data> - Opaque pointer passed to check/coerce on every call
+
+=back
+
+=head4 ObjectTypeCheckFuncEx
+
+	typedef bool (*ObjectTypeCheckFuncEx)(pTHX_ SV *val, void *data);
+
+Check signature with user-data. The C<data> pointer is whatever was
+passed to C<object_register_type_xs_ex>.
+
+=head4 ObjectTypeCoerceFuncEx
+
+	typedef SV* (*ObjectTypeCoerceFuncEx)(pTHX_ SV *val, void *data);
+
+Coerce signature with user-data.
 
 =head3 Complete Example
 
@@ -487,6 +553,62 @@ Usage in Perl:
 
 	my $user = new User id => 42, email => 'user@example.com';
 
+=head3 User-Data Example: Enum Type Registration
+
+	typedef struct {
+	    HV *valid_values;   /* value -> name lookup */
+	    HV *lc_name2val;    /* lc(name) -> value for coercion */
+	} EnumTypeData;
+
+	static bool enum_check(pTHX_ SV *val, void *data_ptr) {
+	    EnumTypeData *etd = (EnumTypeData *)data_ptr;
+	    STRLEN len;
+	    const char *pv = SvPV(val, len);
+	    return hv_exists(etd->valid_values, pv, len);
+	}
+
+	static SV *enum_coerce(pTHX_ SV *val, void *data_ptr) {
+	    EnumTypeData *etd = (EnumTypeData *)data_ptr;
+	    STRLEN len;
+	    const char *pv = SvPV(val, len);
+	    /* case-insensitive name -> value lookup */
+	    char *lc = savepvn(pv, len);
+	    STRLEN i;
+	    for (i = 0; i < len; i++) lc[i] = toLOWER(lc[i]);
+	    SV **found = hv_fetch(etd->lc_name2val, lc, len, 0);
+	    Safefree(lc);
+	    return found ? sv_mortalcopy(*found) : val;
+	}
+
+	/* In BOOT or at parse time: */
+	EnumTypeData *etd;
+	Newxz(etd, 1, EnumTypeData);
+	etd->valid_values = newHV();
+	etd->lc_name2val  = newHV();
+	/* ... populate HVs ... */
+	object_register_type_xs_ex(aTHX_ "Color",
+	    enum_check, enum_coerce, (void*)etd);
+
+The same C<enum_check> and C<enum_coerce> functions serve every enum type;
+only the C<EnumTypeData> differs.
+
+=head3 Dispatch Order
+
+When checking a value, Object::Proto tries handlers in this order:
+
+=over 4
+
+=item 1. C<check_ex> (C function with user-data) - ~5 cycles
+
+=item 2. C<check> (C function) - ~5 cycles
+
+=item 3. C<perl_check> (Perl callback from register_type) - ~100 cycles
+
+=back
+
+Coercion follows the same priority: C<coerce_ex>, then C<coerce>,
+then C<perl_coerce>.
+
 =head3 Performance Tiers
 
 	Type Source               Check Cost    Total Overhead
@@ -495,10 +617,11 @@ Usage in Perl:
 	Registered C function     ~5 cycles     function pointer
 	Perl callback             ~100 cycles   call_sv overhead
 
-=head3 Linking
+=head2 Object::Proto-E<gt>include_dir
 
-Your XS module needs to link against the Object::Proto module. The functions
-are exported with C<PERL_CALLCONV> visibility.
+Returns the path to the installed header directory containing
+C<object_types.h>, or C<undef> if not found. Use in your C<Makefile.PL>
+to set C<INC>.
 
 =head2 new $class @args
 

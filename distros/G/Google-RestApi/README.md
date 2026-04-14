@@ -125,6 +125,39 @@ Each layer only knows about its own URI segment and its parent accessor.
 This pattern applies uniformly across all six APIs (Drive, Sheets,
 Calendar, Gmail, Tasks, Docs).
 
+## Page Callbacks
+
+Many list methods across the API support a `page_callback` parameter for
+processing paginated results. The callback is called with the raw API result
+hashref after each page is fetched. Return a true value to continue fetching,
+or false to stop early.
+
+    # print progress while listing files:
+    my @files = $drive->list(
+      filter        => "name contains 'report'",
+      page_callback => sub {
+        my ($result) = @_;
+        print "Fetched a page of results...\n";
+        return 1;  # continue fetching
+      },
+    );
+
+    # stop after finding what you need:
+    my $target;
+    my @messages = $gmail_api->messages(
+      max_pages     => 0,       # allow unlimited pages
+      page_callback => sub {
+        my ($result) = @_;
+        foreach my $msg (@{ $result->{messages} || [] }) {
+          if ($msg->{id} eq $some_id) {
+            $target = $msg;
+            return 0;  # stop pagination
+          }
+        }
+        return 1;  # keep going
+      },
+    );
+
 # SUBROUTINES
 
 - new(%args); %args consists of:
@@ -137,6 +170,10 @@ Calendar, Gmail, Tasks, Docs).
     - `throttle` &lt;int>: Used in development to sleep the number of seconds specified between API calls to avoid rate limit violations from Google.
 
     You can specify any of the arguments in the optional YAML config file. Any passed-in arguments will override what is in the config file.
+
+    If the config file is shared with other applications, place the Google::RestApi
+    configuration under a `google_restapi` top-level key. That section takes
+    precedence; if absent, the root of the file is used as before.
 
     The 'auth' arg can specify a pre-blessed class of one of the Google::RestApi::Auth::\* classes (e.g. 'OAuth2Client'), or, for convenience sake,
     you may specify a hash of the required arguments to create an instance of that class:
@@ -186,39 +223,6 @@ Calendar, Gmail, Tasks, Docs).
 - stats();
 
     Returns some statistics on how many get/put/post etc calls were made. Useful for performance tuning during development.
-
-# PAGE CALLBACKS
-
-Many list methods across the API support a `page_callback` parameter for
-processing paginated results. The callback is called with the raw API result
-hashref after each page is fetched. Return a true value to continue fetching,
-or false to stop early.
-
-    # print progress while listing files:
-    my @files = $drive->list(
-      filter        => "name contains 'report'",
-      page_callback => sub {
-        my ($result) = @_;
-        print "Fetched a page of results...\n";
-        return 1;  # continue fetching
-      },
-    );
-
-    # stop after finding what you need:
-    my $target;
-    my @messages = $gmail_api->messages(
-      max_pages     => 0,       # allow unlimited pages
-      page_callback => sub {
-        my ($result) = @_;
-        foreach my $msg (@{ $result->{messages} || [] }) {
-          if ($msg->{id} eq $some_id) {
-            $target = $msg;
-            return 0;  # stop pagination
-          }
-        }
-        return 1;  # keep going
-      },
-    );
 
 # NAVIGATION
 
@@ -288,6 +292,14 @@ Please report a bug or missing api call by creating an issue at the git repo.
 # AUTHORS
 
 - Robin Murray mvsjes@cpan.org
+
+# CONTRIBUTORS
+
+- Dimitrios Kechagias
+- Mohammad S Anwar
+- qorron
+- rocketgithub
+- Todd Wade
 
 # COPYRIGHT
 

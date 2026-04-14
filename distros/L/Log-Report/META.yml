@@ -30,7 +30,7 @@ resources:
   bugtracker: https://github.com/markov2/perl5-Log-Report/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Log-Report.git
-version: '1.44'
+version: '1.45'
 x_oodist:
   email: markov@cpan.org
   first_year: 2007
@@ -48,6 +48,8 @@ x_oodist:
     -
       export: website
       markup: html
+      meta:
+        main_manual: Log::Report
       publish: ../public_html/log-report/doctree
       serializer: json
   include:

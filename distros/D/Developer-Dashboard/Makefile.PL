@@ -80,10 +80,11 @@ my %WriteMakefileArgs = (
     "HTTP::Request::Common" => 0,
     "HTTP::Response" => 0,
     "IO::Socket::SSL" => 0,
+    "Module::CPANTS::Analyse" => 0,
     "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.34",
+  "VERSION" => "2.35",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -122,6 +123,7 @@ my %FallbackPrereqs = (
   "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
   "MIME::Base64" => 0,
+  "Module::CPANTS::Analyse" => 0,
   "POSIX" => 0,
   "Plack" => 0,
   "Plack::Runner" => 0,

@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Create project policy file: Code of Conduct
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp;
 use Module::Load qw( load );
@@ -45,15 +45,6 @@ sub get_available_classes_and_versions {
     };
 }
 
-# sub _filename {
-#     my ($format) = @_;
-#     my %formats = (
-#         'markdown' => 'CODE_OF_CONDUCT.md',
-#         'text'     => 'CODE_OF_CONDUCT.txt',
-#     );
-#     return $formats{$format};
-# }
-
 1;
 
 __END__
@@ -68,7 +59,7 @@ Software::Policies::CodeOfConduct - Create project policy file: Code of Conduct
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =begin Pod::Coverage
 

@@ -9,8 +9,10 @@ build_requires:
   Test::File::Contents: '0'
   Test::Most: '0'
   Test::Warnings: '0'
+  perl: '5.020'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: v5.20.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -32,9 +34,13 @@ requires:
   autodie: '0'
   feature: '0'
   namespace::autoclean: '0'
+  perl: '5.020'
   strict: '0'
   warnings: '0'
-version: '0.03'
+resources:
+  bugtracker: https://github.com/payprop/business-nab
+  repository: https://github.com/payprop/business-nab.git
+version: '0.04'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

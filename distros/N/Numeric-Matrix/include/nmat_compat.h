@@ -149,7 +149,7 @@ static MAGIC* nmat_compat_mg_findext(pTHX_ SV *sv, int type, const MGVTBL *vtbl)
 /* x86 AVX */
 #if defined(__AVX__)
 #  define NMAT_HAVE_AVX 1
-#  ifndef NMAT_HAVE_AVX2
+#  if !NMAT_HAVE_AVX2
 #    include <immintrin.h>
 #  endif
 #else
@@ -159,7 +159,7 @@ static MAGIC* nmat_compat_mg_findext(pTHX_ SV *sv, int type, const MGVTBL *vtbl)
 /* x86 SSE2 */
 #if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 #  define NMAT_HAVE_SSE2 1
-#  ifndef NMAT_HAVE_AVX
+#  if !NMAT_HAVE_AVX2 && !NMAT_HAVE_AVX
 #    include <emmintrin.h>
 #  endif
 #else

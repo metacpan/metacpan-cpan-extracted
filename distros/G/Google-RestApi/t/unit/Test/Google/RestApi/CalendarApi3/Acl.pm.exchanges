@@ -1,5 +1,5 @@
 ---
-request: POST /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com/acl
+request: POST /calendar/v3/calendars/52469e82ea383354468bda5548261e3db0bfc5d114fbc927d89cc798ddaa2343@group.calendar.google.com/acl
 request_content:
   role: reader
   scope:
@@ -10,7 +10,7 @@ response:
   content: |
     {
      "kind": "calendar#aclRule",
-     "etag": "\"00001771188570558831\"",
+     "etag": "\"00001776124118197103\"",
      "id": "user:test@example.com",
      "scope": {
       "type": "user",
@@ -19,49 +19,49 @@ response:
      "role": "reader"
     }
   headers:
-    - date
-    - 'Sun, 15 Feb 2026 20:49:30 GMT'
-    - pragma
-    - no-cache
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - x-l2-request-path
-    - l2-managed-14
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - server
-    - ESF
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - date
+  - Mon, 13 Apr 2026 23:48:38 GMT
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-14
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - pragma
+  - no-cache
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
 
 ---
-request: GET /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com/acl/user:test@example.com
+request: GET /calendar/v3/calendars/52469e82ea383354468bda5548261e3db0bfc5d114fbc927d89cc798ddaa2343@group.calendar.google.com/acl/user:test@example.com
 response:
   code: 200
   content: |
     {
      "kind": "calendar#aclRule",
-     "etag": "\"00001771188570558831\"",
+     "etag": "\"00001776124118197103\"",
      "id": "user:test@example.com",
      "scope": {
       "type": "user",
@@ -70,114 +70,114 @@ response:
      "role": "reader"
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:49:32 GMT'
-    - x-l2-request-path
-    - l2-managed-14
-    - server
-    - ESF
-    - cache-control
-    - 'private, max-age=0, must-revalidate, no-transform'
-    - expires
-    - 'Sun, 15 Feb 2026 20:49:32 GMT'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - transfer-encoding
+  - chunked
+  - x-xss-protection
+  - '0'
+  - x-l2-request-path
+  - l2-managed-14
+  - server
+  - ESF
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  - cache-control
+  - private, max-age=0, must-revalidate, no-transform
+  - date
+  - Mon, 13 Apr 2026 23:48:39 GMT
+  - expires
+  - Mon, 13 Apr 2026 23:48:39 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
 
 ---
-request: DELETE /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com/acl/user:test@example.com
+request: DELETE /calendar/v3/calendars/52469e82ea383354468bda5548261e3db0bfc5d114fbc927d89cc798ddaa2343@group.calendar.google.com/acl/user:test@example.com
 response:
   code: 204
   content: ''
   headers:
-    - vary
-    - Origin
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - server
-    - ESF
-    - content-length
-    - 0
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - pragma
-    - no-cache
-    - date
-    - 'Sun, 15 Feb 2026 20:49:33 GMT'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - text/html
-    - x-l2-request-path
-    - l2-managed-14
+  - x-xss-protection
+  - '0'
+  - content-length
+  - '0'
+  - x-l2-request-path
+  - l2-managed-14
+  - x-frame-options
+  - SAMEORIGIN
+  - pragma
+  - no-cache
+  - server
+  - ESF
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - date
+  - Mon, 13 Apr 2026 23:48:41 GMT
+  - content-type
+  - text/html
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - vary
+  - Origin
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::Acl::create_and_delete
 
 ---
-request: DELETE /calendar/v3/calendars/dc0b5e646a6dcff114ccf3ef9a440503ea2ab789bf38455d53acacf4d26af9e9@group.calendar.google.com
+request: DELETE /calendar/v3/calendars/52469e82ea383354468bda5548261e3db0bfc5d114fbc927d89cc798ddaa2343@group.calendar.google.com
 response:
   code: 204
   content: ''
   headers:
-    - content-length
-    - 0
-    - server
-    - ESF
-    - pragma
-    - no-cache
-    - date
-    - 'Sun, 15 Feb 2026 20:49:35 GMT'
-    - content-type
-    - text/html
-    - vary
-    - Origin
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - expires
-    - 'Mon, 01 Jan 1990 00:00:00 GMT'
-    - cache-control
-    - 'no-cache, no-store, max-age=0, must-revalidate'
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - x-frame-options
-    - SAMEORIGIN
-    - x-l2-request-path
-    - l2-managed-14
+  - x-xss-protection
+  - '0'
+  - content-length
+  - '0'
+  - x-frame-options
+  - SAMEORIGIN
+  - pragma
+  - no-cache
+  - server
+  - ESF
+  - x-l2-request-path
+  - l2-managed-14
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - x-content-type-options
+  - nosniff
+  - vary
+  - Origin
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - date
+  - Mon, 13 Apr 2026 23:48:43 GMT
+  - content-type
+  - text/html
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
   message: No Content
 source: Test::Google::RestApi::CalendarApi3::Acl::_teardown_live_calendar
 

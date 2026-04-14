@@ -1,5 +1,9 @@
 Revision history for Numeric-Matrix
 
+0.03    2026-04-13
+        - Fix SSE2 header include guard (#ifndef vs #if !) so emmintrin.h is included when needed
+        - Convert all C99 for-loop declarations to C89 for portability with older compilers 
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

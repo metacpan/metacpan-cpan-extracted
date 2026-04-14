@@ -1,6 +1,7 @@
 * cpanm PPI::App::ppi_version
 * ppi_version change $old_version $new_version
 * git grep $old_version, update anything remaining
+* update Changes file with a summary of what's been done for this release
 * perl -MPod::Markdown -e 'Pod::Markdown->new->filter(@ARGV)' lib/Google/RestApi.pm > README.md
 * perl Makefile.PL
 * make manifest

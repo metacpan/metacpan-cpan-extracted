@@ -8,6 +8,8 @@ use Test::EOL;
 
 my @files = (
     'lib/Software/Policies.pm',
+    'lib/Software/Policies/AIDisclosure.pm',
+    'lib/Software/Policies/AIDisclosure/Basic.pm',
     'lib/Software/Policies/CodeOfConduct.pm',
     'lib/Software/Policies/CodeOfConduct/ContributorCovenant.pm',
     'lib/Software/Policies/Contributing.pm',
@@ -16,6 +18,7 @@ my @files = (
     'lib/Software/Policies/Security.pm',
     'lib/Software/Policies/Security/Individual.pm',
     't/00-load.t',
+    't/aidisclosure.t',
     't/contributing.t',
     't/policies.t'
 );

@@ -88,6 +88,7 @@
             "HTTP::Request::Common" : "0",
             "HTTP::Response" : "0",
             "IO::Socket::SSL" : "0",
+            "Module::CPANTS::Analyse" : "0",
             "Plack::Test" : "0",
             "Test::More" : "0"
          }
@@ -96,175 +97,175 @@
    "provides" : {
       "Developer::Dashboard" : {
          "file" : "lib/Developer/Dashboard.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::ActionRunner" : {
          "file" : "lib/Developer/Dashboard/ActionRunner.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Auth" : {
          "file" : "lib/Developer/Dashboard/Auth.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::CLI::OpenFile" : {
          "file" : "lib/Developer/Dashboard/CLI/OpenFile.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::CLI::Paths" : {
          "file" : "lib/Developer/Dashboard/CLI/Paths.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::CLI::Query" : {
          "file" : "lib/Developer/Dashboard/CLI/Query.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::CLI::SeededPages" : {
          "file" : "lib/Developer/Dashboard/CLI/SeededPages.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::CLI::Skills" : {
          "file" : "lib/Developer/Dashboard/CLI/Skills.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::CLI::Ticket" : {
          "file" : "lib/Developer/Dashboard/CLI/Ticket.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Codec" : {
          "file" : "lib/Developer/Dashboard/Codec.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Collector" : {
          "file" : "lib/Developer/Dashboard/Collector.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::CollectorRunner" : {
          "file" : "lib/Developer/Dashboard/CollectorRunner.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Config" : {
          "file" : "lib/Developer/Dashboard/Config.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::DataHelper" : {
          "file" : "lib/Developer/Dashboard/DataHelper.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::DockerCompose" : {
          "file" : "lib/Developer/Dashboard/DockerCompose.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Doctor" : {
          "file" : "lib/Developer/Dashboard/Doctor.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::File" : {
          "file" : "lib/Developer/Dashboard/File.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::FileRegistry" : {
          "file" : "lib/Developer/Dashboard/FileRegistry.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Folder" : {
          "file" : "lib/Developer/Dashboard/Folder.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::IndicatorStore" : {
          "file" : "lib/Developer/Dashboard/IndicatorStore.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::InternalCLI" : {
          "file" : "lib/Developer/Dashboard/InternalCLI.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::JSON" : {
          "file" : "lib/Developer/Dashboard/JSON.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::PageDocument" : {
          "file" : "lib/Developer/Dashboard/PageDocument.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::PageResolver" : {
          "file" : "lib/Developer/Dashboard/PageResolver.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::PageRuntime" : {
          "file" : "lib/Developer/Dashboard/PageRuntime.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::PageRuntime::StreamHandle" : {
          "file" : "lib/Developer/Dashboard/PageRuntime/StreamHandle.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::PageStore" : {
          "file" : "lib/Developer/Dashboard/PageStore.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::PathRegistry" : {
          "file" : "lib/Developer/Dashboard/PathRegistry.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Platform" : {
          "file" : "lib/Developer/Dashboard/Platform.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Prompt" : {
          "file" : "lib/Developer/Dashboard/Prompt.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Runtime::Result" : {
          "file" : "lib/Developer/Dashboard/Runtime/Result.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::RuntimeManager" : {
          "file" : "lib/Developer/Dashboard/RuntimeManager.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::SKILLS" : {
          "file" : "lib/Developer/Dashboard/SKILLS.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::SeedSync" : {
          "file" : "lib/Developer/Dashboard/SeedSync.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::SessionStore" : {
          "file" : "lib/Developer/Dashboard/SessionStore.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::SkillDispatcher" : {
          "file" : "lib/Developer/Dashboard/SkillDispatcher.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::SkillManager" : {
          "file" : "lib/Developer/Dashboard/SkillManager.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::UpdateManager" : {
          "file" : "lib/Developer/Dashboard/UpdateManager.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Web::App" : {
          "file" : "lib/Developer/Dashboard/Web/App.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Web::DancerApp" : {
          "file" : "lib/Developer/Dashboard/Web/DancerApp.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Web::Server" : {
          "file" : "lib/Developer/Dashboard/Web/Server.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Web::Server::Daemon" : {
          "file" : "lib/Developer/Dashboard/Web/Server/Daemon.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       },
       "Developer::Dashboard::Zipper" : {
          "file" : "lib/Developer/Dashboard/Zipper.pm",
-         "version" : "2.34"
+         "version" : "2.35"
       }
    },
    "release_status" : "stable",
@@ -278,7 +279,7 @@
          "web" : "https://github.mf/manif3station/developer-dashboard"
       }
    },
-   "version" : "2.34",
+   "version" : "2.35",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

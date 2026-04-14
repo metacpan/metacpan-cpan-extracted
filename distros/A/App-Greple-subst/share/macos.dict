@@ -1,0 +1,20 @@
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Cheetah          \)?  //  Mac OS X v10.0 (Cheetah)
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Puma             \)?  //  Mac OS X v10.1 (Puma)
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Jaguar           \)?  //  Mac OS X v10.2 (Jaguar)
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Panther          \)?  //  Mac OS X v10.3 Panther
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Tiger            \)?  //  Mac OS X v10.4 Tiger
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Leo?pard         \)?  //  Mac OS X v10.5 Leopard
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Snow\s*Leo?pard  \)?  //  Mac OS X v10.6 Snow Leopard
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Lion             \)?  //  Mac OS X Lion
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Mountain\s*Lion  \)?  //  OS X Mountain Lion
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Mar?ve[lr]icks?  \)?  //  OS X Mavericks
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Yosemite         \)?  //  OS X Yosemite
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? El\s*Capi?t[ai]n \)?  //  OS X El Capitan
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Sierra           \)?  //  macOS Sierra
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? High\s*Sierra    \)?  //  macOS High Sierra
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Mojave           \)?  //  macOS Mojave
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Catalina         \)?  //  macOS Catalina
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Big\s*Sur        \)?  //  macOS Big Sur
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Monterr?[ae]y    \)?  //  macOS Monterey
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Ventura          \)?  //  macOS Ventura
+(?ix)(mac(\s*OS)?|OS)(\s*X)?(\s*v?10\.\d+)?\s*\(? Sonoma           \)?  //  macOS Sonoma

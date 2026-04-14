@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::ASN1::Enumerated;
-$Crypt::OpenSSL3::ASN1::Enumerated::VERSION = '0.003';
+$Crypt::OpenSSL3::ASN1::Enumerated::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::ASN1::Enumerated - An ASN1 enumerated value
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 METHODS
 

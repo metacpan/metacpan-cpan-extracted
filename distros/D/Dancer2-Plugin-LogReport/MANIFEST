@@ -14,6 +14,7 @@ lib/Dancer2/Plugin/LogReport/Message.pod
 lib/Dancer2/Template/TTLogReport.pm
 lib/Dancer2/Template/TTLogReport.pod
 t/00use.t
+t/10msg-freeze.t
 t/70dancer2.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

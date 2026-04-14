@@ -126,5 +126,6 @@ t/32-sql-dashboard-rdbms-playwright.t
 t/33-web-server-ssl-browser.t
 t/34-scorecard-guardrails.t
 t/35-js-fast-check.t
+t/36-release-kwalitee.t
 t/fuzz/scorecard-fast-check.mjs
 t/web_app_static_files.t

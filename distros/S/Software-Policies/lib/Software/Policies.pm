@@ -6,7 +6,7 @@ use 5.010;
 
 # ABSTRACT: Create policy files: CODE_OF_CONDUCT, CONTRIBUTING, FUNDING, GOVERNANCE, SECURITY, SUPPORT, etc.
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Module::Load   qw( load );
 use Module::Loader ();
@@ -71,19 +71,22 @@ Software::Policies - Create policy files: CODE_OF_CONDUCT, CONTRIBUTING, FUNDING
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
     use Software::Policies;
     my $policies = Software::Policies->new;
-    my $contributing = $policies->create(
+    # Returns a list because there can be more than one files created.
+    my @contributing_policies = $policies->create(
         policy => 'Contributing',
-        class => 'Simple',
+        class => 'PerlDistZilla',
         version => '1',
         format => 'markdown',
         attributes => { },
     );
+    my $contributing = $contributing_policies[0];
+    print $contributing->{'text'} . "\n";
 
 =head1 DESCRIPTION
 

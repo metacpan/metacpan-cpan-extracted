@@ -6,46 +6,46 @@ response:
   code: 200
   content: |
     {
-      "id": "Label_18",
+      "id": "Label_1",
       "name": "Test Label",
       "messageListVisibility": "show",
       "labelListVisibility": "labelShow"
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:57:09 GMT'
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - date
+  - Mon, 13 Apr 2026 23:48:16 GMT
+  - content-type
+  - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
 
 ---
-request: GET /gmail/v1/users/me/labels/Label_18
+request: GET /gmail/v1/users/me/labels/Label_1
 response:
   code: 200
   content: |
     {
-      "id": "Label_18",
+      "id": "Label_1",
       "name": "Test Label",
       "messageListVisibility": "show",
       "labelListVisibility": "labelShow",
@@ -56,61 +56,61 @@ response:
       "threadsUnread": 0
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:57:10 GMT'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - date
+  - Mon, 13 Apr 2026 23:48:18 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - x-xss-protection
+  - '0'
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
 
 ---
-request: DELETE /gmail/v1/users/me/labels/Label_18
+request: DELETE /gmail/v1/users/me/labels/Label_1
 response:
   code: 204
   content: ''
   headers:
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 20:57:11 GMT'
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - content-length
-    - 0
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - Origin
-    - vary
-    - X-Origin
-    - vary
-    - Referer
+  - x-xss-protection
+  - '0'
+  - content-length
+  - '0'
+  - x-frame-options
+  - SAMEORIGIN
+  - server
+  - ESF
+  - x-content-type-options
+  - nosniff
+  - vary
+  - Origin
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Mon, 13 Apr 2026 23:48:19 GMT
   message: No Content
 source: Test::Google::RestApi::GmailApi1::Label::create_and_delete
 

@@ -1,0 +1,20 @@
+Mac OS X v10.0 (Cheetah)
+Mac OS X v10.1 (Puma)
+Mac OS X v10.2 (Jaguar)
+Mac OS X v10.3 Panther
+Mac OS X v10.4 Tiger
+Mac OS X v10.5 Leopard
+Mac OS X v10.6 Snow Leopard
+Mac OS X Lion
+OS X Mountain Lion
+OS X Mavericks
+OS X Yosemite
+OS X El Capitan
+macOS Sierra
+macOS High Sierra
+macOS Mojave
+macOS Catalina
+macOS Big Sur
+macOS Monterey
+macOS Ventura
+macOS Sonoma

@@ -53,10 +53,10 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.34', 'repo version bumped for the same-repo skill-layer fallback fix' );
-like( $pm, qr/^2\.34$/m, 'main POD version matches the module version' );
+is( $version, '2.35', 'repo version bumped for the tarball kwalitee guardrail' );
+like( $pm, qr/^2\.35$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
-    like( $dist, qr/^version = 2\.34$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^version = 2\.35$/m, 'dist.ini version matches the module version in the source tree' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini excludes integration assets so repo-only verification helpers do not leak into release tarballs' );
@@ -67,9 +67,9 @@ if ( $dist ne '' ) {
     like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
 else {
-    like( $meta, qr/"version"\s*:\s*"2\.34"/, 'META.json version matches the module version in the built distribution' );
+    like( $meta, qr/"version"\s*:\s*"2\.35"/, 'META.json version matches the module version in the built distribution' );
 }
-like( $changes, qr/^2\.34\s+2026-04-12$/m, 'Changes top entry matches the bumped version' );
+like( $changes, qr/^2\.35\s+2026-04-13$/m, 'Changes top entry matches the bumped version' );
 ok( $plain_readme ne '', 'plain README is tracked for release kwalitee compatibility' );
 like( $plain_readme, qr/Developer Dashboard/, 'plain README identifies the distribution clearly' );
 

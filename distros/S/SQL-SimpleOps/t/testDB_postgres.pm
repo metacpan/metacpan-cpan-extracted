@@ -46,17 +46,17 @@ sub PG_do()
 	my $dir = shift;
 	if (!defined($ENV{SQL_SIMPLE_PG}) || $ENV{SQL_SIMPLE_PG} eq "")
 	{
-		&PG_envfail();
+		&PG_envfail("\$ENV{SQL_SIMPLE_PG} is missing");
 		return 0;
 	}
 	if (!defined($ENV{SQL_SIMPLE_PG_DB}) || $ENV{SQL_SIMPLE_PG_DB} eq "")
 	{
-		&PG_envfail("SQL_SIMPLE_PG_DB is missing");
+		&PG_envfail("\$ENV{SQL_SIMPLE_PG_DB} is missing");
 		return 0;
 	}
 	if (!defined($ENV{SQL_SIMPLE_PG_SCHEMA}) || $ENV{SQL_SIMPLE_PG_SCHEMA} eq "")
 	{
-		&PG_envfail("SQL_SIMPLE_PG_SCHEMA is missing");
+		&PG_envfail("\$ENV{SQL_SIMPLE_PG_SCHEMA} is missing");
 		return 0;
 	}
 

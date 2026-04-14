@@ -1,5 +1,31 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.4.0 2026-04-14T10:27:25+0900
+    - Fixed t/12.tz_database.t on Windows (Strawberry Perl): replaced
+      POSIX::mktime with Time::Local::timegm for pre-1970 timestamps,
+      which POSIX::mktime cannot handle on Windows.
+    - Added start_of( $unit ) mutator, which modifies the datetime object in place
+      to the first instant of the given unit.
+      Supported units are second, minute, hour, day, week, local_week, month, quarter,
+      year, decade, and century.
+      Delegates to truncate() for most units; decade and century are handled independently.
+      Returns the modified object on success.
+    - Added end_of( $unit ) mutator: modifies the datetime object in place to
+      the last nanosecond of the given unit (i.e. the nanosecond before the
+      start of the next unit).
+      Supports the same units as start_of().
+      Handles variable-length units such as months and leap years correctly without
+      hardcoding boundary values.
+      Returns the modified object on success.
+    - Added test suite t/15.start_end_of.t covering all supported units for both
+      start_of() and end_of(), including edge cases such as February in leap and
+      non-leap years, quarter boundaries, decade and century boundaries, timezone and
+      locale preservation, and invalid unit handling.
+    - Added POD documentation for posix_tz_lookup() under a new =head1 LOW-LEVEL XS UTILITIES
+      section in DateTime::Lite, documenting the XS function signature, all supported
+      POSIX TZ string rule forms (Jn, n, Mm.w.d), the RFC 9636 extensions for TZif v3+,
+      and the structure of the returned hashref.
+
 v0.3.0 2026-04-13T07:30:23+0900
     - Added GPS coordinate-based timezone resolution to DateTime::Lite::TimeZone::new().
       Passing C<latitude> and C<longitude> (decimal degrees) instead of C<name>

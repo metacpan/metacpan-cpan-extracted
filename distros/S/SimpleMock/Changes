@@ -1,5 +1,9 @@
 Revision history for SimpleMock
 
+0.03    2026-04-13
+        - Consistent version numbers across all modules
+        - Added META provides, SECURITY.md, CONTRIBUTING.md (CPAN Kwalitee)
+
 0.02    2026-04-12
         - Renamed LWP model to LWP_UA for consistency with other model names
         - Added abstracts to NAME sections for Model::SUBS, Model::LWP_UA,

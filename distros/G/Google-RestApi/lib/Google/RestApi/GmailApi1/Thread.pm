@@ -1,6 +1,6 @@
 package Google::RestApi::GmailApi1::Thread;
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.2.1';
 
 use Google::RestApi::Setup;
 

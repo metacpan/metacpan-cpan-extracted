@@ -1,0 +1,20 @@
+Revision history for Enum-Declare
+
+0.04	2026-04-14
+	- Add :Type attribute for opt-in Object::Proto type registration
+
+0.03	2026-04-14
+	- Add support for export tags so you can explicity import an enum
+
+0.02 	2026-04-14
+	- Fix duplicate 'static' compiler error on Perl 5.42+ where
+	  XS_INTERNAL already includes static in its expansion.
+	- Fix :Export to also export enum meta accessor functions
+	  (e.g. StatusCode()) alongside the enum constants.
+	- Redesign export mechanism to use deferred merge via custom
+	  import XSUB, allowing modules to declare 'our @EXPORT = qw(...)'
+	  without overwriting XS-pushed enum names.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

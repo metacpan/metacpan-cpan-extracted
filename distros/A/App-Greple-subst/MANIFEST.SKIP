@@ -1,0 +1,8 @@
+docs/.*\.json
+docs/.*\.md
+docs/src/.*\.json
+docs/src/.*\.md
+docs/Makefile
+examples
+docker
+images

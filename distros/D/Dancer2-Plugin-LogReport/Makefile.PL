@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '2.02';
+my $version  = '2.03';
 my $webpages = "../public_html";
 my $git      = "https://github.com/markov2/perl5-Dancer2-Plugin-LogReport";
 my $publish  = "../public_html/dancer2-plugin-logreport";
@@ -18,6 +18,7 @@ my %oodist   = (
 
 	include  => [
 		'../Log-Report',
+		'../Log-Report-Optional',
 	],
 
 	use      => [
@@ -26,6 +27,7 @@ my %oodist   = (
 	parser   => {
 		syntax         => 'markov',
 		skip_links     => [
+			'Dancer2::Logger::Syslog',
 		],
 		pmhead         => undef,
 	},
@@ -41,20 +43,25 @@ my %oodist   = (
 		publish        => "$publish/raw",
 	},
 
-	generate => [
-	  {
+	generate => [ {
 		# Add real pod to the releases
 		format         => 'pod3',
 		podtail        => undef,
-	  },
-	],
+	}, ],
 );
 
 my %requires  = (
 	'Dancer2'               => '0.207',
-	'Log::Report'           => '1.42',
+	'Log::Report'           => '1.45',
 	'Scalar::Util'          => 0,
 	'Log::Report::Template' => 0,
+);
+
+my %optional = (
+	'Dancer2::Session::Sereal' => '0.003',
+	'Plack::Test'              => 0,
+	'HTTP::Cookies'            => 0,
+	'HTTP::Request::Common'    => 0,
 );
 
 WriteMakefile
@@ -80,7 +87,8 @@ WriteMakefile
 		},
 		prereqs => {
 			runtime => {
-				requires => \%requires,
+				requires   => \%requires,
+				recommends => \%optional,
 			},
 			develop => {
 				requires => {

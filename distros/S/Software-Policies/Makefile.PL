@@ -23,6 +23,8 @@ my %WriteMakefileArgs = (
     "Module::Loader" => 0,
     "Software::Policy::CodeOfConduct" => 0,
     "Software::Security::Policy::Individual" => "0.11",
+    "Test::Perl::Critic" => 0,
+    "Text::Template" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -39,7 +41,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +64,8 @@ my %FallbackPrereqs = (
   "Software::Policy::CodeOfConduct" => 0,
   "Software::Security::Policy::Individual" => "0.11",
   "Test2::V0" => 0,
+  "Test::Perl::Critic" => 0,
+  "Text::Template" => 0,
   "lib" => 0,
   "strict" => 0,
   "utf8" => 0,

@@ -1,8 +1,8 @@
-# This code is part of Perl distribution Log-Report version 1.44.
+# This code is part of Perl distribution Log-Report version 1.45.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
-# This software is copyright (c) 2007-2025 by Mark Overmeer.
+# This software is copyright (c) 2007-2026 by Mark Overmeer.
 
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -10,7 +10,7 @@
 
 
 package Log::Report::Dispatcher::LogDispatch;{
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 }
 
 use base 'Log::Report::Dispatcher';

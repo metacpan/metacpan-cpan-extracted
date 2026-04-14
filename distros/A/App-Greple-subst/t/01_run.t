@@ -15,10 +15,10 @@ is(subst(qw(--dict t/JA.dict t/JA-bad.txt))->run->{result}, 0);
 
 line(subst(qw(--dict t/JA.dict t/JA-bad.txt))
      ->run->{stdout}, 9, "--dict");
-line(subst(qw(--dict t/JA.dict t/JA-bad.txt --select=1))
-     ->run->{stdout}, 2, "--select=1");
-line(subst(qw(--dict t/JA.dict t/JA-bad.txt --select=1,5:8))
-     ->run->{stdout}, 6, "--select=1,5:8");
+line(subst(qw(--dict t/JA.dict t/JA-bad.txt --select=4))
+     ->run->{stdout}, 2, "--select=4");
+line(subst(qw(--dict t/JA.dict t/JA-bad.txt --select=4,8:11))
+     ->run->{stdout}, 6, "--select=4,8:11");
 line(subst(qw(--dict t/JA.dict t/JA-bad.txt --stat))
      ->run->{stdout}, 11, "--stat");
 line(subst(qw(--dict t/JA.dict t/JA-bad.txt --with-stat))
@@ -45,6 +45,15 @@ line(subst('--dictdata', <<'END', 't/JA-bad.txt')->run->{stdout}, 3, "--dictdata
 デストゥ?パーゴ			デストゥパーゴ
 END
 
+line(subst(
+    qw"--dictpair イ[エー]ハトー?([ヴブボ]ォ?) イーハトーヴォ",
+    't/JA-bad.txt')->run->{stdout}, 2, "--dictpair");
+
+line(subst(
+    qw"--dictpair イ[エー]ハトー?([ヴブボ]ォ?) イーハトーヴォ",
+    qw"--dictpair デストゥ?パーゴ              デストゥパーゴ",
+    't/JA-bad.txt')->run->{stdout}, 3, "--dictpair");
+
 is(subst(qw(--dict t/JA.dict t/JA-bad.txt --subst --all --no-color))
    ->run->{stdout},
    slurp("t/JA.txt"), "--subst");
@@ -56,6 +65,14 @@ SKIP: {
        ->run->{stdout},
        slurp("t/JA.txt"), "--subst (stdin)");
 }
+
+is(subst(qw(--dict share/macos.dict t/macos-short.txt --subst --all --no-color))
+   ->run->{stdout},
+   slurp("t/macos-list.txt"), "macos.dict (short)");
+
+is(subst(qw(--dict share/macos.dict t/macos-wrong.txt --subst --all --no-color))
+   ->run->{stdout},
+   slurp("t/macos-correct.txt"), "macos.dict (wrong)");
 
 done_testing;
 

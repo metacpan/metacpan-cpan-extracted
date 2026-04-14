@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,16 +19,21 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Dancer2::Session::Sereal: '0.003'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
 requires:
   Dancer2: '0.207'
-  Log::Report: '1.42'
+  Log::Report: '1.45'
   Log::Report::Template: '0'
   Scalar::Util: '0'
 resources:
   bugtracker: https://github.com/markov2/perl5-Dancer2-Plugin-LogReport/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Dancer2-Plugin-LogReport.git
-version: '2.02'
+version: '2.03'
 x_oodist:
   email: markov@cpan.org
   first_year: 2015
@@ -38,10 +43,12 @@ x_oodist:
       podtail: ~
   include:
     - ../Log-Report
+    - ../Log-Report-Optional
   oodoc_version: 3.04
   parser:
     pmhead: ~
-    skip_links: []
+    skip_links:
+      - Dancer2::Logger::Syslog
     syntax: markov
   raw:
     publish: ../public_html/dancer2-plugin-logreport/raw

@@ -12,6 +12,8 @@ README
 SECURITY.md
 SIGNATURE
 lib/Software/Policies.pm
+lib/Software/Policies/AIDisclosure.pm
+lib/Software/Policies/AIDisclosure/Basic.pm
 lib/Software/Policies/CodeOfConduct.pm
 lib/Software/Policies/CodeOfConduct/ContributorCovenant.pm
 lib/Software/Policies/Contributing.pm
@@ -20,6 +22,7 @@ lib/Software/Policies/License.pm
 lib/Software/Policies/Security.pm
 lib/Software/Policies/Security/Individual.pm
 t/00-load.t
+t/aidisclosure.t
 t/contributing.t
 t/policies.t
 xt/author/critic.t
@@ -32,11 +35,6 @@ xt/author/pod-coverage.t
 xt/author/pod-linkcheck.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
-xt/author/policy_CodeOfConduct.t
-xt/author/policy_Contributing.t
-xt/author/policy_License_LICENSE-Artistic-2_0.t
-xt/author/policy_License_LICENSE-GPL-3.t
-xt/author/policy_Security.t
 xt/author/portability.t
 xt/author/signature.t
 xt/author/synopsis.t

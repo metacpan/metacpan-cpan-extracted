@@ -1,20 +1,16 @@
-# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.02.
-# The POD got stripped from this file by OODoc version 3.05.
+# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.03.
+# The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
-# This software is copyright (c) 2015-2025 by Mark Overmeer.
+# This software is copyright (c) 2015-2026 by Mark Overmeer.
 
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package Dancer2::Plugin::LogReport;{
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 }
 
 
@@ -22,15 +18,14 @@ use warnings;
 use strict;
 use version;
 
-BEGIN { use Log::Report () }  # require very early
-
-use Dancer2::Plugin;    # register
+require Log::Report;
 use Dancer2::Plugin::LogReport::Message ();
 
 use Log::Report  'dancer2-plugin-logreport',
-	syntax => 'REPORT',
+	syntax        => 'REPORT',
 	message_class => 'Dancer2::Plugin::LogReport::Message';
 
+use Dancer2::Plugin;    # register()
 use Scalar::Util qw/blessed refaddr/;
 
 my %_all_dsls;  # The DSLs for each app within the Dancer application
@@ -234,7 +229,7 @@ sub _fatal_error_message
 sub _message_add($)
 {	my $msg = shift;
 
-	$session_messages{$msg->reason} && ! $msg->inClass('no_session')
+	$session_messages{$msg->reason} && ! $msg->taggedWith('no_session')
 		or return;
 
 	# Get the DSL, only now that we know it's needed
@@ -346,7 +341,7 @@ sub _report($@) {
 
 	if ($reason eq 'SUCCESS')
 	{	$msg = __$msg unless blessed $msg;
-		$msg = $msg->clone(_class => 'success');
+		$msg = $msg->clone(_tag => 'success');
 		$reason = 'NOTICE';
 	}
 	report uc($reason) => $msg;

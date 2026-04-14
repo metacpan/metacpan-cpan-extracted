@@ -1,4 +1,4 @@
-package Log::Fmt::Test 3.100;
+package Log::Fmt::Test 3.101;
 
 use v5.22.0; # lexical subs too buggy before this
 use warnings;
@@ -756,7 +756,7 @@ sub test_logfmt_implementation ($self, $logfmt_package) {
   }
 }
 
-package Log::Dispatchouli::LogFmtTester 3.100 {
+package Log::Dispatchouli::LogFmtTester 3.101 {
   use parent 'Log::Dispatchouli';
   our $LOG_FMT_PACKAGE;
   sub _log_fmt_package { $LOG_FMT_PACKAGE // die "no package supplied" }
@@ -776,7 +776,7 @@ Log::Fmt::Test
 
 =head1 VERSION
 
-version 3.100
+version 3.101
 
 =head1 PERL VERSION
 

@@ -9,9 +9,12 @@
 # TEST_CLASS='Test::Google::RestApi::SheetsApi4::Range::Col' TEST_METHOD=test_this prove -v t/run_unit_tests.t
 #
 # to regenerate mock data from live data (point to your live config and use the provided logger):
-# GOOGLE_RESTAPI_CONFIG=~/.google/rest_api.yaml GOOGLE_RESTAPI_LOGGER=t/etc/log4perl.conf prove -v t/run_unit_tests.t 
+# GOOGLE_RESTAPI_CONFIG=~/.google/rest_api.yaml GOOGLE_RESTAPI_LOGGER=t/etc/log4perl.conf prove -v t/run_unit_tests.t
 #
 # When doing a lot of bulk live tests, set 'throttle: 1' in your config to avoid 429's.
+#
+# to check that your OAuth token has the required scopes and all APIs are enabled:
+# GOOGLE_RESTAPI_CONFIG=~/.google/rest_api.yaml TEST_CLASS='Test::Google::RestApi::ScopeCheck' prove -v t/run_unit_tests.t
 
 use strict;
 use warnings;
