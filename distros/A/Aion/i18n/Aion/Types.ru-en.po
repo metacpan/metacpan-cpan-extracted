@@ -31,9 +31,6 @@ msgstr "Initializes a type with new arguments. Used with `subtype`."
 msgid "Использует `$code` как тест. Значение для теста передаётся в `$_`."
 msgstr "Uses `$code` as a test. The value for the test is passed to `$_`."
 
-msgid "Используется с `subtype`. Необходимо, если у типа есть аргументы."
-msgstr "Used with `subtype`. Required if the type has arguments."
-
 msgid "Используется с `subtype`."
 msgstr "Used with `subtype`."
 
@@ -63,6 +60,9 @@ msgstr "Used with `subtype` to print an error message if the value excludes the 
 
 msgid "Добавляет новое приведение (`$via`) к `$type` из `$from` типа."
 msgstr "Adds a new cast (`$via`) to `$type` from `$from` type."
+
+msgid "Может использовать параметры типа:"
+msgstr "Can use parameters like:"
 
 msgid "`coerce` выбрасывает исключения:"
 msgstr "`coerce` throws exceptions:"

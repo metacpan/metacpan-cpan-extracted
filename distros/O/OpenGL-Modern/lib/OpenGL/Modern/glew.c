@@ -18416,6 +18416,28 @@ GLboolean GLEWAPIENTRY glewGetExtension (const char* name)
 
 typedef const GLubyte* (GLAPIENTRY * PFNGLGETSTRINGPROC) (GLenum name);
 typedef void (GLAPIENTRY * PFNGLGETINTEGERVPROC) (GLenum pname, GLint *params);
+#if defined(__APPLE__) && !defined(GLEW_APPLE_GLX)
+#include <OpenGL/CGLCurrent.h>
+#endif
+
+GLboolean GLEWAPIENTRY glewHasContext (void)
+{
+  return !(
+  #if defined(GLEW_EGL)
+    eglGetCurrentContext() == EGL_NO_CONTEXT
+  #elif defined(GLEW_OSMESA)
+    !OSMesaGetCurrentContext()
+  #elif defined(_WIN32)
+    !wglGetCurrentContext()
+  #elif defined(__APPLE__) && !defined(GLEW_APPLE_GLX)
+    !CGLGetCurrentContext()
+  #elif defined(__HAIKU__)
+    0 /* no way to detect */
+  #else /* __UNIX || (__APPLE__ && GLEW_APPLE_GLX) */
+    !glXGetCurrentContext()
+  #endif
+  );
+}
 
 GLenum GLEWAPIENTRY glewContextInit (void)
 {
@@ -18423,6 +18445,9 @@ GLenum GLEWAPIENTRY glewContextInit (void)
   const GLubyte* s;
   GLuint dot;
   GLint major, minor;
+
+  if (!glewHasContext())
+    return GLEW_ERROR_NO_GL_CONTEXT;
 
   #ifdef _WIN32
   getString = glGetString;
@@ -23721,6 +23746,7 @@ const GLubyte * GLEWAPIENTRY glewGetErrorString (GLenum error)
     (const GLubyte*)"GL 1.1 and up are not supported",
     (const GLubyte*)"GLX 1.2 and up are not supported",
     (const GLubyte*)"No GLX display",
+    (const GLubyte*)"No GL context",
     (const GLubyte*)"Unknown error"
   };
   const size_t max_error = sizeof(_glewErrorString)/sizeof(*_glewErrorString) - 1;

@@ -1,5 +1,5 @@
 package Kubernetes::REST::Logs;
-our $VERSION = '1.103';
+our $VERSION = '1.104';
 # ABSTRACT: DEPRECATED - v0 compatibility stub
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ Kubernetes::REST::Logs - DEPRECATED - v0 compatibility stub
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,4 @@
+.github/workflows/coverage.yml
 .github/workflows/perl_linux.yml
 .gitignore
 Base/CLI.pm

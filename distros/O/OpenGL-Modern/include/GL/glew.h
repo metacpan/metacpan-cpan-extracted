@@ -26990,6 +26990,7 @@ GLEW_VAR_EXPORT GLboolean __GLEW_WIN_swap_hint;
 #define GLEW_ERROR_GL_VERSION_10_ONLY 2  /* Need at least OpenGL 1.1 */
 #define GLEW_ERROR_GLX_VERSION_11_ONLY 3  /* Need at least GLX 1.2 */
 #define GLEW_ERROR_NO_GLX_DISPLAY 4  /* Need GLX display for GLX support */
+#define GLEW_ERROR_NO_GL_CONTEXT 5  /* no current GL context */
 
 /* string codes */
 #define GLEW_VERSION 1
@@ -27010,6 +27011,7 @@ VERSION_MICRO 1
 
 /* API */
 GLEWAPI GLenum GLEWAPIENTRY glewInit (void);
+GLEWAPI GLboolean GLEWAPIENTRY glewHasContext (void);
 GLEWAPI GLenum GLEWAPIENTRY glewContextInit (void);
 GLEWAPI GLboolean GLEWAPIENTRY glewIsSupported (const char *name);
 #define glewIsExtensionSupported(x) glewIsSupported(x)

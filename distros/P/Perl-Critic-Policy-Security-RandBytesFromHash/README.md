@@ -42,12 +42,12 @@ What can you use instead?  Modules like [Crypt::URandom](https://metacpan.org/po
 
 # RECENT CHANGES
 
-Changes for version v0.1.2 (2026-04-13)
+Changes for version v0.1.3 (2026-04-15)
 
-- Bugs
-    - Removed reliance on anonymous empty structures like {} or \[\] as they lead to too many false positives (GH#1).
 - Documentation
-    - Fixed typos.
+    - Updated author email address due to issues with cpan.org email.
+- Tests
+    - Added test case for false positives (GH#1).
 
 See the `Changes` file for more details.
 
@@ -127,7 +127,7 @@ and may be cloned from [https://github.com/robrwo/Perl-Critic-Policy-Security-Ra
 
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 # COPYRIGHT AND LICENSE
 

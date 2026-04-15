@@ -1,0 +1,120 @@
+################################################################################
+# Jacode 速查表 (ZH)
+# Jacode - Perl 日语字符编码转换程序
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ 安装
+
+  cpanm Jacode
+
+  或者从 https://metacpan.org/pod/Jacode 下载 Jacode.pm 和 jacode.pl，
+  将两个文件放在同一目录下。
+
+■ 使用方法
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # 就地转换字符串（最常用的用法）
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # 返回值（列表上下文）
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # 返回值（标量上下文）
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # 按值返回的封装函数
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # 检测编码
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS 转义序列控制
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # 初始化
+  Jacode::init();
+
+  # 缓存控制
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ 编码名称
+
+  'jis'   ... JIS（ISO-2022-JP）
+  'sjis'  ... Shift_JIS（含 CP932）
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... 二进制（无法转换）
+
+■ 选项
+
+  'z'  ... 半角假名 → 全角假名（h2z）
+  'h'  ... 全角假名 → 半角假名（z2h）
+
+■ JIS 汉字起始序列
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983（默认）
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 第1面
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 第1面
+
+■ 转换示例
+
+  # Shift_JIS 转 UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP 转 Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # 自动检测输入，输出为 JIS
+  Jacode::convert(\$line, 'jis');
+
+  # 转换半角假名的同时将 SJIS 转为 UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # 转换文件的所有行
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ 命令行（pkf 模式）
+
+  perl jacode.pl [选项] [-[输入]输出] 文件
+
+  perl jacode.pl file          # 转换为 JIS
+  perl jacode.pl -sw file      # Shift_JIS 转 UTF-8
+  perl jacode.pl -es file      # EUC-JP 转 Shift_JIS
+  perl jacode.pl -me file      # 混合编码文件转 EUC-JP（动态判断）
+  perl jacode.pl -mc file      # 转换并逐行显示编码名称
+
+  选项:
+  -b  缓冲输出（默认）
+  -u  非缓冲输出
+  -m  动态输入编码识别
+  -c  显示编码名称
+  -Z  半角假名 → 全角假名
+  -H  全角假名 → 半角假名
+  -f [unix|mac|dos]  转换换行符
+
+■ jcode.pl 兼容性
+
+  Jacode 与 Utashiro 的 jcode.pl 兼容。
+  jcode:: 命名空间别名同样可用。
+
+################################################################################

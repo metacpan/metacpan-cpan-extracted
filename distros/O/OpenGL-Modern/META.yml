@@ -25,5 +25,5 @@ resources:
   IRC: irc://irc.perl.org/#pogl
   bugtracker: https://github.com/Perl-GPU/OpenGL-Modern/issues
   repository: https://github.com/Perl-GPU/OpenGL-Modern.git
-version: '0.0404'
+version: '0.0405'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

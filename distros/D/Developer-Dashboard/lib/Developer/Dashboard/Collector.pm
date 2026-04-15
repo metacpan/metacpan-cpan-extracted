@@ -3,7 +3,7 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '2.35';
+our $VERSION = '2.37';
 
 use File::Spec;
 use POSIX qw(strftime);
@@ -30,6 +30,7 @@ sub collector_paths {
     my $dir = $self->{paths}->collector_dir($name);
     return {
         dir       => $dir,
+        log       => File::Spec->catfile( $dir, 'log' ),
         stdout    => File::Spec->catfile( $dir, 'stdout' ),
         stderr    => File::Spec->catfile( $dir, 'stderr' ),
         combined  => File::Spec->catfile( $dir, 'combined' ),
@@ -93,10 +94,20 @@ sub write_result {
         last_failure_at  => $result{exit_code} ? $timestamp : ( $previous->{last_failure_at} || undef ),
         last_started_at  => $result{started_at} || $previous->{last_started_at},
         output_format    => $result{output_format},
+        timed_out        => $result{timed_out} ? 1 : 0,
         updated_at_epoch => time,
     };
 
-    return $self->_atomic_write_json( $paths->{status}, $status );
+    my $written = $self->_atomic_write_json( $paths->{status}, $status );
+    $self->append_log_entry(
+        $name,
+        happened_at => $timestamp,
+        exit_code   => $result{exit_code},
+        timed_out   => $result{timed_out},
+        stdout      => $result{stdout},
+        stderr      => $result{stderr},
+    );
+    return $written;
 }
 
 # write_status($name, $status)
@@ -145,6 +156,57 @@ sub read_output {
         'combined' => $self->_first_existing_text_file( $name, 'combined' ),
         'last_run' => $self->_first_existing_text_file( $name, 'last_run' ),
     };
+}
+
+# collector_exists($name)
+# Returns whether a collector exists in persisted state across any runtime layer.
+# Input: collector name string.
+# Output: boolean true when collector files or directories exist.
+sub collector_exists {
+    my ( $self, $name ) = @_;
+    die 'Missing collector name' if !defined $name || $name eq '';
+    for my $root ( $self->{paths}->collectors_roots ) {
+        return 1 if -d File::Spec->catdir( $root, $name );
+    }
+    return 0;
+}
+
+# append_log_entry($name, %entry)
+# Appends one human-readable collector log entry to the collector log file.
+# Input: collector name string plus happened_at, exit_code, timed_out, stdout, stderr, and error fields.
+# Output: collector log file path string.
+sub append_log_entry {
+    my ( $self, $name, %entry ) = @_;
+    die 'Missing collector name' if !defined $name || $name eq '';
+    my $paths = $self->collector_paths($name);
+    my $text = $self->_format_log_entry(
+        name        => $name,
+        happened_at => $entry{happened_at},
+        exit_code   => $entry{exit_code},
+        timed_out   => $entry{timed_out},
+        stdout      => $entry{stdout},
+        stderr      => $entry{stderr},
+        error       => $entry{error},
+        source      => $entry{source},
+    );
+    open my $fh, '>>', $paths->{log} or die "Unable to append $paths->{log}: $!";
+    print {$fh} $text;
+    close $fh;
+    $self->{paths}->secure_file_permissions( $paths->{log} );
+    return $paths->{log};
+}
+
+# read_log($name)
+# Reads the collector log stream, falling back to the latest persisted output snapshot.
+# Input: collector name string.
+# Output: log text string or empty string when no log data exists yet.
+sub read_log {
+    my ( $self, $name ) = @_;
+    die 'Missing collector name' if !defined $name || $name eq '';
+    for my $file ( $self->_collector_file_candidates( $name, 'log' ) ) {
+        return _slurp($file) if -f $file;
+    }
+    return $self->_render_latest_log_entry($name);
 }
 
 # inspect_collector($name)
@@ -202,6 +264,75 @@ sub _first_existing_text_file {
         return _slurp($file) if -f $file;
     }
     return '';
+}
+
+# _render_latest_log_entry($name)
+# Synthesizes one collector log entry from the latest persisted output/state.
+# Input: collector name string.
+# Output: formatted log text string or an empty string when no persisted log data exists.
+sub _render_latest_log_entry {
+    my ( $self, $name ) = @_;
+    return '' if !$self->collector_exists($name);
+    my $status = $self->read_status($name) || {};
+    my $output = $self->read_output($name) || {};
+    return '' if !$self->_log_payload_present( $status, $output );
+    return $self->_format_log_entry(
+        name        => $name,
+        happened_at => $output->{last_run} || $status->{last_run} || $status->{last_completed_at} || $status->{last_started_at},
+        exit_code   => $status->{last_exit_code},
+        timed_out   => $status->{timed_out},
+        stdout      => $output->{stdout},
+        stderr      => $output->{stderr},
+        source      => 'latest state snapshot',
+    );
+}
+
+# _log_payload_present($status, $output)
+# Checks whether persisted collector state contains anything worth rendering as a log entry.
+# Input: status hash reference and output hash reference.
+# Output: boolean true when exit code, timestamps, or output content exist.
+sub _log_payload_present {
+    my ( $self, $status, $output ) = @_;
+    return 1 if grep { defined && $_ ne '' } map { $output->{$_} } qw(stdout stderr combined last_run);
+    return 1 if grep { defined } map { $status->{$_} } qw(last_exit_code last_run last_completed_at last_started_at timed_out);
+    return 0;
+}
+
+# _format_log_entry(%args)
+# Formats one collector log event into the human-readable CLI log stream.
+# Input: name, happened_at, exit_code, timed_out, stdout, stderr, error, and source fields.
+# Output: formatted log text string with trailing newline.
+sub _format_log_entry {
+    my ( $self, %args ) = @_;
+    my $name = $args{name} || die 'Missing collector name';
+    my $time = $args{happened_at} || 'unknown-time';
+    my @header = ( "=== collector $name", "\@ $time" );
+    push @header, 'exit=' . $args{exit_code} if defined $args{exit_code};
+    push @header, 'timed_out=1' if $args{timed_out};
+    push @header, 'source=' . $args{source} if defined $args{source} && $args{source} ne '';
+
+    my @chunks = ( join( ' | ', @header ) . " ===\n" );
+    if ( defined $args{stdout} && $args{stdout} ne '' ) {
+        push @chunks, "[stdout]\n", _with_trailing_newline( $args{stdout} );
+    }
+    if ( defined $args{stderr} && $args{stderr} ne '' ) {
+        push @chunks, "[stderr]\n", _with_trailing_newline( $args{stderr} );
+    }
+    if ( defined $args{error} && $args{error} ne '' ) {
+        push @chunks, "[error]\n", _with_trailing_newline( $args{error} );
+    }
+    push @chunks, "\n";
+    return join '', @chunks;
+}
+
+# _with_trailing_newline($text)
+# Ensures a text block ends with one newline for deterministic log formatting.
+# Input: text string.
+# Output: text string with a trailing newline.
+sub _with_trailing_newline {
+    my ($text) = @_;
+    $text = '' if !defined $text;
+    return $text =~ /\n\z/ ? $text : $text . "\n";
 }
 
 # _atomic_write_json($file, $data)
@@ -271,7 +402,7 @@ status records, and latest outputs.
 
 =head1 METHODS
 
-=head2 new, collector_paths, write_job, read_job, write_result, write_status, read_status, read_output, inspect_collector, list_collectors
+=head2 new, collector_paths, write_job, read_job, write_result, write_status, read_status, read_output, collector_exists, append_log_entry, read_log, inspect_collector, list_collectors
 
 Construct and manage collector storage.
 

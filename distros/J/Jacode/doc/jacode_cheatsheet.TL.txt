@@ -1,0 +1,120 @@
+################################################################################
+# Cheat Sheet ng Jacode (TL)
+# Jacode - Programa sa Perl para sa conversion ng Japanese character code
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ PAG-INSTALL
+
+  cpanm Jacode
+
+  O i-download ang Jacode.pm at jacode.pl mula sa https://metacpan.org/pod/Jacode
+  at ilagay ang dalawang file sa parehong direktoryo.
+
+■ PAGGAMIT
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # I-convert ang string sa lugar (pinaka-karaniwang paggamit)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # Mga return value (list context)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # Mga return value (scalar context)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # Mga wrapper function na nagbabalik ng value
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # Tukuyin ang encoding
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # Kontrol ng JIS escape sequence
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # Initialization
+  Jacode::init();
+
+  # Kontrol ng cache
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ MGA PANGALAN NG ENCODING
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (kasama ang CP932)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Binary (hindi maaaring i-convert)
+
+■ MGA OPSYON
+
+  'z'  ... Half-width kana → full-width kana (h2z)
+  'h'  ... Full-width kana → half-width kana (z2h)
+
+■ MGA JIS KANJI START SEQUENCE
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (default)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 plane 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 plane 1
+
+■ MGA HALIMBAWA NG CONVERSION
+
+  # Shift_JIS patungong UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP patungong Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # Awtomatikong pagtukoy ng input, output sa JIS
+  Jacode::convert(\$line, 'jis');
+
+  # I-convert ang half-width kana habang SJIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # I-convert ang lahat ng linya ng file
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ COMMAND LINE (pkf mode)
+
+  perl jacode.pl [opsyon] [-[INPUT]OUTPUT] mga file
+
+  perl jacode.pl file          # I-convert sa JIS
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # Mixed encoding → EUC-JP (dynamic)
+  perl jacode.pl -mc file      # I-convert at i-print ang encoding bawat linya
+
+  Mga opsyon:
+  -b  Buffered output (default)
+  -u  Unbuffered output
+  -m  Dynamic na pagtukoy ng input encoding
+  -c  I-print ang pangalan ng encoding
+  -Z  Half-width kana → full-width
+  -H  Full-width kana → half-width
+  -f [unix|mac|dos]  I-convert ang line endings
+
+■ COMPATIBILITY SA jcode.pl
+
+  Ang Jacode ay compatible sa jcode.pl ni Utashiro.
+  Ang mga alias ng namespace na jcode:: ay magagamit din.
+
+################################################################################

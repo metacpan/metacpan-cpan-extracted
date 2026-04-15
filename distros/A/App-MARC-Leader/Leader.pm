@@ -6,10 +6,10 @@ use warnings;
 use Class::Utils qw(set_params);
 use Getopt::Std;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
-use MARC::Leader;
+use MARC::Leader 0.06;
 use MARC::Leader::Print;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -41,18 +41,20 @@ sub run {
 		'd' => 0,
 		'f' => undef,
 		'h' => 0,
+		'v' => undef,
 	};
-	if (! getopts('adf:h', $self->{'_opts'})
-		|| (! $self->{'_opts'}->{'f'} && ! defined $marc_leader)
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('adf:hv', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| (! $self->{'_opts'}->{'f'} && ! defined $marc_leader)) {
 
-		print STDERR "Usage: $0 [-a] [-d] [-f marc_xml_file] [-h] [--version] [leader_string]\n";
+		print STDERR "Usage: $0 [-a] [-d] [-f marc_xml_file] [-h] [-v] [--version] [leader_string]\n";
 		print STDERR "\t-a\t\t\tPrint with ANSI colors (or use NO_COLOR/COLOR env variables).\n";
 		print STDERR "\t-d\t\t\tDon't print description.\n";
 		print STDERR "\t-f marc_xml_file\tMARC XML file.\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
+		print STDERR "\t-v\t\t\tVerbose mode.\n";
 		print STDERR "\t--version\t\tPrint version.\n";
-		print STDERR "\tleader_string\t\tMARC Leader string.\n";
+		print STDERR "\t[leader_string]\t\tMARC Leader string.\n";
 		return 1;
 	}
 
@@ -63,7 +65,9 @@ sub run {
 	}
 
 	# Parse MARC leader.
-	my $leader = MARC::Leader->new->parse($marc_leader);
+	my $leader = MARC::Leader->new(
+		'verbose' => $self->{'_opts'}->{'v'},
+	)->parse($marc_leader);
 
 	# Print information.
 	print scalar MARC::Leader::Print->new(
@@ -86,7 +90,7 @@ __END__
 
 =head1 NAME
 
-App::MARC::Leader - Base class for marc-leader script.
+App::MARC::Leader - Base class for marc-leader tool.
 
 =head1 SYNOPSIS
 
@@ -378,12 +382,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

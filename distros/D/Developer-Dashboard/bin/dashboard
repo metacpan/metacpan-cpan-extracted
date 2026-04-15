@@ -386,7 +386,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard collector job <name>
   dashboard collector output <name>
   dashboard collector inspect <name>
-  dashboard collector log
+  dashboard collector log [name]
   dashboard collector run <name>
   dashboard collector start <name>
   dashboard collector stop <name>

@@ -13,13 +13,18 @@ use Test::More;
 use Test::Differences;
 use Capture::Tiny qw(capture_stderr);
 
+my $testDir = "$FindBin::Bin/examples";
+
 use_ok("MOP4Import::Util::Inspector");
 
-my $testDir = "$FindBin::Bin/examples";
+my $inspectorFn = $INC{"MOP4Import/Util/Inspector.pm"};
+my $distLib = dirname(dirname(dirname(File::Spec->rel2abs($inspectorFn))));
+
+my @run = ($^X, "-I$distLib");
 
 {
   eq_or_diff(scalar(capture_stderr {
-    system $^X ($^X, "-I$testDir", "$testDir/t_Bar.pm")
+    system $^X (@run, "-I$testDir", "$testDir/t_Bar.pm")
   }), <<'END', "cmd_help");
 Usage: t_Bar.pm [--opt=value].. <Command> ARGS...
 
@@ -43,8 +48,11 @@ END
 }
 
 {
+  my $clijsonFn = $INC{"MOP4Import/Base/CLI_JSON.pm"};
+  my $distLib = dirname(dirname(dirname(File::Spec->rel2abs($clijsonFn))));
+
   eq_or_diff(scalar(capture_stderr {
-    system $^X ($^X, "$testDir/../../Base/CLI_JSON.pm", "unknown_method")
+    system $^X (@run, $clijsonFn, "unknown_method")
   }), <<'END', "cmd_help unknown_method");
 Error: No such subcommand 'unknown_method'
 

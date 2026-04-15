@@ -16,7 +16,7 @@ if($Config{nvsize} == 8) {
   # 1.7976931348623157e308 to $nv_max would
   # result in $nv_max being set to 'Inf'.
   # Luckily, on those perls, POSIX::DBL_MAX is available
-  # and has already assigned the correct value.
+  # and has already been assigned the correct value.
 
   $nv_max = 1.7976931348623157e308
      unless $nv_max;
@@ -33,6 +33,25 @@ else {
     $nv_max = 1.18973149535723176502e4932
       if $nv_max == 99 ** (99 ** 99);
   }
+}
+
+my $exclude = 0;
+my $ok = 1;
+
+if($Config{nvtype} eq 'long double' && $Config{nvsize} > 8) {
+
+  if(length(sqrt(2.0)) < 30) {
+    $exclude = 196869; # This value identifies version 3.1.5 of the mpfr library.
+                       # On libraries earlier than 3.1.5, handling of subnormals is
+                       # buggy when the NV is the 80-bit extended precision long double.
+    }
+    else {
+    $exclude = 262659; # This value identifies version 4.2.3 of the mpfr library.
+                       # On libraries earlier than 4.2.3, handling of subnormals
+                       # is buggy when the NV is the IEEE 754 long double.
+                       # At time of writing, the latest stable release is 4.2.2.
+                       # It's likely that the next release will be 4.3.0, not 4.2.3.
+    }
 }
 
 $prec = 128; # Cover precisions of all NV's
@@ -85,16 +104,9 @@ if($@) {
 elsif($Math::MPFR::VERSION < 3.36) {
   _skipper ("need at least version 3.36 of Math::MPFR, have only $Math::MPFR::VERSION");
 }
-elsif(Math::MPFR::MPFR_VERSION() <= 196868 && $Config{nvtype} ne 'double') { # less than 3.1.5
-   # MPFR library doesn't round subnormal long doubles reliably
-   _skipper("mpfr-" . Math::MPFR::MPFR_VERSION_STRING() . " not reliable for these tests, need at least 3.1.5");
-}
 else {
-
   warn "\nUsing Math::MPFR::VERSION $Math::MPFR::VERSION\n";
   warn "Using MPFR library version ", Math::MPFR::MPFR_VERSION_STRING(), "\n";
-
-  my $ok = 1;
 
   Math::MPFR::Rmpfr_set_default_prec($prec);
 
@@ -113,6 +125,7 @@ else {
       }
       my $mpf  = Math::GMPf->new($str, -2);
       my $mpfr = Math::MPFR->new($str,  2);
+      if($exclude && abs($mpfr) < 2 ** -16382) {  next if $exclude > Math::MPFR::MPFR_VERSION() }
 
       # To check the functionality of the below if{} block,
       # uncommenting the next line will force the required inequality:
@@ -152,6 +165,8 @@ else {
 
       my $mpf  = Math::GMPf->new($str, -2);
       my $mpfr = Math::MPFR->new();
+      if($exclude && abs($mpfr) < 2 ** -16382) {  next if $exclude > Math::MPFR::MPFR_VERSION() }
+
       Math::MPFR::Rmpfr_set_str($mpfr, $str, 2, 1); # Round towards zero.
 
       my $mpf_d  = Rmpf_get_NV($mpf);
@@ -308,7 +323,6 @@ else {
     cmp_ok($mpf_nv, '==', $mpfr_nv, "$s:\nRetrieved NVs are equivalent");
 
   }
-
 }
 
 done_testing();
@@ -333,4 +347,5 @@ sub _skipper {
   warn "\n Skipping remaining test - $_[0]\n";
 }
 
-
+__END__
+if($exclude && $value < 2 ** -16382) {  next if Math::MPFR::MPFR_VERSION() < $exclude) }

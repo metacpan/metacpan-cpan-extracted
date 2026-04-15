@@ -1,0 +1,120 @@
+################################################################################
+# Jacode ඉක්මන් යොමු පත්‍රය (SI)
+# Jacode - ජපන් අක්ෂර කේත පරිවර්තනය සඳහා Perl වැඩසටහන
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ ස්ථාපනය
+
+  cpanm Jacode
+
+  නැතහොත් https://metacpan.org/pod/Jacode වෙතින් Jacode.pm සහ jacode.pl
+  බාගත කර ගොනු දෙකම එකම නාමාවලියකට දමන්න.
+
+■ භාවිතය
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # තන්තුව එතැනම පරිවර්තනය කරන්න (බහුලව භාවිතා වන ක්‍රමය)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # ආපසු අගයන් (ලැයිස්තු සන්දර්භය)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # ආපසු අගය (ස්කේලාර් සන්දර්භය)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # අගය ආපසු ලබාදෙන wrapper ශ්‍රිත
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # කේතනය හඳුනා ගන්න
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS escape අනුක්‍රමය පාලනය
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # ආරම්භ කිරීම
+  Jacode::init();
+
+  # cache පාලනය
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ කේතන නාම
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 ඇතුළත්)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... ද්විමය (පරිවර්තනය කළ නොහැකි)
+
+■ විකල්ප
+
+  'z'  ... අඩු-පළල kana → සම්පූර්ණ-පළල kana (h2z)
+  'h'  ... සම්පූර්ණ-පළල kana → අඩු-පළල kana (z2h)
+
+■ JIS kanji ආරම්භ අනුක්‍රම
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (පෙරනිමිය)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 තලය 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 තලය 1
+
+■ පරිවර්තන නිදර්ශන
+
+  # Shift_JIS සිට UTF-8 දක්වා
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP සිට Shift_JIS දක්වා
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # ආදානය ස්වයංක්‍රීයව හඳුනා ගෙන JIS ලෙස ප්‍රතිදානය
+  Jacode::convert(\$line, 'jis');
+
+  # SJIS → UTF-8 කරන අතරතුර අඩු-පළල kana ද පරිවර්තනය
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # ගොනුවේ සියලුම රේඛා පරිවර්තනය
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ විධාන රේඛාව (pkf ප්‍රකාරය)
+
+  perl jacode.pl [විකල්ප] [-[ආදාන]ප්‍රතිදාන] ගොනු
+
+  perl jacode.pl file          # JIS ලෙස පරිවර්තනය
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # මිශ්‍ර කේතනය → EUC-JP (ගතික)
+  perl jacode.pl -mc file      # පරිවර්තනය කර රේඛාවකට කේතන නම මුද්‍රණය
+
+  විකල්ප:
+  -b  buffer සහිත ප්‍රතිදානය (පෙරනිමිය)
+  -u  buffer රහිත ප්‍රතිදානය
+  -m  ගතික ආදාන කේතන හඳුනාගැනීම
+  -c  කේතන නාමය මුද්‍රණය
+  -Z  අඩු-පළල kana → සම්පූර්ණ-පළල
+  -H  සම්පූර්ණ-පළල kana → අඩු-පළල
+  -f [unix|mac|dos]  රේඛා අවසාන පරිවර්තනය
+
+■ jcode.pl අනුකූලතාව
+
+  Jacode, Utashiro ගේ jcode.pl සමග අනුකූල වේ.
+  jcode:: namespace aliases ද භාවිතා කළ හැකිය.
+
+################################################################################

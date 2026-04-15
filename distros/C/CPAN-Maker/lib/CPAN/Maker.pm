@@ -3,7 +3,7 @@ package CPAN::Maker;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.2';
+our $VERSION = '1.7.5';
 
 1;
 
@@ -94,11 +94,12 @@ C<Makefile.PL> and before creating your CPAN distribution.
 
 This script is typically called with the C<--buildspec> option
 specifying a YAML file that contains the options for building a CPAN
-distribution.  Calling this script directly will only result in a
-C<Makefile.PL> being written to STDOUT.
+distribution.  Calling this script without the C<--buildspec> option
+will only result in a C<Makefile.PL> being written to STDOUT.
 
-When invoked with a buildspec it will parse the YAML file and call
-the C<make-cpan-dist> bash script that actually creates the CPAN distribution.
+When invoked with a buildspec it will parse the YAML file and call the
+C<make-cpan-dist> bash script that actually creates the CPAN
+distribution.
 
 See man CPAN::Maker for more details.
 
@@ -108,20 +109,20 @@ See man CPAN::Maker for more details.
 
 =item PRESERVE_MAKEFILE
 
-Set this environment variable to a true value if you want
-the script to preserve the F<Makefile.PL>. It will be copied to your
-current working directory.
+Set this environment variable to a true value if you want the script
+to preserve the F<Makefile.PL> after it builds the distribution
+(useful for inspecting the result of the build). It will be copied to
+your current working directory.
 
 =item SKIP_TESTS
 
-Set this environment variable a true value if you want
-the script to preserve the F<Makefile.PL>. It will be copied to your
+Set this environment variable to skip tests during the build.
 
 =item DEBUG
 
-Set this environment variable to set the debug level to verbose. The
-bash script will echo all commands run. This is useful for debugging
-problems that might arise if you "go off script"
+Set this environment variable to enable debug mode. The bash script
+will echo all commands run. This is useful for debugging unexpected
+output or problems with the final distribution.
 
 =back
 
@@ -129,7 +130,7 @@ problems that might arise if you "go off script"
 
 =head1 VERSION
 
-This documentation refers to version 1.7.2
+This documentation refers to version 1.7.5
 
 =head1 USING THE BASH SCRIPT
 
@@ -326,7 +327,7 @@ main module being packaged.
 
 Example:
 
-  version: 1.7.2
+  version: 1.7.5
   project:
     git: https://github.com/rlauer6/perl-Amazon-Credentials
     description: "AWS credentials discoverer"

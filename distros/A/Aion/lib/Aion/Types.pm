@@ -83,8 +83,6 @@ sub subtype(@) {
 		die "subtype $subtype: awhere is excess" if $awhere;
 	}
 
-	die "subtype $subtype: needs a where" if $is_arg && !($where || $awhere);
-
 	my $init_types = do { given($is_arg) {
 		$INIT_ARGS when /^[A-Z]\w*(,\s*[A-Z]\w*)?\.\.\.$/;
 		$INIT_KW_ARGS when /^[a-z]\w*\s*=>\s*[A-Z],?\s*\.\.\.$/;
@@ -134,7 +132,7 @@ sub subtype(@) {
 }
 }
 
-sub as($) { (as => @_) }
+sub as(@) { (as => @_) }
 sub init_where(&@) { (init_where => @_) }
 sub where(&@) { (where => @_) }
 sub awhere(&@) { (awhere => @_) }
@@ -426,13 +424,13 @@ subtype "Any";
 	coerce &Int => from &Num => via { int($_+($_ < 0? -.5: .5)) };
 	coerce &Bool => from &Any => via { !!$_ };
 	
-	subtype 'Join[separator]', as &Str, where { 1 };
+	subtype 'Join[separator]', as &Str;
 	coerce &Join, from &ArrayRef, via { join A, @$_ };
 	
-	subtype 'Split[separator]', as &ArrayRef, where { 1 };
+	subtype 'Split[separator]', as &ArrayRef;
 	coerce &Split, from &Str, via { [split A, $_] };
 	
-	subtype "Rat", as 'Math::BigRat', where { 1 };
+	subtype "Rat", as 'Math::BigRat';
 	coerce &Rat => from &StrRat => via { Math::BigRat->new($_) };
 };
 
@@ -633,10 +631,6 @@ Uses C<$code> as a test. The value for the test is passed to C<$_>.
 	2 ~~ Two # -> 1
 	3 ~~ Two # -> ""
 
-Used with C<subtype>. Required if the type has arguments.
-
-	subtype 'Ex[a]' # @-> subtype Ex[a]: needs a where
-
 =head2 awhere ($code)
 
 Used with C<subtype>.
@@ -716,7 +710,9 @@ Used with C<subtype> to print an error message if the value excludes the type. C
 
 Adds a new cast (C<$via>) to C<$type> from C<$from> type.
 
-	BEGIN {subtype Four => where {4 eq $_}}
+	BEGIN {
+		subtype Four => where {4 eq $_};
+	}
 	
 	"4a" ~~ Four # -> ""
 	
@@ -731,6 +727,17 @@ Adds a new cast (C<$via>) to C<$type> from C<$from> type.
 	Four->coerce([1,2,3])           # -> 3
 	Four->coerce([1,2,3]) ~~ Four   # -> ""
 	Four->coerce([1,2,3,4]) ~~ Four # -> 1
+
+Can use parameters like:
+
+	BEGIN {
+		subtype 'Plus[acc]', as Num;
+	}
+	coerce &Plus, from Num, via { $_ + A };
+	
+	Plus([5])->coerce(4) # -> 9
+	Plus([5]) >> 5 # -> 10
+	1 >> Plus[5] # -> 6
 
 C<coerce> throws exceptions:
 

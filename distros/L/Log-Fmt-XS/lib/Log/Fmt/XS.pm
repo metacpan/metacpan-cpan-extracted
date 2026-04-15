@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Fmt::XS 0.001;
+package Log::Fmt::XS 0.002;
 
 use parent 'Log::Fmt';
 
@@ -32,7 +32,7 @@ Log::Fmt::XS - XS components to speed up Log::Fmt
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

@@ -3,12 +3,13 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '2.35';
+our $VERSION = '2.37';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use File::Spec;
 use POSIX qw(setsid strftime);
+use Template;
 use Time::HiRes qw(sleep time);
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
@@ -88,6 +89,31 @@ sub run_once {
         timeout_ms => $job->{timeout_ms} || ( $job->{timeout} ? $job->{timeout} * 1000 : undef ),
     );
 
+    my $indicator_payload;
+    if ( $self->{indicators} && ref( $job->{indicator} ) eq 'HASH' ) {
+        $indicator_payload = $self->{indicators}->collector_indicator_candidate(
+            $job,
+            status => $exit_code ? 'error' : 'ok',
+        );
+        my $materialized = eval {
+            $self->_materialize_indicator_state(
+                job       => $job,
+                indicator => $indicator_payload,
+                stdout    => $stdout,
+            );
+        };
+        if ( !$materialized ) {
+            my $error = "$@";
+            $error =~ s/\s+\z//;
+            $stderr = $self->_append_error_text( $stderr, $error );
+            $exit_code = 255 if !$exit_code;
+            $indicator_payload->{status} = 'error';
+        }
+        else {
+            $indicator_payload = $materialized;
+        }
+    }
+
     $self->{collectors}->write_result(
         $name,
         exit_code => $exit_code,
@@ -98,20 +124,11 @@ sub run_once {
         output_format => $job->{output_format},
         timed_out  => $timed_out,
     );
-    if ( $self->{indicators} && ref( $job->{indicator} ) eq 'HASH' ) {
-        my $indicator_name = $job->{indicator}{name} || $name;
-        my $indicator_label = defined $job->{indicator}{label} && $job->{indicator}{label} ne ''
-          ? $job->{indicator}{label}
-          : $indicator_name;
+    if ($indicator_payload) {
+        $indicator_payload->{status} = $exit_code ? 'error' : 'ok';
         $self->{indicators}->set_indicator(
-            $indicator_name,
-            %{ $job->{indicator} },
-            name => $indicator_name,
-            label => $indicator_label,
-            collector_name => $name,
-            managed_by_collector => 1,
-            status => $exit_code ? 'error' : 'ok',
-            prompt_visible => exists $job->{indicator}{prompt_visible} ? $job->{indicator}{prompt_visible} : 1,
+            $indicator_payload->{name},
+            %{$indicator_payload},
         );
     }
 
@@ -122,6 +139,82 @@ sub run_once {
         stderr    => $stderr,
         timed_out => $timed_out ? 1 : 0,
     };
+}
+
+# _materialize_indicator_state(%args)
+# Renders TT-backed collector indicator fields into their live persisted values.
+# Input: collector job hash, normalized indicator hash, and stdout text.
+# Output: normalized indicator hash reference with rendered live values.
+sub _materialize_indicator_state {
+    my ( $self, %args ) = @_;
+    my $job       = $args{job}       || die 'Missing collector job';
+    my $indicator = $args{indicator} || die 'Missing indicator payload';
+    my %materialized = %{$indicator};
+
+    if ( defined $materialized{icon_template} && $materialized{icon_template} ne '' ) {
+        $materialized{icon} = $self->_render_indicator_icon_template(
+            collector_name => $job->{name},
+            template       => $materialized{icon_template},
+            stdout         => $args{stdout},
+        );
+    }
+
+    return \%materialized;
+}
+
+# _render_indicator_icon_template(%args)
+# Renders one collector indicator icon TT template against stdout JSON.
+# Input: collector_name string, TT template string, and stdout JSON text.
+# Output: rendered icon string.
+sub _render_indicator_icon_template {
+    my ( $self, %args ) = @_;
+    my $collector_name = $args{collector_name} || die 'Missing collector name';
+    my $template_text  = $args{template}       || die 'Missing indicator icon template';
+    my $vars = $self->_indicator_template_vars(
+        collector_name => $collector_name,
+        stdout         => $args{stdout},
+    );
+    my $tt = Template->new();
+    my $rendered = '';
+    $tt->process( \$template_text, $vars, \$rendered )
+      or die sprintf "Collector '%s' indicator icon template failed: %s\n", $collector_name, $tt->error();
+    return $rendered;
+}
+
+# _indicator_template_vars(%args)
+# Decodes collector stdout JSON into the TT variable set for indicator
+# templates.
+# Input: collector_name string and stdout JSON text.
+# Output: hash reference of template variables.
+sub _indicator_template_vars {
+    my ( $self, %args ) = @_;
+    my $collector_name = $args{collector_name} || die 'Missing collector name';
+    my $stdout = defined $args{stdout} ? $args{stdout} : '';
+    my $decoded = eval { json_decode($stdout) };
+    if ($@) {
+        my $error = "$@";
+        $error =~ s/\s+\z//;
+        die sprintf "Collector '%s' indicator icon template requires collector stdout JSON: %s\n", $collector_name, $error;
+    }
+
+    my %vars = ( data => $decoded );
+    if ( ref($decoded) eq 'HASH' ) {
+        %vars = ( %vars, %{$decoded} );
+    }
+    return \%vars;
+}
+
+# _append_error_text($stderr, $error)
+# Appends one explicit runtime error line to captured stderr text.
+# Input: existing stderr text and error text string.
+# Output: merged stderr text string.
+sub _append_error_text {
+    my ( $self, $stderr, $error ) = @_;
+    $stderr = '' if !defined $stderr;
+    $error  = '' if !defined $error;
+    return $stderr if $error eq '';
+    $stderr .= "\n" if $stderr ne '' && $stderr !~ /\n\z/;
+    return $stderr . $error . "\n";
 }
 
 # _collector_source($job)
@@ -276,6 +369,12 @@ sub _run_loop_child {
             my $error = "$@";
             my $message = sprintf "[%s][%s] %s\n", _now_iso8601(), $name, $error;
             $self->{files}->append( 'collector_log', $message );
+            $self->{collectors}->append_log_entry(
+                $name,
+                happened_at => _now_iso8601(),
+                error       => $error,
+                source      => 'loop error',
+            );
             $self->_write_loop_state(
                 $name,
                 {
@@ -692,7 +791,8 @@ Developer::Dashboard::CollectorRunner - collector execution and loop management
 
 This module runs collector jobs on demand and as managed background loops. It
 handles scheduling, timeout enforcement, process naming, persisted loop
-state, shell-command collectors, and Perl-code collectors.
+state, shell-command collectors, Perl-code collectors, and TT-backed
+collector indicator icon rendering from stdout JSON.
 
 =head1 METHODS
 
@@ -704,7 +804,7 @@ Construct and manage collector execution.
 
 =head1 PURPOSE
 
-This module manages live collector execution. It turns stored collector jobs into processes, captures their output, updates collector state files, tracks pid ownership, and exposes the start/stop/restart/run/status lifecycle used by the CLI and web-facing status features.
+This module manages live collector execution. It turns stored collector jobs into processes, captures their output, updates collector state files, renders TT-backed collector indicator icons from stdout JSON when configured, tracks pid ownership, and exposes the start/stop/restart/run/status lifecycle used by the CLI and web-facing status features.
 
 =head1 WHY IT EXISTS
 
@@ -712,11 +812,11 @@ It exists because collector process control is more than a single C<system()> ca
 
 =head1 WHEN TO USE
 
-Use this file when changing collector process spawning, pid validation, restart semantics, background job cleanup, or the contract between collector execution and the persisted collector state.
+Use this file when changing collector process spawning, pid validation, restart semantics, background job cleanup, TT-backed indicator icon rendering, or the contract between collector execution and the persisted collector state.
 
 =head1 HOW TO USE
 
-Construct it with the path registry and collector store, then call the lifecycle methods for one collector name. Keep process-management behavior here; the CLI wrappers should only parse arguments and print the returned state.
+Construct it with the path registry and collector store, then call the lifecycle methods for one collector name. Keep process-management behavior and TT-backed collector icon rendering here; the CLI wrappers should only parse arguments and print the returned state.
 
 =head1 WHAT USES IT
 

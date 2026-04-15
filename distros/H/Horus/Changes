@@ -1,5 +1,9 @@
 Revision history for Horus
 
+0.06    2026-04-15
+        - Fix assertion failures on -DDEBUGGING perls: use OP_NULL
+          for newUNOP/newBINOP then set op_type to OP_CUSTOM
+
 0.05    2026-04-11
         - Refactor custom ops to use proper op tree restructuring
         - Cleaner pp functions using TOPs/POPs instead of POPMARK

@@ -1,11 +1,11 @@
-.# README
+# README
 
 ![badge](https://github.com/rlauer6/make-cpan-dist/actions/workflows/build.yml/badge.svg)
 
 This project is yet another attempt to create a repeatable, __easy to
 use__ script for creating CPAN distributions.
 
-!! NEW !!
+*!! NEW !!*
 
 > Checkout
 > [CPAN::Maker::Bootstrapper](https://github.com/rlauer6/CPAN-Maker-Bootstrapper.git)
@@ -27,6 +27,7 @@ make
 
 # Table of Contents
 
+* [README](#readme)
 * [Overview](#overview)
 * [Quick Start](#quick-start)
 * [More Details](#more-details)
@@ -100,7 +101,7 @@ Then to create a CPAN distribution:
 ```
 cd cpan
 make cpan
-cpanm -n -v CPAN-Maker-1.7.2.tar.
+cpanm -n -v CPAN-Maker-1.7.2.tar
 ```
 
 [Back to Table of Contents](#table-of-contents)

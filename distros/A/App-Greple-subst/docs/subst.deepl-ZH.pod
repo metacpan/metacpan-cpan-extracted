@@ -6,7 +6,7 @@ subst - 用于文本搜索和替换的Greple模块
 
 =head1 VERSION
 
-Version 2.3701
+Version 2.3702
 
 =head1 SYNOPSIS
 

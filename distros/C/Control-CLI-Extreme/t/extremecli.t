@@ -52,6 +52,7 @@ my %Cmd = (		# CLI commands to test with (output should be long enough to be mor
 			HiveOS			=> 'show running-config | exclude "console page"',
 			Ipanema			=> 'ifconfig',
 			EnterasysOS		=> 'show running-config all',
+			OneOS			=> 'show version', # OneOS will always fail test 65, comparing output taken with and without more paging..
 );
 my %CmdRefreshed = (	# CLI commands whose output is refreshed; to test that we can exit the refresh
 			PassportERS_cli		=> 'monitor ports stats interface utilization',
@@ -63,6 +64,7 @@ my $PollInterval	= 0.1;		# If testing non-blocking mode, we print a dot to scree
 my $DataWithError	= 0;
 my $SendWakeConsole	= undef;	# Set to 0 to always disable Sending Wake Console string; set to 1 to force sending it (needed with Telnet to XOS with banner before-login with acknowledge enabled)
 my $WakeConsoleString	= undef;	# When undef, default '\n' is used; set to "\n\n" if connecting via serial port to XOS with banner before-login with acknowledge enabled
+my $WindowSize		= [132, 24];	# SLX and OneOS will wrap output lines if they exceed the width value
 my $Debug		= 0; # 13 is good
 ############################################################
 
@@ -177,7 +179,15 @@ sub attribute { # Read, test, print and return a attribute
 sub checkCallback { # Connect() callback
 	my ($blocking, $cli) = @_;
 	my $ssh2 = $cli->parent;
-	my @types = ('LIBSSH2_HOSTKEY_TYPE_UNKNOWN', 'LIBSSH2_HOSTKEY_TYPE_RSA', 'LIBSSH2_HOSTKEY_TYPE_DSS');
+	my @types = ( # From https://github.com/libssh2/libssh2/blob/master/include/libssh2.h
+		'LIBSSH2_HOSTKEY_TYPE_UNKNOWN',		# 0
+		'LIBSSH2_HOSTKEY_TYPE_RSA',		# 1
+		'LIBSSH2_HOSTKEY_TYPE_DSS',		# 2
+		'LIBSSH2_HOSTKEY_TYPE_ECDSA_256',	# 3
+		'LIBSSH2_HOSTKEY_TYPE_ECDSA_384',	# 4
+		'LIBSSH2_HOSTKEY_TYPE_ECDSA_521',	# 5
+		'LIBSSH2_HOSTKEY_TYPE_ED25519',		# 6
+	);
 	my ($key, $type) = $ssh2->remote_hostkey;
 	print "\n" unless $blocking;
 	ok( defined $types[$type], "Testing callback can retrieve host key" );
@@ -282,6 +292,7 @@ do {{ # Test loop, we keep testing until user satisfied
 			Data_with_error		=> $DataWithError,	# optional; used by my acli.pl
 			Console			=> $SendWakeConsole,	# optional; needed with Telnet if XOS has banner before-login with acknowledge
 			Wake_console		=> $WakeConsoleString,	# optional;
+			Window_size		=> $WindowSize,		# optional;
 			Input_log		=> $InputLog,
 			Output_log		=> $OutputLog,
 			Dump_log		=> $DumpLog,
@@ -442,6 +453,7 @@ do {{ # Test loop, we keep testing until user satisfied
 	attribute($cli, 'model',1); # might be undefined if executed on a Standby CPU
 	attribute($cli, 'sysname',1); # might be undefined if executed on a Standby CPU
 	attribute($cli, 'base_mac',1); # might be undefined (if executed on a Standby CPU or some products)
+	attribute($cli, 'serial_number',1); # might be undefined on some older family_types
 	attribute($cli, 'is_apls',1); # will be undefined on non-PassportERS products
 	attribute($cli, 'is_voss',1); # will be undefined on non-PassportERS products
 	attribute($cli, 'is_xos',1); # will be undefined on non-ExtremeXOS products
@@ -450,6 +462,7 @@ do {{ # Test loop, we keep testing until user satisfied
 	attribute($cli, 'is_hiveos',1); # will be undefined on non-HiveOS products
 	attribute($cli, 'is_sdwan',1); # will be undefined on non-Ipanema products
 	attribute($cli, 'is_eos',1); # will be undefined on non-EnterasysOS products
+	attribute($cli, 'is_oneos',1); # will be undefined on non-OneOS products
 	$slx = attribute($cli, 'is_slx',1); # will be undefined on non-SLX products
 	if ($slx) {
 		attribute($cli, 'is_slx_r',1); # will be undefined on non-SLX products
@@ -525,6 +538,13 @@ do {{ # Test loop, we keep testing until user satisfied
 		attribute($cli, 'oob_standby_ip',1); # might be undefined
 		attribute($cli, 'is_oob_connected',1); # might be undefined
 	}
+	elsif ($familyType eq 'EnterasysOS') {
+		attribute($cli, 'stp_mode');
+	}
+	elsif ($familyType eq 'OneOS') {
+		attribute($cli, 'oob_ip',1); # might be undefined
+		attribute($cli, 'is_oob_connected');
+	}
 	elsif ($familyType eq 'Accelar') {
 		attribute($cli, 'is_master_cpu');
 		attribute($cli, 'is_dual_cpu');
@@ -585,7 +605,7 @@ do {{ # Test loop, we keep testing until user satisfied
 					Return_result		=>	1,
 				);
 		}
-		elsif ($familyType eq 'ISWmarvell' || $familyType eq 'EnterasysOS') {
+		elsif ($familyType eq 'ISWmarvell' || $familyType eq 'EnterasysOS' || $familyType eq 'OneOS') {
 			($ok, $result) = $cli->cmd(
 					Command			=>	'configure',
 					Return_result		=>	1,

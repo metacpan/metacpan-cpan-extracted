@@ -1,5 +1,13 @@
 Revision history for Enum-Declare
 
+0.06	2026-04-14
+	- Simplify cross-platform linking: rely on Object::Proto RTLD_GLOBAL
+	  (dl_load_flags) instead of explicit .so linking
+	- Remove XSMULTI in favour of top-level Declare.xs
+
+0.05	2026-04-15
+	- Adds enumSet keyword that allows you to create enum sets via Enum::Declare::Set
+
 0.04	2026-04-14
 	- Add :Type attribute for opt-in Object::Proto type registration
 

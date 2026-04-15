@@ -196,12 +196,6 @@ local ($::_g0 = do {2 ~~ Two}, $::_e0 = do {1}); ::ok defined($::_g0) == defined
 local ($::_g0 = do {3 ~~ Two}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '3 ~~ Two # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# Используется с `subtype`. Необходимо, если у типа есть аргументы.
-# 
-
-eval {subtype 'Ex[a]'}; local ($::_g0 = $@, $::_e0 = 'subtype Ex[a]: needs a where'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, 'subtype \'Ex[a]\' # @-> subtype Ex[a]: needs a where' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
-
-# 
 # ## awhere ($code)
 # 
 # Используется с `subtype`.
@@ -290,7 +284,9 @@ local ($::_g0 = do {"" . BeginAndEnd["Hi,", "!"]}, $::_e0 = "BeginAndEnd['Hi,', 
 # Добавляет новое приведение (`$via`) к `$type` из `$from` типа.
 # 
 ::done_testing; }; subtest 'coerce ($type, from => $from, via => $via)' => sub { 
-BEGIN {subtype Four => where {4 eq $_}}
+BEGIN {
+	subtype Four => where {4 eq $_};
+}
 
 local ($::_g0 = do {"4a" ~~ Four}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"4a" ~~ Four # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
@@ -305,6 +301,19 @@ coerce Four, from ArrayRef, via { scalar @$_ };
 local ($::_g0 = do {Four->coerce([1,2,3])}, $::_e0 = do {3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Four->coerce([1,2,3])           # -> 3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {Four->coerce([1,2,3]) ~~ Four}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Four->coerce([1,2,3]) ~~ Four   # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {Four->coerce([1,2,3,4]) ~~ Four}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Four->coerce([1,2,3,4]) ~~ Four # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# Может использовать параметры типа:
+# 
+
+BEGIN {
+	subtype 'Plus[acc]', as Num;
+}
+coerce &Plus, from Num, via { $_ + A };
+
+local ($::_g0 = do {Plus([5])->coerce(4)}, $::_e0 = do {9}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Plus([5])->coerce(4) # -> 9' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Plus([5]) >> 5}, $::_e0 = do {10}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Plus([5]) >> 5 # -> 10' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {1 >> Plus[5]}, $::_e0 = do {6}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '1 >> Plus[5] # -> 6' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # `coerce` выбрасывает исключения:

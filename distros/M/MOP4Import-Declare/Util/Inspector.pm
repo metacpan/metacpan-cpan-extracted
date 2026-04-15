@@ -317,10 +317,15 @@ sub info_methods :method {
 sub require_module {
   (my MY $self, my ($moduleName, @inc)) = @_;
 
+  my $fn = Module::Runtime::module_notional_filename($moduleName);
+
+  # Use symtab test to avoid require_module() against already loaded modules.
   # In modulino, cmd_help may be called during module loading.
   # At that time, $INC{$moduleFileName} is not yet initialized.
-  # This leads to double-require. To avoid this, use symtab check.
-  return $moduleName if MOP4Import::Util::maybe_symtab($moduleName);
+  # This leads to double-require.
+  if (MOP4Import::Util::maybe_symtab($moduleName)) {
+    return wantarray ? ($moduleName => $INC{$fn}) : $moduleName;
+  }
 
   @inc = map {split /:/} MOP4Import::Util::lexpand($self->{lib})
     if not @inc and ref $self;
@@ -329,7 +334,6 @@ sub require_module {
     local @INC = (@inc, @INC);
     Module::Runtime::require_module($moduleName);
   }
-  my $fn = Module::Runtime::module_notional_filename($moduleName);
   wantarray ? ($moduleName => $INC{$fn}) : $moduleName;
 }
 
@@ -341,10 +345,31 @@ sub list_validator_in_module {
   MOP4Import::Util::list_validator($realType);
 }
 
+sub list_module_path {
+  (my MY $self, my @modName) = @_;
+  my %modules;
+  foreach my $modName (@modName) {
+    (undef, my $path) = $self->require_module($modName);
+    $modules{$modName} = $path;
+  }
+  \%modules
+}
+
+sub list_module_version {
+  (my MY $self, my @modName) = @_;
+  my %modules;
+  foreach my $modName (@modName) {
+    $self->require_module($modName);
+    $modules{$modName} = $modName->VERSION;
+  }
+  \%modules
+}
+
 unless (caller) {
   # To avoid redefinition wornings:
   # cli_run -> cli_help -> cli_inspector -> require MOP4Import::Util::Inspector;
-  $INC{"MOP4Import/Util/Inspector.pm"} = __FILE__;
+  require File::Spec;
+  $INC{"MOP4Import/Util/Inspector.pm"} = File::Spec->rel2abs(__FILE__);
 
   MY->cli_run(\@ARGV);
 }

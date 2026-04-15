@@ -196,12 +196,6 @@ BEGIN {
 3 ~~ Two # -> ""
 ```
 
-Используется с `subtype`. Необходимо, если у типа есть аргументы.
-
-```perl
-subtype 'Ex[a]' # @-> subtype Ex[a]: needs a where
-```
-
 ## awhere ($code)
 
 Используется с `subtype`.
@@ -290,7 +284,9 @@ BEGIN {
 Добавляет новое приведение (`$via`) к `$type` из `$from` типа.
 
 ```perl
-BEGIN {subtype Four => where {4 eq $_}}
+BEGIN {
+	subtype Four => where {4 eq $_};
+}
 
 "4a" ~~ Four # -> ""
 
@@ -305,6 +301,19 @@ coerce Four, from ArrayRef, via { scalar @$_ };
 Four->coerce([1,2,3])           # -> 3
 Four->coerce([1,2,3]) ~~ Four   # -> ""
 Four->coerce([1,2,3,4]) ~~ Four # -> 1
+```
+
+Может использовать параметры типа:
+
+```perl
+BEGIN {
+	subtype 'Plus[acc]', as Num;
+}
+coerce &Plus, from Num, via { $_ + A };
+
+Plus([5])->coerce(4) # -> 9
+Plus([5]) >> 5 # -> 10
+1 >> Plus[5] # -> 6
 ```
 
 `coerce` выбрасывает исключения:

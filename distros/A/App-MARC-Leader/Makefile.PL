@@ -5,7 +5,7 @@ use warnings;
 use inc::Module::Install;
 
 # Definition.
-abstract 'Base class and script for parse and print MARC leader.';
+abstract 'Tool to decode MARC leader from file or string.';
 author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.05;
@@ -22,7 +22,7 @@ recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Getopt::Std' => 0;
 requires 'MARC::File::XML' => '1.0.4';
-requires 'MARC::Leader' => 0.05;
+requires 'MARC::Leader' => 0.06;
 requires 'MARC::Leader::Print' => 0.04;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-MARC-Leader/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-MARC-Leader';
@@ -34,7 +34,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

@@ -1,5 +1,11 @@
 Revision history for Kubernetes-REST
 
+1.104     2026-04-14 16:41:31Z
+ - Add ensure(), ensure_all(), ensure_only() for idempotent create-or-update.
+   Handles 404/409 race conditions and server-side immutability for
+   PersistentVolumeClaim and Job. Accepts either typed IO::K8s objects or
+   plain hashrefs (inflated via struct_to_object).
+
 1.103     2026-03-25 20:09:12Z
  - Add Claude Code skills (.claude/skills/) for kubernetes-rest API reference,
    @Author::GETTY bundle, and dist.ini analysis

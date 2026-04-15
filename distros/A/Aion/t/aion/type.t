@@ -28,7 +28,7 @@ local ($::_g0 = do {77 ~~ $Digit}, $::_e0 = do {""}); ::ok defined($::_g0) == de
 local ($::_g0 = do {"a" ~~ ~$Int;}, $::_e0 = "1"); ::ok $::_g0 eq $::_e0, '"a" ~~ ~$Int; # => 1' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {5   ~~ ~$Int;}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5   ~~ ~$Int; # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-::like scalar do {eval { $Int->validate("a", "..Eval..") }; $@}, qr{..Eval.. must have the type Int. The it is 'a'}, 'eval { $Int->validate("a", "..Eval..") }; $@	# ~> ..Eval.. must have the type Int. The it is \'a\''; undef $::_g0; undef $::_e0;
+::like scalar do {eval { $Int->validate("a", "..Eval..") }; $@}, qr{..Eval.. must have the type Int. The it is 'a'}, 'eval { $Int->validate("a", "..Eval..") }; $@ # ~> ..Eval.. must have the type Int. The it is \'a\''; undef $::_g0; undef $::_e0;
 
 # 
 # # DESCRIPTION
@@ -262,7 +262,7 @@ BEGIN {
 	})->make_arg(__PACKAGE__);
 }
 
-local ($::_g0 = do {"IX" ~~ Len[2,2]}, $::_e0 = "1"); ::ok $::_g0 eq $::_e0, '"IX" ~~ Len[2,2]	# => 1' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {"IX" ~~ Len[2,2]}, $::_e0 = "1"); ::ok $::_g0 eq $::_e0, '"IX" ~~ Len[2,2] # => 1' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # Если подпрограмма не может быть создана, то выбрасывается исключение.
@@ -284,9 +284,9 @@ BEGIN {
 	)->make_maybe_arg(__PACKAGE__);
 }
 
-local ($::_g0 = do {3 ~~ Enum123}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '3 ~~ Enum123			# -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {3 ~~ Enum123[4,5,6]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '3 ~~ Enum123[4,5,6]	 # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {5 ~~ Enum123[4,5,6]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5 ~~ Enum123[4,5,6]	 # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {3 ~~ Enum123}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '3 ~~ Enum123        # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {3 ~~ Enum123[4,5,6]}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '3 ~~ Enum123[4,5,6] # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {5 ~~ Enum123[4,5,6]}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5 ~~ Enum123[4,5,6] # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # Если подпрограмма не может быть создана, то выбрасывается исключение.
@@ -367,11 +367,15 @@ local ($::_g0 = do {$Int ne $PositiveInt}, $::_e0 = do {1}); ::ok defined($::_g0
 # 
 # Акцессор описания (используется для создания схемы **swagger**).
 # 
+# ## example (;$example)
+# 
+# Акцессор примера (используется для создания схемы **swagger**).
+# 
 # # OPERATORS
 # 
 # ## &{}
 # 
-# Делает объект вызываемым.
+# Тестирует `$_`.
 # 
 ::done_testing; }; subtest '&{}' => sub { 
 my $PositiveInt = Aion::Type->new(
@@ -398,11 +402,11 @@ my $Enum = Aion::Type->new(name => "Enum", args => [qw/A B C/]);
 local ($::_g0 = do {"$Enum"}, $::_e0 = "Enum['A', 'B', 'C']"); ::ok $::_g0 eq $::_e0, '"$Enum" # => Enum[\'A\', \'B\', \'C\']' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## $a | $b
+# ## |
 # 
-# Создает новый тип как объединение `$a` и `$b`.
+# Или. Создает новый тип как объединение двух.
 # 
-::done_testing; }; subtest '$a | $b' => sub { 
+::done_testing; }; subtest '|' => sub { 
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 my $Char = Aion::Type->new(name => "Char", test => sub { /^.\z/ });
 
@@ -413,11 +417,11 @@ local ($::_g0 = do {"a"  ~~ $IntOrChar}, $::_e0 = do {1}); ::ok defined($::_g0) 
 local ($::_g0 = do {"ab" ~~ $IntOrChar}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"ab" ~~ $IntOrChar # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## $a & $b
+# ## &
 # 
-# Создает новый тип как пересечение `$a` и `$b`.
+# И. Создает новый тип как пересечение двух.
 # 
-::done_testing; }; subtest '$a & $b' => sub { 
+::done_testing; }; subtest '&' => sub { 
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 my $Char = Aion::Type->new(name => "Char", test => sub { /^.\z/ });
 
@@ -428,22 +432,33 @@ local ($::_g0 = do {77 ~~ $Digit}, $::_e0 = do {""}); ::ok defined($::_g0) == de
 local ($::_g0 = do {"a" ~~ $Digit}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"a" ~~ $Digit # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## ~ $a
+# ## ~
 # 
-# Создает новый тип как исключение из `$a`.
+# Не. Создает новый тип как исключение данного.
 # 
-::done_testing; }; subtest '~ $a' => sub { 
+::done_testing; }; subtest '~' => sub { 
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 
 local ($::_g0 = do {"a" ~~ ~$Int;}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"a" ~~ ~$Int; # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {5   ~~ ~$Int;}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5   ~~ ~$Int; # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## $a eq $b, $a == $b
+# ## ~~
 # 
-# `$a` равно `$b`.
+# Тестирует значение.
 # 
-::done_testing; }; subtest '$a eq $b, $a == $b' => sub { 
+::done_testing; }; subtest '~~' => sub { 
+my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
+
+local ($::_g0 = do {$Int ~~ 3}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$Int ~~ 3    # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {-6   ~~ $Int}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '-6   ~~ $Int # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## eq, ==
+# 
+# Сравнивает два типа.
+# 
+::done_testing; }; subtest 'eq, ==' => sub { 
 my $Int1 = Aion::Type->new(name => "Int");
 my $Int2 = Aion::Type->new(name => "Int");
 
@@ -451,17 +466,30 @@ local ($::_g0 = do {$Int1 eq $Int2}, $::_e0 = do {1}); ::ok defined($::_g0) == d
 local ($::_g0 = do {$Int1 == $Int2}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$Int1 == $Int2 # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## $a ne $b, $a != $b
+# ## ne, !=
 # 
-# `$a` не равно `$b`.
+# Проверяет, что типы не равны.
 # 
-::done_testing; }; subtest '$a ne $b, $a != $b' => sub { 
+::done_testing; }; subtest 'ne, !=' => sub { 
 my $Int1 = Aion::Type->new(name => "Int");
 my $Int2 = Aion::Type->new(name => "Int");
 
 local ($::_g0 = do {$Int1 ne $Int2}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$Int1 ne $Int2 # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {$Int1 != $Int2}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$Int1 != $Int2 # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {123 ne $Int2}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '123 ne $Int2 # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {123   ne $Int2}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '123   ne $Int2 # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## >>
+# 
+# Приведение к типу.
+# 
+::done_testing; }; subtest '>>' => sub { 
+my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
+$Int->{coerce} = [[$Int => sub { $_ + 5 }]];
+
+local ($::_g0 = do {5 >> $Int}, $::_e0 = do {10}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '5 >> $Int # -> 10' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {$Int >> -4}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '$Int >> -4 # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # # AUTHOR

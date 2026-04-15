@@ -6,7 +6,7 @@ extern int _auto_check_errors;
     int err = glGetError(); /* spec: once one happens, no more recorded */ \
     if (err != GL_NO_ERROR) { \
       cleanup; \
-      croak(#name ": OpenGL error: 0x%04x %s", err, gl_error_string(err)); \
+      croak(name ": OpenGL error: 0x%04x %s", err, gl_error_string(err)); \
     } \
   }
 #define OGLM_CHECK_ERR(name, cleanup) \

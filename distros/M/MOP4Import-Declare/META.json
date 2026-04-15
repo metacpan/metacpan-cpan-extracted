@@ -38,6 +38,7 @@
          },
          "requires" : {
             "JSON::MaybeXS" : "0",
+            "List::Util" : "1.45",
             "Module::Runtime" : "0",
             "Sub::Util" : "1.40",
             "perl" : "5.010"
@@ -75,7 +76,7 @@
       },
       "MOP4Import::Declare" : {
          "file" : "Declare.pm",
-         "version" : "0.071"
+         "version" : "0.072"
       },
       "MOP4Import::Declare::Type" : {
          "file" : "Declare/Type.pm"
@@ -138,6 +139,6 @@
          "url" : "https://github.com/hkoba/perl-mop4import-declare"
       }
    },
-   "version" : "0.071",
+   "version" : "0.072",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

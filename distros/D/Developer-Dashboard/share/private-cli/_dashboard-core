@@ -192,6 +192,48 @@ sub _collector_jobs {
     return $config->collectors;
 }
 
+# _find_collector_job($name)
+# Returns the configured collector job definition for one collector name.
+# Input: collector name string.
+# Output: collector job hash reference or undef when not configured.
+sub _find_collector_job {
+    my ($name) = @_;
+    return if !defined $name || $name eq '';
+    my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
+    return $job;
+}
+
+# _known_collector_names()
+# Returns the union of configured and persisted collector names in stable order.
+# Input: none.
+# Output: ordered list of collector name strings.
+sub _known_collector_names {
+    my %seen;
+    my @names;
+    for my $job ( @{ _collector_jobs() } ) {
+        my $name = $job->{name};
+        next if !defined $name || $name eq '' || $seen{$name}++;
+        push @names, $name;
+    }
+    for my $status ( $collectors->list_collectors ) {
+        my $name = $status->{name};
+        next if !defined $name || $name eq '' || $seen{$name}++;
+        push @names, $name;
+    }
+    return @names;
+}
+
+# _collector_known($name)
+# Returns whether a collector is known through config or persisted runtime state.
+# Input: collector name string.
+# Output: boolean true when the collector name is known.
+sub _collector_known {
+    my ($name) = @_;
+    return 0 if !defined $name || $name eq '';
+    return 1 if _find_collector_job($name);
+    return $collectors->collector_exists($name) ? 1 : 0;
+}
+
 sub _sync_configured_collector_indicators {
     return 1 if $COLLECTOR_INDICATORS_SYNCED;
     $indicators->sync_collectors( _collector_jobs() );
@@ -472,19 +514,43 @@ elsif ( $cmd eq 'collector' ) {
         exit 0;
     }
     elsif ( $action eq 'log' ) {
-        print $files->read('collector_log') // '';
+        my $name = shift @ARGV;
+        die "Usage: dashboard collector log [name]\n" if @ARGV;
+        if ( defined $name && $name ne '' ) {
+            die "Unknown collector '$name'\n" if !_collector_known($name);
+            my $log = $collectors->read_log($name);
+            if ( !defined $log || $log eq '' ) {
+                print "No log entries are available yet for collector '$name'.\n";
+                exit 0;
+            }
+            print $log;
+            exit 0;
+        }
+        my @names = _known_collector_names();
+        if ( !@names ) {
+            print "No collector logs are available yet.\n";
+            exit 0;
+        }
+        my @logs;
+        for my $collector_name (@names) {
+            my $log = $collectors->read_log($collector_name);
+            $log = "No log entries are available yet for collector '$collector_name'.\n"
+              if !defined $log || $log eq '';
+            push @logs, $log;
+        }
+        print join "\n", @logs;
         exit 0;
     }
     elsif ( $action eq 'run' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector run <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
+        my $job = _find_collector_job($name);
         die "Unknown collector '$name'\n" if !$job;
         print json_encode( $runner->run_once($job) );
         exit 0;
     }
     elsif ( $action eq 'start' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector start <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
+        my $job = _find_collector_job($name);
         die "Unknown collector '$name'\n" if !$job;
         my $pid = $runner->start_loop($job);
         print "$pid\n";
@@ -498,7 +564,7 @@ elsif ( $cmd eq 'collector' ) {
     }
     elsif ( $action eq 'restart' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector restart <name>\n";
-        my ($job) = grep { $_->{name} eq $name } @{ _collector_jobs() };
+        my $job = _find_collector_job($name);
         die "Unknown collector '$name'\n" if !$job;
         $runner->stop_loop($name);
         my $pid = $runner->start_loop($job);

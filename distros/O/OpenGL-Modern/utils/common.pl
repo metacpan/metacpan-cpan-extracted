@@ -88,13 +88,13 @@ sub bindings {
     xs_argdecls => join('', map "  $_->[1]$_->[0];\n", @argdata),
     aliases => [ map "$_$c_suffix", sort keys %{ $s->{aliases} || {} } ],
     xs_code => "CODE:\n",
-    error_check => ($name eq "glGetError") ? "" : "OGLM_CHECK_ERR($name, )",
+    error_check => ($name eq "glGetError") ? "" : qq{OGLM_CHECK_ERR("$name", )},
     avail_check => $avail_check,
     beforecall => '',
     retcap => ($isvoid ? '' : 'RETVAL = '),
     retnames => ($isvoid ? [] : ['$retval']),
     callarg_list => $callarg_list,
-    error_check2 => ($name eq "glGetError") ? "" : "OGLM_CHECK_ERR($name, )",
+    error_check2 => ($name eq "glGetError") ? "" : qq{OGLM_CHECK_ERR("$name", )},
     aftercall => '',
     retout => ($isvoid ? '' : "\nOUTPUT:\n  RETVAL"),
   );
@@ -234,7 +234,7 @@ sub bindings {
   $this{xs_argdecls} = join('', map "  ".($is_inarray{$_->[0]} ? 'SV *' : $_->[1])."$_->[0]".($is_inarray{$_->[0]} ? 'SV' : '').";\n", @xs_inargs);
   $this{innames} = [(map +($is_inarray{$_->[0]} ? '\\@' : '$').$_->[0], @xs_inargs), $dotdotdot ? "\@$varargsname" : ()];
   $this{aftercall} .= "\n  $cleanup" if $cleanup;
-  $this{error_check2} &&= "OGLM_CHECK_ERR($name, $cleanup)";
+  $this{error_check2} &&= qq{OGLM_CHECK_ERR("$name", $cleanup)};
   my $need_cast;
   my %gotdynlang = map +($_=>1), keys %dynlang;
   my %hasitems = map +($_=>1), grep $dynlang{$_} =~ /\bitems\b/, keys %dynlang;

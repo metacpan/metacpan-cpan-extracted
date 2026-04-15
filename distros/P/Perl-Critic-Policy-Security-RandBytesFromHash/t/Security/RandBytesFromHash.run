@@ -22,6 +22,12 @@ sha256_base64( {} . rand );
 
 digest_data_hex( [ ] . $$ );
 
+## name false positive GH#1
+## failures 0
+## cut
+
+my $code = join "\n", @{ $context->{lo}->{jo} || [] };
+
 ## name method calls
 ## failures 1
 ## cut

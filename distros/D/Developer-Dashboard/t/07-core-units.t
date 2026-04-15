@@ -1163,6 +1163,7 @@ dies_like( sub { Developer::Dashboard::Collector->new }, qr/Missing paths regist
 my $collector_paths = $collector->collector_paths('alpha.collector');
 like( $collector_paths->{status}, qr/status\.json$/, 'collector_paths exposes status file' );
 like( $collector_paths->{combined}, qr/combined$/, 'collector_paths exposes combined output file' );
+like( $collector_paths->{log}, qr/log$/, 'collector_paths exposes collector log file' );
 $collector->write_job(
     'alpha.collector',
     {
@@ -1189,6 +1190,11 @@ is( $output->{stderr}, "nope\n", 'read_output returns stderr' );
 is( $output->{combined}, "bad\nnope\n", 'read_output returns combined output' );
 like( $output->{last_run}, qr/T/, 'read_output returns last run timestamp' );
 is( $collector->inspect_collector('alpha.collector')->{job}{name}, 'alpha.collector', 'inspect_collector returns combined collector data' );
+my $collector_log = $collector->read_log('alpha.collector');
+like( $collector_log, qr/alpha\.collector/, 'read_log includes the collector name' );
+like( $collector_log, qr/\[stdout\]\nbad\n/s, 'read_log includes persisted stdout content' );
+like( $collector_log, qr/\[stderr\]\nnope\n/s, 'read_log includes persisted stderr content' );
+ok( $collector->collector_exists('alpha.collector'), 'collector_exists recognizes persisted collector state' );
 
 $collector->write_result( 'beta.collector', exit_code => 0 );
 is( $collector->read_output('beta.collector')->{stdout}, '', 'read_output falls back to empty stdout' );
@@ -1205,6 +1211,52 @@ is_deeply(
 );
 $collector->write_result( 'beta.collector', exit_code => 0 );
 ok( -f $collector->collector_paths('beta.collector')->{status}, 'write_result overwrites existing collector files cleanly' );
+unlike( $collector->read_log('beta.collector'), qr/\[stdout\]/, 'read_log omits an empty stdout section' );
+
+my $legacy_paths = $collector->collector_paths('legacy.collector');
+make_path( $legacy_paths->{dir} );
+open my $legacy_stdout, '>', $legacy_paths->{stdout} or die $!;
+print {$legacy_stdout} "legacy-stdout\n";
+close $legacy_stdout;
+open my $legacy_stderr, '>', $legacy_paths->{stderr} or die $!;
+print {$legacy_stderr} "legacy-stderr\n";
+close $legacy_stderr;
+open my $legacy_combined, '>', $legacy_paths->{combined} or die $!;
+print {$legacy_combined} "legacy-stdout\nlegacy-stderr\n";
+close $legacy_combined;
+open my $legacy_last_run, '>', $legacy_paths->{last_run} or die $!;
+print {$legacy_last_run} "2026-04-14T00:00:00Z\n";
+close $legacy_last_run;
+$collector->write_status(
+    'legacy.collector',
+    {
+        enabled       => 1,
+        running       => 0,
+        last_exit_code => 7,
+        last_run      => '2026-04-14T00:00:00Z',
+    }
+);
+my $legacy_log = $collector->read_log('legacy.collector');
+like( $legacy_log, qr/legacy\.collector/, 'read_log synthesizes output for legacy collector state without an appended log file' );
+like( $legacy_log, qr/legacy-stdout/, 'read_log fallback includes legacy stdout data' );
+like( $legacy_log, qr/legacy-stderr/, 'read_log fallback includes legacy stderr data' );
+
+$collector->write_status(
+    'status-only.collector',
+    {
+        enabled        => 1,
+        running        => 0,
+        last_exit_code => 3,
+        last_run       => '2026-04-14T12:34:56Z',
+    }
+);
+my $status_only_log = $collector->read_log('status-only.collector');
+like( $status_only_log, qr/status-only\.collector/, 'read_log renders a status-only collector snapshot when no output files exist yet' );
+like( $status_only_log, qr/exit=3/, 'read_log renders the stored exit code for status-only collector snapshots' );
+
+$collector->collector_paths('empty.collector');
+is( $collector->read_log('empty.collector'), '', 'read_log returns an empty string when a collector directory exists without any persisted payload yet' );
+ok( !$collector->collector_exists('missing.collector'), 'collector_exists returns false when no persisted collector directory exists' );
 
 make_path( File::Spec->catdir( $paths->collectors_root, 'broken.collector' ) );
 open my $broken_status, '>', File::Spec->catfile( $paths->collectors_root, 'broken.collector', 'status.json' ) or die $!;
@@ -1223,8 +1275,8 @@ is( $collector->read_status('broken.collector')->{running}, 1, 'write_status rec
 my @collectors = $collector->list_collectors;
 is_deeply(
     [ map { $_->{name} } @collectors ],
-    [ 'alpha.collector', 'beta.collector', 'broken.collector' ],
-    'list_collectors sorts collector status and includes a collector once invalid status is repaired',
+    [ 'alpha.collector', 'beta.collector', 'broken.collector', 'legacy.collector', 'status-only.collector' ],
+    'list_collectors sorts collector status and includes legacy plus status-only persisted collector state once invalid status is repaired',
 );
 
 my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
@@ -1926,6 +1978,110 @@ my $collector_prompt = Developer::Dashboard::Prompt->new( paths => $paths, indic
 my $collector_prompt_output = $collector_prompt->render( jobs => 0, cwd => $home );
 like( $collector_prompt_output, qr/🚨B/, 'prompt keeps the broken collector status visible in the isolation scenario' );
 like( $collector_prompt_output, qr/✅H/, 'prompt keeps the healthy collector status visible in the isolation scenario' );
+{
+    my $tt_home = tempdir(CLEANUP => 1);
+    my $tt_paths = Developer::Dashboard::PathRegistry->new( home => $tt_home );
+    my $tt_files = Developer::Dashboard::FileRegistry->new( paths => $tt_paths );
+    my $tt_collectors = Developer::Dashboard::Collector->new( paths => $tt_paths );
+    my $tt_indicators = Developer::Dashboard::IndicatorStore->new( paths => $tt_paths );
+    my $tt_runner = Developer::Dashboard::CollectorRunner->new(
+        collectors => $tt_collectors,
+        files      => $tt_files,
+        indicators => $tt_indicators,
+        paths      => $tt_paths,
+    );
+
+    my $templated_result = $tt_runner->run_once(
+        {
+            name      => 'templated.collector',
+            command   => q{printf '{"a":123,"label":"Ready"}'},
+            cwd       => 'home',
+            indicator => {
+                name  => 'templated.indicator',
+                label => 'Templated',
+                icon  => '[% a %]',
+            },
+        }
+    );
+    is( $templated_result->{exit_code}, 0, 'collector TT icon rendering keeps a successful collector run green' );
+    is( $tt_indicators->get_indicator('templated.indicator')->{icon}, '123', 'collector TT icon rendering converts stdout JSON into direct template variables' );
+    is( $tt_indicators->get_indicator('templated.indicator')->{icon_template}, '[% a %]', 'collector TT icon rendering keeps the configured TT icon template in persisted state' );
+    is(
+        scalar @{
+            $tt_indicators->sync_collectors(
+                [
+                    {
+                        name      => 'templated.collector',
+                        indicator => {
+                            name  => 'templated.indicator',
+                            label => 'Templated',
+                            icon  => '[% a %]',
+                        },
+                    },
+                ]
+            )
+        },
+        0,
+        'sync_collectors does not rewrite rendered TT collector icons back to raw template text when config is unchanged',
+    );
+    is( $tt_indicators->get_indicator('templated.indicator')->{icon}, '123', 'sync_collectors preserves the previously rendered TT collector icon' );
+    is(
+        scalar @{
+            $tt_indicators->sync_collectors(
+                [
+                    {
+                        name      => 'templated.collector',
+                        indicator => {
+                            name  => 'templated.indicator',
+                            label => 'Templated Updated',
+                            icon  => '[% a %]',
+                        },
+                    },
+                ]
+            )
+        },
+        1,
+        'sync_collectors rewrites TT-backed collector indicators when non-template metadata changes',
+    );
+    is( $tt_indicators->get_indicator('templated.indicator')->{label}, 'Templated Updated', 'sync_collectors still refreshes other TT-backed collector indicator metadata' );
+    is( $tt_indicators->get_indicator('templated.indicator')->{icon}, '123', 'sync_collectors preserves the rendered TT collector icon while refreshing other metadata' );
+    is( $tt_indicators->get_indicator('templated.indicator')->{icon_template}, '[% a %]', 'sync_collectors preserves the configured TT collector icon template while refreshing other metadata' );
+
+    my $iconless_candidate = $tt_indicators->collector_indicator_candidate(
+        {
+            name      => 'iconless.collector',
+            indicator => {
+                name  => 'iconless.indicator',
+                label => 'Iconless',
+            },
+        },
+        existing => {
+            name          => 'iconless.indicator',
+            icon          => 'stale',
+            icon_template => '[% stale %]',
+            label         => 'Old Iconless',
+            status        => 'ok',
+        },
+    );
+    ok( !exists $iconless_candidate->{icon}, 'collector_indicator_candidate removes stale rendered icons when the collector config no longer defines indicator.icon' );
+    ok( !exists $iconless_candidate->{icon_template}, 'collector_indicator_candidate removes stale TT icon templates when the collector config no longer defines indicator.icon' );
+
+    my $bad_template_result = $tt_runner->run_once(
+        {
+            name      => 'templated.collector.bad-json',
+            command   => q{printf 'not json'},
+            cwd       => 'home',
+            indicator => {
+                name => 'templated.indicator.bad-json',
+                icon => '[% a %]',
+            },
+        }
+    );
+    is( $bad_template_result->{exit_code}, 255, 'collector TT icon rendering turns invalid JSON stdout into an explicit collector failure' );
+    like( $bad_template_result->{stderr}, qr/indicator icon template requires collector stdout JSON/i, 'collector TT icon rendering reports invalid JSON explicitly on stderr' );
+    is( $tt_indicators->get_indicator('templated.indicator.bad-json')->{status}, 'error', 'collector TT icon rendering marks the indicator red when JSON decoding fails' );
+    is( $tt_indicators->get_indicator('templated.indicator.bad-json')->{icon}, '', 'collector TT icon rendering leaves the live icon blank when no prior rendered value exists' );
+}
 like( $runner->_process_title('demo'), qr/^dashboard collector: demo$/, '_process_title formats managed process names' );
 ok( !defined $runner->loop_state('missing-loop-state'), 'loop_state returns undef for missing state files' );
 ok( !$runner->_is_managed_loop( undef, 'demo' ), '_is_managed_loop rejects missing pids' );

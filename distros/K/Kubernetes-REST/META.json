@@ -70,7 +70,7 @@
       "x_IRC" : "irc://irc.perl.org/#kubernetes",
       "x_IRC_user" : "Getty"
    },
-   "version" : "1.103",
+   "version" : "1.104",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -80,7 +80,9 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "README.md"
+                  ],
                   "exclude_match" : [],
                   "include_dotfiles" : 1,
                   "prefix" : "",
@@ -397,7 +399,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.103",
+                  "tag" : "1.104",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

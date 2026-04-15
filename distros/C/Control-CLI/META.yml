@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Control-CLI
 provides:
   Control::CLI:
     file: lib/Control/CLI.pm
-    version: '2.12'
+    version: '2.13'
 requires:
   Exporter: '0'
   IO::Handle: '0'
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/lgastevens/Control-CLI/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/lgastevens/Control-CLI
-version: '2.12'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '2.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

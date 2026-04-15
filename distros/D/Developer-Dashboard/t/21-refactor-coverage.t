@@ -346,6 +346,36 @@ ok(
     chdir $cwd or die "Unable to chdir back to $cwd: $!";
 }
 {
+    my $manifest_home = tempdir( CLEANUP => 1 );
+    my $manifest_paths = Developer::Dashboard::PathRegistry->new( home => $manifest_home );
+    my $manifest_path = Developer::Dashboard::CLI::SeededPages::seed_manifest_path( paths => $manifest_paths );
+
+    open my $manifest_fh, '>:raw', $manifest_path or die "Unable to write $manifest_path: $!";
+    print {$manifest_fh} qq|{"sql-dashboard":{"asset":"sql-dashboard.page","md5":"abc123"}}\n|;
+    close $manifest_fh or die "Unable to close $manifest_path: $!";
+
+    is_deeply(
+        Developer::Dashboard::CLI::SeededPages::_read_manifest( paths => $manifest_paths ),
+        {
+            'sql-dashboard' => {
+                asset => 'sql-dashboard.page',
+                md5   => 'abc123',
+            },
+        },
+        '_read_manifest loads an existing seeded-page manifest from disk',
+    );
+
+    open my $blank_manifest_fh, '>:raw', $manifest_path or die "Unable to rewrite $manifest_path: $!";
+    print {$blank_manifest_fh} "\n";
+    close $blank_manifest_fh or die "Unable to close $manifest_path: $!";
+
+    is_deeply(
+        Developer::Dashboard::CLI::SeededPages::_read_manifest( paths => $manifest_paths ),
+        {},
+        '_read_manifest treats a blank seeded-page manifest file as an empty hash',
+    );
+}
+{
     my $legacy_home = tempdir( CLEANUP => 1 );
     my $legacy_paths = Developer::Dashboard::PathRegistry->new( home => $legacy_home );
     my $legacy_seeded_page_hash = Developer::Dashboard::CLI::SeededPages::page_for_id('sql-dashboard')->as_hash;

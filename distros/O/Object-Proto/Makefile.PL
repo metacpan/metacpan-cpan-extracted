@@ -2,8 +2,8 @@ use 5.010000;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
 use Config;
-use File::Spec;
 
 # Platform-specific linker flags for symbol export
 # Only add --export-dynamic on platforms where GNU ld is used.
@@ -17,6 +17,19 @@ elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
     $platform_args{LDDLFLAGS} = ($Config{lddlflags} || '') . ' -Wl,--export-all-symbols';
 }
 
+# Set up ExtUtils::Depends so downstream XS modules can find our
+# headers and link against us on Windows.
+my $pkg = ExtUtils::Depends->new('Object::Proto');
+$pkg->set_inc('-I.');
+$pkg->install('include/object_types.h', 'include/object_compat.h', 'include/xop_compat.h');
+$pkg->save_config('Install/Files.pm');
+
+my %dep_vars = $pkg->get_makefile_vars;
+
+# ExtUtils::Depends sets PM for header installation, but we must also
+# include our own .pm file or it won't be installed to blib.
+$dep_vars{PM}{'lib/Object/Proto.pm'} = '$(INST_LIB)/Object/Proto.pm';
+
 my %WriteMakefileArgs = (
     NAME             => 'Object::Proto',
     AUTHOR           => ['LNATION <email@lnation.org>'],
@@ -27,8 +40,15 @@ my %WriteMakefileArgs = (
     OBJECT           => 'object$(OBJ_EXT)',
     C                => ['object.c'],
     XS               => {},
+    FUNCLIST         => [qw(
+        object_register_type_xs
+        object_register_type_xs_ex
+        object_get_registered_type
+    )],
+    DL_FUNCS         => { 'Object::Proto' => [] },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+       	'ExtUtils::Depends'   => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -38,6 +58,7 @@ my %WriteMakefileArgs = (
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Object-Proto-*' },
     %platform_args,
+    %dep_vars,
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker
@@ -59,21 +80,3 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
-
-# Install include headers alongside the module
-package MY;
-sub postamble {
-    my $self = shift;
-    my $inc_dir = File::Spec->catdir('$(INST_LIB)', 'Object', 'Proto', 'include');
-    return <<"MAKE";
-config :: $inc_dir/.exists
-\t\$(NOECHO) \$(NOOP)
-
-$inc_dir/.exists :: include/object_types.h include/object_compat.h include/xop_compat.h
-\t\$(MKPATH) $inc_dir
-\t\$(CP) include/object_types.h $inc_dir/object_types.h
-\t\$(CP) include/object_compat.h $inc_dir/object_compat.h
-\t\$(CP) include/xop_compat.h $inc_dir/xop_compat.h
-\t\$(TOUCH) $inc_dir/.exists
-MAKE
-}

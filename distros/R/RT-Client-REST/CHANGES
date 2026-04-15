@@ -1,5 +1,11 @@
 ﻿Revision history for Perl module RT::Client::REST
 
+0.73 Wed Apr 15 2026 "Dean Hamstead" <dean@fragfest.com.au>
+  - Fix typos: InvaildObjectTypeException -> InvalidObjectTypeException
+  - Fix namespace: RT::Clite::REST -> RT::Client::REST
+  - Fix get_links path: remove duplicate ID from URL
+  - Replace void-context map with for loop
+
 0.72 Mon Feb 27 2023 "Deean Hamstead" <dean@fragfest.com.au>
   - More fixes for GH#27 to eliminate warnings and handle empty list fields
 

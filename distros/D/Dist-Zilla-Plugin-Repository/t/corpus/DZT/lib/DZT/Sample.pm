@@ -1,4 +1,5 @@
 package DZT::Sample;
+
 # ABSTRACT: Sample DZ Dist
 
 use strict;

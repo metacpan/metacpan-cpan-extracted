@@ -167,7 +167,7 @@ glBindTexture(GL_TEXTURE_2D, 0);
 glDeleteTextures_p($_) for grep $_, $destTextureID;
 glBindFramebuffer(GL_FRAMEBUFFER, 0);
 glDeleteFramebuffers_p($_) for grep $_, $fbo_id;
-glBindVertexArray(0);
+glBindVertexArray(0) if grep $_, $vao;
 glDeleteVertexArrays_p($_) for grep $_, $vao;
 glUseProgram(0);
 glDeleteProgram($_) for grep $_, $program;

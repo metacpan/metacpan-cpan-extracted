@@ -51,6 +51,15 @@ J<< ja;
 L</"check()"> を参照。
 >>
 
+=item C<CRL_CHECK>
+
+=item C<CRL_CHECK_ALL>
+
+See L</setVerifyFlags()>.
+J<< ja;
+L</setVerifyFlags()> を参照.
+>>
+
 =item C<FORMAT_SMIME>
 
 =item C<FORMAT_ASN1>
@@ -263,10 +272,14 @@ J<< ja;
 =item encrypt()
 
   $encrypted_mime = $smime->encrypt($raw_mime);
+  $encrypted_mime = $smime->encrypt($raw_mime, $cipher);
 
-Encrypt a MIME message and return a S/MIME message.
+Encrypt a MIME message and return a S/MIME message. You can pass any
+C<$cipher> string your OpenSSL library understands. Default is
+"AES-128-CBC".
 J<< ja;
-暗号化を行う。
+暗号化を行う. 利用している OpenSSL の理解するようなどのような C<$cipher>
+でも指定できる. デフォルトは "AES-128-CBC" である.
 >>
 
 Any headers except C<Content-*>, C<MIME-*> and C<Subject> will be moved to the
@@ -346,6 +359,21 @@ J<< ja;
 UNIX epoch 形式でなければならない。
 >>
 
+=item setVerifyFlags()
+
+  $smime->setVerifyFlags(C<Crypt::SMIME::CRL_CHECK>);
+
+Set flags used for verification.
+C<Crypt::SMIME::CRL_CHECK> check CRL for signer certificates
+C<Crypt::SMIME::CRL_CHECK_ALL> check CRL for whole certificate chain
+Verification fails if a required CRL is not found.
+J<< ja;
+検証時に用いるフラグを設定する.
+C<Crypt::SMIME::CRL_CHECK> 署名者の証明書の CRL を検証する.
+C<Crypt::SMIME::CRL_CHECK_ALL> 証明書チェイン全体の CRL を検証する.
+必要な CRL が存在しない場合は検証に失敗する.
+>>
+
 =back
 
 =head1 FUNCTIONS
@@ -391,6 +419,23 @@ check() should be executed to ensure public keys are valid.
 J<< ja;
 この関数が返す公開鍵は検証されていないことに注意。
 公開鍵が有効であることを確かめるにはcheck()を実行すること。
+>>
+
+=item getCapabilities()
+
+  @caps = @{Crypt::SMIME::getCapabilities($data)};
+  @caps = @{Crypt::SMIME::getCapabilities($data, $type)};
+
+Get the S/MIME Capabilities included in S/MIME message or PKCS#7 object.
+Optional $type parameter may specify type of data.
+J<< ja;
+S/MIME メッセージもしくは PKCS#7 オブジェクトに含まれる S/MIME Capabilities
+を取得する. オプションの $type パラメータでデータの種類を指定できる.
+>>
+
+This may include both, ciphers and hash algorithms.
+J<< ja;
+これには暗号およびハッシュの両方のアルゴリズムが含まれる.
 >>
 
 =back

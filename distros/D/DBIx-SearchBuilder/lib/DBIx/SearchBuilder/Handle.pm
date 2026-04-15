@@ -1913,13 +1913,13 @@ sub _ExtractBindValues {
         |
         (?: \b \d* \.? \d+ \b )             # number, but not the one in Groups_1.Name
     }isx;
-    state %special_chars = (
+    state $special_chars = {
         'b' => "\b",
         'f' => "\f",
         'n' => "\n",
         'r' => "\r",
         't' => "\t",
-    );
+    };
 
     my $count = 0;
     while ( $$string =~ m!$token_re!g ) {
@@ -1943,7 +1943,7 @@ sub _ExtractBindValues {
                 # For unrecognised escapes (e.g. \q), strip the backslash
                 # and keep the literal character — the correct behaviour
                 # for SQL E-notation strings.
-                $value =~ s!\\(.)!$special_chars{$1} || $1!sgei;
+                $value =~ s!\\(.)!$special_chars->{$1} || $1!sgei;
             }
             $value =~ s!''!'!g;
             push @values, $value;

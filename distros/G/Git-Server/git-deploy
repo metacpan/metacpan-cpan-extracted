@@ -110,17 +110,67 @@ interval between 5 and 7 minutes.
 
   Example: git deploy --max-delay 10
 
-=head2 --identity <identitykeyfile>
+=head2 --identity <identity>
 
-Specify identity keyfile to be used for SSH repos.
+Specify <identity> to be used for SSH repos.
+If <identity> is a Private Key, it must be stored within a file,
+and that file should only readable by the user
+and should not have a passphrase.
+Private Key contents cannot be passed as a commandline value.
 
-  Example: git-deploy -i ~/.ssh/id_ed25519-repodeploy
+Or if SSH_AUTH_SOCK is set for Agent Forwarding,
+then <identity> can be the actual Public Key string (one line)
+or a substring or pattern
+or a path to a file containing the Public Key.
+It will be ignored if it does not match a key available by the Agent.
+It must match a key available by the Agent or it will be ignored.
 
-  sshCommand = ssh -i ~/.ssh/id_ed25519-repodeploykey -o IdentitiesOnly=yes
+  # The easiest case is to use a Private Key File, which doesn't require Agent Forwarding:
+  Exmple: git deploy -i ~/.ssh/id_ed25519-repodeploy
+
+  --OR--
+
+  # Public Key File:
+  Example: SSH_AUTH_SOCK=~/.ssh/.agent.sock git deploy -i ~/.ssh/id_ed25519-repodeploy.pub
+
+  --OR--
+
+  # Match Comment Match
+  Example: git deploy -i hookbot@deployhost.local
+
+  --OR--
+
+  # Match MD5 Fingerprint
+  Example: git deploy -i MD5:7d:5d:fe:e7:07:51:d2:bc:a8:65:aa:17:8a:8a:50:fd
+  Example: git deploy -i 7d5dfee70751d2bca8
+
+  --OR--
+
+  # Match SHA256 Fingerprint or partial
+  Example: git deploy -i SwSJkugJviX1WXVE6L8XMR/NT3S+xAufeMOsTPH0Aac
+  Example: git deploy -i SwSJkugJviX
+
+  --OR--
+
+  # RegExp
+  Example: git deploy -i 'ssh-ed25519.*AAAA.*hookbot@'
+
+It's possible that multiple keys available within the SSH Agent will
+match the substring or fingerprint or comment or RegExp specified.
+If so, then all will be tried in the order they appear.
+
+HINT: To list current keys available, run "ssh-add -L".
+To view fingerprints, run "ssh-add -l" or "ssh-add -l -E md5".
+
+If no --identity option is used, then the default behavior is
+to only use those public keys available in the agent and
+and any efault ~/.ssh/id_* files that ssh normally tries.
 
 =head2 --version
 
 Show git-deploy version.
+
+  Example: git deploy --version
 
 =head1 INSTALL
 
@@ -133,7 +183,7 @@ As super user:
 As deploy user:
 
   [puller@deploy-host projectz]$ git deploy --branch=main
-  [puller@deploy-host projectz]$ echo '0 * * * * git deploy --chdir ~/projectz </dev/null >/dev/null 2>/dev/null' | crontab -
+  [puller@deploy-host projectz]$ (crontab -l;echo;echo '0 * * * * git deploy --chdir ~/projectz --background </dev/null >/dev/null 2>/dev/null') | crontab -
   [puller@deploy-host projectz]$
 
 =head1 AUTHOR
@@ -154,7 +204,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.040";
+our $VERSION = "0.041";
 
 my @invoked = ($0, @ARGV);
 my %initial_ENV = %ENV;
@@ -190,6 +240,20 @@ if ($ver) {
     print "[git-deploy v$VERSION] ".`git --version`;
     exit;
 }
+
+my $runner = $$;
+my $cleanup = sub {
+    $runner == $$ or return 0;
+    # Make sure to wipe out any Temp files
+    foreach my $ident (@$identities) { eval { $ident->isa("File::Temp") } and unlink $ident; }
+    return 1;
+};
+END {$cleanup->() if $cleanup}
+$SIG{INT} = $SIG{TERM} = sub {
+    warn localtime().": [$$] $Script: Caught SIG$_[0]: Running cleanup ...\n";
+    $cleanup->() if $cleanup;
+    exit 1;
+};
 
 sub run_how_cmd {
     my $stderr = shift;
@@ -263,7 +327,7 @@ sub pull_push_notification {
         ($initial_ENV{XMODIFIERS} ? ($initial_ENV{XMODIFIERS}) : ()),
         ;
     # Generate GIT_SSH_COMMAND to ensure XMODIFIERS is provided to the git server:
-    $ENV{GIT_SSH_COMMAND} = ($initial_ENV{GIT_SSH_COMMAND} || (run_output_include_err(qw[git config core.sshCommand]) =~ /^(.+)/ ? $1 : "ssh"))." -o SendEnv=XMODIFIERS";
+    $ENV{GIT_SSH_COMMAND} = ($initial_ENV{GIT_SSH_COMMAND} || (run_output_ignore_err(qw[git config core.sshCommand]) =~ /^(.+)/ ? $1 : "ssh"))." -o SendEnv=XMODIFIERS";
     if (@$identities) {
         # Inject --identity files into GIT_SSH_COMMAND:
         $ENV{GIT_SSH_COMMAND} .= " -o IdentitiesOnly=yes";
@@ -274,12 +338,120 @@ sub pull_push_notification {
     return run_output_include_err(qw[git fetch]);
 }
 
+my $cache_agent_pub_file = {};
+my $agentlist = undef;
+# @files = agentkeys( [ { <pubkeyfile> | <pubkey_pattern_or_substring> } ] )
+# Searches SSH Agent Forwarder for currently available keys.
+# Returns a file or filenames containing matching keys of the requested public key file or regexp pattern or substring of the key or the MD5 or SHA256 fingerprint.
+sub agentkeys {
+    if (!defined $agentlist) {
+        $agentlist = "";
+        if (my $sock = $ENV{SSH_AUTH_SOCK}) {
+            if (!-e $sock) {
+                warn localtime().": [$$] $Script: WARNING! Agent Forwarding malfunction. Manual intervention required. ".
+                    (lstat $sock ? "Broken symlink [$sock]\n" : "Missing SSH_AUTH_SOCK [$sock]\n");
+            }
+            my @keys = map { chomp; [split /\s+/, $_, 3] } `ssh-add -L 2>/dev/null`;
+            for my $alg (qw[md5 sha256]) {
+                my @fp = map { chomp; [split /\s+/, $_, 3] } `ssh-add -l -E $alg 2>/dev/null`;
+                next unless @fp == @keys; # Sanity check to reduce chances of race-condition where a key was added and/or removed in between the "-L" and the "-l"
+                for (my $i=0; $i<@keys; $i++) {
+                    # Insert its fingerprint before the final comment
+                    splice @{$keys[$i]},2,0,$fp[$i]->[1] if $fp[$i]->[1] and @{ $keys[$i] }>1;
+                }
+            }
+            $agentlist = join "", map { join(" ",@$_)."\n" } @keys;
+        }
+    }
+    return () if !$agentlist;
+    my $pub = shift or return ();
+    my $files = $cache_agent_pub_file->{$pub};
+    return @$files if $files;
+    $files = $cache_agent_pub_file->{$pub} = [];
+    my $lines = [];
+    if (-r $pub and open my $fh, "<", $pub) {
+        $lines = [<$fh>];
+        close $fh;
+        chomp foreach @$lines;
+    }
+    my @matches = ();
+    foreach my $pick (@$lines) {
+        # First do lazy exact match, like normal "ssh" does.
+        if ($pick =~ /^(\S+\s\S+)(?:$|\s)/) {
+            my $exact = $1;
+            push @matches, $agentlist =~ /^(\Q$exact\E)\s/gm;
+        }
+    }
+    if (@matches) {
+        # Found at least one exact match, so just let ssh use it asis.
+        push @$files, abs_path $pub;
+        return @$files;
+    }
+
+    if (!eval { require File::Temp;1 }) {
+        warn localtime().": [$$] $Script: --identity '$pub': Ignoring non-file public key commandline argument since required File::Temp module is not available.\n";
+        return @$files;
+    }
+
+    # NO exact match. Try harder to find something to stash into a temporary file.
+    $files = $cache_agent_pub_file->{$pub} = [];
+    push @$lines, $pub;
+    my $pushed = {};
+    foreach my $pick (@$lines) {
+        next if $pick !~ /\S/;
+        my @found = $agentlist =~ /(.*\Q$pick\E.*)/g;
+        push @found, $agentlist =~ /(.*\Q$pick\E.*)/ig  if !@found;
+        push @found, $agentlist =~ /(.*$pick.*)/g       if !@found;
+        push @found, $agentlist =~ /(.*$pick.*)/ig      if !@found;
+        (my $clue = $pick) =~ s/\W+//g;
+        if ($clue ne $pick and $clue) {
+            push @found, $agentlist =~ /(.*\Q$clue\E.*)/g   if !@found;
+            push @found, $agentlist =~ /(.*\Q$clue\E.*)/ig  if !@found;
+            push @found, $agentlist =~ /(.*$clue.*)/g       if !@found;
+            push @found, $agentlist =~ /(.*$clue.*)/ig      if !@found;
+        }
+        if (!@found) {
+            # Try really hard to match, ignoring case and even ignoring non-wordspace
+            foreach my $agent_line (split /\n+/, $agentlist) {
+                (my $stripped = $agent_line) =~ s/[^\w\n]+//g;
+                push @found, $agent_line if $agent_line =~ /\Q$pick\E/i;
+                push @found, $agent_line if $agent_line =~ /$pick/i;
+                push @found, $agent_line if $clue and $agent_line =~ /\Q$clue\E/i;
+                push @found, $agent_line if $stripped =~ /\Q$pick/i;
+                push @found, $agent_line if $stripped =~ /$pick/i;
+                push @found, $agent_line if $clue and $stripped =~ /\Q$clue\E/i;
+            }
+        }
+        foreach my $m (@found) {
+            push @matches, $m if !$pushed->{$m}++;
+        }
+    }
+    foreach my $m (@matches) {
+        if (eval { require File::Temp;1 }) {
+            my $tmp = File::Temp->new( UNLINK => 0, SUFFIX => ".pub" );
+            print $tmp "$m\n";
+            close $tmp;
+            warn localtime().": [$$] $Script: --identity '$pub': Created temp pubkey file: $tmp: $m\n" if $ENV{DEBUG};
+            push @$files, $tmp;
+        }
+    }
+    return @$files;
+}
+
 if ($force_branch and @ARGV) {
     warn "$0: Don't specify both --branch and commandline argument.\n";
     sleep 1;
     exec perldoc => $0 or die "$0: help menu unavailable\n";
 }
 $force_branch ||= shift;
+
+# Expand relative [ -i <identity> ] paths before chdir
+if (@$identities) {
+    foreach (@$identities) {
+        $_ = abs_path $1 if m{^([^/].*)} and -e $1 or !-e and m{(.+)\.pub$}m and -e $1;
+        $_ = abs_path "$_.pub" if !-e and -e "$_.pub";
+    }
+}
 
 # Handle [ -C <dir> ] first
 if (@$chdir) {
@@ -293,24 +465,37 @@ if (@$chdir) {
     $cwd = getcwd();
 }
 
+if (@$identities) {
+    # Sanity check to verify identity files are ready to go, and expand relative paths if needed.
+    my $verified_identities = [];
+    my $public_key_file = {};
+    my $private_key_file = {};
+    foreach my $ident (@$identities) {
+        if (my @found = agentkeys($ident)) {
+            foreach (@found) {
+                push @$verified_identities, $_ if !$public_key_file->{$_}++;
+            }
+        }
+        elsif (-e $ident && -r _ && -s _) {
+            my $pub = run_output_ignore_err "ssh-keygen", "-y", "-P", "", "-f", $_;
+            if ($pub) {
+                warn localtime().": [$$] $Script: Using private key identity: $pub";
+                push @$verified_identities, $_ if !$private_key_file->{$_}++;
+            }
+            else {
+                warn localtime().": [$$] $Script: --identity '$ident': Unable to read identity file. Passphrase required?\n";
+            }
+        }
+        else {
+            warn localtime().": [$$] $Script: --identity '$ident': Ignoring non-existent key\n";
+        }
+    }
+    $identities = $verified_identities;
+}
+
 $ENV{GIT_DIR} ||= abs_path(`git rev-parse --git-dir 2>/dev/null` =~ /^(.+)/ && $1 || ".git");
 
 umask oct $1 if $umask and $umask =~ /^(\d+)$/;
-
-if (@$identities) {
-    # Sanity check to verify identity files are ready to go.
-    foreach (@$identities) {
-        s/\.pub$//;
-        -e && -r _ && -s _ or die "$Script: --identity $_: Unable to find key\n";
-        my $pub = run_output_ignore_err "ssh-keygen", "-y", "-P", "", "-f", $_;
-        if ($pub) {
-            warn localtime().": [$$] $Script: Using identity: $pub";
-        }
-        else {
-            die localtime().": [$$] $Script: Unable to read identity file without using a passphrase: $_\n";
-        }
-    }
-}
 
 $origin = current_origin();
 $0 = "$Script - $cwd: Initial checkout [".checkout_branch()."]";
@@ -338,7 +523,9 @@ if (sleep 1) {
 }
 
 if ($background) {
+    $runner = 0; # Don't wipe Temp files yet.
     exit if fork;
+    $runner = $$; # Now it's okay to wipe Temp files.
     require POSIX;
     POSIX::setsid();
     open STDIN,  "<", "/dev/null";
@@ -362,7 +549,7 @@ while (1) {
         warn localtime().": [$$] $Script: Auto-update $Script respawning ...\n";
         sleep 1;
         %ENV = %initial_ENV;
-        exec @invoked or die localtime().": [$$] $Bin/$Script: RESPAWN FATAL CRASH\n";
+        $cleanup->() && exec @invoked or die localtime().": [$$] $Bin/$Script: RESPAWN FATAL CRASH\n";
     }
     if ($update =~ /POSSIBLE.*SOMEONE.*DOING.*NASTY/) {
         warn $update;

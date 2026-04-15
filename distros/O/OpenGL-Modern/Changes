@@ -1,3 +1,7 @@
+0.0405 2026-04-14
+- local version of glewInit now checks for a GL context and returns an error instead of segfaulting if none (https://github.com/nigels-com/glew/issues/464)
+- add glewHasContext() XS function
+
 0.0404 2026-03-02
 - update docs, add more illustrative GPGPU examples
 

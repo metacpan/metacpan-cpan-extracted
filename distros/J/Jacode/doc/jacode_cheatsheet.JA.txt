@@ -1,0 +1,120 @@
+################################################################################
+# Jacode チートシート (JA)
+# Jacode - Perl 日本語文字コード変換プログラム
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ インストール
+
+  cpanm Jacode
+
+  または https://metacpan.org/pod/Jacode から Jacode.pm と jacode.pl を
+  同じディレクトリに保存する。
+
+■ 使い方
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # 文字列をインプレース変換（最も基本的な使い方）
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # 戻り値（リストコンテキスト）
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # 戻り値（スカラーコンテキスト）
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # 値を返すラッパー
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # エンコーディング名を返す
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS エスケープシーケンス制御
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # 初期化
+  Jacode::init();
+
+  # キャッシュ制御
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ エンコーディング名
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 含む)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... バイナリ（変換不可）
+
+■ オプション
+
+  'z'  ... 半角カナ → 全角カナ（h2z）
+  'h'  ... 全角カナ → 半角カナ（z2h）
+
+■ JIS 漢字開始シーケンス
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983（デフォルト）
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 面1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 面1
+
+■ 典型的な変換例
+
+  # Shift_JIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP → Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # 自動判定 → JIS
+  Jacode::convert(\$line, 'jis');
+
+  # 半角カナを全角化しながら SJIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # ファイル全行を変換
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ コマンドライン (pkf モード)
+
+  perl jacode.pl [option] [-[INPUT]OUTPUT] files
+
+  perl jacode.pl file          # JIS に変換
+  perl jacode.pl -sw file      # SJIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → SJIS
+  perl jacode.pl -me file      # 混在エンコーディング → EUC-JP（動的判定）
+  perl jacode.pl -mc file      # 変換しながら各行のエンコーディングを表示
+
+  オプション:
+  -b  バッファリング出力（デフォルト）
+  -u  バッファリングなし出力
+  -m  動的エンコーディング判定
+  -c  エンコーディング名を表示
+  -Z  半角カナ → 全角カナ
+  -H  全角カナ → 半角カナ
+  -f [unix|mac|dos]  改行コード変換
+
+■ jcode.pl 互換
+
+  Jacode は jcode.pl (Utashiro 氏) と互換性があります。
+  jcode:: 名前空間のエイリアスも利用可能です。
+
+################################################################################

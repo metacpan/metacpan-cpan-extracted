@@ -27,8 +27,14 @@ sub FindMethods {
 	$_ =~ $pattern or next;
       }
     }
-    my $glob = $symtab->{$orig};
-    next unless (ref \$glob eq 'GLOB' and *{$glob}{CODE});
+    my $globOrCode = $symtab->{$orig};
+    if (ref $globOrCode eq 'CODE') {
+      ; #ok
+    } elsif (ref \$globOrCode eq 'GLOB' and *{$globOrCode}{CODE}) {
+      ; #ok
+    } else {
+      next;
+    }
     $found->{$_} //= $class;
   }
 

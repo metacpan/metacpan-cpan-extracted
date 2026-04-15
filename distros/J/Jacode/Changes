@@ -1,5 +1,10 @@
 Revision history for this software.
 
+2.13.4.33 2026-04-15 00:00:00
+  - add t/9080_cheatsheets.t: doc/ cheat sheet quality checks
+  - add doc/jacode_cheatsheet.*.txt: Jacode quick reference in 21 languages
+  - created by INABA Hitoshi
+
 2.13.4.32 2026-04-12 00:00:00
   - update pmake.bat (VERSIONE 0.27 -> 0.28)
     - dist: remove Char-family dead code (3 locations)

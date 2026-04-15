@@ -3,10 +3,8 @@
       "diseases" : [
          {
             "ageOfOnset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0011463",
-                  "label" : "Childhood onset"
-               }
+               "id" : "HP:0011463",
+               "label" : "Childhood onset"
             },
             "diseaseCode" : {
                "id" : "MONDO:0100308",
@@ -18,6 +16,15 @@
       "id" : "16-year-old boy",
       "info" : {
          "phenopacket" : {
+            "biosamples" : [
+               {
+                  "id" : "biosample-16-year-old-boy-1"
+               },
+               {
+                  "id" : "biosample-16-year-old-boy-2",
+                  "individualId" : "16-year-old boy"
+               }
+            ],
             "interpretations" : [
                {
                   "diagnosis" : {
@@ -211,9 +218,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             },
             "timeObserved" : {
                "age" : {
@@ -244,9 +249,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             },
             "timeObserved" : {
                "age" : {
@@ -277,9 +280,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             },
             "timeObserved" : {
                "age" : {
@@ -310,9 +311,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P16Y6M"
-               }
+               "iso8601duration" : "P16Y6M"
             },
             "timeObserved" : {
                "age" : {
@@ -329,9 +328,7 @@
                "label" : "Gait disturbance"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P10Y"
-               }
+               "iso8601duration" : "P10Y"
             }
          },
          {
@@ -347,9 +344,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P10Y"
-               }
+               "iso8601duration" : "P10Y"
             }
          },
          {
@@ -359,9 +354,7 @@
                "label" : "Gait ataxia"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -371,9 +364,7 @@
                "label" : "Tongue fasciculations"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -383,9 +374,7 @@
                "label" : "Intention tremor"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -395,9 +384,7 @@
                "label" : "Dysdiadochokinesis"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -407,9 +394,7 @@
                "label" : "Ataxia"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -419,9 +404,7 @@
                "label" : "Areflexia"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -431,9 +414,7 @@
                "label" : "Ankle clonus"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -443,9 +424,7 @@
                "label" : "Limb muscle weakness"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -455,9 +434,7 @@
                "label" : "Somatic sensory dysfunction"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -467,9 +444,7 @@
                "label" : "Head titubation"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          },
          {
@@ -479,9 +454,7 @@
                "label" : "Abnormal cranial nerve physiology"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P16Y"
-               }
+               "iso8601duration" : "P16Y"
             }
          }
       ],
@@ -604,43 +577,69 @@
       "karyotypicSex" : "UNKNOWN_KARYOTYPE",
       "phenotypicFeatures" : [
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001629",
                "label" : "Ventricular septal defect"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0000280",
@@ -648,118 +647,180 @@
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0008689",
                "label" : "Bilateral cryptorchidism"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001561",
                "label" : "Polyhydramnios"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0011461",
-                  "label" : "Fetal onset"
-               }
+               "id" : "HP:0011461",
+               "label" : "Fetal onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0000054",
                "label" : "Micropenis"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001798",
                "label" : "Anonychia"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001320",
@@ -767,43 +828,69 @@
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0000518",
                "label" : "Cataract"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003593",
-                  "label" : "Infantile onset"
-               }
+               "id" : "HP:0003593",
+               "label" : "Infantile onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0002198",
@@ -811,28 +898,40 @@
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
-                     "id" : "PMID:30808312"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report",
+                              "id" : "PMID:30808312"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30808312",
+                  "notes" : "COL6A1 mutation leading to Bethlem myopathy with recurrent hematuria: a case report"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0100333",
                "label" : "Unilateral cleft lip"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          }
       ],
@@ -858,9 +957,7 @@
             "excluded" : false
          },
          {
-            "ageOfOnset" : {
-               "timestamp" : "2020-03-17T00:00:00Z"
-            },
+            "ageOfOnset" : "2020-03-17T00:00:00Z",
             "diseaseCode" : {
                "id" : "MONDO:0100096",
                "label" : "COVID-19"
@@ -940,23 +1037,26 @@
                      "version" : "2.1"
                   }
                ]
+            },
+            "vitalStatus" : {
+               "causeOfDeath" : {
+                  "id" : "MONDO:0100096",
+                  "label" : "COVID-19"
+               },
+               "status" : "DECEASED"
             }
          }
       },
       "interventionsOrProcedures" : [
          {
-            "ageOfProcedure" : {
-               "timestamp" : "2016-01-01T00:00:00Z"
-            },
+            "dateOfProcedure" : "2016-01-01",
             "procedureCode" : {
                "id" : "NCIT:C80473",
                "label" : "Left Ventricular Assist Device"
             }
          },
          {
-            "ageOfProcedure" : {
-               "timestamp" : "2020-03-22T00:00:00Z"
-            },
+            "dateOfProcedure" : "2020-03-22",
             "procedureCode" : {
                "id" : "NCIT:C116648",
                "label" : "Tracheal Intubation"
@@ -980,10 +1080,8 @@
                }
             },
             "observationMoment" : {
-               "interval" : {
-                  "end" : "2020-03-01T00:00:00Z",
-                  "start" : "2019-09-01T00:00:00Z"
-               }
+               "end" : "2020-03-01T00:00:00Z",
+               "start" : "2019-09-01T00:00:00Z"
             },
             "timeObserved" : {
                "interval" : {
@@ -1006,9 +1104,7 @@
                   "value" : 0.7
                }
             },
-            "observationMoment" : {
-               "timestamp" : "2020-03-20T00:00:00Z"
-            },
+            "observationMoment" : "2020-03-20T00:00:00Z",
             "timeObserved" : {
                "timestamp" : "2020-03-20T00:00:00Z"
             }
@@ -1021,9 +1117,7 @@
                "id" : "HP:0001945",
                "label" : "Fever "
             },
-            "onset" : {
-               "timestamp" : "2021-02-01T05:00:00Z"
-            }
+            "onset" : "2021-02-01T05:00:00Z"
          },
          {
             "excluded" : false,
@@ -1031,9 +1125,7 @@
                "id" : "HP:0030157",
                "label" : "Flank pain"
             },
-            "onset" : {
-               "timestamp" : "2021-02-01T05:00:00Z"
-            }
+            "onset" : "2021-02-01T05:00:00Z"
          },
          {
             "excluded" : false,
@@ -1041,9 +1133,7 @@
                "id" : "HP:0000790",
                "label" : "Hematuria"
             },
-            "onset" : {
-               "timestamp" : "2021-02-01T05:00:00Z"
-            }
+            "onset" : "2021-02-01T05:00:00Z"
          },
          {
             "excluded" : false,
@@ -1051,9 +1141,7 @@
                "id" : "HP:0012625",
                "label" : "Stage 3 chronic kidney disease"
             },
-            "onset" : {
-               "timestamp" : "2021-02-01T05:00:00Z"
-            }
+            "onset" : "2021-02-01T05:00:00Z"
          },
          {
             "excluded" : false,
@@ -1062,10 +1150,8 @@
                "label" : "Myalgia"
             },
             "onset" : {
-               "interval" : {
-                  "end" : "2020-03-20T00:00:00Z",
-                  "start" : "2020-03-18T00:00:00Z"
-               }
+               "end" : "2020-03-20T00:00:00Z",
+               "start" : "2020-03-18T00:00:00Z"
             }
          },
          {
@@ -1075,10 +1161,8 @@
                "label" : "Diarrhea"
             },
             "onset" : {
-               "interval" : {
-                  "end" : "2020-03-20T00:00:00Z",
-                  "start" : "2020-03-18T00:00:00Z"
-               }
+               "end" : "2020-03-20T00:00:00Z",
+               "start" : "2020-03-18T00:00:00Z"
             }
          },
          {
@@ -1088,10 +1172,8 @@
                "label" : "Dyspnea"
             },
             "onset" : {
-               "interval" : {
-                  "end" : "2020-03-20T00:00:00Z",
-                  "start" : "2020-03-18T00:00:00Z"
-               }
+               "end" : "2020-03-20T00:00:00Z",
+               "start" : "2020-03-18T00:00:00Z"
             }
          },
          {
@@ -1100,9 +1182,7 @@
                "id" : "HP:0033677",
                "label" : "Acute respiratory distress syndrome"
             },
-            "onset" : {
-               "timestamp" : "2020-03-20T00:00:00Z"
-            }
+            "onset" : "2020-03-20T00:00:00Z"
          }
       ],
       "sex" : {
@@ -1352,9 +1432,7 @@
                "label" : "Delayed ability to walk"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P1Y6M"
-               }
+               "iso8601duration" : "P1Y6M"
             }
          },
          {
@@ -1364,10 +1442,8 @@
                "label" : "Calf muscle pseudohypertrophy"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0011463",
-                  "label" : "Childhood onset"
-               }
+               "id" : "HP:0011463",
+               "label" : "Childhood onset"
             }
          },
          {
@@ -1377,10 +1453,8 @@
                "label" : "Difficulty running"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0011463",
-                  "label" : "Childhood onset"
-               }
+               "id" : "HP:0011463",
+               "label" : "Childhood onset"
             }
          },
          {
@@ -1390,9 +1464,7 @@
                "label" : "EMG: myopathic abnormalities"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P10Y"
-               }
+               "iso8601duration" : "P10Y"
             }
          },
          {
@@ -1402,9 +1474,7 @@
                "label" : "Elevated circulating creatine kinase concentration"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P10Y"
-               }
+               "iso8601duration" : "P10Y"
             }
          }
       ],
@@ -1514,197 +1584,293 @@
       "karyotypicSex" : "UNKNOWN_KARYOTYPE",
       "phenotypicFeatures" : [
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0000238",
                "label" : "Hydrocephalus"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "weeks" : 40
-               }
+               "weeks" : 40
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0002507",
                "label" : "Semilobar holoprosencephaly"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001750",
                "label" : "Single ventricle"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "weeks" : 40
-               }
+               "weeks" : 40
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001272",
                "label" : "Cerebellar atrophy"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P9M"
-               }
+               "iso8601duration" : "P9M"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0100702",
                "label" : "Arachnoid cyst"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P9M"
-               }
+               "iso8601duration" : "P9M"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001272",
                "label" : "Cerebellar atrophy"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P9M"
-               }
+               "iso8601duration" : "P9M"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001263",
                "label" : "Global developmental delay"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003593",
-                  "label" : "Infantile onset"
-               }
+               "id" : "HP:0003593",
+               "label" : "Infantile onset"
             }
          },
          {
-            "evidence" : [
-               {
-                  "evidenceCode" : {
-                     "id" : "ECO:0000033",
-                     "label" : "author statement supported by traceable reference"
-                  },
-                  "reference" : {
-                     "description" : "Xiong J, et al., 2019",
-                     "id" : "PMID:30855487"
+            "evidence" : {
+               "evidenceCode" : {
+                  "id" : "ECO:0000033",
+                  "label" : "author statement supported by traceable reference"
+               },
+               "info" : {
+                  "phenopacket" : {
+                     "evidence" : [
+                        {
+                           "evidenceCode" : {
+                              "id" : "ECO:0000033",
+                              "label" : "author statement supported by traceable reference"
+                           },
+                           "reference" : {
+                              "description" : "Xiong J, et al., 2019",
+                              "id" : "PMID:30855487"
+                           }
+                        }
+                     ]
                   }
+               },
+               "reference" : {
+                  "id" : "PMID:30855487",
+                  "notes" : "Xiong J, et al., 2019"
                }
-            ],
+            },
             "excluded" : false,
             "featureType" : {
                "id" : "HP:0001347",
                "label" : "Hyperreflexia"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "weeks" : 40
-               }
+               "weeks" : 40
             }
          }
       ],
@@ -2017,6 +2183,13 @@
                      "version" : "2022-03-05"
                   }
                ]
+            },
+            "vitalStatus" : {
+               "causeOfDeath" : {
+                  "id" : "MONDO:0014138",
+                  "label" : "nemaline myopathy 8"
+               },
+               "status" : "DECEASED"
             }
          }
       },
@@ -2029,9 +2202,7 @@
                "label" : "Decreased fetal movement"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "weeks" : 23
-               }
+               "weeks" : 23
             }
          },
          {
@@ -2041,10 +2212,8 @@
                "label" : "Fetal skin edema"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "days" : 4,
-                  "weeks" : 32
-               }
+               "days" : 4,
+               "weeks" : 32
             }
          },
          {
@@ -2054,10 +2223,8 @@
                "label" : "Overlapping fingers"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "days" : 4,
-                  "weeks" : 32
-               }
+               "days" : 4,
+               "weeks" : 32
             }
          },
          {
@@ -2073,10 +2240,8 @@
                }
             ],
             "onset" : {
-               "gestationalAge" : {
-                  "days" : 4,
-                  "weeks" : 32
-               }
+               "days" : 4,
+               "weeks" : 32
             }
          },
          {
@@ -2086,10 +2251,8 @@
                "label" : "1-minute APGAR score of 4"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
@@ -2099,10 +2262,8 @@
                "label" : "5-minute APGAR score of 2"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
@@ -2112,10 +2273,8 @@
                "label" : "10-minute APGAR score of 1"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
@@ -2125,10 +2284,8 @@
                "label" : "Laryngeal edema"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          },
          {
@@ -2138,10 +2295,8 @@
                "label" : "Generalized hypotonia"
             },
             "onset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003577",
-                  "label" : "Congenital onset"
-               }
+               "id" : "HP:0003577",
+               "label" : "Congenital onset"
             }
          }
       ],
@@ -2154,10 +2309,8 @@
       "diseases" : [
          {
             "ageOfOnset" : {
-               "ontologyClass" : {
-                  "id" : "HP:0003581",
-                  "label" : "Adult onset"
-               }
+               "id" : "HP:0003581",
+               "label" : "Adult onset"
             },
             "diseaseCode" : {
                "id" : "MONDO:0008327",
@@ -2248,10 +2401,8 @@
       },
       "interventionsOrProcedures" : [
          {
-            "ageOfProcedure" : {
-               "age" : {
-                  "iso8601duration" : "P70Y"
-               }
+            "ageAtProcedure" : {
+               "iso8601duration" : "P70Y"
             },
             "bodySite" : {
                "id" : "UBERON:0004549",
@@ -2263,10 +2414,8 @@
             }
          },
          {
-            "ageOfProcedure" : {
-               "age" : {
-                  "iso8601duration" : "P70Y6W"
-               }
+            "ageAtProcedure" : {
+               "iso8601duration" : "P70Y6W"
             },
             "bodySite" : {
                "id" : "UBERON:0004548",
@@ -2278,10 +2427,8 @@
             }
          },
          {
-            "ageOfProcedure" : {
-               "age" : {
-                  "iso8601duration" : "P71Y1M"
-               }
+            "ageAtProcedure" : {
+               "iso8601duration" : "P71Y1M"
             },
             "bodySite" : {
                "id" : "UBERON:0004549",
@@ -2318,9 +2465,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P71Y1M1D"
-               }
+               "iso8601duration" : "P71Y1M1D"
             },
             "timeObserved" : {
                "age" : {
@@ -2374,9 +2519,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P71Y1M1D"
-               }
+               "iso8601duration" : "P71Y1M1D"
             },
             "timeObserved" : {
                "age" : {
@@ -2407,9 +2550,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P71Y1M1D"
-               }
+               "iso8601duration" : "P71Y1M1D"
             },
             "timeObserved" : {
                "age" : {
@@ -2440,9 +2581,7 @@
                ]
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P70Y1W"
-               }
+               "iso8601duration" : "P70Y1W"
             },
             "timeObserved" : {
                "age" : {
@@ -2473,9 +2612,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P70Y1W"
-               }
+               "iso8601duration" : "P70Y1W"
             },
             "timeObserved" : {
                "age" : {
@@ -2535,9 +2672,7 @@
                ]
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P70Y1W"
-               }
+               "iso8601duration" : "P70Y1W"
             },
             "timeObserved" : {
                "age" : {
@@ -2568,9 +2703,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P70Y1W"
-               }
+               "iso8601duration" : "P70Y1W"
             },
             "timeObserved" : {
                "age" : {
@@ -2601,9 +2734,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P71Y1M"
-               }
+               "iso8601duration" : "P71Y1M"
             },
             "timeObserved" : {
                "age" : {
@@ -2626,9 +2757,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P70Y"
-               }
+               "iso8601duration" : "P70Y"
             }
          },
          {
@@ -2644,9 +2773,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P71Y1M"
-               }
+               "iso8601duration" : "P71Y1M"
             }
          },
          {
@@ -2662,9 +2789,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P71Y1M"
-               }
+               "iso8601duration" : "P71Y1M"
             }
          },
          {
@@ -2730,9 +2855,7 @@
       "diseases" : [
          {
             "ageOfOnset" : {
-               "age" : {
-                  "iso8601duration" : "P4M"
-               }
+               "iso8601duration" : "P4M"
             },
             "clinicalTnmFinding" : [
                {
@@ -3058,10 +3181,8 @@
       },
       "interventionsOrProcedures" : [
          {
-            "ageOfProcedure" : {
-               "age" : {
-                  "iso8601duration" : "P8M2W"
-               }
+            "ageAtProcedure" : {
+               "iso8601duration" : "P8M2W"
             },
             "bodySite" : {
                "id" : "UBERON:0004548",
@@ -3098,9 +3219,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P6M"
-               }
+               "iso8601duration" : "P6M"
             },
             "timeObserved" : {
                "age" : {
@@ -3131,9 +3250,7 @@
                }
             },
             "observationMoment" : {
-               "age" : {
-                  "iso8601duration" : "P6M"
-               }
+               "iso8601duration" : "P6M"
             },
             "timeObserved" : {
                "age" : {
@@ -3156,9 +3273,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P3M"
-               }
+               "iso8601duration" : "P3M"
             }
          },
          {
@@ -3174,9 +3289,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P4M"
-               }
+               "iso8601duration" : "P4M"
             }
          },
          {
@@ -3192,9 +3305,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P5M15D"
-               }
+               "iso8601duration" : "P5M15D"
             }
          },
          {
@@ -3210,9 +3321,7 @@
                }
             ],
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P6M"
-               }
+               "iso8601duration" : "P6M"
             }
          }
       ],
@@ -3412,9 +3521,7 @@
       "diseases" : [
          {
             "ageOfOnset" : {
-               "age" : {
-                  "iso8601duration" : "P55Y"
-               }
+               "iso8601duration" : "P55Y"
             },
             "diseaseCode" : {
                "id" : "MONDO:0005148",
@@ -3424,9 +3531,7 @@
          },
          {
             "ageOfOnset" : {
-               "age" : {
-                  "iso8601duration" : "P55Y"
-               }
+               "iso8601duration" : "P55Y"
             },
             "diseaseCode" : {
                "id" : "MONDO:0001134",
@@ -3558,9 +3663,7 @@
                "label" : "Proximal muscle weakness in lower limbs"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P65Y"
-               }
+               "iso8601duration" : "P65Y"
             }
          },
          {
@@ -3570,9 +3673,7 @@
                "label" : "Limb fasciculations"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P65Y"
-               }
+               "iso8601duration" : "P65Y"
             }
          },
          {
@@ -3582,9 +3683,7 @@
                "label" : "Proximal lower limb amyotrophy"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P65Y"
-               }
+               "iso8601duration" : "P65Y"
             }
          },
          {
@@ -3594,9 +3693,7 @@
                "label" : "Abnormal muscle tone"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P65Y"
-               }
+               "iso8601duration" : "P65Y"
             }
          },
          {
@@ -3606,9 +3703,7 @@
                "label" : "Gowers sign"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P65Y"
-               }
+               "iso8601duration" : "P65Y"
             }
          },
          {
@@ -3618,9 +3713,7 @@
                "label" : "Difficulty climbing stairs"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P65Y"
-               }
+               "iso8601duration" : "P65Y"
             }
          },
          {
@@ -3630,9 +3723,7 @@
                "label" : "Impaired distal vibration sensation"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P65Y"
-               }
+               "iso8601duration" : "P65Y"
             }
          }
       ],
@@ -3981,6 +4072,7 @@
                   }
                }
             ],
+            "dateOfBirth" : "1964-03-15T00:00:00Z",
             "files" : [
                {
                   "fileAttributes" : {
@@ -4073,9 +4165,7 @@
       "diseases" : [
          {
             "ageOfOnset" : {
-               "age" : {
-                  "iso8601duration" : "P4D"
-               }
+               "iso8601duration" : "P4D"
             },
             "diseaseCode" : {
                "id" : "MONDO:0016649",
@@ -4121,10 +4211,8 @@
                "label" : "Increased fetal lens echogenicity"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "days" : 2,
-                  "weeks" : 27
-               }
+               "days" : 2,
+               "weeks" : 27
             }
          },
          {
@@ -4134,10 +4222,8 @@
                "label" : "Microphthalmia"
             },
             "onset" : {
-               "gestationalAge" : {
-                  "days" : 2,
-                  "weeks" : 27
-               }
+               "days" : 2,
+               "weeks" : 27
             }
          },
          {
@@ -4147,9 +4233,7 @@
                "label" : "Low-set ears"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P4D"
-               }
+               "iso8601duration" : "P4D"
             }
          },
          {
@@ -4159,9 +4243,7 @@
                "label" : "Axial hypotonia"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P4D"
-               }
+               "iso8601duration" : "P4D"
             }
          },
          {
@@ -4171,9 +4253,7 @@
                "label" : "Microphthalmia"
             },
             "onset" : {
-               "age" : {
-                  "iso8601duration" : "P4D"
-               }
+               "iso8601duration" : "P4D"
             }
          }
       ],

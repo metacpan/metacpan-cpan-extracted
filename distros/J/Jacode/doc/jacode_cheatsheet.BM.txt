@@ -1,0 +1,120 @@
+################################################################################
+# Helaian Panduan Jacode (BM)
+# Jacode - Program Perl untuk penukaran kod aksara bahasa Jepun
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ PEMASANGAN
+
+  cpanm Jacode
+
+  Atau muat turun Jacode.pm dan jacode.pl dari https://metacpan.org/pod/Jacode
+  dan letakkan kedua-dua fail dalam direktori yang sama.
+
+■ PENGGUNAAN
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # Tukar rentetan di tempat (penggunaan paling biasa)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # Nilai pulangan (konteks senarai)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # Nilai pulangan (konteks skalar)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # Fungsi pembalut yang memulangkan nilai
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # Kesan pengekodan
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # Kawalan jujukan lepas JIS
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # Permulaan
+  Jacode::init();
+
+  # Kawalan cache
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ NAMA PENGEKODAN
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (termasuk CP932)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Perduaan (tidak boleh ditukar)
+
+■ PILIHAN
+
+  'z'  ... Kana separuh lebar → kana lebar penuh (h2z)
+  'h'  ... Kana lebar penuh → kana separuh lebar (z2h)
+
+■ JUJUKAN MULA KANJI JIS
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (lalai)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 satah 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 satah 1
+
+■ CONTOH PENUKARAN
+
+  # Shift_JIS ke UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP ke Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # Kesan input secara automatik, output JIS
+  Jacode::convert(\$line, 'jis');
+
+  # Tukar kana separuh lebar semasa SJIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # Tukar semua baris fail
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ BARIS ARAHAN (mod pkf)
+
+  perl jacode.pl [pilihan] [-[INPUT]OUTPUT] fail
+
+  perl jacode.pl file          # Tukar ke JIS
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # Pengekodan campuran → EUC-JP (dinamik)
+  perl jacode.pl -mc file      # Tukar dan cetak nama pengekodan setiap baris
+
+  Pilihan:
+  -b  Output dengan penimbal (lalai)
+  -u  Output tanpa penimbal
+  -m  Pengecaman pengekodan input dinamik
+  -c  Cetak nama pengekodan
+  -Z  Kana separuh lebar → lebar penuh
+  -H  Kana lebar penuh → separuh lebar
+  -f [unix|mac|dos]  Tukar penghujung baris
+
+■ KESERASIAN jcode.pl
+
+  Jacode serasi dengan jcode.pl karya Utashiro.
+  Alias ruang nama jcode:: juga boleh digunakan.
+
+################################################################################

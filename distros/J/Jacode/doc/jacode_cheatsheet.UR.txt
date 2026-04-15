@@ -1,0 +1,120 @@
+################################################################################
+# Jacode فوری حوالہ جاتی کارڈ (UR)
+# Jacode - جاپانی حرفی کوڈ تبدیلی کا Perl پروگرام
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ تنصیب
+
+  cpanm Jacode
+
+  یا https://metacpan.org/pod/Jacode سے Jacode.pm اور jacode.pl ڈاؤن لوڈ کریں
+  اور دونوں فائلیں ایک ہی ڈائریکٹری میں رکھیں۔
+
+■ استعمال
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # سٹرنگ کو اسی جگہ تبدیل کریں (سب سے عام استعمال)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # واپسی قدریں (فہرست سیاق)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # واپسی قدریں (اسکیلر سیاق)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # قدر واپس کرنے والے ریپر فنکشن
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # انکوڈنگ معلوم کریں
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS ایسکیپ ترتیب کنٹرول
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # ابتداء
+  Jacode::init();
+
+  # کیش کنٹرول
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ انکوڈنگ نام
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 سمیت)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... بائنری (قابل تبدیل نہیں)
+
+■ اختیارات
+
+  'z'  ... نصف چوڑائی کانا → مکمل چوڑائی کانا (h2z)
+  'h'  ... مکمل چوڑائی کانا → نصف چوڑائی کانا (z2h)
+
+■ JIS کانجی شروع ترتیب
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (پہلے سے طے شدہ)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 طیارہ 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 طیارہ 1
+
+■ تبدیلی کی مثالیں
+
+  # Shift_JIS سے UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP سے Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # خودکار ان پٹ شناخت، JIS آؤٹ پٹ
+  Jacode::convert(\$line, 'jis');
+
+  # SJIS → UTF-8 کے ساتھ نصف چوڑائی کانا تبدیلی
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # فائل کی تمام سطریں تبدیل کریں
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ کمانڈ لائن (pkf موڈ)
+
+  perl jacode.pl [اختیار] [-[ان پٹ]آؤٹ پٹ] فائلیں
+
+  perl jacode.pl file          # JIS میں تبدیل کریں
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # ملا جلا انکوڈنگ → EUC-JP (متحرک)
+  perl jacode.pl -mc file      # تبدیل کریں اور ہر سطر کی انکوڈنگ دکھائیں
+
+  اختیارات:
+  -b  بفرڈ آؤٹ پٹ (پہلے سے طے شدہ)
+  -u  غیر بفرڈ آؤٹ پٹ
+  -m  متحرک ان پٹ انکوڈنگ شناخت
+  -c  انکوڈنگ نام دکھائیں
+  -Z  نصف چوڑائی کانا → مکمل چوڑائی
+  -H  مکمل چوڑائی کانا → نصف چوڑائی
+  -f [unix|mac|dos]  لائن اختتام تبدیلی
+
+■ jcode.pl مطابقت
+
+  Jacode، Utashiro کے jcode.pl کے ساتھ مطابق ہے۔
+  jcode:: نام فضا عرفیت بھی دستیاب ہیں۔
+
+################################################################################

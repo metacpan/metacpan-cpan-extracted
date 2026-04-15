@@ -1,3 +1,33 @@
+Wed Apr 15 05:29:07 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.7.5]:
+	* release-notes-1.7.5.md: new
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- add Makefile$ to skip list, fixes busted 1.7.4
+	* src/main/perl/lib/README.md: generated
+
+Tue Apr 14 07:26:48 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.7.4]:
+	* release-notes-1.7.4.md: new
+	* VERSION: bump
+	* README.md: generated
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(write_makefile): $INCLUDE_DOTFILES = 1
+
+Tue Apr 14 06:37:41 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.7.3]:
+	* release-notes-1.7.3.md: new
+	* README.md: generated
+	* README.md.in: modified
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- avoid use of ExtUtils::Manifest default skip list
+	* src/main/perl/lib/CPAN/Maker.pm.in: POD tweaks
+	* src/main/perl/lib/README.md: generated
+
 Thu Apr  9 11:05:19 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.7.2]:

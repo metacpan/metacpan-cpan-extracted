@@ -1,3 +1,8 @@
+0.03 2026-04-14
+    * Fix code breaking due to internals change of Net::CalDAVTalk 0.14
+      This one is on me, since the module reaches deep into the implementation
+      of Net::CalDAVTalk... Thanks to Andreas Koenig for reporting this!
+
 0.02 2018-10-03
     * Fixed timezone when converting to ICal
     * Need minimum prerequisite of v0.10 for Net::CalDAVTalk (MANWAR)

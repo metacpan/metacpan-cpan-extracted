@@ -46,7 +46,7 @@ my $meetup = {
         };
 
 my $ical = meetup_to_icalendar( $meetup );
-my $entries = Net::CalDAVTalk->_argsToVCalendar($ical);
+my $entries = Net::CalDAVTalk->new(url => 'https://example.com')->_argsToVCalendar($ical);
 my $entry = $entries->{entries}->[0];
 
 ok $entry, "We created a calendar entry";

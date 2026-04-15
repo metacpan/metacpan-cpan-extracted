@@ -131,7 +131,7 @@ use warnings;
 use Cwd qw(abs_path);
 use FindBin qw($RealBin);
 
-our $VERSION = "0.040";
+our $VERSION = "0.041";
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 $ENV{GIT_CONNECTED_EPOCH} ||= eval { require Time::HiRes; Time::HiRes::time() } || time;
@@ -157,10 +157,12 @@ die localtime().": [$who] git-server: You can't access '$1' git repository\n" if
 my $bare = `git config core.bare 2>/dev/null`;
 if ($bare =~ /true/) {
     # Safe! Nothing to worry about.
+    chdir $dir or die localtime().": [$who] git-server: Access denied for bare repo '$dir': chdir [$!]\n";
 }
 elsif ($bare =~ /false/) {
     # If non-bare, then make sure no uncommitted changes are sitting on the server.
     my $where = $dir =~ m{^(.+)/\.git$} ? $1 : $dir;
+    chdir $where or die localtime().": [$who] git-server: Access denied for non-bare repo '$where': chdir [$!]\n";
     my $server_monkeys = `git diff 2>&1`;
     if ($? or $server_monkeys) {
         die localtime().": [$who] git-server: Illegal uncommitted changes found on Non-bare git server! Manual intervention required.\n".
@@ -221,7 +223,7 @@ if (my $xmods = $ENV{XMODIFIERS}) {
     $ENV{GIT_OPTION_COUNT} = scalar @options;
     for (my $i = 0; $i < @options; $i++) {
         $ENV{"GIT_OPTION_$i"} = $options[$i];
-        warn localtime().": [$who] git-server: Transported GIT_OPTION_$i=[$options[$i]]\n" if $ENV{DEBUG};
+        warn localtime().": [$who] git-server: DEBUG: Transported GIT_OPTION_$i=[$options[$i]]\n" if $ENV{DEBUG};
     }
 }
 
@@ -236,7 +238,7 @@ if ($actual_hooks ne $should_hooks) {
     chomp(my $target = `git config core.hooksPath`);
     if (!$target) {
         # No core.hooksPath at all, so just create a global default:
-        if (my $update_err = spawn($dir, "git","config","--global","core.hooksPath",$should_hooks)) {
+        if (my $update_err = system("git","config","--global","core.hooksPath",$should_hooks)) {
             warn localtime().": [$who] git-server: ERROR [$update_err] attempting to update default hooks folder: [$actual_hooks] -> [$should_hooks]\n";
         }
         else {
@@ -247,7 +249,7 @@ if ($actual_hooks ne $should_hooks) {
     $target = abs_path($target =~ /^\// ? $target : "$dir/$target");
     if ($target ne $should_hooks) {
         # Still wrong core.hooksPath set, so override local setting with correct directory:
-        if (my $update_err = spawn($dir, "git","config","--local","core.hooksPath",$should_hooks)) {
+        if (my $update_err = system("git","config","--local","core.hooksPath",$should_hooks)) {
             warn localtime().": [$who] git-server: ERROR [$update_err] attempting to update local hooks folder: [$actual_hooks] -> [$should_hooks]\n";
         }
         else {
@@ -287,9 +289,10 @@ $ENV{IPC} = "$tmpdir/current-$hook-$$-io";
 mkdir $ENV{IPC}, 0700;
 die localtime().": [$who] git-server: Unable to create [$ENV{IPC}] folder! $!\n" unless -d $ENV{IPC};
 
+my $prog = "$ENV{GIT_HOOKS_PATH}/pre-$hook";
 my $pre_failure = 0;
-if (-x "$ENV{GIT_HOOKS_PATH}/pre-$hook") {
-    if ($pre_failure = spawn($dir, "$ENV{GIT_HOOKS_PATH}/pre-$hook")) {
+if (-x $prog) {
+    if ($pre_failure = system { $prog } $prog) {
         warn localtime().": [$who] git-server: pre-$hook failure: $pre_failure\n";
     }
     $ENV{GIT_PRE_EXIT_STATUS} = $pre_failure;
@@ -299,18 +302,19 @@ my $git_failure = $pre_failure;
 if (!$git_failure) {
     my $shell = "$ENV{GIT_HOOKS_PATH}/git-shell";
     $shell = "git-shell" unless -x $shell;
-    $git_failure = spawn(".", $shell, "-c", $cmd);
+    $git_failure = system($shell, "-c", $cmd);
     $ENV{GIT_EXIT_STATUS} = $git_failure;
 }
 
+$prog = "$ENV{GIT_HOOKS_PATH}/post-$hook";
 my $post_failure = 0;
-if (-x "$ENV{GIT_HOOKS_PATH}/post-$hook") {
+if (-x $prog) {
     if ($cmd) {
         # Restore SSH_ORIGINAL_COMMAND in case the post hook wants it.
         $ENV{SSH_ORIGINAL_COMMAND} = $cmd;
     }
-    if ($post_failure = spawn($dir, "$ENV{GIT_HOOKS_PATH}/post-$hook")) {
-        warn localtime().": [$who] git-server: post-$hook failure: $pre_failure\n";
+    if ($post_failure = system { $prog } $prog) {
+        warn localtime().": [$who] git-server: post-$hook failure: $post_failure\n";
     }
 }
 
@@ -342,26 +346,3 @@ if ($ENV{IPC}) {
 rmdir $tmpdir; # Only clear if empty
 
 exit $git_failure;
-
-# spawn( $chdir, $cmd, [ @args ] )
-# chdir $chdir
-# before running cmd.
-# Returns the exit status
-sub spawn {
-    my $chdir = shift;
-    my @cmd = @_;
-    my $pid = fork;
-    if ($pid) {
-        # Parent
-        waitpid($pid, 0);
-        return $? & 127 || $? >> 8;
-    }
-    elsif (!defined $pid) {
-        die "fork: $!\n";
-    }
-    else {
-        # Child
-        chdir($chdir) or die "$chdir: chdir: $!\n";
-        exec @cmd or die "From($chdir) $cmd[0]: exec: $!";
-    }
-}

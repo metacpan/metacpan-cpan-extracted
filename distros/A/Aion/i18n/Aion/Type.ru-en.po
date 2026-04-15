@@ -94,26 +94,35 @@ msgstr "Header accessor (used to create the **swagger** schema)."
 msgid "Акцессор описания (используется для создания схемы **swagger**)."
 msgstr "Description accessor (used to create a **swagger** schema)."
 
-msgid "Делает объект вызываемым."
-msgstr "Makes the object callable."
+msgid "Акцессор примера (используется для создания схемы **swagger**)."
+msgstr "Example accessor (used to create the **swagger** schema)."
+
+msgid "Тестирует `$_`."
+msgstr "Tests `$_`."
 
 msgid "Стрингифицирует объект."
 msgstr "Strings an object."
 
-msgid "Создает новый тип как объединение `$a` и `$b`."
-msgstr "Creates a new type as the union of `$a` and `$b`."
+msgid "Или. Создает новый тип как объединение двух."
+msgstr "Or. Creates a new type as a union of two."
 
-msgid "Создает новый тип как пересечение `$a` и `$b`."
-msgstr "Creates a new type as the intersection of `$a` and `$b`."
+msgid "И. Создает новый тип как пересечение двух."
+msgstr "I. Creates a new type as the intersection of two."
 
-msgid "Создает новый тип как исключение из `$a`."
-msgstr "Creates a new type as an exception to `$a`."
+msgid "Не. Создает новый тип как исключение данного."
+msgstr "Not. Creates a new type as an exception to the given one."
 
-msgid "`$a` равно `$b`."
-msgstr "`$a` is equal to `$b`."
+msgid "Тестирует значение."
+msgstr "Tests the value."
 
-msgid "`$a` не равно `$b`."
-msgstr "`$a` is not equal to `$b`."
+msgid "Сравнивает два типа."
+msgstr "Compares two types."
+
+msgid "Проверяет, что типы не равны."
+msgstr "Checks that the types are not equal."
+
+msgid "Приведение к типу."
+msgstr "Casting to type."
 
 msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"

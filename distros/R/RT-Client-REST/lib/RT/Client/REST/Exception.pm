@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Exception;
-$RT::Client::REST::Exception::VERSION = '0.72';
+$RT::Client::REST::Exception::VERSION = '0.73';
 use parent qw(Exception::Class);
 
 use vars qw($VERSION);
@@ -18,7 +18,7 @@ use Exception::Class (
         description => 'This means that we wanted name/value pairs',
     },
 
-    'RT::Client::REST::InvaildObjectTypeException'   => {
+    'RT::Client::REST::InvalidObjectTypeException'   => {
         isa         => __PACKAGE__,
         description => 'Invalid object type was specified',
     },
@@ -207,7 +207,7 @@ RT::Client::REST::Exception - Exceptions thrown by RT::Client::REST
 
 =head1 VERSION
 
-version 0.72
+version 0.73
 
 =head1 DESCRIPTION
 
@@ -229,7 +229,7 @@ all the exceptions in this category.
 
 This means that the method you called wants key-value pairs.
 
-=item B<RT::Client::REST::InvaildObjectTypeException>
+=item B<RT::Client::REST::InvalidObjectTypeException>
 
 Thrown when you specify an invalid type to C<show()>, C<edit()>, or
 C<search()> methods.
@@ -359,7 +359,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2026, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

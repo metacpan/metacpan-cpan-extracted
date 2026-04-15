@@ -1,8 +1,8 @@
 NAME
-    marc-leader - Script to decode MARC leader from file or string.
+    marc-leader - Tool to decode MARC leader from file or string.
 
 SYNOPSIS
-     marc-leader [-a] [-d] [-f marc_xml_file] [-h] [--version] [leader_string]
+     marc-leader [-a] [-d] [-f marc_xml_file] [-h] [-v] [--version] [leader_string]
 
 DESCRIPTION
     It supports MARC XML files now.
@@ -18,22 +18,30 @@ ARGUMENTS
 
     *       "-f marc_xml_file"
 
-            MARC XML file name to decode of leader
+            Use MARC XML file name to decode of leader instead of leader
+            string.
 
     *       "-h"
 
             Print help.
 
+    *       "-v"
+
+            Verbose mode.
+
     *       "--version"
 
             Print version of script.
 
-    *       "leader_string"
+    *       "[leader_string]"
 
-            MARC leader string to decode.
+            MARC leader string to decode. It's optional to -f option.
 
-EXAMPLE
+EXAMPLE1
      marc-leader -f __MARC.xml__
+
+EXAMPLE2
+     marc-leader '00621ncm a2200217 a 4500'
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-MARC-Leader>
@@ -44,10 +52,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

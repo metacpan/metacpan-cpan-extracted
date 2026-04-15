@@ -31,7 +31,7 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny;
 use version;
 
-our $VERSION = '1.7.2'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.7.5'; ## no critic (RequireInterpolationOfMetachars)
 
 caller or __PACKAGE__->main();
 
@@ -598,6 +598,8 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
+
+\$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
 
 if ( -d 'share' ) {
   install_share 'share';
@@ -1523,7 +1525,7 @@ sub main {
 
 __DATA__
 ---
-version: "1.7.2"
+version: "1.7.5"
 min_perl_version: "type:string"
 min-perl-version: "type:string"
 project:

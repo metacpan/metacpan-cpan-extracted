@@ -43,6 +43,13 @@ optionally be exported:
 See L</check()>.
 
 
+=item C<CRL_CHECK>
+
+=item C<CRL_CHECK_ALL>
+
+See L</setVerifyFlags()>.
+
+
 =item C<FORMAT_SMIME>
 
 =item C<FORMAT_ASN1>
@@ -192,8 +199,11 @@ of the provided public keys are tainted.
 =item encrypt()
 
   $encrypted_mime = $smime->encrypt($raw_mime);
+  $encrypted_mime = $smime->encrypt($raw_mime, $cipher);
 
-Encrypt a MIME message and return a S/MIME message.
+Encrypt a MIME message and return a S/MIME message. You can pass any
+C<$cipher> string your OpenSSL library understands. Default is
+"AES-128-CBC".
 
 
 Any headers except C<Content-*>, C<MIME-*> and C<Subject> will be moved to the
@@ -250,6 +260,16 @@ Set the time to use for verification. Default is to use the current time.
 Must be an unix epoch timestamp.
 
 
+=item setVerifyFlags()
+
+  $smime->setVerifyFlags(C<Crypt::SMIME::CRL_CHECK>);
+
+Set flags used for verification.
+C<Crypt::SMIME::CRL_CHECK> check CRL for signer certificates
+C<Crypt::SMIME::CRL_CHECK_ALL> check CRL for whole certificate chain
+Verification fails if a required CRL is not found.
+
+
 =back
 
 =head1 FUNCTIONS
@@ -282,6 +302,18 @@ Optional $type parameter may specify type of data.
 
 Note that any public keys returned by this function are not verified.
 check() should be executed to ensure public keys are valid.
+
+
+=item getCapabilities()
+
+  @caps = @{Crypt::SMIME::getCapabilities($data)};
+  @caps = @{Crypt::SMIME::getCapabilities($data, $type)};
+
+Get the S/MIME Capabilities included in S/MIME message or PKCS#7 object.
+Optional $type parameter may specify type of data.
+
+
+This may include both, ciphers and hash algorithms.
 
 
 =back

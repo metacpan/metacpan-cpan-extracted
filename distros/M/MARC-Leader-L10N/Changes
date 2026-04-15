@@ -1,0 +1,5 @@
+0.02 2026-04-15T00:57:18+02:00
+ - Add MARC leader value texts. Moved from Data::MARC::Leader::Utils.
+
+0.01 2026-04-14T22:32:22+02:00
+ - First version.

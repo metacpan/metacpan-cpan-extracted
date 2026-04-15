@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.25    2026-04-15
+        Support all repositories as having issue/web/etc (waterkip)
+
 0.24    2018-12-20
         Auto generate minimum perl version as suggested by CPANTS. (manwar)
 

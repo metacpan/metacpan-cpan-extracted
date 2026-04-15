@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-subst
 
+2.3702 2026-04-15T05:18:19Z
+
+    - requires the latest App::Greple
+
 2.3701 2026-04-14T09:08:55Z
 
     - update ms-amend.dict

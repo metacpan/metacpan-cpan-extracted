@@ -7,8 +7,9 @@ build_requires:
   Test::More: '0'
 configure_requires:
   Devel::CallParser: '0.002'
+  ExtUtils::Depends: '0'
   ExtUtils::MakeMaker: '0'
-  Object::Proto: '0.12'
+  Object::Proto: '0.15'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -23,7 +24,7 @@ no_index:
 requires:
   Devel::CallChecker: '0.009'
   Devel::CallParser: '0.002'
-  Object::Proto: '0.12'
+  Object::Proto: '0.14'
   perl: '5.014'
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

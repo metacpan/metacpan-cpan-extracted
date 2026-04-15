@@ -1,0 +1,120 @@
+################################################################################
+# Aide-mémoire Jacode (FR)
+# Jacode - Programme Perl de conversion d'encodage de caractères japonais
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ INSTALLATION
+
+  cpanm Jacode
+
+  Ou téléchargez Jacode.pm et jacode.pl depuis https://metacpan.org/pod/Jacode
+  et placez les deux fichiers dans le même répertoire.
+
+■ UTILISATION
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # Conversion en place de la chaîne (usage le plus courant)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # Valeurs de retour (contexte liste)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # Valeurs de retour (contexte scalaire)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # Fonctions enveloppantes retournant une valeur
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # Détection de l'encodage
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # Contrôle des séquences d'échappement JIS
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # Initialisation
+  Jacode::init();
+
+  # Contrôle du cache
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ NOMS D'ENCODAGE
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (incluant CP932)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Binaire (non convertible)
+
+■ OPTIONS
+
+  'z'  ... Kana demi-chasse → kana pleine chasse (h2z)
+  'h'  ... Kana pleine chasse → kana demi-chasse (z2h)
+
+■ SÉQUENCES DE DÉBUT DE KANJI JIS
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (par défaut)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 plan 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 plan 1
+
+■ EXEMPLES DE CONVERSION
+
+  # Shift_JIS vers UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP vers Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # Détection automatique, sortie en JIS
+  Jacode::convert(\$line, 'jis');
+
+  # Conversion des kana demi-chasse lors de SJIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # Conversion de toutes les lignes d'un fichier
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ LIGNE DE COMMANDE (mode pkf)
+
+  perl jacode.pl [option] [-[ENTRÉE]SORTIE] fichiers
+
+  perl jacode.pl file          # Convertir en JIS
+  perl jacode.pl -sw file      # Shift_JIS vers UTF-8
+  perl jacode.pl -es file      # EUC-JP vers Shift_JIS
+  perl jacode.pl -me file      # Fichier mixte vers EUC-JP (dynamique)
+  perl jacode.pl -mc file      # Convertir et afficher l'encodage par ligne
+
+  Options:
+  -b  Sortie bufférisée (par défaut)
+  -u  Sortie non bufférisée
+  -m  Reconnaissance dynamique de l'encodage
+  -c  Afficher le nom de l'encodage
+  -Z  Kana demi-chasse → pleine chasse
+  -H  Kana pleine chasse → demi-chasse
+  -f [unix|mac|dos]  Convertir les fins de ligne
+
+■ COMPATIBILITÉ jcode.pl
+
+  Jacode est compatible avec jcode.pl d'Utashiro.
+  Les alias du namespace jcode:: sont également disponibles.
+
+################################################################################

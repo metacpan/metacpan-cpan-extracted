@@ -1,0 +1,120 @@
+################################################################################
+# Jacode အမြန်ကိုးကားစာ (MY)
+# Jacode - ဂျပန်အက္ခရာကုဒ်ပြောင်းလဲခြင်းအတွက် Perl ပရိုဂရမ်
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ ထည့်သွင်းခြင်း
+
+  cpanm Jacode
+
+  သို့မဟုတ် https://metacpan.org/pod/Jacode မှ Jacode.pm နှင့် jacode.pl
+  ဒေါင်းလုဒ်လုပ်ပြီး ဖိုင်နှစ်ခုကို တူညီသောဖိုင်တွဲထဲ ထားပါ။
+
+■ အသုံးပြုပုံ
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # string ကို နေရာတွင်ပြောင်းလဲပါ (အသုံးအများဆုံး)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # ပြန်တန်ဖိုးများ (list context)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # ပြန်တန်ဖိုး (scalar context)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # တန်ဖိုးပြန်ပေးသော wrapper function များ
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # encoding ရှာဖွေခြင်း
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS escape sequence ထိန်းချုပ်ခြင်း
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # စတင်ဆောင်ရွက်ခြင်း
+  Jacode::init();
+
+  # cache ထိန်းချုပ်ခြင်း
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ encoding အမည်များ
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 အပါအဝင်)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Binary (ပြောင်းလဲ၍မရ)
+
+■ ရွေးချယ်စရာများ
+
+  'z'  ... တစ်ဝက်အကျယ် kana → အပြည့်အကျယ် kana (h2z)
+  'h'  ... အပြည့်အကျယ် kana → တစ်ဝက်အကျယ် kana (z2h)
+
+■ JIS kanji စတင်အဆင့် sequences
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (မူလသတ်မှတ်ချက်)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 plane 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 plane 1
+
+■ ပြောင်းလဲမှု နမူနာများ
+
+  # Shift_JIS မှ UTF-8 သို့
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP မှ Shift_JIS သို့
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # input အလိုအလျောက်ရှာဖွေ၊ JIS output
+  Jacode::convert(\$line, 'jis');
+
+  # SJIS → UTF-8 ပြောင်းလဲရင်း တစ်ဝက်အကျယ် kana ပါ ပြောင်းလဲ
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # ဖိုင်၏ မျဉ်းများအားလုံး ပြောင်းလဲပါ
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ command line (pkf mode)
+
+  perl jacode.pl [ရွေးချယ်စရာ] [-[INPUT]OUTPUT] ဖိုင်များ
+
+  perl jacode.pl file          # JIS သို့ ပြောင်းလဲ
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # ရောနှောထားသော encoding → EUC-JP (dynamic)
+  perl jacode.pl -mc file      # ပြောင်းလဲပြီး မျဉ်းတစ်ကြောင်းချင်း encoding ပြပါ
+
+  ရွေးချယ်စရာများ:
+  -b  Buffered output (မူလသတ်မှတ်ချက်)
+  -u  Unbuffered output
+  -m  Dynamic input encoding ရှာဖွေမှု
+  -c  Encoding အမည် ပြပါ
+  -Z  တစ်ဝက်အကျယ် kana → အပြည့်အကျယ်
+  -H  အပြည့်အကျယ် kana → တစ်ဝက်အကျယ်
+  -f [unix|mac|dos]  Line ending ပြောင်းလဲပါ
+
+■ jcode.pl နှင့် သဟဇာတဖြစ်မှု
+
+  Jacode သည် Utashiro ၏ jcode.pl နှင့် သဟဇာတဖြစ်သည်။
+  jcode:: namespace alias များကိုလည်း အသုံးပြုနိုင်သည်။
+
+################################################################################

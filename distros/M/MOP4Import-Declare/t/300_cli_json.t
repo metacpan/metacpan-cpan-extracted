@@ -211,8 +211,25 @@ END
   subtest "--output=yaml", sub {
     plan tests => 1;
 
-    $CT->captures([run => ['--output=yaml', @opts, contextual => @vals]], <<'END');
---- 
+    my $error;
+    my ($got, $stderr, @res) = do {
+      local $@;
+      my @output;
+      eval {
+        @output = Capture::Tiny::capture {
+          MyApp1->run(['--output=yaml', @opts, contextual => @vals])
+        }
+      };
+      $error = $@;
+      @output;
+    };
+
+    if ($error) {
+      bail_out("call failed: $error");
+    }
+
+    is_deeply YAML::Syck::Load($got), YAML::Syck::Load(<<'END'), "yaml";
+---
 - 
   result: 
     x: 3

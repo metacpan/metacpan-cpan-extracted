@@ -6,6 +6,8 @@ make communicating with RT using REST protocol easy.  Most of the
 features have been implemented and tested with rt 3.6.0 and later.
 Please see POD for details on usage.
 
+'REST' is used loosely, the API is described [here](https://rt-wiki.bestpractical.com/wiki/REST).
+
 To build
 --------
 

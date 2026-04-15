@@ -52,7 +52,6 @@ my @files = (
     't/84-attachments-rt127607.t',
     't/85-attachments-rt127607.t',
     't/86-redirect.t',
-    't/author-critic.t',
     't/author-distmeta.t',
     't/author-eof.t',
     't/author-eol.t',

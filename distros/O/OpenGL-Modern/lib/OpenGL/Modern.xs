@@ -40,11 +40,11 @@ CODE:
 OUTPUT:
     RETVAL
 
+GLboolean
+glewHasContext()
 
 void
 glewDestroyContext()
-CODE:
-    glewDestroyContext();
 
 UV
 glewInit()
@@ -78,10 +78,6 @@ OUTPUT:
 GLboolean
 glewIsSupported(name);
     char* name;
-CODE:
-    RETVAL = glewIsSupported(name);
-OUTPUT:
-    RETVAL
 
 #// Test for done with glutInit
 int
@@ -108,7 +104,7 @@ OUTPUT:
 void
 glpCheckErrors()
 CODE:
-  OGLM_CROAK_IF_ERR(glpCheckErrors, )
+  OGLM_CROAK_IF_ERR("glpCheckErrors", )
 
 const char *
 glpErrorString(err)

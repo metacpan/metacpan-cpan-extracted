@@ -1,5 +1,13 @@
 Revision history for Object-Proto
 
+0.15	2026-04-14
+	- Use DynaLoader with RTLD_GLOBAL (dl_load_flags 0x01) so downstream XS
+	  modules can resolve Object::Proto symbols at runtime without explicit linking
+
+0.14	2026-04-14
+	- Use ExtUtils::Depends for cross-module XS header and library management
+	- Remove include_dir() in favour of ExtUtils::Depends Install/Files.pm
+
 0.13	2026-04-14
 	- Add object_register_type_xs_ex() user-data API, include_dir() and installable headers for downstream XS modules
 

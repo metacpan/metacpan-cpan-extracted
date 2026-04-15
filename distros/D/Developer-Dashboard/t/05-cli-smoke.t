@@ -554,6 +554,79 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     my $serve_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop") );
     ok( ref( $serve_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still returns the collector stop list after serve/restart lifecycle control' );
 }
+{
+    my $collector_log_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $collector_log_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $collector_init = _run("$perl -I'$lib' '$dashboard' init");
+    like( $collector_init, qr/runtime_root/, 'isolated collector-log smoke home initializes a runtime' );
+    my $collector_config_file = File::Spec->catfile( $collector_log_home, '.developer-dashboard', 'config', 'config.json' );
+    open my $collector_config_fh, '>:raw', $collector_config_file or die "Unable to write $collector_config_file: $!";
+    my $collector_config_json = json_encode(
+        {
+            collectors => [
+                {
+                    name    => 'cli.collector',
+                    command => q{printf 'cli stdout\n'; printf 'cli stderr\n' >&2},
+                    cwd     => 'home',
+                },
+                {
+                    name    => 'pending.collector',
+                    command => q{printf 'pending\n'},
+                    cwd     => 'home',
+                },
+                {
+                    name    => 'templated.collector',
+                    command => q{printf '{"a":123}'},
+                    cwd     => 'home',
+                    indicator => {
+                        name  => 'templated.indicator',
+                        label => 'Templated',
+                        icon  => '[% a %]',
+                    },
+                },
+            ],
+        }
+    );
+    $collector_config_json = encode( 'UTF-8', $collector_config_json ) if utf8::is_utf8($collector_config_json);
+    print {$collector_config_fh} $collector_config_json;
+    close $collector_config_fh;
+
+    my $collector_run = json_decode( _run("$perl -I'$lib' '$dashboard' collector run cli.collector") );
+    is( $collector_run->{name}, 'cli.collector', 'dashboard collector run returns the requested collector payload before log inspection' );
+
+    my $named_log = _run("$perl -I'$lib' '$dashboard' collector log cli.collector");
+    like( $named_log, qr/cli\.collector/, 'dashboard collector log <name> resolves the named collector log stream' );
+    like( $named_log, qr/cli stdout/, 'dashboard collector log <name> includes collector stdout' );
+    like( $named_log, qr/cli stderr/, 'dashboard collector log <name> includes collector stderr' );
+
+    my $all_logs = _run("$perl -I'$lib' '$dashboard' collector log");
+    like( $all_logs, qr/cli\.collector/, 'dashboard collector log without a name aggregates collector log output' );
+    like( $all_logs, qr/cli stdout/, 'dashboard collector log aggregate includes collector stdout' );
+
+    my $pending_log = _run("$perl -I'$lib' '$dashboard' collector log pending.collector");
+    like( $pending_log, qr/No log entries are available yet for collector 'pending\.collector'/, 'dashboard collector log <name> is explicit when a configured collector has not run yet' );
+
+    my $templated_run = json_decode( _run("$perl -I'$lib' '$dashboard' collector run templated.collector") );
+    is( $templated_run->{exit_code}, 0, 'dashboard collector run keeps TT-icon collectors successful when stdout contains valid JSON' );
+    my $templated_indicators = json_decode( _run("$perl -I'$lib' '$dashboard' indicator list") );
+    my ($templated_indicator) = grep { $_->{name} eq 'templated.indicator' } @{$templated_indicators};
+    ok( $templated_indicator, 'dashboard indicator list exposes the TT-backed collector indicator after a collector run' );
+    is( $templated_indicator->{icon}, '123', 'dashboard indicator list preserves the rendered TT-backed collector icon instead of reverting to raw template syntax' ) if $templated_indicator;
+
+    my ( $missing_stdout, $missing_stderr, $missing_exit ) = capture {
+        system 'sh', '-c', "$perl -I'$lib' '$dashboard' collector log missing.collector";
+        return $? >> 8;
+    };
+    ok( $missing_exit != 0, 'dashboard collector log exits non-zero for an unknown collector name' );
+    like(
+        decode( 'UTF-8', $missing_stdout . $missing_stderr ),
+        qr/Unknown collector 'missing\.collector'/,
+        'dashboard collector log reports unknown collector names explicitly',
+    );
+}
 
 my $bookmarks_root = _run("$perl -I'$lib' '$dashboard' path resolve bookmarks_root");
 is( $bookmarks_root, File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'dashboards' ) . "\n", 'dashboard path resolve supports bookmarks_root alias' );

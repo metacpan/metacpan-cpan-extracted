@@ -7,6 +7,7 @@ ignore.txt
 include/object_compat.h
 include/object_types.h
 include/xop_compat.h
+Install/Files.pm
 lib/Object/Proto.pm
 Makefile.PL
 MANIFEST

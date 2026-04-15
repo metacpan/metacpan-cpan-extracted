@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -60,6 +60,7 @@ my %LoginPatterns = ( # Patterns to check for during device login (Telnet/Serial
 	iswMarvell	=>	'Product: ISW-24W-4X',
 	slx		=>	'Welcome to the Extreme SLX-OS Software',
 	eosChassis	=>	'   C H A S S I S',
+	oneosbanner	=>	'System is ready for all commands',
 );
 my %Prm = ( # Hash containing list of named parameters returned by attributes
 	bstk	=>	'BaystackERS',
@@ -77,6 +78,7 @@ my %Prm = ( # Hash containing list of named parameters returned by attributes
 	hive	=>	'HiveOS',
 	ipanema	=>	'Ipanema',
 	eos	=>	'EnterasysOS',
+	oneos	=>	'OneOS',
 	generic	=>	'generic',
 );
 
@@ -92,6 +94,7 @@ my %Attribute = (
 			'ports',
 			'sysname',
 			'base_mac',
+			'serial_number',
 			'baudrate',
 			'max_baud',
 			],
@@ -191,6 +194,12 @@ my %Attribute = (
 			'stp_mode',
 			],
 
+	$Prm{oneos}	=> [
+			'is_oneos',
+			'oob_ip',
+			'is_oob_connected',
+			],
+
 	$Prm{xlr}	=> [
 			'is_master_cpu',
 			'is_dual_cpu',
@@ -217,6 +226,7 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 	$Prm{hive}		=>	'([^\n\x0d\x0a\)]+)()#$',
 	$Prm{ipanema}		=>	'\[([^\n\x0d\x0a\\[\])]+?)(?:\.rt\d)?\]()\$ $',
 	$Prm{eos}		=>	'([^\n\x0d\x0a\)]+)()\((.+?)\)->$',
+	$Prm{oneos}		=>	'([^\n\x0d\x0a\)]+)()(?:\((.+?)\))?# $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
@@ -237,6 +247,7 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{hive}		=>	'SWITCHNAME#$',
 	$Prm{ipanema}		=>	'(?:\[SWITCHNAME(?:\.rt\d)?\]\$|bash-[\d\.]+\$|SWITCHNAME\.?(?:rt\d)?:[~\/\w\.-]+#) $',
 	$Prm{eos}		=>	'SWITCHNAME\((.+?)\)->$',
+	$Prm{oneos}		=>	'SWITCHNAME(?:\((.+?)\))?# $',
 	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
@@ -264,6 +275,7 @@ my %MorePrompt = ( # Regular expression character like ()[]. need to be backslas
 	$Prm{hive}		=>	' --More-- ',
 	$Prm{ipanema}		=>	'', # N/A on Linux..
 	$Prm{eos}		=>	'--More-- <space> next page, <cr> one line, <q> quit',
+	$Prm{oneos}		=>	'\e\[3m--More--\e\[23m',
 	$Prm{generic}		=>	'----More \(q=Quit, space/return=Continue\)----'
 					. '|--More-- \(q = quit\) '
 					. '|Press any key to continue \(q : quit\) :\x00'
@@ -404,6 +416,10 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 	$Prm{eos}		=>	'^('
 					. 'Error: '
 				. ')',
+	$Prm{oneos}		=>	'^('
+					. '-+\^\n.+'
+					. '|%?Error: '
+				. ')',
 );
 our $CmdConfirmPrompt = '(?:' # Y/N prompt
 				. '[\(\[<] *(?:'
@@ -429,10 +445,13 @@ our %CmdConfirmSendY = ( # How to feed "y" to above confirmation prompt: 1 = pri
 	$Prm{hive}		=>	1,
 	$Prm{ipanema}		=>	1,
 	$Prm{eos}		=>	1,
+	$Prm{oneos}		=>	0,
 	$Prm{generic}		=>	1,
 );
 our $CmdInitiatedPrompt = '[?:=]\h*(?:\(.+?\)\h*)?$'; # Prompt for additional user info
 our $WakeConsole = "\n"; # Sequence to send when connecting to console to wake device
+			 # Note that this assumes that binmode is not enabled on underlying Control::CLI, which will thus translate \n into CRLF
+			 # If binmode is enabled, then \n will become just LF and will not work; in which case set the wake_console as CRLF
 
 my $LoginReadAttempts = 10;		# Number of read attempts for readwait() method used in login()
 my $CmdPromptReadAttempts = 8;		# Number of read attempts for readwait() method used in poll_cmd()
@@ -1640,6 +1659,11 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
 							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0, is_eos => 1);
 						}
+						elsif ($key eq 'oneosbanner') {
+							$login->{family_type} = $Prm{oneos};
+							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1, is_oneos => 1);
+						}
 					}
 					if ($patdepth > $deepest) { # We have a deeper match, we keep it
 						($pattern, $deepest) = ($key, $patdepth);
@@ -1712,7 +1736,11 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 			}
 
 			# Now handle any pattern matches we had above
-			if ($pattern eq 'banner' || $pattern eq 'bell') { # We got the banner, send a CTRL-Y to get in
+			if ($pattern eq 'oneosbanner') { # We end up here when, sometimes, OneOS puts the prompt before the banner
+				$self->print(); # So we need to force a new prompt for login to succeed
+				next;
+			}
+			elsif ($pattern eq 'banner' || $pattern eq 'bell') { # We got the banner, send a CTRL-Y to get in
 				$self->debugMsg(8,"\nlogin() Processing Stackable Banner\n\n");
 				$self->put(string => $CTRL_Y, errmode => 'return')
 					or return $self->poll_return($self->error("$pkgsub: Unable to send CTRL-Y sequence // ".$self->errmsg));
@@ -1858,7 +1886,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 			($args{command}, $args{more_pages}, $args{prompt}, $args{reset_prompt}, $args{timeout}, $args{errmode},
 			 $args{feed_list}, $args{cmd_confirm_prompt}, $args{cmd_initiated_prompt}) = @_;
 		}
-		$args{feed_list} = [$args{feed_list}] if defined $args{feed_list} && !ref($args{feed_list}) eq "ARRAY";	# We want it as an array reference
+		$args{feed_list} = [$args{feed_list}] if defined $args{feed_list} && ref($args{feed_list}) ne "ARRAY";	# We want it as an array reference
 		# In which case we need to setup the poll structure for them here (the main poll structure remains unchanged)
 		$self->{POLL}{$pollsub} = { # Populate structure with method arguments/storage
 			# Set method argument keys
@@ -2352,7 +2380,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				return $self->poll_return(1);
 			};
 			($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'is_apls' ||
-			 $attrib->{attribute} eq 'is_voss' || $attrib->{attribute} eq 'is_fabric_engine' ||
+			 $attrib->{attribute} eq 'is_voss' || $attrib->{attribute} eq 'is_fabric_engine' || $attrib->{attribute} eq 'serial_number' ||
 			 $attrib->{attribute} eq 'apls_box_type' || $attrib->{attribute} eq 'brand_name' || # Any new attributes added here, need to be added on exit to this if block below
 			 (!$self->{$Package}{ATTRIBFLAG}{'model'} && ($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports')) || # We need 'model' attrib for port/slot ones
 			 (!$self->{$Package}{ATTRIBFLAG}{'is_voss'} && $attrib->{attribute} =~ /^(?:is_)?oob_/) # We need 'is_voss' attrib for oob ones
@@ -2386,6 +2414,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				else { # Non-VOSS PassportERS
 					$self->_setAttrib('brand_name', undef);
 				}
+				$$outref =~ /Serial#\s+: (\S+)/g && $self->_setAttrib('serial_number', $1);
 				$$outref =~ /BaseMacAddr\s+: (.+)/g && $self->_setBaseMacAttrib($1); # Might not match on 8600 as on page 2
 				# Attributes below are beyond demanded pages of output, but we still check them in case more paging was disabled
 				if ($$outref =~ /CP.+ dormant /		# 8600 & VSP9000
@@ -2399,7 +2428,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				}
 				$$outref =~ /Virtual IP\s+: (.+)/g && $self->_setAttrib('oob_virt_ip', $1);
 				if ($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'is_apls' || $attrib->{attribute} eq 'is_voss' ||
-				    $attrib->{attribute} eq 'apls_box_type' || $attrib->{attribute} eq 'brand_name') { # Needs to match the same listed on beginning of if block above
+				    $attrib->{attribute} eq 'serial_number' || $attrib->{attribute} eq 'apls_box_type' || $attrib->{attribute} eq 'brand_name') { # Needs to match the same listed on beginning of if block above
 					$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 					return $self->poll_return(1);
 				}
@@ -2535,7 +2564,8 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 	elsif ($familyType eq $Prm{bstk}) {
 		($attrib->{attribute} eq 'fw_version' || $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'switch_mode' ||
 		 $attrib->{attribute} eq 'unit_number' || $attrib->{attribute} eq 'base_unit' || $attrib->{attribute} eq 'stack_size' ||
-		 $attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'base_mac') && do {
+		 $attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'base_mac' ||
+		 $attrib->{attribute} eq 'serial_number') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [undef, 'show sys-info']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			if ($$outref =~ /Operation Mode:\s+(Switch)/g) {
@@ -2555,6 +2585,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$$outref =~ /MAC Address:\s+(.+)/gc && $self->_setBaseMacAttrib($1);
 			$$outref =~ /sysDescr:\s+(.+?)(?:\n|\s{4})/gc && # Match up to end of line, or 4 or more spaces (old baystacks append FW/SW version here)
 				$self->_setModelAttrib($1);
+			$$outref =~ /Serial \#:\s+(\S+)/g && $self->_setAttrib('serial_number', $1);
 			$$outref =~ /FW:([\d\.]+)\s+SW:v([\d\.]+)/gc && do {
 				$self->_setAttrib('fw_version', $1);
 				$self->_setAttrib('sw_version', $2);
@@ -2730,11 +2761,12 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		};
 	}
 	elsif ($familyType eq $Prm{xirrus}) {
-		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac' ||
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'serial_number' || $attrib->{attribute} eq 'base_mac' ||
 		 $attrib->{attribute} eq 'fw_version' || $attrib->{attribute} eq 'sw_version')&& do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show system-info']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /Model: (.+?),/g && $self->_setModelAttrib($1);
+			$$outref =~ /System         \S+ +(\S+)/g && $self->_setAttrib('serial_number', $1);
 			$$outref =~ /IAPs\s+(.+?)-/g && $self->_setBaseMacAttrib($1);
 			$$outref =~ /Boot Loader\s+(.+?) \(.+?\), Build: (.+)/g && $self->_setAttrib('fw_version', "$1-$2");
 			$$outref =~ /System Software\s+(.+?) \(.+?\), Build: (.+)/g && $self->_setAttrib('sw_version', "$1-$2");
@@ -2775,23 +2807,10 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
-		($attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
-			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
-			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-			$$outref =~ /Image   : Extreme(?:XOS| Networks Switch Engine) version (.+) by /g && $self->_setAttrib('sw_version', $1);
-			$$outref =~ /BootROM : (?:Default )?(\S+)/g && $self->_setAttrib('fw_version', $1);
-			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
-			return $self->poll_return(1);
-		};
-		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
-			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show port debounce']);
-			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-			$self->_setSlotPortAttrib($outref);
-			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
-			return $self->poll_return(1);
-		};
 		($attrib->{attribute} eq 'switch_mode' || $attrib->{attribute} eq 'stack_size' ||
-		 $attrib->{attribute} eq 'unit_number' || $attrib->{attribute} eq 'master_unit') && do {
+		 $attrib->{attribute} eq 'unit_number' || $attrib->{attribute} eq 'master_unit' || # Any new attributes added here, need to be added on exit to this if block below
+		 (!$self->{$Package}{ATTRIBFLAG}{'master_unit'} && $attrib->{attribute} eq 'serial_number') # We need 'master_unit' attrib for serial_number one
+		) && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show stacking']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			if ($$outref =~ /(?:This node is not in an Active Topology|stacking-support:\s+\w+\s+Disabled|\*[\d:a-f]+  -     Disabled)/) {
@@ -2810,6 +2829,29 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 				}
 				$self->_setAttrib('stack_size', $unitCount);
 			}
+			if ($attrib->{attribute} eq 'switch_mode' || $attrib->{attribute} eq 'stack_size' ||
+			    $attrib->{attribute} eq 'unit_number' || $attrib->{attribute} eq 'master_unit') { # Needs to match the same listed on beginning of if block above
+				$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+				return $self->poll_return(1);
+			}
+			else { # If an attribute that just needed 'master_unit', fall through to appropriate section below
+				$attrib->{debugMsg} = 0;
+			}
+		};
+		($attrib->{attribute} eq 'serial_number' || $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			my $masterUnit = defined $self->{$Package}{ATTRIB}{'master_unit'} ? $self->{$Package}{ATTRIB}{'master_unit'} : "1";
+			$$outref =~ /(?:Switch|Slot-${masterUnit})          : \S+ (\S+)/g && $self->_setAttrib('serial_number', $1);
+			$$outref =~ /Image   : Extreme(?:XOS| Networks Switch Engine) version (.+) by /g && $self->_setAttrib('sw_version', $1);
+			$$outref =~ /BootROM : (?:Default )?(\S+)/g && $self->_setAttrib('fw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show port debounce']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$self->_setSlotPortAttrib($outref);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -2845,10 +2887,11 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 	}
 	elsif ($familyType eq $Prm{isw}) {
 		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'base_mac' ||
-		 $attrib->{attribute} eq 'sw_version')&& do {
+		 $attrib->{attribute} eq 'serial_number' || $attrib->{attribute} eq 'sw_version')&& do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['do show version']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /MAC Address      : (.+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /Serial Number    : (\S+)/g && $self->_setAttrib('serial_number', $1);
 			$$outref =~ /System Name      : (.+)/g && $self->_setAttrib('sysname', $1);
 			$$outref =~ /Product          : (.+)/g && $self->_setModelAttrib($1); # old ISW models
 			$$outref =~ /Board Type       : (.+)/g && $self->_setModelAttrib($1); # New ISW models
@@ -2866,10 +2909,11 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 	}
 	elsif ($familyType eq $Prm{iswMarv}) {
 		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'base_mac' ||
-		 $attrib->{attribute} eq 'sw_version')&& do {
+		 $attrib->{attribute} eq 'serial_number' || $attrib->{attribute} eq 'sw_version')&& do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /MAC Address     : (.+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /Serial Number   : (\S+)/g && $self->_setAttrib('serial_number', $1);
 			$$outref =~ /System Name     : (.+)/g && $self->_setAttrib('sysname', $1);
 			$$outref =~ /Board Type      : (.+)/g && $self->_setModelAttrib($1);
 			$$outref =~ /Software Version: V(.+)/g && $self->_setAttrib('sw_version', $1);
@@ -2885,11 +2929,12 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		};
 	}
 	elsif ($familyType eq $Prm{s200}) {
-		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'sw_version' ||
-		 $attrib->{attribute} eq 'fw_version') && do {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'serial_number' ||
+		 $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [undef, 'show version']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /Machine Model\.+ (.+)/g && $self->_setModelAttrib($1);
+			$$outref =~ /Serial Number\.+ (\S+)/g && $self->_setAttrib('serial_number', $1);
 			$$outref =~ /Burned In MAC Address\.+ (.+)/g && $self->_setBaseMacAttrib($1);
 			$$outref =~ /Software Version\.+ (.+)/g && $self->_setAttrib('sw_version', $1);
 			$$outref =~ /Operating System\.+ Linux (.+)/g && $self->_setAttrib('fw_version', $1);
@@ -2992,8 +3037,8 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		};
 	}
 	elsif ($familyType eq $Prm{wing}) {
-		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'sw_version' ||
-		 $attrib->{attribute} eq 'fw_version' || $attrib->{attribute} eq 'sysname') && do {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'serial_number' ||
+		 $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version' || $attrib->{attribute} eq 'sysname') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [undef, 'show version']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /(\S+) version (.+)/g && do {
@@ -3003,6 +3048,7 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			};
 			$$outref =~ /(\S+) uptime is/g && $self->_setAttrib('sysname', $1);
 			$$outref =~ /Base ethernet MAC address is (.+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /System serial number is (\S+)/g && $self->_setAttrib('serial_number', $1);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -3041,12 +3087,14 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
-		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'switch_type' || $attrib->{attribute} eq 'baudrate') && do {
-			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [($self->config_context ? 'do ':'') . 'show chassis | include "Chassis Name:|switchType:"']);
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'switch_type' || $attrib->{attribute} eq 'baudrate' ||
+		 $attrib->{attribute} eq 'serial_number') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [($self->config_context ? 'do ':'') . 'show chassis | include "Chassis Name:|switchType:|CHASSIS|Factory"']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /Chassis Name:(?:\t|\e\[\d\w)(?:(?:BR|EN)-)?(.+)/g && $self->_setModelAttrib($1); # On serial port SLX uses \e[3C instead of tab char
 			$self->_setAttrib('baudrate', defined $self->{$Package}{ATTRIB}{'model'} && $self->{$Package}{ATTRIB}{'model'} =~ /9030/ ? 115200 : undef);
 			$$outref =~ /switchType: (\d+)/g && $self->_setAttrib('switch_type', $1);
+			$$outref =~ /CHASSIS\//g && $$outref =~ /Factory Serial Num: +\t(\S+)/g && $self->_setAttrib('serial_number', $1);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -3160,10 +3208,11 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
-		($attrib->{attribute} eq 'base_mac') && do {
+		($attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'serial_number') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show hw-info']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-			$$outref =~ /Ethernet MAC address:\s(.+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /Ethernet MAC address:\s+(\S+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /Serial number:\s+(\S+)/g && $self->_setAttrib('serial_number', $1);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -3175,10 +3224,12 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		};
 	}
 	elsif ($familyType eq $Prm{ipanema}) {
-		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version' ||
+		 $attrib->{attribute} eq 'serial_number') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['version']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /Name : (\S+)/g && $self->_setModelAttrib($1);
+			$$outref =~ /S\/N  : (\S+)/g && $self->_setAttrib('serial_number', $1);
 			$$outref =~ /  Kernel : (\S+)/g && $self->_setAttrib('fw_version', $1);
 			$$outref =~ /  Ipe    : (\S+)/g && $self->_setAttrib('sw_version', $1);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
@@ -3220,10 +3271,11 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
-		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac') && do {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'serial_number') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show system hardware']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /Chassis Type:               (.+?)(?:\s?\(0x\d+\)?)/g && $self->_setModelAttrib($1);
+			$$outref =~ /Chassis Serial Number:      (\S+)/g && $self->_setAttrib('serial_number', $1);
 			$$outref =~ /Base MAC Address:        (.+)/g && $self->_setBaseMacAttrib($1);
 			$$outref =~ /Firmware Version:        (\S+)/g && $self->_setAttrib('sw_version', $1);
 			$$outref =~ /BootCode Version:        (\S+)/g && $self->_setAttrib('fw_version', $1);
@@ -3269,6 +3321,54 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ["set console baud ?$CTRL_U"]);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$$outref =~ /,(\d+)\)$/m && $self->_setAttrib('max_baud', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+	}
+	elsif ($familyType eq $Prm{oneos}) {
+		$attrib->{attribute} eq 'sysname' && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show running-config system']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /hostname (.+)/g && $self->_setAttrib('sysname', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'base_mac' || $attrib->{attribute} eq 'serial_number') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show sysinfo chassis']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /Product Name: (\S+)/g && $self->_setModelAttrib($1);
+			$$outref =~ /Serial Number: (\S+)/g && $self->_setAttrib('serial_number', $1);
+			$$outref =~ /Base MAC Address: (\S+)/g && $self->_setBaseMacAttrib($1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'sw_version' || $attrib->{attribute} eq 'fw_version') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version'], 1);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /Base OS:\nCurrent Version:                         (\S+)/g && $self->_setAttrib('fw_version', $1);
+			$$outref =~ /Current Version:                         (\S+)/g && $self->_setAttrib('sw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show interface ethernet brief']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$self->_setSlotPortAttrib($outref);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'oob_ip' || $attrib->{attribute} eq 'is_oob_connected') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show interface management 0'], 1);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			if ($$outref =~ /IPv4 address (.+)\//g) {
+				$self->_setAttrib('oob_ip', $1);
+			}
+			else { # No OOB port on this device
+				$self->_setAttrib('oob_ip', undef);
+			}
+			$self->_setAttrib('is_oob_connected', defined $self->socket &&
+				(defined $self->{$Package}{ATTRIB}{'oob_ip'} && $self->socket->peerhost eq $self->{$Package}{ATTRIB}{'oob_ip'}) ?
+				1 : 0 );
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
 		};
@@ -3811,6 +3911,12 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 		return $self->poll_return($ok) unless $ok;
 		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
 	}
+	elsif ($familyType eq $Prm{oneos}) {
+		$devMorePage->{cmdString} = $devMorePage->{enable} ? '24' : '0' unless defined $devMorePage->{cmdString};
+		my ($ok, undef, $resref) = $self->poll_cmd($pkgsub, "terminal length $devMorePage->{cmdString}");
+		return $self->poll_return($ok) unless $ok;
+		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
+	}
 	else {
 		return $self->poll_return($self->error("$pkgsub: Cannot configure more paging on family type $familyType"));
 	}
@@ -4217,7 +4323,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 	}
 	if ($discDevice->{stage} < 5) { # Next stage
 		# SLX detection command
-		my ($ok, $outref) = $self->poll_cmd($pkgsub, ($self->config_context ? 'do ':'') . 'show chassis | include "Chassis Name:|switchType:"');
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, ($self->config_context ? 'do ':'') . 'show chassis | include "Chassis Name:|switchType:|CHASSIS|Factory"');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^Chassis Name:(?:\t|\e\[\d\w)(?:(?:BR|EN)-)?(.+)/m) { # On serial port SLX uses \e[3C instead of tab char
@@ -4226,6 +4332,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			$self->_setModelAttrib($model);
 			$self->_setAttrib('baudrate', defined $self->{$Package}{ATTRIB}{'model'} && $self->{$Package}{ATTRIB}{'model'} =~ /9030/ ? 115200 : undef);
 			$self->_setAttrib('switch_type', $1) if	$$outref =~ /switchType: (\d+)/g;
+			$self->_setAttrib('serial_number', $1) if $$outref =~ /CHASSIS\//g && $$outref =~ /Factory Serial Num:     (\S+)/g;
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{slx}}/;
 			$self->_setDevicePrompts($Prm{slx}, $1);
 			return (1, $Prm{slx});
@@ -4246,6 +4353,21 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		}
 	}
 	if ($discDevice->{stage} < 7) { # Next stage
+		# OneOS detection command
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show sysinfo chassis');
+		return $ok unless $ok;
+		$discDevice->{stage}++; # Move to next stage on next cycle
+		if ($$outref =~ /Product Name: (\S+)/g) {
+			my $model = $1;
+			$self->_setFamilyTypeAttrib($Prm{oneos}, is_nncli => 1, is_oneos => 1);
+			$self->_setModelAttrib($model);
+			$$outref =~ /Base MAC Address: (\S+)/g && $self->_setBaseMacAttrib($1);
+			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{oneos}}/;
+			$self->_setDevicePrompts($Prm{oneos}, $1);
+			return (1, $Prm{oneos});
+		}
+	}
+	if ($discDevice->{stage} < 8) { # Next stage
 		# ISW detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'do show version | include ISW'); # Must add do, as we may be in config mode
 		return $ok unless $ok;
@@ -4259,7 +4381,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{isw});
 		}
 	}
-	if ($discDevice->{stage} < 8) { # Next stage
+	if ($discDevice->{stage} < 9) { # Next stage
 		# ISWmarvell detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show env');
 		return $ok unless $ok;
@@ -4271,9 +4393,9 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{iswMarv});
 		}
 	}
-	if ($discDevice->{stage} < 9) { # Next stage
+	if ($discDevice->{stage} < 10) { # Next stage
 		# Wing detection command
-		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version | include version|Extreme|MAC|uptime');
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version | include version|Extreme|uptime|MAC|serial');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		if ($$outref =~ /^(\S+) version (.+)\nCopyright \(c\) [\d-]+ Extreme Networks/m) {
@@ -4282,12 +4404,13 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			$self->_setModelAttrib($model);
 			$self->_setAttrib('sysname', $1) if $$outref =~ /^(\S+) uptime is/m;
 			$self->_setBaseMacAttrib($1) if $$outref =~ /^Base ethernet MAC address is (.+)$/m;
+			$self->_setAttrib('serial_number', $1) if $$outref =~ /System serial number is (\S+)/g;
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{wing}}/;
 			$self->_setDevicePrompts($Prm{wing}, $1);
 			return (1, $Prm{wing});
 		}
 	}
-	if ($discDevice->{stage} < 10) { # Next stage
+	if ($discDevice->{stage} < 11) { # Next stage
 		# HiveOS & EnterasysOS detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version');
 		return $ok unless $ok;
@@ -4307,7 +4430,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{eos});
 		}
 	}
-	if ($discDevice->{stage} < 11) { # Next stage
+	if ($discDevice->{stage} < 12) { # Next stage
 		# Ipanema detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'ipconfig -d');
 		return $ok unless $ok;
@@ -4320,7 +4443,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{ipanema});
 		}
 	}
-	if ($discDevice->{stage} < 12) { # Next stage
+	if ($discDevice->{stage} < 13) { # Next stage
 		# Series200 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show slot');
 		return $ok unless $ok;
@@ -4334,7 +4457,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{s200});
 		}
 	}
-	if ($discDevice->{stage} < 13) { # Next stage
+	if ($discDevice->{stage} < 14) { # Next stage
 		# PassportERS-cli detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show bootconfig info');
 		return $ok unless $ok;
@@ -4348,7 +4471,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{pers});
 		}
 	}
-	if ($discDevice->{stage} < 14) { # Next stage
+	if ($discDevice->{stage} < 15) { # Next stage
 		# WLAN 9100 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show contact-info');
 		return $ok unless $ok;
@@ -4362,7 +4485,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{xirrus});
 		}
 	}
-	if ($discDevice->{stage} < 15) { # Next stage
+	if ($discDevice->{stage} < 16) { # Next stage
 		# Secure Router detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show chassis');
 		return $ok unless $ok;
@@ -4376,7 +4499,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{sr});
 		}
 	}
-	if ($discDevice->{stage} < 16) { # Next stage
+	if ($discDevice->{stage} < 17) { # Next stage
 		# WLAN 2300 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show system');
 		return $ok unless $ok;
@@ -4392,7 +4515,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{trpz});
 		}
 	}
-	if ($discDevice->{stage} < 17) { # Next stage
+	if ($discDevice->{stage} < 18) { # Next stage
 		# Accelar detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show sys perf');
 		return $ok unless $ok;
@@ -4903,6 +5026,10 @@ Universal Hardware (FabricEngine & SwitchEngine) 4120, 4220, 5320, 5420, 5520, 5
 
 =item *
 
+OneOS, Switching Routing (SR) and SD-WAN appliance
+
+=item *
+
 ERS models 2500, 3x00, 4x00, 5x00
 
 =item *
@@ -4964,6 +5091,10 @@ Baystack models 325, 425
 =item *
 
 Accelar/Passport models 1000, 1100, 1200
+
+=item *
+
+EnterasysOS Chassis (only tested with S4)
 
 =back
 
@@ -5771,6 +5902,10 @@ B<PassportERS> : Any of Passport/ERS-1600, Passport/ERS-8x00, VOSS VSPs (VSP-900
 
 =item *
 
+B<OneOS> : Switching Routing (SR) and SD-WAN appliance
+
+=item *
+
 B<ISW> : ISW industrial switches (not using Marvell chipset)
 
 =item *
@@ -5835,6 +5970,10 @@ I<sysname>: System name of the device. This attribute will remain undefined if c
 =item *
 
 I<base_mac>: Base MAC address of the device in string format xx-xx-xx-xx-xx-xx. This is the base MAC address from which all other device MACs (VLAN, Port, etc) are derived. This attribute is useful for maintaining a unique reference for the device. This attribute will remain undefined if connected to the Standby CPU of a PassportERS device.
+
+=item *
+
+I<serial_number>: Serial Number of the device. If the device is an ExtremeXOS stack the S/N of the I<master_unit> is returned. This attribute remains undefined for family types SecureRouter, WLAN2300, Accelar.
 
 =item *
 
@@ -6038,6 +6177,26 @@ I<stack_size>: Number of units in the stack, if a stack; undef otherwise
 =item *
 
 I<stp_mode>: Spanning tree operational mode; possible values: B<stpg> (802.1D), B<rstp> (802.1W), B<mstp> (802.1S)
+
+=item *
+
+I<oob_ip>: Out-of-band IP address (only defined on devices which have an OOB port and have an IP address configured on it)
+
+=item *
+
+I<is_oob_connected>: Flag; true(1) if the connection to the device is to the oob_ip IP address; false(0) otherwise
+
+=back
+
+
+
+Attributes which only apply to B<OneOS> family type:
+
+=over 4
+
+=item *
+
+I<is_oneos>: Flag; true(1) if the device is OneOS; false(0) otherwise.
 
 =item *
 
@@ -6628,9 +6787,9 @@ The default value is set to 10.
 
   $prev = $obj->console($flag);
 
-When connecting to the serial console port of a device it is necessary to send some characters to trigger the device at the other end to respond. These characters are defined in wake_console() and are automatically sent when the object console mode is true. By default the object console is undefined, and automatically updates itself to true when connecting via Serial, or Telnet (with port other than 23) or SSH (with port other than 22). The latter two generally represent connection to some terminal server deivce.
+When connecting to the serial console port of a device it is necessary to send some characters to trigger the device at the other end to respond. These characters are defined in wake_console() and are automatically sent when the object console mode is true. By default the object console is undefined, and automatically updates itself to true when connecting via Serial, or Telnet (with port other than 23) or SSH (with port other than 22). The latter two generally represent connection to some terminal server device.
 To prevent the object console mode from auto updating following connection, you may set it with this method to a defined false value (0); this will result in wake_console being permanently disabled.
-Alternatively, to force wake_console to be sent even on regular Telnet/SSH connections, you may set it with this method to a true value. This approach is needed when connecting via Telnet to an XOS switch which is configured with a 'before-login' banner which has to be acknowledged. In this case the XOS switch will not request a login until the user has hit a key; setting this method to 1 (or setting the Console argument to 1 in the object constructor) will ensure that the XOS banner is acknowledged and the login will not time-out.
+Alternatively, to force wake_console to be sent even on regular Telnet/SSH connections, you may set it with this method to a true value (1). This approach is needed when connecting via Telnet to an XOS switch which is configured with a 'before-login' banner which has to be acknowledged. In this case the XOS switch will not request a login until the user has hit a key; setting this method to 1 (or setting the Console argument to 1 in the object constructor) will ensure that the XOS banner is acknowledged and the login will not time-out.
 
 
 =item B<wake_console()> - Set the character sequence to send to wake up device when connecting to console port
@@ -6639,7 +6798,7 @@ Alternatively, to force wake_console to be sent even on regular Telnet/SSH conne
 
   $prev = $obj->wake_console($string);
 
-When connecting to the serial console port of a device it is necessary to send some characters to trigger the device at the other end to respond. These characters can be defined using this method. By default the wake string is "\n". The wake string is sent when the console mode of the connection is true - see console(). By default this happens when connecting via Serial port as well as via Telnet (with port other than 23) or via SSH (with port other than 22), i.e. via a Terminal Server device. See  Setting the wake sequence to the empty string, will disable it.
+When connecting to the serial console port of a device it is necessary to send some characters to trigger the device at the other end to respond. These characters can be defined using this method. By default the wake string is "\n" which assumes that binmode was not enabled on the underlying Control::CLI module (or set via this class constructor) and thus "\n" will become CRLF (Carriage Return + Line Feed) after the underlying Control::CLI module performs newline translation. If however binmode is enabled, then the default "\n" will simply be sent as LF (Line Feed) and will most likely not work as expected; so if binmode is enabled, the wake_console characters will most likely need to be set to "\r\n". The wake string is sent when the console mode of the connection is true - see console(). By default this happens when connecting via Serial port as well as via Telnet (with port other than 23) or via SSH (with port other than 22), i.e. via a Terminal Server device. Setting the wake sequence to the empty string, will disable it.
 
 
 =item B<no_refresh_cmd()> - set pattern and send character to automatically come out of refreshed commands
@@ -7309,7 +7468,7 @@ L<http://search.cpan.org/dist/Control-CLI-Extreme/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2025 Ludovico Stevens.
+Copyright 2026 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

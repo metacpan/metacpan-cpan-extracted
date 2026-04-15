@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.5.2
+## Apache2 API Framework - ~/lib/m
+## Version v0.5.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2026/03/22
+## Modified 2026/04/15
 ## All rights reserved
 ## 
 ## 
@@ -41,7 +41,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.5.2';
+    $VERSION = 'v0.5.3';
 };
 
 use strict;
@@ -1198,7 +1198,7 @@ use vars qw( $VERSION $APR1_RE $BCRYPT_RE $SHA_RE );
 our $APR1_RE   = qr/\$apr1\$(?<salt>[.\/0-9A-Za-z]{1,8})\$[.\/0-9A-Za-z]{22}/;
 our $BCRYPT_RE = qr/\$2[aby]\$(?<bcrypt_cost>\d{2})\$(?<salt>[A-Za-z0-9.\/]{22})[A-Za-z0-9.\/]{31}/;
 our $SHA_RE    = qr/\$(?<sha_size>[56])\$(?:rounds=(?<rounds>\d+)\$)?(?<salt>[A-Za-z0-9.\/]{1,16})\$[A-Za-z0-9.\/]+/;
-our $VERSION   = 'v0.1.0';
+our $VERSION   = 'v0.1.1';
 
 sub init
 {
@@ -1319,7 +1319,11 @@ sub make_bcrypt
     # 22 chars from [./A-Za-z0-9]
     # $salt //= $self->_make_salt(22);
     $salt //= $self->_make_salt_bcrypt;
-    if( $salt =~ m,[^./0-9A-Za-z], )
+    if( !defined( $salt ) )
+    {
+        return( $self->pass_error );
+    }
+    elsif( $salt =~ m,[^./0-9A-Za-z], )
     {
         return( $self->error( "Salt value provided contains illegal characters." ) );
     }
@@ -1406,7 +1410,11 @@ sub make_md5
 
     # salt: max 8 chars, allowed ./0-9A-Za-z
     $salt //= $self->_make_salt(8);
-    if( $salt =~ m,[^./0-9A-Za-z], )
+    if( !defined( $salt ) )
+    {
+        return( $self->pass_error );
+    }
+    elsif( $salt =~ m,[^./0-9A-Za-z], )
     {
         return( $self->error( "Salt value provided contains illegal characters." ) );
     }
@@ -1710,10 +1718,10 @@ sub _make_salt
     {
         return( Bytes::Random::Secure::random_string_from( join( '', @chars ), $len ) );
     }
-
-    my $salt = '';
-    $salt .= $chars[ int( rand( @chars ) ) ] for 1..$len;
-    return( $salt );
+    else
+    {
+        return( $self->error( "Neither Crypt::URandom nor Bytes::Random::Secure are installed on the system to generate a salt." ) );
+    }
 }
 
 # 16 raw bytes -> 22-char bcrypt base64, using either the module helper
@@ -1735,8 +1743,7 @@ sub _make_salt_bcrypt
     }
     else
     {
-        # fallback: pseudo-random bytes (last resort)
-        $raw = pack( 'C*', map{ int( rand(256) ) } 1..16 );
+        return( $self->error( "Neither Crypt::URandom nor Bytes::Random::Secure are installed on the system to generate a bcrypt salt." ) );
     }
 
     # 2) preferred: use Eksblowfish helper
@@ -1953,7 +1960,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.5.2
+    v0.5.3
 
 =head1 DESCRIPTION
 

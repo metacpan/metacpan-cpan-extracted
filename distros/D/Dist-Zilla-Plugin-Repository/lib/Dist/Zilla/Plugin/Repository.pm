@@ -1,8 +1,11 @@
 package Dist::Zilla::Plugin::Repository;
-$Dist::Zilla::Plugin::Repository::VERSION = '0.24';
+$Dist::Zilla::Plugin::Repository::VERSION = '0.25';
+
 # ABSTRACT: Automatically sets repository URL from svn/svk/Git checkout for Dist::Zilla
 
 use Moose;
+use URI;
+use URI::git;
 with 'Dist::Zilla::Role::MetaProvider';
 
 has git_remote => (
@@ -88,23 +91,21 @@ sub _git_to_repo {
 
     $uri =~ s![\w\-]+\@([^:]+):!git://$1/!;
 
+    return if $uri !~ m#^\w+://#;
+
     my %repo = (type => 'git');
 
-    $repo{url} = $uri unless $uri eq 'origin';    # RT 55136
+    $uri       = URI->new($uri);
+    $repo{web} = "https://" . $uri->host . $uri->path =~ s/\.git$//r;
+    $repo{url} = "$uri";
 
-    if ($uri =~ /^(?:git|https?):\/\/((?:git(?:lab|hub)\.com|bitbucket.org).*?)(?:\.git)?$/) {
-        $repo{web} = "https://$1";
+    if ($self->github_http) {
 
-        if ($self->github_http) {
-
-            # I prefer https://github.com/user/repository
-            # to git://github.com/user/repository.git
-            delete $repo{url};
-            $self->log("github_http is deprecated.  "
-                    . "Consider using META.json instead,\n"
-                    . "which can store URLs for both git clone "
-                    . "and the web front-end.");
-        }
+        # I prefer https://github.com/user/repository
+        # to git://github.com/user/repository.git
+        delete $repo{url};
+        $self->log(
+            "github_http is deprecated.  " . "Consider using META.json instead,\n" . "which can store URLs for both git clone " . "and the web front-end.");
     }
     return %repo;
 }
@@ -118,8 +119,8 @@ sub _find_repo {
     if (-e ".git") {
         if ($self->has_repository) {
             %repo = $self->_git_to_repo($self->repository);
-        } elsif ($execute->('git remote show -n ' . $self->git_remote) =~ /URL: (.*)$/m) {
-            %repo = $self->_git_to_repo($1);
+        } elsif (my $url = $execute->('git config --get remote.' . $self->git_remote . '.url')) {
+            %repo = $self->_git_to_repo($url);
         } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
             %repo = (qw(type svn  url), $1);
         }
@@ -139,6 +140,7 @@ sub _find_repo {
             $repo{url} = $svn_url;
         }
     } elsif (-e "_darcs") {
+
         # defaultrepo is better, but that is more likely to be ssh, not http
         $repo{type} = 'darcs';
         if (my $query_repo = $execute->('darcs query repo')) {
@@ -160,9 +162,10 @@ sub _find_repo {
             $repo{url} = $mercurial_url;
         }
     } elsif (-e "$ENV{HOME}/.svk") {
+
         # Is there an explicit way to check if it's an svk checkout?
         my $svk_info = $execute->('svk info') or return;
-        SVK_INFO: {
+    SVK_INFO: {
             if ($svk_info =~ /Mirrored From: (.*), Rev\./) {
                 return qw(type svn  url) => $1;
             }
@@ -198,7 +201,7 @@ Dist::Zilla::Plugin::Repository - Automatically sets repository URL from svn/svk
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -283,7 +286,7 @@ Christopher J. Madsen <perl@cjmweb.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Fayland Lam, Ricardo SIGNES, Moritz Onken, Christopher J. Madsen.
+This software is copyright (c) 2026 by Fayland Lam, Ricardo SIGNES, Moritz Onken, Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

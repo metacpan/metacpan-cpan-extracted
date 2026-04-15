@@ -1,7 +1,13 @@
 Revision history for Perl module Apache2::API
 
+v0.5.3 2026-04-15T07:41:20+0900
+    - Security fix (CVE-2026-5088): removed insecure fallback to rand() for salt generation in
+      Apache2::API::Password. Methods _make_salt() and _make_salt_bcrypt() now require either
+      Crypt::URandom or Bytes::Random::Secure to be installed, and return an error if neither
+      is available.
+
 v0.5.2 2026-03-22T03:03:45+0900
-    - Upddated method reply to ebsyre status code is JSON encoded as an integer, and not as a string.
+    - Upddated method reply to ensure status code is JSON encoded as an integer, and not as a string.
     - Updated status_to_type() in Apache2::API::Status
 
 v0.5.1 2026-03-19T18:11:03+0900

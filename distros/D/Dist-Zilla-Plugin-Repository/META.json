@@ -7,7 +7,7 @@
       "Christopher J. Madsen <perl@cjmweb.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,6 +38,7 @@
          "requires" : {
             "Dist::Zilla" : "4.102340",
             "Moose" : "0",
+            "URI::git" : "0",
             "perl" : "5.008"
          }
       },
@@ -56,7 +57,9 @@
          "web" : "https://github.com/fayland/dist-zilla-plugin-repository"
       }
    },
-   "version" : "0.24",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.25",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

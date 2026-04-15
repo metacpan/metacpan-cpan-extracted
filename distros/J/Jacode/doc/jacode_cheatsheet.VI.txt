@@ -1,0 +1,120 @@
+################################################################################
+# Tờ ghi nhớ Jacode (VI)
+# Jacode - Chương trình Perl chuyển đổi mã ký tự tiếng Nhật
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ CÀI ĐẶT
+
+  cpanm Jacode
+
+  Hoặc tải Jacode.pm và jacode.pl từ https://metacpan.org/pod/Jacode
+  và đặt cả hai tệp vào cùng một thư mục.
+
+■ CÁCH DÙNG
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # Chuyển đổi chuỗi tại chỗ (cách dùng phổ biến nhất)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # Giá trị trả về (ngữ cảnh danh sách)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # Giá trị trả về (ngữ cảnh vô hướng)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # Hàm bao trả về giá trị
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # Phát hiện mã hóa
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # Kiểm soát chuỗi thoát JIS
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # Khởi tạo
+  Jacode::init();
+
+  # Kiểm soát bộ nhớ đệm
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ TÊN MÃ HÓA
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (bao gồm CP932)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Nhị phân (không thể chuyển đổi)
+
+■ TÙY CHỌN
+
+  'z'  ... Kana nửa độ rộng → kana toàn độ rộng (h2z)
+  'h'  ... Kana toàn độ rộng → kana nửa độ rộng (z2h)
+
+■ CHUỖI BẮT ĐẦU CHỮ KANJI JIS
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (mặc định)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 mặt phẳng 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 mặt phẳng 1
+
+■ VÍ DỤ CHUYỂN ĐỔI
+
+  # Shift_JIS sang UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP sang Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # Tự động phát hiện đầu vào, xuất ra JIS
+  Jacode::convert(\$line, 'jis');
+
+  # Chuyển đổi kana nửa độ rộng đồng thời SJIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # Chuyển đổi tất cả các dòng của tệp
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ DÒNG LỆNH (chế độ pkf)
+
+  perl jacode.pl [tùy chọn] [-[ĐẦU VÀO]ĐẦU RA] tệp
+
+  perl jacode.pl file          # Chuyển đổi sang JIS
+  perl jacode.pl -sw file      # Shift_JIS sang UTF-8
+  perl jacode.pl -es file      # EUC-JP sang Shift_JIS
+  perl jacode.pl -me file      # Tệp mã hóa hỗn hợp → EUC-JP (động)
+  perl jacode.pl -mc file      # Chuyển đổi và in tên mã hóa mỗi dòng
+
+  Tùy chọn:
+  -b  Xuất có đệm (mặc định)
+  -u  Xuất không có đệm
+  -m  Nhận dạng mã hóa đầu vào động
+  -c  In tên mã hóa
+  -Z  Kana nửa độ rộng → toàn độ rộng
+  -H  Kana toàn độ rộng → nửa độ rộng
+  -f [unix|mac|dos]  Chuyển đổi ký tự xuống dòng
+
+■ TƯƠNG THÍCH jcode.pl
+
+  Jacode tương thích với jcode.pl của Utashiro.
+  Các bí danh không gian tên jcode:: cũng có thể dùng được.
+
+################################################################################

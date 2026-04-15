@@ -4,7 +4,7 @@
       "Ludovico Stevens <lstevens@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
    "provides" : {
       "Control::CLI" : {
          "file" : "lib/Control/CLI.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "https://github.com/lgastevens/Control-CLI"
       }
    },
-   "version" : "2.12",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "2.13",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

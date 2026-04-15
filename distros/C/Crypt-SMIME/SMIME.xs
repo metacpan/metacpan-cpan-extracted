@@ -26,12 +26,19 @@ enum {
     CRYPT_SMIME_FORMAT_SMIME
 };
 
+int smimecap_ciphers[] = {
+    NID_aes_256_gcm,
+    NID_aes_128_gcm,
+    NID_aes_256_cbc,
+    NID_aes_128_cbc,
+    NID_undef  // End-of-List
+};
+
 struct crypt_smime {
     EVP_PKEY *priv_key;
     X509*     priv_cert;
     bool      priv_key_is_tainted;
     bool      priv_cert_is_tainted;
-    const EVP_CIPHER* cipher;
 
     /* 暗号化, 添付用 */
     STACK_OF(X509)* pubkeys_stack;
@@ -43,6 +50,7 @@ struct crypt_smime {
 
     X509_VERIFY_PARAM *verify_params;
     bool verify_time_is_tainted;
+    bool verify_flags_are_tainted;
 };
 typedef struct crypt_smime * Crypt_SMIME;
 
@@ -142,7 +150,7 @@ static SV* sign(Crypt_SMIME this, char* plaintext, unsigned int len) {
     BIO* inbuf;
     BIO* outbuf;
     CMS_ContentInfo* cms;
-    int flags = CMS_DETACHED | CMS_STREAM | CMS_PARTIAL;
+    int flags = CMS_DETACHED | CMS_STREAM | CMS_NOSMIMECAP | CMS_PARTIAL;
     BUF_MEM* bufmem;
     SV* result;
     int err;
@@ -165,6 +173,23 @@ static SV* sign(Crypt_SMIME this, char* plaintext, unsigned int len) {
         CMS_ContentInfo_free(cms);
         BIO_free(inbuf);
         return NULL;
+    }
+
+    /* Set prefered ciphers in SMIMECapabilities */
+    STACK_OF(CMS_SignerInfo) *sis = CMS_get0_SignerInfos(cms);
+    if (sis && sk_CMS_SignerInfo_num(sis) > 0) {
+        CMS_SignerInfo *si = sk_CMS_SignerInfo_value(sis, 0);
+        if (si) {
+            STACK_OF(X509_ALGOR) *smcap = NULL;
+            for (int *nid = smimecap_ciphers; *nid != NID_undef; ++nid) {
+                if (EVP_get_cipherbynid(*nid))
+                    CMS_add_simple_smimecap(&smcap, *nid, -1);
+            }
+            if (smcap != NULL) {
+                CMS_add_smimecap(si, smcap);
+                sk_X509_ALGOR_pop_free(smcap, X509_ALGOR_free);
+            }
+        }
     }
 
     for (i = 0; i < sk_X509_num(this->pubkeys_stack); i++) {
@@ -302,7 +327,7 @@ static SV* check(Crypt_SMIME this, char* signed_mime, unsigned int len, int flag
     result = newSVpv(bufmem->data, bufmem->length);
     BIO_free(outbuf);
 
-    if (this->pubkeys_are_tainted || this->verify_time_is_tainted) {
+    if (this->pubkeys_are_tainted || this->verify_time_is_tainted || this->verify_flags_are_tainted) {
         SvTAINTED_on(result);
     }
 
@@ -310,7 +335,7 @@ static SV* check(Crypt_SMIME this, char* signed_mime, unsigned int len, int flag
 }
 
 /* CMS */
-static SV* _encrypt(Crypt_SMIME this, char* plaintext, unsigned int len) {
+static SV* _encrypt(Crypt_SMIME this, char* plaintext, unsigned int len, const EVP_CIPHER* evp_cipher) {
     BIO* inbuf;
     BIO* outbuf;
     CMS_ContentInfo* enc;
@@ -324,7 +349,7 @@ static SV* _encrypt(Crypt_SMIME this, char* plaintext, unsigned int len) {
         return NULL;
     }
 
-    enc = CMS_encrypt(this->pubkeys_stack, inbuf, this->cipher, flags);
+    enc = CMS_encrypt(this->pubkeys_stack, inbuf, evp_cipher, flags);
     BIO_free(inbuf);
 
     if (enc == NULL) {
@@ -400,6 +425,23 @@ static SV* _decrypt(Crypt_SMIME this, char* encrypted_mime, unsigned int len) {
     }
 
     return result;
+}
+
+// Implementation based on "STACK_OF(X509_ALGOR) *PKCS7_get_smimecap(PKCS7_SIGNER_INFO *si)"
+static STACK_OF(X509_ALGOR) *CMS_get_smimecaps(CMS_SignerInfo *si) {
+    X509_ATTRIBUTE *attr;
+    ASN1_TYPE *cap;
+    const unsigned char *p;
+
+    attr = CMS_signed_get_attr(si, CMS_signed_get_attr_by_NID(si, NID_SMIMECapabilities, -1));
+    if (!attr)
+        return NULL;
+    cap = X509_ATTRIBUTE_get0_type(attr, 0);
+    if (!cap || (cap->type != V_ASN1_SEQUENCE))
+        return NULL;
+    p = cap->value.sequence->data;
+    return (STACK_OF(X509_ALGOR) *)
+        ASN1_item_d2i(NULL, &p, cap->value.sequence->length, ASN1_ITEM_rptr(X509_ALGORS));
 }
 
 static void seed_rng() {
@@ -824,24 +866,20 @@ _signonly(Crypt_SMIME this, SV* plaintext)
         RETVAL
 
 SV*
-_encrypt(Crypt_SMIME this, SV* plaintext)
+_encrypt(Crypt_SMIME this, SV* plaintext, const char* cipher)
     CODE:
         /* 公開鍵がまだセットされていなければエラー */
         if (this->pubkeys_stack == NULL) {
             croak("Crypt::SMIME#encrypt: public cert has not yet been set. Set one before encrypting");
         }
 
-        /* Initialize the cipher suite to use for encryption */
-        if (this->cipher == NULL) {
-            /* The man page of CMS_encrypt(3) recommends DES-EDE3-CBC
-             * i.e. EVP_des_ede3_cbc() for interoperability but it can
-             * no longer be considered to be a safe algorithm.  We use
-             * AES-128-CBC instead.
-             */
-            this->cipher = EVP_aes_128_cbc();
-        }
+	EVP_CIPHER* evp_cipher = EVP_CIPHER_fetch(NULL, cipher, NULL);
+	if (evp_cipher == NULL) {
+		croak("Crypt::SMIME#encrypt: failed to fetch cipher");
+	}
 
-        RETVAL = _encrypt(this, SvPV_nolen(plaintext), SvCUR(plaintext));
+        RETVAL = _encrypt(this, SvPV_nolen(plaintext), SvCUR(plaintext), evp_cipher);
+	EVP_CIPHER_free(evp_cipher);
         if (RETVAL == NULL) {
             OPENSSL_CROAK("Crypt::SMIME#encrypt: failed to encrypt the message");
         }
@@ -1091,6 +1129,86 @@ getSigners(SV* indata, int informat=CRYPT_SMIME_FORMAT_SMIME)
     OUTPUT:
 	RETVAL
 
+SV*
+getCapabilities(SV* indata, int informat=CRYPT_SMIME_FORMAT_SMIME)
+    PROTOTYPE: $;$
+    INIT:
+	BIO* bio;
+	BIO* detached = NULL;
+	CMS_ContentInfo* cms = NULL;
+	STACK_OF(CMS_SignerInfo)* signerinfos;
+	CMS_SignerInfo* si;
+	STACK_OF(X509_ALGOR)* smimecaps;
+	const ASN1_OBJECT *paobj;
+	int pptype;
+	char buf[128];
+	int i;
+	int j;
+	AV* result;
+
+	if (!SvOK(indata)) {
+	    XSRETURN_UNDEF;
+	}
+	bio = BIO_new_mem_buf(SvPV_nolen(indata), SvCUR(indata));
+	if (bio == NULL) {
+	    OPENSSL_CROAK(
+	        "Crypt::SMIME#getCapabilities: failed to allocate a buffer"
+	    );
+	}
+	switch (informat) {
+	case CRYPT_SMIME_FORMAT_SMIME:
+        cms = SMIME_read_CMS(bio, &detached);
+	    break;
+	case CRYPT_SMIME_FORMAT_PEM:
+        cms = PEM_read_bio_CMS(bio, NULL, NULL, NULL);
+	    break;
+	case CRYPT_SMIME_FORMAT_ASN1:
+        cms = d2i_CMS_bio(bio, NULL);
+	    break;
+	default:
+	    BIO_free(bio);
+	    croak("Crypt::SMIME#getCapabilities: unknown format %d",
+	        informat);
+	}
+	BIO_free(bio);
+	if (cms == NULL) {
+	    XSRETURN_UNDEF;
+	}
+
+	if (detached != NULL) {
+	    BIO_free(detached);
+	}
+
+	signerinfos = CMS_get0_SignerInfos(cms);
+	if (signerinfos == NULL) {
+	    CMS_ContentInfo_free(cms);
+	    XSRETURN_UNDEF;
+	}
+
+	result = (AV*)sv_2mortal((SV*)newAV());
+    CODE:
+	if (0 < sk_CMS_SignerInfo_num(signerinfos)) {
+	    for (i = 0; i < sk_CMS_SignerInfo_num(signerinfos); i++) {
+	        si = sk_CMS_SignerInfo_value(signerinfos, i);
+	        if (si != NULL) {
+	            smimecaps = CMS_get_smimecaps(si);
+	            if (smimecaps != NULL) {
+	                for (j = 0; j < sk_X509_ALGOR_num(smimecaps); j++) {
+	                    X509_ALGOR_get0(&paobj, &pptype, NULL, sk_X509_ALGOR_value(smimecaps, j));
+	                    if (paobj && OBJ_obj2txt(buf, sizeof(buf), paobj, 0) > 0)
+	                        av_push(result, newSVpv(buf, 0));
+	                }
+                        sk_X509_ALGOR_pop_free(smimecaps, X509_ALGOR_free);
+	            }
+	        }
+	    }
+	}
+
+	CMS_ContentInfo_free(cms);
+	RETVAL = newRV((SV*) result);
+    OUTPUT:
+	RETVAL
+
 void
 setAtTime(Crypt_SMIME this, time_t timestamp)
     CODE:
@@ -1099,6 +1217,15 @@ setAtTime(Crypt_SMIME this, time_t timestamp)
         }
         X509_VERIFY_PARAM_set_time(this->verify_params, timestamp);
         this->verify_time_is_tainted = SvTAINTED(ST(1));
+
+void
+setVerifyFlags(Crypt_SMIME this, unsigned long flags)
+    CODE:
+        if ( ! this->verify_params) {
+            this->verify_params = X509_VERIFY_PARAM_new();
+        }
+        X509_VERIFY_PARAM_set_flags(this->verify_params, flags);
+        this->verify_flags_are_tainted = SvTAINTED(ST(1));
 
 # -----------------------------------------------------------------------------
 # End of File.

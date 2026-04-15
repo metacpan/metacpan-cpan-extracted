@@ -14,15 +14,14 @@ use IO::Uncompress::Gunzip qw($GunzipError);
 
 use Data::Dumper;
 use Devel::Size qw(total_size);
-use Convert::Pheno;
-use Convert::Pheno::IO::FileIO;
+use Convert::Pheno::IO::FileIO qw(io_yaml_or_json);
+use Convert::Pheno::Tabular::REDCap::Dictionary;
 use Convert::Pheno::OMOP::Definitions;
-use Convert::Pheno::OMOP;
 use Convert::Pheno::Utils::Schema;
-use Convert::Pheno::Utils::Mapping;
+use Convert::Pheno::Mapping::Shared;
 use Exporter 'import';
 our @EXPORT =
-  qw(read_csv read_csv_stream read_redcap_dict_file read_mapping_file read_sqldump read_sqldump_stream sqldump2csv transpose_omop_data_structure write_csv open_filehandle load_exposures get_headers convert_table_aoh_to_hoh);
+  qw(read_csv read_csv_stream read_redcap_dict_file read_mapping_file select_mapping_entity read_sqldump read_sqldump_stream sqldump2csv transpose_omop_data_structure write_csv open_filehandle load_exposures get_headers convert_table_aoh_to_hoh);
 
 use constant DEVEL_MODE => 0;
 
@@ -34,50 +33,7 @@ use constant DEVEL_MODE => 0;
 
 sub read_redcap_dictionary {
     my $filepath = shift;
-
-    # Define split record separator from file extension
-    my ( $separator, $encoding ) = define_separator( $filepath, undef );
-
-    # We'll create an HoH using as 1D-key the 'Variable / Field Name'
-    my $key = 'Variable / Field Name';
-
-    # We'll be adding the key <_labels>. See sub add_labels
-    my $labels = 'Choices, Calculations, OR Slider Labels';
-
-    # Loading data directly from Text::CSV_XS
-    # NB1: We want HoH and sub read_csv returns AoH
-    # NB2: By default the Text::CSV module treats all fields in a CSV file as strings, regardless of their actual data type.
-    # NB3: csv function ~ x2  RAM. It's ok here.
-    my $hoh = csv(
-        in       => $filepath,
-        sep_char => $separator,
-
-        #binary    => 1, # default
-        auto_diag => 1,
-        encoding  => $encoding,
-        key       => $key,
-        on_in     => sub { $_{_labels} = add_labels( $_{$labels} ) }
-    );
-
-    return $hoh;
-}
-
-sub add_labels {
-    my $value = shift;
-
-    # *** IMPORTANT ***
-    # This sub can return undef, i.e., $_{labels} = undef
-    # That's OK as we won't perform exists $_{_label}
-    # Note that in $hoh (above) empty columns are  key = ''.
-
-    # Premature return if empty ('' = 0)
-    return undef unless $value;    # perlcritic Severity: 5
-
-    # We'll skip values that don't provide even number of key-values
-    my @tmp = map { s/^\s//; s/\s+$//; $_; } ( split /\||,/, $value );    # perlcritic Severity: 5
-
-    # Return undef for non-valid entries
-    return @tmp % 2 == 0 ? {@tmp} : undef;
+    return Convert::Pheno::Tabular::REDCap::Dictionary->from_file($filepath);
 }
 
 sub read_redcap_dict_file {
@@ -104,11 +60,38 @@ sub read_mapping_file {
     );
     $jv->json_validate;
 
-    # Remap for quick looukup
-    remap_assignTermIdFromHeader($data_mapping_file);
-
     # Return if succesful
     return $data_mapping_file;
+}
+
+sub select_mapping_entity {
+    my ( $mapping_file, $entity ) = @_;
+    $entity ||= 'individuals';
+
+    die "Expected a hash reference for the mapping file"
+      unless ref($mapping_file) eq 'HASH';
+
+    die "The mapping file must contain a top-level <beacon> section.\n"
+      unless exists $mapping_file->{beacon}
+      && ref( $mapping_file->{beacon} ) eq 'HASH';
+
+    die "The mapping file must contain a <beacon.$entity> section.\n"
+      unless exists $mapping_file->{beacon}{$entity}
+      && ref( $mapping_file->{beacon}{$entity} ) eq 'HASH';
+
+    my $selected = $mapping_file->{beacon}{$entity};
+
+    my %entity_mapping = %{$selected};
+    $entity_mapping{project} = $mapping_file->{project}
+      if exists $mapping_file->{project}
+      && ref( $mapping_file->{project} ) eq 'HASH'
+      && !exists $entity_mapping{project};
+
+    # Precompute array-based header rules into hashes for faster lookups in the
+    # tabular mapper, but only on the selected entity mapping.
+    remap_useHeaderAsTermLabel( \%entity_mapping );
+
+    return \%entity_mapping;
 }
 
 sub read_sqldump {
@@ -552,9 +535,11 @@ sub read_csv {
     my $filepath = $arg->{in};
     my $sep      = $arg->{sep};
     my $self     = exists $arg->{self} ? $arg->{self} : { verbose => 0 };
+    my $coerce_numbers =
+      exists $arg->{coerce_numbers} ? $arg->{coerce_numbers} : 1;
 
     # Define split record separator from file extension
-    my ( $separator, $encoding ) = define_separator( $filepath, $sep );
+    my ($separator) = define_separator( $filepath, $sep );
 
     # *** IMPORTANT ***
     # Text::CSV_XS functional interface
@@ -611,10 +596,18 @@ sub read_csv {
 "==========================\nRows read (total): $count\n==========================\n\n"
       if $self->{verbose};
 
-    # Coercing the data before returning it
+    # Generic CSV loading defaults to numeric coercion because OMOP-style tabular
+    # inputs are largely typed. Mapping-file workflows opt out so raw strings such
+    # as REDCap choice codes, identifiers, or leading-zero values survive until a
+    # source-aware mapper decides how to interpret them.
     for my $item (@aoh) {
         for my $key ( @{$headers} ) {
-            $item->{$key} = dotify_and_coerce_number( $item->{$key} );
+            if ($coerce_numbers) {
+                $item->{$key} = dotify_and_coerce_number( $item->{$key} );
+            }
+            elsif ( defined $item->{$key} && $item->{$key} eq '' ) {
+                $item->{$key} = undef;
+            }
         }
     }
 
@@ -646,8 +639,7 @@ sub read_csv_stream {
     my $fileout = $self->{out_file};
 
     # Define split record separator
-    my ( $separator, $encoding, $table_name ) =
-      define_separator( $filein, $sep );
+    my ( $separator, undef, $table_name ) = define_separator( $filein, $sep );
     my $table_name_lc = lc($table_name);
 
     # Create a new Text::CSV_XS object
@@ -715,22 +707,33 @@ sub write_csv {
         $data = [$data];    # Convert to an array reference containing one hash
     }
 
-    my @exts = qw(.csv .tsv);
+    my @exts = qw(.csv .tsv .csv.gz .tsv.gz);
     my $msg =
       qq(Can't recognize <$filepath> extension. Extensions allowed are: )
       . ( join ',', @exts ) . "\n";
     my ( undef, undef, $ext ) = fileparse( $filepath, @exts );
     die $msg unless any { $_ eq $ext } @exts;
 
-    # Use Text::CSV_XS to write to CSV, ensuring $data is always an AoH
-    csv(
-        in       => $data,       # This now can be an AoH or a single hash converted to AoH
-        out      => $filepath,
-        sep_char => $sep,
-        eol      => "\n",
-        encoding => 'UTF-8',
-        headers  => $headers     # Ensure headers are defined or auto-detection is enabled
-    );
+    $headers ||= get_headers($data);
+
+    my $fh = open_filehandle( $filepath, 'w' );
+    my $csv = Text::CSV_XS->new(
+        {
+            binary   => 1,
+            eol      => "\n",
+            sep_char => $sep,
+        }
+    ) or die "Cannot initialize CSV writer for <$filepath>";
+
+    $csv->print( $fh, $headers );
+    for my $row ( @{$data} ) {
+        $csv->print(
+            $fh,
+            [ map { exists $row->{$_} ? $row->{$_} : undef } @{$headers} ]
+        );
+    }
+
+    close $fh;
     return 1;
 }
 
@@ -740,8 +743,9 @@ sub open_filehandle {
     my $fh;
     if ( $filepath =~ /\.gz$/ ) {
         if ( $mode eq 'a' || $mode eq 'w' ) {
-            $fh = IO::Compress::Gzip->new( $filepath,
-                Append => ( $mode eq 'a' ? 1 : 0 ) );
+            my %gzip_args;
+            $gzip_args{Append} = 1 if ( $mode eq 'a' && -e $filepath );
+            $fh = IO::Compress::Gzip->new( $filepath, %gzip_args );
         }
         else {
             $fh = IO::Uncompress::Gunzip->new( $filepath, MultiStream => 1 );
@@ -771,11 +775,8 @@ sub define_separator {
       : $ext eq '.tsv.gz' ? "\t"
       :                     "\t";
 
-    my $encoding =
-      $ext =~ m/\.gz/ ? ':gzip:encoding(utf-8)' : 'encoding(utf-8)';
-
-    # Return 3 but some get only 2
-    return ( $separator, $encoding, $table_name );
+    # Return 3 but some callers only use 1 or 2
+    return ( $separator, undef, $table_name );
 }
 
 sub to_gb {
@@ -829,12 +830,12 @@ sub get_headers {
     return \@headers;
 }
 
-sub remap_assignTermIdFromHeader {
+sub remap_useHeaderAsTermLabel {
     my $hash = shift;
     for my $key (%$hash) {
-        if ( exists $hash->{$key}{assignTermIdFromHeader} ) {
-            $hash->{$key}{assignTermIdFromHeader_hash} =
-              array_ref_to_hash( $hash->{$key}{assignTermIdFromHeader} );
+        if ( exists $hash->{$key}{useHeaderAsTermLabel} ) {
+            $hash->{$key}{useHeaderAsTermLabel_hash} =
+              array_ref_to_hash( $hash->{$key}{useHeaderAsTermLabel} );
         }
     }
     return 1;
@@ -844,7 +845,7 @@ sub array_ref_to_hash {
     my $array_ref = shift;
 
     # Check if the input is an array reference
-    die "Expected an array reference at <assignTermIdFromHeader>"
+    die "Expected an array reference at <useHeaderAsTermLabel>"
       unless ref($array_ref) eq 'ARRAY';
 
     my %hash;

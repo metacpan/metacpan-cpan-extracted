@@ -35,11 +35,9 @@ for any directory that smells like a git repo.
 
 =head1 TODO
 
-    * Only allow safe read-only operations appropriate for REMOTE_USER powers
     * Validate scripts installation: git-server git-client git-deploy git-verify
     * Validate core.hooksPath
     * Validate ./hooks symlink for each repo if hooksPath not set
-    * Files and Directories chmod permissions
     * Secured ~/.ssh/authorized_keys format, including "REMOTE_USER" settings
     * Make sure ~/.ssh/authorized_keys has at least one ADMIN user
     * ADMIN and ACL Management (if "ADMIN")
@@ -48,11 +46,13 @@ for any directory that smells like a git repo.
 
 =head1 SUPPORTED
 
+    * Only allow safe read-only operations appropriate for REMOTE_USER powers.
     * Validate git-server installation.
     * Verify AllowAgentForwarding setting for two-way sync feature.
     * Verify AcceptEnv setting.
     * Check ExposeAuthInfo functionality to be able to determine key info, if desired.
     * List accessible repos specified or scanned.
+    * Files and Directories and ~/.ssh/authorized_keys chmod permissions.
 
 =head1 AUTHOR
 
@@ -71,7 +71,7 @@ use warnings;
 use Cwd qw(abs_path);
 use FindBin qw($RealBin);
 
-our $VERSION = "0.040";
+our $VERSION = "0.041";
 
 if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
     s{^ssh://(|[^/:]+\@)\[([a-z0-9\-\.\:]+)\]:(\d+)(?:$|/)}{}i ||
@@ -122,7 +122,7 @@ if (!@repo_dirs) {
     local $_ = $ENV{SSH_ORIGINAL_COMMAND} || "";
     @repo_dirs = split;
     splice @repo_dirs, 0, 2 if $repo_dirs[0] && $repo_dirs[1] && $repo_dirs[0] eq "perl" && $repo_dirs[1] eq "-";
-    shift @repo_dirs if $repo_dirs[0] && $repo_dirs[0] =~ m{/git-verify$};
+    shift @repo_dirs if $repo_dirs[0] && $repo_dirs[0] =~ m{(^|/)git-verify$};
 }
 if (@repo_dirs and $repo_dirs[0] eq "--escaperepos") {
     shift @repo_dirs;
@@ -222,7 +222,7 @@ if (local $_ = $ENV{HOME} and my @s = stat) {
             }
         }
         else {
-            print "REMOTE_USER: ~/.ssh/config does not exist: BAD!\n";
+            print "REMOTE_USER: ~/.ssh/config does not exist: FINE\n";
         }
         $_ = $keyfile;
         if (@s = stat) {
@@ -245,6 +245,11 @@ if (local $_ = $ENV{HOME} and my @s = stat) {
 else {
     print "REMOTE_USER: \$HOME $ENV{HOME} does not exist? BAD!\n";
 }
+my $how = "";
+if ($ENV{SSH_USER_AUTH} and open my $auth, "<", $ENV{SSH_USER_AUTH}) {
+    $how = $1 if (<$auth>||"") =~ /^publickey (.+)/;
+    close $auth;
+}
 if (my $user = $ENV{REMOTE_USER}) {
     if ($ENV{SERVER_ADDR}) {
         print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ForceCommand [git-server] configured properly: GOOD\n";
@@ -255,6 +260,32 @@ if (my $user = $ENV{REMOTE_USER}) {
             print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: Broken [ForceCommand] configuration not going through git-server properly: BAD\n";
         }
         chomp($ENV{SERVER_ADDR} = `hostname`) if !$ENV{SERVER_ADDR};
+    }
+    if ($how) {
+        my $key = eval { require Digest::SHA; $how =~ /^\S+\s+(\S+)/ && " [FingerPrint SHA256:".Digest::SHA::sha256_base64($1)."]" } || "";
+        my $winner = "";
+        my $line = 0;
+        if (open my $keys, "<", $keyfile) {
+            while (<$keys>) {
+                $line++;
+                $winner = $1 and last if /^((?:|[^\#].*?\s)\Q$how\E.*)/;
+            }
+            close $keys;
+        }
+        if ($winner) {
+            print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo is enabled: GREAT$key MATCHED!\n";
+            print "authorized_keys:$line:[$winner]\n";
+        }
+        else {
+            print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo seems half-corrupted: POOR!$key\n";
+            print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: No matching ~/.ssh/authorized_keys line? [$how]\n";
+        }
+    }
+    elsif ($ENV{SSH_USER_AUTH}) {
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo is half-borked: BAD! Set [yes] but no info? Errno=[$!]\n";
+    }
+    else {
+        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo is disabled but authentication working: FINE\n";
     }
     if ($ENV{SSH_AUTH_SOCK}) {
         if (my @pubkeys = `ssh-add -l 2>/dev/null`) {
@@ -276,12 +307,6 @@ if (my $user = $ENV{REMOTE_USER}) {
         # and to allow enabling DEBUG if needed.
         print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: Missing [AcceptEnv XMODIFIERS] on sshd configuration: CRIPPLED SERVER!\n";
     }
-    if ($ENV{SSH_USER_AUTH}) {
-        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo is enabled: OK\n";
-    }
-    else {
-        print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: ExposeAuthInfo is disabled but authentication working: FINE\n";
-    }
     if (my $count = @repo_dirs) {
         print "REMOTE_USER: [$ENV{SERVER_ADDR}] $user: Filtering $count specified repos for access: OK\n";
     }
@@ -296,11 +321,7 @@ elsif (local $_ = $ENV{SSH_CONNECTION}) {
     else {
         ($ENV{REMOTE_ADDR}, $ENV{REMOTE_PORT}, $ENV{SERVER_ADDR}, $ENV{SERVER_PORT}) = split;
     }
-    my $how;
-    if ($ENV{SSH_USER_AUTH} and open my $auth, "<", $ENV{SSH_USER_AUTH}) {
-        $how = $1 if <$auth> =~ /^publickey (.+)/;
-        close $auth;
-    }
+
     if (!$how) {
         print "REMOTE_USER: ExposeAuthInfo is disabled: POOR! Enable it for hints on how to better configure $keyfile\n";
     }

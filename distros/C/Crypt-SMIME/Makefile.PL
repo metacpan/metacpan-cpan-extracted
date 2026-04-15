@@ -80,7 +80,8 @@ EOF
                 print 'checking for libcrypto... ';
                 # CMS support was introduced in 0.9.8
                 # CMS_STREAM was introduced in 0.9.9
-                my %LIBCRYPTO = ExtUtils::PkgConfig->find('libcrypto >= 0.9.9');
+                # EVP_CIPHER_fetch was introduced in 3.0.0
+                my %LIBCRYPTO = ExtUtils::PkgConfig->find('libcrypto >= 3.0.0');
                 print "$LIBCRYPTO{modversion}\n";
 
                 ($LIBCRYPTO{cflags}, $LIBCRYPTO{libs});
@@ -138,7 +139,10 @@ WriteConstants(
 
         {name => 'FORMAT_ASN1' , macro => 1, value => 'CRYPT_SMIME_FORMAT_ASN1' },
         {name => 'FORMAT_PEM'  , macro => 1, value => 'CRYPT_SMIME_FORMAT_PEM'  },
-        {name => 'FORMAT_SMIME', macro => 1, value => 'CRYPT_SMIME_FORMAT_SMIME'}
+        {name => 'FORMAT_SMIME', macro => 1, value => 'CRYPT_SMIME_FORMAT_SMIME'},
+
+        {name => 'CRL_CHECK'    , macro => 'X509_V_FLAG_CRL_CHECK'    , value => 'X509_V_FLAG_CRL_CHECK'},
+        {name => 'CRL_CHECK_ALL', macro => 'X509_V_FLAG_CRL_CHECK_ALL', value => 'X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL'}
        ],
     ($USE_PROXYSUBS ?
        (PROXYSUBS => {autoload => 1}) : ())

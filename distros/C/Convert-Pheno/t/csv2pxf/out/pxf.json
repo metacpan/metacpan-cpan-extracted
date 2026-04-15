@@ -43,17 +43,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -79,17 +75,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -115,17 +107,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -151,17 +139,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -208,7 +192,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 62
+                        "value" : 500
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -292,17 +276,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -328,17 +308,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -364,17 +340,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -400,17 +372,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -457,7 +425,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 62
+                        "value" : 500
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -541,17 +509,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -577,17 +541,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -613,17 +573,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -649,17 +605,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -706,7 +658,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 25
+                        "value" : 90
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -790,17 +742,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -826,17 +774,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -862,17 +806,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -898,17 +838,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -955,7 +891,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 25
+                        "value" : 90
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -1039,17 +975,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1075,17 +1007,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1111,17 +1039,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1147,17 +1071,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1204,7 +1124,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 36
+                        "value" : 1000
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -1288,17 +1208,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1324,17 +1240,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1360,17 +1272,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1396,17 +1304,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1453,7 +1357,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 36
+                        "value" : 1000
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -1537,17 +1441,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1573,17 +1473,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1609,17 +1505,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1645,17 +1537,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1702,7 +1590,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -1786,17 +1674,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1822,17 +1706,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1858,17 +1738,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1894,17 +1770,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -1951,7 +1823,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -2035,17 +1907,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2071,17 +1939,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2107,17 +1971,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2143,17 +2003,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2200,7 +2056,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -2284,17 +2140,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2320,17 +2172,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2356,17 +2204,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2392,17 +2236,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2449,7 +2289,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -2533,17 +2373,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2569,17 +2405,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2605,17 +2437,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2641,17 +2469,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2698,7 +2522,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 25
+                        "value" : 90
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -2782,17 +2606,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2818,17 +2638,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2854,17 +2670,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2890,17 +2702,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -2947,7 +2755,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 25
+                        "value" : 90
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -3031,17 +2839,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3067,17 +2871,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3103,17 +2903,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3139,17 +2935,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3196,7 +2988,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -3280,17 +3072,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3316,17 +3104,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3352,17 +3136,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3388,17 +3168,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3445,7 +3221,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -3529,17 +3305,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3565,17 +3337,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3601,17 +3369,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3637,17 +3401,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3694,7 +3454,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -3778,17 +3538,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3814,17 +3570,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3850,17 +3602,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3886,17 +3634,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -3943,7 +3687,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -4027,17 +3771,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4063,17 +3803,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4099,17 +3835,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4135,17 +3867,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4192,7 +3920,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 25
+                        "value" : 90
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -4276,17 +4004,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4312,17 +4036,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4348,17 +4068,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4384,17 +4100,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4441,7 +4153,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 25
+                        "value" : 90
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -4525,17 +4237,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4561,17 +4269,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4597,17 +4301,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4633,17 +4333,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4690,7 +4386,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",
@@ -4774,17 +4470,13 @@
                "label" : "Hemoglobin Measurement"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4810,17 +4502,13 @@
                "label" : "Leukocyte"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4846,17 +4534,13 @@
                "label" : "Platelet Count"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C27232",
                   "label" : "Blood Test Result"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4882,17 +4566,13 @@
                "label" : "Body Mass Index"
             },
             "procedure" : {
-               "bodySite" : {
-                  "id" : "NCIT:C126101",
-                  "label" : "Not Available"
-               },
                "code" : {
                   "id" : "NCIT:C83341",
                   "label" : "Physical Examination Category"
-               },
-               "performed" : {
-                  "timestamp" : "1900-01-01T00:00:00Z"
                }
+            },
+            "timeObserved" : {
+               "timestamp" : "1900-01-01T00:00:00Z"
             },
             "value" : {
                "quantity" : {
@@ -4939,7 +4619,7 @@
                            "id" : "NCIT:C28253",
                            "label" : "Milligram"
                         },
-                        "value" : 22
+                        "value" : 50
                      },
                      "scheduleFrequency" : {
                         "id" : "NCIT:C126101",

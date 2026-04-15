@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "flag common anti-patterns for generating random bytes",
-  "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "AUTHOR" => "Robert Rothenberg <perl\@rhizomnic.com>",
   "BUILD_REQUIRES" => {
     "ExtUtils::MakeMaker" => "7.22",
     "Module::Metadata" => "1.000015"
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Perl::Critic::Policy" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.1.2",
+  "VERSION" => "v0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }

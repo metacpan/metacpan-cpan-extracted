@@ -1,7 +1,7 @@
 ---
 abstract: 'flag common anti-patterns for generating random bytes'
 author:
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
   ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
@@ -27,7 +27,7 @@ name: Perl-Critic-Policy-Security-RandBytesFromHash
 provides:
   Perl::Critic::Policy::Security::RandBytesFromHash:
     file: lib/Perl/Critic/Policy/Security/RandBytesFromHash.pm
-    version: v0.1.2
+    version: v0.1.3
 recommends:
   Ref::Util::XS: '0'
 requires:
@@ -44,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Perl-Critic-Policy-Security-RandBytesFromHash/issues
   repository: git://github.com/robrwo/Perl-Critic-Policy-Security-RandBytesFromHash.git
-version: v0.1.2
+version: v0.1.3
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

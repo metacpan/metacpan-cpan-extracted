@@ -1,8 +1,9 @@
 Changes
+Declare.xs
 ignore.txt
 lib/Enum/Declare.pm
-lib/Enum/Declare.xs
 lib/Enum/Declare/Meta.pm
+lib/Enum/Declare/Set.pm
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
@@ -17,6 +18,8 @@ t/05-export.t
 t/06-match.t
 t/07-proto.t
 t/08-sugar.t
+t/09-set.t
+t/10-proto-set.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

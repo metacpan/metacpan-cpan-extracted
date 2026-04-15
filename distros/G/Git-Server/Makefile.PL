@@ -10,6 +10,7 @@ WriteMakefile
         'Cwd'          => 0,
         'Getopt::Long' => 0,
         'File::Spec'   => 0,
+        'File::Temp'   => 0,
         'File::Which'  => 0,
         (`which strace 2>/dev/null` ? () : ('IO::Trace' => 0)),
     },

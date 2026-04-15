@@ -1,0 +1,70 @@
+{
+   "abstract" : "A minimal, integrated Class and Role system for Perl",
+   "author" : [
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Mite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "lib/Class.pm",
+         "lib/Role.pm",
+         "lib/Class/More.pm",
+         "lib/Class/Clone.pm"
+      ],
+      "package" : [
+         "Class",
+         "Role",
+         "Class::More",
+         "Class::Clone"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Mite" : {
+         "file" : "lib/Class/Mite.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Class-Mite/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Class-Mite.git",
+         "web" : "https://github.com/manwar/Class-Mite"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

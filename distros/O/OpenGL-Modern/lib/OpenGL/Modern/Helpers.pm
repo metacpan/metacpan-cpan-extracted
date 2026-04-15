@@ -23,8 +23,8 @@ use OpenGL::Modern qw(
   glGetIntegerv_p
   glShaderSource_p
   glBufferData_c
-  glUniform2f
-  glUniform4f
+  glUniform2fv_p
+  glUniform4fv_p
 );
 
 =head1 NAME
@@ -142,16 +142,6 @@ sub glBufferData_p {                                        # NOTE: this might b
 sub glBufferData_o {                                        # NOTE: this was glBufferData_p in OpenGL
     my ( $target, $oga, $usage ) = @_;
     glBufferData_c $target, $oga->length, $oga->ptr, $usage;
-}
-
-sub glUniform2fv_p {                                        # NOTE: this name is more consistent with OpenGL API
-    my ( $uniform, $v0, $v1 ) = @_;
-    glUniform2f $uniform, $v0, $v1;
-}
-
-sub glUniform4fv_p {                                        # NOTE: this name is more consistent with OpenGL API
-    my ( $uniform, $v0, $v1, $v2, $v3 ) = @_;
-    glUniform4f $uniform, $v0, $v1, $v2, $v3;
 }
 
 1;

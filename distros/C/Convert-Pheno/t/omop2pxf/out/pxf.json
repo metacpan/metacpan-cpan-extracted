@@ -103,7 +103,9 @@
                "label" : "Surgical manipulation of joint of knee"
             },
             "performed" : {
-               "timestamp" : "1981-08-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -118,7 +120,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1982-09-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -133,7 +137,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1981-08-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -148,7 +154,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1958-03-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -163,7 +171,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1958-03-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       }
@@ -193,7 +203,9 @@
                "label" : "Plain chest X-ray"
             },
             "performed" : {
-               "timestamp" : "1955-10-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -208,7 +220,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1977-04-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P56Y"
+               }
             }
          }
       },
@@ -223,7 +237,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1931-09-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       }
@@ -245,6 +261,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P56Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -334,6 +355,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P39Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -467,7 +493,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1994-12-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -482,7 +510,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-04-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -497,7 +527,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-07-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -512,7 +544,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-01-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -527,7 +561,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1994-10-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -542,7 +578,9 @@
                "label" : "Allergy screening test"
             },
             "performed" : {
-               "timestamp" : "1991-07-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -557,7 +595,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1994-01-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -572,7 +612,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-07-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -874,7 +916,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1986-04-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P7Y"
+               }
             }
          }
       },
@@ -889,7 +933,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1988-05-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       }
@@ -919,7 +965,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1991-06-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       }
@@ -1038,7 +1086,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "1977-08-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P7Y"
+               }
             }
          }
       },
@@ -1053,7 +1103,9 @@
                "label" : "Injection of epinephrine"
             },
             "performed" : {
-               "timestamp" : "1971-02-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P0Y"
+               }
             }
          }
       },
@@ -1068,7 +1120,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1975-06-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
             }
          }
       },
@@ -1083,7 +1137,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1975-06-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
             }
          }
       },
@@ -1098,7 +1154,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1980-06-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       }
@@ -1270,7 +1328,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2018-06-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P66Y"
+               }
             }
          }
       },
@@ -1285,7 +1345,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "2018-06-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P66Y"
+               }
             }
          }
       },
@@ -1300,7 +1362,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1961-03-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -1315,7 +1379,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1961-03-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -1330,7 +1396,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1964-12-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -1345,7 +1413,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1972-02-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -1360,7 +1430,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1967-08-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -1375,7 +1447,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1967-08-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -1462,6 +1536,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P23Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -1587,6 +1666,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P30Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -1732,7 +1816,9 @@
                "label" : "Injection of epinephrine"
             },
             "performed" : {
-               "timestamp" : "1977-03-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -1747,7 +1833,9 @@
                "label" : "Asthma screening"
             },
             "performed" : {
-               "timestamp" : "1971-01-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P3Y"
+               }
             }
          }
       },
@@ -1762,7 +1850,9 @@
                "label" : "Injection of epinephrine"
             },
             "performed" : {
-               "timestamp" : "1978-07-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       }
@@ -1792,7 +1882,9 @@
                "label" : "Radiography of ankle"
             },
             "performed" : {
-               "timestamp" : "2008-02-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P52Y"
+               }
             }
          }
       },
@@ -1807,7 +1899,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2008-02-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P52Y"
+               }
             }
          }
       },
@@ -1822,7 +1916,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "2008-02-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P52Y"
+               }
             }
          }
       },
@@ -1837,7 +1933,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1990-09-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -1852,7 +1950,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1973-12-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       }
@@ -2481,7 +2581,9 @@
                "label" : "Percutaneous mechanical thrombectomy of portal vein using fluoroscopic guidance"
             },
             "performed" : {
-               "timestamp" : "2005-01-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P52Y"
+               }
             }
          }
       },
@@ -2496,7 +2598,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1982-07-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
             }
          }
       },
@@ -2511,7 +2615,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1972-04-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       }
@@ -2541,7 +2647,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1990-09-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -2556,7 +2664,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1979-02-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       },
@@ -2571,7 +2681,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1969-12-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
             }
          }
       },
@@ -2586,7 +2698,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1969-12-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
             }
          }
       },
@@ -2601,7 +2715,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1968-12-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       }
@@ -2635,6 +2751,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P72Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:399211009",
             "label" : "History of myocardial infarction"
@@ -2889,6 +3010,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P40Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:399211009",
             "label" : "History of myocardial infarction"
@@ -2945,7 +3071,9 @@
                "label" : "Review of systems"
             },
             "performed" : {
-               "timestamp" : "2006-03-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -2960,7 +3088,9 @@
                "label" : "Brief general examination"
             },
             "performed" : {
-               "timestamp" : "2006-03-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -2975,7 +3105,9 @@
                "label" : "Medication Reconciliation"
             },
             "performed" : {
-               "timestamp" : "2006-03-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -2990,7 +3122,9 @@
                "label" : "Percutaneous mechanical thrombectomy of portal vein using fluoroscopic guidance"
             },
             "performed" : {
-               "timestamp" : "2004-11-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -3005,7 +3139,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1988-08-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       }
@@ -3035,7 +3171,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2001-06-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P41Y"
+               }
             }
          }
       },
@@ -3050,7 +3188,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "2006-06-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P46Y"
+               }
             }
          }
       }
@@ -3169,7 +3309,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2002-04-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P75Y"
+               }
             }
          }
       }
@@ -3398,7 +3540,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2004-10-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P29Y"
             }
          },
          "value" : {
@@ -3434,7 +3583,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1987-01-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P12Y"
             }
          },
          "value" : {
@@ -3494,7 +3650,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2010-10-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P39Y"
+               }
             }
          }
       },
@@ -3509,7 +3667,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "1988-12-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       }
@@ -3628,7 +3788,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-07-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       },
@@ -3643,7 +3805,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-01-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
             }
          }
       },
@@ -3658,7 +3822,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -3673,7 +3839,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-09-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P19Y"
+               }
             }
          }
       },
@@ -3688,7 +3856,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-09-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       }
@@ -3722,7 +3892,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1999-08-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P30Y"
             }
          },
          "value" : {
@@ -3758,7 +3935,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1986-12-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P17Y"
             }
          },
          "value" : {
@@ -3809,7 +3993,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1991-01-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P6Y"
             }
          },
          "value" : {
@@ -3845,7 +4036,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1987-03-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P3Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P3Y"
             }
          },
          "value" : {
@@ -3879,7 +4077,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "2000-05-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -3894,7 +4094,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "2000-08-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -3909,7 +4111,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "2001-02-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       }
@@ -3943,7 +4147,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2000-08-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P35Y"
             }
          },
          "value" : {
@@ -3977,7 +4188,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1981-04-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -3992,7 +4205,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1981-04-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -4007,7 +4222,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1982-10-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       }
@@ -4037,7 +4254,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1984-01-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       }
@@ -4164,6 +4383,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P6Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -4220,7 +4444,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1995-07-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -4235,7 +4461,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1995-04-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -4250,7 +4478,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1999-01-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -4265,7 +4495,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1999-04-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -4280,7 +4512,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1998-04-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -4295,7 +4529,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1996-07-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       },
@@ -4310,7 +4546,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1995-01-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       }
@@ -4653,7 +4891,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1985-07-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       },
@@ -4668,7 +4908,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1983-11-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -4683,7 +4925,9 @@
                "label" : "Plain chest X-ray"
             },
             "performed" : {
-               "timestamp" : "1977-11-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -4698,7 +4942,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1977-11-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       }
@@ -4806,7 +5052,9 @@
                "label" : "Surgical manipulation of joint of knee"
             },
             "performed" : {
-               "timestamp" : "1975-05-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -4821,7 +5069,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1975-05-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -4836,7 +5086,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1990-08-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       }
@@ -4910,6 +5162,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P11Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -5358,7 +5615,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1982-07-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       },
@@ -5373,7 +5632,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1968-09-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P7Y"
+               }
             }
          }
       },
@@ -5388,7 +5649,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1975-10-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -5403,7 +5666,9 @@
                "label" : "Injection of tetanus antitoxin"
             },
             "performed" : {
-               "timestamp" : "1975-10-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       }
@@ -5511,7 +5776,9 @@
                "label" : "Plain chest X-ray"
             },
             "performed" : {
-               "timestamp" : "1954-01-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
             }
          }
       },
@@ -5526,7 +5793,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2007-07-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P66Y"
+               }
             }
          }
       },
@@ -5541,7 +5810,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "2007-07-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P66Y"
+               }
             }
          }
       }
@@ -5667,6 +5938,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P25Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -5741,6 +6017,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P5Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -5868,6 +6149,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P11Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -5898,7 +6184,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1966-10-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
             }
          }
       },
@@ -5913,7 +6201,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1966-10-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
             }
          }
       },
@@ -5928,7 +6218,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-05-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -5943,7 +6235,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-02-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       }
@@ -5973,7 +6267,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1980-07-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P8Y"
+               }
             }
          }
       },
@@ -5988,7 +6284,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1980-07-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P8Y"
+               }
             }
          }
       }
@@ -6100,7 +6398,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2007-11-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P63Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P63Y"
             }
          },
          "value" : {
@@ -6134,7 +6439,9 @@
                "label" : "Radiography of ankle"
             },
             "performed" : {
-               "timestamp" : "1983-05-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P38Y"
+               }
             }
          }
       }
@@ -6143,6 +6450,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P18Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -6165,6 +6477,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P10Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -6200,6 +6517,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P66Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:399211009",
             "label" : "History of myocardial infarction"
@@ -6321,7 +6643,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2012-11-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P96Y"
+               }
             }
          }
       },
@@ -6336,7 +6660,9 @@
                "label" : "Pelvis X-ray"
             },
             "performed" : {
-               "timestamp" : "2015-09-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P99Y"
+               }
             }
          }
       },
@@ -6351,7 +6677,9 @@
                "label" : "Nasal sinus endoscopy"
             },
             "performed" : {
-               "timestamp" : "1922-07-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
             }
          }
       },
@@ -6366,7 +6694,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "1984-02-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P67Y"
+               }
             }
          }
       },
@@ -6381,7 +6711,9 @@
                "label" : "Pelvis X-ray"
             },
             "performed" : {
-               "timestamp" : "1984-02-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P67Y"
+               }
             }
          }
       },
@@ -6396,7 +6728,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2006-07-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P90Y"
+               }
             }
          }
       },
@@ -6411,7 +6745,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2014-07-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P98Y"
+               }
             }
          }
       }
@@ -6726,7 +7062,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-10-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -6741,7 +7079,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -6756,7 +7096,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-06-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -6771,7 +7113,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-02-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -6786,7 +7130,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-05-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -6801,7 +7147,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-02-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -6816,7 +7164,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-06-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       }
@@ -6961,7 +7311,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-12-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -6976,7 +7328,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-06-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -6991,7 +7345,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -7006,7 +7362,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-01-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -7021,7 +7379,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-04-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -7036,7 +7396,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-04-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -7051,7 +7413,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-07-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       }
@@ -7124,7 +7488,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1962-08-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P23Y"
             }
          },
          "value" : {
@@ -7160,7 +7531,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1981-01-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P42Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P42Y"
             }
          },
          "value" : {
@@ -7300,7 +7678,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1984-02-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P3Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P3Y"
             }
          },
          "value" : {
@@ -7336,7 +7721,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1993-05-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P12Y"
             }
          },
          "value" : {
@@ -7437,7 +7829,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "2017-06-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P89Y"
+               }
             }
          }
       },
@@ -7452,7 +7846,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "2017-06-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P89Y"
+               }
             }
          }
       },
@@ -7467,7 +7863,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2017-06-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P89Y"
+               }
             }
          }
       },
@@ -7482,7 +7880,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2016-05-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P88Y"
+               }
             }
          }
       },
@@ -7497,7 +7897,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "2016-05-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P88Y"
+               }
             }
          }
       },
@@ -7512,7 +7914,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "2016-05-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P88Y"
+               }
             }
          }
       },
@@ -7527,7 +7931,9 @@
                "label" : "Surgical manipulation of joint of knee"
             },
             "performed" : {
-               "timestamp" : "1979-01-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P50Y"
+               }
             }
          }
       }
@@ -7611,6 +8017,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P40Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -7751,7 +8162,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1963-05-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -7787,7 +8205,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1965-10-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P3Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P3Y"
             }
          },
          "value" : {
@@ -7823,7 +8248,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1963-05-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -7859,7 +8291,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1963-05-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -7910,7 +8349,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1988-07-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P16Y"
             }
          },
          "value" : {
@@ -7946,7 +8392,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2002-11-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P30Y"
             }
          },
          "value" : {
@@ -8250,7 +8703,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1975-12-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P48Y"
+               }
             }
          }
       },
@@ -8265,7 +8720,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1932-05-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
             }
          }
       },
@@ -8280,7 +8737,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1963-06-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -8295,7 +8754,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "2006-08-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P79Y"
+               }
             }
          }
       },
@@ -8310,7 +8771,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2006-08-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P79Y"
+               }
             }
          }
       },
@@ -8325,7 +8788,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "2006-08-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P79Y"
+               }
             }
          }
       },
@@ -8340,7 +8805,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2014-02-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P86Y"
+               }
             }
          }
       }
@@ -8550,7 +9017,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-04-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -8565,7 +9034,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-10-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P27Y"
+               }
             }
          }
       }
@@ -8684,7 +9155,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "2009-09-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P74Y"
+               }
             }
          }
       },
@@ -8699,7 +9172,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "2009-09-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P74Y"
+               }
             }
          }
       },
@@ -8714,7 +9189,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1970-04-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -8729,7 +9206,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "2005-09-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P70Y"
+               }
             }
          }
       },
@@ -8744,7 +9223,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "2005-09-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P70Y"
+               }
             }
          }
       }
@@ -8941,7 +9422,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-02-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P22Y"
+               }
             }
          }
       },
@@ -8956,7 +9439,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-05-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P22Y"
+               }
             }
          }
       },
@@ -8971,7 +9456,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-02-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -8986,7 +9473,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       },
@@ -9001,7 +9490,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-02-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       },
@@ -9016,7 +9507,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-04-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -9031,7 +9524,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -9046,7 +9541,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-08-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P22Y"
+               }
             }
          }
       }
@@ -9055,6 +9552,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419263009",
             "label" : "Allergy to tree pollen"
@@ -9062,6 +9564,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419474003",
             "label" : "Allergy to mold"
@@ -9069,6 +9576,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:418689008",
             "label" : "Allergy to grass pollen"
@@ -9076,6 +9588,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:232350006",
             "label" : "Allergy to house dust mite"
@@ -9239,6 +9756,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P38Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -9295,7 +9817,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-11-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -9310,7 +9834,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-09-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -9325,7 +9851,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-03-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -9340,7 +9868,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -9355,7 +9885,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -9370,7 +9902,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       }
@@ -9379,6 +9913,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P0Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:91930004",
             "label" : "Allergy to eggs"
@@ -9386,6 +9925,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P42Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -9416,7 +9960,9 @@
                "label" : "Percutaneous mechanical thrombectomy of portal vein using fluoroscopic guidance"
             },
             "performed" : {
-               "timestamp" : "2012-07-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P72Y"
+               }
             }
          }
       }
@@ -9446,7 +9992,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1988-01-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       }
@@ -9750,6 +10298,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P24Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419474003",
             "label" : "Allergy to mold"
@@ -9810,7 +10363,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1985-02-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P17Y"
             }
          },
          "value" : {
@@ -9846,7 +10406,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1998-06-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P31Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P31Y"
             }
          },
          "value" : {
@@ -9872,6 +10439,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P29Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -9906,7 +10478,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2016-07-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P41Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P41Y"
             }
          },
          "value" : {
@@ -9942,7 +10521,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1992-10-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P17Y"
             }
          },
          "value" : {
@@ -9978,7 +10564,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1984-09-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P9Y"
             }
          },
          "value" : {
@@ -10014,7 +10607,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1985-06-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P10Y"
             }
          },
          "value" : {
@@ -10065,7 +10665,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2009-08-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P37Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P37Y"
             }
          },
          "value" : {
@@ -10219,6 +10826,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P62Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -10370,6 +10982,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P69Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:399211009",
             "label" : "History of myocardial infarction"
@@ -10426,7 +11043,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -10441,7 +11060,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2016-12-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P61Y"
+               }
             }
          }
       },
@@ -10456,7 +11077,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-02-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -10471,7 +11094,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -10486,7 +11111,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-07-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P37Y"
+               }
             }
          }
       },
@@ -10501,7 +11128,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -10516,7 +11145,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -10531,7 +11162,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-03-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P37Y"
+               }
             }
          }
       }
@@ -10540,6 +11173,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P3Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:232350006",
             "label" : "Allergy to house dust mite"
@@ -10547,6 +11185,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P3Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:418689008",
             "label" : "Allergy to grass pollen"
@@ -10554,6 +11197,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P3Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419474003",
             "label" : "Allergy to mold"
@@ -10699,7 +11347,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-02-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P37Y"
+               }
             }
          }
       },
@@ -10714,7 +11364,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-10-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P40Y"
+               }
             }
          }
       },
@@ -10729,7 +11381,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-05-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P41Y"
+               }
             }
          }
       },
@@ -10744,7 +11398,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P39Y"
+               }
             }
          }
       },
@@ -10759,7 +11415,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-03-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P38Y"
+               }
             }
          }
       },
@@ -10774,7 +11432,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-04-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P41Y"
+               }
             }
          }
       },
@@ -10789,7 +11449,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-06-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P38Y"
+               }
             }
          }
       },
@@ -10804,7 +11466,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-04-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P39Y"
+               }
             }
          }
       }
@@ -10962,7 +11626,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-01-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -10977,7 +11643,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -10992,7 +11660,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-02-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -11007,7 +11677,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-11-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -11022,7 +11694,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-05-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -11037,7 +11711,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -11052,7 +11728,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-03-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P31Y"
+               }
             }
          }
       },
@@ -11067,7 +11745,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-07-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       }
@@ -11216,7 +11896,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1912-10-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -11252,7 +11939,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1912-10-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -11288,7 +11982,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1913-11-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P2Y"
             }
          },
          "value" : {
@@ -11324,7 +12025,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1913-11-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P2Y"
             }
          },
          "value" : {
@@ -11360,7 +12068,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1913-11-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P2Y"
             }
          },
          "value" : {
@@ -11396,7 +12111,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1913-11-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P2Y"
             }
          },
          "value" : {
@@ -11432,7 +12154,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1913-04-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -11497,6 +12226,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P40Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -11616,7 +12350,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "1938-10-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P7Y"
+               }
             }
          }
       },
@@ -11631,7 +12367,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "1941-10-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -11646,7 +12384,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1997-12-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P66Y"
+               }
             }
          }
       },
@@ -11661,7 +12401,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2011-11-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P80Y"
+               }
             }
          }
       },
@@ -11676,7 +12418,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1940-11-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       }
@@ -11706,7 +12450,9 @@
                "label" : "Radiography of ankle"
             },
             "performed" : {
-               "timestamp" : "1999-01-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P51Y"
+               }
             }
          }
       },
@@ -11721,7 +12467,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1999-01-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P51Y"
+               }
             }
          }
       },
@@ -11736,7 +12484,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "1999-01-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P51Y"
+               }
             }
          }
       }
@@ -11907,7 +12657,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-10-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P45Y"
+               }
             }
          }
       },
@@ -11922,7 +12674,9 @@
                "label" : "Injection of tetanus antitoxin"
             },
             "performed" : {
-               "timestamp" : "1992-08-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P44Y"
+               }
             }
          }
       },
@@ -11937,7 +12691,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1992-08-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P44Y"
+               }
             }
          }
       },
@@ -11952,7 +12708,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-09-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P45Y"
+               }
             }
          }
       },
@@ -11967,7 +12725,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-03-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P45Y"
+               }
             }
          }
       },
@@ -11982,7 +12742,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-06-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P43Y"
+               }
             }
          }
       },
@@ -11997,7 +12759,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-02-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P43Y"
+               }
             }
          }
       },
@@ -12012,7 +12776,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-01-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P44Y"
+               }
             }
          }
       }
@@ -12047,6 +12813,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P13Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -12158,6 +12929,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P8Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -12214,7 +12990,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1984-03-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -12229,7 +13007,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1981-11-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -12244,7 +13024,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1981-06-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -12259,7 +13041,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1982-01-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -12274,7 +13058,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1984-08-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -12289,7 +13075,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1984-01-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -12304,7 +13092,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1982-04-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -12319,7 +13109,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1985-06-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       }
@@ -12399,6 +13191,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P26Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -12478,7 +13275,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2008-11-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P57Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P57Y"
             }
          },
          "value" : {
@@ -12514,7 +13318,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2016-05-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P64Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P64Y"
             }
          },
          "value" : {
@@ -12550,7 +13361,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1961-03-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P9Y"
             }
          },
          "value" : {
@@ -12586,7 +13404,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2009-05-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P57Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P57Y"
             }
          },
          "value" : {
@@ -12622,7 +13447,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1964-12-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P13Y"
             }
          },
          "value" : {
@@ -12673,7 +13505,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1986-05-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P13Y"
             }
          },
          "value" : {
@@ -12709,7 +13548,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1978-03-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P5Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P5Y"
             }
          },
          "value" : {
@@ -12745,7 +13591,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1981-01-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P8Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P8Y"
             }
          },
          "value" : {
@@ -12933,7 +13786,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1948-04-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
             }
          }
       },
@@ -12948,7 +13803,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1944-12-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -12963,7 +13820,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1946-09-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -12978,7 +13837,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1947-01-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -12993,7 +13854,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1945-12-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -13008,7 +13871,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1945-04-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -13023,7 +13888,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1950-09-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -13038,7 +13905,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1945-12-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       }
@@ -13073,6 +13942,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P4Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -13504,7 +14378,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1962-09-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P7Y"
+               }
             }
          }
       }
@@ -13538,7 +14414,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1976-12-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -13574,7 +14457,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2010-06-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P35Y"
             }
          },
          "value" : {
@@ -13610,7 +14500,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1993-10-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P18Y"
             }
          },
          "value" : {
@@ -13644,7 +14541,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-04-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       },
@@ -13659,7 +14558,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-06-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -13674,7 +14575,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-09-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -13689,7 +14592,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-01-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -13704,7 +14609,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-12-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -13719,7 +14626,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-10-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       },
@@ -13734,7 +14643,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       }
@@ -13857,7 +14768,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1961-03-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P14Y"
             }
          },
          "value" : {
@@ -13893,7 +14811,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2016-03-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P69Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P69Y"
             }
          },
          "value" : {
@@ -13944,7 +14869,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2009-05-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P41Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P41Y"
             }
          },
          "value" : {
@@ -13980,7 +14912,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1998-12-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P30Y"
             }
          },
          "value" : {
@@ -14040,7 +14979,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-01-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
             }
          }
       },
@@ -14055,7 +14996,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-01-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P31Y"
+               }
             }
          }
       },
@@ -14070,7 +15013,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-12-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P31Y"
+               }
             }
          }
       },
@@ -14085,7 +15030,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P31Y"
+               }
             }
          }
       },
@@ -14100,7 +15047,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-08-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -14115,7 +15064,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-05-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -14130,7 +15081,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -14145,7 +15098,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-01-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -14218,7 +15173,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1990-12-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P43Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P43Y"
             }
          },
          "value" : {
@@ -14254,7 +15216,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1979-06-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P32Y"
             }
          },
          "value" : {
@@ -14290,7 +15259,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1955-03-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P8Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P8Y"
             }
          },
          "value" : {
@@ -14316,6 +15292,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P69Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -14589,7 +15570,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1977-04-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
             }
          }
       },
@@ -14604,7 +15587,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1977-04-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
             }
          }
       },
@@ -14619,7 +15604,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "2013-07-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P43Y"
+               }
             }
          }
       }
@@ -14649,7 +15636,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1969-04-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
             }
          }
       },
@@ -14664,7 +15653,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1980-12-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
             }
          }
       },
@@ -14679,7 +15670,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1972-03-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
             }
          }
       },
@@ -14694,7 +15687,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1953-12-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P3Y"
+               }
             }
          }
       },
@@ -14709,7 +15704,9 @@
                "label" : "Nasal sinus endoscopy"
             },
             "performed" : {
-               "timestamp" : "1983-10-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P32Y"
+               }
             }
          }
       },
@@ -15043,6 +16040,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P36Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -15086,7 +16088,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-10-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
             }
          }
       },
@@ -15101,7 +16105,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-12-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P28Y"
+               }
             }
          }
       },
@@ -15116,7 +16122,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-07-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P27Y"
+               }
             }
          }
       },
@@ -15131,7 +16139,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-03-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       },
@@ -15146,7 +16156,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-11-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       },
@@ -15161,7 +16173,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-03-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
             }
          }
       },
@@ -15176,7 +16190,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-04-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       },
@@ -15191,7 +16207,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-12-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
             }
          }
       }
@@ -15315,6 +16333,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P66Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:399211009",
             "label" : "History of myocardial infarction"
@@ -15322,6 +16345,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P38Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -15329,6 +16357,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P0Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -15351,6 +16384,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:417532002",
             "label" : "Allergy to fish"
@@ -15381,7 +16419,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1961-10-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       }
@@ -15500,7 +16540,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2011-04-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P58Y"
+               }
             }
          }
       },
@@ -15515,7 +16557,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1989-05-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       }
@@ -15545,7 +16589,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "1980-03-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P60Y"
+               }
             }
          }
       },
@@ -15560,7 +16606,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1920-12-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
             }
          }
       },
@@ -15575,7 +16623,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1920-12-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
             }
          }
       },
@@ -15590,7 +16640,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1977-07-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P57Y"
+               }
             }
          }
       },
@@ -15605,7 +16657,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "1977-07-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P57Y"
+               }
             }
          }
       }
@@ -15764,7 +16818,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-03-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -15779,7 +16835,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-01-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -15794,7 +16852,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-07-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -15809,7 +16869,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-11-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -15824,7 +16886,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -15839,7 +16903,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-04-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -15854,7 +16920,9 @@
                "label" : "Allergy screening test"
             },
             "performed" : {
-               "timestamp" : "1990-01-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -15869,7 +16937,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-05-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       }
@@ -15878,6 +16948,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P21Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419474003",
             "label" : "Allergy to mold"
@@ -16344,6 +17419,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:300913006",
             "label" : "Shellfish allergy"
@@ -16351,6 +17431,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419263009",
             "label" : "Allergy to tree pollen"
@@ -16358,6 +17443,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:91934008",
             "label" : "Allergy to nut"
@@ -16365,6 +17455,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:300916003",
             "label" : "Latex allergy"
@@ -16372,6 +17467,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:91935009",
             "label" : "Allergy to peanuts"
@@ -16379,6 +17479,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419474003",
             "label" : "Allergy to mold"
@@ -16386,6 +17491,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:232347008",
             "label" : "Allergy to animal dander"
@@ -16749,7 +17859,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1983-02-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P4Y"
             }
          },
          "value" : {
@@ -16885,7 +18002,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1994-07-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -16900,7 +18019,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1993-04-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -16915,7 +18036,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1993-10-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -16930,7 +18053,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1993-07-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -16945,7 +18070,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1993-01-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -16960,7 +18087,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1994-04-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -16975,7 +18104,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1994-10-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -16990,7 +18121,9 @@
                "label" : "Intramuscular injection"
             },
             "performed" : {
-               "timestamp" : "1994-01-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       }
@@ -17274,6 +18407,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P43Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -17317,7 +18455,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2002-06-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P46Y"
+               }
             }
          }
       },
@@ -17332,7 +18472,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-10-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -17347,7 +18489,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-01-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -17362,7 +18506,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-03-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -17377,7 +18523,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -17392,7 +18540,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-03-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       },
@@ -17407,7 +18557,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-06-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -17422,7 +18574,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-06-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P37Y"
+               }
             }
          }
       }
@@ -17517,7 +18671,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2002-04-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P66Y"
+               }
             }
          }
       }
@@ -17547,7 +18703,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1986-12-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -17562,7 +18720,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1970-04-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
             }
          }
       },
@@ -17577,7 +18737,9 @@
                "label" : "Plain chest X-ray"
             },
             "performed" : {
-               "timestamp" : "1970-04-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
             }
          }
       },
@@ -17592,7 +18754,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1968-05-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
             }
          }
       },
@@ -17607,7 +18771,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1968-05-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
             }
          }
       }
@@ -17726,7 +18892,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-11-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P80Y"
+               }
             }
          }
       },
@@ -17741,7 +18909,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-05-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P83Y"
+               }
             }
          }
       },
@@ -17817,6 +18987,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P3Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -17873,7 +19048,9 @@
                "label" : "Nasal sinus endoscopy"
             },
             "performed" : {
-               "timestamp" : "2001-08-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P28Y"
+               }
             }
          }
       }
@@ -17907,7 +19084,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2017-03-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P69Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P69Y"
             }
          },
          "value" : {
@@ -17943,7 +19127,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1998-11-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P50Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P50Y"
             }
          },
          "value" : {
@@ -17977,7 +19168,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2003-06-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P55Y"
+               }
             }
          }
       },
@@ -17992,7 +19185,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2012-08-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P64Y"
+               }
             }
          }
       },
@@ -18007,7 +19202,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2019-04-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P71Y"
+               }
             }
          }
       },
@@ -18022,7 +19219,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2009-07-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P61Y"
+               }
             }
          }
       },
@@ -18037,7 +19236,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2004-06-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P56Y"
+               }
             }
          }
       },
@@ -18052,7 +19253,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2002-06-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P54Y"
+               }
             }
          }
       },
@@ -18067,7 +19270,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2011-08-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P63Y"
+               }
             }
          }
       }
@@ -18101,7 +19306,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1982-09-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P29Y"
             }
          },
          "value" : {
@@ -18137,7 +19349,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1998-11-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P45Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P45Y"
             }
          },
          "value" : {
@@ -18173,7 +19392,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1974-05-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P21Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P21Y"
             }
          },
          "value" : {
@@ -18209,7 +19435,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2009-03-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P56Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P56Y"
             }
          },
          "value" : {
@@ -18245,7 +19478,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1983-02-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P30Y"
             }
          },
          "value" : {
@@ -18281,7 +19521,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1965-05-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P12Y"
             }
          },
          "value" : {
@@ -18317,7 +19564,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2008-02-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P55Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P55Y"
             }
          },
          "value" : {
@@ -18408,6 +19662,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P42Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -18442,7 +19701,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1983-09-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P6Y"
             }
          },
          "value" : {
@@ -18468,6 +19734,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P21Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -18502,7 +19773,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2008-12-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P55Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P55Y"
             }
          },
          "value" : {
@@ -18538,7 +19816,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1978-03-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P25Y"
             }
          },
          "value" : {
@@ -18574,7 +19859,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1989-10-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P36Y"
             }
          },
          "value" : {
@@ -18660,7 +19952,9 @@
                "label" : "Percutaneous coronary intervention"
             },
             "performed" : {
-               "timestamp" : "2012-06-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P51Y"
+               }
             }
          }
       },
@@ -18675,7 +19969,9 @@
                "label" : "Coronary artery bypass graft"
             },
             "performed" : {
-               "timestamp" : "2012-06-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P51Y"
+               }
             }
          }
       },
@@ -18690,7 +19986,9 @@
                "label" : "Injection of tetanus antitoxin"
             },
             "performed" : {
-               "timestamp" : "1993-10-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -18705,7 +20003,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1993-10-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -18720,7 +20020,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2018-02-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P57Y"
+               }
             }
          }
       }
@@ -18750,7 +20052,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "2012-07-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P31Y"
+               }
             }
          }
       },
@@ -18765,7 +20069,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "2011-02-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       },
@@ -18780,7 +20086,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "2011-03-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       }
@@ -18901,7 +20209,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-03-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P22Y"
+               }
             }
          }
       },
@@ -18916,7 +20226,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-04-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -18931,7 +20243,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-08-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -18946,7 +20260,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-04-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       },
@@ -18961,7 +20277,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-06-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -18976,7 +20294,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-04-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -18991,7 +20311,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P22Y"
+               }
             }
          }
       },
@@ -19006,7 +20328,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-05-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
             }
          }
       }
@@ -19067,6 +20391,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P24Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -19123,7 +20452,9 @@
                "label" : "Surgical manipulation of joint of knee"
             },
             "performed" : {
-               "timestamp" : "1999-09-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P48Y"
+               }
             }
          }
       },
@@ -19138,7 +20469,9 @@
                "label" : "Plain chest X-ray"
             },
             "performed" : {
-               "timestamp" : "1968-09-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       },
@@ -19153,7 +20486,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1968-09-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       },
@@ -19168,7 +20503,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2018-01-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P67Y"
+               }
             }
          }
       },
@@ -19183,7 +20520,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1966-09-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -19198,7 +20537,9 @@
                "label" : "Nasal sinus endoscopy"
             },
             "performed" : {
-               "timestamp" : "1962-12-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -19213,7 +20554,9 @@
                "label" : "Radiography of humerus"
             },
             "performed" : {
-               "timestamp" : "1984-05-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -19228,7 +20571,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1984-05-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       }
@@ -19336,7 +20681,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1961-03-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -19351,7 +20698,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1972-03-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P22Y"
+               }
             }
          }
       },
@@ -19366,7 +20715,9 @@
                "label" : "Vasectomy"
             },
             "performed" : {
-               "timestamp" : "1984-07-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -19381,7 +20732,9 @@
                "label" : "Coronary artery bypass graft"
             },
             "performed" : {
-               "timestamp" : "2005-08-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P56Y"
+               }
             }
          }
       },
@@ -19396,7 +20749,9 @@
                "label" : "Percutaneous coronary intervention"
             },
             "performed" : {
-               "timestamp" : "2005-08-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P56Y"
+               }
             }
          }
       },
@@ -19411,7 +20766,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1973-11-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       }
@@ -19441,7 +20798,9 @@
                "label" : "Medication Reconciliation"
             },
             "performed" : {
-               "timestamp" : "1964-04-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
             }
          }
       },
@@ -19456,7 +20815,9 @@
                "label" : "Review of systems"
             },
             "performed" : {
-               "timestamp" : "1964-04-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
             }
          }
       }
@@ -19525,7 +20886,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-10-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -19540,7 +20903,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1970-03-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
             }
          }
       },
@@ -19555,7 +20920,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-04-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -19570,7 +20937,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-12-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P24Y"
+               }
             }
          }
       },
@@ -19585,7 +20954,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-08-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -19600,7 +20971,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-07-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -19615,7 +20988,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-28T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -19630,7 +21005,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-11-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       }
@@ -19764,7 +21141,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "1959-08-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
             }
          }
       },
@@ -19779,7 +21158,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "2003-09-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P62Y"
+               }
             }
          }
       },
@@ -19794,7 +21175,9 @@
                "label" : "Surgical manipulation of joint of knee"
             },
             "performed" : {
-               "timestamp" : "2003-09-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P62Y"
+               }
             }
          }
       }
@@ -19824,7 +21207,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1986-03-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -19839,7 +21224,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1985-05-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -19854,7 +21241,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2010-07-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P38Y"
+               }
             }
          }
       },
@@ -19869,7 +21258,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1985-05-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -19884,7 +21275,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1985-01-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       }
@@ -19932,6 +21325,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P25Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -20040,7 +21438,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-11-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P55Y"
+               }
             }
          }
       },
@@ -20055,7 +21455,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-02-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P52Y"
+               }
             }
          }
       },
@@ -20070,7 +21472,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-09-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P53Y"
+               }
             }
          }
       },
@@ -20085,7 +21489,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-04-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P53Y"
+               }
             }
          }
       },
@@ -20100,7 +21506,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-07-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P52Y"
+               }
             }
          }
       },
@@ -20115,7 +21523,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-05-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P53Y"
+               }
             }
          }
       },
@@ -20130,7 +21540,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "1972-09-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -20145,7 +21557,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-06-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P54Y"
+               }
             }
          }
       }
@@ -20240,7 +21654,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2010-01-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P40Y"
+               }
             }
          }
       }
@@ -20270,7 +21686,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1985-08-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P19Y"
+               }
             }
          }
       },
@@ -20285,7 +21703,9 @@
                "label" : "Insertion of intrauterine contraceptive device"
             },
             "performed" : {
-               "timestamp" : "1983-07-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P16Y"
+               }
             }
          }
       },
@@ -20300,7 +21720,9 @@
                "label" : "Removal of intrauterine device"
             },
             "performed" : {
-               "timestamp" : "1985-03-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
             }
          }
       }
@@ -20369,7 +21791,9 @@
                "label" : "Injection of tetanus antitoxin"
             },
             "performed" : {
-               "timestamp" : "1977-11-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P66Y"
+               }
             }
          }
       },
@@ -20384,7 +21808,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1990-05-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P78Y"
+               }
             }
          }
       },
@@ -20399,7 +21825,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1990-05-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P78Y"
+               }
             }
          }
       },
@@ -20414,7 +21842,9 @@
                "label" : "Surgical manipulation of joint of knee"
             },
             "performed" : {
-               "timestamp" : "1954-06-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P43Y"
+               }
             }
          }
       },
@@ -20429,7 +21859,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "1982-03-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P70Y"
+               }
             }
          }
       },
@@ -20444,7 +21876,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1954-06-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P42Y"
+               }
             }
          }
       },
@@ -20459,7 +21893,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1921-11-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -20474,7 +21910,9 @@
                "label" : "Injection of tetanus antitoxin"
             },
             "performed" : {
-               "timestamp" : "1978-12-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P67Y"
+               }
             }
          }
       }
@@ -20569,7 +22007,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1973-06-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P19Y"
+               }
             }
          }
       },
@@ -20584,7 +22024,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1994-06-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P40Y"
+               }
             }
          }
       },
@@ -20599,7 +22041,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1996-07-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P42Y"
+               }
             }
          }
       },
@@ -20614,7 +22058,9 @@
                "label" : "Surgical manipulation of joint of knee"
             },
             "performed" : {
-               "timestamp" : "1994-06-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P40Y"
+               }
             }
          }
       },
@@ -20629,7 +22075,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1980-03-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       },
@@ -20644,7 +22092,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1980-03-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P25Y"
+               }
             }
          }
       }
@@ -20674,7 +22124,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1971-02-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
             }
          }
       },
@@ -20689,7 +22141,9 @@
                "label" : "Nasal sinus endoscopy"
             },
             "performed" : {
-               "timestamp" : "2002-11-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P45Y"
+               }
             }
          }
       },
@@ -20908,6 +22362,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P19Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -21083,7 +22542,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2009-10-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P45Y"
+               }
             }
          }
       },
@@ -21098,7 +22559,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1991-05-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -21180,7 +22643,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2008-11-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P60Y"
+               }
             }
          }
       },
@@ -21195,7 +22660,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1960-06-09T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -21210,7 +22677,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1967-02-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
             }
          }
       },
@@ -21225,7 +22694,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1978-04-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       },
@@ -21240,7 +22711,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1978-04-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       }
@@ -21283,7 +22756,9 @@
                "label" : "Plain chest X-ray"
             },
             "performed" : {
-               "timestamp" : "2017-10-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P72Y"
+               }
             }
          }
       }
@@ -21357,6 +22832,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P14Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -21430,7 +22910,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1993-10-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P27Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P27Y"
             }
          },
          "value" : {
@@ -21466,7 +22953,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1978-05-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P12Y"
             }
          },
          "value" : {
@@ -21502,7 +22996,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2005-05-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P39Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P39Y"
             }
          },
          "value" : {
@@ -21579,7 +23080,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1996-09-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P44Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P44Y"
             }
          },
          "value" : {
@@ -21615,7 +23123,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2010-04-18T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P58Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P58Y"
             }
          },
          "value" : {
@@ -21651,7 +23166,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2011-04-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P59Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P59Y"
             }
          },
          "value" : {
@@ -21687,7 +23209,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2014-05-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P62Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P62Y"
             }
          },
          "value" : {
@@ -21723,7 +23252,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2016-05-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P64Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P64Y"
             }
          },
          "value" : {
@@ -21759,7 +23295,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1994-09-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P42Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P42Y"
             }
          },
          "value" : {
@@ -21795,7 +23338,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2013-05-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P61Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P61Y"
             }
          },
          "value" : {
@@ -21821,6 +23371,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P31Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -21855,7 +23410,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1997-12-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P23Y"
             }
          },
          "value" : {
@@ -21906,7 +23468,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1976-11-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P19Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P19Y"
             }
          },
          "value" : {
@@ -21942,7 +23511,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1996-09-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P39Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P39Y"
             }
          },
          "value" : {
@@ -21976,7 +23552,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-04-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -21991,7 +23569,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-01-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -22006,7 +23586,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-06-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -22021,7 +23603,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-07-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -22036,7 +23620,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-09-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -22051,7 +23637,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-01-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P34Y"
+               }
             }
          }
       },
@@ -22066,7 +23654,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-02-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -22081,7 +23671,9 @@
                "label" : "Vasectomy"
             },
             "performed" : {
-               "timestamp" : "1994-03-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
             }
          }
       }
@@ -22137,7 +23729,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2013-11-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P99Y"
+               }
             }
          }
       },
@@ -22152,7 +23746,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2003-09-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P89Y"
+               }
             }
          }
       },
@@ -22167,7 +23763,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1975-09-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P61Y"
+               }
             }
          }
       },
@@ -22182,7 +23780,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1947-02-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P33Y"
+               }
             }
          }
       },
@@ -22197,7 +23797,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "1994-04-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P80Y"
+               }
             }
          }
       },
@@ -22212,7 +23814,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "1995-05-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P81Y"
+               }
             }
          }
       },
@@ -22227,7 +23831,9 @@
                "label" : "Direct current cardioversion"
             },
             "performed" : {
-               "timestamp" : "2017-12-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P103Y"
+               }
             }
          }
       },
@@ -22242,7 +23848,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1952-06-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P38Y"
+               }
             }
          }
       }
@@ -22391,7 +23999,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-09-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -22406,7 +24016,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-12-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -22421,7 +24033,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-02-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -22436,7 +24050,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2005-10-22T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P28Y"
+               }
             }
          }
       },
@@ -22451,7 +24067,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-06-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       },
@@ -22466,7 +24084,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1984-01-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P6Y"
+               }
             }
          }
       },
@@ -22481,7 +24101,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-07-31T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -22496,7 +24118,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-11-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P13Y"
+               }
             }
          }
       },
@@ -22583,6 +24207,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P27Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -22656,7 +24285,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2012-03-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P36Y"
             }
          },
          "value" : {
@@ -22692,7 +24328,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1978-11-26T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P2Y"
             }
          },
          "value" : {
@@ -22718,6 +24361,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:420174000",
             "label" : "Allergy to wheat"
@@ -22725,6 +24373,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:232347008",
             "label" : "Allergy to animal dander"
@@ -22768,7 +24421,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-10-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P28Y"
+               }
             }
          }
       },
@@ -22783,7 +24438,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1976-04-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
             }
          }
       },
@@ -22798,7 +24455,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-03-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       },
@@ -22813,7 +24472,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1991-06-13T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P28Y"
+               }
             }
          }
       },
@@ -22828,7 +24489,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-08-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P27Y"
+               }
             }
          }
       },
@@ -22843,7 +24506,9 @@
                "label" : "Cognitive and behavioral therapy"
             },
             "performed" : {
-               "timestamp" : "1975-03-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P11Y"
+               }
             }
          }
       },
@@ -22858,7 +24523,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1992-10-08T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P29Y"
+               }
             }
          }
       },
@@ -22873,7 +24540,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-04-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
             }
          }
       }
@@ -22959,7 +24628,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1943-02-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P23Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P23Y"
             }
          },
          "value" : {
@@ -22995,7 +24671,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1946-01-01T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P26Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P26Y"
             }
          },
          "value" : {
@@ -23031,7 +24714,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1965-10-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P46Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P46Y"
             }
          },
          "value" : {
@@ -23067,7 +24757,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1956-07-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P36Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P36Y"
             }
          },
          "value" : {
@@ -23103,7 +24800,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1958-12-25T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P39Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P39Y"
             }
          },
          "value" : {
@@ -23139,7 +24843,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1925-02-07T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P5Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P5Y"
             }
          },
          "value" : {
@@ -23175,7 +24886,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1937-06-19T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P17Y"
             }
          },
          "value" : {
@@ -23239,7 +24957,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2010-09-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P49Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P49Y"
             }
          },
          "value" : {
@@ -23275,7 +25000,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1992-03-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P31Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P31Y"
             }
          },
          "value" : {
@@ -23326,7 +25058,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1993-12-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P48Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P48Y"
             }
          },
          "value" : {
@@ -23365,6 +25104,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P38Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -23387,6 +25131,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P50Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -23394,6 +25143,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P59Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:399211009",
             "label" : "History of myocardial infarction"
@@ -23545,7 +25299,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1998-10-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P42Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P42Y"
             }
          },
          "value" : {
@@ -23581,7 +25342,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2010-08-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P54Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P54Y"
             }
          },
          "value" : {
@@ -23607,6 +25375,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P36Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -23614,6 +25387,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P0Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -23648,7 +25426,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1985-10-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P20Y"
             }
          },
          "value" : {
@@ -23684,7 +25469,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2004-02-15T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P39Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P39Y"
             }
          },
          "value" : {
@@ -23720,7 +25512,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1967-10-03T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P2Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P2Y"
             }
          },
          "value" : {
@@ -23756,7 +25555,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2004-11-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P40Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P40Y"
             }
          },
          "value" : {
@@ -23803,7 +25609,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1985-01-24T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P9Y"
+               }
             }
          }
       },
@@ -23818,7 +25626,9 @@
                "label" : "Radiography of ankle"
             },
             "performed" : {
-               "timestamp" : "1995-09-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -23833,7 +25643,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1995-09-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P20Y"
+               }
             }
          }
       },
@@ -23848,7 +25660,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1985-10-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -23863,7 +25677,9 @@
                "label" : "Insertion of intrauterine contraceptive device"
             },
             "performed" : {
-               "timestamp" : "1991-08-04T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P15Y"
+               }
             }
          }
       }
@@ -23893,7 +25709,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "2002-10-27T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P49Y"
+               }
             }
          }
       }
@@ -23979,7 +25797,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1995-02-21T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P53Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P53Y"
             }
          },
          "value" : {
@@ -24015,7 +25840,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1992-02-10T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P50Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P50Y"
             }
          },
          "value" : {
@@ -24051,7 +25883,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1955-07-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P14Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P14Y"
             }
          },
          "value" : {
@@ -24087,7 +25926,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "2019-06-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P77Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P77Y"
             }
          },
          "value" : {
@@ -24123,7 +25969,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1999-01-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P57Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P57Y"
             }
          },
          "value" : {
@@ -24157,7 +26010,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "2012-08-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P71Y"
+               }
             }
          }
       },
@@ -24172,7 +26027,9 @@
                "label" : "Radiography of ankle"
             },
             "performed" : {
-               "timestamp" : "2012-08-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P71Y"
+               }
             }
          }
       },
@@ -24187,7 +26044,9 @@
                "label" : "Bone density scan"
             },
             "performed" : {
-               "timestamp" : "2012-08-16T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P71Y"
+               }
             }
          }
       },
@@ -24202,7 +26061,9 @@
                "label" : "Plain chest X-ray"
             },
             "performed" : {
-               "timestamp" : "1981-12-17T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P40Y"
+               }
             }
          }
       },
@@ -24217,7 +26078,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "1979-04-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P37Y"
+               }
             }
          }
       },
@@ -24232,7 +26095,9 @@
                "label" : "Radiography of wrist"
             },
             "performed" : {
-               "timestamp" : "1952-02-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       },
@@ -24247,7 +26112,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1952-02-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P10Y"
+               }
             }
          }
       }
@@ -24282,6 +26149,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P5Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:703151001",
             "label" : "History of single seizure"
@@ -24312,7 +26184,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1993-01-23T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P37Y"
+               }
             }
          }
       },
@@ -24327,7 +26201,9 @@
                "label" : "Subcutaneous immunotherapy"
             },
             "performed" : {
-               "timestamp" : "1990-10-06T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       }
@@ -24357,7 +26233,9 @@
                "label" : "Radiography of ankle"
             },
             "performed" : {
-               "timestamp" : "1979-05-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
             }
          }
       },
@@ -24372,7 +26250,9 @@
                "label" : "Bone immobilization"
             },
             "performed" : {
-               "timestamp" : "1979-05-29T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
             }
          }
       },
@@ -24387,7 +26267,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2009-04-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P48Y"
+               }
             }
          }
       },
@@ -24402,7 +26284,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "1990-10-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P30Y"
+               }
             }
          }
       },
@@ -24417,7 +26301,9 @@
                "label" : "Injection of tetanus antitoxin"
             },
             "performed" : {
-               "timestamp" : "2019-04-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P58Y"
+               }
             }
          }
       },
@@ -24432,7 +26318,9 @@
                "label" : "Suture open wound"
             },
             "performed" : {
-               "timestamp" : "2019-04-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P58Y"
+               }
             }
          }
       }
@@ -24546,7 +26434,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1990-02-14T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P12Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P12Y"
             }
          },
          "value" : {
@@ -24582,7 +26477,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1996-09-05T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P18Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P18Y"
             }
          },
          "value" : {
@@ -24618,7 +26520,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1995-04-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P17Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P17Y"
             }
          },
          "value" : {
@@ -24654,7 +26563,14 @@
                "label" : "Not Available"
             },
             "performed" : {
-               "timestamp" : "1979-08-30T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P1Y"
+               }
+            }
+         },
+         "timeObserved" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
             }
          },
          "value" : {
@@ -24688,7 +26604,9 @@
                "label" : "Sputum examination"
             },
             "performed" : {
-               "timestamp" : "2019-02-20T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P41Y"
+               }
             }
          }
       },
@@ -24703,7 +26621,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "1982-12-11T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P4Y"
+               }
             }
          }
       },
@@ -24746,7 +26666,9 @@
                "label" : "Plain X-ray of clavicle"
             },
             "performed" : {
-               "timestamp" : "2000-07-02T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P35Y"
+               }
             }
          }
       },
@@ -24761,7 +26683,9 @@
                "label" : "Radiologic examination of knee"
             },
             "performed" : {
-               "timestamp" : "1968-11-12T00:00:00Z"
+               "age" : {
+                  "iso8601duration" : "P3Y"
+               }
             }
          }
       }
@@ -24861,6 +26785,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -25067,6 +26996,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P76Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:429007001",
             "label" : "History of cardiac arrest"
@@ -25074,6 +27008,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P82Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:399211009",
             "label" : "History of myocardial infarction"
@@ -25176,6 +27115,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:232350006",
             "label" : "Allergy to house dust mite"
@@ -25183,6 +27127,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:91930004",
             "label" : "Allergy to eggs"
@@ -25190,6 +27139,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:232347008",
             "label" : "Allergy to animal dander"
@@ -25197,6 +27151,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419474003",
             "label" : "Allergy to mold"
@@ -25204,6 +27163,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:417532002",
             "label" : "Allergy to fish"
@@ -25211,6 +27175,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419263009",
             "label" : "Allergy to tree pollen"
@@ -25218,6 +27187,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P1Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:300913006",
             "label" : "Shellfish allergy"
@@ -25318,6 +27292,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P14Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:428251008",
             "label" : "History of appendectomy"
@@ -25405,6 +27384,11 @@
    "phenotypicFeatures" : [
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P0Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:419474003",
             "label" : "Allergy to mold"
@@ -25412,6 +27396,11 @@
       },
       {
          "excluded" : false,
+         "onset" : {
+            "age" : {
+               "iso8601duration" : "P0Y"
+            }
+         },
          "type" : {
             "id" : "SNOMED:714035009",
             "label" : "Allergy to soy"

@@ -2,26 +2,26 @@ use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
 use File::Spec::Functions 'abs2rel';
 use Devel::CallParser 'callparser1_h', 'callparser_linkable';
 
-# Resolve Object::Proto include directory:
-#   1. Try installed Object::Proto module (CPAN / system)
-#   2. Fall back to sibling directory (development)
-my $proto_inc;
-eval {
-    no warnings 'redefine';
-    local *XSLoader::load = sub {};  # skip XS bootstrap
-    require Object::Proto;
-    my $dir = Object::Proto->include_dir();
-    $proto_inc = $dir if $dir && -d $dir;
-};
-if (!$proto_inc && -d '../Object-Proto/include') {
-    $proto_inc = '../Object-Proto/include';
+# ExtUtils::Depends handles include paths automatically.
+# Object::Proto uses dl_load_flags {0x01} (RTLD_GLOBAL) so its symbols
+# are visible to downstream XS modules at runtime.
+my $pkg;
+eval { $pkg = ExtUtils::Depends->new('Enum::Declare', 'Object::Proto') };
+if (!$pkg) {
+    # Development fallback: sibling Object-Proto directory
+    die "Cannot find Object::Proto dependency.\n"
+      . "Install Object::Proto or place it as a sibling directory.\n"
+        unless -d '../Object-Proto/include';
+    $pkg = ExtUtils::Depends->new('Enum::Declare');
+    $pkg->set_inc('-I. -I../Object-Proto/include');
+} else {
+    my %vars = $pkg->get_makefile_vars;
+    $pkg->set_inc('-I. ' . ($vars{INC} || ''));
 }
-die "Cannot find Object::Proto include directory.\n"
-  . "Install Object::Proto or place it as a sibling directory.\n"
-    unless $proto_inc;
 
 # Generate callparser1.h for this perl
 open my $fh, '>', 'callparser1.h' or die "Couldn't write to callparser1.h: $!";
@@ -37,11 +37,11 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Enum/Declare.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.014',
-    XSMULTI => 1,
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'Devel::CallParser'  => '0.002',
-        'Object::Proto'      => '0.12',
+        'Object::Proto'      => '0.15',
+     	'ExtUtils::Depends'  => '0',
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
@@ -50,13 +50,13 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Devel::CallParser'  => '0.002',
         'Devel::CallChecker'  => '0.009',
-        'Object::Proto'      => '0.12',
+        'Object::Proto'      => '0.14',
     },
     TYPEMAPS         => [],
-    INC              => "-I. -I$proto_inc",
     ($#linkable >= 0 ? (OBJECT => join(' ', @linkable)) : ()),
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Enum-Declare-* callparser1.h' },
+    $pkg->get_makefile_vars,
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

@@ -13,11 +13,14 @@ our %EXPORT_TAGS = (
         FORMAT_ASN1
         FORMAT_PEM
         FORMAT_SMIME
+
+        CRL_CHECK
+        CRL_CHECK_ALL
        )]
    );
 Exporter::export_ok_tags('constants');
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -33,7 +36,7 @@ sub sign {
 		die __PACKAGE__."#sign: ARG[1] is a Ref. [$mime]\n";
 	}
 
-	$this->_moveHeaderAndDo($mime, '_sign');
+	$this->_moveHeaderAndDo('_sign', $mime);
 }
 
 sub signonly {
@@ -55,6 +58,10 @@ sub signonly {
 sub encrypt {
 	my $this = shift;
 	my $mime = shift;
+	# The man page of CMS_encrypt(3) recommends DES-EDE3-CBC
+	# for interoperability but it can no longer be considered
+	# to be a safe algorithm. We use AES-128-CBC instead.
+	my $cipher = shift // "AES-128-CBC";
 
 	if(!defined($mime)) {
 		die __PACKAGE__."#encrypt: ARG[1] is not defined.\n";
@@ -62,7 +69,7 @@ sub encrypt {
 		die __PACKAGE__."#encrypt: ARG[1] is a Ref. [$mime]\n";
 	}
 
-	$this->_moveHeaderAndDo($mime, '_encrypt');
+	$this->_moveHeaderAndDo('_encrypt', $mime, $cipher);
 }
 
 sub isSigned {
@@ -99,7 +106,7 @@ sub isEncrypted {
 
 	my $ctype = $this->_getContentType($mime);
 	if($ctype =~ m!^application/(?:x-)?pkcs7-mime!
-	&& ($ctype !~ m!smime-type=! || $ctype =~ m!smime-type="?enveloped-data"?!)) {
+	&& ($ctype !~ m!smime-type=! || $ctype =~ m!smime-type="?(?:authE|e)nveloped-data"?!)) {
 		# smime-typeが存在しないか、それがenveloped-dataである。
 		1;
 	} else {
@@ -109,15 +116,16 @@ sub isEncrypted {
 
 sub _moveHeaderAndDo {
 	my $this = shift;
-	my $mime = shift;
 	my $method = shift;
+	my $mime = shift;
+	my @args = @_;
 
 	# Content- または MIME- で始まるヘッダはそのままに、
 	# それ以外のヘッダはmultipartのトップレベルにコピーしなければならない。
 	# (FromやTo、Subject等)
-	($mime,my $headers) = $this->prepareSmimeMessage($mime);
+	($mime, my $headers) = $this->prepareSmimeMessage($mime);
 
-	my $result = $this->$method($mime);
+	my $result = $this->$method($mime, @args);
 	$result =~ s/\r?\n|\r/\r\n/g;
 
 	# コピーしたヘッダを入れる
@@ -228,6 +236,13 @@ optionally be exported:
 =item C<NO_CHECK_CERTIFICATE>
 
 See L</check()>.
+
+
+=item C<CRL_CHECK>
+
+=item C<CRL_CHECK_ALL>
+
+See L</setVerifyFlags()>.
 
 
 =item C<FORMAT_SMIME>
@@ -379,8 +394,11 @@ of the provided public keys are tainted.
 =item encrypt()
 
   $encrypted_mime = $smime->encrypt($raw_mime);
+  $encrypted_mime = $smime->encrypt($raw_mime, $cipher);
 
-Encrypt a MIME message and return a S/MIME message.
+Encrypt a MIME message and return a S/MIME message. You can pass any
+C<$cipher> string your OpenSSL library understands. Default is
+"AES-128-CBC".
 
 
 Any headers except C<Content-*>, C<MIME-*> and C<Subject> will be moved to the
@@ -437,6 +455,16 @@ Set the time to use for verification. Default is to use the current time.
 Must be an unix epoch timestamp.
 
 
+=item setVerifyFlags()
+
+  $smime->setVerifyFlags(C<Crypt::SMIME::CRL_CHECK>);
+
+Set flags used for verification.
+C<Crypt::SMIME::CRL_CHECK> check CRL for signer certificates
+C<Crypt::SMIME::CRL_CHECK_ALL> check CRL for whole certificate chain
+Verification fails if a required CRL is not found.
+
+
 =back
 
 =head1 FUNCTIONS
@@ -469,6 +497,18 @@ Optional $type parameter may specify type of data.
 
 Note that any public keys returned by this function are not verified.
 check() should be executed to ensure public keys are valid.
+
+
+=item getCapabilities()
+
+  @caps = @{Crypt::SMIME::getCapabilities($data)};
+  @caps = @{Crypt::SMIME::getCapabilities($data, $type)};
+
+Get the S/MIME Capabilities included in S/MIME message or PKCS#7 object.
+Optional $type parameter may specify type of data.
+
+
+This may include both, ciphers and hash algorithms.
 
 
 =back

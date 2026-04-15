@@ -1,0 +1,40 @@
+---
+abstract: 'A minimal, integrated Class and Role system for Perl'
+author:
+  - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Mite
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - lib/Class.pm
+    - lib/Role.pm
+    - lib/Class/More.pm
+    - lib/Class/Clone.pm
+  package:
+    - Class
+    - Role
+    - Class::More
+    - Class::Clone
+provides:
+  Class::Mite:
+    file: lib/Class/Mite.pm
+    version: v0.1.1
+requires:
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/manwar/Class-Mite/issues
+  repository: https://github.com/manwar/Class-Mite.git
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,70 @@
+NAME
+    MARC::Leader::L10N - Localization framework for MARC::Leader.
+
+SYNOPSIS
+     use MARC::Leader::L10N;
+
+     my $lh = MARC::Leader::L10N->get_handle([$lang_code]);
+     my $text = $lh->maketext($key);
+
+METHODS
+  "get_gandle"
+     my $lh = MARC::Leader::L10N->get_handle([$lang_code]);
+
+    Get handle object.
+
+    Argument $lang_code is optional, default value is language from locales.
+    Language code is ISO 639-1 code.
+
+    Returns instance of translation object in case that language code
+    exists. Returns undef in case that language code doesn't exists.
+
+  "run"
+     my $text = $lh->maketext($key);
+
+    Return translation of text for text defined as $key.
+
+    Returns string.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use MARC::Leader::L10N;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 lang_code\n";
+             exit 1;
+     }
+     my $lang_code = $ARGV[0];
+
+     my $lh = MARC::Leader::L10N->get_handle($lang_code);
+
+     print encode_utf8($lh->maketext('Bibliographic level'))."\n";
+
+     # Output for cs.
+     # Bibliografická úroveň
+
+     # Output for en.
+     # Bibliographic level
+
+DEPENDENCIES
+    Locale::Maketext.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/MARC-Leader-L10N>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

@@ -28,7 +28,7 @@ my $Digit = $Int & $Char;
 "a" ~~ ~$Int; # => 1
 5   ~~ ~$Int; # -> ""
 
-eval { $Int->validate("a", "..Eval..") }; $@	# ~> ..Eval.. must have the type Int. The it is 'a'
+eval { $Int->validate("a", "..Eval..") }; $@ # ~> ..Eval.. must have the type Int. The it is 'a'
 ```
 
 # DESCRIPTION
@@ -262,7 +262,7 @@ BEGIN {
 	})->make_arg(__PACKAGE__);
 }
 
-"IX" ~~ Len[2,2]	# => 1
+"IX" ~~ Len[2,2] # => 1
 ```
 
 Если подпрограмма не может быть создана, то выбрасывается исключение.
@@ -284,9 +284,9 @@ BEGIN {
 	)->make_maybe_arg(__PACKAGE__);
 }
 
-3 ~~ Enum123			# -> 1
-3 ~~ Enum123[4,5,6]	 # -> ""
-5 ~~ Enum123[4,5,6]	 # -> 1
+3 ~~ Enum123        # -> 1
+3 ~~ Enum123[4,5,6] # -> ""
+5 ~~ Enum123[4,5,6] # -> 1
 ```
 
 Если подпрограмма не может быть создана, то выбрасывается исключение.
@@ -367,11 +367,15 @@ $Int ne $PositiveInt         # -> 1
 
 Акцессор описания (используется для создания схемы **swagger**).
 
+## example (;$example)
+
+Акцессор примера (используется для создания схемы **swagger**).
+
 # OPERATORS
 
 ## &{}
 
-Делает объект вызываемым.
+Тестирует `$_`.
 
 ```perl
 my $PositiveInt = Aion::Type->new(
@@ -398,9 +402,9 @@ my $Enum = Aion::Type->new(name => "Enum", args => [qw/A B C/]);
 "$Enum" # => Enum['A', 'B', 'C']
 ```
 
-## $a | $b
+## |
 
-Создает новый тип как объединение `$a` и `$b`.
+Или. Создает новый тип как объединение двух.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -413,9 +417,9 @@ my $IntOrChar = $Int | $Char;
 "ab" ~~ $IntOrChar # -> ""
 ```
 
-## $a & $b
+## &
 
-Создает новый тип как пересечение `$a` и `$b`.
+И. Создает новый тип как пересечение двух.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -428,9 +432,9 @@ my $Digit = $Int & $Char;
 "a" ~~ $Digit # -> ""
 ```
 
-## ~ $a
+## ~
 
-Создает новый тип как исключение из `$a`.
+Не. Создает новый тип как исключение данного.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -439,9 +443,20 @@ my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 5   ~~ ~$Int; # -> ""
 ```
 
-## $a eq $b, $a == $b
+## ~~
 
-`$a` равно `$b`.
+Тестирует значение.
+
+```perl
+my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
+
+$Int ~~ 3    # -> 1
+-6   ~~ $Int # -> 1
+```
+
+## eq, ==
+
+Сравнивает два типа.
 
 ```perl
 my $Int1 = Aion::Type->new(name => "Int");
@@ -451,9 +466,9 @@ $Int1 eq $Int2 # -> 1
 $Int1 == $Int2 # -> 1
 ```
 
-## $a ne $b, $a != $b
+## ne, !=
 
-`$a` не равно `$b`.
+Проверяет, что типы не равны.
 
 ```perl
 my $Int1 = Aion::Type->new(name => "Int");
@@ -461,7 +476,20 @@ my $Int2 = Aion::Type->new(name => "Int");
 
 $Int1 ne $Int2 # -> ""
 $Int1 != $Int2 # -> ""
-123 ne $Int2 # -> 1
+123   ne $Int2 # -> 1
+```
+
+## >>
+
+Приведение к типу.
+
+```perl
+my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
+$Int->{coerce} = [[$Int => sub { $_ + 5 }]];
+
+5 >> $Int # -> 10
+
+$Int >> -4 # -> 1
 ```
 
 # AUTHOR

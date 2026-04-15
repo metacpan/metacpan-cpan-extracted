@@ -16,7 +16,7 @@
 
 name:      perl-Git-Server
 summary:   Git-Server - Secure Git Server with more granular hooks capabilities than default git.
-version:   0.040
+version:   0.041
 release:   1
 vendor:    Rob Brown <bbb@cpan.org>
 packager:  Arix International <cpan2rpm@arix.com>
@@ -28,7 +28,7 @@ buildarch: noarch
 prefix:    %(echo %{_prefix})
 buildrequires: /usr/lib/rpm/perl.req
 buildrequires: /usr/lib/rpm/perl.prov
-source0:   http://www.cpan.org/authors/id/B/BB/BBB/%{pkgname}-%{version}.tar.gz
+source0:   %{pkgname}-%{version}.tar.gz
 
 %description
 This is intented to be a drop-in replacement for any standard git server,
@@ -132,5 +132,5 @@ find %{buildroot}%{_prefix}             \
 %defattr(-,root,root)
 
 %changelog
-* Mon Apr 6 2026 hookbot@almalinux9
+* Wed Apr 15 2026 hookbot@tiny14.threerings.net
 - Initial build.

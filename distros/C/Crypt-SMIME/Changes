@@ -1,5 +1,31 @@
 Revision history for Crypt::SMIME
 
+0.32    Wed Apr 15 14:52:28 JST 2026
+
+        Applied a series of patches from cpan [...] schmirler.de
+        (https://rt.cpan.org/Public/Bug/Display.html?id=175921):
+
+        - Crypt::SMIME now requires OpenSSL 3.0 or newer.
+        - Decryption: Handle the new smime-type value "authEnveloped-data"
+          in isEncrypted().
+        - Encryption: Add an optional "cipher" argument to encrypt(...),
+          defaulting to "AES-128-CBC" as before. Pass e.g. "AES-128-GCM" to
+          encrypt with a modern AEAD cipher.
+        - Signing: To tell a peer that we support AEAD ciphers we should
+          advertise them in the SMIMECapabilities signed attribute. As of
+          OpenSSL 3.5 AES-GCM is not part of the default list. Now we
+          advertise AES-256-GCM, AES-128-GCM, AES-256-CBC, and AES-128-CBC.
+        - Checking: Added the new function "getCapabilities(...)" to get
+          the SMIMECapabilities a peer sent us. Note that SMIMECapabilities
+          may not only contain ciphers but also hash algorithms.
+
+        Applied a patch from cpan [...] schmirler.de
+        (https://rt.cpan.org/Public/Bug/Display.html?id=175923):
+
+        - Added a new method setVerifyFlags($flags) with the flags
+          Crypt::SMIME::CRL_CHECK and Crypt::SMIME::CRL_CHECK_ALL to enable
+          checking CRLs.
+
 0.31    Wed Mar 12 12:28:16 JST 2025
         - Fix build with ExtUtils-ParseXS > 3.51:
           https://rt.cpan.org/Public/Bug/Display.html?id=162293

@@ -1,0 +1,120 @@
+################################################################################
+# Jacode Hızlı Başvuru Kılavuzu (TR)
+# Jacode - Japonca karakter kodu dönüştürme için Perl programı
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ KURULUM
+
+  cpanm Jacode
+
+  Ya da https://metacpan.org/pod/Jacode adresinden Jacode.pm ve jacode.pl
+  dosyalarını indirip aynı dizine yerleştirin.
+
+■ KULLANIM
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # Dizeyi yerinde dönüştür (en yaygın kullanım)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # Dönüş değerleri (liste bağlamı)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # Dönüş değerleri (skaler bağlam)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # Değer döndüren sarmalayıcı işlevler
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # Kodlamayı algıla
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS kaçış dizisi denetimi
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # Başlatma
+  Jacode::init();
+
+  # Önbellek denetimi
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ KODLAMA ADLARI
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 dahil)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... İkili (dönüştürülemeyen)
+
+■ SEÇENEKLER
+
+  'z'  ... Yarım genişlik kana → tam genişlik kana (h2z)
+  'h'  ... Tam genişlik kana → yarım genişlik kana (z2h)
+
+■ JIS KANJİ BAŞLANGIC DİZİLERİ
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (varsayılan)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 düzlem 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 düzlem 1
+
+■ DÖNÜŞTÜRME ÖRNEKLERİ
+
+  # Shift_JIS'ten UTF-8'e
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP'den Shift_JIS'e
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # Girişi otomatik algıla, JIS olarak çıkar
+  Jacode::convert(\$line, 'jis');
+
+  # SJIS → UTF-8 dönüştürürken yarım genişlik kanayı da dönüştür
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # Dosyanın tüm satırlarını dönüştür
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ KOMUT SATIRI (pkf modu)
+
+  perl jacode.pl [seçenek] [-[GİRİŞ]ÇIKIŞ] dosyalar
+
+  perl jacode.pl file          # JIS'e dönüştür
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # Karma kodlamalı dosya → EUC-JP (dinamik)
+  perl jacode.pl -mc file      # Dönüştür ve her satır için kodlama adını yazdır
+
+  Seçenekler:
+  -b  Tamponlu çıkış (varsayılan)
+  -u  Tamponsuz çıkış
+  -m  Dinamik giriş kodlaması tanıma
+  -c  Kodlama adını yazdır
+  -Z  Yarım genişlik kana → tam genişlik
+  -H  Tam genişlik kana → yarım genişlik
+  -f [unix|mac|dos]  Satır sonu dönüştür
+
+■ jcode.pl UYUMLULUĞU
+
+  Jacode, Utashiro'nun jcode.pl'si ile uyumludur.
+  jcode:: ad alanı takma adları da kullanılabilir.
+
+################################################################################

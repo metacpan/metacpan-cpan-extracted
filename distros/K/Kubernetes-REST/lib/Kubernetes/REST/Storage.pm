@@ -1,5 +1,5 @@
 package Kubernetes::REST::Storage;
-our $VERSION = '1.103';
+our $VERSION = '1.104';
 # ABSTRACT: DEPRECATED - v0 API group for Storage resources
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Storage - DEPRECATED - v0 API group for Storage resources
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 SYNOPSIS
 

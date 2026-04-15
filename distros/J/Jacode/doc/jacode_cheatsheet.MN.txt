@@ -1,0 +1,120 @@
+################################################################################
+# Jacode Хуурцаг Лавлах (MN)
+# Jacode - Японы тэмдэгтийн код хөрвүүлэх Perl програм
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ СУУЛГАХ
+
+  cpanm Jacode
+
+  Эсвэл https://metacpan.org/pod/Jacode хаягаас Jacode.pm болон jacode.pl
+  файлуудыг татаж аваад нэг директорт байрлуулна уу.
+
+■ ХЭРЭГЛЭХ АРГА
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # Мөрийг байгаа газарт нь хөрвүүлэх (хамгийн нийтлэг хэрэглээ)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # Буцаах утгууд (жагсаалтын контекст)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # Буцаах утга (скаляр контекст)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # Утга буцаадаг ороочид функцууд
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # Кодчилол тодорхойлох
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS зугтах дарааллыг удирдах
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # Эхлүүлэх
+  Jacode::init();
+
+  # Кэш удирдах
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ КОДЧИЛОЛЫН НЭРС
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 орсон)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Хоёртын (хөрвүүлэх боломжгүй)
+
+■ СОНГОЛТУУД
+
+  'z'  ... Хагас өргөн кана → бүтэн өргөн кана (h2z)
+  'h'  ... Бүтэн өргөн кана → хагас өргөн кана (z2h)
+
+■ JIS КАНДЗИ ЭХЛЭХ ДАРААЛАЛ
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (өгөгдмөл)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 хавтгай 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 хавтгай 1
+
+■ ХӨРВҮҮЛЭЛТИЙН ЖИШЭЭ
+
+  # Shift_JIS-ээс UTF-8 рүү
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP-ээс Shift_JIS рүү
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # Оролтыг автоматаар тодорхойлж JIS гаралт хийх
+  Jacode::convert(\$line, 'jis');
+
+  # SJIS → UTF-8 хөрвүүлэхдээ хагас өргөн канаг мөн хөрвүүлэх
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # Файлын бүх мөрийг хөрвүүлэх
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ КОМАНДЫН МӨР (pkf горим)
+
+  perl jacode.pl [сонголт] [-[ОРОЛТ]ГАРАЛТ] файлууд
+
+  perl jacode.pl file          # JIS рүү хөрвүүлэх
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # Холимог кодчилол → EUC-JP (динамик)
+  perl jacode.pl -mc file      # Хөрвүүлж мөр бүрийн кодчилолын нэрийг хэвлэх
+
+  Сонголтууд:
+  -b  Буферт гаралт (өгөгдмөл)
+  -u  Буфергүй гаралт
+  -m  Динамик оролт кодчилол таних
+  -c  Кодчилолын нэр хэвлэх
+  -Z  Хагас өргөн кана → бүтэн өргөн
+  -H  Бүтэн өргөн кана → хагас өргөн
+  -f [unix|mac|dos]  Мөр төгсгөл хөрвүүлэх
+
+■ jcode.pl-ТАЙ НИЙЦЭМЖ
+
+  Jacode нь Utashiro-ийн jcode.pl-тай нийцэмжтэй.
+  jcode:: нэрийн орон зайн товчлолуудыг мөн ашиглах боломжтой.
+
+################################################################################

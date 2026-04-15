@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object::Exception;
-$RT::Client::REST::Object::Exception::VERSION = '0.72';
+$RT::Client::REST::Object::Exception::VERSION = '0.73';
 use parent qw(RT::Client::REST::Exception);
 
 use RT::Client::REST::Exception (
@@ -29,7 +29,7 @@ use RT::Client::REST::Exception (
         description => 'Invalid search parameters provided',
     },
 
-    'RT::Clite::REST::Object::InvalidAttributeException' => {
+    'RT::Client::REST::Object::InvalidAttributeException' => {
         isa         => __PACKAGE__,
         description => 'Invalid attribute name',
     },
@@ -65,7 +65,7 @@ RT::Client::REST::Object::Exception
 
 =head1 VERSION
 
-version 0.72
+version 0.73
 
 =head1 AUTHOR
 
@@ -73,7 +73,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2026, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

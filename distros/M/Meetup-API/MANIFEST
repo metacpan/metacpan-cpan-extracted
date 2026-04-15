@@ -1,4 +1,5 @@
 .gitignore
+.prove
 Changes
 examples/dump-group.pl
 examples/events-to-ical.pl

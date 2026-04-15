@@ -5,7 +5,7 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - If running hooks/proxy shows 100% perfectly clean during the pre-write hook, then for the post-write hook, hooks/proxy is safe to rudely "--force" jam the sync to push to the remote $there repo every single branch and tag from $here, even if it rewrites history.
 
- - Allow proxy.url to be specified multiple times in order to sync with multiple remote "$there" repos. For example, there-0, there-1, there-2, etc...
+ - If proxy fails with the default Forwarding Agent, try each public key individually to see if any of them work any better.
 
  - Make sure ipc-parse can determine if action was actually performed or else the reason of why not.
 
@@ -15,12 +15,16 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - Investigate converting get_fork_hash common fork sniffer scan to use "git merge-base --fork-point <ref> <commit>" instead of grinding through the logs.
 
- - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6.
+ - Make git-deploy remove temp files eariler so they won't exist during long waits for a push notification.
 
- - Add git-deploy [ -i <IDENTITY_FILE> ] to force a specific ssh identity file when connecting to remote repo.
+ - Make git-deploy brick over "local modified" files if the end target version is exactly the same.
+
+ - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6.
 
  - Add Support for HTTP protocol git read and write operations using Basic password Authorization (instead of only pubkeys over SSH protocol).
    * Design a way to support "git-deploy" feature via HTTP (through REMOTE_USER or DeployToken or URI flag or Special HTTP Header or PAT [Personal Access Token] or maybe some other mechanism). Allow client to specify max-delay seconds (default 90) in case nothing new is ready since last pull.
+
+ - Pre-Load GIT_OPTION_<optionname> also since GIT_OPTION_<N> is annoying to spin through every time just to find the option you want.
 
  - Integrate or convert to be compatible with Git::Hooks::* plugins.
 

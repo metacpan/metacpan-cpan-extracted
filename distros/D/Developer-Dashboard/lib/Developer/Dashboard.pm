@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.35';
+our $VERSION = '2.37';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.35
+2.37
 
 =head1 INTRODUCTION
 
@@ -369,6 +369,13 @@ old and new names at the same time. Those managed indicator records now also
 preserve a newer live collector status during restart/config-sync windows, so
 a healthy collector does not flicker back to C<missing> after it has already
 reported C<ok>.
+If C<indicator.icon> contains Template Toolkit syntax such as C<[% a %]>, the
+collector runner now treats collector C<stdout> as JSON, decodes it through
+C<JSON::XS>, exposes hash keys as direct template variables plus C<data>, and
+persists the rendered icon as the live indicator value. Invalid JSON or TT
+render failures are explicit collector errors: the collector C<stderr> records
+the template problem and the indicator stays red instead of silently falling
+back.
 
 =head2 Why It Works As A Developer Home
 
@@ -1152,6 +1159,16 @@ List collector status:
 
   dashboard collector list
 
+Inspect collector logs:
+
+  dashboard collector log
+  dashboard collector log shell.example
+
+C<dashboard collector log> prints the known collector log streams.
+C<dashboard collector log E<lt>nameE<gt>> prints one collector transcript.
+If a configured collector has not run yet, the command prints an explicit
+no-log message instead of blank output.
+
 Collector jobs support two execution fields:
 
 =over 4
@@ -1185,6 +1202,17 @@ Example collector definitions:
         "indicator": {
           "icon": "P"
         }
+      },
+      {
+        "name": "foobar",
+        "command": "./foobar",
+        "cwd": "home",
+        "interval": 10,
+        "indicator": {
+          "name": "foobar.indicator",
+          "label": "Foobar",
+          "icon": "[% a %]"
+        }
       }
     ]
   }
@@ -1204,6 +1232,12 @@ of falling back to the collector name, and stale managed indicators are
 removed automatically if the collector config is renamed. The browser chrome
 now uses an emoji-capable font stack there as well, so UTF-8 icons such as
 C<🐳> and C<💰> remain visible instead of collapsing into fallback boxes.
+For TT-backed collector icons, a collector such as C<./foobar> can print
+C<{"a":123}> on C<stdout>; the runner decodes that JSON into Perl data and
+renders C<[% a %]> into the live icon C<123>. Later config-sync passes keep
+the configured C<icon_template> metadata and the already-rendered live
+C<icon>, so commands such as C<dashboard indicator list> and C<dashboard ps1>
+do not revert the persisted icon back to raw C<[% ... %]> text between runs.
 The blank-environment integration flow also keeps a regression for mixed
 collector health: one intentionally broken Perl collector must stay red
 without stopping a second healthy collector from staying green in

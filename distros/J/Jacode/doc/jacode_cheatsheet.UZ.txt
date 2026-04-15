@@ -1,0 +1,120 @@
+################################################################################
+# Jacode Tezkor Qo'llanma (UZ)
+# Jacode - Yapon belgilar kodini o'zgartirish uchun Perl dasturi
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ O'RNATISH
+
+  cpanm Jacode
+
+  Yoki https://metacpan.org/pod/Jacode sahifasidan Jacode.pm va jacode.pl
+  fayllarini yuklab oling va ikkalasini bir xil jildga joylashtiring.
+
+■ FOYDALANISH
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # Satrni o'z joyida o'zgartirish (eng keng tarqalgan foydalanish)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # Qaytarish qiymatlari (ro'yxat konteksti)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # Qaytarish qiymati (skalar konteksti)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # Qiymat qaytaruvchi o'rash funksiyalari
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # Kodlashni aniqlash
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS qochish ketma-ketligini boshqarish
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # Ishga tushirish
+  Jacode::init();
+
+  # Kesh boshqaruvi
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ KODLASH NOMLARI
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 bilan birga)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Ikkilik (o'zgartirib bo'lmaydi)
+
+■ PARAMETRLAR
+
+  'z'  ... Yarim kenglikdagi kana → to'liq kenglikdagi kana (h2z)
+  'h'  ... To'liq kenglikdagi kana → yarim kenglikdagi kana (z2h)
+
+■ JIS KANJI BOSHLANISH KETMA-KETLIGI
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (standart)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 tekislik 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 tekislik 1
+
+■ O'ZGARTIRISH MISOLLARI
+
+  # Shift_JIS dan UTF-8 ga
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP dan Shift_JIS ga
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # Kirishni avtomatik aniqlash, JIS chiqarish
+  Jacode::convert(\$line, 'jis');
+
+  # SJIS → UTF-8 o'zgartirishda yarim kenglikdagi kanani ham o'zgartirish
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # Faylning barcha qatorlarini o'zgartirish
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ BUYRUQ SATRI (pkf rejimi)
+
+  perl jacode.pl [parametr] [-[KIRISH]CHIQISH] fayllar
+
+  perl jacode.pl file          # JIS ga o'zgartirish
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # Aralash kodlash → EUC-JP (dinamik)
+  perl jacode.pl -mc file      # O'zgartirish va har qator uchun kodlash nomini chiqarish
+
+  Parametrlar:
+  -b  Buferli chiqish (standart)
+  -u  Bufersiz chiqish
+  -m  Dinamik kirish kodlashini aniqlash
+  -c  Kodlash nomini chiqarish
+  -Z  Yarim kenglikdagi kana → to'liq kenglik
+  -H  To'liq kenglikdagi kana → yarim kenglik
+  -f [unix|mac|dos]  Qator oxirini o'zgartirish
+
+■ jcode.pl MUVOFIQLIGI
+
+  Jacode Utashironing jcode.pl bilan muvofiq.
+  jcode:: nom maydoni taxalluslari ham mavjud.
+
+################################################################################

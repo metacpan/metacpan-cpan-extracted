@@ -93,7 +93,7 @@ Rmpf_get_IV Rmpf_set_IV Rmpf_fits_IV_p
     );
 
     @Math::GMPf::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.55';
+    our $VERSION = '0.56';
     #$VERSION = eval $VERSION;
 
     Math::GMPf->DynaLoader::bootstrap($VERSION);

@@ -135,7 +135,7 @@ sub init
             $self->accept_charset( $accept_def->param( 'charset' ) );
         }
 
-        my $json = $self->json;
+        my $json    = $self->json->utf8;
         my $payload = $self->data;
         # An error occurred while reading the payload, because even empty, data would return an empty string.
         return( $self->pass_error ) if( !defined( $payload ) );
@@ -152,7 +152,8 @@ sub init
             };
             if( $@ )
             {
-                return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Json data provided is malformed." }) );
+                $r->log_error( ref( $self ), "::init() JSON data provided is malformed: $@" );
+                return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "JSON data provided is malformed." }) );
             }
             $self->payload( $json_data );
         }
@@ -767,7 +768,7 @@ sub json
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    my $j = JSON->new->relaxed;
+    my $j    = JSON->new->relaxed;
     my $equi =
     {
         ordered => 'canonical',

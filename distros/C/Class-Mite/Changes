@@ -1,0 +1,30 @@
+Revision history for Class::Mite
+
+v0.1.1  2026-04-14
+        - Set no index for Class, Role, Class::More and Class::Clone.
+        - Only provides Class::Mite now, all other modules are
+          still available internally but not searchable on CPAN.
+
+v0.1.0  2026-04-14
+        - Released to CPAN world.
+        - Switched to dotted-decimal versioning (v-strings).
+
+0.06  2025-10-23
+      - Added test for DOES/does in Class.
+      - Clean up export list in Class.
+
+0.05  2025-10-17
+      - Support role composition
+
+0.04  2025-10-14
+      - Role now 'has' function
+
+0.03  2025-10-14
+      - Added Class::More support 'has'
+      - Added Class::Clone support native clone()
+
+0.02  2025-10-03
+      - Added support for key 'extends' in Class.pm.
+
+0.01  2025-10-02
+      - Module Created.

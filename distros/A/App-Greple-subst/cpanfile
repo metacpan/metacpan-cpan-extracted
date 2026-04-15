@@ -1,9 +1,9 @@
 requires 'perl', 'v5.18.2';
 
-requires 'App::Greple', '9.18';
+requires 'App::Greple', '10.04';
 requires 'App::Greple::update', '1.04';
 requires 'Getopt::Long';
-requires 'Getopt::EX', '2.1.6';
+requires 'Getopt::EX', '3.03';
 requires 'Getopt::EX::termcolor', '1.08';
 requires 'File::Share', '0.27';
 requires 'List::Util', '1.56';

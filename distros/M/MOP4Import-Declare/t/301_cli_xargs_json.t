@@ -10,10 +10,24 @@ use File::Basename qw(dirname);
 use Test::More;
 use Test2::Tools::Command;
 
-my $dist_root = dirname($FindBin::Bin);
+use_ok("MOP4Import::Base::CLI_JSON");
+
+my $modulinoFn = $INC{"MOP4Import/Base/CLI_JSON.pm"};
+
+unless ($modulinoFn) {
+  bail_out("CLI_JSON.pm is not loaded");
+}
+
+unless (-r $modulinoFn) {
+  bail_out("CLI_JSON.pm is not readable($modulinoFn)");
+}
+
+my $dist_lib = dirname(dirname(dirname($modulinoFn)));
+
+my @run = ($^X, "-I$dist_lib");
 
 command {
-  args => ["$dist_root/Base/CLI_JSON.pm"]
+  args => [@run, $modulinoFn]
     , status => 255
     , stderr => qr/^Usage: /
 };
@@ -23,7 +37,7 @@ SKIP: {
     if $] <= 5.018;
 
   command {
-    args => ["$dist_root/Base/CLI_JSON.pm", qw(cli_xargs_json cli_array)]
+    args => [@run, $modulinoFn, qw(cli_xargs_json cli_array)]
       , stdin => qq{{}},
       , stdout => qq{[{}]\n}
     };

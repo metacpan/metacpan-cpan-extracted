@@ -1,5 +1,5 @@
 package Kubernetes::REST::Call::GetAutoscalingAPIGroup;
-our $VERSION = '1.103';
+our $VERSION = '1.104';
 # ABSTRACT: Deprecated - use the new Kubernetes::REST API instead
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ Kubernetes::REST::Call::GetAutoscalingAPIGroup - Deprecated - use the new Kubern
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 SUPPORT
 

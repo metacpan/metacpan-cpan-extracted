@@ -41,7 +41,7 @@ to get the API key
 
 # SEE ALSO
 
-[Meetup::API::v3](https://metacpan.org/pod/Meetup::API::v3)
+[Meetup::API::v3](https://metacpan.org/pod/Meetup%3A%3AAPI%3A%3Av3)
 
 # REPOSITORY
 

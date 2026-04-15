@@ -7,7 +7,11 @@ use FindBin qw($RealBin);
 use Test::More;
 
 BEGIN {
-    eval { require Module::CPANTS::Analyse; 1 }
+    eval {
+        require Module::CPANTS::Analyse;
+        require Module::CPANTS::Kwalitee;
+        1;
+    }
       or plan skip_all => 'Module::CPANTS::Analyse is required for the release kwalitee gate';
 }
 

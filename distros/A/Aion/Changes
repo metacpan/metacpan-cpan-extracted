@@ -1,5 +1,11 @@
 Revision history for Perl extension Aion
 
+1.9 2026-04-14T17:58:35Z
+
+    - added property example to Aion::Type
+    - where optional in parametrised subtype
+    - operator >> for corerce added to Aion::Type
+
 1.8 2026-04-09T19:37:48Z
 
     - $Aion::pleroma replace to Aion->pleroma for autoinitialization

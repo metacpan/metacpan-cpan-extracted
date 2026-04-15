@@ -4,11 +4,11 @@
 #
 #   This file is part of Convert::Pheno
 #
-#   Last Modified: May/10/2024
+#   Last Modified: Apr/09/2024
 #
 #   $VERSION taken from Convert::Pheno
 #
-#   Copyright (C) 2022-2025 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
+#   Copyright (C) 2022-2026 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
 #
 #   License: Artistic License 2.0
 
@@ -18,8 +18,6 @@ use strict;
 use warnings;
 use autodie;
 use feature      qw(say);
-use Getopt::Long qw(:config no_ignore_case);
-use Pod::Usage;
 use Data::Dumper;
 use Sys::Hostname;
 use POSIX                          qw(strftime);
@@ -29,6 +27,7 @@ use FindBin                        qw($Bin);
 use lib "$Bin/../lib";
 use Term::ANSIColor qw(:constants);
 use Convert::Pheno;
+use Convert::Pheno::CLI::Args qw(build_cli_request);
 use Convert::Pheno::IO::CSVHandler;
 use Convert::Pheno::OMOP::Definitions;
 
@@ -38,237 +37,175 @@ $Data::Dumper::Sortkeys = 1;
 my $out_dir     = '.';
 my $share_dir   = dist_dir('Convert-Pheno');
 my $schema_file = catfile( $share_dir, 'schema', 'mapping.json' );
-my $color       = 1;
-my $stream      = 0;
-my $ohdsi_db    = 0;
 
-# Reading arguments
-GetOptions(
-    'ipxf=s'                      => \my $in_pxf,                              # string
-    'ibff=s'                      => \my $in_bff,                              # string
-    'iredcap=s'                   => \my $in_redcap,                           # string
-    'icdisc=s'                    => \my $in_cdisc,                            # string
-    'iomop=s{1,}'                 => \my @omop_files,                          # array
-    'icsv=s'                      => \my $in_csv,                              # string
-    'obff=s'                      => \my $out_bff,                             # string
-    'opxf=s'                      => \my $out_pxf,                             # string
-    'ocsv=s'                      => \my $out_csv,                             # string
-    'ojsonf=s'                    => \my $out_jsonf,                           # string
-    'ojsonld=s'                   => \my $out_jsonld,                          # string
-    'oomop=s'                     => \my $out_omop,                            # string
-    'out-dir=s'                   => \$out_dir,                                # string
-    'help|?'                      => \my $help,                                # flag
-    'man'                         => \my $man,                                 # flag
-    'mapping-file=s'              => \my $mapping_file,                        # string
-    'max-lines-sql=i'             => \my $max_lines_sql,                       # integer
-    'search=s'                    => \my $search,                              # string
-    'text-similarity-method=s'    => \my $text_similarity_method,              # string
-    'min-text-similarity-score=f' => \my $min_text_similarity_score,           # floating
-    'levenshtein-weight=f'        => \my $levenshtein_weight,                  # floating
-    'debug=i'                     => \my $debug,                               # integer
-    'verbose|v'                   => \my $verbose,                             # flag
-    'color!'                      => \$color,                                  # flag
-    'separator|sep=s'             => \my $sep,                                 # str
-    'schema-file=s'               => \$schema_file,                            # str
-    'exposures-file=s'            => \my $exposures_file,                      # str
-    'stream!'                     => \$stream,                                 # flag
-    'sql2csv'                     => \my $sql2csv,                             # flag
-    'test'                        => \my $test,                                # flag
-    'ohdsi-db'                    => \$ohdsi_db,                               # flag
-    'omop-tables=s{1,}'           => \my @omop_tables,                         # array
-    'redcap-dictionary|rcd=s'     => \my $redcap_dictionary,                   # string
-    'path-to-ohdsi-db=s'          => \my $path_to_ohdsi_db,                    # string
-    'print-hidden-labels|phl'     => \my $print_hidden_labels,                 # flag
-    'self-validate-schema|svs'    => \my $self_validate_schema,                # flag
-    'O'                           => \my $overwrite,                           # flag
-    'username=s'                  => \my $username,                            # string
-    'log:s'                       => \my $log,                                 # opt-string
-    'version|V'                   => sub { say "$0 Version $VERSION"; exit; }
-) or pod2usage(2);
-pod2usage(1)                              if $help;
-pod2usage( -verbose => 2, -exitval => 0 ) if $man;
+sub print_help {
+    my $out = shift || *STDOUT;
+    print {$out} <<'EOF';
+Usage:
+  convert-pheno -i <input-type> <infile> -o <output-type> <outfile> [options]
+  convert-pheno -ipxf <infile> -obff <outfile> [options]
+  convert-pheno -ipxf <infile> -obff --entities <list> --out-dir <dir> [options]
 
-# Validate certain CLI options
-# NB: The sequence of validations is important
-my @validation_checks = (
-    {
-        condition => sub {
-            !(     ( defined $in_pxf && -f $in_pxf )
-                || ( defined $in_bff    && -f $in_bff )
-                || ( defined $in_redcap && -f $in_redcap )
-                || ( defined $in_cdisc  && -f $in_cdisc )
-                || ( defined $in_csv    && -f $in_csv )
-                || ( @omop_files        && -f $omop_files[0] ) );
-        },
-        message => "Please specify a valid input [-i input-type] <infile>\n",
-    },
-    {
-        condition => sub { !-d $out_dir },
-        message   => "Please specify a valid directory for --out-dir\n",
-    },
-    {
-        condition => sub { ( $in_redcap || $in_cdisc ) && !$redcap_dictionary },
-        message   =>
-          "Please specify a valid REDCap data dictionary --rcd <file>\n",
-    },
-    {
-        condition =>
-          sub { ( $in_redcap || $in_cdisc || $in_csv ) && !$mapping_file },
-        message =>
-          "Please specify a valid mapping file --mapping-file <file>\n",
-    },
-    {
-        condition =>
-          sub { @omop_files && $omop_files[0] !~ m/\.(csv|sql|tsv)/i },
-        message =>
-          "Please specify a valid OMOP-CDM file(s) (e.g., *csv or .sql)\n",
-    },
-    {
-        condition => sub { @omop_tables && !@omop_files },
-        message   => "The flag <--omop-tables> is only valid with <-iomop>\n",
-    },
-    {
-        condition => sub { $stream && $out_pxf },
-        message   => "The flag <--stream> is only valid with <-obff>\n",
-    },
-    {
-        condition => sub { $stream && $sql2csv },
-        message   =>
-"The flags <--stream> and <--sql2csv> are mutually exclusive.\nIf you are using <--stream> is because you are likely processing huge files and we don't want to duplicate them in your HDD\n",
-    },
-    {
-        condition => sub {
-            @omop_files
-              && ( ( defined $out_bff && $out_bff !~ m/\.json/i )
-                || ( defined $out_pxf && $out_pxf !~ m/\.json/i ) );
-        },
-        message =>
-"The flag <--iomops> only supports output files in <json|json.gz> format\n",
-    },
-    {
-        condition => sub { !-f $schema_file },
-        message   =>
-"Please specify a valid schema for the mapping file --schema-file <file>\n",
-    },
-    {
-        condition => sub { defined $path_to_ohdsi_db && !-d $path_to_ohdsi_db },
-        message   =>
-"Please specify a valid directory for the mapping file --path-to-ohdsi-db <dir>\n",
-    },
-    {
-        condition => sub { defined $exposures_file && !-f $exposures_file },
-        message   => "Please specify a valid --exposures-file <file>\n",
-    },
-    {
-        condition => sub {
-            ( $out_csv || $out_jsonf || $out_jsonld )
-              && ( !$in_bff && !$in_pxf );
-        },
-        message =>
-"Sorry, <--ocsv>, <--ojsonf> and <--ojsonf> are only compatible with <--ibff> or <--ipxf>\n",
-    },
-    {
-        condition => sub { defined $out_omop && !$ohdsi_db },
-        message   =>
-          "Error: Please use --ohdsi-db when using OMOP CDM as an output"
-    },
-    {
-        condition => sub { defined($out_omop) && $out_omop =~ /^-/ },
-        message   =>
-"Error: The value for --oomop appears to be an option. Please supply a proper non-option string using --oomop=VALUE"
-    }
+Common input flags:
+  -i <type> <file>    Generic input form (pxf|bff|omop|redcap|cdisc|csv)
+  -ibff <file>      Beacon v2 Models ('individuals' JSON|YAML)
+  -ipxf <file>      Phenopackets v2 (JSON|YAML)
+  -iomop <files...> OMOP-CDM CSV files or PostgreSQL dump
+  -iredcap <file>   REDCap export CSV
+  -icdisc <file>    CDISC-ODM XML
+  -icsv <file>      Raw CSV
 
+Common output flags:
+  -o <type> <file>    Generic output form (bff|pxf|omop|csv|jsonf|jsonld)
+  -obff [file]      Beacon-oriented JSON/YAML output
+                    Use -obff FILE for legacy single-file individuals mode
+                    Use -obff with --entities --out-dir for entity-aware BFF
+  -opxf <file>      Phenopackets v2 output
+  -oomop <prefix>   OMOP-CDM CSV prefix
+  -ocsv <file>      Flattened CSV (with -ibff or -ipxf)
+  -ojsonf <file>    Flattened 1D JSON/YAML (with -ibff or -ipxf)
+  -ojsonld <file>   JSON-LD / YAML-LD (with -ibff or -ipxf)
+
+Output behavior:
+  --out-dir <dir>       Output directory (required for entity-aware BFF mode)
+  --entities <list>     Beacon entities for BFF output [individuals]
+                        Supported: individuals, biosamples, datasets, cohorts
+                        biosamples are emitted from -ipxf when present
+                        datasets and cohorts are synthesized from individuals
+                        Use with -obff and --out-dir
+  --out-entity e=file   Override one entity filename; repeat as needed
+                        Requires --entities
+  -O                    Overwrite output file(s)
+
+Mapping and search:
+  --mapping-file <file>           Fields mapping YAML or JSON file
+  --redcap-dictionary|-rcd <file> REDCap data dictionary CSV file
+  --schema-file <file>            Alternative JSON Schema for mapping files
+  --self-validate-schema|-svs     Self-validate the mapping JSON Schema
+  --search <type>                 Ontology label search mode [exact|mixed|fuzzy]
+                                  Default: exact
+  --text-similarity-method <m>    Token similarity for mixed/fuzzy search
+                                  [cosine|dice], default: cosine
+  --min-text-similarity-score <s> Minimum score for mixed/fuzzy search
+                                  Default: 0.8
+  --levenshtein-weight <w>        Levenshtein weight in fuzzy composite score
+                                  Default: 0.1, range: 0-1
+  --print-hidden-labels|-phl      Preserve original text labels in output
+  --search-audit-tsv <file>       Write a TSV audit of ontology search results
+
+OMOP:
+  --ohdsi-db                      Enable Athena-OHDSI lookup
+  --path-to-ohdsi-db <dir>        Directory containing <ohdsi.db>
+  --omop-tables <list>            Restrict OMOP tables
+  --exposures-file <file>         OMOP concept_id list treated as exposures
+  --stream                        Incremental OMOP processing with legacy
+                                  -obff output
+  --sql2csv                       Print SQL tables instead of converting
+  --max-lines-sql <n>             Maximum SQL lines per table [500]
+
+Other useful options:
+  --default-vital-status <s>   Fallback PXF subject vitalStatus
+                               [ALIVE|DECEASED|UNKNOWN_STATUS]
+                               Used only with PXF output when no source
+                               vitalStatus is available
+  --separator|--sep <char>        Delimiter for CSV input [; for .csv]
+  --username|-u <name>            Override username stored in metadata
+  --test                          Skip time-varying metadata for stable tests
+  --debug <level>                 Print internal request/debug data
+                                  (level >= 2 also prints DB lookup summary)
+  --verbose|-v                    Print progress information
+  --version|-V
+  --help
+  --man
+
+Examples:
+  convert-pheno -i pxf pxf.json -o bff individuals.json
+  convert-pheno -ipxf pxf.json -obff individuals.json
+  convert-pheno -ipxf pxf.json -obff --entities biosamples --out-dir out/
+  convert-pheno -ipxf pxf.json -obff --entities individuals biosamples --out-dir out/ --out-entity biosamples=samples.json
+  convert-pheno -ipxf pxf.json -obff --entities individuals datasets cohorts --out-dir out/
+  convert-pheno -icsv data.csv --mapping-file mapping.yaml -obff --entities individuals datasets cohorts --out-dir out/
+  convert-pheno -iomop dump.sql.gz -opxf phenopackets.json.gz --default-vital-status UNKNOWN_STATUS --ohdsi-db
+  convert-pheno -iomop dump.sql.gz -obff individuals.json.gz --stream --ohdsi-db
+
+BFF output modes:
+  -obff FILE keeps the legacy single-output behavior and emits individuals only.
+  -obff --entities ... --out-dir DIR writes one file per requested BFF entity.
+  If a PXF input also contains biosamples, convert-pheno warns and preserves them
+  under info.phenopacket.biosamples unless --entities is used.
+  PXF output still defaults subject.vitalStatus to ALIVE unless a preserved
+  source vitalStatus or --default-vital-status is available.
+
+Docs:
+  Site:  https://cnag-biomedical-informatics.github.io/convert-pheno
+  CLI:   https://cnag-biomedical-informatics.github.io/convert-pheno/use-as-a-command-line-interface/
+  Install:
+         https://cnag-biomedical-informatics.github.io/convert-pheno/download-and-installation/
+EOF
+}
+
+sub print_usage_summary {
+    my $out = shift || *STDERR;
+    print {$out} <<'EOF';
+Usage:
+  convert-pheno -i <input-type> <infile> -o <output-type> <outfile> [options]
+  convert-pheno -ipxf <infile> -obff <outfile> [options]
+  convert-pheno -ipxf <infile> -obff --entities <list> --out-dir <dir> [options]
+
+Run `convert-pheno --help` for full usage
+EOF
+}
+
+sub usage_error {
+    my ($message) = @_;
+    print STDERR "Error: $message";
+    print STDERR "\n" unless $message =~ /\n\z/;
+    print STDERR "\n";
+    print_usage_summary(*STDERR);
+    exit 1;
+}
+
+sub print_man {
+    print <<'EOF';
+Full CLI documentation now lives in Markdown instead of POD.
+
+Documentation site:
+  https://cnag-biomedical-informatics.github.io/convert-pheno
+
+CLI guide:
+  https://cnag-biomedical-informatics.github.io/convert-pheno/use-as-a-command-line-interface/
+
+Installation:
+  https://cnag-biomedical-informatics.github.io/convert-pheno/download-and-installation/
+EOF
+}
+
+my $cli = build_cli_request(
+    argv        => \@ARGV,
+    usage_error => \&usage_error,
+    schema_file => $schema_file,
+    out_dir     => $out_dir,
+    color       => 1,
+    stream      => 0,
+    ohdsi_db    => 0,
 );
 
-foreach my $check (@validation_checks) {
-    if ( $check->{condition}->() ) {
-        pod2usage( -message => $check->{message}, -exitval => 1 );
-    }
-}
+if ( $cli->{action} eq 'help' ) { print_help(); exit 0; }
+if ( $cli->{action} eq 'man' )  { print_man();  exit 0; }
+if ( $cli->{action} eq 'version' ) { say "$0 Version $VERSION"; exit 0; }
 
-# Validate that --oomop's argument doesn't look like another option.
-if ( defined($out_omop) && $out_omop =~ /^-/ ) {
-    die
-"Error: The value for --oomop ('$out_omop') appears to be an option. Please supply a proper non-option string using --oomop=VALUE\n";
-}
+my $data      = $cli->{data};
+my $out_file  = $cli->{out_file};
+my $log_file  = $cli->{log_file};
+my $overwrite = $cli->{overwrite};
+my $verbose   = $cli->{verbose};
+my $stream    = $cli->{stream};
+my $color     = $cli->{color};
+my $log       = $data->{log};
 
-# Turning color off if argument <--no-color>
 $ENV{'ANSI_COLORS_DISABLED'} = 1 unless $color;
 
-# Defining $out_file
-my $out_file =
-    $out_pxf    ? catfile( $out_dir, $out_pxf )
-  : $out_bff    ? catfile( $out_dir, $out_bff )
-  : $out_csv    ? catfile( $out_dir, $out_csv )
-  : $out_jsonf  ? catfile( $out_dir, $out_jsonf )
-  : $out_jsonld ? catfile( $out_dir, $out_jsonld )
-  : $out_omop   ? catfile( $out_dir, $out_omop )
-  :               catfile( $out_dir, 'individuals.json' );
-
-# Defining $log_file
-my $log_file =
-  catfile( $out_dir, ( $log ? $log : 'convert-pheno-log.json' ) );    # // works for undef
-
-# Defining method
-my $in_type =
-    $in_pxf     ? 'pxf'
-  : $in_bff     ? 'bff'
-  : $in_redcap  ? 'redcap'
-  : $in_cdisc   ? 'cdisc'
-  : $in_csv     ? 'csv'
-  : @omop_files ? 'omop'
-  :               'bff';
-my $out_type =
-    $out_pxf    ? 'pxf'
-  : $out_bff    ? 'bff'
-  : $out_csv    ? 'csv'
-  : $out_jsonf  ? 'jsonf'
-  : $out_jsonld ? 'jsonld'
-  : $out_omop   ? 'omop'
-  :               'bff';
-my $method = $in_type . '2' . $out_type;
-
-#Define job id
-my $id = time . substr( "00000$$", -5 );
-
-# Defining data as a hashref
-my $data = {
-    out_dir     => $out_dir,
-    in_textfile => 1,
-    in_file     => $in_pxf ? $in_pxf
-    : $in_bff    ? $in_bff
-    : $in_redcap ? $in_redcap
-    : $in_cdisc  ? $in_cdisc
-    : $in_csv    ? $in_csv
-    : undef,
-    in_files                  => \@omop_files // undef,        # only for Omop
-    method                    => $method,
-    sep                       => $sep,
-    sql2csv                   => $sql2csv,
-    redcap_dictionary         => $redcap_dictionary,
-    mapping_file              => $mapping_file,
-    exposures_file            => $exposures_file,
-    search                    => $search,
-    ohdsi_db                  => $ohdsi_db,
-    omop_tables               => \@omop_tables,
-    username                  => $username,
-    text_similarity_method    => $text_similarity_method,
-    min_text_similarity_score => $min_text_similarity_score,
-    levenshtein_weight        => $levenshtein_weight,
-    self_validate_schema      => $self_validate_schema,
-    path_to_ohdsi_db          => $path_to_ohdsi_db,
-    print_hidden_labels       => $print_hidden_labels,
-    max_lines_sql             => $max_lines_sql,
-    stream                    => $stream,
-    schema_file               => $schema_file,
-    out_file                  => $out_file,
-    id                        => $id,
-    test                      => $test,
-    debug                     => $debug,
-    log                       => $log,
-    verbose                   => $verbose
-};
-print Dumper $data if $debug;
+print Dumper $data if defined $data->{debug};
 
 # Start printing to STDOUT
 say BOLD CYAN program_header($VERSION), RESET if $verbose;
@@ -289,76 +226,177 @@ convert( $out_file, $data );
 sub convert {
     my ( $o_file, $l_data ) = @_;
 
-    # Before proceeding we ask the user what to do with $o_file
-    if ($overwrite) {
-        unlink($o_file) if -e $o_file;
-    }
-    else {
-        ask_overwrite($o_file);
-    }
+    my $entity_mode =
+      $l_data->{method} =~ /2bff$/
+      && (
+        @{ $l_data->{entities} || [] } != 1
+        || ( $l_data->{entities}[0] || 'individuals' ) ne 'individuals'
+      );
+
+    maybe_warn_legacy_pxf_biosamples( $l_data, $entity_mode );
+    prepare_output_targets( $l_data, $o_file, $entity_mode );
 
     # Start verbose
     print BOLD BLUE program_body($l_data), RESET if $verbose;
 
     # Creating object
     my $convert = Convert::Pheno->new($l_data);
-
-    # Running $method and writing the results to $o_file
-    my $method = $l_data->{method};
-
-    # Perform the conversion based on the method
-    my $data;
-
-    # For omop2bff and omop2pxf we serialize to JSON (not YAML) by individual
-    if ( $stream || $method eq 'omop2bff' || $method eq 'omop2pxf' ) {
-        say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
-        $convert->$method;
-    }
-    else {
-        $data = $convert->$method;
-    }
-
-    # Determine the appropriate writing method
-    if ($data) {
-        say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
-        if ( $method eq 'bff2csv' || $method eq 'pxf2csv' ) {
-            write_csv(
-                {
-                    sep      => $l_data->{sep} // ';',
-                    filepath => $o_file,
-                    headers  => get_headers($data),
-                    data     => $data,
-                }
-            );
-        }
-        elsif ( $method =~ /2omop$/ ) {
-
-            for my $table ( keys %$data ) {
-                my $filepath = catfile( $o_file . "_$table.csv" );
-                my @headers  = @{ $omop_headers->{$table} };
-                write_csv(
-                    {
-                        sep      => ";",                # or the separator your CSV requires
-                        filepath => $filepath,
-                        headers  => \@headers,
-                        data     => $data->{$table},    # array-of-hashes
-                    }
-                );
-            }
-        }
-        else {
-            io_yaml_or_json(
-                {
-                    filepath => $o_file,
-                    mode     => 'write',
-                    data     => $data,
-                }
-            );
-        }
-    }
+    my ( $data, $bundle ) = execute_conversion( $convert, $l_data, $o_file, $entity_mode );
+    write_conversion_result( $l_data, $o_file, $data, $bundle );
 
     # Finish
     print BOLD GREEN program_footer(), RESET if $verbose;
+}
+
+sub maybe_warn_legacy_pxf_biosamples {
+    my ( $l_data, $entity_mode ) = @_;
+
+    return if $entity_mode;
+    return unless $l_data->{method} eq 'pxf2bff';
+    return unless defined $l_data->{in_file};
+
+    my $input = io_yaml_or_json(
+        {
+            filepath => $l_data->{in_file},
+            mode     => 'read',
+        }
+    );
+
+    my @items = ref($input) eq 'ARRAY' ? @$input : ($input);
+
+    for my $item (@items) {
+        next unless ref($item) eq 'HASH';
+        my $phenopacket =
+          exists $item->{phenopacket} ? $item->{phenopacket} : $item;
+        next unless ref($phenopacket) eq 'HASH';
+        next
+          unless exists $phenopacket->{biosamples}
+          && ref( $phenopacket->{biosamples} ) eq 'ARRAY'
+          && @{ $phenopacket->{biosamples} };
+
+        print STDERR <<'EOF';
+Warning: input PXF contains biosamples. Legacy <-obff FILE> mode emits only <individuals>; biosamples were preserved under <info.phenopacket.biosamples>. Use <-obff --entities biosamples --out-dir DIR> or <-obff --entities individuals biosamples --out-dir DIR> for first-class biosample output.
+EOF
+        return;
+    }
+
+    return;
+}
+
+sub prepare_output_targets {
+    my ( $l_data, $o_file, $entity_mode ) = @_;
+
+    if ($entity_mode) {
+        for my $entity ( @{ $l_data->{entities} } ) {
+            my $entity_file = resolve_entity_output_file( $l_data, $entity );
+            if ($overwrite) {
+                unlink($entity_file) if -e $entity_file;
+            }
+            else {
+                ask_overwrite($entity_file);
+            }
+        }
+        return;
+    }
+
+    if ($overwrite) {
+        unlink($o_file) if -e $o_file;
+    }
+    else {
+        ask_overwrite($o_file);
+    }
+}
+
+sub execute_conversion {
+    my ( $convert, $l_data, $o_file, $entity_mode ) = @_;
+    my $method = $l_data->{method};
+
+    if ($entity_mode) {
+        my $bundle = $convert->_run_bundle_view;
+        return ( undef, $bundle );
+    }
+
+    # For omop2bff and omop2pxf we serialize to JSON (not YAML) by individual.
+    if ( $stream || $method eq 'omop2bff' || $method eq 'omop2pxf' ) {
+        say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
+        $convert->$method;
+        return ( undef, undef );
+    }
+
+    my $data = $convert->$method;
+    return ( $data, undef );
+}
+
+sub write_conversion_result {
+    my ( $l_data, $o_file, $data, $bundle ) = @_;
+    my $method = $l_data->{method};
+
+    if ($bundle) {
+        for my $entity ( @{ $l_data->{entities} } ) {
+            my $entity_file = resolve_entity_output_file( $l_data, $entity );
+            say BOLD GREEN "Writing <$entity_file> file\n", RESET if $verbose;
+            io_yaml_or_json(
+                {
+                    filepath => $entity_file,
+                    mode     => 'write',
+                    data     => $bundle->entities($entity),
+                }
+            );
+        }
+        return;
+    }
+
+    return unless $data;
+
+    say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
+
+    if ( $method eq 'bff2csv' || $method eq 'pxf2csv' ) {
+        write_csv(
+            {
+                sep      => $l_data->{sep} // ';',
+                filepath => $o_file,
+                headers  => get_headers($data),
+                data     => $data,
+            }
+        );
+        return;
+    }
+
+    if ( $method =~ /2omop$/ ) {
+        for my $table ( keys %$data ) {
+            my $filepath = resolve_omop_table_output_file( $o_file, $table );
+            my @headers  = @{ $omop_headers->{$table} };
+            write_csv(
+                {
+                    sep      => ";",
+                    filepath => $filepath,
+                    headers  => \@headers,
+                    data     => $data->{$table},
+                }
+            );
+        }
+        return;
+    }
+
+    io_yaml_or_json(
+        {
+            filepath => $o_file,
+            mode     => 'write',
+            data     => $data,
+        }
+    );
+}
+
+sub resolve_omop_table_output_file {
+    my ( $prefix, $table ) = @_;
+
+    my $gzip = $prefix =~ /\.gz$/i ? 1 : 0;
+    my $base = $prefix;
+
+    $base =~ s/\.gz$//i if $gzip;
+    $base =~ s/\.csv$//i;
+
+    return $base . "_$table.csv" . ( $gzip ? '.gz' : '' );
 }
 
 sub program_header {
@@ -368,7 +406,7 @@ sub program_header {
 *  Phenotypic Data Model Convert Tool  *
 *          - CONVERT-PHENO -           *
 *            Version: $version             *
-*   (C) 2022-2025 Manuel Rueda, CNAG   *
+*   (C) 2022-2026 Manuel Rueda, CNAG   *
 *       The Artistic License 2.0       *
 ****************************************
 EOF
@@ -471,321 +509,10 @@ sub ask_overwrite {
     }
 }
 
-=head1 NAME
-
-convert-pheno - A script to interconvert common data models for phenotypic data
-
-=head1 SYNOPSIS
-
- convert-pheno [-i input-type] <infile> [-o output-type] <outfile> [-options]
-
-     Arguments:                       
-       (input-type): 
-             -ibff                    Beacon v2 Models ('individuals' JSON|YAML) file
-             -iomop                   OMOP-CDM CSV files or PostgreSQL dump
-             -ipxf                    Phenopacket v2 (JSON|YAML) file
-             -iredcap (experimental)  REDCap (raw data) export CSV file
-             -icdisc  (experimental)  CDISC-ODM v1 XML file
-             -icsv    (experimental)  Raw data CSV
-
-             (Wish-list)
-             #-iopenehr               openEHR
-
-       (output-type):
-             -obff                    Beacon v2 Models ('individuals' JSON|YAML) file
-             -opxf                    Phenopacket v2 (JSON|YAML) file
-             -oomop   (experimental)  Prefix for OMOP-CDM tables (CSV)
-
-             Compatible with -i(bff|pxf):
-             -ocsv                    Flatten data to CSV
-             -ojsonf                  Flatten data to 1D-JSON (or 1D-YAML if suffix is .yml|.yaml)
-             -ojsonld (experimental)  JSON-LD (interoperable w/ RDF ecosystem; YAML-LD if suffix is .ymlld|.yamlld)
-
-     Options:
-       -exposures-file <file>         CSV file with a list of 'concept_id' considered to be exposures (with -iomop)
-       -levenshtein-weight <weight>   Set the normalized Levenshtein weight for fuzzy search composite scoring (default: 0.1, range: 0-1)
-       -mapping-file <file>           Fields mapping YAML (or JSON) file
-       -max-lines-sql <number>        Maximum lines read per table from SQL dump [500]
-       -min-text-similarity-score <score> Minimum score for cosine similarity (or Sorensen-Dice coefficient) [0.8] (to be used with --search [mixed|fuzzy])
-       -ohdsi-db                      Use Athena-OHDSI database (~2.2GB) with -iomop
-       -omop-tables <tables>          OMOP-CDM tables to be processed. Tables <CONCEPT> and <PERSON> are always included.
-       -out-dir <directory>           Output (existing) directory
-       -O                             Overwrite output file
-       -path-to-ohdsi-db <directory>  Directory for the file <ohdsi.db>
-       -phl|print-hidden-labels       Print original values (before DB mapping) of text fields <_labels>
-       -rcd|redcap-dictionary <file>  REDCap data dictionary CSV file
-       -schema-file <file>            Alternative JSON Schema for mapping file
-       -search <type>                 Type of search [>exact|mixed|fuzzy]
-       -svs|self-validate-schema      Perform a self-validation of the JSON schema that defines mapping (requires IO::Socket::SSL)
-       -sep|separator <char>          Delimiter character for CSV files [;] e.g., --sep $'\t'
-       -stream                        Enable incremental processing with -iomop and -obff [>no-stream|stream]
-       -sql2csv                       Print SQL TABLES (only valid with -iomop). Mutually exclusive with --stream
-       -test                          Does not print time-changing-events (useful for file-based cmp)
-       -text-similarity-method <method> The method used to compare values to DB [>cosine|dice]
-       -u|username <username>         Set the username
-
-     Generic Options:
-       -debug <level>                 Print debugging level (from 1 to 5, being 5 max)
-       -help                          Brief help message
-       -log                           Save log file (JSON). If no argument is given then the log is named [convert-pheno-log.json]
-       -man                           Full documentation
-       -no-color                      Don't print colors to STDOUT [>color|no-color]
-       -v|verbose                     Verbosity on
-       -V|version                     Print Version
-
-=head1 DESCRIPTION
-
-C<convert-pheno> is a command-line front-end to the CPAN's module L<Convert::Pheno>.
-
-=head1 SUMMARY
-
-C<convert-pheno> is a command-line front-end to the CPAN's module L<Convert::Pheno> to interconvert common data models for phenotypic data.
-
-=head1 INSTALLATION
-
-If you plan to only use the CLI, we recommend installing it via CPAN. See details below.
-
-=head2 Non containerized
-
-The script runs on command-line Linux and it has been tested on Debian/RedHat/MacOS based distributions (only showing commands for Debian's). Perl 5 is installed by default on Linux, 
-but we will install a few CPAN modules with C<cpanminus>.
-
-=head3 Method 1: From CPAN
-
-First install system level dependencies:
-
-  sudo apt-get install cpanminus libbz2-dev zlib1g-dev libperl-dev libssl-dev
-
-Now you have two choose between one of the 2 options below:
-
-B<Option 1:> Install Convert-Pheno and the dependencies at C<~/perl5>
-
-  cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-  cpanm --notest Convert::Pheno
-  convert-pheno --help
-
-To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
-
-  echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
-
-To B<update> to the newest version:
-
-  cpanm Convert::Pheno
-
-B<Option 2:> Install Convert-Pheno and the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
-
-  mkdir local
-  cpanm --notest --local-lib=local/ Carton
-  echo "requires 'Convert::Pheno';" > cpanfile
-  export PATH=$PATH:local/bin; export PERL5LIB=$(pwd)/local/lib/perl5:$PERL5LIB
-  carton install
-  carton exec -- convert-pheno -help
-
-=head3 Method 2: From CPAN in a Conda environment
-
-Please follow L<these instructions|https://cnag-biomedical-informatics.github.io/convert-pheno/download-and-installation/#__tabbed_1_2>.
-
-=head3 Method 3: From Github
-
-To clone the repository for the first time:
-
-  git clone https://github.com/cnag-biomedical-informatics/convert-pheno.git
-  cd convert-pheno
-
-To update an existing clone, navigate to the repository folder and run:
-
-  git pull
-
-Install system level dependencies:
-  
-  sudo apt-get install cpanminus libbz2-dev zlib1g-dev libperl-dev libssl-dev
-
-Now you have two choose between one of the 2 options below:
-
-B<Option 1:> Install the dependencies at C<~/perl5>:
-
-  cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-  cpanm --notest --installdeps .
-  bin/convert-pheno --help
-
-To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
-
-  echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
-
-B<Option 2:> Install the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
-
-  mkdir local
-  cpanm --notest --local-lib=local/ Carton
-  export PATH=$PATH:local/bin; export PERL5LIB=$(pwd)/local/lib/perl5:$PERL5LIB
-  carton install
-  carton exec -- bin/convert-pheno -help
-
-=head2 Containerized
-
-=head3 Method 4: From Docker Hub
-
-(Estimated Time: Approximately 15 seconds)
-
-Download the latest version of the Docker image (supports both amd64 and arm64 architectures) from L<Docker Hub|https://hub.docker.com/r/manuelrueda/convert-pheno> by executing:
-
-  docker pull manuelrueda/convert-pheno:latest
-  docker image tag manuelrueda/convert-pheno:latest cnag/convert-pheno:latest
-
-See additional instructions below.
-
-=head3 Method 5: With Dockerfile
-
-(Estimated Time: Approximately 3 minutes)
-
-Please download the C<Dockerfile> from the repo:
-
-  wget https://raw.githubusercontent.com/cnag-biomedical-informatics/convert-pheno/main/Dockerfile
-
-And then run:
-
-  docker buildx build -t cnag/convert-pheno:latest .
-
-=head3 Additional instructions for Methods 4 and 5
-
-To run the container (detached) execute:
-
-  docker run -tid -e USERNAME=root --name convert-pheno cnag/convert-pheno:latest
-
-To enter:
-
-  docker exec -ti convert-pheno bash
-
-The command-line executable can be found at:
-
-  /usr/share/convert-pheno/bin/convert-pheno
-
-The default container user is C<root> but you can also run the container as C<$UID=1000> (C<dockeruser>). 
-
-  docker run --user 1000 -tid --name convert-pheno cnag/convert-pheno:latest
- 
-Alternatively, you can use C<make> to perform all the previous steps:
-
-  wget https://raw.githubusercontent.com/cnag-biomedical-informatics/convert-pheno/main/Dockerfile
-  wget https://raw.githubusercontent.com/cnag-biomedical-informatics/convert-pheno/main/makefile.docker
-  make -f makefile.docker install
-  make -f makefile.docker run
-  make -f makefile.docker enter
-
-=head3 Mounting volumes
-
-Docker containers are fully isolated. If you need the mount a volume to the container please use the following syntax (C<-v host:container>). 
-Find an example below (note that you need to change the paths to match yours):
-
-  docker run -tid --volume /media/mrueda/4TBT/data:/data --name convert-pheno-mount cnag/convert-pheno:latest
-
-Then I will do something like this:
-
-  # First I create an alias to simplify invocation (from the host)
-  alias convert-pheno='docker exec -ti convert-pheno-mount /usr/share/convert-pheno/bin/convert-pheno'
-
-  # Now I use the alias to run the command (note that I use the flag --out-dir to specify the output directory)
-  convert-pheno -ibff /data/individuals.json -opxf pxf.json --out-dir /data
-
-=head3 System requirements
-
-  - OS/ARCH supported: B<linux/amd64> and B<linux/arm64>.
-  - Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOS, OpenSUSE) should do as well (untested).
-    (It should also work on macOS and Windows Server, but we are only providing information for Linux here)
-  * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
-  * >= 4GB of RAM
-  * 1 core
-  * At least 16GB HDD
-
-=head1 HOW TO RUN CONVERT-PHENO
-
-For executing convert-pheno you will need:
-
-=over
-
-=item Input file(s):
-      
-A text file in one of the accepted formats.
-
-Note that when using C<--iomop>, I/O files can be gzipped.
-
-=item Optional: 
-
-Athena-OHDSI database
-
-The database file is available at this L<link|https://drive.google.com/drive/folders/1-5Ywf-hhwb8bX1sRNV2Tf3EjH4TCaC8P?usp=sharing> (~2.2GB). The database may be needed when using C<-iomop>.
-
-Regardless if you're using the containerized or non-containerized version, the download procedure is the same. For CLI users, Google makes it difficult to use C<wget>, C<curl> or C<aria2c> so we will use a C<Python> module instead:
-
- $ pip install gdown
-
-And then run the following script
-
- import gdown
-
- url = 'https://drive.google.com/uc?export=download&id=1-Ls1nmgxp-iW-8LkRIuNNdNytXa8kgNw'
- output = './ohdsi.db'
- gdown.download(url, output, quiet=False)
-
-Once downloaded, you have two options:
-
-a) Move the file C<ohdsi.db> inside the C<share/db/> directory.
-
-or
-
-b) Use the option C<--path-to-ohdsi-db>
-
-=back
-
-B<Examples:>
-
-Note that you can find input examples for all conversions within the C<t/> directory of this repository:
-
- $ bin/convert-pheno -ipxf t/pxf2bff/in/pxf.json -obff individuals.json
-
- $ bin/convert-pheno -ibff t/bff2pxf/in/individuals.json -opxf phenopackets.yaml --out-dir my_out_dir 
-
- $ bin/convert-pheno -iomop t/omop2bff/in/omop_cdm_eunomia.sql -opxf phenopackets.json -max-lines-sql 2694
-
- $ bin/convert-pheno -ibff t/bff2omop/in/individuals.json -oomop my_prefix --ohdsi-db # Needs ohdsi.db
-
-Generic examples:
-
- $ $path/convert-pheno -iredcap redcap.csv -opxf phenopackets.json --redcap-dictionary redcap_dict.csv --mapping-file mapping_file.yaml
-
- $ $path/convert-pheno -iomop dump.sql.gz -obff individuals.json.gz --stream -omop-tables measurement -verbose
-
- $ $path/convert-pheno -cdisc cdisc_odm.xml -obff individuals.json --rcd redcap_dict.csv --mapping-file mapping_file.yaml --search mixed --min-text-similarity-score 0.6
-
- $ $path/convert-pheno -iomop *csv -obff individuals.json -sep ','
-
- $ carton exec -- $path/convert-pheno -ibff individuals.json -opxf phenopackets.json # If using Carton
-
-=head2 COMMON ERRORS AND SOLUTIONS
-
- * Error message: CSV_XS ERROR: 2023 - EIQ - QUO character not allowed @ rec 1 pos 21 field 1
-   Solution: Make sure you use the right character separator for your data with --sep <char>. 
-             The script tries to guess it from the file extension, but sometimes extension and actual separator do not match. 
-             When using REDCap as input, make sure that <--iredcap> and <--rcd> files use the same separator field.
-             The defauly value for the separator is ';'. 
-   Example for tab separator in CLI.
-    --sep  $'\t' 
-
- * Error message: Error: malformed UTF-8 character in JSON string, at character offses...
-   Solution:  iconv -f ISO-8859-1 -t UTF-8 yourfile.json -o yourfile-utf8.json
-
-
-=head1 CITATION
-
-The author requests that any published work that utilizes C<Convert-Pheno> includes a cite to the the following reference:
-
-Rueda, M et al., (2024). Convert-Pheno: A software toolkit for the interconversion of standard data models for phenotypic data. Journal of Biomedical Informatics. L<DOI|https://doi.org/10.1016/j.jbi.2023.104558>
-
-=head1 AUTHOR 
-
-Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag.eu>.
-
-=head1 COPYRIGHT AND LICENSE
-
-This PERL file is copyrighted. See the LICENSE file included in this distribution.
-
-=cut
+sub resolve_entity_output_file {
+    my ( $l_data, $entity ) = @_;
+    return $l_data->{entity_output_files}{$entity}
+      if exists $l_data->{entity_output_files}
+      && exists $l_data->{entity_output_files}{$entity};
+    return catfile( $l_data->{out_dir}, $entity . '.json' );
+}

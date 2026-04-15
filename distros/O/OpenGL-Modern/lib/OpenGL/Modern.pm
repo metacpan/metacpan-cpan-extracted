@@ -8,7 +8,7 @@ use Exporter 'import';
 
 use OpenGL::Modern::Const;
 
-our $VERSION    = '0.0404';
+our $VERSION    = '0.0405';
 our $XS_VERSION = $VERSION; # capture before strip, as EUMM reads statically in setting version for .xs file
 $VERSION =~ tr/_//d;
 
@@ -10754,6 +10754,7 @@ our @gl_constants = qw(
   GLEW_ERROR_GLX_VERSION_11_ONLY
   GLEW_ERROR_GL_VERSION_10_ONLY
   GLEW_ERROR_NO_GLX_DISPLAY
+  GLEW_ERROR_NO_GL_CONTEXT
   GLEW_ERROR_NO_GL_VERSION
   GLEW_NO_ERROR
   GLEW_OK
@@ -16615,6 +16616,7 @@ our @glew_functions = qw(
   glewIsSupported
   glewInit
   done_glewInit
+  glewHasContext
   glewDestroyContext
 );
 our @glp_functions = qw(

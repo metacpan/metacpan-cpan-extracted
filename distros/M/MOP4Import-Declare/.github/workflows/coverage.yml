@@ -1,0 +1,28 @@
+name: coverage
+
+on: ["push", "pull_request"]
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+    name: Coverage
+    container:
+      image: perl:stable
+    steps:
+      - uses: actions/checkout@v4
+        with:
+           path: 'lib/MOP4Import'
+      - name: Install cpm
+        run: curl -fsSL --compressed https://git.io/cpm > cpm; chmod +x cpm
+      - name: Install Dependencies
+        run: ./cpm install -g --cpanfile=lib/MOP4Import/cpanfile
+      - name: Install Devel::Cover
+        run: ./cpm install -g App::Yath Devel::Cover Devel::Cover::Report::Coveralls
+      - name: Run tests (with coverage)
+        working-directory: 'lib/MOP4Import'
+        run: PERL5OPT=-MDevel::Cover="-ignore,^t/,-ignore,^/usr" yath test --qvf t/
+      - name: push coverage report
+        working-directory: 'lib/MOP4Import'
+        run: cover -report coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,23 @@
+# Performance baseline data - DO NOT EDIT MANUALLY
+# Generated on: Wed Oct 15 19:44:19 2025
+# Iterations: 100000
+# Role Iterations: 50000
+
+class_multi_role_time=0.00558590888977051
+class_with_role_time=0.0297949314117432
+inheritance_time=0.0716748237609863
+class_role_method_time=0.0177829265594482
+method_access_time=0.00831913948059082
+basic_creation_time=0.0639181137084961
+individual_class_more_access=0.0140299797058105
+individual_class_access=0.00831913948059082
+individual_class_more_with_role=0.0585401058197021
+individual_class_more_create=0.155397891998291
+individual_class_more_inherit=0.200169086456299
+individual_class_multi_role=0.00558590888977051
+individual_class_role_method=0.0177829265594482
+individual_class_more_role_method=0.0253050327301025
+individual_class_with_role=0.0297949314117432
+individual_class_inherit=0.0716748237609863
+individual_class_more_multi_role=0.00896215438842773
+individual_class_create=0.0639181137084961

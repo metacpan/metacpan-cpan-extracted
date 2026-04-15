@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object;
-$RT::Client::REST::Object::VERSION = '0.72';
+$RT::Client::REST::Object::VERSION = '0.73';
 
 use Try::Tiny;
 use Params::Validate;
@@ -382,7 +382,7 @@ sub search {
         catch {
             die $_ unless blessed $_ && $_->can('rethrow');
 
-            if ($_->isa('RT::Clite::REST::Object::InvalidAttributeException')) {
+            if ($_->isa('RT::Client::REST::Object::InvalidAttributeException')) {
                 RT::Client::REST::Object::InvalidSearchParametersException
                     ->throw(shift->message);
             }
@@ -459,7 +459,7 @@ sub _attr2keyword {
 
     unless (exists($attributes->{$attr})) {
         no warnings 'uninitialized';
-        RT::Clite::REST::Object::InvalidAttributeException->throw(
+        RT::Client::REST::Object::InvalidAttributeException->throw(
             "Attribute '$attr' does not exist in object type '" .
                 ref($self) . "'"
         );
@@ -631,7 +631,7 @@ RT::Client::REST::Object - base class for RT objects
 
 =head1 VERSION
 
-version 0.72
+version 0.73
 
 =head1 SYNOPSIS
 
@@ -975,7 +975,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020 by Dmitri Tikhonov.
+This software is copyright (c) 2026, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

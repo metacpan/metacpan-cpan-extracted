@@ -27,33 +27,20 @@ my %result;
     }
 }
 
-$result{'git remote show -n origin'} = <<'END GIT';
-* remote origin
-  Fetch URL: git@github.com:fayland/dist-zilla-plugin-repository.git
-  Push  URL: git@github.com:fayland/dist-zilla-plugin-repository.git
-  HEAD branch: (not queried)
-  Remote branch: (status not queried)
-    master
-  Local branch configured for 'git pull':
-    master merges with remote master
-  Local ref configured for 'git push' (status not queried):
-    (matching) pushes to (matching)
-END GIT
+my %remotes = (
+    origin    => 'git@github.com:fayland/dist-zilla-plugin-repository.git',
+    dzil      => 'git://github.com/rjbs/dist-zilla.git',
+    bitbucket => 'git@bitbucket.org:foo/bar',
+    codeberg  => 'ssh://git@codeberg.org/foo/bar.git',
+    gitlab    => 'git@gitlab.com:foo/bar',
+    github    => 'git@github.com:foo/bar',
+    work      => 'work',
+    nourl     => 'origin',
+);
 
-$result{'git remote show -n dzil'} = <<'END GIT DZIL';
-* remote dzil
-  Fetch URL: git://github.com/rjbs/dist-zilla.git
-  Push  URL: git://github.com/rjbs/dist-zilla.git
-  HEAD branch: (not queried)
-  Remote branches: (status not queried)
-    config-mvp-reader
-    cpan-meta-prereqs
-    master
-    new-classic
-    prereq-overhaul
-  Local ref configured for 'git push' (status not queried):
-    (matching) pushes to (matching)
-END GIT DZIL
+foreach (keys %remotes) {
+    $result{"git config --get remote.$_.url"} = $remotes{$_};
+}
 
 $result{'svn info'} = <<'END SVN';
 Path: .
@@ -81,32 +68,6 @@ END DARCS
 $result{'hg paths'} = <<'END HG';
 default = https://foobar.googlecode.com/hg/
 END HG
-
-$result{'git remote show -n gitlab'} = <<'END GITLAB';
-* remote origin
-  Fetch URL: git@gitlab.com:foo/bar
-  Push  URL: git@gitlab.com:foo/bar
-  HEAD branch: (not queried)
-  Remote branch: (status not queried)
-    master
-  Local branch configured for 'git pull':
-    master merges with remote master
-  Local ref configured for 'git push' (status not queried):
-    (matching) pushes to (matching)
-END GITLAB
-
-$result{'git remote show -n bitbucket'} = <<'END BITBUCKET';
-* remote origin
-  Fetch URL: git@bitbucket.org:foo/bar
-  Push  URL: git@bitbucket.org:foo/bar
-  HEAD branch: (not queried)
-  Remote branch: (status not queried)
-    master
-  Local branch configured for 'git pull':
-    master merges with remote master
-  Local ref configured for 'git push' (status not queried):
-    (matching) pushes to (matching)
-END BITBUCKET
 
 #---------------------------------------------------------------------
 sub make_ini {
@@ -153,6 +114,7 @@ sub build_tzil {
 sub github_deprecated {
     scalar grep { /github_http is deprecated/ } @{shift->log_messages};
 }    # end github_deprecated
+
 #---------------------------------------------------------------------
 sub remote_not_found {
     scalar grep { /Skipping invalid git remote/ } @{shift->log_messages};
@@ -182,14 +144,7 @@ sub remote_not_found {
 
     my $tzil = build_tzil(["repository = $url", 'type = svn']);
 
-    is_deeply(
-        $tzil->distmeta->{resources}{repository},
-        {
-            url  => $url,
-            type => 'svn'
-        },
-        "SVN with type"
-    );
+    is_deeply($tzil->distmeta->{resources}{repository}, {url => $url, type => 'svn'}, "SVN with type");
     ok(!github_deprecated($tzil), "SVN with type log message");
 }
 
@@ -200,15 +155,7 @@ sub remote_not_found {
 
     my $tzil = build_tzil(["repository = $url", "web = $web", 'type = svn']);
 
-    is_deeply(
-        $tzil->distmeta->{resources}{repository},
-        {
-            web  => $web,
-            url  => $url,
-            type => 'svn'
-        },
-        "SVN with type and web"
-    );
+    is_deeply($tzil->distmeta->{resources}{repository}, {web => $web, url => $url, type => 'svn'}, "SVN with type and web");
     ok(!github_deprecated($tzil), "SVN with type and web log message");
 }
 
@@ -380,14 +327,7 @@ sub remote_not_found {
 
     my $tzil = build_tzil([], '_darcs/prefs/repos' => "ssh:foo\n$url\n");
 
-    is_deeply(
-        $tzil->distmeta->{resources}{repository},
-        {
-            type => 'darcs',
-            url  => $url
-        },
-        "Auto darcs from prefs/repos"
-    );
+    is_deeply($tzil->distmeta->{resources}{repository}, {type => 'darcs', url => $url}, "Auto darcs from prefs/repos");
     ok(!github_deprecated($tzil), "Auto darcs from prefs/repos log message");
 }
 
@@ -395,20 +335,13 @@ sub remote_not_found {
 {
     my $tzil = build_tzil([], '.hg');
 
-    is_deeply(
-        $tzil->distmeta->{resources}{repository},
-        {
-            type => 'hg',
-            url  => 'https://foobar.googlecode.com/hg/'
-        },
-        "Auto hg"
-    );
+    is_deeply($tzil->distmeta->{resources}{repository}, {type => 'hg', url => 'https://foobar.googlecode.com/hg/'}, "Auto hg");
     ok(!github_deprecated($tzil), "Auto hg log message");
 }
 
 #---------------------------------------------------------------------
 {
-    my $web = 'http://code.google.com/p/foobar/';
+    my $web  = 'http://code.google.com/p/foobar/';
     my $tzil = build_tzil(["web = $web"], '.hg');
 
     is_deeply(
@@ -424,14 +357,6 @@ sub remote_not_found {
 }
 
 #---------------------------------------------------------------------
-$result{'git remote show -n nourl'} = <<'END GIT NOURL';
-* remote nourl
-  Fetch URL: origin
-  Push  URL: origin
-  HEAD branch: (not queried)
-  Remote branches: (status not queried)
-END GIT NOURL
-
 {
     my $tzil = build_tzil(['git_remote = nourl'], '.git');
 
@@ -440,34 +365,22 @@ END GIT NOURL
 }
 
 {
-    my $url = 'git://example.com/example.git';
+    my $url  = 'git://example.com/example.git';
     my $tzil = build_tzil(['git_remote = nourl', "repository = $url"], '.git');
 
     is_deeply(
         $tzil->distmeta->{resources}{repository},
-        {
-            type => 'git',
-            url  => $url
-        },
+        {type => 'git', url => $url, web => 'https://example.com/example'},
         "Auto git remote nourl with repository"
     );
     ok(!github_deprecated($tzil), "Auto git remote nourl with repository log message");
 }
 
-#---------------------------------------------------------------------
-$result{'git remote show -n github'} = <<'END GITHUB REMOTE NOT FOUND';
-* remote github
-  Fetch URL: github
-  Push  URL: github
-  HEAD branch: (not queried)
-  Remote branches: (status not queried)
-END GITHUB REMOTE NOT FOUND
-
 {
-    my $tzil = build_tzil(['git_remote = github'], '.git');
+    my $tzil = build_tzil(['git_remote = work'], '.git');
 
-    is($tzil->distmeta->{resources}{repository}, undef, "Auto git remote github not found");
-    ok(remote_not_found($tzil), "Auto git remote github not found");
+    is($tzil->distmeta->{resources}{repository}, undef, "Auto git remote work not found");
+    ok(!remote_not_found($tzil), "Auto git remote work not found");
 }
 
 #---------------------------------------------------------------------
@@ -486,4 +399,18 @@ END GITHUB REMOTE NOT FOUND
     ok(!github_deprecated($tzil), "Auto gitlab log message");
 }
 
+{
+    my $tzil = build_tzil(['repository = git@codeberg.org:foo/bar.git'], '.git');
+
+    is_deeply(
+        $tzil->distmeta->{resources}{repository},
+        {
+            type => 'git',
+            url  => 'git://codeberg.org/foo/bar.git',
+            web  => 'https://codeberg.org/foo/bar'
+        },
+        "Auto codeberg"
+    );
+    ok(!github_deprecated($tzil), "Auto codeberg log message");
+}
 done_testing;

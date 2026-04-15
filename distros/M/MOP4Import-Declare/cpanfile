@@ -7,6 +7,9 @@ requires 'JSON::MaybeXS';
 requires 'Sub::Util', '>= 1.40'; # For subname
 
 requires 'Module::Runtime'; # For module_notional_filename
+
+requires 'List::Util', '>= 1.45'; # For uniq
+
 recommends 'YAML::Syck';
 recommends 'Cpanel::JSON::XS', '>= 4.05';
 

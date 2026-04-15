@@ -18,15 +18,36 @@ use_ok("MOP4Import::Util::Inspector");
 
 my $testDir = "$FindBin::Bin/examples";
 
-{
+SKIP: {
+  skip "Not in MOP4Import", 5,
+    unless basename(dirname($FindBin::Bin)) eq 'MOP4Import';
+  
+  local $ENV{PERL5LIB} = "";
+
   my $modulinoFn = $INC{"MOP4Import/Util/Inspector.pm"};
   ok -x $modulinoFn, "Inspector.pm is executable";
-  stdout_is sub {
-    system $^X ($^X, $modulinoFn, "--lib=$testDir", list_commands_of => "t_Case1")
-  }, "foo\nhelp\n", "Inspector.pm as a modulino";
+
+  my $myLib = dirname(dirname(dirname($modulinoFn)));
+
+  my @run = ($^X, "-Mlib=$myLib", $modulinoFn);
 
   is_deeply decode_json(capture_stdout {
-    system $^X ($^X, $modulinoFn, "--lib=$testDir"
+    system $^X (@run, list_module_version => 'MOP4Import::Declare')
+  }), {
+    'MOP4Import::Declare' => $MOP4Import::Declare::VERSION,
+  }, "Inspector.pm's MOP4Import::Declare version sanity check($MOP4Import::Declare::VERSION)";
+
+  is_deeply decode_json(capture_stdout {
+    system $^X (@run, "--lib=$testDir"
+                , qw(list_module_path t_Case1))
+  }), +{t_Case1 => "$testDir/t_Case1.pm"}, "sanity check for t_Case1 path";
+
+  stdout_is sub {
+    system $^X (@run, "--lib=$testDir", list_commands_of => "t_Case1")
+  }, "foo\nhelp\n", "Inspector.pm list_commands_of t_Case1";
+
+  is_deeply decode_json(capture_stdout {
+    system $^X (@run, "--lib=$testDir"
                 , qw(info_code_attributes_of t_Case2 foo))
   }), +{Bar => "yy", Foo => "xx"}, "Custom code attributes";
 }
@@ -96,9 +117,14 @@ SKIP: {
     , "info_code_attributes_of(wo_m4i_method_att1 => bar)";
 }
 
-{
+SKIP: {
+  skip "Not in MOP4Import", 1,
+    unless basename(dirname($FindBin::Bin)) eq 'MOP4Import';
+
+  my $distLib = dirname(dirname($FindBin::Bin));
+
   stderr_like sub {
-    system $^X ($^X, "$testDir/t_Case1.pm")
+    system $^X ($^X, "-I$distLib", "$testDir/t_Case1.pm")
   }, qr{\A\QUsage: t_Case1.pm [--opt=value].. <Command> ARGS...
 
 Commands

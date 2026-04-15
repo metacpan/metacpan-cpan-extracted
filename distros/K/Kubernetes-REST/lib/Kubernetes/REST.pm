@@ -1,5 +1,5 @@
 package Kubernetes::REST;
-our $VERSION = '1.103';
+our $VERSION = '1.104';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
@@ -697,6 +697,121 @@ sub delete {
     return 1;
 }
 
+sub ensure {
+    my ($self, $object) = @_;
+
+
+    if (ref($object) eq 'HASH') {
+        my $kind = $object->{kind} or croak "ensure: hashref must have 'kind'";
+        my $class = $self->expand_class($kind);
+        $object = $self->k8s->struct_to_object($class, $object);
+    }
+
+    my $class = ref($object);
+    croak "ensure requires an IO::K8s object or hashref" unless blessed($object);
+    (my $kind = $class) =~ s/.*:://;
+    my $metadata = $object->metadata or croak "object must have metadata";
+    my $name = $metadata->name or croak "object must have metadata.name";
+    my $namespace = $metadata->namespace;
+
+    my $path = $self->_build_path($class, name => $name, namespace => $namespace);
+
+    my $existing = eval {
+        my $response = $self->_request('GET', $path);
+        return undef if $response->status == 404;
+        $self->_check_response($response, "ensure get $kind/$name");
+        $self->_inflate_object($class, $response);
+    };
+    my $get_err = $@;
+    die $get_err if $get_err && $get_err !~ /\b404\b/;
+
+    if ($existing) {
+        return $existing if $kind eq 'PersistentVolumeClaim';
+        if ($kind eq 'Job') {
+            my $status = $existing->status;
+            my $succeeded = $status && $status->succeeded;
+            my $active    = $status && $status->active;
+            return $existing if $succeeded || $active;
+            eval { $self->delete($existing) };
+            return $self->create($object);
+        }
+        $object->metadata->resourceVersion($existing->metadata->resourceVersion);
+        my $updated = eval { $self->update($object) };
+        return $updated if $updated;
+        if ($@ =~ /\b409\b/) {
+            $existing = $self->_request('GET', $path);
+            $self->_check_response($existing, "ensure refetch $kind/$name");
+            $existing = $self->_inflate_object($class, $existing);
+            $object->metadata->resourceVersion($existing->metadata->resourceVersion);
+            return $self->update($object);
+        }
+        die $@;
+    }
+
+    my $created = eval { $self->create($object) };
+    return $created if $created;
+
+    if ($@ =~ /\b409\b/) {
+        my $response = $self->_request('GET', $path);
+        $self->_check_response($response, "ensure post-409 get $kind/$name");
+        $existing = $self->_inflate_object($class, $response);
+        return $existing if $kind eq 'PersistentVolumeClaim';
+        $object->metadata->resourceVersion($existing->metadata->resourceVersion);
+        return $self->update($object);
+    }
+    die $@;
+}
+
+sub ensure_all {
+    my ($self, @objects) = @_;
+
+
+    return map { $self->ensure($_) } @objects;
+}
+
+sub ensure_only {
+    my ($self, %args) = @_;
+
+
+    my $label      = $args{label} or croak "ensure_only requires 'label'";
+    my @objects    = @{$args{objects} || []};
+    my @kinds      = @{$args{kinds} || []};
+    my @namespaces = @{$args{namespaces} || [undef]};
+
+    for my $obj (@objects) {
+        next unless ref($obj) eq 'HASH';
+        my $kind = $obj->{kind} or croak "ensure_only: hashref must have 'kind'";
+        my $class = $self->expand_class($kind);
+        $obj = $self->k8s->struct_to_object($class, $obj);
+    }
+
+    my @results = $self->ensure_all(@objects);
+
+    my %expected;
+    for my $obj (@objects) {
+        (my $kind = ref $obj) =~ s/.*:://;
+        my $key = join("\0", $kind, $obj->metadata->namespace // '');
+        $expected{$key}{$obj->metadata->name} = 1;
+    }
+
+    for my $kind (@kinds) {
+        for my $ns (@namespaces) {
+            my %list_args = (labelSelector => $label);
+            $list_args{namespace} = $ns if defined $ns;
+            my $list = eval { $self->list($kind, %list_args) };
+            next unless $list;
+            for my $item (@{$list->items}) {
+                my $item_ns = $item->metadata->namespace // '';
+                my $key = join("\0", $kind, $item_ns);
+                next if $expected{$key} && $expected{$key}{$item->metadata->name};
+                eval { $self->delete($item) };
+            }
+        }
+    }
+
+    return @results;
+}
+
 sub watch {
     my ($self, $short_class, %args) = @_;
 
@@ -1021,7 +1136,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 SYNOPSIS
 
@@ -1075,6 +1190,26 @@ version 1.103
     $api->delete($pod);
     # or by name:
     $api->delete('Pod', name => 'my-pod', namespace => 'default');
+
+    # Idempotent create-or-update (from a typed object or a manifest hashref)
+    $api->ensure($pod);
+    $api->ensure({
+        apiVersion => 'v1',
+        kind       => 'Secret',
+        metadata   => { name => 'my-secret', namespace => 'default' },
+        stringData => { password => 'hunter2' },
+    });
+
+    # Batch apply
+    $api->ensure_all(@objects);
+
+    # Apply a labeled set and prune anything with that label not in the set
+    $api->ensure_only(
+        label      => 'app.kubernetes.io/component=queen',
+        objects    => \@rbac_objects,
+        kinds      => [qw(Role RoleBinding ClusterRoleBinding)],
+        namespaces => ['default', undef],
+    );
 
 =head1 DESCRIPTION
 
@@ -1296,6 +1431,77 @@ See L<Kubernetes::REST/patch> for detailed examples.
 
 Delete a resource. Returns true on success.
 
+=head2 ensure
+
+    my $obj = $api->ensure($pod);
+    # or from a plain hashref (treated as a Kubernetes manifest):
+    my $secret = $api->ensure({
+        apiVersion => 'v1',
+        kind       => 'Secret',
+        metadata   => { name => 'foo', namespace => 'default' },
+        stringData => { password => 'hunter2' },
+    });
+
+Idempotent create-or-update. Fetches the resource by kind/name/namespace; if it
+exists, updates it (preserving C<resourceVersion>), otherwise creates it.
+Returns the resulting L<IO::K8s> object.
+
+Accepts either a typed L<IO::K8s> object or a plain hashref. A hashref must
+carry a C<kind> field and is inflated to a typed object via
+L<IO::K8s/struct_to_object>. Hashref keys follow the Kubernetes API convention
+(camelCase, e.g. C<stringData>, not C<string_data>).
+
+Handles common race conditions:
+
+=over 4
+
+=item * 404 on initial get is treated as "does not exist" and falls through to create.
+
+=item * 409 AlreadyExists on create (resource appeared between get and create) is
+retried as an update.
+
+=item * 409 Conflict on update (resourceVersion changed server-side, e.g. a
+controller wrote status) is retried by re-fetching and re-applying.
+
+=back
+
+Special-cases for kinds with server-side mutation constraints:
+
+=over 4
+
+=item * C<PersistentVolumeClaim> - spec is immutable after creation, so an existing
+PVC is returned unchanged.
+
+=item * C<Job> - spec is immutable; an existing Job that is active or has
+succeeded is returned unchanged. A failed Job is deleted and recreated.
+
+=back
+
+=head2 ensure_all
+
+    my @results = $api->ensure_all(@objects);
+
+Batch version of L</ensure>. Applies create-or-update to each object in order
+and returns the list of resulting objects.
+
+=head2 ensure_only
+
+    $api->ensure_only(
+        label      => 'app.kubernetes.io/component=queen',
+        objects    => \@objects,
+        kinds      => [qw(Role RoleBinding ClusterRoleBinding)],
+        namespaces => ['default', 'kube-system', undef],
+    );
+
+Like L</ensure_all>, but also B<deletes> any resources matching the label
+selector in the given kinds and namespaces that are not present in C<objects>.
+Use this for resources where stale objects must not survive (e.g. RBAC).
+
+Pass C<undef> inside C<namespaces> to scan cluster-scoped resources. If
+C<namespaces> is omitted, only cluster-scoped resources are scanned.
+
+Returns the list of applied objects (from L</ensure_all>).
+
 =head2 watch
 
     my $last_rv = $api->watch('Pod',
@@ -1417,7 +1623,8 @@ This version has been completely rewritten. Key changes that may affect your cod
 
 The old method-per-operation API (e.g., C<< $api->Core->ListNamespacedPod(...) >>)
 has been replaced with a simple API: C<list>, C<get>, C<create>, C<update>,
-C<patch>, C<delete>, C<watch>, C<log>, C<port_forward>, C<exec>, C<attach>.
+C<patch>, C<delete>, C<ensure>, C<ensure_all>, C<ensure_only>, C<watch>,
+C<log>, C<port_forward>, C<exec>, C<attach>.
 
 =item * B<Old API still works but deprecated>
 

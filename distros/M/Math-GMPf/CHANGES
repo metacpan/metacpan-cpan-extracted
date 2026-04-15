@@ -1,5 +1,11 @@
 Revision history for Perl module Math::GMPf
 
+0.56
+ - In t/get_set_NV.t, cater for some bugginess (now fixed in mpfr trunk)
+   in the mpfr library that would have some IEEE 754 subnormal values
+   returned by mpfr_get_ld() differ (by 1 ULP) from the representation
+   returned by mpfr_get_float128().
+
 0.55
  - In t/get_set_NVt, attend to some bad coding of diagnostic information
    and test a value that appears to cause a test failure in 0.54.

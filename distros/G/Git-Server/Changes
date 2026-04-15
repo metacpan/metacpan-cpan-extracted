@@ -1,5 +1,33 @@
 Revision History for Git::Server
 
+0.041  2026-04-14 18:00:00
+ - hooks/proxy enhancements:
+   * Allow multiple proxy.url remote targets.
+   * Allow syncing to an empty repo.
+   * Add "skip_proxy" feature to avoid cycles.
+ - git-verify enhancements:
+   * Better handling if no ~/.ssh/config file.
+   * Allow git-verify test without basedir.
+   * Note supported features in POD.
+   * Show FingerPrint for verification.
+ - git-deploy enhancements:
+   * Fix DEBUG crash if missing core.sshCommand.
+   * Don't crash with one bad [-i <identity>] option.
+   * Honor "-i" files as if before or after --chdir.
+   * Allow [ -i <PrivateKeyFile> ] if no PassPhrase.
+   * If Agent Forwarding, allow -i <PubKeyFile>.
+   * Or allow -i "<RawPubKey>" on commandline.
+   * Or any PubKey substring filter or regexp.
+   * Avoid using duplicate Public or Private keys.
+ - git-client enhancements:
+   * Better handling of other git-client in $PATH.
+   * OPTIMIZATION: Prevent looping back to itself.
+   * Cleaner "git -v" output
+ - git-server enhancements:
+   * If ExposeAuthInfo enabled, then show which PubKey
+     was connected with when no command is attempted.
+     i.e.,: $ ssh -T git@server.com
+
 0.040  2026-04-06 15:00:00
  - Prevent "mangling shebang" during build.
  - Security: Honor core.sshCommand if exists.

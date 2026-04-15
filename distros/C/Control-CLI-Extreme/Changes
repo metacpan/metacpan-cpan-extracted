@@ -134,3 +134,10 @@ Revision history for Control-CLI-Extreme
 	* Adjusted patterns for Y/N confirmation prompt
 	* Update to PassportERS VOSS error patterns
 	* Documentation updates for Control::CLI version 2.12 changes
+
+1.14	2026-04-14
+	* Corrections to documentation around wake_console default character string and implications if binmode
+	  is enabled on underlying Control::CLI
+	* Fixed warning about "Possible precedence problem between ! and string eq" appearing in latest Perl 5.42
+	* Added support for Extreme Networks OneOS
+	* Added new global attribute 'serial_number'

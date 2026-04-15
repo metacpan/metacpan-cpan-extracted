@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.35';
+our $VERSION = '2.37';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -159,30 +159,26 @@ sub sync_collectors {
         next if !defined $job->{name} || $job->{name} eq '';
 
         $active_collectors{ $job->{name} } = 1;
-        my $name = $job->{indicator}{name} || $job->{name} || next;
-        my $existing = eval { $self->get_indicator($name) } || {};
-        my $label = defined $job->{indicator}{label} && $job->{indicator}{label} ne ''
-          ? $job->{indicator}{label}
-          : $name;
-        my %candidate = (
-            %{$existing},
-            %{ $job->{indicator} },
-            name           => $name,
-            label          => $label,
-            status         => defined $existing->{status} && $existing->{status} ne '' ? $existing->{status} : 'missing',
-            collector_name => $job->{name},
-            managed_by_collector => 1,
-            prompt_visible => exists $job->{indicator}{prompt_visible}
-              ? $job->{indicator}{prompt_visible}
-              : exists $existing->{prompt_visible}
-              ? $existing->{prompt_visible}
-              : 1,
+        my $existing = eval { $self->get_indicator( $job->{indicator}{name} || $job->{name} ) } || {};
+        my $candidate = $self->collector_indicator_candidate(
+            $job,
+            existing => $existing,
+            status   => defined $existing->{status} && $existing->{status} ne '' ? $existing->{status} : 'missing',
         );
-        if ( !$self->_indicator_matches( $existing, \%candidate ) ) {
+        if ( !$self->_indicator_matches( $existing, $candidate ) ) {
+            my @preserve_existing = qw(status updated_at stale);
+            if (
+                defined $candidate->{icon_template}
+                && $candidate->{icon_template} ne ''
+                && defined $existing->{icon_template}
+                && $existing->{icon_template} eq $candidate->{icon_template}
+            ) {
+                push @preserve_existing, qw(icon icon_template);
+            }
             push @written, $self->set_indicator(
-                $name,
-                %candidate,
-                _preserve_existing_fields => [ qw(status updated_at stale) ],
+                $candidate->{name},
+                %{$candidate},
+                _preserve_existing_fields => \@preserve_existing,
             );
         }
     }
@@ -198,6 +194,72 @@ sub sync_collectors {
     }
 
     return \@written;
+}
+
+# collector_indicator_candidate($job, %opts)
+# Normalizes one collector-managed indicator payload from config plus optional
+# existing live state.
+# Input: collector job hash reference plus optional existing indicator hash and
+# explicit status override.
+# Output: normalized indicator hash reference ready for persistence.
+sub collector_indicator_candidate {
+    my ( $self, $job, %opts ) = @_;
+    die 'Collector indicator candidate requires a collector job hash'
+      if ref($job) ne 'HASH';
+    die 'Collector indicator candidate requires a collector name'
+      if !defined $job->{name} || $job->{name} eq '';
+
+    my $indicator = ref( $job->{indicator} ) eq 'HASH' ? $job->{indicator} : {};
+    my $name = $indicator->{name} || $job->{name};
+    my $existing = ref( $opts{existing} ) eq 'HASH'
+      ? $opts{existing}
+      : eval { $self->get_indicator($name) } || {};
+    my $label = defined $indicator->{label} && $indicator->{label} ne ''
+      ? $indicator->{label}
+      : $name;
+
+    my %candidate = (
+        %{$existing},
+        %{$indicator},
+        name                 => $name,
+        label                => $label,
+        status               => exists $opts{status}
+          ? $opts{status}
+          : defined $existing->{status} && $existing->{status} ne ''
+          ? $existing->{status}
+          : 'missing',
+        collector_name       => $job->{name},
+        managed_by_collector => 1,
+        prompt_visible       => exists $indicator->{prompt_visible}
+          ? $indicator->{prompt_visible}
+          : exists $existing->{prompt_visible}
+          ? $existing->{prompt_visible}
+          : 1,
+    );
+
+    if ( $self->_is_template_toolkit_text( $indicator->{icon} ) ) {
+        my $preserved_icon = '';
+        if (
+            defined $existing->{icon_template}
+            && $existing->{icon_template} eq $indicator->{icon}
+            && defined $existing->{icon}
+        ) {
+            $preserved_icon = $existing->{icon};
+        }
+        $candidate{icon_template} = $indicator->{icon};
+        $candidate{icon}          = $preserved_icon;
+    }
+    else {
+        delete $candidate{icon_template};
+        if ( exists $indicator->{icon} ) {
+            $candidate{icon} = defined $indicator->{icon} ? $indicator->{icon} : '';
+        }
+        else {
+            delete $candidate{icon};
+        }
+    }
+
+    return \%candidate;
 }
 
 # delete_indicator($name)
@@ -379,7 +441,7 @@ sub _page_status_icon {
 sub _indicator_matches {
     my ( $self, $existing, $candidate ) = @_;
     return 0 if ref($existing) ne 'HASH' || ref($candidate) ne 'HASH';
-    for my $key ( qw(name label alias icon status priority prompt_visible page_status_icon collector_name managed_by_collector) ) {
+    for my $key ( qw(name label alias icon icon_template status priority prompt_visible page_status_icon collector_name managed_by_collector) ) {
         my $left  = exists $existing->{$key}  ? $existing->{$key}  : undef;
         my $right = exists $candidate->{$key} ? $candidate->{$key} : undef;
         $left  = '' if !defined $left;
@@ -387,6 +449,16 @@ sub _indicator_matches {
         return 0 if $left ne $right;
     }
     return 1;
+}
+
+# _is_template_toolkit_text($text)
+# Detects whether a configured indicator field contains Template Toolkit syntax.
+# Input: optional text string.
+# Output: boolean true when the text contains a TT directive marker.
+sub _is_template_toolkit_text {
+    my ( $self, $text ) = @_;
+    return 0 if !defined $text || $text eq '';
+    return index( $text, '[%' ) >= 0 ? 1 : 0;
 }
 
 # _read_indicator_file($file)
@@ -435,7 +507,7 @@ for core generic indicators.
 
 =head1 METHODS
 
-=head2 new, set_indicator, get_indicator, list_indicators
+=head2 new, set_indicator, get_indicator, list_indicators, collector_indicator_candidate
 
 Construct and manage the indicator store.
 
@@ -447,7 +519,7 @@ Handle stale state and refresh built-in generic indicators.
 
 =head1 PURPOSE
 
-This module persists prompt and browser status indicators. It stores indicator definitions and live status updates, merges collector-managed indicators with user-managed ones, and provides the ordered indicator data used by the prompt renderer and the browser status strip.
+This module persists prompt and browser status indicators. It stores indicator definitions and live status updates, merges collector-managed indicators with user-managed ones, keeps TT-backed collector icon templates separate from their live rendered icon values, and provides the ordered indicator data used by the prompt renderer and the browser status strip.
 
 =head1 WHY IT EXISTS
 
@@ -455,7 +527,7 @@ It exists because indicators are shared state that multiple features read and wr
 
 =head1 WHEN TO USE
 
-Use this file when changing indicator JSON layout, sorting rules, collector-managed indicator behavior, or the persistence semantics of prompt-visible versus hidden indicators.
+Use this file when changing indicator JSON layout, sorting rules, collector-managed indicator behavior, TT-backed collector icon persistence, or the persistence semantics of prompt-visible versus hidden indicators.
 
 =head1 HOW TO USE
 

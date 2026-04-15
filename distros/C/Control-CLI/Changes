@@ -183,47 +183,38 @@ Revision history for Control-CLI
 	  The following tables summarize how and where newline translation was and is now performed.
 	  In previous module versions up to and including version 2.11:
 	  
-		Connection	Translation	OS	Newline	is			Newline sent as
-		=======================================================================================
-		Telnet		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
-				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
-				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
-		SSH		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
-				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
-				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
-		Serial		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
-				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
-				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		Connection	Translation	Newline		Newline sent as
+		===============================================================
+		Telnet		yes		"\n"	<=>	CRLF "\015\012"
+		SSH		no		"\n"	<=>	LF "\012"
+		Serial		no		"\n"	<=>	LF "\012"
 	  
 	  From version 2.12 with binmode disabled (default):
 	  
-		Connection	Translation	OS	Newline	is			Newline sent as
-		=======================================================================================
-		Telnet		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
-				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
-				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
-		SSH		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
-				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
-				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
-		Serial		yes		Unix	"\n" = LF "\012"	<=>	CRLF "\015\012"
-				yes		MAC	"\n" = CR "\015"	<=>	CRLF "\015\012"
-				yes		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		Connection	Translation	Newline		Newline sent as
+		===============================================================
+		Telnet		yes		"\n"	<=>	CRLF "\015\012"
+		SSH		yes		"\n"	<=>	CRLF "\015\012"
+		Serial		yes		"\n"	<=>	CRLF "\015\012"
 	  
 	  From version 2.12 with binmode enabled:
 	  
-		Connection	Translation	OS	Newline	is			Newline sent as
-		=======================================================================================
-		Telnet		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
-				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
-				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
-		SSH		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
-				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
-				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
-		Serial		no		Unix	"\n" = LF "\012"	<=>	LF "\012"
-				no		MAC	"\n" = CR "\015"	<=>	CR "\015"
-				no		Windows	"\n" = CRLF "\015\012"	<=>	CRLF "\015\012"
+		Connection	Translation	Newline		Newline sent as
+		===============================================================
+		Telnet		no		"\n"	<=>	LF "\012"
+		SSH		no		"\n"	<=>	LF "\012"
+		Serial		no		"\n"	<=>	LF "\012"
 
 	* Methods input_log, output_log and dump_log were re-implemented for Serial and SSH access, while they would simply reuse
 	  the same methods for Telnet access as Net::Telnet provides them. Now that newline translation is handled in this module,
 	  all of input_log, output_log and dump_log methods are also re-implemented for Telnet, thus providing consistency across
 	  all access types
+
+2.13	2026-04-14
+	* Seen issue on laptop where Win32::SerialPort serial port connection can enter an error condition when performing a
+	a write() and block forever. This module was not able to catch that error condition and calls to put() and print() would
+	hang forever, while the calling Perl script would appear to freeze. The put() and print() functions, with Win32::SerialPort,
+	now use the non-blocking write_bg() and will then wait 1 millisecond (new hard coded constant $ComWriteDoneDelay) before
+	checking write_done(0) for write success; in case of write failure, now the module is able to perform the expected error
+	mode action as expected
+	* Debug level bit 2 now also activates Win32::SerialPort's user_msg(1) and error_msg(1) functions

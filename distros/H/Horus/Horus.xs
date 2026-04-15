@@ -84,7 +84,8 @@ static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
     OpMORESIB_set(pushop, nextop); \
     OpLASTSIB_set(argop, NULL); \
     \
-    newop = newUNOP(OP_CUSTOM, 0, argop); \
+    newop = newUNOP(OP_NULL, 0, argop); \
+    newop->op_type = OP_CUSTOM; \
     newop->op_ppaddr = pp_horus_##name; \
     op_free(entersubop); \
     return newop; \
@@ -118,7 +119,8 @@ static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
     OpLASTSIB_set(arg1, NULL); \
     OpLASTSIB_set(arg2, NULL); \
     \
-    newop = newBINOP(OP_CUSTOM, 0, arg1, arg2); \
+    newop = newBINOP(OP_NULL, 0, arg1, arg2); \
+    newop->op_type = OP_CUSTOM; \
     newop->op_ppaddr = pp_horus_##name; \
     op_free(entersubop); \
     return newop; \
@@ -213,7 +215,8 @@ static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
         nextop = OpSIBLING(argop); \
         OpMORESIB_set(pushop, nextop); \
         OpLASTSIB_set(argop, NULL); \
-        newop = newUNOP(OP_CUSTOM, 0, argop); \
+        newop = newUNOP(OP_NULL, 0, argop); \
+        newop->op_type = OP_CUSTOM; \
         newop->op_ppaddr = pp_horus_##name##_fmt; \
     } else { \
         return entersubop; \
@@ -457,7 +460,8 @@ static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
         nextop = OpSIBLING(arg1); \
         OpMORESIB_set(pushop, nextop); \
         OpLASTSIB_set(arg1, NULL); \
-        newop = newUNOP(OP_CUSTOM, 0, arg1); \
+        newop = newUNOP(OP_NULL, 0, arg1); \
+        newop->op_type = OP_CUSTOM; \
         newop->op_ppaddr = pp1; \
     } else if (argc == 2) { \
         arg1 = OpSIBLING(pushop); \
@@ -466,7 +470,8 @@ static OP *horus_ck_##name(pTHX_ OP *entersubop, GV *namegv, SV *protosv) { \
         OpMORESIB_set(pushop, nextop); \
         OpLASTSIB_set(arg1, NULL); \
         OpLASTSIB_set(arg2, NULL); \
-        newop = newBINOP(OP_CUSTOM, 0, arg1, arg2); \
+        newop = newBINOP(OP_NULL, 0, arg1, arg2); \
+        newop->op_type = OP_CUSTOM; \
         newop->op_ppaddr = pp2; \
     } else { \
         return entersubop; \

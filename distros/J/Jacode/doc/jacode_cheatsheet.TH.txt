@@ -1,0 +1,120 @@
+################################################################################
+# แผ่นสรุป Jacode (TH)
+# Jacode - โปรแกรม Perl สำหรับแปลงรหัสอักขระภาษาญี่ปุ่น
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ การติดตั้ง
+
+  cpanm Jacode
+
+  หรือดาวน์โหลด Jacode.pm และ jacode.pl จาก https://metacpan.org/pod/Jacode
+  แล้ววางไฟล์ทั้งสองในไดเรกทอรีเดียวกัน
+
+■ การใช้งาน
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # แปลงสตริงในที่เดิม (การใช้งานทั่วไปที่สุด)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # ค่าที่ส่งคืน (บริบทรายการ)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # ค่าที่ส่งคืน (บริบทสเกลาร์)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # ฟังก์ชันห่อหุ้มที่ส่งคืนค่า
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # ตรวจจับการเข้ารหัส
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # ควบคุมลำดับหลีก JIS
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # การเริ่มต้น
+  Jacode::init();
+
+  # ควบคุมแคช
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ ชื่อการเข้ารหัส
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (รวม CP932)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... ไบนารี (แปลงไม่ได้)
+
+■ ตัวเลือก
+
+  'z'  ... คะนะความกว้างครึ่ง → คะนะความกว้างเต็ม (h2z)
+  'h'  ... คะนะความกว้างเต็ม → คะนะความกว้างครึ่ง (z2h)
+
+■ ลำดับเริ่มต้นคันจิ JIS
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (ค่าเริ่มต้น)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 ระนาบ 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 ระนาบ 1
+
+■ ตัวอย่างการแปลง
+
+  # Shift_JIS เป็น UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP เป็น Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # ตรวจจับอัตโนมัติ ส่งออกเป็น JIS
+  Jacode::convert(\$line, 'jis');
+
+  # แปลงคะนะความกว้างครึ่งพร้อมกับ SJIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # แปลงทุกบรรทัดของไฟล์
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ บรรทัดคำสั่ง (โหมด pkf)
+
+  perl jacode.pl [ตัวเลือก] [-[อินพุต]เอาต์พุต] ไฟล์
+
+  perl jacode.pl file          # แปลงเป็น JIS
+  perl jacode.pl -sw file      # Shift_JIS เป็น UTF-8
+  perl jacode.pl -es file      # EUC-JP เป็น Shift_JIS
+  perl jacode.pl -me file      # ไฟล์การเข้ารหัสผสม → EUC-JP (ไดนามิก)
+  perl jacode.pl -mc file      # แปลงและแสดงชื่อการเข้ารหัสต่อบรรทัด
+
+  ตัวเลือก:
+  -b  เอาต์พุตแบบบัฟเฟอร์ (ค่าเริ่มต้น)
+  -u  เอาต์พุตแบบไม่มีบัฟเฟอร์
+  -m  การรู้จำการเข้ารหัสอินพุตแบบไดนามิก
+  -c  แสดงชื่อการเข้ารหัส
+  -Z  คะนะความกว้างครึ่ง → ความกว้างเต็ม
+  -H  คะนะความกว้างเต็ม → ความกว้างครึ่ง
+  -f [unix|mac|dos]  แปลงอักขระขึ้นบรรทัดใหม่
+
+■ ความเข้ากันได้กับ jcode.pl
+
+  Jacode เข้ากันได้กับ jcode.pl ของ Utashiro
+  นามแฝงเนมสเปซ jcode:: ก็ใช้งานได้เช่นกัน
+
+################################################################################

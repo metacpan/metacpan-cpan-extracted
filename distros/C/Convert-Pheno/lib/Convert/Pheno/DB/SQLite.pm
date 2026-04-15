@@ -6,6 +6,7 @@ use autodie;
 use feature qw(say);
 use DBI;
 use File::Spec::Functions qw(catdir catfile);
+use Time::HiRes qw(time);
 use Data::Dumper;
 use Exporter 'import';
 use Convert::Pheno::DB::Similarity;
@@ -14,6 +15,122 @@ our @EXPORT =
 my @matches = qw(exact_match full_text_search);    # excluded 'contains'
 
 use constant DEVEL_MODE => 0;
+
+my %COLUMN_MATCH_CONFIG = (
+    label         => { exact_collate_nocase => 1 },
+    id            => { exact_collate_nocase => 1 },
+    concept_id    => { exact_collate_nocase => 0 },
+    vocabulary_id => { exact_collate_nocase => 1 },
+);
+
+sub _db_profile_enabled {
+    my ($self) = @_;
+    return $self && defined $self->{debug} && $self->{debug} >= 2;
+}
+
+sub _db_profile_path {
+    my ( $self, @keys ) = @_;
+    return unless _db_profile_enabled($self);
+    return unless @keys;
+
+    my $node = $self->{db_profile} ||= {};
+    for my $key ( @keys[ 0 .. $#keys - 1 ] ) {
+        $node->{$key} ||= {};
+        $node = $node->{$key};
+    }
+
+    return ( $node, $keys[-1] );
+}
+
+sub _db_profile_inc {
+    my ( $self, @keys ) = @_;
+    my ( $node, $leaf ) = _db_profile_path( $self, @keys ) or return 1;
+    $node->{$leaf} = ( $node->{$leaf} // 0 ) + 1;
+    return 1;
+}
+
+sub _db_profile_add {
+    my ( $self, $value, @keys ) = @_;
+    return 1 unless defined $value;
+    my ( $node, $leaf ) = _db_profile_path( $self, @keys ) or return 1;
+    $node->{$leaf} = ( $node->{$leaf} // 0 ) + $value;
+    return 1;
+}
+
+sub _db_profile_get {
+    my ( $hashref, @keys ) = @_;
+    my $node = $hashref;
+    for my $key (@keys) {
+        return 0 unless ref $node eq 'HASH' && exists $node->{$key};
+        $node = $node->{$key};
+    }
+    return $node // 0;
+}
+
+sub _db_profile_reset {
+    my ($self) = @_;
+    return 1 unless _db_profile_enabled($self);
+    $self->{db_profile} = { started_at => time };
+    return 1;
+}
+
+sub _emit_db_profile_summary {
+    my ($self) = @_;
+    return 1 unless _db_profile_enabled($self);
+
+    my $profile = delete $self->{db_profile};
+    return 1 unless $profile;
+
+    my $elapsed = time - ( $profile->{started_at} || time );
+    my @lines   = ('DB lookup profile:');
+
+    push @lines,
+      sprintf(
+        '  mapping requests=%d cache_hits=%d db_lookups=%d elapsed=%.3fs',
+        _db_profile_get( $profile, 'mapping', 'requests' ),
+        _db_profile_get( $profile, 'mapping', 'cache_hits' ),
+        _db_profile_get( $profile, 'mapping', 'db_lookups' ),
+        $elapsed,
+      );
+
+    push @lines,
+      sprintf(
+        '  final resolution exact=%d similarity=%d fallback_na=%d',
+        _db_profile_get( $profile, 'final_resolution', 'exact' ),
+        _db_profile_get( $profile, 'final_resolution', 'similarity' ),
+        _db_profile_get( $profile, 'final_resolution', 'fallback_na' ),
+      );
+
+    push @lines,
+      sprintf(
+        '  sql exact_match=%d full_text_search=%d rows_fetched=%d candidate_rows=%d shortlisted=%d failures=%d time=%.3fs',
+        _db_profile_get( $profile, 'sql', 'match_type', 'exact_match',      'executions' ),
+        _db_profile_get( $profile, 'sql', 'match_type', 'full_text_search', 'executions' ),
+        _db_profile_get( $profile, 'sql', 'rows_fetched' ),
+        _db_profile_get( $profile, 'sql', 'candidate_rows' ),
+        _db_profile_get( $profile, 'sql', 'shortlisted_candidates' ),
+        _db_profile_get( $profile, 'sql', 'failures' ),
+        _db_profile_get( $profile, 'sql', 'total_time' ),
+      );
+
+    my $ontologies = $profile->{ontology} || {};
+    for my $ontology ( sort keys %{$ontologies} ) {
+        push @lines,
+          sprintf(
+            '  ontology[%s] requests=%d cache_hits=%d db_lookups=%d exact=%d similarity=%d fallback_na=%d',
+            $ontology,
+            _db_profile_get( $ontologies, $ontology, 'requests' ),
+            _db_profile_get( $ontologies, $ontology, 'cache_hits' ),
+            _db_profile_get( $ontologies, $ontology, 'db_lookups' ),
+            _db_profile_get( $ontologies, $ontology, 'final_resolution', 'exact' ),
+            _db_profile_get( $ontologies, $ontology, 'final_resolution', 'similarity' ),
+            _db_profile_get( $ontologies, $ontology, 'final_resolution', 'fallback_na' ),
+          );
+    }
+
+    print STDERR join( "\n", @lines ), "\n";
+    return 1;
+}
 
 ########################
 ########################
@@ -37,6 +154,8 @@ sub open_connections_SQLite {
     # The 'ohdsi' database is treated as an exception due to its larger size.
     # Opening the 'ohdsi' database can impact performance timings, so it's only
     # opened if explicitly required (indicated by $self->{ohdsi_db}).
+    _db_profile_reset($self);
+
     my @databases = @{ $self->{databases} };
 
     # Open databases
@@ -58,6 +177,7 @@ sub close_connections_SQLite {
     my $dbh       = $self->{dbh};
     my @databases = @{ $self->{databases} };
     close_db_SQLite( $dbh->{$_} ) for (@databases);
+    _emit_db_profile_summary($self);
     return 1;
 }
 
@@ -91,11 +211,11 @@ sub open_db_SQLite {
 
 sub get_database_file_path {
     my ( $ontology, $path_to_ohdsi_db ) = @_;
-    my $filename = "$ontology.db";
+    my $filename = defined $ontology ? "$ontology.db" : '.db';
     my $path =
-      ( $ontology eq 'ohdsi' && defined $path_to_ohdsi_db )
+      ( defined $ontology && $ontology eq 'ohdsi' && defined $path_to_ohdsi_db )
       ? $path_to_ohdsi_db
-      : catdir( $Convert::Pheno::share_dir, 'db' );
+      : catdir( $Convert::Pheno::share_dir // q{}, 'db' );
     return catfile( $path, $filename );
 }
 
@@ -160,6 +280,10 @@ sub build_query {
     my ( $ontology, $column, $match ) = @_;
     my $db     = uc($ontology) . '_table';
     my $db_fts = uc($ontology) . '_fts';
+    my $exact_predicate =
+      $COLUMN_MATCH_CONFIG{$column}{exact_collate_nocase}
+      ? qq($column = ? COLLATE NOCASE)
+      : qq($column = ?);
 
     my %match_type = (
 
@@ -169,7 +293,7 @@ sub build_query {
         # Exact search queries
         # What out for leading spaces!!!
         # SELECT * FROM HPO_table WHERE TRIM(label) = ? COLLATE NOCASE
-        exact_match => qq(SELECT * FROM $db WHERE $column = ? COLLATE NOCASE),
+        exact_match => qq(SELECT * FROM $db WHERE $exact_predicate),
 
         # **********************
         # *** IMPORTANT STEP ***
@@ -205,6 +329,7 @@ sub get_ontology_terms {
     my $text_similarity_method    = $arg->{text_similarity_method};
     my $min_text_similarity_score = $arg->{min_text_similarity_score};
     my $levenshtein_weight        = $arg->{levenshtein_weight};
+    my $self                      = $arg->{self};
     say "QUERY <$query> ONTOLOGY <$ontology> COLUM <$column> SEARCH <$search>\n      min_text_similarity_score <$min_text_similarity_score> levenshtein_weight<$levenshtein_weight>"
       if DEVEL_MODE;
 
@@ -224,7 +349,7 @@ sub get_ontology_terms {
     $default_value{concept_id} = 0 if $ontology eq 'ohdsi';
 
     # exact_match (always performed)
-    my ( $id, $label, $concept_id ) = execute_query_SQLite(
+    my ( $id, $label, $concept_id, $search_resolution ) = execute_query_SQLite(
         {
             sth                       => $sth_column_ref->{exact_match},    # IMPORTANT STEP
             query                     => $query,
@@ -234,7 +359,8 @@ sub get_ontology_terms {
             match_type                => 'exact_match',
             text_similarity_method    => $text_similarity_method,           # Not used here
             min_text_similarity_score => $min_text_similarity_score,
-            levenshtein_weight        => $levenshtein_weight
+            levenshtein_weight        => $levenshtein_weight,
+            self                      => $self,
         }
     );
 
@@ -243,7 +369,7 @@ sub get_ontology_terms {
         if ( $search eq 'mixed' || $search eq 'fuzzy' ) {
             print "EXECUTING SEARCH <$search> on QUERY <$query>\n"
               if DEVEL_MODE;
-            ( $id, $label, $concept_id ) = execute_query_SQLite(
+            ( $id, $label, $concept_id, $search_resolution ) = execute_query_SQLite(
                 {
                     sth        => $sth_column_ref->{'full_text_search'},    # IMPORTANT STEP
                     query      => $query,
@@ -253,7 +379,8 @@ sub get_ontology_terms {
                     search     => $search,
                     text_similarity_method    => $text_similarity_method,
                     min_text_similarity_score => $min_text_similarity_score,
-                    levenshtein_weight        => $levenshtein_weight
+                    levenshtein_weight        => $levenshtein_weight,
+                    self                      => $self,
                 }
             );
         }
@@ -265,12 +392,15 @@ sub get_ontology_terms {
     if ( $ontology eq 'ohdsi' ) {
         $concept_id = $concept_id // $default_value{concept_id};
     }
+    $search_resolution = defined $id && $id eq $default_value{id}
+      ? 'fallback_na'
+      : $search_resolution // 'fallback_na';
 
     #############
     # END QUERY #
     #############
 
-    return ( $id, $label, $concept_id );
+    return ( $id, $label, $concept_id, $search_resolution );
 
 }
 
@@ -285,12 +415,15 @@ sub execute_query_SQLite {
     my @databases                 = @{ $arg->{databases} };
     my $search                    = $arg->{search};
     my $levenshtein_weight        = $arg->{levenshtein_weight};
+    my $self                      = $arg->{self};
+    my $started_at                = _db_profile_enabled($self) ? time : undef;
 
     # Initialize $id and $label to undefined
-    my ( $id, $label, $concept_id ) = ( undef, undef, undef );
+    my ( $id, $label, $concept_id, $search_resolution ) =
+      ( undef, undef, undef, undef );
 
     # Premature return if $query is empty
-    return ( $id, $label, $concept_id ) if $query eq '';
+    return ( $id, $label, $concept_id, $search_resolution ) if $query eq '';
 
     # Preprocess query for execution
     $query = prune_problematic_chars( $query, $match_type );
@@ -317,12 +450,17 @@ sub execute_query_SQLite {
 
     # Execute the query
     $sth->bind_param( 1, $query );
+    _db_profile_inc( $self, 'sql', 'match_type', $match_type, 'executions' );
 
+    my $execute_started_at = _db_profile_enabled($self) ? time : undef;
     eval { $sth->execute(); };
     if ($@) {
+        _db_profile_inc( $self, 'sql', 'failures' );
         warn "Query execution failed: $@";
-        return ( $id, $label, $concept_id );
+        return ( $id, $label, $concept_id, $search_resolution );
     }
+    _db_profile_add( $self, time - $execute_started_at, 'sql', 'execute_time' )
+      if defined $execute_started_at;
 
     # HPO to HP
     chop($ontology) if $ontology eq 'hpo';
@@ -331,12 +469,14 @@ sub execute_query_SQLite {
     if ( $match_type eq 'exact_match' ) {
         say "MATCH_TYPE: <exact_match>" if DEVEL_MODE;
         while ( my $row = $sth->fetchrow_arrayref ) {
+            _db_profile_inc( $self, 'sql', 'rows_fetched' );
             $id =
               $ontology ne 'ohdsi'
               ? uc($ontology) . ':' . $row->[$id_column]
               : $row->[3] . ':' . $row->[$id_column];
             $label      = $row->[$label_column];
             $concept_id = $row->[$concept_id_column];
+            $search_resolution = 'exact';
             last;    # Only the first match is used
         }
     }
@@ -346,7 +486,8 @@ sub execute_query_SQLite {
         if ( $search eq 'mixed' ) {
 
             # For other match types, use text similarity
-            ( $id, $label, $concept_id ) = similarity_match(
+            my $stats;
+            ( $id, $label, $concept_id, $stats ) = similarity_match(
                 {
                     sth                       => $sth,
                     query                     => $query,
@@ -356,14 +497,20 @@ sub execute_query_SQLite {
                     text_similarity_method    => $text_similarity_method,
                     min_text_similarity_score => $min_text_similarity_score,
                     levenshtein_weight        => $levenshtein_weight,
-                    concept_id_column         => $concept_id_column
+                    concept_id_column         => $concept_id_column,
+                    self                      => $self,
                 }
             );
+            _db_profile_add( $self, $stats->{candidate_rows},         'sql', 'candidate_rows' );
+            _db_profile_add( $self, $stats->{shortlisted_candidates}, 'sql', 'shortlisted_candidates' );
+            _db_profile_add( $self, $stats->{evaluation_time},        'sql', 'similarity_time' );
+            $search_resolution = defined $id ? 'similarity' : undef;
         }
         else {
 
             # Call a subroutine to compute composite similarity.
-            ( $id, $label, $concept_id ) = composite_similarity_match(
+            my $stats;
+            ( $id, $label, $concept_id, $stats ) = composite_similarity_match(
                 {
                     sth                       => $sth,
                     query                     => $query,
@@ -373,19 +520,26 @@ sub execute_query_SQLite {
                     text_similarity_method    => $text_similarity_method,      # cosine or dice
                     min_text_similarity_score => $min_text_similarity_score,
                     levenshtein_weight        => $levenshtein_weight,
-                    concept_id_column         => $concept_id_column
+                    concept_id_column         => $concept_id_column,
+                    self                      => $self,
 
                       # Possibly additional parameters, e.g., weighting factors
                 }
             );
+            _db_profile_add( $self, $stats->{candidate_rows},         'sql', 'candidate_rows' );
+            _db_profile_add( $self, $stats->{shortlisted_candidates}, 'sql', 'shortlisted_candidates' );
+            _db_profile_add( $self, $stats->{evaluation_time},        'sql', 'similarity_time' );
+            $search_resolution = defined $id ? 'similarity' : undef;
         }
     }
 
     # Finish the statement handle
     $sth->finish();
+    _db_profile_add( $self, time - $started_at, 'sql', 'total_time' )
+      if defined $started_at;
 
     # Return the results
-    return ( $id, $label, $concept_id );
+    return ( $id, $label, $concept_id, $search_resolution );
 }
 
 sub prune_problematic_chars {
@@ -429,12 +583,15 @@ sub similarity_match {
     my $min_score         = $arg->{min_text_similarity_score};
     my $sim_method        = $arg->{text_similarity_method};      # 'dice' or 'cosine'
     my $concept_id_column = $arg->{concept_id_column};
+    my $started_at        = _db_profile_enabled( $arg->{self} ) ? time : undef;
+    my $candidate_rows    = 0;
 
     # Create a new Text::Similarity object.
     my $ts = Text::Similarity::Overlaps->new();
 
     my @results;
     while ( my $row = $sth->fetchrow_arrayref() ) {
+        $candidate_rows++;
         my $candidate_label = $row->[$label_column];
         say "--- MIXED: Computing similarity for candidate <$candidate_label>"
           if DEVEL_MODE;
@@ -470,9 +627,14 @@ sub similarity_match {
     }
 
     # Return the top candidate if available, otherwise return undefined values.
+    my $stats = {
+        candidate_rows         => $candidate_rows,
+        shortlisted_candidates => scalar @results,
+        evaluation_time        => defined $started_at ? time - $started_at : undef,
+    };
     return @results
-      ? ( $results[0]->{id}, $results[0]->{label}, $results[0]->{concept_id} )
-      : ( undef, undef, undef );
+      ? ( $results[0]->{id}, $results[0]->{label}, $results[0]->{concept_id}, $stats )
+      : ( undef, undef, undef, $stats );
 }
 
 sub composite_similarity_match {
@@ -487,9 +649,12 @@ sub composite_similarity_match {
     my $levenshtein_weight     = $arg->{levenshtein_weight};
     my $token_weight           = 1 - $levenshtein_weight;
     my $concept_id_column      = $arg->{concept_id_column};
+    my $started_at             = _db_profile_enabled( $arg->{self} ) ? time : undef;
+    my $candidate_rows         = 0;
 
     my @results;
     while ( my $row = $sth->fetchrow_arrayref() ) {
+        $candidate_rows++;
         my $candidate_label = $row->[$label_column];
         my $token_sim =
           Convert::Pheno::DB::Similarity::compute_token_similarity( $query,
@@ -518,8 +683,13 @@ sub composite_similarity_match {
     }
     @results = sort { $b->{composite} <=> $a->{composite} } @results;
     print Dumper \@results if DEVEL_MODE;
+    my $stats = {
+        candidate_rows         => $candidate_rows,
+        shortlisted_candidates => scalar @results,
+        evaluation_time        => defined $started_at ? time - $started_at : undef,
+    };
     return @results
-      ? ( $results[0]->{id}, $results[0]->{label}, $results[0]->{concept_id} )
-      : ( undef, undef, undef );
+      ? ( $results[0]->{id}, $results[0]->{label}, $results[0]->{concept_id}, $stats )
+      : ( undef, undef, undef, $stats );
 }
 1;

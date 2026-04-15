@@ -1,5 +1,26 @@
 Revision history for Developer Dashboard
 
+2.37  2026-04-14
+    - added TT-backed collector indicator icons so `indicator.icon` values such
+      as `[% a %]` now render against collector stdout JSON before the live
+      indicator is persisted
+    - kept configured TT icon source separate from the live rendered icon so
+      later config-sync reads preserve the rendered value instead of reverting
+      prompt and browser state back to raw `[% ... %]` text
+    - turned invalid JSON or Template Toolkit render failures for TT-backed
+      collector icons into explicit collector errors, with focused unit and CLI
+      smoke coverage plus synced collector docs
+
+2.36  2026-04-14
+    - fixed `dashboard collector log` so it now prints explicit collector
+      transcripts instead of a usually blank shared file
+    - added `dashboard collector log <name>` for named collector inspection,
+      including explicit no-log-yet messaging for configured collectors that
+      have not run
+    - persisted per-collector log transcripts in the collector state layer and
+      added focused unit and CLI smoke coverage for named, aggregate, and
+      unknown-collector log handling
+
 2.35  2026-04-13
     - added a tarball-level CPANTS kwalitee guard so the built
       `Developer-Dashboard-X.XX.tar.gz` must score 100 percent before release

@@ -27,6 +27,7 @@ use overload
 	"~~" => "include",
 	"eq" => "equal",
 	"ne" => "nonequal",
+	">>" => "coerce",
 ;
 
 Aion::Meta::Util::create_getters(qw/name args as me/);
@@ -52,6 +53,7 @@ $Aion::Type::SELF = {
 # * message (CodeRef) — Сообщение об ошибке.
 # * title (Str) — Заголовок.
 # * description (Str) — Описание.
+# * example (Any) — Пример.
 # * me (Str) — Только для типа Me: пакет в котором он был объявлен.
 sub new {
 	my $cls = shift;
@@ -193,6 +195,16 @@ sub description {
 	}
 }
 
+# Описание
+sub example {
+	my ($self, $description) = @_;
+	if(@_ == 1) {
+		$self->{example}
+	} else {
+		bless {%$self, example => $description}, ref $self
+	}
+}
+
 # Создаёт функцию для типа
 sub make {
 	my ($self, $pkg) = @_;
@@ -296,7 +308,7 @@ Aion::Type - class of validators
 	"a" ~~ ~$Int; # => 1
 	5   ~~ ~$Int; # -> ""
 	
-	eval { $Int->validate("a", "..Eval..") }; $@	# ~> ..Eval.. must have the type Int. The it is 'a'
+	eval { $Int->validate("a", "..Eval..") }; $@ # ~> ..Eval.. must have the type Int. The it is 'a'
 
 =head1 DESCRIPTION
 
@@ -506,7 +518,7 @@ Creates a subroutine with arguments that returns a type.
 		})->make_arg(__PACKAGE__);
 	}
 	
-	"IX" ~~ Len[2,2]	# => 1
+	"IX" ~~ Len[2,2] # => 1
 
 If the routine cannot be created, an exception is thrown.
 
@@ -524,9 +536,9 @@ Creates a subroutine with arguments that returns a type.
 		)->make_maybe_arg(__PACKAGE__);
 	}
 	
-	3 ~~ Enum123			# -> 1
-	3 ~~ Enum123[4,5,6]	 # -> ""
-	5 ~~ Enum123[4,5,6]	 # -> 1
+	3 ~~ Enum123        # -> 1
+	3 ~~ Enum123[4,5,6] # -> ""
+	5 ~~ Enum123[4,5,6] # -> 1
 
 If the routine cannot be created, an exception is thrown.
 
@@ -600,11 +612,15 @@ Header accessor (used to create the B<swagger> schema).
 
 Description accessor (used to create a B<swagger> schema).
 
+=head2 example (;$example)
+
+Example accessor (used to create the B<swagger> schema).
+
 =head1 OPERATORS
 
 =head2 &{}
 
-Makes the object callable.
+Tests C<$_>.
 
 	my $PositiveInt = Aion::Type->new(
 		name => "PositiveInt",
@@ -627,9 +643,9 @@ Strings an object.
 	
 	"$Enum" # => Enum['A', 'B', 'C']
 
-=head2 $a | $b
+=head2 |
 
-Creates a new type as the union of C<$a> and C<$b>.
+Or. Creates a new type as a union of two.
 
 	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 	my $Char = Aion::Type->new(name => "Char", test => sub { /^.\z/ });
@@ -640,9 +656,9 @@ Creates a new type as the union of C<$a> and C<$b>.
 	"a"  ~~ $IntOrChar # -> 1
 	"ab" ~~ $IntOrChar # -> ""
 
-=head2 $a & $b
+=head2 &
 
-Creates a new type as the intersection of C<$a> and C<$b>.
+I. Creates a new type as the intersection of two.
 
 	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 	my $Char = Aion::Type->new(name => "Char", test => sub { /^.\z/ });
@@ -653,18 +669,27 @@ Creates a new type as the intersection of C<$a> and C<$b>.
 	77 ~~ $Digit # -> ""
 	"a" ~~ $Digit # -> ""
 
-=head2 ~ $a
+=head2 ~
 
-Creates a new type as an exception to C<$a>.
+Not. Creates a new type as an exception to the given one.
 
 	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 	
 	"a" ~~ ~$Int; # -> 1
 	5   ~~ ~$Int; # -> ""
 
-=head2 $a eq $b, $a == $b
+=head2 ~~
 
-C<$a> is equal to C<$b>.
+Tests the value.
+
+	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
+	
+	$Int ~~ 3    # -> 1
+	-6   ~~ $Int # -> 1
+
+=head2 eq, ==
+
+Compares two types.
 
 	my $Int1 = Aion::Type->new(name => "Int");
 	my $Int2 = Aion::Type->new(name => "Int");
@@ -672,16 +697,27 @@ C<$a> is equal to C<$b>.
 	$Int1 eq $Int2 # -> 1
 	$Int1 == $Int2 # -> 1
 
-=head2 $a ne $b, $a != $b
+=head2 ne, !=
 
-C<$a> is not equal to C<$b>.
+Checks that the types are not equal.
 
 	my $Int1 = Aion::Type->new(name => "Int");
 	my $Int2 = Aion::Type->new(name => "Int");
 	
 	$Int1 ne $Int2 # -> ""
 	$Int1 != $Int2 # -> ""
-	123 ne $Int2 # -> 1
+	123   ne $Int2 # -> 1
+
+=head2 >>
+
+Casting to type.
+
+	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
+	$Int->{coerce} = [[$Int => sub { $_ + 5 }]];
+	
+	5 >> $Int # -> 10
+	
+	$Int >> -4 # -> 1
 
 =head1 AUTHOR
 

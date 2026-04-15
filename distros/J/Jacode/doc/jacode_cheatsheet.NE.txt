@@ -1,0 +1,120 @@
+################################################################################
+# Jacode द्रुत सन्दर्भ पत्र (NE)
+# Jacode - जापानी क्यारेक्टर कोड रूपान्तरणको लागि Perl कार्यक्रम
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ स्थापना
+
+  cpanm Jacode
+
+  वा https://metacpan.org/pod/Jacode बाट Jacode.pm र jacode.pl
+  डाउनलोड गर्नुहोस् र दुवै फाइल एउटै डाइरेक्टरीमा राख्नुहोस्।
+
+■ प्रयोग
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # स्ट्रिङलाई यथास्थानमा रूपान्तरण गर्नुहोस् (सबैभन्दा सामान्य प्रयोग)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # फर्काउने मानहरू (सूची सन्दर्भ)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # फर्काउने मान (स्केलर सन्दर्भ)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # मान फर्काउने र्यापर फङ्सनहरू
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # एन्कोडिङ पत्ता लगाउनुहोस्
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # JIS इस्केप अनुक्रम नियन्त्रण
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # प्रारम्भिकरण
+  Jacode::init();
+
+  # क्यास नियन्त्रण
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ एन्कोडिङ नामहरू
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (CP932 सहित)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... बाइनरी (रूपान्तरण असम्भव)
+
+■ विकल्पहरू
+
+  'z'  ... अर्ध-चौडाइ काना → पूर्ण-चौडाइ काना (h2z)
+  'h'  ... पूर्ण-चौडाइ काना → अर्ध-चौडाइ काना (z2h)
+
+■ JIS काँजी सुरु अनुक्रम
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (पूर्वनिर्धारित)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 प्लेन १
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 प्लेन १
+
+■ रूपान्तरण उदाहरणहरू
+
+  # Shift_JIS देखि UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP देखि Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # इनपुट स्वचालित पहिचान, JIS आउटपुट
+  Jacode::convert(\$line, 'jis');
+
+  # SJIS → UTF-8 सँगै अर्ध-चौडाइ काना रूपान्तरण
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # फाइलका सबै लाइनहरू रूपान्तरण गर्नुहोस्
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ कमाण्ड लाइन (pkf मोड)
+
+  perl jacode.pl [विकल्प] [-[इनपुट]आउटपुट] फाइलहरू
+
+  perl jacode.pl file          # JIS मा रूपान्तरण
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # मिश्रित एन्कोडिङ → EUC-JP (गतिशील)
+  perl jacode.pl -mc file      # रूपान्तरण गर्नुहोस् र प्रत्येक लाइनको एन्कोडिङ देखाउनुहोस्
+
+  विकल्पहरू:
+  -b  बफर्ड आउटपुट (पूर्वनिर्धारित)
+  -u  अनबफर्ड आउटपुट
+  -m  गतिशील इनपुट एन्कोडिङ पहिचान
+  -c  एन्कोडिङ नाम देखाउनुहोस्
+  -Z  अर्ध-चौडाइ काना → पूर्ण-चौडाइ
+  -H  पूर्ण-चौडाइ काना → अर्ध-चौडाइ
+  -f [unix|mac|dos]  लाइन अन्त्य रूपान्तरण
+
+■ jcode.pl सङ्गतता
+
+  Jacode, Utashiro को jcode.pl सँग सङ्गत छ।
+  jcode:: नेमस्पेस उपनामहरू पनि उपयोगयोग्य छन्।
+
+################################################################################

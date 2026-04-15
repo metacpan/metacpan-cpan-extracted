@@ -1,0 +1,120 @@
+################################################################################
+# សន្លឹកយោង Jacode (KM)
+# Jacode - កម្មវិធី Perl សម្រាប់បំប្លែងកូដតួអក្សរភាសាជប៉ុន
+# https://metacpan.org/dist/Jacode
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org>
+################################################################################
+
+■ ការដំឡើង
+
+  cpanm Jacode
+
+  ឬទាញយក Jacode.pm និង jacode.pl ពី https://metacpan.org/pod/Jacode
+  ហើយដាក់ទាំងពីរឯកសារក្នុងថតតែមួយ។
+
+■ ការប្រើប្រាស់
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode;
+
+■ API
+
+  # បំប្លែង string នៅទីកន្លែង (ការប្រើប្រាស់ទូទៅបំផុត)
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding);
+  Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding, $option);
+
+  # តម្លៃត្រឡប់ (list context)
+  ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUT, $IN);
+
+  # តម្លៃត្រឡប់ (scalar context)
+  $got_INPUT_encoding = Jacode::convert(\$line, $OUT, $IN);
+
+  # អនុគមន៍ wrapper ត្រឡប់តម្លៃ
+  $out = Jacode::jis($str);
+  $out = Jacode::euc($str);
+  $out = Jacode::sjis($str);
+  $out = Jacode::utf8($str);
+
+  # រកឃើញ encoding
+  $encoding = Jacode::getcode(\$line);
+  ($matched_length, $encoding) = Jacode::getcode(\$line);
+
+  # ការគ្រប់គ្រង JIS escape sequence
+  ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line);
+  ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]]);
+
+  # ការចាប់ផ្តើម
+  Jacode::init();
+
+  # ការគ្រប់គ្រង cache
+  Jacode::cache();
+  Jacode::nocache();
+  Jacode::flushcache();
+
+■ ឈ្មោះ encoding
+
+  'jis'   ... JIS (ISO-2022-JP)
+  'sjis'  ... Shift_JIS (រួមមាន CP932)
+  'euc'   ... EUC-JP
+  'utf8'  ... UTF-8
+  'binary'... Binary (មិនអាចបំប្លែងបាន)
+
+■ ជម្រើស
+
+  'z'  ... kana កន្លះទទឹង → kana ទទឹងពេញ (h2z)
+  'h'  ... kana ទទឹងពេញ → kana កន្លះទទឹង (z2h)
+
+■ លំដាប់ចាប់ផ្តើម JIS kanji
+
+  '@'  ... ESC $ @    JIS C 6226-1978
+  'B'  ... ESC $ B    JIS X 0208-1983 (លំនាំដើម)
+  '&'  ... ESC & @ ESC $ B  JIS X 0208-1990
+  'O'  ... ESC $ ( O  JIS X 0213:2000 plane 1
+  'Q'  ... ESC $ ( Q  JIS X 0213:2004 plane 1
+
+■ ឧទាហរណ៍នៃការបំប្លែង
+
+  # Shift_JIS ទៅ UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis');
+
+  # EUC-JP ទៅ Shift_JIS
+  Jacode::convert(\$line, 'sjis', 'euc');
+
+  # រកឃើញ input ដោយស្វ័យប្រវត្តិ output ជា JIS
+  Jacode::convert(\$line, 'jis');
+
+  # បំប្លែង kana កន្លះទទឹងខណៈ SJIS → UTF-8
+  Jacode::convert(\$line, 'utf8', 'sjis', 'z');
+
+  # បំប្លែងបន្ទាត់ទាំងអស់នៃឯកសារ
+  while (<IN>) {
+      Jacode::convert(\$_, 'utf8', 'sjis');
+      print OUT $_;
+  }
+
+■ បន្ទាត់ពាក្យបញ្ជា (pkf mode)
+
+  perl jacode.pl [ជម្រើស] [-[INPUT]OUTPUT] ឯកសារ
+
+  perl jacode.pl file          # បំប្លែងទៅ JIS
+  perl jacode.pl -sw file      # Shift_JIS → UTF-8
+  perl jacode.pl -es file      # EUC-JP → Shift_JIS
+  perl jacode.pl -me file      # encoding លាយ → EUC-JP (dynamic)
+  perl jacode.pl -mc file      # បំប្លែង និងបង្ហាញ encoding ក្នុងបន្ទាត់
+
+  ជម្រើស:
+  -b  Buffered output (លំនាំដើម)
+  -u  Unbuffered output
+  -m  ការទទួលស្គាល់ encoding input ថាមវន្ត
+  -c  បង្ហាញឈ្មោះ encoding
+  -Z  kana កន្លះទទឹង → ទទឹងពេញ
+  -H  kana ទទឹងពេញ → កន្លះទទឹង
+  -f [unix|mac|dos]  បំប្លែង line ending
+
+■ ភាពឆបគ្នាជាមួយ jcode.pl
+
+  Jacode ឆបគ្នាជាមួយ jcode.pl របស់ Utashiro ។
+  alias namespace jcode:: ក៏អាចប្រើបានដែរ។
+
+################################################################################

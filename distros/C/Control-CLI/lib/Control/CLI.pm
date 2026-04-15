@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.12';
+our $VERSION = '2.13';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -28,6 +28,7 @@ my $PollTimer = 100;		# Some connection types require a polling loop; this is th
 my $ComPortReadBuffer = 4096;	# Size of serial port read buffers
 my $ComReadInterval = 100;	# Timeout between single character reads
 my $ComBreakDuration = 300;	# Number of milliseconds the break signal is held for
+my $ComWriteDoneDelay = 1;	# Number of milliseconds to wait after every Win32::SerialPort write before checking success
 my $ChangeBaudDelay = 100;	# Number of milliseconds to sleep between tearing down and restarting serial port connection
 my $VT100_QueryDeviceStatus	= "\e[5n";	# With report_query_status, if received from host
 my $VT100_ReportDeviceOk	= "\e[0n";	# .. sent to host, with report_query_status
@@ -296,6 +297,8 @@ sub new {
 			Win32::SerialPort::debug($debug & 2 ? 'ON' : 'OFF');
 			$parent = Win32::SerialPort->new($connectionType, !($debug & 1))
 				or return _error(__FILE__, __LINE__, $errmode, "$pkgsub: Cannot open serial port '$connectionType'", $msgFormat);
+			$parent->user_msg($debug & 2); 	# prints function messages like "Waiting for CTS"
+			$parent->error_msg($debug & 2); # prints hardware messages like "Framing Error"
 		}
 		else {
 			croak "$pkgsub: Module 'Device::SerialPort' required for serial access" unless $UseSerial;
@@ -1023,9 +1026,16 @@ sub disconnect { # Disconnect from host
 	}
 	elsif ($self->{TYPE} eq 'SERIAL') {
 		if (defined $self->{PARENT} && !$self->{SERIALEOF}) {
-			# Needed to flush writes before closing with Device::SerialPort (do once only)
-			$self->{PARENT}->write_done(1) if defined $self->{BAUDRATE};
-			$self->{PARENT}->close;
+			if ($^O eq 'MSWin32') { # Win32::SerialPort
+				# When Win32::SerialPort locks up on write(), doing a close throws carp messages from Win32API::CommPort; we want to suppress these
+				local $SIG{__WARN__} = sub { }; # Disable warnings
+				$self->{PARENT}->close;
+			}
+			else { # Device::SerialPort
+				# Needed to flush writes before closing with Device::SerialPort (do once only)
+				$self->{PARENT}->write_done(1) if defined $self->{BAUDRATE};
+				$self->{PARENT}->close;
+			}
 		}
 		$self->{HANDSHAKE} = undef;
 		$self->{BAUDRATE} = undef;
@@ -1479,6 +1489,8 @@ sub debug { # Set/read debug level
 			if ($^O eq 'MSWin32') {
 				Win32::SerialPort->set_test_mode_active(!($newSetting & 1));
 				Win32::SerialPort::debug($newSetting & 2 ? 'ON' : 'OFF');
+				$self->{PARENT}->user_msg($newSetting & 2); 	# prints function messages like "Waiting for CTS"
+				$self->{PARENT}->error_msg($newSetting & 2); # prints hardware messages like "Framing Error"
 			}
 			else {
 				Device::SerialPort->set_test_mode_active(!($newSetting & 1));
@@ -2865,8 +2877,18 @@ sub _put { # Internal write method
 		print {$self->{SSHCHANNEL}} $$outref;
 	}
 	elsif ($self->{TYPE} eq 'SERIAL') {
-		my $countOut = $self->{PARENT}->write($$outref);
-		return $self->error("$pkgsub: Serial port write failed") unless $countOut;
+		my ($done, $countOut) = (1, undef);
+		if ($^O eq 'MSWin32') { # Win32::SerialPort
+			# To avoid issues with write() errors and write() blockng forever, we use background write_bg() instead
+			# Better ref than Win32::SerialPort POD: https://www.foo.be/docs/tpj/issues/vol4_1/tpj0401-0020.html
+			$self->{PARENT}->write_bg($$outref);
+			Time::HiRes::sleep($ComWriteDoneDelay/1000); # Millisec delay before checking write_done()
+			($done, $countOut) = $self->{PARENT}->write_done(0);
+		}
+		else { # Device::SerialPort
+			$countOut = $self->{PARENT}->write($$outref);
+		}
+		return $self->error("$pkgsub: Serial port write failed") unless $done && $countOut;
 		return $self->error("$pkgsub: Serial port write incomplete") if $countOut != length($$outref);
 	}
 	else {
@@ -5181,7 +5203,7 @@ A lot of the methods and functionality of this class, as well as some code, is d
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2025 Ludovico Stevens.
+Copyright 2026 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

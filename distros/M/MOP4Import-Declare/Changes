@@ -1,6 +1,8 @@
 Revision history for Perl extension MOP4Import::Declare
 
-0.071 2025-11-12
+0.072 2026-04-15
+    * Add sanity check for some tests.
+    * GH-102 RT172096 - Adapt coming coderef-in-stash optimization
     * GH-99 - Inspector - Add support for `$class->meta->get_attribute_list` for better interop with Moose, Moo, Mouse...
     
 0.070 2025-09-21

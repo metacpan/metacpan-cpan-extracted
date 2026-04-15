@@ -14,7 +14,7 @@
   <developer>
     <foaf:Person>
       <foaf:name>Robert Rothenberg</foaf:name>
-      <foaf:mbox rdf:resource="mailto:rrwo@cpan.org" />
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
     </foaf:Person>
   </developer>
   <license rdf:resource="http://dev.perl.org/licenses/" />

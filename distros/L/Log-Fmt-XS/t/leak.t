@@ -7,8 +7,8 @@ use Test::More;
 use Log::Fmt;
 use Log::Fmt::XS;
 
-unless (-f "/proc/$$/status") {
-    plan skip_all => '/proc/$$/status not available';
+unless ($^O eq 'linux') {
+    plan skip_all => 'test relies on Linux /proc';
 }
 
 plan tests => 1;

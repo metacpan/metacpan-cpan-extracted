@@ -1,20 +1,15 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '0.13';
-require XSLoader;
-XSLoader::load('Object::Proto', $VERSION);
+our $VERSION = '0.15';
 
-use File::Spec;
+use DynaLoader;
+our @ISA = ('DynaLoader');
 
-sub include_dir {
-	my $pm = $INC{'Object/Proto.pm'};
-	return unless $pm;
-	my $dir = File::Spec->catdir(
-		(File::Spec->splitpath($pm))[0,1], 'Proto', 'include'
-	);
-	return -d $dir ? $dir : undef;
-}
+# Make our symbols globally visible so downstream XS modules
+sub dl_load_flags { 0x01 }
+
+bootstrap Object::Proto $VERSION;
 
 1;
 
@@ -406,14 +401,14 @@ Include C<object_types.h> in your XS module:
 
 	#include "object_types.h"
 
-Use C<Object::Proto-E<gt>include_dir()> to locate the installed header
-directory for use in your C<Makefile.PL>:
+Object::Proto uses L<ExtUtils::Depends> so downstream XS modules can
+automatically find the headers and link flags. In your C<Makefile.PL>:
 
 	# Makefile.PL
-	use Object::Proto;
-	my $inc = Object::Proto->include_dir;
+	use ExtUtils::Depends;
+	my $pkg = ExtUtils::Depends->new('MyTypes', 'Object::Proto');
 	WriteMakefile(
-	    INC => "-I$inc",
+	    $pkg->get_makefile_vars,
 	    ...
 	);
 
@@ -589,6 +584,8 @@ Usage in Perl:
 	object_register_type_xs_ex(aTHX_ "Color",
 	    enum_check, enum_coerce, (void*)etd);
 
+=head3 Dispatch Order
+
 The same C<enum_check> and C<enum_coerce> functions serve every enum type;
 only the C<EnumTypeData> differs.
 
@@ -616,12 +613,6 @@ then C<perl_coerce>.
 	Built-in (Str, Int)       ~0 cycles     inline switch
 	Registered C function     ~5 cycles     function pointer
 	Perl callback             ~100 cycles   call_sv overhead
-
-=head2 Object::Proto-E<gt>include_dir
-
-Returns the path to the installed header directory containing
-C<object_types.h>, or C<undef> if not found. Use in your C<Makefile.PL>
-to set C<INC>.
 
 =head2 new $class @args
 
