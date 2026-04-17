@@ -2,7 +2,13 @@ package IPC::Manager::Client::SharedMem;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000022';
+
+# Set to 1 by Makefile.PL at install time when the host's SysV IPC is
+# unreliable.  When true, _viable() throws an exception explaining how
+# to recover instead of returning a successful viability check.  The
+# module otherwise loads normally so callers can still introspect it.
+our $BROKEN_SYSV_IPC = 0;
 
 use Carp qw/croak/;
 
@@ -30,7 +36,20 @@ sub _load_constants {
     $_S_IWUSR     = IPC::SysV::S_IWUSR();
 }
 
-sub _viable { require IPC::SysV; IPC::SysV->VERSION('2.09'); 1 }
+sub _viable {
+    die <<'BROKEN' if $BROKEN_SYSV_IPC;
+IPC::Manager::Client::SharedMem was disabled when IPC::Manager was
+installed because the host's SysV IPC implementation was unreliable.
+To use the SharedMem protocol, fix the SysV IPC support on this
+system (kernel module / capabilities / IPC::SysV version) and then
+re-install IPC::Manager.  Other IPC::Manager protocols (UnixSocket,
+AtomicPipe, JSONFile, MessageFiles, the DBI-backed protocols, etc.)
+are unaffected and continue to work.
+BROKEN
+    require IPC::SysV;
+    IPC::SysV->VERSION('2.09');
+    return 1;
+}
 
 # Route format: "shmid:semid"
 

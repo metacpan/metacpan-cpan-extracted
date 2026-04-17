@@ -6,7 +6,7 @@ use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use File::Temp qw(tempfile);
-use Test::More 'tests' => 9;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn;
@@ -90,6 +90,26 @@ stderr_is(
 	},
 	$right_ret,
 	'Bad number of arguments (no arguments).',
+);
+
+# Test.
+@ARGV = (
+	'-n',
+	10,
+	'-p',
+	'perl',
+	File::Object->new->up->dir('data')->file('print.pl')->s,
+);
+$right_ret = <<'END';
+..........Everything is ok.
+END
+stdout_is(
+	sub {
+		App::Run::Command::ToFail->new->run;
+		return;
+	},
+	$right_ret,
+	'Run perl script (10x).',
 );
 
 # Test.

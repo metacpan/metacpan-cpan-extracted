@@ -509,6 +509,13 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
             'helper_content renders the shipped ps1 helper body',
         );
     }
+    elsif ( $helper eq 'housekeeper' ) {
+        like(
+            $content,
+            qr/\Qdashboard housekeeper\E/,
+            'helper_content renders the shipped housekeeper helper body',
+        );
+    }
     else {
         like(
             $content,

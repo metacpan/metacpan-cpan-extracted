@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Net::Gearman;
+package Net::Gearman 0.05;
 
-use strict;
+use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use base qw( IO::Socket::IP );
 
@@ -17,6 +18,8 @@ use base qw( IO::Socket::IP );
 C<Net::Gearman> - provide a synchronous concrete Gearman implementation
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This module provides a simple synchronous concrete implementation to run a
 L<Protocol::Gearman::Client> or L<Protocol::Gearman::Worker> on top of. It
@@ -38,7 +41,9 @@ L<Net::Gearman::Worker>
 
 =cut
 
-=head2 $gearman = Net::Gearman->new( %args )
+=head2 new
+
+   $gearman = Net::Gearman->new( %args );
 
 Returns a new C<Net::Gearman> object. Takes the same arguments as
 C<IO::Socket::IP>. Sets a default value for C<PeerService> if not provided of
@@ -46,32 +51,27 @@ C<IO::Socket::IP>. Sets a default value for C<PeerService> if not provided of
 
 =cut
 
-sub new
+sub new ( $class, @args )
 {
-   my $class = shift;
-   my %args = @_ == 1 ? ( PeerHost => shift ) : @_;
+   my %args = @args == 1 ? ( PeerHost => shift @args ) : @args;
 
    $args{PeerService} //= 4730;
 
    return $class->SUPER::new( %args );
 }
 
-sub gearman_state
+sub gearman_state ( $self )
 {
-   my $self = shift;
    ${*$self}{gearman} ||= {};
 }
 
-sub new_future
+sub new_future ( $self )
 {
-   my $self = shift;
    return Net::Gearman::Future->new( $self );
 }
 
-sub do_read
+sub do_read ( $self )
 {
-   my $self = shift;
-
    my $buffer = $self->gearman_state->{gearman_buffer} // "";
 
    # TODO: consider an on_recv_packet to make this more efficient
@@ -85,21 +85,17 @@ package # hide
    Net::Gearman::Future;
 use base qw( Future );
 
-sub new
+sub new ( $class, $gearman )
 {
-   my $class = shift;
-   my ( $gearman ) = @_;
    my $self = $class->SUPER::new;
-   $self->{gearman} = $gearman;
+   $self->set_udata( gearman => $gearman );
    return $self;
 }
 
-sub await
+sub await ( $self )
 {
-   my $self = shift;
-
    while( !$self->is_ready ) {
-      $self->{gearman}->do_read;
+      $self->udata( 'gearman' )->do_read;
    }
 }
 

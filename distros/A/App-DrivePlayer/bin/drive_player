@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use App::DrivePlayer::GUI;
+
+App::DrivePlayer::GUI->new()->run();
+
+__END__
+
+=head1 NAME
+
+drive_player - GTK3 music player for Google Drive
+
+=head1 SYNOPSIS
+
+  drive_player
+
+=head1 SETUP
+
+=head2 1. Install dependencies
+
+  make install
+
+This installs system packages (Gtk3, Glib, SQLite, mpv) and all required
+CPAN modules.
+
+=head2 2. Create a Google Cloud project and OAuth credentials
+
+=over 4
+
+=item 1.
+
+Go to L<https://console.cloud.google.com/> and create a new project (or
+select an existing one).
+
+=item 2.
+
+Enable the B<Google Drive API>: APIs & Services > Enable APIs and Services >
+search for "Drive API" > Enable.
+
+=item 3.
+
+Create OAuth credentials: APIs & Services > Credentials > Create Credentials
+> OAuth client ID.  Choose B<Desktop app> as the application type.
+
+=item 4.
+
+Download or note the B<Client ID> and B<Client Secret>.
+
+=back
+
+=head2 3. Configure the application
+
+Launch the app, then open B<File E<gt> Settings> and paste the Client ID and
+Client Secret.  Click Save.
+
+The config file is written to F<~/.config/drive_player/config.yaml>.
+
+=head2 4. Authorise access to Google Drive
+
+Run the OAuth token creator that ships with Google::RestApi:
+
+  google_restapi_oauth_token_creator
+
+Follow the prompts.  The resulting token file is stored at
+F<~/.config/drive_player/token.dat> by default.
+
+=head2 5. Add music folders
+
+Launch the app and choose B<File E<gt> Add Music Folder>.  Enter the Google
+Drive folder ID (the last path component of the folder's Drive URL) and a
+display name.  The app will scan the folder and add tracks to the library.
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.config/drive_player/config.yaml>
+
+Main configuration file (OAuth credentials, log level, folder list).
+
+=item F<~/.config/drive_player/token.dat>
+
+OAuth2 token cache.  Created by the token creator; refreshed automatically.
+
+=item F<~/.local/share/drive_player/music.db>
+
+SQLite database storing the scanned track library.
+
+=item F<~/.local/share/drive_player/drive_player.log>
+
+Application log.
+
+=back
+
+=cut

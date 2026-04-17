@@ -63,6 +63,7 @@ t/02-csts.t
 t/03-fs.t
 t/04-xslt.t
 t/05-resources.t
+t/06-seq.t
 t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t

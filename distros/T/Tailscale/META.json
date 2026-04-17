@@ -1,0 +1,55 @@
+{
+   "abstract" : "Perl bindings for tailscale-rs (Tailscale in Rust)",
+   "author" : [
+      "Brad Fitzpatrick <brad@danga.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tailscale",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "2.00",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "JSON::PP" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

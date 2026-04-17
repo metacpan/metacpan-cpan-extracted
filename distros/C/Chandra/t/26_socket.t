@@ -9,7 +9,7 @@ unless ($is_win32) {
     require IO::Socket::UNIX;
 }
 
-plan tests => 47;
+# Use done_testing() instead of fixed plan for cross-platform compatibility
 
 use_ok('Chandra::Socket::Connection');
 use_ok('Chandra::Socket::Hub');
@@ -116,7 +116,9 @@ SKIP: {
 }
 
 # === Hub + Client connection lifecycle ===
-{
+SKIP: {
+	skip 'Unix socket Hub/Client not available on Windows', 16 if $is_win32;
+
 	my $name = "test-lifecycle-$$";
 	my $hub = Chandra::Socket::Hub->new(name => $name);
 
@@ -177,7 +179,8 @@ SKIP: {
 }
 
 # === Multiple spokes ===
-{
+SKIP: {
+	skip 'Unix socket Hub/Client not available on Windows', 3 if $is_win32;
 	my $name = "test-multi-$$";
 	my $hub = Chandra::Socket::Hub->new(name => $name);
 
@@ -209,3 +212,4 @@ SKIP: {
 	$s2->close;
 	$hub->close;
 }
+done_testing();

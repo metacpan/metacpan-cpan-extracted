@@ -1,4 +1,4 @@
-{ use 5.006; }
+use 5.006;
 use warnings;
 use strict;
 
@@ -29,8 +29,8 @@ Module::Build->new(
 		"Crypt::Eksblowfish::Uklblowfish" => "0.008",
 		"Crypt::MySQL" => "0.03",
 		"Crypt::PasswdMD5" => "1.0",
+		"Crypt::SysRandom" => 0,
 		"Crypt::UnixCrypt_XS" => "0.08",
-		"Data::Entropy::Algorithms" => 0,
 		"Digest" => "1.00",
 		"Digest::MD4" => "1.2",
 		"Digest::MD5" => "1.9953",
@@ -44,9 +44,18 @@ Module::Build->new(
 		"warnings" => 0,
 	},
 	dynamic_config => 0,
-	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
-	sign => 1,
+	meta_merge => {
+		x_deprecated => 1,
+		"meta-spec" => {
+			"version" => 2,
+		},
+		resources => {
+			repository => {
+				type => "git",
+				web => "https://github.com/Leont/authen-passphrase",
+			},
+		},
+	},
 )->create_build_script;
 
 1;

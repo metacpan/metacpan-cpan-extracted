@@ -12,11 +12,11 @@ hv_monitor [B<-c>] [B<-b> <backend>]
 
 For cron...
 
-    */5 * * * * /usr/local/bin/hv_monitor > /var/cache/hv_monitor.json -c 2> /dev/null
+    */5 * * * * /usr/local/bin/hv_monitor -q
 
 For snmpd...
 
-    extend hv-monitor /bin/cat /var/cache/hv_monitor.json
+    extend hv-monitor /bin/cat /var/cache/hv_monitor.json.snmp
 
 =head1 FLAGS
 
@@ -34,22 +34,50 @@ Defaults are as below.
 Compress the output using gzip and base64 encoded so it
 can be transmitted via SNMP with out issue.
 
+This only reflects what is printed to STDOUT.
+
+/var/cache/hv_monitor.json.snmp will always be created
+as base64 encoded gzipped JSON.
+
+=head2 -w
+
+Write the data out to files as well.
+
+Raw JSON: /var/cache/hv_monitor.json
+For SNMP: /var/cache/hv_monitor.json.snmp
+
+=head2 -o
+
+Base file path to use to with -w.
+
+".snmp" will be appended to this for the file containing the
+SNMP return data.
+
+Default: /var/cache/hv_monitor.json
+
+=head2 -q
+
+If combined with -w, this won't print the results.
+
+Error messages will still be printed.
+
+If not used with -w, this will error out.
+
 =cut
 
-use JSON;
+use JSON qw( encode_json );
 use strict;
 use warnings;
-use Getopt::Long;
-use JSON;
+use Getopt::Long qw( GetOptions );
 use HV::Monitor;
-use MIME::Base64;
+use MIME::Base64       qw( encode_base64 );
 use IO::Compress::Gzip qw(gzip $GzipError);
-use Pod::Usage;
+use Pod::Usage         qw( pod2usage );
+use File::Slurp;
 
 sub version {
 	print 'hv_monitor v. ' . $HV::Monitor::VERSION . "\n";
 }
-
 
 my $backend;
 if ( $^O eq 'freebsd' ) {
@@ -59,9 +87,12 @@ if ( $^O eq 'freebsd' ) {
 }
 
 # get the commandline options
-my $help     = 0;
-my $version  = 0;
-my $compress = 0;
+my $help             = 0;
+my $version          = 0;
+my $compress         = 0;
+my $output_file_base = '/var/cache/hv_monitor.json';
+my $quiet;
+my $write;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -71,18 +102,23 @@ GetOptions(
 	'h'       => \$help,
 	'b=s'     => \$backend,
 	'c'       => \$compress,
+	'q'       => \$quiet,
+	'w'       => \$write,
+	'o'       => \$output_file_base,
 );
 
 if ($version) {
-		print 'hv_monitor v. ' . $HV::Monitor::VERSION . "\n";
+	print 'hv_monitor v. ' . $HV::Monitor::VERSION . "\n";
+	exit 255;
 }
 
 if ($help) {
-        pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+	exit 255;
 }
 
-if ($version) {
-	exit 255;
+if ( $quiet && !$write ) {
+	die('-q must by used with -w');
 }
 
 my $hm = HV::Monitor->new( { backend => $backend } );
@@ -95,9 +131,8 @@ if ($@) {
 
 my $data = encode_json( $hm->run );
 
-if ( !$compress ) {
+if ( !$compress && !$quiet ) {
 	print $data. "\n";
-	exit;
 }
 
 # compress and write to the cache file for it
@@ -106,4 +141,11 @@ gzip \$data => \$compressed_string;
 my $compressed = encode_base64($compressed_string);
 $compressed =~ s/\n//g;
 $compressed = $compressed . "\n";
-print $compressed;
+if ( !$quiet ) {
+	print $compressed;
+}
+
+if ($write) {
+	write_file( $output_file_base . '.snmp', $compressed );
+	write_file( $output_file_base,           $data );
+}

@@ -1,0 +1,19 @@
+examples/http-client.pl
+examples/http-server.pl
+Hacking.md
+lib/Tailscale.pm
+lib/Tailscale/HttpServer.pm
+lib/Tailscale/TcpListener.pm
+lib/Tailscale/TcpStream.pm
+LICENSE
+Makefile.dev
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/integration.t
+testenv/go.mod
+testenv/go.sum
+testenv/main.go
+testenv/testenv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

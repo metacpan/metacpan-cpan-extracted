@@ -1,3 +1,8 @@
+0.08 2026-04-15T13:55:12+02:00
+ - Add tests.
+ - Remove translations. Moved to MARC::Leader::L10N.
+ - Update copyright years.
+
 0.07 2025-11-14T16:52:08+01:00
  - Add ACKNOWLEDGEMENTS section to doc.
  - Add Czech translation.

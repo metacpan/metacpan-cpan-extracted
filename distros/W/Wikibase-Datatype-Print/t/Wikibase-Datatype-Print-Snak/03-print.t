@@ -3,9 +3,11 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
+use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Snak;
+use Wikibase::Datatype::Value::Quantity;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Print::Snak;
 
@@ -18,7 +20,20 @@ my $obj = Wikibase::Datatype::Snak->new(
 	'property' => 'P11',
 );
 my $ret = Wikibase::Datatype::Print::Snak::print($obj);
-is($ret, 'P11: 1.1', 'Get snak value.');
+is($ret, 'P11: 1.1', 'Get snak value (string).');
+
+$obj = Wikibase::Datatype::Snak->new(
+	'datatype' => 'quantity',
+	'datavalue' => Wikibase::Datatype::Value::Quantity->new(
+		'lower_bound' => 9,
+		'unit' => 'Q174728',
+		'upper_bound' => 11,
+		'value' => 10,
+	),
+	'property' => 'P11',
+);
+$ret = Wikibase::Datatype::Print::Snak::print($obj);
+is($ret, decode_utf8('P11: 10±1 (Q174728)'), 'Get snak value (quantity with tolerance).');
 
 # Test.
 $obj = Wikibase::Datatype::Snak->new(

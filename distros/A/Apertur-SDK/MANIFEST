@@ -1,0 +1,25 @@
+lib/Apertur/SDK.pm
+lib/Apertur/SDK/Crypto.pm
+lib/Apertur/SDK/Error.pm
+lib/Apertur/SDK/Error/Authentication.pm
+lib/Apertur/SDK/Error/NotFound.pm
+lib/Apertur/SDK/Error/RateLimit.pm
+lib/Apertur/SDK/Error/Validation.pm
+lib/Apertur/SDK/HTTPClient.pm
+lib/Apertur/SDK/Resource/Destinations.pm
+lib/Apertur/SDK/Resource/Encryption.pm
+lib/Apertur/SDK/Resource/Keys.pm
+lib/Apertur/SDK/Resource/Polling.pm
+lib/Apertur/SDK/Resource/Sessions.pm
+lib/Apertur/SDK/Resource/Stats.pm
+lib/Apertur/SDK/Resource/Upload.pm
+lib/Apertur/SDK/Resource/Uploads.pm
+lib/Apertur/SDK/Resource/Webhooks.pm
+lib/Apertur/SDK/Signature.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01_client.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

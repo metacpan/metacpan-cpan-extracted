@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -629,6 +629,7 @@ sub _pkill_perl {
     return 1 if $exit_code == 0 || $exit_code == 1;
     if ( $exit_code < 0 || $exit_code == 127 || ( defined $stderr && $stderr =~ /not found/i ) ) {
         for my $proc ( $self->_ps_processes ) {
+            next if !$self->_proc_owned_by_current_user($proc);
             next if $proc->{args} !~ /$pattern/;
             kill 'TERM', $proc->{pid};
         }
@@ -643,7 +644,10 @@ sub _pkill_perl {
 # Output: list of process hash references.
 sub _find_processes_by_prefix {
     my ( $self, $prefix ) = @_;
-    return grep { $_->{args} =~ /^\Q$prefix\E/ } $self->_ps_processes;
+    return grep {
+        $self->_proc_owned_by_current_user($_)
+          && $_->{args} =~ /^\Q$prefix\E/
+    } $self->_ps_processes;
 }
 
 # _find_web_processes()
@@ -657,10 +661,22 @@ sub _find_web_processes {
     for my $proc ( $self->_ps_processes ) {
         next if $proc->{pid} == $$;
         next if $seen_pid{ $proc->{pid} }++;
+        next if !$self->_proc_owned_by_current_user($proc);
         next if !$self->_looks_like_web_process($proc);
         push @seen, $proc;
     }
     return @seen;
+}
+
+# _proc_owned_by_current_user($proc)
+# Checks whether one scanned process belongs to the current runtime user.
+# Input: process hash reference with optional uid metadata.
+# Output: boolean true when the process belongs to the current uid.
+sub _proc_owned_by_current_user {
+    my ( $self, $proc ) = @_;
+    return 0 if !$proc || !$proc->{pid};
+    return 1 if !defined $proc->{uid} || $proc->{uid} eq '';
+    return ( $proc->{uid} + 0 ) == ( $< + 0 ) ? 1 : 0;
 }
 
 # _find_legacy_web_processes()
@@ -694,16 +710,17 @@ sub _looks_like_web_process {
 sub _ps_processes {
     my ($self) = @_;
     my ( $stdout, undef, $exit_code ) = capture {
-        system 'ps', '-eo', 'pid=,args=';
+        system 'ps', '-eo', 'pid=,uid=,args=';
         return $? >> 8;
     };
     return if $exit_code != 0;
     my @procs;
     for my $line ( split /\n/, $stdout ) {
-        next if $line !~ /^\s*(\d+)\s+(.*)$/;
+        next if $line !~ /^\s*(\d+)\s+(\d+)\s+(.*)$/;
         push @procs, {
             pid  => $1 + 0,
-            args => $2,
+            uid  => $2 + 0,
+            args => $3,
         };
     }
     return @procs;

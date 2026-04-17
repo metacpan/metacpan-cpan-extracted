@@ -16,5 +16,7 @@ iotrace - Like strace enough to log STDIN STDOUT STDERR I/O
 
 use strict;
 use warnings;
+use FindBin qw($RealBin); # Allow bootstrap or symlink method too
+use lib "$RealBin/../lib","$RealBin/../lib/perl5";
 use IO::Trace qw(iotrace);
 iotrace;

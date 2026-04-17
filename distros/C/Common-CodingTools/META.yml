@@ -18,8 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Exporter::Easy: '0.16'
   List::Util: '1.41'
   perl: '5.008'
-version: 2.04
+version: 2.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

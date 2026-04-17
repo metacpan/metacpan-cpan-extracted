@@ -11,7 +11,7 @@ use IRI;
 
 Readonly::Array our @EXPORT_OK => qw(check_iri);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub check_iri {
 	my ($self, $key) = @_;
@@ -22,14 +22,14 @@ sub check_iri {
 
 	my $value = $self->{$key};
 	my $iri = eval {
-		IRI->new($value);
+		IRI->new('value' => $value);
 	};
 	if ($EVAL_ERROR) {
 		err "Parameter '".$key."' doesn't contain valid IRI.",
 			'Value', $value,
 		;
 	}
-	if (! $iri->can('scheme') || ! $iri->can('host') || ! $iri->scheme || ! $iri->host) {
+	if (! $iri->scheme || ! $iri->host) {
 		err "Parameter '".$key."' doesn't contain valid IRI.",
 			'Value', $value,
 		;
@@ -175,12 +175,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2024-2025 Michal Josef Špaček
+© 2024-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

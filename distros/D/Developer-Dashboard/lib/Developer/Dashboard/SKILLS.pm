@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
 1;
 
@@ -113,7 +113,9 @@ into the system PATH.
 Executable hook files for a command. They run in sorted order before the main
 command. Their results are serialized into C<RESULT>, the immediate previous
 hook is exposed through C<LAST_RESULT>, and later hooks stop only when a hook
-writes C<[[STOP]]> to C<stderr>.
+writes C<[[STOP]]> to C<stderr>. Executable F<.go> hooks run through
+C<go run>. Executable F<.java> hooks compile with C<javac> and then run
+through C<java>.
 
 =item B<config/config.json>
 
@@ -215,6 +217,14 @@ have their C<stdout>, C<stderr>, and exit codes captured into C<RESULT>
 =item *
 
 expose the immediate previous hook payload through C<LAST_RESULT>
+
+=item *
+
+run executable F<.go> hooks through C<go run>
+
+=item *
+
+compile executable F<.java> hooks with C<javac> and then run them through C<java>
 
 =item *
 

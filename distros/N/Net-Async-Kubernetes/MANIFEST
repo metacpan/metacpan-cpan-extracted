@@ -8,12 +8,13 @@ META.json
 META.yml
 Makefile.PL
 README
-README.md
 cpanfile
 dist.ini
 eg/demo.pl
 eg/watch_pods.pl
+ex/live_features.pl
 lib/Net/Async/Kubernetes.pm
+lib/Net/Async/Kubernetes/Controller.pm
 lib/Net/Async/Kubernetes/Watcher.pm
 t/00-load.t
 t/01-crud.t
@@ -27,9 +28,12 @@ t/08-mock-edge-cases.t
 t/09-mock-log.t
 t/10-dual-crud.t
 t/11-dual-watcher.t
+t/12-controller.t
 t/12-mock-port-forward.t
 t/13-duplex-transport.t
 t/14-mock-exec.t
+t/15-mock-attach.t
+t/16-mock-cp.t
 t/author-pod-syntax.t
 t/lib/MockTransport.pm
 t/lib/My/StaticWebSite.pm

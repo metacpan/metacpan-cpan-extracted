@@ -1,7 +1,7 @@
 package Common::CodingTools;
 
 use strict;
-no strict 'subs';
+no strict 'subs'; # Needed for constants
 
 =encoding utf8
 
@@ -247,7 +247,7 @@ use constant {
 };
 
 BEGIN {
-    our $VERSION = 2.04;
+    our $VERSION = 2.06;
 }
 
 require Exporter;
@@ -586,7 +586,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-Version 2.02 (November 06, 2025)
+Version 2.06 (April 15, 2026)
 
 =head1 BUGS
 
@@ -604,17 +604,17 @@ You can also look for information at:
 
 =item RT: CPAN's request tracker (report bugs here)
 
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Common-CodingTools
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Common-CodingTools>
 
 =item AnnoCPAN: Annotated CPAN documentation
 
-http://annocpan.org/dist/Common-CodingTools
+L<http://annocpan.org/dist/Common-CodingTools>
 
 =item CPAN Ratings
 
-http://cpanratings.perl.org/d/Common-CodingTools
+L<http://cpanratings.perl.org/d/Common-CodingTools>
 
-Not exactly a reliable and fair means of rating modules. Modules are updated and improved over time, and what may have been a poor or mediocre review at version 0,04, may not remotely apply to current or later versions. It applies ratings in an arbitrary manner with no ability for the author to add their own rebuttals or comments to the review, especially should the review be malicious or inapplicable.
+Not exactly a reliable and fair means of rating modules. Modules are updated and improved over time, and what may have been a poor or mediocre review at version 0.04, may not remotely apply to current or later versions. It applies ratings in an arbitrary manner with no ability for the author to add their own rebuttals or comments to the review, especially should the review be malicious or inapplicable.
 
 More importantly, issues brought up in a mediocre review may have been addressed and improved in later versions, or completely changed to allieviate that issue.
 
@@ -622,11 +622,11 @@ So, check the reviews AND the version number when that review was written.
 
 =item Search CPAN
 
-http://search.cpan.org/dist/Common-CodingTools/
+L<http://search.cpan.org/dist/Common-CodingTools/>
 
 =item GitHub
 
-https://github.com/richcsst/Common-CodingTools
+L<https://github.com/richcsst/Common-CodingTools>
 
 =back
 
@@ -668,3 +668,73 @@ L<http://www.opensource.org/licenses/mit-license.php>
 =back
 
 =cut
+
+__END__
+
+######################## Perl Cheat Sheet #########################
+#  CONTEXTS  SIGILS  ref        ARRAYS        HASHES
+#  void      $scalar SCALAR     @array        %hash
+#  scalar    @array  ARRAY      @array[0, 2]  @hash{'a', 'b'}
+#  list      %hash   HASH       $array[0]     $hash{'a'}
+#            &sub    CODE
+#            *glob   GLOB       SCALAR VALUES
+#                    FORMAT     number, string, ref, glob, undef
+#  REFERENCES
+#  \      reference       $$foo[1]       aka $foo->[1]
+#  $@%&*  dereference     $$foo{bar}     aka $foo->{bar}
+#  []     anon. arrayref  ${$$foo[1]}[2] aka $foo->[1]->[2]
+#  {}     anon. hashref   ${$$foo[1]}[2] aka $foo->[1][2]
+#  \()    list of refs
+#                         SYNTAX
+#  OPERATOR PRECEDENCE    foreach (LIST) { }     for (a;b;c) { }
+#  ->                     while   (e) { }        until (e)   { }
+#  ++ --                  if      (e) { } elsif (e) { } else { }
+#  **                     unless  (e) { } elsif (e) { } else { }
+#  ! ~ \ u+ u-            given   (e) { when (e) {} default {} }
+#  =~ !~
+#  * / % x                 NUMBERS vs STRINGS  FALSE vs TRUE
+#  + - .                   =          =        undef, "", 0, "0"
+#  << >>                   +          .        anything else
+#  named uops              == !=      eq ne
+#  < > <= >= lt gt le ge   < > <= >=  lt gt le ge
+#  == != <=> eq ne cmp ~~  <=>        cmp
+#  &
+#  | ^             REGEX MODIFIERS       REGEX METACHARS
+#  &&              /i case insensitive   ^      string begin
+#  || //           /m line based ^$      $      str end (bfr \n)
+#  .. ...          /s . includes \n      +      one or more
+#  ?:              /x /xx ign. wh.space  *      zero or more
+#  = += last goto  /p preserve           ?      zero or one
+#  , =>            /a ASCII    /aa safe  {3,7}  repeat in range
+#  list ops        /l locale   /d  dual  |      alternation
+#  not             /u Unicode            []     character class
+#  and             /e evaluate /ee rpts  \b     boundary
+#  or xor          /g global             \z     string end
+#                  /o compile pat once   (p)    capture
+#  DEBUG                                 (?:p)  no capture
+#  -MO=Deparse     REGEX CHARCLASSES     (?#t)  comment
+#  -MO=Terse       .   [^\n]             (?=p)  ZW pos ahead
+#  -D##            \s  whitespace        (?!p)  ZW neg ahead
+#  -d:Trace        \w  word chars        (?<=p) ZW pos behind \K
+#                  \d  digits            (?<!p) ZW neg behind
+#  CONFIGURATION   \pP named property    (?>p)  no backtrack
+#  perl -V:ivsize  \h  horiz.wh.space    (?|p|p)branch reset
+#                  \R  linebreak         (?<n>p)named capture
+#                  \S \W \D \H negate    \g{n}  ref to named cap
+#                                        \K     keep left part
+#  FUNCTION RETURN LISTS
+#  stat      localtime    caller         SPECIAL VARIABLES
+#   0 dev    0 second      0 package     $_    default variable
+#   1 ino    1 minute      1 filename    $0    program name
+#   2 mode   2 hour        2 line        $/    input separator
+#   3 nlink  3 day         3 subroutine  $\    output separator
+#   4 uid    4 month-1     4 hasargs     $|    autoflush
+#   5 gid    5 year-1900   5 wantarray   $!    sys/libcall error
+#   6 rdev   6 weekday     6 evaltext    $@    eval error
+#   7 size   7 yearday     7 is_require  $$    process ID
+#   8 atime  8 is_dst      8 hints       $.    line number
+#   9 mtime                9 bitmask     @ARGV command line args
+#  10 ctime               10 hinthash    @INC  include paths
+#  11 blksz               3..10 only     @_    subroutine args
+#  12 blcks               with EXPR      %ENV  environment
+###################################################################

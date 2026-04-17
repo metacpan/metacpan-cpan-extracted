@@ -29,11 +29,11 @@ my %WriteMakefileArgs = (
         'vars'                  => 0,
         'warnings'              => 0,
         'warnings::register'    => 0,
-        'Locale::Unicode'       => 'v0.3.11',
-        'Locale::Unicode::Data' => 'v1.3.2',
+        'Locale::Unicode'       => 'v0.4.0',
+        'Locale::Unicode::Data' => 'v1.8.0',
         'Scalar::Util'          => 0,
         # Version compatible with perl v5.10
-        'Want'                  => '0.17',
+        'Wanted'                => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

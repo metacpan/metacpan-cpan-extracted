@@ -5,7 +5,7 @@ use Encode qw(decode);
 use base 'Exporter';
 our @EXPORT = qw(convert_to_ascii);
 our @EXPORT_OK = qw(convert_to_ascii);
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 my %char_map;
 
 =encoding utf8
@@ -103,7 +103,7 @@ UNITCHECK {
 sub convert_to_ascii {
     my $str = is_valid_utf_8($_[0]) ? decode('UTF-8', $_[0]) : $_[0];
     # remove zero-width characters and combining marks
-    $str =~ s/[\xAD\x{034F}\x{200B}-\x{200F}\x{202A}\x{202B}\x{202C}\x{2060}\x{FEFF}]|\p{Combining_Mark}//g;
+    $str =~ s/[\xAD\x{034F}\x{200A}-\x{200F}\x{202A}\x{202B}\x{202C}\x{2060}\x{FEFF}]|\p{Combining_Mark}//g;
     # replace non-ascii characters with ascii equivalents
     $str =~ s/([^[:ascii:]])/defined($char_map{$1})?$char_map{$1}:' '/eg;
     # collapse spaces

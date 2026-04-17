@@ -8,7 +8,7 @@ WriteMakefile(
                          'Test::Number::Delta' => 0,
                         },
     PREREQ_PM        => {
-                         'Geo::H3::FFI'  => 0.05,
+                         'Geo::H3::FFI'  => 0.07, #for kRingDistancesWrapperArray
                          'FFI::CheckLib' => 0,
                         },
     ABSTRACT_FROM    => 'lib/Geo/H3.pm',

@@ -32,13 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Exporter::Easy" : "0.16",
             "List::Util" : "1.41",
             "perl" : "5.008"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 2.04,
+   "version" : 2.06,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

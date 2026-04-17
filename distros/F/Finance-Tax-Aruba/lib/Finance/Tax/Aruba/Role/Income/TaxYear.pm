@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -188,12 +188,6 @@ has aov_yearly_income => (
     builder => '_get_aov_yearly_income',
 );
 
-has azv_max => (
-    is      => 'ro',
-    isa     => 'Num',
-    default => 85_000,
-);
-
 has azv_percentage_employee => (
     is      => 'ro',
     isa     => 'Num',
@@ -359,10 +353,8 @@ sub _format_perc {
 sub _build_taxfree_amount {
     my $self = shift;
 
-    if ($self->zuiver_jaarloon < $self->taxfree_max) {
-        return $self->zuiver_jaarloon * ($self->months / 12);
-    }
-    return $self->taxfree_max * ($self->months / 12);
+    my $max = _get_max($self->taxfree_max, $self->zuiver_jaarloon);
+    return $max * ($self->months / 12);
 }
 
 sub _get_aov_yearly_income {
@@ -456,11 +448,14 @@ sub pension_total {
 
 sub tax_free_wage {
     my $self = shift;
-    return
+
+    my $wage =
           $self->yearly_income
         - $self->employee_income_deductions
         - $self->taxfree_amount
         - $self->fringe;
+
+    return $wage > 0 ? $wage : 0;
 }
 
 sub net_income {
@@ -589,7 +584,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

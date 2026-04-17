@@ -264,6 +264,7 @@ $files->remove('web_pid');
         return (
             {
                 pid  => $pid,
+                uid  => $< + 0,
                 args => 'dashboard web: 0.0.0.0:7898',
             }
         );
@@ -272,6 +273,39 @@ $files->remove('web_pid');
     is( $scan_state->{pid}, $pid, 'running_web falls back to process scanning when the pid file is missing' );
 }
 $files->write( 'web_pid', "$pid\n" );
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_ps_processes = sub {
+        return (
+            {
+                pid  => 410_001,
+                uid  => $< + 1,
+                args => 'dashboard web: foreign:7898',
+            },
+            {
+                pid  => 410_002,
+                uid  => $< + 1,
+                args => 'dashboard ajax: foreign-worker',
+            },
+            {
+                pid  => 410_003,
+                uid  => $< + 0,
+                args => 'dashboard ajax: local-worker',
+            },
+        );
+    };
+    is_deeply(
+        [ map { $_->{pid} } $manager->_find_web_processes ],
+        [],
+        '_find_web_processes ignores dashboard web processes owned by other users',
+    );
+    is_deeply(
+        [ map { $_->{pid} } $manager->_find_processes_by_prefix('dashboard ajax:') ],
+        [410_003],
+        '_find_processes_by_prefix only returns current-user dashboard processes',
+    );
+}
 
 my $stopped_pid;
 for ( 1 .. 5 ) {
@@ -521,7 +555,11 @@ is_deeply( \@stopped_collectors, [ 'alpha.collector', 'beta.collector' ], 'stop_
 is_deeply( $runner->{stopped}, [ 'alpha.collector', 'beta.collector' ], 'stop_collectors delegates each running collector to the runner' );
 
 my @started_collectors = $manager->start_collectors;
-is_deeply( [ map { $_->{name} } @started_collectors ], [ 'alpha.collector', 'beta.collector' ], 'start_collectors starts configured collectors' );
+is_deeply(
+    [ map { $_->{name} } @started_collectors ],
+    [ 'housekeeper', 'alpha.collector', 'beta.collector' ],
+    'start_collectors starts built-in and configured collectors',
+);
 
 {
     my $skill_config_dir = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'fleet-skill', 'config' );
@@ -563,7 +601,7 @@ JSON
     my @skill_started = $skill_manager->start_collectors;
     is_deeply(
         [ map { $_->{name} } @skill_started ],
-        [ 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
+        [ 'housekeeper', 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
         'start_collectors includes installed skill collectors in the managed fleet under repo-qualified names',
     );
 
@@ -573,7 +611,7 @@ JSON
     my @disabled_skill_started = $skill_manager->start_collectors;
     is_deeply(
         [ map { $_->{name} } @disabled_skill_started ],
-        [ 'alpha.collector', 'beta.collector' ],
+        [ 'housekeeper', 'alpha.collector', 'beta.collector' ],
         'start_collectors skips collectors contributed by disabled skills',
     );
     unlink File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'fleet-skill', '.disabled' ) or die $!;
@@ -586,8 +624,8 @@ JSON
     local $runner->{fail}    = { 'beta.collector' => "beta start failed\n" };
     my $error = eval { $manager->start_collectors; 1 } ? '' : $@;
     like( $error, qr/Failed to start collector 'beta\.collector': beta start failed/, 'start_collectors surfaces collector loop startup failures explicitly' );
-    is_deeply( $runner->{started}, [ 'alpha.collector' ], 'start_collectors stops launching collectors after a startup failure' );
-    is_deeply( $runner->{stopped}, ['alpha.collector'], 'start_collectors cleans up already-started collectors when a later collector fails to start' );
+    is_deeply( $runner->{started}, [ 'housekeeper', 'alpha.collector' ], 'start_collectors stops launching collectors after a startup failure' );
+    is_deeply( $runner->{stopped}, [ 'housekeeper', 'alpha.collector' ], 'start_collectors cleans up already-started collectors when a later collector fails to start' );
 }
 
 {
@@ -643,7 +681,7 @@ my $restart = $manager->restart_all( host => '0.0.0.0', port => 7903 );
 ok( $restart->{web_pid} > 0, 'restart_all starts a background web process' );
 is_deeply(
     [ map { $_->{name} } @{ $restart->{collectors} } ],
-    [ 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
+    [ 'housekeeper', 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
     'restart_all restarts configured collectors including the installed skill fleet',
 );
 ok( $manager->running_web, 'restart_all leaves the web process running' );
@@ -893,6 +931,7 @@ END {
         return (
             {
                 pid  => $fallback_child,
+                uid  => $< + 0,
                 args => 'dashboard web: fallback:9999',
             }
         );

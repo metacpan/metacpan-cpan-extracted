@@ -67,6 +67,35 @@ subtest 'POD: constructor with frame_size_limit' => sub {
     isa_ok($ne, 'Net::Nostr::Negentropy');
 };
 
+subtest 'frame_size_limit: initiate rejects oversized messages' => sub {
+    my $ne = Net::Nostr::Negentropy->new(frame_size_limit => 1);
+    $ne->add_item(1000, '01' x 32);
+    $ne->seal;
+
+    like(
+        dies { $ne->initiate },
+        qr/frame_size_limit/i,
+        'oversized initiate message rejected'
+    );
+};
+
+subtest 'frame_size_limit: reconcile rejects oversized responses' => sub {
+    my $client = Net::Nostr::Negentropy->new;
+    $client->add_item(1000, '01' x 32);
+    $client->seal;
+
+    my $server = Net::Nostr::Negentropy->new(frame_size_limit => 1);
+    $server->add_item(2000, '02' x 32);
+    $server->seal;
+
+    my $q = $client->initiate;
+    like(
+        dies { $server->reconcile($q) },
+        qr/frame_size_limit/i,
+        'oversized reconcile response rejected'
+    );
+};
+
 subtest 'exports: public methods available' => sub {
     can_ok('Net::Nostr::Negentropy', qw(new add_item seal initiate reconcile));
 };

@@ -1,3 +1,8 @@
+0.04 2026-04-16
+
+   - Add support for depending on a specific fpm version
+   - Add support for installing fpm from a git repo
+
 0.03 2025-10-02
 
    - Add a dependency for Alien::Ruby.

@@ -8,12 +8,12 @@ Unix crypt()
 	use Authen::Passphrase::BlowfishCrypt;
 
 	$ppr = Authen::Passphrase::BlowfishCrypt->new(
-		cost => 8,
+		cost => 14,
 		salt => "sodium__chloride",
 		hash_base64 => "BPZijhMHLvPeNMHd6XwZyNamOXVBTPi");
 
 	$ppr = Authen::Passphrase::BlowfishCrypt->new(
-		cost => 8, salt_random => 1,
+		cost => 14, salt_random => 1,
 		passphrase => "passphrase");
 
 	$ppr = Authen::Passphrase::BlowfishCrypt->from_crypt(
@@ -98,9 +98,9 @@ use strict;
 use Authen::Passphrase 0.003;
 use Carp qw(croak);
 use Crypt::Eksblowfish::Bcrypt 0.008 qw(bcrypt_hash en_base64 de_base64);
-use Data::Entropy::Algorithms 0.000 qw(rand_bits);
+use Crypt::SysRandom 'random_bytes';
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 
@@ -141,8 +141,7 @@ The salt, as a string of 22 base 64 digits.
 =item B<salt_random>
 
 Causes salt to be generated randomly.  The value given for this attribute
-is ignored.  The source of randomness may be controlled by the facility
-described in L<Data::Entropy>.
+is ignored.
 
 =item B<hash>
 
@@ -194,7 +193,7 @@ sub new {
 		} elsif($attr eq "salt_random") {
 			croak "salt specified redundantly"
 				if exists $self->{salt};
-			$self->{salt} = rand_bits(128);
+			$self->{salt} = random_bytes(16);
 		} elsif($attr eq "hash") {
 			croak "hash specified redundantly"
 				if exists($self->{hash}) ||

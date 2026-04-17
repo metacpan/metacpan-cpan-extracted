@@ -1,5 +1,34 @@
 Revision history for MIDI-Drummer
 
+0.7013 2026-04-16 19:04:03
+    - Replaced "’" with "'" in the shared grooves file. :eyeroll:
+    - Changed the groove() method to acceptr hash-ref, instead of key/values.
+
+0.7012 2026-04-16 08:20:15
+    - Improve documentation.
+    - Comment out debugging code.
+
+0.7011 2026-04-15 22:47:03
+    - Ok. It works on Windows now. Whew.
+    - Fix documentation.
+
+0.7010-TRIAL 2026-04-15 22:31:34
+    - Handle newlines and \r correctly.
+
+0.7009-TRIAL 2026-04-15 22:02:05
+    - Improve documentation.
+    - Drop Algorithm::Combinatorics like a hot potato.
+
+0.7008-TRIAL 2026-04-15 21:22:18
+    - Improve documentation.
+    - Fixed groove datatype. Oops.
+    - Fixed-up the tests and eg/grooves.pl, naturally.
+
+0.7007-TRIAL 2026-04-15 20:29:15
+    - Add all the grooves with a shared text file processed and fixed from the "Pocket Operator" PDF.
+    - Change how grooves are processed.
+    - Improve documentation.
+
 0.7006 2026-04-08 10:29:14
     - Fix groove patterns again. :\
 

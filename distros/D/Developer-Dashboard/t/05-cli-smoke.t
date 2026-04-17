@@ -5,8 +5,10 @@ use utf8;
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Capture::Tiny qw(capture);
 use Cwd qw(abs_path getcwd);
+use Developer::Dashboard::Collector;
 use Developer::Dashboard::CLI::SeededPages ();
 use Developer::Dashboard::JSON qw(json_decode json_encode);
+use Developer::Dashboard::PathRegistry;
 use Encode qw(decode encode);
 use File::Path qw(make_path);
 use File::Spec;
@@ -587,6 +589,21 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
                         icon  => '[% a %]',
                     },
                 },
+                {
+                    name      => 'housekeeper',
+                    interval  => 30,
+                    indicator => {
+                        icon => 'HK',
+                    },
+                },
+                {
+                    name     => 'rotating.collector',
+                    command  => q{printf 'rotate\n'},
+                    cwd      => 'home',
+                    rotation => {
+                        lines => 4,
+                    },
+                },
             ],
         }
     );
@@ -615,6 +632,26 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     my ($templated_indicator) = grep { $_->{name} eq 'templated.indicator' } @{$templated_indicators};
     ok( $templated_indicator, 'dashboard indicator list exposes the TT-backed collector indicator after a collector run' );
     is( $templated_indicator->{icon}, '123', 'dashboard indicator list preserves the rendered TT-backed collector icon instead of reverting to raw template syntax' ) if $templated_indicator;
+
+    my $collector_log_paths = Developer::Dashboard::PathRegistry->new( home => $collector_log_home );
+    my $collector_store = Developer::Dashboard::Collector->new( paths => $collector_log_paths );
+    my $rotating_log = $collector_store->collector_paths('rotating.collector')->{log};
+    open my $rotating_log_fh, '>', $rotating_log or die "Unable to write $rotating_log: $!";
+    print {$rotating_log_fh} "line-1\nline-2\nline-3\nline-4\nline-5\nline-6\n";
+    close $rotating_log_fh or die "Unable to close $rotating_log: $!";
+
+    my $housekeeper_run = json_decode( _run("$perl -I'$lib' '$dashboard' housekeeper") );
+    is( $housekeeper_run->{ok}, 1, 'dashboard housekeeper reports a successful cleanup scan' );
+    ok( exists $housekeeper_run->{scanned}, 'dashboard housekeeper reports scan counts' );
+    ok( $housekeeper_run->{scanned}{collector_logs} >= 1, 'dashboard housekeeper reports configured collector log scans when rotation is enabled' );
+    open my $rotated_log_fh, '<', $rotating_log or die "Unable to read $rotating_log: $!";
+    my $rotated_log = do { local $/; <$rotated_log_fh> };
+    close $rotated_log_fh or die "Unable to close $rotating_log: $!";
+    is( $rotated_log, "line-3\nline-4\nline-5\nline-6\n", 'dashboard housekeeper rotates configured collector logs from the CLI command path' );
+
+    my $collector_housekeeper_run = json_decode( _run("$perl -I'$lib' '$dashboard' collector run housekeeper") );
+    is( $collector_housekeeper_run->{name}, 'housekeeper', 'dashboard collector run housekeeper executes the built-in housekeeper collector' );
+    is( $collector_housekeeper_run->{exit_code}, 0, 'dashboard collector run housekeeper succeeds' );
 
     my ( $missing_stdout, $missing_stderr, $missing_exit ) = capture {
         system 'sh', '-c', "$perl -I'$lib' '$dashboard' collector log missing.collector";
@@ -1073,6 +1110,61 @@ open my $jq_hook_result_fh, '<', $jq_hook_result or die "Unable to read $jq_hook
 is( do { local $/; <$jq_hook_result_fh> }, "hook-one\n", 'later built-in command hooks can read the accumulated RESULT JSON from earlier hook output' );
 close $jq_hook_result_fh;
 
+SKIP: {
+    skip 'Go hook smoke requires go in PATH', 4 if !_command_available('go');
+    my $jq_go_hook = File::Spec->catfile( $jq_hook_root, '02-go.go' );
+    open my $jq_go_hook_fh, '>', $jq_go_hook or die "Unable to write $jq_go_hook: $!";
+    print {$jq_go_hook_fh} <<'GO';
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+func main() {
+    fmt.Println("hook-go")
+    fmt.Fprintln(os.Stderr, "hook-go-err")
+}
+GO
+    close $jq_go_hook_fh;
+    chmod 0755, $jq_go_hook or die "Unable to chmod $jq_go_hook: $!";
+
+    my ( $jq_go_stdout, $jq_go_stderr, $jq_go_exit ) = capture {
+        system 'sh', '-c', qq{printf '{"alpha":{"beta":2}}' | $perl -I'$lib' '$dashboard' jq alpha.beta};
+        return $? >> 8;
+    };
+    is( $jq_go_exit, 0, 'dashboard jq succeeds when an executable Go hook file exists' );
+    like( $jq_go_stdout, qr/hook-go\n2\n\z/s, 'dashboard jq runs the Go hook before the main command output' );
+    like( $jq_go_stderr, qr/hook-go-err\n/, 'dashboard jq keeps Go hook stderr visible' );
+    like( $jq_go_stdout, qr/^hook-one\nhook-two\nhook-go\n/s, 'dashboard jq keeps Go hook ordering with earlier hook files' );
+}
+
+SKIP: {
+    skip 'Java hook smoke requires javac and java in PATH', 4 if !_command_available('javac') || !_command_available('java');
+    my $jq_java_hook = File::Spec->catfile( $jq_hook_root, '03-java.java' );
+    open my $jq_java_hook_fh, '>', $jq_java_hook or die "Unable to write $jq_java_hook: $!";
+    print {$jq_java_hook_fh} <<'JAVA';
+class HookJava {
+    public static void main(String[] args) {
+        System.out.println("hook-java");
+        System.err.println("hook-java-err");
+    }
+}
+JAVA
+    close $jq_java_hook_fh;
+    chmod 0755, $jq_java_hook or die "Unable to chmod $jq_java_hook: $!";
+
+    my ( $jq_java_stdout, $jq_java_stderr, $jq_java_exit ) = capture {
+        system 'sh', '-c', qq{printf '{"alpha":{"beta":2}}' | $perl -I'$lib' '$dashboard' jq alpha.beta};
+        return $? >> 8;
+    };
+    is( $jq_java_exit, 0, 'dashboard jq succeeds when an executable Java hook file exists' );
+    like( $jq_java_stdout, qr/hook-java\n2\n\z/s, 'dashboard jq runs the Java hook before the main command output' );
+    like( $jq_java_stderr, qr/hook-java-err\n/, 'dashboard jq keeps Java hook stderr visible' );
+    like( $jq_java_stdout, qr/^hook-one\nhook-two\n(?:hook-go\n)?hook-java\n/s, 'dashboard jq keeps Java hook ordering with the earlier hook files' );
+}
+
 local $ENV{RESULT} = json_encode(
     {
         '00-first.pl' => {
@@ -1479,6 +1571,51 @@ my ( $ext_stdout, $ext_stderr, $ext_exit ) = capture {
 is( $ext_exit, 0, 'user CLI extension exits successfully' );
 is( $ext_stderr, '', 'user CLI extension keeps stderr clean' );
 like( $ext_stdout, qr/^argv:one two\|stdin:hello-extension$/m, 'user CLI extension receives argv and stdin passthrough' );
+SKIP: {
+    skip 'go command not available for direct CLI source-command smoke test', 3 if !_command_available('go');
+    my $go_extension = File::Spec->catfile( $cli_root, 'hi.go' );
+    open my $go_extension_fh, '>', $go_extension or die "Unable to write $go_extension: $!";
+    print {$go_extension_fh} <<'GO';
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+GO
+    close $go_extension_fh;
+    chmod 0755, $go_extension or die "Unable to chmod $go_extension: $!";
+    my ( $go_stdout, $go_stderr, $go_exit ) = capture {
+        system $perl, '-I' . $lib, $dashboard, 'hi';
+        return $? >> 8;
+    };
+    is( $go_exit, 0, 'dashboard resolves cli/<command>.go as a direct custom command' );
+    is( $go_stderr, '', 'dashboard direct Go custom command keeps stderr clean' );
+    is( $go_stdout, "Hello, World!\n", 'dashboard direct Go custom command runs through go run' );
+}
+SKIP: {
+    skip 'javac and java are required for direct CLI source-command smoke test', 3
+      if !_command_available('javac') || !_command_available('java');
+    my $java_extension = File::Spec->catfile( $cli_root, 'foo.java' );
+    open my $java_extension_fh, '>', $java_extension or die "Unable to write $java_extension: $!";
+    print {$java_extension_fh} <<'JAVA';
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+JAVA
+    close $java_extension_fh;
+    chmod 0755, $java_extension or die "Unable to chmod $java_extension: $!";
+    my ( $java_stdout, $java_stderr, $java_exit ) = capture {
+        system $perl, '-I' . $lib, $dashboard, 'foo';
+        return $? >> 8;
+    };
+    is( $java_exit, 0, 'dashboard resolves cli/<command>.java as a direct custom command' );
+    is( $java_stderr, '', 'dashboard direct Java custom command keeps stderr clean' );
+    is( $java_stdout, "Hello, World!\n", 'dashboard direct Java custom command compiles and runs through javac/java' );
+}
 
 my $nonrepo_root = File::Spec->catdir( $ENV{HOME}, 'projects', 'nonrepo-local-cli-project' );
 my $nonrepo_cli_root = File::Spec->catdir( $nonrepo_root, '.developer-dashboard', 'cli' );
@@ -1731,7 +1868,9 @@ sub _write_zip_entries {
 
 sub _run {
     my ($cmd) = @_;
+    my $child_perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
     my ( $stdout, $stderr, $exit_code ) = capture {
+        local $ENV{PERL5OPT} = $child_perl5opt if $child_perl5opt =~ /Devel::Cover/;
         system 'sh', '-c', $cmd;
         return $? >> 8;
     };
@@ -1765,6 +1904,15 @@ sub _module_version {
     $content =~ /our \$VERSION = '([^']+)'/
       or die "Unable to find module version in $path";
     return $1;
+}
+
+sub _command_available {
+    my ($name) = @_;
+    my ( undef, undef, $exit_code ) = capture {
+        system 'sh', '-c', "command -v '$name' >/dev/null 2>&1";
+        return $? >> 8;
+    };
+    return $exit_code == 0 ? 1 : 0;
 }
 
 __END__

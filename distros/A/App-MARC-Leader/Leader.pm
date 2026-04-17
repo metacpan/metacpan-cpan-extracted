@@ -7,9 +7,10 @@ use Class::Utils qw(set_params);
 use Getopt::Std;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Leader 0.06;
-use MARC::Leader::Print;
+use MARC::Leader::Print 0.08;
+use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -41,17 +42,19 @@ sub run {
 		'd' => 0,
 		'f' => undef,
 		'h' => 0,
+		'l' => undef,
 		'v' => undef,
 	};
-	if (! getopts('adf:hv', $self->{'_opts'})
+	if (! getopts('adf:hl:v', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| (! $self->{'_opts'}->{'f'} && ! defined $marc_leader)) {
 
-		print STDERR "Usage: $0 [-a] [-d] [-f marc_xml_file] [-h] [-v] [--version] [leader_string]\n";
+		print STDERR "Usage: $0 [-a] [-d] [-f marc_xml_file] [-h] [-l lang_code] [-v] [--version] [leader_string]\n";
 		print STDERR "\t-a\t\t\tPrint with ANSI colors (or use NO_COLOR/COLOR env variables).\n";
 		print STDERR "\t-d\t\t\tDon't print description.\n";
 		print STDERR "\t-f marc_xml_file\tMARC XML file.\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
+		print STDERR "\t-l lang_code\t\tISO 639-1 language code (default is from locales).\n";
 		print STDERR "\t-v\t\t\tVerbose mode.\n";
 		print STDERR "\t--version\t\tPrint version.\n";
 		print STDERR "\t[leader_string]\t\tMARC Leader string.\n";
@@ -70,17 +73,17 @@ sub run {
 	)->parse($marc_leader);
 
 	# Print information.
-	print scalar MARC::Leader::Print->new(
+	print encode_utf8(scalar MARC::Leader::Print->new(
+		'lang' => $self->{'_opts'}->{'l'},
 		'mode_ansi' => $self->{'_opts'}->{'a'},
-		'mode_desc' => ! $self->{'_opts'}->{'d'},
-	)->print($leader);
+		'mode_desc' => $self->{'_opts'}->{'d'} ? 0 : 1,
+	)->print($leader));
 	print "\n";
 
 	return 0;
 }
 
 1;
-
 
 __END__
 
@@ -134,6 +137,8 @@ Returns 1 for error, 0 for success.
  use IO::Barf qw(barf);
  use File::Temp qw(tempfile);
  use MIME::Base64;
+
+ $ENV{'NO_COLOR'} = 1;
 
  # Content.
  my $marc_xml_example = <<'END';
@@ -217,6 +222,8 @@ Returns 1 for error, 0 for success.
 
  # Arguments.
  @ARGV = (
+         '-l',
+         'en',
          '-f',
          $temp_file,
  );
@@ -336,6 +343,8 @@ Returns 1 for error, 0 for success.
 
  # Arguments.
  @ARGV = (
+         '-l',
+         'en',
          '-a',
          '-f',
          $temp_file,
@@ -368,7 +377,8 @@ L<Class::Utils>,
 L<Getopt::Std>,
 L<MARC::File::XML>,
 L<MARC::Leader>,
-L<MARC::Leader::Print>.
+L<MARC::Leader::Print>,
+L<Unicode::UTF8>.
 
 =head1 REPOSITORY
 
@@ -388,6 +398,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

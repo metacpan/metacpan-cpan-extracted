@@ -1,5 +1,4 @@
 #!/usr/local/bin/perl
-use v5.36.1;
 use strict;
 use warnings;
 use lib './t';

@@ -54,18 +54,18 @@ typedef struct {
 #  endif
 
 /* Fallback custom op registration using deprecated interface
- * Use PERL_IMPLICIT_CONTEXT not USE_ITHREADS - that's what controls aTHX_ expansion */
+ * 
+ * IMPORTANT: The C preprocessor counts macro arguments BEFORE expanding aTHX_.
+ * So Perl_custom_op_register(aTHX_ ppfunc, xop) is seen as 2 args, not 3.
+ * 
+ * We use a variadic macro to handle both threaded and non-threaded cases.
+ * The helper function then uses pTHX to get the interpreter context.
+ */
 #  ifndef Perl_custom_op_register
-#    ifdef PERL_IMPLICIT_CONTEXT
-#      define Perl_custom_op_register(ctx, ppfunc, xop) \
-          xop_compat_register_custom_op((ctx), (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)
-#    else
-#      define Perl_custom_op_register(ppfunc, xop) \
-          xop_compat_register_custom_op(aTHX_ (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)
-#    endif
+#    define Perl_custom_op_register(...) xop_compat_register_custom_op(__VA_ARGS__)
 #  endif
 
-static void xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, const char *name, const char *desc) {
+static void xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, XOP *xop) {
     /*
      * The deprecated PL_custom_op_names/PL_custom_op_descs interface
      * uses the pp function pointer address as the hash key.
@@ -77,8 +77,8 @@ static void xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, const char
     if (!PL_custom_op_descs) {
         PL_custom_op_descs = newHV();
     }
-    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(name, 0), 0);
-    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(desc, 0), 0);
+    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_name, 0), 0);
+    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_desc, 0), 0);
 }
 
 #endif /* PERL_VERSION_GE(5,14,0) */

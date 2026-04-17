@@ -1,0 +1,65 @@
+---
+abstract: 'Perl TUI Framework (Turbo Vision 2.0 Port)'
+author:
+  - 'J. Schneider'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TUI-Vision
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  TUI::App:
+    file: lib/TUI/App.pm
+    version: v2.0.0
+  TUI::Dialogs:
+    file: lib/TUI/Dialogs.pm
+    version: v2.0.0
+  TUI::Drivers:
+    file: lib/TUI/Drivers.pm
+    version: v2.0.0
+  TUI::Gadgets:
+    file: lib/TUI/Gadgets.pm
+    version: v2.0.0
+  TUI::Memory:
+    file: lib/TUI/Memory.pm
+    version: v2.0.0
+  TUI::MsgBox:
+    file: lib/TUI/MsgBox.pm
+    version: v2.0.0
+  TUI::Objects:
+    file: lib/TUI/Objects.pm
+    version: v2.0.0
+  TUI::StdDlg:
+    file: lib/TUI/StdDlg.pm
+    version: v2.0.0
+  TUI::TextView:
+    file: lib/TUI/TextView.pm
+    version: v2.0.0
+  TUI::Validate:
+    file: lib/TUI/Validate.pm
+    version: v2.0.0
+  TUI::Views:
+    file: lib/TUI/Views.pm
+    version: v2.0.0
+  TUI::Vision:
+    file: lib/TUI/Vision.pm
+    version: v2.0.0
+  TUI::toolkit:
+    file: lib/TUI/toolkit.pm
+    version: v2.0.0
+requires:
+  perl: '5.010'
+resources:
+  repository: https://github.com/brickpool/tvision.git
+version: v2.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

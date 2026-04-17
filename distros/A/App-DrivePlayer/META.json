@@ -1,0 +1,75 @@
+{
+   "abstract" : "GTK3 music player for Google Drive",
+   "author" : [
+      "Robin Murray <mvsjes@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-DrivePlayer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBIx::Class" : "0",
+            "Glib" : "0",
+            "Google::RestApi" : "v2.2.2",
+            "Gtk3" : "0",
+            "JSON::MaybeXS" : "0",
+            "Log::Log4perl" : "0",
+            "Moo" : "0",
+            "Readonly" : "0",
+            "SQL::Translator" : "0.11018",
+            "ToolSet" : "0",
+            "Type::Tiny" : "0",
+            "URI" : "0",
+            "YAML" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mock::MonkeyPatch" : "0",
+            "Module::Load" : "0",
+            "Test::Class" : "0",
+            "Test::Class::Load" : "0",
+            "Test::Compile" : "0",
+            "Test::Most" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mvsjes2/drive_player.git",
+         "web" : "https://github.com/mvsjes2/drive_player"
+      }
+   },
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

@@ -82,6 +82,19 @@ EXPORTS
       throw exceptions if you use an invalid $NAME, which includes the case
       of calling it without a set jump point.
 
+    $bool = havejump($NAME)
+
+    $bool = havejump $NAME
+
+      Check if a jump point with the given $NAME is currently set somewhere
+      on the call stack. Returns a true value (1) if the named jump point
+      is active and would be reachable via longjump($NAME), otherwise
+      returns false (0).
+
+      This is useful for code that wants to conditionally call longjump()
+      only when an enclosing setjump() is actually present, avoiding the
+      exception that would be thrown for an unknown name.
+
 SOURCE
 
     The source code repository for Long-Jump can be found at

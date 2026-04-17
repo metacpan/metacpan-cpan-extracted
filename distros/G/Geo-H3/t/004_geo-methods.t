@@ -22,7 +22,7 @@ SKIP: {
   my $resolution = 7;
   my $h3         = $geo->h3($resolution);
   isa_ok($h3, 'Geo::H3::Index');
-  is($h3->index, '608725951823478783', 'index');
+  is($h3->uint64, '608725951823478783', 'uint64');
   is($h3->string, '872a1072bffffff', 'string');
   is($h3->resolution, $resolution, 'resolution');
 }

@@ -12,7 +12,7 @@ BEGIN { use_ok('CGI::ACL') }
 
 my $mock = Test::MockModule->new('CGI::ACL');
 
-$mock->mock('verified_rdns', sub {
+$mock->mock('_verified_rdns', sub {
 	my $ip = $_[0];
 
 	return 'ec2-1-2-3-4.compute-1.amazonaws.com' if $ip eq '1.2.3.4';   # AWS
@@ -21,7 +21,7 @@ $mock->mock('verified_rdns', sub {
 
 	return 'customer-5-6-7-8.example.com' if $ip eq '5.6.7.8';   # Residential / non-cloud
 
-	return undef;              # No PTR or unverified
+	return undef;	# No PTR or unverified
 });
 
 # ------------------------------------------------------------
@@ -32,9 +32,9 @@ my $acl = CGI::ACL->new()->deny_cloud()->allow_ip('1.2.3.4')->allow_ip('203.0.11
 
 # Helper to call all_denied() with a fake REMOTE_ADDR
 sub denied_for {
-    my ($ip) = @_;
-    local $ENV{REMOTE_ADDR} = $ip;
-    return $acl->all_denied();
+	my $ip = $_[0];
+	local $ENV{REMOTE_ADDR} = $ip;
+	return $acl->all_denied();
 }
 
 # ------------------------------------------------------------
@@ -42,19 +42,19 @@ sub denied_for {
 # ------------------------------------------------------------
 
 subtest 'AWS EC2 should be denied' => sub {
-    ok denied_for('1.2.3.4'), 'AWS IP denied';
+	ok denied_for('1.2.3.4'), 'AWS IP denied';
 };
 
 subtest 'Google Cloud should be denied' => sub {
-    ok denied_for('203.0.113.10'), 'GCP IP denied';
+	ok denied_for('203.0.113.10'), 'GCP IP denied';
 };
 
 subtest 'Residential IP should be allowed' => sub {
-    ok !denied_for('5.6.7.8'), 'Non-cloud IP allowed';
+	ok !denied_for('5.6.7.8'), 'Non-cloud IP allowed';
 };
 
 subtest 'IP with no verified PTR should be allowed' => sub {
-    ok !denied_for('198.51.100.99'), 'Unknown PTR allowed';
+	ok !denied_for('198.51.100.99'), 'Unknown PTR allowed';
 };
 
 done_testing();

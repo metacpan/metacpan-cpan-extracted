@@ -1,0 +1,32 @@
+CHANGES
+CONTRIBUTING.md
+DateTime-Format-Lite.xs
+lib/DateTime/Format/Lite.pm
+lib/DateTime/Format/Lite/Exception.pm
+lib/DateTime/Format/Lite/PP.pm
+LICENSE
+Makefile.PL
+MANIFEST
+ppport.h
+README
+README.md
+SIGNATURE
+t/00.load.t
+t/10.basic.t
+t/20.format.t
+t/30.errors.t
+t/40.zones.t
+t/50.edge.t
+t/60.import.t
+t/70.locale.t
+t/75.generated-locale.t
+t/85.serialisation.t
+t/89.tz_abbr_resolution.t
+t/90.pod.t
+t/91.coverage.t
+t/92.manifest.t
+t/93.signature.t
+t/95.exception.t
+t/99.kwalitee.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,21 @@
+0.08 2026-04-15T18:06:49+02:00
+ - Remove trailing descriptions, only values.
+
+0.07 2026-04-15T16:42:10+02:00
+ - Add check for mode parameters in constructor.
+ - Fix ERRORS section in doc.
+ - Fix test dependencies.
+
+0.06 2026-04-15T16:33:22+02:00
+ - Add tests for print().
+ - Fix value for indicator count.
+ - Update to MARC::Leader::L10N@0.03, there were bad key.
+
+0.05 2026-04-15T13:11:39+02:00
+ - Add test for constructor.
+ - Add 'lang' parameter and rewrite to L10N.
+ - Update copyright years.
+
 0.04 2024-01-11T23:22:32+01:00
  - Add EXAMPLE2 to doc.
  - Fix raw output.

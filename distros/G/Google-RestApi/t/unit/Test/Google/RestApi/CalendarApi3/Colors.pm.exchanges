@@ -152,18 +152,12 @@ response:
      }
     }
   headers:
-  - x-xss-protection
-  - '0'
-  - cache-control
-  - private, max-age=3600, must-revalidate, no-transform
-  - accept-ranges
-  - none
-  - transfer-encoding
-  - chunked
-  - x-frame-options
-  - SAMEORIGIN
+  - x-l2-request-path
+  - l2-managed-14
   - server
   - ESF
+  - x-xss-protection
+  - '0'
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - vary
@@ -174,14 +168,20 @@ response:
   - Origin,Accept-Encoding
   - x-content-type-options
   - nosniff
-  - x-l2-request-path
-  - l2-managed-14
+  - date
+  - Thu, 16 Apr 2026 19:10:56 GMT
+  - expires
+  - Thu, 16 Apr 2026 19:10:56 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
   - content-type
   - application/json; charset=UTF-8
-  - expires
-  - Mon, 13 Apr 2026 23:49:40 GMT
-  - date
-  - Mon, 13 Apr 2026 23:49:40 GMT
+  - cache-control
+  - private, max-age=3600, must-revalidate, no-transform
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Colors::get
 

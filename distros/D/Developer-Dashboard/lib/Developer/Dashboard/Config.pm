@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
 use File::Spec;
 use Cwd qw(cwd);
@@ -161,7 +161,10 @@ sub _merge_named_hash_array {
             && $item->{$identity_key} ne ''
         ) {
             if ( exists $positions{ $item->{$identity_key} } ) {
-                $merged[ $positions{ $item->{$identity_key} } ] = $item;
+                $merged[ $positions{ $item->{$identity_key} } ] = $self->_merge_named_hash_item(
+                    $merged[ $positions{ $item->{$identity_key} } ],
+                    $item,
+                );
                 next;
             }
             $positions{ $item->{$identity_key} } = scalar @merged;
@@ -172,6 +175,17 @@ sub _merge_named_hash_array {
     return \@merged;
 }
 
+# _merge_named_hash_item($left, $right)
+# Merges two logical array members so deeper layers can override individual keys
+# without discarding inherited nested hash settings.
+# Input: left and right item values from a named array.
+# Output: merged item value with right-hand overrides applied.
+sub _merge_named_hash_item {
+    my ( $self, $left, $right ) = @_;
+    return $right if ref($left) ne 'HASH' || ref($right) ne 'HASH';
+    return $self->_merge_hashes( $left, $right );
+}
+
 # collectors()
 # Returns all configured collectors from merged configuration.
 # Input: none.
@@ -179,12 +193,12 @@ sub _merge_named_hash_array {
 sub collectors {
     my ($self) = @_;
     my $cfg = $self->merged;
-    my @jobs = ();
+    my @jobs = @{ $self->_builtin_collectors };
 
     if ( ref( $cfg->{collectors} ) eq 'ARRAY' ) {
-        push @jobs, @{ $cfg->{collectors} };
+        @jobs = @{ $self->_merge_named_hash_array( \@jobs, $cfg->{collectors}, 'name' ) };
     }
-    push @jobs, $self->_skill_collectors;
+    @jobs = @{ $self->_merge_named_hash_array( \@jobs, [ $self->_skill_collectors ], 'name' ) };
 
     if ( my $filter = $ENV{DEVELOPER_DASHBOARD_CHECKERS} ) {
         my %wanted = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, $filter;
@@ -192,6 +206,30 @@ sub collectors {
     }
 
     return \@jobs;
+}
+
+# _builtin_collectors()
+# Returns the built-in collector job definitions that ship with the runtime.
+# Input: none.
+# Output: array reference of collector job hash references.
+sub _builtin_collectors {
+    return [
+        {
+            name     => 'housekeeper',
+            code     => <<'PERL',
+my $housekeeper = Developer::Dashboard::Housekeeper->new(
+    paths => Developer::Dashboard::PathRegistry->new(
+        workspace_roots => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
+        project_roots   => [ grep { defined && -d } map { "$ENV{HOME}/$_" } qw(projects src work) ],
+    ),
+);
+print Developer::Dashboard::JSON::json_encode( $housekeeper->run );
+0;
+PERL
+            cwd      => 'home',
+            interval => 900,
+        },
+    ];
 }
 
 # path_aliases()
@@ -545,7 +583,9 @@ Developer::Dashboard::Config - merged configuration loader
 =head1 DESCRIPTION
 
 This module loads and merges global and repo-local configuration for Developer
-Dashboard.
+Dashboard. Matching collector and provider entries merge by logical identity,
+so deeper layers can override fields such as C<interval> or nested
+C<indicator> metadata without discarding inherited defaults.
 
 =head1 METHODS
 
@@ -563,7 +603,10 @@ configuration.
 
 =head1 PURPOSE
 
-This module owns runtime configuration files such as F<config/config.json>, path aliases, web settings, collector definitions, and feature-specific config trees. It loads the effective config through C<DD-OOP-LAYERS> and writes changes back to the deepest participating runtime root.
+This module owns runtime configuration files such as F<config/config.json>,
+path aliases, web settings, collector definitions, and feature-specific config
+trees. It loads the effective config through C<DD-OOP-LAYERS> and writes
+changes back to the deepest participating runtime root.
 
 =head1 WHY IT EXISTS
 
@@ -575,7 +618,13 @@ Use this file when changing config schema defaults, alias persistence, collector
 
 =head1 HOW TO USE
 
-Construct it with the file registry and path registry, then use the accessor and persistence methods instead of reading config JSON directly. New config-backed features should register their data under the appropriate runtime config directory and let this module handle loading rules.
+Construct it with the file registry and path registry, then use the accessor
+and persistence methods instead of reading config JSON directly. New
+config-backed features should register their data under the appropriate
+runtime config directory and let this module handle loading rules. Matching
+collectors merge by C<name>, so a config entry such as C<housekeeper> can
+override only C<interval> or C<indicator> while still inheriting the built-in
+collector C<code> and C<cwd>.
 
 =head1 WHAT USES IT
 

@@ -11,7 +11,7 @@ CGI::ACL - Decide whether to allow a client to run this script
 
 # VERSION
 
-Version 0.05
+Version 0.07
 
 # SYNOPSIS
 
@@ -36,6 +36,12 @@ Handles both hash and hashref arguments.
 Includes basic error handling for invalid arguments.
 
     my $acl = CGI::ACL->new(allowed_ips => { '127.0.0.1' => 1 });
+
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting `$ENV{'CGI__ACL__allowed_ips'}`.
+For more information about configuring object constructors at runtime,
+see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
 
 ## allow\_ip
 
@@ -140,7 +146,8 @@ A VPN or proxy would most likely bypass the IP-based access control.
 
 # SEE ALSO
 
-[CGI::Lingua](https://metacpan.org/pod/CGI%3A%3ALingua)
+- [CGI::Lingua](https://metacpan.org/pod/CGI%3A%3ALingua)
+- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 
 # SUPPORT
 

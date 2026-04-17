@@ -1,7 +1,9 @@
-![Debug::Easy Logo](Debug-Easy.png?raw=true "Debug::Easy")
-
 # Richard Kelsch
 
-The author of this utility, has been a Perl coder for well over three decades.  His specialization was code optimization and multi-threading and did it quite well.
+![Author](images/author.jpg?raw=true "Richard Kelsch")
 
-He has switched jobs and is now a Linux System Administrator, but still codes in Perl as a hobby.
+![Divider](images/pink.jpg?raw=true "Divider")
+
+I am a Perl Programmer and Linux System Administrator by profession.  I specialize in code optimization and multi-threading.  I have been coding professionally for nearly 4 decades.  I am a [published author](images/TinyPrint.jpg "ST Format Cover Disk #65 Dec 1994 Page 9") as well.
+
+* **GitHub** - [https://github.com/richcsst](https://github.com/richcsst)

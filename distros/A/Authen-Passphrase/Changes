@@ -1,3 +1,11 @@
+version 0.009; 2026-04-15
+
+  * Mark module as deprecated
+
+  * Switch from Data::Entropy to Crypt::SysRandom
+
+  * Fix various documentation issues.
+
 version 0.008; 2012-02-04
 
   * bugfix: avoid passing magic variables $1 et al into functions where

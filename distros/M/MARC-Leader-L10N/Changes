@@ -1,3 +1,10 @@
+0.04 2026-04-15T18:18:13+02:00
+ - Remove trailing descriptions.
+
+0.03 2026-04-15T14:49:31+02:00
+ - Add tests for get_handle() method.
+ - Fix lang key.
+
 0.02 2026-04-15T00:57:18+02:00
  - Add MARC leader value texts. Moved from Data::MARC::Leader::Utils.
 

@@ -1,0 +1,32 @@
+Revision history for App::DrivePlayer.
+
+0.2.1 2026-04-16
+        - Fix window height: replace alpha-strip button VBox with TreeView so
+          the sidebar ScrolledWindow can properly constrain minimum height,
+          allowing the main window to be resized smaller.
+        - Alpha strip width increased to 32px to avoid scrollbar overlap.
+
+0.2.0 2026-04-15
+        - GUI refactored into Moo roles (MetadataFetch, SheetSync, FolderBrowse).
+        - Background metadata fetch via fork+pipe; UI remains responsive.
+        - Live track-row updates in the list view as metadata arrives.
+        - Retry Incomplete Metadata: re-fetches only tracks missing key fields.
+        - FLAC embedded tag reading via Audio::FLAC::Header (optional).
+        - MusicBrainz genre support (curated genres preferred over folksonomy tags).
+        - Genre lookup now falls back through release → release-group levels.
+        - Title cleaning now strips leading track numbers from underscore filenames.
+        - Duration captured from mpv playback and persisted to DB and sheet.
+        - Config supports google_restapi key introduced in Google::RestApi 2.2.1.
+        - Track lookup fixed after column sort (was using stale position index).
+        - Column widths set to sensible defaults on initial load.
+        - Log4perl appenders set to UTF-8 to suppress wide-character warnings.
+        - Library → Refresh menu item added.
+        - Stop button hidden when playback is idle.
+        - Folder-scoped metadata fetch via sidebar right-click.
+
+0.1.0 2026-04-12
+        - Initial release.
+        - GTK3 music player for Google Drive with SQLite local library.
+        - Google Sheets sync for cross-device metadata portability.
+        - AcoustID / iTunes / MusicBrainz metadata fetching.
+        - Incremental folder sync with large-deletion confirmation.

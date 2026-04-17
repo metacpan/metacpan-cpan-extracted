@@ -22,5 +22,6 @@ SIGNATURE
 t/MARC-Leader-Print/01-use.t
 t/MARC-Leader-Print/02-version.t
 t/MARC-Leader-Print/03-new.t
+t/MARC-Leader-Print/04-print.t
 xt/MARC-Leader-Print/01-pod_coverage.t
 xt/MARC-Leader-Print/02-pod.t

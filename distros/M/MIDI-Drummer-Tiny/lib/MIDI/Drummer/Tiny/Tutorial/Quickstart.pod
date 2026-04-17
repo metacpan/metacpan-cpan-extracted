@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Quickstart
 
 =head1 VERSION
 
-version 0.7006
+version 0.7013
 
 =head1 Import the Module
 

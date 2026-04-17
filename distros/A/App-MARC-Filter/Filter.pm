@@ -7,7 +7,9 @@ use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
 use Getopt::Std;
+use IO::Uncompress::AnyUncompress qw($AnyUncompressError);
 use List::Util 1.33 qw(any none);
+use MARC::Batch;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::File::USMARC;
 use MARC::Leader;
@@ -18,7 +20,7 @@ use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 $| = 1;
 
@@ -86,11 +88,30 @@ sub run {
 		;
 	}
 
-	my $marc_file;
+	my ($fh, $errno);
+	if ($self->_open_marc_input($self->{'_marc_file'}, \$fh, \$errno)) {
+		print STDERR "Cannot open file '$self->{'_marc_file'}'.";
+		if (defined $errno) {
+			print STDERR "\tErrno: $errno\n";
+		}
+		return 1;
+	}
+	my ($marc_batch, $stream);
 	if ($self->{'_marc_file'} =~ m/\.xml$/ms) {
-		$marc_file = MARC::File::XML->in($self->{'_marc_file'});
+		$stream = 'XML';
+		$marc_batch = eval {
+			MARC::Batch->new('XML', $fh);
+		};
 	} else {
-		$marc_file = MARC::File::USMARC->in($self->{'_marc_file'});
+		$stream = 'USMARC';
+		$marc_batch = eval {
+			MARC::Batch->new('USMARC', $fh);
+		};
+	}
+	if ($EVAL_ERROR) {
+		print STDERR "Cannot open MARC $stream stream.\n";
+		print STDERR "\tError: $EVAL_ERROR\n";
+		return 1;
 	}
 	my @ret;
 	my $num = 1;
@@ -103,7 +124,7 @@ sub run {
 		}
 
 		my $record = eval {
-			$marc_file->next;
+			$marc_batch->next;
 		};
 		if ($EVAL_ERROR) {
 			print STDERR "Cannot process '$num' record. ".
@@ -244,6 +265,19 @@ sub _match_inverse {
 	}
 
 	return 0;
+}
+
+sub _open_marc_input {
+	my ($self, $path, $fh_sr, $errno_sr) = @_;
+
+	# Compression autodetection.
+	${$fh_sr} = IO::Uncompress::AnyUncompress->new($path);
+	if (defined ${$fh_sr}) {
+		return 0;
+	}
+	${$errno_sr} = $AnyUncompressError;
+
+	return 1;
 }
 
 sub _print {
@@ -478,9 +512,10 @@ Returns 1 for error, 0 for success.
  Y3Rpb24+Cg==
  END
 
- my ($temp_file, $temp_file_fh) = tempfile();
+ my ($temp_file_fh, $temp_file) = tempfile(SUFFIX => '.xml');
 
  barf($temp_file_fh, decode_base64($marc_xml_example));
+ close($temp_file_fh);
 
  # Arguments.
  @ARGV = (
@@ -593,7 +628,9 @@ L<Class::Utils>,
 L<English>,
 L<Error::Pure>,
 L<Getopt::Std>,
+L<IO::Uncompress::AnyUncompress>,
 L<List::Util>,
+L<MARC::Batch>,
 L<MARC::File::XML>,
 L<Readonly>,
 L<Unicode::UTF8>.
@@ -616,6 +653,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

@@ -1,0 +1,89 @@
+NAME
+
+    Test2::Harness2::ChildSubReaper - Tiny XS wrapper around Linux's
+    PR_SET_CHILD_SUBREAPER prctl.
+
+DESCRIPTION
+
+    This distribution exists solely to let Test2::Harness2 ask the Linux
+    kernel to make the current process a "subreaper" for its descendants.
+
+    On Linux (kernel 3.4 or newer), a process that sets
+    PR_SET_CHILD_SUBREAPER becomes the adoptive parent of any descendant
+    process that gets orphaned, instead of that descendant reparenting to
+    init(1). This lets long-running services such as the Test2-Harness2
+    service reliably waitpid grandchildren and guarantee cleanup when a
+    test double-forks or calls setsid followed by a parent exit.
+
+    The surface area is intentionally minimal: this module exposes exactly
+    one prctl operation and nothing else. It is meant to replace
+    Linux::Prctl as an optional runtime dependency of Test2-Harness2
+    without pulling in the full prctl(2) surface.
+
+SYNOPSIS
+
+        use Test2::Harness2::ChildSubReaper qw/set_child_subreaper have_subreaper_support/;
+    
+        if (have_subreaper_support()) {
+            set_child_subreaper(1) or warn "prctl failed: $!";
+        }
+
+EXPORTS
+
+    Neither function is exported by default. Request them explicitly.
+
+    $bool = have_subreaper_support()
+
+      Returns 1 if this build of the module was compiled with support for
+      PR_SET_CHILD_SUBREAPER (i.e. compiled on Linux with the macro
+      available in <sys/prctl.h>). Returns 0 otherwise.
+
+      Safe to call on any platform. Does not make any syscalls.
+
+    $ok = set_child_subreaper($bool)
+
+      Enables (truthy argument) or disables (falsy argument) the subreaper
+      flag on the current process.
+
+      Returns 1 on success, 0 on failure with $! (errno) set by the kernel.
+      On platforms where support was not compiled in, returns 0 and sets $!
+      to ENOSYS.
+
+      No exception is thrown for runtime failures such as EPERM; the caller
+      chooses whether to warn, die, or carry on.
+
+PORTABILITY
+
+    The module installs cleanly on any platform Perl can build XS on, so
+    listing it as an optional or suggested dependency will not cause
+    installation failures on non-Linux systems. The XS file guards the real
+    prctl call with #ifdef __linux__ and #ifdef PR_SET_CHILD_SUBREAPER;
+    platforms without the macro get a stub that always returns 0 with $!
+    set to ENOSYS.
+
+SEE ALSO
+
+    Test2::Harness2, prctl(2), Linux::Prctl.
+
+SOURCE
+
+    The source code repository for Test2-Harness2-ChildSubReaper can be
+    found at https://github.com/Test-More/Test2-Harness2-ChildSubReaper/.
+
+MAINTAINERS
+
+    Chad Granum <exodist@cpan.org>
+
+AUTHORS
+
+    Chad Granum <exodist@cpan.org>
+
+COPYRIGHT
+
+    Copyright Chad Granum <exodist7@gmail.com>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

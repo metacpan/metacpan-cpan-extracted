@@ -1323,8 +1323,10 @@ static OP* accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
         OpLASTSIB_set(valop, NULL);
         OpLASTSIB_set(selfop, NULL);
         
-        /* Create binop with self and val */
-        newop = newBINOP(OP_CUSTOM, 0, selfop, valop);
+        /* Create binop with self and val - use OP_NULL to avoid assertion
+         * failures on debugging Perls (5.14-5.20), then set OP_CUSTOM */
+        newop = newBINOP(OP_NULL, 0, selfop, valop);
+        newop->op_type = OP_CUSTOM;
         newop->op_ppaddr = pp_object_set;
         newop->op_targ = idx;
         
@@ -1335,7 +1337,10 @@ static OP* accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
         OpMORESIB_set(pushop, cvop);
         OpLASTSIB_set(selfop, NULL);
         
-        newop = newUNOP(OP_CUSTOM, 0, selfop);
+        /* Use OP_NULL to avoid assertion failures on debugging Perls
+         * (5.14-5.20), then set OP_CUSTOM */
+        newop = newUNOP(OP_NULL, 0, selfop);
+        newop->op_type = OP_CUSTOM;
         newop->op_ppaddr = pp_object_get;
         newop->op_targ = idx;
         
@@ -1816,7 +1821,11 @@ static OP* func_accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckob
             OpLASTSIB_set(valop, NULL);
             OpLASTSIB_set(objop, NULL);
 
-            newop = newBINOP(OP_CUSTOM, 0, objop, valop);
+            /* Use OP_NULL first, then set op_type to OP_CUSTOM.
+             * This avoids assertion failures in newBINOP on older
+             * debugging Perls (5.14-5.20) which check op class masks. */
+            newop = newBINOP(OP_NULL, 0, objop, valop);
+            newop->op_type = OP_CUSTOM;
             newop->op_ppaddr = pp_object_func_set;
             newop->op_targ = data->registry_id;
 
@@ -1836,7 +1845,11 @@ static OP* func_accessor_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *ckob
     OpMORESIB_set(pushop, cvop);
     OpLASTSIB_set(objop, NULL);
 
-    newop = newUNOP(OP_CUSTOM, 0, objop);
+    /* Use OP_NULL first, then set op_type to OP_CUSTOM.
+     * This avoids assertion failures in newUNOP on older
+     * debugging Perls (5.14-5.20) which check op class masks. */
+    newop = newUNOP(OP_NULL, 0, objop);
+    newop->op_type = OP_CUSTOM;
     newop->op_ppaddr = pp_object_func_get;
     newop->op_targ = data->registry_id;
 
@@ -2358,7 +2371,10 @@ static OP* accessor_typed_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *cko
         OpLASTSIB_set(valop, NULL);
         OpLASTSIB_set(selfop, NULL);
         
-        newop = newBINOP(OP_CUSTOM, 0, selfop, valop);
+        /* Use OP_NULL to avoid assertion failures on debugging Perls
+         * (5.14-5.20), then set OP_CUSTOM */
+        newop = newBINOP(OP_NULL, 0, selfop, valop);
+        newop->op_type = OP_CUSTOM;
         newop->op_ppaddr = pp_object_set_typed;
         newop->op_targ = PTR2IV(data);
         
@@ -2369,7 +2385,10 @@ static OP* accessor_typed_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *cko
         OpMORESIB_set(pushop, cvop);
         OpLASTSIB_set(selfop, NULL);
         
-        newop = newUNOP(OP_CUSTOM, 0, selfop);
+        /* Use OP_NULL to avoid assertion failures on debugging Perls
+         * (5.14-5.20), then set OP_CUSTOM */
+        newop = newUNOP(OP_NULL, 0, selfop);
+        newop->op_type = OP_CUSTOM;
         newop->op_ppaddr = pp_object_get;
         newop->op_targ = idx;
         

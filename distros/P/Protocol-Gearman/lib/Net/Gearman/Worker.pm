@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Net::Gearman::Worker;
+package Net::Gearman::Worker 0.05;
 
-use strict;
+use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use base qw( Net::Gearman Protocol::Gearman::Worker );
 
@@ -18,22 +19,24 @@ C<Net::Gearman::Worker> - concrete Gearman worker over an IP socket
 
 =head1 SYNOPSIS
 
- use List::Util qw( sum );
- use Net::Gearman::Worker;
+=for highlighter language=perl
 
- my $worker = Net::Gearman::Worker->new(
-    PeerAddr => $SERVER,
- ) or die "Cannot connect - $@\n";
+   use List::Util qw( sum );
+   use Net::Gearman::Worker;
 
- $worker->can_do( 'sum' );
+   my $worker = Net::Gearman::Worker->new(
+      PeerAddr => $SERVER,
+   ) or die "Cannot connect - $@\n";
 
- while(1) {
-    my $job = $worker->grab_job->get;
+   $worker->can_do( 'sum' );
 
-    my $total = sum split m/,/, $job->arg;
+   while(1) {
+      my $job = $worker->grab_job->get;
 
-    $job->complete( $total );
- }
+      my $total = sum split m/,/, $job->arg;
+
+      $job->complete( $total );
+   }
 
 =head1 DESCRIPTION
 

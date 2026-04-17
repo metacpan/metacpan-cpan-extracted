@@ -127,9 +127,9 @@ use Crypt::UnixCrypt_XS 0.08 qw(
 	base64_to_int24 int24_to_base64
 	base64_to_int12 int12_to_base64
 );
-use Data::Entropy::Algorithms 0.000 qw(rand_int);
+use Crypt::SysRandom 'random_bytes';
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 
@@ -182,8 +182,6 @@ The salt, as a string of two or four base 64 digits.
 
 Causes salt to be generated randomly.  The value given for this attribute
 must be either 12 or 24, giving the number of bits of salt to generate.
-The source of randomness may be controlled by the facility described
-in L<Data::Entropy>.
 
 =item B<hash>
 
@@ -260,7 +258,7 @@ sub new {
 				if exists $self->{salt};
 			croak "\"$value\" is not a valid salt size"
 				unless $value == 12 || $value == 24;
-			$self->{salt} = rand_int(1 << $value);
+			$self->{salt} = unpack("I", random_bytes(4)) % (1 << $value);
 		} elsif($attr eq "hash") {
 			croak "hash specified redundantly"
 				if exists($self->{hash}) ||

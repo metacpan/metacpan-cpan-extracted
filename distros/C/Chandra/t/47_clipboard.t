@@ -57,8 +57,11 @@ use Chandra::Clipboard;
 {
     ok(Chandra::Clipboard->set_text(''), 'set empty string');
     my $got = Chandra::Clipboard->get_text;
-    # Empty string may or may not be considered "has text" by platform
-    ok(defined $got, 'get_text returns defined for empty');
+    # Empty string handling is platform-dependent:
+    # - Some platforms return '' (empty string)
+    # - Some platforms return undef (clipboard clears on empty)
+    # - Headless systems may not retain clipboard contents at all
+    ok(!defined $got || $got eq '', 'get_text returns undef or empty for empty string');
 }
 
 # ---- HTML round-trip ----

@@ -1,5 +1,5 @@
 Name:           perl-Geo-H3-FFI
-Version:        0.06
+Version:        0.08
 Release:        1%{?dist}
 Summary:        Perl FFI binding to H3 library functions
 License:        MIT
@@ -51,7 +51,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes META.json perl-Geo-H3-FFI.spec README
+%doc Changes META.json
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 

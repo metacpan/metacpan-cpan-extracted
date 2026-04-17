@@ -65,5 +65,10 @@ $obj = MARC::Convert::Wikidata::Object->new(
 	'subtitles' => [decode_utf8('Román')],
 	'title' => 'Krakatit',
 	'translators' => [$translator],
+	'udcs' => [
+		'821.162.3-31',
+		'(0:82-313.2)',
+		'(0:82-313.2)',
+	],
 );
 isa_ok($obj, 'MARC::Convert::Wikidata::Object', 'Full object.');

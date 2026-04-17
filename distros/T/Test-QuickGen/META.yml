@@ -23,5 +23,8 @@ requires:
 resources:
   bugtracker: https://github.com/antoniskalou/Test-QuickGen/issues
   repository: https://github.com/antoniskalou/Test-QuickGen.git
-version: v0.1.0
+version: v0.1.2
+x_contributors:
+  - 'bas080 <https://github.com/bas080>'
+  - 'Mike Whitaker <penfold@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

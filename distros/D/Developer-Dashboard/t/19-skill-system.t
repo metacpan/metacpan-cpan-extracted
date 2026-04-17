@@ -174,11 +174,12 @@ JSON
 my $fleet_jobs = $fleet_config->collectors;
 is_deeply(
     [ map { $_->{name} } @{$fleet_jobs} ],
-    [ 'system.collector', 'alpha-skill.status' ],
+    [ 'housekeeper', 'system.collector', 'alpha-skill.status' ],
     'config collector fleet includes installed skill collectors under repo-qualified names',
 );
-is( $fleet_jobs->[1]{skill_name}, 'alpha-skill', 'skill collectors carry their source skill name in fleet metadata' );
-is( $fleet_jobs->[1]{indicator}{label}, 'Alpha Status', 'skill collector indicator config survives fleet loading' );
+my ($skill_fleet_job) = grep { $_->{name} eq 'alpha-skill.status' } @{$fleet_jobs};
+is( $skill_fleet_job->{skill_name}, 'alpha-skill', 'skill collectors carry their source skill name in fleet metadata' );
+is( $skill_fleet_job->{indicator}{label}, 'Alpha Status', 'skill collector indicator config survives fleet loading' );
 my $usage_with_collectors = $manager->usage('alpha-skill');
 is( $usage_with_collectors->{collectors}[0]{qualified_name}, 'alpha-skill.status', 'usage reports repo-qualified collector names' );
 ok( $usage_with_collectors->{collectors}[0]{has_indicator}, 'usage reports when a collector has an indicator' );
@@ -253,7 +254,7 @@ is_deeply(
 is( $dispatcher->dispatch( 'alpha-skill', 'run-test', 'disabled' )->{error}, "Skill 'alpha-skill' is disabled", 'disabled skills no longer dispatch commands' );
 is_deeply(
     [ map { $_->{name} } @{ $fleet_config->collectors } ],
-    ['system.collector'],
+    [ 'housekeeper', 'system.collector' ],
     'disabled skills no longer contribute collectors to the managed fleet',
 );
 my ( $cli_disable_stdout, $cli_disable_stderr, $cli_disable_exit ) = capture {
@@ -272,7 +273,7 @@ my $reenabled_dispatch = $dispatcher->dispatch( 'alpha-skill', 'run-test', 're-e
 like( $reenabled_dispatch->{stdout}, qr/updated:re-enabled/, 're-enabled skills can dispatch commands again' );
 is_deeply(
     [ map { $_->{name} } @{ $fleet_config->collectors } ],
-    [ 'system.collector', 'alpha-skill.status' ],
+    [ 'housekeeper', 'system.collector', 'alpha-skill.status' ],
     're-enabled skills rejoin the managed collector fleet',
 );
 my ( $cli_enable_stdout, $cli_enable_stderr, $cli_enable_exit ) = capture {

@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.014',
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
-        'Devel::CallParser'  => '0.002',
+        'Devel::CallParser'  => '0.004',
         'Object::Proto'      => '0.15',
      	'ExtUtils::Depends'  => '0',
         'ExtUtils::MakeMaker' => '0',
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Devel::CallParser'  => '0.002',
+        'Devel::CallParser'  => '0.003',
         'Devel::CallChecker'  => '0.009',
         'Object::Proto'      => '0.14',
     },

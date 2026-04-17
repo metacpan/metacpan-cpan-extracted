@@ -1,4 +1,87 @@
 ---
+request: GET /gmail/v1/users/me/profile
+response:
+  code: 200
+  content: |
+    {
+      "emailAddress": "mvsjes2.test.restapi@gmail.com",
+      "messagesTotal": 3,
+      "threadsTotal": 3,
+      "historyId": "8859"
+    }
+  headers:
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - server
+  - ESF
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Thu, 16 Apr 2026 19:12:25 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  message: OK
+source: Test::Google::RestApi::GmailApi1::startup
+
+---
+request: POST /gmail/v1/users/me/messages/send
+request_content:
+  raw: Q29udGVudC1EaXNwb3NpdGlvbjogaW5saW5lCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDhiaXQKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PSJVVEYtOCIKTUlNRS1WZXJzaW9uOiAxLjAKWC1NYWlsZXI6IE1JTUU6OkxpdGUgMy4wMzggKEYyLjg1OyBUMi4yNjsgQTIuMjE7IEIzLjE2OyBRMy4xNikKRGF0ZTogVGh1LCAxNiBBcHIgMjAyNiAxNjoxMjoyNiAtMDMwMApUbzogbXZzamVzMi50ZXN0LnJlc3RhcGlAZ21haWwuY29tClN1YmplY3Q6IFRlc3QgTWVzc2FnZSBmb3IgR21haWxBcGkxIFVuaXQgVGVzdHMKClRoaXMgaXMgYSB0ZXN0IG1lc3NhZ2UgZm9yIEdtYWlsQXBpMSB1bml0IHRlc3RzLg
+response:
+  code: 200
+  content: |
+    {
+      "id": "19d97b57e11c1247",
+      "threadId": "19d97b57e11c1247",
+      "labelIds": [
+        "UNREAD",
+        "SENT",
+        "INBOX"
+      ]
+    }
+  headers:
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - server
+  - ESF
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - date
+  - Thu, 16 Apr 2026 19:12:27 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  message: OK
+source: Test::Google::RestApi::GmailApi1::startup
+
+---
 request: GET /gmail/v1/users/me/labels
 response:
   code: 200
@@ -15,22 +98,18 @@ response:
         {
           "id": "SENT",
           "name": "SENT",
-          "messageListVisibility": "hide",
-          "labelListVisibility": "labelShow",
           "type": "system"
         },
         {
           "id": "INBOX",
           "name": "INBOX",
-          "messageListVisibility": "hide",
-          "labelListVisibility": "labelShow",
           "type": "system"
         },
         {
           "id": "IMPORTANT",
           "name": "IMPORTANT",
           "messageListVisibility": "hide",
-          "labelListVisibility": "labelShow",
+          "labelListVisibility": "labelHide",
           "type": "system"
         },
         {
@@ -43,8 +122,6 @@ response:
         {
           "id": "DRAFT",
           "name": "DRAFT",
-          "messageListVisibility": "hide",
-          "labelListVisibility": "labelShow",
           "type": "system"
         },
         {
@@ -57,139 +134,81 @@ response:
         {
           "id": "CATEGORY_FORUMS",
           "name": "CATEGORY_FORUMS",
+          "messageListVisibility": "hide",
+          "labelListVisibility": "labelHide",
           "type": "system"
         },
         {
           "id": "CATEGORY_UPDATES",
           "name": "CATEGORY_UPDATES",
+          "messageListVisibility": "hide",
+          "labelListVisibility": "labelHide",
           "type": "system"
         },
         {
           "id": "CATEGORY_PERSONAL",
           "name": "CATEGORY_PERSONAL",
+          "messageListVisibility": "hide",
+          "labelListVisibility": "labelHide",
           "type": "system"
         },
         {
           "id": "CATEGORY_PROMOTIONS",
           "name": "CATEGORY_PROMOTIONS",
+          "messageListVisibility": "hide",
+          "labelListVisibility": "labelHide",
           "type": "system"
         },
         {
           "id": "CATEGORY_SOCIAL",
           "name": "CATEGORY_SOCIAL",
-          "type": "system"
-        },
-        {
-          "id": "YELLOW_STAR",
-          "name": "YELLOW_STAR",
+          "messageListVisibility": "hide",
+          "labelListVisibility": "labelHide",
           "type": "system"
         },
         {
           "id": "STARRED",
           "name": "STARRED",
-          "messageListVisibility": "hide",
-          "labelListVisibility": "labelShow",
           "type": "system"
         },
         {
           "id": "UNREAD",
           "name": "UNREAD",
           "type": "system"
-        },
-        {
-          "id": "Label_10",
-          "name": "Work",
-          "messageListVisibility": "hide",
-          "labelListVisibility": "labelShow",
-          "type": "user"
-        },
-        {
-          "id": "Label_12",
-          "name": "ads",
-          "messageListVisibility": "show",
-          "labelListVisibility": "labelShow",
-          "type": "user"
-        },
-        {
-          "id": "Label_13",
-          "name": "ownersafe",
-          "messageListVisibility": "show",
-          "labelListVisibility": "labelShow",
-          "type": "user"
-        },
-        {
-          "id": "Label_3",
-          "name": "nslug",
-          "messageListVisibility": "show",
-          "labelListVisibility": "labelShow",
-          "type": "user"
-        },
-        {
-          "id": "Label_4",
-          "name": "Personal",
-          "messageListVisibility": "show",
-          "labelListVisibility": "labelHide",
-          "type": "user"
-        },
-        {
-          "id": "Label_5",
-          "name": "Receipts",
-          "messageListVisibility": "hide",
-          "labelListVisibility": "labelShow",
-          "type": "user"
-        },
-        {
-          "id": "Label_7",
-          "name": "subscriptions",
-          "messageListVisibility": "show",
-          "labelListVisibility": "labelShow",
-          "type": "user"
-        },
-        {
-          "id": "Label_8289853136251489959",
-          "name": "Joshr",
-          "type": "user"
-        },
-        {
-          "id": "Label_9",
-          "name": "whereisit",
-          "messageListVisibility": "show",
-          "labelListVisibility": "labelShowIfUnread",
-          "type": "user"
         }
       ]
     }
   headers:
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:54:11 GMT'
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Thu, 16 Apr 2026 19:12:29 GMT
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - server
+  - ESF
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
   message: OK
 source: Test::Google::RestApi::GmailApi1::list_labels
 
 ---
 query_params:
-  fields: 'nextPageToken, resultSizeEstimate, messages(id, threadId)'
+  fields: nextPageToken, resultSizeEstimate, messages(id, threadId)
 request: GET /gmail/v1/users/me/messages
 response:
   code: 200
@@ -197,440 +216,55 @@ response:
     {
       "messages": [
         {
-          "id": "19c62e9a1b0a34b4",
-          "threadId": "19c62e9a1b0a34b4"
+          "id": "19d97b57e11c1247",
+          "threadId": "19d97b57e11c1247"
         },
         {
-          "id": "19c6275ab2dd1787",
-          "threadId": "19ac221eec7703d2"
+          "id": "19d96be24e23eaea",
+          "threadId": "19d96be24e23eaea"
         },
         {
-          "id": "19c6257f7cb4b8a5",
-          "threadId": "19c6257f7cb4b8a5"
+          "id": "19d961434194bc8c",
+          "threadId": "19d961434194bc8c"
         },
         {
-          "id": "19c625789e2ff055",
-          "threadId": "19c625789e2ff055"
-        },
-        {
-          "id": "19c61d4f7b47648b",
-          "threadId": "19c61d4f7b47648b"
-        },
-        {
-          "id": "19c61d4d2ee6c0bd",
-          "threadId": "19c61d4d2ee6c0bd"
-        },
-        {
-          "id": "19c6195e257cde4b",
-          "threadId": "19c6195e257cde4b"
-        },
-        {
-          "id": "19c60f63bfee93e6",
-          "threadId": "19c60f63bfee93e6"
-        },
-        {
-          "id": "19c609122164b1e9",
-          "threadId": "19c609122164b1e9"
-        },
-        {
-          "id": "19c60175722053d7",
-          "threadId": "19c60175722053d7"
-        },
-        {
-          "id": "19c5fcf3f51acc90",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5fc8d774a30e7",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5f86dd2f3afc4",
-          "threadId": "19c5f86dd2f3afc4"
-        },
-        {
-          "id": "19c5f857c982d285",
-          "threadId": "19c5f857c982d285"
-        },
-        {
-          "id": "19c5f7b129a2ea3a",
-          "threadId": "19c5f7b129a2ea3a"
-        },
-        {
-          "id": "19c5f746bae33c34",
-          "threadId": "19c5f746bae33c34"
-        },
-        {
-          "id": "19c5f724aa61ff65",
-          "threadId": "19c5f724aa61ff65"
-        },
-        {
-          "id": "19c5f10bc03223f0",
-          "threadId": "19c5f10bc03223f0"
-        },
-        {
-          "id": "19c5eaa7b7194daf",
-          "threadId": "19c5eaa7b7194daf"
-        },
-        {
-          "id": "19c5e8aebc6ad8fa",
-          "threadId": "19c5e8aebc6ad8fa"
-        },
-        {
-          "id": "19c5e4a42d42047c",
-          "threadId": "19c5e4a42d42047c"
-        },
-        {
-          "id": "19c5e43c79a95acc",
-          "threadId": "19c5e43c79a95acc"
-        },
-        {
-          "id": "19c5e1280e59d6c9",
-          "threadId": "19c5e1280e59d6c9"
-        },
-        {
-          "id": "19c5e119f7aa4cda",
-          "threadId": "19c5e119f7aa4cda"
-        },
-        {
-          "id": "19c5dc80dcd4f720",
-          "threadId": "19c5dc80dcd4f720"
-        },
-        {
-          "id": "19c5dc351e857640",
-          "threadId": "19c5dc351e857640"
-        },
-        {
-          "id": "19c5d8a663b650f7",
-          "threadId": "19c5d8a663b650f7"
-        },
-        {
-          "id": "19c5d890bb1f95da",
-          "threadId": "19c5d890bb1f95da"
-        },
-        {
-          "id": "19c5d6809eb3badd",
-          "threadId": "19c5d6809eb3badd"
-        },
-        {
-          "id": "19c5d2a02910bb51",
-          "threadId": "19c5d2a02910bb51"
-        },
-        {
-          "id": "19c5d293caf707cc",
-          "threadId": "19c5d293caf707cc"
-        },
-        {
-          "id": "19c5ce6e64d3c3af",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5ce2c999adfc7",
-          "threadId": "19c5ce2c999adfc7"
-        },
-        {
-          "id": "19c5cd84b3f011e3",
-          "threadId": "19c5cd84b3f011e3"
-        },
-        {
-          "id": "19c5cbcb054f9796",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5cb628f2f0d7f",
-          "threadId": "19c5cb628f2f0d7f"
-        },
-        {
-          "id": "19c5c65cec3c6f42",
-          "threadId": "19c5c65cec3c6f42"
-        },
-        {
-          "id": "19c5c493023ca2c4",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5b6c25e90d09d",
-          "threadId": "19c5b6c25e90d09d"
-        },
-        {
-          "id": "19c59e65104a250a",
-          "threadId": "19c59e65104a250a"
-        },
-        {
-          "id": "19c597485f8a7c5d",
-          "threadId": "19c597485f8a7c5d"
-        },
-        {
-          "id": "19c58fc65751ae39",
-          "threadId": "19c58fc65751ae39"
-        },
-        {
-          "id": "19c58b8995e6edfb",
-          "threadId": "19c58b8995e6edfb"
-        },
-        {
-          "id": "19c58b33c50b2314",
-          "threadId": "19c58b33c50b2314"
-        },
-        {
-          "id": "19c58b1e1d9bfcfc",
-          "threadId": "19c58b1e1d9bfcfc"
-        },
-        {
-          "id": "19c57ec5a8b5e5d3",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c821a123b8e",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c5ecc7783d0",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c518f56dcbf",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c3ac78c5837",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c26d4cb0376",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57b98be716983",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c5741f9c5b0375",
-          "threadId": "19c5741f9c5b0375"
-        },
-        {
-          "id": "19c5737af3194973",
-          "threadId": "19c5734c9b1af25b"
-        },
-        {
-          "id": "19c5734c9b1af25b",
-          "threadId": "19c5734c9b1af25b"
-        },
-        {
-          "id": "19c56edcf2f94596",
-          "threadId": "19c568eaa5e1adde"
-        },
-        {
-          "id": "19c55c9c229dae82",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c55bb23847191e",
-          "threadId": "19c55bb23847191e"
-        },
-        {
-          "id": "19c52b6e5ff3e7d0",
-          "threadId": "19c4ec16a053d2b8"
-        },
-        {
-          "id": "19c51c417d5810ce",
-          "threadId": "19c51c417d5810ce"
-        },
-        {
-          "id": "19c51470bbe7943c",
-          "threadId": "19c51470bbe7943c"
-        },
-        {
-          "id": "19c4da727350f85e",
-          "threadId": "19c4d6d6386948d6"
-        },
-        {
-          "id": "19c4d90f7efba2c7",
-          "threadId": "19c4d838b7627953"
-        },
-        {
-          "id": "19c4d5dae8d7772f",
-          "threadId": "19c4d45e23f377db"
-        },
-        {
-          "id": "19c4d541874115ab",
-          "threadId": "19c4d45e23f377db"
-        },
-        {
-          "id": "19c4d4a7a6b248c3",
-          "threadId": "19c4d37339e468da"
-        },
-        {
-          "id": "19c4d470a347164d",
-          "threadId": "19c4d37339e468da"
-        },
-        {
-          "id": "19c4d45e23f377db",
-          "threadId": "19c4d45e23f377db"
-        },
-        {
-          "id": "19c4d37339e468da",
-          "threadId": "19c4d37339e468da"
-        },
-        {
-          "id": "19c4ccc9f710b5bf",
-          "threadId": "19c4ccc9f710b5bf"
-        },
-        {
-          "id": "19c4cc6938381f22",
-          "threadId": "19c4cc6938381f22"
-        },
-        {
-          "id": "19c4c0d80a45df2f",
-          "threadId": "19c4c0d80a45df2f"
-        },
-        {
-          "id": "19c4b5c9ec4c725d",
-          "threadId": "19c4b5c9ec4c725d"
-        },
-        {
-          "id": "19c4a230609cfcb3",
-          "threadId": "19c4a230609cfcb3"
-        },
-        {
-          "id": "19c4a17989eaebfb",
-          "threadId": "19c4a17989eaebfb"
-        },
-        {
-          "id": "19c49b80af676bc9",
-          "threadId": "19c49b80af676bc9"
-        },
-        {
-          "id": "19c495c2477d8dd3",
-          "threadId": "19c495c2477d8dd3"
-        },
-        {
-          "id": "19c490562239df50",
-          "threadId": "19c48fcb45d3f6a5"
-        },
-        {
-          "id": "19c49055cdeafc15",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c48fcb45d3f6a5",
-          "threadId": "19c48fcb45d3f6a5"
-        },
-        {
-          "id": "19c48f2c0fd95de3",
-          "threadId": "19c48f2c0fd95de3"
-        },
-        {
-          "id": "19c48d5329dce721",
-          "threadId": "19c48d5329dce721"
-        },
-        {
-          "id": "19c487d250f7bf0d",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c480dec55c30d4",
-          "threadId": "19c4620110847b47"
-        },
-        {
-          "id": "19c47c0dde403df0",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c46db2789ba406",
-          "threadId": "19c46db2789ba406"
-        },
-        {
-          "id": "19c4620110847b47",
-          "threadId": "19c4620110847b47"
-        },
-        {
-          "id": "19c44b0025b9165e",
-          "threadId": "19c44ae2b12323b3"
-        },
-        {
-          "id": "19c44aee43f04a55",
-          "threadId": "19c44ae2b12323b3"
-        },
-        {
-          "id": "19c43c391b84e839",
-          "threadId": "19c43c391b84e839"
-        },
-        {
-          "id": "19c41cf7fb01165b",
-          "threadId": "19c41cf7fb01165b"
-        },
-        {
-          "id": "19c3f7b225356067",
-          "threadId": "19c3f7b225356067"
-        },
-        {
-          "id": "19c3e701796fdf72",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c3d7286027378c",
-          "threadId": "19c3d7286027378c"
-        },
-        {
-          "id": "19c353aaba328641",
-          "threadId": "19c353aaba328641"
-        },
-        {
-          "id": "19c3342255ce8ed6",
-          "threadId": "19c3342255ce8ed6"
-        },
-        {
-          "id": "19c2ff52d0032526",
-          "threadId": "19c2ff52d0032526"
-        },
-        {
-          "id": "19c2d18391d43dd8",
-          "threadId": "19c2d18391d43dd8"
-        },
-        {
-          "id": "19c2ad75eaa8250c",
-          "threadId": "19c2ad75eaa8250c"
-        },
-        {
-          "id": "19c284b7b374110f",
-          "threadId": "19c284b7b374110f"
+          "id": "19d8e53f6864e9d4",
+          "threadId": "19d8e53f6864e9d4"
         }
       ],
-      "nextPageToken": "13246545994019666809",
-      "resultSizeEstimate": 201
+      "resultSizeEstimate": 4
     }
   headers:
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 20:54:13 GMT'
+  - server
+  - ESF
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - date
+  - Thu, 16 Apr 2026 19:12:31 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::GmailApi1::list_messages
 
 ---
 query_params:
-  fields: 'nextPageToken, resultSizeEstimate, messages(id, threadId)'
+  fields: nextPageToken, resultSizeEstimate, messages(id, threadId)
 request: GET /gmail/v1/users/me/messages
 response:
   code: 200
@@ -638,434 +272,49 @@ response:
     {
       "messages": [
         {
-          "id": "19c62e9a1b0a34b4",
-          "threadId": "19c62e9a1b0a34b4"
+          "id": "19d97b57e11c1247",
+          "threadId": "19d97b57e11c1247"
         },
         {
-          "id": "19c6275ab2dd1787",
-          "threadId": "19ac221eec7703d2"
+          "id": "19d96be24e23eaea",
+          "threadId": "19d96be24e23eaea"
         },
         {
-          "id": "19c6257f7cb4b8a5",
-          "threadId": "19c6257f7cb4b8a5"
+          "id": "19d961434194bc8c",
+          "threadId": "19d961434194bc8c"
         },
         {
-          "id": "19c625789e2ff055",
-          "threadId": "19c625789e2ff055"
-        },
-        {
-          "id": "19c61d4f7b47648b",
-          "threadId": "19c61d4f7b47648b"
-        },
-        {
-          "id": "19c61d4d2ee6c0bd",
-          "threadId": "19c61d4d2ee6c0bd"
-        },
-        {
-          "id": "19c6195e257cde4b",
-          "threadId": "19c6195e257cde4b"
-        },
-        {
-          "id": "19c60f63bfee93e6",
-          "threadId": "19c60f63bfee93e6"
-        },
-        {
-          "id": "19c609122164b1e9",
-          "threadId": "19c609122164b1e9"
-        },
-        {
-          "id": "19c60175722053d7",
-          "threadId": "19c60175722053d7"
-        },
-        {
-          "id": "19c5fcf3f51acc90",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5fc8d774a30e7",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5f86dd2f3afc4",
-          "threadId": "19c5f86dd2f3afc4"
-        },
-        {
-          "id": "19c5f857c982d285",
-          "threadId": "19c5f857c982d285"
-        },
-        {
-          "id": "19c5f7b129a2ea3a",
-          "threadId": "19c5f7b129a2ea3a"
-        },
-        {
-          "id": "19c5f746bae33c34",
-          "threadId": "19c5f746bae33c34"
-        },
-        {
-          "id": "19c5f724aa61ff65",
-          "threadId": "19c5f724aa61ff65"
-        },
-        {
-          "id": "19c5f10bc03223f0",
-          "threadId": "19c5f10bc03223f0"
-        },
-        {
-          "id": "19c5eaa7b7194daf",
-          "threadId": "19c5eaa7b7194daf"
-        },
-        {
-          "id": "19c5e8aebc6ad8fa",
-          "threadId": "19c5e8aebc6ad8fa"
-        },
-        {
-          "id": "19c5e4a42d42047c",
-          "threadId": "19c5e4a42d42047c"
-        },
-        {
-          "id": "19c5e43c79a95acc",
-          "threadId": "19c5e43c79a95acc"
-        },
-        {
-          "id": "19c5e1280e59d6c9",
-          "threadId": "19c5e1280e59d6c9"
-        },
-        {
-          "id": "19c5e119f7aa4cda",
-          "threadId": "19c5e119f7aa4cda"
-        },
-        {
-          "id": "19c5dc80dcd4f720",
-          "threadId": "19c5dc80dcd4f720"
-        },
-        {
-          "id": "19c5dc351e857640",
-          "threadId": "19c5dc351e857640"
-        },
-        {
-          "id": "19c5d8a663b650f7",
-          "threadId": "19c5d8a663b650f7"
-        },
-        {
-          "id": "19c5d890bb1f95da",
-          "threadId": "19c5d890bb1f95da"
-        },
-        {
-          "id": "19c5d6809eb3badd",
-          "threadId": "19c5d6809eb3badd"
-        },
-        {
-          "id": "19c5d2a02910bb51",
-          "threadId": "19c5d2a02910bb51"
-        },
-        {
-          "id": "19c5d293caf707cc",
-          "threadId": "19c5d293caf707cc"
-        },
-        {
-          "id": "19c5ce6e64d3c3af",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5ce2c999adfc7",
-          "threadId": "19c5ce2c999adfc7"
-        },
-        {
-          "id": "19c5cd84b3f011e3",
-          "threadId": "19c5cd84b3f011e3"
-        },
-        {
-          "id": "19c5cbcb054f9796",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5cb628f2f0d7f",
-          "threadId": "19c5cb628f2f0d7f"
-        },
-        {
-          "id": "19c5c65cec3c6f42",
-          "threadId": "19c5c65cec3c6f42"
-        },
-        {
-          "id": "19c5c493023ca2c4",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c5b6c25e90d09d",
-          "threadId": "19c5b6c25e90d09d"
-        },
-        {
-          "id": "19c59e65104a250a",
-          "threadId": "19c59e65104a250a"
-        },
-        {
-          "id": "19c597485f8a7c5d",
-          "threadId": "19c597485f8a7c5d"
-        },
-        {
-          "id": "19c58fc65751ae39",
-          "threadId": "19c58fc65751ae39"
-        },
-        {
-          "id": "19c58b8995e6edfb",
-          "threadId": "19c58b8995e6edfb"
-        },
-        {
-          "id": "19c58b33c50b2314",
-          "threadId": "19c58b33c50b2314"
-        },
-        {
-          "id": "19c58b1e1d9bfcfc",
-          "threadId": "19c58b1e1d9bfcfc"
-        },
-        {
-          "id": "19c57ec5a8b5e5d3",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c821a123b8e",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c5ecc7783d0",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c518f56dcbf",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c3ac78c5837",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57c26d4cb0376",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c57b98be716983",
-          "threadId": "19755742083f85b2"
-        },
-        {
-          "id": "19c5741f9c5b0375",
-          "threadId": "19c5741f9c5b0375"
-        },
-        {
-          "id": "19c5737af3194973",
-          "threadId": "19c5734c9b1af25b"
-        },
-        {
-          "id": "19c5734c9b1af25b",
-          "threadId": "19c5734c9b1af25b"
-        },
-        {
-          "id": "19c56edcf2f94596",
-          "threadId": "19c568eaa5e1adde"
-        },
-        {
-          "id": "19c55c9c229dae82",
-          "threadId": "19ac221eec7703d2"
-        },
-        {
-          "id": "19c55bb23847191e",
-          "threadId": "19c55bb23847191e"
-        },
-        {
-          "id": "19c52b6e5ff3e7d0",
-          "threadId": "19c4ec16a053d2b8"
-        },
-        {
-          "id": "19c51c417d5810ce",
-          "threadId": "19c51c417d5810ce"
-        },
-        {
-          "id": "19c51470bbe7943c",
-          "threadId": "19c51470bbe7943c"
-        },
-        {
-          "id": "19c4da727350f85e",
-          "threadId": "19c4d6d6386948d6"
-        },
-        {
-          "id": "19c4d90f7efba2c7",
-          "threadId": "19c4d838b7627953"
-        },
-        {
-          "id": "19c4d5dae8d7772f",
-          "threadId": "19c4d45e23f377db"
-        },
-        {
-          "id": "19c4d541874115ab",
-          "threadId": "19c4d45e23f377db"
-        },
-        {
-          "id": "19c4d4a7a6b248c3",
-          "threadId": "19c4d37339e468da"
-        },
-        {
-          "id": "19c4d470a347164d",
-          "threadId": "19c4d37339e468da"
-        },
-        {
-          "id": "19c4d45e23f377db",
-          "threadId": "19c4d45e23f377db"
-        },
-        {
-          "id": "19c4d37339e468da",
-          "threadId": "19c4d37339e468da"
-        },
-        {
-          "id": "19c4ccc9f710b5bf",
-          "threadId": "19c4ccc9f710b5bf"
-        },
-        {
-          "id": "19c4cc6938381f22",
-          "threadId": "19c4cc6938381f22"
-        },
-        {
-          "id": "19c4c0d80a45df2f",
-          "threadId": "19c4c0d80a45df2f"
-        },
-        {
-          "id": "19c4b5c9ec4c725d",
-          "threadId": "19c4b5c9ec4c725d"
-        },
-        {
-          "id": "19c4a230609cfcb3",
-          "threadId": "19c4a230609cfcb3"
-        },
-        {
-          "id": "19c4a17989eaebfb",
-          "threadId": "19c4a17989eaebfb"
-        },
-        {
-          "id": "19c49b80af676bc9",
-          "threadId": "19c49b80af676bc9"
-        },
-        {
-          "id": "19c495c2477d8dd3",
-          "threadId": "19c495c2477d8dd3"
-        },
-        {
-          "id": "19c490562239df50",
-          "threadId": "19c48fcb45d3f6a5"
-        },
-        {
-          "id": "19c49055cdeafc15",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c48fcb45d3f6a5",
-          "threadId": "19c48fcb45d3f6a5"
-        },
-        {
-          "id": "19c48f2c0fd95de3",
-          "threadId": "19c48f2c0fd95de3"
-        },
-        {
-          "id": "19c48d5329dce721",
-          "threadId": "19c48d5329dce721"
-        },
-        {
-          "id": "19c487d250f7bf0d",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c480dec55c30d4",
-          "threadId": "19c4620110847b47"
-        },
-        {
-          "id": "19c47c0dde403df0",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c46db2789ba406",
-          "threadId": "19c46db2789ba406"
-        },
-        {
-          "id": "19c4620110847b47",
-          "threadId": "19c4620110847b47"
-        },
-        {
-          "id": "19c44b0025b9165e",
-          "threadId": "19c44ae2b12323b3"
-        },
-        {
-          "id": "19c44aee43f04a55",
-          "threadId": "19c44ae2b12323b3"
-        },
-        {
-          "id": "19c43c391b84e839",
-          "threadId": "19c43c391b84e839"
-        },
-        {
-          "id": "19c41cf7fb01165b",
-          "threadId": "19c41cf7fb01165b"
-        },
-        {
-          "id": "19c3f7b225356067",
-          "threadId": "19c3f7b225356067"
-        },
-        {
-          "id": "19c3e701796fdf72",
-          "threadId": "19c3e701796fdf72"
-        },
-        {
-          "id": "19c3d7286027378c",
-          "threadId": "19c3d7286027378c"
-        },
-        {
-          "id": "19c353aaba328641",
-          "threadId": "19c353aaba328641"
-        },
-        {
-          "id": "19c3342255ce8ed6",
-          "threadId": "19c3342255ce8ed6"
-        },
-        {
-          "id": "19c2ff52d0032526",
-          "threadId": "19c2ff52d0032526"
-        },
-        {
-          "id": "19c2d18391d43dd8",
-          "threadId": "19c2d18391d43dd8"
-        },
-        {
-          "id": "19c2ad75eaa8250c",
-          "threadId": "19c2ad75eaa8250c"
-        },
-        {
-          "id": "19c284b7b374110f",
-          "threadId": "19c284b7b374110f"
+          "id": "19d8e53f6864e9d4",
+          "threadId": "19d8e53f6864e9d4"
         }
       ],
-      "nextPageToken": "13246545994019666809",
-      "resultSizeEstimate": 201
+      "resultSizeEstimate": 4
     }
   headers:
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - server
-    - ESF
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - date
-    - 'Sun, 15 Feb 2026 20:54:15 GMT'
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - server
+  - ESF
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Thu, 16 Apr 2026 19:12:32 GMT
   message: OK
 source: Test::Google::RestApi::GmailApi1::messages_max_pages
 
@@ -1075,42 +324,42 @@ response:
   code: 200
   content: |
     {
-      "emailAddress": "test.user@gmail.com",
-      "messagesTotal": 1000,
-      "threadsTotal": 500,
-      "historyId": "21211568"
+      "emailAddress": "mvsjes2.test.restapi@gmail.com",
+      "messagesTotal": 4,
+      "threadsTotal": 4,
+      "historyId": "8912"
     }
   headers:
-    - accept-ranges
-    - none
-    - transfer-encoding
-    - chunked
-    - x-content-type-options
-    - nosniff
-    - x-xss-protection
-    - 0
-    - server
-    - ESF
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - x-frame-options
-    - SAMEORIGIN
-    - content-type
-    - application/json; charset=UTF-8
-    - date
-    - 'Sun, 15 Feb 2026 20:54:17 GMT'
+  - accept-ranges
+  - none
+  - date
+  - Thu, 16 Apr 2026 19:12:34 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - server
+  - ESF
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Google::RestApi::GmailApi1::profile
 
 ---
 query_params:
-  fields: 'nextPageToken, resultSizeEstimate, threads(id, snippet)'
+  fields: nextPageToken, resultSizeEstimate, threads(id, snippet)
 request: GET /gmail/v1/users/me/threads
 response:
   code: 200
@@ -1118,434 +367,91 @@ response:
     {
       "threads": [
         {
-          "id": "19c62e9a1b0a34b4",
-          "snippet": "Test email snippet"
+          "id": "19d97b57e11c1247",
+          "snippet": "This is a test message for GmailApi1 unit tests."
         },
         {
-          "id": "19c6257f7cb4b8a5",
-          "snippet": "Test email snippet"
+          "id": "19d96be24e23eaea",
+          "snippet": "Address not found Your message wasn&#39;t delivered to test@example.com because the domain example.com couldn&#39;t be found. Check for typos or unnecessary spaces and try again. LEARN MORE This link"
         },
         {
-          "id": "19c625789e2ff055",
-          "snippet": "Test email snippet"
+          "id": "19d961434194bc8c",
+          "snippet": "Address not found Your message wasn&#39;t delivered to test@example.com because the domain example.com couldn&#39;t be found. Check for typos or unnecessary spaces and try again. LEARN MORE This link"
         },
         {
-          "id": "19c61d4f7b47648b",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c61d4d2ee6c0bd",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c6195e257cde4b",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c60f63bfee93e6",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c609122164b1e9",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c60175722053d7",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19ac221eec7703d2",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5f86dd2f3afc4",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5f857c982d285",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5f7b129a2ea3a",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5f746bae33c34",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5f724aa61ff65",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5f10bc03223f0",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5eaa7b7194daf",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5e8aebc6ad8fa",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5e4a42d42047c",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5e43c79a95acc",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5e1280e59d6c9",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5e119f7aa4cda",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5dc80dcd4f720",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5dc351e857640",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5d8a663b650f7",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5d890bb1f95da",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5d6809eb3badd",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5d2a02910bb51",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5d293caf707cc",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5ce2c999adfc7",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5cd84b3f011e3",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5cb628f2f0d7f",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5c65cec3c6f42",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5b6c25e90d09d",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c59e65104a250a",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c597485f8a7c5d",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c58fc65751ae39",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c58b8995e6edfb",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c58b33c50b2314",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c58b1e1d9bfcfc",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19755742083f85b2",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5741f9c5b0375",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c5734c9b1af25b",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c568eaa5e1adde",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c55bb23847191e",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4ec16a053d2b8",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c51c417d5810ce",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c51470bbe7943c",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4d6d6386948d6",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4d838b7627953",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4d45e23f377db",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4d37339e468da",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4ccc9f710b5bf",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4cc6938381f22",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4c0d80a45df2f",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4b5c9ec4c725d",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4a230609cfcb3",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4a17989eaebfb",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c49b80af676bc9",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c495c2477d8dd3",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c3e701796fdf72",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c48fcb45d3f6a5",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c48f2c0fd95de3",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c48d5329dce721",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c46db2789ba406",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c4620110847b47",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c44ae2b12323b3",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c43c391b84e839",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c41cf7fb01165b",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c3f7b225356067",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c3d7286027378c",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c353aaba328641",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c3342255ce8ed6",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c2ff52d0032526",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c2d18391d43dd8",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c2ad75eaa8250c",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c284b7b374110f",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c27e6a5a9d2ef8",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c268d3697a8e6d",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c25f69eedf4c04",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c25d9d86496a89",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c258180bd8788c",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c24ebeaf521710",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c24a92519c5296",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c23f895b66cf4f",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c23edf40ac603d",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c20f837fb2b1fe",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c20981bc40cac5",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c2088c97f83baa",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c204d0fcd1ebf6",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c204d0d1347164",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c204d0c487d9fa",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c204d0b35a73d2",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c204ad0d2d394b",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c204d08d5abfdc",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c1f8c4289f8941",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c1f8847cdb7842",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c1b0318afc75aa",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c1a9841fd6e0b2",
-          "snippet": "Test email snippet"
-        },
-        {
-          "id": "19c18de0b87ab4ca",
-          "snippet": "Test email snippet"
+          "id": "19d8e53f6864e9d4",
+          "snippet": "Address not found Your message wasn&#39;t delivered to test@example.com because the domain example.com couldn&#39;t be found. Check for typos or unnecessary spaces and try again. LEARN MORE This link"
         }
       ],
-      "nextPageToken": "15855394057523639658",
-      "resultSizeEstimate": 201
+      "resultSizeEstimate": 5
     }
   headers:
-    - date
-    - 'Sun, 15 Feb 2026 20:54:19 GMT'
-    - content-type
-    - application/json; charset=UTF-8
-    - x-frame-options
-    - SAMEORIGIN
-    - x-xss-protection
-    - 0
-    - x-content-type-options
-    - nosniff
-    - transfer-encoding
-    - chunked
-    - accept-ranges
-    - none
-    - vary
-    - X-Origin
-    - vary
-    - Referer
-    - vary
-    - 'Origin,Accept-Encoding'
-    - alt-svc
-    - 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'
-    - server
-    - ESF
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  - server
+  - ESF
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Thu, 16 Apr 2026 19:12:36 GMT
   message: OK
 source: Test::Google::RestApi::GmailApi1::threads_max_pages
+
+---
+request: POST /gmail/v1/users/me/messages/19d97b57e11c1247/trash
+response:
+  code: 200
+  content: |
+    {
+      "id": "19d97b57e11c1247",
+      "threadId": "19d97b57e11c1247",
+      "labelIds": [
+        "UNREAD",
+        "TRASH",
+        "SENT"
+      ]
+    }
+  headers:
+  - server
+  - ESF
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Thu, 16 Apr 2026 19:12:37 GMT
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  message: OK
+source: Test::Google::RestApi::GmailApi1::shutdown
 

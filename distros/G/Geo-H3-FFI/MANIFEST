@@ -1,7 +1,8 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
+CONTRIBUTING.md
 LICENSE
 t/001_load.t
 t/002_GeoCoord.t

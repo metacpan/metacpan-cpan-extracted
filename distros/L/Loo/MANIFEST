@@ -74,6 +74,7 @@ t/58-edge-deepcopy-sparseseen.t
 t/59-edge-colour.t
 t/60-edge-maxrecurse.t
 t/61-edge-refs.t
+t/62-deparse-custom-op.t
 t/99-odea.t
 t/manifest.t
 t/pod-coverage.t

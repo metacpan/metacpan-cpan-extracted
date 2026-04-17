@@ -245,12 +245,9 @@ subtest 'new() POD example' => sub {
     is $info->fees, { admission => [{ amount => 1000, unit => 'msats' }] };
 };
 
-subtest 'new() rejects unknown arguments' => sub {
-    like(
-        dies { Net::Nostr::RelayInfo->new(name => 'test', bogus => 'value') },
-        qr/unknown.+bogus/i,
-        'unknown argument rejected'
-    );
+subtest 'new() stores unknown arguments as extensions' => sub {
+    my $info = Net::Nostr::RelayInfo->new(name => 'test', bogus => 'value');
+    is($info->extensions->{bogus}, 'value', 'unknown argument stored as extension');
 };
 
 ###############################################################################
@@ -297,6 +294,71 @@ subtest 'accessor mutation of fees does not affect object' => sub {
     my $got = $info->fees;
     $got->{subscription} = [{ amount => 5000, unit => 'msats' }];
     ok !exists $info->fees->{subscription}, 'fees unaffected';
+};
+
+###############################################################################
+# Extension fields
+###############################################################################
+
+subtest 'extension fields accepted in constructor' => sub {
+    my $info = Net::Nostr::RelayInfo->new(
+        name    => 'Test',
+        overnet => { version => '1.0', features => ['chat'] },
+    );
+    is($info->name, 'Test', 'standard field preserved');
+    my $ext = $info->extensions;
+    is($ext->{overnet}{version}, '1.0', 'extension field accessible');
+    is($ext->{overnet}{features}, ['chat'], 'extension nested data preserved');
+};
+
+subtest 'extension fields included in to_json' => sub {
+    my $info = Net::Nostr::RelayInfo->new(
+        name    => 'Test',
+        overnet => { version => '1.0' },
+    );
+    my $json = $info->to_json;
+    my $doc = JSON->new->utf8->decode($json);
+    is($doc->{name}, 'Test', 'standard field in JSON');
+    is($doc->{overnet}{version}, '1.0', 'extension field in JSON');
+};
+
+subtest 'extension fields included in to_http_response' => sub {
+    my $info = Net::Nostr::RelayInfo->new(
+        name    => 'Test',
+        custom  => 'value',
+    );
+    my $resp = $info->to_http_response;
+    like($resp, qr/"custom":"value"/, 'extension field in HTTP response body');
+};
+
+subtest 'extension fields round-trip via from_json' => sub {
+    my $info = Net::Nostr::RelayInfo->new(
+        name    => 'Test',
+        overnet => { version => '2.0' },
+    );
+    my $json = $info->to_json;
+    my $info2 = Net::Nostr::RelayInfo->from_json($json);
+    is($info2->name, 'Test', 'standard field survives round-trip');
+    is($info2->extensions->{overnet}{version}, '2.0', 'extension survives round-trip');
+};
+
+subtest 'caller mutation of extension fields does not affect object' => sub {
+    my %ext = (version => '1.0');
+    my $info = Net::Nostr::RelayInfo->new(overnet => \%ext);
+    $ext{version} = '2.0';
+    is($info->extensions->{overnet}{version}, '1.0', 'extension field unaffected');
+};
+
+subtest 'extensions returns empty hashref when none set' => sub {
+    my $info = Net::Nostr::RelayInfo->new(name => 'Test');
+    is($info->extensions, {}, 'empty hashref');
+};
+
+subtest 'extensions accessor returns defensive copy' => sub {
+    my $info = Net::Nostr::RelayInfo->new(overnet => { version => '1.0' });
+    my $ext = $info->extensions;
+    $ext->{overnet}{version} = '2.0';
+    is($info->extensions->{overnet}{version}, '1.0', 'mutation does not affect object');
 };
 
 done_testing;

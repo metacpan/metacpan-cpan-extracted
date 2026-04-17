@@ -1,5 +1,6 @@
 Changes
-Debug-Easy.png
+images/Debug-Easy.png
+images/author.jpg
 examples/test-tree.pl
 examples/test.pl
 examples/X1/X2.pm
@@ -10,6 +11,9 @@ MANIFEST
 README.md
 AUTHOR.md
 t/01-all-levels.t
+images/TinyPrint.jpg
+images/author.jpg
+images/pink.jpg
 LICENSE
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

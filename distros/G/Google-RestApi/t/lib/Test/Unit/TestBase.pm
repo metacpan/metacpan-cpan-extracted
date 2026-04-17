@@ -30,7 +30,7 @@ sub startup : Tests(startup) {
   $module =~ s|::|/|g;
   my $exchange_path = "$FindBin::RealBin/unit/$module.pm.exchanges";
 
-  if (my $appender = Log::Log4perl->appender_by_name('UnitTestCapture')) {
+  if ($ENV{GOOGLE_RESTAPI_LOGGER} && (my $appender = Log::Log4perl->appender_by_name('UnitTestCapture'))) {
     $appender->file_switch($exchange_path);
     $self->capture_exchanges;
   } elsif (-f $exchange_path) {
@@ -80,7 +80,7 @@ sub startup : Tests(startup) {
 
 sub shutdown : Tests(shutdown) {
   my $self = shift;
-  $self->delete_mock_spreadsheets unless $self->dont_create_mock_spreadsheets;
+  eval { $self->delete_mock_spreadsheets unless $self->dont_create_mock_spreadsheets; };
   $self->_sub_restore();
   return;
 }

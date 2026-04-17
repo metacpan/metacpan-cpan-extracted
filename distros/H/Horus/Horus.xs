@@ -157,6 +157,7 @@ static XOP horus_xop_uuid_parse, horus_xop_uuid_validate,
 #define PP_CONST_IV(name, val) \
 static OP *pp_horus_##name(pTHX) { \
     dSP; \
+    EXTEND(SP, 1); \
     mPUSHi(val); \
     RETURN; \
 } \
@@ -178,6 +179,7 @@ PP_CONST_IV(fmt_upper_hex, HORUS_FMT_UPPER_HEX)
 #define PP_CONST_PV(name, str, slen) \
 static OP *pp_horus_##name(pTHX) { \
     dSP; \
+    EXTEND(SP, 1); \
     mPUSHp(str, slen); \
     RETURN; \
 } \
@@ -230,6 +232,7 @@ static OP *pp_horus_uuid_v4_noarg(pTHX) {
     dSP;
     unsigned char uuid[16];
     horus_uuid_v4(uuid);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
     RETURN;
 }
@@ -239,6 +242,7 @@ static OP *pp_horus_uuid_v4_fmt(pTHX) {
     int fmt = POPi;
     unsigned char uuid[16];
     horus_uuid_v4(uuid);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
     RETURN;
 }
@@ -250,6 +254,7 @@ static OP *pp_horus_uuid_v1_noarg(pTHX) {
     dMY_CXT;
     unsigned char uuid[16];
     horus_uuid_v1(uuid, &MY_CXT.v1_state);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
     RETURN;
 }
@@ -260,6 +265,7 @@ static OP *pp_horus_uuid_v1_fmt(pTHX) {
     int fmt = POPi;
     unsigned char uuid[16];
     horus_uuid_v1(uuid, &MY_CXT.v1_state);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
     RETURN;
 }
@@ -271,6 +277,7 @@ static OP *pp_horus_uuid_v6_noarg(pTHX) {
     dMY_CXT;
     unsigned char uuid[16];
     horus_uuid_v6(uuid, &MY_CXT.v1_state, &MY_CXT.v6_state);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
     RETURN;
 }
@@ -281,6 +288,7 @@ static OP *pp_horus_uuid_v6_fmt(pTHX) {
     int fmt = POPi;
     unsigned char uuid[16];
     horus_uuid_v6(uuid, &MY_CXT.v1_state, &MY_CXT.v6_state);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
     RETURN;
 }
@@ -292,6 +300,7 @@ static OP *pp_horus_uuid_v7_noarg(pTHX) {
     dMY_CXT;
     unsigned char uuid[16];
     horus_uuid_v7(uuid, &MY_CXT.v7_state);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
     RETURN;
 }
@@ -302,6 +311,7 @@ static OP *pp_horus_uuid_v7_fmt(pTHX) {
     int fmt = POPi;
     unsigned char uuid[16];
     horus_uuid_v7(uuid, &MY_CXT.v7_state);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
     RETURN;
 }
@@ -312,6 +322,7 @@ static OP *pp_horus_uuid_nil_noarg(pTHX) {
     dSP;
     unsigned char uuid[16];
     horus_uuid_nil(uuid);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
     RETURN;
 }
@@ -321,6 +332,7 @@ static OP *pp_horus_uuid_nil_fmt(pTHX) {
     int fmt = POPi;
     unsigned char uuid[16];
     horus_uuid_nil(uuid);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
     RETURN;
 }
@@ -331,6 +343,7 @@ static OP *pp_horus_uuid_max_noarg(pTHX) {
     dSP;
     unsigned char uuid[16];
     horus_uuid_max(uuid);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, HORUS_FMT_STR));
     RETURN;
 }
@@ -340,6 +353,7 @@ static OP *pp_horus_uuid_max_fmt(pTHX) {
     int fmt = POPi;
     unsigned char uuid[16];
     horus_uuid_max(uuid);
+    EXTEND(SP, 1);
     mPUSHs(horus_uuid_to_sv(aTHX_ uuid, fmt));
     RETURN;
 }

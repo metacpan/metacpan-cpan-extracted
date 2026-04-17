@@ -17,6 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06",
             "perl" : "5.024"
          }
       },
@@ -68,15 +69,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Algorithm::Combinatorics" : "0",
             "Carp" : "0",
             "Data::Dumper::Compact" : "0",
+            "File::ShareDir" : "0",
             "List::Util" : "1.26",
             "MIDI::Util" : "0.1304",
             "Math::Bezier" : "0",
             "Moo" : "2",
             "Music::Duration" : "0.0900",
             "Music::RhythmSet::Util" : "0",
+            "Path::Tiny" : "0",
             "Type::Library" : "0",
             "Type::Utils" : "0",
             "Types::MIDI" : "v0.601.0",
@@ -116,7 +118,7 @@
          "web" : "https://github.com/ology/MIDI-Drummer-Tiny"
       }
    },
-   "version" : "0.7006",
+   "version" : "0.7013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

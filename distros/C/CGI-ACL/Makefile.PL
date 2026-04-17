@@ -36,7 +36,6 @@ WriteMakefile(
 		'Test::NoWarnings' => 0,
 		'Test::CleanNamespaces' => 0,
 		'Test::Distribution' => 0,
-		'Test::Kwalitee' => 0,
 		'autodie' => 0,
 		'strict' => 0,
 		'warnings' => 0,
@@ -47,6 +46,8 @@ WriteMakefile(
 		'File::Spec' => 3.4,
 		'namespace::clean' => 0,
 		'Net::CIDR' => 0,
+		'Object::Configure' => 0,
+		'Params::Get' => 0,
 		'Regexp::Common' => 0
 	},
 	dist => $dist,

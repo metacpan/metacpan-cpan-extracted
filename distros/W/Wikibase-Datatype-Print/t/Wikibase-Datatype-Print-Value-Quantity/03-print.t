@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 12;
+use Test::More 'tests' => 13;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Cache;
@@ -43,6 +43,16 @@ $obj = Wikibase::Datatype::Value::Quantity->new(
 );
 $ret = Wikibase::Datatype::Print::Value::Quantity::print($obj);
 is($ret, decode_utf8('10±1 (Q174728)'), 'Get printed value with tolerance. Default printing.');
+
+# Test.
+$obj = Wikibase::Datatype::Value::Quantity->new(
+	'lower_bound' => 10,
+	'unit' => 'Q174728',
+	'upper_bound' => 11,
+	'value' => 10,
+);
+$ret = Wikibase::Datatype::Print::Value::Quantity::print($obj);
+is($ret, decode_utf8('10±1 (Q174728)'), 'Get printed value with upper tolerance only. Default printing.');
 
 # Test.
 $obj = Wikibase::Datatype::Value::Quantity->new(

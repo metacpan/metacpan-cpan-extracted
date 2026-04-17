@@ -79,7 +79,7 @@ my $tests = [
             {
                 method => 'metazone_daylight_long',
                 args => [qw( metazone America_Pacific )],
-                expects => 'アメリカ太平洋夏時間',
+                expects => '米国太平洋夏時間',
             },
             {
                 method => 'metazone_daylight_short',
@@ -89,7 +89,7 @@ my $tests = [
             {
                 method => 'metazone_generic_long',
                 args => [qw( metazone America_Pacific )],
-                expects => 'アメリカ太平洋時間',
+                expects => '米国太平洋時間',
             },
             {
                 method => 'metazone_generic_short',
@@ -99,7 +99,7 @@ my $tests = [
             {
                 method => 'metazone_standard_long',
                 args => [qw( metazone America_Pacific )],
-                expects => 'アメリカ太平洋標準時',
+                expects => '米国太平洋標準時',
             },
             {
                 method => 'metazone_standard_short',
@@ -160,7 +160,7 @@ my $tests = [
             {
                 method => 'metazone_daylight_short',
                 args => [qw( metazone America_Pacific )],
-                expects => 'HEP',
+                expects => '',
             },
             {
                 method => 'metazone_generic_long',
@@ -170,7 +170,7 @@ my $tests = [
             {
                 method => 'metazone_generic_short',
                 args => [qw( metazone America_Pacific )],
-                expects => 'HP',
+                expects => '',
             },
             {
                 method => 'metazone_standard_long',
@@ -180,7 +180,7 @@ my $tests = [
             {
                 method => 'metazone_standard_short',
                 args => [qw( metazone America_Pacific )],
-                expects => 'HNP',
+                expects => '',
             },
         ],
     },
@@ -245,7 +245,7 @@ my $tests = [
             {
                 method => 'timezone_city',
                 args => [qw( timezone Etc/Unknown )],
-                expects => 'Unknown City',
+                expects => 'Unknown Location',
             },
         ],
     },
@@ -258,7 +258,7 @@ my $tests = [
             {
                 method => 'timezone_city',
                 args => [qw( timezone Etc/Unknown )],
-                expects => 'ville inconnue',
+                expects => 'lieu inconnu',
             },
         ],
     },
@@ -424,7 +424,7 @@ my $tests = [
             {
                 method => 'timezone_daylight_short',
                 args => [qw( timezone Pacific/Honolulu )],
-                expects => 'HDT',
+                expects => '',
             },
             {
                 method => 'timezone_generic_long',
@@ -439,7 +439,7 @@ my $tests = [
             {
                 method => 'timezone_generic_short',
                 args => [qw( timezone Pacific/Honolulu )],
-                expects => 'HST',
+                expects => '',
             },
             {
                 method => 'timezone_standard_long',
@@ -454,7 +454,7 @@ my $tests = [
             {
                 method => 'timezone_standard_short',
                 args => [qw( timezone Pacific/Honolulu )],
-                expects => 'HST',
+                expects => '',
             },
         ],
     },
@@ -494,7 +494,7 @@ my $tests = [
             {
                 method => 'format_timezone_non_location',
                 args => [qw( timezone America/Los_Angeles type standard )],
-                expects => 'アメリカ太平洋標準時',
+                expects => '米国太平洋標準時',
             },
         ],
     },

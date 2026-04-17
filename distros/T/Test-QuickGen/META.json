@@ -52,6 +52,10 @@
          "web" : "https://github.com/antoniskalou/Test-QuickGen"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.2",
+   "x_contributors" : [
+      "bas080 <https://github.com/bas080>",
+      "Mike Whitaker <penfold@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -12,7 +12,7 @@ use Readonly;
 Readonly::Array our @SOURCING_CIRCUMSTANCES => qw(circa near presumably disputed);
 Readonly::Array our @PRECISION => qw(day month year decade century millenium);
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 has copyright => (
 	is => 'ro',
@@ -596,12 +596,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2025
+© Michal Josef Špaček 2021-2026
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

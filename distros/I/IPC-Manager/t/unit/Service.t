@@ -174,6 +174,61 @@ subtest 'run_should_end' => sub {
     ok($svc->run_should_end, "should_end true when any callback returns true");
 };
 
+subtest 'on_pid push/remove/clear/run' => sub {
+    my $svc = IPC::Manager::Service->new(
+        name      => 'onpid-svc',
+        ipcm_info => 'fake',
+        on_all    => sub { },
+    );
+
+    my @got;
+    my $cb = sub { my ($self, $pid, $exit) = @_; push @got, [$pid, $exit]; };
+
+    $svc->push_on_pid($cb);
+    $svc->run_on_pid(4242, 256);
+    is(\@got, [[4242, 256]], "on_pid callback invoked with pid and exit");
+
+    $svc->remove_on_pid($cb);
+    $svc->run_on_pid(1, 0);
+    is(\@got, [[4242, 256]], "on_pid callback not invoked after remove");
+
+    $svc->push_on_pid($cb);
+    $svc->clear_on_pid;
+    $svc->run_on_pid(2, 0);
+    is(\@got, [[4242, 256]], "on_pid callback not invoked after clear");
+};
+
+subtest 'on_pid accepts array of callbacks in constructor' => sub {
+    my @order;
+    my $svc = IPC::Manager::Service->new(
+        name      => 'onpid-arr',
+        ipcm_info => 'fake',
+        on_all    => sub { },
+        on_pid    => [
+            sub { push @order, ['a', $_[1], $_[2]] },
+            sub { push @order, ['b', $_[1], $_[2]] },
+        ],
+    );
+
+    $svc->run_on_pid(99, 512);
+    is(\@order, [['a', 99, 512], ['b', 99, 512]], "both on_pid callbacks invoked in order");
+};
+
+subtest 'on_pid rejects non-coderef' => sub {
+    like(
+        dies {
+            IPC::Manager::Service->new(
+                name      => 'bad-onpid',
+                ipcm_info => 'fake',
+                on_all    => sub { },
+                on_pid    => 'not_a_coderef',
+            )
+        },
+        qr/coderefs/,
+        "non-coderef on_pid rejected",
+    );
+};
+
 subtest 'on_sig push/remove/clear/run' => sub {
     my $svc = IPC::Manager::Service->new(
         name      => 'onsig-svc',

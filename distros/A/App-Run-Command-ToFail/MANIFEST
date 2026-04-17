@@ -24,6 +24,7 @@ t/App-Run-Command-ToFail/01-use.t
 t/App-Run-Command-ToFail/02-version.t
 t/App-Run-Command-ToFail/03-new.t
 t/App-Run-Command-ToFail/04-run.t
+t/data/print.pl
 t/data/test_fail.pl
 t/data/test_ok.pl
 ToFail.pm

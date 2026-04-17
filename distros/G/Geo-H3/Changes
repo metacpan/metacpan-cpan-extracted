@@ -1,5 +1,17 @@
 Revision history for Perl extension Geo::H3.
 
+0.09 2026-04-14
+  - Fixed hex->areNeighbors return value
+
+0.08 2026-04-14
+  - Refactored library to use hex->uint64 property instead of hex->index property
+  - Deprecated hex->index property
+  - Updated documentaion to remove the use of the word index in favor of hex, uint64, or string as much as possible
+  - BREAKING CHANGES:
+    -  Updated hex->kRingDistances and hex->hexRangeDistances method outputs
+      - 1) uint64 key values are now blessed objects in accordence with convention
+      - 2) Output is now ARRAY-ARRAY instead of HASH (e.g. [[$hex, $k_distance], ...] instead of {$uint64=>$k_distance, ...})
+
 0.07 2022-02-08
   - Updated lib/Geo/H3.pm - fixed documentation
   - Dropped README for README.md only

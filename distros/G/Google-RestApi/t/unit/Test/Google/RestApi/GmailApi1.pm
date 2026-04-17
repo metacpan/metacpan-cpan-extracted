@@ -16,6 +16,27 @@ init_logger;
 
 sub dont_create_mock_spreadsheets { 1; }
 
+sub startup : Tests(startup) {
+  my $self = shift;
+  $self->SUPER::startup(@_);
+  my $gmail = mock_gmail_api();
+  my $profile = $gmail->profile();
+  my $msg = $gmail->send_message(
+    to      => $profile->{emailAddress},
+    subject => 'Test Message for GmailApi1 Unit Tests',
+    body    => 'This is a test message for GmailApi1 unit tests.',
+  );
+  $self->{_setup_msg} = $msg;
+  return;
+}
+
+sub shutdown : Tests(shutdown) {
+  my $self = shift;
+  $self->{_setup_msg}->trash() if $self->{_setup_msg};
+  $self->SUPER::shutdown(@_);
+  return;
+}
+
 sub _constructor : Tests(4) {
   my $self = shift;
 

@@ -1,5 +1,18 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0506 2026-04-16 20:16:53
+    - Improve eg/grooves.pl.
+
+0.0505 2026-04-16 19:08:23
+    - Updated eg/grooves.pl to use the changed groove() argument correctly.
+
+0.0504 2026-04-16 09:03:27
+    - Add the missing conga patch that is known to M::D::T::Grooves.
+
+0.0503 2026-04-15 22:58:22
+    - Don't require ddc. Oops.
+    - Fix eg/grooves.pl with the improved syntax.
+
 0.0502 2026-04-09 10:42:05
     - Fix-up the eg/ programs.
     - Add the eg/odd-meter.pl example program.

@@ -90,6 +90,8 @@ barf($temp_file, decode_base64($marc_xml_example));
 
 # Arguments.
 @ARGV = (
+        '-l',
+        'en',
         '-a',
         '-f',
         $temp_file,

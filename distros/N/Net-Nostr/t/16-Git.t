@@ -7,6 +7,7 @@ use Test2::V0 -no_srand => 1;
 use lib 't/lib';
 use TestFixtures qw(make_event);
 
+use Net::Nostr::Bech32 qw(encode_naddr encode_npub);
 use Net::Nostr::Event;
 use Net::Nostr::Git;
 
@@ -19,6 +20,8 @@ my $tag_commit_id = 'def456' . ('0' x 58);
 my $tip_commit_id = 'ghi789' . ('0' x 58);
 
 my $new_tip_commit_id = 'jkl012' . ('0' x 58);
+
+my $npub = encode_npub($my_pubkey);
 
 my $event_id       = '1' x 64;
 my $patch_event_id = '2' x 64;
@@ -174,6 +177,201 @@ subtest 'new() rejects unknown arguments' => sub {
         qr/unknown.+bogus/i,
         'unknown argument rejected'
     );
+};
+
+###############################################################################
+# nostr_clone_url / parse_nostr_clone_url - NIP-34 Nostr Clone URL format
+###############################################################################
+
+subtest 'POD: nostr_clone_url with naddr' => sub {
+    my $naddr = encode_naddr(
+        identifier => 'my-project',
+        pubkey     => $my_pubkey,
+        kind       => 30617,
+        relays     => ['wss://relay.example.com'],
+    );
+    my $url = Net::Nostr::Git->nostr_clone_url(naddr => $naddr);
+    is $url, "nostr://$naddr", 'naddr form';
+};
+
+subtest 'POD: nostr_clone_url with owner and identifier' => sub {
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => $npub,
+        identifier => 'my-project',
+    );
+    is $url, "nostr://$npub/my-project", 'owner/identifier form';
+};
+
+subtest 'POD: nostr_clone_url with relay hint' => sub {
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => $npub,
+        relay_hint => 'wss://relay.example.com',
+        identifier => 'my-project',
+    );
+    is $url, "nostr://$npub/relay.example.com/my-project", 'wss:// stripped';
+};
+
+subtest 'nostr_clone_url percent-encodes identifier' => sub {
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => $npub,
+        identifier => 'my repo',
+    );
+    like $url, qr{/my%20repo\z}, 'space percent-encoded';
+};
+
+subtest 'nostr_clone_url keeps non-wss scheme in relay hint' => sub {
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => 'example.com',
+        relay_hint => 'ws://localhost:7334',
+        identifier => 'my-repo',
+    );
+    like $url, qr{/ws%3A%2F%2Flocalhost%3A7334/}, 'ws:// percent-encoded';
+};
+
+subtest 'nostr_clone_url rejects missing arguments' => sub {
+    like dies { Net::Nostr::Git->nostr_clone_url() },
+        qr/requires/, 'no args';
+    like dies { Net::Nostr::Git->nostr_clone_url(owner => $npub) },
+        qr/requires.*identifier/i, 'missing identifier';
+};
+
+subtest 'nostr_clone_url rejects invalid naddr' => sub {
+    ok dies { Net::Nostr::Git->nostr_clone_url(naddr => 'bogus') },
+        'invalid naddr rejected';
+};
+
+subtest 'POD: parse_nostr_clone_url naddr form' => sub {
+    my $naddr = encode_naddr(
+        identifier => 'my-project',
+        pubkey     => $my_pubkey,
+        kind       => 30617,
+    );
+    my $result = Net::Nostr::Git->parse_nostr_clone_url("nostr://$naddr");
+    is $result->{identifier}, 'my-project', 'identifier from naddr';
+    is $result->{pubkey}, $my_pubkey, 'pubkey from naddr';
+    is $result->{kind}, 30617, 'kind from naddr';
+};
+
+subtest 'POD: parse_nostr_clone_url owner/identifier form' => sub {
+    my $result = Net::Nostr::Git->parse_nostr_clone_url("nostr://$npub/my-project");
+    is $result->{owner}, $npub, 'owner';
+    is $result->{identifier}, 'my-project', 'identifier';
+    ok !exists $result->{relay_hint}, 'no relay_hint';
+};
+
+subtest 'parse_nostr_clone_url: owner/relay/identifier form' => sub {
+    my $result = Net::Nostr::Git->parse_nostr_clone_url(
+        "nostr://$npub/relay.example.com/my-project"
+    );
+    is $result->{owner}, $npub, 'owner';
+    is $result->{relay_hint}, 'wss://relay.example.com', 'relay_hint with wss:// prepended';
+    is $result->{identifier}, 'my-project', 'identifier';
+};
+
+subtest 'parse_nostr_clone_url: percent-decodes identifier' => sub {
+    my $result = Net::Nostr::Git->parse_nostr_clone_url(
+        "nostr://$npub/my%20%F0%9F%9A%80%20repo"
+    );
+    is $result->{identifier}, "my \x{1F680} repo", 'emoji in identifier decoded';
+};
+
+subtest 'parse_nostr_clone_url: non-wss relay hint' => sub {
+    my $result = Net::Nostr::Git->parse_nostr_clone_url(
+        "nostr://example.com/ws%3A%2F%2Flocalhost%3A7334/my-repo"
+    );
+    is $result->{relay_hint}, 'ws://localhost:7334', 'ws:// preserved';
+    is $result->{identifier}, 'my-repo', 'identifier';
+};
+
+subtest 'spec example: npub with relay and identifier' => sub {
+    my $url = 'nostr://npub15qydau2hjma6ngxkl2cyar74wzyjshvl65za5k5rl69264ar2exs5cyejr/relay.ngit.dev/ngit';
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{owner}, 'npub15qydau2hjma6ngxkl2cyar74wzyjshvl65za5k5rl69264ar2exs5cyejr', 'owner';
+    is $result->{relay_hint}, 'wss://relay.ngit.dev', 'relay_hint';
+    is $result->{identifier}, 'ngit', 'identifier';
+};
+
+subtest 'spec example: npub with emoji identifier' => sub {
+    my $url = 'nostr://npub15qydau2hjma6ngxkl2cyar74wzyjshvl65za5k5rl69264ar2exs5cyejr/my%20%F0%9F%9A%80%20repo';
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{owner}, 'npub15qydau2hjma6ngxkl2cyar74wzyjshvl65za5k5rl69264ar2exs5cyejr', 'owner';
+    ok !exists $result->{relay_hint}, 'no relay_hint';
+    is $result->{identifier}, "my \x{1F680} repo", 'identifier with emoji';
+};
+
+subtest 'spec example: nip05 with ws relay' => sub {
+    my $url = 'nostr://danconwaydev.com/ws%3A%2F%2Flocalhost%3A7334/my-local-only-repo';
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{owner}, 'danconwaydev.com', 'NIP-05 owner';
+    is $result->{relay_hint}, 'ws://localhost:7334', 'ws:// relay';
+    is $result->{identifier}, 'my-local-only-repo', 'identifier';
+};
+
+subtest 'spec example: nip05 with relay and identifier' => sub {
+    my $url = 'nostr://danconwaydev.com/relay.ngit.dev/ngit';
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{owner}, 'danconwaydev.com', 'NIP-05 owner';
+    is $result->{relay_hint}, 'wss://relay.ngit.dev', 'relay_hint';
+    is $result->{identifier}, 'ngit', 'identifier';
+};
+
+subtest 'round-trip: nostr_clone_url then parse (naddr)' => sub {
+    my $naddr = encode_naddr(
+        identifier => 'test-repo',
+        pubkey     => $my_pubkey,
+        kind       => 30617,
+        relays     => ['wss://relay.example.com'],
+    );
+    my $url = Net::Nostr::Git->nostr_clone_url(naddr => $naddr);
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{identifier}, 'test-repo', 'identifier round-trips';
+    is $result->{pubkey}, $my_pubkey, 'pubkey round-trips';
+    is $result->{kind}, 30617, 'kind round-trips';
+};
+
+subtest 'round-trip: nostr_clone_url then parse (owner with relay)' => sub {
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => $npub,
+        relay_hint => 'wss://relay.example.com',
+        identifier => 'my project',
+    );
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{owner}, $npub, 'owner round-trips';
+    is $result->{relay_hint}, 'wss://relay.example.com', 'relay_hint round-trips';
+    is $result->{identifier}, 'my project', 'identifier round-trips with space';
+};
+
+subtest 'round-trip: nostr_clone_url then parse (owner without relay)' => sub {
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => $npub,
+        identifier => 'simple-repo',
+    );
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{owner}, $npub, 'owner round-trips';
+    ok !exists $result->{relay_hint}, 'no relay_hint';
+    is $result->{identifier}, 'simple-repo', 'identifier round-trips';
+};
+
+subtest 'round-trip: nostr_clone_url then parse (non-wss relay)' => sub {
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => 'user@example.com',
+        relay_hint => 'ws://localhost:7334',
+        identifier => 'local-repo',
+    );
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+    is $result->{relay_hint}, 'ws://localhost:7334', 'ws:// relay round-trips';
+    is $result->{identifier}, 'local-repo', 'identifier round-trips';
+};
+
+subtest 'parse_nostr_clone_url rejects invalid input' => sub {
+    like dies { Net::Nostr::Git->parse_nostr_clone_url(undef) },
+        qr/nostr:\/\/ URL required/, 'undef';
+    like dies { Net::Nostr::Git->parse_nostr_clone_url('https://example.com') },
+        qr/nostr:\/\/ URL required/, 'wrong scheme';
+    like dies { Net::Nostr::Git->parse_nostr_clone_url('nostr://') },
+        qr/nostr:\/\/ URL required/, 'empty path';
+    like dies { Net::Nostr::Git->parse_nostr_clone_url('nostr://owner') },
+        qr/identifier/, 'missing identifier';
 };
 
 done_testing;

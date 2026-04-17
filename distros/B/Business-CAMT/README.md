@@ -13,6 +13,7 @@ to make that happen.  Contact the author for support.
 
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Business-CAMT>
+  * Sponsor me: <https://markov.solutions/sponsor/index-en.html>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
   * Indexed from CPAN: <https://metacpan.org/release/Business-CAMT>
 

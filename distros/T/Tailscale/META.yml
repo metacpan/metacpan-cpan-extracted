@@ -1,0 +1,32 @@
+---
+abstract: 'Perl bindings for tailscale-rs (Tailscale in Rust)'
+author:
+  - 'Brad Fitzpatrick <brad@danga.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  JSON::PP: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tailscale
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  FFI::CheckLib: '0'
+  FFI::Platypus: '2.00'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  perl: '5.020'
+resources: {}
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

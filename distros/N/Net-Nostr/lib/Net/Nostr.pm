@@ -2,7 +2,7 @@ package Net::Nostr;
 
 use strictures 2;
 
-our $VERSION = '1.000002';
+our $VERSION = '1.003000';
 
 use Net::Nostr::Client;
 use Net::Nostr::Relay;
@@ -177,8 +177,8 @@ Equivalent to C<< Net::Nostr::Relay->new >>.
 =head1 SUPPORTED NIPS
 
 Conformance target:
-L<nostr-protocol/nips commit 420f0b18|https://github.com/nostr-protocol/nips/commit/420f0b181434c348e487c6ffaa8fea6111c10210>
-(2026-04-01).
+L<nostr-protocol/nips commit 0a25dd52|https://github.com/nostr-protocol/nips/commit/0a25dd524389d642ec153d9009a16fb183eb23ce>
+(2026-04-10).
 
 =over 4
 

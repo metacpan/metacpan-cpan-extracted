@@ -1,0 +1,14 @@
+Revision history for Plack-Middleware-Zitadel
+
+0.010     2026-04-16 23:54:26Z
+
+0.001     2026-04-16 21:34:23Z
+    - Initial release of Plack::Middleware::Zitadel:
+      - Bearer token verification via WWW::Zitadel::OIDC
+      - Optional audience verification
+      - Optional required scope checks
+      - Claims injection into PSGI env (`zitadel.claims`)
+    - Test coverage for auth success/failure and scope enforcement
+    - Transparent proxy PSGI example (`examples/proxy.psgi`)
+    - Dockerfile for containerized middleware deployment
+    - Kubernetes manifests + deploy script for Gateway API usage

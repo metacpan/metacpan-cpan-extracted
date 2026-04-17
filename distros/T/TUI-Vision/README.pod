@@ -1,0 +1,109 @@
+=pod
+
+=head1 NAME
+
+TUI::Vision - Turbo Vision inspired TUI framework for modern Perl
+
+=head1 SYNOPSIS
+
+  use TUI::Views;
+  use TUI::Dialogs;
+  use TUI::App;
+
+  # Placeholder distribution.
+  # Full implementation will be migrated from TV::* modules.
+
+=head1 DESCRIPTION
+
+TUI::Vision is the successor namespace to the TV:: module family.
+It provides a modern Perl port of the classic Turbo Vision framework.
+This distribution currently contains namespace stubs for all major
+subsystems. These stubs reserve the API surface and document the
+intended architecture for the upcoming full implementation.
+
+The goal of TUI::Vision is to provide a complete, modular, and portable
+text user interface framework for Perl, including:
+
+=over 4
+
+=item * Core object system (TUI::Objects)
+
+=item * View and windowing system (TUI::Views)
+
+=item * Dialogs and widgets (TUI::Dialogs)
+
+=item * Menus and status lines (TUI::Menus)
+
+=item * Application framework (TUI::App)
+
+=item * Drivers and hardware abstraction (TUI::Drivers)
+
+=item * Gadgets and diagnostic tools (TUI::Gadgets)
+
+=item * Standard dialogs (TUI::StdDlg)
+
+=item * Message boxes (TUI::MsgBox)
+
+=item * Text rendering subsystem (TUI::TextView)
+
+=item * Memory utilities (TUI::Memory)
+
+=item * Validation utilities (TUI::Validate)
+
+=item * Unified OO toolkit (TUI::toolkit)
+
+=back
+
+All modules in this release are placeholders. They contain no functional
+code and no dependencies. Their purpose is to establish the namespace
+structure and documentation for the upcoming migration of the existing
+TV:: implementation.
+
+=head1 ROADMAP
+
+=over 4
+
+=item * Phase 1  
+Namespace reservation and documentation (this release).
+
+=item * Phase 2  
+Migration of TV::* modules into TUI::*.
+
+=item * Phase 3  
+Integration of the unified OO toolkit.
+
+=item * Phase 4  
+Driver abstraction and portable rendering.
+
+=item * Phase 5  
+Full Turbo Vision compatibility and extended widget set.
+
+=back
+
+=head1 STATUS
+
+This distribution is under active development.
+Modules are added as stubs first, then filled with functionality in
+subsequent releases.
+
+=head1 AUTHORS
+
+=over
+
+=item Turbo Vision Development Team
+
+=item J. Schneider <brickpool@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 1990-1994, 1997 by Borland International
+
+Copyright (c) 2021-2026 the L</AUTHORS> as listed above.
+
+This software is licensed under the MIT license (see the LICENSE file, which is 
+part of the distribution). This documentation is provided under the same terms 
+as the Turbo Vision library itself.
+
+=cut

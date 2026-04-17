@@ -754,4 +754,52 @@ subtest 'tag hash set: large number of event tags' => sub {
     ok(!$filter_miss->matches($e), 'miss with many event tags');
 };
 
+###############################################################################
+# Multi-letter tag filters
+###############################################################################
+
+subtest 'multi-letter tag filter accepted in constructor' => sub {
+    my $f = Net::Nostr::Filter->new('#overnet_et' => ['chat']);
+    is($f->tag_filter('overnet_et'), ['chat'], 'tag_filter returns values');
+};
+
+subtest 'multi-letter tag filter matching' => sub {
+    my $f = Net::Nostr::Filter->new('#overnet_et' => ['chat'], '#overnet_ot' => ['message']);
+    my $hit = Net::Nostr::Event->new(
+        pubkey => 'aa' x 32, kind => 1, content => '', created_at => 1,
+        tags => [['overnet_et', 'chat'], ['overnet_ot', 'message']],
+    );
+    ok($f->matches($hit), 'matches event with multi-letter tags');
+
+    my $miss = Net::Nostr::Event->new(
+        pubkey => 'aa' x 32, kind => 1, content => '', created_at => 1,
+        tags => [['overnet_et', 'chat'], ['overnet_ot', 'wrong']],
+    );
+    ok(!$f->matches($miss), 'rejects event with wrong multi-letter tag value');
+};
+
+subtest 'multi-letter tag filter in to_hash' => sub {
+    my $f = Net::Nostr::Filter->new('#overnet_oid' => ['abc123']);
+    my $h = $f->to_hash;
+    is($h->{'#overnet_oid'}, ['abc123'], '#overnet_oid in to_hash');
+};
+
+subtest 'mixed single and multi-letter tag filters' => sub {
+    my $f = Net::Nostr::Filter->new('#t' => ['nostr'], '#overnet_et' => ['relay']);
+    is($f->tag_filter('t'), ['nostr'], 'single-letter tag');
+    is($f->tag_filter('overnet_et'), ['relay'], 'multi-letter tag');
+};
+
+subtest 'multi-letter tag with digits and underscores' => sub {
+    my $f = Net::Nostr::Filter->new('#tag2_name' => ['val']);
+    is($f->tag_filter('tag2_name'), ['val'], 'tag with digits and underscores');
+};
+
+subtest 'invalid multi-letter tag names rejected' => sub {
+    like(dies { Net::Nostr::Filter->new('#2bad' => ['v']) }, qr/unknown argument/,
+         'tag starting with digit rejected');
+    like(dies { Net::Nostr::Filter->new('#' => ['v']) }, qr/unknown argument/,
+         'bare # rejected');
+};
+
 done_testing;

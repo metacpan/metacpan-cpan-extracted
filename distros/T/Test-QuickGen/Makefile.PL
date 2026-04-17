@@ -18,10 +18,15 @@ WriteMakefile(
         web => 'https://github.com/antoniskalou/Test-QuickGen/issues'
       },
     },
+    x_contributors => [
+      'bas080 <https://github.com/bas080>',
+      'Mike Whitaker <penfold@cpan.org>',
+    ],
   },
   VERSION_FROM => 'lib/Test/QuickGen.pm',
   EXE_FILES => ['bin/quicktest'],
   MIN_PERL_VERSION => '5.16.0',
+  PREREQ_PM => {},
   TEST_REQUIRES => {
     'Test::More' => 0,
   }

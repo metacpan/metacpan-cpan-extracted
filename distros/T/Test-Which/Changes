@@ -1,5 +1,8 @@
 Revision history for Test-Which
 
+0.07	Wed Apr 15 08:29:43 EDT 2026
+	Ensure messages aren't lost
+
 0.06	Wed Dec  3 21:33:47 EST 2025
 	More work fixing on Windows
 

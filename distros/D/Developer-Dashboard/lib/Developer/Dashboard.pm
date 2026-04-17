@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.37
+2.43
 
 =head1 INTRODUCTION
 
@@ -722,6 +722,14 @@ C<dashboard foobar a b> will exec the first matching
 F<cli/foobar> with C<a b> as argv, while preserving stdin, stdout, and
 stderr.
 
+A direct custom command can also be stored as an executable
+F<cli/E<lt>commandE<gt>.pl>, F<cli/E<lt>commandE<gt>.go>,
+F<cli/E<lt>commandE<gt>.java>, F<cli/E<lt>commandE<gt>.sh>,
+F<cli/E<lt>commandE<gt>.bash>, F<cli/E<lt>commandE<gt>.ps1>,
+F<cli/E<lt>commandE<gt>.cmd>, or F<cli/E<lt>commandE<gt>.bat>, and
+C<dashboard E<lt>commandE<gt>> resolves the same logical command name to
+those files.
+
 C<DD-OOP-LAYERS> is now the runtime contract for the whole local ecosystem.
 Starting at F<~/.developer-dashboard> and walking down through every parent
 directory until the current working directory, every existing
@@ -755,7 +763,11 @@ to earlier hook output and also inspect the immediate previous hook in a stable
 shape. C<LAST_RESULT> carries C<file>, C<exit>, C<STDOUT>, and C<STDERR>.
 Only an explicit C<[[STOP]]> marker in one hook's C<stderr> stops the
 remaining hook files for that command. A non-zero exit code alone is still
-recorded, but it does not skip later hooks.
+recorded, but it does not skip later hooks. Executable F<.go> hook files and
+direct F<.go> custom commands run through C<go run>. Executable F<.java>
+hook files and direct F<.java> custom commands are compiled with C<javac>
+into an isolated temp directory and then run through C<java> using the
+declared main class from the source file.
 
 Perl hook code can use C<Runtime::Result> to decode C<RESULT> safely, read the
 immediate C<last_result>, and inspect per-hook C<stdout>, C<stderr>, exit
@@ -1184,6 +1196,39 @@ C<code> runs Perl code directly inside the collector runtime
 
 =back
 
+The built-in C<housekeeper> collector is always present even when
+F<config/config.json> is otherwise empty. It runs every C<900> seconds with
+Perl C<code> instead of a shell command, so it does not depend on C<PATH>
+resolution. That collector removes stale hashed runtime state roots from the
+shared temp tree under F</tmp/E<lt>userE<gt>/developer-dashboard/state/> and
+removes older C<developer-dashboard-ajax-*> temp files plus
+C<dashboard-result-*> runtime result temp files left behind in F</tmp/>. It
+also rotates collector log transcripts when a collector defines C<rotation>
+or C<rotations>. C<lines> keeps the trailing line count, while C<minute>,
+C<minutes>, C<hour>, C<hours>, C<day>, C<days>, C<week>, C<weeks>,
+C<month>, and C<months> keep only log entries newer than the requested
+retention window. Run it on demand with:
+
+  dashboard housekeeper
+  dashboard collector run housekeeper
+
+If you need different cadence or behavior, define your own collector named
+C<housekeeper> in config. That override now inherits the built-in C<code> and
+C<cwd> defaults, so changing only C<interval> or adding C<indicator>
+metadata is enough:
+
+  {
+    "collectors": [
+      {
+        "name": "housekeeper",
+        "interval": 60,
+        "indicator": {
+          "icon": "🧹"
+        }
+      }
+    ]
+  }
+
 Example collector definitions:
 
   {
@@ -1208,6 +1253,10 @@ Example collector definitions:
         "command": "./foobar",
         "cwd": "home",
         "interval": 10,
+        "rotation": {
+          "lines": 100,
+          "days": 1
+        },
         "indicator": {
           "name": "foobar.indicator",
           "label": "Foobar",
@@ -2075,6 +2124,14 @@ each hook result is appended to C<RESULT>
 =item *
 
 the immediately previous hook payload is exposed through C<LAST_RESULT>
+
+=item *
+
+executable F<.go> hooks run through C<go run>
+
+=item *
+
+executable F<.java> hooks compile with C<javac> and then run through C<java>
 
 =item *
 

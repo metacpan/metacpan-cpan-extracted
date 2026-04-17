@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Music::SimpleDrumMachine",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Data::Dumper::Compact" => 0,
     "IO::Async::Loop" => 0,
     "IO::Async::Timer::Periodic" => 0,
     "MIDI::RtMidi::FFI::Device" => 0,
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "strict" => 0
   },
-  "VERSION" => "0.0502",
+  "VERSION" => "0.0506",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +44,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Data::Dumper::Compact" => 0,
   "File::Spec" => 0,
   "IO::Async::Loop" => 0,
   "IO::Async::Timer::Periodic" => 0,

@@ -8,6 +8,8 @@ use IO::Barf qw(barf);
 use File::Temp qw(tempfile);
 use MIME::Base64;
 
+$ENV{'NO_COLOR'} = 1;
+
 # Content.
 my $marc_xml_example = <<'END';
 PD94bWwgdmVyc2lvbiA9ICIxLjAiIGVuY29kaW5nID0gIlVURi04Ij8+Cjxjb2xsZWN0aW9uIHht
@@ -90,6 +92,8 @@ barf($temp_file, decode_base64($marc_xml_example));
 
 # Arguments.
 @ARGV = (
+        '-l',
+        'en',
         '-f',
         $temp_file,
 );

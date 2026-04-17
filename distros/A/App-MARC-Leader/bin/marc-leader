@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Leader;
 
-our $VERSION = 0.08;
+our $VERSION = 0.10;
 
 # Run.
 exit App::MARC::Leader->new->run;
@@ -28,7 +28,7 @@ marc-leader - Tool to decode MARC leader from file or string.
 
 =head1 SYNOPSIS
 
- marc-leader [-a] [-d] [-f marc_xml_file] [-h] [-v] [--version] [leader_string]
+ marc-leader [-a] [-d] [-f marc_xml_file] [-h] [-l lang_code] [-v] [--version] [leader_string]
 
 =head1 DESCRIPTION
 
@@ -54,6 +54,12 @@ Use MARC XML file name to decode of leader instead of leader string.
 =item * C<-h>
 
 Print help.
+
+=item * C<-l lang_code>
+
+ISO 639-1 language code of output language.
+
+Default value is from locales.
 
 =item * C<-v>
 
@@ -95,6 +101,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.10
 
 =cut

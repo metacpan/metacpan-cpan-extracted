@@ -10,6 +10,7 @@ requires "File::Spec" => "0";
 requires "File::Temp" => "0";
 requires "Importer" => "0.026";
 requires "List::Util" => "1.33";
+requires "Long::Jump" => "0.000004";
 requires "Object::HashBase" => "0.015";
 requires "POSIX" => "0";
 requires "Role::Tiny" => "2.002004";

@@ -73,9 +73,9 @@ use Authen::Passphrase 0.003;
 use Authen::Passphrase::DESCrypt;
 use Carp qw(croak);
 use Crypt::UnixCrypt_XS 0.08 qw(base64_to_block base64_to_int12);
-use Data::Entropy::Algorithms 0.000 qw(rand_int);
+use Crypt::SysRandom 'random_bytes';
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 
@@ -102,8 +102,7 @@ The salt for the first section, as a string of two base 64 digits.
 
 Causes salt for the first section to be generated randomly.  The value
 given for this attribute must be 12, indicating generation of 12 bits
-of salt.  The source of randomness may be controlled by the facility
-described in L<Data::Entropy>.
+of salt.
 
 =item B<hash>
 
@@ -150,7 +149,7 @@ sub new {
 				if defined $salt;
 			croak "\"$value\" is not a valid salt size"
 				unless $value == 12;
-			$salt = rand_int(1 << $value);
+			$salt = unpack("S", random_bytes(2)) % 4096;
 		} elsif($attr eq "hash") {
 			croak "hash specified redundantly"
 				if @hashes || defined($passphrase);

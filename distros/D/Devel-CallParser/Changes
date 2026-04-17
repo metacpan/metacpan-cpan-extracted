@@ -1,3 +1,27 @@
+version 0.004 2026-04-16
+  * Adoption as this is a downstream dep for Object::Proto::Sugar
+
+  * Fix failing tests where '.' was removed from INC?
+  
+  * Fix cpantester fails on debug perls switch to a rv2cv op that dereferences a code reference, 
+    matching what Perl expects as the last child of OP_ENTERSUB
+    newUNOP(OP_RV2CV, 0, newSVOP(OP_CONST, 0, newRV_inc((SV*)cv)));
+ 
+  * Fix qerror compatibility across perl versions:
+    declare Perl_qerror via EXTERN_C to fix implicit declaration error
+    on blead perl 5.43.9+ and avoid Perl_yyerror linker failure on
+    Windows
+ 
+  * PERL_VERSION_GE is now wrapped in #ifndef so it skips the local definition when Perl's handy.h already defines it
+ 
+  * The qerror fallback now checks for Perl_qerror first (older Perls), and falls back to Perl_yyerror 
+ 
+  * Fix t/leximport.t failures on threaded/debugging Perl builds:
+    add find_lexical_cv() helper that checks %^H hints hash directly
+    for Lexical::Sub CVs before falling back to rv2cv_op_cv() lookup
+
+  * six developer releases under 0.003*
+
 version 0.002; 2013-09-21
 
   * bugfix: allow generated headers to work on API-compatible Perls

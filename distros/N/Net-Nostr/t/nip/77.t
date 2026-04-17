@@ -329,6 +329,22 @@ subtest 'range: mode 2 is IdList with length + ids (spec lines 146-148)' => sub 
     is($decoded->[0]{payload}[1], "\xbb" x 32, 'second id');
 };
 
+subtest 'range: mode 1 truncated fingerprint is rejected' => sub {
+    like(
+        dies { $decode_message->("\x61\x00\x00\x01\xaa") },
+        qr/fingerprint.*16 bytes|truncated fingerprint/i,
+        'truncated fingerprint rejected'
+    );
+};
+
+subtest 'range: mode 2 truncated id list is rejected' => sub {
+    like(
+        dies { $decode_message->("\x61\x00\x00\x02\x01\xaa") },
+        qr/id list.*32 bytes|truncated id list/i,
+        'truncated id list rejected'
+    );
+};
+
 ###############################################################################
 # Appendix: Bound encoding (spec lines 151-165)
 ###############################################################################
@@ -886,6 +902,35 @@ subtest 'NEG-ERR: serializes 3 elements without neg_limit' => sub {
 subtest 'constructor: frame_size_limit accepted' => sub {
     my $ne = Net::Nostr::Negentropy->new(frame_size_limit => 4096);
     isa_ok($ne, 'Net::Nostr::Negentropy');
+};
+
+subtest 'frame_size_limit: initiate enforces maximum encoded message size' => sub {
+    my $ne = Net::Nostr::Negentropy->new(frame_size_limit => 1);
+    $ne->add_item(1000, '01' x 32);
+    $ne->seal;
+
+    like(
+        dies { $ne->initiate },
+        qr/frame_size_limit/i,
+        'oversized initiate message rejected'
+    );
+};
+
+subtest 'frame_size_limit: reconcile enforces maximum encoded response size' => sub {
+    my $client = Net::Nostr::Negentropy->new;
+    $client->add_item(1000, '01' x 32);
+    $client->seal;
+
+    my $server = Net::Nostr::Negentropy->new(frame_size_limit => 1);
+    $server->add_item(2000, '02' x 32);
+    $server->seal;
+
+    my $q = $client->initiate;
+    like(
+        dies { $server->reconcile($q) },
+        qr/frame_size_limit/i,
+        'oversized response rejected'
+    );
 };
 
 ###############################################################################

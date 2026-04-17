@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.28'; # version template
+  $VERSION='2.29'; # version template
 }
 use strict;
 use Treex::PML::List;
@@ -269,13 +269,6 @@ in the sequence. Returns the number of elements removed.
 
 =cut
 
-=item $seq->delete_element (element)
-
-Find and remove (all occurences) of a given Treex::PML::Seq::Element object
-in the sequence. Returns the number of elements removed.
-
-=cut
-
   sub delete_element {
     my ($self,$element)=@_;
     my $start = @{$self->[0]};
@@ -334,13 +327,51 @@ Note: Use $seq->elements_list->index_of($element) to search for a Treex::PML::Se
     return;
   }
 
+=item $seq->delete_element_at($index)
+
+Delete the element at the given index. Returns 1 if successful, 0 if not
+(element at the index didn't exist).
+
+=cut
+
+  sub delete_element_at {
+      my ($self, $index) = @_;
+      return 0 unless $self->element_at($index);
+
+      splice @{ $self->[0] }, $index, 1;
+      return 1
+  }
+
+=item $seq->replace_element_at($index, $name, $value)
+
+Replace the element at the given index with a new element with the given name
+and value. Returns 1 if successful, 0 if not (element at the index didn't
+exist).
+
+=cut
+
+  sub replace_element_at {
+      my ($self, $index, $name, $value) = @_;
+      return $self->replace_element_obj_at($index,
+                 'Treex::PML::Seq::Element'->new($name, $value))
+  }
+
+=item $seq->replace_element_obj_at($index, $element)
+
+Replace the element at the given index with the given element. Returns 1 if
+successful, 0 if not (element at the index didn't exist).
+
+=cut
+
+  sub replace_element_obj_at {
+      my ($self, $index, $element) = @_;
+      defined $self->element_at($index) or return;
+
+      splice @{ $self->[0] }, $index, 1, $element;
+      return 1
+  }
+
   # sub splice {
-  #   # TODO
-  # }
-  # sub delete_element_at {
-  #   # TODO
-  # }
-  # sub store_element_at {
   #   # TODO
   # }
 
@@ -369,7 +400,7 @@ sub empty {
 This utility function converts a given sequence content pattern string
 into a Perl regular expression. The resulting expression matches
 a list of element 'tags', where a tag is an element name surrounded by < and >.
-For example, the content pattern 'A,#TEXT,(B+|C)*' translates roughly 
+For example, the content pattern 'A,#TEXT,(B+|C)*' translates roughly
 to '<A><\#TEXT>(?:(?:<B>)+(?:<C>))*' and matches (a substring of) each of the following strings:
 
   '<A><#TEXT>'

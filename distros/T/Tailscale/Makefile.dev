@@ -1,0 +1,22 @@
+TSRS_DIR ?= /home/ubuntu/src/github.com/tailscale/tailscale-rs
+LIB = $(TSRS_DIR)/target/release/libtailscalers.so
+
+.PHONY: all lib testenv test clean
+
+all: lib testenv
+
+lib: $(LIB)
+
+$(LIB):
+	cd $(TSRS_DIR) && TS_RS_EXPERIMENT=this_is_unstable_software cargo build --release -p ts_ffi
+
+testenv: testenv/testenv
+
+testenv/testenv: testenv/main.go testenv/go.mod testenv/go.sum
+	cd testenv && go build -o testenv .
+
+test: all
+	TS_LIB_PATH=$(dir $(LIB)) prove -Ilib t/
+
+clean:
+	rm -f testenv/testenv

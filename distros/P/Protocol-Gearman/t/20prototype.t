@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::HexString;
+use Test2::V0;
 
 use Future;
 
@@ -25,7 +23,7 @@ ok( defined $gearman, '$gearman defined' );
 {
    $gearman->send_packet( SUBMIT_JOB => "func", "id", "ARGS" );
 
-   is_hexstr( $sent, "\0REQ\0\0\0\x07\0\0\0\x0cfunc\0id\0ARGS",
+   is( $sent, "\0REQ\0\0\0\x07\0\0\0\x0cfunc\0id\0ARGS",
       'data written by ->send_packet' );
 }
 

@@ -1,0 +1,418 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Class-Exporter-0.03
+    pathname: S/SP/SPLICE/Class-Exporter-0.03.tar.gz
+    provides:
+      Class::Exporter 0.03
+    requirements:
+      ExtUtils::MakeMaker 0
+  Class-Inspector-1.36
+    pathname: P/PL/PLICEASE/Class-Inspector-1.36.tar.gz
+    provides:
+      Class::Inspector 1.36
+      Class::Inspector::Functions 1.36
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Spec 0.80
+      base 0
+      perl 5.008
+  Const-Fast-0.014
+    pathname: L/LE/LEONT/Const-Fast-0.014.tar.gz
+    provides:
+      Const::Fast 0.014
+    requirements:
+      Carp 0
+      Module::Build::Tiny 0.021
+      Scalar::Util 0
+      Storable 0
+      Sub::Exporter::Progressive 0.001007
+      perl 5.008
+      strict 0
+      warnings 0
+  Data-Dumper-Names-0.03
+    pathname: O/OV/OVID/Data-Dumper-Names-0.03.tar.gz
+    provides:
+      Data::Dumper::Names 0.03
+    requirements:
+      PadWalker 0.13
+      Scalar::Util 0
+      Test::More 0
+  Devel-StackTrace-2.05
+    pathname: D/DR/DROLSKY/Devel-StackTrace-2.05.tar.gz
+    provides:
+      Devel::StackTrace 2.05
+      Devel::StackTrace::Frame 2.05
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      Scalar::Util 0
+      overload 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Devel-StackTrace-WithLexicals-2.01
+    pathname: S/SA/SARTAK/Devel-StackTrace-WithLexicals-2.01.tar.gz
+    provides:
+      Devel::StackTrace::WithLexicals 2.01
+      Devel::StackTrace::WithLexicals::Frame undef
+    requirements:
+      Devel::StackTrace 2.00
+      ExtUtils::MakeMaker 6.59
+      PadWalker 1.98
+      perl 5.008001
+  ExtUtils-CChecker-0.12
+    pathname: P/PE/PEVANS/ExtUtils-CChecker-0.12.tar.gz
+    provides:
+      ExtUtils::CChecker 0.12
+    requirements:
+      ExtUtils::CBuilder 0
+      Module::Build 0.4004
+      perl 5.014
+  ExtUtils-Config-0.010
+    pathname: L/LE/LEONT/ExtUtils-Config-0.010.tar.gz
+    provides:
+      ExtUtils::Config 0.010
+      ExtUtils::Config::MakeMaker 0.010
+    requirements:
+      Data::Dumper 0
+      ExtUtils::MakeMaker 0
+      ExtUtils::MakeMaker::Config 0
+      perl 5.006
+      strict 0
+      warnings 0
+  ExtUtils-Helpers-0.028
+    pathname: L/LE/LEONT/ExtUtils-Helpers-0.028.tar.gz
+    provides:
+      ExtUtils::Helpers 0.028
+      ExtUtils::Helpers::Unix 0.028
+      ExtUtils::Helpers::VMS 0.028
+      ExtUtils::Helpers::Windows 0.028
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      File::Basename 0
+      File::Copy 0
+      File::Spec::Functions 0
+      Text::ParseWords 3.24
+      strict 0
+      warnings 0
+  ExtUtils-InstallPaths-0.015
+    pathname: L/LE/LEONT/ExtUtils-InstallPaths-0.015.tar.gz
+    provides:
+      ExtUtils::InstallPaths 0.015
+    requirements:
+      Carp 0
+      ExtUtils::Config 0.009
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      perl 5.008
+      strict 0
+      warnings 0
+  File-ShareDir-1.118
+    pathname: R/RE/REHSACK/File-ShareDir-1.118.tar.gz
+    provides:
+      File::ShareDir 1.118
+    requirements:
+      Carp 0
+      Class::Inspector 1.12
+      ExtUtils::MakeMaker 0
+      File::ShareDir::Install 0.13
+      File::Spec 0.80
+      perl 5.008001
+      warnings 0
+  File-ShareDir-Install-0.14
+    pathname: E/ET/ETHER/File-ShareDir-Install-0.14.tar.gz
+    provides:
+      File::ShareDir::Install 0.14
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      IO::Dir 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Future-0.52
+    pathname: P/PE/PEVANS/Future-0.52.tar.gz
+    provides:
+      Future 0.52
+      Future::Exception 0.52
+      Future::Mutex 0.52
+      Future::PP 0.52
+      Future::Utils 0.52
+      Test::Future 0.52
+      Test::Future::Deferred 0.52
+    requirements:
+      Carp 1.25
+      List::Util 1.29
+      Module::Build 0.4004
+      Test::Builder::Module 0
+      Time::HiRes 0
+      perl 5.014
+  Future-AsyncAwait-0.71
+    pathname: P/PE/PEVANS/Future-AsyncAwait-0.71.tar.gz
+    provides:
+      Future::AsyncAwait 0.71
+      Future::AsyncAwait::Awaitable 0.71
+      Future::AsyncAwait::ExtensionBuilder 0.71
+      Test::Future::AsyncAwait::Awaitable 0.71
+    requirements:
+      ExtUtils::CBuilder 0
+      File::ShareDir 1.00
+      Future 0.50
+      Module::Build 0.4004
+      XS::Parse::Keyword 0.13
+      XS::Parse::Keyword::Builder 0.13
+      XS::Parse::Sublike 0.31
+      XS::Parse::Sublike::Builder 0.31
+      perl 5.016
+  IPC-Nosh-0.01-TRIAL
+    pathname: C/CR/CRABAPP/IPC-Nosh-0.01-TRIAL.tar.gz
+    provides:
+      IPC::Nosh 0.01
+      IPC::Nosh::Common undef
+      IPC::Nosh::Handle undef
+      IPC::Nosh::Mux undef
+    requirements:
+      Class::Exporter 0
+      Const::Fast 0
+      Data::Dumper::Names 0
+      Devel::StackTrace::WithLexicals 0
+      IO::Handle 0
+      IPC::Run3 0
+      Module::Build::Tiny 0.034
+      Object::Pad 0
+      Path::Tiny 0
+      Regexp::Common 0
+      Syntax::Keyword::Defer 0
+      Syntax::Keyword::Dynamically 0
+      perl v5.40.0
+  IPC-Run3-0.049
+    pathname: R/RJ/RJBS/IPC-Run3-0.049.tar.gz
+    provides:
+      IPC::Run3 0.049
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0.31
+      Time::HiRes 0
+  Module-Build-0.4234
+    pathname: L/LE/LEONT/Module-Build-0.4234.tar.gz
+    provides:
+      Module::Build 0.4234
+      Module::Build::Base 0.4234
+      Module::Build::Compat 0.4234
+      Module::Build::Config 0.4234
+      Module::Build::Cookbook 0.4234
+      Module::Build::Dumper 0.4234
+      Module::Build::Notes 0.4234
+      Module::Build::PPMMaker 0.4234
+      Module::Build::Platform::Default 0.4234
+      Module::Build::Platform::MacOS 0.4234
+      Module::Build::Platform::Unix 0.4234
+      Module::Build::Platform::VMS 0.4234
+      Module::Build::Platform::VOS 0.4234
+      Module::Build::Platform::Windows 0.4234
+      Module::Build::Platform::aix 0.4234
+      Module::Build::Platform::cygwin 0.4234
+      Module::Build::Platform::darwin 0.4234
+      Module::Build::Platform::os2 0.4234
+      Module::Build::PodParser 0.4234
+    requirements:
+      CPAN::Meta 2.142060
+      Cwd 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0.27
+      ExtUtils::Install 0
+      ExtUtils::Manifest 0
+      ExtUtils::Mkbootstrap 0
+      ExtUtils::ParseXS 2.21
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.82
+      Getopt::Long 0
+      Module::Metadata 1.000002
+      Perl::OSType 1
+      TAP::Harness 3.29
+      Text::Abbrev 0
+      Text::ParseWords 0
+      perl 5.006001
+      version 0.87
+  Module-Build-Tiny-0.052
+    pathname: L/LE/LEONT/Module-Build-Tiny-0.052.tar.gz
+    provides:
+      Module::Build::Tiny 0.052
+    requirements:
+      CPAN::Meta 0
+      DynaLoader 0
+      Exporter 5.57
+      ExtUtils::CBuilder 0
+      ExtUtils::Config 0.003
+      ExtUtils::Helpers 0.020
+      ExtUtils::Install 0
+      ExtUtils::InstallPaths 0.002
+      ExtUtils::ParseXS 0
+      File::Basename 0
+      File::Find 0
+      File::Path 0
+      File::Spec::Functions 0
+      Getopt::Long 2.36
+      JSON::PP 2
+      Pod::Man 0
+      TAP::Harness::Env 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Object-Pad-0.823
+    pathname: P/PE/PEVANS/Object-Pad-0.823.tar.gz
+    provides:
+      Object::Pad 0.823
+      Object::Pad::ExtensionBuilder 0.823
+      Object::Pad::MOP::Class 0.823
+      Object::Pad::MOP::Field 0.823
+      Object::Pad::MOP::FieldAttr 0.823
+      Object::Pad::MOP::Method 0.823
+      Object::Pad::MetaFunctions 0.823
+    requirements:
+      ExtUtils::CBuilder 0
+      File::ShareDir 1.00
+      Module::Build 0.4004
+      XS::Parse::Keyword 0.47
+      XS::Parse::Keyword::Builder 0.48
+      XS::Parse::Sublike 0.35
+      XS::Parse::Sublike::Builder 0.35
+      perl 5.018
+  PadWalker-2.5
+    pathname: R/RO/ROBIN/PadWalker-2.5.tar.gz
+    provides:
+      PadWalker 2.5
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.008001
+  Path-Tiny-0.150
+    pathname: D/DA/DAGOLDEN/Path-Tiny-0.150.tar.gz
+    provides:
+      Path::Tiny 0.150
+      Path::Tiny::Error 0.150
+    requirements:
+      Carp 0
+      Cwd 0
+      Digest 1.03
+      Digest::SHA 5.45
+      Encode 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.17
+      Fcntl 0
+      File::Compare 0
+      File::Copy 0
+      File::Glob 0
+      File::Path 2.07
+      File::Spec 0.86
+      File::Temp 0.19
+      File::stat 0
+      constant 0
+      overload 0
+      perl 5.008001
+      strict 0
+      warnings 0
+      warnings::register 0
+  Regexp-Common-2024080801
+    pathname: A/AB/ABIGAIL/Regexp-Common-2024080801.tar.gz
+    provides:
+      Regexp::Common 2024080801
+      Regexp::Common::CC 2024080801
+      Regexp::Common::Entry 2024080801
+      Regexp::Common::SEN 2024080801
+      Regexp::Common::URI 2024080801
+      Regexp::Common::URI::RFC1035 2024080801
+      Regexp::Common::URI::RFC1738 2024080801
+      Regexp::Common::URI::RFC1808 2024080801
+      Regexp::Common::URI::RFC2384 2024080801
+      Regexp::Common::URI::RFC2396 2024080801
+      Regexp::Common::URI::RFC2806 2024080801
+      Regexp::Common::URI::fax 2024080801
+      Regexp::Common::URI::file 2024080801
+      Regexp::Common::URI::ftp 2024080801
+      Regexp::Common::URI::gopher 2024080801
+      Regexp::Common::URI::http 2024080801
+      Regexp::Common::URI::news 2024080801
+      Regexp::Common::URI::pop 2024080801
+      Regexp::Common::URI::prospero 2024080801
+      Regexp::Common::URI::tel 2024080801
+      Regexp::Common::URI::telnet 2024080801
+      Regexp::Common::URI::tv 2024080801
+      Regexp::Common::URI::wais 2024080801
+      Regexp::Common::_support 2024080801
+      Regexp::Common::balanced 2024080801
+      Regexp::Common::comment 2024080801
+      Regexp::Common::delimited 2024080801
+      Regexp::Common::lingua 2024080801
+      Regexp::Common::list 2024080801
+      Regexp::Common::net 2024080801
+      Regexp::Common::number 2024080801
+      Regexp::Common::profanity 2024080801
+      Regexp::Common::whitespace 2024080801
+      Regexp::Common::zip 2024080801
+    requirements:
+      Config 0
+      ExtUtils::MakeMaker 0
+      perl 5.010
+      strict 0
+      vars 0
+      warnings 0
+  Sub-Exporter-Progressive-0.001013
+    pathname: F/FR/FREW/Sub-Exporter-Progressive-0.001013.tar.gz
+    provides:
+      Sub::Exporter::Progressive 0.001013
+    requirements:
+      ExtUtils::MakeMaker 0
+  Syntax-Keyword-Defer-0.11
+    pathname: P/PE/PEVANS/Syntax-Keyword-Defer-0.11.tar.gz
+    provides:
+      Syntax::Keyword::Defer 0.11
+    requirements:
+      ExtUtils::CBuilder 0
+      Module::Build 0.4004
+      XS::Parse::Keyword 0.13
+      XS::Parse::Keyword::Builder 0.13
+      perl 5.014
+  Syntax-Keyword-Dynamically-0.14
+    pathname: P/PE/PEVANS/Syntax-Keyword-Dynamically-0.14.tar.gz
+    provides:
+      Syntax::Keyword::Dynamically 0.14
+    requirements:
+      ExtUtils::CBuilder 0
+      Future::AsyncAwait::ExtensionBuilder 0.60
+      Module::Build 0.4004
+      XS::Parse::Keyword 0.13
+      XS::Parse::Keyword::Builder 0.13
+      perl 5.014
+  XS-Parse-Keyword-0.49
+    pathname: P/PE/PEVANS/XS-Parse-Keyword-0.49.tar.gz
+    provides:
+      XS::Parse::Infix 0.49
+      XS::Parse::Infix::Builder 0.49
+      XS::Parse::Keyword 0.49
+      XS::Parse::Keyword::Builder 0.49
+    requirements:
+      ExtUtils::CBuilder 0
+      ExtUtils::CChecker 0.11
+      ExtUtils::ParseXS 3.16
+      File::ShareDir 1.00
+      Module::Build 0.4004
+      perl 5.014
+  XS-Parse-Sublike-0.41
+    pathname: P/PE/PEVANS/XS-Parse-Sublike-0.41.tar.gz
+    provides:
+      Sublike::Extended 0.41
+      XS::Parse::Sublike 0.41
+      XS::Parse::Sublike::Builder 0.41
+    requirements:
+      ExtUtils::CBuilder 0
+      File::ShareDir 1.00
+      Module::Build 0.4004
+      perl 5.016

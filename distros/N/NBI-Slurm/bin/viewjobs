@@ -87,7 +87,8 @@ my $COLORS = {
     cell_running => "\e[0;32;40m",       # green on black  (State=RUNNING)
     cell_pending => "\e[0;33;40m",       # yellow on black (State=PENDING)
     cell_error   => "\e[0;31;40m",       # red on black    (error State/Reason)
-    cell_time_zero => "\e[0;34;40m",     # blue on black   (Time=0 / no time)
+    cell_time_zero  => "\e[0;34;40m",     # blue on black   (Time=0 / no time)
+    cell_completed  => "\e[0;36;40m",     # cyan on black   (State=COMPLETED)
     # Detail view
     detail_key => "\e[0;36;40m",         # cyan on black   (key column in detail view)
     # Filter input prompt
@@ -145,9 +146,24 @@ my $state = {
     input_buffer => '',   # text typed so far in filter prompt
 
     # Detail view state
-    detail_fields => [],
-    detail_scroll  => 0,
-    detail_jobid   => '',
+    detail_fields      => [],
+    detail_scroll      => 0,
+    detail_jobid       => '',
+    detail_source      => '',   # 'scontrol' | 'sacct'
+    detail_stderr      => '',   # path to stderr file (E to open)
+    detail_stdout      => '',   # path to stdout file (O to open)
+    detail_script      => '',   # path to script file (S to open, Nextflow only)
+    detail_is_nextflow => 0,    # bool
+
+    # File viewer mode
+    file_view_lines  => [],
+    file_view_scroll => 0,
+    file_view_title  => '',   # short label shown on header line 1
+    file_view_path   => '',   # full file path shown on header line 2
+
+    # Completed-job tracking (persists across refreshes)
+    completed_jobs => {},   # JOBID => job hashref (STATE forced to COMPLETED)
+    sacct_cache    => {},   # JOBID => detail fields arrayref
 };
 
 # Package variable for terminal state restoration
@@ -268,7 +284,12 @@ sub read_key {
 sub load_jobs {
     my $state = shift;
 
-    # Reuse getjobs() from lsjobs with error handling
+    # ── Snapshot previously live jobs (exclude already-completed ghosts) ────
+    my %prev_live = map  { $_->{JOBID} => $_ }
+                    grep { ($_->{STATE} // '') ne 'COMPLETED' }
+                    @{$state->{all_jobs}};
+
+    # ── Fetch fresh data from squeue ────────────────────────────────────────
     my $jobs_hash = eval { getjobs() };
     if ($@ || !defined $jobs_hash || ref($jobs_hash) ne 'HASH') {
         $state->{message} = "Error loading jobs: $@";
@@ -276,15 +297,21 @@ sub load_jobs {
         return;
     }
 
-    # Convert to array for easier indexing
-    my @jobs = ();
-    for my $jobid (sort keys %$jobs_hash) {
-        push @jobs, $jobs_hash->{$jobid};
+    # ── Detect jobs that vanished → accumulate as COMPLETED ghosts ──────────
+    for my $jobid (keys %prev_live) {
+        unless (exists $jobs_hash->{$jobid}) {
+            my $ghost = { %{$prev_live{$jobid}} };
+            $ghost->{STATE} = 'COMPLETED';
+            $state->{completed_jobs}{$jobid} = $ghost;
+        }
     }
 
-    # Store immutable master copy; working copy starts identical
-    $state->{all_jobs}      = \@jobs;
-    $state->{jobs}          = [@jobs];   # safety fallback if apply_filters skips
+    # ── Build master list: live jobs + all accumulated ghosts ───────────────
+    my @live_jobs = map { $jobs_hash->{$_} } sort keys %$jobs_hash;
+    my @all_jobs  = (@live_jobs, values %{$state->{completed_jobs}});
+
+    $state->{all_jobs}      = \@all_jobs;
+    $state->{jobs}          = [@all_jobs];
 
     # Clear interactive filters and selections on every (re)load
     $state->{filters}       = [];
@@ -394,6 +421,10 @@ sub render_screen {
 
     if ($state->{mode} eq 'detail') {
         render_detail_screen($state);
+        return;
+    }
+    if ($state->{mode} eq 'file_view') {
+        render_file_view_screen($state);
         return;
     }
 
@@ -637,9 +668,10 @@ sub get_cell_color {
     $value //= '';
 
     if ($col_name eq 'State') {
-        return $COLORS->{cell_running} if $value =~ /^RUNNING/i;
-        return $COLORS->{cell_pending} if $value =~ /^PENDING/i;
-        return $COLORS->{cell_error}   if $value ne 'N/A' && $value ne '';
+        return $COLORS->{cell_running}   if $value =~ /^RUNNING/i;
+        return $COLORS->{cell_pending}   if $value =~ /^PENDING/i;
+        return $COLORS->{cell_completed} if $value =~ /^COMPLETED/i;
+        return $COLORS->{cell_error}     if $value ne 'N/A' && $value ne '';
     } elsif ($col_name eq 'Time') {
         return $COLORS->{cell_time_zero}
             if $value eq '' || $value eq '0:00' || $value eq 'N/A';
@@ -675,27 +707,147 @@ sub fetch_job_details {
     return \@fields;
 }
 
+# Run sacct for a completed job and parse into ordered [[key,val], ...] list.
+# Records (job + steps) are separated by a visual divider row.
+sub fetch_sacct_details {
+    my $jobid = shift;
+    my $fmt = join(',', qw(
+        JobID JobName User Account Partition State ExitCode
+        Submit Start End Elapsed CPUTime
+        MaxRSS MaxVMSize AveRSS AveCPU
+        NodeList NCPUS NNodes WorkDir Comment
+    ));
+    $fmt =~ s/\s+//g;
+    my @lines = `sacct -j '$jobid' --format=$fmt -P 2>&1`;
+    return [] unless @lines >= 2;
+
+    chomp for @lines;
+    my @headers = split /\|/, shift @lines;
+    my @fields;
+
+    my $record_num = 0;
+    for my $line (@lines) {
+        next if $line =~ /^\s*$/;
+
+        # Visual separator between job record and step records
+        push @fields, ['---', ''] if $record_num > 0;
+        $record_num++;
+
+        my @values = split /\|/, $line, -1;
+        for my $i (0 .. $#headers) {
+            my $val = defined $values[$i] ? $values[$i] : '';
+            push @fields, [$headers[$i], $val];
+        }
+    }
+
+    return \@fields;
+}
+
+# Post-process fetched detail fields:
+#   - Detect Nextflow (WorkDir/.command.sh present) → set file shortcuts
+#   - Reorder: Nextflow banner, then JobID/Name/StdErr/StdOut/WorkDir, then rest
+sub enrich_detail_fields {
+    my ($state, $fields) = @_;
+
+    # Index by key (first non-divider occurrence wins)
+    my %by_key;
+    for my $f (@$fields) {
+        next if $f->[0] eq '---';
+        $by_key{ $f->[0] } //= $f->[1];
+    }
+
+    my $workdir = $by_key{WorkDir} // '';
+
+    # Nextflow detection
+    my $is_nextflow = ($workdir && -f "$workdir/.command.sh") ? 1 : 0;
+
+    if ($is_nextflow) {
+        $state->{detail_stderr}   = "$workdir/.command.err";
+        $state->{detail_stdout}   = "$workdir/.command.out";
+        $state->{detail_script}   = "$workdir/.command.sh";
+    } else {
+        $state->{detail_stderr}   = $by_key{StdErr} // '';
+        $state->{detail_stdout}   = $by_key{StdOut} // '';
+        $state->{detail_script}   = '';
+    }
+    $state->{detail_is_nextflow} = $is_nextflow;
+
+    # Keys to float to the top (union of scontrol and sacct key names)
+    my @promote_order = qw(JobId JobID JobName StdErr StdOut WorkDir);
+    my %promoted_set  = map { $_ => 1 } @promote_order;
+
+    # Collect promoted fields in declared order (gracefully skip absent keys)
+    my %seen;
+    my @top;
+    for my $key (@promote_order) {
+        for my $f (@$fields) {
+            next if $f->[0] ne $key || $seen{$key}++;
+            push @top, $f;
+            last;
+        }
+    }
+
+    # Remaining fields (skip promoted keys and dividers)
+    my @rest;
+    for my $f (@$fields) {
+        next if $f->[0] eq '---' || $promoted_set{ $f->[0] };
+        push @rest, $f;
+    }
+
+    # Nextflow banner prepended (key '[Nextflow]' is rendered specially)
+    my @header;
+    if ($is_nextflow) {
+        push @header, ['[Nextflow]', 'Nextflow job'];
+    }
+
+    return [@header, @top, @rest];
+}
+
 sub show_job_details {
     my $state = shift;
     return if scalar @{$state->{jobs}} == 0;
 
-    my $job   = $state->{jobs}[$state->{active_row}];
-    my $jobid = $job->{JOBID};
+    my $job          = $state->{jobs}[$state->{active_row}];
+    my $jobid        = $job->{JOBID};
+    my $is_completed = (($job->{STATE} // '') eq 'COMPLETED');
+
+    # Serve from cache for completed jobs (sacct can be slow)
+    if ($is_completed && exists $state->{sacct_cache}{$jobid}) {
+        my $fields = $state->{sacct_cache}{$jobid};
+        $fields = enrich_detail_fields($state, $fields);
+        $state->{detail_fields} = $fields;
+        $state->{detail_scroll}  = 0;
+        $state->{detail_jobid}   = $jobid;
+        $state->{detail_source}  = 'sacct';
+        $state->{mode}           = 'detail';
+        return;
+    }
 
     # Show a brief loading flash on the normal screen
-    $state->{message} = "Loading details for job $jobid …";
+    $state->{message} = $is_completed
+        ? "Loading sacct details for completed job $jobid …"
+        : "Loading details for job $jobid …";
     render_screen($state);
     $state->{message} = '';
 
-    my $fields = fetch_job_details($jobid);
-    if (!@$fields) {
+    my $raw_fields = $is_completed
+        ? fetch_sacct_details($jobid)
+        : fetch_job_details($jobid);
+
+    if (!@$raw_fields) {
         $state->{message} = "No details returned for job $jobid";
         return;
     }
 
+    # Cache raw sacct results (enrich on every open so paths stay fresh)
+    $state->{sacct_cache}{$jobid} = $raw_fields if $is_completed;
+
+    my $fields = enrich_detail_fields($state, $raw_fields);
+
     $state->{detail_fields} = $fields;
     $state->{detail_scroll}  = 0;
     $state->{detail_jobid}   = $jobid;
+    $state->{detail_source}  = $is_completed ? 'sacct' : 'scontrol';
     $state->{mode}           = 'detail';
 }
 
@@ -704,9 +856,10 @@ sub get_detail_value_color {
     my ($key, $val) = @_;
     $val //= '';
 
-    if ($key eq 'JobState') {
-        return $COLORS->{cell_running} if $val =~ /^RUNNING/i;
-        return $COLORS->{cell_pending} if $val =~ /^PENDING/i;
+    if ($key eq 'JobState' || $key eq 'State') {
+        return $COLORS->{cell_running}   if $val =~ /^RUNNING/i;
+        return $COLORS->{cell_pending}   if $val =~ /^PENDING/i;
+        return $COLORS->{cell_completed} if $val =~ /^COMPLETED/i;
         return $COLORS->{cell_error}
             if $val =~ /^(FAILED|CANCELLED|TIMEOUT|NODE_FAIL|OUT_OF_MEMORY)/i;
     } elsif ($key eq 'Reason') {
@@ -740,8 +893,12 @@ sub render_detail_header {
     for my $f (@{$state->{detail_fields}}) {
         if ($f->[0] eq 'JobName') { $jobname = $f->[1]; last; }
     }
+    my $source = $state->{detail_source} eq 'sacct'    ? '  [sacct]'
+               : $state->{detail_source} eq 'scontrol' ? '  [scontrol]'
+               : '';
     my $title = "  Job Details  ·  #$state->{detail_jobid}"
-              . ($jobname ? "  ·  $jobname" : '');
+              . ($jobname ? "  ·  $jobname" : '')
+              . $source;
     print $COLORS->{header}
         . sprintf("%-*s", $state->{term_width}, substr($title, 0, $state->{term_width}))
         . $COLORS->{reset} . "\r\n";
@@ -770,6 +927,30 @@ sub render_detail_body {
         my ($key, $val) = @{$fields->[$fi]};
         $val //= '';
 
+        # Nextflow banner row
+        if ($key eq '[Nextflow]') {
+            my $nf_color = "\e[0;1;32;40m";   # bold green on black
+            my @hints;
+            push @hints, 'S:script' if $state->{detail_script} && -f $state->{detail_script};
+            push @hints, 'E:stderr' if $state->{detail_stderr} && -f $state->{detail_stderr};
+            push @hints, 'O:stdout' if $state->{detail_stdout} && -f $state->{detail_stdout};
+            my $hint_str = @hints ? '  ·  ' . join('  ', @hints) : '';
+            my $banner   = "  \x{2605} Nextflow job$hint_str";
+            print $nf_color
+                . sprintf("%-*s", $state->{term_width}, substr($banner, 0, $state->{term_width}))
+                . $COLORS->{reset} . "\r\n";
+            next;
+        }
+
+        # Divider row between sacct records (job vs steps)
+        if ($key eq '---') {
+            my $divider = '─' x $state->{term_width};
+            print $COLORS->{col_sep}
+                . substr($divider, 0, $state->{term_width})
+                . $COLORS->{reset} . "\r\n";
+            next;
+        }
+
         my $val_color = get_detail_value_color($key, $val);
 
         # Truncate long values; they can be scrolled horizontally in a future version
@@ -788,9 +969,17 @@ sub render_detail_footer {
     my $vis    = $state->{term_height} - 2;
     my $from   = $state->{detail_scroll} + 1;
     my $to     = min($state->{detail_scroll} + $vis, $total);
-    my $text   = sprintf(
-        "  ESC/q:back  ↑↓/jk:scroll  PgUp/PgDn:page  g/G:top/bot   [%d-%d of %d fields]",
-        $from, $to, $total);
+
+    # Build file-shortcut hints for keys that point to existing files
+    my @file_hints;
+    push @file_hints, 'E:stderr' if $state->{detail_stderr} && -f $state->{detail_stderr};
+    push @file_hints, 'O:stdout' if $state->{detail_stdout} && -f $state->{detail_stdout};
+    push @file_hints, 'S:script' if $state->{detail_script} && -f $state->{detail_script};
+    my $file_hint_str = @file_hints ? '  ' . join('  ', @file_hints) : '';
+
+    my $text = sprintf(
+        "  ESC/q:back  ↑↓/jk:scroll  PgUp/PgDn:page  g/G:top/bot%s   [%d-%d of %d fields]",
+        $file_hint_str, $from, $to, $total);
     print $COLORS->{status_bar}
         . sprintf("%-*s", $state->{term_width}, substr($text, 0, $state->{term_width}))
         . $COLORS->{reset};
@@ -818,6 +1007,145 @@ sub handle_detail_input {
         $state->{detail_scroll} = 0;
     } elsif ($key eq 'END' || $key eq 'G') {
         $state->{detail_scroll} = max(0, $total - $vis);
+    }
+    # File viewer shortcuts
+    elsif ($key eq 'e' || $key eq 'E') {
+        open_file_view($state, $state->{detail_stderr}, 'StdErr', 1);
+    } elsif ($key eq 'o' || $key eq 'O') {
+        open_file_view($state, $state->{detail_stdout}, 'StdOut', 1);
+    } elsif ($key eq 's' || $key eq 'S') {
+        open_file_view($state, $state->{detail_script}, 'Script', 0);
+    }
+}
+
+# ── File viewer ───────────────────────────────────────────────────────────────
+
+# Open a file in the scrollable viewer.
+#   $label        = short type label shown on header line 1 (e.g. "StdErr")
+#   $start_at_end = 1 → start at last screenful (logs); 0 → top (scripts)
+sub open_file_view {
+    my ($state, $path, $label, $start_at_end) = @_;
+
+    unless (defined $path && $path ne '') {
+        $state->{message} = "No file path available";
+        return;
+    }
+    unless (-f $path) {
+        $state->{message} = "File not found: $path";
+        return;
+    }
+
+    open my $fh, '<', $path or do {
+        $state->{message} = "Cannot open $path: $!";
+        return;
+    };
+    my @lines = <$fh>;
+    close $fh;
+    chomp for @lines;
+    s/\t/    /g for @lines;   # expand tabs for display
+
+    # Two header rows: label + path line
+    my $header_rows = 2;
+    my $visible = $state->{term_height} - $header_rows - 1;   # -1 for footer
+    my $scroll  = 0;
+    if ($start_at_end && @lines > $visible) {
+        $scroll = scalar(@lines) - $visible;
+        $scroll = 0 if $scroll < 0;
+    }
+
+    $state->{file_view_lines}  = \@lines;
+    $state->{file_view_scroll} = $scroll;
+    $state->{file_view_title}  = $label;
+    $state->{file_view_path}   = $path;
+    $state->{mode}             = 'file_view';
+}
+
+sub render_file_view_screen {
+    my $state = shift;
+    print $ANSI->{hide_cursor};
+    print $ANSI->{clear_screen};
+    print $ANSI->{move_home};
+    render_file_view_header($state);
+    render_file_view_body($state);
+    render_file_view_footer($state);
+    print $ANSI->{show_cursor};
+}
+
+sub render_file_view_header {
+    my $state = shift;
+
+    # Line 1: label (e.g. "StdErr")
+    my $line1 = "  \x{1F4C4} " . $state->{file_view_title};
+    print $COLORS->{header}
+        . sprintf("%-*s", $state->{term_width}, substr($line1, 0, $state->{term_width}))
+        . $COLORS->{reset} . "\r\n";
+
+    # Line 2: full file path (dim/normal color so it stands apart from the header)
+    my $path  = $state->{file_view_path};
+    my $line2 = "  $path";
+    print $COLORS->{normal}
+        . sprintf("%-*s", $state->{term_width}, substr($line2, 0, $state->{term_width}))
+        . $COLORS->{reset} . "\r\n";
+}
+
+sub render_file_view_body {
+    my $state   = shift;
+    my $lines   = $state->{file_view_lines};
+    my $visible = $state->{term_height} - 3;   # 2 header rows + 1 footer
+
+    for my $ri (0 .. $visible - 1) {
+        my $li   = $state->{file_view_scroll} + $ri;
+        if ($li >= scalar @$lines) {
+            print $COLORS->{normal}
+                . (' ' x $state->{term_width})
+                . $COLORS->{reset} . "\r\n";
+            next;
+        }
+        my $line = $lines->[$li];
+        # Truncate to terminal width (simple, no horizontal scroll for now)
+        $line = substr($line, 0, $state->{term_width});
+        print $COLORS->{normal}
+            . sprintf("%-*s", $state->{term_width}, $line)
+            . $COLORS->{reset} . "\r\n";
+    }
+}
+
+sub render_file_view_footer {
+    my $state = shift;
+    my $total = scalar @{$state->{file_view_lines}};
+    my $vis   = $state->{term_height} - 3;   # 2 header rows + 1 footer
+    my $from  = $state->{file_view_scroll} + 1;
+    my $to    = min($state->{file_view_scroll} + $vis, $total);
+    $from     = min($from, $total) if $total > 0;
+    my $text  = sprintf(
+        "  ESC/q:back to details  ↑↓/jk:scroll  PgUp/PgDn:page  g/G:top/bot   [line %d-%d of %d]",
+        ($total ? $from : 0), ($total ? $to : 0), $total);
+    print $COLORS->{status_bar}
+        . sprintf("%-*s", $state->{term_width}, substr($text, 0, $state->{term_width}))
+        . $COLORS->{reset};
+}
+
+sub handle_file_view_input {
+    my ($state, $key) = @_;
+    my $total = scalar @{$state->{file_view_lines}};
+    my $vis   = $state->{term_height} - 3;   # 2 header rows + 1 footer
+
+    if ($key eq 'ESC' || $key eq 'q' || $key eq 'Q' || $key eq 'CTRL_C') {
+        $state->{mode} = 'detail';
+    } elsif ($key eq 'UP' || $key eq 'k') {
+        $state->{file_view_scroll}-- if $state->{file_view_scroll} > 0;
+    } elsif ($key eq 'DOWN' || $key eq 'j') {
+        $state->{file_view_scroll}++
+            if $state->{file_view_scroll} < $total - $vis;
+    } elsif ($key eq 'PGUP') {
+        $state->{file_view_scroll} = max(0, $state->{file_view_scroll} - $vis);
+    } elsif ($key eq 'PGDN') {
+        $state->{file_view_scroll} = max(0,
+            min($total - $vis, $state->{file_view_scroll} + $vis));
+    } elsif ($key eq 'HOME' || $key eq 'g') {
+        $state->{file_view_scroll} = 0;
+    } elsif ($key eq 'END' || $key eq 'G') {
+        $state->{file_view_scroll} = max(0, $total - $vis);
     }
 }
 
@@ -940,6 +1268,10 @@ sub handle_input {
 
     if ($state->{mode} eq 'detail') {
         return handle_detail_input($state, $key);
+    }
+
+    if ($state->{mode} eq 'file_view') {
+        return handle_file_view_input($state, $key);
     }
 
     # Filter input mode (sub-mode of normal)
@@ -1330,7 +1662,7 @@ viewjobs - Interactive TUI for viewing and managing SLURM jobs
 
 =head1 VERSION
 
-version 0.19.1
+version 0.20.0
 
 =head1 SYNOPSIS
 

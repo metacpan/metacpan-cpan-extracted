@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use lib '.';
 
 use Test::More tests => 47;
 use t::LoadXS ();

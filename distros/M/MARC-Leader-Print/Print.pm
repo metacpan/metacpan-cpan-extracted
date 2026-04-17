@@ -4,11 +4,13 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
-use Data::MARC::Leader::Utils;
 use English;
 use Error::Pure qw(err);
+use MARC::Leader::L10N 0.03;
+use Mo::utils 0.06 qw(check_bool);
+use Mo::utils::Language 0.05 qw(check_language_639_1);
 
-our $VERSION = 0.04;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -16,6 +18,9 @@ sub new {
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Language.
+	$self->{'lang'} = undef;
 
 	# Use with ANSI sequences.
 	$self->{'mode_ansi'} = undef;
@@ -29,7 +34,14 @@ sub new {
 	# Process parameters.
 	set_params($self, @params);
 
-	$self->{'_utils'} = Data::MARC::Leader::Utils->new;
+	# Check 'lang'.
+	check_language_639_1($self, 'lang');
+
+	# Check 'mode_ansi'.
+	check_bool($self, 'mode_ansi');
+
+	# Check 'mode_desc'.
+	check_bool($self, 'mode_desc');
 
 	if (! defined $self->{'mode_ansi'}) {
 		if (exists $ENV{'NO_COLOR'}) {
@@ -51,6 +63,8 @@ sub new {
 		}
 	}
 
+	$self->{'_l'} = MARC::Leader::L10N->get_handle(defined $self->{'lang'} ? $self->{'lang'} : ());
+
 	return $self;
 }
 
@@ -67,10 +81,10 @@ sub print {
 		'type_of_control');
 	push @ret, $self->_key('Character coding scheme').$self->_print($leader_obj,
 		'char_coding_scheme');
-	push @ret, $self->_key('Indicator count').$self->_print($leader_obj,
-		'indicator_count');
-	push @ret, $self->_key('Subfield code count').$self->_print($leader_obj,
-		'subfield_code_count', 1);
+	push @ret, $self->_key('Indicator count').
+		$leader_obj->indicator_count;
+	push @ret, $self->_key('Subfield code count').
+		$leader_obj->subfield_code_count;
 	push @ret, $self->_key('Base address of data').$leader_obj->data_base_addr;
 	push @ret, $self->_key('Encoding level').$self->_print($leader_obj,
 		'encoding_level');
@@ -78,12 +92,12 @@ sub print {
 		'descriptive_cataloging_form');
 	push @ret, $self->_key('Multipart resource record level').$self->_print($leader_obj,
 		'multipart_resource_record_level');
-	push @ret, $self->_key('Length of the length-of-field portion').$self->_print($leader_obj,
-		'length_of_field_portion_len', 1);
+	push @ret, $self->_key('Length of the length-of-field portion').
+		$leader_obj->length_of_field_portion_len;
 	push @ret, $self->_key('Length of the starting-character-position portion').
-		$self->_print($leader_obj, 'starting_char_pos_portion_len', 1);
+		$leader_obj->starting_char_pos_portion_len;
 	push @ret, $self->_key('Length of the implementation-defined portion').
-		$self->_print($leader_obj, 'impl_def_portion_len', 1);
+		$leader_obj->impl_def_portion_len;
 	push @ret, $self->_key('Undefined').$self->_print($leader_obj, 'undefined');
 
 	return wantarray ? @ret : (join $self->{'output_separator'}, @ret);
@@ -93,10 +107,11 @@ sub _key {
 	my ($self, $key) = @_;
 
 	my $ret;
+	my $value = $self->{'_l'}->maketext($key);
 	if ($self->{'mode_ansi'}) {
-		$ret = Term::ANSIColor::color('cyan').$key.Term::ANSIColor::color('reset');
+		$ret = Term::ANSIColor::color('cyan').$value.Term::ANSIColor::color('reset');
 	} else {
-		$ret = $key;
+		$ret = $value;
 	}
 	$ret .= ': ';
 
@@ -104,15 +119,14 @@ sub _key {
 }
 
 sub _print {
-	my ($self, $leader_obj, $method_name, $value) = @_;
+	my ($self, $leader_obj, $method_name) = @_;
 
 	my $ret_value = $leader_obj->$method_name;
 	my $ret;
 	if ($self->{'mode_desc'}) {
-		$ret = eval "\$self->{'_utils'}->desc_$method_name(\$ret_value);";
-		if (defined $value) {
-			$ret .= ' ('.$ret_value.')';
-		}
+		my $ret_value_fixed = $ret_value;
+		$ret_value_fixed =~ s/\ /_/msg;
+		$ret = $self->{'_l'}->maketext($method_name.'.'.$ret_value_fixed);
 	} else {
 		$ret = $ret_value;
 	}
@@ -149,6 +163,22 @@ MARC::Leader::Print - MARC leader class for print.
 Constructor.
 
 =over 8
+
+=item * C<lang>
+
+Language of texts in ISO 639-1 format.
+
+Possible values are:
+
+=over
+
+=item * C<en>
+
+=item * C<cs>
+
+=back
+
+Default value is undef, try to use language from locales.
 
 =item * C<mode_ansi>
 
@@ -198,6 +228,16 @@ Returns array of string in array context.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_bool():
+                 Parameter 'mode_ansi' must be a bool (0/1).
+                         Value: %s
+                 Parameter 'mode_desc' must be a bool (0/1).
+                         Value: %s
+         From Mo::utils::Language::check_language_639_1():
+                 Parameter 'lang' doesn't contain valid ISO 639-1 code.
+                         Codeset: %s
+                         Value: %s
+         Cannot load 'Term::ANSIColor' module.
 
 =head1 EXAMPLE1
 
@@ -210,7 +250,9 @@ Returns array of string in array context.
  use MARC::Leader::Print;
 
  # Print object.
- my $print = MARC::Leader::Print->new;
+ my $print = MARC::Leader::Print->new(
+         'lang' => 'en',
+ );
 
  # Data object.
  my $data_marc_leader = Data::MARC::Leader->new(
@@ -262,9 +304,11 @@ Returns array of string in array context.
 
  use Data::MARC::Leader;
  use MARC::Leader::Print;
+ use Unicode::UTF8 qw(encode_utf8);
 
  # Print object.
  my $print = MARC::Leader::Print->new(
+         'lang' => 'cs',
          'mode_desc' => 0,
  );
 
@@ -289,32 +333,33 @@ Returns array of string in array context.
  );
 
  # Print to output.
- print scalar $print->print($data_marc_leader), "\n";
+ print encode_utf8(scalar $print->print($data_marc_leader)), "\n";
 
  # Output:
- # Record length: 2200
- # Record status: c
- # Type of record: e
- # Bibliographic level: m
- # Type of control:  
- # Character coding scheme: a
- # Indicator count: 2
- # Subfield code count: 2
- # Base address of data: 541
- # Encoding level:  
- # Descriptive cataloging form: i
- # Multipart resource record level:  
- # Length of the length-of-field portion: 4
- # Length of the starting-character-position portion: 5
- # Length of the implementation-defined portion: 0
- # Undefined: 0
+ # Délka záznamu: 2200
+ # Status záznamu: c
+ # Typ záznamu: e
+ # Bibliografická úroveň: m
+ # Typ kontroly:  
+ # Použitá znaková sada: a
+ # Délka indikátorů: 2
+ # Délka označení podpole: 2
+ # Bázová adresa údajů: 541
+ # Úroveň úplnosti záznamu:  
+ # Forma katalogizačního popisu: i
+ # Úroveň záznamu vícedílného zdroje:  
+ # Počet znaků délky pole: 4
+ # Délka počáteční znakové pozice: 5
+ # Délka implementačně definované části: 0
+ # Není definován: 0
 
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
-L<Data::MARC::Leader::Utils>,
 L<English>,
 L<Error::Pure>.
+L<MARC::Leader::L10N>,
+L<Mo::utils::Language>.
 
 And optional L<Term::ANSIColor> for ANSI color support.
 
@@ -340,12 +385,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.08
 
 =cut

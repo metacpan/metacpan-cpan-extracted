@@ -2,7 +2,7 @@ NAME
     marc-leader - Tool to decode MARC leader from file or string.
 
 SYNOPSIS
-     marc-leader [-a] [-d] [-f marc_xml_file] [-h] [-v] [--version] [leader_string]
+     marc-leader [-a] [-d] [-f marc_xml_file] [-h] [-l lang_code] [-v] [--version] [leader_string]
 
 DESCRIPTION
     It supports MARC XML files now.
@@ -24,6 +24,12 @@ ARGUMENTS
     *       "-h"
 
             Print help.
+
+    *       "-l lang_code"
+
+            ISO 639-1 language code of output language.
+
+            Default value is from locales.
 
     *       "-v"
 
@@ -57,5 +63,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.10
 

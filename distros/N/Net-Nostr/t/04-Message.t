@@ -394,6 +394,36 @@ subtest 'AUTH round-trip (challenge)' => sub {
     is $parsed->challenge, 'rt-test', 'challenge preserved';
 };
 
+subtest 'NEG-OPEN rejects odd-length neg_msg' => sub {
+    my $filter = Net::Nostr::Filter->new(kinds => [1]);
+    like(
+        dies {
+            Net::Nostr::Message->new(
+                type            => 'NEG-OPEN',
+                subscription_id => 'neg1',
+                filter          => $filter,
+                neg_msg         => 'a',
+            );
+        },
+        qr/even-length hex/i,
+        'odd-length NEG-OPEN neg_msg rejected'
+    );
+};
+
+subtest 'NEG-MSG rejects odd-length neg_msg' => sub {
+    like(
+        dies {
+            Net::Nostr::Message->new(
+                type            => 'NEG-MSG',
+                subscription_id => 'neg1',
+                neg_msg         => 'a',
+            );
+        },
+        qr/even-length hex/i,
+        'odd-length NEG-MSG neg_msg rejected'
+    );
+};
+
 subtest 'auth-required prefix extraction' => sub {
     my $raw = JSON->new->utf8->encode([
         'OK', 'dd' x 32, JSON::false, 'auth-required: please authenticate'

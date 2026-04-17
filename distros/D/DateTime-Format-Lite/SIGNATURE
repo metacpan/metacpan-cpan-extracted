@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 d48d63e905a3de924db2cfa8344fbdde96451cb4ee61d69e78751b2003973f37 CHANGES
+SHA256 3c6a5975d385f85ea79aa5672d37616b18ef923bbd56f2543b42fce942f02e8f CONTRIBUTING.md
+SHA256 ec26ca3ba3e204c1d9c3fb479719bb06f029251f9c47eab5dc55f576831271d6 DateTime-Format-Lite.xs
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 9ed3bdcc94983412a52daead29b4473ad5e1420312d7806d5388bd0b6a70c02a MANIFEST
+SHA256 4b4e980324d40e8b0f09a2ae581651464b0def8a5664237c349b8d9549932ec9 META.json
+SHA256 5ea424e5572b14ec74732818718a8309e76533fbae367e3c02cefa00f9ca0777 META.yml
+SHA256 430c162c516487871571297acb4a54b030b8e6263982575997212263a0179f41 Makefile.PL
+SHA256 079447bb7c8fd128aa87a423c509f422ef5ec88aa4ae6fff58dc0b48ba80bb73 README
+SHA256 40f2ab3507648639368184186101d8154f1f892792c2d98681686f098686d3bb README.md
+SHA256 70ad9c15877876ab91f2e147f2d1ffbbf41212a36d64bb6ddcd2eeb057f124d3 lib/DateTime/Format/Lite.pm
+SHA256 d9b13ea34d562f0a56e0d2967103cad520c7c088ffaf5ed03791d4715e59ddb1 lib/DateTime/Format/Lite/Exception.pm
+SHA256 e16e0bf39e6c2abda9f73b4b21cfacb71b0188f8d11c5c9864619de7ecbba397 lib/DateTime/Format/Lite/PP.pm
+SHA256 8f4cc4e18c790a522ea066dc934d7e20fb5fafc2c2342cc0cb303a61155941af ppport.h
+SHA256 8ba06e52d587b165e78548edbe715dcd865c7df4ec6039527ce5e9e29ea8a951 t/00.load.t
+SHA256 5827fb7569316c7da5a6bf46a3094e5099fb5f09bb0d9bc200103dfc16070baf t/10.basic.t
+SHA256 7ed95a35cf08a485f6b4c87e4ec1ece3339f9b55df5c26d0db7288f96da498c8 t/20.format.t
+SHA256 f9ab48d0d41b6281f3733351a5bf95a1009755371c37ee6f782f3af9cbaafe23 t/30.errors.t
+SHA256 137a943c96ea7e9388738ed28a3d5dfb60d810e49ef4a8d0f100ed096f0b067d t/40.zones.t
+SHA256 97bb7bf158ac9e5f288a71fca6a9c72f0c995cb6898451b6c1171df1b8c9066e t/50.edge.t
+SHA256 77ab2e9f452b2846046562fca2e350f9f674cbecaead3f800d82e74040facf74 t/60.import.t
+SHA256 5383ffce1c41600c3c51f1f710f8ceeff8ed9cf257623cfdbe2e4fc0e0cc5b45 t/70.locale.t
+SHA256 587cb0cda7079a95801890d433373562094a37c96ed043af42deaafc9baf4fcf t/75.generated-locale.t
+SHA256 56ded3fa4dd620d42f836741e4056de86f9de525380caa9448758cb616790649 t/85.serialisation.t
+SHA256 ffcb951785c518ea1098bcde1583e7f3f5822dc3084de1aed0207c6144aeb405 t/89.tz_abbr_resolution.t
+SHA256 62aa6aa85707f9693e678da55a78a461e292bab447734b35129e8e9c68eb7619 t/90.pod.t
+SHA256 1855f1851cc59711d63c6ce10bb000e24b838e77cc02acd2a314b03bda80cb49 t/91.coverage.t
+SHA256 310a1b527105a8453812d86a4829006f901591218f00e708bdc45ef2f5e8f5f6 t/92.manifest.t
+SHA256 f229776ce2dd7cd0fa3b6b87fc42ddfe50bdb505b736154ebfd4c5bcf5b5129e t/93.signature.t
+SHA256 0961427af5f1446036ef11118982d5e5071ae5d76f9d70ca2a1900924d0aea1a t/95.exception.t
+SHA256 51e3199e1210ec73cf9bf5acee8de3216cb6002150cad36c10de47fa36c87f55 t/99.kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmng0nkACgkQXzwCYc2y
+51JgBQ//bu3wmKqvqVyFzIIXy+Kr6jX9lO7PldjlhgyksrmZGLPiaXMR3g+k65NN
+4WZob9xM6JDZF3pQGyOnkbhoPX3BqudeAoETrGMNwOarJOZjpslCeII/X91P6lJn
+VGBkq22R9KbaT4/EJxqFx7sr4uZFGPoK8aqTk35lhYlpuTTXDOCQ07hIXvW1hCZU
+WZINZeNkDtlUv+1OyL1pUTqLy4wXF1ZESuV1Fo4rlPXhBbSiGC26izOXwuI9hpzf
+nRSk0XB4oZEHyXrinRAgwfvwGKoHPoNmMtVOTk5rkPVpeK2D6aBtyetmA45g/kGL
+rJim9iwmrcgplL7NjPyiIW6qkzLiyL8QYnR1GtVjxhWMq9/KXlqx1qA1CshyP9D3
+3TZgJXXtZNQ3+cdv/texYz1dhp1XakK3xNyq2y5Y2ddYZEWh4oeg7L5FMgEyCv8d
+nXVQ1WhCX52/SPypFUqEdonALW3VDINmarPmyhnWCx0jTnYPGd28Dyz6gaj0e8n+
+unancWH15TEfGz9kjX5QespLApmxkFTw8E9da4eaNNQDco+OZ3Xm7dnpKgSEJScP
+kcrDmatfNLg/BmOQ1Txnl7+hkCrn6QbvhPzzKEx8LYBSUZkiXAaxGAn/kbzwWiu+
+33F7dSS0jFaaCrUAh12d2SryvkFKc1+jVV5TwOs9sJr5QS3365M=
+=VHkq
+-----END PGP SIGNATURE-----

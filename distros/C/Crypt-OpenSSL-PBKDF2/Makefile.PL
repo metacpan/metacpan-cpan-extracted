@@ -9,8 +9,8 @@ WriteMakefile(
     ($] >= 5.005 ?		## Add these new keywords supported since 5.005
     	(
 		ABSTRACT_FROM	=> 'PBKDF2.pm', # retrieve abstract from module
-		AUTHOR			=> 'R.Scussat - OpenDiogene Project  <rscussat@dsplabs.net>',
-		LICENSE			=> 'gplv2+ or artistic'
+		AUTHOR			=> 'R.Scussat <rscussat@dsplabs.net>',
+		LICENSE			=> 'gpl_3',
 		) :	()
 	),
     LIBS				=> ['-lcrypto -lssl '], # e.g., '-lm'

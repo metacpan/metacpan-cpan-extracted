@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.8.0
+## Version v1.8.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2026/03/19
+## Modified 2026/04/16
 ## All rights reserved
 ## 
 ## 
@@ -39,7 +39,7 @@ BEGIN
     our $CLDR_VERSION = '48.2';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.8.0';
+    our $VERSION = 'v1.8.1';
 };
 
 use strict;
@@ -5024,7 +5024,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.8.0
+    v1.8.1
 
 =head1 DESCRIPTION
 

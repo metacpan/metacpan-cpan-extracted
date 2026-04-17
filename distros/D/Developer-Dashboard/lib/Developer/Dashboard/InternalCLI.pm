@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
 use File::Basename qw(dirname);
 use File::Spec;
@@ -18,7 +18,7 @@ sub helper_names {
     return qw(
       jq yq tomq propq iniq csvq xmlq
       of open-file ticket path paths ps1
-      encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor skills
+      encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills
     );
 }
 

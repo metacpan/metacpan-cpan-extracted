@@ -39,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Run-Command-ToFail
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Run-Command-ToFail
-version: '0.05'
+version: '0.06'

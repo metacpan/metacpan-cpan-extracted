@@ -4,7 +4,7 @@ use base qw(Locale::Maketext);
 use strict;
 use warnings;
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 1;
 
@@ -95,6 +95,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

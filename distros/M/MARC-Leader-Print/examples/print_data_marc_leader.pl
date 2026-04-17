@@ -7,7 +7,9 @@ use Data::MARC::Leader;
 use MARC::Leader::Print;
 
 # Print object.
-my $print = MARC::Leader::Print->new;
+my $print = MARC::Leader::Print->new(
+        'lang' => 'en',
+);
 
 # Data object.
 my $data_marc_leader = Data::MARC::Leader->new(

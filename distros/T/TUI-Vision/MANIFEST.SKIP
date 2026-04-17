@@ -1,0 +1,9 @@
+^\.git
+^\.github
+^\.vscode
+^\.idea
+^blib
+^Makefile$
+^Makefile.old$
+^pm_to_blib
+^TUI-Vision-\d

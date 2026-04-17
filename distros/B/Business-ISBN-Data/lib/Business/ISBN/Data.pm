@@ -8,7 +8,7 @@ use Carp                  qw(carp);
 use File::Basename        qw(dirname);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '20260411.001';
+our $VERSION = '20260416.001';
 
 =encoding utf8
 
@@ -423,7 +423,7 @@ sub _get_data {
 	my $file = 'RangeMessage.xml';
 	no warnings 'uninitialized';
 	my @candidates = grep { -e } (
-		$ENV{ISBN_RANGE_MESSAGE},              # env
+		(exists $ENV{ISBN_RANGE_MESSAGE} ?  $ENV{ISBN_RANGE_MESSAGE} : ()),
 		catfile( dirname( __FILE__ ), $file ), # next to the module
 		$file,                                 # current directory
 		);

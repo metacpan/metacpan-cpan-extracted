@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 use Protocol::Gearman::Worker;
@@ -29,7 +29,7 @@ my $worker = TestWorker->new;
       my ( $type, @args ) = @_;
 
       is( $type, "CAN_DO", '$type for sent packet by ->can_do' );
-      is_deeply( \@args, [ "function" ], '@args for packet sent by ->can_do' );
+      is( \@args, [ "function" ], '@args for packet sent by ->can_do' );
 
       $received++;
    };
@@ -49,7 +49,7 @@ my $worker = TestWorker->new;
       my ( $type, @args ) = @_;
 
       is( $type, "CAN_DO_TIMEOUT", '$type for sent packet by ->can_do timeout' );
-      is_deeply( \@args, [ "function", 20 ], '@args for packet sent by ->can_do timeout' );
+      is( \@args, [ "function", 20 ], '@args for packet sent by ->can_do timeout' );
 
       $received++;
    };
@@ -127,7 +127,7 @@ my $job;
 
    $job->complete( "result" );
 
-   is_deeply( \@received,
+   is( \@received,
       [ [ WORK_STATUS   => "the-handle", 0, 1 ],
         [ WORK_DATA     => "the-handle", "moredata" ],
         [ WORK_WARNING  => "the-handle", "Ooops?" ],
@@ -161,7 +161,7 @@ my $job;
 
    $job->fail( "Here is the exception" );
 
-   is_deeply( \@received,
+   is( \@received,
       [ [ WORK_EXCEPTION => "a-handle", "Here is the exception" ],
         [ WORK_FAIL      => "a-handle" ]
      ],

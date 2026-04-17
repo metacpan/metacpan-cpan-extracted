@@ -88,6 +88,7 @@ my %WriteMakefileArgs = (
         'overload'                   => 0,
         'overloading'                => 0,
         'strict'                     => 0,
+        'vars'                       => 0,
         'warnings'                   => 0,
         'warnings::register'         => 0,
         'Config'                     => 0,
@@ -135,7 +136,7 @@ my %WriteMakefileArgs = (
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     # Do not recurse into subdirectories (prevents old DateTime-Lite-vX.X.X/ directories from triggering a double execution of Makefile.PL)
     DIR    => [],
-    dist   => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
+    dist   => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp', PREOP => './dev/cleanup.pl' },
     clean  => { FILES => 'DateTime-Lite-* DateTime-Lite.c DateTime-Lite$(OBJ_EXT)' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE =>
     {

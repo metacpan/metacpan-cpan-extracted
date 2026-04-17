@@ -85,9 +85,10 @@ use strict;
 use Authen::Passphrase 0.003;
 use Carp qw(croak);
 use Crypt::PasswdMD5 1.0 qw(unix_md5_crypt);
-use Data::Entropy::Algorithms 0.000 qw(rand_int);
+use Crypt::SysRandom 'random_bytes';
+use MIME::Base64 'encode_base64';
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 
@@ -111,8 +112,6 @@ usage it is conventionally limited to zero to eight base 64 digits.
 
 Causes salt to be generated randomly.  The value given for this
 attribute is ignored.  The salt will be a string of eight base 64 digits.
-The source of randomness may be controlled by the facility described
-in L<Data::Entropy>.
 
 =item B<hash_base64>
 
@@ -145,11 +144,8 @@ sub new {
 		} elsif($attr eq "salt_random") {
 			croak "salt specified redundantly"
 				if exists $self->{salt};
-			$self->{salt} = "";
-			for(my $i = 8; $i--; ) {
-				$self->{salt} .= chr(rand_int(64));
-			}
-			$self->{salt} =~ tr#\x00-\x3f#./0-9A-Za-z#;
+			$self->{salt} = encode_base64(random_bytes(6), '');
+			$self->{salt} =~ tr{A-Za-z0-9+/=}{./0-9A-Za-z}d;
 		} elsif($attr eq "hash_base64") {
 			croak "hash specified redundantly"
 				if exists($self->{hash_base64}) ||

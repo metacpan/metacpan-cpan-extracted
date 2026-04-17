@@ -14,15 +14,16 @@ my %WriteMakefileArgs = (
 	EXE_FILES          => ['src_bin/hv_monitor'],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
-		'JSON'                => '0',
 	},
 	TEST_REQUIRES => {
 		'Test::More' => '0',
 	},
 	PREREQ_PM => {
-		'Module::List' => '0',
-		'JSON'         => '0',
-		'MIME::Base64' => '0',
+		'Module::List'       => '0',
+		'JSON'               => '0',
+		'MIME::Base64'       => '0',
+		'File::Slurp'        => '0',
+		'IO::Compress::Gzip' => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'HV-Monitor-*' },

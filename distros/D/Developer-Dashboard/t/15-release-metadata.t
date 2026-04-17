@@ -30,6 +30,7 @@ my @doc_paths = grep { -e $_ } (
     _repo_path('SOFTWARE_SPEC.md'),
     _repo_path('TEST_PLAN.md'),
     _repo_path( 'doc', 'architecture.md' ),
+    _repo_path( 'doc', 'housekeeper-rotation.md' ),
     _repo_path( 'doc', 'integration-test-plan.md' ),
     _repo_path( 'doc', 'security.md' ),
     _repo_path( 'doc', 'skills.md' ),
@@ -53,10 +54,10 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.37', 'repo version bumped for the collector TT icon regression fix' );
-like( $pm, qr/^2\.37$/m, 'main POD version matches the module version' );
+is( $version, '2.43', 'repo version bumped for the housekeeper collector rotation fix' );
+like( $pm, qr/^2\.43$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
-    like( $dist, qr/^version = 2\.37$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^version = 2\.43$/m, 'dist.ini version matches the module version in the source tree' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini excludes integration assets so repo-only verification helpers do not leak into release tarballs' );
@@ -66,10 +67,10 @@ if ( $dist ne '' ) {
     like( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini excludes Markdown files so repo-internal docs do not leak into release tarballs' );
     like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
-else {
-    like( $meta, qr/"version"\s*:\s*"2\.37"/, 'META.json version matches the module version in the built distribution' );
-}
-like( $changes, qr/^2\.37\s+2026-04-14$/m, 'Changes top entry matches the bumped version' );
+    else {
+        like( $meta, qr/"version"\s*:\s*"2\.43"/, 'META.json version matches the module version in the built distribution' );
+    }
+like( $changes, qr/^2\.43\s+2026-04-17$/m, 'Changes top entry matches the bumped version' );
 ok( $plain_readme ne '', 'plain README is tracked for release kwalitee compatibility' );
 like( $plain_readme, qr/Developer Dashboard/, 'plain README identifies the distribution clearly' );
 
@@ -139,7 +140,7 @@ for my $module (
     like( $cpanfile, qr/requires ['"]\Q$module\E['"];/, "cpanfile declares runtime prerequisite $module" );
     like( $dist, qr/^\Q$module\E = 0$/m, "dist.ini declares runtime prerequisite $module" ) if $dist ne '';
 }
-for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor skills)) {
+for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
 

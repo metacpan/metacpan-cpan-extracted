@@ -5,7 +5,7 @@ use warnings;
 
 use App::Run::Command::ToFail;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Run.
 exit App::Run::Command::ToFail->new->run;
@@ -92,6 +92,16 @@ One argument is required, it's Perl file to run.
 
  run-command-to-fail -n 10 -p blank true
 
+=head1 SEE ALSO
+
+=over
+
+=item L<quicktest>
+
+Run prove repeatedly until failure.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/App-Run-Command-ToFail>
@@ -104,12 +114,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

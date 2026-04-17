@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "Devel::CallParser" : "0.002",
+            "Devel::CallParser" : "0.004",
             "ExtUtils::Depends" : "0",
             "ExtUtils::MakeMaker" : "0",
             "Object::Proto" : "0.15"
@@ -36,7 +36,7 @@
       "runtime" : {
          "requires" : {
             "Devel::CallChecker" : "0.009",
-            "Devel::CallParser" : "0.002",
+            "Devel::CallParser" : "0.003",
             "Object::Proto" : "0.14",
             "perl" : "5.014"
          }
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

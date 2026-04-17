@@ -5,9 +5,11 @@ use warnings;
 
 use Data::MARC::Leader;
 use MARC::Leader::Print;
+use Unicode::UTF8 qw(encode_utf8);
 
 # Print object.
 my $print = MARC::Leader::Print->new(
+        'lang' => 'cs',
         'mode_desc' => 0,
 );
 
@@ -32,22 +34,22 @@ my $data_marc_leader = Data::MARC::Leader->new(
 );
 
 # Print to output.
-print scalar $print->print($data_marc_leader), "\n";
+print encode_utf8(scalar $print->print($data_marc_leader)), "\n";
 
 # Output:
-# Record length: 2200
-# Record status: c
-# Type of record: e
-# Bibliographic level: m
-# Type of control:  
-# Character coding scheme: a
-# Indicator count: 2
-# Subfield code count: 2
-# Base address of data: 541
-# Encoding level:  
-# Descriptive cataloging form: i
-# Multipart resource record level:  
-# Length of the length-of-field portion: 4
-# Length of the starting-character-position portion: 5
-# Length of the implementation-defined portion: 0
-# Undefined: 0
+# Délka záznamu: 2200
+# Status záznamu: c
+# Typ záznamu: e
+# Bibliografická úroveň: m
+# Typ kontroly:  
+# Použitá znaková sada: a
+# Délka indikátorů: 2
+# Délka označení podpole: 2
+# Bázová adresa údajů: 541
+# Úroveň úplnosti záznamu:  
+# Forma katalogizačního popisu: i
+# Úroveň záznamu vícedílného zdroje:  
+# Počet znaků délky pole: 4
+# Délka počáteční znakové pozice: 5
+# Délka implementačně definované části: 0
+# Není definován: 0

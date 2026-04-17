@@ -3,13 +3,15 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
+use Digest::MD5 qw(md5_hex);
 use Cwd qw(abs_path cwd);
 use File::Basename qw(dirname);
 use File::Find ();
 use File::Path qw(make_path);
 use File::Spec;
+use Developer::Dashboard::JSON qw(json_encode);
 
 # new(%args)
 # Constructs the logical path registry for the runtime.
@@ -151,7 +153,23 @@ sub runtime_layers {
 # Output: directory path string.
 sub state_root {
     my ($self) = @_;
-    return $self->_ensure_dir( File::Spec->catdir( $self->runtime_root, 'state' ) );
+    my $dir = $self->_ensure_state_dir( File::Spec->catdir( $self->state_base_root, $self->_state_root_key( $self->runtime_root ) ) );
+    $self->_write_state_metadata( $dir, $self->runtime_root );
+    return $dir;
+}
+
+# state_base_root()
+# Returns the stable base directory for runtime state roots.
+# Input: none.
+# Output: directory path string.
+sub state_base_root {
+    my ($self) = @_;
+    if ( my $root = $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} ) {
+        return $self->_ensure_state_dir( $self->_expand_home($root) );
+    }
+    return $self->_ensure_state_dir(
+        File::Spec->catdir( File::Spec->tmpdir, $self->_state_root_user, $self->app_name, 'state' )
+    );
 }
 
 # cache_root()
@@ -379,7 +397,7 @@ sub installed_skill_docker_roots_for_runtime {
 # Output: directory path string.
 sub collectors_root {
     my ($self) = @_;
-    return $self->_ensure_dir( File::Spec->catdir( $self->state_root, 'collectors' ) );
+    return $self->_ensure_state_dir( File::Spec->catdir( $self->state_root, 'collectors' ) );
 }
 
 # collectors_roots()
@@ -388,7 +406,9 @@ sub collectors_root {
 # Output: ordered list of collector state root directory path strings.
 sub collectors_roots {
     my ($self) = @_;
-    return map { File::Spec->catdir( $_, 'state', 'collectors' ) } $self->runtime_roots;
+    return map {
+        $self->_ensure_state_dir( File::Spec->catdir( $self->_state_root_for_layer($_), 'collectors' ) )
+    } $self->runtime_roots;
 }
 
 # indicators_root()
@@ -397,7 +417,7 @@ sub collectors_roots {
 # Output: directory path string.
 sub indicators_root {
     my ($self) = @_;
-    return $self->_ensure_dir( File::Spec->catdir( $self->state_root, 'indicators' ) );
+    return $self->_ensure_state_dir( File::Spec->catdir( $self->state_root, 'indicators' ) );
 }
 
 # indicators_roots()
@@ -406,7 +426,9 @@ sub indicators_root {
 # Output: ordered list of indicator state root directory path strings.
 sub indicators_roots {
     my ($self) = @_;
-    return map { File::Spec->catdir( $_, 'state', 'indicators' ) } $self->runtime_roots;
+    return map {
+        $self->_ensure_state_dir( File::Spec->catdir( $self->_state_root_for_layer($_), 'indicators' ) )
+    } $self->runtime_roots;
 }
 
 # sessions_root()
@@ -415,7 +437,7 @@ sub indicators_roots {
 # Output: directory path string.
 sub sessions_root {
     my ($self) = @_;
-    return $self->_ensure_dir( File::Spec->catdir( $self->state_root, 'sessions' ) );
+    return $self->_ensure_state_dir( File::Spec->catdir( $self->state_root, 'sessions' ) );
 }
 
 # sessions_roots()
@@ -424,7 +446,63 @@ sub sessions_root {
 # Output: ordered list of session root directory path strings.
 sub sessions_roots {
     my ($self) = @_;
-    return map { File::Spec->catdir( $_, 'state', 'sessions' ) } $self->runtime_roots;
+    return map {
+        $self->_ensure_state_dir( File::Spec->catdir( $self->_state_root_for_layer($_), 'sessions' ) )
+    } $self->runtime_roots;
+}
+
+# _state_root_key($runtime_root)
+# Returns the key for a runtime layer-specific state directory.
+# Input: runtime layer path string.
+# Output: directory name string.
+sub _state_root_key {
+    my ( $self, $runtime_root ) = @_;
+    my $identity = $self->_path_identity($runtime_root);
+    return md5_hex( defined $identity ? $identity : '' );
+}
+
+# _state_root_user()
+# Returns a sanitized username used to namespace runtime state roots in the shared temp area.
+# Input: none.
+# Output: username string.
+sub _state_root_user {
+    my ($self) = @_;
+    my $raw = $ENV{DD_STATE_ROOT_USER} || $ENV{USER} || $ENV{LOGNAME} || getpwuid($<) || 'user';
+    $raw =~ s{[^A-Za-z0-9._-]}{_}g;
+    return $raw || 'user';
+}
+
+# _state_root_for_layer($runtime_root)
+# Returns the full state root for a runtime layer.
+# Input: runtime layer path string.
+# Output: directory path string.
+sub _state_root_for_layer {
+    my ( $self, $runtime_root ) = @_;
+    my $dir = File::Spec->catdir( $self->state_base_root, $self->_state_root_key($runtime_root) );
+    $self->_ensure_state_dir($dir);
+    $self->_write_state_metadata( $dir, $runtime_root );
+    return $dir;
+}
+
+# _write_state_metadata($dir, $runtime_root)
+# Records the runtime identity for one hashed temp-state root.
+# Input: state root directory path and originating runtime root path.
+# Output: metadata file path string.
+sub _write_state_metadata {
+    my ( $self, $dir, $runtime_root ) = @_;
+    return '' if !defined $dir || $dir eq '';
+    return '' if !defined $runtime_root || $runtime_root eq '';
+    my $file = File::Spec->catfile( $dir, 'runtime.json' );
+    open my $fh, '>:raw', $file or die "Unable to write $file: $!";
+    print {$fh} json_encode(
+        {
+            runtime_root => $runtime_root,
+            app_name     => $self->app_name,
+        }
+    );
+    close $fh or die "Unable to close $file: $!";
+    $self->secure_file_permissions($file);
+    return $file;
 }
 
 # temp_root()
@@ -807,11 +885,24 @@ sub secure_dir_permissions {
 # Output: file path string.
 sub secure_file_permissions {
     my ( $self, $file, %args ) = @_;
-    return $file if !$self->is_home_runtime_path($file);
+    return $file if !defined $file || $file eq '';
+    return $file if !$self->is_home_runtime_path($file) && !$self->_is_state_path($file);
     return $file if !-e $file;
     my $mode = $args{executable} ? 0700 : 0600;
     chmod $mode, $file or die sprintf 'Unable to chmod %s to %04o: %s', $file, $mode, $!;
     return $file;
+}
+
+# _is_state_path($path)
+# Checks whether a file path is inside the configured runtime state area.
+# Input: path string.
+# Output: boolean true when the path is under state_base_root.
+sub _is_state_path {
+    my ( $self, $path ) = @_;
+    return 0 if !defined $path || $path eq '';
+    my $state_base = eval { $self->state_base_root };
+    return 0 if !defined $state_base || $state_base eq '';
+    return $self->_same_or_descendant_path( $path, $state_base );
 }
 
 # _ensure_dir($dir)
@@ -829,6 +920,21 @@ sub _ensure_dir {
         }
     }
     $self->secure_dir_permissions($dir);
+    return $dir;
+}
+
+# _ensure_state_dir($dir)
+# Creates a state directory and applies owner-only hardening.
+# Input: directory path string.
+# Output: directory path string.
+sub _ensure_state_dir {
+    my ( $self, $dir ) = @_;
+    if ( !-d $dir ) {
+        make_path( $dir, { mode => 0700 } );
+    }
+    else {
+        chmod 0700, $dir or die sprintf 'Unable to chmod %s to 0700: %s', $dir, $!;
+    }
     return $dir;
 }
 
@@ -873,7 +979,8 @@ sub _ancestor_runtime_layers {
     my $dir = $cwd;
     while ($dir) {
         my $candidate = File::Spec->catdir( $dir, '.developer-dashboard' );
-        push @layers, $candidate if -d $candidate && $self->_path_identity($candidate) ne $self->_path_identity($home_runtime);
+        my $visible_candidate = $self->_display_path($candidate);
+        push @layers, $visible_candidate if -d $candidate && $self->_path_identity($candidate) ne $self->_path_identity($home_runtime);
         last if $self->_path_identity($dir) eq $self->_path_identity($stop_dir);
         my $parent = dirname($dir);
         last if !$parent || $parent eq $dir;
@@ -893,6 +1000,53 @@ sub _path_identity {
     my $resolved = eval { abs_path($path) };
     return $resolved if defined $resolved && $resolved ne '';
     return File::Spec->canonpath($path);
+}
+
+# _prefer_reference_style($path, $reference)
+# Rewrites an equivalent filesystem path into the same textual style as $reference
+# when both paths resolve to the same canonical identity.
+# Input: filesystem path and reference path.
+# Output: styled path string that preserves user-visible aliases when possible.
+sub _prefer_reference_style {
+    my ( $self, $path, $reference ) = @_;
+    return $path if !defined $path || $path eq '';
+    return $path if !defined $reference || $reference eq '';
+
+    my $path_id = $self->_path_identity($path);
+    my $ref_id  = $self->_path_identity($reference);
+    return $path if $path_id eq '' || $ref_id eq '';
+
+    my $prefix = $ref_id;
+    $prefix .= '/' if $prefix !~ m{/$};
+    return $path if index( $path_id, $prefix ) != 0;
+
+    my $relative = substr( $path_id, length($prefix) );
+    $relative =~ s{^/}{} if defined $relative;
+    return $reference if !$relative;
+
+    my @segments = grep { $_ ne '' && $_ ne '.' && $_ ne '..' } File::Spec->splitdir($relative);
+    return File::Spec->catdir( $reference, @segments );
+}
+
+# _display_path($path)
+# Returns a stable user-facing path string while keeping canonical identity
+# handling separate for comparisons.
+# Input: filesystem path string.
+# Output: display-stable path string.
+sub _display_path {
+    my ( $self, $path ) = @_;
+    return $path if !defined $path || $path eq '';
+
+    for my $alias_prefix ( '/private/tmp', '/private/var' ) {
+        next if index( $path, $alias_prefix ) != 0;
+        my $short_prefix = substr( $alias_prefix, length('/private') );
+        my $candidate = $short_prefix . substr( $path, length($alias_prefix) );
+        next if $candidate eq '';
+        next if $self->_path_identity($candidate) ne $self->_path_identity($path);
+        return $candidate;
+    }
+
+    return $path;
 }
 
 # _same_or_descendant_path($path, $root)

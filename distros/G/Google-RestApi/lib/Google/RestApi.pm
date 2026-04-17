@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '2.2.1';
+our $VERSION = '2.2.2';
 
 use Google::RestApi::Setup;
 
@@ -21,17 +21,23 @@ sub new {
   my $class = shift;
 
   my $self = merge_config_file(@_);
+  resolve_config_file_path($self, 'log4perl_config');
   state $check = signature(
     bless => !!0,
     named => [
-      config_file  => ReadableFile, { optional => 1 },          # specify any of the below in a yaml file instead.
-      auth         => HashRef | HasMethods[qw(headers params)], # a string that will be used to construct an auth obj, or the obj itself.
-      throttle     => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
-      timeout      => Int, { default => 120 },
-      max_attempts => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
+      config_file     => ReadableFile, { optional => 1 },          # specify any of the below in a yaml file instead.
+      log4perl_config => ReadableFile, { optional => 1 },          # log4perl config file; alternative to GOOGLE_RESTAPI_LOGGER env var.
+      auth            => HashRef | HasMethods[qw(headers params)], # a string that will be used to construct an auth obj, or the obj itself.
+      throttle        => PositiveOrZeroInt, { default => 0 },      # mostly used for integration testing, to ensure we don't blow our rate limit.
+      timeout         => Int, { default => 120 },
+      max_attempts    => PositiveInt->where(sub { $_ < 10; }), { default => 4 },
     ],
   );
   $self = $check->(%$self);
+
+  if ($self->{log4perl_config} && !Log::Log4perl->initialized()) {
+    Log::Log4perl->init($self->{log4perl_config});
+  }
 
   $self->{ua} = Furl->new(timeout => $self->{timeout});
 
@@ -460,11 +466,13 @@ or false to stop early.
 
 =item * C<config_file> <path_to_config_file>: Optional YAML configuration file that can specify any or all of the following args...
 
+=item * C<log4perl_config> <path_to_log4perl_config>: Optional path to a Log4perl configuration file. Initializes Log4perl logging if it has not already been initialized. A relative path is resolved relative to the directory of C<config_file>. This is an alternative to setting the C<GOOGLE_RESTAPI_LOGGER> environment variable.
+
 =item * C<auth> <hash|object>: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
 If this is an object, it must provide the 'params' and 'headers' subroutines to provide the appropriate Google authentication/authorization.
 See below for more details.
 
-=item * C<api_callback> <coderef>: A coderef to call after each API call. 
+=item * C<api_callback> <coderef>: A coderef to call after each API call.
 
 =item * C<throttle> <int>: Used in development to sleep the number of seconds specified between API calls to avoid rate limit violations from Google.
 

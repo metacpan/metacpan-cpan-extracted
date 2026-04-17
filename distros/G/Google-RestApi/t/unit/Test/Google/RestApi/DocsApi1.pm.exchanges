@@ -436,9 +436,9 @@ response:
           }
         ]
       },
-      "revisionId": "AMHacu4kkzS5p_DCCa5nbmu5LR4XPRjxKF4np5sUwL4jyZKODTEzoSV_gzAr7LwN4U82ZwxQOC_u1kVOIzKc7_D5AhCmnX5DT254Xs5BVsVp",
+      "revisionId": "AMHacu7CL1zGnMLzKRY6Sf8n5qQxnMShZFAmBRGr-G3fvjRAWev6i92-9VdEBVbZZef68bWp5KBU3Y38R6EwYGWVFq_5pGyNYCW_TBUALYqZ",
       "suggestionsViewMode": "SUGGESTIONS_INLINE",
-      "documentId": "1W4czaoAny6SnF3rONfUdbrIBAPxw4AvGCOctOqeiXHY",
+      "documentId": "1B5pivBTAaJpS0ymbQG4wxtkG6Bk2j1dFsQeVzAIH9HM",
       "tabs": [
         {
           "tabProperties": {
@@ -881,12 +881,24 @@ response:
       ]
     }
   headers:
-  - x-xss-protection
-  - '0'
+  - date
+  - Thu, 16 Apr 2026 19:15:02 GMT
+  - x-frame-options
+  - SAMEORIGIN
   - accept-ranges
   - none
   - transfer-encoding
   - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - x-l2-request-path
+  - l2-managed-5
+  - server
+  - ESF
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - vary
   - X-Origin
   - vary
@@ -895,18 +907,6 @@ response:
   - Origin,Accept-Encoding
   - x-content-type-options
   - nosniff
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-  - x-frame-options
-  - SAMEORIGIN
-  - server
-  - ESF
-  - date
-  - Mon, 13 Apr 2026 23:45:37 GMT
-  - x-l2-request-path
-  - l2-managed-5
-  - content-type
-  - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::DocsApi1::create_document
 
@@ -921,38 +921,82 @@ response:
     {
       "files": [
         {
+          "id": "1B5pivBTAaJpS0ymbQG4wxtkG6Bk2j1dFsQeVzAIH9HM",
+          "name": "Test Document"
+        },
+        {
+          "id": "1MKc-Aquyk9ldbcKafgjzsfUbuknYRZ25iE2PkdHlgBE",
+          "name": "Test Document"
+        },
+        {
+          "id": "1r1BhC1oPTkFTstYUFDPN6jLHy1x5vENIUQknWag6tlU",
+          "name": "Test Document"
+        },
+        {
+          "id": "1mdWy8bMub3n4v-_7K2m3S0PnAjG2CdkES_sDmu7JYj0",
+          "name": "Test Document"
+        },
+        {
+          "id": "11ED-_9DXjQQZPt1VvyxkefZY_-Xr9cKFJlzam8kcTaE",
+          "name": "Test Document"
+        },
+        {
+          "id": "1eE7lmgmXcmyGTI5vFs602UaaZK0WrRuVJp0G1z9KXO8",
+          "name": "Test Document"
+        },
+        {
+          "id": "1qHcoi7MrLdCw27kDAnyMNeNWY0ouh_zQE03FLfw6FYI",
+          "name": "Test Document"
+        },
+        {
+          "id": "19T44apIyVudqgOAK8oxcg4nlNDGcrvzagXFCgnFNOj4",
+          "name": "Test Document"
+        },
+        {
+          "id": "1Jb5Th2PQhl2nObpaMnSPxqAkybDdINRrlFsCsoTW9CM",
+          "name": "Test Document"
+        },
+        {
+          "id": "1cgYXDGjwH3AMHHzhJON4G_ckBEIszAR6KFv4GSF2goY",
+          "name": "Test Document"
+        },
+        {
+          "id": "1TKS1nyAlu9UeqJrwXty2SY6wj6XZL1IsKJXxtwaWyAM",
+          "name": "Test Document"
+        },
+        {
           "id": "1W4czaoAny6SnF3rONfUdbrIBAPxw4AvGCOctOqeiXHY",
           "name": "Test Document"
         }
       ]
     }
   headers:
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - date
+  - Thu, 16 Apr 2026 19:15:04 GMT
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - accept-ranges
+  - none
+  - x-xss-protection
+  - '0'
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - vary
   - Origin, X-Origin,Accept-Encoding
   - x-content-type-options
   - nosniff
-  - expires
-  - Mon, 01 Jan 1990 00:00:00 GMT
-  - content-type
-  - application/json; charset=UTF-8
-  - date
-  - Mon, 13 Apr 2026 23:45:40 GMT
-  - cache-control
-  - no-cache, no-store, max-age=0, must-revalidate
-  - accept-ranges
-  - none
-  - server
-  - ESF
   - pragma
   - no-cache
-  - x-frame-options
-  - SAMEORIGIN
-  - x-xss-protection
-  - '0'
-  - transfer-encoding
-  - chunked
+  - server
+  - ESF
   message: OK
 source: Test::Google::RestApi::DocsApi1::page_callback
 
@@ -967,38 +1011,82 @@ response:
     {
       "files": [
         {
+          "id": "1B5pivBTAaJpS0ymbQG4wxtkG6Bk2j1dFsQeVzAIH9HM",
+          "name": "Test Document"
+        },
+        {
+          "id": "1MKc-Aquyk9ldbcKafgjzsfUbuknYRZ25iE2PkdHlgBE",
+          "name": "Test Document"
+        },
+        {
+          "id": "1r1BhC1oPTkFTstYUFDPN6jLHy1x5vENIUQknWag6tlU",
+          "name": "Test Document"
+        },
+        {
+          "id": "1mdWy8bMub3n4v-_7K2m3S0PnAjG2CdkES_sDmu7JYj0",
+          "name": "Test Document"
+        },
+        {
+          "id": "11ED-_9DXjQQZPt1VvyxkefZY_-Xr9cKFJlzam8kcTaE",
+          "name": "Test Document"
+        },
+        {
+          "id": "1eE7lmgmXcmyGTI5vFs602UaaZK0WrRuVJp0G1z9KXO8",
+          "name": "Test Document"
+        },
+        {
+          "id": "1qHcoi7MrLdCw27kDAnyMNeNWY0ouh_zQE03FLfw6FYI",
+          "name": "Test Document"
+        },
+        {
+          "id": "19T44apIyVudqgOAK8oxcg4nlNDGcrvzagXFCgnFNOj4",
+          "name": "Test Document"
+        },
+        {
+          "id": "1Jb5Th2PQhl2nObpaMnSPxqAkybDdINRrlFsCsoTW9CM",
+          "name": "Test Document"
+        },
+        {
+          "id": "1cgYXDGjwH3AMHHzhJON4G_ckBEIszAR6KFv4GSF2goY",
+          "name": "Test Document"
+        },
+        {
+          "id": "1TKS1nyAlu9UeqJrwXty2SY6wj6XZL1IsKJXxtwaWyAM",
+          "name": "Test Document"
+        },
+        {
           "id": "1W4czaoAny6SnF3rONfUdbrIBAPxw4AvGCOctOqeiXHY",
           "name": "Test Document"
         }
       ]
     }
   headers:
-  - accept-ranges
-  - none
-  - cache-control
-  - no-cache, no-store, max-age=0, must-revalidate
-  - date
-  - Mon, 13 Apr 2026 23:45:41 GMT
-  - content-type
-  - application/json; charset=UTF-8
-  - expires
-  - Mon, 01 Jan 1990 00:00:00 GMT
-  - x-content-type-options
-  - nosniff
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-  - vary
-  - Origin, X-Origin,Accept-Encoding
-  - transfer-encoding
-  - chunked
-  - x-xss-protection
-  - '0'
-  - x-frame-options
-  - SAMEORIGIN
   - pragma
   - no-cache
   - server
   - ESF
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  - x-content-type-options
+  - nosniff
+  - date
+  - Thu, 16 Apr 2026 19:15:06 GMT
+  - vary
+  - Origin, X-Origin,Accept-Encoding
+  - x-frame-options
+  - SAMEORIGIN
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - accept-ranges
+  - none
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
   message: OK
 source: Test::Google::RestApi::DocsApi1::page_callback
 

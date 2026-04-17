@@ -2,6 +2,7 @@ package Net::Nostr::Relay;
 
 use strictures 2;
 
+use AnyEvent ();
 use Carp qw(croak);
 use Net::Nostr::Message;
 use Net::Nostr::Filter;
@@ -52,6 +53,8 @@ use Class::Tiny qw(
     on_event
     idle_timeout
     shutdown_timeout
+    ssl_cert_file
+    ssl_key_file
     _idle_timers
     _sub_by_kind
     _sub_no_kind
@@ -100,6 +103,10 @@ sub new {
             unless ref($self->on_event) eq 'CODE';
     }
 
+    if (defined $self->ssl_key_file && !defined $self->ssl_cert_file) {
+        croak "ssl_key_file requires ssl_cert_file";
+    }
+
     # Initialize store: use provided store, or build default
     if (!$self->store) {
         my %store_args;
@@ -119,7 +126,10 @@ sub new {
     $self->_idle_timers({});
     $self->_sub_by_kind({});
     $self->_sub_no_kind({});
-    $self->_server(AnyEvent::WebSocket::Server->new());
+    $self->_server(AnyEvent::WebSocket::Server->new(
+        (defined $self->ssl_cert_file ? (ssl_cert_file => $self->ssl_cert_file) : ()),
+        (defined $self->ssl_key_file  ? (ssl_key_file  => $self->ssl_key_file)  : ()),
+    ));
     return $self;
 }
 
@@ -155,7 +165,9 @@ sub start {
         }
         $self->_conn_count_by_ip->{$peer_host}++;
 
-        if ($self->relay_info) {
+        if (defined $self->ssl_cert_file || defined $self->ssl_key_file) {
+            $self->_establish_ws($fh, $peer_host);
+        } elsif ($self->relay_info) {
             $self->_handle_nip11_or_ws($fh, $peer_host);
         } else {
             $self->_establish_ws($fh, $peer_host);
@@ -176,6 +188,25 @@ sub _establish_ws {
     });
 }
 
+sub _write_all {
+    my ($writer, $data) = @_;
+    my $off = 0;
+    while ($off < length $data) {
+        my $n = $writer->($data, $off);
+        last unless defined $n && $n > 0;
+        $off += $n;
+    }
+    return $off;
+}
+
+sub _syswrite_all {
+    my ($fh, $data) = @_;
+    return _write_all(sub {
+        my ($buf, $off) = @_;
+        return syswrite($fh, $buf, length($buf) - $off, $off);
+    }, $data);
+}
+
 sub _handle_nip11_or_ws {
     my ($self, $fh, $peer_host) = @_;
     my $fileno = fileno($fh);
@@ -191,7 +222,7 @@ sub _handle_nip11_or_ws {
     my $dispatch = sub {
         if ($buf =~ /^OPTIONS\s/i) {
             sysread($fh, my $discard, 8192);
-            syswrite($fh, Net::Nostr::RelayInfo->cors_preflight_response);
+            _syswrite_all($fh, Net::Nostr::RelayInfo->cors_preflight_response);
             close $fh;
             $self->_conn_count_by_ip->{$peer_host}--;
             return;
@@ -200,7 +231,7 @@ sub _handle_nip11_or_ws {
         if ($buf =~ /Accept:\s*application\/nostr\+json/i
             && $buf !~ /Upgrade:\s*websocket/i) {
             sysread($fh, my $discard, 8192);
-            syswrite($fh, $self->relay_info->to_http_response);
+            _syswrite_all($fh, $self->relay_info->to_http_response);
             close $fh;
             $self->_conn_count_by_ip->{$peer_host}--;
             return;
@@ -384,105 +415,109 @@ sub _on_connection {
             $self->{_reset_idle}{$conn_id}->();
         }
 
-        if (defined $self->max_message_length && length($raw) > $self->max_message_length) {
-            $conn->send(Net::Nostr::Message->new(
-                type => 'NOTICE', message => "error: message too large",
-            )->serialize);
-            return;
-        }
+        AE::postpone {
+            return unless $self->_connections->{$conn_id};
 
-        my $arr = eval { JSON::decode_json($raw) };
-        return warn "bad message: $@\n" if $@ || ref($arr) ne 'ARRAY' || !@$arr;
-
-        my $type = $arr->[0];
-
-        if ($type eq 'REQ') {
-            my $sub_id = $arr->[1] // '';
-            my $msg = eval { Net::Nostr::Message->parse($message->body) };
-            if ($@) {
+            if (defined $self->max_message_length && length($raw) > $self->max_message_length) {
                 $conn->send(Net::Nostr::Message->new(
-                    type => 'CLOSED', subscription_id => $sub_id,
-                    message => "error: $@"
+                    type => 'NOTICE', message => "error: message too large",
                 )->serialize);
                 return;
             }
-            $self->_handle_req($conn_id, $msg->subscription_id, @{$msg->filters});
-            return;
-        }
 
-        if ($type eq 'COUNT') {
-            my $sub_id = $arr->[1] // '';
-            my $msg = eval { Net::Nostr::Message->parse($message->body) };
-            if ($@) {
-                $conn->send(Net::Nostr::Message->new(
-                    type => 'CLOSED', subscription_id => $sub_id,
-                    message => "error: $@"
-                )->serialize);
+            my $arr = eval { JSON::decode_json($raw) };
+            return warn "bad message: $@\n" if $@ || ref($arr) ne 'ARRAY' || !@$arr;
+
+            my $type = $arr->[0];
+
+            if ($type eq 'REQ') {
+                my $sub_id = $arr->[1] // '';
+                my $msg = eval { Net::Nostr::Message->parse($raw) };
+                if ($@) {
+                    $conn->send(Net::Nostr::Message->new(
+                        type => 'CLOSED', subscription_id => $sub_id,
+                        message => "error: $@"
+                    )->serialize);
+                    return;
+                }
+                $self->_handle_req($conn_id, $msg->subscription_id, @{$msg->filters});
                 return;
             }
-            $self->_handle_count($conn_id, $msg->subscription_id, @{$msg->filters});
-            return;
-        }
 
-        if ($type eq 'NEG-OPEN') {
-            my $sub_id = $arr->[1] // '';
-            my $msg = eval { Net::Nostr::Message->parse($message->body) };
-            if ($@) {
-                my $reason = $@;
-                $reason =~ s/\n\z//;
-                $conn->send(Net::Nostr::Message->new(
-                    type => 'NEG-ERR', subscription_id => $sub_id,
-                    message => "error: $reason",
-                )->serialize);
+            if ($type eq 'COUNT') {
+                my $sub_id = $arr->[1] // '';
+                my $msg = eval { Net::Nostr::Message->parse($raw) };
+                if ($@) {
+                    $conn->send(Net::Nostr::Message->new(
+                        type => 'CLOSED', subscription_id => $sub_id,
+                        message => "error: $@"
+                    )->serialize);
+                    return;
+                }
+                $self->_handle_count($conn_id, $msg->subscription_id, @{$msg->filters});
                 return;
             }
-            $self->_handle_neg_open($conn_id, $msg);
-            return;
-        }
 
-        if ($type eq 'NEG-MSG') {
-            my $sub_id = $arr->[1] // '';
-            my $msg = eval { Net::Nostr::Message->parse($message->body) };
-            if ($@) {
-                my $reason = $@;
-                $reason =~ s/\n\z//;
-                $conn->send(Net::Nostr::Message->new(
-                    type => 'NEG-ERR', subscription_id => $sub_id,
-                    message => "error: $reason",
-                )->serialize);
+            if ($type eq 'NEG-OPEN') {
+                my $sub_id = $arr->[1] // '';
+                my $msg = eval { Net::Nostr::Message->parse($raw) };
+                if ($@) {
+                    my $reason = $@;
+                    $reason =~ s/\n\z//;
+                    $conn->send(Net::Nostr::Message->new(
+                        type => 'NEG-ERR', subscription_id => $sub_id,
+                        message => "error: $reason",
+                    )->serialize);
+                    return;
+                }
+                $self->_handle_neg_open($conn_id, $msg);
                 return;
             }
-            $self->_handle_neg_msg($conn_id, $msg);
-            return;
-        }
 
-        if ($type eq 'NEG-CLOSE') {
-            $self->_handle_neg_close($conn_id, $arr->[1] // '');
-            return;
-        }
-
-        my $msg = eval { Net::Nostr::Message->parse($message->body) };
-        if ($@) {
-            if ($type eq 'EVENT' || $type eq 'AUTH') {
-                my $raw_id = (ref($arr->[1]) eq 'HASH' ? $arr->[1]{id} : '') // '';
-                my $event_id = $raw_id =~ /\A[0-9a-f]{64}\z/ ? $raw_id : ('0' x 64);
-                my $reason = $@;
-                $reason =~ s/\n\z//;
-                $conn->send(Net::Nostr::Message->new(
-                    type => 'OK', event_id => $event_id,
-                    accepted => 0, message => "invalid: $reason"
-                )->serialize);
+            if ($type eq 'NEG-MSG') {
+                my $sub_id = $arr->[1] // '';
+                my $msg = eval { Net::Nostr::Message->parse($raw) };
+                if ($@) {
+                    my $reason = $@;
+                    $reason =~ s/\n\z//;
+                    $conn->send(Net::Nostr::Message->new(
+                        type => 'NEG-ERR', subscription_id => $sub_id,
+                        message => "error: $reason",
+                    )->serialize);
+                    return;
+                }
+                $self->_handle_neg_msg($conn_id, $msg);
+                return;
             }
-            return;
-        }
 
-        if ($msg->type eq 'EVENT') {
-            $self->_handle_event($conn_id, $msg->event);
-        } elsif ($msg->type eq 'CLOSE') {
-            $self->_handle_close($conn_id, $msg->subscription_id);
-        } elsif ($msg->type eq 'AUTH') {
-            $self->_handle_auth($conn_id, $msg->event);
-        }
+            if ($type eq 'NEG-CLOSE') {
+                $self->_handle_neg_close($conn_id, $arr->[1] // '');
+                return;
+            }
+
+            my $msg = eval { Net::Nostr::Message->parse($raw) };
+            if ($@) {
+                if ($type eq 'EVENT' || $type eq 'AUTH') {
+                    my $raw_id = (ref($arr->[1]) eq 'HASH' ? $arr->[1]{id} : '') // '';
+                    my $event_id = $raw_id =~ /\A[0-9a-f]{64}\z/ ? $raw_id : ('0' x 64);
+                    my $reason = $@;
+                    $reason =~ s/\n\z//;
+                    $conn->send(Net::Nostr::Message->new(
+                        type => 'OK', event_id => $event_id,
+                        accepted => 0, message => "invalid: $reason"
+                    )->serialize);
+                }
+                return;
+            }
+
+            if ($msg->type eq 'EVENT') {
+                $self->_handle_event($conn_id, $msg->event);
+            } elsif ($msg->type eq 'CLOSE') {
+                $self->_handle_close($conn_id, $msg->subscription_id);
+            } elsif ($msg->type eq 'AUTH') {
+                $self->_handle_auth($conn_id, $msg->event);
+            }
+        };
     });
 
     $conn->on(finish => sub {
@@ -1086,6 +1121,10 @@ Supports all NIP-01 event semantics:
     my $relay = Net::Nostr::Relay->new(max_connections_per_ip => 10);
     my $relay = Net::Nostr::Relay->new(relay_url => 'wss://relay.example.com/');
     my $relay = Net::Nostr::Relay->new(relay_info => $info);
+    my $relay = Net::Nostr::Relay->new(
+        ssl_cert_file => 'cert.pem',
+        ssl_key_file  => 'key.pem',
+    );
     my $relay = Net::Nostr::Relay->new(min_pow_difficulty => 16);
     my $relay = Net::Nostr::Relay->new(max_events => 10000);
     my $relay = Net::Nostr::Relay->new(event_rate_limit => '10/60');
@@ -1122,6 +1161,12 @@ relay serves the information document in response to HTTP requests with
 C<Accept: application/nostr+json>, and handles CORS preflight OPTIONS requests.
 Default: C<undef> (NIP-11 disabled).
 
+For plain listeners, the relay serves this document directly on the same port.
+TLS listeners accept secure WebSocket traffic natively, but do not perform the
+raw HTTP pre-read needed for direct NIP-11 document serving on that same
+socket. If you want HTTPS for the relay information document, terminate TLS in
+front of the relay or serve the document separately.
+
     use Net::Nostr::RelayInfo;
 
     my $relay = Net::Nostr::Relay->new(
@@ -1130,6 +1175,18 @@ Default: C<undef> (NIP-11 disabled).
             supported_nips => [1, 9, 11, 42],
             version        => '1.0.0',
         ),
+    );
+
+=item C<ssl_cert_file> - Path to a PEM certificate file used to accept secure
+WebSocket listeners (C<wss://>). The PEM file may contain both the certificate
+and private key. Default: C<undef> (plain C<ws://> listener).
+
+=item C<ssl_key_file> - Optional path to a PEM private key file used with
+C<ssl_cert_file>. Default: C<undef>. If set, C<ssl_cert_file> is required.
+
+    my $relay = Net::Nostr::Relay->new(
+        ssl_cert_file => 'cert.pem',
+        ssl_key_file  => 'key.pem',
     );
 
 =item C<store> - A pluggable storage backend object. Must implement the same
@@ -1280,6 +1337,15 @@ process, or compose with other AnyEvent watchers.
     my $client = Net::Nostr::Client->new;
     $client->connect('ws://127.0.0.1:8080');
 
+    my $secure = Net::Nostr::Relay->new(
+        ssl_cert_file => 'cert.pem',
+        ssl_key_file  => 'key.pem',
+    );
+    $secure->start('127.0.0.1', 8443);
+
+    my $secure_client = Net::Nostr::Client->new;
+    $secure_client->connect('wss://127.0.0.1:8443');
+
 =head2 stop
 
     $relay->stop;
@@ -1427,6 +1493,9 @@ Returns the L<Net::Nostr::RelayInfo> object (NIP-11), or C<undef> if not set.
     $relay->start('0.0.0.0', 8080);
 
     # Clients can now fetch: curl -H 'Accept: application/nostr+json' http://localhost:8080/
+
+On TLS listeners, L</relay_info> metadata can still describe the relay, but the
+built-in direct NIP-11 HTTP response path is only available on plain listeners.
 
 =head2 max_subscriptions
 

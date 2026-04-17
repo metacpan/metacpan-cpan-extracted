@@ -4,6 +4,13 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 0.15: Thu 16 Apr 14:33:15 CEST 2026
+
+	Improvements:
+	- be clearer about the reach of this module.
+	- add bugtracker to meta.
+	- 2026-04-16 add latest schemas.
+
 version 0.14: Thu  6 Nov 12:18:30 CET 2025
 
 	Improvements:

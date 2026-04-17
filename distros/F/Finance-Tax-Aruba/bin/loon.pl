@@ -154,14 +154,15 @@ my @order = qw(
     aov_employer
     pensioen_employer
     -
+    cost_employer
+    total_cost_employer
+    -
     azv_total
     aov_total
     gov_costs
     -
     pensioen
     social_costs
-    -
-    cost_employer
 );
 
 my $jaarloon_bruto = $calc->yearly_income_gross;
@@ -193,7 +194,7 @@ my %year = (
     pensioen_employee => $calc->pension_employee,
     pensioen_employer => $calc->pension_employer,
     pensioen       => $calc->pension_total,
-    cost_employer  => $calc->company_costs,
+    total_cost_employer  => $calc->company_costs,
     gov_costs      => $calc->government_costs,
     social_costs   => $calc->social_costs,
     azv_total      => $calc->azv_premium,
@@ -201,6 +202,7 @@ my %year = (
     tax_free       => $calc->tax_free,
     bonus          => $calc->bonus,
     fringe         => $calc->fringe,
+    cost_employer  => $calc->pension_employer + $calc->azv_employer + $calc->aov_employer,
 );
 
 my %mapping = (
@@ -229,7 +231,8 @@ my %mapping = (
     pensioen_employer => sprintf('Pension (%s%%)', $calc->pension_employer_perc),
     pensioen       => sprintf('Pension Totaal (%s%%)',
         $calc->pension_employee_perc + $calc->pension_employer_perc),
-    cost_employer  => "Totale loonkosten bedrijf",
+    total_cost_employer  => "Totale loonkosten bedrijf",
+    cost_employer => "Additionele loonkosten",
 
     azv_total => sprintf('AZV Totaal (%s%%)',
         $calc->azv_percentage_employee + $calc->azv_percentage_employer),
@@ -298,7 +301,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

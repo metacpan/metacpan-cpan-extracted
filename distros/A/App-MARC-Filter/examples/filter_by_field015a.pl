@@ -137,9 +137,10 @@ Y2FsX2Jhc2U9Q05CPC9zdWJmaWVsZD4KICA8L2RhdGFmaWVsZD4KPC9yZWNvcmQ+Cgo8L2NvbGxl
 Y3Rpb24+Cg==
 END
 
-my ($temp_file, $temp_file_fh) = tempfile();
+my ($temp_file_fh, $temp_file) = tempfile(SUFFIX => '.xml');
 
 barf($temp_file_fh, decode_base64($marc_xml_example));
+close($temp_file_fh);
 
 # Arguments.
 @ARGV = (

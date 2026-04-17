@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.3.0
+## Version v0.4.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/13
+## Modified 2026/04/14
 ## All rights reserved
 ## 
 ## 
@@ -57,6 +57,7 @@ BEGIN
         $FALLBACK_TO_DT_TZ
         $HAS_CONSTANTS
         $MISSING_AUTO_UTF8_DECODING
+        $SQLITE_HAS_MATH_FUNCTIONS
         $USE_MEM_CACHE
     );
     # Package-level memory cache: canonical_name -> blessed object.
@@ -90,12 +91,14 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.4.0';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
     # $STHS->{ $db_file }->{ $statement_id } = $sth
     our $STHS    = {};
+    # $SQLITE_HAS_MATH_FUNCTIONS is not defined on purpose
+    # Its definedness is checked in _dbh_add_user_defined_functions()
 
     # The bundled database lives next to this file
     {
@@ -1017,6 +1020,112 @@ sub pass_error
     return;
 }
 
+sub resolve_abbreviation
+{
+    my $self = shift( @_ );
+    my $abbr = shift( @_ ) ||
+        return( $self->error( "No timezone abbreviation was provided." ) );
+    my %opts = @_;
+
+    local $@;
+    my $sth;
+    my $has_offset = (
+        defined( $opts{utc_offset} ) &&
+        Scalar::Util::looks_like_number( $opts{utc_offset} )
+    ) ? 1 : 0;
+
+    # We maintain two cached statements: one plain and one with an additional
+    # utc_offset filter for co-parsed numeric offsets (%z).
+    my $cache_id = $has_offset
+        ? 'resolve_abbreviation_filtered'
+        : 'resolve_abbreviation';
+
+    unless( $sth = $self->_get_cached_statement( $cache_id ) )
+    {
+        my $dbh = $self->_dbh || return( $self->pass_error );
+        my $query = $has_offset ? <<'SQL_FILTERED' : <<'SQL_PLAIN';
+SELECT DISTINCT z.name AS zone_name, t.utc_offset, t.is_dst
+FROM types t
+JOIN zones z ON z.zone_id = t.zone_id
+WHERE z.canonical = 1
+  AND t.abbreviation = ?
+  AND t.utc_offset   = ?
+ORDER BY z.name
+SQL_FILTERED
+SELECT DISTINCT z.name AS zone_name, t.utc_offset, t.is_dst
+FROM types t
+JOIN zones z ON z.zone_id = t.zone_id
+WHERE z.canonical = 1
+  AND t.abbreviation = ?
+ORDER BY z.name
+SQL_PLAIN
+        $sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $self->error( "Error preparing the abbreviation resolution query: ", ( $@ || $dbh->errstr ) ) );
+        $self->_set_cached_statement( $cache_id => $sth );
+    }
+
+    my $rv = eval
+    {
+        $has_offset
+            ? $sth->execute( $abbr, $opts{utc_offset} )
+            : $sth->execute( $abbr );
+    };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $self->error( "Error executing the abbreviation resolution query for '$abbr': $@" ) );
+    }
+    elsif( !defined( $rv ) )
+    {
+        $sth->finish;
+        return( $self->error( "Error executing the abbreviation resolution query for '$abbr': ", $sth->errstr ) );
+    }
+
+    my $all = eval{ $sth->fetchall_arrayref( {} ) };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $self->error( "Error retrieving abbreviation resolution results for '$abbr': $@" ) );
+    }
+    elsif( !defined( $all ) && $sth->errstr )
+    {
+        $sth->finish;
+        return( $self->error( "Error retrieving abbreviation resolution results for '$abbr': ", $sth->errstr ) );
+    }
+    $sth->finish;
+
+    # No results means the abbreviation is not in the IANA database.
+    unless( @$all )
+    {
+        return( $self->error( "No timezone found for abbreviation '$abbr'." ) );
+    }
+
+    # Determine whether all candidates share the same UTC offset.
+    # If they do, the abbreviation is unambiguous in terms of wall-clock meaning,
+    # even if multiple zone names match (such as JST covering several Asian zones
+    # all at +09:00). Genuinely ambiguous abbreviations such as IST or CST map to
+    # different offsets and get ambiguous => 1.
+    my %offsets = map{ $_->{utc_offset} => 1 } @$all;
+    my $ambiguous = scalar( keys( %offsets ) ) > 1 ? 1 : 0;
+
+    my $results = [
+        map
+        {
+            {
+                zone_name  => $_->{zone_name},
+                utc_offset => $_->{utc_offset},
+                is_dst     => $_->{is_dst} ? 1 : 0,
+                ambiguous  => $ambiguous,
+            }
+        }
+        @$all
+    ];
+
+    return( $results );
+}
+
 sub short_name_for_datetime
 {
     my $self = shift( @_ );
@@ -1384,6 +1493,64 @@ sub _dbh
         $dbh->{sqlite_string_mode} = DBD::SQLite::Constants::DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK();
     }
     return( $DBH->{ $file } = $dbh );
+}
+
+sub _dbh_add_user_defined_functions
+{
+    my( $this, $dbh ) = @_;
+    if( defined( $SQLITE_HAS_MATH_FUNCTIONS ) )
+    {
+        return( $SQLITE_HAS_MATH_FUNCTIONS );
+    }
+    elsif( !$dbh )
+    {
+        return( $this->error( "No database handle was provided." ) );
+    }
+    my $query = "SELECT name FROM pragma_function_list WHERE name = 'sqrt'";
+    local $@;
+    my $sth = eval
+    {
+        $dbh->prepare( $query );
+    } || return( $this->error( "Error preparing the query to check if SQLite has math functions: ", ( $@ || $dbh->errstr ) ) );
+    my $rv = eval{ $sth->execute };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $this->error( "Error executing the query to check if SQLite has math functions: $@" ) );
+    }
+    elsif( !defined( $rv ) )
+    {
+        $sth->finish;
+        return( $this->error( "Error executing the query to check if SQLite has math functions: ", $sth->errstr ) );
+    }
+    my $row = eval{ $sth->fetchrow_arrayref };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $this->error( "Error retrieving the value to check if SQLite has math functions: $@" ) );
+    }
+    # We check for definedness, which means an error in DBI
+    elsif( !defined( $row ) && $sth->errstr )
+    {
+        $sth->finish;
+        return( $this->error( "Error retrieving the value to check if SQLite has math functions: ", $sth->errstr ) );
+    }
+    $sth->finish;
+    if( $row->[0] )
+    {
+        # <https://sqlite.org/lang_mathfunc.html>
+        $SQLITE_HAS_MATH_FUNCTIONS = 1;
+    }
+    else
+    {
+        require POSIX;
+        $dbh->sqlite_create_function( 'sqrt', 1, sub{ CORE::sqrt( $_[0] ) } );
+        $dbh->sqlite_create_function( 'sin',  1, sub{ CORE::sin(  $_[0] ) } );
+        $dbh->sqlite_create_function( 'cos',  1, sub{ CORE::cos(  $_[0] ) } );
+        $dbh->sqlite_create_function( 'asin', 1, sub{ POSIX::asin( $_[0] ) } );
+        $SQLITE_HAS_MATH_FUNCTIONS = 0;
+    }
+    return(1);
 }
 
 # _decode_sql_array() decode the JSON array and returns an array reference. 
@@ -2185,7 +2352,9 @@ sub _nearest_zone
     my $sth;
     unless( $sth = $class->_get_cached_statement( 'nearest_zone' ) )
     {
-        my $dbh = $class->_dbh || return( $self->pass_error );
+        my $dbh = $class->_dbh || return( $class->pass_error );
+        $class->_dbh_add_user_defined_functions( $dbh ) ||
+            return( $class->pass_error );
         # Use the haversine formula entirely within SQLite to find the nearest zone.
         # Only canonical zones with coordinates are considered.
         # haversine(lat1, lon1, lat2, lon2):
@@ -2218,7 +2387,7 @@ SQL
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Cannot prepare nearest_zone: ", ( $@ || $dbh->errstr ), "\nQuery was: $query" ) );
+        } || return( $class->error( "Cannot prepare nearest_zone: ", ( $@ || $dbh->errstr ), "\nQuery was: $query" ) );
         $class->_set_cached_statement( nearest_zone => $sth );
     }
 
@@ -2226,25 +2395,25 @@ SQL
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: $@" ) );
+        return( $class->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: $@" ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
+        return( $class->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
     }
 
     my $row = eval{ $sth->fetchrow_hashref };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: $@" ) );
+        return( $class->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: $@" ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
+        return( $class->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
     }
     $sth->finish;
     unless( defined( $row ) && defined( $row->{name} ) )
@@ -2583,6 +2752,10 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
     # See https://perldoc.perl.org/perldiag#Can't-call-method-%22%25s%22-on-an-undefined-value
     my $bad = DateTime::Lite::TimeZone->new( name => 'Mars/Olympus' )->name;
 
+=head1 VERSION
+
+    v0.4.0
+
 =head1 DESCRIPTION
 
 C<DateTime::Lite::TimeZone> is a drop-in replacement for L<DateTime::TimeZone> designed to eliminate its heavy dependency and memory footprint.
@@ -2805,6 +2978,9 @@ As an alternative to a C<name>, you can pass decimal-degree coordinates to have 
 The resolution uses the reference coordinates stored in the IANA C<zone1970.tab> file (one representative point per canonical zone) and finds the nearest zone by the L<haversine great-circle distance|https://en.wikipedia.org/wiki/Haversine_formula>. This is an B<approximation>: it is accurate for most locations, but may give incorrect results near timezone boundaries, in disputed territories, or for enclaves such as Kaliningrad. If you need boundary-precise resolution, consider L<Geo::Location::TimeZoneFinder> instead.
 
 C<latitude> must be in the range C<-90> to C<90>; C<longitude> in C<-180> to C<180>. An L<error object|DateTime::Lite::Exception> is set and C<undef> is returned in scalar context, or an empty list in list context, if the values are out of range or if no zone with coordinates is found in the database.
+
+The haversine formula is computed in SQLite when the database was compiled with C<-DSQLITE_ENABLE_MATH_FUNCTIONS> (SQLite E<gt>= 3.35.0, released March 2021).
+On older systems that ships SQLite 3.31.1, the required functions (C<sqrt>, C<sin>, C<cos>, C<asin>) are registered automatically as Perl UDFs (User Defined Functions) via L<DBD::SQLite/sqlite_create_function> on first use, so coordinate resolution works transparently on all supported SQLite versions.
 
 =back
 
@@ -3244,6 +3420,57 @@ Used internally during timezone conversion.
 Upon error, then this sets an L<error object|DateTime::Lite::Exception>, and returns C<undef> in scalar context or an empty list in list context.
 
 =for Pod::Coverage pass_error
+
+=head2 resolve_abbreviation
+
+    # Unambiguous: JST maps to a single UTC offset
+    my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST' );
+    # $results = [
+    #   { zone_name => 'Asia/Tokyo', utc_offset => 32400, is_dst => 0, ambiguous => 0 },
+    #   { zone_name => 'Asia/Seoul', utc_offset => 32400, is_dst => 0, ambiguous => 0 },
+    #   ...
+    # ]
+
+    # Truly ambiguous: CST has different offsets in Asia and America
+    my $cst = DateTime::Lite::TimeZone->resolve_abbreviation( 'CST' );
+    # $cst->[0]{ambiguous} == 1
+
+    # Narrow by offset when already known (such as from a co-parsed %z token)
+    my $filtered = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'PST', utc_offset => -28800
+    );
+
+Class or instance method. Resolves a timezone abbreviation such as C<JST> or C<EST> against the IANA data in the bundled C<tz.sqlite3> database, returning all canonical zones that have ever used that abbreviation.
+
+The single required argument is the abbreviation string. An optional C<utc_offset> argument (integer seconds east of UTC) narrows the results to candidates with a matching offset, which is useful when the numeric offset has already been parsed from the same string (such as from a co-parsed C<%z> token).
+
+Returns an array reference of hashrefs on success, each with the following keys:
+
+=over 4
+
+=item C<zone_name>
+
+The canonical IANA zone name, such as C<Asia/Tokyo>.
+
+=item C<utc_offset>
+
+The UTC offset in seconds east of UTC for this abbreviation in this zone.
+
+=item C<is_dst>
+
+C<1> if this abbreviation represents a DST period, C<0> otherwise.
+
+=item C<ambiguous>
+
+C<1> if the abbreviation maps to multiple distinct UTC offsets across the result set (a genuine ambiguity such as C<IST> or C<CST>); C<0> if all candidates share the same UTC offset (same time, different zone names).
+
+=back
+
+Returns an empty array reference if the abbreviation is not found in the database.
+
+If an error occurred, this sets an L<exception object|DateTime::Lite::Exception>, and returns C<undef> in scalar context, and an empty list in list context. The exception object can then be retrieved with L</error>
+
+Note that many abbreviations such as C<EST> or C<PST> match multiple zone names that all share the same UTC offset. These are not genuinely ambiguous for the purpose of parsing a datetime string; the C<ambiguous> flag will be C<0> in those cases. Genuinely ambiguous abbreviations such as C<IST> (Irish Summer Time, Indian Standard Time, or Israel Standard Time) will have C<ambiguous =E<gt> 1>.
 
 =head2 short_name_for_datetime
 

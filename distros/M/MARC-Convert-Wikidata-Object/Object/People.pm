@@ -7,7 +7,7 @@ use Mo qw(build default is);
 use Mo::utils::Array qw(check_array_object);
 use Mo::utils::Date 0.04 qw(check_date check_date_order);
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 has date_of_birth => (
 	is => 'ro',
@@ -313,12 +313,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2025
+© Michal Josef Špaček 2021-2026
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

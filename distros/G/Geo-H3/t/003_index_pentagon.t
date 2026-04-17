@@ -3,12 +3,12 @@ use strict;
 use warnings;
 use Data::Dumper qw{Dumper};
 use Test::Number::Delta;
-use Test::More tests => 38;
+use Test::More tests => 39;
 use FFI::CheckLib qw{find_lib};
 my $lib = find_lib(lib=>'h3');
 
 SKIP: {
-  skip 'libh3 not available', 38 unless $lib;
+  skip 'libh3 not available', 39 unless $lib;
   
   require_ok 'Geo::H3::Index';
 
@@ -26,9 +26,9 @@ SKIP: {
     #║  4 Child   ║ 0
     #╚════════════╝
 
-    my $index  = 595812165542215679;
+    my $uint64  = 595812165542215679;
     my $string = '844c001ffffffff';
-    my $h3     = Geo::H3::Index->new(index=>$index);
+    my $h3     = Geo::H3::Index->new(uint64=>$uint64);
     isa_ok($h3, 'Geo::H3::Index');
     my $gb     = $h3->geoBoundary;
     isa_ok($gb, 'Geo::H3::GeoBoundary');
@@ -36,7 +36,8 @@ SKIP: {
     my $coordinates = $gb->coordinates;
     isa_ok($coordinates, 'ARRAY');
     is(scalar(@$coordinates), 6, 'polygon verts');
-    is($h3->index, $index, 'index');
+    is($h3->index, $uint64, 'index');
+    is($h3->uint64, $uint64, 'uint64');
     is($h3->string, $string, 'string');
     is($h3->resolution, 4, 'resolution');
     ok($h3->isPentagon, 'isPentagon');

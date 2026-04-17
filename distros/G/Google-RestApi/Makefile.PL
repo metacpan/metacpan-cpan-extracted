@@ -19,7 +19,6 @@ WriteMakefile(
       'Cache::Memory::Simple'           => 0,
       'Carp'                            => 0,
       'Exporter'                        => 0,
-      'File::Slurp'                     => 0,
       'Furl'                            => 0,
       'Hash::Merge'                     => 0,
       'JSON::MaybeXS'                   => 0,
@@ -27,6 +26,7 @@ WriteMakefile(
       'List::Util'                      => 0,
       'LWP::Protocol::https'            => 0,
       'Log::Log4perl'                   => 0,
+      'MIME::Lite'                      => 0,
       'Module::Load'                    => 0,
       'Net::OAuth2::Client'             => 0,
       'Net::OAuth2::Profile::WebServer' => 0,
@@ -47,6 +47,7 @@ WriteMakefile(
       'YAML::Any'                       => 0,
     },
     TEST_REQUIRES     => {
+      'HTTP::Status'                => 0,
       'Sub::Override'               => 0,
       'Test::Class'                 => 0,
       'Test::Class::Load'           => 0,

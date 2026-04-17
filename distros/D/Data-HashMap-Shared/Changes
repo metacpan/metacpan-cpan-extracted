@@ -1,5 +1,9 @@
 Revision history for Data-HashMap-Shared
 
+0.06  2026-04-15
+    - Clarify new_sharded $max_entries is per-shard
+    - Improve benchmark tables in POD
+
 0.05  2026-04-12
     - Fix DESTROY ordering (zero IV before free)
     - Add SEE ALSO cross-links to family modules

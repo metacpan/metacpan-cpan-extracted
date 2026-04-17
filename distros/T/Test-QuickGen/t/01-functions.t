@@ -39,10 +39,22 @@ subtest 'ascii_string' => sub {
   is(ascii_string(0), '', 'zero length');
   is(ascii_string(-1), '', 'negative length');
   
+  my $allowed_chars = join '', map { quotemeta chr($_) } 33..126;
   for (1..5) {
     my $s = ascii_string(50);
     is(length($s), 50, 'correct length');
-    like($s, qr/^[a-zA-Z0-9_]+$/, 'valid ASCII chars');
+    like($s, qr/^[$allowed_chars]+$/, 'valid ASCII chars');
+  }
+};
+
+subtest 'alphanumeric_string' => sub {
+  is(alphanumeric_string(0), '', 'zero length');
+  is(alphanumeric_string(-1), '', 'negative length');
+
+  for (1..5) {
+    my $s = alphanumeric_string(50);
+    is(length($s), 50, 'correct length');
+    like($s, qr/^[A-Za-z0-9]+$/, 'valid alphanumeric characters');
   }
 };
 
@@ -138,6 +150,12 @@ subtest 'words' => sub {
 
   is(scalar @words, 5, 'correct number of words');
   like($s, qr/^\S+( \S+){4}$/, 'correct spacing');
+
+  # accepts an optional max word size
+  is(words($gen, 2, 1), 'x x', 'accepts optional max word length');
+
+  eval { words($gen, 2, 0) };
+  like($@, qr/must be a positive number/, 'fails with non-positive number');
 };
 
 done_testing;

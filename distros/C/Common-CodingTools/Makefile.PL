@@ -27,7 +27,6 @@ if (WriteMakefile(
         'Test::More' => 0.44,
     },
     PREREQ_PM      => {
-        'Exporter::Easy' => 0.16,
         'List::Util'     => 1.41,
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},

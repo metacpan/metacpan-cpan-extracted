@@ -18,9 +18,6 @@ name 'Data-MARC-Leader';
 perl_version 5.008;
 readme_from 'Leader.pm';
 recursive_author_tests('xt');
-requires 'Class::Utils' => 0;
-requires 'English' => 0;
-requires 'Error::Pure' => 0;
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.22;
 requires 'Readonly' => 0;
@@ -31,9 +28,8 @@ test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
-test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

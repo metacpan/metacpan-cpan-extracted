@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use lib '.';
 
 BEGIN {
 	eval {

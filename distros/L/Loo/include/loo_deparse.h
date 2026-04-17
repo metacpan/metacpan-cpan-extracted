@@ -3025,6 +3025,47 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
     case OP_DBSTATE:
         break;
 
+    /* ── Custom ops (call checker optimised XS) ──────────────── */
+    case OP_CUSTOM: {
+        const char *name = NULL;
+
+#if PERL_VERSION >= 20
+        /* 5.20+ : XopENTRYCUSTOM looks up the XOP by ppaddr */
+        name = XopENTRYCUSTOM(o, xop_name);
+#elif PERL_VERSION >= 14
+        {
+            /* 5.14-5.18 : Perl_custom_op_xop may not exist;
+               fall back to PL_custom_op_names hash */
+            SV **svp;
+            IV  key = PTR2IV(o->op_ppaddr);
+            char buf[32];
+            int  klen;
+
+            klen = my_snprintf(buf, sizeof(buf), "%" IVdf, key);
+            if (PL_custom_op_names &&
+                (svp = hv_fetch(PL_custom_op_names, buf, klen, 0)))
+                name = SvPV_nolen(*svp);
+        }
+#endif
+        if (!name)
+            name = "custom_op";
+
+        ddc_emit_keyword(aTHX_ ctx, name, strlen(name));
+        sv_catpvn(ctx->out, "(", 1);
+        if (o->op_flags & OPf_KIDS) {
+            OP *kid;
+            int first = 1;
+            for (kid = cUNOPo->op_first; kid; kid = OpSIBLING(kid)) {
+                if (!first)
+                    sv_catpvn(ctx->out, ", ", 2);
+                ddc_deparse_op(aTHX_ kid, ctx);
+                first = 0;
+            }
+        }
+        sv_catpvn(ctx->out, ")", 1);
+        break;
+    }
+
     /* ── Fallback ─────────────────────────────────────────────── */
     default:
         if (o->op_flags & OPf_KIDS) {

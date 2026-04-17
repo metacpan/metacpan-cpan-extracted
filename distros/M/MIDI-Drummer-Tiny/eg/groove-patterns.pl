@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Compact 'ddc';
+# use Data::Dumper::Compact 'ddc';
 use MIDI::Drummer::Tiny::Grooves ();
 
 my $grooves = MIDI::Drummer::Tiny::Grooves->new(return_patterns => 1);

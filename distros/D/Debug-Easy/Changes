@@ -396,3 +396,7 @@ Revision history for Debug-Easy
 2.24    Mar 07, 2026
 
         Removed an unneeded variable.
+
+2.25    April 15, 2026
+
+        Fixed %date%, %time%, %Benchmark% and %epoch% tokens.

@@ -1,0 +1,12 @@
+severity = 4
+verbose = %f: [%p] %m at line %l, column %c.\n%d\n
+theme = core
+
+[-Subroutines::ProhibitBuiltinHomonyms]
+[-Subroutines::RequireArgUnpacking]
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+
+[-Subroutines::RequireFinalReturn]
+terminal_funcs = LOGDIE

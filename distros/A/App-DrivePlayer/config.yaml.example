@@ -1,0 +1,30 @@
+# Drive Player configuration example
+# Copy this to ~/.config/drive_player/config.yaml and fill in your credentials.
+
+# Google OAuth2 credentials
+# Create an OAuth2 Client ID at: https://console.cloud.google.com/
+# Enable the Google Drive API for your project.
+auth:
+  class: OAuth2Client
+  client_id: "YOUR_CLIENT_ID.apps.googleusercontent.com"
+  client_secret: "YOUR_CLIENT_SECRET"
+  token_file: "~/.config/drive_player/token.dat"
+  scope:
+    - "https://www.googleapis.com/auth/drive.readonly"
+
+# Google Drive folder IDs to scan for music.
+# Find the folder ID from the URL when you open a folder in Google Drive:
+#   https://drive.google.com/drive/folders/FOLDER_ID_IS_HERE
+music_folders:
+  - id: "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2"
+    name: "My Music"
+  # - id: "another_folder_id"
+  #   name: "Albums"
+
+# Local SQLite database for the music library
+database:
+  path: "~/.local/share/drive_player/music.db"
+
+# Logging: DEBUG, INFO, WARN, ERROR
+log_level: WARN
+log_file: "~/.local/share/drive_player/drive_player.log"

@@ -1,5 +1,9 @@
 Revision history for Crypt::SMIME
 
+0.33    Thu Apr 16 13:59:10 JST 2026
+        - Fixed a build issue on Windows, reported by
+          Thomas.Eckardt [...] thockar.com
+
 0.32    Wed Apr 15 14:52:28 JST 2026
 
         Applied a series of patches from cpan [...] schmirler.de

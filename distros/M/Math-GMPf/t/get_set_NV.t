@@ -115,6 +115,8 @@ else {
   my $fmt = "%La\n";
   $fmt = "%a\n" if $Config{nvsize} == 8;
 
+## Test 9 START
+
   for my $bits(113, 110, 91, 68, 57) {
     for(-16500..-16350, -1100..-950, -200..200, 900..1050, 16400..16600) {
       my $str;
@@ -155,6 +157,9 @@ else {
 
   cmp_ok($ok, '==', 1, "Test 9");
 
+## Test 9 END
+## Test 10 START
+
   $ok = 1;
 
   $print_err = 0;
@@ -165,9 +170,8 @@ else {
 
       my $mpf  = Math::GMPf->new($str, -2);
       my $mpfr = Math::MPFR->new();
-      if($exclude && abs($mpfr) < 2 ** -16382) {  next if $exclude > Math::MPFR::MPFR_VERSION() }
-
       Math::MPFR::Rmpfr_set_str($mpfr, $str, 2, 1); # Round towards zero.
+      if($exclude && abs($mpfr) < 2 ** -16382) {  next if $exclude > Math::MPFR::MPFR_VERSION() }
 
       my $mpf_d  = Rmpf_get_NV($mpf);
 
@@ -207,6 +211,9 @@ else {
 
   cmp_ok($ok, '==', 1, "Test 10");
 
+## Test 10 END
+## Test 11 START
+
   $ok = 1;
 
   $prec = 64;
@@ -220,6 +227,8 @@ else {
     my $str = random_string($prec) . "e$_";
     my $mpf  = Math::GMPf->new($str, -2);
     my $mpfr = Math::MPFR->new($str,  2);
+
+    if($exclude && abs($mpfr) < 2 ** -16382) {  next if $exclude > Math::MPFR::MPFR_VERSION() }
 
     my $mpf_d  = Rmpf_get_NV_rndn($mpf);
 
@@ -243,6 +252,9 @@ else {
 
   cmp_ok($ok, '==', 1, "Test 11");
 
+  ## Test 11 END
+  ## Test 12 START
+
   $ok = 1;
 
   $print_err = 0;
@@ -252,6 +264,8 @@ else {
 
     my $mpf  = Math::GMPf->new($str, -2);
     my $mpfr = Math::MPFR->new($str,  2);
+
+    if($exclude && abs($mpfr) < 2 ** -16382) {  next if $exclude > Math::MPFR::MPFR_VERSION() }
 
     my $mpf_d  = Rmpf_get_NV($mpf);
 
@@ -290,6 +304,9 @@ else {
   }
 
   cmp_ok($ok, '==', 1, "Test 12");
+
+## Test 12 END
+## Test 13 START
 
   $ok = 1;
 

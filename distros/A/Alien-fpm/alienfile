@@ -5,32 +5,59 @@ use alienfile;
 use Env qw( @GEM_PATH );
 use Path::Tiny;
 
+my $version = $ENV{ALIEN_FPM_VERSION};
+my $git_url = $ENV{ALIEN_FPM_GIT_URL};
+my $git_branch = $ENV{ALIEN_FPM_GIT_BRANCH};
+
 plugin 'Probe::CommandLine' => (
     command => 'fpm',
     args    => [ '--version' ],
-    match   => qr/([\d\.]+)/,
+    match   => $version ? qr/^\Q$version\E$/ : qr/([\d\.]+)/,
     version => qr/([\d\.]+)/
 );
 
 share {
     requires 'Alien::Ruby';
-    download [ '%{gem} fetch fpm' ];
-    plugin 'Extract::File';
-    build [
-        sub {
-            my ($build) = @_;
-            $build->log('Writing to gemrc');
-            # solves gem shebang issue when using a --enable-load-relative ruby (which Alien::Ruby share installs provide): https://github.com/rubygems/rubygems/issues/8135
-            Path::Tiny::path('gemrc')->spew(
-                qq{custom_shebang: \$ruby\n}
-            );
-        },
-        '%{gem} install --config-file gemrc --install-dir %{.install.prefix} --no-document %{.install.download}'
-    ];
+
+    my $gem_install_cmd_prefix = '%{gem} install --config-file gemrc --install-dir %{.install.prefix} --no-document ';
+
+    if ($git_url) {
+        requires 'Alien::git';
+
+        my $branch = $git_branch || ($version ? "v$version" : '');
+        my @clone = ('%{git}', 'clone', '--depth', 1, '--single-branch');
+        push @clone, '--branch', $branch if $branch;
+        push @clone, $git_url;
+
+        download [ \@clone ];
+        plugin 'Extract::Directory';
+        build [
+            \&write_gemrc,
+            '%{gem} build fpm.gemspec',
+            $gem_install_cmd_prefix . 'fpm-*.gem'
+        ];
+    }
+    else {
+        download [ '%{gem} fetch fpm' . ($version ? " -v $version" : '') ];
+        plugin 'Extract::File';
+        build [
+            \&write_gemrc,
+            $gem_install_cmd_prefix . '%{.install.download}'
+        ];
+    }
 
     gather sub {
         my ($build) = @_;
         unshift @GEM_PATH, $build->install_prop->{prefix};
         $build->runtime_prop->{version} = (`fpm --version` =~ /([\d\.]+)/)[0];
     };
+};
+
+sub write_gemrc {
+    # solves gem shebang issue when using a --enable-load-relative ruby (which Alien::Ruby share installs provide): https://github.com/rubygems/rubygems/issues/8135
+    my ($build) = @_;
+    $build->log('Writing to gemrc');
+    Path::Tiny::path('gemrc')->spew(
+        qq{custom_shebang: \$ruby\n}
+    );
 }

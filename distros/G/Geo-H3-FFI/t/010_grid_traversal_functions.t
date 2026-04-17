@@ -2,12 +2,12 @@ use strict;
 use warnings;
 use Data::Dumper qw{Dumper};
 use Test::Number::Delta;
-use Test::More tests => 43;
+use Test::More tests => 49;
 use FFI::CheckLib qw{find_lib};
 my $lib = find_lib(lib=>'h3');
 
 SKIP: {
-  skip 'libh3 not available', 43 unless $lib;
+  skip 'libh3 not available', 49 unless $lib;
 
   require_ok 'Geo::H3::FFI';
 
@@ -63,6 +63,12 @@ SKIP: {
     isa_ok($href, 'HASH');
     is(scalar(keys %$href), 19, 'size');
     #diag Dumper $href;
+ 
+    my $aref = $obj->kRingDistancesWrapperArray($index, $k);
+    isa_ok($aref, 'ARRAY');
+    isa_ok($aref->[0], 'ARRAY');
+    is(scalar(@$aref), 19, 'size');
+    #diag Dumper $aref;
   }
 
   #hexRange
@@ -71,7 +77,7 @@ SKIP: {
     my $k       = 1;
     my $indexes = $obj->hexRangeWrapper($index, $k);
     isa_ok($indexes, 'ARRAY');
-    diag Dumper $indexes;
+    #diag Dumper $indexes;
   }
 
   {
@@ -112,6 +118,12 @@ SKIP: {
     isa_ok($href, 'HASH');
     is(scalar(keys %$href), 19, 'size');
     diag Dumper $href;
+
+    my $aref = $obj->hexRangeDistancesWrapperArray($index, $k);
+    isa_ok($aref, 'ARRAY', 'hexRangeDistancesWrapperArray');
+    isa_ok($aref->[0], 'ARRAY' , 'hexRangeDistancesWrapperArray[0]');
+    is(scalar(@$aref), 19, 'hexRangeDistancesWrapperArray size');
+    diag Dumper $aref;
   }
 
   #hexRanges
@@ -134,7 +146,7 @@ SKIP: {
   my $start = 622236750694711295; #0x8a2a1072b59ffff;
   my $end   = 622236750638612479; #0x8a2a1072801ffff;
   my $aref  = $obj->h3LineWrapper($start, $end);
-  diag map {sprintf "%s => %s\n", $_ => $obj->h3ToStringWrapper($_)} @$aref;
+  #diag map {sprintf "%s => %s\n", $_ => $obj->h3ToStringWrapper($_)} @$aref;
   is($aref->[0], $start, 'h3LineWrapper');
   is($aref->[-1], $end, 'h3LineWrapper');
   is(scalar(@$aref), 23, 'h3LineWrapper');

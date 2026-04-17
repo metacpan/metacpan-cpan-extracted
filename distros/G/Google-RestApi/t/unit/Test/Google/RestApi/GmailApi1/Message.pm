@@ -13,9 +13,9 @@ init_logger;
 
 sub dont_create_mock_spreadsheets { 1; }
 
-sub _setup_live_message : Tests(startup) {
+sub startup : Tests(startup) {
   my $self = shift;
-  return unless $ENV{GOOGLE_RESTAPI_CONFIG};
+  $self->SUPER::startup(@_);
   my $gmail = mock_gmail_api();
   my $profile = $gmail->profile();
   my $msg = $gmail->send_message(
@@ -27,15 +27,16 @@ sub _setup_live_message : Tests(startup) {
   return;
 }
 
-sub _teardown_live_message : Tests(shutdown) {
+sub shutdown : Tests(shutdown) {
   my $self = shift;
   $self->{_live_msg}->trash() if $self->{_live_msg};
+  $self->SUPER::shutdown(@_);
   return;
 }
 
 sub _msg_id {
   my $self = shift;
-  return $self->{_live_msg} ? $self->{_live_msg}->message_id() : 'mock_msg_id_001';
+  return $self->{_live_msg}->message_id();
 }
 
 sub _constructor : Tests(3) {

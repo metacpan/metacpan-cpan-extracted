@@ -14,6 +14,26 @@ SYNOPSIS
 DESCRIPTION
     This package can be used by other Perl modules that require fpm.
 
+    On a share install, by default, fpm is installed from RubyGems.org. Set
+    "ALIEN_FPM_GIT_URL" to install from a git repository instead.
+
+ENVIRONMENT VARIABLES
+    "ALIEN_FPM_VERSION"
+        When set, requires the specified version of fpm. On the gem path,
+        this passes "-v VERSION" to "gem fetch". On the git path, this
+        derives the git tag "vVERSION" as the branch unless
+        "ALIEN_FPM_GIT_BRANCH" is explicitly set.
+
+    "ALIEN_FPM_GIT_URL"
+        When set, fpm will be installed from a git repository instead of
+        from RubyGems.org. The value should be a URL that "git clone"
+        accepts.
+
+    "ALIEN_FPM_GIT_BRANCH"
+        When set alongside "ALIEN_FPM_GIT_URL", the specified branch or tag
+        will be checked out. If not set, the repository's default branch is
+        used.
+
 SEE ALSO
     Alien
         Documentation on the Alien concept itself.

@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Net::Gearman::Client;
+package Net::Gearman::Client 0.05;
 
-use strict;
+use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use base qw( Net::Gearman Protocol::Gearman::Client );
 
@@ -18,18 +19,20 @@ C<Net::Gearman::Client> - concrete Gearman client over an IP socket
 
 =head1 SYNOPSIS
 
- use Net::Gearman::Client;
+=for highlighter language=perl
 
- my $client = Net::Gearman::Client->new(
-    PeerAddr => $SERVER,
- ) or die "Cannot connect - $@\n";
+   use Net::Gearman::Client;
 
- my $total = $client->submit_job(
-    func => "sum",
-    arg  => "10,20,30",
- )->get;
+   my $client = Net::Gearman::Client->new(
+      PeerAddr => $SERVER,
+   ) or die "Cannot connect - $@\n";
 
- say $total;
+   my $total = await $client->submit_job(
+      func => "sum",
+      arg  => "10,20,30",
+   );
+
+   say $total;
 
 =head1 DESCRIPTION
 

@@ -52,7 +52,7 @@ use Authen::Passphrase 0.003;
 use Carp qw(croak);
 use Digest::MD4 1.2 qw(md4);
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 

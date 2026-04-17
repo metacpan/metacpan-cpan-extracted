@@ -4,7 +4,7 @@ use warnings;
 use base qw{Geo::H3::Base}; #provides new, ffi, and Geo::H3::FFI::Struct::GeoCoord
 require Geo::H3::Index;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -16,7 +16,7 @@ Geo::H3::Geo - H3 Geospatial Hexagon Indexing System Geo Object
   use Geo::H3::Geo;
   my $geo    = Geo::H3::Geo->new(lat=>$lat, lon=>$lon); #isa Geo::H3::Geo
   my $h3     = $geo->h3($resolution);                   #isa Geo::H3::Index
-  my $center = $h3->center;                             #isa Geo::H3::Geo
+  my $center = $h3->geo;                                #isa Geo::H3::Geo
   my $lat    = $center->lat;                            #isa double WGS-84 Decimal Degrees
   my $lon    = $center->lon;                            #isa double WGS-84 Decimal Degrees
 
@@ -67,7 +67,7 @@ sub struct {
 
 =head2 h3
 
-Indexes the location at the specified resolution, returning the index object L<Geo::H3::Index> of the cell containing the location.
+Indexes the location at the specified resolution, returning the hex object L<Geo::H3::Index> of the cell containing the location.
 
   my $h3 = $geo->h3;    #default resolution is 0
   my $h3 = $geo->h3(7); #isa Geo::H3::H3Index
@@ -77,11 +77,11 @@ Returns undef on error.
 =cut
 
 sub h3 {
-  my $self  = shift;
-  my $res   = shift || 0;
-  my $index = $self->ffi->geoToH3Wrapper(lat=>$self->lat, lon=>$self->lon, resolution=>$res, uom=>"deg")
-                or die("Error: API geoToH3Wrapper return index invalid");
-  return  Geo::H3::Index->new(index=>$index);
+  my $self   = shift;
+  my $res    = shift || 0;
+  my $uint64 = $self->ffi->geoToH3Wrapper(lat=>$self->lat, lon=>$self->lon, resolution=>$res, uom=>"deg")
+                or die("Error: API geoToH3Wrapper returned an invalid value");
+  return Geo::H3::Index->new(uint64 => $uint64, ffi=>$self->ffi);
 }
 
 =head2 distance
@@ -112,24 +112,6 @@ Michael R. Davis
 MIT License
 
 Copyright (c) 2021 Michael R. Davis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 =cut
 

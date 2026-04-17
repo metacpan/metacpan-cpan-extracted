@@ -74,6 +74,32 @@ subtest 'ssl options with only CA cert' => sub {
 };
 
 # ============================================================================
+# SSL with inline PEM data
+# ============================================================================
+
+subtest 'ssl options with inline pem data' => sub {
+    my $kube = Net::Async::Kubernetes->new(
+        server => Kubernetes::REST::Server->new(
+            endpoint          => 'https://k8s.local:6443',
+            ssl_verify_server => 1,
+            ssl_ca_pem        => "CA-PEM\n",
+            ssl_cert_pem      => "CERT-PEM\n",
+            ssl_key_pem       => "KEY-PEM\n",
+        ),
+        credentials => Kubernetes::REST::AuthToken->new(token => ''),
+    );
+
+    my %opts = $kube->_ssl_options;
+    is($opts{SSL_verify_mode}, SSL_VERIFY_PEER, 'verify enabled for pem config');
+    ok($opts{SSL_ca_file}, 'CA pem materialized to temp file');
+    ok($opts{SSL_cert_file}, 'client cert pem materialized to temp file');
+    ok($opts{SSL_key_file}, 'client key pem materialized to temp file');
+    is(do { local (@ARGV, $/) = $opts{SSL_ca_file}; <> }, "CA-PEM\n", 'CA pem contents preserved');
+    is(do { local (@ARGV, $/) = $opts{SSL_cert_file}; <> }, "CERT-PEM\n", 'client cert pem contents preserved');
+    is(do { local (@ARGV, $/) = $opts{SSL_key_file}; <> }, "KEY-PEM\n", 'client key pem contents preserved');
+};
+
+# ============================================================================
 # SSL options are cached
 # ============================================================================
 

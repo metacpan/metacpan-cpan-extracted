@@ -1,8 +1,11 @@
 bin/quicktest
+Changes
+CONTRIBUTING.md
 lib/Test/QuickGen.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README.md
 t/00-load.t
 t/01-functions.t
 t/import.t

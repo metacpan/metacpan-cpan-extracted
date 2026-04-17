@@ -11,7 +11,7 @@ use IO::Handle;
 use IO::File qw(O_WRONLY O_TRUNC O_CREAT SEEK_CUR);
 
 our @EXPORT = qw(iotrace);
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 # Magic Timer Settings
 our $has_hires = eval { require Time::HiRes; 1 };
@@ -34,6 +34,7 @@ sub iotrace {
     $self->parse_commandline(@args) or die usage; # Broken args parsing is Error
     $self->{help} and print usage and exit; # Showing --help usage is not Error
     $self->{version} and print "iotrace -- version $VERSION\n" and exit; # Show version
+    @{$self->{run}} or exit print usage; # No CMD is Error
     $self->{child_died} = 0;
     local $SIG{CHLD} = sub { $self->{child_died} = now; };
     $self->run_trace;

@@ -1,5 +1,10 @@
 Revision history for Object-Proto
 
+0.16	2026-04-15
+	- Fix OP_CUSTOM assertion failures on debugging Perls 5.14-5.20 
+	- Fix Perl_custom_op_register macro compatibility on Perl 5.10.x 
+	- Fix duplicate cv_set_call_checker definition on older Perls
+
 0.15	2026-04-14
 	- Use DynaLoader with RTLD_GLOBAL (dl_load_flags 0x01) so downstream XS
 	  modules can resolve Object::Proto symbols at runtime without explicit linking

@@ -1,6 +1,9 @@
 use Test2::V0;
 use Test2::IPC;
 
+use POSIX();
+use Time::HiRes qw/sleep/;
+
 use IPC::Manager::Client::LocalMemory;
 use IPC::Manager::Serializer::JSON;
 
@@ -68,6 +71,61 @@ subtest 'register_worker and workers' => sub {
     my $svc = TestRoleService::Impl->new(name => 'x', ipcm_info => 'f', pid => $$);
     $svc->register_worker('w1', 12345);
     is($svc->workers, {12345 => 'w1'}, "worker registered");
+};
+
+subtest 'reap_children returns non-worker pids and leaves $? untouched' => sub {
+    my $svc = TestRoleService::Impl->new(name => 'x', ipcm_info => 'f', pid => $$);
+
+    my $pid = fork // die "fork: $!";
+    if (!$pid) {
+        POSIX::_exit(7);
+    }
+
+    my $before = 'sentinel';
+    $? = 42;
+
+    my $reaped;
+    my $waited = 0;
+    while ($waited < 5) {
+        $reaped = $svc->reap_children;
+        last if $reaped && exists $reaped->{$pid};
+        sleep 0.05;
+        $waited += 0.05;
+    }
+
+    is($?, 42, 'reap_children did not leak $?');
+
+    ok($reaped && exists $reaped->{$pid}, "child pid $pid reaped into pids hash");
+    is($reaped->{$pid} >> 8, 7, "reaped child exit code is 7");
+};
+
+subtest 'reap_children silently reaps registered workers' => sub {
+    my $svc = TestRoleService::Impl->new(name => 'x', ipcm_info => 'f', pid => $$);
+
+    my $pid = fork // die "fork: $!";
+    if (!$pid) {
+        POSIX::_exit(0);
+    }
+
+    $svc->register_worker(w1 => $pid);
+
+    my $reaped;
+    my $waited = 0;
+    while ($waited < 5) {
+        $reaped = $svc->reap_children;
+        last unless $svc->workers->{$pid};
+        sleep 0.05;
+        $waited += 0.05;
+    }
+
+    ok(!exists $svc->workers->{$pid}, "worker removed from workers hash after reap_children");
+    ok(!exists $reaped->{$pid}, "worker pid not present in reap_children result");
+};
+
+subtest 'reap_children returns hashref when called with no children' => sub {
+    my $svc = TestRoleService::Impl->new(name => 'x', ipcm_info => 'f', pid => $$);
+    my $reaped = $svc->reap_children;
+    is(ref($reaped), 'HASH', "reap_children returns a hashref");
 };
 
 subtest 'try without intercept_errors' => sub {

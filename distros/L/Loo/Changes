@@ -29,3 +29,6 @@ Revision history for Loo
 
 0.10	2026/04/02
 	- Fix deparsing of list context
+
+0.11	2026/04/17
+	- Fix deparsing of custom ops

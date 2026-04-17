@@ -82,6 +82,7 @@ query($cql: String, $offset: Int, $limit: Int) {
         staffOnly
       }
       holdingsRecords2(limit: 100) {
+        hrid
         temporaryLocation {
           institution { name }
           library { name }

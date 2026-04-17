@@ -24,11 +24,6 @@ $inc = $self->{inc};
 
 	sub Inline {
 		my ($class, $lang) = @_;
-		if ($lang ne 'C') {
-			warn "Warning: Inline hints not available for $lang language
-";
-			return;
-		}
 		+{ map { (uc($_) => $self->{$_}) } qw(inc libs typemaps) };
 	}
 

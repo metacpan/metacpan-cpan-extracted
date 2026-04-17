@@ -7,8 +7,10 @@
 #define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
 #define PERL_DECIMAL_VERSION \
 	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
-#define PERL_VERSION_GE(r,v,s) \
+#ifndef PERL_VERSION_GE
+# define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#endif /* !PERL_VERSION_GE */
 
 #ifndef op_append_elem
 # define op_append_elem(t, f, l) THX_op_append_elem(aTHX_ t, f, l)
@@ -31,6 +33,10 @@ static OP *THX_op_append_elem(pTHX_ I32 type, OP *first, OP *last)
 #endif /* !op_append_elem */
 
 #ifndef qerror
+  /* Perl_qerror is exported (EXp) on all platforms but its declaration
+   * is hidden behind PERL_CORE/PERL_EXT header guards. Declare it
+   * ourselves so we can use it. */
+  EXTERN_C void Perl_qerror(pTHX_ SV *err);
 # define qerror(m) Perl_qerror(aTHX_ m)
 #endif /* !qerror */
 
@@ -300,6 +306,32 @@ MY_EXPORT_CALLCONV void QPFXD(scp1)(pTHX_ CV *cv,
 
 #endif /* Q_PARSER_AVAILABLE */
 
+/*
+ * Find a CV by name, checking lexical hints first (for Lexical::Sub
+ * and similar modules), then falling back to package lookup.
+ * This is more reliable than rv2cv_op_cv() on threaded/debugging perls.
+ *
+ * Lexical::Sub (via Lexical::Var) stores CVs with the key format:
+ *   "Lexical::Var/&subname"
+ */
+static CV *THX_find_lexical_cv(pTHX_ char *name, STRLEN len)
+{
+	/* Check %^H hints hash - where Lexical::Sub stores its subs */
+	if ((PL_hints & HINT_LOCALIZE_HH) && GvHV(PL_hintgv)) {
+		SV *keysv;
+		SV **svp;
+		/* Construct the Lexical::Var key format: "Lexical::Var/&name" */
+		keysv = newSVpvs("Lexical::Var/&");
+		sv_catpvn(keysv, name, len);
+		svp = hv_fetch(GvHV(PL_hintgv), SvPVX(keysv), (I32)SvCUR(keysv), 0);
+		SvREFCNT_dec(keysv);
+		if (svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV) {
+			return (CV*)SvRV(*svp);
+		}
+	}
+	return NULL;
+}
+
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 static int my_keyword_plugin(pTHX_
 	char *keyword_ptr, STRLEN keyword_len, OP **op_ptr)
@@ -311,6 +343,35 @@ static int my_keyword_plugin(pTHX_
 	SV *psobj;
 	U32 parser_flags;
 	/*
+	 * First, check for lexically-scoped CVs directly in %^H.
+	 * This handles Lexical::Sub and similar modules reliably
+	 * across all Perl configurations (threaded, debugging, etc.).
+	 */
+	cv = THX_find_lexical_cv(aTHX_ keyword_ptr, keyword_len);
+	if (cv) {
+		QPFXD(gcp0)(aTHX_ cv, &psfun, &psobj);
+		if (psfun || psobj) {
+			/* Found lexical CV with call parser - use it */
+			nmop = newSVOP(OP_CONST, 0,
+				newSVpvn(keyword_ptr, keyword_len));
+			nmop->op_private = OPpCONST_BARE;
+			cvop = newUNOP(OP_RV2CV, 0,
+				newSVOP(OP_CONST, 0, newRV_inc((SV*)cv)));
+			namegv = (GV*)newSVpvn(keyword_ptr, keyword_len);
+			parser_flags = 0;
+			argsop = psfun(aTHX_ namegv, psobj, &parser_flags);
+			SvREFCNT_dec((SV*)namegv);
+			if(!(parser_flags & CALLPARSER_PARENS))
+				cvop->op_private |= OPpENTERSUB_NOPAREN;
+			*op_ptr = newUNOP(OP_ENTERSUB, OPf_STACKED,
+				op_append_elem(OP_LIST, argsop, cvop));
+			return (parser_flags & CALLPARSER_STATEMENT) ?
+				KEYWORD_PLUGIN_STMT : KEYWORD_PLUGIN_EXPR;
+		}
+	}
+	/*
+	 * Fall back to original op-based lookup for package subs.
+	 *
 	 * Creation of the rv2cv op below (or more precisely its gv op
 	 * child created during checking) uses a pad slot under threads.
 	 * Normally this is fine, but early versions of the padrange

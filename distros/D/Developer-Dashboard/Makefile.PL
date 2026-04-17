@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Fcntl" => 0,
     "File::Basename" => 0,
+    "File::Copy" => 0,
     "File::Find" => 0,
     "File::Path" => 0,
     "File::ShareDir" => 0,
@@ -85,7 +86,7 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.37",
+  "VERSION" => "2.43",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -103,6 +104,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "Fcntl" => 0,
   "File::Basename" => 0,
+  "File::Copy" => 0,
   "File::Find" => 0,
   "File::Path" => 0,
   "File::ShareDir" => 0,

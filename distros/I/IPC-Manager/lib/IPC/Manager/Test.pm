@@ -409,9 +409,14 @@ sub test_workers {
                     exit 0;
                 };
 
-                open my $fh, '>', $longpid_file or die "open: $!";
+                # Write pid atomically: the parent polls for file existence,
+                # so we cannot let it observe an empty file before close()
+                # has flushed the pid.
+                my $tmp = "$longpid_file.tmp";
+                open my $fh, '>', $tmp or die "open: $!";
                 print $fh "$$\n";
                 close $fh;
+                rename($tmp, $longpid_file) or die "rename: $!";
 
                 sleep 1 while 1;
                 return 0;
@@ -650,12 +655,17 @@ sub test_service_callbacks {
     }
     ok(-e $interval_file, "on_interval callback fired");
 
-    # Trigger peer_delta by connecting a new client to the same bus
+    # Trigger peer_delta by connecting a new client to the same bus.
+    # The service polls at its interval (0.1s above), but slow CI machines
+    # can take much longer to schedule the service's poll, so wait for the
+    # callback to actually fire instead of relying on a fixed sleep.
     my $extra = ipcm_connect('extra_peer' => $handle->ipcm_info);
-    # Let the service notice
-    Time::HiRes::sleep(0.5);
+    $waited = 0;
+    until (-e $peer_file || $waited > 10) {
+        Time::HiRes::sleep(0.1);
+        $waited += 0.1;
+    }
     $extra->disconnect;
-    Time::HiRes::sleep(0.5);
     ok(-e $peer_file, "on_peer_delta callback fired");
 
     # Trigger should_end
@@ -669,6 +679,73 @@ sub test_service_callbacks {
         $waited += 0.1;
     }
     ok(-e $cleanup_file, "on_cleanup callback fired after should_end");
+
+    $handle = undef;
+}
+
+sub test_service_on_pid {
+    my $marker_dir = File::Temp::tempdir(CLEANUP => 1);
+    my $pid_file = File::Spec->catfile($marker_dir, 'reaped_pid');
+
+    my $handle = ipcm_service(
+        'pid_svc',
+        class  => 'IPC::Manager::Service',
+        on_pid => sub {
+            my ($self, $pid, $exit) = @_;
+            open my $fh, '>>', $pid_file or die "open: $!";
+            print $fh "$pid $exit\n";
+            close $fh;
+        },
+        handle_request => sub {
+            my ($self, $req, $msg) = @_;
+
+            if ($req->{request} eq 'fork_child') {
+                my $kid = fork // die "fork: $!";
+                if (!$kid) {
+                    POSIX::_exit(5);
+                }
+                return $kid;
+            }
+
+            return undef;
+        },
+    );
+
+    my $got_pid;
+    $handle->send_request(
+        pid_svc => 'fork_child',
+        sub {
+            my ($resp, $msg) = @_;
+            $got_pid = $resp->{response};
+        },
+    );
+    $handle->await_all_responses;
+    ok($got_pid, "Got forked non-worker child pid: $got_pid");
+
+    my $waited = 0;
+    until (-s $pid_file || $waited > 5) {
+        Time::HiRes::sleep(0.1);
+        $waited += 0.1;
+    }
+    ok(-s $pid_file, "on_pid handler fired after non-worker child exit");
+
+    open my $fh, '<', $pid_file or die "open: $!";
+    my @lines = <$fh>;
+    close $fh;
+
+    my ($reaped_pid, $reaped_exit);
+    for my $line (@lines) {
+        chomp $line;
+        my ($p, $e) = split / /, $line;
+        if ($p == $got_pid) {
+            $reaped_pid = $p;
+            $reaped_exit = $e;
+            last;
+        }
+    }
+
+    is($reaped_pid, $got_pid, "on_pid got the forked child's pid");
+    is($reaped_exit >> 8, 5, "on_pid got exit value 5");
 
     $handle = undef;
 }
@@ -1329,6 +1406,13 @@ C<should_end> service callbacks in a single service.  Verifies that
 C<on_interval> fires periodically, C<on_peer_delta> fires when a new peer
 connects, C<should_end> terminates the service when its condition becomes
 true, and C<on_cleanup> runs during shutdown.
+
+=item IPC::Manager::Test->test_service_on_pid
+
+Tests the C<on_pid> callback.  The service forks a non-worker child from inside
+a request handler, returning the child's PID.  The child exits with a known
+status and the test verifies C<on_pid> was invoked with the matching PID and
+exit value.
 
 =item IPC::Manager::Test->test_service_signal_handling
 

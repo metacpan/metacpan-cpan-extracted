@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Loo-*' },
-
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     # XS configuration
     INC    => '-I. -Iinclude',
     OBJECT => '$(O_FILES)',

@@ -52,6 +52,10 @@ ACTUAL PRESETS
 EXAMPLE
      run-command-to-fail -n 10 -p blank true
 
+SEE ALSO
+    quicktest
+        Run prove repeatedly until failure.
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-Run-Command-ToFail>
 
@@ -61,10 +65,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

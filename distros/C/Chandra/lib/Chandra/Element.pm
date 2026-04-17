@@ -5,7 +5,7 @@ use warnings;
 
 use Chandra::Bind;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.

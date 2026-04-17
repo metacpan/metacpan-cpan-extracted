@@ -26,6 +26,7 @@ t/MARC-Leader-L10N-en/01-use.t
 t/MARC-Leader-L10N-en/02-version.t
 t/MARC-Leader-L10N/01-use.t
 t/MARC-Leader-L10N/02-version.t
+t/MARC-Leader-L10N/03-get_handle.t
 xt/MARC-Leader-L10N-cs/01-pod_coverage.t
 xt/MARC-Leader-L10N-cs/02-pod.t
 xt/MARC-Leader-L10N-en/01-pod_coverage.t

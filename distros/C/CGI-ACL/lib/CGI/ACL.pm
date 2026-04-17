@@ -24,6 +24,8 @@ use namespace::clean;
 use Carp;
 use Net::CIDR;
 use Regexp::Common qw/net/;
+use Object::Configure;
+use Params::Get;
 use Scalar::Util;
 use Socket;
 
@@ -33,11 +35,11 @@ CGI::ACL - Decide whether to allow a client to run this script
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -63,6 +65,12 @@ Includes basic error handling for invalid arguments.
 
     my $acl = CGI::ACL->new(allowed_ips => { '127.0.0.1' => 1 });
 
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting C<$ENV{'CGI__ACL__allowed_ips'}>.
+For more information about configuring object constructors at runtime,
+see L<Object::Configure>.
+
 =cut
 
 sub new
@@ -70,18 +78,10 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args;
-	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
-		%args = %{$_[0]};
-	} elsif((@_ % 2) == 0) {
-		%args = @_;
-	} else {
-		carp(__PACKAGE__, ': Invalid arguments passed to new()');
-		return;
-	}
+	my $params = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
+		if(defined($params)) {
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
@@ -89,10 +89,14 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+		$params ||= {};
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	return bless { %args }, $class;
+	# Load the configuration from a config file, if provided
+	$params = Object::Configure::configure($class, $params);
+
+	return bless $params, $class;
 }
 
 =head2 allow_ip
@@ -308,7 +312,7 @@ sub all_denied {
 sub _is_cloud_host {
 	my $ip = $_[0];
 
-	my $hostname = verified_rdns($ip) or return 0;
+	my $hostname = _verified_rdns($ip) or return 0;
 
 	# AWS
 	return 1 if $hostname =~ /\.compute(-\d+)?\.amazonaws\.com$/;
@@ -345,10 +349,10 @@ sub _verified_rdns {
 	my $packed = inet_aton($ip) or return;
 
 	# Step 1: reverse lookup
-	my ($hostname) = gethostbyaddr($packed, AF_INET) or return;
+	my $hostname = gethostbyaddr($packed, AF_INET) or return;
 
 	# Step 2: forward lookup
-		my @forward_ips = map { inet_ntoa($_) }
+	my @forward_ips = map { inet_ntoa($_) }
 		grep { defined }
 		map { inet_aton($_) }
 		($hostname);
@@ -410,7 +414,13 @@ A VPN or proxy would most likely bypass the IP-based access control.
 
 =head1 SEE ALSO
 
-L<CGI::Lingua>
+=over 4
+
+=item * L<CGI::Lingua>
+
+=item * L<Object::Configure>
+
+=back
 
 =head1 SUPPORT
 

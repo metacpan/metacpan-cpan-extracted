@@ -15,3 +15,16 @@ dzil-local/
 *~
 *.swp
 *.bak
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# Local planning artifacts
+docs/superpowers/

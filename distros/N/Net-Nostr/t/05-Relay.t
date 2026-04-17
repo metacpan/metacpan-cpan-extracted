@@ -5,7 +5,9 @@ use Test2::V0 -no_srand => 1;
 use AnyEvent;
 use AnyEvent::WebSocket::Client;
 use JSON;
+use File::Temp qw(tempdir tempfile);
 use IO::Socket::INET;
+use IO::Socket::SSL::Utils qw(CERT_create PEM_cert2file PEM_key2file);
 
 use Net::Nostr::Relay;
 use Net::Nostr::Event;
@@ -27,9 +29,15 @@ sub free_port {
 # Returns the client connection (must be stored to prevent GC).
 sub connect_to_relay {
     my ($port, $cv_or_cb) = @_;
-    my $client = AnyEvent::WebSocket::Client->new;
+    return connect_to_relay_url("ws://127.0.0.1:$port", {}, $cv_or_cb);
+}
+
+sub connect_to_relay_url {
+    my ($url, $client_args, $cv_or_cb) = @_;
+    $client_args ||= {};
+    my $client = AnyEvent::WebSocket::Client->new(%$client_args);
     my $client_conn;
-    $client->connect("ws://127.0.0.1:$port")->cb(sub {
+    $client->connect($url)->cb(sub {
         $client_conn = eval { shift->recv };
         return unless $client_conn;
         # delay to let server establish handler
@@ -39,6 +47,18 @@ sub connect_to_relay {
         });
     });
     return \$client_conn; # return ref to keep alive
+}
+
+sub create_tls_material {
+    my $dir = tempdir(CLEANUP => 1);
+    my ($cert, $key) = CERT_create(
+        subject => { commonName => '127.0.0.1' },
+    );
+    my $cert_file = "$dir/cert.pem";
+    my $key_file  = "$dir/key.pem";
+    PEM_cert2file($cert, $cert_file);
+    PEM_key2file($key, $key_file);
+    return ($dir, $cert_file, $key_file);
 }
 
 ###############################################################################
@@ -69,6 +89,28 @@ subtest 'start accepts WebSocket connections' => sub {
     my $ref = connect_to_relay($port, sub { $cv->send(1) });
 
     ok($cv->recv, 'client connects successfully');
+    $relay->stop;
+};
+
+subtest 'start accepts secure WebSocket connections' => sub {
+    my $port = free_port();
+    my ($tmpdir, $cert_file, $key_file) = create_tls_material();
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        ssl_cert_file     => $cert_file,
+        ssl_key_file      => $key_file,
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $ref = connect_to_relay_url(
+        "wss://127.0.0.1:$port",
+        { ssl_no_verify => 1 },
+        sub { $cv->send(1) },
+    );
+
+    ok($cv->recv, 'client connects successfully over wss');
     $relay->stop;
 };
 
@@ -145,6 +187,46 @@ subtest 'relay responds OK to EVENT' => sub {
 
         $conn->send(Net::Nostr::Message->new(type => 'EVENT', event => $event)->serialize);
     });
+
+    my $response = $cv->recv;
+    ok(defined $response, 'got response');
+    my $parsed = $JSON->decode($response);
+    is($parsed->[0], 'OK', 'response type is OK');
+    is($parsed->[1], $event->id, 'OK references event id');
+    is($parsed->[2], JSON::true, 'event accepted');
+
+    $relay->stop;
+};
+
+subtest 'relay responds OK to EVENT over secure WebSocket' => sub {
+    my $port = free_port();
+    my ($tmpdir, $cert_file, $key_file) = create_tls_material();
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        ssl_cert_file     => $cert_file,
+        ssl_key_file      => $key_file,
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $event = Net::Nostr::Event->new(
+        pubkey => 'a' x 64, kind => 1, content => 'hello over tls',
+        sig => 'b' x 128, created_at => 1000, tags => [],
+    );
+    my $ref = connect_to_relay_url(
+        "wss://127.0.0.1:$port",
+        { ssl_no_verify => 1 },
+        sub {
+            my ($conn) = @_;
+            $conn->on(each_message => sub {
+                my ($c, $msg) = @_;
+                $cv->send($msg->body);
+            });
+
+            $conn->send(Net::Nostr::Message->new(type => 'EVENT', event => $event)->serialize);
+        },
+    );
 
     my $response = $cv->recv;
     ok(defined $response, 'got response');
@@ -860,6 +942,88 @@ subtest 'relay sends AUTH challenge on new connection' => sub {
     $relay->stop;
 };
 
+subtest 'relay accepts first EVENT sent immediately after connect' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $event = Net::Nostr::Event->new(
+        pubkey => 'a' x 64, kind => 1, content => 'immediate event',
+        sig => 'b' x 128, created_at => 1000, tags => [],
+    );
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $client = AnyEvent::WebSocket::Client->new;
+    my $conn_ref;
+    $client->connect("ws://127.0.0.1:$port")->cb(sub {
+        my $conn = eval { shift->recv };
+        die $@ if $@;
+        $conn_ref = $conn; # keep alive
+        $conn->on(each_message => sub {
+            my ($c, $msg) = @_;
+            my $parsed = $JSON->decode($msg->body);
+            $cv->send($parsed) if $parsed->[0] eq 'OK';
+        });
+
+        # Send immediately, without the delayed helper, to catch handler-ordering races.
+        $conn->send(Net::Nostr::Message->new(type => 'EVENT', event => $event)->serialize);
+    });
+
+    my $parsed = $cv->recv;
+    is($parsed->[0], 'OK', 'response is OK');
+    is($parsed->[1], $event->id, 'OK references event id');
+    is($parsed->[2], JSON::true, 'event accepted');
+
+    $relay->stop;
+};
+
+subtest '_syswrite_all helper writes full payload to filehandle' => sub {
+    my ($fh, $path) = tempfile();
+
+    my $written = Net::Nostr::Relay::_syswrite_all($fh, 'hello world');
+    close $fh;
+
+    open my $rfh, '<', $path or die "open temp file for read: $!";
+    local $/;
+    my $buf = <$rfh>;
+    close $rfh;
+
+    is($written, 11, 'returns number of bytes written');
+    is($buf, 'hello world', 'full payload written');
+};
+
+subtest '_write_all helper advances across partial writes' => sub {
+    my @offsets;
+    my $written = '';
+    my @returns = (2, 1, 3);
+
+    my $count = Net::Nostr::Relay::_write_all(sub {
+        my ($buf, $off) = @_;
+        push @offsets, $off;
+        my $n = shift @returns;
+        $written .= substr($buf, $off, $n) if defined $n && $n > 0;
+        return $n;
+    }, 'abcdef');
+
+    is($count, 6, 'returns bytes written across partial writes');
+    is($written, 'abcdef', 'all data segments written in order');
+    is(\@offsets, [0, 2, 3], 'writer called with advancing offsets');
+};
+
+subtest '_write_all helper stops on zero-byte write' => sub {
+    my $calls = 0;
+
+    my $count = Net::Nostr::Relay::_write_all(sub {
+        my ($buf, $off) = @_;
+        $calls++;
+        return 0;
+    }, 'abcdef');
+
+    is($count, 0, 'zero-byte write stops without progress');
+    is($calls, 1, 'writer called once');
+};
+
 subtest 'relay rejects kind 22242 via EVENT (must use AUTH)' => sub {
     my $port = free_port();
     my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
@@ -988,6 +1152,31 @@ subtest 'relay with relay_info still accepts WebSocket' => sub {
     $relay->stop;
 };
 
+subtest 'relay with relay_info still accepts secure WebSocket' => sub {
+    use Net::Nostr::RelayInfo;
+
+    my $port = free_port();
+    my ($tmpdir, $cert_file, $key_file) = create_tls_material();
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        relay_info        => Net::Nostr::RelayInfo->new(name => 'Test'),
+        ssl_cert_file     => $cert_file,
+        ssl_key_file      => $key_file,
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $ref = connect_to_relay_url(
+        "wss://127.0.0.1:$port",
+        { ssl_no_verify => 1 },
+        sub { $cv->send('connected') },
+    );
+
+    is($cv->recv, 'connected', 'WebSocket connects with relay_info set over wss');
+    $relay->stop;
+};
+
 ###############################################################################
 # Per-filter limit semantics (NIP-01)
 ###############################################################################
@@ -1110,6 +1299,14 @@ subtest 'new() rejects unknown arguments' => sub {
         dies { Net::Nostr::Relay->new(bogus => 'value') },
         qr/unknown.+bogus/i,
         'unknown argument rejected'
+    );
+};
+
+subtest 'new() rejects ssl_key_file without ssl_cert_file' => sub {
+    like(
+        dies { Net::Nostr::Relay->new(ssl_key_file => 'key.pem') },
+        qr/ssl_key_file requires ssl_cert_file/,
+        'ssl_key_file requires ssl_cert_file',
     );
 };
 
@@ -2930,6 +3127,48 @@ subtest 'idle_timeout: cleanup after disconnect removes timer state' => sub {
 };
 
 ###############################################################################
+# Deferred message processing: messages for disconnected clients are dropped
+###############################################################################
+
+subtest 'deferred processing drops messages for server-removed connections' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+
+    my $ws = AnyEvent::WebSocket::Client->new;
+    $ws->connect("ws://127.0.0.1:$port")->cb(sub {
+        my $conn = eval { shift->recv } or return;
+        my $t; $t = AnyEvent->timer(after => 0.15, cb => sub {
+            undef $t;
+            # Send a message, then forcefully remove the connection from the
+            # server side before AE::postpone fires, simulating a server-
+            # initiated disconnect during the deferral window.
+            my $event = Net::Nostr::Event->new(
+                pubkey => 'a' x 64, kind => 1, content => 'ghost',
+                sig => 'b' x 128, created_at => 1000, tags => [],
+            );
+            $conn->send(Net::Nostr::Message->new(type => 'EVENT', event => $event)->serialize);
+            # Wipe all server-side connection state before postpone runs
+            $relay->_connections({});
+            # Wait for deferred processing to run (and be skipped)
+            my $t2; $t2 = AnyEvent->timer(after => 0.3, cb => sub {
+                undef $t2;
+                $cv->send(1);
+            });
+        });
+    });
+
+    ok($cv->recv, 'no crash when processing message after server removes connection');
+    my $events = $relay->events || [];
+    is(scalar @$events, 0, 'event was not stored for removed connection');
+
+    $relay->stop;
+};
+
+###############################################################################
 # _relay_host_matches: URL normalization
 ###############################################################################
 
@@ -3018,6 +3257,92 @@ subtest '_relay_host_matches: bracketed IPv6' => sub {
     ok(Net::Nostr::Relay::_relay_host_matches(
         'ws://[::1]:80', 'ws://[::1]'),
         'IPv6 default port normalization');
+};
+
+###############################################################################
+# Multi-letter tag filters via REQ
+###############################################################################
+
+subtest 'REQ with multi-letter tag filter matches stored events' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my @messages;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $ref = connect_to_relay($port, sub {
+        my ($conn) = @_;
+        my $phase = 'store';
+        $conn->on(each_message => sub {
+            my ($c, $msg) = @_;
+            my $parsed = $JSON->decode($msg->body);
+            if ($phase eq 'store') {
+                $phase = 'query';
+                $c->send($JSON->encode([
+                    'REQ', 'mlsub', { '#overnet_et' => ['chat'] },
+                ]));
+            } else {
+                push @messages, $parsed;
+                $cv->send() if $parsed->[0] eq 'EOSE';
+            }
+        });
+
+        my $event = Net::Nostr::Event->new(
+            pubkey => 'a' x 64, kind => 1, content => 'hello',
+            sig => 'b' x 128, created_at => 1000,
+            tags => [['overnet_et', 'chat'], ['overnet_ot', 'msg']],
+        );
+        $conn->send(Net::Nostr::Message->new(type => 'EVENT', event => $event)->serialize);
+    });
+
+    $cv->recv;
+    is(scalar @messages, 2, 'got EVENT + EOSE');
+    is($messages[0][0], 'EVENT', 'first message is EVENT');
+    is($messages[0][2]{tags}[0][0], 'overnet_et', 'event has multi-letter tag');
+    is($messages[1][0], 'EOSE', 'second message is EOSE');
+
+    $relay->stop;
+};
+
+subtest 'REQ with multi-letter tag filter rejects non-matching events' => sub {
+    my $port = free_port();
+    my $relay = Net::Nostr::Relay->new(verify_signatures => 0);
+    $relay->start('127.0.0.1', $port);
+
+    my @messages;
+    my $cv = AnyEvent->condvar;
+    my $timeout = AnyEvent->timer(after => 5, cb => sub { $cv->croak("timeout") });
+    my $ref = connect_to_relay($port, sub {
+        my ($conn) = @_;
+        my $phase = 'store';
+        $conn->on(each_message => sub {
+            my ($c, $msg) = @_;
+            my $parsed = $JSON->decode($msg->body);
+            if ($phase eq 'store') {
+                $phase = 'query';
+                $c->send($JSON->encode([
+                    'REQ', 'mlsub', { '#overnet_et' => ['relay'] },
+                ]));
+            } else {
+                push @messages, $parsed;
+                $cv->send() if $parsed->[0] eq 'EOSE';
+            }
+        });
+
+        my $event = Net::Nostr::Event->new(
+            pubkey => 'a' x 64, kind => 1, content => 'hello',
+            sig => 'b' x 128, created_at => 1000,
+            tags => [['overnet_et', 'chat']],
+        );
+        $conn->send(Net::Nostr::Message->new(type => 'EVENT', event => $event)->serialize);
+    });
+
+    $cv->recv;
+    is(scalar @messages, 1, 'got only EOSE');
+    is($messages[0][0], 'EOSE', 'no matching events returned');
+
+    $relay->stop;
 };
 
 done_testing;

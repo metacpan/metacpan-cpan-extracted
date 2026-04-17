@@ -7,51 +7,55 @@ response:
   content: |
     {
       "kind": "tasks#taskList",
-      "id": "c0NEaGRSQTQxMjhxcmJVeA",
-      "etag": "\"mgpYDD0d69k\"",
+      "id": "aFFSOHRxZlR4X1BJblZTdQ",
+      "etag": "\"OJ02PFASGPc\"",
       "title": "Test Task List",
-      "updated": "2026-04-13T23:51:16.353Z",
-      "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/c0NEaGRSQTQxMjhxcmJVeA"
+      "updated": "2026-04-16T19:15:31.771Z",
+      "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/aFFSOHRxZlR4X1BJblZTdQ"
     }
   headers:
-  - date
-  - Mon, 13 Apr 2026 23:51:16 GMT
-  - x-l2-request-path
-  - l2-managed-14
-  - content-type
-  - application/json; charset=UTF-8
-  - x-content-type-options
-  - nosniff
+  - x-xss-protection
+  - '0'
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-content-type-options
+  - nosniff
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
+  - x-l2-request-path
+  - l2-managed-14
   - server
   - ESF
-  - x-frame-options
-  - SAMEORIGIN
+  - content-type
+  - application/json; charset=UTF-8
   - transfer-encoding
   - chunked
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Thu, 16 Apr 2026 19:15:31 GMT
   - accept-ranges
   - none
-  - x-xss-protection
-  - '0'
   message: OK
 source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
 
 ---
-request: DELETE /tasks/v1/users/@me/lists/c0NEaGRSQTQxMjhxcmJVeA
+request: DELETE /tasks/v1/users/@me/lists/aFFSOHRxZlR4X1BJblZTdQ
 response:
   code: 204
   content: ''
   headers:
+  - x-l2-request-path
+  - l2-managed-14
+  - server
+  - ESF
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - x-xss-protection
-  - '0'
-  - content-length
   - '0'
   - vary
   - Origin
@@ -61,18 +65,14 @@ response:
   - Referer
   - x-content-type-options
   - nosniff
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - date
+  - Thu, 16 Apr 2026 19:15:34 GMT
   - x-frame-options
   - SAMEORIGIN
-  - server
-  - ESF
-  - date
-  - Mon, 13 Apr 2026 23:51:17 GMT
-  - x-l2-request-path
-  - l2-managed-14
   - content-type
   - application/json; charset=UTF-8
+  - content-length
+  - '0'
   message: No Content
 source: Test::Google::RestApi::TasksApi1::create_and_delete_task_list
 
@@ -92,22 +92,20 @@ response:
       ]
     }
   headers:
-  - transfer-encoding
-  - chunked
-  - x-xss-protection
-  - '0'
-  - x-l2-request-path
-  - l2-managed-14
-  - x-frame-options
-  - SAMEORIGIN
-  - server
-  - ESF
   - accept-ranges
   - none
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Thu, 16 Apr 2026 19:15:35 GMT
   - content-type
   - application/json; charset=UTF-8
-  - date
-  - Mon, 13 Apr 2026 23:51:19 GMT
+  - transfer-encoding
+  - chunked
+  - server
+  - ESF
+  - x-l2-request-path
+  - l2-managed-14
   - x-content-type-options
   - nosniff
   - vary
@@ -118,6 +116,8 @@ response:
   - Origin,Accept-Encoding
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
   message: OK
 source: Test::Google::RestApi::TasksApi1::list_task_lists
 
@@ -137,32 +137,32 @@ response:
       ]
     }
   headers:
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - accept-ranges
+  - none
+  - x-frame-options
+  - SAMEORIGIN
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
+  - x-l2-request-path
+  - l2-managed-14
+  - date
+  - Thu, 16 Apr 2026 19:15:37 GMT
   - x-content-type-options
   - nosniff
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-  - x-frame-options
-  - SAMEORIGIN
-  - server
-  - ESF
-  - date
-  - Mon, 13 Apr 2026 23:51:21 GMT
-  - x-l2-request-path
-  - l2-managed-14
-  - content-type
-  - application/json; charset=UTF-8
   - x-xss-protection
   - '0'
-  - accept-ranges
-  - none
-  - transfer-encoding
-  - chunked
+  - server
+  - ESF
   message: OK
 source: Test::Google::RestApi::TasksApi1::list_task_lists_max_pages
 

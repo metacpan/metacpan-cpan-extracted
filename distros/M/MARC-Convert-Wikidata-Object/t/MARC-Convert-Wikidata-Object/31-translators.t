@@ -25,5 +25,5 @@ my $translator = MARC::Convert::Wikidata::Object::People->new(
 $obj = MARC::Convert::Wikidata::Object->new(
 	'translators' => [$translator],
 );
-my @translators = $obj->translators;
+my @translators = @{$obj->translators};
 is(@translators, 1, 'Get number of translators.');

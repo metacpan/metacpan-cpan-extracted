@@ -22,7 +22,7 @@ Readonly::Array our @TYPE => qw(a c d e f g i j k m o p r t);
 Readonly::Array our @TYPE_OF_CONTROL => (' ', 'a');
 Readonly::Array our @UNDEFINED => ('0');
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 has bibliographic_level => (
 	is => 'ro',
@@ -567,7 +567,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2025 Michal Josef Špaček
+© 2023-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
@@ -580,6 +580,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

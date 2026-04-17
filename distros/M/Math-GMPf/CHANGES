@@ -1,5 +1,8 @@
 Revision history for Perl module Math::GMPf
 
+0.57
+ - Correction to t/get_set_NV.t
+
 0.56
  - In t/get_set_NV.t, cater for some bugginess (now fixed in mpfr trunk)
    in the mpfr library that would have some IEEE 754 subnormal values

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zitadel-auth-proxy
+  namespace: zitadel
+spec:
+  selector:
+    app: zitadel-auth-proxy
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000

@@ -89,6 +89,7 @@ AssgnmtCxlConf,AssignmentCancellationConfirmation
 Assgnr,Assigner
 AssoctdPoolAcct,AssociatedPoolAccount
 Authstn,Authorisation
+AvlblAmt,AvailableAmount
 Avlbty,Availability
 AvrgAmt,AverageAmount
 BIC,BIC
@@ -125,6 +126,11 @@ BkToCstmrStmt,BankToCustomerStatement
 BkTxCd,BankTransactionCode
 BldgNb,BuildingNumber
 BldgNm,BuildingName
+BllgId,BillingId
+BllgPrd,BillingPeriod
+BllgRpt,BillingReport
+BllgRptOrErr,BillingReportOrError
+BllgRptReq,BillingReportRequest
 BllgStmt,BillingStatement
 BllgStmtGrp,BillingStatementGroup
 BnfcryInstn,BeneficiaryInstitution
@@ -260,6 +266,7 @@ Crit,Criteria
 CrrctdAmt,CorrectedAmount
 CrrctnTx,CorrectionTransaction
 CshAcct,CashAccount
+CshAcctId,CashAccountId
 CshAcctOwnr,CashAccountOwner
 CshAcctSvcr,CashAccountServicer
 CshDpst,CashDeposit
@@ -308,6 +315,7 @@ Cxl,Cancellation
 CxlDtls,CancellationDetails
 CxlId,CancellationId
 CxlReqId,CancellationRequestId
+CxlRpt,CancellationReport
 CxlRsn,CancellationReason
 CxlRsnInf,CancellationReasonInformation
 CxlStsId,CancellationStatusId
@@ -346,6 +354,7 @@ DfltLmtTp,DefaultLimitType
 DfltRsvatn,DefaultReservation
 DfltRsvatnTp,DefaultReservationType
 DgtlSgntr,DigitalSignature
+DgtlTknUnit,DigitalTokenUnit
 DispCpblties,DisplayCapabilities
 DispTp,DisplayType
 DlvrgAgt,DeliveringAgent
@@ -572,6 +581,8 @@ IntrmyAgt3Acct,IntermediaryAgent3Account
 IntrmyInd,IntermediaryInd
 Intrst,Interest
 IntrstRate,InterestRate
+InvcDt,InvoiceDate
+InvcLglStmt,InvoiceLegalStatement
 InvcNb,InvoiceNumber
 Invcee,Invoicee
 Invcr,Invoicer
@@ -591,6 +602,9 @@ Issr,Issuer
 Itm,Item
 ItmSts,ItemStatus
 JobTitl,JobTitle
+JrnlActvtyDt,JournalActivityDate
+JrnlDt,JournalDate
+JrnlNtry,JournalEntry
 Justfn,Justification
 KeyAttrbtsInd,KeyAttributesInd
 LEI,LEI
@@ -618,8 +632,13 @@ LmtCrit,LimitCriteria
 LmtData,LimitData
 LmtDtls,LimitDetails
 LmtId,LimitId
+LmtJrnl,LimitJournal
 LmtOrErr,LimitOrError
 LmtQryDef,LimitQueryDefinitions
+LmtRpt,LimitReport
+LmtTp,LimitType
+LmtUtlstnJrnlQry,LimitUtilisationJournalQuery
+LmtUtlstnJrnlRpt,LimitUtilisationJournalReport
 LmtValAmdmnt,LimitValueAmendment
 LmtVldAsOfDt,LimitValidAsOfDate
 Lng,Long
@@ -763,12 +782,14 @@ NtryTp,EntryType
 NtwkRef,NetworkReference
 OblgtnDrctn,ObligationDirection
 OblgtnId,ObligationId
-OdLmtValSet,
+OdLmtValSet,OldLimitValueSet
+OffclCorpActnEvtId,OfficialCorporateActionEventId
 OnLineCpblties,OnLineCapabilities
 OprlErr,OperationalError
 OrgId,OrganisationId
 OrgnlAcct,OriginalAccount
 OrgnlAndCurFaceAmt,OriginalAndCurrentFaceAmount
+OrgnlBizInstr,OriginalBusinessInstrument
 OrgnlBizQry,OriginalBusinessQuery
 OrgnlBkTxCd,OriginalBankTransactionCode
 OrgnlCdtrAgt,OriginalCreditorAgent
@@ -871,6 +892,7 @@ PhneNb,PhoneNumber
 PlainCardData,PlainCardData
 PlcAndNm,PlaceAndName
 Pmt,Payment
+PmtClrCentr,PaymentClearanceCenter
 PmtCmonInf,PaymentCommonInformation
 PmtCtrl,PaymentControl
 PmtCxlId,PaymentCancellationId
@@ -1010,10 +1032,12 @@ ReqdExctnDtInd,RequestedExecutionDateInd
 ReqdExctnDtTm,RequestedExecutionDateTime
 ReqdMsgNmId,RequestMessageNameId
 ReqdNAVCcy,RequestedNAVCurrency
+ReqdSttlmDt,RequestedSettlementDate
 ReqdTxTp,RequestedTransactionType
 ReqdValtn,RequestedValidation
 RfrdDocAmt,ReferencedDocumentsAmount
 RfrdDocInf,ReferencedDocumentInformation
+RgltryData,RegelatoryData
 Rgn,Region
 RgnId,RegionId
 RgnNb,RegionNumber
@@ -1024,6 +1048,7 @@ RjctdMod,RejectedModification
 RjctnRsn,RejectionReason
 RltdAcct,RelatedAccount
 RltdAgts,RelatedAgents
+RltdCorpActn,RelatedCorporateAction
 RltdDt,RelatedDate
 RltdDts,RelatedDates
 RltdFileData,RelatedFileFata
@@ -1088,6 +1113,7 @@ RtrBizDayInf,ReturnBusinessDayInformation
 RtrCcyXchgRate,ReturnCurrencyExchangeRate
 RtrCrit,ReturnCriteria
 RtrGnlBizInf,ReturnGeneralBusinessInformation
+RtrId,ReturnId
 RtrInf,ReturnInformation
 RtrLmt,ReturnLimit
 RtrMmb,ReturnMember
@@ -1105,6 +1131,8 @@ SchCrit,SearchCriteria
 SchdlTp,ScheduledType
 SchdldTm,ScheduledTime
 SchmeNm,SchemeName
+SctiesAcctId,SecuritiesAccountId
+SctiesData,SecuritiesData
 SctiesForm,SecuritiesForm
 SctiesSttlmTxId,SecuritiesSettlementTransactionId
 SctiesTxRefs,SecuritiesTransactionReferences
@@ -1171,6 +1199,7 @@ SttlmCcy,SettlementCurrency
 SttlmCcyCd,SettlementCurrencyCode
 SttlmDt,SettlementDate
 SttlmInf,SettlementInformation
+SttlmInstr,SettlementInstrument
 SttlmMtd,SettlementMethod
 SttlmPlc,SettlementPlace
 SttlmSsnIdr,SettlementSessionIdentifier
@@ -1298,7 +1327,7 @@ UltmtCdtr,UltimateCreditor
 UltmtDbtr,UltimateDebitor
 Umtchd,Unmatched
 Undrlyg,Underlying
-UndrlygAllcn,
+UndrlygAllcn,UnderlyingAllocation
 UndrlygInstrm,UnderlyingInstrument
 UndrlygIntraBal,UnderlyingIntraBalance
 UndrlygTx,UnderlyingTransaction
@@ -1307,6 +1336,7 @@ UnitCcy,UnitCurrency
 UnitNb,UnitNumber
 UnitPric,UnitPrice
 UnitsNb,UnitsNumber
+UnqTxIdr,UniqueTransactionIdentifier
 UpdTp,UpdateType
 UsdAmt,UsedAmount
 UsdAmtCdtDbtInd,UsedAmountCreditDebitInd
@@ -1315,6 +1345,7 @@ UsdPctg,UsedPercentage
 UsdPctgInd,UsedPercentageInd
 UsrDfnd,UserDefined
 Ustrd,Unstructured
+UtlstnAmt,UtilisationAmount
 VATRegnNb,VATRegionNumber
 Val,Value
 ValDt,ValueDate

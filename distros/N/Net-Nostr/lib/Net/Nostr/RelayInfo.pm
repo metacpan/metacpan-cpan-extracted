@@ -16,13 +16,32 @@ my @SCALAR_FIELDS = qw(
 );
 my @STRUCT_FIELDS = qw(supported_nips limitation fees);
 
+sub _copy_extension_fields {
+    my ($ext) = @_;
+    my %copy;
+    for my $k (keys %$ext) {
+        my $v = $ext->{$k};
+        $copy{$k}
+            = ref($v) eq 'HASH'  ? { %$v }
+            : ref($v) eq 'ARRAY' ? [@$v]
+            :                     $v;
+    }
+    return \%copy;
+}
+
 sub new {
     my $class = shift;
     my $self = bless { @_ }, $class;
     my %known; @known{Class::Tiny->get_all_attributes_for($class)} = ();
     @known{@STRUCT_FIELDS} = ();
-    my @unknown = grep { !exists $known{$_} } keys %$self;
-    croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
+
+    # Collect unknown keys as extension fields
+    my %ext;
+    for my $k (keys %$self) {
+        next if exists $known{$k};
+        $ext{$k} = delete $self->{$k};
+    }
+    $self->{_extensions} = _copy_extension_fields(\%ext) if %ext;
 
     # Defensive copies of structured fields
     $self->{supported_nips} = [@{$self->{supported_nips}}]
@@ -33,6 +52,12 @@ sub new {
         if ref $self->{fees} eq 'HASH';
 
     return $self;
+}
+
+sub extensions {
+    my ($self) = @_;
+    my $ext = $self->{_extensions} || {};
+    return _copy_extension_fields($ext);
 }
 
 # Read-only accessors for structured fields that return shallow copies.
@@ -56,6 +81,10 @@ sub to_json {
     for my $field (@STRUCT_FIELDS) {
         $doc{$field} = $self->$field if defined $self->$field;
     }
+    my $ext = $self->{_extensions} || {};
+    for my $k (keys %$ext) {
+        $doc{$k} = $ext->{$k};
+    }
     return JSON->new->utf8->canonical->encode(\%doc);
 }
 
@@ -63,8 +92,8 @@ sub from_json {
     my ($class, $json) = @_;
     my $data = JSON->new->utf8->decode($json);
     my %args;
-    for my $field (@SCALAR_FIELDS, @STRUCT_FIELDS) {
-        $args{$field} = $data->{$field} if exists $data->{$field};
+    for my $k (keys %$data) {
+        $args{$k} = $data->{$k};
     }
     return $class->new(%args);
 }
@@ -170,7 +199,9 @@ correct Accept header, and handle CORS preflight OPTIONS requests.
         fees             => { admission => [{ amount => 1000, unit => 'msats' }] },
     );
 
-All fields are optional and may be omitted. Croaks on unknown arguments.
+All fields are optional and may be omitted. Any unrecognized keys are
+stored as extension fields and included in C<to_json> output.  See
+L</extensions>.
 The C<name> field SHOULD be less than 30 characters. The C<pubkey> field is
 the administrative contact pubkey. The C<self> field is the relay's own
 pubkey. C<supported_nips> is an arrayref of integer NIP numbers.
@@ -216,7 +247,8 @@ subscriptions) or C<kinds> (for per-kind publication fees):
 
     my $info = Net::Nostr::RelayInfo->from_json($json_string);
 
-Parses a JSON relay information document. Unknown fields are ignored per spec.
+Parses a JSON relay information document. Unknown fields are preserved as
+extension fields and are available via L</extensions>.
 
     use HTTP::Tiny;
     my $resp = HTTP::Tiny->new->get($relay_url, {
@@ -309,6 +341,21 @@ URL for relay payment information.
 =head2 fees
 
 Hashref of fee schedules (see L</new> for structure).
+
+=head2 extensions
+
+    my $ext = $info->extensions;  # hashref or empty hashref
+
+Returns a shallow copy of any extension fields passed to the constructor
+that are not part of the NIP-11 standard fields. These are included in
+the JSON output of C<to_json> and C<to_http_response>.
+
+    my $info = Net::Nostr::RelayInfo->new(
+        name    => 'Overnet Relay',
+        overnet => { version => '1.0', features => ['chat'] },
+    );
+    my $ext = $info->extensions;
+    # { overnet => { version => '1.0', features => ['chat'] } }
 
 =head1 SEE ALSO
 

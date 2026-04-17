@@ -34,7 +34,9 @@ requires:
   English: 0
   Error::Pure: 0
   Getopt::Std: 0
+  IO::Uncompress::AnyUncompress: 0
   List::Util: 1.33
+  MARC::Batch: 0
   MARC::File::USMARC: 0
   MARC::File::XML: 1.0.4
   MARC::Leader: 0
@@ -47,4 +49,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-MARC-Filter
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-MARC-Filter
-version: '0.08'
+version: '0.09'

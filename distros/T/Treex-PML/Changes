@@ -1,5 +1,12 @@
 Revision history for Treex-PML
 
+2.29    Wed Apr 15 04:25:51 PM CEST 2026
+        Implement new methods for Seq (and add tests for the class):
+        delete_element_at, replace_element_at, replace_element_obj_at.
+
+2.28    Wed May 22 02:36:55 PM CEST 2024
+        Implement new methods for Container: set_value, set_content.
+
 2.27    Wed Apr 24 13:03:14 CEST 2024
         Make the tests 5.10 compatible.
 

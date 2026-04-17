@@ -57,7 +57,7 @@ C<data> is C<undef>, then C<undef> will be returned.
 
 =back
 
-=head2 Accessors
+=head2 Attributes
 
 =over 4
 
@@ -119,14 +119,14 @@ All C<%options> are passed to L<Business::CAMT::write()|Business::CAMT/"Read and
 
 =head1 SEE ALSO
 
-This module is part of Business-CAMT version 0.14,
-built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT version 0.15,
+built on April 16, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2024-2025 by Mark Overmeer.
+This software is copyright (c) 2024-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

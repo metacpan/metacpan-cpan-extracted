@@ -36,6 +36,14 @@ subtest 'create requires recipients' => sub {
     ) }, qr/recipients required/i, 'missing recipients');
 };
 
+subtest 'create rejects empty recipients array' => sub {
+    like(dies { Net::Nostr::DirectMessage->create(
+        sender_pubkey => $PUBKEY,
+        content       => 'hello',
+        recipients    => [],
+    ) }, qr/recipients must contain at least one recipient/i, 'empty recipients rejected');
+};
+
 ###############################################################################
 # create_file validation
 ###############################################################################
@@ -52,6 +60,57 @@ subtest 'create_file requires file_type' => sub {
     ) }, qr/file_type required/i, 'missing file_type');
 };
 
+subtest 'create_file rejects empty recipients array' => sub {
+    like(dies { Net::Nostr::DirectMessage->create_file(
+        sender_pubkey        => $PUBKEY,
+        content              => 'https://example.com/file',
+        recipients           => [],
+        file_type            => 'image/jpeg',
+        encryption_algorithm => 'aes-gcm',
+        decryption_key       => 'key',
+        decryption_nonce     => 'nonce',
+        x                    => 'f' x 64,
+    ) }, qr/recipients must contain at least one recipient/i, 'empty recipients rejected');
+};
+
+subtest 'create_file rejects unsupported encryption algorithm' => sub {
+    like(dies { Net::Nostr::DirectMessage->create_file(
+        sender_pubkey        => $PUBKEY,
+        content              => 'https://example.com/file',
+        recipients           => [$RECIPIENT],
+        file_type            => 'image/jpeg',
+        encryption_algorithm => 'chacha20',
+        decryption_key       => 'key',
+        decryption_nonce     => 'nonce',
+        x                    => 'f' x 64,
+    ) }, qr/encryption_algorithm.*aes-gcm/i, 'unsupported encryption algorithm rejected');
+};
+
+subtest 'create_file rejects invalid encrypted file hash tags' => sub {
+    like(dies { Net::Nostr::DirectMessage->create_file(
+        sender_pubkey        => $PUBKEY,
+        content              => 'https://example.com/file',
+        recipients           => [$RECIPIENT],
+        file_type            => 'image/jpeg',
+        encryption_algorithm => 'aes-gcm',
+        decryption_key       => 'key',
+        decryption_nonce     => 'nonce',
+        x                    => 'not-hex',
+    ) }, qr/x must be 64-char lowercase hex/i, 'invalid x rejected');
+
+    like(dies { Net::Nostr::DirectMessage->create_file(
+        sender_pubkey        => $PUBKEY,
+        content              => 'https://example.com/file',
+        recipients           => [$RECIPIENT],
+        file_type            => 'image/jpeg',
+        encryption_algorithm => 'aes-gcm',
+        decryption_key       => 'key',
+        decryption_nonce     => 'nonce',
+        x                    => 'f' x 64,
+        ox                   => 'not-hex',
+    ) }, qr/ox must be 64-char lowercase hex/i, 'invalid ox rejected');
+};
+
 ###############################################################################
 # create_relay_list validation
 ###############################################################################
@@ -66,6 +125,20 @@ subtest 'create_relay_list requires relays' => sub {
     like(dies { Net::Nostr::DirectMessage->create_relay_list(
         pubkey => $PUBKEY,
     ) }, qr/relays required/i, 'missing relays');
+};
+
+subtest 'create_relay_list rejects empty relay list' => sub {
+    like(dies { Net::Nostr::DirectMessage->create_relay_list(
+        pubkey => $PUBKEY,
+        relays => [],
+    ) }, qr/relays must contain at least one relay URI/i, 'empty relay list rejected');
+};
+
+subtest 'create_relay_list rejects invalid relay URIs' => sub {
+    like(dies { Net::Nostr::DirectMessage->create_relay_list(
+        pubkey => $PUBKEY,
+        relays => ['not a uri'],
+    ) }, qr/relay URI/i, 'invalid relay URI rejected');
 };
 
 ###############################################################################

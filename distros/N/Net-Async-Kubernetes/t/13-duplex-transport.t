@@ -120,12 +120,29 @@ subtest 'duplex websocket transport returns active session' => sub {
     $session->write_channel(2, 'abc')->get;
     is($last_ws->sent_binary->[0], chr(2) . 'abc', 'write_channel encodes first byte as channel');
 
+    $session->write_stdin("pwd\n")->get;
+    is($last_ws->sent_binary->[1], chr(0) . "pwd\n", 'write_stdin uses channel 0');
+
+    $session->resize(width => 120, height => 40)->get;
+    is($last_ws->sent_binary->[2], chr(4) . '{"Width":120,"Height":40}', 'resize uses channel 4 json payload');
+
     $session->close(code => 1000, payload => 'bye')->get;
     is($last_ws->sent_close->[0], pack('n', 1000) . 'bye', 'close sends websocket close payload');
     is($last_ws->closed_when_empty, 1, 'close requests graceful socket close');
 
     $last_ws->emit_read_error(undef, 'boom');
     like($errors[-1], qr/boom/, 'transport errors forwarded to on_error');
+};
+
+subtest 'session helper validation' => sub {
+    my $ws = Test::WSClient->new;
+    my $session = Net::Async::Kubernetes::PortForwardSession->new(ws_client => $ws);
+
+    eval { $session->resize(width => 0, height => 20) };
+    like($@, qr/invalid width/i, 'resize validates width');
+
+    eval { $session->resize(width => 80) };
+    like($@, qr/height required/i, 'resize requires height');
 };
 
 subtest 'connect failure is propagated and reported to on_error' => sub {
@@ -179,6 +196,35 @@ subtest 'exec uses websocket transport and command query params' => sub {
     like($connect->{url}, qr/command=sh/, 'first command parameter');
     like($connect->{url}, qr/command=-c/, 'second command parameter');
     like($connect->{url}, qr/command=id/, 'third command parameter');
+    like($connect->{url}, qr/stdin=true/, 'stdin set');
+    like($connect->{url}, qr/stdout=true/, 'stdout default set');
+    like($connect->{url}, qr/stderr=false/, 'stderr override set');
+    like($connect->{url}, qr/tty=false/, 'tty default set');
+};
+
+subtest 'attach uses websocket transport and stream flags' => sub {
+    my $loop = IO::Async::Loop->new;
+    my $kube = make_kube($loop);
+    my $last_ws;
+
+    no warnings 'redefine';
+    local *Net::Async::Kubernetes::_make_websocket_client = sub {
+        my ($self, %args) = @_;
+        $last_ws = Test::WSClient->new(%args);
+        return $last_ws;
+    };
+
+    my $session = $kube->attach('Pod', 'nginx',
+        namespace => 'default',
+        container => 'app',
+        stdin     => 1,
+        stderr    => 0,
+    )->get;
+
+    isa_ok($session, 'Net::Async::Kubernetes::PortForwardSession');
+    my $connect = $last_ws->connect_args;
+    like($connect->{url}, qr{/api/v1/namespaces/default/pods/nginx/attach}, 'attach path used');
+    like($connect->{url}, qr/container=app/, 'container parameter');
     like($connect->{url}, qr/stdin=true/, 'stdin set');
     like($connect->{url}, qr/stdout=true/, 'stdout default set');
     like($connect->{url}, qr/stderr=false/, 'stderr override set');

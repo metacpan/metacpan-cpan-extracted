@@ -81,9 +81,9 @@ use strict;
 use Authen::DecHpwd 2.003 qw(lgi_hpwd UAI_C_PURDY UAI_C_PURDY_V UAI_C_PURDY_S);
 use Authen::Passphrase 0.003;
 use Carp qw(croak);
-use Data::Entropy::Algorithms 0.000 qw(rand_int);
+use Crypt::SysRandom 'random_bytes';
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 
@@ -124,8 +124,7 @@ each byte.
 =item B<salt_random>
 
 Causes salt to be generated randomly.  The value given for this attribute
-is ignored.  The source of randomness may be controlled by the facility
-described in L<Data::Entropy>.
+is ignored.
 
 =item B<hash>
 
@@ -181,7 +180,7 @@ sub new {
 		} elsif($attr eq "salt_random") {
 			croak "salt specified redundantly"
 				if exists $self->{salt};
-			$self->{salt} = rand_int(65536);
+			$self->{salt} = unpack "S", random_bytes(2);
 		} elsif($attr eq "hash") {
 			croak "hash specified redundantly"
 				if exists($self->{hash}) ||

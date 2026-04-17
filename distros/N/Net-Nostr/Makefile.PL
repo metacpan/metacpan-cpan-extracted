@@ -30,6 +30,7 @@ WriteMakefile(
         'Test::Pod'           => 0,
         'Test::Pod::Coverage' => 0,
         'Clone'      => 0,
+        'IO::Socket::SSL'     => 0,
     },
     META_MERGE => {
         resources   => {

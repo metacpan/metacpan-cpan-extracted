@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes;
 # ABSTRACT: Async Kubernetes client for IO::Async
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -8,6 +8,7 @@ use parent 'IO::Async::Notifier';
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use IO::Socket::SSL;
+use File::Temp ();
 use Future;
 use URI;
 use Protocol::WebSocket::Request;
@@ -137,12 +138,39 @@ sub _ssl_options {
     } else {
         push @opts, SSL_verify_mode => SSL_VERIFY_NONE;
     }
+
     push @opts, SSL_ca_file   => $server->ssl_ca_file   if $server->ssl_ca_file;
     push @opts, SSL_cert_file => $server->ssl_cert_file  if $server->ssl_cert_file;
     push @opts, SSL_key_file  => $server->ssl_key_file   if $server->ssl_key_file;
+    my $ca_pem = $server->ssl_ca_pem;
+    if (defined $ca_pem && length $ca_pem) {
+        push @opts, SSL_ca_file => $self->_materialize_ssl_pem(ca => $ca_pem);
+    }
+    my $cert_pem = $server->ssl_cert_pem;
+    if (defined $cert_pem && length $cert_pem) {
+        push @opts, SSL_cert_file => $self->_materialize_ssl_pem(cert => $cert_pem);
+    }
+    my $key_pem = $server->ssl_key_pem;
+    if (defined $key_pem && length $key_pem) {
+        push @opts, SSL_key_file => $self->_materialize_ssl_pem(key => $key_pem);
+    }
 
     $self->{_ssl_options} = \@opts;
     return @opts;
+}
+
+sub _materialize_ssl_pem {
+    my ($self, $kind, $pem) = @_;
+
+    my $fh = File::Temp->new(
+        SUFFIX => ".$kind.pem",
+        UNLINK => 1,
+    );
+    print {$fh} $pem;
+    close $fh;
+
+    push @{ $self->{_ssl_tempfiles} ||= [] }, $fh;
+    return $fh->filename;
 }
 
 sub expand_class { shift->_rest->expand_class(@_) }
@@ -549,6 +577,249 @@ sub exec {
 }
 
 
+sub attach {
+    my ($self, $short_class, @rest_args) = @_;
+
+    my $rest = $self->_rest;
+    my %args;
+
+    # Support: attach('Pod', 'name', ...) and attach('Pod', name => 'name', ...)
+    if (@rest_args >= 1
+        && !ref($rest_args[0])
+        && $rest_args[0] !~ /^(name|namespace|container|stdin|stdout|stderr|tty|subprotocol|on_open|on_frame|on_close|on_error)$/
+    ) {
+        $args{name} = shift @rest_args;
+        return Future->fail("Invalid arguments to attach()") if @rest_args % 2;
+        %args = (%args, @rest_args);
+    } elsif (@rest_args % 2 == 0) {
+        %args = @rest_args;
+    } else {
+        return Future->fail("Invalid arguments to attach()");
+    }
+
+    return Future->fail("name required for attach") unless $args{name};
+
+    my $container = delete $args{container};
+    my $stdin  = delete($args{stdin})  ? 1 : 0;
+    my $stdout = exists($args{stdout}) ? (delete($args{stdout}) ? 1 : 0) : 1;
+    my $stderr = exists($args{stderr}) ? (delete($args{stderr}) ? 1 : 0) : 1;
+    my $tty    = delete($args{tty})    ? 1 : 0;
+
+    my $subprotocol = delete $args{subprotocol} // 'v4.channel.k8s.io';
+    my $on_open  = delete $args{on_open};
+    my $on_frame = delete $args{on_frame};
+    my $on_close = delete $args{on_close};
+    my $on_error = delete $args{on_error};
+
+    my $class = $rest->expand_class($short_class);
+    my $path = $rest->build_path($class, %args) . '/attach';
+
+    my %params = (
+        stdin   => $stdin  ? 'true' : 'false',
+        stdout  => $stdout ? 'true' : 'false',
+        stderr  => $stderr ? 'true' : 'false',
+        tty     => $tty    ? 'true' : 'false',
+    );
+    $params{container} = $container if defined $container;
+
+    my $req = $rest->prepare_request('GET', $path,
+        parameters => \%params,
+        headers    => {
+            Accept                   => '*/*',
+            Connection               => 'Upgrade',
+            Upgrade                  => 'websocket',
+            'Sec-WebSocket-Protocol' => $subprotocol,
+        },
+    );
+
+    return $self->_do_duplex_request($req,
+        on_open  => $on_open,
+        on_frame => $on_frame,
+        on_close => $on_close,
+        on_error => $on_error,
+    );
+}
+
+
+sub cp_to_pod {
+    my ($self, $short_class, @rest_args) = @_;
+
+    my $loop = eval { $self->loop };
+    return Future->fail("cp_to_pod requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
+        unless $loop;
+
+    my %args;
+    if (@rest_args >= 1
+        && !ref($rest_args[0])
+        && $rest_args[0] !~ /^(name|namespace|container|local|remote|chunk_size)$/
+    ) {
+        $args{name} = shift @rest_args;
+        return Future->fail("Invalid arguments to cp_to_pod()") if @rest_args % 2;
+        %args = (%args, @rest_args);
+    } elsif (@rest_args % 2 == 0) {
+        %args = @rest_args;
+    } else {
+        return Future->fail("Invalid arguments to cp_to_pod()");
+    }
+
+    return Future->fail("name required for cp_to_pod") unless $args{name};
+
+    my $local = delete $args{local};
+    my $remote = delete $args{remote};
+    return Future->fail("local path required for cp_to_pod") unless defined $local && length $local;
+    return Future->fail("remote path required for cp_to_pod") unless defined $remote && length $remote;
+    return Future->fail("local file '$local' does not exist for cp_to_pod") unless -e $local;
+    return Future->fail("local path '$local' is not a file for cp_to_pod") unless -f $local;
+
+    my $chunk_size = delete($args{chunk_size}) // 64 * 1024;
+    return Future->fail("invalid chunk_size '$chunk_size' for cp_to_pod")
+        unless defined($chunk_size) && $chunk_size =~ /^\d+$/ && $chunk_size > 0;
+
+    open my $fh, '<:raw', $local
+        or return Future->fail("cannot read local file '$local' for cp_to_pod: $!");
+    local $/ = undef;
+    my $bytes = <$fh>;
+    close $fh;
+    $bytes = '' unless defined $bytes;
+
+    my $size = length($bytes);
+    my $stderr = '';
+    my $status_payload = '';
+    my $done = $loop->new_future;
+
+    return $self->exec($short_class, $args{name},
+        namespace => $args{namespace},
+        (defined($args{container}) ? (container => $args{container}) : ()),
+        command   => ['sh', '-c', 'head -c "$1" > "$2"', 'k8s-cp', $size, $remote],
+        stdin     => 1,
+        stdout    => 0,
+        stderr    => 1,
+        tty       => 0,
+        on_frame  => sub {
+            my ($channel, $payload) = @_;
+            $stderr .= $payload if $channel == 2;
+            $status_payload .= $payload if $channel == 3;
+        },
+        on_close  => sub {
+            return if $done->is_ready;
+            if ($status_payload =~ /"status"\s*:\s*"Failure"/i) {
+                $done->fail("cp_to_pod failed: $status_payload");
+            } else {
+                $done->done({
+                    local   => $local,
+                    remote  => $remote,
+                    bytes   => $size,
+                    stderr  => $stderr,
+                    status  => $status_payload,
+                });
+            }
+        },
+        on_error  => sub {
+            my ($err) = @_;
+            $done->fail("cp_to_pod transport error: $err") unless $done->is_ready;
+        },
+    )->then(sub {
+        my ($session) = @_;
+        return $self->_send_stdin_chunks($session, $bytes, $chunk_size)
+            ->then(sub { return $done; });
+    });
+}
+
+
+sub cp_from_pod {
+    my ($self, $short_class, @rest_args) = @_;
+
+    my $loop = eval { $self->loop };
+    return Future->fail("cp_from_pod requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
+        unless $loop;
+
+    my %args;
+    if (@rest_args >= 1
+        && !ref($rest_args[0])
+        && $rest_args[0] !~ /^(name|namespace|container|local|remote)$/
+    ) {
+        $args{name} = shift @rest_args;
+        return Future->fail("Invalid arguments to cp_from_pod()") if @rest_args % 2;
+        %args = (%args, @rest_args);
+    } elsif (@rest_args % 2 == 0) {
+        %args = @rest_args;
+    } else {
+        return Future->fail("Invalid arguments to cp_from_pod()");
+    }
+
+    return Future->fail("name required for cp_from_pod") unless $args{name};
+
+    my $local = delete $args{local};
+    my $remote = delete $args{remote};
+    return Future->fail("local path required for cp_from_pod") unless defined $local && length $local;
+    return Future->fail("remote path required for cp_from_pod") unless defined $remote && length $remote;
+    return Future->fail("local path '$local' is a directory for cp_from_pod") if -d $local;
+
+    my $stdout = '';
+    my $stderr = '';
+    my $status_payload = '';
+    my $done = $loop->new_future;
+
+    return $self->exec($short_class, $args{name},
+        namespace => $args{namespace},
+        (defined($args{container}) ? (container => $args{container}) : ()),
+        command   => ['cat', $remote],
+        stdin     => 0,
+        stdout    => 1,
+        stderr    => 1,
+        tty       => 0,
+        on_frame  => sub {
+            my ($channel, $payload) = @_;
+            $stdout .= $payload if $channel == 1;
+            $stderr .= $payload if $channel == 2;
+            $status_payload .= $payload if $channel == 3;
+        },
+        on_close  => sub {
+            return if $done->is_ready;
+            if ($status_payload =~ /"status"\s*:\s*"Failure"/i) {
+                $done->fail("cp_from_pod failed: $status_payload");
+                return;
+            }
+
+            open my $fh, '>:raw', $local
+                or do {
+                    $done->fail("cannot write local file '$local' for cp_from_pod: $!");
+                    return;
+                };
+            print {$fh} $stdout;
+            close $fh;
+
+            $done->done({
+                local   => $local,
+                remote  => $remote,
+                bytes   => length($stdout),
+                stderr  => $stderr,
+                status  => $status_payload,
+            });
+        },
+        on_error  => sub {
+            my ($err) = @_;
+            $done->fail("cp_from_pod transport error: $err") unless $done->is_ready;
+        },
+    )->then(sub { return $done; });
+}
+
+
+sub _send_stdin_chunks {
+    my ($self, $session, $bytes, $chunk_size) = @_;
+
+    my $f = Future->done;
+    my $len = length($bytes // '');
+    for (my $off = 0; $off < $len; $off += $chunk_size) {
+        my $chunk = substr($bytes, $off, $chunk_size);
+        $f = $f->then(sub {
+            return $session->write_stdin($chunk);
+        });
+    }
+
+    return $f;
+}
+
 # ============================================================================
 # WATCHER FACTORY
 # ============================================================================
@@ -567,6 +838,21 @@ sub watcher {
     $self->add_child($watcher);
     return $watcher;
 }
+
+sub controller {
+    my ($self, %args) = @_;
+
+    require Net::Async::Kubernetes::Controller;
+
+    my $controller = Net::Async::Kubernetes::Controller->new(
+        kube => $self,
+        %args,
+    );
+
+    $self->add_child($controller);
+    return $controller;
+}
+
 
 
 # ============================================================================
@@ -808,9 +1094,32 @@ sub write_channel {
     return $self->ws_client->send_binary_frame(chr($channel) . $payload);
 }
 
+sub write_stdin {
+    my ($self, $payload) = @_;
+    return $self->write_channel(0, $payload);
+}
+
 {
     no warnings 'once';
     *write = \&write_channel;
+    *stdin = \&write_stdin;
+}
+
+sub resize {
+    my ($self, %args) = @_;
+
+    my $width  = exists($args{width})  ? $args{width}  : $args{cols};
+    my $height = exists($args{height}) ? $args{height} : $args{rows};
+
+    croak "width required for resize" unless defined $width;
+    croak "height required for resize" unless defined $height;
+    croak "invalid width '$width' for resize"
+        unless $width =~ /^\d+$/ && $width > 0;
+    croak "invalid height '$height' for resize"
+        unless $height =~ /^\d+$/ && $height > 0;
+
+    my $payload = sprintf('{"Width":%d,"Height":%d}', $width, $height);
+    return $self->write_channel(4, $payload);
 }
 
 sub close {
@@ -844,7 +1153,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -911,6 +1220,32 @@ version 0.006
         command   => ['sh', '-c', 'id'],
         on_frame  => sub { my ($channel, $payload) = @_; ... },
     )->get;
+    $exec->write_stdin("id\n");
+    $exec->resize(width => 120, height => 40);
+
+    # Pod attach (websocket duplex)
+    my $attach = $kube->attach('Pod', 'nginx',
+        namespace => 'default',
+        container => 'app',
+        stdin     => 1,
+        stdout    => 1,
+        stderr    => 1,
+        tty       => 0,
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    )->get;
+    $attach->write_stdin("help\n");
+
+    # Copy local file to pod and back (built on exec)
+    $kube->cp_to_pod('Pod', 'nginx',
+        namespace => 'default',
+        local     => '/tmp/local.txt',
+        remote    => '/tmp/remote.txt',
+    )->get;
+    $kube->cp_from_pod('Pod', 'nginx',
+        namespace => 'default',
+        remote    => '/tmp/remote.txt',
+        local     => '/tmp/downloaded.txt',
+    )->get;
 
     # Watcher with auto-reconnect
     my $watcher = $kube->watcher('Pod',
@@ -929,7 +1264,7 @@ It extends L<IO::Async::Notifier> and uses L<Net::Async::HTTP> for
 non-blocking HTTP communication, plus L<Net::Async::WebSocket::Client> for
 duplex subresources like pod port-forward.
 
-All CRUD, log, port-forward, and exec methods return L<Future> objects. The
+All CRUD, log, port-forward, exec, attach, and cp helper methods return L<Future> objects. The
 L<Net::Async::Kubernetes::Watcher>
 provides auto-reconnecting event streaming with separate callbacks per
 event type.
@@ -1172,6 +1507,9 @@ Returns a L<Future> that resolves to the duplex session object returned by the
 transport backend. The default transport returns a
 L<Net::Async::Kubernetes::PortForwardSession> object.
 
+The session helper supports C<write_channel>, C<write_stdin>, C<resize>, and
+C<close>.
+
 C<on_open> receives the created session object.
 
 C<on_frame> receives C<($channel, $payload)> where the first byte of each
@@ -1192,10 +1530,70 @@ Returns a L<Future> that resolves to the duplex session object returned by the
 transport backend. The default transport returns a
 L<Net::Async::Kubernetes::PortForwardSession> object.
 
+The session helper supports C<write_channel>, C<write_stdin>, C<resize>, and
+C<close>.
+
 C<on_open> receives the created session object.
 
 C<on_frame> receives C<($channel, $payload)> where the first byte of each
 binary websocket frame is decoded as Kubernetes channel id.
+
+=head2 attach
+
+    my $f = $kube->attach('Pod', 'my-pod',
+        namespace => 'default',
+        container => 'app',
+        stdin     => 1,
+        stdout    => 1,
+        stderr    => 1,
+        tty       => 0,
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    );
+    my $session = $f->get;
+
+Create an async pod attach session request.
+
+Returns a L<Future> that resolves to the duplex session object returned by the
+transport backend. The default transport returns a
+L<Net::Async::Kubernetes::PortForwardSession> object.
+
+The session helper supports C<write_channel>, C<write_stdin>, C<resize>, and
+C<close>.
+
+C<on_open> receives the created session object.
+
+C<on_frame> receives C<($channel, $payload)> where the first byte of each
+binary websocket frame is decoded as Kubernetes channel id.
+
+=head2 cp_to_pod
+
+    my $f = $kube->cp_to_pod('Pod', 'my-pod',
+        namespace => 'default',
+        container => 'app',
+        local     => '/tmp/local.txt',
+        remote    => '/tmp/remote.txt',
+    );
+    my $result = $f->get;
+
+Copy a single local file into a pod using C<exec()> and stdin streaming.
+
+Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
+C<bytes>, C<stderr>, and C<status>.
+
+=head2 cp_from_pod
+
+    my $f = $kube->cp_from_pod('Pod', 'my-pod',
+        namespace => 'default',
+        container => 'app',
+        remote    => '/tmp/remote.txt',
+        local     => '/tmp/local.txt',
+    );
+    my $result = $f->get;
+
+Copy a single file from a pod using C<exec()> and stdout streaming.
+
+Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
+C<bytes>, C<stderr>, and C<status>.
 
 =head2 watcher
 
@@ -1224,6 +1622,21 @@ Arguments:
 =back
 
 See L<Net::Async::Kubernetes::Watcher> for all available parameters.
+
+=head2 controller
+
+    my $controller = $kube->controller(
+        on_reconcile => sub {
+            my ($ctx) = @_;
+            ...
+        },
+    );
+
+Create and register a L<Net::Async::Kubernetes::Controller> runtime bound to
+this client. The controller is added as a child notifier and can register
+resource watches, queue reconcile work, and patch object status.
+
+Returns the controller object.
 
 =head1 NAME
 

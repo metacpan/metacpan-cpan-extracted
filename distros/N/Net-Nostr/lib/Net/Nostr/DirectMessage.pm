@@ -7,15 +7,13 @@ use Net::Nostr::Event;
 use Net::Nostr::GiftWrap;
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
+my $RELAY_URI = qr{\A(?:ws|wss)://\S+\z};
 
-sub create {
-    my ($class, %args) = @_;
-    my $sender_pubkey = $args{sender_pubkey} // croak "sender_pubkey required";
-    my $content       = $args{content}       // croak "content required";
-    my $recipients    = $args{recipients}    // croak "recipients required";
-    my $reply_to      = $args{reply_to};
-    my $subject       = $args{subject};
-    my $quotes        = $args{quotes};
+sub _build_recipient_tags {
+    my ($recipients) = @_;
+
+    croak "recipients must contain at least one recipient"
+        unless ref $recipients eq 'ARRAY' && @$recipients;
 
     my @tags;
     for my $r (@$recipients) {
@@ -27,6 +25,33 @@ sub create {
             push @tags, ['p', $r];
         }
     }
+
+    return @tags;
+}
+
+sub _validate_sha256_hex {
+    my ($name, $value) = @_;
+
+    croak "$name must be 64-char lowercase hex" unless $value =~ $HEX64;
+}
+
+sub _validate_relay_uri {
+    my ($relay) = @_;
+
+    croak "relay URI must be a ws:// or wss:// URI"
+        unless defined $relay && $relay =~ $RELAY_URI;
+}
+
+sub create {
+    my ($class, %args) = @_;
+    my $sender_pubkey = $args{sender_pubkey} // croak "sender_pubkey required";
+    my $content       = $args{content}       // croak "content required";
+    my $recipients    = $args{recipients}    // croak "recipients required";
+    my $reply_to      = $args{reply_to};
+    my $subject       = $args{subject};
+    my $quotes        = $args{quotes};
+
+    my @tags = _build_recipient_tags($recipients);
     if (defined $reply_to) {
         my $eid = ref $reply_to eq 'ARRAY' ? $reply_to->[0] : $reply_to;
         croak "reply_to must be 64-char lowercase hex" unless $eid =~ $HEX64;
@@ -63,16 +88,12 @@ sub create_file {
     my $decryption_nonce     = $args{decryption_nonce}     // croak "decryption_nonce required";
     my $x                    = $args{x}                    // croak "x required";
 
-    my @tags;
-    for my $r (@$recipients) {
-        my $pk = ref $r eq 'ARRAY' ? $r->[0] : $r;
-        croak "recipient pubkey must be 64-char lowercase hex" unless $pk =~ $HEX64;
-        if (ref $r eq 'ARRAY') {
-            push @tags, ['p', @$r];
-        } else {
-            push @tags, ['p', $r];
-        }
-    }
+    croak "encryption_algorithm must be aes-gcm"
+        unless $encryption_algorithm eq 'aes-gcm';
+    _validate_sha256_hex('x', $x);
+    _validate_sha256_hex('ox', $args{ox}) if defined $args{ox};
+
+    my @tags = _build_recipient_tags($recipients);
     if (defined $args{reply_to}) {
         my $eid = ref $args{reply_to} eq 'ARRAY' ? $args{reply_to}[0] : $args{reply_to};
         croak "reply_to must be 64-char lowercase hex" unless $eid =~ $HEX64;
@@ -111,6 +132,13 @@ sub create_relay_list {
     my ($class, %args) = @_;
     my $pubkey = $args{pubkey} // croak "pubkey required";
     my $relays = $args{relays} // croak "relays required";
+
+    croak "relays must contain at least one relay URI"
+        unless ref $relays eq 'ARRAY' && @$relays;
+
+    for my $relay (@$relays) {
+        _validate_relay_uri($relay);
+    }
 
     my @tags = map { ['relay', $_] } @$relays;
 
@@ -255,8 +283,8 @@ tag sets the conversation topic.
     );
 
 Creates a kind 14 chat message as an unsigned rumor. C<content> MUST be
-plain text. C<recipients> is an arrayref of pubkey hex strings or
-C<[$pubkey, $relay_url]> pairs for relay hints.
+plain text. C<recipients> is a non-empty arrayref of pubkey hex strings
+or C<[$pubkey, $relay_url]> pairs for relay hints.
 
 C<reply_to> can be a plain event ID string or an arrayref
 C<[$event_id, $relay_url]> for relay hints.
@@ -302,7 +330,10 @@ triples for citing other events via C<q> tags.
 
 Creates a kind 15 file message as an unsigned rumor. The C<content> is
 the file URL. Required tags: C<file-type>, C<encryption-algorithm>,
-C<decryption-key>, C<decryption-nonce>, C<x>.
+C<decryption-key>, C<decryption-nonce>, C<x>. C<recipients> must contain
+at least one recipient. C<encryption-algorithm> currently supports only
+C<aes-gcm>. C<x> and optional C<ox> must be 64-character lowercase hex
+SHA-256 digests.
 
 Optional tags: C<ox> (SHA-256 of original file), C<size>, C<dim>,
 C<blurhash>, C<thumb>, C<fallback> (arrayref of fallback URLs),
@@ -390,7 +421,8 @@ calling C<receive>.
     );
 
 Creates a kind 10050 replaceable event listing preferred DM relays.
-Tags use the C<relay> tag name (not C<r>). Clients SHOULD keep lists
+Tags use the C<relay> tag name (not C<r>). C<relays> must be a non-empty
+arrayref of C<ws://> or C<wss://> relay URIs. Clients SHOULD keep lists
 small (1-3 relays).
 
 =head2 chat_members

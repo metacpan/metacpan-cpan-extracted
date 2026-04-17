@@ -4,7 +4,9 @@ use strictures 2;
 
 use Test2::V0 -no_srand => 1;
 use AnyEvent;
+use File::Temp qw(tempdir);
 use IO::Socket::INET;
+use IO::Socket::SSL::Utils qw(CERT_create PEM_cert2file PEM_key2file);
 
 use Net::Nostr::Client;
 use Net::Nostr::Relay;
@@ -32,6 +34,18 @@ sub make_event {
         tags       => [],
         %override,
     );
+}
+
+sub create_tls_material {
+    my $dir = tempdir(CLEANUP => 1);
+    my ($cert, $key) = CERT_create(
+        subject => { commonName => '127.0.0.1' },
+    );
+    my $cert_file = "$dir/cert.pem";
+    my $key_file  = "$dir/key.pem";
+    PEM_cert2file($cert, $cert_file);
+    PEM_key2file($key, $key_file);
+    return ($dir, $cert_file, $key_file);
 }
 
 ###############################################################################
@@ -106,6 +120,44 @@ subtest 'POD: async connect with error callback' => sub {
     });
 
     $cv->recv;
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+subtest 'connects to wss relay with ssl_no_verify' => sub {
+    my $port = free_port();
+    my ($tmpdir, $cert_file, $key_file) = create_tls_material();
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        ssl_cert_file     => $cert_file,
+        ssl_key_file      => $key_file,
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $client = Net::Nostr::Client->new(ssl_no_verify => 1);
+    my $ret = $client->connect("wss://127.0.0.1:$port");
+    is($ret, $client, 'connect returns self over wss');
+    ok($client->is_connected, 'client reports connected over wss with ssl_no_verify');
+
+    $client->disconnect;
+    $relay->stop;
+};
+
+subtest 'connects to wss relay with ssl_ca_file' => sub {
+    my $port = free_port();
+    my ($tmpdir, $cert_file, $key_file) = create_tls_material();
+    my $relay = Net::Nostr::Relay->new(
+        verify_signatures => 0,
+        ssl_cert_file     => $cert_file,
+        ssl_key_file      => $key_file,
+    );
+    $relay->start('127.0.0.1', $port);
+
+    my $client = Net::Nostr::Client->new(ssl_ca_file => $cert_file);
+    my $ret = $client->connect("wss://127.0.0.1:$port");
+    is($ret, $client, 'connect returns self over wss with trusted CA');
+    ok($client->is_connected, 'client reports connected over wss with ssl_ca_file');
 
     $client->disconnect;
     $relay->stop;
@@ -587,6 +639,14 @@ subtest 'new() rejects unknown arguments' => sub {
         qr/unknown.+bogus/i,
         'unknown argument rejected'
     );
+};
+
+subtest 'new() accepts TLS client arguments' => sub {
+    my $client = Net::Nostr::Client->new(
+        ssl_no_verify => 1,
+        ssl_ca_file   => 't/data/ca.pem',
+    );
+    isa_ok($client, 'Net::Nostr::Client');
 };
 
 ###############################################################################

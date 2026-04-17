@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.8.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Unicode Locale Identifier - ~/lib/m
+## Version v0.8.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2025/10/16
+## Modified 2026/04/16
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.8.0';
+    our $VERSION = 'v0.8.2';
 };
 
 use strict;
@@ -4255,7 +4255,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.8.0
+    v0.8.2
 
 =head1 DESCRIPTION
 

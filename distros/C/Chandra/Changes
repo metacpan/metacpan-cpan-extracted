@@ -1,5 +1,13 @@
 Revision history for Chandra
 
+0.23 2026-04-16
+  - Fix t/47_clipboard.t test for empty string on FreeBSD/headless systems
+  - Empty clipboard behavior is now platform-tolerant (undef or empty allowed)
+  - Fix t/63_pack.t path separator comparison on Windows
+  - Fix t/26_socket.t plan mismatch on Windows (use done_testing instead of fixed plan)
+  - Skip Unix socket Hub/Client tests on Windows
+  - Adds Chandra::Canvas
+
 0.22 2026-04-11
   - make manifest to include edge header
 

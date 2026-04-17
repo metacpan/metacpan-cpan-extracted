@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0506';
 
 use v5.36;
 use feature 'try';
@@ -11,7 +11,7 @@ use feature 'try';
 use Moo;
 use strictures 2;
 use Carp qw(croak);
-use Data::Dumper::Compact qw(ddc);
+# use Data::Dumper::Compact qw(ddc);
 use IO::Async::Loop ();
 use IO::Async::Timer::Periodic ();
 use MIDI::RtMidi::FFI::Device ();
@@ -78,6 +78,7 @@ sub _build_drums {
         hi_tom    => { num => 48, chan => $self->chan < 0 ? 11 : $self->chan, pat => [] },
         mid_tom   => { num => 47, chan => $self->chan < 0 ? 12 : $self->chan, pat => [] },
         low_tom   => { num => 45, chan => $self->chan < 0 ? 13 : $self->chan, pat => [] },
+        conga     => { num => 45, chan => $self->chan < 0 ? 14 : $self->chan, pat => [] },
     };
     return $drums;
 }
@@ -458,7 +459,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0502
+version 0.0506
 
 =head1 SYNOPSIS
 
@@ -594,6 +595,7 @@ Default:
   hi_tom    => 48 # Hi Mid Tom
   mid_tom   => 47 # Low Mid Tom
   low_tom   => 45 # Low Tom
+  conga     => 63 # Open Hi Conga
 
 But literally B<any> name could be used, as long as the number is a
 known MIDI percussion instrument number.

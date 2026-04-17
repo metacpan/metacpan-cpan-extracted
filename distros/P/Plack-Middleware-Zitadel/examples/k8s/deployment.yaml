@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zitadel-auth-proxy
+  namespace: zitadel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zitadel-auth-proxy
+  template:
+    metadata:
+      labels:
+        app: zitadel-auth-proxy
+    spec:
+      containers:
+        - name: proxy
+          image: ghcr.io/your-org/zitadel-auth-proxy:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: zitadel-auth-proxy
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10

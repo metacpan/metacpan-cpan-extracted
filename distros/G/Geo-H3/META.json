@@ -4,13 +4,13 @@
       "Michael R. Davis <mrdvt@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-H3",
    "no_index" : {
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "FFI::CheckLib" : "0",
-            "Geo::H3::FFI" : "0.05",
+            "Geo::H3::FFI" : "0.07",
             "perl" : "5.008"
          }
       }
@@ -50,5 +50,6 @@
          "web" : "https://github.com/mrdvt92/perl-Geo-H3.git"
       }
    },
-   "version" : "0.07"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

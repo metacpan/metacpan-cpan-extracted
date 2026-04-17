@@ -130,6 +130,7 @@ t/MARC-Convert-Wikidata-Object/28-start_time.t
 t/MARC-Convert-Wikidata-Object/29-subtitles.t
 t/MARC-Convert-Wikidata-Object/30-title.t
 t/MARC-Convert-Wikidata-Object/31-translators.t
+t/MARC-Convert-Wikidata-Object/32-udcs.t
 xt/MARC-Convert-Wikidata-Object-ExternalId/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object-ExternalId/02-pod.t
 xt/MARC-Convert-Wikidata-Object-ISBN/01-pod_coverage.t

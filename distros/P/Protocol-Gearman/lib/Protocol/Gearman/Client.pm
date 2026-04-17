@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Protocol::Gearman::Client;
+package Protocol::Gearman::Client 0.05;
 
-use strict;
+use v5.20;
 use warnings;
-use 5.010; # //
 
-our $VERSION = '0.04';
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use base qw( Protocol::Gearman );
 
@@ -24,6 +24,8 @@ struct Job => [qw( f on_data on_warning on_status exception )];
 C<Protocol::Gearman::Client> - implement a Gearman client
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 A base class that implements a complete Gearman client. This abstract class
 still requires the implementation methods as documented in
@@ -46,7 +48,9 @@ L<Net::Gearman::Client>.
 
 =cut
 
-=head2 $client->option_request( $option ) ==> ()
+=head2 option_request
+
+   await $client->option_request( $option );
 
 Requests that the Gearman server enable the named option for this connection.
 
@@ -63,11 +67,8 @@ to receive them.
 
 =cut
 
-sub option_request
+sub option_request ( $self, $option )
 {
-   my $self = shift;
-   my ( $option ) = @_;
-
    my $state = $self->gearman_state;
 
    my $request_f = $self->new_future;
@@ -78,16 +79,15 @@ sub option_request
    return $request_f;
 }
 
-sub on_OPTION_RES
+sub on_OPTION_RES ( $self, $option )
 {
-   my $self = shift;
-   my ( $option ) = @_;
-
    my $state = $self->gearman_state;
    ( delete $state->{gearman_option_reqs}{$option} )->done();
 }
 
-=head2 $client->submit_job( %args ) ==> $result
+=head2 submit_job
+
+   $result = await $client->submit_job( %args );
 
 Submits a job request to the Gearman server, and returns a future that will
 eventually yield the result of the job or its failure.
@@ -128,29 +128,26 @@ C<"low"> or the empty string.
 
 Invoked on receipt of more incremental data from the worker.
 
- $on_data->( $data )
+   $on_data->( $data )
 
 =item on_warning => CODE
 
 Invoked on receipt of a warning from the worker.
 
- $on_warning->( $warning )
+   $on_warning->( $warning )
 
 =item on_status => CODE
 
 Invoked on a status update from the worker.
 
- $on_status->( $numerator, $denominator )
+   $on_status->( $numerator, $denominator )
 
 =back
 
 =cut
 
-sub submit_job
+sub submit_job ( $self, %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $func = $args{func} // croak "Required 'func' is missing in submit_job";
    my $arg  = $args{arg}  // croak "Required 'arg' is missing in submit_job";
 
@@ -163,12 +160,10 @@ sub submit_job
    my $state = $self->gearman_state;
 
    my $submit_f = $self->new_future;
-   push @{ $state->{gearman_submits} }, $submit_f;
+   push $state->{gearman_submits}->@*, $submit_f;
 
    my $f = $self->new_future;
-   $submit_f->on_done( sub {
-      my ( $job_handle ) = @_;
-
+   $submit_f->on_done( sub ( $job_handle ) {
       if( $bg ) {
          $f->done;
       }
@@ -191,22 +186,16 @@ sub submit_job
    return $f;
 }
 
-sub on_JOB_CREATED
+sub on_JOB_CREATED ( $self, $job_handle )
 {
-   my $self = shift;
-   my ( $job_handle ) = @_;
-
    my $state = $self->gearman_state;
 
-   my $f = shift @{ $state->{gearman_submits} };
+   my $f = shift $state->{gearman_submits}->@*;
    $f->done( $job_handle );
 }
 
-sub on_WORK_DATA
+sub on_WORK_DATA ( $self, $job_handle, $data )
 {
-   my $self = shift;
-   my ( $job_handle, $data ) = @_;
-
    my $state = $self->gearman_state;
 
    my $job = $state->{gearman_job}{$job_handle};
@@ -214,11 +203,8 @@ sub on_WORK_DATA
    $job->on_data->( $data ) if $job->on_data;
 }
 
-sub on_WORK_WARNING
+sub on_WORK_WARNING ( $self, $job_handle, $warning )
 {
-   my $self = shift;
-   my ( $job_handle, $warning ) = @_;
-
    my $state = $self->gearman_state;
 
    my $job = $state->{gearman_job}{$job_handle};
@@ -226,11 +212,8 @@ sub on_WORK_WARNING
    $job->on_warning->( $warning ) if $job->on_warning;
 }
 
-sub on_WORK_STATUS
+sub on_WORK_STATUS ( $self, $job_handle, $num, $denom )
 {
-   my $self = shift;
-   my ( $job_handle, $num, $denom ) = @_;
-
    my $state = $self->gearman_state;
 
    my $job = $state->{gearman_job}{$job_handle};
@@ -238,11 +221,8 @@ sub on_WORK_STATUS
    $job->on_status->( $num, $denom ) if $job->on_status;
 }
 
-sub on_WORK_COMPLETE
+sub on_WORK_COMPLETE ( $self, $job_handle, $result )
 {
-   my $self = shift;
-   my ( $job_handle, $result ) = @_;
-
    my $state = $self->gearman_state;
 
    my $job = delete $state->{gearman_job}{$job_handle};
@@ -250,22 +230,16 @@ sub on_WORK_COMPLETE
    $job->f->done( $result );
 }
 
-sub on_WORK_EXCEPTION
+sub on_WORK_EXCEPTION ( $self, $job_handle, $exception )
 {
-   my $self = shift;
-   my ( $job_handle, $exception ) = @_;
-
    my $state = $self->gearman_state;
 
    my $job = $state->{gearman_job}{$job_handle};
    $job->exception = $exception;
 }
 
-sub on_WORK_FAIL
+sub on_WORK_FAIL ( $self, $job_handle )
 {
-   my $self = shift;
-   my ( $job_handle ) = @_;
-
    my $state = $self->gearman_state;
 
    my $job = delete $state->{gearman_job}{$job_handle};

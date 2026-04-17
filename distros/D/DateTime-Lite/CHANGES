@@ -1,5 +1,15 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.5.0 2026-04-16T15:26:07+0900
+    - Added the method resolve_abbreviation() in DateTime::Lite::TimeZone
+    - Corrected method _nearest_zone() to use $class instead of $self
+    - Implemented a check for the availability of SQLite math functions
+      (SQLite version >= 3.35.0; March 2021)
+    - Added a private method, _dbh_add_user_defined_functions(), to add the missing math
+      functions with User Defined Functions if missing. _dbh_add_user_defined_functions()
+      is only called by relevant methods, so those math functions are added only when
+      necessary.
+
 v0.4.0 2026-04-14T10:27:25+0900
     - Fixed t/12.tz_database.t on Windows (Strawberry Perl): replaced
       POSIX::mktime with Time::Local::timegm for pre-1970 timestamps,

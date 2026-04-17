@@ -20,6 +20,7 @@ App::Netdisco::Builder->new(
     'ExtUtils::InstallPaths' => '0',
     'File::ShareDir' => '1.03',
     'Path::Class' => '0.32',
+    'IO::Pty' => '1.25',
   },
   requires => {
     'aliased' => '0',
@@ -103,7 +104,7 @@ App::Netdisco::Builder->new(
     'Storable' => '0',
     'String::Util' => '1.35',
     'Sub::Util' => '1.40',
-    'Sys::SigAction' => '0',
+    'Sys::SigAction' => '0.24',
     'Template' => '2.24',
     'Template::AutoFilter' => '0',
     'Template::Plugin::CSV' => '0.04',

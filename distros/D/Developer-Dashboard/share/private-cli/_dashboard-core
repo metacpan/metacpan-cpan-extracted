@@ -8,7 +8,7 @@ use Config ();
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use FindBin qw($Bin);
-use lib "$Bin/../lib";
+use lib grep { defined && -d } ( $ENV{DEVELOPER_DASHBOARD_REPO_LIB}, "$Bin/../lib" );
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
 use Getopt::Long ();
@@ -47,6 +47,7 @@ require Developer::Dashboard;
 require Developer::Dashboard::DockerCompose;
 require Developer::Dashboard::Doctor;
 require Developer::Dashboard::FileRegistry;
+require Developer::Dashboard::Housekeeper;
 require Developer::Dashboard::IndicatorStore;
 require Developer::Dashboard::JSON;
 Developer::Dashboard::JSON->import(qw(json_encode));
@@ -101,6 +102,9 @@ my $docker = Developer::Dashboard::DockerCompose->new(
     paths   => $paths,
 );
 my $doctor = Developer::Dashboard::Doctor->new(
+    paths => $paths,
+);
+my $housekeeper = Developer::Dashboard::Housekeeper->new(
     paths => $paths,
 );
 my $prompt = Developer::Dashboard::Prompt->new(
@@ -584,6 +588,10 @@ elsif ( $cmd eq 'config' ) {
         print json_encode( $config->merged );
         exit 0;
     }
+}
+elsif ( $cmd eq 'housekeeper' ) {
+    print json_encode( $housekeeper->run );
+    exit 0;
 }
 elsif ( $cmd eq 'auth' ) {
     my $action = shift @ARGV || '';

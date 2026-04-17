@@ -1,6 +1,56 @@
-# Debug-Easy
+# Debug::Easy
 
-![Debug::Easy Logo](Debug-Easy.png?raw=true "Debug::Easy")
+![Debug::Easy Logo](images/Debug-Easy.png?raw=true "Debug::Easy")
+
+## SYNOPSIS
+
+```perl
+use Debug::Easy;
+
+my $debug = Debug::Easy->new( 'LogLevel' => 'DEBUG', 'Color' => 1);
+```
+
+'LogLevel' is the maximum level to report, and ignore the rest. The method names correspond to their loglevels, when outputting a specific message. This identifies to the module what type of message [...]
+
+The following is a list, in order of level, of the logging methods:
+
+   * ERR or ERROR        - Error
+   * WARN or WARNING     - Warning
+   * NOTICE or ATTENTION - Notice
+   * INFO or INFORMATION - Information
+   * VERBOSE             - Special version of INFO that does not output any logging headings.  Very useful for verbose modes in your scripts.
+   * DEBUG               - Level 1 debugging messages, intended for simple helpful messages.
+   * DEBUGMAX            - Level 2 debugging messages, typically much more terse like dumping variables.
+
+The parameter is either a string or a reference to an array of strings to output as multiple lines.
+
+Each string can contain newlines, which will also be split into a separate line and formatted accordingly:
+
+```perl
+$debug->ERR(        ['Error message']);
+$debug->ERROR(      ['Error message']);
+
+$debug->WARN(       ['Warning message']);
+$debug->WARNING(    ['Warning message']);
+
+$debug->NOTICE(     ['Notice message']);
+$debug->ATTENTION   ['Notice message']);
+
+$debug->INFO(       ['Information and VERBOSE mode message']);
+$debug->INFORMATION(['Information and VERBOSE mode message']);
+
+$debug->DEBUG(      ['Level 1 Debug message']);
+$debug->DEBUGMAX(   ['Level 2 (terse) Debug message']);
+
+my @messages = (
+   'First Message',
+   'Second Message',
+   "Third Message First Line\nThird Message Second Line",
+   \%hash_reference
+);
+
+$debug->INFO([\@messages]);
+```
 
 ## DESCRIPTION
 
@@ -33,8 +83,8 @@ After installing, you can find documentation for this module with the perldoc co
 
 You can also look for information at:
 
-* **GitHub** - https://github.com/richcsst/Debug-Easy
-* **GitHub Clone** - https://github.com/richcsst/Debug-Easy.git
+* **GitHub** - [https://github.com/richcsst/Debug-Easy](https://github.com/richcsst/Debug-Easy)
+* **GitHub Clone** - [https://github.com/richcsst/Debug-Easy.git](https://github.com/richcsst/Debug-Easy.git)
 
   GitHub will always have the latest version available, even before CPAN.
 
@@ -44,4 +94,4 @@ Copyright © 2013-2025 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 
-* **Artistic License** - https://www.perlfoundation.org/artistic_license_2_0
+* **Artistic License** - [https://www.perlfoundation.org/artistic_license_2_0](https://www.perlfoundation.org/artistic_license_2_0)

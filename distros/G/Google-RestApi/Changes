@@ -1,5 +1,14 @@
 Revision history for Perl extension Google::RestApi.
 
+2.2.2 2026-04-16
+        - Add MIME::Lite to dependencies (was missing; required by GmailApi1).
+        - Remove File::Slurp from dependencies (not used).
+        - Move HTTP::Status to test dependencies.
+        - Restore strict validation in RestApi::new (google_restapi namespace makes _extra_ unnecessary).
+        - Fix offline test log noise (log4perl_config test was polluting subsequent test classes).
+        - Expand test coverage: log4perl_config, 401 token refresh, GmailApi1 profile/messages/labels, Drive CRUD.
+        - Fix TestBase offline mode: guard live-capture path with GOOGLE_RESTAPI_LOGGER env var.
+
 2.2.1 2026-04-14
         - Add CONTRIBUTORS section to POD/README.
         - Read OAuth scope from config file instead of hard-coding in token creator.

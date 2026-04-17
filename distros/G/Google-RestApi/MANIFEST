@@ -68,6 +68,7 @@ t/bin/regenerate_exchanges.sh
 t/compile.t
 t/etc/log4perl.conf
 t/etc/log4perl_debug.conf
+t/etc/log4perl_quiet.conf
 t/etc/perlcriticrc
 t/etc/rest_config.token
 t/etc/rest_config.yaml

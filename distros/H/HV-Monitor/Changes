@@ -1,5 +1,9 @@
 Revision history for HV-Monitor
 
+0.2.0   2026-04-26/15:30
+		-add -q, -w, and -o flags for writing to a file instead of always printing to STDOUT
+
+
 0.1.0   2024-10-26/13:30
 		-replace Gzip::Faster with IO::Compress::Gzip
 		-use Pod::Usage

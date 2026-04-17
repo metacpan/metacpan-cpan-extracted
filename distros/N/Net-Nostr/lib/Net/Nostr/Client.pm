@@ -18,9 +18,11 @@ use Class::Tiny qw(
 sub new {
     my $class = shift;
     my %args = @_;
-    croak "unknown argument(s): " . join(', ', sort keys %args) if %args;
+    my %allowed = map { $_ => 1 } qw(ssl_no_verify ssl_ca_file);
+    my @unknown = grep { !$allowed{$_} } keys %args;
+    croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
     my $self = bless {}, $class;
-    $self->_ws_client(AnyEvent::WebSocket::Client->new);
+    $self->_ws_client(AnyEvent::WebSocket::Client->new(%args));
     $self->_callbacks({});
     return $self;
 }
@@ -217,6 +219,7 @@ Net::Nostr::Client - WebSocket client for Nostr relays
 
     my $key    = Net::Nostr::Key->new;
     my $client = Net::Nostr::Client->new;
+    my $secure = Net::Nostr::Client->new(ssl_ca_file => 'ca.pem');
 
     # Register callbacks before connecting
     $client->on(event => sub {
@@ -267,6 +270,25 @@ messages, counting events (NIP-45), and negentropy set reconciliation
 Creates a new client instance. No connection is established until
 C<connect> is called. Croaks on unknown arguments.
 
+Optional arguments are passed through to the underlying
+L<AnyEvent::WebSocket::Client> for secure WebSocket connections:
+
+=over 4
+
+=item C<ssl_no_verify>
+
+Disables TLS certificate verification for C<wss://> connections. Intended for
+local testing and self-signed development relays.
+
+=item C<ssl_ca_file>
+
+Path to a CA file used to verify C<wss://> relay certificates.
+
+=back
+
+    my $client = Net::Nostr::Client->new(ssl_no_verify => 1);
+    my $client = Net::Nostr::Client->new(ssl_ca_file => 'ca.pem');
+
 =head1 METHODS
 
 =head2 connect
@@ -276,10 +298,11 @@ C<connect> is called. Croaks on unknown arguments.
     # Non-blocking with callback:
     $client->connect($url, sub { ... });
 
-Connects to the relay at the given WebSocket URL. Blocks until the
-connection is established and returns C<$self> for chaining. Croaks
-if the connection fails, C<$url> is not provided, or the callback
-is not a CODE ref.
+Connects to the relay at the given WebSocket URL. Supports both
+C<ws://> and C<wss://> relay URLs. Blocks until the connection is
+established and returns C<$self> for chaining. Croaks if the
+connection fails, C<$url> is not provided, or the callback is not a
+CODE ref.
 
 If a callback is provided, connects asynchronously and returns
 immediately without blocking. The callback receives a single argument:

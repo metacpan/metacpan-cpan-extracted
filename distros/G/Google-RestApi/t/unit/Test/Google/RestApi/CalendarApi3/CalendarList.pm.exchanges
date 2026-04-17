@@ -48,36 +48,36 @@ response:
      }
     }
   headers:
-  - transfer-encoding
-  - chunked
-  - x-xss-protection
-  - '0'
   - x-l2-request-path
   - l2-managed-14
-  - x-frame-options
-  - SAMEORIGIN
-  - server
-  - ESF
-  - cache-control
-  - private, max-age=0, must-revalidate, no-transform
-  - accept-ranges
-  - none
-  - content-type
-  - application/json; charset=UTF-8
-  - expires
-  - Mon, 13 Apr 2026 23:54:48 GMT
-  - date
-  - Mon, 13 Apr 2026 23:54:48 GMT
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
+  - accept-ranges
+  - none
+  - x-frame-options
+  - SAMEORIGIN
+  - expires
+  - Thu, 16 Apr 2026 19:06:04 GMT
+  - cache-control
+  - private, max-age=0, must-revalidate, no-transform
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - server
+  - ESF
   - x-content-type-options
   - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  - date
+  - Thu, 16 Apr 2026 19:06:04 GMT
   message: OK
 source: Test::Google::RestApi::CalendarApi3::CalendarList::get
 

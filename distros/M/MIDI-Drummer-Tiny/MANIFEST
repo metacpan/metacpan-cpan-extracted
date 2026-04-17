@@ -48,6 +48,7 @@ lib/MIDI/Drummer/Tiny/Tutorial/Advanced.pod
 lib/MIDI/Drummer/Tiny/Tutorial/Basics.pod
 lib/MIDI/Drummer/Tiny/Tutorial/Quickstart.pod
 lib/MIDI/Drummer/Tiny/Types.pm
+share/drum-pattern-bit-strings.txt
 t/00-compile.t
 t/01-methods.t
 t/author-eol.t

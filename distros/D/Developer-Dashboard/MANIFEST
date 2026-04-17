@@ -30,6 +30,7 @@ lib/Developer/Dashboard/Doctor.pm
 lib/Developer/Dashboard/File.pm
 lib/Developer/Dashboard/FileRegistry.pm
 lib/Developer/Dashboard/Folder.pm
+lib/Developer/Dashboard/Housekeeper.pm
 lib/Developer/Dashboard/IndicatorStore.pm
 lib/Developer/Dashboard/InternalCLI.pm
 lib/Developer/Dashboard/JSON.pm
@@ -67,6 +68,7 @@ share/private-cli/decode
 share/private-cli/docker
 share/private-cli/doctor
 share/private-cli/encode
+share/private-cli/housekeeper
 share/private-cli/indicator
 share/private-cli/iniq
 share/private-cli/init

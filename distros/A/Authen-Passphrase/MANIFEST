@@ -49,4 +49,3 @@ t/smd5.t
 t/ssha.t
 t/traddescrypt.t
 t/vmspurdy.t
-SIGNATURE    Added here by Module::Build

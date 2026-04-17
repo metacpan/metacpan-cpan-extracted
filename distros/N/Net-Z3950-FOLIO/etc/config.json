@@ -29,6 +29,7 @@
   "queryFilter": "cql.allRecords=1 NOT discoverySuppress=true",
   "chunkSize": 5,
   "xmlElementSets": {
+    "dc": "xslt/folio2dc.xsl",
     "mods": "xslt/folio2mods.xsl",
     "testmarc": "xslt/folio2marcxml.xsl",
     "testopac": "xslt/folio2opac.xsl"

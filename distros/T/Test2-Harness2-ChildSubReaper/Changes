@@ -1,0 +1,9 @@
+Revision history for Test2-Harness2-ChildSubReaper
+
+0.000001  2026-04-16 15:01:58-07:00 America/Los_Angeles
+
+    - First release.
+    - Tiny XS wrapper around Linux's PR_SET_CHILD_SUBREAPER prctl(2) op.
+    - Exports two functions: set_child_subreaper, have_subreaper_support.
+    - Installs cleanly on non-Linux platforms; set_child_subreaper returns
+      0 with $! = ENOSYS where support is unavailable.

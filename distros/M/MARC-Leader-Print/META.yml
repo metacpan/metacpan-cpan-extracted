@@ -3,7 +3,10 @@ abstract: 'MARC leader class for print.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  MARC::Leader: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -24,13 +27,15 @@ no_index:
     - xt
 requires:
   Class::Utils: 0.03
-  Data::MARC::Leader::Utils: 0.03
   English: 0
   Error::Pure: 0
+  MARC::Leader::L10N: 0.03
+  Mo::utils: 0.06
+  Mo::utils::Language: 0.05
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/MARC-Leader-Print/issues
   homepage: https://github.com/michal-josef-spacek/MARC-Leader-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Leader-Print
-version: '0.04'
+version: '0.08'

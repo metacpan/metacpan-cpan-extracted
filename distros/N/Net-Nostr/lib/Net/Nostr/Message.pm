@@ -25,6 +25,12 @@ sub _validate_non_negative_int {
         unless defined $value && !ref($value) && $value =~ /\A[0-9]+\z/;
 }
 
+sub _validate_hex_message {
+    my ($value, $name) = @_;
+    croak "$name must be an even-length hex string"
+        unless defined $value && !ref($value) && $value =~ /\A(?:[0-9a-f]{2})+\z/;
+}
+
 sub _validate_filters {
     my ($filters) = @_;
     for my $f (@$filters) {
@@ -136,16 +142,14 @@ sub new {
         $self->filter($args{filter});
         croak "neg_msg is required for NEG-OPEN"
             unless defined $args{neg_msg};
-        croak "neg_msg must be a hex string"
-            unless $args{neg_msg} =~ /\A[0-9a-f]+\z/;
+        _validate_hex_message($args{neg_msg}, 'neg_msg');
         $self->neg_msg($args{neg_msg});
     } elsif ($type eq 'NEG-MSG') {
         _validate_subscription_id($args{subscription_id});
         $self->subscription_id($args{subscription_id});
         croak "neg_msg is required for NEG-MSG"
             unless defined $args{neg_msg};
-        croak "neg_msg must be a hex string"
-            unless $args{neg_msg} =~ /\A[0-9a-f]+\z/;
+        _validate_hex_message($args{neg_msg}, 'neg_msg');
         $self->neg_msg($args{neg_msg});
     } elsif ($type eq 'NEG-CLOSE') {
         _validate_subscription_id($args{subscription_id});
@@ -350,8 +354,8 @@ my %PARSERS = (
             if ref($arr->[1]);
         croak "NEG-OPEN filter must be a JSON object\n"
             unless ref($arr->[2]) eq 'HASH';
-        croak "NEG-OPEN neg_msg must be a hex string\n"
-            unless defined $arr->[3] && !ref($arr->[3]) && $arr->[3] =~ /\A[0-9a-f]+\z/;
+        croak "NEG-OPEN neg_msg must be an even-length hex string\n"
+            unless defined $arr->[3] && !ref($arr->[3]) && $arr->[3] =~ /\A(?:[0-9a-f]{2})+\z/;
         return (
             subscription_id => $arr->[1],
             filter          => Net::Nostr::Filter->new(%{$arr->[2]}),
@@ -363,8 +367,8 @@ my %PARSERS = (
         croak "NEG-MSG message requires 3 elements\n" unless @$arr == 3;
         croak "NEG-MSG subscription_id must be a string\n"
             if ref($arr->[1]);
-        croak "NEG-MSG neg_msg must be a hex string\n"
-            unless defined $arr->[2] && !ref($arr->[2]) && $arr->[2] =~ /\A[0-9a-f]+\z/;
+        croak "NEG-MSG neg_msg must be an even-length hex string\n"
+            unless defined $arr->[2] && !ref($arr->[2]) && $arr->[2] =~ /\A(?:[0-9a-f]{2})+\z/;
         return (
             subscription_id => $arr->[1],
             neg_msg         => $arr->[2],
@@ -480,8 +484,8 @@ Required fields by type:
     CLOSED - subscription_id, message (string)
     COUNT     - subscription_id, filters (client-to-relay) or count (non-negative integer, relay-to-client); mutually exclusive
     AUTH       - challenge (string) or event (Net::Nostr::Event object); mutually exclusive
-    NEG-OPEN  - subscription_id, filter (Net::Nostr::Filter), neg_msg (hex string)
-    NEG-MSG   - subscription_id, neg_msg (hex string)
+    NEG-OPEN  - subscription_id, filter (Net::Nostr::Filter), neg_msg (even-length hex string)
+    NEG-MSG   - subscription_id, neg_msg (even-length hex string)
     NEG-CLOSE - subscription_id
     NEG-ERR   - subscription_id, message (string), optional neg_limit (non-negative integer)
 
@@ -621,8 +625,8 @@ The challenge string. Present on AUTH messages from relays.
 
     my $hex = $msg->neg_msg;
 
-The negentropy protocol message as a hex string. Present on NEG-OPEN
-and NEG-MSG messages.
+The negentropy protocol message as an even-length hex string. Present
+on NEG-OPEN and NEG-MSG messages.
 
 =head2 filter
 

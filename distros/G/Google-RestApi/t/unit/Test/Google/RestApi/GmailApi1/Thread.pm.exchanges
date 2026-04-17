@@ -1,15 +1,203 @@
 ---
-request: GET /gmail/v1/users/me/threads/19d893cd23751659
+request: GET /gmail/v1/users/me/profile
 response:
   code: 200
   content: |
     {
-      "id": "19d893cd23751659",
-      "historyId": "1924",
+      "emailAddress": "mvsjes2.test.restapi@gmail.com",
+      "messagesTotal": 3,
+      "threadsTotal": 3,
+      "historyId": "8523"
+    }
+  headers:
+  - server
+  - ESF
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - accept-ranges
+  - none
+  - date
+  - Thu, 16 Apr 2026 19:09:12 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Thread::startup
+
+---
+request: POST /gmail/v1/users/me/messages/send
+request_content:
+  raw: Q29udGVudC1EaXNwb3NpdGlvbjogaW5saW5lCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDhiaXQKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PSJVVEYtOCIKTUlNRS1WZXJzaW9uOiAxLjAKWC1NYWlsZXI6IE1JTUU6OkxpdGUgMy4wMzggKEYyLjg1OyBUMi4yNjsgQTIuMjE7IEIzLjE2OyBRMy4xNikKRGF0ZTogVGh1LCAxNiBBcHIgMjAyNiAxNjowOToxMyAtMDMwMApUbzogbXZzamVzMi50ZXN0LnJlc3RhcGlAZ21haWwuY29tClN1YmplY3Q6IFRlc3QgVGhyZWFkIGZvciBVbml0IFRlc3RzCgpUaGlzIGlzIGEgdGVzdCB0aHJlYWQgbWVzc2FnZS4
+response:
+  code: 200
+  content: |
+    {
+      "id": "19d97b28a97c6d61",
+      "threadId": "19d97b28a97c6d61",
+      "labelIds": [
+        "UNREAD",
+        "SENT",
+        "INBOX"
+      ]
+    }
+  headers:
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - accept-ranges
+  - none
+  - date
+  - Thu, 16 Apr 2026 19:09:13 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - x-content-type-options
+  - nosniff
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - server
+  - ESF
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Thread::startup
+
+---
+request: GET /gmail/v1/users/me/messages/19d97b28a97c6d61
+response:
+  code: 200
+  content: |
+    {
+      "id": "19d97b28a97c6d61",
+      "threadId": "19d97b28a97c6d61",
+      "labelIds": [
+        "UNREAD",
+        "SENT",
+        "INBOX"
+      ],
+      "snippet": "This is a test thread message.",
+      "payload": {
+        "partId": "",
+        "mimeType": "text/plain",
+        "filename": "",
+        "headers": [
+          {
+            "name": "Received",
+            "value": "from 842140574913 named unknown by gmailapi.google.com with HTTPREST; Thu, 16 Apr 2026 12:09:13 -0700"
+          },
+          {
+            "name": "Received",
+            "value": "from 842140574913 named unknown by gmailapi.google.com with HTTPREST; Thu, 16 Apr 2026 12:09:13 -0700"
+          },
+          {
+            "name": "Content-Disposition",
+            "value": "inline"
+          },
+          {
+            "name": "Content-Transfer-Encoding",
+            "value": "8bit"
+          },
+          {
+            "name": "Content-Type",
+            "value": "text/plain; charset=\"UTF-8\""
+          },
+          {
+            "name": "MIME-Version",
+            "value": "1.0"
+          },
+          {
+            "name": "X-Mailer",
+            "value": "MIME::Lite 3.038 (F2.85; T2.26; A2.21; B3.16; Q3.16)"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 16 Apr 2026 12:09:13 -0700"
+          },
+          {
+            "name": "To",
+            "value": "mvsjes2.test.restapi@gmail.com"
+          },
+          {
+            "name": "Subject",
+            "value": "Test Thread for Unit Tests"
+          },
+          {
+            "name": "Message-Id",
+            "value": "\u003cCAB=bx6pe7_1c-nVVGMBoZA83sUfqzkxFpDzqN987vS3-5G6_qA@mail.gmail.com\u003e"
+          },
+          {
+            "name": "From",
+            "value": "mvsjes2.test.restapi@gmail.com"
+          }
+        ],
+        "body": {
+          "size": 30,
+          "data": "VGhpcyBpcyBhIHRlc3QgdGhyZWFkIG1lc3NhZ2Uu"
+        }
+      },
+      "sizeEstimate": 694,
+      "historyId": "8567",
+      "internalDate": "1776366553000"
+    }
+  headers:
+  - accept-ranges
+  - none
+  - date
+  - Thu, 16 Apr 2026 19:09:15 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - server
+  - ESF
+  - vary
+  - X-Origin
+  - vary
+  - Referer
+  - vary
+  - Origin,Accept-Encoding
+  - x-content-type-options
+  - nosniff
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  message: OK
+source: Test::Google::RestApi::GmailApi1::Thread::startup
+
+---
+request: GET /gmail/v1/users/me/threads/19d97b28a97c6d61
+response:
+  code: 200
+  content: |
+    {
+      "id": "19d97b28a97c6d61",
+      "historyId": "8567",
       "messages": [
         {
-          "id": "19d893cd23751659",
-          "threadId": "19d893cd23751659",
+          "id": "19d97b28a97c6d61",
+          "threadId": "19d97b28a97c6d61",
           "labelIds": [
             "UNREAD",
             "SENT",
@@ -23,11 +211,11 @@ response:
             "headers": [
               {
                 "name": "Received",
-                "value": "from 842140574913 named unknown by gmailapi.google.com with HTTPREST; Mon, 13 Apr 2026 23:45:58 +0000"
+                "value": "from 842140574913 named unknown by gmailapi.google.com with HTTPREST; Thu, 16 Apr 2026 12:09:13 -0700"
               },
               {
                 "name": "Received",
-                "value": "from 842140574913 named unknown by gmailapi.google.com with HTTPREST; Mon, 13 Apr 2026 23:45:57 +0000"
+                "value": "from 842140574913 named unknown by gmailapi.google.com with HTTPREST; Thu, 16 Apr 2026 12:09:13 -0700"
               },
               {
                 "name": "Content-Disposition",
@@ -51,7 +239,7 @@ response:
               },
               {
                 "name": "Date",
-                "value": "Mon, 13 Apr 2026 23:45:57 +0000"
+                "value": "Thu, 16 Apr 2026 12:09:13 -0700"
               },
               {
                 "name": "To",
@@ -63,7 +251,7 @@ response:
               },
               {
                 "name": "Message-Id",
-                "value": "\u003cCAB=bx6r-WFoN8HE3fZaQjfDpf4io=nA8uzygKaCfsOmMUukzRg@mail.gmail.com\u003e"
+                "value": "\u003cCAB=bx6pe7_1c-nVVGMBoZA83sUfqzkxFpDzqN987vS3-5G6_qA@mail.gmail.com\u003e"
               },
               {
                 "name": "From",
@@ -76,22 +264,22 @@ response:
             }
           },
           "sizeEstimate": 694,
-          "historyId": "1924",
-          "internalDate": "1776123957000"
+          "historyId": "8567",
+          "internalDate": "1776366553000"
         }
       ]
     }
   headers:
-  - x-xss-protection
-  - '0'
-  - accept-ranges
-  - none
+  - content-type
+  - application/json; charset=UTF-8
   - transfer-encoding
   - chunked
+  - accept-ranges
+  - none
   - x-frame-options
   - SAMEORIGIN
-  - server
-  - ESF
+  - date
+  - Thu, 16 Apr 2026 19:09:16 GMT
   - x-content-type-options
   - nosniff
   - vary
@@ -102,15 +290,15 @@ response:
   - Origin,Accept-Encoding
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-  - content-type
-  - application/json; charset=UTF-8
-  - date
-  - Mon, 13 Apr 2026 23:46:01 GMT
+  - x-xss-protection
+  - '0'
+  - server
+  - ESF
   message: OK
 source: Test::Google::RestApi::GmailApi1::Thread::get_and_modify
 
 ---
-request: POST /gmail/v1/users/me/threads/19d893cd23751659/modify
+request: POST /gmail/v1/users/me/threads/19d97b28a97c6d61/modify
 request_content:
   addLabelIds:
   - STARRED
@@ -120,11 +308,11 @@ response:
   code: 200
   content: |
     {
-      "id": "19d893cd23751659",
+      "id": "19d97b28a97c6d61",
       "messages": [
         {
-          "id": "19d893cd23751659",
-          "threadId": "19d893cd23751659",
+          "id": "19d97b28a97c6d61",
+          "threadId": "19d97b28a97c6d61",
           "labelIds": [
             "STARRED",
             "SENT",
@@ -134,44 +322,44 @@ response:
       ]
     }
   headers:
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
+  - accept-ranges
+  - none
+  - date
+  - Thu, 16 Apr 2026 19:09:18 GMT
+  - x-frame-options
+  - SAMEORIGIN
+  - x-content-type-options
+  - nosniff
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-  - x-content-type-options
-  - nosniff
-  - x-frame-options
-  - SAMEORIGIN
-  - server
-  - ESF
-  - date
-  - Mon, 13 Apr 2026 23:46:02 GMT
-  - content-type
-  - application/json; charset=UTF-8
   - x-xss-protection
   - '0'
-  - accept-ranges
-  - none
-  - transfer-encoding
-  - chunked
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - server
+  - ESF
   message: OK
 source: Test::Google::RestApi::GmailApi1::Thread::get_and_modify
 
 ---
-request: POST /gmail/v1/users/me/threads/19d893cd23751659/trash
+request: POST /gmail/v1/users/me/threads/19d97b28a97c6d61/trash
 response:
   code: 200
   content: |
     {
-      "id": "19d893cd23751659",
+      "id": "19d97b28a97c6d61",
       "messages": [
         {
-          "id": "19d893cd23751659",
-          "threadId": "19d893cd23751659",
+          "id": "19d97b28a97c6d61",
+          "threadId": "19d97b28a97c6d61",
           "labelIds": [
             "STARRED",
             "TRASH",
@@ -183,42 +371,42 @@ response:
   headers:
   - server
   - ESF
-  - x-frame-options
-  - SAMEORIGIN
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - x-content-type-options
   - nosniff
-  - content-type
-  - application/json; charset=UTF-8
-  - date
-  - Mon, 13 Apr 2026 23:46:04 GMT
   - x-xss-protection
   - '0'
-  - transfer-encoding
-  - chunked
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - accept-ranges
   - none
+  - x-frame-options
+  - SAMEORIGIN
+  - date
+  - Thu, 16 Apr 2026 19:09:20 GMT
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
   message: OK
 source: Test::Google::RestApi::GmailApi1::Thread::trash_and_untrash
 
 ---
-request: POST /gmail/v1/users/me/threads/19d893cd23751659/untrash
+request: POST /gmail/v1/users/me/threads/19d97b28a97c6d61/untrash
 response:
   code: 200
   content: |
     {
-      "id": "19d893cd23751659",
+      "id": "19d97b28a97c6d61",
       "messages": [
         {
-          "id": "19d893cd23751659",
-          "threadId": "19d893cd23751659",
+          "id": "19d97b28a97c6d61",
+          "threadId": "19d97b28a97c6d61",
           "labelIds": [
             "STARRED",
             "SENT"
@@ -229,10 +417,10 @@ response:
   headers:
   - server
   - ESF
-  - x-frame-options
-  - SAMEORIGIN
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
   - x-content-type-options
   - nosniff
   - vary
@@ -241,27 +429,27 @@ response:
   - Referer
   - vary
   - Origin,Accept-Encoding
-  - content-type
-  - application/json; charset=UTF-8
   - date
-  - Mon, 13 Apr 2026 23:46:05 GMT
-  - x-xss-protection
-  - '0'
-  - transfer-encoding
-  - chunked
+  - Thu, 16 Apr 2026 19:09:21 GMT
+  - x-frame-options
+  - SAMEORIGIN
   - accept-ranges
   - none
+  - transfer-encoding
+  - chunked
+  - content-type
+  - application/json; charset=UTF-8
   message: OK
 source: Test::Google::RestApi::GmailApi1::Thread::trash_and_untrash
 
 ---
-request: POST /gmail/v1/users/me/messages/19d893cd23751659/trash
+request: POST /gmail/v1/users/me/messages/19d97b28a97c6d61/trash
 response:
   code: 200
   content: |
     {
-      "id": "19d893cd23751659",
-      "threadId": "19d893cd23751659",
+      "id": "19d97b28a97c6d61",
+      "threadId": "19d97b28a97c6d61",
       "labelIds": [
         "STARRED",
         "TRASH",
@@ -271,28 +459,28 @@ response:
   headers:
   - transfer-encoding
   - chunked
-  - accept-ranges
-  - none
-  - x-xss-protection
-  - '0'
-  - date
-  - Mon, 13 Apr 2026 23:46:06 GMT
   - content-type
   - application/json; charset=UTF-8
+  - accept-ranges
+  - none
+  - date
+  - Thu, 16 Apr 2026 19:09:22 GMT
+  - x-frame-options
+  - SAMEORIGIN
   - x-content-type-options
   - nosniff
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   - server
   - ESF
-  - x-frame-options
-  - SAMEORIGIN
   message: OK
-source: Test::Google::RestApi::GmailApi1::Thread::_teardown_live_thread
+source: Test::Google::RestApi::GmailApi1::Thread::shutdown
 

@@ -15,9 +15,10 @@ subtest 'file does not exist' => sub {
 	my $file = 'lib/Business/ISBN/RangeMessage.yamml';
 	ok ! -e $file, "$file does not exist";
 
-	diag( "This will be a warning here" );
+	my $warning;
+	local $SIG{'__WARN__'} = sub { $warning .= $_[0] };
 	my $result = Business::ISBN::Data::_parse_range_message( $file );
-	diag( "There should be no more warnings" );
+	like $warning, qr/Could not open/, 'warning message notes the file is not there';
 	ok ! defined $result, "_parse_range_message returns undef if file does not exist";
 	};
 

@@ -81,7 +81,9 @@ sub initiate {
         }
     }
 
-    return unpack('H*', _encode_message(\@ranges));
+    my $msg = _encode_message(\@ranges);
+    $self->_check_frame_size_limit($msg, 'initiate');
+    return unpack('H*', $msg);
 }
 
 sub reconcile {
@@ -89,6 +91,7 @@ sub reconcile {
     croak "must seal before reconcile" unless $self->{_sealed};
 
     my $msg_bytes = pack('H*', $hex_msg);
+    $self->_check_frame_size_limit($msg_bytes, 'reconcile input');
     my $ranges = _decode_message($msg_bytes);
 
     my @items = @{$self->{_items}};
@@ -152,12 +155,24 @@ sub reconcile {
 
     my $response_hex;
     if ($have_non_skip) {
-        $response_hex = unpack('H*', _encode_message(\@response_ranges));
+        my $response_bytes = _encode_message(\@response_ranges);
+        $self->_check_frame_size_limit($response_bytes, 'reconcile response');
+        $response_hex = unpack('H*', $response_bytes);
     } else {
         $response_hex = undef;
     }
 
     return ($response_hex, \@have_ids, \@need_ids);
+}
+
+sub _check_frame_size_limit {
+    my ($self, $bytes, $context) = @_;
+
+    return unless $self->{frame_size_limit};
+    return if length($bytes) <= $self->{frame_size_limit};
+
+    croak "frame_size_limit exceeded for $context: "
+        . length($bytes) . " bytes > " . $self->{frame_size_limit} . " bytes";
 }
 
 # --- Binary protocol internals ---
@@ -239,6 +254,8 @@ sub _decode_message {
             $ts = $prev_ts + $encoded_ts - 1;
         }
         my ($prefix_len, $pos3) = _decode_varint($buf, $pos2);
+        croak "truncated bound prefix"
+            if $pos3 + $prefix_len > length($buf);
         my $prefix = substr($buf, $pos3, $prefix_len);
         $pos = $pos3 + $prefix_len;
 
@@ -250,11 +267,15 @@ sub _decode_message {
         if ($mode == 0) {
             $payload = undef;
         } elsif ($mode == 1) {
+            croak "truncated fingerprint: expected 16 bytes"
+                if $pos + 16 > length($buf);
             $payload = substr($buf, $pos, 16);
             $pos += 16;
         } elsif ($mode == 2) {
             my ($count, $pos5) = _decode_varint($buf, $pos);
             $pos = $pos5;
+            croak "truncated id list: expected " . ($count * 32) . " bytes"
+                if $pos + ($count * 32) > length($buf);
             my @ids;
             for (1 .. $count) {
                 push @ids, substr($buf, $pos, 32);
@@ -450,7 +471,9 @@ Options:
 =over 4
 
 =item C<frame_size_limit> -- maximum byte size for encoded protocol
-messages. Defaults to C<0> (unlimited).
+messages. When set, L</initiate> and L</reconcile> croak if an incoming
+or outgoing binary negentropy frame would exceed the configured limit.
+Defaults to C<0> (unlimited).
 
 =back
 

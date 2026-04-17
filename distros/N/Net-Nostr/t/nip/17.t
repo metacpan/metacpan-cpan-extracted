@@ -121,6 +121,20 @@ subtest 'multiple p-tags for multiple recipients' => sub {
     is($p_tags[1][1], $other_pubkey, 'second recipient');
 };
 
+subtest 'chat message requires one or more receivers' => sub {
+    like(
+        dies {
+            Net::Nostr::DirectMessage->create(
+                sender_pubkey => $SENDER_PUBKEY,
+                content       => 'hello',
+                recipients    => [],
+            );
+        },
+        qr/recipients must contain at least one recipient/i,
+        'empty recipient list rejected'
+    );
+};
+
 ###############################################################################
 # Reply: e tag denotes parent message
 ###############################################################################
@@ -248,6 +262,81 @@ subtest 'kind 15 optional file tags' => sub {
     is($tags{fallback}[0], 'https://backup.example.com/file.bin', 'fallback tag');
 };
 
+subtest 'kind 15 file message requires one or more receivers' => sub {
+    like(
+        dies {
+            Net::Nostr::DirectMessage->create_file(
+                sender_pubkey        => $SENDER_PUBKEY,
+                content              => 'https://example.com/file.bin',
+                recipients           => [],
+                file_type            => 'image/png',
+                encryption_algorithm => 'aes-gcm',
+                decryption_key       => 'key',
+                decryption_nonce     => 'nonce',
+                x                    => 'a' x 64,
+            );
+        },
+        qr/recipients must contain at least one recipient/i,
+        'empty recipient list rejected'
+    );
+};
+
+subtest 'kind 15 encryption-algorithm only supports aes-gcm' => sub {
+    like(
+        dies {
+            Net::Nostr::DirectMessage->create_file(
+                sender_pubkey        => $SENDER_PUBKEY,
+                content              => 'https://example.com/file.bin',
+                recipients           => [$RECIPIENT_PUBKEY],
+                file_type            => 'image/png',
+                encryption_algorithm => 'chacha20',
+                decryption_key       => 'key',
+                decryption_nonce     => 'nonce',
+                x                    => 'a' x 64,
+            );
+        },
+        qr/encryption_algorithm.*aes-gcm/i,
+        'unsupported algorithm rejected'
+    );
+};
+
+subtest 'kind 15 x and ox must be hex-encoded SHA-256 values' => sub {
+    like(
+        dies {
+            Net::Nostr::DirectMessage->create_file(
+                sender_pubkey        => $SENDER_PUBKEY,
+                content              => 'https://example.com/file.bin',
+                recipients           => [$RECIPIENT_PUBKEY],
+                file_type            => 'image/png',
+                encryption_algorithm => 'aes-gcm',
+                decryption_key       => 'key',
+                decryption_nonce     => 'nonce',
+                x                    => 'not-hex',
+            );
+        },
+        qr/x must be 64-char lowercase hex/i,
+        'invalid x rejected'
+    );
+
+    like(
+        dies {
+            Net::Nostr::DirectMessage->create_file(
+                sender_pubkey        => $SENDER_PUBKEY,
+                content              => 'https://example.com/file.bin',
+                recipients           => [$RECIPIENT_PUBKEY],
+                file_type            => 'image/png',
+                encryption_algorithm => 'aes-gcm',
+                decryption_key       => 'key',
+                decryption_nonce     => 'nonce',
+                x                    => 'a' x 64,
+                ox                   => 'not-hex',
+            );
+        },
+        qr/ox must be 64-char lowercase hex/i,
+        'invalid ox rejected'
+    );
+};
+
 ###############################################################################
 # Encrypting: seal and gift wrap to each recipient + sender
 ###############################################################################
@@ -330,6 +419,30 @@ subtest 'kind 10050 DM relay list' => sub {
     is(scalar @relay_tags, 2, 'two relay tags');
     is($relay_tags[0][1], 'wss://inbox.nostr.wine', 'first relay');
     is($relay_tags[1][1], 'wss://myrelay.nostr1.com', 'second relay');
+};
+
+subtest 'kind 10050 relay list requires relay URIs' => sub {
+    like(
+        dies {
+            Net::Nostr::DirectMessage->create_relay_list(
+                pubkey => $SENDER_PUBKEY,
+                relays => [],
+            );
+        },
+        qr/relays must contain at least one relay URI/i,
+        'empty relay list rejected'
+    );
+
+    like(
+        dies {
+            Net::Nostr::DirectMessage->create_relay_list(
+                pubkey => $SENDER_PUBKEY,
+                relays => ['not a uri'],
+            );
+        },
+        qr/relay URI/i,
+        'non-URI relay rejected'
+    );
 };
 
 subtest 'kind 10050 uses relay tags (not r tags)' => sub {

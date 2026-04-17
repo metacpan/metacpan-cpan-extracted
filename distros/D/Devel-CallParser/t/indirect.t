@@ -1,6 +1,7 @@
 use warnings;
 no warnings "void";
 use strict;
+use lib '.';
 
 BEGIN {
 	eval {

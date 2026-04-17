@@ -4,7 +4,7 @@ use base qw(MARC::Leader::L10N);
 use strict;
 use warnings;
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 our %Lexicon = (
 	'_AUTO' => 1,
@@ -38,26 +38,16 @@ our %Lexicon = (
 	'encoding_level.u' => 'Unknown',
 	'encoding_level.z' => 'Not applicable',
 
-	'impl_def_portion_len,0' => 'Number of characters in the implementation-defined portion of a Directory entry',
-
-	'indicator_count.2' => 'Number of character positions used for indicators',
-
-	'length_of_field_portion_len.4' => 'Number of characters in the length-of-field portion of a Directory entry',
-
 	'multipart_resource_record_level._' => 'Not specified or not applicable',
 	'multipart_resource_record_level.a' => 'Set',
 	'multipart_resource_record_level.b' => 'Part with independent title',
 	'multipart_resource_record_level.c' => 'Part with dependent title',
-
-	'starting_char_pos_portion_len.5' => 'Number of characters in the starting-character-position portion of a Directory entry',
 
 	'status.a' => 'Increase in encoding level',
 	'status.c' => 'Corrected or revised',
 	'status.d' => 'Deleted',
 	'status.n' => 'New',
 	'status.p' => 'Increase in encoding level from prepublication',
-
-	'subfield_code_count.2' => 'Number of character positions used for a subfield code',
 
 	'type.a' => 'Language material',
 	'type.c' => 'Notated music',

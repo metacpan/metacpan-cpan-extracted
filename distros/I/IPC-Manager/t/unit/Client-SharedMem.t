@@ -1,7 +1,19 @@
 use Test2::V0;
 use Test2::Require::Module 'IPC::SysV' => '2.09';
 
-use IPC::Manager::Client::SharedMem;
+# Skip if Makefile.PL disabled SharedMem because the host's SysV IPC
+# was broken at install time.  _viable() throws when disabled, so
+# viable() returns false.
+require IPC::Manager::Client::SharedMem;
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    unless (IPC::Manager::Client::SharedMem->viable) {
+        my $reason = join('', @warnings) || 'viable() returned false';
+        plan(skip_all => "IPC::Manager::Client::SharedMem not viable: $reason");
+    }
+}
+
 use IPC::Manager::Serializer::JSON;
 
 my $CLASS      = 'IPC::Manager::Client::SharedMem';

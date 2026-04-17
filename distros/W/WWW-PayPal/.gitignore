@@ -1,0 +1,12 @@
+WWW-PayPal-*
+.build/
+cover_db/
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/

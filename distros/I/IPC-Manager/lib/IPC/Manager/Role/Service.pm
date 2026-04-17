@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000022';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -58,6 +58,7 @@ sub run_on_cleanup         { }
 sub run_on_general_message { }
 sub run_on_interval        { }
 sub run_on_peer_delta      { }
+sub run_on_pid             { }
 sub run_on_sig             { }
 sub run_on_start           { }
 sub run_should_end         { }
@@ -78,6 +79,7 @@ sub _run_on_cleanup    { my ($self, @args) = @_; $self->try(sub { $self->run_on_
 sub _run_on_interval   { my ($self, @args) = @_; $self->try(sub { $self->run_on_interval(@args)   }) }
 sub _run_on_message    { my ($self, @args) = @_; $self->try(sub { $self->run_on_message(@args)    }) }
 sub _run_on_peer_delta { my ($self, @args) = @_; $self->try(sub { $self->run_on_peer_delta(@args) }) }
+sub _run_on_pid        { my ($self, @args) = @_; $self->try(sub { $self->run_on_pid(@args)        }) }
 sub _run_on_sig        { my ($self, @args) = @_; $self->try(sub { $self->run_on_sig(@args)        }) }
 sub _run_on_start      { my ($self, @args) = @_; $self->try(sub { $self->run_on_start(@args)      }) }
 sub _run_on_unhandled  { my ($self, @args) = @_; $self->try(sub { $self->run_on_unhandled(@args)  }) }
@@ -163,6 +165,30 @@ sub reap_workers {
     }
 
     return \%out;
+}
+
+sub reap_children {
+    my $self = shift;
+    local $?;
+
+    my $workers = $self->{_WORKERS};
+    my %pids;
+
+    while (1) {
+        my $pid = waitpid(-1, WNOHANG);
+        last if $pid == 0 || $pid == -1;
+
+        my $exit = $?;
+
+        if ($workers && exists $workers->{$pid}) {
+            delete $workers->{$pid};
+            next;
+        }
+
+        $pids{$pid} = $exit;
+    }
+
+    return \%pids;
 }
 
 sub run_on_message {
@@ -361,7 +387,8 @@ sub watch {
         my @messages;
         my %activity;
 
-        $self->reap_workers;
+        my $reaped = $self->reap_children;
+        $activity{pids} = $reaped if $reaped && keys %$reaped;
 
         my $select = $self->select;
 
@@ -436,6 +463,12 @@ sub run {
             for my $sig (keys %$sigs) {
                 my $count = delete $sigs->{$sig} or next;
                 $self->_run_on_sig($sig) for $count;
+            }
+        }
+
+        if (my $pids = delete $activity->{pids}) {
+            for my $pid (keys %$pids) {
+                $self->_run_on_pid($pid, $pids->{$pid});
             }
         }
 
@@ -680,6 +713,13 @@ Called when peer connections change. C<$delta> is a hashref showing added/remove
 
 The L</"ACTIVITY HASH"> section shows the structure of the peer_delta as well.
 
+=item $self->run_on_pid($pid, $exit)
+
+Called when a non-worker child process is reaped by C<reap_children> during the
+service loop.  C<$pid> is the process ID and C<$exit> is the raw C<$?> value
+captured from C<waitpid>.  Worker processes registered via C<register_worker>
+are handled internally and do B<not> reach this callback.
+
 =item $self->run_on_sig($sig)
 
 Called when a signal is received. May be called multiple times in rapid
@@ -713,7 +753,22 @@ Returns a hashref of worker PIDs to names.
 
 =item $self->reap_workers()
 
-Reaps terminated worker processes. Returns a hashref of results.
+Reaps terminated worker processes by calling C<waitpid> on each registered
+worker PID.  Used by C<terminate_workers> at shutdown; the main service loop
+uses C<reap_children> instead.
+
+Returns a hashref of results.
+
+=item $pids = $self->reap_children()
+
+Calls C<waitpid(-1, WNOHANG)> in a loop to reap any ready child process.
+For each reaped PID that matches a registered worker the worker is removed
+from the internal workers hash.  For any other PID the pair is collected into
+a hashref mapping C<< $pid => $exit >> (the raw C<$?> value), which is
+returned.  C<$?> is localized so the caller's value is not disturbed.
+
+This is called once per iteration of the service loop and is what feeds the
+C<pids> key of the L</"ACTIVITY HASH">.
 
 =item $self->send_response($peer, $id, $resp)
 
@@ -792,6 +847,9 @@ Note that all keys that are not applicable may be omitted.
 
         # True if a wtached pid has exited
         pid_watch => $bool,
+
+        # Hashref of non-worker child pids reaped this iteration mapped to their raw $? exit values
+        pids => {pid1 => $exit1, pid2 => $exit2},
 
         # Hashref of all signals intercepted since the last iteration, plus a count of how many times they were recieved
         sigs => {sig => $count, sig2 => $count2},

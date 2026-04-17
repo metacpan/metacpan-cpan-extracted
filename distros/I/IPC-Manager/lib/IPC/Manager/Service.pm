@@ -2,7 +2,7 @@ package IPC::Manager::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000022';
 
 use Carp qw/croak confess/;
 use List::Util qw/max/;
@@ -15,6 +15,7 @@ BEGIN {
         on_general_message
         on_interval
         on_peer_delta
+        on_pid
         on_start
         on_unhandled
         should_end
@@ -273,6 +274,12 @@ Callback called at regular intervals.
 
 Callback called when peer connections change.
 
+=item on_pid => \&callback
+
+Callback called (with C<$pid> and C<$exit>) for each non-worker child process
+reaped by the service loop.  Worker processes registered with
+C<ipcm_worker> are handled internally and do not trigger this callback.
+
 =item on_start => \&callback
 
 Callback called on startup before the main loop.
@@ -424,6 +431,27 @@ Runs all callbacks for C<on_peer_delta>.
 =item $self->remove_on_peer_delta($cb)
 
 Removes a specific callback from the C<on_peer_delta> callback array.
+
+=item $self->clear_on_pid()
+
+Clears the array of callbacks for C<on_pid>.
+
+=item $self->push_on_pid($cb)
+
+Adds a callback to the C<on_pid> callback array.
+
+=item $self->unshift_on_pid($cb)
+
+Prepends a callback to the C<on_pid> callback array.
+
+=item $self->run_on_pid($pid, $exit)
+
+Runs all callbacks for C<on_pid>, passing the reaped child's PID and raw C<$?>
+exit value.
+
+=item $self->remove_on_pid($cb)
+
+Removes a specific callback from the C<on_pid> callback array.
 
 =item $self->clear_on_start()
 

@@ -14,3 +14,9 @@ Revision history for Perl extension Crypt::OpenSSL::PBKDF2.
 	- added derive_bin function
 	- updated docs
 	- updated tests (w RFC7060 vectors)
+
+0.10  Thu Apr 16 13:21:00 2026
+	- added alg parm to functions to select the algorithm to use for hashing
+	- fixed and updated docs
+	- updated tests
+	- updated licensing

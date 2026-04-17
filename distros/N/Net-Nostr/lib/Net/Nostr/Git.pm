@@ -3,6 +3,7 @@ package Net::Nostr::Git;
 use strictures 2;
 
 use Carp qw(croak);
+use Net::Nostr::Bech32 qw(decode_naddr);
 use Net::Nostr::Event;
 
 my $HEX64 = qr/\A[0-9a-f]{64}\z/;
@@ -475,6 +476,79 @@ sub _parse_grasp_list {
     );
 }
 
+sub _percent_encode {
+    my ($str) = @_;
+    utf8::encode($str) if utf8::is_utf8($str);
+    $str =~ s/([^A-Za-z0-9._~-])/sprintf('%%%02X', ord($1))/ge;
+    return $str;
+}
+
+sub _percent_decode {
+    my ($str) = @_;
+    $str =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+    utf8::decode($str);
+    return $str;
+}
+
+sub nostr_clone_url {
+    my ($class, %args) = @_;
+
+    if (defined $args{naddr}) {
+        decode_naddr($args{naddr});
+        return "nostr://$args{naddr}";
+    }
+
+    my $owner      = $args{owner}      // croak "nostr_clone_url requires 'naddr' or 'owner'";
+    my $identifier = $args{identifier} // croak "nostr_clone_url requires 'identifier'";
+
+    croak "owner must not be empty" unless length $owner;
+
+    my $enc_id = _percent_encode($identifier);
+
+    if (defined $args{relay_hint}) {
+        my $relay = $args{relay_hint};
+        $relay =~ s{\Awss://}{};
+        my $enc_relay = _percent_encode($relay);
+        return "nostr://$owner/$enc_relay/$enc_id";
+    }
+
+    return "nostr://$owner/$enc_id";
+}
+
+sub parse_nostr_clone_url {
+    my ($class, $url) = @_;
+    croak "nostr:// URL required" unless defined $url && $url =~ m{\Anostr://(.+)\z}i;
+    my $rest = $1;
+
+    # naddr form
+    if ($rest =~ /\Anaddr1/) {
+        my $data = decode_naddr($rest);
+        return $data;
+    }
+
+    # owner/[relay-hint/]identifier form
+    my @parts = split m{/}, $rest, -1;
+    my $owner = $parts[0];
+    croak "owner must not be empty" unless defined $owner && length $owner;
+    croak "nostr:// clone URL requires an identifier" if @parts < 2;
+
+    if (@parts == 2) {
+        return {
+            owner      => $owner,
+            identifier => _percent_decode($parts[1]),
+        };
+    }
+
+    my $relay_hint = _percent_decode($parts[1]);
+    $relay_hint = "wss://$relay_hint" unless $relay_hint =~ m{://};
+
+    return {
+        owner      => $owner,
+        relay_hint => $relay_hint,
+        identifier => _percent_decode($parts[2]),
+    };
+}
+
 sub validate {
     my ($class, $event) = @_;
     my $kind = $event->kind;
@@ -816,6 +890,69 @@ tagged in the Applied event.
 Creates a kind 10317 (replaceable) user grasp list event with C<g> tags
 for grasp server URLs in order of preference. C<servers> is optional;
 zero or more grasp server URLs may be provided.
+
+=head2 nostr_clone_url
+
+    my $url = Net::Nostr::Git->nostr_clone_url(naddr => $naddr_bech32);
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => $npub_or_nip05,
+        identifier => 'repo-id',
+    );
+    my $url = Net::Nostr::Git->nostr_clone_url(
+        owner      => $npub_or_nip05,
+        relay_hint => 'wss://relay.example.com',
+        identifier => 'repo-id',
+    );
+
+Builds a C<nostr://> clone URL compatible with C<git clone> when a
+C<git-remote-nostr> helper is installed. Three forms are supported:
+
+=over 4
+
+=item C<nostr://E<lt>naddrE<gt>> - an naddr bech32 referencing a kind 30617 event
+
+=item C<nostr://E<lt>npub|nip05E<gt>/E<lt>identifierE<gt>> - owner and repository C<d> tag
+
+=item C<nostr://E<lt>npub|nip05E<gt>/E<lt>relay-hintE<gt>/E<lt>identifierE<gt>> - with relay hint
+
+=back
+
+C<relay_hint> and C<identifier> are automatically percent-encoded per
+RFC 3986. The C<wss://> scheme is stripped from relay hints for brevity;
+other schemes (e.g. C<ws://>) are kept and percent-encoded.
+
+Croaks if required arguments are missing or if the C<naddr> is invalid.
+
+=head2 parse_nostr_clone_url
+
+    my $result = Net::Nostr::Git->parse_nostr_clone_url($url);
+
+Parses a C<nostr://> clone URL. For the naddr form, returns the decoded
+naddr data (same structure as C<decode_naddr> from L<Net::Nostr::Bech32>):
+
+    # { identifier => '...', pubkey => '...', kind => 30617, relays => [...] }
+
+For owner forms, returns:
+
+    # { owner => '...', identifier => '...' }
+    # { owner => '...', relay_hint => 'wss://...', identifier => '...' }
+
+Relay hints without a scheme get C<wss://> prepended. Percent-encoded
+components are decoded automatically.
+
+Croaks if the URL is missing, does not start with C<nostr://>, or lacks
+required path segments.
+
+    # Spec examples:
+    Net::Nostr::Git->parse_nostr_clone_url(
+        'nostr://npub1.../relay.ngit.dev/ngit'
+    );
+    # { owner => 'npub1...', relay_hint => 'wss://relay.ngit.dev', identifier => 'ngit' }
+
+    Net::Nostr::Git->parse_nostr_clone_url(
+        'nostr://danconwaydev.com/ws%3A%2F%2Flocalhost%3A7334/my-local-only-repo'
+    );
+    # { owner => 'danconwaydev.com', relay_hint => 'ws://localhost:7334', identifier => 'my-local-only-repo' }
 
 =head2 from_event
 

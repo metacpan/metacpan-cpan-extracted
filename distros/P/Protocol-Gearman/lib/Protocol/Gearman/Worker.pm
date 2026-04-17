@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Protocol::Gearman::Worker;
+package Protocol::Gearman::Worker 0.05;
 
-use strict;
+use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use base qw( Protocol::Gearman );
 
@@ -19,6 +20,8 @@ use Carp;
 C<Protocol::Gearman::Worker> - implement a Gearman worker
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 A base class that implements a complete Gearman worker. This abstract class
 still requires the implementation methods as documented in
@@ -41,7 +44,9 @@ L<Net::Gearman::Worker>.
 
 =cut
 
-=head2 $worker->can_do( $name, %opts )
+=head2 can_do
+
+   $worker->can_do( $name, %opts );
 
 Informs the server that the worker can perform a function of the given name.
 
@@ -59,11 +64,8 @@ have completed. The timeout is specified in seconds.
 
 =cut
 
-sub can_do
+sub can_do ( $self, $name, %opts )
 {
-   my $self = shift;
-   my ( $name, %opts ) = @_;
-
    my $timeout = $opts{timeout};
 
    if( defined $timeout ) {
@@ -74,56 +76,51 @@ sub can_do
    }
 }
 
-=head2 $worker->grab_job ==> $job
+=head2 grab_job
+
+   $job = await $worker->grab_job;
 
 Returns a future that will eventually yield another job assignment from the
 server as an instance of a job object; see below.
 
 =cut
 
-sub grab_job
+sub grab_job ( $self )
 {
-   my $self = shift;
-
    my $state = $self->gearman_state;
 
-   push @{ $state->{gearman_assigns} }, my $f = $self->new_future;
+   push $state->{gearman_assigns}->@*, my $f = $self->new_future;
 
    $self->send_packet( GRAB_JOB => );
 
    return $f;
 }
 
-sub on_JOB_ASSIGN
+sub on_JOB_ASSIGN ( $self, @args )
 {
-   my $self = shift;
-   my @args = @_;
-
    my $state = $self->gearman_state;
 
-   my $f = shift @{ $state->{gearman_assigns} };
+   my $f = shift $state->{gearman_assigns}->@*;
    $f->done( Protocol::Gearman::Worker::Job->new( $self, @args ) );
 }
 
 # Manage Gearman's slightly odd sleep/wakeup job request loop
 
-sub on_NO_JOB
+sub on_NO_JOB ( $self )
 {
-   my $self = shift;
-
    $self->send_packet( PRE_SLEEP => );
 }
 
-sub on_NOOP
+sub on_NOOP ( $self )
 {
-   my $self = shift;
-
    my $state = $self->gearman_state;
 
-   $self->send_packet( GRAB_JOB => ) if @{ $state->{gearman_assigns} };
+   $self->send_packet( GRAB_JOB => ) if $state->{gearman_assigns}->@*;
 }
 
-=head2 $worker->job_finished( $job )
+=head2 job_finished
+
+   $worker->job_finished( $job );
 
 Invoked by the C<complete> and C<fail> methods on a job object, after the
 server has been informed of the final status of the job. By default this
@@ -132,7 +129,7 @@ informed when a job is finished.
 
 =cut
 
-sub job_finished { }
+sub job_finished ( $self, $ ) { }
 
 package # hide from CPAN
    Protocol::Gearman::Worker::Job;
@@ -145,11 +142,8 @@ of the work to perform, and report on its result.
 
 =cut
 
-sub new
+sub new ( $class, $worker, $handle, $func, $arg )
 {
-   my $class = shift;
-   my ( $worker, $handle, $func, $arg ) = @_;
-
    return bless {
       worker => $worker,
       handle => $handle,
@@ -158,88 +152,94 @@ sub new
    }, $class;
 }
 
-=head2 $worker = $job->worker
+=head2 worker
+
+   $worker = $job->worker;
 
 Returns the C<Protocol::Gearman::Worker> object the job was received by.
 
-=head2 $handle = $job->handle
+=head2 handle
+
+   $handle = $job->handle;
 
 Returns the job handle assigned by the server. Most implementations should not
 need to use this directly.
 
-=head2 $func = $job->func
+=head2 func
 
-=head2 $arg = $job->arg
+=head2 arg
+
+   $func = $job->func;
+
+   $arg = $job->arg;
 
 The function name and opaque argument data bytes sent by the requesting
 client.
 
 =cut
 
-sub worker { $_[0]->{worker} }
-sub handle { $_[0]->{handle} }
-sub func   { $_[0]->{func} }
-sub arg    { $_[0]->{arg} }
+sub worker ( $self ) { $self->{worker} }
+sub handle ( $self ) { $self->{handle} }
+sub func   ( $self ) { $self->{func} }
+sub arg    ( $self ) { $self->{arg} }
 
-=head2 $job->data( $data )
+=head2 data
+
+   $job->data( $data );
 
 Sends more data back to the client. Intended for long-running jobs with
 incremental output.
 
 =cut
 
-sub data
+sub data ( $self, $data )
 {
-   my $self = shift;
-   my ( $data ) = @_;
-
    $self->worker->send_packet( WORK_DATA => $self->handle, $data );
 }
 
-=head2 $job->warning( $warning )
+=head2 warning
+
+   $job->warning( $warning );
 
 Sends a warning to the client.
 
 =cut
 
-sub warning
+sub warning ( $self, $warning )
 {
-   my $self = shift;
-   my ( $warning ) = @_;
-
    $self->worker->send_packet( WORK_WARNING => $self->handle, $warning );
 }
 
-=head2 $job->status( $numerator, $denominator )
+=head2 status
+
+   $job->status( $numerator, $denominator );
 
 Sets the current progress of the job.
 
 =cut
 
-sub status
+sub status ( $self, $num, $denom )
 {
-   my $self = shift;
-   my ( $num, $denom ) = @_;
-
    $self->worker->send_packet( WORK_STATUS => $self->handle, $num, $denom );
 }
 
-=head2 $job->complete( $result )
+=head2 complete
+
+   $job->complete( $result );
 
 Informs the server that the job is now complete, and sets its result.
 
 =cut
 
-sub complete
+sub complete ( $self, $result )
 {
-   my $self = shift;
-   my ( $result ) = @_;
-
    $self->worker->send_packet( WORK_COMPLETE => $self->handle, $result );
    $self->worker->job_finished( $self );
 }
 
-=head2 $job->fail( $exception )
+=head2 fail
+
+   $job->fail( $exception );
 
 Informs the server that the job has failed.
 
@@ -249,11 +249,8 @@ receive this; it is an optional feature.
 
 =cut
 
-sub fail
+sub fail ( $self, $exception )
 {
-   my $self = shift;
-   my ( $exception ) = @_;
-
    if( defined $exception ) {
       $self->worker->send_packet( WORK_EXCEPTION => $self->handle, $exception );
    }

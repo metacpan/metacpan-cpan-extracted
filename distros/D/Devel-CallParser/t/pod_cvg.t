@@ -1,5 +1,6 @@
 use warnings;
 use strict;
+use lib '.';
 
 use Test::More;
 plan skip_all => "Test::Pod::Coverage not available"

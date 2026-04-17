@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future;
 use Protocol::Gearman::Client;
@@ -71,7 +71,7 @@ my $client = TestClient->new;
 
    is( $result, "result", '$result from ->submit_job->get' );
    is( $data, "moredata", 'on_data received data for ->submit_job' );
-   is_deeply( \@warnings, [ "Ooops?" ], 'on_warning received warnings for ->submit_job' );
+   is( \@warnings, [ "Ooops?" ], 'on_warning received warnings for ->submit_job' );
    is( $status, "1/1", 'on_status received status updates for ->submit_job' );
 }
 
@@ -134,9 +134,9 @@ my $client = TestClient->new;
       arg  => "arg",
    );
 
-   is_deeply( [ $f->failure ],
-              [ "Work failed", gearman => "The failure here" ],
-              '->failure from ->submit_job on failing job' );
+   is( [ $f->failure ],
+       [ "Work failed", gearman => "The failure here" ],
+       '->failure from ->submit_job on failing job' );
 }
 
 done_testing;

@@ -10,8 +10,12 @@ TODO:
     * Add Profit tax
     * Add tourist levy
 
-0.012     2025-01-15 17:33:59Z
+0.013     2026-04-15 14:45:15Z
 
+    * Fix small (display) issue with negative 0 on nett wages
+    * 2026 == 2025
+
+0.012     2025-01-15 17:33:59Z
 
     * Fix bug for 2023/2024 income tax rate of lowest tier
 

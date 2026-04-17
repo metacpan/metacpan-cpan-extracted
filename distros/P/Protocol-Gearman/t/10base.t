@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
-use Test::HexString;
+use Test2::V0;
 
 use Future;
 
@@ -31,7 +29,7 @@ ok( defined $base, '$base defined' );
 
    $base->send_packet( SUBMIT_JOB => "func", "id", "ARGS" );
 
-   is_hexstr( $sent, "\0REQ\x00\x00\x00\x07\x00\x00\x00\x0c" .
+   is( $sent, "\0REQ\x00\x00\x00\x07\x00\x00\x00\x0c" .
          "func\0id\0ARGS",
       'data written by ->pack_send_packet' );
 }
@@ -55,7 +53,7 @@ ok( defined $base, '$base defined' );
 
    $buffer = "\0RES\x00\x00\x00\x13\x00\x00\x00\x15fail\0This call failed";
 
-   like( exception { $base->on_recv( $buffer ) },
+   like( dies { $base->on_recv( $buffer ) },
       qr/"This call failed"/, 'automatic ERROR packet handling' );
 }
 

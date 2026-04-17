@@ -29,6 +29,7 @@
 #include "include/chandra/chandra_splash.h"
 #include "include/chandra/chandra_form.h"
 #include "include/chandra/chandra_bridge_ext.h"
+#include "include/chandra/chandra_canvas.h"
 
 /* Window registry - maps native wid to Perl SV* objects */
 static HV *_window_registry = NULL;
@@ -104,3 +105,4 @@ INCLUDE: xs/log.xs
 INCLUDE: xs/window.xs
 INCLUDE: xs/splash.xs
 INCLUDE: xs/form.xs
+INCLUDE: xs/canvas.xs

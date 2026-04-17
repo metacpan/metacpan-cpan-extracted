@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl FFI binding to H3 library functions'
+abstract: 'Perl FFI binding to H3 v3.x library functions'
 author:
   - 'Michael R. Davis (mrdvt@cpan.org)'
 build_requires:
@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,4 +28,5 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Geo-H3-FFI/issues
   homepage: https://github.com/mrdvt92/perl-Geo-H3-FFI
   repository: https://github.com/mrdvt92/perl-Geo-H3-FFI.git
-version: '0.06'
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

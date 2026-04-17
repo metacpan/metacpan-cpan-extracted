@@ -47,7 +47,7 @@ sub new {
     my %args = @_;
     {
         my %known = map { $_ => 1 } (@SCALAR_FIELDS, @LIST_FIELDS);
-        my @unknown = grep { !$known{$_} && !/^#[a-zA-Z]$/ } keys %args;
+        my @unknown = grep { !$known{$_} && !/^#[a-zA-Z][a-zA-Z0-9_]*$/ } keys %args;
         croak "unknown argument(s): " . join(', ', sort @unknown) if @unknown;
     }
     my $self = bless {}, $class;
@@ -77,10 +77,10 @@ sub new {
         }
     }
 
-    # extract #<letter> tag filters
+    # extract #<tag-name> tag filters
     my %tf;
     for my $k (keys %args) {
-        if ($k =~ /^#([a-zA-Z])$/) {
+        if ($k =~ /^#([a-zA-Z][a-zA-Z0-9_]*)$/) {
             croak "$k must be a non-empty array"
                 unless ref($args{$k}) eq 'ARRAY' && @{$args{$k}};
             _validate_hex64("#$1", $args{$k}) if $HEX64_REQUIRED{$1};
@@ -218,9 +218,14 @@ Net::Nostr::Filter - Nostr event filter for subscriptions and queries
     # Check if an event matches
     if ($filter->matches($event)) { ... }
 
-    # Tag filters use #<letter> syntax
+    # Tag filters use #<tag-name> syntax
     my $filter = Net::Nostr::Filter->new(
         '#t' => ['nostr', 'perl'],
+    );
+
+    # Multi-letter tag names are supported
+    my $filter = Net::Nostr::Filter->new(
+        '#overnet_et' => ['chat'],
     );
 
     # Retrieve a tag filter
@@ -257,8 +262,10 @@ filters in a subscription are OR-ed (use C<matches_any>).
 All fields are optional. C<ids>, C<authors>, C<#e>, and C<#p> values must
 be 64-character lowercase hex strings. C<kinds> values must be integers
 between 0 and 65535. C<since>, C<until>, and C<limit> must be non-negative
-integers. C<search> must be a plain string (not a reference). Croaks on
-invalid values or unknown arguments.
+integers. C<search> must be a plain string (not a reference). Tag filter
+keys use the form C<#E<lt>nameE<gt>> where the name starts with a letter
+and may contain letters, digits, and underscores (e.g. C<#t>, C<#e>,
+C<#overnet_et>). Croaks on invalid values or unknown arguments.
 
 The C<search> field (NIP-50) is a human-readable query string. It may
 contain C<key:value> extension pairs (e.g. C<language:en>). See
@@ -302,7 +309,7 @@ Class method. Returns true if the event matches any of the given filters
     my $values = $filter->tag_filter('t');  # ['nostr'] or undef
 
 Returns the arrayref of values for a tag filter, or C<undef> if that
-tag letter was not specified.
+tag name was not specified.
 
 =head2 to_hash
 

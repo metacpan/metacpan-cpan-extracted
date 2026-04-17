@@ -4,6 +4,7 @@ author:
   - 'Robin Murray <mvsjes@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  HTTP::Status: '0'
   Perl::Critic::TooMuchCode: '0'
   Sub::Override: '0'
   Test::Class: '0'
@@ -28,7 +29,6 @@ requires:
   Cache::Memory::Simple: '0'
   Carp: '0'
   Exporter: '0'
-  File::Slurp: '0'
   Furl: '0'
   Hash::Merge: '0'
   JSON::MaybeXS: '0'
@@ -36,6 +36,7 @@ requires:
   List::MoreUtils: '0'
   List::Util: '0'
   Log::Log4perl: '0'
+  MIME::Lite: '0'
   Module::Load: '0'
   Net::OAuth2::Client: '0'
   Net::OAuth2::Profile::WebServer: '0'
@@ -60,5 +61,5 @@ requires:
   constant: '0'
 resources:
   repository: https://github.com/mvsjes2/p5-google-restapi.git
-version: v2.2.1
+version: v2.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

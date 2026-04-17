@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::IRI qw(check_iri);
 use Readonly;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -20,6 +20,7 @@ Readonly::Array our @BAD_IRIS => (
 	['foo'],
 	['https://michal.josef.špaček', 'https://michal.josef.špaček in bytes'],
 	['://foo'],
+	['mailto:foo@example.com'],
 );
 
 # Test.

@@ -1,15 +1,16 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Protocol::Gearman" );
-use_ok( "Protocol::Gearman::Client" );
-use_ok( "Protocol::Gearman::Worker" );
-use_ok( "Net::Gearman" );
-use_ok( "Net::Gearman::Client" );
-use_ok( "Net::Gearman::Worker" );
+require Protocol::Gearman;
+require Protocol::Gearman::Client;
+require Protocol::Gearman::Worker;
+require Net::Gearman;
+require Net::Gearman::Client;
+require Net::Gearman::Worker;
 
+pass( 'Modules loaded' );
 done_testing;

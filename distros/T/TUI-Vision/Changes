@@ -1,0 +1,4 @@
+2.0.0  2026-04-16
+    - Initial namespace reservation for TUI::Vision
+    - Added stub modules for all TUI::* components
+    - Added toolkit placeholder

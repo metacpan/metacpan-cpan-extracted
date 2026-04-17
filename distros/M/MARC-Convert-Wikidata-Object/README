@@ -482,6 +482,9 @@ ERRORS
                      Parameter 'subtitles' must be a array.
                              Value: %s
                              Reference: %s
+                     Parameter 'udcs' must be a array.
+                             Value: %s
+                             Reference: %s
 
              From Mo::utils::Array::check_array_object():
                      Parameter 'authors' must be a array.
@@ -627,10 +630,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2021-2025
+    © Michal Josef Špaček 2021-2026
 
     BSD 2-Clause License
 
 VERSION
-    0.15
+    0.16
 

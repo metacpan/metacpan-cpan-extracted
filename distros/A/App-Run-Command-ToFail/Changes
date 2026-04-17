@@ -1,3 +1,8 @@
+0.06 2026-04-15T20:07:18+02:00
+ - Add SEE ALSO section to doc with quicktest app.
+ - Add test for perl preset.
+ - Update copyright years.
+
 0.05 2024-07-01T15:31:27+02:00
  - Add DESCRIPTION section to doc.
  - Fix minimal version of Test::Warn.

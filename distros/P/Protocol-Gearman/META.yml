@@ -3,11 +3,11 @@ abstract: 'abstract base class for both client and worker'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Fatal: '0'
-  Test::HexString: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,27 +16,28 @@ name: Protocol-Gearman
 provides:
   Net::Gearman:
     file: lib/Net/Gearman.pm
-    version: '0.04'
+    version: '0.05'
   Net::Gearman::Client:
     file: lib/Net/Gearman/Client.pm
-    version: '0.04'
+    version: '0.05'
   Net::Gearman::Worker:
     file: lib/Net/Gearman/Worker.pm
-    version: '0.04'
+    version: '0.05'
   Protocol::Gearman:
     file: lib/Protocol/Gearman.pm
-    version: '0.04'
+    version: '0.05'
   Protocol::Gearman::Client:
     file: lib/Protocol/Gearman/Client.pm
-    version: '0.04'
+    version: '0.05'
   Protocol::Gearman::Worker:
     file: lib/Protocol/Gearman/Worker.pm
-    version: '0.04'
+    version: '0.05'
 requires:
-  Future: '0'
+  Future: '0.49'
   IO::Socket::IP: '0'
   Struct::Dumb: '0'
-  perl: '5.010'
+  perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

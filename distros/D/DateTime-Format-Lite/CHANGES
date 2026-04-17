@@ -1,0 +1,27 @@
+Revision history for Perl module DateTime::Format::Lite
+
+v0.1.0 2026-04-16T13:32:10+0900
+	- Initial version
+	- Parses and formats datetime strings using strptime-style patterns.
+	- XS-accelerated _match_and_extract() and format_datetime() with automatic
+	  pure-Perl fallback (DateTime::Format::Lite::PP) when no compiler is available.
+	- Supports all standard strptime tokens including %N (nanoseconds), %O
+	  (Olson/IANA timezone name), %s (epoch), %z (numeric offset), and %Z
+	  (timezone abbreviation).
+	- Timezone abbreviation resolution via the IANA SQLite database bundled with
+	  DateTime::Lite::TimeZone, with zone_map override for ambiguous abbreviations
+	  such as IST or EST.
+	- When both %Z and %z are parsed, the explicit numeric offset (%z) takes precedence
+	  and the abbreviation is treated as informational.
+	- Locale-aware day and month name parsing and formatting via DateTime::Locale::FromCLDR.
+	- Three error-handling modes:
+	  - on_error => 'undef' (default);
+	  - on_error => coderef; and
+	  - on_error => die
+	- DateTime::Format::Lite::NullObject returned on error in object context for safe
+	  method chaining.
+	- Exportable strptime() and strftime() convenience functions.
+	- Full serialisation support: FREEZE/THAW (Sereal/CBOR), STORABLE_freeze/STORABLE_thaw
+	  (Storable), and TO_JSON.
+	- Comprehensive cross-field validation: 24-hour vs 12-hour, epoch vs date components,
+	  year vs century, day name vs date, and more.

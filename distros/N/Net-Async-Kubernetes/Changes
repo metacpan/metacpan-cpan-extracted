@@ -1,5 +1,32 @@
 Revision history for Net-Async-Kubernetes
 
+0.007     2026-04-15 18:21:50Z
+ - Add `Net::Async::Kubernetes::Controller` as a minimal controller runtime.
+   Provides watch registration, keyed workqueue deduplication, serialized
+   reconcile dispatch, retry hooks, and small helpers for object reload and
+   status subresource patch/update.
+ - Add `$kube->controller(...)` factory to bind controller runtimes directly
+   to an existing async Kubernetes client.
+ - Fix async TLS handling for kubeconfigs with inline CA/client PEM data by
+   materializing PEM content to temporary files before passing SSL options to
+   Net::Async::HTTP / IO::Socket::SSL. This unblocks mTLS-authenticated async
+   clients and controller runtimes against real clusters using embedded certs.
+ - Add active `exec()` API that builds Kubernetes pod exec requests
+   (`/exec` subresource) and delegates to the websocket duplex transport.
+   Supports command, container, stdin/stdout/stderr/tty toggles, and
+   subprotocol override.
+ - Add active `attach()` API that builds Kubernetes pod attach requests
+   (`/attach` subresource) and delegates to the websocket duplex transport.
+   Supports container, stdin/stdout/stderr/tty toggles, and subprotocol
+   override.
+ - Extend `Net::Async::Kubernetes::PortForwardSession` with `write_stdin`
+   (writes to channel 0) and `resize` (writes TTY resize JSON to channel 4)
+   helpers for exec/attach sessions.
+ - Add async `cp_to_pod()` and `cp_from_pod()` helpers that stream tar
+   archives through an exec session for file transfer.
+ - Add mock test coverage for exec (`t/14-mock-exec.t`), attach
+   (`t/15-mock-attach.t`), and cp (`t/16-mock-cp.t`) flows.
+
 0.006     2026-03-09 08:37:54Z
  - Add async Pod Log API via `log()`.
    Supports one-shot mode (Future resolves to full text) and streaming mode
@@ -21,6 +48,19 @@ Revision history for Net-Async-Kubernetes
    (stdin/stdout/stderr/tty).
  - Add async exec test coverage (`t/14-mock-exec.t`) and duplex transport
    assertions for exec in `t/13-duplex-transport.t`.
+ - Add active `attach()` API that builds Kubernetes pod `/attach` requests with
+   stream toggles (stdin/stdout/stderr/tty).
+ - Add async attach test coverage (`t/15-mock-attach.t`) and duplex transport
+   assertions for attach in `t/13-duplex-transport.t`.
+ - Extend `Net::Async::Kubernetes::PortForwardSession` with convenience
+   helpers `write_stdin()` (channel 0) and `resize()` (channel 4 terminal
+   resize payload for exec/attach).
+ - Add async cp helpers `cp_to_pod()` and `cp_from_pod()` built on `exec()`.
+   Supports single-file upload/download via channel streaming with Future-based
+   completion and status/error propagation.
+ - Add cp helper mock tests in `t/16-mock-cp.t`.
+ - Add live demo script `ex/live_features.pl` to exercise log, exec, attach,
+   port-forward, and cp helpers against a real cluster/kubeconfig.
  - Raise minimum versions to Kubernetes::REST 1.101 and IO::K8s 1.008.
 
 0.005     2026-03-04 17:14:31Z

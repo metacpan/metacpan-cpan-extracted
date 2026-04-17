@@ -1,0 +1,50 @@
+Revision history for WWW-PayPal
+
+0.002     2026-04-17 02:45:51Z
+    - WWW::PayPal::API::Orders: new checkout() convenience method — the
+      modern Express Checkout one-liner. Builds purchase_units +
+      application_context from flat args (amount, currency, return_url,
+      cancel_url, + optional brand_name, locale, items[], shipping,
+      invoice_id, custom_id, soft_descriptor, description, reference_id,
+      shipping_preference, user_action). Auto-fills amount.breakdown.item_total
+      when items are present.
+    - WWW::PayPal: new js_sdk_url() and js_sdk_script_tag() helpers for
+      dropping the PayPal JS SDK into a Catalyst/Mojolicious/etc. template.
+      Supports currency, intent, locale, components, disable_funding /
+      enable_funding, vault (for subscription buttons), merchant_id,
+      buyer_country (sandbox), debug. HTML output is properly escaped.
+
+0.001     2026-04-15 19:41:41Z
+    - Initial release
+    - WWW::PayPal client with OAuth2 client_credentials token caching
+      and sandbox/live switch
+    - WWW::PayPal::Role::HTTP: JSON request wrapper with transparent
+      bearer-token acquisition and refresh
+    - WWW::PayPal::Role::OpenAPI: operationId dispatch against cached
+      operation tables (pre-computed; no runtime spec parsing)
+    - WWW::PayPal::API::Orders (Checkout / Orders v2):
+        orders.create, orders.get, orders.patch, orders.confirm,
+        orders.authorize, orders.capture
+    - WWW::PayPal::API::Payments (Payments v2):
+        captures.get, captures.refund, refunds.get,
+        authorizations.get, authorizations.capture, authorizations.void
+    - WWW::PayPal::Order entity with approve_url, payer_email,
+      payer_name, payer_id, capture_id, fee_in_cent, total, currency
+      (covers the amigaevent / ExpressCheckout replacement surface)
+    - WWW::PayPal::Capture and WWW::PayPal::Refund entities
+    - WWW::PayPal::API::Products (Catalogs v1):
+        catalogs.products.create, .list, .get, .patch
+    - WWW::PayPal::API::Plans (Billing Plans v1):
+        billing.plans.create, .list, .get, .patch, .activate, .deactivate
+        plus create_monthly(product_id, price, currency, trial_days)
+        convenience constructor
+    - WWW::PayPal::API::Subscriptions (Billing Subscriptions v1):
+        billing.subscriptions.create, .get, .patch, .revise, .suspend,
+        .activate, .cancel, .capture, .transactions
+    - WWW::PayPal::Product, WWW::PayPal::Plan, WWW::PayPal::Subscription
+      entities (subscription exposes approve_url, status, subscriber_email/
+      _name, next_billing_time, last_payment_amount, plus suspend/activate/
+      cancel lifecycle methods)
+    - examples/buy_demo.pl: end-to-end Orders v2 Mojolicious::Lite demo
+    - examples/subscribe_demo.pl: end-to-end Subscriptions demo (auto-creates
+      product + monthly plan on first run, prints IDs for reuse)

@@ -130,6 +130,9 @@ use App::Netdisco::Web::Device;
 use App::Netdisco::Web::Report;
 use App::Netdisco::Web::API::Objects;
 use App::Netdisco::Web::API::Queue;
+use App::Netdisco::Web::API::Statistics;
+use App::Netdisco::Web::Health;
+use App::Netdisco::Web::Metrics;
 use App::Netdisco::Web::AdminTask;
 use App::Netdisco::Web::TypeAhead;
 use App::Netdisco::Web::PortControl;
@@ -486,7 +489,7 @@ $swagger_doc->{consumes} = 'application/json';
 $swagger_doc->{produces} = 'application/json';
 $swagger_doc->{tags} = [
   {name => 'General',
-    description => 'Log in and Log out'},
+    description => 'Log in/out and health checks'},
   {name => 'Search',
     description => 'Search Operations'},
   {name => 'Objects',

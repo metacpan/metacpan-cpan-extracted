@@ -13,8 +13,13 @@ sub insertMARCHoldings {
         my $holdingsMap = _listOfPairs2map($holdingsObjects->[$i]);
 	my $itemObjects = $holdingsMap->{circulations};
 	my $marcField;
-	my $nitems = 0;
 
+	if (scalar @$itemObjects == 0) {
+	    # Special case: we have holdings information, but no associated items
+	    $marcField = _addSubfields($marcField, $marcCfg, $marcCfg->{holdingsElements}, $holdingsMap);
+	}
+
+	my $nitems = 0;
 	for (my $j = 0; $j < @$itemObjects; $j++) {
 	    my $itemMap = _listOfPairs2map($itemObjects->[$j]);
 	    next if $marcCfg->{restrictToItem} && $barcode && $itemMap->{itemId} ne $barcode;

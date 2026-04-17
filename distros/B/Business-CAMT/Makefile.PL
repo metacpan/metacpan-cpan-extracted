@@ -9,6 +9,7 @@ use 5.020;
 use ExtUtils::MakeMaker;
 
 # Use command 'oodist' to produce your whole software release.
+my $version  = '0.15';
 my $git      = "https://github.com/markov2/perl5-Business-CAMT";
 my $publish  = "../public_html/business-camt";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -42,33 +43,31 @@ my %oodist   = (
 		publish        => "$publish/raw",
 	},
 
-	generate => [
-	  {
+	generate => [ {
 		format         => 'pod3',
 		podtail        => undef,
-	  },
-	],
+	 } ],
+);
+
+my %requires = (
+	'Data::Dumper'   => 0,
+	'Getopt::Long'   => 0,
+	'JSON'           => 0,
+	'List::Util'     => 0,
+	'Log::Report'    => 1.32,
+	'Path::Class'    => 0,
+	'Scalar::Util'   => 0,
+	'XML::Compile'   => 1.64,
+	'XML::Compile::Cache' => 1.06,
+	'XML::LibXML'    => 2.0207,
 );
 
 WriteMakefile
-    NAME             => 'Business::CAMT',
-    VERSION          => '0.14',
-    AUTHOR           => 'Mark Overmeer <markov@cpan.org>',
+	NAME             => 'Business::CAMT',
+	VERSION          => $version,
+	AUTHOR           => 'Mark Overmeer <markov@cpan.org>',
 	ABSTRACT         => 'ISO20022 Cash Management (CAMT) messages',
 	LICENSE          => 'perl_5',
-
-    PREREQ_PM        => {
-		'Data::Dumper'   => 0,
-		'Getopt::Long'   => 0,
-		'JSON'           => 0,
-		'List::Util'     => 0,
-        'Log::Report'    => 1.32,
-		'Path::Class'    => 0,
-        'Scalar::Util'   => 0,
-        'XML::Compile'   => 1.64,
-        'XML::Compile::Cache' => 1.06,
-        'XML::LibXML'    => 2.0207,
-    },
 	EXE_FILES        => [ qw(bin/camt) ],
 
 	META_MERGE => {
@@ -79,10 +78,16 @@ WriteMakefile
 				url  => "$git.git",
 				web  => $git,
 			},
+			bugtracker => {
+				web  => "$git/issues",
+			},
 			homepage => $homepage,
 			license  => [ 'http//dev.perl.org/licenses/' ],
 		},
 		prereqs => {
+			runtime => {
+				requires => \%requires,
+			},
 			develop => {
 				requires => {
 					'OODoc' => '3.00',

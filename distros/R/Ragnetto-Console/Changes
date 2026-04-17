@@ -1,0 +1,7 @@
+Revision history for Perl extension Ragnetto-Console
+
+0.01  2026-04-16T00:25:00Z
+  - Initial release.
+  - Ported from Lua version.
+  - Added ANSI color support, cursor manipulation, and cross-platform input.
+  

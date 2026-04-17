@@ -18,6 +18,10 @@ Authen::Passphrase - hashed passwords/passphrases as objects
 
 =head1 DESCRIPTION
 
+B<THIS MODULE IS DEPRECATED>. For a module that's more extensible, and
+less held-back by legacy algorithms, you may want to use
+L<Crypt::Passphrase|Crypt::Passphrase> instead.
+
 This is the base class for a system of objects that encapsulate
 passphrases.  An object of this type is a passphrase recogniser: its
 job is to recognise whether an offered passphrase is the right one.
@@ -139,7 +143,7 @@ use Carp qw(croak);
 use MIME::Base64 2.21 qw(decode_base64);
 use Module::Runtime 0.011 qw(use_module);
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 =head1 CONSTRUCTORS
 
@@ -477,6 +481,8 @@ sub from_rfc2307 {
 =item $ppr->match(PASSPHRASE)
 
 Checks whether the supplied passphrase is correct.  Returns a truth value.
+
+The passphrase is expected to be octets, not characters.
 
 =item $ppr->passphrase
 

@@ -9,12 +9,13 @@ use DummyRecord;
 BEGIN {
     use vars qw(@tests);
     @tests = (
-	# testName, configName1, configName2
-	[ '[regular]', undef ],
-	[ 'fieldPerItem', 'fieldPerItem' ],
-	[ 'restrictToItem', 'restrictToItem' ],
-	[ 'holdingsInEachItem', 'holdingsInEachItem' ],
-	[ 'fieldPerItem with holdings', 'fieldPerItem', 'holdingsInEachItem' ],
+	# testName, inputRecord, configName1, configName2
+	[ '[regular]', 1, undef ],
+	[ 'fieldPerItem', 1, 'fieldPerItem' ],
+	[ 'restrictToItem', 1, 'restrictToItem' ],
+	[ 'holdingsInEachItem', 1, 'holdingsInEachItem' ],
+	[ 'fieldPerItem with holdings', 1, 'fieldPerItem', 'holdingsInEachItem' ],
+	[ 'no items in holdings', 4 ],
     );
 }
 
@@ -22,21 +23,19 @@ use Test::More tests => 1 + scalar(@tests);
 
 BEGIN { use_ok('Net::Z3950::FOLIO') };
 
-for (my $i = 1; $i <= 1; $i++) {
-    foreach my $test (@tests) {
-	my($testName, $configName1, $configName2) = @$test;
+foreach my $test (@tests) {
+    my($testName, $inputRecord, $configName1, $configName2) = @$test;
 
-	my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', $configName1, $configName2);
-	#use Data::Dumper; $Data::Dumper::INDENT = 2; warn "config", Dumper($cfg);
-	my $dummyMarc = makeDummyMarc();
-	my $expected = readFile("t/data/records/expectedMarc$i" . ($configName1 || "") . ($configName2 || "") . ".marc");
-	my $folioJson = readFile("t/data/records/input$i.json");
-	my $folioHoldings = decode_json(qq[{ "holdingsRecords2": $folioJson }]);
-	my $rec = new DummyRecord($folioHoldings, $dummyMarc);
-	insertMARCHoldings($rec, $dummyMarc, $cfg, '9876543210');
-	my $marcString = $dummyMarc->as_formatted() . "\n";
-	is($marcString, $expected, "generated holdings $i: $testName match expected MARC");
-    }
+    my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', $configName1, $configName2);
+    #use Data::Dumper; $Data::Dumper::INDENT = 2; warn "config", Dumper($cfg);
+    my $dummyMarc = makeDummyMarc();
+    my $expected = readFile("t/data/records/expectedMarc$inputRecord" . ($configName1 || "") . ($configName2 || "") . ".marc");
+    my $folioJson = readFile("t/data/records/input$inputRecord.json");
+    my $folioHoldings = decode_json(qq[{ "holdingsRecords2": $folioJson }]);
+    my $rec = new DummyRecord($folioHoldings, $dummyMarc);
+    insertMARCHoldings($rec, $dummyMarc, $cfg, '9876543210');
+    my $marcString = $dummyMarc->as_formatted() . "\n";
+    is($marcString, $expected, "generated holdings $inputRecord: $testName match expected MARC");
 }
 
 

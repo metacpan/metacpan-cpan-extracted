@@ -10,36 +10,36 @@ response:
      "value": "UTC"
     }
   headers:
-  - accept-ranges
-  - none
-  - cache-control
-  - private, max-age=0, must-revalidate, no-transform
-  - date
-  - Mon, 13 Apr 2026 23:51:23 GMT
-  - expires
-  - Mon, 13 Apr 2026 23:51:23 GMT
-  - content-type
-  - application/json; charset=UTF-8
   - alt-svc
   - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - x-xss-protection
+  - '0'
+  - x-content-type-options
+  - nosniff
+  - server
+  - ESF
+  - date
+  - Thu, 16 Apr 2026 19:07:42 GMT
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
-  - x-content-type-options
-  - nosniff
-  - transfer-encoding
-  - chunked
-  - x-xss-protection
-  - '0'
   - x-l2-request-path
   - l2-managed-14
-  - server
-  - ESF
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - cache-control
+  - private, max-age=0, must-revalidate, no-transform
   - x-frame-options
   - SAMEORIGIN
+  - expires
+  - Thu, 16 Apr 2026 19:07:42 GMT
+  - accept-ranges
+  - none
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Settings::get
 
@@ -55,36 +55,36 @@ response:
      "value": "UTC"
     }
   headers:
-  - date
-  - Mon, 13 Apr 2026 23:51:25 GMT
-  - content-type
-  - application/json; charset=UTF-8
-  - expires
-  - Mon, 13 Apr 2026 23:51:25 GMT
   - x-content-type-options
   - nosniff
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - server
+  - ESF
+  - date
+  - Thu, 16 Apr 2026 19:07:44 GMT
   - vary
   - X-Origin
   - vary
   - Referer
   - vary
   - Origin,Accept-Encoding
-  - alt-svc
-  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-  - accept-ranges
-  - none
-  - cache-control
-  - private, max-age=0, must-revalidate, no-transform
   - x-l2-request-path
   - l2-managed-14
-  - x-frame-options
-  - SAMEORIGIN
-  - server
-  - ESF
+  - cache-control
+  - private, max-age=0, must-revalidate, no-transform
+  - content-type
+  - application/json; charset=UTF-8
   - transfer-encoding
   - chunked
-  - x-xss-protection
-  - '0'
+  - accept-ranges
+  - none
+  - x-frame-options
+  - SAMEORIGIN
+  - expires
+  - Thu, 16 Apr 2026 19:07:44 GMT
   message: OK
 source: Test::Google::RestApi::CalendarApi3::Settings::value
 

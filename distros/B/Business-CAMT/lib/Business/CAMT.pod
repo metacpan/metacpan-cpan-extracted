@@ -17,18 +17,20 @@ Business::CAMT - ISO20022 Cash Management (CAMT) messages
 
 =head1 DESCRIPTION
 
-Use this module to manage CAMT messages, which are ISO20022 standard
-"Cash Management" messages as produced in banking.  For instance,
-CAMT.053 is produced by banks and consumed by accountancies, showing
-transactions in bank-accounts.  See L<https://www.iso20022.org>.
+Use this module to manage B<any type of CAMT messages>, which are
+ISO20022 standard "Cash Management" messages as produced in banking.
+For instance, CAMT.053 is produced by banks and consumed by accountancies,
+showing transactions in bank-accounts.  See L<https://www.iso20022.org>.
 
-At the moment, this module can be used to read and write the XML
-message files, perfectly validated and predictable.  It is intended to
-also support abstraction in interpreting and constructing the content.
+At the moment, this module can be used to read and write the XML message
+files, perfectly validated and predictable.  Not all versions of all
+schemas are included (yet) because there is no public historical archive
+for them (AFAIK).
 
-However, B<I need a sponsor> to make that happen.  Contact the author
-for support.  Please.  I would also like to include a CAMT.053 to CSV
-and MT-940 converter, v.v.  Please hire me.
+It is intended to also support abstraction in interpreting and
+constructing the content.  However, B<I need a sponsor> to make that
+happen.  Contact the author for support.  Please.  I would also like to
+include a CAMT.053 to CSV and MT-940 converter, v.v.  Please hire me.
 
 =head1 METHODS
 
@@ -75,7 +77,7 @@ section about the namespace versioning horrors.
 
 =back
 
-=head2 Accessors
+=head2 Attributes
 
 =over 4
 
@@ -124,7 +126,7 @@ Something like C<camt.053.001.02> or C<053.001.02>.
 =item $obj-E<gt>B<read>($file|$xml, %options)
 
 Pass a C<$file> name, an C<$xml> document or an C<$xml> element.  Returned is
-a HASH blessed in class 'Business::CAMT::CAMT<nr>', for instance
+a HASH blessed in class 'C<Business::CAMT::CAMT[nr]>', for instance
 C<Business::CAMT::CAMT053>.
 
  -Option      --Default
@@ -397,14 +399,14 @@ Cast by C<read()>
 
 =head1 SEE ALSO
 
-This module is part of Business-CAMT version 0.14,
-built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT version 0.15,
+built on April 16, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
 For contributors see file ChangeLog.
 
-This software is copyright (c) 2024-2025 by Mark Overmeer.
+This software is copyright (c) 2024-2026 by Mark Overmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

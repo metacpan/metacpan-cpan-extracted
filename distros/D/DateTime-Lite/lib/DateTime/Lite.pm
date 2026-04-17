@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.4.0
+## Version v0.5.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/13
+## Modified 2026/04/15
 ## All rights reserved
 ## 
 ## 
@@ -19,7 +19,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use vars qw(
-        $VERSION $AUTOLOAD_SUBS $ERROR $FATAL_EXCEPTIONS $IsPurePerl
+        $VERSION $AUTOLOAD $AUTOLOAD_SUBS $ERROR $FATAL_EXCEPTIONS $IsPurePerl
         @MonthLengths @LeapYearMonthLengths
         @QuarterLengths @LeapYearQuarterLengths
     );
@@ -40,7 +40,7 @@ BEGIN
         'ne'     => '_string_not_equals_overload',
     );
 
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.5.0';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -51,11 +51,15 @@ BEGIN
     $LeapYearQuarterLengths[0]++;
 };
 
+use strict;
+use warnings;
+
 # NOTE: Load XS; fall back to pure-Perl implementations if unavailable.
 {
     my $loaded = 0;
     unless( $ENV{PERL_DATETIME_LITE_PP} )
     {
+        local $@;
         eval
         {
             require XSLoader;
@@ -634,7 +638,22 @@ sub error
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
 
-sub fatal { return( shift->_set_get_prop( 'fatal', @_ ) ); }
+sub fatal
+{
+    my $this = shift( @_ );
+    if( @_ )
+    {
+        if( ref( $this ) )
+        {
+            return( $this->_set_get_prop( 'fatal', @_ ) );
+        }
+        else
+        {
+            warn( "Cannot call fatal in mutator mode as a class method." ) if( warnings::enabled() );
+        }
+    }
+    return( ref( $this ) ? $this->_set_get_prop( 'fatal' ) : $FATAL_EXCEPTIONS );
+}
 
 # NOTE: format_cldr
 # TODO: If the user wants to do CLDR formatting, we should instead load DateTime::Format::Unicode, which does a much better job, because CLDR formatting is not easy. So, we should lazy-load DateTime::Format::Unicode instead
@@ -3370,7 +3389,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.4.0
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -4329,7 +4348,7 @@ Measured as C<time()> around a cold C<require> (modules not yet in C<%INC>):
     require Module                     48 ms            32 ms
     require TimeZone standalone       180 ms           100 ms
 
-Startup time matters in short-lived scripts (cron jobs, CLI tools, CGI) where the process initialisation is a significant fraction of total runtime. For a long-running Plack/Mojolicious service, this cost is paid once and amortised over millions of requests.
+Startup time matters in short-lived scripts (cron jobs, CLI tools, CGI) where the process initialisation is a significant fraction of total runtime. For a long-running Apache2/mod_perl2, Plack, or Mojolicious service, this cost is paid once and amortised over millions of requests.
 
 =head2 Memory (RSS after loading)
 

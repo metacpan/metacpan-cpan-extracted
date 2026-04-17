@@ -62,7 +62,7 @@ use Authen::Passphrase 0.003;
 use Carp qw(croak);
 use Crypt::DES;
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 

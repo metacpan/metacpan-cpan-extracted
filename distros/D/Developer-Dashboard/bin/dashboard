@@ -222,7 +222,9 @@ sub _custom_command_path {
     return '' if !defined $cmd || $cmd eq '';
     for my $root ( _cli_runtime_roots() ) {
         my $path = File::Spec->catfile( $root, $cmd );
-        return $path if -e $path;
+        return $path if -d $path;
+        my $resolved = resolve_runnable_file($path);
+        return $resolved if defined $resolved && $resolved ne '';
     }
     return '';
 }
@@ -391,6 +393,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard collector start <name>
   dashboard collector stop <name>
   dashboard collector restart <name>
+  dashboard housekeeper
   dashboard skills install <git-url>
   dashboard skills enable <repo-name>
   dashboard skills disable <repo-name>

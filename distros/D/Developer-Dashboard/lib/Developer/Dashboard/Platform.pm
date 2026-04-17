@@ -3,11 +3,13 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
 use Exporter 'import';
-use File::Basename qw(basename);
+use File::Basename qw(basename dirname);
+use File::Copy qw(copy);
 use File::Spec;
+use File::Temp qw(tempdir);
 
 our @EXPORT_OK = qw(
   is_windows
@@ -22,6 +24,8 @@ our @EXPORT_OK = qw(
 );
 
 our $OS_NAME = $^O;
+our $EXEC_LAUNCHER = sub { exec @_ };
+our $SYSTEM_LAUNCHER = sub { system @_ };
 
 # is_windows()
 # Detects whether the active Perl runtime is running on Windows.
@@ -123,7 +127,7 @@ sub resolve_runnable_file {
     my ($path) = @_;
     return if !defined $path || $path eq '';
 
-    for my $candidate ( _path_candidates($path) ) {
+    for my $candidate ( _runnable_path_candidates($path) ) {
         next if !-f $candidate;
         return $candidate if !is_windows() && -x $candidate;
         return $candidate if is_windows() && _is_windows_runnable_candidate($candidate);
@@ -142,6 +146,10 @@ sub command_argv_for_path {
     my $lower = lc $resolved;
 
     return ($^X, $resolved) if $lower =~ /\.pl\z/;
+    return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_go_source(@ARGV)', $resolved )
+      if $lower =~ /\.go\z/;
+    return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_java_source(@ARGV)', $resolved )
+      if $lower =~ /\.java\z/;
     return ($^X, $resolved) if !is_windows() && _shebang_uses_perl($resolved);
     return ($resolved) if !is_windows() && _has_shebang($resolved);
     return ( _powershell_binary(), '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $resolved )
@@ -203,6 +211,24 @@ sub _path_candidates {
     return @candidates;
 }
 
+# _runnable_path_candidates($path)
+# Expands one logical command path into runnable file candidates, including
+# dashboard-supported source-script extensions when the caller omits them.
+# Input: command or file path string.
+# Output: ordered list of candidate path strings.
+sub _runnable_path_candidates {
+    my ($path) = @_;
+    my @candidates = _path_candidates($path);
+    return @candidates if $path =~ /\.[^\\\/.]+\z/;
+
+    for my $suffix (qw(.pl .go .java .ps1 .cmd .bat .sh .bash)) {
+        push @candidates, _path_candidates( $path . $suffix );
+    }
+
+    my %seen;
+    return grep { !$seen{$_}++ } @candidates;
+}
+
 # _is_windows_runnable_candidate($path)
 # Determines whether one existing Windows file should be treated as runnable.
 # Input: concrete existing file path.
@@ -251,6 +277,84 @@ sub _cmd_binary {
 sub _posix_shell_binary {
     my ($preferred) = @_;
     return command_in_path($preferred) || command_in_path('sh') || $preferred;
+}
+
+# _module_lib_root()
+# Resolves the lib root that contains this loaded Platform module so child perl
+# wrappers can force the same module version they were built from.
+# Input: none.
+# Output: absolute lib root path string.
+sub _module_lib_root {
+    my $path = $INC{'Developer/Dashboard/Platform.pm'} || __FILE__;
+    return dirname( dirname( dirname($path) ) );
+}
+
+# _exec_go_source($path, @args)
+# Re-execs one executable Go source file through go run so hook and command
+# launch code can treat it like any other runnable script.
+# Input: Go source file path plus passthrough argv.
+# Output: does not return on success; dies when exec fails.
+sub _exec_go_source {
+    my ( $path, @args ) = @_;
+    die "Missing Go source path\n" if !defined $path || $path eq '';
+    $EXEC_LAUNCHER->( 'go', 'run', $path, @args ) or die "Unable to exec go run for $path: $!";
+}
+
+# _exec_java_source($path, @args)
+# Compiles one executable Java source file into an isolated temp directory and
+# then re-execs the resulting main class through java.
+# Input: Java source file path plus passthrough argv.
+# Output: does not return on success; dies when compilation or exec fails.
+sub _exec_java_source {
+    my ( $path, @args ) = @_;
+    die "Missing Java source path\n" if !defined $path || $path eq '';
+
+    my $class = _java_main_class($path);
+    my ($simple_class) = $class =~ /([^\.]+)\z/;
+    die "Unable to resolve Java main class for $path\n" if !defined $simple_class || $simple_class eq '';
+
+    my $build_root = tempdir( CLEANUP => 1 );
+    my $source_root = tempdir( CLEANUP => 1 );
+    my $staged_source = File::Spec->catfile( $source_root, $simple_class . '.java' );
+    copy( $path, $staged_source ) or die "Unable to stage Java source $path as $staged_source: $!";
+
+    $SYSTEM_LAUNCHER->( 'javac', '-d', $build_root, $staged_source );
+    my $exit_code = $? >> 8;
+    die "javac failed for $path with exit code $exit_code\n" if $exit_code != 0;
+
+    $EXEC_LAUNCHER->( 'java', '-cp', $build_root, $class, @args ) or die "Unable to exec java for $path: $!";
+}
+
+# _java_main_class($path)
+# Resolves the fully qualified Java main class name from one source file,
+# honoring an optional package declaration.
+# Input: Java source file path.
+# Output: class name string suitable for java -cp execution.
+sub _java_main_class {
+    my ($path) = @_;
+    die "Missing Java source path\n" if !defined $path || $path eq '';
+
+    open my $fh, '<', $path or die "Unable to read $path: $!";
+    my $package = '';
+    my $class = '';
+    while ( my $line = <$fh> ) {
+        if ( $line =~ /^\s*package\s+([A-Za-z_][A-Za-z0-9_\.]*)\s*;/ ) {
+            $package = $1;
+            next;
+        }
+        if ( $line =~ /^\s*(?:public\s+)?(?:final\s+|abstract\s+)?(?:class|interface|enum|record)\s+([A-Za-z_][A-Za-z0-9_]*)\b/ ) {
+            $class = $1;
+            last;
+        }
+    }
+    close $fh;
+
+    if ( $class eq '' ) {
+        $class = basename($path);
+        $class =~ s/\.java\z//i;
+    }
+
+    return $package eq '' ? $class : $package . '.' . $class;
 }
 
 1;

@@ -59,7 +59,7 @@ use Authen::Passphrase 0.003;
 use Authen::Passphrase::LANManagerHalf;
 use Carp qw(croak);
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 

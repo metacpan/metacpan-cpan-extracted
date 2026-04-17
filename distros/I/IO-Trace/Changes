@@ -1,5 +1,9 @@
 Revision history for IO::Trace
 
+0.025 2026-04-15 23:00:00
+ - Sanity check args.
+ - Allow bootstrapped symlink iotrace to work too.
+
 0.024 2026-03-20 23:00:00
  - Add -V option to show version
  - Compatibility fix Perl v5.8.8

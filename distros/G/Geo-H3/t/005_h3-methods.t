@@ -16,11 +16,11 @@ SKIP: {
 
   require_ok 'Geo::H3';
 
-  my $index      = 608725951823478783;
+  my $uint64      = 608725951823478783;
   my $resolution = 7;
-  my $h3         = Geo::H3->new->h3(index=>$index);
+  my $h3         = Geo::H3->new->h3(uint64=>$uint64);
   isa_ok($h3, 'Geo::H3::Index');
-  is($h3->index, $index, 'index');
+  is($h3->uint64, $uint64, 'uint64');
   is($h3->string, '872a1072bffffff', 'string');
   is($h3->resolution, $resolution);
 

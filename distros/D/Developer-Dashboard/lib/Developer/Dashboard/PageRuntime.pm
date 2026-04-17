@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '2.37';
+our $VERSION = '2.43';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);

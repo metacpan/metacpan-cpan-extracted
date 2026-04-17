@@ -51,6 +51,7 @@ etc/config.withLoans.json
 etc/instances.graphql-query
 etc/mod-search-with-loans.graphql-query
 etc/mod-search.graphql-query
+etc/xslt/folio2dc.xsl
 etc/xslt/folio2marcxml.xsl
 etc/xslt/folio2mods.xsl
 etc/xslt/folio2opac.xsl
@@ -104,6 +105,7 @@ t/data/records/expectedMarc1fieldPerItem.marc
 t/data/records/expectedMarc1fieldPerItemholdingsInEachItem.marc
 t/data/records/expectedMarc1holdingsInEachItem.marc
 t/data/records/expectedMarc1restrictToItem.marc
+t/data/records/expectedMarc4.marc
 t/data/records/expectedOutput1.xml
 t/data/records/expectedOutput2.xml
 t/data/records/expectedOutput3.xml
@@ -111,5 +113,6 @@ t/data/records/expectedOutput4.xml
 t/data/records/input1.json
 t/data/records/input2.json
 t/data/records/input3.json
+t/data/records/input4.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

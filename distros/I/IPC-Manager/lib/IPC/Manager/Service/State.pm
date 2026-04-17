@@ -6,6 +6,7 @@ use Carp qw/croak/;
 use Time::HiRes qw/sleep time/;
 use IPC::Manager::Util qw/require_mod clone_io/;
 use IPC::Manager::Serializer::JSON();
+use Long::Jump qw/setjump longjump havejump/;
 
 use POSIX();
 
@@ -59,8 +60,9 @@ sub ipcm_worker {
     $0 = "$0 $name";
 
     $service_inst = $cb;
-    no warnings 'exiting';
-    redo SERVICE;
+    croak "ipcm_worker: no IPCM_SERVICE jump point on the stack (worker invoked outside a running service?)"
+        unless havejump 'IPCM_SERVICE';
+    longjump IPCM_SERVICE => ();
     die "This should not be reachable";
 }
 
@@ -202,34 +204,46 @@ sub _ipcm_service {
     # Set the new instance as the current one
     $service_inst = $new_inst;
 
-    # If we want the stack to unwind, use this to unwind it (nested services)
+    # If a service is already running on the stack, unwind back to its
+    # setjump so the new $service_inst replaces it rather than nesting
+    # another run loop on top.
     if ($prev_service) {
-        no warnings 'exiting';
-        redo SERVICE;
+        croak "ipcm_service: previous service detected but no IPCM_SERVICE jump point on the stack"
+            unless havejump 'IPCM_SERVICE';
+        longjump IPCM_SERVICE => ();
         die "This should not be reachable";
     }
 
-    # Run the service
-    # We have this label here for the 'redo' above.
-    SERVICE: {
-        # Get a copy to work with, the $service_inst can be replaced before this block exits.
-        my $using_service = $service_inst;
+    # Top-level service: enter the setjump loop.  ipcm_worker and nested
+    # ipcm_service() calls from inside the running service both unwind
+    # back here via `longjump IPCM_SERVICE`, after which the loop re-runs
+    # setjump() with $service_inst pointing at the replacement.
+    while (1) {
+        my $jumped = setjump IPCM_SERVICE => sub {
+            # Snapshot: $service_inst can be replaced before this block exits.
+            my $using_service = $service_inst;
 
-        my $do_posix_exit = ref($using_service) ne 'CODE' && $using_service->use_posix_exit;
+            my $do_posix_exit = ref($using_service) ne 'CODE' && $using_service->use_posix_exit;
 
-        eval {
-            if (ref($using_service) eq 'CODE') {
-                my $exit = $using_service->();
-                exit($exit);
-            }
-            else {
-                my $exit = $using_service->run() // 0;
-                $do_posix_exit ? POSIX::_exit($exit) : exit($exit);
-            }
-            1;
-        } or warn $@;
+            eval {
+                if (ref($using_service) eq 'CODE') {
+                    my $exit = $using_service->();
+                    exit($exit);
+                }
+                else {
+                    my $exit = $using_service->run() // 0;
+                    $do_posix_exit ? POSIX::_exit($exit) : exit($exit);
+                }
+                1;
+            } or warn $@;
 
-        $do_posix_exit ? POSIX::_exit(255) : exit(255);
+            $do_posix_exit ? POSIX::_exit(255) : exit(255);
+        };
+
+        # setjump returns undef if the sub returned normally (never, in
+        # practice -- we always exit()).  Any other value means longjump
+        # was called and we loop with the updated $service_inst.
+        last unless $jumped;
     }
 
     # This should not be reachable....

@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::HexString;
+use Test2::V0;
 use IO::Socket::IP;
 
 use Net::Gearman::Client;
@@ -30,12 +29,12 @@ my $f = $client->submit_job(
 
 $server->sysread( my $buffer, 8192 );
 
-is_hexstr( $buffer, "\0REQ\0\0\0\x07\0\0\0\x13function\x000\0argument",
+is( $buffer, "\0REQ\0\0\0\x07\0\0\0\x13function\x000\0argument",
    'SUBMIT_JOB request written to buffer' );
 
 $server->syswrite( "\0RES\0\0\0\x08\0\0\0\x02id" );
 $server->syswrite( "\0RES\0\0\0\x0d\0\0\0\x09id\0result" );
 
-is_deeply( [ $f->get ], [ "result" ], '$f->get' );
+is( [ $f->get ], [ "result" ], '$f->get' );
 
 done_testing;

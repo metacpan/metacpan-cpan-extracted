@@ -1,6 +1,11 @@
+0.20.0  2026-04-26
+
+* Added new views in viewjobs, can inspect StdOut and StdErr files
+* Added persistence of completed jobs in viewjobs (sacctl)
+
 0.19.1	2026-04-09
 
-* Title fixed in lsjobs
+* Title fixed in lsjobs and viewjobs
 
 0.19.0	2026-04-01
 

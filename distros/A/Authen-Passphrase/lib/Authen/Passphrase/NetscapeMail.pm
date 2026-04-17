@@ -52,10 +52,10 @@ use strict;
 
 use Authen::Passphrase 0.003;
 use Carp qw(croak);
-use Data::Entropy::Algorithms 0.000 qw(rand_bits);
+use Crypt::SysRandom 'random_bytes';
 use Digest::MD5 1.99_53 ();
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 
@@ -79,8 +79,6 @@ it is conventionally limited to lowercase hexadecimal digits.
 
 Causes salt to be generated randomly.  The value given for this attribute
 is ignored.  The salt will be a string of 32 lowercase hexadecimal digits.
-The source of randomness may be controlled by the facility described
-in L<Data::Entropy>.
 
 =item B<hash>
 
@@ -116,7 +114,7 @@ sub new {
 		} elsif($attr eq "salt_random") {
 			croak "salt specified redundantly"
 				if exists $self->{salt};
-			$self->{salt} = unpack("H*", rand_bits(128));
+			$self->{salt} = unpack("H*", random_bytes(16));
 		} elsif($attr eq "hash") {
 			croak "hash specified redundantly"
 				if exists($self->{hash}) ||

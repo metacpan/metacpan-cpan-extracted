@@ -23,11 +23,11 @@ Test::Which - Skip tests if external programs are missing from PATH (with versio
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -598,18 +598,19 @@ sub _check_requirements {
 	my @reqs;
 	my $i = 0;
 
+	my @missing;
 	while ($i < @args) {
 		my $name = $args[$i];
 
 		# Validate program name
 		unless (defined $name) {
-			warn "Undefined program name at position $i, skipping";
+			push @missing, "Undefined program name at position $i, skipping";
 			$i++;
 			next;
 		}
 
 		if (ref $name) {
-			warn "Program name at position $i cannot be a reference, skipping";
+			push @missing, "Program name at position $i cannot be a reference, skipping";
 			$i++;
 			next;
 		}
@@ -634,14 +635,13 @@ sub _check_requirements {
 					$constraint = $next;
 					$i++;
 				}
-			# Other refs (ARRAY, CODE, etc.) - treat as next program name, don't consume
+				# Other refs (ARRAY, CODE, etc.) - treat as next program name, don't consume
 			}
 		}
 
 		push @reqs, { name => $name, constraint => $constraint };
 	}
 
-	my @missing;
 	my @bad_version;
 	my @checked;
 
@@ -885,7 +885,7 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

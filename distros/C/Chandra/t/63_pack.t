@@ -38,10 +38,17 @@ file_spew($icon, 'FAKEPNG');
 
 # ── Constructor ──────────────────────────────────────────────────────
 
+# Helper to normalize paths for comparison (handles / vs \ on Windows)
+sub _norm_path {
+    my $p = shift;
+    $p =~ s|\\|/|g if $^O eq 'MSWin32';
+    return $p;
+}
+
 {
     my $p = Chandra::Pack->new(script => $script);
     isa_ok($p, 'Chandra::Pack');
-    is($p->script, $script, 'script accessor');
+    is(_norm_path($p->script), _norm_path($script), 'script accessor');
     is($p->version, '0.0.1', 'default version');
     ok($p->name, 'name derived from script');
     ok($p->identifier, 'default identifier generated');

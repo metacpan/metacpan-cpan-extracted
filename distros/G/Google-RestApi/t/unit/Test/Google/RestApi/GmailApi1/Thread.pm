@@ -12,9 +12,9 @@ init_logger;
 
 sub dont_create_mock_spreadsheets { 1; }
 
-sub _setup_live_thread : Tests(startup) {
+sub startup : Tests(startup) {
   my $self = shift;
-  return unless $ENV{GOOGLE_RESTAPI_CONFIG};
+  $self->SUPER::startup(@_);
   my $gmail = mock_gmail_api();
   my $profile = $gmail->profile();
   my $msg = $gmail->send_message(
@@ -23,21 +23,21 @@ sub _setup_live_thread : Tests(startup) {
     body    => 'This is a test thread message.',
   );
   $self->{_live_msg} = $msg;
-  # Get the thread ID from the message
   my $details = $msg->get();
   $self->{_live_thread_id} = $details->{threadId};
   return;
 }
 
-sub _teardown_live_thread : Tests(shutdown) {
+sub shutdown : Tests(shutdown) {
   my $self = shift;
   $self->{_live_msg}->trash() if $self->{_live_msg};
+  $self->SUPER::shutdown(@_);
   return;
 }
 
 sub _thread_id {
   my $self = shift;
-  return $self->{_live_thread_id} || 'mock_thread_id_001';
+  return $self->{_live_thread_id};
 }
 
 sub _constructor : Tests(3) {

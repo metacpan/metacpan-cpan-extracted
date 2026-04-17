@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Protocol::Gearman;
+package Protocol::Gearman 0.05;
 
-use strict;
+use v5.20;
 use warnings;
 
-our $VERSION = '0.04';
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use Carp;
 use Scalar::Util qw( reftype );
@@ -18,6 +19,8 @@ use Scalar::Util qw( reftype );
 C<Protocol::Gearman> - abstract base class for both client and worker
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This base class is used by both L<Protocol::Gearman::Client> and
 L<Protocol::Gearman::Worker>. It shouldn't be used directly by end-user
@@ -61,38 +64,42 @@ The implementation should provide the following methods:
 
 =cut
 
-=head2 $f = $gearman->new_future
+=head2 new_future
+
+   $f = $gearman->new_future;
 
 Return a new L<Future> subclass instance, for request methods to use. This
 instance should support awaiting appropriately.
 
 =cut
 
-sub new_future
+sub new_future ( $self, @args )
 {
-   my $self = shift;
    reftype $self eq "HASH" and ref( my $code = $self->{gearman_method_new_future} ) eq "CODE" or
       croak "Can't locate object method \"new_future\" via package ".ref($self).", or it is not a prototypical object";
 
-   $code->( $self, @_ );
+   $code->( $self, @args );
 }
 
-=head2 $gearman->send( $bytes )
+=head2 send
+
+   $gearman->send( $bytes );
 
 Send the given bytes to the server.
 
 =cut
 
-sub send
+sub send ( $self, @args )
 {
-   my $self = shift;
    reftype $self eq "HASH" and ref( my $code = $self->{gearman_method_send} ) eq "CODE" or
       croak "Can't locate object method \"send\" via package ".ref($self).", or it is not a prototypical object";
 
-   $code->( $self, @_ );
+   $code->( $self, @args );
 }
 
-=head2 $h = $gearman->gearman_state
+=head2 gearman_state
+
+   $h = $gearman->gearman_state;
 
 Return a HASH reference for the Gearman-related code to store its state on.
 If not implemented, a default method will be provided which uses C<$gearman>
@@ -102,7 +109,7 @@ clashes with other object state.
 
 =cut
 
-sub gearman_state { shift }
+sub gearman_state ( $self ) { $self }
 
 # These are used internally but not exported
 use constant {
@@ -205,7 +212,9 @@ my %ARGS_FOR_TYPE = (
    JOB_ASSIGN_UNIQ    => 4,
 );
 
-=head2 ( $type, $body ) = $gearman->pack_packet( $name, @args )
+=head2 pack_packet
+
+   ( $type, $body ) = $gearman->pack_packet( $name, @args );
 
 Given a name of a packet type (specified as a string as the name of one of the
 C<TYPE_*> constants, without the leading C<TYPE_> prefix; case insignificant)
@@ -213,15 +222,12 @@ returns the type value and the arguments for the packet packed into a body
 string. This is intended for passing directly into C<build_packet> or
 C<send_packet>:
 
- send_packet $fh, pack_packet( SUBMIT_JOB => $func, $id, $arg );
+   send_packet $fh, pack_packet( SUBMIT_JOB => $func, $id, $arg );
 
 =cut
 
-sub pack_packet
+sub pack_packet ( $, $typename, @args )
 {
-   shift;
-   my ( $typename, @args ) = @_;
-
    my $typefn = __PACKAGE__->can( "TYPE_\U$typename" ) or
       croak "Unrecognised packet type '$typename'";
 
@@ -235,7 +241,9 @@ sub pack_packet
    return ( $type, join "\0", @args );
 }
 
-=head2 ( $name, @args ) = $gearman->unpack_packet( $type, $body )
+=head2 unpack_packet
+
+   ( $name, @args ) = $gearman->unpack_packet( $type, $body );
 
 Given a type code and body string, returns the type name and unpacked
 arguments from the body. This function is the reverse of C<pack_packet> and is
@@ -247,17 +255,14 @@ the C<TYPE_*> constants without the leading C<TYPE_> prefix.
 This is intended for a C<given/when> control block, or dynamic method
 dispatch:
 
- my ( $name, @args ) = unpack_packet( recv_packet $fh );
+   my ( $name, @args ) = unpack_packet( recv_packet $fh );
 
- $self->${\"handle_$name"}( @args )
+   $self->${\"handle_$name"}( @args );
 
 =cut
 
-sub unpack_packet
+sub unpack_packet ( $, $type, $body )
 {
-   shift;
-   my ( $type, $body ) = @_;
-
    my $typename = $TYPENAMES{$type} or
       croak "Unrecognised packet type $type";
 
@@ -267,7 +272,9 @@ sub unpack_packet
    return ( $typename, split m/\0/, $body, $n_args );
 }
 
-=head2 ( $name, @args ) = $gearman->parse_packet_from_string( $bytes )
+=head2 parse_packet_from_string
+
+   ( $name, @args ) = $gearman->parse_packet_from_string( $bytes );
 
 Attempts to parse a complete message packet from the given byte string. If it
 succeeds, it returns the type name and arguments. If it fails it returns an
@@ -282,6 +289,7 @@ exception before modifying the string.
 
 =cut
 
+# hard to do $_[0] mutation with a signature
 sub parse_packet_from_string
 {
    my $self = shift;
@@ -302,7 +310,9 @@ sub parse_packet_from_string
    return $self->unpack_packet( $type, $body );
 }
 
-=head2 ( $name, @args ) = $gearman->recv_packet_from_fh( $fh )
+=head2 recv_packet_from_fh
+
+   ( $name, @args ) = $gearman->recv_packet_from_fh( $fh );
 
 Attempts to read a complete packet from the given filehandle, blocking until
 it is available. The results are undefined if this function is called on a
@@ -315,11 +325,8 @@ filehandle should be considered no longer valid and should be closed.
 
 =cut
 
-sub recv_packet_from_fh
+sub recv_packet_from_fh ( $self, $fh )
 {
-   my $self = shift;
-   my ( $fh ) = @_;
-
    $fh->read( my $magic, 4 ) or croak "Cannot read header - $!";
    croak "Expected to find 'RES' magic in packet" unless
       $magic eq MAGIC_RESPONSE;
@@ -333,48 +340,52 @@ sub recv_packet_from_fh
    return $self->unpack_packet( $type, $body );
 }
 
-=head2 $bytes = $gearman->build_packet_to_string( $name, @args )
+=head2 build_packet_to_string
+
+   $bytes = $gearman->build_packet_to_string( $name, @args );
 
 Returns a byte string containing a complete packet with the given fields.
 
 =cut
 
-sub build_packet_to_string
+sub build_packet_to_string ( $self, $name, @args )
 {
-   my $self = shift;
-   my ( $type, $body ) = $self->pack_packet( @_ );
+   my ( $type, $body ) = $self->pack_packet( $name, @args );
 
    return pack "a4 N N a*", MAGIC_REQUEST, $type, length $body, $body;
 }
 
-=head2 $gearman->send_packet_to_fh( $fh, $name, @args )
+=head2 send_packet_to_fh
+
+   $gearman->send_packet_to_fh( $fh, $name, @args );
 
 Sends a complete packet to the given filehandle. If an IO error happens, an
 exception is thrown.
 
 =cut
 
-sub send_packet_to_fh
+sub send_packet_to_fh ( $self, $fh, $name, @args )
 {
-   my $self = shift;
-   my $fh = shift;
-   $fh->print( $self->build_packet_to_string( @_ ) ) or croak "Cannot send packet - $!";
+   $fh->print( $self->build_packet_to_string( $name, @args ) ) or croak "Cannot send packet - $!";
 }
 
-=head2 $gearman->send_packet( $typename, @args )
+=head2 send_packet
+
+   $gearman->send_packet( $typename, @args );
 
 Packs a packet from a list of arguments then sends it; a combination of
 C<pack_packet> and C<build_packet>. Uses the implementation's C<send> method.
 
 =cut
 
-sub send_packet
+sub send_packet ( $self, $type, @args )
 {
-   my $self = shift;
-   $self->send( $self->build_packet_to_string( @_ ) );
+   $self->send( $self->build_packet_to_string( $type, @args ) );
 }
 
-=head2 $gearman->on_recv( $buffer )
+=head2 on_recv
+
+   $gearman->on_recv( $buffer );
 
 The implementation should call this method when more bytes of data have been
 received. It parses and unpacks packets from the buffer, then dispatches to
@@ -387,61 +398,58 @@ time it is called.
 
 =cut
 
+# hard to do $_[0] mutation with a signature
 sub on_recv
 {
    my $self = shift;
 
    while( my ( $type, @args ) = $self->parse_packet_from_string( $_[0] ) ) {
-      $self->${\"on_$type"}( @args );
+      my $method = "on_$type";
+      $self->$method( @args );
    }
 }
 
 *on_read = \&on_recv;
 
-=head2 $gearman->on_ERROR( $name, $message )
+=head2 on_ERROR
+
+   $gearman->on_ERROR( $name, $message );
 
 Default handler for the C<TYPE_ERROR> packet. This method should be overriden
 by subclasses to change the behaviour.
 
 =cut
 
-sub on_ERROR
+sub on_ERROR ( $self, $name, $message )
 {
-   my $self = shift;
-   my ( $name, $message ) = @_;
-
    die "Received Gearman error '$name' (\"$message\")\n";
 }
 
-=head2 $gearman->echo_request( $payload ) ==> ( $payload )
+=head2 echo_request
+
+   $payload = await $gearman->echo_request( $payload );
 
 Sends an C<ECHO_REQ> packet to the Gearman server, and returns a future that
 will eventually yield the payload when the server responds.
 
 =cut
 
-sub echo_request
+sub echo_request ( $self, $payload )
 {
-   my $self = shift;
-   my ( $payload ) = @_;
-
    my $state = $self->gearman_state;
 
-   push @{ $state->{gearman_echos} }, my $f = $self->new_future;
+   push $state->{gearman_echos}->@*, my $f = $self->new_future;
 
    $self->send_packet( ECHO_REQ => $payload );
 
    return $f;
 }
 
-sub on_ECHO_RES
+sub on_ECHO_RES ( $self, $payload )
 {
-   my $self = shift;
-   my ( $payload ) = @_;
-
    my $state = $self->gearman_state;
 
-   ( shift @{ $state->{gearman_echos} } )->done( $payload );
+   ( shift $state->{gearman_echos}->@* )->done( $payload );
 }
 
 =head1 PROTOTYPICAL OBJECTS
@@ -454,25 +462,24 @@ special constructor that creates a concrete object.
 This may be more convenient to use in smaller one-shot cases (like unit tests
 or small scripts) instead of creating a subclass.
 
- my $socket = ...;
+   my $socket = ...;
 
- my $client = Protocol::Gearman::Client->new_prototype(
-    send       => sub { $socket->print( $_[1] ); },
-    new_future => sub { My::Future::Subclass->new },
- );
+   my $client = Protocol::Gearman::Client->new_prototype(
+      send       => sub { $socket->print( $_[1] ); },
+      new_future => sub { My::Future::Subclass->new },
+   );
 
-=head2 $gearman = Protocol::Gearman->new_prototype( %methods )
+=head2 new_prototype
+
+   $gearman = Protocol::Gearman->new_prototype( %methods )
 
 Returns a new prototypical object constructed using the given methods. The
 named arguments must give values for the C<send> and C<new_future> methods.
 
 =cut
 
-sub new_prototype
+sub new_prototype ( $class, %methods )
 {
-   my $class = shift;
-   my %methods = @_;
-
    my $self = bless {}, $class;
 
    foreach (qw( send new_future )) {

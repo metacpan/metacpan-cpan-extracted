@@ -3,6 +3,7 @@ package t::LoadXS;
 use warnings;
 use strict;
 
+use Cwd ();
 use DynaLoader ();
 use ExtUtils::CBuilder ();
 use ExtUtils::ParseXS ();
@@ -26,6 +27,7 @@ sub load_xs($$$) {
 	my($so_file, @so_tmps) = $cb->link(objects => [ $o_file, @$extralibs ],
 						module_name => "t::$basename");
 	push @todelete, $so_file, @so_tmps;
+	$so_file = Cwd::abs_path($so_file);
 	my $boot_symbol = "boot_t__$basename";
 	@DynaLoader::dl_require_symbols = ($boot_symbol);
 	my $so_handle = DynaLoader::dl_load_file($so_file, 0);

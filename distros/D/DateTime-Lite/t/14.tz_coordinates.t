@@ -18,10 +18,12 @@ subtest 'Tokyo coordinates resolve to Asia/Tokyo' => sub
         latitude  => 35.658558,
         longitude => 139.745504,
     );
-    ok( defined( $tz ), 'new() succeeds with Tokyo coordinates' );
-    is( $tz->name, 'Asia/Tokyo', 'Tokyo coordinates resolve to Asia/Tokyo' );
-    ok( $tz->is_olson, 'resolved zone is_olson' );
-    ok( !$tz->is_floating, 'resolved zone is not floating' );
+    if( ok( defined( $tz ), 'new() succeeds with Tokyo coordinates' ) )
+    {
+        is( $tz->name, 'Asia/Tokyo', 'Tokyo coordinates resolve to Asia/Tokyo' );
+        ok( $tz->is_olson, 'resolved zone is_olson' );
+        ok( !$tz->is_floating, 'resolved zone is not floating' );
+    }
 };
 
 subtest 'Paris coordinates resolve to Europe/Paris' => sub
@@ -31,8 +33,10 @@ subtest 'Paris coordinates resolve to Europe/Paris' => sub
         latitude  => 48.858258,
         longitude => 2.294488,
     );
-    ok( defined( $tz ), 'new() succeeds with Paris coordinates' );
-    is( $tz->name, 'Europe/Paris', 'Paris coordinates resolve to Europe/Paris' );
+    if( ok( defined( $tz ), 'new() succeeds with Paris coordinates' ) )
+    {
+        is( $tz->name, 'Europe/Paris', 'Paris coordinates resolve to Europe/Paris' );
+    }
 };
 
 subtest 'New York coordinates resolve to America/New_York' => sub
@@ -42,8 +46,10 @@ subtest 'New York coordinates resolve to America/New_York' => sub
         latitude  => 40.748443,
         longitude => -73.985650,
     );
-    ok( defined( $tz ), 'new() succeeds with New York coordinates' );
-    is( $tz->name, 'America/New_York', 'New York coordinates resolve to America/New_York' );
+    if( ok( defined( $tz ), 'new() succeeds with New York coordinates' ) )
+    {
+        is( $tz->name, 'America/New_York', 'New York coordinates resolve to America/New_York' );
+    }
 };
 
 # NOTE: Southern hemisphere negative latitude
@@ -54,9 +60,11 @@ subtest 'Taipei coordinates resolve to Asia/Taipei' => sub
         latitude  => 25.033649,
         longitude => 121.564824,
     );
-    ok( defined( $tz ), 'new() succeeds with Taipei coordinates' );
-    is( $tz->name, 'Asia/Taipei',
-        'Taipei coordinates resolve to Asia/Taipei' );
+    if( ok( defined( $tz ), 'new() succeeds with Taipei coordinates' ) )
+    {
+        is( $tz->name, 'Asia/Taipei',
+            'Taipei coordinates resolve to Asia/Taipei' );
+    }
 };
 
 # NOTE: Southern hemisphere negative latitude
@@ -67,8 +75,10 @@ subtest 'Sydney coordinates resolve to Australia/Sydney' => sub
         latitude  => -33.856867,
         longitude => 151.215285,
     );
-    ok( defined( $tz ), 'new() succeeds with Sydney coordinates' );
-    is( $tz->name, 'Australia/Sydney', 'Sydney coordinates resolve to Australia/Sydney' );
+    if( ok( defined( $tz ), 'new() succeeds with Sydney coordinates' ) )
+    {
+        is( $tz->name, 'Australia/Sydney', 'Sydney coordinates resolve to Australia/Sydney' );
+    }
 };
 
 subtest 'Buenos Aires coordinates resolve to America/Argentina/Buenos_Aires' => sub
@@ -77,9 +87,11 @@ subtest 'Buenos Aires coordinates resolve to America/Argentina/Buenos_Aires' => 
         latitude  => -34.6037,
         longitude => -58.3816,
     );
-    ok( defined( $tz ), 'new() succeeds with Buenos Aires coordinates' );
-    is( $tz->name, 'America/Argentina/Buenos_Aires',
-        'Buenos Aires coordinates resolve to America/Argentina/Buenos_Aires' );
+    if( ok( defined( $tz ), 'new() succeeds with Buenos Aires coordinates' ) )
+    {
+        is( $tz->name, 'America/Argentina/Buenos_Aires',
+            'Buenos Aires coordinates resolve to America/Argentina/Buenos_Aires' );
+    }
 };
 
 # NOTE: Coordinate resolution integrates with DateTime::Lite
@@ -91,12 +103,13 @@ subtest 'DateTime::Lite->now() with coordinate-based timezone' => sub
         latitude  => 35.658558,
         longitude => 139.745504,
     );
-    ok( defined( $tz ), 'TimeZone object created from coordinates' );
-
-    my $dt = DateTime::Lite->now( time_zone => $tz );
-    ok( defined( $dt ), 'DateTime::Lite->now() succeeds with coordinate-resolved timezone' );
-    is( $dt->time_zone_long_name, 'Asia/Tokyo',
-        'datetime carries the coordinate-resolved timezone' );
+    if( ok( defined( $tz ), 'TimeZone object created from coordinates' ) )
+    {
+        my $dt = DateTime::Lite->now( time_zone => $tz );
+        ok( defined( $dt ), 'DateTime::Lite->now() succeeds with coordinate-resolved timezone' );
+        is( $dt->time_zone_long_name, 'Asia/Tokyo',
+            'datetime carries the coordinate-resolved timezone' );
+    }
 };
 
 # NOTE: Input validation - missing longitude

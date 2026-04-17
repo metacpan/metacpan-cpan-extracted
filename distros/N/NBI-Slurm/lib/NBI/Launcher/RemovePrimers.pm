@@ -216,7 +216,7 @@ NBI::Launcher::RemovePrimers
 
 =head1 VERSION
 
-version 0.19.1
+version 0.20.0
 
 =head1 SYNOPSIS
 

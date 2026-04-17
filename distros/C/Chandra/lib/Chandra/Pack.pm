@@ -3,7 +3,7 @@ package Chandra::Pack;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use File::Raw qw(import);
 use Cwd ();
@@ -61,7 +61,11 @@ sub config {
 }
 
 sub _config_file {
-    my $home = $ENV{HOME} || (getpwuid($<))[7] || '.';
+    my $home = $ENV{HOME};
+    if (!$home && $^O ne 'MSWin32') {
+        $home = (getpwuid($<))[7];
+    }
+    $home ||= $ENV{USERPROFILE} || '.';
     return file_join($home, '.chandra', 'pack.conf');
 }
 

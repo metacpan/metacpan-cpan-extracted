@@ -4,6 +4,7 @@ examples/assets_example.pl
 examples/assets_mount_example.pl
 examples/bind_example.pl
 examples/bridge_extension_example.pl
+examples/canvas_demo.pl
 examples/chat_hub.pl
 examples/chat_window.pl
 examples/clipboard_example.pl
@@ -33,6 +34,7 @@ include/chandra/chandra.h
 include/chandra/chandra_assets.h
 include/chandra/chandra_bind.h
 include/chandra/chandra_bridge_ext.h
+include/chandra/chandra_canvas.h
 include/chandra/chandra_clipboard.h
 include/chandra/chandra_contextmenu.h
 include/chandra/chandra_devtools.h
@@ -63,6 +65,7 @@ lib/Chandra/Assets.pm
 lib/Chandra/Bind.pm
 lib/Chandra/Bridge.pm
 lib/Chandra/Bridge/Extension.pm
+lib/Chandra/Canvas.pm
 lib/Chandra/Clipboard.pm
 lib/Chandra/ContextMenu.pm
 lib/Chandra/DevTools.pm
@@ -144,6 +147,8 @@ t/49_dragdrop.t
 t/50_dragdrop_edge.t
 t/51_contextmenu.t
 t/52_contextmenu_edge.t
+t/53_canvas.t
+t/54_canvas_paths.t
 t/57_log.t
 t/58_log_edge.t
 t/59_form.t
@@ -163,6 +168,7 @@ xs/assets.xs
 xs/bind.xs
 xs/bridge.xs
 xs/bridge_extension.xs
+xs/canvas.xs
 xs/clipboard.xs
 xs/contextmenu.xs
 xs/core.xs

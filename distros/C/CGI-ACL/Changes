@@ -1,5 +1,9 @@
 Revision history for CGI-ACL
 
+0.07	Thu Apr 16 19:38:57 EDT 2026
+	Fixed call to _verified_rdns
+	Allow an object to be configured at runtime via Object::Configure
+
 0.06	Wed Mar  4 06:33:13 EST 2026
 	Added t/30-basics.t
 	Use Test::Needs

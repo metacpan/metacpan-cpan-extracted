@@ -1,144 +1,37 @@
 ---
-request: GET /drive/v3/drives/drive123
+query_params:
+  fields: nextPageToken, drives(id, name)
+request: GET /drive/v3/drives
 response:
   code: 200
-  content: |
-    {
-      "kind": "drive#drive",
-      "id": "drive123",
-      "name": "Test Shared Drive",
-      "colorRgb": "#0F9D58",
-      "capabilities": {
-        "canAddChildren": true,
-        "canDeleteDrive": true,
-        "canRenameDrive": true
-      }
-    }
+  content: "{\n  \"drives\": []\n}\n"
   headers:
-    - content-type
-    - application/json; charset=UTF-8
+  - vary
+  - Origin, X-Origin,Accept-Encoding
+  - accept-ranges
+  - none
+  - x-frame-options
+  - SAMEORIGIN
+  - expires
+  - Mon, 01 Jan 1990 00:00:00 GMT
+  - cache-control
+  - no-cache, no-store, max-age=0, must-revalidate
+  - content-type
+  - application/json; charset=UTF-8
+  - transfer-encoding
+  - chunked
+  - server
+  - ESF
+  - pragma
+  - no-cache
+  - x-content-type-options
+  - nosniff
+  - x-xss-protection
+  - '0'
+  - alt-svc
+  - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+  - date
+  - Thu, 16 Apr 2026 19:10:54 GMT
   message: OK
-source: Test::Google::RestApi::DriveApi3::Drive::get_drive
-
----
-request: GET /drive/v3/drives/drive123
-response:
-  code: 200
-  content: |
-    {
-      "id": "drive123",
-      "name": "Test Shared Drive"
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::DriveApi3::Drive::get_with_fields
-
----
-request: GET /drive/v3/drives/drive123
-response:
-  code: 200
-  content: |
-    {
-      "kind": "drive#drive",
-      "id": "drive123",
-      "name": "Test Shared Drive"
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::DriveApi3::Drive::get_with_domain_admin
-
----
-request: PATCH /drive/v3/drives/drive123
-request_content:
-  name: Renamed Drive
-response:
-  code: 200
-  content: |
-    {
-      "kind": "drive#drive",
-      "id": "drive123",
-      "name": "Renamed Drive"
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::DriveApi3::Drive::update_drive
-
----
-request: PATCH /drive/v3/drives/drive123
-response:
-  code: 200
-  content: |
-    {
-      "kind": "drive#drive",
-      "id": "drive123",
-      "name": "Styled Drive",
-      "colorRgb": "#FF0000"
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::DriveApi3::Drive::update_with_options
-
----
-request: DELETE /drive/v3/drives/drive123
-response:
-  code: 204
-  content: ''
-  headers:
-    - content-type
-    - text/html
-  message: No Content
-source: Test::Google::RestApi::DriveApi3::Drive::delete_drive
-
----
-request: DELETE /drive/v3/drives/drive123
-response:
-  code: 204
-  content: ''
-  headers:
-    - content-type
-    - text/html
-  message: No Content
-source: Test::Google::RestApi::DriveApi3::Drive::delete_with_options
-
----
-request: POST /drive/v3/drives/drive123/hide
-response:
-  code: 200
-  content: |
-    {
-      "kind": "drive#drive",
-      "id": "drive123",
-      "name": "Test Shared Drive",
-      "hidden": true
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::DriveApi3::Drive::hide_drive
-
----
-request: POST /drive/v3/drives/drive123/unhide
-response:
-  code: 200
-  content: |
-    {
-      "kind": "drive#drive",
-      "id": "drive123",
-      "name": "Test Shared Drive",
-      "hidden": false
-    }
-  headers:
-    - content-type
-    - application/json; charset=UTF-8
-  message: OK
-source: Test::Google::RestApi::DriveApi3::Drive::unhide_drive
+source: Test::Google::RestApi::DriveApi3::Drive::startup
 

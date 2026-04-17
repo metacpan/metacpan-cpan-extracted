@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -146,18 +146,18 @@ lock-free read path is used. The only overhead is a branch (predicted away).
     my $map = Data::HashMap::Shared::II->new_sharded($path_prefix, $shards, $max_entries, ...);
 
 Creates C<$shards> independent maps (files C<$path_prefix.0>, C<$path_prefix.1>,
-...) behind a single handle. Per-key operations automatically route to the
-correct shard via hash dispatch. Writes to different shards proceed in parallel
-with independent locks.
+...) behind a single handle, each with up to C<$max_entries> entries
+(total capacity is C<$shards * $max_entries>). Per-key operations automatically
+route to the correct shard via hash dispatch. Writes to different shards
+proceed in parallel with independent locks.
 
 All operations work transparently on sharded maps: C<put>, C<get>, C<remove>,
 C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<cas>,
 C<get_or_set>, C<put_ttl>, C<touch>, C<persist>, C<set_ttl>, C<keys>,
 C<values>, C<items>, C<to_hash>, C<set_multi> (method only),
-C<get_multi> (method only), C<each>,
-C<pop>, C<shift>, C<drain>, C<clear>, C<flush_expired>,
-C<flush_expired_partial>, C<size>, C<stats> (method only), C<reserve>,
-and all diagnostic keywords.
+C<get_multi> (method only), C<each>, C<pop>, C<shift>, C<drain>,
+C<clear>, C<flush_expired>, C<flush_expired_partial>, C<size>,
+C<stats> (method only), C<reserve>, and all diagnostic keywords.
 
 Cursors chain across shards automatically. C<cursor_seek> routes to the
 correct shard based on key hash. C<$shards> is rounded up to the next
@@ -170,7 +170,7 @@ C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
 
     my $ok = shm_xx_put $map, $key, $value;   # insert or overwrite
     my $ok = shm_xx_add $map, $key, $value;   # insert only if key absent
-    my $ok = shm_xx_update $map, $key, $value;# overwrite only if key exists
+    my $ok = shm_xx_update $map, $key, $value; # overwrite only if key exists
     my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new)
     my $n  = $map->set_multi($k, $v, ...);   # batch put under single lock, returns count
     my @v  = $map->get_multi($k1, $k2, ...); # batch get under single lock with prefetch pipeline
@@ -201,7 +201,7 @@ LRU/TTL operations (require TTL-enabled map for C<put_ttl>):
     my $ms = shm_xx_max_size $map;            # LRU capacity (0 = disabled)
     my $t  = shm_xx_ttl $map;                 # default TTL in seconds
     my $r  = shm_xx_ttl_remaining $map, $key; # seconds left (0 = permanent, undef if missing/expired/no TTL)
-    my $ok = shm_xx_touch $map, $key;         # reset TTL to default_ttl (LRU promotion still occurs on permanent entries); false if no TTL/LRU
+    my $ok = shm_xx_touch $map, $key;         # reset TTL to default; promotes in LRU; false if no TTL/LRU
     my $ok = shm_xx_persist $map, $key;       # remove TTL, make key permanent; false on non-TTL maps
     my $ok = shm_xx_set_ttl $map, $key, $sec; # change TTL without changing value (0 = permanent); false on non-TTL maps
     my $n  = shm_xx_flush_expired $map;       # proactively expire all stale entries, returns count
@@ -211,7 +211,7 @@ Atomic remove-and-return:
 
     my $v = shm_xx_take $map, $key;           # remove key and return value (undef if missing)
     my ($k, $v) = shm_xx_pop $map;            # remove+return from LRU tail / scan forward
-    my ($k, $v) = shm_xx_shift $map;         # remove+return from LRU head / scan backward
+    my ($k, $v) = shm_xx_shift $map;          # remove+return from LRU head / scan backward
     my @kv = shm_xx_drain $map, $n;           # remove+return up to N entries as flat (k,v,...) list
 
 C<pop> and C<shift> remove from opposite ends: C<pop> takes the LRU tail
@@ -238,11 +238,11 @@ Diagnostics:
     my $au  = shm_xx_arena_used $map;         # arena bytes used (0 for int-only)
     my $ac  = shm_xx_arena_cap $map;          # arena total capacity (0 for int-only)
     my $sz  = shm_xx_mmap_size $map;          # backing file size in bytes
-    my $ok = shm_xx_reserve $map, $n;          # pre-grow (false if exceeds max)
+    my $ok  = shm_xx_reserve $map, $n;          # pre-grow (false if exceeds max)
     my $ev  = shm_xx_stat_evictions $map;     # cumulative LRU eviction count
     my $ex  = shm_xx_stat_expired $map;       # cumulative TTL expiration count
-    my $rc  = shm_xx_stat_recoveries $map;   # cumulative stale lock recovery count
-    my $p   = $map->path;                     # backing file path (method only)
+    my $rc  = shm_xx_stat_recoveries $map;    # cumulative stale lock recovery count
+    my $p   = $map->path;                    # backing file path (method only)
     my $s   = $map->stats;                   # hashref with all diagnostics in one call
     # stats keys: size, capacity, max_entries, tombstones, mmap_size,
     #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
@@ -273,33 +273,41 @@ safety-critical applications.
 =head1 BENCHMARKS
 
 Throughput versus other shared-memory / on-disk solutions, 25K entries,
-single process, Linux x86_64.  Run C<perl -Mblib bench/vs.pl 25000> to reproduce.
+single process, Linux x86_64.  All values in M ops/s (higher is better).
+Run C<perl -Mblib bench/vs.pl 25000> to reproduce.
 
-    INTEGER KEY -> INTEGER VALUE (Shared::II)
-                   Rate BerkeleyDB    LMDB Shared::II
-    INSERT       31/s         31      46       184
-    LOOKUP       35/s         35      40       383
-    INCREMENT    16/s         16      18       165
+B<Integer key E<rarr> integer value> (Shared::II):
 
-    STRING KEY -> STRING VALUE, SHORT (inline ≤7B, Shared::SS)
-                   Rate FastMmap BerkeleyDB  LMDB SharedMem Shared::SS
-    INSERT       11/s       11       26    40       62        130
-    LOOKUP       10/s       10       32    34      146        213
-    DELETE       14/s       14       18    --       32         68
+              BerkeleyDB   LMDB   Shared::II
+    INSERT          31       46         184
+    LOOKUP          35       40         383
+    INCREMENT       16       18         165
 
-    STRING KEY -> STRING VALUE, LONG (~50-100B, Shared::SS)
-                   Rate BerkeleyDB  LMDB SharedMem Shared::SS
-    INSERT       25/s       25      37       61        133
-    LOOKUP       30/s       30      33      125        229
+B<String key E<rarr> string value, short> (inline E<le> 7B, Shared::SS):
 
-    LRU CACHE LOOKUP (25K entries, lock-free clock eviction)
-    II plain   350/s    II LRU   373/s  (lock-free, ~6% faster via clock)
-    SS plain   159/s    SS LRU   159/s
+              FastMmap   BerkeleyDB   LMDB   SharedMem   Shared::SS
+    INSERT        11          26       40        62          130
+    LOOKUP        10          32       34       146          213
+    DELETE        14          18       --        32           68
 
-    CROSS-PROCESS (25K SS entries, 2 processes)
-    READS          Shared::SS  3,250,000/s   SharedMem  1,986,000/s   LMDB    728,000/s
-    WRITES         Shared::SS  2,801,000/s   SharedMem    826,000/s   LMDB     95,000/s
-    MIXED 50/50    Shared::SS  3,691,000/s   SharedMem  1,963,000/s   LMDB    211,000/s
+B<String key E<rarr> string value, long> (~50-100B, Shared::SS):
+
+              BerkeleyDB   LMDB   SharedMem   Shared::SS
+    INSERT        25         37        61          133
+    LOOKUP        30         33       125          229
+
+B<LRU cache lookup> (25K entries, lock-free clock eviction):
+
+              plain   LRU
+    II         350    373   (lock-free, ~6% faster via clock)
+    SS         159    159
+
+B<Cross-process> (25K SS entries, 2 processes, ops/s):
+
+                  Shared::SS   SharedMem       LMDB
+    READS        3,250,000    1,986,000     728,000
+    WRITES       2,801,000      826,000      95,000
+    MIXED 50/50  3,691,000    1,963,000     211,000
 
 LMDB benchmarked with MDB_WRITEMAP|MDB_NOSYNC|MDB_NOMETASYNC|MDB_NORDAHEAD.
 BerkeleyDB with DB_PRIVATE|128MB cache.
@@ -343,6 +351,10 @@ L<Data::Stack::Shared> - LIFO stack
 L<Data::Deque::Shared> - double-ended queue
 
 L<Data::Log::Shared> - append-only log (WAL)
+
+L<Data::Heap::Shared> - priority queue
+
+L<Data::Graph::Shared> - directed weighted graph
 
 =head1 AUTHOR
 

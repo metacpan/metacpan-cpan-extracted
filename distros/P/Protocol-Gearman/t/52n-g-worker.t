@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::HexString;
+use Test2::V0;
 use IO::Socket::IP;
 
 use Net::Gearman::Worker;
@@ -31,7 +30,7 @@ my $job;
 
    $server->sysread( my $buffer, 8192 );
 
-   is_hexstr( $buffer, "\0REQ\0\0\0\x09\0\0\0\0" );
+   is( $buffer, "\0REQ\0\0\0\x09\0\0\0\0" );
 
    $server->syswrite( "\0RES\0\0\0\x0b\0\0\0\x0eH:c:1\0func\0arg" );
 
@@ -49,7 +48,7 @@ my $job;
 
    $server->sysread( my $buffer, 8192 );
 
-   is_hexstr( $buffer, "\0REQ\0\0\0\x0d\0\0\0\x0cH:c:1\0result" );
+   is( $buffer, "\0REQ\0\0\0\x0d\0\0\0\x0cH:c:1\0result" );
 }
 
 done_testing;

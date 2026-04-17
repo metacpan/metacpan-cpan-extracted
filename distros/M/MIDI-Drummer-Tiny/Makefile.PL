@@ -6,26 +6,34 @@ use 5.024;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Glorified metronome",
   "AUTHOR" => "Gene Boggs <gene.boggs\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "MIDI-Drummer-Tiny",
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.024",
   "NAME" => "MIDI::Drummer::Tiny",
   "PREREQ_PM" => {
-    "Algorithm::Combinatorics" => 0,
     "Carp" => 0,
     "Data::Dumper::Compact" => 0,
+    "File::ShareDir" => 0,
     "List::Util" => "1.26",
     "MIDI::Util" => "0.1304",
     "Math::Bezier" => 0,
     "Moo" => 2,
     "Music::Duration" => "0.0900",
     "Music::RhythmSet::Util" => 0,
+    "Path::Tiny" => 0,
     "Type::Library" => 0,
     "Type::Utils" => 0,
     "Types::MIDI" => "0.601.0",
@@ -49,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Output" => "0.04"
   },
-  "VERSION" => "0.7006",
+  "VERSION" => "0.7013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,10 +65,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Algorithm::Combinatorics" => 0,
   "Carp" => 0,
   "Data::Dumper::Compact" => 0,
   "English" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "IO::Handle" => 0,
@@ -71,6 +79,7 @@ my %FallbackPrereqs = (
   "Moo" => 2,
   "Music::Duration" => "0.0900",
   "Music::RhythmSet::Util" => 0,
+  "Path::Tiny" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Test::Output" => "0.04",
@@ -99,3 +108,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

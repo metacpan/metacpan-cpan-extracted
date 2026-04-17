@@ -2,6 +2,7 @@ use warnings;
 no warnings "syntax";
 no warnings "void";
 use strict;
+use lib '.';
 
 BEGIN {
 	if("$]" < 5.013008) {

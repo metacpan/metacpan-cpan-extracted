@@ -1,0 +1,14 @@
+Revision history for App-md2html
+
+0.01.1  2026-04-16 06:59:37 PDT
+        - Add MD2HTML_EMBEDDED/MD2HTML_FRAGMENT environment variables and
+        --embedded|fragment CLI options for embedding output in existing HTML
+        documents, for example the cgit about-filter output
+
+        - Fix main package main so it indexes on CPAN properly/can be seen by cpanm,
+        carton, carmel, cpm, etc.
+
+        - Update author/fatpack.pl for latest version of IPC::Nosh
+
+0.01  2026-04-13 13:45:38 PDT
+        - Initial release

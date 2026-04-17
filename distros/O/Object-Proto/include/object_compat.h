@@ -84,9 +84,12 @@
 #endif
 
 /* cv_set_call_checker - introduced in 5.14 (5.13.006)
+ * Note: xop_compat.h also defines this, but we use #ifndef to avoid redefinition.
  * No-op fallback: call checkers are an optimization, not required for correctness */
 #if !PERL_VERSION_GE(5,14,0)
-#  define cv_set_call_checker(cv, checker, ckobj) ((void)0)
+#  ifndef cv_set_call_checker
+#    define cv_set_call_checker(cv, checker, ckobj) ((void)0)
+#  endif
 #  define OBJECT_HAS_CALL_CHECKER 0
 #else
 #  define OBJECT_HAS_CALL_CHECKER 1

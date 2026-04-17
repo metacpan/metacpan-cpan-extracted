@@ -163,10 +163,11 @@ or false to stop early.
 - new(%args); %args consists of:
 
     - `config_file` &lt;path\_to\_config\_file>: Optional YAML configuration file that can specify any or all of the following args...
+    - `log4perl_config` &lt;path\_to\_log4perl\_config>: Optional path to a Log4perl configuration file. Initializes Log4perl logging if it has not already been initialized. A relative path is resolved relative to the directory of `config_file`. This is an alternative to setting the `GOOGLE_RESTAPI_LOGGER` environment variable.
     - `auth` &lt;hash|object>: A hashref to create the specified auth class, or (outside the config file) an instance of the blessed class itself.
     If this is an object, it must provide the 'params' and 'headers' subroutines to provide the appropriate Google authentication/authorization.
     See below for more details.
-    - `api_callback` &lt;coderef>: A coderef to call after each API call. 
+    - `api_callback` &lt;coderef>: A coderef to call after each API call.
     - `throttle` &lt;int>: Used in development to sleep the number of seconds specified between API calls to avoid rate limit violations from Google.
 
     You can specify any of the arguments in the optional YAML config file. Any passed-in arguments will override what is in the config file.

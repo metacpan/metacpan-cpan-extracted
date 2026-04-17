@@ -1,0 +1,38 @@
+bin/drive_player
+Changes
+config.yaml.example
+cpanfile
+lib/App/DrivePlayer.pm
+lib/App/DrivePlayer/Config.pm
+lib/App/DrivePlayer/DB.pm
+lib/App/DrivePlayer/GUI.pm
+lib/App/DrivePlayer/GUI/FolderBrowse.pm
+lib/App/DrivePlayer/GUI/MetadataFetch.pm
+lib/App/DrivePlayer/GUI/SheetSync.pm
+lib/App/DrivePlayer/MetadataFetcher.pm
+lib/App/DrivePlayer/Player.pm
+lib/App/DrivePlayer/Scanner.pm
+lib/App/DrivePlayer/Schema.pm
+lib/App/DrivePlayer/Schema/Result/Folder.pm
+lib/App/DrivePlayer/Schema/Result/ScanFolder.pm
+lib/App/DrivePlayer/Schema/Result/Track.pm
+lib/App/DrivePlayer/Setup.pm
+lib/App/DrivePlayer/SheetDB.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/compile.t
+t/etc/perlcriticrc
+t/lib/Test/DrivePlayer/TestBase.pm
+t/lib/Test/DrivePlayer/Utils.pm
+t/perlcritic.t
+t/pod.t
+t/run_unit_tests.t
+t/unit/Test/DrivePlayer/Config.pm
+t/unit/Test/DrivePlayer/DB.pm
+t/unit/Test/DrivePlayer/Player.pm
+t/unit/Test/DrivePlayer/Scanner.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

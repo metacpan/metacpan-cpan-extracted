@@ -44,6 +44,7 @@ lib/Business/CAMT/xsd/camt.026.001.10.xsd
 lib/Business/CAMT/xsd/camt.027.001.10.xsd
 lib/Business/CAMT/xsd/camt.028.001.12.xsd
 lib/Business/CAMT/xsd/camt.029.001.13.xsd
+lib/Business/CAMT/xsd/camt.029.001.14.xsd
 lib/Business/CAMT/xsd/camt.030.001.06.xsd
 lib/Business/CAMT/xsd/camt.031.001.07.xsd
 lib/Business/CAMT/xsd/camt.032.001.05.xsd
@@ -68,16 +69,24 @@ lib/Business/CAMT/xsd/camt.050.001.07.xsd
 lib/Business/CAMT/xsd/camt.051.001.07.xsd
 lib/Business/CAMT/xsd/camt.052.001.12.xsd
 lib/Business/CAMT/xsd/camt.052.001.13.xsd
+lib/Business/CAMT/xsd/camt.052.001.14.xsd
 lib/Business/CAMT/xsd/camt.053.001.02.xsd
 lib/Business/CAMT/xsd/camt.053.001.12.xsd
 lib/Business/CAMT/xsd/camt.053.001.13.xsd
+lib/Business/CAMT/xsd/camt.053.001.14.xsd
 lib/Business/CAMT/xsd/camt.054.001.12.xsd
 lib/Business/CAMT/xsd/camt.054.001.13.xsd
+lib/Business/CAMT/xsd/camt.054.001.14.xsd
 lib/Business/CAMT/xsd/camt.055.001.12.xsd
+lib/Business/CAMT/xsd/camt.055.001.13.xsd
 lib/Business/CAMT/xsd/camt.056.001.11.xsd
+lib/Business/CAMT/xsd/camt.056.001.12.xsd
 lib/Business/CAMT/xsd/camt.057.001.08.xsd
+lib/Business/CAMT/xsd/camt.057.001.09.xsd
 lib/Business/CAMT/xsd/camt.058.001.09.xsd
+lib/Business/CAMT/xsd/camt.058.001.10.xsd
 lib/Business/CAMT/xsd/camt.059.001.08.xsd
+lib/Business/CAMT/xsd/camt.059.001.09.xsd
 lib/Business/CAMT/xsd/camt.060.001.07.xsd
 lib/Business/CAMT/xsd/camt.061.001.02.xsd
 lib/Business/CAMT/xsd/camt.062.001.03.xsd
@@ -94,6 +103,8 @@ lib/Business/CAMT/xsd/camt.072.001.02.xsd
 lib/Business/CAMT/xsd/camt.073.001.02.xsd
 lib/Business/CAMT/xsd/camt.074.001.02.xsd
 lib/Business/CAMT/xsd/camt.075.001.02.xsd
+lib/Business/CAMT/xsd/camt.076.001.01.xsd
+lib/Business/CAMT/xsd/camt.077.001.01.xsd
 lib/Business/CAMT/xsd/camt.078.001.02.xsd
 lib/Business/CAMT/xsd/camt.079.001.02.xsd
 lib/Business/CAMT/xsd/camt.080.001.02.xsd
@@ -118,8 +129,10 @@ lib/Business/CAMT/xsd/camt.107.001.02.xsd
 lib/Business/CAMT/xsd/camt.108.001.02.xsd
 lib/Business/CAMT/xsd/camt.109.001.02.xsd
 lib/Business/CAMT/xsd/camt.110.001.01.xsd
+lib/Business/CAMT/xsd/camt.110.001.02.xsd
 lib/Business/CAMT/xsd/camt.111.001.01.xsd
 lib/Business/CAMT/xsd/camt.111.001.02.xsd
+lib/Business/CAMT/xsd/camt.111.001.03.xsd
 t/00use.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

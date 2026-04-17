@@ -1,5 +1,49 @@
 Revision history for Developer Dashboard
 
+2.43  2026-04-17
+    - taught the built-in `housekeeper` cleanup pass to rotate collector log
+      transcripts when collector config declares `rotation` or `rotations`,
+      supporting line-count retention plus minute/hour/day/week/month windows
+    - fixed built-in `housekeeper` collector overrides so a layered config can
+      change only `interval` or nested `indicator` metadata without replacing
+      the inherited built-in Perl `code` or `cwd`
+    - added focused unit and CLI smoke coverage for housekeeper-backed
+      collector log rotation, explicit invalid-rotation failures, and the
+      merged built-in housekeeper override contract
+
+2.42  2026-04-17
+    - added a built-in `housekeeper` collector plus `dashboard housekeeper`
+      so the runtime can clean stale hashed temp-state roots and older
+      oversized Ajax payload files without relying on user-managed shell
+      commands
+    - taught the built-in housekeeper cleanup pass to remove stale
+      `dashboard-result-*` runtime result temp files from `/tmp` alongside
+      the existing Ajax temp cleanup
+    - recorded hashed temp-state runtime metadata under the shared `/tmp`
+      state tree so stale temp roots can be identified safely and active
+      DD-OOP-LAYERS state roots are preserved
+    - added focused unit and CLI smoke coverage for built-in housekeeper
+      cleanup, helper staging, and collector execution
+
+2.40  2026-04-16
+    - taught executable hook files with a `.go` suffix to run through
+      `go run` while keeping the normal hook ordering, RESULT chaining, and
+      stdout/stderr streaming behavior
+    - taught executable hook files with a `.java` suffix to compile through
+      `javac` into an isolated temp directory and then run through `java`
+      using the declared main class from the source file
+    - taught direct `dashboard <command>` lookup to resolve executable
+      `cli/<command>.go` and `cli/<command>.java` source commands
+    - added focused platform coverage plus CLI smoke coverage for Go and Java
+      hook launch paths, with live smoke cases running when the corresponding
+      toolchains are available on the host
+
+2.38  2026-04-15
+    - aligned all Perl module versions and release metadata to 2.38 after the
+      layer-system and collector-log reliability fixes
+    - added an explicit release-metadata sanity pass to keep `dist.ini` and
+      `Developer/Dashboard.pm` in lockstep for the shipped artifact
+
 2.37  2026-04-14
     - added TT-backed collector indicator icons so `indicator.icon` values such
       as `[% a %]` now render against collector stdout JSON before the live

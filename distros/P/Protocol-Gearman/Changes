@@ -1,5 +1,15 @@
 Revision history for Protocol-Gearman
 
+0.05    2026-03-15
+        [CHANGES]
+         * Overall module refresh:
+            + perl v5.20, signatures, postfix-deref
+            + Pod style updates
+            + Test using Test2::V0
+
+        [BUGFIXES]
+         * Use `->udata` API of Future v0.49
+
 0.04    2014/07/03 19:24:39
         [CHANGES]
          * Implement background and high/low priority job submission

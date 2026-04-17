@@ -48,7 +48,7 @@ use Authen::Passphrase 0.003;
 use Carp qw(croak);
 use Crypt::MySQL 0.03 qw(password);
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 use parent "Authen::Passphrase";
 

@@ -2,14 +2,16 @@ package Long::Jump;
 use strict;
 use warnings;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 use Carp qw/croak/;
 use Importer Importer => 'import';
 
-our @EXPORT_OK = qw/setjump longjump/;
+our @EXPORT_OK = qw/setjump longjump havejump/;
 
 my (%STACK, $SEEK, $OUT);
+
+sub havejump { $STACK{$_[-1]} ? 1 : 0 }
 
 sub setjump {
     my ($name, $code, @args) = @_;
@@ -142,6 +144,18 @@ to the correct name.
 Jump to the named point, optionally with values to return. This will throw
 exceptions if you use an invalid C<$NAME>, which includes the case of calling
 it without a set jump point.
+
+=item $bool = havejump($NAME)
+
+=item $bool = havejump $NAME
+
+Check if a jump point with the given C<$NAME> is currently set somewhere on the
+call stack. Returns a true value (C<1>) if the named jump point is active and
+would be reachable via C<longjump($NAME)>, otherwise returns false (C<0>).
+
+This is useful for code that wants to conditionally call C<longjump()> only
+when an enclosing C<setjump()> is actually present, avoiding the exception
+that would be thrown for an unknown name.
 
 =back
 

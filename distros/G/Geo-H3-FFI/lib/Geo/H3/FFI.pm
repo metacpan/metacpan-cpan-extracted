@@ -7,7 +7,7 @@ use FFI::Platypus qw{};
 use FFI::C qw{};
 
 our $PACKAGE = __PACKAGE__;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 my $lib = FFI::CheckLib::find_lib_or_die(lib => 'h3');
 my $ffi = FFI::Platypus->new(api => 1, lib => $lib);
@@ -27,7 +27,7 @@ sub _oowrapper {
 
 =head1 NAME
 
-Geo::H3::FFI - Perl FFI binding to H3 library functions
+Geo::H3::FFI - Perl FFI binding to H3 v3.x library functions
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,9 @@ Geo::H3::FFI - Perl FFI binding to H3 library functions
 
 =head1 DESCRIPTION
 
-Perl FFI binding to H3 library functions
+Perl FFI binding to H3 v3.x library functions.
+
+Please note that the H3 library has undergone a re-write that is not backwards compatible.  I hope to add support for the H3 v4.x library seamlessly for the Perl Community but for now please use the L<3.7.2|https://github.com/uber/h3/releases/tag/v3.7.2> version of the H3 library with this module.
 
 =head1 CONSTRUCTORS
 
@@ -402,20 +404,43 @@ Returns a hash reference where the keys are the H3 index and values are the k di
 
   my $href = $gh3->kRingDistancesWrapper($index, $k); #isa HASH
 
+Note: kRingDistancesWrapper is now a wrapper around kRingDistancesWrapperArray for backwards compatibility
+
 =cut
 
 sub kRingDistancesWrapper {
   my $self  = shift;
   my $index = shift;
   my $k     = shift;
-  my $size  = $self->maxKringSize($k);
-  my @array = (-1) x $size;
-  my @dist  = (-1) x $size;
-  my %hash  = ();
+  return {map {@$_} @{$self->kRingDistancesWrapperArray($index, $k)}};
+}
+
+=head2 kRingDistancesWrapperArray
+
+Returns an array reference of array references where the first value is the H3 index and second value is the k distance for the given index and k value.
+
+  my $aref = $gh3->kRingDistancesWrapperArray($index, $k); #isa ARRAY-ARRAY - [[uint64, k-distance], ...]
+
+Note: kRingDistancesWrapperArray maintains order and does not coerce uint64 to a hash key string unlike kRingDistancesWrapper.
+
+=cut
+
+sub kRingDistancesWrapperArray {
+  my $self   = shift;
+  my $index  = shift;
+  my $k      = shift;
+  my $size   = $self->maxKringSize($k);
+  my @array  = (-1) x $size;
+  my @dist   = (-1) x $size;
+  my @output = ();
   $self->kRingDistances($index, $k, \@array, \@dist);
-  @hash{@array} = @dist; #hash slice assignment
-  delete $hash{'18446744073709551615'};
-  return \%hash;
+  foreach my $j (0 .. $#array) {
+    my $uint64 = $array[$j];
+    my $k_dist = $dist[$j];
+    next if $uint64 == 18446744073709551615;
+    push @output, [$uint64, $k_dist];
+  }
+  return \@output;
 }
 
 =head2 hexRange
@@ -448,7 +473,7 @@ sub hexRangeWrapper {
   my $size       = $self->maxHexRangeSize($k);
   my @array      = (-1) x $size;
   my $distortion = $self->hexRange($index, $k, \@array); #0 if no pentagonal distortion is encountered
-  warn("Error: Package: $PACKAGE, Method: hexRangeWrapper, Distrortion: $distortion") if $distortion;
+  warn("Error: Package: $PACKAGE, Method: hexRangeWrapper, Distortion: $distortion") if $distortion;
   return \@array;
 }
 
@@ -487,15 +512,34 @@ sub hexRangeDistancesWrapper {
   my $self       = shift;
   my $index      = shift;
   my $k          = shift;
+  return {map {@$_} @{$self->hexRangeDistancesWrapperArray($index, $k)}};
+}
+
+=head2 hexRangeDistancesWrapperArray
+
+ my $aref = $gh3->hexRangeDistancesWrapperArray($index, $k); #isa ARRAY-ARRAY - [[uint64, k-distance], ...]
+
+Note: hexRangeDistancesWrapperArray maintains order and does not coerce uint64 to a hash key string unlike hexRangeDistancesWrapper.
+
+=cut
+
+sub hexRangeDistancesWrapperArray {
+  my $self       = shift;
+  my $index      = shift;
+  my $k          = shift;
   my $size       = $self->maxHexRangeSize($k);
   my @array      = (-1) x $size;
   my @dist       = (-1) x $size;
-  my %hash       = ();
+  my @output     = ();
   my $distortion = $self->hexRangeDistances($index, $k, \@array, \@dist);
-  warn("Error: Package: $PACKAGE, Method: hexRangeDistancesWrapper, Distrortion: $distortion") if $distortion;
-  @hash{@array}  = @dist; #hash slice assignment
-  delete $hash{'18446744073709551615'};
-  return \%hash;
+  warn("Error: Package: $PACKAGE, Method: hexRangeDistancesWrapper, Distortion: $distortion") if $distortion;
+  foreach my $j (0 .. $#array) {
+    my $uint64 = $array[$j];
+    my $k_dist = $dist[$j];
+    next if $uint64 == 18446744073709551615;
+    push @output, [$uint64, $k_dist];
+  }
+  return \@output;
 }
 
 =head2 hexRanges
@@ -535,7 +579,7 @@ sub hexRingWrapper {
   my $size       = $self->maxHexRingSize($k);
   my @array      = (-1) x $size;
   my $distortion = $self->hexRing($index, $k, \@array); #0 if no pentagonal distortion was encountered
-  warn("Error: Package: $PACKAGE, Method: hexRingWrapper, Distrortion: $distortion") if $distortion;
+  warn("Error: Package: $PACKAGE, Method: hexRingWrapper, Distortion: $distortion") if $distortion;
   return [grep {$_ > 0 and $_ < 18446744073709551615} @array];
 }
 
@@ -1051,7 +1095,6 @@ Gives the "great circle" or "haversine" distance between pairs of GeoCoord point
 #double pointDistRads(const GeoCoord *a, const GeoCoord *b);
 $ffi->attach(pointDistRads => ['geo_coord_t', 'geo_coord_t'] => 'double' => \&_oowrapper);
 
-
 =head1 SEE ALSO
 
 L<https://h3geo.org/docs/api/indexing>, L<https://h3geo.org/docs/community/bindings>, L<FFI::CheckLib>, L<FFI::Platypus>, L<FFI::C>
@@ -1065,24 +1108,6 @@ Michael R. Davis
 MIT License
 
 Copyright (c) 2020 Michael R. Davis
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 =cut
 
