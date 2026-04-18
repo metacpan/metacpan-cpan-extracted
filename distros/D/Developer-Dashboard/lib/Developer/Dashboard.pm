@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.43';
+our $VERSION = '2.46';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.43
+2.46
 
 =head1 INTRODUCTION
 
@@ -2046,6 +2046,11 @@ ships C<cli/somecmd>, C<dashboard example-skill.somecmd> resolves the correct
 layered skill command. If the active child layer for that same repo omits
 C<cli/somecmd>, the command falls back to the nearest inherited skill layer
 that still provides it.
+Nested skill trees under C<skills/E<lt>repoE<gt>/cli/> stay reachable through
+that same public dotted route, including multiple nested levels. For example,
+if C<example-skill> ships C<skills/foo/skills/bar/cli/baz>, then
+C<dashboard example-skill.foo.bar.baz> resolves the nested command through the
+installed skill tree.
 isolated skill root, runs sorted hooks from C<cli/somecmd.d/>, and then runs the
 main command.
 

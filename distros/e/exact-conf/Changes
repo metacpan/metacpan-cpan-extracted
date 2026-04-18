@@ -1,5 +1,8 @@
 Revision history for exact::conf
 
+1.10      2026-04-17 11:55:54-07:00 America/Los_Angeles
+        - Require Config::App >= v1.20
+
 1.09      2025-06-13 10:29:06-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

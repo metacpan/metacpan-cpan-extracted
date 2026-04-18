@@ -8,9 +8,10 @@ use Business::ISBN;
 use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 use English;
-use Error::Pure::Utils qw(err_get);
+use Error::Pure::Utils qw(clean err_get);
+use MARC::Leader;
 
-our $VERSION = 0.15;
+our $VERSION = 0.17;
 
 sub module_name {
 	my $self = shift;
@@ -29,6 +30,18 @@ sub process {
 
 	my $record_id = $self->{'cb_record_id'}->($marc_record);
 	my @record_errors;
+
+	my $leader_string = $marc_record->leader;
+	my $leader = eval {
+		MARC::Leader->new(
+			'verbose' => $self->{'verbose'},
+		)->parse($leader_string);
+	};
+	if ($EVAL_ERROR) {
+		# Error in leader, not validate.
+		clean();
+		return;
+	}
 
 	my @isbn_fields = $marc_record->field('020');
 	foreach my $isbn_field (@isbn_fields) {
@@ -63,15 +76,7 @@ sub process {
 			}
 		} else {
 			if ($isbn_obj->as_string ne $isbn) {
-				if ((length $isbn_obj->as_string) != (length $isbn)) {
-					push @record_errors, Data::MARC::Validator::Report::Error->new(
-						'error' => 'Bad ISBN in 020a field, extra characters.',
-						'params' => {
-							'Value' => $isbn,
-							'proposed_value' => $isbn_obj->as_string,
-						},
-					);
-				} else {
+				if ($isbn =~ m/^[\d\-]+$/ms) {
 					push @record_errors, Data::MARC::Validator::Report::Error->new(
 						'error' => 'Bad ISBN in 020a field, bad formatting.',
 						'params' => {
@@ -79,6 +84,28 @@ sub process {
 							'proposed_value' => $isbn_obj->as_string,
 						},
 					);
+				} else {
+					# Skip ISBD punctuations.
+					if ($leader->descriptive_cataloging_form eq 'i') {
+						my $new_isbn = $isbn_obj->as_string;
+						if ($isbn !~ m/^$new_isbn\s*:?\s*$/ms) {
+							push @record_errors, Data::MARC::Validator::Report::Error->new(
+								'error' => 'Bad ISBN in 020a field, extra characters.',
+								'params' => {
+									'Value' => $isbn,
+									'proposed_value' => $isbn_obj->as_string,
+								},
+							);
+						}
+					} else {
+						push @record_errors, Data::MARC::Validator::Report::Error->new(
+							'error' => 'Bad ISBN in 020a field, extra characters.',
+							'params' => {
+								'Value' => $isbn,
+								'proposed_value' => $isbn_obj->as_string,
+							},
+						);
+					}
 				}
 			}
 		}

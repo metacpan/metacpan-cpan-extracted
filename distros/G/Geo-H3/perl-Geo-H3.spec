@@ -1,5 +1,5 @@
 Name:           perl-Geo-H3
-Version:        0.09
+Version:        0.10
 Release:        1%{?dist}
 Summary:        H3 Geospatial Hexagon Indexing System
 License:        MIT
@@ -10,9 +10,11 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Geo::H3::FFI) => 0.07
+BuildRequires:  perl(List::Util)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Number::Delta)
 Requires:       perl(Geo::H3::FFI) => 0.07
+Requires:       perl(List::Util)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description

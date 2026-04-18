@@ -84,9 +84,10 @@ my %WriteMakefileArgs = (
     "Module::CPANTS::Analyse" => 0,
     "Module::CPANTS::Kwalitee" => 0,
     "Plack::Test" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Pod" => 0
   },
-  "VERSION" => "2.43",
+  "VERSION" => "2.46",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -140,6 +141,7 @@ my %FallbackPrereqs = (
   "TOML::Tiny" => 0,
   "Template" => 0,
   "Test::More" => 0,
+  "Test::Pod" => 0,
   "Time::HiRes" => 0,
   "Time::Local" => 0,
   "URI" => 0,

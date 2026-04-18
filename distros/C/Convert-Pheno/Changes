@@ -1,5 +1,16 @@
 Revision history for Perl distribution Convert-Pheno
 
+0.31 2026-04-17XXT00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Deprecated pyperler and updated Python binding
+ - Refactored Perl/Python APIs with structured multi-entity JSON support
+ - Added experimental OMOP SPECIMEN -> BFF biosamples conversion to entity-aware output
+ - Fixed OMOP concept_id fallback when the local CONCEPT input is incomplete
+ - Harmonized nomenclature across multi-output formats
+ - Removed 'metaData' from BFF 'info'; now only present in PXF to reduce payload size
+ - Added initial openEHR canonical JSON to BFF support:
+   - Multi-composition aggregation into one individual and first-class diseases, measures, phenotypicFeatures, interventionsOrProcedures, and treatments arrays
+
 0.30 2026-04-14XXT00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Refactored BFF internals to support entity-aware and multi-entity conversion
@@ -28,11 +39,11 @@ Revision history for Perl distribution Convert-Pheno
  - Added --search <fuzzy> mode (default: 0.9 token-based  + 0.1 Levenshtein distance)
  - Added --levenshtein-weight parameter
  - In 'omop2bff' conversion:
-   - Added property "_visit" to 'interventionsOrProcedures' term
+   - Added property '_visit' to 'interventionsOrProcedures' term
    - Added 'P' string to age (to conform with ISO8601) generated via condition_start_date + birth_datetime
    - Added DateTime::Format::ISO8601 module to simplify ome time-related calculations
  - Added "basic" 'bff2omop' conversion. To be further tested and improved in next releases
- - Added 'visitId' property to 'mapping.json' schema that lands in "_visit.id" on array-based terms
+ - Added 'visitId' property to 'mapping.json' schema that lands in '_visit.id' on array-based terms
 
 0.27 2025-01-16T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 

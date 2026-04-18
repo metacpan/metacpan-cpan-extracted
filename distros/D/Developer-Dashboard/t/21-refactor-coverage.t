@@ -1684,6 +1684,38 @@ is( $dispatcher->command_path( '', 'run-test' ), undef, 'command_path returns un
 is( $dispatcher->command_path( 'dep-skill', '' ), undef, 'command_path returns undef for missing command names' );
 is( $dispatcher->command_path( 'missing-skill', 'run-test' ), undef, 'command_path returns undef for unknown skills' );
 is( $dispatcher->command_path( 'dep-skill', 'missing' ), undef, 'command_path returns undef for missing skill commands' );
+make_path( File::Spec->catdir( $dep_skill_root, 'skills', 'foo', 'cli' ) );
+_write_file(
+    File::Spec->catfile( $dep_skill_root, 'skills', 'foo', 'cli', 'foo' ),
+    "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{nested-coverage\\n};\n",
+    0755,
+);
+make_path( File::Spec->catdir( $dep_skill_root, 'skills', 'level1', 'skills', 'level2', 'cli' ) );
+_write_file(
+    File::Spec->catfile( $dep_skill_root, 'skills', 'level1', 'skills', 'level2', 'cli', 'here' ),
+    "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{deep-nested-coverage\\n};\n",
+    0755,
+);
+is(
+    $dispatcher->command_path( 'dep-skill', 'foo.foo' ),
+    File::Spec->catfile( $dep_skill_root, 'skills', 'foo', 'cli', 'foo' ),
+    'command_path resolves nested skills/<repo>/cli commands inside one installed skill',
+);
+is(
+    $dispatcher->dispatch( 'dep-skill', 'foo.foo' )->{stdout},
+    "nested-coverage\n",
+    'dispatcher executes nested skills/<repo>/cli commands inside one installed skill',
+);
+is(
+    $dispatcher->command_path( 'dep-skill', 'level1.level2.here' ),
+    File::Spec->catfile( $dep_skill_root, 'skills', 'level1', 'skills', 'level2', 'cli', 'here' ),
+    'command_path resolves multi-level nested skills/<repo>/.../skills/<repo>/cli commands inside one installed skill',
+);
+is(
+    $dispatcher->dispatch( 'dep-skill', 'level1.level2.here' )->{stdout},
+    "deep-nested-coverage\n",
+    'dispatcher executes multi-level nested skills/<repo>/.../skills/<repo>/cli commands inside one installed skill',
+);
 is_deeply(
     $dispatcher->dispatch( 'dep-skill', 'missing' ),
     { error => "Command 'missing' not found in skill 'dep-skill'" },

@@ -1,0 +1,10 @@
+BitTorrent-Simple-0.01.tar.gz
+Changes
+lib/BitTorrent/Simple.pm
+Makefile.PL
+MANIFEST
+README
+script/torrent
+t/BitTorrent-Simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

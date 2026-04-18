@@ -1,0 +1,9 @@
+0.001     2026-04-18 03:35:07Z
+
+ - Initial release
+ - IO::Async / Net::Async::HTTP client wrapping WWW::Firecrawl
+ - Future-returning equivalents of all v2 endpoints
+ - Retry on transport + retryable API errors via delay_future
+ - Flow helpers: crawl_and_collect, batch_scrape_and_wait, extract_and_wait, agent_and_wait
+ - scrape_many (partial-success, concurrent) and retry_failed_pages
+ - Flow results carry {data, failed, raw_data, stats} split by is_failure policy

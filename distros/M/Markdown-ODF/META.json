@@ -4,7 +4,7 @@
       "Andy Beverley <andy@andybev.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -51,6 +51,6 @@
          "url" : "https://github.com/Amtivo-Group/Markdown-ODF"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -34,6 +34,7 @@ our @EXPORT_OK = qw(
   load_data_file
   structured_files_match
   cli_script_path
+  test_tmpdir
   ensure_clean_dir
   remove_dir_if_exists
   csv_files_match
@@ -95,10 +96,15 @@ sub read_first_json_object {
     return $json->[0];
 }
 
+sub test_tmpdir {
+    return File::Spec->tmpdir();
+}
+
 sub temp_output_file {
     my (%args) = @_;
     my $suffix = exists $args{suffix} ? $args{suffix} : '.json';
     my $dir    = exists $args{dir}    ? $args{dir}    : 't';
+    $dir = test_tmpdir() if !defined $dir || !-d $dir;
     my ( undef, $file ) = tempfile( DIR => $dir, SUFFIX => $suffix, UNLINK => 1 );
     return $file;
 }
@@ -165,10 +171,26 @@ sub load_data_file {
     );
 }
 
+sub _strip_convertpheno {
+    my ($data) = @_;
+
+    if ( ref $data eq 'HASH' ) {
+        delete $data->{convertPheno};
+        _strip_convertpheno($_) for values %{$data};
+    }
+    elsif ( ref $data eq 'ARRAY' ) {
+        _strip_convertpheno($_) for @{$data};
+    }
+
+    return $data;
+}
+
 sub structured_files_match {
     my ( $expected, $got ) = @_;
     my $expected_data = load_data_file($expected);
     my $got_data      = load_data_file($got);
+    _strip_convertpheno($expected_data);
+    _strip_convertpheno($got_data);
     my $json = JSON::XS->new->canonical;
     return $json->encode($expected_data) eq $json->encode($got_data) ? 1 : 0;
 }

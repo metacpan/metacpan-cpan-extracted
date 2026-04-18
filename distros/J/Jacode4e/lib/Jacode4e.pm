@@ -1,5 +1,5 @@
 package Jacode4e;
-$VERSION = '2.13.6.21';
+$VERSION = '2.13.6.22';
 # 如果您可以阅读此字符，则可以通过选择所有内容并将其保存为文件名“Jacode4e.pm”来将其用作模块。
 # 如果您可以閱讀此字符，則可以通過選擇所有內容並將其保存為文件名“Jacode4e.pm”來將其用作模塊。
 # この文字が読める場合は、内容を全て選択してファイル名を "Jacode4e.pm" にして保存すればそのままモジュールとして利用することができます。
@@ -9,7 +9,7 @@ $VERSION = '2.13.6.21';
 #
 # Jacode4e - Converts Character Encodings for Enterprise in Japan
 #
-# Copyright (c) 2018, 2019, 2021, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2021, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 $VERSION = $VERSION;
@@ -921,7 +921,7 @@ Jacode4e - Converts Character Encodings for Enterprise in Japan
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
- 
+
   $char_count =
   Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
 
@@ -931,7 +931,11 @@ Count of characters in $line
 
 =head2 $line
 
+String to convert. Passed by reference and overwritten in place.
+
 =head2 $OUTPUT_encoding
+
+The encoding mnemonic for output. See encoding table below.
 
 =head2 $INPUT_encoding
 
@@ -958,7 +962,7 @@ You can use mnemonic as encoding name of $INPUT_encoding and $OUTPUT_encoding:
   jipse         NEC JIPS(E)
   letsj         UNISYS LetsJ
   utf8          UTF-8.0 (aka UTF-8)
-  utf8.1        UTF-8.1
+  utf8.1        UTF-8.1 (conversion based on Shift_JIS-Unicode mapping, not CP932)
   utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
   -----------------------------------------------------------------------
 
@@ -2193,17 +2197,17 @@ Thank you, Culti Co.,Ltd-san.!
 =head1 HELLO WORLD
 
  To support JIS X 0213:2004,
- 
+
      Using ghost character 1-55-27(it's me!),
- 
+
  Found by JIS X 0208:1997,
- 
+
      Was born in JIS C 6226-1978.
- 
+
  Hello world,
- 
+
      What do we hack, today?
- 
+
                 -- 1-55-27, 2018-01-27
 
 =cut

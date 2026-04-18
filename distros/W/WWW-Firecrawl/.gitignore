@@ -1,0 +1,12 @@
+WWW-Firecrawl-*
+.build
+
+.env
+.env.*
+
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/

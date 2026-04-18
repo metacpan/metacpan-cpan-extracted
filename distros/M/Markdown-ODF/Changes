@@ -1,5 +1,10 @@
 Revision history for Markdown::ODF
 
+0.03 Fri Apr 17 2026
+
+    * Remove warning workaround - no longer necessary and produces other
+      warnings
+
 0.02 Wed May 3 2023
 
     * Performance improvements for simple text

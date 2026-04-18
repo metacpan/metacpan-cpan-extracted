@@ -4,7 +4,7 @@ use warnings;
 use File::Object;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator::Plugin::Field020;
-use Test::More 'tests' => 38;
+use Test::More 'tests' => 61;
 use Test::NoWarnings;
 
 # Data dir.
@@ -58,6 +58,8 @@ is($errors->[0]->record_id, 'cnb003698545', 'Get record id (cnb003698545).');
 is($errors->[0]->errors->[0]->error, "Bad ISBN in 020a field, bad formatting.",
 	"Get error (Bad ISBN in 020a field, bad formatting.).");
 is($errors->[0]->errors->[0]->params->{'Value'}, "80-900-2311-8", 'Get error parameter (Value => 80-900-2311-8).');
+is($errors->[0]->errors->[0]->params->{'proposed_value'}, '80-900231-1-8',
+	'Get error parameter (proposed_value => 80-900231-1-8).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field020->new(
@@ -76,6 +78,8 @@ is($errors->[0]->record_id, 'cnb001410157', 'Get record id (cnb001410157).');
 is($errors->[0]->errors->[0]->error, "Bad ISBN in 020a field, extra characters.",
 	"Get error (Bad ISBN in 020a field, extra characters.).");
 is($errors->[0]->errors->[0]->params->{'Value'}, "80-902905-0-7 :", 'Get error parameter (Value => 80-902905-0-7 :).');
+is($errors->[0]->errors->[0]->params->{'proposed_value'}, '80-902905-0-7',
+	'Get error parameter (proposed_value => 80-902905-0-7).');
 
 # Test.
 $obj = MARC::Validator::Plugin::Field020->new(
@@ -96,9 +100,66 @@ is($errors->[0]->errors->[0]->error, "Bad ISBN in 020a field.",
 is($errors->[0]->errors->[0]->params->{'Value'}, 'bad', 'Get error parameter (Value => bad).');
 
 # Test.
+$obj = MARC::Validator::Plugin::Field020->new(
+	'record_id_def' => '015a',
+);
+$obj->init;
+$marc_record = MARC::File::XML->in($data_dir->file('cnb003712487-incorrect_field_020a_isbn_formatting.xml')->s)->next;
+$obj->process($marc_record);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_020', 'Get name (field_020).');
+$errors = $ret->plugin_errors;
+is($errors->[0]->record_id, 'cnb003712487', 'Get record id (cnb003712487).');
+is($errors->[0]->errors->[0]->error, "Bad ISBN in 020a field, bad formatting.",
+	"Get error (Bad ISBN in 020a field, bad formatting.).");
+is($errors->[0]->errors->[0]->params->{'Value'}, '9788072790890', 'Get error parameter (Value => 9788072790890).');
+is($errors->[0]->errors->[0]->params->{'proposed_value'}, '978-80-7279-089-0',
+	'Get error parameter (proposed_value => 978-80-7279-089-0).');
+
+# Test.
+$obj = MARC::Validator::Plugin::Field020->new(
+	'record_id_def' => '015a',
+);
+$obj->init;
+$marc_record = MARC::File::XML->in($data_dir->file('cnb002932107-incorrect_field_020a_isbn_formatting.xml')->s)->next;
+$obj->process($marc_record);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_020', 'Get name (field_020).');
+$errors = $ret->plugin_errors;
+is($errors->[0]->record_id, 'cnb002932107', 'Get record id (cnb002932107).');
+is($errors->[0]->errors->[0]->error, "Bad ISBN in 020a field, bad formatting.",
+	"Get error (Bad ISBN in 020a field, bad formatting.).");
+is($errors->[0]->errors->[0]->params->{'Value'}, '978-82-932-59-11-4', 'Get error parameter (Value => 978-82-932-59-11-4).');
+is($errors->[0]->errors->[0]->params->{'proposed_value'}, '978-82-93259-11-4',
+	'Get error parameter (proposed_value => 978-82-93259-11-4).');
+
+# Test.
 $obj = MARC::Validator::Plugin::Field020->new;
 $obj->init;
 $marc_record = MARC::File::XML->in($data_dir->file('cnb000000168-correct_field_020a_isbn_not_present.xml')->s)->next;
+$obj->process($marc_record);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_020', 'Get name (field_020).');
+$errors = $ret->plugin_errors;
+is_deeply(
+	$errors,
+	[],
+	'No errors.',
+);
+
+# Test.
+$obj = MARC::Validator::Plugin::Field020->new;
+$obj->init;
+$marc_record = MARC::File::XML->in($data_dir->file('cnb000060952-isbd_extra_characters_in_020a.xml')->s)->next;
 $obj->process($marc_record);
 $ret = $obj->report;
 isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');

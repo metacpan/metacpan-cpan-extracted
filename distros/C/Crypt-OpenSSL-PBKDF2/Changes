@@ -20,3 +20,6 @@ Revision history for Perl extension Crypt::OpenSSL::PBKDF2.
 	- fixed and updated docs
 	- updated tests
 	- updated licensing
+
+0.11  Fri Apr 17 13:11:23 2026
+	- better compatibility under Windows (thanks to sisyphus for the hint)

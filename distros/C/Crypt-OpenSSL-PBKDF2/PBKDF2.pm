@@ -13,7 +13,7 @@ use AutoLoader;
 
 @EXPORT_OK = qw( derive derive_bin );
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 bootstrap Crypt::OpenSSL::PBKDF2 $VERSION;
 
@@ -65,7 +65,7 @@ The function will not ever attempt to auto-calculate the length of the salt
 because it is not assumed to be a NULL terminated value, so its length is 
 always required.
 The hashing is performed using the default algorithm SHA1, but an alternate 
-algortithm may be specified using the (optional) parameter b<alg>; the allowed
+algortithm may be specified using the (optional) parameter B<alg>; the allowed
 values are the textual names as defined in OpenSSL (a list may be obtained 
 with the command: openssl dgst -list); so right now you may use:
 

@@ -1,0 +1,61 @@
+=pod
+
+=head1 NAME
+
+CONTRIBUTING - contributor workflow for Developer Dashboard
+
+=head1 DESCRIPTION
+
+This file ships the release-visible contribution guide for Developer Dashboard
+so the tarball keeps contributor expectations available even when repository
+Markdown files are excluded from the distribution.
+
+=head1 WORKFLOW
+
+=over 4
+
+=item 1.
+
+Make the change with tests in C<t/>.
+
+=item 2.
+
+Run C<prove -lr t>.
+
+=item 3.
+
+Run Devel::Cover and keep C<lib/> at 100 percent statement and subroutine
+coverage.
+
+=item 4.
+
+Update documentation in C<doc/>, C<README.md>, and the
+C<Developer::Dashboard> POD when behavior changes.
+
+=item 5.
+
+Update C<FIXED_BUGS.md> and C<Changes>.
+
+=item 6.
+
+Rebuild the tarball and keep only the latest
+C<Developer-Dashboard-X.XX.tar.gz>.
+
+=item 7.
+
+Run C<integration/blank-env/run-host-integration.sh>.
+
+=back
+
+=head1 RELEASE HYGIENE
+
+Do not modify the read-only older reference tree. Use C<JSON::XS>,
+C<LWP::UserAgent>, and C<Capture::Tiny> in active code where those rules
+apply. Keep comments and POD in sync with behavior.
+
+=head1 SECURITY
+
+For private vulnerability reports, use the contact in the shipped security
+policy document and the repository security documentation.
+
+=cut

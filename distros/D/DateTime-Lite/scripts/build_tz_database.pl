@@ -315,14 +315,15 @@ sub _build_database
     _message( 1, "Preparing all SQL queries." );
     my $queries =
     [
-        aliases     => "INSERT INTO aliases     (alias, zone_id) VALUES(?, ?)",
-        countries   => "INSERT INTO countries   (code, name) VALUES(?, ?)",
-        leap_second => "INSERT INTO leap_second (zone_id, leap_index, occurrence_time, correction, is_expiration) VALUES(?, ?, ?, ?, ?)",
-        metadata    => "INSERT INTO metadata    (key, value) VALUES(?, ?)",
-        spans       => "INSERT INTO spans       (zone_id, type_id, span_index, utc_start, utc_end, local_start, local_end, offset, is_dst, short_name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        transition  => "INSERT INTO transition  (zone_id, trans_index, trans_time, type_id) VALUES(?, ?, ?, ?)",
-        types       => "INSERT INTO types       (zone_id, type_index, utc_offset, is_dst, abbreviation, designation_index, is_standard_time, is_ut_time, is_placeholder) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        zones       => "INSERT INTO zones       (name, canonical, has_dst, countries, coordinates, latitude, longitude, comment, tzif_version, footer_tz_string, transition_count, type_count, leap_count, isstd_count, isut_count, designation_charcount, category, subregion, location) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        aliases          => "INSERT INTO aliases          (alias, zone_id) VALUES(?, ?)",
+        countries        => "INSERT INTO countries        (code, name) VALUES(?, ?)",
+        extended_aliases => "INSERT INTO extended_aliases (abbreviation, zone_id, is_primary, comment) SELECT ?, zone_id, ?, ? FROM zones WHERE name = ?",
+        leap_second      => "INSERT INTO leap_second      (zone_id, leap_index, occurrence_time, correction, is_expiration) VALUES(?, ?, ?, ?, ?)",
+        metadata         => "INSERT INTO metadata         (key, value) VALUES(?, ?)",
+        spans            => "INSERT INTO spans            (zone_id, type_id, span_index, utc_start, utc_end, local_start, local_end, offset, is_dst, short_name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        transition       => "INSERT INTO transition       (zone_id, trans_index, trans_time, type_id) VALUES(?, ?, ?, ?)",
+        types            => "INSERT INTO types            (zone_id, type_index, utc_offset, is_dst, abbreviation, designation_index, is_standard_time, is_ut_time, is_placeholder) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        zones            => "INSERT INTO zones            (name, canonical, has_dst, countries, coordinates, latitude, longitude, comment, tzif_version, footer_tz_string, transition_count, type_count, leap_count, isstd_count, isut_count, designation_charcount, category, subregion, location) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     ];
     my $sths = {};
 
@@ -367,9 +368,436 @@ sub _build_database
     $sths->{resolve_alias} = $dbh->prepare( q{SELECT zone_id FROM zones WHERE name = ?} ) ||
         die( "Error preparing query to resolve zone alias: ", $dbh->errstr );
 
+    # NOTE: Timezones aliases, including historic outdated ones
+    my $aliases = 
+    {
+        # NOTE: A
+        A     => { comment => "Alpha Military Time Zone", timezones => ['Etc/GMT-1'] },
+        ACDT  => { comment => "Australian Central Daylight Saving Time", timezones => ['Australia/Adelaide', 'Australia/Darwin'] },
+        ACST  => { comment => "Australian Central Standard Time", timezones => ['Australia/Darwin', 'Australia/Adelaide'] },
+        ACT   => { comment => "ASEAN Common Time", timezones => ['Asia/Singapore'] },
+        ACWST => { comment => "Australian Central Western Standard Time", timezones => ['Australia/Eucla'] },
+        ADT   => { comment => "Atlantic Daylight Time", timezones => ['America/Halifax', 'America/Glace_Bay', 'America/Moncton', 'America/Thule', 'Atlantic/Bermuda'] },
+        AEDT  => { comment => "Australian Eastern Daylight Saving Time", timezones => ['Australia/Sydney', 'Australia/Melbourne', 'Australia/Hobart', 'Australia/Lord_Howe'] },
+        AES   => { comment => "Australian Eastern Standard Time", timezones => ['Australia/Brisbane'] },
+        AEST  => { comment => "Australian Eastern Standard Time", timezones => ['Australia/Brisbane', 'Australia/Sydney', 'Australia/Melbourne'] },
+        AET   => { comment => "Australian Eastern Time", timezones => ['Australia/Sydney', 'Australia/Brisbane'] },
+        AFT   => { comment => "Afghanistan Time", timezones => ['Asia/Kabul'] },
+        AHDT  => { comment => "Alaska-Hawaii Daylight Time", timezones => ['America/Adak'] },
+        AHST  => { comment => "Alaska-Hawaii Standard Time", timezones => ['Pacific/Honolulu'] },
+        AKDT  => { comment => "Alaska Daylight Time", timezones => ['America/Anchorage', 'America/Juneau', 'America/Nome', 'America/Sitka', 'America/Yakutat'] },
+        AKST  => { comment => "Alaska Standard Time", timezones => ['America/Anchorage', 'America/Juneau', 'America/Nome', 'America/Sitka', 'America/Yakutat'] },
+        ALMT  => { comment => "Alma-Ata Time", timezones => ['Asia/Almaty'] },
+        AMST  => { comment => "Amazon Summer Time (Brazil)", timezones => ['America/Manaus', 'America/Boa_Vista'] },
+        AMT   => { comment => "Armenia Time", timezones => ['America/Manaus', 'Asia/Yerevan'] },
+        ANAST => { comment => "Anadyr Summer Time", timezones => ['Asia/Anadyr'] },
+        ANAT  => { comment => "Anadyr Time", timezones => ['Asia/Anadyr'] },
+        AQTT  => { comment => "Aqtobe Time", timezones => ['Asia/Aqtau'] },
+        ART   => { comment => "Argentina Time", timezones => ['America/Argentina/Buenos_Aires'] },
+        AST   => { comment => "Atlantic Standard Time", timezones => ['America/Halifax', 'America/Puerto_Rico', 'America/Santo_Domingo', 'America/Barbados', 'Asia/Riyadh', 'Asia/Kuwait', 'Asia/Baghdad'] },
+        AT    => { comment => "Azores Time", timezones => ['Atlantic/Azores'] },
+        AWST  => { comment => "Australian Western Standard Time", timezones => ['Australia/Perth'] },
+        AZOST => { comment => "Azores Summer Time", timezones => ['Atlantic/Azores'] },
+        AZOT  => { comment => "Azores Standard Time", timezones => ['Atlantic/Azores'] },
+        AZST  => { comment => "Azerbaijan Summer Time", timezones => ['Asia/Baku'] },
+        AZT   => { comment => "Azerbaijan Time", timezones => ['Asia/Baku'] },
+
+        # NOTE: B
+        B     => { comment => "Bravo Military Time Zone", timezones => ['Etc/GMT-2'] },
+        BADT  => { comment => "Baghdad Daylight Time", timezones => ['Asia/Baghdad'] },
+        BAT   => { comment => "Baghdad Time", timezones => ['Asia/Baghdad'] },
+        BDST  => { comment => "British Double Summer Time", timezones => ['Europe/London'] },
+        BDT   => { comment => "Bangladesh Time", timezones => ['Asia/Dhaka'] },
+        BET   => { comment => "Bering Standard Time", timezones => ['Etc/GMT+11'] },
+        BIOT  => { comment => "British Indian Ocean Time", timezones => ['Indian/Chagos'] },
+        BIT   => { comment => "Baker Island Time", timezones => ['Etc/GMT+12'] },
+        BNT   => { comment => "Brunei Time", timezones => ['Asia/Brunei'] },
+        BORT  => { comment => "Borneo Time (Indonesia)", timezones => ['Asia/Kuching'] },
+        BOT   => { comment => "Bolivia Time", timezones => ['America/La_Paz'] },
+        BRA   => { comment => "Brazil Time", timezones => ['America/Sao_Paulo'] },
+        BRST  => { comment => "Brasília Summer Time", timezones => ['America/Sao_Paulo', 'America/Fortaleza'] },
+        BRT   => { comment => "Brasília Time", timezones => ['America/Sao_Paulo', 'America/Fortaleza', 'America/Belem', 'America/Recife', 'America/Maceio'] },
+        BST   => { comment => "British Summer Time (British Standard Time from Feb 1968 to Oct 1971)", timezones => ['Europe/London', 'Pacific/Pago_Pago'] },
+        BTT   => { comment => "Bhutan Time", timezones => ['Asia/Thimphu'] },
+
+        # NOTE: C
+        C     => { comment => "Charlie Military Time Zone", timezones => ['Etc/GMT-3'] },
+        CAST  => { comment => "Casey Time Zone", timezones => ['Antarctica/Casey'] },
+        CAT   => { comment => "Central Africa Time", timezones => ['Africa/Harare', 'Africa/Maputo', 'Africa/Lusaka', 'Africa/Blantyre', 'Africa/Bujumbura', 'Africa/Gaborone', 'Africa/Kigali', 'Africa/Lubumbashi'] },
+        CCT   => { comment => "Cocos Islands Time", timezones => ['Indian/Cocos'] },
+        CDT   => { comment => "Cuba Daylight Time", timezones => ['America/Chicago', 'America/Winnipeg', 'America/Havana'] },
+        CEST  => { comment => "Central European Summer Time", timezones => ['Europe/Paris', 'Europe/Berlin', 'Europe/Rome', 'Europe/Madrid', 'Europe/Warsaw', 'Europe/Amsterdam', 'Europe/Brussels', 'Europe/Copenhagen', 'Europe/Oslo', 'Europe/Stockholm', 'Europe/Vienna', 'Europe/Zurich'] },
+        CETDST=> { comment => "Central Europe Summer Time", timezones => ['Europe/Paris', 'Europe/Berlin'] },
+        CET   => { comment => "Central European Time", timezones => ['Europe/Paris', 'Europe/Berlin', 'Europe/Rome', 'Europe/Madrid', 'Europe/Warsaw', 'Europe/Amsterdam'] },
+        CHADT => { comment => "Chatham Daylight Time", timezones => ['Pacific/Chatham'] },
+        CHAST => { comment => "Chatham Standard Time", timezones => ['Pacific/Chatham'] },
+        CHOST => { comment => "Choibalsan Summer Time", timezones => ['Asia/Choibalsan'] },
+        CHOT  => { comment => "Choibalsan Standard Time", timezones => ['Asia/Choibalsan'] },
+        CHST  => { comment => "Chamorro Standard Time", timezones => ['Pacific/Guam', 'Pacific/Saipan'] },
+        CHUT  => { comment => "Chuuk Time", timezones => ['Pacific/Chuuk'] },
+        CIST  => { comment => "Clipperton Island Standard Time", timezones => ['Pacific/Pitcairn'] },
+        CKT   => { comment => "Cook Island Time", timezones => ['Pacific/Rarotonga'] },
+        CLST  => { comment => "Chile Summer Time", timezones => ['America/Santiago'] },
+        CLT   => { comment => "Chile Standard Time", timezones => ['America/Santiago'] },
+        COST  => { comment => "Colombia Summer Time", timezones => ['America/Bogota'] },
+        COT   => { comment => "Colombia Time", timezones => ['America/Bogota'] },
+        CST   => { comment => "Cuba Standard Time", timezones => ['America/Chicago', 'America/Winnipeg', 'Asia/Shanghai', 'Asia/Taipei', 'Asia/Macau', 'Asia/Hong_Kong', 'America/Havana', 'Australia/Darwin', 'Australia/Adelaide'] },
+        # Australian Central Daylight (variant of ACDT)
+        CSUT  => { comment => "Australian Central Daylight", timezones => ['Australia/Adelaide'] },
+        CT    => { comment => "Central Time", timezones => ['America/Chicago', 'America/Winnipeg'] },
+        CUT   => { comment => "Coordinated Universal Time", timezones => ['Etc/UTC'] },
+        CVT   => { comment => "Cape Verde Time", timezones => ['Atlantic/Cape_Verde'] },
+        CWST  => { comment => "Central Western Standard Time (Australia)", timezones => ['Australia/Eucla'] },
+        CXT   => { comment => "Christmas Island Time", timezones => ['Indian/Christmas'] },
+
+        # NOTE: D
+        D     => { comment => "Delta Military Time Zone", timezones => ['Etc/GMT-4'] },
+        DAVT  => { comment => "Davis Time", timezones => ['Antarctica/Davis'] },
+        DDUT  => { comment => "Dumont d'Urville Time", timezones => ['Antarctica/DumontDUrville'] },
+        DFT   => { comment => "AIX-specific equivalent of Central European Time", timezones => ['Europe/Paris'] },
+        DNT   => { comment => "Dansk Normal", timezones => ['Europe/Oslo'] },
+        DST   => { comment => "Dansk Summer", timezones => ['Europe/Copenhagen'] },
+
+        # NOTE: E
+        E     => { comment => "Echo Military Time Zone", timezones => ['Etc/GMT-5'] },
+        EASST => { comment => "Easter Island Summer Time", timezones => ['Pacific/Easter'] },
+        EAST  => { comment => "Easter Island Standard Time", timezones => ['Pacific/Easter'] },
+        EAT   => { comment => "East Africa Time", timezones => ['Africa/Nairobi', 'Africa/Addis_Ababa', 'Africa/Asmara', 'Africa/Dar_es_Salaam', 'Africa/Djibouti', 'Africa/Kampala', 'Africa/Mogadishu', 'Indian/Antananarivo', 'Indian/Comoro', 'Indian/Mayotte'] },
+        ECT   => { comment => "Ecuador Time", timezones => ['America/Guayaquil', 'Pacific/Galapagos'] },
+        EDT   => { comment => "Eastern Daylight Time (North America)", timezones => ['America/New_York', 'America/Detroit', 'America/Toronto', 'America/Montreal'] },
+        EEST  => { comment => "Eastern European Summer Time", timezones => ['Europe/Athens', 'Europe/Helsinki', 'Europe/Kyiv', 'Europe/Tallinn', 'Europe/Vilnius', 'Europe/Riga', 'Europe/Sofia', 'Europe/Bucharest', 'Europe/Chisinau', 'Europe/Istanbul', 'Asia/Nicosia', 'Asia/Beirut', 'Asia/Damascus', 'Asia/Amman', 'Asia/Jerusalem', 'Africa/Cairo'] },
+        EETDST=> { comment => "European Eastern Summer", timezones => ['Europe/Athens', 'Europe/Helsinki'] },
+        EET   => { comment => "Eastern European Time", timezones => ['Europe/Athens', 'Europe/Helsinki', 'Europe/Kyiv', 'Europe/Tallinn', 'Europe/Vilnius', 'Europe/Riga', 'Europe/Sofia', 'Europe/Bucharest', 'Europe/Chisinau', 'Europe/Istanbul', 'Asia/Nicosia', 'Africa/Cairo', 'Africa/Tripoli'] },
+        EGST  => { comment => "Eastern Greenland Summer Time", timezones => ['America/Scoresbysund'] },
+        EGT   => { comment => "Eastern Greenland Time", timezones => ['America/Scoresbysund'] },
+        EMT   => { comment => "Norway Time", timezones => ['Europe/Oslo'] },
+        EST   => { comment => "Eastern Standard Time (North America)", timezones => ['America/New_York', 'America/Detroit', 'America/Toronto', 'America/Indiana/Indianapolis', 'America/Kentucky/Louisville', 'America/Jamaica', 'America/Panama'] },
+        ESUT  => { comment => "Australian Eastern Daylight", timezones => ['Australia/Sydney'] },
+        ET    => { comment => "Eastern Time (North America)", timezones => ['America/New_York'] },
+
+        # NOTE: F
+        F     => { comment => "Foxtrot Military Time Zone", timezones => ['Etc/GMT-6'] },
+        FET   => { comment => "Further-eastern European Time", timezones => ['Europe/Kaliningrad', 'Europe/Minsk'] },
+        FJST  => { comment => "Fiji Summer Time", timezones => ['Pacific/Fiji'] },
+        FJT   => { comment => "Fiji Time", timezones => ['Pacific/Fiji'] },
+        FKST  => { comment => "Falkland Islands Summer Time", timezones => ['Atlantic/Stanley'] },
+        FKT   => { comment => "Falkland Islands Time", timezones => ['Atlantic/Stanley'] },
+        FNT   => { comment => "Fernando de Noronha Time", timezones => ['America/Noronha'] },
+        FWT   => { comment => "French Winter Time", timezones => ['Europe/Paris'] },
+
+        # NOTE: G
+        G     => { comment => "Golf Military Time Zone", timezones => ['Etc/GMT-7'] },
+        GALT  => { comment => "Galapagos Time", timezones => ['Pacific/Galapagos'] },
+        GAMT  => { comment => "Gambier Islands Time", timezones => ['Pacific/Gambier'] },
+        GEST  => { comment => "Georgia Summer Time", timezones => ['Asia/Tbilisi'] },
+        GET   => { comment => "Georgia Standard Time", timezones => ['Asia/Tbilisi'] },
+        GFT   => { comment => "French Guiana Time", timezones => ['America/Cayenne'] },
+        GILT  => { comment => "Gilbert Island Time", timezones => ['Pacific/Tarawa'] },
+        GIT   => { comment => "Gambier Island Time", timezones => ['Pacific/Gambier'] },
+        GMT   => { comment => "Greenwich Mean Time", timezones => ['Etc/GMT', 'Europe/London', 'Africa/Abidjan', 'Africa/Accra', 'Africa/Monrovia', 'Atlantic/Reykjavik'] },
+        GST   => { comment => "Gulf Standard Time", timezones => ['Asia/Dubai', 'Asia/Muscat', 'Atlantic/South_Georgia'] },
+        GT    => { comment => "Greenwich Time", timezones => ['Etc/GMT'] },
+        GYT   => { comment => "Guyana Time", timezones => ['America/Guyana'] },
+        GZ    => { comment => "Greenwichzeit", timezones => ['Etc/GMT'] },
+
+        # NOTE: H
+        H     => { comment => "Hotel Military Time Zone", timezones => ['Etc/GMT-8'] },
+        HAA   => { comment => "Heure Avancée de l'Atlantique", timezones => ['America/Halifax'] },
+        HAC   => { comment => "Heure Avancee du Centre", timezones => ['America/Winnipeg'] },
+        HAE   => { comment => "Heure Avancee de l'Est", timezones => ['America/New_York'] },
+        HAEC  => { comment => "Heure Avancée d'Europe Centrale", timezones => ['Europe/Paris'] },
+        HAP   => { comment => "Heure Avancee du Pacifique", timezones => ['America/Vancouver'] },
+        HAR   => { comment => "Heure Avancee des Rocheuses", timezones => ['America/Denver'] },
+        HAT   => { comment => "Heure Avancee de Terre-Neuve", timezones => ['America/St_Johns'] },
+        HAY   => { comment => "Heure Avancee du Yukon", timezones => ['America/Anchorage'] },
+        HDT   => { comment => "Hawaii–Aleutian Daylight Time", timezones => ['America/Adak'] },
+        HFE   => { comment => "Heure Fancais d'Ete", timezones => ['Europe/Paris'] },
+        HFH   => { comment => "Heure Fancais d'Hiver", timezones => ['Europe/Paris'] },
+        HG    => { comment => "Heure de Greenwich", timezones => ['Etc/GMT'] },
+        HKT   => { comment => "Hong Kong Time", timezones => ['Asia/Hong_Kong'] },
+        # HL is skipped, because there is no IANA equivalent
+        HMT   => { comment => "Heard and McDonald Islands Time", timezones => ['Indian/Kerguelen'] },
+        HNA   => { comment => "Heure Normale de l'Atlantique", timezones => ['America/Halifax'] },
+        HNC   => { comment => "Heure Normale du Centre", timezones => ['America/Winnipeg'] },
+        HNE   => { comment => "Heure Normale de l'Est", timezones => ['America/New_York'] },
+        HNP   => { comment => "Heure Normale du Pacifique", timezones => ['America/Vancouver'] },
+        HNR   => { comment => "Heure Normale des Rocheuses", timezones => ['America/Denver'] },
+        HNT   => { comment => "Heure Normale de Terre-Neuve", timezones => ['America/St_Johns'] },
+        HNY   => { comment => "Heure Normale du Yukon", timezones => ['America/Anchorage'] },
+        HOE   => { comment => "Spain Time", timezones => ['Europe/Madrid'] },
+        HOVST => { comment => "Hovd Summer Time (not used from 2017-present)", timezones => ['Asia/Hovd'] },
+        HOVT  => { comment => "Hovd Time", timezones => ['Asia/Hovd'] },
+        HST   => { comment => "Hawaii–Aleutian Standard Time", timezones => ['Pacific/Honolulu', 'Pacific/Johnston'] },
+
+        # NOTE: I
+        I     => { comment => "India Military Time Zone", timezones => ['Etc/GMT-9'] },
+        ICT   => { comment => "Indochina Time", timezones => ['Asia/Bangkok', 'Asia/Ho_Chi_Minh', 'Asia/Phnom_Penh', 'Asia/Vientiane'] },
+        IDLE  => { comment => "Internation Date Line East", timezones => ['Etc/GMT-12'] },
+        IDLW  => { comment => "International Day Line West time zone", timezones => ['Etc/GMT+12'] },
+        IDT   => { comment => "Israel Daylight Time", timezones => ['Asia/Jerusalem'] },
+        IOT   => { comment => "Indian Ocean Time", timezones => ['Indian/Chagos'] },
+        IRDT  => { comment => "Iran Daylight Time", timezones => ['Asia/Tehran'] },
+        IRKST => { comment => "Irkutsk Summer Time", timezones => ['Asia/Irkutsk'] },
+        IRKT  => { comment => "Irkutsk Time", timezones => ['Asia/Irkutsk'] },
+        IRST  => { comment => "Iran Standard Time", timezones => ['Asia/Tehran'] },
+        IRT   => { comment => "Iran Time", timezones => ['Asia/Tehran'] },
+        IST   => { comment => "Israel Standard Time", timezones => ['Asia/Kolkata', 'Europe/Dublin', 'Asia/Jerusalem'] },
+        IT    => { comment => "Iran Time", timezones => ['Asia/Tehran'] },
+        ITA   => { comment => "Italy Time", timezones => ['Europe/Rome'] },
+
+        # NOTE: J
+        JAVT  => { comment => "Java Time", timezones => ['Asia/Jakarta'] },
+        JAYT  => { comment => "Jayapura Time (Indonesia)", timezones => ['Asia/Jayapura'] },
+        JST   => { comment => "Japan Standard Time", timezones => ['Asia/Tokyo'] },
+        JT    => { comment => "Java Time", timezones => ['Asia/Jakarta'] },
+
+        # NOTE: K
+        K     => { comment => "Kilo Military Time Zone", timezones => ['Etc/GMT-10'] },
+        KALT  => { comment => "Kaliningrad Time", timezones => ['Europe/Kaliningrad'] },
+        KDT   => { comment => "Korean Daylight Time", timezones => ['Asia/Seoul'] },
+        KGST  => { comment => "Kyrgyzstan Summer Time", timezones => ['Asia/Bishkek'] },
+        KGT   => { comment => "Kyrgyzstan Time", timezones => ['Asia/Bishkek'] },
+        KOST  => { comment => "Kosrae Time", timezones => ['Pacific/Kosrae'] },
+        KRAST => { comment => "Krasnoyarsk Summer Time", timezones => ['Asia/Krasnoyarsk'] },
+        KRAT  => { comment => "Krasnoyarsk Time", timezones => ['Asia/Krasnoyarsk'] },
+        KST   => { comment => "Korea Standard Time", timezones => ['Asia/Seoul', 'Asia/Pyongyang'] },
+
+        # NOTE: L
+        L     => { comment => "Lima Military Time Zone", timezones => ['Etc/GMT-11'] },
+        LHDT  => { comment => "Lord Howe Daylight Time", timezones => ['Australia/Lord_Howe'] },
+        LHST  => { comment => "Lord Howe Summer Time", timezones => ['Australia/Lord_Howe'] },
+        LIGT  => { comment => "Melbourne, Australia", timezones => ['Australia/Melbourne'] },
+        LINT  => { comment => "Line Islands Time", timezones => ['Pacific/Kiritimati'] },
+        LKT   => { comment => "Lanka Time", timezones => ['Asia/Colombo'] },
+        # LST (Local Sidereal Time) is skipped, because there is no IANA equivalent
+        # LST   => { comment => "Local Sidereal Time", timezones => [] },   # local
+        # LT (Local Time) is skipped, because there is no IANA equivalent
+        # LT    => { comment => "Local Time", timezones => [] },            # local
+
+        # NOTE: M
+        M     => { comment => "Mike Military Time Zone", timezones => ['Etc/GMT-12'] },
+        MAGST => { comment => "Magadan Summer Time", timezones => ['Asia/Magadan'] },
+        MAGT  => { comment => "Magadan Time", timezones => ['Asia/Magadan'] },
+        MAL   => { comment => "Malaysia Time", timezones => ['Asia/Kuala_Lumpur'] },
+        MART  => { comment => "Marquesas Islands Time", timezones => ['Pacific/Marquesas'] },
+        MAT   => { comment => "Turkish Standard Time", timezones => ['Europe/Istanbul'] },
+        MAWT  => { comment => "Mawson Station Time", timezones => ['Antarctica/Mawson'] },
+        MDT   => { comment => "Mountain Daylight Time (North America)", timezones => ['America/Denver', 'America/Boise', 'America/Edmonton', 'America/Calgary'] },
+        MED   => { comment => "Middle European Daylight", timezones => ['Europe/Paris'] },
+        MEDST => { comment => "Middle European Summer", timezones => ['Europe/Paris'] },
+        MEST  => { comment => "Middle European Summer Time", timezones => ['Europe/Paris', 'Europe/Berlin'] },
+        MESZ  => { comment => "Mitteieuropaische Sommerzeit", timezones => ['Europe/Berlin'] },
+        MET   => { comment => "Middle European Time", timezones => ['Europe/Paris', 'Europe/Berlin'] },
+        MEWT  => { comment => "Middle European Winter Time", timezones => ['Europe/Paris'] },
+        MEX   => { comment => "Mexico Time", timezones => ['America/Mexico_City'] },
+        MEZ   => { comment => "Mitteieuropaische Zeit", timezones => ['Europe/Berlin'] },
+        MHT   => { comment => "Marshall Islands Time", timezones => ['Pacific/Majuro', 'Pacific/Kwajalein'] },
+        MIST  => { comment => "Macquarie Island Station Time", timezones => ['Antarctica/Macquarie'] },
+        MIT   => { comment => "Marquesas Islands Time", timezones => ['Pacific/Marquesas'] },
+        MMT   => { comment => "Myanmar Standard Time", timezones => ['Asia/Yangon'] },
+        MPT   => { comment => "North Mariana Islands Time", timezones => ['Pacific/Saipan'] },
+        MSD   => { comment => "Moscow Summer Time", timezones => ['Europe/Moscow'] },
+        MSK   => { comment => "Moscow Time", timezones => ['Europe/Moscow', 'Europe/Kirov', 'Europe/Volgograd', 'Europe/Simferopol'] },
+        MSKS  => { comment => "Moscow Summer Time", timezones => ['Europe/Moscow'] },
+        MST   => { comment => "Mountain Standard Time", timezones => ['America/Denver', 'America/Boise', 'America/Edmonton', 'America/Calgary', 'America/Phoenix'] },
+        MT    => { comment => "Moluccas", timezones => ['Asia/Jayapura'] },
+        MUT   => { comment => "Mauritius Time", timezones => ['Indian/Mauritius'] },
+        MVT   => { comment => "Maldives Time", timezones => ['Indian/Maldives'] },
+        MYT   => { comment => "Malaysia Time", timezones => ['Asia/Kuala_Lumpur', 'Asia/Kuching'] },
+
+        # NOTE: N
+        N     => { comment => "November Military Time Zone", timezones => ['Etc/GMT+1'] },
+        NCT   => { comment => "New Caledonia Time", timezones => ['Pacific/Noumea'] },
+        NDT   => { comment => "Newfoundland Daylight Time", timezones => ['America/St_Johns'] },
+        NFT   => { comment => "Norfolk Island Time", timezones => ['Pacific/Norfolk'] },
+        NOR   => { comment => "Norway Time", timezones => ['Europe/Oslo'] },
+        NOVST => { comment => "Novosibirsk Summer Time (Russia)", timezones => ['Asia/Novosibirsk'] },
+        NOVT  => { comment => "Novosibirsk Time", timezones => ['Asia/Novosibirsk'] },
+        NPT   => { comment => "Nepal Time", timezones => ['Asia/Kathmandu'] },
+        NRT   => { comment => "Nauru Time", timezones => ['Pacific/Nauru'] },
+        NST   => { comment => "Newfoundland Standard Time", timezones => ['America/St_Johns'] },
+        NSUT  => { comment => "North Sumatra Time", timezones => ['Asia/Jakarta'] },
+        NT    => { comment => "Newfoundland Time", timezones => ['America/St_Johns'] },
+        NUT   => { comment => "Niue Time", timezones => ['Pacific/Niue'] },
+        NZDT  => { comment => "New Zealand Daylight Time", timezones => ['Pacific/Auckland', 'Antarctica/McMurdo'] },
+        NZST  => { comment => "New Zealand Standard Time", timezones => ['Pacific/Auckland', 'Antarctica/McMurdo'] },
+        NZT   => { comment => "New Zealand Standard Time", timezones => ['Pacific/Auckland'] },
+
+        # NOTE: O
+        O     => { comment => "Oscar Military Time Zone", timezones => ['Etc/GMT+2'] },
+        OESZ  => { comment => "Osteuropaeische Sommerzeit", timezones => ['Europe/Athens'] },
+        OEZ   => { comment => "Osteuropaische Zeit", timezones => ['Europe/Athens'] },
+        OMSST => { comment => "Omsk Summer Time", timezones => ['Asia/Omsk'] },
+        OMST  => { comment => "Omsk Time", timezones => ['Asia/Omsk'] },
+        ORAT  => { comment => "Oral Time", timezones => ['Asia/Oral'] },
+        # OZ (Ortszeit) is skipped, because there is no IANA equivalent
+
+        # NOTE: P
+        P     => { comment => "Papa Military Time Zone", timezones => ['Etc/GMT+3'] },
+        PDT   => { comment => "Pacific Daylight Time (North America)", timezones => ['America/Los_Angeles', 'America/Vancouver', 'America/Tijuana'] },
+        PET   => { comment => "Peru Time", timezones => ['America/Lima'] },
+        PETST => { comment => "Kamchatka Summer Time", timezones => ['Asia/Kamchatka'] },
+        PETT  => { comment => "Kamchatka Time", timezones => ['Asia/Kamchatka'] },
+        PGT   => { comment => "Papua New Guinea Time", timezones => ['Pacific/Port_Moresby'] },
+        PHOT  => { comment => "Phoenix Island Time", timezones => ['Pacific/Enderbury'] },
+        PHST  => { comment => "Philippine Standard Time", timezones => ['Asia/Manila'] },
+        PHT   => { comment => "Philippine Time", timezones => ['Asia/Manila'] },
+        PKT   => { comment => "Pakistan Standard Time", timezones => ['Asia/Karachi'] },
+        PMDT  => { comment => "Saint Pierre and Miquelon Daylight Time", timezones => ['America/Miquelon'] },
+        PMST  => { comment => "Saint Pierre and Miquelon Standard Time", timezones => ['America/Miquelon'] },
+        PMT   => { comment => "Pierre & Miquelon Standard Time", timezones => ['America/Miquelon'] },
+        PNT   => { comment => "Pitcairn Time", timezones => ['Pacific/Pitcairn'] },
+        PONT  => { comment => "Pohnpei Standard Time", timezones => ['Pacific/Pohnpei'] },
+        PST   => { comment => "Pacific Standard Time (North America)", timezones => ['America/Los_Angeles', 'America/Vancouver', 'America/Tijuana', 'Pacific/Pitcairn'] },
+        PWT   => { comment => "Palau Time", timezones => ['Pacific/Palau'] },
+        PYST  => { comment => "Paraguay Summer Time", timezones => ['America/Asuncion'] },
+        PYT   => { comment => "Paraguay Time", timezones => ['America/Asuncion'] },
+
+        # NOTE: Q
+        Q     => { comment => "Quebec Military Time Zone", timezones => ['Etc/GMT+4'] },
+        QYZT  => { comment => "Qyzylorda Time (Kazakhstan, UTC+6)", timezones => ['Asia/Qyzylorda'] },
+
+        # NOTE: R
+        R     => { comment => "Romeo Military Time Zone", timezones => ['Etc/GMT+5'] },
+        R1T   => { comment => "Russia Zone 1", timezones => ['Europe/Kaliningrad'] },
+        R2T   => { comment => "Russia Zone 2", timezones => ['Europe/Moscow'] },
+        RET   => { comment => "Réunion Time", timezones => ['Indian/Reunion'] },
+        ROK   => { comment => "Korean Standard Time", timezones => ['Asia/Seoul'] },
+        ROTT  => { comment => "Rothera Research Station Time", timezones => ['Antarctica/Rothera'] },
+
+        # NOTE: S
+        S     => { comment => "Sierra Military Time Zone", timezones => ['Etc/GMT+6'] },
+        SADT  => { comment => "Australian South Daylight Time", timezones => ['Australia/Adelaide'] },
+        SAKT  => { comment => "Sakhalin Island Time", timezones => ['Asia/Sakhalin'] },
+        SAMT  => { comment => "Samara Time", timezones => ['Europe/Samara'] },
+        SAST  => { comment => "South African Standard Time", timezones => ['Africa/Johannesburg', 'Africa/Maseru', 'Africa/Mbabane'] },
+        SBT   => { comment => "Solomon Islands Time", timezones => ['Pacific/Guadalcanal'] },
+        SCT   => { comment => "Seychelles Time", timezones => ['Indian/Mahe'] },
+        SDT   => { comment => "Samoa Daylight Time", timezones => ['Pacific/Apia', 'Pacific/Pago_Pago'] },
+        SET   => { comment => "Prague, Vienna Time", timezones => ['Europe/Prague', 'Europe/Vienna'] },
+        SGT   => { comment => "Singapore Time", timezones => ['Asia/Singapore'] },
+        SLST  => { comment => "Sri Lanka Standard Time", timezones => ['Asia/Colombo'] },
+        SRET  => { comment => "Srednekolymsk Time", timezones => ['Asia/Srednekolymsk'] },
+        SRT   => { comment => "Suriname Time", timezones => ['America/Paramaribo'] },
+        SST   => { comment => "Singapore Standard Time", timezones => ['Asia/Singapore'] },
+        SWT   => { comment => "Swedish Winter", timezones => ['Europe/Stockholm'] },
+        SYOT  => { comment => "Showa Station Time", timezones => ['Antarctica/Syowa'] },
+
+        # NOTE: T
+        T     => { comment => "Tango Military Time Zone", timezones => ['Etc/GMT+7'] },
+        TAHT  => { comment => "Tahiti Time", timezones => ['Pacific/Tahiti'] },
+        TFT   => { comment => "French Southern and Antarctic Time", timezones => ['Indian/Kerguelen'] },
+        THA   => { comment => "Thailand Standard Time", timezones => ['Asia/Bangkok'] },
+        THAT  => { comment => "Tahiti Time", timezones => ['Pacific/Tahiti'] },
+        TJT   => { comment => "Tajikistan Time", timezones => ['Asia/Dushanbe'] },
+        TKT   => { comment => "Tokelau Time", timezones => ['Pacific/Fakaofo'] },
+        TLT   => { comment => "Timor Leste Time", timezones => ['Asia/Dili'] },
+        TMT   => { comment => "Turkmenistan Time", timezones => ['Asia/Ashgabat'] },
+        TOT   => { comment => "Tonga Time", timezones => ['Pacific/Tongatapu'] },
+        TRT   => { comment => "Turkey Time", timezones => ['Europe/Istanbul'] },
+        TRUT  => { comment => "Truk Time", timezones => ['Pacific/Chuuk'] },
+        TST   => { comment => "Turkish Standard Time", timezones => ['Europe/Istanbul'] },
+        TVT   => { comment => "Tuvalu Time", timezones => ['Pacific/Funafuti'] },
+
+        # NOTE: U
+        U     => { comment => "Uniform Military Time Zone", timezones => ['Etc/GMT+8'] },
+        ULAST => { comment => "Ulaanbaatar Summer Time", timezones => ['Asia/Ulaanbaatar'] },
+        ULAT  => { comment => "Ulaanbaatar Standard Time", timezones => ['Asia/Ulaanbaatar'] },
+        USZ1  => { comment => "Russia Zone 1", timezones => ['Europe/Kaliningrad'] },
+        USZ1S => { comment => "Kaliningrad Summer Time (Russia)", timezones => ['Europe/Kaliningrad'] },
+        USZ3  => { comment => "Volga Time (Russia)", timezones => ['Europe/Samara'] },
+        USZ3S => { comment => "Volga Summer Time (Russia)", timezones => ['Europe/Samara'] },
+        USZ4  => { comment => "Ural Time (Russia)", timezones => ['Asia/Yekaterinburg'] },
+        USZ4S => { comment => "Ural Summer Time (Russia)", timezones => ['Asia/Yekaterinburg'] },
+        USZ5  => { comment => "West-Siberian Time (Russia)", timezones => ['Asia/Novosibirsk', 'Asia/Omsk'] },
+        USZ5S => { comment => "West-Siberian Summer Time", timezones => ['Asia/Novosibirsk'] },
+        USZ6  => { comment => "Yenisei Time (Russia)", timezones => ['Asia/Krasnoyarsk'] },
+        USZ6S => { comment => "Yenisei Summer Time (Russia)", timezones => ['Asia/Krasnoyarsk'] },
+        USZ7  => { comment => "Irkutsk Time (Russia)", timezones => ['Asia/Irkutsk'] },
+        USZ7S => { comment => "Irkutsk Summer Time", timezones => ['Asia/Irkutsk'] },
+        USZ8  => { comment => "Amur Time (Russia)", timezones => ['Asia/Yakutsk'] },
+        USZ8S => { comment => "Amur Summer Time (Russia)", timezones => ['Asia/Yakutsk'] },
+        USZ9  => { comment => "Vladivostok Time (Russia)", timezones => ['Asia/Vladivostok'] },
+        USZ9S => { comment => "Vladivostok Summer Time (Russia)", timezones => ['Asia/Vladivostok'] },
+        UTC   => { comment => "Coordinated Universal Time", timezones => ['Etc/UTC'] },
+        UTZ   => { comment => "Greenland Western Standard Time", timezones => ['America/Nuuk'] },
+        UYST  => { comment => "Uruguay Summer Time", timezones => ['America/Montevideo'] },
+        UYT   => { comment => "Uruguay Standard Time", timezones => ['America/Montevideo'] },
+        UZ10  => { comment => "Okhotsk Time (Russia)", timezones => ['Asia/Srednekolymsk'] },
+        UZ10S => { comment => "Okhotsk Summer Time (Russia)", timezones => ['Asia/Srednekolymsk'] },
+        UZ11  => { comment => "Kamchatka Time (Russia)", timezones => ['Asia/Kamchatka', 'Asia/Magadan'] },
+        UZ11S => { comment => "Kamchatka Summer Time (Russia)", timezones => ['Asia/Kamchatka'] },
+        UZ12  => { comment => "Chukot Time (Russia)", timezones => ['Asia/Anadyr'] },
+        UZ12S => { comment => "Chukot Summer Time (Russia)", timezones => ['Asia/Anadyr'] },
+        UZT   => { comment => "Uzbekistan Time", timezones => ['Asia/Tashkent', 'Asia/Samarkand'] },
+
+        # NOTE: V
+        V     => { comment => "Victor Military Time Zone", timezones => ['Etc/GMT+9'] },
+        VET   => { comment => "Venezuelan Standard Time", timezones => ['America/Caracas'] },
+        VLAST => { comment => "Vladivostok Summer Time", timezones => ['Asia/Vladivostok'] },
+        VLAT  => { comment => "Vladivostok Time", timezones => ['Asia/Vladivostok'] },
+        VOLT  => { comment => "Volgograd Time", timezones => ['Europe/Volgograd'] },
+        VOST  => { comment => "Vostok Station Time", timezones => ['Antarctica/Vostok'] },
+        VTZ   => { comment => "Greenland Eastern Standard Time", timezones => ['America/Noronha'] },
+        VUT   => { comment => "Vanuatu Time", timezones => ['Pacific/Efate'] },
+
+        # NOTE: W
+        W     => { comment => "Whiskey Military Time Zone", timezones => ['Etc/GMT+10'] },
+        WAKT  => { comment => "Wake Island Time", timezones => ['Pacific/Wake'] },
+        WAST  => { comment => "West Africa Summer Time", timezones => ['Africa/Windhoek'] },
+        WAT   => { comment => "West Africa Time", timezones => ['Africa/Lagos', 'Africa/Bangui', 'Africa/Brazzaville', 'Africa/Douala', 'Africa/Kinshasa', 'Africa/Libreville', 'Africa/Luanda', 'Africa/Malabo', 'Africa/Ndjamena', 'Africa/Niamey', 'Africa/Porto-Novo', 'Africa/Tunis'] },
+        WEST  => { comment => "Western European Summer Time", timezones => ['Europe/Lisbon', 'Atlantic/Canary', 'Atlantic/Madeira', 'Atlantic/Faroe'] },
+        WESZ  => { comment => "Westeuropaische Sommerzeit", timezones => ['Europe/Lisbon', 'Atlantic/Canary'] },
+        WET   => { comment => "Western European Time", timezones => ['Europe/Lisbon', 'Atlantic/Canary', 'Atlantic/Madeira', 'Atlantic/Faroe'] },
+        WETDST=> { comment => "European Western Summer", timezones => ['Europe/Lisbon'] },
+        WEZ   => { comment => "Western Europe Time", timezones => ['Europe/Lisbon'] },
+        WFT   => { comment => "Wallis and Futuna Time", timezones => ['Pacific/Wallis'] },
+        WGST  => { comment => "West Greenland Summer Time", timezones => ['America/Nuuk'] },
+        WGT   => { comment => "West Greenland Time", timezones => ['America/Nuuk'] },
+        WIB   => { comment => "Western Indonesian Time", timezones => ['Asia/Jakarta', 'Asia/Pontianak'] },
+        WIT   => { comment => "Eastern Indonesian Time", timezones => ['Asia/Jayapura'] },
+        WITA  => { comment => "Central Indonesia Time", timezones => ['Asia/Makassar'] },
+        WST   => { comment => "Western Standard Time", timezones => ['Pacific/Apia'] },
+        # Western Sahara Standard Time (UTC+0). This seems to be very rare and often mistaken with other significations of "WT".
+        # So not Atlantic/St_Helena, but instead Africa/El_Aaiun
+        WT    => { comment => "Western Sahara Standard Time", timezones => ['Africa/El_Aaiun'] },
+        WTZ   => { comment => "Greenland Eastern Daylight Time", timezones => ['America/Nuuk'] },
+        WUT   => { comment => "Austria Time", timezones => ['Europe/Vienna'] },
+
+        # NOTE: X
+        X     => { comment => "X-ray Military Time Zone", timezones => ['Etc/GMT+11'] },
+
+        # NOTE: Y
+        Y     => { comment => "Yankee Military Time Zone", timezones => ['Etc/GMT+12'] },
+        YAKST => { comment => "Yakutsk Summer Time", timezones => ['Asia/Yakutsk'] },
+        YAKT  => { comment => "Yakutsk Time", timezones => ['Asia/Yakutsk'] },
+        YAPT  => { comment => "Yap Time (Micronesia)", timezones => ['Pacific/Chuuk'] },
+        YDT   => { comment => "Yukon Daylight Time", timezones => ['America/Anchorage'] },
+        YEKST => { comment => "Yekaterinburg Summer Time", timezones => ['Asia/Yekaterinburg'] },
+        YEKT  => { comment => "Yekaterinburg Time", timezones => ['Asia/Yekaterinburg'] },
+        YST   => { comment => "Yukon Standard Time", timezones => ['America/Anchorage'] },
+
+        # NOTE: Z
+        Z     => { comment => "Zulu", timezones => ['Etc/UTC'] },
+    };
+    # An alias of an alias...
+    # Faute de frappe / variante rare de HAEC (Heure Avancée d’Europe Centrale = CEST).
+    $aliases->{HADC} = $aliases->{HAEC};
+    # Variante ancienne ou alternative de HDT (Hawaii–Aleutian Daylight Time). L’abréviation courante et reconnue est HDT.
+    $aliases->{HADT} = $aliases->{HDT};
+    # Variante de HST (Hawaii–Aleutian Standard Time). L’abréviation principale est HST.
+    $aliases->{HAST} = $aliases->{HST};
+    # Abréviation espagnole/portugaise pour Hora Legal de Venezuela (= VET).
+    $aliases->{HLV} = $aliases->{VET};
+    # Kuybyshev Time (ancien nom de la zone de Samara, UTC+4). C’est un alias historique de SAMT (Samara Time).
+    $aliases->{KUYT} = $aliases->{SAMT};
+    # Sri Lanka Time. L’abréviation officielle et actuelle est SLST (Sri Lanka Standard Time).
+    $aliases->{SLT} = $aliases->{SLST};
+    # TOST : Tonga Summer Time (UTC+14, utilisé seulement pendant une courte période dans le passé). Tonga utilise maintenant TOT (UTC+13) toute l’année.
+    $aliases->{TOST} = $aliases->{TOT};
 
     $dbh->begin_work;
-    my( $total_spans, $total_types, $total_zones, $total_aliases, $errors ) = ( 0, 0, 0, 0, 0 );
+    my( $total_spans, $total_types, $total_zones, $total_aliases, $total_extended_aliases, $errors ) = ( 0, 0, 0, 0, 0, 0 );
 
     eval
     {
@@ -651,6 +1079,48 @@ sub _build_database
             $total_aliases++;
         }
 
+        _message( 3, "Processing extended aliases.. " );
+        # NOTE: Extended aliases
+        # Skipped (local/solar time - no fixed IANA zone):
+        #   HL   = Heure locale
+        #   LST  = Local Sidereal Time
+        #   LT   = Local Time
+        #   OZ   = Ortszeit (German for local time)
+        my $total_abbr  = scalar( keys( %$aliases ) );
+        my $total_pairs = 0;
+        my $ambiguous   = 0;
+        $total_pairs   += scalar( @{$aliases->{ $_ }->{timezones}} ) for( keys( %$aliases ) );
+        $ambiguous++  for grep{ scalar( @{$aliases->{ $_ }->{timezones}} ) > 1 } keys( %$aliases );
+        $out->printf( "Total abbreviations : %d\n",  $total_abbr ) if( $LOG_LEVEL );
+        $out->printf( "Total pairs         : %d\n",  $total_pairs ) if( $LOG_LEVEL );
+        $out->printf( "Ambiguous (>1 zone) : %d\n",  $ambiguous ) if( $LOG_LEVEL );
+        $out->printf( "Unambiguous         : %d\n",  $total_abbr - $ambiguous ) if( $LOG_LEVEL );
+        $out->printf( "Skipped (local TZ)  : 4  (HL, LST, LT, OZ)\n" ) if( $LOG_LEVEL );
+        local $" = ', ';
+
+        my $n = 0;
+        $out->printf( "$total_abbr / %03d (%.2f%%)\r", $n, ( ( $n / $total_abbr ) * 100 ) ) if( $LOG_LEVEL );
+        foreach my $abbr ( sort( keys( %$aliases ) ) )
+        {
+            my @zones   = @{$aliases->{ $abbr }->{timezones}};
+            my $comment = $aliases->{ $abbr }->{comment};
+            die( "Alias $abbr is missing a comment." ) if( !defined( $comment ) );
+            my $first = 1;
+            foreach my $zone ( @zones )
+            {
+                $sths->{extended_aliases}->execute(
+                    $abbr,              # abbreviation
+                    ( $first ? 1 : 0 ), # is_primary
+                    $comment,           # comment
+                    $zone,              # zones.name
+                ) || die( "Error adding extended alias(es) @zones for abbreviated timezone $abbr: ", $sths->{extended_aliases}->errstr );
+                $first = 0;
+            }
+            $out->printf( "$total_abbr / %03d (%.2f%%)\r", ++$n, ( ( $n / $total_abbr ) * 100 ) ) if( $LOG_LEVEL );
+        }
+        $out->print( "\n" ) if( $LOG_LEVEL );
+        $total_extended_aliases = $n;
+
         $sths->{metadata}->execute( 'tz_version',  $tz_version ) ||
             die( "Error inserting into metadata table tz_version $tz_version: ", $sths->{metadata}->errstr );
         $sths->{metadata}->execute( 'built_by',    "build_tz_database.pl $VERSION" ) ||
@@ -684,6 +1154,7 @@ sub _build_database
     _message( 1, sprintf( "  Types       : <green>%d</>",    $total_types ) );
     _message( 1, sprintf( "  Spans       : <green>%d</>",    $total_spans ) );
     _message( 1, sprintf( "  Alias       : <green>%d</>",    $total_aliases ) );
+    _message( 1, sprintf( "  Ext. Alias  : <green>%d</>",    $total_extended_aliases ) );
     _message( 1, sprintf( "  Errors      : <green>%d</>",    $errors ) );
     _message( 1, sprintf( "  DB size     : <green>%d kB</>", $size_kb ) );
     _message( 1, sprintf( "  Written     : <green>%s</>",    $temp_zone_db ) );

@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Test::More tests=>2;
+
+subtest 'Depth 0'=>sub {
+	ok(1,'d0a');
+};
+subtest 'Depth 1'=>sub {
+	subtest 'Depth 2'=>sub {
+		ok(1,'d12a');
+		ok(0,'d12b');
+	};
+	ok(1,'d1a');
+	ok(0,'d1b');
+	ok(0,'d1c');
+};

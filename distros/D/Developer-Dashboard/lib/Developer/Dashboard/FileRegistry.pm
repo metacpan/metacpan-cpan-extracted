@@ -3,7 +3,7 @@ package Developer::Dashboard::FileRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '2.43';
+our $VERSION = '2.46';
 
 use File::Spec;
 
@@ -209,7 +209,7 @@ Return known runtime file paths.
 
 =head1 PURPOSE
 
-This module is the runtime file-system façade. It resolves the concrete files and directories under the layered runtime tree, loads and writes dashboard-managed files, and gives higher-level services a single place to ask for runtime paths and file content without rebuilding path logic themselves.
+This module is the runtime file-system facade. It resolves the concrete files and directories under the layered runtime tree, loads and writes dashboard-managed files, and gives higher-level services a single place to ask for runtime paths and file content without rebuilding path logic themselves.
 
 =head1 WHY IT EXISTS
 

@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '2.43';
+our $VERSION = '2.46';
 
 1;
 
@@ -69,12 +69,12 @@ root
 Create a Git repository with at least:
 
   example-skill/
-  ├── cli/
-  │   └── hello
-  ├── config/
-  │   └── config.json
-  └── dashboards/
-      └── welcome
+  |-- cli/
+  |   `-- hello
+  |-- config/
+  |   `-- config.json
+  `-- dashboards/
+      `-- welcome
 
 Install it:
 
@@ -106,7 +106,10 @@ The prepared layout is:
 
 Executable skill commands. These are run through
 C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> and are not installed
-into the system PATH.
+into the system PATH. Nested skill trees under
+C<skills/E<lt>repo-nameE<gt>/cli/> also stay reachable through the same dotted
+syntax across multiple nested levels, so C<skills/foo/skills/bar/cli/baz> is
+invoked as C<dashboard E<lt>repo-nameE<gt>.foo.bar.baz>.
 
 =item B<cli/E<lt>commandE<gt>.d/>
 

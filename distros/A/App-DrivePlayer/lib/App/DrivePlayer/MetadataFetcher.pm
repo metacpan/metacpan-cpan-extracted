@@ -357,7 +357,6 @@ sub read_embedded_tags {
     $meta{artist}       = $tags{artist}      if $tags{artist};
     $meta{album}        = $tags{album}       if $tags{album};
     $meta{genre}        = $tags{genre}       if $tags{genre};
-    $meta{composer}     = $tags{composer}    if $tags{composer};
     $meta{comment}      = $tags{comment}     if $tags{comment};
     if ($tags{tracknumber} && $tags{tracknumber} =~ /^(\d+)/) {
         $meta{track_number} = $1 + 0;

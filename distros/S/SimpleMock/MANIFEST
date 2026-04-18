@@ -19,14 +19,17 @@ README.txt
 SECURITY.md
 t/00-load.t
 t/lib/SimpleMock/Mocks/TestModule.pm
+t/lib/SimpleMock/Mocks/TestMultiMock.pm
 t/lib/TestModule.pm
 t/lib/TestModule2.pm
+t/lib/TestMultiMock.pm
 t/pod.t
 t/unit_tests/SimpleMock.t
 t/unit_tests/SimpleMock/Model/DBI.t
 t/unit_tests/SimpleMock/Model/LWP_UA.t
 t/unit_tests/SimpleMock/Model/PATH_TINY.t
 t/unit_tests/SimpleMock/Model/SUBS.t
+t/unit_tests/SimpleMock/multi_model_auto_load.t
 t/unit_tests/SimpleMock/ScopeGuard.t
 t/unit_tests/SimpleMock/Util.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

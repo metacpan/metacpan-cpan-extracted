@@ -11,7 +11,7 @@ my %SHEET_PROPERTIES = (
         cols => [ qw( drive_id name ) ],
     },
     tracks => {
-        cols => [ qw( drive_id title artist album track_number year duration_ms genre composer comment ) ],
+        cols => [ qw( drive_id title artist album track_number year duration_ms genre comment ) ],
     },
 );
 
@@ -51,31 +51,72 @@ sub create {
 # Push  (SQLite → Sheet)
 # ------------------------------------------------------------------
 
-# Write all scan folders and their tracks to the spreadsheet.
-# Each scan folder gets its own worksheet named after the folder.
-# Returns { scan_folders => N, tracks => N }.
+# Write all scan folders and their tracks to the spreadsheet, merging with
+# any existing sheet content so that:
+#   - Local non-blank values overwrite the sheet.
+#   - Local blank/undef values preserve whatever is currently on the sheet.
+#   - Rows on the sheet whose drive_id is not present locally are kept intact
+#     (they may belong to another device that has scanned different tracks).
+# Returns { scan_folders => N, tracks => N } counting local records written.
 sub push_to_sheet {
     my ($self, $db) = @_;
     my $ss = $self->_open();
 
-    # Write the folders index tab
-    my @scan_folders = $db->all_scan_folders();
-    my @folder_rows = map { [$_->{drive_id}, $_->{name}] } @scan_folders;
+    # --- Folders index: merge local + sheet, preserving sheet-only folders.
+    my @scan_folders       = $db->all_scan_folders();
+    my $sheet_folders      = $self->_read_worksheet($ss, 'folders');
+    my %local_folder_by_id = map { $_->{drive_id} => $_ } @scan_folders;
+    my %sheet_folder_by_id = map { $_->{drive_id} => $_ } @$sheet_folders;
+
+    my @folder_ids   = _union_ids(\@scan_folders, $sheet_folders);
+    my @folder_rows  = map {
+        my $id = $_;
+        [$id, _merge_field('name', $local_folder_by_id{$id}, $sheet_folder_by_id{$id})]
+    } @folder_ids;
     $self->_write_worksheet($ss, 'folders', 'folders', \@folder_rows);
 
-    # Write one worksheet per scan folder
+    # --- Per-folder track tabs: merge rows, preserve sheet-only drive_ids.
+    my $cols         = $SHEET_PROPERTIES{tracks}{cols};
     my $total_tracks = 0;
     for my $sf (@scan_folders) {
-        my @tracks     = $db->tracks_by_scan_folder($sf->{id});
-        my @track_rows = map {
-            my $t = $_;
-            [map { $t->{$_} // '' } $SHEET_PROPERTIES{tracks}->{cols}->@*]
-        } @tracks;
-        $self->_write_worksheet($ss, _ws_name($sf->{name}), 'tracks', \@track_rows);
+        my $tab_name        = _ws_name($sf->{name});
+        my @tracks          = $db->tracks_by_scan_folder($sf->{id});
+        my $sheet_rows      = $self->_read_worksheet($ss, $tab_name);
+        my %local_by_id     = map { $_->{drive_id} => $_ } @tracks;
+        my %sheet_by_id     = map { $_->{drive_id} => $_ } @$sheet_rows;
+
+        my @drive_ids = _union_ids(\@tracks, $sheet_rows);
+        my @rows = map {
+            my $id    = $_;
+            my $local = $local_by_id{$id};
+            my $sheet = $sheet_by_id{$id};
+            [map { _merge_field($_, $local, $sheet) } @$cols];
+        } @drive_ids;
+
+        $self->_write_worksheet($ss, $tab_name, 'tracks', \@rows);
         $total_tracks += scalar @tracks;
     }
 
     return { scan_folders => scalar @scan_folders, tracks => $total_tracks };
+}
+
+# Return drive_ids from both lists in order (local first), with no duplicates.
+sub _union_ids {
+    my ($local, $sheet) = @_;
+    my %seen;
+    return grep { length $_ && !$seen{$_}++ }
+        (map { $_->{drive_id} } @$local),
+        (map { $_->{drive_id} } @$sheet);
+}
+
+# Return the local value for $field if it's defined and non-empty, otherwise
+# fall back to the sheet value (or '' if neither side has it).
+sub _merge_field {
+    my ($field, $local, $sheet) = @_;
+    my $lv = $local ? $local->{$field} : undef;
+    return $lv if defined $lv && $lv ne '';
+    my $sv = $sheet ? $sheet->{$field} : undef;
+    return defined $sv ? $sv : '';
 }
 
 # ------------------------------------------------------------------
@@ -271,7 +312,7 @@ C<drive_id> and C<name> for every top-level folder in the library.
 =item One tab per folder (named after the folder)
 
 Track metadata columns: C<drive_id title artist album track_number year
-duration_ms genre composer comment>.  Structural fields (folder_id, etc.)
+duration_ms genre comment>.  Structural fields (folder_id, etc.)
 are re-derived from Drive scanning and are not stored in the sheet.
 
 =back
@@ -299,8 +340,12 @@ Returns and stores the new spreadsheet ID.
 
 =head2 push_to_sheet($db)
 
-Writes the C<folders> index and one worksheet of track metadata per
-folder, replacing whatever was there before.
+Writes the C<folders> index and one worksheet of track metadata per folder.
+The existing sheet content is merged with the local DB: local non-blank
+values overwrite the sheet, local blanks preserve whatever is on the sheet,
+and rows whose C<drive_id> is not known locally are kept intact (so a
+device that has only scanned a subset of the library does not wipe data
+pushed from another device).
 
 =head2 pull_from_sheet($db)
 

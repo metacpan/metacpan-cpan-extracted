@@ -12,7 +12,7 @@ use MARC::Leader 0.08;
 use MARC::Field008;
 use MARC::Validator::Const;
 
-our $VERSION = 0.15;
+our $VERSION = 0.17;
 
 sub module_name {
 	my $self = shift;
@@ -65,25 +65,31 @@ sub process {
 		if (defined $field_655a) {
 			my $material = $field_008->material;
 			my $lang = $marc_record->subfield('040', 'b');
-			my $qr;
-			if (defined $lang
-				&& exists $MARC::Validator::Const::FIELD_655{$lang}) {
-
-				$qr = $MARC::Validator::Const::FIELD_655{$lang};
+			if (! defined $lang) {
+				return;
 			}
-			if ($material->isa('Data::MARC::Field008::Book')
-				&& defined $qr
-				&& $field_655a =~ $qr
-				&& $material->nature_of_content !~ '6') {
+			my $qr;
+			foreach my $qr_ar (['comics', '6'], ['textbook', 'p']) {
+				if (exists $MARC::Validator::Const::FIELD_655{$lang}->{$qr_ar->[0]}) {
+					$qr = $MARC::Validator::Const::FIELD_655{$lang}->{$qr_ar->[0]};
+				}
+				if (! defined $qr) {
+					next;
+				}
+				if ($material->isa('Data::MARC::Field008::Book')
+					&& $material->nature_of_content ne '||||'
+					&& $field_655a =~ $qr
+					&& $material->nature_of_content !~ $qr_ar->[1]) {
 
-				push @record_errors, Data::MARC::Validator::Report::Error->new(
-					'error' => 'Missing comics nature of content in field 008.',
-					'params' => {
-						'field_008_nature_of_content' => $material->nature_of_content,
-						'field_655_a' => $field_655a,
-						'material' => 'book',
-					},
-				);
+					push @record_errors, Data::MARC::Validator::Report::Error->new(
+						'error' => 'Missing '.$qr_ar->[0].' nature of content in field 008.',
+						'params' => {
+							'field_008_nature_of_content' => $material->nature_of_content,
+							'field_655_a' => $field_655a,
+							'material' => 'book',
+						},
+					);
+				}
 			}
 		}
 	}

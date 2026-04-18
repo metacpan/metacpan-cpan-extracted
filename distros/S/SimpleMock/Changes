@@ -1,5 +1,14 @@
 Revision history for SimpleMock
 
+0.04    2026-04-17
+        - Fixed silent swallowing of errors thrown during register_mocks when
+          called from inside an auto-loaded SimpleMock::Mocks::* module.
+          _load_mocks_for's "mock file not found" check matched /Can't locate/
+          too broadly, also catching "Can't locate object method" dies from
+          validate_mocks and causing them to vanish.
+        - SimpleMock::Model::LWP_UA now explicitly loads HTTP::Response and
+          HTTP::Headers (previously relied on them being loaded transitively).
+
 0.03    2026-04-13
         - Consistent version numbers across all modules
         - Added META provides, SECURITY.md, CONTRIBUTING.md (CPAN Kwalitee)

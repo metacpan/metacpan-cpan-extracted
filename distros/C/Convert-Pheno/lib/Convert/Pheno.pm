@@ -23,6 +23,10 @@ use Convert::Pheno::Emit::OMOP qw(
   dispatcher_open_stream_out
   transform_item
   finalize_stream_out
+  omop_stream_targets_open
+  omop_stream_targets_write
+  omop_stream_targets_finalize
+  omop_streams_multiple_entities
 );
 use Convert::Pheno::OMOP::Source qw(collect_omop_input);
 use Convert::Pheno::OMOP::ParticipantStream qw(
@@ -37,6 +41,7 @@ use Convert::Pheno::CSV;
 use Convert::Pheno::JSONLD qw(do_bff2jsonld do_pxf2jsonld);
 use Convert::Pheno::OMOP::ToBFF qw(do_omop2bff);
 use Convert::Pheno::PXF::ToBFF;
+use Convert::Pheno::OpenEHR::ToBFF;
 use Convert::Pheno::BFF::ToPXF;
 use Convert::Pheno::BFF::ToOMOP;
 use Convert::Pheno::CDISC;
@@ -55,7 +60,7 @@ $SIG{__WARN__} = sub { warn "Warn: ", @_ };
 $SIG{__DIE__}  = sub { die "Error: ", @_ };
 
 # Global variables:
-our $VERSION   = '0.30';
+our $VERSION   = '0.31';
 our $share_dir = dist_dir('Convert-Pheno');
 
 # SQLite database
@@ -125,14 +130,14 @@ has max_lines_sql => (
 );
 
 has 'omop_tables' => (
-    default => sub { [@omop_essential_tables] },
+    default => sub { [@omop_supported_tables] },
     coerce  => sub {
         my $tables = shift;
 
         $tables =
           @$tables
           ? [ uniq( map { uc($_) } ( 'CONCEPT', 'PERSON', @$tables ) ) ]
-          : \@omop_essential_tables;
+          : \@omop_supported_tables;
 
         return $tables;
     },
@@ -452,6 +457,42 @@ sub pxf2omop {
     );
 }
 
+#################
+#################
+# OPENEHR2BFF   #
+#################
+#################
+
+sub openehr2bff {
+    my $self = shift;
+    _prepare_openehr2bff_input($self);
+    $self->{convertPheno} ||= get_info($self);
+    $self->{conversion_context} = Convert::Pheno::Context->from_self(
+        $self,
+        {
+            source_format => 'openehr',
+            target_format => 'beacon',
+            entities      => $self->{entities} || ['individuals'],
+        }
+    );
+    return _run_primary_view($self);
+}
+
+#################
+#################
+# OPENEHR2PXF   #
+#################
+#################
+
+sub openehr2pxf {
+    my $self = shift;
+    return _convert_via_bff(
+        $self,
+        via_method => 'openehr2bff',
+        to_method  => 'bff2pxf',
+    );
+}
+
 #############
 #############
 #  CSV2BFF  #
@@ -536,6 +577,7 @@ sub pxf2jsonld {
 
 sub _dispatcher_input_data {
     my ($self) = @_;
+    return $self->{data} if exists $self->{data};
     return ( $self->{in_textfile} && $self->{method} !~ m/^(redcap2|omop2|cdisc2|csv)/ )
       ? io_yaml_or_json( { filepath => $self->{in_file}, mode => 'read' } )
       : $self->{data};
@@ -570,6 +612,8 @@ sub _prepare_bundle_input {
     return _prepare_redcap2bff_input($self) if $self->{method} eq 'redcap2bff';
     return _prepare_cdisc2bff_input($self)  if $self->{method} eq 'cdisc2bff';
     return _prepare_csv2bff_input($self)    if $self->{method} eq 'csv2bff';
+    return _prepare_openehr2bff_input($self)
+      if $self->{method} eq 'openehr2bff' || $self->{method} eq 'openehr2pxf';
     if ( $self->{method} eq 'omop2bff' ) {
         delete $self->{mapping_file_derived_entity_overrides};
         return _prepare_omop2bff_input($self);
@@ -578,7 +622,10 @@ sub _prepare_bundle_input {
     # PXF bundle mode bypasses the public method, so initialize conversion
     # provenance here as well for synthesized dataset/cohort metadata.
     delete $self->{mapping_file_derived_entity_overrides};
-    $self->{convertPheno} ||= get_info($self) if $self->{method} eq 'pxf2bff';
+    $self->{convertPheno} ||= get_info($self)
+      if $self->{method} eq 'pxf2bff'
+      || $self->{method} eq 'openehr2bff'
+      || $self->{method} eq 'openehr2pxf';
 
     return 1;
 }
@@ -680,12 +727,14 @@ sub _prepare_omop2bff_input {
 
     $self->{method_ori} =
       exists $self->{method_ori} ? $self->{method_ori} : 'omop2bff';
+    _ensure_omop_specimen_table_for_biosamples($self);
     $self->{prev_omop_tables} = [ @{ $self->{omop_tables} } ];
 
     my $ctx  = _omop_collect_input($self);
     my $data = $ctx->{data};
 
     _omop_require_concept( $self, $data );
+    _require_omop_specimen_for_biosamples( $self, $data, $ctx );
     _omop_init_caches_and_metadata( $self, $data );
     _omop_prepare_data_shape( $self, $data );
 
@@ -693,6 +742,211 @@ sub _prepare_omop2bff_input {
     $self->{filepaths_csv} = $ctx->{filepaths_csv} if exists $ctx->{filepaths_csv};
 
     return 1;
+}
+
+sub _prepare_openehr2bff_input {
+    my ($self) = @_;
+    return 1 if $self->{openehr_input_prepared};
+
+    my @documents = _collect_openehr_documents($self);
+    my $grouped   = _group_openehr_documents_by_patient( $self, \@documents );
+
+    $self->{data} = @{$grouped} == 1 ? $grouped->[0] : $grouped;
+    $self->{convertPheno} ||= get_info($self);
+    $self->{openehr_input_prepared} = 1;
+
+    return 1;
+}
+
+sub _collect_openehr_documents {
+    my ($self) = @_;
+
+    return _normalize_openehr_documents( $self->{data} ) if exists $self->{data};
+
+    my @files = @{ $self->{in_files} || [] };
+    push @files, $self->{in_file} if !@files && defined $self->{in_file};
+
+    my @documents;
+    for my $file (@files) {
+        my $loaded = io_yaml_or_json(
+            {
+                filepath => $file,
+                mode     => 'read',
+            }
+        );
+        push @documents, _normalize_openehr_documents($loaded);
+    }
+
+    return @documents;
+}
+
+sub _normalize_openehr_documents {
+    my ($data) = @_;
+    return () unless defined $data;
+
+    if ( ref($data) eq 'ARRAY' ) {
+        my $all_envelopes = 1;
+        for my $item ( @{$data} ) {
+            if ( ref($item) ne 'HASH' || !exists $item->{compositions} ) {
+                $all_envelopes = 0;
+                last;
+            }
+        }
+
+        return map { _normalize_openehr_document($_) } @{$data}
+          if @{$data} && $all_envelopes;
+
+        return ( _normalize_openehr_document($data) );
+    }
+
+    return ( _normalize_openehr_document($data) );
+}
+
+sub _normalize_openehr_document {
+    my ($doc) = @_;
+
+    return $doc
+      if ref($doc) eq 'HASH' && exists $doc->{compositions};
+
+    return { compositions => $doc } if ref($doc) eq 'ARRAY';
+    return { compositions => [$doc] };
+}
+
+sub _group_openehr_documents_by_patient {
+    my ( $self, $documents ) = @_;
+
+    my %by_patient;
+    my @order;
+
+    for my $doc ( @{$documents} ) {
+        for my $patient_doc ( _split_openehr_document_by_patient( $self, $doc ) ) {
+        my $patient_id =
+          Convert::Pheno::OpenEHR::ToBFF::resolve_openehr_patient_id( $self, $patient_doc );
+
+        die "The input <openEHR> data could not be resolved to a patient id; please provide one composition set with a stable patient identifier in the payload or envelope\n"
+          unless defined $patient_id && length $patient_id;
+
+        if ( !exists $by_patient{$patient_id} ) {
+            $by_patient{$patient_id} = {
+                patient      => { id => $patient_id },
+                compositions => [],
+            };
+            push @order, $patient_id;
+        }
+
+        push @{ $by_patient{$patient_id}{compositions} },
+          @{
+            Convert::Pheno::OpenEHR::ToBFF::extract_openehr_compositions($patient_doc);
+          };
+        }
+    }
+
+    return [ map { $by_patient{$_} } @order ];
+}
+
+sub _split_openehr_document_by_patient {
+    my ( $self, $doc ) = @_;
+
+    return ($doc) if _openehr_document_has_patient_context($doc);
+
+    my $compositions =
+      Convert::Pheno::OpenEHR::ToBFF::extract_openehr_compositions($doc);
+    return ($doc) unless ref($compositions) eq 'ARRAY' && @{$compositions} > 1;
+
+    my %by_patient;
+    my @order;
+    my $missing = 0;
+
+    for my $composition ( @{$compositions} ) {
+        my $patient_id = Convert::Pheno::OpenEHR::ToBFF::resolve_openehr_embedded_patient_id(
+            $composition,
+            [$composition]
+        );
+
+        if ( !defined $patient_id || !length $patient_id ) {
+            $missing = 1;
+            next;
+        }
+
+        if ( !exists $by_patient{$patient_id} ) {
+            $by_patient{$patient_id} = [];
+            push @order, $patient_id;
+        }
+        push @{ $by_patient{$patient_id} }, $composition;
+    }
+
+    return ($doc) unless @order > 1;
+
+    die "The input <openEHR> data mixes patient-identified and unidentified compositions; please provide patient-bearing envelopes or per-patient composition sets\n"
+      if $missing;
+
+    return map {
+        {
+            patient      => { id => $_ },
+            compositions => $by_patient{$_},
+        }
+    } @order;
+}
+
+sub _openehr_document_has_patient_context {
+    my ($doc) = @_;
+    return 0 unless ref($doc) eq 'HASH';
+
+    # Keep only explicitly patient-scoped envelope identifiers here.
+    # Top-level envelope ids such as <id> or <ehr_id> are accepted later as
+    # fallback patient identifiers, but they must not suppress per-composition
+    # splitting when distinct embedded patient ids are present.
+    return 1
+      if exists $doc->{patient}
+      && ref( $doc->{patient} ) eq 'HASH'
+      && defined $doc->{patient}{id}
+      && length $doc->{patient}{id};
+
+    return 1
+      if exists $doc->{ehr_status}
+      && ref( $doc->{ehr_status} ) eq 'HASH'
+      && exists $doc->{ehr_status}{subject};
+
+    return 0;
+}
+
+sub _omop_requests_biosamples {
+    my ($self) = @_;
+    return scalar grep { $_ eq 'biosamples' } @{ $self->{entities} || [] };
+}
+
+sub _ensure_omop_specimen_table_for_biosamples {
+    my ($self) = @_;
+    return 1 unless _omop_requests_biosamples($self);
+    return 1 if grep { $_ eq 'SPECIMEN' } @{ $self->{omop_tables} || [] };
+
+    $self->{omop_tables} = [ @{ $self->{omop_tables} || [] }, 'SPECIMEN' ];
+    return 1;
+}
+
+sub _require_omop_specimen_for_biosamples {
+    my ( $self, $data, $ctx ) = @_;
+    return 1 unless _omop_requests_biosamples($self);
+    return 1 if exists $data->{SPECIMEN};
+    return 1 if _omop_stream_source_has_specimen( $self, $ctx );
+
+    die "The entity <biosamples> requires the OMOP table <SPECIMEN>\n";
+}
+
+sub _omop_stream_source_has_specimen {
+    my ( $self, $ctx ) = @_;
+    return 0 unless $self->{stream};
+    return 0 unless defined $ctx && ref($ctx) eq 'HASH';
+
+    if ( defined $ctx->{filepath_sql} && length $ctx->{filepath_sql} ) {
+        return scalar grep { $_ eq 'SPECIMEN' } @{ $self->{prev_omop_tables} || [] };
+    }
+
+    for my $file ( @{ $ctx->{filepaths_csv} || [] } ) {
+        return 1 if $file =~ m{(?:^|/|\\)SPECIMEN\.(?:csv|tsv)(?:\.gz)?$}i;
+    }
+
+    return 0;
 }
 
 sub _mapping_file_derived_entity_overrides {
@@ -848,7 +1102,28 @@ sub process_sqldump_stream {
 
 sub omop2bff_stream_processing {
     my ( $self, $data ) = @_;
+    return Convert::Pheno::OMOP::ToBFF::run_omop_to_bundle(
+        $self, $data, $self->{conversion_context}
+      )
+      if omop_streams_multiple_entities($self);
+
     return do_omop2bff( $self, $data );
+}
+
+sub omop_stream_targets_open_wrapper {
+    return omop_stream_targets_open(@_);
+}
+
+sub omop_stream_targets_write_wrapper {
+    return omop_stream_targets_write(@_);
+}
+
+sub omop_stream_targets_finalize_wrapper {
+    return omop_stream_targets_finalize(@_);
+}
+
+sub omop_streams_multiple_entities_wrapper {
+    return omop_streams_multiple_entities(@_);
 }
 
 sub Dumper_concise {

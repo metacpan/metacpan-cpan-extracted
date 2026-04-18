@@ -1,0 +1,286 @@
+app Madyote::App::ExquisiteCorpse {
+
+  values {
+    appName          Exquisite Corpse
+    appVersion       1.0.0
+    description      "A collaborative storytelling game where each player only sees the previous paragraph."
+    sectionsToComplete 5
+  }
+
+  vars {
+    SECTIONS_TO_COMPLETE 5
+    VISIBLE_CHARS        200
+  }
+
+  cols {
+    stories_in_progress  *ARRAY_*::Story
+    stories_completed    *ARRAY_*::Story
+  }
+
+  field_access {
+  }
+
+  method public getCompletedStories {
+    my ($self, $args, $session) = @_;
+    my $limit = $args->{limit} // 10;
+    my $offset = $args->{offset} // 0;
+
+    my $completed = $self->get_stories_completed // [];
+    my $total = scalar(@$completed);
+
+    # Return newest first
+    my @sorted = reverse @$completed;
+    my $end = $offset + $limit - 1;
+    $end = $#sorted if $end > $#sorted;
+
+    my @slice = $offset <= $#sorted ? @sorted[$offset..$end] : ();
+
+    return 1, {
+        stories => \@slice,
+        total   => $total,
+    };
+  }
+
+  method public getStory {
+    my ($self, $args, $session) = @_;
+    my $story_id = $args->{id};
+
+    return 0, "story id required" unless $story_id;
+
+    # Find story in completed list
+    my $completed = $self->get_stories_completed // [];
+    for my $story (@$completed) {
+        if ($story->id eq $story_id) {
+            return 1, $story;
+        }
+    }
+
+    return 0, "story not found";
+  }
+
+  method auth startStory {
+    my ($self, $args, $session) = @_;
+    my $user = $session->get_user;
+    my $text = $args->{text};
+
+    return 0, "text required" unless $text;
+    return 0, "text too short (min 50 chars)" if length($text) < 50;
+    return 0, "text too long (max 2000 chars)" if length($text) > 2000;
+
+    my $store = $self->store;
+
+    # Create first section
+    my $section = $store->new_obj(
+        'Madyote::App::ExquisiteCorpse::Section',
+        owner => $user,
+        text  => $text,
+    );
+
+    # Create story
+    my $story = $store->new_obj(
+        'Madyote::App::ExquisiteCorpse::Story',
+        owner         => $user,
+        last_author   => $user,
+        sections_needed => $SECTIONS_TO_COMPLETE,
+    );
+
+    push @{$story->get_sections}, $section;
+
+    # Add to in-progress list
+    push @{$self->get_stories_in_progress}, $story;
+
+    # Track that user is playing this story
+    $store->set_rel_path($user, 'refs', 'stories_started', $story);
+
+    return 1, {
+        message => "Story started! Others will continue it.",
+        story   => $story,
+    };
+  }
+
+  method auth getAvailableStories {
+    my ($self, $args, $session) = @_;
+    my $user = $session->get_user;
+
+    my $in_progress = $self->get_stories_in_progress // [];
+    my @available;
+
+    for my $story (@$in_progress) {
+        # Can't continue your own story consecutively
+        next if $story->get_last_author->id eq $user->id;
+
+        # Get hint (last N chars of previous section)
+        my $sections = $story->get_sections;
+        my $last_section = $sections->[-1];
+        my $hint = substr($last_section->get_text, -$VISIBLE_CHARS);
+        $hint = "..." . $hint if length($last_section->get_text) > $VISIBLE_CHARS;
+
+        push @available, {
+            story          => $story,
+            sectionCount   => scalar(@$sections),
+            sectionsNeeded => $story->get_sections_needed,
+            hint           => $hint,
+            createdAt      => $story->get_created,
+        };
+    }
+
+    return 1, {
+        stories => \@available,
+    };
+  }
+
+  method auth continueStory {
+    my ($self, $args, $session) = @_;
+    my $user = $session->get_user;
+    my $story_id = $args->{story_id};
+    my $text = $args->{text};
+
+    return 0, "story_id required" unless $story_id;
+    return 0, "text required" unless $text;
+    return 0, "text too short (min 50 chars)" if length($text) < 50;
+    return 0, "text too long (max 2000 chars)" if length($text) > 2000;
+
+    # Find story
+    my $story;
+    my $story_idx;
+    my $in_progress = $self->get_stories_in_progress // [];
+
+    for my $i (0..$#$in_progress) {
+        if ($in_progress->[$i]->id eq $story_id) {
+            $story = $in_progress->[$i];
+            $story_idx = $i;
+            last;
+        }
+    }
+
+    return 0, "story not found or already completed" unless $story;
+    return 0, "you cannot continue your own section"
+        if $story->get_last_author->id eq $user->id;
+
+    my $store = $self->store;
+
+    # Create new section
+    my $section = $store->new_obj(
+        'Madyote::App::ExquisiteCorpse::Section',
+        owner => $user,
+        text  => $text,
+    );
+
+    push @{$story->get_sections}, $section;
+    $story->set_last_author($user);
+
+    # Check if story is complete
+    if (scalar(@{$story->get_sections}) >= $story->get_sections_needed) {
+        # Move to completed
+        $story->set_completed(1);
+        splice(@$in_progress, $story_idx, 1);
+        push @{$self->get_stories_completed}, $story;
+
+        return 1, {
+            message   => "Story completed! It now has " . scalar(@{$story->get_sections}) . " sections.",
+            completed => 1,
+            story     => $story,
+        };
+    }
+
+    return 1, {
+        message      => "Section added! " . ($story->get_sections_needed - scalar(@{$story->get_sections})) . " more sections needed.",
+        completed    => 0,
+        sectionCount => scalar(@{$story->get_sections}),
+    };
+  }
+
+  method auth getMyStories {
+    my ($self, $args, $session) = @_;
+    my $user = $session->get_user;
+
+    my @started;
+    my @contributed;
+
+    # Check in-progress stories
+    for my $story (@{$self->get_stories_in_progress // []}) {
+        if ($story->get_owner->id eq $user->id) {
+            push @started, $story;
+        }
+        for my $section (@{$story->get_sections}) {
+            if ($section->get_owner->id eq $user->id) {
+                push @contributed, $story unless grep { $_->id eq $story->id } @contributed;
+                last;
+            }
+        }
+    }
+
+    # Check completed stories
+    for my $story (@{$self->get_stories_completed // []}) {
+        if ($story->get_owner->id eq $user->id) {
+            push @started, $story;
+        }
+        for my $section (@{$story->get_sections}) {
+            if ($section->get_owner->id eq $user->id) {
+                push @contributed, $story unless grep { $_->id eq $story->id } @contributed;
+                last;
+            }
+        }
+    }
+
+    return 1, {
+        started     => \@started,
+        contributed => \@contributed,
+    };
+  }
+}
+
+object Story {
+  cols {
+    owner            *Yote::YapiServer::User
+    last_author      *Yote::YapiServer::User
+    sections         *ARRAY_*::Section
+    sections_needed  INT DEFAULT 5
+    completed        TINYINT DEFAULT 0
+    created          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  }
+
+  field_access {
+    owner            public
+    last_author      public
+    sections         public
+    sections_needed  public
+    completed        public
+    created          public
+  }
+
+  sub to_client_hash {
+    my ($self, $session, $viewer) = @_;
+
+    my $sections = $self->get_sections // [];
+
+    my %result = (
+        sectionCount   => scalar(@$sections),
+        sectionsNeeded => $self->get_sections_needed,
+        completed      => $self->get_completed ? 1 : 0,
+        created        => $self->get_created,
+        owner          => $self->get_owner,
+    );
+
+    # Only include full sections if story is completed
+    if ($self->get_completed) {
+        $result{sections} = $sections;
+    }
+
+    return \%result;
+  }
+}
+
+object Section {
+  cols {
+    owner   *Yote::YapiServer::User
+    text    TEXT
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  }
+
+  field_access {
+    owner   public
+    text    public
+    created public
+  }
+}

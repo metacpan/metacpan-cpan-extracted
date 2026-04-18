@@ -176,7 +176,7 @@ SYNOPSIS
             die( $dt->error );
 
 VERSION
-        v0.4.0
+        v0.6.0
 
 DESCRIPTION
     "DateTime::Lite" is a lightweight, memory-efficient, drop-in replacement
@@ -1203,8 +1203,8 @@ PERFORMANCE
 
     Startup time matters in short-lived scripts (cron jobs, CLI tools, CGI)
     where the process initialisation is a significant fraction of total
-    runtime. For a long-running Plack/Mojolicious service, this cost is paid
-    once and amortised over millions of requests.
+    runtime. For a long-running Apache2/mod_perl2, Plack, or Mojolicious
+    service, this cost is paid once and amortised over millions of requests.
 
   Memory (RSS after loading)
     Measured in a clean Perl process immediately after "use Module":

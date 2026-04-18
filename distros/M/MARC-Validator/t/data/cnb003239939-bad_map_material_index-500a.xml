@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01440nem a2200385 i 4500</leader>
+  <controlfield tag="001">nkc20203239939</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20201204103754.0</controlfield>
+  <controlfield tag="007">aj canzn</controlfield>
+  <controlfield tag="008">200810s1993    xr z      a     0   cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb003239939</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-270-8906-2</subfield>
+    <subfield code="q">(v mapě neuvedeno)</subfield>
+  </datafield>
+  <datafield tag="034" ind1="1" ind2=" ">
+    <subfield code="a">a</subfield>
+    <subfield code="b">6803</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+    <subfield code="b">e-xr-zl</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">913(437)</subfield>
+    <subfield code="x">Geografie Česka a Slovenska, reálie, cestování</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">7</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">912</subfield>
+    <subfield code="x">Mapy. Atlasy. Glóby</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">7</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">913(437.323)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(084.3)911.375</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="110" ind1="2" ind2=" ">
+    <subfield code="a">B.A.T. Program</subfield>
+    <subfield code="7">kn20010724063</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Holešov :</subfield>
+    <subfield code="b">orientační plán města /</subfield>
+    <subfield code="c">B.A.T. Program</subfield>
+  </datafield>
+  <datafield tag="246" ind1="1" ind2=" ">
+    <subfield code="i">Název v tiráži:</subfield>
+    <subfield code="a">Orientační plán města Holešov</subfield>
+  </datafield>
+  <datafield tag="255" ind1=" " ind2=" ">
+    <subfield code="a">Měřítko 1:6 803</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Holešov :</subfield>
+    <subfield code="b">Městský úřad Holešov,</subfield>
+    <subfield code="c">1993</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">1 mapa :</subfield>
+    <subfield code="b">barevná ;</subfield>
+    <subfield code="c">40 x 58 cm, na listu 42 x 60 cm, složeno na 21 x 10 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">kartografický obraz</subfield>
+    <subfield code="b">cri</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">list</subfield>
+    <subfield code="b">nb</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje rejstřík</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Na rubu historie města, stručný vlastivědný text s fotografiemi</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Holešov (Česko)</subfield>
+    <subfield code="7">ge129276</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">plány měst</subfield>
+    <subfield code="7">fd133027</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="f">[1. vydání]</subfield>
+    <subfield code="g">ISBN zkontrolováno pouze podle báze NKC</subfield>
+    <subfield code="o">20201204</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">003239939</subfield>
+  </datafield>
+</record>
+
+</collection>

@@ -2,7 +2,7 @@ package IPC::Manager::Client::LocalMemory;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 

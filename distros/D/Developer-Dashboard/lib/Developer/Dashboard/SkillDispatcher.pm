@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '2.43';
+our $VERSION = '2.46';
 
 use File::Spec;
 use JSON::XS qw(encode_json decode_json);
@@ -37,18 +37,20 @@ sub dispatch {
     return { error => "Skill '$skill_name' not found" } if !$skill_path;
     return { error => "Skill '$skill_name' is disabled" } if !$self->{manager}->is_enabled($skill_name);
 
-    my ( $cmd_path, $command_skill_path ) = $self->_command_location( $skill_name, $command );
+    my $command_spec = $self->_command_spec( $skill_name, $command );
+    my $cmd_path = $command_spec ? $command_spec->{cmd_path} : undef;
+    my $command_skill_path = $command_spec ? $command_spec->{skill_path} : undef;
     return { error => "Command '$command' not found in skill '$skill_name'" } if !$cmd_path;
 
     my $hook_result = $self->execute_hooks( $skill_name, $command, @args );
     return $hook_result if $hook_result->{error};
-    my @skill_layers = $self->_skill_layers($skill_name);
+    my @skill_layers = $command_spec ? @{ $command_spec->{skill_layers} || [] } : $self->_skill_layers($skill_name);
 
     my %env = $self->_skill_env(
         skill_name   => $skill_name,
         skill_path   => $command_skill_path || $skill_path,
         skill_layers => \@skill_layers,
-        command      => $command,
+        command      => $command_spec ? $command_spec->{command_name} : $command,
         result_state => $hook_result->{result_state} || {},
     );
     my @command = command_argv_for_path($cmd_path);
@@ -77,12 +79,14 @@ sub execute_hooks {
     my $skill_path = $self->{manager}->get_skill_path( $skill_name, include_disabled => 1 );
     return { hooks => {}, result_state => {} } if !$skill_path;
     return { hooks => {}, result_state => {} } if !$self->{manager}->is_enabled($skill_name);
-    my @skill_layers = $self->_skill_layers($skill_name);
+    my $command_spec = $self->_command_spec( $skill_name, $command );
+    my @skill_layers = $command_spec ? @{ $command_spec->{skill_layers} || [] } : $self->_skill_layers($skill_name);
     return { hooks => {}, result_state => {} } if !@skill_layers;
+    my $resolved_command = $command_spec ? $command_spec->{command_name} : $command;
 
     my %results;
     for my $layer_path (@skill_layers) {
-        my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$command.d" );
+        my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$resolved_command.d" );
         next if !-d $hooks_dir;
         opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";
         for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
@@ -93,7 +97,7 @@ sub execute_hooks {
                 skill_name   => $skill_name,
                 skill_path   => $layer_path,
                 skill_layers => \@skill_layers,
-                command      => $command,
+                command      => $resolved_command,
                 result_state => \%results,
             );
             my @command = command_argv_for_path($hook_path);
@@ -175,8 +179,8 @@ sub get_skill_path {
 sub command_path {
     my ( $self, $skill_name, $command ) = @_;
     return if !$skill_name || !$command;
-    my ($cmd_path) = $self->_command_location( $skill_name, $command );
-    return $cmd_path;
+    my $command_spec = $self->_command_spec( $skill_name, $command );
+    return $command_spec ? $command_spec->{cmd_path} : undef;
 }
 
 # route_response(%args)
@@ -376,18 +380,87 @@ sub _skill_lookup_roots {
     return reverse $self->_skill_layers( $skill_name, %args );
 }
 
-# _command_location($skill_name, $command)
-# Resolves one runnable skill command across every participating skill layer.
+# _command_spec($skill_name, $command)
+# Resolves one runnable skill command across every participating skill layer,
+# including nested skills/<repo>/cli command trees addressed through dotted
+# command tails such as foo.bar.
 # Input: skill repository name string and command name string.
-# Output: resolved runnable file path and the skill layer root that provided it.
-sub _command_location {
+# Output: hash reference containing cmd_path, skill_path, skill_layers, and command_name.
+sub _command_spec {
     my ( $self, $skill_name, $command ) = @_;
     return if !$skill_name || !$command;
-    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
-        my $cmd_path = resolve_runnable_file( File::Spec->catfile( $skill_path, 'cli', $command ) );
-        return ( $cmd_path, $skill_path ) if $cmd_path;
+
+    my @segments = grep { defined && $_ ne '' } split /\./, $command;
+    return if !@segments;
+
+    for my $command_root_spec ( $self->_command_root_specs( \@segments ) ) {
+        my @provider_layers = ();
+        for my $skill_path ( $self->_skill_layers($skill_name) ) {
+            my $provider_path = $skill_path;
+            if ( @{ $command_root_spec->{nested_segments} } ) {
+                $provider_path = $self->_nested_skill_path( $skill_path, $command_root_spec->{nested_segments} );
+                next if !-d $provider_path;
+            }
+            push @provider_layers, $provider_path;
+        }
+        next if !@provider_layers;
+
+        for my $provider_path ( reverse @provider_layers ) {
+            my $cmd_path = resolve_runnable_file( File::Spec->catfile( $provider_path, 'cli', $command_root_spec->{command_name} ) );
+            next if !$cmd_path;
+            return {
+                cmd_path      => $cmd_path,
+                skill_path    => $provider_path,
+                skill_layers  => \@provider_layers,
+                command_name  => $command_root_spec->{command_name},
+            };
+        }
     }
+
     return;
+}
+
+# _command_root_specs(\@segments)
+# Builds candidate nested-skill command roots from the dotted command tail.
+# Input: array reference of dotted command segments.
+# Output: ordered list of hash references with nested_segments and command_name.
+sub _command_root_specs {
+    my ( $self, $segments ) = @_;
+    my @segments = @{ $segments || [] };
+    return () if !@segments;
+
+    my @specs = (
+        {
+            nested_segments => [],
+            command_name    => join( '.', @segments ),
+        },
+    );
+
+    for my $split_index ( 1 .. $#segments ) {
+        push @specs, {
+            nested_segments => [ @segments[ 0 .. $split_index - 1 ] ],
+            command_name    => join( '.', @segments[ $split_index .. $#segments ] ),
+        };
+    }
+
+    return @specs;
+}
+
+# _nested_skill_path($skill_path, \@nested_segments)
+# Resolves one nested installed-skill tree where each dotted skill segment lives
+# beneath its own repeated skills/<repo> directory pair.
+# Input: installed skill root path string and array reference of nested skill names.
+# Output: absolute nested skill root path string.
+sub _nested_skill_path {
+    my ( $self, $skill_path, $nested_segments ) = @_;
+    my @segments = @{ $nested_segments || [] };
+    return $skill_path if !@segments;
+
+    my @parts = ($skill_path);
+    for my $segment (@segments) {
+        push @parts, 'skills', $segment;
+    }
+    return File::Spec->catdir(@parts);
 }
 
 # _page_location($skill_name, $route_id)

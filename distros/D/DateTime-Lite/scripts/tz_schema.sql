@@ -1,20 +1,24 @@
 /*----------------------------------------------------------------------------
  * DateTime::Lite::TimeZone - ~/scripts/tz_schema.sql
- * Version v0.5.0
+ * Version v0.6.0
  * Copyright(c) 2026 DEGUEST Pte. Ltd.
  * Author: Jacques Deguest <jack@deguest.jp>
  * Created 2026/04/03
- * Modified 2026/04/07
+ * Modified 2026/04/17
  * All rights reserved
  *
  * This program is free software; you can redistribute  it  and/or  modify  it
  * under the same terms as Perl itself.
  *----------------------------------------------------------------------------*/
--- 2026-04-05 v3 Improved schema, and added spans
--- 2026-04-07 v4 Use boolean instead of integer, for better sementic
--- 2026-04-07 v5
--- - Added the field category to the table zones, and the corresponding index.
--- - Added a check for has_dst in table zones
+/*----------------------------------------------------------------------------
+ * 2026-04-05 v3 Improved schema, and added spans
+ * 2026-04-07 v4 Use boolean instead of integer, for better sementic
+ * 2026-04-07 v5
+ * - Added the field category to the table zones, and the corresponding index.
+ * - Added a check for has_dst in table zones
+ * 2026-04-07 v6 Added the extended aliases
+ *----------------------------------------------------------------------------*/
+
 PRAGMA foreign_keys = ON;
 
 -- Generic key/value metadata for this imported database.
@@ -37,14 +41,16 @@ CREATE TABLE countries
     ,CHECK( code REGEXP '^[A-Z]{2}$' )
 );
 
--- Canonical zones table.
--- This stores:
---   - canonical zones name
---   - countries as JSON array text, e.g. ["JP"]
---   - coordinates from zone1970.tab
---   - parsed decimal latitude/longitude
---   - optional zone comment
---   - top-level TZif metadata
+/*
+Canonical zones table.
+This stores:
+- canonical zones name
+- countries as JSON array text, e.g. ["JP"]
+- coordinates from zone1970.tab
+- parsed decimal latitude/longitude
+- optional zone comment
+- top-level TZif metadata
+*/
 CREATE TABLE zones
 (
      zone_id               INTEGER NOT NULL
@@ -192,6 +198,76 @@ CREATE        INDEX idx_spans_zone_id_utc_end     ON spans(zone_id, utc_end);
 CREATE        INDEX idx_spans_zone_id_local_start ON spans(zone_id, local_start);
 CREATE        INDEX idx_spans_zone_id_local_end   ON spans(zone_id, local_end);
 
+/*
+ * Unlike the 'aliases' table which covers strict IANA canonical aliases
+ * (one alias -> one zone, e.g. "Japan" -> "Asia/Tokyo"), this table covers
+ * the broader set of timezone abbreviations found in real-world date strings
+ * (such as JST, IST, CST, etc.) which may map to multiple canonical zones.
+ * 
+ * One row per (abbreviation, zone_id) pair. An abbreviation with a single
+ * row is NOT necessarily unambiguous; it may simply be that only one mapping
+ * is known. The caller (resolve_abbreviation()) must always check whether the
+ * user has supplied a zone_map override, regardless of row count.
+ * 
+ * is_primary: when an abbreviation maps to multiple zones, this flag marks
+ * the most commonly accepted canonical zone (e.g. CST -> America/Chicago
+ * rather than Asia/Shanghai). This is the zone returned when the caller has
+ * opted into extended resolution without providing a zone_map override, and
+ * the abbreviation has exactly one primary. If no primary is marked, or more
+ * than one is marked, the ambiguity error is raised as usual.
+ */
+CREATE TABLE extended_aliases
+(
+     abbr_id       INTEGER NOT NULL
+    ,abbreviation  TEXT    NOT NULL COLLATE NOCASE
+    ,zone_id       INTEGER NOT NULL
+    -- Marks the preferred zone when multiple candidates exist.
+    -- At most one row per abbreviation should have is_primary = TRUE.
+    -- If none or more than one is marked, resolution falls back to error.
+    ,is_primary    BOOLEAN NOT NULL DEFAULT FALSE
+    ,comment       TEXT
+    ,PRIMARY KEY(abbr_id)
+    ,UNIQUE(abbreviation, zone_id)
+    ,FOREIGN KEY(zone_id) REFERENCES zones(zone_id) ON UPDATE CASCADE ON DELETE CASCADE
+    ,CHECK(is_primary IN(0, 1))
+);
+CREATE INDEX idx_extended_aliases_abbreviation ON extended_aliases(abbreviation);
+CREATE INDEX idx_extended_aliases_zone_id      ON extended_aliases(zone_id);
+
+/*
+ * Prevent duplicate is_primary = 1 for the same abbreviation.
+ * Fires only on INSERT/UPDATE, so does not affect read performance.
+ * The check is intentionally strict: if a second is_primary row is attempted, the
+ * insert fails with a clear error rather than silently overwriting.
+ */
+CREATE TRIGGER trg_extended_aliases_one_primary
+BEFORE INSERT ON extended_aliases
+WHEN NEW.is_primary = 1
+BEGIN
+    SELECT RAISE(ABORT, 'extended_aliases: is_primary = 1 already exists for this abbreviation')
+    WHERE EXISTS (
+        SELECT 1
+        FROM   extended_aliases
+        WHERE  abbreviation = NEW.abbreviation
+        AND    is_primary   = 1
+    );
+END;
+
+CREATE TRIGGER trg_extended_aliases_one_primary_update
+BEFORE UPDATE OF is_primary ON extended_aliases
+WHEN NEW.is_primary = 1
+BEGIN
+    SELECT RAISE(ABORT, 'extended_aliases: is_primary = 1 already exists for this abbreviation')
+    WHERE EXISTS (
+        SELECT 1
+        FROM   extended_aliases
+        WHERE  abbreviation = NEW.abbreviation
+        AND    is_primary   = 1
+        AND    abbr_id     != NEW.abbr_id
+    );
+END;
+
+
 -- Views
 CREATE VIEW v_zone_aliases AS
 SELECT
@@ -300,4 +376,34 @@ JOIN zones z
  * SELECT *
  * FROM v_zone_name
  * WHERE input_name = 'Japan';
+ */
+
+-- View for convenient lookup, joining with zone name.
+CREATE VIEW v_extended_alias AS
+SELECT
+     ea.abbreviation
+    ,z.name    AS zone_name
+    ,ea.is_primary
+    ,ea.comment
+FROM extended_aliases ea
+JOIN zones z ON z.zone_id = ea.zone_id;
+
+/*
+ * Example queries:
+ *
+ * -- All candidates for an ambiguous abbreviation:
+ * SELECT zone_name, is_primary
+ * FROM   v_extended_alias
+ * WHERE  abbreviation = 'IST';
+ * -> Asia/Kolkata    is_primary=1
+ * -> Europe/Dublin   is_primary=0
+ * -> Asia/Jerusalem  is_primary=0
+ *
+ * -- Unambiguous (single known mapping):
+ * SELECT zone_name FROM v_extended_alias WHERE abbreviation = 'JST';
+ * -> Asia/Tokyo
+ *
+ * -- All abbreviations for a given zone:
+ * SELECT abbreviation FROM v_extended_alias WHERE zone_name = 'Asia/Tokyo';
+ * -> JST
  */

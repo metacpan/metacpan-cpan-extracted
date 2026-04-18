@@ -1,0 +1,6 @@
+Revision history for Perl extension BitTorrent::Simple.
+
+0.01  Fri Apr 17 19:09:30 2026
+	- original version; created by h2xs 1.23 with options
+		-AXn BitTorrent::Simple
+

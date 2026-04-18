@@ -1,0 +1,56 @@
+=pod
+
+=head1 NAME
+
+SECURITY - security policy for Developer Dashboard releases
+
+=head1 DESCRIPTION
+
+This file ships the release-visible security policy for Developer Dashboard so
+the tarball carries a machine-installable security contact and reporting
+process even when Markdown source files are excluded from the built
+distribution.
+
+=head1 REPORTING A VULNERABILITY
+
+Report security issues privately to:
+
+=over 4
+
+=item *
+
+C<security@manif3station.local>
+
+=item *
+
+C<https://github.com/manif3station/developer-dashboard/security/advisories>
+
+=back
+
+Include the affected version, a short reproduction, the expected impact, and
+any suggested mitigation. Do not open a public issue for an unpatched security
+problem.
+
+=head1 COORDINATED DISCLOSURE EXPECTATIONS
+
+We aim to acknowledge a vulnerability report within 3 business days, provide a
+status update within 14 days, and work toward a coordinated disclosure window
+of 90 days unless the impact or the fix timeline requires a different
+schedule.
+
+If a report is not actually a vulnerability, or if the impact turns out to be
+different after triage, we will still reply with that outcome so the reporter
+is not left guessing about the disclosure status.
+
+=head1 SUPPORTED RELEASES
+
+Security fixes are applied to the latest active release line in this
+repository.
+
+=head1 ADDITIONAL CONTEXT
+
+The runtime-facing security baseline and verification notes also live in the
+source tree security documentation, including the C<dashboard doctor> command
+used to audit and repair owner-only runtime permissions.
+
+=cut

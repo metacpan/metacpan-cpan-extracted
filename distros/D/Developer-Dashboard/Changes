@@ -1,5 +1,39 @@
 Revision history for Developer Dashboard
 
+2.46  2026-04-17
+    - fixed dotted skill command dispatch for multiple nested levels, so
+      commands such as `dashboard nest.level1.level2.here` now execute
+      `skills/level1/skills/level2/cli/here`
+    - fixed the nested-skill provider root builder to follow the real repeated
+      `skills/<repo>` directory contract instead of flattening dotted skill
+      names into one `skills/<repo>/<repo>` path
+    - added focused multi-level nested skill coverage in the skill-system and
+      dispatcher tests so repeated `skills/<repo>/.../skills/<repo>/cli`
+      trees stay covered through both the runtime module and the public CLI
+
+2.45  2026-04-17
+    - taught dotted skill command dispatch to resolve nested
+      `skills/<repo>/cli/<command>` trees inside one installed skill, so
+      commands such as `dashboard ho.foo.foo` now execute
+      `skills/foo/cli/foo`
+    - reused the same nested resolver for hook lookup and isolated skill
+      runtime env setup so nested commands follow the normal `cli/<command>.d`
+      and layered fallback contract
+    - added focused skill-system and dispatcher coverage for nested dotted
+      skill dispatch through both the public `dashboard` entrypoint and the
+      runtime module
+
+2.44  2026-04-17
+    - removed POD syntax drift from shipped Perl files by replacing the
+      remaining non-ASCII inline POD text that broke Test::Pod and CPANTS
+      parsing in the release tarball
+    - added shipped `SECURITY.pod` and `CONTRIBUTING.pod` so the built
+      distribution carries a security policy, a private contact address, and
+      contributor workflow guidance even though repository Markdown files stay
+      excluded from the tarball
+    - added an explicit `Test::Pod` gate plus release-metadata coverage for
+      the shipped security/contact and contributing documents
+
 2.43  2026-04-17
     - taught the built-in `housekeeper` cleanup pass to rotate collector log
       transcripts when collector config declares `rotation` or `rotations`,

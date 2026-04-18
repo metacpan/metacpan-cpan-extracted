@@ -1,5 +1,28 @@
 Revision history for Test2-Harness2-ChildSubReaper
 
+0.000003  2026-04-17 13:29:15-07:00 America/Los_Angeles
+
+    - Fix t/10-have-support.t and t/15-mechanism.t failing their
+      boolean-agreement invariant on build hosts where the prctl
+      (or procctl) macro is absent at compile time. Test2::V0's
+      is() uses string eq, and !!$have yields "" (not "0") when
+      false; normalize both sides to 0/1 before comparing.
+      Reported via CPAN Testers on Linux 3.2 / perl 5.20.0.
+
+
+0.000002  2026-04-17 11:18:10-07:00 America/Los_Angeles
+
+    - Add FreeBSD and DragonFlyBSD backends via
+      procctl(PROC_REAP_ACQUIRE / PROC_REAP_RELEASE).
+    - Add subreaper_mechanism() diagnostic function returning
+      "prctl", "procctl", or undef.
+    - Fix brittle t/10-have-support.t that failed on Linux build
+      environments where <sys/prctl.h> lacks PR_SET_CHILD_SUBREAPER.
+    - Generalize t/20-set-success.t and t/40-subreaper-behavior.t to
+      run on any platform advertising support (not just Linux).
+    - Refactor: move platform resolution into subreaper_impl.h; the
+      XS file now has zero #ifdef noise.
+
 0.000001  2026-04-16 15:01:58-07:00 America/Los_Angeles
 
     - First release.

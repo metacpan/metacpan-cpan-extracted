@@ -92,9 +92,6 @@ sub run {
     $self->_auto_sync_from_sheet_on_new_db() if $db_is_new;
     $self->_prune_removed_folders();
     $self->_load_library();
-    if ($self->db->tracks_needing_metadata()) {
-        $self->_init_api() && $self->_fetch_all_metadata();
-    }
 
     Glib::Timeout->add($POLL_INTERVAL_MS, sub {
         $self->_player_poll();
@@ -173,6 +170,8 @@ sub _init_api {
 
 sub _build_ui {
     my ($self) = @_;
+
+    Gtk3::Window::set_default_icon_name('multimedia-player');
 
     $self->win(Gtk3::Window->new('toplevel'));
     $self->win->set_title('Drive Player');
@@ -350,6 +349,7 @@ sub _build_alpha_strip {
     $view->set_headers_visible(FALSE);
     $view->set_fixed_height_mode(TRUE);
     $view->set_can_focus(FALSE);
+    $view->set_activate_on_single_click(TRUE);
     $view->get_style_context()->add_class('alpha-nav');
     $view->get_style_context()->add_provider($css, 600);
 
@@ -1256,7 +1256,6 @@ sub _edit_metadata_dialog {
         [ artist       => 'Artist:'       ],
         [ album        => 'Album:'        ],
         [ genre        => 'Genre:'        ],
-        [ composer     => 'Composer:'     ],
         [ track_number => 'Track Number:' ],
         [ year         => 'Year:'         ],
         [ comment      => 'Comment:'      ],
@@ -1286,6 +1285,7 @@ sub _edit_metadata_dialog {
         }
         $self->db->update_track_metadata($track->{id}, %fields);
         $self->_load_library();
+        $self->_auto_sync_to_sheet();
     }
     $dlg->destroy();
 }

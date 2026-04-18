@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use App::Prove;
-use Test::More tests=>4;
+use Test::More tests=>6;
 
 my $sbackup = {};
 sub steal_stderr {
@@ -129,5 +129,51 @@ subtest 'module'=>sub {
 	$prove->run();
 	return_stderr();
 	is_deeply(\%metrics,\%expect,'collected metrics');
+};
+
+subtest 'stderr, rollup, no label'=>sub {
+	plan tests=>5;
+	my $prove=App::Prove->new();
+	$prove->process_args('-PMetrics=stderr,prefix,PRE,sep, SEP ,subdepth,-1,label,0,rollup,1',glob('t/tests/rollup.tt'));
+	my $serr; steal_stderr(\$serr);
+	$prove->run();
+	return_stderr();
+	my %seen=map {$_=>1} map {s/\s+/ /gr} grep {/^METRIC:/} split(/\n/,$serr);
+	foreach my $expect (
+		['rollup-1-2',  0.5,'PRE SEP t/tests/rollup.tt SEP Depth1 SEP Depth2'],
+		['rollup-1',   0.25,'PRE SEP t/tests/rollup.tt SEP Depth1'],
+		['rollup-0',      1,'PRE SEP t/tests/rollup.tt SEP Depth0'],
+		['rollup',      0.5,'PRE SEP t/tests/rollup.tt'],
+	) {
+		ok($seen{"METRIC: $$expect[1] $$expect[2]"},$$expect[0]);
+	}
+	#
+	is(scalar(keys %seen),4,'Pigeonhole');
+};
+
+subtest 'stderr, rollup, label'=>sub {
+	plan tests=>11;
+	my $prove=App::Prove->new();
+	$prove->process_args('-PMetrics=stderr,prefix,PRE,sep, SEP ,subdepth,-1,label,1,rollup,1',glob('t/tests/rollup.tt'));
+	my $serr; steal_stderr(\$serr);
+	$prove->run();
+	return_stderr();
+	my %seen=map {$_=>1} map {s/\s+/ /gr} grep {/^METRIC:/} split(/\n/,$serr);
+	foreach my $expect (
+		['rollup-0-a',      1,'PRE SEP t/tests/rollup.tt SEP Depth0 SEP d0a'],
+		['rollup-0',        1,'PRE SEP t/tests/rollup.tt SEP Depth0'],
+		['rollup-1-2-a',    1,'PRE SEP t/tests/rollup.tt SEP Depth1 SEP Depth2 SEP d12a'],
+		['rollup-1-2-b',    0,'PRE SEP t/tests/rollup.tt SEP Depth1 SEP Depth2 SEP d12b'],
+		['rollup-1-2',    0.5,'PRE SEP t/tests/rollup.tt SEP Depth1 SEP Depth2'],
+		['rollup-1-a',      1,'PRE SEP t/tests/rollup.tt SEP Depth1 SEP d1a'],
+		['rollup-1-b',      0,'PRE SEP t/tests/rollup.tt SEP Depth1 SEP d1b'],
+		['rollup-1-c',      0,'PRE SEP t/tests/rollup.tt SEP Depth1 SEP d1c'],
+		['rollup-1',     0.25,'PRE SEP t/tests/rollup.tt SEP Depth1'],
+		['rollup-',       0.5,'PRE SEP t/tests/rollup.tt'],
+	) {
+		ok($seen{"METRIC: $$expect[1] $$expect[2]"},$$expect[0]);
+	}
+	#
+	is(scalar(keys %seen),10,'Pigeonhole');
 };
 

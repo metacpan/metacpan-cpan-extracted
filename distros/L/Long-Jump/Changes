@@ -1,3 +1,10 @@
+0.000005  2026-04-17 11:29:35-07:00 America/Los_Angeles
+
+    - Require Importer 0.025+ so `use Importer Importer => 'import'` works
+      (older Importer versions like 0.014 lack 'import' in IMPORTER_MENU,
+      causing "Importer does not export &import" at load time)
+
+
 0.000004  2026-04-15 14:34:09-07:00 America/Los_Angeles
 
     - Add havejump() to check if a named jump point is currently set

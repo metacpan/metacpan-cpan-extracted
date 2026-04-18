@@ -5,7 +5,7 @@ use base qw{Geo::H3::Base}; #provides new and ffi
 use Geo::H3::Index;
 use Geo::H3::Geo;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME

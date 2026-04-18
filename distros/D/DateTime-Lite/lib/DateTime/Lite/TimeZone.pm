@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.4.0
+## Version v0.5.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/14
+## Modified 2026/04/17
 ## All rights reserved
 ## 
 ## 
@@ -91,7 +91,7 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.5.0';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
@@ -356,7 +356,7 @@ sub aliases
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all timezone aliases: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the query to get all timezone aliases: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( all_aliases => $sth );
     }
 
@@ -364,25 +364,25 @@ sub aliases
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone aliases: $@" ) );
+        return( $self->error( "Error executing the query to get all timezone aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone aliases: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get all timezone aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0,1]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone aliases: $@" ) );
+        return( $self->error( "Error retrieving all timezone aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone aliases: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving all timezone aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $aliases = +{map{ $_->[0] => $_->[1] } @$all};
@@ -408,7 +408,7 @@ sub all_names
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all timezone names: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the query to get all timezone names: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( all_names => $sth );
     }
 
@@ -416,25 +416,25 @@ sub all_names
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone names: $@" ) );
+        return( $self->error( "Error executing the query to get all timezone names: $@\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone names: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get all timezone names: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone names: $@" ) );
+        return( $self->error( "Error retrieving all timezone names: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone names: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving all timezone names: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $zones = [map{ $_->[0] } @$all];
@@ -454,7 +454,7 @@ sub categories
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all timezone categories: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the query to get all timezone categories: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( categories => $sth );
     }
 
@@ -462,25 +462,25 @@ sub categories
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone categories: $@" ) );
+        return( $self->error( "Error executing the query to get all timezone categories: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone categories: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get all timezone categories: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone categories: $@" ) );
+        return( $self->error( "Error retrieving all timezone categories: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone categories: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving all timezone categories: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $categories = [map{ $_->[0] } @$all];
@@ -540,7 +540,7 @@ sub countries
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all country codes: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the query to get all country codes: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( countries => $sth );
     }
 
@@ -548,25 +548,25 @@ sub countries
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all country codes: $@" ) );
+        return( $self->error( "Error executing the query to get all country codes: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all country codes: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get all country codes: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all country codes: $@" ) );
+        return( $self->error( "Error retrieving all country codes: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all country codes: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving all country codes: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $codes = [map{ $_->[0] } @$all];
@@ -732,7 +732,7 @@ SQL
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all local names for a category: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the query to get all local names for a category: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( names_in_category => $sth );
     }
 
@@ -740,25 +740,25 @@ SQL
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all local names for the category $cat: $@" ) );
+        return( $self->error( "Error executing the query to get all local names for the category $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all local names for the category $cat: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get all local names for the category $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all local names for the category $cat: $@" ) );
+        return( $self->error( "Error retrieving all local names for the category $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all local names for the category $cat: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving all local names for the category $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $names = [map{ $_->[0] } @$all];
@@ -790,7 +790,7 @@ SQL
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all zone names for a given country code: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the query to get all zone names for a given country code: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( names_in_category => $sth );
     }
 
@@ -798,12 +798,12 @@ SQL
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all zone names for the country code $cat: $@" ) );
+        return( $self->error( "Error executing the query to get all zone names for the country code $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all zone names for the country code $cat: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get all zone names for the country code $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
@@ -816,7 +816,7 @@ SQL
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all zone names for the country code $cat: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving all zone names for the country code $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $names = [map{ $_->[0] } @$all];
@@ -1033,97 +1033,296 @@ sub resolve_abbreviation
         defined( $opts{utc_offset} ) &&
         Scalar::Util::looks_like_number( $opts{utc_offset} )
     ) ? 1 : 0;
+    my $extended = $opts{extended} ? 1 : 0;
 
-    # We maintain two cached statements: one plain and one with an additional
-    # utc_offset filter for co-parsed numeric offsets (%z).
-    my $cache_id = $has_offset
-        ? 'resolve_abbreviation_filtered'
-        : 'resolve_abbreviation';
+    # Build the dynamic WHERE skeleton for the IANA types query.
+    # Based on Locale::Unicode::Data::_fetch_all(): each filter value may be prefixed
+    # with a comparison operator (<, <=, >, >=, =, !=).
+    # When period is an array ref, each element adds one AND condition on
+    # MAX(tr.trans_time). When period is the special string 'current', the query
+    # is restricted to the zone's last transition (MAX = most recent) and requires
+    # that last transition to be in the past, effectively returning only zones that
+    # still use the abbreviation today.
+    my $op_map = { '=' => 'IS', '!=' => 'IS NOT' };
 
+    # Conditions on MAX(tr.trans_time) built from the 'period' option.
+    # Each element of @period_skels is a HAVING clause fragment.
+    # @period_key_parts accumulates tokens for the cache key; they must distinguish
+    # ISO date strings from raw epoch integers since each uses a different SQL
+    # placeholder form ('e' = epoch, 'd' = ISO date).
+    my @period_skels     = ();
+    my @period_values    = ();
+    my @period_key_parts = ();
+    my $current_special  = 0;
+
+    if( defined( $opts{period} ) )
+    {
+        my @period_items = ref( $opts{period} ) eq 'ARRAY'
+            ? @{$opts{period}}
+            : ( $opts{period} );
+
+        foreach my $item ( @period_items )
+        {
+            if( !defined( $item ) || !length( $item ) )
+            {
+                return( $self->error( "Empty value in 'period' option for resolve_abbreviation." ) );
+            }
+
+            # Special value 'current': return only zones whose most recent transition
+            # for this abbreviation is in the past and whose next transition has not yet
+            # occurred. Handled via LEFT JOIN below.
+            if( $item eq 'current' )
+            {
+                $current_special = 1;
+                push( @period_key_parts, 'current' );
+                next;
+            }
+
+            my $op  = '>';
+            my $val = $item;
+            # Strip leading operator prefix, e.g. '>1950-01-01' -> op='>', val='1950-01-01'
+            if( $val =~ s/^[[:blank:]\h]*(?<op>\<|\<=|\>|\>=|=|\!=)[[:blank:]\h]*(?<val>.+?)$/$+{val}/ )
+            {
+                $op = $+{op};
+            }
+            $op = $op_map->{ $op } if( exists( $op_map->{ $op } ) );
+            # Dates are stored as Unix epoch integers; convert ISO date string via
+            # SQLite strftime('%s', ...) so the user can pass '1950-01-01'.
+            # Numeric values are used as-is (already epoch seconds).
+            # IMPORTANT: the two paths generate different SQL, so the cache key must
+            # distinguish them via 'e' (epoch int) vs 'd' (ISO date string).
+            if( Scalar::Util::looks_like_number( $val ) )
+            {
+                # Use CAST(? AS INTEGER) rather than a bare ? to ensure SQLite
+                # treats the bind value as an integer regardless of how DBD::SQLite
+                # represents the Perl scalar internally (string vs numeric).
+                push( @period_skels,     "MAX(tr.trans_time) ${op} CAST(? AS INTEGER)" );
+                push( @period_values,    $val + 0 );
+                push( @period_key_parts, "${op}e" );
+            }
+            else
+            {
+                push( @period_skels,     "MAX(tr.trans_time) ${op} CAST(strftime('%s', ?) AS INTEGER)" );
+                push( @period_values,    $val );
+                push( @period_key_parts, "${op}d" );
+            }
+        }
+    }
+
+    # The HAVING clause combines the utc_offset filter and any period conditions.
+    # Because we GROUP BY zone to obtain MAX(trans_time) for ordering and period
+    # filtering, utc_offset is also moved into HAVING (it is functionally constant
+    # per (zone, abbreviation) pair so this is semantically equivalent).
+    my @having_skels  = ();
+    my @having_values = ();
+
+    if( $has_offset )
+    {
+        push( @having_skels,  "t.utc_offset = ?" );
+        push( @having_values, $opts{utc_offset} );
+    }
+    push( @having_skels,  @period_skels );
+    push( @having_values, @period_values );
+
+    # Build the HAVING clause first so we can derive the cache key from the actual SQL
+    # string, which is provably collision-free.
+    # 'current' restricts to zones where the matched abbreviation type's most recent
+    # transition IS the zone's overall most recent transition, meaning the abbreviation
+    # is still active right now. The conditions are added directly to @having_skels so
+    # that the HAVING keyword is always emitted when needed, avoiding any
+    # GROUP BY / HAVING confusion.
+    # A correlated subquery referencing the outer MAX() is not supported by SQLite in
+    # HAVING; we use an independent scalar subquery instead.
+    if( $current_special )
+    {
+        push( @having_skels, <<'SQL' );
+MAX(tr.trans_time) <= CAST(strftime('%s', 'now') AS INTEGER)
+SQL
+        push( @having_skels, <<'SQL' );
+MAX(tr.trans_time) = (
+    SELECT MAX(tr2.trans_time)
+    FROM   transition tr2
+    WHERE  tr2.zone_id = t.zone_id
+)
+SQL
+    }
+    # Build the HAVING clause from all accumulated conditions.
+    # Conditions are joined with AND; the HAVING keyword is only emitted when at least
+    # one condition exists, keeping the SQL clean.
+    my @having_parts = ();
+    foreach my $skel ( @having_skels )
+    {
+        chomp( my $s = $skel );
+        push( @having_parts, $s );
+    }
+    my $having_sql = scalar( @having_parts )
+        ? "\nHAVING " . join( "\n   AND ", @having_parts )
+        : "";
+    # We JOIN transition to get MAX(trans_time) per zone for:
+    #   1. Default sort order: most-recently-used first (DESC).
+    #   2. Period filtering via HAVING on MAX(trans_time).
+    # DISTINCT is replaced by GROUP BY zone since we aggregate.
+    my $query = <<"SQL_IANA";
+SELECT z.name AS zone_name, t.utc_offset, t.is_dst,
+       MAX(tr.trans_time) AS last_trans_time
+FROM types t
+JOIN zones z       ON z.zone_id  = t.zone_id
+JOIN transition tr ON tr.zone_id = t.zone_id AND tr.type_id = t.type_id
+WHERE z.canonical = 1
+  AND t.abbreviation = ?
+GROUP BY z.name, t.utc_offset, t.is_dst${having_sql}
+ORDER BY last_trans_time DESC
+SQL_IANA
+    # Use the SQL string itself as the cache key - provably collision-free
+    # regardless of any subtlety in the period_key_parts logic.
+    my $cache_id = 'resolve_abbreviation_sql_' . $query;
     unless( $sth = $self->_get_cached_statement( $cache_id ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
-        my $query = $has_offset ? <<'SQL_FILTERED' : <<'SQL_PLAIN';
-SELECT DISTINCT z.name AS zone_name, t.utc_offset, t.is_dst
-FROM types t
-JOIN zones z ON z.zone_id = t.zone_id
-WHERE z.canonical = 1
-  AND t.abbreviation = ?
-  AND t.utc_offset   = ?
-ORDER BY z.name
-SQL_FILTERED
-SELECT DISTINCT z.name AS zone_name, t.utc_offset, t.is_dst
-FROM types t
-JOIN zones z ON z.zone_id = t.zone_id
-WHERE z.canonical = 1
-  AND t.abbreviation = ?
-ORDER BY z.name
-SQL_PLAIN
+        my $dbh  = $self->_dbh || return( $self->pass_error );
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the abbreviation resolution query: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the abbreviation resolution query: ", ( $@ || $dbh->errstr ), "\nSQL query was: $query" ) );
         $self->_set_cached_statement( $cache_id => $sth );
     }
 
     my $rv = eval
     {
-        $has_offset
-            ? $sth->execute( $abbr, $opts{utc_offset} )
-            : $sth->execute( $abbr );
+        $sth->execute( $abbr, @having_values );
     };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the abbreviation resolution query for '$abbr': $@" ) );
+        return( $self->error( "Error executing the abbreviation resolution query for '$abbr': $@\nSQL query was: ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the abbreviation resolution query for '$abbr': ", $sth->errstr ) );
+        return( $self->error( "Error executing the abbreviation resolution query for '$abbr': ", $sth->errstr, "\nSQL query was: ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref( {} ) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving abbreviation resolution results for '$abbr': $@" ) );
+        return( $self->error( "Error retrieving abbreviation resolution results for '$abbr': $@\nSQL query was: ", $sth->{Statement} ) );
     }
     elsif( !defined( $all ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving abbreviation resolution results for '$abbr': ", $sth->errstr ) );
+        return( $self->error( "Error retrieving abbreviation resolution results for '$abbr': ", $sth->errstr, "\nSQL query was: ", $sth->{Statement} ) );
     }
     $sth->finish;
 
-    # No results means the abbreviation is not in the IANA database.
-    unless( @$all )
+    # IANA types table returned results: use them directly.
+    if( @$all )
+    {
+        # Determine whether all candidates share the same UTC offset.
+        # If they do, the abbreviation is unambiguous in terms of wall-clock meaning,
+        # even if multiple zone names match (such as JST covering several Asian zones
+        # all at +09:00). Genuinely ambiguous abbreviations such as IST or CST map to
+        # different offsets and get ambiguous => 1.
+        my %offsets = map{ $_->{utc_offset} => 1 } @$all;
+        my $ambiguous = scalar( keys( %offsets ) ) > 1 ? 1 : 0;
+        return([
+            map
+            {
+                {
+                    zone_name       => $_->{zone_name},
+                    utc_offset      => $_->{utc_offset},
+                    is_dst          => $_->{is_dst} ? 1 : 0,
+                    ambiguous       => $ambiguous,
+                    extended        => 0,
+                    last_trans_time => $_->{last_trans_time},
+                }
+            }
+            @$all
+        ]);
+    }
+
+    # No results in the IANA types table.
+    # If extended mode is not requested, fail with the standard message.
+    unless( $extended )
     {
         return( $self->error( "No timezone found for abbreviation '$abbr'." ) );
     }
 
-    # Determine whether all candidates share the same UTC offset.
-    # If they do, the abbreviation is unambiguous in terms of wall-clock meaning,
-    # even if multiple zone names match (such as JST covering several Asian zones
-    # all at +09:00). Genuinely ambiguous abbreviations such as IST or CST map to
-    # different offsets and get ambiguous => 1.
-    my %offsets = map{ $_->{utc_offset} => 1 } @$all;
-    my $ambiguous = scalar( keys( %offsets ) ) > 1 ? 1 : 0;
+    # Extended mode: fall back to the extended_aliases table.
+    # Covers real-world abbreviations (such as BDT, CEST, JST) that are not stored as
+    # type abbreviations in the IANA TZif data but map to known zones.
+    # Note: extended aliases carry no utc_offset or is_dst data; those fields are
+    # undef in the result. The caller must resolve offset from the zone itself if
+    # needed.
+    # Period filtering does not apply to extended aliases (no trans_time data).
+    my $ext_sth;
+    unless( $ext_sth = $self->_get_cached_statement( 'resolve_abbreviation_extended' ) )
+    {
+        my $dbh = $self->_dbh || return( $self->pass_error );
+        my $query = <<'SQL_EXTENDED';
+SELECT ea.abbreviation, z.name AS zone_name, ea.is_primary
+FROM extended_aliases ea
+JOIN zones z ON z.zone_id = ea.zone_id
+WHERE ea.abbreviation = ?
+ORDER BY ea.is_primary DESC, z.name
+SQL_EXTENDED
+        $ext_sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $self->error( "Error preparing the extended alias resolution query: ", ( $@ || $dbh->errstr ), "\nSQL query was: $query" ) );
+        $self->_set_cached_statement( resolve_abbreviation_extended => $ext_sth );
+    }
 
-    my $results = [
+    my $ext_rv = eval{ $ext_sth->execute( $abbr ) };
+    if( $@ )
+    {
+        $ext_sth->finish;
+        return( $self->error( "Error executing the extended alias resolution query for '$abbr': $@\nSQL query was: ", $ext_sth->{Statement} ) );
+    }
+    elsif( !defined( $ext_rv ) )
+    {
+        $ext_sth->finish;
+        return( $self->error( "Error executing the extended alias resolution query for '$abbr': ", $ext_sth->errstr, "\nSQL query was: ", $ext_sth->{Statement} ) );
+    }
+
+    my $ext_all = eval{ $ext_sth->fetchall_arrayref( {} ) };
+    if( $@ )
+    {
+        $ext_sth->finish;
+        return( $self->error( "Error retrieving extended alias results for '$abbr': $@\nSQL query was: ", $ext_sth->{Statement} ) );
+    }
+    elsif( !defined( $ext_all ) && $ext_sth->errstr )
+    {
+        $ext_sth->finish;
+        return( $self->error( "Error retrieving extended alias results for '$abbr': ", $ext_sth->errstr, "\nSQL query was: ", $ext_sth->{Statement} ) );
+    }
+    $ext_sth->finish;
+
+    unless( @$ext_all )
+    {
+        return( $self->error( "No timezone found for abbreviation '$abbr' (including extended aliases)." ) );
+    }
+
+    # Ambiguity for extended aliases: more than one candidate with no single
+    # is_primary designating the canonical choice.
+    my $n_primary = scalar( grep{ $_->{is_primary} } @$ext_all );
+    my $n_total   = scalar( @$ext_all );
+    my $ambiguous = ( $n_total > 1 && $n_primary != 1 ) ? 1 : 0;
+
+    return([
         map
         {
             {
                 zone_name  => $_->{zone_name},
-                utc_offset => $_->{utc_offset},
-                is_dst     => $_->{is_dst} ? 1 : 0,
+                # Extended aliases carry no offset data.
+                utc_offset => undef,
+                is_dst     => undef,
                 ambiguous  => $ambiguous,
+                is_primary => $_->{is_primary} ? 1 : 0,
+                extended   => 1,
             }
         }
-        @$all
-    ];
-
-    return( $results );
+        @$ext_all
+    ]);
 }
 
 sub short_name_for_datetime
@@ -1167,11 +1366,12 @@ sub tz_version
     unless( $sth = $self->_get_cached_statement( 'tz_version' ) )
     {
         my $dbh = $self->_dbh || return( $self->pass_error );
+        my $query = "SELECT value FROM metadata WHERE key = 'tz_version'";
         local $@;
         $sth = eval
         {
-            $dbh->prepare( "SELECT value FROM metadata WHERE key = 'tz_version'" )
-        } || return( $self->error( "Cannot prepare tz_version query: ", ( $@ || $dbh->errstr ) ) );
+            $dbh->prepare( $query )
+        } || return( $self->error( "Cannot prepare tz_version query: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( tz_version => $sth );
     }
 
@@ -1179,24 +1379,24 @@ sub tz_version
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the tz_version: $@" ) );
+        return( $self->error( "Error executing the query to get the tz_version: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the tz_version: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get the tz_version: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     my $row = eval{ $sth->fetchrow_arrayref };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the tz_version: $@" ) );
+        return( $self->error( "Error retrieving the tz_version: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the tz_version: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving the tz_version: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     return( $row ? $row->[0] : undef );
@@ -1511,29 +1711,29 @@ sub _dbh_add_user_defined_functions
     my $sth = eval
     {
         $dbh->prepare( $query );
-    } || return( $this->error( "Error preparing the query to check if SQLite has math functions: ", ( $@ || $dbh->errstr ) ) );
+    } || return( $this->error( "Error preparing the query to check if SQLite has math functions: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
     my $rv = eval{ $sth->execute };
     if( $@ )
     {
         $sth->finish;
-        return( $this->error( "Error executing the query to check if SQLite has math functions: $@" ) );
+        return( $this->error( "Error executing the query to check if SQLite has math functions: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $this->error( "Error executing the query to check if SQLite has math functions: ", $sth->errstr ) );
+        return( $this->error( "Error executing the query to check if SQLite has math functions: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     my $row = eval{ $sth->fetchrow_arrayref };
     if( $@ )
     {
         $sth->finish;
-        return( $this->error( "Error retrieving the value to check if SQLite has math functions: $@" ) );
+        return( $this->error( "Error retrieving the value to check if SQLite has math functions: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $this->error( "Error retrieving the value to check if SQLite has math functions: ", $sth->errstr ) );
+        return( $this->error( "Error retrieving the value to check if SQLite has math functions: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     if( $row->[0] )
@@ -1680,7 +1880,7 @@ sub _get_zone_info
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get the timezone information for $self->{name}: ", ( $@ || $dbh->errstr ) ) );
+        } || return( $self->error( "Error preparing the query to get the timezone information for $self->{name}: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( get_zone_info => $sth );
     }
 
@@ -1688,25 +1888,25 @@ sub _get_zone_info
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the timezone information for $self->{name}: $@" ) );
+        return( $self->error( "Error executing the query to get the timezone information for $self->{name}: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the timezone information for $self->{name}: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get the timezone information for $self->{name}: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $row = eval{ $sth->fetchrow_hashref };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the timezone information for $self->{name}: $@" ) );
+        return( $self->error( "Error retrieving the timezone information for $self->{name}: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the timezone information for $self->{name}: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving the timezone information for $self->{name}: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     $self->_decode_sql_arrays( [qw( countries )], $row ) if( defined( $row ) );
@@ -2011,10 +2211,7 @@ sub _lookup_span
     my $sth;
     unless( $sth = $self->_get_cached_statement( 'span_by_utc' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
-        $sth = eval
-        {
-            $dbh->prepare( <<'SQL' )
+        my $query = <<'SQL';
 SELECT s.offset, s.is_dst, s.short_name, s.utc_start, s.utc_end
 FROM spans s
 WHERE s.zone_id = ?
@@ -2022,7 +2219,11 @@ WHERE s.zone_id = ?
   AND ( s.utc_end   IS NULL OR s.utc_end   >  ? )
 LIMIT 1
 SQL
-        } || return( $self->error( "Cannot prepare span_by_utc: ", ( $@ || $dbh->errstr ) ) );
+        my $dbh = $self->_dbh || return( $self->pass_error );
+        $sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $self->error( "Cannot prepare span_by_utc: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( span_by_utc => $sth );
     }
 
@@ -2031,25 +2232,25 @@ SQL
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the timezone spans information for $self->{name} and zone ID $zone_id: $@" ) );
+        return( $self->error( "Error executing the query to get the timezone spans information for $self->{name} and zone ID $zone_id: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the timezone spans information for $self->{name} and zone ID $zone_id: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get the timezone spans information for $self->{name} and zone ID $zone_id: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $row = eval{ $sth->fetchrow_hashref };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the timezone spans information for $self->{name} and zone ID $zone_id: $@" ) );
+        return( $self->error( "Error retrieving the timezone spans information for $self->{name} and zone ID $zone_id: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the timezone spans information for $self->{name} and zone ID $zone_id: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving the timezone spans information for $self->{name} and zone ID $zone_id: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
 
@@ -2136,11 +2337,7 @@ sub _lookup_span_local
     my $sth;
     unless( $sth = $self->_get_cached_statement( 'span_by_local' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
-        local $@;
-        $sth = eval
-        {
-            $dbh->prepare( <<'SQL' )
+        my $query = <<'SQL';
 SELECT s.offset, s.is_dst, s.short_name, s.local_start, s.local_end
 FROM spans s
 WHERE s.zone_id = ?
@@ -2148,7 +2345,12 @@ WHERE s.zone_id = ?
   AND ( s.local_end   IS NULL OR s.local_end   >  ? )
 LIMIT 1
 SQL
-        } || return( $self->error( "Cannot prepare span_by_local: ", ( $@ || $dbh->errstr ) ) );
+        my $dbh = $self->_dbh || return( $self->pass_error );
+        local $@;
+        $sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $self->error( "Cannot prepare span_by_local: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( span_by_local => $sth );
     }
 
@@ -2157,25 +2359,25 @@ SQL
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all the spans for the zone ID $zone_id: $@" ) );
+        return( $self->error( "Error executing the query to get all the spans for the zone ID $zone_id: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all the spans for the zone ID $zone_id: ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get all the spans for the zone ID $zone_id: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $row = eval{ $sth->fetchrow_hashref };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all the spans for the zone ID $zone_id: $@" ) );
+        return( $self->error( "Error retrieving all the spans for the zone ID $zone_id: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all the spans for the zone ID $zone_id: ", $sth->errstr ) );
+        return( $self->error( "Error retrieving all the spans for the zone ID $zone_id: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
 
@@ -2395,25 +2597,25 @@ SQL
     if( $@ )
     {
         $sth->finish;
-        return( $class->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: $@" ) );
+        return( $class->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $class->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
+        return( $class->error( "Error executing the query to get the nearest zone for latitude $latitude and longitude $longitude: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $row = eval{ $sth->fetchrow_hashref };
     if( $@ )
     {
         $sth->finish;
-        return( $class->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: $@" ) );
+        return( $class->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $class->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: ", $sth->errstr ) );
+        return( $class->error( "Error retrieving the nearest zone information for latitude $latitude and longitude $longitude: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     unless( defined( $row ) && defined( $row->{name} ) )
@@ -2450,17 +2652,18 @@ sub _resolve_alias
     my $sth;
     unless( $sth = $self->_get_cached_statement( 'resolve_alias' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
-        local $@;
-        $sth = eval
-        {
-            $dbh->prepare( <<'SQL' )
+        my $query = <<'SQL';
 SELECT z.name
 FROM aliases a
 JOIN zones z ON z.zone_id = a.zone_id
 WHERE a.alias = ?
 SQL
-        } || return( $self->error( "Cannot prepare resolve_alias: ", ( $@ || $dbh->errstr ) ) );
+        my $dbh = $self->_dbh || return( $self->pass_error );
+        local $@;
+        $sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $self->error( "Cannot prepare resolve_alias: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( resolve_alias => $sth );
     }
 
@@ -2468,25 +2671,25 @@ SQL
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the canonical zone name for alias '$name': $@" ) );
+        return( $self->error( "Error executing the query to get the canonical zone name for alias '$name': $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the canonical zone name for alias '$name': ", $sth->errstr ) );
+        return( $self->error( "Error executing the query to get the canonical zone name for alias '$name': ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $row = eval{ $sth->fetchrow_arrayref };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the canonical zone name for alias '$name': $@" ) );
+        return( $self->error( "Error retrieving the canonical zone name for alias '$name': $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the canonical zone name for alias '$name': ", $sth->errstr ) );
+        return( $self->error( "Error retrieving the canonical zone name for alias '$name': ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     # Not found in aliases: the name is assumed to be a canonical zone name
@@ -2734,6 +2937,70 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
     my %aliases  = DateTime::Lite::TimeZone->aliases;   # hash    alias => canonical
     my $links    = $tz->links;                          # arrayref of alias names
 
+    # Resolve a timezone abbreviation against the IANA types table
+    my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST' );
+    # $results = [
+    #     {
+    #         ambiguous       => 0,
+    #         extended        => 0,
+    #         is_dst          => 0,
+    #         last_trans_time => -577962000,
+    #         utc_offset      => 32400,
+    #         zone_name       => "Asia/Tokyo",
+    #     },
+    #     {
+    #         ambiguous       => 0,
+    #         extended        => 0,
+    #         is_dst          => 0,
+    #         last_trans_time => -880016400,
+    #         utc_offset      => 32400,
+    #         zone_name       => "Asia/Manila",
+    #     },
+    #     # etc...
+    # ]
+
+    # Narrow by co-parsed numeric offset
+    my $pst = DateTime::Lite::TimeZone->resolve_abbreviation( 'PST',
+        utc_offset => -28800
+    );
+
+    # Period filter: zones that still used JST after 1950
+    my $modern = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
+        period => '>1950-01-01'
+    );
+
+    # Period filter with two ISO date bounds
+    my $wartime = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
+        period => ['>1941-01-01', '<1946-01-01']
+    );
+
+    # Period filter with a raw epoch integer (post-1970 value, safe on all platforms)
+    my $epoch_2010 = 1262304000;  # 2010-01-01 00:00:00 UTC
+    my $recent = DateTime::Lite::TimeZone->resolve_abbreviation( 'EST',
+        period => ">$epoch_2010"
+    );
+
+    # Period filter: only zones currently on this abbreviation
+    my $current = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
+        period => 'current'
+    );
+
+    # Extended mode: fall back to extended_aliases if not in IANA types
+    # (covers real-world abbreviations such as AFT, AMST, CEST, HAEC, ...)
+    my $aft = DateTime::Lite::TimeZone->resolve_abbreviation( 'AFT',
+        extended => 1
+    );
+    # $aft = [
+    #     {
+    #         ambiguous  => 0,
+    #         extended   => 1,
+    #         is_dst     => undef,
+    #         is_primary => 1,
+    #         utc_offset => undef,
+    #         zone_name  => "Asia/Kabul",
+    #     },
+    # ]
+
     # Database access (low-level)
     my $path = DateTime::Lite::TimeZone->datafile;  # path to tz.sqlite3
     # Raw SQLite queries via public view methods (return DBI statement handles):
@@ -2754,7 +3021,7 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
 
 =head1 VERSION
 
-    v0.4.0
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -3424,11 +3691,26 @@ Upon error, then this sets an L<error object|DateTime::Lite::Exception>, and ret
 =head2 resolve_abbreviation
 
     # Unambiguous: JST maps to a single UTC offset
+    # Results sorted by most-recently-used first (last_trans_time DESC).
     my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST' );
     # $results = [
-    #   { zone_name => 'Asia/Tokyo', utc_offset => 32400, is_dst => 0, ambiguous => 0 },
-    #   { zone_name => 'Asia/Seoul', utc_offset => 32400, is_dst => 0, ambiguous => 0 },
-    #   ...
+    #     {
+    #         ambiguous       => 0,
+    #         extended        => 0,
+    #         is_dst          => 0,
+    #         last_trans_time => -577962000,
+    #         utc_offset      => 32400,
+    #         zone_name       => "Asia/Tokyo",
+    #     },
+    #     {
+    #         ambiguous       => 0,
+    #         extended        => 0,
+    #         is_dst          => 0,
+    #         last_trans_time => -880016400,
+    #         utc_offset      => 32400,
+    #         zone_name       => "Asia/Manila",
+    #     },
+    #     # etc...
     # ]
 
     # Truly ambiguous: CST has different offsets in Asia and America
@@ -3440,9 +3722,91 @@ Upon error, then this sets an L<error object|DateTime::Lite::Exception>, and ret
         'PST', utc_offset => -28800
     );
 
+    # Period filter: only zones that used JST after 1950
+    my $modern = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'JST', period => '>1950-01-01'
+    );
+
+    # Period filter with two bounds: zones that used JST during WWII
+    my $wartime = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'JST', period => ['>1941-01-01', '<1946-01-01']
+    );
+
+    # Period filter: only zones currently on this abbreviation
+    my $current = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'JST', period => 'current'
+    );
+
+    # Extended mode: fall back to extended_aliases if not in IANA types
+    my $aft = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'AFT', extended => 1
+    );
+    # $aft = [
+    #   { zone_name => 'Asia/Kabul', utc_offset => undef, is_dst => undef,
+    #     ambiguous => 0, is_primary => 1, extended => 1 },
+    # ]
+
+    # extended => 1 is a no-op for abbreviations already in IANA types (such as IST, CST):
+    # the IANA result is returned and the extended_aliases table is not consulted.
+
 Class or instance method. Resolves a timezone abbreviation such as C<JST> or C<EST> against the IANA data in the bundled C<tz.sqlite3> database, returning all canonical zones that have ever used that abbreviation.
 
-The single required argument is the abbreviation string. An optional C<utc_offset> argument (integer seconds east of UTC) narrows the results to candidates with a matching offset, which is useful when the numeric offset has already been parsed from the same string (such as from a co-parsed C<%z> token).
+Results are sorted by the most recent transition using the abbreviation (C<last_trans_time> descending), so the currently-active or most-recently-active zone appears first.
+
+The single required argument is the abbreviation string. The following optional keyword arguments are accepted:
+
+=over 4
+
+=item C<extended>
+
+Boolean. When true and the abbreviation is not found in the IANA types table, the method falls back to querying the C<extended_aliases> table. This covers real-world abbreviations (such as C<AFT>, C<AMST>, or C<HAEC>) that appear in date strings but are not stored as TZif type abbreviations in the IANA database.
+
+When an extended result is returned, C<utc_offset> and C<is_dst> are C<undef> since the extended alias table maps abbreviations to zone names only. If you need the offset, instantiate a C<DateTime::Lite::TimeZone> object from the returned C<zone_name>.
+
+=item C<period>
+
+Restricts results to zones whose most recent matching transition (C<MAX(trans_time)>) falls within a given time window. Accepts either a single string or an array reference of strings for multiple conditions.
+
+Each value may be prefixed with a comparison operator:
+
+=over 4
+
+=item C<< > >> (default when no operator is given)
+
+Greater than. The most common operator: zones whose last use of the abbreviation is more recent than the given date.
+
+=item C<< >= >>
+
+Greater than or equal.
+
+=item C<< < >>
+
+Less than. Returns zones whose last use is older than the given date.
+
+=item C<< <= >>
+
+Less than or equal.
+
+=back
+
+The operators C<=> and C<!=> are accepted but map to SQL C<IS> and C<IS NOT>. They have no practical use for timestamp comparisons and are not recommended.
+
+B<Value types>: ISO date strings such as C<1950-01-01> are converted to Unix epoch via SQLite C<strftime('%s', ...)>. Plain integers are treated as epoch seconds and passed as C<CAST(? AS INTEGER)> to ensure correct numeric comparison regardless of how the Perl scalar is internally represented. For portability, use post-1970 epoch values when passing raw integers; pre-1970 negatives may behave unexpectedly on some platforms.
+
+The special value C<current> returns only zones whose most recent use of the abbreviation is in the past and whose next scheduled transition has not yet occurred, which means zones that are on this abbreviation right now.
+
+    period => '>1950-01-01'                   # last used after 1950 (ISO date)
+    period => ['>1941-01-01', '<1946-01-01']  # last used within WWII window
+    period => '>1262304000'                   # last used after 2010-01-01 (epoch int)
+    period => 'current'                       # currently active only
+
+Period filtering does not apply to extended alias results.
+
+=item C<utc_offset>
+
+Integer seconds east of UTC. Narrows the results to candidates with a matching offset, which is useful when the numeric offset has already been parsed from the same string (such as from a co-parsed C<%z> token). Only applies to the IANA types lookup; not used for the extended aliases fallback.
+
+=back
 
 Returns an array reference of hashrefs on success, each with the following keys:
 
@@ -3454,21 +3818,33 @@ The canonical IANA zone name, such as C<Asia/Tokyo>.
 
 =item C<utc_offset>
 
-The UTC offset in seconds east of UTC for this abbreviation in this zone.
+The UTC offset in seconds east of UTC for this abbreviation in this zone. C<undef> for extended alias results.
 
 =item C<is_dst>
 
-C<1> if this abbreviation represents a DST period, C<0> otherwise.
+C<1> if this abbreviation represents a DST period, C<0> otherwise. C<undef> for extended alias results.
 
 =item C<ambiguous>
 
-C<1> if the abbreviation maps to multiple distinct UTC offsets across the result set (a genuine ambiguity such as C<IST> or C<CST>); C<0> if all candidates share the same UTC offset (same time, different zone names).
+For IANA results: C<1> if the abbreviation maps to multiple distinct UTC offsets (a genuine ambiguity such as C<IST> or C<CST>); C<0> if all candidates share the same UTC offset.
+
+For extended alias results: C<1> if there are multiple candidates and none or more than one is marked C<is_primary>; C<0> if exactly one candidate has C<is_primary = 1>.
+
+=item C<extended>
+
+C<1> if this result came from the C<extended_aliases> table; C<0> if it came from the IANA types table.
+
+=item C<is_primary>
+
+Only present in extended alias results (C<extended =E<gt> 1>). C<1> marks the preferred zone for this abbreviation when multiple candidates exist. Absent from IANA results.
+
+=item C<last_trans_time>
+
+Unix epoch of the most recent transition in this zone using the abbreviation. Absent from extended alias results. Useful for understanding how recently a zone was last on this abbreviation.
 
 =back
 
-Returns an empty array reference if the abbreviation is not found in the database.
-
-If an error occurred, this sets an L<exception object|DateTime::Lite::Exception>, and returns C<undef> in scalar context, and an empty list in list context. The exception object can then be retrieved with L</error>
+If an error occurred, this sets an L<exception object|DateTime::Lite::Exception>, and returns C<undef> in scalar context, and an empty list in list context. The exception object can then be retrieved with L</error>.
 
 Note that many abbreviations such as C<EST> or C<PST> match multiple zone names that all share the same UTC offset. These are not genuinely ambiguous for the purpose of parsing a datetime string; the C<ambiguous> flag will be C<0> in those cases. Genuinely ambiguous abbreviations such as C<IST> (Irish Summer Time, Indian Standard Time, or Israel Standard Time) will have C<ambiguous =E<gt> 1>.
 
@@ -3568,6 +3944,34 @@ A string field, case insensitive.
 =item * C<name>
 
 A string field, case insensitive.
+
+=back
+
+=head2 extended_aliases
+
+=over 4
+
+=item * C<abbr_id>
+
+An integer field.
+
+=item * C<abbreviation>
+
+A string field, case insensitive.
+
+=item * C<zone_id>
+
+An integer field.
+
+=item * C<is_primary>
+
+A boolean field.
+
+Defaults to false
+
+=item * C<comment>
+
+A string field.
 
 =back
 

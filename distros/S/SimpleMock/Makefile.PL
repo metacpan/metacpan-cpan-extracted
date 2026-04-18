@@ -49,47 +49,47 @@ WriteMakefile(
     provides => {
       'SimpleMock' => {
         file    => 'lib/SimpleMock.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::ScopeGuard' => {
         file    => 'lib/SimpleMock/ScopeGuard.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Util' => {
         file    => 'lib/SimpleMock/Util.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Model::DBI' => {
         file    => 'lib/SimpleMock/Model/DBI.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Model::LWP_UA' => {
         file    => 'lib/SimpleMock/Model/LWP_UA.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Model::PATH_TINY' => {
         file    => 'lib/SimpleMock/Model/PATH_TINY.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Model::SUBS' => {
         file    => 'lib/SimpleMock/Model/SUBS.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Mocks::DBI' => {
         file    => 'lib/SimpleMock/Mocks/DBI.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Mocks::LWP::UserAgent' => {
         file    => 'lib/SimpleMock/Mocks/LWP/UserAgent.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'SimpleMock::Mocks::Path::Tiny' => {
         file    => 'lib/SimpleMock/Mocks/Path/Tiny.pm',
-        version => '0.03',
+        version => '0.04',
       },
       'DBD::SimpleMock' => {
         file    => 'lib/DBD/SimpleMock.pm',
-        version => '0.03',
+        version => '0.04',
       },
     },
     prereqs => {

@@ -89,8 +89,10 @@ nav:
       - "Mapping Steps": mapping-steps.md
       - "Mapping Tables":
           - "OMOP to BFF": omop2bff.md
+          - "openEHR to BFF": openehr2bff.md
           - "PXF to BFF": pxf2bff.md
           - "BFF to PXF": bff2pxf.md
+          - "BFF to OMOP": bff2omop.md
   - "❓ Help":
       - "Tutorial": tutorial.md
       - "Google Colab": https://colab.research.google.com/drive/1T6F3bLwfZyiYKD6fl1CIxs9vG068RHQ6

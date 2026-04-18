@@ -86,7 +86,6 @@ sub _map_person {
       map_iso8601_date2timestamp( $person->{birth_datetime} );
 
     unless ( $self->{test} ) {
-        $individual->{info}{metaData}     = $self->{metaData};
         $individual->{info}{convertPheno} = $self->{convertPheno};
     }
 
@@ -105,7 +104,6 @@ sub _map_person {
             ontology => 'ncit',
             self     => $self
         }
-
     ) if $sex;
 }
 

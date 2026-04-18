@@ -1,0 +1,16 @@
+^Build$
+^Build.bat$
+^_build/
+^blib/
+\.bak$
+\.tar\.gz$
+^MYMETA
+^data/
+^html$
+^html/
+^www/
+^\.git/
+^\.claude/
+^SERVERPLAN\.txt$
+^YAPI\.txt$
+^x\.txt$

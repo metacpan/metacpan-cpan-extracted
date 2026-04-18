@@ -1,0 +1,85 @@
+{
+   "abstract" : "Yote API Server - JSON RPC for persistent Perl objects",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Yote-YapiServer",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "IO::Socket::INET" : "0",
+            "JSON::PP" : "0",
+            "Time::HiRes" : "0",
+            "Time::Piece" : "0",
+            "YAML" : "0",
+            "Yote::SQLObjectStore" : "0",
+            "perl" : "v5.16.0"
+         }
+      }
+   },
+   "provides" : {
+      "Yote::YapiServer" : {
+         "file" : "lib/Yote/YapiServer.pm",
+         "version" : "0.02"
+      },
+      "Yote::YapiServer::App::Base" : {
+         "file" : "lib/Yote/YapiServer/App/Base.pm"
+      },
+      "Yote::YapiServer::App::Example" : {
+         "file" : "lib/Yote/YapiServer/App/Example.pm"
+      },
+      "Yote::YapiServer::BaseObj" : {
+         "file" : "lib/Yote/YapiServer/BaseObj.pm"
+      },
+      "Yote::YapiServer::Compiler" : {
+         "file" : "lib/Yote/YapiServer/Compiler.pm"
+      },
+      "Yote::YapiServer::File" : {
+         "file" : "lib/Yote/YapiServer/File.pm"
+      },
+      "Yote::YapiServer::Handler" : {
+         "file" : "lib/Yote/YapiServer/Handler.pm"
+      },
+      "Yote::YapiServer::Session" : {
+         "file" : "lib/Yote/YapiServer/Session.pm"
+      },
+      "Yote::YapiServer::Site" : {
+         "file" : "lib/Yote/YapiServer/Site.pm"
+      },
+      "Yote::YapiServer::User" : {
+         "file" : "lib/Yote/YapiServer/User.pm"
+      },
+      "Yote::YapiServer::YapiDef" : {
+         "file" : "lib/Yote/YapiServer/YapiDef.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

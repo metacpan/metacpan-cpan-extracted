@@ -1,5 +1,62 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.6.0 2026-04-17T22:30:20+0900
+    - Added extended_aliases table to tz.sqlite3 (schema v0.6.0).
+      355 timezone abbreviations, 535 (abbreviation, zone) pairs, covering real-world
+      abbreviations not stored as TZif type entries in the IANA database, such as BDT,
+      CEST, HAEC, JST, and the full set of NATO military single-letter zones.
+      Each abbreviation maps to one or more canonical IANA zone names.
+      One row per (abbreviation, zone_id) pair with 'is_primary' marking the most
+      commonly accepted canonical zone when multiple candidates exist.
+      Two triggers enforce that at most one is_primary = 1 row exists per abbreviation
+      (on INSERT and on UPDATE OF is_primary).
+    - Updated tz.sqlite3 with new schema and latest data (tzdata 2026a).
+    - Extended resolve_abbreviation() in DateTime::Lite::TimeZone with an optional
+      'extended' boolean argument.
+      When true and the abbreviation is absent from the IANA types table, the method
+      falls back to querying the new table 'extended_aliases'.
+      Extended results carry utc_offset => undef and is_dst => undef (the extended
+      alias table maps names only); the new 'is_primary' and 'extended' keys are added
+      to each result hashref.
+      The ambiguity flag for extended results is based on candidate count and
+      'is_primary': 'ambiguous' is set to 0 when exactly one 'is_primary' exists,
+      otherwise, 'ambiguous' is set to 1.
+      Existing callers are unaffected: without the option 'extended' set to a true value,
+      the behaviour is identical to the previous version v0.5.0.
+    - Added the property 'extended' set to 0 in all IANA results returned from
+      resolve_abbreviation() for consistency with extended alias results.
+    - Added cached prepared statement resolve_abbreviation_extended for the
+      'extended_aliases' table query, consistent with existing statement caching.
+    - Updated POD for resolve_abbreviation() to document the boolean option 'extended',
+      'utc_offset', and the result fields 'extended' and 'is_primary', and the 'ambiguity'
+      semantics for extended results.
+    - Added t/16.extended_aliases.t with 6 subtests covering:
+      - IANA abbreviation with the boolean option 'extended' as a no-op (CEST)
+      - unambiguous single-zone extended alias (AFT -> Asia/Kabul)
+      - multi-zone extended alias with 'is_primary' (AMST)
+      - unknown abbreviation with and without the boolean option 'extended'
+      - JST IANA offset verification; and
+      - round-trip: using the returned 'zone_name' to instantiate a
+        DateTime::Lite::TimeZone object.
+    - Extended resolve_abbreviation() with period-based filtering and deterministic
+      sort order:
+      - Results are now sorted by most-recently-used first
+        (MAX(trans_time) DESC), so the currently-active or most-recently-active zone
+        appears first. The new result field 'last_trans_time' exposes the Unix epoch
+        of that most recent transition.
+      - Added optional 'period' argument to restrict results to zones whose most recent
+        matching transition falls within a given time window.
+        Accepts a single value or an array reference of values for multiple AND-combined
+        conditions. Each value may be prefixed with a comparison operator: >, >=, <, <=.
+        ISO date strings such as '1950-01-01' are converted to Unix epoch via SQLite
+        strftime(); plain integers are passed as CAST(? AS INTEGER) to ensure
+        arithmetic comparison.
+        The special value 'current' returns only zones where the abbreviation is active
+        right now, by checking that the most recent matching transition is the zone's
+        overall most recent transition and is in the past.
+    - Added t/17.resolve_abbreviation_period.t with 10 subtests for abbreviated timezone
+      resolution.
+
 v0.5.0 2026-04-16T15:26:07+0900
     - Added the method resolve_abbreviation() in DateTime::Lite::TimeZone
     - Corrected method _nearest_zone() to use $class instead of $self

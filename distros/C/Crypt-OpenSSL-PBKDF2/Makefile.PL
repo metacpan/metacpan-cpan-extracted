@@ -13,7 +13,7 @@ WriteMakefile(
 		LICENSE			=> 'gpl_3',
 		) :	()
 	),
-    LIBS				=> ['-lcrypto -lssl '], # e.g., '-lm'
+    LIBS				=> [ '-lcrypto -lssl -leay32 -lssl32' ], # e.g., '-lm'
     DEFINE				=> '', # e.g., '-DHAVE_SOMETHING'
     INC					=> '-I.', # e.g., '-I. -I/usr/include/other'
 );

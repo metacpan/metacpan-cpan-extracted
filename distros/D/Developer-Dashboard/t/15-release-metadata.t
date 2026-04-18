@@ -20,6 +20,8 @@ my $meta = _slurp_optional( _repo_path('META.json') );
 my $cpanfile = _slurp( _repo_path('cpanfile') );
 my $makefile = _slurp( _repo_path('Makefile.PL') );
 my $agents_override = _slurp_optional( _repo_path('AGENTS.override.md') );
+my $security_pod = _slurp_optional( _repo_path('SECURITY.pod') );
+my $contributing_pod = _slurp_optional( _repo_path('CONTRIBUTING.pod') );
 my @doc_paths = grep { -e $_ } (
     _repo_path('README.md'),
     _repo_path('SQL_DASHBOARD_SUPPORTS_DB.md'),
@@ -27,6 +29,8 @@ my @doc_paths = grep { -e $_ } (
     _repo_path('FIXED_BUGS.md'),
     _repo_path('MISTAKE.md'),
     _repo_path('CONTRIBUTING.md'),
+    _repo_path('CONTRIBUTING.pod'),
+    _repo_path('SECURITY.pod'),
     _repo_path('SOFTWARE_SPEC.md'),
     _repo_path('TEST_PLAN.md'),
     _repo_path( 'doc', 'architecture.md' ),
@@ -54,10 +58,10 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.43', 'repo version bumped for the housekeeper collector rotation fix' );
-like( $pm, qr/^2\.43$/m, 'main POD version matches the module version' );
+is( $version, '2.46', 'repo version bumped for the multi-level nested skill dotted dispatch fix' );
+like( $pm, qr/^2\.46$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
-    like( $dist, qr/^version = 2\.43$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^version = 2\.46$/m, 'dist.ini version matches the module version in the source tree' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini excludes integration assets so repo-only verification helpers do not leak into release tarballs' );
@@ -65,14 +69,17 @@ if ( $dist ne '' ) {
     like( $dist, qr/^exclude_match = \^test_by_michael\/$/m, 'dist.ini excludes test_by_michael so private scratch fixtures do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^updates\/$/m, 'dist.ini excludes checkout-only update scripts so user-defined update remains the installed runtime contract' );
     like( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini excludes Markdown files so repo-internal docs do not leak into release tarballs' );
-    like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
+        like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
     else {
-        like( $meta, qr/"version"\s*:\s*"2\.43"/, 'META.json version matches the module version in the built distribution' );
+        like( $meta, qr/"version"\s*:\s*"2\.46"/, 'META.json version matches the module version in the built distribution' );
     }
-like( $changes, qr/^2\.43\s+2026-04-17$/m, 'Changes top entry matches the bumped version' );
+like( $changes, qr/^2\.46\s+2026-04-17$/m, 'Changes top entry matches the bumped version' );
 ok( $plain_readme ne '', 'plain README is tracked for release kwalitee compatibility' );
 like( $plain_readme, qr/Developer Dashboard/, 'plain README identifies the distribution clearly' );
+ok( $security_pod ne '', 'SECURITY.pod is tracked so the release tarball ships a security policy document' );
+ok( $contributing_pod ne '', 'CONTRIBUTING.pod is tracked so the release tarball ships contribution guidance' );
+like( $security_pod, qr/security\@manif3station\.local/i, 'SECURITY.pod includes a concrete private security contact address' );
 
 for my $path (
     qw(
@@ -268,6 +275,7 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/dashboard skills usage/, 'README documents skill usage inspection' );
     like( $doc, qr/dashboard skills list -o table|dashboard skills usage example-skill -o table/, 'README documents table output for skill inspection' );
     like( $doc, qr/dashboard example-skill\.somecmd/, 'README documents dotted isolated skill command dispatch' );
+    like( $doc, qr/dashboard example-skill\.foo\.bar\.baz|skills\/foo\/skills\/bar\/cli\/baz/, 'README documents dotted dispatch for multi-level nested skills/<repo>/cli commands' );
     unlike( $doc, qr/dashboard skill example-skill/, 'README no longer documents the removed singular dispatcher' );
     like( $doc, qr/aptfile/, 'README documents skill apt dependency bootstrap' );
     like( $doc, qr/_example-skill|_<repo-name>/, 'README documents underscored skill config merge keys' );

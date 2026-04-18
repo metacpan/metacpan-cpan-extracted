@@ -2,7 +2,7 @@ package IPC::Manager::Client::SharedMem;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 # Set to 1 by Makefile.PL at install time when the host's SysV IPC is
 # unreliable.  When true, _viable() throws an exception explaining how

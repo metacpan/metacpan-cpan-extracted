@@ -1,5 +1,8 @@
 Revision history for App::Prove::Plugin::Metrics
 
+0.0.4 - 2026-04-17
+	- Defined basic rollup functionality
+
 0.0.3 - 2026-03-26
 	- Handle "No tests run for subtest" failures
 	- Distinguish between subtest names and assertion labels

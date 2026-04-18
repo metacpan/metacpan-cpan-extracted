@@ -1,0 +1,9 @@
+type: server
+package: Madyote
+base: Yote::YapiServer::Site
+
+uses:
+  - Madyote::App::ExquisiteCorpse
+
+apps:
+  corpse: Madyote::App::ExquisiteCorpse

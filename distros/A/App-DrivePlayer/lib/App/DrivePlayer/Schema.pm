@@ -32,13 +32,16 @@ sub connect_and_deploy {
     # Migrate: add columns introduced after initial deploy
     my %existing = map { $_->[1] => 1 }
         @{ $dbh->selectall_arrayref('PRAGMA table_info(tracks)') };
-    for my $col (qw( genre composer comment )) {
+    for my $col (qw( genre comment )) {
         next if $existing{$col};
         $dbh->do("ALTER TABLE tracks ADD COLUMN $col TEXT");
     }
     unless ($existing{metadata_fetched}) {
         $dbh->do('ALTER TABLE tracks ADD COLUMN metadata_fetched INTEGER NOT NULL DEFAULT 0');
     }
+
+    # Migrate: drop the unused composer column (SQLite >= 3.35)
+    $dbh->do('ALTER TABLE tracks DROP COLUMN composer') if $existing{composer};
 
     return $schema;
 }

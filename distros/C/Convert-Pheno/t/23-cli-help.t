@@ -3,9 +3,12 @@ use strict;
 use warnings;
 
 use lib qw(./lib ../lib t/lib);
+use File::Spec;
 use Test::More;
-use Test::ConvertPheno qw(cli_script_path);
+use Test::ConvertPheno qw(cli_script_path test_tmpdir);
 use Convert::Pheno::CLI::Args qw(build_cli_request);
+
+my $tmpdir = test_tmpdir();
 
 my $request = build_cli_request(
     argv => [
@@ -16,7 +19,7 @@ my $request = build_cli_request(
     ],
     usage_error => sub { die @_ },
     schema_file => 'share/schema/mapping.json',
-    out_dir     => '/tmp',
+    out_dir     => $tmpdir,
     color       => 1,
 );
 
@@ -34,7 +37,7 @@ $request = build_cli_request(
     ],
     usage_error => sub { die @_ },
     schema_file => 'share/schema/mapping.json',
-    out_dir     => '/tmp',
+    out_dir     => $tmpdir,
     color       => 1,
 );
 
@@ -49,7 +52,7 @@ $request = build_cli_request(
         '-ipxf',     't/pxf2bff/in/pxf.json',
         '-obff',
         '--entities', 'biosamples',
-        '--out-dir', '/tmp',
+        '--out-dir', $tmpdir,
     ],
     usage_error => sub { die @_ },
     schema_file => 'share/schema/mapping.json',
@@ -69,6 +72,52 @@ is_deeply(
     'CLI parser accepts -obff together with --entities'
 );
 
+$request = build_cli_request(
+    argv => [
+        '-ibff', 't/bff2pxf/in/individuals.json',
+        '-oomop',
+        '--out-dir', $tmpdir,
+        '--out-name', 'PERSON=patients.csv',
+        '--ohdsi-db',
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping.json',
+    out_dir     => '.',
+    color       => 1,
+);
+
+is(
+    $request->{data}{method},
+    'bff2omop',
+    'CLI parser accepts -oomop without a prefix value'
+);
+
+is(
+    $request->{data}{output_name_overrides}{PERSON},
+    File::Spec->catfile( $tmpdir, 'patients.csv' ),
+    'CLI parser accepts --out-name for OMOP table output'
+);
+
+$request = build_cli_request(
+    argv => [
+        '-i', 'bff',
+        't/bff2pxf/in/individuals.json',
+        '-o', 'omop',
+        '--out-dir', $tmpdir,
+        '--ohdsi-db',
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping.json',
+    out_dir     => '.',
+    color       => 1,
+);
+
+is(
+    $request->{data}{method},
+    'bff2omop',
+    'CLI parser accepts generic -o omop without an output prefix'
+);
+
 my $usage_error;
 eval {
     build_cli_request(
@@ -79,7 +128,7 @@ eval {
         ],
         usage_error => sub { die @_ },
         schema_file => 'share/schema/mapping.json',
-        out_dir     => '/tmp',
+        out_dir     => $tmpdir,
         color       => 1,
     );
     1;
@@ -89,6 +138,29 @@ like(
     $usage_error,
     qr/--default-vital-status> is only valid with PXF output/,
     'CLI parser rejects --default-vital-status without PXF output'
+);
+
+$usage_error = undef;
+eval {
+    build_cli_request(
+        argv => [
+            '-ibff', 't/bff2pxf/in/individuals.json',
+            '-oomop', 'old-prefix',
+            '--out-dir', $tmpdir,
+            '--ohdsi-db',
+        ],
+        usage_error => sub { die @_ },
+        schema_file => 'share/schema/mapping.json',
+        out_dir     => '.',
+        color       => 1,
+    );
+    1;
+} or $usage_error = $@;
+
+like(
+    $usage_error,
+    qr/no longer accepts a prefix/,
+    'CLI parser prints a focused error for the removed -oomop PREFIX form'
 );
 
 my $cli = cli_script_path();
@@ -149,17 +221,32 @@ like(
 );
 like(
     $help,
-    qr/-obff FILE keeps the legacy single-output behavior and emits individuals only\./s,
-    'CLI help documents the legacy single-file BFF behavior'
+    qr/-obff FILE keeps the individuals-only BFF behavior\./s,
+    'CLI help documents the individuals-only BFF behavior'
 );
 like(
     $help,
     qr/-obff --entities \.\.\. --out-dir DIR writes one file per requested BFF entity\./s,
     'CLI help documents the explicit entity-aware BFF form'
 );
+like(
+    $help,
+    qr/-oomop --out-dir DIR writes one file per emitted OMOP table\./s,
+    'CLI help documents the out-dir based OMOP table output mode'
+);
+like(
+    $help,
+    qr/-oomop\s+OMOP-CDM CSV table output \(use with --out-dir\)/s,
+    'CLI help documents OMOP output as out-dir based multi-file output'
+);
+like(
+    $help,
+    qr/--out-name k=file\s+Override one multi-file output name/s,
+    'CLI help documents the shared multi-file rename flag'
+);
 
 my $usage_error_output =
-  qx{$^X $cli -ipxf t/pxf2bff/in/pxf.json --entities biosamples --out-dir /tmp 2>&1};
+  qx{$^X $cli -ipxf t/pxf2bff/in/pxf.json --entities biosamples --out-dir $tmpdir 2>&1};
 is( $? >> 8, 1, 'CLI validation error exits with status 1' );
 like(
     $usage_error_output,

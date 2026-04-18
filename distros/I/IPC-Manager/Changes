@@ -1,3 +1,10 @@
+0.000023  2026-04-17 12:06:27-07:00 America/Los_Angeles
+
+    - Strengthen SysV IPC configure-time probe: add concurrent-contention and rapid create/destroy phases to catch hosts where semop sporadically returns EINVAL only under load
+    - Add kernel-limit probe that disables SharedMem when /proc/sys/kernel/sem or shmmni/shmmax are below workable minimums
+    - Add persistence probe that disables SharedMem when an external reaper (systemd-logind RemoveIPC, ipcrm cronjob, cgroup IPC policy, etc.) destroys a freshly-created semaphore mid-probe
+    - Detect systemd-logind RemoveIPC=yes without user linger and include it as a diagnostic hint in the install-time failure message
+
 0.000022  2026-04-16 16:49:45-07:00 America/Los_Angeles
 
     - Reap children in the service loop via waitpid(-1, WNOHANG) so unrelated zombies are cleaned up

@@ -35,7 +35,6 @@ my %MAX_LEN = (
     artist        => 255,
     album         => 255,
     genre         => 100,
-    composer      => 255,
     comment       => 500,
     mime_type     => 100,
     modified_time =>  50,
@@ -124,8 +123,8 @@ sub folders_for_scan_folder {
 
 # ---------- tracks ----------
 
-my @STRUCTURAL_FIELDS = qw( folder_id folder_path mime_type size modified_time duration_ms );
-my @METADATA_FIELDS   = qw( title artist album track_number year genre composer comment );
+my @STRUCTURAL_FIELDS = qw( folder_id folder_path mime_type size modified_time );
+my @METADATA_FIELDS   = qw( title artist album track_number year duration_ms genre comment );
 
 sub upsert_track {
     my ($self, %t) = @_;
@@ -161,7 +160,6 @@ sub upsert_track {
             folder_id     => $t{folder_id},
             folder_path   => _trunc($t{folder_path},   'folder_path'),
             genre         => _trunc($t{genre},         'genre'),
-            composer      => _trunc($t{composer},      'composer'),
             comment       => _trunc($t{comment},       'comment'),
         });
     }
@@ -171,7 +169,7 @@ sub update_track_metadata {
     my ($self, $id, %fields) = @_;
     my $row = $self->_rs('Track')->find($id) or return;
     my %allowed = map { $_ => 1 }
-        qw( title artist album track_number year duration_ms genre composer comment );
+        qw( title artist album track_number year duration_ms genre comment );
     my %update = map { $_ => $fields{$_} }
         grep { $allowed{$_} } keys %fields;
     $row->update(\%update) if %update;
@@ -193,8 +191,8 @@ sub upsert_track_from_metadata {
             album        => _trunc($fields{album},     'album'),
             track_number => $fields{track_number} // undef,
             year         => $fields{year}         // undef,
+            duration_ms  => $fields{duration_ms}  // undef,
             genre        => _trunc($fields{genre},     'genre'),
-            composer     => _trunc($fields{composer},  'composer'),
             comment      => _trunc($fields{comment},   'comment'),
         },
         { key => 'unique_drive_id' },

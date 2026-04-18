@@ -1,0 +1,8 @@
+0.001     2026-04-18 03:34:49Z
+
+ - Initial release
+ - Full Firecrawl v2 API bindings: scrape, crawl, map, search, batch/scrape, extract, agent, browser, monitoring
+ - Structured error model via WWW::Firecrawl::Error (type: transport/api/job/scrape/page)
+ - Classification policy (is_failure/failure_codes), strict flag for single scrape
+ - Retry on transport + retryable API errors (429/502/503/504) with Retry-After support
+ - scrape_many and retry_failed_pages helpers

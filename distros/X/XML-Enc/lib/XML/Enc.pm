@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Enc;
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 # ABSTRACT: XML::Enc Encryption Support
 
@@ -136,7 +136,12 @@ sub decrypt {
 
     local $XML::LibXML::skipXMLDeclaration = $self->{ no_xml_declaration };
 
-    my $doc = XML::LibXML->load_xml( string => $xml );
+    my $doc = XML::LibXML->load_xml(
+                                    string => $xml,
+                                    no_network      => 1,
+                                    load_ext_dtd    => 0,
+                                    expand_entities => 0
+                                );
 
     my $xpc = XML::LibXML::XPathContext->new($doc);
     $xpc->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
@@ -148,7 +153,11 @@ sub decrypt {
 
     die "You cannot decrypt XML without a private key." unless $self->{key_obj};
 
-    my $parser = XML::LibXML->new();
+    my $parser = XML::LibXML->new(
+                                    no_network      => 1,
+                                    load_ext_dtd    => 0,
+                                    expand_entities => 0
+                                );
     $self->_decrypt_encrypted_key_nodes($xpc, $parser, %options);
     $self->_decrypt_uri_nodes($xpc, $parser, %options);
 
@@ -345,7 +354,12 @@ sub encrypt {
     # Create the EncryptedData node
     my ($encrypted) = $self->_create_encrypted_data_xml();
 
-    my $dom = XML::LibXML->load_xml( string => $xml);
+    my $dom = XML::LibXML->load_xml(
+                                    string => $xml,
+                                    no_network      => 1,
+                                    load_ext_dtd    => 0,
+                                    expand_entities => 0
+                                );
 
     my $xpc = XML::LibXML::XPathContext->new($encrypted);
     $xpc->registerNs('dsig', 'http://www.w3.org/2000/09/xmldsig#');
@@ -1097,7 +1111,7 @@ XML::Enc - XML::Enc Encryption Support
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -1278,11 +1292,11 @@ XML containing the plaintext data.
 
 =head1 AUTHOR
 
-Timothy Legge <timlegge@cpan.org>
+Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by TImothy Legge.
+This software is copyright (c) 2026 by TImothy Legge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

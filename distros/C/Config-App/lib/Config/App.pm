@@ -14,7 +14,7 @@ use POSIX ();
 use URI ();
 use YAML::XS ();
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -148,7 +148,7 @@ sub import {
             }
         }
 
-        delete $INC{ join( '/', split /(?:'|::)/, __PACKAGE__ ) . '.pm' };
+        delete $INC{ join( '/', split qr{(?:'|::)}, __PACKAGE__ ) . '.pm' };
 
         return;
     }
@@ -243,32 +243,8 @@ sub _process_location {
         sources    => $sources,
     });
 
-    my $sub_process_location = sub { _process_location({
-        box      => $input->{box},
-        user     => $input->{user},
-        env      => $input->{env},
-        conf     => $input->{conf},
-        location => $_[0],
-        optional => $_[1],
-        sources  => $sources,
-    }) };
-
-    my $fetch_block = sub {
-        my ($include_type) = @_;
-        my $optional = 'optional_' . $include_type;
-
-        $sub_process_location->( $set->{$include_type}, 0 ) if ( $set->{$include_type} );
-        $sub_process_location->( delete( $input->{conf}->{$include_type} ), 0 )
-            if ( $input->{conf}->{$include_type} );
-        $sub_process_location->( $set->{$optional}, 1 ) if ( $set->{$optional} );
-        $sub_process_location->( delete( $input->{conf}->{$optional} ), 1 )
-            if ( $input->{conf}->{$optional} );
-    };
-
-    $fetch_block->('preinclude');
-
     my ( $box, $user, $env ) = @$input{ qw( box user env ) };
-    _merge_settings( $input->{conf}, $_ ) for (
+    _merge_settings( $input->{conf}, $_, $input->{reverse} ) for (
         grep { defined } (
             map {
                 $set->{ join( '|', ( grep { defined } @$_ ) ) }
@@ -286,7 +262,29 @@ sub _process_location {
         )
     );
 
-    $fetch_block->('include');
+    my $sub_process_location = sub {
+        _process_location({
+            box      => $input->{box},
+            user     => $input->{user},
+            env      => $input->{env},
+            conf     => $input->{conf},
+            sources  => $sources,
+            location => $_[0],
+            optional => $_[1],
+            reverse  => $_[2],
+        });
+    };
+
+    for (
+        [ '',          'pre' ],
+        [ 'optional_', 'pre' ],
+        [ '',          ''    ],
+        [ 'optional_', ''    ],
+    ) {
+        my $type = join( '', @$_, 'include' );
+        $sub_process_location->( $set->{$type},                     @$_ ) if ( $set->{$type}           );
+        $sub_process_location->( delete( $input->{conf}->{$type} ), @$_ ) if ( $input->{conf}->{$type} );
+    }
 
     return;
 }
@@ -388,7 +386,7 @@ sub _process_location {
 }
 
 sub _merge_settings {
-    my ( $merge, $source, $is_deep_call ) = @_;
+    my ( $merge, $source, $reverse, $is_deep_call ) = @_;
     return unless $source;
 
     if ( not $is_deep_call and ref $merge eq 'HASH' and ref $source eq 'HASH' ) {
@@ -408,14 +406,24 @@ sub _merge_settings {
     }
 
     if ( ref $merge eq 'HASH' ) {
-        for my $key ( keys %{$source} ) {
-            if ( exists $merge->{$key} and ref $merge->{$key} eq 'HASH' and ref $source->{$key} eq 'HASH' ) {
-                _merge_settings( $merge->{$key}, $source->{$key}, 1 );
+        my $handle_keys = sub {
+            my ( $origin, $target ) = @_;
+            for my $key ( keys %{$origin} ) {
+                if (
+                    exists $target->{$key}
+                    and ref $target->{$key} eq 'HASH'
+                    and ref $origin->{$key} eq 'HASH'
+                ) {
+                    _merge_settings( $target->{$key}, $origin->{$key}, 0, 1 );
+                }
+                else {
+                    $target->{$key} = _clone( $origin->{$key} );
+                }
             }
-            else {
-                $merge->{$key} = _clone( $source->{$key} );
-            }
-        }
+        };
+
+        $handle_keys->( $merge, $source ) if ($reverse);
+        $handle_keys->( $source, $merge );
     }
     elsif ( ref $merge eq 'ARRAY' ) {
         push( @$source, @$merge );
@@ -442,7 +450,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =for markdown [![test](https://github.com/gryphonshafer/Config-App/workflows/test/badge.svg)](https://github.com/gryphonshafer/Config-App/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Config-App/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Config-App)

@@ -12,7 +12,7 @@ use MARC::Leader 0.08;
 use MARC::Field008;
 use MARC::Validator::Const;
 
-our $VERSION = 0.15;
+our $VERSION = 0.17;
 
 sub module_name {
 	my $self = shift;
@@ -67,21 +67,28 @@ sub process {
 			my $lang = $marc_record->subfield('040', 'b');
 			my $qr;
 			if (defined $lang
-				&& exists $MARC::Validator::Const::FIELD_504{$lang}) {
+				&& exists $MARC::Validator::Const::FIELD_504{$lang}->{'index'}) {
 
-				$qr = $MARC::Validator::Const::FIELD_504{$lang};
+				$qr = $MARC::Validator::Const::FIELD_504{$lang}->{'index'};
 			}
-			if ($material->isa('Data::MARC::Field008::Book')
+			if (($material->isa('Data::MARC::Field008::Book')
+				|| $material->isa('Data::MARC::Field008::Map'))
 				&& defined $qr
 				&& $field_504a =~ $qr
 				&& $material->index eq '0') {
 
+				my $material_string;
+				if ($material->isa('Data::MARC::Field008::Book')) {
+					$material_string = 'book';
+				} else {
+					$material_string = 'map';
+				}
 				push @record_errors, Data::MARC::Validator::Report::Error->new(
 					'error' => 'Missing index in field 008.',
 					'params' => {
 						'field_008_index' => $material->index,
 						'field_504_a' => $field_504a,
-						'material' => 'book',
+						'material' => $material_string,
 					},
 				);
 			}

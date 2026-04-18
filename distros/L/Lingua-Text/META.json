@@ -1,10 +1,10 @@
 {
-   "abstract" : "Class to contain text many different languages",
+   "abstract" : "Class to contain text in many different languages",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -36,6 +36,7 @@
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "HTML::Entities" : "0",
+            "I18N::LangTags::Detect" : "0",
             "Params::Get" : "0",
             "Scalar::Util" : "0",
             "perl" : "5.006002"
@@ -65,6 +66,6 @@
          "x_repository" : "https://github.com/nigelhorne/Lingua-Text"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

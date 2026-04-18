@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01308nem a2200373 a 4500</leader>
+  <controlfield tag="001">cpc20011021906</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20190516140845.0</controlfield>
+  <controlfield tag="007">a  c    </controlfield>
+  <controlfield tag="008">011015s2001    xr        |     0   cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb001021906</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-7224-274-1</subfield>
+  </datafield>
+  <datafield tag="034" ind1="1" ind2=" ">
+    <subfield code="a">a</subfield>
+    <subfield code="b">100000</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">y0y0</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">913(437)</subfield>
+    <subfield code="x">Geografie Česka a Slovenska, reálie, cestování</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">7</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">796.5</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">912.43</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">91(437.1)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Okolí Prahy</subfield>
+    <subfield code="h">[kartografický dokument] :</subfield>
+    <subfield code="b">Posázaví ; Táborsko : turistická mapa 1:100 000</subfield>
+  </datafield>
+  <datafield tag="255" ind1=" " ind2=" ">
+    <subfield code="a">Měřítko 1:100 000</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Vizovice :</subfield>
+    <subfield code="b">SHOCart,</subfield>
+    <subfield code="c">2001</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">2 mapy na 1 listu :</subfield>
+    <subfield code="b">barev. ;</subfield>
+    <subfield code="c">44 x 54 cm složeno na 23 x 11 cm</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Zpracováno metodami digitální kartografie</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje rejstřík</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Posázaví (Česko)</subfield>
+    <subfield code="7">ge128588</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Tábor (Česko : oblast)</subfield>
+    <subfield code="7">ge131165</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Praha (Česko : oblast)</subfield>
+    <subfield code="7">ge130513</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">turistické mapy</subfield>
+    <subfield code="7">fd133737</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="740" ind1="0" ind2="2">
+    <subfield code="a">Táborsko</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="b">9788072242740</subfield>
+    <subfield code="f">[1. vyd.]</subfield>
+    <subfield code="g">Stejné ISBN-13 (ISBN 978-807224-274-0) přiděleno duplicitně též [2. vyd.]</subfield>
+    <subfield code="o">20010927</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">001021906</subfield>
+  </datafield>
+</record>
+
+</collection>

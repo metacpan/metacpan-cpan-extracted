@@ -1,6 +1,6 @@
 {
     "name" : "Jacode4e-RoundTrip",
-    "version" : "2.13.81.14",
+    "version" : "2.13.81.15",
     "abstract" : "Converts JIS X 0213 Encodings with Round-Trip",
     "author" : [
         "ina <ina@cpan.org>"
@@ -19,52 +19,45 @@
         "license" : [
             "http://dev.perl.org/licenses/"
         ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/Jacode4e-RoundTrip/issues"
+        },
         "repository" : {
-            "url" : "https://github.com/ina-cpan/Jacode4e-RoundTrip"
+            "url"  : "https://github.com/ina-cpan/Jacode4e-RoundTrip",
+            "web"  : "https://github.com/ina-cpan/Jacode4e-RoundTrip",
+            "type" : "git"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0"
+                "strict" : "1.01"
             }
         },
         "configure" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0"
+                "strict" : "1.01"
             }
         },
         "runtime" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0"
+                "strict" : "1.01"
             }
+        },
+        "test" : {
+            "requires" : {
+                "perl" : "5.00503",
+                "strict" : "1.01"
+            }
+        }
+    },
+    "provides" : {
+        "Jacode4e::RoundTrip" : {
+            "file" : "lib/Jacode4e/RoundTrip.pm",
+            "version" : "2.13.81.15"
         }
     }
 }

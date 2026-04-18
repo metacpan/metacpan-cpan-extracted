@@ -9,7 +9,7 @@ use SimpleMock::Util qw(
     generate_args_sha
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $drh = DBI->install_driver('SimpleMock');
 

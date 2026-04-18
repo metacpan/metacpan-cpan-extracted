@@ -4,8 +4,9 @@ use warnings;
 use File::Object;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Validator::Plugin::Field655;
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 25;
 use Test::NoWarnings;
+use Unicode::UTF8 qw(decode_utf8);
 
 # Data dir.
 my $data_dir = File::Object->new->up->dir('data');
@@ -44,4 +45,27 @@ is($errors->[0]->errors->[0]->params->{'field_008_nature_of_content'}, '    ',
 	'Get error parameter (field_008_nature_of_content => (    ).');
 is($errors->[0]->errors->[0]->params->{'field_655_a'}, 'komiksy',
 	'Get error parameter (field_655_a => (komiksy).');
+is($errors->[0]->errors->[0]->params->{'material'}, 'book', 'Get error parameter (material => (book).');
+
+# Test.
+$obj = MARC::Validator::Plugin::Field655->new(
+	'record_id_def' => '015a',
+);
+$obj->init;
+$marc = MARC::File::XML->in($data_dir->file('cnb003689262-missing_008_programmed_texts-655a.xml')->s);
+$obj->process($marc->next);
+$ret = $obj->report;
+isa_ok($ret, 'Data::MARC::Validator::Report::Plugin');
+ok(defined $ret->module_name, 'Module name is defined.');
+ok(defined $ret->version, 'Version is defined.');
+is($ret->name, 'field_655', 'Get name (field_655).');
+$errors = $ret->plugin_errors;
+is(@{$errors}, 1, 'Get errors count (1).');
+is($errors->[0]->record_id, 'cnb003689262', 'Get record id (cnb003689262).');
+is($errors->[0]->errors->[0]->error, "Missing textbook nature of content in field 008.",
+	"Get error (Missing comics nature of content in field 008.).");
+is($errors->[0]->errors->[0]->params->{'field_008_nature_of_content'}, '    ',
+	'Get error parameter (field_008_nature_of_content => (    ).');
+is($errors->[0]->errors->[0]->params->{'field_655_a'}, decode_utf8('učebnice vysokých škol'),
+	'Get error parameter (field_655_a => (učebnice vysokých škol).');
 is($errors->[0]->errors->[0]->params->{'material'}, 'book', 'Get error parameter (material => (book).');

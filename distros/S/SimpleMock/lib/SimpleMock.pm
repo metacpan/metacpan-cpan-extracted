@@ -18,7 +18,7 @@ our @EXPORT_OK = qw(
     clear_mocks
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # mocks get stored in a stack, with globals as the first element
 our @MOCK_STACK = ( {} );
@@ -71,15 +71,16 @@ sub _load_mocks_for {
     my $original_filename = shift;
      _debug("_load_mocks_for($original_filename)");
     # Skip if the file is a SimpleMock file
-    return if $original_filename =~ /^SimpleMock/;
+    return if $original_filename =~ /^SimpleMock\b/;
 
     my $mock_filename = "SimpleMock/Mocks/$original_filename";
     eval {
         require $mock_filename;
     };
     if ($@) {
-        # mock doesn't exist
-        $@ =~ /Can't locate/ and return;
+        # mock doesn't exist — match only the file-not-found form so that
+        # "Can't locate object method" dies inside the mock file still surface
+        $@ =~ /\ACan't locate \S+ in \@INC/ and return;
         # mock is borked
         die "Error loading $mock_filename: $@";
     }

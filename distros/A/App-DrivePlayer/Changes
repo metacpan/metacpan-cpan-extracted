@@ -1,5 +1,31 @@
 Revision history for App::DrivePlayer.
 
+0.2.4 2026-04-17
+        - Sheet push is now a merge instead of a full replace: local
+          non-blank values overwrite the sheet, local blanks preserve
+          existing sheet values, and drive_ids only present on the sheet
+          are kept intact.  Prevents a device with partially-populated
+          metadata from wiping data pushed from another device.
+        - No longer auto-fetches metadata on startup.  If another device
+          has already populated metadata and synced it to the sheet, a
+          new device doesn't need to refetch.  Use Library → Fetch All
+          Metadata to trigger a fetch manually.
+        - Dropped the Composer field entirely (sheet, edit-metadata
+          dialog, metadata-fetch pipeline, and DB schema).  The only
+          source was embedded FLAC tags, which in practice populated
+          almost no tracks, so it was carrying no value.  Existing
+          databases have the column dropped on first run (SQLite >= 3.35).
+
+0.2.3 2026-04-17
+        - Edit Metadata dialog now auto-syncs to the Google Sheet after save,
+          so manual edits (e.g. fixing a genre) propagate to other devices
+          without waiting for the next Library → Sync.
+
+0.2.2 2026-04-16
+        - Fix duration_ms and genre not propagating to new devices on sheet
+          pull: duration_ms was overwritten by Drive scans (moved to metadata
+          fields) and was absent from skeleton-track creation.
+
 0.2.1 2026-04-16
         - Fix window height: replace alpha-strip button VBox with TreeView so
           the sidebar ScrolledWindow can properly constrain minimum height,

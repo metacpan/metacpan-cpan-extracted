@@ -1,0 +1,53 @@
+---
+abstract: 'Yote API Server - JSON RPC for persistent Perl objects'
+author:
+  - unknown
+build_requires:
+  Module::Build: '0.4'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yote-YapiServer
+provides:
+  Yote::YapiServer:
+    file: lib/Yote/YapiServer.pm
+    version: '0.02'
+  Yote::YapiServer::App::Base:
+    file: lib/Yote/YapiServer/App/Base.pm
+  Yote::YapiServer::App::Example:
+    file: lib/Yote/YapiServer/App/Example.pm
+  Yote::YapiServer::BaseObj:
+    file: lib/Yote/YapiServer/BaseObj.pm
+  Yote::YapiServer::Compiler:
+    file: lib/Yote/YapiServer/Compiler.pm
+  Yote::YapiServer::File:
+    file: lib/Yote/YapiServer/File.pm
+  Yote::YapiServer::Handler:
+    file: lib/Yote/YapiServer/Handler.pm
+  Yote::YapiServer::Session:
+    file: lib/Yote/YapiServer/Session.pm
+  Yote::YapiServer::Site:
+    file: lib/Yote/YapiServer/Site.pm
+  Yote::YapiServer::User:
+    file: lib/Yote/YapiServer/User.pm
+  Yote::YapiServer::YapiDef:
+    file: lib/Yote/YapiServer/YapiDef.pm
+requires:
+  Digest::MD5: '0'
+  IO::Socket::INET: '0'
+  JSON::PP: '0'
+  Time::HiRes: '0'
+  Time::Piece: '0'
+  YAML: '0'
+  Yote::SQLObjectStore: '0'
+  perl: v5.16.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

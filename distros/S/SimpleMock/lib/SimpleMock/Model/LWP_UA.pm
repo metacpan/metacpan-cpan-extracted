@@ -2,6 +2,8 @@ package SimpleMock::Model::LWP_UA;
 use strict;
 use warnings;
 use HTTP::Status qw(status_message);
+use HTTP::Response;
+use HTTP::Headers;
 use URI::QueryParam;
 use URI;
 use Data::Dumper;
@@ -10,7 +12,7 @@ use SimpleMock::Util qw(
     generate_args_sha
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub mock_send_request {
     my ($request, $ua, $h) = @_;

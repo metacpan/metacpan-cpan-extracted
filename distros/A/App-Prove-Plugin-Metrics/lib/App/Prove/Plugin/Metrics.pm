@@ -3,7 +3,7 @@ package App::Prove::Plugin::Metrics;
 use strict;
 use warnings;
 
-our $VERSION='0.0.3';
+our $VERSION='0.0.4';
 
 sub load {
 	my ($class,$opt)=@_;
@@ -25,7 +25,7 @@ App::Prove::Plugin::Metrics - Emit metrics when running prove
 
 =head1 VERSION
 
-Version 0.0.3
+Version 0.0.4
 
 =head1 SYNOPSIS
 

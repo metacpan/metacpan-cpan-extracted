@@ -178,7 +178,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 # VERSION
 
-    v0.4.0
+    v0.6.0
 
 # DESCRIPTION
 
@@ -1105,7 +1105,7 @@ Measured as `time()` around a cold `require` (modules not yet in `%INC`):
     require Module                     48 ms            32 ms
     require TimeZone standalone       180 ms           100 ms
 
-Startup time matters in short-lived scripts (cron jobs, CLI tools, CGI) where the process initialisation is a significant fraction of total runtime. For a long-running Plack/Mojolicious service, this cost is paid once and amortised over millions of requests.
+Startup time matters in short-lived scripts (cron jobs, CLI tools, CGI) where the process initialisation is a significant fraction of total runtime. For a long-running Apache2/mod\_perl2, Plack, or Mojolicious service, this cost is paid once and amortised over millions of requests.
 
 ## Memory (RSS after loading)
 

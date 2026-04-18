@@ -4,7 +4,7 @@ use parent qw/TAP::Harness/;
 use strict;
 use warnings;
 
-our $VERSION='0.0.3';
+our $VERSION='0.0.4';
 
 use Carp qw/confess/;
 use Fcntl qw/:flock/;
@@ -85,16 +85,29 @@ sub bubbled {
 	return $self->name(%event);
 }
 
-sub collate {
+sub collateRollup {
 	my ($self,@metrics)=@_;
 	my (%res,%count);
 	foreach my $event (@metrics) {
+		if(defined($$event{label})) {
+			foreach my $name ($self->name(%$event), ($$self{label}?$self->bubbled(%$event):())) {
+				$count{$name}++; $res{$name}+=$$event{pass} } }
+		else {
+			local($$self{label})=0;
+			foreach my $name ($self->bubbled(%$event)) {
+				$count{$name}++; $res{$name}+=$$event{pass} } }
+	}
+	foreach my $k (keys %res) { $res{$k}/=$count{$k} }
+	return %res;
+}
+
+sub collate {
+	my ($self,@metrics)=@_;
+	my (%res,%count);
+	if($$self{rollup}) { return $self->collateRollup(@metrics) }
+	foreach my $event (@metrics) {
 	foreach my $name ($self->name(%$event), ($$self{bubble}?$self->bubbled(%$event):())) {
-		$count{$name}++;
-		if($$self{rollup}) { $res{$name}+=$$event{pass} }
-		else { $res{$name}//=1; $res{$name}&&=$$event{pass} }
-	} }
-	if($$self{rollup}) { foreach my $k (keys %res) { $res{$k}/=$count{$k} } }
+		$count{$name}++; $res{$name}//=1; $res{$name}&&=$$event{pass} } }
 	return %res;
 }
 

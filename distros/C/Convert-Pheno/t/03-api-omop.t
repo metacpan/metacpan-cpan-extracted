@@ -6,7 +6,10 @@ use lib qw(./lib ../lib t/lib);
 use Test::More;
 use Test::Warn;
 use Test::ConvertPheno
-  qw(build_convert temp_output_file has_ohdsi_db structured_files_match);
+  qw(build_convert temp_output_file has_ohdsi_db structured_files_match load_csv_table
+  csv_headers_from_file write_csv_rows load_json_file);
+use File::Temp qw(tempdir);
+use File::Spec;
 
 my @snapshot_cases = (
     {
@@ -81,6 +84,76 @@ for my $case (@snapshot_cases) {
         ok( structured_files_match( 't/omop2bff/out/ohdsi.json', $tmp_file ),
             'omop2bff with OHDSI db matches reduced fixture' );
     }
+}
+
+{
+    my $tmp_dir = tempdir( CLEANUP => 1 );
+    my $concept_file = File::Spec->catfile( $tmp_dir, 'CONCEPT.csv' );
+    my $headers      = csv_headers_from_file('t/omop2bff/in/CONCEPT.csv');
+    my $rows         = load_csv_table('t/omop2bff/in/CONCEPT.csv');
+    my @filtered_rows =
+      grep { $_->{concept_id} ne '8507' && $_->{concept_id} ne '8532' } @{$rows};
+    write_csv_rows( $concept_file, $headers, \@filtered_rows );
+
+    my @in_files = (
+        $concept_file,
+        't/omop2bff/in/DRUG_EXPOSURE.csv',
+        't/omop2bff/in/PERSON.csv',
+    );
+
+    {
+        my $convert = build_convert(
+            in_files => \@in_files,
+            out_file => temp_output_file(),
+            method   => 'omop2bff',
+        );
+
+        my $error;
+        eval { $convert->omop2bff; 1 } or $error = $@;
+        like(
+            $error,
+            qr/Could not find concept_id:<(?:8507|8532)> in provided CONCEPT table\./,
+            'omop2bff without --ohdsi-db fails when gender concepts are missing locally'
+        );
+    }
+
+  SKIP: {
+        skip q{share/db/ohdsi.db is required for reduced OMOP concept fallback test}, 1
+          unless has_ohdsi_db();
+
+        my $tmp_file = temp_output_file();
+        my $convert  = build_convert(
+            in_files  => \@in_files,
+            out_file  => $tmp_file,
+            ohdsi_db  => 1,
+            method    => 'omop2bff',
+        );
+
+        $convert->omop2bff;
+        my $data = load_json_file($tmp_file);
+        my %sex_counts;
+        $sex_counts{ ( $_->{sex} || {} )->{label} }++ for @{$data};
+
+        is( $sex_counts{'Not Available'} || 0, 0,
+            'omop2bff with --ohdsi-db resolves missing gender concepts instead of degrading to Not Available' );
+    }
+}
+
+{
+    my $out_dir = tempdir( CLEANUP => 1 );
+    my $convert = build_convert(
+        in_files => ['t/omop2bff/in/omop_cdm_eunomia.sql'],
+        out_dir  => $out_dir,
+        out_file => temp_output_file(),
+        sql2csv  => 1,
+        method   => 'omop2bff',
+    );
+
+    $convert->omop2bff;
+
+    my $specimen_csv = File::Spec->catfile( $out_dir, 'SPECIMEN.csv' );
+    ok( -f $specimen_csv, 'sql2csv exports SPECIMEN.csv by default for supported OMOP tables' );
+    is_deeply( load_csv_table($specimen_csv), [], 'empty specimen fixture exports as an empty CSV table' );
 }
 
 done_testing();

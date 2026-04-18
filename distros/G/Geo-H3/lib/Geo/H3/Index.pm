@@ -4,8 +4,9 @@ use warnings;
 use base qw{Geo::H3::Base}; #provides new and ffi
 require Geo::H3::Geo;
 require Geo::H3::GeoBoundary;
+use List::Util qw{sum};
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -182,13 +183,36 @@ sub areaApprox {
 
 =head2 edgeLength
 
-Returns the exact edge length in meters of this hex.
+Returns the exact edge length in meters that this hex shares with the passed in neighbor.
+
+  my $edgeLength_meters = $hex->edgeLength(); #default hex is first kring neighbor
+  my $edgeLength_meters = $hex->edgeLength($neighbor_hex_obj);
 
 =cut
 
 sub edgeLength {
-  my $self = shift;
-  return $self->ffi->exactEdgeLengthM($self->uint64);
+  my $self     = shift;
+  my $neighbor = shift || [grep {$_->[1] == 1} @{$self->kRingDistances(1)}]->[0]->[0];  #default first kring
+  my $edge     = $self->ffi->getH3UnidirectionalEdge($self->uint64, $neighbor->uint64); #edges not exposed currently
+  return $self->ffi->exactEdgeLengthM($edge); 
+}
+
+=head2 edgeLengthAverage
+
+Returns the average of the exact edge lengths in meters of this hex. 
+
+=cut
+
+sub edgeLengthAverage {
+  my $self      = shift;
+  my @neighbors = map {$_->[0]} grep {$_->[1] == 1} @{$self->kRingDistances(1)};
+  my @edgeLengths = ();
+  foreach my $neighbor (@neighbors) {
+    my $edge       = $self->ffi->getH3UnidirectionalEdge($self->uint64, $neighbor->uint64);
+    my $edgeLength = $self->ffi->exactEdgeLengthM($edge);
+    push @edgeLengths, $edgeLength;
+  }
+  return @edgeLengths > 0 ? sum(@edgeLengths)/@edgeLengths : undef;
 }
 
 =head2 edgeLengthApprox

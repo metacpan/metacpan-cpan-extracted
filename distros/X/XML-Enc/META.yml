@@ -1,7 +1,7 @@
 ---
 abstract: 'A toolkit to help encrypt and decrypt XML Digital Signatures.'
 author:
-  - 'Timothy Legge <timlegge@cpan.org>'
+  - 'Timothy Legge <timlegge@gmail.com>'
 build_requires:
   Crypt::OpenSSL::Guess: '0'
   CryptX: '0'
@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ name: XML-Enc
 provides:
   XML::Enc:
     file: lib/XML/Enc.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Carp: '0'
   Crypt::AuthEnc::GCM: '0.062'
@@ -42,11 +42,11 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Enc/issues
-version: '0.15'
+version: '0.16'
 x_contributors:
   - 'Timothy Legge <timlegge@gmail.com>'
-x_generated_by_perl: v5.38.2
+x_generated_by_perl: v5.42.0
 x_maintainers:
-  - 'Timothy Legge <timlegge@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.74'
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

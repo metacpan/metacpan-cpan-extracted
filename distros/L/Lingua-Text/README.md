@@ -1,6 +1,6 @@
 # NAME
 
-Lingua::Text - Class to contain text many different languages
+Lingua::Text - Class to contain text in many different languages
 
 # VERSION
 
@@ -74,8 +74,8 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
-There's no decode() (yet) so you'll have to be extra careful to avoid
-double encoding.
+There's no decode() (yet),
+so you'll have to be extra careful to avoid double encoding.
 
 # SEE ALSO
 
@@ -115,5 +115,5 @@ Copyright 2021-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.
-All other users (for example Commercial, Charity, Educational, Government)
+All other users (for example, Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at \`&lt;njh at nigelhorne.com>\`.

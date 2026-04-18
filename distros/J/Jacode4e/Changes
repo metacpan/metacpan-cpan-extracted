@@ -1,5 +1,40 @@
 Revision history for this software.
 
+2.13.6.22 2026-04-18 00:00:00
+  - add t/9001_cheatsheet_ja.t (Japanese cheatsheet + tests)
+  - add t/9002_cheatsheet_en.t (English cheatsheet + tests)
+  - add t/9003_cheatsheet_zh_CN.t (Simplified Chinese cheatsheet + tests)
+  - add t/9004_cheatsheet_ko.t (Korean cheatsheet + tests)
+  - add t/9005_cheatsheet_zh_TW.t (Traditional Chinese cheatsheet + tests)
+  - add t/9006_cheatsheet_de.t (German cheatsheet + tests)
+  - add t/9007_cheatsheet_fr.t (French cheatsheet + tests)
+  - add t/9008_cheatsheet_es.t (Spanish cheatsheet + tests)
+  - add t/9009_cheatsheet_pt.t (Portuguese cheatsheet + tests)
+  - add t/9010_cheatsheet_it.t (Italian cheatsheet + tests)
+  - add t/9011_cheatsheet_ru.t (Russian cheatsheet + tests)
+  - add t/9012_cheatsheet_ar.t (Arabic cheatsheet + tests)
+  - add t/9013_cheatsheet_hi.t (Hindi cheatsheet + tests)
+  - add t/9014_cheatsheet_th.t (Thai cheatsheet + tests)
+  - add t/9015_cheatsheet_vi.t (Vietnamese cheatsheet + tests)
+  - add t/9016_cheatsheet_id.t (Indonesian cheatsheet + tests)
+  - add t/9017_cheatsheet_nl.t (Dutch cheatsheet + tests)
+  - add t/9018_cheatsheet_pl.t (Polish cheatsheet + tests)
+  - add t/9020_cheatsheet_tr.t (Turkish cheatsheet + tests)
+  - add t/9021_cheatsheet_bm.t (Malay cheatsheet + tests)
+  - add t/9022_cheatsheet_bn.t (Bengali cheatsheet + tests)
+  - add t/9023_cheatsheet_km.t (Khmer cheatsheet + tests)
+  - add t/9024_cheatsheet_mn.t (Mongolian cheatsheet + tests)
+  - add t/9025_cheatsheet_my.t (Burmese cheatsheet + tests)
+  - add t/9026_cheatsheet_ne.t (Nepali cheatsheet + tests)
+  - add t/9027_cheatsheet_si.t (Sinhala cheatsheet + tests)
+  - add t/9028_cheatsheet_tl.t (Filipino/Tagalog cheatsheet + tests)
+  - add t/9029_cheatsheet_ur.t (Urdu cheatsheet + tests)
+  - add t/9030_cheatsheet_uz.t (Uzbek cheatsheet + tests)
+  - add t/9050_podtest_G11.t (Pod::Checker >= 1.51 guard)
+  - add t/9051_podtest_G12.t (Pod::Checker >= 1.60 guard)
+  - add SECURITY.md
+  - created by INABA Hitoshi
+
 2.13.6.21 2023-03-22 00:00:00
   - update POD
   - created by INABA Hitoshi

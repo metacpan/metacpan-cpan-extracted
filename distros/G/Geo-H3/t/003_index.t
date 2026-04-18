@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 use Test::Number::Delta;
-use Test::More tests => 43;
+use Test::More tests => 44;
 use FFI::CheckLib qw{find_lib};
 my $lib = find_lib(lib=>'h3');
 
 SKIP: {
-  skip 'libh3 not available', 41 unless $lib;
+  skip 'libh3 not available', 44 unless $lib;
   
   require_ok 'Geo::H3::Index';
 
@@ -66,11 +66,9 @@ SKIP: {
     is($h3->areaApprox, 15047.5, 'areaApprox');
     is($h3->areNeighbors(Geo::H3::Index->new(string=>"8a2aaaa2e767fff")), 1, 'areNeighbors'); #kring 1
     is($h3->areNeighbors(Geo::H3::Index->new(string=>"8a2aaaa2e0dffff")), 0, 'areNeighbors'); #kring 2
-    {
-      local $TODO = "Fix exactEdgeLengthM in Geo::H3::FFI";
-      is($h3->edgeLength, 99999, 'edgeLength');
-    }
-    is($h3->edgeLengthApprox, 65.90780749, 'edgeLengthApprox ');
+    delta_within($h3->edgeLength, 77.3100806756333, 1e-7, 'edgeLength');
+    delta_within($h3->edgeLengthAverage, 74.98080357, 1e-7, 'edgeLengthAverage');
+    is($h3->edgeLengthApprox, 65.90780749, 'edgeLengthApprox');
   }
   {
     #h3ToComponents -v --index 821c07fffffffff

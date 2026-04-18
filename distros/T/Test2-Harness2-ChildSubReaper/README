@@ -1,44 +1,79 @@
 NAME
 
-    Test2::Harness2::ChildSubReaper - Tiny XS wrapper around Linux's
-    PR_SET_CHILD_SUBREAPER prctl.
+    Test2::Harness2::ChildSubReaper - Cross-platform wrapper to mark the
+    current process as a child subreaper.
 
 DESCRIPTION
 
-    This distribution exists solely to let Test2::Harness2 ask the Linux
-    kernel to make the current process a "subreaper" for its descendants.
+    This distribution exists solely to let Test2::Harness2 ask the kernel
+    to make the current process a "subreaper" for its descendants.
 
-    On Linux (kernel 3.4 or newer), a process that sets
-    PR_SET_CHILD_SUBREAPER becomes the adoptive parent of any descendant
-    process that gets orphaned, instead of that descendant reparenting to
-    init(1). This lets long-running services such as the Test2-Harness2
-    service reliably waitpid grandchildren and guarantee cleanup when a
-    test double-forks or calls setsid followed by a parent exit.
+    A process with the subreaper flag set becomes the adoptive parent of
+    any descendant that gets orphaned (its immediate parent exits, as in a
+    double-fork or setsid + parent exit), instead of that descendant
+    reparenting to init(1). This lets long-running services such as the
+    Test2-Harness2 service reliably waitpid grandchildren and guarantee
+    cleanup on a hard stop.
 
     The surface area is intentionally minimal: this module exposes exactly
-    one prctl operation and nothing else. It is meant to replace
-    Linux::Prctl as an optional runtime dependency of Test2-Harness2
-    without pulling in the full prctl(2) surface.
+    this one kernel concept, mapped to the native primitive on each
+    supported platform, and nothing else.
+
+ Supported backends
+
+    Linux (3.4+)
+
+      prctl(PR_SET_CHILD_SUBREAPER, ...). subreaper_mechanism() returns
+      "prctl".
+
+    FreeBSD (10.2+), DragonFlyBSD
+
+      procctl(P_PID, getpid(), PROC_REAP_ACQUIRE | PROC_REAP_RELEASE,
+      NULL). subreaper_mechanism() returns "procctl".
+
+    Any other OS (macOS, OpenBSD, NetBSD, Windows, ...)
+
+      The module installs and loads cleanly, but no backend compiles in.
+      have_subreaper_support() returns 0, subreaper_mechanism() returns
+      undef, and set_child_subreaper returns 0 with $! set to ENOSYS.
 
 SYNOPSIS
 
-        use Test2::Harness2::ChildSubReaper qw/set_child_subreaper have_subreaper_support/;
+        use Test2::Harness2::ChildSubReaper qw/
+            set_child_subreaper
+            have_subreaper_support
+            subreaper_mechanism
+        /;
     
         if (have_subreaper_support()) {
-            set_child_subreaper(1) or warn "prctl failed: $!";
+            set_child_subreaper(1)
+                or warn "subreaper setup failed: $!";
+            warn "subreaper backend: " . subreaper_mechanism();
         }
 
 EXPORTS
 
-    Neither function is exported by default. Request them explicitly.
+    None of the functions are exported by default. Request them explicitly.
 
     $bool = have_subreaper_support()
 
-      Returns 1 if this build of the module was compiled with support for
-      PR_SET_CHILD_SUBREAPER (i.e. compiled on Linux with the macro
-      available in <sys/prctl.h>). Returns 0 otherwise.
+      Returns 1 if this build of the module was compiled with a real
+      backend (Linux PR_SET_CHILD_SUBREAPER or BSD PROC_REAP_ACQUIRE).
+      Returns 0 otherwise.
 
       Safe to call on any platform. Does not make any syscalls.
+
+    $name = subreaper_mechanism()
+
+      Returns a short string identifying the compiled-in backend: "prctl"
+      on Linux, "procctl" on FreeBSD/DragonFlyBSD, or undef when no backend
+      is available.
+
+      Invariant: !!have_subreaper_support() ==
+      defined(subreaper_mechanism()).
+
+      Useful for startup logs and for diagnostics where the caller wants to
+      surface which path the kernel is actually taking.
 
     $ok = set_child_subreaper($bool)
 
@@ -46,24 +81,26 @@ EXPORTS
       flag on the current process.
 
       Returns 1 on success, 0 on failure with $! (errno) set by the kernel.
-      On platforms where support was not compiled in, returns 0 and sets $!
+      On platforms where no backend was compiled in, returns 0 and sets $!
       to ENOSYS.
 
-      No exception is thrown for runtime failures such as EPERM; the caller
-      chooses whether to warn, die, or carry on.
+      Follows the Perl syscall convention: does not throw on runtime
+      failures such as EPERM. The caller chooses whether to warn, die, or
+      carry on.
 
 PORTABILITY
 
     The module installs cleanly on any platform Perl can build XS on, so
     listing it as an optional or suggested dependency will not cause
-    installation failures on non-Linux systems. The XS file guards the real
-    prctl call with #ifdef __linux__ and #ifdef PR_SET_CHILD_SUBREAPER;
-    platforms without the macro get a stub that always returns 0 with $!
-    set to ENOSYS.
+    installation failures. Platform resolution happens at compile time via
+    #ifdef __linux__, #ifdef __FreeBSD__, and #ifdef __DragonFly__ guards,
+    plus macro checks for the specific kernel operations. Any platform not
+    matched falls through to a stub that always returns 0 with $! set to
+    ENOSYS.
 
 SEE ALSO
 
-    Test2::Harness2, prctl(2), Linux::Prctl.
+    Test2::Harness2, prctl(2), procctl(2).
 
 SOURCE
 

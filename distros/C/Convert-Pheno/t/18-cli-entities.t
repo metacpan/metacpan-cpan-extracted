@@ -10,8 +10,11 @@ use Test::ConvertPheno qw(
   cli_script_path
   ensure_clean_dir
   remove_dir_if_exists
+  has_ohdsi_db
   load_data_file
   load_json_file
+  csv_files_match
+  test_tmpdir
   write_json_file
 );
 
@@ -20,6 +23,7 @@ plan skip_all => "convert-pheno CLI not found at $cli" unless -f $cli;
 
 my $out_dir = ensure_clean_dir('t/cli-entities-out');
 my $input_file = File::Spec->catfile( $out_dir, 'pxf-biosamples.json' );
+my $tmpdir = test_tmpdir();
 
 write_json_file(
     $input_file,
@@ -64,7 +68,7 @@ my @custom_cmd = (
     '-obff',
     '--entities', 'biosamples',
     '--out-dir', $custom_out_dir,
-    '--out-entity', 'biosamples=samples.json',
+    '--out-name', 'biosamples=samples.json',
     '-O',
 );
 
@@ -83,7 +87,7 @@ my @multi_cmd = (
     '-obff',
     '--entities', 'individuals', 'biosamples',
     '--out-dir', $multi_out_dir,
-    '--out-entity', 'biosamples=samples.json',
+    '--out-name', 'biosamples=samples.json',
     '-O',
 );
 
@@ -148,7 +152,7 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
         },
     };
 
-    my ( $fh, $mapping_file ) = tempfile( DIR => '/tmp', SUFFIX => '.json', UNLINK => 1 );
+    my ( $fh, $mapping_file ) = tempfile( DIR => $tmpdir, SUFFIX => '.json', UNLINK => 1 );
     close $fh;
     write_json_file( $mapping_file, $mapping );
 
@@ -186,10 +190,10 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
 }
 
 {
-    my $legacy_out_dir = ensure_clean_dir('t/cli-entities-legacy-out');
-    my $legacy_out_file = File::Spec->catfile( $legacy_out_dir, 'individuals.json' );
+    my $single_file_out_dir = ensure_clean_dir('t/cli-entities-single-file-out');
+    my $single_file_out_file = File::Spec->catfile( $single_file_out_dir, 'individuals.json' );
     my ( $fh, $log_file ) =
-      tempfile( DIR => '/tmp', SUFFIX => '.cli.log', UNLINK => 1 );
+      tempfile( DIR => $tmpdir, SUFFIX => '.cli.log', UNLINK => 1 );
     my $pid = fork();
     die 'fork failed' unless defined $pid;
 
@@ -200,7 +204,7 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
             $^X,
             $cli,
             '-ipxf', $input_file,
-            '-obff', $legacy_out_file,
+            '-obff', $single_file_out_file,
             '-O',
         ) or die "exec failed: $!";
     }
@@ -211,27 +215,27 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
     my $output = <$fh>;
     close $fh;
 
-    is( $? >> 8, 0, 'CLI keeps legacy pxf2bff single-output mode working when biosamples are present' );
+    is( $? >> 8, 0, 'CLI keeps individuals-only pxf2bff output working when biosamples are present' );
     like(
         $output,
         qr/Warning: input PXF contains biosamples\./,
-        'CLI warns when legacy pxf2bff output hides first-class biosamples'
+        'CLI warns when individuals-only pxf2bff output hides first-class biosamples'
     );
-    ok( -f $legacy_out_file, 'CLI still writes the legacy individuals output file' );
+    ok( -f $single_file_out_file, 'CLI still writes the individuals-only output file' );
 
-    my $legacy_individuals = load_json_file($legacy_out_file);
+    my $single_file_individuals = load_json_file($single_file_out_file);
     is(
-        $legacy_individuals->[0]{info}{phenopacket}{biosamples}[0]{id},
+        $single_file_individuals->[0]{info}{phenopacket}{biosamples}[0]{id},
         'bio-1',
-        'legacy pxf2bff output still preserves biosamples under info.phenopacket.biosamples'
+        'individuals-only pxf2bff output still preserves biosamples under info.phenopacket.biosamples'
     );
 
-    remove_dir_if_exists($legacy_out_dir);
+    remove_dir_if_exists($single_file_out_dir);
 }
 
 {
     my ( $fh, $log_file ) =
-      tempfile( DIR => '/tmp', SUFFIX => '.cli.log', UNLINK => 1 );
+      tempfile( DIR => $tmpdir, SUFFIX => '.cli.log', UNLINK => 1 );
     my $pid = fork();
     die 'fork failed' unless defined $pid;
 
@@ -263,7 +267,7 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
 
 {
     my ( $fh, $log_file ) =
-      tempfile( DIR => '/tmp', SUFFIX => '.cli.log', UNLINK => 1 );
+      tempfile( DIR => $tmpdir, SUFFIX => '.cli.log', UNLINK => 1 );
     my $pid = fork();
     die 'fork failed' unless defined $pid;
 
@@ -295,7 +299,7 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
 
 {
     my ( $fh, $log_file ) =
-      tempfile( DIR => '/tmp', SUFFIX => '.cli.log', UNLINK => 1 );
+      tempfile( DIR => $tmpdir, SUFFIX => '.cli.log', UNLINK => 1 );
     my $pid = fork();
     die 'fork failed' unless defined $pid;
 
@@ -327,7 +331,7 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
 
 {
     my ( $fh, $log_file ) =
-      tempfile( DIR => '/tmp', SUFFIX => '.cli.log', UNLINK => 1 );
+      tempfile( DIR => $tmpdir, SUFFIX => '.cli.log', UNLINK => 1 );
     my $pid = fork();
     die 'fork failed' unless defined $pid;
 
@@ -338,7 +342,7 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
             $^X,
             $cli,
             '-ipxf', $input_file,
-            '--out-entity', 'biosamples=samples.json'
+            '--out-name', 'biosamples=samples.json'
         ) or die "exec failed: $!";
     }
 
@@ -348,12 +352,47 @@ is( $cohorts->[0]{cohortSize}, 1, 'cohorts output records the cohort size' );
     my $output = <$fh>;
     close $fh;
 
-    isnt( $? >> 8, 0, 'CLI rejects --out-entity without --entities' );
+    isnt( $? >> 8, 0, 'CLI rejects --out-name without a compatible multi-file output mode' );
     like(
         $output,
-        qr/The flag <--out-entity> requires <--entities>/,
-        'CLI prints a focused error for --out-entity without --entities'
+        qr/The flag <--out-name> requires either entity-aware BFF output or OMOP output/,
+        'CLI prints a focused error for --out-name without a compatible multi-file output mode'
     );
+}
+
+SKIP: {
+    skip 'share/db/ohdsi.db is required for bff2omop CLI naming test', 5
+      unless has_ohdsi_db();
+
+    my $omop_out_dir = ensure_clean_dir('t/cli-omop-out');
+    my @omop_cmd = (
+        $^X,
+        $cli,
+        '-ibff', 't/bff2omop/in/individuals.json',
+        '-oomop',
+        '--out-dir', $omop_out_dir,
+        '--out-name', 'PERSON=patients.csv',
+        '--ohdsi-db',
+        '--test',
+        '-O',
+    );
+
+    my $omop_status = system @omop_cmd;
+    is( $omop_status, 0, 'CLI writes OMOP tables into --out-dir without a prefix' );
+
+    my $renamed_person = File::Spec->catfile( $omop_out_dir, 'patients.csv' );
+    my $default_person = File::Spec->catfile( $omop_out_dir, 'PERSON.csv' );
+    my $default_obs    = File::Spec->catfile( $omop_out_dir, 'OBSERVATION.csv' );
+
+    ok( -f $renamed_person, 'CLI honors --out-name for OMOP table output' );
+    ok( !-f $default_person, 'CLI does not also write the default PERSON.csv when overridden' );
+    ok( -f $default_obs, 'CLI keeps default OMOP table names for non-overridden tables' );
+    ok(
+        csv_files_match( 't/bff2omop/out/eunomia_PERSON.csv', $renamed_person ),
+        'renamed PERSON.csv still matches the reference OMOP content'
+    );
+
+    remove_dir_if_exists($omop_out_dir);
 }
 
 remove_dir_if_exists($out_dir);

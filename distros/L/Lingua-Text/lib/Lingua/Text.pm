@@ -7,20 +7,21 @@ use Carp;
 use HTML::Entities;
 use Params::Get;
 use Scalar::Util;
+use I18N::LangTags::Detect;
 
 # TODO: Investigate Locale::Maketext
 
 =head1 NAME
 
-Lingua::Text - Class to contain text many different languages
+Lingua::Text - Class to contain text in many different languages
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use overload (
 	# '==' => \&equal,
@@ -63,7 +64,7 @@ Create a Lingua::Text object.
 
     my $str = Lingua::Text->new({ 'en' => 'Here', 'fr' => 'Ici' });
 
-Accepts various input formats, e.g. HASH or reference to a HASH.
+Accepts various input formats, e.g., HASH or reference to a HASH.
 Clones existing objects with or without modifications.
 Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
@@ -143,6 +144,11 @@ sub set
 # https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
 sub _get_language
 {
+	for my $tag (I18N::LangTags::Detect::detect()) {
+		if ($tag =~ /^([a-z]{2})/i) {
+			return lc($1);
+		}
+	}
 	if(($ENV{'LANGUAGE'}) && ($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i)) {
 		return lc($1);
 	}
@@ -152,7 +158,8 @@ sub _get_language
 		next unless(defined($val));
 
 		if($val =~ /^([a-z]{2})/i) {
-			return lc($1);
+			$val = lc($1);
+			return lc($val) if _is_valid_language($val);
 		}
 	}
 
@@ -230,6 +237,11 @@ sub AUTOLOAD
 	# Ensure the key is called on the correct package object
 	return unless ref($self) eq __PACKAGE__;
 
+	# Only allow 2-letter language codes
+	return unless $key =~ /^[a-z]{2}$/i;
+
+	return unless _is_valid_language($key);
+
 	if(my $value = shift) {
 		# Set the requested language ($key) to the given text ($value)
 		$self->{'texts'}->{$key} = $value;
@@ -239,14 +251,20 @@ sub AUTOLOAD
 	return $self->{'texts'}->{$key};
 }
 
+# Language validation
+sub _is_valid_language {
+	my $lang = shift;
+	return $lang =~ /^[a-z]{2}(?:_[A-Z]{2})?$/;  # en or en_US format
+}
+
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
-There's no decode() (yet) so you'll have to be extra careful to avoid
-double encoding.
+There's no decode() (yet),
+so you'll have to be extra careful to avoid double encoding.
 
 =head1 SEE ALSO
 
@@ -286,11 +304,11 @@ L<http://deps.cpantesters.org/?module=Lingua-Text>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2021-2025 Nigel Horne.
+Copyright 2021-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.
-All other users (for example Commercial, Charity, Educational, Government)
+All other users (for example, Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
 
 =cut

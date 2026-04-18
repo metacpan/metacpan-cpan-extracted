@@ -3,24 +3,23 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Jacode4e
-version: 2.13.6.21
+version: 2.13.6.22
 abstract: Converts Character Encodings for Enterprise in Japan
 author:
   - ina <ina@cpan.org>
 license: perl
 generated_by: pmake.bat
 requires:
-  ExtUtils::MakeMaker: 5.4302
-  File::Basename: 2.6
-  File::Copy: 2.02
-  File::Path: 1.0401
-  FindBin: 1.42
-  Socket: 0
-  lib: 0
   perl: 5.00503
   strict: 1.01
 build_requires:
   Test: 1.122
+minimum_perl_version: 5.00503
+provides:
+  Jacode4e:
+    file: lib/Jacode4e.pm
+    version: 2.13.6.22
 resources:
   license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/Jacode4e/issues
   repository: https://github.com/ina-cpan/Jacode4e

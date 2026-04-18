@@ -1,13 +1,13 @@
-"App::Prove::Plugin::Metrics" Version 0.0.3
+"App::Prove::Plugin::Metrics" Version 0.0.4
 
 Abstract:
 ---------
 This package provides a mechanism to emit pass-rate metrics from Perl unit tests executed with the `prove` testing tool.
 
-What's new in version 0.0.3:
-----------------------------
+What's new in recent versions:
+------------------------------
+* Defined basic rollup functionality
 * "No tests run for subtest" emit as failures
-* Subtest names also bubble up as labels by default
 * Unlabeled assertions are handled properly
 
 Copyright & License:

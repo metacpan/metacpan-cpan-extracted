@@ -221,6 +221,20 @@ my $update = $manager->update('alpha-skill');
 ok( !$update->{error}, 'skill update refreshes the checkout cleanly' ) or diag $update->{error};
 my $updated_dispatch = $dispatcher->dispatch( 'alpha-skill', 'run-test', 'three' );
 like( $updated_dispatch->{stdout}, qr/updated:three/, 'updated skill command executes the refreshed checkout' );
+_write_file(
+    File::Spec->catfile( $install->{path}, 'skills', 'level1', 'skills', 'level2', 'cli', 'here' ),
+    <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "deep:", join('|', @ARGV), "\n";
+PL
+    0755,
+);
+my $deep_nested_dispatch = $dispatcher->dispatch( 'alpha-skill', 'level1.level2.here', 'four' );
+ok( !$deep_nested_dispatch->{error}, 'dispatcher resolves multi-level nested skill trees addressed through dotted command tails' )
+  or diag $deep_nested_dispatch->{error};
+like( $deep_nested_dispatch->{stdout}, qr/deep:four/, 'multi-level nested skill command executes from its deepest nested cli root' );
 
 my $beta_repo = _create_skill_repo(
     'beta-skill',
@@ -452,6 +466,23 @@ my ( $dotted_skill_stdout, $dotted_skill_stderr, $dotted_skill_exit ) = capture 
 };
 is( $dotted_skill_exit >> 8, 0, 'dashboard <skill>.<command> dispatch exits cleanly' );
 like( $dotted_skill_stdout, qr/updated:cli-dot/, 'dashboard <skill>.<command> routes into the installed skill command' );
+
+make_path( File::Spec->catdir( $install->{path}, 'skills', 'foo', 'cli' ) );
+_write_file(
+    File::Spec->catfile( $install->{path}, 'skills', 'foo', 'cli', 'foo' ),
+    <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "nested:", join('|', @ARGV), "\n";
+PL
+    0755,
+);
+my ( $nested_skill_stdout, $nested_skill_stderr, $nested_skill_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'alpha-skill.foo.foo', 'nested-arg' );
+};
+is( $nested_skill_exit >> 8, 0, 'dashboard <skill>.<nested-skill>.<command> dispatch exits cleanly' );
+like( $nested_skill_stdout, qr/nested:nested-arg/, 'dashboard dotted dispatch resolves nested skills/<repo>/cli commands inside an installed skill' );
 
 my ( $uninstall_stdout, $uninstall_stderr, $uninstall_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'uninstall', 'alpha-skill' );

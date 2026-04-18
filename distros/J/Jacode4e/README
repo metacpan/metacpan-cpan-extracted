@@ -39,7 +39,7 @@ SYNOPSIS
       jipse         NEC JIPS(E)
       letsj         UNISYS LetsJ
       utf8          UTF-8.0 (aka UTF-8)
-      utf8.1        UTF-8.1
+      utf8.1        UTF-8.1 (conversion based on Shift_JIS-Unicode mapping, not CP932)
       utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
       -----------------------------------------------------------------------
 

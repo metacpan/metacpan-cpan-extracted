@@ -172,7 +172,14 @@ Returns the average area in square meters of hexes at this resolution.
 
 ### edgeLength
 
-Returns the exact edge length in meters of this hex.
+Returns the exact edge length in meters that this hex shares with the passed in neighbor.
+
+    my $edgeLength_meters = $hex->edgeLength(); #default hex is first kring neighbor
+    my $edgeLength_meters = $hex->edgeLength($neighbor_hex_obj);
+
+### edgeLengthAverage
+
+Returns the average of the exact edge lengths in meters of this hex. 
 
 ### edgeLengthApprox
 
@@ -242,7 +249,7 @@ Returns the hex ring of this hex as an array reference of [Geo::H3::Index](https
 
 ### areNeighbors
 
-Returns whether or not the provided hex object are neighbors.
+Returns a 1 or 0 based on whether or not the provided hex object is a neighbor.
 
     my $areNeighbors = $start_hex->areNeighbors($end_hex);
 

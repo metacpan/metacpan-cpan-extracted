@@ -65,10 +65,6 @@ __PACKAGE__->add_columns(
         data_type   => 'text',
         is_nullable => 1,
     },
-    composer => {
-        data_type   => 'text',
-        is_nullable => 1,
-    },
     comment => {
         data_type   => 'text',
         is_nullable => 1,
@@ -111,6 +107,7 @@ a L<App::DrivePlayer::Schema::Result::Folder>.
 
 Columns: C<id>, C<drive_id>, C<title>, C<artist>, C<album>,
 C<track_number>, C<year>, C<duration_ms>, C<size>, C<mime_type>,
-C<modified_time>, C<folder_id>, C<folder_path>.
+C<modified_time>, C<folder_id>, C<folder_path>, C<genre>, C<comment>,
+C<metadata_fetched>.
 
 =cut

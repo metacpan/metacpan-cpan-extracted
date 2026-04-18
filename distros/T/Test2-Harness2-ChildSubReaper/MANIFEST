@@ -11,8 +11,10 @@ README
 cpanfile
 dist.ini
 lib/Test2/Harness2/ChildSubReaper.pm
+subreaper_impl.h
 t/00-load.t
 t/10-have-support.t
+t/15-mechanism.t
 t/20-set-success.t
 t/30-set-without-support.t
 t/40-subreaper-behavior.t

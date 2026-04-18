@@ -13,6 +13,10 @@ our @EXPORT_OK = qw(
   transform_item
   finalize_stream_out
   omop_dispatcher
+  omop_stream_targets_open
+  omop_stream_targets_write
+  omop_stream_targets_finalize
+  omop_streams_multiple_entities
 );
 
 sub dispatcher_open_stream_out {
@@ -68,6 +72,103 @@ sub omop_dispatcher {
     }
     chomp $out;
     return \$out;
+}
+
+sub omop_streams_multiple_entities {
+    my ($self) = @_;
+    my @entities = @{ $self->{entities} || ['individuals'] };
+    return @entities != 1 || $entities[0] ne 'individuals';
+}
+
+sub omop_stream_targets_open {
+    my ($self) = @_;
+    return $self->{_omop_stream_targets}
+      if exists $self->{_omop_stream_targets};
+
+    my @entities = @{ $self->{entities} || ['individuals'] };
+    my %targets;
+
+    for my $entity (@entities) {
+        my $path = _stream_output_path( $self, $entity );
+        my $fh   = Convert::Pheno::open_filehandle( $path, 'w' );
+        $targets{$entity} = {
+            fh   => $fh,
+            path => $path,
+        };
+    }
+
+    $self->{_omop_stream_targets} = \%targets;
+    $self->{_omop_stream_seen}    = {};
+    return $self->{_omop_stream_targets};
+}
+
+sub omop_stream_targets_write {
+    my ( $self, $result ) = @_;
+    my $targets = omop_stream_targets_open($self);
+    my $json    = JSON::XS->new->canonical;
+    my $seen    = $self->{_omop_stream_seen} ||= {};
+
+    if ( ref($result) && $result->can('entities') ) {
+        for my $entity ( keys %{$targets} ) {
+            for my $entry ( @{ $result->entities($entity) } ) {
+                next if _stream_entity_entry_seen( $seen, $entity, $entry );
+                print { $targets->{$entity}{fh} } $json->encode($entry), "\n";
+            }
+        }
+        return 1;
+    }
+
+    return 1 unless defined $result;
+    return 1 unless exists $targets->{individuals};
+    return 1 if _stream_entity_entry_seen( $seen, 'individuals', $result );
+
+    print { $targets->{individuals}{fh} } $json->encode($result), "\n";
+    return 1;
+}
+
+sub omop_stream_targets_finalize {
+    my ($self) = @_;
+    return 1 unless exists $self->{_omop_stream_targets};
+
+    for my $entity ( keys %{ $self->{_omop_stream_targets} } ) {
+        close $self->{_omop_stream_targets}{$entity}{fh};
+    }
+
+    delete $self->{_omop_stream_targets};
+    delete $self->{_omop_stream_seen};
+    return 1;
+}
+
+sub _stream_entity_entry_seen {
+    my ( $seen, $entity, $entry ) = @_;
+    return 0
+      unless $entity eq 'individuals'
+      && ref($entry) eq 'HASH'
+      && exists $entry->{id}
+      && defined $entry->{id};
+
+    return 1 if $seen->{$entity}{ $entry->{id} }++;
+    return 0;
+}
+
+sub _stream_output_path {
+    my ( $self, $entity ) = @_;
+
+    if ( !omop_streams_multiple_entities($self)
+        && $entity eq 'individuals'
+        && defined $self->{out_file}
+        && length $self->{out_file} )
+    {
+        return $self->{out_file};
+    }
+
+    if ( exists $self->{output_name_overrides}
+        && exists $self->{output_name_overrides}{$entity} )
+    {
+        return $self->{output_name_overrides}{$entity};
+    }
+
+    return $self->{out_dir} . q{/} . $entity . '.json';
 }
 
 1;

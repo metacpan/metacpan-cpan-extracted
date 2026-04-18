@@ -1,5 +1,5 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.14';
+$VERSION = '2.13.81.15';
 '有朋自遠方来不亦楽乎'=~/^\xE6\x9C\x89/ or die "Perl script '@{[__FILE__]}' must be UTF-8 encoding.\n";
 # 如果您可以阅读此字符，则可以通过选择所有内容并将其保存为文件名“Jacode4e/RoundTrip.pm”来将其用作模块。
 # 如果您可以閱讀此字符，則可以通過選擇所有內容並將其保存為文件名“Jacode4e/RoundTrip.pm”來將其用作模塊。
@@ -10,7 +10,7 @@ $VERSION = '2.13.81.14';
 #
 # Jacode4e::RoundTrip - Converts JIS X 0213 Encodings with Round-Trip
 #
-# Copyright (c) 2018, 2019, 2021, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2021, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 $VERSION = $VERSION;
@@ -1034,7 +1034,7 @@ B<TO ROUND-TRIP CONVERTION, MUST USE SAME VERSION OF THIS SOFTWARE WHEN "A to B"
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
- 
+
   $char_count =
   Jacode4e::RoundTrip::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
 
@@ -1044,7 +1044,11 @@ Count of characters in $line
 
 =head2 $line
 
+String to convert. Passed by reference and overwritten in place.
+
 =head2 $OUTPUT_encoding
+
+The encoding mnemonic for output. See encoding table below.
 
 =head2 $INPUT_encoding
 
@@ -1067,7 +1071,7 @@ You can use mnemonic as encoding name of $INPUT_encoding and $OUTPUT_encoding:
   jipse         NEC JIPS(E)
   letsj         UNISYS LetsJ
   utf8          UTF-8.0 (aka UTF-8)
-  utf8.1        UTF-8.1
+  utf8.1        UTF-8.1 (conversion based on Shift_JIS-Unicode mapping, not CP932)
   utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
   -----------------------------------------------------------------------
 
@@ -2326,17 +2330,17 @@ Thank you, Culti Co.,Ltd-san.!
 =head1 HELLO WORLD
 
  To support JIS X 0213:2004,
- 
+
      Using ghost character 1-55-27(it's me!),
- 
+
  Found by JIS X 0208:1997,
- 
+
      Was born in JIS C 6226-1978.
- 
+
  Hello world,
- 
+
      What do we hack, today?
- 
+
                 -- 1-55-27, 2018-01-27
 
 =cut

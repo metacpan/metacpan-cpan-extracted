@@ -3,7 +3,6 @@ use POSIX ();
 
 use Test2::Harness2::ChildSubReaper qw/set_child_subreaper have_subreaper_support/;
 
-skip_all "Linux-only"                         unless $^O eq 'linux';
 skip_all "no subreaper support in this build" unless have_subreaper_support();
 
 # Run in a fresh forked process so the test process itself is not left

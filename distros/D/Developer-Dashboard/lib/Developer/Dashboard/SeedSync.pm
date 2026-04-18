@@ -3,7 +3,7 @@ package Developer::Dashboard::SeedSync;
 use strict;
 use warnings;
 
-our $VERSION = '2.43';
+our $VERSION = '2.46';
 
 use Digest::MD5 qw(md5_hex);
 use Encode qw(encode_utf8);
@@ -77,7 +77,7 @@ files need to be rewritten.
 
 =head1 PURPOSE
 
-This module provides the MD5-based content comparison helpers used when the dashboard stages private helpers and seeds starter pages. It answers the question “did the shipped managed content actually change?” without relying on external checksum tools.
+This module provides the MD5-based content comparison helpers used when the dashboard stages private helpers and seeds starter pages. It answers the question "did the shipped managed content actually change?" without relying on external checksum tools.
 
 =head1 WHY IT EXISTS
 

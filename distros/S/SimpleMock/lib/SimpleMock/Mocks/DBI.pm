@@ -4,7 +4,7 @@ use warnings;
 
 no warnings 'redefine';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
             
 my $orig_connect = \&DBI::connect;
      

@@ -10,13 +10,7 @@ use Markdown::Parser;
 use Markdown::Parser::Document;
 use ODF::lpOD;
 
-our $VERSION = '0.02';
-
-{
-    # Silence warnings from ODF package
-    package ODF::lpOD::Element;
-    sub DESTROY {}
-}
+our $VERSION = '0.03';
 
 =head1 NAME
 

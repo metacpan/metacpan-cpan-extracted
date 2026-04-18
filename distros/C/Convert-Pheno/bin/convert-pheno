@@ -47,10 +47,13 @@ Usage:
   convert-pheno -ipxf <infile> -obff --entities <list> --out-dir <dir> [options]
 
 Common input flags:
-  -i <type> <file>    Generic input form (pxf|bff|omop|redcap|cdisc|csv)
+  -i <type> <file>    Generic input form (pxf|bff|omop|redcap|cdisc|csv|openehr)
   -ibff <file>      Beacon v2 Models ('individuals' JSON|YAML)
   -ipxf <file>      Phenopackets v2 (JSON|YAML)
   -iomop <files...> OMOP-CDM CSV files or PostgreSQL dump
+  -iopenehr <files...>
+                    Experimental openEHR canonical JSON/YAML compositions
+                    (currently EHRbase-oriented; input-only; BFF/PXF output)
   -iredcap <file>   REDCap export CSV
   -icdisc <file>    CDISC-ODM XML
   -icsv <file>      Raw CSV
@@ -58,10 +61,10 @@ Common input flags:
 Common output flags:
   -o <type> <file>    Generic output form (bff|pxf|omop|csv|jsonf|jsonld)
   -obff [file]      Beacon-oriented JSON/YAML output
-                    Use -obff FILE for legacy single-file individuals mode
+                    Use -obff FILE for individuals-only BFF output
                     Use -obff with --entities --out-dir for entity-aware BFF
   -opxf <file>      Phenopackets v2 output
-  -oomop <prefix>   OMOP-CDM CSV prefix
+  -oomop            OMOP-CDM CSV table output (use with --out-dir)
   -ocsv <file>      Flattened CSV (with -ibff or -ipxf)
   -ojsonf <file>    Flattened 1D JSON/YAML (with -ibff or -ipxf)
   -ojsonld <file>   JSON-LD / YAML-LD (with -ibff or -ipxf)
@@ -70,11 +73,12 @@ Output behavior:
   --out-dir <dir>       Output directory (required for entity-aware BFF mode)
   --entities <list>     Beacon entities for BFF output [individuals]
                         Supported: individuals, biosamples, datasets, cohorts
-                        biosamples are emitted from -ipxf when present
+                        biosamples are emitted from -ipxf when present, or
+                        from -iomop when the SPECIMEN table is provided
                         datasets and cohorts are synthesized from individuals
                         Use with -obff and --out-dir
-  --out-entity e=file   Override one entity filename; repeat as needed
-                        Requires --entities
+  --out-name k=file     Override one multi-file output name; repeat as needed
+                        Use entity keys for BFF and table keys for OMOP
   -O                    Overwrite output file(s)
 
 Mapping and search:
@@ -82,6 +86,7 @@ Mapping and search:
   --redcap-dictionary|-rcd <file> REDCap data dictionary CSV file
   --schema-file <file>            Alternative JSON Schema for mapping files
   --self-validate-schema|-svs     Self-validate the mapping JSON Schema
+                                  (mainly for author/development checks)
   --search <type>                 Ontology label search mode [exact|mixed|fuzzy]
                                   Default: exact
   --text-similarity-method <m>    Token similarity for mixed/fuzzy search
@@ -98,8 +103,11 @@ OMOP:
   --path-to-ohdsi-db <dir>        Directory containing <ohdsi.db>
   --omop-tables <list>            Restrict OMOP tables
   --exposures-file <file>         OMOP concept_id list treated as exposures
-  --stream                        Incremental OMOP processing with legacy
-                                  -obff output
+  --stream                        Incremental OMOP processing with single-file
+                                  line-delimited JSON output
+                                  Supports individuals-only <-obff FILE>, or
+                                  entity-aware <-obff --entities individuals
+                                  biosamples --out-dir DIR>
   --sql2csv                       Print SQL tables instead of converting
   --max-lines-sql <n>             Maximum SQL lines per table [500]
 
@@ -122,19 +130,26 @@ Examples:
   convert-pheno -i pxf pxf.json -o bff individuals.json
   convert-pheno -ipxf pxf.json -obff individuals.json
   convert-pheno -ipxf pxf.json -obff --entities biosamples --out-dir out/
-  convert-pheno -ipxf pxf.json -obff --entities individuals biosamples --out-dir out/ --out-entity biosamples=samples.json
+  convert-pheno -ipxf pxf.json -obff --entities individuals biosamples --out-dir out/ --out-name biosamples=samples.json
   convert-pheno -ipxf pxf.json -obff --entities individuals datasets cohorts --out-dir out/
   convert-pheno -icsv data.csv --mapping-file mapping.yaml -obff --entities individuals datasets cohorts --out-dir out/
+  convert-pheno -ibff individuals.json -oomop --out-dir omop_out/
+  convert-pheno -ibff individuals.json -oomop --out-dir omop_out/ --out-name PERSON=patients.csv
   convert-pheno -iomop dump.sql.gz -opxf phenopackets.json.gz --default-vital-status UNKNOWN_STATUS --ohdsi-db
   convert-pheno -iomop dump.sql.gz -obff individuals.json.gz --stream --ohdsi-db
+  convert-pheno -iomop dump.sql.gz -obff --stream --entities individuals biosamples --out-dir out/ --ohdsi-db
+  convert-pheno -i openehr patient-set.json -o bff individual.json
+  convert-pheno -i openehr patient-set.json -o pxf phenopacket.json
 
 BFF output modes:
-  -obff FILE keeps the legacy single-output behavior and emits individuals only.
+  -obff FILE keeps the individuals-only BFF behavior.
   -obff --entities ... --out-dir DIR writes one file per requested BFF entity.
+  -oomop --out-dir DIR writes one file per emitted OMOP table.
   If a PXF input also contains biosamples, convert-pheno warns and preserves them
   under info.phenopacket.biosamples unless --entities is used.
   PXF output still defaults subject.vitalStatus to ALIVE unless a preserved
   source vitalStatus or --default-vital-status is available.
+  openEHR input support is currently experimental and limited to BFF or PXF output.
 
 Docs:
   Site:  https://cnag-biomedical-informatics.github.io/convert-pheno
@@ -275,7 +290,7 @@ sub maybe_warn_legacy_pxf_biosamples {
           && @{ $phenopacket->{biosamples} };
 
         print STDERR <<'EOF';
-Warning: input PXF contains biosamples. Legacy <-obff FILE> mode emits only <individuals>; biosamples were preserved under <info.phenopacket.biosamples>. Use <-obff --entities biosamples --out-dir DIR> or <-obff --entities individuals biosamples --out-dir DIR> for first-class biosample output.
+Warning: input PXF contains biosamples. Single-file <-obff FILE> mode emits only <individuals>; biosamples were preserved under <info.phenopacket.biosamples>. Use <-obff --entities biosamples --out-dir DIR> or <-obff --entities individuals biosamples --out-dir DIR> for first-class biosample output.
 EOF
         return;
     }
@@ -299,6 +314,8 @@ sub prepare_output_targets {
         return;
     }
 
+    return if $l_data->{method} =~ /2omop$/;
+
     if ($overwrite) {
         unlink($o_file) if -e $o_file;
     }
@@ -310,6 +327,11 @@ sub prepare_output_targets {
 sub execute_conversion {
     my ( $convert, $l_data, $o_file, $entity_mode ) = @_;
     my $method = $l_data->{method};
+
+    if ( $stream && $method eq 'omop2bff' ) {
+        $convert->$method;
+        return ( undef, undef );
+    }
 
     if ($entity_mode) {
         my $bundle = $convert->_run_bundle_view;
@@ -363,8 +385,14 @@ sub write_conversion_result {
     }
 
     if ( $method =~ /2omop$/ ) {
-        for my $table ( keys %$data ) {
-            my $filepath = resolve_omop_table_output_file( $o_file, $table );
+        for my $table ( sort keys %$data ) {
+            my $filepath = resolve_omop_table_output_file( $l_data, $table );
+            if ($overwrite) {
+                unlink($filepath) if -e $filepath;
+            }
+            else {
+                ask_overwrite($filepath);
+            }
             my @headers  = @{ $omop_headers->{$table} };
             write_csv(
                 {
@@ -388,15 +416,11 @@ sub write_conversion_result {
 }
 
 sub resolve_omop_table_output_file {
-    my ( $prefix, $table ) = @_;
-
-    my $gzip = $prefix =~ /\.gz$/i ? 1 : 0;
-    my $base = $prefix;
-
-    $base =~ s/\.gz$//i if $gzip;
-    $base =~ s/\.csv$//i;
-
-    return $base . "_$table.csv" . ( $gzip ? '.gz' : '' );
+    my ( $l_data, $table ) = @_;
+    return $l_data->{output_name_overrides}{$table}
+      if exists $l_data->{output_name_overrides}
+      && exists $l_data->{output_name_overrides}{$table};
+    return catfile( $l_data->{out_dir}, $table . '.csv' );
 }
 
 sub program_header {
@@ -511,8 +535,8 @@ sub ask_overwrite {
 
 sub resolve_entity_output_file {
     my ( $l_data, $entity ) = @_;
-    return $l_data->{entity_output_files}{$entity}
-      if exists $l_data->{entity_output_files}
-      && exists $l_data->{entity_output_files}{$entity};
+    return $l_data->{output_name_overrides}{$entity}
+      if exists $l_data->{output_name_overrides}
+      && exists $l_data->{output_name_overrides}{$entity};
     return catfile( $l_data->{out_dir}, $entity . '.json' );
 }

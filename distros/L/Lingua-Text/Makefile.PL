@@ -35,6 +35,7 @@ WriteMakefile(
 		'Exporter' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'HTML::Entities' => 0,
+		'I18N::LangTags::Detect' => 0,
 		'Params::Get' => 0,
 		'Scalar::Util' => 0
 	}, dist => $dist,

@@ -40,7 +40,7 @@ sub _apply_meta_result {
         # Embedded tags are authoritative — overwrite folder-inferred values.
         # Text search / fingerprint only fill in fields that are missing.
         my $trust_tags = ($msg->{source} // '') =~ /embedded tags/;
-        for my $key (qw( artist album year genre composer comment track_number )) {
+        for my $key (qw( artist album year genre comment track_number )) {
             next if !$trust_tags && $track->{$key} && length $track->{$key};
             $upd{$key} = $meta->{$key} if $meta->{$key};
         }
