@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.636-3-ga9ec6cf8
+package JSON::Schema::Modern; # git description: v0.637-12-gff7414b1
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.637';
+our $VERSION = '0.638';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -21,7 +21,7 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Carp qw(croak carp);
-use List::Util 1.55 qw(pairs first uniqint pairmap uniq min);
+use List::Util 1.55 qw(pairs first uniqint pairmap uniqstr min);
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
 use builtin::compat qw(refaddr load_module);
@@ -1104,7 +1104,7 @@ sub _get_or_load_resource ($self, $uri) {
 # - vocabularies: the vocabularies to use when considering schema keywords
 # creates a Document and adds it to the resource index, if not already present.
 sub _fetch_from_uri ($self, $uri_reference) {
-  $uri_reference = Mojo::URL->new($uri_reference) if not is_schema($uri_reference);
+  $uri_reference = Mojo::URL->new($uri_reference) if not ref $uri_reference;
 
   # this is *a* resource that would contain our desired location, but may not be the closest one
   my $resource = $self->_get_or_load_resource($uri_reference->clone->fragment(undef));
@@ -1175,14 +1175,7 @@ sub _prefix_match_length ($x, $y) {
   return $len;
 }
 
-# Mojo::JSON::JSON_XS is false when the environment variable $MOJO_NO_JSON_XS is set
-# and also checks if Cpanel::JSON::XS is installed.
-# Mojo::JSON falls back to its own pure-perl encoder/decoder but does not support all the options
-# that we require here.
-use constant _JSON_BACKEND =>
-    Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION('4.38'); 1 } ? 'Cpanel::JSON::XS'
-  : eval { JSON::PP->VERSION('4.11'); 1 } ? 'JSON::PP'
-  : die 'Cpanel::JSON::XS 4.38 or JSON::PP 4.11 is required';
+use constant _JSON_BACKEND => JSON::Schema::Modern::Utilities::_JSON_BACKEND;
 
 # used for internal encoding as well (when caching serialized schemas)
 has _json_decoder => (
@@ -1192,52 +1185,42 @@ has _json_decoder => (
   default => sub { _JSON_BACKEND->new->allow_nonref(1)->canonical(1)->utf8(1)->allow_bignum(1)->convert_blessed(1) },
 );
 
-# since media types are case-insensitive, all type names must be casefolded on insertion.
+# since media types are case-insensitive, all legacy type names must be casefolded on insertion.
 has _media_type => (
   is => 'bare',
-  isa => my $media_type_type = Map[Str->where(q{$_ eq CORE::fc($_)}), CodeRef],
+  isa => ArrayRef[my $media_type_type = Str->where(q{$_ eq CORE::fc($_)})],
   reader => '__media_type',
   lazy => 1,
-  default => sub ($self) {
-    my $_json_media_type = sub ($content_ref) {
-      # utf-8 decoding is always done, as per the JSON spec.
-      # other charsets are not supported: see RFC8259 §11
-      \ _JSON_BACKEND->new->allow_nonref(1)->utf8(1)->decode($content_ref->$*);
-    };
-    +{
-      (map +($_ => $_json_media_type),
-        qw(application/json application/schema+json application/schema-instance+json)),
-      (map +($_ => sub ($content_ref) { $content_ref }),
-        qw(text/* application/octet-stream)),
-      'application/x-www-form-urlencoded' => sub ($content_ref) {
-        \ Mojo::Parameters->new->charset('UTF-8')->parse($content_ref->$*)->to_hash;
-      },
-      'application/x-ndjson' => sub ($content_ref) {
-        my $decoder = _JSON_BACKEND->new->allow_nonref(1)->utf8(1);
-        my $line = 0; # line numbers start at 1
-        \[ map {
-            do {
-              try { ++$line; $decoder->decode($_) }
-              catch ($e) { die 'parse error at line '.$line.': '.$e }
-            }
-          }
-          split(/\r?\n/, $content_ref->$*)
-        ];
-      },
-    };
-  },
+  default => sub ($self) { [] },
 );
 
-sub add_media_type { $media_type_type->({ @_[1..2] }); $_[0]->__media_type->{$_[1]} = $_[2]; }
+my ($warn_add_media_type, $warn_get_media_type);  # we will warn just once
 
-# get_media_type('TExT/bloop') will fall through to matching an entry for 'text/*' or '*/*'
+# deprecated interface
+sub add_media_type ($self, $media_type, $decoder) {
+  $media_type_type->($media_type);
+
+  carp '$jsm->add_media_type is deprecated; use the function in JSON::Schema::Modern::Utilities instead' if not $warn_add_media_type++;
+
+  # backcompat preservation: add to the global registry, and remove it again when this object goes
+  # out of scope
+  JSON::Schema::Modern::Utilities::add_media_type($media_type, $decoder, undef, refaddr $self);
+  push $self->__media_type->@*, $media_type;
+  return;
+}
+
+sub DESTROY ($self) {
+  foreach my $media_type (uniqstr $self->__media_type->@*) {
+    JSON::Schema::Modern::Utilities::delete_media_type($media_type, refaddr $self);
+  }
+}
+
+# deprecated interface; will use global definitions
 sub get_media_type ($self, $type) {
-  my $types = $self->__media_type;
-  my $mt = $types->{fc $type};
-  return $mt if $mt;
+  carp '$jsm->get_media_type is deprecated; use the function in JSON::Schema::Modern::Utilities instead' if not $warn_get_media_type++;
 
-  return $types->{(first { m{([^/]+)/\*\z} && fc($type) =~ m{^\Q$1\E/[^/]+\z} } keys %$types) // '*/*'};
-};
+  JSON::Schema::Modern::Utilities::_get_media_type_decoder($type);
+}
 
 has _encoding => (
   is => 'bare',
@@ -1246,13 +1229,13 @@ has _encoding => (
   lazy => 1,
   default => sub ($self) {
     +{
-      identity => sub ($content_ref) { $content_ref },
-      base64 => sub ($content_ref) {
+      identity => sub ($content_ref, @) { $content_ref },
+      base64 => sub ($content_ref, @) {
         die "invalid characters\n"
           if $content_ref->$* =~ m{[^A-Za-z0-9+/=]} or $content_ref->$* =~ m{=(?=[^=])};
         require MIME::Base64; \ MIME::Base64::decode_base64($content_ref->$*);
       },
-      base64url => sub ($content_ref) {
+      base64url => sub ($content_ref, @) {
         die "invalid characters\n"
           if $content_ref->$* =~ m{[^A-Za-z0-9=_-]} or $content_ref->$* =~ m{=(?=[^=])};
         require MIME::Base64; \ MIME::Base64::decode_base64url($content_ref->$*);
@@ -1279,7 +1262,7 @@ sub THAW ($class, $serializer, $data) {
 
   # load all vocabulary classes, both those used by loaded schemas, as well as all the core modules
   load_module($_)
-    foreach uniq(
+    foreach uniqstr(
       (map $_->{vocabularies}->@*, $self->_canonical_resources),
       (map $_->[1], values $self->__vocabulary_classes->%*));
 
@@ -1302,7 +1285,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.637
+version 0.638
 
 =head1 SYNOPSIS
 
@@ -1840,7 +1823,7 @@ Vocabularies cannot be redefined; subsequent calls to add the same vocabulary wi
 
 =head2 add_media_type
 
-  $js->add_media_type('application/furble' => sub ($content_ref) {
+  $js->add_media_type('application/furble' => sub ($content_ref, @) {
     return ...;  # data representing the deserialized text for Content-Type: application/furble
   });
 
@@ -1849,61 +1832,25 @@ a reference to a string, which might contain wide characters (i.e. not octets), 
 in conjunction with L</get_encoding> below. Must return B<a reference to a value of any type> (which is
 then dereferenced for the C<contentSchema> keyword).
 
-These media types are already known:
-
-=over 4
-
-=item *
-
-C<application/json> - see L<RFC 4627|https://datatracker.ietf.org/doc/html/rfc4627>
-
-=item *
-
-C<application/schema+json> - see L<proposed definition|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schemajson>
-
-=item *
-
-C<application/schema-instance+json> - see L<proposed definition|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schema-instance>
-
-=item *
-
-C<application/octet-stream> - passes strings through unchanged
-
-=item *
-
-C<application/x-www-form-urlencoded>
-
-=item *
-
-C<application/x-ndjson> - see L<https://github.com/ndjson/ndjson-spec>
-
-=item *
-
-C<text/*> - passes strings through unchanged
-
-=back
-
-Media-type definitions can be overridden with a new call to C<add_media_type>.
-
-See the official L<OpenAPI Media Type Registry|https://spec.openapis.org/registry/media-type>
-for a registry of known and useful media types; for
-compatibility reasons, avoid defining a media type listed here with different semantics.
+This interface is B<deprecated> as of version 0.638 and may eventually be removed; use
+L<JSON::Schema::Modern::Utilities/add_media_type> instead, which supports defining an encoder as
+well, and supports media-type parameters.
 
 =head2 get_media_type
-
-Fetches a decoder sub for the indicated media type. Lookups are performed B<without case sensitivity>.
-
-=for stopwords thusly
-
-You can use it thusly:
 
   $js->add_media_type('application/furble' => sub { ... }); # as above
   my $decoder = $self->get_media_type('application/furble') or die 'cannot find media type decoder';
   my $content_ref = $decoder->(\$content_string);
 
+Fetches a decoder sub from the current object's registry for the indicated media type. Lookups are
+performed B<without case sensitivity>.
+
+This interface is B<deprecated> as of version 0.638 and may eventually be removed; use
+L<JSON::Schema::Modern::Utilities/decode_media_type> instead.
+
 =head2 add_encoding
 
-  $js->add_encoding('bloop' => sub ($content_ref) {
+  $js->add_encoding('bloop' => sub ($content_ref, @) {
     return \ ...;  # data representing the deserialized content for Content-Transfer-Encoding: bloop
   });
 
@@ -1937,14 +1884,12 @@ See also L<HTTP::Message/encode>.
 
 =head2 get_encoding
 
+  my $decoder = $self->get_encoding('base64') or die 'cannot find encoding decoder';
+  my $content_ref = $decoder->(\$content_string);
+
 Fetches a decoder sub for the indicated encoding. Incoming values MUST be a reference to an octet
 string. Result values will be a scalar-reference to a string, which might be passed to a media_type
 decoder (see above).
-
-You can use it thusly:
-
-  my $decoder = $self->get_encoding('base64') or die 'cannot find encoding decoder';
-  my $content_ref = $decoder->(\$content_string);
 
 =head2 get
 

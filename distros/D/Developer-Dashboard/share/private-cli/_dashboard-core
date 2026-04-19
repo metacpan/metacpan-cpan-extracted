@@ -840,6 +840,46 @@ elsif ( $cmd eq 'docker' ) {
         exec @{ $result->{command} };
         die "Unable to exec docker compose: $!";
     }
+    if ( $sub eq 'disable' ) {
+        my $service = shift @ARGV || die "Usage: dashboard docker disable <service>\n";
+        die "Usage: dashboard docker disable <service>\n" if @ARGV;
+        print json_encode(
+            $docker->disable_service(
+                service => $service,
+            )
+        );
+        exit 0;
+    }
+    if ( $sub eq 'enable' ) {
+        my $service = shift @ARGV || die "Usage: dashboard docker enable <service>\n";
+        die "Usage: dashboard docker enable <service>\n" if @ARGV;
+        print json_encode(
+            $docker->enable_service(
+                service => $service,
+            )
+        );
+        exit 0;
+    }
+    if ( $sub eq 'list' ) {
+        my $enabled_only  = 0;
+        my $disabled_only = 0;
+        GetOptionsFromArray(
+            \@ARGV,
+            'enabled!'  => \$enabled_only,
+            'disabled!' => \$disabled_only,
+        );
+        die "Usage: dashboard docker list [--enabled|--disabled]\n"
+          if @ARGV || ( $enabled_only && $disabled_only );
+        my $filter = 'all';
+        $filter = 'enabled'  if $enabled_only;
+        $filter = 'disabled' if $disabled_only;
+        print json_encode(
+            $docker->list_services(
+                filter => $filter,
+            )
+        );
+        exit 0;
+    }
 }
 elsif ( $cmd eq 'serve' ) {
     _load_configured_path_aliases();
@@ -896,20 +936,28 @@ elsif ( $cmd eq 'serve' ) {
     my $port = $settings->{port};
     my $workers = $settings->{workers};
     my $ssl = $settings->{ssl};
+    my $editor_enabled = $settings->{no_editor} ? 0 : 1;
+    my $indicators_enabled = $settings->{no_indicators} ? 0 : 1;
     my $foreground = 0;
     GetOptionsFromArray(
         \@ARGV,
-        'host=s'      => \$host,
-        'port=i'      => \$port,
-        'workers=i'   => \$workers,
-        'ssl!'        => \$ssl,
-        'foreground!' => \$foreground,
+        'host=s'        => \$host,
+        'port=i'        => \$port,
+        'workers=i'     => \$workers,
+        'ssl!'          => \$ssl,
+        'editor!'       => \$editor_enabled,
+        'endit!'        => \$editor_enabled,
+        'indicator!'    => \$indicators_enabled,
+        'indicators!'   => \$indicators_enabled,
+        'foreground!'   => \$foreground,
     );
     $config->save_global_web_settings(
-        host    => $host,
-        port    => $port,
-        workers => $workers,
-        ssl     => $ssl,
+        host          => $host,
+        port          => $port,
+        workers       => $workers,
+        ssl           => $ssl,
+        no_editor     => $editor_enabled ? 0 : 1,
+        no_indicators => $indicators_enabled ? 0 : 1,
     );
     my $result = $runtime->serve_all(
         foreground => $foreground,

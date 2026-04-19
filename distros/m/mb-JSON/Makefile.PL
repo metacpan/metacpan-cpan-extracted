@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{mb::JSON},
-    'VERSION'   => q{0.05},
+    'VERSION'   => q{0.06},
     'ABSTRACT'  => q{JSON encode/decode for multibyte (UTF-8) strings},
     'PREREQ_PM' => {
         'Carp' => '0',
@@ -44,11 +44,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'mb::JSON' => {
                 'file'    => 'lib/mb/JSON.pm',
-                'version' => '0.05',
+                'version' => '0.06',
             },
             'mb::JSON::Boolean' => {
                 'file'    => 'lib/mb/JSON.pm',
-                'version' => '0.05',
+                'version' => '0.06',
             }
         },
     };

@@ -1,25 +1,24 @@
 use Test::More;
 
-use Object::Iterate;
-use Object::Iterate::Tester;
+my $class = 'Object::Iterate';
 
-ok( Object::Iterate::_check_object(	
-	Object::Iterate::Tester->new() ),
-	'Tester object can use Object::Iterate' );
+subtest 'sanity' => sub {
+	use_ok $class;
+	can_ok $class, qw(_check_object);
+	};
 
-my $result = not eval{ Object::Iterate::_check_object( {} ) };
-ok( $result, "Thought anonymous hash would work!" );
+my @table = (
+	[ [ {}              ], 'anonymous hash'  ],
+	[ [ []              ], 'anonymous array' ],
+	[ [ bless {}, 'Foo' ], 'blessed object'  ],
+	[ [ undef           ], 'undef'           ],
+	[ [                 ], 'empty'           ],
+	);
 
-$result = not eval{ Object::Iterate::_check_object( [] ) };
-ok( $result, "Thought anonymous array would work!" );
-
-$result = not eval{ Object::Iterate::_check_object( bless {}, 'Foo' ) };
-ok( $result, "Thought blessed hash would work!" );
-
-$result = not eval{ Object::Iterate::_check_object( undef ) };
-ok( $result, "Thought undef would work!" );
-
-$result = not eval{ Object::Iterate::_check_object( ) };
-ok( $result, "Thought empty arg list would work!" );
+foreach my $row ( @table ) {
+	my( $args, $label ) = @$row;
+	$result = not eval{ Object::Iterate::_check_object( @$args ) };
+	ok $result, $label;
+	}
 
 done_testing();

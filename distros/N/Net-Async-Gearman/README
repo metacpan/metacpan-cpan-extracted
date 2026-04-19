@@ -1,18 +1,25 @@
 NAME
-    `Net::Async::Gearman' - use Gearman with IO::Async
+
+    Net::Async::Gearman - use Gearman with IO::Async
 
 DESCRIPTION
+
     This module provides an IO::Async-based wrapper around
     Protocol::Gearman. It shouldn't be used directly; see instead
 
-    * Net::Async::Gearman::Client
+      * Net::Async::Gearman::Client
 
 METHODS
-  $gearman->connect( %args ) ==> ( $gearman )
+
+ connect
+
+       $gearman = await $gearman->connect( %args );
+
     Connects to the server. Takes the same arguments as IO::Async::Handle's
-    `connect' method, but additionally sets a default service name of port
+    connect method, but additionally sets a default service name of port
     4730.
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

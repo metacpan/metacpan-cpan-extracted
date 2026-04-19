@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Use
 
+1.055 2026-04-18T13:51:30Z
+	* extract_modules can now search PATH for file
+
 1.054 2025-04-13T22:28:12Z
 	* require a newer version.pm for v5.10.1 tests
 

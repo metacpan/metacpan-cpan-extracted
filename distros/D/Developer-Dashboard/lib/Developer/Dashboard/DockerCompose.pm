@@ -3,10 +3,11 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
+use File::Path qw(make_path);
 use File::Spec;
 
 use Developer::Dashboard::JSON qw(json_encode);
@@ -348,6 +349,89 @@ sub _infer_services_from_args {
     return @services;
 }
 
+# disable_service(%args)
+# Writes the isolated-service disabled marker into the deepest runtime docker root for one service.
+# Input: service name and optional project_root.
+# Output: hash reference describing the toggled service and marker path.
+sub disable_service {
+    my ( $self, %args ) = @_;
+    my $service = $args{service} || die "Usage: dashboard docker disable <service>\n";
+    my $marker = $self->_service_disabled_marker_path(
+        project_root => $args{project_root},
+        service      => $service,
+    );
+    my ( undef, $dir ) = File::Spec->splitpath($marker);
+    make_path($dir) if !-d $dir;
+    open my $fh, '>', $marker or die "Unable to write $marker: $!";
+    print {$fh} "---\ndisabled: 1\n";
+    close $fh or die "Unable to close $marker: $!";
+    return {
+        action   => 'disable',
+        disabled => 1,
+        marker   => $marker,
+        service  => $service,
+    };
+}
+
+# enable_service(%args)
+# Removes the isolated-service disabled marker from the deepest runtime docker root for one service.
+# Input: service name and optional project_root.
+# Output: hash reference describing the toggled service and marker path.
+sub enable_service {
+    my ( $self, %args ) = @_;
+    my $service = $args{service} || die "Usage: dashboard docker enable <service>\n";
+    my $marker = $self->_service_disabled_marker_path(
+        project_root => $args{project_root},
+        service      => $service,
+    );
+    unlink $marker or die "Unable to remove $marker: $!" if -e $marker;
+    return {
+        action   => 'enable',
+        disabled => 0,
+        marker   => $marker,
+        service  => $service,
+    };
+}
+
+# list_services(%args)
+# Lists isolated docker services together with their effective enabled or disabled state.
+# Input: optional project_root and filter values all, enabled, or disabled.
+# Output: array reference of service state hash references in sorted service order.
+sub list_services {
+    my ( $self, %args ) = @_;
+    my $project_root = $args{project_root} || cwd();
+    my $filter = defined $args{filter} && $args{filter} ne '' ? $args{filter} : 'all';
+    die "Usage: dashboard docker list [--enabled|--disabled]\n"
+      if $filter !~ /\A(?:all|enabled|disabled)\z/;
+
+    my @services = $self->_discover_service_names(
+        project_root => $project_root,
+        service_map  => $self->{config}->docker_config->{services} || {},
+    );
+
+    my @listed;
+    for my $service (@services) {
+        my $disabled = $self->_service_folder_is_disabled(
+            project_root => $project_root,
+            service      => $service,
+        ) ? 1 : 0;
+        next if $filter eq 'enabled'  && $disabled;
+        next if $filter eq 'disabled' && !$disabled;
+        push @listed, {
+            disabled => $disabled,
+            enabled  => $disabled ? 0 : 1,
+            marker   => $self->_service_disabled_marker_path(
+                project_root => $project_root,
+                service      => $service,
+            ),
+            service => $service,
+            status  => $disabled ? 'disabled' : 'enabled',
+        };
+    }
+
+    return \@listed;
+}
+
 # run(%args)
 # Executes the resolved docker compose command or returns dry-run data.
 # Input: same resolution arguments plus optional dry_run flag.
@@ -384,6 +468,31 @@ sub _discover_base_files {
     return grep { -f $_ } map { File::Spec->catfile( $root, $_ ) } @candidates;
 }
 
+# _service_disabled_marker_path(%args)
+# Resolves the disabled.yml marker path in the deepest runtime docker root for one isolated service.
+# Input: service name and optional project_root.
+# Output: absolute disabled.yml marker file path string.
+sub _service_disabled_marker_path {
+    my ( $self, %args ) = @_;
+    my $service = $args{service} || die 'Missing service';
+    my $root = $self->_service_toggle_root(%args);
+    return File::Spec->catfile( $root, $service, 'disabled.yml' );
+}
+
+# _service_toggle_root(%args)
+# Returns the deepest participating docker root where isolated-service toggle markers should be written.
+# Input: optional project_root.
+# Output: absolute docker root directory path string.
+sub _service_toggle_root {
+    my ( $self, %args ) = @_;
+    my @layers = $self->{paths}->runtime_layers;
+    my $runtime_root = @layers ? $layers[-1] : $self->{paths}->home_runtime_root;
+    my $home_runtime_root = $self->{paths}->home_runtime_root;
+    return $runtime_root eq $home_runtime_root
+      ? File::Spec->catdir( $runtime_root, 'config', 'docker' )
+      : File::Spec->catdir( $runtime_root, 'docker' );
+}
+
 1;
 
 __END__
@@ -407,9 +516,9 @@ docker compose command line and can optionally execute it.
 
 =head1 METHODS
 
-=head2 new, resolve, run
+=head2 new, resolve, list_services, run
 
-Construct, resolve, and optionally execute compose operations.
+Construct, resolve, list, and optionally execute compose operations.
 
 =for comment FULL-POD-DOC START
 
@@ -448,6 +557,13 @@ Example 2:
 Run the focused regression tests that most directly exercise this module's behavior.
 
 Example 3:
+
+  dashboard docker list --disabled
+
+Inspect the effective disabled-service view through the same resolver rules as
+compose discovery.
+
+Example 4:
 
   HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
 

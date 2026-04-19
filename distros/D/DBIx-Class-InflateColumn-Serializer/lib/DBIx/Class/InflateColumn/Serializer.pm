@@ -1,5 +1,5 @@
 package DBIx::Class::InflateColumn::Serializer;
-$DBIx::Class::InflateColumn::Serializer::VERSION = '0.09';
+$DBIx::Class::InflateColumn::Serializer::VERSION = '0.10';
 use strict;
 use warnings;
 

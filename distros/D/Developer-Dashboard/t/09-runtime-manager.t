@@ -457,6 +457,47 @@ my $clean_exit_manager = Developer::Dashboard::RuntimeManager->new(
 }
 
 {
+    my $signal_manager = Developer::Dashboard::RuntimeManager->new(
+        app_builder => sub {
+            return Local::RuntimeServer->new(
+                host => '0.0.0.0',
+                port => 7906,
+            );
+        },
+        config => $config,
+        files  => $files,
+        paths  => $paths,
+        runner => $runner,
+    );
+    pipe my $reader, my $writer or die "pipe failed: $!";
+    my $signal_pid = fork();
+    die "fork failed: $!" if !defined $signal_pid;
+    if ( !$signal_pid ) {
+        close $reader;
+        exit $signal_manager->_run_web_child( $writer, '0.0.0.0', 7906, detach => 0, redirect => 0 );
+    }
+    close $writer;
+    my $startup_line = <$reader>;
+    close $reader;
+    like( $startup_line, qr/^ok\|\d+\|0\.0\.0\.0\|7906\n\z/, '_run_web_child reports startup before waiting for signals' );
+    kill 'TERM', $signal_pid;
+    my $signal_state;
+    for ( 1 .. 30 ) {
+        $signal_state = $signal_manager->web_state;
+        last if $signal_state && ( $signal_state->{status} || '' ) eq 'stopped' && !kill 0, $signal_pid;
+        sleep 0.1;
+    }
+    my $signal_reaped = waitpid( $signal_pid, WNOHANG );
+    ok(
+        ( $signal_reaped == $signal_pid || ( $signal_state && ( $signal_state->{status} || '' ) eq 'stopped' ) ),
+        '_run_web_child exits after TERM triggers the shutdown handler'
+    );
+    waitpid( $signal_pid, 0 ) if $signal_reaped == 0;
+    is( $signal_state->{status}, 'stopped', '_run_web_child TERM shutdown records stopped status through the signal handler' );
+    $signal_manager->_cleanup_web_files;
+}
+
+{
     my $state = $manager->_write_web_state();
     is_deeply( $state, {}, '_write_web_state persists an empty hash when no state payload is provided' );
     is_deeply( $manager->web_state, {}, 'web_state reads back the empty-state payload written by _write_web_state' );

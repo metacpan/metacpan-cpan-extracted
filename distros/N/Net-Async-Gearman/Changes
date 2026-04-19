@@ -1,0 +1,12 @@
+Revision history for Net-Async-Gearman
+
+0.02    2026-03-18
+        [CHANGES]
+         * Overall module refresh:
+            + perl v5.20, signatures, postfix-deref
+            + Pod style updates
+            + Test using Test2::V0
+
+0.01    2014/06/23 17:39:09
+        First version, released on an unsuspecting world.
+

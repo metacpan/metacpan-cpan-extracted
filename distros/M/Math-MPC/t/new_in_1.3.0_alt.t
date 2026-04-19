@@ -32,9 +32,10 @@ if(MPC_VERSION < 66304) {
 else {
   my $ok = 0;
   Rmpc_eta_fund($rop, $op1, MPC_RNDNN);
-  $ok =  1
-    if "$rop" eq '(7.2829981913846153e-1 -5.6948215660904557e-2)';
-  cmp_ok($ok, '==', 1, "'$rop' eq '(7.2829981913846153e-1 -5.6948215660904557e-2)'");
+  if("$rop" eq '(7.2829981913846153e-1 -5.6948215660904557e-2)') { $ok = 1 }
+  else { warn "$rop is not (7.2829981913846153e-1 -5.6948215660904557e-2)\n" }
+  my $substitute = "$rop";
+  cmp_ok($ok, '==', 1, "$substitute eq '(7.2829981913846153e-1 -5.6948215660904557e-2)'"); # Fails on freebsd, arm64.
   $ok = 0;
   #cmp_ok("$rop", 'eq', '(7.2829981913846153e-1 -5.6948215660904557e-2)', "Rmpc_eta_fund output is ok");
 

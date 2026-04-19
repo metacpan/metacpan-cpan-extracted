@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendTrackOrder 2.160;
+package Config::Model::BackendTrackOrder 2.161;
 
 # ABSTRACT: Track read order of elements from configuration
 
@@ -15,7 +15,10 @@ use Mouse;
 use strict;
 use warnings;
 use Carp;
-use 5.10.0;
+use v5.20;
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 use Mouse::Util;
 use Log::Log4perl qw(get_logger :levels);
@@ -63,10 +66,9 @@ has _created => (
 # or at the end of initial load ???
 # or mixall at the end of init() ?
 
-sub register_element {
-    my ($self, $name) = @_;
-
+sub register_element ($self, $name) {
     return if $self->has_created($name);
+
     $self->register_created($name => 1 );
 
     if ($self->node->instance->initial_load) {
@@ -112,10 +114,10 @@ sub register_element {
             $self->_register_element($name);
         }
     }
+    return;
 }
 
-sub get_ordered_element_names {
-    my $self = shift;
+sub get_ordered_element_names ($self) {
     if ($self->node->instance->canonical) {
         return $self->get_element_names;
     }
@@ -142,7 +144,7 @@ Config::Model::BackendTrackOrder - Track read order of elements from configurati
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 

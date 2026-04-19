@@ -176,7 +176,7 @@ SYNOPSIS
             die( $dt->error );
 
 VERSION
-        v0.6.0
+        v0.6.1
 
 DESCRIPTION
     "DateTime::Lite" is a lightweight, memory-efficient, drop-in replacement

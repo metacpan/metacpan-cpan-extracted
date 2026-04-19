@@ -2,7 +2,7 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed weaken/;
@@ -43,6 +43,7 @@ sub pre_disconnect_hook  { }
 sub pre_suspend_hook     { }
 sub post_suspend_hook    { }
 sub post_disconnect_hook { }
+sub peer_left            { }
 
 sub reconnect { shift->connect(@_, reconnect => 1) }
 sub pid_check { croak "Client used from wrong PID" if $_[0]->{+PID} != $$; $_[0] }
@@ -169,7 +170,6 @@ sub peer_active {
 
     return 0 unless $peer_pid;
     return 0 unless $self->pid_is_running($peer_pid);
-    return 0 unless kill(0, $peer_pid);
     return 1;
 }
 

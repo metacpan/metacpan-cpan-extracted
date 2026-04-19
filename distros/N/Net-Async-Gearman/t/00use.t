@@ -1,12 +1,13 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Net::Async::Gearman" );
-use_ok( "Net::Async::Gearman::Client" );
-use_ok( "Net::Async::Gearman::Worker" );
+require Net::Async::Gearman;
+require Net::Async::Gearman::Client;
+require Net::Async::Gearman::Worker;
 
+pass( 'Modules loaded' );
 done_testing;

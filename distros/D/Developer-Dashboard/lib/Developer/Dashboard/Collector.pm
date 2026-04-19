@@ -3,7 +3,7 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 use File::Spec;
 use POSIX qw(strftime);
@@ -20,6 +20,18 @@ sub new {
     my ( $class, %args ) = @_;
     my $paths = $args{paths} || die 'Missing paths registry';
     return bless { paths => $paths }, $class;
+}
+
+# new_from_all_folders()
+# Constructs a collector store from the public Folder-derived path inventory.
+# Input: none.
+# Output: Developer::Dashboard::Collector object.
+sub new_from_all_folders {
+    my ($class) = @_;
+    require Developer::Dashboard::PathRegistry;
+    return $class->new(
+        paths => Developer::Dashboard::PathRegistry->new_from_all_folders,
+    );
 }
 
 # collector_paths($name)
@@ -151,11 +163,13 @@ sub read_status {
 # Output: hash reference with stdout, stderr, combined, and last_run.
 sub read_output {
     my ( $self, $name ) = @_;
+    my $last_run = $self->_first_existing_text_file( $name, 'last_run' );
+    $last_run =~ s/\r?\n\z// if defined $last_run;
     return {
         'stdout'   => $self->_first_existing_text_file( $name, 'stdout' ),
         'stderr'   => $self->_first_existing_text_file( $name, 'stderr' ),
         'combined' => $self->_first_existing_text_file( $name, 'combined' ),
-        'last_run' => $self->_first_existing_text_file( $name, 'last_run' ),
+        'last_run' => $last_run,
     };
 }
 
@@ -496,23 +510,30 @@ sub _split_log_entries {
 # Output: UTC epoch integer for the entry timestamp.
 sub _entry_timestamp_epoch {
     my ( $self, $name, $entry ) = @_;
-    my ($timestamp) = $entry =~ /\A=== collector [^\n]* \| \@ ([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)(?: \| [^\n]*)* ===\n/;
+    my ($timestamp) = $entry =~ /\A=== collector [^\n]* \| \@ ([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:Z|[+-][0-9]{4}|[+-][0-9]{2}:[0-9]{2}))(?: \| [^\n]*)* ===\n/;
     die "Unable to parse collector log timestamp for $name\n"
       if !defined $timestamp;
     return $self->_iso8601_to_epoch($timestamp);
 }
 
 # _iso8601_to_epoch($timestamp)
-# Converts one dashboard ISO-8601 UTC timestamp string into epoch seconds.
-# Input: timestamp string in YYYY-MM-DDTHH:MM:SSZ form.
+# Converts one dashboard ISO-8601 timestamp string into epoch seconds.
+# Input: timestamp string in YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+HHMM form.
 # Output: UTC epoch integer.
 sub _iso8601_to_epoch {
     my ( $self, $timestamp ) = @_;
-    my ( $year, $month, $day, $hour, $minute, $second ) =
-      $timestamp =~ /\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z\z/;
-    die "Unsupported collector log timestamp $timestamp\n"
-      if !defined $second;
-    return timegm( $second, $minute, $hour, $day, $month - 1, $year );
+    my ( $year, $month, $day, $hour, $minute, $second, $zone ) =
+      $timestamp =~ /\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|[+-]\d{4}|[+-]\d{2}:\d{2})\z/;
+    die "Unsupported collector log timestamp $timestamp\n" if !defined $zone;
+
+    my $offset_seconds = 0;
+    if ( $zone ne 'Z' ) {
+        my ( $sign, $offset_hour, $offset_minute ) = $zone =~ /\A([+-])(\d{2}):?(\d{2})\z/;
+        $offset_seconds = ( $offset_hour * 3600 ) + ( $offset_minute * 60 );
+        $offset_seconds *= -1 if $sign eq '-';
+    }
+
+    return timegm( $second, $minute, $hour, $day, $month - 1, $year ) - $offset_seconds;
 }
 
 # _with_trailing_newline($text)
@@ -564,12 +585,12 @@ sub _slurp {
 }
 
 # _now_iso8601()
-# Returns the current UTC timestamp in ISO-8601 form.
+# Returns the current local timestamp in ISO-8601 form with timezone offset.
 # Input: none.
 # Output: timestamp string.
 sub _now_iso8601 {
-    my @t = gmtime();
-    return strftime( '%Y-%m-%dT%H:%M:%SZ', @t );
+    my @t = localtime();
+    return strftime( '%Y-%m-%dT%H:%M:%S%z', @t );
 }
 
 1;

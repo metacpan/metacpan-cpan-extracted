@@ -4,7 +4,7 @@
       "Apertur <support@apertur.ca>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -58,6 +58,6 @@
          "web" : "https://github.com/Apertur-dev/apertur-perl"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

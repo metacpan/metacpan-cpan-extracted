@@ -1,5 +1,25 @@
 Revision history for App::DrivePlayer.
 
+0.2.5 2026-04-18
+        - Unified sheet sync: Library -> Sync now does a single
+          bidirectional reconcile after the Drive scan.  Rules: both
+          sides have a value -> DB wins; one side blank -> filled from
+          the other; drive_id only in DB -> added to sheet; drive_id
+          only on sheet -> Drive is queried and the track is either
+          added to the DB (exists) or removed from the sheet (gone).
+          Drive API errors during the existence check preserve the row
+          on both sides -- sync never destroys data on an API error.
+        - Removed the separate File -> Sync from Sheet / Sync to Sheet
+          menu items.  Auto-push after metadata edits/fetches is kept
+          as a targeted merge-push, since running a full two-way sync
+          after every field edit would be wasteful.
+        - Fix: clicking a track in the list no longer auto-scrolls the
+          viewport between the two clicks of a double-click, which
+          could cause a different track to end up under the cursor and
+          be played instead of the one clicked.  The tracklist now
+          handles left-clicks manually so GTK's set_cursor auto-scroll
+          never fires on click.
+
 0.2.4 2026-04-17
         - Sheet push is now a merge instead of a full replace: local
           non-blank values overwrite the sheet, local blanks preserve

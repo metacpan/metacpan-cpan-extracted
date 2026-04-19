@@ -65,27 +65,27 @@ Object::Iterate - iterators for objects that know the next element
 
 	use Object::Iterate qw(iterate igrep imap);
 
-	iterate {...} $object;
+	# Each iteration sets $_ to the thing that $object gives back
 
-	my @filtered    = igrep {...} $object;
-
-	my @transformed = imap  {...} $object;
+	my $final       = iterate {...} $object;
+	my @filtered    = igrep   {...} $object;
+	my @transformed = imap    {...} $object;
 
 =head1 DESCRIPTION
 
 This module provides control structures to iterate through the
-elements of an object that cannot be represented as list of items all
+elements of an object that cannot be represented as a list of items all
 at once.  Objects can represent a virtual collection that is beyond
 the reaches of foreach, map, and grep because they cannot turn
 themselves into a list.
 
-If the object can return a next element, it can use this module.
+If the object can return the next element, it can use this module.
 Iterate assumes that the object responds to C<__next__> with the next
 element, and to C<__more__> with TRUE or FALSE if more elements remain
 to be processed.  The C<__init__> method is called before the first
 iteration (if it exists), and is silently skipped otherwise. The
 control structure continues until the C<__more__> method returns FALSE
-(which does not mean that it visited all of the elements but that the
+(which does not mean that it visited all of the elements, but that the
 object has decided to stop iterating).  At the end of all iterations
 (when C<__more__> returns false), C<Object::Iterate> calls
 C<__final__> if it exists, and skips it otherwise.
@@ -96,17 +96,17 @@ foreach, map, and grep.
 =head2  Mutable method names
 
 You do not really have to use the C<__next__>, C<__more__>,
-C<__init__>, or C<__final__> names. They are just the defaults which
-<Object::Iterate> stores in the package variables C<$Next>, C<$More>,
+C<__init__>, or C<__final__> names. They are just the defaults, which
+C<Object::Iterate> stores in the package variables C<$Next>, C<$More>,
 C<$Init>, and C<$Final> respectively.  This module does not export
 these variables, so you need to use the full package specification to
 change them (I<i.e.> C<$Object::Iterate::Next>). If your object does
 not have the specified methods, the functions will die.  You may want
 to wrap them in eval blocks.
 
-Since this module uses package variables to store these methods names,
-the method names apply to every use of the functions no matter the
-object.  You might want to local()-ise the variables for different
+Since this module uses package variables to store these method names,
+the method names apply to every use of the functions, no matter the
+object. You might want to local()-ise the variables for different
 objects.
 
 Before any control structure does its job, it checks the object to see
@@ -170,13 +170,12 @@ sub iterate (&$) {
 
 	_check_object( $object );
 
-	while( $object->$More() ) {
-		local $_;
-		$_ = $object->$Next();
+	while( $object->$More ) {
+		local $_ = $object->$Next;
 		$sub->();
 		}
 
-	$object->$Final() if $object->can( $Final );
+	$object->$Final if $object->can( $Final );
 	}
 
 =item igrep BLOCK, OBJECT
@@ -184,11 +183,12 @@ sub iterate (&$) {
 Applies BLOCK to each item returned by C<< OBJECT->__next__ >>, and
 returns all of the elements for which the BLOCK returns TRUE.
 
-	my $output = igrep { print "$_\n" } $object;
+	my @output = igrep { /abc/ } $object;
 
 This is a grep for something that cannot be represented as a
 list at one time.
 
+	my @output;
 	while( $object->__more__ ) {
 		local $_ = $object->__next__;
 		push @output, $_ if ...BLOCK...;
@@ -206,15 +206,13 @@ sub igrep (&$) {
 
 	_check_object( $object );
 
-	my @output = ();
-
-	while( $object->$More() ) {
-		local $_;
-		$_ = $object->$Next();
+	my @output;
+	while( $object->$More ) {
+		local $_ = $object->$Next;
 		push @output, $_ if $sub->();
 		}
 
-	$object->$Final() if $object->can( $Final );
+	$object->$Final if $object->can( $Final );
 
 	wantarray ? @output : scalar @output;
 	}
@@ -225,14 +223,14 @@ Applies BLOCK to each item returned by C<< OBJECT->__next__ >>, and
 returns the combined lists that BLOCK returns for each of the
 elements.
 
-	my @output = imap { print "$_\n" } $object;
+	my @output = imap { uc($_) } $object;
 
 This is a map for something that cannot be represented as a
 list at one time.
 
+	my @output;
 	while( $object->$More ) {
 		local $_ = $object->__next__;
-
 		push @output, ...BLOCK...;
 		}
 
@@ -248,11 +246,9 @@ sub imap (&$) {
 
 	_check_object( $object );
 
-	my @output = ();
-
+	my @output;
 	while( $object->$More ) {
-		local $_;
-		$_ = $object->$Next;
+		local $_ = $object->$Next;
 		push @output, $sub->();
 		}
 
@@ -283,13 +279,17 @@ value of C<$Object::Iterate::Next>.
 
 =head1 SOURCE AVAILABILITY
 
-This module is on Github:
+This module is on GitHub:
 
-	http://github.com/briandfoy/object-iterate
+	https://github.com/briandfoy/object-iterate
 
 =head1 TO DO
 
-* let the methods discover the method names per object.
+=over 4
+
+=item * let the methods discover the method names per object.
+
+=back
 
 =head1 CREDITS
 
@@ -301,7 +301,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2002-2026, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

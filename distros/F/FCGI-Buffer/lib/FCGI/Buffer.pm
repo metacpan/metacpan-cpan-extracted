@@ -29,11 +29,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 
@@ -152,14 +152,15 @@ sub new
 	return bless $rc, $class;
 }
 
-sub DESTROY {
+sub DESTROY
+{
 	if(defined($^V) && ($^V ge 'v5.14.0')) {
 		return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
 	}
 	my $self = shift;
 
 	if($self->{'logger'}) {
-		$self->{'logger'}->info('In DESTROY');
+		$self->{'logger'}->trace('>In ' . __PACKAGE__ . ' DESTROY');
 	}
 	select($self->{old_buf});
 	if((!defined($self->{buf})) || (!defined($self->{buf}->getpos()))) {
@@ -187,6 +188,7 @@ sub DESTROY {
 			"Generate_304 = $self->{generate_304}, ",
 			"Generate_last_modified = $self->{generate_last_modified}");
 	}
+
 	unless($headers || $self->is_cached()) {
 		if($self->{'logger'}) {
 			$self->{'logger'}->debug('There was no output');
@@ -448,9 +450,9 @@ sub DESTROY {
 						push @{$self->{o}}, 'X-Cache: HIT', 'X-Cache-Lookup: HIT';
 					}
 				} elsif($self->{logger}) {
-					$self->{logger}->warn("Error retrieving data for key $key");
+					$self->{logger}->warn(ref($self), ": Error retrieving data for key $key");
 				} else {
-					carp(__PACKAGE__, ": error retrieving data for key $key");
+					carp(ref($self), ": error retrieving data for key $key");
 				}
 			}
 
@@ -459,7 +461,7 @@ sub DESTROY {
 			if($self->{send_body} && $ENV{'SERVER_PROTOCOL'} &&
 			  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 			  $self->{generate_304} && ($self->{status} == 200)) {
-				if($ENV{'HTTP_IF_MODIFIED_SINCE'}) {
+				if($ENV{'HTTP_IF_MODIFIED_SINCE'} && $self->{'cobject'}) {
 					$self->_check_modified_since({
 						since => $ENV{'HTTP_IF_MODIFIED_SINCE'},
 						modified => $self->{cobject}->created_at()
@@ -1020,7 +1022,7 @@ sub _generate_key {
 		$self->{info} = CGI::Info->new({ cache => $self->{cache} });
 	}
 
-	my $key = $self->{info}->browser_type() . '::' . $self->{info}->domain_name() . '::' . $self->{info}->script_name() . '::' . $self->{info}->as_string();
+	my $key = __PACKAGE__ . '::' . $self->{info}->browser_type() . '::' . $self->{info}->domain_name() . '::' . $self->{info}->script_name() . '::' . $self->{info}->as_string();
 
 	if($self->{lingua}) {
 		$key .= '::' . $self->{lingua}->language();
@@ -1435,7 +1437,8 @@ sub _my_age {
 	return $self->{script_mtime};
 }
 
-sub _should_gzip {
+sub _should_gzip
+{
 	my $self = shift;
 
 	if($self->{compress_content} && ($ENV{'HTTP_ACCEPT_ENCODING'} || $ENV{'HTTP_TE'})) {
@@ -1456,13 +1459,14 @@ sub _should_gzip {
 	return '';
 }
 
-sub _set_content_type {
+sub _set_content_type
+{
 	my $self = shift;
 	my $headers = shift;
 
 	foreach my $header (split(/\r?\n/, $headers)) {
 		my ($header_name, $header_value) = split /\:\s*/, $header, 2;
-		if (lc($header_name) eq 'content-type') {
+		if(lc($header_name) eq 'content-type') {
 			my @content_type = split /\//, $header_value, 2;
 			$self->{content_type} = \@content_type;
 			return;
@@ -1504,7 +1508,7 @@ sub _compress()
 	} elsif($encoding eq 'zstd') {
 		# Facebook
 		if(eval { require Compress::Zstd; 1 }) {
-			my $compressed_body = Compress::Zstd::compress(\Encode::_encode_utf8($self->{'body'}));
+			my $compressed_body = Compress::Zstd::compress(\Encode::encode_utf8($self->{'body'}));
 			if(length($compressed_body) < length($self->{'body'})) {
 				$self->{'body'} = $compressed_body;
 				unless(grep(/^Content-Encoding: zstd/, @{$self->{o}})) {
@@ -1550,20 +1554,22 @@ sub _compress()
 sub _check_if_none_match {
 	my $self = shift;
 
-	if($self->{logger}) {
-		$self->{logger}->debug("Compare $ENV{HTTP_IF_NONE_MATCH} with $self->{etag}");
-	}
-	if($ENV{'HTTP_IF_NONE_MATCH'} eq $self->{etag}) {
-		push @{$self->{o}}, 'Status: 304 Not Modified';
-		$self->{send_body} = 0;
-		$self->{status} = 304;
-		if($self->{'info'}) {
-			$self->{'info'}->status(304);
-		}
+	if($ENV{'HTTP_IF_NONE_MATCH'}) {
 		if($self->{logger}) {
-			$self->{logger}->debug('Set status to 304');
+			$self->{logger}->debug("Compare $ENV{HTTP_IF_NONE_MATCH} with $self->{etag}");
 		}
-		return 1;
+		if($ENV{'HTTP_IF_NONE_MATCH'} eq $self->{etag}) {
+			push @{$self->{o}}, 'Status: 304 Not Modified';
+			$self->{send_body} = 0;
+			$self->{status} = 304;
+			if($self->{'info'}) {
+				$self->{'info'}->status(304);
+			}
+			if($self->{logger}) {
+				$self->{logger}->debug('Set status to 304');
+			}
+			return 1;
+		}
 	}
 	if($self->{cache} && $self->{logger} && $self->{logger}->is_debug()) {
 		my $cached_copy = $self->{cache}->get($self->_generate_key());
@@ -1726,7 +1732,7 @@ sub _save_to {
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
@@ -1786,6 +1792,8 @@ L<HTML::Lint>
 
 =head1 SUPPORT
 
+This module is provided as-is without any warranty.
+
 You can find documentation for this module with the perldoc command.
 
     perldoc FCGI::Buffer
@@ -1820,7 +1828,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2025 Nigel Horne,
+The rest of the program is Copyright 2015-2026 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

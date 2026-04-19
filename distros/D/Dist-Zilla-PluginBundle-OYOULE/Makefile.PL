@@ -20,21 +20,23 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Dist::Zilla::PluginBundle::OYOULE",
   "PREREQ_PM" => {
+    "Dist::Zilla::Plugin::OurPkgVersion" => 0,
     "Dist::Zilla::Plugin::PodWeaver" => 0,
     "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
     "Dist::Zilla::Plugin::UploadToDarkPAN" => 0,
     "Dist::Zilla::PluginBundle::Starter" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
+    "ExtUtils::MakeMaker" => "7.78",
     "Moose" => 0,
     "namespace::autoclean" => 0,
     "strictures" => 2
   },
   "TEST_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::MakeMaker" => "7.78",
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.0.0",
+  "VERSION" => "2.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,12 +45,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Dist::Zilla" => 0,
+  "Dist::Zilla::Plugin::OurPkgVersion" => 0,
   "Dist::Zilla::Plugin::PodWeaver" => 0,
   "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => 0,
   "Dist::Zilla::Plugin::UploadToDarkPAN" => 0,
   "Dist::Zilla::PluginBundle::Starter" => 0,
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
-  "ExtUtils::MakeMaker" => 0,
+  "ExtUtils::MakeMaker" => "7.78",
   "File::Spec" => 0,
   "Moose" => 0,
   "Test::More" => 0,

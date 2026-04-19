@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.149   2026-04-19
+        - New options: max_width, bottom_text, tabs_bottom_text.
+        - Update options: tabs_info and tabs_prompt.
+        - Update prompt defaults.
+
 0.148   2026-04-09
         - Bugfix choose_a_subset option all_by_default.
         - Term::Choose minimum version 1.782.

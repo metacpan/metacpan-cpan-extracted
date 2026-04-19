@@ -1,26 +1,41 @@
-use strict;
-
 use Test::More;
+use lib qw(t/lib);
 
 use Object::Iterate qw(iterate);
 
-my $o = T->new();
-isa_ok( $o, 'T' );
+my $class         = 'Object::Iterate';
+my $function_name = 'iterate';
+my $object_class  = 'Object::Iterate::Tester';
 
-my @out = ();
-iterate { push @out, "$_$_" } $o;
+subtest 'load object class' => sub {
+	use_ok $object_class;
+	can_ok $object_class, 'new';
+	isa_ok $object_class->new, $object_class;
+	};
 
-my @expected = qw( AA BB CC DD EE FF );
+subtest 'list context' => sub {
+	my $o = $object_class->new;
+	isa_ok $o, $object_class;
+	ok defined &{"$function_name"}, "$function_name is defined";
 
-ok( eq_array( \@out, \@expected ), 'Iterate returned the right thing' );
+	my @expected = map { "$_$_" } qw( a b c d e f );
 
-BEGIN {
-	package T;
-	
-	sub new { bless { A => [ 'A' .. 'F' ] }, __PACKAGE__     }
-	sub __init__ { $_[0]{Pos} = 0                   }
-	sub __next__ { $_[0]{A}[ $_[0]{Pos}++ ]          }
-	sub __more__ { $_[0]{Pos} > $#{ $_[0]{A} } ? 0 : 1 }
-	}
+	my @got;
+	iterate { push @got, "$_$_" } $o;
+	is_deeply \@got, \@expected, "$function_name gives the right results";
+	};
+
+subtest 'empty set' => sub {
+	my $empty_class = 'Local::Empty';
+	use_ok $empty_class;
+	can_ok $empty_class, 'new';
+	my $o = $empty_class->new;
+	isa_ok $o, $empty_class;
+
+	my @got;
+	iterate { push @got, "$_$_" } $o;
+	is scalar @got, 0, 'the empty class returns no results';
+	};
 
 done_testing();
+`	`

@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-InflateColumn-Serializer
 
+0.10      2026-04-18 22:54:12-04:00 America/New_York
+    - Update LICENSE file and migrate repo from GitHub to Codeberg.
+      No functional changes.
+
 0.09      2017-01-14 17:31:18+00:00 Europe/London
     - Cosmetic changes to release and test files. No functional changes.
       Thanks to paultcochrane for the several PRs

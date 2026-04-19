@@ -1,10 +1,10 @@
 {
    "abstract" : "Verify, Cache and Optimise FCGI Output",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -74,17 +74,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-FCGI-Buffer@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/FCGI-Buffer/issues",
-         "x_url" : "https://github.com/nigelhorne/FCGI-Buffer/issues"
+         "mailto" : "bug-CGI-Buffer@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer"
       },
+      "homepage" : "https://metacpan.org/pod/CGI::Buffer",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/nigelhorne/FCGI-Buffer.git",
-         "web" : "https://github.com/nigelhorne/FCGI-Buffer",
-         "x_repository" : "https://github.com/nigelhorne/FCGI-Buffer"
+         "url" : "git://github.com/nigelhorne/CGI-Buffer.git",
+         "web" : "https://github.com/nigelhorne/CGI-Buffer"
       }
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -23,11 +23,11 @@ plan_skip('README not found') unless -f "$ROOT/README";
 
 # Required README sections (common to all ina@CPAN distributions)
 my @required_sections = qw(
-    NAME SYNOPSIS DESCRIPTION
+    NAME SYNOPSIS DESCRIPTION FUNCTIONS
     INSTALLATION COMPATIBILITY
     AUTHOR
 );
-# Optional but expected sections in DB-Handy
+# Optional but expected sections in mb-JSON
 my @recommended_sections = (
     'INCLUDED DOCUMENTATION',
     'TARGET USE CASES',

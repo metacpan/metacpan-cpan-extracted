@@ -13,6 +13,7 @@ t/lib/INA_CPAN_Check.pm
 t/1001-decode.t
 t/1002-encode.t
 t/1003-boolean.t
+t/1004-stringify.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t
@@ -24,6 +25,8 @@ t/9070-examples.t
 t/9080-cheatsheets.t
 eg/01_decode.pl
 eg/02_encode.pl
+eg/03_parse.pl
+eg/04_stringify.pl
 doc/json_cheatsheet.BM.txt
 doc/json_cheatsheet.BN.txt
 doc/json_cheatsheet.EN.txt

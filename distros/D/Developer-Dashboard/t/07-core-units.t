@@ -1477,9 +1477,11 @@ is( $output->{stdout}, "bad\n", 'read_output returns stdout' );
 is( $output->{stderr}, "nope\n", 'read_output returns stderr' );
 is( $output->{combined}, "bad\nnope\n", 'read_output returns combined output' );
 like( $output->{last_run}, qr/T/, 'read_output returns last run timestamp' );
+like( $output->{last_run}, qr/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}\z/, 'read_output returns a local ISO-8601 timestamp with timezone offset' );
 is( $collector->inspect_collector('alpha.collector')->{job}{name}, 'alpha.collector', 'inspect_collector returns combined collector data' );
 my $collector_log = $collector->read_log('alpha.collector');
 like( $collector_log, qr/alpha\.collector/, 'read_log includes the collector name' );
+like( $collector_log, qr/\A=== collector alpha\.collector \| \@ \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4} \| exit=1 ===/s, 'read_log renders local ISO-8601 timestamps with timezone offsets in collector headers' );
 like( $collector_log, qr/\[stdout\]\nbad\n/s, 'read_log includes persisted stdout content' );
 like( $collector_log, qr/\[stderr\]\nnope\n/s, 'read_log includes persisted stderr content' );
 ok( $collector->collector_exists('alpha.collector'), 'collector_exists recognizes persisted collector state' );
@@ -2832,7 +2834,7 @@ is_deeply(
     );
     $rotation_collector->append_log_entry(
         'age.rotator',
-        happened_at => '2026-04-17T00:00:00Z',
+        happened_at => '2026-04-17T00:00:00+0100',
         exit_code   => 0,
         stdout      => "fresh-entry\n",
     );

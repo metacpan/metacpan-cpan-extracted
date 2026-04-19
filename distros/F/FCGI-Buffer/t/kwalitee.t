@@ -3,6 +3,7 @@ use warnings;
 
 use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Kwalitee';
 
 eval "use Test::Kwalitee tests => [ qw( -has_meta_yml ) ]";
 

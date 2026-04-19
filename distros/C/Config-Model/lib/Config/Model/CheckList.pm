@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.160;
+package Config::Model::CheckList 2.161;
 
 use Mouse;
 use 5.020;
@@ -539,8 +539,8 @@ sub get_info {
 sub clear {
     my $self = shift;
     # also triggers notify changes
-    for ($self->get_choice) {
-        $self->clear_item($_)
+    for my $item ($self->get_choice) {
+        $self->clear_item($item);
     }
     return;
 }
@@ -833,7 +833,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,101 @@
 Revision history for Developer Dashboard
 
+2.56  2026-04-18
+    - tightened the documentation gate so README and the main POD must both
+      document executable `.go` and `.java` custom-command dispatch through
+      `go run`, `javac`, and `java`
+    - added concrete `dashboard hi` and `dashboard foo` examples to the main
+      user docs so source-backed CLI commands are visible in the top-level
+      manual instead of being implied by a deep runtime paragraph
+    - turned the Go/Java source-command documentation requirement into an
+      executable release-metadata guardrail rather than leaving it to manual
+      spot checks
+
+2.55  2026-04-18
+    - aligned collector status and transcript timestamps with the machine's
+      local timezone offset so cron-scheduled collectors no longer look an
+      hour behind the wall clock during daylight-saving periods
+    - fixed the collector timestamp contract end to end by trimming stored
+      `last_run` output values and teaching collector log rotation to parse
+      both new local-offset timestamps and legacy UTC `Z` timestamps
+    - added regression coverage proving collector-visible timestamps now match
+      the scheduler timezone contract without breaking housekeeper rotation
+
+2.54  2026-04-18
+    - hardened the release kwalitee gate so it now fails when stale unpacked
+      `Developer-Dashboard-X.XX/` build directories remain beside the current
+      release tarball
+    - turned release artifact cleanup into an enforced invariant by requiring
+      exactly one unpacked build directory and exactly one matching tarball
+      after the documented `rm -rf ... && dzil build` flow
+    - synced the release manuals to document the new build-directory hygiene
+      check instead of leaving it as an operator memory rule
+
+2.53  2026-04-18
+    - added `dashboard serve --no-indicators` and the compatibility alias
+      `dashboard serve --no-indicator` so the web UI can clear the whole
+      top-right chrome area without affecting terminal prompt indicators
+    - hid the browser-only top-right indicator strip, username, host or IP
+      link, and live date-time line under that mode while leaving
+      `/system/status`, bookmark rendering, and `dashboard ps1` unchanged
+    - added focused web, config, CLI smoke, and browser coverage proving the
+      no-indicators mode persists across restart and only affects the web
+      interface chrome
+
+2.52  2026-04-18
+    - added `dashboard serve --no-editor` and the compatibility alias
+      `dashboard serve --no-endit` so the web UI can run in a persisted
+      read-only mode without exposing the bookmark editor chrome
+    - blocked bookmark editor GET and POST routes plus saved bookmark source
+      routes under that mode, while keeping normal saved-page render routes
+      available and hiding the Share, Play, and View Source links
+    - added focused web, config, and CLI smoke coverage proving read-only
+      serve persistence across restart and direct POST-bypass denial, and
+      synced the manuals for the new serve mode
+
+2.51  2026-04-18
+    - added `dashboard docker list` with `--enabled` and `--disabled`
+      filters so users can inspect isolated compose service marker state
+      without scanning layered docker folders by hand
+    - added `Developer::Dashboard::DockerCompose->list_services` so the thin
+      docker helper can report effective enabled and disabled service state
+      through the same layered lookup contract used by compose resolution
+    - added focused module and CLI coverage for docker service listing,
+      filter semantics, and synced the docker service toggle manuals to
+      document the new inspection path
+
+2.50  2026-04-18
+    - added `dashboard docker disable <service>` and
+      `dashboard docker enable <service>` so isolated compose services can
+      toggle `disabled.yml` markers without manual file creation or deletion
+    - wrote toggle markers into the deepest runtime docker root, allowing
+      child project layers to disable inherited home compose services locally
+      and re-enable them again by removing the same local marker
+    - added focused module and CLI coverage for docker-service toggle marker
+      management and documented the new command contract in the synced manuals
+
+2.49  2026-04-18
+    - added `Developer::Dashboard::PathRegistry->new_from_all_folders` as a
+      convenience constructor that rebuilds a fresh path registry object from
+      the public `Developer::Dashboard::Folder->all` inventory
+    - added `Developer::Dashboard::Collector->new_from_all_folders` so code can
+      build a collector store from the same Folder-derived runtime roots
+      without repeating constructor plumbing
+    - documented both convenience constructors alongside the existing public
+      path inventory methods and added focused coverage for the object
+      rehydration paths
+
+2.47  2026-04-18
+    - added public Perl path inventory APIs through
+      `Developer::Dashboard::PathRegistry->all_paths`,
+      `Developer::Dashboard::PathRegistry->all_path_aliases`, and
+      `Developer::Dashboard::Folder->all` so code can fetch the same full
+      payloads printed by `dashboard paths` and `dashboard path list`
+    - switched the lightweight paths CLI helper to use those new public path
+      inventory methods instead of keeping a separate private payload builder
+    - added focused coverage for the new public path inventory APIs through
+      both `PathRegistry` and the compatibility `Folder` wrapper
+
 2.46  2026-04-17
     - fixed dotted skill command dispatch for multiple nested levels, so
       commands such as `dashboard nest.level1.level2.here` now execute

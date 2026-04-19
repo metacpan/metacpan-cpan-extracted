@@ -2,10 +2,6 @@
 
 Riemann::Client - A Perl client for the Riemann event system
 
-<div>
-    <a href="https://travis-ci.org/miquelruiz/Riemann-Client"><img src="https://travis-ci.org/miquelruiz/Riemann-Client.svg?branch=master"></a>
-</div>
-
 # SYNOPSIS
 
     use Riemann::Client;
@@ -84,7 +80,7 @@ Accepts a string and returns a message.
 
 # MESSAGE SPECS
 
-The specification of the messages in [Google::ProtocolBuffers](https://metacpan.org/pod/Google::ProtocolBuffers) format is at:
+The specification of the messages in [Google::ProtocolBuffers](https://metacpan.org/pod/Google%3A%3AProtocolBuffers) format is at:
 [https://github.com/riemann/riemann-java-client/blob/master/riemann-java-client/src/main/proto/riemann/proto.proto](https://github.com/riemann/riemann-java-client/blob/master/riemann-java-client/src/main/proto/riemann/proto.proto)
 
 # SEE ALSO

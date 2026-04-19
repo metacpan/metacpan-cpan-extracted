@@ -1,5 +1,5 @@
 package Riemann::Client;
-$Riemann::Client::VERSION = '0.05';
+$Riemann::Client::VERSION = '0.06';
 use Moo;
 use Net::Domain qw/hostfqdn/;
 
@@ -56,8 +56,6 @@ __END__
 =head1 NAME
 
 Riemann::Client - A Perl client for the Riemann event system
-
-=for html <a href="https://travis-ci.org/miquelruiz/Riemann-Client"><img src="https://travis-ci.org/miquelruiz/Riemann-Client.svg?branch=master"></a>
 
 =head1 SYNOPSIS
 

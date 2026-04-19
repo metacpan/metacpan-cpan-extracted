@@ -29,6 +29,8 @@ use Developer::Dashboard::PathRegistry;
     is($settings->{port}, 7890, 'default port is 7890');
     is($settings->{workers}, 1, 'default workers is 1');
     is($settings->{ssl}, 0, 'default ssl is 0 (disabled)');
+    is($settings->{no_editor}, 0, 'default no_editor is 0 (editor enabled)');
+    is($settings->{no_indicators}, 0, 'default no_indicators is 0 (browser chrome visible)');
 }
 
 # Test 2: save_global_web_settings() saves all settings
@@ -47,6 +49,8 @@ use Developer::Dashboard::PathRegistry;
         port    => 8000,
         workers => 4,
         ssl     => 1,
+        no_editor     => 1,
+        no_indicators => 1,
     );
 
     ok($result, 'save_global_web_settings returns result');
@@ -54,6 +58,8 @@ use Developer::Dashboard::PathRegistry;
     is($result->{port}, 8000, 'returned port matches');
     is($result->{workers}, 4, 'returned workers matches');
     is($result->{ssl}, 1, 'returned ssl matches');
+    is($result->{no_editor}, 1, 'returned no_editor matches');
+    is($result->{no_indicators}, 1, 'returned no_indicators matches');
 }
 
 # Test 3: web_settings() retrieves saved settings
@@ -72,6 +78,8 @@ use Developer::Dashboard::PathRegistry;
         port    => 9000,
         workers => 2,
         ssl     => 1,
+        no_editor     => 1,
+        no_indicators => 1,
     );
 
     # Create new config object (simulates restart reading config)
@@ -82,6 +90,8 @@ use Developer::Dashboard::PathRegistry;
     is($settings->{port}, 9000, 'loaded port matches saved');
     is($settings->{workers}, 2, 'loaded workers matches saved');
     is($settings->{ssl}, 1, 'loaded ssl matches saved');
+    is($settings->{no_editor}, 1, 'loaded no_editor matches saved');
+    is($settings->{no_indicators}, 1, 'loaded no_indicators matches saved');
 }
 
 # Test 4: partial save updates only specified settings
@@ -100,6 +110,8 @@ use Developer::Dashboard::PathRegistry;
         port    => 9000,
         workers => 2,
         ssl     => 1,
+        no_editor     => 1,
+        no_indicators => 1,
     );
 
     # Save only ssl without others
@@ -111,9 +123,11 @@ use Developer::Dashboard::PathRegistry;
     is($settings->{ssl}, 0, 'ssl updated to 0');
     is($settings->{host}, '192.168.1.100', 'host preserved from previous save');
     is($settings->{port}, 9000, 'port preserved from previous save');
+    is($settings->{no_editor}, 1, 'no_editor preserved from previous save');
+    is($settings->{no_indicators}, 1, 'no_indicators preserved from previous save');
 }
 
-# Test 5: ssl flag validation
+# Test 5: ssl, no_editor, and no_indicators flag validation
 {
     my $temp_home = tempdir(CLEANUP => 1);
     my $temp_config = tempdir(CLEANUP => 1);
@@ -130,6 +144,18 @@ use Developer::Dashboard::PathRegistry;
 
     $result = $config->save_global_web_settings(ssl => 0);
     is($result->{ssl}, 0, 'ssl => 0 saved correctly');
+
+    $result = $config->save_global_web_settings(no_editor => 1);
+    is($result->{no_editor}, 1, 'no_editor => 1 saved correctly');
+
+    $result = $config->save_global_web_settings(no_editor => 0);
+    is($result->{no_editor}, 0, 'no_editor => 0 saved correctly');
+
+    $result = $config->save_global_web_settings(no_indicators => 1);
+    is($result->{no_indicators}, 1, 'no_indicators => 1 saved correctly');
+
+    $result = $config->save_global_web_settings(no_indicators => 0);
+    is($result->{no_indicators}, 0, 'no_indicators => 0 saved correctly');
 }
 
 # Test 6: port validation

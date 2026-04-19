@@ -132,5 +132,6 @@ t/34-scorecard-guardrails.t
 t/35-js-fast-check.t
 t/36-release-kwalitee.t
 t/37-pod-syntax.t
+t/38-web-no-editor-browser.t
 t/fuzz/scorecard-fast-check.mjs
 t/web_app_static_files.t

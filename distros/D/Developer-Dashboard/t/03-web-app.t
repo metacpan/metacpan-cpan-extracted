@@ -1097,6 +1097,50 @@ my ($status_icon_code, undef, $status_icon_body) = @{ $app->handle(path => '/sys
 is($status_icon_code, 200, 'legacy status endpoint still responds after syncing config-backed collector indicators');
 like(decode('UTF-8', $status_icon_body), qr/"alias"\s*:\s*"🔑"/, 'legacy status endpoint exposes configured collector indicator icons instead of collector names');
 like($app->_prompt_summary, qr/🔑/, 'page top-right prompt summary prefers the configured collector indicator icon');
+$config->save_global_web_settings( no_editor => 1 );
+my ($readonly_render_code, undef, $readonly_render_body) = @{ $app->handle(path => '/app/welcome', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($readonly_render_code, 200, 'no-editor mode still renders saved pages');
+unlike($readonly_render_body, qr/id="share-url"/, 'no-editor mode hides the share link from render views');
+unlike($readonly_render_body, qr/id="view-source-url"/, 'no-editor mode hides the view-source link from render views');
+unlike($readonly_render_body, qr/id="play-url"/, 'no-editor mode hides the play link from render views');
+my ($readonly_source_code, $readonly_source_type, $readonly_source_body) = @{ $app->handle(path => '/app/welcome/source', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($readonly_source_code, 403, 'no-editor mode blocks saved page source routes');
+like($readonly_source_type, qr/text\/plain/, 'no-editor blocked source route returns plain text');
+like($readonly_source_body, qr/read-only|no-editor/i, 'no-editor blocked source route explains the read-only restriction');
+my ($readonly_edit_code, $readonly_edit_type, $readonly_edit_body) = @{ $app->handle(path => '/app/welcome/edit', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($readonly_edit_code, 403, 'no-editor mode blocks saved page editor routes');
+like($readonly_edit_type, qr/text\/plain/, 'no-editor blocked editor route returns plain text');
+like($readonly_edit_body, qr/read-only|no-editor/i, 'no-editor blocked editor route explains the read-only restriction');
+my $readonly_post_instruction = uri_escape("TITLE: Changed\n:--------------------------------------------------------------------------------:\nBOOKMARK: welcome\n:--------------------------------------------------------------------------------:\nHTML: changed\n");
+my ($readonly_post_code, $readonly_post_type, $readonly_post_body) = @{ $app->handle(
+    path        => '/app/welcome/edit',
+    method      => 'POST',
+    body        => 'instruction=' . $readonly_post_instruction,
+    remote_addr => '127.0.0.1',
+    headers     => { host => '127.0.0.1' },
+) };
+is($readonly_post_code, 403, 'no-editor mode blocks saved page editor POST saves');
+like($readonly_post_type, qr/text\/plain/, 'no-editor blocked editor POST returns plain text');
+like($readonly_post_body, qr/read-only|no-editor/i, 'no-editor blocked editor POST explains the read-only restriction');
+my $welcome_after_block = $store->load_saved_page('welcome');
+is($welcome_after_block->as_hash->{layout}{body}, 'hello from app [% stash.name %]', 'no-editor mode leaves the saved bookmark unchanged after a blocked POST');
+my ($readonly_root_code, $readonly_root_type, $readonly_root_body, $readonly_root_headers) = @{ $app->handle(path => '/', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($readonly_root_code, 302, 'no-editor mode still lets the root route redirect to a saved index page');
+like($readonly_root_type, qr/text\/plain/, 'no-editor root redirect still returns the standard plain-text redirect body');
+is($readonly_root_headers->{Location}, '/app/index', 'no-editor root redirect still targets the saved index page');
+$config->save_global_web_settings( no_editor => 0 );
+$config->save_global_web_settings( no_indicators => 1 );
+my ($noind_render_code, undef, $noind_render_body) = @{ $app->handle(path => '/app/welcome', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($noind_render_code, 200, 'no-indicators mode still renders saved pages');
+unlike($noind_render_body, qr/id="status-on-top"/, 'no-indicators mode hides the top-right indicator strip');
+unlike($noind_render_body, qr/id="status-datetime"/, 'no-indicators mode hides the top-right date-time marker');
+unlike($noind_render_body, qr/id="status-server"/, 'no-indicators mode hides the top-right server marker');
+unlike($noind_render_body, qr/class="user-name-and-icon"/, 'no-indicators mode hides the top-right username marker');
+like($app->_prompt_summary, qr/🔑/, 'no-indicators mode does not change prompt-summary data generation');
+my ($noind_status_code, undef, $noind_status_body) = @{ $app->handle(path => '/system/status', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($noind_status_code, 200, 'no-indicators mode keeps the status endpoint available');
+like(decode('UTF-8', $noind_status_body), qr/"alias"\s*:\s*"🔑"/, 'no-indicators mode keeps status endpoint indicator payloads intact');
+$config->save_global_web_settings( no_indicators => 0 );
 $config->save_global(
     {
         collectors => [

@@ -7,14 +7,18 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::FuseUI 2.160;
+package Config::Model::FuseUI 2.161;
 
 # there's no Singleton with Mouse
 use Mouse;
+use v5.20;
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
-use Fuse qw(fuse_get_context);
+
+use Filesys::Fuse3 qw(fuse_get_context);
 use Fcntl ':mode';
-use POSIX qw(ENOENT EISDIR EINVAL);
+use POSIX qw(ENOENT EISDIR EINVAL O_TRUNC O_CREAT O_APPEND);
 use Log::Log4perl qw(get_logger :levels);
 use English qw( -no_match_vars );
 
@@ -29,30 +33,29 @@ has dir_char_mockup => ( is => 'ro', isa => 'Str', default => '<slash>' );
 our $fuseui;
 my $dir_char_mockup;
 
-sub BUILD {
-    my $self = shift;
+sub BUILD ($self, $) {
     croak( __PACKAGE__, " singleton constructed twice" )
         if defined $fuseui and $fuseui ne $self;
     $fuseui          = $self;                    # store singleton object in global variable
     $dir_char_mockup = $self->dir_char_mockup;
+    return;
 }
 
 # nodes, list and hashes are directories
-sub getdir {
-    my $name = shift;
-    $logger->trace("FuseUI getdir called with $name");
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub readdir ($name, $, $) {
+    $logger->trace("FuseUI readdir called with $name");
 
     my $obj = get_object($name);
     return -EINVAL() unless ( ref $obj and $obj->can('children') );
 
     my @c = ( '..', '.', $obj->children );
     for (@c) { s(/)($dir_char_mockup)g };
-    $logger->debug( "FuseUI getdir return @c , wantarray is " . ( wantarray ? 1 : 0 ) );
+    $logger->debug( "FuseUI readdir return @c , wantarray is " . ( wantarray ? 1 : 0 ) );
     return ( @c, 0 );
 }
 
-sub fetch_as_line {
-    my $obj = shift;
+sub fetch_as_line ($obj) {
     my $v = $obj->fetch( check => 'no' );
     $v = '' unless defined $v;
 
@@ -62,8 +65,7 @@ sub fetch_as_line {
     return $v;
 }
 
-sub get_object {
-    my $name = shift;
+sub get_object ($name) {
     return _get_object( $name, 0 );
 }
 
@@ -72,9 +74,7 @@ sub get_or_create_object {
     return _get_object( $name, 1 );
 }
 
-sub _get_object {
-    my ( $name, $autoadd ) = @_;
-
+sub _get_object ($name, $autoadd) {
     my $obj = $fuseui->root->get(
         path            => $name,
         check           => 'skip',
@@ -85,11 +85,9 @@ sub _get_object {
     $logger->debug( "FuseUI _get_object on $name returns ",
         ( defined $obj ? $obj->name : '<undef>' ) );
     return $obj;
-
 }
 
-sub getattr {
-    my $name = shift;
+sub getattr ($name) {
     $logger->trace("FuseUI getattr called with $name");
     my $obj = get_object($name);
 
@@ -129,30 +127,37 @@ sub getattr {
         $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,
         $size, $atime, $mtime, $ctime, $blksize, $blocks
     );
+
     $logger->trace( "FuseUI getattr returns '" . join( "','", @r ) . "'" );
 
     return @r;
 }
 
-sub open {
-
-    # VFS sanity check; it keeps all the necessary state, not much to do here.
-    my $name = shift;
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub open ($name, $flags, $info) {
     $logger->trace("FuseUI open called on $name");
     my $obj = $fuseui->root->get( path => $name, check => 'skip', get_obj => 1 );
-    my $type = $obj->get_type;
-
     return -ENOENT() unless defined $obj;
+
+    my $type = $obj->get_type;
     return -EISDIR() unless ( $type eq 'leaf' or $type eq 'check_list' );
+
+    if ($flags & O_TRUNC) {
+        # must be able to clear a mandatory value
+        $obj->clear(check => 'no');
+
+        $logger->debug("FuseUI open with truncate on $name ok");
+        return 0;
+    }
+
     $logger->debug("FuseUI open on $name ok");
     return 0;
 }
 
-sub read {
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub read ($name, $buf, $off, $) {
     # return an error numeric, or binary/text string.  (note: 0 means EOF, "0" will
     # give a byte (ascii "0") to the reading program)
-    my ( $name, $buf, $off ) = @_;
 
     $logger->trace("FuseUI read called on $name");
     my $obj  = get_or_create_object($name);
@@ -169,9 +174,8 @@ sub read {
     return "$ret";
 }
 
-sub truncate {
-    my ( $name, $off ) = @_;
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub truncate ($name, $off) {
     $logger->trace("FuseUI truncate called on $name with length $off");
     my $obj  = get_or_create_object($name);
     my $type = $obj->get_type;
@@ -189,9 +193,8 @@ sub truncate {
     return 0;
 }
 
-sub write {
-    my ( $name, $buf, $off ) = @_;
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub write ($name, $buf, $off, $) {
     if ( $logger->is_trace ) {
         my $str = $buf;
         $str =~ s/\n/\\n/g;
@@ -207,6 +210,7 @@ sub write {
     my $v = fetch_as_line($obj);
     $logger->debug("FuseUI write starts with '$v'");
 
+    # replace or insert buffer
     substr $v, $off, length($buf), $buf;
     chomp $v unless ( $type eq 'leaf' and $obj->value_type eq 'string' );
     $logger->debug("FuseUI write stores '$v'");
@@ -215,11 +219,10 @@ sub write {
     return length($buf);
 }
 
-sub mkdir {
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub mkdir ($name, $mode) {
     # return an error numeric, or binary/text string.  (note: 0 means EOF, "0" will
     # give a byte (ascii "0") to the reading program)
-    my ( $name, $mode ) = @_;
 
     $logger->trace("FuseUI mkdir called on $name with mode $mode");
     my $obj = get_or_create_object($name);
@@ -231,11 +234,10 @@ sub mkdir {
     return 0;
 }
 
-sub rmdir {
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub rmdir ($name) {
     # return an error numeric, or binary/text string.  (note: 0 means EOF, "0" will
     # give a byte (ascii "0") to the reading program)
-    my ($name) = @_;
 
     $logger->trace("FuseUI rmdir called on $name");
     my $obj = get_object($name);
@@ -259,9 +261,8 @@ sub rmdir {
     return 0;
 }
 
-sub unlink {
-    my ($name) = @_;
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub unlink ($name) {
     $logger->debug("FuseUI unlink called on $name");
     my $obj  = get_object($name);
     my $type = $obj->get_type;
@@ -287,7 +288,7 @@ sub unlink {
 sub statfs { return 255, 1, 1, 1, 1, 2 }
 
 my @methods = map { ( $_ => __PACKAGE__ . "::$_" ) }
-    qw/getattr getdir open read write statfs truncate unlink mkdir rmdir/;
+    qw/getattr readdir open read write statfs truncate unlink mkdir rmdir/;
 
 # FIXME: flush release
 # maybe also: readlink mknod symlink rename link chmod chown utime
@@ -296,12 +297,13 @@ sub run_loop {
     my ( $self, %args ) = @_;
     my $debug = $args{debug} || 0;
 
-    Fuse::main(
+    Filesys::Fuse3::main(
         mountpoint => $self->mountpoint,
         @methods,
         debug => $debug || 0,
         threaded => 0,
     );
+    return;
 }
 
 1;
@@ -320,7 +322,7 @@ Config::Model::FuseUI - Fuse virtual file interface for Config::Model
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 

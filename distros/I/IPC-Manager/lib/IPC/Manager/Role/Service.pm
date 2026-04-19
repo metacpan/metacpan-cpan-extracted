@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -482,7 +482,13 @@ sub run {
             $self->{_LAST_INTERVAL} = time;
         }
 
-        $self->_run_on_peer_delta(delete $activity->{peer_delta}) if $activity->{peer_delta};
+        if (my $delta = delete $activity->{peer_delta}) {
+            my $client = $self->client;
+            for my $peer (keys %$delta) {
+                $client->peer_left($peer) if $delta->{$peer} < 0;
+            }
+            $self->_run_on_peer_delta($delta);
+        }
 
         if (my $msgs = delete $activity->{messages}) {
             for my $msg (@$msgs) {

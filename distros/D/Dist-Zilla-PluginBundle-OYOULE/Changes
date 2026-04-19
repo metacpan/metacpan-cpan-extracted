@@ -1,5 +1,11 @@
 Revision history for Dist::Zilla::PluginBundle::OYOULE
 
+2.1.1  2026-04-18
+    - Use ExtUtils::MakeMaker version 7.78
+
+2.1.0  2026-04-18
+    - Include Dist::Zilla::Plugin::OurPkgVersion
+
 2.0.0  2025-11-23
     - Change license to Perl 5.
 

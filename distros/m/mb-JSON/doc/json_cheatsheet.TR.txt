@@ -2,32 +2,44 @@
  mb::JSON Cheat Sheet                                      [TR] Türkçe
 ======================================================================
 
-[ 1. Load ]
+[ Veri Türü Eşleştirmesi ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "metin"    -> skaler string
+  123        -> skaler sayı
+  true       -> mb::JSON::Boolean (değer: 1)
+  false      -> mb::JSON::Boolean (değer: 0)
+  null       -> undef
+  [...]      -> dizi referansı
+  {...}      -> hash referansı
+
+[ 1. Yükleme ]
   use mb::JSON;
 
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
-  my $data = mb::JSON::parse($json_text);  # alias
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: decode() için alias ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Boolean ]
+[ 5. stringify: Perl -> JSON  (JavaScript uyumlu alias) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() ve encode() aynı çıktıyı üretir
+
+[ 6. Boolean ]
   mb::JSON::true  -> true
   mb::JSON::false -> false
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef -> null  /  null -> undef
 
-[ 6. Hash keys sorted, UTF-8 kept as-is ]
+[ 8. Hash anahtarları alfabetik sırayla dizilir, UTF-8 olduğu gibi kalır ]
 
-[ 7. Type mapping ]
-  "string" -> scalar    123   -> number
-  true     -> Boolean   false -> Boolean
-  null     -> undef     [...]  -> arrayref
-  {...}  -> hashref
-
-[ 8. Example ]
+[ 9. Örnek ]
   my $h = mb::JSON::decode('{"name":"Alice","ok":true}');
   my $j = mb::JSON::encode({name=>'Alice',ok=>mb::JSON::true});
+  my $j = mb::JSON::stringify({name=>'Alice',ok=>mb::JSON::true});
   # -> {"name":"Alice","ok":true}

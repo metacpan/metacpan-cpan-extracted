@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 use Cwd qw(cwd);
 use Developer::Dashboard::Config;
@@ -37,7 +37,7 @@ sub run_paths_command {
 
     if ( $command eq 'paths' ) {
         $load_configured_path_aliases->();
-        print json_encode( _paths_payload($paths) );
+        print json_encode( $paths->all_paths );
         return 1;
     }
 
@@ -81,7 +81,7 @@ sub run_paths_command {
     }
     if ( $action eq 'list' ) {
         $load_configured_path_aliases->();
-        print json_encode( _path_list_payload($paths) );
+        print json_encode( $paths->all_path_aliases );
         return 1;
     }
 
@@ -134,55 +134,6 @@ sub _cdr_payload {
     return {
         target  => @matches == 1 ? $matches[0] : '',
         matches => @matches == 1 ? [] : \@matches,
-    };
-}
-
-# _paths_payload($paths)
-# Builds the JSON payload for C<dashboard paths>.
-# Input: path registry object.
-# Output: hash reference describing the active runtime path set.
-sub _paths_payload {
-    my ($paths) = @_;
-    return {
-        home                 => $paths->home,
-        home_runtime_root    => $paths->home_runtime_root,
-        project_runtime_root => scalar $paths->project_runtime_root,
-        runtime_root         => $paths->runtime_root,
-        state_root           => $paths->state_root,
-        cache_root           => $paths->cache_root,
-        logs_root            => $paths->logs_root,
-        dashboards_root      => $paths->dashboards_root,
-        bookmarks_root       => $paths->bookmarks_root,
-        cli_root             => $paths->cli_root,
-        collectors_root      => $paths->collectors_root,
-        indicators_root      => $paths->indicators_root,
-        config_root          => $paths->config_root,
-        current_project_root => scalar $paths->current_project_root,
-        %{ $paths->named_paths },
-    };
-}
-
-# _path_list_payload($paths)
-# Builds the JSON payload for C<dashboard path list>.
-# Input: path registry object.
-# Output: hash reference of named path aliases plus the standard runtime roots.
-sub _path_list_payload {
-    my ($paths) = @_;
-    return {
-        home            => $paths->home,
-        home_runtime    => $paths->home_runtime_root,
-        project_runtime => scalar $paths->project_runtime_root,
-        runtime         => $paths->runtime_root,
-        state           => $paths->state_root,
-        cache           => $paths->cache_root,
-        logs            => $paths->logs_root,
-        dashboards      => $paths->dashboards_root,
-        bookmarks       => $paths->bookmarks_root,
-        cli             => $paths->cli_root,
-        config          => $paths->config_root,
-        collectors      => $paths->collectors_root,
-        indicators      => $paths->indicators_root,
-        %{ $paths->named_paths },
     };
 }
 

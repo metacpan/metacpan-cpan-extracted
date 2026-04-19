@@ -10,7 +10,7 @@ use MARC::Leader 0.06;
 use MARC::Leader::Print 0.08;
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Constructor.
 sub new {
@@ -398,6 +398,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

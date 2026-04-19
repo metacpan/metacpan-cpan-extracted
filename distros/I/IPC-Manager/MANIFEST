@@ -291,4 +291,8 @@ t/unit/Service-Peer.t
 t/unit/Service.t
 t/unit/Spawn.t
 t/unit/Util.t
+t/unit/atomicpipe_reassembly_cleanup.t
+t/unit/sync_request_peer_death.t
+t/unit/sync_request_peer_suspend.t
+t/unit/sync_request_timeout.t
 xt/author/pod-syntax.t

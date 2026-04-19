@@ -1,5 +1,5 @@
 package DBIx::Class::InflateColumn::Serializer::YAML;
-$DBIx::Class::InflateColumn::Serializer::YAML::VERSION = '0.09';
+$DBIx::Class::InflateColumn::Serializer::YAML::VERSION = '0.10';
 =head1 NAME
 
 DBIx::Class::InflateColumn::Serializer::YAML - YAML Inflator

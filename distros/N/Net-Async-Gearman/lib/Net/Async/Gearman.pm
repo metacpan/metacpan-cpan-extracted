@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Net::Async::Gearman;
+package Net::Async::Gearman 0.02;
 
-use strict;
+use v5.20;
 use warnings;
-
-our $VERSION = '0.01';
 
 use base qw( IO::Async::Stream Protocol::Gearman );
 
@@ -17,6 +15,8 @@ use base qw( IO::Async::Stream Protocol::Gearman );
 C<Net::Async::Gearman> - use Gearman with L<IO::Async>
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This module provides an L<IO::Async>-based wrapper around
 L<Protocol::Gearman>. It shouldn't be used directly; see instead
@@ -35,7 +35,9 @@ L<Net::Async::Gearman::Client>
 
 =cut
 
-=head2 $gearman->connect( %args ) ==> ( $gearman )
+=head2 connect
+
+   $gearman = await $gearman->connect( %args );
 
 Connects to the server. Takes the same arguments as L<IO::Async::Handle>'s
 C<connect> method, but additionally sets a default service name of port 4730.

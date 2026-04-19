@@ -3,7 +3,7 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 use Digest::MD5 qw(md5_hex);
 use Cwd qw(abs_path cwd);
@@ -31,6 +31,16 @@ sub new {
     }, $class;
 
     return $self;
+}
+
+# new_from_all_folders()
+# Constructs a path registry from the public Folder compatibility inventory.
+# Input: none.
+# Output: Developer::Dashboard::PathRegistry object.
+sub new_from_all_folders {
+    my ($class) = @_;
+    require Developer::Dashboard::Folder;
+    return $class->new( %{ Developer::Dashboard::Folder->all } );
 }
 
 # home()
@@ -78,6 +88,12 @@ sub named_paths {
     my ($self) = @_;
     return { %{ $self->{named_paths} || {} } };
 }
+
+# all_paths() and all_path_aliases()
+# Return the public hash payloads for the same inventories printed by
+# dashboard paths and dashboard path list.
+# Input: none.
+# Output: hash references describing resolved runtime roots and aliases.
 
 # runtime_root()
 # Returns the effective runtime root directory.
@@ -242,6 +258,55 @@ sub bookmarks {
 sub bookmarks_root {
     my ($self) = @_;
     return $self->dashboards_root;
+}
+
+# all_paths()
+# Returns the full runtime path inventory used by C<dashboard paths>.
+# Input: none.
+# Output: hash reference describing the active runtime path set plus named aliases.
+sub all_paths {
+    my ($self) = @_;
+    return {
+        home                 => $self->home,
+        home_runtime_root    => $self->home_runtime_root,
+        project_runtime_root => scalar $self->project_runtime_root,
+        runtime_root         => $self->runtime_root,
+        state_root           => $self->state_root,
+        cache_root           => $self->cache_root,
+        logs_root            => $self->logs_root,
+        dashboards_root      => $self->dashboards_root,
+        bookmarks_root       => $self->bookmarks_root,
+        cli_root             => $self->cli_root,
+        collectors_root      => $self->collectors_root,
+        indicators_root      => $self->indicators_root,
+        config_root          => $self->config_root,
+        current_project_root => scalar $self->current_project_root,
+        %{ $self->named_paths },
+    };
+}
+
+# all_path_aliases()
+# Returns the runtime path inventory used by C<dashboard path list>.
+# Input: none.
+# Output: hash reference of standard runtime aliases plus named aliases.
+sub all_path_aliases {
+    my ($self) = @_;
+    return {
+        home            => $self->home,
+        home_runtime    => $self->home_runtime_root,
+        project_runtime => scalar $self->project_runtime_root,
+        runtime         => $self->runtime_root,
+        state           => $self->state_root,
+        cache           => $self->cache_root,
+        logs            => $self->logs_root,
+        dashboards      => $self->dashboards_root,
+        bookmarks       => $self->bookmarks_root,
+        cli             => $self->cli_root,
+        config          => $self->config_root,
+        collectors      => $self->collectors_root,
+        indicators      => $self->indicators_root,
+        %{ $self->named_paths },
+    };
 }
 
 # cli_root()

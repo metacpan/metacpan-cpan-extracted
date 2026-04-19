@@ -408,6 +408,9 @@ sub _build_tracklist {
     $sw->set_policy('automatic', 'automatic');
     $sw->set_size_request(-1, 1);
     $sw->set_propagate_natural_height(FALSE);
+    $sw->set_kinetic_scrolling(FALSE);
+    $sw->set_capture_button_press(FALSE);
+    $sw->set_overlay_scrolling(FALSE);
     $vbox->pack_start($sw, TRUE, TRUE, 0);
 
     my $count_lbl = Gtk3::Label->new('');
@@ -433,7 +436,7 @@ sub _build_tracklist {
 
     my $view = Gtk3::TreeView->new($store);
     $view->set_headers_visible(TRUE);
-    $view->set_rubber_banding(TRUE);
+    $view->set_fixed_height_mode(TRUE);
     $view->get_selection()->set_mode('multiple');
     $view->signal_connect('row-activated' => sub { $self->_track_activated(@_) });
     $self->track_view($view);
@@ -457,14 +460,43 @@ sub _build_tracklist {
         $view->append_column($c);
     }
 
-    # Context menu on right-click
+    # Take full control of left-click so GTK's default handler (which
+    # calls set_cursor and auto-scrolls the clicked row into view) doesn't
+    # shift the viewport between the clicks of a double-click.
     $view->signal_connect('button-press-event' => sub {
         my ($w, $event) = @_;
+
         if ($event->button == 3) {
             $self->_tracklist_context_menu($event);
             return TRUE;
         }
-        return FALSE;
+
+        return FALSE unless $event->button == 1;
+
+        my ($path, $col) = $w->get_path_at_pos($event->x, $event->y);
+        return FALSE unless $path;
+
+        if ($event->type eq '2button-press') {
+            $self->_play_at_path($path, no_scroll => 1);
+            return TRUE;
+        }
+
+        my $sel   = $w->get_selection();
+        my $state = $event->state;
+        if ($state & 'control-mask') {
+            $sel->path_is_selected($path)
+                ? $sel->unselect_path($path)
+                : $sel->select_path($path);
+        }
+        elsif ($state & 'shift-mask') {
+            # Let GTK handle shift-click range extension.
+            return FALSE;
+        }
+        else {
+            $sel->unselect_all();
+            $sel->select_path($path);
+        }
+        return TRUE;
     });
 
     $sw->add($view);
@@ -670,7 +702,7 @@ sub _refresh_track_row {
 
 sub _track_activated {
     my ($self, $view, $path, $col) = @_;
-    $self->_play_at_path($path);
+    $self->_play_at_path($path, no_scroll => 1);
 }
 
 sub _track_at_path {
@@ -688,7 +720,7 @@ sub _current_path {
 }
 
 sub _play_at_path {
-    my ($self, $path) = @_;
+    my ($self, $path, %opts) = @_;
     my $track = $self->_track_at_path($path) or return;
     return unless $self->_init_api();
 
@@ -701,7 +733,7 @@ sub _play_at_path {
     $self->_playing_track_id($track->{id});
     $self->_playing_row_ref(Gtk3::TreeRowReference->new($self->track_store, $path));
     $self->_update_now_playing($track);
-    $self->_highlight_path($path);
+    $self->_highlight_path($path) unless $opts{no_scroll};
 }
 
 sub _toggle_play {
@@ -964,7 +996,7 @@ sub _show_sync_dialog {
 
     $dlg->destroy();
     $self->_load_library();
-    $self->_auto_sync_to_sheet() unless $stopped;
+    $self->_sync_with_sheet() unless $stopped;
 }
 
 # ---- Dialogs ----

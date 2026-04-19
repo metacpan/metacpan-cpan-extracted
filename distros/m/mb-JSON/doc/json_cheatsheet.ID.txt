@@ -20,38 +20,48 @@
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($teks_json);
   my $data = mb::JSON::decode();           # menggunakan $_
-  my $data = mb::JSON::parse($teks_json);  # alias (kompatibel)
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: alias dari decode() ]
+  my $data = mb::JSON::parse($teks_json);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Nilai Boolean ]
+[ 5. stringify: Perl -> JSON  (alias kompatibel JavaScript) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() dan encode() menghasilkan output yang identik
+
+[ 6. Nilai Boolean ]
   mb::JSON::true   -> JSON: true
   mb::JSON::false  -> JSON: false
   Angka 1 atau 0   -> JSON: angka (bukan boolean)
 
-[ 5. null dan undef ]
+[ 7. null dan undef ]
   undef  -> null (saat encode)
   null   -> undef (saat decode)
 
-[ 6. Kunci hash diurutkan secara alfabetis ]
+[ 8. Kunci hash diurutkan secara alfabetis ]
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. String UTF-8 ditulis apa adanya (tidak di-escape ke \uXXXX) ]
+[ 9. String UTF-8 ditulis apa adanya (tidak di-escape ke \uXXXX) ]
 
-[ 8. Contoh Penggunaan ]
-  # decode
+[ 10. Contoh Penggunaan ]
   my $h = mb::JSON::decode('{"nama":"Budi","usia":30}');
   print $h->{nama};   # Budi
 
-  # encode
   my $j = mb::JSON::encode({
-      nama   => 'Budi',
-      aktif  => mb::JSON::true,
-      nilai  => undef,
+      nama  => 'Budi',
+      aktif => mb::JSON::true,
+      nilai => undef,
   });
   # -> {"aktif":true,"nama":"Budi","nilai":null}
 
+  my $j = mb::JSON::stringify({
+      nama  => 'Budi',
+      aktif => mb::JSON::true,
+  });
+  # -> {"aktif":true,"nama":"Budi"}
+
   # bolak-balik (roundtrip)
-  my $data = mb::JSON::decode($json);
+  my $data   = mb::JSON::decode($json);
   my $kembali = mb::JSON::encode($data);

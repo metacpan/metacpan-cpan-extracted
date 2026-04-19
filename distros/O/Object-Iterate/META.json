@@ -37,8 +37,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1",
-            "version" : "0.86"
+            "Test::More" : "1"
          }
       }
    },
@@ -54,6 +53,6 @@
          "web" : "https://github.com/briandfoy/object-iterate"
       }
    },
-   "version" : "1.152",
+   "version" : "1.153",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

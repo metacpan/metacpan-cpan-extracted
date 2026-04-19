@@ -60,7 +60,7 @@ my $inf = 1 / $mpfr1;
 my $nan = Math::MPFR->new();
 my $mpc3 = Math::MPC->new($nan, $inf);
 
-if(lc(Math::MPC::overload_string($mpc3)) eq '(@nan@ -@inf@)') {$ok .= 'b'}
+if(lc(Math::MPC::overload_string($mpc3)) eq '(nan -inf)') {$ok .= 'b'}
 else {warn "\n2b: got '", lc(Math::MPC::overload_string($mpc3)), "'\n" }
 
 if($ok eq 'ab') {print "ok 2\n"}

@@ -3,6 +3,8 @@ package Dist::Zilla::Plugin::UploadToDarkPAN;
 use v5.26;
 use strictures 2;
 
+our $VERSION = '2.0.1'; # VERSION
+
 use Moose;
 use namespace::autoclean;
 
@@ -45,7 +47,7 @@ Dist::Zilla::Plugin::UploadToDarkPAN - Release to a private CPAN (a.k.a a DarkPA
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 SYNOPSIS
 

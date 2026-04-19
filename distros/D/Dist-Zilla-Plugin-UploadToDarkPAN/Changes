@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::Plugin::UploadToDarkPAN
 
+2.0.1  2026-04-18
+    - Fix missing $VERSION
+
 2.0.0  2025-11-23
     - Change license to Perl 5
 

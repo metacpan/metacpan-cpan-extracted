@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 use Capture::Tiny qw(capture);
 use POSIX qw(strftime);
@@ -59,6 +59,40 @@ sub _transient_url_forbidden_response {
         403,
         'text/plain; charset=utf-8',
         "Transient token URLs are disabled. Save the page as a bookmark file or set DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS=1.\n",
+    ];
+}
+
+# _editor_disabled()
+# Reports whether the web service is running in read-only no-editor mode.
+# Input: none.
+# Output: boolean true when bookmark editing and source views are disabled.
+sub _editor_disabled {
+    my ($self) = @_;
+    return 0 if !blessed( $self->{config} ) || !$self->{config}->can('web_settings');
+    my $settings = $self->{config}->web_settings;
+    return $settings->{no_editor} ? 1 : 0;
+}
+
+# _indicators_disabled()
+# Reports whether the web service is running with the top-right browser chrome hidden.
+# Input: none.
+# Output: boolean true when the right-top browser indicators/context area is disabled.
+sub _indicators_disabled {
+    my ($self) = @_;
+    return 0 if !blessed( $self->{config} ) || !$self->{config}->can('web_settings');
+    my $settings = $self->{config}->web_settings;
+    return $settings->{no_indicators} ? 1 : 0;
+}
+
+# _no_editor_response()
+# Builds the read-only denial response used when bookmark editing is disabled.
+# Input: none.
+# Output: response array reference with a 403 plain-text error.
+sub _no_editor_response {
+    return [
+        403,
+        'text/plain; charset=utf-8',
+        "Dashboard serve is running in read-only no-editor mode.\n",
     ];
 }
 
@@ -278,6 +312,7 @@ sub root_response {
     my $headers = $args{headers} || {};
 
     if ( exists $body_params->{instruction} || exists $params->{instruction} ) {
+        return _no_editor_response() if $self->_editor_disabled;
         my $instruction = exists $body_params->{instruction} ? $body_params->{instruction} : $params->{instruction};
         my $page = Developer::Dashboard::PageDocument->from_instruction($instruction);
         $page->{meta}{raw_instruction} = $instruction;
@@ -313,6 +348,8 @@ sub root_response {
         my $page = $self->{pages}->load_transient_page($token);
         $page->{meta}{raw_instruction} = $page->canonical_instruction;
         my $mode = $params->{mode} || 'edit';
+        return _no_editor_response() if $self->_editor_disabled && $mode eq 'source';
+        $mode = 'render' if $self->_editor_disabled && $mode eq 'edit';
         $page = $self->_page_with_runtime_state(
             $page,
             query_params => $params,
@@ -338,6 +375,7 @@ sub root_response {
         ];
     }
 
+    return _no_editor_response() if $self->_editor_disabled;
     return $self->_blank_editor_response;
 }
 
@@ -703,6 +741,7 @@ sub transient_action_response {
 # Output: response array reference.
 sub page_source_response {
     my ( $self, %args ) = @_;
+    return _no_editor_response() if $self->_editor_disabled;
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $page = $self->_load_named_page( $args{id} );
     $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;
@@ -728,6 +767,7 @@ sub page_source_response {
 # Output: response array reference.
 sub page_edit_post_response {
     my ( $self, %args ) = @_;
+    return _no_editor_response() if $self->_editor_disabled;
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $instruction = exists $body_params->{instruction} ? $body_params->{instruction} : $params->{instruction};
     if ( defined $instruction ) {
@@ -761,6 +801,7 @@ sub page_edit_post_response {
 # Output: response array reference.
 sub page_edit_response {
     my ( $self, %args ) = @_;
+    return _no_editor_response() if $self->_editor_disabled;
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $page = $self->_load_named_page( $args{id} );
     $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;
@@ -815,6 +856,7 @@ sub page_action_response {
 # Output: response array reference.
 sub _blank_editor_response {
     my ($self) = @_;
+    return _no_editor_response() if $self->_editor_disabled;
     my $page = Developer::Dashboard::PageDocument->new(
         title       => 'Developer Dashboard',
         description => '',
@@ -842,12 +884,14 @@ sub _page_response {
     my $source = $page->{meta}{raw_instruction} || $page->canonical_instruction;
 
     if ( $mode eq 'source' ) {
+        return _no_editor_response() if $self->_editor_disabled;
         return [ 200, 'text/plain; charset=utf-8', $source ];
     }
     if ( $mode eq 'render' ) {
         return [ 200, 'text/html; charset=utf-8', $self->_render_page_html( $page, 'render' ) ];
     }
 
+    return _no_editor_response() if $self->_editor_disabled;
     return [ 200, 'text/html; charset=utf-8', $self->_edit_html($page) ];
 }
 
@@ -1758,6 +1802,7 @@ sub _skill_app_fallback_response {
 # Output: response array reference containing the edit view.
 sub _missing_named_page_response {
     my ( $self, $id ) = @_;
+    return [ 404, 'text/plain; charset=utf-8', "Not found\n" ] if $self->_editor_disabled;
     my $bookmark_path = $self->_saved_page_url($id);
     my $instruction = join "\n",
         'TITLE: Developer Dashboard',
@@ -2013,9 +2058,10 @@ sub _saved_page_url {
 sub _top_chrome_html {
     my ( $self, $page, $urls ) = @_;
     $urls ||= {};
-    my $share = $urls->{edit}   || '';
-    my $play  = $urls->{render} || '';
-    my $src   = $urls->{source} || '';
+    my $readonly = $self->_editor_disabled;
+    my $share = $readonly ? '' : ( $urls->{edit}   || '' );
+    my $play  = $readonly ? '' : ( $urls->{render} || '' );
+    my $src   = $readonly ? '' : ( $urls->{source} || '' );
     my $mode  = $page->as_hash->{mode} || 'edit';
     my $ctx   = $page->{meta}{request_context} || {};
     my @links;
@@ -2024,16 +2070,21 @@ sub _top_chrome_html {
     push @links, q{<a href="/logout" id="logout-url">Logout</a>}
       if ( $ctx->{tier} || '' ) eq 'helper';
     my $nav = join ' ', @links;
-    my $status = $self->_prompt_summary;
-    my $context = $self->_top_context_html($page);
-    return sprintf <<'HTML', $share, $nav, $context, $status;
-<div class="dd-top-chrome" style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd3c2">
-  <div>
-    <div><a href="%s" id="share-url">Right Click Copy &amp; Share or Bookmark This Page</a></div>
-    <div style="margin-top:6px">%s</div>
-  </div>
-  <div style="text-align:right;white-space:pre-wrap;font-family:'Segoe UI Emoji','Noto Color Emoji','Segoe UI Symbol',Georgia,'Times New Roman',serif">%s<span id="status-on-top">%s</span></div>
-</div>
+    my $hide_indicators = $self->_indicators_disabled;
+    my $status = $hide_indicators ? q{} : $self->_prompt_summary;
+    my $context = $hide_indicators ? q{} : $self->_top_context_html($page);
+    my $share_html = $share ne ''
+      ? qq{<div><a href="$share" id="share-url">Right Click Copy &amp; Share or Bookmark This Page</a></div>}
+      : q{};
+    my $nav_html = $nav ne '' ? qq{<div style="margin-top:6px">$nav</div>} : q{};
+    my $right_html = $hide_indicators
+      ? q{}
+      : sprintf(
+        q{<div style="text-align:right;white-space:pre-wrap;font-family:'Segoe UI Emoji','Noto Color Emoji','Segoe UI Symbol',Georgia,'Times New Roman',serif">%s<span id="status-on-top">%s</span></div>},
+        $context,
+        $status,
+      );
+    my $script_html = $hide_indicators ? q{} : <<'HTML';
 <script>
 (function() {
   function renderTopStatus(items) {
@@ -2070,6 +2121,16 @@ sub _top_chrome_html {
   setInterval(updateDateTime, 1000);
 })();
 </script>
+HTML
+    return sprintf <<'HTML', $share_html, $nav_html, $right_html, $script_html;
+<div class="dd-top-chrome" style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd3c2">
+  <div>
+    %s
+    %s
+  </div>
+  %s
+</div>
+%s
 HTML
 }
 

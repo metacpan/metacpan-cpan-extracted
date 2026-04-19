@@ -1,0 +1,36 @@
+0.002     2026-04-18 15:48:51Z
+
+0.002     2026-04-18
+
+ - POD documentation: clarified provider instantiation and registration examples
+ - SYNOPSIS now shows consistent provider stack with tags (free, paid)
+ - Stacking providers example: fixed to show proper registration flow
+ - Removed confusing enabled=>0 pattern in examples; use exclude/only instead
+
+0.001     2026-04-18 15:30:31Z
+
+ - Initial release
+ - IO::Async web search aggregator across pluggable providers
+ - Providers: DuckDuckGo (HTML), SearxNG, Serper.dev, Brave Search,
+   Google CSE, Yandex XML, Reddit JSON, Reddit OAuth2
+ - Reddit::OAuth supports all four grant types (client_credentials,
+   password, installed, authorization_code) plus refresh_token
+   auto-refresh. authorize_url / complete_authorization / token_state
+   primitives let a host app (MCP, web) drive the user consent flow
+   and persist/rehydrate sessions.
+ - Normalized Result fields: url, title, snippet, provider, rank, score,
+   domain (auto-derived), published_at, language, nsfw. Provider-specific
+   extras in `extra`, raw upstream payload in `raw`.
+ - Modes: collect (RRF-merged top-N), stream (event per result via
+   on_result), race (first-done wins)
+ - Per-call provider selection via `only` / `exclude`, matched against
+   provider name, class leaf, or tags
+ - Stacking: multiple instances of the same provider class allowed;
+   add_provider auto-renames collisions (name#2, name#3...)
+ - Per-provider `enabled` flag, `tags` for grouping
+ - `provider_opts` keyed by name / class leaf / tag (exact name wins)
+ - Optional page-body fetch: `fetch => N` hits the top N URLs after
+   search and attaches `{ok,status,body,...}` to each Result; works in
+   collect / stream / race. Two-tier concurrency: `fetch_concurrency`
+   (global, default 100) and `fetch_concurrency_per_target_ip`
+   (per-host, default 5).

@@ -43,5 +43,5 @@ requires:
   YAML::XS: '0'
 resources:
   repository: https://github.com/mvsjes2/drive_player.git
-version: v0.2.4
+version: v0.2.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

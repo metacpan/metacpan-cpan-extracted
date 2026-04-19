@@ -73,7 +73,7 @@ _Complex_I               : Defined by complex.h. Attempts to define _DO_COMPLEX_
                            (see below) will not succeed if _Complex_I is not
                            defined.
 
-_DO_COMPLEX_H              : Automatically defined if at least one of Math::Complex_C,
+_DO_COMPLEX_H            : Automatically defined if at least one of Math::Complex_C,
                            Math::Complex_C::L and Math::Complex_C::Q is installed.
                            complex.h will be included iff _DO_COMPLEX_H is defined.
                            Can also be defined in the Makefile.PL by setting
@@ -82,6 +82,11 @@ _DO_COMPLEX_H              : Automatically defined if at least one of Math::Comp
                            (Will be automatically undefined if _Complex_I is not
                            defined following the inclusion of complex.h.)
 
+DIVISION_BUG_*           : These macros (DIVISION_BUG_DECL, DIVISION_BUG_PRE(op) &
+                           DIVISION_BUG_POST) handle a bug in mpc_ui_div & mpc_fr_div
+                           that exists in mpc-1.4.0. If the underlying mpc library is
+                           not version 1.4.0, then these macros are no-ops. See:
+                           https://sympa.inria.fr/sympa/arc/mpc-discuss/2026-03/msg00019.html
 
 *************************************************/
 
@@ -219,5 +224,26 @@ typedef __float128 float128;
 # define CHECK_ROUNDING_VALUE(rnd_val)
 #endif
 
+#if MPC_VERSION == 66560 /* workaround for mpc_ui_div() and mpc_fr_div() bugginess in mpc-1.4.0 */
 
+#  define DIVISION_BUG_DECL                             \
+      int no_skip = 1;                                  \
+      mpfr_prec_t prec_default;
 
+#  define DIVISION_BUG_PRE(op)                          \
+    if(!mpfr_cmp_ui(MPC_IM(op), 0)) {                   \
+      prec_default=mpfr_get_default_prec();             \
+      mpfr_set_default_prec(mpfr_get_prec(MPC_IM(op))); \
+    }                                                   \
+    else no_skip = 0;
+
+#  define DIVISION_BUG_POST                             \
+    if(no_skip) mpfr_set_default_prec(prec_default);
+
+#else
+
+#  define DIVISION_BUG_DECL
+#  define DIVISION_BUG_PRE(op)
+#  define DIVISION_BUG_POST
+
+#endif

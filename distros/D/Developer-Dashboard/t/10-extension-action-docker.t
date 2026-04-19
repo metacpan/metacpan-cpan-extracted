@@ -388,6 +388,89 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is( $resolved->{command}[-1], 'config', 'docker compose resolver preserves passthrough config invocation with active auto-discovery' );
 }
 
+{
+    my $old = Cwd::getcwd();
+    chdir $repo or die $!;
+    my $docker = Developer::Dashboard::DockerCompose->new(
+        config  => $config,
+        paths   => $paths,
+    );
+
+    ok( !$docker->_service_folder_is_disabled( project_root => $repo, service => 'purple' ), 'project-local docker service starts enabled when no local marker exists' );
+
+    my $disable = $docker->disable_service(
+        project_root => $repo,
+        service      => 'purple',
+    );
+    is( $disable->{service}, 'purple', 'disable_service reports the toggled service name' );
+    is( $disable->{disabled}, 1, 'disable_service reports the service as disabled' );
+    is_same_path(
+        $disable->{marker},
+        File::Spec->catfile( $repo, '.developer-dashboard', 'docker', 'purple', 'disabled.yml' ),
+        'disable_service writes the marker into the deepest runtime docker root',
+    );
+    ok( -f $disable->{marker}, 'disable_service creates the disabled.yml marker file' );
+    ok( $docker->_service_folder_is_disabled( project_root => $repo, service => 'purple' ), 'project-local marker disables an inherited home docker service' );
+
+    my $enable = $docker->enable_service(
+        project_root => $repo,
+        service      => 'purple',
+    );
+    is( $enable->{service}, 'purple', 'enable_service reports the toggled service name' );
+    is( $enable->{disabled}, 0, 'enable_service reports the service as enabled' );
+    is_same_path(
+        $enable->{marker},
+        File::Spec->catfile( $repo, '.developer-dashboard', 'docker', 'purple', 'disabled.yml' ),
+        'enable_service reports the same local marker path it removed',
+    );
+    ok( !-f $enable->{marker}, 'enable_service removes the local disabled.yml marker file' );
+    ok( !$docker->_service_folder_is_disabled( project_root => $repo, service => 'purple' ), 'enable_service re-enables the inherited home docker service' );
+
+    my $all_services = $docker->list_services(
+        project_root => $repo,
+    );
+    is_deeply(
+        [ map { $_->{service} } @{$all_services} ],
+        [ qw(blue green orange purple worker) ],
+        'list_services returns isolated docker services in sorted order',
+    );
+    is_deeply(
+        {
+            map { $_->{service} => $_->{disabled} } @{$all_services}
+        },
+        {
+            blue   => 1,
+            green  => 0,
+            orange => 0,
+            purple => 0,
+            worker => 0,
+        },
+        'list_services reports enabled and disabled service state',
+    );
+    is_deeply(
+        [ map { $_->{service} } @{ $docker->list_services( project_root => $repo, filter => 'enabled' ) } ],
+        [ qw(green orange purple worker) ],
+        'list_services filter enabled keeps only enabled services',
+    );
+    is_deeply(
+        [ map { $_->{service} } @{ $docker->list_services( project_root => $repo, filter => 'disabled' ) } ],
+        [qw(blue)],
+        'list_services filter disabled keeps only disabled services',
+    );
+
+    $docker->disable_service(
+        project_root => $repo,
+        service      => 'purple',
+    );
+    is_deeply(
+        [ map { $_->{service} } @{ $docker->list_services( project_root => $repo, filter => 'disabled' ) } ],
+        [ qw(blue purple) ],
+        'list_services reflects newly disabled services from the deepest runtime layer',
+    );
+
+    chdir $old or die $!;
+}
+
 my $auth = Developer::Dashboard::Auth->new( files => $files, paths => $paths );
 my $sessions = Developer::Dashboard::SessionStore->new( paths => $paths );
 my $app = Developer::Dashboard::Web::App->new(

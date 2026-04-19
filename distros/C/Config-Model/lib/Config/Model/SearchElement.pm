@@ -7,7 +7,8 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SearchElement 2.160;
+package Config::Model::SearchElement 2.161;
+use v5.20;
 
 use Log::Log4perl qw(get_logger :levels);
 use Carp;
@@ -16,12 +17,12 @@ use warnings;
 
 use Config::Model::Exception;
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 my $logger = get_logger("Model::Searcher");
 
-sub new {
-    my $type = shift;
-    my %args = @_;
-
+sub new ($type, %args) {
     my $self = {};
     foreach my $p (qw/model node/) {
         $self->{$p} = delete $args{$p}
@@ -40,9 +41,7 @@ sub new {
 # to verify the data structure returned by search_element, you can used
 # either Data::Dumper or Tk::ObjScanner (both are available on CPAN)
 
-sub _sniff_class {
-    my ( $self, $class, $found_ref ) = @_;
-
+sub _sniff_class ($self, $class, $found_ref) {
     my %h;
     my $model   = $self->{model};
     my $c_model = $model->get_model_clone($class);
@@ -87,9 +86,7 @@ sub _sniff_class {
     return \%h;
 }
 
-sub _sniff_warped_node {
-    my ( $self, $element_model, $found_ref ) = @_;
-
+sub _sniff_warped_node ($self, $element_model, $found_ref) {
     my %warp_tmp;
     my $ref = $element_model->{warp}{rules};
     my @rules = ref $ref eq 'HASH' ? %$ref : @$ref;
@@ -109,15 +106,12 @@ sub _sniff_warped_node {
     return \%warp_tmp;
 }
 
-sub get_searchable_elements {
-    my $self = shift;
-    sort keys %{ $self->{data} };
+sub get_searchable_elements ($self) {
+    my @elts = sort keys %{ $self->{data} };
+    return @elts;
 }
 
-sub prepare {
-    my $self = shift;
-    my %args = @_;
-
+sub prepare ($self, %args) {
     foreach my $p (qw/element/) {
         $self->{$p} = delete $args{$p}
             or croak "Searcher->prepare: Missing $p parameter";
@@ -137,23 +131,21 @@ sub prepare {
     return $self;
 }
 
-sub reset {
-    my $self = shift;
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub reset ($self) {
     my $searched = $self->{element};
     $self->{search_tree}           = $self->{data}{$searched};
     $self->{current}{object}       = $self->{node};
     $self->{current}{element_name} = 'Root';
     $self->{current}{element_type} = 'node';
+    return;
 }
 
-sub searched {
-    return shift->{element};
+sub searched ($self) {
+    return $self->{element};
 }
 
-sub next_step {
-    my $self = shift;
-
+sub next_step ($self) {
     my $current_obj = $self->{current}{object};
 
     my @result;
@@ -174,8 +166,7 @@ sub next_step {
     return wantarray ? @result : \@result;
 }
 
-sub next_choice {
-    my $self = shift;
+sub next_choice ($self) {
     my $result;
 
     while (1) {
@@ -186,26 +177,21 @@ sub next_choice {
         $self->choose(@$result);
     }
 
+    return;
 }
 
-sub choose {
-    my $self   = shift;
-    my $choice = shift;
-
+sub choose ($self, $choice) {
     #print "choose $choice from node\n";
     my $obj = $self->{current}{object};
     if ( $obj->get_type =~ /hash|list/ ) {
-        $self->choose_from_id_element($choice);
+        return $self->choose_from_id_element($choice);
     }
     else {
-        $self->choose_from_node($choice);
+        return $self->choose_from_node($choice);
     }
 }
 
-sub choose_from_id_element {
-    my $self   = shift;
-    my $choice = shift;
-
+sub choose_from_id_element ($self, $choice) {
     #print "choose $choice from id\n";
     my $id_obj = $self->{current}{object};
     my $class  = $id_obj->config_class_name;
@@ -218,10 +204,7 @@ sub choose_from_id_element {
     return $next_node;
 }
 
-sub choose_from_node {
-    my $self   = shift;
-    my $choice = shift;
-
+sub choose_from_node ($self, $choice) {
     #print "choose $choice from node\n";
     my $next       = $self->{search_tree}{next_step};
     my $node       = $self->{current}{object};
@@ -265,16 +248,11 @@ sub choose_from_node {
     return $next_node;
 }
 
-sub current_object {
-    my $self = shift;
+sub current_object ($self) {
     return $self->{current}{object};
 }
 
-sub auto_choose {
-    my $self   = shift;
-    my $elt_cb = shift || croak "auto_choose: missing element call back";
-    my $id_cb  = shift || croak "auto_choose: missing id call back";
-
+sub auto_choose ($self, $elt_cb, $id_cb) {
     my $object = $self->{current}{object};
     while (1) {
         my $next_step = $self->next_step;
@@ -289,13 +267,10 @@ sub auto_choose {
 
         $self->_auto_choose_elt( $next_choice, $id_cb );
     }
+    return;
 }
 
-sub _auto_choose_elt {
-    my $self        = shift;
-    my $next_choice = shift;
-    my $id_cb       = shift;
-
+sub _auto_choose_elt ($self, $next_choice, $id_cb) {
     $self->choose($next_choice);
 
     my $elt_type = $self->{current}{element_type};
@@ -310,6 +285,7 @@ sub _auto_choose_elt {
 
         $self->{current}{object} = $object->fetch_with_id($id);
     }
+    return;
 }
 
 1;
@@ -328,7 +304,7 @@ Config::Model::SearchElement - Search an element in a configuration model
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 

@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($MARC::Leader::L10N::en::VERSION, 0.04, 'Version.');
+is($MARC::Leader::L10N::en::VERSION, 0.05, 'Version.');

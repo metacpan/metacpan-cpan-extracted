@@ -95,11 +95,11 @@ sub differ {
     my @lines1 = loadlines($file1);
     my @lines2 = loadlines($file2);
     my $linesm = @lines1 > @lines2 ? @lines1 : @lines2;
-    for ( my $line = 1; $line < $linesm; $line++ ) {
+    for ( my $line = 0; $line < $linesm; $line++ ) {
 	$lines1[$line] //= "***missing***1";
 	$lines2[$line] //= "***missing***2";
 	next if $lines1[$line] eq $lines2[$line];
-	Test::More::diag("Files $file1 and $file2 differ at line $line");
+	Test::More::diag("Files $file1 and $file2 differ at line ", 1+$line);
 	Test::More::diag("  <  $lines1[$line]");
 	Test::More::diag("  >  $lines2[$line]");
 	return 1;

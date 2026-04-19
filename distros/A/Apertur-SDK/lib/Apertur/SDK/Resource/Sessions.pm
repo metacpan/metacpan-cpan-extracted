@@ -59,8 +59,16 @@ sub verify_password {
 }
 
 sub delivery_status {
-    my ($self, $uuid) = @_;
-    return $self->{http}->request('GET', "/api/v1/upload-sessions/$uuid/delivery-status");
+    my ($self, $uuid, %opts) = @_;
+    my $path = "/api/v1/upload-sessions/$uuid/delivery-status";
+    my %req_opts;
+    if (defined $opts{poll_from}) {
+        $path .= '?pollFrom=' . uri_escape($opts{poll_from});
+        # Long-poll: server holds up to 5 min; give the request 6 min so the
+        # server releases first under the happy path.
+        $req_opts{timeout} = 360;
+    }
+    return $self->{http}->request('GET', $path, %req_opts);
 }
 
 sub _build_query_string {
@@ -120,9 +128,29 @@ C<style>, C<fg>, C<bg>, C<borderSize>, C<borderColor>.
 
 Verifies a password for a protected session.
 
-=item B<delivery_status($uuid)>
+=item B<delivery_status($uuid, %opts)>
 
-Returns per-destination delivery status for a session.
+Returns the delivery status snapshot for a session as a hashref:
+
+    {
+        status      => 'pending' | 'active' | 'completed' | 'expired',
+        files       => [ { record_id => ..., filename => ..., size_bytes => ...,
+                           destinations => [ { destination_id => ..., status => ..., ... } ] } ],
+        lastChanged => '<ISO 8601>',
+    }
+
+Options:
+
+=over 4
+
+=item C<poll_from>
+
+ISO 8601 timestamp. When provided, the server long-polls for up to 5 minutes
+waiting for something to change before responding. This call automatically
+widens the per-request timeout to 360 s (6 min) so the server releases first
+under the happy path.
+
+=back
 
 =back
 

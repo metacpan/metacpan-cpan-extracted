@@ -29,7 +29,7 @@ sub is   {
 }
 END { exit 1 if $T_PLAN && $T_FAIL }
 
-plan_tests(20);
+plan_tests(22);
 
 # ok 1-2: type check
 ok(ref(mb::JSON::true)  eq 'mb::JSON::Boolean', 'true is mb::JSON::Boolean');
@@ -72,5 +72,9 @@ is( mb::JSON::encode($f), 'false', 'decoded false re-encodes as false');
 # ok 19: $VERSION defined
 ok(defined $mb::JSON::Boolean::VERSION, 'mb::JSON::Boolean has VERSION');
 
-# ok 20: true != false
+# ok 20-21: stringify() also encodes booleans correctly
+is( mb::JSON::stringify(mb::JSON::true),  'true',  'stringify(true)  -> "true"');
+is( mb::JSON::stringify(mb::JSON::false), 'false', 'stringify(false) -> "false"');
+
+# ok 22: true != false
 ok(mb::JSON::true != mb::JSON::false, 'true != false');

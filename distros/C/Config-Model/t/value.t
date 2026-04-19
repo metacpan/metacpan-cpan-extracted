@@ -501,6 +501,9 @@ subtest "mandatory string" => sub {
     $toto_str =~ s/text/string/;
     $ms->store($toto_str);
 
+    $ms->clear(check => 'no');
+    throws_ok { my $v = $ms->fetch; } 'Config::Model::Exception::User', "mandatory string: undef error after clear";
+
     print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
     $inst->clear_changes;
 };
@@ -564,7 +567,11 @@ subtest "boolean written with wrong value" => sub {
     my $bp = $root->fetch_element('boolean_plain');
 
     $bp->store(qw/value a check skip/);
-    is( $bp->fetch(qw/check no/), undef, "boolean_plain: get empty value after writing bad value" );
+    is( $bp->fetch(), undef, "boolean_plain: undef value is unchanged after writing bad value" );
+
+    $bp->store(qw/value 1/);
+    $bp->store(qw/value a check skip/);
+    is( $bp->fetch(), 1, "boolean_plain: true value is unchanged after writing bad value" );
 
     $bp->clear;
     is( $bp->fetch(), undef, "boolean_plain: get 'undef' after clear()" );
@@ -1135,17 +1142,15 @@ subtest "problems during initial load" => sub {
 
     my $s = $inst2->config_root->fetch_element('string');
     $s->store('foo');
+    is( $inst2->needs_save, 0, "no need to save after first initial value" );
+
     $s->store('foo');
+    is( $inst2->needs_save, 0, "no need to save after writing redundant data (idemtpotency)" );
 
-
-    is( $inst2->needs_save, 1, "verify instance needs_save status after redundant data" );
-
-    eq_or_diff([$inst2->list_changes],['string: removed redundant initial value'],"check change message for redundant data");
-    $inst2->clear_changes;
-    is( $inst2->needs_save, 0, "needs_save after clearing changes" );
-
+    # storing conflicting values during initial load is probably a bug
     $s->store('bar');
-    eq_or_diff([$inst2->list_changes],['string: \'foo\' -> \'bar\' # conflicting initial values'],"check change message for redundant data");
+    eq_or_diff([$inst2->list_changes],['string: \'foo\' -> \'bar\' # conflicting initial values'],
+               "check change message for redundant data");
     is( $inst2->needs_save, 1, "verify instance needs_save status after conflicting data" );
 
     $inst2->clear_changes;

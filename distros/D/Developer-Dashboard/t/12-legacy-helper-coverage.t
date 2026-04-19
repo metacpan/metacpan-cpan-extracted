@@ -84,6 +84,7 @@ is( Developer::Dashboard::Folder->bookmarks, $paths->dashboards_root, 'Folder bo
 is( Developer::Dashboard::Folder->bookmarks_root, $paths->dashboards_root, 'Folder AUTOLOAD resolves bookmarks_root through the legacy bookmarks alias' );
 is( Developer::Dashboard::Folder->configs, $paths->config_root, 'Folder configs resolves config root' );
 is( Developer::Dashboard::Folder->config_root, $paths->config_root, 'Folder AUTOLOAD resolves config_root through the legacy configs alias' );
+is_deeply( Developer::Dashboard::Folder->all, $paths->all_paths, 'Folder all returns the full dashboard paths inventory' );
 ok( -d Developer::Dashboard::Folder->postman, 'Folder postman creates the neutral postman directory' );
 
 my $cd_result = Developer::Dashboard::Folder->cd(

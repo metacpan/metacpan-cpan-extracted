@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Utils::GenClassPod 2.160;
+package Config::Model::Utils::GenClassPod 2.161;
 
 # ABSTRACT: generate pod documentation from configuration models
 
@@ -64,7 +64,7 @@ Config::Model::Utils::GenClassPod - generate pod documentation from configuratio
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 

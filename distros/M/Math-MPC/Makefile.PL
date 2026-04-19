@@ -9,7 +9,7 @@ our $DEFS = '';
 
 # A cpantester's build of perl is/was specifying "LIBS=-lquadmath" in the Perl_MM_OPT
 # envirnoment variable - which overrides the assignment to $options{LIBS} below,
-# at line 120.
+# at line 184.
 # See (eg) https://www.cpantesters.org/cpan/report/dab208d0-71b3-1014-beba-d9dcb6a500a3 .
 # The following substitution regex works around the problem.
 {

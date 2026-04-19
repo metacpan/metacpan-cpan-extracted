@@ -1,7 +1,7 @@
 ---
 abstract: 'Verify, Cache and Optimise FCGI Output'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   CGI::Lingua: '0'
   Capture::Tiny: '0'
@@ -20,7 +20,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -51,7 +51,8 @@ requires:
   Time::localtime: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://github.com/nigelhorne/FCGI-Buffer/issues
-  repository: git://github.com/nigelhorne/FCGI-Buffer.git
-version: '0.21'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer
+  homepage: https://metacpan.org/pod/CGI::Buffer
+  repository: git://github.com/nigelhorne/CGI-Buffer.git
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -19,26 +19,42 @@
 
 [ 2. decode：JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
-  my $data = mb::JSON::parse($json_text);  # 相容別名
 
-[ 3. encode：Perl -> JSON ]
+[ 3. parse：decode() 的別名 ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode：Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. 布林值 ]
+[ 5. stringify：Perl -> JSON  （JavaScript 相容別名）]
+  my $json = mb::JSON::stringify($data);
+  # stringify() 與 encode() 輸出完全相同
+
+[ 6. 布林值 ]
   mb::JSON::true   -> JSON: true
   mb::JSON::false  -> JSON: false
   數字 1 或 0      -> JSON 數字（非布林值）
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef -> null（編碼時）
   null  -> undef（解碼時）
 
-[ 6. 雜湊鍵依字母順序排序 ]
+[ 8. 雜湊鍵依字母順序排序 ]
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. UTF-8 字元原樣輸出（不轉義為 \uXXXX）]
+[ 9. UTF-8 字元原樣輸出（不轉義為 \uXXXX）]
+  encode({"name"=>"田中"}) -> '{"name":"田中"}'
 
-[ 8. 範例 ]
+[ 10. 範例 ]
   my $h = mb::JSON::decode('{"name":"田中","age":30}');
-  print $h->{name};
+  print $h->{name};   # 田中
+
   my $j = mb::JSON::encode({name=>'田中', ok=>mb::JSON::true});
+  # -> {"name":"田中","ok":true}
+
+  my $j = mb::JSON::stringify({name=>'田中', ok=>mb::JSON::true});
+  # -> {"name":"田中","ok":true}
+
+  # 往返轉換
+  my $data = mb::JSON::decode($json);
+  my $back = mb::JSON::encode($data);

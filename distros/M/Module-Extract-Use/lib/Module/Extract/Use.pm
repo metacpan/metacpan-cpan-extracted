@@ -1,4 +1,5 @@
 use v5.10;
+use utf8;
 
 package Module::Extract::Use;
 use strict;
@@ -6,7 +7,7 @@ use strict;
 use warnings;
 no warnings;
 
-our $VERSION = '1.054';
+our $VERSION = '1.055';
 
 =encoding utf8
 
@@ -56,7 +57,7 @@ load a module once (and may be faster):
 		}
 
 Additionally, it finds module names used with C<parent> and C<base>,
-either of which establish an inheritance relationship:
+either of which establishes an inheritance relationship:
 
 	use parent qw(Foo);
 	use base qw(Foo);
@@ -338,7 +339,7 @@ L<Module::ScanDeps>, L<Module::Extract>
 
 =head1 SOURCE AVAILABILITY
 
-The source code is in Github:
+The source code is on GitHub:
 
 	https://github.com/briandfoy/module-extract-use
 
@@ -348,7 +349,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2025, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
+Copyright © 2008-2026, brian d foy C<< <briandfoy@pobox.com> >>. All rights reserved.
 
 This project is under the Artistic License 2.0.
 

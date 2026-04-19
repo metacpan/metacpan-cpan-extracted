@@ -20,28 +20,34 @@
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
   my $data = mb::JSON::decode();           # $_ を使用
-  my $data = mb::JSON::parse($json_text);  # エイリアス（後方互換）
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: decode() のエイリアス ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. 真偽値 ]
+[ 5. stringify: Perl -> JSON  （JavaScript 互換エイリアス）]
+  my $json = mb::JSON::stringify($data);
+  # stringify() と encode() は同じ出力を返す
+
+[ 6. 真偽値 ]
   mb::JSON::true   -> JSON: true
   mb::JSON::false  -> JSON: false
   数値の 1 や 0    -> JSON: 1 や 0（数値として出力）
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef  -> null（encode 時）
   null   -> undef（decode 時）
 
-[ 6. ハッシュキーはアルファベット順にソート ]
+[ 8. ハッシュキーはアルファベット順にソート ]
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. UTF-8 マルチバイト文字はそのまま出力 ]
+[ 9. UTF-8 マルチバイト文字はそのまま出力 ]
   encode({"name"=>"田中"}) -> '{"name":"田中"}'
   \uXXXX にはエスケープしない
 
-[ 8. 使用例 ]
+[ 10. 使用例 ]
   # デコード
   my $h = mb::JSON::decode('{"name":"田中","age":30}');
   print $h->{name};   # 田中
@@ -53,3 +59,14 @@
       score  => undef,
   });
   # -> {"active":true,"name":"田中","score":null}
+
+  # stringify（encode と同じ）
+  my $j = mb::JSON::stringify({
+      name   => '田中',
+      active => mb::JSON::true,
+  });
+  # -> {"active":true,"name":"田中"}
+
+  # ラウンドトリップ
+  my $data = mb::JSON::decode($json);
+  my $back = mb::JSON::encode($data);

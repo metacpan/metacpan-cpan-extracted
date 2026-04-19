@@ -33,7 +33,7 @@ sub ok {
 sub diag { print "# $_[0]\n" }
 END { exit 1 if $T_PLAN && $T_FAIL }
 
-plan_tests(13);
+plan_tests(14);
 
 # ok 1: module loads
 eval { require mb::JSON };
@@ -48,20 +48,20 @@ ok($mb::JSON::VERSION =~ /^\d+\.\d+/, 'mb::JSON: $VERSION looks like a version n
 ok(defined $mb::JSON::Boolean::{new} || 1,
    'mb::JSON::Boolean package present');
 
-# ok 5-9: functions exist
-for my $fn (qw(encode decode parse true false)) {
+# ok 5-10: functions exist (decode/parse pair, encode/stringify pair, true/false)
+for my $fn (qw(decode parse encode stringify true false)) {
     ok(mb::JSON->can($fn), "mb::JSON->can('$fn')");
 }
 
-# ok 10-11: true / false are Boolean objects
+# ok 11-12: true / false are Boolean objects
 ok(ref(mb::JSON::true())  eq 'mb::JSON::Boolean', 'mb::JSON::true  is a Boolean object');
 ok(ref(mb::JSON::false()) eq 'mb::JSON::Boolean', 'mb::JSON::false is a Boolean object');
 
-# ok 12: INA_CPAN_Check loads
+# ok 13: INA_CPAN_Check loads
 eval { require INA_CPAN_Check };
 ok(!$@, 'INA_CPAN_Check loads without error');
 
-# ok 13: key helpers defined
+# ok 14: key helpers defined
 ok( defined &INA_CPAN_Check::check_A
  && defined &INA_CPAN_Check::check_K,
    'INA_CPAN_Check: check_A through check_K defined');

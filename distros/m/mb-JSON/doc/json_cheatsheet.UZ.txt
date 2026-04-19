@@ -20,38 +20,48 @@
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_matn);
   my $data = mb::JSON::decode();             # $_ ishlatiladi
-  my $data = mb::JSON::parse($json_matn);    # taxallus (moslik)
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: decode() uchun taxallus ]
+  my $data = mb::JSON::parse($json_matn);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Mantiqiy Qiymatlar ]
+[ 5. stringify: Perl -> JSON  (JavaScript bilan mos taxallus) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() va encode() bir xil natija beradi
+
+[ 6. Mantiqiy Qiymatlar ]
   mb::JSON::true   -> JSON: true
   mb::JSON::false  -> JSON: false
   1 yoki 0 soni    -> JSON: son (mantiqiy emas)
 
-[ 5. null va undef ]
+[ 7. null va undef ]
   undef  -> null (encode paytida)
   null   -> undef (decode paytida)
 
-[ 6. Xesh kalitlari alifbo tartibida saralanadi ]
+[ 8. Xesh kalitlari alifbo tartibida saralanadi ]
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. UTF-8 satrlar o'zgarmaydi (\uXXXX ga aylantirilmaydi) ]
+[ 9. UTF-8 satrlar o'zgarmaydi (\uXXXX ga aylantirilmaydi) ]
 
-[ 8. Misollar ]
-  # decode
+[ 10. Misollar ]
   my $h = mb::JSON::decode('{"ism":"Alisher","yosh":30}');
   print $h->{ism};   # Alisher
 
-  # encode
   my $j = mb::JSON::encode({
-      ism     => 'Alisher',
-      faol    => mb::JSON::true,
-      izoh    => undef,
+      ism  => 'Alisher',
+      faol => mb::JSON::true,
+      izoh => undef,
   });
   # -> {"faol":true,"ism":"Alisher","izoh":null}
 
+  my $j = mb::JSON::stringify({
+      ism  => 'Alisher',
+      faol => mb::JSON::true,
+  });
+  # -> {"faol":true,"ism":"Alisher"}
+
   # ikki tomonlama (roundtrip)
-  my $data = mb::JSON::decode($json);
+  my $data  = mb::JSON::decode($json);
   my $qayta = mb::JSON::encode($data);

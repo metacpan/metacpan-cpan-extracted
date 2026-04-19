@@ -69,3 +69,5 @@ Module-.*
 
 \.gitattributes\b
 \.appveyor
+
+.downstream.json

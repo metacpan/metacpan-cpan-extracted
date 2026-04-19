@@ -442,7 +442,11 @@ like( $usage_stdout . $usage_stderr, qr/SYNOPSIS|dashboard init/, 'dashboard wit
 my $help = _run("$perl -I'$lib' '$dashboard' help");
 like($help, qr/Description:/, 'dashboard help renders the fuller POD help');
 like($help, qr/dashboard serve \[logs \[-f\] \[-n N\]\|workers <N>\]/, 'dashboard help documents serve logs tail/follow flags and serve workers commands');
+like($help, qr/dashboard serve .*--no-editor.*--no-endit.*--no-indicators.*--no-indicator/s, 'dashboard help documents serve no-editor and no-indicators aliases');
 like($help, qr/dashboard ticket \[ticket-ref\]/, 'dashboard help documents the built-in ticket subcommand');
+like($help, qr/dashboard docker enable <service>/, 'dashboard help documents docker enable for isolated compose services');
+like($help, qr/dashboard docker disable <service>/, 'dashboard help documents docker disable for isolated compose services');
+like($help, qr/dashboard docker list \[--enabled\|--disabled\]/, 'dashboard help documents docker list filters for isolated compose services');
 like($help, qr/dashboard skills enable <repo-name>/, 'dashboard help documents skill enable');
 like($help, qr/dashboard skills disable <repo-name>/, 'dashboard help documents skill disable');
 like($help, qr/dashboard skills usage <repo-name> \[-o json\|table\]/, 'dashboard help documents skill usage inspection');
@@ -536,17 +540,19 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     my $serve_json = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $serve_port") );
     ok( $serve_json->{pid}, 'dashboard serve returns a managed web pid for the collector lifecycle smoke test' );
     my $first_stdout = '';
-    for ( 1 .. 40 ) {
+    for ( 1 .. 80 ) {
         my $output = json_decode( _run("$perl -I'$lib' '$dashboard' collector output tick.collector") );
         $first_stdout = $output->{stdout} || '';
         last if $first_stdout =~ /^\d+\.\d+\n$/;
+        my $status = json_decode( _run("$perl -I'$lib' '$dashboard' collector status tick.collector") );
+        last if ( $status->{last_success} || 0 ) && $first_stdout =~ /^\d+\.\d+\n$/;
         sleep 0.25;
     }
     like( $first_stdout, qr/^\d+\.\d+\n$/, 'dashboard serve starts configured interval collectors so collector output begins changing without a separate restart' );
     my $restart_json = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $serve_port") );
     ok( $restart_json->{web_pid}, 'dashboard restart still returns a managed web pid in the collector lifecycle smoke test' );
     my $second_stdout = '';
-    for ( 1 .. 40 ) {
+    for ( 1 .. 80 ) {
         my $output = json_decode( _run("$perl -I'$lib' '$dashboard' collector output tick.collector") );
         $second_stdout = $output->{stdout} || '';
         last if $second_stdout =~ /^\d+\.\d+\n$/ && $second_stdout ne $first_stdout;
@@ -555,6 +561,103 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     unlike( $second_stdout, qr/^\Q$first_stdout\E$/, 'dashboard restart restarts collector loops and refreshes collector output after the serve-started run' );
     my $serve_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop") );
     ok( ref( $serve_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still returns the collector stop list after serve/restart lifecycle control' );
+}
+{
+    my $readonly_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $readonly_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $readonly_init = _run("$perl -I'$lib' '$dashboard' init");
+    like( $readonly_init, qr/runtime_root/, 'isolated no-editor smoke home initializes a runtime' );
+    _run("$perl -I'$lib' '$dashboard' page new readonly 'Read Only' | $perl -I'$lib' '$dashboard' page save readonly");
+    my $readonly_port = _find_free_port();
+    my $readonly_serve = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $readonly_port --no-endit") );
+    ok( $readonly_serve->{pid}, 'dashboard serve --no-endit starts the managed web service' );
+    my $readonly_ua = LWP::UserAgent->new( timeout => 5 );
+    my $render_response;
+    for ( 1 .. 40 ) {
+        $render_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly");
+        last if $render_response->is_success;
+        sleep 0.25;
+    }
+    ok( $render_response && $render_response->is_success, 'no-editor live server serves saved page render routes' );
+    my $render_body = decode( 'UTF-8', $render_response->decoded_content );
+    unlike( $render_body, qr/id="share-url"/, 'no-editor live server hides the share link from render views' );
+    unlike( $render_body, qr/id="view-source-url"/, 'no-editor live server hides the view-source link from render views' );
+    unlike( $render_body, qr/id="play-url"/, 'no-editor live server hides the play link from render views' );
+    my $edit_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly/edit");
+    is( $edit_response->code, 403, 'no-editor live server blocks direct bookmark editor routes' );
+    my $edit_post_response = $readonly_ua->post(
+        "http://127.0.0.1:$readonly_port/app/readonly/edit",
+        { instruction => "TITLE: Changed\n:--------------------------------------------------------------------------------:\nBOOKMARK: readonly\n:--------------------------------------------------------------------------------:\nHTML: changed\n" },
+    );
+    is( $edit_post_response->code, 403, 'no-editor live server blocks bookmark editor post saves' );
+    my $readonly_config_file = File::Spec->catfile( $readonly_home, '.developer-dashboard', 'config', 'config.json' );
+    open my $readonly_config_fh, '<', $readonly_config_file or die "Unable to read $readonly_config_file: $!";
+    my $readonly_config = do { local $/; <$readonly_config_fh> };
+    close $readonly_config_fh;
+    like( $readonly_config, qr/"web"\s*:\s*\{[\s\S]*"no_editor"\s*:\s*1/s, 'dashboard serve --no-endit persists no_editor in config' );
+    my $readonly_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $readonly_port") );
+    ok( $readonly_restart->{web_pid}, 'dashboard restart keeps managing the no-editor web service' );
+    for ( 1 .. 40 ) {
+        my $ready_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly");
+        last if $ready_response->is_success;
+        sleep 0.25;
+    }
+    my $source_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly/source");
+    is( $source_response->code, 403, 'dashboard restart preserves the saved no-editor source block' );
+    my $readonly_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop") );
+    ok( ref( $readonly_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still works after a no-editor lifecycle run' );
+}
+{
+    my $noind_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $noind_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $noind_init = _run("$perl -I'$lib' '$dashboard' init");
+    like( $noind_init, qr/runtime_root/, 'isolated no-indicators smoke home initializes a runtime' );
+    _run("$perl -I'$lib' '$dashboard' page new noind 'No Indicators' | $perl -I'$lib' '$dashboard' page save noind");
+    my $noind_port = _find_free_port();
+    my $noind_serve = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $noind_port --no-indicator") );
+    ok( $noind_serve->{pid}, 'dashboard serve --no-indicator starts the managed web service' );
+    my $noind_ua = LWP::UserAgent->new( timeout => 5 );
+    my $noind_render_response;
+    for ( 1 .. 40 ) {
+        $noind_render_response = $noind_ua->get("http://127.0.0.1:$noind_port/app/noind");
+        last if $noind_render_response->is_success;
+        sleep 0.25;
+    }
+    ok( $noind_render_response && $noind_render_response->is_success, 'no-indicators live server serves saved page render routes' );
+    my $noind_render_body = decode( 'UTF-8', $noind_render_response->decoded_content );
+    unlike( $noind_render_body, qr/id="status-on-top"/, 'no-indicators live server hides the top-right indicator strip' );
+    unlike( $noind_render_body, qr/id="status-datetime"/, 'no-indicators live server hides the top-right date-time marker' );
+    unlike( $noind_render_body, qr/id="status-server"/, 'no-indicators live server hides the top-right server marker' );
+    unlike( $noind_render_body, qr/class="user-name-and-icon"/, 'no-indicators live server hides the top-right user marker' );
+    my $noind_status_response = $noind_ua->get("http://127.0.0.1:$noind_port/system/status");
+    is( $noind_status_response->code, 200, 'no-indicators live server keeps the status endpoint available' );
+    like( decode( 'UTF-8', $noind_status_response->decoded_content ), qr/"array"\s*:/, 'no-indicators live server still exposes status payload data' );
+    my $noind_ps1 = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 0");
+    like( $noind_ps1, qr/\S/, 'no-indicators mode does not blank the terminal prompt output' );
+    my $noind_config_file = File::Spec->catfile( $noind_home, '.developer-dashboard', 'config', 'config.json' );
+    open my $noind_config_fh, '<', $noind_config_file or die "Unable to read $noind_config_file: $!";
+    my $noind_config = do { local $/; <$noind_config_fh> };
+    close $noind_config_fh;
+    like( $noind_config, qr/"web"\s*:\s*\{[\s\S]*"no_indicators"\s*:\s*1/s, 'dashboard serve --no-indicator persists no_indicators in config' );
+    my $noind_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $noind_port") );
+    ok( $noind_restart->{web_pid}, 'dashboard restart keeps managing the no-indicators web service' );
+    my $post_restart_render;
+    for ( 1 .. 40 ) {
+        $post_restart_render = $noind_ua->get("http://127.0.0.1:$noind_port/app/noind");
+        last if $post_restart_render->is_success;
+        sleep 0.25;
+    }
+    ok( $post_restart_render && $post_restart_render->is_success, 'no-indicators live server remains reachable after restart' );
+    my $post_restart_body = decode( 'UTF-8', $post_restart_render->decoded_content );
+    unlike( $post_restart_body, qr/id="status-on-top"/, 'dashboard restart preserves the no-indicators top-right strip removal' );
+    my $noind_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop") );
+    ok( ref( $noind_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still works after a no-indicators lifecycle run' );
 }
 {
     my $collector_log_home = tempdir( CLEANUP => 1 );
@@ -785,6 +888,52 @@ chmod 0755, $fake_docker or die "Unable to chmod $fake_docker: $!";
 my $docker_exec_output = _run("PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' docker compose up -d --build green");
 like( $docker_exec_output, qr/^DOCKER:compose /m, 'dashboard docker compose execs the real docker command for non-dry-run invocations' );
 unlike( $docker_exec_output, qr/\"command\"\s*:/, 'dashboard docker compose no longer prints JSON envelopes for non-dry-run invocations' );
+my $docker_disable = _run("$perl -I'$lib' '$dashboard' docker disable green");
+like( $docker_disable, qr/"service"\s*:\s*"green"/, 'dashboard docker disable reports the toggled service name' );
+like( $docker_disable, qr/"disabled"\s*:\s*1/, 'dashboard docker disable reports the service as disabled' );
+ok( -f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ), 'dashboard docker disable creates the disabled marker in the home docker root when no project layer is active' );
+my $docker_enable = _run("$perl -I'$lib' '$dashboard' docker enable green");
+like( $docker_enable, qr/"service"\s*:\s*"green"/, 'dashboard docker enable reports the toggled service name' );
+like( $docker_enable, qr/"disabled"\s*:\s*0/, 'dashboard docker enable reports the service as enabled' );
+ok( !-f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ), 'dashboard docker enable removes the disabled marker from the home docker root' );
+my $docker_blue_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'blue' );
+make_path($docker_blue_root);
+open my $docker_blue_fh, '>', File::Spec->catfile( $docker_blue_root, 'compose.yml' )
+  or die "Unable to write docker blue compose file: $!";
+print {$docker_blue_fh} "services:\n  blue:\n    image: alpine\n";
+close $docker_blue_fh;
+open my $docker_blue_disabled_fh, '>', File::Spec->catfile( $docker_blue_root, 'disabled.yml' )
+  or die "Unable to write docker blue disabled marker: $!";
+print {$docker_blue_disabled_fh} "---\ndisabled: 1\n";
+close $docker_blue_disabled_fh;
+my $docker_list = json_decode( _run("$perl -I'$lib' '$dashboard' docker list") );
+is_deeply(
+    [ map { $_->{service} } @{$docker_list} ],
+    [ qw(blue green) ],
+    'dashboard docker list reports all isolated services in sorted order',
+);
+is_deeply(
+    {
+        map { $_->{service} => $_->{disabled} } @{$docker_list}
+    },
+    {
+        blue  => 1,
+        green => 0,
+    },
+    'dashboard docker list reports enabled and disabled state',
+);
+my $docker_enabled_list = json_decode( _run("$perl -I'$lib' '$dashboard' docker list --enabled") );
+is_deeply(
+    [ map { $_->{service} } @{$docker_enabled_list} ],
+    [qw(green)],
+    'dashboard docker list --enabled keeps only enabled services',
+);
+my $docker_disabled_list = json_decode( _run("$perl -I'$lib' '$dashboard' docker list --disabled") );
+is_deeply(
+    [ map { $_->{service} } @{$docker_disabled_list} ],
+    [qw(blue)],
+    'dashboard docker list --disabled keeps only disabled services',
+);
 my $fake_cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
 my $fake_cpanm = File::Spec->catfile( $fake_bin, 'cpanm' );
 open my $fake_cpanm_fh, '>', $fake_cpanm or die "Unable to write $fake_cpanm: $!";

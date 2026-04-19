@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More;
 
 use Mojo::DOM;
 
@@ -16,6 +16,5 @@ ok($dom->at('div')->style('color', 'purple')->style eq "color:purple", 'replace 
 
 ok($dom->at('div')->style(undef)->style eq "", 'undefine');
 
-print $dom;
-
+done_testing()
 

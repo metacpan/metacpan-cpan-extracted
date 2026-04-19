@@ -60,50 +60,42 @@ sub _auto_sync_to_sheet {
     return;
 }
 
-sub _sync_to_sheet {
+sub _sync_with_sheet {
     my ($self) = @_;
     my $sheet = $self->_sheet_db() or return;
-    $self->_set_status('Syncing to Sheet…');
+    $self->_set_status('Syncing with Sheet…');
     Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
 
-    my $counts = eval { $sheet->push_to_sheet($self->db) };
+    my $drive   = $self->drive;
+    my $summary = eval {
+        $sheet->sync_with_db(
+            $self->db,
+            drive_exists => sub {
+                my ($id) = @_;
+                my $meta = $drive->file(id => $id)->get(fields => 'id,trashed');
+                return $meta && !$meta->{trashed};
+            },
+        );
+    };
     if ($@) {
         if ($@ =~ /^SHEET_NOT_FOUND:/) {
             $self->_clear_sheet_id();
             $self->_show_error("Spreadsheet not found (deleted?).\n\nThe sheet ID has been cleared. Use File → Settings to create or enter a new one.");
         } else {
-            $self->_show_error("Sync to Sheet failed:\n$@");
+            $self->_show_error("Sync with Sheet failed:\n$@");
         }
         $self->_set_status('Sync failed.');
-    } else {
-        $self->_set_status(
-            "Synced to Sheet: $counts->{scan_folders} folders, $counts->{tracks} tracks."
-        );
+        return;
     }
-    return;
-}
 
-sub _sync_from_sheet {
-    my ($self) = @_;
-    my $sheet = $self->_sheet_db() or return;
-    $self->_set_status('Syncing from Sheet…');
-    Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
-
-    my $counts = eval { $sheet->pull_from_sheet($self->db) };
-    if ($@) {
-        if ($@ =~ /^SHEET_NOT_FOUND:/) {
-            $self->_clear_sheet_id();
-            $self->_show_error("Spreadsheet not found (deleted?).\n\nThe sheet ID has been cleared. Use File → Settings to create or enter a new one.");
-        } else {
-            $self->_show_error("Sync from Sheet failed:\n$@");
-        }
-        $self->_set_status('Sync failed.');
-    } else {
-        $self->_set_status(
-            "Synced from Sheet: $counts->{scan_folders} folders, $counts->{tracks} tracks updated."
-        );
-        $self->_load_library();
-    }
+    $self->_set_status(sprintf(
+        'Synced: %d tracks merged, %d added locally, %d added to sheet, %d removed from sheet.',
+        $summary->{tracks_merged},
+        $summary->{tracks_added_local},
+        $summary->{tracks_added_sheet},
+        $summary->{tracks_deleted_sheet},
+    ));
+    $self->_load_library();
     return;
 }
 

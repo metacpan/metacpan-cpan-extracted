@@ -20,31 +20,35 @@
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($teksto_json);
   my $data = mb::JSON::decode();              # gumagamit ng $_
-  my $data = mb::JSON::parse($teksto_json);   # alias (katugma)
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: alias ng decode() ]
+  my $data = mb::JSON::parse($teksto_json);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Mga Boolean na Halaga ]
+[ 5. stringify: Perl -> JSON  (alias na katugma sa JavaScript) ]
+  my $json = mb::JSON::stringify($data);
+  # Ang stringify() at encode() ay nagbibigay ng parehong output
+
+[ 6. Mga Boolean na Halaga ]
   mb::JSON::true   -> JSON: true
   mb::JSON::false  -> JSON: false
   Numero 1 o 0     -> JSON: numero (hindi boolean)
 
-[ 5. null at undef ]
+[ 7. null at undef ]
   undef  -> null (sa encode)
   null   -> undef (sa decode)
 
-[ 6. Mga susi ng hash ay inayos ayon sa alpabeto ]
+[ 8. Mga susi ng hash ay inayos ayon sa alpabeto ]
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. Ang mga UTF-8 na string ay nananatiling buo (hindi \uXXXX) ]
+[ 9. Ang mga UTF-8 na string ay nananatiling buo (hindi \uXXXX) ]
 
-[ 8. Mga Halimbawa ]
-  # decode
+[ 10. Mga Halimbawa ]
   my $h = mb::JSON::decode('{"pangalan":"Juan","edad":30}');
   print $h->{pangalan};   # Juan
 
-  # encode
   my $j = mb::JSON::encode({
       pangalan => 'Juan',
       aktibo   => mb::JSON::true,
@@ -52,6 +56,12 @@
   });
   # -> {"aktibo":true,"memo":null,"pangalan":"Juan"}
 
+  my $j = mb::JSON::stringify({
+      pangalan => 'Juan',
+      aktibo   => mb::JSON::true,
+  });
+  # -> {"aktibo":true,"pangalan":"Juan"}
+
   # roundtrip
-  my $data = mb::JSON::decode($json);
+  my $data  = mb::JSON::decode($json);
   my $balik = mb::JSON::encode($data);

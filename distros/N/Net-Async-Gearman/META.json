@@ -4,42 +4,46 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-Gearman",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::Fatal" : "0",
-            "Test::HexString" : "0",
-            "Test::More" : "0.88"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "IO::Async::Stream" : "0",
-            "Protocol::Gearman" : "0.03"
+            "Protocol::Gearman" : "0.03",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Net::Async::Gearman" : {
          "file" : "lib/Net/Async/Gearman.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Net::Async::Gearman::Client" : {
          "file" : "lib/Net/Async/Gearman/Client.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Net::Async::Gearman::Worker" : {
          "file" : "lib/Net/Async/Gearman/Worker.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -48,5 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

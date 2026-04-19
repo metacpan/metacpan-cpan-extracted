@@ -78,3 +78,7 @@ MANIFEST\s\d
 \A\.github\b
 
 \.gitattributes\b
+
+.downstream.json
+agents/
+CLAUDE.md

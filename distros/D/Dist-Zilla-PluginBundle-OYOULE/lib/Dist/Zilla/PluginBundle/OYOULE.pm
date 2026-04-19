@@ -3,6 +3,8 @@ package Dist::Zilla::PluginBundle::OYOULE;
 use v5.26;
 use strictures 2;
 
+our $VERSION = '2.1.1'; # VERSION
+
 use Moose;
 use namespace::autoclean;
 
@@ -90,6 +92,7 @@ sub _plugins {
                 'repository.type' => 'git',
             },
         ],
+        'OurPkgVersion',
         'PodWeaver',
         'Prereqs::FromCPANfile',
         [
@@ -112,7 +115,8 @@ sub _starter_config {
     my $self = shift;
 
     my %config = (
-        revision   => 5,
+        revision                 => 5,
+        'MakeMaker.eumm_version' => '7.78',
     );
 
     if ($self->use_darkpan) {
@@ -184,7 +188,7 @@ Dist::Zilla::PluginBundle::OYOULE - Dist::Zilla plugin configuration for Author/
 
 =head1 VERSION
 
-version 2.0.0
+version 2.1.1
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,9 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Annotation 2.160;
+package Config::Model::Annotation 2.161;
+
+use v5.20;
 
 use Mouse;
 use English;
@@ -24,6 +26,9 @@ use Config::Model::ObjTreeScanner;
 use strict ;
 use warnings;
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 use Carp qw/croak confess cluck/;
 
 #my $logger = get_logger("Annotation") ;
@@ -39,31 +44,26 @@ has 'root_dir' => (
     coerce => 1
 );
 
-sub _set_file {
-    my $self = shift;
+sub _set_file ($self) {
     return $self->dir->child( $self->config_class_name . '-note.pl');
 }
 
-sub _set_dir {
-    my $self = shift;
+sub _set_dir ($self) {
     return
           $self->root_dir ? $self->root_dir->child('config-model')
         : $EUID           ? path("/var/lib/config-model")
         :                   path("~/.config-model");
 }
 
-sub save {
-    my $self = shift;
-
+sub save ($self) {
     my $dir = $self->dir;
     $dir->mkpath;
     my $h    = $self->get_annotation_hash;
     $self->file->spew_utf8( Dumper($h) );
+    return;
 }
 
-sub get_annotation_hash {
-    my $self = shift;
-
+sub get_annotation_hash ($self) {
     my %data;
     my $scanner = Config::Model::ObjTreeScanner->new(
         leaf_cb         => \&my_leaf_cb,
@@ -86,6 +86,7 @@ sub my_hash_element_cb {
 
     # resume exploration
     map { $scanner->scan_hash( $data_ref, $node, $element_name, $_ ) } @keys;
+    return;
 }
 
 # WARNING: not a method
@@ -97,6 +98,7 @@ sub my_node_element_cb {
 
     # explore next node
     $scanner->scan_node( $data_ref, $contained_node );
+    return;
 }
 
 # WARNING: not a method
@@ -110,12 +112,14 @@ sub my_list_element_cb {
     map { $scanner->scan_list( $data_ref, $node, $element_name, $_ ) } @idx;
 
     # note: scan_list and scan_hash are equivalent
+    return;
 }
 
 # WARNING: not a method
 sub my_leaf_cb {
     my ( $scanner, $data_ref, $node, $element_name, $index, $leaf_object ) = @_;
     store_note_in_data( $data_ref, $leaf_object );
+    return;
 }
 
 # WARNING: not a method
@@ -127,10 +131,10 @@ sub store_note_in_data {
 
     my $key = $obj->location;
     $data_ref->{$key} = $note;
+    return;
 }
 
-sub load {
-    my $self = shift;
+sub load ($self) {
     my $f    = $self->file;
     return unless $f->exists;
     my $hash = do "./$f" || croak "can't do $f:$!";
@@ -141,6 +145,7 @@ sub load {
         next if $@;    # skip annotation of unknown elements
         $obj->annotation( $hash->{$path} );
     }
+    return;
 }
 
 no Mouse;
@@ -163,7 +168,7 @@ Config::Model::Annotation - Read and write configuration annotations
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 

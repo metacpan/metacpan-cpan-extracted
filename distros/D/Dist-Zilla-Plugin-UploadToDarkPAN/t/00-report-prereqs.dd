@@ -2,6 +2,7 @@ do { my $x = {
        'build' => {
                     'requires' => {
                                     'Dist::Zilla' => '0',
+                                    'Dist::Zilla::Plugin::OurPkgVersion' => '0',
                                     'Dist::Zilla::Plugin::PodWeaver' => '0',
                                     'Dist::Zilla::Plugin::Prereqs::FromCPANfile' => '0',
                                     'Dist::Zilla::PluginBundle::Starter' => '0'

@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Net::Async::Gearman::Worker;
+package Net::Async::Gearman::Worker 0.02;
 
-use strict;
+use v5.20;
 use warnings;
-
-our $VERSION = '0.01';
 
 use base qw( Net::Async::Gearman Protocol::Gearman::Worker );
 Protocol::Gearman::Worker->VERSION( '0.03' ); # job_finished
@@ -17,9 +15,9 @@ Protocol::Gearman::Worker->VERSION( '0.03' ); # job_finished
 
 C<Net::Async::Gearman::Worker> - concrete Gearman worker over an L<IO::Async::Stream>
 
-=head1 SYNOPSIS
-
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This module combines the abstract L<Protocol::Gearman::Worker> with
 L<Net::Async::Gearman> to provide an asynchronous concrete Gearman worker
@@ -31,7 +29,9 @@ implementation.
 
 =cut
 
-=head2 $worker->add_function( $name, $code )
+=head2 add_function
+
+   $worker->add_function( $name, $code );
 
 Adds a new function to the collection known by the worker. On connection to
 the server, it will declare the names of all of these by using the C<can_do>
@@ -42,7 +42,7 @@ a Future that will give the eventual result of the function. It is not
 necessary to invoke the C<complete> or C<fail> methods on the Job; that will
 be done automatically when the Future becomes ready.
 
- $f = $code->( $job )
+   $f = $code->( $job )
 
 =cut
 

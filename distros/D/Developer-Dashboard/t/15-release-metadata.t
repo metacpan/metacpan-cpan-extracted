@@ -14,6 +14,7 @@ my $readme = _slurp_optional( _repo_path('README.md') );
 my $plain_readme = _slurp_optional( _repo_path('README') );
 my $skill_guide = _slurp_optional( _repo_path('SKILL.md') );
 my $release_doc = _slurp_optional( _repo_path( 'doc', 'update-and-release.md' ) );
+my $housekeeper_rotation_doc = _slurp_optional( _repo_path( 'doc', 'housekeeper-rotation.md' ) );
 my $changes = _slurp( _repo_path('Changes') );
 my $dist = _slurp_optional( _repo_path('dist.ini') );
 my $meta = _slurp_optional( _repo_path('META.json') );
@@ -34,13 +35,16 @@ my @doc_paths = grep { -e $_ } (
     _repo_path('SOFTWARE_SPEC.md'),
     _repo_path('TEST_PLAN.md'),
     _repo_path( 'doc', 'architecture.md' ),
+    _repo_path( 'doc', 'docker-service-toggle.md' ),
     _repo_path( 'doc', 'housekeeper-rotation.md' ),
+    _repo_path( 'doc', 'path-inventory-api.md' ),
     _repo_path( 'doc', 'integration-test-plan.md' ),
     _repo_path( 'doc', 'security.md' ),
     _repo_path( 'doc', 'skills.md' ),
     _repo_path( 'doc', 'static-file-serving.md' ),
     _repo_path( 'doc', 'testing.md' ),
     _repo_path( 'doc', 'update-and-release.md' ),
+    _repo_path( 'doc', 'web-readonly-mode.md' ),
 );
 my @pod_paths = (
     _repo_path( 'lib', 'Developer', 'Dashboard.pm' ),
@@ -58,10 +62,10 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.46', 'repo version bumped for the multi-level nested skill dotted dispatch fix' );
-like( $pm, qr/^2\.46$/m, 'main POD version matches the module version' );
+is( $version, '2.56', 'repo version bumped for the Go and Java main-documentation guardrail fix' );
+like( $pm, qr/^2\.56$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
-    like( $dist, qr/^version = 2\.46$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^version = 2\.56$/m, 'dist.ini version matches the module version in the source tree' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini excludes integration assets so repo-only verification helpers do not leak into release tarballs' );
@@ -71,10 +75,10 @@ if ( $dist ne '' ) {
     like( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini excludes Markdown files so repo-internal docs do not leak into release tarballs' );
         like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
-    else {
-        like( $meta, qr/"version"\s*:\s*"2\.46"/, 'META.json version matches the module version in the built distribution' );
+else {
+        like( $meta, qr/"version"\s*:\s*"2\.56"/, 'META.json version matches the module version in the built distribution' );
     }
-like( $changes, qr/^2\.46\s+2026-04-17$/m, 'Changes top entry matches the bumped version' );
+like( $changes, qr/^2\.56\s+2026-04-18$/m, 'Changes top entry matches the bumped version' );
 ok( $plain_readme ne '', 'plain README is tracked for release kwalitee compatibility' );
 like( $plain_readme, qr/Developer Dashboard/, 'plain README identifies the distribution clearly' );
 ok( $security_pod ne '', 'SECURITY.pod is tracked so the release tarball ships a security policy document' );
@@ -220,12 +224,31 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/local\/lib\/perl5/, 'docs describe layered runtime local Perl library exposure' );
     like( $doc, qr/LAST_RESULT/, 'docs describe the immediate previous-hook LAST_RESULT payload' );
     like( $doc, qr/\[\[STOP\]\]/, 'docs describe the explicit stderr stop marker for hook chains' );
+    like( $doc, qr/\.go.*go run|go run.*\.go/s, 'docs describe direct executable Go command and hook dispatch through go run' );
+    like( $doc, qr/\.java.*javac.*java|javac.*\.java.*java/s, 'docs describe direct executable Java command and hook dispatch through javac and java' );
+    like( $doc, qr/dashboard hi|dashboard foo/, 'docs include concrete custom-command examples for source-backed CLI dispatch' );
     unlike( $doc, qr/CPANManager/, 'docs do not describe a dedicated CPAN manager module for the sql-dashboard runtime driver flow' );
     like( $doc, qr/Developer::Dashboard::SKILLS/, 'docs point readers at the shipped skill POD module' );
     unlike( $doc, qr/standalone `of` and `open-file`|standalone of and open-file/, 'docs no longer advertise public standalone of/open-file executables' );
     unlike( $doc, qr/standalone `ticket` executable|standalone ticket executable/, 'docs no longer advertise a public standalone ticket executable' );
     like( $doc, qr/Developer::Dashboard::Runtime::Result/, 'docs use the namespaced Runtime::Result module name' );
     like( $doc, qr/Developer::Dashboard::Folder/, 'docs use the namespaced Folder module name' );
+    like( $doc, qr/Folder->all|all_paths|new_from_all_folders|Collector->new_from_all_folders/, 'docs mention the public Perl path inventory API' );
+}
+
+for my $doc (
+    [ 'README.md', $readme ],
+    [ 'lib/Developer/Dashboard.pm', $pm ],
+    [ 'doc/housekeeper-rotation.md', $housekeeper_rotation_doc ],
+  )
+{
+    my ( $label, $content ) = @{$doc};
+    next if !defined $content || $content eq '';
+    like(
+        $content,
+        qr/local .* explicit numeric timezone offset|explicit numeric timezone offset .* local/s,
+        "$label documents that collector-visible timestamps follow the machine local timezone with an explicit offset",
+    );
 }
 
 for my $doc ( grep { defined && $_ ne '' } ( $skill_guide, $skills_pod ) ) {
@@ -288,6 +311,7 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/Do not treat Scorecard as a pre-commit local gate/, 'README documents that live Scorecard runs happen after local gates and commit/push' );
 }
 like( $release_doc, qr/dzil build/, 'release doc still documents the dzil build step' ) if $release_doc ne '';
+like( $release_doc, qr/exactly one unpacked\s+`Developer-Dashboard-X\.XX\/`\s+build directory and exactly one matching\s+`Developer-Dashboard-X\.XX\.tar\.gz`\s+tarball/s, 'release doc describes the enforced single-build-dir and single-tarball invariant' ) if $release_doc ne '';
 like( $release_doc, qr/cpanm .*Developer-Dashboard-1\.\d+\.tar\.gz/, 'release doc still documents tarball installation verification' ) if $release_doc ne '';
 like( $agents_override, qr/DD-OOP-LAYERS/, 'AGENTS.override.md documents the layered runtime contract' ) if $agents_override ne '';
 like( $agents_override, qr/FULL-POD-DOC/, 'AGENTS.override.md documents the FULL-POD-DOC rule' ) if $agents_override ne '';

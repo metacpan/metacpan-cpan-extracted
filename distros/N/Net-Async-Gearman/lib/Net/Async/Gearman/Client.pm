@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014,2026 -- leonerd@leonerd.org.uk
 
-package Net::Async::Gearman::Client;
+package Net::Async::Gearman::Client 0.02;
 
-use strict;
+use v5.20;
 use warnings;
-
-our $VERSION = '0.01';
 
 use base qw( Net::Async::Gearman Protocol::Gearman::Client );
 
@@ -18,26 +16,26 @@ C<Net::Async::Gearman::Client> - concrete Gearman client over an L<IO::Async::St
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop;
- use Net::Async::Gearman::Client;
+=for highlighter language=perl
 
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   use Net::Async::Gearman::Client;
 
- my $client = Net::Async::Gearman::Client->new;
- $loop->add( $client );
+   my $loop = IO::Async::Loop->new;
 
- $client->connect(
-    host => $SERVER
- )->then( sub {
-    $client->submit_job(
-       func => "sum",
-       arg  => "10,20,30"
-    )
- })->then( sub {
-    my ( $total ) = @_;
-    say $total;
-    Future->done;
- })->get;
+   my $client = Net::Async::Gearman::Client->new;
+   $loop->add( $client );
+
+   await $client->connect(
+      host => $SERVER,
+   );
+
+   my $total = await $client->submit_job(
+      func => "sum",
+      arg  => "10,20,30",
+   );
+
+   say $total;
 
 =head1 DESCRIPTION
 

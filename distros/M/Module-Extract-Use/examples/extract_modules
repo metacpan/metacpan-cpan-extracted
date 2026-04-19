@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-
 use v5.10;
+use utf8;
 
 use open qw(:std :utf8);
 use strict;
 use warnings;
 
-use Pod::Usage;
+use File::Spec::Functions qw(catfile);
 use Getopt::Std qw(getopts);
 
 =encoding utf8
@@ -69,11 +69,14 @@ with C<use> or C<require>.
 	requires 'strict';
 	requires 'warnings';
 
+	# look for the file in PATH
+	$ extract_modules -b some_program
+
 =head1 DESCRIPTION
 
 This script does not execute the code in the files it examines. It
 uses the C<Module::Extract::Use> or C<Module::ExtractUse> modules
-which statically analyze the source without compiling or running it.
+which statically analyzes the source without compiling or running it.
 These modules cannot discover modules loaded dynamically through a
 string eval.
 
@@ -81,15 +84,17 @@ string eval.
 
 =over 4
 
+=item * -b  look for filename in current directory or in PATH
+
 =item * -c  cpanfile output
 
 =item * -e  exclude core modules
 
 =item * -j  JSON output
 
-=item * -l  succint list, one module per line
+=item * -l  succinct list, one module per line
 
-=item * -0  succint list, modules null separated (for xargs -0)
+=item * -0  succinct list, modules null separated (for xargs -0)
 
 =cut
 
@@ -97,11 +102,18 @@ run(@ARGV) unless caller;
 
 sub run {
 	my @args = @_;
-	getopts('ecjl0', \my %opts);
+
+	my %opts;
+	{
+	local @ARGV = @args;
+	getopts('bcejl0', \%opts);
+	@args = @ARGV;
+	}
 
 	# if no parameters are passed, give usage information
 	unless( @args ) {
-		pod2usage( msg => 'Please supply at least one filename to analyze' );
+		require Pod::Usage;
+		Pod::Usage::pod2usage( msg => 'Please supply at least one filename to analyze' );
 		exit;
 		}
 
@@ -124,12 +136,36 @@ sub run {
 		( $object, $method, $sub ) = ( $module->new, @{ $methods{$module} } );
 		}
 
-	die "No usable file scanner module found; exiting...\n" .
-		"Install one of these modules to make this program work:\n" .
-		join( "\n\t", sort keys %methods ) .
-		"\n"
+	die join(
+			"\n\t",
+			"Install one of these modules to make this program work:",
+			sort keys %methods
+			) . "\n"
 		unless defined $object;
 
+	if( $opts{'b'} ) {
+		require Config;
+		my @dirs = split /\Q$Config::Config{'path_sep'}/, $ENV{'PATH'};
+
+		my @found_args;
+		FILE: foreach my $file ( @args ) {
+			if( -e $file ) {
+				push @found_args, $file;
+				next FILE;
+				}
+
+			foreach my $dir ( @dirs ) {
+				print STDERR "Looking in $dir\n";
+				my $path = catfile $dir, $file;
+				if( -e $path ) {
+					push @found_args, $path;
+					next FILE;
+					}
+				}
+			}
+
+		@args = @found_args;
+		}
 
 	my @Grand_modules;
 	foreach my $file ( @args ) {
@@ -225,7 +261,6 @@ sub long_list {
 
 	printf "%d module(s) in core, %d external module(s)\n\n", $core, $extern;
 	}
-
 }
 
 =back
@@ -234,11 +269,11 @@ sub long_list {
 
 Jonathan Yu C<< <frequency@cpan.org> >>
 
-brian d foy C<< <bdfoy@cpan.org> >>
+brian d foy C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright © 2009-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2009-2026, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You can use this script under the same terms as Perl itself.
 

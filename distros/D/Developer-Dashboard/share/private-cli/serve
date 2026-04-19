@@ -33,7 +33,7 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard serve>, the command that starts the dashboard web server in background or foreground mode and can also print or follow logs and worker information.
+This staged helper exposes C<dashboard serve>, the command that starts the dashboard web server in background or foreground mode and can also print or follow logs and worker information, including the persisted browser-only C<--no-editor>/C<--no-endit> and C<--no-indicators>/C<--no-indicator> modes.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing serve CLI flags, foreground/background behavior, or 
 
 =head1 HOW TO USE
 
-Users run C<dashboard serve> or one of its log/worker submodes. The staged helper forwards the request into the private runtime, which launches or inspects the managed web process.
+Users run C<dashboard serve> or one of its log/worker submodes. The staged helper forwards the request into the private runtime, which launches or inspects the managed web process and persists serve settings such as the read-only C<--no-editor>/C<--no-endit> browser mode and the top-right-chrome C<--no-indicators>/C<--no-indicator> browser mode.
 
 =head1 WHAT USES IT
 
@@ -61,17 +61,32 @@ Run the public built-in command path that stages or re-enters this helper.
 
 Example 2:
 
+  dashboard serve --no-editor
+
+Start the dashboard in read-only browser mode so bookmark edit and source
+routes stay blocked.
+
+Example 3:
+
+  dashboard serve --no-indicators
+
+Start the dashboard with the top-right browser context and indicator strip
+removed while leaving the left-side page chrome and terminal prompt behavior
+unchanged.
+
+Example 4:
+
   ~/.developer-dashboard/cli/dd/serve --help
 
 Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
 
-Example 3:
+Example 5:
 
   prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
 
 Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
 
-Example 4:
+Example 6:
 
   prove -lr t
 

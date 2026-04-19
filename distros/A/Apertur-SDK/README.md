@@ -78,8 +78,17 @@ my $details = $client->sessions->get($session->{uuid});
 # Verify a password-protected session before uploading
 my $result = $client->sessions->verify_password($session->{uuid}, 's3cr3t');
 
-# Check per-destination delivery status
+# Check per-destination delivery status. Returns:
+#   { status => 'pending|active|completed|expired',
+#     files => [...], lastChanged => '<ISO 8601>' }
 my $status = $client->sessions->delivery_status($session->{uuid});
+
+# Long-poll: server holds the response up to 5 min until something changes.
+# Passing poll_from automatically widens the per-request timeout to 360 s.
+$status = $client->sessions->delivery_status(
+    $session->{uuid},
+    poll_from => $status->{lastChanged},
+);
 ```
 
 ## Uploading Images

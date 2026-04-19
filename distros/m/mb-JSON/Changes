@@ -1,5 +1,30 @@
 Revision history for mb-JSON
 
+0.06  2026-04-18 JST (Japan Standard Time)
+  - Added mb::JSON::stringify(): alias for encode(), symmetric with
+    mb::JSON::parse() which is an alias for decode().
+    Mirrors JSON.stringify() in JavaScript.
+  - Added mb::JSON::parse(): documented as alias for decode() alongside
+    the existing decode() implementation (parse was present since 0.03).
+  - Revised doc/ cheat sheets (all 21 languages): parse and stringify now
+    appear as independent sections [ 3. ] and [ 5. ] with proper sequential
+    numbering; formerly [ 3b. ] notation retired.
+  - Added t/1004-stringify.t: test suite for stringify() (40 tests).
+  - Added t/1003-boolean.t ok 20-21: stringify(true/false) coverage.
+  - Added t/9001-load.t ok 5-10: can() checks for all 6 public functions
+    (decode/parse/encode/stringify/true/false); plan 13->14.
+  - Added t/9060-readme.t: FUNCTIONS added to required README sections;
+    plan 11->12.
+  - Added t/1001-decode.t ok 1: defined check for parse() alias.
+  - Added t/1002-encode.t ok 1: defined check for stringify() alias.
+  - Revised eg/01_decode.pl: added parse() example alongside decode().
+  - Revised eg/02_encode.pl: added stringify() example alongside encode().
+  - Added eg/03_parse.pl: parse() usage example (alias for decode()).
+  - Added eg/04_stringify.pl: stringify() usage example (alias for encode()).
+  - Fixed lib/mb/JSON.pm POD: LIMITATIONS now mentions stringify() alongside
+    encode() for circular reference warning; ENCODING RULES and DECODING RULES
+    sections note their aliases; BOOLEAN VALUES mentions stringify() parity.
+
 0.05  2026-04-04 JST (Japan Standard Time)
   - fix t/9050-pod.t: replace G11 implementation with Pod::Checker OO
     interface (Pod::Checker->new / num_errors / num_warnings) and

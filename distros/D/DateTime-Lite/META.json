@@ -47,6 +47,7 @@
             "perl" : "5.010001",
             "strict" : "0",
             "vars" : "0",
+            "version" : "0",
             "warnings" : "0",
             "warnings::register" : "0"
          }
@@ -70,7 +71,7 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Lite"
       }
    },
-   "version" : "v0.6.0",
+   "version" : "v0.6.2",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

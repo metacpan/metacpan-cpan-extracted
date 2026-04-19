@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.5.0
+## Version v0.5.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/17
+## Modified 2026/04/19
 ## All rights reserved
 ## 
 ## 
@@ -52,19 +52,14 @@ BEGIN
     }
     warnings::register_categories( 'DateTime::Lite' );
     use vars qw(
-        $VERSION $ERROR $DEBUG
+        $VERSION $ERROR $DEBUG $FATAL_EXCEPTIONS
         $DB_FILE $DBH $STHS
         $FALLBACK_TO_DT_TZ
         $HAS_CONSTANTS
         $MISSING_AUTO_UTF8_DECODING
         $SQLITE_HAS_MATH_FUNCTIONS
-        $USE_MEM_CACHE
+        $USE_MEM_CACHE $_CACHE
     );
-    # Package-level memory cache: canonical_name -> blessed object.
-    # Populated when use_cache_mem => 1 is passed to new(), or when
-    # enable_mem_cache() has been called at the class level.
-    # Keys are canonical zone names after alias resolution.
-    my %_CACHE;
     use overload (
         '""'     => \&name,
         bool     => sub{1},
@@ -91,12 +86,17 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.2';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
     # $STHS->{ $db_file }->{ $statement_id } = $sth
     our $STHS    = {};
+    # Package-level memory cache: canonical_name -> blessed object.
+    # Populated when use_cache_mem => 1 is passed to new(), or when
+    # enable_mem_cache() has been called at the class level.
+    # Keys are canonical zone names after alias resolution.
+    our $_CACHE  = {};
     # $SQLITE_HAS_MATH_FUNCTIONS is not defined on purpose
     # Its definedness is checked in _dbh_add_user_defined_functions()
 
@@ -174,6 +174,9 @@ BEGIN
     }
 };
 
+use strict;
+use warnings;
+
 # NOTE: Constructor
 sub new
 {
@@ -214,9 +217,9 @@ sub new
     # is already cached. The cache is keyed BEFORE alias resolution so
     # that both the alias ("US/Eastern") and the canonical name
     # ("America/New_York") are stored and looked up by their original form.
-    if( $use_cache && exists( $_CACHE{ $name } ) )
+    if( $use_cache && exists( $_CACHE->{ $name } ) )
     {
-        return( $_CACHE{ $name } );
+        return( $_CACHE->{ $name } );
     }
 
     # Delegate entirely to DateTime::TimeZone if fallback mode is active
@@ -228,7 +231,7 @@ sub new
         return( $tz );
     }
 
-    $args{fatal} //= 0;
+    $args{fatal} //= ( $FATAL_EXCEPTIONS // 0 );
 
     # Special cases: floating, UTC, and local never need a DB lookup
     if( $name eq 'local' )
@@ -336,8 +339,8 @@ sub new
         $self->{_footer_cache_val}       = undef;
         $self->{_footer_local_cache_key} = undef;
         $self->{_footer_local_cache_val} = undef;
-        $_CACHE{ $name }                 = $self;
-        $_CACHE{ $self->{name} }         = $self if( $self->{name} ne $name );
+        $_CACHE->{ $name }               = $self;
+        $_CACHE->{ $self->{name} }       = $self if( $self->{name} ne $name );
     }
 
     return( $self );
@@ -349,40 +352,40 @@ sub aliases
     my $class_or_self = shift( @_ );
     local $@;
     my $sth;
-    unless( $sth = $self->_get_cached_statement( 'all_aliases' ) )
+    unless( $sth = $class_or_self->_get_cached_statement( 'all_aliases' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
+        my $dbh = $class_or_self->_dbh || return( $class_or_self->pass_error );
         my $query = q{SELECT alias_name, zone_name FROM v_zone_aliases ORDER BY alias_name};
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all timezone aliases: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
-        $self->_set_cached_statement( all_aliases => $sth );
+        } || return( $class_or_self->error( "Error preparing the query to get all timezone aliases: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        $class_or_self->_set_cached_statement( all_aliases => $sth );
     }
 
     my $rv = eval{ $sth->execute };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all timezone aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all timezone aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0,1]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all timezone aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
-    elsif( !defined( $row ) && $sth->errstr )
+    elsif( !defined( $all ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all timezone aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $aliases = +{map{ $_->[0] => $_->[1] } @$all};
@@ -400,41 +403,41 @@ sub all_names
     my $class_or_self = shift( @_ );
     local $@;
     my $sth;
-    unless( $sth = $self->_get_cached_statement( 'all_names' ) )
+    unless( $sth = $class_or_self->_get_cached_statement( 'all_names' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
+        my $dbh = $class_or_self->_dbh || return( $class_or_self->pass_error );
         # We handle each step of building the query, so we can report on any error with better accuracy.
         my $query = q{SELECT name FROM zones ORDER BY name};
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all timezone names: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
-        $self->_set_cached_statement( all_names => $sth );
+        } || return( $class_or_self->error( "Error preparing the query to get all timezone names: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        $class_or_self->_set_cached_statement( all_names => $sth );
     }
 
     my $rv = eval{ $sth->execute };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone names: $@\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all timezone names: $@\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone names: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all timezone names: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone names: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all timezone names: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
-    elsif( !defined( $row ) && $sth->errstr )
+    elsif( !defined( $all ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone names: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all timezone names: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $zones = [map{ $_->[0] } @$all];
@@ -447,40 +450,40 @@ sub categories
     my $class_or_self = shift( @_ );
     local $@;
     my $sth;
-    unless( $sth = $self->_get_cached_statement( 'categories' ) )
+    unless( $sth = $class_or_self->_get_cached_statement( 'categories' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
-        my $query = q{SELECT DISTINCT(category) FROM zones ORDER BY category};
+        my $dbh = $class_or_self->_dbh || return( $class_or_self->pass_error );
+        my $query = q{SELECT DISTINCT(category) FROM zones WHERE category IS NOT NULL ORDER BY category};
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all timezone categories: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
-        $self->_set_cached_statement( categories => $sth );
+        } || return( $class_or_self->error( "Error preparing the query to get all timezone categories: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        $class_or_self->_set_cached_statement( categories => $sth );
     }
 
     my $rv = eval{ $sth->execute };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone categories: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all timezone categories: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all timezone categories: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all timezone categories: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone categories: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all timezone categories: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
-    elsif( !defined( $row ) && $sth->errstr )
+    elsif( !defined( $all ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all timezone categories: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all timezone categories: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $categories = [map{ $_->[0] } @$all];
@@ -491,6 +494,10 @@ sub categories
 sub category
 {
     my $self = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "category() must be called on a class instance." ) );
+    }
     return if( index( $self->{name}, '/' ) == -1 );
     return( [split( /\//, $self->{name}, 2 )]->[0] );
 }
@@ -502,7 +509,7 @@ sub category
 sub clear_mem_cache
 {
     my $class = shift( @_ );
-    %_CACHE = ();
+    $_CACHE = {};
     return( $class );
 }
 
@@ -518,6 +525,10 @@ sub coordinates { return( $_[0]->{coordinates} ) }
 sub country_codes
 {
     my $self = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "country_codes() must be called on a class instance." ) );
+    }
     return unless( defined( $self->{countries} ) );
     # We need to cache it
     unless( ref( $self->{countries} ) eq 'ARRAY' )
@@ -533,40 +544,40 @@ sub countries
     my $class_or_self = shift( @_ );
     local $@;
     my $sth;
-    unless( $sth = $self->_get_cached_statement( 'countries' ) )
+    unless( $sth = $class_or_self->_get_cached_statement( 'countries' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
+        my $dbh = $class_or_self->_dbh || return( $class_or_self->pass_error );
         my $query = q{SELECT LOWER(code) FROM countries ORDER BY code};
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all country codes: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
-        $self->_set_cached_statement( countries => $sth );
+        } || return( $class_or_self->error( "Error preparing the query to get all country codes: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        $class_or_self->_set_cached_statement( countries => $sth );
     }
 
     my $rv = eval{ $sth->execute };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all country codes: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all country codes: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all country codes: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all country codes: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all country codes: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all country codes: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
-    elsif( !defined( $row ) && $sth->errstr )
+    elsif( !defined( $all ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all country codes: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all country codes: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $codes = [map{ $_->[0] } @$all];
@@ -584,7 +595,7 @@ sub disable_mem_cache
 {
     my $class = shift( @_ );
     $USE_MEM_CACHE = 0;
-    %_CACHE = ();
+    $_CACHE = {};
     return( $class );
 }
 
@@ -631,7 +642,22 @@ sub error
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
 
-sub fatal { return( shift->_set_get_prop( 'fatal', @_ ) ); }
+sub fatal
+{
+    my $this = shift( @_ );
+    if( @_ )
+    {
+        if( ref( $this ) )
+        {
+            return( $this->_set_get_prop( 'fatal', @_ ) );
+        }
+        else
+        {
+            warn( "Cannot call fatal in mutator mode as a class method." ) if( warnings::enabled( 'DateTime::Lite' ) );
+        }
+    }
+    return( ref( $this ) ? $this->_set_get_prop( 'fatal' ) : $FATAL_EXCEPTIONS );
+}
 
 sub footer_tz_string { return( $_[0]->{footer_tz_string} ); }
 
@@ -644,6 +670,10 @@ sub footer_tz_string { return( $_[0]->{footer_tz_string} ); }
 sub has_dst_changes
 {
     my $self = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "has_dst_changes() must be called on a class instance." ) );
+    }
     return( $self->{has_dst} ? 1 : 0 );
 }
 
@@ -653,6 +683,10 @@ sub is_dst_for_datetime
 {
     my $self = shift( @_ );
     my $dt   = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "is_dst_for_datetime() must be called on a class instance." ) );
+    }
     return(0) if( $self->{is_floating} || $self->{is_utc} );
     return(0) if( exists( $self->{fixed_offset} ) );
     if( !defined( $dt ) )
@@ -682,16 +716,16 @@ sub is_valid_name
     # Can be called as class method, instance method, or plain function.
     my $class_or_self = shift( @_ );
     my $name = shift( @_ ) ||
-        return( $self->error( "No timezone name was provided." ) );
-    my $canon = $self->_resolve_alias( $name );
-    return( $self->pass_error ) if( !defined( $canon ) && $self->error );
+        return( $class_or_self->error( "No timezone name was provided." ) );
+    my $canon = $class_or_self->_resolve_alias( $name );
+    return( $class_or_self->pass_error ) if( !defined( $canon ) && $class_or_self->error );
     my $orig;
     if( defined( $canon ) && $name ne $canon )
     {
         $orig = $name;
         $name = $canon;
     }
-    my $ref = $self->_get_zone_info( $name ) || return(0);
+    my $ref = $class_or_self->_get_zone_info( $name ) || return(0);
     return(1);
 }
 
@@ -712,12 +746,12 @@ sub names_in_category
     # Can be called as class method, instance method, or plain function.
     my $class_or_self = shift( @_ );
     my $cat = shift( @_ ) ||
-        return( $self->error( "No timezone category was provided." ) );
+        return( $class_or_self->error( "No timezone category was provided." ) );
     local $@;
     my $sth;
-    unless( $sth = $self->_get_cached_statement( 'names_in_category' ) )
+    unless( $sth = $class_or_self->_get_cached_statement( 'names_in_category' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
+        my $dbh = $class_or_self->_dbh || return( $class_or_self->pass_error );
         my $query = <<'SQL';
 SELECT DISTINCT
     CASE
@@ -732,33 +766,33 @@ SQL
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all local names for a category: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
-        $self->_set_cached_statement( names_in_category => $sth );
+        } || return( $class_or_self->error( "Error preparing the query to get all local names for a category: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        $class_or_self->_set_cached_statement( names_in_category => $sth );
     }
 
-    my $rv = eval{ $sth->execute };
+    my $rv = eval{ $sth->execute( $cat ) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all local names for the category $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all local names for the category $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all local names for the category $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all local names for the category $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all local names for the category $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all local names for the category $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
-    elsif( !defined( $row ) && $sth->errstr )
+    elsif( !defined( $all ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all local names for the category $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all local names for the category $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $names = [map{ $_->[0] } @$all];
@@ -770,14 +804,14 @@ sub names_in_country
     # Can be called as class method, instance method, or plain function.
     my $class_or_self = shift( @_ );
     my $code = shift( @_ ) ||
-        return( $self->error( "No country code was provided." ) );
+        return( $class_or_self->error( "No country code was provided." ) );
     # Because the country codes are stored in upper case, and there is no need to have SQL change the case when we can do it.
     $code = uc( $code );
     local $@;
     my $sth;
-    unless( $sth = $self->_get_cached_statement( 'names_in_category' ) )
+    unless( $sth = $class_or_self->_get_cached_statement( 'names_in_country' ) )
     {
-        my $dbh = $self->_dbh || return( $self->pass_error );
+        my $dbh = $class_or_self->_dbh || return( $class_or_self->pass_error );
         my $query = <<'SQL';
 SELECT DISTINCT
      z.name
@@ -790,33 +824,33 @@ SQL
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get all zone names for a given country code: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
-        $self->_set_cached_statement( names_in_category => $sth );
+        } || return( $class_or_self->error( "Error preparing the query to get all zone names for a given country code: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        $class_or_self->_set_cached_statement( names_in_country => $sth );
     }
 
-    my $rv = eval{ $sth->execute };
+    my $rv = eval{ $sth->execute( $code ) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all zone names for the country code $cat: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all zone names for the country code $code: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get all zone names for the country code $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error executing the query to get all zone names for the country code $code: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $all = eval{ $sth->fetchall_arrayref([0]) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all zone names for the country code $cat: $@" ) );
+        return( $class_or_self->error( "Error retrieving all zone names for the country code $code: $@" ) );
     }
     # We check for definedness, which means an error in DBI
-    elsif( !defined( $row ) && $sth->errstr )
+    elsif( !defined( $all ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving all zone names for the country code $cat: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $class_or_self->error( "Error retrieving all zone names for the country code $code: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     my $names = [map{ $_->[0] } @$all];
@@ -846,21 +880,21 @@ sub offset_as_seconds
     else
     {
         # Will return undef in scalar context, and an empty list in list context.
-        return( $self->error( "Unsupported offset format '$offset'" ) );
+        return( $class_or_self->error( "Unsupported offset format '$offset'" ) );
     }
 
     $sign //= '+';
     unless( $hours >= 0 && $hours <= 99 )
     {
-        return( $self->error( "Unsupported hours ($hours). It must be greater or equal to 0 and lower or equal to 99." ) );
+        return( $class_or_self->error( "Unsupported hours ($hours). It must be greater or equal to 0 and lower or equal to 99." ) );
     }
     unless( $minutes >= 0 && $minutes <= 59 )
     {
-        return( $self->error( "Unsupported minutes ($minutes). It must be greater or equal to 0 and lower or equal to 59." ) );
+        return( $class_or_self->error( "Unsupported minutes ($minutes). It must be greater or equal to 0 and lower or equal to 59." ) );
     }
     if( defined( $seconds ) && ( $seconds < 0 || $seconds > 59 ) )
     {
-        return( $self->error( "Unsupported seconds ($seconds). It must be greater or equal to 0 and lower or equal to 59." ) );
+        return( $class_or_self->error( "Unsupported seconds ($seconds). It must be greater or equal to 0 and lower or equal to 59." ) );
     }
 
     my $total = $hours * 3600 + $minutes * 60;
@@ -907,6 +941,10 @@ sub offset_for_datetime
 {
     my $self = shift( @_ );
     my $dt   = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "offset_for_datetime() must be called on a class instance." ) );
+    }
     return(0) if( $self->{is_floating} || $self->{is_utc} );
     return( $self->{fixed_offset} ) if( exists( $self->{fixed_offset} ) );
     if( !defined( $dt ) )
@@ -929,6 +967,10 @@ sub offset_for_local_datetime
 {
     my $self = shift( @_ );
     my $dt   = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "offset_for_local_datetime() must be called on a class instance." ) );
+    }
     return(0) if( $self->{is_floating} || $self->{is_utc} );
     return( $self->{fixed_offset} ) if( exists( $self->{fixed_offset} ) );
     if( !defined( $dt ) )
@@ -1329,6 +1371,10 @@ sub short_name_for_datetime
 {
     my $self = shift( @_ );
     my $dt   = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "short_name_for_datetime() must be called on a class instance." ) );
+    }
     return( 'floating' ) if( $self->{is_floating} );
     return( 'UTC' )      if( $self->{is_utc} );
     if( exists( $self->{fixed_offset} ) )
@@ -1402,7 +1448,15 @@ sub tz_version
     return( $row ? $row->[0] : undef );
 }
 
-sub tzif_version { return( $_[0]->{tzif_version} ); }
+sub tzif_version
+{
+    my $self = shift( @_ );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        return( $self->error( "tzif_version() must be called on a class instance." ) );
+    }
+    return( $self->{tzif_version} );
+}
 
 # NOTE: Windows timezone name -> IANA mapping
 # Source: DateTime::TimeZone::Local::Win32 by Dave Rolsky and David Pinkowitz.
@@ -1661,9 +1715,7 @@ sub _dbh
     # Require SQLite >= 3.6.19 for foreign key support (DBD::SQLite >= 1.27)
     if( version->parse( $DBD::SQLite::sqlite_version ) < version->parse( '3.6.19' ) )
     {
-        return( $self->error(
-            "SQLite version 3.6.19 or higher is required. You have $DBD::SQLite::sqlite_version"
-        ) );
+        return( $self->error( "SQLite version 3.6.19 or higher is required. You have $DBD::SQLite::sqlite_version" ) );
     }
 
     my $params = {};
@@ -1706,43 +1758,75 @@ sub _dbh_add_user_defined_functions
     {
         return( $this->error( "No database handle was provided." ) );
     }
-    my $query = "SELECT name FROM pragma_function_list WHERE name = 'sqrt'";
-    local $@;
-    my $sth = eval
+    # Determine whether SQLite's built-in math functions are available.
+    #
+    # Detection strategy based on SQLite version:
+    #
+    #   >= 3.35.0 (2021-03-12): built-in math functions may be available, but only if
+    #     compiled with -DSQLITE_ENABLE_MATH_FUNCTIONS (which DBD::SQLite enables by
+    #     default since ~1.72). Query pragma_function_list for 'sqrt' to confirm. Since
+    #     this check runs before any UDF is registered, a hit is guaranteed native.
+    #
+    #   >= 3.16.0 (2017-01-02) and < 3.35.0: pragma_function_list exists but the math
+    #     functions do not, so querying it would be pointless.
+    #     Register Perl UDFs directly.
+    #
+    #   < 3.16.0 (2017-01-02): pragma_function_list is not available as a table-valued
+    #     function. Register Perl UDFs directly.
+    #
+    # UDFs via sqlite_create_function() are available on all SQLite >= 3.0.0.
+    # <https://sqlite.org/lang_mathfunc.html>
+    # <https://sqlite.org/pragma.html#pragfunc>
+    my $sqlite_ver = version->parse( $DBD::SQLite::sqlite_version );
+    my $has_math   = 0;
+    # The virtual table pragma_function_list is available, so we query it to check if the math functions have been compiled with the macro 'SQLITE_ENABLE_MATH_FUNCTIONS'
+    if( $sqlite_ver >= version->parse( '3.35.0' ) )
     {
-        $dbh->prepare( $query );
-    } || return( $this->error( "Error preparing the query to check if SQLite has math functions: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
-    my $rv = eval{ $sth->execute };
-    if( $@ )
-    {
+        my $query = "SELECT name FROM pragma_function_list WHERE name = 'sqrt'";
+        local $@;
+        my $sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $this->error( "Error preparing the query to check if SQLite has math functions: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        my $rv = eval{ $sth->execute };
+        if( $@ )
+        {
+            $sth->finish;
+            return( $this->error( "Error executing the query to check if SQLite has math functions: $@", "\nSQL query was ", $sth->{Statement} ) );
+        }
+        elsif( !defined( $rv ) )
+        {
+            $sth->finish;
+            return( $this->error( "Error executing the query to check if SQLite has math functions: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        }
+        my $row = eval{ $sth->fetchrow_arrayref };
+        if( $@ )
+        {
+            $sth->finish;
+            return( $this->error( "Error retrieving the value to check if SQLite has math functions: $@", "\nSQL query was ", $sth->{Statement} ) );
+        }
+        # We check for definedness, which means an error in DBI
+        elsif( !defined( $row ) && $sth->errstr )
+        {
+            $sth->finish;
+            return( $this->error( "Error retrieving the value to check if SQLite has math functions: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        }
         $sth->finish;
-        return( $this->error( "Error executing the query to check if SQLite has math functions: $@", "\nSQL query was ", $sth->{Statement} ) );
+        # Don't assume anything.
+        if( $row && ref( $row ) eq 'ARRAY' && $row->[0] )
+        {
+            $has_math = 1;
+        }
     }
-    elsif( !defined( $rv ) )
-    {
-        $sth->finish;
-        return( $this->error( "Error executing the query to check if SQLite has math functions: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
-    }
-    my $row = eval{ $sth->fetchrow_arrayref };
-    if( $@ )
-    {
-        $sth->finish;
-        return( $this->error( "Error retrieving the value to check if SQLite has math functions: $@", "\nSQL query was ", $sth->{Statement} ) );
-    }
-    # We check for definedness, which means an error in DBI
-    elsif( !defined( $row ) && $sth->errstr )
-    {
-        $sth->finish;
-        return( $this->error( "Error retrieving the value to check if SQLite has math functions: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
-    }
-    $sth->finish;
-    if( $row->[0] )
+
+    if( $has_math )
     {
         # <https://sqlite.org/lang_mathfunc.html>
         $SQLITE_HAS_MATH_FUNCTIONS = 1;
     }
     else
     {
+        # Native math functions are absent or unconfirmed; register Perl UDFs.
         require POSIX;
         $dbh->sqlite_create_function( 'sqrt', 1, sub{ CORE::sqrt( $_[0] ) } );
         $dbh->sqlite_create_function( 'sin',  1, sub{ CORE::sin(  $_[0] ) } );
@@ -1858,13 +1942,17 @@ sub _get_cached_statement
     my $file = $DB_FILE;
     $STHS->{ $file } //= {};
     my $sth = $STHS->{ $file }->{ $id };
-    return( $sth )
-        if( defined( $sth ) &&
-            Scalar::Util::blessed( $sth ) &&
-            $sth->isa( 'DBI::st' ) );
+    if( defined( $sth ) &&
+        Scalar::Util::blessed( $sth ) &&
+        $sth->isa( 'DBI::st' ) )
+    {
+        return( $sth );
+    }
     return;
 }
 
+# DateTime::Lite::TimeZone->_get_zone_info( $name );
+# $tz->_get_zone_info( $name );
 sub _get_zone_info
 {
     my $self = shift( @_ );
@@ -1880,33 +1968,33 @@ sub _get_zone_info
         $sth = eval
         {
             $dbh->prepare( $query );
-        } || return( $self->error( "Error preparing the query to get the timezone information for $self->{name}: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        } || return( $self->error( "Error preparing the query to get the timezone information: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
         $self->_set_cached_statement( get_zone_info => $sth );
     }
 
-    my $rv = eval{ $sth->execute( $self->{name} ) };
+    my $rv = eval{ $sth->execute( $name ) };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the timezone information for $self->{name}: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $self->error( "Error executing the query to get the timezone information for $name: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     elsif( !defined( $rv ) )
     {
         $sth->finish;
-        return( $self->error( "Error executing the query to get the timezone information for $self->{name}: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $self->error( "Error executing the query to get the timezone information for $name: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
 
     my $row = eval{ $sth->fetchrow_hashref };
     if( $@ )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the timezone information for $self->{name}: $@", "\nSQL query was ", $sth->{Statement} ) );
+        return( $self->error( "Error retrieving the timezone information for $name: $@", "\nSQL query was ", $sth->{Statement} ) );
     }
     # We check for definedness, which means an error in DBI
     elsif( !defined( $row ) && $sth->errstr )
     {
         $sth->finish;
-        return( $self->error( "Error retrieving the timezone information for $self->{name}: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+        return( $self->error( "Error retrieving the timezone information for $name: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
     }
     $sth->finish;
     $self->_decode_sql_arrays( [qw( countries )], $row ) if( defined( $row ) );
@@ -1967,6 +2055,7 @@ sub _local_tz_env_only
     return( $class->_local_tz_env( 'TZ' ) );
 }
 
+my $win_map;
 sub _local_tz_mswin32
 {
     my $class = shift( @_ );
@@ -1986,8 +2075,8 @@ sub _local_tz_mswin32
             my $win_name = $class->_win32_tz_from_registry;
             if( defined( $win_name ) )
             {
-                state $map = $class->_build_win_to_iana;
-                my $iana   = $map->{ $win_name };
+                $win_map = $class->_build_win_to_iana unless( defined( $win_map ) );
+                my $iana   = $win_map->{ $win_name };
                 if( defined( $iana ) &&
                     $class->is_valid_name( $iana ) )
                 {
@@ -2168,6 +2257,11 @@ sub _local_tz_vms
 sub _lookup_span
 {
     my( $self, $utc_rd_secs ) = @_;
+    unless( defined( $self ) && ref( $self ) )
+    {
+        # We die, because this is not a user bad call, but an internal design error that should not happen.
+        die( "_lookup_span() must be called on a class instance." );
+    }
     my $zone_id = $self->{_zone_id} ||
         return( $self->error( "No zone_id cached for '$self->{name}'." ) );
 
@@ -2308,7 +2402,7 @@ sub _lookup_span_local
 
     # Per-object span cache for local lookups (same logic as _lookup_span).
     if( defined( $self->{_span_cache_local} ) &&
-        exists( $self->{_span_cache_local}{offset} ) )
+        exists( $self->{_span_cache_local}->{offset} ) )
     {
         my $c    = $self->{_span_cache_local};
         my $unix = $local_rd_secs - UNIX_TO_RD;
@@ -2643,6 +2737,9 @@ sub _posix_tz_lookup
 
 # Resolve an alias (such as "US/Eastern") to its canonical zone name.
 # Queries aliases JOIN zones so the canonical name is returned directly.
+#
+# DateTime::Lite::TimeZone->_resolve_alias( $name );
+# $tz->_resolve_alias( $name );
 sub _resolve_alias
 {
     my $self = shift( @_ );
@@ -2711,6 +2808,8 @@ sub _resolve_local_tz_name
     return( $class->_local_tz_unix );
 }
 
+# DateTime::Lite::TimeZone->_set_cached_statement( $id => $sth );
+# $tz->_set_cached_statement( $id => $sth );
 sub _set_cached_statement
 {
     my $self = shift( @_ );
@@ -2733,6 +2832,10 @@ sub _set_get_prop
 {
     my $self = shift( @_ );
     my $prop = shift( @_ ) || die( "No object property was provided." );
+    unless( defined( $self ) && ref( $self ) )
+    {
+        die( "_set_get_prop() must be called on a class instance." );
+    }
     $self->{ $prop } = shift( @_ ) if( @_ );
     return( $self->{ $prop } );
 }
@@ -3021,7 +3124,7 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.2
 
 =head1 DESCRIPTION
 
@@ -3246,12 +3349,30 @@ The resolution uses the reference coordinates stored in the IANA C<zone1970.tab>
 
 C<latitude> must be in the range C<-90> to C<90>; C<longitude> in C<-180> to C<180>. An L<error object|DateTime::Lite::Exception> is set and C<undef> is returned in scalar context, or an empty list in list context, if the values are out of range or if no zone with coordinates is found in the database.
 
-The haversine formula is computed in SQLite when the database was compiled with C<-DSQLITE_ENABLE_MATH_FUNCTIONS> (SQLite E<gt>= 3.35.0, released March 2021).
+The haversine formula is computed in SQLite when the database was compiled with C<-DSQLITE_ENABLE_MATH_FUNCTIONS> (SQLite version E<gt>= 3.35.0, L<released on March 2021|https://sqlite.org/changes.html>).
+
+On older systems or builds where the math functions are absent, the required functions (C<sqrt>, C<sin>, C<cos>, C<asin>) are registered automatically as Perl UDFs (User Defined Functions) via L<DBD::SQLite/sqlite_create_function> on first use, so coordinate resolution works transparently on all supported SQLite versions.
+
+Detection is version-aware. Thus:
+
+=over 8
+
+=item * on SQLite with version E<gt>= 3.35.0, the special système table C<pragma_function_list> is queried for C<sqrt> before any UDF is registered, to ensure a native function is used in priority.
+
+=item * on SQLite with version E<lt> 3.35.0, where the math functions did not yet exist, UDFs are registered directly without querying C<pragma_function_list>.
+
+=item * on SQLite version E<lt> 3.16.0, C<pragma_function_list> is not available as a table-valued function, so UDFs are registered directly.
+
+=back
+
+UDFs are available on all SQLite version E<gt>= 3.0.0.
+
+
 On older systems that ships SQLite 3.31.1, the required functions (C<sqrt>, C<sin>, C<cos>, C<asin>) are registered automatically as Perl UDFs (User Defined Functions) via L<DBD::SQLite/sqlite_create_function> on first use, so coordinate resolution works transparently on all supported SQLite versions.
 
 =back
 
-An optional C<use_cache_mem =E<gt> 1> argument activates the process-level memory cache for this call. When set, subsequent calls with the same zone name (or its alias) return the cached object without a database query. See L</MEMORY CACHE> for details and for the class-level L</enable_mem_cache> alternative.
+A boolean option C<use_cache_mem> set to a true value activates the process-level memory cache for this call. When set, subsequent calls with the same zone name (or its alias) return the cached object without a database query. See L</MEMORY CACHE> for details and for the class-level L</enable_mem_cache> alternative.
 
     # Each of these hits the cache after the first construction:
     my $tz = DateTime::Lite::TimeZone->new(

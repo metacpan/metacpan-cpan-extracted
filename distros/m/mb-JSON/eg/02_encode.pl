@@ -4,7 +4,8 @@
 # Usage: perl eg/02_encode.pl
 #
 # Demonstrates:
-#   - encode: convert Perl data to JSON text
+#   - encode:    convert Perl data to JSON text
+#   - stringify: alias for encode() -- both names are interchangeable
 #   - true/false via mb::JSON::true and mb::JSON::false
 #   - undef becomes null
 #   - Hash keys are sorted alphabetically
@@ -24,7 +25,7 @@ use lib "$FindBin::Bin/../lib";
 
 use mb::JSON;
 
-# --- Object with boolean and null ---
+# --- encode: object with boolean and null ---
 my $json = mb::JSON::encode({
     name    => 'Alice',
     age     => 30,
@@ -33,6 +34,17 @@ my $json = mb::JSON::encode({
     memo    => undef,
 });
 print "$json\n";
+# -> {"active":true,"age":30,"deleted":false,"memo":null,"name":"Alice"}
+
+# --- stringify: alias for encode() -- identical result ---
+my $json2 = mb::JSON::stringify({
+    name    => 'Alice',
+    age     => 30,
+    active  => mb::JSON::true,
+    deleted => mb::JSON::false,
+    memo    => undef,
+});
+print "$json2\n";
 # -> {"active":true,"age":30,"deleted":false,"memo":null,"name":"Alice"}
 
 # --- Array ---

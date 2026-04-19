@@ -2,7 +2,7 @@ package IPC::Manager::Client::AtomicPipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use File::Spec;
 use Atomic::Pipe;
@@ -104,6 +104,33 @@ sub get_messages {
     @{$self->{+BUFFER}} = ();
 
     return $self->sort_messages(@out);
+}
+
+sub peer_left {
+    my $self = shift;
+
+    my $p = $self->{+PIPE} or return 0;
+    my $state = $p->{Atomic::Pipe::STATE()} or return 0;
+
+    my %tags;
+    $tags{$_} = 1 for keys %{$state->{parts}   // {}};
+    $tags{$_} = 1 for keys %{$state->{buffers} // {}};
+
+    my $removed = 0;
+    for my $tag (keys %tags) {
+        my ($pid) = split /:/, $tag, 2;
+        next unless $pid && $pid =~ m/^-?\d+$/;
+
+        # pid_is_running returns 1 (ours), -1 (running but not ours), or 0
+        # (gone).  Only clear the tag when the pid is genuinely gone.
+        next if $self->pid_is_running($pid);
+
+        delete $state->{parts}->{$tag};
+        delete $state->{buffers}->{$tag};
+        $removed++;
+    }
+
+    return $removed;
 }
 
 sub send_message {

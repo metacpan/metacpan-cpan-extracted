@@ -178,7 +178,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 # VERSION
 
-    v0.6.0
+    v0.6.1
 
 # DESCRIPTION
 

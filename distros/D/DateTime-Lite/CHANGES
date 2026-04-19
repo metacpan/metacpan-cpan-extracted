@@ -1,8 +1,96 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.6.2 2026-04-19T14:15:33+0900
+    [Critical Bug Fixes in DateTime::Lite::TimeZone]
+    - Moved 'use strict' and 'use warnings' out of the BEGIN block and into
+      package-level scope. This hid some latent bugs fixed below.
+    - Fixed nine class-callable methods that referenced an undeclared $self
+      variable throughout their bodies, where only $class_or_self was actually assigned
+      from the first shifted argument.
+      Without strict in effect, these references silently evaluated to undef or crashed
+      at runtime when called. The affected methods are:
+      - aliases()
+      - all_names()
+      - categories()
+      - countries()
+      - is_valid_name()
+      - names_in_category()
+      - names_in_country()
+      - offset_as_seconds()
+      - and offset_as_string().
+      All nine now work correctly when invoked as class methods, as intended and
+      documented.
+    - Fixed _get_zone_info() which ignored its $name parameter and used object-based
+      properties even when called as a class function, which would have triggered a
+      perl error.
+    - Modified fatal() to use the global variable $FATAL_EXCEPTIONS when called as a 
+      class function, or the 'fatal' instance property.
+    - Fixed names_in_country(): the prepared statement cache key was incorrectly shared
+      with names_in_category() (both using 'names_in_category'), so whichever method was
+      called second would retrieve the other method's prepared statement and produce
+      silently wrong results.
+      The cache key is now 'names_in_country'. The method now also correctly passes the
+      $code argument to execute() (it was  previously called with no arguments).
+    - Fixed names_in_category() which called execute() without passing the $cat argument,
+      so the SQL placeholder bound to NULL and the method returned zero matches for every
+      input. Now passes $cat to execute().
+    - Fixed categories() query which returned an empty-string entry from the Factory zone
+      (which has a NULL category in IANA data). Query now filters with 'WHERE category
+      IS NOT NULL'.
+    - Fixed bad variable name $row used in aliases(), all_names(),
+      categories(), countries(), names_in_category(), and names_in_country().
+
+    [Defensive Guards]
+    - Added instance guards to eight class-callable methods that require a blessed
+      instance: category(), country_codes(), has_dst_changes(), is_dst_for_datetime(),
+      offset_for_datetime(), offset_for_local_datetime(), short_name_for_datetime(),
+      and tzif_version(). These return a clean error via $self->error() rather than
+      dereferencing a class name string under strict refs.
+    - Added die() guards in _set_get_prop() and _lookup_span() to catch internal design
+      errors where a class name is passed instead of an instance. These are private
+      methods, so a die() (rather than a clean return) is appropriate: reaching them in
+      class context indicates a caller bug that should surface immediately.
+
+    [API Additions]
+    - Introduced new package variable $FATAL_EXCEPTIONS for DateTime::Lite::TimeZone,
+      similar to the one used in DateTime::Lite.
+      When set to a true value, newly constructed DateTime::Lite::TimeZone objects
+      default to fatal set to true. Per-object fatal flags remain individually settable
+      via the fatal() accessor/mutator.
+
+v0.6.1 2026-04-19T08:22:20+0900
+    - Fixed _dbh_add_user_defined_functions() in DateTime::Lite::TimeZone to
+      correctly handle SQLite installations where pragma_function_list is
+      unavailable.
+      The previous implementation queried pragma_function_list unconditionally to
+      detect whether SQLite's built-in math functions (sqrt, sin, cos, asin) were
+      compiled in (with the macro 'SQLITE_ENABLE_MATH_FUNCTIONS'). That table-valued
+      pragma is only available since SQLite 3.16.0 (2017-01-02).
+      So, older installations raised the error: "no such table: pragma_function_list"
+      causing t/14.tz_coordinates.t to fail entirely.
+      The detection logic is now version-aware, based on $DBD::SQLite::sqlite_version:
+        - SQLite >= 3.35.0 (2021-03-12): pragma_function_list is queried for 'sqrt'.
+          The check runs before any UDF is registered, so a hit is guaranteed to be a
+          native function. A miss means the build omitted -DSQLITE_ENABLE_MATH_FUNCTIONS;
+          Perl UDFs are registered as fallback.
+        - SQLite >= 3.16.0 and < 3.35.0: pragma_function_list exists but the math
+          functions cannot be present regardless of the build flags;
+          Perl UDFs are registered unconditionally without querying the pragma.
+        - SQLite < 3.16.0: pragma_function_list is not available as a table-valued
+          function, so Perl UDFs are registered unconditionally.
+      UDFs via sqlite_create_function() are available on all SQLite >= 3.0.0, so
+      coordinate-based timezone resolution now works transparently on all supported
+      SQLite versions.
+      Reported via CPAN Testers on Perl 5.20.0, 5.22.2 and 5.24.0 on x86_64-linux
+      (Debian Wheezy, system SQLite < 3.16.0).
+      Thanks to Slaven Rezić for the detailed test reports.
+    - Added .gitlab-ci.yml. The pipeline covers Perl 5.10.1 through 5.40 on Linux,
+      plus a dedicated job that builds SQLite 3.15.2 from the official autoconf tarball
+      (the last release before 3.16.0) to ensure the unconditional UDF registration path
+      is exercised in CI.
+
 v0.6.0 2026-04-17T22:30:20+0900
     - Added extended_aliases table to tz.sqlite3 (schema v0.6.0).
-      355 timezone abbreviations, 535 (abbreviation, zone) pairs, covering real-world
       abbreviations not stored as TZif type entries in the IANA database, such as BDT,
       CEST, HAEC, JST, and the full set of NATO military single-letter zones.
       Each abbreviation maps to one or more canonical IANA zone names.
@@ -10,6 +98,7 @@ v0.6.0 2026-04-17T22:30:20+0900
       commonly accepted canonical zone when multiple candidates exist.
       Two triggers enforce that at most one is_primary = 1 row exists per abbreviation
       (on INSERT and on UPDATE OF is_primary).
+      355 timezone abbreviations, 535 (abbreviation, zone) pairs, covering real-world
     - Updated tz.sqlite3 with new schema and latest data (tzdata 2026a).
     - Extended resolve_abbreviation() in DateTime::Lite::TimeZone with an optional
       'extended' boolean argument.

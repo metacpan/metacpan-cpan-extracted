@@ -2,7 +2,7 @@ package IPC::Manager::Client::LocalMemory;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 use Carp qw/croak/;
 
@@ -67,7 +67,7 @@ sub init {
             croak "Client '$id' does not exist";
         }
         my $data = $store->{clients}{$id};
-        if ($data->{pid} && $data->{pid} != $$ && kill(0, $data->{pid})) {
+        if ($data->{pid} && $data->{pid} != $$ && $self->pid_is_running($data->{pid})) {
             $self->{disconnected} = 1;
             croak "Connection already running in pid $data->{pid}";
         }

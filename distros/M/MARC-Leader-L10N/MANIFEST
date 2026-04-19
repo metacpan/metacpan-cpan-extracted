@@ -13,6 +13,7 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 L10N.pm
 L10N/cs.pm
+L10N/de.pm
 L10N/en.pm
 LICENSE
 Makefile.PL
@@ -22,6 +23,8 @@ README
 SIGNATURE
 t/MARC-Leader-L10N-cs/01-use.t
 t/MARC-Leader-L10N-cs/02-version.t
+t/MARC-Leader-L10N-de/01-use.t
+t/MARC-Leader-L10N-de/02-version.t
 t/MARC-Leader-L10N-en/01-use.t
 t/MARC-Leader-L10N-en/02-version.t
 t/MARC-Leader-L10N/01-use.t
@@ -29,6 +32,8 @@ t/MARC-Leader-L10N/02-version.t
 t/MARC-Leader-L10N/03-get_handle.t
 xt/MARC-Leader-L10N-cs/01-pod_coverage.t
 xt/MARC-Leader-L10N-cs/02-pod.t
+xt/MARC-Leader-L10N-de/01-pod_coverage.t
+xt/MARC-Leader-L10N-de/02-pod.t
 xt/MARC-Leader-L10N-en/01-pod_coverage.t
 xt/MARC-Leader-L10N-en/02-pod.t
 xt/MARC-Leader-L10N/01-pod_coverage.t

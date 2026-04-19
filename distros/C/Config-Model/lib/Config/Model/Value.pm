@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.160;
+package Config::Model::Value 2.161;
 
 use v5.20;
 
@@ -1357,9 +1357,6 @@ sub store ($self, @args) {
         if (defined $old_value and $old_value ne $value) {
             $self->notify_change(really => 1, old => $old_value , new => $value, note =>"conflicting initial values");
         }
-        if (defined $old_value and $old_value eq $value) {
-            $self->notify_change(really => 1, note =>"removed redundant initial value");
-        }
     }
 
     if ( defined $old_value and $value eq $old_value ) {
@@ -1562,7 +1559,7 @@ sub check_stored_value ($self, %args) {
     my ( $value, $check, $silent ) =
         @args{qw/value check silent/};
 
-    $self->needs_check(0) unless $self->has_error or $self->has_warning;
+    $self->needs_check(0) unless $self->has_error or $self->has_warning or $check eq 'no';
 
     # must always warn when storing a value, hence clearing the list
     # of already issued warnings
@@ -1939,9 +1936,8 @@ sub fetch_preset {
     return $self->map_write_as( $self->{preset} );
 }
 
-sub clear {
-    my $self = shift;
-    $self->store(undef);
+sub clear ($self, @args){
+    $self->store(value => undef, @args);
     return;
 }
 
@@ -2032,7 +2028,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 
@@ -2790,7 +2786,7 @@ L<Config::Model::Dumper> or L<Config::Model::DumpAsData>)
 =head2 store
 
 Parameters: C<< ( $value ) >>
-or C<< value => ...,	check => yes|no|skip ), silent => 0|1 >>
+or C<< (value => ...,	check => yes|no|skip , silent => 0|1 ) >>
 
 Store value in leaf element. C<check> parameter can be used to
 skip validation check (default is 'yes').
@@ -2800,8 +2796,14 @@ Optional C<callback> is now deprecated.
 
 =head2 clear
 
-Clear the stored value. Further read returns the default value (or
-computed or migrated value).
+Clear the stored value. Further read returns the default value (which
+can be a computed or migrated value), or C<undef>.
+
+Parameters: C<< ( check => yes|no|skip , silent => 0|1 ) >>
+
+C<check> parameter can be used to skip validation check (default is
+'yes') for mandatory values.  C<silent> can be used to suppress
+warnings.
 
 =head2 load_data
 

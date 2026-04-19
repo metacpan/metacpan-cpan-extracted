@@ -76,7 +76,18 @@ sub request {
         }
     }
 
-    my $res = $self->{ua}->request($req);
+    my $res;
+    if (defined $opts{timeout}) {
+        my $prev = $self->{ua}->timeout;
+        $self->{ua}->timeout($opts{timeout});
+        $res = eval { $self->{ua}->request($req) };
+        my $err = $@;
+        $self->{ua}->timeout($prev);
+        die $err if $err;
+    }
+    else {
+        $res = $self->{ua}->request($req);
+    }
     my $status = $res->code;
 
     if ($status >= 400) {
@@ -195,7 +206,8 @@ Sends a JSON API request and returns the decoded response as a hashref
 or arrayref. Returns C<undef> for 204 No Content responses.
 
 Options: C<body> (JSON string), C<headers> (hashref), C<multipart>
-(arrayref for HTTP::Request::Common multipart POST).
+(arrayref for HTTP::Request::Common multipart POST), C<timeout> (per-request
+override in seconds for the underlying LWP::UserAgent timeout).
 
 =item B<request_raw($method, $path, %opts)>
 

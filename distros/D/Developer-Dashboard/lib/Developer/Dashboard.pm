@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.46
+2.56
 
 =head1 INTRODUCTION
 
@@ -276,6 +276,19 @@ C<web.ssl_subject_alt_names> in F<config/config.json>. Older dashboard certs are
 rotated forward automatically when they no longer match that expected profile.
 Browsers still show the normal self-signed certificate warning until you trust
 the generated certificate locally.
+
+Run C<dashboard serve --no-editor> or C<dashboard serve --no-endit> to keep
+the browser in read-only mode. That hides the Share, Play, and View Source
+links, blocks bookmark editor and source routes with C<403>, blocks
+bookmark-save POST requests even if someone tries to hit them directly, and
+persists the mode so later C<dashboard restart> runs stay read-only until you
+switch it back with C<dashboard serve --editor>.
+
+Run C<dashboard serve --no-indicators> or C<dashboard serve --no-indicator> to
+clear the whole top-right browser chrome area. That hides the browser-only
+indicator strip, username, host or IP link, and live date-time line without
+changing C</system/status> or terminal prompt output such as C<dashboard ps1>,
+and persists the mode until C<dashboard serve --indicators> turns it back on.
 
 For example, if you want the same dashboard cert to work for one local
 C</etc/hosts> alias and one LAN IP, keep the runtime config like this:
@@ -730,6 +743,16 @@ F<cli/E<lt>commandE<gt>.cmd>, or F<cli/E<lt>commandE<gt>.bat>, and
 C<dashboard E<lt>commandE<gt>> resolves the same logical command name to
 those files.
 
+Concrete source-backed examples:
+
+  dashboard hi
+  dashboard foo
+
+If F<cli/hi.go> is executable, C<dashboard hi> runs it through C<go run>.
+If F<cli/foo.java> is executable, C<dashboard foo> compiles it with C<javac>
+into an isolated temp directory and then runs the declared main class with
+C<java>.
+
 C<DD-OOP-LAYERS> is now the runtime contract for the whole local ecosystem.
 Starting at F<~/.developer-dashboard> and walking down through every parent
 directory until the current working directory, every existing
@@ -897,6 +920,9 @@ Build the distribution:
 The release gather rules exclude local coverage output such as F<cover_db>, so
 covered runs before C<dzil build> do not leak Devel::Cover artifacts into the
 shipped tarball.
+Release hygiene now also requires that this cleanup leaves exactly one
+unpacked C<Developer-Dashboard-X.XX/> build directory and exactly one matching
+C<Developer-Dashboard-X.XX.tar.gz> artifact after the build.
 The built distribution also ships a plain F<README> companion so CPAN and
 kwalitee consumers still receive a top-level readme without re-including the
 checkout-only documentation set.
@@ -1027,6 +1053,14 @@ same runtime, bookmark, config, and configured alias names exposed by
 C<dashboard paths>, including names such as C<docker>, without relying on
 unscoped CPAN-global module names.
 
+If you need the whole C<dashboard paths> payload in Perl, call
+C<Developer::Dashboard::Folder-E<gt>all> or
+C<Developer::Dashboard::PathRegistry-E<gt>all_paths> instead of rebuilding the
+hash by hand. If you need a fresh path registry object from that public Folder
+inventory, call C<Developer::Dashboard::PathRegistry-E<gt>new_from_all_folders>.
+If you need a collector store from the same Folder-derived runtime roots, call
+C<Developer::Dashboard::Collector-E<gt>new_from_all_folders>.
+
 Render shell bootstrap for bash, zsh, POSIX sh, or PowerShell:
 
   dashboard shell bash
@@ -1060,7 +1094,7 @@ Start the local app:
 
   dashboard serve
 
-Open the root path with no bookmark path to get the free-form bookmark editor directly.
+Open the root path with no bookmark path to get the free-form bookmark editor directly. If you start the web service with C<dashboard serve --no-editor> or C<dashboard serve --no-endit>, the browser stays read-only instead and direct editor/source routes are blocked. If you start it with C<dashboard serve --no-indicators> or C<dashboard serve --no-indicator>, the right-top browser chrome is cleared while normal page rendering still works.
 
 Stop the local app and collector loops:
 
@@ -1180,6 +1214,10 @@ C<dashboard collector log> prints the known collector log streams.
 C<dashboard collector log E<lt>nameE<gt>> prints one collector transcript.
 If a configured collector has not run yet, the command prints an explicit
 no-log message instead of blank output.
+Collector status timestamps and collector log headers use the machine's local
+system time with an explicit numeric timezone offset such as C<+0100>, so the
+visible timestamps line up with cron scheduling on the same machine instead of
+looking one hour behind during daylight-saving transitions.
 
 Collector jobs support two execution fields:
 
@@ -1303,6 +1341,11 @@ Include addons or modes:
   dashboard docker compose --addon mailhog --mode dev up -d
   dashboard docker compose config green
   dashboard docker compose config
+  dashboard docker list
+  dashboard docker list --disabled
+  dashboard docker list --enabled
+  dashboard docker disable green
+  dashboard docker enable green
 
 The resolver also supports old-style isolated service folders without adding
 entries to dashboard JSON config. If
@@ -1316,6 +1359,16 @@ C<docker compose> command is assembled. If no service name is passed, the
 resolver scans isolated service folders and preloads every non-disabled folder.
 If a folder contains C<disabled.yml> it is skipped. Each isolated folder
 contributes C<development.compose.yml> when present, otherwise C<compose.yml>.
+To toggle that marker without creating or deleting the file manually, use
+C<dashboard docker disable E<lt>serviceE<gt>> or
+C<dashboard docker enable E<lt>serviceE<gt>>. The toggle writes to the
+deepest runtime docker root, so a child project layer can locally disable an
+inherited home service by creating
+C<./.developer-dashboard/docker/E<lt>serviceE<gt>/disabled.yml> and can
+re-enable it again by removing that same local marker.
+To inspect the effective marker state without walking the folders manually,
+use C<dashboard docker list>. Add C<--disabled> to show only disabled
+services or C<--enabled> to show only enabled services.
 
 During compose execution the dashboard exports C<DDDC> as the effective
 config-root docker directory for the current runtime, so compose YAML can keep using
@@ -1435,6 +1488,7 @@ the right, refreshed from C</system/status>.
 That top-right area also includes the local username, the current host or IP
 link, and the current date/time in the same spirit as the old local dashboard chrome.
 The displayed address is discovered from the machine interfaces, preferring a VPN-style address when one is active, and the date/time is refreshed in the browser with JavaScript.
+C<dashboard serve --no-indicators> and C<dashboard serve --no-indicator> clear that whole top-right browser-only area without changing the terminal prompt or C</system/status>.
 The bookmark editor also follows the old auto-submit flow, so the form submits when the textarea changes and loses focus instead of showing a manual update button.
 For saved bookmark files, that browser save posts back to the named
 C</app/E<lt>idE<gt>/edit> route and keeps the Play link on
@@ -1491,6 +1545,24 @@ configured C<web.ssl_subject_alt_names>, regenerates older dashboard certs when
 they are stale, redirects non-HTTPS requests to the matching C<https://...>
 URL, and reuses the saved SSL setting on later C<dashboard restart> runs unless
 you override it
+
+=item *
+
+C<dashboard serve --no-editor> and C<dashboard serve --no-endit> keep the
+browser in read-only mode by hiding Share, Play, and View Source chrome,
+denying C</app/E<lt>idE<gt>/edit>, C</app/E<lt>idE<gt>/source>, and
+bookmark-save POST routes with C<403>, and persisting that read-only flag for
+later C<dashboard restart> runs until C<dashboard serve --editor> turns it back
+off
+
+=item *
+
+C<dashboard serve --no-indicators> and C<dashboard serve --no-indicator> keep
+normal page rendering and left-side page chrome intact while clearing the
+whole top-right browser-only chrome area, including the status strip,
+username, host or IP link, and live date-time line, and persisting that flag
+for later C<dashboard restart> runs until C<dashboard serve --indicators>
+turns it back off
 
 =item *
 
@@ -1598,8 +1670,11 @@ Release kwalitee is also a hard tarball-level gate. After C<dzil build>, run:
 
 That gate analyzes the built C<Developer-Dashboard-X.XX.tar.gz> with
 C<Module::CPANTS::Analyse> and fails unless every reported kwalitee indicator
-passes. Do not trust source-tree kwalitee probes for this repository; use the
-built tarball because that is the artifact PAUSE and CPANTS actually inspect.
+passes. It also fails if stale unpacked C<Developer-Dashboard-X.XX/> build
+directories remain beside the current tarball, so artifact cleanup is now an
+enforced release invariant instead of a manual habit. Do not trust
+source-tree kwalitee probes for this repository; use the built tarball
+because that is the artifact PAUSE and CPANTS actually inspect.
 Tests that depend on a missing or empty environment variable now establish that
 state explicitly inside the test file, rather than assuming the parent shell
 or install harness starts clean.

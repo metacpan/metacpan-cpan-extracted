@@ -120,6 +120,130 @@ sub _merge_field {
 }
 
 # ------------------------------------------------------------------
+# Sync  (bidirectional reconcile)
+# ------------------------------------------------------------------
+
+# Reconcile the local DB with the sheet per these rules:
+#   - Both sides have a value for a field, different: DB wins.
+#   - One side blank/missing: fill from the other (blank = missing).
+#   - drive_id only in DB: add to sheet.
+#   - drive_id only on sheet: ask drive_exists; if exists, add to DB; else
+#     delete from sheet.  If drive_exists throws, keep the row as-is
+#     (never destroy data on an API error).
+#   - Scan-folder list: union, never auto-delete (config is user-owned).
+# Returns a summary hashref.
+sub sync_with_db {
+    my ($self, $db, %opts) = @_;
+    my $drive_exists = $opts{drive_exists} || sub { 1 };
+    my $ss = $self->_open();
+
+    my %summary = (
+        folders_added_local => 0,
+        folders_added_sheet => 0,
+        tracks_added_local  => 0,
+        tracks_added_sheet  => 0,
+        tracks_deleted_sheet => 0,
+        tracks_merged       => 0,
+    );
+
+    # --- Folders index: union, never auto-delete. ---
+    my @local_folders      = $db->all_scan_folders();
+    my $sheet_folders      = $self->_read_worksheet($ss, 'folders');
+    my %local_folder_by_id = map { $_->{drive_id} => $_ } @local_folders;
+    my %sheet_folder_by_id = map { $_->{drive_id} => $_ } @$sheet_folders;
+
+    my @folder_ids = _union_ids(\@local_folders, $sheet_folders);
+    my @folder_rows;
+    for my $id (@folder_ids) {
+        my $local = $local_folder_by_id{$id};
+        my $sheet = $sheet_folder_by_id{$id};
+
+        if ($sheet && !$local) {
+            $db->upsert_scan_folder($id, $sheet->{name});
+            $summary{folders_added_local}++;
+        }
+        elsif ($local && !$sheet) {
+            $summary{folders_added_sheet}++;
+        }
+        push @folder_rows, [$id, _merge_field('name', $local, $sheet)];
+    }
+    $self->_write_worksheet($ss, 'folders', 'folders', \@folder_rows);
+
+    # --- Per-folder track tabs: only process tabs for scan folders we
+    # have locally, so another device's folder tabs are left untouched.
+    my $cols = $SHEET_PROPERTIES{tracks}{cols};
+    for my $sf (@local_folders) {
+        my $tab_name      = _ws_name($sf->{name});
+        my @local_tracks  = $db->tracks_by_scan_folder($sf->{id});
+        my $sheet_rows    = $self->_read_worksheet($ss, $tab_name);
+        my %local_by_id   = map { $_->{drive_id} => $_ } @local_tracks;
+        my %sheet_by_id   = map { $_->{drive_id} => $_ } @$sheet_rows;
+
+        # Ensure a root folder record exists so sheet-only tracks have a
+        # valid folder_id when we upsert them from the sheet.
+        my $folder_rec = $db->upsert_folder(
+            drive_id        => $sf->{drive_id},
+            name            => $sf->{name},
+            parent_drive_id => undef,
+            path            => $sf->{name},
+            scan_folder_id  => $sf->{id},
+        );
+
+        my @drive_ids = _union_ids(\@local_tracks, $sheet_rows);
+        my @merged_rows;
+        for my $id (@drive_ids) {
+            my $local = $local_by_id{$id};
+            my $sheet = $sheet_by_id{$id};
+
+            if ($local && $sheet) {
+                # Both: fill DB blanks from sheet; sheet row is DB-wins merge.
+                my %fill;
+                for my $col (grep { $_ ne 'drive_id' } @$cols) {
+                    my $lv = $local->{$col};
+                    my $sv = $sheet->{$col};
+                    if ((!defined $lv || $lv eq '') && defined $sv && $sv ne '') {
+                        $fill{$col} = $sv;
+                    }
+                }
+                $db->update_track_metadata($local->{id}, %fill) if %fill;
+                push @merged_rows, [map { _merge_field($_, $local, $sheet) } @$cols];
+                $summary{tracks_merged}++;
+            }
+            elsif ($local) {
+                # DB only: add to sheet.
+                push @merged_rows, [map { _merge_field($_, $local, undef) } @$cols];
+                $summary{tracks_added_sheet}++;
+            }
+            else {
+                # Sheet only: check Drive existence.
+                my $exists = eval { $drive_exists->($id) };
+                if ($@) {
+                    # API error --preserve sheet row, skip DB add.
+                    $log->warn("sync: drive_exists check failed for $id: $@") if $log;
+                    push @merged_rows, [map { _merge_field($_, undef, $sheet) } @$cols];
+                }
+                elsif ($exists) {
+                    my %meta = map  { $_ => $sheet->{$_} }
+                               grep { defined $sheet->{$_} && $sheet->{$_} ne '' }
+                               @$cols;
+                    $db->upsert_track_from_metadata(%meta, folder_id => $folder_rec->{id});
+                    push @merged_rows, [map { _merge_field($_, undef, $sheet) } @$cols];
+                    $summary{tracks_added_local}++;
+                }
+                else {
+                    $summary{tracks_deleted_sheet}++;
+                    # Row dropped from merged_rows -> removed from sheet.
+                }
+            }
+        }
+
+        $self->_write_worksheet($ss, $tab_name, 'tracks', \@merged_rows);
+    }
+
+    return \%summary;
+}
+
+# ------------------------------------------------------------------
 # Pull  (Sheet → SQLite)
 # ------------------------------------------------------------------
 
@@ -294,9 +418,10 @@ App::DrivePlayer::SheetDB - Sync the DrivePlayer library to/from a Google Sheet
       spreadsheet_id => $id,             # omit when calling create()
   );
 
-  my $id     = $sheet->create();             # create spreadsheet, returns ID
-  my $counts = $sheet->push_to_sheet($db);  # { scan_folders => N, tracks => N }
-  my $counts = $sheet->pull_from_sheet($db);
+  my $id      = $sheet->create();             # create spreadsheet, returns ID
+  my $summary = $sheet->sync_with_db($db, drive_exists => \&check);
+  my $counts  = $sheet->push_to_sheet($db);   # merge-push only
+  my $counts  = $sheet->pull_from_sheet($db); # new-device restore
 
 =head1 DESCRIPTION
 
@@ -322,9 +447,10 @@ The Sheet is a portable sync target accessible from any device with Drive access
 
 =head1 NEW DEVICE WORKFLOW
 
-  1. File -> Sync from Sheet   # pulls scan_folders into SQLite
-  2. Library -> Sync           # discovers audio files on Drive
-  3. File -> Sync from Sheet   # applies saved metadata to the scanned tracks
+On first launch the app detects a fresh local DB and automatically runs
+C<pull_from_sheet> to seed scan folders and track metadata from the
+sheet.  The user then runs Library -> Sync to discover audio files on
+Drive and reconcile two-way.
 
 =head1 METHODS
 
@@ -338,19 +464,48 @@ C<spreadsheet_id> is optional (omit before calling C<create()>).
 Creates a new "DrivePlayer Library" spreadsheet with a C<folders> tab.
 Returns and stores the new spreadsheet ID.
 
+=head2 sync_with_db($db, drive_exists => \&cb)
+
+Two-way reconciliation keyed on C<drive_id>:
+
+=over 4
+
+=item *
+
+Fields present on both sides: DB wins, and any DB blanks are filled
+from the sheet.  A blank (C<undef> or empty string) is treated as
+"missing" on either side, so cleared fields cannot be propagated.
+
+=item *
+
+C<drive_id> in the DB but not the sheet: row added to the sheet.
+
+=item *
+
+C<drive_id> on the sheet but not in the DB: C<drive_exists-E<gt>($id)>
+is called.  A truthy result adds the track to the DB; a falsy result
+deletes the row from the sheet.  If the callback throws (API failure),
+the row is preserved on both sides --sync never destroys data on error.
+
+=item *
+
+Scan-folder list: union only; folders are never auto-deleted because
+the list is user-owned configuration.
+
+=back
+
+Returns a summary hashref.
+
 =head2 push_to_sheet($db)
 
-Writes the C<folders> index and one worksheet of track metadata per folder.
-The existing sheet content is merged with the local DB: local non-blank
-values overwrite the sheet, local blanks preserve whatever is on the sheet,
-and rows whose C<drive_id> is not known locally are kept intact (so a
-device that has only scanned a subset of the library does not wipe data
-pushed from another device).
+Merge-push only: local non-blank values overwrite the sheet, local
+blanks preserve whatever is on the sheet, and C<drive_id>s only on the
+sheet are kept intact.  Used by auto-push after metadata edits.
 
 =head2 pull_from_sheet($db)
 
-Upserts scan folders into SQLite and applies track metadata to any tracks
-already present (keyed by C<drive_id>).  Tracks not yet scanned locally
-are silently skipped.
+Upserts scan folders into SQLite and applies track metadata to any
+tracks already present (keyed by C<drive_id>).  Used once on first
+launch when the local DB is brand new.
 
 =cut

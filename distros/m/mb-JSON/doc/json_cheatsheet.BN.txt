@@ -2,32 +2,44 @@
  mb::JSON Cheat Sheet                                       [BN] বাংলা
 ======================================================================
 
-[ 1. Load ]
+[ ডেটা টাইপ সংযোগ ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "স্ট্রিং" -> স্কেলার স্ট্রিং
+  123        -> স্কেলার সংখ্যা
+  true       -> mb::JSON::Boolean (মান: 1)
+  false      -> mb::JSON::Boolean (মান: 0)
+  null       -> undef
+  [...]      -> অ্যারে রেফারেন্স
+  {...}      -> হ্যাশ রেফারেন্স
+
+[ 1. লোড ]
   use mb::JSON;
 
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
-  my $data = mb::JSON::parse($json_text);  # alias
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: decode() এর alias ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Boolean ]
+[ 5. stringify: Perl -> JSON  (JavaScript-compatible alias) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() এবং encode() একই ফলাফল দেয়
+
+[ 6. Boolean ]
   mb::JSON::true  -> true
   mb::JSON::false -> false
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef -> null  /  null -> undef
 
-[ 6. Hash keys sorted, UTF-8 kept as-is ]
+[ 8. Hash keys sorted, UTF-8 kept as-is ]
 
-[ 7. Type mapping ]
-  "string" -> scalar    123   -> number
-  true     -> Boolean   false -> Boolean
-  null     -> undef     [...]  -> arrayref
-  {...}  -> hashref
-
-[ 8. Example ]
+[ 9. উদাহরণ ]
   my $h = mb::JSON::decode('{"name":"Alice","ok":true}');
   my $j = mb::JSON::encode({name=>'Alice',ok=>mb::JSON::true});
+  my $j = mb::JSON::stringify({name=>'Alice',ok=>mb::JSON::true});
   # -> {"name":"Alice","ok":true}

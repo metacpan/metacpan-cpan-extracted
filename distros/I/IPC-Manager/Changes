@@ -1,3 +1,9 @@
+0.000024  2026-04-18 14:57:47-07:00 America/Los_Angeles
+
+    - Fix sync_request hang when a peer disappears mid-request: await_response now snapshots the peer at send time and croaks if the peer is fully removed from the bus before the response arrives. Suspend-capable protocols (those advertising suspend_supported) keep waiting across a clean suspend or a restart-under-a-new-pid because the response can still be delivered once the peer resumes — only full unregistration counts as "gone"
+    - Add optional $timeout argument to sync_request() and await_response(); without it the behavior is unchanged (blocks indefinitely), with it the call croaks once the deadline elapses
+    - Sweep orphaned Atomic::Pipe reassembly state when a peer leaves the bus: a new Client peer_left() hook (called from the service loop on peer-delta removal) lets AtomicPipe drop per-(pid, tid) parts/buffers entries belonging to dead peers instead of accumulating them forever
+
 0.000023  2026-04-17 12:06:27-07:00 America/Los_Angeles
 
     - Strengthen SysV IPC configure-time probe: add concurrent-contention and rapid create/destroy phases to catch hosts where semop sporadically returns EINVAL only under load

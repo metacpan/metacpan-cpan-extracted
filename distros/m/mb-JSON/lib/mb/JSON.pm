@@ -21,7 +21,7 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 use Carp qw(croak);
@@ -32,7 +32,7 @@ use Carp qw(croak);
 
 package mb::JSON::Boolean;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 use overload
@@ -83,7 +83,7 @@ sub decode {
     return $val;
 }
 
-sub parse {    # backward-compatible alias for decode()
+sub parse {    # alias for decode()
     my $json = defined $_[0] ? $_[0] : $_;
     return decode($json);
 }
@@ -183,6 +183,11 @@ sub _cp_to_utf8 {
 }
 
 ######################################################################
+# decode -- JSON text -> Perl data
+# parse  -- alias for decode()
+######################################################################
+
+######################################################################
 # encode -- Perl data -> JSON text
 #
 # Encoding rules:
@@ -198,6 +203,11 @@ sub _cp_to_utf8 {
 sub encode {
     my ($data) = @_;
     return _enc_value($data);
+}
+
+sub stringify {    # alias for encode()
+    my ($data) = @_;
+    return encode($data);
 }
 
 sub _enc_value {
@@ -238,18 +248,25 @@ mb::JSON - JSON encode/decode for multibyte (UTF-8) strings
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =head1 SYNOPSIS
 
   use mb::JSON;
 
   # decode: JSON text -> Perl data
-  my $data = mb::JSON::decode('{"name":"\u7530\u4e2d","age":30}');
-  my $data = mb::JSON::decode('{"name":"Tanaka","age":30}');
+  my $data = mb::JSON::decode("{\"name\":\"\\u7530\\u4e2d\",\"age\":30}");
+  my $data = mb::JSON::decode("{\"name\":\"Tanaka\",\"age\":30}");
+
+  # parse: alias for decode()
+  my $data = mb::JSON::parse("{\"key\":\"value\"}");
 
   # encode: Perl data -> JSON text
   my $json = mb::JSON::encode({ name => 'Tanaka', age => 30 });
+  # -> '{"age":30,"name":"Tanaka"}'
+
+  # stringify: alias for encode()
+  my $json = mb::JSON::stringify({ name => 'Tanaka', age => 30 });
   # -> '{"age":30,"name":"Tanaka"}'
 
   # Boolean values
@@ -262,9 +279,6 @@ Version 0.04
   # null
   my $json = mb::JSON::encode({ value => undef });
   # -> '{"value":null}'
-
-  # parse() -- backward-compatible alias for decode()
-  my $data = mb::JSON::parse('{"key":"value"}');
 
 =head1 TABLE OF CONTENTS
 
@@ -297,18 +311,14 @@ designed for Perl 5.005_03 and later.  It handles UTF-8 multibyte
 strings correctly, making it suitable for environments where standard
 JSON modules requiring Perl 5.8+ are unavailable.
 
-Version 0.04 adds C<encode()> (Perl data to JSON text) and the Boolean
-type objects C<mb::JSON::true> and C<mb::JSON::false>, complementing
-the existing C<decode()>/C<parse()>.
+C<mb::JSON> provides two pairs of symmetric functions:
+C<decode()>/C<parse()> convert JSON text to Perl data, and
+C<encode()>/C<stringify()> convert Perl data to JSON text.
+Within each pair, both names are aliases and produce identical output.
+Version 0.06 adds C<stringify()> as an alias for C<encode()>,
+mirror of C<parse()> which is an alias for C<decode()>.
 
 =head1 FUNCTIONS
-
-=head2 encode( $data )
-
-Converts a Perl data structure to a JSON text string.
-Returns a byte string encoded in UTF-8.
-
-  my $json = mb::JSON::encode($data);
 
 =head2 decode( $json_text )
 
@@ -319,9 +329,23 @@ If no argument is given, C<$_> is used.
 
 =head2 parse( $json_text )
 
-Alias for C<decode()>.  Retained for backward compatibility with 0.03.
+Alias for C<decode()>.  Both names are interchangeable.
 
   my $data = mb::JSON::parse($json_text);
+
+=head2 encode( $data )
+
+Converts a Perl data structure to a JSON text string.
+Returns a byte string encoded in UTF-8.
+
+  my $json = mb::JSON::encode($data);
+
+=head2 stringify( $data )
+
+Alias for C<encode()>.  Both names are interchangeable.
+Mirrors the C<JSON.stringify()> function in JavaScript.
+
+  my $json = mb::JSON::stringify($data);
 
 =head2 true
 
@@ -355,7 +379,11 @@ When decoding, JSON C<true> and C<false> are returned as
 C<mb::JSON::Boolean> objects, which behave as C<1> and C<0>
 in numeric and boolean context.
 
+C<stringify()> behaves identically to C<encode()> for boolean values.
+
 =head1 ENCODING RULES
+
+Applies to both C<encode()> and C<stringify()>.
 
 =over 4
 
@@ -382,6 +410,8 @@ Hash keys are sorted alphabetically for deterministic output.
 =back
 
 =head1 DECODING RULES
+
+Applies to both C<decode()> and C<parse()>.
 
 =over 4
 
@@ -412,7 +442,7 @@ supported.
 
 =item *
 
-Circular references in C<encode()> are not detected and will cause
+Circular references in C<encode()> and C<stringify()> are not detected and will cause
 infinite recursion.
 
 =item *

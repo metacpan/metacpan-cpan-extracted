@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ObjTreeScanner 2.160;
+package Config::Model::ObjTreeScanner 2.161;
 
 use 5.20.0;
 use strict;
@@ -274,7 +274,7 @@ Config::Model::ObjTreeScanner - Scan config tree and perform call-backs for each
 
 =head1 VERSION
 
-version 2.160
+version 2.161
 
 =head1 SYNOPSIS
 

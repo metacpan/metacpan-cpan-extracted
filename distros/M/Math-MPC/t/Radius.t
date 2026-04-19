@@ -92,10 +92,14 @@ my $mpc1 = Math::MPC->new(3.0, -4.0);
 my $mpc2 = Math::MPC->new(4.0, -3.0);
 Rmpcr_c_abs_rnd($rop, $mpc1, 2); # MPFR_RNDU
 Rmpcr_c_abs_rnd($chk, $mpc2, 2); # MPFR_RNDU
-cmp_ok(Rmpcr_cmp($rop, $chk), '==', 0, "Rmpcr_c_abs_rnd is consistent");
+
+my $compare = Rmpcr_cmp($rop, $chk);
+cmp_ok($compare, '==', 0, "Rmpcr_c_abs_rnd is consistent");
 
 Rmpcr_c_abs_rnd($chk, $mpc2, 3); # MPFR_RNDD
-cmp_ok(Rmpcr_cmp($rop, $chk), '>', 0, "Value is lessened by rounding down");
+
+$compare = Rmpcr_cmp($rop, $chk);
+cmp_ok($compare, '>', 0, "Value is lessened by rounding down");
 
 Rmpcr_set_ui64_2si64($two , 2, 0);# 1073741824, -29);
 Rmpcr_set_ui64_2si64($four, 4, 0);# 1073741824, -28);

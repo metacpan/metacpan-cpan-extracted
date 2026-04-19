@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+Net-Async-WebSearch-*.tar.gz
+Net-Async-WebSearch-*/
+.build/
+*.bak
+*.swp
+pm_to_blib
+Makefile
+Makefile.old
+blib/
+MYMETA.*
+/searxng/

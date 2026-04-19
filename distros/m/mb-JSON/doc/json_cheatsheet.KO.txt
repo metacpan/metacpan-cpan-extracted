@@ -19,24 +19,41 @@
 
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
-  my $data = mb::JSON::parse($json_text);  # 하위 호환 별칭
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: decode() 의 별칭 ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. 불리언 값 ]
+[ 5. stringify: Perl -> JSON  (JavaScript 호환 별칭) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() 와 encode() 는 동일한 출력을 반환
+
+[ 6. 불리언 값 ]
   mb::JSON::true   -> JSON: true
   mb::JSON::false  -> JSON: false
   숫자 1, 0        -> JSON 숫자 (불리언 아님)
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef -> null (인코딩)
   null  -> undef (디코딩)
 
-[ 6. 해시 키는 알파벳순 정렬 ]
+[ 8. 해시 키는 알파벳순 정렬 ]
+  encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. UTF-8 멀티바이트 문자 그대로 출력 ]
+[ 9. UTF-8 멀티바이트 문자 그대로 출력 (\uXXXX 변환 없음) ]
 
-[ 8. 예제 ]
+[ 10. 예제 ]
   my $h = mb::JSON::decode('{"name":"홍길동","age":30}');
   print $h->{name};   # 홍길동
+
+  my $j = mb::JSON::encode({name=>'홍길동', ok=>mb::JSON::true});
+  # -> {"name":"홍길동","ok":true}
+
+  my $j = mb::JSON::stringify({name=>'홍길동', ok=>mb::JSON::true});
+  # -> {"name":"홍길동","ok":true}
+
+  # 왕복 변환
+  my $data = mb::JSON::decode($json);
+  my $back = mb::JSON::encode($data);

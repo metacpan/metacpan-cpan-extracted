@@ -20,27 +20,33 @@
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
   my $data = mb::JSON::decode();    # uses $_
-  my $data = mb::JSON::parse($json_text);  # alias
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: alias for decode() ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Boolean Values ]
+[ 5. stringify: Perl -> JSON  (JavaScript-compatible alias) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() and encode() produce identical output
+
+[ 6. Boolean Values ]
   mb::JSON::true   -> encodes as: true
   mb::JSON::false  -> encodes as: false
   Plain 1 or 0     -> encodes as: 1 or 0 (number)
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef            -> null (encode)
   null             -> undef (decode)
 
-[ 6. Hash keys are sorted ]
+[ 8. Hash keys are sorted ]
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. UTF-8 kept as-is ]
+[ 9. UTF-8 kept as-is ]
   encode({"name"=>"田中"}) -> '{"name":"田中"}'
 
-[ 8. Examples ]
+[ 10. Examples ]
   # decode
   my $h = mb::JSON::decode('{"name":"Alice","age":30}');
   print $h->{name};   # Alice
@@ -52,6 +58,13 @@
       score  => undef,
   });
   # -> {"active":true,"name":"Alice","score":null}
+
+  # stringify (same as encode)
+  my $j = mb::JSON::stringify({
+      name   => 'Alice',
+      active => mb::JSON::true,
+  });
+  # -> {"active":true,"name":"Alice"}
 
   # roundtrip
   my $data = mb::JSON::decode($json);

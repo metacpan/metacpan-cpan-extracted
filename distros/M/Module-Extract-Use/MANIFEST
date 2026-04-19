@@ -14,7 +14,6 @@ MANIFEST.SKIP
 README.pod
 SECURITY.md
 t/get_modules.t
-t/hooks.t
 t/imports.t
 t/load.t
 t/pod.t

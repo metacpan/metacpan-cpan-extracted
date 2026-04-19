@@ -23,6 +23,7 @@ t/aaa_compat.t
 t/aab_basic.t
 t/Ball.t
 t/bool.t
+t/bug_in_1.4.0.t
 t/complex_c.t
 t/complex_c-l.t
 t/complex_c-q.t

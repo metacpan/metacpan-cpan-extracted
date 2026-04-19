@@ -23,5 +23,4 @@ prototype_ok( &main::imap,    '&$' );
 prototype_ok( &main::igrep,   '&$' );
 prototype_ok( &main::iterate, '&$' );
 
-
 done_testing();

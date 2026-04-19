@@ -19,7 +19,7 @@ Object::Iterate::Tester - test module that uses Object::Iterate
 	use Object::Iterate qw( imap );
 	use Object::Iterate::Tester;
 
-	my $object = Object::Iterate::Tester->new();
+	my $object = Object::Iterate::Tester->new;
 
 	my @list = imap { $_ } $object;
 
@@ -29,15 +29,15 @@ Object::Iterate::Tester - test module that uses Object::Iterate
 
 This module is on Github:
 
-	http://github.com/briandfoy/Object-Iterate
+	https://github.com/briandfoy/object-iterate
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2025, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2026, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

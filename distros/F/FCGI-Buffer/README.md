@@ -4,7 +4,7 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.21
+Version 0.22
 
 # SYNOPSIS
 
@@ -201,7 +201,7 @@ the result stored in the cache.
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
@@ -261,6 +261,8 @@ The lint operation only works on HTML4, because of a restriction in [HTML::Lint]
 
 # SUPPORT
 
+This module is provided as-is without any warranty.
+
 You can find documentation for this module with the perldoc command.
 
     perldoc FCGI::Buffer
@@ -291,5 +293,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2025 Nigel Horne,
+The rest of the program is Copyright 2015-2026 Nigel Horne,
 and is released under the following licence: GPL2

@@ -1,0 +1,63 @@
+# Example docker-compose for a local private SearxNG exposing the JSON
+# API that Net::Async::WebSearch::Provider::SearxNG talks to.
+#
+# The gotchas this file sidesteps (all from default SearxNG settings):
+#   - Default settings.yml serves HTML only, not JSON → 403 on ?format=json
+#   - Modern SearxNG expects Valkey + a separate limiter.toml — we disable
+#     the limiter so a private instance Just Works with zero extra state.
+#
+# Usage — we mount the WHOLE ex/searxng directory (NOT settings.yml
+# directly). Bind-mounting a single file that doesn't exist yet makes
+# Docker silently create an empty directory at that path, and the
+# container then fails confusingly. Directory mounts avoid that.
+#
+#   cd to this dist's root (so relative paths resolve correctly).
+#   $EDITOR ex/searxng/settings.yml   # paste a real server.secret_key
+#                                     # (openssl rand -hex 32)
+#   docker compose -f ex/docker-compose.searxng.yml up -d
+#
+# Then point the provider at it (replace the IP with whatever
+# SERVICES_INTERNAL_IP resolves to in your .env):
+#   TEST_WEBSEARCH_SEARXNG_ENDPOINT=http://${SERVICES_INTERNAL_IP}:8888 prove -lv t/50-live.t
+
+services:
+  searxng:
+    image: "searxng/searxng:latest"
+    container_name: "searxng"
+    restart: "always"
+    ports:
+      - "${SERVICES_INTERNAL_IP:-127.0.0.1}:8888:8080"
+    environment:
+      - "SEARXNG_BASE_URL=http://searxng:8080/"
+      - "INSTANCE_NAME=local-searxng"
+      - "UWSGI_WORKERS=4"
+      - "UWSGI_THREADS=4"
+    volumes:
+      # Directory mount — NEVER a single-file mount. If the file doesn't
+      # exist yet Docker would create an empty *directory* at that path
+      # and the container would fail in confusing ways (or boot with
+      # defaults silently). Mounting the whole dir is the safe pattern.
+      # Path is relative to THIS compose file (which lives in ex/), so
+      # "./searxng" resolves to ex/searxng — the directory next to me.
+      - "./searxng:/etc/searxng:ro"
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+# If you decide to expose this publicly, add back a Valkey service (NOT
+# redis — the SearxNG default config key is now valkey.url) and drop a
+# /etc/searxng/limiter.toml in. For private on-box use, don't bother.
+#
+# No custom networks / static IPs here on purpose — the service is
+# reached from the host side via SERVICES_INTERNAL_IP:8888 and doesn't
+# talk to anything else over the docker network, so there's no need to
+# carve out a subnet (and every fixed-subnet declaration is another
+# "pool overlaps with other one" Docker error waiting to happen).

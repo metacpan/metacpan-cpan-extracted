@@ -2,32 +2,44 @@
  mb::JSON Cheat Sheet                                       [HI] हिंदी
 ======================================================================
 
-[ 1. Load ]
+[ डेटा प्रकार मानचित्रण ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "स्ट्रिंग" -> स्केलर स्ट्रिंग
+  123        -> स्केलर संख्या
+  true       -> mb::JSON::Boolean (मान: 1)
+  false      -> mb::JSON::Boolean (मान: 0)
+  null       -> undef
+  [...]      -> array reference
+  {...}      -> hash reference
+
+[ 1. लोड ]
   use mb::JSON;
 
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
-  my $data = mb::JSON::parse($json_text);  # alias
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: decode() का alias ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Boolean ]
+[ 5. stringify: Perl -> JSON  (JavaScript-compatible alias) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() और encode() एक ही परिणाम देते हैं
+
+[ 6. Boolean ]
   mb::JSON::true  -> true
   mb::JSON::false -> false
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef -> null  /  null -> undef
 
-[ 6. Hash keys sorted, UTF-8 kept as-is ]
+[ 8. Hash keys sorted, UTF-8 kept as-is ]
 
-[ 7. Type mapping ]
-  "string" -> scalar    123   -> number
-  true     -> Boolean   false -> Boolean
-  null     -> undef     [...]  -> arrayref
-  {...}  -> hashref
-
-[ 8. Example ]
+[ 9. उदाहरण ]
   my $h = mb::JSON::decode('{"name":"Alice","ok":true}');
   my $j = mb::JSON::encode({name=>'Alice',ok=>mb::JSON::true});
+  my $j = mb::JSON::stringify({name=>'Alice',ok=>mb::JSON::true});
   # -> {"name":"Alice","ok":true}

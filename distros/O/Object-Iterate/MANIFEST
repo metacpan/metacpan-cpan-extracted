@@ -17,6 +17,7 @@ t/grep.t
 t/import.t
 t/init.t
 t/iterate.t
+t/lib/Local/Empty.pm
 t/load.t
 t/map.t
 t/pod.t

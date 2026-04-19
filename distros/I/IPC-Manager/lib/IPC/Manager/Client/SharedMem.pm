@@ -2,7 +2,7 @@ package IPC::Manager::Client::SharedMem;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 # Set to 1 by Makefile.PL at install time when the host's SysV IPC is
 # unreliable.  When true, _viable() throws an exception explaining how
@@ -293,7 +293,7 @@ sub init {
                 croak "Client '$id' does not exist";
             }
             my $data = $state->{clients}{$id};
-            if ($data->{pid} && $data->{pid} != $$ && kill(0, $data->{pid})) {
+            if ($data->{pid} && $data->{pid} != $$ && $self->pid_is_running($data->{pid})) {
                 $self->{disconnected} = 1;
                 croak "Connection already running in pid $data->{pid}";
             }

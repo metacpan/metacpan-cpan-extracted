@@ -42,7 +42,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
     NAME                => 'FCGI::Buffer',
-    AUTHOR              => q{Nigel Horne <njh@bandsman.co.uk>},
+    AUTHOR              => q{Nigel Horne <njh@nigelhorne.com>},
     VERSION_FROM        => 'lib/FCGI/Buffer.pm',
     ABSTRACT_FROM       => 'lib/FCGI/Buffer.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -70,19 +70,21 @@ WriteMakefile(
     clean      => { FILES => 'FCGI-Buffer-*' },
     META_MERGE => {
     	'meta-spec' => { version => 2 },
-    	resources => {
-		repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/FCGI-Buffer.git',
-			web => 'https://github.com/nigelhorne/FCGI-Buffer',
-			repository => 'https://github.com/nigelhorne/FCGI-Buffer',
-		}, bugtracker => {
-			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=FCGI-Buffer',
-			web => 'https://github.com/nigelhorne/FCGI-Buffer/issues',
-			url => 'https://github.com/nigelhorne/FCGI-Buffer/issues',
-			mailto => 'bug-FCGI-Buffer@rt.cpan.org'
-		}
-	},
+		resources => {
+			homepage => 'https://metacpan.org/pod/CGI::Buffer',
+			repository => {
+				type => 'git',
+				url => 'git://github.com/nigelhorne/CGI-Buffer.git',
+				web => 'https://github.com/nigelhorne/CGI-Buffer',
+				# license => 'http://dev.perl.org/licenses/',
+			}, bugtracker => {
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer',
+				# web => 'https://github.com/nigelhorne/CGI-Buffer/issues',
+				# url => 'https://github.com/nigelhorne/CGI-Buffer/issues',
+				mailto => 'bug-CGI-Buffer@rt.cpan.org'
+			}
+		},
     },
     MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );

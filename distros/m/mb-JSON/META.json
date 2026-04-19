@@ -1,6 +1,6 @@
 {
     "name" : "mb-JSON",
-    "version" : "0.05",
+    "version" : "0.06",
     "abstract" : "JSON encode/decode for multibyte (UTF-8) strings",
     "author" : [
         "ina <ina@cpan.org>"
@@ -69,11 +69,11 @@
     "provides" : {
         "mb::JSON" : {
             "file" : "lib/mb/JSON.pm",
-            "version" : "0.05"
+            "version" : "0.06"
         },
         "mb::JSON::Boolean" : {
             "file" : "lib/mb/JSON.pm",
-            "version" : "0.05"
+            "version" : "0.06"
         }
     }
 }

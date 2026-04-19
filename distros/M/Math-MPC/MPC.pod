@@ -197,14 +197,15 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    Rmpc_set_default_prec($p);
    Rmpc_set_default_prec2($p_re, $p_im);
     Rmpc_set_default_prec sets the default precision to exactly $p
-    bits for both the real and imaginary parts. Rmpc_set_default_prec2
-    sets the default precision to be *exactly* $p_re bits for the real
-    part, and *exactly* $p_im bits for the imaginary part. The
-    precision of a variable means the number of bits used to store its
-    mantissa.  All subsequent calls to `new' will use this precision,
-    but previously initialized variables are unaffected. This is also
-    the precision that will be used during some overloaded operations
-    (see OPERATOR OVERLOADING below).
+    bits for both the real and imaginary parts.
+    Rmpc_set_default_prec2 sets the default precision to be *exactly*
+    $p_re bits for the real part, and *exactly* $p_im bits for the
+    imaginary part.
+    The precision of a variable means the number of bits used to store
+    its mantissa.  All subsequent calls to `new' will use this
+    precision, but previously initialized variables are unaffected.
+    This is also the precision that will be used during some
+    overloaded operations (see OPERATOR OVERLOADING below).
     The default precision is set to 53 bits initially (for both
     real and imaginary components).
 
@@ -906,6 +907,13 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     achieved by doing this in a *perl* context.
 
 =head1 BUGS
+
+    The mpc-1.4.0 library has buggy mpc_ui_div() and mpc_fr_div()
+    implementations. Math-MPC-1.42 and later work around the issue,
+    but it is recommended that mpc-1.4.0 installations be replaced
+    with mpc-1.4.1 (which was released shortly after 1.4.0).
+    The bug was reported and discussed at:
+    https://sympa.inria.fr/sympa/arc/mpc-discuss/2026-03/msg00019.html
 
     You can get segfaults if you pass the wrong type of
     argument to the functions - so if you get a segfault, the

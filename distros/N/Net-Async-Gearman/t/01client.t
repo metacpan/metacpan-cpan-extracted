@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
-use Test::HexString;
+use Test2::V0;
 use IO::Async::Test;
 use IO::Async::Loop;
 use IO::Async::OS;
@@ -32,7 +31,7 @@ my $f = $client->submit_job(
 my $buffer = "";
 wait_for_stream { length $buffer >= 12+0x13 } $S2 => $buffer;
 
-is_hexstr( $buffer, "\0REQ\0\0\0\x07\0\0\0\x13function\x000\0argument",
+is( $buffer, "\0REQ\0\0\0\x07\0\0\0\x13function\x000\0argument",
    'SUBMIT_JOB request written to buffer' );
 
 $S2->syswrite( "\0RES\0\0\0\x08\0\0\0\x02id" );
@@ -40,6 +39,6 @@ $S2->syswrite( "\0RES\0\0\0\x0d\0\0\0\x09id\0result" );
 
 wait_for { $f->is_ready };
 
-is_deeply( [ $f->get ], [ "result" ], '$f->get' );
+is( [ $f->get ], [ "result" ], '$f->get' );
 
 done_testing;

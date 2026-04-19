@@ -26,3 +26,4 @@ Dirs
 SpaceBar
 TUI
 DEPRECATIONS
+th

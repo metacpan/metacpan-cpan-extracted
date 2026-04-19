@@ -33,7 +33,11 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard docker compose>. It is the command surface for dashboard-specific Compose discovery, addon/mode handling, and dry-run output.
+This staged helper exposes C<dashboard docker compose>, C<dashboard docker list>,
+and the isolated service toggle commands C<dashboard docker enable> and
+C<dashboard docker disable>. It is the command surface for dashboard-specific
+Compose discovery, addon/mode handling, dry-run output, service-state
+reporting, and local C<disabled.yml> marker management.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +49,12 @@ Use this file when changing docker helper CLI arguments or the handoff into the 
 
 =head1 HOW TO USE
 
-Users run C<dashboard docker compose ...>. The staged helper forwards the passthrough args and wrapper flags into the private runtime, which resolves the compose files and then C<exec>s the final Docker command.
+Users run C<dashboard docker compose ...>, C<dashboard docker list>, C<dashboard
+docker enable E<lt>serviceE<gt>>, or C<dashboard docker disable
+E<lt>serviceE<gt>>. The staged helper forwards the request into the private
+runtime, which either resolves and C<exec>s the final Docker command, reports
+the effective enabled or disabled state of isolated services, or creates or
+removes the deepest-layer C<disabled.yml> marker for one isolated service.
 
 =head1 WHAT USES IT
 
@@ -61,17 +70,32 @@ Run the public built-in command path that stages or re-enters this helper.
 
 Example 2:
 
+  dashboard docker list --disabled
+
+Show only isolated service folders that are currently disabled by the effective
+layered marker state.
+
+Example 3:
+
+  dashboard docker disable green
+  dashboard docker enable green
+
+Toggle one isolated service without manually creating or deleting the
+F<disabled.yml> marker file.
+
+Example 4:
+
   ~/.developer-dashboard/cli/dd/docker --help
 
 Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
 
-Example 3:
+Example 5:
 
   prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
 
 Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
 
-Example 4:
+Example 6:
 
   prove -lr t
 

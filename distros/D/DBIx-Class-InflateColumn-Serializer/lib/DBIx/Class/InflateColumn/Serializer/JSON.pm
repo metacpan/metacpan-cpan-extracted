@@ -1,5 +1,5 @@
 package DBIx::Class::InflateColumn::Serializer::JSON;
-$DBIx::Class::InflateColumn::Serializer::JSON::VERSION = '0.09';
+$DBIx::Class::InflateColumn::Serializer::JSON::VERSION = '0.10';
 =head1 NAME
 
 DBIx::Class::InflateColumn::Serializer::JSON - JSON Inflator

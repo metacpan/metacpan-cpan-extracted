@@ -1,5 +1,14 @@
 Revision history for SVGPDF
 
+0.092
+
+	- Allow a document to be parsed into a series of similar elements.
+          This elminates the need for enclosing the document in
+          useless <div> .. </div>.
+
+	- Fix uncontrollable test 08_path1a6 and move it back to t.
+	  Thanks Phil for the Contrib/Bogen.pm fix.
+
 0.091.1	2025-07-11
 
 	- Fix failing test for perls compiled with -Duselongdouble.

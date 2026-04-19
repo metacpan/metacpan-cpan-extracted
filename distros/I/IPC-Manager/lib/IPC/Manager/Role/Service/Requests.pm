@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service::Requests;
 use strict;
 use warnings;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -24,8 +24,8 @@ sub clear_servicerequests_fields {
 sub have_pending_responses {
     my $self = shift;
 
-    return 1 if $self->{_RESPONSES}        && any { !defined($_) } values %{$self->{_RESPONSES}};
-    return 1 if $self->{_RESPONSE_HANDLER} && any { defined($_) } values %{$self->{_RESPONSE_HANDLER}};
+    return 1 if $self->{_RESPONSES}        && any { !defined($_->{response}) } values %{$self->{_RESPONSES}};
+    return 1 if $self->{_RESPONSE_HANDLER} && any { defined($_) }              values %{$self->{_RESPONSE_HANDLER}};
     return 0;
 }
 
@@ -35,13 +35,13 @@ sub handle_response {
 
     my $id = $resp->{ipcm_response_id};
 
-    if (my $handler = delete $self->{_RESPONSE_HANDLER}->{$id}) {
-        $handler->($resp, $msg);
+    if (my $entry = delete $self->{_RESPONSE_HANDLER}->{$id}) {
+        $entry->{cb}->($resp, $msg);
     }
     else {
         croak "Got an unexpected response for '$id'" unless exists $self->{_RESPONSES}->{$id};
-        croak "Got an extra response for '$id'" if defined $self->{_RESPONSES}->{$id};
-        $self->{_RESPONSES}->{$id} = $resp;
+        croak "Got an extra response for '$id'" if defined $self->{_RESPONSES}->{$id}->{response};
+        $self->{_RESPONSES}->{$id}->{response} = $resp;
     }
 
     return;
@@ -52,6 +52,7 @@ sub send_request {
     my ($peer, $req, $cb) = @_;
 
     my $id = gen_uuid();
+    my $pid = $self->client->peer_pid($peer);
 
     $self->client->send_message(
         $peer,
@@ -62,13 +63,23 @@ sub send_request {
     );
 
     if ($cb) {
-        $self->{_RESPONSE_HANDLER}->{$id} = $cb;
+        $self->{_RESPONSE_HANDLER}->{$id} = {peer => $peer, pid => $pid, cb => $cb};
     }
     else {
-        $self->{_RESPONSES}->{$id} = undef;
+        $self->{_RESPONSES}->{$id} = {peer => $peer, pid => $pid, response => undef};
     }
 
     return $id;
+}
+
+sub pending_response_peer {
+    my $self = shift;
+    my ($id) = @_;
+
+    my $entry = $self->{_RESPONSES}->{$id} // $self->{_RESPONSE_HANDLER}->{$id}
+        or return;
+
+    return ($entry->{peer}, $entry->{pid});
 }
 
 sub get_response {
@@ -83,8 +94,10 @@ sub get_response {
     croak "Not expecting a response with id '$resp_id'"
         unless exists $resps->{$resp_id};
 
-    return () unless defined $resps->{$resp_id};
-    return delete $resps->{$resp_id};
+    my $entry = $resps->{$resp_id};
+    return () unless defined $entry->{response};
+    delete $resps->{$resp_id};
+    return $entry->{response};
 }
 
 1;

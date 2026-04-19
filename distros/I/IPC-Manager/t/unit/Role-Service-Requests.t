@@ -23,6 +23,8 @@ use Test2::V0;
         my ($self, $peer, $content) = @_;
         push @SENT, {peer => $peer, content => $content};
     }
+
+    sub peer_pid { 12345 }
 }
 
 subtest 'clear_servicerequests_fields' => sub {

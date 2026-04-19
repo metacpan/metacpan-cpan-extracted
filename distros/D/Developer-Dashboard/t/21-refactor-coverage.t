@@ -16,6 +16,7 @@ use Developer::Dashboard::CLI::SeededPages ();
 use Developer::Dashboard::CLI::Query ();
 use Developer::Dashboard::CLI::Ticket ();
 use Developer::Dashboard::CLI::Paths ();
+use Developer::Dashboard::Collector;
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_decode);
 use Developer::Dashboard::Config;
@@ -62,6 +63,65 @@ is( $paths->app_name, 'developer-dashboard', 'path registry exposes the default 
 is( $paths->register_named_paths('nope'), $paths, 'register_named_paths ignores non-hash input' );
 is( $paths->unregister_named_path(''), $paths, 'unregister_named_path ignores empty names' );
 is_deeply( $paths->named_paths, {}, 'named_paths starts empty' );
+is_deeply(
+    $paths->all_paths,
+    {
+        home                 => $paths->home,
+        home_runtime_root    => $paths->home_runtime_root,
+        project_runtime_root => scalar $paths->project_runtime_root,
+        runtime_root         => $paths->runtime_root,
+        state_root           => $paths->state_root,
+        cache_root           => $paths->cache_root,
+        logs_root            => $paths->logs_root,
+        dashboards_root      => $paths->dashboards_root,
+        bookmarks_root       => $paths->bookmarks_root,
+        cli_root             => $paths->cli_root,
+        collectors_root      => $paths->collectors_root,
+        indicators_root      => $paths->indicators_root,
+        config_root          => $paths->config_root,
+        current_project_root => scalar $paths->current_project_root,
+    },
+    'all_paths returns the same full runtime path inventory exposed by dashboard paths',
+);
+is_deeply(
+    $paths->all_path_aliases,
+    {
+        home            => $paths->home,
+        home_runtime    => $paths->home_runtime_root,
+        project_runtime => scalar $paths->project_runtime_root,
+        runtime         => $paths->runtime_root,
+        state           => $paths->state_root,
+        cache           => $paths->cache_root,
+        logs            => $paths->logs_root,
+        dashboards      => $paths->dashboards_root,
+        bookmarks       => $paths->bookmarks_root,
+        cli             => $paths->cli_root,
+        config          => $paths->config_root,
+        collectors      => $paths->collectors_root,
+        indicators      => $paths->indicators_root,
+    },
+    'all_path_aliases returns the same alias inventory exposed by dashboard path list',
+);
+{
+    my $from_folder = Developer::Dashboard::PathRegistry->new_from_all_folders;
+    isa_ok( $from_folder, 'Developer::Dashboard::PathRegistry', 'new_from_all_folders returns a PathRegistry object' );
+    is_deeply(
+        $from_folder->all_paths,
+        Developer::Dashboard::Folder->all,
+        'new_from_all_folders rehydrates a PathRegistry from the public Folder path inventory',
+    );
+}
+{
+    my $collector_from_folder = Developer::Dashboard::Collector->new_from_all_folders;
+    isa_ok( $collector_from_folder, 'Developer::Dashboard::Collector', 'Collector new_from_all_folders returns a collector store' );
+    is_deeply(
+        $collector_from_folder->collector_paths('sample')->{dir},
+        Developer::Dashboard::Collector->new(
+            paths => Developer::Dashboard::PathRegistry->new_from_all_folders,
+        )->collector_paths('sample')->{dir},
+        'Collector new_from_all_folders uses the same Folder-derived path registry as the explicit constructor',
+    );
+}
 is( $paths->resolve_any('missing-one', 'missing-two'), undef, 'resolve_any returns undef when nothing exists' );
 is( $paths->is_home_runtime_path(''), 0, 'is_home_runtime_path rejects empty input' );
 is( $paths->is_home_runtime_path('/tmp/outside'), 0, 'is_home_runtime_path rejects non-home runtime paths' );

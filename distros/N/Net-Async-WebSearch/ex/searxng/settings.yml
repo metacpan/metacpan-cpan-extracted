@@ -1,0 +1,40 @@
+# Minimal SearxNG settings.yml for a private local instance that the
+# Net::Async::WebSearch::Provider::SearxNG talks to. Mount this at
+# /etc/searxng/settings.yml in the container.
+#
+# Two things people trip on and this file fixes:
+#   - JSON format is OFF by default. `search.formats` below turns it on
+#     (without this you get 403 Forbidden on /search?format=json).
+#   - The bundled limiter now requires Valkey AND a separate limiter.toml
+#     in recent SearxNG versions. For a private instance on an internal
+#     network there's no reason to run either — so we disable it.
+#
+# Before first run: replace CHANGE-ME-...  with a random string.
+#   openssl rand -hex 32
+
+use_default_settings: true
+
+server:
+  secret_key: "CHANGE-ME-TO-A-RANDOM-SECRET-STRING"
+  base_url: false
+  image_proxy: false
+  method: "POST"
+  limiter: false          # private instance — skip the Valkey+limiter.toml dance
+  public_instance: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: ""
+  # JSON is OFF by default — add it here or the /search?format=json endpoint
+  # returns 403 Forbidden and you'll spend an afternoon wondering why.
+  formats:
+    - html
+    - json
+
+# If you ever expose this publicly, DO NOT leave `limiter: false`.
+# For that case you'll also need:
+#   - a Valkey container (image: valkey/valkey:8-alpine)
+#   - valkey.url: "valkey://valkey-host:6379/0"  (NOT redis.url — deprecated)
+#   - a /etc/searxng/limiter.toml with your rate-limit tiers
+#     (see https://docs.searxng.org/admin/searx.limiter.html)

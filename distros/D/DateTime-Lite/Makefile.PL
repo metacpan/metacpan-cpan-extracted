@@ -80,6 +80,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/DateTime/Lite.pm',
     ABSTRACT_FROM    => 'lib/DateTime/Lite.pm',
     INSTALLDIRS      => ( $] < 5.011 ? 'perl' : 'site' ),
+    # 2009-08-23
     MIN_PERL_VERSION => 'v5.10.1',
     LICENSE          => 'perl_5',
     PREREQ_PM        =>
@@ -89,6 +90,8 @@ my %WriteMakefileArgs = (
         'overloading'                => 0,
         'strict'                     => 0,
         'vars'                       => 0,
+        # parse() reliable since at least from version 0.43 in 2005-06-06, predating our perl version requirements
+        'version'                    => 0,
         'warnings'                   => 0,
         'warnings::register'         => 0,
         'Config'                     => 0,

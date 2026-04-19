@@ -10,6 +10,7 @@ use POSIX();
 use Test2::V1 -ip;
 use Test2::IPC;
 use IPC::Manager::Serializer::JSON;
+use IPC::Manager::Util qw/pid_is_running/;
 use IPC::Manager qw/ipcm_service ipcm_worker ipcm_connect ipcm_reconnect ipcm_spawn ipcm_default_protocol/;
 
 sub run_all {
@@ -319,8 +320,8 @@ sub test_nested_services {
         handle_response => sub {
             my ($self, $resp, $msg) = @_;
             my $id = $resp->{ipcm_response_id};
-            if (my $handler = delete $self->{_RESPONSE_HANDLER}->{$id}) {
-                $handler->($resp, $msg);
+            if (my $entry = delete $self->{_RESPONSE_HANDLER}->{$id}) {
+                $entry->{cb}->($resp, $msg);
             }
         },
     );
@@ -460,7 +461,7 @@ sub test_workers {
     ok($long_worker_pid, "Got long worker pid");
 
     # Verify the long worker is still running
-    ok(kill(0, $long_worker_pid), "Long worker is running before shutdown");
+    ok(pid_is_running($long_worker_pid), "Long worker is running before shutdown");
 
     # Ask the service how many workers are registered (long_worker should
     # still be there; short_worker may or may not have been reaped yet)

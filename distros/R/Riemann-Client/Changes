@@ -1,5 +1,8 @@
 Revision history for Riemann-Client
 
+0.06      2026-04-19 00:02:28-04:00 America/New_York
+    - Migrate from GitHub to Codeberg. No functional changes
+
 0.05      2018-05-07 11:16:15+01:00 Europe/London
     - Tanks to cventers: Sending "metric" as 0 results in :metric being nil
 

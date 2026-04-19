@@ -12,8 +12,19 @@ SYNOPSIS
   print $data->{age};     # 30
   print $data->{active};  # true (mb::JSON::Boolean object)
 
+  # parse: alias for decode() -- both names are interchangeable
+  my $data = mb::JSON::parse('{"key":"value"}');
+
   # encode: Perl data -> JSON text
   my $json = mb::JSON::encode({
+      name   => 'Alice',
+      active => mb::JSON::true,
+      score  => undef,
+  });
+  # -> {"active":true,"name":"Alice","score":null}
+
+  # stringify: alias for encode() -- both names are interchangeable
+  my $json = mb::JSON::stringify({
       name   => 'Alice',
       active => mb::JSON::true,
       score  => undef,
@@ -27,9 +38,6 @@ SYNOPSIS
   });
   # -> {"done":false,"flag":true}
 
-  # parse() is a backward-compatible alias for decode()
-  my $data = mb::JSON::parse('{"key":"value"}');
-
 DESCRIPTION
 
   mb::JSON is a simple, dependency-free JSON encoder and decoder
@@ -37,23 +45,31 @@ DESCRIPTION
   strings correctly, making it suitable for environments where standard
   JSON modules requiring Perl 5.8+ are unavailable.
 
-  Version 0.04 adds encode() (Perl data to JSON text) and explicit
-  Boolean type objects (mb::JSON::true and mb::JSON::false) to
-  complement the existing decode()/parse().
+  mb::JSON provides two pairs of symmetric functions:
+
+    decode() / parse()       -- JSON text -> Perl data
+    encode() / stringify()   -- Perl data -> JSON text
+
+  Within each pair, both names are aliases and produce identical output.
+  parse() mirrors decode(), stringify() mirrors encode().
 
 FUNCTIONS
-
-  mb::JSON::encode($data)
-      Converts a Perl data structure to a JSON text string.
-      Hash keys are sorted alphabetically for deterministic output.
-      UTF-8 multibyte bytes are output as-is (not \uXXXX-escaped).
 
   mb::JSON::decode($json_text)
       Converts a JSON text string to a Perl data structure.
       If no argument is given, $_ is used.
 
   mb::JSON::parse($json_text)
-      Alias for decode(). Retained for backward compatibility with 0.03.
+      Alias for decode().  Both names are interchangeable.
+
+  mb::JSON::encode($data)
+      Converts a Perl data structure to a JSON text string.
+      Hash keys are sorted alphabetically for deterministic output.
+      UTF-8 multibyte bytes are output as-is (not \uXXXX-escaped).
+
+  mb::JSON::stringify($data)
+      Alias for encode().  Both names are interchangeable.
+      Mirrors the JSON.stringify() function in JavaScript.
 
   mb::JSON::true
       Returns the mb::JSON::Boolean object representing JSON true.
@@ -93,7 +109,7 @@ BOOLEAN VALUES
 
   A plain 1 or 0 encodes as a JSON number, not a boolean:
 
-    encode({ count => 1 })           -> '{"count":1}'
+    encode({ count => 1 })             -> '{"count":1}'
     encode({ flag => mb::JSON::true }) -> '{"flag":true}'
 
 INCLUDED DOCUMENTATION

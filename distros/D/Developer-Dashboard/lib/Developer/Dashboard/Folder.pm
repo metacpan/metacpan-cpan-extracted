@@ -3,7 +3,7 @@ package Developer::Dashboard::Folder;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 use Cwd qw(cwd);
 use File::Basename qw(dirname);
@@ -76,6 +76,17 @@ sub bookmarks {
 sub configs {
     my $paths = _paths_obj();
     return $paths && $paths->can('config_root') ? $paths->config_root : '';
+}
+
+# all()
+# Returns the full runtime path inventory exposed by C<dashboard paths>.
+# Input: none.
+# Output: hash reference describing the active runtime path set plus named aliases.
+sub all {
+    my $paths = _paths_obj();
+    _load_configured_aliases();
+    return {} if !$paths || !$paths->can('all_paths');
+    return $paths->all_paths;
 }
 
 # postman()
@@ -273,7 +284,7 @@ code that expects a C<Folder> package.
 
 =head1 METHODS
 
-=head2 configure, home, tmp, dd, bookmarks, configs, cd, ls, locate
+=head2 configure, home, tmp, dd, bookmarks, configs, all, cd, ls, locate
 
 Configure and resolve compatibility folders.
 
@@ -294,6 +305,10 @@ Use this file when a module, bookmark, or helper needs a named runtime directory
 =head1 HOW TO USE
 
 Load C<Developer::Dashboard::Folder> and ask it for the named folder you need. Use it as the semantic folder layer above the lower-level path registry instead of hard-coding F<~/.developer-dashboard> descendants.
+
+When you need the complete resolved path payload that C<dashboard paths>
+prints, call C<Developer::Dashboard::Folder-E<gt>all>. It returns the same
+hash shape as the CLI command.
 
 =head1 WHAT USES IT
 

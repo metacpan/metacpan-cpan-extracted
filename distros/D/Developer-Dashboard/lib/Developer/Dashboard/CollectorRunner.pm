@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '2.46';
+our $VERSION = '2.56';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -628,7 +628,7 @@ sub _cron_due {
     return 0 if !_cron_match( $wday, $now[6] );
 
     my $state = $self->loop_state($name) || {};
-    my $stamp = sprintf '%04d-%02d-%02dT%02d:%02d', $now[5] + 1900, $now[4] + 1, $now[3], $now[2], $now[1];
+    my $stamp = strftime( '%Y-%m-%dT%H:%M%z', @now );
     return 0 if ( $state->{last_cron_slot} || '' ) eq $stamp;
     $self->_write_loop_state( $name, { last_cron_slot => $stamp } );
     return 1;
@@ -766,12 +766,12 @@ sub _slurp {
 }
 
 # _now_iso8601()
-# Returns the current UTC timestamp in ISO-8601 form.
+# Returns the current local timestamp in ISO-8601 form with timezone offset.
 # Input: none.
 # Output: timestamp string.
 sub _now_iso8601 {
-    my @t = gmtime();
-    return strftime( '%Y-%m-%dT%H:%M:%SZ', @t );
+    my @t = localtime();
+    return strftime( '%Y-%m-%dT%H:%M:%S%z', @t );
 }
 
 1;

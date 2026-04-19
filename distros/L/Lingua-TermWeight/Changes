@@ -1,0 +1,12 @@
+Revision history for Lingua-TermWeighted
+
+0.01      2026-04-18 21:33:23Z
+
+  * Fork of Lingua-TFIDF
+    * Remove Japanese language dependencies
+    * Move to Object::Pad
+    * The goal of the new fork is to keep it maintainable and to add more
+      implementations via dependency injection.
+
+0.01    2014-05-12
+        - Initial release.

@@ -2,32 +2,44 @@
  mb::JSON Cheat Sheet                                   [KM] ភាសាខ្មែរ
 ======================================================================
 
+[ ការផ្គូផ្គងប្រភេទទិន្នន័យ ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "អត្ថបទ"  -> scalar string
+  123        -> scalar លេខ
+  true       -> mb::JSON::Boolean (តម្លៃ: 1)
+  false      -> mb::JSON::Boolean (តម្លៃ: 0)
+  null       -> undef
+  [...]      -> array reference
+  {...}      -> hash reference
+
 [ 1. Load ]
   use mb::JSON;
 
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_text);
-  my $data = mb::JSON::parse($json_text);  # alias
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: alias of decode() ]
+  my $data = mb::JSON::parse($json_text);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Boolean ]
+[ 5. stringify: Perl -> JSON  (JavaScript-compatible alias) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() និង encode() ផ្តល់លទ្ធផលដូចគ្នា
+
+[ 6. Boolean ]
   mb::JSON::true  -> true
   mb::JSON::false -> false
 
-[ 5. null / undef ]
+[ 7. null / undef ]
   undef -> null  /  null -> undef
 
-[ 6. Hash keys sorted, UTF-8 kept as-is ]
+[ 8. Hash keys sorted, UTF-8 kept as-is ]
 
-[ 7. Type mapping ]
-  "string" -> scalar    123   -> number
-  true     -> Boolean   false -> Boolean
-  null     -> undef     [...]  -> arrayref
-  {...}  -> hashref
-
-[ 8. Example ]
+[ 9. ឧទាហរណ៍ ]
   my $h = mb::JSON::decode('{"name":"Alice","ok":true}');
   my $j = mb::JSON::encode({name=>'Alice',ok=>mb::JSON::true});
+  my $j = mb::JSON::stringify({name=>'Alice',ok=>mb::JSON::true});
   # -> {"name":"Alice","ok":true}

@@ -20,34 +20,44 @@
 [ 2. decode: JSON -> Perl ]
   my $data = mb::JSON::decode($json_maanw);
   my $data = mb::JSON::decode();               # $_ baara kɛ
-  my $data = mb::JSON::parse($json_maanw);     # tɔgɔ wɛrɛ (kunnafoniw)
 
-[ 3. encode: Perl -> JSON ]
+[ 3. parse: decode() tɔgɔ wɛrɛ ]
+  my $data = mb::JSON::parse($json_maanw);
+
+[ 4. encode: Perl -> JSON ]
   my $json = mb::JSON::encode($data);
 
-[ 4. Tiɲɛ-Nɔgɔn Jabiw ]
+[ 5. stringify: Perl -> JSON  (JavaScript tɔgɔ wɛrɛ) ]
+  my $json = mb::JSON::stringify($data);
+  # stringify() ni encode() ka jaabi kelen kɛ
+
+[ 6. Tiɲɛ-Nɔgɔn Jabiw ]
   mb::JSON::true   -> JSON: true
   mb::JSON::false  -> JSON: false
   Jate 1 walima 0  -> JSON: jate (tiɲɛ-nɔgɔn tɛ)
 
-[ 5. null ni undef ]
+[ 7. null ni undef ]
   undef  -> null (encode tuma)
   null   -> undef (decode tuma)
 
-[ 6. Hash cɛsiliw b'a kɛ alphabeti kan ]
+[ 8. Hash cɛsiliw b'a kɛ alphabeti kan ]
   encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
 
-[ 7. UTF-8 maanw tɛ sɛgɛsɛgɛ (\uXXXX ma kɛ) ]
+[ 9. UTF-8 maanw tɛ sɛgɛsɛgɛ (\uXXXX ma kɛ) ]
 
-[ 8. Kunnafoni ]
-  # decode
+[ 10. Kunnafoni ]
   my $h = mb::JSON::decode('{"togo":"Moussa","san":30}');
   print $h->{togo};   # Moussa
 
-  # encode
   my $j = mb::JSON::encode({
-      togo    => 'Moussa',
-      baara   => mb::JSON::true,
-      note    => undef,
+      togo  => 'Moussa',
+      baara => mb::JSON::true,
+      note  => undef,
   });
   # -> {"baara":true,"note":null,"togo":"Moussa"}
+
+  my $j = mb::JSON::stringify({
+      togo  => 'Moussa',
+      baara => mb::JSON::true,
+  });
+  # -> {"baara":true,"togo":"Moussa"}

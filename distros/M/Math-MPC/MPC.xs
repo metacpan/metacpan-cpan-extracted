@@ -192,16 +192,19 @@ int Rmpc_sj_div (mpc_ptr rop, intmax_t i, mpc_ptr op, mpc_rnd_t rnd) {
 
    mpfr_t x;
    int inex;
+   DIVISION_BUG_DECL /* Defined (and documented) in math_mpc_include.h */
 
-# if MPC_VERSION < 66304 /* less than version 1.3.0 */
-  if(!_check_rounding_value(rnd))
-  croak("Invalid rounding value (%d) supplied to Rmpc_sj_div()", (int)rnd);
-# endif
+#if MPC_VERSION < 66304 /* less than version 1.3.0 */
+   if(!_check_rounding_value(rnd))
+   croak("Invalid rounding value (%d) supplied to Rmpc_sj_div()", (int)rnd);
+#endif
 
    mpfr_init2 (x, sizeof(intmax_t) * CHAR_BIT);
    mpfr_set_sj (x, i, GMP_RNDN);
 
+   DIVISION_BUG_PRE(rop) /* Defined (and documented) in math_mpc_include.h */
    inex = mpc_fr_div (rop, x, op, rnd);
+   DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
 
    mpfr_clear (x);
    return inex;
@@ -254,16 +257,19 @@ int Rmpc_ld_div (mpc_ptr rop, long double i, mpc_ptr op, mpc_rnd_t rnd) {
 
    mpfr_t x;
    int inex;
+   DIVISION_BUG_DECL /* Defined (and documented) in math_mpc_include.h */
 
-# if MPC_VERSION < 66304 /* less than version 1.3.0 */
-  if(!_check_rounding_value(rnd))
-  croak("Invalid rounding value (%d) supplied to Rmpc_ld_div()", (int)rnd);
-# endif
+#if MPC_VERSION < 66304 /* less than version 1.3.0 */
+   if(!_check_rounding_value(rnd))
+   croak("Invalid rounding value (%d) supplied to Rmpc_ld_div()", (int)rnd);
+#endif
 
    mpfr_init2 (x, sizeof(long double) * CHAR_BIT);
    mpfr_set_ld (x, i, GMP_RNDN);
 
+   DIVISION_BUG_PRE(rop) /* Defined (and documented) in math_mpc_include.h */
    inex = mpc_fr_div (rop, x, op, rnd);
+   DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
 
    mpfr_clear (x);
    return inex;
@@ -302,6 +308,7 @@ int Rmpc_div_d (mpc_ptr rop, mpc_ptr op, double i, mpc_rnd_t rnd) {
 int Rmpc_d_div (mpc_ptr rop, double i, mpc_ptr op, mpc_rnd_t rnd) {
    mpfr_t x;
    int inex;
+   DIVISION_BUG_DECL /* Defined (and documented) in math_mpc_include.h */
 
 # if MPC_VERSION < 66304 /* less than version 1.3.0 */
   if(!_check_rounding_value(rnd))
@@ -311,7 +318,9 @@ int Rmpc_d_div (mpc_ptr rop, double i, mpc_ptr op, mpc_rnd_t rnd) {
    mpfr_init2 (x, sizeof(double) * CHAR_BIT);
    mpfr_set_d (x, i, GMP_RNDN);
 
+   DIVISION_BUG_PRE(rop) /* Defined (and documented) in math_mpc_include.h */
    inex = mpc_fr_div (rop, x, op, rnd);
+   DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
 
    mpfr_clear (x);
    return inex;
@@ -1580,9 +1589,17 @@ SV * Rmpc_div_ui(pTHX_ mpc_t * a, mpc_t * b, SV * c, SV * round){
      return newSViv(mpc_div_ui(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
 }
 
-SV * Rmpc_ui_div(pTHX_ mpc_t * a, SV * b, mpc_t * c, SV * round) {
+int Rmpc_ui_div(pTHX_ mpc_t * a, SV * b, mpc_t * c, SV * round) {
+     int inex;
+     DIVISION_BUG_DECL /* Defined (and documented) in math_mpc_include.h */
+
      CHECK_ROUNDING_VALUE(round);
-     return newSViv(mpc_ui_div(*a, SvUV(b), *c, (mpc_rnd_t)SvUV(round)));
+
+     DIVISION_BUG_PRE(*a) /* Defined (and documented) in math_mpc_include.h */
+     inex = mpc_ui_div(*a, SvUV(b), *c, (mpc_rnd_t)SvUV(round));
+     DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
+
+    return inex;
 }
 
 SV * Rmpc_div_fr(pTHX_ mpc_t * a, mpc_t * b, mpfr_t * c, SV * round){
@@ -1590,9 +1607,16 @@ SV * Rmpc_div_fr(pTHX_ mpc_t * a, mpc_t * b, mpfr_t * c, SV * round){
      return newSViv(mpc_div_fr(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
 }
 
-SV * Rmpc_fr_div(pTHX_ mpc_t * a, mpfr_t * b, mpc_t * c, SV * round){
+int Rmpc_fr_div(pTHX_ mpc_t * a, mpfr_t * b, mpc_t * c, SV * round){
+     int inex;
+     DIVISION_BUG_DECL /* Defined (and documented) in math_mpc_include.h */
+
      CHECK_ROUNDING_VALUE(round);
-     return newSViv(mpc_fr_div(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
+
+     DIVISION_BUG_PRE(*a) /* Defined (and documented) in math_mpc_include.h */
+     inex = mpc_fr_div(*a, *b, *c, (mpc_rnd_t)SvUV(round));
+     DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
+     return inex;
 }
 
 SV * Rmpc_sqrt(pTHX_ mpc_t * a, mpc_t * b, SV * round) {
@@ -2252,6 +2276,7 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
      mpc_t * mpc_t_obj;
      SV * obj_ref, * obj;
      mpfr_t t;
+     DIVISION_BUG_DECL /* Defined (and documented) in math_mpc_include.h */
 
      New(1, mpc_t_obj, 1, mpc_t);
      if(mpc_t_obj == NULL) croak("Failed to allocate memory in overload_div function");
@@ -2265,13 +2290,17 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
 
      if(SV_IS_IOK(b)) {
        mpfr_init2(t, sizeof(IV) * CHAR_BIT);
-#ifdef _MSC_VER
+#  ifdef _MSC_VER
        mpfr_set_str(t, SvPV_nolen(b), 10, GMP_RNDN);
-#else
+#  else
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), GMP_RNDN);
        else         mpfr_set_sj(t, SvIVX(b), GMP_RNDN);
-#endif
-       if(SWITCH_ARGS) mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+#  endif
+       if(SWITCH_ARGS) {
+         DIVISION_BUG_PRE(*mpc_t_obj) /* Defined (and documented) in math_mpc_include.h */
+         mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+         DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
+       }
        else mpc_div_fr(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
        mpfr_clear(t);
        return obj_ref;
@@ -2281,19 +2310,23 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
 
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
-         if(SWITCH_ARGS) mpc_ui_div(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
+         if(SWITCH_ARGS) {
+            DIVISION_BUG_PRE(*mpc_t_obj) /* Defined (and documented) in math_mpc_include.h */
+            mpc_ui_div(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
+            DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
+         }
          else mpc_div_ui(*mpc_t_obj, *a, SvUVX(b), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
 
        if(SWITCH_ARGS) {
-          if(SvIVX(b) >=0) {
-            mpc_ui_div(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
-          }
+          DIVISION_BUG_PRE(*mpc_t_obj) /* Defined (and documented) in math_mpc_include.h */
+          if(SvIVX(b) >=0) mpc_ui_div(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
           else {
             mpc_ui_div(*mpc_t_obj, SvIVX(b) * -1, *a, DEFAULT_ROUNDING_MODE);
             mpc_neg(*mpc_t_obj, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
           }
+          DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
        }
        else {
           if(SvIVX(b) >=0) {
@@ -2362,7 +2395,11 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
        mpfr_init2(t, DBL_MANT_DIG);
        mpfr_set_d(t, (double)SvNVX(b), GMP_RNDN);
 #endif
-       if(SWITCH_ARGS) mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+       if(SWITCH_ARGS) {
+         DIVISION_BUG_PRE(*mpc_t_obj) /* Defined (and documented) in math_mpc_include.h */
+         mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+         DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
+       }
        else mpc_div_fr(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
        mpfr_clear(t);
        return obj_ref;
@@ -2377,7 +2414,9 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
 
        if(strEQ(h, "Math::MPFR")) {
          if(SWITCH_ARGS) {
+           DIVISION_BUG_PRE(*mpc_t_obj) /* Defined (and documented) in math_mpc_include.h */
            mpc_fr_div(*mpc_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), *a, DEFAULT_ROUNDING_MODE);
+           DIVISION_BUG_POST /* Defined (and documented) in math_mpc_include.h */
            return obj_ref;
          }
          mpc_div_fr(*mpc_t_obj, *a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
@@ -5652,7 +5691,7 @@ CODE:
   RETVAL = Rmpc_div_ui (aTHX_ a, b, c, round);
 OUTPUT:  RETVAL
 
-SV *
+int
 Rmpc_ui_div (a, b, c, round)
 	mpc_t *	a
 	SV *	b
@@ -5672,7 +5711,7 @@ CODE:
   RETVAL = Rmpc_div_fr (aTHX_ a, b, c, round);
 OUTPUT:  RETVAL
 
-SV *
+int
 Rmpc_fr_div (a, b, c, round)
 	mpc_t *	a
 	mpfr_t *	b

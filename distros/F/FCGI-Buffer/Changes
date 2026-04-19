@@ -1,5 +1,10 @@
 Revision history for FCGI-Buffer
  
+0.22	Sat Apr 18 20:55:55 EDT 2026
+	Fix uninitialized variable
+	More helpful error message
+	Reduce chance of key name clash
+
 0.21	Fri Mar 21 17:08:18 EDT 2025
 	Added support for Zstd
 	Handle the new CGI::Info::as_string()

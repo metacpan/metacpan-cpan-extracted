@@ -1,3 +1,10 @@
+1.42
+ - Restructure the interpolation overloading. The only change in behaviour is
+   that "@NaN@" and "@Inf@" have been replaced by "NaN" and "Inf".
+ - Workaround bug the division bug specific to mpc-1.4.0. See:
+   https://sympa.inria.fr/sympa/arc/mpc-discuss/2026-03/msg00019.html
+ - Rewrite more tests in an attempt to have this module pass its tests on Slaven's
+   freebsd arm64 builds.
 
 1.41
  - Enable quadmath builds on cygwin smoker. See (eg):
