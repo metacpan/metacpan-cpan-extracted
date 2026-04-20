@@ -125,7 +125,7 @@ void draw_windows( int nw, int cmap0_offset )
 {
     int   i, j;
     PLFLT vmin, vmax;
-    char  text[3];
+    char  text[11];
 
     plschr( 0.0, 3.5 );
     plfont( 4 );

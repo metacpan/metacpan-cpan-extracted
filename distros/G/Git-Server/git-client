@@ -85,8 +85,9 @@ This library is free software; you can redistribute it and/or modify it under th
 
 use strict;
 use Cwd qw(abs_path);
+use IO::Handle; # For non-blocking
 
-our $VERSION = "0.041";
+our $VERSION = "0.042";
 
 # Locate the real "git" later in the $PATH (after myself)
 our $real_git = find_real_git();
@@ -304,14 +305,19 @@ sub handle_config {
         map { ($_ eq "config" and ++$help) ? ($_,"--system","--global") : ($_) } @_ if 1 < !!$file + !!$descent + !!$global + !!$system + !!$local;
         # If it's not an implemented action or unrecognized args, then just let the regular git handle it:
         return @ARGV = @_ if !$help && !$list && !$get;
+        my $exit_status;
         # Keep STDERR in case the usage spewage needs to be tweaked to mention the --descent option.
-        require File::Temp;
-        my $tmp = File::Temp->new( UNLINK => 1, SUFFIX => '.err' );;
-        local $HANDLE_STDERR = sub { open STDERR, ">", "$tmp" };
-        my $out = git @_;
-        my $exit_status = $? >> 8;
-        eval { $tmp->seek(0, 0);1 } or open $tmp, "<", "$tmp";
-        my $err = join "", <$tmp>;
+        my $err;
+        my $out = do {
+            pipe my $rd_err, my $wr_err;
+            local $HANDLE_STDERR = sub { close $rd_err; eval { $wr_err->blocking(0) }; open STDERR, ">&", $wr_err };
+            # Hopefully the kernel can hold the entire STDERR within the pipe to avoid deadlock
+            my $stdout = git @_;
+            $exit_status = $? >> 8;
+            close $wr_err;
+            $err = join "", <$rd_err>;
+            $stdout;
+        };
         exit $exit_status if !length $out and !length $err;
 
         if ($help or !length $out or $err =~ /usage: git config/) {

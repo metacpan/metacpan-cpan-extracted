@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -159,19 +159,43 @@ sub sync_collectors {
         next if !defined $job->{name} || $job->{name} eq '';
 
         $active_collectors{ $job->{name} } = 1;
-        my $existing = eval { $self->get_indicator( $job->{indicator}{name} || $job->{name} ) } || {};
+        my $indicator_name = $job->{indicator}{name} || $job->{name};
+        my $existing = eval { $self->get_indicator($indicator_name) } || {};
+        my $local_existing = $self->_local_indicator($indicator_name) || {};
+        my $effective_existing = $existing;
+        my $healed_from_inherited = 0;
+        if (
+            ref($local_existing) eq 'HASH'
+            && %{ $local_existing }
+            && $self->_is_placeholder_missing_indicator($local_existing)
+        ) {
+            my $inherited = $self->_nearest_inherited_indicator($indicator_name);
+            if (
+                ref($inherited) eq 'HASH'
+                && %{ $inherited }
+                && ( $inherited->{managed_by_collector} || 0 )
+                && ( $inherited->{collector_name} || '' ) eq $job->{name}
+                && !$self->_is_placeholder_missing_indicator($inherited)
+            ) {
+                $effective_existing = $inherited;
+                $healed_from_inherited = 1;
+            }
+        }
         my $candidate = $self->collector_indicator_candidate(
             $job,
-            existing => $existing,
-            status   => defined $existing->{status} && $existing->{status} ne '' ? $existing->{status} : 'missing',
+            existing => $effective_existing,
+            status   => defined $effective_existing->{status} && $effective_existing->{status} ne '' ? $effective_existing->{status} : 'missing',
         );
-        if ( !$self->_indicator_matches( $existing, $candidate ) ) {
-            my @preserve_existing = qw(status updated_at stale);
+        my $comparison_existing = ref($local_existing) eq 'HASH' && %{ $local_existing }
+          ? $local_existing
+          : $existing;
+        if ( !$self->_indicator_matches( $comparison_existing, $candidate ) ) {
+            my @preserve_existing = $healed_from_inherited ? () : qw(status updated_at stale);
             if (
                 defined $candidate->{icon_template}
                 && $candidate->{icon_template} ne ''
-                && defined $existing->{icon_template}
-                && $existing->{icon_template} eq $candidate->{icon_template}
+                && defined $effective_existing->{icon_template}
+                && $effective_existing->{icon_template} eq $candidate->{icon_template}
             ) {
                 push @preserve_existing, qw(icon icon_template);
             }
@@ -449,6 +473,46 @@ sub _indicator_matches {
         return 0 if $left ne $right;
     }
     return 1;
+}
+
+# _local_indicator($name)
+# Loads the indicator state stored in the deepest participating runtime layer
+# only, without falling back to inherited layers.
+# Input: indicator name string.
+# Output: indicator hash reference or undef when the deepest layer has no file.
+sub _local_indicator {
+    my ( $self, $name ) = @_;
+    my ($file) = $self->_indicator_file_candidates($name);
+    return if !defined $file || $file eq '';
+    return $self->_read_indicator_file($file);
+}
+
+# _nearest_inherited_indicator($name)
+# Loads the nearest inherited indicator state beneath the deepest local layer.
+# Input: indicator name string.
+# Output: indicator hash reference or undef when no inherited layer stores it.
+sub _nearest_inherited_indicator {
+    my ( $self, $name ) = @_;
+    my @files = $self->_indicator_file_candidates($name);
+    shift @files;
+    for my $file (@files) {
+        my $item = $self->_read_indicator_file($file);
+        return $item if $item;
+    }
+    return;
+}
+
+# _is_placeholder_missing_indicator($indicator)
+# Detects whether one collector-managed indicator is only carrying the default
+# placeholder missing state rather than a real live result.
+# Input: indicator hash reference.
+# Output: boolean true when the indicator status is the default missing state.
+sub _is_placeholder_missing_indicator {
+    my ( $self, $indicator ) = @_;
+    return 0 if ref($indicator) ne 'HASH';
+    return 0 if !( $indicator->{managed_by_collector} || 0 );
+    my $status = defined $indicator->{status} ? lc $indicator->{status} : '';
+    return $status eq 'missing' ? 1 : 0;
 }
 
 # _is_template_toolkit_text($text)

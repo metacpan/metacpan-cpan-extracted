@@ -45,7 +45,7 @@ Use this file when changing the C<dashboard skills> CLI verbs or the dotted-comm
 
 =head1 HOW TO USE
 
-Users run C<dashboard skills install>, C<update>, C<enable>, C<disable>, C<list>, C<usage>, or C<uninstall>. The staged helper forwards those lifecycle requests into the private runtime, which loads the skill manager and performs the requested action. The public dotted form C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> also lands here through an internal action so installed skill commands keep one private helper surface.
+Users run C<dashboard skills install>, C<update>, C<enable>, C<disable>, C<list>, C<usage>, or C<uninstall>. The staged helper forwards those lifecycle requests into the private runtime, which loads the skill manager and performs the requested action. Install accepts either a Git URL or a direct local checked-out skill directory. The public dotted form C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> also lands here through an internal action so installed skill commands keep one private helper surface.
 
 =head1 WHAT USES IT
 
@@ -56,14 +56,18 @@ It is used by developers managing installed skills, by dotted skill command disp
 Example 1:
 
   dashboard skills install git@github.com:user/example-skill.git
+  dashboard skills install /absolute/path/to/example-skill
 
-Install one Git-backed skill into its isolated runtime root.
+Install or reinstall one isolated skill into its runtime root from either Git
+or a qualified local checkout. Direct local installs use C<rsync> when it is
+available and the built-in Perl tree-copy fallback when it is not.
 
 Example 2:
 
   dashboard skills list
 
-Inspect installed skill metadata, including whether each skill ships config, docker roots, C<aptfile>, or C<cpanfile>.
+Inspect installed skill metadata. The default output is a readable table, and
+C<-o json> returns structured output.
 
 Example 3:
 

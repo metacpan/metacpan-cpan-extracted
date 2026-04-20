@@ -12,7 +12,7 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 57;
+use Test::More tests => 64;
 use Test::More::UTF8;
 # use Test::NoWarnings;
 use Test::Exception;
@@ -56,7 +56,6 @@ unlink $ofile;
 my $msg = replication( $file, $info, ofile => $ofile, def => 1, ignore => 1 ) // [];
 
 is( @$msg, 0, "Test #2: '$file' without errors");
-
 
 sub read_file {
 	my $file = shift;
@@ -1176,8 +1175,9 @@ text by default (Trigger ON) %%%V: trigger
    SPECIFY VALUE 'C'! %%%V: C
  \= %%%ADD:
    SPECIFY VALUE 'D'! %%%V: D
-%%%ENDT: -- end of Template area (and myTable_hash also)
+%%%END: -- end of Template area (and myTable_hash also)
 \end{tabbing}
+SPECIFY END DOCUMENT! %%%V: endDocument
 etc...
 \end{document}
 |;
@@ -1201,7 +1201,8 @@ $info = {
 			{A=>10, B=>11, C=>12, D=>undef }, # row 1
 		],
 		paramUndef => undef,
-		trigger => "\x{001}1234567890",
+		trigger => "\x{001}",
+		endDocument => "\x{004}",
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // []; # debug => 0
@@ -1325,9 +1326,10 @@ $msg_ref_s = [
 '\\\\',
 '10 \=11 \=12',
 '\\end{tabbing}',
-'etc...',
 '\\end{document}',
 ];
+
+# 'etc...',
 
 is_deeply( $msg, $msg_ref_s, "Test #27.2: main example of USAGE");
 
@@ -1407,6 +1409,74 @@ lives_ok { $msg = read_file( $ofile_s ) } "Test #30.3: $ofile_s read";
 is_deeply( $msg, $msg_ref_s, "Test #30.4: STDOUT content was captured correctly");
 
 unlink $ofile_s;
+
+
+###Test 31
+
+$tex = q|
+~0~
+%%%VAR: array
+%%%V: 1-3,2%
+%%%VAR: hash
+~1~ %%%ADD:
+SPECIFY X ! %%%V: X ~X1~
+~2~ %%%ADDE:
+%%%V: Z ~Z1~
+~3~ %%%ADD:
+%%%V: Y ~Y1~
+%%%END:
+~
+~
+END DOCUMENT
+}
+|;
+
+lives_ok { &save_file( $file_s, \$tex ) } "Test #31.1: input template $file_s save";
+
+$info = { array=>[0,1,2,3], hash =>{ X=>'', Y=>"\x{003}", Z=>"\x{001}", }, };
+
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // [];
+
+my $msg_ref_31_2 = [];
+
+is_deeply( $msg, $msg_ref_31_2, 'Test #31.2: check errors for \x{003}');
+
+lives_ok { $msg = read_file( $ofile_s ) } "Test #31.3: output $ofile_s read";
+
+$msg_ref_s = [
+'',
+'~0~',
+'1232~1~',
+'',
+'~2~',
+'',
+'~3~',
+'\endinput',
+];
+
+is_deeply( $msg, $msg_ref_s, 'Test #31.4: \x{003} --> exists \endinput');
+
+unlink $ofile_s;
+
+
+$info->{array}[2] = "\x{004}";
+
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // [];
+
+is_deeply( $msg, $msg_ref_31_2, 'Test #31.5: check errors for \x{004} in array');
+
+lives_ok { $msg = read_file( $ofile_s ) } "Test #31.6: output $ofile_s read";
+
+$msg_ref_s = [
+'',
+'~0~',
+'1\end{document}',
+];
+
+is_deeply( $msg, $msg_ref_s, 'Test #31.7: \x{004} --> exists \endinput');
+
+unlink $ofile_s;
+
 
 rmtree('t/tmp');
 

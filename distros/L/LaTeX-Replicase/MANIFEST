@@ -1,11 +1,10 @@
 Changes
+CONTRIBUTING.md
 Makefile.PL
 README
 SECURITY.md
 LICENSE
 MANIFEST
-MYMETA.yml
-MYMETA.json
 MANIFEST.SKIP
 lib/LaTeX/Replicase.pm
 t/00-pod.t

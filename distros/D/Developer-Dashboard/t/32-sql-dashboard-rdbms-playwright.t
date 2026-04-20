@@ -24,7 +24,7 @@ my $node_bin     = _find_command('node');
 my $npx_bin      = _find_command('npx');
 my $git_bin      = _find_command('git');
 my $docker_bin   = _find_command('docker');
-my $chromium_bin = _find_command( qw(chromium chromium-browser google-chrome google-chrome-stable) );
+my $chromium_bin = _find_command( qw(google-chrome-stable google-chrome chromium-browser chromium) );
 
 plan skip_all => 'RDBMS SQL Playwright browser test requires node, npx, git, docker, and Chromium on PATH'
   if !$node_bin || !$npx_bin || !$git_bin || !$docker_bin || !$chromium_bin;
@@ -841,7 +841,9 @@ sub _find_command {
         next if !defined $candidate || $candidate eq '';
         for my $dir ( File::Spec->path() ) {
             my $path = File::Spec->catfile( $dir, $candidate );
-            return $path if -f $path && -x $path;
+            next if !-f $path || !-x $path;
+            next if $path eq '/snap/bin/chromium';
+            return $path;
         }
     }
     return undef;

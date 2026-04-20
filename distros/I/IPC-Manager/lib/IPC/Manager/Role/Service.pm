@@ -2,13 +2,13 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000027';
 
 # Not included in role:
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
 use List::Util qw/any/;
-use Time::HiRes qw/time sleep/;
+use Time::HiRes qw/time/;
 use Test2::Util::UUID qw/gen_uuid/;
 
 use IPC::Manager::Service::Handle();
@@ -20,7 +20,7 @@ with 'IPC::Manager::Role::Service::Select';
 with 'IPC::Manager::Role::Service::Requests';
 
 # Included in role:
-use IPC::Manager::Util qw/pid_is_running/;
+use IPC::Manager::Util qw/pid_is_running tinysleep/;
 
 requires qw{
     new
@@ -130,7 +130,7 @@ sub terminate_workers {
         }
 
         $self->reap_workers(kill => $kill);
-        sleep 0.05 if keys %$workers;
+        tinysleep(0.05) if keys %$workers;
     }
 }
 
@@ -428,7 +428,7 @@ sub watch {
 
         return \%activity if keys %activity;
 
-        sleep $cycle unless $select;
+        tinysleep($cycle) unless $select;
     }
 }
 

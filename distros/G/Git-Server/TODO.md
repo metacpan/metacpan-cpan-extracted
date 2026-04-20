@@ -5,7 +5,7 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - If running hooks/proxy shows 100% perfectly clean during the pre-write hook, then for the post-write hook, hooks/proxy is safe to rudely "--force" jam the sync to push to the remote $there repo every single branch and tag from $here, even if it rewrites history.
 
- - If proxy fails with the default Forwarding Agent, try each public key individually to see if any of them work any better.
+ - If proxy fails with the default Forwarding Agent, try each public key individually to see if any of them work any better. (-i PUB -o IdentitiesOnly=yes? Cache winning reader PUBs? Brick over reader PUB with known writer PUBs?).
 
  - Make sure ipc-parse can determine if action was actually performed or else the reason of why not.
 
@@ -15,11 +15,13 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - Investigate converting get_fork_hash common fork sniffer scan to use "git merge-base --fork-point <ref> <commit>" instead of grinding through the logs.
 
- - Make git-deploy remove temp files eariler so they won't exist during long waits for a push notification.
+ - Make git-deploy remove temp files eariler so they won't exist during long waits for a push notification. (un~FD_CLOEXEC unlink /dev/fd/3 anonymous handle?)
 
- - Make git-deploy brick over "local modified" files if the end target version is exactly the same.
+ - Make git-deploy brick over "local modified" files if the end target version is exactly the same. (git diff HEAD? rebase --autostash?)
 
- - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6.
+ - Make git-deploy --notify be able to signal other git-deploy processes running as another user. (Magic Listen Port? or Special ProcTitle?).
+
+ - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6. (~/.ssh/config Host $remotehost "AddressFamily" inet(6)?).
 
  - Add Support for HTTP protocol git read and write operations using Basic password Authorization (instead of only pubkeys over SSH protocol).
    * Design a way to support "git-deploy" feature via HTTP (through REMOTE_USER or DeployToken or URI flag or Special HTTP Header or PAT [Personal Access Token] or maybe some other mechanism). Allow client to specify max-delay seconds (default 90) in case nothing new is ready since last pull.
@@ -47,11 +49,12 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - [webhook] features for callback:
    * Allow for WhiteList or BlackList filters to trigger webhook or ignore webhooks under certain conditions:
+     : When a certain operation is performed, i.e., clone|pull|push
      : When specified branches are involved
      : When certain REMOTE_USER is involved
      : When coming from a specific IP or Network CIDR
-     : When certain files are affected (tricky for pull reads)
-     : When certain strings exist in any of the commit comments being pushed. (Tricky for pull reads.)
+     : When certain files are affected
+     : When certain strings exist in any of the commit comments being pushed.
    * provide failover queue retry mechanism fibinacci backoff until remote webhook server returns 2xx or 3xx status.
    * at least provide when FORCE push destroys branch history
      : common fork point hash

@@ -3,7 +3,7 @@ package Data::HashMap;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Data::HashMap', $VERSION);
@@ -14,7 +14,7 @@ __END__
 
 =head1 NAME
 
-Data::HashMap - Fast type-specialized hash maps implemented in C
+Data::HashMap - Fast type-specialized hash maps with TTL and LRU, in C
 
 =head1 SYNOPSIS
 
@@ -379,7 +379,7 @@ measured with 1M entries in fork-isolated processes.
 
 =item * Raw C strings (no Perl SV overhead) for string storage
 
-=item * UTF-8 flag packed into high bit of length fields; keys with different UTF-8 flags are treated as distinct even if bytes match
+=item * UTF-8 flag packed into high bit of length fields as metadata only; string keys with identical bytes collide regardless of UTF-8 flag, matching native Perl hash semantics. The stored flag reflects the most-recent put and controls how the key is returned from iteration.
 
 =item * Sentinel values for integer keys (INT_MIN, INT_MIN+1 are reserved and silently rejected). I16/I32 variants croak on out-of-range keys and values.
 
@@ -387,9 +387,11 @@ measured with 1M entries in fork-isolated processes.
 
 =item * Requires 64-bit Perl (C<use64bitint>); II/IS/IA/SI variants use int64 keys/values via IV
 
-=item * C<get_direct> returns a B<read-only> SV pointing at the map's internal buffer (zero-copy, no malloc). The returned value must not be held past any map mutation (C<put>, C<remove>, C<clear>, or any operation that may resize). Safe for immediate use: comparisons, printing, passing to functions. Use C<get> (the default) when you need to store the value.
+=item * C<get_direct> returns a B<read-only> SV pointing at the map's internal buffer (zero-copy, no malloc). The returned value must not be held past any map mutation (C<put>, C<remove>, C<clear>, or any operation that may resize). Safe for immediate use: comparisons, printing, passing to functions. Use C<get> (the default) when you need to store the value. Note: C<< my $d = $m->get_direct(...) >> copies the value via normal Perl assignment semantics, so the read-only guarantee applies only to the direct returned SV, not to any assigned-to scalar.
 
-=item * C<freeze>/C<thaw> produces a native-endian binary format; frozen data is not portable between systems with different byte orders
+=item * C<pop>/C<shift> filter TTL-expired entries out of results. In LRU mode they also reap expired tail/head entries (tombstone them). In non-LRU iteration mode they skip expired entries without tombstoning, so C<size> may remain non-zero; a subsequent read-path operation (C<get>, C<exists>, C<remove>) triggers lazy reaping.
+
+=item * C<freeze>/C<thaw> produces a native-endian binary format; frozen data is not portable between systems with different byte orders. Byte-identical output across C<freeze>-E<gt>C<thaw>-E<gt>C<freeze> is not guaranteed: bucket iteration order may drift across rehashes.
 
 =back
 

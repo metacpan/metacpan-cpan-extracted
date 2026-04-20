@@ -5,6 +5,7 @@ ready_good.tex
 .tar.gz
 LaTeX-Replicase-*
 README.md
+Replicase.html
 
 # Avoid version control files.
 \B\.git\b
@@ -48,7 +49,7 @@ README.md
 \B\.prove$
 
 # Avoid MYMETA files
-# ^MYMETA\.
+^MYMETA\.
 
 # Temp files for new META
-# ^META_new\.(?:json|yml)
+^META_new\.(?:json|yml)

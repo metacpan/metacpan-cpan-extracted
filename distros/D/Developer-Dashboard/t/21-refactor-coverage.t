@@ -576,6 +576,20 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
             'helper_content renders the shipped housekeeper helper body',
         );
     }
+    elsif ( $helper eq 'which' ) {
+        like(
+            $content,
+            qr/\Qrun_which_command( command => 'which', args => \@ARGV );\E/,
+            'helper_content renders the shipped which helper body',
+        );
+    }
+    elsif ( $helper eq 'complete' ) {
+        like(
+            $content,
+            qr/\Qdashboard complete <index> <word0> <word1> ...\E/,
+            'helper_content renders the shipped complete helper body',
+        );
+    }
     else {
         like(
             $content,
@@ -1515,8 +1529,103 @@ is( $manager->get_skill_path('missing'), undef, 'get_skill_path returns undef fo
 is( Developer::Dashboard::SkillManager::_extract_repo_name('bogus'), undef, '_extract_repo_name returns undef for strings without a repo path segment' );
 is( Developer::Dashboard::SkillManager::_extract_repo_name('https://example.invalid/owner/repo.git'), 'repo', '_extract_repo_name strips .git from repository URLs' );
 is( Developer::Dashboard::SkillManager::_extract_repo_name(''), undef, '_extract_repo_name returns undef for empty URLs' );
-is_deeply( $manager->install(''), { error => 'Missing Git URL' }, 'install rejects an empty Git URL' );
+is_deeply( $manager->install(''), { error => 'Missing skill source' }, 'install rejects an empty skill source' );
 like( $manager->install('https://example.invalid/not-a-repo.git')->{error}, qr/Failed to clone/, 'install reports git clone failures' );
+{
+    my $invalid_local_repo = File::Spec->catdir( $test_repos, 'invalid-local-skill' );
+    make_path($invalid_local_repo);
+    is_deeply(
+        $manager->install($invalid_local_repo),
+        { error => "Local skill source '$invalid_local_repo' is missing a .git directory" },
+        'install rejects local directories that are not checked-out git repositories',
+    );
+
+    make_path( File::Spec->catdir( $invalid_local_repo, '.git' ) );
+    is_deeply(
+        $manager->install($invalid_local_repo),
+        { error => "Local skill source '$invalid_local_repo' is missing a .env file with VERSION" },
+        'install rejects local checked-out repositories that are missing the qualification .env file',
+    );
+
+    open my $invalid_env_fh, '>', File::Spec->catfile( $invalid_local_repo, '.env' ) or die "Unable to write invalid local .env: $!";
+    print {$invalid_env_fh} "NAME=invalid\n";
+    close $invalid_env_fh;
+    is_deeply(
+        $manager->install($invalid_local_repo),
+        { error => "Local skill source '$invalid_local_repo' is missing a .env file with VERSION" },
+        'install rejects local checked-out repositories whose .env file has no VERSION key',
+    );
+}
+{
+    my $local_repo = _create_skill_repo( $test_repos, 'no-rsync-local-skill' );
+    open my $local_env_fh, '>', File::Spec->catfile( $local_repo, '.env' ) or die "Unable to write local fallback .env: $!";
+    print {$local_env_fh} "VERSION=1.00\n";
+    close $local_env_fh;
+
+    local *Developer::Dashboard::SkillManager::_rsync_available = sub { 0 };
+    my $local_install = $manager->install($local_repo);
+    ok( !$local_install->{error}, 'install falls back to the Perl local-copy path when rsync is unavailable' ) or diag $local_install->{error};
+    my $local_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $skill_paths );
+    my $local_dispatch = $local_dispatcher->dispatch( 'no-rsync-local-skill', 'run-test' );
+    like( $local_dispatch->{stdout}, qr/hooked/, 'rsync-free local install still leaves one runnable installed skill copy' );
+    my $local_uninstall = $manager->uninstall('no-rsync-local-skill');
+    ok( !$local_uninstall->{error}, 'rsync-free local install fixture can be removed after the fallback coverage' )
+      or diag $local_uninstall->{error};
+}
+{
+    my $sync_error_repo = _create_skill_repo( $test_repos, 'local-sync-error-skill', with_cpanfile => 0 );
+    open my $sync_error_env_fh, '>', File::Spec->catfile( $sync_error_repo, '.env' ) or die "Unable to write local sync error .env: $!";
+    print {$sync_error_env_fh} "VERSION=1.00\n";
+    close $sync_error_env_fh;
+
+    my $preexisting_target = File::Spec->catdir( $skill_paths->skills_root, 'local-sync-error-skill' );
+    make_path($preexisting_target);
+    _write_file( File::Spec->catfile( $preexisting_target, 'stale.txt' ), "stale\n" );
+
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::_remove_existing_skill_path = sub { return { success => 1 } };
+    local *Developer::Dashboard::SkillManager::_sync_local_skill_source     = sub { return { error => 'synthetic sync failure' } };
+
+    is_deeply(
+        $manager->install($sync_error_repo),
+        { error => 'synthetic sync failure' },
+        'install returns local sync failures for direct checked-out repositories',
+    );
+    ok( !-d $preexisting_target, 'install removes a pre-existing target tree when local sync fails mid-install' );
+}
+{
+    my $rsync_fail_bin = File::Spec->catdir( $ENV{HOME}, 'fake-rsync-bin' );
+    make_path($rsync_fail_bin);
+    _write_file(
+        File::Spec->catfile( $rsync_fail_bin, 'rsync' ),
+        "#!/bin/sh\nprintf 'rsync failed\\n' >&2\nexit 1\n",
+        0755,
+    );
+
+    local $ENV{PATH} = $rsync_fail_bin . ':' . ( $ENV{PATH} || '' );
+    local *Developer::Dashboard::SkillManager::_rsync_available = sub { 1 };
+
+    like(
+        $manager->_sync_local_skill_source( '/tmp/source-skill', '/tmp/target-skill' )->{error},
+        qr/^Failed to sync local skill source \/tmp\/source-skill: rsync failed/m,
+        '_sync_local_skill_source reports rsync stderr when rsync fails',
+    );
+}
+{
+    my $copy_source = File::Spec->catdir( $test_repos, 'copy-tree-error-source' );
+    my $copy_target = File::Spec->catdir( $test_repos, 'copy-tree-error-target' );
+    make_path($copy_source);
+    _write_file( File::Spec->catfile( $copy_source, 'file.txt' ), "copy me\n" );
+
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::copy = sub { 0 };
+
+    like(
+        $manager->_copy_tree( $copy_source, $copy_target )->{error},
+        qr/^Failed to sync local skill source \Q$copy_source\E without rsync: Unable to copy /,
+        '_copy_tree reports a local copy failure when one file cannot be copied',
+    );
+}
 is_deeply( $manager->update(''), { error => 'Missing repo name' }, 'update rejects an empty repo name' );
 is_deeply( $manager->uninstall(''), { error => 'Missing repo name' }, 'uninstall rejects an empty repo name' );
 is_deeply( $manager->update('missing-skill'), { error => "Skill 'missing-skill' not found" }, 'update rejects unknown skills' );
@@ -1526,8 +1635,28 @@ my $dep_repo = _create_skill_repo( $test_repos, 'dep-skill', with_cpanfile => 1,
 my $install = $manager->install( 'file://' . $dep_repo );
 ok( !$install->{error}, 'skill manager installs a skill with a cpanfile' ) or diag $install->{error};
 my $dep_skill_root = $manager->get_skill_path('dep-skill');
+_write_file(
+    File::Spec->catfile( $dep_repo, 'cli', 'run-test' ),
+    <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "reinstalled-dep-skill\n";
+PL
+    0755,
+);
+{
+    my $cwd = getcwd();
+    chdir $dep_repo or die "Unable to chdir to $dep_repo: $!";
+    _run_or_die(qw(git add .));
+    _run_or_die( 'git', 'commit', '-m', 'Reinstall dep skill update' );
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+}
 my $duplicate = $manager->install( 'file://' . $dep_repo );
-like( $duplicate->{error}, qr/already installed/, 'install rejects duplicate skill installs' );
+ok( !$duplicate->{error}, 'install acts as reinstall instead of rejecting duplicate skill installs' ) or diag $duplicate->{error};
+my $reinstall_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $skill_paths );
+my $reinstalled_dispatch = $reinstall_dispatcher->dispatch( 'dep-skill', 'run-test' );
+like( $reinstalled_dispatch->{stdout}, qr/reinstalled-dep-skill/, 'reinstall refreshes the already-installed git-backed skill content' );
 my $dep_install = $manager->_install_skill_dependencies( $manager->get_skill_path('dep-skill') );
 ok( !$dep_install->{error}, '_install_skill_dependencies succeeds for a skill with a cpanfile' ) or diag $dep_install->{error};
 ok( -f $apt_log, '_install_skill_dependencies records an apt-get invocation when the skill ships an aptfile' );
@@ -1674,15 +1803,30 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
         'uninstall reports remove_tree failures',
     );
 }
+{
+    my $replace_target = File::Spec->catdir( $test_repos, 'failing-replace-skill' );
+    make_path($replace_target);
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::remove_tree = sub {
+        my ( $path, $options ) = @_;
+        push @{ ${ $options->{error} } }, 'replace failed';
+        return;
+    };
+    is_deeply(
+        $manager->_remove_existing_skill_path($replace_target),
+        { error => "Failed to replace existing skill at $replace_target: replace failed" },
+        '_remove_existing_skill_path reports remove_tree failures while replacing an installed skill',
+    );
+}
 
 my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $skill_paths );
 is_deeply( $dispatcher->dispatch( '', 'run-test' ), { error => 'Missing skill name' }, 'dispatcher rejects missing skill names' );
 is_deeply( $dispatcher->dispatch( 'dep-skill', '' ), { error => 'Missing command name' }, 'dispatcher rejects missing command names' );
-is_deeply(
-    $dispatcher->dispatch( 'missing-skill', 'run-test' ),
-    { error => "Skill 'missing-skill' not found" },
-    'dispatcher rejects missing skills',
-);
+{
+    my $missing_skill = $dispatcher->dispatch( 'missing-skill', 'run-test' );
+    like( $missing_skill->{error}, qr/\ASkill 'missing-skill' not found\./, 'dispatcher rejects missing skills' );
+    like( $missing_skill->{error}, qr/\n\nDid you mean:\n/, 'missing-skill dispatch guidance includes suggestion heading' );
+}
 is_deeply( $dispatcher->execute_hooks( '', 'run-test' ), { hooks => {}, result_state => {} }, 'execute_hooks returns an empty result for missing skill names' );
 is_deeply( $dispatcher->execute_hooks( 'dep-skill', '' ), { hooks => {}, result_state => {} }, 'execute_hooks returns an empty result for missing command names' );
 is_deeply( $dispatcher->execute_hooks( 'missing-skill', 'run-test' ), { hooks => {}, result_state => {} }, 'execute_hooks returns an empty result for missing skills' );
@@ -1696,7 +1840,9 @@ is( $manager->get_skill_path('dep-skill'), undef, 'get_skill_path hides disabled
 ok( $manager->get_skill_path( 'dep-skill', include_disabled => 1 ), 'get_skill_path can still resolve disabled skills when explicitly requested' );
 is_deeply(
     $dispatcher->dispatch( 'dep-skill', 'run-test' ),
-    { error => "Skill 'dep-skill' is disabled" },
+    {
+        error => "Skill 'dep-skill' is disabled.\n\nEnable it with:\n  dashboard skills enable dep-skill\n",
+    },
     'dispatcher rejects disabled skills explicitly',
 );
 is_deeply( $dispatcher->execute_hooks( 'dep-skill', 'run-test' ), { hooks => {}, result_state => {} }, 'execute_hooks returns an empty result for disabled skills' );
@@ -1744,6 +1890,12 @@ is( $dispatcher->command_path( '', 'run-test' ), undef, 'command_path returns un
 is( $dispatcher->command_path( 'dep-skill', '' ), undef, 'command_path returns undef for missing command names' );
 is( $dispatcher->command_path( 'missing-skill', 'run-test' ), undef, 'command_path returns undef for unknown skills' );
 is( $dispatcher->command_path( 'dep-skill', 'missing' ), undef, 'command_path returns undef for missing skill commands' );
+is( $dispatcher->command_spec( '', 'run-test' ), undef, 'command_spec returns undef for missing skill names' );
+is(
+    $dispatcher->command_spec( 'dep-skill', 'run-test' )->{cmd_path},
+    File::Spec->catfile( $dep_skill_root, 'cli', 'run-test' ),
+    'command_spec returns the resolved command metadata for a valid installed skill command',
+);
 make_path( File::Spec->catdir( $dep_skill_root, 'skills', 'foo', 'cli' ) );
 _write_file(
     File::Spec->catfile( $dep_skill_root, 'skills', 'foo', 'cli', 'foo' ),
@@ -1777,10 +1929,20 @@ is(
     'dispatcher executes multi-level nested skills/<repo>/.../skills/<repo>/cli commands inside one installed skill',
 );
 is_deeply(
-    $dispatcher->dispatch( 'dep-skill', 'missing' ),
-    { error => "Command 'missing' not found in skill 'dep-skill'" },
-    'dispatcher rejects missing commands inside installed skills',
+    [ $dispatcher->command_hook_paths( 'dep-skill', 'run-test' ) ],
+    [ File::Spec->catfile( $dep_skill_root, 'cli', 'run-test.d', '00-pre.pl' ) ],
+    'command_hook_paths lists participating skill hook files in execution order',
 );
+is_deeply(
+    [ $dispatcher->command_hook_paths( 'dep-skill', 'level1.level2.here' ) ],
+    [],
+    'command_hook_paths returns an empty list when a nested skill command has no hook directory',
+);
+{
+    my $missing_command = $dispatcher->dispatch( 'dep-skill', 'missing' );
+    like( $missing_command->{error}, qr/\ACommand 'missing' not found in skill 'dep-skill'\./, 'dispatcher rejects missing commands inside installed skills' );
+    like( $missing_command->{error}, qr/\n\nDid you mean:\n/, 'missing skill command guidance includes suggestion heading' );
+}
 {
     no warnings 'redefine';
     local *Developer::Dashboard::SkillDispatcher::execute_hooks = sub {
@@ -1824,7 +1986,7 @@ is_deeply( $dispatcher->skill_nav_pages('no-nav-skill'), [], 'skill_nav_pages re
         result_state => { alpha => { stdout => "ok\n" } },
     );
     like( $env{PERL5LIB}, qr/\Q$local_lib\E/, '_skill_env prepends the skill-local perl library when present' );
-    like( $env{RESULT}, qr/alpha/, '_skill_env serializes RESULT state for skill hooks and commands' );
+    ok( !exists $env{RESULT}, '_skill_env leaves RESULT handoff to Runtime::Result instead of inlining it into the child env' );
 }
 is(
     $dispatcher->_hook_result_key('/tmp/skill/cli/run-test.d/00-pre.pl'),

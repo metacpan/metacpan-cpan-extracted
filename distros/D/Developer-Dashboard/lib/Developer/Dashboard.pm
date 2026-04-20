@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.56
+2.72
 
 =head1 INTRODUCTION
 
@@ -753,6 +753,12 @@ If F<cli/foo.java> is executable, C<dashboard foo> compiles it with C<javac>
 into an isolated temp directory and then runs the declared main class with
 C<java>.
 
+If a user mistypes a command, dashboard now prints an explicit unknown-command
+error together with the closest matching public command before the usual usage
+summary. The same guidance also applies to dotted skill commands, so
+C<dashboard alpha-skill.run-tset> suggests the nearest installed dotted skill
+command instead of only dumping generic help.
+
 C<DD-OOP-LAYERS> is now the runtime contract for the whole local ecosystem.
 Starting at F<~/.developer-dashboard> and walking down through every parent
 directory until the current working directory, every existing
@@ -798,6 +804,136 @@ codes, or the last recorded hook entry.
 If a Perl-backed command wants a compact final summary after its hook files
 run, it can also call C<Developer::Dashboard::Runtime::Result-E<gt>report()> to print a simple
 success/error report for each sorted hook file.
+
+=head3 Layered Env Files
+
+Environment files are part of the same C<DD-OOP-LAYERS> contract.
+When C<dashboard ...> runs, it loads every participating plain-directory env
+file and runtime-layer env file from root to leaf before command hooks,
+custom commands, or built-in helpers execute.
+
+That ordered runtime pass loads, when present:
+
+=over 4
+
+=item *
+
+F<E<lt>rootE<gt>/.env>
+
+=item *
+
+F<E<lt>rootE<gt>/.env.pl>
+
+=item *
+
+each deeper ancestor directory F<.env>
+
+=item *
+
+each deeper ancestor directory F<.env.pl>
+
+=item *
+
+each participating F<.developer-dashboard/.env>
+
+=item *
+
+each participating F<.developer-dashboard/.env.pl>
+
+=back
+
+Deeper files win because later layers overwrite earlier keys. Plain F<.env>
+files must contain explicit C<KEY=VALUE> lines, and the load order at one
+directory is always F<.env> first and then F<.env.pl>. Plain F<.env> parsing
+ignores blank lines, whole-line C<#> comments, whole-line C<//> comments, and
+C</* ... */> block comments that can span multiple lines. Plain F<.env>
+values also support:
+
+=over 4
+
+=item *
+
+leading C<~> expansion to C<$HOME>
+
+=item *
+
+C<$NAME> expansion from the current effective environment
+
+=item *
+
+C<${NAME:-default}> expansion with a fallback value
+
+=item *
+
+C<${Namespace::function():-default}> expansion through a static Perl function
+
+=back
+
+Expansion can see system env keys, values loaded from earlier layers, and
+values assigned by earlier lines in the same F<.env> file. Missing functions,
+malformed lines, malformed keys, and unterminated block comments fail
+explicitly instead of being skipped silently. Executable logic can live in
+F<.env.pl>, which is run directly and may set C<%ENV> programmatically.
+
+Skill-local env files are loaded only when a skill command or skill hook is
+actually running. A normal non-skill command inherits only the root-to-leaf
+runtime env chain. A skill command inherits that same runtime chain first and
+then loads each participating skill root from the base installed skill layer
+to the deepest matching child skill layer, applying:
+
+=over 4
+
+=item *
+
+F<E<lt>skill-rootE<gt>/.env>
+
+=item *
+
+F<E<lt>skill-rootE<gt>/.env.pl>
+
+=back
+
+This means a deeper skill env can override a shared runtime key, but that
+override stays isolated to the skill execution path and does not leak into
+unrelated commands.
+
+Perl code can inspect where a dashboard-managed env key came from with
+C<Developer::Dashboard::EnvAudit>.
+
+Single-key lookup:
+
+  use Developer::Dashboard::EnvAudit;
+
+  my $entry = Developer::Dashboard::EnvAudit->key('FOO');
+
+That returns either C<undef> for normal system env keys or a hashref like:
+
+  {
+      value   => 'bar',
+      envfile => '/full/path/to/.env',
+  }
+
+Full inventory lookup:
+
+  my $all = Developer::Dashboard::EnvAudit->keys;
+
+The audit records only dashboard-loaded env keys. System-provided keys that
+did not come from a dashboard-managed F<.env> or F<.env.pl> file are left
+untracked on purpose.
+
+For example, a layered F<.env> file can now look like:
+
+  # root defaults
+  ROOT_CACHE=~/cache
+  API_BASE=https://example.test
+  TOKEN=${ACCESS_TOKEN:-anonymous}
+  MESSAGE=${Local::Env::Helper::message():-hello}
+
+  /*
+  child layers can still override
+  any value later in the root-to-leaf chain
+  */
+  CHAINED=$ROOT_CACHE/$TOKEN
 
 =head2 Open File Commands
 
@@ -1013,15 +1149,23 @@ Inspect resolved paths:
   dashboard path resolve bookmarks_root
   dashboard path add foobar /tmp/foobar
   dashboard path del foobar
+  dashboard which jq
+  dashboard which layered-tool
+  dashboard which nest.level1.level2.here
 
 Custom path aliases are stored in the effective dashboard config root so shell
 helpers such as C<cdr foobar> and C<which_dir foobar> keep working across
 sessions. When a project-local F<./.developer-dashboard> tree exists, alias
-writes go there first; otherwise they go to the home runtime. When an alias
-points inside the current home directory, the stored config uses C<$HOME/...>
-instead of a hard-coded absolute home path so a shared fallback runtime
-remains portable across different developer accounts. Re-adding an existing
-alias updates it without error, and deleting a missing alias is also safe.
+writes go there first; otherwise they go to the home runtime. Under
+C<DD-OOP-LAYERS>, that write stays local to the deepest participating layer:
+adding one child-layer alias does not copy inherited parent C<config.json>
+domains into the child file. The child layer keeps only its own new delta and
+still inherits the rest from home and parent layers at read time. When an
+alias points inside the current home directory, the stored config uses
+C<$HOME/...> instead of a hard-coded absolute home path so a shared fallback
+runtime remains portable across different developer accounts. Re-adding an
+existing alias updates it without error, and deleting a missing alias is also
+safe.
 
 C<cdr> now follows a two-stage path flow instead of only jumping to one alias
 or one top-level project name. If the first argument resolves as a saved alias
@@ -1060,6 +1204,22 @@ hash by hand. If you need a fresh path registry object from that public Folder
 inventory, call C<Developer::Dashboard::PathRegistry-E<gt>new_from_all_folders>.
 If you need a collector store from the same Folder-derived runtime roots, call
 C<Developer::Dashboard::Collector-E<gt>new_from_all_folders>.
+
+The hashed C<state_root>, C<collectors_root>, C<indicators_root>, and
+C<sessions_root> paths live under the shared temp state tree, not inside the
+layered runtime config tree. If a reboot or temp cleanup removes one of those
+hashed state roots, the path registry recreates it automatically the next time
+dashboard code resolves the path and rewrites the matching F<runtime.json>
+metadata file before collectors, indicators, or sessions use it again.
+
+Use C<dashboard which E<lt>targetE<gt>> to inspect what C<dashboard> would
+execute before you run it. The command prints one
+C<COMMAND /full/path> line for the resolved file and then one
+C<HOOK /full/path> line for each participating hook in runtime execution
+order. That works for built-in helpers such as C<jq>, layered custom commands
+such as C<layered-tool>, single-level skill commands such as
+C<example-skill.somecmd>, and multi-level nested skill commands such as
+C<nest.level1.level2.here>.
 
 Render shell bootstrap for bash, zsh, POSIX sh, or PowerShell:
 
@@ -1314,6 +1474,12 @@ collector has produced real output it appears as missing. Prompt output
 renders an explicit status glyph in front of the collector icon, so
 successful checks show fragments such as C<✅🔑> while failing or not-yet-run
 checks show fragments such as C<🚨🔑>.
+Under C<DD-OOP-LAYERS>, a deeper child layer no longer pins an inherited
+collector indicator at that default C<missing> placeholder just because the
+child runtime has its own F<.developer-dashboard/> folder. If the child layer
+does not override that collector config and only has the placeholder state,
+dashboard now falls back to the nearest inherited real collector state such
+as a parent-layer C<ok> result instead of turning the same indicator red.
 The top-right browser status strip now uses that same configured icon instead
 of falling back to the collector name, and stale managed indicators are
 removed automatically if the collector config is renamed. The browser chrome
@@ -1401,6 +1567,7 @@ Generate shell bootstrap:
   dashboard shell ps
 
 The generated shell helper keeps the same bookmark-aware C<cdr>, C<dd_cdr>,
+C<d2>,
 and C<which_dir> functions across all supported shells. C<cdr> first tries a
 saved alias, then falls back to an AND-matched directory search beneath the
 alias root or the current directory depending on whether that first argument
@@ -1416,11 +1583,26 @@ to a prompt command that does not depend on bash-only prompt escapes, and
 PowerShell installs a C<prompt> function instead of using the POSIX C<PS1>
 variable.
 
+C<d2> is the short shell shortcut for C<dashboard>, so after loading the
+bootstrap you can run C<d2 version>, C<d2 doctor>, or
+C<d2 docker compose ps> without typing the full command name each time.
+
+The same generated bootstrap also wires live tab completion for C<dashboard>
+and C<d2>. Bash registers C<_dashboard_complete>, zsh registers
+C<_dashboard_complete_zsh>, and PowerShell registers
+C<Register-ArgumentCompleter> for both command names. Completion candidates
+come from the live runtime instead of a hardcoded shell list, so built-in
+commands, layered custom CLI commands, and installed dotted skill commands
+all show up in suggestions.
+
 For the POSIX shell bootstrap, the generated helper now decodes its JSON
 payloads through the same Perl interpreter that generated the shell fragment
 instead of a bare C<perl -MJSON::XS ...> call. That keeps C<cdr> and
 C<which_dir> stable on macOS installs where C</usr/bin/perl> and a user-local
-C<~/perl5> XS stack do not belong to the same Perl build.
+C<~/perl5> XS stack do not belong to the same Perl build. The generated
+C<d2> shortcut re-enters the C<dashboard> script directly instead of
+hardcoding the current Perl binary path, so the shortcut still works when the
+bootstrap is loaded by a shell whose preferred Perl lives somewhere else.
 
 On Windows, C<dashboard shell> auto-selects PowerShell by default, and
 interpreter-backed runtime entrypoints such as collector C<command> strings,
@@ -1584,7 +1766,7 @@ C<dashboard stop> stops both the web service and managed collector loops
 
 =item *
 
-C<dashboard restart> stops both, starts configured collector loops again, then starts the web service
+C<dashboard restart> stops both, starts configured collector loops again, then starts the web service, and only reports success after the replacement collector loops and web runtime both survive a short managed stability window, with the web side still holding a live managed pid and an accepting listener on the requested port
 
 =item *
 
@@ -1674,7 +1856,10 @@ passes. It also fails if stale unpacked C<Developer-Dashboard-X.XX/> build
 directories remain beside the current tarball, so artifact cleanup is now an
 enforced release invariant instead of a manual habit. Do not trust
 source-tree kwalitee probes for this repository; use the built tarball
-because that is the artifact PAUSE and CPANTS actually inspect.
+because that is the artifact PAUSE and CPANTS actually inspect. The CPANTS
+modules used by this gate stay release-only and must not leak into the
+generated install-time test prerequisites for blank-environment C<cpanm>
+verification.
 Tests that depend on a missing or empty environment variable now establish that
 state explicitly inside the test file, rather than assuming the parent shell
 or install harness starts clean.
@@ -1852,6 +2037,11 @@ are embedded directly in the command script.
 Installed copies resolve the same seeded pages and helper assets from the
 distribution share directory, so C<dashboard init> works after a C<cpanm>
 install and not just from a source checkout.
+When C<dashboard> re-execs a Perl-backed helper or hook, it also forces the
+same active dashboard F<lib/> root into that child Perl process. That keeps
+thin switchboard handoff on the current checkout code instead of drifting onto
+an older installed C<Developer::Dashboard> copy that may also be visible in
+C<PERL5LIB>.
 
 The seeded C<api-dashboard> bookmark now behaves like a local Postman-style
 workspace. It keeps multiple request tabs in browser-local state, supports
@@ -1969,15 +2159,24 @@ per-database notes for that workspace.
 
 =head2 Skills System
 
-Extend dashboard with Git-backed skill packages:
+Extend dashboard with isolated skill packages:
 
-Install a skill from a Git repository:
+Install a skill from either a Git repository URL or a local checked-out skill
+repository:
 
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills install https://github.com/user/example-skill.git
+  dashboard skills install /absolute/path/to/example-skill
 
-The repository is cloned into its own isolated skill root under the deepest
-participating C<DD-OOP-LAYERS> runtime. In a home-only session that is
+Git sources are cloned. Direct local checked-out directories are synced in
+place instead of recloned, using C<rsync> when it is available and the
+built-in Perl tree-copy fallback when it is not. That means
+C<dashboard skills install> also acts as reinstall and update for an already
+installed skill. A direct local directory is only accepted when it is a
+checked-out Git repository with a F<.git/> directory plus a F<.env> file that
+declares C<VERSION=...>; otherwise the install is rejected. The installed
+copy lives in its own isolated skill root under the deepest participating
+C<DD-OOP-LAYERS> runtime. In a home-only session that is
 F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. In a deeper project
 layer that already has its own F<.developer-dashboard/>, the install target
 becomes
@@ -2002,10 +2201,15 @@ override.
 List installed skills:
 
   dashboard skills list
-  dashboard skills list -o table
+  dashboard skills list -o json
 
-The default output is JSON. It returns a C<skills> array where each item
-reports:
+The default output is a padded table with the columns C<Repo>, C<Enabled>,
+C<CLI>, C<Pages>, C<Docker>, C<Collectors>, and C<Indicators>. The
+C<Enabled> column prints the readable values C<enabled> or C<disabled> so the
+table stays aligned and copied terminal output stays unambiguous.
+
+Use C<-o json> when you want structured output. It returns a C<skills> array
+where each item reports:
 
 =over 4
 
@@ -2030,11 +2234,6 @@ CLI command, page, docker service, collector, and indicator counts
 JSON booleans for C<has_config>, C<has_aptfile>, and C<has_cpanfile>
 
 =back
-
-Use C<-o table> for a terminal view with the columns C<Repo>, C<Enabled>,
-C<CLI>, C<Pages>, C<Docker>, C<Collectors>, and C<Indicators>. The
-C<Enabled> column uses green and red tick markers so disabled skills stand out
-immediately.
 
 Inspect one installed skill:
 
@@ -2121,6 +2320,18 @@ ships C<cli/somecmd>, C<dashboard example-skill.somecmd> resolves the correct
 layered skill command. If the active child layer for that same repo omits
 C<cli/somecmd>, the command falls back to the nearest inherited skill layer
 that still provides it.
+
+If the skill command itself lives below nested
+C<skills/E<lt>repoE<gt>/.../skills/E<lt>repoE<gt>> trees, the same dotted
+public form keeps walking those nested skill roots until it resolves the final
+C<cli/E<lt>cmdE<gt>> file. For example:
+
+  dashboard nest.level1.level2.here
+  dashboard which nest.level1.level2.here
+
+The first command executes the nested skill command. The second prints the
+resolved nested C<cli/here> file plus any matching hook files that would run
+before it.
 Nested skill trees under C<skills/E<lt>repoE<gt>/cli/> stay reachable through
 that same public dotted route, including multiple nested levels. For example,
 if C<example-skill> ships C<skills/foo/skills/bar/cli/baz>, then
@@ -2204,6 +2415,12 @@ each hook result is appended to C<RESULT>
 =item *
 
 the immediately previous hook payload is exposed through C<LAST_RESULT>
+
+=item *
+
+oversized hook payloads spill into C<RESULT_FILE> or
+C<LAST_RESULT_FILE> before later skill hook or command execs would hit the
+kernel arg/env limit
 
 =item *
 

@@ -5,15 +5,17 @@ use warnings;
 use utf8;
 
 use Capture::Tiny qw(capture);
-use Cwd qw(getcwd);
+use Cwd qw(abs_path getcwd);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
 use File::Temp qw(tempdir);
 use JSON::XS qw(decode_json);
+use Developer::Dashboard::Runtime::Result;
 use Test::More;
 
 use lib 'lib';
 use Developer::Dashboard::Config;
+use Developer::Dashboard::EnvAudit;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SkillDispatcher;
@@ -50,6 +52,13 @@ SH
     0755,
 );
 local $ENV{PATH} = join ':', $fake_bin, ( $ENV{PATH} || () );
+
+sub _portable_path {
+    my ($path) = @_;
+    return undef if !defined $path;
+    my $resolved = eval { abs_path($path) };
+    return defined $resolved && $resolved ne '' ? $resolved : $path;
+}
 
 my $paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
 my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
@@ -188,9 +197,16 @@ my ( $cli_install_stdout, $cli_install_stderr, $cli_install_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'list' );
 };
 is( $cli_install_exit >> 8, 0, 'dashboard skills list exits cleanly' );
-my $cli_list = decode_json($cli_install_stdout);
-is( scalar( @{ $cli_list->{skills} } ), 1, 'dashboard skills list reports installed skills' );
-ok( $cli_list->{skills}[0]{enabled}, 'dashboard skills list reports enabled state in JSON output' );
+like( $cli_install_stdout, qr/^Repo\s+Enabled\s+CLI\s+Pages\s+Docker\s+Collectors\s+Indicators/m, 'dashboard skills list defaults to table output with aligned headings' );
+like( $cli_install_stdout, qr/^alpha-skill\s+enabled\s+1\s+1\s+1\s+1\s+1/m, 'dashboard skills list default table renders readable aligned values' );
+
+my ( $cli_json_stdout, $cli_json_stderr, $cli_json_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'list', '-o', 'json' );
+};
+is( $cli_json_exit >> 8, 0, 'dashboard skills list -o json exits cleanly' );
+my $cli_list = decode_json($cli_json_stdout);
+is( scalar( @{ $cli_list->{skills} } ), 1, 'dashboard skills list -o json reports installed skills' );
+ok( $cli_list->{skills}[0]{enabled}, 'dashboard skills list -o json reports enabled state in JSON output' );
 
 my ( $cli_usage_stdout, $cli_usage_stderr, $cli_usage_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'usage', 'alpha-skill' );
@@ -236,6 +252,167 @@ ok( !$deep_nested_dispatch->{error}, 'dispatcher resolves multi-level nested ski
   or diag $deep_nested_dispatch->{error};
 like( $deep_nested_dispatch->{stdout}, qr/deep:four/, 'multi-level nested skill command executes from its deepest nested cli root' );
 
+{
+    my $env_runtime_home = tempdir( CLEANUP => 1 );
+    my $previous_cwd = getcwd();
+    local $ENV{HOME} = $env_runtime_home;
+    my $env_project_root = File::Spec->catdir( $env_runtime_home, 'env-skill-project' );
+    my $env_child_root   = File::Spec->catdir( $env_project_root, 'child' );
+    make_path(
+        File::Spec->catdir( $env_runtime_home, '.developer-dashboard' ),
+        File::Spec->catdir( $env_project_root, '.git' ),
+        File::Spec->catdir( $env_child_root, '.developer-dashboard' ),
+    );
+    chdir $env_child_root or die "Unable to chdir to $env_child_root: $!";
+    open my $root_env_fh, '>:raw', File::Spec->catfile( $env_runtime_home, '.env' ) or die "Unable to write root .env: $!";
+    print {$root_env_fh} "ROOT_SCOPE_ENV=root\nSHARED_SCOPE_ENV=runtime-home\nHOME_SCOPE_ENV=~/skill-home\n";
+    close $root_env_fh or die "Unable to close root .env: $!";
+    open my $child_env_fh, '>:raw', File::Spec->catfile( $env_child_root, '.env' ) or die "Unable to write child .env: $!";
+    print {$child_env_fh} "CHILD_SCOPE_ENV=child\nSHARED_SCOPE_ENV=runtime-child\n";
+    close $child_env_fh or die "Unable to close child .env: $!";
+    open my $child_runtime_pl_fh, '>:raw', File::Spec->catfile( $env_child_root, '.developer-dashboard', '.env.pl' )
+      or die "Unable to write child runtime .env.pl: $!";
+    print {$child_runtime_pl_fh} "\$ENV{RUNTIME_PL_SCOPE_ENV} = 'runtime-child-pl';\n1;\n";
+    close $child_runtime_pl_fh or die "Unable to close child runtime .env.pl: $!";
+
+    my $env_paths = Developer::Dashboard::PathRegistry->new( home => $env_runtime_home );
+    my $env_manager = Developer::Dashboard::SkillManager->new( paths => $env_paths );
+    my $env_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $env_paths );
+    my $env_skill_root = File::Spec->catdir( $env_paths->skills_root, 'env-layer-skill' );
+    make_path(
+        File::Spec->catdir( $env_skill_root, 'cli' ),
+        File::Spec->catdir( $env_skill_root, 'config' ),
+        File::Spec->catdir( $env_skill_root, 'skills', 'childscope' ),
+    );
+    _write_file(
+        File::Spec->catfile( $env_skill_root, 'cli', 'show' ),
+        <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use JSON::XS qw(encode_json);
+use Developer::Dashboard::EnvAudit;
+print encode_json(
+    {
+        root       => $ENV{ROOT_SCOPE_ENV},
+        child      => $ENV{CHILD_SCOPE_ENV},
+        runtime_pl => $ENV{RUNTIME_PL_SCOPE_ENV},
+        home_scope => $ENV{HOME_SCOPE_ENV},
+        skill_only => $ENV{SKILL_ONLY_ENV},
+        skill_chain => $ENV{SKILL_CHAIN_ENV},
+        skill_pl_chain => $ENV{SKILL_PL_CHAIN_ENV},
+        shared     => $ENV{SHARED_SCOPE_ENV},
+        audit      => Developer::Dashboard::EnvAudit->key('SHARED_SCOPE_ENV'),
+    }
+), "\n";
+PL
+        0755,
+    );
+    _write_file(
+        File::Spec->catfile( $env_skill_root, '.env' ),
+        "SKILL_ONLY_ENV=home-skill\nSHARED_SCOPE_ENV=skill-home\nSKILL_CHAIN_ENV=\$SHARED_SCOPE_ENV/from-skill-env\n",
+        0644,
+    );
+    my $env_child_skill_root = File::Spec->catdir( $env_child_root, '.developer-dashboard', 'skills', 'env-layer-skill' );
+    make_path( File::Spec->catdir( $env_child_skill_root, 'config' ) );
+    _write_file(
+        File::Spec->catfile( $env_child_skill_root, '.env.pl' ),
+        "\$ENV{SKILL_CHILD_ENV} = 'child-skill';\n\$ENV{SHARED_SCOPE_ENV} = 'skill-child';\n\$ENV{SKILL_PL_CHAIN_ENV} = \"\$ENV{SKILL_CHAIN_ENV}/from-skill-pl\";\n1;\n",
+        0644,
+    );
+
+    my $env_dispatch = $env_dispatcher->dispatch('env-layer-skill', 'show');
+    ok( !$env_dispatch->{error}, 'dispatcher loads layered runtime env files plus skill-local env files when one skill command runs' )
+      or diag $env_dispatch->{error};
+    my $env_dispatch_payload = decode_json( $env_dispatch->{stdout} );
+    is( $env_dispatch_payload->{root}, 'root', 'skill dispatch inherits the home runtime env layer' );
+    is( $env_dispatch_payload->{child}, 'child', 'skill dispatch inherits the child runtime env layer' );
+    is( $env_dispatch_payload->{runtime_pl}, 'runtime-child-pl', 'skill dispatch inherits runtime .env.pl values before command execution' );
+    is( $env_dispatch_payload->{home_scope}, File::Spec->catdir( $env_runtime_home, 'skill-home' ), 'skill dispatch inherits tilde-expanded runtime env values' );
+    is( $env_dispatch_payload->{skill_only}, 'home-skill', 'skill dispatch loads the base skill .env file' );
+    is( $env_dispatch_payload->{skill_chain}, 'skill-home/from-skill-env', 'skill dispatch expands skill .env values from earlier keys in the same skill env file' );
+    is( $env_dispatch_payload->{skill_pl_chain}, 'skill-home/from-skill-env/from-skill-pl', 'skill dispatch loads skill .env before skill .env.pl within the same skill layer' );
+    is( $env_dispatch_payload->{shared}, 'skill-child', 'skill-local env files override inherited runtime values for the running skill' );
+    is(
+        _portable_path( $env_dispatch_payload->{audit}{envfile} ),
+        _portable_path( File::Spec->catfile( $env_child_skill_root, '.env.pl' ) ),
+        'skill dispatch exposes env audit metadata for the effective deepest skill env source',
+    );
+
+    my ( $dotted_stdout, $dotted_stderr, $dotted_exit ) = capture {
+        system( $^X, '-I', 'lib', $repo_bin, 'env-layer-skill.show' );
+    };
+    is( $dotted_exit >> 8, 0, 'dashboard <skill>.<command> loads runtime and skill env layers through the public dotted switchboard path' );
+    my $dotted_payload = decode_json($dotted_stdout);
+    is( $dotted_payload->{shared}, 'skill-child', 'dashboard <skill>.<command> keeps the deepest skill env override through the public path' );
+    chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    my $oversized_skill_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'oversized-result-skill' );
+    make_path( File::Spec->catdir( $oversized_skill_root, 'cli', 'show.d' ) );
+    _write_file(
+        File::Spec->catfile( $oversized_skill_root, 'cli', 'show.d', '00-big.pl' ),
+        <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print STDERR 'X' x 5000;
+PL
+        0755,
+    );
+    _write_file(
+        File::Spec->catfile( $oversized_skill_root, 'cli', 'show.d', '01-check.pl' ),
+        <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Developer::Dashboard::Runtime::Result;
+my $last = Developer::Dashboard::Runtime::Result::last_result() || {};
+print STDERR $last->{file} || '';
+PL
+        0755,
+    );
+    _write_file(
+        File::Spec->catfile( $oversized_skill_root, 'cli', 'show' ),
+        <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use JSON::XS qw(encode_json);
+use Developer::Dashboard::Runtime::Result;
+my $results = Developer::Dashboard::Runtime::Result::current();
+print encode_json(
+    {
+        result_file  => ( $ENV{RESULT_FILE} ? 1 : 0 ),
+        result_env   => ( defined $ENV{RESULT} && $ENV{RESULT} ne '' ? 1 : 0 ),
+        hook_length  => length( Developer::Dashboard::Runtime::Result::stderr('00-big.pl') || '' ),
+        prior_seen   => Developer::Dashboard::Runtime::Result::stderr('01-check.pl'),
+        last_file    => ( Developer::Dashboard::Runtime::Result::last_result() || {} )->{file},
+    }
+), "\n";
+PL
+        0755,
+    );
+    _write_file(
+        File::Spec->catfile( $oversized_skill_root, 'config', 'config.json' ),
+        qq|{"skill_name":"oversized-result-skill"}\n|,
+        0644,
+    );
+
+    local $ENV{DEVELOPER_DASHBOARD_RESULT_INLINE_MAX} = 64;
+    my $oversized_dispatch = $dispatcher->dispatch( 'oversized-result-skill', 'show' );
+    ok( !$oversized_dispatch->{error}, 'skill dispatch survives oversized hook RESULT payloads by spilling to RESULT_FILE' )
+      or diag $oversized_dispatch->{error};
+    my $oversized_payload = decode_json( $oversized_dispatch->{stdout} );
+    ok( $oversized_payload->{result_file}, 'skill command sees RESULT_FILE when hook RESULT exceeds the inline limit' );
+    ok( !$oversized_payload->{result_env}, 'skill command does not rely on inline RESULT when the hook RESULT spills to a file' );
+    is( $oversized_payload->{hook_length}, 5000, 'skill command can read the full oversized hook stdout through Runtime::Result' );
+    like( $oversized_payload->{prior_seen}, qr/00-big\.pl\z/, 'later skill hooks see the immediate previous hook through LAST_RESULT before the final command runs' );
+    like( $oversized_payload->{last_file}, qr/01-check\.pl\z/, 'skill command sees the immediate previous hook through LAST_RESULT' );
+    remove_tree($oversized_skill_root);
+}
+
 my $beta_repo = _create_skill_repo(
     'beta-skill',
     command_body => <<'PL',
@@ -248,6 +425,40 @@ PL
 my $beta_install = $manager->install( 'file://' . $beta_repo );
 ok( !$beta_install->{error}, 'second skill installs without interfering with the first one' ) or diag $beta_install->{error};
 is( scalar( @{ $manager->list } ), 2, 'multiple isolated skills can coexist' );
+
+{
+    my $local_repo = _create_skill_repo(
+        'local-reinstall-skill',
+        command_body => <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "local-v1\n";
+PL
+    );
+    _write_file( File::Spec->catfile( $local_repo, '.env' ), "VERSION=1.00\n", 0644 );
+    my $local_install = $manager->install($local_repo);
+    ok( !$local_install->{error}, 'local checked-out skill installs through the direct directory path' ) or diag $local_install->{error};
+    my $local_dispatch = $dispatcher->dispatch( 'local-reinstall-skill', 'run-test' );
+    like( $local_dispatch->{stdout}, qr/local-v1/, 'local checked-out skill command executes after install' );
+
+    _write_file(
+        File::Spec->catfile( $local_repo, 'cli', 'run-test' ),
+        <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "local-v2\n";
+PL
+        0755,
+    );
+    my $reinstall = $manager->install($local_repo);
+    ok( !$reinstall->{error}, 'install acts as reinstall for an already-installed local checked-out skill' ) or diag $reinstall->{error};
+    my $reinstall_dispatch = $dispatcher->dispatch( 'local-reinstall-skill', 'run-test' );
+    like( $reinstall_dispatch->{stdout}, qr/local-v2/, 'reinstall refreshes the installed local skill checkout content' );
+    my $local_uninstall = $manager->uninstall('local-reinstall-skill');
+    ok( !$local_uninstall->{error}, 'temporary local checked-out skill can be removed after reinstall coverage' ) or diag $local_uninstall->{error};
+}
 
 my $disable = $manager->disable('alpha-skill');
 ok( !$disable->{error}, 'disable marks an installed skill as disabled' ) or diag $disable->{error};
@@ -265,7 +476,11 @@ is_deeply(
     ],
     'installed_skill_docker_roots can include disabled skill docker roots when requested',
 );
-is( $dispatcher->dispatch( 'alpha-skill', 'run-test', 'disabled' )->{error}, "Skill 'alpha-skill' is disabled", 'disabled skills no longer dispatch commands' );
+like(
+    $dispatcher->dispatch( 'alpha-skill', 'run-test', 'disabled' )->{error},
+    qr/^Skill 'alpha-skill' is disabled\./,
+    'disabled skills no longer dispatch commands',
+);
 is_deeply(
     [ map { $_->{name} } @{ $fleet_config->collectors } ],
     [ 'housekeeper', 'system.collector' ],
@@ -466,6 +681,18 @@ my ( $dotted_skill_stdout, $dotted_skill_stderr, $dotted_skill_exit ) = capture 
 };
 is( $dotted_skill_exit >> 8, 0, 'dashboard <skill>.<command> dispatch exits cleanly' );
 like( $dotted_skill_stdout, qr/updated:cli-dot/, 'dashboard <skill>.<command> routes into the installed skill command' );
+my ( $dotted_skill_typo_stdout, $dotted_skill_typo_stderr, $dotted_skill_typo_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'alpha-skill.run-tset', 'cli-dot' );
+};
+is( $dotted_skill_typo_exit >> 8, 1, 'dashboard <skill>.<command> exits non-zero for an unknown dotted skill command' );
+like( $dotted_skill_typo_stdout . $dotted_skill_typo_stderr, qr/Command 'run-tset' not found in skill 'alpha-skill'/, 'dashboard reports the missing dotted skill command explicitly' );
+like( $dotted_skill_typo_stdout . $dotted_skill_typo_stderr, qr/Did you mean:\s+dashboard alpha-skill\.run-test/s, 'dashboard suggests the closest installed dotted skill command when the command tail is mistyped' );
+my ( $skill_which_stdout, $skill_which_stderr, $skill_which_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'which', 'alpha-skill.run-test' );
+};
+is( $skill_which_exit >> 8, 0, 'dashboard which <skill>.<command> exits cleanly' );
+like( $skill_which_stdout, qr/^COMMAND \Q@{[ File::Spec->catfile( $install->{path}, 'cli', 'run-test' ) ]}\E$/m, 'dashboard which <skill>.<command> reports the resolved skill command path' );
+like( $skill_which_stdout, qr/^HOOK \Q@{[ File::Spec->catfile( $install->{path}, 'cli', 'run-test.d', '00-pre.pl' ) ]}\E$/m, 'dashboard which <skill>.<command> reports the participating skill hook file' );
 
 make_path( File::Spec->catdir( $install->{path}, 'skills', 'foo', 'cli' ) );
 _write_file(
@@ -483,6 +710,11 @@ my ( $nested_skill_stdout, $nested_skill_stderr, $nested_skill_exit ) = capture 
 };
 is( $nested_skill_exit >> 8, 0, 'dashboard <skill>.<nested-skill>.<command> dispatch exits cleanly' );
 like( $nested_skill_stdout, qr/nested:nested-arg/, 'dashboard dotted dispatch resolves nested skills/<repo>/cli commands inside an installed skill' );
+my ( $nested_which_stdout, $nested_which_stderr, $nested_which_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'which', 'alpha-skill.foo.foo' );
+};
+is( $nested_which_exit >> 8, 0, 'dashboard which <skill>.<nested-skill>.<command> exits cleanly' );
+like( $nested_which_stdout, qr/^COMMAND \Q@{[ File::Spec->catfile( $install->{path}, 'skills', 'foo', 'cli', 'foo' ) ]}\E$/m, 'dashboard which resolves nested skill commands to the deepest nested cli file' );
 
 my ( $uninstall_stdout, $uninstall_stderr, $uninstall_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'uninstall', 'alpha-skill' );

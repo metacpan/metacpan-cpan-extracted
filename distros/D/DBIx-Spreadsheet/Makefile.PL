@@ -53,6 +53,7 @@ my %module = (
         'Spreadsheet::Read'  => '0.82', # more fixes for OO support
         'DBD::SQLite'        => '1.44', # we need virtual table support, diagnosed by Alexandr Ciornii
         'DBIx::RunSQL'       => '0',
+        'PerlIO::gzip'       => '0',
         'Text::Unidecode'    => '0',
         'Text::CleanFragment'=> '0',
         'Filesys::Notify::Simple' => '0',

@@ -103,6 +103,7 @@ my @perl_scripts = (
       shell
       doctor
       skills
+      which
     ),
     ),
     (

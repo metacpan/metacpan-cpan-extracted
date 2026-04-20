@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 1;
 
@@ -23,6 +23,7 @@ Developer::Dashboard::SKILLS - shipped skill authoring reference for Developer D
 Skill lifecycle:
 
   dashboard skills install git@github.com:user/example-skill.git
+  dashboard skills install /absolute/path/to/example-skill
   dashboard skills update example-skill
   dashboard skills list
   dashboard example-skill.hello arg1 arg2
@@ -78,7 +79,15 @@ Create a Git repository with at least:
 
 Install it:
 
+  # from Git
   dashboard skills install file:///absolute/path/to/example-skill
+  # or from a direct checked-out local repo with .git/ and .env VERSION=...
+  dashboard skills install /absolute/path/to/example-skill
+
+Repeated C<dashboard skills install ...> calls reinstall or refresh the
+isolated installed copy instead of failing on an existing repo name, using
+C<rsync> when it is available for direct local checkouts and a built-in Perl
+tree-copy fallback when it is not.
 
 Run its command:
 
@@ -115,10 +124,11 @@ invoked as C<dashboard E<lt>repo-nameE<gt>.foo.bar.baz>.
 
 Executable hook files for a command. They run in sorted order before the main
 command. Their results are serialized into C<RESULT>, the immediate previous
-hook is exposed through C<LAST_RESULT>, and later hooks stop only when a hook
-writes C<[[STOP]]> to C<stderr>. Executable F<.go> hooks run through
-C<go run>. Executable F<.java> hooks compile with C<javac> and then run
-through C<java>.
+hook is exposed through C<LAST_RESULT>, and oversized hook payloads spill into
+C<RESULT_FILE> or C<LAST_RESULT_FILE> before later skill hook or command execs
+would hit the kernel arg/env limit. Later hooks stop only when a hook writes
+C<[[STOP]]> to C<stderr>. Executable F<.go> hooks run through C<go run>.
+Executable F<.java> hooks compile with C<javac> and then run through C<java>.
 
 =item B<config/config.json>
 

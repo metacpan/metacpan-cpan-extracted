@@ -16,12 +16,15 @@ cpanfile
 lib/Developer/Dashboard.pm
 lib/Developer/Dashboard/ActionRunner.pm
 lib/Developer/Dashboard/Auth.pm
+lib/Developer/Dashboard/CLI/Complete.pm
 lib/Developer/Dashboard/CLI/OpenFile.pm
 lib/Developer/Dashboard/CLI/Paths.pm
 lib/Developer/Dashboard/CLI/Query.pm
 lib/Developer/Dashboard/CLI/SeededPages.pm
 lib/Developer/Dashboard/CLI/Skills.pm
+lib/Developer/Dashboard/CLI/Suggest.pm
 lib/Developer/Dashboard/CLI/Ticket.pm
+lib/Developer/Dashboard/CLI/Which.pm
 lib/Developer/Dashboard/Codec.pm
 lib/Developer/Dashboard/Collector.pm
 lib/Developer/Dashboard/CollectorRunner.pm
@@ -29,6 +32,8 @@ lib/Developer/Dashboard/Config.pm
 lib/Developer/Dashboard/DataHelper.pm
 lib/Developer/Dashboard/DockerCompose.pm
 lib/Developer/Dashboard/Doctor.pm
+lib/Developer/Dashboard/EnvAudit.pm
+lib/Developer/Dashboard/EnvLoader.pm
 lib/Developer/Dashboard/File.pm
 lib/Developer/Dashboard/FileRegistry.pm
 lib/Developer/Dashboard/Folder.pm
@@ -63,6 +68,7 @@ share/private-cli/_dashboard-core
 share/private-cli/action
 share/private-cli/auth
 share/private-cli/collector
+share/private-cli/complete
 share/private-cli/config
 share/private-cli/cpan
 share/private-cli/csvq
@@ -89,6 +95,7 @@ share/private-cli/skills
 share/private-cli/stop
 share/private-cli/ticket
 share/private-cli/tomq
+share/private-cli/which
 share/private-cli/xmlq
 share/private-cli/yq
 share/seeded-pages/api-dashboard.page
@@ -133,5 +140,6 @@ t/35-js-fast-check.t
 t/36-release-kwalitee.t
 t/37-pod-syntax.t
 t/38-web-no-editor-browser.t
+t/39-cli-suggest-complete-coverage.t
 t/fuzz/scorecard-fast-check.mjs
 t/web_app_static_files.t

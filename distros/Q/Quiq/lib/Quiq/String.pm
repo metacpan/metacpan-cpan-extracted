@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.236';
+our $VERSION = '1.237';
 
 use Encode::Guess ();
 use Encode ();
@@ -905,7 +905,7 @@ sub concat {
 
 =head1 VERSION
 
-1.236
+1.237
 
 =head1 AUTHOR
 

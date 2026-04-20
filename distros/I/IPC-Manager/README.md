@@ -155,7 +155,7 @@ for you:
 
         on_start => sub {
             ipcm_service nested => sub { ... };   # void context - no wait
-            sleep 0.025 until $self->peer('nested')->ready;
+            $self->peer('nested')->ready(0);      # block until ready
         },
 
     Failing to do so is a race condition: a request may be forwarded to the nested

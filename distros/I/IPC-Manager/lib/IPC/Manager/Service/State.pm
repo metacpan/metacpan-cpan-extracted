@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use Carp qw/croak/;
-use Time::HiRes qw/sleep time/;
 use IPC::Manager::Util qw/require_mod clone_io/;
 use IPC::Manager::Serializer::JSON();
 use Long::Jump qw/setjump longjump havejump/;
@@ -154,15 +153,8 @@ sub ipcm_service {
 
         my $timeout = $params{timeout} || 10;
 
-        my $start = time;
-        until ($out->ready) {
-            my $delta = time - $start;
-            last if $delta > $timeout;
-            sleep 0.025;
-        }
-
         croak "Timeout waiting for service to come up after ${timeout}s"
-            unless $out->ready;
+            unless $out->ready($timeout);
 
         return $out;
     }

@@ -23,6 +23,9 @@ use Developer::Dashboard::Platform qw(
   is_runnable_file
   resolve_runnable_file
 );
+use Developer::Dashboard::EnvAudit ();
+use Developer::Dashboard::EnvLoader ();
+use Developer::Dashboard::CLI::Suggest ();
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::Runtime::Result ();
 
@@ -36,6 +39,7 @@ if ( -d $dashboard_lib ) {
 }
 
 my $cmd = shift @ARGV || '';
+_load_runtime_env();
 _prime_command_result_env( $cmd, @ARGV ) if $cmd ne '';
 
 if ( $cmd eq '' ) {
@@ -69,6 +73,10 @@ if ( my $custom_path = _custom_command_path($cmd) ) {
 if ( my ( $skill_name, $skill_command ) = _skill_dotted_command_parts($cmd) ) {
     my $helper_path = _builtin_helper_path('skills');
     _exec_switchboard_command( $helper_path, '_exec', $skill_name, $skill_command, @ARGV );
+}
+
+if ( $cmd ne '' ) {
+    print STDERR Developer::Dashboard::CLI::Suggest->new()->unknown_command_message($cmd);
 }
 
 pod2usage(
@@ -131,6 +139,23 @@ sub _prime_command_result_env {
         Developer::Dashboard::Runtime::Result::clear_current();
         Developer::Dashboard::Runtime::Result::clear_last_result();
     }
+    return 1;
+}
+
+# _load_runtime_env()
+# Loads the participating DD-OOP-LAYERS plain-directory and runtime-layer env
+# files into the current process before command resolution and helper exec.
+# Input: none.
+# Output: true value.
+sub _load_runtime_env {
+    require Developer::Dashboard::PathRegistry;
+    Developer::Dashboard::EnvAudit->clear();
+    my $paths = Developer::Dashboard::PathRegistry->new(
+        home            => $ENV{HOME},
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
     return 1;
 }
 
@@ -266,7 +291,7 @@ sub _skill_dotted_command_parts {
         project_roots   => [],
     );
     my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
-    return if !$manager->get_skill_path($skill_name);
+    return if !$manager->get_skill_path( $skill_name, include_disabled => 1 );
     return ( $skill_name, $skill_command );
 }
 
@@ -394,13 +419,14 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard collector stop <name>
   dashboard collector restart <name>
   dashboard housekeeper
-  dashboard skills install <git-url>
+  dashboard skills install <git-url-or-local-dir>
   dashboard skills enable <repo-name>
   dashboard skills disable <repo-name>
   dashboard skills uninstall <repo-name>
   dashboard skills update <repo-name>
   dashboard skills list
   dashboard skills usage <repo-name> [-o json|table]
+  dashboard which <cmd>|<skill>.<cmd>|<skill1>.<skill2>...<cmd>
   dashboard config init
   dashboard config show
   dashboard auth add-user <username> <password>
@@ -513,6 +539,13 @@ Example 3:
 Run the public command through its server bootstrap path while keeping logs in the foreground.
 
 Example 4:
+
+  dashboard which nest.level1.level2.here
+
+Inspect the exact resolved command file and hook chain without running the
+command body.
+
+Example 5:
 
   mkdir -p ~/.developer-dashboard/cli/update.d
   printf '#!/bin/sh\necho first\n' > ~/.developer-dashboard/cli/update.d/00-first

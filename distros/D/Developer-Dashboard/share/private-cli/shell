@@ -33,7 +33,7 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard shell>, which prints the shell bootstrap snippet for bash, zsh, POSIX sh, PowerShell, or pwsh. It is the CLI surface for shell integration features such as C<cdr>, C<which_dir>, and prompt wiring.
+This staged helper exposes C<dashboard shell>, which prints the shell bootstrap snippet for bash, zsh, POSIX sh, PowerShell, or pwsh. It is the CLI surface for shell integration features such as C<cdr>, C<d2>, C<which_dir>, prompt wiring, and live tab completion for C<dashboard> and C<d2>.
 
 =head1 WHY IT EXISTS
 
@@ -45,11 +45,11 @@ Use this file when changing supported shell names, generated bootstrap content, 
 
 =head1 HOW TO USE
 
-Users run C<dashboard shell bash>, C<dashboard shell zsh>, C<dashboard shell sh>, or the PowerShell variants, then evaluate the printed snippet in their shell startup flow.
+Users run C<dashboard shell bash>, C<dashboard shell zsh>, C<dashboard shell sh>, or the PowerShell variants, then evaluate the printed snippet in their shell startup flow. The generated snippet exposes C<d2> as a short shell shortcut for C<dashboard> and wires shell-native completion back into C<dashboard complete>.
 
 =head1 WHAT USES IT
 
-It is used by developers integrating the dashboard into their shell prompt and navigation flow, by shell smoke tests, and by docs showing how to enable C<cdr> and prompt rendering.
+It is used by developers integrating the dashboard into their shell prompt and navigation flow, by shell smoke tests, and by docs showing how to enable C<cdr>, C<d2>, prompt rendering, and live command completion.
 
 =head1 EXAMPLES
 

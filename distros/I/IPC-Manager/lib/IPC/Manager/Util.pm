@@ -2,7 +2,7 @@ package IPC::Manager::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000027';
 
 use Carp qw/croak/;
 use Errno qw/ESRCH/;
@@ -31,7 +31,18 @@ our @EXPORT_OK = qw{
     require_mod
     pid_is_running
     clone_io
+    tinysleep
 };
+
+# Sub-second sleep that returns early when interrupted by a signal.
+# Time::HiRes::sleep restarts on EINTR, which delays signal-driven loops by
+# up to a full cycle. select() with a timeout returns immediately on EINTR.
+sub tinysleep {
+    my ($secs) = @_;
+    return unless defined($secs) && $secs > 0;
+    select(undef, undef, undef, $secs);
+    return;
+}
 
 sub require_mod {
     my $mod = shift;
@@ -122,6 +133,20 @@ Clones a filehandle. C<$mode> is the open mode (e.g. C<< '<' >>, C<< '>' >>,
 C<< '+<' >>), and C<$orig> is the filehandle to clone.
 
 Returns the filehandle clone.
+
+=item tinysleep($seconds)
+
+Sleeps for up to C<$seconds> seconds (sub-second resolution allowed) using a
+4-arg C<select()> under the hood.  Unlike L<Time::HiRes/sleep>, which restarts
+on C<EINTR>, this returns immediately when a signal handler fires.  Use this
+in polling loops whose progress depends on signals (C<SIGCHLD>, C<SIGTERM>,
+user-installed handlers, etc).
+
+Returns nothing.  Like C<Time::HiRes::sleep>, the actual time slept may be
+shorter than requested when a signal interrupts it; callers that require a
+minimum elapsed time should use a deadline loop.
+
+C<$seconds> values that are undefined or non-positive are treated as a no-op.
 
 =back
 

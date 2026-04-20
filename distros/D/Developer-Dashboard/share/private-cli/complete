@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename qw(basename);
+use File::Spec;
+use FindBin qw($Bin);
+
+my $command = basename($0);
+my $core = File::Spec->catfile( $Bin, '_dashboard-core' );
+exec { $^X } $^X, $core, $command, @ARGV;
+die "Unable to exec $core for $command: $!";
+
+__END__
+
+=pod
+
+=head1 NAME
+
+complete - private built-in completion helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard complete <index> <word0> <word1> ...
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
+public C<dashboard> entrypoint can keep shell-completion logic inside the
+private helper runtime.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This staged helper exposes C<dashboard complete>, which prints shell-completion candidates for C<dashboard> and C<d2>. It is meant to be called by generated shell bootstrap fragments instead of by users typing completion logic by hand.
+
+=head1 WHY IT EXISTS
+
+It exists because shell completion needs live DD-OOP-LAYERS command and skill discovery, but that logic belongs in reusable Perl code and the private helper runtime instead of in the public entrypoint or duplicated shell snippets.
+
+=head1 WHEN TO USE
+
+Use this file when changing the private completion command handoff or the staged helper inventory for shell integration.
+
+=head1 HOW TO USE
+
+Generated bash and zsh shell bootstrap snippets call this helper with the current completion index and command-line words. It prints one completion candidate per line for the shell to consume.
+
+=head1 WHAT USES IT
+
+It is used by generated shell bootstrap snippets, by the shell-completion library code they hand off into, and by shell smoke tests that verify tab-completion wiring for C<dashboard> and C<d2>.
+
+=head1 EXAMPLES
+
+Example 1:
+
+  dashboard complete 1 dashboard do
+
+Print top-level completion candidates for the current C<do> prefix.
+
+Example 2:
+
+  dashboard complete 2 dashboard docker co
+
+Print second-level completion candidates for the built-in C<docker> command.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t
+
+Run the focused shell-completion regression tests after changing the helper behavior.
+
+Example 4:
+
+  prove -lr t
+
+Put any completion-helper change back through the full repository suite before release.
+
+=for comment FULL-POD-DOC END
+
+=cut

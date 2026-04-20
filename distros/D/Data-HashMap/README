@@ -1,5 +1,5 @@
 NAME
-    Data::HashMap - Fast type-specialized hash maps implemented in C
+    Data::HashMap - Fast type-specialized hash maps with TTL and LRU, in C
 
 SYNOPSIS
         use Data::HashMap::II;
@@ -340,8 +340,10 @@ IMPLEMENTATION
 
     *   Raw C strings (no Perl SV overhead) for string storage
 
-    *   UTF-8 flag packed into high bit of length fields; keys with
-        different UTF-8 flags are treated as distinct even if bytes match
+    *   UTF-8 flag packed into high bit of length fields as metadata only;
+        string keys with identical bytes collide regardless of UTF-8 flag,
+        matching native Perl hash semantics. The stored flag reflects the
+        most-recent put and controls how the key is returned from iteration.
 
     *   Sentinel values for integer keys (INT_MIN, INT_MIN+1 are reserved
         and silently rejected). I16/I32 variants croak on out-of-range keys
@@ -361,10 +363,20 @@ IMPLEMENTATION
         past any map mutation ("put", "remove", "clear", or any operation
         that may resize). Safe for immediate use: comparisons, printing,
         passing to functions. Use "get" (the default) when you need to store
-        the value.
+        the value. Note: "my $d = $m->get_direct(...)" copies the value via
+        normal Perl assignment semantics, so the read-only guarantee applies
+        only to the direct returned SV, not to any assigned-to scalar.
+
+    *   "pop"/"shift" filter TTL-expired entries out of results. In LRU mode
+        they also reap expired tail/head entries (tombstone them). In
+        non-LRU iteration mode they skip expired entries without
+        tombstoning, so "size" may remain non-zero; a subsequent read-path
+        operation ("get", "exists", "remove") triggers lazy reaping.
 
     *   "freeze"/"thaw" produces a native-endian binary format; frozen data
-        is not portable between systems with different byte orders
+        is not portable between systems with different byte orders.
+        Byte-identical output across "freeze"->"thaw"->"freeze" is not
+        guaranteed: bucket iteration order may drift across rehashes.
 
 DEPENDENCIES
     XS::Parse::Keyword (>= 0.40)

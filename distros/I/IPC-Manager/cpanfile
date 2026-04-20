@@ -31,7 +31,6 @@ suggests "DBI" => "1.644";
 suggests "DBIx::QuickDB" => "0.000040";
 suggests "IO::Select" => "0";
 suggests "IO::Socket::UNIX" => "1.55";
-suggests "IPC::SysV" => "2.09";
 suggests "Linux::Inotify2" => "2.3";
 
 on 'test' => sub {
@@ -55,7 +54,6 @@ on 'develop' => sub {
   requires "Digest::SHA" => "0";
   requires "IO::Select" => "0";
   requires "IO::Socket::UNIX" => "1.55";
-  requires "IPC::SysV" => "2.09";
   requires "Linux::Inotify2" => "2.3";
   requires "Test::Pod" => "1.41";
 };

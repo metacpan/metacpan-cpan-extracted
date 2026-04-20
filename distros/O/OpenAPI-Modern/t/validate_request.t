@@ -16,7 +16,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 use Test2::Warnings qw(:no_end_test warnings had_no_warnings);
-use JSON::Schema::Modern::Utilities qw(jsonp get_type);
+use JSON::Schema::Modern::Utilities qw(jsonp get_type add_media_type delete_media_type);
 use OpenAPI::Modern::Utilities 'uri_encode';
 
 my $doc_uri_rel = Mojo::URL->new('/api');
@@ -589,14 +589,14 @@ YAML
           instanceLocation => '/request/uri/query/delta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype)))->to_string,
-          error => 'EXCEPTION: unsupported media type "unknown/encodingtype": add support with $openapi->add_media_type(...)',
+          error => 'EXCEPTION: unsupported media type "unknown/encodingtype": add support with JSON::Schema::Modern::Utilities::add_media_type(...)',
         },
       ],
     },
     'a missing media-type is not an error if the schema is a no-op true schema',
   );
 
-  $openapi->add_media_type('unknown/*' => sub ($value) { $value });
+  add_media_type('unknown/*' => sub ($value) { $value });
 
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
@@ -613,6 +613,8 @@ YAML
     },
     'after adding wildcard support, this parameter can be parsed',
   );
+
+  delete_media_type('unknown/*');
 
   $request = request('POST', 'http://example.com/foo', [ Alpha => 1, Beta => 1 ]);
   query_params($request, [ alpha => 1, epsilon => '{"foo":42}' ]);
@@ -632,7 +634,7 @@ YAML
     'media-types in the openapi document are looked up case-insensitively',
   );
 
-  $openapi->add_media_type('image/*' => sub ($value) { $value });
+  add_media_type('image/*' => sub ($value) { $value });
 
   $request = request('POST', 'http://example.com/foo?alpha=1&zeta=binary', [ Alpha => 1, Beta => 1 ]);
   is_equal(
@@ -650,6 +652,7 @@ YAML
     },
     'wildcard media-types in the openapi document are looked up case-insensitively too',
   );
+  delete_media_type('image/*');
 
   $request = request('POST', 'http://example.com/foo?alpha=hello&beta=3.1415',
     [ 'alpha' => 'header value', Beta => 1 ]);    # exactly matches query parameter
@@ -1238,7 +1241,7 @@ paths:
             serializedValue: "%24.a.b%5B1%3A1%5D"
 YAML
 
-  $openapi->add_media_type('application/jsonpath', sub ($x) { $x });
+  add_media_type('application/jsonpath', sub ($x) { $x });
   $request = request('GET', 'http://example.com/foo?%24.a.b%5B1%3A1%5D');
   is_equal(
     ($result = $openapi->validate_request($request))->TO_JSON,
@@ -1250,6 +1253,7 @@ YAML
     { request => { uri => { query => '$.a.b[1:1]' } } },
     'data is correctly deserialized',
   );
+  delete_media_type('application/jsonpath');
 
 
   # see examples in 3.2.0 §4.12.8
@@ -2242,7 +2246,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content blOOp/HTml)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content blOOp/HTml)))->to_string,
-          error => 'EXCEPTION: unsupported media type "blOOp/HTML": add support with $openapi->add_media_type(...)',
+          error => 'EXCEPTION: unsupported media type "blOOp/HTML": add support with JSON::Schema::Modern::Utilities::add_media_type(...)',
         },
       ],
     },
@@ -2251,7 +2255,7 @@ YAML
 
 
   # we have to add media-types in foldcased format
-  $openapi->add_media_type('bloop/html' => sub ($content_ref) { $content_ref });
+  add_media_type('bloop/html' => sub ($content_ref) { $content_ref });
 
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
@@ -2268,9 +2272,10 @@ YAML
     },
     'Content-Type looked up case-insensitively and matched in the document case-insensitively too',
   );
+  delete_media_type('bloop/html');
 
 
-  $openapi->add_media_type('unknown/*' => sub ($value) { $value });
+  add_media_type('unknown/*' => sub ($value) { $value });
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unknown/encodingtype' ], 'binary');
   is_equal(
@@ -2288,11 +2293,12 @@ YAML
     },
     'wildcard support in the media type registry is used to handle an otherwise-unknown content type',
   );
+  delete_media_type('unknown/*');
 
 
   # this will match against the document at image/*
   # but we have no media-type registry for image/*, only image/jpeg
-  $openapi->add_media_type('image/jpeg' => sub ($value) { $value });
+  add_media_type('image/jpeg' => sub ($value) { $value });
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'image/jpeg' ], 'binary');
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
@@ -2309,6 +2315,7 @@ YAML
     },
     'Content-Type header is matched to a wildcard entry in the document, then matched to a media-type implementation',
   );
+  delete_media_type('image/jpeg');
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
     chr(0xe9).'clair');
@@ -2321,7 +2328,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
-          error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
+          error => re(qr/^could not decode content as text\/plain; charset=UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
         },
       ],
     },
@@ -2352,7 +2359,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain)))->to_string,
-          error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
+          error => re(qr{^could not decode content as text/plain; charset=UTF-8: UTF-8 "\\xE9" does not map to Unicode}),
         },
       ],
     },
@@ -2370,7 +2377,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
-          error => re(qr/^could not decode content as application\/json: malformed UTF-8 character in JSON string/),
+          error => re(qr/^could not decode content as application\/json; charset=UTF-8: malformed UTF-8 character in JSON string/),
         },
       ],
     },
@@ -2388,7 +2395,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json)))->to_string,
-          error => re(qr/^could not decode content as application\/json: /),
+          error => re(qr/^could not decode content as application\/json; charset=UTF-8: /),
         },
       ],
     },
@@ -2547,6 +2554,81 @@ YAML
     $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Type' => 'electric/boogaloo' ], 'blah'))->TO_JSON,
     { valid => true },
     '..even when the media-type is unknown',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ a, b ]
+          application/json; foo=whargarbl:
+            schema:
+              required: [ x, y ]
+YAML
+
+  $request = request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'application/schema+json; schema=https://example.com/my_schema/v1' ],
+    '{"a":1,"c":3}');
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body/content',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema required)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema required)))->to_string,
+          error => re(qr/^object is missing property: b/),
+        },
+      ],
+    },
+    'application/schema+json is decoded using the application/json decoder',
+  );
+
+  $request = request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'application/schema+json; schema=https://example.com/my_schema/v1' ],
+    '{"a":1,"b":2,"c":3}');
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'application/schema+json is decoded using the application/json decoder',
+  );
+
+  $request = request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'application/schema+json; foo=whargarbl' ],
+    '{"a":1,"c":3}');
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body/content',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content), 'application/json; foo=whargarbl', qw(schema required)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content), 'application/json; foo=whargarbl', qw(schema required)))->to_string,
+          error => re(qr/^object is missing properties: x, y/),
+        },
+      ],
+    },
+    'application/schema+json is decoded using the application/json decoder when parameters match',
+  );
+
+  $request = request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'application/schema+json; foo="wh\ar\garb\l"' ],
+    '{"x":1,"y":2}');
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'parameter value as quoted string still matches',
   );
 };
 
@@ -3694,7 +3776,7 @@ YAML
     },
   });
 
-  $openapi->evaluator->add_media_type('application/yaml' => sub ($dataref) { \ $yamlpp->load_string($$dataref) });
+  add_media_type('application/yaml' => sub ($dataref) { \ $yamlpp->load_string($$dataref) });
 
   $openapi->evaluator->add_document(
     JSON::Schema::Modern::Document::OpenAPI->new(
@@ -3853,6 +3935,8 @@ YAML
     },
   'correct dialect is used (via json schema\'s $schema keyword) in a secondary document',
   );
+
+  delete_media_type('application/yaml');
 };
 
 subtest $::TYPE.': example of cookie decomposition with encoding and media-type' => sub {

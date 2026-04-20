@@ -54,8 +54,8 @@ use Data::HashMap::IA;
     # UTF-8 string: "é" (2 bytes, UTF-8 flagged)
     my $utf8 = "\x{E9}";
 
-    # Both have the same underlying bytes after encoding
-    # but should be treated as distinct keys
+    # Different byte sequences — must remain distinct keys
+    # ($latin1 is 2 raw bytes "\xC3\xA9", $utf8 is 1 byte "\xE9" with flag on)
     hm_ss_put $m, $latin1, "latin1";
     hm_ss_put $m, $utf8, "utf8";
 

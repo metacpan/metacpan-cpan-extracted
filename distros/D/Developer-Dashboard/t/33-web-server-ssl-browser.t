@@ -17,7 +17,7 @@ use Developer::Dashboard::JSON qw(json_encode);
 my $repo_root     = abs_path('.');
 my $repo_lib      = File::Spec->catdir( $repo_root, 'lib' );
 my $dashboard_bin = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
-my $chromium_bin  = _find_command( qw(chromium chromium-browser google-chrome google-chrome-stable) );
+my $chromium_bin  = _find_command( qw(google-chrome-stable google-chrome chromium-browser chromium) );
 
 plan skip_all => 'SSL browser smoke requires Chromium on PATH'
   if !$chromium_bin;
@@ -148,7 +148,9 @@ sub _find_command {
         next if !defined $candidate || $candidate eq '';
         for my $dir ( File::Spec->path() ) {
             my $path = File::Spec->catfile( $dir, $candidate );
-            return $path if -f $path && -x $path;
+            next if !-f $path || !-x $path;
+            next if $path eq '/snap/bin/chromium';
+            return $path;
         }
     }
     return undef;

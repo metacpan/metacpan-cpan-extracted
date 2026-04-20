@@ -2,7 +2,7 @@ package IPC::Manager::Service::Peer;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000027';
 
 use Carp qw/croak/;
 use Scalar::Util qw/weaken/;
@@ -28,7 +28,8 @@ sub init {
 
 sub ready {
     my $self = shift;
-    $self->{+SERVICE}->client->peer_active($self->{+NAME});
+    my ($timeout) = @_;
+    $self->{+SERVICE}->client->peer_active($self->{+NAME}, $timeout);
 }
 
 sub send_request {
@@ -99,7 +100,21 @@ The parent service object (required). Must be running in the current process.
 
 =item $bool = $self->ready()
 
+=item $bool = $self->ready($timeout)
+
 Check if the peer is ready for requests.
+
+With no argument (or C<undef>), C<ready> returns the current state
+immediately (one-shot, backwards-compatible).
+
+With C<$timeout>, C<ready> blocks until the peer becomes active or the
+timeout elapses, whichever comes first.  A C<$timeout> of C<0> blocks
+indefinitely until the peer is ready.
+
+When the underlying client protocol exposes a peer-change file descriptor
+(C<have_handles_for_peer_change>, e.g. inotify on the FS-based protocols),
+C<ready> waits on that descriptor via C<IO::Select>; otherwise it falls
+back to a short sub-second sleep and retry.
 
 =item $id = $self->send_request($req)
 

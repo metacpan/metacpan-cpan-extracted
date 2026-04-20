@@ -214,17 +214,13 @@ drain(SV* self_sv, UV count)
                     if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[i].value);
-                self->nodes[i].value = NULL;
                 if (HM_UNLIKELY(self->lru_prev)) hashmap_is_lru_unlink(self, (uint32_t)i);
                 hashmap_is_tombstone_at(self, i);
                 n++;
             }
         }
         if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-        if (self->tombstones > self->capacity / 4 ||
-            (self->size > 0 && self->tombstones > self->size))
-            hashmap_is_compact(self);
+        HM_MAYBE_COMPACT_XS(self, hashmap_is_compact);
 
 void
 pop(SV* self_sv)
@@ -234,7 +230,7 @@ pop(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_tail != HM_LRU_NONE) {
                 uint32_t idx = self->lru_tail;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_is_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -244,13 +240,9 @@ pop(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[idx].value);
-                self->nodes[idx].value = NULL;
                 hashmap_is_lru_unlink(self, idx);
                 hashmap_is_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_is_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_is_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -265,12 +257,8 @@ pop(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[i].value);
-                self->nodes[i].value = NULL;
                     hashmap_is_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_is_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_is_compact);
                     XSRETURN(2);
                 }
             }
@@ -286,7 +274,7 @@ shift(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_head != HM_LRU_NONE) {
                 uint32_t idx = self->lru_head;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_is_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -296,13 +284,9 @@ shift(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[idx].value);
-                self->nodes[idx].value = NULL;
                 hashmap_is_lru_unlink(self, idx);
                 hashmap_is_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_is_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_is_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -318,12 +302,8 @@ shift(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[i].value);
-                self->nodes[i].value = NULL;
                     hashmap_is_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_is_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_is_compact);
                     XSRETURN(2);
                 }
             }
@@ -421,7 +401,7 @@ thaw(char* class, SV* data)
             if (p + vl + 4 > end) { hashmap_is_destroy(map); croak("Truncated freeze data"); }
             const char* vstr = (const char*)p; p += vl;
             uint32_t ttl; memcpy(&ttl, p, 4); p += 4;
-            hashmap_is_put(map, key, vstr, vl, vutf8, ttl);
+            if (!hashmap_is_put(map, key, vstr, vl, vutf8, ttl)) { hashmap_is_destroy(map); croak("OOM during thaw"); }
             if (ttl == 0 && map->expires_at) hashmap_is_persist(map, key);
           }
         }
@@ -545,7 +525,6 @@ get_or_set(SV* self_sv, int64_t key, SV* default_sv)
         EXTRACT_STR_VAL(default_sv);
         bool was_found;
         size_t idx = hashmap_is_get_or_set(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
-        (void)was_found;
         if (idx >= self->capacity) XSRETURN_UNDEF;
         if (self->nodes[idx].value) {
             RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));

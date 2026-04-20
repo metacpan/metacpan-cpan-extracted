@@ -229,7 +229,6 @@ lib/IPC/Manager/Client/MessageFiles.pm
 lib/IPC/Manager/Client/MySQL.pm
 lib/IPC/Manager/Client/PostgreSQL.pm
 lib/IPC/Manager/Client/SQLite.pm
-lib/IPC/Manager/Client/SharedMem.pm
 lib/IPC/Manager/Client/UnixSocket.pm
 lib/IPC/Manager/DBI.pm
 lib/IPC/Manager/Message.pm
@@ -256,7 +255,6 @@ t/MessageFiles-NoInotify.t
 t/MySQL.t
 t/PostgreSQL.t
 t/SQLite.t
-t/SharedMem.t
 t/UnixSocket.t
 t/lib/IPC/Manager/Test/BaseFS.pm
 t/lib/IPC/Manager/Test/BlockInotify.pm
@@ -276,7 +274,6 @@ t/unit/Client-MessageFiles-NoInotify.t
 t/unit/Client-MySQL.t
 t/unit/Client-PostgreSQL.t
 t/unit/Client-SQLite.t
-t/unit/Client-SharedMem.t
 t/unit/Client-UnixSocket.t
 t/unit/Client.t
 t/unit/DBI.t
@@ -292,6 +289,7 @@ t/unit/Service.t
 t/unit/Spawn.t
 t/unit/Util.t
 t/unit/atomicpipe_reassembly_cleanup.t
+t/unit/peer_active_timeout.t
 t/unit/sync_request_peer_death.t
 t/unit/sync_request_peer_suspend.t
 t/unit/sync_request_timeout.t

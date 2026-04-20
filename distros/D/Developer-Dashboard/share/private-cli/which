@@ -1,0 +1,107 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::Which ();
+
+# main(@ARGV)
+# Runs the which helper for Developer Dashboard.
+# Input: command-line arguments from @ARGV.
+# Output: prints the resolved command file path and participating hook paths,
+# then exits.
+Developer::Dashboard::CLI::Which::run_which_command( command => 'which', args => \@ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+which - private runtime command-inspection helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard which jq
+  dashboard which layered-tool
+  dashboard which alpha-skill.run-test
+  dashboard which alpha-skill.level1.level2.here
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
+C<dashboard> command can show the resolved runnable file and the participating
+hook files for built-in commands, layered custom commands, and dotted skill
+commands without bloating the public switchboard.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This staged helper exposes C<dashboard which>, the command that explains what
+dashboard would execute for a given command token. It prints the resolved
+command file first and then every hook file that would participate for the same
+runtime resolution path.
+
+=head1 WHY IT EXISTS
+
+It exists because DD-OOP-LAYERS, staged built-in helpers, and nested skill
+dispatch can make command resolution non-obvious from the shell. A dedicated
+inspection helper gives users a direct way to confirm the exact file path and
+hook chain before they run a command.
+
+=head1 WHEN TO USE
+
+Use this file when changing C<dashboard which>, the staged helper handoff, or
+the path and hook inspection contract for built-in commands, layered custom
+commands, and skill commands.
+
+=head1 HOW TO USE
+
+Users run C<dashboard which E<lt>targetE<gt>> where the target can be a
+built-in command such as C<jq>, a layered custom command such as
+C<layered-tool>, or a dotted skill command such as C<alpha-skill.run-test> or
+C<alpha-skill.level1.level2.here>. The helper prints one C<COMMAND> line with
+the resolved executable path and then one C<HOOK> line per participating hook
+file in runtime execution order.
+
+=head1 WHAT USES IT
+
+It is used by users debugging command resolution, by contributors verifying the
+switchboard remains thin, and by tests that lock down built-in, layered, and
+skill command inspection behavior.
+
+=head1 EXAMPLES
+
+Example 1:
+
+  dashboard which jq
+
+Show the staged helper path for the built-in C<jq> command and any layered
+hooks that would run before it.
+
+Example 2:
+
+  dashboard which build-assets
+
+Show the resolved layered custom command file and its participating hook chain.
+
+Example 3:
+
+  dashboard which nest.level1.level2.here
+
+Show the resolved nested skill command file beneath one installed skill tree.
+
+Example 4:
+
+  prove -lv t/05-cli-smoke.t t/19-skill-system.t t/21-refactor-coverage.t
+
+Rerun the focused tests that keep the staged helper and inspection behavior
+green after changes.
+
+=for comment FULL-POD-DOC END
+
+=cut

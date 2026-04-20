@@ -9,26 +9,27 @@ my $base = delete $ENV{GIT_DIR} or die "$0: Unimplemented invocation.\n";
 my %proxy = do { my $i=0; map { ("there".($i++?"-$i":"") => $_) } split /\n/, scalar `git config --get-all proxy.url` } or exit 0;
 my $working = "$base.workingdir";
 
-$ENV{GIT_SSH_COMMAND} = "ssh -A -o SendEnv=XMODIFIERS";
+$ENV{GIT_SSH_COMMAND} = (`git config core.sshCommand 2>/dev/null` =~ /^(.+)/ ? $1 : "ssh")." -A -o SendEnv=XMODIFIERS";
 $ENV{XMODIFIERS} ||= "";
 ($ENV{DEBUG} and !warn localtime().": [$who] git-server: DEBUG: [$base] Skipping proxy checks during $how\n") or exit 0 if $ENV{XMODIFIERS} =~ /^skip_proxy=(.*)/m and $1;
 $ENV{XMODIFIERS} = join "\n", "skip_proxy=1", split /\n/, $ENV{XMODIFIERS};
-my $WHY_REMOTE_FAILED = "";
+my $WHY_FAILED = {};
 sub remote_refs {
     my $remote = shift;
+    return "" if $WHY_FAILED->{$remote};
     require File::Temp;
     my $tmp = File::Temp->new;
     warn localtime().": [$who] git-server: DEBUG: [$base] Comparing refs for ".($proxy{$remote} || $base)." ...\n" if $ENV{DEBUG};
     my @list = `git ls-remote $remote 2>$tmp`;
     if (my $why = $?) {
-        $WHY_REMOTE_FAILED = "FAILED [$why] VIEWING REMOTE ".($proxy{$remote} || $base)."\n";
+        $WHY_FAILED->{$remote} = "FAILED [$why] VIEWING REMOTE ".($proxy{$remote} || $base)."\n";
         seek($tmp, 0, 0);
-        $WHY_REMOTE_FAILED .= join "", <$tmp>;
-        $WHY_REMOTE_FAILED =~ s/\s*$//;
+        $WHY_FAILED->{$remote} .= join "", map { "! $_" } <$tmp>;
+        $WHY_FAILED->{$remote} =~ s/\s*$//;
         $? = $why;
     }
     else {
-        $WHY_REMOTE_FAILED = "";
+        $WHY_FAILED->{$remote} = "";
     }
     # Clean up refs list ignoring "HEAD" and ignore everything that isn't a regular branch or tag, such as /pull/ requests.
     @list = sort { $a cmp $b } grep { m{\srefs/(?:heads|tags)/(?!HEAD)} } @list;
@@ -59,28 +60,28 @@ if (!-d $working) {
             warn localtime().": [$who] git-server: DEBUG: Detected remote proxy SSH server [$remotehost] port [$remoteport]\n" if $ENV{DEBUG};
             my $try = `ssh -o BatchMode=yes -o StrictHostKeyChecking=no -T -p $remoteport $remotehost hostname 2>&1`;
         }
-        if (0 == system "git fetch $remote" and $refs->{$remote} = remote_refs $remote) {
+        if ($refs->{$remote} = remote_refs $remote and 0 == system "git fetch $remote") {
             warn localtime().": [$who] git-server: Successful access to remote proxy: $proxy\n" if $ENV{DEBUG};
         }
         elsif (!$?) {
             warn localtime().": [$who] git-server: Warning: Detected remote proxy without any commits: $proxy\n";
         }
-        elsif (0 != system "rm","-rf",$working) {
+        elsif (!chdir $base or 0 != system "rm","-rf",$working) {
             die localtime().": [$who] git-server: [$working] Failed to clear broken merge folder? ERR[$?]\n";
         }
         elsif (!$remotehost) {
-            die localtime().": [$who] git-server: Unable to read from non-SSH repo required for initial proxy setup. Manual intervention required!\n\n$WHY_REMOTE_FAILED\n\n";
+            die localtime().": [$who] git-server: Unable to read from non-SSH repo required for initial proxy setup. Manual intervention required!\n\n$WHY_FAILED->{$remote}\n\n";
         }
         elsif (!$ENV{SSH_AUTH_SOCK}) {
-            die localtime().qq{: [$who] git-server: SSH forwarding not attempted. Did you enable ForwardAgent? Hint: "export GIT_SSH_COMMAND='ssh -A'"\n\n$WHY_REMOTE_FAILED\n\n};
+            die localtime().qq{: [$who] git-server: SSH forwarding not attempted. Did you enable ForwardAgent? Hint: "export GIT_SSH_COMMAND='ssh -A'"\n\n$WHY_FAILED->{$remote}\n\n};
         }
         elsif (my $keys = `ssh-add -l 2>/dev/null`) {
             my $num = 0;
             $keys =~ s/^\s*(\d+)\s*/"FINGERPRINT#".++$num." : ($1 bits) "/gem;
-            die localtime().": [$who] git-server: Remote access via $remotehost is required for initial proxy setup, but failed using the following keys:\n$keys\n$WHY_REMOTE_FAILED\n\n";
+            die localtime().": [$who] git-server: Remote access via [$remotehost] is required for initial proxy setup, but failed using the following keys:\n$keys\n$WHY_FAILED->{$remote}\n\n";
         }
         else {
-            die localtime().qq{: [$who] git-server: Remote access to $remotehost failed. Forwarding enabled properly but no SSH keys provided? Hint: "ssh -L" or "ssh-add <identityfile>"\n$WHY_REMOTE_FAILED\n\n};
+            die localtime().qq{: [$who] git-server: Remote access to [$remotehost] failed. Forwarding enabled properly but no SSH keys provided? Hint: "ssh -L" or "ssh-add <identityfile>"\n$WHY_FAILED->{$remote}\n\n};
         }
     }
 }
@@ -113,10 +114,10 @@ if (1) {
                 warn localtime().": [$who] git-server: WARNING: Local repo has no commits yet?\n";
             }
             elsif ($ENV{SSH_AUTH_SOCK}) {
-                warn localtime().": [$who] git-server: WARNING! Proxy remote worked before but failed this time: $url\n$WHY_REMOTE_FAILED\n";
+                warn localtime().": [$who] git-server: WARNING! Proxy remote worked before but failed this time: $url\n$WHY_FAILED->{$remote}\n";
             }
             else {
-                warn localtime().qq{: [$who] git-server: WARNING! Proxy remote failed. Did you enable ForwardAgent this time? Hint: "export GIT_SSH_COMMAND='ssh -A'"\n\n$WHY_REMOTE_FAILED\n\n};
+                warn localtime().qq{: [$who] git-server: WARNING! Proxy remote failed. Did you enable ForwardAgent this time? Hint: "export GIT_SSH_COMMAND='ssh -A'"\n\n$WHY_FAILED->{$remote}\n\n};
             }
         };
         $need_sync ||= $remote, $partial_sync_ok ||= !$? && $url if $refs->{here} ne $refs->{$remote};
@@ -272,7 +273,7 @@ if (1) {
     my $synced = 1;
     foreach my $remote (@$remotes) {
         $refs->{$remote} = remote_refs $remote; # Now that sync is complete, reload all refs fresh to compare again.
-        warn localtime().": [$who] git-server: ERROR [$?] while proxy remote viewing after sync: ".($proxy{$remote} || "[$remote]")."\n$WHY_REMOTE_FAILED\n========\n" if $? and $ENV{DEBUG};
+        warn localtime().": [$who] git-server: ERROR [$?] while proxy remote viewing after sync: ".($proxy{$remote} || "[$remote]")."\n$WHY_FAILED->{$remote}\n========\n" if $? and $ENV{DEBUG};
         $synced = 0 if $refs->{here} ne $refs->{$remote};
     }
     if ($synced) {

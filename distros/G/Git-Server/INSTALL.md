@@ -456,9 +456,9 @@ DEBUG
 To enable optional debugging, run this on any client host:
 
 ```
-[user1@devbox ProjX]$ git config --global core.SshCommand 'ssh -o SendEnv=XMODIFIERS'
+[user1@devbox ProjX]$ git config --global core.sshCommand 'ssh -o SendEnv=XMODIFIERS'
 # -AND/OR- for super annoying SSH debugging on local repo:
-[user1@devbox ProjX]$ git config --local core.SshCommand 'ssh -v -o SendEnv=XMODIFIERS'
+[user1@devbox ProjX]$ git config --local core.sshCommand 'ssh -v -o SendEnv=XMODIFIERS'
 # -AND/OR- you can use ENV if you don't want to mess with the git config:
 [user1@devbox ProjX]$ export GIT_SSH_COMMAND='ssh -o SendEnv=XMODIFIERS'
 [user1@devbox ProjX]$ export XMODIFIERS=DEBUG=1

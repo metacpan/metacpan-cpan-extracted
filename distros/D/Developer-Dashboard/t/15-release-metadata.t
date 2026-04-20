@@ -15,6 +15,7 @@ my $plain_readme = _slurp_optional( _repo_path('README') );
 my $skill_guide = _slurp_optional( _repo_path('SKILL.md') );
 my $release_doc = _slurp_optional( _repo_path( 'doc', 'update-and-release.md' ) );
 my $housekeeper_rotation_doc = _slurp_optional( _repo_path( 'doc', 'housekeeper-rotation.md' ) );
+my $layered_env_doc = _slurp_optional( _repo_path( 'doc', 'layered-env-loading.md' ) );
 my $changes = _slurp( _repo_path('Changes') );
 my $dist = _slurp_optional( _repo_path('dist.ini') );
 my $meta = _slurp_optional( _repo_path('META.json') );
@@ -35,10 +36,14 @@ my @doc_paths = grep { -e $_ } (
     _repo_path('SOFTWARE_SPEC.md'),
     _repo_path('TEST_PLAN.md'),
     _repo_path( 'doc', 'architecture.md' ),
+    _repo_path( 'doc', 'command-suggestions.md' ),
     _repo_path( 'doc', 'docker-service-toggle.md' ),
     _repo_path( 'doc', 'housekeeper-rotation.md' ),
+    _repo_path( 'doc', 'layered-env-loading.md' ),
     _repo_path( 'doc', 'path-inventory-api.md' ),
+    _repo_path( 'doc', 'shell-bootstrap.md' ),
     _repo_path( 'doc', 'integration-test-plan.md' ),
+    _repo_path( 'doc', 'which-command.md' ),
     _repo_path( 'doc', 'security.md' ),
     _repo_path( 'doc', 'skills.md' ),
     _repo_path( 'doc', 'static-file-serving.md' ),
@@ -62,10 +67,12 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.56', 'repo version bumped for the Go and Java main-documentation guardrail fix' );
-like( $pm, qr/^2\.56$/m, 'main POD version matches the module version' );
+is( $version, '2.72', 'repo version bumped for the WSL cmd.exe and portable d2 bootstrap fixes' );
+like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
-    like( $dist, qr/^version = 2\.56$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^version = \Q$version\E$/m, 'dist.ini version matches the module version in the source tree' );
+    like( $dist, qr/^skip = \^Module::CPANTS::Analyse\$$/m, 'dist.ini skips release-only Module::CPANTS::Analyse from generated install-time prereqs' );
+    like( $dist, qr/^skip = \^Module::CPANTS::Kwalitee\$$/m, 'dist.ini skips release-only Module::CPANTS::Kwalitee from generated install-time prereqs' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini excludes integration assets so repo-only verification helpers do not leak into release tarballs' );
@@ -76,9 +83,9 @@ if ( $dist ne '' ) {
         like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
 else {
-        like( $meta, qr/"version"\s*:\s*"2\.56"/, 'META.json version matches the module version in the built distribution' );
+        like( $meta, qr/"version"\s*:\s*"\Q$version\E"/, 'META.json version matches the module version in the built distribution' );
     }
-like( $changes, qr/^2\.56\s+2026-04-18$/m, 'Changes top entry matches the bumped version' );
+like( $changes, qr/^\Q$version\E\s+\d{4}-\d{2}-\d{2}$/m, 'Changes top entry matches the bumped version' );
 ok( $plain_readme ne '', 'plain README is tracked for release kwalitee compatibility' );
 like( $plain_readme, qr/Developer Dashboard/, 'plain README identifies the distribution clearly' );
 ok( $security_pod ne '', 'SECURITY.pod is tracked so the release tarball ships a security policy document' );
@@ -151,7 +158,7 @@ for my $module (
     like( $cpanfile, qr/requires ['"]\Q$module\E['"];/, "cpanfile declares runtime prerequisite $module" );
     like( $dist, qr/^\Q$module\E = 0$/m, "dist.ini declares runtime prerequisite $module" ) if $dist ne '';
 }
-for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills)) {
+for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills which)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
 
@@ -220,9 +227,12 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/distribution share dir|distribution share directory|cpanm install.*source checkout/s, 'docs describe installed seeded bookmark asset lookup through the dist share directory' );
     like( $doc, qr/stays thin for all built-in commands|thin for all built-in commands.*_dashboard-core|_dashboard-core.*share\/private-cli/s, 'docs describe the thin lazy loader path for all built-in commands' );
     like( $doc, qr/DD-OOP-LAYERS/, 'docs describe the layered runtime inheritance contract explicitly' );
+    like( $doc, qr/placeholder.*missing|default .*missing placeholder/is, 'docs describe the placeholder missing collector-indicator state explicitly' );
+    like( $doc, qr/inherited real collector state|parent-layer .*ok result/is, 'docs describe inherited collector indicator fallback when a child DD-OOP-LAYER only has placeholder missing state' );
     like( $doc, qr/raw TT\/HTML fragment files under `nav\/` also work|raw TT\/HTML fragment files under C<nav\/> also work|raw `nav\/\*\.tt` TT\/HTML fragment rendering/i, 'docs describe raw nav tt fragment support explicitly' );
     like( $doc, qr/local\/lib\/perl5/, 'docs describe layered runtime local Perl library exposure' );
     like( $doc, qr/LAST_RESULT/, 'docs describe the immediate previous-hook LAST_RESULT payload' );
+    like( $doc, qr/RESULT_FILE|LAST_RESULT_FILE/, 'docs describe file-backed hook result overflow handling' );
     like( $doc, qr/\[\[STOP\]\]/, 'docs describe the explicit stderr stop marker for hook chains' );
     like( $doc, qr/\.go.*go run|go run.*\.go/s, 'docs describe direct executable Go command and hook dispatch through go run' );
     like( $doc, qr/\.java.*javac.*java|javac.*\.java.*java/s, 'docs describe direct executable Java command and hook dispatch through javac and java' );
@@ -234,6 +244,14 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/Developer::Dashboard::Runtime::Result/, 'docs use the namespaced Runtime::Result module name' );
     like( $doc, qr/Developer::Dashboard::Folder/, 'docs use the namespaced Folder module name' );
     like( $doc, qr/Folder->all|all_paths|new_from_all_folders|Collector->new_from_all_folders/, 'docs mention the public Perl path inventory API' );
+    like( $doc, qr/dashboard which/, 'docs mention the command inspection helper explicitly' );
+    like( $doc, qr/COMMAND \/full\/path|HOOK \/full\/path/, 'docs describe the COMMAND and HOOK output shape for dashboard which' );
+    like( $doc, qr/Developer::Dashboard::EnvAudit/, 'docs mention the env provenance audit API' );
+    like( $doc, qr/\.env\.pl|\.env/, 'docs describe layered env files explicitly' );
+    like( $doc, qr/skill-local env files (?:load|are loaded) only when a skill command|skill env files only load when a skill command/i, 'docs describe skill-local env loading isolation' );
+    like( $doc, qr/\.env.*before.*\.env\.pl|\.env\.pl.*after.*\.env/s, 'docs describe same-level .env before .env.pl ordering' );
+    like( $doc, qr/\$NAME|\$\{NAME:-default\}|\$\{Namespace::function\(\):-default\}/, 'docs describe supported plain env expansion forms' );
+    like( $doc, qr/whole-line `\/\/` comments|whole-line C<\/\/> comments|block comments.*multiple lines|block comments.*multi-line/i, 'docs describe supported .env comment syntax including // and block comments' );
 }
 
 for my $doc (
@@ -253,6 +271,8 @@ for my $doc (
 
 for my $doc ( grep { defined && $_ ne '' } ( $skill_guide, $skills_pod ) ) {
     like( $doc, qr/dashboard skills install/, 'skill authoring docs explain installation' );
+    like( $doc, qr/\/absolute\/path\/to\/example-skill/, 'skill authoring docs explain direct local skill installs' );
+    like( $doc, qr/\.git\/.*\.env.*VERSION|\.env.*VERSION.*\.git\//is, 'skill authoring docs explain local skill qualification' );
     like( $doc, qr/dashboard example-skill\.hello/, 'skill authoring docs explain dotted command dispatch' );
     unlike( $doc, qr/dashboard skill example-skill/, 'skill authoring docs no longer describe the removed singular dispatcher' );
     like( $doc, qr{~/.developer-dashboard/skills/<repo-name>/|F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>}, 'skill authoring docs describe the isolated skill root' );
@@ -268,6 +288,7 @@ for my $doc ( grep { defined && $_ ne '' } ( $skill_guide, $skills_pod ) ) {
     like( $doc, qr{~/.developer-dashboard/cli/<command>\.d|~/.developer-dashboard/cli/E<lt>commandE<gt>\.d}, 'skill authoring docs explain dashboard-wide custom CLI hooks' );
     like( $doc, qr/DEVELOPER_DASHBOARD_SKILL_ROOT/, 'skill authoring docs explain the skill command environment' );
     like( $doc, qr/LAST_RESULT/, 'skill authoring docs explain previous-hook payloads' );
+    like( $doc, qr/RESULT_FILE|LAST_RESULT_FILE/, 'skill authoring docs explain file-backed hook result overflow handling' );
     like( $doc, qr/\[\[STOP\]\]/, 'skill authoring docs explain explicit hook stop markers' );
     like( $doc, qr/_example-skill|_<repo-name>|_E<lt>repo-nameE<gt>|_something/, 'skill authoring docs explain underscored skill config merge keys' );
     like( $doc, qr/aptfile/, 'skill authoring docs explain isolated apt dependency installation' );
@@ -291,12 +312,15 @@ for my $path (@pod_paths) {
 
 for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/dashboard skills install/, 'README documents skill installation' );
+    like( $doc, qr/dashboard skills install \/absolute\/path\/to\/example-skill/, 'README documents direct local skill installation' );
     like( $doc, qr/dashboard skills uninstall/, 'README documents skill uninstallation' );
     like( $doc, qr/dashboard skills update/, 'README documents skill updates' );
     like( $doc, qr/dashboard skills enable/, 'README documents skill enablement' );
     like( $doc, qr/dashboard skills disable/, 'README documents skill disablement' );
     like( $doc, qr/dashboard skills usage/, 'README documents skill usage inspection' );
     like( $doc, qr/dashboard skills list -o table|dashboard skills usage example-skill -o table/, 'README documents table output for skill inspection' );
+    like( $doc, qr/dashboard skills list -o json/, 'README documents explicit JSON output for the skills list' );
+    like( $doc, qr/default output is a padded table|default output is a .*table/i, 'README documents table as the default skills list output' );
     like( $doc, qr/dashboard example-skill\.somecmd/, 'README documents dotted isolated skill command dispatch' );
     like( $doc, qr/dashboard example-skill\.foo\.bar\.baz|skills\/foo\/skills\/bar\/cli\/baz/, 'README documents dotted dispatch for multi-level nested skills/<repo>/cli commands' );
     unlike( $doc, qr/dashboard skill example-skill/, 'README no longer documents the removed singular dispatcher' );

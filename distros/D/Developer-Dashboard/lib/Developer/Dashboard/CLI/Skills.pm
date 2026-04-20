@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::JSON qw(json_encode);
@@ -27,8 +27,8 @@ sub run_skills_command {
     my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
 
     if ( $action eq 'install' ) {
-        my $git_url = shift @argv || die "Usage: dashboard skills install <git-url>\n";
-        my $result = $manager->install($git_url);
+        my $source = shift @argv || die "Usage: dashboard skills install <git-url-or-local-dir>\n";
+        my $result = $manager->install($source);
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
@@ -57,7 +57,7 @@ sub run_skills_command {
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'list' ) {
-        my $output = 'json';
+        my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         my $skills = $manager->list();
         if ( $output eq 'json' ) {
@@ -126,7 +126,7 @@ sub _skills_table {
     my @rows = map {
         [
             $_->{name},
-            _tick( $_->{enabled} ),
+            _enabled_text( $_->{enabled} ),
             $_->{cli_commands_count} || 0,
             $_->{pages_count} || 0,
             $_->{docker_services_count} || 0,
@@ -148,7 +148,7 @@ sub _usage_table {
     my ($usage) = @_;
     my $text = '';
     $text .= "Skill: $usage->{name}\n";
-    $text .= "Enabled: " . _tick( $usage->{enabled} ) . "\n";
+    $text .= "Enabled: " . _enabled_text( $usage->{enabled} ) . "\n";
     $text .= "Path: $usage->{path}\n";
     $text .= "Config Root: $usage->{config}{root}\n";
     $text .= "Config File: $usage->{config}{file}\n";
@@ -159,7 +159,7 @@ sub _usage_table {
         [ 'Command', 'Hooks', 'Hook Count', 'Path' ],
         [
             map {
-                [ $_->{name}, _tick( $_->{has_hooks} ), $_->{hook_count} || 0, $_->{path} ]
+                [ $_->{name}, _boolean_text( $_->{has_hooks} ), $_->{hook_count} || 0, $_->{path} ]
             } @{ $usage->{cli} || [] }
         ],
     );
@@ -186,7 +186,7 @@ sub _usage_table {
                 [
                     $_->{name},
                     $_->{qualified_name},
-                    _tick( $_->{has_indicator} ),
+                    _boolean_text( $_->{has_indicator} ),
                     defined $_->{interval} ? 'interval=' . $_->{interval} : ( $_->{schedule} || '' ),
                 ]
             } @{ $usage->{collectors} || [] }
@@ -233,13 +233,22 @@ sub _format_row {
     return join '  ', @cells;
 }
 
-# _tick($value)
-# Converts a boolean-like value into a colored tick or cross marker.
+# _enabled_text($value)
+# Converts one enabled flag into a plain readable table value.
 # Input: scalar truthy or falsey value.
-# Output: UTF-8 checkmark/cross string with ANSI color.
-sub _tick {
+# Output: plain text string.
+sub _enabled_text {
     my ($value) = @_;
-    return $value ? "\e[32m✓\e[0m" : "\e[31m✗\e[0m";
+    return $value ? 'enabled' : 'disabled';
+}
+
+# _boolean_text($value)
+# Converts one boolean-like value into a plain readable yes/no string.
+# Input: scalar truthy or falsey value.
+# Output: plain text string.
+sub _boolean_text {
+    my ($value) = @_;
+    return $value ? 'yes' : 'no';
 }
 
 # _plain_text($value)

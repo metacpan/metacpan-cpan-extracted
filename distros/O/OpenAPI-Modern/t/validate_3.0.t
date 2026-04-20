@@ -16,7 +16,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 use JSON::Schema::Modern::Utilities 'jsonp';
-use Storable 'dclone';
+use Clone 'clone';
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
@@ -217,7 +217,7 @@ YAML
     'upgrade to an explicit version less than the current maximum point version',
   );
 
-  my $expected_schema_3_2 = dclone($schema_3_1);
+  my $expected_schema_3_2 = clone($schema_3_1);
   $expected_schema_3_2->{openapi} = SUPPORTED_OAD_VERSIONS->[-1];
   delete $expected_schema_3_2->{components}{responses}{responseA}{description};
 

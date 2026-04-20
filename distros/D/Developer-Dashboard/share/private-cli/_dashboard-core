@@ -1025,6 +1025,17 @@ elsif ( $cmd eq 'skills' ) {
     );
     exit $exit_code;
 }
+elsif ( $cmd eq 'complete' ) {
+    require Developer::Dashboard::CLI::Complete;
+    my $index = shift @ARGV;
+    die "Usage: dashboard complete <index> <word0> <word1> ...\n" if !defined $index || $index !~ /\A\d+\z/;
+    my @candidates = Developer::Dashboard::CLI::Complete::complete(
+        index => $index,
+        words => \@ARGV,
+    );
+    print join( "\n", @candidates ), "\n" if @candidates;
+    exit 0;
+}
 else {
     die "Unsupported built-in dashboard command '$cmd'\n";
 }
@@ -1053,29 +1064,19 @@ sub _seed_init_page {
 sub _shell_dashboard_command {
     my ($shell) = @_;
     my $script = $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || File::Spec->rel2abs($0);
-    my $repo_lib = $ENV{DEVELOPER_DASHBOARD_REPO_LIB} || File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', 'lib' ) );
-    if ( -f File::Spec->catfile( $repo_lib, 'Developer', 'Dashboard.pm' ) ) {
-        if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
+    if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
+        my $repo_lib = $ENV{DEVELOPER_DASHBOARD_REPO_LIB} || File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', 'lib' ) );
+        if ( -f File::Spec->catfile( $repo_lib, 'Developer', 'Dashboard.pm' ) ) {
             return join ' ',
-              '&',
               shell_quote_for( $shell, $^X ),
               shell_quote_for( $shell, '-I' . $repo_lib ),
               shell_quote_for( $shell, $script );
         }
         return join ' ',
           shell_quote_for( $shell, $^X ),
-          '-I' . shell_quote_for( $shell, $repo_lib ),
           shell_quote_for( $shell, $script );
     }
-    if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
-        return join ' ',
-          '&',
-          shell_quote_for( $shell, $^X ),
-          shell_quote_for( $shell, $script );
-    }
-    return join ' ',
-      shell_quote_for( $shell, $^X ),
-      shell_quote_for( $shell, $script );
+    return shell_quote_for( $shell, $script );
 }
 
 # _shell_bootstrap($shell)
@@ -1115,7 +1116,7 @@ function Get-DashboardTarget {
   if (-not $DashboardArgs -or $DashboardArgs.Count -eq 0) {
     return [pscustomobject]@{ target = $null; matches = @() }
   }
-  $json = __DASHBOARD_CMD__ path cdr @DashboardArgs
+  $json = & __DASHBOARD_CMD__ path cdr @DashboardArgs
   if ($LASTEXITCODE -ne 0 -or -not $json) {
     return [pscustomobject]@{ target = $null; matches = @() }
   }
@@ -1141,7 +1142,47 @@ function cdr {
   }
 }
 
+function Invoke-DashboardShortcut {
+  param([Parameter(ValueFromRemainingArguments = $true)][string[]]$DashboardArgs)
+  & __DASHBOARD_CMD__ @DashboardArgs
+}
+
 Set-Alias dd_cdr cdr
+Set-Alias d2 Invoke-DashboardShortcut
+
+Register-ArgumentCompleter -CommandName 'dashboard', 'd2' -ScriptBlock {
+  param($wordToComplete, $commandAst, $cursorPosition)
+  $tokens = @()
+  foreach ($element in $commandAst.CommandElements) {
+    if ($null -eq $element) {
+      continue
+    }
+    $tokens += [string]$element.Extent.Text
+  }
+  if ($tokens.Count -eq 0) {
+    return
+  }
+  $index = $tokens.Count - 1
+  if ($commandAst.Extent.EndOffset -gt $cursorPosition) {
+    $prefixCount = 0
+    foreach ($element in $commandAst.CommandElements) {
+      if ($null -eq $element) {
+        continue
+      }
+      last if $element.Extent.EndOffset -ge $cursorPosition
+      $prefixCount++
+    }
+    $index = $prefixCount
+    $tokens = if ($prefixCount -gt 0) { @($tokens[0..($prefixCount - 1)]) } else { @() }
+    $tokens += [string]$wordToComplete
+  }
+  $results = & __DASHBOARD_CMD__ complete $index @tokens
+  foreach ($candidate in @($results)) {
+    if (-not [string]::IsNullOrEmpty($candidate)) {
+      [System.Management.Automation.CompletionResult]::new($candidate, $candidate, 'ParameterValue', $candidate)
+    }
+  }
+}
 
 function which_dir {
   param([Parameter(ValueFromRemainingArguments = $true)][string[]]$DashboardArgs)
@@ -1155,6 +1196,97 @@ function which_dir {
   }
 }
 POWERSHELL
+    }
+    if ( $shell eq 'zsh' ) {
+        return <<'ZSH';
+cdr() {
+  payload="$(__DASHBOARD_CMD__ path cdr "$@")"
+  matches="$(printf '%s' "$payload" | __DASHBOARD_JSON_MATCHES__)"
+  target="$(printf '%s' "$payload" | __DASHBOARD_JSON_TARGET__)"
+  if [ -n "$matches" ]; then
+    printf '%s\n' "$matches"
+  fi
+  if [ -n "$target" ]; then
+    cd "$target"
+  fi
+}
+
+dd_cdr() {
+  cdr "$@"
+}
+
+d2() {
+  __DASHBOARD_CMD__ "$@"
+}
+
+which_dir() {
+  payload="$(__DASHBOARD_CMD__ path cdr "$@")"
+  matches="$(printf '%s' "$payload" | __DASHBOARD_JSON_MATCHES__)"
+  target="$(printf '%s' "$payload" | __DASHBOARD_JSON_TARGET__)"
+  if [ -n "$matches" ]; then
+    printf '%s\n' "$matches"
+    return
+  fi
+  if [ -n "$target" ]; then
+    printf '%s\n' "$target"
+  fi
+}
+
+_dashboard_complete_zsh() {
+  local -a completions
+  completions=("${(@f)$(__DASHBOARD_CMD__ complete "$((CURRENT-1))" "${words[@]}")}")
+  compadd -a completions
+}
+
+compdef _dashboard_complete_zsh dashboard d2
+ZSH
+    }
+    if ( $shell eq 'bash' ) {
+        return <<'BASH';
+cdr() {
+  payload="$(__DASHBOARD_CMD__ path cdr "$@")"
+  matches="$(printf '%s' "$payload" | __DASHBOARD_JSON_MATCHES__)"
+  target="$(printf '%s' "$payload" | __DASHBOARD_JSON_TARGET__)"
+  if [ -n "$matches" ]; then
+    printf '%s\n' "$matches"
+  fi
+  if [ -n "$target" ]; then
+    cd "$target"
+  fi
+}
+
+dd_cdr() {
+  cdr "$@"
+}
+
+d2() {
+  __DASHBOARD_CMD__ "$@"
+}
+
+which_dir() {
+  payload="$(__DASHBOARD_CMD__ path cdr "$@")"
+  matches="$(printf '%s' "$payload" | __DASHBOARD_JSON_MATCHES__)"
+  target="$(printf '%s' "$payload" | __DASHBOARD_JSON_TARGET__)"
+  if [ -n "$matches" ]; then
+    printf '%s\n' "$matches"
+    return
+  fi
+  if [ -n "$target" ]; then
+    printf '%s\n' "$target"
+  fi
+}
+
+_dashboard_complete() {
+  COMPREPLY=()
+  local candidate
+  while IFS= read -r candidate; do
+    [ -n "$candidate" ] || continue
+    COMPREPLY+=("$candidate")
+  done < <(__DASHBOARD_CMD__ complete "$COMP_CWORD" "${COMP_WORDS[@]}")
+}
+
+complete -F _dashboard_complete dashboard d2
+BASH
     }
     return <<'SH';
 cdr() {
@@ -1171,6 +1303,10 @@ cdr() {
 
 dd_cdr() {
   cdr "$@"
+}
+
+d2() {
+  __DASHBOARD_CMD__ "$@"
 }
 
 which_dir() {
@@ -1244,7 +1380,7 @@ SH
     if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
         return <<'POWERSHELL';
 function prompt {
-  __DASHBOARD_CMD__ ps1 --mode compact
+  & __DASHBOARD_CMD__ ps1 --mode compact
 }
 POWERSHELL
     }
@@ -1268,7 +1404,7 @@ after the public C<dashboard> entrypoint has already handled hook execution and
 switchboard dispatch. It is staged under F<~/.developer-dashboard/cli/dd/> as
 F<_dashboard-core> and is not meant to be called by users directly. It also
 generates the shared shell bootstrap snippets that expose C<cdr>,
-C<dd_cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and
+C<dd_cdr>, C<d2>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and
 PowerShell.
 
 __END__

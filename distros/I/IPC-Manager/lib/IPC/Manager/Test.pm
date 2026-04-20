@@ -289,10 +289,10 @@ sub test_nested_services {
             };
 
             # Void-context ipcm_service does not wait for the service to be
-            # ready, so spin here before returning from on_start.  Without
+            # ready, so block here before returning from on_start.  Without
             # this, a request from the test process could arrive before
             # inner_svc has connected to the bus, causing a stall.
-            sleep 0.025 until $self->peer('inner_svc')->ready;
+            $self->peer('inner_svc')->ready(0);
         },
 
         # Receive a request from the test process, forward it to the nested

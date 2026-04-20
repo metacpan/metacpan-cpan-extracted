@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use File::Spec;
 use Cwd qw(cwd);
@@ -67,7 +67,7 @@ sub save_global {
 sub save_global_defaults {
     my ( $self, $defaults ) = @_;
     $defaults ||= {};
-    my $current = $self->load_global;
+    my $current = $self->_load_writable_global;
     my $merged = $self->_merge_hashes( $defaults, $current );
     return $self->save_global($merged);
 }
@@ -277,7 +277,7 @@ sub save_global_web_workers {
     die 'Missing worker count' if !defined $workers || $workers eq '';
     die 'Worker count must be a positive integer' if $workers !~ /^\d+$/ || $workers < 1;
 
-    my $cfg = $self->load_global;
+    my $cfg = $self->_load_writable_global;
     $cfg->{web} = {} if ref( $cfg->{web} ) ne 'HASH';
     $cfg->{web}{workers} = $workers + 0;
     $self->save_global($cfg);
@@ -352,7 +352,7 @@ sub save_global_web_settings {
     }
 
     # Load current config and update with new values
-    my $cfg = $self->load_global;
+    my $cfg = $self->_load_writable_global;
     $cfg->{web} = {} if ref( $cfg->{web} ) ne 'HASH';
 
     for my $key ( keys %{$result} ) {
@@ -392,7 +392,7 @@ sub save_global_path_alias {
     die 'Missing path alias name' if !defined $name || $name eq '';
     die 'Missing path alias target' if !defined $path || $path eq '';
 
-    my $cfg = $self->load_global;
+    my $cfg = $self->_load_writable_global;
     $cfg->{path_aliases} = {} if ref( $cfg->{path_aliases} ) ne 'HASH';
     my $stored_path = $self->_normalize_home_path($path);
     $cfg->{path_aliases}{$name} = $stored_path;
@@ -412,7 +412,7 @@ sub remove_global_path_alias {
     my ( $self, $name ) = @_;
     die 'Missing path alias name' if !defined $name || $name eq '';
 
-    my $cfg = $self->load_global;
+    my $cfg = $self->_load_writable_global;
     $cfg->{path_aliases} = {} if ref( $cfg->{path_aliases} ) ne 'HASH';
     my $removed = delete $cfg->{path_aliases}{$name} ? 1 : 0;
     $self->save_global($cfg);
@@ -509,6 +509,20 @@ sub _global_config_file {
 sub _global_config_files {
     my ($self) = @_;
     return map { File::Spec->catfile( $_, 'config.json' ) } $self->{paths}->config_roots;
+}
+
+# _load_writable_global()
+# Loads only the writable runtime layer configuration file without merging
+# inherited parent-layer settings into the returned hash.
+# Input: none.
+# Output: configuration hash reference for the writable layer only.
+sub _load_writable_global {
+    my ($self) = @_;
+    my $file = $self->_global_config_file;
+    return {} if !-f $file;
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    local $/;
+    return json_decode(<$fh>);
 }
 
 # _skill_config_fragments()

@@ -1,9 +1,16 @@
 COPYING
-lib/Subunit.pm
-lib/Subunit/Diff.pm
+lib/Test/Subunit.pm
+lib/Test/Subunit/Diff.pm
+lib/Test/Subunit/V2.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.yml
+prove-subunit
 README.md
 subunit-diff
+tests/diff.pl
+tests/output_functions.pl
+tests/parse_results.pl
+tests/v2_protocol.pl
 META.json                                Module JSON meta-data (added by MakeMaker)

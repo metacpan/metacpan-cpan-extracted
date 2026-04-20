@@ -2,7 +2,7 @@ package Data::HashMap::I16A;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub import {
     $^H{"Data::HashMap::I16A/hm_i16a_put"}        = 1;

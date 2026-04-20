@@ -4,6 +4,7 @@ use ExtUtils::MakeMaker;
 use Config;
 use File::Spec;
 use Data::Dumper;
+use Text::ParseWords qw(shellwords);
 
 use PDL::Core::Dev;
 use Devel::CheckLib;
@@ -113,11 +114,13 @@ sub compileAndRun {
   my ($code) = @_;
   my $result;
 
+  my $inc = join " ", grep /^-I/, shellwords($plplot_include_path);
+
   check_lib(
-    ccflags  => "$plplot_include_path",
-    ldflags  => "$libs",
-    INC      => "$plplot_include_path",
-    LIBS     => "$libs",
+    ccflags  => $plplot_include_path,
+    ldflags  => $libs,
+    INC      => $inc,
+    LIBS     => $libs,
     header   => [ 'stdio.h', $header ],
     function => $code,
     analyze_binary => sub {

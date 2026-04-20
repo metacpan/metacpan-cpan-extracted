@@ -1,5 +1,12 @@
 Revision history for OpenAPI-Modern
 
+0.134     2026-04-19 16:29:03Z
+          - add new JSON Schema format "media-range", used in the OAD schema
+          - improvements to media-type decoding and matching appropriate
+            decoders to the Content-Type header: matching now also considers
+            media-type parameters and structured suffixes in addition to
+            wildcards
+
 0.133     2026-04-07 18:37:11Z
           - OpenAPI::Modern constructor now supports passing along arbitrary
             configuration options to the JSON::Schema::Modern constructor

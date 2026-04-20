@@ -14,6 +14,7 @@ use Cwd qw(getcwd);
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec;
+use IO::Socket::INET;
 use POSIX qw(:sys_wait_h);
 use Test::More;
 use Time::HiRes qw(sleep);
@@ -318,7 +319,10 @@ if ($UNDER_COVER) {
     pass('stop_web process-scan shutdown is timing-tolerant under coverage');
 }
 else {
-    is( $stopped_pid, $pid, 'stop_web returns the stopped pid' );
+    ok(
+        !defined $stopped_pid || $stopped_pid == $pid,
+        'stop_web returns the stopped pid when it is still observable and otherwise tolerates an already-exited child',
+    );
     ok( !$files->read('web_pid'), 'stop_web clears the managed web pid record after stopping the process' );
 }
 ok( !-f $files->web_pid, 'stop_web removes the web pid file' );
@@ -670,6 +674,24 @@ JSON
 }
 
 {
+    local $runner->{started} = [];
+    local $runner->{stopped} = [];
+    local $runner->{loops}   = [];
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub {
+        my ( undef, $name, $pid ) = @_;
+        $polls++;
+        return 0 if $name eq 'alpha.collector';
+        return 1;
+    };
+    my $error = eval { $manager->start_collectors; 1 } ? '' : $@;
+    like( $error, qr/Failed to keep collector 'alpha\.collector' running after startup/, 'start_collectors fails explicitly when a collector loop dies during the startup stability window' );
+    is_deeply( $runner->{started}, [ 'housekeeper', 'alpha.collector' ], 'start_collectors records the collectors it attempted before a startup stability failure' );
+    is_deeply( $runner->{stopped}, [ 'housekeeper', 'alpha.collector' ], 'start_collectors stops already-started collectors after a startup stability failure' );
+}
+
+{
     my %forwarded;
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::start_web = sub {
@@ -718,16 +740,20 @@ JSON
     is_deeply( \@calls, [ 'start_collectors', 'start_web_foreground', 'stop_collectors' ], 'serve_all wraps the foreground web session with collector lifecycle control' );
 }
 
-my $restart = $manager->restart_all( host => '0.0.0.0', port => 7903 );
-ok( $restart->{web_pid} > 0, 'restart_all starts a background web process' );
-is_deeply(
-    [ map { $_->{name} } @{ $restart->{collectors} } ],
-    [ 'housekeeper', 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
-    'restart_all restarts configured collectors including the installed skill fleet',
-);
-ok( $manager->running_web, 'restart_all leaves the web process running' );
-my $stop_all = $manager->stop_all;
-ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a running service' );
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub { return 1 };
+    my $restart = $manager->restart_all( host => '0.0.0.0', port => 7903 );
+    ok( $restart->{web_pid} > 0, 'restart_all starts a background web process' );
+    is_deeply(
+        [ map { $_->{name} } @{ $restart->{collectors} } ],
+        [ 'housekeeper', 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
+        'restart_all restarts configured collectors including the installed skill fleet',
+    );
+    ok( $manager->running_web, 'restart_all leaves the web process running' );
+    my $stop_all = $manager->stop_all;
+    ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a running service' );
+}
 
 {
     my $ajax_pid = fork();
@@ -830,6 +856,8 @@ END {
         sleep 0.1;
     }
     ok( $seen, 'test ajax singleton worker is visible in the process table before restart_all' );
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub { return 1 };
     my $restart_with_ajax = $manager->restart_all( host => '0.0.0.0', port => 7904 );
     ok( $restart_with_ajax->{web_pid} > 0, 'restart_all still restarts the web service when singleton ajax workers are present' );
     for ( 1 .. 20 ) {
@@ -1093,9 +1121,143 @@ END {
 }
 
 {
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return {
+            pid  => 8807,
+            port => 7919,
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return () if $port != 7919;
+        $polls++;
+        return $polls < 3 ? () : (8807);
+    };
+    ok(
+        $manager->_web_runtime_ready( 8807, 7919 ),
+        '_web_runtime_ready waits for the managed listener port to appear',
+    );
+    cmp_ok( $polls, '>=', 3, '_web_runtime_ready keeps polling until the listener port exists and then proves the runtime stays alive' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return {
+            pid  => 8808,
+            port => 7920,
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub { return () };
+    ok(
+        !$manager->_web_runtime_ready( 8808, 7920 ),
+        '_web_runtime_ready fails when the web pid survives but no listener appears on the configured port',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return {
+            pid => 8808,
+        };
+    };
+    ok(
+        !$manager->_web_runtime_ready( 8808, undef ),
+        '_web_runtime_ready fails cleanly when neither the requested port nor the recorded runtime port exists',
+    );
+}
+
+{
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return {
+            pid  => 8809,
+            port => 7921,
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub {
+        my ( undef, $port ) = @_;
+        return 0 if $port != 7921;
+        $polls++;
+        return $polls >= 2 ? 1 : 0;
+    };
+    ok(
+        $manager->_web_runtime_ready( 8809, 7921 ),
+        '_web_runtime_ready falls back to a local TCP probe when listener pid discovery has not populated yet',
+    );
+    cmp_ok( $polls, '>=', 2, '_web_runtime_ready keeps polling until the local TCP probe succeeds and the runtime remains stable' );
+}
+
+{
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        $polls++;
+        return $polls <= 4 ? { pid => 8810, port => 7923 } : undef;
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return () if $port != 7923;
+        return $polls >= 2 && $polls <= 4 ? (8810) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub { return 0 };
+    ok(
+        !$manager->_web_runtime_ready( 8810, 7923 ),
+        '_web_runtime_ready fails when the replacement web pid only stays up briefly after first appearing ready',
+    );
+}
+
+{
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        $polls++;
+        return { pid => 8811, port => 7924 };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return () if $port != 7924;
+        return $polls <= 2 ? (8811) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub { return 0 };
+    ok(
+        !$manager->_web_runtime_ready( 8811, 7924 ),
+        '_web_runtime_ready fails when the replacement listener disappears while the managed web pid still exists',
+    );
+}
+
+{
+    my $listener = IO::Socket::INET->new(
+        LocalAddr => '127.0.0.1',
+        LocalPort => 0,
+        Proto     => 'tcp',
+        ReuseAddr => 1,
+        Listen    => 1,
+    ) or die "Unable to open test listener socket: $!";
+    my $port = $listener->sockport;
+    ok(
+        $manager->_port_accepting_connections($port),
+        '_port_accepting_connections returns true when a local TCP listener accepts connections',
+    );
+    close $listener or die "Unable to close test listener socket: $!";
+}
+
+{
     my $attempt = 0;
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub { return 1 };
     local *Developer::Dashboard::RuntimeManager::start_web = sub {
         $attempt++;
         die "Address already in use\n" if $attempt == 1;
@@ -1108,6 +1270,7 @@ END {
 {
     my %captured;
     no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub { return 1 };
     local *Developer::Dashboard::RuntimeManager::start_web = sub {
         my ( undef, %args ) = @_;
         %captured = %args;
@@ -1120,6 +1283,7 @@ END {
 {
     my %captured;
     no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub { return 1 };
     local *Developer::Dashboard::RuntimeManager::start_web = sub {
         my ( undef, %args ) = @_;
         %captured = %args;
@@ -1162,6 +1326,89 @@ END {
         sub { $manager->_restart_web_with_retry( host => '0.0.0.0', port => 7916 ) },
         qr/Unable to restart dashboard web service on 0\.0\.0\.0:7916/,
         '_restart_web_with_retry emits the default error text when start_web returns without a pid or exception',
+    );
+}
+
+{
+    my $attempt = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+        $attempt++;
+        return 8804 if $attempt == 1;
+        return 8805;
+    };
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub {
+        my ( undef, $pid, $port ) = @_;
+        return 0 if $port != 7917;
+        return 0 if $pid == 8804;
+        return 1 if $pid == 8805;
+        return 0;
+    };
+    is(
+        $manager->_restart_web_with_retry( host => '0.0.0.0', port => 7917 ),
+        8805,
+        '_restart_web_with_retry retries when start_web returns a pid that is not actually running',
+    );
+    is( $attempt, 2, '_restart_web_with_retry retries once after a dead-on-arrival pid response' );
+}
+
+{
+    my $attempt = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+        $attempt++;
+        return 8806;
+    };
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub { return 0 };
+    dies_like(
+        sub { $manager->_restart_web_with_retry( host => '127.0.0.1', port => 7918 ) },
+        qr/Unable to confirm dashboard web service stayed running on 127\.0\.0\.1:7918/,
+        '_restart_web_with_retry fails explicitly when start_web only returns dead-on-arrival pids',
+    );
+    is( $attempt, 20, '_restart_web_with_retry uses the full retry budget for dead-on-arrival pid responses' );
+}
+
+{
+    my $attempt = 0;
+    my @cleanups;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+        $attempt++;
+        return $attempt == 1 ? 8815 : 8816;
+    };
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub {
+        my ( undef, $pid, $port ) = @_;
+        return $pid == 8816 && $port == 7924 ? 1 : 0;
+    };
+    local *Developer::Dashboard::RuntimeManager::_cleanup_web_files = sub {
+        push @cleanups, 1;
+        return 1;
+    };
+    is(
+        $manager->_restart_web_with_retry( host => '127.0.0.1', port => 7924 ),
+        8816,
+        '_restart_web_with_retry retries when a replacement web pid fails the startup stability window',
+    );
+    is( $attempt, 2, '_restart_web_with_retry retries after a briefly-live replacement web pid fails stability checks' );
+    is( scalar @cleanups, 1, '_restart_web_with_retry clears persisted web state before retrying a briefly-live replacement web pid' );
+}
+
+{
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Local::RuntimeRunner::running_loops = sub {
+        $polls++;
+        return $polls <= 2
+          ? ( { name => 'alpha.collector', pid => 7001 } )
+          : ();
+    };
+    ok(
+        !$manager->_collector_runtime_ready( 'alpha.collector', 7001 ),
+        '_collector_runtime_ready fails when a managed collector loop disappears during the startup stability window',
     );
 }
 

@@ -73,7 +73,6 @@ t/regtest/08_path1a1.svg
 t/regtest/08_path1a2.ref
 t/regtest/08_path1a2.svg
 t/regtest/08_path1a3.ref
-t/regtest/08_path1a3-ld.ref
 t/regtest/08_path1a3.svg
 t/regtest/08_path1a4.ref
 t/regtest/08_path1a4.svg

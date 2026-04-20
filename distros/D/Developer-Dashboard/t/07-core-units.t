@@ -16,9 +16,11 @@ use lib 'lib';
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CollectorRunner;
-use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::Doctor;
+use Developer::Dashboard::EnvAudit;
+use Developer::Dashboard::EnvLoader;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Housekeeper;
 use Developer::Dashboard::IndicatorStore;
@@ -180,6 +182,25 @@ is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'config', 'a
     );
     my $after_collector = Developer::Dashboard::Collector->new( paths => $after );
     ok( !defined $after_collector->read_status('reboot-stale'), 'stale collector state disappears after state directory is removed' );
+}
+{
+    my $metadata_paths = Developer::Dashboard::PathRegistry->new(
+        home            => $home,
+        app_name        => 'dashboard-test',
+        workspace_roots => [ $workspace, $projects ],
+        project_roots   => [$projects],
+    );
+    my $metadata_state_root = $metadata_paths->state_root;
+    my $metadata_file = File::Spec->catfile( $metadata_state_root, 'runtime.json' );
+    ok( -f $metadata_file, 'state root metadata exists before forced temp-state removal' );
+
+    remove_tree($metadata_state_root);
+    ok( !-d $metadata_state_root, 'forced temp-state removal deletes the hashed state root' );
+
+    my $rewritten_metadata = $metadata_paths->_write_state_metadata( $metadata_state_root, $metadata_paths->runtime_root );
+    ok( -d $metadata_state_root, 'write_state_metadata recreates a missing hashed state root before rewriting metadata' );
+    ok( -f $rewritten_metadata, 'write_state_metadata rewrites runtime metadata after the hashed state root disappears' );
+    is( $rewritten_metadata, $metadata_file, 'write_state_metadata rewrites the expected metadata file path' );
 }
 {
     my $secure_home = tempdir(CLEANUP => 1);
@@ -631,7 +652,7 @@ is_deeply(
         close $fh;
         is_deeply(
             [ command_argv_for_path('unix-runner.pl') ],
-            [ $^X, 'unix-runner.pl' ],
+            [ $^X, '-I', $platform_lib_root, 'unix-runner.pl' ],
             'command_argv_for_path resolves Perl scripts through the current perl interpreter on Unix even when they carry a shebang',
         );
         unlink 'unix-runner.pl' or die $!;
@@ -643,7 +664,7 @@ is_deeply(
         chmod 0755, 'unix-runner' or die $!;
         is_deeply(
             [ command_argv_for_path('unix-runner') ],
-            [ $^X, 'unix-runner' ],
+            [ $^X, '-I', $platform_lib_root, 'unix-runner' ],
             'command_argv_for_path resolves shebang-only Perl scripts through the current perl interpreter on Unix',
         );
         unlink 'unix-runner' or die $!;
@@ -893,7 +914,7 @@ SH
     }
     is_deeply(
         [ command_argv_for_path('hook.pl') ],
-        [ $^X, 'hook.pl' ],
+        [ $^X, '-I', $platform_lib_root, 'hook.pl' ],
         'command_argv_for_path resolves Perl scripts on Windows through the current perl interpreter',
     );
     {
@@ -906,6 +927,20 @@ SH
         [ 'cmd.exe', '/d', '/c', 'runner.bat' ],
         'command_argv_for_path resolves .bat scripts on Windows',
     );
+    {
+        no warnings 'redefine';
+        local $ENV{ComSpec} = '/mnt/c/WINDOWS/system32/cmd.exe';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return '/mnt/c/WINDOWS/system32/cmd.exe' if $name eq 'cmd';
+            return undef;
+        };
+        is_deeply(
+            [ command_argv_for_path('runner.bat') ],
+            [ 'cmd.exe', '/d', '/c', 'runner.bat' ],
+            'command_argv_for_path normalizes WSL-style absolute cmd.exe paths back to cmd.exe',
+        );
+    }
     {
         open my $fh, '>', 'runner.sh' or die $!;
         print {$fh} "#!/bin/sh\necho sh-ok\n";
@@ -2036,6 +2071,60 @@ JSON
         [ 'shared-provider', 'leaf-provider' ],
         'providers exposes the layered provider set after id-based merge',
     );
+    is_deeply(
+        $layered_config->save_global_path_alias( 'leaf-added', File::Spec->catdir( $home, 'leaf-added' ) ),
+        {
+            name => 'leaf-added',
+            path => File::Spec->catdir( $home, 'leaf-added' ),
+        },
+        'save_global_path_alias still reports the newly saved layered alias',
+    );
+    open my $leaf_alias_cfg_fh, '<', File::Spec->catfile( $layered_leaf, '.developer-dashboard', 'config', 'config.json' ) or die $!;
+    my $leaf_alias_cfg = json_decode( do { local $/; <$leaf_alias_cfg_fh> } );
+    close $leaf_alias_cfg_fh;
+    is_deeply(
+        $leaf_alias_cfg,
+        {
+            path_aliases => {
+                leaf_only  => '~/leaf-only',
+                'leaf-added' => '$HOME/leaf-added',
+            },
+            collectors => [
+                {
+                    name    => 'leaf.collector',
+                    command => q{printf 'leaf'},
+                    cwd     => 'home',
+                },
+                {
+                    name    => 'parent.collector',
+                    command => q{printf 'leaf-parent'},
+                    cwd     => 'home',
+                },
+            ],
+            providers => [
+                {
+                    id    => 'leaf-provider',
+                    title => 'Leaf Provider',
+                },
+                {
+                    id    => 'shared-provider',
+                    title => 'Leaf Provider Override',
+                },
+            ],
+        },
+        'save_global_path_alias only updates the deepest layer config file and does not copy inherited settings into it',
+    );
+    is_deeply(
+        $layered_config->load_global->{path_aliases},
+        {
+            home_only   => '~/home-only',
+            saved_here  => '~/saved-here',
+            parent_only => '~/parent-only',
+            leaf_only   => '~/leaf-only',
+            'leaf-added'  => '$HOME/leaf-added',
+        },
+        'load_global still exposes inherited path aliases together with the newly saved deepest-layer alias',
+    );
     chdir $original_cwd or die $!;
 }
 {
@@ -2183,6 +2272,70 @@ chdir $original_cwd or die $!;
         [ map { $_->{name} } $indicator_store->list_indicators ],
         [ 'parent-indicator', 'shared-indicator' ],
         'indicator listing unions every layer while deduping by indicator name',
+    );
+
+    chdir $home or die $!;
+}
+
+{
+    my $owning_home = tempdir(CLEANUP => 1);
+    my $owning_parent = File::Spec->catdir( $owning_home, 'workspace', 'parent' );
+    my $owning_child  = File::Spec->catdir( $owning_parent, 'child' );
+    make_path(
+        File::Spec->catdir( $owning_home, '.developer-dashboard', 'config' ),
+        File::Spec->catdir( $owning_parent, '.developer-dashboard', 'config' ),
+        File::Spec->catdir( $owning_child, '.developer-dashboard', 'config' ),
+    );
+
+    open my $owning_home_config, '>', File::Spec->catfile( $owning_home, '.developer-dashboard', 'config', 'config.json' ) or die $!;
+    print {$owning_home_config} qq|{"collectors":[{"name":"fleet.health","indicator":{"name":"fleet.health","icon":"F","label":"Fleet"}}]}|;
+    close $owning_home_config;
+
+    local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = File::Spec->catdir( $owning_home, 'state-root' );
+
+    chdir $owning_child or die $!;
+    my $owning_leaf_paths = Developer::Dashboard::PathRegistry->new( home => $owning_home );
+    my $owning_leaf_store = Developer::Dashboard::IndicatorStore->new( paths => $owning_leaf_paths );
+    my $owning_leaf_files = Developer::Dashboard::FileRegistry->new( paths => $owning_leaf_paths );
+    my $owning_leaf_config = Developer::Dashboard::Config->new(
+        files => $owning_leaf_files,
+        paths => $owning_leaf_paths,
+    );
+    $owning_leaf_store->set_indicator(
+        'fleet.health',
+        collector_name       => 'fleet.health',
+        icon                 => 'F',
+        label                => 'Fleet',
+        managed_by_collector => 1,
+        prompt_visible       => 1,
+        status               => 'missing',
+    );
+
+    {
+        local *Developer::Dashboard::PathRegistry::cwd = sub { return $owning_parent; };
+        my $owning_parent_paths = Developer::Dashboard::PathRegistry->new( home => $owning_home );
+        my $owning_parent_store = Developer::Dashboard::IndicatorStore->new( paths => $owning_parent_paths );
+        $owning_parent_store->set_indicator(
+            'fleet.health',
+            collector_name       => 'fleet.health',
+            icon                 => 'F',
+            label                => 'Fleet',
+            managed_by_collector => 1,
+            prompt_visible       => 1,
+            status               => 'ok',
+        );
+    }
+
+    is(
+        $owning_leaf_store->get_indicator('fleet.health')->{status},
+        'missing',
+        'deepest child-layer managed indicator state shadows the inherited parent state before collector sync heals it',
+    );
+    $owning_leaf_store->sync_collectors( $owning_leaf_config->collectors );
+    is(
+        $owning_leaf_store->get_indicator('fleet.health')->{status},
+        'ok',
+        'sync_collectors heals a deepest child-layer placeholder missing state from the nearest inherited collector indicator when the child layer adds no collector override',
     );
     chdir $home or die $!;
 }
@@ -3103,6 +3256,301 @@ dies_like(
 }
 
 dies_like( sub { Developer::Dashboard::UpdateManager->new }, qr/Missing config/, 'update manager requires config' );
+
+{
+    package Local::EnvLoader::Functions;
+
+    sub from_env {
+        return $ENV{FUNCTION_SOURCE};
+    }
+
+    sub blank_value {
+        return '';
+    }
+}
+
+{
+    my $env_home = tempdir( CLEANUP => 1 );
+    my $previous_cwd = getcwd();
+    my $project_root = File::Spec->catdir( $env_home, 'projects', 'env-audit-project' );
+    my $child_root = File::Spec->catdir( $project_root, 'child' );
+    make_path(
+        File::Spec->catdir( $env_home, '.developer-dashboard' ),
+        File::Spec->catdir( $project_root, '.git' ),
+        File::Spec->catdir( $child_root, '.developer-dashboard' ),
+    );
+    {
+        open my $fh, '>:raw', File::Spec->catfile( $env_home, '.env' ) or die "Unable to write home .env: $!";
+        print {$fh} <<'EOF';
+ROOT_ONLY=root
+SHARED=home
+COMPLEX=one=two
+# hash comment
+// slash comment
+/* multi
+line
+comment */
+HOME_REF=~/runtime
+SYSTEM_REF=$SYSTEM_ONLY
+DEFAULT_REF=${MISSING_VALUE:-fallback}
+FUNCTION_REF=${Local::EnvLoader::Functions::from_env():-fallback}
+FUNCTION_DEFAULT=${Local::EnvLoader::Functions::blank_value():-fallback-from-function}
+CHAIN_REF=$ROOT_ONLY/$SYSTEM_REF
+EOF
+        close $fh or die "Unable to close home .env: $!";
+    }
+    {
+        open my $fh, '>:raw', File::Spec->catfile( $env_home, '.env.pl' ) or die "Unable to write home .env.pl: $!";
+        print {$fh} "\$ENV{ROOT_PL} = \"\$ENV{ROOT_ONLY}-pl\";\n\$ENV{PL_SHARED} = 'home-pl';\n1;\n";
+        close $fh or die "Unable to close home .env.pl: $!";
+    }
+    {
+        open my $fh, '>:raw', File::Spec->catfile( $env_home, '.developer-dashboard', '.env' )
+          or die "Unable to write home runtime .env: $!";
+        print {$fh} "HOME_DD=home-dd\nSHARED=home-dd\n";
+        close $fh or die "Unable to close home runtime .env: $!";
+    }
+    {
+        open my $fh, '>:raw', File::Spec->catfile( $project_root, '.env' ) or die "Unable to write project .env: $!";
+        print {$fh} "PROJECT_ONLY=project\nSHARED=project\n";
+        close $fh or die "Unable to close project .env: $!";
+    }
+    {
+        open my $fh, '>:raw', File::Spec->catfile( $child_root, '.env' ) or die "Unable to write child .env: $!";
+        print {$fh} "CHILD_TEXT=child\nSHARED=project\n";
+        close $fh or die "Unable to close child .env: $!";
+    }
+    {
+        open my $fh, '>:raw', File::Spec->catfile( $child_root, '.env.pl' ) or die "Unable to write child .env.pl: $!";
+        print {$fh} "\$ENV{CHILD_PL} = \"\$ENV{SHARED}-pl\";\n\$ENV{PL_SHARED} = 'child-pl';\n1;\n";
+        close $fh or die "Unable to close child .env.pl: $!";
+    }
+    {
+        open my $fh, '>:raw', File::Spec->catfile( $child_root, '.developer-dashboard', '.env' )
+          or die "Unable to write child runtime .env: $!";
+        print {$fh} "CHILD_DD=child-dd\nSHARED=child-dd\n";
+        close $fh or die "Unable to close child runtime .env: $!";
+    }
+
+    local $ENV{HOME} = $env_home;
+    local $ENV{SYSTEM_ONLY} = 'system';
+    local $ENV{ROOT_ONLY};
+    local $ENV{ROOT_PL};
+    local $ENV{HOME_DD};
+    local $ENV{PROJECT_ONLY};
+    local $ENV{CHILD_DD};
+    local $ENV{CHILD_PL};
+    local $ENV{SHARED};
+    local $ENV{PL_SHARED};
+    local $ENV{COMPLEX};
+    local $ENV{HOME_REF};
+    local $ENV{SYSTEM_REF};
+    local $ENV{DEFAULT_REF};
+    local $ENV{FUNCTION_SOURCE} = 'function-result';
+    local $ENV{FUNCTION_REF};
+    local $ENV{FUNCTION_DEFAULT};
+    local $ENV{CHAIN_REF};
+    local $ENV{CHILD_TEXT};
+    chdir $child_root or die "Unable to chdir to $child_root: $!";
+    Developer::Dashboard::EnvAudit->clear();
+    my $paths = Developer::Dashboard::PathRegistry->new( home => $env_home );
+    Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
+
+    is( $ENV{ROOT_ONLY}, 'root', '.env loader imports home directory .env values' );
+    is( $ENV{ROOT_PL}, 'root-pl', '.env loader loads .env before .env.pl within one layer so .env.pl can use .env values from the same layer' );
+    is( $ENV{HOME_DD}, 'home-dd', '.env loader imports home runtime .developer-dashboard/.env values' );
+    is( $ENV{PROJECT_ONLY}, 'project', '.env loader imports ancestor project .env values' );
+    is( $ENV{CHILD_DD}, 'child-dd', '.env loader imports child runtime .developer-dashboard/.env values' );
+    is( $ENV{CHILD_TEXT}, 'child', '.env loader imports child plain-directory .env values' );
+    is( $ENV{CHILD_PL}, 'project-pl', '.env loader loads child .env before child .env.pl at the same level with no skipping' );
+    is( $ENV{COMPLEX}, 'one=two', '.env loader preserves values that contain additional equals characters' );
+    is( $ENV{SHARED}, 'child-dd', 'deeper runtime env files override shallower values' );
+    is( $ENV{PL_SHARED}, 'child-pl', '.env.pl files can override earlier values from shallower layers' );
+    is( $ENV{HOME_REF}, File::Spec->catdir( $env_home, 'runtime' ), '.env loader expands leading tilde paths relative to home' );
+    is( $ENV{SYSTEM_REF}, 'system', '.env loader expands $NAME from the current environment' );
+    is( $ENV{DEFAULT_REF}, 'fallback', '.env loader expands ${NAME:-default} when the variable is missing' );
+    is( $ENV{FUNCTION_REF}, 'function-result', '.env loader expands ${Function():-default} through a static Perl function' );
+    is( $ENV{FUNCTION_DEFAULT}, 'fallback-from-function', '.env loader uses the default value when a static Perl function returns empty text' );
+    is( $ENV{CHAIN_REF}, 'root/system', '.env loader expands references to earlier variables from the same file' );
+
+    is_deeply(
+        Developer::Dashboard::EnvAudit->key('ROOT_ONLY'),
+        {
+            value   => 'root',
+            envfile => File::Spec->catfile( $env_home, '.env' ),
+        },
+        'EnvAudit records the home .env source file for one imported key',
+    );
+    is_deeply(
+        Developer::Dashboard::EnvAudit->key('SHARED'),
+        {
+            value   => 'child-dd',
+            envfile => File::Spec->catfile( $child_root, '.developer-dashboard', '.env' ),
+        },
+        'EnvAudit records the deepest env file that supplied the effective value',
+    );
+    is_deeply(
+        Developer::Dashboard::EnvAudit->key('CHILD_PL'),
+        {
+            value   => 'project-pl',
+            envfile => File::Spec->catfile( $child_root, '.env.pl' ),
+        },
+        'EnvAudit records .env.pl sourced values with the originating file path',
+    );
+    ok( !defined Developer::Dashboard::EnvAudit->key('SYSTEM_ONLY'), 'EnvAudit leaves system-only environment keys untracked' );
+    my $audit_keys = Developer::Dashboard::EnvAudit->keys();
+    is( $audit_keys->{ROOT_PL}{value}, 'root-pl', 'EnvAudit->keys exposes recorded values as a hash inventory' );
+    is( $audit_keys->{CHILD_DD}{envfile}, File::Spec->catfile( $child_root, '.developer-dashboard', '.env' ), 'EnvAudit->keys exposes the source file for each recorded key' );
+    chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    my $bad_home = tempdir( CLEANUP => 1 );
+    my $previous_cwd = getcwd();
+    my $bad_project = File::Spec->catdir( $bad_home, 'projects', 'bad-env-project' );
+    make_path( File::Spec->catdir( $bad_home, '.developer-dashboard' ), File::Spec->catdir( $bad_project, '.git' ) );
+    open my $fh, '>:raw', File::Spec->catfile( $bad_project, '.env' ) or die "Unable to write malformed .env: $!";
+    print {$fh} "THIS IS NOT VALID\n";
+    close $fh or die "Unable to close malformed .env: $!";
+    local $ENV{HOME} = $bad_home;
+    chdir $bad_project or die "Unable to chdir to $bad_project: $!";
+    Developer::Dashboard::EnvAudit->clear();
+    my $paths = Developer::Dashboard::PathRegistry->new( home => $bad_home );
+    dies_like(
+        sub { Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths ) },
+        qr/Invalid env line .*bad-env-project\/\.env line 1/,
+        'EnvLoader dies explicitly when one .env line is malformed',
+    );
+    chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    my $bad_home = tempdir( CLEANUP => 1 );
+    my $previous_cwd = getcwd();
+    my $bad_project = File::Spec->catdir( $bad_home, 'projects', 'bad-env-key-project' );
+    make_path( File::Spec->catdir( $bad_home, '.developer-dashboard' ), File::Spec->catdir( $bad_project, '.git' ) );
+    open my $fh, '>:raw', File::Spec->catfile( $bad_project, '.env' ) or die "Unable to write invalid-key .env: $!";
+    print {$fh} "1INVALID=value\n";
+    close $fh or die "Unable to close invalid-key .env: $!";
+    local $ENV{HOME} = $bad_home;
+    chdir $bad_project or die "Unable to chdir to $bad_project: $!";
+    Developer::Dashboard::EnvAudit->clear();
+    my $paths = Developer::Dashboard::PathRegistry->new( home => $bad_home );
+    dies_like(
+        sub { Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths ) },
+        qr/Invalid env key .*bad-env-key-project\/\.env line 1/,
+        'EnvLoader rejects invalid environment variable names explicitly',
+    );
+    chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    my $bad_home = tempdir( CLEANUP => 1 );
+    my $previous_cwd = getcwd();
+    my $bad_project = File::Spec->catdir( $bad_home, 'projects', 'bad-env-function-project' );
+    make_path( File::Spec->catdir( $bad_home, '.developer-dashboard' ), File::Spec->catdir( $bad_project, '.git' ) );
+    open my $fh, '>:raw', File::Spec->catfile( $bad_project, '.env' ) or die "Unable to write invalid-function .env: $!";
+    print {$fh} "BROKEN=\${Local::EnvLoader::Functions::missing():-fallback}\n";
+    close $fh or die "Unable to close invalid-function .env: $!";
+    local $ENV{HOME} = $bad_home;
+    chdir $bad_project or die "Unable to chdir to $bad_project: $!";
+    Developer::Dashboard::EnvAudit->clear();
+    my $paths = Developer::Dashboard::PathRegistry->new( home => $bad_home );
+    dies_like(
+        sub { Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths ) },
+        qr/Invalid env function .*Local::EnvLoader::Functions::missing/,
+        'EnvLoader rejects undefined static Perl env functions explicitly',
+    );
+    chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    my $bad_home = tempdir( CLEANUP => 1 );
+    my $previous_cwd = getcwd();
+    my $bad_project = File::Spec->catdir( $bad_home, 'projects', 'bad-env-pl-project' );
+    make_path( File::Spec->catdir( $bad_home, '.developer-dashboard' ), File::Spec->catdir( $bad_project, '.git' ) );
+    open my $fh, '>:raw', File::Spec->catfile( $bad_project, '.env.pl' ) or die "Unable to write false-return .env.pl: $!";
+    print {$fh} "0;\n";
+    close $fh or die "Unable to close false-return .env.pl: $!";
+    local $ENV{HOME} = $bad_home;
+    chdir $bad_project or die "Unable to chdir to $bad_project: $!";
+    Developer::Dashboard::EnvAudit->clear();
+    my $paths = Developer::Dashboard::PathRegistry->new( home => $bad_home );
+    dies_like(
+        sub { Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths ) },
+        qr/did not return a true value/,
+        'EnvLoader propagates .env.pl execution failures instead of hiding them',
+    );
+    chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT};
+    Developer::Dashboard::EnvAudit->clear();
+    dies_like(
+        sub { Developer::Dashboard::EnvAudit->record( undef, 'value', '/tmp/test.env' ) },
+        qr/Missing env audit key/,
+        'EnvAudit rejects an undefined audit key explicitly',
+    );
+    dies_like(
+        sub { Developer::Dashboard::EnvAudit->record( '', 'value', '/tmp/test.env' ) },
+        qr/Missing env audit key/,
+        'EnvAudit rejects an empty audit key explicitly',
+    );
+    dies_like(
+        sub { Developer::Dashboard::EnvAudit->record( 'FOO', 'value', undef ) },
+        qr/Missing env audit source file/,
+        'EnvAudit rejects an undefined audit source file explicitly',
+    );
+    dies_like(
+        sub { Developer::Dashboard::EnvAudit->record( 'FOO', 'value', '' ) },
+        qr/Missing env audit source file/,
+        'EnvAudit rejects an empty audit source file explicitly',
+    );
+    ok( !defined Developer::Dashboard::EnvAudit->key(undef), 'EnvAudit->key returns undef for an undefined key lookup' );
+    ok( !defined Developer::Dashboard::EnvAudit->key(''), 'EnvAudit->key returns undef for an empty key lookup' );
+}
+
+{
+    Developer::Dashboard::EnvAudit->clear();
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT} = json_encode(
+        {
+            FOO => {
+                value   => 'bar',
+                envfile => '/tmp/runtime.env',
+            },
+        }
+    );
+    my $rehydrated = Developer::Dashboard::EnvAudit->keys;
+    is_deeply(
+        $rehydrated,
+        {
+            FOO => {
+                value   => 'bar',
+                envfile => '/tmp/runtime.env',
+            },
+        },
+        'EnvAudit rehydrates its audit inventory from DEVELOPER_DASHBOARD_ENV_AUDIT when a child process inherits it',
+    );
+    is_deeply(
+        Developer::Dashboard::EnvAudit->key('FOO'),
+        {
+            value   => 'bar',
+            envfile => '/tmp/runtime.env',
+        },
+        'EnvAudit->key reads the rehydrated inherited audit entry',
+    );
+}
+
+{
+    Developer::Dashboard::EnvAudit->clear();
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT} = json_encode( ['not-a-hash'] );
+    dies_like(
+        sub { Developer::Dashboard::EnvAudit->keys },
+        qr/DEVELOPER_DASHBOARD_ENV_AUDIT must decode to a hash/,
+        'EnvAudit rejects inherited audit payloads that do not decode to a hash',
+    );
+}
 
 done_testing;
 

@@ -1,5 +1,10 @@
 Change log for Graphics::Framebuffer
 
+6.97   April 19, 2026
+
+       Added the "ball" method.  Allows you to draw pseudo 3D balls.
+	   The "ball" method was also added to "examples/primitives.pl".
+
 6.96   April 11, 2026
 
        Updates to the manual.

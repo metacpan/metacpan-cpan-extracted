@@ -207,9 +207,7 @@ drain(SV* self_sv, UV count)
             }
         }
         if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-        if (self->tombstones > self->capacity / 4 ||
-            (self->size > 0 && self->tombstones > self->size))
-            hashmap_ii_compact(self);
+        HM_MAYBE_COMPACT_XS(self, hashmap_ii_compact);
 
 void
 pop(SV* self_sv)
@@ -219,7 +217,7 @@ pop(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_tail != HM_LRU_NONE) {
                 uint32_t idx = self->lru_tail;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_ii_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -227,9 +225,7 @@ pop(SV* self_sv)
                 mXPUSHi(self->nodes[idx].value);
                 hashmap_ii_lru_unlink(self, idx);
                 hashmap_ii_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_ii_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_ii_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -241,9 +237,7 @@ pop(SV* self_sv)
                 mXPUSHi(self->nodes[i].key);
                 mXPUSHi(self->nodes[i].value);
                     hashmap_ii_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_ii_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_ii_compact);
                     XSRETURN(2);
                 }
             }
@@ -259,7 +253,7 @@ shift(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_head != HM_LRU_NONE) {
                 uint32_t idx = self->lru_head;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_ii_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -267,9 +261,7 @@ shift(SV* self_sv)
                 mXPUSHi(self->nodes[idx].value);
                 hashmap_ii_lru_unlink(self, idx);
                 hashmap_ii_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_ii_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_ii_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -282,9 +274,7 @@ shift(SV* self_sv)
                 mXPUSHi(self->nodes[i].key);
                 mXPUSHi(self->nodes[i].value);
                     hashmap_ii_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_ii_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_ii_compact);
                     XSRETURN(2);
                 }
             }
@@ -375,7 +365,7 @@ thaw(char* class, SV* data)
             int64_t key; memcpy(&key, p, 8); p += 8;
             int64_t val; memcpy(&val, p, 8); p += 8;
             uint32_t ttl; memcpy(&ttl, p, 4); p += 4;
-            hashmap_ii_put(map, key, val, ttl);
+            if (!hashmap_ii_put(map, key, val, ttl)) { hashmap_ii_destroy(map); croak("OOM during thaw"); }
             if (ttl == 0 && map->expires_at) hashmap_ii_persist(map, key);
           }
         }
@@ -496,7 +486,6 @@ get_or_set(SV* self_sv, int64_t key, int64_t default_value)
         EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         bool was_found;
         size_t idx = hashmap_ii_get_or_set(self, key, default_value, 0, &was_found);
-        (void)was_found;
         if (idx >= self->capacity) XSRETURN_UNDEF;
         RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:

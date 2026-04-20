@@ -1,6 +1,7 @@
 use Test2::V0;
+use Time::HiRes qw/time/;
 
-use IPC::Manager::Util qw/USE_INOTIFY USE_IO_SELECT require_mod pid_is_running clone_io/;
+use IPC::Manager::Util qw/USE_INOTIFY USE_IO_SELECT require_mod pid_is_running clone_io tinysleep/;
 
 subtest 'USE_IO_SELECT is constant' => sub {
     my $val = USE_IO_SELECT();
@@ -53,6 +54,44 @@ subtest 'clone_io - no mode' => sub {
 
 subtest 'clone_io - no handle' => sub {
     like(dies { clone_io('<', undef) }, qr/No handle/, "dies without handle");
+};
+
+subtest 'tinysleep sleeps for the requested duration' => sub {
+    my $start = time;
+    tinysleep(0.1);
+    my $elapsed = time - $start;
+    cmp_ok($elapsed, '>=', 0.05, "slept at least a reasonable amount");
+    cmp_ok($elapsed, '<',  1.0,  "did not sleep much longer than requested");
+};
+
+subtest 'tinysleep is interrupted by a signal' => sub {
+    my $fired = 0;
+    local $SIG{USR1} = sub { $fired++ };
+
+    my $pid = fork // die "fork: $!";
+    if ($pid == 0) {
+        # Give the parent a moment to enter tinysleep().
+        select(undef, undef, undef, 0.1);
+        kill 'USR1', getppid();
+        exit 0;
+    }
+
+    my $start   = time;
+    tinysleep(10);
+    my $elapsed = time - $start;
+    waitpid($pid, 0);
+
+    is($fired, 1, "signal handler fired");
+    cmp_ok($elapsed, '<', 5, "tinysleep returned early on signal");
+};
+
+subtest 'tinysleep is a no-op for undef / non-positive values' => sub {
+    my $start = time;
+    tinysleep(undef);
+    tinysleep(0);
+    tinysleep(-1);
+    my $elapsed = time - $start;
+    cmp_ok($elapsed, '<', 0.1, "returned immediately");
 };
 
 done_testing;

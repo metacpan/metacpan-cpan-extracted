@@ -1,10 +1,11 @@
 bench/all.pl
 bench/each.pl
 bench/lru.pl
+Changes
+CLAUDE.md
 eg/basic.pl
 eg/lru_cache.pl
 eg/ttl_cache.pl
-Changes
 HashMap.xs
 hashmap_generic.h
 hashmap_i16.h
@@ -38,6 +39,7 @@ lib/Data/HashMap/SI32.pm
 lib/Data/HashMap/SS.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.bak
 MANIFEST.SKIP
 README
 t/01-i32.t
@@ -49,6 +51,8 @@ t/06-ss.t
 t/07-i32s.t
 t/08-si32.t
 t/09-stress.t
+t/10-lru.t
+t/11-ttl.t
 t/12-i16.t
 t/13-i16s.t
 t/14-si16.t
@@ -57,11 +61,10 @@ t/16-ia.t
 t/17-sa.t
 t/18-i32a.t
 t/19-i16a.t
-t/10-lru.t
-t/11-ttl.t
 t/20-new-features.t
 t/21-leak.t
 t/22-bugfixes.t
+t/23-utf8-flag.t
 typemap
 xs/i16.xsi
 xs/i16a.xsi
@@ -77,6 +80,17 @@ xs/si.xsi
 xs/si16.xsi
 xs/si32.xsi
 xs/ss.xsi
+xt/api_parity.t
+xt/boundary_strings.t
+xt/collision_stress.t
+xt/freeze_corruption.t
+xt/freeze_determinism.t
+xt/from_hash_merge.t
+xt/fuzz_vs_perl_hash.t
+xt/get_direct_readonly.t
+xt/lru_ttl_mix.t
+xt/oom_inject.t
+xt/reserve_grow.t
 xxhash.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

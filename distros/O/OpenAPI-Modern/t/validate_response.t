@@ -635,7 +635,7 @@ YAML
           instanceLocation => '/response/body/content',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content bloop/html)),
           absoluteKeywordLocation => $doc_uri.'#/components/responses/default/content/bloop~1html',
-          error => 'EXCEPTION: unsupported media type "bloop/html": add support with $openapi->add_media_type(...)',
+          error => 'EXCEPTION: unsupported media type "bloop/html": add support with JSON::Schema::Modern::Utilities::add_media_type(...)',
         },
       ],
     },

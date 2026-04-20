@@ -414,7 +414,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.96';
+    our $VERSION   = '6.97';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -502,7 +502,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018-2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.96
+   Version:  6.97
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -4148,7 +4148,6 @@ sub plot {
                                 my $b = (($b2 * $A) + ($b1 * $invA)) >> 8;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
-
                                 # 16-bit RGB565 path (optional): do channel-wise integer blend
                                 # Example skeleton using 5/6-bit channels; you can replace with existing helpers:
                                 my $p1 = unpack('v', $cur);
@@ -4192,7 +4191,6 @@ sub plot {
                                 $b = 255 if $b > 255;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
-
                                 # 16-bit RGB565 add (saturate)
                                 my $p1 = unpack('v', $cur);
                                 my $p2 = unpack('v', $raw_foreground_color);
@@ -4253,7 +4251,6 @@ sub plot {
                                 $c = pack('v', $p);
                             } ## end else [ if ($bytes == 4) ]
                         } elsif ($draw_mode == MULTIPLY_MODE) {
-
                             # Per-channel multiply scaled back to 0..255
                             if ($bytes == 4) {
                                 my ($r1, $g1, $b1, $a1) = unpack('C4', $cur);
@@ -4271,7 +4268,6 @@ sub plot {
                                 my $b = ($b1 * $b2) >> 8;
                                 $c = pack('C3', $r, $g, $b);
                             } else {
-
                                 # 16-bit approximate multiply: expand to 8-bit, multiply, compress back
                                 my $p1 = unpack('v', $cur);
                                 my $p2 = unpack('v', $raw_foreground_color);
@@ -4769,6 +4765,7 @@ sub _flush_screen {
             select($self->{'FB'}) if (defined($self->{'FB'}));
             $| = 1;
             $self->{'FB'}->flush();
+			$self->vsync();
         }
         $self->{'LAST_FLUSHED'} = time + (1/15);
     }
@@ -5580,6 +5577,51 @@ sub ellipse {
     $self->{'RAW_FOREGROUND_COLOR'} = $saved;
 } ## end sub ellipse
 
+=head2 ball
+
+Draw a simple "3D" ball.  It ignores the current foreground color and requires a colors parameter.
+
+=over 4
+
+ $fb->ball({
+     'x' => 300, # Horizontal center
+     'y' => 300, # Vertical center
+     'radius' => 100, # ball radius
+     'colors' => {
+         'red'   => 255, # brightest red
+         'green' => 0,   # brightest green
+         'blue'  => 128, # brightest blue
+         'alpha' => 255, # [optional] most opague alpha
+     },
+ });
+
+=back
+
+=cut
+
+sub ball {
+	my ($self, $params) = @_;
+
+    my $old_color = $self->{'RAW_FOREGROUND_COLOR'};
+	my $count = $params->{'radius'};
+	my $bits  = $self->{'BITS'};
+
+	my @rc = multi_gradient($count, $params->{'colors'}->{'red'},   0);
+	my @gc = multi_gradient($count, $params->{'colors'}->{'green'}, 0);
+	my @bc = multi_gradient($count, $params->{'colors'}->{'blue'},  0);
+	my @ac = multi_gradient($count, 255, 255);
+	if ($bits == 32 && exists($params->{'colors'}->{'alpha'})) {
+		@ac = multi_gradient($count, $params->{'colors'}->{'alpha'}, 0); # replace the plaholder
+	}
+
+	for (my $radius = $count; $radius > 0; $radius--) {
+		$self->set_color({'red' => $rc[$radius], 'green' => $gc[$radius], 'blue' => $bc[$radius], 'alpha' => $ac[$radius]});
+		$self->circle({'filled' => TRUE, 'x' => $params->{'x'}, 'y' => $params->{'y'}, 'radius' => $radius});
+	}
+
+	$self->{'RAW_FOREGROUND_COLOR'} = $old_color;
+}
+
 =head2 circle
 
 Draws a circle at point x,y, with radius 'radius'.  It can be an outline, solid filled, or gradient filled.  Outlined circles can have any pixel size.
@@ -5734,7 +5776,6 @@ sub circle {
                     $self->blit_write($params);
                 }
             } elsif ($gradient) {
-
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     $self->set_color({ 'red' => $rc[$ymy_i], 'green' => $gc[$ymy_i], 'blue' => $bc[$ymy_i] });
@@ -5759,7 +5800,6 @@ sub circle {
                     $self->line($params);
                 }
             } else {
-
                 # Top
                 if ($ymy != $lymy && $ymy != $lymx && $ymy != $lypx && $ymy != $lypy) {
                     ($params->{'x'}, $params->{'y'}, $params->{'xx'}, $params->{'yy'}) = ($xmx, $ymy, $xpx, $ymy);
@@ -5785,7 +5825,6 @@ sub circle {
             $lypy = $ypy;
             $lypx = $ypx;
         } else {
-
             # Top left
             ($params->{'x'}, $params->{'y'}) = ($xmx, $ymy);
             $self->plot($params);
@@ -9777,7 +9816,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.96 (Apr 11, 2026)
+Version 6.97 (Apr 19, 2026)
 
 =head1 THANKS
 

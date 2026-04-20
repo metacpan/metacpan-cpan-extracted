@@ -1,0 +1,294 @@
+#!/usr/bin/perl
+# Run a Perl test suite and emit results in the subunit protocol.
+# Copyright (C) 2026 Jelmer Vernooij <jelmer@samba.org>
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config require_order);
+use File::Find ();
+use FindBin qw($RealBin);
+use lib "$RealBin/lib";
+use TAP::Harness;
+
+my $help     = 0;
+my $use_v2   = 1;
+my @includes;
+my $recurse  = 0;
+my $jobs     = 1;
+
+GetOptions(
+    'v2!'       => \$use_v2,
+    'v1'        => sub { $use_v2 = 0 },
+    'I=s'       => \@includes,
+    'recurse|r' => \$recurse,
+    'jobs|j=i'  => \$jobs,
+    'help|h'    => \$help,
+) or usage(2);
+
+usage(0) if $help;
+
+sub usage {
+    my ($rc) = @_;
+    my $fh = $rc ? \*STDERR : \*STDOUT;
+    print $fh <<"EOF";
+Usage: $0 [options] [test files or dirs]
+
+Run a Perl test suite and emit results on stdout in the subunit protocol.
+Test files are executed via TAP::Harness and results are translated to
+subunit in-process — no external prove or tap2subunit is invoked.
+
+Options:
+  --v1              Emit subunit v1 (text) instead of the v2 default
+  --no-v2           Same as --v1
+  -I PATH           Add PATH to \@INC for each test (repeatable)
+  -j, --jobs N      Run N test files in parallel (default: 1)
+  -r, --recurse     Recurse into directories looking for .t files
+  -h, --help        Show this help
+
+If no test files are given, t/ is scanned for *.t.
+
+Examples:
+  $0 t/
+  $0 --v1 -I lib t/basic.t
+EOF
+    exit $rc;
+}
+
+my @tests = @ARGV ? @ARGV : ('t');
+
+binmode STDOUT if $use_v2;
+
+# TAP::Harness expects a list of files; expand directories to .t files.
+@tests = expand_dirs($recurse, @tests);
+@tests or die "no test files found\n";
+
+sub expand_dirs {
+    my ($recurse, @in) = @_;
+    my @out;
+    for my $t (@in) {
+        if (-d $t) {
+            if ($recurse) {
+                File::Find::find(
+                    sub { push @out, $File::Find::name if -f && /\.t\z/ },
+                    $t);
+            } else {
+                opendir(my $dh, $t) or die "opendir $t: $!";
+                push @out,
+                    map  { "$t/$_" }
+                    sort grep { /\.t\z/ && -f "$t/$_" } readdir $dh;
+            }
+        } elsif (-f $t) {
+            push @out, $t;
+        } else {
+            die "no such file or directory: $t\n";
+        }
+    }
+    return @out;
+}
+
+my $formatter = TAP::Formatter::Subunit->new({ use_v2 => $use_v2 });
+my $harness = TAP::Harness->new({
+    formatter => $formatter,
+    merge     => 1,
+    lib       => \@includes,
+    jobs      => $jobs,
+});
+
+my $aggregate = $harness->runtests(@tests);
+exit($aggregate->has_problems ? 1 : 0);
+
+
+# -- Subunit formatter for TAP::Harness ------------------------------------
+
+package TAP::Formatter::Subunit;
+
+use strict;
+use warnings;
+use base 'TAP::Base';
+
+# Harness calls ->prepare(\@tests), ->open_test($test, $parser) for each
+# test file, and ->summary($aggregate). We emit packets as results arrive
+# in each per-test session, so prepare/summary are no-ops.
+
+sub _initialize {
+    my ($self, $args) = @_;
+    $self->SUPER::_initialize($args);
+    $self->{use_v2} = $args->{use_v2};
+    $self->{stdout} = \*STDOUT;
+    return $self;
+}
+
+sub use_v2    { $_[0]->{use_v2} }
+sub stdout    { $_[0]->{stdout} }
+sub verbosity { 0 }
+sub prepare   { }
+sub summary   { }
+
+sub open_test {
+    my ($self, $test, $parser) = @_;
+    return TAP::Formatter::Subunit::Session->new({
+        name      => $test,
+        formatter => $self,
+        parser    => $parser,
+    });
+}
+
+
+# -- Per-test session: one subunit test per TAP test-point -----------------
+
+package TAP::Formatter::Subunit::Session;
+
+use strict;
+use warnings;
+use Test::Subunit qw(start_test end_test);
+use Test::Subunit::V2 qw(
+    write_packet
+    STATUS_INPROGRESS STATUS_SUCCESS STATUS_FAIL STATUS_SKIP STATUS_XFAIL
+    STATUS_UXSUCCESS
+);
+
+sub new {
+    my ($class, $args) = @_;
+    return bless {
+        name       => $args->{name},
+        formatter  => $args->{formatter},
+        parser     => $args->{parser},
+        test_num   => 0,
+        pending    => undef,  # test pending emit; diag lines append to reason
+        bailed_out => 0,
+    }, $class;
+}
+
+sub result {
+    my ($self, $r) = @_;
+    my $file = $self->{name};
+
+    if ($r->is_test) {
+        $self->_flush_pending;
+        $self->{test_num}++;
+        my $desc = $r->description // '';
+        $desc =~ s/^\s*-\s*//;
+        my $name = length $desc
+            ? "$file: $desc"
+            : "$file: test $self->{test_num}";
+
+        my ($status, $reason);
+        if ($r->has_skip) {
+            $status = 'skip';
+            $reason = $r->explanation;
+        } elsif ($r->has_todo) {
+            $status = $r->is_actual_ok ? 'uxsuccess' : 'xfail';
+            my $e = $r->explanation // '';
+            $reason = length $e ? "TODO: $e" : 'TODO';
+        } elsif ($r->is_ok) {
+            $status = 'success';
+        } else {
+            $status = 'fail';
+        }
+
+        $self->{pending} = { name => $name, status => $status, reason => $reason };
+    } elsif ($r->is_comment) {
+        # Diagnostic lines come after the failing/todo test they describe.
+        # Append to the pending test's reason if one is buffered.
+        if ($self->{pending}) {
+            my $line = $r->as_string . "\n";
+            my $cur = $self->{pending}{reason};
+            if (defined $cur && length $cur) {
+                $cur .= "\n" unless $cur =~ /\n\z/;
+                $self->{pending}{reason} = $cur . $line;
+            } else {
+                $self->{pending}{reason} = $line;
+            }
+        }
+    } elsif ($r->is_bailout) {
+        $self->_flush_pending;
+        my $name = "$file: bail out";
+        my $msg  = $r->explanation // '';
+        $self->_emit($name, 'fail',
+                     length $msg ? "Bail out! $msg" : 'Bail out!');
+        $self->{bailed_out} = 1;
+    }
+}
+
+sub _flush_pending {
+    my ($self) = @_;
+    my $p = delete $self->{pending} or return;
+    $self->_emit($p->{name}, $p->{status}, $p->{reason});
+}
+
+sub close_test {
+    my ($self) = @_;
+    $self->_flush_pending;
+    return if $self->{bailed_out};
+
+    my $parser = $self->{parser};
+    my $exit = $parser->exit;
+    my @perrors = $parser->parse_errors;
+    return unless (defined $exit && $exit != 0) || @perrors;
+
+    my $reason = '';
+    $reason .= "exit $exit\n" if defined $exit && $exit != 0;
+    $reason .= join("\n", @perrors) . "\n" if @perrors;
+    $self->_emit("$self->{name}: test harness", 'fail', $reason);
+}
+
+sub clear_for_close { }
+
+sub _emit {
+    my ($self, $name, $result, $reason) = @_;
+    my $fmt = $self->{formatter};
+    my $fh  = $fmt->stdout;
+
+    if ($fmt->use_v2) {
+        write_packet($fh,
+            status => STATUS_INPROGRESS, testid => $name, runnable => 1);
+
+        my %map = (
+            success   => STATUS_SUCCESS,
+            fail      => STATUS_FAIL,
+            skip      => STATUS_SKIP,
+            xfail     => STATUS_XFAIL,
+            uxsuccess => STATUS_UXSUCCESS,
+        );
+        my %extra;
+        if (defined $reason && length $reason) {
+            $extra{mime}         = 'text/plain; charset=utf-8';
+            $extra{file_name}    = 'reason';
+            $extra{file_content} = $reason;
+            $extra{eof}          = 1;
+        }
+        write_packet($fh,
+            status   => $map{$result},
+            testid   => $name,
+            runnable => 1,
+            %extra);
+    } else {
+        # v1 emit helpers print to the current STDOUT.
+        my $old = select $fh;
+        start_test($name);
+        # v1 protocol uses 'failure' (not 'fail') in emit output.
+        my $v1 = $result eq 'fail'      ? 'failure'
+               : $result eq 'uxsuccess' ? 'success'  # v1 has no uxsuccess
+               :                          $result;
+        # The v1 parser expects "]\n" on its own line; ensure the reason
+        # ends with a newline so the closing bracket isn't appended to it.
+        my $r = $reason;
+        $r .= "\n" if defined $r && length $r && $r !~ /\n\z/;
+        end_test($name, $v1, $r);
+        select $old;
+    }
+}
+
+1;

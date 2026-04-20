@@ -3,10 +3,11 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
+use IO::Socket::INET;
 use POSIX qw(setsid strftime);
 use Time::HiRes qw(sleep time);
 
@@ -219,6 +220,14 @@ sub start_collectors {
             }
             my $name = $job->{name} || '(unnamed)';
             die "Failed to start collector '$name': $error\n";
+        }
+        if ( defined $pid && !$self->_collector_runtime_ready( $job->{name}, $pid ) ) {
+            for my $started (@started) {
+                eval { $self->{runner}->stop_loop( $started->{name} ) };
+            }
+            eval { $self->{runner}->stop_loop( $job->{name} ) };
+            my $name = $job->{name} || '(unnamed)';
+            die "Failed to keep collector '$name' running after startup\n";
         }
         push @started, { name => $job->{name}, pid => $pid } if defined $pid;
     }
@@ -881,15 +890,110 @@ sub _restart_web_with_retry {
     my $attempts = 20;
     for my $attempt ( 1 .. $attempts ) {
         my $pid = eval { $self->start_web( host => $host, port => $port, workers => $workers, ssl => $ssl ) };
-        return $pid if defined $pid && !$@;
         my $error = $@;
+        if ( defined $pid && !$error ) {
+            return $pid if $self->_web_runtime_ready( $pid, $port );
+            $self->_cleanup_web_files;
+            $error = "Unable to confirm dashboard web service stayed running on $host:$port (pid $pid)\n";
+        }
         if ( !$error ) {
             $error = "Unable to restart dashboard web service on $host:$port\n";
         }
-        die $error if $error !~ /Address already in use/;
+        die $error if $error !~ /Address already in use|Unable to confirm dashboard web service stayed running/;
         die $error if $attempt == $attempts;
         sleep 0.25;
     }
+}
+
+# _web_runtime_ready($pid, $port)
+# Confirms that one reported web pid is still the active managed web process
+# and that the configured listen port is actually bound.
+# Input: process id integer and configured TCP port integer.
+# Output: boolean true when the runtime stayed alive long enough to expose its listener.
+sub _web_runtime_ready {
+    my ( $self, $pid, $port ) = @_;
+    return 0 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+    return 0 if defined $port && $port ne '' && ( $port !~ /^\d+$/ || $port < 1 );
+    my $ready = 0;
+    for ( 1 .. $self->_runtime_stability_polls ) {
+        my $running = $self->running_web;
+        if ( $running && ( $running->{pid} || 0 ) == $pid ) {
+            my $listener_port = $port || $running->{port} || 0;
+            if ($listener_port) {
+                my $listening = scalar $self->_listener_pids_for_port($listener_port) ? 1 : 0;
+                $listening = 1 if !$listening && $self->_port_accepting_connections($listener_port);
+                if ($listening) {
+                    $ready = 1;
+                }
+                elsif ($ready) {
+                    return 0;
+                }
+            }
+        }
+        elsif ($ready) {
+            return 0;
+        }
+        sleep $self->_runtime_poll_interval;
+    }
+    return $ready;
+}
+
+# _collector_runtime_ready($name, $pid)
+# Confirms that a newly started collector loop became visible and stayed alive
+# through the startup stability window.
+# Input: collector name string and process id integer.
+# Output: boolean true when the collector loop remained managed and running.
+sub _collector_runtime_ready {
+    my ( $self, $name, $pid ) = @_;
+    return 0 if !defined $name || $name eq '';
+    return 0 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+    my $ready = 0;
+    for ( 1 .. $self->_runtime_stability_polls ) {
+        my ($running) = grep { $_->{name} eq $name && ( $_->{pid} || 0 ) == $pid } $self->{runner}->running_loops;
+        if ($running) {
+            $ready = 1;
+        }
+        elsif ($ready) {
+            return 0;
+        }
+        sleep $self->_runtime_poll_interval;
+    }
+    return $ready;
+}
+
+# _runtime_stability_polls()
+# Returns the number of readiness polls used to prove that a replacement
+# runtime survived startup instead of dying immediately afterwards.
+# Input: none.
+# Output: positive integer poll count.
+sub _runtime_stability_polls {
+    return 5;
+}
+
+# _runtime_poll_interval()
+# Returns the sleep interval in seconds between runtime readiness polls.
+# Input: none.
+# Output: fractional seconds between polls.
+sub _runtime_poll_interval {
+    return 0.1;
+}
+
+# _port_accepting_connections($port)
+# Checks whether one TCP port is currently accepting local connections.
+# Input: TCP port integer.
+# Output: boolean true when a local TCP connection succeeds.
+sub _port_accepting_connections {
+    my ( $self, $port ) = @_;
+    return 0 if !defined $port || $port !~ /^\d+$/ || $port < 1;
+    my $socket = IO::Socket::INET->new(
+        PeerAddr => '127.0.0.1',
+        PeerPort => $port,
+        Proto    => 'tcp',
+        Timeout  => 1,
+    );
+    return 0 if !$socket;
+    close $socket;
+    return 1;
 }
 
 # _read_process_env_marker($pid, $key)

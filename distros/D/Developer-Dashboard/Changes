@@ -1,4 +1,153 @@
+2.72  2026-04-20
+    - normalized Windows `cmd.exe` launcher argv so `.cmd` and `.bat`
+      execution keeps returning `cmd.exe` even on WSL hosts that surface the
+      command processor through `/mnt/c/.../cmd.exe`, and added a focused
+      regression for that mixed-runtime path
+    - changed the generated POSIX shell bootstrap so `d2` now re-enters the
+      `dashboard` script directly instead of hardcoding the Perl interpreter
+      path that generated the bootstrap, which keeps the shortcut working
+      across machines where the active shell and the original bootstrap Perl
+      do not share the same install location
+    - synced the shell-bootstrap docs and added focused smoke coverage for the
+      direct-entrypoint `d2` helper contract across bash, zsh, and POSIX sh
+
+2.71  2026-04-20
+    - taught the public `dashboard` switchboard to report unknown top-level
+      commands explicitly and suggest the closest built-in, layered custom, or
+      other public command before printing the usual usage summary
+    - taught dotted skill dispatch to suggest the closest installed skill
+      command, including nested `skills/<repo>/skills/<repo>/...` trees,
+      instead of failing with only a bare not-found error
+    - added the generated shell-bootstrap `d2` shortcut so bash, zsh, POSIX
+      sh, and PowerShell sessions can forward `d2 ...` directly into
+      `dashboard ...` after evaluating `dashboard shell ...`
+    - added live shell completion for `dashboard` and `d2`, with bash, zsh,
+      and PowerShell bootstraps delegating into `dashboard complete` so
+      built-ins, layered custom commands, and installed dotted skill commands
+      stay in sync with the active runtime
+    - documented the generated shell bootstrap helpers in the README, the main
+      manual, and a dedicated shell-bootstrap doc page, and added focused
+      smoke coverage for the new shortcut, typo guidance, and completion
+      wiring across POSIX shells plus the PowerShell alias/completer setup
+
+2.67  2026-04-19
+    - tightened runtime restart validation so `dashboard restart` and the
+      background `serve` path only report success after the replacement web
+      pid and restarted collector loops survive a managed startup stability
+      window instead of trusting the first startup acknowledgement alone
+    - fixed the collector lifecycle race where a loop that died moments after
+      fork could still be reported as started, and now stop the already-started
+      fleet explicitly before surfacing the failure
+    - added focused runtime-manager regressions covering briefly-live web
+      replacements, startup-stability retries, and collector-loop stability
+      failures so the lifecycle contract stays guarded
+
+2.66  2026-04-19
+    - taught `dashboard skills install` to accept direct local checked-out
+      skill directories by syncing them with `rsync` when they contain both a
+      `.git/` directory and a `.env` file with `VERSION=...`, while repeated
+      installs now act as reinstall or refresh instead of failing on an
+      already-installed repo name
+    - changed `dashboard skills list` so table output is now the default and
+      the enabled state prints explicit `enabled` or `disabled` text instead
+      of colored glyphs, while `-o json` keeps the machine-readable payload
+    - fixed the release tarball metadata so the local release-only kwalitee
+      gate no longer leaks `Module::CPANTS::Analyse` or
+      `Module::CPANTS::Kwalitee` into install-time test prerequisites for
+      blank-environment `cpanm` verification
+    - added a built-in local skill tree-copy fallback for environments where
+      `rsync` is not installed, so direct local checked-out skill reinstalls
+      still work during blank-environment tarball installs
+    - synced the helper usage text, public manuals, and release metadata
+      coverage so the local-install qualification rules and list-output
+      contract stay documented and guarded
+
+2.63  2026-04-19
+    - added `dashboard which` as a thin built-in inspection command that prints
+      the resolved runnable file plus the participating hook files for
+      built-in helpers, layered custom commands, and dotted skill commands
+    - taught skill dispatch to expose public command resolution and hook-path
+      introspection so nested `skill.skill.command` lookups can be inspected
+      without reimplementing skill resolution in the switchboard
+    - added focused CLI smoke, skill-system, loader, and release-metadata
+      coverage plus synced the manuals for built-in, layered, and nested-skill
+      command inspection
+
 Revision history for Developer Dashboard
+
+2.62  2026-04-19
+    - fixed skill command dispatch so oversized accumulated hook `RESULT`
+      payloads now use the same file-backed `RESULT_FILE` and
+      `LAST_RESULT_FILE` overflow-safe handoff as the main dashboard
+      switchboard instead of forcing inline JSON into the skill child env
+    - preserved the immediate previous skill-hook payload through
+      `LAST_RESULT` while keeping empty-hook behavior backward compatible for
+      existing callers of `execute_hooks`
+    - added focused skill-system and refactor-coverage regressions for
+      forced file-backed result handoff and synced the skill authoring docs to
+      describe the overflow-safe contract
+
+2.61  2026-04-19
+    - extended layered plain `.env` parsing so same-level `.env` files always
+      load before `.env.pl`, whole-line `#` and `//` comments plus `/* ... */`
+      block comments are ignored explicitly, and malformed env syntax still
+      fails fast instead of being skipped
+    - added plain `.env` expansion support for leading `~`, `$NAME`,
+      `${NAME:-default}`, and `${Namespace::function():-default}` so layered
+      env files can compose values from system env, earlier layers, and prior
+      assignments in the same file
+    - expanded the env-loader regression suite and synced manuals so the
+      comment, expansion, and precedence contract is covered through unit,
+      CLI, skill, and release-metadata gates
+
+2.60  2026-04-19
+    - added ordered layered env loading for both plain-directory roots and
+      participating `.developer-dashboard/` runtime layers, so `dashboard`
+      now applies `.env` and `.env.pl` files from root to leaf before command
+      hooks, built-in helpers, and custom commands execute
+    - added skill-local env loading that applies only when a skill command or
+      skill hook runs, preserving the shared runtime env chain for normal
+      commands while letting deeper skill layers override keys inside the
+      skill path
+    - added `Developer::Dashboard::EnvAudit` plus focused unit, CLI, and
+      skill coverage so Perl code can inspect the source file for each
+      dashboard-managed env key and the manuals now document the env-loading
+      contract explicitly
+
+2.59  2026-04-19
+    - fixed layered config writes so `dashboard path add` and the related
+      config mutators now save only the deepest writable layer delta instead
+      of copying inherited parent `config.json` domains into the child layer
+    - fixed the thin switchboard Perl helper handoff so staged Perl-backed
+      helpers and hooks force the active dashboard `lib/` root and no longer
+      drift onto an older installed `Developer::Dashboard` copy from
+      `PERL5LIB`
+    - added CLI smoke and unit coverage for child-layer path alias writes plus
+      the Perl launcher argv contract, and updated the DD-OOP-LAYERS docs and
+      integration plan for the local-only child config write rule
+
+2.58  2026-04-18
+    - fixed `dashboard restart` so it no longer trusts a just-returned web pid
+      by itself and now requires the replacement runtime to keep a live
+      managed pid plus an accepting listener on the requested port before it
+      reports success
+    - added a TCP-connect readiness fallback for restart validation so the
+      runtime does not depend only on listener pid discovery races when a new
+      web listener comes up
+    - added focused runtime-manager and CLI smoke coverage proving restart now
+      rejects dead-on-arrival web pids and leaves the public listener
+      reachable after the reported restart succeeds
+
+2.57  2026-04-18
+    - fixed layered collector indicator inheritance so a child
+      `.developer-dashboard/` with no collector override no longer keeps an
+      old placeholder `missing` state pinned red over a healthy inherited
+      parent-layer collector indicator
+    - taught collector indicator config sync to distinguish the deepest local
+      indicator file from the nearest inherited one, so DD-OOP-LAYERS now
+      heals child placeholder state from real inherited collector state
+    - added regression coverage and integration-plan documentation for the
+      child-layer placeholder-state case under DD-OOP-LAYERS
 
 2.56  2026-04-18
     - tightened the documentation gate so README and the main POD must both

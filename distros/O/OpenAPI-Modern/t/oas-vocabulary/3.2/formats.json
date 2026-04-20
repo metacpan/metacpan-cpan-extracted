@@ -247,5 +247,59 @@
                 "valid": true
             }
         ]
+    },
+    {
+        "description": "media-range format",
+        "schema": {
+            "$schema": "https://spec.openapis.org/oas/3.2/dialect/latest",
+            "format": "media-range"
+        },
+        "tests": [
+            {
+                "description": "full wildcard",
+                "data": "*/*",
+                "valid": true
+            },
+            {
+                "description": "partial wildcard",
+                "data": "text/*",
+                "valid": true
+            },
+            {
+                "description": "standard type and subtype",
+                "data": "text/plain",
+                "valid": true
+            },
+            {
+                "description": "standard with parameter",
+                "data": "text/plain; charset=UTF-8",
+                "valid": true
+            },
+            {
+                "description": "standard with two parameters",
+                "data": "audio/PCMU;rate=44100;channels=2;q=0.9",
+                "valid": true
+            },
+            {
+                "description": "invalid character in type",
+                "data": "te]xt/plain",
+                "valid": false
+            },
+            {
+                "description": "invalid character in subtype",
+                "data": "text/pl]ain",
+                "valid": false
+            },
+            {
+                "description": "parameter with quoted string and backslash",
+                "data": "text/plain; charset=\"UTF\\x5C-8\"",
+                "valid": true
+            },
+            {
+                "description": "parameter with structured suffix and parameter",
+                "data": "application/openapi+json; schema=\"https://example.com/myschema/v1\"",
+                "valid": true
+            }
+        ]
     }
 ]

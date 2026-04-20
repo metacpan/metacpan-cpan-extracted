@@ -1,0 +1,9 @@
+^Test-Subunit-
+\.tar\.gz$
+^MYMETA\.
+^Makefile$
+^blib/
+^pm_to_blib$
+^\.git/
+^\.github/
+^\.gitignore$

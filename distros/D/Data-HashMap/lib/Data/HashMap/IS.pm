@@ -2,7 +2,7 @@ package Data::HashMap::IS;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub import {
     $^H{"Data::HashMap::IS/hm_is_put"}    = 1;

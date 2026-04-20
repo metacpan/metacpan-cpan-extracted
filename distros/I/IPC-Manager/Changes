@@ -1,3 +1,13 @@
+0.000027  2026-04-19 09:58:22-07:00 America/Los_Angeles
+
+0.000026  2026-04-19 08:36:18-07:00 America/Los_Angeles
+
+    - Split IPC::Manager::Client::SharedMem out into its own CPAN distribution (IPC-Manager-Client-SharedMem). The SharedMem module, its tests, the SysV configure-time probe, and the matching Makefile.PL / dist.ini shims no longer ship with IPC-Manager. Install IPC::Manager::Client::SharedMem separately if you need the SysV shared-memory protocol
+
+0.000025  2026-04-19 06:33:45-07:00 America/Los_Angeles
+
+    - Add optional $timeout argument to Service::Peer::ready(), Service::Handle::ready(), and the underlying Client::peer_active(). With no timeout the behavior is unchanged (one-shot check); with a timeout the call blocks until the peer becomes active or the timeout elapses. A timeout of 0 blocks indefinitely. Polls via IO::Select on the client's peer-change descriptor when available (inotify on FS-based protocols) and otherwise falls back to a 0.05s sleep-and-retry loop, replacing the 0.025s busy-wait in Service::State
+
 0.000024  2026-04-18 14:57:47-07:00 America/Los_Angeles
 
     - Fix sync_request hang when a peer disappears mid-request: await_response now snapshots the peer at send time and croaks if the peer is fully removed from the bus before the response arrives. Suspend-capable protocols (those advertising suspend_supported) keep waiting across a clean suspend or a restart-under-a-new-pid because the response can still be delivered once the peer resumes — only full unregistration counts as "gone"

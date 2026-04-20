@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.236';
+our $VERSION = '1.237';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -3845,7 +3845,7 @@ Kopiere die Datensätze in Chunks der Größe $n.
 
 =item -ignoreSourceTable => $bool (Default: 0)
 
-Wenn gesetzt, ignoriere den Inhalt der Tabelle auf der Quelldatenbank.
+Wenn gesetzt, ignoriere wir den Inhalt der Tabelle auf der Quelldatenbank.
 Diese Option ist nützlich, wenn der Inhalt der Zieltabelle von -initialData
 aufgebaut werden soll. Alternativ kann auch insertMulit genutzt werden,
 a la
@@ -6155,7 +6155,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.236
+1.237
 
 =head1 AUTHOR
 

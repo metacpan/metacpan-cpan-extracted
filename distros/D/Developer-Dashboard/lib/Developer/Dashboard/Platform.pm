@@ -3,7 +3,7 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use Exporter 'import';
 use File::Basename qw(basename dirname);
@@ -145,12 +145,12 @@ sub command_argv_for_path {
     my $resolved = ( -f $path ? $path : resolve_runnable_file($path) ) || die "Unable to find runnable file for $path";
     my $lower = lc $resolved;
 
-    return ($^X, $resolved) if $lower =~ /\.pl\z/;
+    return ( $^X, '-I', _module_lib_root(), $resolved ) if $lower =~ /\.pl\z/;
     return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_go_source(@ARGV)', $resolved )
       if $lower =~ /\.go\z/;
     return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_java_source(@ARGV)', $resolved )
       if $lower =~ /\.java\z/;
-    return ($^X, $resolved) if !is_windows() && _shebang_uses_perl($resolved);
+    return ( $^X, '-I', _module_lib_root(), $resolved ) if !is_windows() && _shebang_uses_perl($resolved);
     return ($resolved) if !is_windows() && _has_shebang($resolved);
     return ( _powershell_binary(), '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $resolved )
       if $lower =~ /\.ps1\z/;
@@ -267,7 +267,9 @@ sub _powershell_binary {
 # Input: none.
 # Output: executable path or command name string.
 sub _cmd_binary {
-    return $ENV{ComSpec} || command_in_path('cmd') || 'cmd.exe';
+    my $candidate = $ENV{ComSpec} || command_in_path('cmd') || 'cmd.exe';
+    return 'cmd.exe' if lc( basename($candidate) ) eq 'cmd.exe';
+    return $candidate;
 }
 
 # _posix_shell_binary($preferred)

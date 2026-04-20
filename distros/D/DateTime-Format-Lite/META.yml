@@ -24,7 +24,7 @@ no_index:
     - t
     - inc
 requires:
-  DateTime::Lite: v0.5.0
+  DateTime::Lite: v0.6.2
   DateTime::Locale::FromCLDR: v0.8.2
   Exporter: '0'
   Locale::Unicode: v0.4.0
@@ -39,6 +39,6 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Format-Lite/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Format-Lite
-version: v0.1.0
+version: v0.1.1
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

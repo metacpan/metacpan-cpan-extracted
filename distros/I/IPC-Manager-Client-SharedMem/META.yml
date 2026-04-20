@@ -1,0 +1,33 @@
+---
+abstract: 'SysV shared memory as a message store'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::API: '1.302219'
+  Test2::IPC: '1.302219'
+  Test2::Require::Module: '1.302219'
+  Test2::V0: '1.302219'
+  Test2::V1: '1.302219'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Manager-Client-SharedMem
+requires:
+  Carp: '0'
+  IPC::Manager: '0.000026'
+  IPC::SysV: '2.09'
+  Object::HashBase: '0.015'
+  parent: '0'
+  perl: '5.012000'
+resources:
+  bugtracker: https://github.com/exodist/IPC-Manager-Client-SharedMem/issues
+  repository: https://github.com/exodist/IPC-Manager-Client-SharedMem/
+version: '0.000026'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

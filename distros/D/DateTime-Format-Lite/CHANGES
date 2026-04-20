@@ -1,5 +1,17 @@
 Revision history for Perl module DateTime::Format::Lite
 
+v0.1.1 2026-04-19T16:25:51+0900
+    [Bug Fixes]
+    - %Z matching a canonical IANA zone name (UTC, GMT, Z, floating, or any string
+      containing '/') is now handled directly via DateTime::Lite::TimeZone->new
+      instead of going through resolve_abbreviation.
+      This fixes CPAN Testers failures on Solaris, OpenBSD, and FreeBSD where
+      t/10.basic.t tests 28 and 30 ('epoch with timezone' and 'negative epoch with
+      timezone') were failing with "No timezone found for abbreviation 'UTC'".
+    - Updated minimum DateTime::Lite prereq to v0.6.2 for the bundled bug fixes in
+      DateTime::Lite::TimeZone (class-method safety, strict/warnings scope,
+      _get_zone_info argument handling).
+
 v0.1.0 2026-04-16T13:32:10+0900
 	- Initial version
 	- Parses and formats datetime strings using strptime-style patterns.

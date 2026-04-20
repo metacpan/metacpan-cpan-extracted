@@ -37,7 +37,7 @@ get(SV* self_sv, SV* key_sv)
         const char* val;
         uint32_t val_len;
         bool val_utf8;
-        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val, &val_len, &val_utf8))
+        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, &val, &val_len, &val_utf8))
             XSRETURN_UNDEF;
         RETVAL = newSVpvn(val, val_len);
         if (val_utf8) SvUTF8_on(RETVAL);
@@ -52,7 +52,7 @@ get_direct(SV* self_sv, SV* key_sv)
         const char* val;
         uint32_t val_len;
         bool val_utf8;
-        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val, &val_len, &val_utf8))
+        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, &val, &val_len, &val_utf8))
             XSRETURN_UNDEF;
         RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
     OUTPUT:
@@ -63,7 +63,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_ss_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
+        RETVAL = hashmap_ss_remove(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
         RETVAL
 
@@ -73,7 +73,7 @@ take(SV* self_sv, SV* key_sv)
         EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
         const char* val; uint32_t val_len; bool val_utf8;
-        if (!hashmap_ss_take(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val, &val_len, &val_utf8)) XSRETURN_UNDEF;
+        if (!hashmap_ss_take(self, _kstr, (uint32_t)_klen, _khash, &val, &val_len, &val_utf8)) XSRETURN_UNDEF;
         RETVAL = newSVpvn(val, val_len);
         if (val_utf8) SvUTF8_on(RETVAL);
         free((void*)val);
@@ -85,7 +85,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_ss_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
+        RETVAL = hashmap_ss_exists(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
         RETVAL
 
@@ -237,17 +237,13 @@ drain(SV* self_sv, UV count)
                     if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[i].value);
-                self->nodes[i].value = NULL;
                 if (HM_UNLIKELY(self->lru_prev)) hashmap_ss_lru_unlink(self, (uint32_t)i);
                 hashmap_ss_tombstone_at(self, i);
                 n++;
             }
         }
         if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-        if (self->tombstones > self->capacity / 4 ||
-            (self->size > 0 && self->tombstones > self->size))
-            hashmap_ss_compact(self);
+        HM_MAYBE_COMPACT_XS(self, hashmap_ss_compact);
 
 void
 pop(SV* self_sv)
@@ -257,7 +253,7 @@ pop(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_tail != HM_LRU_NONE) {
                 uint32_t idx = self->lru_tail;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_ss_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -271,13 +267,9 @@ pop(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[idx].value);
-                self->nodes[idx].value = NULL;
                 hashmap_ss_lru_unlink(self, idx);
                 hashmap_ss_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_ss_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_ss_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -296,12 +288,8 @@ pop(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[i].value);
-                self->nodes[i].value = NULL;
                     hashmap_ss_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_ss_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_ss_compact);
                     XSRETURN(2);
                 }
             }
@@ -317,7 +305,7 @@ shift(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_head != HM_LRU_NONE) {
                 uint32_t idx = self->lru_head;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_ss_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -331,13 +319,9 @@ shift(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[idx].value);
-                self->nodes[idx].value = NULL;
                 hashmap_ss_lru_unlink(self, idx);
                 hashmap_ss_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_ss_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_ss_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -357,12 +341,8 @@ shift(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
                     mXPUSHs(sv);
                 } else { XPUSHs(&PL_sv_undef); }
-                free((void*)self->nodes[i].value);
-                self->nodes[i].value = NULL;
                     hashmap_ss_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_ss_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_ss_compact);
                     XSRETURN(2);
                 }
             }
@@ -468,8 +448,8 @@ thaw(char* class, SV* data)
             if (p + vl + 4 > end) { hashmap_ss_destroy(map); croak("Truncated freeze data"); }
             const char* vstr = (const char*)p; p += vl;
             uint32_t ttl; memcpy(&ttl, p, 4); p += 4;
-            hashmap_ss_put(map, kstr, kl, khash, kutf8, vstr, vl, vutf8, ttl);
-            if (ttl == 0 && map->expires_at) hashmap_ss_persist(map, kstr, kl, khash, kutf8);
+            if (!hashmap_ss_put(map, kstr, kl, khash, kutf8, vstr, vl, vutf8, ttl)) { hashmap_ss_destroy(map); croak("OOM during thaw"); }
+            if (ttl == 0 && map->expires_at) hashmap_ss_persist(map, kstr, kl, khash);
           }
         }
         if (p > end) croak("Truncated freeze data");
@@ -491,7 +471,7 @@ persist(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_ss_persist(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
+        RETVAL = hashmap_ss_persist(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
         RETVAL
 
@@ -502,7 +482,7 @@ swap(SV* self_sv, SV* key_sv, SV* new_sv)
         EXTRACT_STR_KEY(key_sv);
         STRLEN _nvl; const char* _nvs = SvPV(new_sv, _nvl); bool _nvu = SvUTF8(new_sv) ? true : false;
         const char* old; uint32_t old_len; bool old_utf8;
-        if (!hashmap_ss_swap(self, _kstr, (uint32_t)_klen, _khash, _kutf8, _nvs, (uint32_t)_nvl, _nvu, &old, &old_len, &old_utf8)) XSRETURN_UNDEF;
+        if (!hashmap_ss_swap(self, _kstr, (uint32_t)_klen, _khash, _nvs, (uint32_t)_nvl, _nvu, &old, &old_len, &old_utf8)) XSRETURN_UNDEF;
         RETVAL = newSVpvn(old, old_len);
         if (old_utf8) SvUTF8_on(RETVAL);
         free((void*)old);
@@ -599,7 +579,6 @@ get_or_set(SV* self_sv, SV* key_sv, SV* default_sv)
         bool was_found;
         size_t idx = hashmap_ss_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
                           _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
-        (void)was_found;
         if (idx >= self->capacity) XSRETURN_UNDEF;
         if (self->nodes[idx].value) {
             RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));

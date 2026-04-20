@@ -1,6 +1,10 @@
 Revision history for SVGPDF
 
-0.092
+0.092.1 2025-04-19
+
+	- Fix failing tests for longdouble perls.
+
+0.092	2025-04-18
 
 	- Allow a document to be parsed into a series of similar elements.
           This elminates the need for enclosing the document in

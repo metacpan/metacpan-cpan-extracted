@@ -24,6 +24,7 @@ instantly after a push is triggered.
     [ --background ]
     [ --max-delay <seconds> ]
     [ { --identity | -i } <identitykeyfile> ]
+    [ --notify <repo> [ <branch> ... ] ]
     [ { -v | --version } ]
 
 =head2 --branch <branch>
@@ -166,6 +167,29 @@ If no --identity option is used, then the default behavior is
 to only use those public keys available in the agent and
 and any efault ~/.ssh/id_* files that ssh normally tries.
 
+=head2 --notify [ <repo> [ <branch> ... ] ]
+
+This option is used by hooks/webhookscallback.cgi but can also
+be called manually to notify another "git-deploy" process that
+it's time to wake up and proceed with the git pull and optional
+--build execution. This is intended to be used in conjuction
+with NON-deploy git hosts, i.e., those without "acl.deploy".
+(If the git-deploy client has "acl.deploy" rights, then this
+--notify option will have no effect since the "wake up" timing
+is all handled on the git server side.)
+
+If no <branch> is provided, then git-deploy will be notified
+regardless of which branch it is waiting on.
+
+  Example:
+  git deploy https://github.com/user/projectx.git beta
+
+If no <repo> is provided, then all git-deploy waiters will be
+notified to "git pull" immediately.
+
+An example invoker hooks/webhookcallbaack.cgi has been provided
+with this distribution.
+
 =head2 --version
 
 Show git-deploy version.
@@ -204,7 +228,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.041";
+our $VERSION = "0.042";
 
 my @invoked = ($0, @ARGV);
 my %initial_ENV = %ENV;
@@ -219,6 +243,7 @@ my $fix_nasty = undef;
 my $background = undef;
 our $maxpatience = undef;
 my $identities = [];
+my $notify = undef;
 my $ver = undef;
 my $deploying_version = 0;
 my $maxdelayrecommended = 0;
@@ -230,6 +255,7 @@ GetOptions
     "branch=s" => \$force_branch,
     "chdir|C=s" => $chdir,
     "version|v" => \$ver,
+    "notify" => \$notify,
     "fix-nasty" => \$fix_nasty,
     "background" => \$background,
     "max-delay=i" => \$maxpatience,
@@ -254,6 +280,7 @@ $SIG{INT} = $SIG{TERM} = sub {
     $cleanup->() if $cleanup;
     exit 1;
 };
+exit push_notify(@ARGV) if $notify;
 
 sub run_how_cmd {
     my $stderr = shift;
@@ -281,7 +308,18 @@ sub run_output_include_err {
 }
 
 sub getps {
-    return (run_output_ignore_err qw[ps fauwwx] or run_output_include_err qw[ps auwwx]);
+    return (run_output_ignore_err qw[ps -eo user,pid,ppid,tty,time,args]);
+}
+
+sub background {
+    $runner = 0; # Don't wipe Temp files yet.
+    exit if fork;
+    $runner = $$; # Now it's okay to wipe Temp files.
+    require POSIX;
+    POSIX::setsid();
+    open STDIN,  "<", "/dev/null";
+    open STDOUT, ">", "/dev/null";
+    open STDERR, ">", "/dev/null";
 }
 
 sub rebuild {
@@ -313,6 +351,37 @@ sub current_branch {
 # Which branch to checkout and remain on for the pull to update
 sub checkout_branch {
     return $force_branch || current_branch;
+}
+
+sub push_notify {
+    my $pushed_repo = shift || "";
+    my $pushed_refs = [@_];
+    $0 = "$Script - $cwd: Processing Push Notification ...";
+    background();
+    $pushed_repo =~ s{.*/}{};
+    $pushed_repo =~ s{\.git$}{};
+    $pushed_repo or return 0;
+    my $deployer_folder = {};
+    my $sleeper_child = {};
+    my $running = getps; # USER PID PPID TTY TIME COMMAND
+    $deployer_folder->{$1} = $2 while $running =~ s/^\S+\s+(\d+)\s+\d+\s.*\Q$Script\E - (.+?): Waiting.*//m;
+    $sleeper_child->{$2} = $1 while $running =~ s/^\S+\s+(\d+)\s+(\d+)\s.*\ssleep.*//m;
+    foreach my $deployer_pid (keys %$deployer_folder) {
+        my $sleeper_pid = $sleeper_child->{$deployer_pid} or next;
+        my $need_to_notify = !$pushed_repo; # If no repo, just wake up every deployer to be safe.
+        if ($pushed_repo) {
+            chdir $deployer_folder->{$deployer_pid} or next;
+            if (run_output_ignore_err(qw[git config --list]) =~ /^remote.*url=.*\Q$pushed_repo\E(|\.git)$/m) { # Smells like the right repo so verify the branch.
+                $need_to_notify = !@$pushed_refs; # If no refs found, just wake up the deployer to be safe.
+                if (@$pushed_refs and eval { checkout_branch() } =~ m{([^/]+)$} and my $this_branch = $1) {
+                    # If a specific branch has been pushed, then only wake up the deployer if it matches
+                    $need_to_notify = 1 if grep { /\Q$this_branch\E$/ } @$pushed_refs;
+                }
+            }
+        }
+        kill TERM => $sleeper_pid if $need_to_notify; # WAKE UP!
+    }
+    return 0;
 }
 
 # pull_push_notification()
@@ -477,10 +546,13 @@ if (@$identities) {
             }
         }
         elsif (-e $ident && -r _ && -s _) {
-            my $pub = run_output_ignore_err "ssh-keygen", "-y", "-P", "", "-f", $_;
+            my $pub = run_output_ignore_err "ssh-keygen", "-y", "-P", "", "-f", $ident;
             if ($pub) {
-                warn localtime().": [$$] $Script: Using private key identity: $pub";
-                push @$verified_identities, $_ if !$private_key_file->{$_}++;
+                warn localtime().": [$$] $Script: --identity '$ident': Using private key for: $pub";
+                push @$verified_identities, $ident if !$private_key_file->{$ident}++;
+            }
+            elsif ($ident =~ m{^(.+)\.pub$} and -r $1 and $ident = $1) {
+                redo; # Try again with the NON-".pub" file
             }
             else {
                 warn localtime().": [$$] $Script: --identity '$ident': Unable to read identity file. Passphrase required?\n";
@@ -522,16 +594,7 @@ if (sleep 1) {
     die localtime().": [$$] $Script: Fatal crash while attempting to pull from ".run_output_ignore_err("git","config","remote.$origin.url")."\n$update\n\n".localtime().": [$$] $Script: Manual intervention required.\n" if $update =~ /^fatal:/m;
 }
 
-if ($background) {
-    $runner = 0; # Don't wipe Temp files yet.
-    exit if fork;
-    $runner = $$; # Now it's okay to wipe Temp files.
-    require POSIX;
-    POSIX::setsid();
-    open STDIN,  "<", "/dev/null";
-    open STDOUT, ">", "/dev/null";
-    open STDERR, ">", "/dev/null";
-}
+background if $background;
 
 sleep 1;
 

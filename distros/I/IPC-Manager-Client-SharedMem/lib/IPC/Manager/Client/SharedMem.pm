@@ -2,7 +2,7 @@ package IPC::Manager::Client::SharedMem;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000026';
 
 # Set to 1 by Makefile.PL at install time when the host's SysV IPC is
 # unreliable.  When true, _viable() throws an exception explaining how
@@ -519,8 +519,8 @@ See L<IPC::Manager::Client> for inherited methods.
 
 =head1 SOURCE
 
-The source code repository for IPC::Manager can be found at
-L<https://github.com/exodist/IPC-Manager>.
+The source code repository for IPC::Manager::Client::SharedMem can be found
+at L<https://github.com/exodist/IPC-Manager-Client-SharedMem>.
 
 =head1 MAINTAINERS
 

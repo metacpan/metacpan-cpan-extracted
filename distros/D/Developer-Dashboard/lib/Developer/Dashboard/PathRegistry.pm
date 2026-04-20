@@ -3,7 +3,7 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use Digest::MD5 qw(md5_hex);
 use Cwd qw(abs_path cwd);
@@ -550,13 +550,15 @@ sub _state_root_for_layer {
 }
 
 # _write_state_metadata($dir, $runtime_root)
-# Records the runtime identity for one hashed temp-state root.
+# Records the runtime identity for one hashed temp-state root, recreating the
+# hashed directory first if temp cleanup removed it.
 # Input: state root directory path and originating runtime root path.
 # Output: metadata file path string.
 sub _write_state_metadata {
     my ( $self, $dir, $runtime_root ) = @_;
     return '' if !defined $dir || $dir eq '';
     return '' if !defined $runtime_root || $runtime_root eq '';
+    $self->_ensure_state_dir($dir);
     my $file = File::Spec->catfile( $dir, 'runtime.json' );
     open my $fh, '>:raw', $file or die "Unable to write $file: $!";
     print {$fh} json_encode(

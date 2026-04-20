@@ -16,7 +16,7 @@
 
 name:      perl-Git-Server
 summary:   Git-Server - Secure Git Server with more granular hooks capabilities than default git.
-version:   0.041
+version:   0.042
 release:   1
 vendor:    Rob Brown <bbb@cpan.org>
 packager:  Arix International <cpan2rpm@arix.com>
@@ -28,7 +28,7 @@ buildarch: noarch
 prefix:    %(echo %{_prefix})
 buildrequires: /usr/lib/rpm/perl.req
 buildrequires: /usr/lib/rpm/perl.prov
-source0:   %{pkgname}-%{version}.tar.gz
+source0:   http://www.cpan.org/authors/id/B/BB/BBB/%{pkgname}-%{version}.tar.gz
 
 %description
 This is intented to be a drop-in replacement for any standard git server,
@@ -132,5 +132,20 @@ find %{buildroot}%{_prefix}             \
 %defattr(-,root,root)
 
 %changelog
-* Wed Apr 15 2026 hookbot@tiny14.threerings.net
-- Initial build.
+Revision History for Git::Server
+
+0.042  2026-04-20 01:00:00
+ - proxy.url enhancements:
+   * OPTIMIZATION: Cache ls-remote failures.
+   * Prevent crashing deploy if one sync fails.
+   * Honor core.sshCommand to reach remote easier.
+ - git-deploy enhancements:
+   * Fix -i <PrivKey> (broke in v0.041).
+   * Let -i <PubKey> work again.
+   * More portable ps BSD, OSX, and Solaris.
+   * Add webhookcallback.cgi support.
+ - git-verify enhancements:
+   * Make sure executable
+ - git-client enhancements:
+   * Remove File::Temp dep (Added v0.034).
+

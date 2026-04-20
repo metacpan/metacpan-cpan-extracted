@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Lite - ~/lib/DateTime/Format/Lite.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/14
-## Modified 2026/04/15
-## All rights reserved
+## Modified 2026/04/19
+## All rights reserved.
 ## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util ();
     use Wanted;
-    our $VERSION    = 'v0.1.0';
+    our $VERSION    = 'v0.1.1';
     our @EXPORT_OK  = qw( strptime strftime );
     our $IsPurePerl;
 };
@@ -122,7 +122,7 @@ my %UNIVERSAL_PATTERNS =
     Y   => { regex => qr/$DIGIT{4}/,            field => 'year'              },
     z   => { regex => qr/(?:Z|[+-]$DIGIT{2}(?:[:]?$DIGIT{2})?)/,
              field => 'time_zone_offset'                                     },
-    Z   => { regex => qr/[a-zA-Z]{1,6}|[\-\+]$DIGIT{2}/,
+    Z   => { regex => qr{[a-zA-Z]{1,6}(?:/[a-zA-Z_]+(?:/[a-zA-Z_]+)?)?|[\-\+]$DIGIT{2}},
              field => 'time_zone_abbreviation'                               },
 );
 
@@ -138,6 +138,11 @@ my %UNIVERSAL_REPLACEMENTS =
 
 # NOTE: subroutine pre-declaration
 # for sub in `perl -ln -E 'say "$1" if( /^sub (\w+)[[:blank:]\v]*(?:\{|\Z|[[:blank:]\v]*:[[:blank:]\v]*lvalue)/ )' ./lib/DateTime/Format/Lite.pm | LC_COLLATE=C sort -uV`; do echo "sub $sub;"; done
+sub FREEZE;
+sub STORABLE_freeze;
+sub STORABLE_thaw;
+sub THAW;
+sub TO_JSON;
 sub debug;
 sub error;
 sub fatal;
@@ -163,6 +168,9 @@ sub _munge_args;
 sub _on_error;
 sub _parser;
 sub _parser_pieces;
+sub _restore_state;
+sub _serialise_state;
+sub _set_get_prop;
 sub _token_re_for;
 
 sub new
@@ -860,13 +868,12 @@ sub _build_parser
         }
     }
 
-    return(
-    {
+    return({
         regex  => ( $self->{strict}
             ? qr/(?:\A|\b)$regex(?:\b|\Z)/
             : qr/$regex/ ),
         fields => \@fields,
-    } );
+    });
 }
 
 sub _check_dt
@@ -1101,13 +1108,29 @@ sub _munge_args
         my $tz;
 
         # 1. Check caller-supplied zone_map first (explicit overrides)
-        if( exists( $self->{zone_map}{ $abbr } ) )
+        if( exists( $self->{zone_map}->{ $abbr } ) )
         {
-            if( !defined( $self->{zone_map}{ $abbr } ) )
+            if( !defined( $self->{zone_map}->{ $abbr } ) )
             {
                 return( $self->_on_error( qq{The time zone abbreviation "$abbr" is marked ambiguous in zone_map.} ) );
             }
-            $tz = DateTime::Lite::TimeZone->new( name => $self->{zone_map}{ $abbr } );
+            $tz = DateTime::Lite::TimeZone->new( name => $self->{zone_map}->{ $abbr } );
+        }
+        # Short-circuit for canonical zone names that also show up as %Z.
+        # UTC, GMT, and Z (Zulu) are all IANA zone names, not abbreviations in the
+        # types table, so resolve_abbreviation() would fail. Any string with a '/' is
+        # an IANA zone name and never an abbreviation.
+        elsif( $abbr eq 'UTC' ||
+               $abbr eq 'GMT' ||
+               $abbr eq 'Z' ||
+               $abbr eq 'floating' ||
+               index( $abbr, '/' ) >= 0 )
+        {
+            $tz = DateTime::Lite::TimeZone->new( name => $abbr );
+            if( !defined( $tz ) )
+            {
+                return( $self->_on_error( qq{Cannot construct timezone "$abbr": } . DateTime::Lite::TimeZone->error ) );
+            }
         }
         else
         {
@@ -1489,7 +1512,7 @@ DateTime::Format::Lite - Parse and format datetimes with strptime patterns, retu
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

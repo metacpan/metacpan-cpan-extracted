@@ -3,12 +3,14 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use Cwd qw(realpath);
+use File::Copy qw(copy);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
 use File::Basename qw(basename);
+use File::Find qw(find);
 use Capture::Tiny qw(capture);
 use JSON::XS qw(decode_json encode_json);
 use Developer::Dashboard::PathRegistry;
@@ -31,30 +33,42 @@ sub new {
     }, $class;
 }
 
-# install($git_url)
-# Clones a Git repository as a skill into the deepest participating
-# DD-OOP-LAYERS skills root.
-# Input: Git URL (can be git@, https://, file:///, etc.)
+# install($source)
+# Installs or reinstalls a skill into the deepest participating DD-OOP-LAYERS
+# skills root.
+# Input: Git URL or direct local checked-out repository path.
 # Output: hash ref with success status and repo name.
 sub install {
-    my ( $self, $git_url ) = @_;
-    return { error => 'Missing Git URL' } if !$git_url;
+    my ( $self, $source ) = @_;
+    return { error => 'Missing skill source' } if !$source;
 
-    my $repo_name = _extract_repo_name($git_url);
-    return { error => "Unable to extract repo name from $git_url" } if !$repo_name;
+    my $local_source = $self->_local_checked_out_source($source);
+    return $local_source if ref($local_source) eq 'HASH';
+    my $repo_name = $local_source ? basename($local_source) : _extract_repo_name($source);
+    return { error => "Unable to extract repo name from $source" } if !$repo_name;
 
     my $skills_root = $self->{paths}->skills_root;
     my $skill_path = File::Spec->catdir( $skills_root, $repo_name );
-    return { error => "Skill '$repo_name' already installed at $skill_path" } if -d $skill_path;
 
     $self->{paths}->ensure_dir($skills_root);
+    my $remove = $self->_remove_existing_skill_path($skill_path);
+    return $remove if $remove->{error};
 
-    my ( $stdout, $stderr, $exit ) = capture {
-        system( 'git', 'clone', $git_url, $skill_path );
-    };
-    if ( $exit != 0 ) {
-        remove_tree($skill_path) if -d $skill_path;
-        return { error => "Failed to clone $git_url: $stderr" };
+    if ($local_source) {
+        my $sync = $self->_sync_local_skill_source( $local_source, $skill_path );
+        if ( $sync->{error} ) {
+            remove_tree($skill_path) if -d $skill_path;
+            return $sync;
+        }
+    }
+    else {
+        my ( $stdout, $stderr, $exit ) = capture {
+            system( 'git', 'clone', $source, $skill_path );
+        };
+        if ( $exit != 0 ) {
+            remove_tree($skill_path) if -d $skill_path;
+            return { error => "Failed to clone $source: $stderr" };
+        }
     }
 
     $self->_prepare_skill_layout($skill_path);
@@ -242,14 +256,15 @@ sub usage {
     return $self->_skill_usage( $repo_name, $skill_path );
 }
 
-# _extract_repo_name($git_url)
+# _extract_repo_name($source)
 # Extracts repository name from various Git URL formats.
-# Input: Git URL string.
+# Input: Git URL string or local directory path.
 # Output: repo name or undef.
 sub _extract_repo_name {
     my ($url) = @_;
     
     return if !$url;
+    return basename($url) if -d $url;
     
     # Extract from: git@github.com:user/repo-name.git
     if ( $url =~ m{/([^/]+?)(\.git)?$} ) {
@@ -258,6 +273,124 @@ sub _extract_repo_name {
     }
     
     return;
+}
+
+# _sync_local_skill_source($source_path, $target_path)
+# Copies one validated local skill checkout into the isolated installed skill
+# root, using rsync when available and a Perl tree copy otherwise.
+# Input: absolute source path and absolute target path.
+# Output: success hash ref or error hash ref.
+sub _sync_local_skill_source {
+    my ( $self, $source_path, $target_path ) = @_;
+    return { error => 'Missing local skill source path' } if !$source_path;
+    return { error => 'Missing local skill target path' } if !$target_path;
+
+    if ( $self->_rsync_available ) {
+        my ( $stdout, $stderr, $exit ) = capture {
+            system( 'rsync', '-a', '--delete', $source_path . '/', $target_path );
+        };
+        return { success => 1 } if $exit == 0;
+        return { error => "Failed to sync local skill source $source_path: $stderr" };
+    }
+
+    return $self->_copy_tree( $source_path, $target_path );
+}
+
+# _rsync_available()
+# Reports whether the external rsync binary is available for local skill sync.
+# Input: none.
+# Output: boolean true when rsync can be executed from PATH, false otherwise.
+sub _rsync_available {
+    my ($self) = @_;
+    return system( 'sh', '-c', 'command -v rsync >/dev/null 2>&1' ) == 0 ? 1 : 0;
+}
+
+# _copy_tree($source_path, $target_path)
+# Recursively copies one source directory tree into a fresh target directory
+# while preserving executable modes needed by installed skill commands.
+# Input: absolute source path and absolute target path.
+# Output: success hash ref or error hash ref.
+sub _copy_tree {
+    my ( $self, $source_path, $target_path ) = @_;
+    eval {
+        make_path($target_path);
+        find(
+            {
+                no_chdir => 1,
+                wanted   => sub {
+                    my $path = $File::Find::name;
+                    return if $path eq $source_path;
+                    my $relative = File::Spec->abs2rel( $path, $source_path );
+                    my $target = File::Spec->catfile( $target_path, $relative );
+                    if ( -d $path ) {
+                        make_path($target);
+                        chmod( ( stat($path) )[2] & 07777, $target );
+                        return;
+                    }
+                    copy( $path, $target ) or die "Unable to copy $path to $target: $!";
+                    chmod( ( stat($path) )[2] & 07777, $target );
+                },
+            },
+            $source_path,
+        );
+        1;
+    } or do {
+        my $error = $@ || 'Unknown local skill copy failure';
+        return { error => "Failed to sync local skill source $source_path without rsync: $error" };
+    };
+
+    return { success => 1 };
+}
+
+# _local_checked_out_source($source)
+# Detects and validates one direct local checked-out skill repository path.
+# Input: install source string.
+# Output: normalized absolute source path string or undef when the source is
+# not a direct local repository path.
+sub _local_checked_out_source {
+    my ( $self, $source ) = @_;
+    return if !$source;
+    return if $source =~ m{\A[A-Za-z][A-Za-z0-9+.-]*://};
+    return if !-d $source;
+
+    my $local_source = realpath($source) || $source;
+    return { error => "Local skill source '$source' is missing a .git directory" }
+      if !-d File::Spec->catdir( $local_source, '.git' );
+    return { error => "Local skill source '$source' is missing a .env file with VERSION" }
+      if !$self->_local_skill_has_version($local_source);
+    return $local_source;
+}
+
+# _local_skill_has_version($skill_path)
+# Checks whether one direct local checked-out skill source carries a
+# qualification .env file with a VERSION assignment.
+# Input: local skill source directory path.
+# Output: boolean true when .env exists and contains VERSION=..., false
+# otherwise.
+sub _local_skill_has_version {
+    my ( $self, $skill_path ) = @_;
+    my $env_file = File::Spec->catfile( $skill_path, '.env' );
+    return 0 if !-f $env_file;
+    open my $fh, '<', $env_file or die "Unable to read $env_file: $!";
+    local $/;
+    my $content = <$fh>;
+    close $fh;
+    return $content =~ /^VERSION\s*=\s*\S+/m ? 1 : 0;
+}
+
+# _remove_existing_skill_path($skill_path)
+# Removes one previously installed skill path so install can act as reinstall.
+# Input: absolute installed skill root path.
+# Output: success hash reference.
+sub _remove_existing_skill_path {
+    my ( $self, $skill_path ) = @_;
+    return { success => 1 } if !-e $skill_path;
+    my $error;
+    remove_tree( $skill_path, { error => \$error } );
+    if ( @{$error} ) {
+        return { error => "Failed to replace existing skill at $skill_path: " . join( ', ', @{$error} ) };
+    }
+    return { success => 1 };
 }
 
 # _prepare_skill_layout($skill_path)

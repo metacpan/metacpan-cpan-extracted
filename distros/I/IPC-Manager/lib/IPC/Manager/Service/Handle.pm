@@ -2,11 +2,13 @@ package IPC::Manager::Service::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000027';
 
 use Carp qw/croak/;
-use Time::HiRes qw/sleep time/;
+use Time::HiRes qw/time/;
 use Test2::Util::UUID qw/gen_uuid/;
+
+use IPC::Manager::Util qw/tinysleep/;
 
 use Role::Tiny::With;
 
@@ -64,7 +66,8 @@ sub select_handles {
 
 sub ready {
     my $self = shift;
-    $self->client->peer_active($self->{+SERVICE_NAME});
+    my ($timeout) = @_;
+    $self->client->peer_active($self->{+SERVICE_NAME}, $timeout);
 }
 
 sub client {
@@ -176,7 +179,7 @@ sub poll {
                 last if $delta >= $timeout
             }
 
-            sleep $self->{+INTERVAL};
+            tinysleep($self->{+INTERVAL});
         }
     }
 
@@ -284,7 +287,20 @@ Returns a list of filehandles for select().
 
 =item $bool = $self->ready()
 
-Returns true if the handle is ready to use
+=item $bool = $self->ready($timeout)
+
+Returns true if the handle's peer service is active.
+
+With no argument (or C<undef>), C<ready> returns the current state
+immediately (one-shot, backwards-compatible).
+
+With C<$timeout>, C<ready> blocks until the peer becomes active or the
+timeout elapses, whichever comes first.  A C<$timeout> of C<0> blocks
+indefinitely.
+
+Uses the underlying client's peer-change notification handle
+(C<IO::Select> on an inotify/similar fd) where available; otherwise
+falls back to a short sub-second sleep-and-retry loop.
 
 =item $client = $self->client()
 

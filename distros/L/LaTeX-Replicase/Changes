@@ -82,3 +82,14 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Fixed old tests.
 	- Increased diversity of code test coverage.
 	- The manual has been corrected and expanded.
+
+0.705 Sun Apr 19 19:19:19 2026
+	- Added magic value 003 (\x{003} or chr(0x03)) for %%%V: and %%%VAR: tags, which insert C<\endinput> command into TeX document and cuts off the rest of the template.
+	- Added magic value 004 (\x{004} or chr(0x04)) for %%%V: and %%%VAR: tags, which insert C<\end{document}> command into TeX document and cuts off the rest of the template.
+	- Fixed magic value "\x{001}" (or chr(0x01)).
+	- Fixed kwalitee Indicator (no_mymeta_files): update MANIFEST & MANIFEST.SKIP files to exclude MYMETA files.
+	- Optimized algorithms.
+	- Added new tests.
+	- Fixed old tests.
+	- Added CONTRIBUTING.md file.
+	- The manual has been corrected and expanded.

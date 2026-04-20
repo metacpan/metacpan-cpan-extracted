@@ -95,7 +95,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.236';
+our $VERSION = '1.237';
 
 use Quiq::Hash;
 use Quiq::Properties;
@@ -786,7 +786,7 @@ sub asText {
 
 =head1 VERSION
 
-1.236
+1.237
 
 =head1 AUTHOR
 

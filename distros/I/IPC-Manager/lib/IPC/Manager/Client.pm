@@ -2,12 +2,13 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000027';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed weaken/;
+use Time::HiRes qw/time/;
 
-use IPC::Manager::Util qw/pid_is_running/;
+use IPC::Manager::Util qw/pid_is_running tinysleep/;
 
 use IPC::Manager::Message;
 
@@ -165,12 +166,63 @@ sub requeue_message {
 
 sub peer_active {
     my $self = shift;
+    my ($peer, $timeout) = @_;
 
-    my $peer_pid = $self->peer_pid(@_);
+    return $self->_peer_active_once($peer) unless defined $timeout;
+
+    # timeout == 0 means "block indefinitely".  Otherwise build a deadline.
+    my $deadline = $timeout > 0 ? time + $timeout : undef;
+
+    while (1) {
+        return 1 if $self->_peer_active_once($peer);
+
+        my $remaining;
+        if (defined $deadline) {
+            $remaining = $deadline - time;
+            return 0 if $remaining <= 0;
+        }
+
+        $self->_wait_for_peer_change($remaining);
+    }
+}
+
+sub _peer_active_once {
+    my $self = shift;
+    my ($peer) = @_;
+
+    my $peer_pid = $self->peer_pid($peer);
 
     return 0 unless $peer_pid;
     return 0 unless $self->pid_is_running($peer_pid);
     return 1;
+}
+
+# Block (up to $remaining seconds, or indefinitely if undef) waiting for
+# something that might indicate the peer set has changed.  When the client
+# advertises have_handles_for_peer_change we use IO::Select on those
+# handles; otherwise we fall back to a short Time::HiRes sleep and re-poll.
+#
+# Note: IN_CREATE inotify watches (FS-based protocols) only fire for new
+# peer directories, not for pidfile writes inside an existing peer dir, so
+# we still clamp the IO::Select wait to a sub-second value so the caller
+# continues to catch pidfile-only transitions.
+sub _wait_for_peer_change {
+    my $self = shift;
+    my ($remaining) = @_;
+
+    my $max_wait = 0.05;
+    $max_wait = $remaining if defined($remaining) && $remaining < $max_wait;
+
+    if ($self->have_handles_for_peer_change) {
+        require IO::Select;
+        my $s = IO::Select->new($self->handles_for_peer_change);
+        $s->can_read($max_wait);
+        $self->reset_handles_for_peer_change;
+        return;
+    }
+
+    tinysleep($max_wait);
+    return;
 }
 
 sub disconnect {
@@ -363,7 +415,20 @@ Get the identifier for this connection.
 
 =item $bool = $con->peer_active($peer_name)
 
+=item $bool = $con->peer_active($peer_name, $timeout)
+
 Check if the specified peer is active.
+
+With no C<$timeout> (or C<undef>), returns the current state immediately.
+
+With C<$timeout> in seconds, blocks until the peer becomes active or the
+timeout elapses, whichever comes first.  A C<$timeout> of C<0> blocks
+indefinitely.
+
+When the protocol exposes a peer-change descriptor
+(C<have_handles_for_peer_change>), C<peer_active> waits on it via
+C<IO::Select>.  Otherwise it falls back to a 0.05-second sleep-and-retry
+loop, avoiding a tight busy-loop in either case.
 
 =item $bool = $con->peer_exists($peer_name)
 

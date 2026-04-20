@@ -33,7 +33,7 @@ get(SV* self_sv, SV* key_sv)
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t value;
-        if (!hashmap_si_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value))
+        if (!hashmap_si_get(self, _kstr, (uint32_t)_klen, _khash, &value))
             XSRETURN_UNDEF;
         RETVAL = newSViv(value);
     OUTPUT:
@@ -44,7 +44,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
+        RETVAL = hashmap_si_remove(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
         RETVAL
 
@@ -54,7 +54,7 @@ take(SV* self_sv, SV* key_sv)
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t value;
-        if (!hashmap_si_take(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value)) XSRETURN_UNDEF;
+        if (!hashmap_si_take(self, _kstr, (uint32_t)_klen, _khash, &value)) XSRETURN_UNDEF;
         RETVAL = newSViv(value);
     OUTPUT:
         RETVAL
@@ -64,7 +64,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
+        RETVAL = hashmap_si_exists(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
         RETVAL
 
@@ -232,9 +232,7 @@ drain(SV* self_sv, UV count)
             }
         }
         if (self->iter_pos >= self->capacity) self->iter_pos = 0;
-        if (self->tombstones > self->capacity / 4 ||
-            (self->size > 0 && self->tombstones > self->size))
-            hashmap_si_compact(self);
+        HM_MAYBE_COMPACT_XS(self, hashmap_si_compact);
 
 void
 pop(SV* self_sv)
@@ -244,7 +242,7 @@ pop(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_tail != HM_LRU_NONE) {
                 uint32_t idx = self->lru_tail;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_si_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -256,9 +254,7 @@ pop(SV* self_sv)
                 mXPUSHi(self->nodes[idx].value);
                 hashmap_si_lru_unlink(self, idx);
                 hashmap_si_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_si_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_si_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -274,9 +270,7 @@ pop(SV* self_sv)
                 }
                 mXPUSHi(self->nodes[i].value);
                     hashmap_si_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_si_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_si_compact);
                     XSRETURN(2);
                 }
             }
@@ -292,7 +286,7 @@ shift(SV* self_sv)
         if (self->lru_prev) {
             while (self->lru_head != HM_LRU_NONE) {
                 uint32_t idx = self->lru_head;
-                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now > self->expires_at[idx]) {
+                if (HM_UNLIKELY(HM_TTL_SKIP_EXPIRED(self, idx, now))) {
                     hashmap_si_expire_at(self, idx, true); continue;
                 }
                 EXTEND(SP, 2);
@@ -304,9 +298,7 @@ shift(SV* self_sv)
                 mXPUSHi(self->nodes[idx].value);
                 hashmap_si_lru_unlink(self, idx);
                 hashmap_si_tombstone_at(self, idx);
-                if (self->tombstones > self->capacity / 4 ||
-                    (self->size > 0 && self->tombstones > self->size))
-                    hashmap_si_compact(self);
+                HM_MAYBE_COMPACT_XS(self, hashmap_si_compact);
                 XSRETURN(2);
             }
             XSRETURN_EMPTY;
@@ -323,9 +315,7 @@ shift(SV* self_sv)
                 }
                 mXPUSHi(self->nodes[i].value);
                     hashmap_si_tombstone_at(self, i);
-                    if (self->tombstones > self->capacity / 4 ||
-                        (self->size > 0 && self->tombstones > self->size))
-                        hashmap_si_compact(self);
+                    HM_MAYBE_COMPACT_XS(self, hashmap_si_compact);
                     XSRETURN(2);
                 }
             }
@@ -424,8 +414,8 @@ thaw(char* class, SV* data)
             uint32_t khash = hm_hash_string(kstr, kl);
             int64_t val; memcpy(&val, p, 8); p += 8;
             uint32_t ttl; memcpy(&ttl, p, 4); p += 4;
-            hashmap_si_put(map, kstr, kl, khash, kutf8, val, ttl);
-            if (ttl == 0 && map->expires_at) hashmap_si_persist(map, kstr, kl, khash, kutf8);
+            if (!hashmap_si_put(map, kstr, kl, khash, kutf8, val, ttl)) { hashmap_si_destroy(map); croak("OOM during thaw"); }
+            if (ttl == 0 && map->expires_at) hashmap_si_persist(map, kstr, kl, khash);
           }
         }
         if (p > end) croak("Truncated freeze data");
@@ -447,7 +437,7 @@ persist(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_persist(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
+        RETVAL = hashmap_si_persist(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
         RETVAL
 
@@ -457,7 +447,7 @@ swap(SV* self_sv, SV* key_sv, int64_t new_val)
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t old;
-        if (!hashmap_si_swap(self, _kstr, (uint32_t)_klen, _khash, _kutf8, new_val, &old)) XSRETURN_UNDEF;
+        if (!hashmap_si_swap(self, _kstr, (uint32_t)_klen, _khash, new_val, &old)) XSRETURN_UNDEF;
         RETVAL = newSViv(old);
     OUTPUT:
         RETVAL
@@ -467,7 +457,7 @@ cas(SV* self_sv, SV* key_sv, int64_t expected, int64_t new_val)
     CODE:
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_cas(self, _kstr, (uint32_t)_klen, _khash, _kutf8, expected, new_val);
+        RETVAL = hashmap_si_cas(self, _kstr, (uint32_t)_klen, _khash, expected, new_val);
     OUTPUT:
         RETVAL
 
@@ -551,7 +541,6 @@ get_or_set(SV* self_sv, SV* key_sv, int64_t default_value)
         EXTRACT_STR_KEY(key_sv);
         bool was_found;
         size_t idx = hashmap_si_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0, &was_found);
-        (void)was_found;
         if (idx >= self->capacity) XSRETURN_UNDEF;
         RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:

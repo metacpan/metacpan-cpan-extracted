@@ -3,12 +3,15 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '2.56';
+our $VERSION = '2.72';
 
 use File::Spec;
 use JSON::XS qw(encode_json decode_json);
 use Capture::Tiny qw(capture);
 use File::Basename qw(dirname basename);
+use Developer::Dashboard::CLI::Suggest;
+use Developer::Dashboard::EnvLoader;
+use Developer::Dashboard::Runtime::Result;
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file resolve_runnable_file);
 
@@ -34,13 +37,17 @@ sub dispatch {
     return { error => 'Missing command name' } if !$command;
 
     my $skill_path = $self->{manager}->get_skill_path( $skill_name, include_disabled => 1 );
-    return { error => "Skill '$skill_name' not found" } if !$skill_path;
-    return { error => "Skill '$skill_name' is disabled" } if !$self->{manager}->is_enabled($skill_name);
+    my $suggest = Developer::Dashboard::CLI::Suggest->new(
+        paths   => $self->{manager}{paths},
+        manager => $self->{manager},
+    );
+    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$skill_path;
+    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$self->{manager}->is_enabled($skill_name);
 
     my $command_spec = $self->_command_spec( $skill_name, $command );
     my $cmd_path = $command_spec ? $command_spec->{cmd_path} : undef;
     my $command_skill_path = $command_spec ? $command_spec->{skill_path} : undef;
-    return { error => "Command '$command' not found in skill '$skill_name'" } if !$cmd_path;
+    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$cmd_path;
 
     my $hook_result = $self->execute_hooks( $skill_name, $command, @args );
     return $hook_result if $hook_result->{error};
@@ -57,6 +64,15 @@ sub dispatch {
 
     my ( $stdout, $stderr, $exit ) = capture {
         local %ENV = ( %ENV, %env );
+        Developer::Dashboard::Runtime::Result::set_current( $hook_result->{result_state} || {} );
+        if ( ref( $hook_result->{last_result} ) eq 'HASH' && %{ $hook_result->{last_result} } ) {
+            Developer::Dashboard::Runtime::Result::set_last_result( $hook_result->{last_result} );
+        }
+        else {
+            Developer::Dashboard::Runtime::Result::clear_last_result();
+        }
+        Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+        Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
         system( @command, @args );
     };
     my $hook_stdout = join '', map { defined $_->{stdout} ? $_->{stdout} : '' } values %{ $hook_result->{hooks} || {} };
@@ -85,6 +101,7 @@ sub execute_hooks {
     my $resolved_command = $command_spec ? $command_spec->{command_name} : $command;
 
     my %results;
+    my $last_result = {};
     for my $layer_path (@skill_layers) {
         my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$resolved_command.d" );
         next if !-d $hooks_dir;
@@ -103,6 +120,15 @@ sub execute_hooks {
             my @command = command_argv_for_path($hook_path);
             my ( $stdout, $stderr, $exit ) = capture {
                 local %ENV = ( %ENV, %env );
+                Developer::Dashboard::Runtime::Result::set_current( \%results );
+                if (%{$last_result}) {
+                    Developer::Dashboard::Runtime::Result::set_last_result($last_result);
+                }
+                else {
+                    Developer::Dashboard::Runtime::Result::clear_last_result();
+                }
+                Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+                Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
                 system( @command, @args );
             };
             my $result_key = exists $results{$entry} ? $self->_hook_result_key($hook_path) : $entry;
@@ -111,13 +137,21 @@ sub execute_hooks {
                 stderr    => $stderr,
                 exit_code => $exit,
             };
+            $last_result = {
+                file   => $hook_path,
+                exit   => $exit,
+                STDOUT => $stdout,
+                STDERR => $stderr,
+            };
         }
         closedir($dh);
     }
-    return {
+    my %payload = (
         hooks        => \%results,
         result_state => \%results,
-    };
+    );
+    $payload{last_result} = $last_result if %{$last_result};
+    return \%payload;
 }
 
 # get_skill_config($skill_name)
@@ -181,6 +215,48 @@ sub command_path {
     return if !$skill_name || !$command;
     my $command_spec = $self->_command_spec( $skill_name, $command );
     return $command_spec ? $command_spec->{cmd_path} : undef;
+}
+
+# command_spec($skill_name, $command)
+# Resolves one dotted skill command and returns the internal command
+# specification used for dispatch.
+# Input: skill repo name and command name.
+# Output: hash reference containing cmd_path, skill_path, skill_layers, and
+# command_name, or undef when the command cannot be resolved.
+sub command_spec {
+    my ( $self, $skill_name, $command ) = @_;
+    return if !$skill_name || !$command;
+    return $self->_command_spec( $skill_name, $command );
+}
+
+# command_hook_paths($skill_name, $command)
+# Enumerates the skill-local hook files that would execute before one resolved
+# skill command across every participating skill layer.
+# Input: skill repo name and command name.
+# Output: ordered list of absolute hook file paths.
+sub command_hook_paths {
+    my ( $self, $skill_name, $command ) = @_;
+    return () if !$skill_name || !$command;
+    my $command_spec = $self->_command_spec( $skill_name, $command );
+    return () if !$command_spec;
+
+    my @hooks;
+    my $resolved_command = $command_spec->{command_name} || '';
+    return () if $resolved_command eq '';
+
+    for my $layer_path ( @{ $command_spec->{skill_layers} || [] } ) {
+        my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$resolved_command.d" );
+        next if !-d $hooks_dir;
+        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+            my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
+            next unless is_runnable_file($hook_path);
+            push @hooks, $hook_path;
+        }
+        closedir($dh);
+    }
+
+    return @hooks;
 }
 
 # route_response(%args)
@@ -330,7 +406,7 @@ sub _load_skill_page {
 
 # _skill_env(%args)
 # Builds the isolated environment passed to skill hooks and commands.
-# Input: skill name, skill path, command name, and accumulated RESULT state.
+# Input: skill name, skill path, and command name.
 # Output: hash of environment variables.
 sub _skill_env {
     my ( $self, %args ) = @_;
@@ -353,7 +429,6 @@ sub _skill_env {
         DEVELOPER_DASHBOARD_SKILL_STATE_ROOT  => File::Spec->catdir( $skill_path, 'state' ),
         DEVELOPER_DASHBOARD_SKILL_LOGS_ROOT   => File::Spec->catdir( $skill_path, 'logs' ),
         DEVELOPER_DASHBOARD_SKILL_LOCAL_ROOT  => $local_root,
-        RESULT                                => encode_json( $args{result_state} || {} ),
         PERL5LIB                              => join( $path_sep, @perl5lib ),
     );
 }
@@ -641,7 +716,7 @@ Handles:
 
 =head1 PURPOSE
 
-This module executes installed skill commands and serves skill bookmark routes. It resolves a skill command path, runs any sorted hook files under C<cli/E<lt>commandE<gt>.d>, prepares the isolated skill environment, captures stdout/stderr, and can render bookmarks under C</skill/E<lt>repoE<gt>/bookmarks/...> through the main page renderer.
+This module executes installed skill commands and serves skill bookmark routes. It resolves a skill command path, runs any sorted hook files under C<cli/E<lt>commandE<gt>.d>, prepares the isolated skill environment, hands hook state through C<Developer::Dashboard::Runtime::Result> so oversized hook payloads spill into C<RESULT_FILE> automatically, captures stdout/stderr, and can render bookmarks under C</skill/E<lt>repoE<gt>/bookmarks/...> through the main page renderer.
 
 =head1 WHY IT EXISTS
 

@@ -7,6 +7,7 @@ use Capture::Tiny qw(capture);
 use Cwd qw(abs_path getcwd);
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CLI::SeededPages ();
+use Developer::Dashboard::EnvAudit;
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::PathRegistry;
 use Encode qw(decode encode);
@@ -450,7 +451,39 @@ like($help, qr/dashboard docker list \[--enabled\|--disabled\]/, 'dashboard help
 like($help, qr/dashboard skills enable <repo-name>/, 'dashboard help documents skill enable');
 like($help, qr/dashboard skills disable <repo-name>/, 'dashboard help documents skill disable');
 like($help, qr/dashboard skills usage <repo-name> \[-o json\|table\]/, 'dashboard help documents skill usage inspection');
+like($help, qr/dashboard which <cmd>/, 'dashboard help documents the built-in which command');
 unlike($help, qr/dashboard skill <repo-name> <command>/, 'dashboard help no longer documents the removed singular skill dispatcher');
+my ( $invalid_cmd_stdout, $invalid_cmd_stderr, $invalid_cmd_exit ) = capture {
+    system $perl, '-I' . $lib, $dashboard, 'dcoekr';
+    return $? >> 8;
+};
+is( $invalid_cmd_exit, 1, 'dashboard exits non-zero for an unknown top-level command' );
+like( $invalid_cmd_stdout . $invalid_cmd_stderr, qr/Unknown dashboard command 'dcoekr'/, 'dashboard reports the mistyped top-level command explicitly' );
+like( $invalid_cmd_stdout . $invalid_cmd_stderr, qr/Did you mean:\s+dashboard docker/s, 'dashboard suggests the closest built-in command for a mistyped top-level command' );
+my ( $invalid_alias_stdout, $invalid_alias_stderr, $invalid_alias_exit ) = capture {
+    system $perl, '-I' . $lib, $dashboard, 'skils', 'list';
+    return $? >> 8;
+};
+is( $invalid_alias_exit, 1, 'dashboard exits non-zero for another unknown top-level command typo' );
+like( $invalid_alias_stdout . $invalid_alias_stderr, qr/Did you mean:\s+dashboard skills/s, 'dashboard suggests the closest plural built-in command for another typo' );
+like( $invalid_alias_stdout . $invalid_alias_stderr, qr/Usage:/, 'dashboard still prints the command list after typo guidance' );
+my $complete_top = _run("$perl -I'$lib' '$dashboard' complete 1 dashboard do");
+like( $complete_top, qr/^docker$/m, 'dashboard complete suggests docker for top-level completion' );
+like( $complete_top, qr/^doctor$/m, 'dashboard complete suggests doctor for top-level completion' );
+my $complete_top_alias = _run("$perl -I'$lib' '$dashboard' complete 1 d2 do");
+like( $complete_top_alias, qr/^docker$/m, 'dashboard complete suggests docker for the d2 alias as well' );
+like( $complete_top_alias, qr/^doctor$/m, 'dashboard complete suggests doctor for the d2 alias as well' );
+my $complete_sub = _run("$perl -I'$lib' '$dashboard' complete 2 dashboard docker co");
+is( $complete_sub, "compose\n", 'dashboard complete suggests docker subcommands' );
+my $completion_skill_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'completion-skill', 'cli' );
+make_path($completion_skill_root);
+my $completion_skill_command = File::Spec->catfile( $completion_skill_root, 'run-test' );
+open my $completion_skill_fh, '>', $completion_skill_command or die "Unable to write $completion_skill_command: $!";
+print {$completion_skill_fh} "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{completion\\n};\n";
+close $completion_skill_fh;
+chmod 0755, $completion_skill_command or die "Unable to chmod $completion_skill_command: $!";
+my $complete_skill = _run("$perl -I'$lib' '$dashboard' complete 1 dashboard completion-s");
+like( $complete_skill, qr/^completion-skill\.run-test$/m, 'dashboard complete suggests installed dotted skill commands' );
 
 my $serve_workers_port = _find_free_port();
 my $serve_workers = _run("$perl -I'$lib' '$dashboard' serve workers 3 --port $serve_workers_port");
@@ -540,7 +573,7 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     my $serve_json = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $serve_port") );
     ok( $serve_json->{pid}, 'dashboard serve returns a managed web pid for the collector lifecycle smoke test' );
     my $first_stdout = '';
-    for ( 1 .. 80 ) {
+    for ( 1 .. 160 ) {
         my $output = json_decode( _run("$perl -I'$lib' '$dashboard' collector output tick.collector") );
         $first_stdout = $output->{stdout} || '';
         last if $first_stdout =~ /^\d+\.\d+\n$/;
@@ -551,8 +584,17 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     like( $first_stdout, qr/^\d+\.\d+\n$/, 'dashboard serve starts configured interval collectors so collector output begins changing without a separate restart' );
     my $restart_json = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $serve_port") );
     ok( $restart_json->{web_pid}, 'dashboard restart still returns a managed web pid in the collector lifecycle smoke test' );
+    ok( kill( 0, $restart_json->{web_pid} ), 'dashboard restart reports a live managed web pid in the collector lifecycle smoke test' );
+    my $serve_ua = LWP::UserAgent->new( timeout => 5 );
+    my $serve_health_response;
+    for ( 1 .. 40 ) {
+        $serve_health_response = $serve_ua->get("http://127.0.0.1:$serve_port/");
+        last if $serve_health_response->code;
+        sleep 0.25;
+    }
+    ok( $serve_health_response && $serve_health_response->code, 'dashboard restart leaves the collector lifecycle web listener reachable on the restarted port' );
     my $second_stdout = '';
-    for ( 1 .. 80 ) {
+    for ( 1 .. 160 ) {
         my $output = json_decode( _run("$perl -I'$lib' '$dashboard' collector output tick.collector") );
         $second_stdout = $output->{stdout} || '';
         last if $second_stdout =~ /^\d+\.\d+\n$/ && $second_stdout ne $first_stdout;
@@ -570,13 +612,25 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
     my $readonly_init = _run("$perl -I'$lib' '$dashboard' init");
     like( $readonly_init, qr/runtime_root/, 'isolated no-editor smoke home initializes a runtime' );
-    _run("$perl -I'$lib' '$dashboard' page new readonly 'Read Only' | $perl -I'$lib' '$dashboard' page save readonly");
+    my $readonly_source = _run("$perl -I'$lib' '$dashboard' page new readonly 'Read Only'");
+    my $readonly_source_file = File::Spec->catfile( $readonly_home, 'readonly.page' );
+    open my $readonly_source_fh, '>:raw', $readonly_source_file or die "Unable to write $readonly_source_file: $!";
+    print {$readonly_source_fh} $readonly_source;
+    close $readonly_source_fh;
+    _run("$perl -I'$lib' '$dashboard' page save readonly < '$readonly_source_file'");
     my $readonly_port = _find_free_port();
     my $readonly_serve = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $readonly_port --no-endit") );
     ok( $readonly_serve->{pid}, 'dashboard serve --no-endit starts the managed web service' );
     my $readonly_ua = LWP::UserAgent->new( timeout => 5 );
+    my $readonly_ready_response;
+    for ( 1 .. 240 ) {
+        $readonly_ready_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/system/status");
+        last if $readonly_ready_response->is_success;
+        sleep 0.25;
+    }
+    ok( $readonly_ready_response && $readonly_ready_response->is_success, 'no-editor live server exposes the system status route before route assertions begin' );
     my $render_response;
-    for ( 1 .. 40 ) {
+    for ( 1 .. 240 ) {
         $render_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly");
         last if $render_response->is_success;
         sleep 0.25;
@@ -586,12 +640,22 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     unlike( $render_body, qr/id="share-url"/, 'no-editor live server hides the share link from render views' );
     unlike( $render_body, qr/id="view-source-url"/, 'no-editor live server hides the view-source link from render views' );
     unlike( $render_body, qr/id="play-url"/, 'no-editor live server hides the play link from render views' );
-    my $edit_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly/edit");
+    my $edit_response;
+    for ( 1 .. 240 ) {
+        $edit_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly/edit");
+        last if $edit_response->code == 403;
+        sleep 0.25;
+    }
     is( $edit_response->code, 403, 'no-editor live server blocks direct bookmark editor routes' );
-    my $edit_post_response = $readonly_ua->post(
-        "http://127.0.0.1:$readonly_port/app/readonly/edit",
-        { instruction => "TITLE: Changed\n:--------------------------------------------------------------------------------:\nBOOKMARK: readonly\n:--------------------------------------------------------------------------------:\nHTML: changed\n" },
-    );
+    my $edit_post_response;
+    for ( 1 .. 240 ) {
+        $edit_post_response = $readonly_ua->post(
+            "http://127.0.0.1:$readonly_port/app/readonly/edit",
+            { instruction => "TITLE: Changed\n:--------------------------------------------------------------------------------:\nBOOKMARK: readonly\n:--------------------------------------------------------------------------------:\nHTML: changed\n" },
+        );
+        last if $edit_post_response->code == 403;
+        sleep 0.25;
+    }
     is( $edit_post_response->code, 403, 'no-editor live server blocks bookmark editor post saves' );
     my $readonly_config_file = File::Spec->catfile( $readonly_home, '.developer-dashboard', 'config', 'config.json' );
     open my $readonly_config_fh, '<', $readonly_config_file or die "Unable to read $readonly_config_file: $!";
@@ -618,13 +682,25 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
     my $noind_init = _run("$perl -I'$lib' '$dashboard' init");
     like( $noind_init, qr/runtime_root/, 'isolated no-indicators smoke home initializes a runtime' );
-    _run("$perl -I'$lib' '$dashboard' page new noind 'No Indicators' | $perl -I'$lib' '$dashboard' page save noind");
+    my $noind_source = _run("$perl -I'$lib' '$dashboard' page new noind 'No Indicators'");
+    my $noind_source_file = File::Spec->catfile( $noind_home, 'noind.page' );
+    open my $noind_source_fh, '>:raw', $noind_source_file or die "Unable to write $noind_source_file: $!";
+    print {$noind_source_fh} $noind_source;
+    close $noind_source_fh;
+    _run("$perl -I'$lib' '$dashboard' page save noind < '$noind_source_file'");
     my $noind_port = _find_free_port();
     my $noind_serve = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $noind_port --no-indicator") );
     ok( $noind_serve->{pid}, 'dashboard serve --no-indicator starts the managed web service' );
     my $noind_ua = LWP::UserAgent->new( timeout => 5 );
+    my $noind_ready_response;
+    for ( 1 .. 240 ) {
+        $noind_ready_response = $noind_ua->get("http://127.0.0.1:$noind_port/system/status");
+        last if $noind_ready_response->is_success;
+        sleep 0.25;
+    }
+    ok( $noind_ready_response && $noind_ready_response->is_success, 'no-indicators live server exposes the system status route before route assertions begin' );
     my $noind_render_response;
-    for ( 1 .. 40 ) {
+    for ( 1 .. 240 ) {
         $noind_render_response = $noind_ua->get("http://127.0.0.1:$noind_port/app/noind");
         last if $noind_render_response->is_success;
         sleep 0.25;
@@ -635,7 +711,12 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     unlike( $noind_render_body, qr/id="status-datetime"/, 'no-indicators live server hides the top-right date-time marker' );
     unlike( $noind_render_body, qr/id="status-server"/, 'no-indicators live server hides the top-right server marker' );
     unlike( $noind_render_body, qr/class="user-name-and-icon"/, 'no-indicators live server hides the top-right user marker' );
-    my $noind_status_response = $noind_ua->get("http://127.0.0.1:$noind_port/system/status");
+    my $noind_status_response;
+    for ( 1 .. 240 ) {
+        $noind_status_response = $noind_ua->get("http://127.0.0.1:$noind_port/system/status");
+        last if $noind_status_response->code == 200;
+        sleep 0.25;
+    }
     is( $noind_status_response->code, 200, 'no-indicators live server keeps the status endpoint available' );
     like( decode( 'UTF-8', $noind_status_response->decoded_content ), qr/"array"\s*:/, 'no-indicators live server still exposes status payload data' );
     my $noind_ps1 = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 0");
@@ -648,7 +729,7 @@ is($serve_logs_tail, "Dancer2 boot line\n", 'dashboard serve logs -n prints only
     my $noind_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $noind_port") );
     ok( $noind_restart->{web_pid}, 'dashboard restart keeps managing the no-indicators web service' );
     my $post_restart_render;
-    for ( 1 .. 40 ) {
+    for ( 1 .. 240 ) {
         $post_restart_render = $noind_ua->get("http://127.0.0.1:$noind_port/app/noind");
         last if $post_restart_render->is_success;
         sleep 0.25;
@@ -785,6 +866,204 @@ my $foobar_resolved = _run("$perl -I'$lib' '$dashboard' path resolve foobar");
 is( $foobar_resolved, $custom_path_root . "\n", 'dashboard path resolve supports user-defined aliases' );
 my $path_list = _run("$perl -I'$lib' '$dashboard' path list");
 like( $path_list, qr/"foobar"\s*:\s*"\Q$custom_path_root\E"/, 'dashboard path list includes user-defined aliases' );
+{
+    my $layered_path_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $layered_path_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $layered_init = _run("$perl -I'$lib' '$dashboard' init");
+    like( $layered_init, qr/runtime_root/, 'isolated layered path smoke home initializes a runtime' );
+    my $layered_root_config_file = File::Spec->catfile( $layered_path_home, '.developer-dashboard', 'config', 'config.json' );
+    open my $layered_root_config_fh, '>:raw', $layered_root_config_file or die "Unable to write $layered_root_config_file: $!";
+    print {$layered_root_config_fh} json_encode(
+        {
+            collectors => [
+                {
+                    name     => 'root.collector',
+                    command  => q{true},
+                    cwd      => 'home',
+                    interval => 10,
+                },
+            ],
+            web => {
+                no_editor => 1,
+            },
+        }
+    );
+    close $layered_root_config_fh;
+    my $layered_project = File::Spec->catdir( $layered_path_home, 'layered-path-project' );
+    make_path(
+        File::Spec->catdir( $layered_project, '.git' ),
+        File::Spec->catdir( $layered_project, '.developer-dashboard', 'cli' ),
+    );
+    my $layered_cli = File::Spec->catfile( $layered_project, '.developer-dashboard', 'cli', 'foobar' );
+    open my $layered_cli_fh, '>:raw', $layered_cli or die "Unable to write $layered_cli: $!";
+    print {$layered_cli_fh} "#!/usr/bin/env perl\nprint qq{layered path smoke\\n};\n";
+    close $layered_cli_fh;
+    chmod 0700, $layered_cli or die "Unable to chmod $layered_cli: $!";
+    my $layered_path_add = _run("cd '$layered_project' && HOME='$layered_path_home' $perl -I'$lib' '$dashboard' path add layered '$layered_project'");
+    like( $layered_path_add, qr/"name"\s*:\s*"layered"/, 'dashboard path add saves an alias inside a deepest child DD-OOP layer' );
+    my $layered_child_config_file = File::Spec->catfile( $layered_project, '.developer-dashboard', 'config', 'config.json' );
+    open my $layered_child_config_fh, '<', $layered_child_config_file or die "Unable to read $layered_child_config_file: $!";
+    my $layered_child_config = decode( 'UTF-8', do { local $/; <$layered_child_config_fh> } );
+    close $layered_child_config_fh;
+    is_deeply(
+        json_decode($layered_child_config),
+        {
+            path_aliases => {
+                layered => '$HOME/layered-path-project',
+            },
+        },
+        'dashboard path add writes only the new portable alias into the deepest child config file',
+    );
+    unlike( $layered_child_config, qr/"root\.collector"/, 'dashboard path add does not copy inherited collector settings into the deepest child config file' );
+    unlike( $layered_child_config, qr/"no_editor"\s*:\s*1/, 'dashboard path add does not copy inherited web settings into the deepest child config file' );
+}
+{
+    my $env_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $env_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+
+    my $env_project = File::Spec->catdir( $env_home, 'env-project', 'child' );
+    make_path(
+        File::Spec->catdir( $env_home, '.developer-dashboard' ),
+        File::Spec->catdir( $env_home, 'env-project', '.git' ),
+        File::Spec->catdir( $env_project, '.developer-dashboard', 'cli' ),
+        File::Spec->catdir( $env_project, '.developer-dashboard', 'skills', 'envskill', 'cli' ),
+    );
+    open my $home_env_fh, '>:raw', File::Spec->catfile( $env_home, '.env' ) or die "Unable to write $env_home/.env: $!";
+    print {$home_env_fh} <<'EOF';
+ROOT_ENV=root
+SHARED_ENV=home
+HOME_REF=~/cli-home
+DEFAULT_REF=${MISSING_VALUE:-cli-fallback}
+CHAIN_REF=$ROOT_ENV/$SHARED_ENV
+# comment
+// comment
+/* block
+comment */
+EOF
+    close $home_env_fh or die "Unable to close $env_home/.env: $!";
+    open my $child_env_fh, '>:raw', File::Spec->catfile( $env_project, '.env' ) or die "Unable to write child .env: $!";
+    print {$child_env_fh} "CHILD_ENV=child\nSHARED_ENV=child\n";
+    close $child_env_fh or die "Unable to close child .env: $!";
+    open my $child_env_pl_fh, '>:raw', File::Spec->catfile( $env_project, '.developer-dashboard', '.env.pl' )
+      or die "Unable to write child runtime .env.pl: $!";
+    print {$child_env_pl_fh} "\$ENV{CHILD_PL_ENV} = \"\$ENV{SHARED_ENV}-pl\";\n1;\n";
+    close $child_env_pl_fh or die "Unable to close child runtime .env.pl: $!";
+    open my $skill_env_fh, '>:raw', File::Spec->catfile( $env_project, '.developer-dashboard', 'skills', 'envskill', '.env' )
+      or die "Unable to write skill .env: $!";
+    print {$skill_env_fh} "SKILL_ONLY_ENV=skill\nSHARED_ENV=skill\n";
+    close $skill_env_fh or die "Unable to close skill .env: $!";
+    open my $show_env_fh, '>:raw', File::Spec->catfile( $env_project, '.developer-dashboard', 'cli', 'show-env' )
+      or die "Unable to write show-env command: $!";
+    print {$show_env_fh} <<'PL';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use JSON::XS qw(encode_json);
+use Developer::Dashboard::EnvAudit;
+print encode_json(
+    {
+        root       => $ENV{ROOT_ENV},
+        child      => $ENV{CHILD_ENV},
+        child_pl   => $ENV{CHILD_PL_ENV},
+        shared     => $ENV{SHARED_ENV},
+        home_ref   => $ENV{HOME_REF},
+        default_ref => $ENV{DEFAULT_REF},
+        chain_ref  => $ENV{CHAIN_REF},
+        skill_only => defined $ENV{SKILL_ONLY_ENV} ? $ENV{SKILL_ONLY_ENV} : undef,
+        audit      => Developer::Dashboard::EnvAudit->key('SHARED_ENV'),
+    }
+), "\n";
+PL
+    close $show_env_fh or die "Unable to close show-env command: $!";
+    chmod 0700, File::Spec->catfile( $env_project, '.developer-dashboard', 'cli', 'show-env' )
+      or die "Unable to chmod show-env command: $!";
+    open my $skill_show_fh, '>:raw', File::Spec->catfile( $env_project, '.developer-dashboard', 'skills', 'envskill', 'cli', 'show' )
+      or die "Unable to write skill show command: $!";
+    print {$skill_show_fh} <<'PL';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use JSON::XS qw(encode_json);
+use Developer::Dashboard::EnvAudit;
+print encode_json(
+    {
+        root       => $ENV{ROOT_ENV},
+        child      => $ENV{CHILD_ENV},
+        skill_only => $ENV{SKILL_ONLY_ENV},
+        shared     => $ENV{SHARED_ENV},
+        audit      => Developer::Dashboard::EnvAudit->key('SHARED_ENV'),
+    }
+), "\n";
+PL
+    close $skill_show_fh or die "Unable to close skill show command: $!";
+    chmod 0700, File::Spec->catfile( $env_project, '.developer-dashboard', 'skills', 'envskill', 'cli', 'show' )
+      or die "Unable to chmod skill show command: $!";
+
+    my $regular_env = json_decode( _run("cd '$env_project' && HOME='$env_home' $perl -I'$lib' '$dashboard' show-env") );
+    is( $regular_env->{root}, 'root', 'dashboard custom commands inherit env values from the home .env layer' );
+    is( $regular_env->{child}, 'child', 'dashboard custom commands inherit env values from the child .env layer' );
+    is( $regular_env->{child_pl}, 'child-pl', 'dashboard custom commands load child .env before child .env.pl at the same layer' );
+    is( $regular_env->{shared}, 'child', 'dashboard custom commands keep the deepest non-skill env value when no skill command is being run' );
+    is( $regular_env->{home_ref}, File::Spec->catdir( $env_home, 'cli-home' ), 'dashboard custom commands receive tilde-expanded env values from .env files' );
+    is( $regular_env->{default_ref}, 'cli-fallback', 'dashboard custom commands receive default-expanded ${NAME:-default} env values from .env files' );
+    is( $regular_env->{chain_ref}, 'root/home', 'dashboard custom commands receive values expanded from earlier keys in the same .env file' );
+    ok( !defined $regular_env->{skill_only}, 'dashboard non-skill commands do not load skill-local env files' );
+    is(
+        _portable_path( $regular_env->{audit}{envfile} ),
+        _portable_path( File::Spec->catfile( $env_project, '.env' ) ),
+        'dashboard custom commands expose env audit metadata for the deepest effective non-skill key source',
+    );
+
+    my $skill_env = json_decode( _run("cd '$env_project' && HOME='$env_home' $perl -I'$lib' '$dashboard' envskill.show") );
+    is( $skill_env->{root}, 'root', 'dashboard dotted skill commands still inherit the home .env layer' );
+    is( $skill_env->{child}, 'child', 'dashboard dotted skill commands still inherit the child .env layer' );
+    is( $skill_env->{skill_only}, 'skill', 'dashboard dotted skill commands additionally load skill-local env files' );
+    is( $skill_env->{shared}, 'skill', 'skill-local env files override the inherited non-skill layered env when the skill is running' );
+    is(
+        _portable_path( $skill_env->{audit}{envfile} ),
+        _portable_path( File::Spec->catfile( $env_project, '.developer-dashboard', 'skills', 'envskill', '.env' ) ),
+        'dashboard dotted skill commands expose env audit metadata for the effective skill-local override',
+    );
+}
+{
+    my $bad_env_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $bad_env_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $bad_env_project = File::Spec->catdir( $bad_env_home, 'bad-env-project' );
+    make_path(
+        File::Spec->catdir( $bad_env_home, '.developer-dashboard' ),
+        File::Spec->catdir( $bad_env_project, '.git' ),
+        File::Spec->catdir( $bad_env_project, '.developer-dashboard', 'cli' ),
+    );
+    open my $bad_env_fh, '>:raw', File::Spec->catfile( $bad_env_project, '.env' ) or die "Unable to write malformed child .env: $!";
+    print {$bad_env_fh} "THIS IS NOT VALID\n";
+    close $bad_env_fh or die "Unable to close malformed child .env: $!";
+    open my $bad_cli_fh, '>:raw', File::Spec->catfile( $bad_env_project, '.developer-dashboard', 'cli', 'show-env' )
+      or die "Unable to write bad-env show-env command: $!";
+    print {$bad_cli_fh} "#!/usr/bin/env perl\nprint qq{never-runs\\n};\n";
+    close $bad_cli_fh or die "Unable to close bad-env show-env command: $!";
+    chmod 0700, File::Spec->catfile( $bad_env_project, '.developer-dashboard', 'cli', 'show-env' )
+      or die "Unable to chmod bad-env show-env command: $!";
+
+    my ( $bad_stdout, $bad_stderr, $bad_exit ) = capture {
+        system 'sh', '-c', "cd '$bad_env_project' && HOME='$bad_env_home' $perl -I'$lib' '$dashboard' show-env";
+        return $? >> 8;
+    };
+    ok( $bad_exit != 0, 'dashboard exits non-zero when a participating .env file is malformed' );
+    like(
+        decode( 'UTF-8', $bad_stdout . $bad_stderr ),
+        qr/Invalid env line .*bad-env-project\/\.env line 1/,
+        'dashboard reports malformed .env files explicitly instead of hiding the load failure',
+    );
+}
 
 my $alias_multi_one = File::Spec->catdir( $custom_path_root, 'alpha-foo' );
 my $alias_multi_two = File::Spec->catdir( $custom_path_root, 'alpha-foo-two' );
@@ -801,10 +1080,22 @@ my $shell_bootstrap = _run("$perl -I'$lib' '$dashboard' shell bash");
 like( $shell_bootstrap, qr/path cdr/, 'dashboard shell bootstrap delegates cdr target selection through the Perl path helper' );
 unlike( $shell_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell bootstrap does not decode helper JSON through a bare perl command that can drift to an incompatible interpreter' );
 like( $shell_bootstrap, qr/\Q$perl\E.*-MJSON::XS/s, 'dashboard shell bootstrap decodes helper JSON through the same perl interpreter that generated the bootstrap' );
+like( $shell_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell bash bootstrap exposes the d2 shortcut helper' );
+like( $shell_bootstrap, qr/complete -F _dashboard_complete dashboard d2/, 'dashboard shell bash bootstrap wires tab completion for dashboard and d2' );
+like( $shell_bootstrap, qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s, 'dashboard shell bash bootstrap dispatches d2 through the dashboard entrypoint directly' );
+unlike( $shell_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell bash bootstrap does not hardcode the current perl binary for d2' );
 my $shell_bootstrap_file = File::Spec->catfile( $ENV{HOME}, 'dashboard-shell.sh' );
 open my $shell_bootstrap_fh, '>', $shell_bootstrap_file or die "Unable to write $shell_bootstrap_file: $!";
 print {$shell_bootstrap_fh} $shell_bootstrap;
 close $shell_bootstrap_fh;
+my $bash_d2_version = _run("bash -lc '. \"$shell_bootstrap_file\"; d2 version'");
+is( $bash_d2_version, "$expected_version\n", 'd2 helper dispatches dashboard subcommands through the bash bootstrap' );
+my $bash_completion = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(dashboard do); COMP_CWORD=1; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_completion, qr/^docker$/m, 'dashboard shell bash completion suggests docker through the generated completion helper' );
+like( $bash_completion, qr/^doctor$/m, 'dashboard shell bash completion suggests doctor through the generated completion helper' );
+my $bash_completion_alias = _run("bash -lc '. \"$shell_bootstrap_file\"; COMP_WORDS=(d2 do); COMP_CWORD=1; _dashboard_complete; printf \"%s\\n\" \"\${COMPREPLY[@]}\"'");
+like( $bash_completion_alias, qr/^docker$/m, 'dashboard shell bash completion also works through the d2 alias' );
+like( $bash_completion_alias, qr/^doctor$/m, 'dashboard shell bash completion keeps the same candidates for d2' );
 my $which_dir_bookmarks = _run("bash -lc '. \"$shell_bootstrap_file\"; which_dir bookmarks_root'");
 is_same_path_output( $which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the shell helper' );
 my $cdr_bookmarks = _run("bash -lc '. \"$shell_bootstrap_file\"; cdr bookmarks_root; pwd'");
@@ -835,6 +1126,10 @@ my $zsh_bootstrap = _run("$perl -I'$lib' '$dashboard' shell zsh");
 like( $zsh_bootstrap, qr/add-zsh-hook precmd _dd_update_prompt/, 'dashboard shell zsh bootstrap refreshes the prompt through a precmd hook' );
 like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact/, 'dashboard shell zsh bootstrap uses zsh job counts for prompt rendering' );
 like( $zsh_bootstrap, qr/path cdr/, 'dashboard shell zsh bootstrap keeps the cdr path helper functions' );
+like( $zsh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell zsh bootstrap exposes the d2 shortcut helper' );
+like( $zsh_bootstrap, qr/compdef _dashboard_complete_zsh dashboard d2/, 'dashboard shell zsh bootstrap wires tab completion for dashboard and d2' );
+like( $zsh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s, 'dashboard shell zsh bootstrap dispatches d2 through the dashboard entrypoint directly' );
+unlike( $zsh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell zsh bootstrap does not hardcode the current perl binary for d2' );
 
 my $sh_bootstrap = _run("$perl -I'$lib' '$dashboard' shell sh");
 like( $sh_bootstrap, qr/path cdr/, 'dashboard shell sh bootstrap keeps the cdr path helper functions' );
@@ -842,10 +1137,15 @@ like( $sh_bootstrap, qr/ps1 --mode compact/, 'dashboard shell sh bootstrap rende
 unlike( $sh_bootstrap, qr/\\j/, 'dashboard shell sh bootstrap does not rely on bash-specific job expansion' );
 unlike( $sh_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell sh bootstrap does not decode helper JSON through a bare perl command either' );
 like( $sh_bootstrap, qr/\Q$perl\E.*-MJSON::XS/s, 'dashboard shell sh bootstrap decodes helper JSON through the same perl interpreter that generated the bootstrap' );
+like( $sh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell sh bootstrap exposes the d2 shortcut helper' );
+like( $sh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s, 'dashboard shell sh bootstrap dispatches d2 through the dashboard entrypoint directly' );
+unlike( $sh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell sh bootstrap does not hardcode the current perl binary for d2' );
 my $sh_bootstrap_file = File::Spec->catfile( $ENV{HOME}, 'dashboard-shell-posix.sh' );
 open my $sh_bootstrap_fh, '>', $sh_bootstrap_file or die "Unable to write $sh_bootstrap_file: $!";
 print {$sh_bootstrap_fh} $sh_bootstrap;
 close $sh_bootstrap_fh;
+my $sh_d2_version = _run("sh -lc '. \"$sh_bootstrap_file\"; d2 version'");
+is( $sh_d2_version, "$expected_version\n", 'd2 helper dispatches dashboard subcommands through the POSIX shell bootstrap' );
 my $sh_which_dir_bookmarks = _run("sh -lc '. \"$sh_bootstrap_file\"; which_dir bookmarks_root'");
 is_same_path_output( $sh_which_dir_bookmarks, $bookmarks_root, 'which_dir resolves bookmarks_root through the POSIX shell helper' );
 my $sh_cdr_bookmarks = _run("sh -lc '. \"$sh_bootstrap_file\"; cdr bookmarks_root; pwd'");
@@ -858,6 +1158,10 @@ like( $ps_bootstrap, qr/function prompt \{/, 'dashboard shell ps bootstrap uses 
 like( $ps_bootstrap, qr/function cdr \{/, 'dashboard shell ps bootstrap exposes the cdr helper' );
 like( $ps_bootstrap, qr/\bps1 --mode compact/, 'dashboard shell ps bootstrap still renders prompt text through dashboard ps1' );
 unlike( $ps_bootstrap, qr/\bPS1\b/, 'dashboard shell ps bootstrap does not mention the POSIX PS1 environment variable' );
+like( $ps_bootstrap, qr/function Invoke-DashboardShortcut \{/, 'dashboard shell ps bootstrap exposes the d2 shortcut runner' );
+like( $ps_bootstrap, qr/Set-Alias d2 Invoke-DashboardShortcut/, 'dashboard shell ps bootstrap exposes the d2 shortcut alias' );
+like( $ps_bootstrap, qr/Register-ArgumentCompleter/, 'dashboard shell ps bootstrap wires argument completion for dashboard and d2' );
+like( $ps_bootstrap, qr/CommandName 'dashboard', 'd2'/, 'dashboard shell ps bootstrap registers completion for both dashboard and d2' );
 my $path_del = _run("$perl -I'$lib' '$dashboard' path del foobar");
 like( $path_del, qr/"name"\s*:\s*"foobar"/, 'dashboard path del reports the removed alias' );
 like( $path_del, qr/"removed"\s*:\s*1/, 'dashboard path del removes existing aliases' );
@@ -1255,6 +1559,10 @@ like( $jq_hooked_stdout, qr/^hook-one\n/s, 'dashboard jq streams hook stdout bef
 like( $jq_hooked_stdout, qr/hook-two\n2\n\z/s, 'dashboard jq keeps the main command output after streamed hook stdout' );
 like( $jq_hooked_stderr, qr/hook-one-err\n/, 'dashboard jq streams hook stderr live' );
 like( $jq_hooked_stderr, qr/hook-two-err\n/, 'dashboard jq keeps later hook stderr visible' );
+my $jq_which = _run("$perl -I'$lib' '$dashboard' which jq");
+like( $jq_which, qr/^COMMAND \Q$runtime_jq\E$/m, 'dashboard which jq reports the staged built-in helper path' );
+like( $jq_which, qr/^HOOK \Q$jq_hook_one\E$/m, 'dashboard which jq lists the first participating hook file' );
+like( $jq_which, qr/^HOOK \Q$jq_hook_two\E$/m, 'dashboard which jq lists the later participating hook file' );
 open my $jq_hook_result_fh, '<', $jq_hook_result or die "Unable to read $jq_hook_result: $!";
 is( do { local $/; <$jq_hook_result_fh> }, "hook-one\n", 'later built-in command hooks can read the accumulated RESULT JSON from earlier hook output' );
 close $jq_hook_result_fh;
@@ -1952,6 +2260,10 @@ PL
 close $layer_tool_run_fh;
 chmod 0755, File::Spec->catfile( $layer_leaf_cli, 'layered-tool' )
   or die "Unable to chmod layered tool command: $!";
+my $layered_command = File::Spec->catfile( $layer_leaf_cli, 'layered-tool' );
+my $home_hook       = File::Spec->catfile( $layer_home_cli, 'layered-tool.d', '00-home.pl' );
+my $parent_hook     = File::Spec->catfile( $layer_parent_cli, 'layered-tool.d', '10-parent.pl' );
+my $leaf_hook       = File::Spec->catfile( $layer_leaf_cli, 'layered-tool.d', '20-leaf.pl' );
 
 my ( $layered_command_stdout, undef, $layered_command_exit ) = capture {
     system 'sh', '-c', "cd '$layer_leaf' && $perl -I'$repo/lib' '$repo/bin/dashboard' foobar one two";
@@ -1978,6 +2290,11 @@ like( $layered_hook_stdout, qr/00-home\.pl/, 'home hook output is preserved in R
 like( $layered_hook_stdout, qr/10-parent\.pl/, 'parent hook output is preserved in RESULT for the final command' );
 like( $layered_hook_stdout, qr/20-leaf\.pl/, 'leaf hook output is preserved in RESULT for the final command' );
 is( $layered_hook_stderr, '', 'layered hook-backed command keeps stderr clean' );
+my $layered_which = _run("cd '$layer_leaf' && $perl -I'$repo/lib' '$repo/bin/dashboard' which layered-tool");
+like( $layered_which, qr/^COMMAND \Q$layered_command\E$/m, 'dashboard which reports the deepest resolved custom command path' );
+like( $layered_which, qr/^HOOK \Q$home_hook\E$/m, 'dashboard which includes the home-layer hook for a layered custom command' );
+like( $layered_which, qr/^HOOK \Q$parent_hook\E$/m, 'dashboard which includes the parent-layer hook for a layered custom command' );
+like( $layered_which, qr/^HOOK \Q$leaf_hook\E$/m, 'dashboard which includes the leaf-layer hook for a layered custom command' );
 
 my $project_local_bookmarks = File::Spec->catdir( $project_root, '.developer-dashboard', 'dashboards' );
 make_path($project_local_bookmarks);

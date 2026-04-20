@@ -312,6 +312,42 @@ check_parse(
     skip_roundtrip => 1,
 );
 
+# NOTE: %Z matching a canonical zone name - short-circuit path added in v0.1.1
+check_parse(
+    name    => 'epoch with GMT zone name',
+    pattern => '%s %Z',
+    input   => '42 GMT',
+    expect  => { epoch => 42, offset => 0 },
+    skip_roundtrip => 1,
+);
+
+# NOTE: %Z matching an IANA zone name with a slash
+check_parse(
+    name           => '%Z matching full IANA zone name',
+    pattern        => '%Y-%m-%d %Z',
+    input          => '2026-04-19 Asia/Tokyo',
+    expect         => { year => 2026, month => 4, day => 19 },
+    skip_roundtrip => 1,
+);
+
+# NOTE: %Z matching an alias resolved via _resolve_alias
+check_parse(
+    name           => '%Z matching a zone alias (US/Eastern)',
+    pattern        => '%Y-%m-%d %Z',
+    input          => '2026-04-19 US/Eastern',
+    expect         => { year => 2026, month => 4, day => 19 },
+    skip_roundtrip => 1,
+);
+
+# NOTE: %Z matching 'Z' (Zulu) - ISO 8601 style but via %Z token
+check_parse(
+    name           => '%Z matching Z (Zulu)',
+    pattern        => '%Y-%m-%dT%H:%M:%S %Z',
+    input          => '2026-04-19T12:00:00 Z',
+    expect         => { year => 2026, month => 4, day => 19, hour => 12, offset => 0 },
+    skip_roundtrip => 1,
+);
+
 # NOTE: Whitespace tokens
 subtest 'whitespace tokens %n and %t' => sub
 {

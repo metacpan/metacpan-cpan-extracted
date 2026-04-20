@@ -68,7 +68,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.236';
+our $VERSION = '1.237';
 
 use Quiq::Unindent;
 
@@ -149,7 +149,7 @@ sub snippets {
 
 =head1 VERSION
 
-1.236
+1.237
 
 =head1 AUTHOR
 

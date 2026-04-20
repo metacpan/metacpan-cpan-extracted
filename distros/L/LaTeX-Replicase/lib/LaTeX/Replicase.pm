@@ -23,7 +23,7 @@ our %EXPORT_TAGS = ('all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.701';
+our $VERSION = '0.705';
 our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
 our @logs;
 our $nlo = 1; # Number Line Output, start of 1
@@ -206,6 +206,7 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 	my $key;
 	my $tdz; # flag of The Dead Zone
 	my @columns;
+	my $end = 0;
 
 =for comment
 =begin comment
@@ -214,7 +215,7 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 	[...]{...} -- descriptions (properties) of table columns:
 			{ki} -- name (key || index ) of a variable from $data->{ $key }
 			{%} -- NO \par
-			{v} -- to paste by default text (located in template) if variable =~/^\x{001}/
+			{v} -- to paste by default text (located in template) if variable =~/^\x{001}$/
 			{p} -- to paste text on right
 			{head}[...] -- TeX strings before %%%V:
 			{tail}[...] -- TeX strings after %%%V:
@@ -225,8 +226,11 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 	if( $TEMPLATE )  {
 		while( my $z = <$TEMPLATE> ) {
 
-			if( &_line_decryption( $fh, $info, \$z, \$data, \$vardata, \$chkVAR, \$key, \$tdz, \@columns, \%op ) ) {
-				print { $fh } <$TEMPLATE>;
+			$end = &_line_decryption( $fh, $info, \$z, \$data, \$vardata, \$chkVAR, \$key, \$tdz, \@columns, \%op );
+
+			if( $end ) {
+				print { $fh } <$TEMPLATE> if $end != 3; # NOT ( \endinput AND \end{document} )
+
 				last; #--> Exit template
 			}
 			undef $z;
@@ -235,19 +239,20 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 		close $TEMPLATE;
 	}
 	else {
-		my $e;
 		for my $z ( @$source ) {
 
-			if( $e ) {
+			if( $end ) {
 				print { $fh } $z;
 			}
 			else {
-				$e = &_line_decryption( $fh, $info, \$z, \$data, \$vardata, \$chkVAR, \$key, \$tdz, \@columns, \%op );
+				$end = &_line_decryption( $fh, $info, \$z, \$data, \$vardata, \$chkVAR, \$key, \$tdz, \@columns, \%op );
+
+				last if $end == 3; # \endinput OR \end{document}
 			}
 		}
 	}
 
-	if( defined $key ) {
+	if( ! $end and defined( $key ) ) {
 		&_var_output( $fh, $key, $vardata, \@columns, \%op );
 
 		$_ = "~~> l.EOF. WARNING#1: Missing '%%%ENDx' tag for '$key'";
@@ -273,26 +278,29 @@ sub _line_decryption {
 
 	if( defined $$key ) { # We are in VAR-structure
 
-		return unless $$z =~/%%%[AETV]\S*:/; # Nope control tags --> drop TeX line
+		return 0 unless $$z =~/%%%[AETV]\S*:/; # Nope control tags --> drop TeX line
 
 		if( $$z =~/%%%(?:END(?<t>[TZ]?)|TDZ|VAR):/) {
 			my $t = $+{t};
-			&_var_output( $fh, $$key, $$vardata, $columns, $op );
+
+			my $end = &_var_output( $fh, $$key, $$vardata, $columns, $op );
 
 			# Clear the VAR-structure for the next external VARiable
 			$$chkVAR = 0;
 			undef $$key;
 			@$columns = ();
 
-			return 1 if $t && $t eq 'T'; # end of template area --> Exit template
+			return $end if $end;
+
+			return 1 if $t && $t eq 'T'; # END of Template area --> output everything to the end of template without substitution
 
 			undef $$tdz if $t && $t eq 'Z';
 
-			return if $$z =~/%%%ENDZ?:/; # end of %%%VAR: tag
+			return 0 if $$z =~/%%%ENDZ?:/; # end of %%%VAR: tag
 
 			if( $$z =~/%%%+TDZ:/) { # The Dead Zone
 				$$tdz = 1;
-				return;
+				return 0;
 			}
 
 		}
@@ -399,7 +407,7 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 				my $s = $+{s};
 
 				if( $+{p} ) {
-					length($s) or return;
+					length($s) or return 0;
 				}
 				else {
 					$s .= "\n";
@@ -424,10 +432,10 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 				}
 			}
 
-			return;
+			return 0;
 		}
 		else {
-			return;
+			return 0;
 		}
 
 	}
@@ -438,10 +446,10 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 		undef $$key;
 		@$columns = ();
 
-		return 1 if $+{t} eq 'T'; # end of template area --> Exit template
+		return 1 if $+{t} eq 'T'; # END of Template area --> output everything to the end of template without substitution
 
 		undef $$tdz if $+{t} eq 'Z'; # End of TDZ
-		return;
+		return 0;
 	}
 
 	$$tdz = 1 if $$z =~s/^\s*%%%+TDZ:\s?[\r\n]*//; # The Dead Zone
@@ -451,7 +459,7 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 			print { $fh } $$z;
 			++$nlo;
 		}
-		return;
+		return 0;
 	}
 
 	if( $$z =~/(.*?)\s?%%%+VAR:\s*([^\s:%#]+)(%?)\s?(.*)/) {
@@ -493,7 +501,7 @@ push @logs, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR o
 			$$vardata = $$data;
 			print { $fh } $$z;
 			++$nlo;
-			return;
+			return 0;
 		}
 
 		# key or sub-...sub-key is found
@@ -503,18 +511,18 @@ push @logs, "--> l.$. Found %%%VAR:". $k if $DEBUG;
 
 push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk) && $DEBUG;
 
-		return if &_chk_var( $fh, $k, $vk, $Np, \$paste, \$before, $chkVAR, $columns, $z, $op );
+		return 0 if &_chk_var( $fh, $k, $vk, $Np, \$paste, \$before, $chkVAR, $columns, $z, $op );
 
 # push @logs, "--> l.$. Remember key = '$k' (chkVAR=$$chkVAR), type: ".ref($vk) if $DEBUG; ###AG
 
 		$$key = $k; # save key name
-		return;
+		return 0;
 
 	}
 	elsif( $$z =~/%%%+V:\s*=(def|esc|ignore|silent|debug)=\s*(\S*)/) { # setting up facultative options
 		$op->{$1} = $2 || 0;
 		$DEBUG = $2 || 0 if $1 eq 'debug';
-		return;
+		return 0;
 	}
 	elsif( $$z =~/^(?<v>.*?)\s?%%%+V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
 		my $k = $+{k};
@@ -527,7 +535,7 @@ push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk) && $DEBU
 		if( $k =~s/^\/+//) {
 			$$data = $info; # reset to root environment
 
-			length($k) or return;
+			length($k) or return 0;
 		}
 
 		# Search nested sub-keys
@@ -575,7 +583,7 @@ push @logs, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of '$sk' in 
 				last;
 			}
 
-			&_v_print( $fh, $k, $v, \%el, $op );
+			$_ = &_v_print( $fh, $k, $v, \%el, $op ) and return $_;
 
 			$x = 1;
 			last;
@@ -583,13 +591,13 @@ push @logs, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of '$sk' in 
 
 		$$data = $inidata if $x; # value found or unknown sub-key: reset to initial environment
 
-		return;
+		return 0;
 	}
 
 	print { $fh } $$z;
 	++$nlo;
 
-	return;
+	return 0;
 }
 
 
@@ -686,35 +694,47 @@ sub _v_print {
 	unless( defined $v ) {
 		if( $op->{def} ) {
 push @logs, "~~> l.$.".' NOT defined %%%V[AR]:'. $k if $DEBUG;
-			return;
+			return 0;
 		}
 		$v = '';
 	}
 
-	if( $v =~/^\x{001}/) { # by default text from template
+	if( $v =~/^\x{001}[\x{003}\x{004}]?$/) { # by default text from template
 		if( exists $el->{v} ) {
 			print { $fh } $el->{v};
 
 push @logs, "--> l.$.>$nlo".' Insert text by default %%%V[AR]:'. $k .'= '. $el->{v} if $DEBUG;
 		}
-
+		$v =~s/^\x{001}//;
 	}
-	else {
+
+	if( $v =~/^\x{003}$/) { # END of INPUT template, similar to \endinput
+		say { $fh } '\endinput';
+		++$nlo;
+		return 3;
+	}
+	elsif( $v =~/^\x{004}$/) { # END of INPUT template, similar to \endinput
+		say { $fh } '\end{document}';
+		++$nlo;
+		return 3;
+	}
+	elsif( length $v ) {
 		tex_escape( $v, $op->{esc} ) if $op->{esc};
 
-		if( length $v ) {
 push @logs, "--> l.$.>$nlo".' Insert %%%V[AR]:'. $k .'= '. $v if $DEBUG;
 
-			print { $fh } $v;
-			++$nlo while $v =~/\n/g;
-		}
+		print { $fh } $v;
+		++$nlo while $v =~/\n/g;
+
 		print { $fh } $el->{p} if exists $el->{p};
 	}
 
-	return if $el->{'%'};
+	unless( $el->{'%'} ) {
+		print { $fh } "\n"; # NO:YES \par
+		++$nlo;
+	}
 
-	print { $fh } "\n"; # NO:YES \par
-	++$nlo;
+	return 0;
 }
 
 # HEAD-TAIL output
@@ -753,7 +773,7 @@ sub _hvt_print {
 	if( length($ki) and ! defined $val ) {
 		if( $op->{def} ) {
 			push @logs, "~~> l.$.".' NOT defined %%%V:'. $ki if $DEBUG;
-			return;
+			return 0;
 		}
 
 		$val = '';
@@ -762,11 +782,13 @@ sub _hvt_print {
 	# output head of variable
 	&_ht_print( $fh, $el, 'head', $border );
 
-	# output value of variable
-	&_v_print; # ( $fh, $ki, $val, $el, $op );
+	# output value of variable ( $fh, $ki, $val, $el, $op )
+	$_ = &_v_print and return $_;
 
 	# output tail of variable
 	&_ht_print( $fh, $el, 'tail', 0);
+
+	return 0;
 }
 
 
@@ -776,21 +798,30 @@ sub _s_a_prn {
 	my $val = $values->[$i];
 	$val = $$val if ref $val eq 'SCALAR';
 
+	my $end = 0;
+
 	if( ref \$val eq 'SCALAR') {
-		&_hvt_print( $fh, $i, $val, $el, $op, $$border );
+		$end = &_hvt_print( $fh, $i, $val, $el, $op, $$border );
+
 		++$$col;
 		$$border = 0;
 	}
 	elsif( ref $val eq 'ARRAY') { # [...].ARRAY.ARRAY
+
 		for( @$val ) {
 			next if ref \$_ ne 'SCALAR';
 
-			&_hvt_print( $fh, $i, $_, $el, $op, $$border );
+			$end = &_hvt_print( $fh, $i, $_, $el, $op, $$border );
+
 			++$$col;
 			$$border = 0;
+
+			last if $end;
 		}
+
 	}
 
+	return $end;
 }
 
 
@@ -798,7 +829,7 @@ sub _mixed_indices {
 	my( $fh, $ki, $values, $el, $op, $border ) = @_;
 
 	my $nd = @$values;
-	my $col = 0;
+	my $col = my $end = 0;
 
 	for my $ii ( split ',', $ki ) { # e.g. -1-,1-3,6-7-9,-,4,-5,0,7-
 		next if $ii eq '-';
@@ -811,17 +842,19 @@ sub _mixed_indices {
 			($s, $e) = ($e, $s) if $e > $s;
 
 			for( my $i = $s; $i >= $e; --$i ) {
-				&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
+				$end = &_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col ) and last;
 			}
-			next;
+
+			$end ? last : next;
 		}
 
 		if( $ii =~/^\-[0-9]+$/ ) { # -5
 			my $i = $ii+0;
 
 			if( abs($i) <= $nd ) {
-				&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
+				$end = &_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col ) and last;
 			}
+
 			next;
 		}
 
@@ -831,24 +864,25 @@ sub _mixed_indices {
 			if( $ii =~/\-$/) { # 7(-)
 
 				for( my $i = $n[0]; $i < $nd; ++$i ) {
-					&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
+					$end = &_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col ) and last;
 				}
 
 			}
 			else { # 4 || 0
-				&_s_a_prn( $fh, $n[0], $values, $el, $op, \$border, \$col );
+				$end = &_s_a_prn( $fh, $n[0], $values, $el, $op, \$border, \$col ) and last;
 			}
 
 		}
 		else { # 1-3 ->(1..3) || 6-7-9 ->(6..9)
 			for( my $i = $n[0]; $i <= $n[-1]; ++$i ) {
-				&_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col );
+				$end = &_s_a_prn( $fh, $i, $values, $el, $op, \$border, \$col ) and last;
 			}
 		}
 
+		last if $end;
 	}
 
-	return $col;
+	return( $col, $end );
 }
 
 
@@ -862,16 +896,17 @@ sub _var_output {
 	our @logs;
 	our $nlo;
 
+	my $end = 0;
+
 	if( ref \$values eq 'SCALAR' or ref $values eq 'SCALAR') { # key => SCALAR
-		&_hvt_print( $fh, $key, $values, $columns->[0], $op );
-		return;
+		return &_hvt_print( $fh, $key, $values, $columns->[0], $op );
 	}
 
 	if( ref $values eq 'ARRAY') { # key => ARRAY
 
 		unless( @$values ) {
 push @logs, "~~> l.$. WARNING#7: empty ARRAY of %%%VAR:". $key if $DEBUG or ! $op->{ignore};
-			return;
+			return 0;
 		}
 
 		# Forming a table
@@ -900,11 +935,11 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
 							last _var_output_M0 if $row;
 
-							if( $_ = &_mixed_indices( $fh, $ki, $values, $el, $op, $border ) ) {
-								$col += $_ - 1;
-							}
+							($_, $end) = &_mixed_indices( $fh, $ki, $values, $el, $op, $border );
+							$col += $_ - 1 if $_;
 						}
-						next;
+
+						$end ? last _var_output_M0 : next;
 					}
 					elsif( ref $d eq 'HASH') { # ARRAY.HASH
 						$val = $d->{$ki};
@@ -913,10 +948,11 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 							for my $vv ( @$val ) {
 								next unless ref \$vv eq 'SCALAR';
 
-								&_hvt_print( $fh, $ki, $vv, $el, $op, $border );
+								$end = &_hvt_print( $fh, $ki, $vv, $el, $op, $border ) and last _var_output_M0;
 								++$col;
 							}
-							next;
+
+							$end ? last _var_output_M0 : next;
 						}
 						elsif( ref \$val ne 'SCALAR' and ref $val ne 'SCALAR') {
 							next;
@@ -926,10 +962,11 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 
 						if( $ki =~/^[\d,\-]+$/) {
 						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
-							$_ = &_mixed_indices( $fh, $ki, $d, $el, $op, $border ) and $col += $_ - 1;
+							($_, $end) = &_mixed_indices( $fh, $ki, $d, $el, $op, $border );
+							$col += $_ - 1 if $_;
 						}
 
-						next;
+						$end ? last _var_output_M0 : next;
 					}
 					elsif( $op->{def} ) {
 
@@ -943,11 +980,13 @@ push @logs, "~~> l.$. NOT defined %%%V:". $ki if $DEBUG;
 					$ki = '';
 				}
 
-				&_hvt_print( $fh, $ki, $val, $el, $op, $border );
+				$end = &_hvt_print( $fh, $ki, $val, $el, $op, $border ) and last _var_output_M0;
 			}
 			continue {
 				++$col;
 			}
+
+			last if $end;
 		}
 		continue {
 			++$row;
@@ -990,10 +1029,11 @@ push @logs, "-->\tl.$. ". 'NOT HASH.ARRAY.SCALAR %%%V:@->{'.$k."} in %%%VAR:". $
 							next;
 						}
 
-						&_hvt_print( $fh, $k, $v, $el, $op, $border );
+						$end = &_hvt_print( $fh, $k, $v, $el, $op, $border ) and last _var_output_M0;
 						$border = 0;
 					}
-					next;
+
+					$end ? last : next;
 				}
 				elsif( $op->{def} ) {
 push @logs, "~~> l.$. NOT HASH.SCALAR or NOT defined %%%V:". $ki if $DEBUG;
@@ -1006,13 +1046,14 @@ push @logs, "~~> l.$. NOT HASH.SCALAR or NOT defined %%%V:". $ki if $DEBUG;
 				$ki = '';
 			}
 
-			&_hvt_print( $fh, $ki, $val, $el, $op, $border );
+			$end = &_hvt_print( $fh, $ki, $val, $el, $op, $border ) and last;
 		}
 		continue {
 			++$col;
 		}
 	}
 
+	return $end;
 }
 
 1;
@@ -1401,30 +1442,101 @@ This construct can be used as an ON or OFF switch, for example by setting C<myPa
 to C<"~"> (i.e. C<" ">) or C<"%"> the text 'C<  After blah, \ldots blah.>' will be present or absent 
 in the finished (e.g. compiled by C<pdflatex> or C<latex>) PDF or DVI document.
 
-Another trick is to use the magic value C<"\x{001}"> (or C<chr(0x01)>) at the very beginning,
-as a starting sequence for a variable that acts as a trigger,
+Another trick is to use the magic value C<"\x{001}"> (or C<chr(0x01)>) for a variable that acts as a trigger,
 i.e., output the value to the left of C<%%%V:> in the template to the finished document.
 Such a trigger can work like this:
 
   Default value %%%V: myParam
 
-If C<myParam = "some text"> then that template will lead to the creation of such a TeX fragment:
+If C<< myParam => "some text" >> then that template will lead to the creation of such a TeX fragment:
 
   some text
 
-If C<myParam = "\x{001}some text"> or simply C<myParam = "\x{001}"> then output:
+If C<< myParam => "\x{001}" >> then output:
 
   Default value
 
 This trick can also be performed in a more complex way - without using a magic C<"\x{001}">, 
 but using the C<%%%ADD:> tag and an additional variable C<phantom>,
-the value of which should be adjusted to the value of C<myParam>:
+the value of which should be adjusted to the value of C<myParam> inside C<area>:
 
+  %%%VAR: area
+  ...
   Default value %%%ADD:%
   %%%V: phantom%
   %%%V: myParam
+  ...
+  %%%END:
 
 which, you must admit, is extremely inconvenient :(
+
+It is very important to understand that there are four (4) states for C<%%%V: variable> (or C<%%%VAR>)
+when the C<def> option is B<enabled>:
+
+=over 6
+
+=item 1.
+
+complete absence, i.e. C<variable> B<does not exist>;
+
+=item 2.
+
+presence (B<exists>) with an B<undefined> value;
+
+=item 3.
+
+B<exists> and B<defined> value and B<empty> (i.e. C<value = ''>, C<length of value == 0>);
+
+=item 4.
+
+B<defined> value and B<not empty>.
+
+=back
+
+BTW: if C<def> option is B<disabled>, then state (2) is identical to state (3).
+
+These states influence the final  outcome.
+The following example demonstrate this.
+
+  YES %%%V: param  NO
+
+(1) C<unless exists param>, then output as is C<'YES %%%V: param  NO'>, i.e. C<YES>.
+
+(2) C<if param == undef>, then output C<''>, i.e. empty (and text is NOT saved in C<%%%ADD[E]:> tags, if specified).
+
+(3) C<if param eq ''>, then output C<''>, i.e. empty also (but text is saved in C<%%%ADD[E]:> tags, if specified).
+
+(4) C<if param eq ' '> then, output C<' NO'>, i.e. it is actually C<'NO'> (with text is saved in C<%%%ADD[E]:> tags, if specified).
+
+(4) C<if param eq 'there will be '> then, output C<'there will be NO'> (with text is saved in C<%%%ADD[E]:> tags, if specified).
+
+(4) C<if param eq '%'>, then output C<'% NO'>, i.e. commented out 'NO' and it is actually empty (with text is saved in C<%%%ADD[E]:> tags, if specified).
+
+(4) C<if param eq "\x{001}">, then output C<YES> (with text is saved in C<%%%ADD[E]:> tags, if specified).
+
+
+There are two magic values of C<%%%V:> (or C<%%%VAR:>) tag
+for forced completion (ending) of a finished TeX document:
+
+=over 6
+
+=item 1.
+
+C<"\x{003}"> (or C<chr(0x03)>) - inserts C<\endinput> command into TeX document and cuts off the rest of the template.
+
+=item 2.
+
+C<"\x{004}"> (or C<chr(0x04)>) - inserts C<\end{document}> command into TeX document and cuts off the rest of the template.
+
+=back
+
+Let me repeat:
+the B<difference> between C<"\x{003}"> (C<"\x{004}">) and directly inserting 
+C<\endinput> (C<\end{document}> ) command is that B<remaining part of the template is cut off>.
+
+These magical values can be set separately (singly) or together with the first C<"\x{001}"> such as
+C<"\x{001}\x{003}"> and C<"\x{001}\x{004}">.
+
 
 Besides, if a C<variable_name> ends in C<%> (i.e. C<variable_name%>), a newline is suppressed.
 By default, a newline always occurs after value substitution and 'After blah, \ldots blah.' if it exists.
@@ -1507,6 +1619,34 @@ It only sets the I<local environment> within the scope of C<%%%VAR:> tag.
 
 Nested C<%%%VAR:> tags will not work and are treated as C<%%%END:> tags,
 i.e. tags for early termination of the scope.
+
+It is very important to understand that there are four (4) states for C<%%%VAR: variable> (or C<%%%V>)
+when the C<def> option is B<enabled>:
+
+=over 6
+
+=item 1.
+
+complete absence, i.e. C<variable> B<does not exist>;
+
+=item 2.
+
+presence (B<exists>) with an B<undefined> value;
+
+=item 3.
+
+B<exists> and B<defined> value and B<empty> (i.e. C<value = ''>, C<length of value == 0>);
+
+=item 4.
+
+B<defined> value and B<not empty>.
+
+=back
+
+BTW: If C<def> option is B<disabled>, then state (2) is identical to state (3).
+
+These states influence the final  outcome (see above for C<%%%V:> tag).
+
 
 =item *
 There are three options for B< C<%%%ENDx> > tags:
@@ -1643,8 +1783,9 @@ For example:
    my $msg = replication( $file, $info, def =>1 );
 
 =item 2.
-B< C<%%%ADDE:> > is similar to C<%%%ADD:> (means B<Ending> C<%%%ADD>),
-but it differs in that text is added B<after> variable specified in C<%%%V:> tag.
+B< C<%%%ADDE:> > is similar to C<%%%ADD:>.
+
+Means B<Ending> C<%%%ADD>, but it differs in that text is added B<after> variable specified in C<%%%V:> tag.
 
 This C<%%%ADDE:> tag must follow immediately after C<%%%V:> tag 
 (i.e. there should not be C<%%%ADD:> tag before it), otherwise it will also become 
@@ -1657,12 +1798,14 @@ C<%%%ADD:> denotes what will come before the variable value,
 and C<%%%ADDE:> - after it (see above).
 
 =item 3.
-B< C<%%%ADDX:> > is similar to C<%%%ADD:> for all lines (records)
-B<eXcept the first column (0) of first record (0)> or B<after the last column of last record>.
+B< C<%%%ADDX:> > is similar to C<%%%ADD:>.
 
-=item 3.
-B< C<%%%ADDA:> > is similar to C<%%%ADD:> (means that C<%%%ADD> is Always present),
-but it is not linked to any C<%%%V:> in the block of C<%%%VAR:>,
+For all lines (records) B<eXcept the first column (0) of first record (0)> or B<after the last column of last record>.
+
+=item 4.
+B< C<%%%ADDA:> > is similar to C<%%%ADD:>.
+
+Means that C<%%%ADD> is B<Always> present, but it is not linked to any C<%%%V:> in the block of C<%%%VAR:>,
 meaning its contents will not depend on the variable's uncertainty of C<%%%V:>,
 and its value will be output in any case and in the appropriate order.
 
@@ -1683,7 +1826,7 @@ If C<< myHash = { myKey => undef, ... } >>, then that template will lead to the 
 
 =back
 
-If any C<%%%ADDx:> ends in C<%> (e.g. C<%%%ADD:%>, C<%%%ADDE:%>, or C<%%%ADDX:%> ), a newline is suppressed.
+If any C<%%%ADDx:> ends in C<%> (e.g. C<%%%ADD:%>, C<%%%ADDA:%>, C<%%%ADDE:%>, or C<%%%ADDX:%> ), a newline is suppressed.
 (By default, a newline always occurs after adding text).
 
 =back

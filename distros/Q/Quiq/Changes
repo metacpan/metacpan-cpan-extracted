@@ -1,4 +1,11 @@
+1.237 2026-04-19
+================
+
+[Quiq::Database::Connection]
+* Doku bearbeitet
+
 1.236 2026-03-07
+================
 
 [Quiq::Debug]
 showRdiff(): Methode hinzugefügt

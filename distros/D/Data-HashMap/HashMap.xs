@@ -650,6 +650,15 @@ DEFINE_KW_HOOK(sa, "SA", get_or_set, 3, build_kw_3arg)
 #define HM_TTL_SKIP_EXPIRED(self, i, now) \
     (self->expires_at && self->expires_at[i] && (now) > self->expires_at[i])
 
+/* Compaction policy after drain/pop/shift in XS. Variant-agnostic: caller
+ * supplies the variant-prefixed compact function. Mirrors the C-template's
+ * HM_MAYBE_COMPACT macro so the threshold lives in one place per layer. */
+#define HM_MAYBE_COMPACT_XS(self, compact_fn) do { \
+    if ((self)->tombstones > (self)->capacity / 4 || \
+        ((self)->size > 0 && (self)->tombstones > (self)->size)) \
+        compact_fn(self); \
+} while (0)
+
 
 MODULE = Data::HashMap    PACKAGE = Data::HashMap::I32
 PROTOTYPES: DISABLE

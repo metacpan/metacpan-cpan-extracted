@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.133';
+our $VERSION = '0.134';
 
 use 5.020;
 use utf8;
@@ -24,7 +24,7 @@ use JSON::Schema::Modern::Result 0.630;
 use OpenAPI::Modern::Utilities qw(:constants add_vocab_and_default_schemas);
 use Carp qw(croak carp);
 use Digest::MD5 'md5_hex';
-use Storable 'dclone';
+use Clone 'clone';
 use builtin::compat qw(blessed indexed);
 use MooX::TypeTiny 0.002002;
 use Types::Standard qw(HashRef ArrayRef Str Map Any);
@@ -706,7 +706,7 @@ sub _dynamic_metaschema_uri ($self, $json_schema_dialect, $evaluator) {
 
   # we use the definition of https://spec.openapis.org/oas/<version>/schema-base/<date> but swap out
   # the dialect reference.
-  my $schema = dclone($evaluator->_get_resource(DEFAULT_BASE_METASCHEMA->{$self->oas_version})->{document}->schema);
+  my $schema = clone($evaluator->_get_resource(DEFAULT_BASE_METASCHEMA->{$self->oas_version})->{document}->schema);
   $schema->{'$id'} = $dialect_uri;
   $schema->{'$defs'}{dialect}{const} = $json_schema_dialect;
   $schema->{'$defs'}{schema}{'$ref'} = $json_schema_dialect;
@@ -756,7 +756,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.133
+version 0.134
 
 =head1 SYNOPSIS
 
