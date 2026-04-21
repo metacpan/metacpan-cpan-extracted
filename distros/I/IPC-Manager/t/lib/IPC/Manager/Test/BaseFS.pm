@@ -185,6 +185,60 @@ sub run_tests {
         IPC::Manager::Client::MessageFiles->unspawn($route);
         ok(!-e $route, "unspawn removes the directory");
     };
+
+    subtest 'on_disk_name hashes long and path-unsafe names' => sub {
+        my $dir   = tempdir(CLEANUP => 1);
+        my $con   = IPC::Manager::Client::MessageFiles->new(serializer => $SERIALIZER, route => $dir, id => 'od1');
+
+        is($con->on_disk_name("short"), "short", "short safe name kept as-is");
+        my $long = "L" x 300;
+        my $hashed = $con->on_disk_name($long);
+        like($hashed, qr/^h-[0-9a-f]{40}$/, "long name becomes h- + 40 hex");
+        is($con->on_disk_name($long), $hashed, "hashing is deterministic");
+
+        is($con->on_disk_name("a" x 200), "a" x 200, "name at the threshold is kept");
+        like($con->on_disk_name("a" x 201), qr/^h-[0-9a-f]{40}$/, "over threshold is hashed");
+
+        like($con->on_disk_name("with/slash"), qr/^h-[0-9a-f]{40}$/, "slash-containing name is hashed");
+        like($con->on_disk_name("h-prefixed-but-short"), qr/^h-[0-9a-f]{40}$/, "h- prefix reserved, so hashed");
+
+        like(dies { $con->on_disk_name(undef) }, qr/required/, "undef peer_id croaks");
+
+        $con->disconnect;
+    };
+
+    subtest 'long peer names survive round trip' => sub {
+        my $dir = tempdir(CLEANUP => 1);
+
+        my $long_id = "very-long-peer-name-" . ("x" x 250);
+        my $con1 = IPC::Manager::Client::MessageFiles->new(serializer => $SERIALIZER, route => $dir, id => $long_id);
+        my $con2 = IPC::Manager::Client::MessageFiles->new(serializer => $SERIALIZER, route => $dir, id => 'short2');
+
+        ok($con2->peer_exists($long_id), "peer_exists sees the long-named peer");
+        is([$con2->peers], [$long_id], "peers() reports the real long name");
+        is($con2->peer_pid($long_id), $$, "peer_pid works for long-named peer");
+
+        $con2->send_message($long_id => {hello => 'long'});
+        my @msgs = $con1->get_messages;
+        is(scalar @msgs, 1, "one message received");
+        is($msgs[0]->content, {hello => 'long'}, "content round-trips to long-named peer");
+        is($msgs[0]->to, $long_id, "message 'to' is the real long name");
+
+        $con1->send_message('short2' => {hello => 'back'});
+        my @back = $con2->get_messages;
+        is(scalar @back, 1, "reply received");
+        is($back[0]->from, $long_id, "message 'from' is the real long name");
+
+        $con1->write_stats;
+        $con2->write_stats;
+
+        my $all = $con2->all_stats;
+        ok(exists $all->{$long_id}, "all_stats keyed by real long name");
+        ok(exists $all->{short2},   "all_stats includes short-named peer");
+
+        $con1->disconnect;
+        $con2->disconnect;
+    };
 }
 
 1;

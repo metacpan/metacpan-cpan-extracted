@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.72';
+our $VERSION = '2.76';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -427,40 +427,30 @@ sub _prepare_skill_layout {
 # Output: result hash reference with success or error state.
 sub _install_skill_dependencies {
     my ( $self, $skill_path ) = @_;
-    my $aptfile = File::Spec->catfile( $skill_path, 'aptfile' );
-    my $cpanfile = File::Spec->catfile( $skill_path, 'cpanfile' );
-    return { success => 1, skipped => 1 } if !-f $aptfile && !-f $cpanfile;
-
-    my @apt_packages = $self->_skill_apt_packages($skill_path);
-    if (@apt_packages) {
-        my ( $stdout, $stderr, $exit ) = capture {
-            system( 'apt-get', 'install', '-y', @apt_packages );
-        };
-        return {
-            error => "Failed to install skill apt dependencies for $skill_path: $stderr",
-        } if $exit != 0;
+    my @steps = (
+        [ ddfile         => sub { $self->_install_skill_ddfile($skill_path) } ],
+        [ aptfile        => sub { $self->_install_skill_aptfile($skill_path) } ],
+        [ brewfile       => sub { $self->_install_skill_brewfile($skill_path) } ],
+        [ cpanfile       => sub { $self->_install_skill_cpanfile($skill_path) } ],
+        [ 'cpanfile.local' => sub { $self->_install_skill_cpanfile_local($skill_path) } ],
+    );
+    my @stdout;
+    my @stderr;
+    my $ran = 0;
+    for my $step (@steps) {
+        my ( $name, $runner ) = @{$step};
+        my $result = $runner->();
+        return $result if $result->{error};
+        $ran ||= !$result->{skipped};
+        push @stdout, $result->{stdout} if defined $result->{stdout} && $result->{stdout} ne '';
+        push @stderr, $result->{stderr} if defined $result->{stderr} && $result->{stderr} ne '';
     }
 
+    return { success => 1, skipped => 1 } if !$ran;
     return {
         success => 1,
-        skipped => 1,
-    } if !-f $cpanfile;
-
-    my $local_root = File::Spec->catdir( $skill_path, 'local' );
-    make_path($local_root) if !-d $local_root;
-    $self->{paths}->secure_dir_permissions($local_root);
-
-    my ( $stdout, $stderr, $exit ) = capture {
-        system( 'cpanm', '-L', $local_root, '--installdeps', $skill_path );
-    };
-    return {
-        error => "Failed to install skill dependencies for $skill_path: $stderr",
-    } if $exit != 0;
-
-    return {
-        success => 1,
-        stdout  => $stdout,
-        stderr  => $stderr,
+        stdout  => join( '', @stdout ),
+        stderr  => join( '', @stderr ),
     };
 }
 
@@ -484,6 +474,214 @@ sub _skill_apt_packages {
     }
     close $fh;
     return @packages;
+}
+
+# _dependency_file_lines($file)
+# Reads one dependency manifest into a trimmed ordered entry list.
+# Input: absolute dependency file path.
+# Output: ordered list of non-empty non-comment entry strings.
+sub _dependency_file_lines {
+    my ( $self, $file ) = @_;
+    return () if !defined $file || !-f $file;
+    open my $fh, '<', $file or die "Unable to read $file: $!";
+    my @entries;
+    while ( my $line = <$fh> ) {
+        chomp $line;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next if $line eq '';
+        next if $line =~ /^#/;
+        push @entries, $line;
+    }
+    close $fh;
+    return @entries;
+}
+
+# _current_os()
+# Resolves the active operating system for dependency policy checks.
+# Input: none.
+# Output: short operating system string such as linux or darwin.
+sub _current_os {
+    return $ENV{DD_TEST_OS} || $^O;
+}
+
+# _is_debian_like()
+# Detects whether aptfile processing should run on the current host.
+# Input: none.
+# Output: boolean true when the host is Debian-like.
+sub _is_debian_like {
+    my ($self) = @_;
+    return 1 if $ENV{DD_TEST_DEBIAN_LIKE};
+    return 0 if $self->_current_os ne 'linux';
+    return -f '/etc/debian_version' ? 1 : 0;
+}
+
+# _shared_perl_root()
+# Returns the shared Perl dependency install root used by skills.
+# Input: none.
+# Output: absolute directory path string.
+sub _shared_perl_root {
+    my ($self) = @_;
+    return File::Spec->catdir( $self->{paths}->home, 'perl5' );
+}
+
+# _skill_local_perl_root($skill_path)
+# Returns the skill-local Perl dependency install root for cpanfile.local.
+# Input: absolute skill root directory path.
+# Output: absolute directory path string.
+sub _skill_local_perl_root {
+    my ( $self, $skill_path ) = @_;
+    return File::Spec->catdir( $skill_path, 'perl5' );
+}
+
+# _ensure_perl_root($root)
+# Creates and secures one Perl dependency install root.
+# Input: absolute target directory path.
+# Output: same absolute target directory path.
+sub _ensure_perl_root {
+    my ( $self, $root ) = @_;
+    make_path($root) if !-d $root;
+    $self->{paths}->secure_dir_permissions($root);
+    return $root;
+}
+
+# _install_skill_ddfile($skill_path)
+# Installs dependent skills listed in ddfile while skipping already-installed
+# or in-flight dependencies to avoid recursion loops.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_ddfile {
+    my ( $self, $skill_path ) = @_;
+    my $ddfile = File::Spec->catfile( $skill_path, 'ddfile' );
+    my @skills = $self->_dependency_file_lines($ddfile);
+    return { success => 1, skipped => 1 } if !@skills;
+
+    my %seen = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, ( $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} || '' );
+    my $repo_name = basename($skill_path);
+    $seen{$repo_name} = 1 if defined $repo_name && $repo_name ne '';
+
+    my @stdout;
+    my @stderr;
+    for my $dependency (@skills) {
+        next if $seen{$dependency};
+        next if $self->get_skill_path( $dependency, include_disabled => 1 );
+        my $install_stack = join ':', grep { defined && $_ ne '' } sort keys %{{ %seen, $dependency => 1 }};
+        my ( $step_stdout, $step_stderr, $exit ) = do {
+            local $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} = $install_stack;
+            capture {
+                system( 'dashboard', 'skills', 'install', $dependency );
+            };
+        };
+        return {
+            error => "Failed to install dependent skills for $skill_path: $step_stderr",
+        } if $exit != 0;
+        push @stdout, $step_stdout if defined $step_stdout && $step_stdout ne '';
+        push @stderr, $step_stderr if defined $step_stderr && $step_stderr ne '';
+    }
+
+    return { success => 1, skipped => 1 } if !@stdout && !@stderr;
+    return {
+        success => 1,
+        stdout  => join( '', @stdout ),
+        stderr  => join( '', @stderr ),
+    };
+}
+
+# _install_skill_aptfile($skill_path)
+# Installs aptfile packages on Debian-like hosts after printing the requested
+# package list.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_aptfile {
+    my ( $self, $skill_path ) = @_;
+    my @apt_packages = $self->_skill_apt_packages($skill_path);
+    return { success => 1, skipped => 1 } if !@apt_packages || !$self->_is_debian_like;
+
+    my $aptfile = File::Spec->catfile( $skill_path, 'aptfile' );
+    my ( $stdout, $stderr, $exit ) = capture {
+        print "Installing apt packages for ", basename($skill_path), " from $aptfile: ", join( ' ', @apt_packages ), "\n";
+        system( 'sudo', 'apt-get', 'install', '-y', @apt_packages );
+    };
+    return {
+        error => "Failed to install skill apt dependencies for $skill_path: $stderr",
+    } if $exit != 0;
+
+    return {
+        success => 1,
+        stdout  => $stdout,
+        stderr  => $stderr,
+    };
+}
+
+# _install_skill_brewfile($skill_path)
+# Installs brewfile packages on macOS after printing the requested package list.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_brewfile {
+    my ( $self, $skill_path ) = @_;
+    my $brewfile = File::Spec->catfile( $skill_path, 'brewfile' );
+    my @packages = $self->_dependency_file_lines($brewfile);
+    return { success => 1, skipped => 1 } if !@packages || $self->_current_os ne 'darwin';
+
+    my ( $stdout, $stderr, $exit ) = capture {
+        print "Installing brew packages for ", basename($skill_path), " from $brewfile: ", join( ' ', @packages ), "\n";
+        system( 'brew', 'install', @packages );
+    };
+    return {
+        error => "Failed to install skill brew dependencies for $skill_path: $stderr",
+    } if $exit != 0;
+
+    return {
+        success => 1,
+        stdout  => $stdout,
+        stderr  => $stderr,
+    };
+}
+
+# _install_skill_cpanfile($skill_path)
+# Installs shared Perl dependencies from cpanfile into HOME perl5.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_cpanfile {
+    my ( $self, $skill_path ) = @_;
+    my $cpanfile = File::Spec->catfile( $skill_path, 'cpanfile' );
+    return { success => 1, skipped => 1 } if !-f $cpanfile;
+    my $shared_root = $self->_ensure_perl_root( $self->_shared_perl_root );
+    my ( $stdout, $stderr, $exit ) = capture {
+        system( 'cpanm', '-L', $shared_root, '--cpanfile', $cpanfile, '--installdeps', $skill_path );
+    };
+    return {
+        error => "Failed to install skill dependencies for $skill_path: $stderr",
+    } if $exit != 0;
+
+    return {
+        success => 1,
+        stdout  => $stdout,
+        stderr  => $stderr,
+    };
+}
+
+# _install_skill_cpanfile_local($skill_path)
+# Installs skill-local Perl dependencies from cpanfile.local into ./perl5.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_cpanfile_local {
+    my ( $self, $skill_path ) = @_;
+    my $cpanfile_local = File::Spec->catfile( $skill_path, 'cpanfile.local' );
+    return { success => 1, skipped => 1 } if !-f $cpanfile_local;
+    my $local_root = $self->_ensure_perl_root( $self->_skill_local_perl_root($skill_path) );
+    my ( $stdout, $stderr, $exit ) = capture {
+        system( 'cpanm', '-L', $local_root, '--cpanfile', $cpanfile_local, '--installdeps', $skill_path );
+    };
+    return {
+        error => "Failed to install skill local dependencies for $skill_path: $stderr",
+    } if $exit != 0;
+
+    return {
+        success => 1,
+        stdout  => $stdout,
+        stderr  => $stderr,
+    };
 }
 
 # _skill_metadata($repo_name, $skill_path)
@@ -511,16 +709,20 @@ sub _skill_metadata {
         docker_services_count => scalar(@docker_services),
         collectors_count   => scalar( @{$collectors} ),
         indicators_count   => $indicators_count,
+        has_ddfile      => -f File::Spec->catfile( $skill_path, 'ddfile' ) ? JSON::XS::true() : JSON::XS::false(),
         has_aptfile     => -f File::Spec->catfile( $skill_path, 'aptfile' ) ? JSON::XS::true() : JSON::XS::false(),
+        has_brewfile    => -f File::Spec->catfile( $skill_path, 'brewfile' ) ? JSON::XS::true() : JSON::XS::false(),
         has_config      => -f File::Spec->catfile( $skill_path, 'config', 'config.json' ) ? JSON::XS::true() : JSON::XS::false(),
         has_cpanfile    => -f File::Spec->catfile( $skill_path, 'cpanfile' ) ? JSON::XS::true() : JSON::XS::false(),
+        has_cpanfile_local => -f File::Spec->catfile( $skill_path, 'cpanfile.local' ) ? JSON::XS::true() : JSON::XS::false(),
         config_root     => File::Spec->catdir( $skill_path, 'config' ),
         docker_root     => $docker_root,
         docker_services => \@docker_services,
         state_root      => File::Spec->catdir( $skill_path, 'state' ),
         logs_root       => File::Spec->catdir( $skill_path, 'logs' ),
         cli_root        => $cli_root,
-        local_root      => File::Spec->catdir( $skill_path, 'local' ),
+        local_root      => $self->_skill_local_perl_root($skill_path),
+        shared_perl_root => $self->_shared_perl_root,
     };
 }
 
@@ -545,9 +747,12 @@ sub _skill_usage {
             root        => File::Spec->catdir( $skill_path, 'config' ),
             file        => File::Spec->catfile( $skill_path, 'config', 'config.json' ),
             merged_key  => '_' . $repo_name,
+            has_ddfile  => -f File::Spec->catfile( $skill_path, 'ddfile' ) ? JSON::XS::true() : JSON::XS::false(),
             has_config  => -f File::Spec->catfile( $skill_path, 'config', 'config.json' ) ? JSON::XS::true() : JSON::XS::false(),
             has_aptfile => -f File::Spec->catfile( $skill_path, 'aptfile' ) ? JSON::XS::true() : JSON::XS::false(),
+            has_brewfile => -f File::Spec->catfile( $skill_path, 'brewfile' ) ? JSON::XS::true() : JSON::XS::false(),
             has_cpanfile => -f File::Spec->catfile( $skill_path, 'cpanfile' ) ? JSON::XS::true() : JSON::XS::false(),
+            has_cpanfile_local => -f File::Spec->catfile( $skill_path, 'cpanfile.local' ) ? JSON::XS::true() : JSON::XS::false(),
         },
         collectors => $collectors,
     };

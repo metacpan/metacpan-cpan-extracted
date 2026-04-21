@@ -14,11 +14,15 @@ my $res;
 my $client = LLNG::Manager::Test->new( {
         ini => {
             customPlugins     => "t::Test2FA t::Test2FRegister t::sfHookPlugin",
-            restSessionServer      => 1,
+            restSessionServer => 1,
             test2fSelfRegistration => 1,
             test2fActivation       => 'has2f("test")',
             sfRequired             => '$uid eq "dwho"',
             sfRetries              => 1,
+            macros                 => {
+                _whatToTrace => '$uid',
+                mfa          => '$_2f ? 1 : 0',
+            },
         }
     }
 );
@@ -110,7 +114,8 @@ subtest "Register 2FA on first login" => sub {
         $client, $id,
         uid                 => "dwho",
         _2f                 => "test",
-        authenticationLevel => 7
+        authenticationLevel => 7,
+        mfa                 => 1,
     );
     my $devices = from_json( getPSession("dwho")->data->{_2fDevices} );
     is( $devices->[0]->{_private}, "myprivateinfo", "Correct private info" );
@@ -181,6 +186,7 @@ subtest "Login with 2FA" => sub {
         uid                 => "dwho",
         _2f                 => "test",
         authenticationLevel => "7",
+        mfa                 => 1,
     );
 };
 

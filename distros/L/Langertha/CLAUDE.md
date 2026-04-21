@@ -24,7 +24,7 @@ Engine::Remote              url required, JSON + HTTP
   ├── Engine::AnthropicBase /v1/messages format, x-api-key auth, SSE streaming
   │     │
   │     ├── Anthropic       Claude models, thinking blocks, tool_use
-  │     ├── MiniMax         Anthropic-compatible Shanghai provider
+  │     ├── MiniMaxAnthropic MiniMax via legacy /anthropic/v1 shim endpoint
   │     └── LMStudioAnthropic LM Studio Anthropic-compatible endpoint
   │
   ├── Engine::OpenAIBase    /chat/completions format, Bearer auth, SSE streaming
@@ -34,7 +34,7 @@ Engine::Remote              url required, JSON + HTTP
   │     ├── DeepSeek        deepseek-chat/reasoner, structured output
   │     ├── Groq            ultra-fast inference, whisper transcription, structured output
   │     ├── Mistral         EU-hosted, embeddings, structured output
-  │     ├── MiniMax         Shanghai, 1M context window
+  │     ├── MiniMax         Shanghai (default), 1M context window, M2.7
   │     ├── NousResearch    Hermes models, <tool_call> XML tool format
   │     ├── Cerebras        wafer-scale chips, fastest inference
   │     ├── OpenRouter      meta-provider, 300+ models, provider/model format

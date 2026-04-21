@@ -60,7 +60,7 @@ sub fill_A {
 sub fill_B {
     say 'Fill B';
     my %patterns = (
-        snare   => [qw(1 0 1 0 1 1 1 1 0 1 0 1)],
+        snare => [qw(1 0 1 0 1 1 1 1 0 1 0 1)],
     );
     my $next = 'fill_A';
     return $next, \%patterns;

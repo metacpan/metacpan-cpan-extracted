@@ -1,5 +1,11 @@
 Revision history for Perl module DateTime::Format::Lite
 
+v0.1.2 2026-04-21T10:05:01+0900
+    - on_error now also accepts 'die' as a synonym of 'croak', in addition to
+      'croak', 'undef', and a code reference.
+    - Fixed POD in DateTime::Format::Lite::PP which referenced the wrong environment
+      variable name (PERL_DATETIME_LITE_PP instead of PERL_DATETIME_FORMAT_LITE_PP).
+
 v0.1.1 2026-04-19T16:25:51+0900
     [Bug Fixes]
     - %Z matching a canonical IANA zone name (UTC, GMT, Z, floating, or any string

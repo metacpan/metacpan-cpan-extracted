@@ -426,7 +426,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard skills update <repo-name>
   dashboard skills list
   dashboard skills usage <repo-name> [-o json|table]
-  dashboard which <cmd>|<skill>.<cmd>|<skill1>.<skill2>...<cmd>
+  dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill1>.<skill2>...<cmd>
   dashboard config init
   dashboard config show
   dashboard auth add-user <username> <password>
@@ -541,6 +541,7 @@ Run the public command through its server bootstrap path while keeping logs in t
 Example 4:
 
   dashboard which nest.level1.level2.here
+  dashboard which --edit jq
 
 Inspect the exact resolved command file and hook chain without running the
 command body.

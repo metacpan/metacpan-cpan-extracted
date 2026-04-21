@@ -2,7 +2,7 @@ package IPC::Manager::Client::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak/;
 use File::Temp qw/tempfile/;
@@ -29,7 +29,7 @@ sub table_sql {
     return (
         <<"        EOT",
             CREATE TABLE IF NOT EXISTS ipcm_peers(
-                `id`        CHAR(36)        NOT NULL PRIMARY KEY,
+                `id`        VARCHAR(512)    NOT NULL PRIMARY KEY,
                 `pid`       INTEGER         DEFAULT NULL,
                 `active`    REAL            DEFAULT (strftime('%s', 'now')),
                 `stats`     BLOB            DEFAULT NULL
@@ -38,8 +38,8 @@ sub table_sql {
         <<"        EOT",
             CREATE TABLE IF NOT EXISTS ipcm_messages(
                 `id`        UUID            NOT NULL PRIMARY KEY,
-                `to`        CHAR(36)        NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
-                `from`      CHAR(36)        NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
+                `to`        VARCHAR(512)    NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
+                `from`      VARCHAR(512)    NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
                 `stamp`     REAL            NOT NULL,
                 `content`   BLOB            NOT NULL,
                 `broadcast` BOOL            NOT NULL DEFAULT 0

@@ -1,0 +1,77 @@
+======================================================================
+ JSON::LINQ 速查表                                        [TW] 中文（繁體）
+======================================================================
+
+[ 1. 建立查詢 ]
+
+  use JSON::LINQ;
+  # 從JSON檔案讀取（頂層為陣列）
+  my $q = JSON::LINQ->FromJSON('data.json');
+  # 從JSONL檔案讀取（每行一個JSON物件，串流）
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+  # 從JSON字串
+  my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
+  # 從記憶體陣列
+  my $q = JSON::LINQ->From(\@array);
+  # 空序列
+  my $q = JSON::LINQ->Empty();
+  # 整數序列: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
+
+[ 2. 過濾 ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+[ 3. 投影 ]
+
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+[ 4. 排序 ]
+
+  ->OrderBy(sub { $_[0]{name} })           # 升冪（智慧）
+  ->OrderByDescending(sub { $_[0]{score} }) # 降冪（智慧）
+  ->OrderByNum(sub { $_[0]{price} })        # 數值升冪
+  ->OrderByStr(sub { $_[0]{code} })         # 字串升冪
+  ->ThenBy(sub { $_[0]{name} })             # 次級升冪
+  ->Reverse()                               # 反轉順序
+
+[ 5. 分頁 ]
+
+  ->Skip(10)  # 跳過前10筆
+  ->Take(5)   # 取前5筆
+
+[ 6. 分組 ]
+
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  my $lookup = $q->ToLookup(sub { $_[0]{dept} });
+
+[ 7. 聚合（終端方法） ]
+
+  ->Count()                            # 元素數量
+  ->Sum(sub { $_[0]{amount} })         # 加總
+  ->Average(sub { $_[0]{score} })      # 平均值（空則die）
+  ->Min(sub { $_[0]{price} })           # 最小值
+  ->Max(sub { $_[0]{price} })           # 最大值
+  ->First()  ->FirstOrDefault()        # 第一個元素
+  ->Last()   ->LastOrDefault()         # 最後一個元素
+  ->Any()    ->All(sub { ... })        # 量詞
+  ->ForEach(sub { print $_[0] })        # 逐一執行
+
+[ 8. 輸出方法 ]
+
+  ->ToJSON('output.json')    # 寫出JSON陣列檔
+  ->ToJSONL('output.jsonl')  # 寫出JSONL檔
+
+[ 9. 布林值 ]
+
+  JSON::LINQ::true    # "true" / 1
+  JSON::LINQ::false   # "false" / 0
+
+[ 10. 相關連結 ]
+
+  JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
+  JSONL規範:  https://jsonlines.org/
+
+======================================================================

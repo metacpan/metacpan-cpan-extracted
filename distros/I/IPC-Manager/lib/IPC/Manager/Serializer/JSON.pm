@@ -2,7 +2,7 @@ package IPC::Manager::Serializer::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use parent 'IPC::Manager::Serializer';
 

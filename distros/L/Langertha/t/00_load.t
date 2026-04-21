@@ -31,6 +31,7 @@ my @modules = qw(
   Langertha::Engine::LMStudioAnthropic
   Langertha::Engine::LMStudioOpenAI
   Langertha::Engine::MiniMax
+  Langertha::Engine::MiniMaxAnthropic
   Langertha::Engine::Mistral
   Langertha::Engine::NousResearch
   Langertha::Engine::OpenAI

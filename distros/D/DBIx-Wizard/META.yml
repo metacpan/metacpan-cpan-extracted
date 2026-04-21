@@ -1,0 +1,59 @@
+---
+abstract: 'Lightweight, chainable, zero-configuration ORM for Perl'
+author:
+  - 'Thomas Busch <tbusch@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - dbi
+  - database
+  - query
+  - builder
+  - executor
+  - zero-configuration
+  - orm
+  - sql
+  - fluent
+  - lightweight
+  - chaining
+  - chainable
+  - resultset
+  - cursor
+  - select
+  - insert
+  - update
+  - delete
+  - truncate
+  - join
+  - expression
+  - composable
+  - postgresql
+  - mysql
+  - sqlite
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Wizard
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '0'
+  SQL::Wizard: '0.11'
+  Time::Moment: '0.44'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/thomasbusch/perl-DBIx-Wizard/issues
+  homepage: https://github.com/thomasbusch/perl-DBIx-Wizard
+  repository: https://github.com/thomasbusch/perl-DBIx-Wizard.git
+version: '0.04'
+x_authority: cpan:TBUSCH
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

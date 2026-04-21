@@ -1184,6 +1184,40 @@ Register-ArgumentCompleter -CommandName 'dashboard', 'd2' -ScriptBlock {
   }
 }
 
+Register-ArgumentCompleter -CommandName 'cdr', 'dd_cdr', 'which_dir' -ScriptBlock {
+  param($wordToComplete, $commandAst, $cursorPosition)
+  $tokens = @()
+  foreach ($element in $commandAst.CommandElements) {
+    if ($null -eq $element) {
+      continue
+    }
+    $tokens += [string]$element.Extent.Text
+  }
+  if ($tokens.Count -eq 0) {
+    return
+  }
+  $index = $tokens.Count - 1
+  if ($commandAst.Extent.EndOffset -gt $cursorPosition) {
+    $prefixCount = 0
+    foreach ($element in $commandAst.CommandElements) {
+      if ($null -eq $element) {
+        continue
+      }
+      last if $element.Extent.EndOffset -ge $cursorPosition
+      $prefixCount++
+    }
+    $index = $prefixCount
+    $tokens = if ($prefixCount -gt 0) { @($tokens[0..($prefixCount - 1)]) } else { @() }
+    $tokens += [string]$wordToComplete
+  }
+  $results = & __DASHBOARD_CMD__ path complete-cdr $index @tokens
+  foreach ($candidate in @($results)) {
+    if (-not [string]::IsNullOrEmpty($candidate)) {
+      [System.Management.Automation.CompletionResult]::new($candidate, $candidate, 'ParameterValue', $candidate)
+    }
+  }
+}
+
 function which_dir {
   param([Parameter(ValueFromRemainingArguments = $true)][string[]]$DashboardArgs)
   $selection = Get-DashboardTarget -DashboardArgs $DashboardArgs
@@ -1239,6 +1273,14 @@ _dashboard_complete_zsh() {
 }
 
 compdef _dashboard_complete_zsh dashboard d2
+
+_dashboard_complete_cdr_zsh() {
+  local -a completions
+  completions=("${(@f)$(__DASHBOARD_CMD__ path complete-cdr "$((CURRENT-1))" "${words[@]}")}")
+  compadd -a completions
+}
+
+compdef _dashboard_complete_cdr_zsh cdr dd_cdr which_dir
 ZSH
     }
     if ( $shell eq 'bash' ) {
@@ -1286,6 +1328,17 @@ _dashboard_complete() {
 }
 
 complete -F _dashboard_complete dashboard d2
+
+_dashboard_complete_cdr() {
+  COMPREPLY=()
+  local candidate
+  while IFS= read -r candidate; do
+    [ -n "$candidate" ] || continue
+    COMPREPLY+=("$candidate")
+  done < <(__DASHBOARD_CMD__ path complete-cdr "$COMP_CWORD" "${COMP_WORDS[@]}")
+}
+
+complete -F _dashboard_complete_cdr cdr dd_cdr which_dir
 BASH
     }
     return <<'SH';
@@ -1404,8 +1457,8 @@ after the public C<dashboard> entrypoint has already handled hook execution and
 switchboard dispatch. It is staged under F<~/.developer-dashboard/cli/dd/> as
 F<_dashboard-core> and is not meant to be called by users directly. It also
 generates the shared shell bootstrap snippets that expose C<cdr>,
-C<dd_cdr>, C<d2>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and
-PowerShell.
+C<dd_cdr>, C<d2>, C<which_dir>, prompt wiring, and tab-completion handlers
+across bash, zsh, POSIX sh, and PowerShell.
 
 __END__
 

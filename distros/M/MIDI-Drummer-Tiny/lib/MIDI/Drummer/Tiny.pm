@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.7013';
+our $VERSION = '0.7014';
 
 use 5.024;
 use strictures 2;
@@ -1404,7 +1404,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.7013
+version 0.7014
 
 =head1 SYNOPSIS
 

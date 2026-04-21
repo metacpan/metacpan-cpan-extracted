@@ -1,5 +1,9 @@
 Revision history for SVGPDF
 
+0.092.2 2025-04-20
+
+	- Bump PDF::Builder requirement to 3.027.
+
 0.092.1 2025-04-19
 
 	- Fix failing tests for longdouble perls.

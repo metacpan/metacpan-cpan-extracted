@@ -175,8 +175,12 @@ sub _getSSOMod {
 
 sub _saveApplyConf {
     my ( $self, $conf ) = @_;
-    $self->_confAcc->saveConf($conf);
+    my $res = $self->_confAcc->saveConf($conf);
+    if ( $res <= 0 ) {
+        return 0;
+    }
     $self->applyConf($conf);
+    return 1;
 }
 
 1;

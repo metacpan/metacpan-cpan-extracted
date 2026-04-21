@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAI;
 # ABSTRACT: OpenAI API
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 use Carp qw( croak );
 
@@ -51,7 +51,7 @@ Langertha::Engine::OpenAI - OpenAI API
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

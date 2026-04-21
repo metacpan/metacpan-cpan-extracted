@@ -6,6 +6,7 @@ use File::Find qw(find);
 use File::Spec;
 use FindBin qw($RealBin);
 use Test::More;
+use Archive::Tar;
 
 my $ROOT = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
 
@@ -67,7 +68,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.72', 'repo version bumped for the WSL cmd.exe and portable d2 bootstrap fixes' );
+is( $version, '2.76', 'repo version bumped for the skill dependency policy unification fix' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
     like( $dist, qr/^version = \Q$version\E$/m, 'dist.ini version matches the module version in the source tree' );
@@ -75,12 +76,12 @@ if ( $dist ne '' ) {
     like( $dist, qr/^skip = \^Module::CPANTS::Kwalitee\$$/m, 'dist.ini skips release-only Module::CPANTS::Kwalitee from generated install-time prereqs' );
     like( $dist, qr/^exclude_filename = LICENSE$/m, 'dist.ini excludes the tracked LICENSE so dzil does not build duplicate LICENSE files' );
     like( $dist, qr/^exclude_match = \^cover_db\/$/m, 'dist.ini excludes cover_db so coverage artifacts do not leak into release tarballs' );
-    like( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini excludes integration assets so repo-only verification helpers do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^node_modules\/$/m, 'dist.ini excludes node_modules so JavaScript dependency trees do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^test_by_michael\/$/m, 'dist.ini excludes test_by_michael so private scratch fixtures do not leak into release tarballs' );
     like( $dist, qr/^exclude_match = \^updates\/$/m, 'dist.ini excludes checkout-only update scripts so user-defined update remains the installed runtime contract' );
-    like( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini excludes Markdown files so repo-internal docs do not leak into release tarballs' );
-        like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
+    unlike( $dist, qr/^exclude_match = \^integration\/$/m, 'dist.ini keeps integration assets in the release tarball so install-time integration tests can read them' );
+    unlike( $dist, qr/^exclude_match = \\.md\$$/m, 'dist.ini keeps Markdown documentation in the release tarball so release tests can read the shipped docs' );
+    like( $dist, qr/^\[ShareDir\]$/m, 'dist.ini installs the seeded share assets into the built distribution' );
 }
 else {
         like( $meta, qr/"version"\s*:\s*"\Q$version\E"/, 'META.json version matches the module version in the built distribution' );
@@ -160,6 +161,27 @@ for my $module (
 }
 for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills which)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
+}
+
+my @release_tarballs = sort glob _repo_path('Developer-Dashboard-*.tar.gz');
+if (@release_tarballs) {
+    my $tar = Archive::Tar->new;
+    ok( $tar->read( $release_tarballs[-1] ), 'latest release tarball can be read for content assertions' );
+    my @files = $tar->list_files;
+    ok( scalar @files > 0, 'latest release tarball lists packaged files' );
+    like( $files[0], qr{^Developer-Dashboard-\Q$version\E(?:/|\z)}, 'latest release tarball root matches the repo version' );
+    my %files = map { $_ => 1 } @files;
+    for my $required (
+        "Developer-Dashboard-$version/doc/integration-test-plan.md",
+        "Developer-Dashboard-$version/doc/testing.md",
+        "Developer-Dashboard-$version/doc/windows-testing.md",
+        "Developer-Dashboard-$version/integration/blank-env/run-integration.pl",
+        "Developer-Dashboard-$version/integration/browser/run-bookmark-browser-smoke.pl",
+        "Developer-Dashboard-$version/integration/windows/run-qemu-windows-smoke.sh",
+        "Developer-Dashboard-$version/integration/windows/run-strawberry-smoke.ps1",
+    ) {
+        ok( $files{$required}, "$required is packaged into the release tarball" );
+    }
 }
 
 for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
@@ -246,6 +268,7 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/Folder->all|all_paths|new_from_all_folders|Collector->new_from_all_folders/, 'docs mention the public Perl path inventory API' );
     like( $doc, qr/dashboard which/, 'docs mention the command inspection helper explicitly' );
     like( $doc, qr/COMMAND \/full\/path|HOOK \/full\/path/, 'docs describe the COMMAND and HOOK output shape for dashboard which' );
+    like( $doc, qr/--edit.*dashboard open-file|dashboard open-file.*--edit/s, 'docs describe dashboard which --edit re-entering dashboard open-file' );
     like( $doc, qr/Developer::Dashboard::EnvAudit/, 'docs mention the env provenance audit API' );
     like( $doc, qr/\.env\.pl|\.env/, 'docs describe layered env files explicitly' );
     like( $doc, qr/skill-local env files (?:load|are loaded) only when a skill command|skill env files only load when a skill command/i, 'docs describe skill-local env loading isolation' );

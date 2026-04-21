@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
 use Exporter qw/import/;
 our @EXPORT_OK = qw/
@@ -84,7 +84,7 @@ Create hash reference omitted by block.
 
 The MIT License (MIT)
 
-Copyright (c) 2016-2019, 2025 Pine Mizune
+Copyright (c) 2016-2019, 2025-2026 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

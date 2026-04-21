@@ -1,0 +1,74 @@
+Revision history for App-Raider
+
+0.003     2026-04-21 01:46:09Z
+
+    - Switch bash tool from the retired MCP::Server::Run::Bash to
+      MCP::Run::Bash (same API, renamed upstream distribution).
+    - Dockerfile installs App::Raider from the dzil-built tarball
+      instead of the source tree (no Makefile.PL in Dist::Zilla dists).
+    - Docker Hub image published as raudssus/raider. dzil release now
+      runs run_after_release hooks that create the GitHub release,
+      build the runtime-root image, and push raudssus/raider:VERSION
+      plus :latest.
+    - Ship a cpanfile.snapshot for reproducible Carton deployments.
+
+0.002     2026-04-20 20:28:50Z
+
+    - /model REPL command: show current engine and model, list available
+      models from the engine grouped by date-snapshot families (e.g.
+      gpt-4o [+3 snapshots]); /model list [FILTER] for the full or
+      substring-filtered list; /model NAME saves the chosen model to
+      .raider.yml under default.model.
+    - Model list colours: names in bright-blue, structural labels grey —
+      consistent with the rest of the banner.
+    - Fixed _build_skill_sources calling _normalize_skill_spec in scalar
+      context, silently dropping the CLAUDE.md spec from the claude
+      profile when loaded from .raider.yml ("seeing CLAUDE.md, ignoring"
+      even with profiles: claude active).
+    - Fixed Term::ReadLine::Gnu detection: require Term::ReadLine::Gnu
+      fails with "invalid to load directly"; now detected via
+      Term::ReadLine->new + ->ReadLine =~ /Gnu/.
+    - Readline history now persists across Ctrl-C / SIGTERM via signal
+      handlers that call WriteHistory before exit.
+
+0.001     2026-04-20 17:44:05Z
+
+    - Initial release.
+    - CLI agent (App::Raider) wrapping Langertha::Raider with a default
+      viking persona ("Langertha"), caveman-style communication, and
+      effectively unlimited tool-calling iterations per raid.
+    - Tools: filesystem (list_files, read_file, write_file, edit_file),
+      bash (MCP::Server::Run::Bash), web_search and web_fetch
+      (Net::Async::WebSearch + Net::Async::HTTP).
+    - Engine auto-detection from available *_API_KEY env var with cheap
+      per-engine default models (claude-haiku-4-5, gpt-4o-mini, etc.).
+    - .raider.md for persona customization; hot-reload via /reload;
+      /prompt spawns a sub-agent prompt-builder that writes .raider.md.
+    - .raider.yml for engine options (temperature, response_size, ...)
+      with flat or default/<engine> layers; -o key=value CLI override.
+    - Skill / profile loading: --claude loads CLAUDE.md and
+      .claude/skills/*/SKILL.md; --openai/--codex loads AGENTS.md;
+      --skills DIR adds plain-markdown dirs. Choices persist to
+      .raider.yml with (saved) banner tag on first use.
+    - App::Raider::Skill generates self-describing how-to-use-raider
+      documentation from the live config, as plain markdown or as a
+      Claude Code SKILL.md with YAML frontmatter; usable via CLI
+      (--export-skill / --export-claude-skill) or REPL (/skill,
+      /skill-claude).
+    - REPL: Term::ReadLine::Gnu with persistent ~/.raider_history,
+      IO::Prompt::Tiny fallback; plain-ASCII output with blue/green
+      palette; slash commands /help /clear /metrics /stats /reload
+      /prompt /skill /skill-claude /quit.
+    - App::Raider::Plugin::Trace streams per-iteration tool calls,
+      args, results and cumulative token counts; meta-line after each
+      raid shows elapsed time, history size vs. context cap, and
+      cumulative tokens in / out / total.
+    - App::Raider::Plugin::Situation injects a compact single-line
+      situation block (local time, timezone, host, user) at the start
+      of each session.
+    - Auto-compression at 70% of a 40k-token context window to stay
+      under typical per-minute rate limits.
+    - Dockerfile with multi-stage build: runtime-root for root use,
+      runtime-user with RAIDER_UID/RAIDER_GID build args for host-uid
+      matching. README includes a shell-alias recipe that mounts $PWD
+      and forwards API-key env vars.

@@ -12,7 +12,7 @@ use Developer::Dashboard::CLI::Which ();
 # Runs the which helper for Developer Dashboard.
 # Input: command-line arguments from @ARGV.
 # Output: prints the resolved command file path and participating hook paths,
-# then exits.
+# or re-enters dashboard open-file when --edit is requested, then exits.
 Developer::Dashboard::CLI::Which::run_which_command( command => 'which', args => \@ARGV );
 
 __END__
@@ -29,13 +29,15 @@ which - private runtime command-inspection helper for Developer Dashboard
   dashboard which layered-tool
   dashboard which alpha-skill.run-test
   dashboard which alpha-skill.level1.level2.here
+  dashboard which --edit jq
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
 C<dashboard> command can show the resolved runnable file and the participating
 hook files for built-in commands, layered custom commands, and dotted skill
-commands without bloating the public switchboard.
+commands, or reopen the resolved command file through C<dashboard open-file>
+when C<--edit> is requested, without bloating the public switchboard.
 
 =for comment FULL-POD-DOC START
 
@@ -66,7 +68,10 @@ built-in command such as C<jq>, a layered custom command such as
 C<layered-tool>, or a dotted skill command such as C<alpha-skill.run-test> or
 C<alpha-skill.level1.level2.here>. The helper prints one C<COMMAND> line with
 the resolved executable path and then one C<HOOK> line per participating hook
-file in runtime execution order.
+file in runtime execution order. When users add C<--edit>, the helper skips
+the printed inspection output and re-enters the public C<dashboard open-file>
+command with the resolved command file path so the usual editor selection logic
+is reused.
 
 =head1 WHAT USES IT
 
@@ -101,6 +106,13 @@ Example 4:
 
 Rerun the focused tests that keep the staged helper and inspection behavior
 green after changes.
+
+Example 5:
+
+  dashboard which --edit nest.level1.level2.here
+
+Open the resolved nested skill command file through C<dashboard open-file>
+instead of only printing the resolved path and hook chain.
 
 =for comment FULL-POD-DOC END
 

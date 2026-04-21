@@ -2,7 +2,7 @@ package IPC::Manager::Client::MessageFiles;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak confess/;
 use File::Spec;
@@ -58,7 +58,7 @@ sub inotify {
 sub pre_disconnect_hook {
     my $self = shift;
 
-    my $new_path = File::Spec->catfile($self->{+ROUTE}, "_" . $self->{+ID});
+    my $new_path = File::Spec->catfile($self->{+ROUTE}, "_" . $self->on_disk_name($self->{+ID}));
     rename($self->path, $new_path) or die "Cannot rename directory: $!";
     $self->{+PATH} = $new_path;
 }

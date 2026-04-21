@@ -69,6 +69,13 @@ sub check400 {
     checkJson( $test, $res );
 }
 
+sub check503 {
+    my ( $test, $res ) = splice @_;
+    is( $res->[0], "503", "$test: Result code is 503" );
+    count(1);
+    checkJson( $test, $res );
+}
+
 sub checkJson {
     my ( $test, $res ) = splice @_;
     my $key;
@@ -182,6 +189,17 @@ sub checkUpdateFailsIfExists {
 sub checkUpdateWithUnknownAttributes {
     my ( $test, $type, $confKey, $update ) = splice @_;
     check400( $test, update( $test, $type, $confKey, $update ) );
+}
+
+sub checkUpdateSaveConfFailed {
+    my ( $test, $type, $confKey, $update ) = splice @_;
+    {
+        no warnings 'once';
+        local *Lemonldap::NG::Common::Conf::saveConf = sub {
+            return -1;
+        };
+        check503( $test, update( $test, $type, $confKey, $update ) );
+    }
 }
 
 sub replace {
@@ -324,6 +342,17 @@ sub checkDeleteNotFound {
     check404( $test, deleteProvider( $test, $type, $confKey ) );
 }
 
+sub checkDeleteSaveConfFailed {
+    my ( $test, $type, $confKey ) = splice @_;
+    {
+        no warnings 'once';
+        local *Lemonldap::NG::Common::Conf::saveConf = sub {
+            return -1;
+        };
+        check503( $test, deleteProvider( $test, $type, $confKey ) );
+    }
+}
+
 my $test;
 
 my $oidcRp = {
@@ -374,6 +403,7 @@ delete $oidcRp->{exportedVars};
 delete $oidcRp->{clientId};
 $oidcRp->{macros}->{given_name} = '$givenName';
 $oidcRp->{exportedVars}->{cn}   = 'cn';
+checkUpdateSaveConfFailed( $test, 'oidc/rp', 'myOidcRp1', $oidcRp );
 checkUpdate( $test, 'oidc/rp', 'myOidcRp1', $oidcRp );
 checkGet( $test, 'oidc/rp', 'myOidcRp1', 'options/clientSecret', 'secret2' );
 checkGet( $test, 'oidc/rp', 'myOidcRp1', 'options/clientId', 'myOidcClient1' );
@@ -467,6 +497,7 @@ $test = "OidcRp - FindByClientId should find nothing";
 checkFindByProviderIdNotFound( $test, 'oidc/rp', 'clientId', 'myOidcClient3' );
 
 $test = "OidcRp - Clean up";
+checkDeleteSaveConfFailed( $test, 'oidc/rp', 'myOidcRp1' );
 checkDelete( $test, 'oidc/rp', 'myOidcRp1' );
 checkDelete( $test, 'oidc/rp', 'myOidcRp2' );
 $test = "OidcRp - Entity should not be found after clean up";
@@ -558,11 +589,12 @@ $samlSp->{options}->{checkSLOMessageSignature} = 1;
 $samlSp->{options}->{encryptionMode}           = 'nameid';
 delete $samlSp->{options}->{sessionNotOnOrAfterTimeout};
 delete $samlSp->{exportedAttributes};
-$samlSp->{macros}->{family_name} = '$sn',
-  $samlSp->{exportedAttributes}->{cn}->{name}         = "cn",
-  $samlSp->{exportedAttributes}->{cn}->{friendlyName} = "common_name",
-  $samlSp->{exportedAttributes}->{cn}->{mandatory}    = "false",
-  checkUpdate( $test, 'saml/sp', 'mySamlSp1', $samlSp );
+$samlSp->{macros}->{family_name}                    = '$sn';
+$samlSp->{exportedAttributes}->{cn}->{name}         = "cn";
+$samlSp->{exportedAttributes}->{cn}->{friendlyName} = "common_name";
+$samlSp->{exportedAttributes}->{cn}->{mandatory}    = "false";
+checkUpdateSaveConfFailed( $test, 'saml/sp', 'mySamlSp1', $samlSp );
+checkUpdate( $test, 'saml/sp', 'mySamlSp1', $samlSp );
 checkGet( $test, 'saml/sp', 'mySamlSp1',
     'options/checkSLOMessageSignature', 1 );
 checkGet( $test, 'saml/sp', 'mySamlSp1',
@@ -665,6 +697,7 @@ checkFindByProviderId( $test, 'saml/sp', 'entityId',
     'http://fed.example.com/' );
 
 $test = "SamlSp -  Clean up";
+checkDeleteSaveConfFailed( $test, 'saml/sp', 'mySamlSp1' );
 checkDelete( $test, 'saml/sp', 'mySamlSp1' );
 checkDelete( $test, 'saml/sp', 'mySamlSp2' );
 $test = "SamlSp -  Entity should not be found after clean up";
@@ -707,6 +740,7 @@ delete $casApp->{macros};
 delete $casApp->{exportedVars};
 $casApp->{macros}->{given_name} = '$givenName';
 $casApp->{exportedVars}->{cn}   = 'uid';
+checkUpdateSaveConfFailed( $test, 'cas/app', 'myCasApp1', $casApp );
 checkUpdate( $test, 'cas/app', 'myCasApp1', $casApp );
 checkGet( $test, 'cas/app', 'myCasApp1', 'options/service/0',
     'http://mycasapp.acme.com' );
@@ -787,6 +821,7 @@ checkFindByProviderIdNotFound( $test, 'cas/app', 'serviceUrl',
     'http://mycasapp.corporation.com' );
 
 $test = "CasApp - Clean up";
+checkDeleteSaveConfFailed( $test, 'cas/app', 'myCasApp1' );
 checkDelete( $test, 'cas/app', 'myCasApp1' );
 checkDelete( $test, 'cas/app', 'myCasApp2' );
 $test = "CasApp - Entity should not be found after clean up";

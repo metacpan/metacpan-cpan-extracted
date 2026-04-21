@@ -166,7 +166,7 @@ sub addMenuApp {
     my $res =
       $self->_pushMenuApp( $conf, $catConfKey, $add->{confKey}, $add, 1 );
 
-    return $self->sendError( $req, $res->{msg}, 400 )
+    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse(
@@ -215,7 +215,7 @@ sub updateMenuApp {
     my $res =
       $self->_pushMenuApp( $conf, $catConfKey, $appConfKey, $update, 0 );
 
-    return $self->sendError( $req, $res->{msg}, 400 )
+    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -276,7 +276,7 @@ sub replaceMenuApp {
 
     my $res =
       $self->_pushMenuApp( $conf, $catConfKey, $appConfKey, $replace, 1 );
-    return $self->sendError( $req, $res->{msg}, 400 )
+    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -313,9 +313,13 @@ sub deleteMenuApp {
     delete $conf->{applicationList}->{$catConfKey}->{$appConfKey};
 
     # Save configuration
-    $self->_saveApplyConf($conf);
-
-    return $self->sendJSONresponse( $req, undef, code => 204 );
+    if ( $self->_saveApplyConf($conf) ) {
+        return $self->sendJSONresponse( $req, undef, code => 204 );
+    }
+    else {
+        return $self->sendError( $req,
+            "Failed to save configuration, please try again later", 503 );
+    }
 }
 
 sub _isCatApp {
@@ -391,17 +395,23 @@ sub _pushMenuApp {
     );
     unless ( $parser->testNewConf( $self->p ) ) {
         return {
-            res  => 'ko',
-            code => 400,
-            msg  => "Configuration error: "
+            res => 'ko',
+            msg => "Configuration error: "
               . join( ". ", map { $_->{message} } @{ $parser->errors } ),
         };
     }
 
     # Save configuration
-    $self->_saveApplyConf($conf);
-
-    return { res => 'ok' };
+    if ( $self->_saveApplyConf($conf) ) {
+        return { res => 'ok' };
+    }
+    else {
+        return {
+            res  => 'ko',
+            msg  => "Failed to save configuration, please try again later",
+            code => 503,
+        };
+    }
 }
 
 1;

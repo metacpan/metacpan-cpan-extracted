@@ -2685,7 +2685,7 @@ sub registration {
     my $backchannel_logout_uri = $client_metadata->{backchannel_logout_uri};
     my $backchannel_logout_session_required =
       $client_metadata->{backchannel_logout_session_required};
-    my $frontchannel_logout_uri = $client_metadata->{backchannel_logout_uri};
+    my $frontchannel_logout_uri = $client_metadata->{frontchannel_logout_uri};
     my $frontchannel_logout_session_required =
       $client_metadata->{frontchannel_logout_session_required};
     my $jwksUri = $client_metadata->{jwks_uri};

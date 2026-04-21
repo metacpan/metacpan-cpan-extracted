@@ -1,0 +1,84 @@
+======================================================================
+ JSON::LINQ Kopya Kağıdı                                       [TR] Türkçe
+======================================================================
+
+[ 1. 1. Sorgu Oluşturma ]
+
+  use JSON::LINQ;
+  my $q = JSON::LINQ->FromJSON('data.json');
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+  my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
+  my $q = JSON::LINQ->From(\@array);
+  my $q = JSON::LINQ->Empty();
+  my $q = JSON::LINQ->Range(1, 5);
+  my $q = JSON::LINQ->Repeat('x', 3);
+
+[ 2. 2. Filtreleme ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+[ 3. 3. Projeksiyon ]
+
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+[ 4. 4. Sıralama ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByStr(sub { $_[0]{code} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->Reverse()
+
+[ 5. 5. Sayfalama ]
+
+  ->Skip(10)  ->Take(5)
+  ->SkipWhile(sub { ... })  ->TakeWhile(sub { ... })
+
+[ 6. 6. Gruplama ]
+
+  my @g = $q->GroupBy(sub { $_[0]{cat} })->ToArray();
+  my $l = $q->ToLookup(sub { $_[0]{dept} });
+
+[ 7. 7. Toplama (terminal metotlar) ]
+
+  ->Count()  ->Sum(sub { $_[0]{v} })  ->Average(sub { ... })
+  ->Min(sub { ... })  ->Max(sub { ... })
+  ->First()  ->FirstOrDefault()
+  ->Last()   ->LastOrDefault()
+  ->Any()    ->All(sub { ... })
+  ->ForEach(sub { ... })  ->Aggregate($s, sub { ... })
+
+[ 8. 8. Küme İşlemleri ]
+
+  ->Distinct()  ->Union($q2)  ->Intersect($q2)  ->Except($q2)
+  ->SequenceEqual($q2)
+
+[ 9. 9. Dönüşüm ]
+
+  ->ToJSON('out.json')   ->ToJSONL('out.jsonl')
+  ->ToArray()  ->ToDictionary(sub { ... })  ->ToLookup(sub { ... })
+
+[ 10. 10. Mantıksal Değerler ]
+
+  JSON::LINQ::true   # 1 / "true"
+  JSON::LINQ::false  # 0 / "false"
+
+[ 11. 11. Birleştirme ]
+
+  $outer->Join($inner, sub{$_[0]{k}}, sub{$_[0]{k}}, sub{...})
+  $outer->GroupJoin($inner, sub{...}, sub{...}, sub{...})
+
+[ 12. 12. Diğer Metotlar ]
+
+  ->Concat($q2)  ->Zip($q2, sub{...})  ->DefaultIfEmpty($d)
+
+[ 13. 13. Referans Bağlantıları ]
+
+  JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
+  JSONL:      https://jsonlines.org/
+  LINQ:       https://docs.microsoft.com/dotnet/api/system.linq
+
+======================================================================

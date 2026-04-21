@@ -164,6 +164,35 @@ like(
         qr/Invalid regex 'broken\('/,
         'locate_dirs_under reports invalid regex keywords explicitly',
     );
+
+    my $restricted_parent = File::Spec->catdir( $search_root, 'restricted' );
+    my $restricted_match   = File::Spec->catdir( $restricted_parent, 'team-alpha-hidden' );
+    my $visible_match      = File::Spec->catdir( $search_root, 'visible', 'team-alpha-public' );
+    make_path( $restricted_match, $visible_match );
+    chmod 0000, $restricted_parent or die "Unable to chmod $restricted_parent: $!";
+    my $restricted_effectively_unreadable = !opendir( my $restricted_dh, $restricted_parent );
+    closedir($restricted_dh) if !$restricted_effectively_unreadable;
+    my ( $restricted_stdout, $restricted_stderr ) = capture {
+        my @matches = $paths->locate_dirs_under( $search_root, 'team', 'alpha' );
+        print join "\n", @matches;
+    };
+    chmod 0700, $restricted_parent or die "Unable to restore chmod on $restricted_parent: $!";
+    is( $restricted_stderr, '', 'locate_dirs_under skips unreadable subdirectories without printing permission errors' );
+    like(
+        $restricted_stdout,
+        qr/\Q$visible_match\E/,
+        'locate_dirs_under still returns readable sibling matches when one subtree is unreadable',
+    );
+    if ($restricted_effectively_unreadable) {
+        unlike(
+            $restricted_stdout,
+            qr/\Q$restricted_match\E/,
+            'locate_dirs_under skips matches hidden behind unreadable subdirectories',
+        );
+    }
+    else {
+        pass('locate_dirs_under unreadable-subdirectory exclusion is skipped when the current user can still read chmod 0000 directories, such as root inside the blank install gate');
+    }
 }
 {
     my $docker = Developer::Dashboard::DockerCompose->new(
@@ -887,6 +916,19 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
+            args    => [ 'complete-cdr', '2', 'cdr', 'named-home-target', 'team-a' ],
+        );
+    };
+    is( $stderr, '', 'CLI::Paths complete-cdr writes no stderr for alias-root completion candidates' );
+    is_deeply(
+        [ grep { length } split /\n/, $stdout ],
+        [qw(team-alpha team-alpha-red)],
+        'CLI::Paths complete-cdr suggests alias-root directory basenames that match the current prefix',
+    );
+
+    ( $stdout, $stderr ) = capture {
+        Developer::Dashboard::CLI::Paths::run_paths_command(
+            command => 'path',
             args    => [ 'locate', 'sample' ],
         );
     };
@@ -912,6 +954,19 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
             matches => [],
         },
         'CLI::Paths cdr searches beneath the current directory when the first argument is not a saved alias and one path matches every keyword',
+    );
+
+    ( $stdout, $stderr ) = capture {
+        Developer::Dashboard::CLI::Paths::run_paths_command(
+            command => 'path',
+            args    => [ 'complete-cdr', '1', 'cdr', 'doc' ],
+        );
+    };
+    is( $stderr, '', 'CLI::Paths complete-cdr writes no stderr for current-directory completion candidates' );
+    is_deeply(
+        [ grep { length } split /\n/, $stdout ],
+        [qw(docs-alpha docs-alpha-red)],
+        'CLI::Paths complete-cdr suggests current-directory basenames that match the current prefix',
     );
 
     ( $stdout, $stderr ) = capture {
@@ -997,7 +1052,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
 
     like(
         _dies( sub { Developer::Dashboard::CLI::Paths::run_paths_command( command => 'path', args => ['bogus'] ) } ),
-        qr/Usage: dashboard path <resolve\|locate\|cdr\|add\|del\|project-root\|list> \.\.\./,
+        qr/Usage: dashboard path <resolve\|locate\|cdr\|complete-cdr\|add\|del\|project-root\|list> \.\.\./,
         'CLI::Paths rejects unsupported path subcommands with a usage error',
     );
 
@@ -1496,12 +1551,52 @@ chdir $test_cwd or die "Unable to chdir to $test_cwd: $!";
 my $fake_bin = tempdir( CLEANUP => 1 );
 my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
 my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
+my $brew_log = File::Spec->catfile( $fake_bin, 'brew.log' );
+my $sudo_log = File::Spec->catfile( $fake_bin, 'sudo.log' );
+my $dashboard_log = File::Spec->catfile( $fake_bin, 'dashboard.log' );
+my $dependency_log = File::Spec->catfile( $fake_bin, 'dependency-install.log' );
 _write_file(
     File::Spec->catfile( $fake_bin, 'cpanm' ),
     <<"SH",
 #!/bin/sh
 printf '%s\\n' "\$*" >> "$cpanm_log"
+printf 'CPANM:%s\\n' "\$*" >> "$dependency_log"
 if [ "\$DD_TEST_CPANM_FAIL" = "1" ]; then
+  exit 1
+fi
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'brew' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$brew_log"
+printf 'BREW:%s\\n' "\$*" >> "$dependency_log"
+if [ "\$DD_TEST_BREW_FAIL" = "1" ]; then
+  exit 1
+fi
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'sudo' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$sudo_log"
+exec "\$@"
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'dashboard' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$dashboard_log"
+printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
+if [ "\$DD_TEST_DDFILE_FAIL" = "1" ]; then
   exit 1
 fi
 exit 0
@@ -1513,6 +1608,7 @@ _write_file(
     <<"SH",
 #!/bin/sh
 printf '%s\\n' "\$*" >> "$apt_log"
+printf 'APT:%s\\n' "\$*" >> "$dependency_log"
 if [ "\$DD_TEST_APT_FAIL" = "1" ]; then
   exit 1
 fi
@@ -1631,7 +1727,14 @@ is_deeply( $manager->uninstall(''), { error => 'Missing repo name' }, 'uninstall
 is_deeply( $manager->update('missing-skill'), { error => "Skill 'missing-skill' not found" }, 'update rejects unknown skills' );
 is_deeply( $manager->uninstall('missing-skill'), { error => "Skill 'missing-skill' not found" }, 'uninstall rejects unknown skills' );
 
-my $dep_repo = _create_skill_repo( $test_repos, 'dep-skill', with_cpanfile => 1, with_aptfile => 1 );
+my $dep_repo = _create_skill_repo(
+    $test_repos,
+    'dep-skill',
+    with_cpanfile => 1,
+    with_aptfile => 1,
+    with_ddfile  => 1,
+    with_cpanfile_local => 1,
+);
 my $install = $manager->install( 'file://' . $dep_repo );
 ok( !$install->{error}, 'skill manager installs a skill with a cpanfile' ) or diag $install->{error};
 my $dep_skill_root = $manager->get_skill_path('dep-skill');
@@ -1660,12 +1763,28 @@ like( $reinstalled_dispatch->{stdout}, qr/reinstalled-dep-skill/, 'reinstall ref
 my $dep_install = $manager->_install_skill_dependencies( $manager->get_skill_path('dep-skill') );
 ok( !$dep_install->{error}, '_install_skill_dependencies succeeds for a skill with a cpanfile' ) or diag $dep_install->{error};
 ok( -f $apt_log, '_install_skill_dependencies records an apt-get invocation when the skill ships an aptfile' );
-ok( -f $cpanm_log, '_install_skill_dependencies records an isolated cpanm invocation when the skill ships a cpanfile' );
+ok( -f $cpanm_log, '_install_skill_dependencies records cpanm invocations when the skill ships Perl dependency files' );
+ok( -f $dashboard_log, '_install_skill_dependencies records dashboard install invocations when the skill ships a ddfile' );
+open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $dependency_log: $!";
+my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
+close $dependency_log_fh;
+is_deeply(
+    [ map { (/^(DDFILE|APT|BREW|CPANM):/)[0] } @dependency_steps[-4 .. -1] ],
+    [ 'DDFILE', 'APT', 'CPANM', 'CPANM' ],
+    '_install_skill_dependencies follows the documented ddfile -> aptfile -> cpanfile -> cpanfile.local order on Debian-like hosts while leaving brewfile inactive',
+);
+open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
+my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
+close $cpanm_log_fh;
+like( $cpanm_steps[-2], qr/^-L \Q$ENV{HOME}\/skills-home\/perl5\E --cpanfile .*\/cpanfile --installdeps /, '_install_skill_dependencies installs cpanfile dependencies into HOME perl5' );
+like( $cpanm_steps[-1], qr/^-L .*\/perl5 --cpanfile .*\/cpanfile\.local --installdeps /, '_install_skill_dependencies installs cpanfile.local dependencies into the skill-local perl5 root' );
 my $metadata = $manager->list->[0];
 ok( $metadata->{enabled}, 'skill metadata records enabled state for active skills' );
 is( $metadata->{has_config}, 1, 'skill metadata records config presence' );
+is( $metadata->{has_ddfile}, 1, 'skill metadata records ddfile presence' );
 is( $metadata->{has_cpanfile}, 1, 'skill metadata records cpanfile presence' );
 is( $metadata->{has_aptfile}, 1, 'skill metadata records aptfile presence' );
+is( $metadata->{has_cpanfile_local}, 1, 'skill metadata records cpanfile.local presence' );
 is_deeply( $metadata->{docker_services}, ['postgres'], 'skill metadata records docker service folders' );
 is_deeply( $metadata->{cli_commands}, ['run-test'], 'skill metadata records cli commands only, not hook directories' );
 is( $metadata->{pages_count}, 2, 'skill metadata records non-nav page counts' );
@@ -1760,7 +1879,6 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
     local $ENV{DD_TEST_CPANM_FAIL} = 1;
     my $fail_repo = File::Spec->catdir( $test_repos, 'fail-dep-skill' );
     make_path($fail_repo);
-    make_path( File::Spec->catdir( $fail_repo, 'local' ) );
     _write_file( File::Spec->catfile( $fail_repo, 'cpanfile' ), "requires 'JSON::XS';\n" );
     like(
         $manager->_install_skill_dependencies($fail_repo)->{error},
@@ -1778,6 +1896,53 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
         qr/Failed to install skill apt dependencies/,
         'install reports isolated apt dependency installation failures',
     );
+}
+{
+    local $ENV{DD_TEST_OS} = 'darwin';
+    my $brew_repo = File::Spec->catdir( $test_repos, 'brew-skill' );
+    make_path($brew_repo);
+    _write_file( File::Spec->catfile( $brew_repo, 'brewfile' ), "jq\n" );
+    unlink $brew_log;
+    my $brew_install = $manager->_install_skill_dependencies($brew_repo);
+    ok( !$brew_install->{error}, '_install_skill_dependencies succeeds for brewfile-driven installs on macOS' ) or diag $brew_install->{error};
+    ok( -f $brew_log, '_install_skill_dependencies records a brew invocation when the skill ships a brewfile on macOS' );
+}
+{
+    local $ENV{DD_TEST_BREW_FAIL} = 1;
+    local $ENV{DD_TEST_OS} = 'darwin';
+    my $fail_repo = File::Spec->catdir( $test_repos, 'fail-brew-skill' );
+    make_path($fail_repo);
+    _write_file( File::Spec->catfile( $fail_repo, 'brewfile' ), "jq\n" );
+    like(
+        $manager->_install_skill_dependencies($fail_repo)->{error},
+        qr/Failed to install skill brew dependencies/,
+        'install reports brew dependency installation failures',
+    );
+}
+{
+    local $ENV{DD_TEST_DDFILE_FAIL} = 1;
+    my $fail_repo = File::Spec->catdir( $test_repos, 'fail-dd-skill' );
+    make_path($fail_repo);
+    _write_file( File::Spec->catfile( $fail_repo, 'ddfile' ), "shared-skill\n" );
+    like(
+        $manager->_install_skill_dependencies($fail_repo)->{error},
+        qr/Failed to install dependent skills for/,
+        'install reports ddfile dependency installation failures',
+    );
+}
+{
+    my $installed_dep = File::Spec->catdir( $skill_paths->skills_root, 'shared-skill' );
+    make_path($installed_dep);
+    my $skip_repo = File::Spec->catdir( $test_repos, 'skip-dd-skill' );
+    make_path($skip_repo);
+    _write_file( File::Spec->catfile( $skip_repo, 'ddfile' ), "shared-skill\nfresh-skill\n" );
+    unlink $dashboard_log;
+    my $skip_install = $manager->_install_skill_dependencies($skip_repo);
+    ok( !$skip_install->{error}, '_install_skill_dependencies skips already-installed ddfile dependencies without looping' ) or diag $skip_install->{error};
+    open my $dashboard_log_fh, '<', $dashboard_log or die "Unable to read $dashboard_log: $!";
+    my @dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dashboard_log_fh>;
+    close $dashboard_log_fh;
+    is_deeply( \@dashboard_steps, ['skills install fresh-skill'], '_install_skill_dependencies skips installed skills and only installs missing ddfile dependencies' );
 }
 {
     my $broken_repo = _create_skill_repo( $test_repos, 'broken-update-skill', with_cpanfile => 0 );
@@ -1975,7 +2140,7 @@ is_deeply( $dispatcher->skill_nav_pages(''), [], 'skill_nav_pages returns an emp
 is_deeply( $dispatcher->skill_nav_pages('missing-skill'), [], 'skill_nav_pages returns an empty list for unknown skills' );
 is_deeply( $dispatcher->skill_nav_pages('no-nav-skill'), [], 'skill_nav_pages returns an empty list when a skill has no nav root' );
 {
-    my $local_lib = File::Spec->catdir( $manager->get_skill_path('dep-skill'), 'local', 'lib', 'perl5' );
+    my $local_lib = File::Spec->catdir( $manager->get_skill_path('dep-skill'), 'perl5', 'lib', 'perl5' );
     make_path($local_lib);
     local $ENV{PERL5LIB} = 'base-lib';
     my %env = $dispatcher->_skill_env(
@@ -2100,6 +2265,15 @@ sub _create_skill_repo {
     }
     if ( $args{with_aptfile} ) {
         _write_file( 'aptfile', "git\ncurl\n" );
+    }
+    if ( $args{with_ddfile} ) {
+        _write_file( 'ddfile', "shared-skill\n" );
+    }
+    if ( $args{with_brewfile} ) {
+        _write_file( 'brewfile', "jq\n" );
+    }
+    if ( $args{with_cpanfile_local} ) {
+        _write_file( 'cpanfile.local', "requires 'YAML::XS';\n" );
     }
     if ( !exists $args{with_bookmark} || $args{with_bookmark} ) {
         _write_file(

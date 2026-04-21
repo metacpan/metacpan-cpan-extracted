@@ -1,9 +1,10 @@
 package Langertha::Engine::AnthropicBase;
 # ABSTRACT: Base class for Anthropic-compatible engines
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
+use Langertha::ToolChoice;
 
 extends 'Langertha::Engine::Remote';
 
@@ -62,6 +63,7 @@ sub default_model { croak "".(ref $_[0])." requires model to be set" }
 
 sub chat_request {
   my ( $self, $messages, %extra ) = @_;
+  $self->_normalize_tool_params(\%extra);
   my @msgs;
   my $system = "";
   for my $message (@{$messages}) {
@@ -91,6 +93,28 @@ sub chat_request {
   );
 }
 
+# Normalize tool_choice (any accepted format -> Anthropic native) and fold
+# parallel_tool_use into the tool_choice block as Anthropic expects.
+sub _normalize_tool_params {
+  my ( $self, $extra ) = @_;
+
+  if ( exists $extra->{tool_choice} && defined $extra->{tool_choice} ) {
+    if ( my $tc = Langertha::ToolChoice->from_hash( $extra->{tool_choice} ) ) {
+      $extra->{tool_choice} = $tc->to_anthropic;
+    }
+  }
+
+  return unless exists $extra->{tools}
+    && $self->can('has_parallel_tool_use') && $self->has_parallel_tool_use;
+
+  my $tc = $extra->{tool_choice};
+  $tc = { type => 'auto' } unless ref($tc) eq 'HASH';
+  unless ( exists $tc->{disable_parallel_tool_use} ) {
+    $tc->{disable_parallel_tool_use} = $self->parallel_tool_use ? JSON->false : JSON->true;
+  }
+  $extra->{tool_choice} = $tc;
+}
+
 sub chat_response {
   my ( $self, $response ) = @_;
   my $data = $self->parse_response($response);
@@ -114,6 +138,7 @@ sub stream_format { 'sse' }
 
 sub chat_stream_request {
   my ( $self, $messages, %extra ) = @_;
+  $self->_normalize_tool_params(\%extra);
   my @msgs;
   my $system = "";
   for my $message (@{$messages}) {
@@ -352,7 +377,7 @@ Langertha::Engine::AnthropicBase - Base class for Anthropic-compatible engines
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

@@ -99,7 +99,8 @@ q"I refuse to compile 'rules.json' when useSafeJail isn't activated! Yes I know,
     foreach ( keys %{ $json->{headers} } ) {
         my $header = $json->{headers}->{$_};
         $header =~ s/^\$//;
-        if ( isHiddenAttr( $class->localConfig, $header ) ) {
+        if ( isHiddenAttr( $class->localConfig->{hiddenAttributes}, $header ) )
+        {
             delete $json->{headers}->{$_};
             $class->auditLog(
                 $req,

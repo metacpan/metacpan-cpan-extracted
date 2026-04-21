@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ ත්වරිත යොමු කාඩ්                                  [SI] සිංහල
+======================================================================
+
+JSON සහ JSONL ගොනු සඳහා LINQ-ශෛලී විමසුම් අතුරු මුහුණත
+
+[ 1. 1. විමසුම් නිර්මාණය ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. පෙරීම ]
+
+  Where
+
+[ 3. 3. ප්‍රක්ෂේපණය ]
+
+  Select, SelectMany
+
+[ 4. 4. අනුපිළිවෙල ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. පිටු ගැනීම ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. කාණ්ඩ ගැනීම ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. සමස්තතාව ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. කට්ටල මෙහෙයුම් ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. පරිවර්තනය ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. එකතු කිරීම ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. බූලියන් අගයන් ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. යොමු සබැඳි ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

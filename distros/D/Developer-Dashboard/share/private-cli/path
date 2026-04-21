@@ -37,7 +37,7 @@ loading the full runtime first.
 =head1 PURPOSE
 
 This staged helper exposes the C<dashboard path ...> subcommand family:
-resolve, locate, cdr, add, del, project-root, and list. It is the public CLI
+resolve, locate, cdr, complete-cdr, add, del, project-root, and list. It is the public CLI
 front end for saved path aliases, layered runtime path discovery, and the
 payload generation used by shell navigation helpers.
 
@@ -60,7 +60,10 @@ path command runtime and prints either JSON or line-oriented output. For
 C<dashboard path cdr>, the first argument is treated as a saved alias when one
 exists; otherwise it becomes the first search regex under the current
 directory. Any remaining narrowing arguments are case-insensitive regexes and
-all of them must match a candidate directory path.
+all of them must match a candidate directory path. C<dashboard path
+complete-cdr> takes a shell completion index plus raw shell words and prints
+newline-delimited alias or directory-basename candidates for the generated
+C<cdr>, C<dd_cdr>, and C<which_dir> shell helpers.
 
 =head1 WHAT USES IT
 
@@ -73,6 +76,7 @@ lookup, current-directory fallback, and multiple-match behavior.
   dashboard path resolve dashboards
   dashboard path add work ~/projects/work
   dashboard path cdr work alpha red
+  dashboard path complete-cdr 2 cdr work alp
   dashboard path list
   dashboard path project-root
 

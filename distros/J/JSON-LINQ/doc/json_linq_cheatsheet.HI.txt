@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ चीट शीट                                          [HI] हिन्दी
+======================================================================
+
+JSON और JSONL फ़ाइलों के लिए LINQ-शैली क्वेरी इंटरफ़ेस
+
+[ 1. 1. क्वेरी बनाना ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. फ़िल्टरिंग ]
+
+  Where
+
+[ 3. 3. प्रोजेक्शन ]
+
+  Select, SelectMany
+
+[ 4. 4. क्रमबद्धता ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. पेजिनेशन ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. समूहीकरण ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. समग्रण ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. सेट संचालन ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. रूपांतरण ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. जॉइन ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. बूलियन मान ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. संदर्भ लिंक ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

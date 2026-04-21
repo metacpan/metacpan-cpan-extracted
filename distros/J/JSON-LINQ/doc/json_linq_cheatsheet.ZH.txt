@@ -1,0 +1,92 @@
+======================================================================
+ JSON::LINQ 速查表                                        [ZH] 中文（简体）
+======================================================================
+
+[ 1. 创建查询 ]
+
+  use JSON::LINQ;
+  # 从JSON文件读取（顶层为数组）
+  my $q = JSON::LINQ->FromJSON('data.json');
+  # 从JSONL文件读取（每行一个JSON对象，流式）
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+  # 从JSON字符串
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
+  # 从内存数组
+  my $q = JSON::LINQ->From(\@array);
+  # 空序列
+  my $q = JSON::LINQ->Empty();
+  # 整数序列: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
+  # 注意：终端方法会消耗迭代器，需重新调用创建方法
+
+[ 2. 过滤 ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} })
+
+[ 3. 投影 ]
+
+  # Select：转换每个元素
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
+  # SelectMany：展开嵌套数组（选择器必须返回数组引用）
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+[ 4. 排序 ]
+
+  ->OrderBy(sub { $_[0]{name} })           # 升序（智能）
+  ->OrderByDescending(sub { $_[0]{score} }) # 降序（智能）
+  ->OrderByNum(sub { $_[0]{price} })        # 数值升序
+  ->OrderByStr(sub { $_[0]{code} })         # 字符串升序
+  ->ThenBy(sub { $_[0]{name} })             # 次级升序
+  ->Reverse()                               # 逆序
+
+[ 5. 分页 ]
+
+  ->Skip(10)           # 跳过前10条
+  ->Take(5)            # 取前5条
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+[ 6. 分组 ]
+
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+  my $lookup = $q->ToLookup(sub { $_[0]{dept} });
+
+[ 7. 聚合（终端方法） ]
+
+  ->ToArray()                          # 收集所有元素
+  ->Count()                            # 元素数量
+  ->Sum(sub { $_[0]{amount} })         # 求和
+  ->Average(sub { $_[0]{score} })      # 平均值（空则die）
+  ->Min(sub { $_[0]{price} })           # 最小值
+  ->Max(sub { $_[0]{price} })           # 最大值
+  ->First()                            # 第一个元素（空则die）
+  ->FirstOrDefault()                   # 第一个元素或undef
+  ->Any()                              # 非空则真
+  ->All(sub { $_[0] > 0 })             # 全满足则真
+  ->ForEach(sub { print $_[0] })        # 遍历执行
+
+[ 8. 输出方法 ]
+
+  ->ToJSON('output.json')    # 写出JSON数组文件
+  ->ToJSONL('output.jsonl')  # 写出JSONL文件
+  ->ToDictionary(sub { $_[0]{id} })    # hashref: 键 => 元素
+  ->ToLookup(sub { $_[0]{dept} })      # hashref: 键 => [元素]
+
+[ 9. 布尔值 ]
+
+  JSON::LINQ::true    # 字符串为 "true"，数值为 1
+  JSON::LINQ::false   # 字符串为 "false"，数值为 0
+
+[ 10. 相关链接 ]
+
+  JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
+  JSONL规范:   https://jsonlines.org/
+  LINQ参考:    https://docs.microsoft.com/dotnet/api/system.linq
+
+======================================================================

@@ -416,31 +416,43 @@ test_openai_cloud_engine(
 );
 is(Langertha::Engine::Mistral->new(api_key => 'k')->default_model, 'mistral-small-latest', 'Mistral default_model');
 
-# --- MiniMax ---
+# --- MiniMax (OpenAI-compatible endpoint) ---
 
 use Langertha::Engine::MiniMax;
 
-# MiniMax uses Anthropic-compatible API (extends Anthropic, not OpenAIBase)
-ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::AnthropicBase'), 'MiniMax isa AnthropicBase');
+ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::OpenAIBase'), 'MiniMax isa OpenAIBase');
 ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::Remote'), 'MiniMax isa Remote');
-ok(!Langertha::Engine::MiniMax->isa('Langertha::Engine::OpenAIBase'), 'MiniMax is NOT OpenAIBase');
+ok(!Langertha::Engine::MiniMax->isa('Langertha::Engine::AnthropicBase'), 'MiniMax is NOT AnthropicBase');
 ok(Langertha::Engine::MiniMax->does('Langertha::Role::Chat'), 'MiniMax does Chat');
 ok(Langertha::Engine::MiniMax->does('Langertha::Role::Streaming'), 'MiniMax does Streaming');
 ok(Langertha::Engine::MiniMax->does('Langertha::Role::Tools'), 'MiniMax does Tools');
 ok(Langertha::Engine::MiniMax->does('Langertha::Role::StaticModels'), 'MiniMax does StaticModels');
 {
   my $m = Langertha::Engine::MiniMax->new(api_key => 'test-key');
-  is($m->url, 'https://api.minimax.io/anthropic', 'MiniMax url default correct');
-  is($m->default_model, 'MiniMax-M2.5', 'MiniMax default_model');
+  is($m->url, 'https://api.minimax.io/v1', 'MiniMax url default correct');
+  is($m->default_model, 'MiniMax-M2.7', 'MiniMax default_model');
 
   local $ENV{LANGERTHA_MINIMAX_API_KEY} = 'env-key-12345';
   my $m2 = Langertha::Engine::MiniMax->new;
   is($m2->api_key, 'env-key-12345', 'MiniMax reads api_key from LANGERTHA_MINIMAX_API_KEY');
+}
 
+# --- MiniMaxAnthropic (legacy Anthropic-compatible endpoint) ---
+
+use Langertha::Engine::MiniMaxAnthropic;
+
+ok(Langertha::Engine::MiniMaxAnthropic->isa('Langertha::Engine::AnthropicBase'), 'MiniMaxAnthropic isa AnthropicBase');
+ok(!Langertha::Engine::MiniMaxAnthropic->isa('Langertha::Engine::OpenAIBase'), 'MiniMaxAnthropic is NOT OpenAIBase');
+ok(Langertha::Engine::MiniMaxAnthropic->does('Langertha::Role::Tools'), 'MiniMaxAnthropic does Tools');
+ok(Langertha::Engine::MiniMaxAnthropic->does('Langertha::Role::StaticModels'), 'MiniMaxAnthropic does StaticModels');
+{
+  my $m = Langertha::Engine::MiniMaxAnthropic->new(api_key => 'test-key');
+  is($m->url, 'https://api.minimax.io/anthropic/v1', 'MiniMaxAnthropic url default correct');
+  is($m->default_model, 'MiniMax-M2.7', 'MiniMaxAnthropic default_model');
   my $req = $m->chat('test prompt');
-  is($req->method, 'POST', 'MiniMax chat request is POST');
-  like($req->uri, qr{/v1/messages$}, 'MiniMax chat endpoint is /v1/messages');
-  is($req->header('x-api-key'), 'test-key', 'MiniMax uses x-api-key header');
+  is($req->method, 'POST', 'MiniMaxAnthropic chat request is POST');
+  like($req->uri, qr{/v1/messages$}, 'MiniMaxAnthropic chat endpoint is /v1/messages');
+  is($req->header('x-api-key'), 'test-key', 'MiniMaxAnthropic uses x-api-key header');
 }
 
 # --- NousResearch ---

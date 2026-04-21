@@ -1,0 +1,65 @@
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+
+# Tracked: shared config & extensibility
+!/.claude/
+.claude/*
+!.claude/settings.json
+!.claude/settings.local.json
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/hooks/
+!.claude/hooks/**
+
+# Local overrides (machine-specific)
+.claude/*.local.*
+.claude/local/
+
+# Credentials & session state (never track)
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# Raider Files
+.raider.*
+
+# Build artifacts
+App-Raider-*
+*.tar.gz
+*.bak
+*.old
+*.swp
+.build/
+_build/
+blib/
+pm_to_blib
+Build
+Makefile
+Makefile.old
+MANIFEST.bak
+MYMETA.*
+
+# Carton / Carmel
+carton.lock
+local/
+.carton/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.orig
+*.rej
+
+# Raider runtime state
+.raider_history
+
+# Per-project raider config — opt-in per repo; not shipped in the dist
+.raider.md
+.raider.yml
+
+# Auto-generated skill docs (regenerate via /skill or --export-skill)
+RAIDER-SKILL.md

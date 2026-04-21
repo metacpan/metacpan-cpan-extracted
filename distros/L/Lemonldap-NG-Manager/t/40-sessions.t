@@ -30,7 +30,8 @@ sub newSession {
             _whatToTrace  => $uid,
             uid           => $uid,
             _utime        => time,
-            _session_kind => 'SSO'
+            _session_kind => 'SSO',
+            _password     => 'dwho',
         }
     );
     return $tmp->{id};
@@ -44,7 +45,8 @@ my $res = &client->jsonResponse("/sessions/global/$ids[0]");
 ok( ( $res->{uid} and $res->{uid} eq 'dwho' ), 'Uid found' )
   or print STDERR Dumper($res);
 ok( ( $res->{ipAddr} and $res->{ipAddr} eq '127.10.0.1' ), 'IP found' );
-count(2);
+isnt( $res->{_password}, 'dwho', 'Password attribute is hidden' );
+count(3);
 
 # "All" query
 $res = &client->jsonResponse("/sessions/global/");

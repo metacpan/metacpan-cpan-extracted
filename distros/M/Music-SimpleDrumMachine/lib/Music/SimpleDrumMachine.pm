@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0506';
+our $VERSION = '0.0508';
 
 use v5.36;
 use feature 'try';
@@ -65,20 +65,53 @@ has drums => (
 sub _build_drums {
     my ($self) = @_;
     my $drums = {
-        kick      => { num => 36, chan => $self->chan < 0 ?  0 : $self->chan, pat => [] },
-        snare     => { num => 38, chan => $self->chan < 0 ?  1 : $self->chan, pat => [] },
-        closed    => { num => 42, chan => $self->chan < 0 ?  2 : $self->chan, pat => [] },
-        fillcrash => { num => 49, chan => $self->chan < 0 ?  3 : $self->chan, pat => [] },
-        open      => { num => 46, chan => $self->chan < 0 ?  4 : $self->chan, pat => [] },
-        rimshot   => { num => 37, chan => $self->chan < 0 ?  5 : $self->chan, pat => [] },
-        clap      => { num => 39, chan => $self->chan < 0 ?  6 : $self->chan, pat => [] },
-        shaker    => { num => 70, chan => $self->chan < 0 ?  7 : $self->chan, pat => [] },
-        cowbell   => { num => 56, chan => $self->chan < 0 ?  8 : $self->chan, pat => [] },
-        cymbal    => { num => 57, chan => $self->chan < 0 ? 10 : $self->chan, pat => [] }, # skip 9
-        hi_tom    => { num => 48, chan => $self->chan < 0 ? 11 : $self->chan, pat => [] },
-        mid_tom   => { num => 47, chan => $self->chan < 0 ? 12 : $self->chan, pat => [] },
-        low_tom   => { num => 45, chan => $self->chan < 0 ? 13 : $self->chan, pat => [] },
-        conga     => { num => 45, chan => $self->chan < 0 ? 14 : $self->chan, pat => [] },
+        kick         => { num => 36, chan => $self->chan < 0 ?  0 : $self->chan, pat => [] },
+        snare        => { num => 38, chan => $self->chan < 0 ?  1 : $self->chan, pat => [] },
+        closed       => { num => 42, chan => $self->chan < 0 ?  2 : $self->chan, pat => [] },
+        fillcrash    => { num => 49, chan => $self->chan < 0 ?  3 : $self->chan, pat => [] },
+        open         => { num => 46, chan => $self->chan < 0 ?  4 : $self->chan, pat => [] },
+        rimshot      => { num => 37, chan => $self->chan < 0 ?  5 : $self->chan, pat => [] },
+        clap         => { num => 39, chan => $self->chan < 0 ?  6 : $self->chan, pat => [] },
+        shaker       => { num => 70, chan => $self->chan < 0 ?  7 : $self->chan, pat => [] },
+        cowbell      => { num => 56, chan => $self->chan < 0 ?  8 : $self->chan, pat => [] },
+        crash        => { num => 57, chan => $self->chan < 0 ? 10 : $self->chan, pat => [] }, # skip 9
+        hi_tom       => { num => 48, chan => $self->chan < 0 ? 11 : $self->chan, pat => [] },
+        mid_tom      => { num => 47, chan => $self->chan < 0 ? 12 : $self->chan, pat => [] },
+        low_tom      => { num => 45, chan => $self->chan < 0 ? 13 : $self->chan, pat => [] },
+        conga        => { num => 45, chan => $self->chan < 0 ? 14 : $self->chan, pat => [] },
+        kick2        => { num => 35, chan => $self->chan < 0 ? 15 : $self->chan, pat => [] },
+        snare2       => { num => 40, chan => $self->chan < 0 ? 16 : $self->chan, pat => [] }, # bogus channels now...
+        pedal        => { num => 44, chan => $self->chan < 0 ? 19 : $self->chan, pat => [] },
+        low_floor    => { num => 41, chan => $self->chan < 0 ? 17 : $self->chan, pat => [] },
+        hi_floor     => { num => 43, chan => $self->chan < 0 ? 18 : $self->chan, pat => [] },
+        hihi_tom     => { num => 50, chan => $self->chan < 0 ? 20 : $self->chan, pat => [] },
+        ride         => { num => 51, chan => $self->chan < 0 ? 21 : $self->chan, pat => [] },
+        ride_bell    => { num => 53, chan => $self->chan < 0 ? 22 : $self->chan, pat => [] },
+        ride2        => { num => 59, chan => $self->chan < 0 ? 23 : $self->chan, pat => [] },
+        china        => { num => 52, chan => $self->chan < 0 ? 24 : $self->chan, pat => [] },
+        splash       => { num => 55, chan => $self->chan < 0 ? 25 : $self->chan, pat => [] },
+        tamborine    => { num => 54, chan => $self->chan < 0 ? 26 : $self->chan, pat => [] },
+        vibraslap    => { num => 58, chan => $self->chan < 0 ? 27 : $self->chan, pat => [] },
+        hi_bongo     => { num => 60, chan => $self->chan < 0 ? 28 : $self->chan, pat => [] },
+        low_bongo    => { num => 61, chan => $self->chan < 0 ? 29 : $self->chan, pat => [] },
+        mute_conga   => { num => 62, chan => $self->chan < 0 ? 30 : $self->chan, pat => [] },
+        low_conga    => { num => 64, chan => $self->chan < 0 ? 31 : $self->chan, pat => [] },
+        hi_timbale   => { num => 65, chan => $self->chan < 0 ? 32 : $self->chan, pat => [] },
+        low_timbale  => { num => 66, chan => $self->chan < 0 ? 33 : $self->chan, pat => [] },
+        hi_agogo     => { num => 67, chan => $self->chan < 0 ? 34 : $self->chan, pat => [] },
+        low_agogo    => { num => 67, chan => $self->chan < 0 ? 35 : $self->chan, pat => [] },
+        cabasa       => { num => 69, chan => $self->chan < 0 ? 36 : $self->chan, pat => [] },
+        whistle      => { num => 71, chan => $self->chan < 0 ? 37 : $self->chan, pat => [] },
+        long_whistle => { num => 72, chan => $self->chan < 0 ? 38 : $self->chan, pat => [] },
+        guiro        => { num => 73, chan => $self->chan < 0 ? 39 : $self->chan, pat => [] },
+        long_guiro   => { num => 74, chan => $self->chan < 0 ? 40 : $self->chan, pat => [] },
+        claves       => { num => 75, chan => $self->chan < 0 ? 41 : $self->chan, pat => [] },
+        wood_block   => { num => 76, chan => $self->chan < 0 ? 42 : $self->chan, pat => [] },
+        low_block    => { num => 77, chan => $self->chan < 0 ? 43 : $self->chan, pat => [] },
+        mute_cuica   => { num => 78, chan => $self->chan < 0 ? 44 : $self->chan, pat => [] },
+        open_cuica   => { num => 79, chan => $self->chan < 0 ? 45 : $self->chan, pat => [] },
+        mute_tri     => { num => 80, chan => $self->chan < 0 ? 46 : $self->chan, pat => [] },
+        open_tri     => { num => 81, chan => $self->chan < 0 ? 47 : $self->chan, pat => [] },
     };
     return $drums;
 }
@@ -280,8 +313,7 @@ sub BUILD {
             $self->_ticks($self->_ticks + 1);
 
             if ($self->_ticks % $self->_nth == 0) {
-                if (
-                    ($self->filling || (ref($self->next_part) && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
+                if (($self->filling || (ref($self->next_part) && $self->next_part->[ $self->_part_inc % $self->next_part->@* ] =~ /fill/))
                     && ($self->_beat_count + $self->beats - $self->_trigger) % ($self->beats * $self->divisions - 1) == 0
                 ) {
                     $self->_adjust_drums(1); # fill!
@@ -336,7 +368,6 @@ sub _adjust_cymbals($self) {
             $self->drums->{closed}{pat}[0] = $self->_hats; # restore hihat bit
         }
     }
-    $self->_filled(0);
 }
 
 sub _adjust_drums($self, $fill_flag) {
@@ -381,6 +412,7 @@ sub _adjust_drums($self, $fill_flag) {
         $self->_hats($self->drums->{closed}{pat}[0]); # save bit
         $self->drums->{fillcrash}{pat} = [ (0) x ($self->beats * $self->divisions) ];
         $self->_adjust_cymbals;
+        $self->_filled(0);
     }
 }
 
@@ -459,7 +491,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0506
+version 0.0508
 
 =head1 SYNOPSIS
 
@@ -578,24 +610,57 @@ Default: C<4>
   $drums = $dm->drums;
   $dm->drums($drums);
 
-The known drums.
+The known drums (with short, abbreviated names that I made up).
 
 Default:
 
-  kick      => 36 # Bass Drum 1
-  snare     => 38 # Acoustic Snare
-  closed    => 42 # Closed Hi Hat
-  fillcrash => 49 # Crash Cymbal 1
-  open      => 46 # Open Hi Hat
-  rimshot   => 37 # Side Stick
-  clap      => 39 # Hand Clap
-  shaker    => 70 # Maracas
-  cowbell   => 56 # Cowbell
-  cymbal    => 57 # Crash Cymbal 2
-  hi_tom    => 48 # Hi Mid Tom
-  mid_tom   => 47 # Low Mid Tom
-  low_tom   => 45 # Low Tom
-  conga     => 63 # Open Hi Conga
+  kick         => 36 # Bass Drum 1
+  snare        => 38 # Acoustic Snare
+  closed       => 42 # Closed Hi Hat
+  fillcrash    => 49 # Crash Cymbal 1
+  open         => 46 # Open Hi Hat
+  rimshot      => 37 # Side Stick
+  clap         => 39 # Hand Clap
+  shaker       => 70 # Maracas
+  cowbell      => 56 # Cowbell
+  crash        => 57 # Crash Cymbal 2
+  hi_tom       => 48 # Hi Mid Tom
+  mid_tom      => 47 # Low Mid Tom
+  low_tom      => 45 # Low Tom
+  conga        => 63 # Open Hi Conga
+  kick2        => 35 # Acoustic Bass Drum
+  snare2       => 40 # Electric Snare
+  pedal        => 44 # Pedal Hi Hat
+  low_floor    => 41 # Low Floor Tom
+  hi_floor     => 43 # High Floor Tom
+  hihi_tom     => 50 # High Tom
+  ride         => 51 # Ride Cymbal 1
+  ride_bell    => 53 # Ride Bell
+  ride2        => 59 # Ride Cymbal 2
+  china        => 52 # Chinese Cymbal
+  splash       => 55 # Splash Cymbal
+  tamborine    => 54 # Tambourine
+  vibraslap    => 58 # Vibraslap
+  hi_bongo     => 60 # Hi Bongo
+  low_bongo    => 61 # Low Bongo
+  mute_conga   => 62 # Mute Hi Conga
+  low_conga    => 64 # Low Conga
+  hi_timbale   => 65 # High Timbale
+  low_timbale  => 66 # Low Timbale
+  hi_agogo     => 67 # High Agogo
+  low_agogo    => 68 # Low Agogo
+  cabasa       => 69 # Cabasa
+  whistle      => 71 # Short Whistle
+  long_whistle => 72 # Long Whistle
+  guiro        => 73 # Short Guiro
+  long_guiro   => 74 # Long Guiro
+  claves       => 75 # Claves
+  wood_block   => 76 # Hi Wood Block
+  low_block    => 77 # Low Wood Block
+  mute_cuica   => 78 # Mute Cuica
+  open_cuica   => 79 # Open Cuica
+  mute_tri     => 80 # Mute Triangle
+  open_tri     => 81 # Open Triangle
 
 But literally B<any> name could be used, as long as the number is a
 known MIDI percussion instrument number.

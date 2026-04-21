@@ -1,4 +1,12 @@
 Revision history for Text-Names-Abbreviate
 
+0.02	Mon Apr 20 20:25:46 EDT 2026
+	Use Params::Get
+	Added fuzz testing in GitHub Actions
+	Fixed "abbreviate('0')" which gave a Usage error
+	Fixed edge cases
+	Expanded on the documentation
+	Wrote a fuller test suite
+
 0.01	Wed May 28 21:01:16 EDT 2025
         First draft

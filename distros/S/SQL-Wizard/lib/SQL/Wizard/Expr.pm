@@ -34,7 +34,7 @@ sub to_sql {
 
 sub as {
   my ($self, $alias) = @_;
-  croak "alias must be a word (\\w+), got '$alias'" unless $alias =~ /^\w+$/;
+  $self->{_renderer}->_assert_column($alias);
   SQL::Wizard::Expr::Alias->new(
     expr      => $self,
     alias     => $alias,

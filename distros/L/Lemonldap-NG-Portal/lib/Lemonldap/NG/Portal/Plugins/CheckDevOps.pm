@@ -193,7 +193,7 @@ sub parse {
         foreach ( keys %{ $json->{headers} } ) {
             my $header = $json->{headers}->{$_};
             $header =~ s/^\$//;
-            if ( isHiddenAttr( $self->conf, $header ) ) {
+            if ( isHiddenAttr( $self->conf->{hiddenAttributes}, $header ) ) {
                 my $user = $req->userData->{ $self->conf->{whatToTrace} };
                 $self->userLogger->warn(
 "CheckDevOps: $user tried to retrieve a hidden attribute -> $header"

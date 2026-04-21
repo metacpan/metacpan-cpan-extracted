@@ -3,10 +3,7 @@ use 5.010;
 # ABSTRACT: The method metarole
 
 package MooseX::Params::Meta::Method;
-{
-  $MooseX::Params::Meta::Method::VERSION = '0.010';
-}
-
+$MooseX::Params::Meta::Method::VERSION = '0.011';
 use Moose;
 use List::Util qw(max);
 
@@ -123,7 +120,10 @@ sub _convert_argv_to_hash
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =for :stopwords Peter Shangov TODO invocant isa metaroles metarole multimethods sourcecode
 backwards buildargs checkargs slurpy preprocess
@@ -134,7 +134,7 @@ MooseX::Params::Meta::Method - The method metarole
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 AUTHOR
 
@@ -142,10 +142,9 @@ Peter Shangov <pshangov@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Peter Shangov.
+This software is copyright (c) 2026 by Peter Shangov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

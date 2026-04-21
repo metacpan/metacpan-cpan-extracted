@@ -107,11 +107,14 @@ sub BUILD {
     foreach my $k ( keys %$defaultIni ) {
         $ini->{$k} //= $defaultIni->{$k};
     }
+    $ini->{logger} = 'Lemonldap::NG::Common::Logger::Null';
     if ( $ENV{DEBUG} ) {
         $ini->{logLevel} = 'debug';
+        $ini->{logger}   = 'Lemonldap::NG::Common::Logger::Std';
     }
     if ( $ENV{LLNGLOGLEVEL} ) {
         $ini->{logLevel} = $ENV{LLNGLOGLEVEL};
+        $ini->{logger}   = 'Lemonldap::NG::Common::Logger::Std';
     }
 
     $ini->{configStorage} = { confFile => $self->iniFile };

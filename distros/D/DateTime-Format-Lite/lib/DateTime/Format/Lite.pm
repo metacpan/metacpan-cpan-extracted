@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Lite - ~/lib/DateTime/Format/Lite.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/14
-## Modified 2026/04/19
+## Modified 2026/04/21
 ## All rights reserved.
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util ();
     use Wanted;
-    our $VERSION    = 'v0.1.1';
+    our $VERSION    = 'v0.1.2';
     our @EXPORT_OK  = qw( strptime strftime );
     our $IsPurePerl;
 };
@@ -376,13 +376,13 @@ sub on_error
         {
             $self->{on_error} = $val;
         }
-        elsif( defined( $val ) && ( $val eq 'croak' || $val eq 'undef' ) )
+        elsif( defined( $val ) && ( $val eq 'croak' || $val eq 'die' || $val eq 'undef' ) )
         {
             $self->{on_error} = $val;
         }
         else
         {
-            return( $self->error( "on_error must be 'croak', 'undef', or a code reference." ) );
+            return( $self->error( "on_error must be 'croak', 'die', 'undef', or a code reference." ) );
         }
     }
     return( $self->{on_error} );
@@ -1292,7 +1292,7 @@ sub _on_error
         $self->{on_error}->( $self, $msg );
         return;
     }
-    elsif( defined( $self->{on_error} ) && $self->{on_error} eq 'croak' )
+    elsif( defined( $self->{on_error} ) && ( $self->{on_error} eq 'croak' || $self->{on_error} eq 'die' ) )
     {
         die( $msg );
     }
@@ -1512,27 +1512,27 @@ DateTime::Format::Lite - Parse and format datetimes with strptime patterns, retu
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
-C<DateTime::Format::Lite> parses and formats datetime strings using strptime-style patterns, returning L<DateTime::Lite> objects.
+L<DateTime::Format::Lite> parses and formats datetime strings using strptime-style patterns, returning L<DateTime::Lite> objects.
 
-It is a replacement for L<DateTime::Format::Strptime> designed for the C<DateTime::Lite> ecosystem, with the following key differences:
+It is a replacement for L<DateTime::Format::Strptime> designed for the L<DateTime::Lite> ecosystem, with the following key differences:
 
 =over 4
 
 =item No heavy dependencies
 
-No C<Params::ValidationCompiler>, C<Specio>, or C<Try::Tiny>. Validation follows the same lightweight philosophy as C<DateTime::Lite> itself.
+No C<Params::ValidationCompiler>, C<Specio>, or C<Try::Tiny>. Validation follows the same lightweight philosophy as L<DateTime::Lite> itself.
 
-=item Returns C<DateTime::Lite> objects
+=item Returns L<DateTime::Lite> objects
 
 C<parse_datetime> returns L<DateTime::Lite> objects rather than L<DateTime> objects.
 
 =item Dynamic timezone abbreviation resolution
 
-Rather than a static hardcoded table of ~300 entries, timezone abbreviations are resolved live against the IANA data in the SQLite database bundled with C<DateTime::Lite::TimeZone>, via L<DateTime::Lite::TimeZone/resolve_abbreviation>. The resolution is automatically up to date with each tzdata release.
+Rather than a static hardcoded table of ~300 entries, timezone abbreviations are resolved live against the L<IANA data|https://ftp.iana.org/tz/releases/> in the SQLite database bundled with L<DateTime::Lite::TimeZone>, via L<DateTime::Lite::TimeZone/resolve_abbreviation>. The resolution is automatically up to date with each tzdata release.
 
 =item XS-accelerated hot paths
 
@@ -1540,7 +1540,7 @@ When a C compiler is available at install time, C<_match_and_extract> and C<form
 
 =item Error handling via C<error()>
 
-Errors set an error object accessible via C<< $fmt->error >> and return C<undef>, consistent with C<DateTime::Lite>. Fatal mode is available via C<< on_error => 'croak' >>.
+Errors set an error object accessible via C<< $fmt->error >> and return C<undef> in scalar context, or an empty list in list context, or a C<DateTime::Format::Lite::NullObject> object in object chaining context detected with L<Wanted>, consistent with L<DateTime::Lite>. Fatal mode is available when the instantiation option C<on_error> is set to C<croak> or C<die>.
 
 =back
 
@@ -1567,7 +1567,7 @@ A strptime-style format string. See L</TOKENS>.
 
 =item C<locale>
 
-A BCP47 locale string (such as C<fr-FR> or C<ja-JP>), a L<DateTime::Locale::FromCLDR> object, or a L<Locale::Unicode> object. Defaults to C<en>.
+A L<BCP47 locale|https://cldr.unicode.org/index/bcp47-extension> string (such as C<fr-FR> or C<ja-JP> or even more complex ones like C<ja-Kana-t-it> or C<es-Latn-001-valencia>), a L<DateTime::Locale::FromCLDR> object, or a L<Locale::Unicode> object. Defaults to C<en>.
 
 =item C<time_zone>
 
@@ -1575,7 +1575,7 @@ An IANA timezone name string (such as C<Asia/Tokyo>) or a L<DateTime::Lite::Time
 
 =item C<on_error>
 
-Error handling mode: C<'undef'> (default - returns C<undef> on error), C<'croak'> (dies with the error message), or a code reference invoked as C<< $coderef->( $fmt_object, $message ) >>.
+Error handling mode: C<undef> (by default, it returns C<undef> on error), C<croak> or C<die> (dies with the error message), or a code reference invoked as C<< $coderef->( $fmt_object, $message ) >>.
 
 =item C<strict>
 
@@ -1593,7 +1593,7 @@ A hash reference of abbreviation overrides. Keys are abbreviation strings; value
 
     my $string = $fmt->format_datetime( $dt );
 
-Formats a L<DateTime::Lite> object using the configured pattern. Delegates directly to C<DateTime::Lite->strftime> without cloning.
+Formats a L<DateTime::Lite> object using the configured pattern. Delegates directly to L<DateTime::Lite->strftime|DateTime::Lite/strftime> without cloning.
 
 Returns a string, or C<undef> on error.
 
@@ -1630,11 +1630,11 @@ Returns the last L<DateTime::Format::Lite::Exception> object set by a failed ope
 
 =head2 fatal
 
-Boolean. When true, any error calls C<die()> immediately instead of returning C<undef>. Equivalent to setting C<< on_error => die >> at the instance level but applies globally when set as a class method.
+Boolean. When true, any error calls C<die()> immediately instead of returning C<undef>. Equivalent to setting the instantiation option C<on_error> to C<die>, but applies globally when set as a class method.
 
 =head2 locale
 
-A BCP47 locale string (such as C<fr-FR> or C<ja-JP>), a L<DateTime::Locale::FromCLDR> object, or a L<Locale::Unicode> object. Defaults to C<en>.
+A L<BCP47 locale|https://cldr.unicode.org/index/bcp47-extension> string (such as C<fr-FR> or C<ja-JP> or even more complex ones like C<ja-Kana-t-it> or C<es-Latn-001-valencia>), a L<DateTime::Locale::FromCLDR> object, or a L<Locale::Unicode> object. Defaults to C<en>.
 
 Controls the locale used for parsing and formatting locale-sensitive tokens such as C<%a>, C<%A>, C<%b>, C<%B>, and C<%p>.
 
@@ -1648,7 +1648,7 @@ Error handling mode. One of:
 
 Returns C<undef> on error and stores the exception in C<< $fmt->error >>.
 
-=item C<die>
+=item C<croak> or C<die>
 
 Calls C<die()> with the exception object.
 
@@ -1667,7 +1667,7 @@ Propagates the last error from C<$self> (or from C<$other_object> if provided) u
 
 =head2 pattern
 
-The strptime pattern string, such as C<'%Y-%m-%dT%H:%M:%S'>. Required at construction time; may be updated after construction.
+The strptime pattern string, such as C<%Y-%m-%dT%H:%M:%S>. Required at construction time; may be updated after construction.
 
 =head2 strict
 
@@ -1743,13 +1743,13 @@ Both functions dies on error.
 
     my $dt = strptime( $pattern, $string );
 
-Convenience wrapper. Constructs a one-shot C<DateTime::Format::Lite> with C<$pattern> and calls C<parse_datetime( $string )>. Dies on error (constructor or parse failure).
+Convenience wrapper. Constructs a one-shot L<DateTime::Format::Lite> with C<$pattern> and calls C<parse_datetime( $string )>. Dies on error (constructor or parse failure).
 
 =head2 strftime
 
     my $str = strftime( $pattern, $dt );
 
-Convenience wrapper. Constructs a one-shot C<DateTime::Format::Lite> with C<$pattern> and calls C<format_datetime( $dt )>. Dies on error.
+Convenience wrapper. Constructs a one-shot L<DateTime::Format::Lite> with C<$pattern> and calls C<format_datetime( $dt )>. Dies on error.
 
 =head1 ERROR HANDLING
 
@@ -1760,7 +1760,7 @@ On error, this class methods set an L<exception object|DateTime::Format::Lite::E
 
 The exception object stringifies to a human-readable message including file and line number.
 
-C<error> detects the context is chaining, or object, and thus instead of returning C<undef>, it will return a dummy instance of C<DateTime::Format::Lite::Null> to avoid the typical perl error C<Can't call method '%s' on an undefined value>.
+C<error> detects the context is chaining, or object, and thus instead of returning C<undef>, it will return a dummy instance of C<DateTime::Format::Lite::NullObject> to avoid the typical perl error C<Can't call method '%s' on an undefined value>.
 
 So for example:
 
@@ -1773,7 +1773,7 @@ If there was an error in C<parse_datetime>, the chain will execute, but the last
 
 =head1 SERIALISATION
 
-C<DateTime::Format::Lite> supports serialisation via L<Storable>, L<Sereal>, L<CBOR::XS>, and JSON serialisers.
+L<DateTime::Format::Lite> supports serialisation via L<Storable>, L<Sereal>, L<CBOR::XS>, and JSON serialisers.
 
 The following methods are implemented:
 
@@ -1781,17 +1781,17 @@ The following methods are implemented:
 
 =item C<FREEZE> / C<THAW>
 
-Used by L<Sereal> (v4+) and L<CBOR::XS>. The object is reduced to its public configuration state (pattern, locale, time_zone, on_error, strict, debug, zone_map). Internal caches are not serialised and are rebuilt on demand after thawing.
+Used by L<Sereal> (v4+) and L<CBOR::XS>. The object is reduced to its public configuration state (C<pattern>, C<locale>, C<time_zone>, C<on_error>, C<strict>, C<debug>, C<zone_map>). Internal caches are not serialised and are rebuilt on demand after thawing.
 
 =item C<STORABLE_freeze> / C<STORABLE_thaw>
 
-Used by L<Storable>. The state is encoded as a compact pipe-delimited string. The zone_map is JSON-encoded when non-empty.
+Used by L<Storable>. The state is encoded as a compact pipe-delimited string. The C<zone_map> is JSON-encoded when non-empty.
 
 =item C<TO_JSON>
 
-Returns the public configuration state as a plain hashref, suitable for serialisation by L<JSON::XS>, L<Cpanel::JSON::XS>, or similar. The returned hashref contains: C<pattern>, C<locale> (BCP47 string), C<time_zone> (IANA name string or C<undef>), C<on_error>, C<strict>, C<debug>, and C<zone_map>.
+Returns the public configuration state as a plain hash reference, suitable for serialisation by L<JSON::XS>, L<Cpanel::JSON::XS>, or similar. The returned hash reference contains: C<pattern>, C<locale> (BCP47 string), C<time_zone> (IANA name string or C<undef>), C<on_error>, C<strict>, C<debug>, and C<zone_map>.
 
-Note that if C<on_error> was set to a code reference, it cannot be serialised. C<'undef'> is stored as a fallback and a warning is issued if the C<DateTime::Format::Lite> warning category is enabled.
+Note that if C<on_error> was set to a code reference, it cannot be serialised. C<undef> is stored as a fallback and a warning is issued if the L<DateTime::Format::Lite> warning category is enabled.
 
 =back
 

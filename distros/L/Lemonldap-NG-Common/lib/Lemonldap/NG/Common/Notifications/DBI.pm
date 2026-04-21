@@ -12,7 +12,7 @@ use DBI;
 use Encode;
 use Lemonldap::NG::Common::Lib::DBI qw(check_dbh);
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.2';
 
 extends 'Lemonldap::NG::Common::Notifications';
 

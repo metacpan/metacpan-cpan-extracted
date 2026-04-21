@@ -70,6 +70,7 @@ lib/Langertha/Engine/LMStudioAnthropic.pm
 lib/Langertha/Engine/LMStudioOpenAI.pm
 lib/Langertha/Engine/LlamaCpp.pm
 lib/Langertha/Engine/MiniMax.pm
+lib/Langertha/Engine/MiniMaxAnthropic.pm
 lib/Langertha/Engine/Mistral.pm
 lib/Langertha/Engine/NousResearch.pm
 lib/Langertha/Engine/Ollama.pm
@@ -114,6 +115,7 @@ lib/Langertha/Role/Langfuse.pm
 lib/Langertha/Role/Models.pm
 lib/Langertha/Role/OpenAICompatible.pm
 lib/Langertha/Role/OpenAPI.pm
+lib/Langertha/Role/ParallelToolUse.pm
 lib/Langertha/Role/PluginHost.pm
 lib/Langertha/Role/ResponseFormat.pm
 lib/Langertha/Role/ResponseSize.pm
@@ -173,6 +175,7 @@ t/70_response.t
 t/71_raider_engine_catalog.t
 t/72_langfuse.t
 t/75_think_tag.t
+t/76_tool_choice_normalization.t
 t/80_live_tool_calling.t
 t/81_live_aki.t
 t/82_live_embedding.t

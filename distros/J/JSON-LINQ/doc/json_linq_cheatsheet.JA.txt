@@ -1,0 +1,198 @@
+======================================================================
+ JSON::LINQ チートシート                                   [JA] 日本語
+======================================================================
+
+[ 1. クエリの作成 ]
+
+  use JSON::LINQ;
+
+  # JSONファイル（トップレベルが配列）から
+  my $q = JSON::LINQ->FromJSON('data.json');
+
+  # JSONLファイル（1行1JSONオブジェクト、ストリーミング）から
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+
+  # JSON文字列から
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
+
+  # ハッシュリファレンスの配列から（スカラーの配列も可）
+  my $q = JSON::LINQ->From(\@array);
+
+  # 空のシーケンス
+  my $q = JSON::LINQ->Empty();
+
+  # 整数列: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
+
+  # 値をN回繰り返す: "x", "x", "x"
+  my $q = JSON::LINQ->Repeat("x", 3);
+
+  # 注意: 終端メソッドを呼ぶとイテレータが使い切られます。
+  # 再クエリするには FromJSON/FromJSONL/From を再度呼んでください。
+
+[ 2. フィルタリング ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
+
+[ 3. 射影 ]
+
+  # Select: 各要素を変換する
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
+
+  # SelectMany: ネストされた配列を平坦化（セレクタはARRAYリファレンスを返すこと）
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+[ 4. ソート ]
+
+  # 第1ソートキー -- スマート比較（両方が数値なら数値比較）
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+
+  # 第1ソートキー -- 数値比較を強制
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
+
+  # 第1ソートキー -- 文字列比較を強制（cmp）
+  ->OrderByStr(sub { $_[0]{code} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+
+  # 第2ソートキー（OrderBy*の後に連結）
+  ->ThenBy(sub { $_[0]{name} })              # スマート昇順
+  ->ThenByDescending(sub { $_[0]{score} })   # スマート降順
+  ->ThenByNum(sub { $_[0]{age} })            # 数値昇順
+  ->ThenByNumDescending(sub { $_[0]{age} })  # 数値降順
+  ->ThenByStr(sub { $_[0]{name} })           # 文字列昇順
+  ->ThenByStrDescending(sub { $_[0]{name} }) # 文字列降順
+
+  # Reverse: 現在の順序を逆順にする
+  ->Reverse()
+
+[ 5. ページング ]
+
+  ->Skip(10)                                # 最初の10件をスキップ
+  ->Take(5)                                 # 次の5件を取得
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+[ 6. グループ化 ]
+
+  # GroupBy: { Key => '...', Elements => [...] } の配列を返す
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d件\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+
+  # ToLookup: hashref of arrayrefs を返す
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
+
+  # ToLookup（値セレクタ付き）
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. 集合演算 ]
+
+  ->Distinct()                          # 重複除去（値で比較）
+  ->Distinct(sub { $_[0]{id} })         # キーで重複除去
+  ->Union($other_q)                     # 和集合（重複なし）
+  ->Union($other_q, sub { $_[0]{id} })  # キーで和集合
+  ->Intersect($other_q)                 # 積集合（両方に存在）
+  ->Intersect($other_q, sub { ... })    # キーで積集合
+  ->Except($other_q)                    # 差集合（他方にない）
+  ->Except($other_q, sub { ... })       # キーで差集合
+  ->SequenceEqual($other_q)             # 2つのシーケンスが等しければ真
+
+[ 8. 結合 ]
+
+  # Join（内部結合）
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # 外部キーセレクタ
+      sub { $_[0]{id} },                   # 内部キーセレクタ
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # 結果セレクタ
+  )
+
+  # GroupJoin（左外部結合）
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # 外部キーセレクタ
+      sub { $_[0]{user_id} },              # 内部キーセレクタ
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+[ 9. 集計（終端メソッド） ]
+
+  ->ToArray()                            # 全要素をPerl配列に収集
+  ->ToList()                             # ToArray()のエイリアス
+  ->Count()                              # 要素数
+  ->Count(sub { $_[0] > 5 })            # 条件付き件数
+  ->Sum(sub { $_[0]{amount} })          # セレクタ値の合計
+  ->Average(sub { $_[0]{score} })       # 平均値（空なら die）
+  ->AverageOrDefault(sub { ... })       # 平均値（空なら undef）
+  ->Min(sub { $_[0]{price} })           # 最小値
+  ->Max(sub { $_[0]{price} })           # 最大値
+  ->First()                             # 最初の要素（空なら die）
+  ->First(sub { $_[0] > 5 })            # 最初の一致（なければ die）
+  ->FirstOrDefault()                    # 最初の要素または undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # 最初の一致または undef
+  ->Last()                              # 最後の要素（空なら die）
+  ->Last(sub { $_[0] > 5 })             # 最後の一致（なければ die）
+  ->LastOrDefault()                     # 最後の要素または undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # 最後の一致または undef
+  ->Single()                            # ちょうど1つ（それ以外は die）
+  ->SingleOrDefault()                   # 1つまたは undef
+  ->ElementAt($n)                       # インデックス $n の要素（0始まり）
+  ->ElementAtOrDefault($n)              # インデックス $n の要素または undef
+  ->Any()                               # 要素が存在すれば真
+  ->Any(sub { $_[0] > 5 })              # 条件に合う要素があれば真
+  ->All(sub { $_[0] > 0 })              # 全要素が条件を満たせば真
+  ->Contains($value)                    # 値が存在すれば真
+  ->ForEach(sub { print $_[0] })        # 各要素に副作用を実行
+  ->Aggregate($seed, sub { $_[0] + $_[1] }) # カスタムfold/reduce
+
+[ 10. その他のシーケンスメソッド ]
+
+  ->Concat($other_q)                    # 2つのシーケンスを連結
+  ->DefaultIfEmpty($default)            # 空なら $default を返す
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # 2つのシーケンスを要素ごとに結合
+
+[ 11. 変換メソッド ]
+
+  ->ToArray()                           # Perl配列を返す
+  ->ToList()                            # ToArray()のエイリアス
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: キー => 要素
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: キー => 値
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: キー => [要素]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: キー => [値]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # JSON配列ファイルとして書き出す
+  ->ToJSONL('output.jsonl')             # JSONLファイルとして書き出す
+
+[ 12. 真偽値 ]
+
+  JSON::LINQ::true    # "true" と表示、数値コンテキストで 1
+  JSON::LINQ::false   # "false" と表示、数値コンテキストで 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON で {"active":true} にエンコードされる
+
+[ 13. 公式資料リンク ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL仕様:
+    https://jsonlines.org/
+
+  LINQ (.NET) リファレンス（意味論的インスピレーション）:
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ（LTSVファイル用姉妹モジュール）:
+    https://metacpan.org/dist/LTSV-LINQ
+
+======================================================================

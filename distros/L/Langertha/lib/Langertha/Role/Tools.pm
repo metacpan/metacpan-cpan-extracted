@@ -1,11 +1,13 @@
 package Langertha::Role::Tools;
 # ABSTRACT: Role for MCP tool calling support
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose::Role;
 use Future::AsyncAwait;
 use Carp qw( croak );
 use JSON::MaybeXS;
 use Log::Any qw( $log );
+
+with 'Langertha::Role::ParallelToolUse';
 
 
 has mcp_servers => (
@@ -116,7 +118,7 @@ Langertha::Role::Tools - Role for MCP tool calling support
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

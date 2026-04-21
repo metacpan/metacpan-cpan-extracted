@@ -1,8 +1,11 @@
 Revision history for MIDI-Drummer
 
+0.7014 2026-04-21 00:48:27
+    - Rename 'cymbal' to 'crash'.
+
 0.7013 2026-04-16 19:04:03
-    - Replaced "’" with "'" in the shared grooves file. :eyeroll:
-    - Changed the groove() method to acceptr hash-ref, instead of key/values.
+    - Replace "’" with "'" in the shared grooves file. :eyeroll:
+    - Change the groove() method to acceptr hash-ref, instead of key/values.
 
 0.7012 2026-04-16 08:20:15
     - Improve documentation.

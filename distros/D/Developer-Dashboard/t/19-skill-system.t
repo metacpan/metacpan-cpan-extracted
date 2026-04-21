@@ -30,6 +30,9 @@ my $test_repos = tempdir( CLEANUP => 1 );
 my $fake_bin = tempdir( CLEANUP => 1 );
 my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
 my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
+my $brew_log = File::Spec->catfile( $fake_bin, 'brew.log' );
+my $sudo_log = File::Spec->catfile( $fake_bin, 'sudo.log' );
+my $dashboard_log = File::Spec->catfile( $fake_bin, 'dashboard.log' );
 my $dependency_log = File::Spec->catfile( $fake_bin, 'dependency-install.log' );
 _write_file(
     File::Spec->catfile( $fake_bin, 'cpanm' ),
@@ -37,6 +40,35 @@ _write_file(
 #!/bin/sh
 printf '%s\\n' "\$*" >> "$cpanm_log"
 printf 'CPANM:%s\\n' "\$*" >> "$dependency_log"
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'brew' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$brew_log"
+printf 'BREW:%s\\n' "\$*" >> "$dependency_log"
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'sudo' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$sudo_log"
+exec "\$@"
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'dashboard' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$dashboard_log"
+printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
 exit 0
 SH
     0755,
@@ -78,7 +110,10 @@ use strict;
 use warnings;
 print "hook-alpha\n";
 PL
+    ddfile_body => "dep-alpha\n",
     aptfile_body => "git\ncurl\n",
+    brewfile_body => "jq\n",
+    cpanfile_local_body => "requires 'YAML::XS';\n",
     bookmark_body => <<'BOOKMARK',
 TITLE: Skill Bookmark
 :--------------------------------------------------------------------------------:
@@ -97,9 +132,12 @@ ok( -d File::Spec->catdir( $install->{path}, 'config', 'docker' ), 'install prep
 ok( -d File::Spec->catdir( $install->{path}, 'state' ), 'install prepares isolated state root' );
 ok( -d File::Spec->catdir( $install->{path}, 'logs' ), 'install prepares isolated logs root' );
 ok( -d File::Spec->catdir( $install->{path}, 'local' ), 'install prepares isolated local dependency root' );
+ok( -d File::Spec->catdir( $ENV{HOME}, 'perl5' ), 'install prepares the shared perl dependency root under HOME' );
 ok( -f File::Spec->catfile( $install->{path}, 'config', 'config.json' ), 'install ensures isolated skill config exists' );
 ok( -f File::Spec->catfile( $install->{path}, 'cpanfile' ), 'test skill includes cpanfile for dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'aptfile' ), 'test skill includes aptfile for dependency handling' );
+ok( -f File::Spec->catfile( $install->{path}, 'brewfile' ), 'test skill includes brewfile for dependency handling' );
+ok( -f File::Spec->catfile( $install->{path}, 'cpanfile.local' ), 'test skill includes cpanfile.local for local dependency handling' );
 ok( -f $apt_log, 'install runs apt-get for isolated skill apt dependencies when an aptfile is present' );
 ok( -f $cpanm_log, 'install runs cpanm for isolated skill dependencies when a cpanfile is present' );
 is_deeply(
@@ -110,8 +148,20 @@ is_deeply(
 open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $dependency_log: $!";
 my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
 close $dependency_log_fh;
-is( $dependency_steps[0] =~ /^APT:/ ? 1 : 0, 1, 'skill install runs aptfile processing before cpanfile processing' );
-is( $dependency_steps[1] =~ /^CPANM:/ ? 1 : 0, 1, 'skill install runs cpanfile processing after aptfile processing' );
+is_deeply(
+    [ map { (/^(DDFILE|APT|BREW|CPANM):/)[0] } @dependency_steps ],
+    [ 'DDFILE', 'APT', 'CPANM', 'CPANM' ],
+    'skill install processes ddfile, aptfile, cpanfile, and cpanfile.local in policy order on Debian-like hosts while leaving brewfile inactive',
+);
+open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
+my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
+close $cpanm_log_fh;
+like( $cpanm_steps[0], qr/^-L \Q$ENV{HOME}\/perl5\E --cpanfile \Q$install->{path}\/cpanfile\E --installdeps \Q$install->{path}\E$/, 'cpanfile installs shared Perl dependencies into HOME perl5' );
+is( $cpanm_steps[1], "-L $install->{path}/perl5 --cpanfile $install->{path}/cpanfile.local --installdeps $install->{path}", 'cpanfile.local installs local Perl dependencies into the skill perl5 root' );
+open my $dashboard_log_fh, '<', $dashboard_log or die "Unable to read $dashboard_log: $!";
+my @dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dashboard_log_fh>;
+close $dashboard_log_fh;
+is( $dashboard_steps[0], 'skills install dep-alpha', 'ddfile installs dependent skills through dashboard skills install' );
 
 my $listed = $manager->list();
 is( scalar(@$listed), 1, 'list returns the installed skill only once' );
@@ -123,7 +173,10 @@ is_deeply(
 ok( $listed->[0]{enabled}, 'list reports installed skills as enabled by default' );
 is( $listed->[0]{pages_count}, 1, 'list reports the number of non-nav skill pages' );
 is( $listed->[0]{docker_services_count}, 1, 'list reports the number of skill docker services' );
+is( $listed->[0]{has_ddfile}, 1, 'list reports ddfile presence for one installed skill' );
 is( $listed->[0]{has_aptfile}, 1, 'list reports aptfile presence for one installed skill' );
+is( $listed->[0]{has_brewfile}, 1, 'list reports brewfile presence for one installed skill' );
+is( $listed->[0]{has_cpanfile_local}, 1, 'list reports cpanfile.local presence for one installed skill' );
 ok(
     index( $listed->[0]{path}, File::Spec->catdir( $paths->skills_root, 'alpha-skill' ) ) == 0,
     'installed skill lives under the active DD-OOP-LAYER skills root',
@@ -693,6 +746,31 @@ my ( $skill_which_stdout, $skill_which_stderr, $skill_which_exit ) = capture {
 is( $skill_which_exit >> 8, 0, 'dashboard which <skill>.<command> exits cleanly' );
 like( $skill_which_stdout, qr/^COMMAND \Q@{[ File::Spec->catfile( $install->{path}, 'cli', 'run-test' ) ]}\E$/m, 'dashboard which <skill>.<command> reports the resolved skill command path' );
 like( $skill_which_stdout, qr/^HOOK \Q@{[ File::Spec->catfile( $install->{path}, 'cli', 'run-test.d', '00-pre.pl' ) ]}\E$/m, 'dashboard which <skill>.<command> reports the participating skill hook file' );
+my $skill_editor_log = File::Spec->catfile( $ENV{HOME}, 'skill-which-editor.log' );
+my $skill_editor = File::Spec->catfile( $ENV{HOME}, 'skill-which-editor' );
+_write_file(
+    $skill_editor,
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$@" > '$skill_editor_log'
+SH
+    0755,
+);
+my ( $skill_which_edit_stdout, $skill_which_edit_stderr, $skill_which_edit_exit ) = capture {
+    local $ENV{EDITOR} = $skill_editor;
+    system( $^X, '-I', 'lib', $repo_bin, 'which', '--edit', 'alpha-skill.run-test' );
+};
+is( $skill_which_edit_exit >> 8, 0, 'dashboard which --edit <skill>.<command> exits cleanly' );
+is( $skill_which_edit_stdout, '', 'dashboard which --edit <skill>.<command> does not print inspection output before opening the file' );
+is( $skill_which_edit_stderr, '', 'dashboard which --edit <skill>.<command> keeps stderr clean' );
+open my $skill_editor_log_fh, '<', $skill_editor_log or die "Unable to read $skill_editor_log: $!";
+my $skill_editor_args = do { local $/; <$skill_editor_log_fh> };
+close $skill_editor_log_fh;
+is(
+    $skill_editor_args,
+    File::Spec->catfile( $install->{path}, 'cli', 'run-test' ) . "\n",
+    'dashboard which --edit <skill>.<command> opens the resolved skill command path through dashboard open-file',
+);
 
 make_path( File::Spec->catdir( $install->{path}, 'skills', 'foo', 'cli' ) );
 _write_file(
@@ -715,6 +793,21 @@ my ( $nested_which_stdout, $nested_which_stderr, $nested_which_exit ) = capture 
 };
 is( $nested_which_exit >> 8, 0, 'dashboard which <skill>.<nested-skill>.<command> exits cleanly' );
 like( $nested_which_stdout, qr/^COMMAND \Q@{[ File::Spec->catfile( $install->{path}, 'skills', 'foo', 'cli', 'foo' ) ]}\E$/m, 'dashboard which resolves nested skill commands to the deepest nested cli file' );
+my ( $nested_which_edit_stdout, $nested_which_edit_stderr, $nested_which_edit_exit ) = capture {
+    local $ENV{EDITOR} = $skill_editor;
+    system( $^X, '-I', 'lib', $repo_bin, 'which', '--edit', 'alpha-skill.foo.foo' );
+};
+is( $nested_which_edit_exit >> 8, 0, 'dashboard which --edit <skill>.<nested-skill>.<command> exits cleanly' );
+is( $nested_which_edit_stdout, '', 'dashboard which --edit nested skill command does not print inspection output before opening the file' );
+is( $nested_which_edit_stderr, '', 'dashboard which --edit nested skill command keeps stderr clean' );
+open my $nested_editor_log_fh, '<', $skill_editor_log or die "Unable to read $skill_editor_log after nested which --edit: $!";
+my $nested_editor_args = do { local $/; <$nested_editor_log_fh> };
+close $nested_editor_log_fh;
+is(
+    $nested_editor_args,
+    File::Spec->catfile( $install->{path}, 'skills', 'foo', 'cli', 'foo' ) . "\n",
+    'dashboard which --edit nested skill command opens the deepest resolved nested skill path through dashboard open-file',
+);
 
 my ( $uninstall_stdout, $uninstall_stderr, $uninstall_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'uninstall', 'alpha-skill' );
@@ -753,9 +846,18 @@ sub _create_skill_repo {
     }
     _write_file( File::Spec->catfile( 'config', 'config.json' ), $args{config_body} || qq|{"skill_name":"$name"}\n|, 0644 );
     _write_file( File::Spec->catfile( 'config', 'docker', 'postgres', 'compose.yml' ), "services: {}\n", 0644 );
-    _write_file( 'cpanfile', "requires 'JSON::XS';\n", 0644 );
+    _write_file( 'cpanfile', $args{cpanfile_body} || "requires 'JSON::XS';\n", 0644 );
+    if ( defined $args{ddfile_body} ) {
+        _write_file( 'ddfile', $args{ddfile_body}, 0644 );
+    }
     if ( defined $args{aptfile_body} ) {
         _write_file( 'aptfile', $args{aptfile_body}, 0644 );
+    }
+    if ( defined $args{brewfile_body} ) {
+        _write_file( 'brewfile', $args{brewfile_body}, 0644 );
+    }
+    if ( defined $args{cpanfile_local_body} ) {
+        _write_file( 'cpanfile.local', $args{cpanfile_local_body}, 0644 );
     }
     if ( defined $args{bookmark_body} ) {
         _write_file( File::Spec->catfile( 'dashboards', 'welcome' ), $args{bookmark_body}, 0644 );

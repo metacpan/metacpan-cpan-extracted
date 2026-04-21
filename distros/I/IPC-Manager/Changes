@@ -1,3 +1,7 @@
+0.000028  2026-04-20 13:48:46-07:00 America/Los_Angeles
+
+    - Support arbitrarily long peer names. DBI-backed drivers (PostgreSQL, MySQL, MariaDB, SQLite) widen the ipcm_peers.id and ipcm_messages to/from columns from VARCHAR(36) to VARCHAR(512). Filesystem-based drivers (UnixSocket, AtomicPipe, MessageFiles) transparently hash peer ids that are too long, contain path-unsafe characters, or collide with the reserved "h-" prefix to a 42-character on-disk form ("h-" + 40 hex chars of sha256), storing a .name sidecar file so peers(), peer_exists(), all_stats(), and message routing keep using the real peer names. UnixSocket sizes its threshold dynamically to respect the sun_path limit and croaks up front if the route leaves no room
+
 0.000027  2026-04-19 09:58:22-07:00 America/Los_Angeles
 
 0.000026  2026-04-19 08:36:18-07:00 America/Los_Angeles

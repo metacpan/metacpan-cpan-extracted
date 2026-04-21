@@ -1,0 +1,189 @@
+NAME
+    JSON::LINQ - LINQ-style query interface for JSON and JSONL files
+
+VERSION
+    Version 1.00
+
+SYNOPSIS
+        use JSON::LINQ;
+
+        # Read JSON file (array of objects) and query
+        my @results = JSON::LINQ->FromJSON("users.json")
+            ->Where(sub { $_[0]{age} >= 18 })
+            ->Select(sub { $_[0]{name} })
+            ->Distinct()
+            ->ToArray();
+
+        # Read JSONL (JSON Lines) file - streaming, one object per line
+        my @errors = JSON::LINQ->FromJSONL("events.jsonl")
+            ->Where(sub { $_[0]{level} eq 'ERROR' })
+            ->ToArray();
+
+        # DSL syntax for simple filtering
+        my @active = JSON::LINQ->FromJSON("users.json")
+            ->Where(status => 'active')
+            ->ToArray();
+
+        # Grouping and aggregation
+        my @stats = JSON::LINQ->FromJSON("orders.json")
+            ->GroupBy(sub { $_[0]{category} })
+            ->Select(sub {
+                my $g = shift;
+                return {
+                    Category => $g->{Key},
+                    Count    => scalar(@{$g->{Elements}}),
+                    Total    => JSON::LINQ->From($g->{Elements})
+                                    ->Sum(sub { $_[0]{amount} }),
+                };
+            })
+            ->OrderByDescending(sub { $_[0]{Total} })
+            ->ToArray();
+
+        # Write results back as JSON or JSONL
+        JSON::LINQ->From(\@results)->ToJSON("output.json");
+        JSON::LINQ->From(\@results)->ToJSONL("output.jsonl");
+
+        # Boolean values
+        my $rec = { active => JSON::LINQ::true, count => 0 };
+
+DESCRIPTION
+    JSON::LINQ provides a LINQ-style query interface for JSON and JSONL
+    (JSON Lines) files.  It is the JSON counterpart of LTSV::LINQ, sharing
+    the same 60-method LINQ API and adding JSON-specific I/O methods.
+
+    Key features:
+
+    * Lazy evaluation - O(1) memory for JSONL streaming
+    * Method chaining - Fluent, readable query composition
+    * DSL syntax - Simple key-value filtering without code references
+    * 63 LINQ methods - including JSON-specific I/O (FromJSON, FromJSONL,
+      FromJSONString, ToJSON, ToJSONL) and all 60 methods from LTSV::LINQ
+    * Built-in JSON parser - No CPAN JSON module required
+    * Pure Perl - No XS dependencies
+    * Perl 5.005_03+ - Works on ancient and modern Perl
+
+INCLUDED DOCUMENTATION
+    The eg/ directory contains sample programs:
+
+        eg/01_json_query.pl    FromJSON/Where/Select/OrderByDescending/Distinct/ToLookup
+        eg/02_jsonl_query.pl   FromJSONL streaming, GroupBy, aggregation, ToJSONL
+        eg/03_grouping.pl      GroupBy, ToLookup, GroupJoin, SelectMany, Join
+        eg/04_sorting.pl       OrderBy/ThenBy multi-key sort, OrderByNum vs OrderByStr
+
+    The doc/ directory contains JSON::LINQ cheat sheets in 21 languages:
+
+        doc/json_linq_cheatsheet.EN.txt   English
+        doc/json_linq_cheatsheet.JA.txt   Japanese
+        doc/json_linq_cheatsheet.ZH.txt   Chinese (Simplified)
+        doc/json_linq_cheatsheet.TW.txt   Chinese (Traditional)
+        doc/json_linq_cheatsheet.KO.txt   Korean
+        doc/json_linq_cheatsheet.FR.txt   French
+        doc/json_linq_cheatsheet.ID.txt   Indonesian
+        doc/json_linq_cheatsheet.VI.txt   Vietnamese
+        doc/json_linq_cheatsheet.TH.txt   Thai
+        doc/json_linq_cheatsheet.HI.txt   Hindi
+        doc/json_linq_cheatsheet.BN.txt   Bengali
+        doc/json_linq_cheatsheet.TR.txt   Turkish
+        doc/json_linq_cheatsheet.MY.txt   Malay
+        doc/json_linq_cheatsheet.TL.txt   Filipino
+        doc/json_linq_cheatsheet.KM.txt   Khmer
+        doc/json_linq_cheatsheet.MN.txt   Mongolian
+        doc/json_linq_cheatsheet.NE.txt   Nepali
+        doc/json_linq_cheatsheet.SI.txt   Sinhala
+        doc/json_linq_cheatsheet.UR.txt   Urdu
+        doc/json_linq_cheatsheet.UZ.txt   Uzbek
+        doc/json_linq_cheatsheet.BM.txt   Burmese
+
+TARGET USE CASES
+    * Querying JSON API response files
+    * Streaming analysis of JSONL log files
+    * Data transformation pipelines (JSON in, JSON/JSONL out)
+    * In-memory array queries using LINQ-style API
+    * Systems where no CPAN JSON module is available
+
+DATA SOURCES
+    FromJSON($file)
+        Read a JSON file containing a top-level array.  The entire file is
+        parsed once into memory, then iterated lazily.
+
+    FromJSONL($file)
+        Read a JSONL file.  Each non-empty line is parsed as a separate
+        JSON value.  Lazy: one line at a time.  O(1) memory usage.
+
+    FromJSONString($json)
+        Parse a JSON string and iterate its elements.
+
+    From(\@array)
+        Query an in-memory Perl array.
+
+    Range($start, $count)
+        Generate an integer sequence.
+
+    Empty()
+        Return an empty sequence.
+
+    Repeat($element, $count)
+        Repeat one element N times.
+
+LINQ METHODS (63)
+    Data Sources:  From, FromJSON, FromJSONL, FromJSONString,
+                   Range, Empty, Repeat
+    Filtering:     Where (with DSL key=>value form)
+    Projection:    Select, SelectMany
+    Concatenation: Concat, Zip
+    Partitioning:  Take, Skip, TakeWhile, SkipWhile
+    Ordering:      OrderBy, OrderByDescending, OrderByStr, OrderByStrDescending,
+                   OrderByNum, OrderByNumDescending, Reverse,
+                   ThenBy, ThenByDescending, ThenByStr, ThenByStrDescending,
+                   ThenByNum, ThenByNumDescending
+    Grouping:      GroupBy
+    Set ops:       Distinct, Union, Intersect, Except
+    Joins:         Join, GroupJoin
+    Quantifiers:   All, Any, Contains, SequenceEqual
+    Element:       First, FirstOrDefault, Last, LastOrDefault,
+                   Single, SingleOrDefault, ElementAt, ElementAtOrDefault
+    Aggregation:   Count, Sum, Min, Max, Average, AverageOrDefault, Aggregate
+    Conversion:    ToArray, ToList, ToDictionary, ToLookup,
+                   ToJSON, ToJSONL, DefaultIfEmpty
+    Utility:       ForEach
+
+INSTALLATION
+    Standard CPAN installation:
+
+        cpan JSON::LINQ
+
+    Or manually:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    No C compiler required.  No non-core CPAN dependencies.
+
+COMPATIBILITY
+    Perl 5.005_03 and later.  Tested on Perl 5.005_03 through 5.42.
+    Works on Windows and UNIX/Linux.  Pure Perl, no XS.
+
+LIMITATIONS
+    * Query objects can only be consumed once (iterator is exhausted
+      after a terminal method).  Re-create the query to re-iterate.
+    * FromJSON loads the entire file into memory.  Use FromJSONL for
+      large files where streaming matters.
+    * The built-in JSON parser does not support surrogate pairs
+      (\uD800-\uDFFF) or circular reference detection in encoding.
+
+AUTHOR
+    INABA Hitoshi <ina@cpan.org>
+
+SEE ALSO
+    LTSV::LINQ  - The LTSV counterpart of this module
+    mb::JSON    - The JSON encoder/decoder this module's parser derives from
+    JSONL spec  - https://jsonlines.org/
+    LINQ ref    - https://docs.microsoft.com/dotnet/api/system.linq
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2026 INABA Hitoshi
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

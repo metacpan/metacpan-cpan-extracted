@@ -1,8 +1,5 @@
 package MooseX::Params::Magic::Wizard;
-{
-  $MooseX::Params::Magic::Wizard::VERSION = '0.010';
-}
-
+$MooseX::Params::Magic::Wizard::VERSION = '0.011';
 # ABSTRACT: Magic behavior for %_
 
 use 5.010;
@@ -13,6 +10,9 @@ use Scalar::Readonly qw(readonly_on);
 use MooseX::Params::Util;
 use MooseX::Params::Magic::Data;
 use parent 'MooseX::Params::Magic::Base';
+
+no warnings 'experimental::smartmatch';
+no warnings 'deprecated';
 
 sub data
 {
@@ -80,7 +80,10 @@ sub store
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =for :stopwords Peter Shangov TODO invocant isa metaroles metarole multimethods sourcecode
 backwards buildargs checkargs slurpy preprocess
@@ -91,7 +94,7 @@ MooseX::Params::Magic::Wizard - Magic behavior for %_
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 AUTHOR
 
@@ -99,10 +102,9 @@ Peter Shangov <pshangov@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Peter Shangov.
+This software is copyright (c) 2026 by Peter Shangov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ хуурамч хуудас                                    [MN] Монгол
+======================================================================
+
+JSON болон JSONL файлуудад зориулсан LINQ загварт асуулгын интерфэйс
+
+[ 1. 1. Асуулга үүсгэх ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. Шүүлт ]
+
+  Where
+
+[ 3. 3. Проекц ]
+
+  Select, SelectMany
+
+[ 4. 4. Эрэмбэлэлт ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. Хуудасжуулалт ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. Бүлэглэлт ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. Нэгтгэл ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. Олонлогийн үйлдлүүд ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. Хөрвүүлэлт ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. Нэгдэл ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. Boolean утгууд ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. Лавлагааны холбоосууд ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

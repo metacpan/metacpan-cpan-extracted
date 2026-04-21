@@ -78,6 +78,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Archive::Tar" => 0,
     "HTTP::Request::Common" => 0,
     "HTTP::Response" => 0,
     "IO::Socket::SSL" => 0,
@@ -85,7 +86,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "2.72",
+  "VERSION" => "2.76",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,6 +94,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::Tar" => 0,
   "Archive::Zip" => 0,
   "Capture::Tiny" => 0,
   "Cwd" => 0,

@@ -20,30 +20,31 @@ SYNOPSIS
         my $str2 = strftime( '%Y-%m-%d', $dt2 );
 
 VERSION
-        v0.1.0
+        v0.1.2
 
 DESCRIPTION
-    "DateTime::Format::Lite" parses and formats datetime strings using
+    DateTime::Format::Lite parses and formats datetime strings using
     strptime-style patterns, returning DateTime::Lite objects.
 
     It is a replacement for DateTime::Format::Strptime designed for the
-    "DateTime::Lite" ecosystem, with the following key differences:
+    DateTime::Lite ecosystem, with the following key differences:
 
     No heavy dependencies
         No "Params::ValidationCompiler", "Specio", or "Try::Tiny".
-        Validation follows the same lightweight philosophy as
-        "DateTime::Lite" itself.
+        Validation follows the same lightweight philosophy as DateTime::Lite
+        itself.
 
-    Returns "DateTime::Lite" objects
+    Returns DateTime::Lite objects
         "parse_datetime" returns DateTime::Lite objects rather than DateTime
         objects.
 
     Dynamic timezone abbreviation resolution
         Rather than a static hardcoded table of ~300 entries, timezone
-        abbreviations are resolved live against the IANA data in the SQLite
-        database bundled with "DateTime::Lite::TimeZone", via
-        "resolve_abbreviation" in DateTime::Lite::TimeZone. The resolution
-        is automatically up to date with each tzdata release.
+        abbreviations are resolved live against the IANA data
+        <https://ftp.iana.org/tz/releases/> in the SQLite database bundled
+        with DateTime::Lite::TimeZone, via "resolve_abbreviation" in
+        DateTime::Lite::TimeZone. The resolution is automatically up to date
+        with each tzdata release.
 
     XS-accelerated hot paths
         When a C compiler is available at install time, "_match_and_extract"
@@ -52,8 +53,11 @@ DESCRIPTION
 
     Error handling via "error()"
         Errors set an error object accessible via "$fmt->error" and return
-        "undef", consistent with "DateTime::Lite". Fatal mode is available
-        via "on_error => 'croak'".
+        "undef" in scalar context, or an empty list in list context, or a
+        "DateTime::Format::Lite::NullObject" object in object chaining
+        context detected with Wanted, consistent with DateTime::Lite. Fatal
+        mode is available when the instantiation option "on_error" is set to
+        "croak" or "die".
 
 CONSTRUCTORS
   new
@@ -72,7 +76,9 @@ CONSTRUCTORS
         A strptime-style format string. See "TOKENS".
 
     "locale"
-        A BCP47 locale string (such as "fr-FR" or "ja-JP"), a
+        A BCP47 locale <https://cldr.unicode.org/index/bcp47-extension>
+        string (such as "fr-FR" or "ja-JP" or even more complex ones like
+        "ja-Kana-t-it" or "es-Latn-001-valencia"), a
         DateTime::Locale::FromCLDR object, or a Locale::Unicode object.
         Defaults to "en".
 
@@ -84,9 +90,9 @@ CONSTRUCTORS
         %O.
 
     "on_error"
-        Error handling mode: 'undef' (default - returns "undef" on error),
-        'croak' (dies with the error message), or a code reference invoked
-        as "$coderef->( $fmt_object, $message )".
+        Error handling mode: "undef" (by default, it returns "undef" on
+        error), "croak" or "die" (dies with the error message), or a code
+        reference invoked as "$coderef->( $fmt_object, $message )".
 
     "strict"
         If true, wraps the compiled regex with word-boundary anchors,
@@ -103,7 +109,8 @@ METHODS
         my $string = $fmt->format_datetime( $dt );
 
     Formats a DateTime::Lite object using the configured pattern. Delegates
-    directly to "DateTime::Lite-"strftime> without cloning.
+    directly to DateTime::Lite-strftime|DateTime::Lite/strftime> without
+    cloning.
 
     Returns a string, or "undef" on error.
 
@@ -143,13 +150,14 @@ ACCESSORS
 
   fatal
     Boolean. When true, any error calls "die()" immediately instead of
-    returning "undef". Equivalent to setting "on_error => die" at the
-    instance level but applies globally when set as a class method.
+    returning "undef". Equivalent to setting the instantiation option
+    "on_error" to "die", but applies globally when set as a class method.
 
   locale
-    A BCP47 locale string (such as "fr-FR" or "ja-JP"), a
-    DateTime::Locale::FromCLDR object, or a Locale::Unicode object. Defaults
-    to "en".
+    A BCP47 locale <https://cldr.unicode.org/index/bcp47-extension> string
+    (such as "fr-FR" or "ja-JP" or even more complex ones like
+    "ja-Kana-t-it" or "es-Latn-001-valencia"), a DateTime::Locale::FromCLDR
+    object, or a Locale::Unicode object. Defaults to "en".
 
     Controls the locale used for parsing and formatting locale-sensitive
     tokens such as %a, %A, %b, %B, and %p.
@@ -160,7 +168,7 @@ ACCESSORS
     "undef" (default)
         Returns "undef" on error and stores the exception in "$fmt->error".
 
-    "die"
+    "croak" or "die"
         Calls "die()" with the exception object.
 
     "coderef"
@@ -177,7 +185,7 @@ ACCESSORS
     methods.
 
   pattern
-    The strptime pattern string, such as '%Y-%m-%dT%H:%M:%S'. Required at
+    The strptime pattern string, such as "%Y-%m-%dT%H:%M:%S". Required at
     construction time; may be updated after construction.
 
   strict
@@ -256,14 +264,14 @@ EXPORTABLE FUNCTIONS
   strptime
         my $dt = strptime( $pattern, $string );
 
-    Convenience wrapper. Constructs a one-shot "DateTime::Format::Lite" with
+    Convenience wrapper. Constructs a one-shot DateTime::Format::Lite with
     $pattern and calls "parse_datetime( $string )". Dies on error
     (constructor or parse failure).
 
   strftime
         my $str = strftime( $pattern, $dt );
 
-    Convenience wrapper. Constructs a one-shot "DateTime::Format::Lite" with
+    Convenience wrapper. Constructs a one-shot DateTime::Format::Lite with
     $pattern and calls "format_datetime( $dt )". Dies on error.
 
 ERROR HANDLING
@@ -279,8 +287,8 @@ ERROR HANDLING
 
     "error" detects the context is chaining, or object, and thus instead of
     returning "undef", it will return a dummy instance of
-    "DateTime::Format::Lite::Null" to avoid the typical perl error "Can't
-    call method '%s' on an undefined value".
+    "DateTime::Format::Lite::NullObject" to avoid the typical perl error
+    "Can't call method '%s' on an undefined value".
 
     So for example:
 
@@ -294,31 +302,31 @@ ERROR HANDLING
             die( $fmt->error );
 
 SERIALISATION
-    "DateTime::Format::Lite" supports serialisation via Storable, Sereal,
+    DateTime::Format::Lite supports serialisation via Storable, Sereal,
     CBOR::XS, and JSON serialisers.
 
     The following methods are implemented:
 
     "FREEZE" / "THAW"
         Used by Sereal (v4+) and CBOR::XS. The object is reduced to its
-        public configuration state (pattern, locale, time_zone, on_error,
-        strict, debug, zone_map). Internal caches are not serialised and are
-        rebuilt on demand after thawing.
+        public configuration state ("pattern", "locale", "time_zone",
+        "on_error", "strict", "debug", "zone_map"). Internal caches are not
+        serialised and are rebuilt on demand after thawing.
 
     "STORABLE_freeze" / "STORABLE_thaw"
         Used by Storable. The state is encoded as a compact pipe-delimited
-        string. The zone_map is JSON-encoded when non-empty.
+        string. The "zone_map" is JSON-encoded when non-empty.
 
     "TO_JSON"
-        Returns the public configuration state as a plain hashref, suitable
-        for serialisation by JSON::XS, Cpanel::JSON::XS, or similar. The
-        returned hashref contains: "pattern", "locale" (BCP47 string),
-        "time_zone" (IANA name string or "undef"), "on_error", "strict",
-        "debug", and "zone_map".
+        Returns the public configuration state as a plain hash reference,
+        suitable for serialisation by JSON::XS, Cpanel::JSON::XS, or
+        similar. The returned hash reference contains: "pattern", "locale"
+        (BCP47 string), "time_zone" (IANA name string or "undef"),
+        "on_error", "strict", "debug", and "zone_map".
 
         Note that if "on_error" was set to a code reference, it cannot be
-        serialised. 'undef' is stored as a fallback and a warning is issued
-        if the "DateTime::Format::Lite" warning category is enabled.
+        serialised. "undef" is stored as a fallback and a warning is issued
+        if the DateTime::Format::Lite warning category is enabled.
 
 SEE ALSO
     DateTime::Lite, DateTime::Lite::TimeZone, DateTime::Format::Strptime,

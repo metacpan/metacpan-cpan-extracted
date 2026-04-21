@@ -1,3 +1,8 @@
+0.11  2026-04-02
+    - Allow dotted identifiers in ->as() aliases (e.g. u.name)
+      Validated via _assert_column instead of \w+ regex
+    - Dotted aliases are quoted as a single identifier ("u.name")
+
 0.10  2026-04-02
     - BREAKING: { column => \@list } now generates OR conditions instead of IN
       Each element is processed individually: undef => IS NULL,

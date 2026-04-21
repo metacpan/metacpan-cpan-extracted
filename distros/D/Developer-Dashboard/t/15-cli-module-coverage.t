@@ -14,6 +14,7 @@ use lib 'lib';
 
 use Developer::Dashboard::CLI::OpenFile qw(build_path_registry run_open_file_command);
 use Developer::Dashboard::CLI::Query qw(run_query_command);
+use Developer::Dashboard::CLI::Which ();
 use Developer::Dashboard::JSON qw(json_decode);
 
 local $ENV{HOME} = tempdir(CLEANUP => 1);
@@ -235,6 +236,507 @@ eval {
 };
 like( $@, qr/^EXEC/, 'editor-mode open-file path reaches the exec hook' );
 like( $captured_exec, qr/^fake-editor\n--wait\n\+12\n\Q$notes_file\E$/m, 'editor-mode open-file command builds the expected editor invocation' );
+
+my $which_exec = '';
+eval {
+    local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '/tmp/dashboard-entrypoint';
+    local *Developer::Dashboard::CLI::Which::_locate_target = sub {
+        return {
+            command => $notes_file,
+            hooks   => [],
+        };
+    };
+    local *Developer::Dashboard::CLI::Which::_command_exec = sub {
+        $which_exec = join "\n", @_;
+        die "EXEC";
+    };
+    Developer::Dashboard::CLI::Which::run_which_command(
+        command => 'which',
+        args    => [ '--edit', 'alpha-tool' ],
+    );
+};
+like( $@, qr/^EXEC/, 'which --edit reaches the exec hook' );
+is(
+    $which_exec,
+    join( "\n", '/tmp/dashboard-entrypoint', 'open-file', $notes_file ),
+    'which --edit re-enters dashboard open-file with the resolved command path',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_usage(),
+    'Usage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>' . "\n",
+    'which usage text documents the --edit switch and dotted skill targets',
+);
+
+{
+    my $original_cwd = cwd();
+    chdir $project_root or die "Unable to chdir to $project_root: $!";
+    my $which_paths = Developer::Dashboard::CLI::Which::_build_paths();
+    isa_ok( $which_paths, 'Developer::Dashboard::PathRegistry', 'which helper builds a path registry' );
+    chdir $original_cwd or die "Unable to restore cwd to $original_cwd: $!";
+}
+
+is_deeply(
+    Developer::Dashboard::CLI::Which::_locate_target(
+        paths  => $registry,
+        target => '',
+    ),
+    { command => '', hooks => [] },
+    'which target lookup returns an empty result for an empty target',
+);
+
+ok(
+    !defined Developer::Dashboard::CLI::Which::_builtin_target(
+        paths  => $registry,
+        target => 'not-a-built-in-helper',
+    ),
+    'which builtin lookup returns undef for unsupported helper names',
+);
+
+ok(
+    !defined Developer::Dashboard::CLI::Which::_locate_skill_target(
+        paths  => $registry,
+        target => 'plain-command',
+    ),
+    'which skill lookup ignores plain command names without dotted skill syntax',
+);
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Which::_locate_skill_target = sub {
+        return {
+            command => '/tmp/skill-command',
+            hooks   => ['/tmp/skill-hook'],
+        };
+    };
+    local *Developer::Dashboard::CLI::Which::_builtin_target = sub {
+        die 'builtin should not run after a skill match';
+    };
+    local *Developer::Dashboard::CLI::Which::_custom_target = sub {
+        die 'custom should not run after a skill match';
+    };
+
+    is_deeply(
+        Developer::Dashboard::CLI::Which::_locate_target(
+            paths  => $registry,
+            target => 'alpha.run-test',
+        ),
+        {
+            command => '/tmp/skill-command',
+            hooks   => ['/tmp/skill-hook'],
+        },
+        'which target lookup prefers skill resolution before built-in and custom commands',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Which::_locate_skill_target = sub { return; };
+    local *Developer::Dashboard::CLI::Which::_builtin_target = sub {
+        return {
+            command => '/tmp/builtin-command',
+            hooks   => ['/tmp/builtin-hook'],
+        };
+    };
+    local *Developer::Dashboard::CLI::Which::_custom_target = sub {
+        die 'custom should not run after a built-in match';
+    };
+
+    is_deeply(
+        Developer::Dashboard::CLI::Which::_locate_target(
+            paths  => $registry,
+            target => 'jq',
+        ),
+        {
+            command => '/tmp/builtin-command',
+            hooks   => ['/tmp/builtin-hook'],
+        },
+        'which target lookup falls back to built-in helpers when no skill matches',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Which::_locate_skill_target = sub { return; };
+    local *Developer::Dashboard::CLI::Which::_builtin_target = sub { return; };
+    local *Developer::Dashboard::CLI::Which::_custom_target = sub {
+        return {
+            command => '/tmp/custom-command',
+            hooks   => ['/tmp/custom-hook'],
+        };
+    };
+
+    is_deeply(
+        Developer::Dashboard::CLI::Which::_locate_target(
+            paths  => $registry,
+            target => 'custom-tool',
+        ),
+        {
+            command => '/tmp/custom-command',
+            hooks   => ['/tmp/custom-hook'],
+        },
+        'which target lookup falls back to layered custom commands when no skill or helper matches',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Which::_locate_skill_target = sub { return; };
+    local *Developer::Dashboard::CLI::Which::_builtin_target = sub { return; };
+    local *Developer::Dashboard::CLI::Which::_custom_target = sub { return; };
+
+    is_deeply(
+        Developer::Dashboard::CLI::Which::_locate_target(
+            paths  => $registry,
+            target => 'missing-command',
+        ),
+        { command => '', hooks => [] },
+        'which target lookup returns an empty result when no skill, helper, or custom command matches',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::new = sub {
+        return bless {}, 'Developer::Dashboard::SkillManager';
+    };
+    local *Developer::Dashboard::SkillManager::get_skill_path = sub {
+        my ( $self, $name ) = @_;
+        return $name eq 'alpha-skill' ? '/tmp/alpha-skill' : undef;
+    };
+    local *Developer::Dashboard::SkillDispatcher::new = sub {
+        return bless {}, 'Developer::Dashboard::SkillDispatcher';
+    };
+    local *Developer::Dashboard::SkillDispatcher::command_spec = sub {
+        my ( $self, $skill_name, $skill_command ) = @_;
+        return if $skill_name ne 'alpha-skill' || $skill_command ne 'nested.run-test';
+        return { cmd_path => '/tmp/alpha-skill/cli/run-test' };
+    };
+    local *Developer::Dashboard::SkillDispatcher::command_hook_paths = sub {
+        my ( $self, $skill_name, $skill_command ) = @_;
+        return (
+            '/tmp/alpha-skill/hooks/00-home.pl',
+            '/tmp/alpha-skill/hooks/10-project.pl',
+        ) if $skill_name eq 'alpha-skill' && $skill_command eq 'nested.run-test';
+        return ();
+    };
+
+    is_deeply(
+        Developer::Dashboard::CLI::Which::_locate_skill_target(
+            paths  => $registry,
+            target => 'alpha-skill.nested.run-test',
+        ),
+        {
+            command => '/tmp/alpha-skill/cli/run-test',
+            hooks   => [
+                '/tmp/alpha-skill/hooks/00-home.pl',
+                '/tmp/alpha-skill/hooks/10-project.pl',
+            ],
+        },
+        'which skill lookup resolves nested dotted skill commands and their hook chain',
+    );
+
+    ok(
+        !defined Developer::Dashboard::CLI::Which::_locate_skill_target(
+            paths  => $registry,
+            target => 'missing-skill.run-test',
+        ),
+        'which skill lookup returns undef when the requested skill is not installed',
+    );
+}
+
+my $which_project = File::Spec->catdir( $ENV{HOME}, 'projects', 'which-project' );
+my $which_home_cli = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'cli' );
+my $which_project_cli = File::Spec->catdir( $which_project, '.developer-dashboard', 'cli' );
+make_path($which_project);
+my $which_original_cwd = cwd();
+chdir $which_project or die "Unable to chdir to $which_project: $!";
+my $which_paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
+make_path(
+    File::Spec->catdir( $which_home_cli, 'demo-tool.d' ),
+    File::Spec->catdir( $which_project_cli, 'demo-tool.d' ),
+    File::Spec->catdir( $which_home_cli, 'dir-tool' ),
+    File::Spec->catdir( $which_home_cli, 'go-tool' ),
+);
+
+my $home_hook = File::Spec->catfile( $which_home_cli, 'demo-tool.d', '00-home.sh' );
+open my $home_hook_fh, '>', $home_hook or die "Unable to write $home_hook: $!";
+print {$home_hook_fh} "#!/bin/sh\nexit 0\n";
+close $home_hook_fh;
+chmod 0755, $home_hook or die "Unable to chmod $home_hook: $!";
+
+my $skip_hook = File::Spec->catfile( $which_home_cli, 'demo-tool.d', 'run' );
+open my $skip_hook_fh, '>', $skip_hook or die "Unable to write $skip_hook: $!";
+print {$skip_hook_fh} "#!/bin/sh\nexit 0\n";
+close $skip_hook_fh;
+chmod 0755, $skip_hook or die "Unable to chmod $skip_hook: $!";
+
+my $plain_file = File::Spec->catfile( $which_home_cli, 'demo-tool.d', '99-not-executable.txt' );
+open my $plain_file_fh, '>', $plain_file or die "Unable to write $plain_file: $!";
+print {$plain_file_fh} "skip me\n";
+close $plain_file_fh;
+
+my $project_hook = File::Spec->catfile( $which_project_cli, 'demo-tool.d', '10-project.sh' );
+open my $project_hook_fh, '>', $project_hook or die "Unable to write $project_hook: $!";
+print {$project_hook_fh} "#!/bin/sh\nexit 0\n";
+close $project_hook_fh;
+chmod 0755, $project_hook or die "Unable to chmod $project_hook: $!";
+
+my $home_command = File::Spec->catfile( $which_home_cli, 'demo-tool' );
+open my $home_command_fh, '>', $home_command or die "Unable to write $home_command: $!";
+print {$home_command_fh} "#!/bin/sh\necho home\n";
+close $home_command_fh;
+chmod 0755, $home_command or die "Unable to chmod $home_command: $!";
+
+my $project_command = File::Spec->catfile( $which_project_cli, 'demo-tool' );
+open my $project_command_fh, '>', $project_command or die "Unable to write $project_command: $!";
+print {$project_command_fh} "#!/bin/sh\necho project\n";
+close $project_command_fh;
+chmod 0755, $project_command or die "Unable to chmod $project_command: $!";
+
+my $dir_runner = File::Spec->catfile( $which_home_cli, 'dir-tool', 'run.sh' );
+open my $dir_runner_fh, '>', $dir_runner or die "Unable to write $dir_runner: $!";
+print {$dir_runner_fh} "#!/bin/sh\nexit 0\n";
+close $dir_runner_fh;
+chmod 0755, $dir_runner or die "Unable to chmod $dir_runner: $!";
+
+my $go_runner = File::Spec->catfile( $which_home_cli, 'go-tool', 'run.go' );
+open my $go_runner_fh, '>', $go_runner or die "Unable to write $go_runner: $!";
+print {$go_runner_fh} "package main\nfunc main() {}\n";
+close $go_runner_fh;
+chmod 0755, $go_runner or die "Unable to chmod $go_runner: $!";
+
+my $empty_dir_runner = File::Spec->catdir( $which_home_cli, 'empty-tool' );
+make_path($empty_dir_runner);
+
+is_deeply(
+    [ Developer::Dashboard::CLI::Which::_command_hook_files( paths => $which_paths, command => 'demo-tool' ) ],
+    [ $home_hook, $project_hook ],
+    'which hook lookup walks DD-OOP-LAYERS in order and filters run plus non-runnable files',
+);
+
+ok(
+    !Developer::Dashboard::CLI::Which::_command_hook_files( paths => $which_paths, command => '' ),
+    'which hook lookup returns no hooks for an empty command name',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_custom_command_path(
+        paths   => $which_paths,
+        command => 'demo-tool',
+    ),
+    $project_command,
+    'which custom command lookup prefers the deepest DD-OOP-LAYER command file',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_custom_command_path(
+        paths   => $which_paths,
+        command => '',
+    ),
+    '',
+    'which custom command lookup returns an empty string for an empty command name',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_resolved_command_path($project_command),
+    $project_command,
+    'which file resolution returns executable file-backed commands directly',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_resolved_command_path( File::Spec->catfile( $which_project_cli, 'missing-tool' ) ),
+    '',
+    'which file resolution returns an empty string when nothing runnable exists',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_resolved_command_path( File::Spec->catdir( $which_home_cli, 'dir-tool' ) ),
+    $dir_runner,
+    'which file resolution resolves directory-backed commands through their run entrypoint',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_resolve_directory_runner( File::Spec->catdir( $which_home_cli, 'dir-tool' ) ),
+    $dir_runner,
+    'which directory-runner lookup finds shell run entrypoints',
+);
+
+is(
+    Developer::Dashboard::CLI::Which::_resolve_directory_runner( File::Spec->catdir( $which_home_cli, 'go-tool' ) ),
+    $go_runner,
+    'which directory-runner lookup recognizes executable Go entrypoints',
+);
+
+ok(
+    !defined Developer::Dashboard::CLI::Which::_resolve_directory_runner( File::Spec->catdir( $which_home_cli, 'missing-dir' ) ),
+    'which directory-runner lookup returns undef for missing command directories',
+);
+
+ok(
+    !defined Developer::Dashboard::CLI::Which::_resolve_directory_runner($empty_dir_runner),
+    'which directory-runner lookup returns undef for command directories without runnable entrypoints',
+);
+
+is_deeply(
+    Developer::Dashboard::CLI::Which::_custom_target(
+        paths  => $which_paths,
+        target => 'demo-tool',
+    ),
+    {
+        command => $project_command,
+        hooks   => [ $home_hook, $project_hook ],
+    },
+    'which custom target lookup returns the resolved command path together with ordered hooks',
+);
+
+ok(
+    !defined Developer::Dashboard::CLI::Which::_custom_target(
+        paths  => $which_paths,
+        target => 'missing-tool',
+    ),
+    'which custom target lookup returns undef when the command does not exist',
+);
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::ensure_helpers = sub { return []; };
+    my $builtin = Developer::Dashboard::CLI::Which::_builtin_target(
+        paths  => $which_paths,
+        target => 'jq',
+    );
+    like( $builtin->{command}, qr{/\.developer-dashboard/cli/dd/jq\z}, 'which builtin lookup resolves the staged helper path' );
+    is_deeply( $builtin->{hooks}, [], 'which builtin lookup reports no hooks when no jq hooks are present' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Which::_locate_target = sub {
+        return {
+            command => '/tmp/demo-command',
+            hooks   => [ '/tmp/demo-hook-1', '/tmp/demo-hook-2' ],
+        };
+    };
+    my ( $stdout, $stderr ) = capture {
+        Developer::Dashboard::CLI::Which::run_which_command(
+            command => 'which',
+            args    => ['demo-tool'],
+        );
+    };
+    is(
+        $stdout,
+        "COMMAND /tmp/demo-command\nHOOK /tmp/demo-hook-1\nHOOK /tmp/demo-hook-2\n",
+        'which non-edit mode prints the resolved command and hooks',
+    );
+    is( $stderr, '', 'which non-edit mode stays quiet on STDERR' );
+}
+
+{
+    my @exec;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Which::_locate_target = sub {
+        return {
+            command => '/tmp/demo-command',
+            hooks   => [],
+        };
+    };
+    local *Developer::Dashboard::CLI::Which::_command_exec = sub {
+        @exec = @_;
+        return 1;
+    };
+
+    is(
+        Developer::Dashboard::CLI::Which::run_which_command(
+            command => 'which',
+            args    => [ '--edit', 'demo-tool' ],
+        ),
+        0,
+        'which edit mode returns success after the dashboard open-file handoff returns in tests',
+    );
+    is_deeply(
+        \@exec,
+        [ ( $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || 'dashboard' ), 'open-file', '/tmp/demo-command' ],
+        'which edit mode hands the resolved command path to dashboard open-file before returning success',
+    );
+}
+
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Which::run_which_command(
+                command => 'paths',
+                args    => [],
+            );
+        }
+    ),
+    qr/^\QUsage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
+    'which rejects direct calls under the wrong command name with the usage text',
+);
+
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Which::run_which_command(
+                command => 'which',
+                args    => 'demo-tool',
+            );
+        }
+    ),
+    qr/^Command arguments must be an array reference/,
+    'which rejects non-array argument payloads explicitly',
+);
+
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Which::run_which_command(
+                command => 'which',
+                args    => [],
+            );
+        }
+    ),
+    qr/^\QUsage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
+    'which requires a target command token',
+);
+
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Which::run_which_command(
+                command => 'which',
+                args    => [ 'demo-tool', 'extra' ],
+            );
+        }
+    ),
+    qr/^\QUsage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
+    'which rejects unexpected extra positional arguments',
+);
+
+is_deeply(
+    [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
+    [ $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || 'dashboard' ],
+    'which edit handoff defaults to the current public dashboard entrypoint',
+);
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '/tmp/custom-dashboard';
+    is_deeply(
+        [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
+        ['/tmp/custom-dashboard'],
+        'which edit handoff honors an overridden public dashboard entrypoint',
+    );
+}
+
+{
+    my $pid = fork();
+    die "fork failed: $!" if !defined $pid;
+    if (!$pid) {
+        Developer::Dashboard::CLI::Which::_command_exec($home_command);
+    }
+    waitpid( $pid, 0 );
+    is( $? >> 8, 0, 'which exec helper delegates to process exec' );
+}
+chdir $which_original_cwd or die "Unable to restore cwd to $which_original_cwd: $!";
 
 my $duplicate_file = File::Spec->catfile( $project_root, 'alpha-second-notes.txt' );
 open my $duplicate_fh, '>', $duplicate_file or die "Unable to write $duplicate_file: $!";

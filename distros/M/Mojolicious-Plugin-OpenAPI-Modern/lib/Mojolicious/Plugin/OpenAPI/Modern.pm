@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.018-4-gf47457e
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.019-4-gb7cf299
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.020;
 use utf8;
@@ -107,7 +107,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -251,30 +251,46 @@ itself is used (although some information in the route may be used in future fea
 
 =head1 STASH VALUES
 
-This plugin stores all its data under the C<openapi> hashref, e.g.:
+This plugin stores all its data under the C<openapi> hashref for use by controllers and templates,
+e.g.:
 
   my $operation_id = $c->stash->{openapi}{operation_id};
 
-Keys starting with underscore are for I<internal use only> and should not be relied upon to behave
-consistently across release versions. Values that may be used by controllers and templates are:
+Note: keys starting with underscore are for I<internal use only> and should not be relied upon to
+behave consistently across release versions.
+
+See the documentation for L<OpenAPI::Modern/find_path_item> for the full description of these
+values:
 
 =over 4
 
 =item *
 
-C<path_template>: Set by the first call to L</validate_request> or L</validate_response>. A string representing the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/latest#paths-object>.
+C<path_template>
 
 =item *
 
-C<path_captures>: Set by the first call to L</validate_request> or L</validate_response>. A hashref mapping placeholders in the path to their actual values in the request URI.
+C<path_captures>
 
 =item *
 
-C<operation_id>: Set by the first call to L</validate_request> or L</validate_response>. Contains the corresponding L<operationId|https://swagger.io/docs/specification/paths-and-operations/#operationid> of the current endpoint.
+C<operation_id>
 
 =item *
 
-C<method>: Set by the first call to L</validate_request> or L</validate_response>. The HTTP method used by the request, lower-cased.
+C<uri>
+
+=item *
+
+C<method>
+
+=item *
+
+C<uri_captures>
+
+=item *
+
+C<operation_uri>
 
 =back
 

@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ សន្លឹកបញ្ជី                                       [KM] ភាសាខ្មែរ
+======================================================================
+
+ចំណុចប្រទាក់សំណួរ LINQ សម្រាប់ JSON និង JSONL
+
+[ 1. 1. ការបង្កើតសំណួរ ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. ការត្រង ]
+
+  Where
+
+[ 3. 3. ការព្រួញ ]
+
+  Select, SelectMany
+
+[ 4. 4. ការតម្រៀប ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. ការបែងចែកទំព័រ ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. ការដាក់ជាក្រុម ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. ការប្រមូលផ្តុំ ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. ប្រតិបត្តិការសំណុំ ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. ការបំលែង ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. ការភ្ជាប់ ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. តម្លៃប៊ូលីន ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. តំណយោង ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

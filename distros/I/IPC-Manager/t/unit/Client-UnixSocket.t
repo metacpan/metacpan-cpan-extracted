@@ -140,4 +140,42 @@ subtest 'get_messages returns empty when none' => sub {
     $con->disconnect;
 };
 
+subtest 'long peer names survive sun_path limit' => sub {
+    # Force a predictable short tmpdir so there is room to exercise long ids.
+    my $dir = tempdir('ipcm-uXXXXXX', TMPDIR => 1, CLEANUP => 1);
+
+    my $long_id = "ll-" . ("z" x 200);
+    my $con1 = $CLASS->new(serializer => $SERIALIZER, route => $dir, id => $long_id);
+    my $con2 = $CLASS->new(serializer => $SERIALIZER, route => $dir, id => 'short');
+
+    ok($con2->peer_exists($long_id), "peer_exists sees long-named peer");
+    is([$con2->peers], [$long_id], "peers() returns the real long name");
+
+    $con2->send_message($long_id => {hi => 'long'});
+    my @msgs = $con1->get_messages;
+    is(scalar(@msgs), 1, "long-named peer received one message");
+    is($msgs[0]->content, {hi => 'long'}, "content round-trips");
+    is($msgs[0]->to, $long_id, "'to' is the real long name");
+
+    $con1->disconnect;
+    $con2->disconnect;
+};
+
+subtest 'route too long for sun_path croaks clearly' => sub {
+    my $dir = tempdir('ipcm-uXXXXXX', TMPDIR => 1, CLEANUP => 1);
+    # Create a deep subdirectory to push the route past the sun_path ceiling.
+    my $deep = $dir;
+    my $seg  = 'x' x 20;
+    $deep .= "/$seg" for 1 .. 6; # ~120+ chars
+    require File::Path;
+    File::Path::make_path($deep);
+    like(
+        dies {
+            my $con = $CLASS->new(serializer => $SERIALIZER, route => $deep, id => 'anything');
+        },
+        qr/sun_path limit/,
+        "route too long croaks with sun_path message",
+    );
+};
+
 done_testing;

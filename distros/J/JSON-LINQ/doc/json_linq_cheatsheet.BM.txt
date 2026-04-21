@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ အမြန်ကိုးကားချက်                                  [BM] မြန်မာဘာသာ
+======================================================================
+
+JSON နှင့် JSONL ဖိုင်များအတွက် LINQ-ပုံစံ မေးမြန်းမှု ဝိနည်းချပ်
+
+[ 1. 1. မေးမြန်းမှု ဖန်တီးခြင်း ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. စစ်ထုတ်ခြင်း ]
+
+  Where
+
+[ 3. 3. ပုံစံပြောင်းခြင်း ]
+
+  Select, SelectMany
+
+[ 4. 4. စီစစ်ခြင်း ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. စာမျက်နှာ ခွဲခြင်း ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. အုပ်စုဖွဲ့ခြင်း ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. စုစည်းခြင်း ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. အစုအဝေး လုပ်ဆောင်ချက်များ ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. ပြောင်းလဲခြင်း ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. ချိတ်ဆက်ခြင်း ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. Boolean တန်ဖိုးများ ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. ကိုးကားချက် လင့်ခ်များ ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

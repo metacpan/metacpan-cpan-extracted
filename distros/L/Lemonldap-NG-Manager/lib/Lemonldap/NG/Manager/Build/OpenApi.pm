@@ -225,6 +225,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -367,6 +370,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -407,6 +413,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -434,6 +443,9 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -463,6 +475,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -606,6 +621,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -646,6 +664,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -673,6 +694,9 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -702,6 +726,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -842,6 +869,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -882,6 +912,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -909,6 +942,9 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -1212,6 +1248,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -1322,7 +1361,11 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
+
                     }
                 },
                 'patch' => {
@@ -1362,6 +1405,9 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -1389,7 +1435,11 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
+
                     }
                 }
             },
@@ -1462,7 +1512,11 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
+
                     }
                 }
             },
@@ -1604,7 +1658,11 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
+
                     }
                 },
                 'patch' => {
@@ -1654,7 +1712,11 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
+
                     }
                 },
                 'delete' => {
@@ -1691,7 +1753,11 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
+                        },
+                        '503' => {
+                            '$ref' => '#/components/responses/Unavailable'
                         }
+
                     }
                 }
             }
@@ -2380,6 +2446,17 @@ sub openapi {
                 'NotFound' => {
                     'description' => 'The specified resource was not found',
                     'content'     => {
+                        'application/json' => {
+                            'schema' => {
+                                '$ref' => '#/components/schemas/Error'
+                            }
+                        }
+                    }
+                },
+                'Unavailable' => {
+                    'description' =>
+'The new configuration could not be saved, this is usually a lock-related temporary condition',
+                    'content' => {
                         'application/json' => {
                             'schema' => {
                                 '$ref' => '#/components/schemas/Error'

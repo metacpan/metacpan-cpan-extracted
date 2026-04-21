@@ -1,6 +1,6 @@
 package Langertha::Role::ResponseSize;
 # ABSTRACT: Role for an engine where you can specify the response size (in tokens)
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose::Role;
 
 has response_size => (
@@ -33,7 +33,7 @@ Langertha::Role::ResponseSize - Role for an engine where you can specify the res
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head2 response_size
 

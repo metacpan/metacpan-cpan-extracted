@@ -1,6 +1,6 @@
 package Langertha::Cost;
 # ABSTRACT: Immutable value object for the monetary cost of a single LLM call
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 
 has input_usd  => ( is => 'ro', isa => 'Num', default => 0 );
@@ -38,7 +38,7 @@ Langertha::Cost - Immutable value object for the monetary cost of a single LLM c
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SUPPORT
 

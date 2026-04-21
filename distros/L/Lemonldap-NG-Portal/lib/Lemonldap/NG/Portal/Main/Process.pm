@@ -1,13 +1,13 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.22.2';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use MIME::Base64;
-use POSIX                                  qw(strftime);
-use Lemonldap::NG::Common::Util            qw(isHiddenAttr);
+use POSIX qw(strftime);
+use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(portalConsts);
 use URI;
 
@@ -688,7 +688,8 @@ sub store {
     foreach my $k ( sort keys %{ $req->{sessionInfo} } ) {
         next unless defined $req->{sessionInfo}->{$k};
         my $displayValue = $req->{sessionInfo}->{$k};
-        $displayValue = '****' if isHiddenAttr( $self->conf, $k );
+        $displayValue = '****'
+          if isHiddenAttr( $self->conf->{hiddenAttributes}, $k );
         $self->logger->debug("Store $displayValue in session key $k");
         $self->_dump($displayValue) if ref($displayValue);
         $infos->{$k} = $req->{sessionInfo}->{$k};

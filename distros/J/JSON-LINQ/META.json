@@ -1,0 +1,83 @@
+{
+    "name" : "JSON-LINQ",
+    "version" : "1.00",
+    "abstract" : "LINQ-style query interface for JSON and JSONL files",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/JSON-LINQ/issues"
+        },
+        "repository" : {
+            "url"  : "https://github.com/ina-cpan/JSON-LINQ",
+            "web"  : "https://github.com/ina-cpan/JSON-LINQ",
+            "type" : "git"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Carp" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "Carp" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Carp" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Carp" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        }
+    },
+    "provides" : {
+        "JSON::LINQ" : {
+            "file" : "lib/JSON/LINQ.pm",
+            "version" : "1.00"
+        },
+        "JSON::LINQ::Boolean" : {
+            "file" : "lib/JSON/LINQ.pm",
+            "version" : "1.00"
+        },
+        "JSON::LINQ::Ordered" : {
+            "file" : "lib/JSON/LINQ.pm",
+            "version" : "1.00"
+        }
+    }
+}

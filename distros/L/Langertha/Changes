@@ -1,5 +1,41 @@
 Revision history for Langertha
 
+0.402     2026-04-20 22:07:40Z
+
+    - [BREAKING] Langertha::Engine::MiniMax now talks to MiniMax's native
+      OpenAI-compatible endpoint (https://api.minimax.io/v1) instead of
+      the Anthropic-compatible shim. The previous behavior is preserved
+      as a new class Langertha::Engine::MiniMaxAnthropic (URL corrected
+      to /anthropic/v1 as MiniMax actually documents). Background:
+      MiniMax's /anthropic endpoint does not reliably re-parse
+      stringified tool-call arguments, causing intermittent tool-calling
+      failures where the Anthropic SDK sees a wrapper object whose key
+      rotates between 'result', 'arguments', and the tool name.
+      MiniMax's native OpenAI endpoint avoids the shim entirely. Users
+      who need the Anthropic wire format should switch from
+      Langertha::Engine::MiniMax to Langertha::Engine::MiniMaxAnthropic.
+      The default model is now MiniMax-M2.7 (was MiniMax-M2.5) on both
+      classes.
+    - Automatic tool_choice normalization. chat_request in OpenAICompatible
+      and AnthropicBase now runs any tool_choice passed via %extra through
+      Langertha::ToolChoice and emits the target-engine's native format.
+      Callers can pass Anthropic-style (type+name), OpenAI-style
+      (type:function + function.name), or string shorthands ('auto',
+      'none', 'required', 'any') to any engine — no more engine-specific
+      branching needed.
+    - New Langertha::Role::ParallelToolUse with a canonical
+      `parallel_tool_use` boolean attribute. Constructor also accepts the
+      provider-native alias names: `parallel_tool_calls` (OpenAI) and
+      `disable_parallel_tool_use` (Anthropic, inverted). The attribute is
+      translated per-engine to the native request parameter — OpenAI sends
+      `parallel_tool_calls`, Anthropic folds `disable_parallel_tool_use`
+      into the tool_choice block. Automatically composed by
+      Langertha::Role::Tools so every tool-capable engine gets it.
+    - Langertha::ToolChoice accepts 'any' as a string shorthand and
+      {type:'required'} as a hash form (both normalize to canonical type
+      'any').
+    - Added MiniMax-M2.7 to the static model list and made it the default.
+
 0.401     2026-04-12 21:24:49Z
 
     - Guard list_models in OpenAICompatible against engines that do not

@@ -3,12 +3,11 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '2.72';
+our $VERSION = '2.76';
 
 use Digest::MD5 qw(md5_hex);
 use Cwd qw(abs_path cwd);
 use File::Basename qw(dirname);
-use File::Find ();
 use File::Path qw(make_path);
 use File::Spec;
 use Developer::Dashboard::JSON qw(json_encode);
@@ -842,30 +841,39 @@ sub locate_dirs_under {
     my $root_id = $self->_path_identity($root);
     my %seen;
     my @found;
+    my @pending = ($root);
 
-    File::Find::find(
-        {
-            no_chdir => 1,
-            wanted   => sub {
-                my $path = $File::Find::name;
-                return if !-d $path;
-                my $path_id = $self->_path_identity($path);
-                return if $path_id eq '' || $seen{$path_id}++;
+    while (@pending) {
+        my $path = shift @pending;
+        next if !defined $path || !-d $path;
 
-                my $relative = $path_id eq $root_id ? '.' : File::Spec->abs2rel( $path_id, $root_id );
-                $relative = '.' if !defined $relative || $relative eq '';
-                $relative =~ s{\\}{/}g;
-                $relative = $relative eq '.' ? '.' : './' . $relative;
+        my $path_id = $self->_path_identity($path);
+        next if $path_id eq '' || $seen{$path_id}++;
 
-                for my $term (@wanted) {
-                    return if $relative !~ $term;
-                }
+        my $relative = $path_id eq $root_id ? '.' : File::Spec->abs2rel( $path_id, $root_id );
+        $relative = '.' if !defined $relative || $relative eq '';
+        $relative =~ s{\\}{/}g;
+        $relative = $relative eq '.' ? '.' : './' . $relative;
 
-                push @found, $path_id;
-            },
-        },
-        $root,
-    );
+        my $matches = 1;
+        for my $term (@wanted) {
+            if ( $relative !~ $term ) {
+                $matches = 0;
+                last;
+            }
+        }
+
+        push @found, $path_id if $matches;
+
+        opendir( my $dh, $path ) or next;
+        while ( my $entry = readdir($dh) ) {
+            next if $entry eq '.' || $entry eq '..';
+            my $child = File::Spec->catdir( $path, $entry );
+            next if !-d $child;
+            push @pending, $child;
+        }
+        closedir($dh);
+    }
 
     return sort @found;
 }

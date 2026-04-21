@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '2.72';
+our $VERSION = '2.76';
 
 1;
 
@@ -19,7 +19,7 @@ Developer::Dashboard - a local home for development work
 
 =head1 VERSION
 
-2.72
+2.76
 
 =head1 INTRODUCTION
 
@@ -1152,6 +1152,7 @@ Inspect resolved paths:
   dashboard which jq
   dashboard which layered-tool
   dashboard which nest.level1.level2.here
+  dashboard which --edit jq
 
 Custom path aliases are stored in the effective dashboard config root so shell
 helpers such as C<cdr foobar> and C<which_dir foobar> keep working across
@@ -1179,7 +1180,8 @@ treats every argument as an AND-matched regex search beneath the current
 directory. One match means C<cd> there; multiple matches mean print the list
 and leave the current directory unchanged. C<which_dir> follows the same
 selection logic but only prints the chosen target or match list instead of
-changing directory.
+changing directory. Unreadable subdirectories are skipped explicitly during
+that search so one protected tree does not abort the whole lookup.
 
 Both C<cdr> and C<which_dir> therefore use regex narrowing arguments, not
 quoted substring tokens.
@@ -1219,7 +1221,9 @@ C<HOOK /full/path> line for each participating hook in runtime execution
 order. That works for built-in helpers such as C<jq>, layered custom commands
 such as C<layered-tool>, single-level skill commands such as
 C<example-skill.somecmd>, and multi-level nested skill commands such as
-C<nest.level1.level2.here>.
+C<nest.level1.level2.here>. If you add C<--edit>, C<dashboard which> skips the
+inspection output and re-enters C<dashboard open-file> with the resolved
+command file path so the normal editor-selection behavior is reused.
 
 Render shell bootstrap for bash, zsh, POSIX sh, or PowerShell:
 
@@ -1593,7 +1597,11 @@ C<_dashboard_complete_zsh>, and PowerShell registers
 C<Register-ArgumentCompleter> for both command names. Completion candidates
 come from the live runtime instead of a hardcoded shell list, so built-in
 commands, layered custom CLI commands, and installed dotted skill commands
-all show up in suggestions.
+all show up in suggestions. The generated bootstrap also wires C<cdr>,
+C<dd_cdr>, and C<which_dir> completion. The first argument suggests saved
+aliases plus matching directory names beneath the current directory, and later
+arguments suggest matching directory basenames beneath the resolved alias root
+or current directory without crashing when one subtree is not readable.
 
 For the POSIX shell bootstrap, the generated helper now decodes its JSON
 payloads through the same Perl interpreter that generated the shell fragment
@@ -2182,8 +2190,8 @@ layer that already has its own F<.developer-dashboard/>, the install target
 becomes
 F<E<lt>that-layerE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>.
 Developer Dashboard does not merge the skill's C<cli/>, C<dashboards/>,
-C<config/>, C<cpanfile>, C<aptfile>, or Docker files into the normal runtime
-folders.
+C<config/>, C<ddfile>, C<aptfile>, C<brewfile>, C<cpanfile>,
+C<cpanfile.local>, or Docker files into the normal runtime folders.
 
 Skill lookup also follows C<DD-OOP-LAYERS>, but a same-named deeper skill is
 now layered instead of flattening the whole repo. The home
@@ -2193,7 +2201,7 @@ F<.developer-dashboard/skills/E<lt>repo-nameE<gt>/> checkout becomes an
 inherited layer for that same skill. Runtime lookup walks those
 participating skill layers for C<cli/E<lt>commandE<gt>>,
 C<cli/E<lt>commandE<gt>.d>, C<dashboards/*>, C<dashboards/nav/*>,
-C<config/config.json>, and C<local/lib/perl5>. If a child layer omits a file,
+C<config/config.json>, and C<perl5/lib/perl5>. If a child layer omits a file,
 folder, or config key, lookup falls back to the base layer. If multiple
 layers provide the same file or config key, the deepest layer still wins that
 override.
@@ -2231,7 +2239,8 @@ CLI command, page, docker service, collector, and indicator counts
 
 =item *
 
-JSON booleans for C<has_config>, C<has_aptfile>, and C<has_cpanfile>
+JSON booleans for C<has_config>, C<has_ddfile>, C<has_aptfile>,
+C<has_brewfile>, C<has_cpanfile>, and C<has_cpanfile_local>
 
 =back
 
@@ -2386,13 +2395,27 @@ Persistent skill state and data
 
 Skill output logs
 
+=item B<ddfile>
+
+Optional dependent skill list installed before package managers run
+
 =item B<aptfile>
 
-Optional system packages installed before Perl dependencies
+Optional Debian-family system packages installed through
+C<sudo apt-get install -y>
+
+=item B<brewfile>
+
+Optional macOS Homebrew packages installed through C<brew install>
 
 =item B<cpanfile>
 
-Skill Perl dependencies (optional)
+Optional shared Perl dependencies installed into C<~/perl5>
+
+=item B<cpanfile.local>
+
+Optional skill-local Perl dependencies installed into
+C<E<lt>skill-rootE<gt>/perl5>
 
 =back
 
@@ -2508,12 +2531,29 @@ Skill dependency and docker layering:
 
 =item *
 
-if an C<aptfile> exists, its package list is installed first
+if a C<ddfile> exists, each listed dependency is installed first through
+C<dashboard skills install E<lt>dependencyE<gt>> while already-installed or
+in-flight skills are skipped to avoid loops
 
 =item *
 
-if a C<cpanfile> exists, its Perl dependencies are then installed into the
-skill-local C<local/> tree
+if an C<aptfile> exists on a Debian-family host, its package list is printed
+before the sudo prompt and then installed through
+C<sudo apt-get install -y>
+
+=item *
+
+if a C<brewfile> exists on macOS, its package list is printed and then
+installed through C<brew install>
+
+=item *
+
+if a C<cpanfile> exists, its Perl dependencies are installed into C<~/perl5>
+
+=item *
+
+if a C<cpanfile.local> exists, its Perl dependencies are installed into the
+skill-local C<perl5/> tree
 
 =item *
 
@@ -2531,8 +2571,9 @@ re-enabled
 
 To build a new skill, start with a Git repository that contains C<cli/>,
 C<config/config.json>, and optional C<dashboards/>, C<dashboards/nav/>,
-C<state/>, C<logs/>, C<local/>, C<aptfile>, and C<cpanfile> files under the
-skill root. Skill commands are file-based commands run through the dotted
+C<state/>, C<logs/>, C<ddfile>, C<aptfile>, C<brewfile>, C<cpanfile>, and
+C<cpanfile.local> files under the skill root. Skill commands are file-based
+commands run through the dotted
 C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> form. Skill hook files live
 under C<cli/E<lt>commandE<gt>.d/>, skill app pages render from
 C</app/E<lt>repo-nameE<gt>> and C</app/E<lt>repo-nameE<gt>/E<lt>idE<gt>>, and
@@ -2550,8 +2591,9 @@ layout, environment variables such as C<DEVELOPER_DASHBOARD_SKILL_ROOT>,
 bookmark syntax like C<TITLE:>, C<BOOKMARK:>, C<HTML:>, and C<CODE1:>,
 bookmark browser helpers such as C<fetch_value()>, C<stream_value()>, and
 C<stream_data()>, underscored config merge keys such as C<_example-skill>,
-C<aptfile>-then-C<cpanfile> dependency install order, skill docker layering,
-and when to use dashboard-wide custom CLI hook folders such as
+C<ddfile -> aptfile -> brewfile -> cpanfile -> cpanfile.local> dependency
+install order, the shared C<~/perl5> versus skill-local C<perl5/> split, skill
+docker layering, and when to use dashboard-wide custom CLI hook folders such as
 F<~/.developer-dashboard/cli/E<lt>commandE<gt>.d> instead of a skill-local
 hook tree.
 

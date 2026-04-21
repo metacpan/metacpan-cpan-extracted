@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ चिट सिट                                           [NE] नेपाली
+======================================================================
+
+JSON र JSONL फाइलहरूका लागि LINQ-शैली क्वेरी इन्टरफेस
+
+[ 1. 1. क्वेरी सिर्जना ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. फिल्टरिङ ]
+
+  Where
+
+[ 3. 3. प्रोजेक्सन ]
+
+  Select, SelectMany
+
+[ 4. 4. क्रम मिलाउने ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. पेजिनेसन ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. समूहीकरण ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. एकत्रीकरण ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. सेट सञ्चालन ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. रूपान्तरण ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. जोइन ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. बुलियन मान ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. सन्दर्भ लिङ्कहरू ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

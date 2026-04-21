@@ -1,5 +1,13 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0508 2026-04-21 00:54:07
+    - Rename the 'cymbal' drum to 'crash'.
+
+0.0507 2026-04-20 19:58:33
+    - Improve eg/grooves.pl again.
+    - Clean code a bit.
+    - Add the rest of the General MIDI percussion set.
+
 0.0506 2026-04-16 20:16:53
     - Improve eg/grooves.pl.
 

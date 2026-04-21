@@ -606,7 +606,7 @@ sub _createArray {
         push @$array_attrs,
           { key => $_, value => $attrs->{$_} }
           unless ( (
-                isHiddenAttr( $self->conf, $_, @hidden )
+                isHiddenAttr( $self->conf->{hiddenAttributes}, $_, @hidden )
                 && !$self->displayHiddenAttributesRule->( $req, $userData )
             )
             || (   !$attrs->{$_}

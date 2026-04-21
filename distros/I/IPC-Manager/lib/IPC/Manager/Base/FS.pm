@@ -2,15 +2,24 @@ package IPC::Manager::Base::FS;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use File::Spec;
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
 use File::Path qw/remove_tree/;
+use Digest::SHA qw/sha256_hex/;
 
 use IPC::Manager::Util qw/USE_INOTIFY USE_IO_SELECT/;
+
+# When the peer id is too long or contains path-unsafe characters, we hash
+# it to this on-disk form. "h-" + 40 hex chars of sha256 = 42 chars total.
+# The "h-" prefix is reserved: any caller-supplied id starting with "h-"
+# that would otherwise be used verbatim is still hashed, so the real name
+# is always read from the ".name" sidecar to avoid ambiguity.
+use constant ON_DISK_HASH_LEN => 40;
+use constant ON_DISK_HASH_PREFIX => 'h-';
 
 use parent 'IPC::Manager::Client';
 use Object::HashBase qw{
@@ -30,7 +39,65 @@ sub check_path     { croak "Not Implemented" }
 sub make_path      { croak "Not Implemented" }
 sub path_type      { croak "Not Implemented" }
 
-sub have_resume_file { -e $_[0]->resume_file }
+sub max_on_disk_name_length { 200 }
+
+sub on_disk_name {
+    my ($self, $peer_id) = @_;
+    croak "peer_id is required" unless defined $peer_id && length $peer_id;
+
+    my $max = $self->max_on_disk_name_length;
+    if (length($peer_id) <= $max
+        && $peer_id !~ m{[\x00-\x1f/\\]}
+        && index($peer_id, ON_DISK_HASH_PREFIX) != 0)
+    {
+        return $peer_id;
+    }
+
+    return ON_DISK_HASH_PREFIX . substr(sha256_hex($peer_id), 0, ON_DISK_HASH_LEN);
+}
+
+sub name_file {
+    my $self = shift;
+    my ($peer_id) = @_;
+    $peer_id //= $self->{+ID};
+    return File::Spec->catfile($self->{+ROUTE}, $self->on_disk_name($peer_id) . ".name");
+}
+
+sub _read_name_file {
+    my ($self, $on_disk) = @_;
+    my $file = File::Spec->catfile($self->{+ROUTE}, "$on_disk.name");
+    return undef unless -e $file;
+    open(my $fh, '<', $file) or return undef;
+    my $real = do { local $/; <$fh> };
+    close($fh);
+    return $real;
+}
+
+sub _real_name_for_on_disk {
+    my ($self, $on_disk) = @_;
+    my $real = $self->_read_name_file($on_disk);
+    return defined($real) ? $real : $on_disk;
+}
+
+sub _write_name_file {
+    my $self = shift;
+
+    my $on_disk = $self->on_disk_name($self->{+ID});
+    return if $on_disk eq $self->{+ID};
+
+    my $file = File::Spec->catfile($self->{+ROUTE}, "$on_disk.name");
+    my $pend = $file . ".pend";
+    open(my $fh, '>', $pend) or die "Could not open name file '$pend': $!";
+    print $fh $self->{+ID};
+    close($fh);
+    rename($pend, $file) or die "Could not rename '$pend' -> '$file': $!";
+}
+
+sub have_resume_file {
+    my $self = shift;
+    my $file = eval { $self->resume_file } // return 0;
+    return -e $file;
+}
 
 sub can_select { USE_IO_SELECT() }
 sub select {
@@ -53,7 +120,7 @@ sub all_stats {
     opendir(my $dh, $self->{+ROUTE}) or die "Could not open dir: $!";
     for my $file (readdir($dh)) {
         next unless $file =~ m/^(.+)\.stats$/;
-        my $peer = $1;
+        my $peer = $self->_real_name_for_on_disk($1);
         open(my $fh, '<', File::Spec->catfile($self->{+ROUTE}, $file)) or die "Could not open stats file: $!";
         $out->{$peer} = do { local $/; $self->{+SERIALIZER}->deserialize(<$fh>) };
         close($fh);
@@ -66,13 +133,13 @@ sub all_stats {
 
 sub stats_file {
     my $self = shift;
-    return File::Spec->catfile($self->{+ROUTE}, "$self->{+ID}.stats");
+    return File::Spec->catfile($self->{+ROUTE}, $self->on_disk_name($self->{+ID}) . ".stats");
 }
 
 sub write_stats {
     my $self = shift;
 
-    my $file = $self->stats_file;
+    my $file = eval { $self->stats_file } // return;
     if (open(my $fh, '>', $file)) {
         print $fh $self->{+SERIALIZER}->serialize($self->{+STATS});
         close($fh);
@@ -98,19 +165,19 @@ sub pidfile {
 
 sub path {
     my $self = shift;
-    return $self->{+PATH} //= File::Spec->catfile($self->{+ROUTE}, $self->{+ID});
+    return $self->{+PATH} //= File::Spec->catfile($self->{+ROUTE}, $self->on_disk_name($self->{+ID}));
 }
 
 sub resume_file {
     my $self = shift;
-    return $self->{+RESUME_FILE} //= File::Spec->catfile($self->{+ROUTE}, $self->{+ID} . ".resume");
+    return $self->{+RESUME_FILE} //= File::Spec->catfile($self->{+ROUTE}, $self->on_disk_name($self->{+ID}) . ".resume");
 }
 
 sub peer_pid_file {
     my $self = shift;
     my ($peer_id) = @_;
 
-    return File::Spec->catfile($self->{+ROUTE}, $peer_id . ".pid");
+    return File::Spec->catfile($self->{+ROUTE}, $self->on_disk_name($peer_id) . ".pid");
 }
 
 sub init {
@@ -135,6 +202,7 @@ sub init {
     else {
         croak "${id} ${pt} already exists" if -e $path;
         $self->make_path($path);
+        $self->_write_name_file;
     }
 
     # Prime the peer-change inotify watch now that the route directory
@@ -194,7 +262,8 @@ sub read_resume_file {
 sub post_disconnect_hook {
     my $self = shift;
     $self->SUPER::post_disconnect_hook;
-    remove_tree($self->path, {keep_root => 0, safe => 1});
+    my $path = eval { $self->path } // return;
+    remove_tree($path, {keep_root => 0, safe => 1}) if -e $path;
 }
 
 sub pre_suspend_hook {
@@ -221,16 +290,20 @@ sub handles_for_peer_change {
 sub peers {
     my $self = shift;
 
+    my $my_on_disk = $self->on_disk_name($self->{+ID});
+
     my @out;
 
     opendir(my $dh, $self->{+ROUTE}) or die "Could not open dir: $!";
     for my $file (readdir($dh)) {
-        next if $file eq $self->{+ID};
+        next if $file eq $my_on_disk;
         next if $file =~ m/^(\.|_)/;
-        next if $file =~ m/\.pid$/;
-        $self->peer_exists($file) or next;
+        next if $file =~ m/\.(?:pid|name|resume|stats)$/;
 
-        push @out => $file;
+        my $path = File::Spec->catdir($self->{+ROUTE}, $file);
+        next unless $self->check_path($path);
+
+        push @out => $self->_real_name_for_on_disk($file);
     }
 
     close($dh);
@@ -257,7 +330,7 @@ sub peer_exists {
 
     croak "'peer_id' is required" unless $peer_id;
 
-    my $path = File::Spec->catdir($self->{+ROUTE}, $peer_id);
+    my $path = File::Spec->catdir($self->{+ROUTE}, $self->on_disk_name($peer_id));
     return $path if $self->check_path($path);
     return undef;
 }
@@ -325,6 +398,28 @@ Get the proper path for the client.
 =item $string = $con->path_type
 
 Returns a human readable name for what types of files/etc the paths should be.
+
+=item $on_disk = $con->on_disk_name($peer_id)
+
+Returns the filesystem component used for C<$peer_id> under the route directory.
+For short, safe names the peer id is returned unchanged.  For names that would
+exceed L</max_on_disk_name_length>, contain path-unsafe characters, or begin with
+the reserved C<h-> prefix, returns C<< "h-" . substr(sha256_hex($peer_id), 0, 40) >>.
+The mapping from hashed on-disk name back to the real peer id is recorded in a
+C<.name> sidecar file so that L</peers> and L</all_stats> report real peer names.
+This lets callers use arbitrarily long peer ids transparently.
+
+=item $n = $con->max_on_disk_name_length
+
+Returns the maximum length of an on-disk peer name component before it is hashed.
+Defaults to 200, which is safe on common filesystems.  Subclasses may override
+this.  In particular L<IPC::Manager::Client::UnixSocket> computes it dynamically
+from the route length to stay within the C<sun_path> limit.
+
+=item $file = $con->name_file($peer_id)
+
+Returns the path to the C<.name> sidecar file for C<$peer_id>.  Defaults to
+C<$self-E<gt>{+ID}> when C<$peer_id> is not given.
 
 =item $file = $con->peer_pid_file($peer_name)
 

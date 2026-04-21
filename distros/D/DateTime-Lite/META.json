@@ -71,7 +71,7 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Lite"
       }
    },
-   "version" : "v0.6.2",
+   "version" : "v0.6.3",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

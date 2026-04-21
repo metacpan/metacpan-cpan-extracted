@@ -1,0 +1,36 @@
+Revision history for JSON::LINQ
+
+1.00  2026-04-20 JST (Japan Standard Time)
+
+    Initial release.
+
+    Features:
+    - FromJSON($file)         : read JSON file (top-level array or object)
+    - FromJSONL($file)        : read JSONL file (streaming, one line at a time)
+    - FromJSONString($json)   : read JSON string (array or object)
+    - ToJSON($file)           : write sequence as JSON array file
+    - ToJSONL($file)          : write sequence as JSONL file
+    - true / false            : JSON boolean singleton objects
+    - Built-in JSON encoder/decoder (derived from mb::JSON 0.06)
+      No CPAN JSON module required.
+    - 60 LINQ methods from LTSV::LINQ 1.08:
+      From, Range, Empty, Repeat,
+      Where (with DSL), Select, SelectMany, Concat, Zip,
+      Take, Skip, TakeWhile, SkipWhile,
+      OrderBy, OrderByDescending, OrderByStr, OrderByStrDescending,
+      OrderByNum, OrderByNumDescending, Reverse,
+      ThenBy, ThenByDescending, ThenByStr, ThenByStrDescending,
+      ThenByNum, ThenByNumDescending,
+      GroupBy, Distinct, Union, Intersect, Except,
+      Join, GroupJoin,
+      All, Any, Contains, SequenceEqual,
+      First, FirstOrDefault, Last, LastOrDefault,
+      Single, SingleOrDefault, ElementAt, ElementAtOrDefault,
+      Count, Sum, Min, Max, Average, AverageOrDefault, Aggregate,
+      ToArray, ToList, ToDictionary, ToLookup, DefaultIfEmpty, ForEach
+    - JSON::LINQ::Ordered subclass for ThenBy* chaining
+    - Perl 5.005_03 compatibility (Universal Consensus 1998)
+    - Pure Perl, no XS dependencies
+    - 21-language cheat sheets (doc/json_linq_cheatsheet.*.txt)
+    - 4 example scripts (eg/01_*.pl .. eg/04_*.pl)
+    - Full test suite (t/0001*.t .. t/9080*.t)

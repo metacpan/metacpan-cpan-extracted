@@ -881,6 +881,7 @@ sub _continueLogin {
         $self->logger->debug(
             "Update sessionInfo with new authenticationLevel: $level");
         $req->sessionInfo->{authenticationLevel} = $level;
+        $req->sessionInfo->{_2f}                 = $prefix;
 
         # Compute macros & local groups again with new authenticationLevel
         $self->logger->debug("Compute macros and local groups...");

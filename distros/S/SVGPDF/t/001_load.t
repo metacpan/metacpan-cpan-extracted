@@ -33,7 +33,7 @@ diag( "Testing SVGPDF $SVGPDF::VERSION, Perl $], $^X" );
 my @pdfapi = ( 'PDF::API2' => 2.043 ); # default
 if ( my $a = $ENV{SVGPDF_API} ) {
     if ( $a =~ /PDF::Builder/ ) {
-	@pdfapi = ( 'PDF::Builder' => 3.025 );
+	@pdfapi = ( 'PDF::Builder' => 3.027 );
     }
     elsif ( $a =~ /PDF::API2/ ) {
     }

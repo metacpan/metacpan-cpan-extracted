@@ -1,0 +1,198 @@
+======================================================================
+ JSON::LINQ Cheat Sheet                                    [EN] English
+======================================================================
+
+[ 1. Creating Queries ]
+
+  use JSON::LINQ;
+
+  # From a JSON file (top-level array)
+  my $q = JSON::LINQ->FromJSON('data.json');
+
+  # From a JSONL file (one JSON object per line, streaming)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+
+  # From a JSON string
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
+
+  # From an in-memory array
+  my $q = JSON::LINQ->From(\@array);
+
+  # Empty sequence
+  my $q = JSON::LINQ->Empty();
+
+  # Integer sequence: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
+
+  # Repeat an element N times
+  my $q = JSON::LINQ->Repeat("x", 3);
+
+  # Note: once consumed by a terminal method, the iterator is exhausted.
+  # Call FromJSON/FromJSONL/From again to re-query.
+
+[ 2. Filtering ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
+
+[ 3. Projection ]
+
+  # Select: transform each element
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
+
+  # SelectMany: flatten nested arrays (selector must return ARRAY ref)
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+[ 4. Sorting ]
+
+  # Primary key -- smart (numeric if both look like numbers)
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+
+  # Primary key -- force numeric comparison
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
+
+  # Primary key -- force string comparison (cmp)
+  ->OrderByStr(sub { $_[0]{code} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+
+  # Secondary key (chain after OrderBy*)
+  ->ThenBy(sub { $_[0]{name} })              # smart ascending
+  ->ThenByDescending(sub { $_[0]{score} })   # smart descending
+  ->ThenByNum(sub { $_[0]{age} })            # numeric ascending
+  ->ThenByNumDescending(sub { $_[0]{age} })  # numeric descending
+  ->ThenByStr(sub { $_[0]{name} })           # string ascending
+  ->ThenByStrDescending(sub { $_[0]{name} }) # string descending
+
+  # Reverse current order
+  ->Reverse()
+
+[ 5. Paging ]
+
+  ->Skip(10)                                # skip first 10
+  ->Take(5)                                 # take next 5
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+[ 6. Grouping ]
+
+  # GroupBy: returns { Key => '...', Elements => [...] }
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d items\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+
+  # ToLookup: returns hashref of arrayrefs
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
+
+  # ToLookup with value selector
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. Set Operations ]
+
+  ->Distinct()                          # deduplicate (by value)
+  ->Distinct(sub { $_[0]{id} })         # deduplicate by key
+  ->Union($other_q)                     # set union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} })  # union by key
+  ->Intersect($other_q)                 # set intersection
+  ->Intersect($other_q, sub { ... })    # intersection by key
+  ->Except($other_q)                    # set difference
+  ->Except($other_q, sub { ... })       # difference by key
+  ->SequenceEqual($other_q)             # true if equal sequence
+
+[ 8. Joins ]
+
+  # Join (inner join)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # outer key selector
+      sub { $_[0]{id} },                   # inner key selector
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # result selector
+  )
+
+  # GroupJoin (left outer join)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # outer key selector
+      sub { $_[0]{user_id} },              # inner key selector
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+[ 9. Aggregation (terminal methods) ]
+
+  ->ToArray()                            # collect all elements
+  ->ToList()                             # same as ToArray()
+  ->Count()                              # element count
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{amount} })          # sum of selector values
+  ->Average(sub { $_[0]{score} })       # mean (die if empty)
+  ->AverageOrDefault(sub { ... })       # mean or undef if empty
+  ->Min(sub { $_[0]{price} })           # minimum
+  ->Max(sub { $_[0]{price} })           # maximum
+  ->First()                             # first element (die if empty)
+  ->First(sub { $_[0] > 5 })            # first match (die if none)
+  ->FirstOrDefault()                    # first or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first match or undef
+  ->Last()                              # last element (die if empty)
+  ->Last(sub { $_[0] > 5 })             # last match (die if none)
+  ->LastOrDefault()                     # last or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last match or undef
+  ->Single()                            # exactly one (else die)
+  ->SingleOrDefault()                   # one or undef
+  ->ElementAt($n)                       # element at index $n (0-based)
+  ->ElementAtOrDefault($n)              # element at $n or undef
+  ->Any()                               # true if non-empty
+  ->Any(sub { $_[0] > 5 })              # true if any match
+  ->All(sub { $_[0] > 0 })              # true if all match
+  ->Contains($value)                    # true if value present
+  ->ForEach(sub { print $_[0] })        # side-effect per element
+  ->Aggregate($seed, sub { $_[0] + $_[1] })  # fold/reduce
+
+[ 10. Other Sequence Methods ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # return $default if empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine element-wise
+
+[ 11. Conversion Methods ]
+
+  ->ToArray()                           # returns Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # write as JSON array file
+  ->ToJSONL('output.jsonl')             # write as JSONL file
+
+[ 12. Boolean Values ]
+
+  JSON::LINQ::true    # stringifies as "true",  numifies as 1
+  JSON::LINQ::false   # stringifies as "false", numifies as 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON encodes as: {"active":true}
+
+[ 13. Reference Links ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL specification:
+    https://jsonlines.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ (sister module for LTSV files):
+    https://metacpan.org/dist/LTSV-LINQ
+
+======================================================================

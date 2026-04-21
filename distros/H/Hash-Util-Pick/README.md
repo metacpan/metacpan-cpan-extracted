@@ -68,7 +68,7 @@ omit_by { foo => 0, bar => 1 } => sub { $_ > 0 }; # { foo => 0 }
 
 The MIT License (MIT)
 
-Copyright (c) 2016-2019, 2025 Pine Mizune
+Copyright (c) 2016-2019, 2025-2026 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

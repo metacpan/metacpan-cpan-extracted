@@ -22,25 +22,25 @@ DateTime::Format::Lite - Parse and format datetimes with strptime patterns, retu
 
 # VERSION
 
-    v0.1.0
+    v0.1.2
 
 # DESCRIPTION
 
-`DateTime::Format::Lite` parses and formats datetime strings using strptime-style patterns, returning [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) objects.
+[DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) parses and formats datetime strings using strptime-style patterns, returning [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) objects.
 
-It is a replacement for [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AStrptime) designed for the `DateTime::Lite` ecosystem, with the following key differences:
+It is a replacement for [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AStrptime) designed for the [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) ecosystem, with the following key differences:
 
 - No heavy dependencies
 
-    No `Params::ValidationCompiler`, `Specio`, or `Try::Tiny`. Validation follows the same lightweight philosophy as `DateTime::Lite` itself.
+    No `Params::ValidationCompiler`, `Specio`, or `Try::Tiny`. Validation follows the same lightweight philosophy as [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) itself.
 
-- Returns `DateTime::Lite` objects
+- Returns [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) objects
 
     `parse_datetime` returns [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) objects rather than [DateTime](https://metacpan.org/pod/DateTime) objects.
 
 - Dynamic timezone abbreviation resolution
 
-    Rather than a static hardcoded table of ~300 entries, timezone abbreviations are resolved live against the IANA data in the SQLite database bundled with `DateTime::Lite::TimeZone`, via ["resolve\_abbreviation" in DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone#resolve_abbreviation). The resolution is automatically up to date with each tzdata release.
+    Rather than a static hardcoded table of ~300 entries, timezone abbreviations are resolved live against the [IANA data](https://ftp.iana.org/tz/releases/) in the SQLite database bundled with [DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone), via ["resolve\_abbreviation" in DateTime::Lite::TimeZone](https://metacpan.org/pod/DateTime%3A%3ALite%3A%3ATimeZone#resolve_abbreviation). The resolution is automatically up to date with each tzdata release.
 
 - XS-accelerated hot paths
 
@@ -48,7 +48,7 @@ It is a replacement for [DateTime::Format::Strptime](https://metacpan.org/pod/Da
 
 - Error handling via `error()`
 
-    Errors set an error object accessible via `$fmt->error` and return `undef`, consistent with `DateTime::Lite`. Fatal mode is available via `on_error => 'croak'`.
+    Errors set an error object accessible via `$fmt->error` and return `undef` in scalar context, or an empty list in list context, or a `DateTime::Format::Lite::NullObject` object in object chaining context detected with [Wanted](https://metacpan.org/pod/Wanted), consistent with [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite). Fatal mode is available when the instantiation option `on_error` is set to `croak` or `die`.
 
 # CONSTRUCTORS
 
@@ -71,7 +71,7 @@ The `pattern` parameter is required. All others are optional.
 
 - `locale`
 
-    A BCP47 locale string (such as `fr-FR` or `ja-JP`), a [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR) object, or a [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) object. Defaults to `en`.
+    A [BCP47 locale](https://cldr.unicode.org/index/bcp47-extension) string (such as `fr-FR` or `ja-JP` or even more complex ones like `ja-Kana-t-it` or `es-Latn-001-valencia`), a [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR) object, or a [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) object. Defaults to `en`.
 
 - `time_zone`
 
@@ -79,7 +79,7 @@ The `pattern` parameter is required. All others are optional.
 
 - `on_error`
 
-    Error handling mode: `'undef'` (default - returns `undef` on error), `'croak'` (dies with the error message), or a code reference invoked as `$coderef->( $fmt_object, $message )`.
+    Error handling mode: `undef` (by default, it returns `undef` on error), `croak` or `die` (dies with the error message), or a code reference invoked as `$coderef->( $fmt_object, $message )`.
 
 - `strict`
 
@@ -95,7 +95,7 @@ The `pattern` parameter is required. All others are optional.
 
     my $string = $fmt->format_datetime( $dt );
 
-Formats a [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object using the configured pattern. Delegates directly to `DateTime::Lite-`strftime> without cloning.
+Formats a [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object using the configured pattern. Delegates directly to [DateTime::Lite-](https://metacpan.org/pod/DateTime%3A%3ALite-)strftime|DateTime::Lite/strftime> without cloning.
 
 Returns a string, or `undef` on error.
 
@@ -132,11 +132,11 @@ Returns the last [DateTime::Format::Lite::Exception](https://metacpan.org/pod/Da
 
 ## fatal
 
-Boolean. When true, any error calls `die()` immediately instead of returning `undef`. Equivalent to setting `on_error => die` at the instance level but applies globally when set as a class method.
+Boolean. When true, any error calls `die()` immediately instead of returning `undef`. Equivalent to setting the instantiation option `on_error` to `die`, but applies globally when set as a class method.
 
 ## locale
 
-A BCP47 locale string (such as `fr-FR` or `ja-JP`), a [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR) object, or a [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) object. Defaults to `en`.
+A [BCP47 locale](https://cldr.unicode.org/index/bcp47-extension) string (such as `fr-FR` or `ja-JP` or even more complex ones like `ja-Kana-t-it` or `es-Latn-001-valencia`), a [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR) object, or a [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) object. Defaults to `en`.
 
 Controls the locale used for parsing and formatting locale-sensitive tokens such as `%a`, `%A`, `%b`, `%B`, and `%p`.
 
@@ -148,7 +148,7 @@ Error handling mode. One of:
 
     Returns `undef` on error and stores the exception in `$fmt->error`.
 
-- `die`
+- `croak` or `die`
 
     Calls `die()` with the exception object.
 
@@ -165,7 +165,7 @@ Propagates the last error from `$self` (or from `$other_object` if provided) up 
 
 ## pattern
 
-The strptime pattern string, such as `'%Y-%m-%dT%H:%M:%S'`. Required at construction time; may be updated after construction.
+The strptime pattern string, such as `%Y-%m-%dT%H:%M:%S`. Required at construction time; may be updated after construction.
 
 ## strict
 
@@ -241,13 +241,13 @@ Both functions dies on error.
 
     my $dt = strptime( $pattern, $string );
 
-Convenience wrapper. Constructs a one-shot `DateTime::Format::Lite` with `$pattern` and calls `parse_datetime( $string )`. Dies on error (constructor or parse failure).
+Convenience wrapper. Constructs a one-shot [DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) with `$pattern` and calls `parse_datetime( $string )`. Dies on error (constructor or parse failure).
 
 ## strftime
 
     my $str = strftime( $pattern, $dt );
 
-Convenience wrapper. Constructs a one-shot `DateTime::Format::Lite` with `$pattern` and calls `format_datetime( $dt )`. Dies on error.
+Convenience wrapper. Constructs a one-shot [DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) with `$pattern` and calls `format_datetime( $dt )`. Dies on error.
 
 # ERROR HANDLING
 
@@ -258,7 +258,7 @@ On error, this class methods set an [exception object](https://metacpan.org/pod/
 
 The exception object stringifies to a human-readable message including file and line number.
 
-`error` detects the context is chaining, or object, and thus instead of returning `undef`, it will return a dummy instance of `DateTime::Format::Lite::Null` to avoid the typical perl error `Can't call method '%s' on an undefined value`.
+`error` detects the context is chaining, or object, and thus instead of returning `undef`, it will return a dummy instance of `DateTime::Format::Lite::NullObject` to avoid the typical perl error `Can't call method '%s' on an undefined value`.
 
 So for example:
 
@@ -271,23 +271,23 @@ If there was an error in `parse_datetime`, the chain will execute, but the last 
 
 # SERIALISATION
 
-`DateTime::Format::Lite` supports serialisation via [Storable](https://metacpan.org/pod/Storable), [Sereal](https://metacpan.org/pod/Sereal), [CBOR::XS](https://metacpan.org/pod/CBOR%3A%3AXS), and JSON serialisers.
+[DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) supports serialisation via [Storable](https://metacpan.org/pod/Storable), [Sereal](https://metacpan.org/pod/Sereal), [CBOR::XS](https://metacpan.org/pod/CBOR%3A%3AXS), and JSON serialisers.
 
 The following methods are implemented:
 
 - `FREEZE` / `THAW`
 
-    Used by [Sereal](https://metacpan.org/pod/Sereal) (v4+) and [CBOR::XS](https://metacpan.org/pod/CBOR%3A%3AXS). The object is reduced to its public configuration state (pattern, locale, time\_zone, on\_error, strict, debug, zone\_map). Internal caches are not serialised and are rebuilt on demand after thawing.
+    Used by [Sereal](https://metacpan.org/pod/Sereal) (v4+) and [CBOR::XS](https://metacpan.org/pod/CBOR%3A%3AXS). The object is reduced to its public configuration state (`pattern`, `locale`, `time_zone`, `on_error`, `strict`, `debug`, `zone_map`). Internal caches are not serialised and are rebuilt on demand after thawing.
 
 - `STORABLE_freeze` / `STORABLE_thaw`
 
-    Used by [Storable](https://metacpan.org/pod/Storable). The state is encoded as a compact pipe-delimited string. The zone\_map is JSON-encoded when non-empty.
+    Used by [Storable](https://metacpan.org/pod/Storable). The state is encoded as a compact pipe-delimited string. The `zone_map` is JSON-encoded when non-empty.
 
 - `TO_JSON`
 
-    Returns the public configuration state as a plain hashref, suitable for serialisation by [JSON::XS](https://metacpan.org/pod/JSON%3A%3AXS), [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS), or similar. The returned hashref contains: `pattern`, `locale` (BCP47 string), `time_zone` (IANA name string or `undef`), `on_error`, `strict`, `debug`, and `zone_map`.
+    Returns the public configuration state as a plain hash reference, suitable for serialisation by [JSON::XS](https://metacpan.org/pod/JSON%3A%3AXS), [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS), or similar. The returned hash reference contains: `pattern`, `locale` (BCP47 string), `time_zone` (IANA name string or `undef`), `on_error`, `strict`, `debug`, and `zone_map`.
 
-    Note that if `on_error` was set to a code reference, it cannot be serialised. `'undef'` is stored as a fallback and a warning is issued if the `DateTime::Format::Lite` warning category is enabled.
+    Note that if `on_error` was set to a code reference, it cannot be serialised. `undef` is stored as a fallback and a warning is issued if the [DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) warning category is enabled.
 
 # SEE ALSO
 

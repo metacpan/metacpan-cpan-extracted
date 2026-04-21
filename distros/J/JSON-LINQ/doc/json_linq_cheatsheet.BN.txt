@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ চিট শিট                                           [BN] বাংলা
+======================================================================
+
+JSON এবং JSONL ফাইলের জন্য LINQ-স্টাইল কোয়েরি ইন্টারফেস
+
+[ 1. 1. কোয়েরি তৈরি ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. ফিল্টারিং ]
+
+  Where
+
+[ 3. 3. প্রজেকশন ]
+
+  Select, SelectMany
+
+[ 4. 4. সাজানো ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. পেজিনেশন ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. গ্রুপিং ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. সমষ্টি ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. সেট অপারেশন ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. রূপান্তর ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. জয়েন ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. বুলিয়ান মান ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. রেফারেন্স লিংক ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

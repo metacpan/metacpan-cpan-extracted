@@ -1,0 +1,24 @@
+Changes
+lib/DBIx/Wizard.pm
+lib/DBIx/Wizard.pod
+lib/DBIx/Wizard/Cursor.pm
+lib/DBIx/Wizard/DB.pm
+lib/DBIx/Wizard/DB/Table.pm
+lib/DBIx/Wizard/ResultSet.pm
+LICENSE
+Makefile.PL
+MANIFEST
+t/lib/Test/DBIW.pm
+t/01_dbiw.t
+t/02_insert.t
+t/03_select.t
+t/04_find.t
+t/05_update.t
+t/06_delete.t
+t/07_join.t
+t/08_cursor.t
+t/09_db.t
+t/10_inflate_class.t
+t/11_transaction.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

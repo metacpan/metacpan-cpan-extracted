@@ -1,5 +1,54 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.6.3 2026-04-20T21:57:34+0900
+    [Improvement]
+    - In resolve_abbreviation(), reworked the default sort order for IANA
+      (non-extended) results returned by DateTime::Lite::TimeZone->resolve_abbreviation().
+      The previous order (ORDER BY MAX(tr.trans_time) DESC) produced counter-intuitive
+      top results such as CEST -> Africa/Tripoli first.
+    - The new ordering is a four-level key:
+        1. is_active DESC         (zones whose POSIX footer still references the
+                                   abbreviation come first)
+        2. first_trans_time ASC   (earliest adopter of the abbreviation wins)
+        3. last_trans_time DESC   (tie-break by persistence)
+        4. zone_name ASC          (deterministic final tie-breaker)
+      For CEST, this puts Europe/Berlin first. For PST, America/Los_Angeles.
+      For JST, Asia/Tokyo. For WET, Atlantic/Faroe. The ordering now matches
+      user intuition as closely as the data allows.
+    - Added two new fields to IANA results:
+      - 'is_active': 1 if the zone's POSIX footer_tz_string still references the
+        abbreviation; 0 otherwise. This is computed post-query via regex.
+      - 'first_trans_time': Unix epoch of the earliest transition in this zone
+        using the abbreviation (complements the existing last_trans_time).
+    - Extended alias results (when extended is set to true, falls back to
+      extended_aliases table) keep their previous shape: 'is_primary' instead of
+      'is_active', no 'first_trans_time'. The two branches intentionally expose
+      different ordering signals because their sources of authority differ
+      (curated editorial for extended, transition data for IANA).
+
+    [Documentation]
+    - Rewrote the POD for resolve_abbreviation() for is_primary and added a new
+      section "USING Locale::Unicode::Data FOR CANONICAL DESIGNATION" that explains
+      why no single zone is marked as "primary" among IANA candidates of an
+      abbreviation, and demonstrates how to delegate canonical designation to
+      Locale::Unicode::Data (which exposes CLDR's 'is_golden', 'is_primary',
+      'is_preferred' flags via its metazones mapping).
+    - Updated the POD examples for resolve_abbreviation() to show the new result
+      shape ('is_active', 'first_trans_time') and documented the four-level sort order
+      in prose.
+
+    [Tests]
+    - Updated t/17.resolve_abbreviation_period.t to assert the new sort order, and
+      added two subtests checking that IANA results carry 'is_active', and that
+      extended results carry 'is_primary' (but not 'is_active').
+    - Added new test suite t/18.resolve_abbreviation_ordering.t
+
+    [Performance]
+    - Measured the cost of the new sort: roughly +35 microseconds per call
+      on the full 178-abbreviation test set (around +17% over the v0.6.2
+      baseline). Memory overhead is two additional hash keys per result row
+      (approximately 50 bytes per row).
+
 v0.6.2 2026-04-19T14:15:33+0900
     [Critical Bug Fixes in DateTime::Lite::TimeZone]
     - Moved 'use strict' and 'use warnings' out of the BEGIN block and into

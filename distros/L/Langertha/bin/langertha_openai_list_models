@@ -49,7 +49,7 @@ langertha_list_models - Simple script to check the model list on an OpenAI compa
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

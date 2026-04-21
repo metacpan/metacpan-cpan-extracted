@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Grooves;
-$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7013';
+$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7014';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -103,7 +103,7 @@ has duration => (
 );
 sub _build_duration { shift->drummer->sixteenth }
 
-#pod =head2 kick, rimshot, snare, clap, conga, cowbell, shaker, closed, open, cymbal, hi_tom, mid_tom, low_tom
+#pod =head2 kick, rimshot, snare, clap, conga, cowbell, shaker, closed, open, crash, hi_tom, mid_tom, low_tom
 #pod
 #pod   $kick = $grooves->kick;
 #pod   $grooves->kick(36);
@@ -145,7 +145,7 @@ sub _build__grooves {
         RS => 'rimshot',
         CH => 'closed',
         OH => 'open',
-        CY => 'cymbal',
+        CY => 'crash',
         CB => 'cowbell',
         CL => 'clap',
         SH => 'shaker',
@@ -201,7 +201,7 @@ for my $patch (qw(
     shaker
     closed
     open
-    cymbal
+    crash
     hi_tom
     mid_tom
     low_tom
@@ -220,7 +220,7 @@ sub _build_cowbell { shift->drummer->cowbell }
 sub _build_shaker  { shift->drummer->maracas }
 sub _build_closed  { shift->drummer->closed_hh }
 sub _build_open    { shift->drummer->open_hh }
-sub _build_cymbal  { shift->drummer->crash1 }
+sub _build_crash   { shift->drummer->crash1 }
 sub _build_hi_tom  { shift->drummer->hi_mid_tom }
 sub _build_mid_tom { shift->drummer->low_mid_tom }
 sub _build_low_tom { shift->drummer->low_tom }
@@ -342,7 +342,7 @@ MIDI::Drummer::Tiny::Grooves
 
 =head1 VERSION
 
-version 0.7013
+version 0.7014
 
 =head1 SYNOPSIS
 
@@ -420,7 +420,7 @@ L<MIDI::Drummer::Tiny/sync_patterns> method.
 This is initialized to the sixteenth duration of the drummer
 L<MIDI::Drummer::Tiny> object.
 
-=head2 kick, rimshot, snare, clap, conga, cowbell, shaker, closed, open, cymbal, hi_tom, mid_tom, low_tom
+=head2 kick, rimshot, snare, clap, conga, cowbell, shaker, closed, open, crash, hi_tom, mid_tom, low_tom
 
   $kick = $grooves->kick;
   $grooves->kick(36);

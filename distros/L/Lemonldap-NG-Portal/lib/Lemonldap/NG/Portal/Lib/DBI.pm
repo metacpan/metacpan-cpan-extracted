@@ -16,7 +16,7 @@ use Lemonldap::NG::Common::Lib::DBI qw(check_dbh);
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.22.2';
 
 # PROPERTIES
 

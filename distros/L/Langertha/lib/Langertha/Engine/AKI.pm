@@ -1,6 +1,6 @@
 package Langertha::Engine::AKI;
 # ABSTRACT: AKI.IO native API
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 use Carp qw( croak carp );
 use JSON::MaybeXS;
@@ -192,7 +192,7 @@ Langertha::Engine::AKI - AKI.IO native API
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

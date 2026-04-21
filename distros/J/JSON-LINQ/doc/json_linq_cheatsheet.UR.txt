@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ فوری گائیڈ                                        [UR] اردو
+======================================================================
+
+JSON اور JSONL فائلوں کے لیے LINQ طرز کا سوال انٹرفیس
+
+[ 1. 1. سوال بنانا ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. فلٹرنگ ]
+
+  Where
+
+[ 3. 3. پروجیکشن ]
+
+  Select, SelectMany
+
+[ 4. 4. ترتیب ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. صفحہ بندی ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. گروپ بندی ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. اجتماع ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. سیٹ آپریشنز ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. تبدیلی ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. جوڑ ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. بولین اقدار ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. حوالہ لنکس ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

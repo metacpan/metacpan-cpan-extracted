@@ -418,7 +418,7 @@ subtest 'NousResearch static models' => sub {
 };
 
 subtest 'MiniMax static models' => sub {
-  plan tests => 5;
+  plan tests => 6;
 
   use_ok('Langertha::Engine::MiniMax');
 
@@ -429,6 +429,7 @@ subtest 'MiniMax static models' => sub {
   is(ref($model_ids), 'ARRAY', 'Returns arrayref');
   ok(scalar(@$model_ids) >= 5, 'Has at least 5 models');
   ok((grep { $_ eq 'MiniMax-M2.5' } @$model_ids), 'Contains MiniMax-M2.5');
+  ok((grep { $_ eq 'MiniMax-M2.7' } @$model_ids), 'Contains MiniMax-M2.7');
 
   # Full mode returns hashrefs
   my $full = $engine->list_models(full => 1);

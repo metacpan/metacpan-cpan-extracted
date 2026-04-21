@@ -1,6 +1,6 @@
 package Langertha::ToolCall;
 # ABSTRACT: Immutable canonical tool invocation emitted by an LLM
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 use JSON::MaybeXS qw( encode_json decode_json );
 
@@ -184,7 +184,7 @@ Langertha::ToolCall - Immutable canonical tool invocation emitted by an LLM
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SUPPORT
 

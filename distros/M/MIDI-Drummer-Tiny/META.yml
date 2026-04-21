@@ -50,7 +50,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny.git
-version: '0.7013'
+version: '0.7014'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

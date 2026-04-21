@@ -1,6 +1,6 @@
 package Langertha;
 # ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use utf8;
 use strict;
 use warnings;
@@ -156,7 +156,7 @@ Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 
@@ -324,7 +324,9 @@ Resolves and constructs an engine instance in one call.
 
 =item * L<Langertha::Engine::DeepSeek> - DeepSeek models
 
-=item * L<Langertha::Engine::MiniMax> - MiniMax AI models (M2.5, M2.1)
+=item * L<Langertha::Engine::MiniMax> - MiniMax AI models (M2.7, M2.5, M2.1) via OpenAI-compatible endpoint
+
+=item * L<Langertha::Engine::MiniMaxAnthropic> - MiniMax via legacy Anthropic-compatible endpoint
 
 =item * L<Langertha::Engine::Gemini> - Google Gemini models (Flash, Pro)
 

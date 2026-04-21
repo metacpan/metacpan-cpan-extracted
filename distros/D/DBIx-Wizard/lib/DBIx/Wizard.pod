@@ -1,0 +1,526 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+DBIx::Wizard - Lightweight, chainable, zero-configuration ORM for Perl
+
+=head1 SYNOPSIS
+
+    use DBIx::Wizard;
+    use DBIx::Wizard::DB;
+
+    # Register a database
+    DBIx::Wizard::DB->declare('mydb',
+        'dbi:mysql:dbname=myapp', 'user', 'password',
+        { RaiseError => 1 },
+    );
+
+    # Or via environment variable (no code needed)
+    # export DBIW_DECLARE_MYDB="dbi:mysql:dbname=myapp|user|password"
+
+    # Query
+    my @active = dbiw('mydb:users')->find({ status => 'active' })->all;
+    my @names  = dbiw('mydb:users')->sort('name')->all('name');
+    my $alice  = dbiw('mydb:users')->find({ name => 'Alice' })->one;
+    my $count  = dbiw('mydb:users')->find({ status => 'active' })->count;
+
+    # Insert
+    my $id = dbiw('mydb:users')->insert({
+        name  => 'Alice',
+        email => 'alice@example.com',
+    });
+
+    # Update
+    dbiw('mydb:users')->find({ id => 42 })
+                       ->update({ status => 'inactive' });
+
+    # Update with expressions
+    dbiw('mydb:users')->find({ id => 42 })
+                       ->update({ views => dbiw->col('views') + 1 });
+
+    # Delete
+    dbiw('mydb:users')->find({ status => 'deleted' })->delete;
+
+    # Joins
+    my @rows = dbiw('mydb:users')
+        ->as('u')
+        ->join('orders|o' => 'o.user_id = u.id')
+        ->find({ 'u.status' => 'active' })
+        ->sort('-o.created_at')
+        ->limit(20)
+        ->all;
+
+=head1 DESCRIPTION
+
+DBIx::Wizard is a thin, fluent database query executor for Perl. It sits
+between raw DBI (too verbose) and DBIx::Class (too heavy), providing a
+chainable API that requires zero schema definition.
+
+It uses L<SQL::Wizard> for SQL generation, inheriting its multi-layer
+injection protection, composable expression trees, and support for joins,
+subqueries, CTEs, window functions, and more.
+
+Key properties:
+
+=over 4
+
+=item * B<Zero schema definition.> Point it at a database and table, start
+querying. No result classes, no relationship declarations.
+
+=item * B<Fluent chaining.> Build queries with C<< ->find->sort->limit->all >>.
+
+=item * B<SQL::Wizard expressions everywhere.> Use C<< dbiw->col(...) >>,
+C<< dbiw->func(...) >>, C<< dbiw->now >>, and arithmetic in any position.
+
+=item * B<Plain hashrefs.> Rows are returned as plain Perl hashrefs, not
+objects. Fast and simple.
+
+=item * B<Pluggable DateTime inflation.> Automatically inflate time columns
+to objects, with the class configurable at three levels.
+
+=item * B<Environment-based configuration.> Databases can be declared via
+environment variables following the twelve-factor app principle.
+
+=back
+
+=head1 EXPORTED FUNCTIONS
+
+=head2 dbiw
+
+    # With argument: returns a ResultSet
+    my $rs = dbiw('mydb:users');
+
+    # Without argument: returns a SQL::Wizard instance
+    my $expr = dbiw->col('u.name');
+    my $now  = dbiw->now;
+    my $func = dbiw->func('COUNT', '*');
+
+When called with a C<'db:table'> string, returns a
+L<DBIx::Wizard::ResultSet> object tied to that database and table.
+
+When called without arguments, returns a shared L<SQL::Wizard> instance
+for building expressions. These expressions can be used in C<find()>,
+C<update()>, C<sort()>, C<having()>, and column lists.
+
+=head1 DATABASE REGISTRATION
+
+Before querying, databases must be registered by name.
+
+=head2 Code-based declaration
+
+    use DBIx::Wizard::DB;
+
+    DBIx::Wizard::DB->declare('mydb',
+        'dbi:mysql:dbname=myapp',     # DSN
+        'user',                        # username
+        'password',                    # password
+        {                              # DBI options
+            RaiseError    => 1,
+            inflate_class => 'My::DateTime',   # optional, see DATETIME INFLATION
+        },
+    );
+
+=head2 Environment-based declaration
+
+    export DBIW_DECLARE_MYDB="dbi:mysql:dbname=myapp|user|password"
+    export DBIW_DECLARE_ANALYTICS="dbi:Pg:dbname=stats|readonly|pass"
+    export DBIW_DECLARE_LOGS="dbi:SQLite:dbname=/tmp/logs.db||"
+
+The format is C<< DBIW_DECLARE_<NAME>=<dsn>|<user>|<password> >>. The
+C<< <NAME> >> is uppercased in the environment but maps to lowercase in
+C<dbiw()>. Empty user/password is supported with C<||>.
+
+Environment declarations are checked lazily on first connection. If both
+C<declare()> and an environment variable exist for the same name,
+C<declare()> takes precedence.
+
+=head1 RESULTSET — QUERY BUILDING
+
+All builder methods modify the ResultSet and return C<$self> for chaining.
+
+=head2 as
+
+    dbiw('mydb:users')->as('u')
+
+Sets the table alias. The alias is used in the SQL FROM clause.
+
+=head2 find
+
+    ->find({ status => 'active' })
+    ->find({ age => { '>' => 18 }, status => 'active' })
+    ->find({ name => { -in => ['Alice', 'Bob'] } })
+
+Sets or extends the WHERE clause. When called with a hashref, merges with
+any existing conditions (AND). When called with an arrayref, replaces the
+WHERE clause entirely.
+
+Accepts all L<SQL::Wizard> WHERE syntax: hashrefs, arrayrefs with
+C<-and>/C<-or>, operator hashrefs (C<< { '>' => 5 } >>), C<< { -in => [...] } >>,
+C<undef> for IS NULL, C<< { '!=' => undef } >> for IS NOT NULL, and
+expression objects.
+
+=head2 join
+
+    ->join('orders|o' => 'o.user_id = u.id')
+
+Adds an INNER JOIN. The first argument is the table (with optional
+C<table|alias> syntax), the second is the ON condition. Multiple joins
+can be chained:
+
+    ->join('orders|o' => 'o.user_id = u.id')
+    ->join('payments|p' => 'p.order_id = o.id')
+
+=head2 left_join
+
+    ->left_join('orders|o' => 'o.user_id = u.id')
+
+Adds a LEFT JOIN. Same arguments as C<join>.
+
+=head2 right_join
+
+    ->right_join('returns|r' => 'r.order_id = o.id')
+
+Adds a RIGHT JOIN.
+
+=head2 full_join
+
+    ->full_join('archive|a' => 'a.user_id = u.id')
+
+Adds a FULL OUTER JOIN.
+
+=head2 cross_join
+
+    ->cross_join('sizes')
+
+Adds a CROSS JOIN (no ON condition).
+
+=head2 sort
+
+    ->sort('name')                           # ORDER BY name
+    ->sort('-created_at')                    # ORDER BY created_at DESC
+    ->sort('-created_at', 'name')            # ORDER BY created_at DESC, name
+    ->sort(dbiw->col('score')->desc)         # ORDER BY score DESC
+
+Sets the ORDER BY clause. A leading C<-> on a column name is shorthand for
+DESC. Accepts expression objects.
+
+=head2 group_by
+
+    ->group_by('department')
+    ->group_by('department', 'year')
+
+Sets the GROUP BY clause.
+
+=head2 having
+
+    ->having({ dbiw->raw('COUNT(*)') => { '>' => 5 } })
+
+Sets the HAVING clause. Same syntax as C<find()>.
+
+=head2 limit
+
+    ->limit(20)
+
+Sets the LIMIT. Must be a positive integer.
+
+=head2 offset
+
+    ->offset(40)
+
+Sets the OFFSET. Must be a positive integer.
+
+=head2 inflate
+
+    ->inflate(1)    # enable (default)
+    ->inflate(0)    # disable
+
+Enables or disables DateTime inflation for time columns. See
+L</DATETIME INFLATION>.
+
+=head2 inflate_class
+
+    ->inflate_class('My::DateTime')
+
+Sets the DateTime inflation class for this ResultSet. See
+L</DATETIME INFLATION>.
+
+=head1 RESULTSET — DATA RETRIEVAL
+
+=head2 all
+
+    my @rows  = dbiw('mydb:users')->all;                   # all columns
+    my @rows  = dbiw('mydb:users')->all(['name', 'email']); # specific columns
+    my @names = dbiw('mydb:users')->all('name');            # flat list of values
+
+Executes SELECT and returns all matching rows as hashrefs. When given a
+single scalar column name (not an arrayref), returns a flat list of that
+column's values instead.
+
+=head2 distinct
+
+    my @depts = dbiw('mydb:users')->distinct('department');
+    my @pairs = dbiw('mydb:users')->distinct(['dept', 'city']);
+
+Returns distinct values. Mirrors C<all()>'s column argument: a scalar returns
+a flat list of values, an arrayref returns hashrefs. Emits C<SELECT DISTINCT>
+under the hood.
+
+A column argument is required — C<< ->distinct >> without columns would
+produce C<SELECT DISTINCT *>, which is almost never what you want.
+
+=head2 one
+
+    my $row  = dbiw('mydb:users')->find({ id => 42 })->one;
+    my $name = dbiw('mydb:users')->find({ id => 42 })->one('name');
+
+Like C<all()> but with LIMIT 1. Returns a single hashref, or a single
+scalar value when given a column name.
+
+=head2 cursor
+
+    my $cursor = dbiw('mydb:users')->cursor;
+    while (my $row = $cursor->next) {
+        # process row
+    }
+
+Returns a L<DBIx::Wizard::Cursor> for lazy row-by-row iteration. Useful
+for large result sets that should not be loaded entirely into memory.
+
+=head2 count
+
+    my $n = dbiw('mydb:users')->find({ status => 'active' })->count;
+
+Returns the COUNT(*) of matching rows.
+
+=head2 exists
+
+    if (dbiw('mydb:users')->find({ email => $email })->exists) {
+        ...
+    }
+
+Returns true if the query matches at least one row, false otherwise.
+Equivalent to C<< count > 0 >>.
+
+=head2 sum
+
+    my $total = dbiw('mydb:orders')->find({ user_id => 42 })->sum('amount');
+
+Returns the SUM of the given column.
+
+=head1 RESULTSET — DATA MODIFICATION
+
+=head2 insert
+
+    my $id = dbiw('mydb:users')->insert({
+        name  => 'Alice',
+        email => 'alice@example.com',
+    });
+
+Inserts a row and returns the auto-generated primary key if the table has
+one (detected automatically via table metadata). Expression objects can be
+used as values:
+
+    dbiw('mydb:users')->insert({
+        name       => 'Alice',
+        created_at => dbiw->now,
+    });
+
+=head2 update
+
+    my $rows = dbiw('mydb:users')
+                   ->find({ status => 'inactive' })
+                   ->update({ status => 'deleted' });
+
+Updates all rows matching the current WHERE clause. Returns the number of
+affected rows. Expression objects work in the SET values:
+
+    dbiw('mydb:counters')->find({ key => 'hits' })
+                          ->update({ value => dbiw->col('value') + 1 });
+
+=head2 delete
+
+    dbiw('mydb:users')->find({ status => 'deleted' })->delete;
+
+Deletes all rows matching the current WHERE clause.
+
+=head2 truncate
+
+    dbiw('mydb:temp_data')->truncate;
+
+Truncates the table. On SQLite (which does not support TRUNCATE TABLE),
+falls back to C<DELETE FROM>.
+
+=head1 EXPRESSIONS
+
+When called without arguments, C<dbiw> returns a L<SQL::Wizard> instance.
+This provides access to the full expression API:
+
+    dbiw->col('u.name')                    # column reference
+    dbiw->val(42)                          # bound value
+    dbiw->raw('NOW() - INTERVAL 1 DAY')   # raw SQL
+    dbiw->func('COUNT', '*')              # function call
+    dbiw->now                              # NOW()
+    dbiw->coalesce('nickname', dbiw->val('Anonymous'))
+    dbiw->between('age', 18, 65)
+    dbiw->exists($subquery)
+    dbiw->any($subquery)
+    dbiw->all($subquery)
+    dbiw->case(...)
+    dbiw->col('price') * dbiw->col('qty')  # arithmetic
+
+These expression objects can be used in C<find()>, C<sort()>, C<having()>,
+C<all()> column lists, C<insert()> values, and C<update()> SET values.
+
+See L<SQL::Wizard> for the complete expression API.
+
+=head1 DATETIME INFLATION
+
+By default, columns with datetime, date, or timestamp types are inflated
+to objects using the configured inflate class. The default class is
+C<Time::Moment>.
+
+The inflate class is resolved in this order (first defined wins):
+
+=over 4
+
+=item 1. B<ResultSet level> — C<< ->inflate_class('My::DateTime') >>
+
+=item 2. B<Database level> — C<< inflate_class >> option in C<declare()>
+
+=item 3. B<Package level> — C<< use DBIx::Wizard inflate_class => '...' >>
+or C<< DBIx::Wizard->default_inflate_class('...') >>
+
+=back
+
+The inflate class must implement C<< ->new($datetime_string) >>.
+
+    # Package level (at use time)
+    use DBIx::Wizard inflate_class => 'My::DateTime';
+
+    # Package level (at runtime)
+    DBIx::Wizard->default_inflate_class('My::DateTime');
+
+    # Database level
+    DBIx::Wizard::DB->declare('mydb', $dsn, $user, $pass, {
+        inflate_class => 'My::DateTime',
+    });
+
+    # ResultSet level
+    dbiw('mydb:users')->inflate_class('My::DateTime')->all;
+
+    # Disable inflation entirely
+    dbiw('mydb:users')->inflate(0)->all;
+
+=head1 TRANSACTIONS
+
+    dbiw('mydb')->transaction(sub {
+        dbiw('mydb:users')->insert({ name => 'Alice', email => 'alice@test.com' });
+        dbiw('mydb:orders')->insert({ user_id => 42, total => 99.95 });
+    });
+
+Wraps the code block in a BEGIN / COMMIT pair. If the block dies, the
+transaction is rolled back and the exception is re-thrown.
+
+Note: C<dbiw('mydb')> (without a table) returns a database wrapper with
+the C<transaction> method.
+
+=head2 Nested transactions
+
+Nested calls to C<transaction()> use savepoints. If the inner block dies,
+only the inner savepoint is rolled back — the outer transaction can continue:
+
+    dbiw('mydb')->transaction(sub {
+        dbiw('mydb:users')->insert({ name => 'Dave' });
+
+        eval {
+            dbiw('mydb')->transaction(sub {
+                dbiw('mydb:users')->insert({ name => 'Eve' });
+                die "inner failure";
+            });
+        };
+        # Dave is committed, Eve is rolled back
+    });
+
+=head1 DEBUGGING
+
+SQL logging is controlled via environment variables:
+
+    DEBUG_DBIW=1                    # print SQL to STDOUT
+    DEBUG_DBIW_FILE=/tmp/sql.log    # log SQL to file
+
+Each logged line includes the method name, the SQL statement, and the bind
+parameters.
+
+=head1 CURSOR
+
+L<DBIx::Wizard::Cursor> provides lazy row-by-row iteration:
+
+    my $cursor = dbiw('mydb:users')->sort('name')->cursor;
+    while (my $row = $cursor->next) {
+        print $row->{name}, "\n";
+    }
+
+C<next()> returns a hashref for each row, with DateTime inflation and
+decimal fixing applied. Returns C<undef> when no more rows are available.
+
+=head1 UTILITY METHODS
+
+=head2 dbh
+
+    my $dbh = dbiw('mydb:users')->dbh;
+
+Returns the raw L<DBI> database handle for direct access.
+
+=head1 INSPIRATION
+
+The closest equivalents in other languages are Ruby's Sequel, Python's
+SQLAlchemy, and JavaScript's Knex. DBIx::Wizard brings that level of
+ergonomic database access to Perl.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<SQL::Wizard> — the SQL generation engine behind DBIx::Wizard
+
+=item L<DBI> — the database interface DBIx::Wizard executes queries through
+
+=item L<DBIx::Class> — full ORM for when you need schema definitions and relationships
+
+=item L<DBIx::Lite> — Chained and minimal ORM
+
+=item L<SQL::Abstract> — hash/arrayref to SQL, used by DBIx::Class
+
+=back
+
+=head1 AUTHOR
+
+Thomas Busch E<lt>tbusch@cpan.orgE<gt>
+
+=head1 LICENSE
+
+MIT License
+
+Copyright (c) 2026 Thomas Busch
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

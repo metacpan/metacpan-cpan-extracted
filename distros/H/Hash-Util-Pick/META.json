@@ -4,7 +4,7 @@
       "Pine Mizune"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.27",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "mit"
    ],
@@ -64,7 +64,7 @@
    "provides" : {
       "Hash::Util::Pick" : {
          "file" : "lib/Hash/Util/Pick.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -79,11 +79,11 @@
          "web" : "https://github.com/pine/p5-Hash-Util-Pick"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_authority" : "cpan:PINE",
    "x_contributors" : [
       "Pine Mizune <pinemz@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

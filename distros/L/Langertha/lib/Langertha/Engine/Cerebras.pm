@@ -1,6 +1,6 @@
 package Langertha::Engine::Cerebras;
 # ABSTRACT: Cerebras Inference API
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 use Carp qw( croak );
 
@@ -43,7 +43,7 @@ Langertha::Engine::Cerebras - Cerebras Inference API
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

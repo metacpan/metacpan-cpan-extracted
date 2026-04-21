@@ -44,8 +44,8 @@ my $proxy = Langertha::Engine::OpenAI->new(
 
 | Base | Engines |
 |------|---------|
-| AnthropicBase | Anthropic, MiniMax, LMStudioAnthropic |
-| OpenAIBase | OpenAI, DeepSeek, Groq, Mistral, Cerebras, OpenRouter, Replicate, HuggingFace, Perplexity, OllamaOpenAI, vLLM, SGLang, LlamaCpp, AKIOpenAI |
+| AnthropicBase | Anthropic, MiniMaxAnthropic, LMStudioAnthropic |
+| OpenAIBase | OpenAI, DeepSeek, Groq, Mistral, Cerebras, OpenRouter, Replicate, HuggingFace, Perplexity, MiniMax, OllamaOpenAI, vLLM, SGLang, LlamaCpp, AKIOpenAI |
 | Other | Gemini (Google), Ollama (native), AKI (EU) |
 </engines>
 

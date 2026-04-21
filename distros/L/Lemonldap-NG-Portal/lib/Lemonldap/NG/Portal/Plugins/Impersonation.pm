@@ -2,7 +2,7 @@ package Lemonldap::NG::Portal::Plugins::Impersonation;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Common::Util            qw(isHiddenAttr);
+use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
   PE_OK PE_BADCREDENTIALS
@@ -137,7 +137,7 @@ sub run {
             next unless defined $req->{sessionInfo}->{$k};
         }
         my $spk = $self->prefix . $k;
-        unless ( isHiddenAttr( $self->conf, $k, @hidden )
+        unless ( isHiddenAttr( $self->conf->{hiddenAttributes}, $k, @hidden )
             || $k =~ /^(?:_imp|token|_type)\w*\b/ )
         {
             $realSession->{$spk} = $req->{sessionInfo}->{$k};

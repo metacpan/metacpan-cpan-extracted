@@ -27,12 +27,17 @@ plan skip_all => 'build the release tarball first with dzil build'
   if !@tarballs;
 
 is( scalar @tarballs, 1, 'exactly one release tarball is present for the kwalitee gate' );
-is( scalar @build_dirs, 1, 'exactly one unpacked release build directory is present for the kwalitee gate' );
+ok( scalar @build_dirs <= 1, 'at most one unpacked release build directory is present for the kwalitee gate' );
 
 my $tarball  = File::Spec->catfile( $ROOT, $tarballs[-1] );
 my $tarball_stem = $tarballs[-1];
 $tarball_stem =~ s/\.tar\.gz\z//;
-is( $build_dirs[-1], $tarball_stem, 'the unpacked build directory matches the single release tarball version' );
+if (@build_dirs) {
+    is( $build_dirs[-1], $tarball_stem, 'the unpacked build directory matches the single release tarball version when present' );
+}
+else {
+    pass('kwalitee gate can analyse the single release tarball even when the unpacked build directory has already been cleaned up');
+}
 my $report   = Module::CPANTS::Analyse->new( { dist => $tarball } )->run;
 my $kwalitee = $report->{kwalitee} || {};
 
@@ -73,7 +78,7 @@ Use this file after C<dzil build>, when changing release metadata or packaging r
 
 =head1 HOW TO USE
 
-Build the tarball first, then run C<prove -lv t/36-release-kwalitee.t> from the repository root. The test locates the single C<Developer-Dashboard-X.XX.tar.gz> artifact, requires exactly one matching unpacked C<Developer-Dashboard-X.XX/> build directory beside it, analyzes the tarball with C<Module::CPANTS::Analyse>, and fails unless every reported indicator passes.
+Build the tarball first, then run C<prove -lv t/36-release-kwalitee.t> from the repository root. The test locates the single C<Developer-Dashboard-X.XX.tar.gz> artifact, tolerates the unpacked C<Developer-Dashboard-X.XX/> build directory being absent after later cleanup, analyzes the tarball with C<Module::CPANTS::Analyse>, and fails unless every reported indicator passes.
 
 =head1 WHAT USES IT
 

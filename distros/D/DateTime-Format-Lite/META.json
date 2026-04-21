@@ -34,7 +34,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Lite" : "v0.6.2",
+            "DateTime::Lite" : "v0.6.3",
             "DateTime::Locale::FromCLDR" : "v0.8.2",
             "Exporter" : "0",
             "Locale::Unicode" : "v0.4.0",
@@ -67,7 +67,7 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Format-Lite"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '2.72';
+our $VERSION = '2.76';
 
 1;
 
@@ -166,19 +166,32 @@ Persistent skill-owned state.
 
 Persistent skill-owned logs.
 
-=item B<local/>
+=item B<ddfile>
 
-Isolated local dependency root.
+Optional dependent skill list installed before package managers run.
 
 =item B<aptfile>
 
-Optional system package declaration. When present, Developer Dashboard installs
-those packages before it processes the skill C<cpanfile>.
+Optional Debian-family system package declaration. When present, Developer
+Dashboard prints the requested package list and installs it through
+C<sudo apt-get install -y>.
+
+=item B<brewfile>
+
+Optional macOS Homebrew package declaration. When present, Developer Dashboard
+prints the requested package list and installs it through C<brew install>.
 
 =item B<cpanfile>
 
-Optional Perl dependency declaration. When present, Developer Dashboard runs
-C<cpanm -L local --installdeps E<lt>skill-rootE<gt>>.
+Optional shared Perl dependency declaration. When present, Developer
+Dashboard runs C<cpanm -L ~/perl5 --cpanfile cpanfile --installdeps
+E<lt>skill-rootE<gt>>.
+
+=item B<cpanfile.local>
+
+Optional skill-local Perl dependency declaration. When present, Developer
+Dashboard runs C<cpanm -L E<lt>skill-rootE<gt>/perl5 --cpanfile
+cpanfile.local --installdeps E<lt>skill-rootE<gt>>.
 
 =back
 
@@ -305,8 +318,9 @@ C<PERL5LIB>
 
 =back
 
-If the skill has installed local Perl dependencies, C<PERL5LIB> is prefixed
-with C<local/lib/perl5>.
+If the skill has installed Perl dependencies, C<PERL5LIB> is prefixed with the
+shared C<~/perl5/lib/perl5> tree and then any participating skill-local
+C<perl5/lib/perl5> trees from the inherited skill layers.
 
 =head1 BOOKMARKS
 
@@ -539,12 +553,14 @@ indicator config participates in the normal prompt and browser status flow.
 
 =head2 Can I use isolated Perl dependencies?
 
-Yes. Ship a C<cpanfile>. Dependencies install into C<local/>.
+Yes. Ship a C<cpanfile> for shared skill dependencies in C<~/perl5>, and ship
+a C<cpanfile.local> when that skill also needs a skill-local C<./perl5> tree.
 
 =head2 Can a skill install system packages first?
 
-Yes. Ship an C<aptfile>. Developer Dashboard installs those packages before it
-processes the skill C<cpanfile>.
+Yes. Ship a C<ddfile> for dependent skills, an C<aptfile> for Debian-family
+packages, or a C<brewfile> for macOS packages. The install order is
+C<ddfile -> aptfile -> brewfile -> cpanfile -> cpanfile.local>.
 
 =head2 Where is the long-form guide?
 

@@ -1,0 +1,76 @@
+NAME
+    Check::Term::Color - Check terminal color functionality.
+
+SYNOPSIS
+     use Check::Term::Color qw(check_term_color);
+
+     my $ret = check_term_color($env_hr);
+
+DESCRIPTION
+    This check test environment variables and returns value which define
+    situation about color output in terminal.
+
+    See <https://no-color.org/> for more information about $ENV{'NO_COLOR'}
+    environment variable.
+
+    Usage of $ENV{'COLOR'} environment variable is related to GNU "--color"
+    option. See grep(1).
+
+SUBROUTINES
+  "check_term_color"
+     my $ret = check_term_color($env_hr);
+
+    Check color terminal setting.
+
+    Variable $env_hr is primarily for testing and default is "\%ENV".
+
+    Soubroutine is checking $ENV{'COLOR'} and $ENV{'NO_COLOR'} variables.
+
+    Returns 0/1.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Check::Term::Color qw(check_term_color);
+
+     if (check_term_color()) {
+             print "We could write color output to terminal.\n";
+     } else {
+             print "We couldn't write color output to terminal.\n";
+     }
+
+     # Output with $ENV{'COLOR'} = 'always' set:
+     # We could write color output to terminal.
+ 
+     # Output with $ENV{'COLOR'} = 'never' set:
+     # We couldn't write color output to terminal.
+
+     # Output with $ENV{'COLOR'} = '1' set:
+     # We could write color output to terminal.
+
+     # Output with $ENV{'NO_COLOR'} = '1' set:
+     # We couldn't write color output to terminal.
+
+     # Output with $ENV{'NO_COLOR'} = 'foo' set:
+     # We couldn't write color output to terminal.
+
+DEPENDENCIES
+    Exporter, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Check-Term-Color>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

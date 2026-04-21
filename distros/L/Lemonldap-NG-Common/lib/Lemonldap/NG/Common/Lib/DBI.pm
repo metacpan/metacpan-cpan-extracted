@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Lib::DBI;
 use strict;
 use Exporter 'import';
 
-our $VERSION   = '2.22.0';
+our $VERSION   = '2.22.2';
 our @EXPORT_OK = qw(check_dbh);
 
 # Check if a DBI handle is still valid

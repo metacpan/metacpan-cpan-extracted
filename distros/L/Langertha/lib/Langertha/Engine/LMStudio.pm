@@ -1,6 +1,6 @@
 package Langertha::Engine::LMStudio;
 # ABSTRACT: LM Studio native REST API
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -371,7 +371,7 @@ Langertha::Engine::LMStudio - LM Studio native REST API
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SYNOPSIS
 

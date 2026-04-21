@@ -2,7 +2,7 @@ package IPC::Manager::Client::UnixSocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use File::Spec;
 use Carp qw/croak/;
@@ -20,6 +20,22 @@ sub _viable { require IO::Socket::UNIX; IO::Socket::UNIX->VERSION('1.55'); 1 }
 
 sub check_path { -S $_[1] }
 sub path_type  { 'UNIX Socket' }
+
+# sun_path is 108 bytes on Linux, 104 on some BSDs. The socket file
+# path "<route>/<on_disk_name>" (NUL-terminated) must fit. Leave room
+# for the route, a separator, and the trailing NUL.
+use constant _SUN_PATH_LIMIT => 104;
+
+sub max_on_disk_name_length {
+    my $self = shift;
+    my $room = _SUN_PATH_LIMIT - length($self->{+ROUTE}) - 2; # '/' + NUL
+    my $min  = length(IPC::Manager::Base::FS::ON_DISK_HASH_PREFIX()) + IPC::Manager::Base::FS::ON_DISK_HASH_LEN();
+    croak sprintf(
+        "UnixSocket route '%s' is too long: no room for peer socket files in sun_path limit of %d bytes",
+        $self->{+ROUTE}, _SUN_PATH_LIMIT,
+    ) if $room < $min;
+    return $room;
+}
 
 sub have_handles_for_select { 1 }
 sub handles_for_select { $_[0]->{+SOCKET} }
@@ -42,6 +58,7 @@ sub make_path {
 
 sub pre_disconnect_hook {
     my $self = shift;
+    return unless defined $self->{+PATH};
     unlink($self->{+PATH}) or warn "Could not unlink socket: $!";
 }
 

@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20260330';
+our $VERSION = '5.20260420';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -457,6 +457,7 @@ sub changes_between {
     5.043009 => '2026-03-20',
     5.040004 => '2026-03-29',
     5.042002 => '2026-03-29',
+    5.043010 => '2026-04-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -22532,7 +22533,6 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'DynaLoader'            => '1.54_01',
             'Module::CoreList'      => '5.20250118_38',
             'Module::CoreList::Utils'=> '5.20250118_38',
-            'Pod::Functions::Functions'=> '1.14',
         },
         removed => {
         }
@@ -22546,7 +22546,6 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'File::Spec'            => '3.91',
             'Module::CoreList'      => '5.20250118_40',
             'Module::CoreList::Utils'=> '5.20250118_40',
-            'Pod::Functions::Functions'=> '1.14',
             'warnings'              => '1.70',
         },
         removed => {
@@ -24649,6 +24648,49 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.043010 => {
+        delta_from => 5.043009,
+        changed => {
+            'B::Concise'            => '1.012',
+            'B::Op_private'         => '5.043010',
+            'Config'                => '5.04301',
+            'File::Glob'            => '1.44',
+            'Module::CoreList'      => '5.20260420',
+            'Module::CoreList::Utils'=> '5.20260420',
+            'Module::Metadata'      => '1.000039',
+            'Pod::Simple'           => '3.48',
+            'Pod::Simple::BlackBox' => '3.48',
+            'Pod::Simple::Checker'  => '3.48',
+            'Pod::Simple::Debug'    => '3.48',
+            'Pod::Simple::DumpAsText'=> '3.48',
+            'Pod::Simple::DumpAsXML'=> '3.48',
+            'Pod::Simple::HTML'     => '3.48',
+            'Pod::Simple::HTMLBatch'=> '3.48',
+            'Pod::Simple::LinkSection'=> '3.48',
+            'Pod::Simple::Methody'  => '3.48',
+            'Pod::Simple::Progress' => '3.48',
+            'Pod::Simple::PullParser'=> '3.48',
+            'Pod::Simple::PullParserEndToken'=> '3.48',
+            'Pod::Simple::PullParserStartToken'=> '3.48',
+            'Pod::Simple::PullParserTextToken'=> '3.48',
+            'Pod::Simple::PullParserToken'=> '3.48',
+            'Pod::Simple::RTF'      => '3.48',
+            'Pod::Simple::Search'   => '3.48',
+            'Pod::Simple::SimpleTree'=> '3.48',
+            'Pod::Simple::Text'     => '3.48',
+            'Pod::Simple::TextContent'=> '3.48',
+            'Pod::Simple::TiedOutFH'=> '3.48',
+            'Pod::Simple::Transcode'=> '3.48',
+            'Pod::Simple::TranscodeDumb'=> '3.48',
+            'Pod::Simple::TranscodeSmart'=> '3.48',
+            'Pod::Simple::XHTML'    => '3.48',
+            'Pod::Simple::XMLOutStream'=> '3.48',
+            'version'               => '0.9934',
+            'version::regex'        => '0.9934',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -26395,6 +26437,13 @@ sub is_core
     },
     5.042002 => {
         delta_from => 5.042001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.043010 => {
+        delta_from => 5.043009,
         changed => {
         },
         removed => {

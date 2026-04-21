@@ -1,0 +1,55 @@
+======================================================================
+ JSON::LINQ ชีทโกง                                            [TH] ภาษาไทย
+======================================================================
+
+ใช้ JSON::LINQ เพื่อค้นหาข้อมูล JSON และ JSONL
+
+[ 1. 1. การสร้างคิวรี ]
+
+  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+
+[ 2. 2. การกรอง ]
+
+  Where
+
+[ 3. 3. การฉาย ]
+
+  Select, SelectMany
+
+[ 4. 4. การเรียงลำดับ ]
+
+  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+
+[ 5. 5. การแบ่งหน้า ]
+
+  Skip, Take, SkipWhile, TakeWhile
+
+[ 6. 6. การจัดกลุ่ม ]
+
+  GroupBy, ToLookup
+
+[ 7. 7. การรวม ]
+
+  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+
+[ 8. 8. การดำเนินการชุด ]
+
+  Distinct, Union, Intersect, Except
+
+[ 9. 9. การแปลง ]
+
+  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+
+[ 10. 10. การเชื่อมต่อ ]
+
+  Join, GroupJoin, Concat, Zip
+
+[ 11. 11. ค่าบูลีน ]
+
+  JSON::LINQ::true / JSON::LINQ::false
+
+[ 12. 12. ลิงก์อ้างอิง ]
+
+  https://metacpan.org/dist/JSON-LINQ
+
+======================================================================

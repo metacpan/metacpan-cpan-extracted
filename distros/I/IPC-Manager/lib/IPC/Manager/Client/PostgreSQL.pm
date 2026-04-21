@@ -2,7 +2,7 @@ package IPC::Manager::Client::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
@@ -37,7 +37,7 @@ sub table_sql {
     return (
         <<"        EOT",
             CREATE TABLE IF NOT EXISTS ipcm_peers(
-                "id"        VARCHAR(36)     NOT NULL PRIMARY KEY,
+                "id"        VARCHAR(512)    NOT NULL PRIMARY KEY,
                 "pid"       INTEGER         DEFAULT NULL,
                 "active"    NUMERIC         DEFAULT EXTRACT(epoch FROM NOW()),
                 "stats"     BYTEA           DEFAULT NULL
@@ -46,8 +46,8 @@ sub table_sql {
         <<"        EOT",
             CREATE TABLE IF NOT EXISTS ipcm_messages(
                 "id"        UUID            NOT NULL PRIMARY KEY,
-                "to"        VARCHAR(36)     NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
-                "from"      VARCHAR(36)     NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
+                "to"        VARCHAR(512)    NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
+                "from"      VARCHAR(512)    NOT NULL REFERENCES ipcm_peers(id) ON DELETE CASCADE,
                 "stamp"     NUMERIC         NOT NULL,
                 "content"   BYTEA           NOT NULL,
                 "broadcast" BOOL            NOT NULL DEFAULT FALSE

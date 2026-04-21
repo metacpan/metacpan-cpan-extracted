@@ -1,0 +1,34 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: JSON-LINQ
+version: 1.00
+abstract: LINQ-style query interface for JSON and JSONL files
+author:
+  - ina <ina@cpan.org>
+license: perl
+generated_by: pmake.bat
+requires:
+  Carp: 0
+  perl: 5.00503
+  strict: 1.01
+  vars: 0
+  warnings: 0
+build_requires:
+  Test: 1.122
+minimum_perl_version: 5.00503
+provides:
+  JSON::LINQ:
+    file: lib/JSON/LINQ.pm
+    version: 1.00
+  JSON::LINQ::Boolean:
+    file: lib/JSON/LINQ.pm
+    version: 1.00
+  JSON::LINQ::Ordered:
+    file: lib/JSON/LINQ.pm
+    version: 1.00
+resources:
+  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/JSON-LINQ/issues
+  repository: https://github.com/ina-cpan/JSON-LINQ

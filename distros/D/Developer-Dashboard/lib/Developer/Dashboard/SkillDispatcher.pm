@@ -3,8 +3,9 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '2.72';
+our $VERSION = '2.76';
 
+use Config ();
 use File::Spec;
 use JSON::XS qw(encode_json decode_json);
 use Capture::Tiny qw(capture);
@@ -411,12 +412,23 @@ sub _load_skill_page {
 sub _skill_env {
     my ( $self, %args ) = @_;
     my $skill_path = $args{skill_path} || die 'Missing skill path';
-    my $local_root = File::Spec->catdir( $skill_path, 'local' );
+    my $local_root = File::Spec->catdir( $skill_path, 'perl5' );
+    my $shared_root = File::Spec->catdir( $self->{manager}{paths}->home, 'perl5' );
     my $path_sep   = $^O eq 'MSWin32' ? ';' : ':';
     my @perl5lib   = grep { defined && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
+    for my $shared_lib (
+        File::Spec->catdir( $shared_root, 'lib', 'perl5' ),
+        File::Spec->catdir( $shared_root, 'lib', 'perl5', $Config::Config{archname} || '' ),
+    ) {
+        unshift @perl5lib, $shared_lib if defined $shared_lib && $shared_lib ne '' && -d $shared_lib;
+    }
     for my $layer_path ( reverse @{ $args{skill_layers} || [] } ) {
-        my $local_lib = File::Spec->catdir( $layer_path, 'local', 'lib', 'perl5' );
-        unshift @perl5lib, $local_lib if -d $local_lib;
+        for my $local_lib (
+            File::Spec->catdir( $layer_path, 'perl5', 'lib', 'perl5' ),
+            File::Spec->catdir( $layer_path, 'perl5', 'lib', 'perl5', $Config::Config{archname} || '' ),
+        ) {
+            unshift @perl5lib, $local_lib if defined $local_lib && $local_lib ne '' && -d $local_lib;
+        }
     }
 
     return (

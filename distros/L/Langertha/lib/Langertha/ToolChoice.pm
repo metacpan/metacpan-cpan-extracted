@@ -1,6 +1,6 @@
 package Langertha::ToolChoice;
 # ABSTRACT: Immutable canonical tool-selection policy with cross-provider conversion
-our $VERSION = '0.401';
+our $VERSION = '0.402';
 use Moose;
 use Moose::Util::TypeConstraints qw( enum );
 
@@ -37,7 +37,7 @@ sub from_hash {
   return undef unless defined $val;
 
   if ( !ref($val) ) {
-    return $class->any  if $val eq 'required';
+    return $class->any  if $val eq 'required' || $val eq 'any';
     return $class->auto if $val eq 'auto';
     return $class->none if $val eq 'none';
     return undef;
@@ -61,7 +61,7 @@ sub from_hash {
     return length($name) ? $class->specific($name) : $class->auto;
   }
 
-  return $class->any  if $type eq 'any';
+  return $class->any  if $type eq 'any' || $type eq 'required';
   return $class->auto if $type eq 'auto';
   return $class->none if $type eq 'none';
   return undef;
@@ -118,7 +118,7 @@ Langertha::ToolChoice - Immutable canonical tool-selection policy with cross-pro
 
 =head1 VERSION
 
-version 0.401
+version 0.402
 
 =head1 SUPPORT
 

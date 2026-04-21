@@ -1,0 +1,764 @@
+#!/usr/bin/env perl
+# PODNAME: raider
+# ABSTRACT: Autonomous CLI agent with filesystem and bash access
+
+use strict;
+use warnings;
+use utf8;
+use Getopt::Long qw( GetOptions :config no_ignore_case bundling );
+use JSON::MaybeXS ();
+use YAML::PP ();
+use Term::ANSIColor qw( colored color );
+use Term::ReadLine;                   # Core; upgrades to Gnu if installed
+use IO::Prompt::Tiny qw( prompt );    # Fallback when Gnu is not available
+use Path::Tiny;
+use App::Raider;
+use App::Raider::Skill;
+use Langertha::Raider;
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDIN,  ':encoding(UTF-8)';
+
+# --- Palette: blue tones + yellow accents -------------------------------
+
+my %C = (
+  brand  => 'bold bright_blue',
+  title  => 'bold blue',
+  prompt => 'bold cyan',
+  agent  => 'bright_green',
+  meta   => 'bright_black',
+  accent => 'yellow',
+  warn   => 'yellow',
+  err    => 'red',
+);
+
+sub c { my ($k, @t) = @_; -t STDOUT ? colored([$C{$k}], join('', @t)) : join('', @t) }
+
+# --- Options ------------------------------------------------------------
+
+my %opt;
+my @raw_engine_opts;
+
+GetOptions(
+  'e|engine=s'       => \$opt{engine},
+  'm|model=s'        => \$opt{model},
+  'r|root=s'         => \$opt{root},
+  'M|mission=s'      => \$opt{mission},
+  'k|api-key=s'      => \$opt{api_key},
+  'o|option=s@'      => \@raw_engine_opts,
+  'i|interactive'    => \$opt{interactive},
+  'json'             => \$opt{json},
+  'max-iterations=i' => \$opt{max_iterations},
+  'no-color'         => \$opt{no_color},
+  'trace!'           => \$opt{trace},
+  'customize-prompt'     => \$opt{customize_prompt},
+  'claude'               => \$opt{profile_claude},
+  'openai|codex'         => \$opt{profile_openai},
+  'skills=s@'            => \@{ $opt{skill_dirs} //= [] },
+  'export-skill:s'       => \$opt{export_skill},
+  'export-claude-skill:s'=> \$opt{export_claude_skill},
+  'h|help'               => \$opt{help},
+) or die "Bad options. Try --help.\n";
+
+my %engine_opts;
+for my $pair (@raw_engine_opts) {
+  my ($k, $v) = split /=/, $pair, 2;
+  die "bad -o spec '$pair' (expected key=value)\n" unless defined $k && defined $v;
+  # Auto-coerce simple numerics so temperature=0.2 lands as a number.
+  if    ($v =~ /\A-?\d+\z/)                { $v = 0 + $v }
+  elsif ($v =~ /\A-?\d*\.\d+(?:[eE]-?\d+)?\z/) { $v = 0 + $v }
+  elsif ($v eq 'true')                     { $v = 1 }
+  elsif ($v eq 'false')                    { $v = 0 }
+  $engine_opts{$k} = $v;
+}
+
+$ENV{ANSI_COLORS_DISABLED} = 1 if $opt{no_color} || $opt{json};
+
+if ($opt{help}) {
+  print <<'USAGE';
+Usage: raider [options] [prompt...]
+
+Options:
+  -e, --engine NAME        anthropic, openai, deepseek, groq, mistral, gemini,
+                           minimax, cerebras, openrouter, ollama
+                           (default: auto-detected from available *_API_KEY
+                           env var — anthropic > openai > deepseek > ...)
+  -m, --model NAME         Model identifier (engine-specific cheap default)
+  -k, --api-key KEY        API key (overrides *_API_KEY env var)
+  -o, --option KEY=VALUE   Engine attribute (repeatable), e.g.
+                           -o temperature=0.2 -o response_size=4096
+                           Merged over .raider.yml; CLI wins.
+  -r, --root DIR           Working directory (default: cwd). File tools are
+                           confined to this directory.
+  -M, --mission TEXT       System prompt / mission
+  -i, --interactive        REPL mode (default when stdin is a TTY with no
+                           prompt argv and no pipe; forces it otherwise)
+      --json               Emit JSON ({response, metrics, elapsed}) and exit
+      --max-iterations N   Hard safety cap on tool rounds per raid
+                           (default: 10000 — effectively unlimited)
+      --no-color           Disable ANSI colors
+      --no-trace           Hide live tool-call progress output
+      --customize-prompt   Launch the prompt-builder at startup
+      --claude             Load Claude Code layout: CLAUDE.md +
+                           .claude/skills/*/SKILL.md.
+      --openai / --codex   Load AGENTS.md (the OpenAI Codex / cross-tool
+                           convention).
+      --skills DIR         Load *.md files from DIR as skills (repeatable).
+      --export-skill [PATH]
+                           Write a plain-markdown "how to use raider" doc
+                           (default: ./RAIDER-SKILL.md) and exit.
+      --export-claude-skill [PATH]
+                           Write a Claude Code SKILL.md with frontmatter
+                           (default: .claude/skills/app-raider/SKILL.md)
+                           and exit.
+  -h, --help               Show this help
+
+If no prompt is given and not interactive, reads the prompt from STDIN.
+USAGE
+  exit 0;
+}
+
+my %args;
+$args{engine}         = $opt{engine}         if defined $opt{engine};
+$args{model}          = $opt{model}          if defined $opt{model};
+$args{root}           = $opt{root}           if defined $opt{root};
+$args{mission}        = $opt{mission}        if defined $opt{mission};
+$args{api_key}        = $opt{api_key}        if defined $opt{api_key};
+$args{trace}          = $opt{trace}          if defined $opt{trace};
+$args{max_iterations} = $opt{max_iterations} if defined $opt{max_iterations};
+$args{engine_options} = \%engine_opts        if %engine_opts;
+
+my @skill_specs;
+my @cli_profiles;
+if ($opt{profile_claude}) {
+  push @skill_specs, @{ $App::Raider::AGENT_PROFILES{claude} };
+  push @cli_profiles, 'claude';
+}
+if ($opt{profile_openai}) {
+  push @skill_specs, @{ $App::Raider::AGENT_PROFILES{openai} };
+  push @cli_profiles, 'openai';
+}
+push @skill_specs, { type => 'dir', path => $_ } for @{ $opt{skill_dirs} // [] };
+
+# Persist profile flags to .raider.yml so the user doesn't need to retype
+# --claude / --openai every invocation. Track which ones were freshly
+# persisted this run for the banner "(saved)" hint.
+my %saved_now;
+if (@cli_profiles) {
+  my $root = $opt{root} // Path::Tiny::path('.')->absolute->stringify;
+  %saved_now = persist_profiles($root, \@cli_profiles);
+}
+$args{skill_sources} = \@skill_specs if @skill_specs;
+
+my $app = App::Raider->new(%args);
+
+# One-shot skill export paths. Empty string means "use default path".
+if (defined $opt{export_skill}) {
+  my $path = length $opt{export_skill}
+    ? $opt{export_skill}
+    : Path::Tiny::path($app->root)->child('RAIDER-SKILL.md')->stringify;
+  my $p = App::Raider::Skill->new(app => $app)->write_markdown($path);
+  print STDERR "wrote $p\n";
+  exit 0;
+}
+if (defined $opt{export_claude_skill}) {
+  my $path = length $opt{export_claude_skill} ? $opt{export_claude_skill} : undef;
+  my $p = App::Raider::Skill->new(app => $app)->write_claude_skill($path);
+  print STDERR "wrote $p\n";
+  exit 0;
+}
+
+# Default to interactive REPL when stdin is a terminal and no prompt was given
+# on argv / piped in / requested as one-shot JSON.
+if (!$opt{interactive} && !$opt{json} && !@ARGV && -t STDIN) {
+  $opt{interactive} = 1;
+}
+
+# --- Output helpers -----------------------------------------------------
+
+my $LOGO = <<'LOGO';
+             __     __
+.----.---.-.|__|.--|  |.-----.----.
+|   _|  _  ||  ||  _  ||  -__|   _|
+|__| |___._||__||_____||_____|__|
+LOGO
+
+sub banner {
+  my ($app, $rl_impl, $active_profiles, $saved_now) = @_;
+  $active_profiles //= [];
+  $saved_now       //= {};
+  my $env = $app->api_key_env;
+  my $env_display = defined $env
+    ? ($ENV{$env} ? "$env (set)" : "$env (missing)")
+    : '(no API key required)';
+  my $model = $app->has_model ? $app->model : '(engine default)';
+
+  my $custom = path($app->root)->child('.raider.md');
+  my $persona = -f $custom ? "custom (.raider.md loaded)" : "Langertha (default)";
+
+  print c(brand => $LOGO);
+  print c(accent => " perl agent - powered by Langertha"), "\n\n";
+  my @skills  = $app->loaded_skill_names;
+  my @ignored = $app->ignored_agent_files;
+
+  print c(meta => "persona:  "), c(title => $persona), "\n";
+
+  if (@$active_profiles) {
+    my @parts;
+    for my $p (@$active_profiles) {
+      my $tag = $saved_now->{$p} ? ' (saved)' : '';
+      push @parts, $p . $tag;
+    }
+    print c(meta => "profiles: "), c(title => join(', ', @parts)), "\n";
+  }
+
+  my $skills_line = @skills
+    ? sprintf("%d loaded (%s)", scalar @skills, join(', ', @skills))
+    : 'none';
+  print c(meta => "skills:   "), c(title => $skills_line), "\n";
+
+  for my $ign (@ignored) {
+    print c(meta => "          "), c(warn => "seeing $ign->{path}, ignoring (use --$ign->{profile} to load)"), "\n";
+  }
+  print c(meta => "engine:   "), c(title => $app->engine_name), "\n";
+  print c(meta => "model:    "), c(title => $model), "\n";
+  print c(meta => "api key:  "), c(title => $env_display), "\n";
+  print c(meta => "root:     "), c(title => $app->root), "\n";
+  print c(meta => "readline: "), c(title => $rl_impl), "\n";
+  print c(meta => "type "), c(accent => "/help"), c(meta => " for commands, "),
+        c(accent => "/quit"), c(meta => " to leave"), "\n\n";
+}
+
+sub render_inline_code {
+  my ($text) = @_;
+  return $text unless -t STDOUT && !$ENV{ANSI_COLORS_DISABLED};
+  # Wrap `...` spans with a subtly-darker background. Triple backticks stay
+  # untouched so fenced code blocks keep their own flow.
+  my $code_on  = color('on_grey3');
+  my $agent_on = color($C{agent});
+  my $reset    = color('reset');
+  $text =~ s{(?<!`)`([^`\n]+?)`(?!`)}{$code_on$1$reset$agent_on}g;
+  return $text;
+}
+
+sub persist_profiles {
+  my ($root, $profiles) = @_;
+  my $file = Path::Tiny::path($root)->child('.raider.yml');
+
+  my $yml = {};
+  if (-f $file) {
+    my $loaded = eval { YAML::PP->new->load_string($file->slurp_utf8) };
+    $yml = $loaded if ref $loaded eq 'HASH';
+  }
+
+  my @existing;
+  if (defined $yml->{skills}) {
+    @existing = ref $yml->{skills} eq 'ARRAY' ? @{$yml->{skills}} : ($yml->{skills});
+  }
+  my %have = map { (!ref $_ ? $_ : '') => 1 } @existing;
+
+  my %saved_now;
+  my $changed = 0;
+  for my $p (@$profiles) {
+    next if $have{$p};
+    push @existing, $p;
+    $have{$p} = 1;
+    $saved_now{$p} = 1;
+    $changed = 1;
+  }
+
+  if ($changed) {
+    $yml->{skills} = \@existing;
+    my $dumped = YAML::PP->new->dump_string($yml);
+    $file->spew_utf8($dumped);
+  }
+  return %saved_now;
+}
+
+sub collapse_model_list {
+  my ($list, $current) = @_;
+  my %all    = map { $_ => 1 } @$list;
+  my %groups;   # base => [snapshot variants]
+  my %is_snap;  # id => 1
+
+  for my $id (@$list) {
+    if (my ($base) = ($id =~ /^(.+?)-\d{4}-\d{2}-\d{2}(?:-.+)?$/)) {
+      push @{$groups{$base}}, $id;
+      $is_snap{$id} = 1;
+    }
+    elsif (my ($base2) = ($id =~ /^(.+)-\d{4}$/)) {
+      push @{$groups{$base2}}, $id;
+      $is_snap{$id} = 1;
+    }
+  }
+
+  my @rows;
+  for my $id (sort @$list) {
+    next if $is_snap{$id};
+    my @snaps = sort @{$groups{$id} // []};
+    push @rows, {
+      id      => $id,
+      snaps   => \@snaps,
+      current => ($id eq $current || !!(grep { $_ eq $current } @snaps)),
+    };
+  }
+
+  # orphaned snapshot families whose base isn't a standalone model
+  my %seen = map { $_->{id} => 1 } @rows;
+  for my $base (sort keys %groups) {
+    next if $seen{$base};
+    my @snaps = sort @{$groups{$base}};
+    push @rows, {
+      id      => $base,
+      snaps   => \@snaps,
+      orphan  => 1,
+      current => !!(grep { $_ eq $current } @snaps),
+    };
+  }
+
+  return sort { $a->{id} cmp $b->{id} } @rows;
+}
+
+sub persist_model {
+  my ($root, $model) = @_;
+  my $file = Path::Tiny::path($root)->child('.raider.yml');
+  my $yml = {};
+  if (-f $file) {
+    my $loaded = eval { YAML::PP->new->load_string($file->slurp_utf8) };
+    $yml = $loaded if ref $loaded eq 'HASH';
+  }
+  $yml->{default} = {} unless ref $yml->{default} eq 'HASH';
+  $yml->{default}{model} = $model;
+  $file->spew_utf8(YAML::PP->new->dump_string($yml));
+}
+
+sub print_agent { print c(agent => render_inline_code($_[0])), "\n" }
+sub print_meta  { print c(meta  => $_[0]), "\n" }
+sub print_err   { print c(err   => "error: "), c(warn => $_[0]), "\n" }
+
+sub handle_slash {
+  my ($app, $line) = @_;
+  my ($cmd, @rest) = split /\s+/, $line;
+  $cmd =~ s{^/}{};
+  my $arg = join ' ', @rest;
+
+  if ($cmd eq 'help') {
+    print_meta("commands:");
+    print_meta("  /help                 show this help");
+    print_meta("  /clear                reset conversation history");
+    print_meta("  /metrics              show cumulative raid metrics");
+    print_meta("  /stats                show token usage (when trace is on)");
+    print_meta("  /reload               reload .raider.md into the mission");
+    print_meta("  /prompt               launch the prompt-builder (edits .raider.md)");
+    print_meta("  /skill [PATH]         export plain-markdown skill doc");
+    print_meta("  /skill-claude [PATH]  export Claude Code SKILL.md with frontmatter");
+    print_meta("  /model [NAME]         set+save model to .raider.yml");
+    print_meta("  /model list [FILTER]  list available models (optionally filtered)");
+    print_meta("  /quit /exit :q        leave the REPL");
+    return;
+  }
+  if ($cmd eq 'clear') {
+    $app->raider->clear_history;
+    my $t = $app->trace_plugin;
+    $t->token_stats({ prompt => 0, completion => 0, total => 0, calls => 0 }) if $t;
+    print_meta("history cleared.");
+    return;
+  }
+  if ($cmd eq 'metrics') {
+    my $m = $app->raider->metrics;
+    print_meta(sprintf(
+      "raids=%d iterations=%d tool_calls=%d time_ms=%d",
+      $m->{raids}, $m->{iterations}, $m->{tool_calls}, $m->{time_ms},
+    ));
+    return;
+  }
+  if ($cmd eq 'stats') {
+    my $s = $app->token_stats;
+    unless ($s) {
+      print_meta("stats unavailable (trace is off — start without --no-trace).");
+      return;
+    }
+    print_meta(sprintf(
+      "llm calls: %d | tokens in: %d | out: %d | total: %d",
+      $s->{calls}, $s->{prompt}, $s->{completion}, $s->{total},
+    ));
+    return;
+  }
+  if ($cmd eq 'reload') {
+    my $new = $app->reload_mission;
+    my $file = path($app->root)->child('.raider.md');
+    my $status = -f $file ? "custom (.raider.md loaded)" : "Langertha (default, no .raider.md)";
+    print_meta("mission reloaded: $status (" . length($new) . " chars)");
+    return;
+  }
+  if ($cmd eq 'prompt') {
+    run_prompt_builder($app);
+    return;
+  }
+  if ($cmd eq 'skill') {
+    my $path = $arg || Path::Tiny::path($app->root)->child('RAIDER-SKILL.md')->stringify;
+    my $p = App::Raider::Skill->new(app => $app)->write_markdown($path);
+    print_meta("wrote $p");
+    return;
+  }
+  if ($cmd eq 'skill-claude') {
+    my $path = length $arg ? $arg : undef;
+    my $p = App::Raider::Skill->new(app => $app)->write_claude_skill($path);
+    print_meta("wrote $p");
+    return;
+  }
+  if ($cmd eq 'model') {
+    my ($subcmd, $filter) = split /\s+/, $arg, 2;
+
+    if (!length $arg || ($subcmd eq 'list')) {
+      my $current = $app->has_model ? $app->model : '';
+      print c(meta => "engine:  "), c(title => $app->engine_name), "\n";
+      print c(meta => "model:   "), c(title => length $current ? $current : '(engine default)'), "\n";
+      my $engine = eval { $app->_engine };
+      if ($engine && $engine->can('list_models')) {
+        my $list = eval { $engine->list_models };
+        if ($@) {
+          my $err = $@; chomp $err;
+          print_err("list_models failed: $err");
+        }
+        elsif (@$list) {
+          my @filtered = length($filter // '')
+            ? grep { index($_, $filter) >= 0 } @$list
+            : @$list;
+          my @rows    = collapse_model_list(\@filtered, $current);
+          my $total   = scalar @rows;
+          my $cap     = (defined $subcmd && $subcmd eq 'list') ? $total : 20;
+          my @show    = @rows[0 .. ($cap < $total ? $cap - 1 : $total - 1)];
+          print c(meta => "models" . (length($filter // '') ? " (/$filter/)" : "") . ":"), "\n";
+          for my $row (@show) {
+            my $star  = $row->{current} ? c(accent => '*') : ' ';
+            my $name  = c(title => $row->{id});
+            my $snaps = @{$row->{snaps}}
+              ? c(meta => '  [+' . scalar(@{$row->{snaps}}) . (scalar(@{$row->{snaps}}) == 1 ? ' snapshot]' : ' snapshots]'))
+              : '';
+            print "  $star $name$snaps\n";
+          }
+          if ($cap < $total) {
+            print c(meta => "    … $cap of $total shown — /model list [filter] for all"), "\n";
+          }
+        }
+      }
+      return;
+    }
+    persist_model($app->root, $arg);
+    print c(meta => "model saved: "), c(title => $arg), c(meta => " (takes effect on next start)"), "\n";
+    return;
+  }
+  print_err("unknown command: /$cmd (try /help)");
+}
+
+sub run_prompt_builder {
+  my ($app) = @_;
+  my $file = path($app->root)->child('.raider.md');
+  my $current = -f $file ? $file->slurp_utf8 : '(no .raider.md yet — Langertha default persona is active)';
+
+  my $meta_mission = <<"EOM";
+You are the raider prompt-builder. Your only job right now is to help the user
+craft a .raider.md file that customizes the persona and instructions of
+"raider" (the CLI agent; the default persona is Langertha, a viking
+shield-maiden).
+
+Current .raider.md content:
+---
+$current
+---
+
+Rules:
+  - Converse naturally with the user. Ask what persona, tone, rules or
+    constraints they want.
+  - When the user is satisfied, use write_file to save to:
+      @{[ $file ]}
+  - After writing, confirm what you saved and tell the user they can type
+    "/done" to return to the main agent (the main agent will auto-reload the
+    new persona).
+  - If the user asks you to cancel, do not write anything; just confirm.
+  - Do NOT call bash or any tool other than read_file / write_file / edit_file
+    during this session.
+EOM
+
+  my $builder_raider = Langertha::Raider->new(
+    engine         => $app->_engine,
+    mission        => $meta_mission,
+    max_iterations => 20,
+  );
+
+  print_meta("entering prompt-builder. /done to return, /cancel to discard.");
+  my $ps = 'raider:prompt> ';
+
+  while (1) {
+    print $ps;
+    my $line = <STDIN>;
+    last unless defined $line;
+    chomp $line;
+    $line =~ s/^\s+|\s+$//g;
+    next unless length $line;
+
+    if ($line =~ m{^/(?:done|back|exit|quit)$}i) {
+      my $new = $app->reload_mission;
+      print_meta("prompt-builder finished. mission reloaded (" . length($new) . " chars).");
+      last;
+    }
+    if ($line =~ m{^/cancel$}i) {
+      print_meta("prompt-builder cancelled.");
+      last;
+    }
+
+    my $f = $builder_raider->raid_f($line);
+    $app->loop->await($f);
+    my $r = eval { $f->get };
+    if ($@) {
+      my $err = $@; chomp $err;
+      print_err($err);
+      next;
+    }
+    print_agent("$r");
+  }
+}
+
+# --- Run one prompt -----------------------------------------------------
+
+sub run_one {
+  my ($text, %o) = @_;
+  return unless defined $text && length $text;
+
+  my $t0 = time;
+  my $result;
+  my $ok = eval { $result = $app->run($text); 1 };
+  my $elapsed = time - $t0;
+
+  unless ($ok) {
+    my $err = $@; chomp $err;
+    if ($o{json}) {
+      print JSON::MaybeXS->new(utf8 => 1, pretty => 1, canonical => 1)
+        ->encode({ error => $err, elapsed => $elapsed });
+    }
+    else {
+      print_err($err);
+    }
+    return;
+  }
+
+  my $m = $app->raider->metrics;
+
+  if ($o{json}) {
+    print JSON::MaybeXS->new(utf8 => 1, pretty => 1, canonical => 1)->encode({
+      response => "$result",
+      metrics  => $m,
+      elapsed  => $elapsed,
+    });
+    return;
+  }
+
+  print_agent("$result");
+
+  my $tok = $app->token_stats;
+  my $tok_part = $tok
+    ? sprintf(" | tokens %d in / %d out / %d total",
+        $tok->{prompt}, $tok->{completion}, $tok->{total})
+    : '';
+
+  my $r   = $app->raider;
+  my $msgs = scalar @{$r->history};
+  my $last = $r->has_last_prompt_tokens ? $r->_last_prompt_tokens : 0;
+  my $cap  = $r->max_context_tokens;
+  my $pct  = $cap ? int(100 * $last / $cap) : 0;
+  my $hist_part = sprintf(" | history %d msgs, %d/%d tok (%d%%)",
+    $msgs, $last, $cap, $pct);
+
+  print_meta(sprintf(
+    "%ds%s%s",
+    $elapsed, $hist_part, $tok_part,
+  ));
+}
+
+# --- CLI entry ----------------------------------------------------------
+
+if ($opt{interactive}) {
+  # Prefer Term::ReadLine::Gnu (line editing + persistent history).
+  # Fall back to IO::Prompt::Tiny when Gnu isn't installed.
+  my ($histfile, $read_line, $impl);
+  my $term     = Term::ReadLine->new('raider');
+  my $have_gnu = ($term->ReadLine =~ /Gnu/);
+
+  if ($have_gnu) {
+    $term->ornaments(0);
+    $impl     = $term->ReadLine;
+    $histfile = path($ENV{HOME} // '.')->child('.raider_history')->stringify;
+    eval { $term->ReadHistory($histfile) } if -f $histfile;
+    # Gray prompt, plain-color user input. Non-printing sequences are
+    # wrapped in \x01...\x02 so readline computes prompt width correctly.
+    my $ps = "\x01" . color('bright_black') . "\x02"
+           . 'raider> '
+           . "\x01" . color('reset') . "\x02";
+    $read_line = sub { $term->readline($ps) };
+    # Save history on Ctrl-C / SIGTERM so entries survive interrupted sessions
+    my $save_and_exit = sub {
+      eval { $term->WriteHistory($histfile) };
+      print c(meta => "\nbye."), "\n";
+      exit 0;
+    };
+    $SIG{INT}  = $save_and_exit;
+    $SIG{TERM} = $save_and_exit;
+  }
+  else {
+    $impl      = 'IO::Prompt::Tiny (install Term::ReadLine::Gnu for history)';
+    $read_line = sub { prompt('raider>') };
+    $SIG{INT}  = sub { print c(meta => "\nbye."), "\n"; exit 0 };
+  }
+
+  # Collect active profile names: CLI flags + any persisted in .raider.yml.
+  my %seen_prof;
+  my @active_profiles;
+  for my $p (@cli_profiles) {
+    next if $seen_prof{$p}++;
+    push @active_profiles, $p;
+  }
+  {
+    my $ymlfile = Path::Tiny::path($app->root)->child('.raider.yml');
+    if (-f $ymlfile) {
+      my $ydata = eval { YAML::PP->new->load_string($ymlfile->slurp_utf8) };
+      if (ref $ydata eq 'HASH' && defined $ydata->{skills}) {
+        my @list = ref $ydata->{skills} eq 'ARRAY'
+          ? @{$ydata->{skills}}
+          : ($ydata->{skills});
+        for my $it (@list) {
+          next if ref $it;
+          next unless $it eq 'claude' || $it eq 'openai' || $it eq 'codex' || $it eq 'agents';
+          my $norm = ($it eq 'codex' || $it eq 'agents') ? 'openai' : $it;
+          next if $seen_prof{$norm}++;
+          push @active_profiles, $norm;
+        }
+      }
+    }
+  }
+
+  banner($app, $impl, \@active_profiles, \%saved_now);
+
+  if ($opt{customize_prompt}) {
+    run_prompt_builder($app);
+  }
+
+  run_one(join(' ', @ARGV)) if @ARGV;
+
+  while (defined(my $line = $read_line->())) {
+    $line =~ s/^\s+|\s+$//g;
+    next unless length $line;
+
+    if ($line =~ m{^(?:/quit|/exit|:q|quit|exit)$}i) {
+      print c(meta => "bye."), "\n";
+      last;
+    }
+    if ($line =~ m{^/}) {
+      $term->addhistory($line) if $have_gnu;
+      handle_slash($app, $line);
+      next;
+    }
+
+    $term->addhistory($line) if $have_gnu;
+    run_one($line);
+  }
+
+  if ($have_gnu) {
+    eval { $term->WriteHistory($histfile) };
+  }
+}
+else {
+  my $text;
+  if (@ARGV) {
+    $text = join(' ', @ARGV);
+  }
+  elsif (-t STDIN) {
+    # Interactive terminal but no -i and no argv: ask once.
+    $text = prompt(c(prompt => 'raider>'));
+  }
+  else {
+    local $/;
+    $text = <STDIN>;
+  }
+  die "No prompt given.\n" unless defined $text && length $text;
+  run_one($text, json => $opt{json});
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+raider - Autonomous CLI agent with filesystem and bash access
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    raider "Find all TODO comments in lib/ and summarize them"
+    raider -e openai -m gpt-4o "Run the test suite and fix any trivial failures"
+    raider -i -r ~/dev/myproject
+    raider --json "Summarize README.md" > result.json
+
+=head1 DESCRIPTION
+
+F<raider> is the CLI front-end for L<App::Raider>. It wires an LLM engine
+(via L<Langertha>) to a filesystem tool server and L<MCP::Run::Bash>,
+then runs the L<Langertha::Raider> multi-turn agent loop on your prompt.
+
+Interactive mode (C<-i>) opens a REPL with conversation history retained
+across turns. With L<Term::ReadLine::Gnu> installed, line editing and
+persistent input history (F<~/.raider_history>) are enabled automatically —
+including across Ctrl-C interrupts. Slash commands available in the REPL:
+C</help>, C</clear>, C</metrics>, C</stats>, C</reload>, C</prompt>,
+C</skill>, C</skill-claude>, C</model>, C</quit>.
+
+With C<--json>, F<raider> emits a single JSON object
+(C<{response, metrics, elapsed}>) instead of the human-oriented output, which
+is useful for scripting.
+
+API keys come from standard environment variables
+(C<ANTHROPIC_API_KEY>, C<OPENAI_API_KEY>, etc.).
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<App::Raider>
+
+=item * L<Langertha::Raider>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-app-raider/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

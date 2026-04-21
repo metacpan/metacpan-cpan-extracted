@@ -37,7 +37,7 @@ sub filterKey2F {
 }
 
 sub isHiddenAttr {
-    my ( $conf, $attr, @extra_hidden_attributes ) = @_;
+    my ( $hiddenAttributes, $attr, @extra_hidden_attributes ) = @_;
     my ( @regexps, $match );
 
     my %hiddenAttributes = map { $_ => 1 } grep {
@@ -48,8 +48,7 @@ sub isHiddenAttr {
         else {
             1;
         }
-    } ( split( /[,\s]+/, $conf->{hiddenAttributes} ),
-        @extra_hidden_attributes );
+    } ( split( /[,\s]+/, $hiddenAttributes ), @extra_hidden_attributes );
 
     my $regex =
       keys %hiddenAttributes
@@ -112,7 +111,7 @@ This method computes the unique ID of each 2F device, for use with the API and C
 
 This method formats device name for logging purpose
 
-=head3 isHiddenAttr( $conf, $attr, @extra_hidden_attributes )
+=head3 isHiddenAttr( $conf_value, $attr, @extra_hidden_attributes )
 
 This method tests if the attribute is hidden.
 @extra_hidden_attributes is an array of additional attributes to hide.

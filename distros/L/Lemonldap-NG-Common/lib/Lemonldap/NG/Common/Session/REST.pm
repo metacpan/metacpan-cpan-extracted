@@ -14,6 +14,11 @@ has sessionTypes => ( is => 'rw' );
 # Boolean value to tell if storage ID is hashed or not
 has hashedSessionStore => ( is => 'rw' );
 
+sub hiddenAttributes {
+    my ($self) = @_;
+    return $self->{hiddenAttributes} || $self->conf->{hiddenAttributes};
+}
+
 sub setTypes {
     my ( $self, $conf ) = @_;
     foreach my $type (@sessionTypes) {
@@ -467,7 +472,8 @@ sub _session {
     my %session = %{ $apacheSession->data };
     unless ($raw) {
         foreach ( keys %session ) {
-            $session{$_} = '******' if isHiddenAttr( $self->conf, $_ );
+            $session{$_} = '******'
+              if isHiddenAttr( $self->hiddenAttributes, $_ );
         }
     }
 

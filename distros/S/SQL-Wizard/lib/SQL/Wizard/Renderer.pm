@@ -261,7 +261,16 @@ sub _render_alias {
   if ($node->{expr}->isa('SQL::Wizard::Expr::Select')) {
     $sql = "($sql)";
   }
-  return ("$sql AS " . $self->_quote_ident_if_needed($node->{alias}), @bind);
+  my $alias = $node->{alias};
+  my $quoted_alias;
+  if ($alias =~ /\./) {
+    # Dotted alias: quote as a single identifier (e.g. "d.domain"), not as schema.column
+    my $q = ($self->{dialect} || 'ansi') eq 'mysql' ? '`' : '"';
+    $quoted_alias = $q . ($alias =~ s/\Q$q\E/$q$q/gr) . $q;
+  } else {
+    $quoted_alias = $self->_quote_ident_if_needed($alias);
+  }
+  return ("$sql AS $quoted_alias", @bind);
 }
 
 sub _render_order {

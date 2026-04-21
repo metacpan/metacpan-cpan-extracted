@@ -3,10 +3,11 @@ package Developer::Dashboard::CLI::Which;
 use strict;
 use warnings;
 
-our $VERSION = '2.72';
+our $VERSION = '2.76';
 
 use Cwd qw(cwd);
 use File::Spec;
+use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::InternalCLI;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Platform qw(command_argv_for_path resolve_runnable_file is_runnable_file);
@@ -18,17 +19,24 @@ use Developer::Dashboard::SkillManager;
 # Input: command name under "command" plus the remaining argv array reference
 # under "args".
 # Output: prints the resolved command path plus hook file paths to STDOUT and
-# returns a process exit code, or dies with a usage message when invalid.
+# returns a process exit code, or re-enters dashboard open-file when --edit is
+# requested, or dies with a usage message when invalid.
 sub run_which_command {
     my (%args) = @_;
     my $command = $args{command} || die "Missing command name\n";
     my $argv    = $args{args}    || die "Missing command arguments\n";
     die "Command arguments must be an array reference\n" if ref($argv) ne 'ARRAY';
-    die "Usage: dashboard which <cmd>|<skill>.<cmd>\n" if $command ne 'which';
+    die _usage() if $command ne 'which';
 
     my @argv = @{$argv};
-    my $target = shift @argv || die "Usage: dashboard which <cmd>|<skill>.<cmd>\n";
-    die "Usage: dashboard which <cmd>|<skill>.<cmd>\n" if @argv;
+    my $edit = 0;
+    GetOptionsFromArray(
+        \@argv,
+        'edit!' => \$edit,
+    );
+
+    my $target = shift @argv || die _usage();
+    die _usage() if @argv;
 
     my $paths = _build_paths();
     my $result = _locate_target(
@@ -37,9 +45,22 @@ sub run_which_command {
     );
     die "Command '$target' not found\n" if !$result->{command};
 
+    if ($edit) {
+        _command_exec( _dashboard_entry_command(), 'open-file', $result->{command} );
+        return 0;
+    }
+
     print "COMMAND $result->{command}\n";
     print "HOOK $_\n" for @{ $result->{hooks} || [] };
     return 0;
+}
+
+# _usage()
+# Returns the usage text for dashboard which.
+# Input: none.
+# Output: usage string.
+sub _usage {
+    return "Usage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\n";
 }
 
 # _build_paths()
@@ -221,6 +242,27 @@ sub _resolve_directory_runner {
     return;
 }
 
+# _dashboard_entry_command()
+# Resolves the public dashboard entrypoint used when which --edit re-enters
+# dashboard open-file.
+# Input: none.
+# Output: command list whose first element is the dashboard executable path or
+# command name.
+sub _dashboard_entry_command {
+    my $entrypoint = $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || 'dashboard';
+    return ($entrypoint);
+}
+
+# _command_exec(@command)
+# Wraps process exec so tests can override it and inspect the final dashboard
+# open-file handoff.
+# Input: shell command array.
+# Output: never returns during normal command execution.
+sub _command_exec {
+    my (@command) = @_;
+    exec { $command[0] } @command;
+}
+
 1;
 
 __END__
@@ -236,13 +278,16 @@ Developer::Dashboard::CLI::Which - lightweight command and hook locator
       command => 'which',
       args    => \@ARGV,
   );
+  # dashboard which [--edit] jq
 
 =head1 DESCRIPTION
 
 Implements the lightweight C<dashboard which> helper so the public entrypoint
 can show the resolved runnable file plus the participating hook files for a
 built-in command, layered custom command, or dotted skill command without
-loading the full runtime.
+loading the full runtime. When users pass C<--edit>, it re-enters the public
+C<dashboard open-file> command with the resolved command file path instead of
+printing the inspection output.
 
 =for comment FULL-POD-DOC START
 
@@ -264,7 +309,8 @@ file wins and which hooks will participate.
 
 Use this file when changing the public C<dashboard which> contract, the way the
 switchboard resolves built-in versus custom commands, or the way skill command
-and hook discovery should be presented for debugging.
+and hook discovery should be presented for debugging, or the way C<--edit>
+hands off to C<dashboard open-file>.
 
 =head1 HOW TO USE
 
@@ -272,13 +318,17 @@ Call C<run_which_command(command =E<gt> 'which', args =E<gt> \@ARGV)>. The modul
 builds a lightweight path registry, detects whether the target is a built-in
 helper, a layered custom command, or a dotted skill command, then prints one
 C<COMMAND /full/path> line followed by zero or more C<HOOK /full/path> lines in
-the same order the runtime would execute them.
+the same order the runtime would execute them. When users add C<--edit>, the
+module skips the printed inspection output and re-enters C<dashboard open-file>
+with the resolved command file path so the existing editor-selection behavior
+is reused.
 
 =head1 WHAT USES IT
 
 It is used by the staged C<which> private helper, by CLI smoke tests that pin
-the visible shell contract, and by contributors debugging DD-OOP-LAYERS command
-resolution and skill hook chains.
+the visible shell contract, by users who want to open the resolved command file
+through the public C<dashboard open-file> path, and by contributors debugging
+DD-OOP-LAYERS command resolution and skill hook chains.
 
 =head1 EXAMPLES
 
@@ -286,6 +336,7 @@ resolution and skill hook chains.
   dashboard which layered-tool
   dashboard which example-skill.run-test
   dashboard which example-skill.level1.level2.here
+  dashboard which --edit jq
 
 =for comment FULL-POD-DOC END
 

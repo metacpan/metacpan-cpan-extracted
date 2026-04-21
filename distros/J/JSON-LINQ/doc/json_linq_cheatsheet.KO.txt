@@ -1,0 +1,75 @@
+======================================================================
+ JSON::LINQ 치트시트                                       [KO] 한국어
+======================================================================
+
+[ 1. 쿼리 생성 ]
+
+  use JSON::LINQ;
+  # JSON 파일에서 읽기 (최상위 배열)
+  my $q = JSON::LINQ->FromJSON('data.json');
+  # JSONL 파일에서 읽기 (줄당 하나의 JSON 객체, 스트리밍)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+  # JSON 문자열에서
+  my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
+  # 메모리 배열에서
+  my $q = JSON::LINQ->From(\@array);
+  # 빈 시퀀스
+  my $q = JSON::LINQ->Empty();
+  # 정수 시퀀스: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
+
+[ 2. 필터링 ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+[ 3. 프로젝션 ]
+
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+[ 4. 정렬 ]
+
+  ->OrderBy(sub { $_[0]{name} })           # 오름차순 (스마트)
+  ->OrderByDescending(sub { $_[0]{score} }) # 내림차순 (스마트)
+  ->OrderByNum(sub { $_[0]{price} })        # 숫자 오름차순
+  ->ThenBy(sub { $_[0]{name} })             # 보조 정렬 오름차순
+  ->Reverse()                               # 역순
+
+[ 5. 페이징 ]
+
+  ->Skip(10)  # 처음 10개 건너뜀
+  ->Take(5)   # 다음 5개 가져옴
+
+[ 6. 그룹화 ]
+
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  my $lookup = $q->ToLookup(sub { $_[0]{dept} });
+
+[ 7. 집계 (터미널 메서드) ]
+
+  ->Count()                            # 요소 수
+  ->Sum(sub { $_[0]{amount} })         # 합계
+  ->Average(sub { $_[0]{score} })      # 평균 (빈 경우 die)
+  ->Min(sub { $_[0]{price} })           # 최솟값
+  ->Max(sub { $_[0]{price} })           # 최댓값
+  ->First()  ->FirstOrDefault()        # 첫 번째 요소
+  ->Any()    ->All(sub { ... })        # 한정사
+  ->ForEach(sub { print $_[0] })        # 각 요소 실행
+
+[ 8. 출력 메서드 ]
+
+  ->ToJSON('output.json')    # JSON 배열 파일로 출력
+  ->ToJSONL('output.jsonl')  # JSONL 파일로 출력
+
+[ 9. 불리언 값 ]
+
+  JSON::LINQ::true    # "true" / 1
+  JSON::LINQ::false   # "false" / 0
+
+[ 10. 참고 링크 ]
+
+  JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
+  JSONL 명세: https://jsonlines.org/
+
+======================================================================

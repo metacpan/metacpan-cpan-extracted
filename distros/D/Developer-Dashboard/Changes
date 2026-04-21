@@ -1,3 +1,45 @@
+2.76  2026-04-20
+    - changed skill dependency installation policy so `dashboard skills install`
+      now processes `ddfile`, `aptfile`, `brewfile`, `cpanfile`, and
+      `cpanfile.local` in that exact order
+    - moved skill `cpanfile` installs into the shared `~/perl5` tree while
+      keeping `cpanfile.local` isolated under each skill's `./perl5` root
+    - taught skill dispatch to expose both the shared `~/perl5` libraries and
+      any participating skill-local `perl5/lib/perl5` trees through `PERL5LIB`
+    - documented the new skill dependency contract, added metadata booleans
+      for `ddfile`, `brewfile`, and `cpanfile.local`, and covered Debian,
+      macOS, and loop-prevention paths with focused regression tests
+
+2.75  2026-04-20
+    - fixed `cdr` directory narrowing so unreadable subdirectories are skipped
+      explicitly instead of aborting the whole lookup with `opendir(...)`
+      failures
+    - added `dashboard path complete-cdr` plus generated shell bootstrap
+      completion for `cdr`, `dd_cdr`, and `which_dir` across bash, zsh, and
+      PowerShell
+    - added path-helper and shell-smoke regression coverage for cdr-family
+      completion and unreadable-subtree safety
+    - fixed the release packaging drift so the built tarball now keeps the
+      shipped Markdown testing guides plus the `integration/` verification
+      helpers needed by install-time tarball tests, with explicit tarball
+      content regression coverage
+
+2.74  2026-04-20
+    - taught `dashboard which` to accept `--edit` for built-in helpers,
+      layered custom commands, single-level skill commands, and nested skill
+      commands, re-entering `dashboard open-file` with the resolved command
+      file path instead of only printing the inspection output
+    - documented the new `dashboard which --edit` behavior across the README,
+      the main manual, the private which helper POD, the public dashboard
+      synopsis, and the dedicated which-command guide, with focused regression
+      coverage for built-in and skill command editing paths
+
+2.73  2026-04-20
+    - fixed the CI-only integration-assets failure by tracking `doc/testing.md`
+      in git, unignoring it in `.gitignore`, and teaching the integration
+      asset gate to assert the testing workflow document is both present and
+      tracked before it is read
+
 2.72  2026-04-20
     - normalized Windows `cmd.exe` launcher argv so `.cmd` and `.bat`
       execution keeps returning `cmd.exe` even on WSL hosts that surface the

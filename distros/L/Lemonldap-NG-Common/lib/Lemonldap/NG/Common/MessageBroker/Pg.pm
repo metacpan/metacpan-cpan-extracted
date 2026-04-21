@@ -5,7 +5,7 @@ use JSON;
 use POSIX qw(:signal_h);
 use Lemonldap::NG::Common::Lib::DBI qw(check_dbh);
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.2';
 
 sub new {
     my ( $class, $conf, $logger ) = @_;

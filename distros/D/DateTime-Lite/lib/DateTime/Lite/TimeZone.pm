@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.5.2
+## Version v0.5.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/19
+## Modified 2026/04/20
 ## All rights reserved
 ## 
 ## 
@@ -86,7 +86,7 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.5.2';
+    our $VERSION = 'v0.5.3';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
@@ -1201,19 +1201,37 @@ SQL
         ? "\nHAVING " . join( "\n   AND ", @having_parts )
         : "";
     # We JOIN transition to get MAX(trans_time) per zone for:
-    #   1. Default sort order: most-recently-used first (DESC).
-    #   2. Period filtering via HAVING on MAX(trans_time).
+    #   1. Period filtering via HAVING on MAX(trans_time).
+    #   2. Secondary sort keys: MIN(trans_time) = first use of the abbreviation,
+    #      MAX(trans_time) = most recent use.
     # DISTINCT is replaced by GROUP BY zone since we aggregate.
+    #
+    # Sort strategy (most discriminating first):
+    #   1. is_active DESC: zones whose POSIX footer still mentions the
+    #      abbreviation come before zones that no longer use it.
+    #   2. first_trans_time ASC: among active (or among inactive) zones,
+    #      the one that adopted the abbreviation earliest comes first.
+    #   3. last_trans_time DESC: tie-break by persistence (still-using vs
+    #      early-abandoned) when first_trans_time is equal.
+    #   4. z.name ASC: final deterministic tie-breaker.
+    #
+    # is_active cannot be computed in SQL (word-boundary regex over
+    # footer_tz_string), so we fetch footer_tz_string, compute is_active in
+    # Perl post-query, then re-sort. The SQL ORDER BY below applies the other
+    # three keys, which is useful because the final Perl sort is stable over
+    # rows already ordered by (first ASC, last DESC, name ASC).
     my $query = <<"SQL_IANA";
 SELECT z.name AS zone_name, t.utc_offset, t.is_dst,
+       z.footer_tz_string,
+       MIN(tr.trans_time) AS first_trans_time,
        MAX(tr.trans_time) AS last_trans_time
 FROM types t
 JOIN zones z       ON z.zone_id  = t.zone_id
 JOIN transition tr ON tr.zone_id = t.zone_id AND tr.type_id = t.type_id
 WHERE z.canonical = 1
   AND t.abbreviation = ?
-GROUP BY z.name, t.utc_offset, t.is_dst${having_sql}
-ORDER BY last_trans_time DESC
+GROUP BY z.name, t.utc_offset, t.is_dst, z.footer_tz_string${having_sql}
+ORDER BY first_trans_time ASC, last_trans_time DESC, z.name ASC
 SQL_IANA
     # Use the SQL string itself as the cache key - provably collision-free
     # regardless of any subtlety in the period_key_parts logic.
@@ -1266,19 +1284,53 @@ SQL_IANA
         # different offsets and get ambiguous => 1.
         my %offsets = map{ $_->{utc_offset} => 1 } @$all;
         my $ambiguous = scalar( keys( %offsets ) ) > 1 ? 1 : 0;
+
+        # Compute is_active from footer_tz_string via word-bounded regex.
+        # Alphabetic abbreviations: must not be adjacent to another alpha char
+        # (so CEST's footer "CET-1CEST" does not match a search for "CST").
+        # Numeric/sign-prefixed abbreviations (such as '-03' or '+0430'): must
+        # appear wrapped in <...> per POSIX TZ spec. The regex is compiled
+        # once per call; the resulting ~35 microseconds per call overhead
+        # has been measured on the full 178-abbreviation test set.
+        my $rx;
+        if( $abbr =~ /^[A-Za-z]+\z/ )
+        {
+            $rx = qr/(?:^|[^A-Za-z])\Q$abbr\E(?:[^A-Za-z]|\z)/;
+        }
+        else
+        {
+            $rx = qr/<\Q$abbr\E>/;
+        }
+
+        foreach my $row ( @$all )
+        {
+            my $footer = $row->{footer_tz_string};
+            $row->{is_active} =
+                ( defined( $footer ) && length( $footer ) && $footer =~ $rx )
+                    ? 1 : 0;
+        }
+
+        # Re-sort with is_active as primary key. The SQL already gave us
+        # (first_trans_time ASC, last_trans_time DESC, name ASC), so a
+        # stable sort on is_active preserves that ordering within each group.
+        # Perl's sort is stable since 5.8, so this is safe.
+        my @sorted = sort { $b->{is_active} <=> $a->{is_active} } @$all;
+
         return([
             map
             {
                 {
-                    zone_name       => $_->{zone_name},
-                    utc_offset      => $_->{utc_offset},
-                    is_dst          => $_->{is_dst} ? 1 : 0,
-                    ambiguous       => $ambiguous,
-                    extended        => 0,
-                    last_trans_time => $_->{last_trans_time},
+                    zone_name        => $_->{zone_name},
+                    utc_offset       => $_->{utc_offset},
+                    is_dst           => $_->{is_dst} ? 1 : 0,
+                    ambiguous        => $ambiguous,
+                    is_active        => $_->{is_active},
+                    extended         => 0,
+                    first_trans_time => $_->{first_trans_time},
+                    last_trans_time  => $_->{last_trans_time},
                 }
             }
-            @$all
+            @sorted
         ]);
     }
 
@@ -3044,20 +3096,24 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
     my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST' );
     # $results = [
     #     {
-    #         ambiguous       => 0,
-    #         extended        => 0,
-    #         is_dst          => 0,
-    #         last_trans_time => -577962000,
-    #         utc_offset      => 32400,
-    #         zone_name       => "Asia/Tokyo",
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -2587712400,
+    #         is_active        => 1,
+    #         is_dst           => 0,
+    #         last_trans_time  => -577962000,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Tokyo",
     #     },
     #     {
-    #         ambiguous       => 0,
-    #         extended        => 0,
-    #         is_dst          => 0,
-    #         last_trans_time => -880016400,
-    #         utc_offset      => 32400,
-    #         zone_name       => "Asia/Manila",
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -1830414600,
+    #         is_active        => 0,
+    #         is_dst           => 0,
+    #         last_trans_time  => -1830414600,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Pyongyang",
     #     },
     #     # etc...
     # ]
@@ -3124,7 +3180,7 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
 
 =head1 VERSION
 
-    v0.5.2
+    v0.5.3
 
 =head1 DESCRIPTION
 
@@ -3785,7 +3841,7 @@ Examples: C<+0900>, C<-0200>, C<0900>, C<+090000>, C<090000>
     say $zone->offset_as_string(32400);                          # +0900
     say $zone->offset_as_string(32400, ':');                     # +09:00
 
-Class or instance method. This converts a numeric UTC offset in seconds to a formatted string such as C<+0900> (default) or C<+09:00> (with C<':'> as separator).
+Class or instance method. This converts a numeric UTC offset in seconds to a formatted string such as C<+0900> (default) or C<+09:00> (with C<:> as separator).
 
 Drop-in compatible with L<DateTime::TimeZone/offset_as_string>.
 
@@ -3812,24 +3868,28 @@ Upon error, then this sets an L<error object|DateTime::Lite::Exception>, and ret
 =head2 resolve_abbreviation
 
     # Unambiguous: JST maps to a single UTC offset
-    # Results sorted by most-recently-used first (last_trans_time DESC).
+    # Results sorted by is_active DESC, first_trans_time ASC, last_trans_time DESC, name ASC.
     my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST' );
     # $results = [
     #     {
-    #         ambiguous       => 0,
-    #         extended        => 0,
-    #         is_dst          => 0,
-    #         last_trans_time => -577962000,
-    #         utc_offset      => 32400,
-    #         zone_name       => "Asia/Tokyo",
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -2587712400,
+    #         is_active        => 1,
+    #         is_dst           => 0,
+    #         last_trans_time  => -577962000,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Tokyo",
     #     },
     #     {
-    #         ambiguous       => 0,
-    #         extended        => 0,
-    #         is_dst          => 0,
-    #         last_trans_time => -880016400,
-    #         utc_offset      => 32400,
-    #         zone_name       => "Asia/Manila",
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -1830414600,
+    #         is_active        => 0,
+    #         is_dst           => 0,
+    #         last_trans_time  => -1830414600,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Pyongyang",
     #     },
     #     # etc...
     # ]
@@ -3872,7 +3932,23 @@ Upon error, then this sets an L<error object|DateTime::Lite::Exception>, and ret
 
 Class or instance method. Resolves a timezone abbreviation such as C<JST> or C<EST> against the IANA data in the bundled C<tz.sqlite3> database, returning all canonical zones that have ever used that abbreviation.
 
-Results are sorted by the most recent transition using the abbreviation (C<last_trans_time> descending), so the currently-active or most-recently-active zone appears first.
+IANA results are sorted by a four-level key:
+
+=over 4
+
+=item 1. C<is_active> descending: zones whose POSIX footer still references the abbreviation appear before zones that no longer use it.
+
+=item 2. C<first_trans_time> ascending: among zones sharing the same C<is_active> value, the one that adopted the abbreviation first appears first.
+
+=item 3. C<last_trans_time> descending: among zones sharing the first two keys, the one that used it most recently appears first.
+
+=item 4. C<zone_name> ascending: final deterministic tie-breaker.
+
+=back
+
+In practice this means that for an abbreviation like C<CEST>, the currently-active Central European zones come first (ordered by their date of adoption), followed by zones that have since migrated away from CEST (such as C<Europe/Kaliningrad>, which abandoned CEST in 2014).
+
+Extended alias results (when C<extended =E<gt> 1> falls back to the C<extended_aliases> table) use a different ordering: C<is_primary> descending, then C<zone_name> ascending. See L</is_primary> below.
 
 The single required argument is the abbreviation string. The following optional keyword arguments are accepted:
 
@@ -3955,13 +4031,31 @@ For extended alias results: C<1> if there are multiple candidates and none or mo
 
 C<1> if this result came from the C<extended_aliases> table; C<0> if it came from the IANA types table.
 
+=item C<is_active>
+
+Only present in IANA results (C<extended =E<gt> 0>). C<1> if the zone's POSIX C<TZ> footer string still references this abbreviation (meaning the zone continues to cycle through this abbreviation under its current daylight-saving rules, or uses it as its permanent abbreviation); C<0> if the footer no longer mentions the abbreviation, which typically means the zone has transitioned away from it.
+
+For example, C<Europe/Berlin>'s footer is C<CET-1CEST,M3.5.0,M10.5.0/3>, so both C<CET> and C<CEST> yield C<is_active =E<gt> 1>. In contrast, C<Europe/Kaliningrad>'s footer is C<EET-2>, so C<resolve_abbreviation('CEST')> still lists Kaliningrad (it used CEST until 2014), but with C<is_active =E<gt> 0>.
+
+This field is used as the primary sort key, so zones with C<is_active =E<gt> 1> appear before zones with C<is_active =E<gt> 0>. Callers that only want currently-active zones can filter with C<grep { $_-E<gt>{is_active} } @$results>.
+
+The detection is a word-boundary regex against the footer string: alphabetic abbreviations must be adjacent to non-alphabetic characters (so C<CST> does not match C<CEST>), and numeric/sign-prefixed abbreviations (such as C<-03>, C<+0430>) must appear inside C<E<lt>...E<gt>> per POSIX TZ syntax. The regex was validated against all 1449 (zone, abbreviation) pairs in the bundled database with zero false negatives against an empirical ground truth; see the internal C<RESOLVE_ABBREVIATION_DESIGN_NOTES.md> if curious about the details.
+
+Absent from extended alias results, where the ordering signal is the editorial C<is_primary> marker instead.
+
 =item C<is_primary>
 
-Only present in extended alias results (C<extended =E<gt> 1>). C<1> marks the preferred zone for this abbreviation when multiple candidates exist. Absent from IANA results.
+Only present in extended alias results (C<extended =E<gt> 1>). When multiple candidates match, C<1> marks the editorially-chosen canonical zone for this abbreviation (such as C<America/Sao_Paulo> for C<BRT>), and C<0> marks the others. Absent from IANA results, because no single zone is canonically designated among IANA candidates of an abbreviation; the C<is_active> marker plus the sort order (first-used first, still-active first) serve the analogous role for IANA results.
+
+If you need a canonical or preferred zone designation in the CLDR sense, use L<Locale::Unicode::Data> which exposes CLDR's C<is_golden>, C<is_primary>, and C<is_preferred> flags on a per-timezone basis. See L</"USING Locale::Unicode::Data FOR CANONICAL DESIGNATION"> below for an example.
+
+=item C<first_trans_time>
+
+Unix epoch of the earliest transition in this zone using the abbreviation. Absent from extended alias results. Used as a sort key (ascending) after C<is_active>, so among zones with the same C<is_active> value, the one that adopted the abbreviation first appears first.
 
 =item C<last_trans_time>
 
-Unix epoch of the most recent transition in this zone using the abbreviation. Absent from extended alias results. Useful for understanding how recently a zone was last on this abbreviation.
+Unix epoch of the most recent transition in this zone using the abbreviation. Absent from extended alias results. Used as a secondary sort key (descending): among zones with the same C<is_active> and same C<first_trans_time>, the one that has used the abbreviation most recently appears first.
 
 =back
 
@@ -4000,6 +4094,38 @@ Returns the timezone version string from the timezone data.
 The possible values are C<1>, C<2>, C<3> or C<4>
 
 See L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-header>
+
+=head1 USING Locale::Unicode::Data FOR CANONICAL DESIGNATION
+
+When L</resolve_abbreviation> returns several IANA candidates for an abbreviation (such as the 30 zones that match C<CEST>), the result set contains no C<is_primary> marker. C<DateTime::Lite::TimeZone> deliberately does not try to pick a canonical zone among IANA candidates, because no single heuristic gives a satisfying answer across all abbreviations.
+
+L<Locale::Unicode::Data> exposes CLDR's own canonical-designation flags (C<is_golden>, C<is_primary>, C<is_preferred>, C<is_canonical>) on a per-timezone basis, and is the recommended source of truth when a single representative zone is needed. A typical pattern is to resolve the abbreviation here, then ask L<Locale::Unicode::Data> which candidate is the CLDR golden zone:
+
+    use DateTime::Lite::TimeZone;
+    use Locale::Unicode::Data;
+
+    my $candidates = DateTime::Lite::TimeZone->resolve_abbreviation( 'CEST' );
+    my $cldr       = Locale::Unicode::Data->new;
+
+    my $golden;
+    foreach my $c ( @$candidates )
+    {
+        my $info = $cldr->timezone( timezone => $c->{zone_name} ) || next;
+        if( $info->{is_golden} )
+        {
+            $golden = $c->{zone_name};
+            last;
+        }
+    }
+    # $golden is now 'Europe/Paris' (the CLDR golden zone for the
+    # 'Europe_Central' metazone)
+
+Alternatively, if the abbreviation is known to map to a specific metazone, you can query the golden zone directly:
+
+    my $zones  = $cldr->timezones( metazone => 'Europe_Central', is_golden => 1 );
+    my $golden = $zones->[0]->{timezone};  # 'Europe/Paris'
+
+For abbreviations that are I<not> in the IANA types table (such as C<BRT>, C<HAEC>, C<AFT>, and many others), use L</resolve_abbreviation> with the C<extended> flag instead: the C<extended_aliases> table carries its own editorial C<is_primary> marker that identifies the preferred zone among the candidates.
 
 =head1 ERROR HANDLING
 
