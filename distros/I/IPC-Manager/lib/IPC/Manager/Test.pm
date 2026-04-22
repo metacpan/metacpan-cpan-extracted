@@ -1287,6 +1287,154 @@ sub test_post_fork_hook {
     # Reap the middle process so it doesn't linger as a zombie
     waitpid($middle_pid, 0) if $middle_pid;
 
+    # child_pid on the handle is the first-fork pid from ipcm_service.
+    # In this daemonize case that is the middle process, which has now
+    # exited - so it is no longer alive.
+    my $cpid = $handle->child_pid;
+    ok($cpid, "Handle carries a child_pid");
+    is($cpid, $middle_pid, "child_pid == first-fork (middle) pid");
+    ok(!kill(0, $cpid), "First-fork pid no longer alive after daemonize");
+
+    $handle = undef;
+}
+
+sub test_child_pid {
+    # Basic accessor: handle returned by ipcm_service carries the
+    # first-fork pid, and it is alive while the service is up.
+
+    my $handle = ipcm_service(
+        'child_pid_svc',
+        class          => 'IPC::Manager::Service',
+        handle_request => sub { return "ok" },
+    );
+
+    my $cpid = $handle->child_pid;
+    ok($cpid, "Handle has child_pid");
+    like($cpid, qr/^\d+$/, "child_pid is a positive integer");
+    ok(kill(0, $cpid), "child_pid is alive while service is up");
+
+    # No post_fork_hook: first-fork pid == service pid
+    is($handle->service_pid, $cpid, "child_pid == service_pid (no post_fork_hook)");
+
+    $handle = undef;
+}
+
+sub test_child_pid_nested {
+    # Nested ipcm_service from inside a running service should also
+    # stamp child_pid onto the peer it returns.
+
+    my $outer = ipcm_service(
+        'cp_outer',
+        class    => 'IPC::Manager::Service',
+        on_start => sub {
+            my $self = shift;
+
+            my $peer = ipcm_service(
+                'cp_inner',
+                class          => 'IPC::Manager::Service',
+                handle_request => sub { return "inner_ok" },
+            );
+
+            $self->{_inner_cpid} = $peer->child_pid;
+        },
+
+        handle_request => sub {
+            my ($self, $req, $msg) = @_;
+            return $self->{_inner_cpid};
+        },
+    );
+
+    my $resp = $outer->sync_request(cp_outer => 'cpid?');
+    my $inner_cpid = $resp->{response};
+    ok($inner_cpid, "Inner peer has child_pid");
+    like($inner_cpid, qr/^\d+$/, "Inner child_pid is a positive integer");
+
+    $outer = undef;
+}
+
+sub test_child_pid_unset {
+    # Handles/peers constructed outside ipcm_service's spawn path have
+    # child_pid undef.
+
+    require IPC::Manager::Service::Handle;
+    my $h = IPC::Manager::Service::Handle->new(
+        service_name => 'nope',
+        ipcm_info    => 'fake',
+    );
+    is($h->child_pid, undef, "Bare handle has undef child_pid");
+}
+
+sub test_child_pid_interpose {
+    # post_fork_hook interpose pattern: first-fork pid stays alive as
+    # the long-lived "wrapper", and a deeper fork runs the service loop.
+    # child_pid should equal the wrapper (first-fork) pid, and that pid
+    # should stay alive as long as the service is up.
+
+    my $marker_dir   = File::Temp::tempdir(CLEANUP => 1);
+    my $wrapper_file = File::Spec->catfile($marker_dir, 'wrapper_pid');
+    my $service_file = File::Spec->catfile($marker_dir, 'service_pid');
+
+    my $handle = ipcm_service(
+        'cp_interpose_svc',
+        class => 'IPC::Manager::Service',
+
+        post_fork => sub {
+            my $self = shift;
+
+            my $pid = fork // die "Could not fork in post_fork: $!";
+
+            if ($pid) {
+                # Wrapper: record our pid, stay alive, wait for service to exit.
+                open my $fh, '>', $wrapper_file or die "open: $!";
+                print $fh "$$\n";
+                close $fh;
+                waitpid($pid, 0);
+                POSIX::_exit(0);
+            }
+
+            # Deeper child: return to become the service
+        },
+
+        on_start => sub {
+            open my $fh, '>', $service_file or die "open: $!";
+            print $fh "$$\n";
+            close $fh;
+        },
+
+        handle_request => sub { return "ok" },
+    );
+
+    my $waited = 0;
+    until (-e $wrapper_file || $waited > 10) {
+        Time::HiRes::sleep(0.1);
+        $waited += 0.1;
+    }
+    ok(-e $wrapper_file, "Wrapper process ran and wrote marker");
+
+    # Drive one request so service is definitely up
+    my $resp = $handle->sync_request(cp_interpose_svc => 'ping');
+    is($resp->{response}, 'ok', "Service responded");
+
+    $waited = 0;
+    until (-e $service_file || $waited > 10) {
+        Time::HiRes::sleep(0.1);
+        $waited += 0.1;
+    }
+    ok(-e $service_file, "Service on_start ran");
+
+    open my $wfh, '<', $wrapper_file or die "open: $!";
+    chomp(my $wrapper_pid = <$wfh>);
+    close $wfh;
+
+    open my $sfh, '<', $service_file or die "open: $!";
+    chomp(my $svc_pid = <$sfh>);
+    close $sfh;
+
+    my $cpid = $handle->child_pid;
+    is($cpid, $wrapper_pid, "child_pid == wrapper (first-fork) pid");
+    isnt($cpid, $svc_pid, "Wrapper pid differs from service pid");
+    ok(kill(0, $cpid), "Wrapper pid alive while service is up");
+
     $handle = undef;
 }
 
@@ -1488,7 +1636,31 @@ performs a double-fork: the middle process writes a marker file and exits, while
 the grandchild returns and becomes the service.  The test verifies that the
 middle process ran, the service is functional (responds to requests), and the
 PID reported by the handle matches the grandchild rather than the middle
-process.
+process.  Also verifies C<< $handle->child_pid >> equals the first-fork
+(middle) pid, which has exited after daemonization.
+
+=item IPC::Manager::Test->test_child_pid
+
+Tests that C<< $handle->child_pid >> is set to a live pid after
+C<ipcm_service> spawns a simple service, and that first-fork pid equals
+service pid when no C<post_fork_hook> is in play.
+
+=item IPC::Manager::Test->test_child_pid_nested
+
+Tests that the peer returned by a nested C<ipcm_service> call (from inside a
+running service) also carries C<child_pid>.
+
+=item IPC::Manager::Test->test_child_pid_unset
+
+Tests that C<child_pid> is C<undef> on a handle constructed outside the
+C<ipcm_service> spawn path.
+
+=item IPC::Manager::Test->test_child_pid_interpose
+
+Tests the interpose C<post_fork_hook> pattern: the parent becomes a
+long-lived wrapper and the deeper child runs the service loop.  Verifies
+C<child_pid> equals the wrapper pid, differs from the service pid, and that
+the wrapper pid stays alive for as long as the service is up.
 
 =back
 

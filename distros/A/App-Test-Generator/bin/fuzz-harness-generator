@@ -2,12 +2,14 @@
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 use App::Test::Generator;
-use autodie qw(:all);
+use File::Spec;
 use File::Temp;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
+use YAML::XS qw(LoadFile);
 
 =head1 NAME
 
@@ -101,13 +103,13 @@ my $replay_corpus;
 Getopt::Long::Configure('bundling');
 
 GetOptions(
-	'help|h' => \$help,
-	'input|i=s' => \$infile,
-	'dry-run|n' => \$dry_run,
-	'output|o=s' => \$outfile,
-	'run|r' => \$run,
-	'verbose|v' => \$verbose,
-	'version|V' => \$version,
+	'help|h'          => \$help,
+	'input|i=s'       => \$infile,
+	'dry-run|n'       => \$dry_run,
+	'output|o=s'      => \$outfile,
+	'run|r'           => \$run,
+	'verbose|v'       => \$verbose,
+	'version|V'       => \$version,
 	'replay-corpus|R=s' => \$replay_corpus,
 ) or pod2usage(2);
 
@@ -122,22 +124,23 @@ if($version) {
 # --replay-corpus mode: generate a regression .t from corpus bug entries
 # ---------------------------------------------------------------------------
 
-if ($replay_corpus) {
+if($replay_corpus) {
 	pod2usage('--replay-corpus cannot be combined with --dry-run') if $dry_run;
-	pod2usage('--replay-corpus cannot be combined with --input') if $infile;
+	pod2usage('--replay-corpus cannot be combined with --input')   if $infile;
 
 	my @corpus_files = _collect_corpus_files($replay_corpus);
-	die "No corpus JSON files found at: $replay_corpus" unless @corpus_files;
+	die "No corpus JSON files found at: $replay_corpus\n" unless @corpus_files;
 
 	my $tap = _generate_replay_tap(@corpus_files);
 
-	if ($outfile) {
-		open my $fh, '>', $outfile or die "Cannot write to $outfile: $!";
+	if($outfile) {
+		open(my $fh, '>', $outfile)
+			or die "Cannot write to $outfile: $!";
 		print $fh $tap;
 		close $fh;
 		chmod 0755, $outfile;
 		print "Replay test written to: $outfile\n";
-		if ($run) {
+		if($run) {
 			exit system('prove', '-l', $outfile) >> 8;
 		}
 	} else {
@@ -150,13 +153,26 @@ if($infile && @ARGV) {
 	pod2usage('Specify input file either as argument or via --input, not both');
 }
 
+if($infile) {
+	my $schema = eval { LoadFile($infile) };
+	if($@) {
+		die "Cannot parse '$infile' as YAML: $@";
+	}
+	unless(ref($schema) eq 'HASH') {
+		die "Input file '$infile' does not contain a YAML hash";
+	}
+	unless($schema->{function}) {
+		die "Input file '$infile' is missing required 'function' key";
+	}
+}
+
 $infile ||= shift @ARGV or pod2usage('No config file given');
 
 if($dry_run && $run) {
 	pod2usage('--dry-run cannot be used with --run');
 }
 
-if ($dry_run && $outfile) {
+if($dry_run && $outfile) {
 	warn '--dry-run specified; --output will be ignored';
 }
 
@@ -165,16 +181,15 @@ if($verbose) {
 }
 
 if($run && !$outfile) {
-	my $fh;
-	($fh, $outfile) = File::Temp::tempfile();
+	my ($fh, $tmp) = File::Temp::tempfile();
 	close $fh;
 
-	App::Test::Generator->generate($infile, $outfile);
+	App::Test::Generator->generate($infile, $tmp);
 
-	exit system('prove', '-l', $outfile) >> 8;
+	exit system('prove', '-l', $tmp) >> 8;
 }
 
-if ($dry_run) {
+if($dry_run) {
 	my ($fh, $tmp) = File::Temp::tempfile();
 	close $fh;
 
@@ -197,7 +212,8 @@ App::Test::Generator->generate($infile, $outfile);
 if($outfile) {
 	chmod 0755, $outfile if($outfile =~ /\.(pl|cgi)$/);
 	if($run) {
-		system("prove -l $outfile");
+		# Use list form to avoid shell interpolation of $outfile
+		system('prove', '-l', $outfile);
 	}
 }
 
@@ -207,71 +223,131 @@ exit 0;
 # Helpers for --replay-corpus
 # ---------------------------------------------------------------------------
 
-# Collect corpus JSON files from a path that is either a single file or a dir
+# --------------------------------------------------
+# _collect_corpus_files
+#
+# Purpose:    Collect the list of corpus JSON files
+#             to process for --replay-corpus mode.
+#             Accepts either a single file path or
+#             a directory, returning all *.json files
+#             found in the directory case.
+#
+# Entry:      $path - filesystem path to either a
+#                     single .json file or a directory
+#                     containing .json files.
+#
+# Exit:       Returns a sorted list of file paths.
+#             Returns an empty list if the path does
+#             not exist or contains no .json files.
+#
+# Side effects: None.
+#
+# Notes:      Directory globbing matches only *.json
+#             files at the top level of the directory;
+#             subdirectories are not recursed into.
+# --------------------------------------------------
 sub _collect_corpus_files {
 	my ($path) = @_;
 
-	if (-f $path) {
+	if(-f $path) {
 		return ($path);
-	} elsif (-d $path) {
+	} elsif(-d $path) {
 		my @files = glob(File::Spec->catfile($path, '*.json'));
 		return sort @files;
 	}
+
 	return ();
 }
 
-# Read corpus files and generate a complete .t file as a string
+# --------------------------------------------------
+# _generate_replay_tap
+#
+# Purpose:    Read one or more corpus JSON files and
+#             produce a complete .t file as a string.
+#             Each bug entry in the corpus becomes
+#             one lives_ok test that calls the target
+#             method with the exact input that
+#             previously caused a crash, asserting
+#             that it no longer dies.
+#
+# Entry:      @corpus_files - list of paths to corpus
+#                             JSON files as returned
+#                             by _collect_corpus_files.
+#
+# Exit:       Returns the complete .t file content as
+#             a string. Never returns undef.
+#             Returns a skip_all plan if no bugs are
+#             found across all corpus files.
+#
+# Side effects: Reads corpus JSON files from disk.
+#               Attempts to load JSON::MaybeXS or
+#               JSON via block eval.
+#
+# Notes:      Corpus files that cannot be parsed are
+#             skipped with a warning rather than
+#             aborting the entire run.
+#             Clean corpus entries (those without
+#             recorded bugs) are silently ignored —
+#             only entries with a 'bugs' array are
+#             processed.
+#             The module name for each test is
+#             inferred from the YAML schema file
+#             alongside the corpus file via
+#             _infer_module_from_schema. Falls back
+#             to 'UNKNOWN::Module' if not found.
+# --------------------------------------------------
 sub _generate_replay_tap {
 	my (@corpus_files) = @_;
 
+	# Prefer JSON::MaybeXS for correctness; fall back to JSON
 	my $json_module;
 	for my $mod (qw(JSON::MaybeXS JSON)) {
-		eval "require $mod" and $json_module = $mod and last;
+		eval { require $mod; 1 } and $json_module = $mod and last;
 	}
-	die 'No JSON module available; install JSON or JSON::MaybeXS'
+	die "No JSON module available; install JSON or JSON::MaybeXS\n"
 		unless $json_module;
 
-	# Collect all bugs across all corpus files
-	my @tests;	# [{module => ..., method => ..., input => ..., error => ...}]
+	# Collect all bugs across all corpus files into a flat list
+	my @tests;
 
 	for my $file (@corpus_files) {
-		open my $fh, '<', $file or die "Cannot read $file: $!";
+		open(my $fh, '<', $file)
+			or die "Cannot read $file: $!";
 		my $data = eval {
 			$json_module->new->decode(do { local $/; <$fh> })
 		};
 		close $fh;
 
-		if ($@) {
+		if($@) {
 			warn "Skipping $file: could not parse JSON: $@\n";
 			next;
 		}
 
-		my $bugs = $data->{bugs} // [];
-		next unless @$bugs;
+		my $bugs = $data->{'bugs'} // [];
+		next unless @{$bugs};
 
 		# Derive method name from filename: translate.json -> translate
 		my (undef, undef, $fname) = File::Spec->splitpath($file);
 		(my $method = $fname) =~ s/\.json$//;
 
-		# The corpus file doesn't store the module name, but the schema
-		# directory will have a YAML file with the same stem that does.
-		# Try to find it; fall back to a placeholder if not found.
-		my $module = _infer_module_from_schema($file, $method) // 'UNKNOWN::Module';
+		# Look up the module name from the companion schema file;
+		# fall back to a placeholder if the schema cannot be found
+		my $module = _infer_module_from_schema($file, $method)
+			// 'UNKNOWN::Module';
 
-		for my $bug (@$bugs) {
+		for my $bug (@{$bugs}) {
 			push @tests, {
 				module => $module,
 				method => $method,
-				input => $bug->{input},
-				error => $bug->{error},
-				file => $file,
+				input  => $bug->{'input'},
+				error  => $bug->{'error'},
+				file   => $file,
 			};
 		}
 	}
 
-	# Build the .t content
-	my $test_count = scalar @tests;
-
+	# Build the .t header — include Test::Exception up front since
+	# lives_ok is always needed when there are tests to emit
 	my $t = <<'HEADER';
 #!/usr/bin/env perl
 # Auto-generated by fuzz-harness-generator --replay-corpus
@@ -279,15 +355,18 @@ sub _generate_replay_tap {
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 HEADER
 
-	if ($test_count == 0) {
+	my $test_count = scalar @tests;
+
+	if($test_count == 0) {
 		$t .= "\nplan skip_all => 'No bugs recorded in corpus files';\n";
 		return $t;
 	}
 
-	# Collect unique modules to load
-	my %modules = map { $_->{module} => 1 } @tests;
+	# Emit one use statement per unique module (excluding the placeholder)
+	my %modules = map { $_->{'module'} => 1 } @tests;
 	for my $mod (sort keys %modules) {
 		next if $mod eq 'UNKNOWN::Module';
 		$t .= "use $mod;\n";
@@ -296,58 +375,112 @@ HEADER
 	$t .= "\nplan tests => $test_count;\n\n";
 
 	for my $i (0 .. $#tests) {
-		my $test = $tests[$i];
-		my $n = $i + 1;
-		my $input = _format_input($test->{input});
-		my $label = "$test->{method} does not die on input from $test->{file}";
+		my $test  = $tests[$i];
+		my $n     = $i + 1;
+		my $input = _format_input($test->{'input'});
+		my $label = "$test->{'method'} does not die on input from $test->{'file'}";
 
-		# Escape the error for use in a comment
-		(my $orig_error = $test->{error} // '') =~ s/\n/ /g;
+		# Flatten and escape the original error for use as a comment
+		(my $orig_error = $test->{'error'} // '') =~ s/\n/ /g;
 		$orig_error =~ s/'/\\'/g;
 
 		$t .= "# Corpus bug: $orig_error\n";
-		$t .= "lives_ok { $test->{module}\->$test->{method}($input) }\n";
+		$t .= "lives_ok { $test->{'module'}\->$test->{'method'}($input) }\n";
 		$t .= "    '$label';\n\n";
 	}
-
-	# lives_ok is in Test::Exception; add a use at the top
-	$t =~ s/(use Test::More;)/$1\nuse Test::Exception;/;
 
 	return $t;
 }
 
-# Format a scalar input value as a Perl literal for embedding in source
+# --------------------------------------------------
+# _format_input
+#
+# Purpose:    Format a scalar input value as a Perl
+#             literal string suitable for embedding
+#             directly in generated test source code.
+#
+# Entry:      $input - the input value to format.
+#                      May be undef, a numeric string,
+#                      or an arbitrary string.
+#
+# Exit:       Returns a Perl literal string:
+#               'undef'     if $input is undef
+#               bare number if $input looks numeric
+#               single-quoted string otherwise, with
+#               backslashes and single quotes escaped.
+#
+# Side effects: None.
+#
+# Notes:      Only scalar inputs are handled — corpus
+#             entries with arrayref or hashref inputs
+#             are not currently supported and will be
+#             formatted as a single-quoted string of
+#             the stringified reference, which will
+#             not reproduce the original input.
+# --------------------------------------------------
 sub _format_input {
 	my ($input) = @_;
+
 	return 'undef' unless defined $input;
 
-	# Numeric
+	# Emit bare numeric literals without quoting
 	return $input if $input =~ /^-?(?:\d+\.?\d*|\.\d+)$/;
 
-	# String: escape single quotes and backslashes
+	# Escape backslashes first, then single quotes, to avoid
+	# double-escaping when both appear in the same string
 	(my $escaped = $input) =~ s/\\/\\\\/g;
 	$escaped =~ s/'/\\'/g;
+
 	return "'$escaped'";
 }
 
-# Try to find the module name from the YAML schema file that sits alongside
-# the corpus file.  The corpus lives in schemas/corpus/method.json;
-# the schema is at schemas/method.yaml (or .yml).
+# --------------------------------------------------
+# _infer_module_from_schema
+#
+# Purpose:    Attempt to determine the Perl module
+#             name for a given corpus method by
+#             locating and reading the companion YAML
+#             schema file that sits alongside the
+#             corpus directory.
+#
+# Entry:      $corpus_file - path to the corpus JSON
+#                            file, e.g.
+#                            schemas/corpus/translate.json
+#             $method      - the method name derived
+#                            from the corpus filename,
+#                            e.g. 'translate'
+#
+# Exit:       Returns the module name string if found,
+#             or undef if no companion schema file
+#             exists or the schema contains no
+#             'module:' line.
+#
+# Side effects: Reads schema files from disk.
+#
+# Notes:      The corpus is expected to live one
+#             directory below the schemas directory,
+#             e.g. schemas/corpus/ alongside
+#             schemas/translate.yaml. This function
+#             walks up one level from the corpus
+#             directory to find the schema.
+#             Both .yaml and .yml extensions are
+#             tried, in that order.
+# --------------------------------------------------
 sub _infer_module_from_schema {
 	my ($corpus_file, $method) = @_;
 
 	my (undef, $corpus_dir) = File::Spec->splitpath($corpus_file);
 
-	# Walk up one directory from corpus/ to find the schemas/ dir
+	# Walk up one directory from corpus/ to reach the schemas/ dir
 	my $schema_dir = File::Spec->catdir($corpus_dir, File::Spec->updir());
 
 	for my $ext (qw(yaml yml)) {
 		my $schema_file = File::Spec->catfile($schema_dir, "$method.$ext");
 		next unless -f $schema_file;
 
-		open my $fh, '<', $schema_file or next;
-		while (<$fh>) {
-			if (/^module:\s*(\S+)/) {
+		open(my $fh, '<', $schema_file) or next;
+		while(<$fh>) {
+			if(/^module:\s*(\S+)/) {
 				close $fh;
 				return $1;
 			}

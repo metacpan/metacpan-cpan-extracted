@@ -2,7 +2,7 @@ package IPC::Manager::Service::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -22,6 +22,8 @@ use Object::HashBase qw{
 
     interval
 
+    <child_pid
+
     +client
 
     +request_callbacks
@@ -31,6 +33,8 @@ use Object::HashBase qw{
 
     +spawn
 };
+
+sub _set_child_pid { $_[0]->{+CHILD_PID} = $_[1] }
 
 sub init {
     my $self = shift;
@@ -309,6 +313,22 @@ Returns the client connection, creating it if necessary.
 =item $pid = $self->service_pid()
 
 Returns the PID of the peer service.
+
+=item $pid = $self->child_pid()
+
+Returns the pid that C<fork> returned in C<ipcm_service>'s parent branch
+(the "first-fork" pid).  Populated only when the handle was produced by
+C<ipcm_service> spawning a child; C<undef> otherwise (e.g. on handles
+constructed directly via C<< IPC::Manager->connect >>).
+
+B<Caveat>: this is C<ipcm_service>'s own fork pid, not necessarily the pid
+the service loop ends up running in.  If a C<post_fork_hook> daemonizes
+(double-fork + parent-exit), the first-fork pid exits inside the hook and
+this value becomes stale; use C<service_pid> to retrieve the currently
+running service pid in that case.  If a C<post_fork_hook> interposes a
+long-lived wrapper (parent becomes the wrapper, child runs the service
+loop), C<child_pid> is the wrapper pid and is the correct pid for a
+supervisor to watch.
 
 =item $res = $self->sync_request($peer, $payload)
 

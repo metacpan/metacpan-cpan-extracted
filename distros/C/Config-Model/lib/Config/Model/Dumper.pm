@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Dumper 2.161;
+package Config::Model::Dumper 2.162;
 
 use Carp;
 use strict;
@@ -17,44 +17,42 @@ use Config::Model::Exception;
 use Config::Model::ObjTreeScanner;
 use Config::Model::Value;
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 sub new {
-    bless {}, shift;
+    return bless {}, shift;
 }
 
-sub quote {
-    _quote( qr/[\s~"#*]/, @_ );
+sub quote (@args) {
+    return _quote( qr/[\s~"#*]/, @args ); # "
 }
 
-sub id_quote {
-    _quote( qr/[\s~"@*<>.=#]/, @_ );
+sub id_quote (@args) {
+    return _quote( qr/[\s~"@*<>.=#]/, @args ); # " ))
 }
 
-sub _quote {
-    my ( $re, @res ) = @_;
-    foreach (@res) {
-        if ( defined $_ and ( /$re/ or $_ eq '' ) ) {
-            s/"/\\"/g;    # escape present quotes
-            $_ = '"' . $_ . '"';    # add my quotes
+sub _quote ($re, @res) {
+    foreach my $r (@res) {
+        if ( defined $r and ( $r =~ /$re/ or $r eq '' ) ) {
+            $r =~ s/"/\\"/g;     # escape present quotes
+            $r = '"' . $r . '"'; # add my quotes
         }
     }
     return wantarray ? @res : $res[0];
 }
 
-sub note_quote {
-    my @res = @_;
-    foreach (@res) {
-        if ( defined $_ and $_ and (/(\s|"|\*)/) ) {
-            s/"/\\"/g;              # escape present quotes
-            $_ = '"' . $_ . '"';    # add my quotes
+sub note_quote (@res) {
+    foreach my $r (@res) {
+        if ( defined $r and $r and ($r =~ /(\s|"|\*)/) ) { # " )))
+            $r =~ s/"/\\"/g;     # escape present quotes
+            $r = '"' . $r . '"'; # add my quotes
         }
     }
     return wantarray ? @res : $res[0];
 }
 
-sub dump_tree {
-    my $self = shift;
-
-    my %args    = @_;
+sub dump_tree ($self, %args) {
     my $full    = delete $args{full_dump} || 0;
     my $skip_aw = delete $args{skip_auto_write} || '';
     my $auto_v  = delete $args{auto_vivify} || 0;
@@ -83,9 +81,8 @@ sub dump_tree {
     my $node = delete $args{node}
         || croak "dump_tree: missing 'node' parameter";
 
-    my $compute_pad = sub {
+    my $compute_pad = sub ($obj) {
         my $depth = 0;
-        my $obj   = shift;
         while ( defined $obj->parent ) {
             $depth++;
             $obj = $obj->parent;
@@ -93,9 +90,7 @@ sub dump_tree {
         return '  ' x $depth;
     };
 
-    my $leaf_cb = sub {
-        my ( $scanner, $data_r, $node, $element, $index, $value_obj ) = @_;
-
+    my $leaf_cb = sub ($scanner, $data_r, $node, $element, $index, $value_obj) {
         # get value or only customized value
         my $value = quote( $value_obj->fetch( mode => $fetch_mode, check => $check ) );
         $index = id_quote($index);
@@ -115,11 +110,10 @@ sub dump_tree {
             $$data_r .= '=' . $value;
         }
         $$data_r .= '#' . $note         if $note;
+        return;
     };
 
-    my $check_list_cb = sub {
-        my ( $scanner, $data_r, $node, $element, $index, $value_obj ) = @_;
-
+    my $check_list_cb = sub ($scanner, $data_r, $node, $element, $index, $value_obj) {
         # get value or only customized value
         my $value = $value_obj->fetch( mode => $fetch_mode, check => $check );
         my $qvalue = quote($value);
@@ -136,11 +130,10 @@ sub dump_tree {
         $$data_r .= "\n" . $pad . $name if $value or $note;
         $$data_r .= '=' . $qvalue       if $value;
         $$data_r .= '#' . $note         if $note;
+        return;
     };
 
-    my $list_element_cb = sub {
-        my ( $scanner, $data_r, $node, $element, @keys ) = @_;
-
+    my $list_element_cb = sub ($scanner, $data_r, $node, $element, @keys) {
         my $pad      = $compute_pad->($node);
         my $list_obj = $node->fetch_element($element);
 
@@ -167,11 +160,10 @@ sub dump_tree {
                 );
             $$data_r .= "\n$pad$element:=" . join( ',', @val ) if @val;
         }
+        return;
     };
 
-    my $hash_element_cb = sub {
-        my ( $scanner, $data_r, $node, $element, @keys ) = @_;
-
+    my $hash_element_cb = sub ($scanner, $data_r, $node, $element, @keys) {
         my $pad      = $compute_pad->($node);
         my $hash_obj = $node->fetch_element($element);
 
@@ -181,13 +173,12 @@ sub dump_tree {
 
         # resume exploration
         map { $scanner->scan_hash( $data_r, $node, $element, $_ ); } @keys;
+        return;
     };
 
     # called for nodes contained in nodes (not root).
     # This node can be held by a plain element or a hash element or a list element
-    my $node_element_cb = sub {
-        my ( $scanner, $data_r, $node, $element, $key, $contained_node ) = @_;
-
+    my $node_element_cb = sub ($scanner, $data_r, $node, $element, $key, $contained_node) {
         my $type = $node->element_type($element);
 
         return if $skip_aw and $contained_node->is_auto_write_for_type($skip_aw);
@@ -217,6 +208,7 @@ sub dump_tree {
             # skip simple nodes that do not bring data
             $$data_r .= $head . $sub_data . ' -' if $sub_data;
         }
+        return;
     };
 
     my @scan_args = (
@@ -261,7 +253,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.161
+version 2.162
 
 =head1 SYNOPSIS
 

@@ -78,4 +78,21 @@ subtest 'have_pending_responses initially false' => sub {
     ok(!$h->have_pending_responses, "no pending responses initially");
 };
 
+subtest 'child_pid undef by default' => sub {
+    my $h = IPC::Manager::Service::Handle->new(
+        service_name => 'my-svc',
+        ipcm_info    => 'fake_info',
+    );
+    is($h->child_pid, undef, "child_pid is undef when not spawned via ipcm_service");
+};
+
+subtest 'child_pid set via _set_child_pid' => sub {
+    my $h = IPC::Manager::Service::Handle->new(
+        service_name => 'my-svc',
+        ipcm_info    => 'fake_info',
+    );
+    $h->_set_child_pid(4242);
+    is($h->child_pid, 4242, "child_pid reflects value stamped by ipcm_service");
+};
+
 done_testing;

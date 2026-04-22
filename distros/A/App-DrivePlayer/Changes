@@ -1,5 +1,26 @@
 Revision history for App::DrivePlayer.
 
+0.2.6 2026-04-20
+        - Fix: track auto-advance now handles mpv 'end-file' with
+          reason=error (transient network/stream failures), and no
+          longer spuriously advances on reason=stop (which fires for
+          user-initiated stop and for loadfile-replace pre-emption).
+        - Fix: re-playing a track already visible in the list no
+          longer re-centres the tracklist viewport.  _highlight_path
+          checks get_visible_range first and only scrolls when the
+          target row is off-screen.
+        - A-Z sidebar strip now follows the selected category:
+          operates on Artists / Albums / Genres depending on the
+          current sidebar selection, and is disabled (insensitive)
+          while All Tracks or a Folders entry is selected.
+        - New "YYYY-AlbumName" folder/filename convention: when an
+          album (inferred from the folder path) or a filename starts
+          with a 19xx/20xx year followed by '-', the prefix is
+          stripped from the album/title and the year is written to
+          the track's year metadata.  Re-scan to populate existing
+          tracks.
+        - Tracklist gains a Year column between Genre and Duration.
+
 0.2.5 2026-04-18
         - Unified sheet sync: Library -> Sync now does a single
           bidirectional reconcile after the Drive scan.  Rules: both

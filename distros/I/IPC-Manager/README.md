@@ -147,6 +147,11 @@ for you:
     an [IPC::Manager::Service::Peer](https://metacpan.org/pod/IPC%3A%3AManager%3A%3AService%3A%3APeer) that the calling service can use to send
     requests to the nested service.
 
+    The returned handle or peer carries the first-fork child pid via
+    `$handle->child_pid` - useful for supervisors that track services by
+    pid.  See ["child\_pid" in IPC::Manager::Service::Handle](https://metacpan.org/pod/IPC%3A%3AManager%3A%3AService%3A%3AHandle#child_pid) for the first-fork
+    caveat around `post_fork_hook` daemonization.
+
     **Void context and the ready race**: when called in void context from inside a
     service, `ipcm_service` forks the nested service and returns immediately
     without waiting for it to finish connecting to the bus. If you intend to

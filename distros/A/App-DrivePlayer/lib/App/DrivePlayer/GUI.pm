@@ -46,6 +46,8 @@ has _progress_dragging => ( is => 'rw', isa => Bool, default => 0 );
 has win                => ( is => 'rw' );
 has sidebar_store      => ( is => 'rw' );
 has sidebar_view       => ( is => 'rw' );
+has alpha_view         => ( is => 'rw' );
+has _alpha_category    => ( is => 'rw', default => sub { 'Artists' } );
 has track_store        => ( is => 'rw' );
 has _track_iter_map    => ( is => 'rw', default => sub { {} } );
 has track_view         => ( is => 'rw' );
@@ -352,6 +354,7 @@ sub _build_alpha_strip {
     $view->set_activate_on_single_click(TRUE);
     $view->get_style_context()->add_class('alpha-nav');
     $view->get_style_context()->add_provider($css, 600);
+    $self->alpha_view($view);
 
     my $renderer = Gtk3::CellRendererText->new();
     $renderer->set(xalign => 0.5);
@@ -378,26 +381,45 @@ sub _build_alpha_strip {
 
 sub _sidebar_jump_to_letter {
     my ($self, $letter) = @_;
+    my $cat_label = $self->_alpha_category or return;
     my $store = $self->sidebar_store;
     my $view  = $self->sidebar_view;
 
     my $cat_iter = $store->get_iter_first() or return;
-    do {
-        my $n = $store->iter_n_children($cat_iter);
-        for my $i (0 .. $n - 1) {
-            my $child = $store->iter_nth_child($cat_iter, $i) or next;
-            my $label = $store->get($child, 0) // '';
-            my $first = uc(substr($label, 0, 1));
-            my $matches = $letter eq '#' ? ($first lt 'A' || $first gt 'Z')
-                                         : $first eq $letter;
-            next unless $matches;
-            my $path = $store->get_path($child);
-            $view->expand_to_path($path);
-            $view->set_cursor($path, undef, FALSE);
-            $view->scroll_to_cell($path, undef, TRUE, 0.0, 0.0);
-            return;
+    my $target;
+    while (1) {
+        if (($store->get($cat_iter, 0) // '') eq $cat_label) {
+            $target = $store->get_path($cat_iter);  # snapshot path before iter moves
+            last;
         }
-    } while ($store->iter_next($cat_iter));
+        last unless $store->iter_next($cat_iter);
+    }
+    return unless $target;
+
+    my $target_iter = $store->get_iter($target) or return;
+    my $n = $store->iter_n_children($target_iter);
+    for my $i (0 .. $n - 1) {
+        my $child = $store->iter_nth_child($target_iter, $i) or next;
+        my $label = $store->get($child, 0) // '';
+        my $first = uc(substr($label, 0, 1));
+        my $matches = $letter eq '#' ? ($first lt 'A' || $first gt 'Z')
+                                     : $first eq $letter;
+        next unless $matches;
+        my $path = $store->get_path($child);
+        $view->expand_to_path($path);
+        $view->set_cursor($path, undef, FALSE);
+        $view->scroll_to_cell($path, undef, TRUE, 0.0, 0.0);
+        return;
+    }
+}
+
+sub _update_alpha_category {
+    my ($self, $label) = @_;
+    my $enabled = defined $label
+               && $label =~ / \A (?: Artists | Albums | Genres ) \z /x;
+    $self->_alpha_category($enabled ? $label : undef);
+    $self->alpha_view->set_sensitive($enabled ? TRUE : FALSE)
+        if $self->alpha_view;
 }
 
 sub _build_tracklist {
@@ -421,7 +443,7 @@ sub _build_tracklist {
     $self->track_count_label($count_lbl);
     $vbox->pack_start($count_lbl, FALSE, FALSE, 0);
 
-    # ListStore columns: id, track#, title, artist, album, genre, duration_str, drive_id
+    # ListStore columns: id, track#, title, artist, album, genre, year, duration_str, drive_id
     my $store = Gtk3::ListStore->new(
         'Glib::Int',    # 0 db id
         'Glib::String', # 1 track#
@@ -429,8 +451,9 @@ sub _build_tracklist {
         'Glib::String', # 3 artist
         'Glib::String', # 4 album
         'Glib::String', # 5 genre
-        'Glib::String', # 6 duration
-        'Glib::String', # 7 drive_id
+        'Glib::String', # 6 year
+        'Glib::String', # 7 duration
+        'Glib::String', # 8 drive_id
     );
     $self->track_store($store);
 
@@ -447,7 +470,8 @@ sub _build_tracklist {
         ['Artist',   3, 160],
         ['Album',    4, 160],
         ['Genre',    5, 100],
-        ['Duration', 6,  65],
+        ['Year',     6,  60],
+        ['Duration', 7,  65],
     );
     for my $col_def (@cols) {
         my ($title, $idx, $width) = @$col_def;
@@ -672,8 +696,9 @@ sub _populate_tracklist {
             3, $t->{artist}       // '',
             4, $t->{album}        // '',
             5, $t->{genre}        // '',
-            6, _dur_str($t->{duration_ms}),
-            7, $t->{drive_id}     // '',
+            6, $t->{year}         // '',
+            7, _dur_str($t->{duration_ms}),
+            8, $t->{drive_id}     // '',
         );
         if ($t->{id}) {
             $self->_track_iter_map->{$t->{id}} = $iter;
@@ -694,7 +719,8 @@ sub _refresh_track_row {
         3, $t->{artist}   // '',
         4, $t->{album}    // '',
         5, $t->{genre}    // '',
-        6, _dur_str($t->{duration_ms}),
+        6, $t->{year}     // '',
+        7, _dur_str($t->{duration_ms}),
     );
 }
 
@@ -835,6 +861,18 @@ sub _sidebar_activated {
     my $iter  = $store->get_iter($path);
     my $type  = $store->get($iter, 1);
     my $value = $store->get($iter, 2);
+    my $label = $store->get($iter, 0);
+
+    # Resolve the alpha-nav category for the current selection. Leaf rows look
+    # up their parent category's label; category headers use their own label.
+    my $cat_label;
+    if ($type eq 'category') {
+        $cat_label = $label;
+    } elsif ($type =~ / \A (?: artist | album | genre ) \z /x) {
+        my $parent = $store->iter_parent($iter);
+        $cat_label = $parent ? $store->get($parent, 0) : undef;
+    }
+    $self->_update_alpha_category($cat_label);
 
     if ($type eq 'all') {
         $self->_populate_tracklist($self->db->all_tracks());
@@ -847,6 +885,8 @@ sub _sidebar_activated {
     } elsif ($type eq 'folder') {
         my $sf = $self->db->get_scan_folder_by_drive_id($value) or return;
         $self->_populate_tracklist($self->db->tracks_by_scan_folder($sf->{id}));
+    } else {
+        return;  # category header selected — no tracklist change
     }
 
     $self->_set_status(scalar(@{ $self->_playlist }) . ' tracks');
@@ -1353,10 +1393,19 @@ sub _update_now_playing {
 
 sub _highlight_path {
     my ($self, $path) = @_;
-    my $sel = $self->track_view->get_selection();
+    my $view = $self->track_view;
+    my $sel  = $view->get_selection();
     $sel->unselect_all();
     $sel->select_path($path);
-    $self->track_view->scroll_to_cell($path, undef, TRUE, 0.5, 0.0);
+
+    # Only scroll if the row isn't already visible — re-centring an on-screen
+    # row is the "extra scrolling" the user sees.
+    my ($first, $last) = $view->get_visible_range();
+    return if $first && $last
+           && $path->compare($first) >= 0
+           && $path->compare($last)  <= 0;
+
+    $view->scroll_to_cell($path, undef, TRUE, 0.5, 0.0);
 }
 
 sub _set_status {

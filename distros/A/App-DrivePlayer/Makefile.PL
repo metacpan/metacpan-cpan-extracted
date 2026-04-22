@@ -34,12 +34,16 @@ WriteMakefile(
         'Test::Class::Load'  => 0,
         'Test::Compile'      => 0,
         'Test::Most'         => 0,
-        'Test::Perl::Critic' => 0,
-        'Test::Pod'          => 0,
+        # Test::Pod / Test::Perl::Critic are author-only tests, gated by
+        # AUTHOR_TESTING in t/pod.t and t/perlcritic.t.
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
+            homepage   => 'https://github.com/mvsjes2/drive_player',
+            bugtracker => {
+                web => 'https://github.com/mvsjes2/drive_player/issues',
+            },
             repository => {
                 type => 'git',
                 url  => 'https://github.com/mvsjes2/drive_player.git',

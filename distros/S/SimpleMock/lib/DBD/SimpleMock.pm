@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # built out from DBD::Nullp;
 {
@@ -11,7 +11,7 @@ our $VERSION = '0.04';
     require Carp;
 
     our @EXPORT = qw(); # Do NOT @EXPORT anything.
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
 
     our $drh = undef;    # holds driver handle once initialised
 

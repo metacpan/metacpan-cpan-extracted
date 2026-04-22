@@ -18,7 +18,7 @@ requires 'JSON::MaybeXS';
 requires 'Module::Load::Conditional';
 requires 'PPI';
 requires 'Params::Get', '0.13';
-requires 'Params::Validate::Strict', '0.23';
+requires 'Params::Validate::Strict', '0.30';
 requires 'Pod::Simple';
 requires 'Pod::Usage';
 requires 'Readonly::Values::Boolean';

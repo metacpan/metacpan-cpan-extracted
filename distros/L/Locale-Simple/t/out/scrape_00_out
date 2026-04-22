@@ -10,6 +10,18 @@ msgctxt "alien"
 msgid "Hello"
 msgstr ""
 
+#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE
+#, locale-simple-format
+msgctxt "menu"
+msgid "Open"
+msgstr ""
+
+#: /lib/Locale/Simple.pm:LINE
+#, locale-simple-format
+msgctxt "state"
+msgid "Open"
+msgstr ""
+
 #: /t/data/dummy.pl:10
 #, locale-simple-format
 msgid " Sie müssen eine eigene Domain eingeben. \"%s\" ist nicht zulässig. "
@@ -37,7 +49,7 @@ msgstr ""
 msgid "Change order test %s %s"
 msgstr ""
 
-#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:17 /t/21-dryrun.t:20 /t/30-locale-simple-other.t:18 /t/30-locale-simple-other.t:26 /t/data/test.py:38
+#: /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:17 /t/21-dryrun.t:20 /t/30-locale-simple-other.t:18 /t/30-locale-simple-other.t:26 /t/data/test.py:38
 #, locale-simple-format
 msgid "Hello"
 msgstr ""
@@ -78,7 +90,7 @@ msgid "You have %d message of %s"
 msgid_plural "You have %d messages of %s"
 msgstr[0] ""
 
-#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:23 /t/20-locale-simple.t:29 /t/21-dryrun.t:26 /t/21-dryrun.t:32 /t/data/test.py:43 /t/data/test.py:48
+#: /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:23 /t/20-locale-simple.t:29 /t/21-dryrun.t:26 /t/21-dryrun.t:32 /t/data/test.py:43 /t/data/test.py:48
 #, locale-simple-format
 msgid "You have %d message"
 msgid_plural "You have %d messages"

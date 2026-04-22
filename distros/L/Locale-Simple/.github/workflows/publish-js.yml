@@ -1,0 +1,54 @@
+name: Publish JS to npm
+
+on:
+  push:
+    tags:
+      - '[0-9]*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Compute npm version from Perl tag
+        id: ver
+        run: |
+          PERL_VER="${GITHUB_REF_NAME}"
+          if [[ "$PERL_VER" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            NPM_VER="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+          elif [[ "$PERL_VER" =~ ^([0-9]+)\.([0-9])([0-9]*)$ ]]; then
+            NPM_VER="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.$(( 10#${BASH_REMATCH[3]:-0} ))"
+          else
+            echo "Cannot parse Perl version: $PERL_VER" >&2
+            exit 1
+          fi
+          echo "npm_version=$NPM_VER" >> "$GITHUB_OUTPUT"
+          echo "Perl $PERL_VER -> npm $NPM_VER"
+
+      - name: Bump package.json
+        working-directory: js
+        run: npm version "${{ steps.ver.outputs.npm_version }}" --no-git-tag-version --allow-same-version
+
+      - name: Copy Changes into js/CHANGELOG.md
+        run: cp Changes js/CHANGELOG.md
+
+      - name: Install + build + test
+        working-directory: js
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+          npm run build
+
+      - name: Publish
+        working-directory: js
+        run: npm publish --provenance --access public

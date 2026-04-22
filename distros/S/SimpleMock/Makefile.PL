@@ -5,7 +5,7 @@ my %test_requires = (
     'DBI'              => 0,
     'LWP::UserAgent'   => 0,
     'HTTP::Status'     => 0,
-    'Path::Tiny'       => 0,
+    'Path::Tiny'       => '0.144',
     'URI'              => 0,
 );
 
@@ -49,47 +49,47 @@ WriteMakefile(
     provides => {
       'SimpleMock' => {
         file    => 'lib/SimpleMock.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::ScopeGuard' => {
         file    => 'lib/SimpleMock/ScopeGuard.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Util' => {
         file    => 'lib/SimpleMock/Util.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Model::DBI' => {
         file    => 'lib/SimpleMock/Model/DBI.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Model::LWP_UA' => {
         file    => 'lib/SimpleMock/Model/LWP_UA.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Model::PATH_TINY' => {
         file    => 'lib/SimpleMock/Model/PATH_TINY.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Model::SUBS' => {
         file    => 'lib/SimpleMock/Model/SUBS.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Mocks::DBI' => {
         file    => 'lib/SimpleMock/Mocks/DBI.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Mocks::LWP::UserAgent' => {
         file    => 'lib/SimpleMock/Mocks/LWP/UserAgent.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'SimpleMock::Mocks::Path::Tiny' => {
         file    => 'lib/SimpleMock/Mocks/Path/Tiny.pm',
-        version => '0.04',
+        version => '0.05',
       },
       'DBD::SimpleMock' => {
         file    => 'lib/DBD/SimpleMock.pm',
-        version => '0.04',
+        version => '0.05',
       },
     },
     prereqs => {
@@ -98,7 +98,7 @@ WriteMakefile(
           'DBI'            => 0,
           'LWP::UserAgent' => 0,
           'HTTP::Status'   => 0,
-          'Path::Tiny'     => 0,
+          'Path::Tiny'     => '0.144',
           'URI'            => 0,
         },
       },

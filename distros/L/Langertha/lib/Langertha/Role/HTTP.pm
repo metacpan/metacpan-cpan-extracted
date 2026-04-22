@@ -1,6 +1,6 @@
 package Langertha::Role::HTTP;
 # ABSTRACT: Role for HTTP APIs
-our $VERSION = '0.402';
+our $VERSION = '0.404';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -81,7 +81,7 @@ sub parse_response {
   }
   $self->_update_rate_limit($response) if $self->can('_update_rate_limit');
   $log->tracef("[%s] Response: %s", ref $self, $response->decoded_content);
-  return $self->json->decode($response->decoded_content);
+  return $self->json->decode($response->content);
 }
 
 
@@ -128,7 +128,7 @@ sub execute_streaming_request {
   croak "".(ref $self)." streaming request failed: ".($response->status_line)
     unless $response->is_success;
 
-  return $self->process_stream_data($response->decoded_content, $chunk_callback);
+  return $self->process_stream_data($response->content, $chunk_callback);
 }
 
 
@@ -147,7 +147,7 @@ Langertha::Role::HTTP - Role for HTTP APIs
 
 =head1 VERSION
 
-version 0.402
+version 0.404
 
 =head2 url
 
@@ -248,11 +248,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -54,6 +54,8 @@ ex/synopsis.pl
 ex/transcription.pl
 lib/Langertha.pm
 lib/Langertha/Chat.pm
+lib/Langertha/Content.pm
+lib/Langertha/Content/Image.pm
 lib/Langertha/Cost.pm
 lib/Langertha/Embedder.pm
 lib/Langertha/Engine/AKI.pm
@@ -176,6 +178,8 @@ t/71_raider_engine_catalog.t
 t/72_langfuse.t
 t/75_think_tag.t
 t/76_tool_choice_normalization.t
+t/77_utf8_handling.t
+t/78_content_image.t
 t/80_live_tool_calling.t
 t/81_live_aki.t
 t/82_live_embedding.t

@@ -1,10 +1,22 @@
-0.06  2017-11-21
+0.07  2026-04-21
+    - XML namespace handling when creating elements with namespace prefixes
+    - xmlns attribute present only when needed
+    - cleaner xc() creation with XML::LibXML::Document as a parameter
+    - children() now returns only child elements to match chaining semantics
+    - auto_indent() formatting no longer mutates the original DOM
+    - reference inputs are now parsed via a private safe default XML::LibXML parser
+    - parent() now stops at the document root (returns same element when called on root)
+    - add map_selection() and grep_selection() methods for functional element filtering and transformation
+    - add data() method for storing arbitrary per-element metadata
+    - switch from Moose to Class::XSAccessor (test run went from 1,490s down to 0,778s)
+
+0.06  2018-11-21
     - fix configure_requires dependency, thanks Slaven Rezic (RT127733)
 
 0.05  2017-10-17
-    - set_io_any() accepts second argument, IO::Any options
-    - using canical XML - toStringC14N() for stringification
-    - replaces XML::Tidy with _reindent_children() function (experimental)
+    - set_io_any() accepts a second argument, IO::Any options
+    - using canonical XML - toStringC14N() for stringification
+    - replaces XML::Tidy with the _reindent_children() function (experimental)
 
 0.04  2017-10-08
     - fix xc(XML::LibXML::Document->new()) case
@@ -26,10 +38,10 @@
     - namespaces support
     - chained methods reworked into selectors (XML::Chain::Selector)
     - add find($xpath) method
-    - first version of auto_indent(1) using XML::Tidy (don't use in persistent env [rt.cpan.org #120296])
+    - first version of auto_indent(1) using XML::Tidy (do not use in persistent environments [rt.cpan.org #120296])
     - single() method (XML::Chain::Element)
     - empty() method to remove all child elements
-    - loading & storing of xml files / xml strings using IO::Any
+    - loading and storing XML files / XML strings using IO::Any
 
 0.01  2017-01-18
     - initial prototype version

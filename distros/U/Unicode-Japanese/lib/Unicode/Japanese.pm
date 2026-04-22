@@ -9,7 +9,7 @@ package Unicode::Japanese;
 
 use strict;
 use vars qw($VERSION $XS_VERSION $PurePerl $xs_loaderror);
-$VERSION    = '0.50';
+$VERSION    = '0.51';
 $XS_VERSION = $VERSION;
 $VERSION    = eval $VERSION;
 

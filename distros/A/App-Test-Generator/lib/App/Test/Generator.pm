@@ -25,7 +25,8 @@ use File::Basename qw(basename);
 use File::Spec;
 use Module::Load::Conditional qw(check_install can_load);
 use Params::Get;
-use Params::Validate::Strict;
+use Params::Validate::Strict 0.30;
+use Readonly;
 use Readonly::Values::Boolean;
 use Scalar::Util qw(looks_like_number);
 use re 'regexp_pattern';
@@ -36,7 +37,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -45,13 +46,117 @@ use constant {
 
 use constant CONFIG_TYPES => ('test_nuls', 'test_undef', 'test_empty', 'test_non_ascii', 'dedup', 'properties', 'close_stdin', 'test_security');
 
+# --------------------------------------------------
+# Delimiter pairs tried in order when wrapping a
+# string with q{} — bracket forms are preferred as
+# they are most readable in generated test code
+# --------------------------------------------------
+Readonly my @Q_BRACKET_PAIRS => (
+	['{', '}'],
+	['(', ')'],
+	['[', ']'],
+	['<', '>'],
+);
+
+# --------------------------------------------------
+# Single-character delimiters tried when no bracket
+# pair is usable — each is tried in order and the
+# first one not present in the string is used.
+# The # character is last since it starts comments
+# in many contexts and is least readable
+# --------------------------------------------------
+Readonly my @Q_SINGLE_DELIMITERS => (
+	'~', '!', '%', '^', '=', '+', ':', ',', ';', '|', '/', '#'
+);
+
+# --------------------------------------------------
+# Sentinel returned by index() when the search
+# string is not found — used to make the >= 0
+# boundary check self-documenting and to prevent
+# NumericBoundary mutants from surviving
+# --------------------------------------------------
+Readonly my $INDEX_NOT_FOUND => -1;
+
+# --------------------------------------------------
+# Readonly constants for schema validation
+# --------------------------------------------------
+Readonly my $CONFIG_PROPERTIES_KEY => 'properties';
+Readonly my $LEGACY_PERL_KEY_1     => '$module';
+Readonly my $LEGACY_PERL_KEY_2     => 'our $module';
+Readonly my $SOURCE_KEY            => '_source';
+
+# --------------------------------------------------
+# Readonly constants for render_hash key detection
+# --------------------------------------------------
+Readonly my $KEY_MATCHES => 'matches';
+Readonly my $KEY_NOMATCH => 'nomatch';
+
+# --------------------------------------------------
+# Reserved module name indicating a Perl builtin
+# function rather than a CPAN or user module
+# --------------------------------------------------
+Readonly my $MODULE_BUILTIN => 'builtin';
+
+# --------------------------------------------------
+# Regex pattern matched against transform names to
+# detect the positive/non-negative idempotence
+# heuristic in _detect_transform_properties
+# --------------------------------------------------
+Readonly my $TRANSFORM_POSITIVE_PATTERN => 'positive';
+
+# --------------------------------------------------
+# Default type assumed for schema fields that declare
+# no explicit type — used in generator selection and
+# dominant-type detection
+# --------------------------------------------------
+Readonly my $DEFAULT_FIELD_TYPE => 'string';
+
+# --------------------------------------------------
+# Default range used by the LectroTest float/integer
+# generators when no min or max constraint is given.
+# Chosen to provide a useful spread without producing
+# values so large they overflow downstream arithmetic.
+# --------------------------------------------------
+Readonly my $DEFAULT_GENERATOR_RANGE => 1000;
+
+# --------------------------------------------------
+# Default upper bound on the number of elements in
+# generated arrayrefs and hashrefs when no max is
+# declared in the schema.
+# --------------------------------------------------
+Readonly my $DEFAULT_MAX_COLLECTION_SIZE => 10;
+
+# --------------------------------------------------
+# Default upper bound on generated string length
+# when no max is declared in the schema.
+# --------------------------------------------------
+Readonly my $DEFAULT_MAX_STRING_LEN => 100;
+
+# --------------------------------------------------
+# Sentinel for the zero boundary used in float
+# generator selection — comparing min/max against
+# this constant makes the boundary intent explicit
+# and prevents NumericBoundary mutants from surviving.
+# --------------------------------------------------
+Readonly my $ZERO_BOUNDARY => 0;
+
+# --------------------------------------------------
+# Environment variable names used to control verbose
+# output and optional load validation in
+# _validate_module. Centralised here so they are
+# easy to find and consistent across the codebase.
+# --------------------------------------------------
+Readonly my $ENV_TEST_VERBOSE       => 'TEST_VERBOSE';
+Readonly my $ENV_GENERATOR_VERBOSE  => 'GENERATOR_VERBOSE';
+Readonly my $ENV_VALIDATE_LOAD      => 'GENERATOR_VALIDATE_LOAD';
+
 =head1 NAME
 
-App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test schemas
+App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for Perl modules
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -183,12 +288,12 @@ tests that kill them on the next run, without manual intervention.
 =head2 How to Use It
 
 The pipeline is driven by three flags passed to
-C<scripts/generate_index.pl>, which is invoked automatically by
-C<scripts/generate_test_dashboard> on each CI push.
+C<bin/test-generator-index>, which is invoked automatically by
+C<bin/generate-test-dashboard> on each CI push.
 
 =head3 Step 1: Generate TODO stubs for all survivors
 
-    scripts/generate_index.pl --generate_mutant_tests=t
+    bin/test-generator-index --generate_mutant_tests=t
 
 Produces C<t/mutant_YYYYMMDD_HHMMSS.t> containing:
 
@@ -207,7 +312,7 @@ stub. One good test kills all variants on that line.
 
 =head3 Step 2: Generate runnable schemas for NUM_BOUNDARY survivors
 
-    scripts/generate_index.pl \
+    bin/test-generator-index \
         --generate_mutant_tests=t \
         --generate_test=mutant
 
@@ -232,7 +337,7 @@ Falls back to a TODO stub if:
 
 =head3 Step 3: Augment existing schemas with survivor boundary values
 
-    scripts/generate_index.pl \
+    bin/test-generator-index \
         --generate_mutant_tests=t \
         --generate_test=mutant \
         --generate_fuzz
@@ -250,10 +355,10 @@ are skipped, with a note if C<--verbose> is active.
 
 =head3 Putting It All Together
 
-The recommended invocation in C<scripts/generate_test_dashboard>
+The recommended invocation in C<bin/generate-test-dashboard>
 Step 7 runs all three stages together:
 
-    scripts/generate_index.pl \
+    bin/test-generator-index \
         --generate_mutant_tests=t \
         --generate_test=mutant \
         --generate_fuzz
@@ -310,10 +415,10 @@ merged in. Picked up by C<t/fuzz.t>.
 =item * L<App::Test::Generator::SchemaExtractor> - Schema extraction
 from Perl source code
 
-=item * L<scripts/generate_index.pl> - Dashboard generator and
+=item * L<bin/test-generator-index> - Dashboard generator and
 pipeline driver
 
-=item * L<scripts/generate_test_dashboard> - Full pipeline runner
+=item * L<bin/generate-test-dashboard> - Full pipeline runner
 
 =back
 
@@ -1529,16 +1634,15 @@ sub generate
 		if ($yaml_data && ref($yaml_data) eq 'HASH') {
 			# Validate that the corpus inputs are arrayrefs
 			# e.g: "FooBar": 	["foo_bar"]
-			my $valid_input = 1;
+			# Skip only invalid entries:
 			for my $expected (keys %{$yaml_data}) {
 				my $outputs = $yaml_data->{$expected};
 				unless($outputs && (ref $outputs eq 'ARRAY')) {
 					carp("$yaml_cases: $expected does not point to an array ref, ignoring");
-					$valid_input = 0;
+					next;
 				}
+				$yaml_corpus_data{$expected} = $outputs;
 			}
-
-			%yaml_corpus_data = %$yaml_data if($valid_input);
 		}
 	}
 
@@ -1568,6 +1672,69 @@ sub generate
 		}
 	}
 
+	# Load relationships from the schema if present and well-formed.
+	# SchemaExtractor may set this to undef or an empty arrayref when
+	# no relationships were detected, so guard both existence and type.
+	my @relationships;
+	if(exists($schema->{relationships}) && ref($schema->{relationships}) eq 'ARRAY') {
+		@relationships = @{$schema->{relationships}};
+	}
+
+	# Serialise the relationships array from the schema into Perl source
+	# code for embedding in the generated test file. Each relationship
+	# type is rendered as a hashref in the @relationships array.
+
+	my $relationships_code = '';
+
+	# Walk each relationship in the order SchemaExtractor produced them
+	for my $rel (@relationships) {
+		my $type = $rel->{type} // '';
+
+		# Mutually exclusive: both params being set should cause the method to die
+		if($type eq 'mutually_exclusive') {
+			$relationships_code .= "{ type => 'mutually_exclusive', params => [" .
+				join(', ', map { perl_quote($_) } @{$rel->{params}}) .
+				"] },\n";
+
+		# Required group: at least one of the params must be present
+		} elsif($type eq 'required_group') {
+			$relationships_code .= "{ type => 'required_group', params => [" .
+				join(', ', map { perl_quote($_) } @{$rel->{params}}) .
+				"], logic => " . perl_quote($rel->{logic} // 'or') . " },\n";
+
+		# Conditional requirement: if one param is set, another becomes mandatory
+		} elsif($type eq 'conditional_requirement') {
+			$relationships_code .= "{ type => 'conditional_requirement', if => " .
+				perl_quote($rel->{'if'}) . ", then_required => " .
+				perl_quote($rel->{then_required}) . " },\n";
+
+		# Dependency: one param requires another to also be present
+		} elsif($type eq 'dependency') {
+			$relationships_code .= "{ type => 'dependency', param => " .
+				perl_quote($rel->{param}) . ", requires => " .
+				perl_quote($rel->{requires}) . " },\n";
+
+		# Value constraint: one param being set forces another to a specific value
+		} elsif($type eq 'value_constraint') {
+			$relationships_code .= "{ type => 'value_constraint', if => " .
+				perl_quote($rel->{'if'}) . ", then => " .
+				perl_quote($rel->{then}) . ", operator => " .
+				perl_quote($rel->{operator}) . ", value => " .
+				perl_quote($rel->{value}) . " },\n";
+
+		# Value conditional: one param equalling a specific value requires another param
+		} elsif($type eq 'value_conditional') {
+			$relationships_code .= "{ type => 'value_conditional', if => " .
+				perl_quote($rel->{'if'}) . ", equals => " .
+				perl_quote($rel->{equals}) . ", then_required => " .
+				perl_quote($rel->{then_required}) . " },\n";
+
+		# Unknown type — warn and skip rather than emitting broken code
+		} else {
+			carp "Unknown relationship type '$type', skipping";
+		}
+	}
+
 	# Dedup the edge cases
 	my %seen;
 	@edge_case_array = grep {
@@ -1575,7 +1742,7 @@ sub generate
 		!$seen{$key}++;
 	} @edge_case_array;
 
-	# Sort the edge cases to keep it consitent across runs
+	# Sort the edge cases to keep it consistent across runs
 	@edge_case_array = sort {
 		return -1 if !defined $a;
 		return 1 if !defined $b;
@@ -1588,12 +1755,6 @@ sub generate
 		return 1 if $nb;
 		return $a cmp $b;
 	} @edge_case_array;
-
-	# $self->_log(
-		# 'EDGE CASES: ' . join(', ',
-			# map { defined($_) ? $_ : 'undef' } @edge_case_array
-		# )
-	# );
 
 	# render edge case maps for inclusion in the .t
 	my $edge_cases_code = render_arrayref_map(\%edge_cases);
@@ -1634,10 +1795,34 @@ sub generate
 	}
 	if(defined(my $re = $output{'matches'})) {
 		if(ref($re) ne 'Regexp') {
-			$re = qr/$re/;
-			$output{'matches'} = $re;
+			# Use eval to compile safely — qr/$re/ would interpolate
+			# the string first, corrupting patterns containing [ or \
+			my $compiled = eval { qr/$re/ };
+			if($@) {
+				carp("Invalid matches pattern '$re': $@");
+			} else {
+				$output{'matches'} = $compiled;
+			}
 		}
 	}
+
+	# Compile nomatch pattern to a Regexp object so it renders
+	# as qr{} in the generated test rather than a raw string.
+	# Without this, patterns containing [ or other regex
+	# metacharacters cause compilation failures in validators
+	if(defined(my $re = $output{'nomatch'})) {
+		if(ref($re) ne 'Regexp') {
+			# Use eval to compile safely — qr/$re/ would interpolate
+			# the string first, corrupting patterns containing [ or \
+			my $compiled = eval { qr/$re/ };
+			if($@) {
+				carp("Invalid nomatch pattern '$re': $@");
+			} else {
+				$output{'nomatch'} = $compiled;
+			}
+		}
+	}
+
 	my $output_code = render_args_hash(\%output);
 	my $new_code = ($new && (ref $new eq 'HASH')) ? render_args_hash($new) : '';
 
@@ -1703,7 +1888,7 @@ sub generate
 	my $call_code;	# Code to call the function being test when used with named arguments
 	my $position_code;	# Code to call the function being test when used with position arguments
 	my $has_positions = _has_positions(\%input);
-	if(defined($new)) {
+	if(defined($new) && defined($module)) {
 		# keep use_ok regardless (user found earlier issue)
 		if($new_code eq '') {
 			$new_code = "new_ok('$module')";
@@ -1816,7 +2001,7 @@ sub generate
 						perl_quote(join(', ', map { $_ // '' } @$inputs )),
 						$expected_str
 					);
-					if($output{'type'} eq 'boolean') {
+					if(($output{'type'} // '') eq 'boolean') {
 						if($expected_str eq '1') {
 							$corpus_code .= "ok(\$obj->$function($input_str), " . q_wrap($desc) . ");\n";
 						} elsif($expected_str eq '0') {
@@ -1834,7 +2019,7 @@ sub generate
 						$corpus_code .= "dies_ok { $module\::$function($input_str) } " .
 							"'Corpus $expected dies';\n";
 					} else {
-						$corpus_code .= "dies_ok { ::$function($input_str) } " .
+						$corpus_code .= "dies_ok { $function($input_str) } " .
 							"'Corpus $expected dies';\n";
 					}
 				} elsif($status eq 'WARNS') {
@@ -1842,7 +2027,7 @@ sub generate
 						$corpus_code .= "warnings_exist { $module\::$function($input_str) } qr/./, " .
 							"'Corpus $expected warns';\n";
 					} else {
-						$corpus_code .= "warnings_exist { ::$function($input_str) } qr/./, " .
+						$corpus_code .= "warnings_exist { $function($input_str) } qr/./, " .
 							"'Corpus $expected warns';\n";
 					}
 				} else {
@@ -1850,7 +2035,7 @@ sub generate
 						perl_quote((ref $inputs eq 'ARRAY') ? (join(', ', map { $_ // '' } @{$inputs})) : $inputs),
 						$expected_str
 					);
-					if($output{'type'} eq 'boolean') {
+					if(($output{'type'} // '') eq 'boolean') {
 						if($expected_str eq '1') {
 							$corpus_code .= "ok(\$obj->$function($input_str), " . q_wrap($desc) . ");\n";
 						} elsif($expected_str eq '0') {
@@ -1905,6 +2090,7 @@ sub generate
 		use_properties => $use_properties,
 		transform_properties_code => $transform_properties_code,
 		property_trials => $config{properties}{trials} // DEFAULT_PROPERTY_TRIALS,
+		relationships_code => $relationships_code,
 		module => $module
 	};
 
@@ -1912,7 +2098,7 @@ sub generate
 	$tt->process($template, $vars, \$test) or croak($tt->error());
 
 	if ($test_file) {
-		open my $fh, '>:encoding(UTF-8)', $test_file or die "Cannot open $test_file: $!";
+		open my $fh, '>:encoding(UTF-8)', $test_file or croak "Cannot open $test_file: $!";
 		print $fh "$test\n";
 		close $fh;
 		if($module) {
@@ -1927,270 +2113,578 @@ sub generate
 
 # --- Helpers for rendering data structures into Perl code for the generated test ---
 
+# --------------------------------------------------
+# _load_schema
+#
+# Load and parse a schema file using
+#     Config::Abstraction, returning the
+#     schema as a hashref.
+#
+# Entry:      $schema_file - path to the schema file.
+#             Must be defined, non-empty, and readable.
+#
+# Exit:       Returns a hashref of the parsed schema
+#             with a '_source' key added containing
+#             the originating file path.
+#             Croaks on any error.
+#
+# Side effects: Reads from the filesystem.
+#
+# Notes:      Legacy Perl-file configs (containing
+#             '$module' or 'our $module' keys) are
+#             rejected with a clear error. Config::
+#             Abstraction is used rather than require()
+#             to avoid executing arbitrary code from
+#             user-supplied config files.
+# --------------------------------------------------
 sub _load_schema {
 	my $schema_file = $_[0];
 
-	if(!defined($schema_file)) {
-		croak(__PACKAGE__, ': Usage: _load_schema($schema_file)');
-	}
+	# Validate the argument before touching the filesystem
+	croak(__PACKAGE__, ': Usage: _load_schema($schema_file)') unless defined $schema_file;
 
-	if(length($schema_file) == 0) {
-		croak(__PACKAGE__, ': _load_schema given empty filename');
-	}
+	croak(__PACKAGE__, ': _load_schema given empty filename') unless length($schema_file);
 
-	if(!-r $schema_file) {
-		croak(__PACKAGE__, ": _load_schema($schema_file): $!");
-	}
+	# Confirm the file exists and is readable before attempting
+	# to load it — gives a clearer error than Config::Abstraction would
+	croak(__PACKAGE__, ": _load_schema($schema_file): $!") unless -r $schema_file;
 
-	# --- Load configuration safely (require so config can use 'our' variables) ---
-	# FIXME:  would be better to use Config::Abstraction, since requiring the user's config could execute arbitrary code
-	# my $abs = $schema_file;
-	# $abs = "./$abs" unless $abs =~ m{^/};
-	# require $abs;
-
-	if(my $schema = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file, no_fixate => 1)) {
+	# Load configuration via Config::Abstraction which supports
+	# YAML, JSON, and other formats without executing arbitrary code.
+	# no_fixate prevents automatic type coercion that could alter values
+	if(my $schema = Config::Abstraction->new(
+		config_dirs  => ['.', ''],
+		config_file  => $schema_file,
+		no_fixate    => 1,
+	)) {
 		if($schema = $schema->all()) {
-			if(exists($schema->{'$module'}) || exists($schema->{'our $module'}) || !exists($schema->{'module'})) {
+			# Detect legacy Perl config files by the presence of
+			# variable declaration keys — these are no longer supported
+			if(exists($schema->{$LEGACY_PERL_KEY_1}) ||
+			   exists($schema->{$LEGACY_PERL_KEY_2})) {
 				croak("$schema_file: Loading perl files as configs is no longer supported");
 			}
-			$schema->{'_source'} = $schema_file;
+
+			# Tag the schema with its source path for error messages
+			$schema->{$SOURCE_KEY} = $schema_file;
 			return $schema;
 		}
 	}
+
 	croak "Failed to load schema from $schema_file";
 }
 
-sub _load_schema_section
-{
-	my($schema, $section, $schema_file) = @_;
+# --------------------------------------------------
+# _load_schema_section
+#
+# Purpose:    Extract a named section from a parsed
+#             schema hashref, validating that it is
+#             a hashref if present.
+#
+# Entry:      $schema      - the full parsed schema hashref.
+#             $section     - name of the section to extract
+#                            (e.g. 'input', 'output').
+#             $schema_file - path of the schema file,
+#                            used in error messages only.
+#
+# Exit:       Returns the section hashref if present,
+#             or an empty hashref {} if absent.
+#             Croaks if the section exists but is not
+#             a hashref (and not the string 'undef').
+#
+# Side effects: None.
+#
+# Notes:      The string 'undef' is treated as an
+#             absent section — callers that set a
+#             section to 'undef' in YAML get the same
+#             result as omitting it entirely.
+# --------------------------------------------------
+sub _load_schema_section {
+	my ($schema, $section, $schema_file) = @_;
 
-	if(exists($schema->{$section})) {
-		if(ref($schema->{$section}) eq 'HASH') {
-			return $schema->{$section};
-		} elsif(defined($schema->{$section}) && ($schema->{$section} ne 'undef')) {
-			# carp(Dumper($schema));
-			if(ref($schema->{$section}) && length($schema->{$section})) {
-				croak("$schema_file: $section should be a hash, not ", ref($schema->{$section}));
-			} else {
-				croak("$schema_file: $section should be a hash, not ", $schema->{$section});
-			}
-		}
-	}
-	return {};
+	# Section absent — return empty hash as the safe default
+	return {} unless exists $schema->{$section};
+
+	# Section present and is a hashref — return it directly
+	return $schema->{$section}
+		if ref($schema->{$section}) eq 'HASH';
+
+	# Treat the YAML scalar 'undef' as equivalent to absent
+	return {}
+		if defined($schema->{$section}) &&
+		   $schema->{$section} eq 'undef';
+
+	# Section present but wrong type — croak with a clear message
+	# showing what type was found so the user can fix their schema
+	croak(
+		"$schema_file: $section should be a hash, not ",
+		ref($schema->{$section}) || $schema->{$section}
+	);
 }
 
-# Input validation for configuration
+# --------------------------------------------------
+# _validate_config
+#
+# Purpose:    Validate the top-level schema hashref
+#             loaded from a schema file, checking that
+#             required fields are present and that all
+#             input parameters, types, positions, and
+#             transform properties are well-formed.
+#
+# Entry:      $schema - the full parsed schema hashref
+#             as returned by _load_schema().
+#
+# Exit:       Returns nothing on success.
+#             Croaks on any structural error.
+#             Carps on non-fatal warnings (unknown
+#             semantic types, position gaps, missing
+#             input/output definitions).
+#
+# Side effects: May delete $schema->{input} if its
+#               value is the string 'undef'.
+#
+# Notes:      The parameter is named $schema throughout
+#             to distinguish the top-level schema from
+#             the nested config sub-hash. _validate_config
+#             is called before _normalize_config so config
+#             boolean normalisation has not yet occurred.
+# --------------------------------------------------
 sub _validate_config {
-	my $config = $_[0];
+	my $schema = $_[0];
 
-	if((!defined($config->{'module'})) && (!defined($config->{'function'}))) {
-		# Can't work out what should be tested
+	# At least one of module or function must be present —
+	# without these we cannot generate any meaningful test
+	if(!defined($schema->{'module'}) && !defined($schema->{'function'})) {
 		croak('At least one of function and module must be defined');
 	}
 
-	if((!defined($config->{'input'})) && (!defined($config->{'output'}))) {
-		# Routine takes no input and no output, so there's nothing that would be gained using this software
+	# Warn if neither input nor output is defined — a few
+	# generic tests can still be generated but it is unusual
+	if(!defined($schema->{'input'}) && !defined($schema->{'output'})) {
 		carp('Neither input nor output is defined, only a few tests will be generated');
 	}
-	if(($config->{'input'}) && (ref($config->{input}) ne 'HASH')) {
-		if($config->{'input'} eq 'undef') {
-			delete $config->{'input'};
+
+	# Normalise input: the string 'undef' means no input defined
+	if($schema->{'input'} && ref($schema->{input}) ne 'HASH') {
+		if($schema->{'input'} eq 'undef') {
+			delete $schema->{'input'};
 		} else {
-			croak('Invalid input specification')
+			croak("Invalid input specification: expected hash, got '$schema->{'input'}'");
 		}
 	}
 
-	if($config->{input}) {
-		# Validate types, constraints, etc.
-		for my $param (keys %{$config->{input}}) {
-			if(!length($param)) {
-				croak 'Empty input parameter name';
-			}
-			my $spec = $config->{input}{$param};
-			if(ref($spec)) {
-				croak("Missing type for parameter '$param'") unless(defined $spec->{type});
-				croak("Invalid type '$spec->{type}' for parameter '$param'") unless _valid_type($spec->{type});
-			} else {
-				croak "Invalid type '$spec' for parameter '$param'" unless _valid_type($spec);
-			}
-		}
-
-		# Check if using positional arguments
-		my $has_positions = 0;
-		my %positions;
-
-		for my $param (keys %{$config->{input}}) {
-			my $spec = $config->{input}{$param};
-			if (ref($spec) eq 'HASH' && defined($spec->{position})) {
-				$has_positions = 1;
-				my $pos = $spec->{position};
-
-				# Validate position is non-negative integer
-				croak "Position for '$param' must be a non-negative integer" unless $pos =~ /^\d+$/;
-
-				# Check for duplicate positions
-				croak "Duplicate position $pos for parameters '$positions{$pos}' and '$param'" if exists $positions{$pos};
-
-				$positions{$pos} = $param;
-			}
-		}
-
-		# If using positions, all params must have positions
-		if ($has_positions) {
-			for my $param (keys %{$config->{input}}) {
-				my $spec = $config->{input}{$param};
-				unless (ref($spec) eq 'HASH' && defined($spec->{position})) {
-					croak "Parameter '$param' missing position (all params must have positions if any do)";
-				}
-			}
-
-			# Check for gaps in positions (0, 1, 3 - missing 2)
-			my @sorted = sort { $a <=> $b } keys %positions;
-			for my $i (0..$#sorted) {
-				if ($sorted[$i] != $i) {
-					carp "Warning: Position sequence has gaps (positions: @sorted)";
-					last;
-				}
-			}
-		}
-
-		# Validate input types
-		my $semantic_generators = _get_semantic_generators();
-		for my $param (keys %{$config->{input}}) {
-			my $spec = $config->{input}{$param};
-			if(ref($spec) eq 'HASH') {
-				if(defined($spec->{semantic})) {
-					my $semantic = $spec->{semantic};
-					unless (exists $semantic_generators->{$semantic}) {
-						carp "Warning: $config->{_source}: Unknown semantic type '$semantic' for parameter '$param'. Available types: ",
-							join(', ', sort keys %$semantic_generators);
-					}
-				}
-				if($spec->{'enum'} && $spec->{'memberof'}) {
-					croak "$param: has both enum and memberof";
-				}
-				for my $type('enum', 'memberof') {
-					if(exists $spec->{$type}) {
-						croak "$type must be arrayref" unless(ref($spec->{$type}) eq 'ARRAY');
-					}
-				}
-			}
-		}
+	# Validate each input parameter if input is defined
+	if($schema->{input}) {
+		_validate_input_params($schema);
+		_validate_input_positions($schema);
+		_validate_input_semantics($schema);
 	}
 
-	# Validate custom properties in transforms
-	if (exists $config->{transforms} && ref($config->{transforms}) eq 'HASH') {
-		my $builtin_props = _get_builtin_properties();
-
-		for my $transform_name (keys %{$config->{transforms}}) {
-			my $transform = $config->{transforms}{$transform_name};
-
-			if (exists $transform->{properties}) {
-				unless (ref($transform->{properties}) eq 'ARRAY') {
-					croak "Transform '$transform_name': properties must be an array";
-				}
-
-				for my $prop (@{$transform->{properties}}) {
-					if (!ref($prop)) {
-						# Check if builtin exists
-						unless (exists $builtin_props->{$prop}) {
-							carp "Transform '$transform_name': unknown built-in property '$prop'. Available: ",
-								join(', ', sort keys %$builtin_props);
-						}
-					}
-					elsif (ref($prop) eq 'HASH') {
-						# Validate custom property structure
-						unless ($prop->{name} && $prop->{code}) {
-							croak "Transform '$transform_name': custom properties must have 'name' and 'code' fields";
-						}
-					}
-					else {
-						croak "Transform '$transform_name': invalid property definition";
-					}
-				}
-			}
-		}
+	# Validate transform property definitions if present
+	if(exists($schema->{transforms}) && ref($schema->{transforms}) eq 'HASH') {
+		_validate_transform_properties($schema);
 	}
 
-	if(ref($config->{config}) eq 'HASH') {
-		# Validate the config variables, checking that they are ones we know
-		foreach my $k (keys %{$config->{'config'}}) {
-			if(!grep { $_ eq $k } (CONFIG_TYPES) ) {
-				croak "unknown config setting $k";
+	# Validate any nested config sub-hash keys against known types
+	if(ref($schema->{config}) eq 'HASH') {
+		for my $k (keys %{$schema->{'config'}}) {
+			# CONFIG_TYPES is the authoritative list of valid keys
+			croak "unknown config setting '$k'"
+				unless grep { $_ eq $k } CONFIG_TYPES;
+		}
+	}
+}
+
+# --------------------------------------------------
+# _validate_input_params
+#
+# Purpose:    Validate type specifications for each
+#             named input parameter.
+#
+# Entry:      $schema - the full parsed schema hashref.
+#             $schema->{input} must be a hashref.
+#
+# Exit:       Returns nothing. Croaks on invalid type.
+# Side effects: None.
+# --------------------------------------------------
+sub _validate_input_params {
+	my $schema = $_[0];
+
+	for my $param (keys %{$schema->{input}}) {
+		# Catch empty parameter names — these would produce
+		# broken Perl variable names in the generated test
+		croak 'Empty input parameter name'
+			unless length($param);
+
+		my $spec = $schema->{input}{$param};
+
+		# Validate the type field — required for all parameters
+		if(ref($spec)) {
+			croak("Missing type for parameter '$param'")
+				unless defined $spec->{type};
+			croak("Invalid type '$spec->{type}' for parameter '$param'")
+				unless _valid_type($spec->{type});
+		} else {
+			croak("Invalid type '$spec' for parameter '$param'")
+				unless _valid_type($spec);
+		}
+	}
+}
+
+# --------------------------------------------------
+# _validate_input_positions
+#
+# Purpose:    Validate positional argument declarations
+#             in the input schema — positions must be
+#             non-negative integers with no duplicates,
+#             and either all or no parameters must have
+#             positions.
+#
+# Entry:      $schema - the full parsed schema hashref.
+#             $schema->{input} must be a hashref.
+#
+# Exit:       Returns nothing. Croaks on invalid or
+#             duplicate positions. Carps on gaps.
+# Side effects: None.
+# --------------------------------------------------
+sub _validate_input_positions {
+	my $schema = $_[0];
+
+	my $has_positions = 0;
+	my %positions;
+
+	for my $param (keys %{$schema->{input}}) {
+		my $spec = $schema->{input}{$param};
+
+		# Only process params that explicitly declare a position
+		next unless ref($spec) eq 'HASH' && defined($spec->{position});
+
+		$has_positions = 1;
+		my $pos = $spec->{position};
+
+		# Position must be a non-negative integer
+		croak "Position for '$param' must be a non-negative integer"
+			unless $pos =~ /^\d+$/;
+
+		# Duplicate positions would produce ambiguous generated tests
+		croak "Duplicate position $pos for parameters '$positions{$pos}' and '$param'"
+			if exists $positions{$pos};
+
+		$positions{$pos} = $param;
+	}
+
+	# If any param has a position, all params must have one
+	if($has_positions) {
+		for my $param (keys %{$schema->{input}}) {
+			my $spec = $schema->{input}{$param};
+			unless(ref($spec) eq 'HASH' && defined($spec->{position})) {
+				croak "Parameter '$param' missing position " .
+					'(all params must have positions if any do)';
+			}
+		}
+
+		# Check for gaps — positions must be a contiguous sequence
+		# starting at 0, otherwise the generated test will be wrong
+		my @sorted = sort { $a <=> $b } keys %positions;
+		for my $i (0 .. $#sorted) {
+			if($sorted[$i] != $i) {
+				carp "Position sequence has gaps (positions: @sorted)";
+				last;
 			}
 		}
 	}
 }
 
-# Handle the various possible boolean settings for config values
-# Note that the default for everything is true
-sub _normalize_config
-{
+# --------------------------------------------------
+# _validate_input_semantics
+#
+# Purpose:    Validate semantic type annotations and
+#             enum/memberof constraints on input params.
+#
+# Entry:      $schema - the full parsed schema hashref.
+#             $schema->{input} must be a hashref.
+#
+# Exit:       Returns nothing. Croaks on conflicting
+#             or malformed enum/memberof. Carps on
+#             unknown semantic types.
+# Side effects: None.
+# --------------------------------------------------
+sub _validate_input_semantics {
+	my $schema = $_[0];
+
+	my $semantic_generators = _get_semantic_generators();
+
+	for my $param (keys %{$schema->{input}}) {
+		my $spec = $schema->{input}{$param};
+		next unless ref($spec) eq 'HASH';
+
+		# Warn on unknown semantic types rather than croaking —
+		# new semantic types may be added without updating this list
+		if(defined($spec->{semantic})) {
+			my $semantic = $spec->{semantic};
+			unless(exists $semantic_generators->{$semantic}) {
+				carp "Unknown semantic type '$semantic' for parameter '$param'. " .
+					'Available types: ' .
+					join(', ', sort keys %{$semantic_generators});
+			}
+		}
+
+		# enum and memberof are mutually exclusive representations
+		# of the same concept — having both is always a schema error
+		if($spec->{'enum'} && $spec->{'memberof'}) {
+			croak "$param: has both enum and memberof";
+		}
+
+		# Both enum and memberof must be arrayrefs when present
+		for my $type ('enum', 'memberof') {
+			if(exists $spec->{$type}) {
+				croak "$type must be an arrayref"
+					unless ref($spec->{$type}) eq 'ARRAY';
+			}
+		}
+	}
+}
+
+# --------------------------------------------------
+# _validate_transform_properties
+#
+# Purpose:    Validate the properties array in each
+#             transform definition, checking that each
+#             property is either a known builtin name
+#             or a custom hashref with name and code.
+#
+# Entry:      $schema - the full parsed schema hashref.
+#             $schema->{transforms} must be a hashref.
+#
+# Exit:       Returns nothing. Croaks on invalid property
+#             definitions. Carps on unknown builtins.
+# Side effects: None.
+# --------------------------------------------------
+sub _validate_transform_properties {
+	my $schema = $_[0];
+
+	my $builtin_props = _get_builtin_properties();
+
+	for my $transform_name (keys %{$schema->{transforms}}) {
+		my $transform = $schema->{transforms}{$transform_name};
+
+		# properties is optional — skip transforms that don't define it
+		next unless exists $transform->{properties};
+
+		croak "Transform '$transform_name': properties must be an array"
+			unless ref($transform->{properties}) eq 'ARRAY';
+
+		for my $prop (@{$transform->{properties}}) {
+			if(!ref($prop)) {
+				# Plain string — must be a known builtin property name
+				unless(exists $builtin_props->{$prop}) {
+					carp "Transform '$transform_name': unknown built-in property '$prop'. " .
+						'Available: ' .
+						join(', ', sort keys %{$builtin_props});
+				}
+			} elsif(ref($prop) eq 'HASH') {
+				# Custom property — must have both name and code fields
+				unless($prop->{name} && $prop->{code}) {
+					croak "Transform '$transform_name': " .
+						"custom properties must have 'name' and 'code' fields";
+				}
+			} else {
+				croak "Transform '$transform_name': invalid property definition";
+			}
+		}
+	}
+}
+
+# --------------------------------------------------
+# _normalize_config
+#
+# Purpose:    Normalise boolean string values in the
+#             config sub-hash to Perl integers (1/0),
+#             and default absent boolean fields to 1
+#             (enabled). The 'properties' field is a
+#             hashref not a boolean and is handled
+#             separately.
+#
+# Entry:      $config - the config sub-hash extracted
+#             from the schema (i.e. $schema->{config}).
+#             May be empty.
+#
+# Exit:       Returns nothing. Modifies $config in place.
+#
+# Side effects: Modifies the caller's config hashref.
+#
+# Notes:      String-to-boolean conversion is delegated
+#             to %Readonly::Values::Boolean::booleans
+#             which handles 'yes'/'no', 'on'/'off',
+#             'true'/'false' etc. Fields not present in
+#             the config hash are defaulted to 1 so
+#             that test generation is maximally thorough
+#             unless the schema explicitly disables a
+#             feature.
+# --------------------------------------------------
+sub _normalize_config {
 	my $config = $_[0];
 
-	foreach my $field (CONFIG_TYPES) {
-		next if($field eq 'properties');	# Not a boolean
-		if(exists($config->{$field})) {
+	for my $field (CONFIG_TYPES) {
+		# The properties field is a hashref not a boolean —
+		# it is handled at the end of this function separately
+		next if $field eq $CONFIG_PROPERTIES_KEY;
+
+		if(exists($config->{$field}) && defined($config->{$field})) {
+			# Convert string boolean representations to integers
+			# using the lookup table from Readonly::Values::Boolean
 			if(defined(my $b = $Readonly::Values::Boolean::booleans{$config->{$field}})) {
 				$config->{$field} = $b;
 			}
 		} else {
+			# Default absent boolean fields to enabled (1) so that
+			# test generation is comprehensive unless explicitly disabled
 			$config->{$field} = 1;
 		}
 	}
 
-	$config->{properties} = { enable => 0 } unless ref $config->{properties} eq 'HASH';
+	# Ensure properties is always a hashref — if absent or set to
+	# a non-hash value, replace with a disabled default so that
+	# downstream code can safely dereference it without checking ref()
+	$config->{$CONFIG_PROPERTIES_KEY} = { enable => 0 } unless ref($config->{$CONFIG_PROPERTIES_KEY}) eq 'HASH';
 }
 
-sub _valid_type
-{
+# --------------------------------------------------
+# _valid_type
+#
+# Determine whether a string is a
+#     recognised schema field type accepted
+#     by the generator.
+#
+# Entry:      $type - the type string to validate.
+#             May be undef.
+#
+# Exit:       Returns 1 if the type is known,
+#             0 if the type is unknown or undef.
+#
+# Side effects: None.
+#
+# Notes:      The lookup hash is declared with
+#             'state' so it is built only once per
+#             process rather than on every call —
+#             important since _valid_type is called
+#             in a loop over all input parameters.
+#
+#             'int' and 'bool' are accepted as
+#             aliases for 'integer' and 'boolean'
+#             respectively, for compatibility with
+#             schemas generated by external tools
+#             that use the shorter forms.
+# --------------------------------------------------
+sub _valid_type {
 	my $type = $_[0];
 
-	return 0 if(!defined($type));
+	# Undef is never a valid type
+	return 0 unless defined($type);
 
+	# Build the lookup table once and cache it for
+	# the lifetime of the process via 'state'
 	state %VALID = map { $_ => 1 } qw(
-		string boolean integer number float hashref arrayref object int bool
+		string boolean integer number float
+		hashref arrayref object int bool
 	);
-	return $VALID{$type};
+
+	return($VALID{$type} // 0);
 }
 
+# --------------------------------------------------
+# _validate_module
+#
+# Purpose:    Check whether the module named in a
+#             schema can be found in @INC during
+#             test generation. Optionally also
+#             attempts to load it if the
+#             GENERATOR_VALIDATE_LOAD environment
+#             variable is set.
+#
+# Entry:      $module      - the module name to
+#                            check. If undef or
+#                            empty, returns 1
+#                            immediately (builtin
+#                            functions need no
+#                            module).
+#             $schema_file - path to the schema
+#                            file, used in warning
+#                            messages only.
+#
+# Exit:       Returns 1 if the module was found
+#             (and loaded, if validation was
+#             requested).
+#             Returns 0 if the module was not
+#             found or failed to load — this is
+#             non-fatal; generation continues.
+#             Returns 1 immediately for undef or
+#             empty $module.
+#
+# Side effects: Prints to STDERR when TEST_VERBOSE
+#               or GENERATOR_VERBOSE is set.
+#               Carps (non-fatally) when the module
+#               cannot be found or loaded.
+#               May attempt to load the module into
+#               the current process when
+#               GENERATOR_VALIDATE_LOAD is set —
+#               this can have side effects depending
+#               on the module.
+#
+# Notes:      Not finding a module during generation
+#             is intentionally non-fatal — the module
+#             may be available on the target machine
+#             even if not on the generation machine.
+#             Verbose output goes to STDERR via
+#             print rather than carp since it is
+#             informational, not a warning.
+# --------------------------------------------------
 sub _validate_module {
 	my ($module, $schema_file) = @_;
 
-	return 1 unless $module;	# No module to validate (builtin functions)
+	# Builtin functions have no module to validate
+	return 1 unless $module;
 
-	# Check if the module can be found
+	# Check whether the module is findable in @INC
 	my $mod_info = check_install(module => $module);
 
 	if($schema_file && !$mod_info) {
-		# Module not found - this is just a warning, not an error
-		# The module might not be installed on the generation machine
-		# but could be on the test machine
-		carp("Warning: Module '$module' not found in \@INC during generation.");
-		carp("  Config file: $schema_file");
-		carp("  This is OK if the module will be available when tests run.");
-		carp('  If this is unexpected, check your module name and installation.');
-		return 0;	# Not found, but not fatal
+		# Non-fatal — emit a single consolidated warning so
+		# the caller sees one message rather than four
+		carp(
+			"Module '$module' not found in \@INC during generation.\n" .
+			"  Config file: $schema_file\n" .
+			"  This is OK if the module will be available when tests run.\n" .
+			'  If unexpected, check your module name and installation.'
+		);
+		return 0;
 	}
 
-	# Module was found
-	if($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
-		print STDERR "Found module '$module' at: $mod_info->{file}\n",
-			'  Version: ', ($mod_info->{version} || 'unknown'), "\n";
+	# Check once and reuse — avoids evaluating two env vars twice
+	my $verbose = $ENV{$ENV_TEST_VERBOSE} || $ENV{$ENV_GENERATOR_VERBOSE};
+
+	if($verbose) {
+		print STDERR "Found module '$module' at: $mod_info->{'file'}\n",
+			'  Version: ', ($mod_info->{'version'} || 'unknown'), "\n";
 	}
 
-	# Optionally try to load it (disabled by default since it can have side effects)
-	if($ENV{GENERATOR_VALIDATE_LOAD}) {
+	# Optional load validation — disabled by default because
+	# loading a module can have side effects (e.g. BEGIN blocks,
+	# database connections, file I/O) that are undesirable
+	# during generation
+	if($ENV{$ENV_VALIDATE_LOAD}) {
 		my $loaded = can_load(modules => { $module => undef }, verbose => 0);
 
 		if(!$loaded) {
 			my $err = $Module::Load::Conditional::ERROR || 'unknown error';
-			carp("Warning: Module '$module' found but failed to load: $err");
-			carp('  This might indicate a broken installation or missing dependencies.');
+			carp(
+				"Module '$module' found but failed to load: $err\n" .
+				'  This might indicate a broken installation or missing dependencies.'
+			);
 			return 0;
 		}
 
-		if($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
+		if($verbose) {
 			print STDERR "Successfully loaded module '$module'\n";
 		}
 	}
@@ -2198,154 +2692,645 @@ sub _validate_module {
 	return 1;
 }
 
-sub perl_sq {
-	my $s = $_[0];
+=head2 render_fallback
 
-	return '' unless defined $s;
+Render any Perl value into a compact Perl source-code string using
+L<Data::Dumper>. Used as a catch-all when no more specific renderer
+applies.
 
-	$s =~ s/\\/\\\\/g;
-	$s =~ s/'/\\'/g;
-	$s =~ s/\n/\\n/g;
-	$s =~ s/\r/\\r/g;
-	$s =~ s/\t/\\t/g;
-	$s =~ s/\f/\\f/g;
-	# $s =~ s/\b/\\b/g;
-	$s =~ s/\0/\\0/g;
-	return $s;
-}
+    my $code = render_fallback({ key => 'value' });
+    # returns: "{'key' => 'value'}"
 
-sub perl_quote {
+=head3 Arguments
+
+=over 4
+
+=item * C<$v>
+
+Any Perl value, including undef, scalars, refs, and blessed objects.
+
+=back
+
+=head3 Returns
+
+A string of Perl source code that reproduces the value when evaluated.
+Returns the string C<'undef'> when C<$v> is undef.
+
+=head3 Side effects
+
+Temporarily sets C<$Data::Dumper::Terse> and C<$Data::Dumper::Indent>
+to produce compact single-line output. Both are restored on return via
+C<local>.
+
+=head3 Notes
+
+The output is always a single line with no trailing newline. Suitable
+for embedding in generated test code where readability is secondary to
+correctness.
+
+=head3 API specification
+
+=head4 input
+
+    { v => { type => SCALAR|REF, optional => 1 } }
+
+=head4 output
+
+    { type => SCALAR }
+
+=cut
+
+sub render_fallback {
 	my $v = $_[0];
+
+	# Handle undef explicitly rather than letting Dumper produce
+	# 'undef' without the localised settings applied
 	return 'undef' unless defined $v;
-	return '!!1' if $v eq 'true';
-	if(ref($v)) {
-		if(ref($v) eq 'ARRAY') {
-			my @quoted_v = map { perl_quote($_) } @{$v};
-			return '[ ' . join(', ', @quoted_v) . ' ]';
-		}
-		if(ref($v) eq 'Regexp') {
-			my ($pat, $mods) = regexp_pattern($v);
 
-			my $re = "qr{$pat}";
-			$re .= $mods if $mods;
-			return $re;
-		}
-		# Generic fallback
-		return render_fallback($v);
-	}
-	$v =~ s/\\/\\\\/g;
-	# return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . perl_sq($v) . "'";
-	return looks_like_number($v) ? $v : "'" . perl_sq($v) . "'";
-}
-
-sub render_fallback
-{
-	my $v = $_[0];
-
-	local $Data::Dumper::Terse = 1;
+	# Use Terse+Indent=0 to produce compact single-line output
+	# suitable for embedding in generated test code
+	local $Data::Dumper::Terse  = 1;
 	local $Data::Dumper::Indent = 0;
+
 	my $s = Dumper($v);
+
+	# Remove trailing newline that Dumper always appends
 	chomp $s;
 	return $s;
 }
 
+=head2 render_hash
+
+Render a two-level hashref (parameter name => spec hashref) into Perl
+source code suitable for embedding in a generated test file as the
+input specification passed to L<Params::Validate::Strict>.
+
+    my $code = render_hash(\%input);
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$href>
+
+A hashref whose values are themselves hashrefs containing field
+specifications. Keys whose values are not hashrefs are skipped with
+a warning.
+
+=back
+
+=head3 Returns
+
+A string of comma-separated Perl source-code lines, one per key, of
+the form:
+
+    'key' => { subkey => value, ... }
+
+Returns an empty string if C<$href> is undef, empty, or not a hashref.
+
+=head3 Side effects
+
+None. Does not modify C<$href>.
+
+=head3 Notes
+
+The C<matches> and C<nomatch> sub-keys are treated specially — their
+values are compiled to C<Regexp> objects via C<eval { qr/.../ }> and
+then rendered using C<perl_quote> so they appear as C<qr{...}> in the
+generated test. This prevents unmatched bracket characters in the
+pattern from causing compilation failures.
+
+Other sub-keys are rendered via C<perl_quote>.
+
+=head3 API specification
+
+=head4 input
+
+    { href => { type => HASHREF, optional => 1 } }
+
+=head4 output
+
+    { type => SCALAR }
+
+=cut
+
 sub render_hash {
 	my $href = $_[0];
+
+	# Return empty string for absent or non-hash input — callers
+	# treat '' as "no input specification" in the generated test
 	return '' unless $href && ref($href) eq 'HASH';
+
 	my @lines;
-	for my $k (sort keys %$href) {
-		my $def = $href->{$k} // {};
-		next unless ref $def eq 'HASH';
+
+	for my $k (sort keys %{$href}) {
+		my $def = $href->{$k};
+
+		# Handle scalar shorthand — 'arg1: string' is equivalent to
+		# 'arg1: { type: string }' and is explicitly supported by the
+		# validation layer in _validate_input_params
+		unless(defined($def) && ref($def) eq 'HASH') {
+			if(defined($def) && !ref($def) && _valid_type($def)) {
+				# Expand scalar type shorthand to a full spec hashref
+				$def = { type => $def };
+			} else {
+				carp "render_hash: skipping key '$k' — value is not a hashref or recognised type string";
+				next;
+			}
+		}
+
 		my @pairs;
-		for my $subk (sort keys %$def) {
+
+		for my $subk (sort keys %{$def}) {
+			# Skip undef sub-values — they contribute nothing to the spec
 			next unless defined $def->{$subk};
+
+			# Validate that reference types are ones we can render —
+			# nested hashrefs are not yet supported
 			if(ref($def->{$subk})) {
-				unless((ref($def->{$subk}) eq 'ARRAY') || (ref($def->{$subk}) eq 'Regexp')) {
-					croak(__PACKAGE__, ": schema_file, $subk is a nested element, not yet supported (", ref($def->{$subk}), ')');
+				unless((ref($def->{$subk}) eq 'ARRAY') ||
+				       (ref($def->{$subk}) eq 'Regexp')) {
+					croak(
+						__PACKAGE__,
+						": $subk is a nested element, not yet supported (",
+						ref($def->{$subk}), ')'
+					);
 				}
 			}
-			if(($subk eq 'matches') || ($subk eq 'nomatch')) {
-				# push @pairs, "$subk => qr/$def->{$subk}/";
-				push @pairs, "$subk => " . perl_quote(qr/$def->{$subk}/);
+
+			# matches and nomatch values must be Regexp objects in the
+			# generated test — compile raw strings safely via eval so
+			# patterns containing [ or \ don't cause compile failures
+			if(($subk eq $KEY_MATCHES) || ($subk eq $KEY_NOMATCH)) {
+				my $re = ref($def->{$subk}) eq 'Regexp'
+					? $def->{$subk}
+					: eval { qr/$def->{$subk}/ };
+				if($@ || !defined($re)) {
+					carp "render_hash: invalid $subk pattern '$def->{$subk}': $@";
+					next;
+				}
+				push @pairs, "$subk => " . perl_quote($re);
 			} else {
+				# All other sub-keys are rendered via perl_quote which
+				# handles scalars, arrayrefs, and Regexp objects correctly
 				push @pairs, "$subk => " . perl_quote($def->{$subk});
 			}
 		}
-		push @lines, '	' . perl_quote($k) . " => { " . join(", ", @pairs) . " }";
+
+		# Use "\t" rather than a literal tab for clarity and grep-ability
+		push @lines, "\t" . perl_quote($k) . ' => { ' . join(', ', @pairs) . ' }';
 	}
+
 	return join(",\n", @lines);
 }
 
+=head2 render_args_hash
+
+Render a flat hashref into a Perl source-code argument list of the
+form C<'key' => value, ...>, suitable for embedding in a function call
+in a generated test file.
+
+    my $code = render_args_hash({ type => 'string', min => 1 });
+    # returns: "'min' => 1, 'type' => 'string'"
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$href>
+
+A flat hashref of key-value pairs. Values may be scalars, arrayrefs,
+or Regexp objects — all are handled by C<perl_quote>.
+
+=back
+
+=head3 Returns
+
+A comma-separated string of C<key => value> pairs sorted by key.
+Returns an empty string if C<$href> is undef, empty, or not a hashref.
+
+=head3 Side effects
+
+None.
+
+=head3 Notes
+
+Keys and values are both rendered via C<perl_quote>. In particular,
+C<Regexp> values are rendered as C<qr{...}> which is correct for
+L<Params::Validate::Strict> and L<Return::Set> schema arguments in
+the generated test.
+
+=head3 API specification
+
+=head4 input
+
+    { href => { type => HASHREF, optional => 1 } }
+
+=head4 output
+
+    { type => SCALAR }
+
+=cut
+
 sub render_args_hash {
 	my $href = $_[0];
+
+	# Return empty string for absent or non-hash input
 	return '' unless $href && ref($href) eq 'HASH';
-	my @pairs = map { perl_quote($_) . ' => ' . perl_quote($href->{$_}) } sort keys %$href;
+
+	# Sort keys for deterministic output across runs — important for
+	# generated test files that are committed to version control
+	my @pairs = map {
+		perl_quote($_) . ' => ' . perl_quote($href->{$_})
+	} sort keys %{$href};
+
 	return join(', ', @pairs);
 }
 
+=head2 render_arrayref_map
+
+Render a hashref whose values are arrayrefs into a Perl source-code
+fragment suitable for use as a hash literal in a generated test file.
+
+    my $code = render_arrayref_map({ name => ['', 'a' x 100] });
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$href>
+
+A hashref whose values are arrayrefs. Keys whose values are not
+arrayrefs are silently skipped.
+
+=back
+
+=head3 Returns
+
+A comma-separated string of C<'key' => [ val, ... ]> entries, one per
+qualifying key, sorted alphabetically. Returns the string C<'()'> if
+C<$href> is undef, empty, or not a hashref — this produces an empty
+hash assignment in the generated test rather than a syntax error.
+
+=head3 Side effects
+
+None.
+
+=head3 Notes
+
+Array element values are rendered via C<perl_quote> which handles
+scalars, arrayrefs, and Regexp objects. Non-arrayref values are
+skipped without warning — this is intentional since callers may pass
+mixed-value hashes and only want the arrayref entries rendered.
+
+=head3 API specification
+
+=head4 input
+
+    { href => { type => HASHREF, optional => 1 } }
+
+=head4 output
+
+    { type => SCALAR }
+
+=cut
+
 sub render_arrayref_map {
 	my $href = $_[0];
+
+	# Return '()' rather than '' so callers get a valid empty hash
+	# literal rather than a syntax error in the generated test
 	return '()' unless $href && ref($href) eq 'HASH';
+
 	my @entries;
-	for my $k (sort keys %$href) {
+
+	for my $k (sort keys %{$href}) {
 		my $aref = $href->{$k};
-		next unless ref $aref eq 'ARRAY';
-		my $vals = join(', ', map { perl_quote($_) } @$aref);
-		push @entries, '	' . perl_quote($k) . " => [ $vals ]";
+
+		# Skip non-arrayref values — mixed hashes are allowed by callers
+		next unless ref($aref) eq 'ARRAY';
+
+		# Render each array element via perl_quote so strings are
+		# properly quoted and numbers are left unquoted
+		my $vals = join(', ', map { perl_quote($_) } @{$aref});
+
+		# Use "\t" rather than a literal tab for clarity
+		push @entries, "\t" . perl_quote($k) . " => [ $vals ]";
 	}
+
 	return join(",\n", @entries);
 }
 
-# Robustly quote a string (GitHub#1)
-sub q_wrap
-{
+# --------------------------------------------------
+# _has_positions
+#
+# Purpose:    Determine whether any field in an input
+#             spec hashref declares a positional argument
+#             via the 'position' key.
+#
+# Entry:      $input_spec - the input section of a parsed
+#             schema, expected to be a hashref whose values
+#             are themselves hashrefs containing field specs.
+#             May be undef or a non-hash ref.
+#
+# Exit:       Returns 1 if any field has a defined
+#             'position' key, 0 otherwise.
+#
+# Side effects: None.
+#
+# Notes:      Returns 0 immediately for undef or non-hash
+#             input rather than throwing — callers use the
+#             return value as a boolean and do not expect
+#             exceptions from this function.
+# --------------------------------------------------
+sub _has_positions {
+	my $input_spec = $_[0];
+
+	# Guard against undef or non-hash input — keys %$undef would throw
+	return 0 unless defined($input_spec) && ref($input_spec) eq 'HASH';
+
+	for my $field (keys %{$input_spec}) {
+		# Only examine fields whose spec is a hashref — scalar specs
+		# (e.g. input: { type: string }) cannot have positions
+		next unless ref($input_spec->{$field}) eq 'HASH';
+
+		# Return immediately on first match — no need to scan further
+		return 1 if defined $input_spec->{$field}{position};
+	}
+
+	# No positional arguments found in any field
+	return 0;
+}
+
+# --------------------------------------------------
+# q_wrap
+#
+# Purpose:    Wrap a string in the most readable
+#             q{} form that does not require escaping,
+#             falling back to single-quoted form with
+#             escaped apostrophes if no delimiter is
+#             available.
+#
+# Entry:      $s - the string to wrap. May be undef.
+# Exit:       Returns a Perl source-code fragment that
+#             evaluates to the original string value,
+#             or the string 'undef' if $s is undef.
+#
+# Side effects: None.
+#
+# Notes:      index() returns -1 when not found and
+#             any value >= 0 when found, including 0
+#             for a delimiter at the start of the
+#             string. We compare against $INDEX_NOT_FOUND
+#             to make this boundary explicit and to
+#             prevent off-by-one mutation survivors.
+#             See GitHub issue #1.
+# --------------------------------------------------
+sub q_wrap {
 	my $s = $_[0];
 
-	return "''" if(!defined($s));
+	# Return empty string for undef — this function is a low-level
+	# string quoter only. Callers that need the Perl literal 'undef'
+	# for undefined values should use perl_quote() instead, which
+	# handles the undef -> 'undef' semantic conversion correctly.
+	# Returning '' here preserves the original behaviour and avoids
+	# injecting the bare word 'undef' into contexts that expect a
+	# quoted string value.
+	return "''" unless defined $s;
 
-	for my $p ( ['{','}'], ['(',')'], ['[',']'], ['<','>'] ) {
-		my ($l, $r) = @$p;
+	# Try bracket-form q{} delimiters first — most readable
+	for my $p (@Q_BRACKET_PAIRS) {
+		my ($l, $r) = @{$p};
+
+		# Only use this bracket pair if neither bracket
+		# appears in the string — both must be checked
 		return "q$l$s$r" unless $s =~ /\Q$l\E|\Q$r\E/;
 	}
-	for my $d ('~', '!', '%', '^', '=', '+', ':', ',', ';', '|', '/', '#') {
-		return "q$d$s$d" unless index($s, $d) >= 0;
+
+	# Try single-character delimiters in preference order
+	for my $d (@Q_SINGLE_DELIMITERS) {
+		# index() returns $INDEX_NOT_FOUND (-1) when not found.
+		# Must use != $INDEX_NOT_FOUND rather than > 0 since
+		# the delimiter may legitimately appear at position 0
+		return "q$d$s$d" if index($s, $d) == $INDEX_NOT_FOUND;
 	}
+
+	# Last resort — single-quoted string with escaped apostrophes
 	(my $esc = $s) =~ s/'/\\'/g;
 	return "'$esc'";
 }
 
-=head2 _generate_transform_properties
+# --------------------------------------------------
+# perl_sq
+#
+# Purpose:    Escape a string for safe inclusion
+#             inside a single-quoted Perl string
+#             literal in generated test code.
+#
+# Entry:      $s - the string to escape.
+# Exit:       Returns the escaped string, or an
+#             empty string if $s is undef.
+#
+# Side effects: None.
+#
+# Notes:      NUL byte replacement produces the
+#             two-character sequence \0 which is
+#             only correct when the result is used
+#             inside a double-quoted string context
+#             in the generated test.
+#
+#             The \b substitution (backspace) is
+#             intentionally omitted — in Perl regex
+#             context \b means word boundary, not
+#             backspace, so substituting it here
+#             would corrupt strings containing word
+#             boundaries.
+# --------------------------------------------------
+sub perl_sq {
+	my $s = $_[0];
 
-Converts transform specifications into LectroTest property definitions.
+	# Return empty string for undef — callers that need
+	# 'undef' literal should use perl_quote instead
+	return '' unless defined $s;
 
-=cut
+	# Escape backslashes first so later substitutions
+	# don't double-escape already-escaped sequences
+	$s =~ s/\\/\\\\/g;
 
+	# Escape apostrophes so they don't terminate the
+	# surrounding single-quoted string literal
+	$s =~ s/'/\\'/g;
+
+	# Escape common control characters to their
+	# printable two-character escape sequences
+	$s =~ s/\n/\\n/g;
+	$s =~ s/\r/\\r/g;
+	$s =~ s/\t/\\t/g;
+	$s =~ s/\f/\\f/g;
+
+	# Replace NUL bytes with \0 — valid only in
+	# double-quoted string context in generated code
+	$s =~ s/\0/\\0/g;
+
+	return $s;
+}
+
+# --------------------------------------------------
+# perl_quote
+#
+# Purpose:    Convert a Perl value into a source-code
+#             fragment that reproduces that value when
+#             evaluated in a generated test file.
+#
+# Entry:      $v - the value to quote. May be undef,
+#             a scalar, an arrayref, a Regexp, or any
+#             other reference type.
+#
+# Exit:       Returns a string of Perl source code.
+#             Undef produces the literal 'undef'.
+#             Numbers are returned unquoted.
+#             Strings are returned single-quoted via
+#             perl_sq(). Arrays are recursively quoted.
+#             Regexps are rendered as qr{...}.
+#             Other refs fall through to render_fallback.
+#
+# Side effects: None.
+#
+# Notes:      The boolean string literals 'true' and
+#             'false' are converted to Perl boolean
+#             constants !!1 and !!0 respectively so
+#             that YAML boolean values round-trip
+#             correctly into generated tests.
+# --------------------------------------------------
+sub perl_quote {
+	my $v = $_[0];
+
+	# Undef produces the Perl literal 'undef'
+	return 'undef' unless defined $v;
+
+	# Convert YAML boolean string literals to Perl
+	# boolean constants so they survive round-tripping
+	return '!!1' if $v eq 'true';
+	return '!!0' if $v eq 'false';
+
+	if(ref($v)) {
+		# Recursively quote each element of an arrayref
+		if(ref($v) eq 'ARRAY') {
+			my @quoted_v = map { perl_quote($_) } @{$v};
+			return '[ ' . join(', ', @quoted_v) . ' ]';
+		}
+
+		# Render Regexp objects as qr{} with modifiers
+		if(ref($v) eq 'Regexp') {
+			my ($pat, $mods) = regexp_pattern($v);
+			my $re = "qr{$pat}";
+
+			# Append modifiers (e.g. 'i', 'x') if present
+			$re .= $mods if $mods;
+			return $re;
+		}
+
+		# Hashrefs and other reference types fall through
+		# to render_fallback which uses Data::Dumper
+		return render_fallback($v);
+	}
+
+	# Numeric values are emitted unquoted so the generated
+	# test performs numeric rather than string comparison
+	return looks_like_number($v) ? $v : "'" . perl_sq($v) . "'";
+}
+
+# --------------------------------------------------
+# _generate_transform_properties
+#
+# Convert a hashref of transform
+#     specifications into an arrayref of
+#     LectroTest property definition hashrefs,
+#     one per transform. Each hashref contains
+#     all the information needed by
+#     _render_properties to emit a runnable
+#     Test::LectroTest property block.
+#
+# Entry:      $transforms  - hashref of transform name
+#                            => transform spec, as
+#                            loaded from the schema.
+#             $function    - name of the function under
+#                            test.
+#             $module      - module name, or undef for
+#                            builtin functions.
+#             $input       - the top-level input spec
+#                            hashref from the schema
+#                            (used for position sorting).
+#             $config      - the normalised config
+#                            hashref, used to read
+#                            properties.trials.
+#             $new         - defined if the function is
+#                            an object method; the value
+#                            is not used here since
+#                            property tests always
+#                            construct a fresh object
+#                            via new_ok() with no args.
+#                            Presence vs absence is the
+#                            only signal used.
+#
+# Exit:       Returns an arrayref of property hashrefs.
+#             Returns an empty arrayref if no transforms
+#             produce any testable properties.
+#             Never returns undef.
+#
+# Side effects: None. Does not modify any argument.
+#
+# Notes:      Transforms whose input is the string
+#             'undef' or whose input spec is not a
+#             hashref are silently skipped — they
+#             represent error-case transforms that have
+#             no meaningful generator.
+#
+#             The 'WARN' vs 'WARNS' distinction in
+#             _STATUS: the schema convention uses
+#             'WARNS' throughout. This function checks
+#             for 'WARNS' to match that convention.
+# --------------------------------------------------
 sub _generate_transform_properties {
 	my ($transforms, $function, $module, $input, $config, $new) = @_;
 
 	my @properties;
 
-	for my $transform_name (sort keys %$transforms) {
-		my $transform = $transforms->{$transform_name};
+	for my $transform_name (sort keys %{$transforms}) {
+		my $transform   = $transforms->{$transform_name};
 
-		my $input_spec = $transform->{input};
-		my $output_spec = $transform->{output};
+		my $input_spec  = $transform->{input};
 
-		# Skip if input is 'undef'
-		if (!ref($input_spec) && $input_spec eq 'undef') {
+		# Guard: skip transforms with no input or with the
+		# YAML scalar 'undef' as their input — these have no
+		# generator and cannot produce meaningful properties
+		if(!defined($input_spec) ||
+		   (!ref($input_spec) && $input_spec eq 'undef')) {
 			next;
 		}
 
+		# Guard: skip transforms whose input is not a hashref —
+		# must come before the helper calls below so we never
+		# pass a non-hash to _detect_transform_properties or
+		# _process_custom_properties
+		next unless ref($input_spec) eq 'HASH';
+
+		# Default output spec to empty hash so _STATUS lookups
+		# below are always safe regardless of schema content
+		my $output_spec = $transform->{output} // {};
+
 		# Detect automatic properties from the transform spec
+		# (range constraints, type preservation, definedness)
 		my @detected_props = _detect_transform_properties(
 			$transform_name,
 			$input_spec,
 			$output_spec
 		);
 
-		# Process custom properties from schema
+		# Process any custom properties defined in the schema
 		my @custom_props = ();
-		if (exists $transform->{properties} && ref($transform->{properties}) eq 'ARRAY') {
+		if(exists($transform->{properties}) &&
+		   ref($transform->{properties}) eq 'ARRAY') {
 			@custom_props = _process_custom_properties(
 				$transform->{properties},
 				$function,
@@ -2356,280 +3341,123 @@ sub _generate_transform_properties {
 			);
 		}
 
-		# Combine detected and custom properties
+		# Combine auto-detected and custom properties into one list
 		my @all_props = (@detected_props, @custom_props);
 
-		# Skip if no properties detected or defined
+		# Skip this transform if no properties were produced —
+		# nothing useful to render into the generated test
 		next unless @all_props;
 
-		next unless ref($input_spec) eq 'HASH';
-
-		# Build LectroTest generator specification
+		# Build the LectroTest generator specification string,
+		# one entry per input field that has a generator
 		my @generators;
 		my @var_names;
 
-		for my $field (sort keys %$input_spec) {
+		for my $field (sort keys %{$input_spec}) {
 			my $spec = $input_spec->{$field};
+
+			# Skip non-hashref field specs — scalar types
+			# like 'string' have no generator sub-structure
 			next unless ref($spec) eq 'HASH';
 
-			if(defined(my $gen = _schema_to_lectrotest_generator($field, $spec))) {
-				if(length($gen)) {
-					push @generators, $gen;
-					push @var_names, $field;
-				}
+			my $gen = _schema_to_lectrotest_generator($field, $spec);
+			if(defined($gen) && length($gen)) {
+				push @generators, $gen;
+				push @var_names, $field;
 			}
 		}
 
 		my $gen_spec = join(', ', @generators);
 
-		# Build the call code
+		# Build the call expression for the function under test.
+		# Note: property tests always construct a fresh object
+		# via new_ok() with no constructor arguments, regardless
+		# of what $new holds in the caller — the intent here is
+		# to test the method in isolation, not with specific
+		# construction state.
 		my $call_code;
 		if($module && defined($new)) {
-			$call_code = "my \$obj = new_ok('$module');";
-			$call_code .= "\$obj->$function";	# Method call
-		} elsif($module && $module ne 'builtin') {
-			# $call_code = "$module->$function";
+			# OO mode — construct a fresh object for each trial
+			$call_code  = "my \$obj = new_ok('$module');";
+			$call_code .= "\$obj->$function";
+		} elsif($module && $module ne $MODULE_BUILTIN) {
+			# Functional mode with a named module
 			$call_code = "$module\::$function";
 		} else {
+			# Builtin or unqualified function call
 			$call_code = $function;
 		}
 
-		# Build argument list (respect positions if defined)
+		# Build the argument list, respecting positional order
+		# if the input spec declares positions
 		my @args;
-		if (_has_positions($input_spec)) {
+		if(_has_positions($input_spec)) {
+			# Sort fields by declared position so the generated
+			# call passes arguments in the correct order
 			my @sorted = sort {
-				$input_spec->{$a}{position} <=> $input_spec->{$b}{position}
-			} keys %$input_spec;
+				$input_spec->{$a}{position} <=>
+				$input_spec->{$b}{position}
+			} keys %{$input_spec};
 			@args = map { "\$$_" } @sorted;
 		} else {
+			# No positions — use alphabetical order from @var_names
 			@args = map { "\$$_" } @var_names;
 		}
+
 		my $args_str = join(', ', @args);
 
-		# Build property checks
+		# Concatenate all property check expressions with &&
+		# so the generated property block passes only when
+		# every check holds
 		my @checks = map { $_->{code} } @all_props;
 		my $property_checks = join(" &&\n\t", @checks);
 
-		# Handle _STATUS in output
-		my $should_die = ($output_spec->{_STATUS} // '') eq 'DIES';
-		my $should_warn = ($output_spec->{_STATUS} // '') eq 'WARN';
+		# Determine expected behaviour from output _STATUS.
+		# Note: the schema convention uses 'WARNS' not 'WARN'
+		my $should_die  = ($output_spec->{'_STATUS'} // '') eq 'DIES';
+		my $should_warn = ($output_spec->{'_STATUS'} // '') eq 'WARNS';
 
 		push @properties, {
-			name => $transform_name,
-			generator_spec => $gen_spec,
-			call_code => "$call_code($args_str)",
-			property_checks => $property_checks,
-			should_die => $should_die,
-			should_warn => $should_warn,
-			trials => $config->{properties}{trials} // DEFAULT_PROPERTY_TRIALS,
+			name             => $transform_name,
+			generator_spec   => $gen_spec,
+			call_code        => "$call_code($args_str)",
+			property_checks  => $property_checks,
+			should_die       => $should_die,
+			should_warn      => $should_warn,
+			trials           => $config->{'properties'}{'trials'} // DEFAULT_PROPERTY_TRIALS,
 		};
 	}
 
 	return \@properties;
 }
 
-=head2 _process_custom_properties
-
-Processes custom property definitions from the schema.
-
-=cut
-
-sub _process_custom_properties {
-	my ($properties_spec, $function, $module, $input_spec, $output_spec, $schema) = @_;
-
-	my @properties;
-	my $builtin_properties = _get_builtin_properties();
-	my $new = defined($schema->{'new'}) ? $schema->{new} : '_UNDEF';
-
-	for my $prop_def (@$properties_spec) {
-		my $prop_name;
-		my $prop_code;
-		my $prop_desc;
-
-		if (!ref($prop_def)) {
-			# Simple string - lookup builtin property
-			$prop_name = $prop_def;
-
-			if (exists $builtin_properties->{$prop_name}) {
-				my $builtin = $builtin_properties->{$prop_name};
-
-				# Get input variable names
-				my @var_names = sort keys %$input_spec;
-
-				# Build args
-				my @args;
-				if (_has_positions($input_spec)) {
-					my @sorted = sort {
-						$input_spec->{$a}{position} <=> $input_spec->{$b}{position}
-					} @var_names;
-					@args = map { "\$$_" } @sorted;
-				} else {
-					@args = map { "\$$_" } @var_names;
-				}
-
-				# Build call code
-				my $call_code;
-				# Check if this is OO mode
-				if($module && defined($new)) {
-					$call_code = "my \$obj = new_ok('$module');";
-					$call_code .= "\$obj->$function";	# Method call
-				} elsif($module && $module ne 'builtin') {
-					$call_code = "$module\::$function";	# Function call
-				} else {
-					$call_code = $function;	# Builtin
-				}
-				$call_code .= '(' . join(', ', @args) . ')';
-
-				# Generate property code from template
-				$prop_code = $builtin->{code_template}->($function, $call_code, \@var_names);
-				$prop_desc = $builtin->{description};
-			} else {
-				carp "Unknown built-in property '$prop_name', skipping";
-				next;
-			}
-		} elsif (ref($prop_def) eq 'HASH') {
-			# Custom property with code
-			$prop_name = $prop_def->{name} || 'custom_property';
-			$prop_code = $prop_def->{code};
-			$prop_desc = $prop_def->{description} || "Custom property: $prop_name";
-
-			unless ($prop_code) {
-				carp "Custom property '$prop_name' missing 'code' field, skipping";
-				next;
-			}
-
-			# Validate that the code looks reasonable
-			unless ($prop_code =~ /\$/ || $prop_code =~ /\w+/) {
-				carp "Custom property '$prop_name' code looks invalid: $prop_code";
-				next;
-			}
-		}
-		else {
-			carp 'Invalid property definition: ', Dumper($prop_def);
-			next;
-		}
-
-		push @properties, {
-			name => $prop_name,
-			code => $prop_code,
-			description => $prop_desc,
-		};
-	}
-
-	return @properties;
-}
-
-=head2 _detect_transform_properties
-
-Automatically detects testable properties from transform input/output specs.
-
-=cut
-
-sub _detect_transform_properties {
-	my ($transform_name, $input_spec, $output_spec) = @_;
-
-	my @properties;
-
-	# Skip if input is 'undef'
-	return @properties if (!ref($input_spec) && $input_spec eq 'undef');
-
-	# Property 1: Output range constraints (numeric)
-	if (_is_numeric_transform($input_spec, $output_spec)) {
-		if (defined $output_spec->{min}) {
-			my $min = $output_spec->{min};
-			push @properties, {
-				name => 'min_constraint',
-				# code => "\$result >= $min"
-				code => "defined(\$result) && looks_like_number(\$result) && \$result >= $min"
-			};
-		}
-
-		if (defined $output_spec->{max}) {
-			my $max = $output_spec->{max};
-			push @properties, {
-				name => 'max_constraint',
-				# code => "\$result <= $max"
-				code => "defined(\$result) && looks_like_number(\$result) && \$result <= $max"
-			};
-		}
-
-		# For transforms, add an idempotence check where appropriate
-		# e.g., abs(abs(x)) == abs(x)
-		if ($transform_name =~ /positive/i) {
-			push @properties, {
-				name => 'non_negative',
-				# code => "\$result >= 0"
-				code => "defined(\$result) && looks_like_number(\$result) && \$result >= 0"
-			};
-		}
-	}
-
-	# Property 2: Specific value output
-	if (defined $output_spec->{value}) {
-		my $expected = $output_spec->{value};
-		push @properties, {
-			name => 'exact_value',
-			# code => "\$result == $expected"
-			(ref($expected))
-			? "\$result == $expected"	# maybe
-			: "\$result eq " . perl_quote($expected)
-		};
-	}
-
-	# Property 3: String length constraints
-	if (_is_string_transform($input_spec, $output_spec)) {
-		if (defined $output_spec->{min}) {
-			push @properties, {
-				name => 'min_length',
-				code => "length(\$result) >= $output_spec->{min}"
-			};
-		}
-
-		if (defined $output_spec->{max}) {
-			push @properties, {
-				name => 'max_length',
-				code => "length(\$result) <= $output_spec->{max}"
-			};
-		}
-
-		if (defined $output_spec->{matches}) {
-			my $pattern = $output_spec->{matches};
-			push @properties, {
-				name => 'pattern_match',
-				code => "\$result =~ qr/$pattern/"
-			};
-		}
-	}
-
-	# Property 4: Type preservation
-	if (_same_type($input_spec, $output_spec)) {
-		my $type = _get_dominant_type($output_spec);
-
-		if ($type eq 'number' || $type eq 'integer' || $type eq 'float') {
-			push @properties, {
-				name => 'numeric_type',
-				code => "looks_like_number(\$result)"
-			};
-		}
-	}
-
-	# Property 5: Definedness (unless output can be undef)
-	unless (($output_spec->{type} // '') eq 'undef') {
-		push @properties, {
-			name => 'defined',
-			code => "defined(\$result)"
-		};
-	}
-
-	return @properties;
-}
-
-=head2 _get_semantic_generators
-
-Returns a hash of built-in semantic generators for common data types.
-
-=cut
-
+# --------------------------------------------------
+# _get_semantic_generators
+#
+# Return a hashref of named semantic
+#     generator definitions for use in
+#     LectroTest property-based tests.
+#     Each entry contains a 'code' key
+#     holding a Gen {} block string and a
+#     'description' key for documentation
+#     and validation messages.
+#
+# Entry:      None.
+#
+# Exit:       Returns a hashref keyed by semantic
+#             type name. Each value is a hashref
+#             with 'code' and 'description' keys.
+#
+# Side effects: None.
+#
+# Notes:      The returned hashref is built fresh
+#             on every call — callers that need it
+#             repeatedly should cache the result.
+#             The 'code' strings are multi-line
+#             Gen {} blocks; callers are responsible
+#             for compressing whitespace before
+#             embedding them in generated test files.
+# --------------------------------------------------
 sub _get_semantic_generators {
 	return {
 		email => {
@@ -2655,6 +3483,7 @@ sub _get_semantic_generators {
 			},
 			description => 'Valid email addresses',
 		},
+
 		url => {
 			code => q{
 				Gen {
@@ -2799,8 +3628,8 @@ sub _get_semantic_generators {
 			code => q{
 				Gen {
 					my @chars = ('A'..'Z', 'a'..'z', '0'..'9', '-', '_');
-					my $header = join('', map { $chars[int(rand(@chars))] } 1..20);
-					my $payload = join('', map { $chars[int(rand(@chars))] } 1..40);
+					my $header    = join('', map { $chars[int(rand(@chars))] } 1..20);
+					my $payload   = join('', map { $chars[int(rand(@chars))] } 1..40);
 					my $signature = join('', map { $chars[int(rand(@chars))] } 1..30);
 					"$header.$payload.$signature";
 				}
@@ -2840,7 +3669,9 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'MD5 hashes (32 hex characters)',
-		}, sha256 => {
+		},
+
+		sha256 => {
 			code => q{
 				Gen {
 					join('', map { sprintf('%x', int(rand(16))) } 1..64);
@@ -2854,31 +3685,72 @@ sub _get_semantic_generators {
 				Gen {
 					time;
 				}
-			}
+			},
+			description => 'Unix timestamps (seconds since epoch)',
 		},
 	};
 }
 
-=head2 _get_builtin_properties
-
-Returns a hash of built-in property templates that can be applied to transforms.
-
-=cut
-
+# --------------------------------------------------
+# _get_builtin_properties
+#
+# Purpose:    Return a hashref of named built-in
+#             property templates that can be
+#             referenced by name in a transform's
+#             'properties' list in the schema.
+#             Each entry contains a 'description'
+#             string, a 'code_template' coderef, and
+#             an 'applicable_to' arrayref.
+#
+# Entry:      None.
+#
+# Exit:       Returns a hashref keyed by property
+#             name. Each value is a hashref with
+#             'description', 'code_template', and
+#             'applicable_to' keys.
+#
+# Side effects: None.
+#
+# Notes:      'applicable_to' lists the types for
+#             which each property is meaningful. It
+#             is stored for documentation purposes
+#             and potential future filtering — it is
+#             not currently enforced by any caller.
+#
+#             Each 'code_template' coderef receives
+#             three arguments: ($function, $call_code,
+#             $input_vars). Most templates use only
+#             $call_code; $function and $input_vars
+#             are provided for templates that need
+#             them (e.g. idempotent, length_preserved,
+#             preserves_keys).
+#
+#             'monotonic_increasing' has been
+#             intentionally omitted. A correct
+#             implementation requires calling the
+#             function twice with ordered inputs,
+#             which the current single-call property
+#             framework does not support. A
+#             placeholder that unconditionally returns
+#             true would give false confidence and has
+#             therefore been removed.
+# --------------------------------------------------
 sub _get_builtin_properties {
 	return {
 		idempotent => {
-			description => 'Function is idempotent: f(f(x)) == f(x)',
+			description   => 'Function is idempotent: f(f(x)) == f(x)',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
-				# Use string comparison - works for all types in Perl
+
+				# String comparison works for all scalar types in Perl —
+				# numeric values stringify consistently for eq
 				return "do { my \$tmp = $call_code; \$result eq \$tmp }";
 			},
 			applicable_to => ['all'],
 		},
 
 		non_negative => {
-			description => 'Result is always non-negative',
+			description   => 'Result is always non-negative',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return '$result >= 0';
@@ -2887,7 +3759,7 @@ sub _get_builtin_properties {
 		},
 
 		positive => {
-			description => 'Result is always positive (> 0)',
+			description   => 'Result is always positive (> 0)',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return '$result > 0';
@@ -2896,7 +3768,7 @@ sub _get_builtin_properties {
 		},
 
 		non_empty => {
-			description => 'Result is never empty',
+			description   => 'Result is never empty',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return 'length($result) > 0';
@@ -2905,7 +3777,7 @@ sub _get_builtin_properties {
 		},
 
 		length_preserved => {
-			description => 'Output length equals input length',
+			description   => 'Output length equals input length',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				my $first_var = $input_vars->[0];
@@ -2915,7 +3787,7 @@ sub _get_builtin_properties {
 		},
 
 		uppercase => {
-			description => 'Result is all uppercase',
+			description   => 'Result is all uppercase',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return '$result eq uc($result)';
@@ -2924,7 +3796,7 @@ sub _get_builtin_properties {
 		},
 
 		lowercase => {
-			description => 'Result is all lowercase',
+			description   => 'Result is all lowercase',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return '$result eq lc($result)';
@@ -2933,7 +3805,7 @@ sub _get_builtin_properties {
 		},
 
 		trimmed => {
-			description => 'Result has no leading/trailing whitespace',
+			description   => 'Result has no leading or trailing whitespace',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return '$result !~ /^\s/ && $result !~ /\s$/';
@@ -2942,25 +3814,29 @@ sub _get_builtin_properties {
 		},
 
 		sorted_ascending => {
-			description => 'Array is sorted in ascending order',
+			description   => 'Array is sorted in ascending order',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
-				return 'do { my @arr = @$result; my $sorted = 1; for my $i (1..$#arr) { $sorted = 0 if $arr[$i] < $arr[$i-1]; } $sorted }';
+				return 'do { my @arr = @$result; my $sorted = 1; ' .
+					'for my $i (1..$#arr) { $sorted = 0 if $arr[$i] < $arr[$i-1]; } ' .
+					'$sorted }';
 			},
 			applicable_to => ['arrayref'],
 		},
 
 		sorted_descending => {
-			description => 'Array is sorted in descending order',
+			description   => 'Array is sorted in descending order',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
-				return 'do { my @arr = @$result; my $sorted = 1; for my $i (1..$#arr) { $sorted = 0 if $arr[$i] > $arr[$i-1]; } $sorted }';
+				return 'do { my @arr = @$result; my $sorted = 1; ' .
+					'for my $i (1..$#arr) { $sorted = 0 if $arr[$i] > $arr[$i-1]; } ' .
+					'$sorted }';
 			},
 			applicable_to => ['arrayref'],
 		},
 
 		unique_elements => {
-			description => 'Array has no duplicate elements',
+			description   => 'Array has no duplicate elements',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				return 'do { my @arr = @$result; my %seen; !grep { $seen{$_}++ } @arr }';
@@ -2969,243 +3845,727 @@ sub _get_builtin_properties {
 		},
 
 		preserves_keys => {
-			description => 'Hash has same keys as input',
+			description   => 'Hash has same keys as input',
 			code_template => sub {
 				my ($function, $call_code, $input_vars) = @_;
 				my $first_var = $input_vars->[0];
-				return 'do { my @in = sort keys %{$' . $first_var . '}; my @out = sort keys %$result; join(",", @in) eq join(",", @out) }';
+				return 'do { my @in  = sort keys %{$' . $first_var . '}; ' .
+					'my @out = sort keys %$result; ' .
+					'join(",", @in) eq join(",", @out) }';
 			},
 			applicable_to => ['hashref'],
-		},
-
-		monotonic_increasing => {
-			description => 'For x <= y, f(x) <= f(y)',
-			code_template => sub {
-				my ($function, $call_code, $input_vars) = @_;
-				# This would need multiple inputs - complex
-				return '1';	# Placeholder
-			},
-			applicable_to => ['number', 'integer'],
 		},
 	};
 }
 
-=head2 _schema_to_lectrotest_generator
-
-Converts a schema field spec to a LectroTest generator string.
-
-=cut
-
+# --------------------------------------------------
+# _schema_to_lectrotest_generator
+#
+# Purpose:    Convert a single schema field spec
+#             hashref into a LectroTest generator
+#             declaration string of the form
+#             '$field <- Generator(...)'.
+#             Used to build the ##[ ... ]## generator
+#             block inside a Property definition.
+#
+# Entry:      $field_name - the parameter name as it
+#                           will appear in the
+#                           generated test code.
+#             $spec       - hashref containing at
+#                           minimum a 'type' key.
+#                           May also contain 'min',
+#                           'max', 'semantic', and
+#                           'matches' keys depending
+#                           on type.
+#
+# Exit:       Returns a string of the form
+#             '$field <- Generator(...)' on success.
+#             Returns undef if the spec is not a
+#             hashref or if range constraints are
+#             invalid (min >= max for numeric types).
+#             Returns a String generator with a carp
+#             warning for unknown types.
+#
+# Side effects: Carps on unknown semantic types,
+#               invalid numeric ranges, and unknown
+#               field types.
+#
+# Notes:      Semantic generators are checked first
+#             for string fields and take precedence
+#             over the regular string generator.
+#             The $input_spec parameter in the type-
+#             detection helpers is reserved for future
+#             use and is currently unused.
+# --------------------------------------------------
 sub _schema_to_lectrotest_generator {
 	my ($field_name, $spec) = @_;
 
-	my $type = $spec->{type} || 'string';
+	# Guard: must be a hashref to dereference safely
+	return unless defined($spec) && ref($spec) eq 'HASH';
 
-	# Check for semantic generator first
-	if ($type eq 'string' && defined $spec->{semantic}) {
-		my $semantic_type = $spec->{semantic};
-		my $generators = _get_semantic_generators();
+	# Default to string when no type is declared
+	my $type = $spec->{'type'} || $DEFAULT_FIELD_TYPE;
 
-		if (exists $generators->{$semantic_type}) {
-			my $gen_code = $generators->{$semantic_type}{code};
-			# Remove leading/trailing whitespace and compress
+	# --------------------------------------------------
+	# Semantic generators take precedence for string
+	# fields — they produce realistic domain-specific
+	# values rather than random character sequences
+	# --------------------------------------------------
+	if($type eq 'string' && defined($spec->{'semantic'})) {
+		my $semantic_type = $spec->{'semantic'};
+		my $generators    = _get_semantic_generators();
+
+		if(exists($generators->{$semantic_type})) {
+			my $gen_code = $generators->{$semantic_type}{'code'};
+
+			# Compress the multi-line generator code into a
+			# single line for embedding in the ##[ ]## block
 			$gen_code =~ s/^\s+//;
 			$gen_code =~ s/\s+$//;
 			$gen_code =~ s/\n\s+/ /g;
+
 			return "$field_name <- $gen_code";
 		} else {
-			carp "Unknown semantic type '$semantic_type', falling back to regular string generator";
-			# Fall through to regular string generation
+			carp "Unknown semantic type '$semantic_type', " .
+				"falling back to regular string generator";
+			# Fall through to regular string generation below
 		}
 	}
 
-	if ($type eq 'integer') {
-		my $min = $spec->{min};
-		my $max = $spec->{max};
+	# --------------------------------------------------
+	# Integer generator
+	# --------------------------------------------------
+	if($type eq 'integer') {
+		my $min = $spec->{'min'};
+		my $max = $spec->{'max'};
 
-		if (!defined($min) && !defined($max)) {
+		if(!defined($min) && !defined($max)) {
+			# Unconstrained — use LectroTest's built-in Int
 			return "$field_name <- Int";
-		} elsif (!defined($min)) {
+		} elsif(!defined($min)) {
+			# Only max defined — generate 0 to max
 			return "$field_name <- Int(sized => sub { int(rand($max + 1)) })";
-		} elsif (!defined($max)) {
-			return "$field_name <- Int(sized => sub { $min + int(rand(1000)) })";
+		} elsif(!defined($max)) {
+			# Only min defined — generate min to min + range
+			return "$field_name <- Int(sized => sub { $min + int(rand($DEFAULT_GENERATOR_RANGE)) })";
 		} else {
+			# Both defined — generate within [min, max]
 			my $range = $max - $min;
 			return "$field_name <- Int(sized => sub { $min + int(rand($range + 1)) })";
 		}
 	}
-	elsif ($type eq 'number' || $type eq 'float') {
-		my $min = $spec->{min};
-		my $max = $spec->{max};
 
-		if (!defined($min) && !defined($max)) {
-			# No constraints - full range
-			return "$field_name <- Float(sized => sub { rand(1000) - 500 })";
-		} elsif (!defined($min)) {
-			# Only max defined
-			if ($max == 0) {
-				# max=0 means negative numbers only
-				return "$field_name <- Float(sized => sub { -rand(1000) })";
-			} elsif ($max > 0) {
-				# Positive max, generate 0 to max
+	# --------------------------------------------------
+	# Float / number generator
+	# --------------------------------------------------
+	if($type eq 'number' || $type eq 'float') {
+		my $min = $spec->{'min'};
+		my $max = $spec->{'max'};
+
+		if(!defined($min) && !defined($max)) {
+			# Unconstrained — symmetric range around zero
+			return "$field_name <- Float(sized => sub { rand($DEFAULT_GENERATOR_RANGE) - $DEFAULT_GENERATOR_RANGE / 2 })";
+
+		} elsif(!defined($min)) {
+			# Only max defined — choose range based on sign of max
+			if($max == $ZERO_BOUNDARY) {
+				# max=0: negative numbers only
+				return "$field_name <- Float(sized => sub { -rand($DEFAULT_GENERATOR_RANGE) })";
+			} elsif($max > $ZERO_BOUNDARY) {
+				# Positive max: generate 0 to max
 				return "$field_name <- Float(sized => sub { rand($max) })";
 			} else {
-				# Negative max, generate from some negative to max
-				return "$field_name <- Float(sized => sub { ($max - 1000) + rand(1000 + $max) })";
+				# Negative max: generate from (max - range) to max
+				return "$field_name <- Float(sized => sub { ($max - $DEFAULT_GENERATOR_RANGE) + rand($DEFAULT_GENERATOR_RANGE + $max) })";
 			}
-		} elsif (!defined($max)) {
-			# Only min defined
-			if ($min == 0) {
-				# min=0 means positive numbers only
-				return "$field_name <- Float(sized => sub { rand(1000) })";
-			} elsif ($min > 0) {
-				# Positive min
-				return "$field_name <- Float(sized => sub { $min + rand(1000) })";
+
+		} elsif(!defined($max)) {
+			# Only min defined — choose range based on sign of min
+			if($min == $ZERO_BOUNDARY) {
+				# min=0: positive numbers only
+				return "$field_name <- Float(sized => sub { rand($DEFAULT_GENERATOR_RANGE) })";
+			} elsif($min > $ZERO_BOUNDARY) {
+				# Positive min: generate min to min + range
+				return "$field_name <- Float(sized => sub { $min + rand($DEFAULT_GENERATOR_RANGE) })";
 			} else {
-				# Negative min
-				return "$field_name <- Float(sized => sub { $min + rand(-$min + 1000) })";
+				# Negative min: generate from min to min + range
+				return "$field_name <- Float(sized => sub { $min + rand(-$min + $DEFAULT_GENERATOR_RANGE) })";
 			}
+
 		} else {
-			# Both min and max defined
+			# Both min and max defined — validate then generate
 			my $range = $max - $min;
-			if ($range <= 0) {
-				carp "Invalid range: min=$min, max=$max";
-				return "$field_name <- Float(sized => sub { $min })";
+			if($range <= $ZERO_BOUNDARY) {
+				carp "Invalid range for '$field_name': min=$min, max=$max";
+				# Return undef rather than emitting a degenerate
+				# generator that would silently produce wrong values
+				return;
 			}
 			return "$field_name <- Float(sized => sub { $min + rand($range) })";
 		}
 	}
-	elsif ($type eq 'string') {
-		my $min_len = $spec->{min} // 0;
-		my $max_len = $spec->{max} // 100;
 
-		# Handle regex patterns
-		if (defined $spec->{matches}) {
-			my $pattern = $spec->{matches};
+	# --------------------------------------------------
+	# String generator
+	# --------------------------------------------------
+	if($type eq 'string') {
+		my $min_len = $spec->{'min'} // 0;
+		my $max_len = $spec->{'max'} // $DEFAULT_MAX_STRING_LEN;
 
-			# Build generator using Data::Random::String::Matches
-			if (defined $spec->{max}) {
-				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{max} }) }";
-			} elsif (defined $spec->{min}) {
-				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{min} }) }";
+		# If a regex pattern is declared, delegate to
+		# Data::Random::String::Matches for pattern-aware generation
+		if(defined($spec->{'matches'})) {
+			my $pattern = $spec->{'matches'};
+
+			if(defined($spec->{'max'})) {
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{'max'} }) }";
+			} elsif(defined($spec->{'min'})) {
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{'min'} }) }";
 			} else {
 				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/ }) }";
 			}
 		}
 
 		return "$field_name <- String(length => [$min_len, $max_len])";
-	} elsif ($type eq 'boolean') {
+	}
+
+	# --------------------------------------------------
+	# Boolean generator
+	# --------------------------------------------------
+	if($type eq 'boolean') {
 		return "$field_name <- Bool";
 	}
-	elsif ($type eq 'arrayref') {
-		my $min_size = $spec->{min} // 0;
-		my $max_size = $spec->{max} // 10;
+
+	# --------------------------------------------------
+	# Arrayref generator
+	# --------------------------------------------------
+	if($type eq 'arrayref') {
+		my $min_size = $spec->{'min'} // 0;
+		my $max_size = $spec->{'max'} // $DEFAULT_MAX_COLLECTION_SIZE;
 		return "$field_name <- List(Int, length => [$min_size, $max_size])";
 	}
-	elsif ($type eq 'hashref') {
-		# LectroTest doesn't have built-in Hash, use custom generator
-		my $min_keys = $spec->{min} // 0;
-		my $max_keys = $spec->{max} // 10;
+
+	# --------------------------------------------------
+	# Hashref generator
+	# LectroTest has no built-in Hash generator so we
+	# use Elements over a pre-built list of hashrefs
+	# --------------------------------------------------
+	if($type eq 'hashref') {
+		my $min_keys = $spec->{'min'} // 0;
+		my $max_keys = $spec->{'max'} // $DEFAULT_MAX_COLLECTION_SIZE;
 		return "$field_name <- Elements(map { my \%h; for (1..\$_) { \$h{'key'.\$_} = \$_ }; \\\%h } $min_keys..$max_keys)";
 	}
-	else {
-		carp "Unknown type '$type' for LectroTest generator, using String";
-		return "$field_name <- String";
-	}
+
+	# --------------------------------------------------
+	# Unknown type — fall back to String with a warning
+	# --------------------------------------------------
+	carp "Unknown type '$type' for '$field_name' LectroTest generator, using String";
+	return "$field_name <- String";
 }
 
-=head2 Helper functions for type detection
-
-=cut
-
+# --------------------------------------------------
+# _is_numeric_transform
+#
+# Determine whether a transform's output
+#     spec declares a numeric type, indicating
+#     that numeric range properties should be
+#     generated for it.
+#
+# Entry:      $input_spec  - the transform's input
+#                            spec hashref. Currently
+#                            unused; reserved for
+#                            future input-type checks.
+#             $output_spec - the transform's output
+#                            spec hashref.
+#
+# Exit:       Returns 1 if the output type is one of
+#             'number', 'integer', or 'float'.
+#             Returns 0 otherwise.
+#
+# Side effects: None.
+# --------------------------------------------------
 sub _is_numeric_transform {
 	my ($input_spec, $output_spec) = @_;
 
-	my $out_type = $output_spec->{type} // '';
-	return $out_type eq 'number' || $out_type eq 'integer' || $out_type eq 'float';
+	# $input_spec is currently unused — reserved for future
+	# input-side type checking when detecting mixed transforms
+	my $out_type = ($output_spec // {})->{'type'} // '';
+
+	return($out_type eq 'number' || $out_type eq 'integer' || $out_type eq 'float');
 }
 
+# --------------------------------------------------
+# _is_string_transform
+#
+# Purpose:    Determine whether a transform's output
+#             spec declares a string type, indicating
+#             that string length and pattern properties
+#             should be generated for it.
+#
+# Entry:      $input_spec  - the transform's input
+#                            spec hashref. Currently
+#                            unused; reserved for
+#                            future input-type checks.
+#             $output_spec - the transform's output
+#                            spec hashref.
+#
+# Exit:       Returns 1 if the output type is 'string'.
+#             Returns 0 otherwise.
+#
+# Side effects: None.
+# --------------------------------------------------
 sub _is_string_transform {
 	my ($input_spec, $output_spec) = @_;
 
-	my $out_type = $output_spec->{type} // '';
-	return $out_type eq 'string';
+	# $input_spec is currently unused — reserved for future
+	# input-side type checking when detecting mixed transforms
+	my $out_type = ($output_spec // {})->{'type'} // '';
+
+	return($out_type eq 'string');
 }
 
+# --------------------------------------------------
+# _same_type
+#
+# Purpose:    Determine whether the dominant type of
+#             a transform's input and output specs
+#             match, indicating that type-preservation
+#             properties are meaningful.
+#
+# Entry:      $input_spec  - the transform's input
+#                            spec hashref, or a nested
+#                            multi-field hashref.
+#             $output_spec - the transform's output
+#                            spec hashref.
+#
+# Exit:       Returns 1 if the dominant input and
+#             output types are identical strings.
+#             Returns 0 otherwise.
+#
+# Side effects: None.
+#
+# Notes:      Uses _get_dominant_type for both sides.
+#             For multi-field input specs, dominant
+#             type is the type of the first field
+#             encountered — this is a simplification.
+#             TODO: extend to handle mixed-type inputs
+#             by checking all fields, not just the
+#             first one found.
+# --------------------------------------------------
 sub _same_type {
 	my ($input_spec, $output_spec) = @_;
 
-	# Simplified - would need more sophisticated logic for multiple inputs
-	my $in_type = _get_dominant_type($input_spec);
-	my $out_type = _get_dominant_type($output_spec);
+	# Guard: treat missing specs as untyped — two untyped
+	# specs both default to $DEFAULT_FIELD_TYPE and would
+	# compare equal, which is intentionally conservative
+	my $in_type  = _get_dominant_type($input_spec  // {});
+	my $out_type = _get_dominant_type($output_spec // {});
 
-	return $in_type eq $out_type;
+	return($in_type eq $out_type);
 }
 
+# --------------------------------------------------
+# _get_dominant_type
+#
+# Purpose:    Extract the most representative type
+#             string from a spec hashref. For flat
+#             output specs this is simply the 'type'
+#             key. For multi-field input specs it is
+#             the type of the first sub-field found
+#             that declares one.
+#
+# Entry:      $spec - a spec hashref. May be a flat
+#                     output spec ({ type => '...' })
+#                     or a multi-field input spec
+#                     ({ field => { type => '...' } }).
+#                     May be undef or empty.
+#
+# Exit:       Returns a type string. Returns
+#             $DEFAULT_FIELD_TYPE ('string') if no
+#             type can be determined.
+#
+# Side effects: None.
+# --------------------------------------------------
 sub _get_dominant_type {
 	my $spec = $_[0];
 
-	return $spec->{type} if defined $spec->{type};
+	# Guard: return default for undef or non-hash input
+	return $DEFAULT_FIELD_TYPE
+		unless defined($spec) && ref($spec) eq 'HASH';
 
-	# For multi-field specs, return the first type found
-	for my $field (keys %$spec) {
+	# Flat spec — type declared directly
+	return $spec->{'type'} if defined($spec->{'type'});
+
+	# Multi-field spec — return the type of the first
+	# sub-field that declares one
+	for my $field (keys %{$spec}) {
 		next unless ref($spec->{$field}) eq 'HASH';
-		return $spec->{$field}{type} if defined $spec->{$field}{type};
+		return $spec->{$field}{'type'}
+			if defined($spec->{$field}{'type'});
 	}
 
-	return 'string';	# Default
+	# No type found anywhere — return the safe default
+	return $DEFAULT_FIELD_TYPE;
 }
 
-sub _has_positions {
-	my $input_spec = $_[0];
-
-	for my $field (keys %$input_spec) {
-		next unless ref($input_spec->{$field}) eq 'HASH';
-		return 1 if defined $input_spec->{$field}{position};
-	}
-
-	return 0;
-}
-
-=head2 _render_properties
-
-Renders property definitions into Perl code for the template.
-
-=cut
-
+# --------------------------------------------------
+# _render_properties
+#
+# Purpose:    Render an arrayref of property definition
+#             hashrefs (as produced by
+#             _generate_transform_properties) into a
+#             string of Perl source code suitable for
+#             embedding in a generated test file.
+#             The output uses Test::LectroTest::Compat
+#             to run each property as a holds() check.
+#
+# Entry:      $properties - arrayref of property
+#             hashrefs, each containing: name,
+#             generator_spec, call_code,
+#             property_checks, should_die,
+#             should_warn, trials.
+#             May be undef or an empty arrayref.
+#
+# Exit:       Returns a string of Perl source code.
+#             Returns an empty string if $properties
+#             is undef, not an arrayref, or empty.
+#
+# Side effects: None.
+#
+# Notes:      The generated code uses 4-space
+#             indentation deliberately — this is the
+#             indentation style of the generated test
+#             file, not of this module. Tabs are used
+#             in this module's own source; spaces are
+#             emitted into generated output for
+#             readability of the produced test files.
+# --------------------------------------------------
 sub _render_properties {
 	my $properties = $_[0];
 
+	# Return empty string for absent or non-array input —
+	# callers treat '' as no property block to emit
+	return '' unless defined($properties) && ref($properties) eq 'ARRAY';
+	return '' unless @{$properties};
+
 	my $code = "use_ok('Test::LectroTest::Compat');\n\n";
 
-	for my $prop (@$properties) {
-		$code .= "# Transform property: $prop->{name}\n";
-		$code .= "my \$$prop->{name} = Property {\n";
-		$code .= "    ##[ $prop->{generator_spec} ]##\n";
+	for my $prop (@{$properties}) {
+		# Emit a labelled Property block for each transform property
+		$code .= "# Transform property: $prop->{'name'}\n";
+		$code .= "my \$$prop->{'name'} = Property {\n";
+		$code .= "    ##[ $prop->{'generator_spec'} ]##\n";
 		$code .= "    \n";
-		$code .= "    my \$result = eval { $prop->{call_code} };\n";
+		$code .= "    my \$result = eval { $prop->{'call_code'} };\n";
 
-		if ($prop->{should_die}) {
+		if($prop->{'should_die'}) {
+			# For transforms that expect death, pass if the
+			# eval caught an exception
 			$code .= "    my \$died = defined(\$\@) && \$\@;\n";
 			$code .= "    \$died;\n";
 		} else {
+			# For normal transforms, pass only if no exception
+			# was thrown and all property checks hold
 			$code .= "    my \$error = \$\@;\n";
-			# $code .= "    diag(\"\$$prop->{name} -> \$error; \") if(\$ENV{'TEST_VERBOSE'});\n";
 			$code .= "    \n";
 			$code .= "    !\$error && (\n";
-			$code .= "        $prop->{property_checks}\n";
+			$code .= "        $prop->{'property_checks'}\n";
 			$code .= "    );\n";
 		}
 
-		$code .= "}, name => '$prop->{name}', trials => $prop->{trials};\n\n";
-
-		$code .= "holds(\$$prop->{name});\n";
+		$code .= "}, name => '$prop->{'name'}', trials => $prop->{'trials'};\n\n";
+		$code .= "holds(\$$prop->{'name'});\n";
 	}
 
 	return $code;
 }
 
-1;
+# --------------------------------------------------
+# _detect_transform_properties
+#
+# Purpose:    Automatically derive a list of testable
+#             LectroTest property hashrefs from a
+#             transform's input and output specs.
+#             Detects numeric range constraints, exact
+#             value matches, string length constraints,
+#             type preservation, and definedness.
+#
+# Entry:      $transform_name - string name of the
+#                               transform, used for
+#                               heuristic matching
+#                               (e.g. 'positive').
+#             $input_spec     - the transform's input
+#                               hashref, or the string
+#                               'undef'.
+#             $output_spec    - the transform's output
+#                               hashref, or undef if
+#                               absent.
+#
+# Exit:       Returns a list of property hashrefs,
+#             each containing 'name' and 'code' keys.
+#             Returns an empty list if no properties
+#             can be detected or if $input_spec is
+#             undef or the string 'undef'.
+#
+# Side effects: None.
+#
+# Notes:      The 'positive' heuristic checks the
+#             transform name case-insensitively against
+#             $TRANSFORM_POSITIVE_PATTERN and adds a
+#             non-negative constraint if matched.
+#             This is intentionally a rough heuristic
+#             rather than a precise semantic check.
+# --------------------------------------------------
+sub _detect_transform_properties {
+	my ($transform_name, $input_spec, $output_spec) = @_;
+
+	my @properties;
+
+	# Guard: skip undef input and the YAML scalar 'undef'
+	return @properties unless defined($input_spec);
+	return @properties if(!ref($input_spec) && $input_spec eq 'undef');
+
+	# Default output spec to empty hash so all key lookups
+	# below are safe regardless of what the schema provides
+	$output_spec //= {};
+
+	# --------------------------------------------------
+	# Property 1: Output range constraints (numeric)
+	# --------------------------------------------------
+	if(_is_numeric_transform($input_spec, $output_spec)) {
+		if(defined($output_spec->{'min'})) {
+			my $min = $output_spec->{'min'};
+			push @properties, {
+				name => 'min_constraint',
+				code => "defined(\$result) && looks_like_number(\$result) && \$result >= $min",
+			};
+		}
+
+		if(defined($output_spec->{'max'})) {
+			my $max = $output_spec->{'max'};
+			push @properties, {
+				name => 'max_constraint',
+				code => "defined(\$result) && looks_like_number(\$result) && \$result <= $max",
+			};
+		}
+
+		# Heuristic: transforms named 'positive' (case-insensitive)
+		# imply a non-negative result constraint
+		if($transform_name =~ /$TRANSFORM_POSITIVE_PATTERN/i) {
+			push @properties, {
+				name => 'non_negative',
+				code => "defined(\$result) && looks_like_number(\$result) && \$result >= 0",
+			};
+		}
+	}
+
+	# --------------------------------------------------
+	# Property 2: Specific value output
+	# --------------------------------------------------
+	if(defined($output_spec->{'value'})) {
+		my $expected = $output_spec->{'value'};
+
+		# Numeric refs use == for comparison; scalars use eq
+		# via perl_quote to produce the correct quoted literal
+		push @properties, {
+			name => 'exact_value',
+			code => ref($expected)
+				? "\$result == $expected"
+				: "\$result eq " . perl_quote($expected),
+		};
+	}
+
+	# --------------------------------------------------
+	# Property 3: String length constraints
+	# --------------------------------------------------
+	if(_is_string_transform($input_spec, $output_spec)) {
+		if(defined($output_spec->{'min'})) {
+			push @properties, {
+				name => 'min_length',
+				code => "length(\$result) >= $output_spec->{'min'}",
+			};
+		}
+
+		if(defined($output_spec->{'max'})) {
+			push @properties, {
+				name => 'max_length',
+				code => "length(\$result) <= $output_spec->{'max'}",
+			};
+		}
+
+		if(defined($output_spec->{'matches'})) {
+			my $pattern = $output_spec->{'matches'};
+			push @properties, {
+				name => 'pattern_match',
+				code => "\$result =~ qr/$pattern/",
+			};
+		}
+	}
+
+	# --------------------------------------------------
+	# Property 4: Type preservation
+	# --------------------------------------------------
+	if(_same_type($input_spec, $output_spec)) {
+		my $type = _get_dominant_type($output_spec);
+
+		# Only emit a numeric_type check for numeric types —
+		# string and other types have no equivalent simple check
+		if($type eq 'number' || $type eq 'integer' || $type eq 'float') {
+			push @properties, {
+				name => 'numeric_type',
+				code => 'looks_like_number($result)',
+			};
+		}
+	}
+
+	# --------------------------------------------------
+	# Property 5: Definedness
+	# --------------------------------------------------
+	# Emit a defined() check for all transforms except those
+	# whose output type is explicitly 'undef' — those are
+	# expected to return nothing
+	unless(($output_spec->{'type'} // '') eq 'undef') {
+		push @properties, {
+			name => 'defined',
+			code => 'defined($result)',
+		};
+	}
+
+	return @properties;
+}
+
+# --------------------------------------------------
+# _process_custom_properties
+#
+# Purpose:    Process the 'properties' array from a
+#             transform definition, resolving each
+#             entry to either a named builtin property
+#             (looked up from _get_builtin_properties)
+#             or a custom property with inline code.
+#
+# Entry:      $properties_spec - arrayref of property
+#                                definitions from the
+#                                schema. Each element
+#                                is either a string
+#                                (builtin name) or a
+#                                hashref with 'name'
+#                                and 'code' fields.
+#             $function        - name of the function
+#                                under test.
+#             $module          - module name, or undef
+#                                for builtins.
+#             $input_spec      - the transform's input
+#                                spec hashref.
+#             $output_spec     - the transform's output
+#                                spec hashref.
+#             $new             - defined if the function
+#                                is an OO method; value
+#                                is not used, only
+#                                presence is checked.
+#
+# Exit:       Returns a list of property hashrefs,
+#             each containing 'name', 'code', and
+#             'description' keys.
+#             Invalid or unrecognised entries are
+#             skipped with a carp warning.
+#
+# Side effects: Carps on unrecognised builtin names,
+#               missing code fields, and invalid
+#               property definition types.
+#
+# Notes:      The sixth argument is $new (the OO
+#             constructor signal), not the full schema
+#             hashref. It is used only to determine
+#             whether to emit OO-style call code for
+#             builtin property templates.
+# --------------------------------------------------
+sub _process_custom_properties {
+	my ($properties_spec, $function, $module, $input_spec, $output_spec, $new) = @_;
+
+	my @properties;
+	my $builtin_properties = _get_builtin_properties();
+
+	for my $prop_def (@{$properties_spec}) {
+		my $prop_name;
+		my $prop_code;
+		my $prop_desc;
+
+		if(!ref($prop_def)) {
+			# Plain string — look up as a named builtin property
+			$prop_name = $prop_def;
+
+			unless(exists($builtin_properties->{$prop_name})) {
+				carp "Unknown built-in property '$prop_name', skipping";
+				next;
+			}
+
+			my $builtin = $builtin_properties->{$prop_name};
+
+			# Build the argument list, respecting positional order
+			my @var_names = sort keys %{$input_spec};
+			my @args;
+			if(_has_positions($input_spec)) {
+				my @sorted = sort { $input_spec->{$a}{'position'} <=> $input_spec->{$b}{'position'} } @var_names;
+				@args = map { "\$$_" } @sorted;
+			} else {
+				@args = map { "\$$_" } @var_names;
+			}
+
+			# Build the call expression for the builtin template.
+			# $new here is the raw OO signal from the caller —
+			# defined means OO mode, undef means functional
+			my $call_code;
+			if($module && defined($new)) {
+				# OO mode — fresh object per trial
+				$call_code  = "my \$obj = new_ok('$module');";
+				$call_code .= "\$obj->$function";
+			} elsif($module && $module ne $MODULE_BUILTIN) {
+				# Functional mode with a named module
+				$call_code = "$module\::$function";
+			} else {
+				# Builtin or unqualified function call
+				$call_code = $function;
+			}
+			$call_code .= '(' . join(', ', @args) . ')';
+
+			# Instantiate the builtin's code template with the
+			# call expression and input variable list
+			$prop_code = $builtin->{'code_template'}->($function, $call_code, \@var_names);
+			$prop_desc = $builtin->{'description'};
+
+		} elsif(ref($prop_def) eq 'HASH') {
+			# Hashref — custom property with inline Perl code
+			$prop_name = $prop_def->{'name'} || 'custom_property';
+			$prop_code = $prop_def->{'code'};
+			$prop_desc = $prop_def->{'description'} || "Custom property: $prop_name";
+
+			unless($prop_code) {
+				carp "Custom property '$prop_name' missing 'code' field, skipping";
+				next;
+			}
+
+			# Sanity-check: code must contain at least a variable
+			# reference or a word character to be meaningful
+			unless($prop_code =~ /\$/ || $prop_code =~ /\w+/) {
+				carp "Custom property '$prop_name' code looks invalid: $prop_code";
+				next;
+			}
+
+		} else {
+			# Neither string nor hashref — unrecognised definition type
+			carp 'Invalid property definition: ', render_fallback($prop_def);
+			next;
+		}
+
+		push @properties, {
+			name        => $prop_name,
+			code        => $prop_code,
+			description => $prop_desc,
+		};
+	}
+
+	return @properties;
+}
 
 =head1 NOTES
 
@@ -3242,25 +4602,47 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 Portions of this module's initial design and documentation were created with the
 assistance of AI.
 
-=cut
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::Test::Generator
+
+You can also look for information at:
+
+=over 4
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/App-Test-Generator>
+
+=item * GitHub
+
+L<https://github.com/nigelhorne/App-Test-Generator>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/App-Test-Generator>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=App-Test-Generator>
+
+=item * CPAN Testers Dependencies
+
+L<http://deps.cpantesters.org/?module=App::Test::Generator>
+
+=back
 
 =head1 LICENCE AND COPYRIGHT
 
 Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
-
-=back
+Usage is subject to the terms of GPL2.
+If you use it,
+please let me know.
 
 =cut
 

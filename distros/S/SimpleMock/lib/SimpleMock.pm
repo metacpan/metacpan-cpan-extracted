@@ -18,7 +18,7 @@ our @EXPORT_OK = qw(
     clear_mocks
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # mocks get stored in a stack, with globals as the first element
 our @MOCK_STACK = ( {} );

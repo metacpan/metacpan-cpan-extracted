@@ -12,6 +12,7 @@ eg/add-drums.pl
 eg/euclidean.pl
 eg/grooves.pl
 eg/list_devices.pl
+eg/no-fills.pl
 eg/odd-meter.pl
 eg/user-defined.pl
 lib/Music/SimpleDrumMachine.pm

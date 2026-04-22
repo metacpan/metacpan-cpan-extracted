@@ -13,7 +13,7 @@ requires 'Storable', '2.34';
 recommends 'DBI';
 recommends 'LWP::UserAgent';
 recommends 'HTTP::Status';
-recommends 'Path::Tiny';
+recommends 'Path::Tiny', '0.144';
 recommends 'URI';
 
 # Test suite needs the optional modules
@@ -21,5 +21,5 @@ test_requires 'Test::Most';
 test_requires 'DBI';
 test_requires 'LWP::UserAgent';
 test_requires 'HTTP::Status';
-test_requires 'Path::Tiny';
+test_requires 'Path::Tiny', '0.144';
 test_requires 'URI';

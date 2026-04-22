@@ -1,5 +1,62 @@
 Revision history for App-Test-Generator
 
+0.33	Tue Apr 21 16:09:24 EDT 2026
+
+    - Fixed NumericBoundary mutator incorrectly identifying the '<' in
+      open() mode strings and readline operators (<$fh>) as numeric
+      comparison operators, producing invalid mutants that caused
+      compilation errors in the mutated code. Two guards added to
+      mutate(): skip any operator whose next sibling is a PPI symbol
+      token (catching <$fh>), and skip operators not parented by a
+      PPI::Statement, PPI::Structure::Condition, or
+      PPI::Structure::Block (catching quoted mode strings in open()
+      argument lists). The same readline guard is also applied inside
+      the transform closure to prevent mutation at apply time if PPI
+      tokenisation differs between the analysis and mutation documents.
+    - Rationalised program names so that they can be used in other modules
+      without the need to have copies
+    - Added detect_prereq_version_cliffs() to cross-reference declared
+      prerequisites from the MetaCPAN API against installed module
+      versions reported by CPAN Testers. Flags cases where failing
+      reports have an installed version below the declared minimum,
+      surfacing dependency version mismatches (e.g. Test::Mockingbird
+      0.02 installed where >= 0.03 is required) that the existing
+      detect_version_cliffs() misses because it only examines prereq
+      metadata within the reports themselves. Falls back to scanning
+      raw CPAN Testers report output for version complaint patterns if
+      the MetaCPAN API is unavailable. Results are merged into the
+      existing Dependency Version Cliffs section alongside findings
+      from detect_version_cliffs(). Added report HTML caching in
+      fetch_report_html() to avoid fetching the same report twice when
+      both aggregate_dependency_stats() and detect_prereq_version_cliffs()
+      process the same GUIDs.
+    - bin/fuzz-harness-generator: fixed shell injection risk in final
+      system() call, replaced string eval with block eval for JSON
+      module loading, added explicit use File::Spec, normalised if()
+      spacing throughout, added structured comment blocks for all four
+      helper functions, added YAML input validation before calling
+      generate()
+    - bin/generate-test-dashboard: removed duplicate cover -report json
+      step that was running twice per dashboard build
+    - bin/test-generator-index: added structured comment blocks for six
+      private analysis functions; fixed detect_universal_failure() to
+      partition genuine FAILs from NAs before counting, returning undef
+      when all reports are NA so detect_perl_version_cliff() can
+      diagnose correctly
+    - SchemaExtractor.pm: added structured comment blocks for all private
+      methods (Pass 3)
+    - App::Test::Generator: added relationships_code emission so schemas
+      containing relationship metadata produced by SchemaExtractor are
+      serialised into the generated test file
+    - Template test.tt: added semantic type test cases for filepath
+      (including Windows paths, reserved device names, UNC paths),
+      email, date_string, and iso8601_string; added relationship test
+      loop covering all six relationship types (mutually_exclusive,
+      required_group, conditional_requirement, dependency,
+      value_constraint, value_conditional); added float edge cases for
+      Inf, -Inf, and NaN with correct status handling based on whether
+      max is defined
+
 0.32	Sun Apr 12 08:16:47 EDT 2026
 
     - Added detect_scattered_failures() root cause detector. Surfaces a

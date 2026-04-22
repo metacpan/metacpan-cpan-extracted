@@ -34,7 +34,7 @@ METHODS
              0 - ANSI color support disabled.
 
             When is undefined, env variables "COLOR" or "NO_COLOR" could
-            control ANSI color support.
+            control ANSI color support. See Check::Term::Color.
 
             Default value is undef.
 
@@ -190,8 +190,8 @@ EXAMPLE2
      # Není definován: 0
 
 DEPENDENCIES
-    Class::Utils, English, Error::Pure. MARC::Leader::L10N,
-    Mo::utils::Language.
+    Check::Term::Color, Class::Utils, English, Error::Pure.
+    MARC::Leader::L10N, Mo::utils, Mo::utils::Language.
 
     And optional Term::ANSIColor for ANSI color support.
 
@@ -213,5 +213,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

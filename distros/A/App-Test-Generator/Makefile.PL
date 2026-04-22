@@ -19,8 +19,14 @@ WriteMakefile(
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),
-	EXE_FILES => ['bin/app-test-generator-mutate', 'bin/fuzz-harness-generator', 'bin/extract-schemas', 'bin/extract-schemas2'],
-	MIN_PERL_VERSION => '5.036',
+	EXE_FILES => [
+		'bin/test-generator-mutate',
+		'bin/fuzz-harness-generator',
+		'bin/extract-schemas',
+		'bin/extract-schemas2',
+		'bin/test-generator-index',
+		'bin/generate-test-dashboard'
+	], MIN_PERL_VERSION => '5.036',
 	PREREQ_PM => {
 		'autodie' => 0,
 		'Carp' => 0,
@@ -38,7 +44,7 @@ WriteMakefile(
 		'IPC::Open3' => 0,
 		'JSON::MaybeXS' => 0,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.23,
+		'Params::Validate::Strict' => 0.30,
 		'PPI' => 0,
 		'Pod::Simple' => 0,
 		'Pod::Usage' => 0,

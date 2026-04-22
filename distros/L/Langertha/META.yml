@@ -1,7 +1,7 @@
 ---
 abstract: 'The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId'
 author:
-  - 'Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>'
+  - 'Torsten Raudssus <getty@cpan.org>'
 build_requires:
   Math::Vector::Similarity: '0'
   Module::Runtime: '0'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha/issues
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.402'
+version: '0.404'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -301,7 +301,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.402'
+          tag: '0.404'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

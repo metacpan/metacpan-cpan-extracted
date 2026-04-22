@@ -1,5 +1,13 @@
 Revision history for SimpleMock
 
+0.05    2026-04-22
+        - Tweaked SQL normalization rules
+        - Changed Path::Tiny min required version due to failing test
+        - Tweaked DBI code to not require an explicit result attr (default to
+          empty result set)
+        - Made error message for DBI mocks more descriptive to provide better
+          hints to end user
+
 0.04    2026-04-17
         - Fixed silent swallowing of errors thrown during register_mocks when
           called from inside an auto-loaded SimpleMock::Mocks::* module.

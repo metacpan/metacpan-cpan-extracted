@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.019-4-gb7cf299
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.020-2-g5da4c0d
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use 5.020;
 use utf8;
@@ -107,7 +107,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

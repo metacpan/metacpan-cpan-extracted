@@ -11,13 +11,13 @@ use App::Test::Generator::Mutation::NumericBoundary;
 
 my $source = <<'END_PERL';
 sub test {
-    if ($x > 10) {
-        return 1;
-    }
+	if ($x > 10) {
+		return 1;
+	}
 
-    if ($y == 5) {
-        return 2;
-    }
+	if ($y == 5) {
+		return 2;
+	}
 }
 END_PERL
 
@@ -40,15 +40,15 @@ ok(@mutants > 0, 'Numeric boundary mutants generated');
 
 for my $m (@mutants) {
 
-    isa_ok($m, 'App::Test::Generator::Mutant');
+	isa_ok($m, 'App::Test::Generator::Mutant');
 
-    like($m->id, qr/^NUM_BOUNDARY_/, 'Correct ID prefix');
+	like($m->id, qr/^NUM_BOUNDARY_/, 'Correct ID prefix');
 
-    ok(defined $m->line, 'Line number defined');
+	ok(defined $m->line, 'Line number defined');
 
-    ok($m->can('transform'), 'Has transform');
+	ok($m->can('transform'), 'Has transform');
 
-    is(ref($m->{transform}), 'CODE', 'Transform is coderef');
+	is(ref($m->{transform}), 'CODE', 'Transform is coderef');
 }
 
 # --------------------------------------------------
@@ -57,10 +57,7 @@ for my $m (@mutants) {
 
 my @ids = map { $_->id } @mutants;
 
-ok(
-    grep(/^NUM_BOUNDARY_\d+$/, @ids),
-    'IDs formatted correctly'
-);
+ok(grep(/^NUM_BOUNDARY_\d+_\d+_/, @ids), 'IDs formatted correctly');
 
 # --------------------------------------------------
 # Apply one mutant and verify operator changed
@@ -71,10 +68,6 @@ my ($first) = @mutants;
 my $clone = PPI::Document->new(\$source);
 $first->{transform}->($clone);
 
-like(
-    $clone->serialize,
-    qr/!=|>=|<=|<|>/,
-    'Operator was transformed'
-);
+like($clone->serialize, qr/!=|>=|<=|<|>/, 'Operator was transformed');
 
-done_testing;
+done_testing();

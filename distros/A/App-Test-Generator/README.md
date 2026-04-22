@@ -1,10 +1,10 @@
 # NAME
 
-App::Test::Generator - Generate fuzz and corpus-driven test harnesses from test schemas
+App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for Perl modules
 
 # VERSION
 
-Version 0.30
+Version 0.33
 
 # SYNOPSIS
 
@@ -116,12 +116,12 @@ tests that kill them on the next run, without manual intervention.
 ## How to Use It
 
 The pipeline is driven by three flags passed to
-`scripts/generate_index.pl`, which is invoked automatically by
-`scripts/generate_test_dashboard` on each CI push.
+`bin/test-generator-index`, which is invoked automatically by
+`bin/generate-test-dashboard` on each CI push.
 
 ### Step 1: Generate TODO stubs for all survivors
 
-    scripts/generate_index.pl --generate_mutant_tests=t
+    bin/test-generator-index --generate_mutant_tests=t
 
 Produces `t/mutant_YYYYMMDD_HHMMSS.t` containing:
 
@@ -135,7 +135,7 @@ stub. One good test kills all variants on that line.
 
 ### Step 2: Generate runnable schemas for NUM\_BOUNDARY survivors
 
-    scripts/generate_index.pl \
+    bin/test-generator-index \
         --generate_mutant_tests=t \
         --generate_test=mutant
 
@@ -154,7 +154,7 @@ Falls back to a TODO stub if:
 
 ### Step 3: Augment existing schemas with survivor boundary values
 
-    scripts/generate_index.pl \
+    bin/test-generator-index \
         --generate_mutant_tests=t \
         --generate_test=mutant \
         --generate_fuzz
@@ -172,10 +172,10 @@ are skipped, with a note if `--verbose` is active.
 
 ### Putting It All Together
 
-The recommended invocation in `scripts/generate_test_dashboard`
+The recommended invocation in `bin/generate-test-dashboard`
 Step 7 runs all three stages together:
 
-    scripts/generate_index.pl \
+    bin/test-generator-index \
         --generate_mutant_tests=t \
         --generate_test=mutant \
         --generate_fuzz
@@ -220,9 +220,9 @@ schemas.
 
 - [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) - Schema extraction
 from Perl source code
-- ["generate\_index.pl" in scripts](https://metacpan.org/pod/scripts#generate_index.pl) - Dashboard generator and
+- ["test-generator-index" in bin](https://metacpan.org/pod/bin#test-generator-index) - Dashboard generator and
 pipeline driver
-- ["generate\_test\_dashboard" in scripts](https://metacpan.org/pod/scripts#generate_test_dashboard) - Full pipeline runner
+- ["generate-test-dashboard" in bin](https://metacpan.org/pod/bin#generate-test-dashboard) - Full pipeline runner
 
 # CONFIGURATION
 
@@ -1208,35 +1208,180 @@ The generated test:
 
 Takes a schema file and produces a test file (or STDOUT).
 
-## \_generate\_transform\_properties
+## render\_fallback
 
-Converts transform specifications into LectroTest property definitions.
+Render any Perl value into a compact Perl source-code string using
+[Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper). Used as a catch-all when no more specific renderer
+applies.
 
-## \_process\_custom\_properties
+    my $code = render_fallback({ key => 'value' });
+    # returns: "{'key' => 'value'}"
 
-Processes custom property definitions from the schema.
+### Arguments
 
-## \_detect\_transform\_properties
+- `$v`
 
-Automatically detects testable properties from transform input/output specs.
+    Any Perl value, including undef, scalars, refs, and blessed objects.
 
-## \_get\_semantic\_generators
+### Returns
 
-Returns a hash of built-in semantic generators for common data types.
+A string of Perl source code that reproduces the value when evaluated.
+Returns the string `'undef'` when `$v` is undef.
 
-## \_get\_builtin\_properties
+### Side effects
 
-Returns a hash of built-in property templates that can be applied to transforms.
+Temporarily sets `$Data::Dumper::Terse` and `$Data::Dumper::Indent`
+to produce compact single-line output. Both are restored on return via
+`local`.
 
-## \_schema\_to\_lectrotest\_generator
+### Notes
 
-Converts a schema field spec to a LectroTest generator string.
+The output is always a single line with no trailing newline. Suitable
+for embedding in generated test code where readability is secondary to
+correctness.
 
-## Helper functions for type detection
+### API specification
 
-## \_render\_properties
+#### input
 
-Renders property definitions into Perl code for the template.
+    { v => { type => SCALAR|REF, optional => 1 } }
+
+#### output
+
+    { type => SCALAR }
+
+## render\_hash
+
+Render a two-level hashref (parameter name => spec hashref) into Perl
+source code suitable for embedding in a generated test file as the
+input specification passed to [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
+
+    my $code = render_hash(\%input);
+
+### Arguments
+
+- `$href`
+
+    A hashref whose values are themselves hashrefs containing field
+    specifications. Keys whose values are not hashrefs are skipped with
+    a warning.
+
+### Returns
+
+A string of comma-separated Perl source-code lines, one per key, of
+the form:
+
+    'key' => { subkey => value, ... }
+
+Returns an empty string if `$href` is undef, empty, or not a hashref.
+
+### Side effects
+
+None. Does not modify `$href`.
+
+### Notes
+
+The `matches` and `nomatch` sub-keys are treated specially — their
+values are compiled to `Regexp` objects via `eval { qr/.../ }` and
+then rendered using `perl_quote` so they appear as `qr{...}` in the
+generated test. This prevents unmatched bracket characters in the
+pattern from causing compilation failures.
+
+Other sub-keys are rendered via `perl_quote`.
+
+### API specification
+
+#### input
+
+    { href => { type => HASHREF, optional => 1 } }
+
+#### output
+
+    { type => SCALAR }
+
+## render\_args\_hash
+
+Render a flat hashref into a Perl source-code argument list of the
+form `'key' =` value, ...>, suitable for embedding in a function call
+in a generated test file.
+
+    my $code = render_args_hash({ type => 'string', min => 1 });
+    # returns: "'min' => 1, 'type' => 'string'"
+
+### Arguments
+
+- `$href`
+
+    A flat hashref of key-value pairs. Values may be scalars, arrayrefs,
+    or Regexp objects — all are handled by `perl_quote`.
+
+### Returns
+
+A comma-separated string of `key =` value> pairs sorted by key.
+Returns an empty string if `$href` is undef, empty, or not a hashref.
+
+### Side effects
+
+None.
+
+### Notes
+
+Keys and values are both rendered via `perl_quote`. In particular,
+`Regexp` values are rendered as `qr{...}` which is correct for
+[Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) and [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) schema arguments in
+the generated test.
+
+### API specification
+
+#### input
+
+    { href => { type => HASHREF, optional => 1 } }
+
+#### output
+
+    { type => SCALAR }
+
+## render\_arrayref\_map
+
+Render a hashref whose values are arrayrefs into a Perl source-code
+fragment suitable for use as a hash literal in a generated test file.
+
+    my $code = render_arrayref_map({ name => ['', 'a' x 100] });
+
+### Arguments
+
+- `$href`
+
+    A hashref whose values are arrayrefs. Keys whose values are not
+    arrayrefs are silently skipped.
+
+### Returns
+
+A comma-separated string of `'key' =` \[ val, ... \]> entries, one per
+qualifying key, sorted alphabetically. Returns the string `'()'` if
+`$href` is undef, empty, or not a hashref — this produces an empty
+hash assignment in the generated test rather than a syntax error.
+
+### Side effects
+
+None.
+
+### Notes
+
+Array element values are rendered via `perl_quote` which handles
+scalars, arrayrefs, and Regexp objects. Non-arrayref values are
+skipped without warning — this is intentional since callers may pass
+mixed-value hashes and only want the arrayref entries rendered.
+
+### API specification
+
+#### input
+
+    { href => { type => HASHREF, optional => 1 } }
+
+#### output
+
+    { type => SCALAR }
 
 # NOTES
 
@@ -1261,15 +1406,40 @@ Nigel Horne, `<njh at nigelhorne.com>`
 Portions of this module's initial design and documentation were created with the
 assistance of AI.
 
+# SUPPORT
+
+This module is provided as-is without any warranty.
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::Test::Generator
+
+You can also look for information at:
+
+- MetaCPAN
+
+    [https://metacpan.org/release/App-Test-Generator](https://metacpan.org/release/App-Test-Generator)
+
+- GitHub
+
+    [https://github.com/nigelhorne/App-Test-Generator](https://github.com/nigelhorne/App-Test-Generator)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/App-Test-Generator](http://cpants.cpanauthors.org/dist/App-Test-Generator)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=App-Test-Generator](http://matrix.cpantesters.org/?dist=App-Test-Generator)
+
+- CPAN Testers Dependencies
+
+    [http://deps.cpantesters.org/?module=App::Test::Generator](http://deps.cpantesters.org/?module=App::Test::Generator)
+
 # LICENCE AND COPYRIGHT
 
 Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-- Personal single user, single computer use: GPL2
-- All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
+Usage is subject to the terms of GPL2.
+If you use it,
+please let me know.

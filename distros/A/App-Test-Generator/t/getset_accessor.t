@@ -233,15 +233,11 @@ ok(
 	'Pure getter does not generate parameter list'
 );
 
-# Getter-only should have medium output confidence
-is($schemas->{getter_only}{_confidence}{output}{level}, 'medium', 'Pure getter marked medium confidence');
+# Getter-only should have low output confidence
+is($schemas->{getter_only}{_confidence}{output}{level}, 'low', 'Pure getter marked low confidence');
 
 # Setter-only should instantiate object
-is(
-	$schemas->{setter_only}{new},
-	'GetSet::Test',
-	'Setter requires object instantiation'
-);
+is($schemas->{setter_only}{new}, 'GetSet::Test', 'Setter requires object instantiation');
 
 # ua (getset) should not contain phantom parameters
 ok(

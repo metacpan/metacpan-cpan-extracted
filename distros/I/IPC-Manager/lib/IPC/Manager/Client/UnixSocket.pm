@@ -2,7 +2,7 @@ package IPC::Manager::Client::UnixSocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 use File::Spec;
 use Carp qw/croak/;

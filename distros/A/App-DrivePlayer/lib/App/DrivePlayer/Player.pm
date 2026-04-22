@@ -280,10 +280,16 @@ sub _handle_event {
 sub _handle_end_file {
     my ($self, $obj) = @_;
     my $reason = $obj->{reason} // '';
-    if ($reason eq 'eof' || $reason eq 'stop') {
-        $self->_set_state('stop');
-        $self->on_track_end->() if $self->has_on_track_end;
-    }
+
+    # Only 'eof' (track played to the end) and 'error' (stream died: network
+    # glitch, 4xx/5xx from Drive, token expiry mid-stream) should advance.
+    # 'stop' fires for user-initiated stop AND for loadfile-replace pre-empting
+    # the current track, so advancing on it causes skips/double-advances.
+    # 'quit' / 'redirect' are housekeeping and should never advance.
+    return unless $reason eq 'eof' || $reason eq 'error';
+
+    $self->_set_state('stop');
+    $self->on_track_end->() if $self->has_on_track_end;
 }
 
 sub _set_state {

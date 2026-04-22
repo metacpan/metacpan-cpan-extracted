@@ -9,7 +9,7 @@ use SimpleMock::Util qw(
     generate_args_sha
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $drh = DBI->install_driver('SimpleMock');
 
@@ -35,7 +35,8 @@ undef @valid_global_meta_keys_lookup{ @valid_global_meta_keys };
 sub _normalize_sql {
     my ($sql) = @_;
     $sql = lc($sql);
-    $sql =~ s/ +/ /g;
+    $sql =~ s/\s+/ /g;
+    $sql =~ s/^ | $//g;
     return $sql;
 }
 
@@ -56,7 +57,7 @@ sub validate_mocks {
     QUERY: foreach my $query (@$queries) {
         my $normalized_sql = _normalize_sql($query->{sql});
         my $cols = $query->{cols} || [];
-        RESULT: foreach my $result (@{$query->{results} || []}) {
+        RESULT: foreach my $result (@{$query->{results} || [{ data => [[]] }]}) {
             my $data = $result->{data} || [[]];
             my $sha = generate_args_sha($result->{args});
             my $mock = {
@@ -95,7 +96,15 @@ sub _get_mock_for {
         return dclone({ data => [[]] }) if $layer->{DBI}{_meta}{allow_unmocked_queries};
     }
 
-    die "No mock data found for '$normalized' with args: " . Dumper($args);
+    # something isn't right, so provide a dump of all the (hopefully!) useful info
+    my %DBI_MOCKS;
+    for my $layer (@SimpleMock::MOCK_STACK) {
+        foreach my $key (keys %{ $layer->{DBI} }) {
+            $DBI_MOCKS{$key} = $layer->{DBI}->{$key}
+        }
+    }
+    local $Data::Dumper::Indent = 1;
+    die "No mock data found:". Dumper({ normalized_query => $normalized, args => $args, sha => $sha, dbi_mocks => \%DBI_MOCKS });
 }
 
 1;

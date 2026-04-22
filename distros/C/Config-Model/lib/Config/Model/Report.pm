@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Report 2.161;
+package Config::Model::Report 2.162;
 
 use Carp;
 use strict;
@@ -17,14 +17,14 @@ use Config::Model::Exception;
 use Config::Model::ObjTreeScanner;
 use Text::Wrap;
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 sub new {
-    bless {}, shift;
+    return bless {}, shift;
 }
 
-sub report {
-    my $self = shift;
-
-    my %args  = @_;
+sub report ($self, %args) {
     my $audit = delete $args{audit} || 0;
     my $node  = delete $args{node}
         || croak "dump_tree: missing 'node' parameter";
@@ -54,6 +54,7 @@ sub report {
             }
             push @$data_r, '';    # to get empty line in report
         }
+        return;
     };
 
     my @scan_args = (
@@ -89,7 +90,7 @@ Config::Model::Report - Reports data from config tree
 
 =head1 VERSION
 
-version 2.161
+version 2.162
 
 =head1 SYNOPSIS
 

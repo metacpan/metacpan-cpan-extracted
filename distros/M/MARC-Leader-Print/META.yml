@@ -26,6 +26,7 @@ no_index:
     - t
     - xt
 requires:
+  Check::Term::Color: 0
   Class::Utils: 0.03
   English: 0
   Error::Pure: 0
@@ -38,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Leader-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Leader-Print
-version: '0.08'
+version: '0.09'

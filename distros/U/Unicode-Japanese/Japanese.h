@@ -4,10 +4,11 @@
 
 /* $Id: Japanese.h 41491 2008-02-15 07:21:13Z hio $ */
 
-#if !defined(__cplusplus) && !defined(bool)
-#define bool char
-#define true 1
-#define false 0
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ < 202311L
+#  undef bool
+#  undef true
+#  undef false
+typedef enum bool { false, true, } bool;
 #endif
 
 #include "EXTERN.h"
@@ -93,18 +94,18 @@ extern "C"
   SV* xs_utf8_utf16(SV* sv_str);
   
 /* init/cleanup memoey map. */
-/* (ja:) ¥á¥â¥ê¥Ş¥Ã¥×¥Õ¥¡¥¤¥ë´ØÏ¢ */
+/* (ja:) ãƒ¡ãƒ¢ãƒªãƒãƒƒãƒ—ãƒ•ã‚¡ã‚¤ãƒ«é–¢é€£ */
 extern void do_memmap(void);
 extern void do_memunmap(void);
 
 /* SJIS <=> UTF8 mapping table      */
-/* (ja:) SJIS <=> UTF8 ÊÑ´¹¥Æ¡¼¥Ö¥ë */
+/* (ja:) SJIS <=> UTF8 å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ« */
 /* index is in 0..0xffff            */
 extern UJ_UINT8 const* g_u2s_table;
 extern UJ_UINT8 const* g_s2u_table;
 
   /* i-mode/j-sky/dot-i emoji <=> UTF8 mapping table */
-  /* (ja:) i-mode/j-sky/dot-i ³¨Ê¸»ú <=> UTF8 ÊÑ´¹¥Æ¡¼¥Ö¥ë */
+  /* (ja:) i-mode/j-sky/dot-i çµµæ–‡å­— <=> UTF8 å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ« */
   extern UJ_UINT32 const* g_ei2u1_table;
   extern UJ_UINT32 const* g_ei2u2_table;
   extern UJ_UINT16 const* g_eu2i1_table;
@@ -116,8 +117,8 @@ extern UJ_UINT8 const* g_s2u_table;
   extern UJ_UINT32 const* g_ed2u_table;
   extern UJ_UINT16 const* g_eu2d_table;
 
-  /* i-mode/j-sky/dot-i³¨Ê¸»ú <=> UTF8 ÊÑ´¹¥Æ¡¼¥Ö¥ë¤ÎÍ×ÁÇ¿ô */
-  /* ¥Ğ¥¤¥È¿ô¤Ç¤Ê¤¯Í×ÁÇ¿ô                                   */
+  /* i-mode/j-sky/dot-içµµæ–‡å­— <=> UTF8 å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«ã®è¦ç´ æ•° */
+  /* ãƒã‚¤ãƒˆæ•°ã§ãªãè¦ç´ æ•°                                   */
   extern int g_ei2u1_size;
   extern int g_ei2u2_size;
   extern int g_eu2i1_size;
@@ -162,12 +163,6 @@ extern UJ_UINT8 const* g_s2u_table;
 #endif
 #ifndef get_sv
 #define get_sv perl_get_sv
-#endif
-
-/* for 5.004_xx */
-#ifndef PL_na
-#define PL_na UNIJP_PL_na
-static STRLEN UNIJP_PL_na;
 #endif
 
 #endif /* UNICODE__JAPANESE_H__ */

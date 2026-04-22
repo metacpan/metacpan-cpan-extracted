@@ -180,29 +180,46 @@ sub handle_end_file_eof : Tests(3) {
     is $state_changes[-1], 'stop', 'on_state_change fired with stop';
 }
 
-sub handle_end_file_non_eof : Tests(2) {
+sub handle_end_file_error : Tests(2) {
     my ($self) = @_;
 
+    # 'error' means the stream died mid-play (transient network failure,
+    # Drive 4xx/5xx, token expiry).  We advance, same as 'eof'.
     my $track_ended = 0;
     my $p = fake_player(on_track_end => sub { $track_ended++ });
     $p->_set_state('play');
 
-    # 'error' reason should not trigger track_end
     $p->_handle_end_file({ event => 'end-file', reason => 'error' });
-    is $track_ended, 0, 'on_track_end not fired for error reason';
-    is $p->state, 'play', 'state unchanged for non-eof reason';
+    is $track_ended, 1,   'on_track_end fired for error reason';
+    is $p->state,    'stop', 'state becomes stop on error';
 }
 
 sub handle_end_file_stop_reason : Tests(2) {
     my ($self) = @_;
 
+    # 'stop' fires for user-initiated stop AND for loadfile-replace
+    # pre-empting the current track.  We must NOT advance on it, otherwise
+    # pressing Next / Stop would trigger phantom skips.
     my $track_ended = 0;
     my $p = fake_player(on_track_end => sub { $track_ended++ });
     $p->_set_state('play');
 
     $p->_handle_end_file({ event => 'end-file', reason => 'stop' });
-    is $track_ended, 1, 'on_track_end fired for stop reason';
-    is $p->state, 'stop', 'state becomes stop';
+    is $track_ended, 0,    'on_track_end NOT fired for stop reason';
+    is $p->state,    'play', 'state unchanged for stop reason';
+}
+
+sub handle_end_file_quit_reason : Tests(2) {
+    my ($self) = @_;
+
+    # 'quit' is emitted when mpv itself is shutting down — ignore.
+    my $track_ended = 0;
+    my $p = fake_player(on_track_end => sub { $track_ended++ });
+    $p->_set_state('play');
+
+    $p->_handle_end_file({ event => 'end-file', reason => 'quit' });
+    is $track_ended, 0,    'on_track_end NOT fired for quit reason';
+    is $p->state,    'play', 'state unchanged for quit reason';
 }
 
 # ---- Event handling ----

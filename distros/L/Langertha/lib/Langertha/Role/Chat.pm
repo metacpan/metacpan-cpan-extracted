@@ -1,15 +1,19 @@
 package Langertha::Role::Chat;
 # ABSTRACT: Role for APIs with normal chat functionality
-our $VERSION = '0.402';
+our $VERSION = '0.404';
 use Moose::Role;
 use Future::AsyncAwait;
 use Carp qw( croak );
 use Log::Any qw( $log );
+use Scalar::Util qw( blessed );
 
 requires qw(
   chat_request
   chat_response
 );
+
+
+sub content_format { 'openai' }
 
 
 has chat_model => (
@@ -33,15 +37,52 @@ sub chat {
 
 sub chat_messages {
   my ( $self, @messages ) = @_;
-  return [$self->has_system_prompt
-    ? ({
-      role => 'system', content => $self->system_prompt,
-    }) : (),
-    map {
-      ref $_ ? $_ : {
-        role => 'user', content => $_,
-      }
-    } @messages];
+  my @out;
+  push @out, { role => 'system', content => $self->system_prompt }
+    if $self->has_system_prompt;
+  for my $m (@messages) {
+    my $msg = ref $m ? $m : { role => 'user', content => $m };
+    push @out, $self->_normalize_content_blocks($msg);
+  }
+  return \@out;
+}
+
+sub _normalize_content_blocks {
+  my ( $self, $msg ) = @_;
+  my $content = $msg->{content};
+  return $msg unless ref $content eq 'ARRAY';
+
+  my $needs_convert = 0;
+  for my $b (@$content) {
+    if ( blessed($b) && $b->does('Langertha::Content') ) {
+      $needs_convert = 1;
+      last;
+    }
+  }
+  return $msg unless $needs_convert;
+
+  my $fmt    = $self->content_format;
+  my $method = "to_$fmt";
+
+  my @blocks = map {
+    if ( blessed($_) && $_->does('Langertha::Content') ) {
+      $_->$method;
+    }
+    elsif ( !ref $_ ) {
+      $fmt eq 'gemini'
+        ? { text => $_ }
+        : { type => 'text', text => $_ };
+    }
+    else {
+      $_;
+    }
+  } @$content;
+
+  if ( $fmt eq 'gemini' ) {
+    my $role = ( $msg->{role} // 'user' ) eq 'assistant' ? 'model' : ( $msg->{role} // 'user' );
+    return { role => $role, parts => \@blocks };
+  }
+  return { %$msg, content => \@blocks };
 }
 
 
@@ -240,7 +281,7 @@ Langertha::Role::Chat - Role for APIs with normal chat functionality
 
 =head1 VERSION
 
-version 0.402
+version 0.404
 
 =head1 SYNOPSIS
 
@@ -402,6 +443,15 @@ This is the recommended method for real-time streaming in async applications.
 Pass C<undef> as the callback (or use L</simple_chat_stream_f>) if you only
 need the final result.
 
+=head2 content_format
+
+    my $fmt = $engine->content_format;  # 'openai' | 'anthropic' | 'gemini'
+
+Wire format for multimodal content blocks. Controls how
+L<Langertha::Content> objects embedded in a message's C<content> arrayref
+are serialized during L</chat_messages>. Defaults to C<'openai'>; overridden
+by L<Langertha::Engine::AnthropicBase> and L<Langertha::Engine::Gemini>.
+
 =head1 SEE ALSO
 
 =over
@@ -439,11 +489,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

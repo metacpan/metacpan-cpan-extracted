@@ -1,5 +1,5 @@
 ---
-abstract: 'chained way of manipulating and inspecting XML documents'
+abstract: 'a chained way of manipulating and inspecting XML documents'
 author:
   - 'Jozef Kutej <jkutej@cpan.org>'
 build_requires:
@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 keywords:
   - XML
   - chain
@@ -27,18 +27,16 @@ name: XML-Chain
 provides:
   XML::Chain:
     file: lib/XML/Chain.pm
-    version: '0.06'
+    version: '0.07'
   XML::Chain::Element:
     file: lib/XML/Chain/Element.pm
-    version: '0.06'
+    version: '0.07'
   XML::Chain::Selector:
     file: lib/XML/Chain/Selector.pm
-    version: '0.06'
+    version: '0.07'
 requires:
+  Class::XSAccessor: '0'
   IO::Any: '0'
-  Moose: '0'
-  Moose::Exporter: '0'
-  MooseX::Aliases: '0'
   Try::Tiny: '0'
   XML::LibXML: '2.01'
   perl: '5.01'
@@ -46,5 +44,5 @@ resources:
   bugtracker: https://github.com/meon/XML-Chain/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/meon/XML-Chain.git
-version: '0.06'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

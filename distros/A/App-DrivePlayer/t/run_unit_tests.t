@@ -17,7 +17,6 @@ use Module::Load;
 use Test::Class;
 
 use lib "$FindBin::RealBin/../lib";         # DrivePlayer source
-use lib "$FindBin::RealBin/../../../p5-google-restapi/lib";  # Google::RestAPI
 use lib "$FindBin::RealBin/lib";            # test support
 use lib "$FindBin::RealBin/unit";           # test classes
 

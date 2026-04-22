@@ -35,15 +35,14 @@ if($@) {
 
 	# Run the generated test
 	my ($stdout, $stderr);
-	run3 [$^X, $outfile], undef, \$stdout, \$stderr;
+	run3 [ $^X, $outfile ], undef, \$stdout, \$stderr;
 
 	ok($? == 0, 'Generated test script exits successfully');
 
-	if($? == 0) {
-		unlink $outfile;
-	} else {
+	if($? != 0) {
 		diag("STDOUT:\n$stdout");
 	}
+	unlink $outfile;
 	diag($stderr) if(length($stderr));
 
 	like($stderr, qr/abs test case created/);

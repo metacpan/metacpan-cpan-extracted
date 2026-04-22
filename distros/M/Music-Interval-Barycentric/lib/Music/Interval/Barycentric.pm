@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0403';
 
 use List::Util qw( min );
 
@@ -104,7 +104,7 @@ Music::Interval::Barycentric - Compute barycentric musical interval space
 
 =head1 VERSION
 
-version 0.0401
+version 0.0403
 
 =head1 SYNOPSIS
 
@@ -112,16 +112,18 @@ version 0.0401
 
  my @chords = ([3,4,5], [0,4,7]); # Given in "pitch-class notation"
 
- my $dist = distance(@chords);
- $dist = orbit_distance(@chords);
- $dist = forte_distance(@chords);
- my $even = evenness_index($chords[0]);
+ my $dist = distance(@chords); # 2.5495...
+ $dist = orbit_distance(@chords); # 2.5495...
+ $dist = forte_distance(@chords); # 2.5495...
+ my $even = evenness_index($chords[0]); # 1
 
  my @cycles = cyclic_permutation($chords[0]);
  # [3,4,5], [5,3,4], [4,5,3]
 
  my @center = barycenter(scalar @{ $chords[0] });
  # [4,4,4]
+
+ my $inv = inversion(@chords); # [ 5, 4, 3 ]
 
 =head1 DESCRIPTION
 
@@ -217,11 +219,11 @@ L<http://www.amazon.com/Geometry-Musical-Chords-Interval-Representation/dp/14502
 
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2023 by Gene Boggs.
+This software is copyright (c) 2014-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

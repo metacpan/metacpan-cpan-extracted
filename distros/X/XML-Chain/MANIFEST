@@ -10,6 +10,9 @@ README
 t/01_basics.t
 t/02_namespaces.t
 t/03_auto-indent.t
+t/04_navigation.t
+t/05_rm.t
+t/06_cross_document.t
 t/90_synopsis.t
 t/tdata/01_basics.xml
 xt/pod-coverage.t

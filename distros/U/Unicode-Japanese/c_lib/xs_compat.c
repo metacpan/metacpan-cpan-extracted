@@ -79,7 +79,6 @@ uj_uint8* _uj_conv_grow(uj_conv_t* conv, uj_size_t new_bufsize)
 }
 
 const uj_conv_t _uj_xs_conv_undef;
-uj_size_t _uj_xs_PL_na;
 
 void _uj_xs_SV_Buf_append_ch(uj_conv_t* conv, int ch)
 {

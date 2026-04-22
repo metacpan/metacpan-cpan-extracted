@@ -12,7 +12,7 @@ use SimpleMock::Util qw(
     generate_args_sha
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub mock_send_request {
     my ($request, $ua, $h) = @_;

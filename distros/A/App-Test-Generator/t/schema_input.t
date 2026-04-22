@@ -123,4 +123,11 @@ if($stdout =~ /1\.\.(\d+)/ms) {
 
 unlike($stdout, qr/^not ok \d/sm, 'No created test failed');
 
+if($stdout =~ /^(not ok \d[^\n]*)/ms) {
+	diag("First failing test: $1");
+}
+if($stderr && length($stderr)) {
+	diag("STDERR: $stderr");
+}
+
 done_testing();

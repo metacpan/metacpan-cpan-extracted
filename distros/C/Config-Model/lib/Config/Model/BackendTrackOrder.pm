@@ -7,11 +7,12 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendTrackOrder 2.161;
+package Config::Model::BackendTrackOrder 2.162;
 
 # ABSTRACT: Track read order of elements from configuration
 
 use Mouse;
+use Mouse::Util;
 use strict;
 use warnings;
 use Carp;
@@ -20,7 +21,6 @@ use v5.20;
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
 
-use Mouse::Util;
 use Log::Log4perl qw(get_logger :levels);
 
 my $logger = get_logger("BackendTrackOrder");
@@ -144,7 +144,7 @@ Config::Model::BackendTrackOrder - Track read order of elements from configurati
 
 =head1 VERSION
 
-version 2.161
+version 2.162
 
 =head1 SYNOPSIS
 

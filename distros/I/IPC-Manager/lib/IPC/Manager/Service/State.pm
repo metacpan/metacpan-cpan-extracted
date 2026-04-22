@@ -156,6 +156,8 @@ sub ipcm_service {
         croak "Timeout waiting for service to come up after ${timeout}s"
             unless $out->ready($timeout);
 
+        $out->_set_child_pid($pid);
+
         return $out;
     }
 

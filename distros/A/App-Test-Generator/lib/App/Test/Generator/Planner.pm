@@ -9,11 +9,11 @@ use App::Test::Generator::Planner::Fixture;
 use App::Test::Generator::Planner::Mock;
 use App::Test::Generator::Planner::Grouping;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 
@@ -28,7 +28,7 @@ sub new {
 sub plan_all {
 	my $self = $_[0];
 
-	my $global = $self->build_plan();
+	# my $global = $self->build_plan();
 
 	my %method_plan;
 
@@ -42,33 +42,28 @@ sub plan_all {
 		# Strategy mapping
 		# -----------------------------------
 
-        if ($schema->{accessor} && $schema->{accessor}->{type}) {
+		if ($schema->{accessor} && $schema->{accessor}->{type}) {
+			if ($schema->{accessor}->{type} eq 'get') {
+				$plan{getter_test} = 1;
+			} elsif ($schema->{accessor}->{type} eq 'getset') {
+				$plan{getset_test} = 1;
+			} elsif ($schema->{accessor}->{type} eq 'injector') {
+				$plan{object_injection_test} = 1;
+			}
+		}
 
-            if ($schema->{accessor}->{type} eq 'get') {
-                $plan{getter_test} = 1;
-            }
+		if ($schema->{output}->{type} && $schema->{output}->{type} eq 'boolean') {
+			$plan{boolean_test} = 1;
+		}
 
-            elsif ($schema->{accessor}->{type} eq 'getset') {
-                $plan{getset_test} = 1;
-            }
+		$method_plan{$method} = \%plan;
+	}
 
-            elsif ($schema->{accessor}->{type} eq 'injector') {
-                $plan{object_injection_test} = 1;
-            }
-        }
-
-        if ($schema->{output}->{type} && $schema->{output}->{type} eq 'boolean') {
-
-            $plan{boolean_test} = 1;
-        }
-
-        $method_plan{$method} = \%plan;
-    }
-
-die Dumper(\%method_plan);
+	# die Dumper(\%method_plan);
 	return \%method_plan;
 }
 
+# TODO:  This doesn't seem to be called anywhere.  Should it be removed?
 sub build_plan {
 	my $self = $_[0];
 
@@ -99,4 +94,3 @@ sub build_plan {
 }
 
 1;
-

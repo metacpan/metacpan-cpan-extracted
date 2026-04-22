@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0508';
+our $VERSION = '0.0509';
 
 use v5.36;
 use feature 'try';
@@ -372,7 +372,8 @@ sub _adjust_cymbals($self) {
 
 sub _adjust_drums($self, $fill_flag) {
     say 'Beats: ' . $self->_beat_count if $self->verbose;
-    my ($next, $patterns, $part, $name);
+    my ($next, $patterns, $part);
+    my $name = '';
     if (ref $self->next_part eq 'ARRAY') {
         $name = $self->next_part->[ $self->_part_inc % $self->next_part->@* ];
         $part = $self->parts->{$name};
@@ -491,7 +492,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0508
+version 0.0509
 
 =head1 SYNOPSIS
 

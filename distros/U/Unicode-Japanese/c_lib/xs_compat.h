@@ -14,7 +14,6 @@ extern uj_conv_t* _uj_conv_new_strn(const uj_alloc_t* alloc, const char* str, uj
 extern uj_conv_t* _uj_conv_clone(const uj_conv_t* conv);
 
 extern const uj_conv_t _uj_xs_conv_undef;
-extern uj_size_t _uj_xs_PL_na;
 extern void _uj_xs_SV_Buf_append_ch(uj_conv_t* conv, int ch);
 extern void _uj_xs_SV_Buf_append_ch2(uj_conv_t* conv, int ch);
 extern void _uj_xs_SV_Buf_append_ch3(uj_conv_t* conv, int ch);
@@ -59,7 +58,6 @@ extern uj_conv_t* _uj_xs_SV_Buf_getSv(const uj_conv_t* conv);
 #define mg_get(sv)     ((void)0)
 #define SvOK(sv)       ((sv) != &PL_sv_undef)
 
-#define PL_na                              _uj_xs_PL_na
 #define SV_Buf_append_ch(p_var,ch)         _uj_xs_SV_Buf_append_ch(p_var, ch)
 #define SV_Buf_append_ch2(p_var,ch)        _uj_xs_SV_Buf_append_ch2(p_var, ch)
 #define SV_Buf_append_ch3(p_var,ch)        _uj_xs_SV_Buf_append_ch3(p_var, ch)

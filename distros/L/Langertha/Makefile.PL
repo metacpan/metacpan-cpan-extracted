@@ -14,7 +14,7 @@ install_share dist => "share";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "The clan of fierce vikings with \x{1fa93} and \x{1f6e1}\x{fe0f} to AId your rAId",
-  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de> L<https://raudssus.de/>",
+  "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
@@ -56,7 +56,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "0.402",
+  "VERSION" => "0.404",
   "test" => {
     "TESTS" => "t/*.t"
   }

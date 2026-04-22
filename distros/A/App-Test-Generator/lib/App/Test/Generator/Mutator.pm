@@ -2,203 +2,233 @@ package App::Test::Generator::Mutator;
 
 use strict;
 use warnings;
-
-use File::Temp qw(tempdir);
+use Carp                qw(croak);
+use Config;
+use File::Copy          qw(copy);
 use File::Copy::Recursive qw(dircopy);
-use File::Copy qw(copy);
-use File::Path;
 use File::Spec;
+use File::Temp          qw(tempdir);
 use PPI;
+use Readonly;
 
 use App::Test::Generator::Mutation::BooleanNegation;
-use App::Test::Generator::Mutation::ReturnUndef;
-use App::Test::Generator::Mutation::NumericBoundary;
 use App::Test::Generator::Mutation::ConditionalInversion;
+use App::Test::Generator::Mutation::NumericBoundary;
+use App::Test::Generator::Mutation::ReturnUndef;
+
+# --------------------------------------------------
+# Default values for optional constructor arguments
+# --------------------------------------------------
+Readonly my $DEFAULT_LIB_DIR        => 'lib';
+Readonly my $DEFAULT_MUTATION_LEVEL => 'full';
+
+# --------------------------------------------------
+# Valid mutation level values
+# --------------------------------------------------
+Readonly my $LEVEL_FULL => 'full';
+Readonly my $LEVEL_FAST => 'fast';
+
+our $VERSION = '0.33';
 
 =head1 NAME
 
-App::Test::Generator::Mutator - Generate mutation tests
+App::Test::Generator::Mutator - Generate and apply mutation tests
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =head1 DESCRIPTION
 
-B<App::Test::Generator::Mutator> is a mutation engine that programmatically alters Perl source files to evaluate the effectiveness of a project's test suite.
-It analyzes modules, generates systematic code mutations (such as conditional inversions,
-logical operator changes,
-and other behavioral tweaks),
-and applies them within an isolated workspace so tests can be executed safely against each modified variant.
-By tracking which mutants are "killed" (cause tests to fail) versus those that "survive" (tests still pass),
-the module enables calculation of a mutation score,
-providing a quantitative measure of how well the test suite detects unintended behavioral changes.
+B<App::Test::Generator::Mutator> is a mutation engine that programmatically
+alters Perl source files to evaluate the effectiveness of a project's test
+suite. It analyses modules, generates systematic code mutations (such as
+conditional inversions, logical operator changes, and numeric boundary
+flips), and applies them within an isolated workspace so tests can be
+executed safely against each modified variant.
+
+By tracking which mutants are killed (cause tests to fail) versus those that
+survive (tests still pass), the module enables calculation of a mutation
+score, providing a quantitative measure of how well the test suite detects
+unintended behavioural changes.
+
+=head2 new
+
+Construct a new Mutator for a given source file.
+
+    my $mutator = App::Test::Generator::Mutator->new(
+        file           => 'lib/My/Module.pm',
+        lib_dir        => 'lib',
+        mutation_level => 'full',
+    );
+
+=head3 Arguments
+
+=over 4
+
+=item * C<file>
+
+Path to the Perl source file to mutate. Required. Must exist on disk.
+
+=item * C<lib_dir>
+
+Root library directory. Optional — defaults to C<lib>.
+
+=item * C<mutation_level>
+
+Controls the breadth of mutation. C<full> applies all mutations;
+C<fast> deduplicates and removes redundant mutants first.
+Optional — defaults to C<full>.
+
+=back
+
+=head3 Returns
+
+A blessed hashref. Croaks if C<file> is missing or does not exist.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        file           => { type => SCALAR },
+        lib_dir        => { type => SCALAR, optional => 1 },
+        mutation_level => { type => SCALAR, optional => 1 },
+    }
+
+=head4 output
+
+    {
+        type => OBJECT,
+        isa  => 'App::Test::Generator::Mutator',
+    }
 
 =cut
 
 sub new {
 	my ($class, %args) = @_;
 
-	die 'file required' unless $args{file};
+	# file is required and must exist on disk
+	croak 'file required'           unless defined $args{file};
+	croak "file not found: $args{file}" unless -f $args{file};
 
-	my $self = bless {
-		file => $args{file},
-		lib_dir => $args{lib_dir} || 'lib',
-		mutation_level => $args{mutation_level} || 'full',	# full or fast
+	return bless {
+		file           => $args{file},
+		lib_dir        => $args{lib_dir}        || $DEFAULT_LIB_DIR,
+		mutation_level => $args{mutation_level} || $DEFAULT_MUTATION_LEVEL,
+
+		# Instantiate all registered mutation strategies
 		mutations => [
 			App::Test::Generator::Mutation::BooleanNegation->new(),
 			App::Test::Generator::Mutation::ReturnUndef->new(),
 			App::Test::Generator::Mutation::NumericBoundary->new(),
-			App::Test::Generator::Mutation::ConditionalInversion->new()
+			App::Test::Generator::Mutation::ConditionalInversion->new(),
 		],
 	}, $class;
-
-	return $self;
 }
+
+=head2 generate_mutants
+
+Parse the target file and generate all mutants by running each registered
+mutation strategy against the PPI document.
+
+    my @mutants = $mutator->generate_mutants();
+
+=head3 Arguments
+
+None beyond C<$self>.
+
+=head3 Returns
+
+A list of L<App::Test::Generator::Mutant> objects. In C<fast> mode,
+redundant and duplicate mutants are removed before returning.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        self => { type => OBJECT, isa => 'App::Test::Generator::Mutator' },
+    }
+
+=head4 output
+
+    {
+        type     => ARRAYREF,
+        elements => { type => OBJECT, isa => 'App::Test::Generator::Mutant' },
+    }
+
+=cut
 
 sub generate_mutants {
 	my $self = $_[0];
 
-	my $doc = PPI::Document->new($self->{file}) or die "Unable to parse $self->{file}";
+	# Parse the target file into a PPI document
+	my $doc = PPI::Document->new($self->{file})
+		or croak "Unable to parse $self->{file}";
 
 	my @mutants;
 
-	for my $mutation (@{$self->{mutations}}) {
+	# Run each registered mutation strategy against the document
+	for my $mutation (@{ $self->{mutations} }) {
 		push @mutants, $mutation->mutate($doc);
 	}
 
-	if($self->{mutation_level} eq 'fast') {
-		return @{_dedup_mutants(\@mutants)};
+	# In fast mode deduplicate and remove redundant mutants
+	if($self->{mutation_level} eq $LEVEL_FAST) {
+		return @{ _dedup_mutants(\@mutants) };
 	}
+
 	return @mutants;
-}
-
-sub apply_mutant {
-	my ($self, $mutant) = @_;
-
-	my $workspace = $self->{workspace} or die 'Workspace not prepared';
-
-	my $relative = $self->{relative} or die 'Relative path not set';
-
-	my $target = File::Spec->catfile(
-		$workspace,
-		$self->{lib_dir},
-		$relative,
-	);
-
-	my $doc = PPI::Document->new($target) or die "Failed to parse $target";
-
-	$mutant->{transform}->($doc);
-
-	$doc->save($target);
-}
-
-sub revert {
-	my $self = $_[0];
-
-	copy("$self->{file}.bak", $self->{file}) or die 'Restore failed';
-}
-
-sub run_tests {
-	my $self = $_[0];
-
-	return system($^X, '-Mblib', '$(which prove)', '-l', 't/') == 0;
 }
 
 =head2 prepare_workspace
 
-Prepares an isolated temporary workspace for a single mutation test run.
+Prepare an isolated temporary workspace for a single mutation test run.
 
-The entire C<lib/> tree is copied into the workspace so that all module
+The entire C<lib_dir> tree is copied into the workspace so that all module
 dependencies resolve correctly when the test suite runs against the mutant.
 Only after this copy is complete is the single target file overwritten by
 C<apply_mutant>.
 
+    my $workspace = $mutator->prepare_workspace();
+    $mutator->apply_mutant($mutant);
+    local $ENV{PERL5LIB} = "$workspace/lib";
+    my $survived = (system('prove', 't') == 0);
+
 =head3 Arguments
 
-Takes no arguments beyond the invocant.
+None beyond C<$self>.
 
 =head3 Returns
 
-A string containing the absolute path to the temporary directory that was created.
-The directory is automatically removed when the
-C<App::Test::Generator::Mutator> object goes out of scope (via
-L<File::Temp>'s C<CLEANUP =E<gt> 1> behaviour).
+A string containing the absolute path to the temporary directory created.
+The directory is automatically removed when the object goes out of scope
+via L<File::Temp>'s C<CLEANUP =E<gt> 1> behaviour.
 
-=head3 Side Effects
+=head3 Side effects
 
-=over 4
-
-=item *
-
-Creates a temporary directory under the system's default temp location.
-
-=item *
-
-Recursively copies the entire C<lib_dir> tree (default C<lib/>) into the
-workspace using C<File::Copy::Recursive::dircopy>.
-
-=item *
-
-Sets C<< $self->{workspace} >> to the absolute path of the temporary directory.
-
-=item *
-
-Sets C<< $self->{relative} >> to the path of the target file relative to
-C<lib_dir>, for use by C<apply_mutant>.
-
-=back
+Creates a temporary directory. Recursively copies C<lib_dir> into it.
+Sets C<< $self->{workspace} >> and C<< $self->{relative} >>.
 
 =head3 Notes
 
-The workspace is only valid for a single file's mutation run.  Call
-C<prepare_workspace> once per file, then call C<apply_mutant> once per
-mutant within that file.  Because C<CLEANUP =E<gt> 1> is set, the workspace
-is silently removed when the tempdir handle is garbage collected - do not
-store the path beyond the lifetime of the enclosing scope.
+Call C<prepare_workspace> once per file, then C<apply_mutant> once per
+mutant within that file. Do not store the returned path beyond the
+lifetime of the enclosing scope.
 
-=head3 Example
+=head3 API specification
 
-    my $mutator = App::Test::Generator::Mutator->new(
-        file    => 'lib/My/Module.pm',
-        lib_dir => 'lib',
-    );
+=head4 input
 
-    my @mutants = $mutator->generate_mutants();
-
-    for my $mutant (@mutants) {
-        my $workspace = $mutator->prepare_workspace();
-
-        $mutator->apply_mutant($mutant);
-
-        local $ENV{PERL5LIB} = "$workspace/lib";
-        my $survived = (system('prove', 't') == 0);
-
-        # workspace cleaned up automatically when $workspace goes out of scope
+    {
+        self => { type => OBJECT, isa => 'App::Test::Generator::Mutator' },
     }
 
-=head3 API Specification
+=head4 output
 
-=head4 Input
-
-    # Params::Validate::Strict schema
     {
-        # No named parameters - invocant only.
-        # Required state (validated by new()):
-        #   file    => { type => SCALAR, callbacks => { 'file exists' => sub { -f $_[0] } } }
-        #   lib_dir => { type => SCALAR, default => 'lib' }
-    }
-
-=head4 Output
-
-    # Return::Set schema
-    {
-        type        => SCALAR,
-        description => 'Absolute path to the temporary workspace directory',
-        callbacks   => {
-            'is absolute path' => sub { File::Spec->file_name_is_absolute($_[0]) },
-            'directory exists' => sub { -d $_[0] },
-        },
+        type => SCALAR,
     }
 
 =cut
@@ -206,17 +236,16 @@ store the path beyond the lifetime of the enclosing scope.
 sub prepare_workspace {
 	my $self = $_[0];
 
+	# Create a self-cleaning temporary directory
 	my $tmp = tempdir(CLEANUP => 1);
 
-	my $src = $self->{file};
-
-	# Derive relative path automatically
-	my $relative = $src;
+	# Derive the file's path relative to lib_dir for use by apply_mutant
+	my $relative = $self->{file};
 	$relative =~ s/^\Q$self->{lib_dir}\E\/?//;
 
-	# Copy the entire lib tree so dependencies resolve correctly
+	# Copy the entire lib tree so all dependencies resolve in the workspace
 	dircopy($self->{lib_dir}, File::Spec->catfile($tmp, $self->{lib_dir}))
-		or die "dircopy failed: $!";
+		or croak "dircopy failed: $!";
 
 	$self->{workspace} = $tmp;
 	$self->{relative}  = $relative;
@@ -224,20 +253,152 @@ sub prepare_workspace {
 	return $tmp;
 }
 
-sub _dedup_mutants
-{
-	my $mutants = $_[0];
+=head2 apply_mutant
+
+Apply a single mutant's transform to the target file in the workspace.
+
+    $mutator->apply_mutant($mutant);
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$mutant>
+
+An L<App::Test::Generator::Mutant> object whose C<transform> closure
+will be applied to the workspace copy of the target file.
+
+=back
+
+=head3 Returns
+
+Nothing. Modifies the workspace copy of the target file in place.
+
+=head3 Side effects
+
+Overwrites the target file in the workspace with the mutated version.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        self   => { type => OBJECT, isa => 'App::Test::Generator::Mutator' },
+        mutant => { type => OBJECT, isa => 'App::Test::Generator::Mutant'  },
+    }
+
+=head4 output
+
+    { type => UNDEF }
+
+=cut
+
+sub apply_mutant {
+	my ($self, $mutant) = @_;
+
+	# Workspace must be prepared before applying any mutant
+	my $workspace = $self->{workspace}
+		or croak 'Workspace not prepared — call prepare_workspace first';
+
+	my $relative  = $self->{relative}
+		or croak 'Relative path not set — call prepare_workspace first';
+
+	# Construct the full path to the file in the workspace
+	my $target = File::Spec->catfile(
+		$workspace,
+		$self->{lib_dir},
+		$relative,
+	);
+
+	# Parse the workspace copy and apply the mutation transform
+	my $doc = PPI::Document->new($target)
+		or croak "Failed to parse $target";
+
+	$mutant->{transform}->($doc);
+
+	$doc->save($target);
+}
+
+=head2 run_tests
+
+Run the test suite against the current workspace and return whether all
+tests passed.
+
+    my $survived = $mutator->run_tests();
+
+=head3 Arguments
+
+None beyond C<$self>.
+
+=head3 Returns
+
+1 if all tests passed (mutant survived), 0 if any test failed (mutant
+killed).
+
+=head3 Side effects
+
+Executes an external process running the test suite.
+
+=head3 Notes
+
+Uses C<prove> found on PATH. Sets C<PERL5LIB> to include the workspace
+lib directory before running.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        self => { type => OBJECT, isa => 'App::Test::Generator::Mutator' },
+    }
+
+=head4 output
+
+    { type => SCALAR }
+
+=cut
+
+sub run_tests {
+	my $self = $_[0];
+
+	# Locate prove on PATH — fall back to bare 'prove' and let shell find it
+	my $prove = File::Spec->catfile($Config{bin}, 'prove');
+	$prove = 'prove' unless -x $prove;
+
+	return system($prove, '-l', 't') == 0;
+}
+
+# --------------------------------------------------
+# _dedup_mutants
+#
+# Purpose:    Remove duplicate and redundant mutants
+#             from a list, used in fast mutation mode
+#             to reduce the number of mutants to run.
+#
+# Entry:      $mutants - arrayref of Mutant objects.
+#
+# Exit:       Returns an arrayref of deduplicated
+#             Mutant objects.
+#
+# Side effects: None.
+#
+# Notes:      Deduplication key uses line, original,
+#             and description rather than the transform
+#             coderef, which is not stable as a string.
+# --------------------------------------------------
+sub _dedup_mutants {
+	my ($mutants) = @_;
 	my @rc;
 	my %seen;
 
 	for my $m (@{$mutants}) {
+		# Build a stable key from metadata — not from the coderef
 		my $key = join '|',
-			$m->{line},
-			$m->{original},
-			$m->{transform};
+			$m->{line}        // '',
+			$m->{original}    // '',
+			$m->{description} // '';
 
 		next if $seen{$key}++;
-
 		next if _is_redundant_mutation($m);
 
 		push @rc, $m;
@@ -246,35 +407,46 @@ sub _dedup_mutants
 	return \@rc;
 }
 
+# --------------------------------------------------
+# _is_redundant_mutation
+#
+# Purpose:    Return true if a mutant is considered
+#             redundant and should be skipped in fast
+#             mutation mode.
+#
+# Entry:      $m - a Mutant hashref.
+#
+# Exit:       Returns 1 if redundant, 0 otherwise.
+#
+# Side effects: None.
+#
+# Notes:      Checks for arithmetic no-ops, double
+#             negation inside conditionals, boolean
+#             literal flips, mutations inside comments,
+#             and equivalent numeric comparisons.
+#             Does not compare transform coderefs —
+#             they are not meaningful as strings.
+# --------------------------------------------------
 sub _is_redundant_mutation {
-	my $m = $_[0];
+	my ($m) = @_;
 
 	my $orig = $m->{original} // '';
-	my $new = $m->{transform} // '';
 
-	# Exact same code (safety guard)
-	return 1 if $orig eq $new;
-
-	# Arithmetic no-op
+	# Arithmetic no-ops add nothing to mutation coverage
 	return 1 if $orig =~ /\+\s*0$/;
 	return 1 if $orig =~ /-\s*0$/;
 
-	# Double negation, because in Perl they force a boolean context
-	if ($m->{context} && $m->{context} eq 'conditional') {
-		# Only skip double negation removal inside conditionals
+	# Double negation inside conditionals forces boolean context
+	# in Perl and is not a meaningful mutation
+	if($m->{context} && $m->{context} eq 'conditional') {
 		return 1 if $orig =~ /^\!\!/;
 	}
 
-	# Boolean literal flip when already strict boolean
+	# Boolean literal flip on a standalone 1 or 0 is trivial
 	return 1 if $orig =~ /^\s*(?:1|0)\s*$/;
 
-	# Mutation inside comment
+	# Mutations inside comments are unreachable code
 	return 1 if $m->{line_content} && $m->{line_content} =~ /^\s*#/;
-
-	# Equivalent numeric comparison
-	if ($orig =~ /^\d+$/ && $new =~ /^\d+$/) {
-		return 1 if $orig == $new;
-	}
 
 	return 0;
 }
@@ -283,7 +455,7 @@ sub _is_redundant_mutation {
 
 =over 4
 
-=item C<bin/app-test-generator-mutate>
+=item C<bin/test-generator-mutate>
 
 =item L<Devel::Mutator>
 
@@ -293,26 +465,16 @@ sub _is_redundant_mutation {
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
 
-Portions of this module's initial design and documentation were created with the
-assistance of AI.
+Portions of this module's initial design and documentation were created
+with the assistance of AI.
 
 =head1 LICENCE AND COPYRIGHT
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
-
-=back
+Usage is subject to the terms of GPL2.
+If you use it,
+please let me know.
 
 =cut
 

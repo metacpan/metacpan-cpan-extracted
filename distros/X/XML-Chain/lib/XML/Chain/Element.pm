@@ -5,22 +5,30 @@ use strict;
 use utf8;
 use 5.010;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-use Moose;
-use MooseX::Aliases;
+use parent qw(XML::Chain::Selector);
+use Class::XSAccessor accessors => [qw(_xc_el_data)];
 use Carp qw(croak);
-
-extends qw(XML::Chain::Selector);
 
 use overload '""' => \&XML::Chain::Selector::as_string, fallback => 1;
 
-has '_xc_el_data' => (is => 'ro', isa => 'HashRef',    required => 1);
-has '_xc'         => (is => 'rw', isa => 'XML::Chain', required => 1);
+sub new {
+    my ( $class, @args ) = @_;
+    my %args =
+        ( ( @args == 1 ) && ( ref( $args[0] ) eq 'HASH' ) )
+        ? %{ $args[0] }
+        : @args;
 
-sub as_xml_libxml    {return $_[0]->{_xc_el_data}->{lxml};}
-sub name             {return $_[0]->{_xc_el_data}->{lxml}->nodeName;}
-sub current_elements {return [$_[0]->_xc_el_data];}
+    return bless {
+        _xc_el_data => $args{_xc_el_data},
+        _xc         => $args{_xc},
+    }, $class;
+}
+
+sub as_xml_libxml    { return $_[0]->{_xc_el_data}->{lxml}; }
+sub name             { return $_[0]->{_xc_el_data}->{lxml}->nodeName; }
+sub current_elements { return [ $_[0]->_xc_el_data ]; }
 
 1;
 
@@ -30,29 +38,39 @@ __END__
 
 =head1 NAME
 
-XML::Chain::Element - helper class for XML::Chain representing single element
+XML::Chain::Element - helper class for XML::Chain representing a single element
 
 =head1 SYNOPSIS
 
-    xc('body')->c(h1)->t('title')->root
+    xc('body')->c('h1')->t('title')->root
 
 =head1 DESCRIPTION
 
-Returned by L<XML::Chain::Selector/single> call.
+Returned by L<XML::Chain::Selector/single>.
 
 =head1 METHODS
 
+=head2 new
+
+Creates a new element wrapper.
+
 =head2 name
 
-return element name
+Returns the element name.
 
 =head2 as_xml_libxml
 
-Returns L<XML::LibXML::Element> object.
+Returns an L<XML::LibXML::Element> object.
+
+=head2 current_elements
+
+Returns the element wrapped in an array reference for internal consistency
+with L<XML::Chain::Selector>. Selectors always work with arrays of elements,
+and Element overrides this to return its single element as a 1-element array.
 
 =head2 XML::Chain::Selector methods
 
-All of the L<XML::Chain::Selector> methods works too.
+All L<XML::Chain::Selector> methods work here as well.
 
 =head1 AUTHOR
 

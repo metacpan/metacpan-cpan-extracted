@@ -7,11 +7,11 @@ use App::Test::Generator::SchemaExtractor;
 use App::Test::Generator::TestWriter;
 use App::Test::Generator::Mutator;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 

@@ -226,8 +226,8 @@ subtest 'poorly_documented method' => sub {
 	my $schema = $schemas->{poorly_documented};
 	ok($schema, 'poorly_documented schema exists');
 
-	is($schema->{_confidence}{input}->{'level'}, 'medium', 'input confidence is medium');
-	is($schema->{_confidence}{output}->{'level'}, 'medium', 'output confidence is medium');
+	is($schema->{_confidence}{input}->{'level'}, 'low', 'input confidence is low');
+	is($schema->{_confidence}{output}->{'level'}, 'low', 'output confidence is low');
 	# Notes might be present or not, depending on what we could infer
 	# Just check the schema exists and has low confidence
 };

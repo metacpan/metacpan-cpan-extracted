@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 package Locale::Simple::Scraper::ParserShortcuts;
-BEGIN {
-  $Locale::Simple::Scraper::ParserShortcuts::AUTHORITY = 'cpan:GETTY';
-}
-$Locale::Simple::Scraper::ParserShortcuts::VERSION = '0.019';
+our $VERSION = '0.108';
 # ABSTRACT: LSS::Parser methods that are generic shortcuts to P::MGC functionality
 
 use Moo::Role;
@@ -67,14 +64,16 @@ sub c_expect {
 sub c_with_ws {
     my ( $self, $code, @args ) = @_;
     return sub {
-        local $self->{patterns}{ws} = qr//;
+        local $self->{patterns}{ws}    = qr//;
+        local $self->{patterns}{_skip} = qr//;
         return $self->$code( @args );
     };
 }
 
 sub with_ws {
     my ( $self, $code, @args ) = @_;
-    local $self->{patterns}{ws} = qr//;
+    local $self->{patterns}{ws}    = qr//;
+    local $self->{patterns}{_skip} = qr//;
     return $self->$code( @args );
 }
 
@@ -84,23 +83,37 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Locale::Simple::Scraper::ParserShortcuts - LSS::Parser methods that are generic shortcuts to P::MGC functionality
 
 =head1 VERSION
 
-version 0.019
+version 0.108
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/locale-simple/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudss.us>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by DuckDuckGo, Inc. L<http://duckduckgo.com/>, Torsten Raudssus <torsten@raudss.us>.
+This software is Copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

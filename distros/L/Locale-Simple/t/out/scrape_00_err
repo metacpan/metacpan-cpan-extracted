@@ -216,11 +216,84 @@ pl => /lib/Locale/Simple.pm
 - found func ln at line LINE
 - found 3 arguments
 - discarded COUNT characters of noise
+- found func lp at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
 - found func l at line LINE
-- found 1 arguments
+- Expected "(":
+ |exporting short function names (C<l>, C<ln>, C<lp>, C<ld>, C<ldn>, C<ldp>,
+ |-----------------------------------^
 - discarded COUNT characters of noise
 - found func ln at line LINE
-- found 3 arguments
+- Expected "(":
+ |exporting short function names (C<l>, C<ln>, C<lp>, C<ld>, C<ldn>, C<ldp>,
+ |------------------------------------------^
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- Expected "(":
+ |exporting short function names (C<l>, C<ln>, C<lp>, C<ld>, C<ldn>, C<ldp>,
+ |-------------------------------------------------^
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- Expected "(":
+ |exporting short function names (C<l>, C<ln>, C<lp>, C<ld>, C<ldn>, C<ldp>,
+ |--------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func ldn at line LINE
+- Expected "(":
+ |exporting short function names (C<l>, C<ln>, C<lp>, C<ld>, C<ldn>, C<ldp>,
+ |----------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func lnp at line LINE
+- Expected "(":
+ |C<lnp>, C<ldnp>) that are API-compatible with the matching Python package
+ |-----^
+- discarded COUNT characters of noise
+- found func ldnp at line LINE
+- Expected "(":
+ |C<lnp>, C<ldnp>) that are API-compatible with the matching Python package
+ |--------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |=head2 l($msgid, @args)
+ |---------^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |=head2 ln($msgid, $msgid_plural, $n, @args)
+ |----------^
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- Expected context id:
+ |=head2 lp($msgctxt, $msgid, @args)
+ |----------^
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func lnp at line LINE
+- Expected context id:
+ |=head2 lnp($msgctxt, $msgid, $msgid_plural, $n, @args)
+ |-----------^
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- Expected domain id:
+ |=head2 ld($domain, $msgid, @args)
+ |----------^
+- discarded COUNT characters of noise
+- found func ldn at line LINE
+- Expected domain id:
+ |=head2 ldn($domain, $msgid, $msgid_plural, $n, @args)
+ |-----------^
+- discarded COUNT characters of noise
+- found func ldnp at line LINE
+- Expected domain id:
+ |=head2 ldnp($domain, $msgctxt, $msgid, $msgid_plural, $n, @args)
+ |------------^
 - discarded COUNT characters of noise
 pl => /lib/Locale/Simple/Scraper.pm
 - discarded COUNT characters of noise
@@ -264,6 +337,76 @@ pl => /lib/Locale/Simple/Scraper.pm
  |        return if -l $file and not -e readlink( $file );
  |--------------------^
 - discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |----^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |------------^
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- Expected context id:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |--------------------^
+- discarded COUNT characters of noise
+- found func lnp at line LINE
+- Expected context id:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |-----------------------------^
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- Expected domain id:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |-------------------------------------^
+- discarded COUNT characters of noise
+- found func ldn at line LINE
+- Expected domain id:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |----------------------------------------------^
+- discarded COUNT characters of noise
+- found func ldnp at line LINE
+- Expected domain id:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |-----------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |  l( msgid, ... )
+ |----^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |  ln( msgid, msgid_plural, n, ... )
+ |-----^
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- Expected context id:
+ |  lp( msgctxt, msgid, ... )
+ |-----^
+- discarded COUNT characters of noise
+- found func lnp at line LINE
+- Expected context id:
+ |  lnp( msgctxt, msgid, msgid_plural, n, ... )
+ |------^
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- Expected domain id:
+ |  ld( domain, msgid, ... )
+ |-----^
+- discarded COUNT characters of noise
+- found func ldn at line LINE
+- Expected domain id:
+ |  ldn( domain, msgid, msgid_plural, n, ... )
+ |------^
+- discarded COUNT characters of noise
+- found func ldnp at line LINE
+- Expected domain id:
+ |  ldnp( domain, msgctxt, msgid, msgid_plural, n, ... )
+ |-------^
+- discarded COUNT characters of noise
 pl => /lib/Locale/Simple/Scraper/Parser.pm
 - discarded COUNT characters of noise
 - found func l at line LINE
@@ -302,117 +445,6 @@ pl => /lib/Locale/Simple/Scraper/Parser.pm
  |------------^
 - discarded COUNT characters of noise
 pl => /lib/Locale/Simple/Scraper/ParserShortcuts.pm
-- discarded COUNT characters of noise
-js => /share/js/gettext/Gettext.js
-- discarded COUNT characters of noise
-js => /share/js/locale_simple.js
-- discarded COUNT characters of noise
-- found func l at line LINE
-- Expected "(":
- |    l: function() {
- |-----^
-- discarded COUNT characters of noise
-- found func ln at line LINE
-- Expected "(":
- |    ln: function() {
- |------^
-- discarded COUNT characters of noise
-- found func lp at line LINE
-- Expected "(":
- |    lp: function() {
- |------^
-- discarded COUNT characters of noise
-- found func lnp at line LINE
-- Expected "(":
- |    lnp: function() {
- |-------^
-- discarded COUNT characters of noise
-- found func ld at line LINE
-- Expected "(":
- |    ld: function() {
- |------^
-- discarded COUNT characters of noise
-- found func ldn at line LINE
-- Expected "(":
- |    ldn: function() {
- |-------^
-- discarded COUNT characters of noise
-- found func ldnp at line LINE
-- Expected "(":
- |    ldnp: function(){
- |--------^
-- discarded COUNT characters of noise
-- found func l at line LINE
-- Expected translation token:
- |function l() { return locale_simple.l.apply(locale_simple,arguments) }
- |-----------^
-- discarded COUNT characters of noise
-- found func l at line LINE
-- Expected "(":
- |function l() { return locale_simple.l.apply(locale_simple,arguments) }
- |-------------------------------------^
-- discarded COUNT characters of noise
-- found func ln at line LINE
-- Expected translation token:
- |function ln() { return locale_simple.ln.apply(locale_simple,arguments) }
- |------------^
-- discarded COUNT characters of noise
-- found func ln at line LINE
-- Expected "(":
- |function ln() { return locale_simple.ln.apply(locale_simple,arguments) }
- |---------------------------------------^
-- discarded COUNT characters of noise
-- found func lp at line LINE
-- Expected context id:
- |function lp() { return locale_simple.lp.apply(locale_simple,arguments) }
- |------------^
-- discarded COUNT characters of noise
-- found func lp at line LINE
-- Expected "(":
- |function lp() { return locale_simple.lp.apply(locale_simple,arguments) }
- |---------------------------------------^
-- discarded COUNT characters of noise
-- found func lnp at line LINE
-- Expected context id:
- |function lnp() { return locale_simple.lnp.apply(locale_simple,arguments) }
- |-------------^
-- discarded COUNT characters of noise
-- found func lnp at line LINE
-- Expected "(":
- |function lnp() { return locale_simple.lnp.apply(locale_simple,arguments) }
- |-----------------------------------------^
-- discarded COUNT characters of noise
-- found func ld at line LINE
-- Expected domain id:
- |function ld() { return locale_simple.ld.apply(locale_simple,arguments) }
- |------------^
-- discarded COUNT characters of noise
-- found func ld at line LINE
-- Expected "(":
- |function ld() { return locale_simple.ld.apply(locale_simple,arguments) }
- |---------------------------------------^
-- discarded COUNT characters of noise
-- found func ldn at line LINE
-- Expected domain id:
- |function ldn() { return locale_simple.ldn.apply(locale_simple,arguments) }
- |-------------^
-- discarded COUNT characters of noise
-- found func ldn at line LINE
-- Expected "(":
- |function ldn() { return locale_simple.ldn.apply(locale_simple,arguments) }
- |-----------------------------------------^
-- discarded COUNT characters of noise
-- found func ldnp at line LINE
-- Expected domain id:
- |function ldnp() { return locale_simple.ldnp.apply(locale_simple,arguments) }
- |--------------^
-- discarded COUNT characters of noise
-- found func ldnp at line LINE
-- Expected "(":
- |function ldnp() { return locale_simple.ldnp.apply(locale_simple,arguments) }
- |-------------------------------------------^
-- discarded COUNT characters of noise
-js => /share/js/sprintf.js
 - discarded COUNT characters of noise
 pl => /t/10-gettext.t
 - discarded COUNT characters of noise
@@ -532,7 +564,7 @@ pl => /t/data/dummy.pl
 - found func l at line LINE
 - found func l at line LINE
 - found 1 arguments
-- found 2 arguments
+- found 1 arguments
 - discarded COUNT characters of noise
 - found func l at line LINE
 - found 1 arguments

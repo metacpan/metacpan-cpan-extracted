@@ -57,4 +57,19 @@ subtest 'construction weakens service ref' => sub {
     ok(!$peer->service, "service ref was weakened");
 };
 
+subtest 'child_pid undef by default; set via _set_child_pid' => sub {
+    my $fake_svc = bless({pid => $$}, 'FakeSvc3');
+    no warnings 'once';
+    *FakeSvc3::pid = sub { $_[0]->{pid} };
+
+    my $peer = IPC::Manager::Service::Peer->new(
+        name    => 'p',
+        service => $fake_svc,
+    );
+
+    is($peer->child_pid, undef, "child_pid undef by default");
+    $peer->_set_child_pid(9999);
+    is($peer->child_pid, 9999, "child_pid set via _set_child_pid");
+};
+
 done_testing;

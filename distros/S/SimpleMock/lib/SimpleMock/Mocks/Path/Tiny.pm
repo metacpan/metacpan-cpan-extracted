@@ -4,7 +4,7 @@ use warnings;
 use Carp qw(confess);
 use Storable qw(dclone);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require Path::Tiny;
 
@@ -27,20 +27,25 @@ my %formats = (
 );
 
 
+our $ORIG_PATH = \&Path::Tiny::path;
+
+sub _normalize_path {
+    return $ORIG_PATH->($_[0])->stringify;
+}
+
 sub _get_path_mock {
     my $path = shift;
+    my $normalized_path = _normalize_path($path);
     for my $layer (reverse @SimpleMock::MOCK_STACK) {
-        return $layer->{PATH_TINY}{$path} if exists $layer->{PATH_TINY}{$path};
+        return $layer->{PATH_TINY}{$normalized_path} if exists $layer->{PATH_TINY}{$normalized_path};
     }
     return undef;
 }
 
-my $orig_path = \&Path::Tiny::path;
-
 *Path::Tiny::path = sub {
     my @arg = @_;
     confess "No mock defined for path $_[0]" unless _get_path_mock($_[0]);
-    return $orig_path->(@arg);
+    return $ORIG_PATH->(@arg);
 };
 
 *Path::Tiny::slurp = sub {

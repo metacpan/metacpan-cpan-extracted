@@ -38,7 +38,6 @@ meta-spec:
   version: '1.4'
 name: Config-Model
 recommends:
-  Fuse: '0'
   Term::ReadLine: '0'
   Text::Levenshtein::Damerau: '0'
 requires:
@@ -51,7 +50,6 @@ requires:
   Fcntl: '0'
   File::HomeDir: '0'
   File::Path: '0'
-  Filesys::Fuse3: '0'
   Hash::Merge: '0.12'
   List::MoreUtils: '0'
   List::Util: '0'
@@ -86,7 +84,7 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.161'
+version: '2.162'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: LGPL-2.1

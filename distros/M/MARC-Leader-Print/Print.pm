@@ -3,6 +3,7 @@ package MARC::Leader::Print;
 use strict;
 use warnings;
 
+use Check::Term::Color qw(check_term_color);
 use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
@@ -10,7 +11,7 @@ use MARC::Leader::L10N 0.03;
 use Mo::utils 0.06 qw(check_bool);
 use Mo::utils::Language 0.05 qw(check_language_639_1);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -43,14 +44,9 @@ sub new {
 	# Check 'mode_desc'.
 	check_bool($self, 'mode_desc');
 
+	# Set 'mode_ansi' from env variables.
 	if (! defined $self->{'mode_ansi'}) {
-		if (exists $ENV{'NO_COLOR'}) {
-			$self->{'mode_ansi'} = 0;
-		} elsif (defined $ENV{'COLOR'}) {
-			$self->{'mode_ansi'} = 1;
-		} else {
-			$self->{'mode_ansi'} = 0;
-		}
+		$self->{'mode_ansi'} = check_term_color();
 	}
 
 	# Check routine for ANSI colors output.
@@ -188,7 +184,7 @@ Mode for ANSI color support:
  0 - ANSI color support disabled.
 
 When is undefined, env variables C<COLOR> or C<NO_COLOR> could control ANSI
-color support.
+color support. See L<Check::Term::Color>.
 
 Default value is undef.
 
@@ -355,10 +351,12 @@ Returns array of string in array context.
 
 =head1 DEPENDENCIES
 
+L<Check::Term::Color>,
 L<Class::Utils>,
 L<English>,
 L<Error::Pure>.
 L<MARC::Leader::L10N>,
+L<Mo::utils>,
 L<Mo::utils::Language>.
 
 And optional L<Term::ANSIColor> for ANSI color support.
@@ -391,6 +389,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

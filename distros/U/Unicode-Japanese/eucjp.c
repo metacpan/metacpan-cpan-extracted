@@ -8,7 +8,7 @@
 #endif
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-/* sjis=>eucjpÊÑ´¹ */
+/* sjis=>eucjpå¤‰æ› */
 EXTERN_C
 SV*
 xs_sjis_eucjp(SV* sv_str)
@@ -48,7 +48,8 @@ xs_sjis_eucjp(SV* sv_str)
     case CHK_SJIS_THROUGH:
       {
 	const unsigned char* start = src;
-	while( ++src<src_end && chk_sjis[*src]==CHK_SJIS_THROUGH );
+	while( ++src<src_end && chk_sjis[*src]==CHK_SJIS_THROUGH )
+		;
 	SV_Buf_append_mem(&result,start,src-start);
 	continue;
       }
@@ -110,7 +111,7 @@ xs_sjis_eucjp(SV* sv_str)
 }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-/* eucjp=>sjisÊÑ´¹Ê¸»úÈ½Äê */
+/* eucjp=>sjiså¤‰æ›æ–‡å­—åˆ¤å®š */
 /* 1:EUCJP:0212, 3:EUCJP:C 4:EUCJP:KANA */
 #define CHK_EUCJP_THROUGH 0
 #define CHK_EUCJP_0212    1
@@ -137,7 +138,7 @@ static const unsigned char chk_eucjp[256] =
 };
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-/* eucjp=>sjisÊÑ´¹ */
+/* eucjp=>sjiså¤‰æ› */
 EXTERN_C
 SV*
 xs_eucjp_sjis(SV* sv_str)
@@ -175,7 +176,8 @@ xs_eucjp_sjis(SV* sv_str)
     case CHK_EUCJP_THROUGH:
       {
 	const unsigned char* start = src;
-	while( ++src<src_end && chk_eucjp[*src]==CHK_EUCJP_THROUGH );
+	while( ++src<src_end && chk_eucjp[*src]==CHK_EUCJP_THROUGH )
+		;
 	SV_Buf_append_mem(&result,start,src-start);
 	continue;
       }

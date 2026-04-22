@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Scalar::Util qw(refaddr);                                                                                                                                            
                   
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my ($class, $layer) = @_;

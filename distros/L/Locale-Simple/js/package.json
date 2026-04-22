@@ -1,0 +1,59 @@
+{
+  "name": "locale-simple",
+  "version": "0.0.21",
+  "description": "Tiny gettext wrapper with sprintf-style helpers (l, ln, lp, ld, …) — same API as the Perl and Python siblings, so one .po file feeds all three runtimes. ESM + CJS + types, zero runtime deps.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Getty/locale-simple.git"
+  },
+  "keywords": [
+    "gettext",
+    "i18n",
+    "internationalization",
+    "localization",
+    "l10n",
+    "translation",
+    "locale",
+    "po",
+    "po2json",
+    "sprintf",
+    "polyglot",
+    "esm"
+  ],
+  "author": "Torsten Raudssus <torsten@raudssus.de>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "bugs": {
+    "url": "https://github.com/Getty/locale-simple/issues"
+  },
+  "homepage": "https://github.com/Getty/locale-simple#readme",
+  "devDependencies": {
+    "rollup": "^4.0.0"
+  }
+}

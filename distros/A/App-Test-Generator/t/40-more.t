@@ -282,32 +282,59 @@ subtest 'OO with new parameters' => sub {
 	App::Test::Generator->generate($oo_conf, $oo_t);
 
 	my $content = slurp($oo_t);
-	like($content, qr/new_ok.*Test::Most.*param1.*value1/,
-		'should generate OO test with constructor parameters');
+	like($content, qr/new_ok.*Test::Most.*param1.*value1/, 'should generate OO test with constructor parameters');
 
 	unlink $oo_conf, $oo_t;
 };
 
-# Test builtin function configuration
-subtest 'builtin functions' => sub {
-	my $builtin_conf = File::Spec->catfile($dir, 'builtin_test.yml');
-	my $builtin_t = File::Spec->catfile($dir, 'builtin_test.t');
+subtest 'builtin with new field should not generate use_ok' => sub {
+	my $conf = File::Spec->catfile($dir, 'builtin_new.yml');
+	my $t	= File::Spec->catfile($dir, 'builtin_new.t');
 
-	write_yaml($builtin_conf, {
-		module => 'Test::Most',
-		module => 'builtin',
-		function => 'length',
-		input => { type => 'string' },
-		output => { type => 'integer' }
+	write_yaml($conf, {
+		module   => 'builtin',
+		function => 'abs',
+		new	  => undef,
+		input	=> { number => { type => 'number', position => 0 } },
+		output   => { type => 'number' },
 	});
 
-	App::Test::Generator->generate($builtin_conf, $builtin_t);
+	App::Test::Generator->generate($conf, $t);
 
-	my $content = slurp($builtin_t);
-	like($content, qr/length\(/, 'should generate test for builtin function');
-	unlike($content, qr/use_ok\('length/, 'should not use_ok for builtin functions');
+	my $content = slurp($t);
 
-	unlink $builtin_conf, $builtin_t;
+	# When module is builtin, no use_ok should be emitted even
+	# when new: is present in the schema
+	unlike($content, qr/use_ok\('abs'\)/, 'builtin + new should not emit use_ok');
+	unlike($content, qr/new_ok\(''\)/, 'builtin + new should not emit new_ok with empty module');
+	like($content,   qr/\babs\(/, 	 'builtin function should be called directly');
+
+	unlink $conf, $t;
+};
+
+subtest 'config with undef field is ignored' => sub {
+	my $conf = File::Spec->catfile($dir, 'undef_config.yml');
+	my $t	= File::Spec->catfile($dir, 'undef_config.t');
+
+	write_yaml($conf, {
+		module   => 'Test::Most',
+		function => 'test',
+		input	=> { test => { type => 'string' } },
+		output   => { type => 'string' },
+		config   => {
+			test_nuls  => 'off',
+			test_undef => undef,	# Explicitly undef — should be ignored
+		},
+	});
+
+	App::Test::Generator->generate($conf, $t);
+
+	my $content = slurp($t);
+
+	# Undef config fields should not cause warnings or errors
+	unlike($content, qr/Use of uninitialized/, 'undef config field should not cause warnings');
+
+	unlink $conf, $t;
 };
 
 done_testing();

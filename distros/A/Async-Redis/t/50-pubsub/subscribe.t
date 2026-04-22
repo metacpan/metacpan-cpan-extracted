@@ -78,6 +78,28 @@ SKIP: {
         $subscriber->disconnect;
     };
 
+    subtest 'message hashref includes pattern => undef for non-pmessage' => sub {
+        my $subscriber = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+        run { $subscriber->connect };
+        my $sub = run { $subscriber->subscribe('test:shape:pattern-undef') };
+
+        my $pub_f = (async sub {
+            await Future::IO->sleep(0.1);
+            await $publisher->publish('test:shape:pattern-undef', 'x');
+        })->();
+
+        my $msg = run { $sub->next };
+        await_f($pub_f);
+
+        is($msg->{type}, 'message', 'type field');
+        is($msg->{channel}, 'test:shape:pattern-undef', 'channel field');
+        is($msg->{data}, 'x', 'data field');
+        ok(exists $msg->{pattern}, 'pattern key exists on non-pmessage');
+        is($msg->{pattern}, undef, 'pattern is undef on non-pmessage');
+
+        $subscriber->disconnect;
+    };
+
     $publisher->disconnect;
 }
 

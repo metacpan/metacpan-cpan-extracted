@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.306';
+our $VERSION = '0.307';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -89,6 +89,13 @@ has no_changes => (
   isa     => 'Bool',
   lazy    => 1,
   default => sub { $_[0]->payload->{no_changes} },
+);
+
+has commit_files_after_release => (
+  is      => 'ro',
+  isa     => 'ArrayRef[Str]',
+  lazy    => 1,
+  default => sub { defined $_[0]->payload->{commit_files_after_release} ? $_[0]->payload->{commit_files_after_release} : [] },
 );
 
 has no_install => (
@@ -272,7 +279,7 @@ has alien_bin_requires => (
   default => sub { defined $_[0]->payload->{alien_bin_requires} ? $_[0]->payload->{alien_bin_requires} : [] },
 );
 
-sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires', @alien_array_attributes }
+sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires', @alien_array_attributes, 'commit_files_after_release' }
 
 sub effective_gather_exclude_filename {
   my ($self) = @_;
@@ -480,6 +487,7 @@ sub configure {
       'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
       'Git::Tag.tag_format' => '%v',
       $self->no_changes ? ( 'NextRelease.format' => '' ) : (),
+      @{ $self->commit_files_after_release } ? ( commit_files_after_release => $self->commit_files_after_release ) : (),
     });
     $self->add_plugins([
       'Git::Push' => { push_to => 'origin' }
@@ -508,7 +516,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.306
+version 0.307
 
 =head1 SYNOPSIS
 
@@ -670,6 +678,22 @@ By default a dzil release would release to L<CPAN|http://www.cpan.org/>.
 
 If set to 1, then L<Dist::Zilla::Plugin::NextRelease> (from @Git::VersionManager)
 will not generate changes entries.
+
+=head2 commit_files_after_release
+
+Extra files to fold into the release commit, forwarded to
+L<@Git::VersionManager|Dist::Zilla::PluginBundle::Git::VersionManager>'s
+option of the same name (which wires them into the C<Git::Commit> plugin's
+C<allow_dirty>). Useful for companion artefacts that are rewritten by a
+C<run_before_release> hook and must ship in the same commit as the version
+bump — e.g. a sibling Python/JS package version file.
+
+Multi-value:
+
+  [@Author::GETTY]
+  run_before_release = xbin/release.pl python-prep %v
+  commit_files_after_release = python/locale_simple.py
+  commit_files_after_release = js/package.json
 
 =head2 no_podweaver
 

@@ -1,5 +1,50 @@
 Revision history for Langertha
 
+0.404     2026-04-21 14:06:44Z
+
+    - New Langertha::Content role and Langertha::Content::Image value object
+      for provider-agnostic vision input. Mirrors the Langertha::ToolChoice
+      pattern: one canonical block (from_url / from_file / from_data /
+      from_base64) serializes to OpenAI image_url, Anthropic image source
+      (URL or base64), and Gemini inline_data via to_openai / to_anthropic
+      / to_gemini. Gemini auto-downloads URL-only images on first call
+      because it has no URL source equivalent; media_type is sniffed from
+      the extension or the fetched Content-Type header.
+    - Langertha::Role::Chat gained content_format ('openai' by default,
+      'anthropic' on AnthropicBase, 'gemini' on Gemini) and a normalization
+      pass in chat_messages: a user message whose content is an arrayref
+      containing Langertha::Content objects is converted to the engine's
+      native wire format (bare strings in the array are wrapped as text
+      blocks, and Gemini messages are rebuilt into role/parts with
+      assistant -> model). Messages without Langertha::Content objects are
+      passed through untouched, so existing callers are unaffected.
+    - Fixes the "messages.0.content.1: Input tag 'image_url' ... does not
+      match 'image'" 400 from Anthropic when the same [text + image] prompt
+      was reused across engines: the canonical block is what callers
+      author, each engine produces its own format.
+
+0.403     2026-04-21 12:04:54Z
+
+    - Fixed "Wide character in subroutine entry" crash on non-ASCII JSON
+      responses. Role::JSON's shared instance is configured with utf8=>1
+      (bytes in/out), but parse_response and execute_streaming_request
+      were feeding it Perl-Unicode via $response->decoded_content, which
+      blew up the first time a response body contained a non-ASCII byte
+      (Umlaut, em-dash, CJK, emoji). Both entry points now use
+      $response->content (raw bytes), keeping the pipeline consistent
+      with the outgoing side. The two spots that re-decode JSON
+      substrings out of an already-decoded tree (OpenAICompatible's
+      extract_tool_call for tool_call.function.arguments, and
+      HermesTools' response_tool_calls for <tool_call> XML bodies) now
+      go through a new Role::JSON::decode_json_text helper that
+      centralizes the encode_utf8 bridge.
+    - format_tools in OpenAICompatible, AnthropicBase, Gemini, and Ollama
+      now accept input_schema, inputSchema, or parameters as the schema
+      key (snake_case preferred, camelCase for MCP spec compatibility,
+      parameters as OpenAI-style fallback). Matches the defensive lookup
+      already done by Langertha::Tool::from_hash and
+      Raider::tools_as_mcp, which mix both styles internally.
+
 0.402     2026-04-20 22:07:40Z
 
     - [BREAKING] Langertha::Engine::MiniMax now talks to MiniMax's native

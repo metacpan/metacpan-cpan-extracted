@@ -56,20 +56,22 @@
             "Test::Class" : "0",
             "Test::Class::Load" : "0",
             "Test::Compile" : "0",
-            "Test::Most" : "0",
-            "Test::Perl::Critic" : "0",
-            "Test::Pod" : "0"
+            "Test::Most" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mvsjes2/drive_player/issues"
+      },
+      "homepage" : "https://github.com/mvsjes2/drive_player",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/mvsjes2/drive_player.git",
          "web" : "https://github.com/mvsjes2/drive_player"
       }
    },
-   "version" : "v0.2.5",
+   "version" : "v0.2.6",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

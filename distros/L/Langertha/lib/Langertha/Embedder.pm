@@ -1,6 +1,6 @@
 package Langertha::Embedder;
 # ABSTRACT: Embedding abstraction wrapping an engine with optional model override
-our $VERSION = '0.402';
+our $VERSION = '0.404';
 use Moose;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -83,7 +83,7 @@ Langertha::Embedder - Embedding abstraction wrapping an engine with optional mod
 
 =head1 VERSION
 
-version 0.402
+version 0.404
 
 =head1 SYNOPSIS
 
@@ -170,11 +170,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

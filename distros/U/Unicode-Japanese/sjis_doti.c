@@ -4,13 +4,6 @@
 #include "Japanese.h"
 #include <stdio.h>
 
-#ifndef __cplusplus
-#undef bool
-#undef true
-#undef false
-typedef enum bool { false, true, } bool;
-#endif
-
 #define DISP_U2S 0
 #define DISP_S2U 0
 
@@ -97,12 +90,12 @@ xs_sjis_doti_utf8(SV* sv_str)
       ++src;
       continue;
     }else if( 0xa1<=src[0] && src[0]<=0xdf )
-    { /* half-width katakana (ja:È¾³Ñ¥«¥Ê) */
+    { /* half-width katakana (ja:åŠè§’ã‚«ãƒŠ) */
       ECHO_U2S((stderr,"kana: %02x\n",src[0]));
       ptr = (UJ_UINT8*)&g_s2u_table[(src[0]-0xa1)*3];
       ++src;
     }else if( src+1<src_end && 0x81<=src[0] && src[0]<=0x9f )
-    { /* a double-byte letter (ja:2¥Ð¥¤¥ÈÊ¸»ú) */
+    { /* a double-byte letter (ja:2ãƒã‚¤ãƒˆæ–‡å­—) */
       const UJ_UINT16 sjis = (src[0]<<8)+src[1]; /* ntohs */
       ECHO_U2S((stderr,"sjis.dbcs#1: %04x\n",sjis));
       ptr = (UJ_UINT8*)&g_s2u_table[(sjis - 0x8100 + 0x3f)*3];
@@ -125,7 +118,7 @@ xs_sjis_doti_utf8(SV* sv_str)
         src += 2;
       }
     }else if( src+1<src_end && 0xe0<=src[0] && src[0]<=0xfc )
-    { /* a double-byte letter (ja:2¥Ð¥¤¥ÈÊ¸»ú) */
+    { /* a double-byte letter (ja:2ãƒã‚¤ãƒˆæ–‡å­—) */
       const UJ_UINT16 sjis = (src[0]<<8)+src[1]; /* ntohs */
       ECHO_U2S((stderr,"sjis.dbcs#2: %04x\n",sjis));
       ptr = (UJ_UINT8*)&g_s2u_table[(sjis- 0xe000 + 0x1f3f)*3];
@@ -204,7 +197,7 @@ xs_utf8_sjis_doti(SV* sv_str)
     
     if( *src<=0x7f )
     {
-      /* ascii chars sequence (ja:ASCII¤Ï¤Þ¤È¤á¤ÆÄÉ²Ã¡Á) */
+      /* ascii chars sequence (ja:ASCIIã¯ã¾ã¨ã‚ã¦è¿½åŠ ã€œ) */
       int len = 1;
       while( src+len<src_end && src[len]<=0x7f )
       {

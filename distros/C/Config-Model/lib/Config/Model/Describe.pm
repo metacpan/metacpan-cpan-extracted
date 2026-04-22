@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
-package Config::Model::Describe 2.161;
+package Config::Model::Describe 2.162;
 
 use Carp;
 use strict;
@@ -19,14 +19,14 @@ use Config::Model::ObjTreeScanner;
 use List::Util qw/max/;
 use utf8;
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 sub new {
-    bless {}, shift;
+    return bless {}, shift;
 }
 
-sub describe {
-    my $self = shift;
-
-    my %args      = @_;
+sub describe ($self, %args) {
     my $desc_node = delete $args{node}
         || croak "describe: missing 'node' parameter";
     my $check = delete $args{check} || 'yes';
@@ -40,18 +40,17 @@ sub describe {
 
     my $tag_name = sub {
         $_[1] .= ' ⚠' if $_[0]->has_warning;
+        return;
     };
 
-    my $my_content_cb = sub {
-        my ( $scanner, $data_ref, $node, @element ) = @_;
+    my $my_content_cb = sub ($scanner, $data_ref, $node, @element) {
         # filter elements according to pattern
         my @scan = $pattern ? grep { $_ =~ $pattern } @element : @element;
         for (@scan) { $scanner->scan_element( $data_ref, $node, $_ ) }
+        return;
     };
 
-    my $std_cb = sub {
-        my ( $scanner, $data_r, $obj, $element, $index, $value_obj ) = @_;
-
+    my $std_cb = sub ($scanner, $data_r, $obj, $element, $index, $value_obj) {
         my $value = $value_obj->fetch( check => $check, mode => 'user' );
 
         return unless $show_empty or (defined $value and length($value));
@@ -75,11 +74,10 @@ sub describe {
 
         $tag_name->($value_obj,$element);
         push @$data_r, [ $name, $type, $value, join( ', ', @comment ) ];
+        return;
     };
 
-    my $list_element_cb = sub {
-        my ( $scanner, $data_r, $obj, $element, @keys ) = @_;
-
+    my $list_element_cb = sub ($scanner, $data_r, $obj, $element, @keys) {
         #print "DEBUG: list_element_cb on $element, keys @keys\n";
         my $list_obj = $obj->fetch_element($element);
         my $elt_type = $list_obj->cargo_type;
@@ -95,20 +93,18 @@ sub describe {
             push @$data_r,
                 [ $element, 'list', join( ',', @values ), '' ] if ($show_empty or @values);
         }
+        return;
     };
 
-    my $check_list_element_cb = sub {
-        my ( $scanner, $data_r, $obj, $element, @choices ) = @_;
-
+    my $check_list_element_cb = sub ($scanner, $data_r, $obj, $element, @choices) {
         my $list_obj = $obj->fetch_element($element);
         $tag_name->($list_obj,$element);
         my @checked = $list_obj->get_checked_list;
         push @$data_r, [ $element, 'check_list', join( ',', @checked ), '' ] if $show_empty or @checked;
+        return;
     };
 
-    my $hash_element_cb = sub {
-        my ( $scanner, $data_r, $obj, $element, @keys ) = @_;
-
+    my $hash_element_cb = sub ($scanner, $data_r, $obj, $element, @keys) {
         #print "DEBUG: hash_element_cb on $element, keys @keys\n";
         my $hash_obj = $obj->fetch_element($element);
         my $elt_type = $hash_obj->cargo_type;
@@ -126,11 +122,10 @@ sub describe {
         else {
             push @$data_r, [ $element, 'value hash', "[empty hash]",  "" ] if $show_empty;
         }
+        return;
     };
 
-    my $node_element_cb = sub {
-        my ( $scanner, $data_r, $obj, $element, $key, $next ) = @_;
-
+    my $node_element_cb = sub ($scanner, $data_r, $obj, $element, $key, $next) {
         #print "DEBUG: elt_cb on $element, key $key\n";
         my $type = $obj->element_type($element);
 
@@ -140,6 +135,7 @@ sub describe {
         #$ret .= ":$key" if $type eq 'list' or $type eq 'hash';
 
         #$view_scanner->scan_node($next);
+        return;
     };
 
     my @scan_args = (
@@ -217,7 +213,7 @@ Config::Model::Describe - Provide a description of a node element
 
 =head1 VERSION
 
-version 2.161
+version 2.162
 
 =head1 SYNOPSIS
 

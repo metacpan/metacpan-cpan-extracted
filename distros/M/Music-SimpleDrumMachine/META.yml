@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-SimpleDrumMachine
   repository: https://github.com/ology/Music-SimpleDrumMachine.git
-version: '0.0508'
+version: '0.0509'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

@@ -1,5 +1,9 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0509 2026-04-21 14:39:49
+    - Add eg/no-fills.pl to illustrate not filling.
+    - Fix-up an undefined situation.
+
 0.0508 2026-04-21 00:54:07
     - Rename the 'cymbal' drum to 'crash'.
 

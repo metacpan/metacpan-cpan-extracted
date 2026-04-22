@@ -162,6 +162,11 @@ EXPORTS
       value is an IPC::Manager::Service::Peer that the calling service can
       use to send requests to the nested service.
 
+      The returned handle or peer carries the first-fork child pid via
+      $handle->child_pid - useful for supervisors that track services by
+      pid. See "child_pid" in IPC::Manager::Service::Handle for the
+      first-fork caveat around post_fork_hook daemonization.
+
       Void context and the ready race: when called in void context from
       inside a service, ipcm_service forks the nested service and returns
       immediately without waiting for it to finish connecting to the bus.

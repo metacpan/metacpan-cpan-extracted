@@ -1,5 +1,35 @@
 Revision history for Future-IO-Redis
 
+0.001007  2026-04-21
+    - Feature: Callback-driven Subscription delivery
+        - New on_message($cb) and on_error($cb) setters on
+          Async::Redis::Subscription, alongside the existing
+          on_reconnect($cb)
+        - Callback signature is ($sub, $msg) / ($sub, $err), consistent
+          with on_reconnect
+        - Message hashref shape matches next(): type, channel, pattern
+          (always present, undef for non-pmessage), data
+        - Synchronous by default; return a Future from the callback for
+          opt-in backpressure (driver awaits it before reading the next
+          frame; failed Futures route to on_error)
+        - Once on_message is set, next() croaks — sticky callback mode
+          for the lifetime of the subscription
+        - Default on_error behavior is to die loudly to prevent silent
+          zombie subscriptions; register an explicit no-op to swallow
+        - Designed for fire-and-forget listeners (channel-layer
+          middleware, websocket gateways, background dispatchers) that
+          trigger Future::AsyncAwait "lost its returning future"
+          warnings with the iterator pattern
+    - Behavior change: Async::Redis::disconnect now calls _close on any
+      active Subscription before closing the socket, so the
+      subscription's driver doesn't trip over an EOF on its pending
+      read. Additive — existing iterator-mode callers are unaffected
+    - Internal: factored _dispatch_frame and _read_frame_with_reconnect
+      out of Subscription::next; shared between the iterator and
+      callback paths. Reconnect semantics are identical across both
+    - Pattern subscription responses now include pattern => undef on
+      non-pmessage frames (previously omitted); no exists() check needed
+
 0.001006  2026-03-16
     - Bug Fix: Pool forwards all connection parameters
         - Pool now passes prefix, client_name, username, request_timeout,

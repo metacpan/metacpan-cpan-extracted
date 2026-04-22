@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "locale-simple"
+dynamic = ["version"]
+description = "Tiny gettext wrapper with sprintf-style helpers (l, ln, lp, ld, …) — same API as the Perl and JavaScript siblings, so one .po file feeds all three runtimes."
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Torsten Raudssus", email = "torsten@raudssus.de" }
+]
+keywords = [
+    "gettext",
+    "i18n",
+    "l10n",
+    "internationalization",
+    "localization",
+    "translation",
+    "locale",
+    "po",
+    "sprintf",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Internationalization",
+    "Topic :: Software Development :: Localization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/Getty/locale-simple"
+Source = "https://github.com/Getty/locale-simple"
+Issues = "https://github.com/Getty/locale-simple/issues"
+Changelog = "https://github.com/Getty/locale-simple/blob/main/Changes"
+"Perl sibling (CPAN)" = "https://metacpan.org/dist/Locale-Simple"
+"JavaScript sibling (npm)" = "https://www.npmjs.com/package/locale-simple"
+
+[tool.setuptools.dynamic]
+version = {attr = "locale_simple.__version__"}
+
+[tool.setuptools]
+py-modules = ["locale_simple"]

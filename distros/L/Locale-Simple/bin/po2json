@@ -81,10 +81,10 @@ sub main
             my $qmsgstr = $po->msgstr;
             my $cur = $po->dequote( $qmsgstr );
             my %cur;
-            foreach my $h (split(/\\n/, $cur))
+            foreach my $h (split(/\n/s, $cur))
             {
                 next unless length($h);
-                my @h = split(':', $h, 2);
+                my @h = split(': ', $h, 2);
 
                 if (length($cur{$h[0]})) {
                     warn "SKIPPING DUPLICATE HEADER LINE: $h\n";
@@ -176,13 +176,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 po2json - Command line tool for converting a po file into a Gettext.js compatible json dataset
 
 =head1 VERSION
 
-version 0.019
+version 0.108
 
 =head1 SYNOPSIS
 
@@ -235,15 +237,27 @@ The above is removing the first linebreak. I don't know if that is significant. 
 
 Copyright (C) 2008, Joshua I. Miller E<lt>unrtst@cpan.orgE<gt>, all rights reserved. See the source code for details.
 
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/locale-simple/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudss.us>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by DuckDuckGo, Inc. L<http://duckduckgo.com/>, Torsten Raudssus <torsten@raudss.us>.
+This software is Copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

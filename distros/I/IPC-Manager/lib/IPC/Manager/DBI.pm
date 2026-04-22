@@ -2,7 +2,7 @@ package IPC::Manager::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 1;
 

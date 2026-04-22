@@ -10,7 +10,6 @@ build_requires:
   HarfBuzz::Shaper: '0.026'
   IPC::Run3: '0.049'
   Image::Info: '1.41'
-  JSON::PP: '2.27203'
   JSON::XS: '4.03'
   JavaScript::QuickJS: '0.18'
   LWP::Protocol::https: '6.14'
@@ -23,6 +22,7 @@ build_requires:
   Scalar::Util: '1.63'
   Storable: '3.08'
   String::Interpolate::Named: '1.06'
+  Test::More::UTF8: '0.05'
   Text::Layout: '0.045'
   Unicode::Collate: '1.31'
   Unicode::Normalize: '1.26'
@@ -48,9 +48,10 @@ no_index:
     - lib/ChordPro/res
     - pp
   file:
-    - lib/ChordPro/Songbook.pm
+    - lib/ChordPro/Assets.pm
     - lib/ChordPro/Chords.pm
     - lib/ChordPro/Config.pm
+    - lib/ChordPro/Songbook.pm
     - lib/ChordPro/Testing.pm
     - lib/ChordPro/Utils.pm
     - lib/ChordPro/Version.pm
@@ -58,10 +59,10 @@ no_index:
 provides:
   App::Music::ChordPro:
     file: lib/ChordPro.pm
-    version: v6.90.1
+    version: v6.100.0
   chordpro:
     file: script/chordpro
-    version: v6.90.1
+    version: v6.100.0
 requires:
   Data::Printer: '1.001001'
   File::Copy: '2.32'
@@ -70,7 +71,6 @@ requires:
   HarfBuzz::Shaper: '0.026'
   IPC::Run3: '0.049'
   Image::Info: '1.41'
-  JSON::PP: '2.27203'
   JSON::XS: '4.03'
   JavaScript::QuickJS: '0.18'
   LWP::Protocol::https: '6.14'
@@ -83,6 +83,7 @@ requires:
   Scalar::Util: '1.63'
   Storable: '3.08'
   String::Interpolate::Named: '1.06'
+  Test::More::UTF8: '0.05'
   Text::Layout: '0.045'
   Unicode::Collate: '1.31'
   Unicode::Normalize: '1.26'
@@ -92,5 +93,5 @@ resources:
   homepage: https://chordpro.org
   license: https://dev.perl.org/licenses/
   repository: git://github.com/ChordPro/chordpro.git
-version: v6.090.1
+version: v6.100.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
 use Test::Needs 'Class::Simple';
-use App::Test::Generator qw(generate);
+
+use_ok('App::Test::Generator');
 
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
@@ -20,5 +21,8 @@ ok(-e $conf_file, 'config file exists: $conf_file');
 	App::Test::Generator->generate($conf_file);
 	like($output, qr/use Test::Most;/, 'output looks like a test file');
 }
+
+dies_ok { App::Test::Generator->generate() } 'Dies when not given an argument';
+like $@, qr/^Usage: /;
 
 done_testing();

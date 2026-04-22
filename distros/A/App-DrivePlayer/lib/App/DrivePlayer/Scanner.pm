@@ -160,6 +160,16 @@ sub _store_track {
         $album = $parts[-1];
     }
 
+    # "YYYY-AlbumName" folder convention: strip the year prefix and use the
+    # captured year as the track's year when one wasn't parsed from the file.
+    if ($album && $album =~ s{
+        ^
+        ( (?: 19 | 20) \d{2} )   # 4-digit year, 19xx or 20xx
+        -
+    }{}x) {
+        $year //= $1;
+    }
+
     my $duration_ms;
     if (my $meta = $file->{videoMediaMetadata}) {
         $duration_ms = $meta->{durationMillis};
@@ -192,6 +202,16 @@ sub _parse_filename {
 
     my ($title, $artist, $album, $track_num, $year);
 
+    # "YYYY-..." prefix: capture the year and strip it before running the
+    # track-number patterns below (otherwise 2001 would match \d+ as track#).
+    if ($base =~ s{
+        ^
+        ( (?: 19 | 20) \d{2} )   # 4-digit year, 19xx or 20xx
+        -
+    }{}x) {
+        $year = $1;
+    }
+
     if ($base =~ /^(\d+)[\s.\-]+(.+?)\s+[-–]\s+(.+)$/) {
         ($track_num, $artist, $title) = ($1 + 0, $2, $3);
     } elsif ($base =~ /^(\d+)[\s.\-]+(.+)$/) {
@@ -202,7 +222,14 @@ sub _parse_filename {
         $title = $base;
     }
 
-    if ($title && $title =~ s/\s*[\(\[]((?:19|20)\d{2})[\)\]]\s*$//) {
+    if (!$year && $title && $title =~ s{
+        \s*
+        [ \( \[ ]                # opening paren or bracket
+        ( (?: 19 | 20) \d{2} )   # 4-digit year
+        [ \) \] ]                # closing paren or bracket
+        \s*
+        $
+    }{}x) {
         $year = $1;
     }
 

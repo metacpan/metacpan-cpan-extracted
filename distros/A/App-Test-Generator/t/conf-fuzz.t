@@ -39,11 +39,10 @@ if($@) {
 
 	ok($? == 0, 'Generated test script exits successfully');
 
-	if($? == 0) {
-		unlink $outfile;
-	} else {
+	if($? != 0) {
 		diag("STDOUT:\n$stdout");
 	}
+	unlink $outfile;
 	diag($stderr) if(length($stderr));
 
 	like($stderr, qr/Data::Text->append test case created/);

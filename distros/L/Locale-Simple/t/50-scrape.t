@@ -15,7 +15,7 @@ done_testing;
 sub run {
     #$ENV{TEST_REGRESSION_GEN}++;
 
-    my @default = qw(--ignore blib --ignore \.build --ignore python --ignore setup.py --ignore release-pod-syntax\.t --ignore Locale-Simple-);
+    my @default = qw(--ignore blib --ignore \.build --ignore python --ignore js --ignore node_modules --ignore xbin --ignore setup.py --ignore release-pod-syntax\.t --ignore author-pod-syntax\.t --ignore Locale-Simple-);
     my @groups  = (
         { desc => "base test",                  argv => \@default, },
         { desc => "force error on wrong quote", argv => [ @default, qw(--pl 1pl --only 1pl) ], },

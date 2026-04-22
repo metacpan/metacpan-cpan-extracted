@@ -75,7 +75,6 @@ my $build = $class->new(
     'Module::Build' => '0.34'
   },
   'recommends' => {
-    'Fuse' => '0',
     'Term::ReadLine' => '0',
     'Text::Levenshtein::Damerau' => '0'
   },
@@ -89,7 +88,6 @@ my $build = $class->new(
     'Fcntl' => '0',
     'File::HomeDir' => '0',
     'File::Path' => '0',
-    'Filesys::Fuse3' => '0',
     'Hash::Merge' => '0.12',
     'List::MoreUtils' => '0',
     'List::Util' => '0',

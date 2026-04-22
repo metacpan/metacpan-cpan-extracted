@@ -35,14 +35,12 @@ my $mb_subclass = Module::Build->subclass(
 );
 
 my $builder = $mb_subclass->new(
-    module_name       => 'XML-Chain',
-    license           => 'perl',
-    dist_author       => 'Jozef Kutej <jkutej@cpan.org>',
-    dist_version_from => 'lib/XML/Chain.pm',
-    configure_requires => {
-        'Module::Build' => '0.36',
-    },
-    build_requires => {
+    module_name        => 'XML-Chain',
+    license            => 'perl',
+    dist_author        => 'Jozef Kutej <jkutej@cpan.org>',
+    dist_version_from  => 'lib/XML/Chain.pm',
+    configure_requires => { 'Module::Build' => '0.36', },
+    build_requires     => {
         'Test::Most'        => 0,
         'File::Temp'        => 0,
         'Path::Class'       => 0,
@@ -50,23 +48,22 @@ my $builder = $mb_subclass->new(
         'DateTime'          => 0,
     },
     requires => {
-        'perl'            => 5.010,
-        'XML::LibXML'     => 2.0100,   # Added the unique_key() method to XML::LibXML::Node
-        'IO::Any'         => 0,
-        'Moose'           => 0,
-        'MooseX::Aliases' => 0,
-        'Moose::Exporter' => 0,
-        'Try::Tiny'       => 0,
+        'perl'        => 5.010,
+        'XML::LibXML' =>
+            2.0100,    # Added the unique_key() method to XML::LibXML::Node
+        'IO::Any'           => 0,
+        'Class::XSAccessor' => 0,
+        'Try::Tiny'         => 0,
     },
-    script_files => [qw()],
+    script_files   => [qw()],
     add_to_cleanup => ['XML-Chain-*'],
     create_readme  => 1,
-    meta_merge => {
+    meta_merge     => {
         resources => {
             repository => 'https://github.com/meon/XML-Chain.git',
             bugtracker => 'https://github.com/meon/XML-Chain/issues',
         },
-        keywords => [ qw/ XML chain build manipulation traversal LibXML / ],
+        keywords => [qw/ XML chain build manipulation traversal LibXML /],
     },
 );
 

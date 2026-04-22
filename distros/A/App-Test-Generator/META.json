@@ -1,5 +1,5 @@
 {
-   "abstract" : "Generate fuzz and corpus-driven test harnesses from test schemas",
+   "abstract" : "Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for Perl modules",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
@@ -48,7 +48,7 @@
             "Module::Load::Conditional" : "0",
             "PPI" : "0",
             "Params::Get" : "0.13",
-            "Params::Validate::Strict" : "0.23",
+            "Params::Validate::Strict" : "0.3",
             "Pod::Simple" : "0",
             "Pod::Usage" : "0",
             "Readonly::Values::Boolean" : "0",
@@ -102,6 +102,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

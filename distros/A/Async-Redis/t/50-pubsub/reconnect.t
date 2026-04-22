@@ -61,6 +61,18 @@ subtest 'on_reconnect accessor' => sub {
     is($sub->on_reconnect, $cb, 'callback stored');
 };
 
+subtest '_read_frame_with_reconnect is defined and returns a Future' => sub {
+    my $redis = Async::Redis->new(host => 'localhost');
+    my $sub = Async::Redis::Subscription->new(redis => $redis);
+    can_ok($sub, '_read_frame_with_reconnect');
+
+    # Without a real connection it will fail, but it must return a Future.
+    my $f = $sub->_read_frame_with_reconnect;
+    ok(ref($f) && $f->isa('Future'), 'returns a Future');
+    # Consume the failure so no uncaught Future warning fires.
+    $f->on_fail(sub { });
+};
+
 # --- Integration tests (require Redis) ---
 
 SKIP: {

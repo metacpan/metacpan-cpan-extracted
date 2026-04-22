@@ -1,7 +1,7 @@
 {
    "abstract" : "The clan of fierce vikings with \ud83e\ude93 and \ud83d\udee1\ufe0f to AId your rAId",
    "author" : [
-      "Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>"
+      "Torsten Raudssus <getty@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -78,7 +78,7 @@
       "x_IRC" : "irc://irc.perl.org/#langertha",
       "x_IRC_user" : "Getty"
    },
-   "version" : "0.402",
+   "version" : "0.404",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -407,7 +407,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.402",
+                  "tag" : "0.404",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

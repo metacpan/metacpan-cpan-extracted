@@ -1,0 +1,21 @@
+Locale-Simple-*
+.build
+build/
+*.pyc
+__pycache__/
+dist/
+*.egg-info/
+cover_db
+js/node_modules/
+js/dist/
+js/CHANGELOG.md
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+js/package-lock.json

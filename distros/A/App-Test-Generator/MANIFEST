@@ -1,4 +1,6 @@
-bin/app-test-generator-mutate
+bin/generate-test-dashboard
+bin/test-generator-index
+bin/test-generator-mutate
 bin/demo_extractor.pl
 bin/extract-schemas
 bin/extract-schemas2
@@ -33,7 +35,6 @@ lib/App/Test/Generator/Planner/Fixture.pm
 lib/App/Test/Generator/Planner/Grouping.pm
 lib/App/Test/Generator/Planner/Isolation.pm
 lib/App/Test/Generator/Planner/Mock.pm
-lib/App/Test/Generator/Report/HTML.pm
 lib/App/Test/Generator/Sample/Module.pm
 lib/App/Test/Generator/SchemaExtractor.pm
 lib/App/Test/Generator/Template.pm
@@ -44,8 +45,6 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-scripts/generate_index.pl
-scripts/generate_test_dashboard
 t/10-compile.t
 t/30-basics.t
 t/40-more.t

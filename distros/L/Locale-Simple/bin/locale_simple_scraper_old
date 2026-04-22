@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# PODNAME: locale_simple_scraper_old_old
+# PODNAME: locale_simple_scraper_old
 # ABSTRACT: Old Command line tool for finding tokens in code
 
 
@@ -249,13 +249,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-locale_simple_scraper_old_old - Old Command line tool for finding tokens in code
+locale_simple_scraper_old - Old Command line tool for finding tokens in code
 
 =head1 VERSION
 
-version 0.019
+version 0.108
 
 =head1 SYNOPSIS
 
@@ -308,15 +310,27 @@ Issue Tracker
 
   http://github.com/Getty/p5-locale-simple/issues
 
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/locale-simple/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudss.us>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by DuckDuckGo, Inc. L<http://duckduckgo.com/>, Torsten Raudssus <torsten@raudss.us>.
+This software is Copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

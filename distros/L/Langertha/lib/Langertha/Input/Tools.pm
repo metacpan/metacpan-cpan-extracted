@@ -1,5 +1,5 @@
 package Langertha::Input::Tools;
-our $VERSION = '0.402';
+our $VERSION = '0.404';
 # ABSTRACT: Backwards-compat facade over Langertha::Tool / Langertha::ToolChoice
 use strict;
 use warnings;
@@ -85,7 +85,7 @@ Langertha::Input::Tools - Backwards-compat facade over Langertha::Tool / Langert
 
 =head1 VERSION
 
-version 0.402
+version 0.404
 
 =head1 SUPPORT
 
@@ -104,11 +104,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

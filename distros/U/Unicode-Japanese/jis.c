@@ -50,7 +50,7 @@
 #define JIS_KANA_LEN 3
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-/* sjis=>jisÊÑ´¹ */
+/* sjis=>jiså¤‰æ› */
 EXTERN_C
 SV*
 xs_sjis_jis(SV* sv_str)
@@ -192,7 +192,7 @@ xs_sjis_jis(SV* sv_str)
 }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-/* jis=>sjisÊÑ´¹ */
+/* jis=>sjiså¤‰æ› */
 EXTERN_C
 SV*
 xs_jis_sjis(SV* sv_str)

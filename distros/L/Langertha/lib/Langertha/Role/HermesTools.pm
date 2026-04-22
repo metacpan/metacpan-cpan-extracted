@@ -1,6 +1,6 @@
 package Langertha::Role::HermesTools;
 # ABSTRACT: Hermes-style tool calling via XML tags
-our $VERSION = '0.402';
+our $VERSION = '0.404';
 use Moose::Role;
 use JSON::MaybeXS;
 
@@ -95,7 +95,7 @@ sub response_tool_calls {
   while ($content =~ m{<\Q$tag\E>\s*(.*?)\s*</\Q$tag\E>}sg) {
     my $json_str = $1;
     eval {
-      my $tc = $self->json->decode($json_str);
+      my $tc = $self->decode_json_text($json_str);
       push @tool_calls, $tc;
     };
   }
@@ -156,7 +156,7 @@ Langertha::Role::HermesTools - Hermes-style tool calling via XML tags
 
 =head1 VERSION
 
-version 0.402
+version 0.404
 
 =head1 SYNOPSIS
 
@@ -277,11 +277,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 NAME
 
-    XML::Chain - chained way of manipulating and inspecting XML documents
+    XML::Chain - a chained way of manipulating and inspecting XML documents
 
 SYNOPSIS
 
@@ -39,44 +39,64 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This module provides fast and easy way to create and manipulate XML
-    elements via set of chained method calls.
+    This module provides a fast and easy way to create and manipulate XML
+    elements via a set of chained method calls.
 
 EXPORTS
 
  xc
 
-    Exported factory method creating new XML::Chain::Element object with a
-    document element as provided in parameters. For example:
+    Exported factory method that creates a new XML::Chain::Element object
+    with the document element provided in the parameters. For example:
 
         my $icon = xc('i', class => 'icon-download icon-white');
         # <i class="icon-download icon-white"/>
 
-    See also "c, append_and_current" in XML::Chain::Selector, from which
-    XML::Chain::Element inherits all methods, for the element parameter
-    description and "CHAINED METHODS" in XML::Chain::Selector for methods
-    of returned object.
+    See also XML::Chain::Selector, from which XML::Chain::Element inherits
+    all methods, for the element parameter description, and "CHAINED
+    METHODS" in XML::Chain::Selector for methods on the returned object.
+
+    In practice, xc() accepts four input categories: a scalar element name,
+    an XML::LibXML document or node, an existing selector/element, or some
+    other reference that IO::Any can read and XML::LibXML can parse.
 
   xc($el_name, @attrs) scalar with 1+ arguments
 
-    Element with $el_name will be create as document element and  @attrs 
-    will be added to it in the same order.
+    An element with $el_name will be created as the document element, and
+    @attrs will be added to it in the same order.
 
-    In case of hash reference passed as argument, key + values will be set
-    as attributes, in alphabetical sorted key name order.
+    If a hash reference is passed as an argument, its keys and values will
+    be set as attributes in alphabetical key order.
 
-    Attribute name "-" is a special case and the value will used for text
-    content inside the element.
+    The attribute name "-" is a special case, and the value will be used
+    for text content inside the element.
 
   xc($xml_libxml_ref)
 
-    In case of XML::LibXML, it will be set as document element.
+    Accepted XML::LibXML object types are:
+
+      * XML::LibXML::Document
+
+      The document is used directly.
+
+      * XML::LibXML::Node
+
+      The node is used as the document element.
+
+      If you need custom parser behavior, parse the XML yourself with your
+      own XML::LibXML instance and pass the resulting document or node to
+      xc().
 
   xc($what_ref)
 
-    Any other reference will be passed to "slurp($what)" in IO::Any which
-    will be then parsed by "load_xml" in XML::LibXML and result set as
-    document element.
+    Any other reference will be passed to "slurp($what)" in IO::Any, then
+    parsed by XML::Chain's private safe default parser, and the result will
+    be set as the document element.
+
+    The default parser disables network access, external DTD loading,
+    automatic entity expansion, and recovery from malformed XML. If you
+    need different parser behavior, parse the XML yourself and pass the
+    resulting XML::LibXML::Document or XML::LibXML::Node to xc().
 
         say xc([$tmp_dir, 't01.xml'])->as_string
         say xc(\'<body><h1>and</h1><h1>head</h1></body>')
@@ -84,13 +104,25 @@ EXPORTS
 
   xc($scalar)
 
-    Element with $scalar will be create as document element.
+    An element with $scalar will be created as the document element.
 
         say xc('body');
 
 CHAINED METHODS, METHODS and ELEMENT METHODS
 
     See XML::Chain::Selector and XML::Chain::Element.
+
+METHODS
+
+ new
+
+    Creates a new XML::Chain object. Optional named arguments is dom (an
+    existing XML::LibXML::Document).
+
+ dom
+
+    Gets or sets the current XML::LibXML::Document instance used by the
+    object.
 
 CHAINED DOCUMENT METHODS
 
@@ -103,36 +135,37 @@ CHAINED DOCUMENT METHODS
 
  set_io_any
 
-    Store  $what , $options  of IO::Any for future use with  ->store() 
+    Stores $what, $options for IO::Any for future use with ->store().
 
  store
 
-    Calls  IO::Any-spew($io_any, $self->as_string, {atomic => 1}) > to save
-    XML back it it's original file of the the target set via set_io_any.
+    Calls IO::Any->spew($io_any, $self->as_string, {atomic => 1}) to save
+    XML back to the target configured via set_io_any.
 
-TODO
+ document_element
 
-        - partial/special tidy (on elements inside xml)
-        - per ->data() storage
-        - ->each(sub {...}) / ->map(sub {}) / ->grep(sub {})
-        - setting and handling namespaces and elements with ns prefixes
-        - ~ton of selectors and manipulators to be added
+    Returns the document root element as an XML::Chain::Element object.
+    This is a convenience method equivalent to ->root on a selector.
+
+        my $root = $xc->document_element;
 
 CONTRIBUTORS & CREDITS
 
     Initially inspired by Strophe.Builder, then also by jQuery.
 
-    The following people have contributed to the XML::Chain by committing
-    their code, sending patches, reporting bugs, asking questions,
-    suggesting useful advice, nitpicking, chatting on IRC or commenting on
-    my blog (in no particular order):
+    The following people have contributed to XML::Chain by committing their
+    code, sending patches, reporting bugs, asking questions, suggesting
+    useful advice, nitpicking, chatting on IRC or commenting on my blog (in
+    no particular order):
 
         Slaven Rezic
         Vienna.pm (for listening to my talk and providing valuable feedback)
         Mohammad S Anwar
+        AI
         you?
 
-    Also thanks to my current day-job-employer http://geizhals.at/.
+    Also thanks to https://geizhals.at/, https://www.riedellskates.eu/ and
+    https://apa.at/.
 
 BUGS
 
@@ -154,7 +187,7 @@ COPYRIGHT & LICENSE
 ----------------------------------------------------------------------------
 NAME
 
-    XML::Chain::Selector - selector for traversing the XML::Chain
+    XML::Chain::Selector - selector for traversing XML::Chain
 
 SYNOPSIS
 
@@ -189,32 +222,49 @@ SYNOPSIS
 
 DESCRIPTION
 
+    XML::Chain::Selector represents the current selection of one or more
+    XML nodes inside an XML::Chain document. Most chained methods either
+    modify those nodes or return a new selector with an updated selection.
+
+    When exactly one node is selected, XML::Chain may return an
+    XML::Chain::Element object instead, which is a subclass for the
+    single-element case.
+
 CHAINED METHODS
 
  c, append_and_select
 
-    Appends new element to current elements and changes context to them.
-    New element is defined in parameters:
+    Appends a new element to the current elements and changes the context
+    to them. The new element is defined by the parameters:
 
         $xc->c('i', class => 'icon-download icon-white')
         # <i class="icon-download icon-white"/>
 
-    First parameter is name of the element, then followed by optional
-    element attributes.
+    The first parameter is the element name, followed by optional element
+    attributes.
+
+ a, append
+
+    Appends a new element to the current elements and then moves the
+    current selection back to the parent elements.
+
+        xc('body')
+            ->a('p', '-' => 'one')
+            ->a('p', '-' => 'two');
+        # <body><p>one</p><p>two</p></body>
 
  t, append_text
 
-    Appends text to current elements.
+    Appends text to the current elements.
 
         xc('span')->t('some')->t(' ')->t('more text')
         # <span>some more text</span>
 
-    First parameter is name of the element, then followed by optional
-    element attributes.
+    The first parameter is the text to append.
 
  root
 
-    Sets document element as current element.
+    Sets the document element as the current element.
 
         say xc('p')
             ->t('this ')
@@ -225,50 +275,59 @@ CHAINED METHODS
 
  up, parent
 
-    Traverse current elements and replace them by their parents.
+    Traverses the current elements and replaces them with their parents.
+    When called on the document root element, returns the same element
+    unchanged (idempotent). This enables safe multichaining like
+    ->parent->parent without needing to check whether you've reached the
+    root.
+
+        my $root = xc('<root><child></child></root>');
+        $root->parent->name eq 'root';
 
  find
 
         say $xc->find('//p/b[@class="less"]')->text_content;
         say $xc->find('//xhtml:div', xhtml => 'http://www.w3.org/1999/xhtml')->count;
 
-    Look-up elements by xpath and set them as current elements. Optional
-    look-up namespace prefixes can be specified. Any global registered
-    namespace prefixes "reg_global_ns" can be used.
+    Looks up elements by XPath and sets them as the current elements.
+    Optional namespace prefixes for lookups can be specified. Any globally
+    registered namespace prefixes from "reg_global_ns" can be used.
 
  children
 
-    Set all current elements child nodes as current elements.
+    Sets all child elements of the current elements as the current
+    elements. Non-element child nodes, such as text nodes and comments, are
+    skipped.
 
  first
 
-    Set first current elements as current elements.
+    Sets the first current element as the current element.
 
  empty
 
-    Removes all child nodes from current elements.
+    Removes all child nodes from the current elements.
 
  rename
 
         my $body = xc('bodyz')->rename('body');
         # <body/>
 
-    Rename node name(s).
+    Renames node name(s).
 
  attr
 
-        my $img = xc('img')->attr('href' => '#', 'title' => 'imaget');
-        # <img href="#" title="imaget"/>
+        my $img = xc('img')->attr('href' => '#', 'title' => 'image-title');
+        # <img href="#" title="image-title"/>
     
         say $img->attr('title')
-        # imaget
+        # image-title
     
         say $img->attr('title' => undef)
         # <img href="#"/>
 
-    Get or set elements attributes. With one argument returns attribute
-    value otherwise sets them. Setting attribute to undef will remove it
-    from the element.
+    Gets or sets element attributes. With one argument, it returns the
+    attribute value; otherwise, it sets the attributes. Setting an
+    attribute to undef removes it from the element.
 
  each
 
@@ -282,8 +341,31 @@ CHAINED METHODS
             ->each(sub { $_->rename('p') if $_->name =~ m/^p[.]/ });
         is($body, '<body><p>1</p><p>2</p><div>3</div><p>4</p></body>','rename using each()');
 
-    Loops through all selected elements and calls callback for each of
-    them.
+    Loops through all selected elements and calls the callback for each
+    one.
+
+ map_selection
+
+        my $children = xc(\'<root><a/><b/><c/></root>')->children->map_selection(sub { $_ });
+        # returns a selector with the same elements
+    
+        my $first_children = $root->find('//p')->map_selection(sub { $_->children->first });
+        # returns a selector of the first child of each <p>
+
+    Applies the callback to each selected element ($_ is set to the
+    element). Returns a new selector built from all XML::Chain::Selector
+    objects returned by the callback. Elements for which the callback
+    returns nothing (or a non-selector value) are omitted from the result.
+    The DOM is never modified.
+
+ grep_selection
+
+        my $ps = xc(\'<body><p/><div/><p/></body>')->children->grep_selection(sub { $_->name eq 'p' });
+        # $ps->count == 2
+
+    Filters the selection. Returns a new selector containing only the
+    elements for which the callback returns a true value ($_ is set to the
+    element). Implemented in terms of "map_selection".
 
  remap
 
@@ -294,7 +376,8 @@ CHAINED METHODS
         )->root;
         # <body><e i="1"/><e i="2"/><e i="3"/><p i="1"/></body>
 
-    Replaces all selected elements by callback returned elements.
+    Replaces all selected elements with the elements returned by the
+    callback.
 
  rm, remove_and_parent
 
@@ -312,8 +395,8 @@ CHAINED METHODS
 
  auto_indent
 
-    (experimental feature (good/usefull for debug, needs more testing),
-    works only on element for which as_string is called at this moment)
+    (experimental feature; useful for debugging, but it needs more testing;
+    works only on the element for which as_string is called at that moment)
 
         my $simple = xc('div')
                         ->auto_indent(1)
@@ -333,12 +416,12 @@ CHAINED METHODS
             <div>in3</div>
         </div>
 
-    Turn on/off tidy/auto-indentation of document elements. Default
+    Turns tidy/auto-indentation of document elements on or off. The default
     indentation characters are tabs.
 
-    Argument can be either true/false scalar or a hashref with indentation
-    options. Currently	{chars=' 'x4} > will set indentation characters to
-    be four spaces.
+    The argument can be either a true/false scalar or a hashref with
+    indentation options. Currently, {chars=' 'x4}> sets the indentation
+    characters to four spaces.
 
 CHAINED DOCUMENT METHODS
 
@@ -346,41 +429,105 @@ CHAINED DOCUMENT METHODS
 
 METHODS
 
+ new
+
+    Creates a new selector object from named arguments.
+
+ current_elements
+
+    Gets or sets the internal array reference of currently selected
+    elements.
+
  as_string, toString
 
-    Returns string representation of current XML elements. Call root before
-    to get a string representing the whole document.
+    Returns a string representation of the current XML elements. Call root
+    first to get a string representing the whole document.
 
         $xc->as_string
         $xc->root->as_string
 
  as_xml_libxml
 
-    Returns array of current elements as XML::LibXML objects.
+    Returns the current elements as XML::LibXML objects. In list context,
+    selectors may return multiple nodes. For the single-element case,
+    "as_xml_libxml" in XML::Chain::Element returns one XML::LibXML::Element
+    object.
 
  text_content
 
-    Returns text content of all current XML elements.
+    Returns the text content of all current XML elements.
 
  count / size
 
         say $xc->find('//b')->count;
 
-    Return the number of current elements.
+    Returns the number of current elements.
 
  single
 
         my $lxml_el = $xc->find('//b')->first->as_xml_libxml;
 
-    Checks is there is exactly one element in current elements and return
-    it as XML::Chain::Element object.
+    Checks that there is exactly one current element and returns it as an
+    XML::Chain::Element object. It throws an exception if the selection is
+    empty or contains more than one element.
 
  reg_global_ns
+
+    Registers a namespace prefix on the document element so that it can be
+    used later in "find" calls. The optional third argument controls
+    whether the namespace is activated on the root element.
 
         $sitemap->reg_global_ns('i' => 'http://www.google.com/schemas/sitemap-image/1.1');
         $sitemap->reg_global_ns('s' => 'http://www.sitemaps.org/schemas/sitemap/0.9');
         say $sitemap->find('/s:urlset/s:url/i:image')->count
         # 2
+
+ document_element
+
+    Returns the document root element as an XML::Chain::Element object.
+    This is an alias for root.
+
+ set_io_any
+
+    Stores $what, $options for IO::Any for future use with store. See
+    "set_io_any" in XML::Chain for details.
+
+ store
+
+    Saves the XML to the target configured via set_io_any. See "store" in
+    XML::Chain for details.
+
+ data
+
+    Stores and retrieves arbitrary metadata on selected elements without
+    affecting the XML content (jQuery-style .data() method).
+
+        # Set data on element
+        $element->data(user_id => 42);
+        $element->data(status => 'active');
+    
+        # Get specific data key
+        my $user_id = $element->data('user_id');
+    
+        # Get all data keys as hash
+        my $all = $element->data;
+    
+        # Set on multiple elements
+        $elements->data(processed => 1);
+
+    Calling with no arguments returns a hash reference of all stored data
+    for the first element in the selection.
+
+    Calling with one argument returns the value for that key in the first
+    element.
+
+    Calling with two or more arguments sets the key/value on all elements
+    in the selection and returns $self for chaining.
+
+    Important: Data storage is tied to element identity within a document.
+    If an element is copied or imported to another document, the data does
+    not survive the operation (the new element will have an empty data
+    store).
 
 AUTHOR
 
@@ -397,30 +544,41 @@ COPYRIGHT & LICENSE
 ----------------------------------------------------------------------------
 NAME
 
-    XML::Chain::Element - helper class for XML::Chain representing single
+    XML::Chain::Element - helper class for XML::Chain representing a single
     element
 
 SYNOPSIS
 
-        xc('body')->c(h1)->t('title')->root
+        xc('body')->c('h1')->t('title')->root
 
 DESCRIPTION
 
-    Returned by "single" in XML::Chain::Selector call.
+    Returned by "single" in XML::Chain::Selector.
 
 METHODS
 
+ new
+
+    Creates a new element wrapper.
+
  name
 
-    return element name
+    Returns the element name.
 
  as_xml_libxml
 
-    Returns XML::LibXML::Element object.
+    Returns an XML::LibXML::Element object.
+
+ current_elements
+
+    Returns the element wrapped in an array reference for internal
+    consistency with XML::Chain::Selector. Selectors always work with
+    arrays of elements, and Element overrides this to return its single
+    element as a 1-element array.
 
  XML::Chain::Selector methods
 
-    All of the XML::Chain::Selector methods works too.
+    All XML::Chain::Selector methods work here as well.
 
 AUTHOR
 

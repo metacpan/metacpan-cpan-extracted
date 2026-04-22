@@ -2,7 +2,7 @@ package IPC::Manager::Service::Peer;
 use strict;
 use warnings;
 
-our $VERSION = '0.000028';
+our $VERSION = '0.000029';
 
 use Carp qw/croak/;
 use Scalar::Util qw/weaken/;
@@ -10,7 +10,10 @@ use Scalar::Util qw/weaken/;
 use Object::HashBase qw{
     <name
     <service
+    <child_pid
 };
+
+sub _set_child_pid { $_[0]->{+CHILD_PID} = $_[1] }
 
 sub init {
     my $self = shift;
@@ -91,6 +94,16 @@ The name of the peer service (required).
 =item service
 
 The parent service object (required). Must be running in the current process.
+
+=item child_pid
+
+The pid that C<fork> returned in C<ipcm_service>'s parent branch (the
+"first-fork" pid).  Populated only when the peer was produced by
+C<ipcm_service> spawning a nested service; C<undef> otherwise.
+
+B<Caveat>: this is C<ipcm_service>'s own fork pid, not necessarily the pid
+the service loop ends up running in.  See
+L<IPC::Manager::Service::Handle/child_pid> for the full caveat.
 
 =back
 
