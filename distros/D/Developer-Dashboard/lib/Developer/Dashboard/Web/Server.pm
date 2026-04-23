@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::Server;
 use strict;
 use warnings;
 
-our $VERSION = '2.76';
+our $VERSION = '3.04';
 
 use Capture::Tiny qw(capture);
 use File::Spec;

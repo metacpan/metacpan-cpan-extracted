@@ -35,6 +35,7 @@ if ( -d $dashboard_lib ) {
 }
 
 my $cmd = shift @ARGV || die "Missing built-in dashboard command\n";
+$0 = join q{ }, 'developer-dashboard', $cmd, @ARGV;
 
 require Developer::Dashboard::Auth;
 require Developer::Dashboard::ActionRunner;
@@ -57,6 +58,7 @@ require Developer::Dashboard::PageResolver;
 require Developer::Dashboard::PageStore;
 require Developer::Dashboard::PathRegistry;
 require Developer::Dashboard::Prompt;
+require Developer::Dashboard::CLI::Progress;
 require Developer::Dashboard::RuntimeManager;
 require Developer::Dashboard::SessionStore;
 require Developer::Dashboard::Web::App;
@@ -972,7 +974,15 @@ elsif ( $cmd eq 'serve' ) {
     exit 0;
 }
 elsif ( $cmd eq 'stop' ) {
-    print json_encode( $runtime->stop_all );
+    my $progress = _lifecycle_progress(
+        title => 'dashboard stop progress',
+        tasks => $runtime->stop_progress_tasks,
+    );
+    my $result = $runtime->stop_all(
+        progress => $progress ? $progress->callback : undef,
+    );
+    $progress->finish if $progress;
+    print json_encode($result);
     exit 0;
 }
 elsif ( $cmd eq 'restart' ) {
@@ -989,14 +999,19 @@ elsif ( $cmd eq 'restart' ) {
         'workers=i' => \$workers,
         'ssl!'      => \$ssl,
     );
-    print json_encode(
-        $runtime->restart_all(
-            host    => $host,
-            port    => $port,
-            workers => $workers,
-            ssl     => $ssl,
-        )
+    my $progress = _lifecycle_progress(
+        title => 'dashboard restart progress',
+        tasks => $runtime->restart_progress_tasks,
     );
+    my $result = $runtime->restart_all(
+        host     => $host,
+        port     => $port,
+        workers  => $workers,
+        ssl      => $ssl,
+        progress => $progress ? $progress->callback : undef,
+    );
+    $progress->finish if $progress;
+    print json_encode($result);
     exit 0;
 }
 elsif ( $cmd eq 'shell' ) {
@@ -1038,6 +1053,24 @@ elsif ( $cmd eq 'complete' ) {
 }
 else {
     die "Unsupported built-in dashboard command '$cmd'\n";
+}
+
+# _lifecycle_progress(%args)
+# Builds an optional terminal progress board for restart/stop lifecycle commands.
+# Input: title string and ordered task array reference.
+# Output: Developer::Dashboard::CLI::Progress object or undef when disabled.
+sub _lifecycle_progress {
+    my (%args) = @_;
+    my $enabled = $ENV{DEVELOPER_DASHBOARD_PROGRESS} ? 1 : 0;
+    $enabled = 1 if !$enabled && -t STDERR;
+    return if !$enabled;
+    return Developer::Dashboard::CLI::Progress->new(
+        title   => $args{title},
+        tasks   => $args{tasks},
+        stream  => \*STDERR,
+        dynamic => ( -t STDERR ? 1 : 0 ),
+        color   => ( -t STDERR ? 1 : 0 ),
+    );
 }
 
 # _seed_init_page($pages, $known_ids, $page)
@@ -1321,10 +1354,14 @@ which_dir() {
 _dashboard_complete() {
   COMPREPLY=()
   local candidate
+  local completion_output
+  completion_output="$(__DASHBOARD_CMD__ complete "$COMP_CWORD" "${COMP_WORDS[@]}")"
   while IFS= read -r candidate; do
     [ -n "$candidate" ] || continue
     COMPREPLY+=("$candidate")
-  done < <(__DASHBOARD_CMD__ complete "$COMP_CWORD" "${COMP_WORDS[@]}")
+  done <<EOF
+$completion_output
+EOF
 }
 
 complete -F _dashboard_complete dashboard d2
@@ -1332,10 +1369,14 @@ complete -F _dashboard_complete dashboard d2
 _dashboard_complete_cdr() {
   COMPREPLY=()
   local candidate
+  local completion_output
+  completion_output="$(__DASHBOARD_CMD__ path complete-cdr "$COMP_CWORD" "${COMP_WORDS[@]}")"
   while IFS= read -r candidate; do
     [ -n "$candidate" ] || continue
     COMPREPLY+=("$candidate")
-  done < <(__DASHBOARD_CMD__ path complete-cdr "$COMP_CWORD" "${COMP_WORDS[@]}")
+  done <<EOF
+$completion_output
+EOF
 }
 
 complete -F _dashboard_complete_cdr cdr dd_cdr which_dir
@@ -1458,7 +1499,9 @@ switchboard dispatch. It is staged under F<~/.developer-dashboard/cli/dd/> as
 F<_dashboard-core> and is not meant to be called by users directly. It also
 generates the shared shell bootstrap snippets that expose C<cdr>,
 C<dd_cdr>, C<d2>, C<which_dir>, prompt wiring, and tab-completion handlers
-across bash, zsh, POSIX sh, and PowerShell.
+across bash, zsh, POSIX sh, and PowerShell. While it is running, it rewrites
+its process title to the public-facing C<developer-dashboard ...> form so
+process listings do not leak the staged helper path.
 
 __END__
 
@@ -1472,7 +1515,7 @@ _dashboard-core - contains the shared private built-in command runtime that the 
 
 =head1 PURPOSE
 
-This private staged runtime owns the heavier built-in command implementations after C<bin/dashboard> has already done hook execution and helper dispatch. It is also where the generated shell bootstrap snippets come from, including C<cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and PowerShell.
+This private staged runtime owns the heavier built-in command implementations after C<bin/dashboard> has already done hook execution and helper dispatch. It is also where the generated shell bootstrap snippets come from, including C<cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and PowerShell. While it runs, it normalizes the live process title to C<developer-dashboard ...> so operators see the public command name in C<ps> output instead of the staged helper path under F<~/.developer-dashboard/cli/dd/>.
 
 =head1 WHY IT EXISTS
 

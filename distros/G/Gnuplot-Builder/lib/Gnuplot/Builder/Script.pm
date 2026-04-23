@@ -247,7 +247,7 @@ sub _draw_with {
     my @commands = ($plotter);
     return $self->run_with(
         do => \@commands,
-        _pair_slice(\%args, qw(writer async output no_stderr))
+        _pair_slice(\%args, qw(writer async output no_stderr on_exit))
     );
 }
 
@@ -296,7 +296,7 @@ sub multiplot_with {
     my @commands = ($multiplot_command, $wrapped_do, "unset multiplot");
     return $self->run_with(
         do => \@commands,
-        _pair_slice(\%args, qw(writer async output no_stderr))
+        _pair_slice(\%args, qw(writer async output no_stderr on_exit))
     );
 }
 
@@ -321,6 +321,10 @@ sub run_with {
     }elsif(ref($commands) ne "ARRAY") {
         $commands = [$commands];
     }
+    my $on_exit = $args{on_exit};
+    if(defined($on_exit) && ref($on_exit) ne "CODE") {
+        croak "on_exit must be a CODE-REF";
+    }
     _wrap_commands_with_output($commands, $self->_plotting_option(\%args, "output"));
     my $do = sub {
         my $writer = shift;
@@ -342,14 +346,21 @@ sub run_with {
     my $result = "";
     my $got_writer = $self->_plotting_option(\%args, "writer");
     if(defined($got_writer)) {
+        if(defined($on_exit)) {
+            croak "on_exit should not be set if writer is set";
+        }
         $do->($got_writer);
     }elsif(defined($_context_writer)) {
+        if(defined($on_exit)) {
+            croak "on_exit should not be set if there is a writer in the context"
+        }
         $do->($_context_writer);
     }else {
         $result = Gnuplot::Builder::Process->with_new_process(
             async => $self->_plotting_option(\%args, "async"),
             do => $do,
-            no_stderr => $self->_plotting_option(\%args, "no_stderr")
+            no_stderr => $self->_plotting_option(\%args, "no_stderr"),
+            on_exit => $on_exit,
         );
     }
     return $result;
@@ -937,6 +948,20 @@ If set to false, it waits for the gnuplot process to finish and return its outpu
 
 By default it's false, but you can change the default by C<$Gnuplot::Builder::Process::ASYNC> package variable.
 
+=item C<on_exit> => CODE-REF (optional)
+
+A code-ref called when the gnutplot process exits. The code-ref is called like
+
+    $on_exit->($status)
+
+where C<$status> is the value of C<$?> for the finished gnuplot process.
+
+If C<plot_with> method does not start a new gnuplot process (e.g. because C<writer> option is set), setting C<on_exit> callback throws an exception.
+
+Note that the C<on_exit> callback might not be called just after the C<plot_with> method finishes, even if C<async> option is set to false.
+This is because the process might persist, e.g. to keep the plotting window open.
+To ensure the process exits, call C<wait_all> method of L<Gnuplot::Builder::Process>.
+
 =back
 
     my $script = "";
@@ -1064,6 +1089,10 @@ If set to true, it won't wait for the gnuplot process to finish.
 In this case, the return value C<$result> will be an empty string.
 
 See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
+
+=item C<on_exit> => CODE-REF (optional)
+
+A code-ref called when the gnutplot process exits. See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =back
 
@@ -1213,6 +1242,10 @@ See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for deta
 If set to true, it won't wait for the gnuplot process to finish. In this case, the return value C<$result> will be an empty string.
 
 See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
+
+=item C<on_exit> => CODE-REF (optional)
+
+A code-ref called when the gnutplot process exits. See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =back
 

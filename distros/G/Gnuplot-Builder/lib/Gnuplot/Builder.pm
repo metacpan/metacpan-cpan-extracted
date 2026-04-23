@@ -6,7 +6,7 @@ use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
 use Gnuplot::Builder::Process;
 
-our $VERSION = "0.32";
+our $VERSION = "0.33";
 
 our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp gwait);
 
@@ -46,6 +46,8 @@ sub gwait {
 __END__
 
 =pod
+
+=encoding utf8
 
 =head1 NAME
 

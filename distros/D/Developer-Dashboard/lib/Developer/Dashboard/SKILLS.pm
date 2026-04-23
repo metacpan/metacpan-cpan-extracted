@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '2.76';
+our $VERSION = '3.04';
 
 1;
 
@@ -24,6 +24,7 @@ Skill lifecycle:
 
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills install /absolute/path/to/example-skill
+  dashboard skills install --ddfile
   dashboard skills update example-skill
   dashboard skills list
   dashboard example-skill.hello arg1 arg2
@@ -87,7 +88,23 @@ Install it:
 Repeated C<dashboard skills install ...> calls reinstall or refresh the
 isolated installed copy instead of failing on an existing repo name, using
 C<rsync> when it is available for direct local checkouts and a built-in Perl
-tree-copy fallback when it is not.
+tree-copy fallback when it is not. Plain C<dashboard skills install> requires
+either one explicit source argument or C<--ddfile>; calling it without either
+returns a usage error.
+
+Run an operator manifest install from the current directory:
+
+  dashboard skills install --ddfile
+
+If F<ddfile> exists there, each listed source installs into the base
+home-layer skills root at
+F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/> even when the command is
+run from a deeper child F<.developer-dashboard/> layer. If F<ddfile.local>
+exists there, each listed source installs into the current directory's nested
+F<skills/E<lt>repo-nameE<gt>/> tree instead. When both manifests are present,
+F<ddfile> runs first and F<ddfile.local> runs second. Repeated
+C<dashboard skills install --ddfile> runs also act as reinstall and refresh
+for existing targets.
 
 Run its command:
 
@@ -168,29 +185,40 @@ Persistent skill-owned logs.
 
 =item B<ddfile>
 
-Optional dependent skill list installed before package managers run.
+Optional dependent skill list installed after package managers run.
+
+=item B<ddfile.local>
+
+Optional local dependent skill list installed after C<ddfile> into the same
+skills root as the current skill install target.
 
 =item B<aptfile>
 
 Optional Debian-family system package declaration. When present, Developer
-Dashboard prints the requested package list and installs it through
-C<sudo apt-get install -y>.
+Dashboard checks each listed package first, prints only the missing packages,
+and installs those through C<sudo apt-get install -y>.
 
 =item B<brewfile>
 
 Optional macOS Homebrew package declaration. When present, Developer Dashboard
 prints the requested package list and installs it through C<brew install>.
 
+=item B<package.json>
+
+Optional Node dependency declaration. When present, Developer Dashboard runs
+C<npm install E<lt>dependency-spec...E<gt>> inside a private dashboard staging
+workspace and then merges the resulting packages into C<$HOME/node_modules>.
+
 =item B<cpanfile>
 
 Optional shared Perl dependency declaration. When present, Developer
-Dashboard runs C<cpanm -L ~/perl5 --cpanfile cpanfile --installdeps
+Dashboard runs C<cpanm --notest -L ~/perl5 --cpanfile cpanfile --installdeps
 E<lt>skill-rootE<gt>>.
 
 =item B<cpanfile.local>
 
 Optional skill-local Perl dependency declaration. When present, Developer
-Dashboard runs C<cpanm -L E<lt>skill-rootE<gt>/perl5 --cpanfile
+Dashboard runs C<cpanm --notest -L E<lt>skill-rootE<gt>/perl5 --cpanfile
 cpanfile.local --installdeps E<lt>skill-rootE<gt>>.
 
 =back
@@ -558,9 +586,16 @@ a C<cpanfile.local> when that skill also needs a skill-local C<./perl5> tree.
 
 =head2 Can a skill install system packages first?
 
-Yes. Ship a C<ddfile> for dependent skills, an C<aptfile> for Debian-family
-packages, or a C<brewfile> for macOS packages. The install order is
-C<ddfile -> aptfile -> brewfile -> cpanfile -> cpanfile.local>.
+Yes. Ship a C<ddfile> for dependent skills, a C<ddfile.local> for dependent
+skills that must stay at the current install level, an C<aptfile> for
+Debian-family packages, an C<apkfile> for Alpine packages, a C<dnfile> for
+Fedora packages, a C<brewfile> for
+macOS packages, or a C<package.json> for Node dependencies that should land under
+C<$HOME/node_modules>. The
+explicit operator manifest order for C<dashboard skills install --ddfile> is
+the deferred C<ddfile -> ddfile.local> pass, while the automatic per-skill
+dependency order is C<aptfile -> apkfile -> dnfile -> brewfile -> package.json ->
+cpanfile -> cpanfile.local -> ddfile -> ddfile.local>.
 
 =head2 Where is the long-form guide?
 

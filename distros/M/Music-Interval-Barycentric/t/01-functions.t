@@ -49,11 +49,13 @@ subtest distance => sub {
     is sprintf('%.3f', distance(@{ $chords[4] })), 5.196, 'distance';
     is distance(@{ $chords[5] }), 3, 'distance';
     is sprintf('%.3f', distance(@{ $chords[6] })), 2.121, 'distance';
-    is sprintf('%.3f', distance(@{ $chords[7] })), 3.464, 'distance';
-
-    my @c = ([3,4,5], [0,4,7]);
-    my $got = distance(@c); # 2.54950975679639
-    is sprintf('%.2f', $got), 2.55, 'distance';
+    is sprintf('%.3f', distance($chords[7][0], $chords[7][1])), 3.464, 'distance';
+    is sprintf('%.3f', distance($chords[7][1], $chords[7][2])), 3.464, 'distance';
+    is sprintf('%.3f', distance($chords[7][0], $chords[7][2])), 3.464, 'distance';
+    is sprintf('%.3f', distance(@{ $chords[8] })), '2.550', 'distance';
+    is sprintf('%.3f', distance($chords[9][0], $chords[9][1])), 1.732, 'distance';
+    is sprintf('%.3f', distance($chords[9][1], $chords[9][2])), 1.732, 'distance';
+    is sprintf('%.3f', distance($chords[9][0], $chords[9][2])), 1.732, 'distance';
 };
 
 subtest orbit_distance => sub {
@@ -64,11 +66,13 @@ subtest orbit_distance => sub {
     is sprintf('%.3f', orbit_distance(@{ $chords[4] })), 5.196, 'orbit_distance';
     is orbit_distance(@{ $chords[5] }), 3, 'orbit_distance';
     is sprintf('%.3f', orbit_distance(@{ $chords[6] })), 2.121, 'orbit_distance';
-    is orbit_distance(@{ $chords[7] }), 0, 'orbit_distance';
-
-    my @c = ([3,4,5], [0,4,7]);
-    my $got = orbit_distance(@c); # 2.54950975679639
-    is sprintf('%.2f', $got), 2.55, 'orbit_distance';
+    is orbit_distance($chords[7][0], $chords[7][1]), 0, 'orbit_distance';
+    is orbit_distance($chords[7][1], $chords[7][2]), 0, 'orbit_distance';
+    is orbit_distance($chords[7][0], $chords[7][2]), 0, 'orbit_distance';
+    is sprintf('%.3f', orbit_distance(@{ $chords[8] })), '2.550', 'orbit_distance';
+    is orbit_distance($chords[9][0], $chords[9][1]), 0, 'orbit_distance';
+    is orbit_distance($chords[9][1], $chords[9][2]), 0, 'orbit_distance';
+    is orbit_distance($chords[9][0], $chords[9][2]), 0, 'orbit_distance';
 };
 
 subtest forte_distance => sub {
@@ -80,10 +84,8 @@ subtest forte_distance => sub {
     is sprintf('%.3f', forte_distance(@{ $chords[5] })), 2.646, 'forte_distance';
     is sprintf('%.3f', forte_distance(@{ $chords[6] })), 1.871, 'forte_distance';
     is forte_distance(@{ $chords[7] }), 0, 'forte_distance';
-
-    my @c = ([3,4,5], [0,4,7]);
-    my $got = forte_distance(@c); # 2.54950975679639
-    is sprintf('%.2f', $got), 2.55, 'forte_distance';
+    is sprintf('%.3f', forte_distance(@{ $chords[8] })), '2.550', 'forte_distance';
+    is forte_distance(@{ $chords[9] }), 0, 'forte_distance';
 };
 
 subtest cyclic_permutation => sub {
@@ -97,9 +99,16 @@ subtest cyclic_permutation => sub {
 
 subtest evenness_index => sub {
     is evenness_index($chords[0][0]), 1, 'evenness_index';
+    is evenness_index($chords[0][1]), 1, 'evenness_index';
+    is evenness_index($chords[1][0]), 1, 'evenness_index';
+    is evenness_index($chords[1][1]), 1, 'evenness_index';
+    is evenness_index($chords[2][0]), 1, 'evenness_index';
     is evenness_index($chords[2][1]), 0, 'evenness_index';
     is evenness_index($chords[3][0]), 2, 'evenness_index';
+    is evenness_index($chords[3][1]), 0, 'evenness_index';
     is sprintf('%.3f', evenness_index($chords[4][0])), 5.196, 'evenness_index';
+    is evenness_index($chords[4][1]), 0, 'evenness_index';
+    is evenness_index($chords[5][0]), 1, 'evenness_index';
     is sprintf('%.3f', evenness_index($chords[5][1])), 3.606, 'evenness_index';
     is sprintf('%.3f', evenness_index($chords[6][0])), 2.646, 'evenness_index';
     is sprintf('%.3f', evenness_index($chords[6][1])), '3.240', 'evenness_index';
@@ -108,19 +117,34 @@ subtest evenness_index => sub {
     is evenness_index($chords[7][2]), 2, 'evenness_index';
     is evenness_index($chords[8][0]), 1, 'evenness_index';
     is sprintf('%.3f', evenness_index($chords[8][1])), 3.536, 'evenness_index';
-
-    my @c = ([3,4,5], [0,4,7]);
-    my $got = evenness_index(@c);
-    is $got, 1, 'evenness_index';
+    is evenness_index($chords[9][0]), 1, 'evenness_index';
+    is evenness_index($chords[9][1]), 1, 'evenness_index';
+    is evenness_index($chords[9][2]), 1, 'evenness_index';
 };
 
 subtest inversion => sub {
     is_deeply inversion($chords[0][0]), [5,3,4], 'inversion';
+    is_deeply inversion($chords[0][1]), [5,3,4], 'inversion';
+    is_deeply inversion($chords[1][0]), [5,3,4], 'inversion';
+    is_deeply inversion($chords[1][1]), [5,4,3], 'inversion';
+    is_deeply inversion($chords[2][0]), [5,3,4], 'inversion';
+    is_deeply inversion($chords[2][1]), [4,4,4], 'inversion';
+    is_deeply inversion($chords[3][0]), [6,4,2], 'inversion';
+    is_deeply inversion($chords[3][1]), [4,4,4], 'inversion';
+    is_deeply inversion($chords[4][0]), [10,1,1], 'inversion';
+    is_deeply inversion($chords[4][1]), [4,4,4], 'inversion';
+    is_deeply inversion($chords[5][0]), [5,3,4], 'inversion';
+    is_deeply inversion($chords[5][1]), [8,3,1], 'inversion';
     is_deeply inversion($chords[6][0]), [6,1,3,2], 'inversion';
-
-    my @c = ([3,4,5], [0,4,7]);
-    my $got = inversion(@c); # [ 5, 4, 3 ]
-    is_deeply $got, [5,4,3], 'inversion';
+    is_deeply inversion($chords[6][1]), [7,3,1,2], 'inversion';
+    is_deeply inversion($chords[7][0]), [6,4,2], 'inversion';
+    is_deeply inversion($chords[7][1]), [4,2,6], 'inversion';
+    is_deeply inversion($chords[7][2]), [2,6,4], 'inversion';
+    is_deeply inversion($chords[8][0]), [5,4,3], 'inversion';
+    is_deeply inversion($chords[8][1]), [7,4,0], 'inversion';
+    is_deeply inversion($chords[9][0]), [5,4,3], 'inversion';
+    is_deeply inversion($chords[9][1]), [4,3,5], 'inversion';
+    is_deeply inversion($chords[9][2]), [3,5,4], 'inversion';
 };
 
 done_testing();

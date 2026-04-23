@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Exception;
-$Bitcoin::Crypto::Exception::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::VERSION = '4.005';
 use v5.14;
 use warnings;
 
@@ -97,7 +97,7 @@ sub as_string
 {
 
 	package Bitcoin::Crypto::Exception::Transaction;
-$Bitcoin::Crypto::Exception::Transaction::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Transaction::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 
 }
@@ -105,7 +105,7 @@ use parent -norequire, 'Bitcoin::Crypto::Exception';
 {
 
 	package Bitcoin::Crypto::Exception::UTXO;
-$Bitcoin::Crypto::Exception::UTXO::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::UTXO::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 
 }
@@ -113,7 +113,7 @@ use parent -norequire, 'Bitcoin::Crypto::Exception';
 {
 
 	package Bitcoin::Crypto::Exception::Sign;
-$Bitcoin::Crypto::Exception::Sign::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Sign::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 
 }
@@ -121,126 +121,126 @@ use parent -norequire, 'Bitcoin::Crypto::Exception';
 {
 
 	package Bitcoin::Crypto::Exception::KeyCreate;
-$Bitcoin::Crypto::Exception::KeyCreate::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::KeyCreate::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::KeyDerive;
-$Bitcoin::Crypto::Exception::KeyDerive::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::KeyDerive::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicGenerate;
-$Bitcoin::Crypto::Exception::MnemonicGenerate::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::MnemonicGenerate::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicCheck;
-$Bitcoin::Crypto::Exception::MnemonicCheck::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::MnemonicCheck::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58;
-$Bitcoin::Crypto::Exception::Base58::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Base58::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputFormat;
-$Bitcoin::Crypto::Exception::Base58InputFormat::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Base58InputFormat::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Base58';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputChecksum;
-$Bitcoin::Crypto::Exception::Base58InputChecksum::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Base58InputChecksum::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Base58';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32;
-$Bitcoin::Crypto::Exception::Bech32::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Bech32::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputFormat;
-$Bitcoin::Crypto::Exception::Bech32InputFormat::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Bech32InputFormat::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Bech32';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputData;
-$Bitcoin::Crypto::Exception::Bech32InputData::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Bech32InputData::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Bech32';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputChecksum;
-$Bitcoin::Crypto::Exception::Bech32InputChecksum::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Bech32InputChecksum::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Bech32';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::SegwitProgram;
-$Bitcoin::Crypto::Exception::SegwitProgram::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::SegwitProgram::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptType;
-$Bitcoin::Crypto::Exception::ScriptType::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::ScriptType::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptOpcode;
-$Bitcoin::Crypto::Exception::ScriptOpcode::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::ScriptOpcode::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptPush;
-$Bitcoin::Crypto::Exception::ScriptPush::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::ScriptPush::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Block;
-$Bitcoin::Crypto::Exception::Block::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Block::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptTree;
-$Bitcoin::Crypto::Exception::ScriptTree::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::ScriptTree::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptCompilation;
-$Bitcoin::Crypto::Exception::ScriptCompilation::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::ScriptCompilation::VERSION = '4.005';
 use Mooish::Base -standard;
 
 	extends 'Bitcoin::Crypto::Exception';
@@ -275,14 +275,14 @@ use Mooish::Base -standard;
 {
 
 	package Bitcoin::Crypto::Exception::ScriptRuntime;
-$Bitcoin::Crypto::Exception::ScriptRuntime::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::ScriptRuntime::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::TransactionScript;
-$Bitcoin::Crypto::Exception::TransactionScript::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::TransactionScript::VERSION = '4.005';
 use parent -norequire,
 		'Bitcoin::Crypto::Exception::Transaction',
 		'Bitcoin::Crypto::Exception::ScriptRuntime';
@@ -291,35 +291,35 @@ use parent -norequire,
 {
 
 	package Bitcoin::Crypto::Exception::NetworkCheck;
-$Bitcoin::Crypto::Exception::NetworkCheck::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::NetworkCheck::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::NetworkConfig;
-$Bitcoin::Crypto::Exception::NetworkConfig::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::NetworkConfig::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Address;
-$Bitcoin::Crypto::Exception::Address::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::Address::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::AddressGenerate;
-$Bitcoin::Crypto::Exception::AddressGenerate::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::AddressGenerate::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception::Address';
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::PSBT;
-$Bitcoin::Crypto::Exception::PSBT::VERSION = '4.004';
+$Bitcoin::Crypto::Exception::PSBT::VERSION = '4.005';
 use parent -norequire, 'Bitcoin::Crypto::Exception';
 }
 

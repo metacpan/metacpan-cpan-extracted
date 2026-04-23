@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Block;
-$Bitcoin::Crypto::Block::VERSION = '4.004';
+$Bitcoin::Crypto::Block::VERSION = '4.005';
 use v5.14;
 use warnings;
 

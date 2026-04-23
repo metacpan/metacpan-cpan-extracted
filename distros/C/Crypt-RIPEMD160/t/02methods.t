@@ -265,8 +265,8 @@ subtest 'MAC reset and reuse' => sub {
 };
 
 subtest 'MAC reset after mac() preserves key' => sub {
-    # mac() and hexmac() zero the key material, but reset() must still
-    # reconstruct the correct HMAC state from the original key.
+    # mac() and hexmac() finalize the inner hash, but reset() must still
+    # reconstruct the correct HMAC state from the preserved key.
     my $key = "secret key";
     my $data = "test data";
 
@@ -453,6 +453,7 @@ subtest 'addfile croaks on read error' => sub {
     {
         package ReadErrorHandle;
         sub TIEHANDLE { bless {}, shift }
+        sub BINMODE { 1 }
         sub READ { $! = 5; return undef }  # EIO
     }
     tie *ERR_FH, 'ReadErrorHandle';
@@ -467,6 +468,7 @@ subtest 'MAC addfile croaks on read error' => sub {
     {
         package ReadErrorHandle2;
         sub TIEHANDLE { bless {}, shift }
+        sub BINMODE { 1 }
         sub READ { $! = 5; return undef }
     }
     tie *ERR_FH2, 'ReadErrorHandle2';
@@ -536,12 +538,113 @@ subtest 'padding boundary: incremental add across boundary' => sub {
 };
 
 # ========================================
+# Method return values ($self for chaining)
+# ========================================
+
+subtest 'add returns self for chaining' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    my $ret = $ctx->add('abc');
+    is($ret, $ctx, 'add() returns the context object');
+};
+
+subtest 'reset returns self for chaining' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('junk');
+    my $ret = $ctx->reset;
+    is($ret, $ctx, 'reset() returns the context object');
+};
+
+subtest 'chained add produces correct hash' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('a')->add('b')->add('c');
+    is(unpack("H*", $ctx->digest), $abc_hex, 'chained add("a")->add("b")->add("c") works');
+};
+
+subtest 'chained reset then add' => sub {
+    my $ctx = Crypt::RIPEMD160->new;
+    $ctx->add('junk');
+    $ctx->digest;
+    $ctx->reset->add('abc');
+    is(unpack("H*", $ctx->digest), $abc_hex, 'reset->add chain works');
+};
+
+subtest 'addfile returns $self for chaining' => sub {
+    my ($fh, $filename) = tempfile(UNLINK => 1);
+    print $fh 'abc';
+    close $fh;
+
+    open my $rfh, '<', $filename or die "Cannot open $filename: $!";
+    my $ctx = Crypt::RIPEMD160->new;
+    my $ret = $ctx->addfile($rfh);
+    close $rfh;
+
+    is($ret, $ctx, 'addfile returns the context object');
+};
+
+subtest 'MAC add returns $self for chaining' => sub {
+    my $mac = Crypt::RIPEMD160::MAC->new('secret');
+    my $ret = $mac->add('data');
+    is($ret, $mac, 'MAC add returns the MAC object');
+};
+
+subtest 'MAC add chaining produces correct result' => sub {
+    my $key = "Jefe";
+    my $mac1 = Crypt::RIPEMD160::MAC->new($key);
+    $mac1->add("what do ya ");
+    $mac1->add("want for nothing?");
+    my $hex1 = $mac1->hexmac;
+
+    my $mac2 = Crypt::RIPEMD160::MAC->new($key);
+    $mac2->add("what do ya ")->add("want for nothing?");
+    my $hex2 = $mac2->hexmac;
+
+    is($hex1, $hex2, 'chained MAC add produces same result as sequential');
+    is($hex1, 'dda6c021 3a485a9e 24f47420 64a7f033 b43c4069',
+       'chained result matches RFC 2286 vector');
+};
+
+subtest 'MAC addfile returns $self for chaining' => sub {
+    my ($fh, $filename) = tempfile(UNLINK => 1);
+    print $fh 'data';
+    close $fh;
+
+    open my $rfh, '<', $filename or die "Cannot open $filename: $!";
+    my $mac = Crypt::RIPEMD160::MAC->new('key');
+    my $ret = $mac->addfile($rfh);
+    close $rfh;
+
+    is($ret, $mac, 'MAC addfile returns the MAC object');
+};
+
+# ========================================
 # Version sanity
 # ========================================
 
 subtest 'module version defined' => sub {
     ok(defined $Crypt::RIPEMD160::VERSION, 'Crypt::RIPEMD160 has VERSION');
     ok(defined $Crypt::RIPEMD160::MAC::VERSION, 'Crypt::RIPEMD160::MAC has VERSION');
+};
+
+# ========================================
+# MAC DESTROY zeroes key material
+# ========================================
+
+subtest 'MAC DESTROY zeroes key material' => sub {
+    my $key = "super secret key";
+    my $mac = Crypt::RIPEMD160::MAC->new($key);
+    $mac->add("data");
+
+    # Grab refs to the internal scalars before DESTROY
+    my $key_ref   = \$mac->{'key'};
+    my $ipad_ref  = \$mac->{'k_ipad'};
+    my $opad_ref  = \$mac->{'k_opad'};
+
+    # Explicitly destroy
+    $mac->DESTROY;
+
+    is($$key_ref, '', 'key zeroed after DESTROY');
+    is($$ipad_ref, '', 'k_ipad zeroed after DESTROY');
+    is($$opad_ref, '', 'k_opad zeroed after DESTROY');
 };
 
 done_testing;

@@ -91,6 +91,8 @@
    #define LTC_SHA1
    #define LTC_SHA3
    #define LTC_SHA512
+   #define LTC_SHA512_256
+   #define LTC_SHA512_224
    #define LTC_SHA384
    #define LTC_SHA256
    #define LTC_SHA224
@@ -143,6 +145,9 @@
 
 /* Use small code where possible */
 /* #define LTC_SMALL_CODE */
+
+/* Always use small stack sizes where possible */
+/* #define LTC_SMALL_STACK */
 
 /* clean the stack of functions which put private information on stack */
 /* #define LTC_CLEAN_STACK */
@@ -256,6 +261,8 @@
 #define LTC_WHIRLPOOL
 #define LTC_SHA3
 #define LTC_KECCAK
+#define LTC_TURBO_SHAKE
+#define LTC_KANGAROO_TWELVE
 #define LTC_SHA512
 #define LTC_SHA512_256
 #define LTC_SHA512_224
@@ -507,6 +514,10 @@
 #define LTC_BCRYPT_DEFAULT_ROUNDS 10
 #endif
 
+#define LTC_ARGON2
+
+#define LTC_SCRYPT
+
 /* Keep LTC_NO_HKDF for compatibility reasons
  * superseeded by LTC_NO_MISC*/
 #ifndef LTC_NO_HKDF
@@ -602,6 +613,10 @@
       /* Maximum recursion limit when processing nested ASN.1 types. */
       #define LTC_DER_MAX_RECURSION 30
    #endif
+   #ifndef LTC_DER_OID_DEFAULT_NODES
+      /* Default number of nodes when decoding an OID. */
+      #define LTC_DER_OID_DEFAULT_NODES 12
+   #endif
 #endif
 
 #if defined(LTC_MECC) || defined(LTC_MRSA) || defined(LTC_MDSA) || defined(LTC_SSH)
@@ -674,6 +689,14 @@
    #error LTC_BCRYPT requires LTC_BLOWFISH
 #endif
 
+#if defined(LTC_ARGON2) && !defined(LTC_BLAKE2B)
+   #error LTC_ARGON2 requires LTC_BLAKE2B
+#endif
+
+#if defined(LTC_SCRYPT) && (!defined(LTC_PKCS_5) || !defined(LTC_SHA256))
+   #error LTC_SCRYPT requires LTC_PKCS_5 and LTC_SHA256
+#endif
+
 #if defined(LTC_CHACHA20POLY1305_MODE) && (!defined(LTC_CHACHA) || !defined(LTC_POLY1305))
    #error LTC_CHACHA20POLY1305_MODE requires LTC_CHACHA + LTC_POLY1305
 #endif
@@ -706,9 +729,29 @@
    #error LTC_SPRNG requires LTC_RNG_GET_BYTES
 #endif
 
+#if defined(LTC_TURBO_SHAKE) && !defined(LTC_SHA3)
+   #error LTC_TURBO_SHAKE requires LTC_SHA3
+#endif
+
+#if defined(LTC_KANGAROO_TWELVE) && !defined(LTC_TURBO_SHAKE)
+   #error LTC_KANGAROO_TWELVE requires LTC_TURBO_SHAKE
+#endif
+
 #if defined(LTC_NO_MATH) && (defined(LTM_DESC) || defined(TFM_DESC) || defined(GMP_DESC))
    #error LTC_NO_MATH defined, but also a math descriptor
 #endif
+
+#if !defined(LTC_ECB_MODE)
+#if defined(LTC_CFB_MODE) || defined(LTC_OFB_MODE) || defined(LTC_CBC_MODE) || defined(LTC_CTR_MODE) || \
+    defined(LTC_F8_MODE) || defined(LTC_LRW_MODE) || defined(LTC_XTS_MODE) )
+   #error LTC_ECB_MODE not defined, but all other modes depend on it
+#endif
+#if defined(LTC_OMAC) || defined(LTC_PMAC) || defined(LTC_XCBC) || defined(LTC_F9_MODE) || defined(LTC_EAX_MODE) || \
+    defined(LTC_OCB_MODE) || defined(LTC_OCB3_MODE) || defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) )
+   #error LTC_ECB_MODE not defined, but most MAC and AEAD modes depend on it
+#endif
+#endif
+
 
 /* THREAD management */
 #ifdef LTC_PTHREAD

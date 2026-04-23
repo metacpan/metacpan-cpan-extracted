@@ -20,6 +20,10 @@ static const oid_id_st s_hmac_oid_names[] = {
    { "1.2.840.113549.2.11", "sha512" },
    { "1.2.840.113549.2.12", "sha512-224" },
    { "1.2.840.113549.2.13", "sha512-256" },
+   { "2.16.840.1.101.3.4.2.13", "sha3-224" },
+   { "2.16.840.1.101.3.4.2.14", "sha3-256" },
+   { "2.16.840.1.101.3.4.2.15", "sha3-384" },
+   { "2.16.840.1.101.3.4.2.16", "sha3-512" },
 };
 
 static int s_pkcs_5_alg2_wrap(const struct password *pwd,
@@ -51,7 +55,7 @@ static const oid_to_pbes s_pbes2_list[] = {
 static int s_pbes2_from_oid(const ltc_asn1_list *cipher_oid, const ltc_asn1_list *hmac_oid, pbes_properties *res)
 {
    unsigned int i;
-   for (i = 0; i < sizeof(s_pbes2_list)/sizeof(s_pbes2_list[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(s_pbes2_list); ++i) {
       if (pk_oid_cmp_with_asn1(s_pbes2_list[i].oid, cipher_oid) == CRYPT_OK) {
          *res = *s_pbes2_list[i].data;
          break;
@@ -59,7 +63,7 @@ static int s_pbes2_from_oid(const ltc_asn1_list *cipher_oid, const ltc_asn1_list
    }
    if (res->c == NULL) return CRYPT_INVALID_CIPHER;
    if (hmac_oid != NULL) {
-      for (i = 0; i < sizeof(s_hmac_oid_names)/sizeof(s_hmac_oid_names[0]); ++i) {
+      for (i = 0; i < LTC_ARRAY_SIZE(s_hmac_oid_names); ++i) {
          if (pk_oid_cmp_with_asn1(s_hmac_oid_names[i].oid, hmac_oid) == CRYPT_OK) {
             res->h = s_hmac_oid_names[i].id;
             return CRYPT_OK;

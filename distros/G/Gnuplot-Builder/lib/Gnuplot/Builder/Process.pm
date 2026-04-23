@@ -73,13 +73,15 @@ sub wait_all {
 ## no_stderr (BOOL optional, default = $NO_STDERR): If set to true,
 ## the return value won't include gnuplot's STDERR. It just includes
 ## STDOUT.
+##
+## on_exit (CODE-REF optional, default: undef): See _new method.
 sub with_new_process {
     my ($class, %args) = @_;
     my $code = $args{do};
     croak "do parameter is mandatory" if !defined($code);
     my $async = defined($args{async}) ? $args{async} : $ASYNC;
     my $no_stderr = defined($args{no_stderr}) ? $args{no_stderr} : $NO_STDERR;
-    my $process = $class->_new(capture => !$async, no_stderr => $no_stderr);
+    my $process = $class->_new(capture => !$async, no_stderr => $no_stderr, on_exit => $args{on_exit});
     my $result = "";
     try {
         $code->($process->_writer);
@@ -106,9 +108,16 @@ sub with_new_process {
 ##
 ## no_stderr (BOOL optional, default: false): If true, STDERR is
 ## discarded instead of being redirected to STDOUT.
+##
+## on_exit (CODE-REF optional, default: undef): If set, this callback is called when the process
+## exits. It's called like $on_exit->($status), where $status is the $? value for the process.
 sub _new {
     my ($class, %args) = @_;
     _clear_zombies();
+    my $on_exit = $args{on_exit};
+    if(defined($on_exit) && ref($on_exit) ne 'CODE') {
+        croak("on_exit must be a CODE-REF");
+    }
     while($MAX_PROCESSES > 0 && $processes->size() >= $MAX_PROCESSES) {
         ## wait for the first process to finish. it's not the smartest
         ## way, but is it possible to wait for specific set of
@@ -129,6 +138,7 @@ sub _new {
         pid => $pid,
         write_handle => $write_handle,
         read_handle => $read_handle,
+        on_exit => $on_exit,
     }, $class;
     $processes->set($pid, $self);
     return $self;
@@ -184,8 +194,12 @@ sub _close_input {
 sub _waitpid {
     my ($self, $blocking) = @_;
     my $result = waitpid($self->{pid}, $blocking ? 0 : WNOHANG);
+    my $status = $?;
     if($result == $self->{pid} || $result == -1) {
         $processes->delete($self->{pid});
+    }
+    if($result == $self->{pid} && defined($self->{on_exit})) {
+        $self->{on_exit}->($status);
     }
 }
 

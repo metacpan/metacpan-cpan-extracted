@@ -2,7 +2,7 @@ package Crypt::PK::RSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash)] );
@@ -623,10 +623,13 @@ If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc76
  my $signature = $priv->sign_hash($message_hash, $hash_name, $padding);
  #or
  my $signature = $priv->sign_hash($message_hash, $hash_name, 'pss', $saltlen);
+ #or
+ my $signature = $priv->sign_hash($message_hash, $hash_name, 'pss', $saltlen, $mgf_hash_name);
 
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
- # $saltlen (only for pss) .. DEFAULT is 12
+ # $hash_name ................. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................... 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
+ # $saltlen (pss only) ........ DEFAULT is 12
+ # $mgf_hash_name (pss only) .. MGF hash function name (DEFAULT: the $hash_name value)
 
 =head2 verify_hash
 
@@ -638,10 +641,13 @@ If you don't know what this is, see RFC 7638 L<https://tools.ietf.org/html/rfc76
  my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, $padding);
  #or
  my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, 'pss', $saltlen);
+ #or
+ my $valid = $pub->verify_hash($signature, $message_hash, $hash_name, 'pss', $saltlen, $mgf_hash_name);
 
- # $hash_name ............... 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
- # $padding ................. 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
- # $saltlen (only for pss) .. DEFAULT is 12
+ # $hash_name ................. 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $padding ................... 'pss' (DEFAULT) or 'v1.5' or 'none' (INSECURE)
+ # $saltlen (pss only) ........ DEFAULT is 12
+ # $mgf_hash_name (pss only) .. MGF hash function name (DEFAULT: the $hash_name value)
 
 =head2 is_private
 

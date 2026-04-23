@@ -1,5 +1,21 @@
 Revision history for App::DrivePlayer.
 
+0.2.7 2026-04-22
+        - Settings dialog: move the Google Sheet Sync section so it
+          follows the Google API Credentials section (related Google
+          settings grouped together).
+        - Settings dialog: add mouseover tooltips on every label and
+          input (OAuth Client ID / Secret / Token File, Spreadsheet
+          ID, fpcalc row, AcoustID API Key) explaining what each
+          value is and where it comes from.
+        - Settings dialog: add clickable help links in the section
+          notes pointing at Google Cloud Console (Credentials + Drive
+          API library), google_restapi_oauth_token_creator,
+          sheets.google.com, and the AcoustID application
+          registration page.
+        - Settings dialog: cap note width at 60 chars so long hints
+          wrap cleanly instead of forcing the dialog wider.
+
 0.2.6 2026-04-20
         - Fix: track auto-advance now handles mpv 'end-file' with
           reason=error (transient network/stream failures), and no

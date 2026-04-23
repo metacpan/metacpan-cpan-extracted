@@ -566,7 +566,7 @@ static const ulong64 table[4*256] = {
     CONST64(0xC83223F1720AEF96) /* 1022 */, CONST64(0xC3A0396F7363A51F) /* 1023 */};
 
 /* one round of the hash function */
-LTC_INLINE static void tiger_round(ulong64 *a, ulong64 *b, ulong64 *c, ulong64 x, int mul)
+static LTC_INLINE void s_tiger_round(ulong64 *a, ulong64 *b, ulong64 *c, ulong64 x, int mul)
 {
     ulong64 tmp;
     tmp = (*c ^= x);
@@ -582,14 +582,14 @@ LTC_INLINE static void tiger_round(ulong64 *a, ulong64 *b, ulong64 *c, ulong64 x
 /* one complete pass */
 static void s_pass(ulong64 *a, ulong64 *b, ulong64 *c, const ulong64 *x, int mul)
 {
-   tiger_round(a,b,c,x[0],mul);
-   tiger_round(b,c,a,x[1],mul);
-   tiger_round(c,a,b,x[2],mul);
-   tiger_round(a,b,c,x[3],mul);
-   tiger_round(b,c,a,x[4],mul);
-   tiger_round(c,a,b,x[5],mul);
-   tiger_round(a,b,c,x[6],mul);
-   tiger_round(b,c,a,x[7],mul);
+   s_tiger_round(a,b,c,x[0],mul);
+   s_tiger_round(b,c,a,x[1],mul);
+   s_tiger_round(c,a,b,x[2],mul);
+   s_tiger_round(a,b,c,x[3],mul);
+   s_tiger_round(b,c,a,x[4],mul);
+   s_tiger_round(c,a,b,x[5],mul);
+   s_tiger_round(a,b,c,x[6],mul);
+   s_tiger_round(b,c,a,x[7],mul);
 }
 
 /* The key mixing schedule */
@@ -862,7 +862,7 @@ static int s_tiger_test(unsigned int idx)
       init[idx](&md);
       tiger_process(&md, (unsigned char *)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
       tiger_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash[idx], sizeof(tests[i].hash[idx]), !idx ? "TIGER": "TIGER2", i)) {
+      if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash[idx], sizeof(tests[i].hash[idx]), !idx ? "TIGER": "TIGER2", i)) {
           return CRYPT_FAIL_TESTVECTOR;
       }
   }

@@ -6,9 +6,10 @@ use warnings;
 use Class::Utils qw(set_params);
 use Cpanel::JSON::XS;
 use Getopt::Std;
+use List::Util 1.33 qw(none);
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -73,24 +74,26 @@ sub _process_errors {
 					print "- $error\n";
 					foreach my $id (sort @{$self->{'_list'}->{$plugin}->{$error}}) {
 						my @err = @{$self->{'_report'}->{$plugin}->{'checks'}->{'not_valid'}->{$id}};
-						my $struct_hr = {};
+						my @structs;
 						foreach my $err_hr (@err) {
 							if ($err_hr->{'error'} eq $error) {
-								$struct_hr = $err_hr->{'params'};
+								push @structs, $err_hr->{'params'};
 							}
 						}
-						print "-- $id";
 						my $i = 0;
-						foreach my $param_key (sort keys %{$struct_hr}) {
-							if ($i == 0) {
-								print ': ';
-							} else {
-								print ', ';
+						foreach my $struct_hr (@structs) {
+							print "-- $id";
+							foreach my $param_key (sort keys %{$struct_hr}) {
+								if ($i == 0) {
+									print ': ';
+								} else {
+									print ', ';
+								}
+								print "$param_key: '".$struct_hr->{$param_key}."'";
+								$i++;
 							}
-							print "$param_key: '".$struct_hr->{$param_key}."'";
-							$i++;
+							print "\n";
 						}
-						print "\n";
 					}
 				}
 			}
@@ -146,7 +149,9 @@ sub _process_report {
 				if (! exists $self->{'_list'}->{$plugin}->{$error_hr->{'error'}}) {
 					$self->{'_list'}->{$plugin}->{$error_hr->{'error'}} = [$record_id];
 				} else {
-					push @{$self->{'_list'}->{$plugin}->{$error_hr->{'error'}}}, $record_id;
+					if (none { $_ eq $record_id } @{$self->{'_list'}->{$plugin}->{$error_hr->{'error'}}}) {
+						push @{$self->{'_list'}->{$plugin}->{$error_hr->{'error'}}}, $record_id;
+					}
 				}
 			}
 		}
@@ -158,7 +163,8 @@ sub _process_report {
 sub _usage {
 	my $self = shift;
 
-	print STDERR "Usage: $0 [-h] [-l] [-p plugin] [-v] [--version] report.json\n";
+	print STDERR "Usage: $0 [-e error] [-h] [-l] [-p plugin] [-v] [--version] report.json\n";
+	print STDERR "\t-e error\tUse error defined by full error string (default is all).\n";
 	print STDERR "\t-h\t\tPrint help.\n";
 	print STDERR "\t-l\t\tList unique errors.\n";
 	print STDERR "\t-p\t\tUse plugin (default all).\n";

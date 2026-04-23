@@ -1067,22 +1067,118 @@ sub _settings_dialog {
     my $row = 0;
     my %entries;
     for my $field (
-        ['client_id',     'OAuth Client ID:'],
-        ['client_secret', 'OAuth Client Secret:'],
-        ['token_file',    'Token File:'],
+        ['client_id',     'OAuth Client ID:',
+         'OAuth 2.0 Client ID from Google Cloud Console (Desktop app type).'],
+        ['client_secret', 'OAuth Client Secret:',
+         'OAuth 2.0 Client Secret paired with the Client ID above.'],
+        ['token_file',    'Token File:',
+         'Path to the OAuth2 token created by running '
+         . 'google_restapi_oauth_token_creator.'],
     ) {
-        my ($key, $lbl) = @$field;
+        my ($key, $lbl, $tip) = @$field;
         my $lbl_w = Gtk3::Label->new($lbl);
         $lbl_w->set_xalign(1.0);
+        $lbl_w->set_tooltip_text($tip);
         $grid->attach($lbl_w, 0, $row, 1, 1);
         my $e = Gtk3::Entry->new();
         $e->set_hexpand(TRUE);
         $e->set_text($self->config->auth_config()->{$key} // '');
         $e->set_visibility(FALSE) if $key eq 'client_secret';
+        $e->set_tooltip_text($tip);
         $grid->attach($e, 1, $row, 1, 1);
         $entries{$key} = $e;
         $row++;
     }
+
+    my $auth_note = Gtk3::Label->new();
+    $auth_note->set_markup(
+        '<span size="small" foreground="#555555">'
+        . 'Create a Desktop-app OAuth client at '
+        . '<a href="https://console.cloud.google.com/apis/credentials">'
+        . 'Google Cloud Console → Credentials</a>, then enable the '
+        . '<a href="https://console.cloud.google.com/apis/library/drive.googleapis.com">'
+        . 'Drive API</a>.  Generate the token file by running '
+        . '<tt>google_restapi_oauth_token_creator</tt> in a terminal.'
+        . '</span>'
+    );
+    $auth_note->set_xalign(0.0);
+    $auth_note->set_line_wrap(TRUE);
+    $auth_note->set_max_width_chars(60);
+    $grid->attach($auth_note, 1, $row, 1, 1);
+
+    # ---- Google Sheet sync ----
+    my $sheet_frame = Gtk3::Frame->new('Google Sheet Sync');
+    $sheet_frame->set_border_width(8);
+    my $sheet_grid = Gtk3::Grid->new();
+    $sheet_grid->set_row_spacing(8);
+    $sheet_grid->set_column_spacing(8);
+    $sheet_grid->set_border_width(8);
+    $sheet_frame->add($sheet_grid);
+    $vbox->pack_start($sheet_frame, FALSE, FALSE, 0);
+
+    my $sid_lbl = Gtk3::Label->new('Spreadsheet ID:');
+    $sid_lbl->set_xalign(1.0);
+    $sheet_grid->attach($sid_lbl, 0, 0, 1, 1);
+
+    my $sid_box = Gtk3::Box->new('horizontal', 6);
+    my $sid_entry = Gtk3::Entry->new();
+    $sid_entry->set_hexpand(TRUE);
+    $sid_entry->set_text($self->config->sheet_id());
+    $sid_entry->set_placeholder_text('Paste spreadsheet ID, or click Find or Create');
+    $sid_entry->set_tooltip_text(
+        'The spreadsheet ID is the long string between "/d/" and "/edit" '
+        . 'in a Google Sheets URL.  Leave blank and click "Find or Create" '
+        . 'to have DrivePlayer find or create a sheet for you.'
+    );
+    $sid_lbl->set_tooltip_text($sid_entry->get_tooltip_text());
+    $sid_box->pack_start($sid_entry, TRUE, TRUE, 0);
+
+    my $create_btn = Gtk3::Button->new_with_label('Find or Create…');
+    $create_btn->set_tooltip_text('Use existing DrivePlayer Library spreadsheet, or create one');
+    $create_btn->signal_connect(clicked => sub {
+        return unless $self->_init_api();
+        $create_btn->set_sensitive(FALSE);
+        $create_btn->set_label('Searching…');
+        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+
+        my $id;
+        my @found = eval {
+            $self->drive->list(
+                filter => "name='DrivePlayer Library' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
+                params => { fields => 'files(id,name)', pageSize => 1 },
+            );
+        };
+        if ($@) {
+            $self->_show_error("Drive search failed:\n$@");
+        } elsif (@found) {
+            $id = $found[0]{id};
+        } else {
+            $create_btn->set_label('Creating…');
+            Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+            my $sheet = App::DrivePlayer::SheetDB->new(api => $self->rest_api);
+            $id = eval { $sheet->create() };
+            $self->_show_error("Failed to create spreadsheet:\n$@") if $@;
+        }
+        $sid_entry->set_text($id) if $id;
+        $create_btn->set_label('Find or Create…');
+        $create_btn->set_sensitive(TRUE);
+    });
+    $sid_box->pack_start($create_btn, FALSE, FALSE, 0);
+    $sheet_grid->attach($sid_box, 1, 0, 1, 1);
+
+    my $sheet_note = Gtk3::Label->new();
+    $sheet_note->set_markup(
+        '<span size="small" foreground="#555555">'
+        . 'The library syncs to this sheet automatically after each '
+        . 'Library → Sync.  Useful for sharing metadata across devices or '
+        . 'editing tags in '
+        . '<a href="https://sheets.google.com/">Google Sheets</a>.'
+        . '</span>'
+    );
+    $sheet_note->set_xalign(0.0);
+    $sheet_note->set_line_wrap(TRUE);
+    $sheet_note->set_max_width_chars(60);
+    $sheet_grid->attach($sheet_note, 1, 1, 1, 1);
 
     # ---- Acoustic fingerprinting ----
     my $fp_frame = Gtk3::Frame->new('Acoustic Fingerprinting (AcoustID)');
@@ -1166,79 +1262,31 @@ sub _settings_dialog {
     $aid_entry->set_hexpand(TRUE);
     $aid_entry->set_text($self->config->acoustid_key());
     $aid_entry->set_placeholder_text('Get a free key at acoustid.org');
+    $aid_entry->set_tooltip_text(
+        'Free AcoustID API key — used with fpcalc to look up missing tags '
+        . 'by acoustic fingerprint.'
+    );
+    $aid_lbl->set_tooltip_text($aid_entry->get_tooltip_text());
     $fp_grid->attach($aid_entry, 1, 1, 1, 1);
+
+    $fp_lbl->set_tooltip_text(
+        'fpcalc (from chromaprint) generates audio fingerprints for '
+        . 'acoustic-ID lookup.  Install it via apt if missing.'
+    );
 
     my $aid_note = Gtk3::Label->new();
     $aid_note->set_markup(
         '<span size="small" foreground="#555555">'
-        . 'Register a free application at <b>acoustid.org</b> to obtain a key.</span>'
+        . 'Register a free application at '
+        . '<a href="https://acoustid.org/new-application">acoustid.org</a> '
+        . 'to obtain a key.  '
+        . '<a href="https://acoustid.org/">More info</a>.'
+        . '</span>'
     );
     $aid_note->set_xalign(0.0);
     $aid_note->set_line_wrap(TRUE);
+    $aid_note->set_max_width_chars(60);
     $fp_grid->attach($aid_note, 1, 2, 1, 1);
-
-    # ---- Google Sheet sync ----
-    my $sheet_frame = Gtk3::Frame->new('Google Sheet Sync');
-    $sheet_frame->set_border_width(8);
-    my $sheet_grid = Gtk3::Grid->new();
-    $sheet_grid->set_row_spacing(8);
-    $sheet_grid->set_column_spacing(8);
-    $sheet_grid->set_border_width(8);
-    $sheet_frame->add($sheet_grid);
-    $vbox->pack_start($sheet_frame, FALSE, FALSE, 0);
-
-    my $sid_lbl = Gtk3::Label->new('Spreadsheet ID:');
-    $sid_lbl->set_xalign(1.0);
-    $sheet_grid->attach($sid_lbl, 0, 0, 1, 1);
-
-    my $sid_box = Gtk3::Box->new('horizontal', 6);
-    my $sid_entry = Gtk3::Entry->new();
-    $sid_entry->set_hexpand(TRUE);
-    $sid_entry->set_text($self->config->sheet_id());
-    $sid_entry->set_placeholder_text('Paste spreadsheet ID, or click Find or Create');
-    $sid_box->pack_start($sid_entry, TRUE, TRUE, 0);
-
-    my $create_btn = Gtk3::Button->new_with_label('Find or Create…');
-    $create_btn->set_tooltip_text('Use existing DrivePlayer Library spreadsheet, or create one');
-    $create_btn->signal_connect(clicked => sub {
-        return unless $self->_init_api();
-        $create_btn->set_sensitive(FALSE);
-        $create_btn->set_label('Searching…');
-        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
-
-        my $id;
-        my @found = eval {
-            $self->drive->list(
-                filter => "name='DrivePlayer Library' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
-                params => { fields => 'files(id,name)', pageSize => 1 },
-            );
-        };
-        if ($@) {
-            $self->_show_error("Drive search failed:\n$@");
-        } elsif (@found) {
-            $id = $found[0]{id};
-        } else {
-            $create_btn->set_label('Creating…');
-            Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
-            my $sheet = App::DrivePlayer::SheetDB->new(api => $self->rest_api);
-            $id = eval { $sheet->create() };
-            $self->_show_error("Failed to create spreadsheet:\n$@") if $@;
-        }
-        $sid_entry->set_text($id) if $id;
-        $create_btn->set_label('Find or Create…');
-        $create_btn->set_sensitive(TRUE);
-    });
-    $sid_box->pack_start($create_btn, FALSE, FALSE, 0);
-    $sheet_grid->attach($sid_box, 1, 0, 1, 1);
-
-    my $sheet_note = Gtk3::Label->new();
-    $sheet_note->set_markup(
-        '<span size="small" foreground="#555555">'
-        . 'The library syncs to this sheet automatically after each Library → Sync.</span>'
-    );
-    $sheet_note->set_xalign(0.0);
-    $sheet_note->set_line_wrap(TRUE);
-    $sheet_grid->attach($sheet_note, 1, 1, 1, 1);
 
     # ---- Config file path (informational) ----
     my $info_grid = Gtk3::Grid->new();

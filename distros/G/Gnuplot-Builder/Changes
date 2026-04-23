@@ -1,5 +1,10 @@
 Revision history for Gnuplot-Builder
 
+0.33    2026-04-23
+        [ENHANCEMENT]
+        - Script: Add `on_exit` option to `plot_with`, `splot_with`, `multiplot_with`,
+          and `run_with` methods (gh#6)
+
 0.32    2023-11-13
         [DOCUMENTATION]
         - Revise documentation about multiplot and $ENCODING (gh#5)

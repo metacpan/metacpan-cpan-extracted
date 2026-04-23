@@ -21,10 +21,10 @@ no_index:
 provides:
   Crypt::RIPEMD160:
     file: lib/Crypt/RIPEMD160.pm
-    version: '0.12'
+    version: '0.13'
   Crypt::RIPEMD160::MAC:
     file: lib/Crypt/RIPEMD160/MAC.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   XSLoader: '0'
   perl: '5.010'
@@ -33,5 +33,5 @@ resources:
   homepage: https://github.com/cpan-authors/Crypt-RIPEMD160
   license: https://dev.perl.org/licenses/
   repository: https://github.com/cpan-authors/Crypt-RIPEMD160.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

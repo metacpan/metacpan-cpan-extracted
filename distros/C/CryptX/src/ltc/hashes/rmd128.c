@@ -380,11 +380,11 @@ int rmd128_test(void)
    unsigned char tmp[16];
    hash_state md;
 
-   for (i = 0; i < (int)(sizeof(tests)/sizeof(tests[0])); i++) {
+   for (i = 0; i < (int)LTC_ARRAY_SIZE(tests); i++) {
        rmd128_init(&md);
        rmd128_process(&md, (unsigned char *)tests[i].msg, XSTRLEN(tests[i].msg));
        rmd128_done(&md, tmp);
-       if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "RIPEMD128", i)) {
+       if (ltc_compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "RIPEMD128", i)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }

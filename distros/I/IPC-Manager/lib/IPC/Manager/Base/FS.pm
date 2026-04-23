@@ -2,7 +2,7 @@ package IPC::Manager::Base::FS;
 use strict;
 use warnings;
 
-our $VERSION = '0.000029';
+our $VERSION = '0.000030';
 
 use File::Spec;
 
@@ -52,6 +52,12 @@ sub on_disk_name {
     {
         return $peer_id;
     }
+
+    my $hashed_len = length(ON_DISK_HASH_PREFIX) + ON_DISK_HASH_LEN;
+    croak sprintf(
+        "Cannot map peer id '%s' to on-disk name: hashed form (%d bytes) exceeds available budget (%d bytes) under route '%s'",
+        $peer_id, $hashed_len, $max, $self->{+ROUTE},
+    ) if $hashed_len > $max;
 
     return ON_DISK_HASH_PREFIX . substr(sha256_hex($peer_id), 0, ON_DISK_HASH_LEN);
 }

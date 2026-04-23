@@ -1,0 +1,14 @@
+# Repo bootstrap packages for Debian-family hosts.
+build-essential
+ca-certificates
+cpanminus
+curl
+git
+libexpat1-dev
+libssl-dev
+npm
+nodejs
+perl
+perlbrew
+pkg-config
+zlib1g-dev

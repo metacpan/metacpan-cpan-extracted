@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Types;
-$Bitcoin::Crypto::Types::VERSION = '4.004';
+$Bitcoin::Crypto::Types::VERSION = '4.005';
 use v5.14;
 use warnings;
 

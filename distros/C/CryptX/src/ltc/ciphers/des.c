@@ -2018,7 +2018,7 @@ int des_test(void)
     symmetric_key skey;
     int i, err;
 
-    for (i = 0; i < (int)(sizeof(cases)/sizeof(cases[0])); i++)
+    for (i = 0; i < (int)LTC_ARRAY_SIZE(cases); i++)
     {
         if ((err = des_setup(cases[i].key, 8, 0, &skey)) != CRYPT_OK) {
             return err;
@@ -2026,13 +2026,13 @@ int des_test(void)
 
         des_ecb_encrypt(cases[i].txt, ct, &skey);
 
-        if (compare_testvector(ct, sizeof(ct), cases[i].out, 8, "DES Encrypt", i) != 0) {
+        if (ltc_compare_testvector(ct, sizeof(ct), cases[i].out, 8, "DES Encrypt", i) != 0) {
             return CRYPT_FAIL_TESTVECTOR;
         }
 
         des_ecb_decrypt(ct, pt, &skey);
 
-        if (compare_testvector(pt, sizeof(pt), cases[i].txt, 8, "DES Decrypt", i) != 0) {
+        if (ltc_compare_testvector(pt, sizeof(pt), cases[i].txt, 8, "DES Decrypt", i) != 0) {
             return CRYPT_FAIL_TESTVECTOR;
         }
     }
@@ -2049,7 +2049,7 @@ int des_test(void)
     for (i = 0; i < 1000; i++) des_ecb_encrypt(tmp, tmp, &skey);
     for (i = 0; i < 1000; i++) des_ecb_decrypt(tmp, tmp, &skey);
 
-    if (compare_testvector(tmp, 8, pt, 8, "DES", 0) != 0) {
+    if (ltc_compare_testvector(tmp, 8, pt, 8, "DES", 0) != 0) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 
@@ -2082,7 +2082,7 @@ int desx_test(void)
     for (i = 0; i < 1000; i++) desx_ecb_encrypt(tmp, tmp, &skey);
     for (i = 0; i < 1000; i++) desx_ecb_decrypt(tmp, tmp, &skey);
 
-    if (compare_testvector(tmp, 8, pt, 8, "DES-X", 0) != 0) {
+    if (ltc_compare_testvector(tmp, 8, pt, 8, "DES-X", 0) != 0) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 
@@ -2125,7 +2125,7 @@ int des3_test(void)
         return err;
     }
 
-    for (i = 0; i < (int)(sizeof(cases)/sizeof(cases[0])); i++)
+    for (i = 0; i < (int)LTC_ARRAY_SIZE(cases); i++)
     {
         if ((err = des3_setup(cases[i].key, 16, 0, &skey)) != CRYPT_OK) {
             return err;
@@ -2133,13 +2133,13 @@ int des3_test(void)
 
         des3_ecb_encrypt(cases[i].txt, ct, &skey);
 
-        if (compare_testvector(ct, sizeof(ct), cases[i].out, 8, "3DES Encrypt", i) != 0) {
+        if (ltc_compare_testvector(ct, sizeof(ct), cases[i].out, 8, "3DES Encrypt", i) != 0) {
             return CRYPT_FAIL_TESTVECTOR;
         }
 
         des3_ecb_decrypt(ct, pt, &skey);
 
-        if (compare_testvector(pt, sizeof(pt), cases[i].txt, 8, "3DES Decrypt", i) != 0) {
+        if (ltc_compare_testvector(pt, sizeof(pt), cases[i].txt, 8, "3DES Decrypt", i) != 0) {
             return CRYPT_FAIL_TESTVECTOR;
         }
     }
@@ -2156,7 +2156,7 @@ int des3_test(void)
     for (i = 0; i < 1000; i++) des3_ecb_encrypt(tmp, tmp, &skey);
     for (i = 0; i < 1000; i++) des3_ecb_decrypt(tmp, tmp, &skey);
 
-    if (compare_testvector(tmp, 8, pt, 8, "3DES", 0) != 0) {
+    if (ltc_compare_testvector(tmp, 8, pt, 8, "3DES", 0) != 0) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 

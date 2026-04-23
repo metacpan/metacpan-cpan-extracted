@@ -230,6 +230,7 @@ sub _start_dashboard_server {
         open STDERR, '>>', $args{log_file} or die "Unable to redirect STDERR to $args{log_file}: $!";
         chdir $args{cwd} or die "Unable to chdir to $args{cwd}: $!";
         local %ENV = ( %ENV, HOME => $args{home} );
+        delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)} if _coverage_requested();
         exec $^X, "-I$args{repo_lib}", $args{dashboard_bin}, 'serve', '--ssl', '--host', '127.0.0.1', '--port', $args{port}, '--foreground'
           or die "Unable to exec dashboard serve --ssl: $!";
     }
@@ -255,7 +256,7 @@ sub _stop_dashboard_server {
 # Output: none.
 sub _wait_for_tcp {
     my ($port) = @_;
-    my $deadline = time() + 20;
+    my $deadline = time() + _tcp_probe_timeout_seconds();
     while ( time() < $deadline ) {
         my $probe = IO::Socket::INET->new(
             PeerAddr => '127.0.0.1',
@@ -269,6 +270,17 @@ sub _wait_for_tcp {
         sleep 0.25;
     }
     die "Timed out waiting for SSL browser smoke server on port $port\n";
+}
+
+sub _tcp_probe_timeout_seconds {
+    my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
+    return 60 if $perl5opt =~ /Devel::Cover/;
+    return 20;
+}
+
+sub _coverage_requested {
+    my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
+    return $perl5opt =~ /Devel::Cover/ ? 1 : 0;
 }
 
 # _read_text($path)

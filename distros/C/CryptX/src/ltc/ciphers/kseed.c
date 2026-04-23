@@ -334,12 +334,12 @@ int kseed_test(void)
    unsigned char buf[2][16];
    symmetric_key skey;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        kseed_setup(tests[x].key, 16, 0, &skey);
        kseed_ecb_encrypt(tests[x].pt, buf[0], &skey);
        kseed_ecb_decrypt(buf[0], buf[1], &skey);
-       if (compare_testvector(buf[0], 16, tests[x].ct, 16, "KSEED Encrypt", x) ||
-             compare_testvector(buf[1], 16, tests[x].pt, 16, "KSEED Decrypt", x)) {
+       if (ltc_compare_testvector(buf[0], 16, tests[x].ct, 16, "KSEED Encrypt", x) ||
+             ltc_compare_testvector(buf[1], 16, tests[x].pt, 16, "KSEED Decrypt", x)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }

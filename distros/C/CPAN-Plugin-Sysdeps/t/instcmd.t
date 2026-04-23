@@ -92,11 +92,29 @@ if ($^O ne 'MSWin32') {
 	maybe_shift_sudo $cmds[-1];
 	is_deeply $cmds[-1], [qw(dnf install libfoo libbar)];
     }
+
+    {
+	my $p = CPAN::Plugin::Sysdeps->new('apk');
+	my @cmds = $p->_install_packages_commands(qw(libfoo libbar));
+	is scalar(@cmds), 2;
+	is_deeply [ @{$cmds[0]}[0,1] ], [qw(sh -c)];
+	like $cmds[0][-1], qr{Install package.*libfoo libbar};
+	maybe_shift_sudo $cmds[-1];
+	is_deeply $cmds[-1], [qw(apk add libfoo libbar)];
+    }
+
+    {
+	my $p = CPAN::Plugin::Sysdeps->new('batch', 'apk');
+	my @cmds = $p->_install_packages_commands(qw(libfoo libbar));
+	is scalar(@cmds), 1;
+	maybe_shift_sudo $cmds[-1];
+	is_deeply $cmds[-1], [qw(apk add libfoo libbar)];
+    }
 } else {
     {
 	my $p = CPAN::Plugin::Sysdeps->new('chocolatey');
 	my @cmds = $p->_install_packages_commands(qw(libfoo libbar));
 	is scalar(@cmds), 1;
-	like $cmds[-1][0], qr{^powershell .*Start-Process 'chocolatey'.*'install libfoo libbar'};
+	like $cmds[-1][0], qr{^powershell .*Start-Process 'choco'.*'install libfoo libbar'};
     }
 }

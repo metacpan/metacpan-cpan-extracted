@@ -54,7 +54,7 @@ $meta_plugin_inst->layered_stop ;
 # modify model, this modification is not done in layered mode, so it's
 # handled as user modification. Note that X_base_class2 is not a
 # mistake.
-$meta_plugin_root->load('class:MasterModel::X_base_class2 element:X#"X note" help:Cv="Mighty help for Cv"');
+$meta_plugin_root->load('class:MasterModel::X_base_class2 element:X help:Cv="Mighty help for Cv"');
 $meta_plugin_root->load('class:MasterModel element:a_string warn_if_match:meh msg="said meh"');
 
 # write just the user's modification of the model, i.e. the plugin
@@ -81,7 +81,6 @@ return [
   }
 ]
 ;
-
 EOS
 
 $expected_plugin{"MasterModel/X_base_class2"} = << "EOS" ;
@@ -102,17 +101,6 @@ return [
   }
 ]
 ;
-
-=head1 Annotations
-
-=over
-
-=item class:"MasterModel::X_base_class2" element:X
-
-X note
-
-=back
-
 EOS
 
 foreach my $name (keys %expected_plugin) {

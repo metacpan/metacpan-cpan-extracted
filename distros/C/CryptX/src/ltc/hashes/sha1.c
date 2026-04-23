@@ -4,13 +4,21 @@
 
 /**
   @file sha1.c
-  LTC_SHA1 code by Tom St Denis
+  SHA1 code by Tom St Denis
 */
 
 
 #ifdef LTC_SHA1
 
-const struct ltc_hash_descriptor sha1_desc =
+/* While implementing the SMALL STACK option in https://github.com/libtom/libtomcrypt/pull/709
+ * we came to the conclusion that SHA1 profits from the SMALL STACK option when the SMALL CODE
+ * option is enabled, so let's do that.
+ */
+#if defined(LTC_SMALL_STACK) || defined(LTC_SMALL_CODE)
+#define LTC_SMALL_STACK_SHA1
+#endif
+
+const struct ltc_hash_descriptor sha1_portable_desc =
 {
     "sha1",
     2,
@@ -21,10 +29,10 @@ const struct ltc_hash_descriptor sha1_desc =
    { 1, 3, 14, 3, 2, 26,  },
    6,
 
-    &sha1_init,
-    &sha1_process,
-    &sha1_done,
-    &sha1_test,
+    &sha1_c_init,
+    &sha1_c_process,
+    &sha1_c_done,
+    &sha1_c_test,
     NULL
 };
 
@@ -34,12 +42,17 @@ const struct ltc_hash_descriptor sha1_desc =
 #define F3(x,y,z)  (x ^ y ^ z)
 
 #ifdef LTC_CLEAN_STACK
-static int ss_sha1_compress(hash_state *md, const unsigned char *buf)
+static int ss_sha1_c_compress(hash_state *md, const unsigned char *buf)
 #else
-static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
+static int  s_sha1_c_compress(hash_state *md, const unsigned char *buf)
 #endif
 {
-    ulong32 a,b,c,d,e,W[80],i;
+    ulong32 a,b,c,d,e,i;
+#ifdef LTC_SMALL_STACK_SHA1
+    ulong32 W[16];
+#else
+    ulong32 W[80];
+#endif
 #ifdef LTC_SMALL_CODE
     ulong32 t;
 #endif
@@ -56,71 +69,86 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
     d = md->sha1.state[3];
     e = md->sha1.state[4];
 
+#ifdef LTC_SMALL_STACK_SHA1
+    #define Wi(i) do { W[(i) % 16] = ROL(W[((i) - 3) % 16] ^ W[((i) - 8) % 16] ^ W[((i) - 14) % 16] ^ W[((i) - 16) % 16], 1); } while(0)
+    #define Windex(i) ((i) % 16)
+#else
+    #define Wi(i) do { } while(0)
+    #define Windex(i) (i)
     /* expand it */
     for (i = 16; i < 80; i++) {
         W[i] = ROL(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16], 1);
     }
+#endif
 
     /* compress */
     /* round one */
-    #define FF0(a,b,c,d,e,i) e = (ROLc(a, 5) + F0(b,c,d) + e + W[i] + 0x5a827999UL); b = ROLc(b, 30);
-    #define FF1(a,b,c,d,e,i) e = (ROLc(a, 5) + F1(b,c,d) + e + W[i] + 0x6ed9eba1UL); b = ROLc(b, 30);
-    #define FF2(a,b,c,d,e,i) e = (ROLc(a, 5) + F2(b,c,d) + e + W[i] + 0x8f1bbcdcUL); b = ROLc(b, 30);
-    #define FF3(a,b,c,d,e,i) e = (ROLc(a, 5) + F3(b,c,d) + e + W[i] + 0xca62c1d6UL); b = ROLc(b, 30);
+    #define FF0(a,b,c,d,e,i) e = (ROLc(a, 5) + F0(b,c,d) + e + W[Windex(i)] + 0x5a827999UL); b = ROLc(b, 30);
+    #define FF1(a,b,c,d,e,i) e = (ROLc(a, 5) + F1(b,c,d) + e + W[Windex(i)] + 0x6ed9eba1UL); b = ROLc(b, 30);
+    #define FF2(a,b,c,d,e,i) e = (ROLc(a, 5) + F2(b,c,d) + e + W[Windex(i)] + 0x8f1bbcdcUL); b = ROLc(b, 30);
+    #define FF3(a,b,c,d,e,i) e = (ROLc(a, 5) + F3(b,c,d) + e + W[Windex(i)] + 0xca62c1d6UL); b = ROLc(b, 30);
 
 #ifdef LTC_SMALL_CODE
 
-    for (i = 0; i < 20; ) {
+    for (i = 0; i < 16; ) {
        FF0(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+    }
+    for (; i < 20; ) {
+       Wi(i); FF0(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 40; ) {
-       FF1(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF1(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 60; ) {
-       FF2(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF2(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 80; ) {
-       FF3(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF3(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
 #else
 
-    for (i = 0; i < 20; ) {
+    for (i = 0; i < 15; ) {
        FF0(a,b,c,d,e,i++);
        FF0(e,a,b,c,d,i++);
        FF0(d,e,a,b,c,i++);
        FF0(c,d,e,a,b,i++);
        FF0(b,c,d,e,a,i++);
     }
+    FF0(a,b,c,d,e,i++);
+    Wi(i); FF0(e,a,b,c,d,i++);
+    Wi(i); FF0(d,e,a,b,c,i++);
+    Wi(i); FF0(c,d,e,a,b,i++);
+    Wi(i); FF0(b,c,d,e,a,i++);
 
     /* round two */
     for (; i < 40; )  {
-       FF1(a,b,c,d,e,i++);
-       FF1(e,a,b,c,d,i++);
-       FF1(d,e,a,b,c,i++);
-       FF1(c,d,e,a,b,i++);
-       FF1(b,c,d,e,a,i++);
+       Wi(i); FF1(a,b,c,d,e,i++);
+       Wi(i); FF1(e,a,b,c,d,i++);
+       Wi(i); FF1(d,e,a,b,c,i++);
+       Wi(i); FF1(c,d,e,a,b,i++);
+       Wi(i); FF1(b,c,d,e,a,i++);
     }
 
     /* round three */
     for (; i < 60; )  {
-       FF2(a,b,c,d,e,i++);
-       FF2(e,a,b,c,d,i++);
-       FF2(d,e,a,b,c,i++);
-       FF2(c,d,e,a,b,i++);
-       FF2(b,c,d,e,a,i++);
+       Wi(i); FF2(a,b,c,d,e,i++);
+       Wi(i); FF2(e,a,b,c,d,i++);
+       Wi(i); FF2(d,e,a,b,c,i++);
+       Wi(i); FF2(c,d,e,a,b,i++);
+       Wi(i); FF2(b,c,d,e,a,i++);
     }
 
     /* round four */
     for (; i < 80; )  {
-       FF3(a,b,c,d,e,i++);
-       FF3(e,a,b,c,d,i++);
-       FF3(d,e,a,b,c,i++);
-       FF3(c,d,e,a,b,i++);
-       FF3(b,c,d,e,a,i++);
+       Wi(i); FF3(a,b,c,d,e,i++);
+       Wi(i); FF3(e,a,b,c,d,i++);
+       Wi(i); FF3(d,e,a,b,c,i++);
+       Wi(i); FF3(c,d,e,a,b,i++);
+       Wi(i); FF3(b,c,d,e,a,i++);
     }
 #endif
 
@@ -128,6 +156,8 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
     #undef FF1
     #undef FF2
     #undef FF3
+    #undef Wi
+    #undef Windex
 
     /* store */
     md->sha1.state[0] = md->sha1.state[0] + a;
@@ -140,10 +170,10 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
 }
 
 #ifdef LTC_CLEAN_STACK
-static int s_sha1_compress(hash_state *md, const unsigned char *buf)
+static int s_sha1_c_compress(hash_state *md, const unsigned char *buf)
 {
    int err;
-   err = ss_sha1_compress(md, buf);
+   err = ss_sha1_c_compress(md, buf);
    burn_stack(sizeof(ulong32) * 87);
    return err;
 }
@@ -154,9 +184,12 @@ static int s_sha1_compress(hash_state *md, const unsigned char *buf)
    @param md   The hash state you wish to initialize
    @return CRYPT_OK if successful
 */
-int sha1_init(hash_state * md)
+int sha1_c_init(hash_state * md)
 {
    LTC_ARGCHK(md != NULL);
+
+   md->sha1.state = LTC_ALIGN_BUF(md->sha1.state_buf, 16);
+
    md->sha1.state[0] = 0x67452301UL;
    md->sha1.state[1] = 0xefcdab89UL;
    md->sha1.state[2] = 0x98badcfeUL;
@@ -174,7 +207,7 @@ int sha1_init(hash_state * md)
    @param inlen  The length of the data (octets)
    @return CRYPT_OK if successful
 */
-HASH_PROCESS(sha1_process, s_sha1_compress, sha1, 64)
+HASH_PROCESS(sha1_c_process, s_sha1_c_compress, sha1, 64)
 
 /**
    Terminate the hash to get the digest
@@ -182,7 +215,7 @@ HASH_PROCESS(sha1_process, s_sha1_compress, sha1, 64)
    @param out [out] The destination of the hash (20 bytes)
    @return CRYPT_OK if successful
 */
-int sha1_done(hash_state * md, unsigned char *out)
+int sha1_c_done(hash_state * md, unsigned char *out)
 {
     int i;
 
@@ -207,7 +240,7 @@ int sha1_done(hash_state * md, unsigned char *out)
         while (md->sha1.curlen < 64) {
             md->sha1.buf[md->sha1.curlen++] = (unsigned char)0;
         }
-        s_sha1_compress(md, md->sha1.buf);
+        s_sha1_c_compress(md, md->sha1.buf);
         md->sha1.curlen = 0;
     }
 
@@ -218,7 +251,7 @@ int sha1_done(hash_state * md, unsigned char *out)
 
     /* store length */
     STORE64H(md->sha1.length, md->sha1.buf+56);
-    s_sha1_compress(md, md->sha1.buf);
+    s_sha1_c_compress(md, md->sha1.buf);
 
     /* copy output */
     for (i = 0; i < 5; i++) {
@@ -234,41 +267,9 @@ int sha1_done(hash_state * md, unsigned char *out)
   Self-test the hash
   @return CRYPT_OK if successful, CRYPT_NOP if self-tests have been disabled
 */
-int  sha1_test(void)
+int  sha1_c_test(void)
 {
- #ifndef LTC_TEST
-    return CRYPT_NOP;
- #else
-  static const struct {
-      const char *msg;
-      unsigned char hash[20];
-  } tests[] = {
-    { "abc",
-      { 0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a,
-        0xba, 0x3e, 0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c,
-        0x9c, 0xd0, 0xd8, 0x9d }
-    },
-    { "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-      { 0x84, 0x98, 0x3E, 0x44, 0x1C, 0x3B, 0xD2, 0x6E,
-        0xBA, 0xAE, 0x4A, 0xA1, 0xF9, 0x51, 0x29, 0xE5,
-        0xE5, 0x46, 0x70, 0xF1 }
-    }
-  };
-
-  int i;
-  unsigned char tmp[20];
-  hash_state md;
-
-  for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0]));  i++) {
-      sha1_init(&md);
-      sha1_process(&md, (unsigned char*)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
-      sha1_done(&md, tmp);
-      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA1", i)) {
-         return CRYPT_FAIL_TESTVECTOR;
-      }
-  }
-  return CRYPT_OK;
-  #endif
+   return sha1_test_desc(&sha1_portable_desc, "SHA1 portable");
 }
 
 #undef F0

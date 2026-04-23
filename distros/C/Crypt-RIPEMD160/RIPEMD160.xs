@@ -4,10 +4,11 @@ Perl Extension for the RIPEMD160 Message-Digest Algorithm
 This module by Christian H. Geuer <christian.geuer@crypto.gun.de>
 following example of MD5 module and SHA module.
 
-This extension (wrapper code and perl-stuff) may be distributed 
-under the same terms as Perl. 
+This extension (wrapper code and perl-stuff) may be distributed
+under the same terms as Perl.
 */
 
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -23,6 +24,7 @@ rmd160_new(packname = "Crypt::RIPEMD160")
 	char *		packname
     CODE:
 	{
+	    PERL_UNUSED_VAR(packname);
 	    RETVAL = (Crypt__RIPEMD160) safemalloc(sizeof(RIPEMD160_INFO));
 	    RIPEMD160_init(RETVAL);
 	}
@@ -35,7 +37,7 @@ rmd160_DESTROY(ripemd160)
 	Crypt::RIPEMD160	ripemd160
     CODE:
 	{
-	    memset(ripemd160, 0, sizeof(RIPEMD160_INFO));
+	    secure_memzero(ripemd160, sizeof(RIPEMD160_INFO));
 	    safefree((char *) ripemd160);
 	}
 
@@ -43,9 +45,11 @@ rmd160_DESTROY(ripemd160)
 void
 reset(ripemd160)
 	Crypt::RIPEMD160	ripemd160
-    CODE:
+    PPCODE:
 	{
 	    RIPEMD160_init(ripemd160);
+	    /* return self for method chaining */
+	    XSRETURN(1);
 	}
 
 Crypt::RIPEMD160
@@ -63,14 +67,14 @@ rmd160_clone(ripemd160)
 void
 rmd160_add(ripemd160, ...)
 	Crypt::RIPEMD160	ripemd160
-    CODE:
+    PPCODE:
 	{
 	    STRLEN len;
 	    byte *strptr;
 	    int i;
 
 	    for (i = 1; i < items; i++) {
-		strptr = (byte *) (SvPV(ST(i), len));
+		strptr = (byte *) (SvPVbyte(ST(i), len));
 #if PTRSIZE > 4
 		/* STRLEN is 64-bit on 64-bit systems but RIPEMD160_update
 		   takes a 32-bit dword length; chunk to avoid truncation */
@@ -82,6 +86,8 @@ rmd160_add(ripemd160, ...)
 #endif
 		RIPEMD160_update(ripemd160, strptr, (dword)len);
 	    }
+	    /* return self for method chaining */
+	    XSRETURN(1);
 	}
 
 SV *
@@ -101,5 +107,7 @@ rmd160_digest(ripemd160)
 		d_str[4*i+3] = (unsigned char)(ripemd160->MDbuf[i] >> 24 & 0xff);
 	    }
 
-	    ST(0) = sv_2mortal(newSVpv((const char *)d_str, 20));
+	    RETVAL = newSVpvn((const char *)d_str, 20);
 	}
+    OUTPUT:
+	RETVAL

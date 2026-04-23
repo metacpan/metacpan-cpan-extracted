@@ -197,7 +197,7 @@ int xtea_test(void)
    unsigned char tmp[2][8];
    symmetric_key skey;
    int i, err, y;
-   for (i = 0; i < (int)(sizeof(tests)/sizeof(tests[0])); i++) {
+   for (i = 0; i < (int)LTC_ARRAY_SIZE(tests); i++) {
        zeromem(&skey, sizeof(skey));
        if ((err = xtea_setup(tests[i].key, 16, 0, &skey)) != CRYPT_OK)  {
           return err;
@@ -205,8 +205,8 @@ int xtea_test(void)
        xtea_ecb_encrypt(tests[i].pt, tmp[0], &skey);
        xtea_ecb_decrypt(tmp[0], tmp[1], &skey);
 
-       if (compare_testvector(tmp[0], 8, tests[i].ct, 8, "XTEA Encrypt", i) != 0 ||
-             compare_testvector(tmp[1], 8, tests[i].pt, 8, "XTEA Decrypt", i) != 0) {
+       if (ltc_compare_testvector(tmp[0], 8, tests[i].ct, 8, "XTEA Encrypt", i) != 0 ||
+             ltc_compare_testvector(tmp[1], 8, tests[i].pt, 8, "XTEA Decrypt", i) != 0) {
           return CRYPT_FAIL_TESTVECTOR;
        }
 

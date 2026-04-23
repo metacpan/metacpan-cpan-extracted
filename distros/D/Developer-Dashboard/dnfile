@@ -1,0 +1,15 @@
+# Repo bootstrap packages for Fedora hosts.
+ca-certificates
+curl
+expat-devel
+gcc
+gcc-c++
+git
+make
+nodejs
+openssl-devel
+perl
+perl-App-cpanminus
+perl-devel
+pkgconf-pkg-config
+zlib-devel

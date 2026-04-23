@@ -52,6 +52,7 @@ sub wait_for_child_exit {
     package Local::RuntimeRunner;
     sub new { bless { loops => [], started => [], stopped => [] }, shift }
     sub running_loops { @{ $_[0]{loops} } }
+    sub loop_state { return $_[0]{loop_state} }
     sub start_loop {
         my ( $self, $job ) = @_;
         die $self->{fail}{ $job->{name} } if ref( $self->{fail} ) eq 'HASH' && exists $self->{fail}{ $job->{name} };
@@ -1057,6 +1058,93 @@ END {
 }
 
 {
+    $runner->{loops} = [
+        { name => 'running.alpha', pid => 2101 },
+        { name => 'running.beta',  pid => 2102 },
+    ];
+    is_deeply(
+        $manager->stop_progress_tasks,
+        [
+            { id => 'stop_web', label => 'Stop dashboard web service' },
+            { id => 'stop_collector:running.alpha', label => 'Stop collector running.alpha' },
+            { id => 'stop_collector:running.beta',  label => 'Stop collector running.beta' },
+        ],
+        'stop_progress_tasks lists the web stop plus each running collector stop task',
+    );
+    is_deeply(
+        $manager->restart_progress_tasks,
+        [
+            { id => 'stop_web', label => 'Stop dashboard web service' },
+            { id => 'stop_collector:running.alpha', label => 'Stop collector running.alpha' },
+            { id => 'stop_collector:running.beta',  label => 'Stop collector running.beta' },
+            { id => 'start_collector:housekeeper',       label => 'Start collector housekeeper' },
+            { id => 'start_collector:alpha.collector',   label => 'Start collector alpha.collector' },
+            { id => 'start_collector:beta.collector',    label => 'Start collector beta.collector' },
+            { id => 'start_collector:fleet-skill.health', label => 'Start collector fleet-skill.health' },
+            { id => 'start_web', label => 'Start dashboard web service' },
+        ],
+        'restart_progress_tasks includes stop tasks, restart collector tasks, and the final web start task',
+    );
+}
+
+{
+    my @events;
+    $runner->{loops} = [
+        { name => 'running.alpha', pid => 3101 },
+        { name => 'running.beta',  pid => 3102 },
+    ];
+    $manager->stop_collectors(
+        progress => sub {
+            my ($event) = @_;
+            push @events, [ @{$event}{qw(task_id status label)} ];
+        }
+    );
+    is_deeply(
+        \@events,
+        [
+            [ 'stop_collector:running.alpha', 'running', 'Stop collector running.alpha' ],
+            [ 'stop_collector:running.alpha', 'done',    'Stop collector running.alpha' ],
+            [ 'stop_collector:running.beta',  'running', 'Stop collector running.beta' ],
+            [ 'stop_collector:running.beta',  'done',    'Stop collector running.beta' ],
+        ],
+        'stop_collectors emits progress events while stopping each running collector',
+    );
+}
+
+{
+    my @events;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 1 };
+    $runner->{started} = [];
+    $runner->{loops}   = [];
+    my @started = $manager->start_collectors(
+        progress => sub {
+            my ($event) = @_;
+            push @events, [ @{$event}{qw(task_id status label)} ];
+        }
+    );
+    is_deeply(
+        \@events,
+        [
+            [ 'start_collector:housekeeper',       'running', 'Start collector housekeeper' ],
+            [ 'start_collector:housekeeper',       'done',    'Start collector housekeeper' ],
+            [ 'start_collector:alpha.collector',   'running', 'Start collector alpha.collector' ],
+            [ 'start_collector:alpha.collector',   'done',    'Start collector alpha.collector' ],
+            [ 'start_collector:beta.collector',    'running', 'Start collector beta.collector' ],
+            [ 'start_collector:beta.collector',    'done',    'Start collector beta.collector' ],
+            [ 'start_collector:fleet-skill.health', 'running', 'Start collector fleet-skill.health' ],
+            [ 'start_collector:fleet-skill.health', 'done',    'Start collector fleet-skill.health' ],
+        ],
+        'start_collectors emits progress events while starting each configured non-manual collector',
+    );
+    is_deeply(
+        [ map { $_->{name} } @started ],
+        [ 'housekeeper', 'alpha.collector', 'beta.collector', 'fleet-skill.health' ],
+        'start_collectors still returns the started collector metadata while progress is enabled',
+    );
+}
+
+{
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
         return ( "State Recv-Q Send-Q Local Address:Port Peer Address:Port Process\nLISTEN 0 1024 127.0.0.1:7906 0.0.0.0:* users:((\"starman worker \",pid=123,fd=4),(\"starman master \",pid=456,fd=4))\n", '', 0 );
@@ -1140,7 +1228,7 @@ END {
         $manager->_web_runtime_ready( 8807, 7919 ),
         '_web_runtime_ready waits for the managed listener port to appear',
     );
-    cmp_ok( $polls, '>=', 3, '_web_runtime_ready keeps polling until the listener port exists and then proves the runtime stays alive' );
+    is( $polls, 5, '_web_runtime_ready returns after the listener becomes visible plus the short confirmation window instead of burning the whole startup budget' );
 }
 
 {
@@ -1194,7 +1282,7 @@ END {
         $manager->_web_runtime_ready( 8809, 7921 ),
         '_web_runtime_ready falls back to a local TCP probe when listener pid discovery has not populated yet',
     );
-    cmp_ok( $polls, '>=', 2, '_web_runtime_ready keeps polling until the local TCP probe succeeds and the runtime remains stable' );
+    is( $polls, 4, '_web_runtime_ready only keeps the short confirmation window once the local TCP probe succeeds' );
 }
 
 {
@@ -1203,12 +1291,12 @@ END {
     local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
     local *Developer::Dashboard::RuntimeManager::running_web = sub {
         $polls++;
-        return $polls <= 4 ? { pid => 8810, port => 7923 } : undef;
+        return $polls <= 3 ? { pid => 8810, port => 7923 } : undef;
     };
     local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
         my ( undef, $port ) = @_;
         return () if $port != 7923;
-        return $polls >= 2 && $polls <= 4 ? (8810) : ();
+        return $polls >= 2 && $polls <= 3 ? (8810) : ();
     };
     local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub { return 0 };
     ok(
@@ -1402,6 +1490,21 @@ END {
     local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
     local *Local::RuntimeRunner::running_loops = sub {
         $polls++;
+        return ( { name => 'alpha.collector', pid => 7002 } );
+    };
+    ok(
+        $manager->_collector_runtime_ready( 'alpha.collector', 7002 ),
+        '_collector_runtime_ready returns once the managed collector survives the short confirmation window',
+    );
+    is( $polls, 3, '_collector_runtime_ready only spends three ready polls proving a healthy collector loop' );
+}
+
+{
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Local::RuntimeRunner::running_loops = sub {
+        $polls++;
         return $polls <= 2
           ? ( { name => 'alpha.collector', pid => 7001 } )
           : ();
@@ -1410,6 +1513,107 @@ END {
         !$manager->_collector_runtime_ready( 'alpha.collector', 7001 ),
         '_collector_runtime_ready fails when a managed collector loop disappears during the startup stability window',
     );
+}
+
+{
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Local::RuntimeRunner::running_loops = sub {
+        $polls++;
+        return ();
+    };
+    local *Local::RuntimeRunner::loop_state = sub {
+        return {
+            pid    => $$,
+            name   => 'alpha.collector',
+            status => 'starting',
+        };
+    };
+    ok(
+        $manager->_collector_runtime_ready( 'alpha.collector', $$ ),
+        '_collector_runtime_ready falls back to the persisted loop state while the managed process title is not observable yet',
+    );
+    is( $polls, 0, '_collector_runtime_ready trusts the persisted loop-state fallback without consulting running_loops when the pid is already proven alive' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Local::RuntimeRunner::running_loops = sub {
+        die "running_loops should not be consulted while the persisted loop-state fallback already proves the pid is alive\n";
+    };
+    local *Local::RuntimeRunner::loop_state = sub {
+        return {
+            pid    => $$,
+            name   => 'alpha.collector',
+            status => 'starting',
+        };
+    };
+    ok(
+        $manager->_collector_runtime_ready( 'alpha.collector', $$ ),
+        '_collector_runtime_ready trusts the persisted loop-state fallback before the destructive running_loops cleanup path can run',
+    );
+}
+
+{
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_stability_polls = sub { return 1 };
+    local *Local::RuntimeRunner::loop_state = sub { return undef };
+    local *Local::RuntimeRunner::running_loops = sub {
+        $polls++;
+        return ();
+    };
+    ok(
+        !$manager->_collector_runtime_ready( 'alpha.collector', 7999 ),
+        '_collector_runtime_ready returns false after the stability window expires without ever observing a managed collector loop',
+    );
+    is( $polls, 1, '_collector_runtime_ready consults running_loops across the full timeout path before giving up' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS};
+    local $ENV{PERL5OPT};
+    local $ENV{HARNESS_PERL_SWITCHES};
+    is( $manager->_runtime_stability_polls, 100, '_runtime_stability_polls keeps the default poll count when no override or instrumentation is active' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_CONFIRMATION_POLLS};
+    is( $manager->_runtime_confirmation_polls, 3, '_runtime_confirmation_polls keeps the default short confirmation window when no override is active' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_CONFIRMATION_POLLS} = 5;
+    is( $manager->_runtime_confirmation_polls, 5, '_runtime_confirmation_polls accepts an explicit environment override' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_CONFIRMATION_POLLS} = 0;
+    is( $manager->_runtime_confirmation_polls, 3, '_runtime_confirmation_polls ignores invalid environment overrides' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS} = 12;
+    local $ENV{PERL5OPT};
+    local $ENV{HARNESS_PERL_SWITCHES};
+    is( $manager->_runtime_stability_polls, 12, '_runtime_stability_polls accepts an explicit environment override' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS} = 'broken';
+    local $ENV{PERL5OPT};
+    local $ENV{HARNESS_PERL_SWITCHES};
+    is( $manager->_runtime_stability_polls, 100, '_runtime_stability_polls ignores invalid environment overrides' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS};
+    local $ENV{PERL5OPT};
+    local $ENV{HARNESS_PERL_SWITCHES} = '-MDevel::Cover';
+    is( $manager->_runtime_stability_polls, 300, '_runtime_stability_polls widens the startup grace window when coverage instrumentation is active' );
 }
 
 {

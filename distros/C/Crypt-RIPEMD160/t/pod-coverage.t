@@ -12,9 +12,6 @@ plan skip_all => "Test::Pod::Coverage 1.00 required" if $@;
 
 pod_coverage_ok('Crypt::RIPEMD160', { trustme => [qr/^DESTROY$/] });
 
-# MAC.pm documents its methods in the DESCRIPTION prose rather than
-# with =head2 sections; trust all public methods for now.
-pod_coverage_ok('Crypt::RIPEMD160::MAC',
-    { trustme => [qr/^(?:new|reset|add|addfile|mac|hexmac)$/] });
+pod_coverage_ok('Crypt::RIPEMD160::MAC');
 
 done_testing;

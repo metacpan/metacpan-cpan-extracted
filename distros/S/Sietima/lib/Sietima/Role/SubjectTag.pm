@@ -4,7 +4,7 @@ use Sietima::Policy;
 use Types::Standard qw(Str);
 use namespace::clean;
 
-our $VERSION = '1.1.4'; # VERSION
+our $VERSION = '1.1.5'; # VERSION
 # ABSTRACT: add a tag to messages' subjects
 
 
@@ -40,7 +40,7 @@ Sietima::Role::SubjectTag - add a tag to messages' subjects
 
 =head1 VERSION
 
-version 1.1.4
+version 1.1.5
 
 =head1 SYNOPSIS
 

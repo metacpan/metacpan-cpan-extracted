@@ -5,7 +5,7 @@ use App::MARC::Validator::Report;
 use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel catfile);
-use Test::More 'tests' => 13;
+use Test::More 'tests' => 17;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -50,6 +50,57 @@ stdout_is(
 	},
 	$right_ret,
 	'Create report.',
+);
+is($exit_code, 0, 'Exit code (0).');
+
+# Test.
+@ARGV = (
+	$data_dir->file('cnb000126664.json')->s,
+);
+$right_ret = <<'END';
+Plugin 'field_080':
+- Field 080a has missing '['.
+-- cnb000126664: value: '091(437.1)+096(437.1)]:779'
+-- cnb000126664, value: '091:096]:027(437)(084.1)'
+-- cnb000126664, value: '096:091]:027(437)(084.1)'
+-- cnb000126664, value: '091:75.05]:027(437-2 Praha)(048.8:084.1)'
+- Field 080a has missing ']'.
+-- cnb000126664: value: '027(437-2 Praha):[091:75.05(048.8:084.1)'
+-- cnb000126664, value: '027(437):[091:096(084.1)'
+END
+$exit_code = 1;
+stdout_is(
+	sub {
+		$exit_code = App::MARC::Validator::Report->new->run;
+		return;
+	},
+	$right_ret,
+	'Create report (multiple same errors).',
+);
+is($exit_code, 0, 'Exit code (0).');
+
+# Test.
+@ARGV = (
+	'-e',
+	"Field 080a has missing '['.",
+	$data_dir->file('cnb000126664.json')->s,
+);
+$right_ret = <<'END';
+Plugin 'field_080':
+- Field 080a has missing '['.
+-- cnb000126664: value: '091(437.1)+096(437.1)]:779'
+-- cnb000126664, value: '091:096]:027(437)(084.1)'
+-- cnb000126664, value: '096:091]:027(437)(084.1)'
+-- cnb000126664, value: '091:75.05]:027(437-2 Praha)(048.8:084.1)'
+END
+$exit_code = 1;
+stdout_is(
+	sub {
+		$exit_code = App::MARC::Validator::Report->new->run;
+		return;
+	},
+	$right_ret,
+	'Create report (multiple same errors, print only one error).',
 );
 is($exit_code, 0, 'Exit code (0).');
 
@@ -133,7 +184,8 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [-l] [-p plugin] [-v] [--version] report.json
+Usage: $script [-e error] [-h] [-l] [-p plugin] [-v] [--version] report.json
+	-e error	Use error defined by full error string (default is all).
 	-h		Print help.
 	-l		List unique errors.
 	-p		Use plugin (default all).

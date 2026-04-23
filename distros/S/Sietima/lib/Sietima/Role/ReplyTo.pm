@@ -5,7 +5,7 @@ use Types::Standard qw(Bool);
 use List::AllUtils qw(part);
 use namespace::clean;
 
-our $VERSION = '1.1.4'; # VERSION
+our $VERSION = '1.1.5'; # VERSION
 # ABSTRACT: munge the C<Reply-To> header
 
 
@@ -76,7 +76,7 @@ Sietima::Role::ReplyTo - munge the C<Reply-To> header
 
 =head1 VERSION
 
-version 1.1.4
+version 1.1.5
 
 =head1 SYNOPSIS
 

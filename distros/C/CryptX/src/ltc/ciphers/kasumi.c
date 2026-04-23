@@ -286,7 +286,7 @@ int kasumi_test(void)
    symmetric_key key;
    int err, x;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        if ((err = kasumi_setup(tests[x].key, 16, 0, &key)) != CRYPT_OK) {
           return err;
        }
@@ -296,8 +296,8 @@ int kasumi_test(void)
        if ((err = kasumi_ecb_decrypt(tests[x].ct, buf[1], &key)) != CRYPT_OK) {
           return err;
        }
-       if (compare_testvector(buf[1], 8, tests[x].pt, 8, "Kasumi Decrypt", x) ||
-             compare_testvector(buf[0], 8, tests[x].ct, 8, "Kasumi Encrypt", x)) {
+       if (ltc_compare_testvector(buf[1], 8, tests[x].pt, 8, "Kasumi Decrypt", x) ||
+             ltc_compare_testvector(buf[0], 8, tests[x].ct, 8, "Kasumi Encrypt", x)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }

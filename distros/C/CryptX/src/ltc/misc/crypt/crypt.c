@@ -157,6 +157,12 @@ const char *crypt_build_settings =
 #if defined(LTC_SHA3)
    "   SHA3\n"
 #endif
+#if defined(LTC_TURBO_SHAKE)
+   "   TurboSHAKE\n"
+#endif
+#if defined(LTC_KANGAROO_TWELVE)
+   "   KangarooTwelve\n"
+#endif
 #if defined(LTC_KECCAK)
    "   KECCAK\n"
 #endif
@@ -445,9 +451,15 @@ const char *crypt_build_settings =
 #if defined(LTC_BASE16)
     " BASE16 "
 #endif
+#if defined(LTC_ARGON2)
+    " ARGON2 "
+#endif
 #if defined(LTC_BCRYPT)
     " BCRYPT "
     " " NAME_VALUE(LTC_BCRYPT_DEFAULT_ROUNDS) " "
+#endif
+#if defined(LTC_SCRYPT)
+    " SCRYPT "
 #endif
 #if defined(LTC_CRC32)
     " CRC32 "
@@ -455,6 +467,7 @@ const char *crypt_build_settings =
 #if defined(LTC_DER)
     " DER "
     " " NAME_VALUE(LTC_DER_MAX_RECURSION) " "
+    " " NAME_VALUE(LTC_DER_OID_DEFAULT_NODES) " "
 #endif
 #if defined(LTC_PKCS_1)
     " PKCS#1 "
@@ -489,6 +502,15 @@ const char *crypt_build_settings =
 #if defined(LTC_PEM_SSH)
     " OpenSSH-PEM "
 #endif
+#if defined(LTC_SHA1_X86)
+   " SHA1-NI "
+#endif
+#if defined(LTC_SHA224_X86)
+   " SHA224-NI "
+#endif
+#if defined(LTC_SHA256_X86)
+   " SHA256-NI "
+#endif
 #if defined(LTC_DEVRANDOM)
     " LTC_DEVRANDOM "
 #endif
@@ -522,6 +544,9 @@ const char *crypt_build_settings =
 #if defined(LTC_SMALL_CODE)
     " LTC_SMALL_CODE "
 #endif
+#if defined(LTC_SMALL_STACK)
+    " LTC_SMALL_STACK "
+#endif
 #if defined(LTC_NO_FILE)
     " LTC_NO_FILE "
 #endif
@@ -548,6 +573,15 @@ const char *crypt_build_settings =
     " LTC_NO_ROLC "
 #endif
 #endif
+#if defined(LTC_HAVE_ROTATE_BUILTIN)
+    " LTC_HAVE_ROTATE_BUILTIN "
+#endif
+#if defined(LTC_HAVE_CLZL_BUILTIN)
+    " LTC_HAVE_CLZL_BUILTIN "
+#endif
+#if defined(LTC_HAVE_CTZL_BUILTIN)
+    " LTC_HAVE_CTZL_BUILTIN "
+#endif
 #if defined(LTC_NO_TEST)
     " LTC_NO_TEST "
 #endif
@@ -571,6 +605,9 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_CLOCK_GETTIME)
     " LTC_CLOCK_GETTIME "
+#endif
+#if defined(LTC_NO_DEPRECATED_APIS)
+    " LTC_NO_DEPRECATED_APIS "
 #endif
     "\n"
     ;

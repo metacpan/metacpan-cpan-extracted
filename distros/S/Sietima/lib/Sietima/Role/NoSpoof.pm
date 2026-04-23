@@ -4,7 +4,7 @@ use Sietima::Policy;
 use Email::Address;
 use namespace::clean;
 
-our $VERSION = '1.1.4'; # VERSION
+our $VERSION = '1.1.5'; # VERSION
 # ABSTRACT: never sends out messages from subscribers' addresses
 
 
@@ -39,7 +39,7 @@ Sietima::Role::NoSpoof - never sends out messages from subscribers' addresses
 
 =head1 VERSION
 
-version 1.1.4
+version 1.1.5
 
 =head1 SYNOPSIS
 

@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Math::BigInt" : "0",
+            "Time::HiRes" : "0",
             "perl" : "5.006"
          }
       },
@@ -51,6 +52,6 @@
          "url" : "https://github.com/DCIT/perl-CryptX"
       }
    },
-   "version" : "0.087",
+   "version" : "0.088",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

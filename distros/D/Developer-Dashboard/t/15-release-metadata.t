@@ -16,6 +16,7 @@ my $plain_readme = _slurp_optional( _repo_path('README') );
 my $skill_guide = _slurp_optional( _repo_path('SKILL.md') );
 my $release_doc = _slurp_optional( _repo_path( 'doc', 'update-and-release.md' ) );
 my $housekeeper_rotation_doc = _slurp_optional( _repo_path( 'doc', 'housekeeper-rotation.md' ) );
+my $install_bootstrap_doc = _slurp_optional( _repo_path( 'doc', 'install-bootstrap.md' ) );
 my $layered_env_doc = _slurp_optional( _repo_path( 'doc', 'layered-env-loading.md' ) );
 my $changes = _slurp( _repo_path('Changes') );
 my $dist = _slurp_optional( _repo_path('dist.ini') );
@@ -40,6 +41,7 @@ my @doc_paths = grep { -e $_ } (
     _repo_path( 'doc', 'command-suggestions.md' ),
     _repo_path( 'doc', 'docker-service-toggle.md' ),
     _repo_path( 'doc', 'housekeeper-rotation.md' ),
+    _repo_path( 'doc', 'install-bootstrap.md' ),
     _repo_path( 'doc', 'layered-env-loading.md' ),
     _repo_path( 'doc', 'path-inventory-api.md' ),
     _repo_path( 'doc', 'shell-bootstrap.md' ),
@@ -68,7 +70,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '2.76', 'repo version bumped for the skill dependency policy unification fix' );
+is( $version, '3.04', 'repo version bumped for quiet streamed installer shell handoff fixes' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
     like( $dist, qr/^version = \Q$version\E$/m, 'dist.ini version matches the module version in the source tree' );
@@ -127,6 +129,7 @@ for my $module (
 }
 
 unlike( $makefile, qr/bin\/pjq|bin\/pyq|bin\/ptomq|bin\/pjp|bin\/jq|bin\/yq|bin\/tomq|bin\/propq|bin\/iniq|bin\/csvq|bin\/xmlq|bin\/of|bin\/open-file/, 'Makefile.PL does not install generic helper commands into the global PATH' );
+unlike( $makefile, qr/install\.sh/, 'Makefile.PL does not install install.sh into the CPAN script namespace' );
 unlike( $makefile, qr/["']HTTP::Daemon["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Daemon metadata' );
 unlike( $makefile, qr/["']HTTP::Status["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Status metadata' );
 for my $module (
@@ -162,6 +165,10 @@ for my $module (
 for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills which)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
+ok( -f _repo_path('install.sh'), 'repo-root install.sh is tracked for bootstrap installs' );
+ok( -f _repo_path('aptfile'), 'repo-root aptfile is tracked for bootstrap installs' );
+ok( -f _repo_path('apkfile'), 'repo-root apkfile is tracked for bootstrap installs' );
+ok( -f _repo_path('brewfile'), 'repo-root brewfile is tracked for bootstrap installs' );
 
 my @release_tarballs = sort glob _repo_path('Developer-Dashboard-*.tar.gz');
 if (@release_tarballs) {
@@ -172,7 +179,12 @@ if (@release_tarballs) {
     like( $files[0], qr{^Developer-Dashboard-\Q$version\E(?:/|\z)}, 'latest release tarball root matches the repo version' );
     my %files = map { $_ => 1 } @files;
     for my $required (
+        "Developer-Dashboard-$version/install.sh",
+        "Developer-Dashboard-$version/aptfile",
+        "Developer-Dashboard-$version/apkfile",
+        "Developer-Dashboard-$version/brewfile",
         "Developer-Dashboard-$version/doc/integration-test-plan.md",
+        "Developer-Dashboard-$version/doc/install-bootstrap.md",
         "Developer-Dashboard-$version/doc/testing.md",
         "Developer-Dashboard-$version/doc/windows-testing.md",
         "Developer-Dashboard-$version/integration/blank-env/run-integration.pl",
@@ -334,6 +346,10 @@ for my $path (@pod_paths) {
 }
 
 for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
+    like( $doc, qr/install\.sh/, 'README documents the repo bootstrap installer' );
+    like( $doc, qr/cpanm --notest Developer::Dashboard/, 'README documents the repo bootstrap installer cpanm contract' );
+    like( $doc, qr/aptfile.*apkfile.*brewfile|aptfile.*brewfile.*apkfile|apkfile.*aptfile.*brewfile|apkfile.*brewfile.*aptfile|brewfile.*aptfile.*apkfile|brewfile.*apkfile.*aptfile/is, 'README documents the repo bootstrap package manifests' );
+    like( $doc, qr/checkout-only.*install\.sh|install\.sh.*checkout-only/is, 'README documents install.sh as a checkout-only bootstrap script instead of an installed CPAN command' );
     like( $doc, qr/dashboard skills install/, 'README documents skill installation' );
     like( $doc, qr/dashboard skills install \/absolute\/path\/to\/example-skill/, 'README documents direct local skill installation' );
     like( $doc, qr/dashboard skills uninstall/, 'README documents skill uninstallation' );
@@ -360,6 +376,9 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
 like( $release_doc, qr/dzil build/, 'release doc still documents the dzil build step' ) if $release_doc ne '';
 like( $release_doc, qr/exactly one unpacked\s+`Developer-Dashboard-X\.XX\/`\s+build directory and exactly one matching\s+`Developer-Dashboard-X\.XX\.tar\.gz`\s+tarball/s, 'release doc describes the enforced single-build-dir and single-tarball invariant' ) if $release_doc ne '';
 like( $release_doc, qr/cpanm .*Developer-Dashboard-1\.\d+\.tar\.gz/, 'release doc still documents tarball installation verification' ) if $release_doc ne '';
+like( $install_bootstrap_doc, qr/install\.sh/, 'bootstrap install doc names the repo installer entrypoint' ) if $install_bootstrap_doc ne '';
+like( $install_bootstrap_doc, qr/cpanm --notest Developer::Dashboard/, 'bootstrap install doc explains the user-space cpanm install contract' ) if $install_bootstrap_doc ne '';
+like( $install_bootstrap_doc, qr/aptfile.*apkfile.*brewfile|aptfile.*brewfile.*apkfile|apkfile.*aptfile.*brewfile|apkfile.*brewfile.*aptfile|brewfile.*aptfile.*apkfile|brewfile.*apkfile.*aptfile/is, 'bootstrap install doc explains all bootstrap package manifests' ) if $install_bootstrap_doc ne '';
 like( $agents_override, qr/DD-OOP-LAYERS/, 'AGENTS.override.md documents the layered runtime contract' ) if $agents_override ne '';
 like( $agents_override, qr/FULL-POD-DOC/, 'AGENTS.override.md documents the FULL-POD-DOC rule' ) if $agents_override ne '';
 unlike( $readme, qr/FULL-POD-DOC/, 'README no longer embeds the contributor-only FULL-POD-DOC contract in the product manual' ) if $readme ne '';

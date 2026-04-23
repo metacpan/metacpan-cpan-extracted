@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.028;
+package Config::Model::Itself 2.029;
 
 use Mouse ;
 use Config::Model 2.157;
@@ -300,8 +300,6 @@ sub read_all ($self, %args) {
         check => $force_load ? 'no' : 'yes'
     ) ;
 
-    $self->read_model_annotations( $dir, $root_obj, \@files);
-
     return $self->{map} = \%class_file_map ;
 }
 
@@ -382,33 +380,6 @@ sub normalize_model {
         }
     }
     return $new_model ;
-}
-
-sub read_model_annotations {
-    my ($self, $dir, $root_obj, $files) = @_;
-
-    # load annotations and comment header
-    for my $file (@$files) {
-        $logger->info("loading annotations from file $file");
-        my $fh = IO::File->new($file) || die "Can't open $file: $!" ;
-        my @lines = $fh->getlines ;
-        $fh->close;
-        $root_obj->load_pod_annotation(join('',@lines)) ;
-
-        my @headers ;
-        foreach my $l (@lines) {
-            if ($l =~ /^\s*#/ or $l =~ /^\s*$/){
-                push @headers, $l
-            }
-            else {
-                last;
-            }
-        }
-        my $rel_file = $file ;
-        $rel_file =~ s/^$dir\/?//;
-        $self->{header}{$rel_file} = \@headers;
-    }
-    return;
 }
 
 # can be removed end of 2019 (after buster is released)
@@ -540,9 +511,9 @@ sub write_all ($self, %args) {
     my %map_to_write = (%$map,%new_map) ;
 
     foreach my $file (keys %map_to_write) {
-        my ($data,$notes) = $self->check_model_to_write($file, \%map_to_write, \%loaded_classes);
+        my $data = $self->check_model_to_write($file, \%map_to_write, \%loaded_classes);
         next unless @$data ; # don't write empty model
-        write_model_file ($dir->child($file), $self->{header}{$file}, $notes, $data);
+        write_model_file ($dir->child($file), $self->{header}{$file}, $data);
         delete $map_to_write{$file};
     }
 
@@ -560,7 +531,6 @@ sub check_model_to_write {
     $logger->info("checking model file $file");
 
     my @data ;
-    my @notes ;
     my $file_needs_write = 0;
 
     # check if any a class of a file was modified
@@ -576,13 +546,12 @@ sub check_model_to_write {
             push @data, $model if defined $model and keys %$model;
 
             my $node = $self->{meta_root}->grab("class:".$class_name) ;
-            push @notes, $node->dump_annotations_as_pod ;
             # remove class name from above list
             delete $loaded_classes->{$class_name} ;
         }
     }
 
-    return (\@data, \@notes);
+    return \@data;
 }
 
 sub write_model_plugin ($self, %args) {
@@ -598,13 +567,11 @@ sub write_model_plugin ($self, %args) {
     my @raw_data = @{$model->{class} || []} ;
     while (@raw_data) {
         my ( $class , $data ) = splice @raw_data,0,2 ;
-        $data ->{name} = $class ;
+        $data->{name} = $class ;
 
-        # does not distinguish between notes from underlying model or snipper notes ...
-        my @notes = $self->meta_root->grab("class:$class")->dump_annotations_as_pod ;
         my $plugin_file = $class.'.pl';
         $plugin_file =~ s!::!/!g;
-        write_model_file ($plugin_dir->child($plugin_name)->child($plugin_file), [], \@notes, [ $data ]);
+        write_model_file ($plugin_dir->child($plugin_name)->child($plugin_file), [], [ $data ]);
     }
 
     $self->meta_instance->clear_changes ;
@@ -660,16 +627,12 @@ sub read_plugin_file {
         $class_element->fetch_with_id($class_name)->load_data( $model ) ;
     }
 
-    # load annotations
-    $logger->info("loading annotations from plugin file $load_file");
-    $self->meta_root->load_pod_annotation($load_file->slurp_utf8) ;
     return;
 }
 
 sub write_model_file {
     my $wr_file  = shift; # Path::Tiny object
     my $comments = shift ;
-    my $notes    = shift;
     my $data     = shift;
 
     $wr_file->parent->mkdir();
@@ -683,12 +646,14 @@ sub write_model_file {
 
     my $dump = $dumper->Dump;
 
-    # munge pod text embedded in values to avoid spurious pod formatting
+    # split pod strings to break text that could be confused as pod markup
     $dump =~ s/\n=/\n'.'=/g;
 
     $wr_file->spew_utf8(
         @$comments,
-        join("\n", "use strict;","use warnings;","", "return $dump;", "", @$notes)
+        "use strict;\n",
+        "use warnings;\n\n",
+        "return $dump;\n",
     );
 
     return;
@@ -845,7 +810,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.028
+version 2.029
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@
 #
 # ABSTRACT: Work on the configuration model of an application
 
-package App::Cme::Command::meta 2.028;
+package App::Cme::Command::meta 2.029;
 
 use strict ;
 use warnings ;
@@ -422,7 +422,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.028
+version 2.029
 
 =head1 SYNOPSIS
 

@@ -20,9 +20,10 @@ no_index:
     - inc
 requires:
   Math::BigInt: '0'
+  Time::HiRes: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/DCIT/perl-CryptX/issues
   repository: https://github.com/DCIT/perl-CryptX
-version: '0.087'
+version: '0.088'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

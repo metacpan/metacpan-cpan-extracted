@@ -26,6 +26,7 @@ t/App-MARC-Validator-Report/03-new.t
 t/App-MARC-Validator-Report/04-run.t
 t/data/bad_report1.json
 t/data/bad_report2.json
+t/data/cnb000126664.json
 t/data/report1.json
 xt/App-MARC-Validator-Report/01-pod_coverage.t
 xt/App-MARC-Validator-Report/02-pod.t

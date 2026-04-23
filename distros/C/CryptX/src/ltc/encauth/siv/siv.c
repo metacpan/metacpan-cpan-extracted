@@ -608,7 +608,7 @@ int siv_test(void)
 
    cipher = find_cipher("aes");
 
-   for (n = 0; n < sizeof(siv_tests)/sizeof(siv_tests[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(siv_tests); ++n) {
       buflen = sizeof(buf);
       if ((err = siv_encrypt_memory(cipher,
                              siv_tests[n].Key, siv_tests[n].Keylen,
@@ -617,7 +617,7 @@ int siv_test(void)
                              buf, &buflen)) != CRYPT_OK) {
          return err;
       }
-      if (compare_testvector(buf, buflen, siv_tests[n].output, siv_tests[n].outputlen, siv_tests[n].name, n) != 0) {
+      if (ltc_compare_testvector(buf, buflen, siv_tests[n].output, siv_tests[n].outputlen, siv_tests[n].name, n) != 0) {
          return CRYPT_FAIL_TESTVECTOR;
       }
       buflen = sizeof(buf);
@@ -628,7 +628,7 @@ int siv_test(void)
                              buf, &buflen)) != CRYPT_OK) {
          return err;
       }
-      if (compare_testvector(buf, buflen, siv_tests[n].Plaintext, siv_tests[n].Plaintextlen, siv_tests[n].name, n + 0x1000) != 0) {
+      if (ltc_compare_testvector(buf, buflen, siv_tests[n].Plaintext, siv_tests[n].Plaintextlen, siv_tests[n].name, n + 0x1000) != 0) {
          return CRYPT_FAIL_TESTVECTOR;
       }
    }
@@ -643,7 +643,7 @@ int siv_test(void)
                          NULL)) != CRYPT_OK) {
       return err;
    }
-   if (compare_testvector(buf, buflen, siv_tests[0].output, siv_tests[0].outputlen, siv_tests[0].name, n) != 0) {
+   if (ltc_compare_testvector(buf, buflen, siv_tests[0].output, siv_tests[0].outputlen, siv_tests[0].name, n) != 0) {
       return CRYPT_FAIL_TESTVECTOR;
    }
    /* Testcase 0x1002 */
@@ -656,7 +656,7 @@ int siv_test(void)
                          NULL)) != CRYPT_OK) {
       return err;
    }
-   if (compare_testvector(buf, buflen, siv_tests[0].Plaintext, siv_tests[0].Plaintextlen, siv_tests[0].name, n + 0x1000) != 0) {
+   if (ltc_compare_testvector(buf, buflen, siv_tests[0].Plaintext, siv_tests[0].Plaintextlen, siv_tests[0].name, n + 0x1000) != 0) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -674,7 +674,7 @@ int siv_test(void)
                          NULL)) != CRYPT_OK) {
       return err;
    }
-   if (compare_testvector(buf, buflen, siv_tests[1].output, siv_tests[1].outputlen, siv_tests[1].name, n) != 0) {
+   if (ltc_compare_testvector(buf, buflen, siv_tests[1].output, siv_tests[1].outputlen, siv_tests[1].name, n) != 0) {
       return CRYPT_FAIL_TESTVECTOR;
    }
    /* Testcase 0x1003 */
@@ -689,7 +689,7 @@ int siv_test(void)
                          NULL)) != CRYPT_OK) {
       return err;
    }
-   if (compare_testvector(buf, buflen, siv_tests[1].Plaintext, siv_tests[1].Plaintextlen, siv_tests[1].name, n + 0x1000) != 0) {
+   if (ltc_compare_testvector(buf, buflen, siv_tests[1].Plaintext, siv_tests[1].Plaintextlen, siv_tests[1].name, n + 0x1000) != 0) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -714,7 +714,7 @@ int siv_test(void)
       }
       tmplen = buflen;
    }
-   if (compare_testvector(&buflen, sizeof(buflen), &tmpmax, sizeof(tmpmax), "Multiple encrypt length", -(int)niter)) {
+   if (ltc_compare_testvector(&buflen, sizeof(buflen), &tmpmax, sizeof(tmpmax), "Multiple encrypt length", -(int)niter)) {
       err = CRYPT_FAIL_TESTVECTOR;
       goto out;
    }
@@ -730,7 +730,7 @@ int siv_test(void)
       }
       tmplen = buflen;
    }
-   if (compare_testvector(tmpd, tmplen, tmpe, tmplen, "Multi decrypt", niter + 0x2000)) {
+   if (ltc_compare_testvector(tmpd, tmplen, tmpe, tmplen, "Multi decrypt", niter + 0x2000)) {
       err = CRYPT_FAIL_TESTVECTOR;
    }
 

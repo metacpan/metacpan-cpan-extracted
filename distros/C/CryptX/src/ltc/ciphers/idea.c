@@ -226,20 +226,20 @@ int idea_test(void)
       return CRYPT_FAIL_TESTVECTOR;
    }
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
       if ((err = idea_setup(tests[x].key, 16, 8, &key)) != CRYPT_OK) {
          return err;
       }
       if ((err = idea_ecb_encrypt(tests[x].pt, buf[0], &key)) != CRYPT_OK) {
          return err;
       }
-      if (compare_testvector(buf[0], 8, tests[x].ct, 8, "IDEA Encrypt", x)) {
+      if (ltc_compare_testvector(buf[0], 8, tests[x].ct, 8, "IDEA Encrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
       if ((err = idea_ecb_decrypt(tests[x].ct, buf[1], &key)) != CRYPT_OK) {
          return err;
       }
-      if (compare_testvector(buf[1], 8, tests[x].pt, 8, "IDEA Decrypt", x)) {
+      if (ltc_compare_testvector(buf[1], 8, tests[x].pt, 8, "IDEA Decrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
    }

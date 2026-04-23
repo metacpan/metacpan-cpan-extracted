@@ -45,11 +45,11 @@
    "provides" : {
       "Crypt::RIPEMD160" : {
          "file" : "lib/Crypt/RIPEMD160.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Crypt::RIPEMD160::MAC" : {
          "file" : "lib/Crypt/RIPEMD160/MAC.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/cpan-authors/Crypt-RIPEMD160"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -56,7 +56,7 @@ name: Data-Dumper-Interp
 provides:
   Data::Dumper::Interp:
     file: lib/Data/Dumper/Interp.pm
-    version: '7.023'
+    version: '8.000'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -85,7 +85,7 @@ resources:
   bugtracker: https://github.com/jimav/Data-Dumper-Interp/issues
   homepage: https://github.com/jimav/Data-Dumper-Interp
   repository: https://github.com/jimav/Data-Dumper-Interp.git
-version: '7.023'
+version: '8.000'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: CC0-1.0

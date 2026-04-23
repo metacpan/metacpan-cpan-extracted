@@ -1,3 +1,16 @@
+2.029 2026-04-22
+
+  Feature:
+    * Itself: drop model annotations (which were also dropped a
+      bit too hastily from Config::Model 2.161)
+
+  Bug fix:
+    * Build.PL: fix regeneration of model pod files
+
+  Misc:
+    * dist.ini: add dzil clean instructions
+    * Build.PL: removed comments and copyright notice
+
 2.028 2026-03-17
 
   Bug fix:

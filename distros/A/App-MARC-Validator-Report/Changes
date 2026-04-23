@@ -1,3 +1,9 @@
+0.04 2026-04-23T07:03:52+02:00
+ - Add missing -e option to tool help.
+ - Add test for -e option.
+ - Fix report for plugin->record->multiple_errors.
+ - Update copyright years.
+
 0.03 2025-11-14T17:22:34+01:00
  - Add link to marc-validator tool.
  - Add test for exit code in -l processing.

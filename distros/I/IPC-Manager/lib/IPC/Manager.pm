@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000029';
+our $VERSION = '0.000030';
 
 use Carp qw/croak/;
 

@@ -22,6 +22,7 @@ recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Cpanel::JSON::XS' => 0;
 requires 'Getopt::Std' => 0;
+requires 'List::Util' => 1.33;
 requires 'Perl6::Slurp' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-MARC-Validator-Report/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-MARC-Validator-Report';
@@ -34,7 +35,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

@@ -35,10 +35,10 @@ my $rw_obj = Config::Model::Itself -> new(
 my @list = (1..3);
 foreach my $i (@list) {
     $meta_root->load(
-    qq/class:Master::Created$i#"my great class $i"
+    qq/class:Master::Created$i
         class_description="Master class created nb $i\nfor tests purpose." 
         author="dod\@foo.com" copyright="2011 dod" license="LGPL"
-       element:created1 type=leaf#"not autumn" value_type=number description="element 1" - 
+       element:created1 type=leaf value_type=number description="element 1" -
     element:created2 type=leaf value_type=uniline description="another element"/) ;
 }
 ok(1,"added new class Master::Created") ;

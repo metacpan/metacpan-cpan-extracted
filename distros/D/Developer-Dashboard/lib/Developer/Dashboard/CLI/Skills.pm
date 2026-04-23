@@ -3,10 +3,12 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '2.76';
+our $VERSION = '3.04';
 
 use Getopt::Long qw(GetOptionsFromArray);
+use Cwd qw(getcwd);
 use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::CLI::Progress;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SkillManager;
 
@@ -24,39 +26,65 @@ sub run_skills_command {
 
     my @argv = @{$argv};
     my $action = shift @argv || '';
-    my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
 
     if ( $action eq 'install' ) {
-        my $source = shift @argv || die "Usage: dashboard skills install <git-url-or-local-dir>\n";
-        my $result = $manager->install($source);
+        my $use_ddfile = 0;
+        GetOptionsFromArray( \@argv, 'ddfile' => \$use_ddfile );
+        return _usage_error("Usage: dashboard skills install <git-url-or-local-dir>\nUsage: dashboard skills install --ddfile\n")
+          if ( $use_ddfile && @argv ) || ( !$use_ddfile && !@argv );
+        my $progress = $use_ddfile ? undef : _skills_install_progress();
+        my $manager = Developer::Dashboard::SkillManager->new(
+            paths    => _build_paths(),
+            progress => $progress ? $progress->callback : undef,
+        );
+        my $result;
+        my $error;
+        eval {
+            $result = $use_ddfile
+              ? $manager->install_from_ddfiles( getcwd() )
+              : $manager->install( shift @argv );
+            1;
+        } or do {
+            $error = $@ || "dashboard skills install failed\n";
+        };
+        if ($error) {
+            $progress->finish if $progress;
+            die $error;
+        }
+        $progress->finish if $progress;
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'uninstall' ) {
+        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills uninstall <repo-name>\n";
         my $result = $manager->uninstall($repo_name);
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'update' ) {
+        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills update <repo-name>\n";
         my $result = $manager->update($repo_name);
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'enable' ) {
+        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills enable <repo-name>\n";
         my $result = $manager->enable($repo_name);
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'disable' ) {
+        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills disable <repo-name>\n";
         my $result = $manager->disable($repo_name);
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'list' ) {
+        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         my $skills = $manager->list();
@@ -71,6 +99,7 @@ sub run_skills_command {
         die "Usage: dashboard skills list [-o json|table]\n";
     }
     if ( $action eq 'usage' ) {
+        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $output = 'json';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         my $repo_name = shift @argv || die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
@@ -91,17 +120,26 @@ sub run_skills_command {
         my $skill_name = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
         my $skill_cmd  = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
         my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
-        my $result = $dispatcher->dispatch( $skill_name, $skill_cmd, @argv );
+        my $result = $dispatcher->exec_command( $skill_name, $skill_cmd, @argv );
         if ( $result->{error} ) {
             print STDERR $result->{error}, "\n";
             return 1;
         }
-        print $result->{stdout} if $result->{stdout};
-        print STDERR $result->{stderr} if $result->{stderr};
-        return $result->{exit_code} || 0;
+        return 0;
     }
 
     die "Unknown skills action: $action\nUsage: dashboard skills [install|uninstall|update|enable|disable|list|usage]\n";
+}
+
+# _usage_error($message)
+# Prints one usage error to STDERR and returns the standard command-line
+# argument failure exit code.
+# Input: one usage text string.
+# Output: numeric exit code 2.
+sub _usage_error {
+    my ($message) = @_;
+    print STDERR $message;
+    return 2;
 }
 
 # _build_paths()
@@ -114,6 +152,22 @@ sub _build_paths {
         home            => $home,
         workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
         project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+    );
+}
+
+# _skills_install_progress()
+# Builds the optional task board used by dashboard skills install.
+# Input: none.
+# Output: Developer::Dashboard::CLI::Progress object or undef when progress is disabled.
+sub _skills_install_progress {
+    my $enabled = $ENV{DEVELOPER_DASHBOARD_PROGRESS} ? 1 : 0;
+    return if !$enabled && !-t STDERR;
+    return Developer::Dashboard::CLI::Progress->new(
+        title   => 'dashboard skills install progress',
+        tasks   => Developer::Dashboard::SkillManager->install_progress_tasks,
+        stream  => \*STDERR,
+        dynamic => ( -t STDERR ? 1 : 0 ),
+        color   => ( -t STDERR ? 1 : 0 ),
     );
 }
 
@@ -309,6 +363,8 @@ It is used by the staged C<skills> private helper, by dotted skill command dispa
 
   dashboard skills list
   dashboard skills list -o table
+  dashboard skills install /absolute/path/to/example-skill
+  dashboard skills install --ddfile
   dashboard skills usage example-skill
   dashboard skills usage example-skill -o table
   dashboard skills disable example-skill

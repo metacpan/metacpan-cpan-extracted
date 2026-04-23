@@ -5,7 +5,7 @@ use Email::Address;
 use Mail::DMARC::PurePerl;
 use namespace::clean;
 
-our $VERSION = '1.1.4'; # VERSION
+our $VERSION = '1.1.5'; # VERSION
 # ABSTRACT: send out messages from subscribers' addresses only if DMARC allows it
 
 
@@ -70,7 +70,7 @@ Sietima::Role::NoSpoof::DMARC - send out messages from subscribers' addresses on
 
 =head1 VERSION
 
-version 1.1.4
+version 1.1.5
 
 =head1 SYNOPSIS
 

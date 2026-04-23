@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::Key;
-$Bitcoin::Crypto::Role::Key::VERSION = '4.004';
+$Bitcoin::Crypto::Role::Key::VERSION = '4.005';
 use v5.14;
 use warnings;
 

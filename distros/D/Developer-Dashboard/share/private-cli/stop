@@ -33,7 +33,7 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard stop>, which stops the managed web listener and coordinated collectors for the current runtime.
+This staged helper exposes C<dashboard stop>, which stops the managed web listener and coordinated collectors for the current runtime while showing a visible terminal task board during interactive runs.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing stop CLI behavior or the handoff into the runtime li
 
 =head1 HOW TO USE
 
-Users run C<dashboard stop>. The staged helper forwards the request into the private runtime, which stops the web process and the collectors associated with the active runtime.
+Users run C<dashboard stop>. The staged helper forwards the request into the private runtime, which prints the full stop task list on C<stderr> for interactive terminals, stops the web process and the collectors associated with the active runtime, and leaves the final JSON payload on C<stdout>.
 
 =head1 WHAT USES IT
 

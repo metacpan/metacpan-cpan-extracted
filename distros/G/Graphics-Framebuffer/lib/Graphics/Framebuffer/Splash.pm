@@ -14,7 +14,7 @@ use List::Util qw(min max); # Helpful for returning the minimum or maximum value
 BEGIN {
     require Exporter;
     our @ISA       = qw( Exporter );
-    our $VERSION   = '1.27';
+    our $VERSION   = '1.28';
     our @EXPORT    = qw( _perl_logo _coin splash );
     our @EXPORT_OK = qw();
 } ## end BEGIN
@@ -398,25 +398,6 @@ sub _coin {
     my $Y  = $self->{'V_OFFSET'};
     my ($R, $G, $B);
 
-    ### Draws the Circle with GFB in it ###
-    # The dark shadow circle
-    $self->set_color(
-		{
-			'red'   => 32,
-			'green' => 0,
-			'blue'  => 0,
-			'alpha' => ($self->{'GPU'} !~ /nouveaufb/) ? 200 : 255,
-		}
-	);
-    $self->circle(
-        {
-            'x'      => (414 * $hf) + $X,
-            'y'      => (414 * $vf) + $Y,
-            'radius' => 400 * min($vf, $hf),
-            'filled' => TRUE
-        }
-    );
-
     $self->normal_mode();
 
     # The "coin"
@@ -428,23 +409,19 @@ sub _coin {
 			'alpha' => 255,
 		}
 	);
-    $self->circle(
-        {
-            'x'        => (400 * $hf) + $X,
-            'y'        => (400 * $vf) + $Y,
-            'radius'   => 400 * min($hf, $vf),
-            'filled'   => TRUE,
-            'gradient' => {
-                'direction' => 'horizontal',
-                'colors'    => {
-                    'red'   => [255, 255, 255],
-                    'green' => [192, 96,  228],
-                    'blue'  => [0,   0,   0],
-                    'alpha' => [255, 255, 255],
-                },
-            }
-        }
-    );
+    $self->ball(
+		{
+			'x' => (400 * $hf) + $X,
+			'y' => (400 * $vf) + $Y,
+			'radius' => 400 * min($hf, $vf),
+			'colors' => {
+                'red'   => 255,
+                'green' => 105,
+                'blue'  => 180,
+				'alpha' => 255,
+			},
+		}
+	);
 
     # G
     $self->set_color(

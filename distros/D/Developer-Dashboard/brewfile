@@ -1,0 +1,9 @@
+# Repo bootstrap packages for macOS hosts.
+cpanminus
+curl
+expat
+git
+node
+openssl@3
+perl
+pkgconf

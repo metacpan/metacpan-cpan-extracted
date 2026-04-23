@@ -31,7 +31,6 @@ LTC_EXPORT void LTC_CALL XFREE(void *p);
 
 LTC_EXPORT void LTC_CALL XQSORT(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
 
-
 /* change the clock function too */
 LTC_EXPORT clock_t LTC_CALL XCLOCK(void);
 
@@ -244,9 +243,14 @@ typedef unsigned long ltc_mp_digit;
    #undef ENDIAN_32BITWORD
    #undef ENDIAN_64BITWORD
    #undef LTC_FAST
+   #define LTC_NO_AES_NI
    #define LTC_NO_BSWAP
+   #define LTC_NO_CLZL
+   #define LTC_NO_CTZL
    #define LTC_NO_ROLC
    #define LTC_NO_ROTATE
+   #define LTC_NO_GCM_PCLMUL
+   #define LTC_NO_GCM_PMULL
 #endif
 
 /* No LTC_FAST if: explicitly disabled OR non-gcc/non-clang compiler OR old gcc OR using -ansi -std=c99 */
@@ -295,9 +299,37 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_HAVE_ROTATE_BUILTIN
 #endif
 
+#if !defined(LTC_NO_CLZL) && __has_builtin(__builtin_clzl)
+   #define LTC_HAVE_CLZL_BUILTIN
+#endif
+
+#if !defined(LTC_NO_CTZL) && __has_builtin(__builtin_ctzl)
+   #define LTC_HAVE_CTZL_BUILTIN
+#endif
+
+#if (defined(__x86_64__) || defined(_M_X64))
+   #if !defined(LTC_NO_AES_NI)
+      #define LTC_AES_NI
+   #endif
+   #if !defined(LTC_NO_SHA1_X86)
+      #define LTC_SHA1_X86
+   #endif
+   #if !defined(LTC_NO_SHA224_X86)
+      #define LTC_SHA224_X86
+   #endif
+   #if !defined(LTC_NO_SHA256_X86)
+      #define LTC_SHA256_X86
+   #endif
+#endif
+
 #if defined(__GNUC__)
+   #define LTC_ALIGN_MSVC(n)
    #define LTC_ALIGN(n) __attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+   #define LTC_ALIGN_MSVC(n) __declspec(align(n))
+   #define LTC_ALIGN(n)
 #else
+   #define LTC_ALIGN_MSVC(n)
    #define LTC_ALIGN(n)
 #endif
 
@@ -321,26 +353,59 @@ typedef unsigned long ltc_mp_digit;
 #   define LTC_NULL_TERMINATED
 #endif
 
+#ifndef LTC_DEPRECATED
 #if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 405)
 #  define LTC_DEPRECATED(s) __attribute__((deprecated("replaced by " #s)))
-#  define PRIVATE_LTC_DEPRECATED_PRAGMA(s) _Pragma(#s)
-#  define LTC_DEPRECATED_PRAGMA(s) PRIVATE_LTC_DEPRECATED_PRAGMA(GCC warning s)
 #elif defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 301)
 #  define LTC_DEPRECATED(s) __attribute__((deprecated))
-#  define LTC_DEPRECATED_PRAGMA(s)
 #elif defined(_MSC_VER) && _MSC_VER >= 1500
    /* supported since Visual Studio 2008 */
 #  define LTC_DEPRECATED(s) __declspec(deprecated("replaced by " #s))
-#  define LTC_DEPRECATED_PRAGMA(s) __pragma(message(s))
 #else
 #  define LTC_DEPRECATED(s)
+#endif
+#endif
+
+#ifndef LTC_DEPRECATED_PRAGMA
+#if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 405)
+#  define PRIVATE_LTC_DEPRECATED_PRAGMA(s) _Pragma(#s)
+#  define LTC_DEPRECATED_PRAGMA(s) PRIVATE_LTC_DEPRECATED_PRAGMA(GCC warning s)
+#elif defined(_MSC_VER) && _MSC_VER >= 1500
+   /* supported since Visual Studio 2008 */
+#  define LTC_DEPRECATED_PRAGMA(s) __pragma(message(s))
+#else
 #  define LTC_DEPRECATED_PRAGMA(s)
+#endif
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
 #  define LTC_ATTRIBUTE(x) __attribute__(x)
 #else
 #  define LTC_ATTRIBUTE(x)
+#endif
+
+#if !defined(LTC_NO_GCM_PCLMUL) && (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
+#define LTC_GCM_PCLMUL
+#undef LTC_GCM_TABLES
+#endif
+
+#if defined(__clang__) || defined(__GNUC__)
+#define LTC_GCM_PCLMUL_TARGET __attribute__((target("pclmul,ssse3")))
+#define LTC_SHA_TARGET __attribute__((__target__("sse2,ssse3,sse4.1,sha")))
+#else
+#define LTC_GCM_PCLMUL_TARGET
+#define LTC_SHA_TARGET
+#endif
+
+#if !defined(LTC_NO_GCM_PMULL) && (defined(__aarch64__) || defined(_M_ARM64))
+#define LTC_GCM_PMULL
+#undef LTC_GCM_TABLES
+#endif
+
+#if defined(LTC_GCM_PMULL) && (defined(__clang__) || defined(__GNUC__))
+#define LTC_GCM_PMULL_TARGET __attribute__((target("+crypto")))
+#else
+#define LTC_GCM_PMULL_TARGET
 #endif
 
 #endif /* TOMCRYPT_CFG_H */

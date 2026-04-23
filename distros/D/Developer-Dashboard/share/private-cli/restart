@@ -33,7 +33,7 @@ public C<dashboard> entrypoint can stay a thin switchboard.
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard restart>, which restarts the web listener and coordinated collectors for the current runtime.
+This staged helper exposes C<dashboard restart>, which restarts the web listener and coordinated collectors for the current runtime while showing a visible terminal task board during interactive runs.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing restart CLI flags or the handoff into the runtime li
 
 =head1 HOW TO USE
 
-Users run C<dashboard restart> with any host, port, or worker overrides. The staged helper forwards that request into the private runtime, which stops the current runtime processes and starts them again in the right order.
+Users run C<dashboard restart> with any host, port, or worker overrides. The staged helper forwards that request into the private runtime, which prints the full restart task list on C<stderr> for interactive terminals, stops the current runtime processes, starts them again in the right order, and leaves the final JSON payload on C<stdout>.
 
 =head1 WHAT USES IT
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.81  2026-04-23
+	- add support for Alpine Linux
+	- various mapping updates (a.o. from zhmylove)
+	- fix: chocolatey -> choco
+	- document DEBIAN_FRONTEND=noninteractive
+	- CI updates
+
 0.80  2025-01-25
 	- mapping update (a.o. from zhmylove)
 

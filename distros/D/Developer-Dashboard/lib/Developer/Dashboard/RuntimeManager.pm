@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '2.76';
+our $VERSION = '3.04';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -156,7 +156,16 @@ sub running_web {
 # Input: none.
 # Output: stopped pid or undef.
 sub stop_web {
-    my ($self) = @_;
+    my ( $self, %args ) = @_;
+    my $progress = $args{progress};
+    $self->_progress_emit(
+        $progress,
+        {
+            task_id => 'stop_web',
+            status  => 'running',
+            label   => 'Stop dashboard web service',
+        }
+    );
     my $running = $self->running_web;
     my $pid = $running ? $running->{pid} : undef;
     my $port = $running ? $running->{port} : undef;
@@ -197,6 +206,14 @@ sub stop_web {
     }
 
     $self->_cleanup_web_files;
+    $self->_progress_emit(
+        $progress,
+        {
+            task_id => 'stop_web',
+            status  => 'done',
+            label   => 'Stop dashboard web service',
+        }
+    );
     return $pid;
 }
 
@@ -205,12 +222,22 @@ sub stop_web {
 # Input: none.
 # Output: list of started collector hashes.
 sub start_collectors {
-    my ($self) = @_;
+    my ( $self, %args ) = @_;
+    my $progress = $args{progress};
     my @started;
     for my $job ( @{ $self->{config}->collectors } ) {
         next if ref($job) ne 'HASH';
         my $schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
         next if $schedule eq 'manual';
+        my $name = $job->{name} || '(unnamed)';
+        $self->_progress_emit(
+            $progress,
+            {
+                task_id => "start_collector:$name",
+                status  => 'running',
+                label   => "Start collector $name",
+            }
+        );
         my $pid = eval { $self->{runner}->start_loop($job) };
         if ($@) {
             my $error = $@;
@@ -218,7 +245,14 @@ sub start_collectors {
             for my $started (@started) {
                 eval { $self->{runner}->stop_loop( $started->{name} ) };
             }
-            my $name = $job->{name} || '(unnamed)';
+            $self->_progress_emit(
+                $progress,
+                {
+                    task_id => "start_collector:$name",
+                    status  => 'failed',
+                    label   => "Start collector $name",
+                }
+            );
             die "Failed to start collector '$name': $error\n";
         }
         if ( defined $pid && !$self->_collector_runtime_ready( $job->{name}, $pid ) ) {
@@ -226,9 +260,24 @@ sub start_collectors {
                 eval { $self->{runner}->stop_loop( $started->{name} ) };
             }
             eval { $self->{runner}->stop_loop( $job->{name} ) };
-            my $name = $job->{name} || '(unnamed)';
+            $self->_progress_emit(
+                $progress,
+                {
+                    task_id => "start_collector:$name",
+                    status  => 'failed',
+                    label   => "Start collector $name",
+                }
+            );
             die "Failed to keep collector '$name' running after startup\n";
         }
+        $self->_progress_emit(
+            $progress,
+            {
+                task_id => "start_collector:$name",
+                status  => 'done',
+                label   => "Start collector $name",
+            }
+        );
         push @started, { name => $job->{name}, pid => $pid } if defined $pid;
     }
     return @started;
@@ -251,7 +300,7 @@ sub serve_all {
     my $foreground = $args{foreground} ? 1 : 0;
 
     if ($foreground) {
-        my @collectors = $self->start_collectors;
+        my @collectors = $self->start_collectors( progress => $args{progress} );
         my $result = eval {
             $self->start_web(
                 foreground => 1,
@@ -299,11 +348,28 @@ sub serve_all {
 # Input: none.
 # Output: list of stopped collector name strings.
 sub stop_collectors {
-    my ($self) = @_;
+    my ( $self, %args ) = @_;
+    my $progress = $args{progress};
     my @running = $self->{runner}->running_loops;
     my @names = map { $_->{name} } @running;
     for my $name (@names) {
+        $self->_progress_emit(
+            $progress,
+            {
+                task_id => "stop_collector:$name",
+                status  => 'running',
+                label   => "Stop collector $name",
+            }
+        );
         eval { $self->{runner}->stop_loop($name) };
+        $self->_progress_emit(
+            $progress,
+            {
+                task_id => "stop_collector:$name",
+                status  => 'done',
+                label   => "Stop collector $name",
+            }
+        );
     }
     $self->_pkill_perl('^dashboard collector:');
     for ( 1 .. 30 ) {
@@ -321,10 +387,10 @@ sub stop_collectors {
 # Input: none.
 # Output: hash reference describing stopped processes.
 sub stop_all {
-    my ($self) = @_;
+    my ( $self, %args ) = @_;
     return {
-        web_pid   => $self->stop_web,
-        collectors => [ $self->stop_collectors ],
+        web_pid   => $self->stop_web( progress => $args{progress} ),
+        collectors => [ $self->stop_collectors( progress => $args{progress} ) ],
     };
 }
 
@@ -347,14 +413,68 @@ sub restart_all {
         $workers = $args{workers};
     }
     my $ssl = $args{ssl} ? 1 : 0;
-    my $stopped = $self->stop_all;
-    my @collectors = $self->start_collectors;
-    my $web_pid = $self->_restart_web_with_retry( host => $host, port => $port, workers => $workers, ssl => $ssl );
+    my %progress_args = defined $args{progress} ? ( progress => $args{progress} ) : ();
+    my $stopped = $self->stop_all(%progress_args);
+    my @collectors = $self->start_collectors(%progress_args);
+    my $web_pid = $self->_restart_web_with_retry(
+        host     => $host,
+        port     => $port,
+        workers  => $workers,
+        ssl      => $ssl,
+        %progress_args,
+    );
     return {
         stopped   => $stopped,
         collectors => \@collectors,
         web_pid   => $web_pid,
     };
+}
+
+# stop_progress_tasks()
+# Builds the ordered task list shown for dashboard stop progress output.
+# Input: none.
+# Output: array reference of task hash references.
+sub stop_progress_tasks {
+    my ($self) = @_;
+    my @tasks = (
+        {
+            id    => 'stop_web',
+            label => 'Stop dashboard web service',
+        }
+    );
+    push @tasks, map {
+        +{
+            id    => "stop_collector:$_->{name}",
+            label => "Stop collector $_->{name}",
+        }
+    } $self->{runner}->running_loops;
+    return \@tasks;
+}
+
+# restart_progress_tasks()
+# Builds the ordered task list shown for dashboard restart progress output.
+# Input: none.
+# Output: array reference of task hash references.
+sub restart_progress_tasks {
+    my ($self) = @_;
+    my @tasks = @{ $self->stop_progress_tasks };
+    for my $job ( @{ $self->{config}->collectors } ) {
+        next if ref($job) ne 'HASH';
+        my $schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
+        next if $schedule eq 'manual';
+        my $name = $job->{name} || '(unnamed)';
+        push @tasks,
+          {
+            id    => "start_collector:$name",
+            label => "Start collector $name",
+          };
+    }
+    push @tasks,
+      {
+        id    => 'start_web',
+        label => 'Start dashboard web service',
+      };
+    return \@tasks;
 }
 
 # web_state()
@@ -887,87 +1007,154 @@ sub _restart_web_with_retry {
         $workers = $args{workers};
     }
     my $ssl = $args{ssl} ? 1 : 0;
+    my $progress = $args{progress};
+    $self->_progress_emit(
+        $progress,
+        {
+            task_id => 'start_web',
+            status  => 'running',
+            label   => 'Start dashboard web service',
+        }
+    );
     my $attempts = 20;
     for my $attempt ( 1 .. $attempts ) {
         my $pid = eval { $self->start_web( host => $host, port => $port, workers => $workers, ssl => $ssl ) };
         my $error = $@;
         if ( defined $pid && !$error ) {
-            return $pid if $self->_web_runtime_ready( $pid, $port );
+            if ( $self->_web_runtime_ready( $pid, $port ) ) {
+                $self->_progress_emit(
+                    $progress,
+                    {
+                        task_id => 'start_web',
+                        status  => 'done',
+                        label   => 'Start dashboard web service',
+                    }
+                );
+                return $pid;
+            }
             $self->_cleanup_web_files;
             $error = "Unable to confirm dashboard web service stayed running on $host:$port (pid $pid)\n";
         }
         if ( !$error ) {
             $error = "Unable to restart dashboard web service on $host:$port\n";
         }
+        $self->_progress_emit(
+            $progress,
+            {
+                task_id => 'start_web',
+                status  => 'failed',
+                label   => 'Start dashboard web service',
+            }
+        ) if $attempt == $attempts || $error !~ /Address already in use|Unable to confirm dashboard web service stayed running/;
         die $error if $error !~ /Address already in use|Unable to confirm dashboard web service stayed running/;
         die $error if $attempt == $attempts;
         sleep 0.25;
     }
 }
 
+# _progress_emit($progress, $event)
+# Sends one lifecycle progress event to an optional progress callback.
+# Input: optional progress coderef and event hash reference.
+# Output: true value.
+sub _progress_emit {
+    my ( $self, $progress, $event ) = @_;
+    return 1 if !$progress || ref($progress) ne 'CODE';
+    $progress->($event);
+    return 1;
+}
+
 # _web_runtime_ready($pid, $port)
 # Confirms that one reported web pid is still the active managed web process
-# and that the configured listen port is actually bound.
+# and that the configured listen port is actually bound, then keeps checking
+# only long enough to catch an immediate post-ready crash.
 # Input: process id integer and configured TCP port integer.
-# Output: boolean true when the runtime stayed alive long enough to expose its listener.
+# Output: boolean true when the runtime exposed its listener and survived the
+# short confirmation window afterwards.
 sub _web_runtime_ready {
     my ( $self, $pid, $port ) = @_;
     return 0 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
     return 0 if defined $port && $port ne '' && ( $port !~ /^\d+$/ || $port < 1 );
-    my $ready = 0;
+    my $ready_polls = 0;
     for ( 1 .. $self->_runtime_stability_polls ) {
         my $running = $self->running_web;
+        my $listening = 0;
         if ( $running && ( $running->{pid} || 0 ) == $pid ) {
             my $listener_port = $port || $running->{port} || 0;
             if ($listener_port) {
-                my $listening = scalar $self->_listener_pids_for_port($listener_port) ? 1 : 0;
+                $listening = scalar $self->_listener_pids_for_port($listener_port) ? 1 : 0;
                 $listening = 1 if !$listening && $self->_port_accepting_connections($listener_port);
-                if ($listening) {
-                    $ready = 1;
-                }
-                elsif ($ready) {
-                    return 0;
-                }
             }
         }
-        elsif ($ready) {
+        if ($listening) {
+            $ready_polls++;
+            return 1 if $ready_polls >= $self->_runtime_confirmation_polls;
+        }
+        elsif ($ready_polls) {
             return 0;
         }
         sleep $self->_runtime_poll_interval;
     }
-    return $ready;
+    return 0;
 }
 
 # _collector_runtime_ready($name, $pid)
 # Confirms that a newly started collector loop became visible and stayed alive
-# through the startup stability window.
+# long enough to catch an immediate post-ready crash.
 # Input: collector name string and process id integer.
-# Output: boolean true when the collector loop remained managed and running.
+# Output: boolean true when the collector loop became visible and survived the
+# short confirmation window afterwards.
 sub _collector_runtime_ready {
     my ( $self, $name, $pid ) = @_;
     return 0 if !defined $name || $name eq '';
     return 0 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
-    my $ready = 0;
+    my $ready_polls = 0;
     for ( 1 .. $self->_runtime_stability_polls ) {
-        my ($running) = grep { $_->{name} eq $name && ( $_->{pid} || 0 ) == $pid } $self->{runner}->running_loops;
-        if ($running) {
-            $ready = 1;
+        my $state = $self->{runner}->can('loop_state') ? $self->{runner}->loop_state($name) : undef;
+        my $state_ready = $state
+          && ( $state->{pid} || 0 ) == $pid
+          && ( $state->{name} || $name ) eq $name
+          && ( $state->{status} || '' ) =~ /^(?:starting|running|error)$/
+          && kill( 0, $pid );
+        my ($running) = $state_ready
+          ? ()
+          : grep { $_->{name} eq $name && ( $_->{pid} || 0 ) == $pid } $self->{runner}->running_loops;
+        if ( $state_ready || $running ) {
+            $ready_polls++;
+            return 1 if $ready_polls >= $self->_runtime_confirmation_polls;
         }
-        elsif ($ready) {
+        elsif ($ready_polls) {
             return 0;
         }
         sleep $self->_runtime_poll_interval;
     }
-    return $ready;
+    return 0;
 }
 
 # _runtime_stability_polls()
 # Returns the number of readiness polls used to prove that a replacement
-# runtime survived startup instead of dying immediately afterwards.
+# runtime had enough time to become visible before it is declared dead on
+# arrival.
 # Input: none.
 # Output: positive integer poll count.
 sub _runtime_stability_polls {
-    return 5;
+    my $override = $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS};
+    return $override if defined $override && $override =~ /^\d+$/ && $override > 0;
+
+    my $perl5opt = join ' ', grep { defined && $_ ne '' } @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)};
+    return 300 if $perl5opt =~ /Devel::Cover/;
+
+    return 100;
+}
+
+# _runtime_confirmation_polls()
+# Returns the number of consecutive ready polls required after startup first
+# becomes visible before the runtime is declared stable.
+# Input: none.
+# Output: positive integer poll count.
+sub _runtime_confirmation_polls {
+    my $override = $ENV{DEVELOPER_DASHBOARD_RUNTIME_CONFIRMATION_POLLS};
+    return $override if defined $override && $override =~ /^\d+$/ && $override > 0;
+    return 3;
 }
 
 # _runtime_poll_interval()

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::Private;
-$Bitcoin::Crypto::Key::Private::VERSION = '4.004';
+$Bitcoin::Crypto::Key::Private::VERSION = '4.005';
 use v5.14;
 use warnings;
 

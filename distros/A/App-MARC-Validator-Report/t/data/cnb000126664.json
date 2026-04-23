@@ -1,0 +1,50 @@
+{
+   "field_080" : {
+      "checks" : {
+         "not_valid" : {
+            "cnb000126664" : [
+               {
+                  "error" : "Field 080a has missing '['.",
+                  "params" : {
+                     "value" : "091(437.1)+096(437.1)]:779"
+                  }
+               },
+               {
+                  "error" : "Field 080a has missing '['.",
+                  "params" : {
+                     "value" : "091:096]:027(437)(084.1)"
+                  }
+               },
+               {
+                  "error" : "Field 080a has missing '['.",
+                  "params" : {
+                     "value" : "096:091]:027(437)(084.1)"
+                  }
+               },
+               {
+                  "error" : "Field 080a has missing '['.",
+                  "params" : {
+                     "value" : "091:75.05]:027(437-2 Praha)(048.8:084.1)"
+                  }
+               },
+               {
+                  "error" : "Field 080a has missing ']'.",
+                  "params" : {
+                     "value" : "027(437-2 Praha):[091:75.05(048.8:084.1)"
+                  }
+               },
+               {
+                  "error" : "Field 080a has missing ']'.",
+                  "params" : {
+                     "value" : "027(437):[091:096(084.1)"
+                  }
+               }
+            ]
+         }
+      },
+      "datetime" : "2026-04-23T04:31:19",
+      "module_name" : "MARC::Validator::Plugin::Field080",
+      "module_version" : 0.18,
+      "name" : "field_080"
+   }
+}

@@ -19,6 +19,7 @@ The goal is to prove that a new environment can:
 - verify browser-facing editor and saved fake-project bookmark pages in a real headless browser
 - verify the environment-variable project override flow works end to end
 - verify layered `.env` and `.env.pl` loading from runtime roots and skill roots works end to end
+- verify dotted skill commands that prompt on standard input still behave interactively after hook execution
 
 ## Scope
 
@@ -144,7 +145,14 @@ The integration run creates:
 - the installed `dashboard` binary works without `perl -Ilib`
 - the fake project's `./.developer-dashboard` tree becomes the active local runtime root with the home tree as fallback
 - layered root-to-leaf `.env` and `.env.pl` files override in order, and skill-local env files load only for skill execution paths
-- skill dependency installs follow `ddfile -> aptfile -> brewfile -> cpanfile -> cpanfile.local`, with shared skill Perl dependencies landing in `~/perl5` and skill-local Perl dependencies landing in each skill's `./perl5`
+- skill dependency installs follow `aptfile -> apkfile -> dnfile -> brewfile -> package.json -> cpanfile -> cpanfile.local -> ddfile -> ddfile.local`, with `aptfile`, `apkfile`, and `dnfile` probing each listed package first and only escalating to `sudo apt-get install -y`, `sudo apk add --no-cache`, or `sudo dnf install -y` for packages that are still missing, `ddfile.local` dependencies staying at the current skill install level, Node dependencies being staged through `npx --yes npm install` in a private dashboard workspace before landing in `$HOME/node_modules`, shared skill Perl dependencies landing in `~/perl5`, and skill-local Perl dependencies landing in each skill's `./perl5`
+- explicit `dashboard skills install --ddfile` runs process `ddfile` first into the active layered skills root and then `ddfile.local` into the current directory's nested `./skills/` tree
+- streamed `install.sh` runs such as `curl ... | sh` succeed without a local checkout by falling back to embedded `aptfile`, `apkfile`, `dnfile`, and `brewfile` manifests, and Debian-family or Alpine hosts bootstrap `App::perlbrew` automatically when the package manager path did not already provide `perlbrew`
+- the old-system-Perl Alpine rescue path keeps the locally bootstrapped `perlbrew` and `patchperl` tools on the private `~/perl5/lib/perl5` include path so `curl ... | sh` can still build `perl-5.38.5` instead of dying with missing `App::perlbrew` or `Devel::PatchPerl` modules
+- Debian-family streamed bootstrap also copes with third-party `nodejs` repositories that conflict with the distro `npm` package by installing `nodejs` first, checking whether `npm` and `npx` are already present, and only then attempting the distro `npm` package
+- Alpine streamed bootstrap installs the repo-root `apkfile` package set through `apk add --no-cache` and then proves the same post-install shell finish line as Debian-family hosts
+- Debian-family streamed bootstrap uses `perlbrew --notest install perl-5.38.5` for the old-system-Perl rescue path so blank-machine bootstrap does not fail on upstream Perl core test noise before Developer Dashboard itself is installed
+- `install.sh` prints a full progress board before it changes the system, then emits only per-step transitions instead of redrawing the whole board, explains any upcoming `sudo` prompt as an operating-system package-manager password request before the prompt appears, suppresses perlbrew's generic `~/.profile` advice, updates the chosen rc file itself with the required `PERLBREW_HOME` and rescue-Perl `PATH` lines without sourcing perlbrew's bash-only startup file under generic `sh`, appends the matching `dashboard shell bash|zsh|sh` eval line so `d2`, prompt integration, and completion come up automatically, bridges bash login shells through `~/.profile` to `~/.bashrc`, re-enters an activated shell automatically on a real terminal-backed `curl ... | sh` run, and for automated acceptance uses `DD_INSTALL_SHELL_COMMANDS` to prove `dashboard version`, `d2 version`, and `dashboard skills install browser` through that activated shell path
 - a broken config Perl collector reports an error without stopping other configured collectors
 - a healthy config collector still reports `ok` and stays green in `dashboard indicator list`, `dashboard ps1`, and `/system/status`, without being clobbered back to `missing` by concurrent config-sync refreshes
 - `dashboard collector log` prints aggregated collector transcripts, `dashboard collector log <name>` prints the named collector transcript, and configured collectors that have not run yet report an explicit no-log message instead of blank output
@@ -162,18 +170,23 @@ The integration run creates:
 - after a helper user exists, non-loopback access produces the helper login page
 - helper logout removes both the helper session and the helper account
 - `dashboard stop` leaves no active listener on port `7890`
+- interactive `dashboard stop` and `dashboard restart` runs print the full lifecycle task board on `stderr` before work begins, so managed shutdown and startup waits stay visible instead of looking hung
 - runtime stop/restart behavior still works when listener ownership must be
   discovered through `/proc` instead of `ss`
 - `dashboard restart` also succeeds when a listener pid survives the first stop
   sweep and must be discovered by a late port re-probe
 - `dashboard restart` only reports success after the replacement runtime still
-  has a live managed pid and an accepting listener on the requested port,
-  instead of trusting an acknowledged pid that dies before the listener is up
+  has a live managed pid and an accepting listener on the requested port, and
+  after that ready state survives a short confirmation window instead of
+  trusting an acknowledged pid that dies immediately afterwards
 
-## macOS Brewfile Verification
+## Optional macOS Brewfile Verification
 
-Use a real macOS host or a disposable macOS guest when you need end-to-end
-`brewfile` verification. One practical route is the `dockur/macos` project:
+End-to-end `brewfile` verification on macOS is optional manual coverage, not a
+required release gate. Use a real macOS host or a disposable macOS guest only
+when you need to investigate a Homebrew-specific regression.
+
+One practical route is the `dockur/macos` project:
 https://github.com/dockur/macos
 
 The upstream README documents a compose flow using `dockurr/macos`,
@@ -181,7 +194,10 @@ The upstream README documents a compose flow using `dockurr/macos`,
 Once the guest is installed and reachable, copy the built tarball in, install
 Developer Dashboard with `cpanm`, create a skill that ships a `brewfile`, and
 confirm `dashboard skills install <skill>` prints the requested Homebrew
-packages before running `brew install ...`.
+packages before running `brew install ...`. When the fixture directory also
+contains `ddfile` and `ddfile.local`, run `dashboard skills install --ddfile`
+from that directory and confirm the global entries land under the active
+layered skills root while the local entries land under `./skills/`.
 
 ## Out Of Scope
 

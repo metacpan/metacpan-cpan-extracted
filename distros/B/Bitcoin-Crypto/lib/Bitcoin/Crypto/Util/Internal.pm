@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Util::Internal;
-$Bitcoin::Crypto::Util::Internal::VERSION = '4.004';
+$Bitcoin::Crypto::Util::Internal::VERSION = '4.005';
 use v5.14;
 use warnings;
 

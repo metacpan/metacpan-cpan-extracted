@@ -22,6 +22,7 @@ lib/Sietima/Role/NoMail.pm
 lib/Sietima/Role/NoSpoof.pm
 lib/Sietima/Role/NoSpoof/DMARC.pm
 lib/Sietima/Role/ReplyTo.pm
+lib/Sietima/Role/StripHeaders.pm
 lib/Sietima/Role/SubjectTag.pm
 lib/Sietima/Role/SubscriberOnly.pm
 lib/Sietima/Role/SubscriberOnly/Drop.pm
@@ -53,6 +54,7 @@ t/tests/sietima/role/nomail.t
 t/tests/sietima/role/nospoof.t
 t/tests/sietima/role/nospoof/dmarc.t
 t/tests/sietima/role/replyto.t
+t/tests/sietima/role/strip-headers.t
 t/tests/sietima/role/subject-tag.t
 t/tests/sietima/role/subscriberonly/drop.t
 t/tests/sietima/role/subscriberonly/moderate.t

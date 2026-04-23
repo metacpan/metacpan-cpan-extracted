@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Recognition;
-$Bitcoin::Crypto::Script::Recognition::VERSION = '4.004';
+$Bitcoin::Crypto::Script::Recognition::VERSION = '4.005';
 use v5.14;
 use warnings;
 

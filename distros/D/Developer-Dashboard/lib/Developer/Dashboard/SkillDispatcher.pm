@@ -3,13 +3,16 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '2.76';
+our $VERSION = '3.04';
 
 use Config ();
+use IPC::Open3 qw(open3);
 use File::Spec;
+use IO::Select;
 use JSON::XS qw(encode_json decode_json);
 use Capture::Tiny qw(capture);
 use File::Basename qw(dirname basename);
+use Symbol qw(gensym);
 use Developer::Dashboard::CLI::Suggest;
 use Developer::Dashboard::EnvLoader;
 use Developer::Dashboard::Runtime::Result;
@@ -86,6 +89,55 @@ sub dispatch {
     };
 }
 
+# exec_command($skill_name, $command, @args)
+# Executes one skill command by streaming hooks first and then replacing the
+# current helper process with the resolved skill command so interactive stdin,
+# stdout, and stderr behave exactly like a direct invocation.
+# Input: skill repo name, command name, and command arguments.
+# Output: never returns on success; otherwise returns an error hash.
+sub exec_command {
+    my ( $self, $skill_name, $command, @args ) = @_;
+    return { error => 'Missing skill name' } if !$skill_name;
+    return { error => 'Missing command name' } if !$command;
+
+    my $skill_path = $self->{manager}->get_skill_path( $skill_name, include_disabled => 1 );
+    my $suggest = Developer::Dashboard::CLI::Suggest->new(
+        paths   => $self->{manager}{paths},
+        manager => $self->{manager},
+    );
+    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$skill_path;
+    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$self->{manager}->is_enabled($skill_name);
+
+    my $command_spec = $self->_command_spec( $skill_name, $command );
+    my $cmd_path = $command_spec ? $command_spec->{cmd_path} : undef;
+    my $command_skill_path = $command_spec ? $command_spec->{skill_path} : undef;
+    return { error => $suggest->unknown_skill_command_message( $skill_name, $command ) } if !$cmd_path;
+
+    my @skill_layers = $command_spec ? @{ $command_spec->{skill_layers} || [] } : $self->_skill_layers($skill_name);
+    my $hook_result = $self->_execute_hooks_streaming( $skill_name, $command_spec ? $command_spec->{command_name} : $command, \@skill_layers, @args );
+    return $hook_result if $hook_result->{error};
+
+    my %env = $self->_skill_env(
+        skill_name   => $skill_name,
+        skill_path   => $command_skill_path || $skill_path,
+        skill_layers => \@skill_layers,
+        command      => $command_spec ? $command_spec->{command_name} : $command,
+        result_state => $hook_result->{result_state} || {},
+    );
+    my @command = command_argv_for_path($cmd_path);
+    %ENV = ( %ENV, %env );
+    Developer::Dashboard::Runtime::Result::set_current( $hook_result->{result_state} || {} );
+    if ( ref( $hook_result->{last_result} ) eq 'HASH' && %{ $hook_result->{last_result} } ) {
+        Developer::Dashboard::Runtime::Result::set_last_result( $hook_result->{last_result} );
+    }
+    else {
+        Developer::Dashboard::Runtime::Result::clear_last_result();
+    }
+    Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+    Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
+    return $self->_exec_resolved_command( $cmd_path, \@command, \@args );
+}
+
 # execute_hooks($skill_name, $command, @args)
 # Executes hook files from skill's cli/<command>.d/ directory before main command.
 # Input: skill repo name, command name, and command arguments.
@@ -132,7 +184,11 @@ sub execute_hooks {
                 Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
                 system( @command, @args );
             };
-            my $result_key = exists $results{$entry} ? $self->_hook_result_key($hook_path) : $entry;
+            my $result_key = $entry;
+            if ( exists $results{$entry} ) {
+                my $leaf = basename( dirname($hook_path) );
+                $result_key = $leaf . '/' . basename($hook_path);
+            }
             $results{$result_key} = {
                 stdout    => $stdout,
                 stderr    => $stderr,
@@ -153,6 +209,257 @@ sub execute_hooks {
     );
     $payload{last_result} = $last_result if %{$last_result};
     return \%payload;
+}
+
+# _execute_hooks_streaming($skill_name, $command, $skill_layers, @args)
+# Executes skill hook files while preserving live stdio so interactive hooks
+# and later main commands can still read from the caller's stdin and print
+# prompts without buffering surprises.
+# Input: skill repo name, resolved command name, array reference of skill layer
+# paths, and command arguments.
+# Output: hash reference containing hook captures, result_state, and
+# last_result.
+sub _execute_hooks_streaming {
+    my ( $self, $skill_name, $command, $skill_layers, @args ) = @_;
+    return { hooks => {}, result_state => {} } if !$skill_name || !$command;
+    my @skill_layers = @{ $self->_arrayref_or_empty($skill_layers) };
+    return { hooks => {}, result_state => {} } if !@skill_layers;
+
+    my %results;
+    my $last_result = {};
+    for my $layer_path (@skill_layers) {
+        my $hooks_dir = File::Spec->catdir( $layer_path, 'cli', "$command.d" );
+        next if !-d $hooks_dir;
+        opendir( my $dh, $hooks_dir ) or die "Unable to read $hooks_dir: $!";
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+            my $hook_path = File::Spec->catfile( $hooks_dir, $entry );
+            next unless is_runnable_file($hook_path);
+
+            my %env = $self->_skill_env(
+                skill_name   => $skill_name,
+                skill_path   => $layer_path,
+                skill_layers => \@skill_layers,
+                command      => $command,
+                result_state => \%results,
+            );
+            my @hook_command = command_argv_for_path($hook_path);
+            my $run = $self->_run_child_command_streaming(
+                command      => \@hook_command,
+                args         => \@args,
+                env          => \%env,
+                skill_layers => \@skill_layers,
+                result_state => \%results,
+                last_result  => $last_result,
+                stdin_mode   => 'null',
+            );
+            my $result_key = $entry;
+            if ( exists $results{$entry} ) {
+                my $leaf = basename( dirname($hook_path) );
+                $result_key = $leaf . '/' . basename($hook_path);
+            }
+            $results{$result_key} = {
+                stdout    => $run->{stdout},
+                stderr    => $run->{stderr},
+                exit_code => $run->{exit_code},
+            };
+            $last_result = {
+                file   => $hook_path,
+                exit   => $run->{exit_code},
+                STDOUT => $run->{stdout},
+                STDERR => $run->{stderr},
+            };
+        }
+        closedir($dh);
+    }
+
+    my %payload = (
+        hooks        => \%results,
+        result_state => \%results,
+    );
+    $payload{last_result} = $last_result if %{$last_result};
+    return \%payload;
+}
+
+# _run_child_command_streaming(%args)
+# Launches one child command with inherited stdin, streams stdout and stderr
+# live, and still captures both streams for RESULT-aware callers.
+# Input: hash containing command array ref, args array ref, env hash ref,
+# skill_layers array ref, result_state hash ref, optional last_result hash
+# ref, and optional stdin_mode string.
+# Output: hash reference containing stdout, stderr, and exit_code.
+sub _run_child_command_streaming {
+    my ( $self, %args ) = @_;
+    my @command = @{ $self->_arrayref_or_empty( $args{command} ) };
+    my @argv = @{ $self->_arrayref_or_empty( $args{args} ) };
+    my %env = %{ $self->_hashref_or_empty( $args{env} ) };
+    my @skill_layers = @{ $self->_arrayref_or_empty( $args{skill_layers} ) };
+    my $result_state = $self->_hashref_or_empty( $args{result_state} );
+    my $last_result = $args{last_result};
+    my $stdin_mode = $self->_defined_or_default( $args{stdin_mode}, 'inherit' );
+    my $stdin_spec = '<&STDIN';
+    my $stdin_fh;
+    if ( $stdin_mode eq 'null' ) {
+        open $stdin_fh, '<', File::Spec->devnull() or die "Unable to open " . File::Spec->devnull() . " for streaming skill hook stdin: $!";
+        $stdin_spec = '<&' . fileno($stdin_fh);
+    }
+    my $stderr = gensym();
+    my $stdout;
+    my ( $stdout_text, $stderr_text ) = ( '', '' );
+    my $pid;
+    {
+        local %ENV = ( %ENV, %env );
+        Developer::Dashboard::Runtime::Result::set_current($result_state);
+        if ( ref($last_result) eq 'HASH' && %{$last_result} ) {
+            Developer::Dashboard::Runtime::Result::set_last_result($last_result);
+        }
+        else {
+            Developer::Dashboard::Runtime::Result::clear_last_result();
+        }
+        Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $self->{manager}{paths} );
+        Developer::Dashboard::EnvLoader->load_skill_layers( skill_layers => \@skill_layers );
+        $pid = open3( $stdin_spec, $stdout, $stderr, @command, @argv );
+    }
+    close $stdin_fh if $stdin_fh;
+
+    my $selector  = IO::Select->new( $stdout, $stderr );
+    my $stdout_fd = fileno($stdout);
+    my $stderr_fd = fileno($stderr);
+    local $| = 1;
+    STDOUT->autoflush(1);
+    STDERR->autoflush(1);
+
+    while ( my @ready = $selector->can_read ) {
+        for my $fh (@ready) {
+            my $buffer = '';
+            my $read = sysread( $fh, $buffer, 8192 );
+            if ( !defined $read || $read == 0 ) {
+                $selector->remove($fh);
+                close $fh;
+                next;
+            }
+
+            if ( fileno($fh) == $stdout_fd ) {
+                print STDOUT $buffer;
+                $stdout_text .= $buffer;
+                next;
+            }
+
+            if ( fileno($fh) == $stderr_fd ) {
+                print STDERR $buffer;
+                $stderr_text .= $buffer;
+                next;
+            }
+        }
+    }
+
+    waitpid( $pid, 0 );
+    return {
+        stdout    => $stdout_text,
+        stderr    => $stderr_text,
+        exit_code => $? >> 8,
+    };
+}
+
+# _exec_resolved_command($cmd_path, $command, $args)
+# Replaces the current helper process with the resolved skill command after
+# hooks and environment setup have completed.
+# Input: resolved command path string, array reference of base command argv, and
+# array reference of user argument strings.
+# Output: never returns on success; otherwise returns an error hash.
+sub _exec_resolved_command {
+    my ( $self, $cmd_path, $command, $args ) = @_;
+    my @command = @{ $self->_arrayref_or_empty($command) };
+    my @args = @{ $self->_arrayref_or_empty($args) };
+    my $error = $self->_exec_replacement( \@command, \@args );
+    if ( defined $error && $error ne '' ) {
+        return { error => "Unable to exec $cmd_path: $error" };
+    }
+}
+
+# _exec_replacement($command, $args)
+# Performs the final exec handoff for one resolved skill command.
+# Input: array reference of base command argv and array reference of user
+# argument strings.
+# Output: never returns on success; otherwise returns the system error string.
+sub _exec_replacement {
+    my ( $self, $command, $args ) = @_;
+    my @command = @{ $self->_arrayref_or_empty($command) };
+    my @args = @{ $self->_arrayref_or_empty($args) };
+    if ( !exec @command, @args ) {
+        my $error = "$!";
+        return $error;
+    }
+}
+
+# _arrayref_or_empty($value)
+# Normalizes optional array references so downstream callers can dereference them
+# safely without using short-circuit fallbacks that obscure coverage.
+# Input: candidate array reference or undef.
+# Output: original array reference when valid, otherwise an empty array reference.
+sub _arrayref_or_empty {
+    my ( $self, $value ) = @_;
+    return $value if ref($value) eq 'ARRAY';
+    my @empty;
+    my $empty = \@empty;
+    return $empty;
+}
+
+# _hashref_or_empty($value)
+# Normalizes optional hash references for callers that need a stable hash ref.
+# Input: candidate hash reference or undef.
+# Output: original hash reference when valid, otherwise an empty hash reference.
+sub _hashref_or_empty {
+    my ( $self, $value ) = @_;
+    return $value if ref($value) eq 'HASH';
+    my %empty;
+    my $empty = \%empty;
+    return $empty;
+}
+
+# _merge_array_items_by_identity($left_items, $right_items, $field)
+# Merges two layered array payloads by replacing hash items that share one
+# logical identity field while preserving unmatched entries in order.
+# Input: two array references plus the hash key name that identifies one item.
+# Output: merged array reference.
+sub _merge_array_items_by_identity {
+    my ( $self, $left_items, $right_items, $field ) = @_;
+    my @combined;
+    my %positions;
+    my $left = $self->_arrayref_or_empty($left_items);
+    my $right = $self->_arrayref_or_empty($right_items);
+
+    for my $item ( @{$left} ) {
+        push @combined, $item;
+        next if ref($item) ne 'HASH';
+        my $identity = $item->{$field};
+        next if !defined $identity || $identity eq '';
+        $positions{$identity} = $#combined;
+    }
+
+    for my $item ( @{$right} ) {
+        if ( ref($item) eq 'HASH' ) {
+            my $identity = $item->{$field};
+            if ( defined $identity && $identity ne '' ) {
+                if ( exists $positions{$identity} ) {
+                    $combined[ $positions{$identity} ] = $item;
+                    next;
+                }
+                $positions{$identity} = scalar @combined;
+            }
+        }
+        push @combined, $item;
+    }
+
+    return \@combined;
+}
+
+# _defined_or_default($value, $default)
+# Supplies a default scalar only when the candidate value is undef.
+# Input: candidate scalar and fallback scalar.
+# Output: original scalar when defined, otherwise the fallback scalar.
+sub _defined_or_default {
+    my ( $self, $value, $default ) = @_;
+    return defined $value ? $value : $default;
 }
 
 # get_skill_config($skill_name)
@@ -621,17 +928,6 @@ sub _skill_nav_route_ids {
     return %routes;
 }
 
-# _hook_result_key($hook_path)
-# Builds a deterministic unique result key for duplicate hook basenames across
-# layered skill hook directories.
-# Input: absolute hook file path string.
-# Output: result key string.
-sub _hook_result_key {
-    my ( $self, $hook_path ) = @_;
-    my $leaf = basename( dirname($hook_path) );
-    return $leaf . '/' . basename($hook_path);
-}
-
 # _merge_skill_hashes($left, $right)
 # Recursively merges layered skill config hashes so deeper layers override keys
 # while missing keys continue to fall back to inherited base layers.
@@ -650,11 +946,11 @@ sub _merge_skill_hashes {
         }
         if ( ref( $left->{$key} ) eq 'ARRAY' && ref( $right->{$key} ) eq 'ARRAY' ) {
             if ( $key eq 'collectors' ) {
-                $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'name' );
+                $merged{$key} = $self->_merge_array_items_by_identity( $left->{$key}, $right->{$key}, 'name' );
                 next;
             }
             if ( $key eq 'providers' ) {
-                $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'id' );
+                $merged{$key} = $self->_merge_array_items_by_identity( $left->{$key}, $right->{$key}, 'id' );
                 next;
             }
         }
@@ -662,36 +958,6 @@ sub _merge_skill_hashes {
     }
 
     return \%merged;
-}
-
-# _merge_named_hash_array($left, $right, $identity_key)
-# Merges named array entries so deeper skill layers can override logical items
-# without discarding unmatched inherited items.
-# Input: left and right array references plus the identity key string.
-# Output: merged array reference.
-sub _merge_named_hash_array {
-    my ( $self, $left, $right, $identity_key ) = @_;
-    my @merged = ();
-    my %positions;
-
-    for my $item ( @{ $left || [] }, @{ $right || [] } ) {
-        if (
-            ref($item) eq 'HASH'
-            && defined $identity_key
-            && $identity_key ne ''
-            && defined $item->{$identity_key}
-            && $item->{$identity_key} ne ''
-        ) {
-            if ( exists $positions{ $item->{$identity_key} } ) {
-                $merged[ $positions{ $item->{$identity_key} } ] = $item;
-                next;
-            }
-            $positions{ $item->{$identity_key} } = scalar @merged;
-        }
-        push @merged, $item;
-    }
-
-    return \@merged;
 }
 
 1;

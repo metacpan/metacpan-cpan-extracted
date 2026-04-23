@@ -1,3 +1,7 @@
+0.000030  2026-04-22 13:17:49-07:00 America/Los_Angeles
+
+    - Fix a regression from 0.000028 that made every UnixSocket test fail on CPAN testers when TMPDIR produced a moderately long route. The route-length check in IPC::Manager::Client::UnixSocket croaked unconditionally as soon as the route left less than 42 bytes of budget, even for short peer ids that would have fit verbatim. The check is now deferred to IPC::Manager::Base::FS::on_disk_name and only fires when a peer id must be hashed to an on-disk name but the hashed form does not fit under the route. Short peer ids pass through unchanged
+
 0.000029  2026-04-21 07:31:45-07:00 America/Los_Angeles
 
     - Expose ipcm_service's first-fork child pid on the returned handle/peer via a new $handle->child_pid accessor. Supervisors that track services by pid (e.g. Test2-Harness2's Role::ResourceServiceHost) can now use the standard ipcm_service spawn path (pre_fork_hook, post_fork_hook, ready() handshake, peer wiring) instead of rolling their own fork helper. child_pid is the pid fork returned in ipcm_service's parent branch: with no post_fork_hook it equals the service pid; with an interpose-style post_fork_hook (parent becomes a long-lived wrapper, child runs the service loop) it is the wrapper pid, which is the correct watchable lifetime; with a daemonizing post_fork_hook (double-fork + parent-exit) it becomes stale once the hook completes, in which case callers should use $handle->service_pid instead. child_pid is undef on handles/peers constructed outside the ipcm_service spawn path

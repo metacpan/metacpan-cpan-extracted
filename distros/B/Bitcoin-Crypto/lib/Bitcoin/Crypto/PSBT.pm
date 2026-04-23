@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::PSBT;
-$Bitcoin::Crypto::PSBT::VERSION = '4.004';
+$Bitcoin::Crypto::PSBT::VERSION = '4.005';
 use v5.14;
 use warnings;
 
@@ -490,7 +490,10 @@ L<Bitcoin::Crypto::PSBT::FieldType/value_data> (which contain short strings
 with description of field content).
 
 For a list of PSBT fields, see
-L<BIP174|https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki>.
+L<BIP174|https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki> and
+follow-up BIPS, most notably
+L<BIP370|https://github.com/bitcoin/bips/blob/master/bip-0370.mediawiki> and
+L<BIP371|https://github.com/bitcoin/bips/blob/master/bip-0371.mediawiki>.
 
 =head2 Global map
 
@@ -537,6 +540,18 @@ B<Value data:> Positive integer value
 B<Key data:> <none>
 
 B<Value data:> Hash reference with flags: inputs_modifiable, outputs_modifiable, has_sighash_single
+
+=item * PSBT_GLOBAL_VERSION
+
+B<Key data:> <none>
+
+B<Value data:> 32-bit positive integer value
+
+=item * PSBT_GLOBAL_PROPRIETARY
+
+B<Key data:> Array reference with three items: bytestring, unsigned integer, bytestring
+
+B<Value data:> Bytestring value
 
 =back
 
@@ -694,6 +709,12 @@ B<Key data:> <none>
 
 B<Value data:> Bytestring value
 
+=item * PSBT_IN_PROPRIETARY
+
+B<Key data:> Array reference with three items: bytestring, unsigned integer, bytestring
+
+B<Value data:> Bytestring value
+
 =back
 
 =head2 Output map
@@ -747,6 +768,12 @@ B<Value data:> Bitcoin::Crypto::Script::Tree instance
 B<Key data:> Bitcoin::Crypto::Key::Public object
 
 B<Value data:> Array reference, where first item is an array of leaf hashes, second element is a fingerprint and the third element is Bitcoin::Crypto::DerivationPath
+
+=item * PSBT_OUT_PROPRIETARY
+
+B<Key data:> Array reference with three items: bytestring, unsigned integer, bytestring
+
+B<Value data:> Bytestring value
 
 =back
 

@@ -267,6 +267,7 @@ sub _start_dashboard_server {
         open STDERR, '>&', \*STDOUT or die "Unable to redirect stderr to $args{log_file}: $!";
         chdir $args{cwd} or die "Unable to chdir to $args{cwd}: $!";
         local %ENV = ( %ENV, HOME => $args{home} );
+        delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)} if _coverage_requested();
         exec(
             $^X, "-I$args{repo_lib}", $args{dashboard_bin},
             'serve', '--foreground', '--host', '127.0.0.1', '--port', $args{port}, @{ $args{serve_args} || [] }
@@ -315,12 +316,23 @@ sub _wait_for_http {
     my ($url) = @_;
     require LWP::UserAgent;
     my $ua = LWP::UserAgent->new( timeout => 2 );
-    for ( 1 .. 80 ) {
+    for ( 1 .. _http_probe_attempts() ) {
         my $response = $ua->get($url);
         return 1 if $response->is_success;
         sleep 0.25;
     }
     die "Timed out waiting for dashboard HTTP URL $url\n";
+}
+
+sub _http_probe_attempts {
+    my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
+    return 240 if $perl5opt =~ /Devel::Cover/;
+    return 80;
+}
+
+sub _coverage_requested {
+    my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
+    return $perl5opt =~ /Devel::Cover/ ? 1 : 0;
 }
 
 # _read_text($path)

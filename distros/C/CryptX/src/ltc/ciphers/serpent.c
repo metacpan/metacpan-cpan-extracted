@@ -693,20 +693,20 @@ int serpent_test(void)
    symmetric_key key;
    int err, x;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
       if ((err = serpent_setup(tests[x].key, tests[x].keylen, 0, &key)) != CRYPT_OK) {
         return err;
       }
       if ((err = serpent_ecb_encrypt(tests[x].pt, buf[0], &key)) != CRYPT_OK) {
         return err;
       }
-      if (compare_testvector(buf[0], 16, tests[x].ct, 16, "SERPENT Encrypt", x)) {
+      if (ltc_compare_testvector(buf[0], 16, tests[x].ct, 16, "SERPENT Encrypt", x)) {
         return CRYPT_FAIL_TESTVECTOR;
       }
       if ((err = serpent_ecb_decrypt(tests[x].ct, buf[1], &key)) != CRYPT_OK) {
         return err;
       }
-      if (compare_testvector(buf[1], 16, tests[x].pt, 16, "SERPENT Decrypt", x)) {
+      if (ltc_compare_testvector(buf[1], 16, tests[x].pt, 16, "SERPENT Decrypt", x)) {
         return CRYPT_FAIL_TESTVECTOR;
       }
    }

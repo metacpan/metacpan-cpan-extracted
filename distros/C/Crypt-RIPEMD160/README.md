@@ -16,11 +16,16 @@ Crypt::RIPEMD160 - Perl extension for the RIPEMD-160 Hash function
 
     $digest = $context->digest();
     $string = $context->hexdigest();
+    $string = $context->b64digest();
 
     $copy = $context->clone();
 
     $digest = Crypt::RIPEMD160->hash(SCALAR);
     $string = Crypt::RIPEMD160->hexhash(SCALAR);
+
+    # Via the Digest module
+    use Digest;
+    $context = Digest->new('RIPEMD-160');
 
 # DESCRIPTION
 
@@ -29,6 +34,10 @@ Message Digest algorithm from within Perl programs.
 
 The module is based on the implementation from Antoon Bosselaers from
 Katholieke Universiteit Leuven.
+
+It inherits from [Digest::base](https://metacpan.org/pod/Digest%3A%3Abase), so it supports the standard Perl
+[Digest](https://metacpan.org/pod/Digest) API including **b64digest** and **add\_bits**. It can be
+loaded via `Digest->new('RIPEMD-160')`.
 
 # METHODS
 
@@ -44,7 +53,10 @@ simultaneous digest contexts can be maintained.
     $context->reset();
 
 Reinitializes the context, discarding any accumulated data. Must be
-called after **digest** before reusing the same context.
+called after **digest** before reusing the same context.  Returns
+the context, so calls can be chained:
+
+    $context->reset->add($data);
 
 ## add
 
@@ -52,7 +64,9 @@ called after **digest** before reusing the same context.
 
 Appends the strings in _LIST_ to the message. `add('foo', 'bar')`,
 `add('foo')` followed by `add('bar')`, and `add('foobar')` all
-produce the same result.
+produce the same result.  Returns the context for method chaining:
+
+    $context->add('foo')->add('bar');
 
 ## addfile
 
@@ -60,7 +74,8 @@ produce the same result.
 
 Reads from the open file-handle in 8192 byte blocks and adds the
 contents to the context. The handle can be a lexical filehandle, a
-type-glob reference, or a bare name.
+type-glob reference, or a bare name. The handle is set to binary mode
+via `binmode` to prevent CRLF translation on Windows.
 
 ## digest
 
@@ -76,6 +91,17 @@ computing another digest.
 
 Calls **digest** and returns the result as a printable string of
 hexadecimal digits in five space-separated groups of eight characters.
+
+**Note:** This format differs from the continuous hex string returned
+by most [Digest](https://metacpan.org/pod/Digest) modules. For a continuous hex string, use
+`unpack("H*", $context->digest())`.
+
+## b64digest
+
+    my $string = $context->b64digest();
+
+Returns the digest as a base64-encoded string (without trailing padding).
+This method is inherited from [Digest::base](https://metacpan.org/pod/Digest%3A%3Abase).
 
 ## clone
 

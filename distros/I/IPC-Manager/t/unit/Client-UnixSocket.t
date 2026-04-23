@@ -2,6 +2,7 @@ use Test2::V0;
 use Test2::Require::Module 'IO::Socket::UNIX' => '1.55';
 
 use File::Temp qw/tempdir/;
+use File::Spec;
 use IPC::Manager::Client::UnixSocket;
 use IPC::Manager::Serializer::JSON;
 
@@ -161,7 +162,7 @@ subtest 'long peer names survive sun_path limit' => sub {
     $con2->disconnect;
 };
 
-subtest 'route too long for sun_path croaks clearly' => sub {
+subtest 'route too long for sun_path croaks only when peer name must be hashed' => sub {
     my $dir = tempdir('ipcm-uXXXXXX', TMPDIR => 1, CLEANUP => 1);
     # Create a deep subdirectory to push the route past the sun_path ceiling.
     my $deep = $dir;
@@ -169,13 +170,35 @@ subtest 'route too long for sun_path croaks clearly' => sub {
     $deep .= "/$seg" for 1 .. 6; # ~120+ chars
     require File::Path;
     File::Path::make_path($deep);
+
+    # A peer id that must be hashed (hash form is 42 bytes, doesn't fit) croaks.
     like(
         dies {
-            my $con = $CLASS->new(serializer => $SERIALIZER, route => $deep, id => 'anything');
+            my $con = $CLASS->new(serializer => $SERIALIZER, route => $deep, id => ("z" x 300));
         },
-        qr/sun_path limit/,
-        "route too long croaks with sun_path message",
+        qr/hashed form .* exceeds available budget/,
+        "hash-required peer id under overlong route croaks clearly",
     );
+};
+
+subtest 'short peer names work under a moderately long route' => sub {
+    # Route long enough to shrink the budget below the hash length but still
+    # leave room for short peer names. Short names must not croak.
+    my $dir = tempdir('ipcm-uXXXXXX', TMPDIR => 1, CLEANUP => 1);
+
+    # Build a deep path whose total length leaves room for 'short' (+ '/' +
+    # NUL = 7 bytes) but not for the 42-byte hash form.
+    my $target = 104 - 20;    # leave 20 bytes of budget, well under hash (42)
+    my $pad    = $target - length($dir);
+    skip_all("tempdir too long to construct the test route") if $pad < 10;
+
+    my $deep = File::Spec->catdir($dir, 'x' x ($pad - 1));
+    require File::Path;
+    File::Path::make_path($deep);
+
+    my $con = $CLASS->new(serializer => $SERIALIZER, route => $deep, id => 'short');
+    ok($con, "short peer id works even when route leaves no room for hashed names");
+    $con->disconnect;
 };
 
 done_testing;

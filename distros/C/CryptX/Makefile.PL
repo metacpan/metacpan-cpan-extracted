@@ -27,18 +27,21 @@ else {
   );
   $mycflags = " $Config{ccflags} $Config{cccdlflags} $Config{optimize} "; # keep leading + trailing spaces
 
-  my $try_aes_ni = 0;
-  $try_aes_ni = 1 if $Config{archname} =~ /x86_64/;      # x86_64-cygwin-threads-multi / x86_64-linux-thread-multi
-  $try_aes_ni = 1 if $Config{archname} =~ /MSWin32-x64/; # MSWin32-x64-multi-thread
-  $try_aes_ni = 1 if $Config{archname} =~ /amd64/;       # OpenBSD.amd64-openbsd-thread-multi / amd64-freebsd
-  $try_aes_ni = 1 if $Config{archname} =~ /darwin/ && qx(uname -m) =~ /x86_64/; # darwin-thread-multi-2level / darwin-2level
-  $try_aes_ni = 1 if $Config{archname} =~ /i86pc-solaris(-.+)?-64/; # i86pc-solaris-thread-multi-64 / i86pc-solaris-64
-  if ($try_aes_ni && $Config{gccversion}) {
+  my $extrainc = '';
+  if ($Config{gccversion}) {
     my $ver1;
     $ver1 ||= $1 if $Config{gccversion} =~ /^([0-9]+)\./; # gccversion='10.2.0'
     $ver1 ||= $1 if $Config{gccversion} =~ /LLVM ([0-9]+)\./i; # gccversion='Apple LLVM 14.0.0 (clang-1400.0.29.202)'
     $ver1 ||= $1 if $Config{gccversion} =~ /Clang ([0-9]+)\./i; # gccversion='FreeBSD Clang 13.0.0 (git@github.com:llvm/llvm-project.git llvmorg-13.0.0-0-gd7b669b3a303)' or 'OpenBSD Clang 13.0.0'
-    $mycflags .= " -DLTC_AES_NI" if $ver1 > 4; # target attributes are supported since gcc-4.9
+    if ($ver1 < 5) {
+      # target attributes needed for AESNI & co. are supported since gcc-4.9
+      $mycflags .= " -DLTC_NO_AES_NI -DLTC_NO_GCM_PCLMUL";
+      $extrainc .= " -DLTC_NO_AES_NI -DLTC_NO_GCM_PCLMUL";
+      ### we need $extrainc HACK here because otherwise this is going to happen:
+      # - libtomcrypt (with LTC_NO_GCM_PCLMUL): LTC_GCM_TABLES defined >> gcm_state includes a 64KB lookup table
+      # - XS code (w/o LTC_NO_GCM_PCLMUL): LTC_GCM_PCLMUL gets defined, which #undefs LTC_GCM_TABLES >> gcm_state is ~600 bytes
+      # - later XS code allocates the small struct, but library functions wrote to the 64KB table >> massive heap overflow
+    }
   }
 
   #FIX: this is particularly useful for Debian https://github.com/DCIT/perl-CryptX/pull/39
@@ -54,6 +57,7 @@ else {
   $mycflags =~ s/\s-pedantic-errors\s/ /g;
   $mycflags =~ s/\s-pedantic\s/ /g;
   $mycflags =~ s/\s-std=c89\s/ /g;
+  $mycflags =~ s/\s-std=c99\s/ /g; # with -std=c99 GCC disables asm
   $mycflags =~ s/\s-ansi\s/ /g;
   $mycflags =~ s/\s-Wwrite-strings\s/ /g;
   $mycflags =~ s/\s-Wcast-qual\s/ /g;
@@ -71,8 +75,8 @@ else {
   $mycflags = "$mycflags -Wall -Werror -Wextra" if $ENV{AUTHOR_MODE};
 
   @EUMM_INC_LIB = (
-    INC      => $ENV{AUTHOR_MODE} ? '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm -Wall -Werror -Wextra' #gcc only!!
-                                  : '-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm',
+    INC      => $ENV{AUTHOR_MODE} ? "-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm $extrainc -Wall -Werror -Wextra" #gcc only!!
+                                  : "-DLTM_DESC -Isrc/ltc/headers -Isrc/ltm $extrainc",
     MYEXTLIB => "src/liballinone$Config{lib_ext}",
     clean    => { 'FILES' => join(' ', @myobjs, "src/liballinone$Config{lib_ext}") },
   );
@@ -94,7 +98,7 @@ my %eumm_args = (
   ABSTRACT         => 'Cryptographic toolkit',
   MIN_PERL_VERSION => '5.006',
   LICENSE          => 'perl',
-  PREREQ_PM        => { 'Math::BigInt' => 0 },
+  PREREQ_PM        => { 'Math::BigInt' => 0, 'Time::HiRes' => 0 },
   TEST_REQUIRES    => { 'Test::More' => 0 },
   META_MERGE       => { resources  => { repository => 'https://github.com/DCIT/perl-CryptX', bugtracker => 'https://github.com/DCIT/perl-CryptX/issues' } },
   dist             => { PREOP => 'perldoc -u lib/CryptX.pm | pod2markdown > README.md', TARFLAGS => '--owner=0 --group=0 -cvf' },

@@ -1498,18 +1498,18 @@ int anubis_test(void)
    unsigned char buf[2][16];
    symmetric_key skey;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        anubis_setup(tests[x].key, tests[x].keylen, 0, &skey);
        anubis_ecb_encrypt(tests[x].pt, buf[0], &skey);
        anubis_ecb_decrypt(buf[0], buf[1], &skey);
-       if (compare_testvector(buf[0], 16, tests[x].ct, 16, "Anubis Encrypt", x) ||
-             compare_testvector(buf[1], 16, tests[x].pt, 16, "Anubis Decrypt", x)) {
+       if (ltc_compare_testvector(buf[0], 16, tests[x].ct, 16, "Anubis Encrypt", x) ||
+             ltc_compare_testvector(buf[1], 16, tests[x].pt, 16, "Anubis Decrypt", x)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
 
        for (y = 0; y < 1000; y++) anubis_ecb_encrypt(buf[0], buf[0], &skey);
        for (y = 0; y < 1000; y++) anubis_ecb_decrypt(buf[0], buf[0], &skey);
-       if (compare_testvector(buf[0], 16, tests[x].ct, 16, "Anubis 1000", 1000)) {
+       if (ltc_compare_testvector(buf[0], 16, tests[x].ct, 16, "Anubis 1000", 1000)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
 

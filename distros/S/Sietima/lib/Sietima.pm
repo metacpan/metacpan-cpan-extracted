@@ -14,7 +14,7 @@ use Email::Address;
 use namespace::clean;
 
 with 'MooX::Traits';
-our $VERSION = '1.1.4'; # VERSION
+our $VERSION = '1.1.5'; # VERSION
 # ABSTRACT: minimal mailing list manager
 
 
@@ -145,7 +145,7 @@ Sietima - minimal mailing list manager
 
 =head1 VERSION
 
-version 1.1.4
+version 1.1.5
 
 =head1 SYNOPSIS
 
@@ -199,9 +199,18 @@ avoids sending messages to subscribers who don't want them
 
 replaces the C<From> address with the list's own address
 
+=item L<< C<NoSpoof::DMARC>|Sietima::Role::NoSpoof::DMARC >>
+
+replaces the C<From> address with the list's own address, if the
+sender's domain requires it
+
 =item L<< C<ReplyTo>|Sietima::Role::ReplyTo >>
 
 optionally sets the C<Reply-To> header to the mailing list address
+
+=item L<< C<StripHeaders>|Sietima::Role::StripHeaders >>
+
+removes some headers from all messages
 
 =item L<< C<SubjectTag>|Sietima::Role::SubjectTag >>
 

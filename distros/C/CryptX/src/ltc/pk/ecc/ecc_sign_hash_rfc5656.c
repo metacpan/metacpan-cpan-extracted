@@ -11,14 +11,13 @@
   @param inlen     The length of the digest
   @param out       [out] The destination for the signature
   @param outlen    [in/out] The max size and resulting size of the signature
-  @param prng      An active PRNG state
-  @param wprng     The index of the PRNG you wish to use
+  @param opts      The signature options that shall be applied
   @param key       A private ECC key
   @return CRYPT_OK if successful
 */
 int ecc_sign_hash_rfc5656(const unsigned char *in,  unsigned long inlen,
                           unsigned char *out, unsigned long *outlen,
-                          prng_state *prng, int wprng, const ecc_key *key)
+                          ltc_ecc_sig_opts *opts, const ecc_key *key)
 {
    int err;
    void *r, *s;
@@ -32,7 +31,7 @@ int ecc_sign_hash_rfc5656(const unsigned char *in,  unsigned long inlen,
    if ((err = ecc_ssh_ecdsa_encode_name(name, &namelen, key)) != CRYPT_OK) return err;
 
    if ((err = ltc_mp_init_multi(&r, &s, LTC_NULL)) != CRYPT_OK) return err;
-   if ((err = ecc_sign_hash_internal(in, inlen, r, s, prng, wprng, NULL, key)) != CRYPT_OK) goto error;
+   if ((err = ecc_sign_hash_internal(in, inlen, r, s, opts, key)) != CRYPT_OK) goto error;
 
    /* Store as SSH data sequence, per RFC4251 */
    err = ssh_encode_sequence_multi(out, outlen,

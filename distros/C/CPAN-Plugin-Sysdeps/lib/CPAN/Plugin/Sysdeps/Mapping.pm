@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 # shortcuts
 #  os and distros
@@ -25,6 +25,7 @@ use constant before_debian_bookworm=> (linuxdistrocodename => [qw(squeeze precis
 use constant before_ubuntu_noble   => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy bookworm)]);
 use constant before_debian_trixie  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy bookworm noble)]);
 use constant like_fedora => (linuxdistro => '~fedora');
+use constant like_alpine => (linuxdistro => '~alpine');
 #  package shortcuts
 use constant freebsd_old_jpeg => 'jpeg | jpeg-turbo'; # older freebsd (e.g. 8, 9)
 use constant freebsd_new_jpeg => 'jpeg-turbo | jpeg'; # newer freebsd (e.g. 13, 14, 15)
@@ -224,6 +225,14 @@ sub mapping {
        [package => ['gtk2', 'pkgconf']]],
       [like_debian,
        [package => 'libgtk2.0-dev']]],
+
+     # needed because of https://github.com/PerlAlien/Alien-xz/issues/11
+     [cpanmod => 'Alien::xz',
+      [like_fedora,
+       [package => [qw(xz xz-devel)]]],
+      [like_debian,
+       [package => [qw(xz-utils liblzma-dev)]]],
+     ],
 
      [cpanmod => 'App::Stacktrace',
       # does not work with freebsd anyway
@@ -560,6 +569,34 @@ sub mapping {
        [package => 'libradosstriper-dev']],
      ],
 
+     [cpanmod => 'Chandra',
+      [like_debian,
+       [before_ubuntu_trusty, # at least not available in debian/wheezy
+	[package => []]],
+       [before_ubuntu_noble,
+	[package => 'libwebkit2gtk-4.0-dev']],
+       [package => 'libwebkit2gtk-4.1-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^[67]\.},
+	package => []], # N/A for centos6+7
+       [linuxdistro => 'rocky',
+	[package => 'webkit2gtk3-devel']], # at least rocky 9
+       [linuxdistro => 'fedora', linuxdistroversion => {'<', 37},
+	[package => 'webkit2gtk3-devel']],
+       [linuxdistro => 'fedora', linuxdistroversion => {'<', 38},
+	[package => 'webkit2gtk4.0-devel']],
+       [linuxdistro => 'fedora', 
+	[package => 'webkit2gtk4.1-devel']],
+       [package => []]],
+      ## XXX does not seem to exist, at least in standard alpine:3.21
+      #[like_alpine,
+      # [package => 'webkit2gtk-dev']],
+      [os_freebsd,
+       [osvers => {'>=', 13},
+	[package => 'webkit2-gtk_40']]], # XXX does not seem to be sufficient...
+     ],
+
      [cpanmod => 'Chipcard::PCSC',
       # XXX what about freebsd?
       [os_freebsd,
@@ -837,7 +874,7 @@ sub mapping {
 
      [cpanmod => ['Data::UUID::LibUUID', 'UUID'],
       [os_freebsd,
-       [package => 'e2fsprogs-libuuid']],
+       [package => 'libuuid']],
       [os_openbsd,
        [package => 'ossp-uuid']],
       [like_debian,
@@ -900,6 +937,21 @@ sub mapping {
       ],
       [like_fedora,
        [package => 'firebird-devel']],
+     ],
+
+     [cpanmod => 'DBD::MariaDB',
+      [os_freebsd,
+       [package => 'mysql80-client']], # same like used in https://www.freshports.org/databases/p5-DBD-MariaDB/
+      [os_openbsd,
+       [package => 'mariadb-connector-c']],
+      [like_debian,
+       [package => 'libmariadb-dev | libmariadbclient-dev | libmariadbd-dev | libmysqlclient-dev | libmysqld-dev']], # see https://metacpan.org/dist/DBD-MariaDB/view/lib/DBD/MariaDB/INSTALL.pod#PREREQUISITES
+      [like_fedora,
+       [package => 'mariadb-devel | mariadb-embedded-devel | mysql-devel | mysql-embedded-devel']], # see https://metacpan.org/dist/DBD-MariaDB/view/lib/DBD/MariaDB/INSTALL.pod#PREREQUISITES
+      [os_darwin,
+       [package => 'mysql-client | mysql-connector-c | mysql']],
+      [os_windows,
+       [package => 'mariadb-cli']],
      ],
 
      [cpanmod => 'DBD::mysql',
@@ -1176,7 +1228,7 @@ sub mapping {
       [os_openbsd,
        [package => [ 'firefox' ]]],
       [like_debian,
-       [linuxdistrocodename => [qw(trusty xenial bionic eoan focal jammy)],
+       [linuxdistro => 'ubuntu',
 	[package => [qw(firefox xvfb xauth)]]], # there's no firefox-esr for Ubuntu
        [package => [ 'firefox-esr', 'xvfb', 'xauth' ]]],
       [like_fedora,
@@ -1250,9 +1302,9 @@ sub mapping {
        [package => 'libgd-dev']],
       [like_fedora,
        [package => 'gd-devel']],
+      [like_alpine,
+       [package => 'gd-dev']],
       [os_darwin,
-       [package => 'gd']],
-      [os_windows,
        [package => 'gd']],
      ],
 
@@ -1640,7 +1692,9 @@ sub mapping {
       [like_debian,
        [before_ubuntu_trusty, # at least not available in debian/wheezy
 	[package => []]],
-       [package => 'libwebkit2gtk-4.0-dev']],
+       [before_ubuntu_noble,
+	[package => 'libwebkit2gtk-4.0-dev']],
+       [package => 'libwebkit2gtk-4.1-dev']], # but does not work with Gtk3-WebKit2-0.013: Typelib file for namespace 'WebKit2', version '4.0' not found
       [like_fedora,
        [linuxdistro => 'centos',
 	linuxdistroversion => qr{^[67]\.},
@@ -1698,7 +1752,11 @@ sub mapping {
 	[package => []]], # not available in wheezy
        [package => 'htmldoc']],
       [like_fedora,
-       [linuxdistro => 'centos', linuxdistroversion => {'>=', 8, '<', 9}, # not available (maybe not yet?) for CentOS8
+       [linuxdistro => 'centos', linuxdistroversion => {'>=', 8}, # not available for CentOS8
+	[package => []]],
+       [linuxdistro => 'rocky', # not available for rockylinux
+	[package => []]],
+       [linuxdistro => 'fedora', # not available for (newer) fedora
 	[package => []]],
        [package => 'htmldoc']],
      ],
@@ -2064,6 +2122,17 @@ sub mapping {
        [package => 'slang-devel']], # module cannot detect lib location
      ],
 
+     [cpanmod => 'IO::Uring',
+      [like_debian,
+       [before_debian_bullseye,
+	[package => []]],
+       [package => 'liburing-dev']],
+      [like_fedora,
+       [linuxdistro => 'rocky', linuxdistroversion => qr{^8\.},
+	[package => []]],
+       [package => 'liburing-devel']],
+     ],
+
      [cpanmod => 'IPC::MMA',
       [os_freebsd,
        [package => 'mm']],
@@ -2200,8 +2269,7 @@ sub mapping {
        [package => 'libsoldout1-dev']], # passes with jessie, fails with xenial
      ],
 
-     [#cpanmod => 'Lingua::Identify::CLD2',
-      cpandist => qr{^Lingua-Identify-CLD2-\d}, # XXX until first stable release happens
+     [cpanmod => 'Lingua::Identify::CLD2',
       [os_freebsd,
        [package => 'cld2']],
       [like_debian,
@@ -2369,6 +2437,8 @@ sub mapping {
       [like_debian,
        [package => 'libmpfi-dev']],
       [like_fedora,
+       [linuxdistro => 'rocky', # not available for rockylinux
+	[package => []]],
        [package => 'mpfi-devel']],
      ],
 
@@ -3118,6 +3188,15 @@ sub mapping {
        [package => 'rrdtool-devel']],
      ],
 
+     # module's Build.PL would try to install the required package itself, which fails in unattended non-root setups
+     # unfortunately this does not help --- the module tries always to run the apt/dnf/... commands, even if the package is already installed
+     [cpanmod => 'Runtime::Debugger',
+      [like_debian,
+       [package => 'libreadline-dev']],
+      [like_fedora,
+       [package => 'readline-devel']],
+     ],
+
      [cpanmod => 'Search::Namazu',
       [os_freebsd,
        [package => 'namazu2']],
@@ -3742,6 +3821,8 @@ sub mapping {
      [cpanmod => 'X11::XCB',
       [os_freebsd,
        [package => ['expat', 'pkgconf', 'xcb-proto', 'xcb-util-wm']]],
+      [like_fedora,
+       [package => ['expat-devel', 'libxcb-devel', 'xcb-util-devel', 'xcb-util-wm-devel', 'xcb-proto']]],
       [like_debian,
        [before_ubuntu_focal,
 	[package => []]],

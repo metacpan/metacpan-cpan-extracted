@@ -30,7 +30,10 @@ my $test_repos = tempdir( CLEANUP => 1 );
 my $fake_bin = tempdir( CLEANUP => 1 );
 my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
 my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
+my $apk_log = File::Spec->catfile( $fake_bin, 'apk.log' );
+my $dnf_log = File::Spec->catfile( $fake_bin, 'dnf.log' );
 my $brew_log = File::Spec->catfile( $fake_bin, 'brew.log' );
+my $npx_log = File::Spec->catfile( $fake_bin, 'npx.log' );
 my $sudo_log = File::Spec->catfile( $fake_bin, 'sudo.log' );
 my $dashboard_log = File::Spec->catfile( $fake_bin, 'dashboard.log' );
 my $dependency_log = File::Spec->catfile( $fake_bin, 'dependency-install.log' );
@@ -55,6 +58,23 @@ SH
     0755,
 );
 _write_file(
+    File::Spec->catfile( $fake_bin, 'npx' ),
+    <<"SH",
+#!/bin/sh
+printf '%s|cwd=%s\\n' "\$*" "\$PWD" >> "$npx_log"
+printf 'NPM:%s\\n' "\$*" >> "$dependency_log"
+shift
+shift
+shift
+for spec in "\$@"; do
+  name=\${spec%%@*}
+  mkdir -p "\$PWD/node_modules/\$name"
+done
+exit 0
+SH
+    0755,
+);
+_write_file(
     File::Spec->catfile( $fake_bin, 'sudo' ),
     <<"SH",
 #!/bin/sh
@@ -68,7 +88,12 @@ _write_file(
     <<"SH",
 #!/bin/sh
 printf '%s\\n' "\$*" >> "$dashboard_log"
-printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
+manifest="\${DEVELOPER_DASHBOARD_DEPENDENCY_MANIFEST:-ddfile}"
+if [ "\$manifest" = "ddfile.local" ]; then
+  printf 'DDFILE_LOCAL:%s\\n' "\$*" >> "$dependency_log"
+else
+  printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
+fi
 exit 0
 SH
     0755,
@@ -80,6 +105,61 @@ _write_file(
 printf '%s\\n' "\$*" >> "$apt_log"
 printf 'APT:%s\\n' "\$*" >> "$dependency_log"
 exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'dpkg-query' ),
+    <<'SH',
+#!/bin/sh
+eval "package=\${$#}"
+case ",${DD_TEST_APT_INSTALLED:-}," in
+  *,"$package",*)
+    printf '%s' 'install ok installed'
+    exit 0
+    ;;
+esac
+exit 1
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'apk' ),
+    <<"SH",
+#!/bin/sh
+if [ "\$1" = "info" ] && [ "\$2" = "-e" ]; then
+  case ",\${DD_TEST_APK_INSTALLED:-}," in
+    *,"\$3",*) exit 0 ;;
+  esac
+  exit 1
+fi
+printf '%s\\n' "\$*" >> "$apk_log"
+printf 'APK:%s\\n' "\$*" >> "$dependency_log"
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'dnf' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$dnf_log"
+printf 'DNF:%s\\n' "\$*" >> "$dependency_log"
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'rpm' ),
+    <<'SH',
+#!/bin/sh
+if [ "$1" = "-q" ] && [ "$2" = "--quiet" ]; then
+  case ",${DD_TEST_DNF_INSTALLED:-}," in
+    *,"$3",*) exit 0 ;;
+  esac
+  exit 1
+fi
+exit 1
 SH
     0755,
 );
@@ -111,8 +191,12 @@ use warnings;
 print "hook-alpha\n";
 PL
     ddfile_body => "dep-alpha\n",
+    ddfile_local_body => "dep-beta\n",
     aptfile_body => "git\ncurl\n",
+    apkfile_body => "procps-dev\n",
+    dnfile_body => "git-core\njq\n",
     brewfile_body => "jq\n",
+    package_json_body => qq|{"name":"alpha-skill-node","version":"0.01.0","dependencies":{"express":"^4.19.2","uuid":"^11.0.0"},"devDependencies":{"playwright":"^1.52.0"}}\n|,
     cpanfile_local_body => "requires 'YAML::XS';\n",
     bookmark_body => <<'BOOKMARK',
 TITLE: Skill Bookmark
@@ -136,6 +220,8 @@ ok( -d File::Spec->catdir( $ENV{HOME}, 'perl5' ), 'install prepares the shared p
 ok( -f File::Spec->catfile( $install->{path}, 'config', 'config.json' ), 'install ensures isolated skill config exists' );
 ok( -f File::Spec->catfile( $install->{path}, 'cpanfile' ), 'test skill includes cpanfile for dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'aptfile' ), 'test skill includes aptfile for dependency handling' );
+ok( -f File::Spec->catfile( $install->{path}, 'apkfile' ), 'test skill includes apkfile for dependency handling' );
+ok( -f File::Spec->catfile( $install->{path}, 'dnfile' ), 'test skill includes dnfile for dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'brewfile' ), 'test skill includes brewfile for dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'cpanfile.local' ), 'test skill includes cpanfile.local for local dependency handling' );
 ok( -f $apt_log, 'install runs apt-get for isolated skill apt dependencies when an aptfile is present' );
@@ -149,19 +235,111 @@ open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $depende
 my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
 close $dependency_log_fh;
 is_deeply(
-    [ map { (/^(DDFILE|APT|BREW|CPANM):/)[0] } @dependency_steps ],
-    [ 'DDFILE', 'APT', 'CPANM', 'CPANM' ],
-    'skill install processes ddfile, aptfile, cpanfile, and cpanfile.local in policy order on Debian-like hosts while leaving brewfile inactive',
+    [ map { (/^(DDFILE_LOCAL|DDFILE|APT|BREW|NPM|CPANM):/)[0] } @dependency_steps ],
+    [ 'APT', 'NPM', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
+    'skill install processes aptfile, package.json, cpanfile, cpanfile.local, ddfile, and ddfile.local in policy order on Debian-like hosts while leaving apkfile and brewfile inactive',
 );
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
 close $cpanm_log_fh;
-like( $cpanm_steps[0], qr/^-L \Q$ENV{HOME}\/perl5\E --cpanfile \Q$install->{path}\/cpanfile\E --installdeps \Q$install->{path}\E$/, 'cpanfile installs shared Perl dependencies into HOME perl5' );
-is( $cpanm_steps[1], "-L $install->{path}/perl5 --cpanfile $install->{path}/cpanfile.local --installdeps $install->{path}", 'cpanfile.local installs local Perl dependencies into the skill perl5 root' );
+like( $cpanm_steps[0], qr/^--notest -L \Q$ENV{HOME}\/perl5\E --cpanfile \Q$install->{path}\/cpanfile\E --installdeps \Q$install->{path}\E$/, 'cpanfile installs shared Perl dependencies into HOME perl5 with cpanm --notest' );
+is( $cpanm_steps[1], "--notest -L $install->{path}/perl5 --cpanfile $install->{path}/cpanfile.local --installdeps $install->{path}", 'cpanfile.local installs local Perl dependencies into the skill perl5 root with cpanm --notest' );
+open my $npx_log_fh, '<', $npx_log or die "Unable to read $npx_log: $!";
+my @npm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$npx_log_fh>;
+close $npx_log_fh;
+like(
+    $npm_steps[0],
+    qr/^--yes npm install express\@\^4\.19\.2 uuid\@\^11\.0\.0 playwright\@\^1\.52\.0\|cwd=\Q$ENV{HOME}\E\/\.developer-dashboard\/cache\/node-package-installs\/npm-install-/,
+    'package.json installs declared Node dependencies through npx from a private staging workspace instead of using bare HOME as the npm project root',
+);
+ok( -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'express' ), 'package.json merges staged Node dependencies into HOME/node_modules' );
+ok( -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'uuid' ), 'package.json merges additional staged Node dependencies into HOME/node_modules' );
+ok( -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'playwright' ), 'package.json merges staged Playwright dependencies into HOME/node_modules' );
 open my $dashboard_log_fh, '<', $dashboard_log or die "Unable to read $dashboard_log: $!";
 my @dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dashboard_log_fh>;
 close $dashboard_log_fh;
-is( $dashboard_steps[0], 'skills install dep-alpha', 'ddfile installs dependent skills through dashboard skills install' );
+is( $dashboard_steps[0], 'skills install dep-alpha', 'deferred ddfile installs dependent skills through dashboard skills install' );
+is( $dashboard_steps[1], 'skills install dep-beta', 'deferred ddfile.local installs dependent skills through dashboard skills install at the current skill level' );
+{
+    local $ENV{DD_TEST_OS} = 'linux';
+    local $ENV{DD_TEST_FEDORA} = 1;
+    local $ENV{DD_TEST_DNF_INSTALLED} = 'git-core,jq';
+    unlink $dnf_log;
+    my $skip_dnf = $manager->_install_skill_dnfile( $install->{path} );
+    ok( !$skip_dnf->{error}, '_install_skill_dnfile succeeds when every Fedora package is already installed' )
+      or diag $skip_dnf->{error};
+    ok( $skip_dnf->{skipped}, '_install_skill_dnfile reports a skip when every Fedora package is already installed' );
+    is( $skip_dnf->{skip_reason}, 'all dnfile packages already installed', '_install_skill_dnfile returns an explicit skip reason for fully installed Fedora package manifests' );
+    ok( !-f $dnf_log, '_install_skill_dnfile does not invoke dnf when every Fedora package is already installed' );
+}
+{
+    local $ENV{DD_TEST_OS} = 'linux';
+    local $ENV{DD_TEST_FEDORA} = 1;
+    local $ENV{DD_TEST_DNF_INSTALLED} = 'git-core';
+    unlink $dnf_log;
+    my $root_dnf = $manager->_install_skill_dnfile( $install->{path} );
+    ok( !$root_dnf->{error}, '_install_skill_dnfile succeeds on Fedora hosts when a dnfile is present and packages are missing' )
+      or diag $root_dnf->{error};
+    open my $root_dnf_fh, '<', $dnf_log or die "Unable to read $dnf_log: $!";
+    my @root_dnf_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$root_dnf_fh>;
+    close $root_dnf_fh;
+    is( $root_dnf_steps[0], 'install -y jq', '_install_skill_dnfile calls dnf install -y with only the missing Fedora packages' );
+}
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::_skill_package_runner_prefix = sub { return (); };
+    local $ENV{DD_TEST_APT_INSTALLED} = 'git';
+    unlink $apt_log;
+    unlink $sudo_log;
+    my $root_apt = $manager->_install_skill_aptfile( $install->{path} );
+    ok( !$root_apt->{error}, '_install_skill_aptfile succeeds without sudo when package installs already run as root' )
+      or diag $root_apt->{error};
+    open my $root_apt_fh, '<', $apt_log or die "Unable to read $apt_log: $!";
+    my @root_apt_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$root_apt_fh>;
+    close $root_apt_fh;
+    is( $root_apt_steps[0], 'install -y curl', '_install_skill_aptfile only installs Debian packages that are still missing' );
+    my $sudo_text = '';
+    if ( -f $sudo_log ) {
+        open my $sudo_fh, '<', $sudo_log or die "Unable to read $sudo_log: $!";
+        $sudo_text = do { local $/; <$sudo_fh> };
+        close $sudo_fh;
+    }
+    ok( $sudo_text eq '', '_install_skill_aptfile does not invoke sudo when package installs already run as root' );
+}
+{
+    local $ENV{DD_TEST_APT_INSTALLED} = 'git,curl';
+    unlink $apt_log;
+    unlink $sudo_log;
+    my $skip_apt = $manager->_install_skill_aptfile( $install->{path} );
+    ok( !$skip_apt->{error}, '_install_skill_aptfile succeeds when every Debian package is already installed' )
+      or diag $skip_apt->{error};
+    ok( $skip_apt->{skipped}, '_install_skill_aptfile reports a skip when every Debian package is already installed' );
+    is( $skip_apt->{skip_reason}, 'all aptfile packages already installed', '_install_skill_aptfile returns an explicit skip reason for fully installed Debian package manifests' );
+    ok( !-f $apt_log, '_install_skill_aptfile does not invoke apt-get when every Debian package is already installed' );
+    ok( !-f $sudo_log, '_install_skill_aptfile does not invoke sudo when every Debian package is already installed' );
+}
+{
+    local $ENV{DD_TEST_ALPINE} = 1;
+    local $ENV{DD_TEST_APK_INSTALLED} = 'procps-dev';
+    unlink $apk_log;
+    my $root_apk = $manager->_install_skill_apkfile( $install->{path} );
+    ok( !$root_apk->{error}, '_install_skill_apkfile succeeds on Alpine hosts when an apkfile is present' )
+      or diag $root_apk->{error};
+    ok( $root_apk->{skipped}, '_install_skill_apkfile reports a skip when every Alpine package is already installed' );
+    is( $root_apk->{skip_reason}, 'all apkfile packages already installed', '_install_skill_apkfile returns an explicit skip reason for fully installed Alpine package manifests' );
+    ok( !-f $apk_log, '_install_skill_apkfile does not invoke apk add when every Alpine package is already installed' );
+}
+{
+    local $ENV{DD_TEST_ALPINE} = 1;
+    unlink $apk_log;
+    my $root_apk = $manager->_install_skill_apkfile( $install->{path} );
+    ok( !$root_apk->{error}, '_install_skill_apkfile succeeds on Alpine hosts when an apkfile is present and packages are missing' )
+      or diag $root_apk->{error};
+    open my $root_apk_fh, '<', $apk_log or die "Unable to read $apk_log: $!";
+    my @root_apk_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$root_apk_fh>;
+    close $root_apk_fh;
+    is( $root_apk_steps[0], 'add --no-cache procps-dev', '_install_skill_apkfile calls apk add --no-cache with only the missing Alpine packages' );
+}
 
 my $listed = $manager->list();
 is( scalar(@$listed), 1, 'list returns the installed skill only once' );
@@ -175,6 +353,8 @@ is( $listed->[0]{pages_count}, 1, 'list reports the number of non-nav skill page
 is( $listed->[0]{docker_services_count}, 1, 'list reports the number of skill docker services' );
 is( $listed->[0]{has_ddfile}, 1, 'list reports ddfile presence for one installed skill' );
 is( $listed->[0]{has_aptfile}, 1, 'list reports aptfile presence for one installed skill' );
+is( $listed->[0]{has_apkfile}, 1, 'list reports apkfile presence for one installed skill' );
+is( $listed->[0]{has_dnfile}, 1, 'list reports dnfile presence for one installed skill' );
 is( $listed->[0]{has_brewfile}, 1, 'list reports brewfile presence for one installed skill' );
 is( $listed->[0]{has_cpanfile_local}, 1, 'list reports cpanfile.local presence for one installed skill' );
 ok(
@@ -850,11 +1030,23 @@ sub _create_skill_repo {
     if ( defined $args{ddfile_body} ) {
         _write_file( 'ddfile', $args{ddfile_body}, 0644 );
     }
+    if ( defined $args{ddfile_local_body} ) {
+        _write_file( 'ddfile.local', $args{ddfile_local_body}, 0644 );
+    }
     if ( defined $args{aptfile_body} ) {
         _write_file( 'aptfile', $args{aptfile_body}, 0644 );
     }
+    if ( defined $args{apkfile_body} ) {
+        _write_file( 'apkfile', $args{apkfile_body}, 0644 );
+    }
+    if ( defined $args{dnfile_body} ) {
+        _write_file( 'dnfile', $args{dnfile_body}, 0644 );
+    }
     if ( defined $args{brewfile_body} ) {
         _write_file( 'brewfile', $args{brewfile_body}, 0644 );
+    }
+    if ( defined $args{package_json_body} ) {
+        _write_file( 'package.json', $args{package_json_body}, 0644 );
     }
     if ( defined $args{cpanfile_local_body} ) {
         _write_file( 'cpanfile.local', $args{cpanfile_local_body}, 0644 );

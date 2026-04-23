@@ -30,6 +30,7 @@ requires:
   Class::Utils: 0
   Cpanel::JSON::XS: 0
   Getopt::Std: 0
+  List::Util: 1.33
   Perl6::Slurp: 0
   perl: 5.6.0
 resources:
@@ -37,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-MARC-Validator-Report
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-MARC-Validator-Report
-version: '0.03'
+version: '0.04'

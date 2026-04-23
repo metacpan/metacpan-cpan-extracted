@@ -936,6 +936,7 @@ sub _start_dashboard_server {
     die "Unable to fork dashboard server: $!" if !defined $pid;
     if ( $pid == 0 ) {
         local %ENV = %ENV;
+        delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)} if _coverage_requested();
         $ENV{HOME} = $args{home};
         chdir $args{cwd} or die "Unable to chdir to $args{cwd}: $!";
         open STDOUT, '>', $args{log_file} or die "Unable to write $args{log_file}: $!";
@@ -990,12 +991,23 @@ sub _wait_for_http {
         timeout      => 2,
         max_redirect => 0,
     );
-    for ( 1 .. 60 ) {
+    for ( 1 .. _http_probe_attempts() ) {
         my $response = $ua->get($url);
         return 1 if $response->is_success;
         sleep 0.25;
     }
     die "Timed out waiting for HTTP endpoint $url\n";
+}
+
+sub _http_probe_attempts {
+    my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
+    return 180 if $perl5opt =~ /Devel::Cover/;
+    return 60;
+}
+
+sub _coverage_requested {
+    my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
+    return $perl5opt =~ /Devel::Cover/ ? 1 : 0;
 }
 
 # _read_text($path)

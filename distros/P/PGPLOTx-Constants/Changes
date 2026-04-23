@@ -1,0 +1,21 @@
+Revision history for PGPLOTx-Constants
+
+0.03      2026-04-22 11:52:02 EDT
+
+  [BUILD]
+
+    * Add missing dependency on CXC::Exporter::Util
+    * Bump minimum Perl to 5.22 to track that of CXC::Exporter::Util
+    * fix use of '<<~' which is only available starting with Perl 5.26
+    * Fiducial repo is at codeberg.org, not gitlab.com
+
+0.02      2026-04-21 13:54:33 EDT (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+
+    * new subs, coerce_constant and list_constants, to aid in creating
+      user interfaces.
+
+0.01      2026-04-20 18:12:23 EDT (TRIAL RELEASE)
+
+* First release upon an unsuspecting world.

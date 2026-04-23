@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '2.76';
+our $VERSION = '3.04';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -332,6 +332,8 @@ sub _run_loop_child {
     my $daemonize     = exists $args{daemonize} ? $args{daemonize} : 1;
     my $single_tick   = $args{single_tick} ? 1 : 0;
 
+    $self->_scrub_coverage_environment;
+
     if ($daemonize) {
         setsid();
         open STDIN, '<', File::Spec->devnull() or die $!;
@@ -596,6 +598,31 @@ sub _cleanup_loop_files {
     unlink $self->_pidfile($name) if -f $self->_pidfile($name);
     unlink $self->_statefile($name) if -f $self->_statefile($name);
     return 1;
+}
+
+# _scrub_coverage_environment()
+# Removes Devel::Cover-specific environment variables from managed collector
+# children so daemonized loop processes do not inherit repository test
+# instrumentation.
+# Input: none.
+# Output: none.
+sub _scrub_coverage_environment {
+    my ($self) = @_;
+    return if !$self->_coverage_instrumentation_active;
+    delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)};
+    return;
+}
+
+# _coverage_instrumentation_active()
+# Detects whether the current process environment requests Devel::Cover
+# instrumentation.
+# Input: none.
+# Output: boolean true when PERL5OPT or HARNESS_PERL_SWITCHES mentions
+# Devel::Cover.
+sub _coverage_instrumentation_active {
+    my ($self) = @_;
+    my $perl5opt = join ' ', grep { defined && $_ ne '' } @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)};
+    return $perl5opt =~ /Devel::Cover/ ? 1 : 0;
 }
 
 # _job_is_due($job, $name)

@@ -29,7 +29,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Interval-Barycentric
   repository: https://github.com/ology/Music-Interval-Barycentric.git
-version: '0.0403'
+version: '0.0404'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

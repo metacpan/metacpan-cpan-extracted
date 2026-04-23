@@ -1,5 +1,9 @@
 Change log for Graphics::Framebuffer
 
+6.98   April 22, 2026
+
+       Changes to the splash screen.
+
 6.97   April 19, 2026
 
        Added the "ball" method.  Allows you to draw pseudo 3D balls.

@@ -4,7 +4,7 @@
       "Toshio Ito <toshioito@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -67,6 +67,6 @@
          "web" : "https://github.com/debug-ito/Gnuplot-Builder"
       }
    },
-   "version" : "0.32",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

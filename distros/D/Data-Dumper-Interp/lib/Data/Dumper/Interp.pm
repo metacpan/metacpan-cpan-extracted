@@ -26,8 +26,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.023'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2026-03-01'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '8.000'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-04-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -68,7 +68,7 @@ use overload ();
 
 our @EXPORT    = qw( visnew
                      vis avis hvis ivis dvis
-                     viso aviso hviso iviso dviso
+                     viso aviso hviso iviso ivisO dviso dvisO
                      visq avisq hvisq ivisq dvisq
                      visr avisr hvisr ivisr dvisr
                      rvis rvisq
@@ -602,8 +602,9 @@ sub _generate_sub($;$) {
   $useqq .= ":condense"            if delete $mod{C};
   $code .= '->Debug(2)'            if delete $mod{D};
   $useqq .= ":hex"                 if delete $mod{h};
-  $code .= '->Objects(0)'          if delete $mod{o};
-  $useqq .= ":octets"              if delete $mod{O};
+  $code .= '->Objects(0)'          if delete $mod{o}; # show internals
+  $code .= '->Objects({overloads => "transparent"})' if delete $mod{O}; # hide overloaded objects, not even showing classname
+  $useqq .= ":octets"              if delete $mod{B};
   $code .= '->Refaddr(1)'          if delete $mod{r};
   $useqq .= ":underscores"         if delete $mod{u};
 
@@ -766,7 +767,7 @@ sub _Do {
         confess "Objects hashref value has unknown key '$key'\n";
       }
     }
-    $objects = $objects->{objects} // (ref($Objects) ? 1 : $Objects);
+    $objects = $objects->{objects} // 1;
   }
   $objects = [ $objects ] unless ref($objects //= []) eq 'ARRAY';
 
@@ -2518,7 +2519,9 @@ The available modifier characters are:
 
 B<l> - omit parenthesis to return a bare list with "avis" or "hvis"; omit quotes from strings formatted by "vis".
 
-B<o> - show object internals (see C<Objects>);
+B<o> - show object internals (see C<Objects>).
+
+B<O> - Hide overloaded object internals, not even showing class name.
 
 B<r> - show abbreviated addresses in refs (see C<Refaddr>).
 
@@ -2534,7 +2537,7 @@ B<d> - ("debug-friendly") Condense strings; show spaces as middle-dot.
 
 B<h> - show numbers in hexadecimal
 
-B<O> - Optimize for strings containing binary octets.
+B<B> - Optimize for strings containing binary octets.
 
 B<q> - show strings 'single quoted' if possible
 
@@ -2550,25 +2553,6 @@ B<u> - show numbers with underscores between groups of three digits
 
 =back
 
-To avoid having to import functions in advance, you can
-use them as methods and import only the C<visnew> function:
-
-  use Spreadsheet::Edit::Interp qw/visnew/;
-  ...
-  say visnew->vis($struct);
-  say visnew->visrq($my_object);
-  say visnew->avis(@ARGV);
-  say visnew->avis2lrq(@ARGV);
-  etc.
-
-(C<visnew> creates a new object.  Non-existent methods are auto-generated
-via the AUTOLOAD mechanism).
-
-* To save memory, only stub declarations with prototypes are generated
-for imported functions.
-Bodies are only generated when they are called, via the AUTOLOAD mechanism.
-Use the C<:debug> import tag to see details.
-
 =head2 RefArgFormatter
 
 $Carp::RefArgFormatter may be set to a ref to this sub
@@ -2576,7 +2560,7 @@ to format arguments using 'vis' in tracebacks (see L<Carp>).
 
 =head1 Import options
 
-By default the following are imported:
+By default the following are guaranteed to be imported:
 
  ivis  dvis    vis  avis  hvis
  ivisq dvisq   visq avisq hvisq rvis rvisq
@@ -2623,6 +2607,24 @@ The following special import tags are available:
 =for HIDE
 =for HIDE You could have used alternate names for the same function such as C<avis2ql>,
 =for HIDE C<q2avisl>, C<q_2_avis_l> etc. if called as methods or explicitly imported.
+
+Instead of importing functions in advance, you can
+call them as methods and import only the C<visnew> function:
+
+  use Spreadsheet::Edit::Interp qw/visnew/;
+  ...
+  say visnew->vis($struct);
+  say visnew->visrq($my_object);
+  say visnew->avis(@ARGV);
+  say visnew->avis2lrq(@ARGV);
+  etc.
+
+(C<visnew> creates a new object.  Non-existent methods are auto-generated
+via the AUTOLOAD mechanism).
+
+* Only stub declarations with prototypes are generated
+when functions are imported; bodies are auto-generated when first called.
+Use the C<:debug> import tag to see details.
 
 =head1 Showing Abbreviated Addresses
 

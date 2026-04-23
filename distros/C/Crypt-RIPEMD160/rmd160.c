@@ -18,6 +18,7 @@
 /*  header files */
 #include <string.h>
 #include "rmd160.h"
+#include "wrap_160.h"
 
 /********************************************************************/
 
@@ -262,7 +263,7 @@ void MDfinish(dword *MDbuf, const byte *strptr, dword lswlen, dword mswlen)
    rmd160_compress(MDbuf, X);
 
    /* zero sensitive message data from the stack */
-   memset(X, 0, 16*sizeof(dword));
+   secure_memzero(X, 16*sizeof(dword));
 
    return;
 }

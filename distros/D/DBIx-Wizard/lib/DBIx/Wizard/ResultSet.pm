@@ -253,6 +253,8 @@ sub insert {
     my @row;
     if ($sth->can('last_insert_id')) {
       @row = $sth->last_insert_id();
+    } elsif ($dbh->can('last_insert_id')) {
+      @row = $dbh->last_insert_id(undef, $self->{db}, $self->{table}, $auto_pk);
     } else {
       @row = $dbh->selectrow_array('SELECT LAST_INSERT_ID()');
     }

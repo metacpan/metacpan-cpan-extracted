@@ -1,5 +1,46 @@
 Revision history for Perl extension Crypt::RIPEMD160.
 
+0.13 2026-04-23
+
+  Bug fixes:
+    - Use SvPVbyte in XS add() so wide-character strings are handled
+      consistently rather than relying on the caller's UTF-8 flag. PR #56
+    - Add binmode to addfile() for cross-platform consistency on Windows. PR #57
+    - Return $self from Perl-level add() and addfile() to enable method
+      chaining at the Perl layer (XS already returned $self). PR #54
+    - Zero MAC key material (key, k_ipad, k_opad) in DESTROY to reduce
+      the window for key material leaking into freed memory. PR #62
+    - Use dead-store-proof memset loop for zeroing sensitive memory so the
+      compiler cannot optimise away the wipe. PR #50
+    - Define PERL_NO_GET_CONTEXT in the XS file for correctness under
+      threaded Perl builds. PR #60
+    - Silence -Wall -Wextra compiler warnings in XS code. PR #49
+    - Include t/03streaming.t in MANIFEST so it is shipped in CPAN
+      distributions. PR #48
+
+  Improvements:
+    - Inherit from Digest::base to support the standard Perl Digest API:
+      b64digest, add_bits, and loading via Digest->new('RIPEMD-160'). PR #58
+    - Return $self from XS-level add() and reset() to allow method
+      chaining: $ctx->reset->add($data)->digest(). PR #53
+    - Delegate MAC addfile() to the inner RIPEMD-160 addfile() to avoid
+      duplicating the read loop and binmode handling. PR #64
+
+  Maintenance:
+    - Add proper =head2 method sections to MAC.pm POD. PR #51
+    - Add comprehensive MAC test suite covering HMAC correctness, reset,
+      addfile, and long-key hashing. PR #55
+    - Add streaming consistency tests verifying that single-call and
+      multi-call add() produce identical digests. PR #46
+    - Move X[] scratch buffer from the RIPEMD-160 state struct to the
+      stack, reducing per-context memory usage. PR #52
+    - Add #!include_default to MANIFEST.SKIP for robust exclusion of
+      build artefacts. PR #59
+    - Fix CI author-test failures on older Perls: install develop deps
+      and skip tests for methods unavailable before Digest::base
+      integration. PR #61
+    - Narrow .gitignore *.c pattern to only the XS-generated C file. PR #63
+
 0.12 2026-04-02
 
   Bug fixes:

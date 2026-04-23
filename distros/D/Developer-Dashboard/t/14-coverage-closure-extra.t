@@ -17,6 +17,7 @@ use Developer::Dashboard::Collector;
 use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageStore;
@@ -360,6 +361,48 @@ PAGE
     );
     my $state = $runner->loop_state($loop_name);
     is( $state->{status}, 'running', '_run_loop_child non-daemonized tick still writes running state' );
+}
+
+{
+    my $loop_name = 'coverage.loop.scrub';
+    my $seen_file = File::Spec->catfile( $paths->state_root, 'coverage-loop-scrub.json' );
+    my $child_pid = fork();
+    die "fork failed: $!" if !defined $child_pid;
+    if ( !$child_pid ) {
+        no warnings 'redefine';
+        local $ENV{PERL5OPT} = '-MDevel::Cover';
+        local $ENV{HARNESS_PERL_SWITCHES} = '-MDevel::Cover';
+        local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::run_once = sub {
+            my ($self, $job) = @_;
+            open my $fh, '>', $seen_file or die "Unable to write $seen_file: $!";
+            print {$fh} json_encode(
+                {
+                    perl5opt               => ( defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : '' ),
+                    harness_perl_switches  => ( defined $ENV{HARNESS_PERL_SWITCHES} ? $ENV{HARNESS_PERL_SWITCHES} : '' ),
+                }
+            );
+            close $fh;
+            return { ok => 1 };
+        };
+        my $ok = $runner->_run_loop_child(
+            daemonize     => 0,
+            interval      => 0,
+            job           => { command => 'printf scrub', cwd => $home },
+            name          => $loop_name,
+            schedule_mode => 'interval',
+            single_tick   => 1,
+            title         => $runner->_process_title($loop_name),
+        );
+        exit( $ok ? 0 : 1 );
+    }
+    waitpid( $child_pid, 0 );
+    is( $? >> 8, 0, '_run_loop_child keeps a coverage-instrumented child alive long enough to execute one scrubbed tick' );
+    open my $seen_fh, '<', $seen_file or die "Unable to read $seen_file: $!";
+    my $seen = json_decode( do { local $/; <$seen_fh> } );
+    close $seen_fh;
+    is( $seen->{perl5opt}, '', '_run_loop_child clears PERL5OPT inside managed collector children when coverage instrumentation is active' );
+    is( $seen->{harness_perl_switches}, '', '_run_loop_child clears HARNESS_PERL_SWITCHES inside managed collector children when coverage instrumentation is active' );
 }
 
 {

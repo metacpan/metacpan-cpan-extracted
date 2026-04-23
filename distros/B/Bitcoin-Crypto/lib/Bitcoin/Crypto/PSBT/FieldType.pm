@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::PSBT::FieldType;
-$Bitcoin::Crypto::PSBT::FieldType::VERSION = '4.004';
+$Bitcoin::Crypto::PSBT::FieldType::VERSION = '4.005';
 use v5.14;
 use warnings;
 
@@ -154,15 +154,15 @@ my %script_serializers = (
 );
 
 my %proprietary_key_serializers = (
-	key_data => "Array reference with two bytestring items",
+	key_data => "Array reference with three items: bytestring, unsigned integer, bytestring",
 	key_serializer => sub {
-		state $sig = signature(positional => [Tuple [ByteStr, ByteStr]]);
-		my ($ident, $subkey) = @{($sig->(@_))[0]};
+		state $sig = signature(positional => [Tuple [ByteStr, PositiveOrZeroInt, ByteStr]]);
+		my ($ident, $subtype, $subkey) = @{($sig->(@_))[0]};
 
 		my $result = '';
 		$result .= pack_compactsize(length $ident);
 		$result .= $ident;
-		$result .= pack_compactsize(length $subkey);
+		$result .= pack_compactsize($subtype);
 		$result .= $subkey;
 
 		return $result;
@@ -175,11 +175,10 @@ my %proprietary_key_serializers = (
 		my $ident = substr $val, $pos, $ident_len;
 		$pos += $ident_len;
 
-		my $subkey_len = unpack_compactsize($val, \$pos);
-		my $subkey = substr $val, $pos, $subkey_len;
-		$pos += $subkey_len;
+		my $subtype = unpack_compactsize($val, \$pos);
+		my $subkey = substr $val, $pos;
 
-		return [$ident, $subkey];
+		return [$ident, $subtype, $subkey];
 	},
 );
 
@@ -902,6 +901,25 @@ sub get_field_by_name
 	return $types{$name};
 }
 
+signature_for get_fields_available_in_version => (
+	method => !!1,
+	positional => [PositiveOrZeroInt],
+);
+
+sub get_fields_available_in_version
+{
+	my ($class, $version) = @_;
+
+	# sort to ensure deterministic order
+	return [
+		grep {
+			$_->available_in_version($version)
+		} map {
+			$types{$_}
+		} sort keys %types
+	];
+}
+
 signature_for get_fields_required_in_version => (
 	method => !!1,
 	positional => [PositiveOrZeroInt],
@@ -1061,6 +1079,12 @@ Returns a field type with a given C<$name>.
 If no such field is defined, an exception will be thrown. Unknown field type
 cannot be created like in L</get_field_by_code>, because code is a required
 part of a field, while name is only informatory.
+
+=head3 get_fields_available_in_version
+
+	$fields_aref = $class->get_fields_available_in_version($version)
+
+Returns an array reference of field types which are available in a given C<$version> number.
 
 =head3 get_fields_required_in_version
 

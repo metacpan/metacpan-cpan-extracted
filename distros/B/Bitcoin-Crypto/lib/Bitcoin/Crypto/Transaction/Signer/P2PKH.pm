@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Signer::P2PKH;
-$Bitcoin::Crypto::Transaction::Signer::P2PKH::VERSION = '4.004';
+$Bitcoin::Crypto::Transaction::Signer::P2PKH::VERSION = '4.005';
 use v5.14;
 use warnings;
 

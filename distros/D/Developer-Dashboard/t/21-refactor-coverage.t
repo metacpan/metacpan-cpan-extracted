@@ -18,7 +18,7 @@ use Developer::Dashboard::CLI::Ticket ();
 use Developer::Dashboard::CLI::Paths ();
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::InternalCLI ();
-use Developer::Dashboard::JSON qw(json_decode);
+use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::DockerCompose;
 use Developer::Dashboard::FileRegistry;
@@ -1551,7 +1551,9 @@ chdir $test_cwd or die "Unable to chdir to $test_cwd: $!";
 my $fake_bin = tempdir( CLEANUP => 1 );
 my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
 my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
+my $apk_log = File::Spec->catfile( $fake_bin, 'apk.log' );
 my $brew_log = File::Spec->catfile( $fake_bin, 'brew.log' );
+my $npx_log = File::Spec->catfile( $fake_bin, 'npx.log' );
 my $sudo_log = File::Spec->catfile( $fake_bin, 'sudo.log' );
 my $dashboard_log = File::Spec->catfile( $fake_bin, 'dashboard.log' );
 my $dependency_log = File::Spec->catfile( $fake_bin, 'dependency-install.log' );
@@ -1582,6 +1584,29 @@ SH
     0755,
 );
 _write_file(
+    File::Spec->catfile( $fake_bin, 'npx' ),
+    <<"SH",
+#!/bin/sh
+printf '%s|cwd=%s\\n' "\$*" "\$PWD" >> "$npx_log"
+printf 'NPM:%s\\n' "\$*" >> "$dependency_log"
+if [ "\$DD_TEST_NPM_FAIL" = "1" ]; then
+  exit 1
+fi
+if [ "\$DD_TEST_NPM_NO_MODULES" = "1" ]; then
+  exit 0
+fi
+shift
+shift
+shift
+for spec in "\$@"; do
+  name=\${spec%%@*}
+  mkdir -p "\$PWD/node_modules/\$name"
+done
+exit 0
+SH
+    0755,
+);
+_write_file(
     File::Spec->catfile( $fake_bin, 'sudo' ),
     <<"SH",
 #!/bin/sh
@@ -1595,7 +1620,12 @@ _write_file(
     <<"SH",
 #!/bin/sh
 printf '%s\\n' "\$*" >> "$dashboard_log"
-printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
+manifest="\${DEVELOPER_DASHBOARD_DEPENDENCY_MANIFEST:-ddfile}"
+if [ "\$manifest" = "ddfile.local" ]; then
+  printf 'DDFILE_LOCAL:%s\\n' "\$*" >> "$dependency_log"
+else
+  printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
+fi
 if [ "\$DD_TEST_DDFILE_FAIL" = "1" ]; then
   exit 1
 fi
@@ -1616,16 +1646,163 @@ exit 0
 SH
     0755,
 );
+_write_file(
+    File::Spec->catfile( $fake_bin, 'dpkg-query' ),
+    <<'SH',
+#!/bin/sh
+eval "package=\${$#}"
+case ",${DD_TEST_APT_INSTALLED:-}," in
+  *,"$package",*)
+    printf '%s' 'install ok installed'
+    exit 0
+    ;;
+esac
+exit 1
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'apk' ),
+    <<"SH",
+#!/bin/sh
+if [ "\$1" = "info" ] && [ "\$2" = "-e" ]; then
+  case ",\${DD_TEST_APK_INSTALLED:-}," in
+    *,"\$3",*) exit 0 ;;
+  esac
+  exit 1
+fi
+printf '%s\\n' "\$*" >> "$apk_log"
+printf 'APK:%s\\n' "\$*" >> "$dependency_log"
+if [ "\$DD_TEST_APK_FAIL" = "1" ]; then
+  exit 1
+fi
+exit 0
+SH
+    0755,
+);
 local $ENV{PATH} = join ':', $fake_bin, ( $ENV{PATH} || () );
 
 my $skill_paths = Developer::Dashboard::PathRegistry->new( home => File::Spec->catdir( $ENV{HOME}, 'skills-home' ) );
 my $manager = Developer::Dashboard::SkillManager->new( paths => $skill_paths );
 is_deeply( $manager->list, [], 'skill manager list is empty before installation' );
+is_deeply(
+    Developer::Dashboard::SkillManager->install_progress_tasks,
+    [
+        { id => 'fetch_source',         label => 'Fetch skill source' },
+        { id => 'prepare_layout',       label => 'Prepare skill layout' },
+        { id => 'install_aptfile',      label => 'Install aptfile dependencies' },
+        { id => 'install_apkfile',      label => 'Install apkfile dependencies' },
+        { id => 'install_dnfile',       label => 'Install dnfile dependencies' },
+        { id => 'install_brewfile',     label => 'Install brewfile dependencies' },
+        { id => 'install_package_json', label => 'Install package.json dependencies' },
+        { id => 'install_cpanfile',     label => 'Install cpanfile dependencies' },
+        { id => 'install_cpanfile_local', label => 'Install cpanfile.local dependencies' },
+        { id => 'install_ddfile',       label => 'Install ddfile dependencies' },
+        { id => 'install_ddfile_local', label => 'Install ddfile.local dependencies' },
+    ],
+    'install_progress_tasks returns the documented dashboard skills install task sequence',
+);
+{
+    my @events;
+    my $progress_manager = Developer::Dashboard::SkillManager->new(
+        paths    => $skill_paths,
+        progress => sub { push @events, shift },
+    );
+    is( $progress_manager->_progress_emit( { task_id => 'fetch_source', status => 'running' } ), 1, '_progress_emit returns true when a progress callback is configured' );
+    is_deeply(
+        \@events,
+        [ { task_id => 'fetch_source', status => 'running' } ],
+        '_progress_emit forwards events into the configured callback',
+    );
+}
+{
+    my $label_skill = File::Spec->catdir( $ENV{HOME}, 'label-skill' );
+    my $label_package_json = File::Spec->catfile( $label_skill, 'package.json' );
+    make_path($label_skill);
+    _write_file( $label_package_json, qq|{"name":"label-skill","version":"1.0.0"}\n| );
+    is(
+        $manager->_dependency_progress_label( 'install_package_json', $label_skill ),
+        "Install package.json dependencies from $label_package_json",
+        '_dependency_progress_label surfaces the detected package.json path while npm work is in progress',
+    );
+    is(
+        $manager->_dependency_progress_label(
+            'install_package_json',
+            $label_skill,
+            result => { success => 1, skipped => 1 },
+        ),
+        'Install package.json dependencies (skipped: package.json not present)',
+        '_dependency_progress_label makes skipped package.json work explicit in the progress board',
+    );
+}
 is( $manager->get_skill_path('missing'), undef, 'get_skill_path returns undef for missing skills' );
+is( $manager->_normalize_install_source('browser'), 'https://github.com/manif3station/browser', '_normalize_install_source expands bare skill names against the official GitHub base' );
+is( $manager->_normalize_install_source('foo/bar'), 'https://github.com/foo/bar', '_normalize_install_source expands owner/repo shorthand against GitHub' );
+is( $manager->_normalize_install_source('https://github.com/foo/bar.git'), 'https://github.com/foo/bar.git', '_normalize_install_source leaves explicit HTTPS remotes unchanged' );
+is( $manager->_normalize_install_source('git@github.com:foo/bar.git'), 'git@github.com:foo/bar.git', '_normalize_install_source leaves explicit SSH remotes unchanged' );
+is( $manager->_normalize_install_source('foo bar?baz'), 'foo bar?baz', '_normalize_install_source leaves non-shorthand install sources unchanged' );
 is( Developer::Dashboard::SkillManager::_extract_repo_name('bogus'), undef, '_extract_repo_name returns undef for strings without a repo path segment' );
 is( Developer::Dashboard::SkillManager::_extract_repo_name('https://example.invalid/owner/repo.git'), 'repo', '_extract_repo_name strips .git from repository URLs' );
 is( Developer::Dashboard::SkillManager::_extract_repo_name(''), undef, '_extract_repo_name returns undef for empty URLs' );
 is_deeply( $manager->install(''), { error => 'Missing skill source' }, 'install rejects an empty skill source' );
+{
+    my $shorthand_home = tempdir( CLEANUP => 1 );
+    my $shorthand_paths = Developer::Dashboard::PathRegistry->new( home => $shorthand_home );
+    my $shorthand_manager = Developer::Dashboard::SkillManager->new( paths => $shorthand_paths );
+    my $remote_repo = _create_skill_repo(
+        $test_repos,
+        'remote-demo',
+        with_cpanfile => 0,
+        with_bookmark => 0,
+        with_nav      => 0,
+        with_hook     => 0,
+    );
+    my @clone_calls;
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::_clone_skill_source = sub {
+        my ( $self, $clone_source, $target_path ) = @_;
+        @clone_calls = ( $clone_source, $target_path );
+        my $copy = $self->_copy_tree( $remote_repo, $target_path );
+        return $copy if $copy->{error};
+        return { success => 1 };
+    };
+    my $remote_install = $shorthand_manager->install('remote-demo');
+    ok( !$remote_install->{error}, 'install accepts one bare skill name and resolves it through the official GitHub base' ) or diag $remote_install->{error};
+    is_deeply(
+        \@clone_calls,
+        [ 'https://github.com/manif3station/remote-demo', $remote_install->{path} ],
+        'install clones bare skill names from the official GitHub base URL',
+    );
+}
+{
+    my $shorthand_home = tempdir( CLEANUP => 1 );
+    my $shorthand_paths = Developer::Dashboard::PathRegistry->new( home => $shorthand_home );
+    my $shorthand_manager = Developer::Dashboard::SkillManager->new( paths => $shorthand_paths );
+    my $remote_repo = _create_skill_repo(
+        $test_repos,
+        'bar',
+        with_cpanfile => 0,
+        with_bookmark => 0,
+        with_nav      => 0,
+        with_hook     => 0,
+    );
+    my @clone_calls;
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::_clone_skill_source = sub {
+        my ( $self, $clone_source, $target_path ) = @_;
+        @clone_calls = ( $clone_source, $target_path );
+        my $copy = $self->_copy_tree( $remote_repo, $target_path );
+        return $copy if $copy->{error};
+        return { success => 1 };
+    };
+    my $remote_install = $shorthand_manager->install('foo/bar');
+    ok( !$remote_install->{error}, 'install accepts owner/repo shorthand skill names' ) or diag $remote_install->{error};
+    is_deeply(
+        \@clone_calls,
+        [ 'https://github.com/foo/bar', $remote_install->{path} ],
+        'install clones owner/repo shorthand from the matching GitHub repository URL',
+    );
+}
 like( $manager->install('https://example.invalid/not-a-repo.git')->{error}, qr/Failed to clone/, 'install reports git clone failures' );
 {
     my $invalid_local_repo = File::Spec->catdir( $test_repos, 'invalid-local-skill' );
@@ -1732,7 +1909,10 @@ my $dep_repo = _create_skill_repo(
     'dep-skill',
     with_cpanfile => 1,
     with_aptfile => 1,
+    with_apkfile => 1,
     with_ddfile  => 1,
+    with_ddfile_local => 1,
+    with_package_json => 1,
     with_cpanfile_local => 1,
 );
 my $install = $manager->install( 'file://' . $dep_repo );
@@ -1769,21 +1949,94 @@ open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $depende
 my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
 close $dependency_log_fh;
 is_deeply(
-    [ map { (/^(DDFILE|APT|BREW|CPANM):/)[0] } @dependency_steps[-4 .. -1] ],
-    [ 'DDFILE', 'APT', 'CPANM', 'CPANM' ],
-    '_install_skill_dependencies follows the documented ddfile -> aptfile -> cpanfile -> cpanfile.local order on Debian-like hosts while leaving brewfile inactive',
+    [ map { (/^(DDFILE_LOCAL|DDFILE|APT|BREW|NPM|CPANM):/)[0] } @dependency_steps[-6 .. -1] ],
+    [ 'APT', 'NPM', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
+    '_install_skill_dependencies follows the documented aptfile -> apkfile -> dnfile -> brewfile -> package.json -> cpanfile -> cpanfile.local -> ddfile -> ddfile.local order on Debian-like hosts while leaving apkfile, dnfile, and brewfile inactive',
 );
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
 close $cpanm_log_fh;
-like( $cpanm_steps[-2], qr/^-L \Q$ENV{HOME}\/skills-home\/perl5\E --cpanfile .*\/cpanfile --installdeps /, '_install_skill_dependencies installs cpanfile dependencies into HOME perl5' );
-like( $cpanm_steps[-1], qr/^-L .*\/perl5 --cpanfile .*\/cpanfile\.local --installdeps /, '_install_skill_dependencies installs cpanfile.local dependencies into the skill-local perl5 root' );
+like( $cpanm_steps[-2], qr/^--notest -L \Q$ENV{HOME}\/skills-home\/perl5\E --cpanfile .*\/cpanfile --installdeps /, '_install_skill_dependencies installs cpanfile dependencies into HOME perl5 with cpanm --notest' );
+like( $cpanm_steps[-1], qr/^--notest -L .*\/perl5 --cpanfile .*\/cpanfile\.local --installdeps /, '_install_skill_dependencies installs cpanfile.local dependencies into the skill-local perl5 root with cpanm --notest' );
+open my $npm_log_fh, '<', $npx_log or die "Unable to read $npx_log: $!";
+my @npm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$npm_log_fh>;
+close $npm_log_fh;
+like(
+    $npm_steps[-1],
+    qr/^--yes npm install dep-skill-runtime\@\^1\.2\.3 dep-skill-dev\@\^4\.5\.6\|cwd=\Q$ENV{HOME}\E\/skills-home\/\.developer-dashboard\/cache\/node-package-installs\/npm-install-/,
+    '_install_skill_dependencies stages package.json work under the dashboard runtime cache through npx instead of using bare HOME as the npm project root',
+);
+ok( -d File::Spec->catdir( $ENV{HOME}, 'skills-home', 'node_modules', 'dep-skill-runtime' ), '_install_skill_dependencies merges staged Node dependencies into the manager HOME node_modules tree' );
+ok( -d File::Spec->catdir( $ENV{HOME}, 'skills-home', 'node_modules', 'dep-skill-dev' ), '_install_skill_dependencies merges staged dev Node dependencies into the manager HOME node_modules tree' );
+{
+    local $ENV{DD_TEST_APT_INSTALLED} = 'git';
+    unlink $apt_log;
+    my $partial_apt = $manager->_install_skill_aptfile( $dep_skill_root );
+    ok( !$partial_apt->{error}, '_install_skill_aptfile succeeds when only some Debian packages are already installed' )
+      or diag $partial_apt->{error};
+    open my $partial_apt_fh, '<', $apt_log or die "Unable to read $apt_log: $!";
+    my @partial_apt_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$partial_apt_fh>;
+    close $partial_apt_fh;
+    is( $partial_apt_steps[-1], 'install -y curl', '_install_skill_aptfile only installs the Debian packages that are still missing' );
+}
+{
+    local $ENV{DD_TEST_APT_INSTALLED} = 'git,curl';
+    unlink $apt_log;
+    unlink $sudo_log;
+    my $skip_apt = $manager->_install_skill_aptfile( $dep_skill_root );
+    ok( !$skip_apt->{error}, '_install_skill_aptfile succeeds when every Debian package from aptfile is already installed' )
+      or diag $skip_apt->{error};
+    ok( $skip_apt->{skipped}, '_install_skill_aptfile reports a skip when every Debian package from aptfile is already installed' );
+    is( $skip_apt->{skip_reason}, 'all aptfile packages already installed', '_install_skill_aptfile returns the explicit Debian package skip reason' );
+    ok( !-f $apt_log, '_install_skill_aptfile does not run apt-get when every Debian package from aptfile is already installed' );
+    ok( !-f $sudo_log, '_install_skill_aptfile does not run sudo when every Debian package from aptfile is already installed' );
+    is(
+        $manager->_dependency_progress_label( 'install_aptfile', $dep_skill_root, result => $skip_apt ),
+        'Install aptfile dependencies (skipped: all aptfile packages already installed)',
+        '_dependency_progress_label reports the explicit Debian package skip reason',
+    );
+}
+my $browser_like_package_json = File::Spec->catfile( $ENV{HOME}, 'browser-like-package.json' );
+_write_file(
+    $browser_like_package_json,
+    qq|{"name":"browser-like","version":"0.01.0","dependencies":{"express":"^4.19.2","uuid":"^11.0.0"},"devDependencies":{"playwright":"^1.52.0"}}\n|,
+);
+is_deeply(
+    [ $manager->_package_json_dependency_specs($browser_like_package_json) ],
+    [ 'express@^4.19.2', 'uuid@^11.0.0', 'playwright@^1.52.0' ],
+    '_package_json_dependency_specs extracts installable dependency specs even when the skill version itself is npm-invalid',
+);
+my $empty_package_json = File::Spec->catfile( $ENV{HOME}, 'empty-package.json' );
+_write_file( $empty_package_json, qq|{"name":"empty-node","version":"1.0.0"}\n| );
+is_deeply(
+    [ $manager->_package_json_dependency_specs($empty_package_json) ],
+    [],
+    '_package_json_dependency_specs returns an empty install list when package.json declares no installable dependency sections',
+);
+_write_file( File::Spec->catfile( $ENV{HOME}, 'package.json' ), qq|{"name":"home-project","version":"0.01.0"}\n| );
+my $home_manifest_skill = File::Spec->catdir( $ENV{HOME}, 'home-manifest-skill' );
+make_path($home_manifest_skill);
+_write_file(
+    File::Spec->catfile( $home_manifest_skill, 'package.json' ),
+    qq|{"name":"staged-node-skill","version":"0.01.0","dependencies":{"left-pad":"1.3.0"}}\n|,
+);
+my $home_manifest_result = $manager->_install_skill_package_json($home_manifest_skill);
+ok( !$home_manifest_result->{error}, '_install_skill_package_json ignores an npm-invalid HOME/package.json by using a private staging workspace' )
+  or diag $home_manifest_result->{error};
+ok( -d File::Spec->catdir( $ENV{HOME}, 'skills-home', 'node_modules', 'left-pad' ), '_install_skill_package_json still lands packages in the manager HOME node_modules tree when HOME/package.json is npm-invalid' );
+{
+    local $ENV{DD_TEST_NPM_NO_MODULES} = '1';
+    my $no_modules_result = $manager->_install_skill_package_json($home_manifest_skill);
+    ok( !$no_modules_result->{error}, '_install_skill_package_json treats a successful npm run without a node_modules tree as a successful no-op merge' )
+      or diag $no_modules_result->{error};
+}
 my $metadata = $manager->list->[0];
 ok( $metadata->{enabled}, 'skill metadata records enabled state for active skills' );
 is( $metadata->{has_config}, 1, 'skill metadata records config presence' );
 is( $metadata->{has_ddfile}, 1, 'skill metadata records ddfile presence' );
 is( $metadata->{has_cpanfile}, 1, 'skill metadata records cpanfile presence' );
 is( $metadata->{has_aptfile}, 1, 'skill metadata records aptfile presence' );
+is( $metadata->{has_apkfile}, 1, 'skill metadata records apkfile presence' );
 is( $metadata->{has_cpanfile_local}, 1, 'skill metadata records cpanfile.local presence' );
 is_deeply( $metadata->{docker_services}, ['postgres'], 'skill metadata records docker service folders' );
 is_deeply( $metadata->{cli_commands}, ['run-test'], 'skill metadata records cli commands only, not hook directories' );
@@ -1823,6 +2076,27 @@ ok( !$manager->install( 'file://' . $shared_layer_repo )->{error}, 'shared layer
         File::Spec->catfile( 'cli', 'run-test' ),
         "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{project-layer\\n};\n",
         0755,
+    );
+    _write_file(
+        File::Spec->catfile( 'cli', 'run-test.d', '00-pre.pl' ),
+        "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{project-hook\\n};\n",
+        0755,
+    );
+    _write_file(
+        File::Spec->catfile( 'config', 'config.json' ),
+        json_encode(
+            {
+                skill_name => 'shared-layer-skill',
+                collectors => [
+                    { name => 'alpha', interval => 20 },
+                    { name => 'beta',  interval => 30 },
+                ],
+                providers => [
+                    { id => 'main',  title => 'Project' },
+                    { id => 'extra', title => 'Extra' },
+                ],
+            }
+        ) . "\n",
     );
     _run_or_die(qw(git add .));
     _run_or_die( 'git', 'commit', '-m', 'Project layer variant' );
@@ -1865,6 +2139,40 @@ ok( !$manager->install( 'file://' . $shared_layer_repo )->{error}, 'shared layer
         File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'home-layer-skill' ),
         'get_skill_path still inherits home-layer skills when no deeper override exists',
     );
+    my $layered_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $layered_paths );
+    my $layered_hooks = $layered_dispatcher->execute_hooks( 'shared-layer-skill', 'run-test' );
+    ok(
+        exists $layered_hooks->{hooks}{'00-pre.pl'},
+        'execute_hooks keeps the first hook basename for the first matching layered hook',
+    );
+    ok(
+        exists $layered_hooks->{hooks}{'run-test.d/00-pre.pl'},
+        'execute_hooks namespaces duplicate layered hook basenames by hook directory leaf',
+    );
+    my $layered_stream_hooks = $layered_dispatcher->_execute_hooks_streaming(
+        'shared-layer-skill',
+        'run-test',
+        [ $layered_manager->get_skill_path('shared-layer-skill'), File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'shared-layer-skill' ) ],
+    );
+    ok(
+        exists $layered_stream_hooks->{hooks}{'run-test.d/00-pre.pl'},
+        '_execute_hooks_streaming namespaces duplicate layered hook basenames by hook directory leaf',
+    );
+    is_deeply(
+        $layered_dispatcher->get_skill_config('shared-layer-skill'),
+        {
+            skill_name => 'shared-layer-skill',
+            collectors => [
+                { name => 'alpha', interval => 20 },
+                { name => 'beta',  interval => 30 },
+            ],
+            providers => [
+                { id => 'main',  title => 'Project' },
+                { id => 'extra', title => 'Extra' },
+            ],
+        },
+        'get_skill_config merges layered collector and provider arrays by logical identity',
+    );
     is_deeply(
         [ map { File::Basename::basename($_) } $layered_paths->installed_skill_roots ],
         [ 'shared-layer-skill', 'dep-skill', 'home-layer-skill', 'layout-skill' ],
@@ -1884,6 +2192,55 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
         $manager->_install_skill_dependencies($fail_repo)->{error},
         qr/Failed to install skill dependencies/,
         'install reports isolated dependency installation failures',
+    );
+}
+{
+    local $ENV{DD_TEST_ALPINE} = 1;
+    my $apk_repo = File::Spec->catdir( $test_repos, 'apk-skill' );
+    make_path($apk_repo);
+    _write_file( File::Spec->catfile( $apk_repo, 'apkfile' ), "procps-dev\n" );
+    unlink $apk_log;
+    my $apk_install = $manager->_install_skill_dependencies($apk_repo);
+    ok( !$apk_install->{error}, '_install_skill_dependencies succeeds for apkfile-driven installs on Alpine' ) or diag $apk_install->{error};
+    ok( -f $apk_log, '_install_skill_dependencies records an apk invocation when the skill ships an apkfile on Alpine' );
+}
+{
+    local $ENV{DD_TEST_ALPINE} = 1;
+    local $ENV{DD_TEST_APK_INSTALLED} = 'procps-dev';
+    my $apk_repo = File::Spec->catdir( $test_repos, 'apk-skip-skill' );
+    make_path($apk_repo);
+    _write_file( File::Spec->catfile( $apk_repo, 'apkfile' ), "procps-dev\n" );
+    unlink $apk_log;
+    unlink $sudo_log;
+    my $skip_apk = $manager->_install_skill_dependencies($apk_repo);
+    ok( !$skip_apk->{error}, '_install_skill_dependencies succeeds for apkfile-driven installs on Alpine when every package is already installed' )
+      or diag $skip_apk->{error};
+    ok( !-f $apk_log, '_install_skill_dependencies skips apk add when every Alpine package is already installed' );
+    ok( !-f $sudo_log, '_install_skill_dependencies skips sudo when every Alpine package is already installed' );
+    is(
+        $manager->_dependency_progress_label(
+            'install_apkfile',
+            $apk_repo,
+            result => {
+                success     => 1,
+                skipped     => 1,
+                skip_reason => 'all apkfile packages already installed',
+            }
+        ),
+        'Install apkfile dependencies (skipped: all apkfile packages already installed)',
+        '_dependency_progress_label reports the explicit Alpine package skip reason',
+    );
+}
+{
+    local $ENV{DD_TEST_APK_FAIL} = 1;
+    local $ENV{DD_TEST_ALPINE} = 1;
+    my $fail_repo = File::Spec->catdir( $test_repos, 'fail-apk-skill' );
+    make_path($fail_repo);
+    _write_file( File::Spec->catfile( $fail_repo, 'apkfile' ), "procps-dev\n" );
+    like(
+        $manager->_install_skill_dependencies($fail_repo)->{error},
+        qr/Failed to install skill apk dependencies/,
+        'install reports apk dependency installation failures',
     );
 }
 {
@@ -1931,6 +2288,70 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
     );
 }
 {
+    local $ENV{DD_TEST_NPM_FAIL} = 1;
+    my $fail_repo = File::Spec->catdir( $test_repos, 'fail-npm-skill' );
+    make_path($fail_repo);
+    _write_file(
+        File::Spec->catfile( $fail_repo, 'package.json' ),
+        qq|{"name":"fail-npm","version":"0.01.0","dependencies":{"fail-npm-runtime":"^9.9.9"}}\n|
+    );
+    like(
+        $manager->_install_skill_dependencies($fail_repo)->{error},
+        qr/Failed to install skill Node dependencies/,
+        'install reports package.json dependency installation failures',
+    );
+}
+{
+    my $missing_home = File::Spec->catdir( $test_repos, 'missing-npm-home' );
+    my $fail_repo = File::Spec->catdir( $test_repos, 'fail-npm-chdir-skill' );
+    make_path($fail_repo);
+    _write_file(
+        File::Spec->catfile( $fail_repo, 'package.json' ),
+        qq|{"name":"fail-npm-chdir","version":"0.01.0","dependencies":{"fail-npm-runtime":"^9.9.9"}}\n|
+    );
+    my $cwd = getcwd();
+    my $broken_paths = Developer::Dashboard::PathRegistry->new( home => $missing_home );
+    my $broken_manager = Developer::Dashboard::SkillManager->new( paths => $broken_paths );
+    my $error = eval { $broken_manager->_install_skill_package_json($fail_repo); 1 } ? '' : $@;
+    like(
+        $error,
+        qr/Unable to chdir to \Q$missing_home\E for package\.json dependency install/,
+        '_install_skill_package_json surfaces a HOME chdir failure before npm runs',
+    );
+    is(
+        getcwd(),
+        $cwd,
+        '_install_skill_package_json restores the original cwd after a HOME chdir failure',
+    );
+}
+{
+    my $capture_fail_repo = File::Spec->catdir( $test_repos, 'capture-fail-npm-skill' );
+    make_path($capture_fail_repo);
+    _write_file(
+        File::Spec->catfile( $capture_fail_repo, 'package.json' ),
+        qq|{"name":"capture-fail-npm","version":"1.0.0","dependencies":{"capture-fail-runtime":"^1.0.0"}}\n|
+    );
+    my $cwd = getcwd();
+    my $error;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::capture = sub (&) {
+            die "synthetic npm capture failure\n";
+        };
+        $error = eval { $manager->_install_skill_package_json($capture_fail_repo); 1 } ? '' : $@;
+    }
+    like(
+        $error,
+        qr/synthetic npm capture failure/,
+        '_install_skill_package_json surfaces capture failures from the staged npm install workspace',
+    );
+    is(
+        getcwd(),
+        $cwd,
+        '_install_skill_package_json restores the original cwd after a staged npm capture failure',
+    );
+}
+{
     my $installed_dep = File::Spec->catdir( $skill_paths->skills_root, 'shared-skill' );
     make_path($installed_dep);
     my $skip_repo = File::Spec->catdir( $test_repos, 'skip-dd-skill' );
@@ -1943,6 +2364,160 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
     my @dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dashboard_log_fh>;
     close $dashboard_log_fh;
     is_deeply( \@dashboard_steps, ['skills install fresh-skill'], '_install_skill_dependencies skips installed skills and only installs missing ddfile dependencies' );
+}
+{
+    my $stacked_repo = File::Spec->catdir( $test_repos, 'stacked-dd-skill' );
+    make_path($stacked_repo);
+    _write_file( File::Spec->catfile( $stacked_repo, 'ddfile' ), "stacked-skill\nfresh-skill\n" );
+
+    open my $dashboard_script_fh, '<', File::Spec->catfile( $fake_bin, 'dashboard' ) or die "Unable to read fake dashboard script: $!";
+    my $original_dashboard_script = do { local $/; <$dashboard_script_fh> };
+    close $dashboard_script_fh;
+
+    _write_file(
+        File::Spec->catfile( $fake_bin, 'dashboard' ),
+        <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$dashboard_log"
+printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
+printf 'installed:%s\\n' "\$3"
+printf 'warning:%s\\n' "\$3" >&2
+if [ "\$DD_TEST_DDFILE_FAIL" = "1" ]; then
+  exit 1
+fi
+exit 0
+SH
+        0755,
+    );
+
+    unlink $dashboard_log;
+    local $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} = 'stacked-skill';
+    my $stacked_install = $manager->_install_skill_ddfile($stacked_repo);
+    ok( !$stacked_install->{error}, '_install_skill_ddfile skips dependencies already present in the install stack' ) or diag $stacked_install->{error};
+    is( $stacked_install->{stdout}, "installed:fresh-skill\n", '_install_skill_ddfile returns captured stdout when a dependent install emits output' );
+    is( $stacked_install->{stderr}, "warning:fresh-skill\n", '_install_skill_ddfile returns captured stderr when a dependent install emits warnings' );
+
+    open my $stacked_dashboard_log_fh, '<', $dashboard_log or die "Unable to read $dashboard_log after stacked ddfile install: $!";
+    my @stacked_dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$stacked_dashboard_log_fh>;
+    close $stacked_dashboard_log_fh;
+    is_deeply( \@stacked_dashboard_steps, ['skills install fresh-skill'], '_install_skill_ddfile only invokes dashboard install for dependencies missing from the current install stack' );
+
+    _write_file( File::Spec->catfile( $fake_bin, 'dashboard' ), $original_dashboard_script, 0755 );
+}
+{
+    my $bad_root_repo = File::Spec->catdir( $test_repos, 'bad-root-dd-skill' );
+    make_path($bad_root_repo);
+    _write_file( File::Spec->catfile( $bad_root_repo, 'ddfile' ), "fresh-skill\n" );
+
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillManager::_skill_install_root = sub { '/definitely/missing-skill-root' };
+
+    my $error = eval { $manager->_install_skill_ddfile($bad_root_repo); 1 } ? '' : $@;
+    like(
+        $error,
+        qr/Unable to chdir to \/definitely\/missing-skill-root for ddfile dependency install/,
+        '_install_skill_ddfile surfaces skill-root chdir failures explicitly',
+    );
+}
+{
+    my $local_repo = File::Spec->catdir( $test_repos, 'stacked-dd-local-skill' );
+    my $skills_root = File::Spec->catdir( $test_repos, 'stacked-dd-local-root', 'skills' );
+    make_path($skills_root);
+    make_path($local_repo);
+    _write_file( File::Spec->catfile( $local_repo, 'ddfile.local' ), "fresh-local-skill\n" );
+
+    unlink $dashboard_log;
+    my $cwd = getcwd();
+    chdir $skills_root or die "Unable to chdir to $skills_root: $!";
+    my $local_install = $manager->_install_skill_ddfile_local($local_repo);
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+    ok( !$local_install->{error}, '_install_skill_ddfile_local installs dependencies at the current skills root level' ) or diag $local_install->{error};
+
+    open my $local_dashboard_log_fh, '<', $dashboard_log or die "Unable to read $dashboard_log after ddfile.local install: $!";
+    my @local_dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$local_dashboard_log_fh>;
+    close $local_dashboard_log_fh;
+    is_deeply( \@local_dashboard_steps, ['skills install fresh-local-skill'], '_install_skill_ddfile_local invokes dashboard install for local-only dependencies' );
+}
+{
+    my $manifest_root = File::Spec->catdir( $test_repos, 'manifest-ddfile-root' );
+    my $global_repo = _create_skill_repo( $test_repos, 'manifest-global-skill', with_cpanfile => 0 );
+    my $local_repo  = _create_skill_repo( $test_repos, 'manifest-local-skill',  with_cpanfile => 0 );
+    make_path($manifest_root);
+    _write_file( File::Spec->catfile( $manifest_root, 'ddfile' ), "file://$global_repo\n" );
+    _write_file( File::Spec->catfile( $manifest_root, 'ddfile.local' ), "file://$local_repo\n" );
+
+    my $manifest_install = $manager->install_from_ddfiles($manifest_root);
+    ok( !$manifest_install->{error}, 'install_from_ddfiles installs both ddfile and ddfile.local manifests successfully' )
+      or diag $manifest_install->{error};
+    ok(
+        -d File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'manifest-global-skill' ),
+        'install_from_ddfiles writes ddfile dependencies into the home DD-OOP-LAYER skills root',
+    );
+    ok(
+        !-d File::Spec->catdir( $manifest_root, '.developer-dashboard', 'skills', 'manifest-global-skill' ),
+        'install_from_ddfiles does not write ddfile dependencies into a child DD-OOP-LAYER skills root under the current directory',
+    );
+    ok(
+        -d File::Spec->catdir( $manifest_root, 'skills', 'manifest-local-skill' ),
+        'install_from_ddfiles writes ddfile.local dependencies into the current skill-local skills root',
+    );
+    is_deeply(
+        $manifest_install->{operations},
+        [
+            {
+                manifest  => 'ddfile',
+                source    => "file://$global_repo",
+                repo_name => 'manifest-global-skill',
+                path      => File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'manifest-global-skill' ),
+            },
+            {
+                manifest  => 'ddfile.local',
+                source    => "file://$local_repo",
+                repo_name => 'manifest-local-skill',
+                path      => File::Spec->catdir( $manifest_root, 'skills', 'manifest-local-skill' ),
+            },
+        ],
+        'install_from_ddfiles processes ddfile before ddfile.local',
+    );
+}
+{
+    my $manifest_root = File::Spec->catdir( $test_repos, 'manifest-reinstall-root' );
+    my $global_repo = _create_skill_repo( $test_repos, 'manifest-reinstall-skill', with_cpanfile => 0 );
+    make_path($manifest_root);
+    _write_file( File::Spec->catfile( $manifest_root, 'ddfile' ), "file://$global_repo\n" );
+
+    my $first_manifest_install = $manager->install_from_ddfiles($manifest_root);
+    ok( !$first_manifest_install->{error}, 'install_from_ddfiles installs a manifest-listed skill the first time' )
+      or diag $first_manifest_install->{error};
+    my $global_skill_root = File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'manifest-reinstall-skill' );
+    _write_file( File::Spec->catfile( $global_repo, 'cli', 'run-test' ), "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{manifest-refresh\\n};\n", 0755 );
+    {
+        my $cwd = getcwd();
+        chdir $global_repo or die "Unable to chdir to $global_repo: $!";
+        _run_or_die(qw(git add .));
+        _run_or_die( 'git', 'commit', '-m', 'Refresh manifest reinstall skill' );
+        chdir $cwd or die "Unable to chdir back to $cwd: $!";
+    }
+
+    my $second_manifest_install = $manager->install_from_ddfiles($manifest_root);
+    ok( !$second_manifest_install->{error}, 'install_from_ddfiles reinstalls already-installed manifest skills as updates' )
+      or diag $second_manifest_install->{error};
+    my $manifest_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $skill_paths );
+    like(
+        $manifest_dispatcher->dispatch( 'manifest-reinstall-skill', 'run-test' )->{stdout},
+        qr/manifest-refresh/,
+        'manifest-driven install refreshes the installed skill content on repeat runs',
+    );
+    ok( -d $global_skill_root, 'manifest reinstall keeps the target skill installed after refresh' );
+}
+{
+    my $missing_manifest_root = File::Spec->catdir( $test_repos, 'missing-manifest-root' );
+    make_path($missing_manifest_root);
+    is_deeply(
+        $manager->install_from_ddfiles($missing_manifest_root),
+        { error => "No ddfile or ddfile.local found under $missing_manifest_root" },
+        'install_from_ddfiles rejects roots with no ddfile manifests',
+    );
 }
 {
     my $broken_repo = _create_skill_repo( $test_repos, 'broken-update-skill', with_cpanfile => 0 );
@@ -1987,14 +2562,24 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
 my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $skill_paths );
 is_deeply( $dispatcher->dispatch( '', 'run-test' ), { error => 'Missing skill name' }, 'dispatcher rejects missing skill names' );
 is_deeply( $dispatcher->dispatch( 'dep-skill', '' ), { error => 'Missing command name' }, 'dispatcher rejects missing command names' );
+is_deeply( $dispatcher->exec_command( '', 'run-test' ), { error => 'Missing skill name' }, 'exec_command rejects missing skill names' );
+is_deeply( $dispatcher->exec_command( 'dep-skill', '' ), { error => 'Missing command name' }, 'exec_command rejects missing command names' );
 {
     my $missing_skill = $dispatcher->dispatch( 'missing-skill', 'run-test' );
     like( $missing_skill->{error}, qr/\ASkill 'missing-skill' not found\./, 'dispatcher rejects missing skills' );
     like( $missing_skill->{error}, qr/\n\nDid you mean:\n/, 'missing-skill dispatch guidance includes suggestion heading' );
 }
+{
+    my $missing_exec = $dispatcher->exec_command( 'missing-skill', 'run-test' );
+    like( $missing_exec->{error}, qr/\ASkill 'missing-skill' not found\./, 'exec_command rejects missing skills' );
+    like( $missing_exec->{error}, qr/\n\nDid you mean:\n/, 'missing-skill exec guidance includes suggestion heading' );
+}
 is_deeply( $dispatcher->execute_hooks( '', 'run-test' ), { hooks => {}, result_state => {} }, 'execute_hooks returns an empty result for missing skill names' );
 is_deeply( $dispatcher->execute_hooks( 'dep-skill', '' ), { hooks => {}, result_state => {} }, 'execute_hooks returns an empty result for missing command names' );
 is_deeply( $dispatcher->execute_hooks( 'missing-skill', 'run-test' ), { hooks => {}, result_state => {} }, 'execute_hooks returns an empty result for missing skills' );
+is_deeply( $dispatcher->_execute_hooks_streaming( '', 'run-test', [] ), { hooks => {}, result_state => {} }, '_execute_hooks_streaming returns an empty payload for missing skill names' );
+is_deeply( $dispatcher->_execute_hooks_streaming( 'dep-skill', '', [] ), { hooks => {}, result_state => {} }, '_execute_hooks_streaming returns an empty payload for missing command names' );
+is_deeply( $dispatcher->_execute_hooks_streaming( 'dep-skill', 'run-test', [] ), { hooks => {}, result_state => {} }, '_execute_hooks_streaming returns an empty payload when no skill layers participate' );
 ok( !$manager->disable('dep-skill')->{error}, 'disable succeeds for an installed skill' );
 ok( !$manager->is_enabled('dep-skill'), 'is_enabled reports false once a skill is disabled' );
 my @enabled_skill_roots = $skill_paths->installed_skill_roots;
@@ -2119,6 +2704,327 @@ is_deeply(
         'dispatcher returns hook execution errors before launching the main skill command',
     );
 }
+{
+    my $streaming_dir = tempdir( CLEANUP => 1 );
+    my $streaming_script = File::Spec->catfile( $streaming_dir, 'stream-child.pl' );
+    _write_file(
+        $streaming_script,
+        <<'PERL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+$| = 1;
+print "stream-out:$ENV{SKILL_COMMAND}\n";
+print STDERR "stream-err\n";
+exit 7;
+PERL
+        0755,
+    );
+    my ( $stdout, $stderr, $result ) = capture {
+        $dispatcher->_run_child_command_streaming(
+            command      => [ $^X, $streaming_script ],
+            args         => [],
+            env          => { SKILL_COMMAND => 'run-test' },
+            skill_layers => [$dep_skill_root],
+            result_state => {},
+            last_result  => {},
+            stdin_mode   => 'null',
+        );
+    };
+    is( $stdout, "stream-out:run-test\n", '_run_child_command_streaming mirrors child stdout while using null stdin for hooks' );
+    is( $stderr, "stream-err\n", '_run_child_command_streaming mirrors child stderr while using null stdin for hooks' );
+    is( $result->{stdout}, "stream-out:run-test\n", '_run_child_command_streaming captures child stdout for RESULT handoff' );
+    is( $result->{stderr}, "stream-err\n", '_run_child_command_streaming captures child stderr for RESULT handoff' );
+    is( $result->{exit_code}, 7, '_run_child_command_streaming captures the child exit code' );
+}
+{
+    my $streaming_dir = tempdir( CLEANUP => 1 );
+    my $streaming_script = File::Spec->catfile( $streaming_dir, 'stream-last-result.pl' );
+    _write_file(
+        $streaming_script,
+        <<'PERL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+print "stream-last-result\n";
+exit 0;
+PERL
+        0755,
+    );
+    local *Developer::Dashboard::Runtime::Result::set_last_result = sub {
+        my ( $payload ) = @_;
+        $main::dd_last_result_payload = $payload;
+        return;
+    };
+    local $main::dd_last_result_payload;
+    my ( $stdout, $stderr, $result ) = capture {
+        $dispatcher->_run_child_command_streaming(
+            command      => [ $^X, $streaming_script ],
+            args         => [],
+            env          => {},
+            skill_layers => [$dep_skill_root],
+            result_state => {},
+            last_result  => { file => '/tmp/previous-hook', exit => 0, STDOUT => "old\n", STDERR => '' },
+            stdin_mode   => 'null',
+        );
+    };
+    is( $stdout, "stream-last-result\n", '_run_child_command_streaming still mirrors stdout when a prior RESULT payload exists' );
+    is( $stderr, '', '_run_child_command_streaming keeps stderr empty when a prior RESULT payload exists and the child emits no stderr' );
+    is_deeply(
+        $main::dd_last_result_payload,
+        { file => '/tmp/previous-hook', exit => 0, STDOUT => "old\n", STDERR => '' },
+        '_run_child_command_streaming reloads the previous RESULT payload before launching the child',
+    );
+    is( $result->{exit_code}, 0, '_run_child_command_streaming preserves successful exit codes while restoring the previous RESULT payload' );
+}
+{
+    my $stdin_dir = tempdir( CLEANUP => 1 );
+    my $stdin_script = File::Spec->catfile( $stdin_dir, 'stdin-child.pl' );
+    _write_file(
+        $stdin_script,
+        <<'PERL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+$| = 1;
+my $line = <STDIN>;
+$line = '' if !defined $line;
+print "stdin:$line";
+exit 0;
+PERL
+        0755,
+    );
+    my $stdin_text = File::Spec->catfile( $stdin_dir, 'stdin.txt' );
+    _write_file( $stdin_text, "hello-from-stdin\n" );
+    open my $saved_stdin, '<&', \*STDIN or die "Unable to duplicate original STDIN: $!";
+    open my $saved_stdout, '>&', \*STDOUT or die "Unable to duplicate original STDOUT: $!";
+    open my $saved_stderr, '>&', \*STDERR or die "Unable to duplicate original STDERR: $!";
+    my $stdout_path = File::Spec->catfile( $stdin_dir, 'stdout.txt' );
+    my $stderr_path = File::Spec->catfile( $stdin_dir, 'stderr.txt' );
+    open STDIN, '<', $stdin_text or die "Unable to open stdin fixture file: $!";
+    open STDOUT, '>', $stdout_path or die "Unable to redirect stdout fixture file: $!";
+    open STDERR, '>', $stderr_path or die "Unable to redirect stderr fixture file: $!";
+    my $result = $dispatcher->_run_child_command_streaming(
+        command      => [ $^X, $stdin_script ],
+        args         => [],
+        env          => {},
+        skill_layers => [$dep_skill_root],
+        result_state => {},
+        last_result  => {},
+        stdin_mode   => 'inherit',
+    );
+    open STDIN, '<&', $saved_stdin or die "Unable to restore original STDIN: $!";
+    open STDOUT, '>&', $saved_stdout or die "Unable to restore original STDOUT: $!";
+    open STDERR, '>&', $saved_stderr or die "Unable to restore original STDERR: $!";
+    my $stdout = do {
+        open my $fh, '<', $stdout_path or die "Unable to read captured stdout fixture file: $!";
+        local $/;
+        <$fh>;
+    };
+    my $stderr = do {
+        open my $fh, '<', $stderr_path or die "Unable to read captured stderr fixture file: $!";
+        local $/;
+        <$fh>;
+    };
+    is( $stdout, "stdin:hello-from-stdin\n", '_run_child_command_streaming preserves interactive stdin when requested' );
+    is( $stderr, '', '_run_child_command_streaming keeps stderr empty when the child emits no stderr' );
+    is( $result->{stdout}, "stdin:hello-from-stdin\n", '_run_child_command_streaming captures inherited-stdin child stdout' );
+    is( $result->{stderr}, '', '_run_child_command_streaming captures an empty stderr stream when nothing is emitted' );
+    is( $result->{exit_code}, 0, '_run_child_command_streaming captures a successful inherited-stdin exit code' );
+}
+{
+    my $hook_dir = File::Spec->catdir( $dep_skill_root, 'cli', 'streaming-hook.d' );
+    make_path($hook_dir);
+    my $hook_script = File::Spec->catfile( $hook_dir, '00-stream.pl' );
+    _write_file(
+        $hook_script,
+        <<'PERL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+$| = 1;
+print "hook-stream-out\n";
+print STDERR "hook-stream-err\n";
+exit 4;
+PERL
+        0755,
+    );
+    my ( $stdout, $stderr, $result ) = capture {
+        $dispatcher->_execute_hooks_streaming( 'dep-skill', 'streaming-hook', [$dep_skill_root] );
+    };
+    is( $stdout, "hook-stream-out\n", '_execute_hooks_streaming mirrors hook stdout live' );
+    is( $stderr, "hook-stream-err\n", '_execute_hooks_streaming mirrors hook stderr live' );
+    is_deeply(
+        $result->{hooks}{'00-stream.pl'},
+        {
+            stdout    => "hook-stream-out\n",
+            stderr    => "hook-stream-err\n",
+            exit_code => 4,
+        },
+        '_execute_hooks_streaming captures hook stdout, stderr, and exit code',
+    );
+    is_deeply(
+        $result->{last_result},
+        {
+            file   => $hook_script,
+            exit   => 4,
+            STDOUT => "hook-stream-out\n",
+            STDERR => "hook-stream-err\n",
+        },
+        '_execute_hooks_streaming records the last streaming hook result for downstream RESULT consumers',
+    );
+}
+{
+    no warnings 'redefine';
+    local %ENV = %ENV;
+    my %seen;
+    local *Developer::Dashboard::SkillDispatcher::_execute_hooks_streaming = sub {
+        return {
+            hooks        => { pre => { stdout => "hook\n", stderr => '', exit_code => 0 } },
+            result_state => { pre => { stdout => "hook\n", stderr => '', exit_code => 0 } },
+            last_result  => { file => '/tmp/hook', exit => 0, STDOUT => "hook\n", STDERR => '' },
+        };
+    };
+    local *Developer::Dashboard::SkillDispatcher::_exec_resolved_command = sub {
+        my ( $self, $cmd_path, $command, $args ) = @_;
+        $seen{cmd_path} = $cmd_path;
+        $seen{command} = [ @{$command} ];
+        $seen{args} = [ @{$args} ];
+        $seen{env} = {
+            map { $_ => $ENV{$_} }
+              grep { exists $ENV{$_} }
+              qw(
+              DEVELOPER_DASHBOARD_SKILL_NAME
+              DEVELOPER_DASHBOARD_SKILL_ROOT
+              DEVELOPER_DASHBOARD_SKILL_COMMAND
+              DEVELOPER_DASHBOARD_SKILL_CLI_ROOT
+              DEVELOPER_DASHBOARD_SKILL_CONFIG_ROOT
+              DEVELOPER_DASHBOARD_SKILL_DOCKER_ROOT
+              DEVELOPER_DASHBOARD_SKILL_STATE_ROOT
+              DEVELOPER_DASHBOARD_SKILL_LOGS_ROOT
+              DEVELOPER_DASHBOARD_SKILL_LOCAL_ROOT
+              PERL5LIB
+              )
+        };
+        $seen{current} = Developer::Dashboard::Runtime::Result::current();
+        $seen{last} = Developer::Dashboard::Runtime::Result::last_result();
+        return {
+            success => 1,
+            %seen,
+        };
+    };
+    local *Developer::Dashboard::EnvLoader::load_runtime_layers = sub {
+        shift;
+        $seen{runtime_layers_loaded}++;
+        return;
+    };
+    local *Developer::Dashboard::EnvLoader::load_skill_layers = sub {
+        shift;
+        my (%args) = @_;
+        $seen{skill_layers} = [ @{ $args{skill_layers} || [] } ];
+        return;
+    };
+    my $exec_result = $dispatcher->exec_command( 'dep-skill', 'run-test', 'alpha', 'beta' );
+    ok( $exec_result->{success}, 'exec_command delegates to the resolved command runner after preparing the environment' );
+    is_same_path( $exec_result->{cmd_path}, File::Spec->catfile( $dep_skill_root, 'cli', 'run-test' ), 'exec_command resolves the final runnable command path' );
+    is_deeply( $exec_result->{args}, [ 'alpha', 'beta' ], 'exec_command forwards the original user arguments to the final command runner' );
+    is( $exec_result->{env}{DEVELOPER_DASHBOARD_SKILL_NAME}, 'dep-skill', 'exec_command exposes the skill name in the child environment' );
+    is( $exec_result->{env}{DEVELOPER_DASHBOARD_SKILL_COMMAND}, 'run-test', 'exec_command exposes the resolved command name in the child environment' );
+    is_same_path( $exec_result->{env}{DEVELOPER_DASHBOARD_SKILL_ROOT}, $dep_skill_root, 'exec_command exposes the resolved skill path in the child environment' );
+    is_deeply( $exec_result->{skill_layers}, [$dep_skill_root], 'exec_command loads the participating skill layers before exec' );
+    is( $exec_result->{runtime_layers_loaded}, 1, 'exec_command reloads runtime env layers before replacing the helper process' );
+    is_deeply(
+        $exec_result->{last},
+        { file => '/tmp/hook', exit => 0, STDOUT => "hook\n", STDERR => '' },
+        'exec_command forwards the last hook RESULT payload into Runtime::Result',
+    );
+}
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillDispatcher::_execute_hooks_streaming = sub { return { error => 'stream hook failure' } };
+    is_deeply(
+        $dispatcher->exec_command( 'dep-skill', 'run-test' ),
+        { error => 'stream hook failure' },
+        'exec_command stops before exec when streaming hooks report an error',
+    );
+}
+{
+    my ( undef, undef, $exec_error ) = capture {
+        local *Developer::Dashboard::SkillDispatcher::_exec_replacement = sub { return 'mock exec failure'; };
+        $dispatcher->_exec_resolved_command( '/no/such/path', [ '/definitely/missing-skill-command' ], [] );
+    };
+    like( $exec_error->{error}, qr/\AUnable to exec \/no\/such\/path: mock exec failure/, '_exec_resolved_command reports direct exec failures clearly' );
+}
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillDispatcher::_execute_hooks_streaming = sub {
+        return {
+            hooks        => {},
+            result_state => {},
+        };
+    };
+    local *Developer::Dashboard::SkillDispatcher::_exec_resolved_command = sub {
+        my $last_result = Developer::Dashboard::Runtime::Result::last_result();
+        return {
+            success     => 1,
+            last_result => $last_result,
+        };
+    };
+    my $exec_result = $dispatcher->exec_command( 'dep-skill', 'run-test' );
+    ok( $exec_result->{success}, 'exec_command still reaches the final command runner when hooks return no last_result payload' );
+    ok( !defined $exec_result->{last_result}, 'exec_command clears the previous RESULT payload when hooks return no last_result data' );
+}
+{
+    my ( undef, $stderr, $exec_error ) = capture {
+        return $dispatcher->_exec_replacement( ['/definitely/missing-skill-command'], [] );
+    };
+    like(
+        $stderr,
+        qr/Can't exec "\/definitely\/missing-skill-command": No such file or directory/,
+        '_exec_replacement leaves the underlying exec failure visible on stderr',
+    );
+    like(
+        $exec_error,
+        qr/No such file or directory/,
+        '_exec_replacement returns the system exec failure string when the replacement command cannot be executed',
+    );
+}
+{
+    my $arrayref = [qw(alpha beta)];
+    is_deeply(
+        $dispatcher->_arrayref_or_empty($arrayref),
+        $arrayref,
+        '_arrayref_or_empty preserves array references',
+    );
+    is_deeply(
+        $dispatcher->_arrayref_or_empty(undef),
+        [],
+        '_arrayref_or_empty falls back to an empty array reference',
+    );
+
+    my $hashref = { alpha => 1 };
+    is_deeply(
+        $dispatcher->_hashref_or_empty($hashref),
+        $hashref,
+        '_hashref_or_empty preserves hash references',
+    );
+    is_deeply(
+        $dispatcher->_hashref_or_empty(undef),
+        {},
+        '_hashref_or_empty falls back to an empty hash reference',
+    );
+
+    is(
+        $dispatcher->_defined_or_default( 'stdin', 'inherit' ),
+        'stdin',
+        '_defined_or_default preserves defined values',
+    );
+    is(
+        $dispatcher->_defined_or_default( undef, 'inherit' ),
+        'inherit',
+        '_defined_or_default falls back when the value is undef',
+    );
+}
 my $no_bookmark_repo = _create_skill_repo( $test_repos, 'no-bookmarks-skill', with_cpanfile => 0, with_bookmark => 0, with_nav => 0 );
 ok( !$manager->install( 'file://' . $no_bookmark_repo )->{error}, 'skill without bookmarks installs cleanly' );
 my $no_nav_repo = _create_skill_repo( $test_repos, 'no-nav-skill', with_cpanfile => 0, with_nav => 0 );
@@ -2140,6 +3046,23 @@ is_deeply( $dispatcher->skill_nav_pages(''), [], 'skill_nav_pages returns an emp
 is_deeply( $dispatcher->skill_nav_pages('missing-skill'), [], 'skill_nav_pages returns an empty list for unknown skills' );
 is_deeply( $dispatcher->skill_nav_pages('no-nav-skill'), [], 'skill_nav_pages returns an empty list when a skill has no nav root' );
 {
+    my %route_ids = $dispatcher->_skill_nav_route_ids('dep-skill');
+    is_deeply(
+        \%route_ids,
+        { 'skill.tt' => 'nav/skill.tt' },
+        '_skill_nav_route_ids enumerates layered nav templates as route ids',
+    );
+}
+{
+    my $pages = $dispatcher->all_skill_nav_pages;
+    ok( ref($pages) eq 'ARRAY', 'all_skill_nav_pages returns an array reference of prepared skill nav pages' );
+    my $has_dep_skill_nav = scalar grep { $_->{meta}{skill_name} && $_->{meta}{skill_name} eq 'dep-skill' } @{$pages};
+    ok(
+        $has_dep_skill_nav,
+        'all_skill_nav_pages includes nav pages from installed skills that provide them',
+    );
+}
+{
     my $local_lib = File::Spec->catdir( $manager->get_skill_path('dep-skill'), 'perl5', 'lib', 'perl5' );
     make_path($local_lib);
     local $ENV{PERL5LIB} = 'base-lib';
@@ -2153,22 +3076,38 @@ is_deeply( $dispatcher->skill_nav_pages('no-nav-skill'), [], 'skill_nav_pages re
     like( $env{PERL5LIB}, qr/\Q$local_lib\E/, '_skill_env prepends the skill-local perl library when present' );
     ok( !exists $env{RESULT}, '_skill_env leaves RESULT handoff to Runtime::Result instead of inlining it into the child env' );
 }
-is(
-    $dispatcher->_hook_result_key('/tmp/skill/cli/run-test.d/00-pre.pl'),
-    'run-test.d/00-pre.pl',
-    '_hook_result_key namespaces duplicate hook basenames by their hook directory',
-);
 is_deeply(
-    $dispatcher->_merge_named_hash_array(
-        [ { name => 'alpha', interval => 10 } ],
-        [ { name => 'alpha', interval => 20 }, { name => 'beta', interval => 30 } ],
+    $dispatcher->_merge_array_items_by_identity(
+        [ { name => 'alpha', interval => 10 }, 'keep-left' ],
+        [ { name => 'alpha', interval => 20 }, { name => 'beta', interval => 30 }, 'keep-right' ],
         'name',
     ),
     [
         { name => 'alpha', interval => 20 },
-        { name => 'beta',  interval => 30 },
+        'keep-left',
+        { name => 'beta', interval => 30 },
+        'keep-right',
     ],
-    '_merge_named_hash_array replaces matching logical entries while preserving new ones',
+    '_merge_array_items_by_identity replaces collector-like entries by logical identity while preserving unmatched items',
+);
+is_deeply(
+    $dispatcher->_merge_array_items_by_identity(
+        [ { id => 'provider', title => 'Base' }, 'keep-left' ],
+        [ { id => 'provider', title => 'Leaf' }, { id => 'two', title => 'Two' }, 'keep-right' ],
+        'id',
+    ),
+    [
+        { id => 'provider', title => 'Leaf' },
+        'keep-left',
+        { id => 'two', title => 'Two' },
+        'keep-right',
+    ],
+    '_merge_array_items_by_identity also handles provider-like identities directly',
+);
+is_deeply(
+    $dispatcher->_merge_array_items_by_identity( undef, undef, 'name' ),
+    [],
+    '_merge_array_items_by_identity returns an empty array ref when both sides are missing',
 );
 is_deeply(
     $dispatcher->_merge_skill_hashes(
@@ -2192,6 +3131,71 @@ is_deeply(
         ],
     },
     '_merge_skill_hashes merges collector and provider arrays by logical identity for layered skill config',
+);
+is_deeply(
+    $dispatcher->_merge_skill_hashes(
+        { collectors => [ { name => 'alpha', interval => 10 } ] },
+        { collectors => [ { name => 'alpha', interval => 20 } ] },
+    ),
+    { collectors => [ { name => 'alpha', interval => 20 } ] },
+    '_merge_skill_hashes routes collector arrays through logical name-based replacement',
+);
+is_deeply(
+    $dispatcher->_merge_skill_hashes(
+        { providers => [ { id => 'alpha', title => 'Old' } ] },
+        { providers => [ { id => 'alpha', title => 'New' } ] },
+    ),
+    { providers => [ { id => 'alpha', title => 'New' } ] },
+    '_merge_skill_hashes routes provider arrays through logical id-based replacement',
+);
+is_deeply(
+    $dispatcher->_merge_skill_hashes(
+        { indicator => { icon => 'base', status => 'ok' }, passthrough => 1 },
+        { indicator => { status => 'warn', label => 'Leaf' } },
+    ),
+    {
+        indicator   => { icon => 'base', status => 'warn', label => 'Leaf' },
+        passthrough => 1,
+    },
+    '_merge_skill_hashes recursively merges nested hashes while preserving inherited keys',
+);
+is_deeply(
+    $dispatcher->_merge_skill_hashes(
+        {
+            collectors => [ { name => 'alpha', interval => 10 }, 'keep-left' ],
+        },
+        {
+            collectors => [ { name => 'alpha', interval => 20 }, { name => 'beta', interval => 30 }, 'keep-right' ],
+        },
+    ),
+    {
+        collectors => [
+            { name => 'alpha', interval => 20 },
+            'keep-left',
+            { name => 'beta', interval => 30 },
+            'keep-right',
+        ],
+    },
+    '_merge_skill_hashes preserves unmatched collector entries while replacing logical collector duplicates',
+);
+is_deeply(
+    $dispatcher->_merge_skill_hashes(
+        {
+            providers => [ { id => 'provider', title => 'Base' }, 'keep-left' ],
+        },
+        {
+            providers => [ { id => 'provider', title => 'Leaf' }, { id => 'two', title => 'Two' }, 'keep-right' ],
+        },
+    ),
+    {
+        providers => [
+            { id => 'provider', title => 'Leaf' },
+            'keep-left',
+            { id => 'two', title => 'Two' },
+            'keep-right',
+        ],
+    },
+    '_merge_skill_hashes preserves unmatched provider entries while replacing logical provider duplicates',
 );
 {
     my $files = Developer::Dashboard::FileRegistry->new( paths => $skill_paths );
@@ -2222,8 +3226,6 @@ is_deeply(
         );
     }
 }
-
-done_testing();
 
 sub _create_skill_repo {
     my ( $root, $name, %args ) = @_;
@@ -2266,11 +3268,23 @@ sub _create_skill_repo {
     if ( $args{with_aptfile} ) {
         _write_file( 'aptfile', "git\ncurl\n" );
     }
+    if ( $args{with_apkfile} ) {
+        _write_file( 'apkfile', "procps-dev\n" );
+    }
     if ( $args{with_ddfile} ) {
         _write_file( 'ddfile', "shared-skill\n" );
     }
+    if ( $args{with_ddfile_local} ) {
+        _write_file( 'ddfile.local', "shared-local-skill\n" );
+    }
     if ( $args{with_brewfile} ) {
         _write_file( 'brewfile', "jq\n" );
+    }
+    if ( $args{with_package_json} ) {
+        _write_file(
+            'package.json',
+            qq|{"name":"$name-node","version":"0.01.0","dependencies":{"$name-runtime":"^1.2.3"},"devDependencies":{"$name-dev":"^4.5.6"}}\n|
+        );
     }
     if ( $args{with_cpanfile_local} ) {
         _write_file( 'cpanfile.local', "requires 'YAML::XS';\n" );
@@ -2321,6 +3335,55 @@ sub _dies {
     my $error = eval { $code->(); 1 } ? '' : $@;
     return $error;
 }
+
+{
+    require Developer::Dashboard::CLI::Progress;
+    my $output = '';
+    open my $fh, '>', \$output or die "Unable to open scalar handle for progress output: $!";
+    my $progress = Developer::Dashboard::CLI::Progress->new(
+        title   => 'dashboard restart progress',
+        tasks   => [
+            { id => 'stop_web',  label => 'Stop dashboard web service' },
+            { id => 'start_web', label => 'Start dashboard web service' },
+        ],
+        stream  => $fh,
+        dynamic => 1,
+    );
+    like( $output, qr/dashboard restart progress/, 'CLI::Progress renders the board title immediately' );
+    like( $output, qr/\[ \] Stop dashboard web service/, 'CLI::Progress renders pending tasks with an empty checkbox marker' );
+    like( $output, qr/\[ \] Start dashboard web service/, 'CLI::Progress renders later pending tasks before work begins' );
+    $progress->callback->( { task_id => 'stop_web', status => 'running' } );
+    like( $output, qr/\e\[1A\e\[2K/, 'CLI::Progress redraws previous lines in dynamic mode' );
+    like( $output, qr/-> Stop dashboard web service/, 'CLI::Progress marks the running task with the right-arrow marker' );
+    $progress->update( { task_id => 'stop_web', status => 'done' } );
+    like( $output, qr/\[OK\] Stop dashboard web service/, 'CLI::Progress marks completed tasks with the OK marker' );
+    $progress->update( { task_id => 'start_web', status => 'failed' } );
+    like( $output, qr/\[X\] Start dashboard web service/, 'CLI::Progress marks failed tasks with the failure marker' );
+    ok( $progress->update( { task_id => 'missing-task', status => 'done' } ), 'CLI::Progress ignores unknown task ids without failing' );
+    ok( $progress->update(), 'CLI::Progress ignores missing events without failing' );
+    ok( $progress->finish, 'CLI::Progress finish succeeds after dynamic redraws' );
+}
+
+{
+    require Developer::Dashboard::CLI::Progress;
+    my $output = '';
+    open my $fh, '>', \$output or die "Unable to open scalar handle for progress output: $!";
+    my $progress = Developer::Dashboard::CLI::Progress->new(
+        title   => 'dashboard restart progress',
+        tasks   => [ { id => 'stop_web', label => 'Stop dashboard web service' } ],
+        stream  => $fh,
+        dynamic => 0,
+        color   => 1,
+    );
+    $progress->update( { task_id => 'stop_web', status => 'running' } );
+    like( $output, qr/\x1b\[33m->\x1b\[0m Stop dashboard web service/, 'CLI::Progress colors the running marker yellow when color output is enabled' );
+    $progress->update( { task_id => 'stop_web', status => 'done' } );
+    like( $output, qr/\x1b\[32m\[OK\]\x1b\[0m Stop dashboard web service/, 'CLI::Progress colors the done marker green when color output is enabled' );
+    $progress->update( { task_id => 'stop_web', status => 'failed' } );
+    like( $output, qr/\x1b\[31m\[X\]\x1b\[0m Stop dashboard web service/, 'CLI::Progress colors the failed marker red when color output is enabled' );
+}
+
+done_testing();
 
 __END__
 

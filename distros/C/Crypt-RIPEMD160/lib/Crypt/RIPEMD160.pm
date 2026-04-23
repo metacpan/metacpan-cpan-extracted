@@ -3,10 +3,12 @@ package Crypt::RIPEMD160;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use XSLoader;
 XSLoader::load('Crypt::RIPEMD160', $VERSION);
+
+use base 'Digest::base';
 
 #package RIPEMD160; # Package-Definition like in Crypt::IDEA
 
@@ -23,11 +25,13 @@ sub addfile
     if (!ref($handle)) {
 	$handle = $package . "::" . $handle unless ($handle =~ /(\:\:|\')/);
     }
+    binmode($handle);
     my $n;
     while ($n = read($handle, $data, 8192)) {
 	$self->add($data);
     }
     croak "addfile read failed: $!" unless defined $n;
+    return $self;
 }
 
 sub hexdigest
@@ -89,11 +93,16 @@ Crypt::RIPEMD160 - Perl extension for the RIPEMD-160 Hash function
 
     $digest = $context->digest();
     $string = $context->hexdigest();
+    $string = $context->b64digest();
 
     $copy = $context->clone();
 
     $digest = Crypt::RIPEMD160->hash(SCALAR);
     $string = Crypt::RIPEMD160->hexhash(SCALAR);
+
+    # Via the Digest module
+    use Digest;
+    $context = Digest->new('RIPEMD-160');
 
 =head1 DESCRIPTION
 
@@ -102,6 +111,10 @@ Message Digest algorithm from within Perl programs.
 
 The module is based on the implementation from Antoon Bosselaers from
 Katholieke Universiteit Leuven.
+
+It inherits from L<Digest::base>, so it supports the standard Perl
+L<Digest> API including B<b64digest> and B<add_bits>. It can be
+loaded via C<< Digest->new('RIPEMD-160') >>.
 
 =head1 METHODS
 
@@ -117,7 +130,10 @@ simultaneous digest contexts can be maintained.
     $context->reset();
 
 Reinitializes the context, discarding any accumulated data. Must be
-called after B<digest> before reusing the same context.
+called after B<digest> before reusing the same context.  Returns
+the context, so calls can be chained:
+
+    $context->reset->add($data);
 
 =head2 add
 
@@ -125,7 +141,9 @@ called after B<digest> before reusing the same context.
 
 Appends the strings in I<LIST> to the message. C<add('foo', 'bar')>,
 C<add('foo')> followed by C<add('bar')>, and C<add('foobar')> all
-produce the same result.
+produce the same result.  Returns the context for method chaining:
+
+    $context->add('foo')->add('bar');
 
 =head2 addfile
 
@@ -133,7 +151,8 @@ produce the same result.
 
 Reads from the open file-handle in 8192 byte blocks and adds the
 contents to the context. The handle can be a lexical filehandle, a
-type-glob reference, or a bare name.
+type-glob reference, or a bare name. The handle is set to binary mode
+via C<binmode> to prevent CRLF translation on Windows.
 
 =head2 digest
 
@@ -149,6 +168,17 @@ computing another digest.
 
 Calls B<digest> and returns the result as a printable string of
 hexadecimal digits in five space-separated groups of eight characters.
+
+B<Note:> This format differs from the continuous hex string returned
+by most L<Digest> modules. For a continuous hex string, use
+C<< unpack("H*", $context->digest()) >>.
+
+=head2 b64digest
+
+    my $string = $context->b64digest();
+
+Returns the digest as a base64-encoded string (without trailing padding).
+This method is inherited from L<Digest::base>.
 
 =head2 clone
 

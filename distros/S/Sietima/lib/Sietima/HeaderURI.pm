@@ -8,7 +8,7 @@ use Types::URI qw(Uri is_Uri);
 use Email::Address;
 use namespace::clean;
 
-our $VERSION = '1.1.4'; # VERSION
+our $VERSION = '1.1.5'; # VERSION
 # ABSTRACT: annotated URI for list headers
 
 
@@ -97,7 +97,7 @@ Sietima::HeaderURI - annotated URI for list headers
 
 =head1 VERSION
 
-version 1.1.4
+version 1.1.5
 
 =head1 SYNOPSIS
 

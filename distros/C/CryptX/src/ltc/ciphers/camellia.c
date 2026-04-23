@@ -680,7 +680,7 @@ int camellia_test(void)
    int err;
    unsigned int x;
 
-   for (x = 0; x < sizeof(tests)/sizeof(tests[0]); x++) {
+   for (x = 0; x < LTC_ARRAY_SIZE(tests); x++) {
       zeromem(&skey, sizeof(skey));
       if ((err = camellia_setup(tests[x].key, tests[x].keylen, 0, &skey)) != CRYPT_OK) {
          return err;
@@ -694,8 +694,8 @@ int camellia_test(void)
          return err;
       }
       camellia_done(&skey);
-      if (compare_testvector(tests[x].ct, 16, buf[0], 16, "Camellia Encrypt", x) ||
-            compare_testvector(tests[x].pt, 16, buf[1], 16, "Camellia Decrypt", x)) {
+      if (ltc_compare_testvector(tests[x].ct, 16, buf[0], 16, "Camellia Encrypt", x) ||
+            ltc_compare_testvector(tests[x].pt, 16, buf[1], 16, "Camellia Decrypt", x)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
    }

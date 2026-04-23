@@ -1,0 +1,14 @@
+# Repo bootstrap packages for Alpine hosts.
+alpine-sdk
+ca-certificates
+curl
+expat-dev
+git
+nodejs
+npm
+openssl-dev
+perl
+perl-app-cpanminus
+perl-dev
+pkgconf
+zlib-dev

@@ -2,7 +2,7 @@ package IPC::Manager::Client::UnixSocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.000029';
+our $VERSION = '0.000030';
 
 use File::Spec;
 use Carp qw/croak/;
@@ -28,13 +28,7 @@ use constant _SUN_PATH_LIMIT => 104;
 
 sub max_on_disk_name_length {
     my $self = shift;
-    my $room = _SUN_PATH_LIMIT - length($self->{+ROUTE}) - 2; # '/' + NUL
-    my $min  = length(IPC::Manager::Base::FS::ON_DISK_HASH_PREFIX()) + IPC::Manager::Base::FS::ON_DISK_HASH_LEN();
-    croak sprintf(
-        "UnixSocket route '%s' is too long: no room for peer socket files in sun_path limit of %d bytes",
-        $self->{+ROUTE}, _SUN_PATH_LIMIT,
-    ) if $room < $min;
-    return $room;
+    return _SUN_PATH_LIMIT - length($self->{+ROUTE}) - 2; # '/' + NUL
 }
 
 sub have_handles_for_select { 1 }

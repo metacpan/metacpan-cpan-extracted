@@ -1,3 +1,219 @@
+3.04  2026-04-22
+    - fixed streamed `install.sh` shell handoff so non-interactive
+      `curl ... | sh` runs no longer probe `/dev/tty` and emit noisy
+      `No such device or address` errors before printing the shell
+      activation guidance
+    - kept the terminal handoff behaviour for real interactive shells while
+      making piped installer runs stay quiet and deterministic in blank
+      Ubuntu, Alpine, and Fedora acceptance gates
+
+3.03  2026-04-22
+    - fixed Alpine old-system-Perl bootstrap so `install.sh` now downloads the
+      `App::perlbrew` tarball with `curl` and installs it from the local file
+      instead of asking `cpanm` to resolve the package name over the network,
+      removing the noisy `IO::Socket::IP` warning from the streamed install path
+    - added Fedora support to `install.sh`, including a repo-root `dnfile`,
+      Fedora platform detection, `dnf install -y` bootstrap handling, and the
+      same user-space Perl and shell activation finish line already enforced on
+      Debian-family and Alpine hosts
+    - added skill-side `dnfile` handling so Fedora hosts can preflight each
+      listed package and only run `sudo dnf install -y` for the packages that
+      are still missing, while exposing `has_dnfile` through skill metadata and
+      keeping the documented dependency order aligned with the runtime contract
+
+3.01  2026-04-22
+    - fixed skill `aptfile` and `apkfile` installs so Dashboard now checks
+      each listed package first and only escalates to `sudo apt-get install`
+      or `sudo apk add` for packages that are still missing, avoiding
+      unnecessary password prompts when everything is already installed
+    - updated skill install progress and docs so skipped `aptfile` and
+      `apkfile` steps now report that all listed packages were already
+      installed instead of looking like a generic missing-manifest skip
+
+3.00  2026-04-22
+    - fixed streamed Alpine `curl ... | sh` activation after an old-system
+      Perl rescue build by keeping the generated shell rc file POSIX-safe
+      instead of sourcing perlbrew's bash-only `etc/bashrc` snippet under
+      `/bin/sh`
+    - fixed streamed Alpine `curl ... | sh` installs on older system Perl
+      releases by keeping the locally bootstrapped `App::perlbrew` and
+      `Devel::PatchPerl` tools on the private `@INC` path while the installer
+      rescues itself with a user-space `perlbrew` Perl
+    - added skill-side `apkfile` handling so Alpine hosts can install skill
+      system packages through `apk add --no-cache`, expose `has_apkfile`
+      through skill metadata, and keep the documented dependency order aligned
+      with the runtime implementation
+    - added Alpine Linux support to `install.sh`, including repo-root
+      `apkfile` handling, streamed `curl ... | sh` fallback package manifests,
+      and a blank Alpine acceptance gate alongside the existing Debian-family
+      finish-line checks
+    - changed the remaining dashboard-managed `cpanm` install paths to pass
+      `--notest`, including the bootstrap `local::lib` / `App::cpanminus`
+      setup and skill `cpanfile` / `cpanfile.local` dependency installs
+    - normalized the staged private helper process title to
+      `developer-dashboard ...` so `ps` output shows the public command name
+      instead of the `_dashboard-core` helper path while built-in commands run
+
+2.94  2026-04-22
+    - fixed the streamed `install.sh` finish line so terminal-backed
+      `curl ... | sh` installs now re-enter an activated shell automatically
+      instead of stopping after a success message and leaving `dashboard` and
+      `d2` unavailable until the user guesses what to source
+    - added a post-install shell command path for acceptance testing so the
+      installer can prove `dashboard version`, `d2 version`, and
+      `dashboard skills install browser` through the same activated shell
+      environment that operators get after bootstrap
+
+2.93  2026-04-22
+    - fixed `install.sh` activation UX after piped `curl ... | sh` runs so the
+      installer now prints the exact rc file it updated, the exact source
+      command the caller must run in the current shell, and an explicit note
+      that a child `sh` process cannot update the parent shell's PATH by magic
+    - fixed post-install shell integration so `install.sh` now appends the
+      matching `dashboard shell bash`, `dashboard shell zsh`, or
+      `dashboard shell sh` eval line, bringing `d2`, prompt wiring, and shell
+      completion up automatically in the next shell
+    - fixed bash shell persistence for blank-machine bootstrap by bridging
+      `~/.profile` to `~/.bashrc`, which keeps future login shells loading the
+      dashboard bootstrap even when the machine did not already have startup
+      files in place
+
+2.92  2026-04-22
+    - fixed `install.sh` progress rendering so the installer now prints the
+      full checklist once and then emits only step transitions, instead of
+      redrawing the entire board and making the active pointer look duplicated
+      in interactive terminals
+    - fixed the old-Perl Debian-family bootstrap UX so `install.sh` now
+      suppresses perlbrew's generic `~/.profile` advice, reports the selected
+      rc file itself, and appends the required perlbrew shell bootstrap lines
+      to that chosen rc file automatically
+
+2.91  2026-04-22
+    - taught `install.sh` to print a visible colored progress board from the
+      start of the bootstrap so operators can see the current stage, what is
+      already finished, and what is still pending during a streamed
+      `curl ... | sh` install
+    - taught `install.sh` to explain any upcoming `sudo` prompt before it
+      appears, making it explicit that the password request is for the user's
+      operating-system account and only for package-manager work
+    - kept the Debian-family NodeSource conflict handling and the
+      `perlbrew --notest install perl-5.38.5` old-Perl rescue path in place
+      while surfacing both through the installer progress output and docs
+
+2.90  2026-04-22
+    - changed automatic skill dependency order so `aptfile`, `brewfile`,
+      `package.json`, `cpanfile`, and `cpanfile.local` run first, while the
+      dependent-skill manifests `ddfile` and `ddfile.local` are deferred until
+      the end of the install in that exact order
+    - aligned the interactive skills-install progress board with that deferred
+      dependency order so the visible task list now matches the real runtime
+      install sequence instead of showing `ddfile` work before the manifests
+      that now run earlier
+    - switched skill `package.json` installs to `npx --yes npm install
+      <dependency-spec...>` inside the private staging workspace before the
+      resulting packages are merged into `$HOME/node_modules`
+    - updated the checkout bootstrap manifests and `install.sh` so Debian,
+      Ubuntu, and macOS installs provision and verify `node`, `npm`, and `npx`
+      before the dashboard is installed, keeping the blank-container tarball
+      gate aligned with the new skill Node dependency contract
+    - fixed streamed `install.sh` runs such as `curl ... | sh` so they fall
+      back to embedded `aptfile` and `brewfile` contents instead of assuming
+      the checkout manifests are present on disk
+    - fixed the Debian-family old-Perl bootstrap path so `install.sh` installs
+      `App::perlbrew` into `~/perl5/bin` when `perlbrew` is still missing
+      after package bootstrapping
+    - fixed Debian-family streamed bootstrap installs on mixed apt sources
+      such as WSL + NodeSource by installing `nodejs` first and only
+      attempting the distro `npm` package when `npm` and `npx` are still
+      missing afterwards
+    - fixed the Debian-family old-Perl rescue path in `install.sh` so blank
+      Ubuntu and WSL-style bootstrap uses `perlbrew --notest install
+      perl-5.38.5` instead of failing in upstream Perl core tests before the
+      dashboard install even begins
+
+2.87  2026-04-22
+    - fixed generated bash completion bootstrap hangs on macOS by replacing
+      process-substitution readers with command-substitution payload capture,
+      which keeps `dashboard shell bash` completion responsive inside the
+      tarball `cpanm` test path as well as interactive shells
+    - fixed slow `dashboard restart` startup paths so collector and web
+      readiness now return as soon as the managed runtime becomes visible and
+      then survives a short post-ready confirmation window, instead of making
+      every healthy startup wait through the full stability poll budget
+    - kept the dead-on-arrival protections in place for both collectors and
+      the web service, so startup still fails explicitly when a replacement
+      pid or listener appears briefly and then disappears during the short
+      confirmation window
+    - made `dashboard skills install` progress explicit for `package.json`
+      skills by showing the detected manifest path on the package.json task and
+      locking in CLI smoke coverage that npm is invoked when a skill ships a
+      package.json manifest
+    - added GitHub shorthand skill installs so bare names such as `browser`
+      resolve to `https://github.com/manif3station/browser`, two-part names
+      such as `foo/bar` resolve to `https://github.com/foo/bar`, and full URLs
+      still clone exactly as supplied
+    - fixed dotted skill command prompting so `dashboard <skill>.<command>`
+      now hands control to the real skill command after hook execution,
+      preserving interactive stdin prompts and immediate prompt text the same
+      way a direct script invocation does
+    - added runtime-manager regression coverage for the short confirmation
+      window contract plus explicit environment overrides for the new
+      confirmation-poll setting
+    - fixed skill `package.json` dependency installs so npm now installs the
+      declared dependency list from the dashboard home directory, landing in
+      `$HOME/node_modules`, instead of trying to install the skill package
+      itself, which broke skills such as `browser` whose manifest version is
+      not acceptable to npm package publication rules
+    - added direct layered `SkillDispatcher` coverage for route, page, nav,
+      bookmark, and config helper paths so the full coverage gate keeps those
+      late-file helpers measured reliably
+
+2.83  2026-04-21
+    - added a repo-root `install.sh` bootstrap path for blank Debian, Ubuntu,
+      and macOS machines, driven by shipped `aptfile` and `brewfile`
+      manifests, user-space `~/perl5` local::lib setup, `cpanm --notest
+      Developer::Dashboard`, and an automatic `dashboard init`
+    - extended the bootstrap installer so Debian-family hosts install the
+      native header and zlib toolchain required by `XML::Parser` and
+      `Net::SSLeay`, and automatically bootstrap `perlbrew` with
+      `perl-5.38.5` when the packaged system Perl is older than the dashboard
+      runtime requirement
+    - changed the interactive lifecycle task-board markers to render
+      successful steps as green `[OK]`, failed steps as red `[X]`, and the
+      active `->` marker in yellow on real terminals
+    - added visible task-board progress output for interactive
+      `dashboard stop` and `dashboard restart` runs, including the full task
+      list before work begins plus live `->` and `[OK]` status updates on
+      `stderr` while the managed runtime waits through shutdown and startup
+      stability windows
+    - kept the machine-readable lifecycle result on `stdout`, so scripts can
+      still consume the final stop or restart JSON payload unchanged
+    - added runtime-manager, CLI smoke, and coverage-closure regressions for
+      the new lifecycle progress behavior
+
+2.79  2026-04-21
+    - fixed skill-local `ddfile.local` dependencies so they now install into
+      the same DD-OOP-LAYER skills root that owns the current installed skill
+      instead of drifting to the current working directory
+    - added skill `package.json` support so Node dependencies install into the
+      dashboard home directory through `npm install --prefix "$HOME" <skill-root>`
+    - extended the skill dependency policy, docs, and regression coverage to
+      lock the order to `ddfile -> ddfile.local -> aptfile -> brewfile -> package.json -> cpanfile -> cpanfile.local`
+
+2.78  2026-04-21
+    - fixed `dashboard skills install --ddfile` so plain `ddfile` manifests
+      always install into the base `~/.developer-dashboard/skills/` layer
+      instead of whichever child DD-OOP-LAYER happened to be active
+    - kept `ddfile.local` installing into the current directory's nested
+      `skills/` tree and tightened the manifest regression coverage so the two
+      targets cannot drift together again
+
+2.77  2026-04-21
+    - added `dashboard skills install --ddfile` so operators can install or refresh every source listed in the current directory's `ddfile`
+    - added `ddfile.local` support so the same explicit manifest run installs local nested skill dependencies into the current directory's `skills/` tree after the global `ddfile` pass
+    - made bare `dashboard skills install` fail with explicit usage unless the user supplies one source argument or `--ddfile`
+    - hardened the coverage/runtime gates so managed collector children scrub `Devel::Cover` environment leakage and slow instrumented startup paths keep enough readiness budget to finish the full suite cleanly
+
 2.76  2026-04-20
     - changed skill dependency installation policy so `dashboard skills install`
       now processes `ddfile`, `aptfile`, `brewfile`, `cpanfile`, and

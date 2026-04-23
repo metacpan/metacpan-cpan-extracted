@@ -246,7 +246,7 @@ generic package names.
 - private `~/.developer-dashboard/cli/dd/*` built-in helpers plus `~/.developer-dashboard/cli/dd/_dashboard-core`
   Provide dashboard-managed helper assets without installing generic command names into the global PATH. Query/open-file/ticket/path/prompt helpers keep their own dedicated helper bodies, while the remaining built-in commands stage thin wrappers that hand off to the shared private `_dashboard-core` runtime.
 
-Only `dashboard` is intended to be the public CPAN-facing command-line entrypoint. The real built-in command bodies now live outside `bin/dashboard` under `share/private-cli/`, then stage into `~/.developer-dashboard/cli/dd/` on demand. Generic helper names such as `ticket`, `of`, `open-file`, `jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, `path`, and `paths` are intentionally kept out of the installed global PATH to avoid polluting the wider Perl and shell ecosystem while still keeping dashboard-owned commands separate from user commands under `~/.developer-dashboard/cli/`.
+Only `dashboard` is intended to be the public CPAN-facing command-line entrypoint. The real built-in command bodies now live outside `bin/dashboard` under `share/private-cli/`, then stage into `~/.developer-dashboard/cli/dd/` on demand. Generic helper names such as `ticket`, `of`, `open-file`, `jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, `path`, and `paths` are intentionally kept out of the installed global PATH to avoid polluting the wider Perl and shell ecosystem while still keeping dashboard-owned commands separate from user commands under `~/.developer-dashboard/cli/`. While those staged helpers run, their process title is normalized to the public `developer-dashboard ...` form so `ps` output shows the user-facing command instead of the staged helper path.
 
 - `dashboard ticket`
   Creates or reuses a tmux session for the requested ticket reference, seeds `TICKET_REF` plus dashboard-friendly branch aliases into that session environment, and attaches to it through a dashboard-managed private helper instead of a public standalone binary.
@@ -590,10 +590,83 @@ decoded XML tree as canonical JSON.
 
 ### Installation
 
+Bootstrap a blank Alpine, Debian, Ubuntu, Fedora, or macOS machine from a checkout with:
+
+```bash
+./install.sh
+```
+
+`install.sh` is a checkout-only bootstrap helper. It ships in the source tree
+and release tarball so operators can run it explicitly from a checkout or
+extracted tarball, but CPAN and `cpanm` do not install it as a global command.
+When the installer is streamed through `sh` without a checkout, such as
+`curl ... | sh`, it falls back to embedded Debian-family, Alpine, Fedora, and
+Homebrew package manifests instead of assuming repo-local `aptfile`, `apkfile`,
+`dnfile`, and `brewfile` files exist on disk.
+
+That installer reads the repo-root `aptfile` on Debian-family hosts and runs
+`apt-get update` plus `apt-get install -y` for the listed packages, reads the
+repo-root `apkfile` on Alpine hosts and runs `apk add --no-cache` for the
+listed packages, reads the repo-root `dnfile` on Fedora hosts and runs
+`dnf install -y` for the listed packages, reads the
+repo-root `brewfile` on macOS and runs `brew install` for the listed packages,
+or falls back to the embedded copies of those package lists when the script is
+streamed without the checkout files, installs Debian-family Node tooling in a
+conflict-aware order by bringing in `nodejs` first and only attempting the
+distro `npm` package if `npm` and `npx` are still missing, verifies that
+`node`, `npm`, and `npx` are available from those bootstrap packages before
+finishing the install, prints a visible install progress board before doing any
+system changes, prints that full checklist once and then only emits step
+transitions so the active pointer does not appear duplicated in interactive
+terminals, explains that any upcoming `sudo` prompt is asking for the user's
+operating-system account password only for package-manager work,
+bootstraps user-space Perl tooling under `~/perl5` with
+`cpanm --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus`,
+appends exactly one `local::lib` bootstrap line to `~/.bashrc`, `~/.zshrc`, or
+`~/.profile` depending on the active shell, keeps bash login shells wired by
+bridging `~/.profile` to `~/.bashrc`, prefers Homebrew Perl on macOS when
+`brew --prefix perl` exposes a brewed interpreter, bootstraps a user-space
+`perlbrew` Perl on Debian-family, Alpine, or Fedora hosts when the system Perl
+is older than the required `5.38`, installs `App::perlbrew` into `~/perl5/bin`
+first if the package manager did not already put `perlbrew` on `PATH`, keeps that local
+`perlbrew` and `patchperl` toolchain pinned to the private `~/perl5/lib/perl5`
+include path while the rescue build runs, fetches the `App::perlbrew` tarball
+with `curl` before the local install so Alpine does not emit the noisy
+`IO::Socket::IP` warning during that bootstrap step, uses
+`perlbrew --notest install perl-5.38.5` so blank-machine bootstrap does not
+stall in upstream Perl core test failures, updates the selected shell rc file
+itself with the needed `PERLBREW_HOME` and rescue-Perl `PATH` lines instead of
+leaving a manual `~/.profile` editing step behind or sourcing perlbrew's
+bash-only startup file under generic `sh`, appends the matching
+`eval "$(".../dashboard" shell bash|zsh|sh)"` bootstrap so `d2`, prompt
+integration, and completion come up automatically in future shells, re-enters
+an activated shell automatically at the end of a terminal-backed streamed
+install so `dashboard`, `d2`, prompt integration, and completion are live
+immediately instead of leaving the user at a dead prompt, falls back to
+printing the exact shell file it updated plus the exact `. "<rc-file>"`
+command the user should run only when the installer cannot safely take over a
+terminal, never probes `/dev/tty` during a piped `curl ... | sh` run so
+non-interactive installs stay quiet, installs Developer Dashboard into the user account with
+`cpanm --notest Developer::Dashboard`, and then runs `dashboard init` so the
+runtime exists immediately after installation.
+
+Release verification is Linux-gated. Debian-family, Alpine, and Fedora
+bootstrap checks are required release gates. macOS bootstrap and `brewfile`
+checks are supported for manual validation and debugging, but they are not
+required release gates.
+
+Useful bootstrap examples:
+
+```bash
+./install.sh
+SHELL=/bin/zsh ./install.sh
+DD_INSTALL_CPAN_TARGET=./Developer-Dashboard-X.XX.tar.gz ./install.sh
+```
+
 Install from CPAN with:
 
 ```bash
-cpanm Developer::Dashboard
+cpanm --notest Developer::Dashboard
 ```
 
 Or install from a checkout with:
@@ -851,11 +924,15 @@ Stop the local app and collector loops:
 dashboard stop
 ```
 
+Interactive terminal runs now print a task board on `stderr` first, then mark each stop step as it finishes so the command does not appear hung while the runtime waits for managed shutdown.
+
 Restart the local app and configured collector loops:
 
 ```bash
 dashboard restart
 ```
+
+Interactive terminal runs now print the full restart task board on `stderr`, mark the active step with a yellow `->`, mark completed steps with a green `[OK]`, mark failed steps with a red `[X]`, and keep the final JSON result on `stdout`.
 
 Create a helper login user:
 
@@ -1176,6 +1253,9 @@ and `d2`. Bash registers `_dashboard_complete`, zsh registers
 for both command names. Completion candidates come from the live runtime
 instead of a hardcoded shell list, so built-in commands, layered custom CLI
 commands, and installed dotted skill commands all show up in suggestions.
+For bash, the generated helper captures completion payloads first instead of
+relying on process substitution, which keeps completion responsive on macOS
+and inside packaged install-test shells.
 The generated bootstrap also wires `cdr`, `dd_cdr`, and `which_dir`
 completion. The first argument suggests saved aliases plus matching directory
 names beneath the current directory, and later arguments suggest matching
@@ -1261,8 +1341,8 @@ by real path identity instead of raw string spelling.
 - `dashboard serve --no-indicators` and `dashboard serve --no-indicator` keep normal page rendering and left-side page chrome intact while clearing the whole top-right browser-only chrome area, including the status strip, username, host or IP link, and live date-time line, and persisting that flag for later `dashboard restart` runs until `dashboard serve --indicators` turns it back off
 - `dashboard serve logs` prints the combined Dancer2 and Starman runtime log captured in the dashboard log file, `dashboard serve logs -n 100` starts from the last 100 lines, and `dashboard serve logs -f` follows appended output live
 - `dashboard serve workers N` saves the default Starman worker count and starts the web service immediately when it is currently stopped; `--host HOST` and `--port PORT` can steer that auto-start path, and `dashboard serve --workers N` or `dashboard restart --workers N` can still override it for one run
-- `dashboard stop` stops both the web service and managed collector loops
-- `dashboard restart` stops both, starts configured collector loops again, then starts the web service, and only reports success after the replacement collector loops and web runtime both survive a short managed stability window, with the web side still holding a live managed pid and an accepting listener on the requested port
+- `dashboard stop` stops both the web service and managed collector loops and, on an interactive terminal, prints the full stop task board on `stderr` before work starts so each shutdown step becomes visible instead of silent waiting
+- `dashboard restart` stops both, starts configured collector loops again, then starts the web service, and only reports success after the replacement collector loops and web runtime become visible and survive a short post-ready confirmation window, with the web side still holding a live managed pid and an accepting listener on the requested port; on an interactive terminal it also prints the full restart task board on `stderr`, marks the active step with a yellow `->`, marks completed steps with a green `[OK]`, marks failed steps with a red `[X]`, and leaves the final JSON result on `stdout`
 - web shutdown and duplicate detection do not trust pid files alone; they validate managed processes by environment marker or process title and use a `pkill`-style scan fallback when needed
 
 ### Environment Customization
@@ -1338,7 +1418,9 @@ helper script bodies are embedded directly in the command script. Installed
 copies resolve the same
 seeded pages and helper assets from the distribution share directory, so
 `dashboard init` works after `cpanm` installs and not just from a source
-checkout.
+checkout. Those helper-backed built-ins also rewrite their live process title
+to `developer-dashboard ...`, so process listings stay aligned with the public
+command names instead of exposing the staged helper path.
 When `dashboard` re-execs a Perl-backed helper or hook, it also forces the
 same active dashboard `lib/` root into that child Perl process. That keeps
 thin switchboard handoff on the current checkout code instead of drifting onto
@@ -1451,7 +1533,7 @@ transformed locally before rendering into derived HTML, links, or button-like
 actions. Its saved Ajax endpoints run through singleton workers. No `DBD::*`
 driver ships in the base tarball by default; install only the one you need
 with `dashboard cpan DBD::Driver` or user-space
-`cpanm -L ~/perl5 DBD::Driver`, and the bookmark will return explicit install
+`cpanm --notest -L ~/perl5 DBD::Driver`, and the bookmark will return explicit install
 guidance when a selected driver is missing. The repository also ships a
 dedicated SQL dashboard support guide with the verification matrix and
 per-database notes for that workspace.
@@ -1464,10 +1546,22 @@ Extend dashboard with isolated skill packages:
 skill repository:
 
 ```bash
+dashboard skills install browser
+dashboard skills install foo/bar
 dashboard skills install git@github.com:user/example-skill.git
 dashboard skills install https://github.com/user/example-skill.git
 dashboard skills install /absolute/path/to/example-skill
+dashboard skills install --ddfile
 ```
+
+Bare one-word skill names are expanded against the official
+`https://github.com/manif3station/` GitHub base, so
+`dashboard skills install browser` clones
+`https://github.com/manif3station/browser`. Two-part `owner/repo` shorthand is
+expanded against GitHub too, so `dashboard skills install foo/bar` clones
+`https://github.com/foo/bar`. Full URLs such as
+`https://github.com/user/example-skill.git` and
+`git@github.com:user/example-skill.git` are used exactly as supplied.
 
 Git sources are cloned. Direct local checked-out directories are synced in
 place instead of recloned, using `rsync` when it is available and the built-in
@@ -1480,9 +1574,36 @@ root under the deepest participating `DD-OOP-LAYERS` runtime. In a home-only
 session that is `~/.developer-dashboard/skills/<repo-name>/`. In a deeper
 project layer that already has its own `.developer-dashboard/`, the install
 target becomes `<that-layer>/.developer-dashboard/skills/<repo-name>/`.
+`dashboard skills install` now requires either one explicit source argument or
+the special `--ddfile` flag; calling it with no source and no `--ddfile`
+returns a usage error instead of guessing.
 Developer Dashboard does not merge the skill's `cli/`, `dashboards/`,
-`config/`, `ddfile`, `aptfile`, `brewfile`, `cpanfile`, `cpanfile.local`, or
-Docker files into the normal runtime folders.
+`config/`, `ddfile`, `ddfile.local`, `aptfile`, `apkfile`, `dnfile`, `brewfile`, `package.json`,
+`cpanfile`, `cpanfile.local`, or Docker files into the normal runtime
+folders.
+
+`dashboard skills install --ddfile` reads dependency manifests from the
+current directory instead of taking one explicit skill source. If `ddfile`
+exists there, each listed source installs into the base home-layer skills root
+at `~/.developer-dashboard/skills/<repo-name>/` even when the command is run
+inside a deeper child `.developer-dashboard/` layer. If
+`ddfile.local` exists there, each listed source installs into the current
+directory's nested `skills/<repo-name>/` tree instead. When both manifests are
+present, the command processes `ddfile` first and `ddfile.local` second.
+Repeated `dashboard skills install --ddfile` runs also act as reinstall and
+refresh for already-installed targets, just like repeated explicit
+`dashboard skills install <source>` runs.
+
+Interactive `dashboard skills install` runs also print a task board on
+`stderr`. When a skill ships dependency manifests such as `package.json`, the
+matching task updates to show the detected file path so a long-running npm,
+cpanm, or package-manager step stays visible instead of looking blind.
+
+Installed dotted skill commands such as `dashboard demo-skill.foo` now hand
+control to the real skill command after hook processing instead of wrapping
+the main command in an extra capture layer. That keeps interactive prompting
+behavior intact for commands that print a prompt and then read from standard
+input.
 
 Skill lookup also follows `DD-OOP-LAYERS`, but a same-named deeper skill is
 now layered instead of flattening the whole repo. The home
@@ -1513,7 +1634,7 @@ where each item reports:
 - installed path
 - `enabled` as a JSON boolean
 - CLI command, page, docker service, collector, and indicator counts
-- JSON booleans for `has_config`, `has_ddfile`, `has_aptfile`, `has_brewfile`,
+- JSON booleans for `has_config`, `has_ddfile`, `has_aptfile`, `has_apkfile`, `has_dnfile`, `has_brewfile`,
   `has_cpanfile`, and `has_cpanfile_local`
 
 **Inspect one installed skill:**
@@ -1609,9 +1730,13 @@ Each installed skill lives under
 - `config/docker/` - Skill-local Docker Compose roots that participate in layered docker service lookup
 - `state/` - Persistent skill state and data
 - `logs/` - Skill output logs
-- `ddfile` - Optional dependent skill list installed before package managers run
-- `aptfile` - Optional Debian-family system packages installed through `sudo apt-get install -y`
+- `ddfile` - Optional dependent skill list installed after package managers run
+- `ddfile.local` - Optional local dependent skill list installed after `ddfile` into the same skills root as the current skill install target
+- `aptfile` - Optional Debian-family system packages; Dashboard checks each package first and only runs `sudo apt-get install -y` for the missing packages
+- `apkfile` - Optional Alpine system packages; Dashboard checks each package first and only runs `sudo apk add --no-cache` for the missing packages
+- `dnfile` - Optional Fedora system packages; Dashboard checks each package first and only runs `sudo dnf install -y` for the missing packages
 - `brewfile` - Optional macOS Homebrew packages installed through `brew install`
+- `package.json` - Optional Node dependencies installed into `$HOME/node_modules` by running `npx --yes npm install <dependency-spec...>` inside a private dashboard staging workspace and then merging the resulting packages into `$HOME/node_modules`
 - `cpanfile` - Optional shared Perl dependencies installed into `~/perl5`
 - `cpanfile.local` - Optional skill-local Perl dependencies installed into `<skill-root>/perl5`
 
@@ -1652,13 +1777,31 @@ Skill browser routes:
 
 Skill dependency and docker layering:
 
-- if a `ddfile` exists, each listed dependency is installed first through
+- if a `ddfile` exists, each listed dependency is installed after package and
+  language dependency manifests through
   `dashboard skills install <dependency>` while already-installed or in-flight
   skills are skipped to avoid loops
-- if an `aptfile` exists on a Debian-family host, its package list is printed
-  before the sudo prompt and then installed through `sudo apt-get install -y`
+- if a `ddfile.local` exists under an installed skill, each listed dependency
+  is then installed through `dashboard skills install <dependency>` into the
+  same skills root that owns the current installed skill, so child-layer skill
+  installs stay in that child layer and home-layer installs stay in the home
+  layer
+- if an operator runs `dashboard skills install --ddfile` inside a directory
+  that contains `ddfile`, every listed source is reinstalled or refreshed into
+  the base `~/.developer-dashboard/skills/` root
+- if that same directory also contains `ddfile.local`, every listed source is
+  then reinstalled or refreshed into the current directory's nested
+  `skills/<repo-name>/` tree after the global `ddfile` pass completes
+- if an `aptfile` exists on a Debian-family host, Dashboard checks each listed package first and only prints and installs the packages that are still missing through `sudo apt-get install -y`
+- if an `apkfile` exists on an Alpine host, Dashboard checks each listed package first and only prints and installs the packages that are still missing through `sudo apk add --no-cache`
+- if a `dnfile` exists on a Fedora host, Dashboard checks each listed package first and only prints and installs the packages that are still missing through `sudo dnf install -y`
 - if a `brewfile` exists on macOS, its package list is printed and then
   installed through `brew install`
+- if a `package.json` exists, its Node dependencies are installed into
+  `$HOME/node_modules` by running `npx --yes npm install <dependency-spec...>` inside a
+  private dashboard staging workspace and then merging the resulting packages
+  into `$HOME/node_modules`, so unrelated `$HOME/package.json` files do not
+  break skill installs
 - if a `cpanfile` exists, its Perl dependencies are installed into `~/perl5`
 - if a `cpanfile.local` exists, its Perl dependencies are installed into the
   skill-local `perl5/` tree
@@ -1670,8 +1813,8 @@ Skill dependency and docker layering:
 
 To build a new skill, start with a Git repository that contains `cli/`,
 `config/config.json`, and optional `dashboards/`, `dashboards/nav/`, `state/`,
-`logs/`, `ddfile`, `aptfile`, `brewfile`, `cpanfile`, and `cpanfile.local`
-files under the skill root. Skill
+`logs/`, `ddfile`, `ddfile.local`, `aptfile`, `apkfile`, `dnfile`, `brewfile`, `package.json`,
+`cpanfile`, and `cpanfile.local` files under the skill root. Skill
 commands are file-based commands run through the dotted
 `dashboard <repo-name>.<command>` form. Skill hook files live under
 `cli/<command>.d/`, skill app pages render from `/app/<repo-name>` and
@@ -1689,9 +1832,13 @@ environment variables such as `DEVELOPER_DASHBOARD_SKILL_ROOT`, bookmark
 syntax like `TITLE:`, `BOOKMARK:`, `HTML:`, and `CODE1:`, bookmark browser
 helpers such as `fetch_value()`, `stream_value()`, and `stream_data()`,
 underscored config merge keys such as `_example-skill`, the
-`ddfile -> aptfile -> brewfile -> cpanfile -> cpanfile.local` dependency
-install order, the shared `~/perl5` versus skill-local `perl5/` split, skill
-docker layering, and when to use
+`aptfile -> apkfile -> dnfile -> brewfile -> package.json -> cpanfile -> cpanfile.local -> ddfile -> ddfile.local`
+automatic dependency install order, the explicit
+`dashboard skills install --ddfile` operator order of
+the deferred `ddfile -> ddfile.local` pass, the shared `~/perl5` versus skill-local `perl5/`
+split, the `$HOME/node_modules` Node install target used by `package.json`, the
+same-install-level dependency target used by skill-local `ddfile.local`,
+skill docker layering, and when to use
 dashboard-wide custom CLI hook folders such as
 `~/.developer-dashboard/cli/<command>.d` instead of a skill-local hook tree.
 
@@ -1778,7 +1925,7 @@ prove -lr t
 Measure library coverage with Devel::Cover:
 
 ```bash
-cpanm --local-lib-contained ./.perl5 Devel::Cover
+cpanm --notest --local-lib-contained ./.perl5 Devel::Cover
 export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
 export PATH="$PWD/.perl5/bin:$PATH"
 cover -delete
