@@ -32,8 +32,10 @@ SECURITY.md
 t/01test.t
 t/02methods.t
 t/03streaming.t
-t/06addfile_binmode.t
 t/04mac.t
+t/05digest_api.t
+t/05encoding.t
+t/06addfile_binmode.t
 t/pod-coverage.t
 t/pod.t
 typemap

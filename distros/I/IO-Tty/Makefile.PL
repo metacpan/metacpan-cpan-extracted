@@ -14,22 +14,22 @@ use File::Spec;
 use Config qw(%Config);
 
 my %cfg;
-@cfg{qw(cc ccflags ldflags)} = @Config{qw(cc ccflags ldflags)};
+@cfg{qw(cc ccflags optimize ldflags)} = @Config{qw(cc ccflags optimize ldflags)};
 for my $arg (@ARGV) {
-  if ( $arg =~ /^(CC|CCFLAGS|LDFLAGS)=(.*)/i ) {
+  if ( $arg =~ /^(CC|CCFLAGS|OPTIMIZE|LDFLAGS)=(.*)/i ) {
     $cfg{lc($1)} = $2;
   }
 }
 if ($ENV{PERL_MM_OPT}) {
   # Split on whitespace just like EU::MM
   for ( split ' ', $ENV{PERL_MM_OPT} ) {
-    if ( /^(CC|CCFLAGS|LDFLAGS)=(.*)/i ) {
+    if ( /^(CC|CCFLAGS|OPTIMIZE|LDFLAGS)=(.*)/i ) {
       $cfg{lc($1)} = $2;
     }
   }
 }
 
-my $flags = "$cfg{ccflags} $cfg{ldflags}";
+my $flags = "$cfg{ccflags} $cfg{optimize} $cfg{ldflags}";
 $flags =~ s/([^A-Za-z0-9 -_])/\\$1/g; # escape shell-metachars
 
 $|=1; # to see output immediately
@@ -84,51 +84,10 @@ use Cwd qw(getcwd);
 my $dir = getcwd;
 chdir('conf') or die "chdir: $!";
 
-open(TST,">compilerok.c") or die "open: $!";
-print TST <<'ESQ';
-int main () { return 0; }
-ESQ
-close(TST);
-
-if (system("$cfg{'cc'} $flags compilerok.c > compilerok.log 2>&1")) {
-  die <<"__EOT__";
-
-ERROR: cannot run the configured compiler '$cfg{'cc'}'
-(see conf/compilerok.log). Suggestions:
-1) The compiler '$cfg{'cc'}' is not in your PATH. Add it
-   to the PATH and try again. OR
-2) The compiler isn't installed on your system. Install it. OR
-3) You only have a different compiler installed (e.g. 'gcc').
-   Either fix the compiler config in the perl Config.pm
-   or install a perl that was built with the right compiler
-   (you could build perl yourself with the available compiler).
-
-Note: this is a system-administration issue, please ask your local
-admin for help. Thank you.
-
-__EOT__
-}
-
-unlink qw(compilerok.c compilerok.log);
-
-# checking for various functions
-
-my %funcs = (ttyname      => "",
-	     openpty      => "-lutil",
-	     _getpty      => "",
-	     strlcpy      => "",
-	     sigaction    => "",
-	     grantpt      => "",
-	     unlockpt     => "",
-	     getpt        => "",
-	     posix_openpt => "",
-	     ptsname      => "",
-	     ptsname_r    => "",
-	    );
-
-foreach my $f (sort keys %funcs) {
-  open(TST,">functest_$f.c") or die "open: $!";
-  print TST <<"ESQ";
+# Platform extension defines shared by function and header probes.
+# Without these, headers like pty.h or functions like openpty may not
+# be visible on strict POSIX systems or certain BSDs.
+my $platform_defines = <<'PLATDEFS';
 /* Enable POSIX and platform extensions so functions like grantpt,
    ptsname, openpty etc. are declared in standard headers.  */
 #ifndef _GNU_SOURCE
@@ -170,7 +129,54 @@ foreach my $f (sort keys %funcs) {
 #define _BSD_SOURCE
 #endif
 #endif
+PLATDEFS
 
+open(TST,">compilerok.c") or die "open: $!";
+print TST <<'ESQ';
+int main () { return 0; }
+ESQ
+close(TST);
+
+if (system("$cfg{'cc'} $flags compilerok.c > compilerok.log 2>&1")) {
+  die <<"__EOT__";
+
+ERROR: cannot run the configured compiler '$cfg{'cc'}'
+(see conf/compilerok.log). Suggestions:
+1) The compiler '$cfg{'cc'}' is not in your PATH. Add it
+   to the PATH and try again. OR
+2) The compiler isn't installed on your system. Install it. OR
+3) You only have a different compiler installed (e.g. 'gcc').
+   Either fix the compiler config in the perl Config.pm
+   or install a perl that was built with the right compiler
+   (you could build perl yourself with the available compiler).
+
+Note: this is a system-administration issue, please ask your local
+admin for help. Thank you.
+
+__EOT__
+}
+
+unlink qw(compilerok.c compilerok.log);
+
+# checking for various functions
+
+my %funcs = (ttyname      => [""],
+	     openpty      => ["", "-lutil"],
+	     _getpty      => [""],
+	     strlcpy      => [""],
+	     sigaction    => [""],
+	     grantpt      => [""],
+	     unlockpt     => [""],
+	     getpt        => [""],
+	     posix_openpt => [""],
+	     ptsname      => [""],
+	     ptsname_r    => [""],
+	    );
+
+foreach my $f (sort keys %funcs) {
+  open(TST,">functest_$f.c") or die "open: $!";
+  print TST <<"ESQ";
+$platform_defines
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -194,6 +200,11 @@ foreach my $f (sort keys %funcs) {
 #  endif
 #endif
 
+/* Store the function pointer in a global so the optimizer cannot
+   eliminate the reference.  A local + (void)cast is dead code that
+   -O2/-Os removes, causing the linker to miss undefined symbols.  */
+void *functest_ptr;
+
 int
 main ()
 {
@@ -203,13 +214,8 @@ main ()
 #if defined (__stub_$f) || defined (__stub___$f)
 choke me
 #else
-/* Undef any macro wrapper (e.g. macOS _FORTIFY_SOURCE) so we get
-   the real function symbol for the linker check below.  */
 #undef $f
-/* Cast through void* to avoid incompatible-function-pointer-types
-   errors on newer clang (e.g. strlcpy returns size_t, not void).  */
-void *fptr = (void *) $f;
-(void)fptr;
+functest_ptr = (void *) $f;
 #endif
 
   ;
@@ -219,13 +225,24 @@ ESQ
 
   close(TST);
   print "Looking for $f()" . "." x (13-length($f)) . " ";
-  if (system("$cfg{'cc'} $flags $funcs{$f} functest_$f.c > functest_$f.log 2>&1")) {
-    print "not found.\n";
-  } else {
-    $define{"-DHAVE_\U$f"} = undef;
-    push @libs, $funcs{$f} if $funcs{$f};
+
+  # Try each library candidate in order (e.g. openpty is in libc on
+  # glibc 2.34+/musl, but needs -lutil on BSDs and older glibc).
+  my @lib_candidates = @{$funcs{$f}};
+  my $found = 0;
+  for my $try_lib (@lib_candidates) {
+    unless (system("$cfg{'cc'} $flags $try_lib functest_$f.c > functest_$f.log 2>&1")) {
+      $define{"-DHAVE_\U$f"} = undef;
+      push @libs, $try_lib if $try_lib;
+      $found = 1;
+      last;
+    }
+  }
+  if ($found) {
     print "FOUND.\n";
-    unlink "functest_$f.c", "functest_$f.log" ;
+    unlink "functest_$f.c", "functest_$f.log";
+  } else {
+    print "not found.\n";
   }
 }
 
@@ -240,6 +257,7 @@ foreach my $h (sort @headers) {
   $def =~ s/\W/_/g;
   open(TST,">headtest_$def.c") or die "open: $!";
   print TST <<"ESQ";
+$platform_defines
 #include <sys/types.h>
 #include <$h>
 int main () { return 0; }

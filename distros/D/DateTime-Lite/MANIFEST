@@ -42,6 +42,8 @@ t/15.start_end_of.t
 t/16.extended_aliases.t
 t/17.resolve_abbreviation_period.t
 t/18.resolve_abbreviation_ordering.t
+t/19.threads.t
+t/20.dst_abolition.t
 t/90.pod.t
 t/91.coverage.t
 t/92.manifest.t

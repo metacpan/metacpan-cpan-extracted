@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml)
+[![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml) [![Coverage](https://codecov.io/gh/cpan-authors/XML-Parser/graph/badge.svg)](https://codecov.io/gh/cpan-authors/XML-Parser)
 
 # NAME
 
@@ -143,6 +143,46 @@ the _Expat_ object, not the Parser object.
         This option has no effect if the ExternEnt or ExternEntFin handlers are
         directly set. Otherwise, if true, it forces the use of a file based external
         entity handler.
+
+    - BillionLaughsAttackProtectionMaximumAmplification
+
+        Sets the maximum amplification factor for the Billion Laughs attack
+        protection.  See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.4.0 built with `XML_DTD` or `XML_GE`.
+
+    - BillionLaughsAttackProtectionActivationThreshold
+
+        Sets the activation threshold (in bytes) for the Billion Laughs attack
+        protection.  See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.4.0 built with `XML_DTD` or `XML_GE`.
+
+    - AllocTrackerMaximumAmplification
+
+        Sets the maximum amplification factor for the allocation tracker.
+        See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.7.2 built with `XML_DTD` or `XML_GE`.
+
+    - AllocTrackerActivationThreshold
+
+        Sets the activation threshold (in bytes) for the allocation tracker.
+        See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.7.2 built with `XML_DTD` or `XML_GE`.
+
+    - ReparseDeferralEnabled
+
+        Enables or disables reparse deferral, a security mechanism that prevents
+        certain token-boundary attacks.  See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.6.0.
 
     - Non\_Expat\_Options
 
@@ -371,16 +411,11 @@ If Fixed is true, then this is a fixed attribute.
 This handler is called for DOCTYPE declarations. Name is the document type
 name. Sysid is the system id of the document type, if it was provided,
 otherwise it's undefined. Pubid is the public id of the document type,
-which will be undefined if no public id was given. Internal is the internal
-subset, given as a string. If there was no internal subset, it will be
-undefined. Internal will contain all whitespace, comments, processing
-instructions, and declarations seen in the internal subset. The declarations
-will be there whether or not they have been processed by another handler
-(except for unparsed entities processed by the Unparsed handler). However,
-comments and processing instructions will not appear if they've been processed
-by their respective handlers.
+which will be undefined if no public id was given. Internal will be
+true or false, indicating whether or not the doctype declaration contains
+an internal subset.
 
-## \* DoctypeFin                (Parser)
+## \* DoctypeFin                (Expat)
 
 This handler is called after parsing of the DOCTYPE declaration has finished,
 including any internal or external DTD declarations.
@@ -539,6 +574,78 @@ the parser:
 
 This will include 2 lines of context on either side of the error in the
 error message.
+
+# SECURITY
+
+XML::Parser relies on the expat C library for parsing. Modern versions of
+expat include several security mechanisms that can be tuned through
+constructor options passed to `new()`. These options are forwarded directly
+to [XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat) and take effect for every subsequent `parse`,
+`parsefile`, or `parse_start` call on the parser instance.
+
+All of these options will `croak` at runtime if the underlying libexpat does
+not support them.
+
+## Billion Laughs Attack Protection
+
+The Billion Laughs attack (also known as an XML bomb) uses deeply nested
+entity definitions to cause exponential expansion, consuming memory and CPU.
+Expat >= 2.4.0 (built with `XML_DTD` or `XML_GE`) includes built-in
+protection controlled by two parameters:
+
+- **BillionLaughsAttackProtectionMaximumAmplification**
+
+    The maximum ratio between the size of the expanded output and the size of
+    the input.  For example, a value of `100.0` means the parser will abort if
+    entity expansion would produce output more than 100 times the size of the
+    input.
+
+- **BillionLaughsAttackProtectionActivationThreshold**
+
+    The number of bytes of expanded output before the amplification limit takes
+    effect.  This prevents false positives on small documents that happen to
+    have a high amplification ratio.
+
+## Allocation Tracker
+
+Expat >= 2.7.2 (built with `XML_DTD` or `XML_GE`) adds a second layer
+of amplification tracking through the allocation tracker, which measures
+memory allocation rather than output size:
+
+- **AllocTrackerMaximumAmplification**
+
+    The maximum ratio of allocated memory to input size.
+
+- **AllocTrackerActivationThreshold**
+
+    The number of bytes of allocation before the limit takes effect.
+
+## Reparse Deferral
+
+Expat >= 2.6.0 includes reparse deferral, which prevents attacks that
+exploit token boundaries.  Rather than reparsing incomplete tokens
+immediately, the parser defers until more input arrives.
+
+- **ReparseDeferralEnabled**
+
+    A boolean.  Set to a true value to enable reparse deferral, or `0` to
+    disable it.
+
+For full details on each option, see ["new" in XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat#new).
+
+    # Example: tighten Billion Laughs limits
+    my $parser = XML::Parser->new(
+      Style => 'Tree',
+      BillionLaughsAttackProtectionMaximumAmplification => 50,
+      BillionLaughsAttackProtectionActivationThreshold  => 1024,
+    );
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See [https://dev.perl.org/licenses/](https://dev.perl.org/licenses/) for more information.
 
 # AUTHORS
 

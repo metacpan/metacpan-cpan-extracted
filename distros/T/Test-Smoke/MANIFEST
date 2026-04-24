@@ -50,7 +50,7 @@ lib/Test/Smoke/App/SyncTree.pm
 lib/Test/Smoke/App/W32Configure.pm
 lib/Test/Smoke/Archiver.pm
 lib/Test/Smoke/BuildCFG.pm
-lib/Test/Smoke/FAQ
+lib/Test/Smoke/FAQ.pod
 lib/Test/Smoke/FTPClient.pm
 lib/Test/Smoke/LogMixin.pm
 lib/Test/Smoke/Mailer.pm
@@ -200,7 +200,6 @@ t/vms_rl.t
 t/win32/Makefile
 t/win32/GNUmakefile
 t/win32_error_mode.t
-t/ftppub/perl-current/Porting/GitUtils.pm
 t/ftppub/perl-current/Porting/make_dot_patch.pl
 t/syncer_ftp.t
 t/syncer_ftpclient.t

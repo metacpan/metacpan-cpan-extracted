@@ -3,7 +3,7 @@ package Developer::Dashboard::SessionStore;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Digest::SHA qw(sha256_hex);
 use File::Spec;

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a62a1ac93af34047a06ae47053a9c4a6869f1d7df2b0d8cbb1d6bff1df8a1a3e Changes
+SHA256 8e2a6231088d66af2ae2ddb2b2c1f070dc7ba25e45a429c9bb24807d123bce30 LICENSE
+SHA256 93905f44baa1c1535874dc4f979f36b1e5d4850838d4719ec0b939eccd58e1bd MANIFEST
+SHA256 c60f7ee7ec446edbc0544ac9cb4437dc6a99d791f679b1608c19eddd0487b2e9 META.json
+SHA256 316d126d42807fb608cc8a1c1ce65468cc29e0670daefa5793880eba327c5eef META.yml
+SHA256 82f54c5a9fa8abe9caee40783a2ea48de940748556c88b1f18caed053ae72058 Makefile.PL
+SHA256 7385d75e12a04e366a6af589cb98c739204a9b52d861c86789d2af6c3e6b262b alienfile
+SHA256 b16f3912fb48a74d687f794f29dedc32646a12eef3316412da1bc00328687e9c cmake4.pm
+SHA256 29b8ed8b9cfbce19a42cf8e586f09c5df7a03e3f9844f7edb62a446df4a2a1c7 t/Alien-cmake4/01-use.t
+SHA256 af6d8ab46bef98f376f4b4c335c457dd73d4a58e9c474b646b831524b4b1accc t/Alien-cmake4/02-version.t
+SHA256 b3a9d7251c6108b1a67f6cfdc353525c304c12bf081108f20876ee1a24909d41 t/Alien-cmake4/03-diag.t
+SHA256 653b7b8d731c5965be3f994d8f70a775e656217ffa96386f84a01fe80bb0eb4e t/Alien-cmake4/04-exe.t
+SHA256 98b69c410edea134ff6a6f718202791e8acac83feb144956bc52f5c24f5b295f xt/Alien-cmake4/01-pod_coverage.t
+SHA256 5d801ac62e99c9d69fd79d1ab321ed44c094d5239f456693d0ddb0557ce787d6 xt/Alien-cmake4/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEECAMiMrHl7JYa0rZPZ58rGyDXs5UFAmnrNF4ACgkQZ58rGyDX
+s5Xfrgv/cI3QXsVp9XDBOHT7oN5pZ5G/x+aixyswElNwoQCSUohiKXMhhayBe9TA
+ImGhDIGlET4LieIJJysDYRMl1aVv4/1U/jh1i3Pldg7cwrMk/llimqRRzcAgCmii
+IkDaZbIcpMp63mxEEXTsn4AbgU2PqYeXuBf4BQTYOfraCADXXx3QR1GNpw2PY8SE
+SOD9pB7yuOPdiw3a60Y1q5gBpKY/Agp1tj5XYhmuSRpuDXNKVofaqa3B/lKdmwp0
+7NUP8wXOCUHERTWZZU408lSjBSj4SCoSAWrf6TT8dcMMBDRonhWedxk2aNIHPT0b
+pC9GHtLD5wzDONVWiFr9EW/HFcD42Qr3kj9vR97CogIagpcL5+Q30dakxhgjyyOe
+t4IYDAUcOPD8DRflwczUJ9Hi+07xlrC7cr2vjy9m2SFu2zmFg6kJMwiVKLnNPDLD
+f5+VCXLwxK0VLaGmNnjz+FKwdFqtneMGtRHOYBsJBDuI6w/xRvjPyEoqM/w4hmyZ
+9C4wO0ff
+=kuHX
+-----END PGP SIGNATURE-----

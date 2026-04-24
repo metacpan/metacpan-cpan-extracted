@@ -86,7 +86,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "3.04",
+  "VERSION" => "3.09",
   "test" => {
     "TESTS" => "t/*.t"
   }

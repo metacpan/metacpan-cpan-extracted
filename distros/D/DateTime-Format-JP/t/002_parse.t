@@ -106,7 +106,7 @@ for my $ref ( @$tests )
 {
     $n++;
     my $dt = $fmt->parse_datetime( $ref->{test} );
-    isa_ok( $dt, 'DateTime', "parse_datetime -> $ref->{test}" );
+    isa_ok( $dt, 'DateTime::Lite', "parse_datetime -> $ref->{test}" );
     diag( "Error for $ref->{test} -> ", $fmt->error ) if( !defined( $dt ) );
     SKIP:
     {

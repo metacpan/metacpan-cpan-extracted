@@ -29,6 +29,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 inc/Spiffy.pm
 inc/Test/Base.pm
 inc/Test/Base/Filter.pm

@@ -1,5 +1,18 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.8.3 2026-04-23T21:36:14+0900
+    - Correcting tests when running under non-threaded perl
+
+v1.8.2 2026-04-23T18:43:55+0900
+    [Thread Safety]
+    - The package-level database handle cache ($DBH) and prepared statement cache
+      ($STHS) are now keyed by thread ID (or PID when not running under threads).
+      This prevents DBD::SQLite's "handle owned by thread X not current thread Y"
+      errors when multiple threads perform CLDR lookups concurrently.
+    - Added t/05.threads.t: thread safety test suite covering concurrent instantiation
+      and concurrent calls to locale(), territory(), language(), plural_rule(), and
+      lookups via a shared object across multiple threads.
+
 v1.8.1 2026-04-16T15:08:09+0900
     - Correcting bad unit tests
 
@@ -8,15 +21,19 @@ v1.8.0 2026-03-19T17:44:56+0900
 
 v1.7.0 2026-03-01T17:26:38+0900
     - Release v1.7.0 for CLDR 48.1
-    - Apply patch to CLDR 48 supplemental/supplementalData.xml at xpath '//references/reference[@type="R1227"]' (fix https:// typo, CLDR-19101)
+    - Apply patch to CLDR 48 supplemental/supplementalData.xml at xpath
+      '//references/reference[@type="R1227"]' (fix https:// typo, CLDR-19101)
 
 v1.6.0 2025-10-30T16:40:34+0900
     - Release v1.6.0 for CLDR 48
-    - Apply patch to CLDR 48 supplemental/supplementalData.xml at xpath '//references/reference[@type="R1227"]' (fix https:// typo, CLDR-19101)
+    - Apply patch to CLDR 48 supplemental/supplementalData.xml at xpath
+      '//references/reference[@type="R1227"]' (fix https:// typo, CLDR-19101)
 
 v1.5.0 2025-10-09T03:11:35+0900
-    - Corrected methods plural_range, plural_ranges, plural_rule, and plural_rules to enable decoding of SQL array in 'aliases'
-    - Added the method plural_forms to return a Gettext Plural-Forms string based on a given locale.
+    - Corrected methods plural_range, plural_ranges, plural_rule, and plural_rules
+      to enable decoding of SQL array in 'aliases'
+    - Added the method plural_forms to return a Gettext Plural-Forms string based on
+      a given locale.
     - Update dependency from Want to Wanted
 
 v1.4.0 2025-03-21T12:14:09+0900
@@ -27,15 +44,19 @@ v1.3.2 2025-01-05T11:58:23+0900
     - Removed the INIT block not working well under modperl
 
 v1.3.1 2025-01-04T08:15:48+0900
-    - Removing allow_tags from JSON instantiation and some debugging tool in unit tests. Gitlab issue #2 and #3 reported by Slaven Rezić
+    - Removing allow_tags from JSON instantiation and some debugging tool in unit tests.
+      Gitlab issue #2 and #3 reported by Slaven Rezić
 
 v1.3.0 2025-01-03T22:52:22+0900
     - Added table time_relative_l10n to handle relative time
     - Added methods time_relative_l10n and time_relatives_l10n
-    - Small correction to the method make_inheritance_tree() to ensure it build the inheritance tree using the locale 'base' information only.
+    - Small correction to the method make_inheritance_tree() to ensure it build the
+      inheritance tree using the locale 'base' information only.
     - Added tables plural_rules and plural_ranges
-    - Added methods plural_rule, plural_rules, plural_range, plural_ranges, and plural_count
-    - Correcting the method make_inheritance_tree to ensure language ID and territory combination is part of the tree.
+    - Added methods plural_rule, plural_rules, plural_range, plural_ranges, and
+      plural_count
+    - Correcting the method make_inheritance_tree to ensure language ID and territory
+      combination is part of the tree.
 
 v1.2.0 2024-12-20T06:27:46+0900
     - Release for updated Unicode data release version 46.1
@@ -46,24 +67,31 @@ v1.1.0 2024-11-09T11:45:17+0900
     - Changed minimum perl required version from v5.10 to v5.10.1
 
 v1.0.4 2024-10-03T06:34:57+0900
-    - Added table date_terms to capture missing field display_name in main/*.xml/ldml/dates/fields/field[@type]/displayName
+    - Added table date_terms to capture missing field display_name in
+      main/*.xml/ldml/dates/fields/field[@type]/displayName
     - Updated the create_database.pl script to add the new table date_terms
     - Added 2 methods: date_term and date_terms
     - Updated the documentation to reflect the new table and methods
 
 v1.0.3 2024-10-02T07:07:17+0900
-    - Improved handling of UTC data for the timezones table in the script create_database.pl
-    - Updated the SQL check constraint for the tables timezones, aliases, bcp47_values, locales_l10n, scripts_l10n, territories_l10n, variants_l10n, calendar_datetime_formats, and time_formats
+    - Improved handling of UTC data for the timezones table in the script
+      create_database.pl
+    - Updated the SQL check constraint for the tables timezones, aliases, bcp47_values,
+      locales_l10n, scripts_l10n, territories_l10n, variants_l10n,
+      calendar_datetime_formats, and time_formats
 
 v1.0.2 2024-09-16T18:20:54+0900
     - Removed test dependency
     - Updated method calendars to allow search by 'calendar'
-    - Added missing 'calendars' field as containing array for methods territory() and territories()
+    - Added missing 'calendars' field as containing array for methods territory() and
+      territories()
 
 v1.0.1 2024-09-09T18:22:29+0900
     - Corrected bug in the timezones_cities_extended view
-    - Added column 'collations' in table 'locales' to contain the possible collations for a locale
-    - Corrected minor oversight when loading locale default numbering systems into the database
+    - Added column 'collations' in table 'locales' to contain the possible collations
+      for a locale
+    - Corrected minor oversight when loading locale default numbering systems into the
+      database
 
 v1.0.0 2024-09-05T15:03:16+0900
     - Added column is_primary to table timezones and associated documentation
@@ -72,19 +100,23 @@ v1.0.0 2024-09-05T15:03:16+0900
     - Corrected default value for column 'time_allowed' in table time_formats
     - Added table 'timezones_cities_supplemental' and view 'timezones_cities_extended'
     - Added method 'extend_timezones_cities'
-    - Updated the 'create_database.pl' script to allow the addition of time zones cities extended data from a JSON file
+    - Updated the 'create_database.pl' script to allow the addition of time zones
+      cities extended data from a JSON file
     - Updated the documentation for the 'create_database.pl' script
     - Updated the documentation for Locale::Unicode::Data
 
 v0.2.0 2024-08-18T12:12:26+0900
-    - Added more data from CLDR with 5 new tables: metazones, timezones_city, timezones_formats, timezones_names and metazones_names, and their method to support the 'v' and 'V' formatting pattern
+    - Added more data from CLDR with 5 new tables: metazones, timezones_city,
+      timezones_formats, timezones_names and metazones_names, and their method to
+      support the 'v' and 'V' formatting pattern
     - Improved the documentation
     - Corrected some bugs in the database creation perl script.
     - Corrected timezone region in table timezones when timezone is GMT*
     - Made the database file path global variable absolute
     - Corrected an ISA check in _dbh
     - Added method 'timezone_canonical'
-    - Added table locale_number_systems, method locale_number_system and locale_number_systems and their documentation
+    - Added table locale_number_systems, method locale_number_system and
+      locale_number_systems and their documentation
     - Added the 'fatal' object option to force exceptions to be fatal
     - Changed the database handler to be a global re-usable object
     - Improved statements cache mechanism

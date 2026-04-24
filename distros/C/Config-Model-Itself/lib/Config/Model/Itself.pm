@@ -7,16 +7,18 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.029;
+package Config::Model::Itself 2.030;
 
 use Mouse ;
-use Config::Model 2.157;
+use Mouse::Util::TypeConstraints;
+
 use v5.20;
 use strict;
 use warnings;
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
 
+use Config::Model 2.157;
 use IO::File ;
 use Log::Log4perl 1.11;
 use Carp ;
@@ -24,7 +26,6 @@ use Data::Dumper ;
 use Scalar::Util qw/weaken/;
 use Data::Compare ;
 use Path::Tiny 0.125; # for mkdir
-use Mouse::Util::TypeConstraints;
 
 my $logger = Log::Log4perl::get_logger("Backend::Itself");
 
@@ -810,7 +811,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.029
+version 2.030
 
 =head1 SYNOPSIS
 

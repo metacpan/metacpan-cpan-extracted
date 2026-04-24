@@ -63,7 +63,7 @@ sub sync {
     my $cwd = cwd();
     chdir $self->{ddir} or croak("Cannot chdir($self->{ddir}): $!");
 
-    $self->make_dot_patch();
+    $self->make_dot_patch() if (! -e ".patch");
 
     my $plevel = $self->check_dot_patch;
 

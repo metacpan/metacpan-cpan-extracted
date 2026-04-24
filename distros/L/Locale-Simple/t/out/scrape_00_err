@@ -30,10 +30,100 @@ pl => /lib/Locale/Simple.pm
  |    ldn
  |-------^
 - discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected "(":
+ |    ldp
+ |-------^
+- discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected "(":
  |    ldnp
  |--------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |    N_
+ |------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |    Nn_
+ |-------^
+- discarded COUNT characters of noise
+- found func Np_ at line LINE
+- Expected "(":
+ |    Np_
+ |-------^
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- Expected "(":
+ |    Nnp_
+ |--------^
+- discarded COUNT characters of noise
+- found func Nd_ at line LINE
+- Expected "(":
+ |    Nd_
+ |-------^
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- Expected "(":
+ |    Ndn_
+ |--------^
+- discarded COUNT characters of noise
+- found func Ndp_ at line LINE
+- Expected "(":
+ |    Ndp_
+ |--------^
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- Expected "(":
+ |    Ndnp_
+ |---------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |# the stored msgid(s) through the matching l*() later.
+ |--------------------------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |sub N_    { $_[0] }
+ |------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |sub Nn_   { wantarray ? @_[0,1] : $_[0] }
+ |-------^
+- discarded COUNT characters of noise
+- found func Np_ at line LINE
+- Expected "(":
+ |sub Np_   { $_[1] }
+ |-------^
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- Expected "(":
+ |sub Nnp_  { wantarray ? @_[1,2] : $_[1] }
+ |--------^
+- discarded COUNT characters of noise
+- found func Nd_ at line LINE
+- Expected "(":
+ |sub Nd_   { $_[1] }
+ |-------^
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- Expected "(":
+ |sub Ndn_  { wantarray ? @_[1,2] : $_[1] }
+ |--------^
+- discarded COUNT characters of noise
+- found func Ndp_ at line LINE
+- Expected "(":
+ |sub Ndp_  { $_[2] }
+ |--------^
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- Expected "(":
+ |sub Ndnp_ { wantarray ? @_[2,3] : $_[2] }
+ |---------^
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
@@ -93,6 +183,16 @@ pl => /lib/Locale/Simple.pm
 - found func ldn at line LINE
 - Expected domain id:
  |    ldn => sub { ldn(@_) },
+ |---------------------^
+- discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected "(":
+ |    ldp => sub { ldp(@_) },
+ |-------^
+- discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected domain id:
+ |    ldp => sub { ldp(@_) },
  |---------------------^
 - discarded COUNT characters of noise
 - found func ldnp at line LINE
@@ -195,6 +295,16 @@ pl => /lib/Locale/Simple.pm
  |sub ldn { return ldnp(shift,undef,shift,shift,shift,@_) }
  |----------------------^
 - discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected domain id:
+ |# ldp(domain,msgctxt,msgid,...)
+ |------^
+- discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected "(":
+ |sub ldp { return ldnp(shift,shift,shift,undef,undef,@_) }
+ |-------^
+- discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected domain id:
  |sub ldp { return ldnp(shift,shift,shift,undef,undef,@_) }
@@ -244,6 +354,11 @@ pl => /lib/Locale/Simple.pm
  |exporting short function names (C<l>, C<ln>, C<lp>, C<ld>, C<ldn>, C<ldp>,
  |----------------------------------------------------------------^
 - discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected "(":
+ |exporting short function names (C<l>, C<ln>, C<lp>, C<ld>, C<ldn>, C<ldp>,
+ |------------------------------------------------------------------------^
+- discarded COUNT characters of noise
 - found func lnp at line LINE
 - Expected "(":
  |C<lnp>, C<ldnp>) that are API-compatible with the matching Python package
@@ -290,47 +405,227 @@ pl => /lib/Locale/Simple.pm
  |=head2 ldn($domain, $msgid, $msgid_plural, $n, @args)
  |-----------^
 - discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected domain id:
+ |=head2 ldp($domain, $msgctxt, $msgid, @args)
+ |-----------^
+- discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected domain id:
  |=head2 ldnp($domain, $msgctxt, $msgid, $msgid_plural, $n, @args)
  |------------^
 - discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |constants. Calling C<l()> inline there freezes the result in the
+ |-----------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |startup locale. Gettext's classic solution is the C<N_> "no-op"
+ |------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |C<Locale::Simple> exports C<N_> and a twin for every C<l*()> helper:
+ |------------------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |C<Locale::Simple> exports C<N_> and a twin for every C<l*()> helper:
+ |--------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected translation token:
+ |  N_($msgid)                          # twin of l()
+ |-----^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |  N_($msgid)                          # twin of l()
+ |--------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected translation token:
+ |  Nn_($sg, $pl)                       # twin of ln()
+ |------^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |  Nn_($sg, $pl)                       # twin of ln()
+ |---------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Np_ at line LINE
+- Expected context id:
+ |  Np_($ctx, $msgid)                   # twin of lp()
+ |------^
+- discarded COUNT characters of noise
+- found func lp at line LINE
+- Expected context id:
+ |  Np_($ctx, $msgid)                   # twin of lp()
+ |---------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- Expected context id:
+ |  Nnp_($ctx, $sg, $pl)                # twin of lnp()
+ |-------^
+- discarded COUNT characters of noise
+- found func lnp at line LINE
+- Expected context id:
+ |  Nnp_($ctx, $sg, $pl)                # twin of lnp()
+ |----------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nd_ at line LINE
+- Expected domain id:
+ |  Nd_($dom, $msgid)                   # twin of ld()
+ |------^
+- discarded COUNT characters of noise
+- found func ld at line LINE
+- Expected domain id:
+ |  Nd_($dom, $msgid)                   # twin of ld()
+ |---------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- Expected domain id:
+ |  Ndn_($dom, $sg, $pl)                # twin of ldn()
+ |-------^
+- discarded COUNT characters of noise
+- found func ldn at line LINE
+- Expected domain id:
+ |  Ndn_($dom, $sg, $pl)                # twin of ldn()
+ |----------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndp_ at line LINE
+- Expected domain id:
+ |  Ndp_($dom, $ctx, $msgid)            # twin of ldp()
+ |-------^
+- discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected domain id:
+ |  Ndp_($dom, $ctx, $msgid)            # twin of ldp()
+ |----------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- Expected domain id:
+ |  Ndnp_($dom, $ctx, $sg, $pl)         # twin of ldnp()
+ |--------^
+- discarded COUNT characters of noise
+- found func ldnp at line LINE
+- Expected domain id:
+ |  Ndnp_($dom, $ctx, $sg, $pl)         # twin of ldnp()
+ |-----------------------------------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected translation token:
+ |  my $label = N_($msgid);                      # = $msgid
+ |-----------------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected translation token:
+ |  my @plur  = Nn_($sg, $pl);                   # = ($sg, $pl)
+ |------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |  print l($label);
+ |----------^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |  print ln(@plur, $count);
+ |-----------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |entries identical to their C<l*()> twins. Templates (C<.tx>) are not
+ |------------------------------^
+- discarded COUNT characters of noise
 pl => /lib/Locale/Simple/Scraper.pm
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
- |        l    => [1],
+ |        l     => [1],
  |---------^
 - discarded COUNT characters of noise
 - found func ln at line LINE
 - Expected "(":
- |        ln   => [ 1, 2 ],
+ |        ln    => [ 1, 2 ],
  |----------^
 - discarded COUNT characters of noise
 - found func ld at line LINE
 - Expected "(":
- |        ld   => [ 4, 1 ],
+ |        ld    => [ 4, 1 ],
  |----------^
 - discarded COUNT characters of noise
 - found func lp at line LINE
 - Expected "(":
- |        lp   => [ 3, 1 ],
+ |        lp    => [ 3, 1 ],
  |----------^
 - discarded COUNT characters of noise
 - found func lnp at line LINE
 - Expected "(":
- |        lnp  => [ 3, 1, 2 ],
+ |        lnp   => [ 3, 1, 2 ],
  |-----------^
 - discarded COUNT characters of noise
 - found func ldn at line LINE
 - Expected "(":
- |        ldn  => [ 4, 1, 2 ],
+ |        ldn   => [ 4, 1, 2 ],
+ |-----------^
+- discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected "(":
+ |        ldp   => [ 4, 3, 1 ],
  |-----------^
 - discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected "(":
- |        ldnp => [ 4, 3, 1, 2 ],
+ |        ldnp  => [ 4, 3, 1, 2 ],
  |------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |        # Locale::Simple). Same mapping as their l* twins — identical
+ |--------------------------------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |        N_    => [1],
+ |----------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |        Nn_   => [ 1, 2 ],
+ |-----------^
+- discarded COUNT characters of noise
+- found func Nd_ at line LINE
+- Expected "(":
+ |        Nd_   => [ 4, 1 ],
+ |-----------^
+- discarded COUNT characters of noise
+- found func Np_ at line LINE
+- Expected "(":
+ |        Np_   => [ 3, 1 ],
+ |-----------^
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- Expected "(":
+ |        Nnp_  => [ 3, 1, 2 ],
+ |------------^
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- Expected "(":
+ |        Ndn_  => [ 4, 1, 2 ],
+ |------------^
+- discarded COUNT characters of noise
+- found func Ndp_ at line LINE
+- Expected "(":
+ |        Ndp_  => [ 4, 3, 1 ],
+ |------------^
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- Expected "(":
+ |        Ndnp_ => [ 4, 3, 1, 2 ],
+ |-------------^
 - discarded COUNT characters of noise
 - found func l at line LINE
 - Expected "(":
@@ -367,6 +662,11 @@ pl => /lib/Locale/Simple/Scraper.pm
  |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
  |----------------------------------------------^
 - discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected domain id:
+ |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
+ |-------------------------------------------------------^
+- discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected domain id:
  |C<l()>/C<ln()>/C<lp()>/C<lnp()>/C<ld()>/C<ldn()>/C<ldp()>/C<ldnp()> call
@@ -402,6 +702,11 @@ pl => /lib/Locale/Simple/Scraper.pm
  |  ldn( domain, msgid, msgid_plural, n, ... )
  |------^
 - discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected domain id:
+ |  ldp( domain, msgctxt, msgid, ... )
+ |------^
+- discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected domain id:
  |  ldnp( domain, msgctxt, msgid, msgid_plural, n, ... )
@@ -410,39 +715,94 @@ pl => /lib/Locale/Simple/Scraper.pm
 pl => /lib/Locale/Simple/Scraper/Parser.pm
 - discarded COUNT characters of noise
 - found func l at line LINE
+- Expected translation token:
+ |has func_qr => ( is => 'ro', default => sub { qr/\b(?:l(?:|n|p|np|d|dp|dn|dnp)\b|N(?:|n|p|np|d|dp|dn|dnp)_)/ } );
+ |--------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
 - Expected "(":
- |        l    => [qw( tr_token )],
+ |        l     => [qw( tr_token )],
  |---------^
 - discarded COUNT characters of noise
 - found func ln at line LINE
 - Expected "(":
- |        ln   => [qw( tr_token    comma  plural_token  comma  plural_count )],
+ |        ln    => [qw( tr_token    comma  plural_token  comma  plural_count )],
  |----------^
 - discarded COUNT characters of noise
 - found func lp at line LINE
 - Expected "(":
- |        lp   => [qw( context_id  comma  tr_token )],
+ |        lp    => [qw( context_id  comma  tr_token )],
  |----------^
 - discarded COUNT characters of noise
 - found func lnp at line LINE
 - Expected "(":
- |        lnp  => [qw( context_id  comma  tr_token      comma  plural_token  comma  plural_count )],
+ |        lnp   => [qw( context_id  comma  tr_token      comma  plural_token  comma  plural_count )],
  |-----------^
 - discarded COUNT characters of noise
 - found func ld at line LINE
 - Expected "(":
- |        ld   => [qw( domain_id   comma  tr_token )],
+ |        ld    => [qw( domain_id   comma  tr_token )],
  |----------^
 - discarded COUNT characters of noise
 - found func ldn at line LINE
 - Expected "(":
- |        ldn  => [qw( domain_id   comma  tr_token      comma  plural_token  comma  plural_count )],
+ |        ldn   => [qw( domain_id   comma  tr_token      comma  plural_token  comma  plural_count )],
+ |-----------^
+- discarded COUNT characters of noise
+- found func ldp at line LINE
+- Expected "(":
+ |        ldp   => [qw( domain_id   comma  context_id    comma  tr_token )],
  |-----------^
 - discarded COUNT characters of noise
 - found func ldnp at line LINE
 - Expected "(":
- |        ldnp => [qw( domain_id   comma  context_id    comma  tr_token      comma  plural_token  comma  plural_count )],
+ |        ldnp  => [qw( domain_id   comma  context_id    comma  tr_token      comma  plural_token  comma  plural_count )],
  |------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |        # them identically to their l* twins.
+ |-------------------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |        N_    => [qw( tr_token )],
+ |----------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |        Nn_   => [qw( tr_token    comma  plural_token )],
+ |-----------^
+- discarded COUNT characters of noise
+- found func Np_ at line LINE
+- Expected "(":
+ |        Np_   => [qw( context_id  comma  tr_token )],
+ |-----------^
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- Expected "(":
+ |        Nnp_  => [qw( context_id  comma  tr_token      comma  plural_token )],
+ |------------^
+- discarded COUNT characters of noise
+- found func Nd_ at line LINE
+- Expected "(":
+ |        Nd_   => [qw( domain_id   comma  tr_token )],
+ |-----------^
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- Expected "(":
+ |        Ndn_  => [qw( domain_id   comma  tr_token      comma  plural_token )],
+ |------------^
+- discarded COUNT characters of noise
+- found func Ndp_ at line LINE
+- Expected "(":
+ |        Ndp_  => [qw( domain_id   comma  context_id    comma  tr_token )],
+ |------------^
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- Expected "(":
+ |        Ndnp_ => [qw( domain_id   comma  context_id    comma  tr_token      comma  plural_token )],
+ |-------------^
 - discarded COUNT characters of noise
 pl => /lib/Locale/Simple/Scraper/ParserShortcuts.pm
 - discarded COUNT characters of noise
@@ -532,6 +892,177 @@ pl => /t/40-error.t
 - found 1 arguments
 - discarded COUNT characters of noise
 pl => /t/50-scrape.t
+- discarded COUNT characters of noise
+pl => /t/51-scrape-N.t
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |# For each (Perl, JS, Python) fixture pair — an l*-call file and its
+ |---------------------------------------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |    my $l_out = scrape_one( "l-calls.$lang",  $lang );
+ |------------------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected "(":
+ |    is( $n_out, $l_out, "$lang: N*_ markers produce same .pot as l*()" );
+ |------------------------------------------------------------------^
+- discarded COUNT characters of noise
+pl => /t/60-N-markers.t
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |is( N_("Hello"),                     "Hello",             "N_ scalar" );
+ |-------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Np_ at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func Np_ at line LINE
+- Expected "(":
+ |is( Np_("menu", "Open"),             "Open",              "Np_ drops context" );
+ |--------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nd_ at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func Nd_ at line LINE
+- Expected "(":
+ |is( Nd_("app", "Hi"),                "Hi",                "Nd_ drops domain" );
+ |--------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndp_ at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func Ndp_ at line LINE
+- Expected "(":
+ |is( Ndp_("app", "menu", "Open"),     "Open",              "Ndp_ drops domain + context" );
+ |---------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |is( scalar Nn_("1 file", "%d files"),                     "1 file",    "Nn_ scalar => singular" );
+ |---------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- Expected "(":
+ |is( scalar Nnp_("ctx", "1 file", "%d files"),             "1 file",    "Nnp_ scalar => singular" );
+ |----------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- Expected "(":
+ |is( scalar Ndn_("dom", "1 file", "%d files"),             "1 file",    "Ndn_ scalar => singular" );
+ |----------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- found 4 arguments
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- Expected "(":
+ |is( scalar Ndnp_("dom", "ctx", "1 file", "%d files"),     "1 file",    "Ndnp_ scalar => singular" );
+ |-----------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |is_deeply( [Nn_("1 file", "%d files")],                 ["1 file", "%d files"], "Nn_ list" );
+ |------------------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func Nnp_ at line LINE
+- Expected "(":
+ |is_deeply( [Nnp_("ctx", "1 file", "%d files")],         ["1 file", "%d files"], "Nnp_ list" );
+ |-------------------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- found 3 arguments
+- discarded COUNT characters of noise
+- found func Ndn_ at line LINE
+- Expected "(":
+ |is_deeply( [Ndn_("dom", "1 file", "%d files")],         ["1 file", "%d files"], "Ndn_ list" );
+ |-------------------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- found 4 arguments
+- discarded COUNT characters of noise
+- found func Ndnp_ at line LINE
+- Expected "(":
+ |is_deeply( [Ndnp_("dom", "ctx", "1 file", "%d files")], ["1 file", "%d files"], "Ndnp_ list" );
+ |--------------------------------------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |# Round-trip: store via N_, render via l_dry so gettext isn't needed.
+ |--------------------------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- found 1 arguments
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |is( l($label), "Greet", "N_ result flows through l()" );
+ |------^
+- discarded COUNT characters of noise
+- found func N_ at line LINE
+- Expected "(":
+ |is( l($label), "Greet", "N_ result flows through l()" );
+ |---------------------------^
+- discarded COUNT characters of noise
+- found func l at line LINE
+- Expected translation token:
+ |is( l($label), "Greet", "N_ result flows through l()" );
+ |---------------------------------------------------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- found 2 arguments
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |is( ln(@plur, 1), "1 item",   "Nn_ result flows through ln() singular" );
+ |-------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |is( ln(@plur, 1), "1 item",   "Nn_ result flows through ln() singular" );
+ |----------------------------------^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |is( ln(@plur, 1), "1 item",   "Nn_ result flows through ln() singular" );
+ |-----------------------------------------------------------^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |is( ln(@plur, 5), "5 items",  "Nn_ result flows through ln() plural" );
+ |-------^
+- discarded COUNT characters of noise
+- found func Nn_ at line LINE
+- Expected "(":
+ |is( ln(@plur, 5), "5 items",  "Nn_ result flows through ln() plural" );
+ |----------------------------------^
+- discarded COUNT characters of noise
+- found func ln at line LINE
+- Expected translation token:
+ |is( ln(@plur, 5), "5 items",  "Nn_ result flows through ln() plural" );
+ |-----------------------------------------------------------^
 - discarded COUNT characters of noise
 pl => /t/data/dummy.pl
 - found func l at line LINE

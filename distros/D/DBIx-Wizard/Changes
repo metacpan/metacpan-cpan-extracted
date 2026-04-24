@@ -1,3 +1,7 @@
+0.06  2026-04-08
+    - BREAKING: rename find() to where() and sort() to order_by()
+      No backward-compatible aliases; update all call sites.
+
 0.05  2026-04-08
     - insert() falls back to $sth->last_insert_id() and
       SELECT LAST_INSERT_ID() when $dbh->last_insert_id is unavailable

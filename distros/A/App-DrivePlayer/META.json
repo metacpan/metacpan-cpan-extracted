@@ -72,6 +72,6 @@
          "web" : "https://github.com/mvsjes2/drive_player"
       }
    },
-   "version" : "v0.2.7",
+   "version" : "v0.2.8",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

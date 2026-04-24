@@ -117,7 +117,7 @@ NBI::Pipeline - Ordered list of NBI::Job objects with dependency wiring
 
 =head1 VERSION
 
-version 0.20.0
+version 0.20.1
 
 =head1 SYNOPSIS
 

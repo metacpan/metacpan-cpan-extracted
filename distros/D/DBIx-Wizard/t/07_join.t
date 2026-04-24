@@ -24,15 +24,15 @@ $dbh->do("INSERT INTO orders (user_id, amount) VALUES (2, 50.25)");
   is scalar(@rows), 3, 'inner join';
 }
 
-# join with find
+# join with where
 {
   my @rows = dbiw('testdb:users')
     ->as('u')
     ->join('orders|o' => 'o.user_id = u.id')
-    ->find({ 'u.name' => 'Bob' })
+    ->where({ 'u.name' => 'Bob' })
     ->inflate(0)
     ->all(['u.name', 'o.amount']);
-  is scalar(@rows), 2, 'join with find';
+  is scalar(@rows), 2, 'join with where';
 }
 
 # as sets table alias

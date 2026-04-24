@@ -109,6 +109,34 @@ export function ldnp(
   ...args: unknown[]
 ): string;
 
+/**
+ * Deferred-translation markers — runtime no-ops that the scraper treats
+ * as msgid sources. Use where strings must be declared before a user
+ * locale is known; pass the stored msgid(s) to the matching l*() at
+ * render time. Plural variants return [sg, pl].
+ */
+export function N_(msgid: string): string;
+export function Nn_(msgid: string, msgid_plural: string): [string, string];
+export function Np_(msgctxt: string, msgid: string): string;
+export function Nnp_(
+  msgctxt: string,
+  msgid: string,
+  msgid_plural: string
+): [string, string];
+export function Nd_(domain: string, msgid: string): string;
+export function Ndn_(
+  domain: string,
+  msgid: string,
+  msgid_plural: string
+): [string, string];
+export function Ndp_(domain: string, msgctxt: string, msgid: string): string;
+export function Ndnp_(
+  domain: string,
+  msgctxt: string,
+  msgid: string,
+  msgid_plural: string
+): [string, string];
+
 declare const localeSimple: {
   l_dir: typeof l_dir;
   l_lang: typeof l_lang;
@@ -124,6 +152,14 @@ declare const localeSimple: {
   ldn: typeof ldn;
   ldp: typeof ldp;
   ldnp: typeof ldnp;
+  N_: typeof N_;
+  Nn_: typeof Nn_;
+  Np_: typeof Np_;
+  Nnp_: typeof Nnp_;
+  Nd_: typeof Nd_;
+  Ndn_: typeof Ndn_;
+  Ndp_: typeof Ndp_;
+  Ndnp_: typeof Ndnp_;
 };
 
 export default localeSimple;

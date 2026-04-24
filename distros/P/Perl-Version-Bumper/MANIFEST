@@ -13,6 +13,7 @@ mess/TODO
 mess/foo
 mess/mk_test_for.pl
 mess/mk_test_for2.pl
+mess/presentation.md
 mess/testing
 t/00-compile.t
 t/00-report-prereqs.dd

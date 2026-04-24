@@ -8,7 +8,7 @@ use strict;
 use XSLoader;
 use Carp;
 
-our $VERSION = '2.57';
+our $VERSION = '2.58';
 
 our ( %Encoding_Table, @Encoding_Path );
 
@@ -314,7 +314,7 @@ sub expand_ns_prefix {
         return ( defined($stack) and @$stack ) ? $stack->[-1] : undef;
     }
 
-    return undef;
+    return;
 }
 
 sub current_ns_prefixes {
@@ -676,7 +676,7 @@ sub children {
     if ( defined $children ) {
         return @$children;
     }
-    return undef;
+    return;
 }
 
 sub asString {
@@ -1431,7 +1431,7 @@ false otherwise.
 
 =item isname
 
-This method returns if the object is an element name.
+This method returns true if the object is an element name.
 
 =item ischoice
 

@@ -212,7 +212,7 @@ make_safe_fd(int * fd)
     int newfd;
     newfd = fcntl(*fd, F_DUPFD, 3);
     if (newfd < 0) {
-      if (PL_dowarn)
+      if (ckWARN(WARN_IO))
 	warn("IO::Tty::pty_allocate(nonfatal): tried to move fd %d up but fcntl() said %.100s", *fd, strerror(errno));
     } else {
       close (*fd);
@@ -231,7 +231,7 @@ char * ptsname(int);
 #endif
 
 static int
-open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
+open_slave(int *ptyfd, int *ttyfd, char *namebuf, size_t namebuflen)
 { 
     /*
      * now do some things that are supposedly healthy for ptys,
@@ -247,7 +247,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	  fprintf(stderr, "trying grantpt()...\n");
 #endif
 	if (grantpt(*ptyfd) < 0) {
-	    if (PL_dowarn)
+	    if (ckWARN(WARN_IO))
 		warn("IO::Tty::pty_allocate(nonfatal): grantpt(): %.100s", strerror(errno));
 	}
 
@@ -258,7 +258,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	  fprintf(stderr, "trying unlockpt()...\n");
 #endif
 	if (unlockpt(*ptyfd) < 0) {
-	    if (PL_dowarn)
+	    if (ckWARN(WARN_IO))
 		warn("IO::Tty::pty_allocate(nonfatal): unlockpt(): %.100s", strerror(errno));
 	}
 #endif /* HAVE_UNLOCKPT */
@@ -278,7 +278,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	  fprintf(stderr, "trying ptsname_r()...\n");
 #endif
 	if(ptsname_r(*ptyfd, namebuf, namebuflen)) {
-	    if (PL_dowarn)
+	    if (ckWARN(WARN_IO))
 		warn("IO::Tty::open_slave(nonfatal): ptsname_r(): %.100s", strerror(errno));
 	}
     }
@@ -300,7 +300,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	      return 0;
 	    }
 	} else {
-	    if (PL_dowarn)
+	    if (ckWARN(WARN_IO))
 		warn("IO::Tty::open_slave(nonfatal): ptsname(): %.100s", strerror(errno));
 	}
     }
@@ -367,7 +367,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 
     *ttyfd = open(namebuf, O_RDWR | O_NOCTTY);
     if (*ttyfd < 0) {
-      if (PL_dowarn)
+      if (ckWARN(WARN_IO))
 	warn("IO::Tty::open_slave(nonfatal): open(%.200s): %.100s",
 	     namebuf, strerror(errno));
       close(*ptyfd);
@@ -388,7 +388,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 #endif
     if (ioctl(*ttyfd, I_PUSH, "ptem") < 0)
 #if defined (__solaris) || defined(__hpux)
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("IO::Tty::pty_allocate: ioctl I_PUSH ptem: %.100s", strerror(errno))
 #endif
 	      ;
@@ -399,7 +399,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 #endif
     if (ioctl(*ttyfd, I_PUSH, "ldterm") < 0)
 #if defined (__solaris) || defined(__hpux)
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("IO::Tty::pty_allocate: ioctl I_PUSH ldterm: %.100s", strerror(errno))
 #endif
 	      ;
@@ -410,7 +410,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 #endif
     if (ioctl(*ttyfd, I_PUSH, "ttcompat") < 0)
 #if defined (__solaris)
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("IO::Tty::pty_allocate: ioctl I_PUSH ttcompat: %.100s", strerror(errno))
 #endif
 	      ;
@@ -440,7 +440,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
  */
 
 static int
-allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
+allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, size_t namebuflen)
 {
     *ptyfd = -1;
     *ttyfd = -1;
@@ -477,7 +477,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 		    break;
 		/* open_slave closes *ptyfd on failure */
 	    } else {
-		if (PL_dowarn)
+		if (ckWARN(WARN_IO))
 		    warn("pty_allocate(nonfatal): _getpty(): %.100s", strerror(errno));
 		*ptyfd = -1;
 	    }
@@ -495,7 +495,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	*ptyfd = posix_openpt(O_RDWR|O_NOCTTY);
 	if (*ptyfd >= 0 && open_slave(ptyfd, ttyfd, namebuf, namebuflen))
 	    break;		/* got one */
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("pty_allocate(nonfatal): posix_openpt(): %.100s", strerror(errno));
 #endif /* defined(HAVE_POSIX_OPENPT) */
 
@@ -508,7 +508,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	*ptyfd = getpt();
 	if (*ptyfd >= 0 && open_slave(ptyfd, ttyfd, namebuf, namebuflen))
 	    break;		/* got one */
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("pty_allocate(nonfatal): getpt(): %.100s", strerror(errno));
 #endif /* defined(HAVE_GETPT) */
 
@@ -541,7 +541,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 		*ptyfd = -1;
 		*ttyfd = -1;
 	    }
-	    if (PL_dowarn)
+	    if (ckWARN(WARN_IO))
 		warn("pty_allocate(nonfatal): openpty(): %.100s", strerror(errno));
 	}
 #endif /* defined(HAVE_OPENPTY) */
@@ -559,7 +559,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	*ptyfd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
 	if (*ptyfd >= 0 && open_slave(ptyfd, ttyfd, namebuf, namebuflen))
 	    break;
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("pty_allocate(nonfatal): open(/dev/ptmx): %.100s", strerror(errno));
 #endif /* HAVE_DEV_PTMX */ 
 
@@ -572,7 +572,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	*ptyfd = open("/dev/ptym/clone", O_RDWR | O_NOCTTY);
 	if (*ptyfd >= 0 && open_slave(ptyfd, ttyfd, namebuf, namebuflen))
 	    break;
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("pty_allocate(nonfatal): open(/dev/ptym/clone): %.100s", strerror(errno));
 #endif /* HAVE_DEV_PTYM_CLONE */
 
@@ -586,7 +586,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	*ptyfd = open("/dev/ptc", O_RDWR | O_NOCTTY);
 	if (*ptyfd >= 0 && open_slave(ptyfd, ttyfd, namebuf, namebuflen))
 	    break;
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("pty_allocate(nonfatal): open(/dev/ptc): %.100s", strerror(errno));
 #endif /* HAVE_DEV_PTC */
 
@@ -598,7 +598,7 @@ allocate_pty(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	*ptyfd = open("/dev/ptmx_bsd", O_RDWR | O_NOCTTY);
 	if (*ptyfd >= 0 && open_slave(ptyfd, ttyfd, namebuf, namebuflen))
 	    break;
-	if (PL_dowarn)
+	if (ckWARN(WARN_IO))
 	    warn("pty_allocate(nonfatal): open(/dev/ptmx_bsd): %.100s", strerror(errno));
 #endif /* HAVE_DEV_PTMX_BSD */ 
 

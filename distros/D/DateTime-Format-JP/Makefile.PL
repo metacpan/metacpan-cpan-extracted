@@ -22,21 +22,24 @@ my %WriteMakefileArgs = (
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
         'parent'        => 0,
-        'strict'        => '0.238',
+        'strict'        => 0,
         'utf8'          => 0,
-        'warnings'      => '1.44',
-        'DateTime'      => '1.54',
-        'DateTime::TimeZone' => '2.52',
-        # 'Nice::Try'     => 'v1.1.2',
+        'warnings'      => 0,
+        # 2026-04-24
+        'DateTime::Lite' => '0.6.4',
     },
     TEST_REQUIRES =>
     {
         'utf8'          => 0,
-        'open'          => '1.11',
-        'Test::More'    => '1.302182',
-        'Test::Pod'     => '1.52',
+        # 2011-05-15
+        'open'          => '1.08',
+        # 2011-02-23
+        'Test::More'    => '0.98',
+        # 2011-03-09
+        'Test::Pod'     => '1.45',
     },
     LICENSE             => 'perl_5',
+    # 2011-05-14
     MIN_PERL_VERSION    => 'v5.14.0',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },

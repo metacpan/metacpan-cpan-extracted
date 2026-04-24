@@ -754,7 +754,7 @@ resolve_perl() {
 run_cpanm() {
     cpanm_script=${CPANM_SCRIPT:-$(command -v cpanm)}
     [ -n "$cpanm_script" ] || fail "Missing required command: cpanm"
-    "$cpanm_script" "$@"
+    "$cpanm_script" --no-wget "$@"
 }
 
 bootstrap_local_lib() {

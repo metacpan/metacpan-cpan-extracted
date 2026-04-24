@@ -24,7 +24,7 @@ resources:
   bugtracker: https://github.com/Getty/locale-simple/issues
   homepage: https://github.com/Getty/locale-simple
   repository: https://github.com/Getty/locale-simple.git
-version: '0.108'
+version: '0.109'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -315,7 +315,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.108'
+          tag: '0.109'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

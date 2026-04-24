@@ -84,7 +84,7 @@ sub write_as_shell {
         strftime("%Y-%m-%dT%H:%M:%S%z", localtime),
         $self->dollar_0,
         $cronline,
-        ($self->current_values->{renice} ? "" : "# ") . "renice " . $self->current_values->{renice},
+        ($self->current_values->{renice} ? "" : "# ") . "renice " . $self->current_values->{renice} . " \$\$",
         Cwd::abs_path(File::Spec->curdir),
         $self->configfile,
         ($self->current_values->{qfile} ? $^X : "# $^X"),
@@ -102,7 +102,7 @@ sub write_as_shell {
 #
 # %s: written by %s v%s
 # on %s
-# NOTE: Changes made in this file will be \*lost\*
+# NOTE: Changes made in this file will be *lost*
 #       after rerunning %s
 #
 # cron: %s

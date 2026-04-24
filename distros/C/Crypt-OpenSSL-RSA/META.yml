@@ -4,12 +4,11 @@ author:
   - 'Ian Robertson <iroberts@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test: '0'
+  Test::More: '0'
 configure_requires:
   Crypt::OpenSSL::Guess: '0.11'
-  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,16 +18,18 @@ no_index:
   directory:
     - t
     - inc
-recommends:
-  Crypt::OpenSSL::Bignum: '0'
+provides:
+  Crypt::OpenSSL::RSA:
+    file: RSA.pm
+    version: '0.41'
 requires:
+  Crypt::OpenSSL::Bignum: '0'
   Crypt::OpenSSL::Random: '0'
-  Test::More: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/cpan-authors/Crypt-OpenSSL-RSA/issues
-  homepage: http://github.com/cpan-authors/Crypt-OpenSSL-RSA
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/cpan-authors/Crypt-OpenSSL-RSA
-version: '0.37'
+  homepage: https://github.com/cpan-authors/Crypt-OpenSSL-RSA
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/cpan-authors/Crypt-OpenSSL-RSA.git
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

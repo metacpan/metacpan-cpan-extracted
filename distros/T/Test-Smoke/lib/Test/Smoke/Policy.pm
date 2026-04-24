@@ -158,7 +158,7 @@ sub _read_Policy {
 
     } elsif ( ref $srcpath eq 'ARRAY' ) {
 
-        $self->{_poliy} = join "", @$srcpath;
+        $self->{_policy} = join "", @$srcpath;
         $vmsg = "internal content";
 
     } elsif ( ref $srcpath eq 'GLOB' ) {

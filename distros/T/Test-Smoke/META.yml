@@ -31,6 +31,7 @@ requires:
   Getopt::Long: '2.39'
   HTTP::Tiny: '0'
   IO::Socket::SSL: '0'
+  LWP::Protocol::https: '6'
   Net::SSLeay: '0'
   POSIX: '0'
   System::Info: '0.05'
@@ -42,5 +43,5 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/Test-Smoke/issues
   homepage: http://perl5.test-smoke.org/
   repository: https://github.com/Perl-Toolchain-Gang/Test-Smoke.git
-version: '1.84'
+version: '1.85'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

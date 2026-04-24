@@ -19,7 +19,7 @@ setup_test_db();
 # insert with expression
 {
   dbiw('testdb:users')->insert({ name => dbiw->raw("'Charlie'"), email => 'charlie@example.com', status => 'inactive' });
-  my $row = dbiw('testdb:users')->inflate(0)->find({ email => 'charlie@example.com' })->one;
+  my $row = dbiw('testdb:users')->inflate(0)->where({ email => 'charlie@example.com' })->one;
   is $row->{name}, 'Charlie', 'insert with expression';
 }
 

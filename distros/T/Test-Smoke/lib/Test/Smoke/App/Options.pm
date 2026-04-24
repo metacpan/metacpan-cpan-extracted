@@ -419,7 +419,7 @@ sub cfg {
         option     => '=s',
         default    => undef,
         helptext   => "The name of the BuildCFG file.",
-        configtext => "Which build configureations file would you like to use?",
+        configtext => "Which build configurations file would you like to use?",
         configtype => 'prompt_file',
         configfnex => 1,
         configdft  => sub {
@@ -729,7 +729,7 @@ sub hostname {
     return $opt->new(
         name       => 'hostname',
         option     => '=s',
-        deafult    => undef,
+        default    => $hostname,
         helptext   => 'Use the hostname option to override System::Info->hostname',
         configtext => "Use this option to override the default hostname.
 \tLeave empty for default ($hostname)",
@@ -1053,7 +1053,7 @@ sub qfile {
         allow      => [undef, '', qr{^[\w./:\\-]+$}],
         default    => undef,
         helptext   => 'The qfile keeps the queue of reports to resend.',
-        configtext => "One can now queue reports if they couldn't be delevered.\n"
+        configtext => "One can now queue reports if they couldn't be delivered.\n"
                     . "\tLeave empty for no queue.",
         configdft => sub {undef},
     );

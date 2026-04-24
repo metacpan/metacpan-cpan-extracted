@@ -1,4 +1,13 @@
-1.84 2025-??-??
+1.85 2026-04-23
+ - Fix renice invokation
+ - Copy also tshandlequeue.pl GH#23 thanks to report from Jim Keenan 
+ - Fix syncer sync in FTP.pm GH#21 thanks to report from Jim Keenan
+ - Force t/poster-post.t test to use IPv4 to avoid test failures GH#21 thanks to report from Jim Keenan
+ - Move FAQ to FAQ.pod to render in MetaCPAN
+ - Some pod cosmetic changes
+ 
+
+1.84 2025-03-12
  - Remove deprecated files:
    - bin/configsmoke.pl
    - bin/chkbcfg.pl

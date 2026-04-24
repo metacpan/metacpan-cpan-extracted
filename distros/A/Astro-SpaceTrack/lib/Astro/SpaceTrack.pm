@@ -36,7 +36,7 @@ suffices.
 
 =head1 CAVEAT
 
-This is an emergency release of this module. It was caused by Space
+Version 0.180 was an emergency release of this module. It was caused by Space
 Track deprecating and ultimately revoking the C<'tle_latest'> and
 C<'tle'> data classes in favor of C<'gp'> and C<'gp_history'>
 respectively, and me being oblivious until the revocation occurred.
@@ -63,8 +63,8 @@ fudge it in. C<NORAD_CAT_ID> has the same value.
 
 In the previous release C<spacetrack()> would fetch canned favorites
 curated by Space Track. As of January 21 2026 these are 404. If I find
-these data sets I will restore them. I also plan to support the existing
-favorites by a new mechanism (i.e. not via C<spacetrack()>).
+these data sets I will restore them. Favorites can still be retrieved
+via the C<favorite()> method.
 
 =back
 
@@ -104,26 +104,13 @@ As of version 0.143, any access of attribute
 C<url_iridium_status_mccants> is fatal.
 
 As of version 0.169, any use of attribute C<url_iridium_status_kelso> is
-fatal. See below for why my normal deprecation procedure was violated.
+fatal.
 
-As of version 0.164 support for Iridium Classic satellites is being
-deprecated and removed. All testing of the iridium_status() method is
-halted as of version 0.164. As of version 0.167, the first use of the
-iridium_status() method will produce a warning. After a further six
-months all uses will warn, and after a further six months use of this
-method will be fatal. Related attributes and manifest constants will be
-deprecated on the same schedule.
-
-Contrary to my normal deprecation procedure (such as it is), the
-Celestrak Iridium catalog is fully deprecated as of version 0.169, and
-will result in a fatal exception. This jump from non-deprecated to fully
-deprecated was triggered by the removal of the Iridium catalog (as
-opposed to Iridium NEXT) from the Celestrak web site May 8 2025.
-
-As of version 0.169, B<any> functionality relating to Iridium status
-will warn on the first use. This includes the C<BODY_STATUS_*> manifest
-constants, which as of 0.169 are no longer manifest constants but simple
-subroutines so that they B<can> warn on the first use.
+As of version 0.181, B<any> remaining functionality relating to Iridium
+Classic satellites is fatal, except for attribute iridium_status_format,
+which I missed, and which warns on the first use. This will be put
+through the usual deprecation cycle. Six months after it becomes fatal,
+all Iridium functionality will be dropped.
 
 =head1 DESCRIPTION
 
@@ -131,7 +118,7 @@ This package retrieves orbital data from the Space Track web site
 L<https://www.space-track.org> and several others. You must register and
 get a user name and password before you can get data from Space Track.
 
-Other methods (C<celestrak()>, C<amsat()>, ...) have
+Other methods (C<celestrak()> ...) have
 been added to access other repositories of orbital data, and in general
 these do not require a Space Track username and password.
 
@@ -164,7 +151,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.180';
+our $VERSION = '0.181';
 our @EXPORT_OK = qw{
     shell
 
@@ -298,8 +285,10 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	active => { name => 'Active Satellites' },
 	analyst => { name => 'Analyst Satellites' },
 	weather => {name => 'Weather'},
-	noaa => {name => 'NOAA'},
-	goes => {name => 'GOES'},
+	# Removed April 1 2026
+	# noaa => {name => 'NOAA'},
+	# Removed April 1 2026
+	# goes => {name => 'GOES'},
 	resource => {name => 'Earth Resources'},
 	sarsat => {name => 'Search and Rescue (SARSAT)'},
 	dmc => {name => 'Disaster Monitoring'},
@@ -326,8 +315,10 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	galileo => {name => 'Galileo'},
 	sbas => {name =>
 	    'Satellite-Based Augmentation System (WAAS/EGNOS/MSAS)'},
-	nnss => {name => 'Navy Navigation Satellite System (NNSS)'},
-	musson => {name => 'Russian LEO Navigation'},
+	# Removed April 16 2026
+	# nnss => {name => 'Navy Navigation Satellite System (NNSS)'},
+	# Removed April 16 2026
+	# musson => {name => 'Russian LEO Navigation'},
 	science => {name => 'Space and Earth Science'},
 	geodetic => {name => 'Geodetic'},
 	engineering => {name => 'Engineering'},
@@ -335,7 +326,8 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	military => {name => 'Miscellaneous Military'},
 	radar => {name => 'Radar Calibration'},
 	cubesat => {name => 'CubeSats'},
-	other => {name => 'Other'},
+	# Removed April 16 2026
+	# other => {name => 'Other'},
 	beidou => { name => 'Beidou navigational satellites' },
 	argos	=> { name => 'ARGOS Data Collection System' },
 	planet	=> { name => 'Planet Labs (Rapideye, Flock)' },
@@ -346,14 +338,16 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	# Removed May 8 2025
 	# swarm		=> { name => 'Swarm' },
 	gnss		=> { name => 'GNSS navigational satellites' },
-	'1982-092'	=> {
-	    name	=> 'Russian ASAT Test Debris (COSMOS 1408)',
-	    note	=> q/'cosmos-1408-debris' as of April 26 2024/,
-	    ignore	=> 1,	# Ignore in xt/author/celestrak_datasets.t
-	},
-	'cosmos-1408-debris'	=> {
-	    name =>	'Russian ASAT Test Debris (COSMOS 1408)',
-	},
+	# Removed April 1 2026
+	# '1982-092'	=> {
+	#    name	=> 'Russian ASAT Test Debris (COSMOS 1408)',
+	#    note	=> q/'cosmos-1408-debris' as of April 26 2024/,
+	#    ignore	=> 1,	# Ignore in xt/author/celestrak_datasets.t
+	#},
+	# Removed April 1 2026
+	# 'cosmos-1408-debris'	=> {
+	#    name =>	'Russian ASAT Test Debris (COSMOS 1408)',
+	# },
 	'1999-025'	=> {
 	    name	=> 'Fengyun 1C debris',
 	    note	=> q/'fengyun-1c-debris' as of April 26 2024/,
@@ -1036,7 +1030,9 @@ This method returns a list of legal attribute names.
 sub attribute_names {
     my ( $self ) = @_;
     my @keys = grep { ! {
+	    url_iridium_status_kelso	=> 1,
 	    url_iridium_status_mccants	=> 1,
+	    url_iridium_status_sladen	=> 1,
 	}->{$_} } sort keys %mutator;
     ref $self
 	or return wantarray ? @keys : \@keys;
@@ -2315,7 +2311,7 @@ results is determined by the optional $format argument, which defaults
 to the value of the C<iridium_status_format> attribute.
 
 If the format is 'kelso', only Dr. Kelso's Celestrak web site
-(L<https://celestrak.org/SpaceTrack/query/iridium.txt>) is queried for
+(C<https://celestrak.org/SpaceTrack/query/iridium.txt>) is queried for
 the data. The possible status values are documented at
 L<https://celestrak.org/satcat/status.php>, and repeated here for
 convenience:
@@ -3006,10 +3002,7 @@ catalog names are:
  vsnames: Molczan-format mags of visual bodies (vsnames.zip) REMOVED
 
 The files marked B<REMOVED> have been removed from Mike McCants' web
-site. The associated arguments are deprecated, will warn on every use,
-and return a C<404> error. Six months after the release of
-C<Astro-SpaceTrack> version 0.171, these arguments will produce a fatal
-error.
+site. As of version 0.181, use of the associated arguments is fatal.
 
 You can specify options as either command-type options (e.g. C<<
 mccants( '-file', 'foo.dat', ... ) >>) or as a leading hash reference
@@ -3044,10 +3037,6 @@ fetched, as follows:
 
  classified: 'orbit'
  integrated: 'orbit'
- mcnames:    'molczan'
- quicksat:   'quicksat'
- rcs:        'rcs.mccants'
- vsnames:    'molczan'
 
 If the C<file> option was passed, the following additional header will
 be provided:
@@ -3778,7 +3767,7 @@ sub search_decay {	## no critic (RequireArgUnpacking)
 This method searches the Space Track database for objects having the
 given international IDs. The international ID is the last two digits of
 the launch year (in the range 1957 through 2056), the three-digit
-sequence number of the launch within the year (with leading zeroes as
+sequence number of the launch within the year (with leading zeros as
 needed), and the piece (A through ZZZ, with A typically being the
 payload). You can omit the piece and get all pieces of that launch, or
 omit both the piece and the launch number and get all launches for the
@@ -5250,7 +5239,7 @@ sub _check_cookie_generic {
 
 {
 
-    use constant _MASTER_IRIDIUM_DEPRECATION_LEVEL	=> 2;
+    use constant _MASTER_IRIDIUM_DEPRECATION_LEVEL	=> 3;
     use constant _MASTER_FAVORITE_DEPRECATION_LEVEL	=> 2;
 
     my %deprecate = (
@@ -5262,12 +5251,13 @@ sub _check_cookie_generic {
 #	    '--sort'		=> 3,
 #	    '--start_epoch'	=> 3,
 	},
-	amsat		=> 0,
+	amsat		=> 1,
 	attribute	=> {
 #	    direct		=> 3,
-	    url_iridium_status_kelso	=> 3,
-	    url_iridium_status_mccants	=> 3,
+	    url_iridium_status_kelso	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
+	    url_iridium_status_mccants	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	    url_iridium_status_sladen	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
+	    iridium_status_format	=> 1,
 	},
 	iridium_status	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	iridium_status_format	=> {
@@ -5279,9 +5269,9 @@ sub _check_cookie_generic {
 	    last5	=> 2,
 	},
 	mccants	=> {
-	    mcnames	=> 2,
-	    quicksat	=> 1,
-	    vsnames	=> 2,
+	    mcnames	=> 3,
+	    quicksat	=> 3,
+	    vsnames	=> 3,
 	},
 	BODY_STATUS_IS_OPERATIONAL	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	BODY_STATUS_IS_SPARE	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,

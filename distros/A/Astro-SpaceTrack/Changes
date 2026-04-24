@@ -1,3 +1,25 @@
+0.181		2026-04-23	T. R. Wyant
+    Drop Celestrak catalogs 'musson', 'nnss', and 'other' because they
+    were dropped from the Celestrak web site itself on or about April 16
+    2026.
+
+    Don't test celestrak('iridium'). No idea why this wasn't failing on
+    my box. Thanks to CPAN Testers for catching this.
+
+    Don't include fatalized attributes in attribute_names() output.
+
+    Fully deprecates mccants() mcnames, quicksat, and vsnames. Any use
+    of thses is now fatal.
+
+    Fully deprecate remaining Iridium functionality. Any use is now
+    fatal.
+
+    Further deprecate amsat(), which doesn't work anyway. It now warns
+    on the first use.
+
+    Remove Celestrak catalogs NOAA, GOES, Russian ASAT Test. These were
+    dropped April 1 2026.
+
 0.180		2026-01-26	T. R. Wyant
     Drop Astro::SpaceTrack::BulkData POD. This was relevant to the API
     v1 to V2 transition, which is long past.

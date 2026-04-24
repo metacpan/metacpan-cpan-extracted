@@ -35,15 +35,6 @@ SKIP: {
 }
 
 SKIP: {
-    is_success_or_skip( $st, celestrak => 'iridium',
-	'Direct-fetch Celestrak iridium', 2 );
-
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
-
-    is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
-}
-
-SKIP: {
 
     is_error_or_skip( $st, celestrak => 'fubar',
 	404, 'Direct-fetch non-existent Celestrak catalog' );

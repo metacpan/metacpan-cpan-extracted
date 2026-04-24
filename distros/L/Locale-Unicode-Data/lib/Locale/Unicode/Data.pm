@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.8.1
+## Version v1.8.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2026/04/16
+## Modified 2026/04/23
 ## All rights reserved
 ## 
 ## 
@@ -24,6 +24,7 @@ BEGIN
     );
     use version;
     use Exporter ();
+    use Config;
     use DBD::SQLite;
     use DBI qw( :sql_types );
     use Encode ();
@@ -39,7 +40,7 @@ BEGIN
     our $CLDR_VERSION = '48.2';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.8.1';
+    our $VERSION = 'v1.8.3';
 };
 
 use strict;
@@ -2622,10 +2623,10 @@ sub plural_ranges { return( shift->_fetch_all({
 
 sub plural_rule { return( shift->_fetch_one({
     id          => 'get_plural_rule',
-    field       => 'rule',
+    field       => 'locale',
     has_array   => [qw( aliases )],
     table       => 'plural_rules',
-    requires    => [qw( locale count )],
+    requires    => [qw( locale )],
 }, @_ ) ); }
 
 sub plural_rules { return( shift->_fetch_all({
@@ -3174,15 +3175,19 @@ sub _dbh
     my $opts = $self->_get_args_as_hash( @_ );
     my $file = $opts->{datafile} || $self->datafile || $DB_FILE;
     my $dbh;
+    my $tid = ( $Config{useithreads} && $INC{'threads.pm'} && threads->can('tid') ) ? threads->tid() : $$;
     if( $DBH &&
         ref( $DBH ) eq 'HASH' &&
-        exists( $DBH->{ $file } ) &&
-        $DBH->{ $file } &&
-        Scalar::Util::blessed( $DBH->{ $file } ) &&
-        $DBH->{ $file }->isa( 'DBI::db' ) &&
-        $DBH->{ $file }->ping )
+        exists( $DBH->{ $tid } ) &&
+        defined( $DBH->{ $tid } ) &&
+        ref( $DBH->{ $tid } ) eq 'HASH' &&
+        exists( $DBH->{ $tid }->{ $file } ) &&
+        $DBH->{ $tid }->{ $file } &&
+        Scalar::Util::blessed( $DBH->{ $tid }->{ $file } ) &&
+        $DBH->{ $tid }->{ $file }->isa( 'DBI::db' ) &&
+        $DBH->{ $tid }->{ $file }->ping )
     {
-        return( $DBH->{ $file } );
+        return( $DBH->{ $tid }->{ $file } );
     }
 
 
@@ -3786,13 +3791,16 @@ sub _get_cached_statement
     my $id = shift( @_ );
     die( "No statement ID was provided to get its cached object." ) if( !length( $id // '' ) );
     my $file = $self->datafile || $DB_FILE;
-    $STHS->{ $file } //= {};
-    if( exists( $STHS->{ $file }->{ $id } ) &&
-        defined( $STHS->{ $file }->{ $id } ) &&
-        Scalar::Util::blessed( $STHS->{ $file }->{ $id } ) &&
-        $STHS->{ $file }->{ $id }->isa( 'DBI::st' ) )
+    my $tid  = ( $Config{useithreads} && $INC{'threads.pm'} && threads->can('tid') ) ? threads->tid() : $$;
+    $STHS->{ $tid } //= {};
+    $STHS->{ $tid }->{ $file } //= {};
+    my $sth = $STHS->{ $tid }->{ $file }->{ $id };
+    if( exists( $STHS->{ $tid }->{ $file }->{ $id } ) &&
+        defined( $STHS->{ $tid }->{ $file }->{ $id } ) &&
+        Scalar::Util::blessed( $STHS->{ $tid }->{ $file }->{ $id } ) &&
+        $STHS->{ $tid }->{ $file }->{ $id }->isa( 'DBI::st' ) )
     {
-        return( $STHS->{ $file }->{ $id } );
+        return( $STHS->{ $tid }->{ $file }->{ $id } );
     }
     return;
 }
@@ -3852,8 +3860,9 @@ sub _set_cached_statement
         die( "Value provided (", overload::StrVal( $sth ), ") is not a DBI statement object." );
     }
     my $file = $self->datafile || $DB_FILE;
-    $STHS->{ $file } //= {};
-    $STHS->{ $file }->{ $id } = $sth;
+    my $tid  = ( $Config{useithreads} && $INC{'threads.pm'} && threads->can('tid') ) ? threads->tid() : $$;
+    $STHS->{ $tid }->{ $file } //= {};
+    $STHS->{ $tid }->{ $file }->{ $id } = $sth;
     return( $sth );
 }
 
@@ -3966,14 +3975,19 @@ END
 {
     if( defined( $STHS ) && ref( $STHS ) eq 'HASH' )
     {
-        foreach my $db ( keys( %$STHS ) )
+        foreach my $tid ( keys( %$STHS ) )
         {
-            foreach my $sth ( keys( %{$STHS->{ $db }} ) )
+            next unless( ref( $STHS->{ $tid } ) eq 'HASH' );
+            foreach my $db ( keys( %{ $STHS->{ $tid } } ) )
             {
-                if( defined( $sth ) &&
-                    Scalar::Util::blessed( $sth ) )
+                next unless( ref( $STHS->{ $tid }->{ $db } ) eq 'HASH' );
+                foreach my $sth ( values( %{ $STHS->{ $tid }->{ $db } } ) )
                 {
-                    $sth->finish;
+                    if( defined( $sth ) &&
+                        Scalar::Util::blessed( $sth ) )
+                    {
+                        $sth->finish;
+                    }
                 }
             }
         }
@@ -5024,7 +5038,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.8.1
+    v1.8.3
 
 =head1 DESCRIPTION
 

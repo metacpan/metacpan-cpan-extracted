@@ -1,6 +1,6 @@
 package Locale::Simple;
 # ABSTRACT: Functions for translate text based on gettext data, also in JavaScript
-our $VERSION = '0.108';
+our $VERSION = '0.109';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ use POSIX qw' setlocale ';
 use IO::All 0.41 -utf8;
 
 our @EXPORT = qw(
-	
+
 	l_dir
 	l_lang
 	l_dry
@@ -25,10 +25,33 @@ our @EXPORT = qw(
 	ldn
 	ldp
 	ldnp
-	
+
+	N_
+	Nn_
+	Np_
+	Nnp_
+	Nd_
+	Ndn_
+	Ndp_
+	Ndnp_
+
 	ltd
 
 );
+
+# Deferred translation markers — no-op identity stubs that exist so the
+# scraper can treat them as msgid sources while runtime just returns the
+# arguments unchanged. Use them where strings must be declared before the
+# viewer's locale is known (attribute defaults, DSLs, constants) and pass
+# the stored msgid(s) through the matching l*() later.
+sub N_    { $_[0] }
+sub Nn_   { wantarray ? @_[0,1] : $_[0] }
+sub Np_   { $_[1] }
+sub Nnp_  { wantarray ? @_[1,2] : $_[1] }
+sub Nd_   { $_[1] }
+sub Ndn_  { wantarray ? @_[1,2] : $_[1] }
+sub Ndp_  { $_[2] }
+sub Ndnp_ { wantarray ? @_[2,3] : $_[2] }
 
 my $dry;
 my $nowrite;
@@ -150,7 +173,7 @@ Locale::Simple - Functions for translate text based on gettext data, also in Jav
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 SYNOPSIS
 
@@ -271,6 +294,46 @@ Domain + context.
 
 All four: domain, context, plural, arguments. The other functions are
 convenience wrappers around this one.
+
+=head1 DEFERRED TRANSLATION
+
+Sometimes a msgid must be declared before a user locale is known —
+attribute defaults, DSL registrations evaluated at C<use>-time, class
+constants. Calling C<l()> inline there freezes the result in the
+startup locale. Gettext's classic solution is the C<N_> "no-op"
+marker: extraction tools recognise it as a translation source, but at
+runtime it just returns its argument so the caller can store the msgid
+and translate it later.
+
+C<Locale::Simple> exports C<N_> and a twin for every C<l*()> helper:
+
+  N_($msgid)                          # twin of l()
+  Nn_($sg, $pl)                       # twin of ln()
+  Np_($ctx, $msgid)                   # twin of lp()
+  Nnp_($ctx, $sg, $pl)                # twin of lnp()
+  Nd_($dom, $msgid)                   # twin of ld()
+  Ndn_($dom, $sg, $pl)                # twin of ldn()
+  Ndp_($dom, $ctx, $msgid)            # twin of ldp()
+  Ndnp_($dom, $ctx, $sg, $pl)         # twin of ldnp()
+
+All are pure pass-throughs. Plural variants return C<($sg, $pl)> in list
+context and C<$sg> in scalar context. The C<domain>/C<context> arguments
+contribute to the extracted C<.pot> entry but are not returned — the
+caller already has them.
+
+  # Class-construction time (no locale yet):
+  my $label = N_($msgid);                      # = $msgid
+  my @plur  = Nn_($sg, $pl);                   # = ($sg, $pl)
+
+  # Render time (after l_lang($user_locale)):
+  print l($label);
+  print ln(@plur, $count);
+
+The scraper (L<Locale::Simple::Scraper>) recognises all eight C<N*_>
+names across C<.pl>/C<.pm>/C<.t>/C<.js>/C<.py> and emits C<.pot>
+entries identical to their C<l*()> twins. Templates (C<.tx>) are not
+scanned for N-markers — they run at request time, so the deferred
+pattern serves no purpose there.
 
 =head1 STRING EXTRACTION
 

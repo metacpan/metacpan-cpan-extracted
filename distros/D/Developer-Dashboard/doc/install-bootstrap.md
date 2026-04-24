@@ -53,7 +53,7 @@ What it does
 7. Bootstraps user-space Perl tooling under `~/perl5` with:
 
    ```bash
-   cpanm --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus
+   cpanm --no-wget --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus
    ```
 
 8. Appends exactly one `local::lib` bootstrap line to the active shell startup
@@ -78,7 +78,7 @@ What it does
 11. Installs Developer Dashboard into the user account with:
 
    ```bash
-   cpanm --notest Developer::Dashboard
+   cpanm --no-wget --notest Developer::Dashboard
    ```
 
 12. Runs `dashboard init` so the runtime exists immediately after the install.

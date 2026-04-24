@@ -257,7 +257,7 @@ locale_simple_scraper_old - Old Command line tool for finding tokens in code
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 SYNOPSIS
 

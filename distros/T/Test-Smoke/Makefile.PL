@@ -78,7 +78,7 @@ else { # this will be the default in some time
 my @scripts = qw(
     tssmokestatus.pl tssysinfo.pl
     tssynctree.pl tsrunsmoke.pl tssendrpt.pl tsarchive.pl
-    tssmokeperl.pl tsreport.pl tsrepostjsn.pl
+    tssmokeperl.pl tsreport.pl tsrepostjsn.pl tshandlequeue.pl
     tsw32configure.pl tsconfigsmoke.pl tsarchivelog.pl
 );
 my @pod_scripts = grep {

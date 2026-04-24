@@ -3,7 +3,7 @@ use warnings;
 use Config;
 
 use 5.006;
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker 6.64;
 use Crypt::OpenSSL::Guess qw(openssl_inc_paths openssl_lib_paths openssl_version);
 
 my ($major, $minor, $patch) = openssl_version(); 
@@ -25,35 +25,45 @@ WriteMakefile(
     'MIN_PERL_VERSION' => 5.006,
     'PL_FILES'         => {},
     'LICENSE'          => 'perl',
+    'CONFIGURE_REQUIRES' => {
+        "Crypt::OpenSSL::Guess" => 0.11,
+    },
     'PREREQ_PM' => {
+        'Crypt::OpenSSL::Bignum' => 0,
         'Crypt::OpenSSL::Random' => 0,
-        'Test::More'             => 0,
+    },
+    'TEST_REQUIRES' => {
+        'Test::More' => 0,
     },
     'OBJECT' => 'RSA.o',
     'LIBS'   => [openssl_lib_paths() . $libs],
     'LDDLFLAGS' => openssl_lib_paths() . ' ' . $Config{lddlflags},
-    'DEFINE' => '-DPERL5 -DOPENSSL_NO_KRB5',
-
-    # perl-5.8/gcc-3.2 needs -DPERL5, and redhat9 likes -DOPENSSL_NO_KRB5
     'INC' => openssl_inc_paths(),    # e.g., '-I/usr/include/other'
 
     'dist'  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     'clean' => { FILES    => 'Crypt-OpenSSL-RSA-*' },
     'META_MERGE' => {
-        recommends => {
-            'Crypt::OpenSSL::Bignum' => 0,
+        'meta-spec' => { version => 2 },
+        provides => {
+            'Crypt::OpenSSL::RSA' => {
+                file    => 'RSA.pm',
+                version => MM->parse_version('RSA.pm'),
+            },
         },
         configure_requires => {
             'Crypt::OpenSSL::Guess' => '0.11',
         },
-        build_requires => {
-            'Test' => 0,    # For testing
-        },
         resources => {
-            'license'    => 'http://dev.perl.org/licenses/',
-            'homepage'   => 'http://github.com/cpan-authors/Crypt-OpenSSL-RSA',
-            'bugtracker' => 'https://github.com/cpan-authors/Crypt-OpenSSL-RSA/issues',
-            'repository' => 'http://github.com/cpan-authors/Crypt-OpenSSL-RSA',
+            'license'    => ['https://dev.perl.org/licenses/'],
+            'homepage'   => 'https://github.com/cpan-authors/Crypt-OpenSSL-RSA',
+            'bugtracker' => {
+                'web' => 'https://github.com/cpan-authors/Crypt-OpenSSL-RSA/issues',
+            },
+            'repository' => {
+                'type' => 'git',
+                'url'  => 'https://github.com/cpan-authors/Crypt-OpenSSL-RSA.git',
+                'web'  => 'https://github.com/cpan-authors/Crypt-OpenSSL-RSA',
+            },
         }
     }
 );

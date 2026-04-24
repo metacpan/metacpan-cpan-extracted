@@ -1,5 +1,13 @@
 Revision history for Perl extension Crypt::RIPEMD160.
 
+0.14 2026-04-23
+
+  Maintenance:
+    - Use GNU tar (gtar) on macOS when building the dist tarball to avoid
+      PaxHeader/ entries that fail the CPANTS no_pax_headers kwalitee
+      check. Falls back to system tar on non-macOS platforms. PR #66
+    - Update MANIFEST. PR #66
+
 0.13 2026-04-23
 
   Bug fixes:

@@ -15,6 +15,14 @@ import {
   ldn,
   ldp,
   ldnp,
+  N_,
+  Nn_,
+  Np_,
+  Nnp_,
+  Nd_,
+  Ndn_,
+  Ndp_,
+  Ndnp_,
 } from '../src/index.js';
 
 // Test translations (German)
@@ -221,6 +229,58 @@ describe('Locale Simple', () => {
       l_lang('xx_YY');
       assert.strictEqual(l('Hello'), 'Hello');
     });
+  });
+});
+
+describe('deferred translation markers (N*_)', () => {
+  // Identity contract — same rationale as the Perl/Python siblings.
+  // The caller gets back exactly what it put in; the scraper sees the
+  // msgid; the actual lookup happens later via l*().
+  it('N_ returns msgid unchanged', () => {
+    assert.strictEqual(N_('Hello'), 'Hello');
+  });
+  it('Np_ drops context, returns msgid', () => {
+    assert.strictEqual(Np_('menu', 'Open'), 'Open');
+  });
+  it('Nd_ drops domain, returns msgid', () => {
+    assert.strictEqual(Nd_('app', 'Hi'), 'Hi');
+  });
+  it('Ndp_ drops domain and context', () => {
+    assert.strictEqual(Ndp_('app', 'menu', 'Open'), 'Open');
+  });
+
+  it('Nn_ returns [sg, pl] for spread into ln(...)', () => {
+    assert.deepStrictEqual(Nn_('1 file', '%d files'), ['1 file', '%d files']);
+  });
+  it('Nnp_ returns [sg, pl]', () => {
+    assert.deepStrictEqual(Nnp_('ctx', '1 file', '%d files'), ['1 file', '%d files']);
+  });
+  it('Ndn_ returns [sg, pl]', () => {
+    assert.deepStrictEqual(Ndn_('dom', '1 file', '%d files'), ['1 file', '%d files']);
+  });
+  it('Ndnp_ returns [sg, pl]', () => {
+    assert.deepStrictEqual(Ndnp_('dom', 'ctx', '1 file', '%d files'), ['1 file', '%d files']);
+  });
+
+  it('round-trip: N_ feeds l()', () => {
+    l_dir('test/data/locale');
+    l_lang('de_DE');
+    loadTranslations('test', 'de_DE', { 'Hello': 'Hallo' });
+    ltd('test');
+    const label = N_('Hello');
+    assert.strictEqual(l(label), 'Hallo');
+  });
+
+  it('round-trip: Nn_ feeds ln()', () => {
+    l_dir('test/data/locale');
+    l_lang('de_DE');
+    loadTranslations('test', 'de_DE', {
+      'You have %d message': ['Du hast %d Nachricht', 'Du hast %d Nachrichten'],
+    });
+    ltd('test');
+    const [sg, pl] = Nn_('You have %d message', 'You have %d messages');
+    assert.strictEqual(ln(sg, pl, 1), 'Du hast 1 Nachricht');
+    assert.strictEqual(ln(sg, pl, 4), 'Du hast 4 Nachrichten');
   });
 });
 

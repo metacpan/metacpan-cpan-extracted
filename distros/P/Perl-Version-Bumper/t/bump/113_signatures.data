@@ -55,3 +55,34 @@ sub foo ($) { }
 use VERSION;
 no feature 'signatures';
 sub foo ($) { }
+########## scoped signature feature
+{
+    use feature qw( signatures );
+    sub hello ($who) { say "Hello, $who!" }
+}
+{
+    no feature qw( signatures );
+    sub swap ($$) { return reverse @_ }
+}
+sub prototyped ($;@) { ... }
+---
+use VERSION;
+{
+    use feature qw( signatures );
+    sub hello ($who) { say "Hello, $who!" }
+}
+{
+    no feature qw( signatures );
+    sub swap ($$) { return reverse @_ }
+}
+sub prototyped ($;@) { ... }
+--- v5.36
+use VERSION;
+{
+    sub hello ($who) { say "Hello, $who!" }
+}
+{
+    no feature qw( signatures );
+    sub swap ($$) { return reverse @_ }
+}
+sub prototyped :prototype($;@) { ... }

@@ -1,4 +1,28 @@
 
+#: /t/60-N-markers.t:17
+#, locale-simple-format app
+msgctxt "menu"
+msgid "Open"
+msgstr ""
+
+#: /t/60-N-markers.t:16
+#, locale-simple-format app
+msgid "Hi"
+msgstr ""
+
+#: /t/60-N-markers.t:22 /t/60-N-markers.t:27
+#, locale-simple-format dom
+msgctxt "ctx"
+msgid "1 file"
+msgid_plural "%d files"
+msgstr[0] ""
+
+#: /t/60-N-markers.t:21 /t/60-N-markers.t:26
+#, locale-simple-format dom
+msgid "1 file"
+msgid_plural "%d files"
+msgstr[0] ""
+
 #: /t/data/dummy.pl:9
 #, locale-simple-format dummy
 msgid "mo'ooooo"
@@ -10,7 +34,14 @@ msgctxt "alien"
 msgid "Hello"
 msgstr ""
 
-#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE
+#: /t/60-N-markers.t:20 /t/60-N-markers.t:25
+#, locale-simple-format
+msgctxt "ctx"
+msgid "1 file"
+msgid_plural "%d files"
+msgstr[0] ""
+
+#: /lib/Locale/Simple.pm:LINE /lib/Locale/Simple.pm:LINE /t/60-N-markers.t:15
 #, locale-simple-format
 msgctxt "menu"
 msgid "Open"
@@ -39,17 +70,34 @@ msgid "%2$s has %1$d message"
 msgid_plural "%2$s has %1$d messages"
 msgstr[0] ""
 
+#: /t/60-N-markers.t:34
+#, locale-simple-format
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] ""
+
 #: /t/data/dummy.tx:4
 #, locale-simple-format
 msgid "/unternehmen/kundeninformationen/agb-verbraucher/#widerrufsrecht"
 msgstr ""
+
+#: /t/60-N-markers.t:19 /t/60-N-markers.t:24
+#, locale-simple-format
+msgid "1 file"
+msgid_plural "%d files"
+msgstr[0] ""
 
 #: /t/20-locale-simple.t:59 /t/data/test.py:73
 #, locale-simple-format
 msgid "Change order test %s %s"
 msgstr ""
 
-#: /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:17 /t/21-dryrun.t:20 /t/30-locale-simple-other.t:18 /t/30-locale-simple-other.t:26 /t/data/test.py:38
+#: /t/60-N-markers.t:31
+#, locale-simple-format
+msgid "Greet"
+msgstr ""
+
+#: /lib/Locale/Simple.pm:LINE /t/20-locale-simple.t:17 /t/21-dryrun.t:20 /t/30-locale-simple-other.t:18 /t/30-locale-simple-other.t:26 /t/60-N-markers.t:14 /t/data/test.py:38
 #, locale-simple-format
 msgid "Hello"
 msgstr ""

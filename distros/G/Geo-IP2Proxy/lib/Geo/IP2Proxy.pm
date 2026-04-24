@@ -580,7 +580,7 @@ sub getIPv6Record {
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
 				} else {
-					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES") || ($proxytype eq "AIC")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;
@@ -644,7 +644,7 @@ sub getIPv6Record {
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
 				} else {
-					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES") || ($proxytype eq "AIC")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;
@@ -827,7 +827,7 @@ sub getIPv4Record {
 				if ($countryshort eq "-") {
 					$isproxy = 0;
 				} else {
-					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES") || ($proxytype eq "AIC")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;
@@ -890,7 +890,7 @@ sub getIPv4Record {
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
 				} else {
-					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES") || ($proxytype eq "AIC")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;

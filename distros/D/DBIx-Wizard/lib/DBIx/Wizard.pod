@@ -21,10 +21,10 @@ DBIx::Wizard - Lightweight, chainable, zero-configuration ORM for Perl
     # export DBIW_DECLARE_MYDB="dbi:mysql:dbname=myapp|user|password"
 
     # Query
-    my @active = dbiw('mydb:users')->find({ status => 'active' })->all;
-    my @names  = dbiw('mydb:users')->sort('name')->all('name');
-    my $alice  = dbiw('mydb:users')->find({ name => 'Alice' })->one;
-    my $count  = dbiw('mydb:users')->find({ status => 'active' })->count;
+    my @active = dbiw('mydb:users')->where({ status => 'active' })->all;
+    my @names  = dbiw('mydb:users')->order_by('name')->all('name');
+    my $alice  = dbiw('mydb:users')->where({ name => 'Alice' })->one;
+    my $count  = dbiw('mydb:users')->where({ status => 'active' })->count;
 
     # Insert
     my $id = dbiw('mydb:users')->insert({
@@ -33,22 +33,22 @@ DBIx::Wizard - Lightweight, chainable, zero-configuration ORM for Perl
     });
 
     # Update
-    dbiw('mydb:users')->find({ id => 42 })
+    dbiw('mydb:users')->where({ id => 42 })
                        ->update({ status => 'inactive' });
 
     # Update with expressions
-    dbiw('mydb:users')->find({ id => 42 })
+    dbiw('mydb:users')->where({ id => 42 })
                        ->update({ views => dbiw->col('views') + 1 });
 
     # Delete
-    dbiw('mydb:users')->find({ status => 'deleted' })->delete;
+    dbiw('mydb:users')->where({ status => 'deleted' })->delete;
 
     # Joins
     my @rows = dbiw('mydb:users')
         ->as('u')
         ->join('orders|o' => 'o.user_id = u.id')
-        ->find({ 'u.status' => 'active' })
-        ->sort('-o.created_at')
+        ->where({ 'u.status' => 'active' })
+        ->order_by('-o.created_at')
         ->limit(20)
         ->all;
 
@@ -69,7 +69,7 @@ Key properties:
 =item * B<Zero schema definition.> Point it at a database and table, start
 querying. No result classes, no relationship declarations.
 
-=item * B<Fluent chaining.> Build queries with C<< ->find->sort->limit->all >>.
+=item * B<Fluent chaining.> Build queries with C<< ->where->order_by->limit->all >>.
 
 =item * B<SQL::Wizard expressions everywhere.> Use C<< dbiw->col(...) >>,
 C<< dbiw->func(...) >>, C<< dbiw->now >>, and arithmetic in any position.
@@ -101,8 +101,8 @@ When called with a C<'db:table'> string, returns a
 L<DBIx::Wizard::ResultSet> object tied to that database and table.
 
 When called without arguments, returns a shared L<SQL::Wizard> instance
-for building expressions. These expressions can be used in C<find()>,
-C<update()>, C<sort()>, C<having()>, and column lists.
+for building expressions. These expressions can be used in C<where()>,
+C<update()>, C<order_by()>, C<having()>, and column lists.
 
 =head1 DATABASE REGISTRATION
 
@@ -146,11 +146,11 @@ All builder methods modify the ResultSet and return C<$self> for chaining.
 
 Sets the table alias. The alias is used in the SQL FROM clause.
 
-=head2 find
+=head2 where
 
-    ->find({ status => 'active' })
-    ->find({ age => { '>' => 18 }, status => 'active' })
-    ->find({ name => { -in => ['Alice', 'Bob'] } })
+    ->where({ status => 'active' })
+    ->where({ age => { '>' => 18 }, status => 'active' })
+    ->where({ name => { -in => ['Alice', 'Bob'] } })
 
 Sets or extends the WHERE clause. When called with a hashref, merges with
 any existing conditions (AND). When called with an arrayref, replaces the
@@ -196,12 +196,12 @@ Adds a FULL OUTER JOIN.
 
 Adds a CROSS JOIN (no ON condition).
 
-=head2 sort
+=head2 order_by
 
-    ->sort('name')                           # ORDER BY name
-    ->sort('-created_at')                    # ORDER BY created_at DESC
-    ->sort('-created_at', 'name')            # ORDER BY created_at DESC, name
-    ->sort(dbiw->col('score')->desc)         # ORDER BY score DESC
+    ->order_by('name')                           # ORDER BY name
+    ->order_by('-created_at')                    # ORDER BY created_at DESC
+    ->order_by('-created_at', 'name')            # ORDER BY created_at DESC, name
+    ->order_by(dbiw->col('score')->desc)         # ORDER BY score DESC
 
 Sets the ORDER BY clause. A leading C<-> on a column name is shorthand for
 DESC. Accepts expression objects.
@@ -217,7 +217,7 @@ Sets the GROUP BY clause.
 
     ->having({ dbiw->raw('COUNT(*)') => { '>' => 5 } })
 
-Sets the HAVING clause. Same syntax as C<find()>.
+Sets the HAVING clause. Same syntax as C<where()>.
 
 =head2 limit
 
@@ -272,8 +272,8 @@ produce C<SELECT DISTINCT *>, which is almost never what you want.
 
 =head2 one
 
-    my $row  = dbiw('mydb:users')->find({ id => 42 })->one;
-    my $name = dbiw('mydb:users')->find({ id => 42 })->one('name');
+    my $row  = dbiw('mydb:users')->where({ id => 42 })->one;
+    my $name = dbiw('mydb:users')->where({ id => 42 })->one('name');
 
 Like C<all()> but with LIMIT 1. Returns a single hashref, or a single
 scalar value when given a column name.
@@ -290,13 +290,13 @@ for large result sets that should not be loaded entirely into memory.
 
 =head2 count
 
-    my $n = dbiw('mydb:users')->find({ status => 'active' })->count;
+    my $n = dbiw('mydb:users')->where({ status => 'active' })->count;
 
 Returns the COUNT(*) of matching rows.
 
 =head2 exists
 
-    if (dbiw('mydb:users')->find({ email => $email })->exists) {
+    if (dbiw('mydb:users')->where({ email => $email })->exists) {
         ...
     }
 
@@ -305,7 +305,7 @@ Equivalent to C<< count > 0 >>.
 
 =head2 sum
 
-    my $total = dbiw('mydb:orders')->find({ user_id => 42 })->sum('amount');
+    my $total = dbiw('mydb:orders')->where({ user_id => 42 })->sum('amount');
 
 Returns the SUM of the given column.
 
@@ -330,18 +330,18 @@ used as values:
 =head2 update
 
     my $rows = dbiw('mydb:users')
-                   ->find({ status => 'inactive' })
+                   ->where({ status => 'inactive' })
                    ->update({ status => 'deleted' });
 
 Updates all rows matching the current WHERE clause. Returns the number of
 affected rows. Expression objects work in the SET values:
 
-    dbiw('mydb:counters')->find({ key => 'hits' })
+    dbiw('mydb:counters')->where({ key => 'hits' })
                           ->update({ value => dbiw->col('value') + 1 });
 
 =head2 delete
 
-    dbiw('mydb:users')->find({ status => 'deleted' })->delete;
+    dbiw('mydb:users')->where({ status => 'deleted' })->delete;
 
 Deletes all rows matching the current WHERE clause.
 
@@ -370,7 +370,7 @@ This provides access to the full expression API:
     dbiw->case(...)
     dbiw->col('price') * dbiw->col('qty')  # arithmetic
 
-These expression objects can be used in C<find()>, C<sort()>, C<having()>,
+These expression objects can be used in C<where()>, C<order_by()>, C<having()>,
 C<all()> column lists, C<insert()> values, and C<update()> SET values.
 
 See L<SQL::Wizard> for the complete expression API.
@@ -457,7 +457,7 @@ parameters.
 
 L<DBIx::Wizard::Cursor> provides lazy row-by-row iteration:
 
-    my $cursor = dbiw('mydb:users')->sort('name')->cursor;
+    my $cursor = dbiw('mydb:users')->order_by('name')->cursor;
     while (my $row = $cursor->next) {
         print $row->{name}, "\n";
     }

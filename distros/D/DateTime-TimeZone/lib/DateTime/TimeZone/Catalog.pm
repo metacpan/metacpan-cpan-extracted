@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.67';
+our $VERSION = '2.68';
 
 our @ALL =
 qw(
@@ -852,12 +852,12 @@ America/Swift_Current
 America/Edmonton
 America/Cambridge_Bay
 America/Inuvik
+America/Vancouver
 America/Creston
 America/Dawson_Creek
 America/Fort_Nelson
 America/Whitehorse
 America/Dawson
-America/Vancouver
 ) ],
   'cc' => [ qw(
 Indian/Cocos
@@ -1864,7 +1864,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2026a' }
+sub OlsonVersion { '2026b' }
 
 
 1;
@@ -2448,12 +2448,12 @@ so that applications can easily present a list of timezones.
   America/Edmonton - Mountain - AB, BC(E), NT(E), SK(W)
   America/Cambridge_Bay - Mountain - NU (west)
   America/Inuvik - Mountain - NT (west)
+  America/Vancouver - MST - BC (most areas)
   America/Creston - MST - BC (Creston)
   America/Dawson_Creek - MST - BC (Dawson Cr, Ft St John)
   America/Fort_Nelson - MST - BC (Ft Nelson)
   America/Whitehorse - MST - Yukon (east)
   America/Dawson - MST - Yukon (west)
-  America/Vancouver - Pacific - BC (most areas)
 
 =head3 Cayman Islands (KY)
 

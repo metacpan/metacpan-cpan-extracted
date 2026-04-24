@@ -376,6 +376,25 @@ export function ldnp(domain, msgctxt, msgid, msgid_plural, n, ...args) {
 }
 
 // ============================================================================
+// Deferred-translation markers
+// ============================================================================
+//
+// Runtime no-ops that exist so the scraper can treat them as msgid sources
+// while render-time code stays in charge of the actual lookup. Use these
+// where the locale is not yet known (module top-level, DSLs, class fields)
+// and hand the stored msgid(s) to the matching l*() later. Plural variants
+// return [sg, pl] so the caller can spread them into ln(...plur, n).
+
+export function N_(msgid)                      { return msgid; }
+export function Nn_(sg, pl)                    { return [sg, pl]; }
+export function Np_(ctxt, msgid)               { return msgid; }
+export function Nnp_(ctxt, sg, pl)             { return [sg, pl]; }
+export function Nd_(domain, msgid)             { return msgid; }
+export function Ndn_(domain, sg, pl)           { return [sg, pl]; }
+export function Ndp_(domain, ctxt, msgid)      { return msgid; }
+export function Ndnp_(domain, ctxt, sg, pl)    { return [sg, pl]; }
+
+// ============================================================================
 // Default export with all functions
 // ============================================================================
 
@@ -394,4 +413,12 @@ export default {
   ldn,
   ldp,
   ldnp,
+  N_,
+  Nn_,
+  Np_,
+  Nnp_,
+  Nd_,
+  Ndn_,
+  Ndp_,
+  Ndnp_,
 };

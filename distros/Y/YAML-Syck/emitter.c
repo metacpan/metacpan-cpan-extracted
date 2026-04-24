@@ -107,6 +107,20 @@ syck_base64dec( char *s, long len, long *out_len )
 }
 
 /*
+ * Free a buffer returned by syck_base64enc() or syck_base64dec().
+ * These buffers are allocated with C's malloc() in this translation unit.
+ * Callers in XS code must NOT use free()/Safefree() directly because
+ * Perl may redefine those to use a different allocator (causes
+ * "Free to wrong pool" on Windows).
+ */
+void
+syck_base64_free( char *ptr )
+{
+    if ( ptr != NULL )
+        free( ptr );
+}
+
+/*
  * Allocate an emitter
  */
 SyckEmitter *

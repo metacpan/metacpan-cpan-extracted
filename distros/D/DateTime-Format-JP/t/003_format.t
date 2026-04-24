@@ -71,7 +71,7 @@ subtest "format roman numbers to full width" => sub
 subtest "format_datetime" => sub
 {
     use utf8;
-    my $dt = DateTime->new(
+    my $dt = DateTime::Lite->new(
         year  => 2021,
         month => 7,
         day   => 12,

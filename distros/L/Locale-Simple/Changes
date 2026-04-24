@@ -1,5 +1,15 @@
 Revision history for Locale-Simple
 
+0.109     2026-04-23 13:40:35Z
+
+ - Deferred-translation markers (N_, Nn_, Np_, Nd_, Ndn_, Ndp_, Nnp_,
+   Ndnp_) — mirror the l-family for class-construction-time use.
+ - Scraper: recognise the eight N*_ names (Perl / JS / Python) and emit
+   .pot entries identical to their l*() twins. .tx templates are not
+   scanned for N-markers on purpose.
+ - Scraper: Ldp now recognised by the parser (was listed in the arg-map
+   but missing from the function regex / required-args table).
+
 0.108     2026-04-22 04:35:31Z
 
  - Modernize build: [@Author::GETTY] bundle, cpanfile, drop weaver.ini/setup.py

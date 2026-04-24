@@ -1,5 +1,35 @@
 Revision history for App::DrivePlayer.
 
+0.2.8 2026-04-23
+        - Fix: Scanner now decodes UTF-8 at the Drive API boundary,
+          preventing double-encoded mojibake (e.g. "Nazan Ãncel"
+          instead of "Nazan Öncel") from landing in SQLite.  New
+          tools/fix_mojibake.pl repairs existing corrupted rows.
+        - Edit dialog: context menu "Edit Metadata…" and "Fetch
+          Metadata…" consolidated into a single "Edit…" with a Fetch
+          button inside the dialog.  Fetch fills only blank fields
+          (whitespace-only counts as blank); to refresh a populated
+          field, clear it first.
+        - Edit dialog: entries force LTR layout with an invisible
+          LRM prefix, so RTL content (Arabic, Hebrew) no longer
+          flips the dialog to right-justified after a fill.  Text
+          strippers remove the marker on read so nothing leaks into
+          the DB or queries.
+        - Display: tracklist, sidebar, and now-playing label strip
+          leading track-number prefixes from titles, leading YYYY-
+          from albums, and underscores across title/artist/album.
+          Stored values stay raw — DB lookups and sheet sync are
+          unaffected.
+        - Sheet sync: single-track metadata saves now update just
+          the one row on the relevant worksheet (two Sheets API
+          calls total — values.get on the drive_id column, then
+          values.update on the matching row) instead of rewriting
+          every tab.
+        - Save: metadata edits refresh the single tracklist row in
+          place, preserving sidebar selection and scroll position
+          (was a full _load_library that bumped the user back to
+          the "All Tracks" view).
+
 0.2.7 2026-04-22
         - Settings dialog: move the Google Sheet Sync section so it
           follows the Google API Credentials section (related Google

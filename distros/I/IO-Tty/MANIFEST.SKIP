@@ -10,3 +10,4 @@
 ^IO-Tty-\d
 ^IO-Tty\.ppd$
 ^cpanfile$
+^CLAUDE\.md$

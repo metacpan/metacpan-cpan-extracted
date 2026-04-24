@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 1;
 
@@ -18,7 +18,7 @@ __END__
 Developer::Dashboard - a local home for development work
 
 =head1 VERSION
-3.04
+3.09
 
 =head1 INTRODUCTION
 
@@ -596,9 +596,10 @@ helper instead of a public standalone binary.
 =item * Runtime Manager
 
 C<Developer::Dashboard::RuntimeManager> manages the background web service and
-collector lifecycle with process-title validation, C<pkill>-style fallback
-shutdown, and restart orchestration, tying the browser and prepared-state
-loops together as one runtime.
+collector lifecycle with process-title validation, numeric POSIX shutdown
+signals for Alpine/iSH compatibility, C<pkill>-style fallback shutdown, and
+restart orchestration, tying the browser and prepared-state loops together as
+one runtime.
 
 =item * Update Manager
 
@@ -1067,7 +1068,7 @@ interactive terminals, explains that any upcoming C<sudo> prompt is asking for
 the user's operating-system account password only for package-manager work,
 bootstraps user-space Perl
 tooling under F<~/perl5> with
-C<cpanm --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus>,
+C<cpanm --no-wget --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus>,
 appends exactly one C<local::lib> bootstrap line to F<~/.bashrc>,
 F<~/.zshrc>, or F<~/.profile> depending on the active shell, keeps bash
 login shells wired by bridging F<~/.profile> to F<~/.bashrc>, prefers
@@ -1094,7 +1095,7 @@ printing the exact shell file it updated plus the exact C<. "<rc-file>">
 command the user should run only when the installer cannot safely take over a
 terminal, never probes F</dev/tty> during a piped C<curl ... | sh> run so
 non-interactive installs stay quiet, installs Developer Dashboard into the user account with
-C<cpanm --notest Developer::Dashboard>,
+C<cpanm --no-wget --notest Developer::Dashboard>,
 and then runs C<dashboard init> so the runtime exists immediately after
 installation.
 
@@ -1106,7 +1107,7 @@ Useful bootstrap examples:
 
 Install from CPAN with:
 
-  cpanm --notest Developer::Dashboard
+  cpanm --no-wget --notest Developer::Dashboard
 
 Or install from a checkout with:
 
@@ -1344,7 +1345,9 @@ Restart the local app and configured collector loops:
 Interactive terminal runs now print the full restart task board on C<stderr>,
 mark the active step with a yellow C<->, mark completed steps with a green
 C<[OK]>, mark failed steps with a red C<[X]>, and keep the final JSON result
-on C<stdout>.
+on C<stdout>. Stop and restart shutdown paths send numeric POSIX signals
+instead of named signal strings, so minimal Alpine/iSH Perl builds that reject
+C<TERM> by name still terminate managed web and collector processes correctly.
 
 Create a helper login user:
 
@@ -1912,7 +1915,7 @@ Run the test suite:
 
 Measure library coverage with Devel::Cover:
 
-  cpanm --notest --local-lib-contained ./.perl5 Devel::Cover
+  cpanm --no-wget --notest --local-lib-contained ./.perl5 Devel::Cover
   export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
   export PATH="$PWD/.perl5/bin:$PATH"
   cover -delete
@@ -1962,6 +1965,10 @@ verification.
 Tests that depend on a missing or empty environment variable now establish that
 state explicitly inside the test file, rather than assuming the parent shell
 or install harness starts clean.
+The JavaScript fast-check wrapper is a source-tree fuzz gate: it runs when
+C<node>, C<npm>, C<package.json>, and C<package-lock.json> are all present, and
+it skips in packaged install-test trees that do not ship those checkout-only
+JavaScript manifests.
 
 From a source checkout, for fast saved-bookmark browser regressions, run the
 dedicated smoke script:
@@ -2254,7 +2261,7 @@ derived HTML, links, or button-like actions. Its saved Ajax endpoints run
 through singleton workers. No
 C<DBD::*> driver ships in the base tarball by default; install only the one
 you need with C<dashboard cpan DBD::Driver> or user-space
-C<cpanm --notest -L ~/perl5 DBD::Driver>, and the bookmark will return explicit
+C<cpanm --no-wget --notest -L ~/perl5 DBD::Driver>, and the bookmark will return explicit
 install guidance when a selected driver is missing. The repository also ships
 a dedicated SQL dashboard support guide with the verification matrix and
 per-database notes for that workspace.
@@ -2271,7 +2278,9 @@ repository:
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills install https://github.com/user/example-skill.git
   dashboard skills install /absolute/path/to/example-skill
+  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
   dashboard skills install --ddfile
+  dashboard skill list
 
 Bare one-word skill names are expanded against the official
 C<https://github.com/manif3station/> GitHub base, so
@@ -2281,6 +2290,16 @@ shorthand is expanded against GitHub too, so
 C<dashboard skills install foo/bar> clones C<https://github.com/foo/bar>.
 Full URLs such as C<https://github.com/user/example-skill.git> and
 C<git@github.com:user/example-skill.git> are used exactly as supplied.
+Multiple explicit sources can be supplied to one install command. Developer
+Dashboard installs them in the order given, returns a batch JSON payload with
+prints a progress rundown before work starts, and registers every source once.
+The default install summary is a terminal table with each skill's F<.env>
+C<VERSION> before and after the install. Use C<-o json> when a script needs the
+raw result payload. C<dashboard skill> is
+accepted as a singular alias for the C<dashboard skills> management command
+family, so C<dashboard skill list> and C<dashboard skill install browser> are
+equivalent to the plural form. It does not replace dotted skill execution;
+installed skill commands still run as C<dashboard E<lt>skillE<gt>.E<lt>commandE<gt>>.
 
 Git sources are cloned. Direct local checked-out directories are synced in
 place instead of recloned, using C<rsync> when it is available and the
@@ -2295,9 +2314,21 @@ F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. In a deeper project
 layer that already has its own F<.developer-dashboard/>, the install target
 becomes
 F<E<lt>that-layerE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>.
-Plain C<dashboard skills install> now requires either one explicit source
-argument or the special C<--ddfile> flag; calling it with no source and no
-C<--ddfile> returns a usage error instead of guessing.
+Each explicit C<dashboard skills install E<lt>sourceE<gt>>, including every
+source in a multi-source command, also registers that exact source in
+F<~/.developer-dashboard/ddfile> unless it is already listed there. When
+F<~/.developer-dashboard/.gitignore> already exists, the install also adds
+C<skills/E<lt>repo-nameE<gt>/> for each installed skill without duplicating
+existing entries, so users who keep the dashboard runtime in Git do not
+accidentally track cloned skill trees. The installer also honors an existing
+F<~/.developer-dashboard/.gitiignore> spelling as a compatibility safety net.
+Calling bare C<dashboard skills install> with no source reads that root
+F<ddfile> and reinstalls every listed skill as an update batch, showing the
+same progress rundown and before/after version table. If no listed skill
+changes version, the summary explicitly says C<No update.>. If the root
+F<ddfile> does not exist yet or has no installable entries, the command returns
+an explicit error telling the user to install a skill first or pass a skill
+source.
 Developer Dashboard does not merge the skill's C<cli/>, C<dashboards/>,
 C<config/>, C<ddfile>, C<ddfile.local>, C<aptfile>, C<apkfile>, C<dnfile>, C<brewfile>,
 C<package.json>, C<cpanfile>, C<cpanfile.local>, or Docker files into the
@@ -2315,10 +2346,11 @@ C<dashboard skills install --ddfile> runs also act as reinstall and refresh
 for already-installed targets, just like repeated explicit
 C<dashboard skills install E<lt>sourceE<gt>> runs.
 Interactive C<dashboard skills install> runs also print a task board on
-C<stderr>. When a skill ships dependency manifests such as F<package.json>,
-the matching task updates to show the detected file path so a long-running
-C<npm>, C<cpanm>, or package-manager step stays visible instead of looking
-blind.
+C<stderr>; multi-source and bare update-all installs show one task for every
+source before any clone or dependency step starts. When a single skill ships
+dependency manifests such as F<package.json>, the matching task updates to
+show the detected file path so a long-running C<npm>, C<cpanm>, or
+package-manager step stays visible instead of looking blind.
 
 Installed dotted skill commands such as C<dashboard demo-skill.foo> now hand
 control to the real skill command after hook processing instead of wrapping
@@ -2409,9 +2441,9 @@ declared collectors, their repo-qualified names, and indicator metadata
 
 =back
 
-Update a skill to the latest version:
+Update registered skills to their latest versions:
 
-  dashboard skills update example-skill
+  dashboard skills install
 
 Disable a skill without uninstalling it:
 

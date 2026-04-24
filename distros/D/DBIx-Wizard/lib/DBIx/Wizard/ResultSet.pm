@@ -29,15 +29,15 @@ sub as {
   return $self;
 }
 
-sub find {
-  my ($self, $where) = @_;
-  $where ||= {};
+sub where {
+  my ($self, $cond) = @_;
+  $cond ||= {};
 
-  if (ref($where) eq 'HASH') {
-    my %h_new_where = (%{$self->{where} || {}}, %{$where});
+  if (ref($cond) eq 'HASH') {
+    my %h_new_where = (%{$self->{where} || {}}, %{$cond});
     $self->{where} = \%h_new_where;
-  } elsif (ref($where) eq 'ARRAY') {
-    $self->{where} = $where;
+  } elsif (ref($cond) eq 'ARRAY') {
+    $self->{where} = $cond;
   }
 
   return $self;
@@ -78,13 +78,13 @@ sub cross_join {
   return $self;
 }
 
-sub sort {
-  my ($self, @sort) = @_;
+sub order_by {
+  my ($self, @order_by) = @_;
 
-  if (scalar(@sort) == 1 && ref($sort[0]) eq 'ARRAY') {
-    $self->{sort} = $sort[0];
+  if (scalar(@order_by) == 1 && ref($order_by[0]) eq 'ARRAY') {
+    $self->{order_by} = $order_by[0];
   } else {
-    $self->{sort} = \@sort;
+    $self->{order_by} = \@order_by;
   }
 
   return $self;
@@ -348,7 +348,7 @@ sub _build_select {
     ($self->{where})    ? (-where    => $self->{where})    : (),
     ($self->{group_by}) ? (-group_by => $self->{group_by}) : (),
     ($self->{having})   ? (-having   => $self->{having})   : (),
-    ($self->{sort})     ? (-order_by => $self->{sort})     : (),
+    ($self->{order_by}) ? (-order_by => $self->{order_by}) : (),
     (defined $self->{limit})  ? (-limit  => $self->{limit})  : (),
     (defined $self->{offset}) ? (-offset => $self->{offset}) : (),
   );

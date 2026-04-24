@@ -45,7 +45,7 @@ our %EXPORT_TAGS = (
 
 =head2 has_module($module)
 
-Retuns true if the named module could be C<requiere>d.
+Retuns true if the named module could be C<require>d.
 
 =cut
 
@@ -101,7 +101,7 @@ Returns a list of available syncer modules/programs (git, rsync)
 sub get_avail_sync {
     my @synctype = qw(copy hardlink snapshot);
 
-    unshift @synctype, 'rsync' if whereis( 'rsync' );
+    unshift @synctype, 'rsync' if whereis('rsync');
 
     unshift @synctype, 'git' if whereis('git');
 

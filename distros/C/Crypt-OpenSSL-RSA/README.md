@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/toddr/Crypt-OpenSSL-RSA.png?branch=master)](https://travis-ci.org/toddr/Crypt-OpenSSL-RSA)
+[![testsuite](https://github.com/cpan-authors/Crypt-OpenSSL-RSA/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Crypt-OpenSSL-RSA/actions/workflows/testsuite.yml)
 
 # NAME
 
@@ -16,7 +16,7 @@ Crypt::OpenSSL::RSA - RSA encoding and decoding, using the openSSL libraries
     $ciphertext = $rsa->encrypt($plaintext);
 
     $rsa_priv = Crypt::OpenSSL::RSA->new_private_key($key_string);
-    $plaintext = $rsa->encrypt($ciphertext);
+    $plaintext = $rsa->decrypt($ciphertext);
 
     $rsa = Crypt::OpenSSL::RSA->generate_key(1024); # or
     $rsa = Crypt::OpenSSL::RSA->generate_key(1024, $prime);
@@ -30,6 +30,15 @@ Crypt::OpenSSL::RSA - RSA encoding and decoding, using the openSSL libraries
     $rsa_priv->use_md5_hash(); # insecure. use_sha256_hash or use_sha1_hash are the default
     $signature = $rsa_priv->sign($plaintext);
     print "Signed correctly\n" if ($rsa->verify($plaintext, $signature));
+
+# SECURITY
+
+Version 0.35 disabled PKCS#1 v1.5 padding entirely to mitigate the Marvin
+attack.  However, the Marvin attack only affects PKCS#1 v1.5 **decryption**
+(padding oracle), not **signatures**.  Version 0.38 re-enables
+`use_pkcs1_padding()` for use with `sign()` and `verify()`, while keeping
+it disabled for `encrypt()` and `decrypt()`.  PKCS1\_OAEP should be used
+for encryption and either PKCS1\_PSS or PKCS1 can be used for signing.
 
 # DESCRIPTION
 
@@ -47,26 +56,43 @@ this (never documented) behavior is no longer the case.
 - new\_public\_key
 
     Create a new `Crypt::OpenSSL::RSA` object by loading a public key in
-    from a string containing Base64/DER-encoding of either the PKCS1 or
-    X.509 representation of the key.  The string should include the
-    `-----BEGIN...-----` and `-----END...-----` lines.
+    from a string containing either PEM or DER encoding of the PKCS#1 or
+    X.509 representation of the key.
+
+    For PEM keys, the string should include the `-----BEGIN...-----` and
+    `-----END...-----` lines.  Both `BEGIN RSA PUBLIC KEY` (PKCS#1) and
+    `BEGIN PUBLIC KEY` (X.509/SubjectPublicKeyInfo) formats are supported.
+
+    DER-encoded keys (raw binary ASN.1) are also accepted and the format
+    (PKCS#1 vs X.509) is auto-detected.
 
     The padding is set to PKCS1\_OAEP, but can be changed with the
     `use_xxx_padding` methods.
 
+    Note, PKCS1\_OAEP can only be used for encryption.  Call
+    `use_pkcs1_pss_padding` or `use_pkcs1_padding` prior to signing operations.
+
 - new\_private\_key
 
     Create a new `Crypt::OpenSSL::RSA` object by loading a private key in
-    from an string containing the Base64/DER encoding of the PKCS1
-    representation of the key.  The string should include the
-    `-----BEGIN...-----` and `-----END...-----` lines.  The padding is set to
-    PKCS1\_OAEP, but can be changed with `use_xxx_padding`.
+    from a string containing either PEM or DER encoding of the key.
 
-    An optional parameter can be passed for passphase protected private key:
+    For PEM keys, the string should include the `-----BEGIN...-----` and
+    `-----END...-----` lines.  The padding is set to PKCS1\_OAEP, but can
+    be changed with `use_xxx_padding`.
 
-    - passphase
+    DER-encoded keys (raw binary ASN.1) are also accepted.
 
-        The passphase which protects the private key.
+    An optional parameter can be passed for passphrase-protected private
+    keys:
+
+    - passphrase
+
+        The passphrase which protects the private key.  For PEM keys, this
+        decrypts traditional encrypted PEM (`DEK-Info` header) and encrypted
+        PKCS#8 PEM (`BEGIN ENCRYPTED PRIVATE KEY`).  For DER keys, this
+        decrypts encrypted PKCS#8 DER (`EncryptedPrivateKeyInfo` ASN.1
+        structure).
 
 - generate\_key
 
@@ -85,6 +111,19 @@ this (never documented) behavior is no longer the case.
     provided and d is undef, d is computed.  Note that while p and q are
     not necessary for a private key, their presence will speed up
     computation.
+
+    An optional `check => 1` parameter can be passed after the key
+    components to validate the key immediately after construction:
+
+        my $rsa = Crypt::OpenSSL::RSA->new_key_from_parameters(
+            $n, $e, $d, $p, $q, check => 1
+        );
+
+    When enabled, `check_key()` is called on the resulting key.  If the
+    key parameters are inconsistent (e.g. wrong CRT values, mismatched
+    n/e/d/p/q), the constructor will croak instead of returning an object
+    that fails at first use.  The check is only performed on private keys;
+    public-only keys (n and e only) are returned without validation.
 
 - import\_random\_seed
 
@@ -108,6 +147,13 @@ this (never documented) behavior is no longer the case.
         -----BEGIN RSA PUBLIC KEY------
         -----END RSA PUBLIC KEY------
 
+- get\_public\_key\_pkcs1\_string
+
+    Alias for `get_public_key_string`.  Returns the same PKCS#1
+    `RSAPublicKey` PEM format (`BEGIN RSA PUBLIC KEY`).  Provided for
+    naming symmetry with the import method `new_public_key` (which
+    auto-detects PKCS#1 vs X.509) and with `get_public_key_x509_string`.
+
 - get\_public\_key\_x509\_string
 
     Return the Base64/DER-encoded representation of the "subject
@@ -128,17 +174,31 @@ this (never documented) behavior is no longer the case.
         -----BEGIN RSA PRIVATE KEY------
         -----END RSA PRIVATE KEY------
 
-    2 optional parameters can be passed for passphase protected private key
+    2 optional parameters can be passed for passphrase protected private key
     string:
 
-    - passphase
+    - passphrase
 
-        The passphase which protects the private key.
+        The passphrase which protects the private key.
 
     - cipher name
 
         The cipher algorithm used to protect the private key. Default to
         'des3'.
+
+- get\_private\_key\_pkcs8\_string
+
+    Return the Base64/DER-encoded PKCS#8 representation of the private
+    key.  This string has header and footer lines:
+
+        -----BEGIN PRIVATE KEY-----
+        -----END PRIVATE KEY-----
+
+    This is the format produced by `openssl pkey -outform PEM`, and is
+    the private-key counterpart of `get_public_key_x509_string`.
+
+    Accepts the same optional passphrase and cipher-name parameters as
+    `get_private_key_string`.
 
 - encrypt
 
@@ -151,11 +211,14 @@ this (never documented) behavior is no longer the case.
 - private\_encrypt
 
     Encrypt a binary "string" using the private key.  Croaks if the key is
-    public only.
+    public only.  On OpenSSL 3.x, only `use_no_padding` and
+    `use_pkcs1_padding` are supported; OAEP and PSS will croak.
 
 - public\_decrypt
 
     Decrypt a binary "string" using the public (portion of the) key.
+    On OpenSSL 3.x, only `use_no_padding` and `use_pkcs1_padding`
+    are supported; OAEP and PSS will croak.
 
 - sign
 
@@ -165,6 +228,16 @@ this (never documented) behavior is no longer the case.
 
     Check the signature on a text.
 
+# Padding Methods
+
+**use\_pkcs1\_padding** can be used for signature operations (`sign()` and
+`verify()`).  PKCS#1 v1.5 encryption is disabled due to the Marvin attack.
+**use\_pkcs1\_pss\_padding** is the recommended replacement for signatures.
+**use\_pkcs1\_oaep\_padding** is used for encryption operations.
+
+On OpenSSL 3.x, the appropriate padding is set for each operation unless
+**use\_no\_padding** or **use\_pkcs1\_padding** is called before the operation.
+
 - use\_no\_padding
 
     Use raw RSA encryption. This mode should only be used to implement
@@ -173,22 +246,44 @@ this (never documented) behavior is no longer the case.
 
 - use\_pkcs1\_padding
 
-    Use PKCS #1 v1.5 padding. This currently is the most widely used mode
-    of padding.
+    Use `PKCS #1 v1.5` padding for **signature operations only**.  PKCS#1 v1.5
+    signatures (RSASSA-PKCS1-v1.5) are secure and widely required by protocols
+    such as JWT RS256, ACME (RFC 8555), and SAML.
+
+    **Note**: PKCS#1 v1.5 **encryption** is disabled because it is vulnerable to
+    the [Marvin Attack](https://github.com/tomato42/marvin-toolkit/blob/master/README.md)
+    (a timing side-channel on decryption padding validation).  Calling
+    `encrypt()` or `decrypt()` with this padding will croak.  Use
+    `use_pkcs1_oaep_padding()` for encryption.
 
 - use\_pkcs1\_oaep\_padding
 
     Use `EME-OAEP` padding as defined in PKCS #1 v2.0 with SHA-1, MGF1 and
     an empty encoding parameter. This mode of padding is recommended for
     all new applications.  It is the default mode used by
-    `Crypt::OpenSSL::RSA`.
+    `Crypt::OpenSSL::RSA` but is only valid for encryption/decryption.
+
+- use\_pkcs1\_pss\_padding
+
+    Use `RSA-PSS` padding as defined in PKCS#1 v2.1.  In general, RSA-PSS
+    should be used as a replacement for RSA-PKCS#1 v1.5.  The module specifies
+    the message digest being requested and the appropriate mgf1 setting and
+    salt length for the digest.
+
+    **Note**: RSA-PSS cannot be used for encryption/decryption and results in a
+    fatal error.  Call `use_pkcs1_oaep_padding` for encryption operations. 
 
 - use\_sslv23\_padding
 
     Use `PKCS #1 v1.5` padding with an SSL-specific modification that
     denotes that the server is SSL3 capable.
 
-    Not available since OpenSSL 3.
+    **Not available on OpenSSL 3.x or later.**  Calling this method will
+    croak with a descriptive error message suggesting alternatives.
+    Use `use_pkcs1_oaep_padding()` for encryption or
+    `use_pkcs1_pss_padding()` for signatures.
+
+# Hash/Digest Methods
 
 - use\_md5\_hash
 
@@ -254,11 +349,7 @@ this (never documented) behavior is no longer the case.
 
 - is\_private
 
-    Return true if this is a private key, and false if it is private only.
-
-# BUGS
-
-There is a small memory leak when generating new keys of more than 512 bits.
+    Return true if this is a private key, and false if it is public only.
 
 # AUTHOR
 

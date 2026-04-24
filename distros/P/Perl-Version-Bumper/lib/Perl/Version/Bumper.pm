@@ -1,7 +1,7 @@
 use v5.10;
 
 package Perl::Version::Bumper;
-$Perl::Version::Bumper::VERSION = '0.250';
+$Perl::Version::Bumper::VERSION = '0.256';
 
 use strict;
 use warnings;
@@ -342,6 +342,40 @@ sub _version_stmts {
     return $version_stmts ? @$version_stmts : ();
 }
 
+use constant {
+    ENABLED  => 'enabled',
+    DISABLED => 'disabled',
+};
+use Hash::Util::FieldHash;
+Hash::Util::FieldHash::fieldhash my %feature_by_scope;
+
+# keep track of features explicitly enabled/disabled in each scope
+sub _add_feature_to_scope {
+    my ( $elem, $feature, $status ) = @_;
+    croak "Invalid status value: '$status'"
+      if $status ne ENABLED && $status ne DISABLED;
+    my $scope = $elem;
+    while ( $scope->parent ) {
+        $scope = $scope->parent;
+        last if $scope->isa('PPI::Structure::Block');
+    }
+    $feature_by_scope{$scope}{$feature} = $status;
+}
+
+# return the status of the feature for the scope surrounding the element
+# the value is one of: ENABLED, DISABLED, '' (the first two are constants)
+sub _feature_status_in_scope {
+    my ( $feature, $doc, $elem ) = @_;
+    my $scope = $elem;
+    my $status;
+    while ( $scope->parent ) {
+        $status = $feature_by_scope{$scope}{$feature}
+          and last;
+        $scope = $scope->parent;
+    }
+    return $status || $feature_by_scope{$doc}{$feature} // '';
+}
+
 my %feature_shine = (
     when_enabled => {
 
@@ -351,13 +385,22 @@ my %feature_shine = (
             my ($doc) = @_;
 
             # this only matters for code using bitwise ops
-            return unless $doc->find(
+            # (dotted bitwise operators are detected by PPI >= 1.285)
+            my $bitwise_ops = $doc->find(
                 sub {
                     my ( $root, $elem ) = @_;
                     $elem->isa('PPI::Token::Operator')
                       && $elem =~ /\A[&|~^]=?\z/;
                 }
             );
+            return unless $bitwise_ops;
+
+            # if any of the bitwise ops is not inside a scope
+            # where `no feature 'bitwise'` is active
+            my @unsafe_ops =
+              grep _feature_status_in_scope( bitwise => $doc, $_ ) ne
+              DISABLED, @$bitwise_ops;
+            return unless @unsafe_ops;
 
             # the `use VERSION` inserted earlier is always the first in the doc
             my $insert_point = ( _version_stmts($doc) )[0];
@@ -394,6 +437,9 @@ TODO_COMMENT
 
             # and turn them into prototype attributes
             for my $proto (@$prototypes) {
+                next
+                  if _feature_status_in_scope( signatures => $doc, $proto ) eq
+                  DISABLED;
                 $proto->insert_before( PPI::Token::Operator->new(':') );
                 $proto->insert_before(
                     PPI::Token::Attribute->new("prototype$proto") );
@@ -417,7 +463,10 @@ TODO_COMMENT
             return unless $core_fc;
 
             # and replace them by 'fc'
-            $_->replace( PPI::Token::Word->new('fc') ) for @$core_fc;
+            # (only when not in scope of a `no feature 'fc'`)
+            $_->replace( PPI::Token::Word->new('fc') )
+              for grep _feature_status_in_scope( fc => $doc, $_ ) ne DISABLED,
+              @$core_fc;
         },
     },
 
@@ -439,6 +488,9 @@ TODO_COMMENT
 
             # and replace it with double colons
             for my $word (@$apostrophes) {
+                next
+                  if ENABLED eq _feature_status_in_scope(
+                    apostrophe_as_package_separator => $doc => $word );
                 ( my $colon = "$word" ) =~ s/'/::/g;
                 $word->replace( bless { content => $colon },
                     'PPI::Token::Word' );
@@ -518,14 +570,13 @@ sub _cleanup_bundled_features {
     my ( $self, $doc, $old_num ) = @_;
     my $version_num       = $self->version_num;
     my $feature_in_bundle = $self->{feature_in_bundle};
-    my ( %enabled_in_code, %disabled_in_code );
 
     # drop features enabled in this bundle
     # (also if they were enabled with `use experimental`)
     for my $module (qw( feature experimental )) {
         for my $use_line ( _find_include( $module => $doc, 'use' ) ) {
             my @old_args = _ppi_list_to_perl_list( $use_line->arguments );
-            $enabled_in_code{$_}++ for @old_args;
+            _add_feature_to_scope( $use_line, $_, ENABLED ) for @old_args;
             my @new_args =    # keep enabling features that
               grep !exists $feature_in_bundle->{enabled}{$_}    # are not enabled yet
                  || exists $feature{$_}{unfeature},             # or are unfeatures
@@ -551,7 +602,7 @@ sub _cleanup_bundled_features {
     for my $module (qw( feature experimental )) {
         for my $no_feature ( _find_include( $module => $doc, 'no' ) ) {
             my @old_args = _ppi_list_to_perl_list( $no_feature->arguments );
-            $disabled_in_code{$_}++ for @old_args;
+            _add_feature_to_scope( $no_feature, $_, DISABLED ) for @old_args;
             my @new_args =                # keep disabling features
               grep exists $feature{$_}    # that actually exist and are
               && !exists $feature_in_bundle->{disabled}{$_},    # not disabled yet
@@ -573,9 +624,7 @@ sub _cleanup_bundled_features {
         my $feature_enabled = $feature{$feature}{enabled};
         $feature_shine{when_enabled}{$feature}->($doc)
           if $old_num < $feature_enabled         # code from before the feature
-          && $version_num >= $feature_enabled    # bumped to after the feature
-          && !$enabled_in_code{$feature}         # not enabling the feature
-          && !$disabled_in_code{$feature};       # and not disabling the feature
+          && $version_num >= $feature_enabled;   # bumped to after the feature
     }
 
     # apply some feature shine when crossing the feature disablement boundary
@@ -583,9 +632,7 @@ sub _cleanup_bundled_features {
         my $feature_disabled = $feature{$feature}{disabled};
         $feature_shine{when_disabled}{$feature}->($doc)
           if $old_num < $feature_disabled        # code from before the feature
-          && $version_num >= $feature_disabled   # bumped to after the feature
-          && !$enabled_in_code{$feature}         # not enabling the feature
-          && !$disabled_in_code{$feature};       # and not disabling the feature
+          && $version_num >= $feature_disabled;  # bumped to after the feature
     }
 
     # drop experimental warnings, if any

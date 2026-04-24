@@ -147,6 +147,9 @@ The integration run creates:
 - layered root-to-leaf `.env` and `.env.pl` files override in order, and skill-local env files load only for skill execution paths
 - skill dependency installs follow `aptfile -> apkfile -> dnfile -> brewfile -> package.json -> cpanfile -> cpanfile.local -> ddfile -> ddfile.local`, with `aptfile`, `apkfile`, and `dnfile` probing each listed package first and only escalating to `sudo apt-get install -y`, `sudo apk add --no-cache`, or `sudo dnf install -y` for packages that are still missing, `ddfile.local` dependencies staying at the current skill install level, Node dependencies being staged through `npx --yes npm install` in a private dashboard workspace before landing in `$HOME/node_modules`, shared skill Perl dependencies landing in `~/perl5`, and skill-local Perl dependencies landing in each skill's `./perl5`
 - explicit `dashboard skills install --ddfile` runs process `ddfile` first into the active layered skills root and then `ddfile.local` into the current directory's nested `./skills/` tree
+- explicit `dashboard skills install <source> ...` runs can install one or more sources in command-line order, append each exact source to the home root `~/.developer-dashboard/ddfile` without duplicating existing non-comment entries, and bare `dashboard skills install` uses that root `ddfile` to reinstall every registered skill as an update-all pass with a visible source-level progress rundown and a default before/after `.env` `VERSION` table summary
+- when the home runtime already has `.gitignore` or compatibility `.gitiignore`, explicit skill installs append `skills/<repo-name>/` without duplicates so cloned skill trees stay ignored by runtime Git checkouts
+- `dashboard skill` is covered as the singular alias for `dashboard skills` management commands while installed command execution remains on the dotted `dashboard <skill>.<command>` path
 - streamed `install.sh` runs such as `curl ... | sh` succeed without a local checkout by falling back to embedded `aptfile`, `apkfile`, `dnfile`, and `brewfile` manifests, and Debian-family or Alpine hosts bootstrap `App::perlbrew` automatically when the package manager path did not already provide `perlbrew`
 - the old-system-Perl Alpine rescue path keeps the locally bootstrapped `perlbrew` and `patchperl` tools on the private `~/perl5/lib/perl5` include path so `curl ... | sh` can still build `perl-5.38.5` instead of dying with missing `App::perlbrew` or `Devel::PatchPerl` modules
 - Debian-family streamed bootstrap also copes with third-party `nodejs` repositories that conflict with the distro `npm` package by installing `nodejs` first, checking whether `npm` and `npx` are already present, and only then attempting the distro `npm` package
@@ -179,6 +182,9 @@ The integration run creates:
   has a live managed pid and an accepting listener on the requested port, and
   after that ready state survives a short confirmation window instead of
   trusting an acknowledged pid that dies immediately afterwards
+- runtime shutdown uses numeric POSIX signals for managed stop/restart paths so
+  Alpine/iSH Perl builds that reject named signal strings still stop web and
+  collector processes correctly
 
 ## Optional macOS Brewfile Verification
 

@@ -2,6 +2,7 @@
 
 package XML::Parser::Style::Stream;
 use strict;
+use warnings;
 
 # This style invented by Tim Bray <tbray@textuality.com>
 

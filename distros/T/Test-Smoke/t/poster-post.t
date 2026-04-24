@@ -24,6 +24,7 @@ if (!has_module('HTTP::Daemon')) {
 use File::Copy qw/copy/;
 use File::Temp qw/tempdir/;
 use File::Spec::Functions;
+use Socket 'AF_INET';
 require URI;
 require HTTP::Daemon;
 require HTTP::Status; HTTP::Status->import('RC_OK', 'RC_NOT_IMPLEMENTED');
@@ -39,9 +40,10 @@ my $timeout = 60;
 my $jsnfile = 'testsuite.jsn';
 my $sockhost;
 {
-    $daemon = HTTP::Daemon->new() || die "Could not initialize a Daemon";
+    $daemon = HTTP::Daemon->new(Family => AF_INET) || die "Could not initialize a Daemon";
     $url = URI->new($daemon->url);
     $sockhost = $daemon->sockhost;
+
     note(
         "HTTP::Daemon ($HTTP::Daemon::VERSION): ",
         $sockhost eq '::' ? "IPv6" : "IPv4",

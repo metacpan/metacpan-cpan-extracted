@@ -6,12 +6,12 @@ README - Perl Core Test Smoke Suite
 
 Make sure you are in the directory where you installed the software!
 
-  $ perl tsconfigsmoke.pl      # will generate smokecurrent.sh
-  $ sh smokecurrent.sh
+    $ perl tsconfigsmoke.pl      # will generate smokecurrent.sh
+    $ sh smokecurrent.sh
 
 or on windows:
 
-    C:>tsconfigsmoke           # will generate smokecurrent.bat
+    C:>tsconfigsmoke             # will generate smokecurrent.bat
     C:>smokecurrent
 
 For the impatient: see the section L</"GETTING STARTED">

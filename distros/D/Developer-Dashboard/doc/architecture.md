@@ -36,7 +36,7 @@ instead of a loose pile of utilities.
   Runs configured collector jobs once or in loops, persists outputs, records loop metadata, supports timeout/env and cron-style schedules, validates managed background processes by pid plus process title, and materializes TT-backed collector indicator icons from collector stdout JSON.
 
 - `Developer::Dashboard::RuntimeManager`
-  Starts the web service in the background, stops or restarts both web and collectors, and falls back to `pkill` plus process scanning instead of trusting pid files alone.
+  Starts the web service in the background, stops or restarts both web and collectors, sends numeric POSIX shutdown signals for Alpine/iSH-compatible process control, and falls back to `pkill` plus process scanning instead of trusting pid files alone.
 
 - `Developer::Dashboard::IndicatorStore`
   Stores prompt/dashboard indicators as file-backed state and can refresh generic built-in indicators.

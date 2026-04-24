@@ -4,8 +4,9 @@ use strict;
 use warnings;
 
 use Carp;    # Removing carp will break the XS code.
+use Crypt::OpenSSL::Bignum;
 
-our $VERSION = '0.37';
+our $VERSION = '0.41';
 
 use XSLoader;
 XSLoader::load 'Crypt::OpenSSL::RSA', $VERSION;
@@ -19,20 +20,65 @@ BEGIN {
 
 sub new_public_key {
     my ( $proto, $p_key_string ) = @_;
+    croak "unrecognized key format: expected PEM-encoded key (starting with '-----BEGIN') "
+        . "or DER-encoded key (binary ASN.1 data)"
+        unless defined $p_key_string && length($p_key_string) > 0;
     if ( $p_key_string =~ /^-----BEGIN RSA PUBLIC KEY-----/ ) {
         return $proto->_new_public_key_pkcs1($p_key_string);
     }
     elsif ( $p_key_string =~ /^-----BEGIN PUBLIC KEY-----/ ) {
         return $proto->_new_public_key_x509($p_key_string);
     }
+    elsif ( $p_key_string =~ /^-----/ ) {
+        croak "unrecognized key format: PEM header not recognized as RSA public key. "
+            . "Expected '-----BEGIN RSA PUBLIC KEY-----' (PKCS#1) or "
+            . "'-----BEGIN PUBLIC KEY-----' (X.509)";
+    }
+    elsif ( substr($p_key_string, 0, 1) eq "\x30" ) {
+        # ASN.1 SEQUENCE tag detected — likely DER-encoded key.
+        # Search for the RSA OID (1.2.840.113549.1.1.1) in raw binary to distinguish
+        # X.509 SubjectPublicKeyInfo from PKCS#1 RSAPublicKey.
+        if (index($p_key_string, "\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01") >= 0) {
+            # RSA encryption OID found — X.509 SubjectPublicKeyInfo
+            return $proto->_new_public_key_x509_der($p_key_string);
+        }
+        else {
+            # No OID — assume PKCS#1 RSAPublicKey, let OpenSSL reject invalid data
+            return $proto->_new_public_key_pkcs1_der($p_key_string);
+        }
+    }
     else {
-        croak "unrecognized key format";
+        croak "unrecognized key format: expected PEM-encoded key (starting with '-----BEGIN') "
+            . "or DER-encoded key (binary ASN.1 data)";
+    }
+}
+
+sub new_private_key {
+    my ( $proto, $p_key_string, @rest ) = @_;
+    croak "unrecognized key format: expected PEM-encoded key (starting with '-----BEGIN') "
+        . "or DER-encoded key (binary ASN.1 data)"
+        unless defined $p_key_string && length($p_key_string) > 0;
+    if ( $p_key_string =~ /^-----/ ) {
+        return $proto->_new_private_key_pem($p_key_string, @rest);
+    }
+    elsif ( substr($p_key_string, 0, 1) eq "\x30" ) {
+        # ASN.1 SEQUENCE tag detected — likely DER-encoded private key.
+        return $proto->_new_private_key_der($p_key_string, @rest);
+    }
+    else {
+        croak "unrecognized key format: expected PEM-encoded key (starting with '-----BEGIN') "
+            . "or DER-encoded key (binary ASN.1 data)";
     }
 }
 
 sub new_key_from_parameters {
-    my ( $proto, $n, $e, $d, $p, $q ) = @_;
-    return $proto->_new_key_from_parameters( map { $_ ? $_->pointer_copy() : 0 } $n, $e, $d, $p, $q );
+    my ( $proto, $n, $e, $d, $p, $q, %opts ) = @_;
+    my $rsa = $proto->_new_key_from_parameters( map { $_ ? $_->pointer_copy() : 0 } $n, $e, $d, $p, $q );
+    if ( $opts{check} && $rsa && $rsa->is_private() ) {
+        $rsa->check_key()
+            or croak("RSA key check failed: inconsistent key parameters");
+    }
+    return $rsa;
 }
 
 sub import_random_seed {
@@ -45,9 +91,22 @@ sub get_key_parameters {
     return map { $_ ? Crypt::OpenSSL::Bignum->bless_pointer($_) : undef } shift->_get_key_parameters();
 }
 
+*get_public_key_pkcs1_string = \&get_public_key_string;
+
+unless ( defined &use_sslv23_padding ) {
+    *use_sslv23_padding = sub {
+        croak(  "use_sslv23_padding is not available: "
+              . "SSLv23 padding was removed in OpenSSL 3.x. "
+              . "Use use_pkcs1_oaep_padding() for encryption "
+              . "or use_pkcs1_pss_padding() for signatures instead." );
+    };
+}
+
 1;
 
 __END__
+
+=for markdown [![testsuite](https://github.com/cpan-authors/Crypt-OpenSSL-RSA/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Crypt-OpenSSL-RSA/actions/workflows/testsuite.yml)
 
 =head1 NAME
 
@@ -82,10 +141,12 @@ Crypt::OpenSSL::RSA - RSA encoding and decoding, using the openSSL libraries
 
 =head1 SECURITY
 
-Version 0.35 makes the use of PKCS#1 v1.5 padding a fatal error.  It is
-very difficult to implement PKCS#1 v1.5 padding securely.  If you are still
-using RSA in in general, you should be looking at alternative encryption
-algorithms.
+Version 0.35 disabled PKCS#1 v1.5 padding entirely to mitigate the Marvin
+attack.  However, the Marvin attack only affects PKCS#1 v1.5 B<decryption>
+(padding oracle), not B<signatures>.  Version 0.38 re-enables
+C<use_pkcs1_padding()> for use with C<sign()> and C<verify()>, while keeping
+it disabled for C<encrypt()> and C<decrypt()>.  PKCS1_OAEP should be used
+for encryption and either PKCS1_PSS or PKCS1 can be used for signing.
 
 =head1 DESCRIPTION
 
@@ -105,28 +166,45 @@ this (never documented) behavior is no longer the case.
 =item new_public_key
 
 Create a new C<Crypt::OpenSSL::RSA> object by loading a public key in
-from a string containing Base64/DER-encoding of either the PKCS1 or
-X.509 representation of the key.  The string should include the
-C<-----BEGIN...-----> and C<-----END...-----> lines.
+from a string containing either PEM or DER encoding of the PKCS#1 or
+X.509 representation of the key.
+
+For PEM keys, the string should include the C<-----BEGIN...-----> and
+C<-----END...-----> lines.  Both C<BEGIN RSA PUBLIC KEY> (PKCS#1) and
+C<BEGIN PUBLIC KEY> (X.509/SubjectPublicKeyInfo) formats are supported.
+
+DER-encoded keys (raw binary ASN.1) are also accepted and the format
+(PKCS#1 vs X.509) is auto-detected.
 
 The padding is set to PKCS1_OAEP, but can be changed with the
 C<use_xxx_padding> methods.
 
+Note, PKCS1_OAEP can only be used for encryption.  Call
+C<use_pkcs1_pss_padding> or C<use_pkcs1_padding> prior to signing operations.
+
 =item new_private_key
 
 Create a new C<Crypt::OpenSSL::RSA> object by loading a private key in
-from an string containing the Base64/DER encoding of the PKCS1
-representation of the key.  The string should include the
-C<-----BEGIN...-----> and C<-----END...-----> lines.  The padding is set to
-PKCS1_OAEP, but can be changed with C<use_xxx_padding>.
+from a string containing either PEM or DER encoding of the key.
 
-An optional parameter can be passed for passphase protected private key:
+For PEM keys, the string should include the C<-----BEGIN...-----> and
+C<-----END...-----> lines.  The padding is set to PKCS1_OAEP, but can
+be changed with C<use_xxx_padding>.
+
+DER-encoded keys (raw binary ASN.1) are also accepted.
+
+An optional parameter can be passed for passphrase-protected private
+keys:
 
 =over
 
-=item passphase
+=item passphrase
 
-The passphase which protects the private key.
+The passphrase which protects the private key.  For PEM keys, this
+decrypts traditional encrypted PEM (C<DEK-Info> header) and encrypted
+PKCS#8 PEM (C<BEGIN ENCRYPTED PRIVATE KEY>).  For DER keys, this
+decrypts encrypted PKCS#8 DER (C<EncryptedPrivateKeyInfo> ASN.1
+structure).
 
 =back
 
@@ -147,6 +225,19 @@ Crypt::OpenSSL::RSA object using these values.  If p and q are
 provided and d is undef, d is computed.  Note that while p and q are
 not necessary for a private key, their presence will speed up
 computation.
+
+An optional C<check =E<gt> 1> parameter can be passed after the key
+components to validate the key immediately after construction:
+
+  my $rsa = Crypt::OpenSSL::RSA->new_key_from_parameters(
+      $n, $e, $d, $p, $q, check => 1
+  );
+
+When enabled, C<check_key()> is called on the resulting key.  If the
+key parameters are inconsistent (e.g. wrong CRT values, mismatched
+n/e/d/p/q), the constructor will croak instead of returning an object
+that fails at first use.  The check is only performed on private keys;
+public-only keys (n and e only) are returned without validation.
 
 =item import_random_seed
 
@@ -174,6 +265,13 @@ header and footer lines:
   -----BEGIN RSA PUBLIC KEY------
   -----END RSA PUBLIC KEY------
 
+=item get_public_key_pkcs1_string
+
+Alias for C<get_public_key_string>.  Returns the same PKCS#1
+C<RSAPublicKey> PEM format (C<BEGIN RSA PUBLIC KEY>).  Provided for
+naming symmetry with the import method C<new_public_key> (which
+auto-detects PKCS#1 vs X.509) and with C<get_public_key_x509_string>.
+
 =item get_public_key_x509_string
 
 Return the Base64/DER-encoded representation of the "subject
@@ -194,14 +292,14 @@ header and footer lines:
   -----BEGIN RSA PRIVATE KEY------
   -----END RSA PRIVATE KEY------
 
-2 optional parameters can be passed for passphase protected private key
+2 optional parameters can be passed for passphrase protected private key
 string:
 
 =over
 
-=item passphase
+=item passphrase
 
-The passphase which protects the private key.
+The passphrase which protects the private key.
 
 =item cipher name
 
@@ -209,6 +307,20 @@ The cipher algorithm used to protect the private key. Default to
 'des3'.
 
 =back
+
+=item get_private_key_pkcs8_string
+
+Return the Base64/DER-encoded PKCS#8 representation of the private
+key.  This string has header and footer lines:
+
+  -----BEGIN PRIVATE KEY-----
+  -----END PRIVATE KEY-----
+
+This is the format produced by C<openssl pkey -outform PEM>, and is
+the private-key counterpart of C<get_public_key_x509_string>.
+
+Accepts the same optional passphrase and cipher-name parameters as
+C<get_private_key_string>.
 
 =item encrypt
 
@@ -221,11 +333,14 @@ Decrypt a binary "string".  Croaks if the key is public only.
 =item private_encrypt
 
 Encrypt a binary "string" using the private key.  Croaks if the key is
-public only.
+public only.  On OpenSSL 3.x, only C<use_no_padding> and
+C<use_pkcs1_padding> are supported; OAEP and PSS will croak.
 
 =item public_decrypt
 
 Decrypt a binary "string" using the public (portion of the) key.
+On OpenSSL 3.x, only C<use_no_padding> and C<use_pkcs1_padding>
+are supported; OAEP and PSS will croak.
 
 =item sign
 
@@ -235,6 +350,20 @@ Sign a string using the secret (portion of the) key.
 
 Check the signature on a text.
 
+=back
+
+=head1 Padding Methods
+
+B<use_pkcs1_padding> can be used for signature operations (C<sign()> and
+C<verify()>).  PKCS#1 v1.5 encryption is disabled due to the Marvin attack.
+B<use_pkcs1_pss_padding> is the recommended replacement for signatures.
+B<use_pkcs1_oaep_padding> is used for encryption operations.
+
+On OpenSSL 3.x, the appropriate padding is set for each operation unless
+B<use_no_padding> or B<use_pkcs1_padding> is called before the operation.
+
+=over
+
 =item use_no_padding
 
 Use raw RSA encryption. This mode should only be used to implement
@@ -243,18 +372,22 @@ Encrypting user data directly with RSA is insecure.
 
 =item use_pkcs1_padding
 
-PKCS #1 v1.5 padding has been disabled as it is nearly impossible to use this
-padding method in a secure manner.  It is known to be vulnerable to timing
-based side channel attacks.  use_pkcs1_padding() results in a fatal error.
+Use C<PKCS #1 v1.5> padding for B<signature operations only>.  PKCS#1 v1.5
+signatures (RSASSA-PKCS1-v1.5) are secure and widely required by protocols
+such as JWT RS256, ACME (RFC 8555), and SAML.
 
-L<Marvin Attack|https://github.com/tomato42/marvin-toolkit/blob/master/README.md>
+B<Note>: PKCS#1 v1.5 B<encryption> is disabled because it is vulnerable to
+the L<Marvin Attack|https://github.com/tomato42/marvin-toolkit/blob/master/README.md>
+(a timing side-channel on decryption padding validation).  Calling
+C<encrypt()> or C<decrypt()> with this padding will croak.  Use
+C<use_pkcs1_oaep_padding()> for encryption.
 
 =item use_pkcs1_oaep_padding
 
 Use C<EME-OAEP> padding as defined in PKCS #1 v2.0 with SHA-1, MGF1 and
 an empty encoding parameter. This mode of padding is recommended for
 all new applications.  It is the default mode used by
-C<Crypt::OpenSSL::RSA>.
+C<Crypt::OpenSSL::RSA> but is only valid for encryption/decryption.
 
 =item use_pkcs1_pss_padding
 
@@ -271,7 +404,16 @@ fatal error.  Call C<use_pkcs1_oaep_padding> for encryption operations.
 Use C<PKCS #1 v1.5> padding with an SSL-specific modification that
 denotes that the server is SSL3 capable.
 
-Not available since OpenSSL 3.
+B<Not available on OpenSSL 3.x or later.>  Calling this method will
+croak with a descriptive error message suggesting alternatives.
+Use C<use_pkcs1_oaep_padding()> for encryption or
+C<use_pkcs1_pss_padding()> for signatures.
+
+=back
+
+=head1 Hash/Digest Methods
+
+=over
 
 =item use_md5_hash
 
@@ -341,13 +483,9 @@ C<Crypt::OpenSSL::Bignum> module must be installed for this to work.
 
 =item is_private
 
-Return true if this is a private key, and false if it is private only.
+Return true if this is a private key, and false if it is public only.
 
 =back
-
-=head1 BUGS
-
-There is a small memory leak when generating new keys of more than 512 bits.
 
 =head1 AUTHOR
 

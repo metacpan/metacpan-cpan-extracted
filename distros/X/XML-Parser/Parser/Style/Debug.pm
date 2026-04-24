@@ -2,6 +2,7 @@
 
 package XML::Parser::Style::Debug;
 use strict;
+use warnings;
 
 sub Start {
     my $expat = shift;

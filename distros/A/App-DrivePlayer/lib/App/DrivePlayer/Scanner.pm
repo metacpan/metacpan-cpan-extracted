@@ -1,9 +1,21 @@
 package App::DrivePlayer::Scanner;
 
 use App::DrivePlayer::Setup;
+use Encode qw( decode_utf8 is_utf8 );
 
 my $FOLDER_MIME  = 'application/vnd.google-apps.folder';
 my $DRIVE_FIELDS = 'files(id,name,mimeType,size,modifiedTime,parents,videoMediaMetadata)';
+
+# Google::RestApi returns HTTP bodies as raw UTF-8 byte strings (no utf8
+# flag). Passing those directly to DBIx::Class with sqlite_unicode=1 causes
+# double-encoding: each byte is re-encoded as if it were Latin-1. Decode
+# once at the boundary so the rest of the code sees proper Unicode.
+sub _u8 {
+    my ($s) = @_;
+    return $s unless defined $s && length $s && !is_utf8($s);
+    my $d = eval { decode_utf8($s, Encode::FB_CROAK) };
+    return $@ ? $s : $d;
+}
 
 Readonly my $LARGE_DELETION_THRESHOLD => 10;
 
@@ -117,6 +129,10 @@ sub _scan_dir {
         $self->_progress("Error scanning $path: $@");
         return;
     }
+
+    # Normalize Drive response bytes to decoded Unicode so SQLite doesn't
+    # re-encode them as Latin-1 → UTF-8 (double-encoding).
+    $_->{name} = _u8($_->{name}) for @items;
 
     my (@subfolders, @audio_files);
     for my $item (@items) {

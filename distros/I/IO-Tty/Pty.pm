@@ -10,7 +10,7 @@ use IO::File;
 require POSIX;
 
 our @ISA     = qw(IO::Handle);
-our $VERSION = '1.27';    # keep same as in Tty.pm
+our $VERSION = '1.29';    # keep same as in Tty.pm
 eval { local $^W = 0; local $SIG{__DIE__}; require IO::Stty };
 push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
@@ -24,12 +24,19 @@ sub new {
     croak "Cannot open a pty" if not defined $ptyfd;
 
     my $pty = $class->SUPER::new_from_fd( $ptyfd, "r+" );
-    croak "Cannot create a new $class from fd $ptyfd: $!" if not $pty;
+    if (not $pty) {
+        POSIX::close($ptyfd);
+        POSIX::close($ttyfd);
+        croak "Cannot create a new $class from fd $ptyfd: $!";
+    }
     $pty->autoflush(1);
     bless $pty => $class;
 
     my $slave = IO::Tty->new_from_fd( $ttyfd, "r+" );
-    croak "Cannot create a new IO::Tty from fd $ttyfd: $!" if not $slave;
+    if (not $slave) {
+        POSIX::close($ttyfd);
+        croak "Cannot create a new IO::Tty from fd $ttyfd: $!";
+    }
     $slave->autoflush(1);
 
     ${*$pty}{'io_pty_slave'}     = $slave;
@@ -71,7 +78,10 @@ sub slave {
     croak "Cannot open slave $tty: $!" if $slave_fd < 0;
 
     my $slave = IO::Tty->new_from_fd( $slave_fd, "r+" );
-    croak "Cannot create IO::Tty from fd $slave_fd: $!" if not $slave;
+    if (not $slave) {
+        POSIX::close($slave_fd);
+        croak "Cannot create IO::Tty from fd $slave_fd: $!";
+    }
     $slave->autoflush(1);
 
     ${*$slave}{'io_tty_ttyname'}    = $tty;
@@ -86,7 +96,7 @@ sub make_slave_controlling_terminal {
     my $self = shift;
     local (*DEVTTY);
 
-    # loose controlling terminal explicitly
+    # lose controlling terminal explicitly
     if ( defined TIOCNOTTY ) {
         if ( open( \*DEVTTY, "/dev/tty" ) ) {
             ioctl( \*DEVTTY, TIOCNOTTY, 0 );
@@ -96,19 +106,23 @@ sub make_slave_controlling_terminal {
 
     # Create a new 'session', lose controlling terminal.
     if ( POSIX::setsid() == -1 ) {
-        warn "setsid() failed, strange behavior may result: $!\r\n" if $^W;
+        warn "setsid() failed, strange behavior may result: $!\r\n";
     }
 
     if ( open( \*DEVTTY, "/dev/tty" ) ) {
-        warn "Could not disconnect from controlling terminal?!\n" if $^W;
+        warn "Could not disconnect from controlling terminal?!\n";
         close \*DEVTTY;
     }
 
     # now open slave, this should set it as controlling tty on some systems
-    my $ttyname = ${*$self}{'io_pty_ttyname'};
-    my $slv     = IO::Tty->new;
-    $slv->open( $ttyname, O_RDWR )
-      or croak "Cannot open slave $ttyname: $!";
+    # Use _open_tty() to ensure STREAMS modules (ptem, ldterm, ttcompat)
+    # are pushed on Solaris/HP-UX, matching the slave() method.
+    my $ttyname  = ${*$self}{'io_pty_ttyname'};
+    my $slave_fd = IO::Tty::_open_tty($ttyname);
+    croak "Cannot open slave $ttyname: $!" if $slave_fd < 0;
+    my $slv = IO::Tty->new_from_fd( $slave_fd, "r+" );
+    croak "Cannot create IO::Tty from fd $slave_fd: $!" if not $slv;
+    $slv->autoflush(1);
 
     if ( not exists ${*$self}{'io_pty_slave'} ) {
         ${*$self}{'io_pty_slave'} = $slv;
@@ -121,16 +135,16 @@ sub make_slave_controlling_terminal {
     if ( not open( \*DEVTTY, "/dev/tty" ) ) {
         if ( defined TIOCSCTTY ) {
             if ( not defined ioctl( ${*$self}{'io_pty_slave'}, TIOCSCTTY, 0 ) ) {
-                warn "warning: TIOCSCTTY failed, slave might not be set as controlling terminal: $!" if $^W;
+                warn "warning: TIOCSCTTY failed, slave might not be set as controlling terminal: $!";
             }
         }
         elsif ( defined TCSETCTTY ) {
             if ( not defined ioctl( ${*$self}{'io_pty_slave'}, TCSETCTTY, 0 ) ) {
-                warn "warning: TCSETCTTY failed, slave might not be set as controlling terminal: $!" if $^W;
+                warn "warning: TCSETCTTY failed, slave might not be set as controlling terminal: $!";
             }
         }
         else {
-            warn "warning: You have neither TIOCSCTTY nor TCSETCTTY on your system\n" if $^W;
+            warn "warning: You have neither TIOCSCTTY nor TCSETCTTY on your system\n";
             return 0;
         }
     }
@@ -170,7 +184,7 @@ IO::Pty - Pseudo TTY object class
 
 =head1 VERSION
 
-1.27
+1.29
 
 =head1 SYNOPSIS
 
@@ -193,8 +207,8 @@ IO::Pty - Pseudo TTY object class
 
 C<IO::Pty> provides an interface to allow the creation of a pseudo tty.
 
-C<IO::Pty> inherits from C<IO::Handle> and so provide all the methods
-defined by the C<IO::Handle> package.
+C<IO::Pty> inherits from L<IO::Handle> and so provide all the methods
+defined by the L<IO::Handle> package.
 
 Please note that pty creation is very system-dependent.  If you have
 problems, see L<IO::Tty> for help.
@@ -224,7 +238,7 @@ purpose only, to get a slave filehandle, use slave().
 =item slave()
 
 The C<slave> method will return the slave filehandle of the given
-master pty, opening it anew if necessary.  If IO::Stty is installed,
+master pty, opening it anew if necessary.  If L<IO::Stty> is installed,
 you can then call C<$slave-E<gt>stty()> to modify the terminal settings.
 
 =item close_slave()
@@ -245,7 +259,7 @@ to C<sync_exec()> (see L<Proc::SyncExec>).  See the C<try> script
 =item set_raw()
 
 Will set the pty to raw.  Note that this is a one-way operation, you
-need IO::Stty to set the terminal settings to anything else.
+need L<IO::Stty> to set the terminal settings to anything else.
 
 On some systems, the master pty is not a tty.  This method checks for
 that and returns success anyway on such systems.  Note that this
@@ -289,18 +303,8 @@ Sets the terminal size. If not specified, C<$xpixel> and C<$ypixel> are set to
 
 L<IO::Tty>, L<IO::Tty::Constant>, L<IO::Handle>, L<Expect>, L<Proc::SyncExec>
 
-
-=head1 MAILING LISTS
-
-As this module is mainly used by Expect, support for it is available
-via the two Expect mailing lists, expectperl-announce and
-expectperl-discuss, at
-
-  http://lists.sourceforge.net/lists/listinfo/expectperl-announce
-
-and
-
-  http://lists.sourceforge.net/lists/listinfo/expectperl-discuss
+Source code and issue tracker at
+L<https://github.com/cpan-authors/IO-Tty>.
 
 
 =head1 AUTHORS
@@ -308,10 +312,12 @@ and
 Originally by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>, based on the
 Ptty module by Nick Ing-Simmons E<lt>F<nik@tiuk.ti.com>E<gt>.
 
-Now maintained and heavily rewritten by Roland Giersig
+Heavily rewritten by Roland Giersig
 E<lt>F<RGiersig@cpan.org>E<gt>.
 
-Contains copyrighted stuff from openssh v3.0p1, authored by 
+Currently maintained by Todd Rinaldo.
+
+Contains copyrighted stuff from openssh v3.0p1, authored by
 Tatu Ylonen <ylo@cs.hut.fi>, Markus Friedl and Todd C. Miller
 <Todd.Miller@courtesan.com>.
 

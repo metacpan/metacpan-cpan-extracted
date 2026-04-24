@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.6.3
+## Version v0.6.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/20
+## Modified 2026/04/24
 ## All rights reserved
 ## 
 ## 
@@ -40,7 +40,7 @@ BEGIN
         'ne'     => '_string_not_equals_overload',
     );
 
-    our $VERSION = 'v0.6.3';
+    our $VERSION = 'v0.6.5';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -339,17 +339,38 @@ sub _new
 
     my $self = bless( {}, $class );
 
+    # If time_zone is a hash reference, resolve it to a TimeZone object now, before
+    # _resolve_time_zone() sees it. This allows callers to pass options such as
+    # extended set to true or latitude/longitude without constructing the
+    # DateTime::Lite::TimeZone object themselves first.
+    if( defined( $p{time_zone} ) && ref( $p{time_zone} ) eq 'HASH' )
+    {
+        $p{time_zone} = DateTime::Lite::TimeZone->new( %{ $p{time_zone} } ) ||
+            return( $class->pass_error( DateTime::Lite::TimeZone->error ) );
+    }
+
     $p{time_zone} = $class->_resolve_time_zone( $p{locale}, $p{time_zone} ) //
         $class->_default_time_zone;
 
     # _set_locale now returns the DateTime::Locale::FromCLDR object
     my $cldr = $self->_set_locale( $p{locale} ) || return( $class->pass_error );
 
-    $self->{tz} = ref( $p{time_zone} )
-        ? $p{time_zone}
-        : DateTime::Lite::TimeZone->new( name => $p{time_zone} );
-    return( $class->pass_error( DateTime::Lite::TimeZone->error ) )
-        unless( $self->{tz} );
+    # Validate that a ref is actually a DateTime::Lite::TimeZone object before
+    # using it. A plain string goes through TimeZone->new as usual.
+    if( defined( $p{time_zone} ) && ref( $p{time_zone} ) )
+    {
+        unless( Scalar::Util::blessed( $p{time_zone} ) &&
+                $p{time_zone}->isa( 'DateTime::Lite::TimeZone' ) )
+        {
+            return( $class->error( "time_zone option must be a DateTime::Lite::TimeZone object, got " . ref( $p{time_zone} ) ) );
+        }
+        $self->{tz} = $p{time_zone};
+    }
+    else
+    {
+        $self->{tz} = DateTime::Lite::TimeZone->new( name => $p{time_zone} ) ||
+            return( $class->pass_error( DateTime::Lite::TimeZone->error ) );
+    }
 
     $self->{local_rd_days}   = $class->_ymd2rd( @p{ qw( year month day ) } );
     $self->{local_rd_secs}   = $class->_time_as_seconds( @p{ qw( hour minute second ) } );
@@ -1281,22 +1302,43 @@ sub set_time_zone
 {
     my( $self, $tz ) = @_;
 
-    if( ref( $tz ) )
+    # If a hash reference is passed, resolve it to a DateTime::Lite::TimeZone object
+    # first, allowing options such as 'extended' set to true or latitude/longitude.
+    if( defined( $tz ) && ref( $tz ) eq 'HASH' )
+    {
+        $tz = DateTime::Lite::TimeZone->new( %$tz ) ||
+            return( $self->pass_error( DateTime::Lite::TimeZone->error ) );
+    }
+
+    if( Scalar::Util::blessed( $tz ) &&
+        $tz->isa( 'DateTime::Lite::TimeZone' ) )
     {
         return( $self ) if( $self->{tz} eq $tz );
     }
-    else
+    elsif( !ref( $tz ) )
     {
         return( $self ) if( $self->{tz}->name eq $tz );
+    }
+    else
+    {
+        return( $self->error( "time_zone must be a string, a hash reference, or a DateTime::Lite::TimeZone object, got " . ref( $tz ) ) );
     }
 
     my $was_floating = $self->{tz}->is_floating;
     my $old_tz       = $self->{tz};
-    $self->{tz}      = ref( $tz ) ? $tz : DateTime::Lite::TimeZone->new( name => $tz );
-    unless( $self->{tz} )
+    if( Scalar::Util::blessed( $tz ) &&
+        $tz->isa( 'DateTime::Lite::TimeZone' ) )
     {
-        $self->{tz} = $old_tz;
-        return( $self->pass_error( DateTime::Lite::TimeZone->error ) );
+        $self->{tz} = $tz;
+    }
+    else
+    {
+        $self->{tz} = DateTime::Lite::TimeZone->new( name => $tz );
+        unless( $self->{tz} )
+        {
+            $self->{tz} = $old_tz;
+            return( $self->pass_error( DateTime::Lite::TimeZone->error ) );
+        }
     }
 
     $self->_handle_offset_modifier( $self->second, 1 );
@@ -1396,11 +1438,13 @@ sub start_of
         'C' => sub{ int( $_[0]->year / 100 ) },
         'd' => sub{ sprintf( '%02d', $_[0]->day ) },
         'D' => sub{ $_[0]->strftime( '%m/%d/%y' ) },
+        'E' => sub{ $_[0]->day_abbr },
         'e' => sub{ sprintf( '%2d', $_[0]->day ) },
         'F' => sub{ $_[0]->ymd( '-' ) },
         'G' => sub{ $_[0]->week_year },
         'g' => sub{ sprintf( '%02d', $_[0]->week_year % 100 ) },
         'H' => sub{ sprintf( '%02d', $_[0]->hour ) },
+        'h' => sub{ $_[0]->month_abbr },
         'I' => sub{ sprintf( '%02d', $_[0]->hour_12 ) },
         'j' => sub{ sprintf( '%03d', $_[0]->day_of_year ) },
         'k' => sub{ sprintf( '%2d',  $_[0]->hour ) },
@@ -1408,7 +1452,8 @@ sub start_of
         'm' => sub{ sprintf( '%02d', $_[0]->month ) },
         'M' => sub{ sprintf( '%02d', $_[0]->minute ) },
         'n' => sub{ "\n" },
-        'N' => sub{ $_[0]->_format_nanosecs(9) },
+        'N' => sub{ $_[0]->_format_nanosecs( defined( $_[1] ) ? $_[1] : 9 ) },
+        'O' => sub{ $_[0]->time_zone->name },
         'p' => sub{ $_[0]->am_or_pm },
         'P' => sub{ lc( $_[0]->am_or_pm ) },
         'r' => sub{ $_[0]->strftime( '%I:%M:%S %p' ) },
@@ -1427,6 +1472,7 @@ sub start_of
         'y' => sub{ sprintf( '%02d', $_[0]->year % 100 ) },
         'Y' => sub{ sprintf( '%04d', $_[0]->year ) },
         'z' => sub{ DateTime::Lite::TimeZone->offset_as_string( $_[0]->offset ) },
+        ':z' => sub{ DateTime::Lite::TimeZone->offset_as_string( $_[0]->offset, ':' ) },
         'Z' => sub{ $_[0]->time_zone_short_name },
         '%' => sub{ '%' },
     );
@@ -1446,6 +1492,8 @@ sub start_of
                       %([%a-zA-Z])      # single character specifier like %d
                       |
                       %(\d+)N           # special case for %N
+                      |
+                      %(:z)             # extended specifier like %:z
                     )
                    /
                     ( $1
@@ -1454,6 +1502,8 @@ sub start_of
                       ? ( $strftime_patterns{$2} ? $strftime_patterns{$2}->($self) : "\%$2" )
                       : $3
                       ? $strftime_patterns{N}->($self, $3)
+                      : $4
+                      ? ( $strftime_patterns{$4} ? $strftime_patterns{$4}->($self) : "\%$4" )
                       : ''
                     )
                    /sgex;
@@ -3389,7 +3439,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.6.3
+    v0.6.5
 
 =head1 DESCRIPTION
 
@@ -3499,7 +3549,20 @@ Accepted parameters are:
 
 =item * C<time_zone>
 
-The time zone for the datetime. Accepts a zone name, such as C<Asia/Tokyo>), a fixed-offset string, such as C<+09:00>, a L<DateTime::Lite::TimeZone> object, C<UTC>, C<floating>, or C<local>.
+The time zone for the datetime. Accepts:
+
+=over 8
+
+=item * A zone name string, such as C<Asia/Tokyo>, a fixed-offset string such as C<+09:00>, C<UTC>, C<floating>, or C<local>.
+
+=item * A L<DateTime::Lite::TimeZone> object.
+
+=item * A hash reference whose keys are passed directly to L<DateTime::Lite::TimeZone/new>. This allows passing options that are not available on the string form, such as C<< extended => 1 >> (to resolve timezone abbreviations such as C<JST> or C<CET>), or C<latitude>/C<longitude> for coordinate-based resolution:
+
+    time_zone => { name => 'JST', extended => 1 }
+    time_zone => { latitude => 35.658558, longitude => 139.745504 }
+
+=back
 
 If omitted, and the C<locale> argument carries a BCP47 C<-u-tz-> extension, such as C<he-IL-u-ca-hebrew-tz-jeruslm>, the corresponding IANA canonical timezone is resolved automatically. If neither is provided, the default floating timezone is used (or C<$ENV{PERL_DATETIME_DEFAULT_TZ}> if set).
 
@@ -3956,7 +4019,302 @@ Returns C<86400>, the number of seconds in one day (excluding leap seconds).
 
 =head2 strftime( @patterns )
 
-POSIX-style formatting. Supports all standard C<%x> specifiers plus C<%{method_name}> and C<%NNN> for nanoseconds.
+POSIX-style formatting. Returns the datetime as a string formatted according to the given pattern(s). Supports all standard C<%x> specifiers, plus C<%{method_name}> for any C<DateTime::Lite> method call, and C<%NNN> for sub-second precision.
+
+All examples below use the following reference datetime, which falls on a Wednesday in British Summer Time (UTC+1):
+
+    my $dt = DateTime::Lite->new(
+        year       => 2026,
+        month      => 7,
+        day        => 15,
+        hour       => 14,
+        minute     => 30,
+        second     => 45,
+        nanosecond => 123456789,
+        time_zone  => 'Europe/London',
+        locale     => 'en-GB',
+    );
+    # Wednesday 15 July 2026, 14:30:45.123456789 BST (UTC+01:00)
+    # Reproduce with: $dt->strftime('%A %d %B %Y, %T.%N %Z (UTC%:z)');
+
+The following C<%x> tokens are supported:
+
+=over 4
+
+=item * C<%a>
+
+The abbreviated weekday name.
+
+    $dt->strftime('%a')  # "Wed"
+
+=item * C<%A>
+
+The full weekday name.
+
+    $dt->strftime('%A')  # "Wednesday"
+
+=item * C<%b>
+
+The abbreviated month name.
+
+    $dt->strftime('%b')  # "Jul"
+
+=item * C<%B>
+
+The full month name.
+
+    $dt->strftime('%B')  # "July"
+
+=item * C<%c>
+
+The default datetime format for the object's locale (C<%a %b %e %H:%M:%S %Y>).
+
+    $dt->strftime('%c')  # "Wed Jul 15 14:30:45 2026"
+
+=item * C<%C>
+
+The century number (year/100) as a 2-digit integer.
+
+    $dt->strftime('%C')  # "20"
+
+=item * C<%d>
+
+The day of the month as a decimal number (range 01 to 31).
+
+    $dt->strftime('%d')  # "15"
+
+=item * C<%D>
+
+Equivalent to C<%m/%d/%y>.
+
+    $dt->strftime('%D')  # "07/15/26"
+
+=item * C<%e>
+
+Like C<%d> but a leading zero is replaced by a space.
+
+    $dt->strftime('%e')  # "15"
+
+=item * C<%E>
+
+The abbreviated weekday name (alias for C<%a>).
+
+    $dt->strftime('%E')  # "Wed"
+
+=item * C<%F>
+
+Equivalent to C<%Y-%m-%d> (the ISO 8601 date format).
+
+    $dt->strftime('%F')  # "2026-07-15"
+
+=item * C<%G>
+
+The ISO 8601 year with century as a decimal number.
+
+    $dt->strftime('%G')  # "2026"
+
+=item * C<%g>
+
+Like C<%G>, but without century (2-digit year).
+
+    $dt->strftime('%g')  # "26"
+
+=item * C<%h>
+
+Equivalent to C<%b> (abbreviated month name).
+
+    $dt->strftime('%h')  # "Jul"
+
+=item * C<%H>
+
+The hour as a decimal number using a 24-hour clock (range 00 to 23).
+
+    $dt->strftime('%H')  # "14"
+
+=item * C<%I>
+
+The hour as a decimal number using a 12-hour clock (range 01 to 12).
+
+    $dt->strftime('%I')  # "02"
+
+=item * C<%j>
+
+The day of the year as a decimal number (range 001 to 366).
+
+    $dt->strftime('%j')  # "196"
+
+=item * C<%k>
+
+The hour (24-hour clock) as a decimal number (range 0 to 23); single digits preceded by a blank.
+
+    $dt->strftime('%k')  # "14"
+
+=item * C<%l>
+
+The hour (12-hour clock) as a decimal number (range 1 to 12); single digits preceded by a blank.
+
+    $dt->strftime('%l')  # " 2"
+
+=item * C<%m>
+
+The month as a decimal number (range 01 to 12).
+
+    $dt->strftime('%m')  # "07"
+
+=item * C<%M>
+
+The minute as a decimal number (range 00 to 59).
+
+    $dt->strftime('%M')  # "30"
+
+=item * C<%n>
+
+A newline character.
+
+    $dt->strftime('date%ntime')  # "date\ntime"
+
+=item * C<%N>
+
+The fractional seconds digits. Default is 9 digits (nanoseconds).
+
+    %3N   milliseconds (3 digits)
+    %6N   microseconds (6 digits)
+    %9N   nanoseconds  (9 digits)
+
+=item * C<%O>
+
+The IANA timezone name, such as C<Asia/Tokyo> or C<Europe/London>.
+
+    $dt->strftime('%O')  # "Europe/London"
+
+=item * C<%p>
+
+Either C<AM> or C<PM> according to the given time value.
+
+    $dt->strftime('%p')  # "PM"
+
+=item * C<%P>
+
+Like C<%p> but in lowercase: C<am> or C<pm>.
+
+    $dt->strftime('%P')  # "pm"
+
+=item * C<%r>
+
+The time in a.m. or p.m. notation (C<%I:%M:%S %p>).
+
+    $dt->strftime('%r')  # "02:30:45 PM"
+
+=item * C<%R>
+
+The time in 24-hour notation (C<%H:%M>).
+
+    $dt->strftime('%R')  # "14:30"
+
+=item * C<%s>
+
+The number of seconds since the epoch.
+
+    $dt->strftime('%s')  # "1784122245"
+
+=item * C<%S>
+
+The second as a decimal number (range 00 to 61).
+
+    $dt->strftime('%S')  # "45"
+
+=item * C<%t>
+
+A tab character.
+
+    $dt->strftime('date%ttime')  # "date\ttime"
+
+=item * C<%T>
+
+The time in 24-hour notation (C<%H:%M:%S>).
+
+    $dt->strftime('%T')  # "14:30:45"
+
+=item * C<%u>
+
+The day of the week as a decimal, range 1 to 7, Monday being 1.
+
+    $dt->strftime('%u')  # "3"  (Wednesday)
+
+=item * C<%U>
+
+The week number of the current year, starting with the first Sunday as the first day of week 01.
+
+    $dt->strftime('%U')  # "28"
+
+=item * C<%V>
+
+The ISO 8601:1988 week number of the current year.
+
+    $dt->strftime('%V')  # "29"
+
+=item * C<%w>
+
+The day of the week as a decimal, range 0 to 6, Sunday being 0.
+
+    $dt->strftime('%w')  # "3"  (Wednesday)
+
+=item * C<%W>
+
+The week number of the current year, starting with the first Monday as the first day of week 01.
+
+    $dt->strftime('%W')  # "28"
+
+=item * C<%x>
+
+The default date format for the object's locale.
+
+    $dt->strftime('%x')  # "07/15/26"
+
+=item * C<%X>
+
+The default time format for the object's locale.
+
+    $dt->strftime('%X')  # "14:30:45"
+
+=item * C<%y>
+
+The year as a decimal number without a century (range 00 to 99).
+
+    $dt->strftime('%y')  # "26"
+
+=item * C<%Y>
+
+The year as a decimal number including the century.
+
+    $dt->strftime('%Y')  # "2026"
+
+=item * C<%z>
+
+The time zone as hour offset from UTC (such as C<+0900>).
+
+    $dt->strftime('%z')  # "+0100"  (BST = UTC+1)
+
+=item * C<%Z>
+
+The short name for the time zone (such as C<JST> or C<EST>).
+
+    $dt->strftime('%Z')  # "BST"
+
+=item * C<%%>
+
+A literal C<%> character.
+
+    $dt->strftime('100%%')  # "100%"
+
+=item * C<%{method}>
+
+Any method name may be specified using the format C<%{method}> where I<method> is a valid C<DateTime::Lite> object method.
+
+    $dt->strftime('%{quarter}')      # "3"
+    $dt->strftime('%{day_of_year}')  # "196"
+
+=back
 
 =head2 format_cldr( @patterns )
 
@@ -4128,8 +4486,11 @@ Sets the formatter object used by L</stringify>. Must respond to C<format_dateti
 =head2 set_time_zone
 
     $dt->set_time_zone( 'Asia/Tokyo' );
+    $dt->set_time_zone( $tz_object );  # A DateTime::Lite::TimeZone object
+    $dt->set_time_zone( { name => 'JST', extended => 1 } );
+    $dt->set_time_zone( { latitude => 35.658558, longitude => 139.745504 } );
 
-Changes the time zone of the datetime in-place. Accepts a time zone name string, such as C<America/New_York>, or a L<DateTime::Lite::TimeZone> object. Returns C<$self>.
+Changes the time zone of the datetime in-place. Accepts a time zone name string such as C<America/New_York>, a L<DateTime::Lite::TimeZone> object, or a hash reference whose keys are passed directly to L<DateTime::Lite::TimeZone/new> (allowing options such as C<< extended => 1 >> or coordinate-based resolution). Returns C<$self>.
 
 =head2 end_of
 

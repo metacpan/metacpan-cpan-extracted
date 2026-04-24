@@ -1,3 +1,11 @@
+0.000032  2026-04-23 08:27:50-07:00 America/Los_Angeles
+
+    - Accidentally uploaded wrong 0.000031 tarball, re-releasing to fix
+
+0.000031  2026-04-23 08:25:32-07:00 America/Los_Angeles
+
+    - Fix a race in IPC::Manager::Service::Handle::await_response where a peer that responded and then exited could be reported as "peer ... went away" even though the response had already been delivered to the local inbox. await_response now does one final non-blocking poll and re-checks for the response after the peer-active probe reports the peer gone, so an in-transit reply still completes the request instead of croaking
+
 0.000030  2026-04-22 13:17:49-07:00 America/Los_Angeles
 
     - Fix a regression from 0.000028 that made every UnixSocket test fail on CPAN testers when TMPDIR produced a moderately long route. The route-length check in IPC::Manager::Client::UnixSocket croaked unconditionally as soon as the route left less than 42 bytes of budget, even for short peer ids that would have fit verbatim. The check is now deferred to IPC::Manager::Base::FS::on_disk_name and only fires when a peer id must be hashed to an on-disk name but the hashed form does not fit under the route. Short peer ids pass through unchanged

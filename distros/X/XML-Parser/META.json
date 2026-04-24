@@ -32,6 +32,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "LWP::UserAgent" : "0"
+         },
          "requires" : {
             "File::ShareDir" : "0",
             "perl" : "5.008"
@@ -44,15 +47,42 @@
          }
       }
    },
+   "provides" : {
+      "XML::Parser" : {
+         "file" : "Parser.pm",
+         "version" : "2.58"
+      },
+      "XML::Parser::Expat" : {
+         "file" : "Expat/Expat.pm",
+         "version" : "2.58"
+      },
+      "XML::Parser::Style::Debug" : {
+         "file" : "Parser/Style/Debug.pm"
+      },
+      "XML::Parser::Style::Objects" : {
+         "file" : "Parser/Style/Objects.pm"
+      },
+      "XML::Parser::Style::Stream" : {
+         "file" : "Parser/Style/Stream.pm"
+      },
+      "XML::Parser::Style::Subs" : {
+         "file" : "Parser/Style/Subs.pm"
+      },
+      "XML::Parser::Style::Tree" : {
+         "file" : "Parser/Style/Tree.pm"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/cpan-authors/XML-Parser/issues"
       },
       "repository" : {
-         "url" : "https://github.com/cpan-authors/XML-Parser"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/XML-Parser.git",
+         "web" : "https://github.com/cpan-authors/XML-Parser"
       }
    },
-   "version" : "2.57",
+   "version" : "2.58",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

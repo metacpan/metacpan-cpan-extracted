@@ -10,6 +10,36 @@ use VERSION;
 print fc("\x{17F}\n");    # s
 ########## no feature fc
 no feature 'fc';
+print CORE::fc("\x{17F}\n");    # s
 ---
 use VERSION;
 no feature 'fc';
+print CORE::fc("\x{17F}\n");    # s
+########## CORE::fc
+print CORE::fc("\x{17F}\n");    # s
+---
+use VERSION;
+print CORE::fc("\x{17F}\n");    # s
+--- v5.16
+use VERSION;
+print fc("\x{17F}\n");    # s
+########## CORE::fc in scope of no feature fc
+say CORE::fc("\x{17F}");
+{
+    no feature "fc";
+    say CORE::fc("\x{17F}");    # s
+}
+---
+use VERSION;
+say CORE::fc("\x{17F}");
+{
+    no feature "fc";
+    say CORE::fc("\x{17F}");    # s
+}
+--- v5.16
+use VERSION;
+say fc("\x{17F}");
+{
+    no feature "fc";
+    say CORE::fc("\x{17F}");    # s
+}

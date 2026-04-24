@@ -60,6 +60,30 @@ sub _auto_sync_to_sheet {
     return;
 }
 
+# Targeted single-row sync used after a single-track edit. Avoids the
+# full-library push_to_sheet (which rewrites every worksheet tab) by updating
+# only the one row on the relevant folder's worksheet.
+sub _auto_sync_track_to_sheet {
+    my ($self, $track_id) = @_;
+    return unless $self->config->sheet_id();
+    $self->_set_status('Syncing track to Sheet…');
+    Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+    my $sheet = $self->_sheet_db() or return;
+    my $ok    = eval { $sheet->push_track($self->db, $track_id) };
+    if ($@) {
+        if ($@ =~ /^SHEET_NOT_FOUND:/) {
+            $self->_clear_sheet_id();
+            $self->_set_status('Spreadsheet not found (deleted?); sheet ID cleared.');
+        } else {
+            $self->_set_status("Sheet sync failed: $@");
+        }
+        return;
+    }
+    $self->_set_status($ok ? 'Track synced to Sheet.'
+                           : 'Track sync skipped (folder not resolved).');
+    return;
+}
+
 sub _sync_with_sheet {
     my ($self) = @_;
     my $sheet = $self->_sheet_db() or return;

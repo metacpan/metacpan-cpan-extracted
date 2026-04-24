@@ -1,5 +1,9 @@
 Revision history for SVGPDF
 
+0.092.3 2025-04-23
+
+	- Add PDF::Builder version to diag.
+
 0.092.2 2025-04-20
 
 	- Bump PDF::Builder requirement to 3.027.

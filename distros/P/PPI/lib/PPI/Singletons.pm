@@ -5,7 +5,7 @@ package PPI::Singletons;
 use strict;
 use Exporter     ();
 
-our $VERSION = '1.284';
+our $VERSION = '1.285';
 
 our @ISA       = 'Exporter';
 our @EXPORT_OK = qw{ %_PARENT %_POSITION_CACHE %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS };
@@ -21,8 +21,10 @@ our %OPERATOR = map { $_ => 1 } (
 	< > <= >= lt gt le ge
 	== != <=> eq ne cmp ~~
 	& | ^ && || // .. ...
+	&. |. ^. ~.
 	? :
 	= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
+	&.= |.= ^.= ~.=
 	=> <> <<>>
 	and or xor not
 	}, ',' 	# Avoids "comma in qw{}" warning

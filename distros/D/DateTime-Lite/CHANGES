@@ -1,5 +1,77 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.6.5 2026-04-24T15:17:55+0900
+    [Bug Fixes]
+    - Added %O in the supported patterns tokens for strftime(). It returns now the
+      IANA timezone name via $dt->time_zone->name (such as Asia/Tokyo or Europe/London).
+      This makes %O usable symmetrically for both parsing and formatting in conjunction
+      with DateTime::Format::Lite.
+    - Added %E (abbreviated weekday name, alias for %a) and %h (abbreviated month
+      name, alias for %b) that were missing from the strftime supported patterns tokens.
+    - Corrected %{n}N patterns (such as %3N for milliseconds and %6N for microseconds)
+      that were returning 9 digits regardless of the specified precision.
+      The N entry in the strftime dispatch table was ignoring its second argument
+      (the digit count captured by the %(\d+)N regex branch).
+
+    [New Feature]
+    - Added %:z to strftime(), returning the UTC offset with a colon separator
+      (such as +01:00 or -05:00). This is a GNU extension also supported by Ruby and
+      Python, useful for producing W3C/RFC 3339 formatted timestamps. The strftime
+      regex has been extended to handle this multi-character specifier.
+
+    [Improvement]
+    - Improved the POD for DateTime::Lite with a detailed section on supported strftime
+      tokens.
+
+v0.6.4 2026-04-23T16:06:35+0900
+    [Maintenance]
+    - SQLite database updated with the newly released IANA data version 2026b.
+
+    [New Features]
+    - DateTime::Lite::TimeZone->new() now accepts an C<extended> boolean option.
+      When set to a true value and the supplied name is not recognised as a valid
+      IANA timezone name, new() calls resolve_abbreviation() with extended => 1
+      internally and, if a single unambiguous candidate is found, recurses with the
+      resolved canonical name. This allows timezone abbreviations such as JST, CET,
+      or EST to be passed directly to new() without requiring the caller to call 
+      resolve_abbreviation() explicitly. See synopsis for examples.
+    - DateTime::Lite->new() and set_time_zone() now accept a hash reference for the
+      time_zone parameter. The hash reference is passed directly to
+      DateTime::Lite::TimeZone->new(), allowing options such as extended => 1 or
+      coordinate-based resolution to be specified inline.
+
+    [Bug Fixes]
+    - DateTime::Lite->_new() now validates that a reference passed as time_zone
+      is a blessed DateTime::Lite::TimeZone object, returning a clear error
+      instead of silently misbehaving with an unexpected reference type.
+    - Fixed: offset_for_datetime() and offset_for_local_datetime() returned an
+      incorrect offset for timezones that abolished DST after having used it, such as
+      Asia/Tehran (DST abolished September 2022).
+      The POSIX footer string (<+0330>-3:30 for Tehran) was applied unconditionally
+      whenever a footer was present, overwriting historically correct bounded DST
+      spans with the post-abolition rule.
+      The footer is now only applied when the matched database span is open-ended
+      (utc_end IS NULL / local_end IS NULL), which means that the timestamp is beyond
+      all stored transitions.
+      For timestamps within stored transitions, the database span is returned as-is.
+      Also, both span lookup queries now use:
+      ORDER BY (utc_start IS NULL) ASC, utc_start DESC (resp. local_start)
+      to guarantee deterministic results when multiple spans satisfy the WHERE clause,
+      because without ORDER BY, LIMIT 1 is non-deterministic across SQLite versions.
+      The IS NULL expression is used instead of the NULLS LAST syntax, because it is
+      only available from SQLite 3.30.0 (2019-10-04) onward and would fail on older
+      installations.
+      Reported by Andrew Grechkin (@andrew-grechkin), GitLab issue #2.
+
+    [Thread Safety]
+    - DateTime::Lite::TimeZone: the package-level database handle cache ($DBH)
+      and prepared statement cache ($STHS) are now keyed by thread ID (or PID
+      when not running under threads). This prevents a DBD::SQLite error, such as
+      "handle 2 is owned by thread aaaae23f22a0 not current thread"
+      when multiple threads call timezone methods concurrently.
+      The thread ID is obtained via threads->tid() when $Config{useithreads} is true,
+      threads.pm is loaded, and threads->can('tid') is available; otherwise $$ is used.
+
 v0.6.3 2026-04-20T21:57:34+0900
     [Improvement]
     - In resolve_abbreviation(), reworked the default sort order for IANA
@@ -7,14 +79,14 @@ v0.6.3 2026-04-20T21:57:34+0900
       The previous order (ORDER BY MAX(tr.trans_time) DESC) produced counter-intuitive
       top results such as CEST -> Africa/Tripoli first.
     - The new ordering is a four-level key:
-        1. is_active DESC         (zones whose POSIX footer still references the
                                    abbreviation come first)
-        2. first_trans_time ASC   (earliest adopter of the abbreviation wins)
-        3. last_trans_time DESC   (tie-break by persistence)
-        4. zone_name ASC          (deterministic final tie-breaker)
       For CEST, this puts Europe/Berlin first. For PST, America/Los_Angeles.
       For JST, Asia/Tokyo. For WET, Atlantic/Faroe. The ordering now matches
       user intuition as closely as the data allows.
+        1. is_active DESC         (zones whose POSIX footer still references the
+        2. first_trans_time ASC   (earliest adopter of the abbreviation wins)
+        3. last_trans_time DESC   (tie-break by persistence)
+        4. zone_name ASC          (deterministic final tie-breaker)
     - Added two new fields to IANA results:
       - 'is_active': 1 if the zone's POSIX footer_tz_string still references the
         abbreviation; 0 otherwise. This is computed post-query via regex.

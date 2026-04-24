@@ -1328,11 +1328,11 @@ close $skill_nav_fh;
     is( $exit, 0, 'skill fixture repository initializes cleanly for CLI smoke coverage' ) or diag $stderr;
     chdir $cwd_before_skill_repo or die "Unable to chdir back to $cwd_before_skill_repo: $!";
 }
-my $skill_install = _run("PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' skills install 'file://$skill_repo'");
+my $skill_install = _run("PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' skills install -o json 'file://$skill_repo'");
 like( $skill_install, qr/"repo_name"\s*:\s*"demo-skill"/, 'dashboard skills install clones the skill into the isolated skills root' );
 my ( $skill_progress_stdout, $skill_progress_stderr, $skill_progress_exit ) = capture {
     local $ENV{DEVELOPER_DASHBOARD_PROGRESS} = 1;
-    system 'sh', '-c', "PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' skills install 'file://$skill_repo'";
+    system 'sh', '-c', "PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' skills install -o json 'file://$skill_repo'";
 };
 is( $skill_progress_exit >> 8, 0, 'dashboard skills install still succeeds when forced terminal progress output is enabled' );
 like( $skill_progress_stdout, qr/"repo_name"\s*:\s*"demo-skill"/, 'dashboard skills install keeps the machine-readable install payload on stdout while progress is enabled' );
@@ -1356,14 +1356,98 @@ ok(
     -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'left-pad' ),
     'dashboard skills install merges staged Node dependencies into HOME/node_modules',
 );
-my ( $skill_install_usage_stdout, $skill_install_usage_stderr, $skill_install_usage_exit ) = capture {
+my $home_root_ddfile = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'ddfile' );
+open my $home_root_ddfile_fh, '<', $home_root_ddfile or die "Unable to read $home_root_ddfile: $!";
+my @registered_skill_sources = grep { defined && $_ ne '' && $_ !~ /\A#/ } map { chomp; $_ } <$home_root_ddfile_fh>;
+close $home_root_ddfile_fh;
+is_deeply(
+    \@registered_skill_sources,
+    ["file://$skill_repo"],
+    'dashboard skills install records one non-duplicated source in the home root ddfile after repeated explicit installs',
+);
+my $second_skill_repo = File::Spec->catdir( $ENV{HOME}, 'demo-skill-two-repo' );
+make_path($second_skill_repo);
+{
+    my $cwd_before_second_skill_repo = getcwd();
+    chdir $second_skill_repo or die "Unable to chdir to $second_skill_repo: $!";
+    make_path('cli');
+    make_path('config');
+    open my $second_skill_env_fh, '>', '.env' or die "Unable to write .env for $second_skill_repo: $!";
+    print {$second_skill_env_fh} "VERSION=1.00\n";
+    close $second_skill_env_fh;
+    open my $second_skill_cli_fh, '>', File::Spec->catfile( 'cli', 'hello' ) or die "Unable to write cli/hello for $second_skill_repo: $!";
+    print {$second_skill_cli_fh} "#!/usr/bin/env perl\nuse strict;\nuse warnings;\nprint qq{demo-skill-two\\n};\n";
+    close $second_skill_cli_fh;
+    chmod 0755, File::Spec->catfile( 'cli', 'hello' ) or die "Unable to chmod cli/hello for $second_skill_repo: $!";
+    open my $second_skill_config_fh, '>', File::Spec->catfile( 'config', 'config.json' ) or die "Unable to write config/config.json for $second_skill_repo: $!";
+    print {$second_skill_config_fh} "{}\n";
+    close $second_skill_config_fh;
+    my ( $second_repo_stdout, $second_repo_stderr, $second_repo_exit ) = capture {
+        system 'git', 'init';
+        system 'git', 'config', 'user.email', 'test@example.com' if $? == 0;
+        system 'git', 'config', 'user.name', 'Test' if $? == 0;
+        system 'git', 'add', '.' if $? == 0;
+        system 'git', 'commit', '-m', 'Initial second demo skill' if $? == 0;
+    };
+    is( $second_repo_exit >> 8, 0, 'second skill fixture repository initializes cleanly for multi-install smoke coverage' )
+      or diag $second_repo_stdout . $second_repo_stderr;
+    chdir $cwd_before_second_skill_repo or die "Unable to chdir back to $cwd_before_second_skill_repo: $!";
+}
+my $multi_skill_install = _run("$perl -I'$lib' '$dashboard' skills install -o json 'file://$skill_repo' 'file://$second_skill_repo'");
+like( $multi_skill_install, qr/"sources"\s*:\s*\[/, 'dashboard skills install accepts more than one explicit source in one command' );
+like( $multi_skill_install, qr/"repo_name"\s*:\s*"demo-skill-two-repo"/, 'dashboard skills install reports the later source result in a multi-source install' );
+open my $multi_root_ddfile_fh, '<', $home_root_ddfile or die "Unable to read $home_root_ddfile after multi-source install: $!";
+my @multi_registered_skill_sources = grep { defined && $_ ne '' && $_ !~ /\A#/ } map { chomp; $_ } <$multi_root_ddfile_fh>;
+close $multi_root_ddfile_fh;
+is_deeply(
+    \@multi_registered_skill_sources,
+    [ "file://$skill_repo", "file://$second_skill_repo" ],
+    'dashboard skills install records every multi-source argument once in the home root ddfile',
+);
+my $singular_skill_list = _run("$perl -I'$lib' '$dashboard' skill list -o json");
+like( $singular_skill_list, qr/"name"\s*:\s*"demo-skill-two-repo"/, 'dashboard skill singular alias reaches the skills management command family' );
+{
+    my $cwd_before_version_bump = getcwd();
+    chdir $second_skill_repo or die "Unable to chdir to $second_skill_repo: $!";
+    open my $bumped_env_fh, '>', '.env' or die "Unable to rewrite .env for $second_skill_repo: $!";
+    print {$bumped_env_fh} "VERSION=1.01\n";
+    close $bumped_env_fh;
+    my ( $bump_stdout, $bump_stderr, $bump_exit ) = capture {
+        system 'git', 'add', '.env';
+        system 'git', 'commit', '-m', 'Bump demo skill version' if $? == 0;
+    };
+    is( $bump_exit >> 8, 0, 'second demo skill fixture commits a newer .env VERSION for update-all summary coverage' )
+      or diag $bump_stdout . $bump_stderr;
+    chdir $cwd_before_version_bump or die "Unable to chdir back to $cwd_before_version_bump: $!";
+}
+my ( $skill_install_registered_stdout, $skill_install_registered_stderr, $skill_install_registered_exit ) = capture {
+    local $ENV{DEVELOPER_DASHBOARD_PROGRESS} = 1;
     system( $perl, '-I', $lib, $dashboard, 'skills', 'install' );
 };
-is( $skill_install_usage_exit >> 8, 2, 'dashboard skills install exits with usage when neither a source nor --ddfile is supplied' );
+is( $skill_install_registered_exit >> 8, 0, 'bare dashboard skills install exits successfully when the home root ddfile has registered sources' );
+like( $skill_install_registered_stderr, qr/dashboard skills install progress/, 'bare dashboard skills install prints a source-level progress rundown before replaying the home root ddfile' );
+like( $skill_install_registered_stderr, qr/Install\/update file:\/\/\Q$skill_repo\E/, 'bare dashboard skills install progress names each registered source before work starts' );
 like(
-    $skill_install_usage_stderr,
-    qr/Usage: dashboard skills install <git-url-or-local-dir>.*Usage: dashboard skills install --ddfile/s,
-    'dashboard skills install requires an explicit source unless --ddfile is used',
+    $skill_install_registered_stdout,
+    qr/Skill\s+Source\s+Before\s+After\s+Status/,
+    'bare dashboard skills install prints a table summary by default',
+);
+like(
+    $skill_install_registered_stdout,
+    qr/demo-skill-two-repo\s+file:\/\/\Q$second_skill_repo\E\s+1\.00\s+1\.01\s+updated/,
+    'bare dashboard skills install table reports updated skills with before and after .env versions',
+);
+my ( $skill_install_no_update_stdout, $skill_install_no_update_stderr, $skill_install_no_update_exit ) = capture {
+    local $ENV{DEVELOPER_DASHBOARD_PROGRESS} = 1;
+    system( $perl, '-I', $lib, $dashboard, 'skills', 'install' );
+};
+is( $skill_install_no_update_exit >> 8, 0, 'bare dashboard skills install exits successfully when no registered skill version changes' );
+like( $skill_install_no_update_stderr, qr/dashboard skills install progress/, 'bare dashboard skills install still prints progress for no-change update-all runs' );
+like( $skill_install_no_update_stdout, qr/No update\./, 'bare dashboard skills install states no update when every .env VERSION is unchanged' );
+like(
+    $skill_install_no_update_stdout,
+    qr/demo-skill-two-repo\s+file:\/\/\Q$second_skill_repo\E\s+1\.01\s+1\.01\s+no update/,
+    'bare dashboard skills install table reports unchanged before and after .env versions',
 );
 
 my $manifest_global_skill_repo = File::Spec->catdir( $ENV{HOME}, 'manifest-global-skill-fixture' );
@@ -1446,7 +1530,7 @@ close $manifest_local_ddfile_fh;
 {
     my $cwd_before_manifest_install_root = getcwd();
     chdir $manifest_install_root or die "Unable to chdir to $manifest_install_root: $!";
-    my $manifest_install = _run("$perl -I'$lib' '$dashboard' skills install --ddfile");
+    my $manifest_install = _run("$perl -I'$lib' '$dashboard' skills install --ddfile -o json");
     like( $manifest_install, qr/"success"\s*:\s*1/, 'dashboard skills install --ddfile succeeds when manifest files are present' );
     ok( -d File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'skills', 'manifest-global-skill-fixture' ), 'dashboard skills install --ddfile installs ddfile entries into the home DD-OOP-LAYER skills root' );
     ok( -d File::Spec->catdir( $manifest_install_root, 'skills', 'manifest-local-skill-fixture' ), 'dashboard skills install --ddfile installs ddfile.local entries into the current skill-local skills root' );

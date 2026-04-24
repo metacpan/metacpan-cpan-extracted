@@ -2,10 +2,6 @@
 
 Plack::Middleware::BlockHeaderInjection - block header injections in responses
 
-# VERSION
-
-version v1.1.1
-
 # SYNOPSIS
 
 ```perl
@@ -22,9 +18,9 @@ $app = builder {
 
 # DESCRIPTION
 
-This middleware will check responses for injected headers. If the
-headers contain newlines, then the return code is set to `500` and
-the offending header(s) are removed.
+This middleware will check response headers for control characters (codes 0 through 31) (which also includes newlines that can be used for header injections).
+These  are not allowed according to the [PSGI specification](https://metacpan.org/pod/PSGI#Headers).
+If they are found, then it will the return code is set to `500` and the offending header(s) are removed.
 
 A common source of header injections is when parameters are passed
 unchecked into a header (such as the redirection location).
@@ -32,30 +28,59 @@ unchecked into a header (such as the redirection location).
 An attacker can use injected headers to bypass system security, by
 forging a header used for security (such as a referrer or cookie).
 
-# ATTRIBUTES
+# RECENT CHANGES
 
-## &lt;status
+Changes for version v1.3.0 (2026-04-24)
 
-The status code to return if an invalid header is found. By default,
-this is `500`.
+- Enhancements
+    - Added a clean option to replace newlines with whitespace.
 
-# SUPPORT FOR OLDER PERL VERSIONS
+See the `Changes` file for more details.
 
-Since v1.1.0, this module requires Perl v5.12 or later.
+# REQUIREMENTS
 
-Future releases may only support Perl versions released in the last ten years.
+This module lists the following modules as runtime dependencies:
 
-If you need this module on Perl v5.8, please use one of the v1.0.x versions of this module.  Signficant bug or security
-fixes may be backported to those versions.
+- [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware)
+- [experimental](https://metacpan.org/pod/experimental)
+- [parent](https://metacpan.org/pod/parent)
+- [perl](https://metacpan.org/pod/perl) version v5.24.0 or later
+- [warnings](https://metacpan.org/pod/warnings)
 
-# SEE ALSO
+See the `cpanfile` file for the full list of prerequisites.
 
-[https://en.wikipedia.org/wiki/HTTP\_header\_injection](https://en.wikipedia.org/wiki/HTTP_header_injection)
+# INSTALLATION
 
-# SOURCE
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
-The development version is on github at [https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection](https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection)
-and may be cloned from [git://github.com/robrwo/Plack-Middleware-BlockHeaderInjection.git](git://github.com/robrwo/Plack-Middleware-BlockHeaderInjection.git)
+```
+cpan Plack::Middleware::BlockHeaderInjection
+```
+
+You can also extract the distribution archive and install this module (along with any dependencies):
+
+```
+cpan .
+```
+
+You can also install this module manually using the following commands:
+
+```
+perl Makefile.PL
+make
+make test
+make install
+```
+
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
+
+```
+dzil build
+dzil test
+dzil install --install-command="cpan ."
+```
+
+For more information, see the `INSTALL` file included with this distribution.
 
 # BUGS
 
@@ -66,19 +91,32 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection](https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection)
+and may be cloned from [https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection.git](https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection.git)
+
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was supported by
 Foxtons, Ltd [https://www.foxtons.co.uk](https://www.foxtons.co.uk).
 
+# CONTRIBUTOR
+
+Graham Knop <haarg@haarg.org>
+
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2020,2023 by Robert Rothenberg.
+This software is Copyright (c) 2014-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# SEE ALSO
+
+[https://en.wikipedia.org/wiki/HTTP\_header\_injection](https://en.wikipedia.org/wiki/HTTP_header_injection)

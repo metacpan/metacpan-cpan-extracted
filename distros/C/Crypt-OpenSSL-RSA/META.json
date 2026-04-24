@@ -4,7 +4,7 @@
       "Ian Robertson <iroberts@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -22,25 +22,31 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Crypt::OpenSSL::Guess" : "0.11",
-            "ExtUtils::MakeMaker" : "0"
+            "Crypt::OpenSSL::Guess" : "0.11"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Crypt::OpenSSL::Bignum" : "0"
-         },
          "requires" : {
+            "Crypt::OpenSSL::Bignum" : "0",
             "Crypt::OpenSSL::Random" : "0",
-            "Test::More" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::OpenSSL::RSA" : {
+         "file" : "RSA.pm",
+         "version" : "0.41"
       }
    },
    "release_status" : "stable",
@@ -48,14 +54,16 @@
       "bugtracker" : {
          "web" : "https://github.com/cpan-authors/Crypt-OpenSSL-RSA/issues"
       },
-      "homepage" : "http://github.com/cpan-authors/Crypt-OpenSSL-RSA",
+      "homepage" : "https://github.com/cpan-authors/Crypt-OpenSSL-RSA",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/cpan-authors/Crypt-OpenSSL-RSA"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/Crypt-OpenSSL-RSA.git",
+         "web" : "https://github.com/cpan-authors/Crypt-OpenSSL-RSA"
       }
    },
-   "version" : "0.37",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

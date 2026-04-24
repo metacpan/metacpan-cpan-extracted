@@ -3,7 +3,7 @@ package CPAN::Maker;
 use strict;
 use warnings;
 
-our $VERSION = '1.7.5';
+our $VERSION = '1.8.0';
 
 1;
 
@@ -130,7 +130,7 @@ output or problems with the final distribution.
 
 =head1 VERSION
 
-This documentation refers to version 1.7.5
+This documentation refers to version 1.8.0
 
 =head1 USING THE BASH SCRIPT
 
@@ -327,7 +327,7 @@ main module being packaged.
 
 Example:
 
-  version: 1.7.5
+  version: 1.8.0
   project:
     git: https://github.com/rlauer6/perl-Amazon-Credentials
     description: "AWS credentials discoverer"
@@ -354,6 +354,7 @@ Example:
       - file
   provides: provides
   postamble: postamble
+  man-links:
   resources:
     homepage: 'http://github.com/rlauer6/perl-Amazon-API'
     bugtracker:
@@ -438,6 +439,20 @@ F<Makefile.PL>. Typically, this will look something like:
 
  install::
         # do something
+
+=item man-links
+
+Create symbolic links for executables to module man pages. Typically
+used to create symlinks to modulinos. For example if C<Foo::Bar> is
+implemented as a modulino and C<foo-bar> is the wrapper script, then
+adding:
+
+  man-links:
+    - foo-bar: Foo::Bar
+
+...would allow C<man foo-bar> to bring up the man page for C<Foo::Bar>.
+The target module must contain POD - if no POD is found the link is
+silently skipped.
 
 =item include-version
 

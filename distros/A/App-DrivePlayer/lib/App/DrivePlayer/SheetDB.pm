@@ -100,6 +100,45 @@ sub push_to_sheet {
     return { scan_folders => scalar @scan_folders, tracks => $total_tracks };
 }
 
+# Update a single track's row on its scan-folder worksheet.
+#
+# Two API calls, end of:
+#   1. values.get on column A (drive_id) — to find the row number.
+#   2. values.update on that one row — with the DB values.
+#
+# No sheet read beyond the drive_id column, no merge, no header-rewriting,
+# no ensure-worksheet dance.  Caller is responsible for making sure the
+# worksheet already exists (it does for any track that's been scanned).
+# Returns 1 on success, 0 if the track or scan-folder can't be resolved
+# or the drive_id isn't already on the sheet.
+sub push_track {
+    my ($self, $db, $track_id) = @_;
+    my $track = $db->get_track($track_id)             or return 0;
+    my $sf    = $db->scan_folder_for_track($track_id) or return 0;
+    my $tab   = _ws_name($sf->{name});
+    my $ss    = $self->_open();
+
+    my $ws = eval { $ss->open_worksheet(name => $tab) } or return 0;
+
+    # 1 API call: values.get on column A.  Flat arrayref starting with
+    # the "drive_id" header at [0]; data drive_ids at [1..].
+    my $ids = $ws->col(1) || [];
+    my $row_num;
+    for my $i (1 .. $#$ids) {
+        next unless ($ids->[$i] // '') eq ($track->{drive_id} // '');
+        $row_num = $i + 1;   # array index -> 1-based sheet row
+        last;
+    }
+    return 0 unless $row_num;   # not on sheet — fall through to a full sync
+
+    my $cols   = $SHEET_PROPERTIES{tracks}{cols};
+    my @values = map { $track->{$_} // '' } @$cols;
+
+    # 1 API call: values.update on the single row range.
+    $ws->row($row_num, \@values);
+    return 1;
+}
+
 # Return drive_ids from both lists in order (local first), with no duplicates.
 sub _union_ids {
     my ($local, $sheet) = @_;

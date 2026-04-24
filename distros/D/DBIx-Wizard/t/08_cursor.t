@@ -13,13 +13,13 @@ dbiw('testdb:users')->insert({ name => 'Charlie', email => 'charlie@example.com'
 
 # cursor returns Cursor object
 {
-  my $cursor = dbiw('testdb:users')->inflate(0)->sort('name')->cursor;
+  my $cursor = dbiw('testdb:users')->inflate(0)->order_by('name')->cursor;
   isa_ok $cursor, 'DBIx::Wizard::Cursor';
 }
 
 # cursor iterates rows
 {
-  my $cursor = dbiw('testdb:users')->inflate(0)->sort('name')->cursor;
+  my $cursor = dbiw('testdb:users')->inflate(0)->order_by('name')->cursor;
   my @names;
   while (my $row = $cursor->next) {
     push @names, $row->{name};
@@ -29,7 +29,7 @@ dbiw('testdb:users')->insert({ name => 'Charlie', email => 'charlie@example.com'
 
 # cursor with columns
 {
-  my $cursor = dbiw('testdb:users')->inflate(0)->sort('name')->cursor(['name']);
+  my $cursor = dbiw('testdb:users')->inflate(0)->order_by('name')->cursor(['name']);
   my $row = $cursor->next;
   ok exists $row->{name}, 'cursor with columns';
 }

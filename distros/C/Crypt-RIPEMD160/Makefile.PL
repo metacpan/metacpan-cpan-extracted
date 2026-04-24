@@ -21,7 +21,11 @@ WriteMakefile(
     ($ExtUtils::MakeMaker::VERSION >= 6.64 ? (TEST_REQUIRES => {
         'Test::More' => 0,
     }) : ()),
-    'dist'                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    'dist'                => {
+        COMPRESS => 'gzip -9f',
+        SUFFIX   => 'gz',
+        ($^O eq 'darwin' ? (TAR => 'gtar') : ()),
+    },
     'clean'               => { FILES => 'Crypt-RIPEMD160-*' },
 
     'OBJECT'       => q[RIPEMD160$(OBJ_EXT) rmd160$(OBJ_EXT) wrap_160$(OBJ_EXT)],

@@ -32,20 +32,19 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime" : "1.54",
-            "DateTime::TimeZone" : "2.52",
+            "DateTime::Lite" : "v0.6.4",
             "parent" : "0",
             "perl" : "5.014000",
-            "strict" : "0.238",
+            "strict" : "0",
             "utf8" : "0",
-            "warnings" : "1.44"
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.302182",
-            "Test::Pod" : "1.52",
-            "open" : "1.11",
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.45",
+            "open" : "1.08",
             "utf8" : "0"
          }
       }
@@ -60,6 +59,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Format-JP"
       }
    },
-   "version" : "v0.1.6",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v0.1.7",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

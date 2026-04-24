@@ -41,7 +41,7 @@ $test++;
 opendir( my $dh, "regtest" ) || BAIL_OUT("Cannot open test data");
 my @files = grep { /^.+\.svg$/ } readdir($dh);
 close($dh);
-diag("Testing ", scalar(@files), " SVG files with $api");
+diag("Testing ", scalar(@files), " SVG files with $api ".$api->VERSION);
 
 foreach my $file ( sort @files ) {
     $file = "regtest/$file";

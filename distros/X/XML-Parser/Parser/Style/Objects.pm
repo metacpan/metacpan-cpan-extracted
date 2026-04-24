@@ -2,6 +2,7 @@
 
 package XML::Parser::Style::Objects;
 use strict;
+use warnings;
 
 sub Init {
     my $expat = shift;

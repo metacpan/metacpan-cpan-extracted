@@ -2,6 +2,7 @@
 
 package XML::Parser::Style::Subs;
 use strict;
+use warnings;
 
 sub Start {
     no strict 'refs';

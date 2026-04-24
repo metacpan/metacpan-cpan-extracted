@@ -10,7 +10,7 @@ require POSIX;
 # pack_winsize / unpack_winsize are XS functions, always available
 # set_winsize / get_winsize require the slave to be a tty
 
-plan tests => 10;
+plan tests => 14;
 
 # Test pack_winsize / unpack_winsize round-trip
 {
@@ -34,17 +34,35 @@ plan tests => 10;
     is( $dims[1], 132, "col=132 round-trips" );
 }
 
+# Test unpack_winsize rejects wrong-sized input
+{
+    eval { IO::Tty::unpack_winsize("too short") };
+    like( $@, qr/Bad arg length/, "unpack_winsize croaks on wrong-sized input" );
+
+    eval { IO::Tty::unpack_winsize("") };
+    like( $@, qr/Bad arg length/, "unpack_winsize croaks on empty input" );
+}
+
+# Test pack_winsize with default pixel values (xpixel/ypixel default to 0)
+{
+    my $packed_explicit = IO::Tty::pack_winsize( 24, 80, 0, 0 );
+    my $packed_default  = IO::Tty::pack_winsize( 24, 80 );
+    is( $packed_explicit, $packed_default,
+        "pack_winsize defaults xpixel/ypixel to 0" );
+}
+
 # Test set_winsize / get_winsize on slave
 {
     my $pty = IO::Pty->new;
     my $slave = $pty->slave;
 
     SKIP: {
-        skip "slave is not a tty on this system", 1
+        skip "slave is not a tty on this system", 2
             unless POSIX::isatty($slave);
 
         $slave->set_winsize( 40, 100, 0, 0 );
         my @ws = $slave->get_winsize();
-        is( $ws[0], 40, "set_winsize/get_winsize round-trip on slave" );
+        is( $ws[0], 40,  "set_winsize/get_winsize row round-trip on slave" );
+        is( $ws[1], 100, "set_winsize/get_winsize col round-trip on slave" );
     }
 }

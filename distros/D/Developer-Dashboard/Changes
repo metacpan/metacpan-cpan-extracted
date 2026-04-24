@@ -1,3 +1,58 @@
+3.09  2026-04-23
+
+    - changed `dashboard skills install` to default to table output and require
+      `-o json` for raw machine-readable payloads
+    - changed bare `dashboard skills install` update-all runs to print a
+      source-level progress rundown before work starts and a final table with
+      each skill's `.env` `VERSION` before and after the install
+    - removed the public `dashboard skills update` verb from CLI completion and
+      documentation so registered updates go through bare `dashboard skills
+      install`
+    - added smoke, manager, completion, metadata, and integration-plan coverage
+      for table summaries, JSON opt-in, no-update reporting, and version
+      transitions
+
+3.08  2026-04-23
+
+    - changed `dashboard skills install` to accept multiple explicit skill
+      sources in one command and install them in the order supplied
+    - changed explicit skill installs to append `skills/<repo-name>/` to an
+      existing home runtime `.gitignore` or compatibility `.gitiignore` without
+      duplicating entries
+    - added `dashboard skill` as a singular alias for the `dashboard skills`
+      management command family without restoring the old singular skill
+      command dispatcher
+    - added manager, CLI, smoke, completion, and skill-system regression
+      coverage for multi-source installs and the singular alias
+
+3.07  2026-04-23
+
+    - changed explicit `dashboard skills install <source>` runs to register
+      the exact source in the home root `~/.developer-dashboard/ddfile`
+      without duplicating existing entries
+    - changed bare `dashboard skills install` into an update-all command that
+      consumes the home root `ddfile` and reinstalls every listed skill
+    - added focused manager and CLI regression coverage for root ddfile
+      registration, duplicate prevention, empty-registry errors, and bare
+      update-all installs
+
+3.06  2026-04-23
+
+    - fixed dashboard stop/restart process control on Alpine/iSH-style Perl
+      builds by sending numeric POSIX signals instead of relying on named
+      signal strings such as TERM and KILL
+    - extended the runtime manager regression suite to lock the portable signal
+      mapping and invalid-pid handling before shutdown code reaches Perl kill
+    - fixed the blank tarball install gate when Node is present by making the
+      source-tree fast-check wrapper skip packaged trees that do not ship the
+      checkout-only JavaScript manifests
+
+3.05  2026-04-23
+    - fixed Alpine streamed installs after the old-system-Perl rescue path so
+      installer-owned `cpanm` calls disable BusyBox `wget` with `--no-wget`
+      and use the already-installed `curl` path instead of failing on
+      `wget: unrecognized option: retry-connrefused`
+
 3.04  2026-04-22
     - fixed streamed `install.sh` shell handoff so non-interactive
       `curl ... | sh` runs no longer probe `/dev/tty` and emit noisy
@@ -171,7 +226,7 @@
 2.83  2026-04-21
     - added a repo-root `install.sh` bootstrap path for blank Debian, Ubuntu,
       and macOS machines, driven by shipped `aptfile` and `brewfile`
-      manifests, user-space `~/perl5` local::lib setup, `cpanm --notest
+      manifests, user-space `~/perl5` local::lib setup, `cpanm --no-wget --notest
       Developer::Dashboard`, and an automatic `dashboard init`
     - extended the bootstrap installer so Debian-family hosts install the
       native header and zlib toolchain required by `XML::Parser` and
@@ -1223,7 +1278,7 @@ Revision history for Developer Dashboard
     - tightened the release metadata coverage so the source tree now guards
       the clean-tarball rule directly before `dzil build`
     - kept the Windows Strawberry Perl path-resolution fix, the
-      Dockur/QEMU host-staged MSI flow, the Windows guest `cpanm --notest`
+      Dockur/QEMU host-staged MSI flow, the Windows guest `cpanm --no-wget --notest`
       dependency policy, and the hardened SSL live-server regression test
       from the earlier 1.78 work on the first clean release artifact
 
@@ -1236,7 +1291,7 @@ Revision history for Developer Dashboard
     - hardened the Windows QEMU/Dockur smoke flow so the host stages the
       Strawberry Perl MSI into the OEM bundle, the launcher supports
       configurable retained web/RDP ports plus reusable cached ISO workdirs,
-      and the Windows guest can install the built tarball with `cpanm --notest`
+      and the Windows guest can install the built tarball with `cpanm --no-wget --notest`
       during the dependency layer while still running the full dashboard
       runtime smoke afterward
     - fixed `t/17-web-server-ssl.t` so an intermittent live TLS connect

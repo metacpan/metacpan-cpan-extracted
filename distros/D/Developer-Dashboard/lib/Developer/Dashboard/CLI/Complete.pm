@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Complete;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Developer::Dashboard::CLI::Suggest;
 
@@ -43,7 +43,7 @@ sub complete {
 # Output: ordered list of candidate strings.
 sub _subcommand_candidates {
     my ($command) = @_;
-    return qw(install enable disable uninstall update list usage) if $command eq 'skills';
+    return qw(install enable disable uninstall list usage) if $command eq 'skills' || $command eq 'skill';
     return qw(compose list enable disable) if $command eq 'docker';
     return qw(list resolve add del locate project-root) if $command eq 'path';
     return qw(set list refresh-core) if $command eq 'indicator';

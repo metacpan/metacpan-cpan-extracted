@@ -15,6 +15,12 @@ my $npm_bin  = _find_command('npm');
 plan skip_all => 'JS fast-check fuzz test requires node and npm on PATH'
   if !$node_bin || !$npm_bin;
 
+my $package_json = File::Spec->catfile( $ROOT, 'package.json' );
+my $package_lock = File::Spec->catfile( $ROOT, 'package-lock.json' );
+
+plan skip_all => 'JS fast-check fuzz test requires source-tree package.json and package-lock.json'
+  if !-f $package_json || !-f $package_lock;
+
 my $node_modules = File::Spec->catdir( $ROOT, 'node_modules' );
 if ( !-d $node_modules ) {
     my ( $stdout, $stderr, $exit ) = capture {
@@ -80,8 +86,9 @@ harness, or the dashboard encode and decode path covered by C<fast-check>.
 Run it directly with C<prove -lv t/35-js-fast-check.t> while iterating, then
 keep it green under C<prove -lr t> and the covered test path before release.
 This wrapper can bootstrap C<node_modules> with C<npm ci> when needed. It skips
-only when C<node> or C<npm> are missing, because that is an environment
-limitation rather than a product pass.
+when C<node> or C<npm> are missing, and it also skips from packaged install
+trees that do not ship the checkout-only C<package.json> and
+C<package-lock.json> manifests needed by the JavaScript fuzz harness.
 
 =head1 WHAT USES IT
 

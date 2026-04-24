@@ -2,11 +2,11 @@
 
 use strict;
 use YAML::Syck;
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 SKIP: {
     eval { require Devel::Leak; require 5.8.9; 1; }
-      or skip( "Devel::Leak not installed or perl too old", 12 );
+      or skip( "Devel::Leak not installed or perl too old", 14 );
 
     # check if arrays leak
 
@@ -159,4 +159,32 @@ result: !perl/code: '{ 42 + + 54ih a; $" }'
     }
     $diff = Devel::Leak::NoteSV($handle) - $before;
     is( $diff, 0, "No leaks - Dump filehandle (rt#41199)" );
+
+    # Check if loading binary data leaks (base64 decode buffer)
+    $yaml = "--- !binary //8=\n";
+
+    foreach ( 1 .. 100 ) {
+        Load($yaml);
+    }
+
+    $before = Devel::Leak::NoteSV($handle);
+    foreach ( 1 .. 100 ) {
+        Load($yaml);
+    }
+    $diff = Devel::Leak::NoteSV($handle) - $before;
+    is( $diff, 0, "No leaks - Load binary" );
+
+    # Check if dumping binary data leaks (base64 encode buffer)
+    my $binary = "\xff\xff\x00\x80";
+
+    foreach ( 1 .. 100 ) {
+        Dump($binary);
+    }
+
+    $before = Devel::Leak::NoteSV($handle);
+    foreach ( 1 .. 100 ) {
+        Dump($binary);
+    }
+    $diff = Devel::Leak::NoteSV($handle) - $before;
+    is( $diff, 0, "No leaks - Dump binary" );
 }

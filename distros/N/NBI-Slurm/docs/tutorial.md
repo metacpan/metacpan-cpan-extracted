@@ -465,6 +465,9 @@ lsjobs --running
 # Pending only
 lsjobs --pending
 
+# Summary for your jobs vs all jobs
+lsjobs --summary
+
 # Filter by name (supports regex)
 lsjobs --name "analysis"
 
@@ -476,6 +479,9 @@ lsjobs --delete --name "test-"
 
 # Tab-separated output for scripting
 lsjobs --tab -u username | awk '{print $1}'
+
+# Summary for a specific user vs all jobs
+lsjobs --summary -u username
 ```
 
 Full documentation: [metacpan.org/dist/NBI-Slurm/view/bin/lsjobs ↗](https://metacpan.org/dist/NBI-Slurm/view/bin/lsjobs)

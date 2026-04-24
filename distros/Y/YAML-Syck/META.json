@@ -39,7 +39,7 @@
    "provides" : {
       "JSON::Syck" : {
          "file" : "lib/JSON/Syck.pm",
-         "version" : "1.44"
+         "version" : "1.45"
       },
       "YAML::Dumper::Syck" : {
          "file" : "lib/YAML/Dumper/Syck.pm"
@@ -49,7 +49,7 @@
       },
       "YAML::Syck" : {
          "file" : "lib/YAML/Syck.pm",
-         "version" : "1.44"
+         "version" : "1.45"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/toddr/YAML-Syck"
       }
    },
-   "version" : "1.44",
+   "version" : "1.45",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

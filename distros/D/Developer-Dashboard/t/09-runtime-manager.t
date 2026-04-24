@@ -143,6 +143,12 @@ dies_like( sub { Developer::Dashboard::RuntimeManager->new( config => $config, f
 
 is( $manager->_web_process_title( '0.0.0.0', 7890 ), 'dashboard web: 0.0.0.0:7890', 'web process title is predictable' );
 like( Developer::Dashboard::RuntimeManager::_now_iso8601(), qr/^\d{4}-\d{2}-\d{2}T/, 'timestamp helper emits ISO-8601' );
+is( Developer::Dashboard::RuntimeManager::_portable_signal('TERM'), 15, 'portable signal helper maps TERM to numeric POSIX signal 15' );
+is( Developer::Dashboard::RuntimeManager::_portable_signal('kill'), 9, 'portable signal helper accepts lowercase signal names' );
+is( Developer::Dashboard::RuntimeManager::_portable_signal(2), 2, 'portable signal helper preserves numeric signals' );
+is( $manager->_send_signal( 'TERM', undef, 0, 'not-a-pid' ), 0, 'portable signal sender skips invalid process ids without named-signal lookup' );
+dies_like( sub { Developer::Dashboard::RuntimeManager::_portable_signal() }, qr/Missing signal name/, 'portable signal helper rejects missing signal names clearly' );
+dies_like( sub { Developer::Dashboard::RuntimeManager::_portable_signal('NOPE') }, qr/Unsupported signal name: NOPE/, 'portable signal helper rejects unsupported signal names clearly' );
 ok( $manager->_looks_like_web_process( { pid => 1, args => 'dashboard web: 0.0.0.0:7890' } ), 'managed web process titles are recognized' );
 ok( $manager->_looks_like_web_process( { pid => 1, args => 'perl -Ilib bin/dashboard serve' } ), 'legacy perl dashboard serve command lines are recognized' );
 ok( $manager->_looks_like_web_process( { pid => 1, args => 'dashboard serve --workers 4 --port 7890' } ), 'dashboard serve with startup flags is recognized as a web process' );

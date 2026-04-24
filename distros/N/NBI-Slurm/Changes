@@ -1,4 +1,9 @@
-0.20.0  2026-04-26
+0.20.1	2026-04-22
+
+* Fixed sorting in 'viewjobs'
+* Added '--summary' in 'lsjobs'
+
+0.20.0  2026-04-20
 
 * Added new views in viewjobs, can inspect StdOut and StdErr files
 * Added persistence of completed jobs in viewjobs (sacctl)

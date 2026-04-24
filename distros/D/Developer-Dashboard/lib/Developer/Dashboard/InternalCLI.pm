@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use File::Basename qw(dirname);
 use File::Spec;
@@ -33,6 +33,7 @@ sub helper_aliases {
         pyq   => 'yq',
         ptomq => 'tomq',
         pjp   => 'propq',
+        skill => 'skills',
     };
 }
 

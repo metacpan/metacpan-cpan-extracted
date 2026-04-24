@@ -1,6 +1,7 @@
+use strict;
+use warnings;
 use Test::More tests => 2;
 use XML::Parser;
-use strict;
 
 # Test that bare glob filehandles (*FH) work with parse().
 # See https://github.com/cpan-authors/XML-Parser/issues/201

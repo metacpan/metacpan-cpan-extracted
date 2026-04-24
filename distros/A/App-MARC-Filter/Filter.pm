@@ -20,7 +20,7 @@ use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 $| = 1;
 
@@ -97,7 +97,7 @@ sub run {
 		return 1;
 	}
 	my ($marc_batch, $stream);
-	if ($self->{'_marc_file'} =~ m/\.xml$/ms) {
+	if ($self->{'_marc_file'} =~ m/\.xml/ms) {
 		$stream = 'XML';
 		$marc_batch = eval {
 			MARC::Batch->new('XML', $fh);
@@ -653,6 +653,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

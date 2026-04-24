@@ -85,7 +85,9 @@ subtest forte_distance => sub {
     is sprintf('%.3f', forte_distance(@{ $chords[6] })), 1.871, 'forte_distance';
     is forte_distance(@{ $chords[7] }), 0, 'forte_distance';
     is sprintf('%.3f', forte_distance(@{ $chords[8] })), '2.550', 'forte_distance';
-    is forte_distance(@{ $chords[9] }), 0, 'forte_distance';
+    is forte_distance($chords[9][0], $chords[9][1]), 0, 'forte_distance';
+    is forte_distance($chords[9][1], $chords[9][2]), 0, 'forte_distance';
+    is forte_distance($chords[9][0], $chords[9][2]), 0, 'forte_distance';
 };
 
 subtest cyclic_permutation => sub {

@@ -1,5 +1,9 @@
 Revision history for Music-Interval-Barycentric
 
+0.0405 2026-04-23 10:46:52
+    - Add more missing tests. Argh.
+    - Improve documentation.
+
 0.0404 2026-04-23 02:28:50
     - Add missing tests.
 

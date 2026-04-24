@@ -1,0 +1,8 @@
+l("PY N plain")
+ln("PY N one", "PY N many", 4)
+lp("PY_ctx", "PY N ctx plain")
+lnp("PY_ctx", "PY N ctx one", "PY N ctx many", 4)
+ld("PY_dom", "PY N dom plain")
+ldn("PY_dom", "PY N dom one", "PY N dom many", 4)
+ldp("PY_dom", "PY_ctx", "PY N dom ctx plain")
+ldnp("PY_dom", "PY_ctx", "PY N dom ctx one", "PY N dom ctx many", 4)

@@ -36,7 +36,7 @@ Test::Smoke::App::Base - Baseclass for Test::Smoke::App::* applications.
                 helptext => "Mailsystem to use for sendig reports.",
             ),
         ],
-        genral_options => [
+        general_options => [
             Test::Smoke::AppOption->new(
                 name    => 'ddir',
                 option  => '=s',

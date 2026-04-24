@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -173,12 +173,12 @@ sub stop_web {
       ? $self->_listener_pids_for_port( $running->{port} )
       : ();
 
-    kill 'TERM', $pid if $pid;
-    kill 'TERM', $_ for @listener_pids;
+    $self->_send_signal( 'TERM', $pid ) if $pid;
+    $self->_send_signal( 'TERM', @listener_pids );
     $self->_pkill_perl('^dashboard web:');
     $self->_pkill_perl('^dashboard ajax:');
     for my $proc ( $self->_find_legacy_web_processes ) {
-        kill 'TERM', $proc->{pid};
+        $self->_send_signal( 'TERM', $proc->{pid} );
     }
     for ( 1 .. 30 ) {
         last if !$self->running_web && !scalar $self->_find_processes_by_prefix('dashboard ajax:');
@@ -187,21 +187,21 @@ sub stop_web {
 
     my $still_running = $self->running_web;
     if ($still_running) {
-        kill 'KILL', $still_running->{pid};
+        $self->_send_signal( 'KILL', $still_running->{pid} );
         sleep 0.1;
     }
     for my $proc ( $self->_find_processes_by_prefix('dashboard ajax:') ) {
-        kill 'KILL', $proc->{pid};
+        $self->_send_signal( 'KILL', $proc->{pid} );
     }
     my @still_listening = grep { kill 0, $_ } @listener_pids;
-    kill 'KILL', $_ for @still_listening;
+    $self->_send_signal( 'KILL', @still_listening );
     for my $proc ( $self->_find_legacy_web_processes ) {
-        kill 'KILL', $proc->{pid};
+        $self->_send_signal( 'KILL', $proc->{pid} );
     }
     my $released = $self->_wait_for_port_release($port);
     if ( !$released && $port ) {
         my @late_listeners = grep { kill 0, $_ } $self->_listener_pids_for_port($port);
-        kill 'KILL', $_ for @late_listeners;
+        $self->_send_signal( 'KILL', @late_listeners );
         $self->_wait_for_port_release($port);
     }
 
@@ -377,7 +377,7 @@ sub stop_collectors {
         sleep 0.1;
     }
     for my $proc ( $self->_find_processes_by_prefix('dashboard collector:') ) {
-        kill 'KILL', $proc->{pid};
+        $self->_send_signal( 'KILL', $proc->{pid} );
     }
     return @names;
 }
@@ -731,6 +731,37 @@ sub _web_process_title {
     return "dashboard web: $host:$port";
 }
 
+# _portable_signal($signal)
+# Converts signal names used by dashboard lifecycle code into POSIX signal numbers.
+# Input: signal name or numeric signal value.
+# Output: numeric signal value safe for Perl builds that reject named signals.
+sub _portable_signal {
+    my ($signal) = @_;
+    die 'Missing signal name' if !defined $signal || $signal eq '';
+    return $signal + 0 if $signal =~ /^\d+$/;
+    my %signal_number = (
+        HUP  => 1,
+        INT  => 2,
+        TERM => 15,
+        KILL => 9,
+    );
+    my $name = uc $signal;
+    die "Unsupported signal name: $signal" if !exists $signal_number{$name};
+    return $signal_number{$name};
+}
+
+# _send_signal($signal, @pids)
+# Sends a portable numeric signal to live process ids.
+# Input: signal name/number and candidate process id values.
+# Output: number of process ids signalled by Perl kill.
+sub _send_signal {
+    my ( $self, $signal, @pids ) = @_;
+    my $portable_signal = _portable_signal($signal);
+    my @targets = grep { defined $_ && /^\d+$/ && $_ > 0 } @pids;
+    return 0 if !@targets;
+    return kill $portable_signal, @targets;
+}
+
 # _is_managed_web($pid)
 # Checks whether a pid belongs to a managed dashboard web process.
 # Input: process id integer.
@@ -752,7 +783,7 @@ sub _is_managed_web {
 sub _pkill_perl {
     my ( $self, $pattern ) = @_;
     my ( undef, $stderr, $exit_code ) = capture {
-        my $ok = system 'pkill', '-TERM', '-f', $pattern;
+        my $ok = system 'pkill', '-15', '-f', $pattern;
         return $ok == -1 ? -1 : ($? >> 8);
     };
     return 1 if $exit_code == 0 || $exit_code == 1;
@@ -760,7 +791,7 @@ sub _pkill_perl {
         for my $proc ( $self->_ps_processes ) {
             next if !$self->_proc_owned_by_current_user($proc);
             next if $proc->{args} !~ /$pattern/;
-            kill 'TERM', $proc->{pid};
+            $self->_send_signal( 'TERM', $proc->{pid} );
         }
         return 1;
     }
@@ -1254,7 +1285,9 @@ Developer::Dashboard::RuntimeManager - runtime lifecycle manager
 =head1 DESCRIPTION
 
 This module manages the lifecycle of the dashboard web service and managed
-collector loops, including stop and restart orchestration.
+collector loops, including stop and restart orchestration. Shutdown uses
+numeric POSIX signals internally so minimal Perl builds that reject named
+signals still stop managed processes correctly.
 
 =head1 METHODS
 
@@ -1266,7 +1299,7 @@ Construct and manage the dashboard runtime.
 
 =head1 PURPOSE
 
-This module manages the dashboard runtime processes. It starts, stops, and restarts the web listener, tracks the web pid, coordinates collector lifecycle around restart/stop flows, and exposes the process-management behavior behind the serve/restart/stop command family.
+This module manages the dashboard runtime processes. It starts, stops, and restarts the web listener, tracks the web pid, coordinates collector lifecycle around restart/stop flows, sends numeric POSIX shutdown signals for Alpine/iSH compatibility, and exposes the process-management behavior behind the serve/restart/stop command family.
 
 =head1 WHY IT EXISTS
 

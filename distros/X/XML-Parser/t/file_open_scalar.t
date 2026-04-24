@@ -1,5 +1,6 @@
-
-use if $] < 5.006, Test::More => skip_all => 'syntax requires perl 5.6';
+use strict;
+use warnings;
+use if $] < 5.006, 'Test::More' => skip_all => 'syntax requires perl 5.6';
 
 #tests behaviour on perls 5.10? .. 5.10.1
 package Some::Fake::Packege;
@@ -12,7 +13,6 @@ package main;
 
 use Test::More tests => 1;
 use XML::Parser;
-use strict;
 
 my $count = 0;
 

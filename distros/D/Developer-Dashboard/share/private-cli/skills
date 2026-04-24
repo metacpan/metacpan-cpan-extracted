@@ -45,7 +45,7 @@ Use this file when changing the C<dashboard skills> CLI verbs or the dotted-comm
 
 =head1 HOW TO USE
 
-Users run C<dashboard skills install>, C<update>, C<enable>, C<disable>, C<list>, C<usage>, or C<uninstall>. The staged helper forwards those lifecycle requests into the private runtime, which loads the skill manager and performs the requested action. Install accepts either a Git URL or a direct local checked-out skill directory. The public dotted form C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> also lands here through an internal action so installed skill commands keep one private helper surface.
+Users run C<dashboard skills install>, C<enable>, C<disable>, C<list>, C<usage>, or C<uninstall>. The singular C<dashboard skill> command is accepted as an alias for the same management family. The staged helper forwards those lifecycle requests into the private runtime, which loads the skill manager and performs the requested action. Install accepts one or more Git URLs, direct local checked-out skill directories, shorthand source names, or no source at all when the home root F<~/.developer-dashboard/ddfile> already lists registered skills to reinstall. Install shows a progress rundown before long work starts and defaults to a before/after version table; C<-o json> keeps the raw payload for scripts. The public dotted form C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> also lands here through an internal action so installed skill commands keep one private helper surface.
 
 =head1 WHAT USES IT
 
@@ -57,37 +57,47 @@ Example 1:
 
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills install /absolute/path/to/example-skill
+  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
+  dashboard skill install browser
 
-Install or reinstall one isolated skill into its runtime root from either Git
-or a qualified local checkout. Direct local installs use C<rsync> when it is
-available and the built-in Perl tree-copy fallback when it is not.
+Install or reinstall one or more isolated skills into their runtime roots from
+Git, shorthand sources, or qualified local checkouts. Direct local installs use
+C<rsync> when it is available and the built-in Perl tree-copy fallback when it
+is not. Each explicit source is remembered in the home root
+F<~/.developer-dashboard/ddfile> without duplicates.
 
 Example 2:
+
+  dashboard skills install
+
+Reinstall every skill source listed in the home root F<~/.developer-dashboard/ddfile>.
+
+Example 3:
 
   dashboard skills list
 
 Inspect installed skill metadata. The default output is a readable table, and
 C<-o json> returns structured output.
 
-Example 3:
+Example 4:
 
   dashboard example-skill.hello
 
 Run an installed skill command through the public dotted route, which the switchboard forwards into this staged helper.
 
-Example 4:
+Example 5:
 
   ~/.developer-dashboard/cli/dd/skills --help
 
 Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
 
-Example 5:
+Example 6:
 
   prove -lv t/05-cli-smoke.t t/19-skill-system.t
 
 Rerun the focused staged-helper and thin-loader tests after changing helper dispatch behavior.
 
-Example 6:
+Example 7:
 
   prove -lr t
 

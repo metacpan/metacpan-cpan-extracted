@@ -1,4 +1,6 @@
 use 5.008;    #Devel::CheckLib
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 use lib './inc';
 use Devel::CheckLib;
@@ -8,8 +10,8 @@ install_share dist => 'share';
 use Config;
 use File::Spec;
 
-$expat_libpath = $ENV{EXPATLIBPATH} || '';
-$expat_incpath = $ENV{EXPATINCPATH} || '';
+my $expat_libpath = $ENV{EXPATLIBPATH} || '';
+my $expat_incpath = $ENV{EXPATINCPATH} || '';
 
 my @replacement_args;
 
@@ -158,15 +160,49 @@ sub MY::postamble {
     return join "\n", @ret;
 }
 
+my $dist_version = MM->parse_version('Parser.pm');
+
 WriteMakefile1(
     ABSTRACT_FROM    => 'Parser.pm',
     AUTHOR           => 'Clark Cooper (coopercc@netheaven.com)',
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.008',
     META_MERGE       => {
+        'meta-spec' => { version => 2 },
+        provides => {
+            'XML::Parser' => {
+                file    => 'Parser.pm',
+                version => $dist_version,
+            },
+            'XML::Parser::Expat' => {
+                file    => 'Expat/Expat.pm',
+                version => $dist_version,
+            },
+            'XML::Parser::Style::Debug' => {
+                file    => 'Parser/Style/Debug.pm',
+            },
+            'XML::Parser::Style::Objects' => {
+                file    => 'Parser/Style/Objects.pm',
+            },
+            'XML::Parser::Style::Stream' => {
+                file    => 'Parser/Style/Stream.pm',
+            },
+            'XML::Parser::Style::Subs' => {
+                file    => 'Parser/Style/Subs.pm',
+            },
+            'XML::Parser::Style::Tree' => {
+                file    => 'Parser/Style/Tree.pm',
+            },
+        },
         resources => {
-            bugtracker => 'https://github.com/cpan-authors/XML-Parser/issues',
-            repository => 'https://github.com/cpan-authors/XML-Parser',
+            bugtracker => {
+                web => 'https://github.com/cpan-authors/XML-Parser/issues',
+            },
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/cpan-authors/XML-Parser.git',
+                web  => 'https://github.com/cpan-authors/XML-Parser',
+            },
         },
         prereqs => {
             runtime => {

@@ -49,6 +49,7 @@ my $opt_verbose_bool = 0;
 my $opt_queue = '.+';
 my $opt_name = '.+';
 my $opt_tab = 0;
+my $opt_summary = 0;
 my @opt_hide = ();
 GetOptions(
     'u|user=s'  => \$opt_user,
@@ -58,6 +59,7 @@ GetOptions(
     'p|pending' => \$opt_pending_bool,
     'd|delete'  => \$opt_delete_bool,
     't|tab'     => \$opt_tab,
+    'summary'   => \$opt_summary,
     'hide=s'    => \@opt_hide,
     'verbose'   => \$opt_verbose_bool,
     'version'   => sub { say "lsjobs v", $NBI::Slurm::VERSION; exit },
@@ -96,6 +98,11 @@ if ($opt_user eq 'ALL' or $opt_user eq 'all') {
 if ($opt_verbose_bool) {
     say STDERR "User: $opt_user";
     say STDERR "Jobs: ", scalar(keys %{$jobs});
+}
+
+if ($opt_summary) {
+    print_state_summary_table($jobs, \@ids, $opt_user);
+    exit 0;
 }
 
 my $selected_jobs = {};
@@ -366,6 +373,108 @@ sub print_summary {
         BOLD . CYAN, $showing, RESET,
         BOLD, $total, RESET
     );
+    say '';
+}
+
+sub summary_bucket_for_state {
+    my $state = shift // '';
+
+    return 'running'   if $state =~ /^RUNNING$/i;
+    return 'pending'   if $state =~ /^PENDING$/i;
+    return 'completed' if $state =~ /^COMPLETED$/i;
+    return 'errors'    if $state =~ /^(?:FAILED|CANCELLED|TIMEOUT|NODE_FAIL|OUT_OF_MEMORY|BOOT_FAIL|DEADLINE|PREEMPTED)$/i;
+    return 'other';
+}
+
+sub summary_color {
+    my $bucket = shift;
+
+    return GREEN . BOLD  if $bucket eq 'running';
+    return YELLOW . BOLD if $bucket eq 'pending';
+    return BLUE          if $bucket eq 'completed';
+    return RED           if $bucket eq 'errors';
+    return BLACK;
+}
+
+sub summary_user_label {
+    my $user = shift;
+    return 'All users' if !defined $user || $user eq '.+';
+    return $user;
+}
+
+sub job_matches_summary_scope {
+    my ($jobid, $job, $ids_ref) = @_;
+
+    return 0 if $job->{PARTITION} !~ /$opt_queue/;
+    return 0 if $job->{NAME} !~ /$opt_name/;
+    return 0 if @$ids_ref && !grep { $_ eq $jobid } @$ids_ref;
+    return 1;
+}
+
+sub print_state_summary_table {
+    my ($jobs, $ids_ref, $user_pattern) = @_;
+
+    my @order = qw(running pending completed errors other);
+    my %labels = (
+        running   => 'Running jobs',
+        pending   => 'Pending jobs',
+        completed => 'Completed',
+        errors    => 'Errors',
+        other     => 'Other',
+    );
+    my %counts = map { $_ => { user => 0, total => 0 } } @order;
+
+    for my $jobid (sort keys %$jobs) {
+        my $job = $jobs->{$jobid};
+        next unless job_matches_summary_scope($jobid, $job, $ids_ref);
+
+        my $bucket = summary_bucket_for_state($job->{STATE});
+        $counts{$bucket}{total}++;
+        if (($job->{USER} // '') =~ /^$user_pattern$/) {
+            $counts{$bucket}{user}++;
+        }
+    }
+
+    my $user_label = summary_user_label($user_pattern);
+    my $label_w = length('Pending jobs');
+    my $user_w  = length($user_label);
+    my $total_w = length('Total');
+    my $user_total = 0;
+    my $grand_total = 0;
+
+    for my $bucket (@order) {
+        my $user_count  = $counts{$bucket}{user};
+        my $total_count = $counts{$bucket}{total};
+        $user_total  += $user_count;
+        $grand_total += $total_count;
+        $user_w  = length($user_count)  if length($user_count)  > $user_w;
+        $total_w = length($total_count) if length($total_count) > $total_w;
+    }
+    $label_w = length('Total') if length('Total') > $label_w;
+    $user_w  = length($user_total) if length($user_total) > $user_w;
+    $total_w = length($grand_total) if length($grand_total) > $total_w;
+
+    say '';
+    say sprintf("  %-*s | %*s | %*s", $label_w, '', $user_w, $user_label, $total_w, 'Total');
+    say sprintf("  %s-+-%s-+-%s", '-' x $label_w, '-' x $user_w, '-' x $total_w);
+
+    for my $bucket (@order) {
+        my $line = sprintf(
+            "  %-*s | %*d | %*d",
+            $label_w, $labels{$bucket},
+            $user_w,  $counts{$bucket}{user},
+            $total_w, $counts{$bucket}{total},
+        );
+        say summary_color($bucket) . $line . RESET;
+    }
+    say sprintf("  %s-+-%s-+-%s", '-' x $label_w, '-' x $user_w, '-' x $total_w);
+    say BOLD . sprintf(
+        "  %-*s | %*d | %*d",
+        $label_w, 'Total',
+        $user_w,  $user_total,
+        $total_w, $grand_total,
+    ) . RESET;
+
     say '';
 }
 
@@ -793,6 +902,7 @@ sub usage {
    -r, --running           Show only running jobs
    -p, --pending           Show only pending jobs
    -t, --tab               Output in simple TSV format (pipe to vd for interactive table)
+   --summary               Print per-state counts for the selected user vs total jobs
 
    --hide <column>         Hide column from display (case insensitive substring match,
                            minimum 3 characters). Can be specified multiple times.
@@ -819,7 +929,7 @@ lsjobs - List your jobs (or others), and delete them if you wish
 
 =head1 VERSION
 
-version 0.20.0
+version 0.20.1
 
 =head1 SYNOPSIS
 
@@ -857,6 +967,11 @@ Show only pending jobs. This is a convenience flag equivalent to C<-s PENDING>.
 =item B<-t, --tab>
 
 Output in simple TSV format (tip: pipe to C<vd> for interactive table)
+
+=item B<--summary>
+
+Print a compact per-state summary table with one column for the selected user
+and one for the total matching jobs.
 
 =item B<--hide <column>>
 
@@ -921,6 +1036,12 @@ Delete some of my jobs (only pending, and with name containing MEGAHIT):
 List jobs with a simplified view (hide some columns):
 
   lsjobs --hide nodelist --hide reason --hide totaltime
+
+=item B<Example 6:>
+
+Show a summary table for a specific user against all jobs:
+
+  lsjobs --summary -u username
 
 =back
 

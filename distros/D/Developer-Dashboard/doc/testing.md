@@ -76,6 +76,10 @@ reads the built `Developer-Dashboard-X.XX.tar.gz` through
 `Module::CPANTS::Analyse` and fails unless every kwalitee indicator passes.
 Use that tarball-focused check for CPANTS drift; the source tree itself is not
 the right surface for this analyzer.
+The JavaScript fast-check wrapper is a source-tree fuzz gate. It runs when
+`node`, `npm`, `package.json`, and `package-lock.json` are all available, and
+it skips in packaged install-test trees that do not ship those checkout-only
+JavaScript manifests.
 The contributor contract now lives here plus `AGENTS.override.md` and
 `agents.md`, not in the top-level product manual in `README.md` or
 `Developer::Dashboard.pm`. Those two files stay synced as user-facing product
@@ -266,6 +270,10 @@ runtime will see in practice.
 Those checks also cover the Starman master-worker split, where the recorded
 managed pid can be the master while the bound listener pid is a separate
 worker process on the same managed port.
+RuntimeManager tests also lock shutdown signal portability by proving the
+dashboard lifecycle maps named dashboard intents such as TERM and KILL to
+numeric POSIX signals before calling Perl `kill`, matching Alpine/iSH Perl
+builds that reject named signal strings.
 
 The integration flow also:
 

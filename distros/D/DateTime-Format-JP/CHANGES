@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Format::JP
 
+v0.1.7 2026-04-24T12:16:24+0900
+    - Changed dependencies to DateTime::Lite
+
 v0.1.6 2024-09-05T13:39:38+0900
     - Removed overlooked dependency
 

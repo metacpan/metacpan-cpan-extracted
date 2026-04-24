@@ -21,6 +21,14 @@ __all__ = [
     'ldn',
     'ldp',
     'ldnp',
+    'N_',
+    'Nn_',
+    'Np_',
+    'Nnp_',
+    'Nd_',
+    'Ndn_',
+    'Ndp_',
+    'Ndnp_',
 ]
 
 global dry, nowrite, nolocales, dir 
@@ -115,6 +123,28 @@ def ldnp(td, ctxt, id, idp, n, *args):
 
         out = sprintf(raw, *args)
     return out
+
+# Deferred-translation markers — runtime no-ops so strings can be declared
+# before a user locale is known (class-construction time, DSLs, constants)
+# and still show up in the extracted .pot. Pass the stored msgid(s) through
+# the real l*() at render time. See Locale::Simple POD for the full story.
+def N_(msgid):
+    return msgid
+def Nn_(sg, pl):
+    return (sg, pl)
+def Np_(ctxt, msgid):
+    return msgid
+def Nnp_(ctxt, sg, pl):
+    return (sg, pl)
+def Nd_(td, msgid):
+    return msgid
+def Ndn_(td, sg, pl):
+    return (sg, pl)
+def Ndp_(td, ctxt, msgid):
+    return msgid
+def Ndnp_(td, ctxt, sg, pl):
+    return (sg, pl)
+
 
 def ltd(td):
     if td not in tds:

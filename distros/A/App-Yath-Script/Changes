@@ -1,0 +1,1502 @@
+2.000011  2026-04-23 03:03:53-07:00 America/Los_Angeles
+
+    - Determine yath version from RC filename (.yath.v#.rc) instead of
+      parsing a #V / ;V header inside the file
+    - Support .yath.rc as a symlink to a versioned .yath.v#.rc file,
+      with the symlink taking highest priority for version detection
+    - Allow specifying the version as the first CLI argument (V# or v#),
+      which restricts RC lookup to versioned filenames only
+    - Accept both uppercase and lowercase V in RC filenames
+    - Plain .yath.rc without a version still defaults to V1
+    - Set the YATH_SCRIPT env var
+    - Move `yath` script out of version branches
+    - Add --goto-file option to V0 for testing goto::file behavior
+    - Fix version auto-detection to dynamically scan @INC instead of
+      using a hardcoded version range
+    - Fix config version marker parsing to allow blank lines before
+      the marker in .yath.rc / .yath.user.rc
+    - Document version detection behavior: default-to-V1 when config
+      exists without a marker, and .yath.user.rc overriding .yath.rc
+    - Add goto::file as a development dependency
+    - Add acceptance test for goto::file in BEGIN phase
+
+2.000010  2026-03-31 22:05:02-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add AI and LLM Policy
+
+2.000009  2026-03-30 16:17:42-07:00 America/Los_Angeles
+
+    - Fix scheduler bug when timing out test startups
+
+2.000008  2026-03-30 10:52:46-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix undef error in some exception cases
+    - Fix . in @INC test
+    - Remove test file that should not exist
+
+2.000007  2026-03-29 21:19:04-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Remove Carp::Always accidentally left in
+    - Require updated Getopt::Yath
+    - Require Starman for a CLI based web server
+    - Removed old demo scripts
+    - Pagination for runs!
+    - Break out Getopt::Yath
+
+2.000006  2025-05-04 03:45:10-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fixing accidental non-trial release
+
+2.000005  2025-05-04 01:16:20-07:00 America/Los_Angeles
+
+    - Minting a fixed tarball, no actual changes
+
+2.000004  2025-05-03 01:15:27-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Several fixes to minor bugs
+    - Switch IPC directory out using SHA1
+
+2.000003  2024-08-01 17:05:41-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix automatic POD generation for commands and options
+    - Fix SQLite schema issue with api_keys
+    - Better POD for generated Schema packages
+    - Fix percona DB support, and add more db tests
+    - Basic docs in Test2::Harness module
+
+2.000002  2024-07-31 17:01:46-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix 5.14
+    - Bump min perl to 5.14
+    - Fix issue where perl libs would not carry down effectively
+    - Remove DBIx::Class::UUIDColumns as a dep
+    - Remove DBIx::Class::Tree::AdjacencyList as a dep
+
+2.000001  2024-07-31 09:30:20-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix some test issues
+    - Include some needed modules when loading schema
+
+2.000000  2024-07-30 15:00:13-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - NOTE: Backwords incompatible changes, plugins and renderers may need rewriting
+    - IPC system overhaul
+    - Getopt::Yath has been extracted to its own set of modules
+    - Use of Atomic::Pipe to convey data between test and harness
+    - Each test has its own auditor process instead of a single auditor bottleneck
+    - Yath web server (formerly Yath-UI) has been merged in
+    - Yath database (formerly part of Yath-UI) has been merged in
+    - Revamped renderer system
+    - JUnit renderer has been merged in
+    - Database rendering happens in a non-blocking way
+    - Several other systems have been overhauled as a result of the IPC rewrite
+    - More consistent flags
+    - Automatic paging for help (With IO::Pager)
+    - Better command list and organization
+    - Ability to restrict help output to specific sections as needed --help=SECTION
+    - Ability to --show-opts=SECTION to see what your settings do
+    - Support for PostgreSQL, SQLite, MySQL (generic), Percona, and MariaDB
+    - Many other fixes and overhauls
+
+1.000155  2023-10-03 08:53:01-07:00 America/Los_Angeles
+
+    - Fix sleep that is often interrupted
+
+1.000154  2023-10-02 08:40:50-07:00 America/Los_Angeles
+
+    - Make it possible to disable shared slots on specific hosts
+
+1.000153  2023-06-14 07:08:47-07:00 America/Los_Angeles
+
+    - Fix #266
+    - Fix several declare-lexical+conditional statements
+
+1.000152  2023-04-29 05:30:12-07:00 America/Los_Angeles
+
+    - Do not require non-perl script tests to be executable
+    - Fix issue where Carp::Always being loaded by PERL5OPT or similar does not crash
+
+1.000151  2023-03-08 07:11:31-08:00 America/Los_Angeles
+
+    - Fix issue where rarely some UUIDs could be duplicated with IPC
+
+1.000150  2023-03-01 13:40:42-08:00 America/Los_Angeles
+
+    - Add ability to override 'add' value in rerun grabbing
+
+1.000149  2023-02-28 09:13:50-08:00 America/Los_Angeles
+
+    - Add more 'rerun' capabilities
+    - Fix diagnostcis replacing '0' with an empty string
+
+1.000148  2023-02-22 17:17:49-08:00 America/Los_Angeles
+
+    - Fix output corruption in interactive mode
+
+1.000147  2023-02-21 08:16:35-08:00 America/Los_Angeles
+
+    - Show all output early in interactive mode
+
+1.000146  2023-02-20 18:21:51-08:00 America/Los_Angeles
+
+    - Fix infinite hang in bad preload (#240)
+    - Remove some debugging
+    - Fix #261 ($. being set incorrectly)
+
+1.000145  2023-02-15 17:31:10-08:00 America/Los_Angeles
+
+    - Add ability to inject lines in resource output
+
+1.000144  2023-02-15 13:29:48-08:00 America/Los_Angeles
+
+    - Skip empty tables in resource view
+
+1.000143  2023-02-15 08:33:57-08:00 America/Los_Angeles
+
+    - Add 'autofill' to simplify 'd' and 'D' option types
+    - Better resource management
+
+1.000142  2023-01-25 14:38:31-08:00 America/Los_Angeles
+
+    - Add more capabilities around argument processing
+
+1.000141  2022-12-15 14:15:39-08:00 America/Los_Angeles
+
+    - Fix typo in rare conditional
+
+1.000140  2022-12-13 18:11:36-08:00 America/Los_Angeles
+
+    - Fix permissions issue with state files
+
+1.000139  2022-12-13 11:49:03-08:00 America/Los_Angeles
+
+    - Add 'COMMON' config options for shared slots
+    - Add options for default j and x values in shared slots
+
+1.000138  2022-12-06 06:52:55-08:00 America/Los_Angeles
+
+    - Fix resources output for shared slots
+    - Make slots a range, not a single value
+
+1.000137  2022-12-05 13:15:45-08:00 America/Los_Angeles
+
+    - Rework shared slots logic
+
+1.000136  2022-11-29 13:56:37-08:00 America/Los_Angeles
+
+    - Add ability to sort resource plugins to get them in order.
+
+1.000135  2022-11-29 10:44:53-08:00 America/Los_Angeles
+
+    - Add ability to specify a umask for shared slots files
+
+1.000134  2022-11-29 10:03:09-08:00 America/Los_Angeles
+
+    - Add ability to assign multiple slots to jobs
+    - Add shared job slots
+
+1.000133  2022-09-07 13:44:03-07:00 America/Los_Angeles
+
+    - Order tests with conflicts earlier than others
+
+1.000132  2022-09-07 09:42:06-07:00 America/Los_Angeles
+
+    - Further improve resource command and file
+
+1.000131  2022-09-06 15:53:55-07:00 America/Los_Angeles
+
+    - Use relative file paths for job slot display
+
+1.000130  2022-09-06 14:39:43-07:00 America/Los_Angeles
+
+    - Better resource display
+    - Fix #255 (.test_info.json being left behind)
+    - Fix issue where not all resources will be loaded by resource command
+
+1.000129  2022-09-06 11:20:38-07:00 America/Los_Angeles
+
+    - Fix issue with job slots sometimes being doubled when tests are skipped
+
+1.000128  2022-09-02 13:01:09-07:00 America/Los_Angeles
+
+    - Fix issue where yath might exit before all output is rendered
+    - Add scheduler process
+    - Fix --color flag (Thanks James Raspass, #246)
+    - Fix spelling mistakes (Thanks bernhard, #249)
+
+1.000127  2022-08-31 08:32:44-07:00 America/Los_Angeles
+
+    - Remove unnecessary Carp::Always
+
+1.000126  2022-08-30 11:09:19-07:00 America/Los_Angeles
+
+    - Add 'yath resources' command to view resource usage
+
+1.000125  2022-07-08 15:50:11-07:00 America/Los_Angeles
+
+    - Change -jN to use a resource class instead of hard-coding it into State.pm
+    - Fix bug in how a POSIX function is called
+
+1.000124  2022-04-08 12:26:14-07:00 America/Los_Angeles
+
+    - Fix bug where see `yath status` was being shown for non-persistent runs
+    - Make 'busy' message shorter so it is less likely to be truncated
+
+1.000123  2022-04-06 13:34:10-07:00 America/Los_Angeles
+
+    - Fix bug where spawns would not run if queued before stages were ready
+
+1.000122  2022-04-06 11:04:43-07:00 America/Los_Angeles
+
+    - Fix another id vs uuid typo
+
+1.000121  2022-04-06 10:46:35-07:00 America/Los_Angeles
+
+    - Fix bug introduced by my last fix... oops
+
+1.000120  2022-04-06 10:17:48-07:00 America/Los_Angeles
+
+    - Fix bug where a stage reload would re-run all previously requested spawns
+
+1.000119  2022-04-05 10:58:59-07:00 America/Los_Angeles
+
+    - Allow per-test args to be specified at the command line
+
+1.000118  2022-04-05 09:39:40-07:00 America/Los_Angeles
+
+    - Do not show broken reload files multiple times
+
+1.000117  2022-04-04 16:09:58-07:00 America/Los_Angeles
+
+    - Check for reload errors before allowing a `yath run` to work
+
+1.000116  2022-04-01 15:29:40-07:00 America/Los_Angeles
+
+    - Better handling of version mismatches in the persistent runner
+    - Better info when a `run` command is waiting on a busy runner
+
+1.000115  2022-03-31 10:28:14-07:00 America/Los_Angeles
+
+    - Fix reload bug when using restricted reload
+    - Fix bug where inotify would only report changes once
+
+1.000114  2022-03-24 09:27:03-07:00 America/Los_Angeles
+
+    - Fix bug when inotify is not installed
+    - Make yath better at detecting when 2 files are the same
+
+1.000113  2022-03-23 09:36:57-07:00 America/Los_Angeles
+
+    - Refactor preloader into preloader and reloader
+    - Honor churn blocks during relead events even if --reload is disabled
+
+1.000112  2022-03-15 14:21:29-07:00 America/Los_Angeles
+
+    - Add --rerun and --rerun-failed options to test/run command
+    - Add lastlog.jsonl.* symlink creation to auto-link to the last log produced
+
+1.000111  2022-03-09 15:07:10-08:00 America/Los_Angeles
+
+    - Better handling and checking of persistence files
+
+1.000110  2022-02-24 11:50:52-08:00 America/Los_Angeles
+
+    - Add 'tick()' method to resource classes
+
+1.000109  2022-02-22 12:07:11-08:00 America/Los_Angeles
+
+    - Do not initialize resources in `yath run`
+    - Add command to settings->harness
+    - Add from_runner to settings included from a persistent runner
+    - Fix temp dir issue in macos
+
+1.000108  2022-02-11 15:23:10-08:00 America/Los_Angeles
+
+    - Add ability for resource managers to report resources as unavailable ot skip tests
+    - Add setup method for resource managers
+
+1.000107  2022-02-10 08:49:19-08:00 America/Los_Angeles
+
+    - Clean up FIFO in interactive mode with a persistent runner
+
+1.000106  2022-02-08 10:10:38-08:00 America/Los_Angeles
+
+    - Fix uninitialized warning
+
+1.000105  2022-02-08 09:52:32-08:00 America/Los_Angeles
+
+    - Make changes_diff work with or without prefixes in the filenames
+
+1.000104  2022-02-04 11:00:29-08:00 America/Los_Angeles
+
+    - Add settings ot paremeter list for coverage managers
+
+1.000103  2022-02-04 10:20:32-08:00 America/Los_Angeles
+
+    - Add options to for whitespace and non-subs in change data
+        --changes-include-whitespace - Include whitespace lines for change data
+        --changes-exclude-nonsub     - Do not include non-sub changes in perl files
+        --changes-exclude-opens      - Do not include tests that only open() changed files
+        --changes-exclude-loads      - Do not include tests that only load changed files without running subs
+
+1.000102  2022-02-03 15:28:54-08:00 America/Los_Angeles
+
+    - Remove warning that can trigger in valid (not warn-worthy) cases.
+
+1.000101  2022-02-02 13:26:35-08:00 America/Los_Angeles
+
+    - Fix 'replay' output of subtests
+
+1.000100  2022-02-01 09:49:52-08:00 America/Los_Angeles
+
+    - Mark reload_syntax_error.t as AUTHOR_TESTING only (#243)
+    - Add threshold for duration data fetching, this saves time when duration data is large
+
+1.000099  2022-01-27 10:20:38-08:00 America/Los_Angeles
+
+    - Add options to exclude some chnaged files when running coverage tests
+
+1.000098  2022-01-27 09:36:24-08:00 America/Los_Angeles
+
+    - Fix bugs in 'failed' command after adding subtests
+
+1.000097  2022-01-27 08:31:46-08:00 America/Los_Angeles
+
+    - Show subtest failures in 'failed' command
+
+1.000096  2022-01-26 14:42:43-08:00 America/Los_Angeles
+
+    - Show failed subtests in final summary
+    - Fix bug where env vars get removed when we preload Test2::API too early (#241)
+    - Fix bug where replay with test filename has uninitialized warnings (#242)
+
+1.000095  2022-01-07 14:35:25-08:00 America/Los_Angeles
+
+    - Fix bug where syntax errors prevented reloading of effected files
+
+1.000094  2022-01-05 13:51:40-08:00 America/Los_Angeles
+
+    - Fix logic so that tests for changed files are only added when requested
+    - Pass all changes to the coverage managers
+
+1.000093  2021-12-16 15:19:47-08:00 America/Los_Angeles
+
+    - Split out 'get_coverage_tests' logic for reuse
+
+1.000092  2021-12-16 10:39:37-08:00 America/Los_Angeles
+
+    - Add plugin hook for post-processing of coverage data.
+
+1.000091  2021-12-15 12:09:09-08:00 America/Los_Angeles
+
+    - Add more reload capabilities (non-perl reloading, callbacks)
+
+1.000090  2021-12-14 12:43:11-08:00 America/Los_Angeles
+
+    - Fix bug in status command when only 1 run is present
+
+1.000089  2021-12-14 12:12:05-08:00 America/Los_Angeles
+
+    - Add several commands for managing persisten runners
+        - yath kill     - Kill the runner and all tests (stop NOW)
+        - yath ps       - Show running yath process list
+        - yath status   - Show processes and health status
+        - yath abort    - Cancel any running or queued test, but do not kill runner
+    - Control+C in `yath run` does a better job of cleaning up
+
+1.000088  2021-12-13 11:29:24-08:00 America/Los_Angeles
+
+    - Skip tests that do not exists when running coverage tests
+
+1.000087  2021-12-09 13:51:59-08:00 America/Los_Angeles
+
+    - Add --procname-prefix option to add custom strings to procnames
+
+1.000086  2021-12-07 13:40:40-08:00 America/Los_Angeles
+
+    - Add 'HARNESS-CHURN-XXX' directive support
+
+1.000085  2021-12-06 16:28:51-08:00 America/Los_Angeles
+
+    - Make 'do' actually work
+
+1.000084  2021-12-06 15:59:23-08:00 America/Los_Angeles
+
+    - Add 'do' command that has the magic of picking run or test as needed
+
+1.000083  2021-12-03 10:18:27-08:00 America/Los_Angeles
+
+    - Add options for controlling runner output, specially for `yath run`
+
+1.000082  2021-11-18 09:04:17-08:00 America/Los_Angeles
+
+    - Make collector options configurable
+    - Add collector option for max poll events
+    - Add collector option for max open jobs
+    - Turn warnings about too many open files into proper events
+
+1.000081  2021-11-15 13:27:48-08:00 America/Los_Angeles
+
+    - Retry opening files later when "too many files open" errors occur
+
+1.000080  2021-11-04 11:13:07-07:00 America/Los_Angeles
+
+    - Add sort_files_2 for plugins to add settings and future-proof it
+
+1.000079  2021-10-29 10:42:39-07:00 America/Los_Angeles
+
+    - smarter reloader, bit via callbacks, not assumptions
+
+1.000078  2021-10-28 15:38:10-07:00 America/Los_Angeles
+
+    - Disable the feature from the last commit, it needs rethinking thanks to
+      things like Moose.
+
+1.000077  2021-10-28 15:14:09-07:00 America/Los_Angeles
+
+    - Make reloader smarter, do not delete subs from other files when reloading a file
+
+1.000076  2021-10-22 10:29:22-07:00 America/Los_Angeles
+
+    - Add relative filename to the queued task
+
+1.000075  2021-10-21 14:05:27-07:00 America/Los_Angeles
+
+    - Fix missing Changes entry for last release
+
+1.000074  2021-10-20 09:58:05-07:00 America/Los_Angeles
+
+    - Better coverage aggregation and plugin capabilities
+
+1.000073  2021-09-21 10:25:42-07:00 America/Los_Angeles
+
+    - Load coverage module EARLY in the runner spawn process
+    - Add ability to for plugins to inject CLI options for the runner
+
+1.000072  2021-09-13 09:29:54-07:00 America/Los_Angeles
+
+    - Wrap fifo creation in a loop for interrupted system calls
+
+1.000071  2021-09-03 08:26:04-07:00 America/Los_Angeles
+
+    - Allow custom subclasses with cover plugin
+
+1.000070  2021-09-01 13:36:50-07:00 America/Los_Angeles
+
+    - Improve reload inotify logic
+
+1.000069  2021-08-31 14:07:54-07:00 America/Los_Angeles
+
+    - Add interactive mode!
+
+1.000068  2021-08-30 09:52:12-07:00 America/Los_Angeles
+
+    - Expand --cover-dir options with glob()
+
+1.000067  2021-08-27 11:32:10-07:00 America/Los_Angeles
+
+    - Add option to only reload repo directories
+
+1.000066  2021-08-12 13:48:06-07:00 America/Los_Angeles
+
+    - Fix 'Cover' plugin to record untested perl files
+
+1.000065  2021-08-04 15:11:59-07:00 America/Los_Angeles
+
+    - Fix 'Cover' plugin bugs and edge cases
+
+1.000064  2021-08-02 15:23:04-07:00 America/Los_Angeles
+
+    - Add more capabilities for plugins
+    - Add the 'Cover' plugin to handle coverage in a better way
+
+1.000063  2021-07-14 09:44:17-07:00 America/Los_Angeles
+
+    - Add diags/notes to notification problem-capture
+
+1.000062  2021-07-07 15:34:34-07:00 America/Los_Angeles
+
+    - Add info on where/why 'claim_file' was called
+
+1.000061  2021-07-07 12:53:11-07:00 America/Los_Angeles
+
+    - Add even more support for notification plugins
+
+1.000060  2021-07-06 09:51:45-07:00 America/Los_Angeles
+
+    - Add support for html email
+
+1.000059  2021-07-01 13:56:29-07:00 America/Los_Angeles
+
+    - Add support for custom email/slack text
+
+1.000058  2021-06-15 15:38:16-07:00 America/Los_Angeles
+
+    - Add support for new yathui direct db coverage/duration plugin
+    - Add option to disable bail-out abortion
+
+1.000057  2021-06-04 15:59:24-07:00 America/Los_Angeles
+
+    - Add ability to provide a diff for changed files
+    - Add ability to filter files with changes
+
+1.000056  2021-05-24 14:26:45-07:00 America/Los_Angeles
+
+    - Fix warnings from preloader
+
+1.000055  2021-05-18 13:05:20-07:00 America/Los_Angeles
+
+    - Run 'conficting' tests sooner
+
+1.000054  2021-05-04 08:58:25-07:00 America/Los_Angeles
+
+    - Add option to dump depmaps
+
+1.000053  2021-04-30 11:22:30-07:00 America/Los_Angeles
+
+    - Be smarter about what can or cannot be reloaded in 'reload' mode
+
+1.000052  2021-04-30 10:37:56-07:00 America/Los_Angeles
+
+    - Add --reload option to 'start' command to reload moduels in-place when possible
+    - Make Test2::Plugin::Cover optional again
+
+1.000051  2021-04-29 07:40:33-07:00 America/Los_Angeles
+
+    - Fix an edge-case warning from git plugin
+
+1.000050  2021-04-27 09:22:25-07:00 America/Los_Angeles
+
+    - Allow a default coverage manager to be provided
+    - Move Test2::Require::Module to dev requirements
+    - Update some modules from 'base' to 'parent'
+
+1.000049  2021-04-26 08:08:05-07:00 America/Los_Angeles
+
+    - Fully require Test2::Plugin::Cover at a sufficient version
+
+1.000048  2021-04-23 11:54:37-07:00 America/Los_Angeles
+
+    - Require updated Test2::Plugin::Cover
+    - Better coverage handling, sync with newer Test2::Plguin::Cover
+
+1.000047  2021-04-20 11:42:49-07:00 America/Los_Angeles
+
+    - Remove some coverage data that was nto intended to be present (false data)
+
+1.000046  2021-04-20 09:25:24-07:00 America/Los_Angeles
+
+    - Remove debugging print statement
+
+1.000045  2021-04-20 09:14:01-07:00 America/Los_Angeles
+
+    - Change how coverage and changed-files data works
+
+1.000044  2021-03-11 20:08:54-08:00 America/Los_Angeles
+
+    - Add plugin support for providing coverage/duration data
+    - Fix running t/integration tests with ./ in path (#215)
+    - Add a fixme/todo test for #216 (Tap subtest parsing)
+
+1.000043  2021-03-05 07:47:04-08:00 America/Los_Angeles
+
+    - Minor documentation correction
+    - Add 'signal()' method to Renderer base class
+
+1.000042  2020-11-17 22:44:35-08:00 America/Los_Angeles
+
+    - Fix pipe size setting to actually use the value we want
+    - Fix pipe size setting code for older perls
+
+1.000041  2020-11-17 22:28:55-08:00 America/Los_Angeles
+
+    - When possible use a larger pipe buffer
+
+1.000040  2020-11-17 21:59:41-08:00 America/Los_Angeles
+
+    - Fix bug in collector that made it marginally less efficient
+    - Fix bug that prevented no-max from working in JobDir poll
+    - Fix bug that prevented the active status display from updating
+
+1.000039  2020-11-17 19:54:08-08:00 America/Los_Angeles
+
+    - yath watch shows aux output
+    - Minor no-op code improvement in Runner.pm
+
+1.000038  2020-11-02 20:49:12-08:00 America/Los_Angeles
+
+    - Add shellcall and aux output capture for plugins
+
+1.000037  2020-11-02 14:31:10-08:00 America/Los_Angeles
+
+    - Fix conflict between process management and resource management
+
+1.000036  2020-11-01 20:34:19-08:00 America/Los_Angeles
+
+    - Add initializing status line
+
+1.000035  2020-10-29 15:00:33-07:00 America/Los_Angeles
+
+    - Add glob() and relgob() .yath.rc pseudo-functions
+    - Document rel() .yath.rc pseudo-function
+
+1.000034  2020-10-29 07:51:19-07:00 America/Los_Angeles
+
+    - Fix warning when output is not a terminal
+
+1.000033  2020-10-28 16:37:19-07:00 America/Los_Angeles
+
+    - Better status line while tests are running
+    - Do not use --START-- and --END-- on long single-lines
+
+1.000032  2020-10-23 11:59:34-07:00 America/Los_Angeles
+
+    - Make it possible to run an alternate file to the one specified
+
+1.000031  2020-10-22 11:27:59-07:00 America/Los_Angeles
+
+    - Fix incorrect return from $spawn->args
+
+1.000030  2020-10-21 19:34:45-07:00 America/Los_Angeles
+
+    - Add environment variable management to spawn command
+    - Move spawn logic to overridable methods
+
+1.000029  2020-10-15 13:57:36-07:00 America/Los_Angeles
+
+    - Add 'spawn' command
+    - Fix plan in test.pl
+
+1.000028  2020-09-25 08:43:43-07:00 America/Los_Angeles
+
+    - Fix issue where args after :: were ignored (#195)
+
+1.000027  2020-09-21 11:46:43-07:00 America/Los_Angeles
+
+    - Move dbi_profile and cover_Files to run
+
+1.000026  2020-09-08 13:37:50-07:00 America/Los_Angeles
+
+    - Make nytprof work in persistent mode
+
+1.000025  2020-09-08 11:29:07-07:00 America/Los_Angeles
+
+    - Fix edge case where STDIN was opened for writing
+    - Add basic support for nytprof
+
+1.000024  2020-08-24 09:06:43-07:00 America/Los_Angeles
+
+    - Add Test2::Harness::Runner::Resource for resource management
+
+1.000023  2020-08-14 21:18:29-07:00 America/Los_Angeles
+
+    - No changes since trial
+
+1.000022  2020-08-13 15:18:07-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make failure to chmod things non-fatal to fix bsd testing
+    - Fix spelling issues
+    - Make chmod stuff more correct
+
+1.000021  2020-08-04 21:03:28-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add changed_files plugin hook
+    - Make git plugin support changed_files hook
+    - Add Test2::Harness::Log docs
+    - Add 'cover-files' option using Test2::Plugin::Cover
+    - Add coverage aggregator tool
+    - Add ability to run tests that cover changed files
+    - Add dbi-profiling option
+    - Fix permissions on temp dirs (may still have some issues)
+
+1.000020  2020-07-08 22:25:23-07:00 America/Los_Angeles
+
+    - reduce version of Data::UUID required
+    - Allow filenames in replay
+    - Add 'cover_files' shortcut for Test2::Plugin::Cover
+
+1.000019  2020-05-30 11:07:09-07:00 America/Los_Angeles
+
+    - Typo Fix in error message
+    - Do not die on 0 failures
+
+1.000018  2020-04-13 13:35:34-07:00 America/Los_Angeles
+
+    - Stop leaving leftover files in /tmp
+
+1.000017  2020-04-07 15:47:42-07:00 America/Los_Angeles
+
+    - Fix log_dir test on macos
+
+1.000016  2020-04-07 15:14:00-07:00 America/Los_Angeles
+
+    - Fix #! in yath script
+    - Fix 'DEFAULT' and 'IGNORE' signal inheritence
+    - Fix log-dir specificiation (#174)
+
+1.000015  2020-03-23 11:49:38-07:00 America/Los_Angeles
+
+    - YathUI plugin improvements (show url, show errors)
+    - Add more compression options to open_file
+
+1.000014  2020-03-21 18:20:37-07:00 America/Los_Angeles
+
+    - Add YathUI plugin
+    - Fix maybe_durations option
+
+1.000013  2020-03-18 13:16:20-07:00 America/Los_Angeles
+
+    - Minor doc change
+
+1.000012  2020-03-18 13:09:14-07:00 America/Los_Angeles
+
+    - Fix #172 qvf+verbose
+    - Fix #169 log path in 'run' command
+    - Fix #168 - :: mistaken for command name
+    - Fix #171 summary should only be shown when applicable
+    - Fix #171 Add --brief option to 'failed' command
+
+1.000011  2020-03-09 09:12:25-07:00 America/Los_Angeles
+
+    - Fix notifications so that all failed tests are shown
+
+1.000010  2020-03-08 15:15:24-07:00 America/Los_Angeles
+
+    - Fix missing Launch in verbose mode
+    - Restore HARNESS_IS_VERBOSE env variable
+    - Fix #163 where 1 concurrent job would get stuck reducing concurrency
+
+1.000009  2020-03-06 14:05:23-08:00 America/Los_Angeles
+
+    - Add HARNESS-NO-RETRY
+
+1.000008  2020-03-06 08:17:29-08:00 America/Los_Angeles
+
+    - Add --exclude-list option
+
+1.000007  2020-03-05 13:55:01-08:00 America/Los_Angeles
+
+    - Fix __FILE__ value in 'projects' command
+
+1.000006  2020-03-03 15:32:49-08:00 America/Los_Angeles
+
+    - Provide methods in TestFile that let you get/set retry
+
+1.000005  2020-03-02 14:48:40-08:00 America/Los_Angeles
+
+    - Use --qvf in test.pl for better output
+    - Use -r1 in test.pl temporarily for some cpantesters
+
+1.000004  2020-03-02 10:05:10-08:00 America/Los_Angeles
+
+    - Switch away from sys-io in Util::File::Stream
+    - Properly wrap FLOCK to handle interrupted syscalls
+    - Remove unnecessary IPC::Open3 dep
+    - Remove unnecessary Module::Pluggable dep
+    - Add missing require statement
+
+1.000003  2020-03-01 21:50:08-08:00 America/Los_Angeles
+
+    - Do not run persistent tests in AUTOMATED_TESTING
+
+1.000002  2020-03-01 21:19:04-08:00 America/Los_Angeles
+
+    - Fix integration tests IO issues
+
+1.000001  2020-02-29 10:49:11-08:00 America/Los_Angeles
+
+    - Do not run tests on broken NJH smokers
+
+1.000000  2020-02-28 09:30:47-08:00 America/Los_Angeles
+
+    - No changes since last trial release
+    - This is the first stable release
+    - Huge changes/refactor from the alpha versions
+
+0.999010  2020-02-27 21:52:25-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make signals.t author-testing
+    - Cleanup failure-test
+    - Show timeout delta when timing out a test
+
+0.999009  2020-02-27 07:27:29-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix sorting in ordering tests
+    - Fix incorrect line numbers in plugin.t errors
+    - Less fragile fork check in Makefile.PL
+
+0.999008  2020-02-26 20:25:34-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Only officially support systems with true fork().
+
+0.999007  2020-02-26 16:52:46-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix IOStream permissions issues
+
+0.999006  2020-02-26 15:39:28-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Do not use IOEvents by default
+
+0.999005  2020-02-25 14:02:01-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Remove blib from tarball
+    - Fix tests when outdated plugins are present
+
+0.999004  2020-02-25 07:48:30-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Warn+Skip when auto-loading outdated plugins
+
+0.999003  2020-02-24 14:51:18-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix older perls (down to 5.10)
+
+0.999002  2020-02-24 08:56:06-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix installation when an old yath is installed
+
+0.999001  2020-02-23 15:42:47-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Attempt to fix includes integration test
+
+0.999000  2020-02-23 10:19:36-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Huge refactor
+    - Fix signal restoration for forked tests
+
+0.001099  2019-09-09 21:12:15-07:00 America/Los_Angeles
+
+    - Add --durations and --maybe_durations options
+
+0.001098  2019-09-09 13:35:22-07:00 America/Los_Angeles
+
+    - Add current dir to run data
+    - Add rel/abs paths to harness_job_start/end
+
+0.001097  2019-09-08 19:22:56-07:00 America/Los_Angeles
+
+    - Add speedtag command
+
+0.001096  2019-09-08 15:24:00-07:00 America/Los_Angeles
+
+    - Cleanup help options a bit
+    - Split category into category and duration
+    - Clean up the ProcMan module
+    - Tests start as their own process groups
+
+0.001095  2019-09-04 15:38:07-07:00 America/Los_Angeles
+
+    - Fix logging of plugin when it is blessed
+
+0.001094  2019-09-04 14:44:55-07:00 America/Los_Angeles
+
+    - Improve+Test SysInfo and Git Plugins
+
+0.001093  2019-09-03 13:23:04-07:00 America/Los_Angeles
+
+    - Add branch info to git data
+
+0.001092  2019-09-03 10:32:46-07:00 America/Los_Angeles
+
+    - Minor tweaks to SysInfo and Git plugins
+
+0.001091  2019-08-30 14:03:19-07:00 America/Los_Angeles
+
+    - Add Yath::Plugin::SysInfo
+
+0.001090  2019-08-30 10:22:23-07:00 America/Los_Angeles
+
+    - Allow specifying run-fields as JSON
+
+0.001089  2019-08-30 09:05:59-07:00 America/Los_Angeles
+
+    - Allow listing run-fields on the command line
+
+0.001088  2019-08-29 23:23:47-07:00 America/Los_Angeles
+
+    - Abstract and correct timing data collection
+
+0.001087  2019-08-29 12:54:23-07:00 America/Los_Angeles
+
+    - Fix incorrect timestamps
+
+0.001086  2019-08-28 14:19:57-07:00 America/Los_Angeles
+
+    - Fix overall harness run time where HiRes was only used for start time,
+      not end time (sometimes resulting in a negative run time being printed)
+    - Do not use Test2::Plugin::Times
+    - Use event based timing data for -T
+    - remove --times flag
+    - Support for non-perl tests
+
+0.001085  2019-08-21 16:49:20-07:00 America/Los_Angeles
+
+    - Do not require DBIProfile yet until we need it (#111)
+    - Standardize how fields are specified
+
+0.001084  2019-08-16 20:08:48-07:00 America/Los_Angeles
+
+    - Make More information available to plugins
+
+0.001083  2019-08-16 19:55:17-07:00 America/Los_Angeles
+
+    - Split out some plugins (DBIProfile, MemUsage, UUID)
+    - No special treatment for plugins, they need to use INFO facets
+
+0.001082  2019-08-15 11:03:22-07:00 America/Los_Angeles
+
+    - Support 'END' phase in calculating times
+    - Support super verbose mode in composer
+    - Improvement ot DBIProfile
+    - New minimum Test2 version
+
+0.001081  2019-08-13 13:49:32-07:00 America/Los_Angeles
+
+    - Add Git injection plugin
+    - Add DBI Profile plugin
+    - Calculate and record timing data
+
+0.001080  2019-07-24 09:56:41-07:00 America/Los_Angeles
+
+    - Make it possible to relocate the persistence file
+
+0.001079  2019-07-05 12:56:06-07:00 America/Los_Angeles
+
+    - Work around JSON::XS Bug
+
+0.001078  2019-07-02 08:46:49-07:00 America/Los_Angeles
+
+    - Document yath log format
+
+0.001077  2019-06-06 15:04:32-07:00 America/Los_Angeles
+
+    - Add --retry options (toddr)
+    - Make sure all events are flushed if there is a sync issue
+    - Added some tests
+
+0.001076  2019-05-20 14:54:50-07:00 America/Los_Angeles
+
+    - Fix TAP parsers nesting parsing
+    - Dix comment groupign when parsing TAP
+
+0.001075  2019-05-18 18:33:52-07:00 America/Los_Angeles
+
+    - Fix Stream+IPC issues
+
+0.001074  2019-05-07 12:04:51-07:00 America/Los_Angeles
+
+    - Add support for table structures
+
+0.001073  2019-04-10 08:21:04-07:00 America/Los_Angeles
+
+    - Add support for disabled progress indicators to QVF mode
+
+0.001072  2019-04-08 10:27:50-07:00 America/Los_Angeles
+
+    - Add option to turn off progress indicators
+
+0.001071  2018-12-13 09:43:38-08:00 America/Los_Angeles
+
+    - Add --notify-text CLI option
+    - Fix exit code parsing and reporting
+
+0.001070  2018-10-24 13:19:53-07:00 America/Los_Angeles
+
+    - Allow --author-testing in 'projects' command
+    - Misc minor changes
+
+0.001069  2018-08-23 13:48:54-07:00 America/Los_Angeles
+
+    - Fix busy-spin in job reaper
+    - Allow --no-fork and --no-preload simultaneously
+
+0.001068  2018-07-27 09:12:45-07:00 America/Los_Angeles
+
+    - Fix more encoding/utf8 bugs
+    - Fix missing dep on sufficient List::Utils version
+
+0.001067  2018-07-18 07:42:06-07:00 America/Los_Angeles
+
+    - Add ability to congiure a custom log file format
+
+0.001066  2018-07-12 08:06:46-07:00 America/Los_Angeles
+
+    - Fix issue where isolation jobs were being kicked off too early. It needs to wait for all non-isolation jobs to finish first.
+    - New Feature: # HARNESS-CONFLICTS-XXX
+    - New documentation for HARNESS-CATEGORY-IMMISCIBLE
+    - New documentation for HARNESS-TIMEOUT-EVENT
+    - Get rid of the use of each when walking a hash.
+    - Allow comment only lines prior to HARNESS-XXX directives
+    - Accept binary TAP output that is not correctly formatted to UTF8
+    - Honor multiple spaces (or -) as a delimiter for # HARNESS directives
+
+0.001065  2018-04-22 03:26:57-07:00 America/Los_Angeles
+
+    - Fix utf8 double encoding error
+
+0.001064  2018-03-29 22:47:10-07:00 America/Los_Angeles
+
+    - Make it possible to chdir for a given test
+    - Make run automatically chdir to the dir you were in when queuing tests
+    - Add 'projects' command to run a dir with multiple projects
+
+0.001063  2018-03-27 10:17:02-07:00 America/Los_Angeles
+
+    - Make it possible to use relative paths in yath.rc
+
+0.001062  2018-03-19 09:22:18-07:00 America/Los_Angeles
+
+    - Fix bug where $, and $\ would break the formatters
+
+0.001061  2018-03-14 12:47:28-07:00 America/Los_Angeles
+
+    - No Changes since last trial
+
+0.001060  2018-03-13 11:11:27-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix parsing of streaming subtests
+
+0.001059  2018-03-12 13:26:43-07:00 America/Los_Angeles
+
+    - Job id's are now uuid's. Numbers for humans are now names
+    - Use UUIDs for event IDs
+    - Update min Test2 version
+
+0.001058  2018-03-11 15:29:23-07:00 America/Los_Angeles
+
+    - Fix broken tests
+    - Record times by default, but only show when requested
+    - Add memory usage
+    - Do not add times from the harness itself
+    - Add UUIDs to everything
+
+0.001057  2018-03-07 08:09:18-08:00 America/Los_Angeles
+
+    - No changes from last trial
+
+0.001056  2018-03-06 13:47:08-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Account for the 'hub' facet
+
+0.001055  2018-03-05 20:10:24-08:00 America/Los_Angeles
+
+    - Fix error where multiple procs read the same fh at once
+
+0.001054  2018-03-02 09:05:44-08:00 America/Los_Angeles
+
+    - Switch Streaming write() to use syswrite
+    - Fix bug where jobs would re-run after a reload
+
+0.001053  2018-02-27 07:15:53-08:00 America/Los_Angeles
+
+    - No changes since last trial
+
+0.001052  2018-02-06 15:03:08-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix infinite recursion in closed subtests log json
+
+0.001051  2018-02-06 13:29:38-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Extract composer logic from Test2 formatter so it can be re-used
+    - Revamp Watcher to stop mangling events
+    - Onlt log processed events now by default (since mangling has stopped)
+
+0.001050  2018-02-01 13:31:58-08:00 America/Los_Angeles
+
+    - Allow logging of both processed and unprocessed events
+    - Add finish() hook to loggers
+    - This is a breaking change for any existing loggers (still alpha! Do not complain!)
+
+0.001049  2018-01-26 14:27:16-08:00 America/Los_Angeles
+
+    - Better 'renderer' handling
+
+0.001048  2018-01-23 10:42:16-08:00 America/Los_Angeles
+
+    - Make it possible to use multiple renderers at once
+    - Fix return via next issue
+
+0.001047  2018-01-19 21:58:13-08:00 America/Los_Angeles
+
+    - Fix auto-reload for preload mode
+
+0.001046  2018-01-18 10:47:31-08:00 America/Los_Angeles
+
+    - Make --qvf show INTERNAL messages (#51)
+    - Make -v override --qvf (#50)
+    - Do not show 'no_display' about messages (#44)
+
+0.001045  2018-01-05 08:38:05-08:00 America/Los_Angeles
+
+    - Make it possible to toggle --qvf off
+    - Show files being run in --qvf mode
+
+0.001044  2018-01-02 07:25:06-08:00 America/Los_Angeles
+
+    - Add post-run hook to plugins
+    - Add -V/--version flags
+
+0.001043  2017-12-19 10:12:22-08:00 America/Los_Angeles
+
+    - Remove test for deleted file
+
+0.001042  2017-12-18 15:03:26-08:00 America/Los_Angeles
+
+    - Better scheduling simplification
+
+0.001041  2017-12-06 11:01:16-08:00 America/Los_Angeles
+
+    - Make realtime slack/email of failures possible
+    - Add QVF (Quiet but verbose on failure) formatter
+
+0.001040  2017-12-04 23:20:35-08:00 America/Los_Angeles
+
+    - Fix filehandle IPC leak issue
+
+0.001039  2017-12-04 21:54:24-08:00 America/Los_Angeles
+
+    - Simplify scheduling
+
+0.001038  2017-11-30 10:13:09-08:00 America/Los_Angeles
+
+    - Minor fixes
+    - Fix race condition/off by 1 when using the 'run' command
+
+0.001037  2017-11-29 09:44:23-08:00 America/Los_Angeles
+
+    - Add slack integrations
+    - Add support for .yath.user.rc
+
+0.001036  2017-11-28 10:26:36-08:00 America/Los_Angeles
+
+    - Harness directives for meta-data
+    - Add email capabilities
+
+0.001035  2017-11-22 09:59:49-08:00 America/Los_Angeles
+
+    - Fix infinite recrusion looking for .yathrc
+    - Add 'failed' command
+
+0.001034  2017-11-20 09:19:47-08:00 America/Los_Angeles
+
+    - Prevent deadlock on win32 (tests do not pass yet in win32)
+
+0.001033  2017-11-18 16:16:52-08:00 America/Los_Angeles
+
+    - Add a summarize_events to Test2::Tools::HarnessTester
+
+0.001032  2017-11-15 08:44:40-08:00 America/Los_Angeles
+
+    - Add an extra @INC hook in persistent mode for dep tracing
+
+0.001031  2017-11-03 09:18:56-07:00 America/Los_Angeles
+
+    - Remove Debug tool that used sigusr1
+    - Fix support for perls as far back as 5.8.9
+
+0.001030  2017-11-01 13:24:17-07:00 America/Los_Angeles
+
+    - Make tests work witohut old version installed
+    - Do not use shm by default
+    - add tests for replay command
+    - better test.pl
+    - use clone_io instead of hand rolling it (Formatter)
+    - doc fixes
+    - make sure test.pl does not run itself
+
+0.001029  2017-10-31 14:53:52-07:00 America/Los_Angeles
+
+    - Move away from IPC::Open3
+
+0.001028  2017-10-31 09:35:23-07:00 America/Los_Angeles
+
+    - More test coverage improvements
+
+0.001027  2017-10-27 15:11:57-07:00 America/Los_Angeles
+
+    - Do not inject a HASHREF as an env var key
+    - Improved test coverage
+    - Added a test helper for commands (including third party ones)
+    - Do not remove newlines from stdout
+    - Merge sequential stdout/stderr lines
+    - Add minimal test descriptions
+
+0.001026  2017-10-24 10:00:34-07:00 America/Los_Angeles
+
+    - Fix a couple commands that broke due ot @INC fixes
+
+0.001025  2017-10-24 09:40:28-07:00 America/Los_Angeles
+
+    - Require a newer goto-file to avoid changing exceptions
+    - Allow control of default search locations
+    - stop command now prints all to stdout
+
+0.001024  2017-10-23 12:12:53-07:00 America/Los_Angeles
+
+    - Make sure @INC is set as soon as possible
+    - Do not let a file hide a command
+
+0.001023  2017-10-20 22:16:33-07:00 America/Los_Angeles
+
+    - Update to a newer HashBase
+
+0.001022  2017-10-20 07:12:19-07:00 America/Los_Angeles
+
+    - Minor test updates
+
+0.001021  2017-10-13 11:02:22-07:00 America/Los_Angeles
+
+    - More @INC corrections
+    - DepTracer no longer mangles caller.
+
+0.001020  2017-10-13 07:34:02-07:00 America/Los_Angeles
+
+    - Use the correct @INC in all preload methods
+
+0.001019  2017-10-11 10:08:14-07:00 America/Los_Angeles
+
+    - Don't call find_yath() if we already found a yath (Matthew Horsfall)
+    - Minor display optimizations
+
+0.001018  2017-10-10 14:42:16-07:00 America/Los_Angeles
+
+    - Fix a DESTROY typo (Michael McClimon)
+    - Test2::Harness namespace does not use App::Yath namespace
+    - Package delcaration allowed before harness directives
+    - When respawning a stage may exit badly, nobody cares
+    - Fix scheduling properly this time
+    - Record timing data for all events
+    - Stop using expensive canonical JSON for logs
+    - Better $0 handling
+
+0.001017  2017-10-07 16:24:01-07:00 America/Los_Angeles
+
+    - Fix scheduling
+    - Add 'times' tool
+    - Put skip reason on same line as filename
+
+0.001016  2017-10-03 07:14:08-07:00 America/Los_Angeles
+
+    - More test coverage
+    - Added --cover option
+    - Added --dummy option
+    - Improved 'start', 'stop', and 'run'
+    - Remove chdir option
+    - Fix broken replay command
+    - Fix some deadlock conditions
+    - Cleaner output
+    - Do not wrap long output lines when output is not a terminal
+    - DZIL generates some docs now
+    - Minor bug fixes and improvements
+    - Improved performance of the parser
+    - Add # HARNESS-TIMEOUT-[TYPE] ##  header support
+    - Add -q|--quiet mode
+    - Do not try to kill job after post-exit timeout
+    - Remove the tcm plugin (it is failure)
+    - Handle sync points when incomplete lines are written
+
+0.001015  2017-09-15 08:55:30-07:00 America/Los_Angeles
+
+    - Put lib, blib, and -I's before system libs (Fixes #31)
+    - Bump minimum goto-file version (Fixes #30)
+    - Use $Config for path seperator instead of ':'
+
+0.001014  2017-09-14 21:27:29-07:00 America/Los_Angeles
+
+    - Pass-Through $ENV{PERL5LIB}
+
+0.001013  2017-09-14 18:29:49-07:00 America/Los_Angeles
+
+    - Put back code that was accidentally removed
+
+0.001012  2017-09-14 15:19:19-07:00 America/Los_Angeles
+
+    - Fix dep list
+
+0.001011  2017-09-14 14:27:32-07:00 America/Los_Angeles
+
+    - Fix bug where no-fork skipped tests
+    - Use relative paths for tests in $0, __FILE__, and caller
+
+0.001010  2017-09-14 10:31:35-07:00 America/Los_Angeles
+
+    - Pull out the filter into goto::file 
+    - Do not use filter for tests that come back as subrefs
+    - Improve TCM plugin
+    - Fix timeouts (again)
+    - Remove unused variable
+    - Stop waiting for a test once it is killed
+    - Fix Typos
+    - Some bug fixes
+
+0.001009  2017-09-12 23:10:05-07:00 America/Los_Angeles
+
+    - Better docs
+    - More testing
+    - Minor bug fixes
+
+0.001008  2017-09-12 13:49:05-07:00 America/Los_Angeles
+
+    NOW Feature-complete!
+    (Needs docs and tests)
+
+    - Fix dep versions in dist.ini
+    - Improve test coverage
+    - Better test.pl detection by yath command
+    - Add color/no-color options
+    - Support for project .yath.rc files
+    - Make sure $VERSION is in correct files
+    - Add 'help' command
+    - Add 'init' command
+    - More hooks for preload modules
+    - Several bug fixes
+    - Make it so that preload+fork does not add a stack layer
+    - unify to only one 'yath' script
+    - Split persist into multiple commands
+    - Create a plugin system, Add TCM plugin to split out later
+    - Remove pre-import option
+    - Better default log location+name
+    - Move CommandShared/Harness -> App/Command.pm
+    - Add --no-long option
+    - Add --exclude option
+    - Bind lib & blib earlier, use absolute paths
+    - Fix parser error on '}'
+    - Allow -w in tests after preload
+    - Handle timers better
+
+0.001007  2017-09-11 21:40:28-07:00 America/Los_Angeles
+
+    - Properly pass args given via '::'
+    - Honor NO-STREAM header
+    - Persist now reloads when a file is changed
+
+0.001006  2017-09-06 14:24:18-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix replay
+    - Add pre-import
+    - Add load and load-import options
+    - Add persistent harness
+
+0.001005  2017-09-05 21:59:21-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix some bugs
+    - Remove accidentally added file
+    - Do not hang when waiting after control+c
+    - Restructure Run/Runner to be more sane
+    - Fix bugs, break out test file and queue
+    - Add extra space in help dialog
+    - Restructure common command options
+    - Better queue handling
+    - Put test and replay common logic in one place
+    - Fix bugs in replay
+    - Put common logic for test and replay commands in a single place.
+
+0.001004  2017-08-31 21:02:34-07:00 America/Los_Angeles
+
+    - Make test.pl ok with preload
+    - Fix Formatter::Test2 for non-tty output
+    - Add -T for timing data per-test
+    - Better signal handling
+    - More HARNESS- header options:
+      - HARNESS-NO-TIMEOUT
+    - Delete job dirs when they are done unless -k is used
+
+0.001003  2017-08-30 23:18:54-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Set env vars in the run-runner for preload
+    - Improve preload support
+    - Fix formatter selection in Open3 runner
+    - Update deps
+
+0.001002  2017-08-29 21:10:17-07:00 America/Los_Angeles
+
+    - Allow preload of Test::Builder
+
+0.001001  2017-08-28 22:40:20-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Complete rewrite
+
+0.000013  2017-01-03 21:18:19-08:00 America/Los_Angeles
+
+    - Add event timeout option
+    - Fix filename rendering when a test is done
+    - Fixed handling of a "plan skip_all" issued in the main test (as opposed
+      to a subtest). Partially fixes GitHub
+      #21, reported by rjbs.
+    - When a test file doesn't run any tests but exits successfully, this was
+      treated as a pass. This is now detected and generates different output
+      indicating that the process did not run any tests. Fixes the rest of
+      GitHub #21, reported by rjbs.
+
+0.000012  2016-12-19 11:46:41-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fixed #9, environment now set properly in preload mode
+    - Job listeners now receive the Test2::Harness::Job object as the first
+      argument, rather than just the job id.
+    - Fixed the TAP parser to handle comments with leading
+      whitespace. Previously it would strip all the leading whitespace out,
+      causing both "# foo" and "#     foo" to be output the same way.
+    - Add example for using the harness as a preload test file
+    - Document using Test2::Harness as a preload test runner
+    - Rewrote all of the internals so that the harness now handles Test2
+      events directly, rather than converting them into Test2::Harness::Fact
+      objects. The facts were losing some details of the events, and the event
+      system already exists and is usable with the harness simply by adding
+      some new harness-specific events. Implemented by Dave Rolsky. GitHub
+      #20.
+
+0.000011  2016-06-10 14:11:01-07:00 America/Los_Angeles
+
+    - Fix rendering todo subtests...
+
+0.000010  2016-06-10 13:39:27-07:00 America/Los_Angeles
+
+    - More complete todo subtest fix
+
+0.000009  2016-06-10 13:02:11-07:00 America/Los_Angeles
+
+    - Fix TAP parsing bug when buffered subtests are TODO
+
+0.000008  2016-05-31 07:35:46-07:00 America/Los_Angeles
+
+    - Lower the IO::Handle version req
+
+0.000007  2016-05-28 16:31:35-07:00 America/Los_Angeles
+
+    - Try to fix JSON encoding problem
+
+0.000006  2016-05-26 20:28:27-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix Data::Dumper typo >:-|
+
+0.000005  2016-05-26 08:48:12-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add missing JSON prototype in Fact.pm
+    - Add diagnostics when fact->to_json fails
+
+0.000004  2016-05-26 08:35:04-07:00 America/Los_Angeles
+
+    - Handle -I better in the runner
+    - Make IO::Pty tests AUTHOR_TESTING only.
+    - Add IO::Pty to diagnostics output
+    - Diagnostics to show which JSON gets used
+
+0.000003  2016-05-25 11:55:51-07:00 America/Los_Angeles
+
+    - Get path separator from config
+    - Better windows prereq specification
+    - Handle buffered usbtest race condition
+
+0.000002  2016-05-25 09:22:22-07:00 America/Los_Angeles
+
+    - Die if given unknown command line flags. Patch by Dave Rolsky. GitHub
+      #1.
+    - Added -l (--lib) and -b (--blib) flags that work just like prove. Patch
+      by Dave Rolsky. GitHub #2.
+    - Better prereq list
+    - Diagnostic test output
+    - Old version and cross platform support
+
+
+0.000001  2016-05-24 17:04:13-07:00 America/Los_Angeles
+
+    - Initial Release

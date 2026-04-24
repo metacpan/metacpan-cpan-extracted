@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -409,12 +409,12 @@ sub stop_loop {
     my $pid = _slurp($pidfile);
     chomp $pid;
     if ( $pid && $self->_is_managed_loop( $pid, $name ) ) {
-        kill 'TERM', $pid;
+        kill 15, $pid;
         for ( 1 .. 20 ) {
             last if !kill 0, $pid;
             sleep 0.1;
         }
-        kill 'KILL', $pid if kill 0, $pid;
+        kill 9, $pid if kill 0, $pid;
     }
     $self->_cleanup_loop_files($name);
     return $pid;

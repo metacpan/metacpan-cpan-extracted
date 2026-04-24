@@ -1,5 +1,166 @@
 Revision history for Perl extension Crypt::OpenSSL::RSA.
 
+0.41 Apr 24 2026
+
+  [Bug Fixes]
+  - PR #181: Skip OpenSSL 3.x-specific tests on LibreSSL. LibreSSL
+    reports version >= 3.0 via Crypt::OpenSSL::Guess's openssl_version()
+    but internally uses the pre-3.x code path
+    (OPENSSL_VERSION_NUMBER < 0x30000000L), causing two CPAN Testers
+    failures on OpenBSD: t/padding.t (use_sslv23_padding is still a
+    valid XS function on LibreSSL because RSA_SSLV23_PADDING exists)
+    and t/pkcs1_sign.t (RSA_verify on pre-3.x/LibreSSL ignores the
+    padding mode, so cross-padding verification succeeds). LibreSSL
+    is now detected by parsing `openssl version` output for the
+    "LibreSSL" string, using find_openssl_exec(find_openssl_prefix())
+    from Crypt::OpenSSL::Guess to locate the correct binary. The
+    earlier approach of detecting LibreSSL via an undefined patch
+    level was not reliable.
+
+0.39 Apr 23 2026
+
+  [Bug Fixes]
+  - PR #171 GH #170: Fix macOS compile warnings. The OLD_CRUFTY_SSL_VERSION
+    macro used defined() inside a #define (undefined behavior when expanded
+    in #if directives); split into #ifdef/#else branches. Also cast
+    SvPV_nolen() result to UNSIGNED_CHAR* to silence the pointer-sign
+    mismatch in _load_rsa_key().
+  - PR #173: Reject non-RSA keys (EC, DSA, etc.) in _new_public_key_x509_der()
+    on OpenSSL 3.x. d2i_PUBKEY_bio() accepts any key type, unlike pre-3.x
+    d2i_RSA_PUBKEY_bio(); without validation a non-RSA DER key would be
+    stored in the rsaData struct and produce confusing failures later.
+  - PR #177: Check padding compatibility before message length in
+    private_encrypt() and public_decrypt(). Previously, calling these with
+    the default OAEP padding (or PSS) produced a misleading "plaintext too
+    long" error that hid the real issue (OAEP/PSS are fundamentally
+    incompatible with private_encrypt/public_decrypt). The clear
+    "OAEP/PSS padding is not supported" error is now emitted regardless of
+    data size, and the rejection extends to pre-3.x OpenSSL (previously
+    only checked on 3.x inside rsa_crypt()).
+  - PR #178: Validate key size in generate_key() before calling OpenSSL.
+    Reject negative, zero, and sub-512-bit key sizes with a clear croak
+    instead of letting OpenSSL produce cryptic errors or hang.
+  - PR #179 GH #174: Restore the lost configure_requires prereq on
+    Crypt::OpenSSL::Guess in Makefile.PL.
+  - PR #179 GH #175: Fix failing test 'Padding method pkcs1_pss is valid
+    for signing with ripemd160'.
+
+  [Improvements]
+  - PR #180: Add optional passphrase argument to new_private_key_der(),
+    enabling decryption of encrypted PKCS#8 DER (EncryptedPrivateKeyInfo)
+    private keys. On OpenSSL 3.x the passphrase is passed to the existing
+    OSSL_DECODER_CTX; on pre-3.x a d2i_PKCS8PrivateKey_bio() helper is
+    used. Previously only PEM-encoded keys supported a passphrase.
+
+  [Maintenance]
+  - PR #172: Fix 'passphase' -> 'passphrase' typo throughout the codebase
+    (RSA.xs internal names, RSA.pm POD for get_private_key_string, and the
+    test variable in t/format.t). The typo dates to the original 0.33
+    passphrase support. No functional change -- all renames are internal.
+
+0.38 Apr 23 2026
+
+  [Bug Fixes]
+  - PR #103 GH #61: Re-enable PKCS#1 v1.5 padding for sign()/verify().  It
+    was incorrectly disabled in 0.35; the Marvin attack only affects
+    decryption, not signatures.
+  - PR #168: Fix croak message to reference use_pkcs1_oaep_padding() (not
+    use_pkcs1_padding()) when non-OAEP padding is used for encrypt/decrypt.
+  - PR #165: Fix OAEP overhead calculation that was hardcoded for SHA-1;
+    correct overhead is now computed per the configured hash algorithm.
+  - PR #141: Reject non-RSA keys (EC, DSA, RSA-PSS) loaded via
+    _load_rsa_key() on OpenSSL 3.x with a clear error instead of a
+    confusing failure later.
+  - PR #118: Fix private_encrypt() and public_decrypt() broken on OpenSSL
+    3.x with any padding except NO_PADDING; rsa_crypt() now distinguishes
+    encrypt vs. sign paths.
+  - PR #142: Free signature buffer on RSA_sign() failure on pre-3.x.
+  - PR #164 GH #152: Drain OpenSSL error queue after _get_key_parameters()
+    on OpenSSL 3.x so a failed optional-param lookup does not pollute the
+    error queue for subsequent operations.
+  - PR #161 GH #152: Cache is_private_key flag in rsaData struct to avoid a
+    per-call BIGNUM heap allocation on OpenSSL 3.x.
+  - PR #159 GH #155: Check return values of EVP_PKEY_get_bn_param() in
+    _get_key_parameters(); a failed mandatory param (n or e) now croaks
+    instead of silently returning undef.
+  - PR #160 GH #156: Use THROW macro for make_rsa_obj() result in
+    _new_key_from_parameters() to prevent resource leak on a NULL return.
+  - PR #158 GH #154: Extract setup_pss_sign_ctx() helper to deduplicate
+    PSS context setup in sign() and verify(); the two paths could previously
+    diverge silently.
+  - PR #157 GH #153: Eliminate duplicate NID-to-name table in
+    get_message_digest(); fixes whirlpool on OpenSSL 3.x where the old
+    low-level WHIRLPOOL() API path was being used instead of EVP_MD_fetch().
+  - PR #145: Fix BIO resource leak in extractBioString() error paths.
+  - PR #143: Validate that a private key is present before attempting export
+    in get_private_key_string().
+  - PR #140: NULL out BIGNUMs after freeing them in _new_key_from_parameters()
+    to prevent a double-free when make_rsa_obj() fails after they are freed.
+  - PR #137: Use BN_clear_free() (instead of BN_free()) for private key
+    BIGNUMs in _get_key_parameters() to scrub sensitive material.
+  - PR #136: Remove static buffer in get_message_digest() that caused
+    thread-safety problems under Perl ithreads.
+  - PR #134: Add Perl-level stub for use_sslv23_padding() on OpenSSL 3.x
+    where the underlying RSA_SSLV23_PADDING constant was removed.
+  - PR #133: Fix PSS MGF1 setup to inspect the correct padding fields
+    (sign_pad/verify_pad) instead of p_rsa->padding, preventing wrong
+    MGF1 hash on auto-promoted PSS operations.
+  - PR #120: Check PEM_write_bio_* return values in key export functions
+    so failures are reported rather than silently ignored.
+  - PR #119: Migrate SHA* digest calls to EVP_Q_digest() on OpenSSL 3.x,
+    replacing deprecated low-level SHA*() functions.
+  - PR #109: Drain the full OpenSSL error queue in croakSsl() and report
+    the last (most specific) error rather than the oldest one.
+  - PR #104: Guard croakSsl() against a NULL error string from
+    ERR_reason_error_string() to prevent a NULL-deref croak.
+  - PR #76: Do not include whrlpool.h when whirlpool support is disabled.
+  - Memory leak fixes across OpenSSL 3.x code paths (PR #75, PR #77, PR #78,
+    PR #79, PR #80, PR #81, PR #83, PR #87, PR #90, PR #99, PR #101, PR #108,
+    PR #112, PR #114, PR #127, PR #128, PR #129, PR #131): plugged leaks in
+    generate_key(), sign(), verify(), rsa_crypt(), check_key(),
+    get_public_key_string(), _new_key_from_parameters(), and
+    _get_key_parameters() across success and error paths.
+
+  [Improvements]
+  - PR #169: Make Crypt::OpenSSL::Bignum a hard runtime requirement (moved
+    from recommended to required in Makefile.PL and added hard import in
+    RSA.pm); it was already required in practice for get_key_parameters().
+  - PR #126: new_public_key() now accepts DER-encoded public keys in addition
+    to PEM; format is detected automatically via ASN.1 OID inspection.
+  - PR #124: Add get_private_key_pkcs8_string() to export private keys in
+    PKCS#8 PEM format.
+  - PR #110: Add get_public_key_pkcs1_string() as an alias for
+    get_public_key_string() for API symmetry with the X.509/PKCS#1 naming.
+  - PR #111: Add optional check=>1 parameter to new_key_from_parameters()
+    to validate the constructed key via check_key() before returning it.
+  - PR #135: Add plaintext length pre-validation in rsa_crypt() with a
+    descriptive croak before attempting the OpenSSL operation.
+  - PR #151: Reject invalid (even-numbered) RSA exponents before passing
+    them to OpenSSL, preventing a potential hang during key generation.
+
+  [Maintenance]
+  - PR #163: Add CONTRIBUTING.md and SECURITY.md to satisfy CPANTS
+    experimental kwalitee metrics.
+  - PR #144: Clean up Makefile.PL metadata: remove dead -DPERL5 and
+    -DOPENSSL_NO_KRB5 defines; derive version dynamically from RSA.pm.
+  - PR #130: Add test coverage for generate_key() with custom public
+    exponents and exponent validation.
+  - PR #121: Add test coverage for private_encrypt() and public_decrypt().
+  - PR #148: Add PKCS#1 v1.5 signing regression tests (PR #148).
+  - PR #95: Add error-path and edge-case test coverage (t/error.t).
+  - PR #115, PR #116: Add encrypt/decrypt and sign/verify edge-case tests.
+  - PR #85, PR #86, PR #88, PR #91: Improve test assertions — replace bare
+    ok() calls with is()/like() and add descriptive test names throughout.
+  - PR #84: Add macOS CI job covering both system LibreSSL and Homebrew
+    OpenSSL 3.x.
+  - PR #123: Add Valgrind memory-leak detection CI job on Debian bookworm.
+  - PR #73: Fix META URLs, remove duplicate .gitignore entries, fix
+    build_requires; add Debian trixie (OpenSSL 3.4.x) to CI matrix.
+  - PR #72: Bump actions/checkout from v4 to v6.
+  - PR #82: Bump perl-actions/perl-versions from 1 to 2.
+  - PR #70: Add Dependabot for automatic GitHub Actions version updates.
+  - PR #69: Remove Debian buster from CI matrix (EOL).
+
 0.37 Oct 29 2025
      - Fix libressl bitwise logic error in RSA.xs
 

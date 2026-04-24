@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Cwd qw(getcwd);
@@ -29,12 +29,28 @@ sub run_skills_command {
 
     if ( $action eq 'install' ) {
         my $use_ddfile = 0;
-        GetOptionsFromArray( \@argv, 'ddfile' => \$use_ddfile );
-        return _usage_error("Usage: dashboard skills install <git-url-or-local-dir>\nUsage: dashboard skills install --ddfile\n")
-          if ( $use_ddfile && @argv ) || ( !$use_ddfile && !@argv );
-        my $progress = $use_ddfile ? undef : _skills_install_progress();
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'ddfile' => \$use_ddfile, 'o|output=s' => \$output );
+        return _usage_error("Usage: dashboard skills install [-o json|table] [<git-url-or-local-dir> ...]\n")
+          if $output ne 'json' && $output ne 'table';
+        return _usage_error(
+            "Usage: dashboard skills install [-o json|table] [<git-url-or-local-dir> ...]\n"
+              . "Usage: dashboard skill install [-o json|table] [<git-url-or-local-dir> ...]\n"
+              . "Usage: dashboard skills install --ddfile [-o json|table]\n"
+        ) if $use_ddfile && @argv;
+        my $paths = _build_paths();
+        my @progress_sources = @argv;
+        if ( !$use_ddfile && !@progress_sources ) {
+            my $source_manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+            @progress_sources = $source_manager->registered_skill_sources;
+        }
+        my $progress = !$use_ddfile
+          ? @progress_sources == 1 && @argv == 1
+              ? _skills_install_progress()
+              : _skills_install_progress_for_sources(@progress_sources)
+          : undef;
         my $manager = Developer::Dashboard::SkillManager->new(
-            paths    => _build_paths(),
+            paths    => $paths,
             progress => $progress ? $progress->callback : undef,
         );
         my $result;
@@ -42,7 +58,11 @@ sub run_skills_command {
         eval {
             $result = $use_ddfile
               ? $manager->install_from_ddfiles( getcwd() )
-              : $manager->install( shift @argv );
+              : @argv
+                ? @argv == 1
+                    ? $manager->install( shift @argv )
+                    : $manager->install_many(@argv)
+                : $manager->install_registered_skills;
             1;
         } or do {
             $error = $@ || "dashboard skills install failed\n";
@@ -52,20 +72,18 @@ sub run_skills_command {
             die $error;
         }
         $progress->finish if $progress;
-        print json_encode($result);
+        if ( $output eq 'json' ) {
+            print json_encode($result);
+        }
+        else {
+            print _skills_install_summary_table($result);
+        }
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'uninstall' ) {
         my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills uninstall <repo-name>\n";
         my $result = $manager->uninstall($repo_name);
-        print json_encode($result);
-        return $result->{error} ? 1 : 0;
-    }
-    if ( $action eq 'update' ) {
-        my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-        my $repo_name = shift @argv || die "Usage: dashboard skills update <repo-name>\n";
-        my $result = $manager->update($repo_name);
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
@@ -128,7 +146,7 @@ sub run_skills_command {
         return 0;
     }
 
-    die "Unknown skills action: $action\nUsage: dashboard skills [install|uninstall|update|enable|disable|list|usage]\n";
+    die "Unknown skills action: $action\nUsage: dashboard skills [install|uninstall|enable|disable|list|usage]\n";
 }
 
 # _usage_error($message)
@@ -169,6 +187,59 @@ sub _skills_install_progress {
         dynamic => ( -t STDERR ? 1 : 0 ),
         color   => ( -t STDERR ? 1 : 0 ),
     );
+}
+
+# _skills_install_progress_for_sources(@sources)
+# Builds the optional source-level task board used by multi-skill and update-all
+# install runs.
+# Input: source strings that will be installed.
+# Output: Developer::Dashboard::CLI::Progress object or undef when progress is disabled.
+sub _skills_install_progress_for_sources {
+    my (@sources) = @_;
+    my $enabled = $ENV{DEVELOPER_DASHBOARD_PROGRESS} ? 1 : 0;
+    return if !$enabled && !-t STDERR;
+    return if !@sources;
+    return Developer::Dashboard::CLI::Progress->new(
+        title   => 'dashboard skills install progress',
+        tasks   => Developer::Dashboard::SkillManager->install_progress_tasks_for_sources(@sources),
+        stream  => \*STDERR,
+        dynamic => ( -t STDERR ? 1 : 0 ),
+        color   => ( -t STDERR ? 1 : 0 ),
+    );
+}
+
+# _skills_install_summary_table($result)
+# Renders skill install results as the default terminal summary table.
+# Input: install result hash reference from SkillManager.
+# Output: formatted table text, or a clear no-update line plus table when nothing changed.
+sub _skills_install_summary_table {
+    my ($result) = @_;
+    my @rows = map {
+        [
+            $_->{repo_name} || '-',
+            $_->{source} || '-',
+            defined $_->{version_before} ? $_->{version_before} : '-',
+            defined $_->{version_after}  ? $_->{version_after}  : '-',
+            $_->{status} || '-',
+        ]
+    } _install_result_rows($result);
+    my $changed = grep { ( $_->[4] || '' ) eq 'installed' || ( $_->[4] || '' ) eq 'updated' } @rows;
+    my $text = $changed ? '' : "No update.\n";
+    $text .= _render_table( [ 'Skill', 'Source', 'Before', 'After', 'Status' ], \@rows );
+    return $text;
+}
+
+# _install_result_rows($result)
+# Normalizes the different install result payload shapes into summary rows.
+# Input: SkillManager install result hash reference.
+# Output: list of row hashes with repo, source, version, and status fields.
+sub _install_result_rows {
+    my ($result) = @_;
+    return () if ref($result) ne 'HASH';
+    return @{ $result->{operations} || [] } if ref( $result->{operations} ) eq 'ARRAY';
+    return @{ $result->{results} || [] }    if ref( $result->{results} ) eq 'ARRAY';
+    return ($result) if $result->{repo_name};
+    return ();
 }
 
 # _skills_table($skills)
@@ -341,7 +412,7 @@ action parsing inline.
 
 =head1 PURPOSE
 
-This module is the command runtime behind C<dashboard skills>. It owns the CLI parsing for skill install, update, uninstall, enable, disable, list, and usage; prints canonical JSON by default; renders optional table output for human inspection; and handles the internal dotted-command handoff used by C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
+This module is the command runtime behind C<dashboard skills> and the singular C<dashboard skill> alias. It owns the CLI parsing for skill install, update, uninstall, enable, disable, list, and usage; prints canonical JSON by default; renders optional table output for human inspection; and handles the internal dotted-command handoff used by C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
 
 =head1 WHY IT EXISTS
 
@@ -364,6 +435,8 @@ It is used by the staged C<skills> private helper, by dotted skill command dispa
   dashboard skills list
   dashboard skills list -o table
   dashboard skills install /absolute/path/to/example-skill
+  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
+  dashboard skill install browser
   dashboard skills install --ddfile
   dashboard skills usage example-skill
   dashboard skills usage example-skill -o table

@@ -1,3 +1,6 @@
+v0.905.0 2026-04-24 09:37:22+02:00
+ - Fix memory leak for trailing UTF8 octets (PR#123)
+
 v0.904.0 2025-05-08 14:12:41+02:00
  - Experimental OOP Interface, YAML 1.2
 

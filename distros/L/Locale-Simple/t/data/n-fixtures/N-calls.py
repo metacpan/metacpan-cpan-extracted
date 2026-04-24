@@ -1,0 +1,8 @@
+N_("PY N plain")
+Nn_("PY N one", "PY N many")
+Np_("PY_ctx", "PY N ctx plain")
+Nnp_("PY_ctx", "PY N ctx one", "PY N ctx many")
+Nd_("PY_dom", "PY N dom plain")
+Ndn_("PY_dom", "PY N dom one", "PY N dom many")
+Ndp_("PY_dom", "PY_ctx", "PY N dom ctx plain")
+Ndnp_("PY_dom", "PY_ctx", "PY N dom ctx one", "PY N dom ctx many")

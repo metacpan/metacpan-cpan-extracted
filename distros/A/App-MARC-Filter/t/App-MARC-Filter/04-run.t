@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 23;
+use Test::More 'tests' => 25;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -205,6 +205,22 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	$data_dir->file('ex1.xml.bz2')->s,
+	'material_type',
+	'book',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (material_type = book, compressed input).',
+);
+
+# Test.
+@ARGV = (
 	'-i',
 	$data_dir->file('ex1.xml')->s,
 	'material_type',
@@ -330,6 +346,22 @@ stdout_is(
 	},
 	$right_ret,
 	'Run filter for MARC USMARC file with 1 record (leader = \'01262nam a2200337   4500\').',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex4.mrc.gz')->s,
+	'leader',
+	'01262nam a2200337   4500',
+);
+$right_ret = slurp($data_dir->file('ex4.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC USMARC file with 1 record (leader = \'01262nam a2200337   4500\', compressed input).',
 );
 
 # Test.

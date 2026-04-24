@@ -60,6 +60,7 @@ lib/NBI/QueuedJob.pm
 lib/NBI/Slurm.pm
 lib/NBI/Test.pl
 run.sh
+s/clean.sh
 s/install.sh
 s/job.pl
 s/opts.pl

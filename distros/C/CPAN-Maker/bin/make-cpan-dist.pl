@@ -31,7 +31,7 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny;
 use version;
 
-our $VERSION = '1.7.5'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.8.0'; ## no critic (RequireInterpolationOfMetachars)
 
 caller or __PACKAGE__->main();
 
@@ -508,13 +508,22 @@ sub write_makefile {
 
   my $EXE_FILES = Dumper \@exe_file_list;
 
-  my %man3pods;
+  # was: blindly putting all exe_files into MAN3PODS
+  # fix: MAN1PODS only for scripts that actually contain POD
+
+  my %man1pods;
+
   foreach (@exe_file_list) {
     my ( $name, $path, $ext ) = fileparse( $_, qr/[.][^.]+\z/xsm );
-    $man3pods{$_} = sprintf 'blib/man3/%s.3', $name;
+
+    # only include scripts that actually contain POD
+    my $content = eval { slurp_file($_) } // q{};
+    next if $content !~ /^=(head\d|pod|over|item|begin|encoding)/xsm;
+
+    $man1pods{$_} = sprintf 'blib/man1/%s.1', $name;
   }
 
-  my $MAN3PODS = Dumper \%man3pods;
+  my $MAN1PODS = Dumper \%man1pods;
 
   my %provides;
 
@@ -614,7 +623,7 @@ WriteMakefile(
   LICENSE          => 'perl',
   PL_FILES         => $PL_FILES,
   EXE_FILES        => $EXE_FILES,
-  MAN3PODS         => $MAN3PODS,
+  MAN1PODS         => $MAN1PODS,
   PREREQ_PM        => $PRE_REQ,
   BUILD_REQUIRES   => {
     'ExtUtils::MakeMaker'     => '6.64',
@@ -1132,6 +1141,26 @@ sub parse_buildspec {
 
   %args = write_pl_files( $buildspec->{pl_files}, %args );
 
+  if ( my $links = $buildspec->{'man-links'} ) {
+    my $man_links_content = _generate_man_links($links);
+
+    my ( $fh, $filename ) = tempfile( 'make-cpan-dist-XXXXX', TMPDIR => $TRUE );
+
+    # preserve existing postamble if one was specified
+    if ( $args{F} && -e $args{F} ) {
+      local $RS = undef;
+      open my $existing, '<', $args{F}
+        or die "could not read postamble $args{F}: $OS_ERROR\n";
+      print {$fh} <$existing>;
+      close $existing;
+    }
+
+    print {$fh} $man_links_content;
+    close $fh;
+
+    $args{F} = $filename;
+  }
+
   # set boolean args from options
 
   my @boolean_args = qw( verbose v cleanup !x scandeps s require-versions !A );
@@ -1166,6 +1195,42 @@ sub parse_buildspec {
   DEBUG Dumper( [ args => \%args ] );
 
   return %args;
+}
+
+########################################################################
+sub _generate_man_links {
+########################################################################
+  my ($links) = @_;
+
+  my $content = q{};
+
+  for my $entry ( @{$links} ) {
+    for my $p ( pairs %{$entry} ) {
+      my ( $alias, $module ) = @{$p};
+
+      # derive the .pm path from the module name and check for POD
+      ( my $pm_path = "lib/$module.pm" ) =~ s|::|/|gxsm;
+
+      if ( -e $pm_path ) {
+        my $pm_content = eval { slurp_file($pm_path) } // q{};
+
+        if ( $pm_content !~ /^=(head\d|pod|over|item|begin|encoding)/xsm ) {
+          next;
+        }
+      }
+      else {
+        next;
+      }
+
+      $content .= <<"POSTAMBLE";
+install ::
+\t\$(NOECHO) ln -sf \$(INSTALLMAN3DIR)/$module.3pm \$(INSTALLMAN3DIR)/$alias.3pm
+\t\$(NOECHO) echo \$(INSTALLMAN3DIR)/$alias.3pm >> \$(DESTINSTALLSITEARCH)/auto/\$(FULLEXT)/.packlist
+POSTAMBLE
+    }
+  }
+
+  return $content;
 }
 
 ########################################################################
@@ -1525,7 +1590,7 @@ sub main {
 
 __DATA__
 ---
-version: "1.7.5"
+version: "1.8.0"
 min_perl_version: "type:string"
 min-perl-version: "type:string"
 project:
@@ -1570,6 +1635,7 @@ resources:
 scripts:
 exe_files:
 version-from: "type:string"
+man-links:
 
 =pod
 

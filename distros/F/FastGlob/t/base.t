@@ -21,8 +21,16 @@ sub globtest(;$) {
         chomp;
 
         note "pattern: $_\n";
-        if ( $_ =~ m{^\s#} ) {
+        if ( $_ =~ m{^#} ) {
           note " test skipped... TODO";
+          next;
+        }
+
+        # Skip patterns containing path separators on Windows — output format
+        # differs between FastGlob ($dirsep=\) and CORE::glob (uses /).
+        if ( $^O eq 'MSWin32' && m{/} ) {
+          note " skipping Unix-path pattern on Windows";
+          next;
         }
 
         @t0     = times();
@@ -49,6 +57,40 @@ sub globtest(;$) {
 globtest();
 
 pass 'done';
+
+# Tilde expansion tests — the module supports ~ and ~user patterns.
+# On Unix, getpwuid/getpwnam provide home dirs; on Windows, $HOME/$USERPROFILE.
+SKIP: {
+    my $homedir;
+
+    if ( $^O eq 'MSWin32' ) {
+        $homedir = defined($ENV{HOME}) ? $ENV{HOME} : $ENV{USERPROFILE};
+    } else {
+        my $has_getpwent = eval { getpwent(); 1 };
+        endpwent() if $has_getpwent;
+        skip 'getpwent not available on this platform', 4 unless $has_getpwent;
+
+        my @home = getpwuid($<);
+        $homedir = $home[7];
+    }
+
+    skip 'cannot determine home directory', 4 unless $homedir && -d $homedir;
+
+    my @tilde_results = FastGlob::glob('~');
+    is( scalar @tilde_results, 1, '~ expands to exactly one entry' );
+    is( $tilde_results[0], $homedir, '~ expands to current user home directory' );
+
+    # ~root expands to root's home directory (named user, Unix only)
+    if ( $^O eq 'MSWin32' ) {
+        skip 'no ~user expansion on Windows', 2;
+    }
+    my @root_pw = getpwnam('root');
+    skip 'root user not available', 2 unless @root_pw && $root_pw[7] && -d $root_pw[7];
+
+    my @root_results = FastGlob::glob('~root');
+    is( scalar @root_results, 1, '~root expands to exactly one entry' );
+    is( $root_results[0], $root_pw[7], '~root expands to root home directory' );
+}
 
 done_testing;
 

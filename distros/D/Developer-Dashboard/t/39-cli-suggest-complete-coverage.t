@@ -41,7 +41,8 @@ use Developer::Dashboard::CLI::Suggest ();
 }
 
 for my $case (
-    [ skills    => [ qw(install enable disable uninstall update list usage) ] ],
+    [ skills    => [ qw(install enable disable uninstall list usage) ] ],
+    [ skill     => [ qw(install enable disable uninstall list usage) ] ],
     [ docker    => [ qw(compose list enable disable) ] ],
     [ path      => [ qw(list resolve add del locate project-root) ] ],
     [ indicator => [ qw(set list refresh-core) ] ],

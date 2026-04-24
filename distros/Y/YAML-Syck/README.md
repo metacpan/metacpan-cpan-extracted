@@ -1,5 +1,3 @@
-[![](https://github.com/toddr/YAML-Syck/workflows/linux/badge.svg)](https://github.com/toddr/YAML-Syck/actions) [![](https://github.com/toddr/YAML-Syck/workflows/macos/badge.svg)](https://github.com/toddr/YAML-Syck/actions) [![](https://github.com/toddr/YAML-Syck/workflows/windows/badge.svg)](https://github.com/toddr/YAML-Syck/actions)
-
 # NAME 
 
 YAML::Syck - Fast, lightweight YAML loader and dumper
@@ -46,6 +44,13 @@ Some calls are designed to die rather than returning YAML. You should wrap
 your calls in eval to assure you do not get unexpected results.
 
 # FLAGS
+
+## $YAML::Syck::MaxDepth
+
+Maximum nesting depth for `Dump`.  Defaults to 512.  If a data structure
+is nested deeper than this limit, `Dump` will `croak` instead of
+overflowing the C stack.  Increase this if you legitimately need to
+serialize very deeply nested structures.
 
 ## $YAML::Syck::Headless
 

@@ -1,6 +1,7 @@
+use strict;
+use warnings;
 use Test::More tests => 4;
 use XML::Parser;
-use strict;
 
 # Test that parsing XML strings does not auto-vivify symbol table entries.
 # See https://github.com/cpan-authors/XML-Parser/issues/27

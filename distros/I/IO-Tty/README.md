@@ -6,7 +6,7 @@ IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 # VERSION
 
-1.27
+1.29
 
 # SYNOPSIS
 
@@ -16,127 +16,80 @@ IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 # DESCRIPTION
 
-`IO::Tty` is used internally by `IO::Pty` to create a pseudo-tty.
+`IO::Tty` is used internally by [IO::Pty](https://metacpan.org/pod/IO%3A%3APty) to create a pseudo-tty.
 You wouldn't want to use it directly except to import constants, use
-`IO::Pty`.  For a list of importable constants, see
+[IO::Pty](https://metacpan.org/pod/IO%3A%3APty).  For a list of importable constants, see
 [IO::Tty::Constant](https://metacpan.org/pod/IO%3A%3ATty%3A%3AConstant).
 
-Windows is now supported, but ONLY under the Cygwin
-environment, see [http://sources.redhat.com/cygwin/](http://sources.redhat.com/cygwin/).
+Windows is now supported under the Cygwin environment, see
+[http://cygwin.com/](http://cygwin.com/).
 
-Please note that pty creation is very system-dependend.  From my
-experience, any modern POSIX system should be fine.  Find below a list
-of systems that `IO::Tty` should work on.  A more detailed table
-(which is slowly getting out-of-date) is available from the project
-pages document manager at SourceForge
-[http://sourceforge.net/projects/expectperl/](http://sourceforge.net/projects/expectperl/).
+Please note that pty creation is very system-dependent.  Any modern
+POSIX system should be fine.  The test suite is run via GitHub Actions
+CI on Linux, macOS, FreeBSD, OpenBSD, and NetBSD.
 
-If you have problems on your system and your system is listed in the
-"verified" list, you probably have some non-standard setup, e.g. you
-compiled your Linux-kernel yourself and disabled ptys (bummer!).
-Please ask your friendly sysadmin for help.
+If you have problems on your system and it is listed below, you
+probably have a non-standard setup, e.g. you compiled your
+Linux-kernel yourself and disabled ptys (bummer!).  Please ask your
+friendly sysadmin for help.
 
 If your system is not listed, unpack the latest version of `IO::Tty`,
-do a `'perl Makefile.PL; make; make test; uname -a'` and send me
-(`RGiersig@cpan.org`) the results and I'll see what I can deduce from
-that.  There are chances that it will work right out-of-the-box...
+do a `'perl Makefile.PL; make; make test; uname -a'` and report
+issues at [https://github.com/cpan-authors/IO-Tty/issues](https://github.com/cpan-authors/IO-Tty/issues).
 
-If it's working on your system, please send me a short note with
-details (version number, distribution, etc. 'uname -a' and 'perl -V'
-is a good start; also, the output from "perl Makefile.PL" contains a
-lot of interesting info, so please include that as well) so I can get
-an overview.  Thanks!
+# PLATFORMS AND KNOWN ISSUES
 
-# VERIFIED SYSTEMS, KNOWN ISSUES
+`IO::Tty` is tested via CI on Linux, macOS, FreeBSD, OpenBSD, and
+NetBSD across multiple Perl versions.  It is also known to work on
+AIX, Solaris/illumos, HP-UX, IRIX, z/OS, and Windows (under Cygwin).
 
-This is a list of systems that `IO::Tty` seems to work on ('make
-test' passes) with comments about "features":
+Known platform-specific behaviors:
 
-- AIX 4.3
+- Linux, AIX
 
     Returns EIO instead of EOF when the slave is closed.  Benign.
 
-- AIX 5.x
-- FreeBSD 4.4
+- FreeBSD, OpenBSD, HP-UX, Solaris
 
     EOF on the slave tty is not reported back to the master.
 
-- OpenBSD 2.8
+- OpenBSD
 
     The ioctl TIOCSCTTY sometimes fails.  This is also known in
-    Tcl/Expect, see http://expect.nist.gov/FAQ.html
+    Tcl/Expect.
 
-    EOF on the slave tty is not reported back to the master.
+- Solaris
 
-- Darwin 7.9.0
-- HPUX 10.20 & 11.00
+    Has the "feature" of returning EOF just once.
 
-    EOF on the slave tty is not reported back to the master.
-
-- IRIX 6.5
-- Linux 2.2.x & 2.4.x
-
-    Returns EIO instead of EOF when the slave is closed.  Benign.
-
-- OSF 4.0
-
-    EOF on the slave tty is not reported back to the master.
-
-- Solaris 8, 2.7, 2.6
-
-    Has the "feature" of returning EOF just once?!
-
-    EOF on the slave tty is not reported back to the master.
-
-- Windows NT/2k/XP (under Cygwin)
+- Cygwin
 
     When you send (print) a too long line (>160 chars) to a non-raw pty,
     the call just hangs forever and even alarm() cannot get you out.
-    Don't complain to me...
 
-    EOF on the slave tty is not reported back to the master.
-
-- z/OS
-
-The following systems have not been verified yet for this version, but
-a previous version worked on them:
-
-- SCO Unix
-- NetBSD
-
-    probably the same as the other \*BSDs...
-
-If you have additions to these lists, please mail them to
-<`RGiersig@cpan.org`>.
+Please report issues at
+[https://github.com/cpan-authors/IO-Tty/issues](https://github.com/cpan-authors/IO-Tty/issues).
 
 # SEE ALSO
 
 [IO::Pty](https://metacpan.org/pod/IO%3A%3APty), [IO::Tty::Constant](https://metacpan.org/pod/IO%3A%3ATty%3A%3AConstant)
 
-# MAILING LISTS
-
-As this module is mainly used by Expect, support for it is available
-via the two Expect mailing lists, expectperl-announce and
-expectperl-discuss, at
-
-    http://lists.sourceforge.net/lists/listinfo/expectperl-announce
-
-and
-
-    http://lists.sourceforge.net/lists/listinfo/expectperl-discuss
+Source code and issue tracker at
+[https://github.com/cpan-authors/IO-Tty](https://github.com/cpan-authors/IO-Tty).
 
 # AUTHORS
 
 Originally by Graham Barr <`gbarr@pobox.com`>, based on the
 Ptty module by Nick Ing-Simmons <`nik@tiuk.ti.com`>.
 
-Now maintained and heavily rewritten by Roland Giersig
+Heavily rewritten by Roland Giersig
 <`RGiersig@cpan.org`>.
+
+Currently maintained by Todd Rinaldo.
 
 Contains copyrighted stuff from openssh v3.0p1, authored by Tatu
 Ylonen <ylo@cs.hut.fi>, Markus Friedl and Todd C. Miller
-<Todd.Miller@courtesan.com>.  I also got a lot of inspiration from
-the pty code in Xemacs.
+<Todd.Miller@courtesan.com>.
 
 # COPYRIGHT
 

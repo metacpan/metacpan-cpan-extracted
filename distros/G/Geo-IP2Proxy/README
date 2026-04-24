@@ -1,7 +1,7 @@
 Geo::IP2Proxy
 =============
 
-This Perl module provides quick reverse lookup of IP addresses to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges, residential proxies, consumer privacy networks, and enterprise private networks using IP2Proxy BIN databases. Other available information includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threats, last seen date, provider names, and fraud score.
+This Perl module provides quick reverse lookup of IP addresses to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges, residential proxies, AI crawlers, consumer privacy networks, and enterprise private networks using IP2Proxy BIN databases. Other available information includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threats, last seen date, provider names, and fraud score.
 
 This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. IP2Proxy supports both IPv4 and IPv6 addressing.
 

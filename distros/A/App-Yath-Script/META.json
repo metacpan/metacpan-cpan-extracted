@@ -1,0 +1,60 @@
+{
+   "abstract" : "Script initialization and utility functions for Test2::Harness",
+   "author" : [
+      "Chad Granum <exodist@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Yath-Script",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12",
+            "goto::file" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "3.75",
+            "File::Spec" : "0",
+            "Getopt::Yath" : "2.000008",
+            "Importer" : "0.025",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "1.302199"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Test-More/Test2-Harness/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Test-More/Test2-Harness/"
+      }
+   },
+   "version" : "2.000011",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

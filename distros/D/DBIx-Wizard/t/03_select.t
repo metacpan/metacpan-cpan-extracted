@@ -27,20 +27,20 @@ dbiw('testdb:users')->insert({ name => 'Charlie', email => 'charlie@example.com'
 
 # all with single column returns flat list
 {
-  my @names = dbiw('testdb:users')->inflate(0)->sort('name')->all('name');
+  my @names = dbiw('testdb:users')->inflate(0)->order_by('name')->all('name');
   is_deeply \@names, ['Alice', 'Bob', 'Charlie'], 'all(scalar) returns flat list';
 }
 
 # one returns single hashref
 {
-  my $row = dbiw('testdb:users')->inflate(0)->find({ name => 'Alice' })->one;
+  my $row = dbiw('testdb:users')->inflate(0)->where({ name => 'Alice' })->one;
   is $row->{name}, 'Alice', 'one returns hashref';
   is $row->{email}, 'alice@example.com', 'one has all columns';
 }
 
 # one with single column returns scalar
 {
-  my $email = dbiw('testdb:users')->inflate(0)->find({ name => 'Alice' })->one('email');
+  my $email = dbiw('testdb:users')->inflate(0)->where({ name => 'Alice' })->one('email');
   is $email, 'alice@example.com', 'one(scalar) returns value';
 }
 
@@ -50,35 +50,35 @@ dbiw('testdb:users')->insert({ name => 'Charlie', email => 'charlie@example.com'
   is $count, 3, 'count all';
 }
 {
-  my $count = dbiw('testdb:users')->inflate(0)->find({ status => 'active' })->count;
-  is $count, 2, 'count with find';
+  my $count = dbiw('testdb:users')->inflate(0)->where({ status => 'active' })->count;
+  is $count, 2, 'count with where';
 }
 
-# sort
+# order_by
 {
-  my @names = dbiw('testdb:users')->inflate(0)->sort('-name')->all('name');
-  is_deeply \@names, ['Charlie', 'Bob', 'Alice'], 'sort DESC';
+  my @names = dbiw('testdb:users')->inflate(0)->order_by('-name')->all('name');
+  is_deeply \@names, ['Charlie', 'Bob', 'Alice'], 'order_by DESC';
 }
 {
-  my @names = dbiw('testdb:users')->inflate(0)->sort('name')->all('name');
-  is_deeply \@names, ['Alice', 'Bob', 'Charlie'], 'sort ASC';
+  my @names = dbiw('testdb:users')->inflate(0)->order_by('name')->all('name');
+  is_deeply \@names, ['Alice', 'Bob', 'Charlie'], 'order_by ASC';
 }
 
 # limit
 {
-  my @names = dbiw('testdb:users')->inflate(0)->sort('name')->limit(2)->all('name');
+  my @names = dbiw('testdb:users')->inflate(0)->order_by('name')->limit(2)->all('name');
   is_deeply \@names, ['Alice', 'Bob'], 'limit';
 }
 
 # offset
 {
-  my @names = dbiw('testdb:users')->inflate(0)->sort('name')->limit(1)->offset(1)->all('name');
+  my @names = dbiw('testdb:users')->inflate(0)->order_by('name')->limit(1)->offset(1)->all('name');
   is_deeply \@names, ['Bob'], 'offset';
 }
 
 # terminal methods don't mutate ResultSet
 {
-  my $rs = dbiw('testdb:users')->inflate(0)->find({ status => 'active' });
+  my $rs = dbiw('testdb:users')->inflate(0)->where({ status => 'active' });
   my $count = $rs->count;
   is $count, 2, 'count before all';
   my @rows = $rs->all;
@@ -88,7 +88,7 @@ dbiw('testdb:users')->insert({ name => 'Charlie', email => 'charlie@example.com'
 
 # one doesn't mutate limit
 {
-  my $rs = dbiw('testdb:users')->inflate(0)->sort('name');
+  my $rs = dbiw('testdb:users')->inflate(0)->order_by('name');
   my $first = $rs->one('name');
   is $first, 'Alice', 'one returns first';
   my @all = $rs->all('name');
@@ -97,19 +97,19 @@ dbiw('testdb:users')->insert({ name => 'Charlie', email => 'charlie@example.com'
 
 # exists
 {
-  ok dbiw('testdb:users')->inflate(0)->find({ name => 'Alice' })->exists, 'exists returns true';
-  ok !dbiw('testdb:users')->inflate(0)->find({ name => 'Nobody' })->exists, 'exists returns false';
+  ok dbiw('testdb:users')->inflate(0)->where({ name => 'Alice' })->exists, 'exists returns true';
+  ok !dbiw('testdb:users')->inflate(0)->where({ name => 'Nobody' })->exists, 'exists returns false';
 }
 
 # distinct with scalar returns flat list of unique values
 {
-  my @s = dbiw('testdb:users')->inflate(0)->sort('status')->distinct('status');
+  my @s = dbiw('testdb:users')->inflate(0)->order_by('status')->distinct('status');
   is_deeply \@s, ['active', 'inactive'], 'distinct(scalar) returns flat list';
 }
 
 # distinct with arrayref returns hashrefs
 {
-  my @rows = dbiw('testdb:users')->inflate(0)->sort('status')->distinct(['status']);
+  my @rows = dbiw('testdb:users')->inflate(0)->order_by('status')->distinct(['status']);
   is scalar(@rows), 2, 'distinct(arrayref) returns 2 rows';
   is $rows[0]->{status}, 'active', 'first status';
   is $rows[1]->{status}, 'inactive', 'second status';

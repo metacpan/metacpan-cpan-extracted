@@ -26,6 +26,7 @@ def test_import():
     testeq(type(__all__), list)
     # API parity with Perl/JS siblings
     for name in ('l', 'ln', 'lp', 'lnp', 'ld', 'ldn', 'ldp', 'ldnp',
+                 'N_', 'Nn_', 'Np_', 'Nnp_', 'Nd_', 'Ndn_', 'Ndp_', 'Ndnp_',
                  'l_dir', 'l_lang', 'l_dry', 'l_nolocales', 'ltd'):
         if name not in __all__:
             raise ValueError("%s missing from __all__" % name)
@@ -191,6 +192,32 @@ def language_switching_lifecycle():
 
     # Switch back.
     l_lang('de_DE')
+
+
+@test
+def deferred_markers():
+    # Identity contract — the whole point of the N*_ family is that
+    # the caller gets back exactly what it put in, so the scraper can
+    # see the msgid at build time while runtime defers the lookup.
+    testeq(N_("Hello"), "Hello")
+    testeq(Np_("menu", "Open"), "Open")
+    testeq(Nd_("app", "Hi"), "Hi")
+    testeq(Ndp_("app", "menu", "Open"), "Open")
+
+    # Plural variants return (sg, pl) so caller can unpack into ln(...).
+    testeq(Nn_("1 file", "%d files"), ("1 file", "%d files"))
+    testeq(Nnp_("ctx", "1 file", "%d files"), ("1 file", "%d files"))
+    testeq(Ndn_("dom", "1 file", "%d files"), ("1 file", "%d files"))
+    testeq(Ndnp_("dom", "ctx", "1 file", "%d files"), ("1 file", "%d files"))
+
+    # Round-trip: store via N_, render via l() — ensures what N_ hands
+    # back is exactly what the runtime l() expects later.
+    label = N_("Hello")
+    testeq(l(label), "Hallo")
+
+    sg, pl = Nn_("You have %d message", "You have %d messages")
+    testeq(ln(sg, pl, 1), "Du hast 1 Nachricht")
+    testeq(ln(sg, pl, 4), "Du hast 4 Nachrichten")
 
 
 exit(err)

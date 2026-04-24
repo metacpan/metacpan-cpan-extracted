@@ -59,7 +59,7 @@ complete( 'celestrak -',
 
 =cut
 
-complete( 'celestrak o', [ qw{ oneweb orbcomm other other-comm } ] );
+complete( 'celestrak o', [ qw{ oneweb orbcomm other-comm } ] );
 
 complete( 'celestrak_supplemental -', [ qw{ --file --format --match --no-match
 	--no-rms --query --rms } ] );

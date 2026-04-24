@@ -1,5 +1,11 @@
 Revision history for Perl-Version-Bumper
 
+0.256 2026-04-24 BOOK
+    - improved support for detecting features enabled/disabled by
+      lexical scope
+    - improved code modification for certain features (fc, bitwise,
+      signatures, apostrophe_as_package_separator)
+
 0.250 2026-03-27 BOOK
     - documentation improvements
     - ensure bump_file works correctly when given a string as filename

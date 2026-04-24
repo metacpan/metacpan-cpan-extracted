@@ -6,7 +6,7 @@ use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::Guess qw(openssl_version);
 
 BEGIN {
-    plan tests => 67 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 4 * 5 : 0 ) + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ? 1 * 5 : 0 );
+    plan tests => 78 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 8 * 5 : 0 ) + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ? 1 * 5 : 0 );
 }
 
 sub _Test_Encrypt_And_Decrypt {
@@ -20,14 +20,14 @@ sub _Test_Encrypt_And_Decrypt {
             map { int( rand 256 ) } ( 1 .. $p_plaintext_length - 5 )
         )
     );
-    ok( $ciphertext   = $p_rsa->encrypt($plaintext) );
-    ok( $decoded_text = $p_rsa->decrypt($ciphertext) );
-    ok( $decoded_text eq $plaintext );
+    ok( $ciphertext   = $p_rsa->encrypt($plaintext), "encrypt succeeds" );
+    ok( $decoded_text = $p_rsa->decrypt($ciphertext), "decrypt succeeds" );
+    is( $decoded_text, $plaintext, "decrypted text matches plaintext" );
 
     if ($p_check_private_encrypt) {
-        ok( $ciphertext   = $p_rsa->private_encrypt($plaintext) );
-        ok( $decoded_text = $p_rsa->public_decrypt($ciphertext) );
-        ok( $decoded_text eq $plaintext );
+        ok( $ciphertext   = $p_rsa->private_encrypt($plaintext), "private_encrypt succeeds" );
+        ok( $decoded_text = $p_rsa->public_decrypt($ciphertext), "public_decrypt succeeds" );
+        is( $decoded_text, $plaintext, "public_decrypt(private_encrypt(plaintext)) round-trips" );
     }
 }
 
@@ -37,7 +37,7 @@ sub _Test_Sign_And_Verify {
     my $sig = eval { $rsa->sign($plaintext) };
   SKIP: {
         skip "OpenSSL error: illegal or unsupported padding mode - $hash", 5 if $@ =~ /illegal or unsupported padding mode/i;
-        skip "OpenSSL error: invalid digest - $hash", 5 if $@ =~ /invalid digest/i;
+        skip "OpenSSL error: invalid digest - $hash", 5 if $@ =~ /invalid digest|no digest set/i;
         ok( $rsa_pub->verify( $plaintext, $sig ), "rsa_pub verify $hash");
 
         my $false_sig = unpack "H*", $sig;
@@ -54,7 +54,7 @@ sub _Test_Sign_And_Verify {
 sub _check_for_croak {
     my ( $code, $expected ) = @_;
     eval { &$code() };
-    ok( $@, "/$expected/" );
+    like( $@, qr/$expected/, "croak matches: $expected" );
 }
 
 # On platforms without a /dev/random, we need to manually seed.  In
@@ -68,11 +68,11 @@ sub _check_for_croak {
 Crypt::OpenSSL::Random::random_seed("OpenSSL needs at least 32 bytes.");
 Crypt::OpenSSL::RSA->import_random_seed();
 
-ok( Crypt::OpenSSL::RSA->generate_key(512)->size() * 8 == 512 );
+is( Crypt::OpenSSL::RSA->generate_key(512)->size() * 8, 512, "512-bit key has correct size" );
 
 my $rsa = Crypt::OpenSSL::RSA->generate_key(2048);
-ok( $rsa->size() * 8 == 2048 );
-ok( $rsa->check_key() );
+is( $rsa->size() * 8, 2048, "2048-bit key has correct size" );
+ok( $rsa->check_key(), "2048-bit key passes check_key()" );
 
 $rsa->use_no_padding();
 _Test_Encrypt_And_Decrypt( $rsa->size(), $rsa, 1 );
@@ -87,18 +87,18 @@ _Test_Encrypt_And_Decrypt( $rsa->size() - 42, $rsa, 0 );
 my $private_key_string = $rsa->get_private_key_string();
 my $public_key_string  = $rsa->get_public_key_string();
 
-ok( $private_key_string and $public_key_string );
+ok( $private_key_string and $public_key_string, "get_private_key_string and get_public_key_string return data" );
 
 my $plaintext = "The quick brown fox jumped over the lazy dog";
 my $rsa_priv  = Crypt::OpenSSL::RSA->new_private_key($private_key_string);
-ok( $plaintext eq $rsa_priv->decrypt( $rsa_priv->encrypt($plaintext) ) );
+is( $rsa_priv->decrypt( $rsa_priv->encrypt($plaintext) ), $plaintext, "private key round-trips encrypt/decrypt" );
 
 my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($public_key_string);
 $rsa->use_pkcs1_oaep_padding();
-ok( $plaintext eq $rsa->decrypt( $rsa_pub->encrypt($plaintext) ) );
+is( $rsa->decrypt( $rsa_pub->encrypt($plaintext) ), $plaintext, "pub encrypt + priv decrypt round-trips" );
 
-ok( $rsa_priv->is_private() );
-ok( !$rsa_pub->is_private() );
+ok( $rsa_priv->is_private(), "private key reports is_private() true" );
+ok( !$rsa_pub->is_private(), "public key reports is_private() false" );
 
 _check_for_croak(
     sub { $rsa_pub->decrypt( $rsa_pub->encrypt($plaintext) ); },
@@ -122,7 +122,7 @@ _check_for_croak(
 
 $plaintext .= $plaintext x 5;
 
-my @paddings = qw/pkcs1_oaep pkcs1_pss/;
+my @paddings = qw/pkcs1 pkcs1_oaep pkcs1_pss/;
 foreach my $padding (@paddings) {
   my $p = "use_${padding}_padding";
 
@@ -174,10 +174,17 @@ if ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ) {
     _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "whirlpool" );
 }
 
+# PKCS#1 v1.5 encryption must croak (Marvin attack)
+$rsa->use_pkcs1_padding();
+_check_for_croak(
+    sub { $rsa->encrypt("test") },
+    "Marvin attack"
+);
+
 # check subclassing
 
 eval { Crypt::OpenSSL::RSA::Subpackage->generate_key(512); };
-ok( !$@ );
+ok( !$@, "subclass generate_key() succeeds" );
 
 package Crypt::OpenSSL::RSA::Subpackage;
 

@@ -70,7 +70,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '3.04', 'repo version bumped for quiet streamed installer shell handoff fixes' );
+is( $version, '3.09', 'repo version bumped for skill install table update-all summaries' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
     like( $dist, qr/^version = \Q$version\E$/m, 'dist.ini version matches the module version in the source tree' );
@@ -306,6 +306,9 @@ for my $doc (
 
 for my $doc ( grep { defined && $_ ne '' } ( $skill_guide, $skills_pod ) ) {
     like( $doc, qr/dashboard skills install/, 'skill authoring docs explain installation' );
+    like( $doc, qr/dashboard skills install browser foo\/bar git\@github\.com:user\/example-skill\.git/, 'skill authoring docs explain multi-source skill installs' );
+    like( $doc, qr/dashboard skill list|C<dashboard skill>/, 'skill authoring docs explain the singular skill management alias' );
+    like( $doc, qr/\.gitignore.*skills\/<repo-name>\/|\.gitignore.*skills\/E<lt>repo-nameE<gt>\//s, 'skill authoring docs explain home gitignore skill tree registration' );
     like( $doc, qr/\/absolute\/path\/to\/example-skill/, 'skill authoring docs explain direct local skill installs' );
     like( $doc, qr/\.git\/.*\.env.*VERSION|\.env.*VERSION.*\.git\//is, 'skill authoring docs explain local skill qualification' );
     like( $doc, qr/dashboard example-skill\.hello/, 'skill authoring docs explain dotted command dispatch' );
@@ -347,13 +350,17 @@ for my $path (@pod_paths) {
 
 for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/install\.sh/, 'README documents the repo bootstrap installer' );
-    like( $doc, qr/cpanm --notest Developer::Dashboard/, 'README documents the repo bootstrap installer cpanm contract' );
+    like( $doc, qr/cpanm --no-wget --notest Developer::Dashboard/, 'README documents the repo bootstrap installer cpanm contract' );
     like( $doc, qr/aptfile.*apkfile.*brewfile|aptfile.*brewfile.*apkfile|apkfile.*aptfile.*brewfile|apkfile.*brewfile.*aptfile|brewfile.*aptfile.*apkfile|brewfile.*apkfile.*aptfile/is, 'README documents the repo bootstrap package manifests' );
     like( $doc, qr/checkout-only.*install\.sh|install\.sh.*checkout-only/is, 'README documents install.sh as a checkout-only bootstrap script instead of an installed CPAN command' );
     like( $doc, qr/dashboard skills install/, 'README documents skill installation' );
+    like( $doc, qr/dashboard skills install browser foo\/bar git\@github\.com:user\/example-skill\.git/, 'README documents multi-source skill installation' );
+    like( $doc, qr/dashboard skill list|`dashboard skill`/, 'README documents the singular skill management alias' );
+    like( $doc, qr/\.gitignore.*skills\/<repo-name>\//s, 'README documents home gitignore skill tree registration' );
     like( $doc, qr/dashboard skills install \/absolute\/path\/to\/example-skill/, 'README documents direct local skill installation' );
     like( $doc, qr/dashboard skills uninstall/, 'README documents skill uninstallation' );
-    like( $doc, qr/dashboard skills update/, 'README documents skill updates' );
+    like( $doc, qr/Update registered skills.*dashboard skills install/s, 'README documents bare install as the registered-skill update command' );
+    like( $doc, qr/-o json.*raw result payload|raw result payload.*-o json/s, 'README documents JSON output as an explicit skill install option' );
     like( $doc, qr/dashboard skills enable/, 'README documents skill enablement' );
     like( $doc, qr/dashboard skills disable/, 'README documents skill disablement' );
     like( $doc, qr/dashboard skills usage/, 'README documents skill usage inspection' );
@@ -377,7 +384,7 @@ like( $release_doc, qr/dzil build/, 'release doc still documents the dzil build 
 like( $release_doc, qr/exactly one unpacked\s+`Developer-Dashboard-X\.XX\/`\s+build directory and exactly one matching\s+`Developer-Dashboard-X\.XX\.tar\.gz`\s+tarball/s, 'release doc describes the enforced single-build-dir and single-tarball invariant' ) if $release_doc ne '';
 like( $release_doc, qr/cpanm .*Developer-Dashboard-1\.\d+\.tar\.gz/, 'release doc still documents tarball installation verification' ) if $release_doc ne '';
 like( $install_bootstrap_doc, qr/install\.sh/, 'bootstrap install doc names the repo installer entrypoint' ) if $install_bootstrap_doc ne '';
-like( $install_bootstrap_doc, qr/cpanm --notest Developer::Dashboard/, 'bootstrap install doc explains the user-space cpanm install contract' ) if $install_bootstrap_doc ne '';
+like( $install_bootstrap_doc, qr/cpanm --no-wget --notest Developer::Dashboard/, 'bootstrap install doc explains the user-space cpanm install contract' ) if $install_bootstrap_doc ne '';
 like( $install_bootstrap_doc, qr/aptfile.*apkfile.*brewfile|aptfile.*brewfile.*apkfile|apkfile.*aptfile.*brewfile|apkfile.*brewfile.*aptfile|brewfile.*aptfile.*apkfile|brewfile.*apkfile.*aptfile/is, 'bootstrap install doc explains all bootstrap package manifests' ) if $install_bootstrap_doc ne '';
 like( $agents_override, qr/DD-OOP-LAYERS/, 'AGENTS.override.md documents the layered runtime contract' ) if $agents_override ne '';
 like( $agents_override, qr/FULL-POD-DOC/, 'AGENTS.override.md documents the FULL-POD-DOC rule' ) if $agents_override ne '';

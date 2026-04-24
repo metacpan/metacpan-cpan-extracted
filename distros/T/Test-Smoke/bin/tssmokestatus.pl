@@ -13,7 +13,6 @@ use File::Path;
 use File::Copy;
 use FindBin;
 use lib catdir( $FindBin::Bin, 'lib' );
-use lib $FindBin::Bin;
 use Test::Smoke;
 use Test::Smoke::Reporter;
 use Test::Smoke::Util qw( 
@@ -33,7 +32,7 @@ my %opt = (
 
 =head1 NAME
 
-smokestatus.pl - Check the status of a running smoke
+tssmokestatus.pl - Check the status of a running smoke
 
 =head1 SYNOPSIS
 
@@ -289,7 +288,7 @@ sub timeout_msg {
 
 =head1 COPYRIGHT
 
-(c) 2002-2003, All rights reserved.
+E<copy> 2002-2003, All rights reserved.
 
   * Abe Timmerman <abeltje@cpan.org>
 

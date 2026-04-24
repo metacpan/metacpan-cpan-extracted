@@ -44,6 +44,8 @@ t/22-locale-simple-simplenumber.t
 t/30-locale-simple-other.t
 t/40-error.t
 t/50-scrape.t
+t/51-scrape-N.t
+t/60-N-markers.t
 t/author-pod-syntax.t
 t/data/bad.1pl
 t/data/bad.2pl
@@ -59,6 +61,12 @@ t/data/locale/de_DE/LC_MESSAGES/test.po
 t/data/locale_simple.py
 t/data/locale_simple_dryrun_test.html
 t/data/locale_simple_test.html
+t/data/n-fixtures/N-calls.js
+t/data/n-fixtures/N-calls.pl
+t/data/n-fixtures/N-calls.py
+t/data/n-fixtures/l-calls.js
+t/data/n-fixtures/l-calls.pl
+t/data/n-fixtures/l-calls.py
 t/data/test.py
 t/data/update_locale.sh
 t/out/scrape_00_err

@@ -9,6 +9,7 @@
 package XML::Parser;
 
 use strict;
+use warnings;
 
 our ( $VERSION, $LWP_load_failed );
 
@@ -16,7 +17,7 @@ use Carp;
 
 BEGIN {
     require XML::Parser::Expat;
-    $VERSION = '2.57';
+    $VERSION = '2.58';
     die "Parser.pm and Expat.pm versions don't match"
       unless $VERSION eq $XML::Parser::Expat::VERSION;
 }
@@ -146,8 +147,13 @@ sub parse_start {
     my $expatnb = XML::Parser::ExpatNB->new( @expat_options, @_ );
     $expatnb->setHandlers(%handlers);
 
-    &$init($expatnb)
-      if defined($init);
+    if (defined($init)) {
+        eval { &$init($expatnb) };
+        if ($@) {
+            $expatnb->release;
+            die $@;
+        }
+    }
 
     $expatnb->{_State_} = 1;
 
@@ -177,8 +183,13 @@ sub parse {
         $expat->base( $self->{Base} );
     }
 
-    &$init($expat)
-      if defined($init);
+    if (defined($init)) {
+        eval { &$init($expat) };
+        if ($@) {
+            $expat->release;
+            die $@;
+        }
+    }
 
     my @result = ();
     my $result;
@@ -190,15 +201,21 @@ sub parse {
     }
 
     if ( $result and defined($final) ) {
-        if (wantarray) {
-            @result = &$final($expat);
-        }
-        else {
-            $result = &$final($expat);
-        }
+        my $want = wantarray;
+        eval {
+            if ($want) {
+                @result = &$final($expat);
+            }
+            else {
+                $result = &$final($expat);
+            }
+        };
+        $err = $@;
     }
 
     $expat->release;
+
+    die $err if $err;
 
     return unless defined wantarray;
     return wantarray ? @result : $result;
@@ -291,7 +308,7 @@ sub file_ext_ent_handler {
     }
 
     require IO::File;
-    my $fh = IO::File->new($path);
+    my $fh = IO::File->new($path, '<');
     unless ( defined $fh ) {
         $xp->{ErrorMessage} .= "Failed to open $path:\n$!";
         return undef;
@@ -322,7 +339,7 @@ sub file_ext_ent_cleanup {
 
 __END__
 
-=for markdown [![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml)
+=for markdown [![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml) [![Coverage](https://codecov.io/gh/cpan-authors/XML-Parser/graph/badge.svg)](https://codecov.io/gh/cpan-authors/XML-Parser)
 
 =head1 NAME
 
@@ -476,6 +493,46 @@ dedicated declaration handlers instead of the Default handler.
 This option has no effect if the ExternEnt or ExternEntFin handlers are
 directly set. Otherwise, if true, it forces the use of a file based external
 entity handler.
+
+=item * BillionLaughsAttackProtectionMaximumAmplification
+
+Sets the maximum amplification factor for the Billion Laughs attack
+protection.  See L<"SECURITY"> below for details.
+
+This is an Expat option.
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD> or C<XML_GE>.
+
+=item * BillionLaughsAttackProtectionActivationThreshold
+
+Sets the activation threshold (in bytes) for the Billion Laughs attack
+protection.  See L<"SECURITY"> below for details.
+
+This is an Expat option.
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD> or C<XML_GE>.
+
+=item * AllocTrackerMaximumAmplification
+
+Sets the maximum amplification factor for the allocation tracker.
+See L<"SECURITY"> below for details.
+
+This is an Expat option.
+Requires libexpat E<gt>= 2.7.2 built with C<XML_DTD> or C<XML_GE>.
+
+=item * AllocTrackerActivationThreshold
+
+Sets the activation threshold (in bytes) for the allocation tracker.
+See L<"SECURITY"> below for details.
+
+This is an Expat option.
+Requires libexpat E<gt>= 2.7.2 built with C<XML_DTD> or C<XML_GE>.
+
+=item * ReparseDeferralEnabled
+
+Enables or disables reparse deferral, a security mechanism that prevents
+certain token-boundary attacks.  See L<"SECURITY"> below for details.
+
+This is an Expat option.
+Requires libexpat E<gt>= 2.6.0.
 
 =item * Non_Expat_Options
 
@@ -708,16 +765,11 @@ If Fixed is true, then this is a fixed attribute.
 This handler is called for DOCTYPE declarations. Name is the document type
 name. Sysid is the system id of the document type, if it was provided,
 otherwise it's undefined. Pubid is the public id of the document type,
-which will be undefined if no public id was given. Internal is the internal
-subset, given as a string. If there was no internal subset, it will be
-undefined. Internal will contain all whitespace, comments, processing
-instructions, and declarations seen in the internal subset. The declarations
-will be there whether or not they have been processed by another handler
-(except for unparsed entities processed by the Unparsed handler). However,
-comments and processing instructions will not appear if they've been processed
-by their respective handlers.
+which will be undefined if no public id was given. Internal will be
+true or false, indicating whether or not the doctype declaration contains
+an internal subset.
 
-=head2 * DoctypeFin                (Parser)
+=head2 * DoctypeFin                (Expat)
 
 This handler is called after parsing of the DOCTYPE declaration has finished,
 including any internal or external DTD declarations.
@@ -880,6 +932,90 @@ the parser:
 
 This will include 2 lines of context on either side of the error in the
 error message.
+
+=head1 SECURITY
+
+XML::Parser relies on the expat C library for parsing. Modern versions of
+expat include several security mechanisms that can be tuned through
+constructor options passed to C<new()>. These options are forwarded directly
+to L<XML::Parser::Expat> and take effect for every subsequent C<parse>,
+C<parsefile>, or C<parse_start> call on the parser instance.
+
+All of these options will C<croak> at runtime if the underlying libexpat does
+not support them.
+
+=head2 Billion Laughs Attack Protection
+
+The Billion Laughs attack (also known as an XML bomb) uses deeply nested
+entity definitions to cause exponential expansion, consuming memory and CPU.
+Expat E<gt>= 2.4.0 (built with C<XML_DTD> or C<XML_GE>) includes built-in
+protection controlled by two parameters:
+
+=over 4
+
+=item B<BillionLaughsAttackProtectionMaximumAmplification>
+
+The maximum ratio between the size of the expanded output and the size of
+the input.  For example, a value of C<100.0> means the parser will abort if
+entity expansion would produce output more than 100 times the size of the
+input.
+
+=item B<BillionLaughsAttackProtectionActivationThreshold>
+
+The number of bytes of expanded output before the amplification limit takes
+effect.  This prevents false positives on small documents that happen to
+have a high amplification ratio.
+
+=back
+
+=head2 Allocation Tracker
+
+Expat E<gt>= 2.7.2 (built with C<XML_DTD> or C<XML_GE>) adds a second layer
+of amplification tracking through the allocation tracker, which measures
+memory allocation rather than output size:
+
+=over 4
+
+=item B<AllocTrackerMaximumAmplification>
+
+The maximum ratio of allocated memory to input size.
+
+=item B<AllocTrackerActivationThreshold>
+
+The number of bytes of allocation before the limit takes effect.
+
+=back
+
+=head2 Reparse Deferral
+
+Expat E<gt>= 2.6.0 includes reparse deferral, which prevents attacks that
+exploit token boundaries.  Rather than reparsing incomplete tokens
+immediately, the parser defers until more input arrives.
+
+=over 4
+
+=item B<ReparseDeferralEnabled>
+
+A boolean.  Set to a true value to enable reparse deferral, or C<0> to
+disable it.
+
+=back
+
+For full details on each option, see L<XML::Parser::Expat/"new">.
+
+  # Example: tighten Billion Laughs limits
+  my $parser = XML::Parser->new(
+    Style => 'Tree',
+    BillionLaughsAttackProtectionMaximumAmplification => 50,
+    BillionLaughsAttackProtectionActivationThreshold  => 1024,
+  );
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/> for more information.
 
 =head1 AUTHORS
 

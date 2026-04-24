@@ -647,7 +647,7 @@ sub _populate_sidebar {
     $store->set($art_iter, 0, 'Artists', 1, 'category', 2, '');
     for my $artist ($self->db->all_artists()) {
         my $iter = $store->append($art_iter);
-        $store->set($iter, 0, $artist, 1, 'artist', 2, $artist);
+        $store->set($iter, 0, _display_text($artist), 1, 'artist', 2, $artist);
     }
 
     # Albums
@@ -655,7 +655,7 @@ sub _populate_sidebar {
     $store->set($alb_iter, 0, 'Albums', 1, 'category', 2, '');
     for my $album ($self->db->all_albums()) {
         my $iter = $store->append($alb_iter);
-        $store->set($iter, 0, $album, 1, 'album', 2, $album);
+        $store->set($iter, 0, _display_album($album), 1, 'album', 2, $album);
     }
 
     # Genres
@@ -692,9 +692,9 @@ sub _populate_tracklist {
         $store->set($iter,
             0, $t->{id}           // 0,
             1, _track_num_str($t->{track_number}),
-            2, $t->{title}        // '(Unknown)',
-            3, $t->{artist}       // '',
-            4, $t->{album}        // '',
+            2, _display_title($t->{title}) || '(Unknown)',
+            3, _display_text($t->{artist}),
+            4, _display_album($t->{album}),
             5, $t->{genre}        // '',
             6, $t->{year}         // '',
             7, _dur_str($t->{duration_ms}),
@@ -716,12 +716,16 @@ sub _refresh_track_row {
     my $t    = $self->db->get_track($track_id)      or return;
     $self->track_store->set($iter,
         1, _track_num_str($t->{track_number}),
-        3, $t->{artist}   // '',
-        4, $t->{album}    // '',
+        2, _display_title($t->{title}) || '(Unknown)',
+        3, _display_text($t->{artist}),
+        4, _display_album($t->{album}),
         5, $t->{genre}    // '',
         6, $t->{year}     // '',
         7, _dur_str($t->{duration_ms}),
     );
+    # Keep the cached hashref in sync so subsequent edits start from the
+    # new values rather than the stale pre-edit snapshot.
+    $self->_track_by_id->{$track_id} = $t;
 }
 
 # ---- Playback ----
@@ -1336,17 +1340,11 @@ sub _tracklist_context_menu {
     $play_item->signal_connect(activate => sub { $self->_play_at_path($path) });
     $menu->append($play_item);
 
-    my $edit_item = Gtk3::MenuItem->new_with_label('Edit Metadata…');
+    my $edit_item = Gtk3::MenuItem->new_with_label('Edit…');
     $edit_item->signal_connect(activate => sub {
         $self->_edit_metadata_dialog($track) if $track;
     });
     $menu->append($edit_item);
-
-    my $fetch_item = Gtk3::MenuItem->new_with_label('Fetch Metadata…');
-    $fetch_item->signal_connect(activate => sub {
-        $self->_fetch_track_metadata($track) if $track;
-    });
-    $menu->append($fetch_item);
 
     $menu->show_all();
     $menu->popup_at_pointer($event);
@@ -1369,6 +1367,25 @@ sub _edit_metadata_dialog {
     $grid->set_border_width(12);
     $dlg->get_content_area()->add($grid);
 
+    # LRM (U+200E) is an invisible left-to-right marker. Prepending it to
+    # an Entry's text forces the internal PangoLayout's base direction to
+    # LTR, which keeps short RTL content (Arabic, Hebrew, …) flush with the
+    # left edge instead of the right. The glyphs within still render in
+    # their natural direction, so "راغب علامة" still looks correct.
+    # We strip the marker on read so it never reaches the DB or a query.
+    my $LRM = "\x{200E}";
+    my $put = sub {
+        my ($entry, $val) = @_;
+        $val //= '';
+        $entry->set_text(length $val ? $LRM . $val : '');
+    };
+    my $get = sub {
+        my ($entry) = @_;
+        my $v = $entry->get_text();
+        $v =~ s/[\x{200E}\x{200F}]//g;   # LRM + RLM
+        return $v;
+    };
+
     my %entries;
     my $row = 0;
     for my $field (
@@ -1386,17 +1403,74 @@ sub _edit_metadata_dialog {
         $grid->attach($label, 0, $row, 1, 1);
         my $entry = Gtk3::Entry->new();
         $entry->set_hexpand(TRUE);
-        $entry->set_text($track->{$key} // '');
+        $entry->set_direction('ltr');
+        $entry->set_alignment(0.0);
+        $put->($entry, $track->{$key});
         $grid->attach($entry, 1, $row, 1, 1);
         $entries{$key} = $entry;
         $row++;
     }
 
+    my $fetch_btn = Gtk3::Button->new_with_label('Fetch');
+    $fetch_btn->set_halign('end');
+    $fetch_btn->set_tooltip_text(
+        'Look up missing fields online (text search, then AcoustID '
+        . 'fingerprint).  Only blank fields are filled — to refresh a '
+        . 'populated field, clear it first.'
+    );
+    # Treat whitespace-only fields as blank for both the query we build and
+    # the emptiness test below — a stray space is almost never what the user
+    # meant and it would otherwise block the fetch from filling the field.
+    my $trimmed = sub {
+        my $s = shift // '';
+        $s =~ s/\A\s+//;
+        $s =~ s/\s+\z//;
+        return $s;
+    };
+
+    $fetch_btn->signal_connect(clicked => sub {
+        # Build a track-like hashref from current dialog contents so the
+        # lookup uses whatever the user has typed so far.
+        my %current = (drive_id => $track->{drive_id});
+        for my $key (keys %entries) {
+            my $val = $trimmed->($get->($entries{$key}));
+            $current{$key} = length $val ? $val : undef;
+        }
+        $fetch_btn->set_sensitive(FALSE);
+        $fetch_btn->set_label('Fetching…');
+        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+
+        my $meta = $self->_lookup_metadata(\%current);
+
+        $fetch_btn->set_label('Fetch');
+        $fetch_btn->set_sensitive(TRUE);
+
+        return unless $meta;
+        my @filled;
+        for my $key (keys %entries) {
+            my $cur = $trimmed->($get->($entries{$key}));
+            my $new = $meta->{$key};
+            if ($log) {
+                $log->debug(sprintf
+                    'Fetch fill %s: cur=[%s] meta=[%s]',
+                    $key, $cur, $new // '(undef)');
+            }
+            next if length $cur;
+            next unless defined $new && length $new;
+            $put->($entries{$key}, "$new");   # LRM-prefixed, LTR layout
+            push @filled, $key;
+        }
+        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+        $log->debug('Fetch filled: ' . (@filled ? join(',', @filled) : '(none)'))
+            if $log;
+    });
+    $grid->attach($fetch_btn, 0, $row, 2, 1);
+
     $dlg->show_all();
     if ($dlg->run() eq 'ok') {
         my %fields;
         for my $key (keys %entries) {
-            my $val = $entries{$key}->get_text();
+            my $val = $get->($entries{$key});
             $fields{$key} = length($val) ? $val : undef;
         }
         # Coerce numeric fields
@@ -1404,8 +1478,14 @@ sub _edit_metadata_dialog {
             $fields{$key} = $fields{$key} ? int($fields{$key}) : undef;
         }
         $self->db->update_track_metadata($track->{id}, %fields);
-        $self->_load_library();
-        $self->_auto_sync_to_sheet();
+        # Refresh the single row in place so the user's sidebar selection
+        # and tracklist scroll position are preserved.  A full _load_library
+        # would clear the sidebar store and reload all_tracks, bumping them
+        # back to the top-level "All Tracks" view.
+        $self->_refresh_track_row($track->{id});
+        # Targeted single-row sheet sync — avoids rewriting every worksheet
+        # tab for a single metadata edit.
+        $self->_auto_sync_track_to_sheet($track->{id});
     }
     $dlg->destroy();
 }
@@ -1432,9 +1512,9 @@ sub _clear_library {
 sub _update_now_playing {
     my ($self, $track) = @_;
     my $text = '';
-    $text .= $track->{artist} . ' — ' if $track->{artist};
-    $text .= $track->{title} // '(Unknown)';
-    $text .= '  [' . $track->{album} . ']' if $track->{album};
+    $text .= _display_text($track->{artist}) . ' — '  if $track->{artist};
+    $text .= _display_title($track->{title}) || '(Unknown)';
+    $text .= '  [' . _display_album($track->{album}) . ']' if $track->{album};
     $self->now_playing_label->set_text($text);
     $self->win->set_title("Drive Player — $text");
 }
@@ -1499,6 +1579,46 @@ sub _track_num_str {
     my ($n) = @_;
     return '' unless defined $n && $n > 0;
     return sprintf("%02d", $n);
+}
+
+# Display-only cosmetics: turn underscores back into spaces for
+# title / artist / album strings that came from filenames.  The DB
+# keeps the raw value so lookups and sheet-sync continue to match.
+sub _display_text {
+    my ($s) = @_;
+    return '' unless defined $s && length $s;
+    $s =~ tr/_/ /;
+    return $s;
+}
+
+# Same as _display_text, plus strips a leading "YYYY-" from album
+# names (19xx / 20xx).  Defensive cover for rows scanned before the
+# Scanner learned to peel the year off.
+sub _display_album {
+    my ($s) = @_;
+    return '' unless defined $s && length $s;
+    $s =~ s{ \A (?: 19 | 20 ) \d{2} - }{}x;
+    $s =~ tr/_/ /;
+    return $s;
+}
+
+# Title-specific: strip a leading track-number prefix like "01 ",
+# "01 - ", "01. ", "01-" before applying the underscore transform.
+# Accepts 1-3 digit numbers so compilation tracks up to 999 still
+# get cleaned.
+sub _display_title {
+    my ($s) = @_;
+    return '' unless defined $s && length $s;
+    # Swap underscores to spaces first so "01_Attention" becomes "01 Attention"
+    # and the track-number prefix below can match it.
+    $s =~ tr/_/ /;
+    $s =~ s{
+        \A
+        \s*              # optional leading whitespace
+        \d{1,3}          # 1-3 digit track number
+        [\s.\-]+         # separator: space, dot, hyphen
+    }{}x;
+    return $s;
 }
 
 1;

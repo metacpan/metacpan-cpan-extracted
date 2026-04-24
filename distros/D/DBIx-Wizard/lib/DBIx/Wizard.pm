@@ -6,7 +6,7 @@ use DBIx::Wizard::ResultSet;
 use DBIx::Wizard::DB;
 use Exporter 'import';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT = qw(dbiw);
 
 my $sw = SQL::Wizard->new;

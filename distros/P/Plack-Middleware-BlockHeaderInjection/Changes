@@ -1,5 +1,45 @@
 Revision history for Plack-Middleware-BlockHeaderInjection
 
+v1.3.0    2026-04-24 08:46:33+01:00 Europe/London
+  [Enhancements]
+  - Added a clean option to replace newlines with whitespace.
+
+v1.2.0    2026-04-23 23:22:39+01:00 Europe/London
+  [Enhancements]
+  - Blocks all characters between 0x00 through 0x1f as per the PSGI specification (GH#1).
+
+  - Initialisation is not run in every request.
+
+  [Incompatabilities]
+  - Perl v5.24 or later is required.
+
+  [Documentation]
+  - Fixed POD errors.
+
+  - Update copyright year.
+
+  - Fixed link in the SOURCE section.
+
+  - Added LICENSE and SECURITY.md.
+
+  - Generate README using the UsefulReadme plugin.
+
+  - Add doap.xml to the distribution.
+
+  - Updated author email due to issues with cpan.org addresses.
+
+  [Tests]
+  - Added missing perlcritic.rc for author tests.
+
+  - Moved author tests into xt.
+
+  [Toolchain]
+  - MANIFEST.SKIP is now static and not rebuilt with buggy Dist::Zilla plugins.
+
+  - Fix issues with the Dist::Zilla configuration.
+
+  - Updated build and development requirements.
+
 v1.1.1    2023-06-19 09:41:15+01:00 Europe/London
   [Documentation]
   - Fixed typo in Changes.

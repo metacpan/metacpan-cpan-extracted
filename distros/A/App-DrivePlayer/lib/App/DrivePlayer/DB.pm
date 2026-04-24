@@ -204,6 +204,16 @@ sub get_track {
     return _row_to_hash( $self->_rs('Track')->find($id) );
 }
 
+# Walk Track → Folder → ScanFolder and return the scan folder hashref.
+# Used by targeted single-row sheet sync so it knows which tab to update.
+sub scan_folder_for_track {
+    my ($self, $track_id) = @_;
+    my $track  = $self->_rs('Track')->find($track_id) or return;
+    my $folder = $track->folder                       or return;
+    my $sf     = $folder->scan_folder                 or return;
+    return _row_to_hash($sf);
+}
+
 sub get_track_by_drive_id {
     my ($self, $drive_id) = @_;
     return _row_to_hash(

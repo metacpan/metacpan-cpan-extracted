@@ -291,13 +291,20 @@ sub _retry_incomplete_metadata {
     return;
 }
 
-sub _fetch_track_metadata {
+sub _lookup_metadata {
     my ($self, $track) = @_;
 
     my $yield = sub { Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending() };
 
     $self->_set_status('Looking up metadata…');
     $yield->();
+
+    if ($log) {
+        my $q = join ' | ',
+            map  { sprintf('%s=%s', $_, $track->{$_} // '(undef)') }
+            qw( title artist album drive_id );
+        $log->debug("Single fetch: query: $q");
+    }
 
     my $fetcher = App::DrivePlayer::MetadataFetcher->new(
         yield        => $yield,
@@ -311,8 +318,8 @@ sub _fetch_track_metadata {
     );
 
     unless ($meta) {
-        my $key      = $self->config->acoustid_key();
-        my $have_fp  = App::DrivePlayer::MetadataFetcher::fpcalc_available();
+        my $key     = $self->config->acoustid_key();
+        my $have_fp = App::DrivePlayer::MetadataFetcher::fpcalc_available();
 
         if (!$key) {
             $self->_set_status('Text search: no match. Fingerprinting skipped: no AcoustID key set.');
@@ -341,10 +348,15 @@ sub _fetch_track_metadata {
         }
     }
 
-    my %merged = (%$track, %$meta);
-    $self->_edit_metadata_dialog(\%merged);
-    $self->_set_status(q{});
-    return;
+    if ($log) {
+        my $dump = join ' | ',
+            map  { sprintf('%s=%s', $_, $meta->{$_} // '(undef)') }
+            sort keys %$meta;
+        $log->debug("Single fetch: result: $dump");
+    }
+
+    $self->_set_status('Metadata found.');
+    return $meta;
 }
 
 1;

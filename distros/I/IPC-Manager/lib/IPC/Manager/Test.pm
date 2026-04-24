@@ -539,6 +539,70 @@ sub test_sync_request {
     $handle = undef;
 }
 
+sub test_sync_request_peer_exits_after_response {
+    # Regression: a service that responds and then exits used to race
+    # with the client's await_response loop.  The response could already
+    # be in the parent's inbox when peer-active first reported the peer
+    # gone, and await_response would croak with "peer ... went away"
+    # instead of returning the response that had already been delivered.
+    #
+    # Reproduce the race deterministically: send the request via the
+    # async API, sleep long enough for the service to respond and fully
+    # tear down (so its registration is gone from the bus), then call
+    # await_response.  The response is sitting in the parent's inbox;
+    # peer_active reports gone.  Without the in-transit drain in
+    # await_response, this throws "peer ... went away".
+    my $iters = 5;
+    my @errors;
+
+    for my $i (1 .. $iters) {
+        my $done = 0;
+        my $name = "exit_after_resp_$i";
+
+        my $handle = ipcm_service(
+            $name,
+            class          => 'IPC::Manager::Service',
+            handle_request => sub {
+                my ($self, $req, $msg) = @_;
+                $done = 1;
+                return {ok => 1, n => $req->{request}->{n}};
+            },
+            should_end => sub { $done },
+        );
+
+        my $req_id = $handle->send_request($name, {n => $i});
+
+        # Wait for the service process to die and the bus to deregister it.
+        # waitpid the child the spawn started, so peer_active() definitively
+        # reports gone by the time await_response runs.
+        my $svc_pid = $handle->child_pid;
+        if (defined $svc_pid) {
+            for (1 .. 50) {
+                last unless pid_is_running($svc_pid);
+                Time::HiRes::sleep(0.05);
+            }
+            waitpid($svc_pid, POSIX::WNOHANG());
+        }
+        else {
+            Time::HiRes::sleep(1);
+        }
+
+        my $resp;
+        my $ok  = eval { $resp = $handle->await_response($req_id); 1 };
+        my $err = $@;
+        if (!$ok) {
+            push @errors => "iter $i: $err";
+        }
+        elsif (!ref($resp) || ($resp->{response}{n} // -1) != $i) {
+            push @errors => "iter $i: bad response: " . (ref($resp) ? $resp->{response}{n} // 'undef' : $resp);
+        }
+
+        $handle = undef;
+    }
+
+    is(\@errors, [], "no peer-gone exceptions across $iters exits-after-response iterations");
+}
+
 sub test_multiple_requests {
     my $handle = ipcm_service(
         'multi_svc',

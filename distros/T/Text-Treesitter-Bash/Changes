@@ -1,0 +1,8 @@
+0.001     2026-04-24 02:54:50Z
+
+  - Initial release
+  - Vendor tree-sitter-bash 0.20.5 grammar sources
+  - Add Bash command extraction and security findings
+  - Add Text::Treesitter::Bash::Security::Checker with rules:
+    PathTraversal, DangerousFlags, SensitiveAccess, EnvDangerousVars,
+    UnquotedExpansion, MissingAbsolutePath

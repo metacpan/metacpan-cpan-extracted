@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Japanese DateTime Parser/Formatter - ~/lib/DateTime/Format/JP.pm
-## Version v0.1.6
+## Version v0.1.7
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/18
-## Modified 2024/09/05
+## Modified 2026/04/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
         $ZENKAKU_NUMBERS $KANJI_NUMBERS $ZENKAKU_TO_ROMAN $KANJI_TO_ROMAN $WEEKDAYS
         $WEEKDAYS_RE $TIME_RE $TIME_ZENKAKU_RE $TIME_KANJI_RE $ERROR
     );
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.1.7';
     our $DICT = [];
     our $ZENKAKU_NUMBERS = [];
     our $KANJI_NUMBERS   = [];
@@ -445,7 +445,8 @@ sub format_datetime
     my $self = shift( @_ );
     my $dt   = shift( @_ );
     require overload;
-    return( $self->error( "Value provided (", overload::StrVal( $dt ), ") is not a DateTime object or one inheriting from it." ) ) if( !ref( $dt ) || ( ref( $dt ) && !$dt->isa( 'DateTime' ) ) );
+    return( $self->error( "Value provided (", overload::StrVal( $dt ), ") is not a DateTime or DateTime::Lite object or one inheriting from either of them." ) ) if( !ref( $dt ) || ( ref( $dt ) && !$dt->isa( 'DateTime' ) && !$dt->isa( 'DateTime::Lite' ) ) );
+    my $dt_class = ref( $dt );
     my $pat  = length( $self->{pattern} ) ? $self->{pattern} : '%c';
     use utf8;
     
@@ -801,7 +802,7 @@ sub format_datetime
         }
         else
         {
-            warnings::warn( "Unsupported DateTime method \"${meth}\" found in pattern.\n" ) if( warnings::enabled() );
+            warnings::warn( "Unsupported ${dt_class} method \"${meth}\" found in pattern.\n" ) if( warnings::enabled() );
             '%{' . $meth . '}';
         }
     }gexs;
@@ -868,7 +869,7 @@ sub lookup_era_by_date
     my $self = shift( @_ );
     my $dt   = shift( @_ );
     require overload;
-    return( $self->error( "Value provided (", overload::StrVal( $dt ), ") is not a DateTime object or one inheriting from it." ) ) if( !ref( $dt ) || ( ref( $dt ) && !$dt->isa( 'DateTime' ) ) );
+    return( $self->error( "Value provided (", overload::StrVal( $dt ), ") is not a DateTime or DateTime::Lite object or one inheriting from it." ) ) if( !ref( $dt ) || ( ref( $dt ) && !$dt->isa( 'DateTime' ) && !$dt->isa( 'DateTime::Lite' ) ) );
     my( $y, $m, $d ) = unpack( 'A4A2A2', $dt->ymd( '' ) );
     my $era;
     foreach my $def ( @$DICT )
@@ -946,7 +947,7 @@ sub make_datetime
                 $p->{time_zone} = $self->{time_zone};
             }
         
-            $dt = DateTime->new( %$p );
+            $dt = DateTime::Lite->new( %$p );
         };
         $dt->set_hour( $opts->{hour} ) if( $opts->{hour} );
         $dt->set_minute( $opts->{minute} ) if( $opts->{minute} );
@@ -1234,9 +1235,9 @@ sub _set_get_zenkaku
         use warnings;
         use parent qw( Exporter );
         use vars qw( $ERROR );
-        use DateTime;
-        use DateTime::TimeZone;
-        use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
+        use DateTime::Lite;
+        use DateTime::Lite::TimeZone;
+        use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::Lite::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
     };
 
     use strict;
@@ -1293,11 +1294,11 @@ sub _set_get_zenkaku
                 @$opts{qw( year month day )} = @$ref;
                 @$opts{qw( hour minute second )} = (0,0,0);
                 $opts->{time_zone} = ( HAS_LOCAL_TZ ? 'local' : 'UTC' );
-                return( DateTime->new( %$opts ) );
+                return( DateTime::Lite->new( %$opts ) );
             }
             else
             {
-                return( DateTime->now( time_zone => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) ) );
+                return( DateTime::Lite->now( time_zone => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) ) );
             }
         };
         if( $@ )
@@ -1329,7 +1330,7 @@ DateTime::Format::JP - Japanese DateTime Parser and Formatter
         zenkaku      => 0,
         time_zone    => 'local',
     );
-    my $dt = DateTime->now;
+    my $dt = DateTime->now or DateTime::Lite->now;
     $dt->set_formatter( $fmt );
     # set the encoding in and out to utf8
     use open ':std' => ':utf8';
@@ -1342,7 +1343,7 @@ DateTime::Format::JP - Japanese DateTime Parser and Formatter
 
 =head1 VERSION
 
-    v0.1.6
+    v0.1.7
 
 =head1 DESCRIPTION
 
@@ -1388,7 +1389,7 @@ If true, this will use full-width, ie double-byte Japanese numbers that still lo
 
 =item I<time_zone> string
 
-The time zone to use when creating a L<DateTime> object. Defaults to C<local> if L<DateTime::TimeZone> supports it, otherwise it will fallback on C<UTC>
+The time zone to use when creating a L<DateTime::Lite> object. Defaults to C<local> if L<DateTime::Lite::TimeZone> supports it, otherwise it will fallback on C<UTC>
 
 =back
 
@@ -1400,9 +1401,9 @@ All method in this module return C<undef> upon error and set an error that can b
 
 =head2 format_datetime
 
-Takes a L<DateTime> object and returns a formatted date and time based on the pattern specified, which defaults to C<%c>. 
+Takes a L<DateTime::Lite> or L<DateTime> object and returns a formatted date and time based on the pattern specified, which defaults to C<%c>. 
 
-You can call this method directly, or you can set this formatter object in L<DateTime/set_formatter> so that ie will be used for stringification of the L<DateTime> object.
+You can call this method directly, or you can set this formatter object in L<DateTime::Lite/set_formatter> so that ie will be used for stringification of the L<DateTime::Lite> object.
 
 See below L</"PATTERN TOKENS"> for the available tokens and their meanings.
 
@@ -1416,11 +1417,11 @@ Sets or gets the boolean value for I<kanji_number>.
 
 =head2 parse_datetime
 
-Takes a string representing a Japanese date, parse it and return a new L<DateTime>. If an error occurred, it will return C<undef> and you can get the error using L</error>
+Takes a string representing a Japanese date, parse it and return a new L<DateTime::Lite>. If an error occurred, it will return C<undef> and you can get the error using L</error>
 
 =head2 time_zone
 
-Sets or gets the string representing the time zone to use when creating L<DateTime> object. This is used by L</parse_datetime>
+Sets or gets the string representing the time zone to use when creating L<DateTime::Lite> object. This is used by L</parse_datetime>
 
 =head2 traditional
 
@@ -1442,11 +1443,11 @@ Takes an Japanese era in kanji and returns an C<DateTime::Format::JP::Era> objec
 
 =head2 lookup_era_by_date
 
-Takes a L<DateTime> object and returns a C<DateTime::Format::JP::Era> object
+Takes a L<DateTime::Lite> or L<DateTime> object and returns a C<DateTime::Format::JP::Era> object
 
 =head2 make_datetime
 
-Returns a L<DateTime> based on parameters provided.
+Returns a L<DateTime::Lite> or L<DateTime> based on parameters provided.
 
 =head2 romaji_to_kanji
 
@@ -1470,7 +1471,7 @@ Takes a string representing a number in full width (全角), i.e. double-byte an
 
 Here are below the available tokens for formatting and the value they represent.
 
-In all respect, they are closely aligned with L<DateTime/strftime> (see L<DateTime/"strftime Patterns">), except that the formatter object parameters provided upon instantiation alter the values used.
+In all respect, they are closely aligned with L<DateTime::Lite/strftime> (see L<DateTime::Lite/"Token reference">), except that the formatter object parameters provided upon instantiation alter the values used.
 
 =over 4
 
@@ -1518,7 +1519,7 @@ And if I<kanji_number> is true, it will then be:
 
 =item * %C
 
-The century number (year/100) as a 2-digit integer. This is the same as L<DateTime/strftime>
+The century number (year/100) as a 2-digit integer. This is the same as L<DateTime::Lite/strftime>
 
 =item * %d or %e
 
@@ -1552,13 +1553,13 @@ For the year only the conversion from regular digits to Japanese kanjis will be 
 
 =item * %g
 
-The year corresponding to the ISO week number, but without the century (0-99). This uses regular digits and is the same as L<DateTime/strftime>
+The year corresponding to the ISO week number, but without the century (0-99). This uses regular digits and is the same as L<DateTime::Lite/strftime>
 
 =item * %G
 
 The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number. This has the same format and value as %Y, except that if the ISO week number belongs to the previous or next year, that year is used instead. Also this returns regular digits.
 
-This uses regular digits and is the same as L<DateTime/strftime>
+This uses regular digits and is the same as L<DateTime::Lite/strftime>
 
 =item * %H
 
@@ -1578,7 +1579,7 @@ If I<zenkaku> is true, it will use full width numbers and if I<kanji_number> is 
 
 =item * %j
 
-The day number in the year (1-366). This uses regular digits and is the same as L<DateTime/strftime>
+The day number in the year (1-366). This uses regular digits and is the same as L<DateTime::Lite/strftime>
 
 =item * %m
 
@@ -1598,13 +1599,13 @@ And if I<kanji_number> is true, it will then be something like C<十分>
 
 =item * %n
 
-Arbitrary whitespace. Same as in L<DateTime/strftime>
+Arbitrary whitespace. Same as in L<DateTime::Lite/strftime>
 
 =item * %N
 
 Nanoseconds. For other sub-second values use C<%[number]N>.
 
-This is a pass-through directly to L<DateTime/strftime>
+This is a pass-through directly to L<DateTime::Lite/strftime>
 
 =item * %p or %P
 
@@ -1646,11 +1647,11 @@ However, if I<zenkaku> is true, then it would rather use full width (全角) num
 
 And if I<kanji_number> is true, it will then be something like C<六十秒>
 
-(60 may occur for leap seconds. See L<DateTime::LeapSecond>).
+(60 may occur for leap seconds. See L<DateTime::Lite/"Floating DateTimes">).
 
 =item * %t
 
-Arbitrary whitespace. Same as in L<DateTime/strftime>
+Arbitrary whitespace. Same as in L<DateTime::Lite/strftime>
 
 =item * %T
 
@@ -1672,7 +1673,7 @@ The weekday number (1-7) with Monday (月曜日) = 1, 火曜日 = 2, 水曜日 =
 
 If I<zenkaku> is enabled, it will return a double-byte number instead.
 
-This is the C<DateTime> standard.
+This is the C<DateTime::Lite> standard.
 
 =item * %w
 
@@ -1741,7 +1742,7 @@ If I<zenkaku> is true, "full-width" (double byte) digits and C<+/-> signs will b
 
 =item * %Z
 
-The timezone name. (For example EST -- which is ambiguous). This is the same as L<DateTime/strftime>
+The timezone name. (For example EST -- which is ambiguous). This is the same as L<DateTime::Lite/strftime>
 
 =back
 
@@ -1769,13 +1770,12 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<DateTime>
+L<DateTime::Lite>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
+Copyright(c) 2021-2026 DEGUEST Pte. Ltd. DEGUEST Pte. Ltd.
 
-You can use, copy, modify and redistribute this package and associated
-files under the same terms as Perl itself.
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 
 =cut

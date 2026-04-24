@@ -163,7 +163,7 @@ removes the current source-tree first.
 This method will sync the source-tree in one of the above basic methods.
 After that, it will create an intermediate copy of the master directory
 as hardlinks and run the F<regen_headers.pl> script. This should yield
-an up-to-date source-tree. The intermadite directory is now copied as
+an up-to-date source-tree. The intermediate directory is now copied as
 hardlinks to its final directory ({ddir}).
 
 This can be used to change the way B<make distclean> is run from

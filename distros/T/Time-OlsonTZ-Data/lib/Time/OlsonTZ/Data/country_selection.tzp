@@ -713,6 +713,11 @@ use strict;
 				olson_description => "MST - BC (Ft Nelson)",
 				timezone_name => "America/Fort_Nelson",
 			},
+			"MST - BC (most areas)" => {
+				location_coords => "+4916-12307",
+				olson_description => "MST - BC (most areas)",
+				timezone_name => "America/Vancouver",
+			},
 			"MST - Yukon (east)" => {
 				location_coords => "+6043-13503",
 				olson_description => "MST - Yukon (east)",
@@ -742,11 +747,6 @@ use strict;
 				location_coords => "+4734-05243",
 				olson_description => "Newfoundland, Labrador (SE)",
 				timezone_name => "America/St_Johns",
-			},
-			"Pacific - BC (most areas)" => {
-				location_coords => "+4916-12307",
-				olson_description => "Pacific - BC (most areas)",
-				timezone_name => "America/Vancouver",
 			},
 		},
 	},

@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 1;
 
@@ -25,7 +25,7 @@ Skill lifecycle:
   dashboard skills install git@github.com:user/example-skill.git
   dashboard skills install /absolute/path/to/example-skill
   dashboard skills install --ddfile
-  dashboard skills update example-skill
+  dashboard skills install
   dashboard skills list
   dashboard example-skill.hello arg1 arg2
   dashboard skills uninstall example-skill
@@ -84,13 +84,29 @@ Install it:
   dashboard skills install file:///absolute/path/to/example-skill
   # or from a direct checked-out local repo with .git/ and .env VERSION=...
   dashboard skills install /absolute/path/to/example-skill
+  # or install several sources in one ordered batch
+  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
+  # singular skill is an alias for skills management commands
+  dashboard skill list
 
 Repeated C<dashboard skills install ...> calls reinstall or refresh the
 isolated installed copy instead of failing on an existing repo name, using
 C<rsync> when it is available for direct local checkouts and a built-in Perl
-tree-copy fallback when it is not. Plain C<dashboard skills install> requires
-either one explicit source argument or C<--ddfile>; calling it without either
-returns a usage error.
+tree-copy fallback when it is not. Each explicit install, including every
+source in a multi-source command, also appends the exact source to the home
+root F<~/.developer-dashboard/ddfile> unless the same non-comment entry
+already exists. Bare C<dashboard skills install> reads that root F<ddfile>
+and reinstalls every listed source, which gives operators one update command
+for all registered skills. Install prints a progress rundown before long work
+starts and defaults to a table summary with each skill's F<.env> C<VERSION>
+before and after the install; pass C<-o json> for the raw result payload.
+C<dashboard skill> is only a singular alias for the
+skills management command family; installed commands still use the dotted
+C<dashboard E<lt>skillE<gt>.E<lt>commandE<gt>> form. If the home runtime
+already has F<~/.developer-dashboard/.gitignore>, each install also appends
+C<skills/E<lt>repo-nameE<gt>/> without duplicates so cloned skill trees stay
+out of runtime Git status. An existing F<~/.developer-dashboard/.gitiignore>
+spelling is honored for compatibility.
 
 Run an operator manifest install from the current directory:
 

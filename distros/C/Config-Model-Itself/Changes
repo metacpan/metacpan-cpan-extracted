@@ -1,3 +1,8 @@
+2.030 2026-04-23
+
+  Bug fix:
+    * Itself: fix signature warning for perl < 5.36
+
 2.029 2026-04-22
 
   Feature:

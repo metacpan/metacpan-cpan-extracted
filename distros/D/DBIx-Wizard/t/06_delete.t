@@ -13,7 +13,7 @@ dbiw('testdb:users')->insert({ name => 'Charlie', email => 'charlie@example.com'
 
 # delete with condition
 {
-  dbiw('testdb:users')->find({ name => 'Charlie' })->delete;
+  dbiw('testdb:users')->where({ name => 'Charlie' })->delete;
   my $count = dbiw('testdb:users')->inflate(0)->count;
   is $count, 2, 'delete with condition';
 }

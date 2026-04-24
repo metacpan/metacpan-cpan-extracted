@@ -12,7 +12,7 @@ t/lib/Test/DBIW.pm
 t/01_dbiw.t
 t/02_insert.t
 t/03_select.t
-t/04_find.t
+t/04_where.t
 t/05_update.t
 t/06_delete.t
 t/07_join.t

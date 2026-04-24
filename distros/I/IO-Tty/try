@@ -1,20 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
 
 use blib;
 use IO::Pty;
 require POSIX;
-$^W = 1;
 
 my $pty = IO::Pty->new;
 my $pid;
 
 unless (@ARGV) {
-  { 
+  {
     my $slave  = $pty->slave;
     print %{*$pty},"\n";
     print "master $pty $$pty ",$pty->ttyname,"\n";
     print "slave  $slave $$slave ",$slave->ttyname,"\n";
 
-    foreach $val (1..10) {
+    foreach my $val (1..10) {
       print $pty "$val\n";
       $_ = <$slave>;
       print "$_";
@@ -24,39 +27,39 @@ unless (@ARGV) {
   print "Done.\n";
   exit 0;
 } else {
-  pipe(STAT_RDR, STAT_WTR)
+  pipe(my $stat_rdr, my $stat_wtr)
     or die "Cannot open pipe: $!";
-  STAT_WTR->autoflush(1);
+  $stat_wtr->autoflush(1);
   $pid = fork();
   die "Cannot fork" if not defined $pid;
   unless ($pid) {
-    close STAT_RDR;
+    close $stat_rdr;
     $pty->make_slave_controlling_terminal();
     my $slave = $pty->slave();
     close $pty;
     $slave->clone_winsize_from(\*STDIN);
     $slave->set_raw();
 
-    open(STDIN,"<&". $slave->fileno())
+    open(STDIN,  '<&', $slave->fileno())
       or die "Couldn't reopen STDIN for reading, $!\n";
-    open(STDOUT,">&". $slave->fileno())
+    open(STDOUT, '>&', $slave->fileno())
       or die "Couldn't reopen STDOUT for writing, $!\n";
-    open(STDERR,">&". $slave->fileno())
+    open(STDERR, '>&', $slave->fileno())
       or die "Couldn't reopen STDERR for writing, $!\n";
 
     close $slave;
 
     { exec(@ARGV) };
-    print STAT_WTR $!+0;
+    print $stat_wtr $!+0;
     die "Cannot exec(@ARGV): $!";
   }
-  close STAT_WTR;
+  close $stat_wtr;
   $pty->close_slave();
   $pty->set_raw();
   # now wait for child exec (eof due to close-on-exit) or exec error
-  my $errstatus = sysread(STAT_RDR, $errno, 256);
+  my $errstatus = sysread($stat_rdr, my $errno, 256);
   die "Cannot sync with child: $!" if not defined $errstatus;
-  close STAT_RDR;
+  close $stat_rdr;
   if ($errstatus) {
     $! = $errno+0;
     die "Cannot exec(@ARGV): $!";
@@ -72,6 +75,8 @@ sub winch {
   $SIG{WINCH} = \&winch;
 }
 
+my $log_fh;
+
 sub process
 {
  my ($rin,$src,$dst) = @_;
@@ -80,11 +85,10 @@ sub process
  if (defined $read && $read)
   {
    syswrite($dst,$buf,$read);
-   syswrite(LOG,$buf,$read);
+   syswrite($log_fh,$buf,$read);
   }
  else
   {
-#   print STDERR "Nothing for $src i.e. $read\n";
    vec($rin, fileno($src), 1) = 0;
   }
  return $rin;
@@ -92,7 +96,7 @@ sub process
 
 sub parent
 {
- open(LOG,">log") || die;
+ open($log_fh, '>', 'log') || die "Cannot open log: $!";
  my ($pty) = @_;
  my $tty = $pty;
  my ($rin,$win,$ein) = ('','','');
@@ -107,26 +111,23 @@ sub parent
  while (1)
   {
    my ($rout,$wout,$eout,$timeleft);
-   ($nfound,$timeleft) = select($rout=$rin,$wout=$win,$eout=$ein,3600);
+   (my $nfound,$timeleft) = select($rout=$rin,$wout=$win,$eout=$ein,3600);
    die "select failed:$!" if ($nfound < 0);
    if ($nfound > 0)
     {
      if (vec($eout, fileno($tty), 1))
       {
-#       print STDERR "Exception on $tty\n";
       }
      if (vec($rout, fileno($tty), 1))
       {
-       $rin = process($rin,$tty,STDOUT);
+       $rin = process($rin,$tty,\*STDOUT);
        last unless (vec($rin, fileno($tty), 1));
       }
      elsif (vec($rout, fileno(STDIN), 1) && vec($wout, fileno($tty), 1))
       {
-       $rin = process($rin,STDIN,$tty);
+       $rin = process($rin,\*STDIN,$tty);
       }
     }
   }
- close(LOG);
+ close($log_fh);
 }
-
-

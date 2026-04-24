@@ -23,6 +23,7 @@ lsjobs [options] [jobid.. | pattern ]
 ```
 
 Add `-d` to delete the jobs (you will be prompted for confirmation).
+Add `--summary` to print per-state counts for the selected user versus all jobs.
 
 ![lsjobs](docs/lsjobs.png)
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.5.3
+## Version v0.5.4
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/20
+## Modified 2026/04/23
 ## All rights reserved
 ## 
 ## 
@@ -66,6 +66,7 @@ BEGIN
         fallback => 1,
     );
     use version ();
+    use Config;
     use Cwd ();
     use File::Spec ();
     use Scalar::Util ();
@@ -86,7 +87,7 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.5.3';
+    our $VERSION = 'v0.5.4';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
@@ -195,8 +196,9 @@ sub new
 
     my $name        = delete( $args{name} );
     my $use_cache   = delete( $args{use_cache_mem} ) // $USE_MEM_CACHE // 0;
-    my $latitude    = delete( $args{latitude} )  // delete( $args{lat} );
-    my $longitude   = delete( $args{longitude} ) // delete( $args{lon} );
+    my $extended    = delete( $args{extended} )      // 0;
+    my $latitude    = delete( $args{latitude} )      // delete( $args{lat} );
+    my $longitude   = delete( $args{longitude} )     // delete( $args{lon} );
 
     # If latitude and longitude are provided instead of a name, resolve the
     # nearest IANA timezone using the coordinates stored in the zones table.
@@ -318,6 +320,21 @@ sub new
     my $ref = $self->_get_zone_info( $self->{name} );
     return( $self->pass_error ) if( !defined( $ref ) && $self->error );
 
+    # If the name is not a known IANA timezone, and extended mode was requested,
+    # attempt to resolve it as a timezone abbreviation (such as JST or CET) via the
+    # extended_aliases table. Use the first unambiguous result.
+    if( !$ref && $extended )
+    {
+        my $candidates = $self->resolve_abbreviation( $name, extended => 1 );
+        if( defined( $candidates ) && @$candidates )
+        {
+            if( $candidates->[0]->{ambiguous} )
+            {
+                return( $self->error( "Timezone abbreviation '$name' is ambiguous (maps to multiple UTC offsets). Use resolve_abbreviation() with a utc_offset filter to disambiguate." ) );
+            }
+            return( $class->new( name => $candidates->[0]->{zone_name}, %args ) );
+        }
+    }
     return( $self->error( "Unknown time zone '$name'." ) ) unless( $ref );
 
     $self->{_zone_id}         = $ref->{zone_id};
@@ -1220,7 +1237,7 @@ SQL
     # Perl post-query, then re-sort. The SQL ORDER BY below applies the other
     # three keys, which is useful because the final Perl sort is stable over
     # rows already ordered by (first ASC, last DESC, name ASC).
-    my $query = <<"SQL_IANA";
+    my $query = <<SQL;
 SELECT z.name AS zone_name, t.utc_offset, t.is_dst,
        z.footer_tz_string,
        MIN(tr.trans_time) AS first_trans_time,
@@ -1232,7 +1249,7 @@ WHERE z.canonical = 1
   AND t.abbreviation = ?
 GROUP BY z.name, t.utc_offset, t.is_dst, z.footer_tz_string${having_sql}
 ORDER BY first_trans_time ASC, last_trans_time DESC, z.name ASC
-SQL_IANA
+SQL
     # Use the SQL string itself as the cache key - provably collision-free
     # regardless of any subtlety in the period_key_parts logic.
     my $cache_id = 'resolve_abbreviation_sql_' . $query;
@@ -1352,13 +1369,13 @@ SQL_IANA
     unless( $ext_sth = $self->_get_cached_statement( 'resolve_abbreviation_extended' ) )
     {
         my $dbh = $self->_dbh || return( $self->pass_error );
-        my $query = <<'SQL_EXTENDED';
+        my $query = <<'SQL';
 SELECT ea.abbreviation, z.name AS zone_name, ea.is_primary
 FROM extended_aliases ea
 JOIN zones z ON z.zone_id = ea.zone_id
 WHERE ea.abbreviation = ?
 ORDER BY ea.is_primary DESC, z.name
-SQL_EXTENDED
+SQL
         $ext_sth = eval
         {
             $dbh->prepare( $query );
@@ -1744,15 +1761,19 @@ sub _dbh
     my $self = shift( @_ );
     my $file = $DB_FILE;
 
+    my $tid = ( $Config{useithreads} && $INC{'threads.pm'} && threads->can('tid') ) ? threads->tid() : $$;
     if( $DBH &&
         ref( $DBH ) eq 'HASH' &&
-        exists( $DBH->{ $file } ) &&
-        $DBH->{ $file } &&
-        Scalar::Util::blessed( $DBH->{ $file } ) &&
-        $DBH->{ $file }->isa( 'DBI::db' ) &&
-        $DBH->{ $file }->ping )
+        exists( $DBH->{ $tid } ) &&
+        defined( $DBH->{ $tid } ) &&
+        ref( $DBH->{ $tid } ) eq 'HASH' &&
+        exists( $DBH->{ $tid }->{ $file } ) &&
+        $DBH->{ $tid }->{ $file } &&
+        Scalar::Util::blessed( $DBH->{ $tid }->{ $file } ) &&
+        $DBH->{ $tid }->{ $file }->isa( 'DBI::db' ) &&
+        $DBH->{ $tid }->{ $file }->ping )
     {
-        return( $DBH->{ $file } );
+        return( $DBH->{ $tid }->{ $file } );
     }
 
     return( $self->error( "Timezone database file '$file' does not exist." ) )
@@ -1796,7 +1817,8 @@ sub _dbh
     {
         $dbh->{sqlite_string_mode} = DBD::SQLite::Constants::DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK();
     }
-    return( $DBH->{ $file } = $dbh );
+    $DBH->{ $tid } //= {};
+    return( $DBH->{ $tid }->{ $file } = $dbh );
 }
 
 sub _dbh_add_user_defined_functions
@@ -1992,8 +2014,10 @@ sub _get_cached_statement
     my $id   = shift( @_ );
     die( "No statement ID provided." ) unless( defined( $id ) && length( $id ) );
     my $file = $DB_FILE;
-    $STHS->{ $file } //= {};
-    my $sth = $STHS->{ $file }->{ $id };
+    my $tid  = ( $Config{useithreads} && $INC{'threads.pm'} && threads->can('tid') ) ? threads->tid() : $$;
+    $STHS->{ $tid } //= {};
+    $STHS->{ $tid }->{ $file } //= {};
+    my $sth = $STHS->{ $tid }->{ $file }->{ $id };
     if( defined( $sth ) &&
         Scalar::Util::blessed( $sth ) &&
         $sth->isa( 'DBI::st' ) )
@@ -2363,6 +2387,7 @@ FROM spans s
 WHERE s.zone_id = ?
   AND ( s.utc_start IS NULL OR s.utc_start <= ? )
   AND ( s.utc_end   IS NULL OR s.utc_end   >  ? )
+ORDER BY (s.utc_start IS NULL) ASC, s.utc_start DESC
 LIMIT 1
 SQL
         my $dbh = $self->_dbh || return( $self->pass_error );
@@ -2404,7 +2429,14 @@ SQL
     # a POSIX footer TZ string, the DB transitions may be incomplete for future
     # dates. The footer encodes the recurring DST rule for all dates beyond the
     # last stored transition, per RFC 9636 section 3.3.
+    # IMPORTANT: we must only apply the footer when the timestamp is actually
+    # beyond the last recorded transition (utc_start of the open-ended span).
+    # If the SQL query returned a bounded span (utc_end IS NOT NULL), the timestamp
+    # is within the stored transitions and the footer must NOT be applied, because
+    # doing so would overwrite a historically correct DST span with the post-abolition
+    # rule, as observed with Asia/Tehran (DST abolished September 2022).
     if( defined( $row ) &&
+        !defined( $row->{utc_end} ) &&
         defined( $self->{footer_tz_string} ) &&
         length( $self->{footer_tz_string} ) )
     {
@@ -2432,9 +2464,9 @@ SQL
     }
 
     # Store matched span in the per-object cache for future range checks.
-    # We cache only when the object already has a _span_cache slot (i.e.
-    # the cache was enabled by use_cache_mem or enable_mem_cache) to avoid
-    # allocating memory for callers that never requested caching.
+    # We cache only when the object already has a _span_cache slot (i.e. the cache
+    # was enabled by use_cache_mem or enable_mem_cache) to avoid allocating memory
+    # for callers that never requested caching.
     if( defined( $self->{_span_cache} ) && defined( $row ) )
     {
         $self->{_span_cache} = $row;
@@ -2489,6 +2521,7 @@ FROM spans s
 WHERE s.zone_id = ?
   AND ( s.local_start IS NULL OR s.local_start <= ? )
   AND ( s.local_end   IS NULL OR s.local_end   >  ? )
+ORDER BY (s.local_start IS NULL) ASC, s.local_start DESC
 LIMIT 1
 SQL
         my $dbh = $self->_dbh || return( $self->pass_error );
@@ -2536,7 +2569,11 @@ SQL
     #   dst only       -> DST
     #   both (overlap) -> prefer standard (fall-back convention)
     #   neither (gap)  -> r_std carries the post-gap DST info
+    # IMPORTANT: only apply the footer when the span is open-ended (local_end IS NULL).
+    # A bounded span means the timestamp is within stored transitions and the footer
+    # must not overwrite the historically correct offset.
     if( defined( $row ) &&
+        !defined( $row->{local_end} ) &&
         defined( $self->{footer_tz_string} ) &&
         length( $self->{footer_tz_string} ) )
     {
@@ -2875,8 +2912,10 @@ sub _set_cached_statement
     }
         ;
     my $file = $DB_FILE;
-    $STHS->{ $file } //= {};
-    $STHS->{ $file }->{ $id } = $sth;
+    my $tid  = ( $Config{useithreads} && $INC{'threads.pm'} && threads->can('tid') ) ? threads->tid() : $$;
+    $STHS->{ $tid } //= {};
+    $STHS->{ $tid }->{ $file } //= {};
+    $STHS->{ $tid }->{ $file }->{ $id } = $sth;
     return( $sth );
 }
 
@@ -2956,22 +2995,31 @@ END
     # Finish all cached statement handles first
     if( ref( $STHS ) eq 'HASH' )
     {
-        for my $file ( keys( %$STHS ) )
+        foreach my $tid ( keys( %$STHS ) )
         {
-            for my $id ( keys( %{ $STHS->{ $file } } ) )
+            next unless( defined( $STHS->{ $tid } ) && ref( $STHS->{ $tid } ) eq 'HASH' );
+            foreach my $file ( keys( %{$STHS->{ $tid }} ) )
             {
-                my $sth = $STHS->{ $file }->{ $id };
-                eval{ $sth->finish } if( ref( $sth ) );
+                next unless( defined( $STHS->{ $tid }->{ $file } ) && ref( $STHS->{ $tid }->{ $file } ) eq 'HASH' );
+                foreach my $id ( keys( %{$STHS->{ $tid }->{ $file }} ) )
+                {
+                    my $sth = $STHS->{ $tid }->{ $file }->{ $id };
+                    eval{ $sth->finish } if( ref( $sth ) );
+                }
             }
         }
     }
     # Then disconnect all database handles
     if( ref( $DBH ) eq 'HASH' )
     {
-        for my $file ( keys( %$DBH ) )
+        foreach my $tid ( keys( %$DBH ) )
         {
-            my $dbh = $DBH->{ $file };
-            eval{ $dbh->disconnect } if( ref( $dbh ) );
+            next unless( defined( $DBH->{ $tid } ) && ref( $DBH->{ $tid } ) eq 'HASH' );
+            foreach my $file ( keys( %{$DBH->{ $tid }} ) )
+            {
+                my $dbh = $DBH->{ $tid }->{ $file };
+                eval{ $dbh->disconnect } if( ref( $dbh ) );
+            }
         }
     }
     $STHS = {};
@@ -3180,7 +3228,7 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
 
 =head1 VERSION
 
-    v0.5.3
+    v0.5.4
 
 =head1 DESCRIPTION
 
@@ -3435,6 +3483,13 @@ A boolean option C<use_cache_mem> set to a true value activates the process-leve
         name          => 'America/New_York',
         use_cache_mem => 1,
     );
+
+A boolean option C<extended> set to a true value enables abbreviation resolution as a fallback when the name is not recognised as a valid IANA timezone name. This is useful when the caller receives a timezone abbreviation such as C<JST>, C<CET>, or C<EST> from an external source and wishes to resolve it to a canonical IANA zone without calling L</resolve_abbreviation> explicitly.
+
+When C<extended> is set and the name is unknown as an IANA timezone, C<new> calls C<resolve_abbreviation> with the C<extended> option set to true internally and, if a single unambiguous candidate is found, recurses with the resolved canonical name. If the abbreviation is ambiguous or not found even in the extended aliases table, the standard C<Unknown time zone> error is returned.
+
+    my $tz = DateTime::Lite::TimeZone->new( name => 'JST', extended => 1 );
+    say $tz->name;  # Asia/Tokyo
 
 Returns the new object on success. On error, sets the L<exception object|DateTime::Lite::Exception> with C<error()> and returns C<undef> in scalar context, or an empty list in list context. In method-chaining (object) context, returns a C<DateTime::Lite::NullObject> to avoid the error C<Can't call method '%s' on an undefined value>. At the end of the chain, C<undef> or an empty list will still be returned though.
 

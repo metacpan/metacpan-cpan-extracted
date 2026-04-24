@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::Server;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -400,7 +400,7 @@ sub _proxy_streams {
 sub _stop_ssl_backend {
     my ($pid) = @_;
     return 1 if !$pid;
-    kill 'TERM', $pid;
+    kill 15, $pid;
     waitpid( $pid, 0 );
     return 1;
 }
@@ -465,7 +465,7 @@ sub _run_previous_signal {
 # Input: none.
 # Output: true value when TERM is ignored, otherwise the process terminates.
 sub _signal_default_term {
-    kill 'TERM', $$;
+    kill 15, $$;
     return 1;
 }
 

@@ -1181,9 +1181,10 @@ sub apply_filters {
         $state->{active_row} = $max if $state->{active_row} > $max;
 
         # Re-apply whichever column is currently sorted
-        for my $col (@{$state->{columns}}) {
+        for my $idx (0 .. $#{$state->{columns}}) {
+            my $col = $state->{columns}[$idx];
             if ($col->{sort} ne 'none') {
-                sort_column($state, $col->{sort});
+                sort_column($state, $col->{sort}, $idx);
                 last;
             }
         }
@@ -1491,10 +1492,10 @@ sub toggle_selection {
 }
 
 sub sort_column {
-    my ($state, $direction) = @_;
+    my ($state, $direction, $col_idx) = @_;
     return if scalar @{$state->{jobs}} == 0;
 
-    my $col_idx = $state->{active_col};
+    $col_idx = $state->{active_col} unless defined $col_idx;
     my $col = $state->{columns}[$col_idx];
 
     # Remember the currently active job ID
@@ -1662,7 +1663,7 @@ viewjobs - Interactive TUI for viewing and managing SLURM jobs
 
 =head1 VERSION
 
-version 0.20.0
+version 0.20.1
 
 =head1 SYNOPSIS
 

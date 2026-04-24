@@ -60,7 +60,7 @@ use PPI             ();
 use PPI::Exception  ();
 use PPI::Singletons '%_PARENT';
 
-our $VERSION = '1.284';
+our $VERSION = '1.285';
 
 our $errstr = "";
 
@@ -157,7 +157,9 @@ sub lex_file {
 		return $self->_error( $errstr );
 	}
 
-	$self->lex_tokenizer( $Tokenizer, %args );
+	return _INSTANCE( $Tokenizer, 'PPI::Tokenizer' )
+	  ? $self->lex_tokenizer( $Tokenizer, %args )
+	  : $self->_error($Tokenizer);
 }
 
 =pod

@@ -222,6 +222,7 @@ subtest 'period with raw epoch integer value' => sub
 # NOTE: period with no matching results returns undef + error
 subtest 'period with no matching results returns error' => sub
 {
+    local $SIG{__WARN__} = sub{};
     my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
         period => '<1900-01-01'
     );
@@ -256,6 +257,7 @@ subtest 'period and utc_offset can be combined' => sub
 # NOTE: Empty period value triggers a descriptive error
 subtest 'Empty period value triggers error' => sub
 {
+    local $SIG{__WARN__} = sub{};
     my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
         period => ''
     );

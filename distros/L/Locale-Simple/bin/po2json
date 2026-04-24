@@ -184,7 +184,7 @@ po2json - Command line tool for converting a po file into a Gettext.js compatibl
 
 =head1 VERSION
 
-version 0.108
+version 0.109
 
 =head1 SYNOPSIS
 

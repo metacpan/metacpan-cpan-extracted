@@ -1,5 +1,40 @@
 Revision history for FastGlob
 
+1.6       2026-04-23 17:53:40+02:00 Europe/Vienna
+
+[Bug Fixes]
+- Escape regex metacharacters when converting glob wildcards to regex (#11)
+- Correct 'parentidr' typo to 'parentdir' in @EXPORT_OK (#4)
+- Use negative lookbehind for wildcard detection regex (#5)
+- Warn on opendir() failure in recurseglob() when verbose is set (#6)
+- Remove ($) prototype from glob() to fix spurious 0 on Perl 5.16 (#3)
+- Add proper Windows support with auto-detected defaults (#10)
+- Match lowercase drive letters in Windows rootpat (#15)
+- Align minimum Perl version to 5.008 and modernize strict/warnings (#16)
+- Preserve tilde patterns when user expansion fails instead of returning undef (#17)
+- Convert POSIX [!...] bracket negation to regex [^...] (#21)
+- Filter dotfiles at readdir level instead of regex mangling (#22)
+- Replace global bareword filehandle with lexical in recurseglob (#12)
+- Skip empty patterns to match CORE::glob behavior (#23)
+
+[Performance]
+- Skip non-directory entries in recurseglob path traversal (#20)
+- Replace unshift with push in recurseglob for O(1) insertion (#18)
+
+[Tests]
+- Add comprehensive CORE::glob comparison test suite (#23)
+- Add comprehensive recursive glob and brace expansion tests (#14)
+- Add tilde expansion coverage in t/base.t (#7)
+- Add export_ok test proving parentdir import is broken (#4)
+- Add wildcard detection tests for leading-wildcard patterns (#5)
+- Add test for opendir failure warning in recurseglob() (#6)
+
+[CI / Chore]
+- Add GitHub Actions CI workflow (#2)
+- Remove stale .travis.yml (#13)
+- Remove unused .whitesource config (#19)
+- Update README.md
+
 1.5       2019-05-30 15:35:49-06:00 America/Denver
 
 adjust CONTRIBUTING.md

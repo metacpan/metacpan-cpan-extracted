@@ -1,8 +1,7 @@
-\.perltidyrc
-cpanfile
-^MANIFEST.bak
+^\.perltidyrc$
+^cpanfile$
 ^Makefile$
-^.github/
-^.git/
-^MYMETA.*
-^.gitignore
+^\.git
+^MYMETA\.*
+^CLAUDE\.md$
+^MANIFEST\.bak$

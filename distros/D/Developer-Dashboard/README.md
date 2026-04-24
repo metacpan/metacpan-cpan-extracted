@@ -252,7 +252,7 @@ Only `dashboard` is intended to be the public CPAN-facing command-line entrypoin
   Creates or reuses a tmux session for the requested ticket reference, seeds `TICKET_REF` plus dashboard-friendly branch aliases into that session environment, and attaches to it through a dashboard-managed private helper instead of a public standalone binary.
 
 - `Developer::Dashboard::RuntimeManager`
-  Manages the background web service and collector lifecycle with process-title validation, `pkill`-style fallback shutdown, and restart orchestration, tying the browser and prepared-state loops together as one runtime.
+  Manages the background web service and collector lifecycle with process-title validation, numeric POSIX shutdown signals for Alpine/iSH compatibility, `pkill`-style fallback shutdown, and restart orchestration, tying the browser and prepared-state loops together as one runtime.
 
 - `Developer::Dashboard::UpdateManager`
   Runs ordered update scripts and restarts validated collector loops when needed, giving the runtime a controlled bootstrap and upgrade path.
@@ -621,7 +621,7 @@ transitions so the active pointer does not appear duplicated in interactive
 terminals, explains that any upcoming `sudo` prompt is asking for the user's
 operating-system account password only for package-manager work,
 bootstraps user-space Perl tooling under `~/perl5` with
-`cpanm --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus`,
+`cpanm --no-wget --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus`,
 appends exactly one `local::lib` bootstrap line to `~/.bashrc`, `~/.zshrc`, or
 `~/.profile` depending on the active shell, keeps bash login shells wired by
 bridging `~/.profile` to `~/.bashrc`, prefers Homebrew Perl on macOS when
@@ -647,7 +647,7 @@ printing the exact shell file it updated plus the exact `. "<rc-file>"`
 command the user should run only when the installer cannot safely take over a
 terminal, never probes `/dev/tty` during a piped `curl ... | sh` run so
 non-interactive installs stay quiet, installs Developer Dashboard into the user account with
-`cpanm --notest Developer::Dashboard`, and then runs `dashboard init` so the
+`cpanm --no-wget --notest Developer::Dashboard`, and then runs `dashboard init` so the
 runtime exists immediately after installation.
 
 Release verification is Linux-gated. Debian-family, Alpine, and Fedora
@@ -666,7 +666,7 @@ DD_INSTALL_CPAN_TARGET=./Developer-Dashboard-X.XX.tar.gz ./install.sh
 Install from CPAN with:
 
 ```bash
-cpanm --notest Developer::Dashboard
+cpanm --no-wget --notest Developer::Dashboard
 ```
 
 Or install from a checkout with:
@@ -1342,7 +1342,7 @@ by real path identity instead of raw string spelling.
 - `dashboard serve logs` prints the combined Dancer2 and Starman runtime log captured in the dashboard log file, `dashboard serve logs -n 100` starts from the last 100 lines, and `dashboard serve logs -f` follows appended output live
 - `dashboard serve workers N` saves the default Starman worker count and starts the web service immediately when it is currently stopped; `--host HOST` and `--port PORT` can steer that auto-start path, and `dashboard serve --workers N` or `dashboard restart --workers N` can still override it for one run
 - `dashboard stop` stops both the web service and managed collector loops and, on an interactive terminal, prints the full stop task board on `stderr` before work starts so each shutdown step becomes visible instead of silent waiting
-- `dashboard restart` stops both, starts configured collector loops again, then starts the web service, and only reports success after the replacement collector loops and web runtime become visible and survive a short post-ready confirmation window, with the web side still holding a live managed pid and an accepting listener on the requested port; on an interactive terminal it also prints the full restart task board on `stderr`, marks the active step with a yellow `->`, marks completed steps with a green `[OK]`, marks failed steps with a red `[X]`, and leaves the final JSON result on `stdout`
+- `dashboard restart` stops both, starts configured collector loops again, then starts the web service, and only reports success after the replacement collector loops and web runtime become visible and survive a short post-ready confirmation window, with the web side still holding a live managed pid and an accepting listener on the requested port; on an interactive terminal it also prints the full restart task board on `stderr`, marks the active step with a yellow `->`, marks completed steps with a green `[OK]`, marks failed steps with a red `[X]`, and leaves the final JSON result on `stdout`. Stop and restart shutdown paths send numeric POSIX signals instead of named signal strings, so minimal Alpine/iSH Perl builds that reject `TERM` by name still terminate managed web and collector processes correctly.
 - web shutdown and duplicate detection do not trust pid files alone; they validate managed processes by environment marker or process title and use a `pkill`-style scan fallback when needed
 
 ### Environment Customization
@@ -1533,7 +1533,7 @@ transformed locally before rendering into derived HTML, links, or button-like
 actions. Its saved Ajax endpoints run through singleton workers. No `DBD::*`
 driver ships in the base tarball by default; install only the one you need
 with `dashboard cpan DBD::Driver` or user-space
-`cpanm --notest -L ~/perl5 DBD::Driver`, and the bookmark will return explicit install
+`cpanm --no-wget --notest -L ~/perl5 DBD::Driver`, and the bookmark will return explicit install
 guidance when a selected driver is missing. The repository also ships a
 dedicated SQL dashboard support guide with the verification matrix and
 per-database notes for that workspace.
@@ -1551,7 +1551,9 @@ dashboard skills install foo/bar
 dashboard skills install git@github.com:user/example-skill.git
 dashboard skills install https://github.com/user/example-skill.git
 dashboard skills install /absolute/path/to/example-skill
+dashboard skills install browser foo/bar git@github.com:user/example-skill.git
 dashboard skills install --ddfile
+dashboard skill list
 ```
 
 Bare one-word skill names are expanded against the official
@@ -1562,6 +1564,15 @@ expanded against GitHub too, so `dashboard skills install foo/bar` clones
 `https://github.com/foo/bar`. Full URLs such as
 `https://github.com/user/example-skill.git` and
 `git@github.com:user/example-skill.git` are used exactly as supplied.
+Multiple explicit sources can be supplied to one install command. Developer
+Dashboard installs them in the order given, prints a progress rundown before
+work starts, and registers every source once. The default install summary is a
+terminal table with each skill's `.env` `VERSION` before and after the
+install. Use `-o json` when a script needs the raw result payload. `dashboard skill` is
+accepted as a singular alias for the `dashboard skills` management command
+family, so `dashboard skill list` and `dashboard skill install browser` are
+equivalent to the plural form. It does not replace dotted skill execution;
+installed skill commands still run as `dashboard <skill>.<command>`.
 
 Git sources are cloned. Direct local checked-out directories are synced in
 place instead of recloned, using `rsync` when it is available and the built-in
@@ -1574,9 +1585,21 @@ root under the deepest participating `DD-OOP-LAYERS` runtime. In a home-only
 session that is `~/.developer-dashboard/skills/<repo-name>/`. In a deeper
 project layer that already has its own `.developer-dashboard/`, the install
 target becomes `<that-layer>/.developer-dashboard/skills/<repo-name>/`.
-`dashboard skills install` now requires either one explicit source argument or
-the special `--ddfile` flag; calling it with no source and no `--ddfile`
-returns a usage error instead of guessing.
+Each explicit `dashboard skills install <source>`, including every source in a
+multi-source command, also registers that exact source in
+`~/.developer-dashboard/ddfile` unless it is already listed there.
+When `~/.developer-dashboard/.gitignore` already exists, the install also adds
+`skills/<repo-name>/` for each installed skill without duplicating existing
+entries, so users who keep the dashboard runtime in Git do not accidentally
+track cloned skill trees. The installer also honors an existing
+`~/.developer-dashboard/.gitiignore` spelling as a compatibility safety net.
+Calling bare `dashboard skills install` with no source reads that root
+`ddfile` and reinstalls every listed skill as an update batch, showing the
+same progress rundown and before/after version table. If no listed skill
+changes version, the summary explicitly says `No update.`. If the root
+`ddfile` does not exist yet or has no installable entries, the command returns
+an explicit error telling the user to install a skill first or pass a skill
+source.
 Developer Dashboard does not merge the skill's `cli/`, `dashboards/`,
 `config/`, `ddfile`, `ddfile.local`, `aptfile`, `apkfile`, `dnfile`, `brewfile`, `package.json`,
 `cpanfile`, `cpanfile.local`, or Docker files into the normal runtime
@@ -1595,7 +1618,9 @@ refresh for already-installed targets, just like repeated explicit
 `dashboard skills install <source>` runs.
 
 Interactive `dashboard skills install` runs also print a task board on
-`stderr`. When a skill ships dependency manifests such as `package.json`, the
+`stderr`; multi-source and bare update-all installs show one task for every
+source before any clone or dependency step starts. When a single skill ships
+dependency manifests such as `package.json`, the
 matching task updates to show the detected file path so a long-running npm,
 cpanm, or package-manager step stays visible instead of looking blind.
 
@@ -1652,10 +1677,10 @@ skill is disabled, including:
 - the merged config key such as `_example-skill`
 - declared collectors, their repo-qualified names, and indicator metadata
 
-**Update a skill** to the latest version:
+**Update registered skills** to their latest versions:
 
 ```bash
-dashboard skills update example-skill
+dashboard skills install
 ```
 
 **Disable a skill** without uninstalling it:
@@ -1925,7 +1950,7 @@ prove -lr t
 Measure library coverage with Devel::Cover:
 
 ```bash
-cpanm --notest --local-lib-contained ./.perl5 Devel::Cover
+cpanm --no-wget --notest --local-lib-contained ./.perl5 Devel::Cover
 export PERL5LIB="$PWD/.perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
 export PATH="$PWD/.perl5/bin:$PATH"
 cover -delete
@@ -1977,6 +2002,10 @@ prerequisites for blank-environment `cpanm` verification.
 Tests that depend on a missing or empty environment variable now establish that
 state explicitly inside the test file, rather than assuming the parent shell
 or install harness starts clean.
+The JavaScript fast-check wrapper is a source-tree fuzz gate: it runs when
+`node`, `npm`, `package.json`, and `package-lock.json` are all present, and it
+skips in packaged install-test trees that do not ship those checkout-only
+JavaScript manifests.
 
 ### Scorecard Timing
 

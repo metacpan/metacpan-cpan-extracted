@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -55,6 +55,26 @@ sub install_progress_tasks {
     ];
 }
 
+# install_progress_tasks_for_sources(@sources)
+# Returns the ordered source-level task list shown for multi-skill install and
+# bare update-all runs.
+# Input: skill source strings in the order they will be installed.
+# Output: array reference of progress task hashes.
+sub install_progress_tasks_for_sources {
+    my ( $class, @sources ) = @_;
+    my @tasks;
+    my $idx = 0;
+    for my $source (@sources) {
+        next if !defined $source || $source eq '';
+        push @tasks, {
+            id    => 'install_source_' . $idx,
+            label => 'Install/update ' . $source,
+        };
+        $idx++;
+    }
+    return \@tasks;
+}
+
 # install($source)
 # Installs or reinstalls a skill into the deepest participating DD-OOP-LAYERS
 # skills root.
@@ -64,7 +84,59 @@ sub install_progress_tasks {
 sub install {
     my ( $self, $source ) = @_;
     return { error => 'Missing skill source' } if !$source;
-    return $self->_install_to_skills_root( $source, $self->{paths}->skills_root );
+    my $result = $self->_install_to_skills_root( $source, $self->{paths}->skills_root );
+    return $result if $result->{error};
+    my $gitignore_registration = $self->_register_home_gitignore_skill( $result->{repo_name} );
+    return $gitignore_registration if $gitignore_registration->{error};
+    $result->{registered_gitignore} = $gitignore_registration->{gitignore} if defined $gitignore_registration->{gitignore};
+    $result->{registered_gitignore_entry} = $gitignore_registration->{registered}
+      if exists $gitignore_registration->{registered};
+    return $result if $ENV{DEVELOPER_DASHBOARD_SKIP_SKILL_REGISTRY};
+    my $registration = $self->_register_root_ddfile_source($source);
+    return $registration if $registration->{error};
+    $result->{registered_ddfile} = $registration->{ddfile};
+    $result->{registered_ddfile_entry} = $registration->{registered};
+    return $result;
+}
+
+# install_many(@sources)
+# Installs or reinstalls multiple explicit skill sources in the order supplied
+# by the operator.
+# Input: one or more Git URLs, shorthand GitHub names, owner/repo shorthands,
+# or direct local checked-out repository paths.
+# Output: hash ref with batch success status, original sources, and individual
+# install results, or an error hash that includes completed results.
+sub install_many {
+    my ( $self, @sources ) = @_;
+    @sources = grep { defined && $_ ne '' } @sources;
+    return { error => 'Missing skill source' } if !@sources;
+
+    my @results;
+    my $idx = 0;
+    for my $source (@sources) {
+        my $task_id = 'install_source_' . $idx;
+        $self->_progress_emit( { task_id => $task_id, status => 'running', label => "Install/update $source" } );
+        my $result = $self->install($source);
+        push @results, $result;
+        if ( $result->{error} ) {
+            $self->_progress_emit( { task_id => $task_id, status => 'failed', label => "Install/update $source" } );
+            return {
+                error   => "Failed to install skill source $source: $result->{error}",
+                source  => $source,
+                sources => \@sources,
+                results => \@results,
+            };
+        }
+        $self->_progress_emit( { task_id => $task_id, status => 'done', label => $self->_install_result_progress_label($source, $result) } );
+        $idx++;
+    }
+
+    return {
+        success => 1,
+        sources => \@sources,
+        results => \@results,
+        message => @sources == 1 ? 'Installed skill successfully' : 'Installed skills successfully',
+    };
 }
 
 # install_from_ddfiles($base_dir)
@@ -105,6 +177,50 @@ sub install_from_ddfiles {
         operations => \@operations,
         message    => 'Installed skills from ddfile manifests successfully',
     };
+}
+
+# install_registered_skills()
+# Reinstalls or updates every skill source listed in the home runtime ddfile.
+# Input: none.
+# Output: hash ref describing completed root-ddfile update operations or an
+# error hash when the root registry is missing or empty.
+sub install_registered_skills {
+    my ($self) = @_;
+    my $home_root = $self->{paths}->home_runtime_root;
+    my $ddfile = File::Spec->catfile( $home_root, 'ddfile' );
+    return { error => "No root ddfile found under $home_root; install a skill first or pass a skill source" }
+      if !-f $ddfile;
+    return { error => "Root ddfile $ddfile does not list any skills to install" }
+      if !$self->_root_ddfile_has_sources($ddfile);
+
+    my @operations;
+    my $result = $self->_install_manifest_file(
+        $ddfile,
+        manifest_name => 'ddfile',
+        skills_root   => File::Spec->catdir( $home_root, 'skills' ),
+        operations    => \@operations,
+        progress      => 1,
+    );
+    return $result if $result->{error};
+
+    return {
+        success    => 1,
+        base_dir   => $home_root,
+        ddfile     => $ddfile,
+        operations => \@operations,
+        message    => 'Installed registered skills from the home root ddfile successfully',
+    };
+}
+
+# registered_skill_sources()
+# Reads the home root ddfile and returns the installable skill sources it lists.
+# Input: none.
+# Output: list of non-comment source strings, or an empty list when absent.
+sub registered_skill_sources {
+    my ($self) = @_;
+    my $ddfile = File::Spec->catfile( $self->{paths}->home_runtime_root, 'ddfile' );
+    return () if !-f $ddfile;
+    return $self->_dependency_file_lines($ddfile);
 }
 
 # uninstall($repo_name)
@@ -316,6 +432,106 @@ sub _normalize_install_source {
     return $source;
 }
 
+# _root_ddfile_has_sources($ddfile)
+# Reports whether one root ddfile has at least one non-comment skill source.
+# Input: root ddfile path.
+# Output: boolean true when an installable source exists.
+sub _root_ddfile_has_sources {
+    my ( $self, $ddfile ) = @_;
+    return scalar $self->_dependency_file_lines($ddfile) ? 1 : 0;
+}
+
+# _register_root_ddfile_source($source)
+# Appends one explicit skill install source to the home root ddfile unless the
+# same non-comment source is already present.
+# Input: source string exactly as supplied to dashboard skills install.
+# Output: hash ref with ddfile path and boolean registered status, or an error hash.
+sub _register_root_ddfile_source {
+    my ( $self, $source ) = @_;
+    return { error => 'Missing skill source' } if !$source;
+
+    my $home_root = $self->{paths}->home_runtime_root;
+    $self->{paths}->ensure_dir($home_root);
+    my $ddfile = File::Spec->catfile( $home_root, 'ddfile' );
+    my $existing = '';
+    if ( -f $ddfile ) {
+        open my $read_fh, '<', $ddfile or return { error => "Unable to read root ddfile $ddfile: $!" };
+        local $/;
+        $existing = <$read_fh> // '';
+        close $read_fh;
+        for my $line ( split /\n/, $existing ) {
+            $line =~ s/^\s+|\s+$//g;
+            next if $line eq '' || $line =~ /\A#/;
+            return {
+                success    => 1,
+                ddfile     => $ddfile,
+                registered => 0,
+            } if $line eq $source;
+        }
+    }
+
+    open my $append_fh, '>>', $ddfile or return { error => "Unable to update root ddfile $ddfile: $!" };
+    print {$append_fh} "\n" if length($existing) && $existing !~ /\n\z/;
+    print {$append_fh} "$source\n";
+    close $append_fh;
+    $self->{paths}->secure_file_permissions($ddfile);
+
+    return {
+        success    => 1,
+        ddfile     => $ddfile,
+        registered => 1,
+    };
+}
+
+# _register_home_gitignore_skill($repo_name)
+# Adds one installed skill directory to the home runtime .gitignore when that
+# ignore file already exists.
+# Input: installed skill repository name.
+# Output: hash ref describing the .gitignore path and whether a new entry was
+# appended, or a success skip hash when no home .gitignore exists.
+sub _register_home_gitignore_skill {
+    my ( $self, $repo_name ) = @_;
+    return { error => 'Missing repo name' } if !$repo_name;
+
+    my $home_root = $self->{paths}->home_runtime_root;
+    my @gitignore_candidates = (
+        File::Spec->catfile( $home_root, '.gitignore' ),
+        File::Spec->catfile( $home_root, '.gitiignore' ),
+    );
+    my ($gitignore) = grep { -f $_ } @gitignore_candidates;
+    return { success => 1, skipped => 1 } if !$gitignore;
+
+    my $entry = "skills/$repo_name/";
+    my $existing = '';
+    open my $read_fh, '<', $gitignore or return { error => "Unable to read home gitignore $gitignore: $!" };
+    {
+        local $/;
+        $existing = <$read_fh> // '';
+    }
+    close $read_fh or return { error => "Unable to close home gitignore $gitignore: $!" };
+    for my $line ( split /\n/, $existing ) {
+        $line =~ s/^\s+|\s+$//g;
+        next if $line eq '' || $line =~ /\A#/;
+        return {
+            success    => 1,
+            gitignore  => $gitignore,
+            registered => 0,
+        } if $line eq $entry;
+    }
+
+    open my $append_fh, '>>', $gitignore or return { error => "Unable to update home gitignore $gitignore: $!" };
+    print {$append_fh} "\n" if length($existing) && $existing !~ /\n\z/;
+    print {$append_fh} "$entry\n";
+    close $append_fh or return { error => "Unable to close home gitignore $gitignore: $!" };
+    $self->{paths}->secure_file_permissions($gitignore);
+
+    return {
+        success    => 1,
+        gitignore  => $gitignore,
+        registered => 1,
+    };
+}
+
 # _sync_local_skill_source($source_path, $target_path)
 # Copies one validated local skill checkout into the isolated installed skill
 # root, using rsync when available and a Perl tree copy otherwise.
@@ -472,6 +688,7 @@ sub _install_to_skills_root {
 
     $self->{paths}->ensure_dir($skills_root);
     my $skill_path = File::Spec->catdir( $skills_root, $repo_name );
+    my $version_before = $self->_skill_env_version($skill_path);
     my $remove = $self->_remove_existing_skill_path($skill_path);
     return $remove if $remove->{error};
 
@@ -525,14 +742,57 @@ sub _install_to_skills_root {
     $self->_progress_emit( { task_id => 'prepare_layout', status => 'done' } );
     my $dependency = $self->_install_skill_dependencies($skill_path);
     return $dependency if $dependency->{error};
+    my $version_after = $self->_skill_env_version($skill_path);
+    my $install_status = $self->_install_version_status( $version_before, $version_after );
 
     return {
-        success   => 1,
-        repo_name => $repo_name,
-        path      => $skill_path,
-        message   => "Skill '$repo_name' installed successfully",
-        metadata  => $self->_skill_metadata( $repo_name, $skill_path ),
+        success        => 1,
+        source         => $source,
+        repo_name      => $repo_name,
+        path           => $skill_path,
+        version_before => $version_before,
+        version_after  => $version_after,
+        status         => $install_status,
+        changed        => $install_status eq 'updated' || $install_status eq 'installed' ? 1 : 0,
+        message        => "Skill '$repo_name' installed successfully",
+        metadata       => $self->_skill_metadata( $repo_name, $skill_path ),
     };
+}
+
+# _skill_env_version($skill_path)
+# Reads VERSION from a skill .env file when it exists.
+# Input: absolute skill root directory path.
+# Output: version string or undef when no VERSION entry exists.
+sub _skill_env_version {
+    my ( $self, $skill_path ) = @_;
+    my $env_file = File::Spec->catfile( $skill_path, '.env' );
+    return undef if !-f $env_file;
+    open my $fh, '<', $env_file or die "Unable to read $env_file: $!";
+    while ( my $line = <$fh> ) {
+        chomp $line;
+        next if $line =~ /\A\s*(?:#|\z)/;
+        if ( $line =~ /\A\s*VERSION\s*=\s*(.*?)\s*\z/ ) {
+            my $version = $1;
+            $version =~ s/\A['"]//;
+            $version =~ s/['"]\z//;
+            close $fh;
+            return $version;
+        }
+    }
+    close $fh;
+    return undef;
+}
+
+# _install_version_status($before, $after)
+# Classifies one install result from the before and after .env VERSION values.
+# Input: optional version strings.
+# Output: installed, updated, no update, or unknown.
+sub _install_version_status {
+    my ( $self, $before, $after ) = @_;
+    return 'installed' if !defined $before && defined $after;
+    return 'updated'   if defined $before && defined $after && $before ne $after;
+    return 'no update' if defined $before && defined $after && $before eq $after;
+    return 'unknown';
 }
 
 # _prepare_skill_layout($skill_path)
@@ -896,6 +1156,7 @@ sub _install_skill_dependency_manifest {
         my ( $step_stdout, $step_stderr, $exit ) = do {
             local $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} = $install_stack;
             local $ENV{DEVELOPER_DASHBOARD_DEPENDENCY_MANIFEST} = $manifest_name;
+            local $ENV{DEVELOPER_DASHBOARD_SKIP_SKILL_REGISTRY} = 1;
             my $cwd = Cwd::getcwd();
             my ( $stdout, $stderr, $status );
             eval {
@@ -1039,18 +1300,46 @@ sub _install_manifest_file {
     my @sources = $self->_dependency_file_lines($manifest_path);
     return { success => 1, skipped => 1 } if !@sources;
 
+    my $idx = 0;
     for my $source (@sources) {
+        my $task_id = 'install_source_' . $idx;
+        $self->_progress_emit( { task_id => $task_id, status => 'running', label => "Install/update $source" } )
+          if $args{progress};
         my $result = $self->_install_to_skills_root( $source, $skills_root );
-        return $result if $result->{error};
+        if ( $result->{error} ) {
+            $self->_progress_emit( { task_id => $task_id, status => 'failed', label => "Install/update $source" } )
+              if $args{progress};
+            return $result;
+        }
         push @{$operations}, {
-            manifest  => $manifest_name,
-            source    => $source,
-            repo_name => $result->{repo_name},
-            path      => $result->{path},
+            manifest       => $manifest_name,
+            source         => $source,
+            repo_name      => $result->{repo_name},
+            path           => $result->{path},
+            version_before => $result->{version_before},
+            version_after  => $result->{version_after},
+            status         => $result->{status},
+            changed        => $result->{changed},
         } if ref($operations) eq 'ARRAY';
+        $self->_progress_emit( { task_id => $task_id, status => 'done', label => $self->_install_result_progress_label($source, $result) } )
+          if $args{progress};
+        $idx++;
     }
 
     return { success => 1 };
+}
+
+# _install_result_progress_label($source, $result)
+# Builds a concise source-level completion label for an install result.
+# Input: source string and install result hash reference.
+# Output: operator-facing progress label with status and version transition.
+sub _install_result_progress_label {
+    my ( $self, $source, $result ) = @_;
+    my $repo = ref($result) eq 'HASH' && $result->{repo_name} ? $result->{repo_name} : $source;
+    my $status = ref($result) eq 'HASH' && $result->{status} ? $result->{status} : 'done';
+    my $before = ref($result) eq 'HASH' && defined $result->{version_before} ? $result->{version_before} : '-';
+    my $after  = ref($result) eq 'HASH' && defined $result->{version_after}  ? $result->{version_after}  : '-';
+    return "$repo $status ($before -> $after)";
 }
 
 # _install_skill_aptfile($skill_path)

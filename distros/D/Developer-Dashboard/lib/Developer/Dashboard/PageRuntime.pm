@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '3.04';
+our $VERSION = '3.09';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -523,12 +523,12 @@ sub _terminate_saved_ajax_process {
     my ( $self, $pid ) = @_;
     return 1 if !$pid;
     return 1 if !kill 0, $pid;
-    kill 'TERM', $pid;
+    kill 15, $pid;
     for ( 1 .. 20 ) {
         return 1 if !kill 0, $pid;
         sleep 0.05;
     }
-    kill 'KILL', $pid if kill 0, $pid;
+    kill 9, $pid if kill 0, $pid;
     return 1;
 }
 

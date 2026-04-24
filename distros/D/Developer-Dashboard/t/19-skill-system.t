@@ -899,15 +899,13 @@ JSON
     chdir $cwd or die "Unable to chdir back to $cwd: $!";
 }
 
-my ( $removed_skill_stdout, $removed_skill_stderr, $removed_skill_exit ) = capture {
-    system( $^X, '-I', 'lib', $repo_bin, 'skill', 'alpha-skill', 'run-test', 'cli' );
+my ( $singular_skill_stdout, $singular_skill_stderr, $singular_skill_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skill', 'list', '-o', 'json' );
 };
-is( $removed_skill_exit >> 8, 1, 'dashboard skill no longer dispatches installed skill commands' );
-like(
-    $removed_skill_stdout . $removed_skill_stderr,
-    qr/Unsupported built-in dashboard command 'skill'|Usage:/s,
-    'dashboard skill now fails as a removed public command',
-);
+is( $singular_skill_exit >> 8, 0, 'dashboard skill aliases the skills management command family' );
+is( $singular_skill_stderr, '', 'dashboard skill alias does not emit errors for management commands' );
+my $singular_skill_list = decode_json($singular_skill_stdout);
+ok( scalar( grep { $_->{name} eq 'alpha-skill' } @{ $singular_skill_list->{skills} } ), 'dashboard skill list sees installed skills through the alias' );
 
 my ( $dotted_skill_stdout, $dotted_skill_stderr, $dotted_skill_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'alpha-skill.run-test', 'cli-dot' );
